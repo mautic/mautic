@@ -27,7 +27,7 @@ class LeadChangeEventDispatcher
         $this->dispatcher = $dispatcher;
     }
 
-    public function dispatchEvents(Events\LeadEvent $event, array $changes)
+    public function dispatchEvents(Events\LeadEvent $event, array $changes): void
     {
         $this->lead    = $event->getLead();
         $this->changes = $changes;
@@ -38,7 +38,7 @@ class LeadChangeEventDispatcher
         $this->dispatchDncChangeEvent();
     }
 
-    private function dispatchDateIdentifiedEvent(Events\LeadEvent $event)
+    private function dispatchDateIdentifiedEvent(Events\LeadEvent $event): void
     {
         if (!isset($this->changes['dateIdentified'])) {
             return;
@@ -47,7 +47,7 @@ class LeadChangeEventDispatcher
         $this->dispatcher->dispatch($event, LeadEvents::LEAD_IDENTIFIED);
     }
 
-    private function dispatchPointChangeEvent(Events\LeadEvent $event)
+    private function dispatchPointChangeEvent(Events\LeadEvent $event): void
     {
         if (!isset($this->changes['points'])) {
             return;
@@ -69,7 +69,7 @@ class LeadChangeEventDispatcher
         $this->dispatcher->dispatch($pointsEvent, LeadEvents::LEAD_POINTS_CHANGE);
     }
 
-    private function dispatchUtmTagsChangeEvent()
+    private function dispatchUtmTagsChangeEvent(): void
     {
         if (!isset($this->changes['utmtags'])) {
             return;
@@ -79,7 +79,7 @@ class LeadChangeEventDispatcher
         $this->dispatcher->dispatch($utmTagsEvent, LeadEvents::LEAD_UTMTAGS_ADD);
     }
 
-    private function dispatchDncChangeEvent()
+    private function dispatchDncChangeEvent(): void
     {
         if (!isset($this->changes['dnc_channel_status'])) {
             return;

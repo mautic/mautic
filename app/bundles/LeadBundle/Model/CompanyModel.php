@@ -81,7 +81,7 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
      * @param Company $entity
      * @param bool    $unlock
      */
-    public function saveEntity($entity, $unlock = true)
+    public function saveEntity($entity, $unlock = true): void
     {
         // Update leads primary company name
         $this->setEntityDefaultValues($entity, 'company');
@@ -245,7 +245,7 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
      *
      * @param bool|false $overwriteWithBlank
      */
-    public function setFieldValues(Company $company, array $data, $overwriteWithBlank = false)
+    public function setFieldValues(Company $company, array $data, $overwriteWithBlank = false): void
     {
         // save the field values
         $fieldValues = $company->getFields();
@@ -425,7 +425,7 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
      *
      * @throws \Doctrine\ORM\ORMException
      */
-    public function removeLeadFromCompany($companies, $lead)
+    public function removeLeadFromCompany($companies, $lead): void
     {
         if (!$lead instanceof Lead) {
             $leadId = (is_array($lead) && isset($lead['id'])) ? $lead['id'] : $lead;

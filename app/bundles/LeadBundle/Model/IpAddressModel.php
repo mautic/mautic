@@ -28,7 +28,7 @@ class IpAddressModel
      * Saving IP Address references sometimes throws UniqueConstraintViolationException exception on Lead entity save.
      * Rather pre-save the IP references here and catch the exception.
      */
-    public function saveIpAddressesReferencesForContact(Lead $contact)
+    public function saveIpAddressesReferencesForContact(Lead $contact): void
     {
         foreach ($contact->getIpAddresses() as $ipAddress) {
             $this->insertIpAddressReference($contact, $ipAddress);
@@ -48,7 +48,7 @@ class IpAddressModel
     /**
      * Tries to insert the Lead/IP relation and continues even if UniqueConstraintViolationException is thrown.
      */
-    private function insertIpAddressReference(Lead $contact, IpAddress $ipAddress)
+    private function insertIpAddressReference(Lead $contact, IpAddress $ipAddress): void
     {
         $ipAddressAdded = isset($contact->getChanges()['ipAddressList'][$ipAddress->getIpAddress()]);
         if (!$ipAddressAdded || !$ipAddress->getId() || !$contact->getId()) {

@@ -206,7 +206,7 @@ class ContactSegmentQueryBuilder
         return $queryBuilder;
     }
 
-    public function queryBuilderGenerated(LeadList $segment, QueryBuilder $queryBuilder)
+    public function queryBuilderGenerated(LeadList $segment, QueryBuilder $queryBuilder): void
     {
         if (!$this->dispatcher->hasListeners(LeadEvents::LIST_FILTERS_QUERYBUILDER_GENERATED)) {
             return;

@@ -46,7 +46,7 @@ class WebhookSubscriber implements EventSubscriberInterface
     /**
      * Add event triggers and actions.
      */
-    public function onWebhookBuild(WebhookBuilderEvent $event)
+    public function onWebhookBuild(WebhookBuilderEvent $event): void
     {
         // add checkbox to the webhook form for new leads
         $event->addEvent(
@@ -130,7 +130,7 @@ class WebhookSubscriber implements EventSubscriberInterface
         );
     }
 
-    public function onLeadNewUpdate(LeadEvent $event)
+    public function onLeadNewUpdate(LeadEvent $event): void
     {
         $lead = $event->getLead();
         if ($lead->isAnonymous()) {
@@ -161,7 +161,7 @@ class WebhookSubscriber implements EventSubscriberInterface
         );
     }
 
-    public function onLeadPointChange(PointsChangeEvent $event)
+    public function onLeadPointChange(PointsChangeEvent $event): void
     {
         $this->webhookModel->queueWebhooksByType(
             LeadEvents::LEAD_POINTS_CHANGE,
@@ -183,7 +183,7 @@ class WebhookSubscriber implements EventSubscriberInterface
         );
     }
 
-    public function onLeadDelete(LeadEvent $event)
+    public function onLeadDelete(LeadEvent $event): void
     {
         $lead = $event->getLead();
         $this->webhookModel->queueWebhooksByType(
@@ -202,7 +202,7 @@ class WebhookSubscriber implements EventSubscriberInterface
         );
     }
 
-    public function onChannelSubscriptionChange(ChannelSubscriptionChange $event)
+    public function onChannelSubscriptionChange(ChannelSubscriptionChange $event): void
     {
         $this->webhookModel->queueWebhooksByType(
             LeadEvents::CHANNEL_SUBSCRIPTION_CHANGED,
@@ -223,7 +223,7 @@ class WebhookSubscriber implements EventSubscriberInterface
         );
     }
 
-    public function onLeadCompanyChange(LeadChangeCompanyEvent $event)
+    public function onLeadCompanyChange(LeadChangeCompanyEvent $event): void
     {
         $leads = $event->getLeads();
         if (empty($leads)) {
@@ -243,7 +243,7 @@ class WebhookSubscriber implements EventSubscriberInterface
         }
     }
 
-    public function onCompanySave(CompanyEvent $event)
+    public function onCompanySave(CompanyEvent $event): void
     {
         $this->webhookModel->queueWebhooksByType(
             LeadEvents::COMPANY_POST_SAVE,
@@ -253,7 +253,7 @@ class WebhookSubscriber implements EventSubscriberInterface
         );
     }
 
-    public function onCompanyDelete(CompanyEvent $event)
+    public function onCompanyDelete(CompanyEvent $event): void
     {
         $company = $event->getCompany();
         $this->webhookModel->queueWebhooksByType(

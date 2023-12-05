@@ -36,7 +36,7 @@ class LeadNote extends FormEntity
      */
     private $dateTime;
 
-    public static function loadMetadata(ORM\ClassMetadata $metadata)
+    public static function loadMetadata(ORM\ClassMetadata $metadata): void
     {
         $builder = new ClassMetadataBuilder($metadata);
 
@@ -63,7 +63,7 @@ class LeadNote extends FormEntity
     /**
      * Prepares the metadata for API usage.
      */
-    public static function loadApiMetadata(ApiMetadataDriver $metadata)
+    public static function loadApiMetadata(ApiMetadataDriver $metadata): void
     {
         $metadata->setGroupPrefix('leadNote')
             ->addProperties(
@@ -141,7 +141,7 @@ class LeadNote extends FormEntity
     /**
      * Form validation rules.
      */
-    public static function loadValidatorMetadata(ClassMetadata $metadata)
+    public static function loadValidatorMetadata(ClassMetadata $metadata): void
     {
         $metadata->addPropertyConstraint('text', new NotBlank(
             ['message' => 'mautic.lead.note.text.notblank']
@@ -156,7 +156,7 @@ class LeadNote extends FormEntity
         return $this->lead;
     }
 
-    public function setLead(Lead $lead)
+    public function setLead(Lead $lead): void
     {
         $this->lead = $lead;
     }
@@ -180,7 +180,7 @@ class LeadNote extends FormEntity
     /**
      * @param mixed $dateTime
      */
-    public function setDateTime($dateTime)
+    public function setDateTime($dateTime): void
     {
         $this->dateTime = $dateTime;
     }

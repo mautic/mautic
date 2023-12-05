@@ -83,7 +83,7 @@ class LeadList extends FormEntity
         $this->leads = new ArrayCollection();
     }
 
-    public static function loadMetadata(ORM\ClassMetadata $metadata)
+    public static function loadMetadata(ORM\ClassMetadata $metadata): void
     {
         $builder = new ClassMetadataBuilder($metadata);
 
@@ -128,7 +128,7 @@ class LeadList extends FormEntity
             ->build();
     }
 
-    public static function loadValidatorMetadata(ClassMetadata $metadata)
+    public static function loadValidatorMetadata(ClassMetadata $metadata): void
     {
         $metadata->addPropertyConstraint('name', new Assert\NotBlank(
             ['message' => 'mautic.core.name.required']
@@ -145,7 +145,7 @@ class LeadList extends FormEntity
     /**
      * Prepares the metadata for API usage.
      */
-    public static function loadApiMetadata(ApiMetadataDriver $metadata)
+    public static function loadApiMetadata(ApiMetadataDriver $metadata): void
     {
         $metadata->setGroupPrefix('leadList')
             ->addListProperties(
@@ -373,7 +373,7 @@ class LeadList extends FormEntity
     /**
      * @param bool $isPreferenceCenter
      */
-    public function setIsPreferenceCenter($isPreferenceCenter)
+    public function setIsPreferenceCenter($isPreferenceCenter): void
     {
         $this->isChanged('isPreferenceCenter', (bool) $isPreferenceCenter);
         $this->isPreferenceCenter = (bool) $isPreferenceCenter;

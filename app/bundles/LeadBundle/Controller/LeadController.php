@@ -792,7 +792,7 @@ class LeadController extends FormController
     /**
      * Upload an asset.
      */
-    private function uploadAvatar(Request $request, AvatarHelper $avatarHelper, Lead $lead)
+    private function uploadAvatar(Request $request, AvatarHelper $avatarHelper, Lead $lead): void
     {
         $leadInformation = $request->files->get('lead', []);
         $file            = $leadInformation['custom_avatar'] ?? null;

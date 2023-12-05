@@ -17,7 +17,7 @@ class LeadCategoryType extends AbstractType
         $this->categoryModel = $categoryModel;
     }
 
-    public function configureOptions(OptionsResolver $resolver)
+    public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults([
             'choices'           => function (Options $options): array {

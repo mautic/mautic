@@ -114,7 +114,7 @@ class LeadListFilteringEvent extends CommonEvent
     /**
      * @param bool $status
      */
-    public function setFilteringStatus($status)
+    public function setFilteringStatus($status): void
     {
         $this->isFilteringDone = $status;
     }
@@ -122,7 +122,7 @@ class LeadListFilteringEvent extends CommonEvent
     /**
      * @param string $query
      */
-    public function setSubQuery($query)
+    public function setSubQuery($query): void
     {
         $this->subQuery = $query;
 
@@ -148,7 +148,7 @@ class LeadListFilteringEvent extends CommonEvent
     /**
      * @param array $details
      */
-    public function setDetails($details)
+    public function setDetails($details): void
     {
         $this->details = $details;
     }

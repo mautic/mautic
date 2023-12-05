@@ -28,7 +28,7 @@ class DoctrineSubscriber implements EventSubscriber
         ];
     }
 
-    public function postGenerateSchema(GenerateSchemaEventArgs $args)
+    public function postGenerateSchema(GenerateSchemaEventArgs $args): void
     {
         $schema = $args->getSchema();
 

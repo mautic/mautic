@@ -58,7 +58,7 @@ class LeadListFiltersOperatorsEvent extends CommonEvent
      * @param string $operatorKey
      * @param array  $operatorConfig
      */
-    public function addOperator($operatorKey, $operatorConfig)
+    public function addOperator($operatorKey, $operatorConfig): void
     {
         if (!array_key_exists($operatorKey, $this->operators)) {
             $this->operators[$operatorKey] = $operatorConfig;

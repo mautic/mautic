@@ -50,7 +50,7 @@ class PointsChangeLog
 
     private ?Group $group = null;
 
-    public static function loadMetadata(ORM\ClassMetadata $metadata)
+    public static function loadMetadata(ORM\ClassMetadata $metadata): void
     {
         $builder = new ClassMetadataBuilder($metadata);
 

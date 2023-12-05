@@ -115,7 +115,7 @@ class TagEntityModelTransformer implements DataTransformerInterface
      *
      * @param string $repo
      */
-    public function setRepository($repo)
+    public function setRepository($repo): void
     {
         $this->repository = $repo;
     }

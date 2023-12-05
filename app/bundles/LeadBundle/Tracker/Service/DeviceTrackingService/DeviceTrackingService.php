@@ -115,7 +115,7 @@ final class DeviceTrackingService implements DeviceTrackingServiceInterface
         return $device;
     }
 
-    public function clearTrackingCookies()
+    public function clearTrackingCookies(): void
     {
         $this->cookieHelper->deleteCookie('mautic_device_id');
         $this->cookieHelper->deleteCookie('mtc_id');
@@ -152,7 +152,7 @@ final class DeviceTrackingService implements DeviceTrackingServiceInterface
         return $generatedIdentifier;
     }
 
-    private function createTrackingCookies(LeadDevice $device)
+    private function createTrackingCookies(LeadDevice $device): void
     {
         // Device cookie
         $this->cookieHelper->setCookie('mautic_device_id', $device->getTrackingId(), 31536000, sameSite: Cookie::SAMESITE_NONE);

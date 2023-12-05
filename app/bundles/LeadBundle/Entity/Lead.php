@@ -235,7 +235,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
         $this->groupScores      = new ArrayCollection();
     }
 
-    public static function loadMetadata(ORM\ClassMetadata $metadata)
+    public static function loadMetadata(ORM\ClassMetadata $metadata): void
     {
         $builder = new ClassMetadataBuilder($metadata);
 
@@ -417,7 +417,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
     /**
      * Prepares the metadata for API usage.
      */
-    public static function loadApiMetadata(ApiMetadataDriver $metadata)
+    public static function loadApiMetadata(ApiMetadataDriver $metadata): void
     {
         $metadata->setRoot('lead')
             ->setGroupPrefix('leadBasic')
@@ -646,7 +646,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
     /**
      * Remove ipAddress.
      */
-    public function removeIpAddress(IpAddress $ipAddress)
+    public function removeIpAddress(IpAddress $ipAddress): void
     {
         $this->ipAddresses->removeElement($ipAddress);
     }
@@ -867,7 +867,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
     /**
      * Set by the repository method when points are updated and requeried directly on the DB side.
      */
-    public function setActualPoints($points)
+    public function setActualPoints($points): void
     {
         $this->actualPoints = (int) $points;
         $this->pointChanges = [];
@@ -927,7 +927,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
     /**
      * Creates a points change entry.
      */
-    public function stageChangeLogEntry($stage, $name, $action)
+    public function stageChangeLogEntry($stage, $name, $action): void
     {
         // create a new points change event
         $event = new StagesChangeLog();
@@ -962,7 +962,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
     /**
      * Remove pointsChangeLog.
      */
-    public function removePointsChangeLog(PointsChangeLog $pointsChangeLog)
+    public function removePointsChangeLog(PointsChangeLog $pointsChangeLog): void
     {
         $this->pointsChangeLog->removeElement($pointsChangeLog);
     }
@@ -1064,7 +1064,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
         return $this;
     }
 
-    public function removePushID(PushID $pushID)
+    public function removePushID(PushID $pushID): void
     {
         $this->pushIds->removeElement($pushID);
     }
@@ -1088,7 +1088,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
         return $this;
     }
 
-    public function removeEventLog(LeadEventLog $eventLog)
+    public function removeEventLog(LeadEventLog $eventLog): void
     {
         $this->eventLog->removeElement($eventLog);
     }
@@ -1108,7 +1108,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
         return $this;
     }
 
-    public function removeDoNotContactEntry(DoNotContact $doNotContact)
+    public function removeDoNotContactEntry(DoNotContact $doNotContact): void
     {
         $this->changes['dnc_channel_status'][$doNotContact->getChannel()] = [
             'reason'     => DoNotContact::IS_CONTACTABLE,
@@ -1130,7 +1130,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
     /**
      * Set internal storage.
      */
-    public function setInternal($internal)
+    public function setInternal($internal): void
     {
         $this->internal = $internal;
     }
@@ -1148,7 +1148,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
     /**
      * Set social cache.
      */
-    public function setSocialCache($cache)
+    public function setSocialCache($cache): void
     {
         $this->socialCache = $cache;
     }
@@ -1174,7 +1174,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
     /**
      * @param mixed $color
      */
-    public function setColor($color)
+    public function setColor($color): void
     {
         $this->color = $color;
     }
@@ -1249,7 +1249,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
     /**
      * @param bool $newlyCreated Created
      */
-    public function setNewlyCreated($newlyCreated)
+    public function setNewlyCreated($newlyCreated): void
     {
         $this->newlyCreated = $newlyCreated;
     }
@@ -1265,7 +1265,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
     /**
      * @param string $source
      */
-    public function setPreferredProfileImage($source)
+    public function setPreferredProfileImage($source): void
     {
         $this->preferredProfileImage = $source;
     }
@@ -1289,7 +1289,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
     /**
      * @param mixed $dateIdentified
      */
-    public function setDateIdentified($dateIdentified)
+    public function setDateIdentified($dateIdentified): void
     {
         $this->isChanged('dateIdentified', $dateIdentified);
         $this->dateIdentified = $dateIdentified;
@@ -1306,13 +1306,13 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
     /**
      * @param mixed $lastActive
      */
-    public function setLastActive($lastActive)
+    public function setLastActive($lastActive): void
     {
         $this->changes['dateLastActive'] = [$this->lastActive, $lastActive];
         $this->lastActive                = $lastActive;
     }
 
-    public function setAvailableSocialFields(array $availableSocialFields)
+    public function setAvailableSocialFields(array $availableSocialFields): void
     {
         $this->availableSocialFields = $availableSocialFields;
     }
@@ -1333,7 +1333,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
     /**
      * Remove tag.
      */
-    public function removeTag(Tag $tag)
+    public function removeTag(Tag $tag): void
     {
         $this->isChanged('tags', $tag->getTag());
         $this->tags->removeElement($tag);
@@ -1384,7 +1384,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
         return $this;
     }
 
-    public function removeUtmTagEntry(UtmTag $utmTag)
+    public function removeUtmTagEntry(UtmTag $utmTag): void
     {
         $this->changes['utmtags'] = ['removed', 'UtmTagID:'.$utmTag->getId()];
         $this->utmtags->removeElement($utmTag);
@@ -1440,7 +1440,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
     /**
      * Remove frequencyRule.
      */
-    public function removeFrequencyRule(FrequencyRule $frequencyRule)
+    public function removeFrequencyRule(FrequencyRule $frequencyRule): void
     {
         $this->isChanged('frequencyRules', $frequencyRule->getId(), false);
         $this->frequencyRules->removeElement($frequencyRule);
@@ -1449,7 +1449,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
     /**
      * Add frequency rule.
      */
-    public function addFrequencyRule(FrequencyRule $frequencyRule)
+    public function addFrequencyRule(FrequencyRule $frequencyRule): void
     {
         $this->isChanged('frequencyRules', $frequencyRule, false);
         $this->frequencyRules[] = $frequencyRule;
@@ -1468,7 +1468,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
     /**
      * If there is an attribution amount but no date, insert today's date.
      */
-    public function checkAttributionDate()
+    public function checkAttributionDate(): void
     {
         $attribution     = $this->getFieldValue('attribution');
         $attributionDate = $this->getFieldValue('attribution_date');
@@ -1483,7 +1483,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
     /**
      * Set date identified.
      */
-    public function checkDateIdentified()
+    public function checkDateIdentified(): void
     {
         if ($this->wasAnonymous()) {
             $this->dateIdentified            = new \DateTime();
@@ -1494,7 +1494,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
     /**
      * Set date added if not already set.
      */
-    public function checkDateAdded()
+    public function checkDateAdded(): void
     {
         if (null === $this->getDateAdded()) {
             $this->setDateAdded(new \DateTime());

@@ -347,7 +347,7 @@ class QueryBuilder extends BaseQueryBuilder
      * This function assembles correct logic for segment processing, this is to replace andWhere and orWhere (virtualy
      *  as they need to be kept). You may not use andWhere in filters!!!
      */
-    public function addLogic($expression, $glue)
+    public function addLogic($expression, $glue): void
     {
         // little setup
         $glue = strtolower($glue);

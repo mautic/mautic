@@ -21,7 +21,7 @@ final class ImportInitEvent extends CommonEvent
         $this->routeObjectName = $routeObjectName;
     }
 
-    public function setIndexRoute(?string $indexRoute, array $routeParams = [])
+    public function setIndexRoute(?string $indexRoute, array $routeParams = []): void
     {
         $this->indexRoute       = $indexRoute;
         $this->indexRouteParams = $routeParams;

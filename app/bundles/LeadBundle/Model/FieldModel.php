@@ -615,7 +615,7 @@ class FieldModel extends FormModel
      *
      * @throws \Mautic\CoreBundle\Exception\SchemaException
      */
-    public function deleteEntity($entity)
+    public function deleteEntity($entity): void
     {
         parent::deleteEntity($entity);
 
@@ -728,7 +728,7 @@ class FieldModel extends FormModel
      *
      * @param int $start Number to start the order by (used for paginated reordering)
      */
-    public function reorderFieldsByList(array $list, $start = 1)
+    public function reorderFieldsByList(array $list, $start = 1): void
     {
         $fields = $this->getRepository()->findBy([], ['order' => 'ASC']);
         foreach ($fields as $field) {

@@ -48,7 +48,7 @@ class SegmentSubscriber implements EventSubscriberInterface
     /**
      * Add a segment entry to the audit log.
      */
-    public function onSegmentPostSave(SegmentEvent $event)
+    public function onSegmentPostSave(SegmentEvent $event): void
     {
         $segment = $event->getList();
         if ($details = $event->getChanges()) {
@@ -79,7 +79,7 @@ class SegmentSubscriber implements EventSubscriberInterface
     /**
      * Add a segment delete entry to the audit log.
      */
-    public function onSegmentDelete(SegmentEvent $event)
+    public function onSegmentDelete(SegmentEvent $event): void
     {
         $segment = $event->getList();
         $log     = [

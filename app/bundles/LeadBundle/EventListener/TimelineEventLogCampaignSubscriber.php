@@ -39,7 +39,7 @@ class TimelineEventLogCampaignSubscriber implements EventSubscriberInterface
         ];
     }
 
-    public function onChange(CampaignLeadChangeEvent $event)
+    public function onChange(CampaignLeadChangeEvent $event): void
     {
         if (!$contact = $event->getLead()) {
             return;
@@ -52,7 +52,7 @@ class TimelineEventLogCampaignSubscriber implements EventSubscriberInterface
         );
     }
 
-    public function onBatchChange(CampaignLeadChangeEvent $event)
+    public function onBatchChange(CampaignLeadChangeEvent $event): void
     {
         if (!$contacts = $event->getLeads()) {
             return;
@@ -65,7 +65,7 @@ class TimelineEventLogCampaignSubscriber implements EventSubscriberInterface
         );
     }
 
-    public function onTimelineGenerate(LeadTimelineEvent $event)
+    public function onTimelineGenerate(LeadTimelineEvent $event): void
     {
         $this->addEvents(
             $event,
@@ -80,7 +80,7 @@ class TimelineEventLogCampaignSubscriber implements EventSubscriberInterface
     /**
      * @param Lead[] $contacts
      */
-    private function writeEntries(array $contacts, Campaign $campaign, $action)
+    private function writeEntries(array $contacts, Campaign $campaign, $action): void
     {
         $user = $this->userHelper->getUser();
 

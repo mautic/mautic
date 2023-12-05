@@ -32,7 +32,7 @@ class ListPreProcessListEvent extends CommonEvent
     /**
      * Sets the lead list entity.
      */
-    public function setList(array $list)
+    public function setList(array $list): void
     {
         $this->list = $list;
     }

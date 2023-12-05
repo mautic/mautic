@@ -11,7 +11,7 @@ class SegmentActionModel
         $this->contactModel = $contactModel;
     }
 
-    public function addContacts(array $contactIds, array $segmentIds)
+    public function addContacts(array $contactIds, array $segmentIds): void
     {
         $contacts = $this->contactModel->getLeadsByIds($contactIds);
 
@@ -26,7 +26,7 @@ class SegmentActionModel
         $this->contactModel->saveEntities($contacts);
     }
 
-    public function removeContacts(array $contactIds, array $segmentIds)
+    public function removeContacts(array $contactIds, array $segmentIds): void
     {
         $contacts = $this->contactModel->getLeadsByIds($contactIds);
 

@@ -26,12 +26,12 @@ trait FilterTrait
      */
     protected $connection;
 
-    public function setConnection(Connection $connection)
+    public function setConnection(Connection $connection): void
     {
         $this->connection = $connection;
     }
 
-    public function buildFiltersForm($eventName, FormEvent $event, TranslatorInterface $translator, $currentListId = null)
+    public function buildFiltersForm($eventName, FormEvent $event, TranslatorInterface $translator, $currentListId = null): void
     {
         $data    = $event->getData();
         $form    = $event->getForm();
@@ -317,7 +317,7 @@ trait FilterTrait
                 // Let's add a custom valdiator to test the regex
                 $customOptions['constraints'][] =
                     new Callback(
-                        function ($regex, ExecutionContextInterface $context) {
+                        function ($regex, ExecutionContextInterface $context): void {
                             // Let's test the regex's syntax by making a fake query
                             try {
                                 $qb = $this->connection->createQueryBuilder();

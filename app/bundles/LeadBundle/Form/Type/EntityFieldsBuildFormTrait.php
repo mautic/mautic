@@ -158,7 +158,7 @@ trait EntityFieldsBuildFormTrait
 
                         $builder->addEventListener(
                             FormEvents::PRE_SUBMIT,
-                            function (FormEvent $event) use ($alias, $type) {
+                            function (FormEvent $event) use ($alias, $type): void {
                                 $data = $event->getData();
 
                                 if (!empty($data[$alias])) {
