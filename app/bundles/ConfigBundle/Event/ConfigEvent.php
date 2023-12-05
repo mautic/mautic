@@ -9,27 +9,24 @@ use Symfony\Component\HttpFoundation\ParameterBag;
 class ConfigEvent extends CommonEvent
 {
     /**
-     * @var array
+     * @var mixed[]
      */
     private $preserve = [];
 
     /**
-     * @param array
+     * @var mixed[]
      */
-    private $config;
+    private array $config;
 
-    /**
-     * @param ParameterBag
-     */
     private \Symfony\Component\HttpFoundation\ParameterBag $post;
 
     /**
-     * @var array
+     * @var mixed[]
      */
     private $errors = [];
 
     /**
-     * @var array
+     * @var mixed[]
      */
     private $fieldErrors = [];
 
