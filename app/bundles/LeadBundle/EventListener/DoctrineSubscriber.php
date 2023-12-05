@@ -11,10 +11,7 @@ use Monolog\Logger;
 
 class DoctrineSubscriber implements EventSubscriber
 {
-    /**
-     * @var Logger
-     */
-    private $logger;
+    private \Monolog\Logger $logger;
 
     public function __construct(Logger $logger)
     {

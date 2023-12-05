@@ -7,10 +7,7 @@ use Symfony\Contracts\EventDispatcher\Event;
 
 class AuthenticationContentEvent extends Event
 {
-    /**
-     * @var Request
-     */
-    protected $request;
+    protected \Symfony\Component\HttpFoundation\Request $request;
 
     /**
      * @var array
@@ -44,7 +41,7 @@ class AuthenticationContentEvent extends Event
         return $this->postLogout;
     }
 
-    public function addContent($content)
+    public function addContent($content): void
     {
         $this->content[] = $content;
     }

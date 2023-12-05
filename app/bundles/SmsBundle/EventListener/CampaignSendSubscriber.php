@@ -13,15 +13,9 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class CampaignSendSubscriber implements EventSubscriberInterface
 {
-    /**
-     * @var SmsModel
-     */
-    private $smsModel;
+    private \Mautic\SmsBundle\Model\SmsModel $smsModel;
 
-    /**
-     * @var TransportChain
-     */
-    private $transportChain;
+    private \Mautic\SmsBundle\Sms\TransportChain $transportChain;
 
     public function __construct(
         SmsModel $smsModel,
@@ -42,7 +36,7 @@ class CampaignSendSubscriber implements EventSubscriberInterface
         ];
     }
 
-    public function onCampaignBuild(CampaignBuilderEvent $event)
+    public function onCampaignBuild(CampaignBuilderEvent $event): void
     {
         if (count($this->transportChain->getEnabledTransports()) > 0) {
             $event->addAction(
@@ -61,10 +55,7 @@ class CampaignSendSubscriber implements EventSubscriberInterface
         }
     }
 
-    /**
-     * @return void
-     */
-    public function onCampaignTriggerAction(CampaignExecutionEvent $event)
+    public function onCampaignTriggerAction(CampaignExecutionEvent $event): void
     {
         $lead  = $event->getLead();
         $smsId = (int) $event->getConfig()['sms'];

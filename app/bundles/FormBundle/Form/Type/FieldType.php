@@ -23,25 +23,13 @@ class FieldType extends AbstractType
 {
     use FormFieldTrait;
 
-    /**
-     * @var TranslatorInterface
-     */
-    private $translator;
+    private \Symfony\Contracts\Translation\TranslatorInterface $translator;
 
-    /**
-     * @var ObjectCollectorInterface
-     */
-    private $objectCollector;
+    private \Mautic\FormBundle\Collector\ObjectCollectorInterface $objectCollector;
 
-    /**
-     * @var FieldCollectorInterface
-     */
-    private $fieldCollector;
+    private \Mautic\FormBundle\Collector\FieldCollectorInterface $fieldCollector;
 
-    /**
-     * @var AlreadyMappedFieldCollectorInterface
-     */
-    private $mappedFieldCollector;
+    private \Mautic\FormBundle\Collector\AlreadyMappedFieldCollectorInterface $mappedFieldCollector;
 
     public function __construct(
         TranslatorInterface $translator,
@@ -55,7 +43,7 @@ class FieldType extends AbstractType
         $this->mappedFieldCollector = $mappedFieldCollector;
     }
 
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         // Populate settings
         $cleanMasks = [
@@ -615,7 +603,7 @@ class FieldType extends AbstractType
         }
     }
 
-    public function configureOptions(OptionsResolver $resolver)
+    public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults(
             [

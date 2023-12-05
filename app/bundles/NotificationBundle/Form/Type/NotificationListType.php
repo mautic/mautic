@@ -12,7 +12,7 @@ class NotificationListType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function configureOptions(OptionsResolver $resolver)
+    public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults(
             [
@@ -20,7 +20,7 @@ class NotificationListType extends AbstractType
                 'modal_header'        => 'mautic.notification.header.new',
                 'model'               => 'notification',
                 'model_lookup_method' => 'getLookupResults',
-                'lookup_arguments'    => function (Options $options) {
+                'lookup_arguments'    => function (Options $options): array {
                     return [
                         'type'    => 'notification',
                         'filter'  => '$data',

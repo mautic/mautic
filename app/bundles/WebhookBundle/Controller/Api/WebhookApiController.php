@@ -26,7 +26,7 @@ class WebhookApiController extends CommonApiController
     /**
      * @var WebhookModel|null
      */
-    protected $model = null;
+    protected $model;
 
     private RequestStack $requestStack;
 

@@ -122,7 +122,7 @@ class SysinfoModel
         foreach ($importantFolders as $folder) {
             $folderPath = realpath($folder);
             $folderKey  = ($folderPath) ? $folderPath : $folder;
-            $isWritable = ($folderPath) ? is_writable($folderPath) : false;
+            $isWritable = $folderPath && is_writable($folderPath);
 
             $this->folders[$folderKey] = $isWritable;
         }

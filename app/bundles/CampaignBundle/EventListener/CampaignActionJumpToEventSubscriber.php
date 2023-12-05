@@ -18,25 +18,13 @@ class CampaignActionJumpToEventSubscriber implements EventSubscriberInterface
 {
     public const EVENT_NAME = 'campaign.jump_to_event';
 
-    /**
-     * @var EventRepository
-     */
-    private $eventRepository;
+    private \Mautic\CampaignBundle\Entity\EventRepository $eventRepository;
 
-    /**
-     * @var EventExecutioner
-     */
-    private $eventExecutioner;
+    private \Mautic\CampaignBundle\Executioner\EventExecutioner $eventExecutioner;
 
-    /**
-     * @var TranslatorInterface
-     */
-    private $translator;
+    private \Symfony\Contracts\Translation\TranslatorInterface $translator;
 
-    /**
-     * @var LeadRepository
-     */
-    private $leadRepository;
+    private \Mautic\CampaignBundle\Entity\LeadRepository $leadRepository;
 
     public function __construct(EventRepository $eventRepository, EventExecutioner $eventExecutioner, TranslatorInterface $translator, LeadRepository $leadRepository)
     {

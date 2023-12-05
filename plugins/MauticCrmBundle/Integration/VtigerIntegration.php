@@ -18,10 +18,7 @@ class VtigerIntegration extends CrmAbstractIntegration
         return 'Vtiger';
     }
 
-    /**
-     * @return array
-     */
-    public function getSupportedFeatures()
+    public function getSupportedFeatures(): array
     {
         return ['push_lead'];
     }
@@ -35,11 +32,9 @@ class VtigerIntegration extends CrmAbstractIntegration
     }
 
     /**
-     * {@inheritdoc}
-     *
-     * @return array
+     * @return array<string, string>
      */
-    public function getRequiredKeyFields()
+    public function getRequiredKeyFields(): array
     {
         return [
             'url'       => 'mautic.vtiger.form.url',
@@ -245,7 +240,7 @@ class VtigerIntegration extends CrmAbstractIntegration
     /**
      * {@inheritdoc}
      */
-    public function amendLeadDataBeforePush(&$mappedData)
+    public function amendLeadDataBeforePush(&$mappedData): void
     {
         if (!empty($mappedData)) {
             // vtiger requires assigned_user_id so default to authenticated user
@@ -258,7 +253,7 @@ class VtigerIntegration extends CrmAbstractIntegration
      * @param array                                             $data
      * @param string                                            $formArea
      */
-    public function appendToForm(&$builder, $data, $formArea)
+    public function appendToForm(&$builder, $data, $formArea): void
     {
         if ('features' == $formArea) {
             $builder->add(

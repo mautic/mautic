@@ -29,15 +29,9 @@ class MessageQueueModel extends FormModel
     /** @var string A default message reschedule interval */
     public const DEFAULT_RESCHEDULE_INTERVAL = 'PT15M';
 
-    /**
-     * @var LeadModel
-     */
-    protected $leadModel;
+    protected \Mautic\LeadBundle\Model\LeadModel $leadModel;
 
-    /**
-     * @var CompanyModel
-     */
-    protected $companyModel;
+    protected \Mautic\LeadBundle\Model\CompanyModel $companyModel;
 
     public function __construct(LeadModel $leadModel, CompanyModel $companyModel, CoreParametersHelper $coreParametersHelper, EntityManagerInterface $em, CorePermissions $security, EventDispatcherInterface $dispatcher, UrlGeneratorInterface $router, Translator $translator, UserHelper $userHelper, LoggerInterface $mauticLogger)
     {
@@ -299,7 +293,7 @@ class MessageQueueModel extends FormModel
     /**
      * @param bool $persist
      */
-    public function reschedule($message, \DateInterval $rescheduleInterval, $leadId = null, $channel = null, $channelId = null, $persist = false)
+    public function reschedule($message, \DateInterval $rescheduleInterval, $leadId = null, $channel = null, $channelId = null, $persist = false): void
     {
         if (!$message instanceof MessageQueue && $leadId && $channel && $channelId) {
             $message = $this->getRepository()->findMessage($channel, $channelId, $leadId);
@@ -335,11 +329,11 @@ class MessageQueueModel extends FormModel
      * @param null   $channelId
      * @param bool   $persist
      */
-    public function rescheduleMessage($message, $rescheduleInterval = null, $leadId = null, $channel = null, $channelId = null, $persist = false)
+    public function rescheduleMessage($message, $rescheduleInterval = null, $leadId = null, $channel = null, $channelId = null, $persist = false): void
     {
         $rescheduleInterval = null == $rescheduleInterval ? self::DEFAULT_RESCHEDULE_INTERVAL : ('P'.$rescheduleInterval);
 
-        return $this->reschedule($message, new \DateInterval($rescheduleInterval), $leadId, $channel, $channelId, $persist);
+        $this->reschedule($message, new \DateInterval($rescheduleInterval), $leadId, $channel, $channelId, $persist);
     }
 
     /**

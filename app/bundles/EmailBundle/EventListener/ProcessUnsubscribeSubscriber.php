@@ -15,15 +15,9 @@ class ProcessUnsubscribeSubscriber implements EventSubscriberInterface
     public const BUNDLE     = 'EmailBundle';
     public const FOLDER_KEY = 'unsubscribes';
 
-    /**
-     * @var Unsubscribe
-     */
-    private $unsubscriber;
+    private \Mautic\EmailBundle\MonitoredEmail\Processor\Unsubscribe $unsubscriber;
 
-    /**
-     * @var FeedbackLoop
-     */
-    private $looper;
+    private \Mautic\EmailBundle\MonitoredEmail\Processor\FeedbackLoop $looper;
 
     /**
      * @return array
@@ -43,12 +37,12 @@ class ProcessUnsubscribeSubscriber implements EventSubscriberInterface
         $this->looper       = $looper;
     }
 
-    public function onEmailConfig(MonitoredEmailEvent $event)
+    public function onEmailConfig(MonitoredEmailEvent $event): void
     {
         $event->addFolder(self::BUNDLE, self::FOLDER_KEY, 'mautic.email.config.monitored_email.unsubscribe_folder');
     }
 
-    public function onEmailParse(ParseEmailEvent $event)
+    public function onEmailParse(ParseEmailEvent $event): void
     {
         if ($event->isApplicable(self::BUNDLE, self::FOLDER_KEY)) {
             // Process the messages
@@ -64,7 +58,7 @@ class ProcessUnsubscribeSubscriber implements EventSubscriberInterface
     /**
      * Add an unsubscribe email to the List-Unsubscribe header if applicable.
      */
-    public function onEmailSend(EmailSendEvent $event)
+    public function onEmailSend(EmailSendEvent $event): void
     {
         $helper = $event->getHelper();
         if ($helper && $unsubscribeEmail = $helper->generateUnsubscribeEmail()) {

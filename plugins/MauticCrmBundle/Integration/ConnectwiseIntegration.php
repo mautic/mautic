@@ -29,20 +29,15 @@ class ConnectwiseIntegration extends CrmAbstractIntegration
         return 'Connectwise';
     }
 
-    /**
-     * @return array
-     */
-    public function getSupportedFeatures()
+    public function getSupportedFeatures(): array
     {
         return ['push_lead', 'get_leads'];
     }
 
     /**
-     * {@inheritdoc}
-     *
-     * @return array
+     * @return array<string, string>
      */
-    public function getRequiredKeyFields()
+    public function getRequiredKeyFields(): array
     {
         return [
             'username'  => 'mautic.connectwise.form.integrator',
@@ -104,10 +99,8 @@ class ConnectwiseIntegration extends CrmAbstractIntegration
 
     /**
      * {@inheritdoc}
-     *
-     * @return array
      */
-    public function getSecretKeys()
+    public function getSecretKeys(): array
     {
         return [
             'password',
@@ -174,9 +167,6 @@ class ConnectwiseIntegration extends CrmAbstractIntegration
         return 'basic';
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getDataPriority(): bool
     {
         return true;
@@ -255,7 +245,7 @@ class ConnectwiseIntegration extends CrmAbstractIntegration
      * @param array                                             $data
      * @param string                                            $formArea
      */
-    public function appendToForm(&$builder, $data, $formArea)
+    public function appendToForm(&$builder, $data, $formArea): void
     {
         if ('features' == $formArea) {
             $builder->add(
@@ -324,7 +314,7 @@ class ConnectwiseIntegration extends CrmAbstractIntegration
     /**
      * @return array of company fields for connectwise
      */
-    public function getCompanyFields()
+    public function getCompanyFields(): array
     {
         return [
             'identifier'            => ['type' => 'string', 'required' => true],
@@ -371,7 +361,7 @@ class ConnectwiseIntegration extends CrmAbstractIntegration
     /**
      * @return array of contact fields for connectwise
      */
-    public function getContactFields()
+    public function getContactFields(): array
     {
         return [
             'firstName'              => ['type' => 'string', 'required' => true],
@@ -914,7 +904,7 @@ class ConnectwiseIntegration extends CrmAbstractIntegration
         return false;
     }
 
-    public function saveCampaignMembers($allCampaignMembers, $campaignMemberObject, $campaignId)
+    public function saveCampaignMembers($allCampaignMembers, $campaignMemberObject, $campaignId): void
     {
         if (empty($allCampaignMembers)) {
             return;

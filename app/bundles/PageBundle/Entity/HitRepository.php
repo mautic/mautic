@@ -321,10 +321,8 @@ class HitRepository extends CommonRepository
 
     /**
      * Get array of dwell time labels with ranges.
-     *
-     * @return array
      */
-    public function getDwellTimeLabels()
+    public function getDwellTimeLabels(): array
     {
         return [
             [
@@ -442,10 +440,8 @@ class HitRepository extends CommonRepository
      * Count stats from hit times.
      *
      * @param array $times
-     *
-     * @return array
      */
-    public function countStats($times)
+    public function countStats($times): array
     {
         return [
             'sum'     => array_sum($times),
@@ -461,7 +457,7 @@ class HitRepository extends CommonRepository
      *
      * @param int $lastHitId
      */
-    public function updateHitDateLeft($lastHitId)
+    public function updateHitDateLeft($lastHitId): void
     {
         $dt = new DateTimeHelper();
         $q  = $this->_em->getConnection()->createQueryBuilder();
@@ -524,7 +520,7 @@ class HitRepository extends CommonRepository
         return $query->executeQuery()->fetchAllAssociative();
     }
 
-    public function updateLeadByTrackingId($leadId, $newTrackingId, $oldTrackingId)
+    public function updateLeadByTrackingId($leadId, $newTrackingId, $oldTrackingId): void
     {
         $q = $this->_em->getConnection()->createQueryBuilder();
         $q->update(MAUTIC_TABLE_PREFIX.'page_hits')
@@ -543,7 +539,7 @@ class HitRepository extends CommonRepository
     /**
      * Updates lead ID (e.g. after a lead merge).
      */
-    public function updateLead($fromLeadId, $toLeadId)
+    public function updateLead($fromLeadId, $toLeadId): void
     {
         $q = $this->_em->getConnection()->createQueryBuilder();
         $q->update(MAUTIC_TABLE_PREFIX.'page_hits')

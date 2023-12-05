@@ -9,10 +9,7 @@ use Symfony\Component\Routing\RouterInterface;
 
 class FieldValueTransformer
 {
-    /**
-     * @var RouterInterface
-     */
-    private $router;
+    private \Symfony\Component\Routing\RouterInterface $router;
 
     /**
      * @var array
@@ -34,7 +31,7 @@ class FieldValueTransformer
         $this->router = $router;
     }
 
-    public function transformValuesAfterSubmit(SubmissionEvent $submissionEvent)
+    public function transformValuesAfterSubmit(SubmissionEvent $submissionEvent): void
     {
         if (true === $this->isTransformed) {
             return;

@@ -10,15 +10,9 @@ use Symfony\Contracts\EventDispatcher\Event;
 
 class InternalObjectCreateEvent extends Event
 {
-    /**
-     * @var ObjectInterface
-     */
-    private $object;
+    private \Mautic\IntegrationsBundle\Sync\SyncDataExchange\Internal\Object\ObjectInterface $object;
 
-    /**
-     * @var array
-     */
-    private $createObjects;
+    private array $createObjects;
 
     /**
      * @var ObjectMapping[]

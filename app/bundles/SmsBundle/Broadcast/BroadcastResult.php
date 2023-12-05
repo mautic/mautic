@@ -14,7 +14,7 @@ class BroadcastResult
      */
     private $failedCount = 0;
 
-    public function process(array $results)
+    public function process(array $results): void
     {
         foreach ($results as $result) {
             if (isset($result['sent']) && true === $result['sent']) {
@@ -25,12 +25,12 @@ class BroadcastResult
         }
     }
 
-    public function sent()
+    public function sent(): void
     {
         ++$this->sentCount;
     }
 
-    public function failed()
+    public function failed(): void
     {
         ++$this->failedCount;
     }

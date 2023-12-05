@@ -7,10 +7,7 @@ use Mautic\EmailBundle\MonitoredEmail\Message;
 
 class Parser
 {
-    /**
-     * @var Message
-     */
-    private $message;
+    private \Mautic\EmailBundle\MonitoredEmail\Message $message;
 
     public function __construct(Message $message)
     {

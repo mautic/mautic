@@ -29,15 +29,9 @@ class ReportBuilderEvent extends AbstractReportEvent
         'line',
     ];
 
-    /**
-     * @var ChannelListHelper
-     */
-    private $channelListHelper;
+    private \Mautic\ChannelBundle\Helper\ChannelListHelper $channelListHelper;
 
-    /**
-     * @var TranslatorInterface
-     */
-    private $translator;
+    private \Symfony\Contracts\Translation\TranslatorInterface $translator;
 
     /**
      * Container with registered graphs.
@@ -53,7 +47,7 @@ class ReportBuilderEvent extends AbstractReportEvent
      */
     private $leadFields = [];
 
-    private $reportHelper;
+    private \Mautic\ReportBundle\Helper\ReportHelper $reportHelper;
 
     private ?string $reportSource;
 
@@ -146,7 +140,7 @@ class ReportBuilderEvent extends AbstractReportEvent
      *
      * @param string $prefix
      *
-     * @return string[]
+     * @return array<string,array<string,string>>
      */
     public function getStandardColumns($prefix, $removeColumns = [], $idLink = null)
     {
@@ -183,10 +177,8 @@ class ReportBuilderEvent extends AbstractReportEvent
      * Get IP Address column.
      *
      * @param string $prefix
-     *
-     * @return array
      */
-    public function getIpColumn($prefix = 'i.')
+    public function getIpColumn($prefix = 'i.'): array
     {
         return [
             $prefix.'ip_address' => [
@@ -200,10 +192,8 @@ class ReportBuilderEvent extends AbstractReportEvent
      * Add category columns.
      *
      * @param string $prefix
-     *
-     * @return array
      */
-    public function getCategoryColumns($prefix = 'c.')
+    public function getCategoryColumns($prefix = 'c.'): array
     {
         return [
             $prefix.'id' => [
@@ -221,10 +211,8 @@ class ReportBuilderEvent extends AbstractReportEvent
 
     /**
      * Add campaign columns joined by the campaign lead event log table.
-     *
-     * @return array
      */
-    public function getCampaignByChannelColumns()
+    public function getCampaignByChannelColumns(): array
     {
         return [
             'clel.campaign_id' => [

@@ -9,27 +9,18 @@ use Ramsey\Uuid\Uuid;
 
 class EmailReply
 {
-    /**
-     * @var string
-     */
-    private $id;
+    private string $id;
 
-    /**
-     * @var Stat
-     */
-    private $stat;
+    private \Mautic\EmailBundle\Entity\Stat $stat;
 
-    /**
-     * @var \DateTimeInterface
-     */
-    private $dateReplied;
+    private \DateTimeInterface $dateReplied;
 
     /**
      * @var string
      */
     private $messageId;
 
-    public static function loadMetadata(ORM\ClassMetadata $metadata)
+    public static function loadMetadata(ORM\ClassMetadata $metadata): void
     {
         $builder = new ClassMetadataBuilder($metadata);
 
@@ -57,7 +48,7 @@ class EmailReply
     /**
      * Prepares the metadata for API usage.
      */
-    public static function loadApiMetadata(ApiMetadataDriver $metadata)
+    public static function loadApiMetadata(ApiMetadataDriver $metadata): void
     {
         $metadata->setGroupPrefix('emailReply')
             ->addProperties(

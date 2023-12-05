@@ -30,10 +30,7 @@ class FieldModel extends CommonFormModel
 {
     private RequestStack $requestStack;
 
-    /**
-     * @var LeadFieldModel
-     */
-    protected $leadFieldModel;
+    protected LeadFieldModel $leadFieldModel;
 
     public function __construct(LeadFieldModel $leadFieldModel, EntityManager $em, CorePermissions $security, EventDispatcherInterface $dispatcher, UrlGeneratorInterface $router, Translator $translator, UserHelper $userHelper, LoggerInterface $mauticLogger, CoreParametersHelper $coreParametersHelper, RequestStack $requestStack)
     {
@@ -66,8 +63,10 @@ class FieldModel extends CommonFormModel
 
     /**
      * @deprecated to be removed in Mautic 4. This method is not used anymore.
+     *
+     * @return array{mixed[], mixed[]}
      */
-    public function getObjectFields($object = 'lead')
+    public function getObjectFields($object = 'lead'): array
     {
         $fields  = $this->leadFieldModel->getFieldListWithProperties($object);
         $choices = [];
@@ -151,7 +150,7 @@ class FieldModel extends CommonFormModel
     }
 
     /**
-     * @return FormFieldEvent|Event|void|null
+     * @return FormFieldEvent|Event|null
      *
      * @throws MethodNotAllowedHttpException
      */
@@ -186,8 +185,8 @@ class FieldModel extends CommonFormModel
             $this->dispatcher->dispatch($event, $name);
 
             return $event;
-        } else {
-            return null;
         }
+
+        return null;
     }
 }

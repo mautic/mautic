@@ -29,7 +29,7 @@ class MessageApiController extends CommonApiController
     /**
      * @var MessageModel|null
      */
-    protected $model = null;
+    protected $model;
 
     private RequestStack $requestStack;
 

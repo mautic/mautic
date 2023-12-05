@@ -16,7 +16,7 @@ class DynamicContentFilterEntryFiltersType extends AbstractType
 {
     use FilterTrait;
 
-    private $translator;
+    private \Symfony\Contracts\Translation\TranslatorInterface $translator;
 
     public function __construct(TranslatorInterface $translator)
     {

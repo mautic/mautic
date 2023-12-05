@@ -51,35 +51,20 @@ class ListModel extends FormModel
 {
     use OperatorListTrait;
 
-    /**
-     * @var CategoryModel
-     */
-    protected $categoryModel;
+    protected \Mautic\CategoryBundle\Model\CategoryModel $categoryModel;
 
-    /**
-     * @var ContactSegmentService
-     */
-    private $leadSegmentService;
+    private \Mautic\LeadBundle\Segment\ContactSegmentService $leadSegmentService;
 
     /**
      * @var mixed[]
      */
     private $choiceFieldsCache = [];
 
-    /**
-     * @var SegmentChartQueryFactory
-     */
-    private $segmentChartQueryFactory;
+    private \Mautic\LeadBundle\Segment\Stat\SegmentChartQueryFactory $segmentChartQueryFactory;
 
-    /**
-     * @var RequestStack
-     */
-    private $requestStack;
+    private \Symfony\Component\HttpFoundation\RequestStack $requestStack;
 
-    /**
-     * @var SegmentCountCacheHelper
-     */
-    private $segmentCountCacheHelper;
+    private \Mautic\LeadBundle\Helper\SegmentCountCacheHelper $segmentCountCacheHelper;
 
     public function __construct(
         CategoryModel $categoryModel,
@@ -282,9 +267,9 @@ class ListModel extends FormModel
     /**
      * Get a list of field choices for filters.
      *
-     * @return array
+     * @return mixed[]
      */
-    public function getChoiceFields(string $search = '')
+    public function getChoiceFields(string $search = ''): array
     {
         if ($this->choiceFieldsCache) {
             return $this->choiceFieldsCache;
@@ -987,10 +972,8 @@ class ListModel extends FormModel
      * @param null  $dateFormat
      * @param array $filter
      * @param bool  $canViewOthers
-     *
-     * @return array
      */
-    public function getStagesBarChartData($unit, \DateTime $dateFrom, \DateTime $dateTo, $dateFormat = null, $filter = [], $canViewOthers = true)
+    public function getStagesBarChartData($unit, \DateTime $dateFrom, \DateTime $dateTo, $dateFormat = null, $filter = [], $canViewOthers = true): array
     {
         $data['values'] = [];
         $data['labels'] = [];
@@ -1051,10 +1034,8 @@ class ListModel extends FormModel
      * @param null  $dateFormat
      * @param array $filter
      * @param bool  $canViewOthers
-     *
-     * @return array
      */
-    public function getDeviceGranularityData($unit, \DateTime $dateFrom, \DateTime $dateTo, $dateFormat = null, $filter = [], $canViewOthers = true)
+    public function getDeviceGranularityData($unit, \DateTime $dateFrom, \DateTime $dateTo, $dateFormat = null, $filter = [], $canViewOthers = true): array
     {
         $data['values'] = [];
         $data['labels'] = [];

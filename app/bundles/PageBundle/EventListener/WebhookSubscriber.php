@@ -11,10 +11,7 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class WebhookSubscriber implements EventSubscriberInterface
 {
-    /**
-     * @var WebhookModel
-     */
-    private $webhookModel;
+    private \Mautic\WebhookBundle\Model\WebhookModel $webhookModel;
 
     public function __construct(WebhookModel $webhookModel)
     {
@@ -35,7 +32,7 @@ class WebhookSubscriber implements EventSubscriberInterface
     /**
      * Add event triggers and actions.
      */
-    public function onWebhookBuild(WebhookBuilderEvent $event)
+    public function onWebhookBuild(WebhookBuilderEvent $event): void
     {
         // add checkbox to the webhook form for new leads
         $pageHit = [
@@ -47,7 +44,7 @@ class WebhookSubscriber implements EventSubscriberInterface
         $event->addEvent(PageEvents::PAGE_ON_HIT, $pageHit);
     }
 
-    public function onPageHit(PageHitEvent $event)
+    public function onPageHit(PageHitEvent $event): void
     {
         $this->webhookModel->queueWebhooksByType(
             PageEvents::PAGE_ON_HIT,

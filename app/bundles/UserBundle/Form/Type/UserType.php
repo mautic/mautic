@@ -26,20 +26,11 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class UserType extends AbstractType
 {
-    /**
-     * @var TranslatorInterface
-     */
-    private $translator;
+    private \Symfony\Contracts\Translation\TranslatorInterface $translator;
 
-    /**
-     * @var UserModel
-     */
-    private $model;
+    private \Mautic\UserBundle\Model\UserModel $model;
 
-    /**
-     * @var LanguageHelper
-     */
-    private $languageHelper;
+    private \Mautic\CoreBundle\Helper\LanguageHelper $languageHelper;
 
     public function __construct(
         TranslatorInterface $translator,
@@ -54,7 +45,7 @@ class UserType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder->addEventSubscriber(new CleanFormSubscriber(['signature' => 'html', 'email' => 'email']));
         $builder->addEventSubscriber(new FormExitSubscriber('user.user', $options));
@@ -258,7 +249,7 @@ class UserType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function configureOptions(OptionsResolver $resolver)
+    public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults(
             [

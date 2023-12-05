@@ -11,20 +11,14 @@ use Symfony\Contracts\EventDispatcher\Event;
 
 class InternalObjectUpdateEvent extends Event
 {
-    /**
-     * @var ObjectInterface
-     */
-    private $object;
+    private \Mautic\IntegrationsBundle\Sync\SyncDataExchange\Internal\Object\ObjectInterface $object;
 
-    /**
-     * @var array
-     */
-    private $identifiedObjectIds;
+    private array $identifiedObjectIds;
 
     /**
      * @var ObjectChangeDAO[]
      */
-    private $updateObjects;
+    private array $updateObjects;
 
     /**
      * @var UpdatedObjectMappingDAO[]

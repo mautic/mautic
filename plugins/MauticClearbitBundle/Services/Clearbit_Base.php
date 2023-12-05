@@ -26,7 +26,7 @@ class Clearbit_Base
     /**
      * Slow down calls to the Clearbit API if needed.
      */
-    private function _wait_for_rate_limit()
+    private function _wait_for_rate_limit(): void
     {
         $now = new \DateTime();
         if ($this->_next_req_time && $this->_next_req_time->getTimestamp() > $now->getTimestamp()) {
@@ -38,7 +38,7 @@ class Clearbit_Base
     /**
      * @param string $hdr
      */
-    private function _update_rate_limit($hdr)
+    private function _update_rate_limit($hdr): void
     {
         $remaining            = (float) $hdr['X-RateLimit-Remaining'];
         $reset                = (float) $hdr['X-RateLimit-Reset'];

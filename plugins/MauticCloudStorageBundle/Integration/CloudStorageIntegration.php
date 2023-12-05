@@ -16,7 +16,7 @@ abstract class CloudStorageIntegration extends AbstractIntegration
     /**
      * {@inheritdoc}
      */
-    public function appendToForm(&$builder, $data, $formArea)
+    public function appendToForm(&$builder, $data, $formArea): void
     {
         if ('features' !== $formArea) {
             return;

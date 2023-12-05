@@ -152,7 +152,7 @@ class Asset extends FormEntity
      */
     private $disallow = false;
 
-    public static function loadMetadata(ORM\ClassMetadata $metadata)
+    public static function loadMetadata(ORM\ClassMetadata $metadata): void
     {
         $builder = new ClassMetadataBuilder($metadata);
 
@@ -221,7 +221,7 @@ class Asset extends FormEntity
     /**
      * Prepares the metadata for API usage.
      */
-    public static function loadApiMetadata(ApiMetadataDriver $metadata)
+    public static function loadApiMetadata(ApiMetadataDriver $metadata): void
     {
         $metadata->setGroupPrefix('asset')
             ->addListProperties(
@@ -275,7 +275,7 @@ class Asset extends FormEntity
     /**
      * Sets file.
      */
-    public function setFile(File $file = null)
+    public function setFile(File $file = null): void
     {
         $this->file = $file;
 
@@ -342,7 +342,7 @@ class Asset extends FormEntity
     /**
      * @param mixed $extension
      */
-    public function setExtension($extension)
+    public function setExtension($extension): void
     {
         $this->extension = $extension;
     }
@@ -358,7 +358,7 @@ class Asset extends FormEntity
     /**
      * @param mixed $mime
      */
-    public function setMime($mime)
+    public function setMime($mime): void
     {
         $this->mime = $mime;
     }
@@ -662,7 +662,7 @@ class Asset extends FormEntity
         return $this->uniqueDownloadCount;
     }
 
-    public function setFileNameFromRemote()
+    public function setFileNameFromRemote(): void
     {
         $fileName = basename($this->getRemotePath());
 
@@ -674,7 +674,7 @@ class Asset extends FormEntity
         }
     }
 
-    public function preUpload()
+    public function preUpload(): void
     {
         if (null !== $this->getFile()) {
             // set the asset title as original file name if title is missing
@@ -695,7 +695,7 @@ class Asset extends FormEntity
         }
     }
 
-    public function upload()
+    public function upload(): void
     {
         // the file property can be empty if the field is not required
         if (null === $this->getFile()) {
@@ -733,7 +733,7 @@ class Asset extends FormEntity
     /**
      * Remove a file.
      */
-    public function setFileInfoFromFile()
+    public function setFileInfoFromFile(): void
     {
         // get some basic information about the file type
         $fileInfo = $this->getFileInfo();
@@ -753,7 +753,7 @@ class Asset extends FormEntity
      *
      * @param bool $temp >> regular uploaded file or temporary
      */
-    public function removeUpload($temp = false)
+    public function removeUpload($temp = false): void
     {
         if ($temp) {
             $file = $this->getAbsoluteTempPath();
@@ -994,9 +994,9 @@ class Asset extends FormEntity
     /**
      * Returns array of common extensions.
      *
-     * @return string
+     * @return array<string, string[]>
      */
-    public function getFileExtensions()
+    public function getFileExtensions(): array
     {
         return [
             'excel' => [
@@ -1131,12 +1131,12 @@ class Asset extends FormEntity
     /**
      * @param mixed $description
      */
-    public function setDescription($description)
+    public function setDescription($description): void
     {
         $this->description = $description;
     }
 
-    public static function loadValidatorMetadata(ClassMetadata $metadata)
+    public static function loadValidatorMetadata(ClassMetadata $metadata): void
     {
         // Add a constraint to manage the file upload data
         $metadata->addConstraint(new Assert\Callback([__CLASS__, 'validateFile']));
@@ -1148,7 +1148,7 @@ class Asset extends FormEntity
      * @param Asset                     $object  Entity object to validate
      * @param ExecutionContextInterface $context Context object
      */
-    public static function validateFile($object, ExecutionContextInterface $context)
+    public static function validateFile($object, ExecutionContextInterface $context): void
     {
         if ($object->isLocal()) {
             $tempName = $object->getTempName();
@@ -1322,10 +1322,8 @@ class Asset extends FormEntity
 
     /**
      * @param string $unit
-     *
-     * @return array
      */
-    public static function convertBytesToUnit($size, $unit = '')
+    public static function convertBytesToUnit($size, $unit = ''): array
     {
         $unit = strtoupper($unit);
 
@@ -1384,7 +1382,7 @@ class Asset extends FormEntity
     /**
      * @param mixed $disallow
      */
-    public function setDisallow($disallow)
+    public function setDisallow($disallow): void
     {
         $this->disallow = $disallow;
     }

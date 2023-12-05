@@ -7,10 +7,7 @@ use Symfony\Contracts\EventDispatcher\Event;
 
 class ContactIdentificationEvent extends Event
 {
-    /**
-     * @var array
-     */
-    private $clickthrough;
+    private array $clickthrough;
 
     /**
      * @var Lead

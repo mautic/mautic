@@ -11,22 +11,13 @@ final class DateHelper
     /**
      * @var string[]
      */
-    private $formats;
+    private array $formats;
 
-    /**
-     * @var DateTimeHelper
-     */
-    private $helper;
+    private \Mautic\CoreBundle\Helper\DateTimeHelper $helper;
 
-    /**
-     * @var TranslatorInterface
-     */
-    private $translator;
+    private \Symfony\Contracts\Translation\TranslatorInterface $translator;
 
-    /**
-     * @var CoreParametersHelper
-     */
-    private $coreParametersHelper;
+    private \Mautic\CoreBundle\Helper\CoreParametersHelper $coreParametersHelper;
 
     /**
      * @param string $dateFullFormat

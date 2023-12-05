@@ -29,7 +29,7 @@ trait FieldsTypeTrait
     ) {
         $builder->addEventListener(
             FormEvents::PRE_SET_DATA,
-            function (FormEvent $event) use ($options, $integrationFields, $mauticFields, $fieldObject, $limit, $start) {
+            function (FormEvent $event) use ($options, $integrationFields, $mauticFields, $fieldObject, $limit, $start): void {
                 $form           = $event->getForm();
                 $index          = 0;
                 $choices        = [];

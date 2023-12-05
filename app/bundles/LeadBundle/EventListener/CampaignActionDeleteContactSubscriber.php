@@ -12,15 +12,9 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class CampaignActionDeleteContactSubscriber implements EventSubscriberInterface
 {
-    /**
-     * @var LeadModel
-     */
-    private $leadModel;
+    private \Mautic\LeadBundle\Model\LeadModel $leadModel;
 
-    /**
-     * @var RemovedContactTracker
-     */
-    private $removedContactTracker;
+    private \Mautic\CampaignBundle\Helper\RemovedContactTracker $removedContactTracker;
 
     public function __construct(LeadModel $leadModel, RemovedContactTracker $removedContactTracker)
     {

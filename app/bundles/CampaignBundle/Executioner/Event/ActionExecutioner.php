@@ -16,15 +16,9 @@ class ActionExecutioner implements EventInterface
 {
     public const TYPE = 'action';
 
-    /**
-     * @var ActionDispatcher
-     */
-    private $dispatcher;
+    private \Mautic\CampaignBundle\Executioner\Dispatcher\ActionDispatcher $dispatcher;
 
-    /**
-     * @var EventLogger
-     */
-    private $eventLogger;
+    private \Mautic\CampaignBundle\Executioner\Logger\EventLogger $eventLogger;
 
     public function __construct(ActionDispatcher $dispatcher, EventLogger $eventLogger)
     {

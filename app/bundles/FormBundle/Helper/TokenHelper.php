@@ -7,15 +7,9 @@ use Mautic\FormBundle\Model\FormModel;
 
 class TokenHelper
 {
-    /**
-     * @var FormModel
-     */
-    protected $formModel;
+    protected \Mautic\FormBundle\Model\FormModel $formModel;
 
-    /**
-     * @var CorePermissions
-     */
-    protected $security;
+    protected \Mautic\CoreBundle\Security\Permissions\CorePermissions $security;
 
     public function __construct(FormModel $formModel, CorePermissions $security)
     {

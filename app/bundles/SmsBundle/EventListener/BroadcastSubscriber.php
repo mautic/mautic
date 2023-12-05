@@ -9,10 +9,7 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class BroadcastSubscriber implements EventSubscriberInterface
 {
-    /**
-     * @var BroadcastExecutioner
-     */
-    private $broadcastExecutioner;
+    private \Mautic\SmsBundle\Broadcast\BroadcastExecutioner $broadcastExecutioner;
 
     public function __construct(BroadcastExecutioner $broadcastExecutioner)
     {
@@ -29,7 +26,7 @@ class BroadcastSubscriber implements EventSubscriberInterface
         ];
     }
 
-    public function onBroadcast(ChannelBroadcastEvent $event)
+    public function onBroadcast(ChannelBroadcastEvent $event): void
     {
         if (!$event->checkContext('sms')) {
             return;

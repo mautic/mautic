@@ -985,7 +985,7 @@ class PageController extends FormController
      * @param array $slots
      * @param Page  $entity
      */
-    private function processSlots(SlotsHelper $slotsHelper, $slots, $entity)
+    private function processSlots(SlotsHelper $slotsHelper, $slots, $entity): void
     {
         $slotsHelper->inBuilder(true);
 

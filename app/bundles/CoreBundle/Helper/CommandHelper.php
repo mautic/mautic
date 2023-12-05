@@ -11,10 +11,7 @@ use Symfony\Component\HttpKernel\KernelInterface;
 
 class CommandHelper
 {
-    /**
-     * @var KernelInterface
-     */
-    private $kernel;
+    private \Symfony\Component\HttpKernel\KernelInterface $kernel;
 
     public function __construct(KernelInterface $kernel)
     {

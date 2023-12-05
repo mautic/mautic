@@ -7,10 +7,7 @@ use Mautic\LeadBundle\Model\FieldModel;
 
 class FieldAliasHelper
 {
-    /**
-     * @var FieldModel
-     */
-    private $fieldModel;
+    private \Mautic\LeadBundle\Model\FieldModel $fieldModel;
 
     public function __construct(FieldModel $fieldModel)
     {

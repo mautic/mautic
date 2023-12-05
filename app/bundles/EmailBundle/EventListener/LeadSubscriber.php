@@ -13,25 +13,13 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class LeadSubscriber implements EventSubscriberInterface
 {
-    /**
-     * @var EmailReplyRepository
-     */
-    private $emailReplyRepository;
+    private \Mautic\EmailBundle\Entity\EmailReplyRepository $emailReplyRepository;
 
-    /**
-     * @var StatRepository
-     */
-    private $statRepository;
+    private \Mautic\EmailBundle\Entity\StatRepository $statRepository;
 
-    /**
-     * @var TranslatorInterface
-     */
-    private $translator;
+    private \Symfony\Contracts\Translation\TranslatorInterface $translator;
 
-    /**
-     * @var RouterInterface
-     */
-    private $router;
+    private \Symfony\Component\Routing\RouterInterface $router;
 
     public function __construct(
         EmailReplyRepository $emailReplyRepository,
@@ -59,7 +47,7 @@ class LeadSubscriber implements EventSubscriberInterface
     /**
      * Compile events for the lead timeline.
      */
-    public function onTimelineGenerate(LeadTimelineEvent $event)
+    public function onTimelineGenerate(LeadTimelineEvent $event): void
     {
         $this->addEmailEvents($event, 'read');
         $this->addEmailEvents($event, 'sent');
@@ -67,7 +55,7 @@ class LeadSubscriber implements EventSubscriberInterface
         $this->addEmailReplies($event);
     }
 
-    public function onLeadMerge(LeadMergeEvent $event)
+    public function onLeadMerge(LeadMergeEvent $event): void
     {
         $this->statRepository->updateLead(
             $event->getLoser()->getId(),
@@ -75,7 +63,7 @@ class LeadSubscriber implements EventSubscriberInterface
         );
     }
 
-    private function addEmailEvents(LeadTimelineEvent $event, $state)
+    private function addEmailEvents(LeadTimelineEvent $event, $state): void
     {
         // Set available event types
         $eventTypeKey  = 'email.'.$state;
@@ -143,7 +131,7 @@ class LeadSubscriber implements EventSubscriberInterface
         }
     }
 
-    private function addEmailReplies(LeadTimelineEvent $event)
+    private function addEmailReplies(LeadTimelineEvent $event): void
     {
         $eventTypeKey  = 'email.replied';
         $eventTypeName = $this->translator->trans('mautic.email.replied');

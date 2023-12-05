@@ -13,25 +13,13 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class LeadSubscriber implements EventSubscriberInterface
 {
-    /**
-     * @var StagesChangeLogRepository
-     */
-    private $stagesChangeLogRepository;
+    private \Mautic\LeadBundle\Entity\StagesChangeLogRepository $stagesChangeLogRepository;
 
-    /**
-     * @var LeadStageLogRepository
-     */
-    private $leadStageLogRepository;
+    private \Mautic\StageBundle\Entity\LeadStageLogRepository $leadStageLogRepository;
 
-    /**
-     * @var TranslatorInterface
-     */
-    private $translator;
+    private \Symfony\Contracts\Translation\TranslatorInterface $translator;
 
-    /**
-     * @var RouterInterface
-     */
-    private $router;
+    private \Symfony\Component\Routing\RouterInterface $router;
 
     public function __construct(
         StagesChangeLogRepository $stagesChangeLogRepository,
@@ -59,7 +47,7 @@ class LeadSubscriber implements EventSubscriberInterface
     /**
      * Compile events for the lead timeline.
      */
-    public function onTimelineGenerate(LeadTimelineEvent $event)
+    public function onTimelineGenerate(LeadTimelineEvent $event): void
     {
         // Set available event types
         $eventTypeKey  = 'stage.changed';
@@ -107,7 +95,7 @@ class LeadSubscriber implements EventSubscriberInterface
         }
     }
 
-    public function onLeadMerge(LeadMergeEvent $event)
+    public function onLeadMerge(LeadMergeEvent $event): void
     {
         $this->leadStageLogRepository->updateLead(
             $event->getLoser()->getId(),

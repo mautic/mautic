@@ -10,15 +10,9 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class MaintenanceSubscriber implements EventSubscriberInterface
 {
-    /**
-     * @var Connection
-     */
-    private $db;
+    private \Doctrine\DBAL\Connection $db;
 
-    /**
-     * @var TranslatorInterface
-     */
-    private $translator;
+    private \Symfony\Contracts\Translation\TranslatorInterface $translator;
 
     public function __construct(Connection $db, TranslatorInterface $translator)
     {
@@ -36,13 +30,13 @@ class MaintenanceSubscriber implements EventSubscriberInterface
         ];
     }
 
-    public function onDataCleanup(MaintenanceEvent $event)
+    public function onDataCleanup(MaintenanceEvent $event): void
     {
         $this->cleanData($event, 'page_hits');
         $this->cleanData($event, 'lead_utmtags');
     }
 
-    private function cleanData(MaintenanceEvent $event, $table)
+    private function cleanData(MaintenanceEvent $event, $table): void
     {
         $qb = $this->db->createQueryBuilder()
             ->setParameter('date', $event->getDate()->format('Y-m-d H:i:s'));

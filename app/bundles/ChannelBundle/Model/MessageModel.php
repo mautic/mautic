@@ -31,15 +31,9 @@ class MessageModel extends FormModel implements AjaxLookupModelInterface
 {
     public const CHANNEL_FEATURE = 'marketing_messages';
 
-    /**
-     * @var ChannelListHelper
-     */
-    protected $channelListHelper;
+    protected \Mautic\ChannelBundle\Helper\ChannelListHelper $channelListHelper;
 
-    /**
-     * @var CampaignModel
-     */
-    protected $campaignModel;
+    protected \Mautic\CampaignBundle\Model\CampaignModel $campaignModel;
 
     protected static $channels;
 
@@ -55,7 +49,7 @@ class MessageModel extends FormModel implements AjaxLookupModelInterface
      * @param Message $entity
      * @param bool    $unlock
      */
-    public function saveEntity($entity, $unlock = true)
+    public function saveEntity($entity, $unlock = true): void
     {
         $isNew = $entity->isNew();
 

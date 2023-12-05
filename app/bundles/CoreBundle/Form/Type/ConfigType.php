@@ -32,30 +32,15 @@ class ConfigType extends AbstractType
 {
     private Shortener $shortenerFactory;
 
-    /**
-     * @var TranslatorInterface
-     */
-    private $translator;
+    private \Symfony\Contracts\Translation\TranslatorInterface $translator;
 
-    /**
-     * @var LanguageHelper
-     */
-    private $langHelper;
+    private \Mautic\CoreBundle\Helper\LanguageHelper $langHelper;
 
-    /**
-     * @var array
-     */
-    private $supportedLanguages;
+    private array $supportedLanguages;
 
-    /**
-     * @var IpLookupFactory
-     */
-    private $ipLookupFactory;
+    private \Mautic\CoreBundle\Factory\IpLookupFactory $ipLookupFactory;
 
-    /**
-     * @var AbstractLookup
-     */
-    private $ipLookup;
+    private ?\Mautic\CoreBundle\IpLookup\AbstractLookup $ipLookup;
 
     public function __construct(
         TranslatorInterface $translator,
@@ -503,7 +488,7 @@ class ConfigType extends AbstractType
                     'class'   => 'form-control',
                     'tooltip' => 'mautic.core.config.create.organization.from.ip.lookup.tooltip',
                 ],
-                'data'     => isset($options['data']['ip_lookup_create_organization']) ? (bool) $options['data']['ip_lookup_create_organization'] : false,
+                'data'     => isset($options['data']['ip_lookup_create_organization']) && (bool) $options['data']['ip_lookup_create_organization'],
                 'required' => false,
             ]
         );

@@ -10,25 +10,13 @@ use Mautic\UserBundle\Model\UserModel;
 
 class FieldsBuilder
 {
-    /**
-     * @var FieldModel
-     */
-    private $fieldModel;
+    private \Mautic\LeadBundle\Model\FieldModel $fieldModel;
 
-    /**
-     * @var ListModel
-     */
-    private $listModel;
+    private \Mautic\LeadBundle\Model\ListModel $listModel;
 
-    /**
-     * @var UserModel
-     */
-    private $userModel;
+    private \Mautic\UserBundle\Model\UserModel $userModel;
 
-    /**
-     * @var LeadModel
-     */
-    private $leadModel;
+    private \Mautic\LeadBundle\Model\LeadModel $leadModel;
 
     public function __construct(FieldModel $fieldModel, ListModel $listModel, UserModel $userModel, LeadModel $leadModel)
     {
@@ -131,10 +119,7 @@ class FieldsBuilder
         return array_merge($baseColumns, $fieldColumns);
     }
 
-    /**
-     * @return array
-     */
-    private function getBaseLeadColumns()
+    private function getBaseLeadColumns(): array
     {
         return [
             'l.id' => [
@@ -170,10 +155,7 @@ class FieldsBuilder
         ];
     }
 
-    /**
-     * @return array
-     */
-    private function getBaseCompanyColumns()
+    private function getBaseCompanyColumns(): array
     {
         return [
             'comp.id' => [

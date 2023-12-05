@@ -15,10 +15,7 @@ class SubmissionRepository extends CommonRepository
 {
     use TimelineTrait;
 
-    /**
-     * {@inheritdoc}
-     */
-    public function saveEntity($entity, $flush = true)
+    public function saveEntity($entity, $flush = true): void
     {
         parent::saveEntity($entity, $flush);
 
@@ -219,7 +216,7 @@ class SubmissionRepository extends CommonRepository
      *
      * @return array<mixed>
      */
-    public function getEntitiesByPage(array $args = [])
+    public function getEntitiesByPage(array $args = []): array
     {
         $activePage = $args['activePage'];
 
@@ -277,7 +274,7 @@ class SubmissionRepository extends CommonRepository
     /**
      * {@inheritdoc}
      */
-    protected function getDefaultOrder()
+    protected function getDefaultOrder(): array
     {
         return [
             ['s.date_submitted', 'ASC'],
@@ -424,7 +421,7 @@ class SubmissionRepository extends CommonRepository
     /**
      * Updates lead ID (e.g. after a lead merge).
      */
-    public function updateLead($fromLeadId, $toLeadId)
+    public function updateLead($fromLeadId, $toLeadId): void
     {
         $q = $this->_em->getConnection()->createQueryBuilder();
         $q->update(MAUTIC_TABLE_PREFIX.'form_submissions')

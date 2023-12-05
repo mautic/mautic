@@ -12,7 +12,7 @@ class MessageListType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function configureOptions(OptionsResolver $resolver)
+    public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults(
             [
@@ -28,7 +28,7 @@ class MessageListType extends AbstractType
                     return 'channel:getLookupChoiceList&'.http_build_query($query);
                 },
                 'model_lookup_method' => 'getLookupResults',
-                'lookup_arguments'    => function (Options $options) {
+                'lookup_arguments'    => function (Options $options): array {
                     return [
                         'type'    => 'channel.message',
                         'filter'  => '$data',

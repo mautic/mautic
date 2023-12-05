@@ -16,37 +16,19 @@ use Mautic\SmsBundle\Model\SmsModel;
 
 class SmsHelper
 {
-    /**
-     * @var EntityManager
-     */
-    protected $em;
+    protected \Doctrine\ORM\EntityManager $em;
 
-    /**
-     * @var LeadModel
-     */
-    protected $leadModel;
+    protected \Mautic\LeadBundle\Model\LeadModel $leadModel;
 
-    /**
-     * @var PhoneNumberHelper
-     */
-    protected $phoneNumberHelper;
+    protected \Mautic\CoreBundle\Helper\PhoneNumberHelper $phoneNumberHelper;
 
-    /**
-     * @var SmsModel
-     */
-    protected $smsModel;
+    protected \Mautic\SmsBundle\Model\SmsModel $smsModel;
 
-    /**
-     * @var IntegrationHelper
-     */
-    protected $integrationHelper;
+    protected \Mautic\PluginBundle\Helper\IntegrationHelper $integrationHelper;
 
     private CoreParametersHelper $coreParametersHelper;
 
-    /**
-     * @var DoNotContact
-     */
-    private $doNotContact;
+    private \Mautic\LeadBundle\Model\DoNotContact $doNotContact;
 
     public function __construct(
         EntityManager $em,

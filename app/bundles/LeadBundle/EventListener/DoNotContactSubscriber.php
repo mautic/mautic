@@ -11,10 +11,7 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 final class DoNotContactSubscriber implements EventSubscriberInterface
 {
-    /**
-     * @var DoNotContact
-     */
-    private $doNotContact;
+    private \Mautic\LeadBundle\Model\DoNotContact $doNotContact;
 
     public function __construct(DoNotContact $doNotContact)
     {

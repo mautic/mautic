@@ -14,7 +14,7 @@ class WebhookQueueRepository extends CommonRepository
      *
      * @param $idList array of webhookqueue IDs
      */
-    public function deleteQueuesById(array $idList)
+    public function deleteQueuesById(array $idList): void
     {
         // don't process the list if there are no items in it
         if (!count($idList)) {

@@ -29,7 +29,7 @@ class TriggerApiController extends CommonApiController
     /**
      * @var TriggerModel|null
      */
-    protected $model = null;
+    protected $model;
 
     private ?RequestStack $requestStack = null;
 

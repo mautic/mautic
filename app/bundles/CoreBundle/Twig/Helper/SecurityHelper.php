@@ -15,25 +15,13 @@ use Symfony\Component\Security\Csrf\CsrfTokenManagerInterface;
  */
 final class SecurityHelper
 {
-    /**
-     * @var CorePermissions
-     */
-    private $security;
+    private \Mautic\CoreBundle\Security\Permissions\CorePermissions $security;
 
-    /**
-     * @var RequestStack
-     */
-    private $requestStack;
+    private \Symfony\Component\HttpFoundation\RequestStack $requestStack;
 
-    /**
-     * @var EventDispatcherInterface
-     */
-    private $dispatcher;
+    private \Symfony\Component\EventDispatcher\EventDispatcherInterface $dispatcher;
 
-    /**
-     * @var CsrfTokenManagerInterface
-     */
-    private $tokenManager;
+    private \Symfony\Component\Security\Csrf\CsrfTokenManagerInterface $tokenManager;
 
     public function __construct(
         CorePermissions $security,

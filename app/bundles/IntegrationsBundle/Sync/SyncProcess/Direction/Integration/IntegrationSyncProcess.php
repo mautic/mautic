@@ -20,20 +20,11 @@ use Mautic\IntegrationsBundle\Sync\SyncDataExchange\SyncDataExchangeInterface;
 
 class IntegrationSyncProcess
 {
-    /**
-     * @var SyncDateHelper
-     */
-    private $syncDateHelper;
+    private \Mautic\IntegrationsBundle\Sync\Helper\SyncDateHelper $syncDateHelper;
 
-    /**
-     * @var MappingHelper
-     */
-    private $mappingHelper;
+    private \Mautic\IntegrationsBundle\Sync\Helper\MappingHelper $mappingHelper;
 
-    /**
-     * @var ObjectChangeGenerator
-     */
-    private $objectChangeGenerator;
+    private \Mautic\IntegrationsBundle\Sync\SyncProcess\Direction\Integration\ObjectChangeGenerator $objectChangeGenerator;
 
     /**
      * @var InputOptionsDAO

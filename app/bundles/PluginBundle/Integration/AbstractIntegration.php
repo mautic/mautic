@@ -132,7 +132,7 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
         $this->doNotContact           = $doNotContact;
     }
 
-    public function setCommandParameters(array $params)
+    public function setCommandParameters(array $params): void
     {
         $this->commandParameters = $params;
     }
@@ -242,10 +242,8 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
 
     /**
      * Get if data priority is enabled in the integration or not default is false.
-     *
-     * @return string
      */
-    public function getDataPriority()
+    public function getDataPriority(): bool
     {
         return false;
     }
@@ -316,7 +314,7 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
     /**
      * Set the social integration entity.
      */
-    public function setIntegrationSettings(Integration $settings)
+    public function setIntegrationSettings(Integration $settings): void
     {
         $this->settings = $settings;
 
@@ -336,7 +334,7 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
     /**
      * Persist settings to the database.
      */
-    public function persistIntegrationSettings()
+    public function persistIntegrationSettings(): void
     {
         $this->em->persist($this->settings);
         $this->em->flush();
@@ -384,7 +382,7 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
     /**
      * Encrypts and saves keys to the entity.
      */
-    public function encryptAndSetApiKeys(array $keys, Integration $entity)
+    public function encryptAndSetApiKeys(array $keys, Integration $entity): void
     {
         $keys = $this->dispatchIntegrationKeyEvent(
             PluginEvents::PLUGIN_ON_INTEGRATION_KEYS_ENCRYPT,
@@ -1343,7 +1341,7 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
     /**
      * Get an array of public activity.
      *
-     * @return array
+     * @return array|void
      */
     public function getPublicActivity($identifier, &$socialCache)
     {
@@ -1362,10 +1360,8 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
 
     /**
      * Generates current URL to set as referer for curl calls.
-     *
-     * @return string
      */
-    protected function getRefererUrl()
+    protected function getRefererUrl(): ?string
     {
         return ($this->request) ? $this->request->getRequestUri() : null;
     }
@@ -1429,7 +1425,7 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
          * @param $mauticFields
          * @param $fieldType
          */
-        $cleanup = function (&$mappedFields, $integrationFields, $mauticFields, $fieldType) use (&$missingRequiredFields, &$featureSettings) {
+        $cleanup = function (&$mappedFields, $integrationFields, $mauticFields, $fieldType) use (&$missingRequiredFields, &$featureSettings): void {
             $updateKey    = ('companyFields' === $fieldType) ? 'update_mautic_company' : 'update_mautic';
             $removeFields = array_keys(array_diff_key($mappedFields, $integrationFields));
 
@@ -1958,7 +1954,7 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
         return $this->notificationModel;
     }
 
-    public function logIntegrationError(\Exception $e, Lead $contact = null)
+    public function logIntegrationError(\Exception $e, Lead $contact = null): void
     {
         $logger = $this->logger;
 
@@ -2074,7 +2070,7 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
      *                                   integration is called when adding an integration to events like point triggers,
      *                                   campaigns actions, forms actions, etc
      */
-    public function appendToForm(&$builder, $data, $formArea)
+    public function appendToForm(&$builder, $data, $formArea): void
     {
     }
 
@@ -2082,7 +2078,7 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
      * @param FormBuilderInterface $builder
      * @param array<mixed>         $options
      */
-    public function modifyForm($builder, $options)
+    public function modifyForm($builder, $options): void
     {
         $this->dispatcher->dispatch(
             new PluginIntegrationFormBuildEvent($this, $builder, $options),
@@ -2093,9 +2089,9 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
     /**
      * Returns settings for the integration form.
      *
-     * @return array
+     * @return array<string, mixed>
      */
-    public function getFormSettings()
+    public function getFormSettings(): array
     {
         $type               = $this->getAuthenticationType();
         $enableDataPriority = $this->getDataPriority();

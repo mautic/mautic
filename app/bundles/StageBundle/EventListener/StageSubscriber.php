@@ -10,15 +10,9 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class StageSubscriber implements EventSubscriberInterface
 {
-    /**
-     * @var IpLookupHelper
-     */
-    private $ipLookupHelper;
+    private \Mautic\CoreBundle\Helper\IpLookupHelper $ipLookupHelper;
 
-    /**
-     * @var AuditLogModel
-     */
-    private $auditLogModel;
+    private \Mautic\CoreBundle\Model\AuditLogModel $auditLogModel;
 
     public function __construct(IpLookupHelper $ipLookupHelper, AuditLogModel $auditLogModel)
     {
@@ -40,7 +34,7 @@ class StageSubscriber implements EventSubscriberInterface
     /**
      * Add an entry to the audit log.
      */
-    public function onStagePostSave(Events\StageEvent $event)
+    public function onStagePostSave(Events\StageEvent $event): void
     {
         $stage = $event->getStage();
         if ($details = $event->getChanges()) {
@@ -59,7 +53,7 @@ class StageSubscriber implements EventSubscriberInterface
     /**
      * Add a delete entry to the audit log.
      */
-    public function onStageDelete(Events\StageEvent $event)
+    public function onStageDelete(Events\StageEvent $event): void
     {
         $stage = $event->getStage();
         $log   = [

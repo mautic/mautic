@@ -9,10 +9,7 @@ use Symfony\Contracts\EventDispatcher\Event;
 
 final class AddColumnBackgroundEvent extends Event
 {
-    /**
-     * @var LeadField
-     */
-    private $leadField;
+    private \Mautic\LeadBundle\Entity\LeadField $leadField;
 
     public function __construct(LeadField $leadField)
     {

@@ -32,15 +32,9 @@ use Symfony\Contracts\EventDispatcher\Event;
  */
 class UserModel extends FormModel
 {
-    /**
-     * @var MailHelper
-     */
-    protected $mailHelper;
+    protected \Mautic\EmailBundle\Helper\MailHelper $mailHelper;
 
-    /**
-     * @var UserTokenServiceInterface
-     */
-    private $userTokenService;
+    private \Mautic\UserBundle\Model\UserToken\UserTokenServiceInterface $userTokenService;
 
     public function __construct(
         MailHelper $mailHelper,
@@ -78,7 +72,7 @@ class UserModel extends FormModel
      *
      * @throws \Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException
      */
-    public function saveEntity($entity, $unlock = true)
+    public function saveEntity($entity, $unlock = true): void
     {
         if (!$entity instanceof User) {
             throw new MethodNotAllowedHttpException(['User'], 'Entity must be of class User()');
@@ -252,7 +246,7 @@ class UserModel extends FormModel
      *
      * @param string $newPassword
      */
-    public function resetPassword(User $user, UserPasswordHasher $hasher, $newPassword)
+    public function resetPassword(User $user, UserPasswordHasher $hasher, $newPassword): void
     {
         $hashedPassword = $this->checkNewPassword($user, $hasher, $newPassword);
 
@@ -356,7 +350,7 @@ class UserModel extends FormModel
      *
      * @param null $value
      */
-    public function setPreference($key, $value = null, User $user = null)
+    public function setPreference($key, $value = null, User $user = null): void
     {
         if (null == $user) {
             $user = $this->userHelper->getUser();

@@ -34,7 +34,7 @@ class TwitterIntegration extends SocialIntegration
     /**
      * {@inheritdoc}
      */
-    public function getSupportedFeatures()
+    public function getSupportedFeatures(): array
     {
         return [
             'public_profile',
@@ -170,9 +170,6 @@ class TwitterIntegration extends SocialIntegration
         return $data;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getPublicActivity($identifier, &$socialCache)
     {
         if (!isset($socialCache['id'])) {
@@ -248,7 +245,7 @@ class TwitterIntegration extends SocialIntegration
     /**
      * {@inheritdoc}
      */
-    public function getAvailableLeadFields($settings = [])
+    public function getAvailableLeadFields($settings = []): array
     {
         return [
             'profileHandle' => ['type' => 'string'],
@@ -299,7 +296,7 @@ class TwitterIntegration extends SocialIntegration
     /**
      * {@inheritdoc}
      */
-    public function getFormType()
+    public function getFormType(): string
     {
         return TwitterType::class;
     }

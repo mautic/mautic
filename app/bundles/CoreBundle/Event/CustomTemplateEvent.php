@@ -11,10 +11,7 @@ class CustomTemplateEvent extends AbstractCustomRequestEvent
      */
     protected $template;
 
-    /**
-     * @var array
-     */
-    protected $vars;
+    protected array $vars;
 
     /**
      * @param string|null $template

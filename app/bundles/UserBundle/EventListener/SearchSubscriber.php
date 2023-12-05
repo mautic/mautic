@@ -12,25 +12,13 @@ use Twig\Environment;
 
 class SearchSubscriber implements EventSubscriberInterface
 {
-    /**
-     * @var UserModel
-     */
-    private $userModel;
+    private \Mautic\UserBundle\Model\UserModel $userModel;
 
-    /**
-     * @var RoleModel
-     */
-    private $userRoleModel;
+    private \Mautic\UserBundle\Model\RoleModel $userRoleModel;
 
-    /**
-     * @var CorePermissions
-     */
-    private $security;
+    private \Mautic\CoreBundle\Security\Permissions\CorePermissions $security;
 
-    /**
-     * @var Environment
-     */
-    private $twig;
+    private \Twig\Environment $twig;
 
     public function __construct(
         UserModel $userModel,
@@ -55,7 +43,7 @@ class SearchSubscriber implements EventSubscriberInterface
         ];
     }
 
-    public function onGlobalSearch(MauticEvents\GlobalSearchEvent $event)
+    public function onGlobalSearch(MauticEvents\GlobalSearchEvent $event): void
     {
         $str = $event->getSearchString();
         if (empty($str)) {
@@ -131,7 +119,7 @@ class SearchSubscriber implements EventSubscriberInterface
         }
     }
 
-    public function onBuildCommandList(MauticEvents\CommandListEvent $event)
+    public function onBuildCommandList(MauticEvents\CommandListEvent $event): void
     {
         if ($this->security->isGranted('user:users:view')) {
             $event->addCommands(

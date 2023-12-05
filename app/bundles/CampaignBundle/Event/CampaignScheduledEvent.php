@@ -44,10 +44,7 @@ class CampaignScheduledEvent extends Event
      */
     protected $eventSettings;
 
-    /**
-     * @var LeadEventLog
-     */
-    protected $log;
+    protected ?\Mautic\CampaignBundle\Entity\LeadEventLog $log;
 
     public function __construct(array $args, LeadEventLog $log = null)
     {

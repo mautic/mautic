@@ -6,30 +6,18 @@ namespace Mautic\CoreBundle\Doctrine\GeneratedColumn;
 
 final class GeneratedColumn implements GeneratedColumnInterface
 {
-    /**
-     * @var string
-     */
-    private $tableName;
+    private string $tableName;
 
     /**
      * @var string
      */
     private $tablePrefix = '';
 
-    /**
-     * @var string
-     */
-    private $columnName;
+    private string $columnName;
 
-    /**
-     * @var string
-     */
-    private $columnType;
+    private string $columnType;
 
-    /**
-     * @var string
-     */
-    private $as;
+    private string $as;
 
     /**
      * @var string|null

@@ -77,50 +77,23 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
     use BuilderModelTrait;
     use FilterTrait;
 
-    /**
-     * @var IpLookupHelper
-     */
-    protected $ipLookupHelper;
+    protected \Mautic\CoreBundle\Helper\IpLookupHelper $ipLookupHelper;
 
-    /**
-     * @var ThemeHelperInterface
-     */
-    protected $themeHelper;
+    protected \Mautic\CoreBundle\Helper\ThemeHelperInterface $themeHelper;
 
-    /**
-     * @var Mailbox
-     */
-    protected $mailboxHelper;
+    protected \Mautic\EmailBundle\MonitoredEmail\Mailbox $mailboxHelper;
 
-    /**
-     * @var MailHelper
-     */
-    protected $mailHelper;
+    protected \Mautic\EmailBundle\Helper\MailHelper $mailHelper;
 
-    /**
-     * @var LeadModel
-     */
-    protected $leadModel;
+    protected \Mautic\LeadBundle\Model\LeadModel $leadModel;
 
-    /**
-     * @var CompanyModel
-     */
-    protected $companyModel;
+    protected \Mautic\LeadBundle\Model\CompanyModel $companyModel;
 
-    /**
-     * @var TrackableModel
-     */
-    protected $pageTrackableModel;
+    protected \Mautic\PageBundle\Model\TrackableModel $pageTrackableModel;
 
-    /**
-     * @var UserModel
-     */
-    protected $userModel;
+    protected \Mautic\UserBundle\Model\UserModel $userModel;
 
-    /**
-     * @var MessageQueueModel
-     */
-    protected $messageQueueModel;
+    protected \Mautic\ChannelBundle\Model\MessageQueueModel $messageQueueModel;
 
     /**
      * @var bool
@@ -132,40 +105,19 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
      */
     protected $emailSettings = [];
 
-    /**
-     * @var SendEmailToContact
-     */
-    protected $sendModel;
+    protected \Mautic\EmailBundle\Model\SendEmailToContact $sendModel;
 
-    /**
-     * @var DeviceTracker
-     */
-    private $deviceTracker;
+    private \Mautic\LeadBundle\Tracker\DeviceTracker $deviceTracker;
 
-    /**
-     * @var RedirectRepository
-     */
-    private $redirectRepository;
+    private \Mautic\PageBundle\Entity\RedirectRepository $redirectRepository;
 
-    /**
-     * @var CacheStorageHelper
-     */
-    private $cacheStorageHelper;
+    private \Mautic\CoreBundle\Helper\CacheStorageHelper $cacheStorageHelper;
 
-    /**
-     * @var ContactTracker
-     */
-    private $contactTracker;
+    private \Mautic\LeadBundle\Tracker\ContactTracker $contactTracker;
 
-    /**
-     * @var DNC
-     */
-    private $doNotContact;
+    private DNC $doNotContact;
 
-    /**
-     * @var StatsCollectionHelper
-     */
-    private $statsCollectionHelper;
+    private \Mautic\EmailBundle\Helper\StatsCollectionHelper $statsCollectionHelper;
 
     public function __construct(
         IpLookupHelper $ipLookupHelper,
@@ -315,10 +267,8 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
 
     /**
      * Save an array of entities.
-     *
-     * @return array
      */
-    public function saveEntities($entities, $unlock = true)
+    public function saveEntities($entities, $unlock = true): void
     {
         // iterate over the results so the events are dispatched on each delete
         $batchSize = 20;
@@ -349,7 +299,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
     /**
      * @param Email $entity
      */
-    public function deleteEntity($entity)
+    public function deleteEntity($entity): void
     {
         if ($entity->isVariant() && $entity->getIsPublished()) {
             $this->resetVariants($entity);
@@ -1102,7 +1052,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
         $maxContactId = null,
         int $maxThreads = null,
         int $threadId = null
-    ) {
+    ): array {
         // get the leads
         if (empty($lists)) {
             $lists = $email->getLists();
@@ -1800,7 +1750,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
      *
      * @param string $email
      */
-    public function removeDoNotContact($email)
+    public function removeDoNotContact($email): void
     {
         /** @var \Mautic\LeadBundle\Entity\LeadRepository $leadRepo */
         $leadRepo = $this->em->getRepository(\Mautic\LeadBundle\Entity\Lead::class);
@@ -1866,7 +1816,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
     /**
      * Joins the email table and limits created_by to currently logged in user.
      */
-    public function limitQueryToCreator(QueryBuilder &$q)
+    public function limitQueryToCreator(QueryBuilder &$q): void
     {
         $q->join('t', MAUTIC_TABLE_PREFIX.'emails', 'e', 'e.id = t.email_id')
             ->andWhere('e.created_by = :userId')
@@ -1921,7 +1871,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
         $counts = array_column($result, 'count');
         $total  = array_sum($counts);
 
-        array_walk($counts, function (&$percentage) use ($total) {
+        array_walk($counts, function (&$percentage) use ($total): void {
             $percentage = round(($percentage / $total) * 100, 1);
         });
 
@@ -2227,7 +2177,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
         return $results;
     }
 
-    private function getContactCompanies(array &$sendTo)
+    private function getContactCompanies(array &$sendTo): void
     {
         $fetchCompanies = [];
         foreach ($sendTo as $key => $contact) {

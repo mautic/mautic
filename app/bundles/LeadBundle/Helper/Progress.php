@@ -22,10 +22,7 @@ class Progress
      */
     protected $done = 0;
 
-    /**
-     * @var OutputInterface|null
-     */
-    protected $output;
+    protected ?\Symfony\Component\Console\Output\OutputInterface $output;
 
     /**
      * @var ProgressBar|null
@@ -139,10 +136,8 @@ class Progress
 
     /**
      * Convert this object to a simple array.
-     *
-     * @return array
      */
-    public function toArray()
+    public function toArray(): array
     {
         return [
             $this->done,

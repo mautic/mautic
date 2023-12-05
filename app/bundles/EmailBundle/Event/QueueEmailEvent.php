@@ -7,10 +7,7 @@ use Symfony\Contracts\EventDispatcher\Event;
 
 class QueueEmailEvent extends Event
 {
-    /**
-     * @var MauticMessage
-     */
-    private $message;
+    private \Mautic\EmailBundle\Mailer\Message\MauticMessage $message;
 
     /**
      * @var bool
@@ -33,7 +30,7 @@ class QueueEmailEvent extends Event
     /**
      * Sets whether the sending of the message should be tried again.
      */
-    public function tryAgain()
+    public function tryAgain(): void
     {
         $this->retry = true;
     }

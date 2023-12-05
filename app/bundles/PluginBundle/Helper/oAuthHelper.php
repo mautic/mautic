@@ -24,7 +24,7 @@ class oAuthHelper
 
     private $settings;
 
-    private $request;
+    private ?\Symfony\Component\HttpFoundation\Request $request;
 
     public function __construct(UnifiedIntegrationInterface $integration, Request $request = null, $settings = [])
     {
@@ -41,10 +41,7 @@ class oAuthHelper
         $this->request           = $request;
     }
 
-    /**
-     * @return array
-     */
-    public function getAuthorizationHeader($url, $parameters, $method)
+    public function getAuthorizationHeader($url, $parameters, $method): array
     {
         // Get standard OAuth headers
         $headers = $this->getOauthHeaders();
@@ -60,7 +57,7 @@ class oAuthHelper
 
         if (!empty($this->settings['double_encode_basestring_parameters'])) {
             // Parameters must be encoded before going through buildBaseString
-            array_walk($parameters, function (&$val, $key, $oauth) {
+            array_walk($parameters, function (&$val, $key, $oauth): void {
                 $val = $oauth->encode($val);
             }, $this);
         }

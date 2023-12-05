@@ -8,22 +8,13 @@ use Mautic\StatsBundle\Aggregate\Helper\CalculatorHelper;
 
 class Calculator
 {
-    /**
-     * @var StatsDAO
-     */
-    private $statsDAO;
+    private \Mautic\StatsBundle\Aggregate\Collection\DAO\StatsDAO $statsDAO;
 
-    /**
-     * @var \DateTimeInterface|null
-     */
-    private $fromDateTime;
+    private ?\DateTimeInterface $fromDateTime;
 
-    /**
-     * @var \DateTimeInterface|null
-     */
-    private $toDateTime;
+    private ?\DateTimeInterface $toDateTime;
 
-    public function __construct(StatsDAO $statsDAO, \DateTime $fromDateTime = null, \DateTime $toDateTime = null)
+    public function __construct(StatsDAO $statsDAO, \DateTimeInterface $fromDateTime = null, \DateTimeInterface $toDateTime = null)
     {
         $this->statsDAO     = $statsDAO;
         $this->fromDateTime = $fromDateTime;

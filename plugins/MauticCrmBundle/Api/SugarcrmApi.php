@@ -306,11 +306,9 @@ class SugarcrmApi extends CrmApi
      */
     public function createLeadActivity(array $activity, $object)
     {
-        $config    = $this->integration->getIntegrationSettings()->getFeatureSettings();
         $tokenData = $this->integration->getKeys();
 
-        // 1st : set_entries to return ids module_name : "Leads" or "Contacts" and name_value_lists (array of arrays of name/value)
-        $module_name          = $object;
+        // 1st : set_entries to return name_value_lists (array of arrays of name/value)
         $set_name_value_lists = [];
         // set relationship
         $module_names     = []; // Contacts or Leads
@@ -558,7 +556,6 @@ class SugarcrmApi extends CrmApi
     public function getLeads($query, $object)
     {
         $tokenData       = $this->integration->getKeys();
-        $data            = ['filter' => 'all'];
         $availableFields = $this->integration->getIntegrationSettings()->getFeatureSettings();
 
         switch ($object) {

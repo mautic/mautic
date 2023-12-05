@@ -7,20 +7,11 @@ use Mautic\FormBundle\Entity\Form;
 
 class DisplayManager
 {
-    /**
-     * @var Form
-     */
-    private $form;
+    private \Mautic\FormBundle\Entity\Form $form;
 
-    /**
-     * @var array
-     */
-    private $viewOnlyFields;
+    private array $viewOnlyFields;
 
-    /**
-     * @var DisplayCounter
-     */
-    private $displayCounter;
+    private \Mautic\FormBundle\ProgressiveProfiling\DisplayCounter $displayCounter;
 
     public function __construct(Form $form, array $viewOnlyFields = [])
     {
@@ -88,7 +79,7 @@ class DisplayManager
         return $this->displayCounter;
     }
 
-    public function increaseDisplayedFields(Field $field)
+    public function increaseDisplayedFields(Field $field): void
     {
         if (!in_array($field->getType(), $this->viewOnlyFields)) {
             $this->displayCounter->increaseDisplayedFields();

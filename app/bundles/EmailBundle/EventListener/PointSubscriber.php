@@ -18,15 +18,9 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class PointSubscriber implements EventSubscriberInterface
 {
-    /**
-     * @var PointModel
-     */
-    private $pointModel;
+    private \Mautic\PointBundle\Model\PointModel $pointModel;
 
-    /**
-     * @var EntityManager
-     */
-    private $entityManager;
+    private \Doctrine\ORM\EntityManager $entityManager;
 
     public function __construct(PointModel $pointModel, EntityManager $entityManager)
     {
@@ -44,7 +38,7 @@ class PointSubscriber implements EventSubscriberInterface
         ];
     }
 
-    public function onPointBuild(PointBuilderEvent $event)
+    public function onPointBuild(PointBuilderEvent $event): void
     {
         $action = [
             'group'    => 'mautic.email.actions',
@@ -65,7 +59,7 @@ class PointSubscriber implements EventSubscriberInterface
         $event->addAction('email.send', $action);
     }
 
-    public function onTriggerBuild(TriggerBuilderEvent $event)
+    public function onTriggerBuild(TriggerBuilderEvent $event): void
     {
         $sendEvent = [
             'group'           => 'mautic.email.point.trigger',
@@ -93,7 +87,7 @@ class PointSubscriber implements EventSubscriberInterface
     /**
      * Trigger point actions for email open.
      */
-    public function onEmailOpen(EmailOpenEvent $event)
+    public function onEmailOpen(EmailOpenEvent $event): void
     {
         $this->pointModel->triggerAction('email.open', $event->getEmail());
     }
@@ -101,7 +95,7 @@ class PointSubscriber implements EventSubscriberInterface
     /**
      * Trigger point actions for email send.
      */
-    public function onEmailSend(EmailSendEvent $event)
+    public function onEmailSend(EmailSendEvent $event): void
     {
         $leadArray = $event->getLead();
         if ($leadArray && is_array($leadArray) && !empty($leadArray['id'])) {

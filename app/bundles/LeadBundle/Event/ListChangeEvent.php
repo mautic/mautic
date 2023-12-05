@@ -10,7 +10,7 @@ class ListChangeEvent extends Event
 {
     private $lead;
     private $leads;
-    private $list;
+    private \Mautic\LeadBundle\Entity\LeadList $list;
     private $added;
     private ?\DateTime $date;
 

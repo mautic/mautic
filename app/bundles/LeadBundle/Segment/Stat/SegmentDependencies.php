@@ -11,35 +11,17 @@ use Mautic\ReportBundle\Model\ReportModel;
 
 class SegmentDependencies
 {
-    /**
-     * @var EmailModel
-     */
-    private $emailModel;
+    private \Mautic\EmailBundle\Model\EmailModel $emailModel;
 
-    /**
-     * @var CampaignModel
-     */
-    private $campaignModel;
+    private \Mautic\CampaignBundle\Model\CampaignModel $campaignModel;
 
-    /**
-     * @var ActionModel
-     */
-    private $actionModel;
+    private \Mautic\FormBundle\Model\ActionModel $actionModel;
 
-    /**
-     * @var ListModel
-     */
-    private $listModel;
+    private \Mautic\LeadBundle\Model\ListModel $listModel;
 
-    /**
-     * @var TriggerEventModel
-     */
-    private $triggerEventModel;
+    private \Mautic\PointBundle\Model\TriggerEventModel $triggerEventModel;
 
-    /**
-     * @var ReportModel
-     */
-    private $reportModel;
+    private \Mautic\ReportBundle\Model\ReportModel $reportModel;
 
     public function __construct(EmailModel $emailModel, CampaignModel $campaignModel, ActionModel $actionModel, ListModel $listModel, TriggerEventModel $triggerEventModel, ReportModel $reportModel)
     {

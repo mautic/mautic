@@ -12,20 +12,11 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class CategorySubscriber implements EventSubscriberInterface
 {
-    /**
-     * @var BundleHelper
-     */
-    private $bundleHelper;
+    private \Mautic\CoreBundle\Helper\BundleHelper $bundleHelper;
 
-    /**
-     * @var IpLookupHelper
-     */
-    private $ipLookupHelper;
+    private \Mautic\CoreBundle\Helper\IpLookupHelper $ipLookupHelper;
 
-    /**
-     * @var AuditLogModel
-     */
-    private $auditLogModel;
+    private \Mautic\CoreBundle\Model\AuditLogModel $auditLogModel;
 
     public function __construct(BundleHelper $bundleHelper, IpLookupHelper $ipLookupHelper, AuditLogModel $auditLogModel)
     {

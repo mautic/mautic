@@ -18,7 +18,7 @@ abstract class PluginBundleBaseStub extends Bundle
      *
      * @throws \Exception
      */
-    public static function onPluginInstall(Plugin $plugin, MauticFactory $factory, $metadata = null, $installedSchema = null)
+    public static function onPluginInstall(Plugin $plugin, MauticFactory $factory, $metadata = null, $installedSchema = null): void
     {
     }
 

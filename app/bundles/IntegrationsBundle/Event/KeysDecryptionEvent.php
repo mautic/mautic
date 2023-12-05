@@ -9,15 +9,9 @@ use Symfony\Contracts\EventDispatcher\Event;
 
 class KeysDecryptionEvent extends Event
 {
-    /**
-     * @var Integration
-     */
-    private $integrationConfiguration;
+    private \Mautic\PluginBundle\Entity\Integration $integrationConfiguration;
 
-    /**
-     * @var array
-     */
-    private $keys;
+    private array $keys;
 
     public function __construct(Integration $integrationConfiguration, array $keys)
     {

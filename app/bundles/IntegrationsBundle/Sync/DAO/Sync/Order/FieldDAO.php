@@ -13,10 +13,7 @@ class FieldDAO
      */
     private $name;
 
-    /**
-     * @var NormalizedValueDAO
-     */
-    private $value;
+    private \Mautic\IntegrationsBundle\Sync\DAO\Value\NormalizedValueDAO $value;
 
     /**
      * @param string $name

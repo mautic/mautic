@@ -42,15 +42,9 @@ class FetchCommonApiController extends AbstractFOSRestController implements Maut
     use RequestTrait;
     use FormErrorMessagesTrait;
 
-    /**
-     * @var EventDispatcherInterface
-     */
-    protected $dispatcher;
+    protected \Symfony\Component\EventDispatcher\EventDispatcherInterface $dispatcher;
 
-    /**
-     * @var CoreParametersHelper
-     */
-    protected $coreParametersHelper;
+    protected \Mautic\CoreBundle\Helper\CoreParametersHelper $coreParametersHelper;
 
     /**
      * If set to true, serializer will not return null values.
@@ -94,15 +88,12 @@ class FetchCommonApiController extends AbstractFOSRestController implements Maut
      */
     protected $extraGetEntitiesArguments = [];
 
-    /**
-     * @var MauticFactory
-     */
-    protected $factory;
+    protected \Mautic\CoreBundle\Factory\MauticFactory $factory;
 
     /**
      * @var ModelFactory<E>
      */
-    protected $modelFactory;
+    protected \Mautic\CoreBundle\Factory\ModelFactory $modelFactory;
 
     /**
      * @var bool
@@ -121,7 +112,7 @@ class FetchCommonApiController extends AbstractFOSRestController implements Maut
      *
      * @var AbstractCommonModel<E>|null
      */
-    protected $model = null;
+    protected $model;
 
     /**
      * The level parent/children should stop loading if applicable.
@@ -139,10 +130,7 @@ class FetchCommonApiController extends AbstractFOSRestController implements Maut
 
     private RequestStack $requestStack;
 
-    /**
-     * @var CorePermissions
-     */
-    protected $security;
+    protected \Mautic\CoreBundle\Security\Permissions\CorePermissions $security;
 
     /**
      * @var array<int, string>

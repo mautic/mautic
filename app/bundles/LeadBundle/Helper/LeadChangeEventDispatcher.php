@@ -10,10 +10,7 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class LeadChangeEventDispatcher
 {
-    /**
-     * @var EventDispatcherInterface
-     */
-    private $dispatcher;
+    private \Symfony\Component\EventDispatcher\EventDispatcherInterface $dispatcher;
 
     /**
      * @var Lead

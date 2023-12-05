@@ -14,7 +14,7 @@ class DetermineWinnerEvent extends Event
      *             email?: \Mautic\EmailBundle\Entity\Email
      *             }
      */
-    private $parameters;
+    private array $parameters;
 
     /**
      * @var array{

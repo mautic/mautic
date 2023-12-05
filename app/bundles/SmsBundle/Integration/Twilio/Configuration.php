@@ -7,10 +7,7 @@ use Twilio\Exceptions\ConfigurationException;
 
 class Configuration
 {
-    /**
-     * @var IntegrationHelper
-     */
-    private $integrationHelper;
+    private \Mautic\PluginBundle\Helper\IntegrationHelper $integrationHelper;
 
     /**
      * @var string

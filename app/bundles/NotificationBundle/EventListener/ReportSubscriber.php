@@ -17,20 +17,11 @@ class ReportSubscriber implements EventSubscriberInterface
     public const MOBILE_NOTIFICATIONS       = 'mobile_notifications';
     public const MOBILE_NOTIFICATIONS_STATS = 'mobile_notifications.stats';
 
-    /**
-     * @var Connection
-     */
-    private $db;
+    private \Doctrine\DBAL\Connection $db;
 
-    /**
-     * @var CompanyReportData
-     */
-    private $companyReportData;
+    private \Mautic\LeadBundle\Model\CompanyReportData $companyReportData;
 
-    /**
-     * @var StatRepository
-     */
-    private $statRepository;
+    private \Mautic\NotificationBundle\Entity\StatRepository $statRepository;
 
     public function __construct(Connection $db, CompanyReportData $companyReportData, StatRepository $statRepository)
     {
@@ -54,7 +45,7 @@ class ReportSubscriber implements EventSubscriberInterface
     /**
      * Add available tables and columns to the report builder lookup.
      */
-    public function onReportBuilder(ReportBuilderEvent $event)
+    public function onReportBuilder(ReportBuilderEvent $event): void
     {
         if (!$event->checkContext([self::MOBILE_NOTIFICATIONS, self::MOBILE_NOTIFICATIONS_STATS])) {
             return;
@@ -184,7 +175,7 @@ class ReportSubscriber implements EventSubscriberInterface
     /**
      * Initialize the QueryBuilder object to generate reports from.
      */
-    public function onReportGenerate(ReportGeneratorEvent $event)
+    public function onReportGenerate(ReportGeneratorEvent $event): void
     {
         if (!$event->checkContext([self::MOBILE_NOTIFICATIONS, self::MOBILE_NOTIFICATIONS_STATS])) {
             return;
@@ -252,7 +243,7 @@ class ReportSubscriber implements EventSubscriberInterface
     /**
      * Initialize the QueryBuilder object to generate reports from.
      */
-    public function onReportGraphGenerate(ReportGraphEvent $event)
+    public function onReportGraphGenerate(ReportGraphEvent $event): void
     {
         // Context check, we only want to fire for Mobile Notification reports
         if (!$event->checkContext(self::MOBILE_NOTIFICATIONS_STATS)) {

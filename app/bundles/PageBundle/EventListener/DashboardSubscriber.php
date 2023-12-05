@@ -43,15 +43,9 @@ class DashboardSubscriber extends MainDashboardSubscriber
         'page:pages:viewother',
     ];
 
-    /**
-     * @var PageModel
-     */
-    protected $pageModel;
+    protected \Mautic\PageBundle\Model\PageModel $pageModel;
 
-    /**
-     * @var RouterInterface
-     */
-    protected $router;
+    protected \Symfony\Component\Routing\RouterInterface $router;
 
     public function __construct(PageModel $pageModel, RouterInterface $router)
     {
@@ -62,7 +56,7 @@ class DashboardSubscriber extends MainDashboardSubscriber
     /**
      * Set a widget detail when needed.
      */
-    public function onWidgetDetailGenerate(WidgetDetailEvent $event)
+    public function onWidgetDetailGenerate(WidgetDetailEvent $event): void
     {
         $this->checkPermissions($event);
         $canViewOthers = $event->hasPermission('page:pages:viewother');

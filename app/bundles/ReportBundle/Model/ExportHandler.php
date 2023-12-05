@@ -14,10 +14,7 @@ class ExportHandler
      */
     private $dir;
 
-    /**
-     * @var FilePathResolver
-     */
-    private $filePathResolver;
+    private \Mautic\CoreBundle\Helper\FilePathResolver $filePathResolver;
 
     public function __construct(CoreParametersHelper $coreParametersHelper, FilePathResolver $filePathResolver)
     {
@@ -44,7 +41,7 @@ class ExportHandler
     /**
      * @param resource $handler
      */
-    public function closeHandler($handler)
+    public function closeHandler($handler): void
     {
         fclose($handler);
     }
@@ -52,7 +49,7 @@ class ExportHandler
     /**
      * @param string $fileName
      */
-    public function removeFile($fileName)
+    public function removeFile($fileName): void
     {
         try {
             $path = $this->getPath($fileName);

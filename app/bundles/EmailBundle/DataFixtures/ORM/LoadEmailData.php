@@ -12,17 +12,14 @@ use Mautic\EmailBundle\Model\EmailModel;
 
 class LoadEmailData extends AbstractFixture implements OrderedFixtureInterface
 {
-    /**
-     * @var EmailModel
-     */
-    private $emailModel;
+    private \Mautic\EmailBundle\Model\EmailModel $emailModel;
 
     public function __construct(EmailModel $emailModel)
     {
         $this->emailModel = $emailModel;
     }
 
-    public function load(ObjectManager $manager)
+    public function load(ObjectManager $manager): void
     {
         $emails = CsvHelper::csv_to_array(__DIR__.'/fakeemaildata.csv');
 

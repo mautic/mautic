@@ -45,35 +45,17 @@ class ReportSubscriber implements EventSubscriberInterface
     ];
     private $companyContexts = [self::CONTEXT_COMPANIES];
 
-    /**
-     * @var LeadModel
-     */
-    private $leadModel;
+    private \Mautic\LeadBundle\Model\LeadModel $leadModel;
 
-    /**
-     * @var StageModel
-     */
-    private $stageModel;
+    private \Mautic\StageBundle\Model\StageModel $stageModel;
 
-    /**
-     * @var CampaignModel
-     */
-    private $campaignModel;
+    private \Mautic\CampaignBundle\Model\CampaignModel $campaignModel;
 
-    /**
-     * @var EventCollector
-     */
-    private $eventCollector;
+    private \Mautic\CampaignBundle\EventCollector\EventCollector $eventCollector;
 
-    /**
-     * @var CompanyModel
-     */
-    private $companyModel;
+    private \Mautic\LeadBundle\Model\CompanyModel $companyModel;
 
-    /**
-     * @var FieldsBuilder
-     */
-    private $fieldsBuilder;
+    private \Mautic\LeadBundle\Report\FieldsBuilder $fieldsBuilder;
 
     /**
      * @var array
@@ -85,15 +67,9 @@ class ReportSubscriber implements EventSubscriberInterface
      */
     private $channelActions;
 
-    /**
-     * @var CompanyReportData
-     */
-    private $companyReportData;
+    private \Mautic\LeadBundle\Model\CompanyReportData $companyReportData;
 
-    /**
-     * @var Translator
-     */
-    private $translator;
+    private \Mautic\CoreBundle\Translation\Translator $translator;
     private FieldModel $fieldModel;
 
     public function __construct(

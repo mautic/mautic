@@ -11,17 +11,14 @@ use Symfony\Component\Validator\Constraints\NotBlank;
 
 class NotificationSendType extends AbstractType
 {
-    /**
-     * @var RouterInterface
-     */
-    protected $router;
+    protected \Symfony\Component\Routing\RouterInterface $router;
 
     public function __construct(RouterInterface $router)
     {
         $this->router = $router;
     }
 
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder->add(
             'notification',
@@ -95,7 +92,7 @@ class NotificationSendType extends AbstractType
         }
     }
 
-    public function configureOptions(OptionsResolver $resolver)
+    public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefined(['update_select']);
     }

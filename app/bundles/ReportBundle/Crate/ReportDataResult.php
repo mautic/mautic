@@ -6,10 +6,7 @@ use Mautic\CoreBundle\Twig\Helper\FormatterHelper;
 
 class ReportDataResult
 {
-    /**
-     * @var int
-     */
-    private $totalResults;
+    private int $totalResults;
 
     /**
      * @var array
@@ -193,7 +190,7 @@ class ReportDataResult
     /**
      * @param array $data
      */
-    private function buildHeader($data)
+    private function buildHeader($data): void
     {
         foreach ($this->columnKeys as $k) {
             $dataColumn      = $data['dataColumns'][$k];
@@ -211,7 +208,7 @@ class ReportDataResult
     /**
      * @param array $data
      */
-    private function buildTypes($data)
+    private function buildTypes($data): void
     {
         foreach ($this->columnKeys as $k) {
             if (isset($data['aggregatorColumns']) && array_key_exists($k, $data['aggregatorColumns'])) {
@@ -258,10 +255,8 @@ class ReportDataResult
 
     /**
      * @param array<string> $aggregators
-     *
-     * @return void
      */
-    private function buildTotals(array $aggregators)
+    private function buildTotals(array $aggregators): void
     {
         $dataCount = count($this->data) + $this->preBatchSize;
 

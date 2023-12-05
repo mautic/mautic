@@ -10,10 +10,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class FormFieldEmailType extends AbstractType
 {
-    /**
-     * @var TranslatorInterface
-     */
-    private $translator;
+    private \Symfony\Contracts\Translation\TranslatorInterface $translator;
 
     public function __construct(TranslatorInterface $translator)
     {
@@ -23,7 +20,7 @@ class FormFieldEmailType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder->add(
             'donotsubmit',

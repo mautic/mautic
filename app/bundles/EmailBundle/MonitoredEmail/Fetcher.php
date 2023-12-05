@@ -11,20 +11,11 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class Fetcher
 {
-    /**
-     * @var Mailbox
-     */
-    private $imapHelper;
+    private \Mautic\EmailBundle\MonitoredEmail\Mailbox $imapHelper;
 
-    /**
-     * @var EventDispatcherInterface
-     */
-    private $dispatcher;
+    private \Symfony\Component\EventDispatcher\EventDispatcherInterface $dispatcher;
 
-    /**
-     * @var TranslatorInterface
-     */
-    private $translator;
+    private \Symfony\Contracts\Translation\TranslatorInterface $translator;
 
     /**
      * @var array
@@ -61,7 +52,7 @@ class Fetcher
     /**
      * @param int $limit
      */
-    public function fetch($limit = null)
+    public function fetch($limit = null): void
     {
         /** @var ParseEmailEvent $event */
         $event = $this->dispatcher->dispatch(new ParseEmailEvent(), EmailEvents::EMAIL_PRE_FETCH);

@@ -32,15 +32,9 @@ class CacheStorageHelper
      */
     protected $adaptor;
 
-    /**
-     * @var Connection
-     */
-    protected $connection;
+    protected ?\Doctrine\DBAL\Connection $connection;
 
-    /**
-     * @var string
-     */
-    protected $cacheDir;
+    protected string $cacheDir;
 
     /**
      * @var string

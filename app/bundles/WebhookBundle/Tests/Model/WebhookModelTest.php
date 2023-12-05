@@ -233,8 +233,7 @@ class WebhookModelTest extends TestCase
 
         $webhookQueueRepoMock
             ->method('deleteQueuesById')
-            ->with([1])
-            ->willReturn(null);
+            ->with([1]);
 
         $responsePayload = [
             'mautic.email_on_send' => [

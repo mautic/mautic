@@ -35,7 +35,7 @@ class AssetsSubscriber implements EventSubscriberInterface
         ];
     }
 
-    public function injectAssets(CustomAssetsEvent $assetsEvent)
+    public function injectAssets(CustomAssetsEvent $assetsEvent): void
     {
         if (!$this->installer->checkIfInstalled()) {
             return;

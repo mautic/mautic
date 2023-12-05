@@ -54,7 +54,7 @@ class BuilderSubscriber implements EventSubscriberInterface
         ];
     }
 
-    public function onBuilderBuild(BuilderEvent $event)
+    public function onBuilderBuild(BuilderEvent $event): void
     {
         if ($event->tokensRequested($this->assetToken)) {
             $tokenHelper = $this->builderTokenHelperFactory->getBuilderTokenHelper('asset');
@@ -62,7 +62,7 @@ class BuilderSubscriber implements EventSubscriberInterface
         }
     }
 
-    public function onEmailGenerate(EmailSendEvent $event)
+    public function onEmailGenerate(EmailSendEvent $event): void
     {
         $lead   = $event->getLead();
         $leadId = (int) (null !== $lead ? $lead['id'] : null);
@@ -71,7 +71,7 @@ class BuilderSubscriber implements EventSubscriberInterface
         $event->addTokens($tokens);
     }
 
-    public function onPageDisplay(PageDisplayEvent $event)
+    public function onPageDisplay(PageDisplayEvent $event): void
     {
         $page    = $event->getPage();
         $lead    = $this->security->isAnonymous() ? $this->contactTracker->getContact() : null;

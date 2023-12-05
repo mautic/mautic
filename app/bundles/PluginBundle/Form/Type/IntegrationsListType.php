@@ -13,10 +13,7 @@ use Symfony\Component\Validator\Constraints\NotBlank;
 
 class IntegrationsListType extends AbstractType
 {
-    /**
-     * @var IntegrationHelper
-     */
-    private $integrationHelper;
+    private \Mautic\PluginBundle\Helper\IntegrationHelper $integrationHelper;
 
     public function __construct(IntegrationHelper $integrationHelper)
     {
@@ -26,7 +23,7 @@ class IntegrationsListType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $integrationObjects = $this->integrationHelper->getIntegrationObjects(null, $options['supported_features'], true);
         $integrations       = ['' => ''];
@@ -66,7 +63,7 @@ class IntegrationsListType extends AbstractType
             ]
         );
 
-        $formModifier = function (FormEvent $event) use ($integrationObjects) {
+        $formModifier = function (FormEvent $event) use ($integrationObjects): void {
             $data            = $event->getData();
             $form            = $event->getForm();
             $statusChoices   = [];
@@ -130,7 +127,7 @@ class IntegrationsListType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function configureOptions(OptionsResolver $resolver)
+    public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefined(['supported_features']);
         $resolver->setDefaults(

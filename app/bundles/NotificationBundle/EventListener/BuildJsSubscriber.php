@@ -12,20 +12,11 @@ use Symfony\Component\Routing\RouterInterface;
 
 class BuildJsSubscriber implements EventSubscriberInterface
 {
-    /**
-     * @var NotificationHelper
-     */
-    private $notificationHelper;
+    private \Mautic\NotificationBundle\Helper\NotificationHelper $notificationHelper;
 
-    /**
-     * @var IntegrationHelper
-     */
-    private $integrationHelper;
+    private \Mautic\PluginBundle\Helper\IntegrationHelper $integrationHelper;
 
-    /**
-     * @var RouterInterface
-     */
-    private $router;
+    private \Symfony\Component\Routing\RouterInterface $router;
 
     public function __construct(NotificationHelper $notificationHelper, IntegrationHelper $integrationHelper, RouterInterface $router)
     {
@@ -44,7 +35,7 @@ class BuildJsSubscriber implements EventSubscriberInterface
         ];
     }
 
-    public function onBuildJs(BuildJsEvent $event)
+    public function onBuildJs(BuildJsEvent $event): void
     {
         $integration = $this->integrationHelper->getIntegrationObject('OneSignal');
 

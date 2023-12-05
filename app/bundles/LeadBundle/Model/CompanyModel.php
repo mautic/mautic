@@ -54,10 +54,7 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
      */
     protected $companyFields;
 
-    /**
-     * @var EmailValidator
-     */
-    protected $emailValidator;
+    protected \Mautic\EmailBundle\Helper\EmailValidator $emailValidator;
 
     /**
      * @var array
@@ -69,10 +66,7 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
      */
     private $repoSetup = false;
 
-    /**
-     * @var CompanyDeduper
-     */
-    protected $companyDeduper;
+    protected \Mautic\LeadBundle\Deduplicate\CompanyDeduper $companyDeduper;
 
     public function __construct(FieldModel $leadFieldModel, EmailValidator $validator, CompanyDeduper $companyDeduper, EntityManager $em, CorePermissions $security, EventDispatcherInterface $dispatcher, UrlGeneratorInterface $router, Translator $translator, UserHelper $userHelper, LoggerInterface $mauticLogger, CoreParametersHelper $coreParametersHelper)
     {
@@ -101,10 +95,8 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
      *
      * @param array $entities
      * @param bool  $unlock
-     *
-     * @return array
      */
-    public function saveEntities($entities, $unlock = true)
+    public function saveEntities($entities, $unlock = true): void
     {
         // Update leads primary company name
         foreach ($entities as $entity) {
@@ -724,10 +716,7 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
         return $this->companyFields;
     }
 
-    /**
-     * @return array
-     */
-    public function extractCompanyDataFromImport(array &$mappedFields, array &$data)
+    public function extractCompanyDataFromImport(array &$mappedFields, array &$data): array
     {
         $companyData    = [];
         $companyFields  = [];

@@ -23,15 +23,9 @@ final class CacheProvider implements CacheProviderInterface
      */
     private $psr16;
 
-    /**
-     * @var CoreParametersHelper
-     */
-    private $coreParametersHelper;
+    private \Mautic\CoreBundle\Helper\CoreParametersHelper $coreParametersHelper;
 
-    /**
-     * @var ContainerInterface
-     */
-    private $container;
+    private \Symfony\Component\DependencyInjection\ContainerInterface $container;
 
     public function __construct(CoreParametersHelper $coreParametersHelper, ContainerInterface $container)
     {

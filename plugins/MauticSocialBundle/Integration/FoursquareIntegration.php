@@ -21,9 +21,9 @@ class FoursquareIntegration extends SocialIntegration
     }
 
     /**
-     * {@inheritdoc}
+     * @return string[]
      */
-    public function getIdentifierFields()
+    public function getIdentifierFields(): array
     {
         return [
             'email',
@@ -82,8 +82,6 @@ class FoursquareIntegration extends SocialIntegration
 
     /**
      * Get public data.
-     *
-     * @return array
      */
     public function getUserData($identifier, &$socialCache)
     {
@@ -101,12 +99,7 @@ class FoursquareIntegration extends SocialIntegration
         }
     }
 
-    /**
-     * {@inheritdoc}
-     *
-     * @return array|void
-     */
-    public function getPublicActivity($identifier, &$socialCache)
+    public function getPublicActivity($identifier, &$socialCache): void
     {
         if ($id = $this->getContactUserId($identifier, $socialCache)) {
             $activity = [
@@ -257,7 +250,7 @@ class FoursquareIntegration extends SocialIntegration
     /**
      * {@inheritdoc}
      */
-    public function getAvailableLeadFields($settings = [])
+    public function getAvailableLeadFields($settings = []): array
     {
         return [
             'profileHandle' => ['type' => 'string'],
@@ -280,7 +273,7 @@ class FoursquareIntegration extends SocialIntegration
     /**
      * {@inheritdoc}
      */
-    public function getSupportedFeatures()
+    public function getSupportedFeatures(): array
     {
         return [
             'public_profile',

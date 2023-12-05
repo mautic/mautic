@@ -9,10 +9,7 @@ use Mautic\IntegrationsBundle\Sync\SyncDataExchange\MauticSyncDataExchange;
 
 class SyncDateHelper
 {
-    /**
-     * @var Connection
-     */
-    private $connection;
+    private \Doctrine\DBAL\Connection $connection;
 
     /**
      * @var \DateTimeInterface|null

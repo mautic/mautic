@@ -35,15 +35,9 @@ use Symfony\Component\HttpFoundation\Response;
 
 class FormController extends CommonFormController
 {
-    /**
-     * @var AlreadyMappedFieldCollectorInterface
-     */
-    private $alreadyMappedFieldCollector;
+    private \Mautic\FormBundle\Collector\AlreadyMappedFieldCollectorInterface $alreadyMappedFieldCollector;
 
-    /**
-     * @var MappedObjectCollector
-     */
-    private $mappedObjectCollector;
+    private \Mautic\FormBundle\Collector\MappedObjectCollector $mappedObjectCollector;
 
     public function __construct(FormFactoryInterface $formFactory, FormFieldHelper $fieldHelper, AlreadyMappedFieldCollectorInterface $alreadyMappedFieldCollector, MappedObjectCollector $mappedObjectCollector, ManagerRegistry $doctrine, MauticFactory $factory, ModelFactory $modelFactory, UserHelper $userHelper, CoreParametersHelper $coreParametersHelper, EventDispatcherInterface $dispatcher, Translator $translator, FlashBag $flashBag, RequestStack $requestStack, CorePermissions $security)
     {
@@ -1151,7 +1145,7 @@ class FormController extends CommonFormController
     /**
      * Clear field and actions from the session.
      */
-    public function clearSessionComponents(Request $request, $sessionId)
+    public function clearSessionComponents(Request $request, $sessionId): void
     {
         $session = $request->getSession();
         $session->remove('mautic.form.'.$sessionId.'.fields.modified');

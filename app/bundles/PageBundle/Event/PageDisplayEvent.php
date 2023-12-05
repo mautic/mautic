@@ -12,15 +12,9 @@ class PageDisplayEvent extends Event
      */
     private $content;
 
-    /**
-     * @var Page
-     */
-    private $page;
+    private \Mautic\PageBundle\Entity\Page $page;
 
-    /**
-     * @var array
-     */
-    private $params;
+    private array $params;
 
     public function __construct($content, Page $page, array $params = [])
     {
@@ -54,7 +48,7 @@ class PageDisplayEvent extends Event
      *
      * @param string $content
      */
-    public function setContent($content)
+    public function setContent($content): void
     {
         $this->content = $content;
     }
@@ -74,7 +68,7 @@ class PageDisplayEvent extends Event
      *
      * @param array $params
      */
-    public function setParams($params)
+    public function setParams($params): void
     {
         $this->params = $params;
     }

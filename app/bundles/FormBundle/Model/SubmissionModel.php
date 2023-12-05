@@ -64,85 +64,37 @@ use Twig\Environment;
  */
 class SubmissionModel extends CommonFormModel
 {
-    /**
-     * @var IpLookupHelper
-     */
-    protected $ipLookupHelper;
+    protected \Mautic\CoreBundle\Helper\IpLookupHelper $ipLookupHelper;
 
-    /**
-     * @var Environment
-     */
-    protected $twig;
+    protected \Twig\Environment $twig;
 
-    /**
-     * @var FormModel
-     */
-    protected $formModel;
+    protected \Mautic\FormBundle\Model\FormModel $formModel;
 
-    /**
-     * @var PageModel
-     */
-    protected $pageModel;
+    protected \Mautic\PageBundle\Model\PageModel $pageModel;
 
-    /**
-     * @var LeadModel
-     */
-    protected $leadModel;
+    protected \Mautic\LeadBundle\Model\LeadModel $leadModel;
 
-    /**
-     * @var CampaignModel
-     */
-    protected $campaignModel;
+    protected \Mautic\CampaignBundle\Model\CampaignModel $campaignModel;
 
-    /**
-     * @var MembershipManager
-     */
-    protected $membershipManager;
+    protected \Mautic\CampaignBundle\Membership\MembershipManager $membershipManager;
 
-    /**
-     * @var LeadFieldModel
-     */
-    protected $leadFieldModel;
+    protected LeadFieldModel $leadFieldModel;
 
-    /**
-     * @var CompanyModel
-     */
-    protected $companyModel;
+    protected \Mautic\LeadBundle\Model\CompanyModel $companyModel;
 
-    /**
-     * @var FormFieldHelper
-     */
-    protected $fieldHelper;
+    protected \Mautic\FormBundle\Helper\FormFieldHelper $fieldHelper;
 
-    /**
-     * @var UploadFieldValidator
-     */
-    private $uploadFieldValidator;
+    private \Mautic\FormBundle\Validator\UploadFieldValidator $uploadFieldValidator;
 
-    /**
-     * @var FormUploader
-     */
-    private $formUploader;
+    private \Mautic\FormBundle\Helper\FormUploader $formUploader;
 
-    /**
-     * @var DeviceTrackingServiceInterface
-     */
-    private $deviceTrackingService;
+    private \Mautic\LeadBundle\Tracker\Service\DeviceTrackingService\DeviceTrackingServiceInterface $deviceTrackingService;
 
-    /**
-     * @var FieldValueTransformer
-     */
-    private $fieldValueTransformer;
+    private \Mautic\FormBundle\Event\Service\FieldValueTransformer $fieldValueTransformer;
 
-    /**
-     * @var DateHelper
-     */
-    private $dateHelper;
+    private \Mautic\CoreBundle\Twig\Helper\DateHelper $dateHelper;
 
-    /**
-     * @var ContactTracker
-     */
-    private $contactTracker;
+    private \Mautic\LeadBundle\Tracker\ContactTracker $contactTracker;
 
     private ContactMerger $contactMerger;
 
@@ -488,7 +440,7 @@ class SubmissionModel extends CommonFormModel
     /**
      * @param Submission $submission
      */
-    public function deleteEntity($submission)
+    public function deleteEntity($submission): void
     {
         $this->formUploader->deleteUploadedFiles($submission);
 
@@ -531,7 +483,7 @@ class SubmissionModel extends CommonFormModel
         switch ($format) {
             case 'csv':
                 $response = new StreamedResponse(
-                    function () use ($results, $form, $viewOnlyFields) {
+                    function () use ($results, $form, $viewOnlyFields): void {
                         $handle = fopen('php://output', 'r+');
 
                         // build the header row
@@ -574,7 +526,7 @@ class SubmissionModel extends CommonFormModel
             case 'xlsx':
                 if (class_exists(Spreadsheet::class)) {
                     $response = new StreamedResponse(
-                        function () use ($results, $form, $name, $viewOnlyFields) {
+                        function () use ($results, $form, $name, $viewOnlyFields): void {
                             $objPHPExcel = new Spreadsheet();
                             $objPHPExcel->getProperties()->setTitle($name);
 
@@ -640,7 +592,7 @@ class SubmissionModel extends CommonFormModel
         switch ($format) {
             case 'csv':
                 $response = new StreamedResponse(
-                    function () use ($results) {
+                    function () use ($results): void {
                         $handle = fopen('php://output', 'r+');
 
                         // build the header row
@@ -680,7 +632,7 @@ class SubmissionModel extends CommonFormModel
                     throw new \Exception('PHPSpreadsheet is required to export to Excel spreadsheets');
                 }
                 $response = new StreamedResponse(
-                    function () use ($results, $name) {
+                    function () use ($results, $name): void {
                         $objPHPExcel = new Spreadsheet();
                         $objPHPExcel->getProperties()->setTitle($name);
 
@@ -955,7 +907,7 @@ class SubmissionModel extends CommonFormModel
 
         $actions->filter(function (Action $action) use ($availableActions) {
             return array_key_exists($action->getType(), $availableActions);
-        })->map(function (Action $action) use ($event, $availableActions) {
+        })->map(function (Action $action) use ($event, $availableActions): void {
             $event->setAction($action);
             $this->dispatcher->dispatch($event, $availableActions[$action->getType()]['eventName']);
         });
@@ -1027,7 +979,7 @@ class SubmissionModel extends CommonFormModel
         };
 
         // Closure to help search for a conflict
-        $checkForIdentifierConflict = function ($fieldSet1, $fieldSet2) {
+        $checkForIdentifierConflict = function ($fieldSet1, $fieldSet2): array {
             // Find fields in both sets
             $potentialConflicts = array_keys(
                 array_intersect_key($fieldSet1, $fieldSet2)

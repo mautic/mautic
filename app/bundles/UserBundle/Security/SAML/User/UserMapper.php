@@ -12,7 +12,7 @@ class UserMapper implements UsernameMapperInterface
     /**
      * @var string[]
      */
-    private $attributes;
+    private array $attributes;
 
     public function __construct(array $attributes)
     {

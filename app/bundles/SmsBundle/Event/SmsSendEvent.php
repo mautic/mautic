@@ -17,10 +17,7 @@ class SmsSendEvent extends CommonEvent
      */
     protected $content;
 
-    /**
-     * @var Lead
-     */
-    protected $lead;
+    protected \Mautic\LeadBundle\Entity\Lead $lead;
 
     /**
      * @param string $content
@@ -42,7 +39,7 @@ class SmsSendEvent extends CommonEvent
     /**
      * @param string $content
      */
-    public function setContent($content)
+    public function setContent($content): void
     {
         $this->content = $content;
     }
@@ -58,7 +55,7 @@ class SmsSendEvent extends CommonEvent
     /**
      * @param Lead $lead
      */
-    public function setLead($lead)
+    public function setLead($lead): void
     {
         $this->lead = $lead;
     }
@@ -74,7 +71,7 @@ class SmsSendEvent extends CommonEvent
     /**
      * @param int $smsId
      */
-    public function setSmsId($smsId)
+    public function setSmsId($smsId): void
     {
         $this->smsId = $smsId;
     }

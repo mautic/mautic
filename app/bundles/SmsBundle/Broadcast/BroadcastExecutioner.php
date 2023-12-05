@@ -11,10 +11,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class BroadcastExecutioner
 {
-    /**
-     * @var SmsModel
-     */
-    private $smsModel;
+    private \Mautic\SmsBundle\Model\SmsModel $smsModel;
 
     private LeadRepository $leadRepository;
 
@@ -23,20 +20,14 @@ class BroadcastExecutioner
      */
     private $contactLimiter;
 
-    /**
-     * @var BroadcastQuery
-     */
-    private $broadcastQuery;
+    private \Mautic\SmsBundle\Broadcast\BroadcastQuery $broadcastQuery;
 
     /**
      * @var BroadcastResult
      */
     private $result;
 
-    /**
-     * @var TranslatorInterface
-     */
-    private $translator;
+    private \Symfony\Contracts\Translation\TranslatorInterface $translator;
 
     public function __construct(SmsModel $smsModel, BroadcastQuery $broadcastQuery, TranslatorInterface $translator, LeadRepository $leadRepository)
     {
@@ -46,7 +37,7 @@ class BroadcastExecutioner
         $this->leadRepository = $leadRepository;
     }
 
-    public function execute(ChannelBroadcastEvent $event)
+    public function execute(ChannelBroadcastEvent $event): void
     {
         // Get list of published broadcasts or broadcast if there is only a single ID
         $smses = $this->smsModel->getRepository()->getPublishedBroadcasts($event->getId());
@@ -70,7 +61,7 @@ class BroadcastExecutioner
      * @throws LimitQuotaException
      * @throws \Mautic\CampaignBundle\Executioner\Exception\NoContactsFoundException
      */
-    private function send(Sms $sms)
+    private function send(Sms $sms): void
     {
         $contacts = $this->broadcastQuery->getPendingContacts($sms, $this->contactLimiter);
         while (!empty($contacts)) {

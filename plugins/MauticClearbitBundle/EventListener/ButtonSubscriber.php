@@ -42,7 +42,7 @@ class ButtonSubscriber implements EventSubscriberInterface
         ];
     }
 
-    public function injectViewButtons(CustomButtonEvent $event)
+    public function injectViewButtons(CustomButtonEvent $event): void
     {
         /** @var ClearbitIntegration $myIntegration */
         $myIntegration = $this->helper->getIntegrationObject('Clearbit');

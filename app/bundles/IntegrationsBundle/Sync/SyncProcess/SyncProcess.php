@@ -30,70 +30,37 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class SyncProcess
 {
-    /**
-     * @var MappingManualDAO
-     */
-    private $mappingManualDAO;
+    private \Mautic\IntegrationsBundle\Sync\DAO\Mapping\MappingManualDAO $mappingManualDAO;
 
     /**
      * @var MauticSyncDataExchange
      */
-    private $internalSyncDataExchange;
+    private \Mautic\IntegrationsBundle\Sync\SyncDataExchange\SyncDataExchangeInterface $internalSyncDataExchange;
 
-    /**
-     * @var SyncDataExchangeInterface
-     */
-    private $integrationSyncDataExchange;
+    private \Mautic\IntegrationsBundle\Sync\SyncDataExchange\SyncDataExchangeInterface $integrationSyncDataExchange;
 
-    /**
-     * @var SyncDateHelper
-     */
-    private $syncDateHelper;
+    private \Mautic\IntegrationsBundle\Sync\Helper\SyncDateHelper $syncDateHelper;
 
-    /**
-     * @var MappingHelper
-     */
-    private $mappingHelper;
+    private \Mautic\IntegrationsBundle\Sync\Helper\MappingHelper $mappingHelper;
 
-    /**
-     * @var RelationsHelper
-     */
-    private $relationsHelper;
+    private \Mautic\IntegrationsBundle\Sync\Helper\RelationsHelper $relationsHelper;
 
-    /**
-     * @var IntegrationSyncProcess
-     */
-    private $integrationSyncProcess;
+    private \Mautic\IntegrationsBundle\Sync\SyncProcess\Direction\Integration\IntegrationSyncProcess $integrationSyncProcess;
 
-    /**
-     * @var MauticSyncProcess
-     */
-    private $mauticSyncProcess;
+    private \Mautic\IntegrationsBundle\Sync\SyncProcess\Direction\Internal\MauticSyncProcess $mauticSyncProcess;
 
-    /**
-     * @var EventDispatcherInterface
-     */
-    private $eventDispatcher;
+    private \Symfony\Component\EventDispatcher\EventDispatcherInterface $eventDispatcher;
 
-    /**
-     * @var Notifier
-     */
-    private $notifier;
+    private \Mautic\IntegrationsBundle\Sync\Notification\Notifier $notifier;
 
-    /**
-     * @var InputOptionsDAO
-     */
-    private $inputOptionsDAO;
+    private \Mautic\IntegrationsBundle\Sync\DAO\Sync\InputOptionsDAO $inputOptionsDAO;
 
     /**
      * @var int
      */
     private $syncIteration;
 
-    /**
-     * @var SyncServiceInterface
-     */
-    private $syncService;
+    private \Mautic\IntegrationsBundle\Sync\SyncService\SyncServiceInterface $syncService;
 
     public function __construct(
         SyncDateHelper $syncDateHelper,

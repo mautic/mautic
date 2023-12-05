@@ -11,15 +11,9 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class BaseFilterQueryBuilder implements FilterQueryBuilderInterface
 {
-    /**
-     * @var RandomParameterName
-     */
-    private $parameterNameGenerator;
+    private \Mautic\LeadBundle\Segment\RandomParameterName $parameterNameGenerator;
 
-    /**
-     * @var EventDispatcherInterface
-     */
-    private $dispatcher;
+    private \Symfony\Component\EventDispatcher\EventDispatcherInterface $dispatcher;
 
     public function __construct(
         RandomParameterName $randomParameterNameService,

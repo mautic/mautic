@@ -14,30 +14,15 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class LeadSubscriber implements EventSubscriberInterface
 {
-    /**
-     * @var FormModel
-     */
-    private $formModel;
+    private \Mautic\FormBundle\Model\FormModel $formModel;
 
-    /**
-     * @var PageModel
-     */
-    private $pageModel;
+    private \Mautic\PageBundle\Model\PageModel $pageModel;
 
-    /**
-     * @var SubmissionRepository
-     */
-    private $submissionRepository;
+    private \Mautic\FormBundle\Entity\SubmissionRepository $submissionRepository;
 
-    /**
-     * @var TranslatorInterface
-     */
-    private $translator;
+    private \Symfony\Contracts\Translation\TranslatorInterface $translator;
 
-    /**
-     * @var RouterInterface
-     */
-    private $router;
+    private \Symfony\Component\Routing\RouterInterface $router;
 
     public function __construct(
         FormModel $formModel,
@@ -67,7 +52,7 @@ class LeadSubscriber implements EventSubscriberInterface
     /**
      * Compile events for the lead timeline.
      */
-    public function onTimelineGenerate(LeadTimelineEvent $event)
+    public function onTimelineGenerate(LeadTimelineEvent $event): void
     {
         // Set available event types
         $eventTypeKey  = 'form.submitted';
@@ -115,7 +100,7 @@ class LeadSubscriber implements EventSubscriberInterface
         }
     }
 
-    public function onLeadMerge(LeadMergeEvent $event)
+    public function onLeadMerge(LeadMergeEvent $event): void
     {
         $this->submissionRepository->updateLead($event->getLoser()->getId(), $event->getVictor()->getId());
     }

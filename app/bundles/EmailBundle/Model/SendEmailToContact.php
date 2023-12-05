@@ -16,25 +16,13 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class SendEmailToContact
 {
-    /**
-     * @var MailHelper
-     */
-    private $mailer;
+    private \Mautic\EmailBundle\Helper\MailHelper $mailer;
 
-    /**
-     * @var StatHelper
-     */
-    private $statHelper;
+    private \Mautic\EmailBundle\Stat\StatHelper $statHelper;
 
-    /**
-     * @var DoNotContact
-     */
-    private $dncModel;
+    private \Mautic\LeadBundle\Model\DoNotContact $dncModel;
 
-    /**
-     * @var TranslatorInterface
-     */
-    private $translator;
+    private \Symfony\Contracts\Translation\TranslatorInterface $translator;
 
     /**
      * @var string|null
@@ -123,7 +111,7 @@ class SendEmailToContact
     /**
      * Flush any remaining queued contacts, process spending stats, create DNC entries and reset this class.
      */
-    public function finalFlush()
+    public function finalFlush(): void
     {
         $this->flush();
         $this->statHelper->deletePending();
@@ -212,7 +200,7 @@ class SendEmailToContact
     /**
      * @throws FailedToSendToContactException
      */
-    public function send()
+    public function send(): void
     {
         if ($this->mailer->inTokenizationMode()) {
             list($success, $errors) = $this->queueTokenizedEmail();
@@ -230,7 +218,7 @@ class SendEmailToContact
     /**
      * Reset everything.
      */
-    public function reset()
+    public function reset(): void
     {
         $this->badEmails         = [];
         $this->errorMessages     = [];
@@ -382,10 +370,7 @@ class SendEmailToContact
         --$this->emailSentCounts[$emailId];
     }
 
-    /**
-     * @return array
-     */
-    protected function queueTokenizedEmail()
+    protected function queueTokenizedEmail(): array
     {
         list($queued, $queueErrors) = $this->mailer->queue(true, MailHelper::QUEUE_RETURN_ERRORS);
 

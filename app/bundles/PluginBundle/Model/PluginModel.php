@@ -21,15 +21,9 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
  */
 class PluginModel extends FormModel
 {
-    /**
-     * @var FieldModel
-     */
-    protected $leadFieldModel;
+    protected \Mautic\LeadBundle\Model\FieldModel $leadFieldModel;
 
-    /**
-     * @var BundleHelper
-     */
-    private $bundleHelper;
+    private \Mautic\CoreBundle\Helper\BundleHelper $bundleHelper;
 
     public function __construct(FieldModel $leadFieldModel, CoreParametersHelper $coreParametersHelper, BundleHelper $bundleHelper, EntityManager $em, CorePermissions $security, EventDispatcherInterface $dispatcher, UrlGeneratorInterface $router, Translator $translator, UserHelper $userHelper, LoggerInterface $mauticLogger)
     {
@@ -78,7 +72,7 @@ class PluginModel extends FormModel
         return $this->leadFieldModel->getFieldList(true, true, ['isPublished' => true, 'object' => 'company']);
     }
 
-    public function saveFeatureSettings($entity)
+    public function saveFeatureSettings($entity): void
     {
         $this->em->persist($entity);
         $this->em->flush();

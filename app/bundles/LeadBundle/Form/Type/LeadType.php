@@ -25,20 +25,11 @@ class LeadType extends AbstractType
 {
     use EntityFieldsBuildFormTrait;
 
-    /**
-     * @var TranslatorInterface
-     */
-    private $translator;
+    private \Symfony\Contracts\Translation\TranslatorInterface $translator;
 
-    /**
-     * @var CompanyModel
-     */
-    private $companyModel;
+    private \Mautic\LeadBundle\Model\CompanyModel $companyModel;
 
-    /**
-     * @var EntityManager
-     */
-    private $entityManager;
+    private \Doctrine\ORM\EntityManager $entityManager;
 
     public function __construct(TranslatorInterface $translator, CompanyModel $companyModel, EntityManager $entityManager)
     {

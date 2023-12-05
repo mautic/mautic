@@ -10,15 +10,9 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class SecuritySubscriber implements EventSubscriberInterface
 {
-    /**
-     * @var IpLookupHelper
-     */
-    private $ipLookupHelper;
+    private \Mautic\CoreBundle\Helper\IpLookupHelper $ipLookupHelper;
 
-    /**
-     * @var AuditLogModel
-     */
-    private $auditLogModel;
+    private \Mautic\CoreBundle\Model\AuditLogModel $auditLogModel;
 
     public function __construct(IpLookupHelper $ipLookupHelper, AuditLogModel $auditLogModel)
     {
@@ -36,7 +30,7 @@ class SecuritySubscriber implements EventSubscriberInterface
         ];
     }
 
-    public function onSecurityInteractiveLogin(LoginEvent $event)
+    public function onSecurityInteractiveLogin(LoginEvent $event): void
     {
         $userId   = (int) $event->getUser()->getId();
         $useName  = $event->getUser()->getUsername();

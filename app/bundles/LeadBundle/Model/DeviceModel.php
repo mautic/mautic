@@ -25,10 +25,7 @@ use Symfony\Contracts\EventDispatcher\Event;
  */
 class DeviceModel extends FormModel
 {
-    /**
-     * @var LeadDeviceRepository
-     */
-    private $leadDeviceRepository;
+    private \Mautic\LeadBundle\Entity\LeadDeviceRepository $leadDeviceRepository;
 
     public function __construct(
         LeadDeviceRepository $leadDeviceRepository,

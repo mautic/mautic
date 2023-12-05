@@ -36,45 +36,21 @@ use Twig\Environment;
 
 class BuilderSubscriber implements EventSubscriberInterface
 {
-    /**
-     * @var TokenHelper
-     */
-    private $tokenHelper;
+    private \Mautic\PageBundle\Helper\TokenHelper $tokenHelper;
 
-    /**
-     * @var IntegrationHelper
-     */
-    private $integrationHelper;
+    private \Mautic\PluginBundle\Helper\IntegrationHelper $integrationHelper;
 
-    /**
-     * @var TranslatorInterface
-     */
-    private $translator;
+    private \Symfony\Contracts\Translation\TranslatorInterface $translator;
 
-    /**
-     * @var Connection
-     */
-    private $connection;
+    private \Doctrine\DBAL\Connection $connection;
 
-    /**
-     * @var CorePermissions
-     */
-    private $security;
+    private \Mautic\CoreBundle\Security\Permissions\CorePermissions $security;
 
-    /**
-     * @var Environment
-     */
-    private $twig;
+    private \Twig\Environment $twig;
 
-    /**
-     * @var BuilderTokenHelperFactory
-     */
-    private $builderTokenHelperFactory;
+    private \Mautic\CoreBundle\Helper\BuilderTokenHelperFactory $builderTokenHelperFactory;
 
-    /**
-     * @var PageModel
-     */
-    private $pageModel;
+    private \Mautic\PageBundle\Model\PageModel $pageModel;
     private $pageTokenRegex      = '{pagelink=(.*?)}';
     private $dwcTokenRegex       = '{dwc=(.*?)}';
     private $langBarRegex        = '{langbar}';
@@ -127,7 +103,7 @@ class BuilderSubscriber implements EventSubscriberInterface
     /**
      * Add forms to available page tokens.
      */
-    public function onPageBuild(Events\PageBuilderEvent $event)
+    public function onPageBuild(Events\PageBuilderEvent $event): void
     {
         $tokenHelper = $this->builderTokenHelperFactory->getBuilderTokenHelper('page');
 
@@ -352,7 +328,7 @@ class BuilderSubscriber implements EventSubscriberInterface
         }
     }
 
-    public function onPageDisplay(Events\PageDisplayEvent $event)
+    public function onPageDisplay(Events\PageDisplayEvent $event): void
     {
         $content = $event->getContent();
         $page    = $event->getPage();
@@ -704,7 +680,7 @@ class BuilderSubscriber implements EventSubscriberInterface
         return $langbar;
     }
 
-    public function onEmailBuild(EmailBuilderEvent $event)
+    public function onEmailBuild(EmailBuilderEvent $event): void
     {
         if ($event->tokensRequested([$this->pageTokenRegex])) {
             $tokenHelper = $this->builderTokenHelperFactory->getBuilderTokenHelper('page');
@@ -712,7 +688,7 @@ class BuilderSubscriber implements EventSubscriberInterface
         }
     }
 
-    public function onEmailGenerate(EmailSendEvent $event)
+    public function onEmailGenerate(EmailSendEvent $event): void
     {
         $content      = $event->getContent();
         $plainText    = $event->getPlainText();

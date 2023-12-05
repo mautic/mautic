@@ -16,7 +16,7 @@ class BuilderEvent extends Event
     protected $entity;
     protected $requested;
     protected $tokenFilterText;
-    protected $tokenFilterTarget;
+    protected string $tokenFilterTarget;
 
     public function __construct($translator, $entity = null, $requested = 'all', protected string $tokenFilter = '')
     {
@@ -239,10 +239,8 @@ class BuilderEvent extends Event
 
     /**
      * Get text of the search filter.
-     *
-     * @return array
      */
-    public function getTokenFilter()
+    public function getTokenFilter(): array
     {
         return [
             'target' => $this->tokenFilterTarget,

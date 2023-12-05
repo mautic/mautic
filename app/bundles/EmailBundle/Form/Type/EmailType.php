@@ -40,27 +40,15 @@ class EmailType extends AbstractType
 {
     use DynamicContentTrait;
 
-    /**
-     * @var TranslatorInterface
-     */
-    private $translator;
+    private \Symfony\Contracts\Translation\TranslatorInterface $translator;
 
-    /**
-     * @var EntityManager
-     */
-    private $em;
+    private \Doctrine\ORM\EntityManager $em;
 
-    /**
-     * @var StageModel
-     */
-    private $stageModel;
+    private \Mautic\StageBundle\Model\StageModel $stageModel;
 
     private CoreParametersHelper $coreParametersHelper;
 
-    /**
-     * @var ThemeHelperInterface
-     */
-    private $themeHelper;
+    private \Mautic\CoreBundle\Helper\ThemeHelperInterface $themeHelper;
 
     public function __construct(
         TranslatorInterface $translator,
@@ -76,7 +64,7 @@ class EmailType extends AbstractType
         $this->themeHelper          = $themeHelper;
     }
 
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder->addEventSubscriber(new CleanFormSubscriber(['content' => 'html', 'customHtml' => 'html', 'headers' => 'clean']));
         $builder->addEventSubscriber(new FormExitSubscriber('email.email', $options));
@@ -368,7 +356,7 @@ class EmailType extends AbstractType
             ]
         );
 
-        $variantSettingsModifier = function (FormEvent $event, $isVariant) {
+        $variantSettingsModifier = function (FormEvent $event, $isVariant): void {
             if ($isVariant) {
                 $event->getForm()->add(
                     'variantSettings',
@@ -383,7 +371,7 @@ class EmailType extends AbstractType
         // Building the form
         $builder->addEventListener(
             FormEvents::PRE_SET_DATA,
-            function (FormEvent $event) use ($variantSettingsModifier) {
+            function (FormEvent $event) use ($variantSettingsModifier): void {
                 $variantSettingsModifier(
                     $event,
                     $event->getData()->getVariantParent()
@@ -394,7 +382,7 @@ class EmailType extends AbstractType
         // After submit
         $builder->addEventListener(
             FormEvents::PRE_SUBMIT,
-            function (FormEvent $event) use ($variantSettingsModifier) {
+            function (FormEvent $event) use ($variantSettingsModifier): void {
                 $data = $event->getData();
                 $variantSettingsModifier(
                     $event,
@@ -515,7 +503,7 @@ class EmailType extends AbstractType
         }
     }
 
-    public function configureOptions(OptionsResolver $resolver)
+    public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults(
             [
@@ -526,7 +514,7 @@ class EmailType extends AbstractType
         $resolver->setDefined(['update_select']);
     }
 
-    public function buildView(FormView $view, FormInterface $form, array $options)
+    public function buildView(FormView $view, FormInterface $form, array $options): void
     {
         $stages       = $this->stageModel->getRepository()->getSimpleList();
         $stageChoices = [];

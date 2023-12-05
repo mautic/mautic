@@ -1379,7 +1379,7 @@ class EmailController extends FormController
                 $fields     = $fieldModel->getFieldList(false, false);
                 array_walk(
                     $fields,
-                    function (&$field) {
+                    function (&$field): void {
                         $field = "[$field]";
                     }
                 );
@@ -1441,7 +1441,7 @@ class EmailController extends FormController
      * @param array $slots
      * @param Email $entity
      */
-    private function processSlots(SlotsHelper $slotsHelper, $slots, $entity)
+    private function processSlots(SlotsHelper $slotsHelper, $slots, $entity): void
     {
         $content     = $entity->getContent();
 

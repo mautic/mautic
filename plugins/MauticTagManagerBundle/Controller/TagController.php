@@ -391,10 +391,8 @@ class TagController extends FormController
      * Get variables for POST action.
      *
      * @param int|null $objectId
-     *
-     * @return array
      */
-    private function getPostActionVars(Request $request, $objectId = null)
+    private function getPostActionVars(Request $request, $objectId = null): array
     {
         // set the return URL
         if ($objectId) {

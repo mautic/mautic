@@ -13,7 +13,6 @@ use Mautic\IntegrationsBundle\Sync\Helper\SyncDateHelper;
 use Mautic\IntegrationsBundle\Sync\Logger\DebugLogger;
 use Mautic\IntegrationsBundle\Sync\Notification\Notifier;
 use Mautic\IntegrationsBundle\Sync\SyncDataExchange\MauticSyncDataExchange;
-use Mautic\IntegrationsBundle\Sync\SyncDataExchange\SyncDataExchangeInterface;
 use Mautic\IntegrationsBundle\Sync\SyncProcess\Direction\Integration\IntegrationSyncProcess;
 use Mautic\IntegrationsBundle\Sync\SyncProcess\Direction\Internal\MauticSyncProcess;
 use Mautic\IntegrationsBundle\Sync\SyncProcess\SyncProcess;
@@ -22,50 +21,23 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 final class SyncService implements SyncServiceInterface
 {
-    /**
-     * @var SyncDataExchangeInterface
-     */
-    private $internalSyncDataExchange;
+    private \Mautic\IntegrationsBundle\Sync\SyncDataExchange\MauticSyncDataExchange $internalSyncDataExchange;
 
-    /**
-     * @var SyncDateHelper
-     */
-    private $syncDateHelper;
+    private \Mautic\IntegrationsBundle\Sync\Helper\SyncDateHelper $syncDateHelper;
 
-    /**
-     * @var MappingHelper
-     */
-    private $mappingHelper;
+    private \Mautic\IntegrationsBundle\Sync\Helper\MappingHelper $mappingHelper;
 
-    /**
-     * @var RelationsHelper
-     */
-    private $relationsHelper;
+    private \Mautic\IntegrationsBundle\Sync\Helper\RelationsHelper $relationsHelper;
 
-    /**
-     * @var IntegrationSyncProcess
-     */
-    private $integratinSyncProcess;
+    private \Mautic\IntegrationsBundle\Sync\SyncProcess\Direction\Integration\IntegrationSyncProcess $integratinSyncProcess;
 
-    /**
-     * @var MauticSyncProcess
-     */
-    private $mauticSyncProcess;
+    private \Mautic\IntegrationsBundle\Sync\SyncProcess\Direction\Internal\MauticSyncProcess $mauticSyncProcess;
 
-    /**
-     * @var SyncIntegrationsHelper
-     */
-    private $syncIntegrationsHelper;
+    private \Mautic\IntegrationsBundle\Helper\SyncIntegrationsHelper $syncIntegrationsHelper;
 
-    /**
-     * @var EventDispatcherInterface
-     */
-    private $eventDispatcher;
+    private \Symfony\Component\EventDispatcher\EventDispatcherInterface $eventDispatcher;
 
-    /**
-     * @var Notifier
-     */
-    private $notifier;
+    private \Mautic\IntegrationsBundle\Sync\Notification\Notifier $notifier;
 
     public function __construct(
         MauticSyncDataExchange $internalSyncDataExchange,

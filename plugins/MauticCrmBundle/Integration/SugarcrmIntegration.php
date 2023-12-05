@@ -99,10 +99,7 @@ class SugarcrmIntegration extends CrmAbstractIntegration
         return 'Sugarcrm';
     }
 
-    /**
-     * @return array
-     */
-    public function getSupportedFeatures()
+    public function getSupportedFeatures(): array
     {
         // Only push_lead is currently supported for version 7
         return ['push_lead', 'get_leads', 'push_leads'];
@@ -130,10 +127,8 @@ class SugarcrmIntegration extends CrmAbstractIntegration
 
     /**
      * {@inheritdoc}
-     *
-     * @return array
      */
-    public function getSecretKeys()
+    public function getSecretKeys(): array
     {
         return [
             'client_secret',
@@ -154,7 +149,7 @@ class SugarcrmIntegration extends CrmAbstractIntegration
     /**
      * SugarCRM 7 refresh tokens.
      */
-    public function getRefreshTokenKeys()
+    public function getRefreshTokenKeys(): array
     {
         return [
             'refresh_token',
@@ -217,11 +212,9 @@ class SugarcrmIntegration extends CrmAbstractIntegration
     }
 
     /**
-     * {@inheritdoc}
-     *
-     * @return array
+     * @return array<string, string>
      */
-    public function getRequiredKeyFields()
+    public function getRequiredKeyFields(): array
     {
         return [
             'sugarcrm_url'  => 'mautic.sugarcrm.form.url',
@@ -597,7 +590,6 @@ class SugarcrmIntegration extends CrmAbstractIntegration
     public function getLeads($params = [], $query = null, &$executed = null, $result = [], $object = 'Leads')
     {
         $params['max_results'] = 100;
-        $config                = $this->mergeConfigToFeatureSettings([]);
 
         if (!isset($params['offset'])) {
             // First call
@@ -977,7 +969,7 @@ class SugarcrmIntegration extends CrmAbstractIntegration
      * @param array                                             $data
      * @param string                                            $formArea
      */
-    public function appendToForm(&$builder, $data, $formArea)
+    public function appendToForm(&$builder, $data, $formArea): void
     {
         if ('keys' == $formArea) {
             $builder->add('version', ButtonGroupType::class, [
@@ -1354,7 +1346,7 @@ class SugarcrmIntegration extends CrmAbstractIntegration
     /**
      * Update body to sync.
      */
-    private function pushDncToSugar(array $lead, array &$body)
+    private function pushDncToSugar(array $lead, array &$body): void
     {
         $features = $this->settings->getFeatureSettings();
         // update DNC sync disabled
@@ -1390,7 +1382,7 @@ class SugarcrmIntegration extends CrmAbstractIntegration
         }
     }
 
-    private function fetchDncToMautic(Lead $lead = null, array $data)
+    private function fetchDncToMautic(Lead $lead = null, array $data): void
     {
         if (is_null($lead)) {
             return;
@@ -1431,7 +1423,7 @@ class SugarcrmIntegration extends CrmAbstractIntegration
      *               We therefore assume that they've been deleted in CRM and will mark them as deleted in the pushLeads function (~line 1320).
      *               The second element contains Ids of records that were explicitly marked as deleted in CRM. ATM, nothing is done with this data.
      */
-    public function getObjectDataToUpdate($checkEmailsInSugar, &$mauticData, $availableFields, $contactSugarFields, $leadSugarFields, $object = 'Leads')
+    public function getObjectDataToUpdate($checkEmailsInSugar, &$mauticData, $availableFields, $contactSugarFields, $leadSugarFields, $object = 'Leads'): array
     {
         $config     = $this->mergeConfigToFeatureSettings([]);
         $queryParam = ('Leads' == $object) ? 'checkemail' : 'checkemail_contacts';
@@ -1599,10 +1591,8 @@ class SugarcrmIntegration extends CrmAbstractIntegration
 
     /**
      * @param array $response
-     *
-     * @return array
      */
-    protected function processCompositeResponse($response)
+    protected function processCompositeResponse($response): array
     {
         $created         = 0;
         $errored         = 0;

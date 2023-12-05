@@ -16,30 +16,15 @@ use Symfony\Component\HttpFoundation\RequestStack;
  */
 final class ContactTrackingService implements ContactTrackingServiceInterface
 {
-    /**
-     * @var CookieHelper
-     */
-    private $cookieHelper;
+    private \Mautic\CoreBundle\Helper\CookieHelper $cookieHelper;
 
-    /**
-     * @var LeadDeviceRepository
-     */
-    private $leadDeviceRepository;
+    private \Mautic\LeadBundle\Entity\LeadDeviceRepository $leadDeviceRepository;
 
-    /**
-     * @var LeadRepository
-     */
-    private $leadRepository;
+    private \Mautic\LeadBundle\Entity\LeadRepository $leadRepository;
 
-    /**
-     * @var MergeRecordRepository
-     */
-    private $mergeRecordRepository;
+    private \Mautic\LeadBundle\Entity\MergeRecordRepository $mergeRecordRepository;
 
-    /**
-     * @var RequestStack
-     */
-    private $requestStack;
+    private \Symfony\Component\HttpFoundation\RequestStack $requestStack;
 
     public function __construct(
         CookieHelper $cookieHelper,

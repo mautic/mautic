@@ -12,15 +12,9 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 class ReplyController extends AbstractController
 {
-    /**
-     * @var HandlerContainer
-     */
-    private $callbackHandler;
+    private \Mautic\SmsBundle\Callback\HandlerContainer $callbackHandler;
 
-    /**
-     * @var ReplyHelper
-     */
-    private $replyHelper;
+    private \Mautic\SmsBundle\Helper\ReplyHelper $replyHelper;
 
     public function __construct(HandlerContainer $callbackHandler, ReplyHelper $replyHelper)
     {

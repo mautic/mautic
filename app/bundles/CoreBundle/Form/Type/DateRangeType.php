@@ -11,15 +11,9 @@ use Symfony\Component\HttpFoundation\Session\SessionInterface;
 
 class DateRangeType extends AbstractType
 {
-    /**
-     * @var SessionInterface
-     */
-    private $session;
+    private \Symfony\Component\HttpFoundation\Session\SessionInterface $session;
 
-    /**
-     * @var CoreParametersHelper
-     */
-    private $coreParametersHelper;
+    private \Mautic\CoreBundle\Helper\CoreParametersHelper $coreParametersHelper;
 
     public function __construct(SessionInterface $session, CoreParametersHelper $coreParametersHelper)
     {

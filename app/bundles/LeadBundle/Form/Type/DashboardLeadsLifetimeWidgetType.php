@@ -10,9 +10,9 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class DashboardLeadsLifetimeWidgetType extends AbstractType
 {
-    private $segmentModel;
+    private \Mautic\LeadBundle\Model\ListModel $segmentModel;
 
-    private $translator;
+    private \Symfony\Contracts\Translation\TranslatorInterface $translator;
 
     public function __construct(ListModel $segmentModel, TranslatorInterface $translator)
     {

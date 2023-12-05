@@ -141,30 +141,15 @@ class ReportSubscriber implements EventSubscriberInterface
         ],
     ];
 
-    /**
-     * @var Connection
-     */
-    private $db;
+    private \Doctrine\DBAL\Connection $db;
 
-    /**
-     * @var CompanyReportData
-     */
-    private $companyReportData;
+    private \Mautic\LeadBundle\Model\CompanyReportData $companyReportData;
 
-    /**
-     * @var GeneratedColumnsProviderInterface
-     */
-    private $generatedColumnsProvider;
+    private \Mautic\CoreBundle\Doctrine\Provider\GeneratedColumnsProviderInterface $generatedColumnsProvider;
 
-    /**
-     * @var StatRepository
-     */
-    private $statRepository;
+    private \Mautic\EmailBundle\Entity\StatRepository $statRepository;
 
-    /**
-     * @var FieldsBuilder
-     */
-    private $fieldsBuilder;
+    private \Mautic\LeadBundle\Report\FieldsBuilder $fieldsBuilder;
 
     public function __construct(
         Connection $db,
@@ -195,7 +180,7 @@ class ReportSubscriber implements EventSubscriberInterface
     /**
      * Add available tables and columns to the report builder lookup.
      */
-    public function onReportBuilder(ReportBuilderEvent $event)
+    public function onReportBuilder(ReportBuilderEvent $event): void
     {
         if (!$event->checkContext([self::CONTEXT_EMAILS, self::CONTEXT_EMAIL_STATS])) {
             return;
@@ -353,7 +338,7 @@ class ReportSubscriber implements EventSubscriberInterface
     /**
      * Initialize the QueryBuilder object to generate reports from.
      */
-    public function onReportGenerate(ReportGeneratorEvent $event)
+    public function onReportGenerate(ReportGeneratorEvent $event): void
     {
         $context    = $event->getContext();
         $qb         = $event->getQueryBuilder();
@@ -488,7 +473,7 @@ class ReportSubscriber implements EventSubscriberInterface
     /**
      * Initialize the QueryBuilder object to generate reports from.
      */
-    public function onReportGraphGenerate(ReportGraphEvent $event)
+    public function onReportGraphGenerate(ReportGraphEvent $event): void
     {
         $graphs = $event->getRequestedGraphs();
 
@@ -779,7 +764,7 @@ class ReportSubscriber implements EventSubscriberInterface
     /**
      * Add the Do Not Contact table to the query builder.
      */
-    private function addDNCTableForEmailStats(QueryBuilder $qb)
+    private function addDNCTableForEmailStats(QueryBuilder $qb): void
     {
         $table = MAUTIC_TABLE_PREFIX.'lead_donotcontact';
 

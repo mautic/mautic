@@ -16,30 +16,15 @@ use Mautic\LeadBundle\Tracker\ContactTracker;
 
 class EventLogger
 {
-    /**
-     * @var IpLookupHelper
-     */
-    private $ipLookupHelper;
+    private \Mautic\CoreBundle\Helper\IpLookupHelper $ipLookupHelper;
 
-    /**
-     * @var ContactTracker
-     */
-    private $contactTracker;
+    private \Mautic\LeadBundle\Tracker\ContactTracker $contactTracker;
 
-    /**
-     * @var LeadEventLogRepository
-     */
-    private $leadEventLogRepository;
+    private \Mautic\CampaignBundle\Entity\LeadEventLogRepository $leadEventLogRepository;
 
-    /**
-     * @var SummaryModel
-     */
-    private $summaryModel;
+    private \Mautic\CampaignBundle\Model\SummaryModel $summaryModel;
 
-    /**
-     * @var LeadRepository
-     */
-    private $leadRepository;
+    private \Mautic\CampaignBundle\Entity\LeadRepository $leadRepository;
 
     /**
      * @var ArrayCollection

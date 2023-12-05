@@ -29,7 +29,7 @@ class StagePermissions extends AbstractPermissions
     /**
      * {@inheritdoc}
      */
-    public function buildForm(FormBuilderInterface &$builder, array $options, array $data)
+    public function buildForm(FormBuilderInterface &$builder, array $options, array $data): void
     {
         $this->addStandardFormFields('stage', 'categories', $builder, $data);
         $this->addStandardFormFields('stage', 'stages', $builder, $data);

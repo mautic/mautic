@@ -21,30 +21,15 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class ActionDispatcher
 {
-    /**
-     * @var EventDispatcherInterface
-     */
-    private $dispatcher;
+    private \Symfony\Component\EventDispatcher\EventDispatcherInterface $dispatcher;
 
-    /**
-     * @var LoggerInterface
-     */
-    private $logger;
+    private \Psr\Log\LoggerInterface $logger;
 
-    /**
-     * @var EventScheduler
-     */
-    private $scheduler;
+    private \Mautic\CampaignBundle\Executioner\Scheduler\EventScheduler $scheduler;
 
-    /**
-     * @var NotificationHelper
-     */
-    private $notificationHelper;
+    private \Mautic\CampaignBundle\Executioner\Helper\NotificationHelper $notificationHelper;
 
-    /**
-     * @var LegacyEventDispatcher
-     */
-    private $legacyDispatcher;
+    private \Mautic\CampaignBundle\Executioner\Dispatcher\LegacyEventDispatcher $legacyDispatcher;
 
     public function __construct(
         EventDispatcherInterface $dispatcher,

@@ -42,7 +42,7 @@ class CommonApiController extends FetchCommonApiController
      *
      * @var FormModel<E>|null
      */
-    protected $model = null;
+    protected $model;
 
     /**
      * @var array

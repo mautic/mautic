@@ -21,40 +21,22 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class Reply implements ProcessorInterface
 {
-    /**
-     * @var EmailAddressHelper
-     */
-    private $addressHelper;
+    private \Mautic\CoreBundle\Helper\EmailAddressHelper $addressHelper;
 
-    /**
-     * @var StatRepository
-     */
-    private $statRepo;
+    private \Mautic\EmailBundle\Entity\StatRepository $statRepo;
 
-    /**
-     * @var ContactFinder
-     */
-    private $contactFinder;
+    private \Mautic\EmailBundle\MonitoredEmail\Search\ContactFinder $contactFinder;
 
-    /**
-     * @var LeadModel
-     */
-    private $leadModel;
+    private \Mautic\LeadBundle\Model\LeadModel $leadModel;
 
     /**
      * @var EventDispatcher
      */
-    private $dispatcher;
+    private \Symfony\Component\EventDispatcher\EventDispatcherInterface $dispatcher;
 
-    /**
-     * @var LoggerInterface
-     */
-    private $logger;
+    private \Psr\Log\LoggerInterface $logger;
 
-    /**
-     * @var ContactTracker
-     */
-    private $contactTracker;
+    private \Mautic\LeadBundle\Tracker\ContactTracker $contactTracker;
 
     public function __construct(
         StatRepository $statRepository,
@@ -74,7 +56,7 @@ class Reply implements ProcessorInterface
         $this->addressHelper    = $addressHelper;
     }
 
-    public function process(Message $message)
+    public function process(Message $message): void
     {
         $this->logger->debug('MONITORED EMAIL: Processing message ID '.$message->id.' for a reply');
 
@@ -163,7 +145,7 @@ class Reply implements ProcessorInterface
         }
     }
 
-    private function dispatchEvent(Stat $stat)
+    private function dispatchEvent(Stat $stat): void
     {
         if ($this->dispatcher->hasListeners(EmailEvents::EMAIL_ON_REPLY)) {
             $this->contactTracker->setTrackedContact($stat->getLead());

@@ -61,7 +61,7 @@ class Organizer
         return array_keys($this->contacts);
     }
 
-    private function organize()
+    private function organize(): void
     {
         foreach ($this->records as $campaignMember) {
             $object    = !empty($campaignMember['LeadId']) ? 'Lead' : 'Contact';

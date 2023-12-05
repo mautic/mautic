@@ -31,15 +31,9 @@ class NotificationModel extends FormModel
      */
     protected $disableUpdates;
 
-    /**
-     * @var PathsHelper
-     */
-    protected $pathsHelper;
+    protected \Mautic\CoreBundle\Helper\PathsHelper $pathsHelper;
 
-    /**
-     * @var UpdateHelper
-     */
-    protected $updateHelper;
+    protected \Mautic\CoreBundle\Helper\UpdateHelper $updateHelper;
 
     private RequestStack $requestStack;
 
@@ -169,10 +163,8 @@ class NotificationModel extends FormModel
      * @param null $afterId
      * @param bool $includeRead
      * @param int  $limit
-     *
-     * @return array
      */
-    public function getNotificationContent($afterId = null, $includeRead = false, $limit = null)
+    public function getNotificationContent($afterId = null, $includeRead = false, $limit = null): array
     {
         if ($this->userHelper->getUser()->isGuest()) {
             return [[], false, ''];

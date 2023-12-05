@@ -39,20 +39,11 @@ class DashboardSubscriber extends MainDashboardSubscriber
         'form:forms:viewother',
     ];
 
-    /**
-     * @var SubmissionModel
-     */
-    protected $formSubmissionModel;
+    protected \Mautic\FormBundle\Model\SubmissionModel $formSubmissionModel;
 
-    /**
-     * @var FormModel
-     */
-    protected $formModel;
+    protected \Mautic\FormBundle\Model\FormModel $formModel;
 
-    /**
-     * @var RouterInterface
-     */
-    private $router;
+    private \Symfony\Component\Routing\RouterInterface $router;
 
     public function __construct(SubmissionModel $formSubmissionModel, FormModel $formModel, RouterInterface $router)
     {
@@ -64,7 +55,7 @@ class DashboardSubscriber extends MainDashboardSubscriber
     /**
      * Set a widget detail when needed.
      */
-    public function onWidgetDetailGenerate(WidgetDetailEvent $event)
+    public function onWidgetDetailGenerate(WidgetDetailEvent $event): void
     {
         $this->checkPermissions($event);
         $canViewOthers = $event->hasPermission('form:forms:viewother');

@@ -34,7 +34,7 @@ class CampaignHelper
     /**
      * Prepares the neccessary data transformations and then makes the HTTP request.
      */
-    public function fireWebhook(array $config, Lead $contact)
+    public function fireWebhook(array $config, Lead $contact): void
     {
         $payload = $this->getPayload($config, $contact);
         $headers = $this->getHeaders($config, $contact);

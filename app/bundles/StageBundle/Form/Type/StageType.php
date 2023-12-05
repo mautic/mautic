@@ -20,10 +20,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class StageType extends AbstractType
 {
-    /**
-     * @var CorePermissions
-     */
-    private $security;
+    private \Mautic\CoreBundle\Security\Permissions\CorePermissions $security;
 
     public function __construct(CorePermissions $security)
     {
@@ -33,7 +30,7 @@ class StageType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder->addEventSubscriber(new CleanFormSubscriber(['description' => 'html']));
         $builder->addEventSubscriber(new FormExitSubscriber('stage', $options));
@@ -107,7 +104,7 @@ class StageType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function configureOptions(OptionsResolver $resolver)
+    public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults([
             'data_class' => 'Mautic\StageBundle\Entity\Stage',

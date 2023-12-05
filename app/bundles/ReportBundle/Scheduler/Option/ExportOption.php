@@ -4,10 +4,7 @@ namespace Mautic\ReportBundle\Scheduler\Option;
 
 class ExportOption
 {
-    /**
-     * @var int
-     */
-    private $reportId;
+    private int $reportId;
 
     /**
      * @param int|null $reportId

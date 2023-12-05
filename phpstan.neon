@@ -28,6 +28,13 @@ parameters:
 		- phpstan-bootstrap.php
 	ignoreErrors:
 		- '/Variable \$\w+ might not be defined\./'
+		# resolve later with translator interface generics
+		- '#Method (.*?)::getTranslatedEntity\(\) return type has no value type specified in iterable type array#'
+		# resolve later with generics
+		- '#Property Mautic\\CoreBundle\\Model\\IteratorExportDataModel::\$model has unknown class Mautic\\CoreBundle\\Model\\T as its type#'
+		- '#Property Mautic\\CoreBundle\\Model\\IteratorExportDataModel::\$model \(Mautic\\CoreBundle\\Model\\AbstractCommonModel<Mautic\\CoreBundle\\Model\\T>\) does not accept Mautic\\CoreBundle\\Model\\AbstractCommonModel<T of object>#'
+		# test on purpose
+		- '#Call to method PHPUnit\\Framework\\Assert::assertIsClosedResource\(\) with resource will always evaluate to true#'
 	scanFiles:
 		# This is here because a few functions in the global namespace are defined in this file
 		- vendor/twig/twig/src/Extension/EscaperExtension.php
@@ -37,4 +44,3 @@ parameters:
 	symfony:
 		containerXmlPath: var/cache/test/AppKernelTestDebugContainer.xml
 		consoleApplicationLoader: app/console-application.php
-		

@@ -18,15 +18,9 @@ class MaxMindDoNotSellDownloadHelper
      */
     private $auth;
 
-    /**
-     * @var LoggerInterface
-     */
-    private $logger;
+    private \Psr\Log\LoggerInterface $logger;
 
-    /**
-     * @var HttpClientInterface
-     */
-    private $httpClient;
+    private \Symfony\Contracts\HttpClient\HttpClientInterface $httpClient;
 
     /**
      * @var string
@@ -90,10 +84,8 @@ class MaxMindDoNotSellDownloadHelper
 
     /**
      * Service URL.
-     *
-     * @return string
      */
-    public function getRemoteDataStoreDownloadUrl()
+    public function getRemoteDataStoreDownloadUrl(): string
     {
         return self::REMOTE_DATA;
     }

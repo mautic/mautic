@@ -33,10 +33,7 @@ class CustomFormEvent extends Event
      */
     protected $subscribers = [];
 
-    /**
-     * @var FormBuilderInterface
-     */
-    private $formBuilder;
+    private \Symfony\Component\Form\FormBuilderInterface $formBuilder;
 
     /**
      * @param string $formName

@@ -36,32 +36,18 @@ class TriggerModel extends CommonFormModel
 {
     protected $triggers = [];
 
-    /**
-     * @var IpLookupHelper
-     */
-    protected $ipLookupHelper;
+    protected \Mautic\CoreBundle\Helper\IpLookupHelper $ipLookupHelper;
 
-    /**
-     * @var LeadModel
-     */
-    protected $leadModel;
+    protected \Mautic\LeadBundle\Model\LeadModel $leadModel;
 
-    /**
-     * @var TriggerEventModel
-     */
-    protected $pointTriggerEventModel;
+    protected \Mautic\PointBundle\Model\TriggerEventModel $pointTriggerEventModel;
 
     /**
      * @deprecated https://github.com/mautic/mautic/issues/8229
-     *
-     * @var MauticFactory
      */
-    protected $mauticFactory;
+    protected \Mautic\CoreBundle\Factory\MauticFactory $mauticFactory;
 
-    /**
-     * @var ContactTracker
-     */
-    private $contactTracker;
+    private \Mautic\LeadBundle\Tracker\ContactTracker $contactTracker;
 
     /**
      * @var array<string,array<string,mixed>>
@@ -144,7 +130,7 @@ class TriggerModel extends CommonFormModel
      * @param \Mautic\PointBundle\Entity\Trigger $entity
      * @param bool                               $unlock
      */
-    public function saveEntity($entity, $unlock = true)
+    public function saveEntity($entity, $unlock = true): void
     {
         $isNew = ($entity->getId()) ? false : true;
 
@@ -288,7 +274,7 @@ class TriggerModel extends CommonFormModel
     /**
      * @param array $sessionEvents
      */
-    public function setEvents(Trigger $entity, $sessionEvents)
+    public function setEvents(Trigger $entity, $sessionEvents): void
     {
         $order           = 1;
         $existingActions = $entity->getEvents();
@@ -442,7 +428,7 @@ class TriggerModel extends CommonFormModel
     /**
      * Trigger events for the current lead.
      */
-    public function triggerEvents(Lead $lead)
+    public function triggerEvents(Lead $lead): void
     {
         $points = $lead->getPoints();
 

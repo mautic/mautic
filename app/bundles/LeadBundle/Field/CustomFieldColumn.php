@@ -16,40 +16,19 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class CustomFieldColumn
 {
-    /**
-     * @var ColumnSchemaHelper
-     */
-    private $columnSchemaHelper;
+    private \Mautic\CoreBundle\Doctrine\Helper\ColumnSchemaHelper $columnSchemaHelper;
 
-    /**
-     * @var SchemaDefinition
-     */
-    private $schemaDefinition;
+    private \Mautic\LeadBundle\Field\SchemaDefinition $schemaDefinition;
 
-    /**
-     * @var LoggerInterface
-     */
-    private $logger;
+    private \Psr\Log\LoggerInterface $logger;
 
-    /**
-     * @var LeadFieldSaver
-     */
-    private $leadFieldSaver;
+    private \Mautic\LeadBundle\Field\LeadFieldSaver $leadFieldSaver;
 
-    /**
-     * @var CustomFieldIndex
-     */
-    private $customFieldIndex;
+    private \Mautic\LeadBundle\Field\CustomFieldIndex $customFieldIndex;
 
-    /**
-     * @var FieldColumnDispatcher
-     */
-    private $fieldColumnDispatcher;
+    private \Mautic\LeadBundle\Field\Dispatcher\FieldColumnDispatcher $fieldColumnDispatcher;
 
-    /**
-     * @var TranslatorInterface
-     */
-    private $translator;
+    private \Symfony\Contracts\Translation\TranslatorInterface $translator;
 
     public function __construct(
         ColumnSchemaHelper $columnSchemaHelper,

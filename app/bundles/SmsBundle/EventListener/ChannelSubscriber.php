@@ -13,10 +13,7 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class ChannelSubscriber implements EventSubscriberInterface
 {
-    /**
-     * @var TransportChain
-     */
-    private $transportChain;
+    private \Mautic\SmsBundle\Sms\TransportChain $transportChain;
 
     public function __construct(TransportChain $transportChain)
     {
@@ -33,7 +30,7 @@ class ChannelSubscriber implements EventSubscriberInterface
         ];
     }
 
-    public function onAddChannel(ChannelEvent $event)
+    public function onAddChannel(ChannelEvent $event): void
     {
         if (count($this->transportChain->getEnabledTransports()) > 0) {
             $event->addChannel(

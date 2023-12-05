@@ -11,10 +11,7 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class ConfigSubscriber implements EventSubscriberInterface
 {
-    /**
-     * @var CoreParametersHelper
-     */
-    private $coreParametersHelper;
+    private \Mautic\CoreBundle\Helper\CoreParametersHelper $coreParametersHelper;
 
     public function __construct(CoreParametersHelper $coreParametersHelper)
     {
@@ -32,7 +29,7 @@ class ConfigSubscriber implements EventSubscriberInterface
         ];
     }
 
-    public function onConfigGenerate(ConfigBuilderEvent $event)
+    public function onConfigGenerate(ConfigBuilderEvent $event): void
     {
         $event->addForm([
             'bundle'     => 'EmailBundle',
@@ -43,7 +40,7 @@ class ConfigSubscriber implements EventSubscriberInterface
         ]);
     }
 
-    public function onConfigBeforeSave(ConfigEvent $event)
+    public function onConfigBeforeSave(ConfigEvent $event): void
     {
         $data = $event->getConfig('emailconfig');
 

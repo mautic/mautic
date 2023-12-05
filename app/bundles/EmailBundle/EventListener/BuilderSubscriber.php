@@ -27,30 +27,15 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class BuilderSubscriber implements EventSubscriberInterface
 {
-    /**
-     * @var CoreParametersHelper
-     */
-    private $coreParametersHelper;
+    private \Mautic\CoreBundle\Helper\CoreParametersHelper $coreParametersHelper;
 
-    /**
-     * @var EmailModel
-     */
-    private $emailModel;
+    private \Mautic\EmailBundle\Model\EmailModel $emailModel;
 
-    /**
-     * @var TrackableModel
-     */
-    private $pageTrackableModel;
+    private \Mautic\PageBundle\Model\TrackableModel $pageTrackableModel;
 
-    /**
-     * @var RedirectModel
-     */
-    private $pageRedirectModel;
+    private \Mautic\PageBundle\Model\RedirectModel $pageRedirectModel;
 
-    /**
-     * @var TranslatorInterface
-     */
-    private $translator;
+    private \Symfony\Contracts\Translation\TranslatorInterface $translator;
 
     public function __construct(
         CoreParametersHelper $coreParametersHelper,
@@ -88,7 +73,7 @@ class BuilderSubscriber implements EventSubscriberInterface
         ];
     }
 
-    public function onEmailBuild(EmailBuilderEvent $event)
+    public function onEmailBuild(EmailBuilderEvent $event): void
     {
         if ($event->abTestWinnerCriteriaRequested()) {
             // add AB Test Winner Criteria
@@ -273,7 +258,7 @@ class BuilderSubscriber implements EventSubscriberInterface
         $event->setContent($content);
     }
 
-    public function onEmailGenerate(EmailSendEvent $event)
+    public function onEmailGenerate(EmailSendEvent $event): void
     {
         $idHash = $event->getIdHash();
         $lead   = $event->getLead();

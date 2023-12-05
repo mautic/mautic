@@ -15,15 +15,9 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class FormSubscriber implements EventSubscriberInterface
 {
-    /**
-     * @var EmailModel
-     */
-    private $emailModel;
+    private \Mautic\EmailBundle\Model\EmailModel $emailModel;
 
-    /**
-     * @var ContactTracker
-     */
-    private $contactTracker;
+    private \Mautic\LeadBundle\Tracker\ContactTracker $contactTracker;
 
     public function __construct(
         EmailModel $emailModel,
@@ -49,7 +43,7 @@ class FormSubscriber implements EventSubscriberInterface
     /**
      * Add a send email actions to available form submit actions.
      */
-    public function onFormBuilder(FormBuilderEvent $event)
+    public function onFormBuilder(FormBuilderEvent $event): void
     {
         $event->addSubmitAction('email.send.user', [
             'group'             => 'mautic.email.actions',

@@ -22,40 +22,19 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class EventScheduler
 {
-    /**
-     * @var LoggerInterface
-     */
-    private $logger;
+    private \Psr\Log\LoggerInterface $logger;
 
-    /**
-     * @var EventLogger
-     */
-    private $eventLogger;
+    private \Mautic\CampaignBundle\Executioner\Logger\EventLogger $eventLogger;
 
-    /**
-     * @var EventDispatcherInterface
-     */
-    private $dispatcher;
+    private \Symfony\Component\EventDispatcher\EventDispatcherInterface $dispatcher;
 
-    /**
-     * @var Interval
-     */
-    private $intervalScheduler;
+    private \Mautic\CampaignBundle\Executioner\Scheduler\Mode\Interval $intervalScheduler;
 
-    /**
-     * @var DateTime
-     */
-    private $dateTimeScheduler;
+    private \Mautic\CampaignBundle\Executioner\Scheduler\Mode\DateTime $dateTimeScheduler;
 
-    /**
-     * @var EventCollector
-     */
-    private $collector;
+    private \Mautic\CampaignBundle\EventCollector\EventCollector $collector;
 
-    /**
-     * @var CoreParametersHelper
-     */
-    private $coreParametersHelper;
+    private \Mautic\CoreBundle\Helper\CoreParametersHelper $coreParametersHelper;
 
     public function __construct(
         LoggerInterface $logger,

@@ -15,15 +15,9 @@ class PreferenceBuilder
      */
     private $channels = [];
 
-    /**
-     * @var LoggerInterface
-     */
-    private $logger;
+    private \Psr\Log\LoggerInterface $logger;
 
-    /**
-     * @var Event
-     */
-    private $event;
+    private \Mautic\CampaignBundle\Entity\Event $event;
 
     public function __construct(ArrayCollection $logs, Event $event, array $channels, LoggerInterface $logger)
     {
@@ -41,7 +35,7 @@ class PreferenceBuilder
         return $this->channels;
     }
 
-    public function removeLogFromAllChannels(LeadEventLog $log)
+    public function removeLogFromAllChannels(LeadEventLog $log): void
     {
         foreach ($this->channels as $channelPreferences) {
             $channelPreferences->removeLog($log);
@@ -52,7 +46,7 @@ class PreferenceBuilder
      * @param string $channel
      * @param int    $priority
      */
-    private function addChannelRule($channel, array $rule, LeadEventLog $log, $priority)
+    private function addChannelRule($channel, array $rule, LeadEventLog $log, $priority): void
     {
         $channelPreferences = $this->getChannelPreferenceObject($channel, $priority);
 
@@ -90,7 +84,7 @@ class PreferenceBuilder
         return $this->channels[$channel];
     }
 
-    private function buildRules(ArrayCollection $logs, array $channels)
+    private function buildRules(ArrayCollection $logs, array $channels): void
     {
         /** @var LeadEventLog $log */
         foreach ($logs as $log) {

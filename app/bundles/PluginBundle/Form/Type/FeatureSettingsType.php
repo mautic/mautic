@@ -15,20 +15,11 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class FeatureSettingsType extends AbstractType
 {
-    /**
-     * @var SessionInterface
-     */
-    protected $session;
+    protected \Symfony\Component\HttpFoundation\Session\SessionInterface $session;
 
-    /**
-     * @var CoreParametersHelper
-     */
-    protected $coreParametersHelper;
+    protected \Mautic\CoreBundle\Helper\CoreParametersHelper $coreParametersHelper;
 
-    /**
-     * @var LoggerInterface
-     */
-    protected $logger;
+    protected \Psr\Log\LoggerInterface $logger;
 
     public function __construct(
         SessionInterface $session,
@@ -40,7 +31,7 @@ class FeatureSettingsType extends AbstractType
         $this->logger               = $logger;
     }
 
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $integrationObject = $options['integration_object'];
 
@@ -49,7 +40,7 @@ class FeatureSettingsType extends AbstractType
         $leadFields    = $options['lead_fields'];
         $companyFields = $options['company_fields'];
 
-        $formModifier = function (FormInterface $form, $data, $method = 'get') use ($integrationObject, $leadFields, $companyFields) {
+        $formModifier = function (FormInterface $form, $data, $method = 'get') use ($integrationObject, $leadFields, $companyFields): void {
             $integrationName = $integrationObject->getName();
             $session         = $this->session;
             $limit           = $session->get(
@@ -141,7 +132,7 @@ class FeatureSettingsType extends AbstractType
 
         $builder->addEventListener(
             FormEvents::PRE_SET_DATA,
-            function (FormEvent $event) use ($formModifier) {
+            function (FormEvent $event) use ($formModifier): void {
                 $data = $event->getData();
                 $formModifier($event->getForm(), $data);
             }
@@ -149,7 +140,7 @@ class FeatureSettingsType extends AbstractType
 
         $builder->addEventListener(
             FormEvents::PRE_SUBMIT,
-            function (FormEvent $event) use ($formModifier) {
+            function (FormEvent $event) use ($formModifier): void {
                 $data = $event->getData();
                 $formModifier($event->getForm(), $data, 'post');
             }
@@ -159,7 +150,7 @@ class FeatureSettingsType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function configureOptions(OptionsResolver $resolver)
+    public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setRequired(['integration', 'integration_object', 'lead_fields', 'company_fields']);
     }

@@ -7,15 +7,9 @@ use Symfony\Contracts\EventDispatcher\Event;
 
 class MonitoredEmailEvent extends Event
 {
-    /**
-     * @var FormBuilder
-     */
-    private $formBuilder;
+    private \Symfony\Component\Form\FormBuilder $formBuilder;
 
-    /**
-     * @var array
-     */
-    private $data;
+    private array $data;
 
     /**
      * @var array
@@ -43,7 +37,7 @@ class MonitoredEmailEvent extends Event
      *
      * @param string $default
      */
-    public function addFolder($bundleKey, $folderKey, $label, $default = '')
+    public function addFolder($bundleKey, $folderKey, $label, $default = ''): void
     {
         $keyName = ($folderKey) ? $bundleKey.'_'.$folderKey : $bundleKey;
 

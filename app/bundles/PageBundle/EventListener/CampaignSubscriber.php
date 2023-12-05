@@ -18,20 +18,11 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class CampaignSubscriber implements EventSubscriberInterface
 {
-    /**
-     * @var LeadModel
-     */
-    private $leadModel;
+    private \Mautic\LeadBundle\Model\LeadModel $leadModel;
 
-    /**
-     * @var TrackingHelper
-     */
-    private $trackingHelper;
+    private \Mautic\PageBundle\Helper\TrackingHelper $trackingHelper;
 
-    /**
-     * @var RealTimeExecutioner
-     */
-    private $realTimeExecutioner;
+    private \Mautic\CampaignBundle\Executioner\RealTimeExecutioner $realTimeExecutioner;
 
     public function __construct(
         LeadModel $leadModel,
@@ -62,7 +53,7 @@ class CampaignSubscriber implements EventSubscriberInterface
     /**
      * Add event triggers and actions.
      */
-    public function onCampaignBuild(CampaignBuilderEvent $event)
+    public function onCampaignBuild(CampaignBuilderEvent $event): void
     {
         // Add trigger
         $pageHitTrigger = [
@@ -111,7 +102,7 @@ class CampaignSubscriber implements EventSubscriberInterface
     /**
      * Trigger actions for page hits.
      */
-    public function onPageHit(PageHitEvent $event)
+    public function onPageHit(PageHitEvent $event): void
     {
         $hit       = $event->getHit();
         $channel   = 'page';

@@ -19,10 +19,7 @@ class LoadRoleData extends AbstractFixture implements OrderedFixtureInterface, F
         return ['group_mautic_install_data'];
     }
 
-    /**
-     * @var RoleModel
-     */
-    private $roleModel;
+    private \Mautic\UserBundle\Model\RoleModel $roleModel;
 
     /**
      * {@inheritdoc}
@@ -32,7 +29,7 @@ class LoadRoleData extends AbstractFixture implements OrderedFixtureInterface, F
         $this->roleModel = $roleModel;
     }
 
-    public function load(ObjectManager $manager)
+    public function load(ObjectManager $manager): void
     {
         if (!$this->hasReference('admin-role')) {
             $role = new Role();

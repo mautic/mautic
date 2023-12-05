@@ -65,7 +65,7 @@ class FileManager
     /**
      * @param string $fileName
      */
-    public function deleteFile($fileName)
+    public function deleteFile($fileName): void
     {
         $this->fileUploader->delete($this->getCompleteFilePath($fileName));
     }

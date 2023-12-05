@@ -13,15 +13,9 @@ class Adder
 {
     public const NAME = 'added';
 
-    /**
-     * @var LeadRepository
-     */
-    private $leadRepository;
+    private \Mautic\CampaignBundle\Entity\LeadRepository $leadRepository;
 
-    /**
-     * @var LeadEventLogRepository
-     */
-    private $leadEventLogRepository;
+    private \Mautic\CampaignBundle\Entity\LeadEventLogRepository $leadEventLogRepository;
 
     public function __construct(LeadRepository $leadRepository, LeadEventLogRepository $leadEventLogRepository)
     {

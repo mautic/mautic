@@ -15,25 +15,13 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class CategoryListType extends AbstractType
 {
-    /**
-     * @var EntityManager
-     */
-    private $em;
+    private \Doctrine\ORM\EntityManager $em;
 
-    /**
-     * @var CategoryModel
-     */
-    private $model;
+    private \Mautic\CategoryBundle\Model\CategoryModel $model;
 
-    /**
-     * @var TranslatorInterface
-     */
-    private $translator;
+    private \Symfony\Contracts\Translation\TranslatorInterface $translator;
 
-    /**
-     * @var RouterInterface
-     */
-    private $router;
+    private \Symfony\Component\Routing\RouterInterface $router;
 
     public function __construct(EntityManager $em, TranslatorInterface $translator, CategoryModel $model, RouterInterface $router)
     {
@@ -69,7 +57,7 @@ class CategoryListType extends AbstractType
             'label_attr'        => ['class' => 'control-label'],
             'multiple'          => false,
             'placeholder'       => 'mautic.core.form.uncategorized',
-            'attr'              => function (Options $options) {
+            'attr'              => function (Options $options): array {
                 $modalHeader = $this->translator->trans('mautic.category.header.new');
                 $newUrl      = $this->router->generate('mautic_category_action', [
                     'objectAction' => 'new',

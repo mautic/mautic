@@ -519,7 +519,7 @@ class PublicController extends CommonFormController
      * @param array $slots
      * @param Page  $entity
      */
-    private function processSlots($slots, $entity)
+    private function processSlots($slots, $entity): void
     {
         /** @var \Mautic\CoreBundle\Twig\Helper\AssetsHelper $assetsHelper */
         $assetsHelper = $this->factory->getHelper('template.assets');

@@ -6,15 +6,9 @@ namespace Mautic\CoreBundle\Helper\Tree;
 
 class IntNode implements NodeInterface
 {
-    /**
-     * @var int
-     */
-    private $value;
+    private int $value;
 
-    /**
-     * @var NodeInterface|null
-     */
-    private $parent;
+    private ?\Mautic\CoreBundle\Helper\Tree\NodeInterface $parent;
 
     /**
      * @var NodeInterface[]

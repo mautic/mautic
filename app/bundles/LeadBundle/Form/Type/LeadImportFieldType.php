@@ -16,15 +16,9 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class LeadImportFieldType extends AbstractType
 {
-    /**
-     * @var TranslatorInterface
-     */
-    private $translator;
+    private \Symfony\Contracts\Translation\TranslatorInterface $translator;
 
-    /**
-     * @var EntityManager
-     */
-    private $entityManager;
+    private \Doctrine\ORM\EntityManager $entityManager;
 
     public function __construct(TranslatorInterface $translator, EntityManager $entityManager)
     {

@@ -11,10 +11,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
  */
 final class DncReasonHelper
 {
-    /**
-     * @var TranslatorInterface
-     */
-    private $translator;
+    private \Symfony\Contracts\Translation\TranslatorInterface $translator;
 
     public function __construct(TranslatorInterface $translator)
     {

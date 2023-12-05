@@ -16,15 +16,9 @@ final class ThemeHelper
      */
     private $theme;
 
-    /**
-     * @var string
-     */
-    private $themeDir;
+    private string $themeDir;
 
-    /**
-     * @var string
-     */
-    private $themePath;
+    private string $themePath;
 
     /**
      * @var mixed

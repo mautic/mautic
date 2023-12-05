@@ -802,10 +802,8 @@ class CommonRepository extends ServiceEntityRepository
      *
      * @param object $entity
      * @param bool   $flush  true by default; use false if persisting in batches
-     *
-     * @return int
      */
-    public function saveEntity($entity, $flush = true)
+    public function saveEntity($entity, $flush = true): void
     {
         $this->getEntityManager()->persist($entity);
 
@@ -1561,7 +1559,6 @@ class CommonRepository extends ServiceEntityRepository
      */
     protected function buildWhereClauseFromArray($query, array $clauses, $expr = null)
     {
-        $isOrm       = $query instanceof QueryBuilder;
         $columnValue = ['eq', 'neq', 'lt', 'lte', 'gt', 'gte', 'like', 'notLike', 'in', 'notIn', 'between', 'notBetween'];
         $justColumn  = ['isNull', 'isNotNull', 'isEmpty', 'isNotEmpty'];
         $andOr       = ['andX', 'orX'];

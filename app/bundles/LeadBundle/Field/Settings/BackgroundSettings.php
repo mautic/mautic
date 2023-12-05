@@ -10,10 +10,7 @@ class BackgroundSettings
 {
     public const CREATE_CUSTOM_FIELD_IN_BACKGROUND = 'create_custom_field_in_background';
 
-    /**
-     * @var CoreParametersHelper
-     */
-    private $coreParametersHelper;
+    private \Mautic\CoreBundle\Helper\CoreParametersHelper $coreParametersHelper;
 
     public function __construct(CoreParametersHelper $coreParametersHelper)
     {

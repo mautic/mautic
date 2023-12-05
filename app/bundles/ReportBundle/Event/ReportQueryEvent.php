@@ -7,20 +7,11 @@ use Mautic\ReportBundle\Entity\Report;
 
 class ReportQueryEvent extends AbstractReportEvent
 {
-    /**
-     * @var QueryBuilder
-     */
-    private $query;
+    private \Doctrine\DBAL\Query\QueryBuilder $query;
 
-    /**
-     * @var array
-     */
-    private $options = [];
+    private array $options;
 
-    /**
-     * @var int
-     */
-    private $totalResults = 0;
+    private int $totalResults;
 
     public function __construct(Report $report, QueryBuilder $query, $totalResults, array $options)
     {
@@ -41,10 +32,8 @@ class ReportQueryEvent extends AbstractReportEvent
 
     /**
      * @param QueryBuilder $query
-     *
-     * @return ReportDataEvent
      */
-    public function setQuery($query)
+    public function setQuery($query): void
     {
         $this->query = $query;
     }

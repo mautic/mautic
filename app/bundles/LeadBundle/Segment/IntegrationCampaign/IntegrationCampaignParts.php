@@ -4,15 +4,9 @@ namespace Mautic\LeadBundle\Segment\IntegrationCampaign;
 
 class IntegrationCampaignParts
 {
-    /**
-     * @var string
-     */
-    private $integrationName;
+    private string $integrationName;
 
-    /**
-     * @var string
-     */
-    private $campaignId;
+    private string $campaignId;
 
     /**
      * @param string $field

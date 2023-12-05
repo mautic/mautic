@@ -9,15 +9,9 @@ use Mautic\LeadBundle\Segment\Decorator\FilterDecoratorInterface;
 
 class DateAnniversary implements FilterDecoratorInterface
 {
-    /**
-     * @var DateDecorator
-     */
-    private $dateDecorator;
+    private \Mautic\LeadBundle\Segment\Decorator\DateDecorator $dateDecorator;
 
-    /**
-     * @var DateOptionParameters
-     */
-    private $dateOptionParameters;
+    private \Mautic\LeadBundle\Segment\Decorator\Date\DateOptionParameters $dateOptionParameters;
 
     public function __construct(DateDecorator $dateDecorator, DateOptionParameters $dateOptionParameters)
     {

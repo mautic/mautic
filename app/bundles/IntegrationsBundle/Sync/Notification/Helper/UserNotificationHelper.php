@@ -10,15 +10,9 @@ use Mautic\IntegrationsBundle\Sync\Notification\Writer;
 
 class UserNotificationHelper
 {
-    /**
-     * @var Writer
-     */
-    private $writer;
+    private \Mautic\IntegrationsBundle\Sync\Notification\Writer $writer;
 
-    /**
-     * @var UserNotificationBuilder
-     */
-    private $userNotificationBuilder;
+    private \Mautic\IntegrationsBundle\Sync\Notification\Helper\UserNotificationBuilder $userNotificationBuilder;
 
     public function __construct(Writer $writer, UserNotificationBuilder $userNotificationBuilder)
     {

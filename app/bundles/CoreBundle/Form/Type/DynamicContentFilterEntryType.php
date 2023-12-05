@@ -17,16 +17,32 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class DynamicContentFilterEntryType extends AbstractType
 {
-    private $fieldChoices    = [];
-    private $countryChoices  = [];
-    private $regionChoices   = [];
-    private $timezoneChoices = [];
-    private $localeChoices   = [];
+    /**
+     * @var mixed[]
+     */
+    private $fieldChoices = [];
 
     /**
-     * @var StageModel
+     * @var mixed[]
      */
-    private $stageModel;
+    private array $countryChoices;
+
+    /**
+     * @var mixed[]
+     */
+    private array $regionChoices;
+
+    /**
+     * @var mixed[]
+     */
+    private array $timezoneChoices;
+
+    /**
+     * @var mixed[]
+     */
+    private array $localeChoices;
+
+    private \Mautic\StageBundle\Model\StageModel $stageModel;
 
     private BuilderIntegrationsHelper $builderIntegrationsHelper;
 

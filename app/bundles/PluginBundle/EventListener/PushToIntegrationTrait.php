@@ -22,7 +22,7 @@ trait PushToIntegrationTrait
     /**
      * Used by methodCalls to event subscribers.
      */
-    public function setIntegrationHelper(IntegrationHelper $integrationHelper)
+    public function setIntegrationHelper(IntegrationHelper $integrationHelper): void
     {
         static::setStaticIntegrationHelper($integrationHelper);
     }
@@ -30,7 +30,7 @@ trait PushToIntegrationTrait
     /**
      * Used by callback methods such as point triggers.
      */
-    public static function setStaticIntegrationHelper(IntegrationHelper $integrationHelper)
+    public static function setStaticIntegrationHelper(IntegrationHelper $integrationHelper): void
     {
         static::$integrationHelper = $integrationHelper;
     }

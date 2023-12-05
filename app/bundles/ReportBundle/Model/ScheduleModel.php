@@ -14,17 +14,11 @@ class ScheduleModel
     /**
      * @var SchedulerRepository
      */
-    private $schedulerRepository;
+    private \Doctrine\ORM\EntityRepository $schedulerRepository;
 
-    /**
-     * @var SchedulerPlanner
-     */
-    private $schedulerPlanner;
+    private \Mautic\ReportBundle\Scheduler\Model\SchedulerPlanner $schedulerPlanner;
 
-    /**
-     * @var EntityManager
-     */
-    private $entityManager;
+    private \Doctrine\ORM\EntityManager $entityManager;
 
     public function __construct(EntityManager $entityManager, SchedulerPlanner $schedulerPlanner)
     {
@@ -41,7 +35,7 @@ class ScheduleModel
         return $this->schedulerRepository->getScheduledReportsForExport($exportOption);
     }
 
-    public function reportWasScheduled(Report $report)
+    public function reportWasScheduled(Report $report): void
     {
         $this->schedulerPlanner->computeScheduler($report);
     }

@@ -10,14 +10,14 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class StageActionListType extends AbstractType
 {
-    private $model;
+    private \Mautic\StageBundle\Model\StageModel $model;
 
     public function __construct(StageModel $model)
     {
         $this->model = $model;
     }
 
-    public function configureOptions(OptionsResolver $resolver)
+    public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults([
             'choices' => function (Options $options): array {

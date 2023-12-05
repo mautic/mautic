@@ -12,10 +12,7 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class CampaignSubscriber implements EventSubscriberInterface
 {
-    /**
-     * @var CampaignHelper
-     */
-    private $campaignHelper;
+    private \Mautic\WebhookBundle\Helper\CampaignHelper $campaignHelper;
 
     public function __construct(CampaignHelper $campaignHelper)
     {
@@ -33,10 +30,7 @@ class CampaignSubscriber implements EventSubscriberInterface
         ];
     }
 
-    /**
-     * @return CampaignExecutionEvent
-     */
-    public function onCampaignTriggerAction(CampaignExecutionEvent $event)
+    public function onCampaignTriggerAction(CampaignExecutionEvent $event): void
     {
         if ($event->checkContext('campaign.sendwebhook')) {
             try {
@@ -51,7 +45,7 @@ class CampaignSubscriber implements EventSubscriberInterface
     /**
      * Add event triggers and actions.
      */
-    public function onCampaignBuild(Events\CampaignBuilderEvent $event)
+    public function onCampaignBuild(Events\CampaignBuilderEvent $event): void
     {
         $sendWebhookAction = [
             'label'              => 'mautic.webhook.event.sendwebhook',

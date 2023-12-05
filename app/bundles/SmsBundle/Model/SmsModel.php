@@ -41,30 +41,15 @@ use Symfony\Contracts\EventDispatcher\Event;
  */
 class SmsModel extends FormModel implements AjaxLookupModelInterface
 {
-    /**
-     * @var TrackableModel
-     */
-    protected $pageTrackableModel;
+    protected \Mautic\PageBundle\Model\TrackableModel $pageTrackableModel;
 
-    /**
-     * @var LeadModel
-     */
-    protected $leadModel;
+    protected \Mautic\LeadBundle\Model\LeadModel $leadModel;
 
-    /**
-     * @var MessageQueueModel
-     */
-    protected $messageQueueModel;
+    protected \Mautic\ChannelBundle\Model\MessageQueueModel $messageQueueModel;
 
-    /**
-     * @var TransportChain
-     */
-    protected $transport;
+    protected \Mautic\SmsBundle\Sms\TransportChain $transport;
 
-    /**
-     * @var CacheStorageHelper
-     */
-    private $cacheStorageHelper;
+    private \Mautic\CoreBundle\Helper\CacheStorageHelper $cacheStorageHelper;
 
     public function __construct(TrackableModel $pageTrackableModel, LeadModel $leadModel, MessageQueueModel $messageQueueModel, TransportChain $transport, CacheStorageHelper $cacheStorageHelper, EntityManagerInterface $em, CorePermissions $security, EventDispatcherInterface $dispatcher, UrlGeneratorInterface $router, Translator $translator, UserHelper $userHelper, LoggerInterface $mauticLogger, CoreParametersHelper $coreParametersHelper)
     {
@@ -107,10 +92,8 @@ class SmsModel extends FormModel implements AjaxLookupModelInterface
      * Save an array of entities.
      *
      * @param iterable<Sms> $entities
-     *
-     * @return array
      */
-    public function saveEntities($entities, $unlock = true)
+    public function saveEntities($entities, $unlock = true): void
     {
         // iterate over the results so the events are dispatched on each delete
         $batchSize = 20;
@@ -456,7 +439,7 @@ class SmsModel extends FormModel implements AjaxLookupModelInterface
     /**
      * Joins the page table and limits created_by to currently logged in user.
      */
-    public function limitQueryToCreator(QueryBuilder &$q)
+    public function limitQueryToCreator(QueryBuilder &$q): void
     {
         $q->join('t', MAUTIC_TABLE_PREFIX.'sms_messages', 's', 's.id = t.sms_id')
             ->andWhere('s.created_by = :userId')

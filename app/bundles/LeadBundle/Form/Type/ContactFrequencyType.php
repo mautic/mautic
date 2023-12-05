@@ -10,10 +10,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class ContactFrequencyType extends AbstractType
 {
-    /**
-     * @var CoreParametersHelper
-     */
-    protected $coreParametersHelper;
+    protected \Mautic\CoreBundle\Helper\CoreParametersHelper $coreParametersHelper;
 
     public function __construct(CoreParametersHelper $coreParametersHelper)
     {

@@ -16,10 +16,7 @@ use Mautic\InstallBundle\Exception\DatabaseVersionTooOldException;
 
 class SchemaHelper
 {
-    /**
-     * @var Connection
-     */
-    protected $db;
+    protected \Doctrine\DBAL\Connection $db;
 
     /**
      * @var EntityManager
@@ -119,12 +116,10 @@ class SchemaHelper
     /**
      * Generates SQL for installation.
      *
-     * @return array|bool Array containing the flash message data on a failure, boolean true on success
-     *
      * @throws \Doctrine\DBAL\Exception
      * @throws ORMException
      */
-    public function installSchema()
+    public function installSchema(): bool
     {
         $sm = $this->db->getSchemaManager();
 

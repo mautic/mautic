@@ -13,17 +13,11 @@ class Scheduler
      */
     private $id;
 
-    /**
-     * @var Report
-     */
-    private $report;
+    private \Mautic\ReportBundle\Entity\Report $report;
 
-    /**
-     * @var \DateTimeInterface
-     */
-    private $scheduleDate;
+    private \DateTimeInterface $scheduleDate;
 
-    public static function loadMetadata(ORM\ClassMetadata $metadata)
+    public static function loadMetadata(ORM\ClassMetadata $metadata): void
     {
         $builder = new ClassMetadataBuilder($metadata);
 

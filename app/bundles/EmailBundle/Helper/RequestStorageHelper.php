@@ -69,10 +69,8 @@ class RequestStorageHelper
 
     /**
      * @param string $key
-     *
-     * @return void
      */
-    public function deleteCachedRequest($key)
+    public function deleteCachedRequest($key): void
     {
         $this->cacheStorage->deleteItem($this->removeCachePrefix($key));
     }

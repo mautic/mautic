@@ -9,15 +9,9 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class CsvExporter
 {
-    /**
-     * @var FormatterHelper
-     */
-    protected $formatterHelper;
+    protected \Mautic\CoreBundle\Twig\Helper\FormatterHelper $formatterHelper;
 
-    /**
-     * @var CoreParametersHelper
-     */
-    private $coreParametersHelper;
+    private \Mautic\CoreBundle\Helper\CoreParametersHelper $coreParametersHelper;
 
     private TranslatorInterface $translator;
 
@@ -32,7 +26,7 @@ class CsvExporter
      * @param resource $handle
      * @param int      $page
      */
-    public function export(ReportDataResult $reportDataResult, $handle, $page = 1)
+    public function export(ReportDataResult $reportDataResult, $handle, $page = 1): void
     {
         if (1 === $page) {
             $this->putHeader($reportDataResult, $handle);
@@ -84,7 +78,7 @@ class CsvExporter
     /**
      * @param resource $handle
      */
-    private function putRow($handle, array $row)
+    private function putRow($handle, array $row): void
     {
         if ($this->coreParametersHelper->get('csv_always_enclose')) {
             fputs($handle, '"'.implode('","', $row).'"'."\n");

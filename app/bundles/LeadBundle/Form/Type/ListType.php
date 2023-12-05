@@ -24,12 +24,9 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class ListType extends AbstractType
 {
-    private $translator;
+    private \Symfony\Contracts\Translation\TranslatorInterface $translator;
 
-    /**
-     * @var ListModel
-     */
-    private $listModel;
+    private \Mautic\LeadBundle\Model\ListModel $listModel;
 
     public function __construct(TranslatorInterface $translator, ListModel $listModel)
     {

@@ -97,10 +97,7 @@ class WebhookModel extends FormModel
      */
     protected $logMax;
 
-    /**
-     * @var SerializerInterface
-     */
-    protected $serializer;
+    protected \JMS\Serializer\SerializerInterface $serializer;
 
     /**
      * Queued events default order by dir
@@ -110,10 +107,7 @@ class WebhookModel extends FormModel
      */
     protected $eventsOrderByDir;
 
-    /**
-     * @var Client
-     */
-    private $httpClient;
+    private \Mautic\WebhookBundle\Http\Client $httpClient;
 
     /**
      * Timestamp when the webhook processing starts.
@@ -144,7 +138,7 @@ class WebhookModel extends FormModel
     /**
      * @param Webhook $entity
      */
-    public function saveEntity($entity, $unlock = true)
+    public function saveEntity($entity, $unlock = true): void
     {
         if (null === $entity->getSecret()) {
             $entity->setSecret(EncryptionHelper::generateKey());
@@ -231,14 +225,14 @@ class WebhookModel extends FormModel
 
     public function queueWebhooksByType($type, $payload, array $groups = [])
     {
-        return $this->queueWebhooks(
+        $this->queueWebhooks(
             $this->getEventWebooksByType($type),
             $payload,
             $groups
         );
     }
 
-    public function queueWebhooks($webhookEvents, $payload, array $serializationGroups = [])
+    public function queueWebhooks($webhookEvents, $payload, array $serializationGroups = []): void
     {
         if (!count($webhookEvents) || !is_array($webhookEvents)) {
             return;
@@ -286,7 +280,7 @@ class WebhookModel extends FormModel
      *
      * @param array|\Doctrine\ORM\Tools\Pagination\Paginator $webhooks
      */
-    public function processWebhooks($webhooks)
+    public function processWebhooks($webhooks): void
     {
         $this->startTime = microtime(true);
 
@@ -403,7 +397,7 @@ class WebhookModel extends FormModel
      *
      * @param string $reason
      */
-    public function killWebhook(Webhook $webhook, $reason = 'mautic.webhook.stopped.reason')
+    public function killWebhook(Webhook $webhook, $reason = 'mautic.webhook.stopped.reason'): void
     {
         $webhook->setIsPublished(false);
         $this->saveEntity($webhook);
@@ -420,7 +414,7 @@ class WebhookModel extends FormModel
      * @param string $note
      *                           $runtime variable unit is in seconds
      */
-    public function addLog(Webhook $webhook, $statusCode, $runtime, $note = null)
+    public function addLog(Webhook $webhook, $statusCode, $runtime, $note = null): void
     {
         if (!$webhook->getId()) {
             return;
@@ -649,7 +643,7 @@ class WebhookModel extends FormModel
     /**
      * Sets all class properties from CoreParametersHelper.
      */
-    private function setConfigProps(CoreParametersHelper $coreParametersHelper)
+    private function setConfigProps(CoreParametersHelper $coreParametersHelper): void
     {
         $this->webhookLimit     = (int) $coreParametersHelper->get('webhook_limit', 10);
         $this->webhookTimeLimit = (int) $coreParametersHelper->get('webhook_time_limit', 600);

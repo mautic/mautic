@@ -11,20 +11,11 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class WebhookSubscriber implements EventSubscriberInterface
 {
-    /**
-     * @var IpLookupHelper
-     */
-    private $ipLookupHelper;
+    private \Mautic\CoreBundle\Helper\IpLookupHelper $ipLookupHelper;
 
-    /**
-     * @var AuditLogModel
-     */
-    private $auditLogModel;
+    private \Mautic\CoreBundle\Model\AuditLogModel $auditLogModel;
 
-    /**
-     * @var WebhookKillNotificator
-     */
-    private $webhookKillNotificator;
+    private \Mautic\WebhookBundle\Notificator\WebhookKillNotificator $webhookKillNotificator;
 
     public function __construct(
         IpLookupHelper $ipLookupHelper,
@@ -51,7 +42,7 @@ class WebhookSubscriber implements EventSubscriberInterface
     /**
      * Add an entry to the audit log.
      */
-    public function onWebhookSave(WebhookEvent $event)
+    public function onWebhookSave(WebhookEvent $event): void
     {
         $webhook = $event->getWebhook();
 
@@ -71,7 +62,7 @@ class WebhookSubscriber implements EventSubscriberInterface
     /**
      * Add a delete entry to the audit log.
      */
-    public function onWebhookDelete(WebhookEvent $event)
+    public function onWebhookDelete(WebhookEvent $event): void
     {
         $webhook = $event->getWebhook();
         $log     = [
@@ -88,7 +79,7 @@ class WebhookSubscriber implements EventSubscriberInterface
     /**
      * Send notification about killed webhook.
      */
-    public function onWebhookKill(WebhookEvent $event)
+    public function onWebhookKill(WebhookEvent $event): void
     {
         $this->webhookKillNotificator->send($event->getWebhook(), $event->getReason());
     }

@@ -59,7 +59,7 @@ class LookupHelper
      * @param bool $notify
      * @param bool $checkAuto
      */
-    public function lookupContact(Lead $lead, $notify = false, $checkAuto = false)
+    public function lookupContact(Lead $lead, $notify = false, $checkAuto = false): void
     {
         if (!$lead->getEmail()) {
             return;
@@ -98,7 +98,7 @@ class LookupHelper
      * @param bool $notify
      * @param bool $checkAuto
      */
-    public function lookupCompany(Company $company, $notify = false, $checkAuto = false)
+    public function lookupCompany(Company $company, $notify = false, $checkAuto = false): void
     {
         if (!$website = $company->getFieldValue('companywebsite')) {
             return;
@@ -183,10 +183,7 @@ class LookupHelper
         return ($person) ? new Clearbit_Person($keys['apikey']) : new Clearbit_Company($keys['apikey']);
     }
 
-    /**
-     * @return array
-     */
-    protected function getCache($entity, $notify)
+    protected function getCache($entity, $notify): array
     {
         /** @var User $user */
         $user      = $this->userHelper->getUser();

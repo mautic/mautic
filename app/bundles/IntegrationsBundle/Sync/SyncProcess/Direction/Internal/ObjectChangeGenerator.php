@@ -25,25 +25,16 @@ use Mautic\IntegrationsBundle\Sync\SyncProcess\Direction\Helper\ValueHelper;
 
 class ObjectChangeGenerator
 {
-    /**
-     * @var SyncJudgeInterface
-     */
-    private $syncJudge;
+    private \Mautic\IntegrationsBundle\Sync\SyncJudge\SyncJudgeInterface $syncJudge;
 
     /**
      * @var ReportDAO
      */
     private $syncReport;
 
-    /**
-     * @var ValueHelper
-     */
-    private $valueHelper;
+    private \Mautic\IntegrationsBundle\Sync\SyncProcess\Direction\Helper\ValueHelper $valueHelper;
 
-    /**
-     * @var FieldHelper
-     */
-    private $fieldHelper;
+    private \Mautic\IntegrationsBundle\Sync\SyncDataExchange\Helper\FieldHelper $fieldHelper;
 
     /**
      * @var MappingManualDAO

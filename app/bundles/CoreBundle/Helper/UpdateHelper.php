@@ -19,35 +19,17 @@ use Monolog\Logger;
  */
 class UpdateHelper
 {
-    /**
-     * @var PathsHelper
-     */
-    private $pathsHelper;
+    private \Mautic\CoreBundle\Helper\PathsHelper $pathsHelper;
 
-    /**
-     * @var Logger
-     */
-    private $logger;
+    private \Monolog\Logger $logger;
 
-    /**
-     * @var CoreParametersHelper
-     */
-    private $coreParametersHelper;
+    private \Mautic\CoreBundle\Helper\CoreParametersHelper $coreParametersHelper;
 
-    /**
-     * @var Client
-     */
-    private $client;
+    private \GuzzleHttp\Client $client;
 
-    /**
-     * @var ReleaseParser
-     */
-    private $releaseParser;
+    private \Mautic\CoreBundle\Helper\Update\Github\ReleaseParser $releaseParser;
 
-    /**
-     * @var string
-     */
-    private $phpVersion;
+    private string $phpVersion;
 
     /**
      * @var string
@@ -79,10 +61,8 @@ class UpdateHelper
      * Fetches a download package from the remote server.
      *
      * @param string $package
-     *
-     * @return array
      */
-    public function fetchPackage($package)
+    public function fetchPackage($package): array
     {
         // GET the update data
         try {

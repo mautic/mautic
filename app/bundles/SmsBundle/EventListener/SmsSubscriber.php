@@ -18,30 +18,15 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class SmsSubscriber implements EventSubscriberInterface
 {
-    /**
-     * @var AuditLogModel
-     */
-    private $auditLogModel;
+    private \Mautic\CoreBundle\Model\AuditLogModel $auditLogModel;
 
-    /**
-     * @var TrackableModel
-     */
-    private $trackableModel;
+    private \Mautic\PageBundle\Model\TrackableModel $trackableModel;
 
-    /**
-     * @var PageTokenHelper
-     */
-    private $pageTokenHelper;
+    private PageTokenHelper $pageTokenHelper;
 
-    /**
-     * @var AssetTokenHelper
-     */
-    private $assetTokenHelper;
+    private AssetTokenHelper $assetTokenHelper;
 
-    /**
-     * @var SmsHelper
-     */
-    private $smsHelper;
+    private \Mautic\SmsBundle\Helper\SmsHelper $smsHelper;
 
     public function __construct(
         AuditLogModel $auditLogModel,
@@ -73,7 +58,7 @@ class SmsSubscriber implements EventSubscriberInterface
     /**
      * Add an entry to the audit log.
      */
-    public function onPostSave(SmsEvent $event)
+    public function onPostSave(SmsEvent $event): void
     {
         $entity = $event->getSms();
         if ($details = $event->getChanges()) {
@@ -91,7 +76,7 @@ class SmsSubscriber implements EventSubscriberInterface
     /**
      * Add a delete entry to the audit log.
      */
-    public function onDelete(SmsEvent $event)
+    public function onDelete(SmsEvent $event): void
     {
         $entity = $event->getSms();
         $log    = [
@@ -104,7 +89,7 @@ class SmsSubscriber implements EventSubscriberInterface
         $this->auditLogModel->writeToLog($log);
     }
 
-    public function onTokenReplacement(TokenReplacementEvent $event)
+    public function onTokenReplacement(TokenReplacementEvent $event): void
     {
         /** @var Lead $lead */
         $lead         = $event->getLead();

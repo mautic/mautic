@@ -20,20 +20,11 @@ class ReportSubscriber implements EventSubscriberInterface
     public const CONTEXT_PAGE_HITS  = 'page.hits';
     public const CONTEXT_VIDEO_HITS = 'video.hits';
 
-    /**
-     * @var CompanyReportData
-     */
-    private $companyReportData;
+    private \Mautic\LeadBundle\Model\CompanyReportData $companyReportData;
 
-    /**
-     * @var HitRepository
-     */
-    private $hitRepository;
+    private \Mautic\PageBundle\Entity\HitRepository $hitRepository;
 
-    /**
-     * @var TranslatorInterface
-     */
-    private $translator;
+    private \Symfony\Contracts\Translation\TranslatorInterface $translator;
 
     public function __construct(
         CompanyReportData $companyReportData,
@@ -60,7 +51,7 @@ class ReportSubscriber implements EventSubscriberInterface
     /**
      * Add available tables and columns to the report builder lookup.
      */
-    public function onReportBuilder(ReportBuilderEvent $event)
+    public function onReportBuilder(ReportBuilderEvent $event): void
     {
         if (!$event->checkContext([self::CONTEXT_PAGES, self::CONTEXT_PAGE_HITS, self::CONTEXT_VIDEO_HITS])) {
             return;
@@ -364,7 +355,7 @@ class ReportSubscriber implements EventSubscriberInterface
     /**
      * Initialize the QueryBuilder object to generate reports from.
      */
-    public function onReportGenerate(ReportGeneratorEvent $event)
+    public function onReportGenerate(ReportGeneratorEvent $event): void
     {
         $context    = $event->getContext();
         $qb         = $event->getQueryBuilder();
@@ -415,7 +406,7 @@ class ReportSubscriber implements EventSubscriberInterface
     /**
      * Initialize the QueryBuilder object to generate reports from.
      */
-    public function onReportGraphGenerate(ReportGraphEvent $event)
+    public function onReportGraphGenerate(ReportGraphEvent $event): void
     {
         // Context check, we only want to fire for Lead reports
         if (!$event->checkContext(self::CONTEXT_PAGE_HITS)) {

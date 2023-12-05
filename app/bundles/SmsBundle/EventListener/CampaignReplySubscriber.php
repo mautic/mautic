@@ -17,15 +17,9 @@ class CampaignReplySubscriber implements EventSubscriberInterface
 {
     public const TYPE = 'sms.reply';
 
-    /**
-     * @var TransportChain
-     */
-    private $transportChain;
+    private \Mautic\SmsBundle\Sms\TransportChain $transportChain;
 
-    /**
-     * @var RealTimeExecutioner
-     */
-    private $realTimeExecutioner;
+    private \Mautic\CampaignBundle\Executioner\RealTimeExecutioner $realTimeExecutioner;
 
     public function __construct(TransportChain $transportChain, RealTimeExecutioner $realTimeExecutioner)
     {
@@ -45,7 +39,7 @@ class CampaignReplySubscriber implements EventSubscriberInterface
         ];
     }
 
-    public function onCampaignBuild(CampaignBuilderEvent $event)
+    public function onCampaignBuild(CampaignBuilderEvent $event): void
     {
         if (0 === count($this->transportChain->getEnabledTransports())) {
             return;
@@ -62,7 +56,7 @@ class CampaignReplySubscriber implements EventSubscriberInterface
         );
     }
 
-    public function onCampaignReply(DecisionEvent $decisionEvent)
+    public function onCampaignReply(DecisionEvent $decisionEvent): void
     {
         /** @var ReplyEvent $replyEvent */
         $replyEvent = $decisionEvent->getPassthrough();
@@ -91,7 +85,7 @@ class CampaignReplySubscriber implements EventSubscriberInterface
      * @throws \Mautic\CampaignBundle\Executioner\Exception\CannotProcessEventException
      * @throws \Mautic\CampaignBundle\Executioner\Scheduler\Exception\NotSchedulableException
      */
-    public function onReply(ReplyEvent $event)
+    public function onReply(ReplyEvent $event): void
     {
         $this->realTimeExecutioner->execute(self::TYPE, $event, 'sms');
     }

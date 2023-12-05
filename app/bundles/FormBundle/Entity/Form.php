@@ -143,7 +143,7 @@ class Form extends FormEntity
         $this->submissions = new ArrayCollection();
     }
 
-    public static function loadMetadata(ORM\ClassMetadata $metadata)
+    public static function loadMetadata(ORM\ClassMetadata $metadata): void
     {
         $builder = new ClassMetadataBuilder($metadata);
 
@@ -220,7 +220,7 @@ class Form extends FormEntity
         $builder->addNullableField('progressiveProfilingLimit', Types::INTEGER, 'progressive_profiling_limit');
     }
 
-    public static function loadValidatorMetadata(ClassMetadata $metadata)
+    public static function loadValidatorMetadata(ClassMetadata $metadata): void
     {
         $metadata->addPropertyConstraint('name', new Assert\NotBlank([
             'message' => 'mautic.core.name.required',
@@ -276,7 +276,7 @@ class Form extends FormEntity
     /**
      * Prepares the metadata for API usage.
      */
-    public static function loadApiMetadata(ApiMetadataDriver $metadata)
+    public static function loadApiMetadata(ApiMetadataDriver $metadata): void
     {
         $metadata->setGroupPrefix('form')
             ->addListProperties(
@@ -509,7 +509,7 @@ class Form extends FormEntity
     /**
      * @param int|string $key
      */
-    public function removeField($key, Field $field)
+    public function removeField($key, Field $field): void
     {
         if ($changes = $field->getChanges()) {
             $this->isChanged('fields', [$key, $changes]);
@@ -548,7 +548,7 @@ class Form extends FormEntity
     {
         return array_filter(
             array_map(
-                function (Field $field) {
+                function (Field $field): array {
                     return [
                         'formFieldId'  => $field->getId(),
                         'mappedObject' => $field->getMappedObject(),
@@ -613,7 +613,7 @@ class Form extends FormEntity
         return $this;
     }
 
-    public function removeSubmission(Submission $submissions)
+    public function removeSubmission(Submission $submissions): void
     {
         $this->submissions->removeElement($submissions);
     }
@@ -641,7 +641,7 @@ class Form extends FormEntity
         return $this;
     }
 
-    public function removeAction(Action $action)
+    public function removeAction(Action $action): void
     {
         $this->actions->removeElement($action);
     }
@@ -649,7 +649,7 @@ class Form extends FormEntity
     /**
      * Removes all actions.
      */
-    public function clearActions()
+    public function clearActions(): void
     {
         $this->actions = new ArrayCollection();
     }
@@ -673,7 +673,7 @@ class Form extends FormEntity
     /**
      * @param mixed $category
      */
-    public function setCategory($category)
+    public function setCategory($category): void
     {
         $this->category = $category;
     }
@@ -689,7 +689,7 @@ class Form extends FormEntity
     /**
      * @param mixed $template
      */
-    public function setTemplate($template)
+    public function setTemplate($template): void
     {
         $this->template = $template;
     }
@@ -705,7 +705,7 @@ class Form extends FormEntity
     /**
      * @param mixed $inKioskMode
      */
-    public function setInKioskMode($inKioskMode)
+    public function setInKioskMode($inKioskMode): void
     {
         $this->inKioskMode = $inKioskMode;
     }
@@ -713,7 +713,7 @@ class Form extends FormEntity
     /**
      * @param mixed $renderStyle
      */
-    public function setRenderStyle($renderStyle)
+    public function setRenderStyle($renderStyle): void
     {
         $this->renderStyle = $renderStyle;
     }
@@ -749,7 +749,7 @@ class Form extends FormEntity
     /**
      * @param bool|null $noIndex
      */
-    public function setNoIndex($noIndex)
+    public function setNoIndex($noIndex): void
     {
         $sanitizedNoIndex = null === $noIndex ? null : (bool) $noIndex;
         $this->isChanged('noIndex', $sanitizedNoIndex);

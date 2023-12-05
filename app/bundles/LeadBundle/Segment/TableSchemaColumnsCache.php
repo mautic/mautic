@@ -6,10 +6,7 @@ use Doctrine\ORM\EntityManager;
 
 class TableSchemaColumnsCache
 {
-    /**
-     * @var EntityManager
-     */
-    private $entityManager;
+    private \Doctrine\ORM\EntityManager $entityManager;
 
     /**
      * @var array

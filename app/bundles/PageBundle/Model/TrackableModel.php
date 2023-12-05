@@ -52,15 +52,9 @@ class TrackableModel extends AbstractCommonModel
      */
     protected $usingClickthrough = true;
 
-    /**
-     * @var RedirectModel
-     */
-    protected $redirectModel;
+    protected \Mautic\PageBundle\Model\RedirectModel $redirectModel;
 
-    /**
-     * @var LeadFieldRepository
-     */
-    private $leadFieldRepository;
+    private \Mautic\LeadBundle\Entity\LeadFieldRepository $leadFieldRepository;
 
     /**
      * @var array|null
@@ -236,7 +230,7 @@ class TrackableModel extends AbstractCommonModel
      *
      * @return array{0: mixed, 1: array<int|string, Redirect|Trackable>}
      */
-    public function parseContentForTrackables($content, array $contentTokens = [], $channel = null, $channelId = null, $usingClickthrough = true)
+    public function parseContentForTrackables($content, array $contentTokens = [], $channel = null, $channelId = null, $usingClickthrough = true): array
     {
         $this->usingClickthrough = $usingClickthrough;
 
@@ -595,7 +589,7 @@ class TrackableModel extends AbstractCommonModel
      *
      * @return array<array<string, mixed>> [$tokenizedParams[], $untokenizedParams[]]
      */
-    protected function parseTokenizedQuery($query)
+    protected function parseTokenizedQuery($query): array
     {
         $tokenizedParams   =
         $untokenizedParams = [];

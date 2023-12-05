@@ -19,20 +19,11 @@ class LeadSubscriber implements EventSubscriberInterface
 {
     use ChannelTrait;
 
-    /**
-     * @var PageModel
-     */
-    private $pageModel;
+    private \Mautic\PageBundle\Model\PageModel $pageModel;
 
-    /**
-     * @var VideoModel
-     */
-    private $pageVideoModel;
+    private \Mautic\PageBundle\Model\VideoModel $pageVideoModel;
 
-    /**
-     * @var TranslatorInterface
-     */
-    private $translator;
+    private \Symfony\Contracts\Translation\TranslatorInterface $translator;
 
     /**
      * @var RouterInterface
@@ -75,7 +66,7 @@ class LeadSubscriber implements EventSubscriberInterface
     /**
      * Compile events for the lead timeline.
      */
-    public function onTimelineGenerate(LeadTimelineEvent $event)
+    public function onTimelineGenerate(LeadTimelineEvent $event): void
     {
         // Set available event types
         $eventTypeKey  = 'page.hit';
@@ -178,7 +169,7 @@ class LeadSubscriber implements EventSubscriberInterface
     /**
      * Compile events for the lead timeline.
      */
-    public function onTimelineGenerateVideo(LeadTimelineEvent $event)
+    public function onTimelineGenerateVideo(LeadTimelineEvent $event): void
     {
         // Set available event types
         $eventTypeKey  = 'page.videohit';
@@ -220,7 +211,7 @@ class LeadSubscriber implements EventSubscriberInterface
         }
     }
 
-    public function onLeadChange(LeadChangeEvent $event)
+    public function onLeadChange(LeadChangeEvent $event): void
     {
         $this->pageModel->getHitRepository()->updateLeadByTrackingId(
             $event->getNewLead()->getId(),
@@ -229,7 +220,7 @@ class LeadSubscriber implements EventSubscriberInterface
         );
     }
 
-    public function onLeadMerge(LeadMergeEvent $event)
+    public function onLeadMerge(LeadMergeEvent $event): void
     {
         $this->pageModel->getHitRepository()->updateLead(
             $event->getLoser()->getId(),

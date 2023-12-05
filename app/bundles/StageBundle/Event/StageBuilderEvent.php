@@ -13,10 +13,7 @@ class StageBuilderEvent extends Event
      */
     private $actions = [];
 
-    /**
-     * @var TranslatorInterface
-     */
-    private $translator;
+    private \Symfony\Contracts\Translation\TranslatorInterface $translator;
 
     public function __construct(TranslatorInterface $translator)
     {
@@ -103,7 +100,7 @@ class StageBuilderEvent extends Event
     public function getActionChoices(): array
     {
         $choices = [];
-        $actions = $this->getActions();
+        $this->getActions();
         foreach ($this->actions as $k => $c) {
             $choices[$c['group']][$k] = $c['label'];
         }

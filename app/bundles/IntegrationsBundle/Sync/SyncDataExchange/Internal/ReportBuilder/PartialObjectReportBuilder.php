@@ -22,20 +22,11 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class PartialObjectReportBuilder
 {
-    /**
-     * @var FieldChangeRepository
-     */
-    private $fieldChangeRepository;
+    private \Mautic\IntegrationsBundle\Entity\FieldChangeRepository $fieldChangeRepository;
 
-    /**
-     * @var FieldHelper
-     */
-    private $fieldHelper;
+    private \Mautic\IntegrationsBundle\Sync\SyncDataExchange\Helper\FieldHelper $fieldHelper;
 
-    /**
-     * @var FieldBuilder
-     */
-    private $fieldBuilder;
+    private \Mautic\IntegrationsBundle\Sync\SyncDataExchange\Internal\ReportBuilder\FieldBuilder $fieldBuilder;
 
     /**
      * @var array
@@ -57,15 +48,9 @@ class PartialObjectReportBuilder
      */
     private $syncReport;
 
-    /**
-     * @var ObjectProvider
-     */
-    private $objectProvider;
+    private \Mautic\IntegrationsBundle\Sync\SyncDataExchange\Internal\ObjectProvider $objectProvider;
 
-    /**
-     * @var EventDispatcherInterface
-     */
-    private $dispatcher;
+    private \Symfony\Component\EventDispatcher\EventDispatcherInterface $dispatcher;
 
     public function __construct(
         FieldChangeRepository $fieldChangeRepository,

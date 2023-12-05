@@ -28,10 +28,7 @@ use Symfony\Contracts\EventDispatcher\Event;
  */
 class StageModel extends CommonFormModel
 {
-    /**
-     * @var LeadModel
-     */
-    protected $leadModel;
+    protected \Mautic\LeadBundle\Model\LeadModel $leadModel;
 
     public function __construct(
         LeadModel $leadModel,

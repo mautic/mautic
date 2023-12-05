@@ -37,7 +37,6 @@ use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 
@@ -49,20 +48,11 @@ class ImportController extends FormController
     public const STEP_PROGRESS_BAR    = 3;
     public const STEP_IMPORT_FROM_CSV = 4;
 
-    /**
-     * @var LoggerInterface
-     */
-    private $logger;
+    private \Psr\Log\LoggerInterface $logger;
 
-    /**
-     * @var SessionInterface
-     */
-    private $session;
+    private \Symfony\Component\HttpFoundation\Session\SessionInterface $session;
 
-    /**
-     * @var ImportModel
-     */
-    private $importModel;
+    private \Mautic\LeadBundle\Model\ImportModel $importModel;
 
     public function __construct(FormFactoryInterface $formFactory, FormFieldHelper $fieldHelper, LoggerInterface $mauticLogger, ManagerRegistry $doctrine, MauticFactory $factory, ModelFactory $modelFactory, UserHelper $userHelper, CoreParametersHelper $coreParametersHelper, EventDispatcherInterface $dispatcher, Translator $translator, FlashBag $flashBag, RequestStack $requestStack, CorePermissions $security)
     {
@@ -98,10 +88,8 @@ class ImportController extends FormController
      * @param string  $orderBy
      * @param string  $orderByDir
      * @param mixed[] $args
-     *
-     * @return array
      */
-    protected function getIndexItems($start, $limit, $filter, $orderBy, $orderByDir, array $args = [])
+    protected function getIndexItems($start, $limit, $filter, $orderBy, $orderByDir, array $args = []): array
     {
         $object = $this->session->get('mautic.import.object');
 

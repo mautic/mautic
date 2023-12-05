@@ -8,15 +8,9 @@ use Mautic\EmailBundle\MonitoredEmail\Mailbox;
 
 class MailboxOrganizer
 {
-    /**
-     * @var ParseEmailEvent
-     */
-    protected $event;
+    protected \Mautic\EmailBundle\Event\ParseEmailEvent $event;
 
-    /**
-     * @var array
-     */
-    protected $mailboxes;
+    protected array $mailboxes;
 
     /**
      * @var MailboxContainer[]
@@ -32,7 +26,7 @@ class MailboxOrganizer
     /**
      * Organize the mailboxes into containers by IMAP connection and criteria.
      */
-    public function organize()
+    public function organize(): void
     {
         $criteriaRequested      = $this->event->getCriteriaRequests();
         $markAsSeenInstructions = $this->event->getMarkAsSeenInstructions();

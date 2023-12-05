@@ -58,7 +58,7 @@ class InjectCustomContentSubscriber implements EventSubscriberInterface
         ];
     }
 
-    public function injectViewCustomContent(CustomContentEvent $customContentEvent)
+    public function injectViewCustomContent(CustomContentEvent $customContentEvent): void
     {
         if (!$this->config->isPublished()) {
             return;

@@ -16,25 +16,16 @@ use Symfony\Component\Form\FormFactoryInterface;
  */
 class ReportGenerator
 {
-    /**
-     * @var Connection
-     */
-    private $db;
+    private \Doctrine\DBAL\Connection $db;
 
     /**
      * @var EventDispatcher
      */
-    private $dispatcher;
+    private \Symfony\Component\EventDispatcher\EventDispatcherInterface $dispatcher;
 
-    /**
-     * @var \Symfony\Component\Form\FormFactoryInterface
-     */
-    private $formFactory;
+    private ?\Symfony\Component\Form\FormFactoryInterface $formFactory;
 
-    /**
-     * @var \Mautic\ReportBundle\Entity\Report
-     */
-    private $entity;
+    private \Mautic\ReportBundle\Entity\Report $entity;
 
     /**
      * @var string
@@ -46,10 +37,7 @@ class ReportGenerator
      */
     private $contentTemplate;
 
-    /**
-     * @var ChannelListHelper
-     */
-    private $channelListHelper;
+    private \Mautic\ChannelBundle\Helper\ChannelListHelper $channelListHelper;
 
     public function __construct(EventDispatcherInterface $dispatcher, Connection $db, Report $entity, ChannelListHelper $channelListHelper, FormFactoryInterface $formFactory = null)
     {

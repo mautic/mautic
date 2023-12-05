@@ -56,37 +56,19 @@ class ReportModel extends FormModel
      */
     protected $defaultPageLimit;
 
-    /**
-     * @var Environment
-     */
-    protected $twig;
+    protected \Twig\Environment $twig;
 
-    /**
-     * @var ChannelListHelper
-     */
-    protected $channelListHelper;
+    protected \Mautic\ChannelBundle\Helper\ChannelListHelper $channelListHelper;
 
     private RequestStack $requestStack;
 
-    /**
-     * @var FieldModel
-     */
-    protected $fieldModel;
+    protected \Mautic\LeadBundle\Model\FieldModel $fieldModel;
 
-    /**
-     * @var ReportHelper
-     */
-    protected $reportHelper;
+    protected \Mautic\ReportBundle\Helper\ReportHelper $reportHelper;
 
-    /**
-     * @var CsvExporter
-     */
-    private $csvExporter;
+    private \Mautic\ReportBundle\Model\CsvExporter $csvExporter;
 
-    /**
-     * @var ExcelExporter
-     */
-    private $excelExporter;
+    private \Mautic\ReportBundle\Model\ExcelExporter $excelExporter;
 
     public function __construct(
         CoreParametersHelper $coreParametersHelper,
@@ -449,7 +431,7 @@ class ReportModel extends FormModel
                 }
 
                 $response = new StreamedResponse(
-                    function () use ($reportDataResult) {
+                    function () use ($reportDataResult): void {
                         $handle = fopen('php://output', 'r+');
                         $this->csvExporter->export($reportDataResult, $handle);
                         fclose($handle);
@@ -479,7 +461,7 @@ class ReportModel extends FormModel
                 }
 
                 $response = new StreamedResponse(
-                    function () use ($reportDataResult, $name) {
+                    function () use ($reportDataResult, $name): void {
                         $this->excelExporter->export($reportDataResult, $name);
                     }
                 );
@@ -497,9 +479,9 @@ class ReportModel extends FormModel
     /**
      * Get report data for view rendering.
      *
-     * @return array
+     * @return mixed[]
      */
-    public function getReportData(Report $entity, FormFactoryInterface $formFactory = null, array $options = [])
+    public function getReportData(Report $entity, FormFactoryInterface $formFactory = null, array $options = []): array
     {
         // Clone dateFrom/dateTo because they handled separately in charts
         $chartDateFrom = isset($options['dateFrom']) ? clone $options['dateFrom'] : (new \DateTime('-30 days'));

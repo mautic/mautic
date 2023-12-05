@@ -20,15 +20,9 @@ class SubmitActionEmailType extends AbstractType
     use FormFieldTrait;
     use ToBcBccFieldsTrait;
 
-    /**
-     * @var TranslatorInterface
-     */
-    private $translator;
+    private \Symfony\Contracts\Translation\TranslatorInterface $translator;
 
-    /**
-     * @var CoreParametersHelper
-     */
-    protected $coreParametersHelper;
+    protected \Mautic\CoreBundle\Helper\CoreParametersHelper $coreParametersHelper;
 
     public function __construct(TranslatorInterface $translator, CoreParametersHelper $coreParametersHelper)
     {
@@ -39,7 +33,7 @@ class SubmitActionEmailType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $data = (isset($options['data']['subject']))
             ? $options['data']['subject']
@@ -148,7 +142,7 @@ class SubmitActionEmailType extends AbstractType
         return 'form_submitaction_sendemail';
     }
 
-    public function buildView(FormView $view, FormInterface $form, array $options)
+    public function buildView(FormView $view, FormInterface $form, array $options): void
     {
         $view->vars['formFields'] = $this->getFormFields($options['attr']['data-formid']);
     }

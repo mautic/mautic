@@ -45,7 +45,7 @@ class PluginRepository extends CommonRepository
     /**
      * {@inheritdoc}
      */
-    protected function getDefaultOrder()
+    protected function getDefaultOrder(): array
     {
         return [
             ['p.name', 'ASC'],

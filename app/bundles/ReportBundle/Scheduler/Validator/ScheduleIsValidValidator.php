@@ -12,10 +12,7 @@ use Symfony\Component\Validator\ConstraintValidator;
 
 class ScheduleIsValidValidator extends ConstraintValidator
 {
-    /**
-     * @var SchedulerBuilder
-     */
-    private $schedulerBuilder;
+    private \Mautic\ReportBundle\Scheduler\Builder\SchedulerBuilder $schedulerBuilder;
 
     public function __construct(SchedulerBuilder $schedulerBuilder)
     {
@@ -25,7 +22,7 @@ class ScheduleIsValidValidator extends ConstraintValidator
     /**
      * @param Report $report
      */
-    public function validate($report, Constraint $constraint)
+    public function validate($report, Constraint $constraint): void
     {
         if (!$report->isScheduled()) {
             $report->setAsNotScheduled();
@@ -67,14 +64,14 @@ class ScheduleIsValidValidator extends ConstraintValidator
         }
     }
 
-    private function addReportScheduleNotValidViolation()
+    private function addReportScheduleNotValidViolation(): void
     {
         $this->context->buildViolation('mautic.report.schedule.notValid')
             ->atPath('isScheduled')
             ->addViolation();
     }
 
-    private function buildScheduler(Report $report)
+    private function buildScheduler(Report $report): void
     {
         try {
             $this->schedulerBuilder->getNextEvent($report);

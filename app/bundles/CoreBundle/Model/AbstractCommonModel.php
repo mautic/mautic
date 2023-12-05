@@ -20,45 +20,21 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
  */
 abstract class AbstractCommonModel implements MauticModelInterface
 {
-    /**
-     * @var EntityManagerInterface
-     */
-    protected $em;
+    protected \Doctrine\ORM\EntityManagerInterface $em;
 
-    /**
-     * @var \Mautic\CoreBundle\Security\Permissions\CorePermissions
-     */
-    protected $security;
+    protected \Mautic\CoreBundle\Security\Permissions\CorePermissions $security;
 
-    /**
-     * @var EventDispatcherInterface
-     */
-    protected $dispatcher;
+    protected \Symfony\Component\EventDispatcher\EventDispatcherInterface $dispatcher;
 
-    /**
-     * @var UrlGeneratorInterface
-     */
-    protected $router;
+    protected \Symfony\Component\Routing\Generator\UrlGeneratorInterface $router;
 
-    /**
-     * @var Translator
-     */
-    protected $translator;
+    protected \Mautic\CoreBundle\Translation\Translator $translator;
 
-    /**
-     * @var UserHelper
-     */
-    protected $userHelper;
+    protected \Mautic\CoreBundle\Helper\UserHelper $userHelper;
 
-    /**
-     * @var LoggerInterface
-     */
-    protected $logger;
+    protected \Psr\Log\LoggerInterface $logger;
 
-    /**
-     * @var CoreParametersHelper
-     */
-    protected $coreParametersHelper;
+    protected \Mautic\CoreBundle\Helper\CoreParametersHelper $coreParametersHelper;
 
     public function __construct(EntityManagerInterface $em, CorePermissions $security, EventDispatcherInterface $dispatcher, UrlGeneratorInterface $router, Translator $translator, UserHelper $userHelper, LoggerInterface $mauticLogger, CoreParametersHelper $coreParametersHelper)
     {

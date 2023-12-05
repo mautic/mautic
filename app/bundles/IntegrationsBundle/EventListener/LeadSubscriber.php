@@ -26,30 +26,15 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class LeadSubscriber implements EventSubscriberInterface
 {
-    /**
-     * @var FieldChangeRepository
-     */
-    private $fieldChangeRepo;
+    private \Mautic\IntegrationsBundle\Entity\FieldChangeRepository $fieldChangeRepo;
 
-    /**
-     * @var ObjectMappingRepository
-     */
-    private $objectMappingRepository;
+    private \Mautic\IntegrationsBundle\Entity\ObjectMappingRepository $objectMappingRepository;
 
-    /**
-     * @var VariableExpresserHelperInterface
-     */
-    private $variableExpressor;
+    private \Mautic\IntegrationsBundle\Sync\VariableExpresser\VariableExpresserHelperInterface $variableExpressor;
 
-    /**
-     * @var SyncIntegrationsHelper
-     */
-    private $syncIntegrationsHelper;
+    private \Mautic\IntegrationsBundle\Helper\SyncIntegrationsHelper $syncIntegrationsHelper;
 
-    /**
-     * @var EventDispatcherInterface
-     */
-    private $dispatcher;
+    private \Symfony\Component\EventDispatcher\EventDispatcherInterface $dispatcher;
 
     public function __construct(
         FieldChangeRepository $fieldChangeRepo,

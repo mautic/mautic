@@ -34,10 +34,7 @@ class DashboardSubscriber extends MainDashboardSubscriber
         'point:points:viewother',
     ];
 
-    /**
-     * @var PointModel
-     */
-    protected $pointModel;
+    protected \Mautic\PointBundle\Model\PointModel $pointModel;
 
     public function __construct(PointModel $pointModel)
     {
@@ -47,7 +44,7 @@ class DashboardSubscriber extends MainDashboardSubscriber
     /**
      * Set a widget detail when needed.
      */
-    public function onWidgetDetailGenerate(WidgetDetailEvent $event)
+    public function onWidgetDetailGenerate(WidgetDetailEvent $event): void
     {
         $this->checkPermissions($event);
         $canViewOthers = $event->hasPermission('point:points:viewother');

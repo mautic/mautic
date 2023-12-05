@@ -21,25 +21,16 @@ class ContactSegmentFilter
      */
     public $contactSegmentFilterCrate;
 
-    /**
-     * @var FilterDecoratorInterface
-     */
-    private $filterDecorator;
+    private \Mautic\LeadBundle\Segment\Decorator\FilterDecoratorInterface $filterDecorator;
 
-    /**
-     * @var FilterQueryBuilderInterface
-     */
-    private $filterQueryBuilder;
+    private \Mautic\LeadBundle\Segment\Query\Filter\FilterQueryBuilderInterface $filterQueryBuilder;
 
-    /**
-     * @var TableSchemaColumnsCache
-     */
-    private $schemaCache;
+    private \Mautic\LeadBundle\Segment\TableSchemaColumnsCache $schemaCache;
 
     /**
      * @var array<string, mixed>
      */
-    private $batchLimiters = [];
+    private array $batchLimiters = [];
 
     /**
      * @param array<string, mixed> $batchLimiters

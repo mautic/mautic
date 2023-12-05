@@ -6,10 +6,7 @@ use Mautic\PageBundle\Model\PageModel;
 
 class TokenHelper
 {
-    /**
-     * @var PageModel
-     */
-    protected $model;
+    protected \Mautic\PageBundle\Model\PageModel $model;
 
     public function __construct(PageModel $model)
     {

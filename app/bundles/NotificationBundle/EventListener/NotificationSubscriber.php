@@ -16,25 +16,13 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class NotificationSubscriber implements EventSubscriberInterface
 {
-    /**
-     * @var TrackableModel
-     */
-    private $trackableModel;
+    private \Mautic\PageBundle\Model\TrackableModel $trackableModel;
 
-    /**
-     * @var PageTokenHelper
-     */
-    private $pageTokenHelper;
+    private PageTokenHelper $pageTokenHelper;
 
-    /**
-     * @var AssetTokenHelper
-     */
-    private $assetTokenHelper;
+    private AssetTokenHelper $assetTokenHelper;
 
-    /**
-     * @var AuditLogModel
-     */
-    private $auditLogModel;
+    private \Mautic\CoreBundle\Model\AuditLogModel $auditLogModel;
 
     public function __construct(AuditLogModel $auditLogModel, TrackableModel $trackableModel, PageTokenHelper $pageTokenHelper, AssetTokenHelper $assetTokenHelper)
     {
@@ -59,7 +47,7 @@ class NotificationSubscriber implements EventSubscriberInterface
     /**
      * Add an entry to the audit log.
      */
-    public function onPostSave(NotificationEvent $event)
+    public function onPostSave(NotificationEvent $event): void
     {
         $entity = $event->getNotification();
         if ($details = $event->getChanges()) {
@@ -77,7 +65,7 @@ class NotificationSubscriber implements EventSubscriberInterface
     /**
      * Add a delete entry to the audit log.
      */
-    public function onDelete(NotificationEvent $event)
+    public function onDelete(NotificationEvent $event): void
     {
         $entity = $event->getNotification();
         $log    = [
@@ -90,7 +78,7 @@ class NotificationSubscriber implements EventSubscriberInterface
         $this->auditLogModel->writeToLog($log);
     }
 
-    public function onTokenReplacement(TokenReplacementEvent $event)
+    public function onTokenReplacement(TokenReplacementEvent $event): void
     {
         /** @var Lead $lead */
         $lead         = $event->getLead();

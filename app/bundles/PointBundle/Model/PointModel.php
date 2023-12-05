@@ -38,27 +38,16 @@ class PointModel extends CommonFormModel
 {
     protected RequestStack $requestStack;
 
-    /**
-     * @var IpLookupHelper
-     */
-    protected $ipLookupHelper;
+    protected \Mautic\CoreBundle\Helper\IpLookupHelper $ipLookupHelper;
 
-    /**
-     * @var LeadModel
-     */
-    protected $leadModel;
+    protected \Mautic\LeadBundle\Model\LeadModel $leadModel;
 
     /**
      * @deprecated https://github.com/mautic/mautic/issues/8229
-     *
-     * @var MauticFactory
      */
-    protected $mauticFactory;
+    protected \Mautic\CoreBundle\Factory\MauticFactory $mauticFactory;
 
-    /**
-     * @var ContactTracker
-     */
-    private $contactTracker;
+    private \Mautic\LeadBundle\Tracker\ContactTracker $contactTracker;
 
     private PointGroupModel $pointGroupModel;
 
@@ -215,7 +204,7 @@ class PointModel extends CommonFormModel
      *
      * @throws \ReflectionException
      */
-    public function triggerAction($type, $eventDetails = null, $typeId = null, Lead $lead = null, $allowUserRequest = false)
+    public function triggerAction($type, $eventDetails = null, $typeId = null, Lead $lead = null, $allowUserRequest = false): void
     {
         // only trigger actions for not logged Mautic users
         if (!$this->security->isAnonymous() && !$allowUserRequest) {

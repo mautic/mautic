@@ -10,7 +10,7 @@ class CategoryChangeEvent extends Event
 {
     private $lead;
     private $leads;
-    private $category;
+    private \Mautic\CategoryBundle\Entity\Category $category;
     private $added;
 
     /**

@@ -8,15 +8,9 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class CompanyReportData
 {
-    /**
-     * @var FieldModel
-     */
-    private $fieldModel;
+    private \Mautic\LeadBundle\Model\FieldModel $fieldModel;
 
-    /**
-     * @var TranslatorInterface
-     */
-    private $translator;
+    private \Symfony\Contracts\Translation\TranslatorInterface $translator;
 
     public function __construct(FieldModel $fieldModel, TranslatorInterface $translator)
     {
@@ -57,10 +51,7 @@ class CompanyReportData
         return false;
     }
 
-    /**
-     * @return array
-     */
-    private function getCompanyColumns()
+    private function getCompanyColumns(): array
     {
         return [
             'comp.id' => [

@@ -33,17 +33,11 @@ class EntityLookupChoiceLoader implements ChoiceLoaderInterface
     /**
      * @var ModelFactory<object>
      */
-    protected $modelFactory;
+    protected \Mautic\CoreBundle\Factory\ModelFactory $modelFactory;
 
-    /**
-     * @var TranslatorInterface
-     */
-    protected $translator;
+    protected \Symfony\Contracts\Translation\TranslatorInterface $translator;
 
-    /**
-     * @var Connection
-     */
-    protected $connection;
+    protected \Doctrine\DBAL\Connection $connection;
 
     /**
      * @param ModelFactory<object> $modelFactory

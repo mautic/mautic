@@ -26,10 +26,7 @@ class Hit
      */
     private $dateLeft;
 
-    /**
-     * @var Page|null
-     */
-    private $page;
+    private ?Page $page = null;
 
     /**
      * @var Redirect|null
@@ -135,7 +132,7 @@ class Hit
      */
     private $device;
 
-    public static function loadMetadata(ORM\ClassMetadata $metadata)
+    public static function loadMetadata(ORM\ClassMetadata $metadata): void
     {
         $builder = new ClassMetadataBuilder($metadata);
 
@@ -253,7 +250,7 @@ class Hit
     /**
      * Prepares the metadata for API usage.
      */
-    public static function loadApiMetadata(ApiMetadataDriver $metadata)
+    public static function loadApiMetadata(ApiMetadataDriver $metadata): void
     {
         $metadata->setGroupPrefix('hit')
             ->addProperties(
@@ -620,9 +617,7 @@ class Hit
     }
 
     /**
-     * Get page.
-     *
-     * @return Page
+     * @return ?Page
      */
     public function getPage()
     {
@@ -806,7 +801,7 @@ class Hit
     /**
      * @param mixed $email
      */
-    public function setEmail(Email $email)
+    public function setEmail(Email $email): void
     {
         $this->email = $email;
     }

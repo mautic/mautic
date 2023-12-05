@@ -648,7 +648,7 @@ class MonitoringController extends FormController
     /*
      * Update the audit log
      */
-    public function updateAuditLog(Monitoring $monitoring, IpLookupHelper $ipLookupHelper, $action)
+    public function updateAuditLog(Monitoring $monitoring, IpLookupHelper $ipLookupHelper, $action): void
     {
         $log = [
             'bundle'    => 'plugin.mauticSocial',

@@ -18,40 +18,19 @@ use Twig\Environment;
 
 class IntegrationHelper
 {
-    /**
-     * @var ContainerInterface
-     */
-    private $container;
+    private \Symfony\Component\DependencyInjection\ContainerInterface $container;
 
-    /**
-     * @var EntityManager
-     */
-    protected $em;
+    protected \Doctrine\ORM\EntityManager $em;
 
-    /**
-     * @var PathsHelper
-     */
-    protected $pathsHelper;
+    protected \Mautic\CoreBundle\Helper\PathsHelper $pathsHelper;
 
-    /**
-     * @var BundleHelper
-     */
-    protected $bundleHelper;
+    protected \Mautic\CoreBundle\Helper\BundleHelper $bundleHelper;
 
-    /**
-     * @var CoreParametersHelper
-     */
-    protected $coreParametersHelper;
+    protected \Mautic\CoreBundle\Helper\CoreParametersHelper $coreParametersHelper;
 
-    /**
-     * @var Environment
-     */
-    protected $twig;
+    protected \Twig\Environment $twig;
 
-    /**
-     * @var PluginModel
-     */
-    protected $pluginModel;
+    protected \Mautic\PluginBundle\Model\PluginModel $pluginModel;
 
     private $integrations = [];
 
@@ -574,7 +553,7 @@ class IntegrationHelper
         $identifier      = (is_array($identifierField)) ? [] : false;
         $matchFound      = false;
 
-        $findMatch = function ($f, $fields) use (&$identifierField, &$identifier, &$matchFound) {
+        $findMatch = function ($f, $fields) use (&$identifierField, &$identifier, &$matchFound): void {
             if (is_array($identifier)) {
                 // there are multiple fields the integration can identify by
                 foreach ($identifierField as $idf) {

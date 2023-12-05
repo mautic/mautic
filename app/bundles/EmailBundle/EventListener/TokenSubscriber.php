@@ -15,15 +15,9 @@ class TokenSubscriber implements EventSubscriberInterface
 {
     use MatchFilterForLeadTrait;
 
-    /**
-     * @var EventDispatcherInterface
-     */
-    private $dispatcher;
+    private \Symfony\Component\EventDispatcher\EventDispatcherInterface $dispatcher;
 
-    /**
-     * @var PrimaryCompanyHelper
-     */
-    private $primaryCompanyHelper;
+    private \Mautic\LeadBundle\Helper\PrimaryCompanyHelper $primaryCompanyHelper;
 
     public function __construct(EventDispatcherInterface $dispatcher, PrimaryCompanyHelper $primaryCompanyHelper)
     {
@@ -43,7 +37,7 @@ class TokenSubscriber implements EventSubscriberInterface
         ];
     }
 
-    public function decodeTokens(EmailSendEvent $event)
+    public function decodeTokens(EmailSendEvent $event): void
     {
         if ($event->isDynamicContentParsing()) {
             // prevent a loop
@@ -81,7 +75,7 @@ class TokenSubscriber implements EventSubscriberInterface
         }
     }
 
-    public function onTokenReplacement(TokenReplacementEvent $event)
+    public function onTokenReplacement(TokenReplacementEvent $event): void
     {
         $clickthrough = $event->getClickthrough();
 

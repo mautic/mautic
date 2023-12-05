@@ -74,7 +74,7 @@ class Download
 
     private ?string $utmTerm;
 
-    public static function loadMetadata(ORM\ClassMetadata $metadata)
+    public static function loadMetadata(ORM\ClassMetadata $metadata): void
     {
         $builder = new ClassMetadataBuilder($metadata);
 
@@ -308,7 +308,7 @@ class Download
     /**
      * @param mixed $lead
      */
-    public function setLead($lead)
+    public function setLead($lead): void
     {
         $this->lead = $lead;
     }
@@ -324,7 +324,7 @@ class Download
     /**
      * @param mixed $source
      */
-    public function setSource($source)
+    public function setSource($source): void
     {
         $this->source = $source;
     }
@@ -340,7 +340,7 @@ class Download
     /**
      * @param mixed $sourceId
      */
-    public function setSourceId($sourceId)
+    public function setSourceId($sourceId): void
     {
         $this->sourceId = (int) $sourceId;
     }
@@ -356,7 +356,7 @@ class Download
     /**
      * @param mixed $email
      */
-    public function setEmail(Email $email)
+    public function setEmail(Email $email): void
     {
         $this->email = $email;
     }

@@ -28,10 +28,7 @@ class ChannelBroadcastEvent extends Event
      */
     protected $results = [];
 
-    /**
-     * @var OutputInterface
-     */
-    protected $output;
+    protected \Symfony\Component\Console\Output\OutputInterface $output;
 
     /**
      * Min contact ID filter can be used for process parallelization.
@@ -99,7 +96,7 @@ class ChannelBroadcastEvent extends Event
      * @param int    $successCount
      * @param int    $failedCount
      */
-    public function setResults($channelLabel, $successCount, $failedCount = 0, array $failedRecipientsByList = [])
+    public function setResults($channelLabel, $successCount, $failedCount = 0, array $failedRecipientsByList = []): void
     {
         $this->results[$channelLabel] = [
             'success'                => (int) $successCount,
@@ -136,7 +133,7 @@ class ChannelBroadcastEvent extends Event
     /**
      * @param int $minContactIdFilter
      */
-    public function setMinContactIdFilter($minContactIdFilter)
+    public function setMinContactIdFilter($minContactIdFilter): void
     {
         $this->minContactIdFilter = $minContactIdFilter;
     }
@@ -152,7 +149,7 @@ class ChannelBroadcastEvent extends Event
     /**
      * @param int $maxContactIdFilter
      */
-    public function setMaxContactIdFilter($maxContactIdFilter)
+    public function setMaxContactIdFilter($maxContactIdFilter): void
     {
         $this->maxContactIdFilter = $maxContactIdFilter;
     }
@@ -168,7 +165,7 @@ class ChannelBroadcastEvent extends Event
     /**
      * @param int $limit
      */
-    public function setLimit($limit)
+    public function setLimit($limit): void
     {
         $this->limit = $limit;
     }
@@ -184,7 +181,7 @@ class ChannelBroadcastEvent extends Event
     /**
      * @param int $batch
      */
-    public function setBatch($batch)
+    public function setBatch($batch): void
     {
         $this->batch = $batch;
     }

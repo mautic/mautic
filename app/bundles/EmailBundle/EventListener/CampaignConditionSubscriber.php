@@ -12,10 +12,7 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class CampaignConditionSubscriber implements EventSubscriberInterface
 {
-    /**
-     * @var EmailValidator
-     */
-    private $validator;
+    private \Mautic\EmailBundle\Helper\EmailValidator $validator;
 
     public function __construct(EmailValidator $validator)
     {
@@ -33,7 +30,7 @@ class CampaignConditionSubscriber implements EventSubscriberInterface
         ];
     }
 
-    public function onCampaignBuild(CampaignBuilderEvent $event)
+    public function onCampaignBuild(CampaignBuilderEvent $event): void
     {
         $event->addCondition(
             'email.validate.address',

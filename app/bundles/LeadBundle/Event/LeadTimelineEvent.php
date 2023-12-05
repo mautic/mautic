@@ -33,17 +33,12 @@ class LeadTimelineEvent extends Event
      */
     protected $filters = [];
 
-    /**
-     * @var array|null
-     */
-    protected $orderBy;
+    protected ?array $orderBy;
 
     /**
      * Lead entity for the lead the timeline is being generated for.
-     *
-     * @var Lead
      */
-    protected $lead;
+    protected ?\Mautic\LeadBundle\Entity\Lead $lead;
 
     /**
      * @var array<string, int>
@@ -347,10 +342,8 @@ class LeadTimelineEvent extends Event
 
     /**
      * Fetch start/limit for queries.
-     *
-     * @return array
      */
-    public function getEventLimit()
+    public function getEventLimit(): array
     {
         return [
             'leadId' => ($this->lead instanceof Lead) ? $this->lead->getId() : null,
@@ -435,10 +428,8 @@ class LeadTimelineEvent extends Event
 
     /**
      * Get the date range to get counts by.
-     *
-     * @return array
      */
-    public function getCountDateRange()
+    public function getCountDateRange(): array
     {
         return ['from' => $this->dateFrom, 'to' => $this->dateTo];
     }
