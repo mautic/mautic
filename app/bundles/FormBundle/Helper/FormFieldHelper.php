@@ -18,10 +18,7 @@ use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 class FormFieldHelper extends AbstractFormFieldHelper
 {
-    /**
-     * @var ValidatorInterface
-     */
-    private $validator;
+    private ?\Symfony\Component\Validator\Validator\ValidatorInterface $validator;
 
     /**
      * @var array

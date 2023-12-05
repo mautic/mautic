@@ -30,10 +30,7 @@ class FieldModel extends CommonFormModel
 {
     private RequestStack $requestStack;
 
-    /**
-     * @var LeadFieldModel
-     */
-    protected $leadFieldModel;
+    protected LeadFieldModel $leadFieldModel;
 
     public function __construct(LeadFieldModel $leadFieldModel, EntityManager $em, CorePermissions $security, EventDispatcherInterface $dispatcher, UrlGeneratorInterface $router, Translator $translator, UserHelper $userHelper, LoggerInterface $mauticLogger, CoreParametersHelper $coreParametersHelper, RequestStack $requestStack)
     {

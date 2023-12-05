@@ -7,15 +7,9 @@ use Symfony\Component\HttpFoundation\File\UploadedFile;
 
 class FileFieldCrate
 {
-    /**
-     * @var UploadedFile
-     */
-    private $uploadedFile;
+    private \Symfony\Component\HttpFoundation\File\UploadedFile $uploadedFile;
 
-    /**
-     * @var Field
-     */
-    private $field;
+    private \Mautic\FormBundle\Entity\Field $field;
 
     public function __construct(UploadedFile $uploadedFile, Field $field)
     {

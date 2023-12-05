@@ -20,13 +20,9 @@ class FormFieldFileType extends AbstractType
     public const PROPERTY_ALLOWED_FILE_SIZE       = 'allowed_file_size';
     public const PROPERTY_PREFERED_PROFILE_IMAGE  = 'profile_image';
 
-    /** @var CoreParametersHelper */
-    private $coreParametersHelper;
+    private \Mautic\CoreBundle\Helper\CoreParametersHelper $coreParametersHelper;
 
-    /**
-     * @var TranslatorInterface
-     */
-    private $translator;
+    private \Symfony\Contracts\Translation\TranslatorInterface $translator;
 
     public function __construct(CoreParametersHelper $coreParametersHelper, TranslatorInterface $translator)
     {

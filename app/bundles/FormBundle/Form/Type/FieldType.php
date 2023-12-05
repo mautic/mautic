@@ -23,25 +23,13 @@ class FieldType extends AbstractType
 {
     use FormFieldTrait;
 
-    /**
-     * @var TranslatorInterface
-     */
-    private $translator;
+    private \Symfony\Contracts\Translation\TranslatorInterface $translator;
 
-    /**
-     * @var ObjectCollectorInterface
-     */
-    private $objectCollector;
+    private \Mautic\FormBundle\Collector\ObjectCollectorInterface $objectCollector;
 
-    /**
-     * @var FieldCollectorInterface
-     */
-    private $fieldCollector;
+    private \Mautic\FormBundle\Collector\FieldCollectorInterface $fieldCollector;
 
-    /**
-     * @var AlreadyMappedFieldCollectorInterface
-     */
-    private $mappedFieldCollector;
+    private \Mautic\FormBundle\Collector\AlreadyMappedFieldCollectorInterface $mappedFieldCollector;
 
     public function __construct(
         TranslatorInterface $translator,

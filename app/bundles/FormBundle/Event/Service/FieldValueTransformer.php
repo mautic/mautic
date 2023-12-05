@@ -9,10 +9,7 @@ use Symfony\Component\Routing\RouterInterface;
 
 class FieldValueTransformer
 {
-    /**
-     * @var RouterInterface
-     */
-    private $router;
+    private \Symfony\Component\Routing\RouterInterface $router;
 
     /**
      * @var array
