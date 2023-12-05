@@ -34,7 +34,7 @@ class ReportSubscriber implements EventSubscriberInterface
     /**
      * Add an entry to the audit log.
      */
-    public function onReportPostSave(ReportEvent $event)
+    public function onReportPostSave(ReportEvent $event): void
     {
         $report = $event->getReport();
         if ($details = $event->getChanges()) {
@@ -53,7 +53,7 @@ class ReportSubscriber implements EventSubscriberInterface
     /**
      * Add a delete entry to the audit log.
      */
-    public function onReportDelete(ReportEvent $event)
+    public function onReportDelete(ReportEvent $event): void
     {
         $report = $event->getReport();
         $log    = [

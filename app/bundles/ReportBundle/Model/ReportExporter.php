@@ -40,7 +40,7 @@ class ReportExporter
     /**
      * @throws FileIOException
      */
-    public function processExport(ExportOption $exportOption)
+    public function processExport(ExportOption $exportOption): void
     {
         $schedulers = $this->schedulerModel->getScheduledReportsForExport($exportOption);
         foreach ($schedulers as $scheduler) {
@@ -51,7 +51,7 @@ class ReportExporter
     /**
      * @throws FileIOException
      */
-    private function processReport(Scheduler $scheduler)
+    private function processReport(Scheduler $scheduler): void
     {
         $report = $scheduler->getReport();
 

@@ -31,10 +31,8 @@ class ReportDataEvent extends AbstractReportEvent
 
     /**
      * @param array $data
-     *
-     * @return ReportDataEvent
      */
-    public function setData($data)
+    public function setData($data): void
     {
         $this->data = $data;
     }
