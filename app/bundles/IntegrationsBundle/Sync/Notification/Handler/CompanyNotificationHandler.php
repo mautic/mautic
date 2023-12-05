@@ -12,20 +12,11 @@ use Mautic\IntegrationsBundle\Sync\SyncDataExchange\MauticSyncDataExchange;
 
 class CompanyNotificationHandler implements HandlerInterface
 {
-    /**
-     * @var Writer
-     */
-    private $writer;
+    private \Mautic\IntegrationsBundle\Sync\Notification\Writer $writer;
 
-    /**
-     * @var UserNotificationHelper
-     */
-    private $userNotificationHelper;
+    private \Mautic\IntegrationsBundle\Sync\Notification\Helper\UserNotificationHelper $userNotificationHelper;
 
-    /**
-     * @var CompanyHelper
-     */
-    private $companyHelper;
+    private \Mautic\IntegrationsBundle\Sync\Notification\Helper\CompanyHelper $companyHelper;
 
     public function __construct(Writer $writer, UserNotificationHelper $userNotificationHelper, CompanyHelper $companyHelper)
     {

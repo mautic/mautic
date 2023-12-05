@@ -24,15 +24,9 @@ class SyncIntegrationsHelper
      */
     private $enabled;
 
-    /**
-     * @var IntegrationsHelper
-     */
-    private $integrationsHelper;
+    private \Mautic\IntegrationsBundle\Helper\IntegrationsHelper $integrationsHelper;
 
-    /**
-     * @var ObjectProvider
-     */
-    private $objectProvider;
+    private \Mautic\IntegrationsBundle\Sync\SyncDataExchange\Internal\ObjectProvider $objectProvider;
 
     public function __construct(IntegrationsHelper $integrationsHelper, ObjectProvider $objectProvider)
     {

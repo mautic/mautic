@@ -15,20 +15,11 @@ use Mautic\IntegrationsBundle\Sync\SyncDataExchange\MauticSyncDataExchange;
 
 class Notifier
 {
-    /**
-     * @var HandlerContainer
-     */
-    private $handlerContainer;
+    private \Mautic\IntegrationsBundle\Sync\Notification\Handler\HandlerContainer $handlerContainer;
 
-    /**
-     * @var SyncIntegrationsHelper
-     */
-    private $syncIntegrationsHelper;
+    private \Mautic\IntegrationsBundle\Helper\SyncIntegrationsHelper $syncIntegrationsHelper;
 
-    /**
-     * @var ConfigIntegrationsHelper
-     */
-    private $configIntegrationsHelper;
+    private \Mautic\IntegrationsBundle\Helper\ConfigIntegrationsHelper $configIntegrationsHelper;
 
     public function __construct(
         HandlerContainer $handlerContainer,

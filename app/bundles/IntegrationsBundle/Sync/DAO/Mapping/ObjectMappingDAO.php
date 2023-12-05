@@ -10,15 +10,9 @@ class ObjectMappingDAO
     public const SYNC_TO_INTEGRATION  = 'integration';
     public const SYNC_BIDIRECTIONALLY = 'bidirectional';
 
-    /**
-     * @var string
-     */
-    private $internalObjectName;
+    private string $internalObjectName;
 
-    /**
-     * @var string
-     */
-    private $integrationObjectName;
+    private string $integrationObjectName;
 
     /**
      * @var array

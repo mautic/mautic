@@ -11,10 +11,7 @@ use Mautic\IntegrationsBundle\Sync\DAO\Mapping\ObjectMappingDAO;
 
 class FieldMergerHelper
 {
-    /**
-     * @var ConfigFormSyncInterface
-     */
-    private $integrationObject;
+    private \Mautic\IntegrationsBundle\Integration\Interfaces\ConfigFormSyncInterface $integrationObject;
 
     /**
      * @var array

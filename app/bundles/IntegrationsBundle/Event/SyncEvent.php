@@ -9,10 +9,7 @@ use Symfony\Contracts\EventDispatcher\Event;
 
 class SyncEvent extends Event
 {
-    /**
-     * @var InputOptionsDAO
-     */
-    private $inputOptionsDAO;
+    private \Mautic\IntegrationsBundle\Sync\DAO\Sync\InputOptionsDAO $inputOptionsDAO;
 
     public function __construct(InputOptionsDAO $inputOptionsDAO)
     {

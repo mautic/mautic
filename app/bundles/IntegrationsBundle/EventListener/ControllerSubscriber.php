@@ -12,15 +12,9 @@ use Symfony\Component\HttpKernel\KernelEvents;
 
 class ControllerSubscriber implements EventSubscriberInterface
 {
-    /**
-     * @var IntegrationsHelper
-     */
-    private $integrationsHelper;
+    private \Mautic\IntegrationsBundle\Helper\IntegrationsHelper $integrationsHelper;
 
-    /**
-     * @var ControllerResolverInterface
-     */
-    private $resolver;
+    private \Symfony\Component\HttpKernel\Controller\ControllerResolverInterface $resolver;
 
     public function __construct(IntegrationsHelper $integrationsHelper, ControllerResolverInterface $resolver)
     {

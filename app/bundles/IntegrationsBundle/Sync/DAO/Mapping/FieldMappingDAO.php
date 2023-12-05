@@ -31,10 +31,7 @@ class FieldMappingDAO
      */
     private $syncDirection;
 
-    /**
-     * @var bool
-     */
-    private $isRequired;
+    private bool $isRequired;
 
     /**
      * FieldMappingDAO constructor.

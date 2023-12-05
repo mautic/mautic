@@ -6,15 +6,9 @@ namespace Mautic\IntegrationsBundle\Sync\DAO;
 
 class DateRange
 {
-    /**
-     * @var \DateTimeInterface|null
-     */
-    private $fromDate;
+    private ?\DateTimeInterface $fromDate;
 
-    /**
-     * @var \DateTimeInterface|null
-     */
-    private $toDate;
+    private ?\DateTimeInterface $toDate;
 
     public function __construct(?\DateTimeInterface $fromDate, ?\DateTimeInterface $toDate)
     {

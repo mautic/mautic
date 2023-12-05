@@ -13,15 +13,9 @@ use Mautic\LeadBundle\Field\SchemaDefinition;
 
 final class FieldValidator implements FieldValidatorInterface
 {
-    /**
-     * @var LeadFieldRepository
-     */
-    private $leadFieldRepository;
+    private \Mautic\LeadBundle\Entity\LeadFieldRepository $leadFieldRepository;
 
-    /**
-     * @var BulkNotification
-     */
-    private $bulkNotification;
+    private \Mautic\IntegrationsBundle\Sync\Notification\BulkNotification $bulkNotification;
 
     /**
      * @var mixed[]

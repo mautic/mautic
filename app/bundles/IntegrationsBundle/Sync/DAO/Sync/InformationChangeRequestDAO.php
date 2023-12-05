@@ -28,10 +28,7 @@ class InformationChangeRequestDAO
      */
     private $field;
 
-    /**
-     * @var NormalizedValueDAO
-     */
-    private $newValue;
+    private \Mautic\IntegrationsBundle\Sync\DAO\Value\NormalizedValueDAO $newValue;
 
     /**
      * @var \DateTimeInterface|null

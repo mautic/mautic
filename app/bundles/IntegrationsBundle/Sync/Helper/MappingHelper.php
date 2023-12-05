@@ -24,25 +24,13 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class MappingHelper
 {
-    /**
-     * @var FieldModel
-     */
-    private $fieldModel;
+    private \Mautic\LeadBundle\Model\FieldModel $fieldModel;
 
-    /**
-     * @var ObjectMappingRepository
-     */
-    private $objectMappingRepository;
+    private \Mautic\IntegrationsBundle\Entity\ObjectMappingRepository $objectMappingRepository;
 
-    /**
-     * @var ObjectProvider
-     */
-    private $objectProvider;
+    private \Mautic\IntegrationsBundle\Sync\SyncDataExchange\Internal\ObjectProvider $objectProvider;
 
-    /**
-     * @var ObjectMappingRepository
-     */
-    private $dispatcher;
+    private \Symfony\Component\EventDispatcher\EventDispatcherInterface $dispatcher;
 
     public function __construct(
         FieldModel $fieldModel,

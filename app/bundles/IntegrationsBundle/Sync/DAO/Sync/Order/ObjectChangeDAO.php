@@ -34,10 +34,7 @@ class ObjectChangeDAO
      */
     private $mappedId;
 
-    /**
-     * @var \DateTimeInterface
-     */
-    private $changeDateTime;
+    private ?\DateTimeInterface $changeDateTime;
 
     /**
      * @var FieldDAO[]

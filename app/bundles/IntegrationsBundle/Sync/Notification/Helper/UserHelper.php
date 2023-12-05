@@ -8,10 +8,7 @@ use Doctrine\DBAL\Connection;
 
 class UserHelper
 {
-    /**
-     * @var Connection
-     */
-    private $connection;
+    private \Doctrine\DBAL\Connection $connection;
 
     public function __construct(Connection $connection)
     {

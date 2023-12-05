@@ -21,20 +21,11 @@ class IntegrationsHelper
      */
     private $integrations = [];
 
-    /**
-     * @var IntegrationRepository
-     */
-    private $integrationRepository;
+    private \Mautic\PluginBundle\Entity\IntegrationRepository $integrationRepository;
 
-    /**
-     * @var EncryptionService
-     */
-    private $encryptionService;
+    private \Mautic\IntegrationsBundle\Facade\EncryptionService $encryptionService;
 
-    /**
-     * @var EventDispatcherInterface
-     */
-    private $eventDispatcher;
+    private \Symfony\Component\EventDispatcher\EventDispatcherInterface $eventDispatcher;
 
     /**
      * @var array

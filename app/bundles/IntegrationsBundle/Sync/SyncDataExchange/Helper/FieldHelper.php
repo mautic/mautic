@@ -23,25 +23,13 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class FieldHelper
 {
-    /**
-     * @var FieldModel
-     */
-    private $fieldModel;
+    private \Mautic\LeadBundle\Model\FieldModel $fieldModel;
 
-    /**
-     * @var VariableExpresserHelperInterface
-     */
-    private $variableExpresserHelper;
+    private \Mautic\IntegrationsBundle\Sync\VariableExpresser\VariableExpresserHelperInterface $variableExpresserHelper;
 
-    /**
-     * @var ChannelListHelper
-     */
-    private $channelListHelper;
+    private \Mautic\ChannelBundle\Helper\ChannelListHelper $channelListHelper;
 
-    /**
-     * @var TranslatorInterface
-     */
-    private $translator;
+    private \Symfony\Contracts\Translation\TranslatorInterface $translator;
 
     /**
      * @var array
@@ -63,10 +51,7 @@ class FieldHelper
      */
     private $eventDispatcher;
 
-    /**
-     * @var ObjectProvider
-     */
-    private $objectProvider;
+    private \Mautic\IntegrationsBundle\Sync\SyncDataExchange\Internal\ObjectProvider $objectProvider;
 
     public function __construct(
         FieldModel $fieldModel,
