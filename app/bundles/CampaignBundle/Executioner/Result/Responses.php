@@ -18,7 +18,7 @@ class Responses
      */
     private $conditionResponses = [];
 
-    public function setFromLogs(ArrayCollection $logs)
+    public function setFromLogs(ArrayCollection $logs): void
     {
         /** @var LeadEventLog $log */
         foreach ($logs as $log) {
@@ -40,7 +40,7 @@ class Responses
     /**
      * @param mixed $response
      */
-    public function setResponse(Event $event, $response)
+    public function setResponse(Event $event, $response): void
     {
         switch ($event->getEventType()) {
             case Event::TYPE_ACTION:

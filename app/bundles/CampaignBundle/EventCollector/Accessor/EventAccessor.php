@@ -127,7 +127,7 @@ class EventAccessor
         return $this->decisions;
     }
 
-    private function buildEvents(array $events)
+    private function buildEvents(array $events): void
     {
         if (isset($events[Event::TYPE_ACTION])) {
             $this->actions = EventBuilder::buildActions($events[Event::TYPE_ACTION]);

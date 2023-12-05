@@ -74,7 +74,7 @@ class InactiveHelper
         $lastActiveEventId,
         ArrayCollection $negativeChildren,
         Event $event
-    ) {
+    ): void {
         $contactIds                 = $contacts->getKeys();
         $lastActiveDates            = $this->getLastActiveDates($lastActiveEventId, $contactIds);
         $this->earliestInactiveDate = $now;

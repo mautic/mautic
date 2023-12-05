@@ -63,7 +63,7 @@ class EventModel extends FormModel
         return parent::getEntity($id);
     }
 
-    public function deleteEvents($currentEvents, $deletedEvents)
+    public function deleteEvents($currentEvents, $deletedEvents): void
     {
         $deletedKeys = [];
         foreach ($deletedEvents as $k => $deleteMe) {

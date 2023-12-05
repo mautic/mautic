@@ -20,7 +20,7 @@ class EventDispatcher
     /**
      * @param string $action
      */
-    public function dispatchMembershipChange(Lead $contact, Campaign $campaign, $action)
+    public function dispatchMembershipChange(Lead $contact, Campaign $campaign, $action): void
     {
         $this->dispatcher->dispatch(
             new CampaignLeadChangeEvent($campaign, $contact, $action),
@@ -28,7 +28,7 @@ class EventDispatcher
         );
     }
 
-    public function dispatchBatchMembershipChange(array $contacts, Campaign $campaign, $action)
+    public function dispatchBatchMembershipChange(array $contacts, Campaign $campaign, $action): void
     {
         $this->dispatcher->dispatch(
             new CampaignLeadChangeEvent($campaign, $contacts, $action),

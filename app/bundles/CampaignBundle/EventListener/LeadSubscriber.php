@@ -51,7 +51,7 @@ class LeadSubscriber implements EventSubscriberInterface
     /**
      * Compile events for the lead timeline.
      */
-    public function onTimelineGenerate(LeadTimelineEvent $event)
+    public function onTimelineGenerate(LeadTimelineEvent $event): void
     {
         $this->addTimelineEvents($event, 'campaign.event', $this->translator->trans('mautic.campaign.triggered'));
         $this->addTimelineEvents($event, 'campaign.event.scheduled', $this->translator->trans('mautic.campaign.scheduled'));
@@ -60,7 +60,7 @@ class LeadSubscriber implements EventSubscriberInterface
     /**
      * Update records after lead merge.
      */
-    public function onLeadMerge(LeadMergeEvent $event)
+    public function onLeadMerge(LeadMergeEvent $event): void
     {
         /** @var LeadEventLogRepository $leadEventLogRepository */
         $leadEventLogRepository = $this->entityManager->getRepository(LeadEventLog::class);
@@ -76,7 +76,7 @@ class LeadSubscriber implements EventSubscriberInterface
      * @param string $eventTypeKey
      * @param string $eventTypeName
      */
-    private function addTimelineEvents(LeadTimelineEvent $event, $eventTypeKey, $eventTypeName)
+    private function addTimelineEvents(LeadTimelineEvent $event, $eventTypeKey, $eventTypeName): void
     {
         $event->addEventType($eventTypeKey, $eventTypeName);
         $event->addSerializerGroup('campaignList');

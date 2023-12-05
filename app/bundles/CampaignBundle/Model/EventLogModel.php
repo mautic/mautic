@@ -220,7 +220,7 @@ class EventLogModel extends AbstractCommonModel
         return [$log, $created];
     }
 
-    public function saveEntity(LeadEventLog $entity)
+    public function saveEntity(LeadEventLog $entity): void
     {
         $triggerDate = $entity->getTriggerDate();
         if (null === $triggerDate) {

@@ -90,7 +90,7 @@ class LeadRepository extends CommonRepository
     /**
      * Updates lead ID (e.g. after a lead merge).
      */
-    public function updateLead($fromLeadId, $toLeadId)
+    public function updateLead($fromLeadId, $toLeadId): void
     {
         // First check to ensure the $toLead doesn't already exist
         $results = $this->getEntityManager()->getConnection()->createQueryBuilder()
@@ -488,7 +488,7 @@ class LeadRepository extends CommonRepository
      *
      * @return bool
      */
-    public function incrementCampaignRotationForContacts(array $contactIds, $campaignId)
+    public function incrementCampaignRotationForContacts(array $contactIds, $campaignId): void
     {
         $q = $this->getEntityManager()->getConnection()->createQueryBuilder();
 
@@ -532,7 +532,7 @@ class LeadRepository extends CommonRepository
         return $segments;
     }
 
-    private function updateQueryWithExistingMembershipExclusion(int $campaignId, QueryBuilder $qb, bool $campaignCanBeRestarted = false)
+    private function updateQueryWithExistingMembershipExclusion(int $campaignId, QueryBuilder $qb, bool $campaignCanBeRestarted = false): void
     {
         $membershipConditions = $qb->expr()->and(
             $qb->expr()->eq('cl.lead_id', 'll.lead_id'),
@@ -564,7 +564,7 @@ class LeadRepository extends CommonRepository
         );
     }
 
-    private function updateQueryWithSegmentMembershipExclusion(array $segments, QueryBuilder $qb)
+    private function updateQueryWithSegmentMembershipExclusion(array $segments, QueryBuilder $qb): void
     {
         if (0 === count($segments)) {
             // No segments so nothing to exclude
@@ -590,7 +590,7 @@ class LeadRepository extends CommonRepository
     /**
      * Exclude contacts with any previous campaign history; this is mainly BC for pre 2.14.0 where the membership entry was deleted.
      */
-    private function updateQueryWithHistoryExclusion($campaignId, QueryBuilder $qb)
+    private function updateQueryWithHistoryExclusion($campaignId, QueryBuilder $qb): void
     {
         $subq = $this->getEntityManager()->getConnection()->createQueryBuilder()
             ->select('null')

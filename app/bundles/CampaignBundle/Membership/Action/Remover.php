@@ -63,7 +63,7 @@ class Remover
         $this->saveCampaignMember($campaignMember);
     }
 
-    private function saveCampaignMember($campaignMember)
+    private function saveCampaignMember($campaignMember): void
     {
         $this->leadRepository->saveEntity($campaignMember);
         $this->leadRepository->detachEntity($campaignMember);

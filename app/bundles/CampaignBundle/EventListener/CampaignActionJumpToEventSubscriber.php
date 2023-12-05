@@ -49,7 +49,7 @@ class CampaignActionJumpToEventSubscriber implements EventSubscriberInterface
     /**
      * Add event triggers and actions.
      */
-    public function onCampaignBuild(CampaignBuilderEvent $event)
+    public function onCampaignBuild(CampaignBuilderEvent $event): void
     {
         // Add action to jump to another event in the campaign flow.
         $event->addAction(self::EVENT_NAME, [
@@ -76,7 +76,7 @@ class CampaignActionJumpToEventSubscriber implements EventSubscriberInterface
      * @throws \Mautic\CampaignBundle\Executioner\Exception\CannotProcessEventException
      * @throws \Mautic\CampaignBundle\Executioner\Scheduler\Exception\NotSchedulableException
      */
-    public function onJumpToEvent(PendingEvent $campaignEvent)
+    public function onJumpToEvent(PendingEvent $campaignEvent): void
     {
         $event      = $campaignEvent->getEvent();
         $jumpTarget = $this->getJumpTargetForEvent($event, 'e.id');
@@ -110,7 +110,7 @@ class CampaignActionJumpToEventSubscriber implements EventSubscriberInterface
      * to ensure that it has the actual ID and not the temp_id as the
      * target for the jump.
      */
-    public function processCampaignEventsAfterSave(CampaignEvent $campaignEvent)
+    public function processCampaignEventsAfterSave(CampaignEvent $campaignEvent): void
     {
         $campaign = $campaignEvent->getCampaign();
         $events   = $campaign->getEvents();

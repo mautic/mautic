@@ -20,7 +20,7 @@ class GroupExecutionDateDAO
         $this->contacts      = new ArrayCollection();
     }
 
-    public function addContact(Lead $contact)
+    public function addContact(Lead $contact): void
     {
         $this->contacts->set($contact->getId(), $contact);
     }

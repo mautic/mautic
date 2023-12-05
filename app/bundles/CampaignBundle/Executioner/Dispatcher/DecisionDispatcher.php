@@ -46,7 +46,7 @@ class DecisionDispatcher
         return $event;
     }
 
-    public function dispatchDecisionResultsEvent(DecisionAccessor $config, ArrayCollection $logs, EvaluatedContacts $evaluatedContacts)
+    public function dispatchDecisionResultsEvent(DecisionAccessor $config, ArrayCollection $logs, EvaluatedContacts $evaluatedContacts): void
     {
         if (!$logs->count()) {
             return;

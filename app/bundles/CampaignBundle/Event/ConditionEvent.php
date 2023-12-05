@@ -56,7 +56,7 @@ class ConditionEvent extends CampaignExecutionEvent
     /**
      * Pass this condition.
      */
-    public function pass()
+    public function pass(): void
     {
         $this->passed = true;
     }
@@ -64,7 +64,7 @@ class ConditionEvent extends CampaignExecutionEvent
     /**
      * Fail this condition.
      */
-    public function fail()
+    public function fail(): void
     {
         $this->passed = false;
     }
@@ -81,7 +81,7 @@ class ConditionEvent extends CampaignExecutionEvent
      * @param string   $channel
      * @param int|null $channelId
      */
-    public function setChannel($channel, $channelId = null)
+    public function setChannel($channel, $channelId = null): void
     {
         $this->log->setChannel($this->channel)
             ->setChannelId($this->channelId);

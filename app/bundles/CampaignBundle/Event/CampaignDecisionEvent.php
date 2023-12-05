@@ -99,7 +99,7 @@ class CampaignDecisionEvent extends Event
      *
      * @param bool|true $triggered
      */
-    public function setDecisionAlreadyTriggered($triggered = true)
+    public function setDecisionAlreadyTriggered($triggered = true): void
     {
         $this->decisionTriggered = $triggered;
     }

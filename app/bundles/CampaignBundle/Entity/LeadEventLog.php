@@ -419,7 +419,7 @@ class LeadEventLog implements ChannelInterface
     /**
      * @param mixed[] $metadata
      */
-    public function appendToMetadata($metadata)
+    public function appendToMetadata($metadata): void
     {
         if (!is_array($metadata)) {
             // Assumed output for timeline BC for <2.14

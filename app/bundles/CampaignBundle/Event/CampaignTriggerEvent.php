@@ -40,7 +40,7 @@ class CampaignTriggerEvent extends Event
     /**
      * Do not trigger this campaign.
      */
-    public function doNotTrigger()
+    public function doNotTrigger(): void
     {
         $this->triggerCampaign = false;
 

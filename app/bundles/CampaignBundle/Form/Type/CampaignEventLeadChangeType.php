@@ -8,7 +8,7 @@ use Symfony\Component\Form\FormBuilderInterface;
 
 class CampaignEventLeadChangeType extends AbstractType
 {
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $data = (isset($options['data']['action'])) ? $options['data']['action'] : 'added';
         $builder->add('action', ButtonGroupType::class, [
