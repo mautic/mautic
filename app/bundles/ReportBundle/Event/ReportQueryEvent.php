@@ -32,8 +32,6 @@ class ReportQueryEvent extends AbstractReportEvent
 
     /**
      * @param QueryBuilder $query
-     *
-     * @return ReportDataEvent
      */
     public function setQuery($query): void
     {
