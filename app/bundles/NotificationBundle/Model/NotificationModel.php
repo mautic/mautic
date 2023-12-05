@@ -34,10 +34,7 @@ use Symfony\Contracts\EventDispatcher\Event;
  */
 class NotificationModel extends FormModel implements AjaxLookupModelInterface
 {
-    /**
-     * @var TrackableModel
-     */
-    protected $pageTrackableModel;
+    protected \Mautic\PageBundle\Model\TrackableModel $pageTrackableModel;
 
     public function __construct(
         TrackableModel $pageTrackableModel,
