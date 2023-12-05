@@ -177,7 +177,7 @@ class AssetRepository extends CommonRepository
      * @param int        $increaseBy
      * @param bool|false $unique
      */
-    public function upDownloadCount($id, $increaseBy = 1, $unique = false)
+    public function upDownloadCount($id, $increaseBy = 1, $unique = false): void
     {
         $q = $this->_em->getConnection()->createQueryBuilder();
 

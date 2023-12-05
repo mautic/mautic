@@ -97,7 +97,7 @@ class AssetModel extends FormModel
     /**
      * {@inheritdoc}
      */
-    public function saveEntity($entity, $unlock = true)
+    public function saveEntity($entity, $unlock = true): void
     {
         if (empty($this->inConversion)) {
             $alias = $entity->getAlias();
@@ -316,7 +316,7 @@ class AssetModel extends FormModel
      * @param int        $increaseBy
      * @param bool|false $unique
      */
-    public function upDownloadCount($asset, $increaseBy = 1, $unique = false)
+    public function upDownloadCount($asset, $increaseBy = 1, $unique = false): void
     {
         $id = ($asset instanceof Asset) ? $asset->getId() : (int) $asset;
 
