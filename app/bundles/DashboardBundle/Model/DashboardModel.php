@@ -136,7 +136,7 @@ class DashboardModel extends FormModel
      *
      * @throws IOException
      */
-    public function saveSnapshot($name)
+    public function saveSnapshot($name): void
     {
         $dir      = $this->pathsHelper->getSystemPath('dashboard.user');
         $filename = InputHelper::filename($name, 'json');
@@ -166,7 +166,7 @@ class DashboardModel extends FormModel
      * @param array $widgets
      * @param array $filter
      */
-    public function populateWidgetsContent(&$widgets, $filter = [])
+    public function populateWidgetsContent(&$widgets, $filter = []): void
     {
         if (count($widgets)) {
             foreach ($widgets as &$widget) {
@@ -201,7 +201,7 @@ class DashboardModel extends FormModel
      *
      * @param array $filter
      */
-    public function populateWidgetContent(Widget $widget, $filter = [])
+    public function populateWidgetContent(Widget $widget, $filter = []): void
     {
         $cacheDir = $this->coreParametersHelper->get('cached_data_dir', $this->pathsHelper->getSystemPath('cache', true));
 
@@ -237,7 +237,7 @@ class DashboardModel extends FormModel
     /**
      * Clears the temporary widget cache.
      */
-    public function clearDashboardCache()
+    public function clearDashboardCache(): void
     {
         $cacheDir     = $this->coreParametersHelper->get('cached_data_dir', $this->pathsHelper->getSystemPath('cache', true));
         $cacheStorage = new CacheStorageHelper(CacheStorageHelper::ADAPTOR_FILESYSTEM, $this->userHelper->getUser()->getId(), null, $cacheDir);
@@ -275,7 +275,7 @@ class DashboardModel extends FormModel
      * @param object $entity
      * @param bool   $unlock
      */
-    public function saveEntity($entity, $unlock = true)
+    public function saveEntity($entity, $unlock = true): void
     {
         // Set widget name from widget type if empty
         if (!$entity->getName()) {
