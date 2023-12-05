@@ -58,11 +58,6 @@ class CategoryModel extends FormModel
         return $bundle.':categories';
     }
 
-    /**
-     * {@inheritdoc}
-     *
-     * @return mixed
-     */
     public function saveEntity($entity, $unlock = true): void
     {
         $alias = $entity->getAlias();

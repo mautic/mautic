@@ -20,7 +20,7 @@ class GeneratedType extends Type
     /**
      * @return string
      */
-    public function getSQLDeclaration(array $fieldDeclaration, AbstractPlatform $platform): void
+    public function getSQLDeclaration(array $fieldDeclaration, AbstractPlatform $platform)
     {
         // Must be defined in `columnDefinition` option when adding the column in the subscriber
     }
