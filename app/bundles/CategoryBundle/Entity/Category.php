@@ -196,11 +196,7 @@ class Category extends FormEntity
     }
 
     /**
-     * Set color.
-     *
      * @param string $color
-     *
-     * @return Category
      */
     public function setColor($color): void
     {
@@ -222,8 +218,6 @@ class Category extends FormEntity
      * Set bundle.
      *
      * @param string $bundle
-     *
-     * @return Category
      */
     public function setBundle($bundle): void
     {

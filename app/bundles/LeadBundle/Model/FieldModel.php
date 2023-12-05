@@ -1003,9 +1003,6 @@ class FieldModel extends FormModel
         return SchemaDefinition::getSchemaDefinition($alias, $type, $isUnique);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getEntityByAlias($alias, $categoryAlias = null, $lang = null)
     {
         return $this->getRepository()->findOneByAlias($alias);

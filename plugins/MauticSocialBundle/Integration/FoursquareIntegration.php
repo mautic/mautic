@@ -83,7 +83,7 @@ class FoursquareIntegration extends SocialIntegration
     /**
      * Get public data.
      */
-    public function getUserData($identifier, &$socialCache): void
+    public function getUserData($identifier, &$socialCache)
     {
         if ($id = $this->getContactUserId($identifier, $socialCache)) {
             $url  = $this->getApiUrl("users/{$id}");

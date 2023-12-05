@@ -112,8 +112,9 @@ abstract class CrmAbstractIntegration extends AbstractIntegration
     /**
      * get query to fetch lead data.
      */
-    public function getFetchQuery($config): void
+    public function getFetchQuery($config)
     {
+        return null;
     }
 
     /**
@@ -166,8 +167,9 @@ abstract class CrmAbstractIntegration extends AbstractIntegration
     /**
      * @param array $params
      */
-    public function pushLeadActivity($params = []): void
+    public function pushLeadActivity($params = [])
     {
+        return null;
     }
 
     /**
