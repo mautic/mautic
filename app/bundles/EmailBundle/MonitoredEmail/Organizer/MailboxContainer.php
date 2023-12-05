@@ -6,10 +6,7 @@ use Mautic\EmailBundle\MonitoredEmail\Accessor\ConfigAccessor;
 
 class MailboxContainer
 {
-    /**
-     * @var ConfigAccessor
-     */
-    protected $config;
+    protected \Mautic\EmailBundle\MonitoredEmail\Accessor\ConfigAccessor $config;
 
     /**
      * @var array

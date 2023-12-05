@@ -10,8 +10,7 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class EmailToUserSubscriber implements EventSubscriberInterface
 {
-    /** @var SendEmailToUser */
-    private $sendEmailToUser;
+    private \Mautic\EmailBundle\Model\SendEmailToUser $sendEmailToUser;
 
     public function __construct(SendEmailToUser $sendEmailToUser)
     {

@@ -10,10 +10,7 @@ use Symfony\Component\Form\FormBuilderInterface;
 
 class ConfigMonitoredEmailType extends AbstractType
 {
-    /**
-     * @var EventDispatcherInterface
-     */
-    private $dispatcher;
+    private \Symfony\Component\EventDispatcher\EventDispatcherInterface $dispatcher;
 
     public function __construct(EventDispatcherInterface $dispatcher)
     {

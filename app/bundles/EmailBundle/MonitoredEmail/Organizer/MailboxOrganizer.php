@@ -8,15 +8,9 @@ use Mautic\EmailBundle\MonitoredEmail\Mailbox;
 
 class MailboxOrganizer
 {
-    /**
-     * @var ParseEmailEvent
-     */
-    protected $event;
+    protected \Mautic\EmailBundle\Event\ParseEmailEvent $event;
 
-    /**
-     * @var array
-     */
-    protected $mailboxes;
+    protected array $mailboxes;
 
     /**
      * @var MailboxContainer[]

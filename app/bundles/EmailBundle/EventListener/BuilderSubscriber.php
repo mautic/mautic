@@ -27,30 +27,15 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class BuilderSubscriber implements EventSubscriberInterface
 {
-    /**
-     * @var CoreParametersHelper
-     */
-    private $coreParametersHelper;
+    private \Mautic\CoreBundle\Helper\CoreParametersHelper $coreParametersHelper;
 
-    /**
-     * @var EmailModel
-     */
-    private $emailModel;
+    private \Mautic\EmailBundle\Model\EmailModel $emailModel;
 
-    /**
-     * @var TrackableModel
-     */
-    private $pageTrackableModel;
+    private \Mautic\PageBundle\Model\TrackableModel $pageTrackableModel;
 
-    /**
-     * @var RedirectModel
-     */
-    private $pageRedirectModel;
+    private \Mautic\PageBundle\Model\RedirectModel $pageRedirectModel;
 
-    /**
-     * @var TranslatorInterface
-     */
-    private $translator;
+    private \Symfony\Contracts\Translation\TranslatorInterface $translator;
 
     public function __construct(
         CoreParametersHelper $coreParametersHelper,

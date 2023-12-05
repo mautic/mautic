@@ -40,27 +40,15 @@ class EmailType extends AbstractType
 {
     use DynamicContentTrait;
 
-    /**
-     * @var TranslatorInterface
-     */
-    private $translator;
+    private \Symfony\Contracts\Translation\TranslatorInterface $translator;
 
-    /**
-     * @var EntityManager
-     */
-    private $em;
+    private \Doctrine\ORM\EntityManager $em;
 
-    /**
-     * @var StageModel
-     */
-    private $stageModel;
+    private \Mautic\StageBundle\Model\StageModel $stageModel;
 
     private CoreParametersHelper $coreParametersHelper;
 
-    /**
-     * @var ThemeHelperInterface
-     */
-    private $themeHelper;
+    private \Mautic\CoreBundle\Helper\ThemeHelperInterface $themeHelper;
 
     public function __construct(
         TranslatorInterface $translator,

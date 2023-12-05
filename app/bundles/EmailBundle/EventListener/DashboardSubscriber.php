@@ -54,15 +54,9 @@ class DashboardSubscriber extends MainDashboardSubscriber
         'email:emails:viewother',
     ];
 
-    /**
-     * @var EmailModel
-     */
-    protected $emailModel;
+    protected \Mautic\EmailBundle\Model\EmailModel $emailModel;
 
-    /**
-     * @var RouterInterface
-     */
-    private $router;
+    private \Symfony\Component\Routing\RouterInterface $router;
 
     public function __construct(EmailModel $emailModel, RouterInterface $router)
     {
