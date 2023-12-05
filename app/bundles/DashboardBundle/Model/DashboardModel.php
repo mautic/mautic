@@ -275,7 +275,7 @@ class DashboardModel extends FormModel
      * @param object $entity
      * @param bool   $unlock
      */
-    public function saveEntity($entity, $unlock = true)
+    public function saveEntity($entity, $unlock = true): void
     {
         // Set widget name from widget type if empty
         if (!$entity->getName()) {

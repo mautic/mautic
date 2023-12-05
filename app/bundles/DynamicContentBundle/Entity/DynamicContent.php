@@ -115,7 +115,7 @@ class DynamicContent extends FormEntity implements VariantEntityInterface, Trans
         $this->stats = new ArrayCollection();
     }
 
-    public static function loadMetadata(ORM\ClassMetadata $metadata)
+    public static function loadMetadata(ORM\ClassMetadata $metadata): void
     {
         $builder = new ClassMetadataBuilder($metadata);
 
@@ -217,7 +217,7 @@ class DynamicContent extends FormEntity implements VariantEntityInterface, Trans
         ]));
     }
 
-    public static function loadApiMetadata(ApiMetadataDriver $metadata)
+    public static function loadApiMetadata(ApiMetadataDriver $metadata): void
     {
         $metadata->setGroupPrefix('dwc')
             ->addListProperties([

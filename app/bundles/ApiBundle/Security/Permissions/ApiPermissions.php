@@ -31,10 +31,7 @@ class ApiPermissions extends AbstractPermissions
         return 'api';
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function buildForm(FormBuilderInterface &$builder, array $options, array $data)
+    public function buildForm(FormBuilderInterface &$builder, array $options, array $data): void
     {
         $builder->add(
             'api:access',

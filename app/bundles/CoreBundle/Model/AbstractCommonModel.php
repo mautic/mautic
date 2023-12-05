@@ -248,7 +248,7 @@ abstract class AbstractCommonModel implements MauticModelInterface
      *
      * @return object|null
      */
-    public function getEntityByAlias($alias, $categoryAlias = null, $lang = null): void
+    public function getEntityByAlias($alias, $categoryAlias = null, $lang = null)
     {
     }
 

@@ -299,7 +299,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
     /**
      * @param Email $entity
      */
-    public function deleteEntity($entity)
+    public function deleteEntity($entity): void
     {
         if ($entity->isVariant() && $entity->getIsPublished()) {
             $this->resetVariants($entity);

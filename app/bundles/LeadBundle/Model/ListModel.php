@@ -142,7 +142,7 @@ class ListModel extends FormModel
      *
      * @throws \Doctrine\DBAL\Exception
      */
-    public function saveEntity($entity, $unlock = true)
+    public function saveEntity($entity, $unlock = true): void
     {
         $isNew = ($entity->getId()) ? false : true;
 

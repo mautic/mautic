@@ -430,7 +430,7 @@ class LeadModel extends FormModel
      * @param Lead $entity
      * @param bool $unlock
      */
-    public function saveEntity($entity, $unlock = true)
+    public function saveEntity($entity, $unlock = true): void
     {
         $companyFieldMatches = [];
         $fields              = $entity->getFields();
@@ -504,7 +504,7 @@ class LeadModel extends FormModel
     /**
      * @param object $entity
      */
-    public function deleteEntity($entity)
+    public function deleteEntity($entity): void
     {
         // Delete custom avatar if one exists
         $imageDir = $this->pathsHelper->getSystemPath('images', true);

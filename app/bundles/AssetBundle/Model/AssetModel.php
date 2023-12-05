@@ -97,7 +97,7 @@ class AssetModel extends FormModel
     /**
      * {@inheritdoc}
      */
-    public function saveEntity($entity, $unlock = true)
+    public function saveEntity($entity, $unlock = true): void
     {
         if (empty($this->inConversion)) {
             $alias = $entity->getAlias();

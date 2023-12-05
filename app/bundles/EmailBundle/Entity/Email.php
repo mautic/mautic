@@ -245,7 +245,7 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
         $this->stats = new ArrayCollection();
     }
 
-    public static function loadMetadata(ORM\ClassMetadata $metadata)
+    public static function loadMetadata(ORM\ClassMetadata $metadata): void
     {
         $builder = new ClassMetadataBuilder($metadata);
 
@@ -410,7 +410,7 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
     /**
      * Prepares the metadata for API usage.
      */
-    public static function loadApiMetadata(ApiMetadataDriver $metadata)
+    public static function loadApiMetadata(ApiMetadataDriver $metadata): void
     {
         $metadata->setGroupPrefix('email')
             ->addListProperties(

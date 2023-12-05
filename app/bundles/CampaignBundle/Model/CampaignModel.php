@@ -160,7 +160,7 @@ class CampaignModel extends CommonFormModel
     /**
      * @param object $entity
      */
-    public function deleteEntity($entity)
+    public function deleteEntity($entity): void
     {
         // Null all the event parents for this campaign to avoid database constraints
         $this->getEventRepository()->nullEventParents($entity->getId());
