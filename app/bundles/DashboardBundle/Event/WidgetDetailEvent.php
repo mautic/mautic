@@ -39,7 +39,7 @@ class WidgetDetailEvent extends CommonEvent
      *
      * @param string $cacheDir
      */
-    public function setCacheDir($cacheDir, $uniqueCacheDir = null)
+    public function setCacheDir($cacheDir, $uniqueCacheDir = null): void
     {
         $this->cacheDir       = $cacheDir;
         $this->uniqueCacheDir = $uniqueCacheDir;
@@ -50,7 +50,7 @@ class WidgetDetailEvent extends CommonEvent
      *
      * @param string $cacheTimeout
      */
-    public function setCacheTimeout($cacheTimeout)
+    public function setCacheTimeout($cacheTimeout): void
     {
         $this->cacheTimeout = (int) $cacheTimeout;
     }
@@ -60,7 +60,7 @@ class WidgetDetailEvent extends CommonEvent
      *
      * @param string $type
      */
-    public function setType($type)
+    public function setType($type): void
     {
         $this->type = $type;
     }
@@ -78,7 +78,7 @@ class WidgetDetailEvent extends CommonEvent
     /**
      * Set the widget entity.
      */
-    public function setWidget(Widget $widget)
+    public function setWidget(Widget $widget): void
     {
         $this->widget = $widget;
 
@@ -122,7 +122,7 @@ class WidgetDetailEvent extends CommonEvent
      *
      * @param string $template
      */
-    public function setTemplate($template)
+    public function setTemplate($template): void
     {
         $this->template = $template;
         $this->widget->setTemplate($template);
@@ -141,7 +141,7 @@ class WidgetDetailEvent extends CommonEvent
     /**
      * Set the widget template data.
      */
-    public function setTemplateData(array $templateData, $skipCache = false)
+    public function setTemplateData(array $templateData, $skipCache = false): void
     {
         $this->templateData = $templateData;
         $this->widget->setTemplateData($templateData);
@@ -171,7 +171,7 @@ class WidgetDetailEvent extends CommonEvent
      *
      * @param array $errorMessage
      */
-    public function setErrorMessage($errorMessage)
+    public function setErrorMessage($errorMessage): void
     {
         $this->errorMessage = $errorMessage;
         $this->widget->setErrorMessage($errorMessage);
@@ -248,7 +248,7 @@ class WidgetDetailEvent extends CommonEvent
     /**
      * Set security object to check the perimissions.
      */
-    public function setSecurity(CorePermissions $security)
+    public function setSecurity(CorePermissions $security): void
     {
         $this->security = $security;
     }

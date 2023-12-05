@@ -58,7 +58,7 @@ class Widget
      *
      * @throws \Exception
      */
-    public function setFilter(Request $request)
+    public function setFilter(Request $request): void
     {
         if (!$request->isMethod(Request::METHOD_POST)) {
             return;

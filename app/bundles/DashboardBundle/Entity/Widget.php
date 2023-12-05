@@ -84,7 +84,7 @@ class Widget extends FormEntity
         parent::__clone();
     }
 
-    public static function loadMetadata(ORM\ClassMetadata $metadata)
+    public static function loadMetadata(ORM\ClassMetadata $metadata): void
     {
         $builder = new ClassMetadataBuilder($metadata);
         $builder->setTable('widgets');
@@ -98,7 +98,7 @@ class Widget extends FormEntity
         $builder->addNullableField('params', Types::ARRAY);
     }
 
-    public static function loadValidatorMetadata(ClassMetadata $metadata)
+    public static function loadValidatorMetadata(ClassMetadata $metadata): void
     {
         $metadata->addPropertyConstraint('type', new NotBlank([
             'message' => 'mautic.core.type.required',

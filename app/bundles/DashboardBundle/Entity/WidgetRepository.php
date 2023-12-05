@@ -17,7 +17,7 @@ class WidgetRepository extends CommonRepository
      *
      * @return string
      */
-    public function updateOrdering($ordering, $userId)
+    public function updateOrdering($ordering, $userId): void
     {
         $widgets = $this->getEntities(
             [

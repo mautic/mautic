@@ -32,7 +32,7 @@ class WidgetType extends AbstractType
         $this->security   = $security;
     }
 
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder->add(
             'name',
@@ -106,7 +106,7 @@ class WidgetType extends AbstractType
         );
 
         // function to add a form for specific widget type dynamically
-        $func = function (FormEvent $e) {
+        $func = function (FormEvent $e): void {
             $data   = $e->getData();
             $form   = $e->getForm();
             $event  = new WidgetFormEvent();
