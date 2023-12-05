@@ -267,10 +267,8 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
 
     /**
      * Save an array of entities.
-     *
-     * @return array
      */
-    public function saveEntities($entities, $unlock = true)
+    public function saveEntities($entities, $unlock = true): void
     {
         // iterate over the results so the events are dispatched on each delete
         $batchSize = 20;

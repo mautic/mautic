@@ -29,7 +29,7 @@ class NotificationEvent extends CommonEvent
     /**
      * Sets the Notification entity.
      */
-    public function setNotification(Notification $notification)
+    public function setNotification(Notification $notification): void
     {
         $this->entity = $notification;
     }

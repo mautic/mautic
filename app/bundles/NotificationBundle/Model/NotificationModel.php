@@ -78,12 +78,7 @@ class NotificationModel extends FormModel implements AjaxLookupModelInterface
         return 'notification:notifications';
     }
 
-    /**
-     * Save an array of entities.
-     *
-     * @return array
-     */
-    public function saveEntities($entities, $unlock = true)
+    public function saveEntities($entities, $unlock = true): void
     {
         // iterate over the results so the events are dispatched on each delete
         $batchSize = 20;
@@ -157,7 +152,7 @@ class NotificationModel extends FormModel implements AjaxLookupModelInterface
      * @param string $source
      * @param int    $sourceId
      */
-    public function createStatEntry(Notification $notification, Lead $lead, $source = null, $sourceId = null)
+    public function createStatEntry(Notification $notification, Lead $lead, $source = null, $sourceId = null): void
     {
         $stat = new Stat();
         $stat->setDateSent(new \DateTime());
@@ -214,7 +209,7 @@ class NotificationModel extends FormModel implements AjaxLookupModelInterface
     /**
      * Joins the page table and limits created_by to currently logged in user.
      */
-    public function limitQueryToCreator(QueryBuilder &$q)
+    public function limitQueryToCreator(QueryBuilder &$q): void
     {
         $q->join('t', MAUTIC_TABLE_PREFIX.'push_notifications', 'p', 'p.id = t.notification_id')
             ->andWhere('p.created_by = :userId')

@@ -597,15 +597,13 @@ class FieldModel extends FormModel
      * @param array $entities
      * @param bool  $unlock
      *
-     * @return array|void
-     *
      * @throws AbortColumnCreateException
      * @throws \Doctrine\DBAL\Exception
      * @throws DriverException
      * @throws \Doctrine\DBAL\Schema\SchemaException
      * @throws \Mautic\CoreBundle\Exception\SchemaException
      */
-    public function saveEntities($entities, $unlock = true)
+    public function saveEntities($entities, $unlock = true): void
     {
         foreach ($entities as $entity) {
             $this->saveEntity($entity, $unlock);
