@@ -54,7 +54,7 @@ class EntityLookupChoiceLoader implements ChoiceLoaderInterface
     /**
      * @param Options|array $options
      */
-    public function setOptions($options)
+    public function setOptions($options): void
     {
         $this->options = $options;
     }
@@ -98,7 +98,7 @@ class EntityLookupChoiceLoader implements ChoiceLoaderInterface
     /**
      * Take note of the selected values for loadChoiceList.
      */
-    public function onFormPostSetData(FormEvent $event)
+    public function onFormPostSetData(FormEvent $event): void
     {
         $this->selected = (array) $event->getData();
     }

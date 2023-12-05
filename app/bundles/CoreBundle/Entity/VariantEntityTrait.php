@@ -73,7 +73,7 @@ trait VariantEntityTrait
     /**
      * Remove variant.
      */
-    public function removeVariantChild(VariantEntityInterface $child)
+    public function removeVariantChild(VariantEntityInterface $child): void
     {
         $this->variantChildren->removeElement($child);
     }
@@ -119,7 +119,7 @@ trait VariantEntityTrait
     /**
      * Remove variant parent.
      */
-    public function removeVariantParent()
+    public function removeVariantParent(): void
     {
         $this->setVariantParent();
     }
@@ -206,7 +206,7 @@ trait VariantEntityTrait
     /**
      * Clear variants.
      */
-    public function clearVariants()
+    public function clearVariants(): void
     {
         $this->variantChildren = new ArrayCollection();
         $this->variantParent   = null;

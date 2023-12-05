@@ -32,7 +32,7 @@ class AssetsSubscriber implements EventSubscriberInterface
         ];
     }
 
-    public function fetchCustomAssets(RequestEvent $event)
+    public function fetchCustomAssets(RequestEvent $event): void
     {
         if ($event->isMainRequest() && $this->dispatcher->hasListeners(CoreEvents::VIEW_INJECT_CUSTOM_ASSETS)) {
             $this->dispatcher->dispatch(

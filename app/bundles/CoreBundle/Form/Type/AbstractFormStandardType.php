@@ -20,7 +20,7 @@ abstract class AbstractFormStandardType extends AbstractType
      */
     protected $security;
 
-    public function setSecurity(CorePermissions $security)
+    public function setSecurity(CorePermissions $security): void
     {
         $this->security = $security;
     }

@@ -19,7 +19,7 @@ class DynamicContentFilterType extends AbstractType
         $this->builderIntegrationsHelper = $builderIntegrationsHelper;
     }
 
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $extraClasses = '';
 
@@ -73,7 +73,7 @@ class DynamicContentFilterType extends AbstractType
         );
     }
 
-    public function configureOptions(OptionsResolver $resolver)
+    public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults(
             [

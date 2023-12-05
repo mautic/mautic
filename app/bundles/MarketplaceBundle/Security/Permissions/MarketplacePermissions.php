@@ -25,7 +25,7 @@ class MarketplacePermissions extends AbstractPermissions
         $this->config = $config;
     }
 
-    public function definePermissions()
+    public function definePermissions(): void
     {
         $this->addStandardPermissions(self::PACKAGES, false);
     }
@@ -40,7 +40,7 @@ class MarketplacePermissions extends AbstractPermissions
         return self::BASE;
     }
 
-    public function buildForm(FormBuilderInterface &$builder, array $options, array $data)
+    public function buildForm(FormBuilderInterface &$builder, array $options, array $data): void
     {
         $this->addStandardFormFields(self::BASE, self::PACKAGES, $builder, $data, false);
     }

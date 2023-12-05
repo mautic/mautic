@@ -110,7 +110,7 @@ class ExportHelper
         $objWriter->setPreCalculateFormulas(false);
 
         $response = new StreamedResponse(
-            function () use ($objWriter) {
+            function () use ($objWriter): void {
                 $objWriter->save('php://output');
             }
         );
@@ -155,7 +155,7 @@ class ExportHelper
         $objWriter->setUseBOM(true);
 
         $response = new StreamedResponse(
-            function () use ($objWriter) {
+            function () use ($objWriter): void {
                 $objWriter->save('php://output');
             }
         );

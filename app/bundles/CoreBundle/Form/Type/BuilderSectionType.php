@@ -10,7 +10,7 @@ use Symfony\Component\Form\FormBuilderInterface;
 
 class BuilderSectionType extends AbstractType
 {
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         // Content - Background Color
         $builder->add(

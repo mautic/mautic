@@ -55,7 +55,7 @@ class DateTimeLocalization
         ];
         $values = array_merge($months, $days);
         $keys   = $values;
-        array_walk($keys, function (&$key) {
+        array_walk($keys, function (&$key): void {
             $key = $this->translator->trans('mautic.core.date.'.strtolower($key));
         });
 

@@ -25,7 +25,7 @@ class AuditLogModel extends AbstractCommonModel
      *
      * @param array $args [bundle, object, objectId, action, details, ipAddress]
      */
-    public function writeToLog(array $args)
+    public function writeToLog(array $args): void
     {
         $bundle    = (isset($args['bundle'])) ? $args['bundle'] : '';
         $object    = (isset($args['object'])) ? $args['object'] : '';

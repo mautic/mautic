@@ -51,7 +51,7 @@ namespace Mautic\CoreBundle\ErrorHandler {
          * @param string|array<mixed> $context
          * @param bool                $backtrace
          */
-        public static function logDebugEntry($log, $context = 'null', $backtrace = false)
+        public static function logDebugEntry($log, $context = 'null', $backtrace = false): void
         {
             if ($debugLogger = self::$handler->getDebugLogger()) {
                 if (!is_array($context)) {
@@ -96,7 +96,7 @@ namespace Mautic\CoreBundle\ErrorHandler {
             return $this->debugLogger;
         }
 
-        public function setDebugLogger($logger)
+        public function setDebugLogger($logger): void
         {
             $this->debugLogger = $logger;
         }
@@ -563,7 +563,7 @@ namespace {
     use Mautic\CoreBundle\ErrorHandler\ErrorHandler;
 
     if (!function_exists('debugIt')) {
-        function debug_it($log, ...$context)
+        function debug_it($log, ...$context): void
         {
             if ('dev' === MAUTIC_ENV) {
                 // Only allowing dev mode just in case uses accidentally left in code
@@ -576,7 +576,7 @@ namespace {
         }
 
         // Call this at each point of interest, passing a descriptive string
-        function prof_flag($str)
+        function prof_flag($str): void
         {
             global $prof_timing, $prof_names;
             $prof_timing[] = microtime(true);
@@ -584,7 +584,7 @@ namespace {
         }
 
         // Call this when you're done and want to see the results
-        function prof_print()
+        function prof_print(): void
         {
             global $prof_timing, $prof_names;
             $size = count($prof_timing);

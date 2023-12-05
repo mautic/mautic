@@ -12,7 +12,7 @@ class CompanyLeadRepository extends CommonRepository
     /**
      * @param CompanyLead[] $entities
      */
-    public function saveEntities($entities, $new = true)
+    public function saveEntities($entities, $new = true): void
     {
         // Get a list of contacts and set primary to 0
         if ($new) {
@@ -40,7 +40,7 @@ class CompanyLeadRepository extends CommonRepository
             }
         }
 
-        return parent::saveEntities($entities);
+        parent::saveEntities($entities);
     }
 
     /**

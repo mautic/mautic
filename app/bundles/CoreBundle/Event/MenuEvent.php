@@ -28,7 +28,7 @@ class MenuEvent extends Event
         $this->type   = $type;
     }
 
-    public function setMenuItems(array $menuItems)
+    public function setMenuItems(array $menuItems): void
     {
         $this->menuItems = $menuItems;
     }
@@ -36,7 +36,7 @@ class MenuEvent extends Event
     /**
      * Add items to the menu.
      */
-    public function addMenuItems(array $menuItems)
+    public function addMenuItems(array $menuItems): void
     {
         $defaultPriority = isset($menuItems['priority']) ? $menuItems['priority'] : 9999;
         $items           = isset($menuItems['items']) ? $menuItems['items'] : $menuItems;

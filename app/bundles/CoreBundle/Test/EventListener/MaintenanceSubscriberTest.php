@@ -104,6 +104,6 @@ class MaintenanceSubscriberTest extends \PHPUnit\Framework\TestCase
             ->method('trans')
             ->willReturn($translatedString);
 
-        $this->assertNull($subscriber->onDataCleanup($event));
+        $subscriber->onDataCleanup($event);
     }
 }

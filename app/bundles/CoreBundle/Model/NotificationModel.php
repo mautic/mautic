@@ -68,7 +68,7 @@ class NotificationModel extends FormModel
     /**
      * @param bool $disableUpdates
      */
-    public function setDisableUpdates($disableUpdates)
+    public function setDisableUpdates($disableUpdates): void
     {
         $this->disableUpdates = $disableUpdates;
     }
@@ -105,7 +105,7 @@ class NotificationModel extends FormModel
         User $user = null,
         string $deduplicateValue = null,
         \DateTime $deduplicateDateTimeFrom = null
-    ) {
+    ): void {
         if (null === $user) {
             $user = $this->userHelper->getUser();
         }
@@ -141,7 +141,7 @@ class NotificationModel extends FormModel
     /**
      * Mark notifications read for a user.
      */
-    public function markAllRead()
+    public function markAllRead(): void
     {
         $this->getRepository()->markAllReadForUser($this->userHelper->getUser()->getId());
     }
@@ -152,7 +152,7 @@ class NotificationModel extends FormModel
      * @param $id       Notification to clear; will clear all if empty
      * @param $limit    Maximum number of notifications to clear if $id is empty
      */
-    public function clearNotification($id, $limit = null)
+    public function clearNotification($id, $limit = null): void
     {
         $this->getRepository()->clearNotificationsForUser($this->userHelper->getUser()->getId(), $id, $limit);
     }

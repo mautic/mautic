@@ -501,7 +501,7 @@ class CorePermissions
     /**
      * Register permission classes.
      */
-    private function registerPermissionClasses()
+    private function registerPermissionClasses(): void
     {
         foreach ($this->getBundles() as $bundle) {
             if (!empty($bundle['permissionClasses'])) {

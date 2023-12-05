@@ -25,7 +25,7 @@ class ArrayType extends \Doctrine\DBAL\Types\ArrayType
         // MySQL will crap out on corrupt UTF8 leading to broken serialized strings
         array_walk(
             $value,
-            function (&$entry) {
+            function (&$entry): void {
                 $entry = UTF8Helper::toUTF8($entry);
             }
         );

@@ -178,7 +178,7 @@ class ColumnSchemaHelper
     /**
      * Computes and executes the changes.
      */
-    public function executeChanges()
+    public function executeChanges(): void
     {
         // create a table diff
         $comparator = new Comparator();

@@ -628,7 +628,7 @@ class CommonController extends AbstractController implements MauticController
      *
      * @deprecated Will be removed in Mautic 3.0 as unused.
      */
-    public function addNotification($message, $type = null, $isRead = true, $header = null, $iconClass = null, \DateTime $datetime = null)
+    public function addNotification($message, $type = null, $isRead = true, $header = null, $iconClass = null, \DateTime $datetime = null): void
     {
         /** @var \Mautic\CoreBundle\Model\NotificationModel $notificationModel */
         $notificationModel = $this->getModel('core.notification');

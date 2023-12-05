@@ -15,7 +15,7 @@ trait VariantModelTrait
     /**
      * Converts a variant to the main item and the original main item a variant.
      */
-    public function convertVariant(VariantEntityInterface $entity)
+    public function convertVariant(VariantEntityInterface $entity): void
     {
         // let saveEntities() know it does not need to set variant start dates
         $this->inConversion = true;

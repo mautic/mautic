@@ -137,7 +137,7 @@ class BuilderTokenHelper
     /**
      * Override default permission set of viewown and viewother.
      */
-    public function setPermissionSet(array $permissions)
+    public function setPermissionSet(array $permissions): void
     {
         $this->permissionSet = $permissions;
     }

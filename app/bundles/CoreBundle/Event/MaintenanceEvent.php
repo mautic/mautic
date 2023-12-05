@@ -64,7 +64,7 @@ class MaintenanceEvent extends Event
      * @param string $key
      * @param int    $recordCount
      */
-    public function setStat($key, $recordCount, $sql = null, $parameters = [])
+    public function setStat($key, $recordCount, $sql = null, $parameters = []): void
     {
         $this->stats[$key] = (int) $recordCount;
 

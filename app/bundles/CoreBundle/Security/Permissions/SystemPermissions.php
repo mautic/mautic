@@ -26,7 +26,7 @@ class SystemPermissions extends AbstractPermissions
     /**
      * {@inheritdoc}
      */
-    public function buildForm(FormBuilderInterface &$builder, array $options, array $data)
+    public function buildForm(FormBuilderInterface &$builder, array $options, array $data): void
     {
         $this->addStandardFormFields('core', 'themes', $builder, $data);
     }

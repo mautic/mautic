@@ -136,7 +136,7 @@ class CacheStorageHelper
         return false;
     }
 
-    public function delete($name)
+    public function delete($name): void
     {
         $this->cacheAdaptor->deleteItem($name);
     }
@@ -152,7 +152,7 @@ class CacheStorageHelper
     /**
      * Wipes out the cache directory.
      */
-    public function clear()
+    public function clear(): void
     {
         $this->cacheAdaptor->clear();
     }
@@ -208,7 +208,7 @@ class CacheStorageHelper
      *
      * @deprecated 2.6.0 to be removed in 3.0
      */
-    public function touchDir()
+    public function touchDir(): void
     {
     }
 }
