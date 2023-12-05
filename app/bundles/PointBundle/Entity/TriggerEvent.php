@@ -59,7 +59,7 @@ class TriggerEvent
         $this->log = new ArrayCollection();
     }
 
-    public static function loadMetadata(ORM\ClassMetadata $metadata)
+    public static function loadMetadata(ORM\ClassMetadata $metadata): void
     {
         $builder = new ClassMetadataBuilder($metadata);
 
@@ -95,7 +95,7 @@ class TriggerEvent
     /**
      * Prepares the metadata for API usage.
      */
-    public static function loadApiMetadata(ApiMetadataDriver $metadata)
+    public static function loadApiMetadata(ApiMetadataDriver $metadata): void
     {
         $metadata->setGroupPrefix('trigger')
             ->addProperties(
@@ -111,7 +111,7 @@ class TriggerEvent
             ->build();
     }
 
-    private function isChanged($prop, $val)
+    private function isChanged($prop, $val): void
     {
         if ($this->$prop != $val) {
             $this->changes[$prop] = [$this->$prop, $val];
@@ -277,7 +277,7 @@ class TriggerEvent
         return $this;
     }
 
-    public function removeLog(LeadTriggerLog $log)
+    public function removeLog(LeadTriggerLog $log): void
     {
         $this->log->removeElement($log);
     }

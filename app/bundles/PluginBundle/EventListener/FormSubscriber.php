@@ -23,7 +23,7 @@ class FormSubscriber implements EventSubscriberInterface
         ];
     }
 
-    public function onFormBuild(FormBuilderEvent $event)
+    public function onFormBuild(FormBuilderEvent $event): void
     {
         $event->addSubmitAction('plugin.leadpush', [
             'group'       => 'mautic.plugin.actions',

@@ -16,7 +16,7 @@ class IntegrationEntityModel extends FormModel
         return $this->em->getRepository(IntegrationEntity::class);
     }
 
-    public function logDataSync(IntegrationObject $integrationObject)
+    public function logDataSync(IntegrationObject $integrationObject): void
     {
     }
 

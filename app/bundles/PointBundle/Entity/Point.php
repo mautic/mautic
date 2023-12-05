@@ -83,7 +83,7 @@ class Point extends FormEntity
         $this->log = new ArrayCollection();
     }
 
-    public static function loadMetadata(ORM\ClassMetadata $metadata)
+    public static function loadMetadata(ORM\ClassMetadata $metadata): void
     {
         $builder = new ClassMetadataBuilder($metadata);
 
@@ -120,7 +120,7 @@ class Point extends FormEntity
             ->build();
     }
 
-    public static function loadValidatorMetadata(ClassMetadata $metadata)
+    public static function loadValidatorMetadata(ClassMetadata $metadata): void
     {
         $metadata->addPropertyConstraint('name', new Assert\NotBlank([
             'message' => 'mautic.core.name.required',
@@ -143,7 +143,7 @@ class Point extends FormEntity
     /**
      * Prepares the metadata for API usage.
      */
-    public static function loadApiMetadata(ApiMetadataDriver $metadata)
+    public static function loadApiMetadata(ApiMetadataDriver $metadata): void
     {
         $metadata->setGroupPrefix('point')
             ->addListProperties(
@@ -278,7 +278,7 @@ class Point extends FormEntity
         return $this;
     }
 
-    public function removeLog(LeadPointLog $log)
+    public function removeLog(LeadPointLog $log): void
     {
         $this->log->removeElement($log);
     }
@@ -344,7 +344,7 @@ class Point extends FormEntity
     /**
      * @param mixed $category
      */
-    public function setCategory($category)
+    public function setCategory($category): void
     {
         $this->category = $category;
     }
@@ -360,7 +360,7 @@ class Point extends FormEntity
     /**
      * @param mixed $delta
      */
-    public function setDelta($delta)
+    public function setDelta($delta): void
     {
         $this->delta = (int) $delta;
     }

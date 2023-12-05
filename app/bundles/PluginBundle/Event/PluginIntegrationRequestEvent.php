@@ -60,7 +60,7 @@ class PluginIntegrationRequestEvent extends AbstractPluginIntegrationEvent
         return $this->parameters;
     }
 
-    public function setParameters(array $parameters)
+    public function setParameters(array $parameters): void
     {
         $this->parameters = $parameters;
     }
@@ -89,7 +89,7 @@ class PluginIntegrationRequestEvent extends AbstractPluginIntegrationEvent
         return $this->authType;
     }
 
-    public function setResponse(ResponseInterface $response)
+    public function setResponse(ResponseInterface $response): void
     {
         $this->response = $response;
     }
@@ -107,7 +107,7 @@ class PluginIntegrationRequestEvent extends AbstractPluginIntegrationEvent
         return $this->headers;
     }
 
-    public function setHeaders(array $headers)
+    public function setHeaders(array $headers): void
     {
         $this->headers = $headers;
     }

@@ -28,7 +28,7 @@ class PluginIntegrationAuthRedirectEvent extends AbstractPluginIntegrationEvent
     /**
      * @param string $authUrl
      */
-    public function setAuthUrl($authUrl)
+    public function setAuthUrl($authUrl): void
     {
         $this->authUrl = $authUrl;
 
