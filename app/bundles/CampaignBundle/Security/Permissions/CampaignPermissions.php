@@ -25,12 +25,6 @@ class CampaignPermissions extends AbstractPermissions
         return 'campaign';
     }
 
-<<<<<<< HEAD
-=======
-    /**
-     * {@inheritdoc}
-     */
->>>>>>> 50c20b9d0b ([types] Add known void types in Campaign bundle)
     public function buildForm(FormBuilderInterface &$builder, array $options, array $data): void
     {
         $this->addStandardFormFields('campaign', 'categories', $builder, $data);

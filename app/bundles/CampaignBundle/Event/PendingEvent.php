@@ -246,8 +246,8 @@ class PendingEvent extends AbstractLogCollectionEvent
     private function logChannel(LeadEventLog $log): void
     {
         if ($this->channel) {
-            $log->setChannel($this->channel)
-                ->setChannelId($this->channelId);
+            $log->setChannel($this->channel);
+            $log->setChannelId($this->channelId);
         }
     }
 }

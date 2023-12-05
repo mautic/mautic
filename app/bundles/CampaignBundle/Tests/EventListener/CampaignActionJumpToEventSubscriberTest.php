@@ -213,12 +213,10 @@ final class CampaignActionJumpToEventSubscriberTest extends TestCase
             {
             }
 
-            public function incrementCampaignRotationForContacts(array $contactIds, $campaignId)
+            public function incrementCampaignRotationForContacts(array $contactIds, $campaignId): void
             {
                 Assert::assertSame([789], $contactIds);
                 Assert::assertSame(111, $campaignId);
-
-                return true;
             }
         };
         $subscriber = new CampaignActionJumpToEventSubscriber(

@@ -43,8 +43,8 @@ class DecisionExecutioner implements EventInterface
         }
 
         $log = $this->eventLogger->buildLogEntry($event, $contact);
-        $log->setChannel($channel)
-            ->setChannelId($channelId);
+        $log->setChannel($channel);
+        $log->setChannelId($channelId);
 
         $decisionEvent = $this->dispatcher->dispatchRealTimeEvent($config, $log, $passthrough);
 

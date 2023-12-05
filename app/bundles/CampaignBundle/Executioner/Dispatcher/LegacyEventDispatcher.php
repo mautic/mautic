@@ -187,8 +187,8 @@ class LegacyEventDispatcher
         $this->dispatcher->dispatch($campaignEvent, $eventName);
 
         if ($channel = $campaignEvent->getChannel()) {
-            $log->setChannel($channel)
-                ->setChannelId($campaignEvent->getChannelId());
+            $log->setChannel($channel);
+            $log->setChannelId($campaignEvent->getChannelId());
         }
 
         return $campaignEvent;

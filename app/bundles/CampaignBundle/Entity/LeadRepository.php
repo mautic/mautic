@@ -485,8 +485,6 @@ class LeadRepository extends CommonRepository
      *
      * @param int[] $contactIds
      * @param int   $campaignId
-     *
-     * @return bool
      */
     public function incrementCampaignRotationForContacts(array $contactIds, $campaignId): void
     {

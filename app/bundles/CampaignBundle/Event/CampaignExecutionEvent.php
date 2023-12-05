@@ -215,21 +215,17 @@ class CampaignExecutionEvent extends Event
     /**
      * @param string          $channel
      * @param string|int|null $channelId
-     *
-     * @return $this
      */
-    public function setChannel($channel, $channelId = null)
+    public function setChannel($channel, $channelId = null): void
     {
         if (null !== $this->log) {
             // Set the channel since we have the resource
-            $this->log->setChannel($channel)
-                      ->setChannelId($channelId);
+            $this->log->setChannel($channel);
+            $this->log->setChannelId($channelId);
         }
 
         $this->channel   = $channel;
         $this->channelId = $channelId;
-
-        return $this;
     }
 
     /**

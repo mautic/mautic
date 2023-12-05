@@ -97,8 +97,8 @@ class DecisionEvent extends CampaignExecutionEvent
      */
     public function setChannel($channel, $channelId = null): void
     {
-        $this->log->setChannel($this->channel)
-            ->setChannelId($this->channelId);
+        $this->log->setChannel($this->channel);
+        $this->log->setChannelId($this->channelId);
     }
 
     /**

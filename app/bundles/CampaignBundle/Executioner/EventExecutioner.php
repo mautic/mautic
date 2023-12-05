@@ -112,7 +112,6 @@ class EventExecutioner
      * @param ArrayCollection<int,Lead> $contacts
      * @param bool                      $isInactiveEvent
      *
-     *
      * @throws Dispatcher\Exception\LogNotProcessedException
      * @throws Dispatcher\Exception\LogPassedAndFailedException
      * @throws Exception\CannotProcessEventException
