@@ -40,7 +40,7 @@ class CategorySubscriber implements EventSubscriberInterface
     /**
      * Add bundle to the category.
      */
-    public function onCategoryBundleListBuild(CategoryTypesEvent $event)
+    public function onCategoryBundleListBuild(CategoryTypesEvent $event): void
     {
         $bundles = $this->bundleHelper->getMauticBundles(true);
 
@@ -56,7 +56,7 @@ class CategorySubscriber implements EventSubscriberInterface
     /**
      * Add an entry to the audit log.
      */
-    public function onCategoryPostSave(Events\CategoryEvent $event)
+    public function onCategoryPostSave(Events\CategoryEvent $event): void
     {
         $category = $event->getCategory();
         if ($details = $event->getChanges()) {
@@ -75,7 +75,7 @@ class CategorySubscriber implements EventSubscriberInterface
     /**
      * Add a delete entry to the audit log.
      */
-    public function onCategoryDelete(Events\CategoryEvent $event)
+    public function onCategoryDelete(Events\CategoryEvent $event): void
     {
         $category = $event->getCategory();
         $log      = [

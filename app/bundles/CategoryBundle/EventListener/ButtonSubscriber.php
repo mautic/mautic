@@ -28,7 +28,7 @@ class ButtonSubscriber implements EventSubscriberInterface
         ];
     }
 
-    public function injectContactBulkButtons(CustomButtonEvent $event)
+    public function injectContactBulkButtons(CustomButtonEvent $event): void
     {
         if (0 === strpos($event->getRoute(), 'mautic_contact_')) {
             $event->addButton(

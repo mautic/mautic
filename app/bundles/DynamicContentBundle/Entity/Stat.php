@@ -122,7 +122,7 @@ class Stat
             ->build();
     }
 
-    public function addSentDetails($details)
+    public function addSentDetails($details): void
     {
         $this->sentDetails[] = $details;
 
@@ -153,7 +153,7 @@ class Stat
     /**
      * @param int $id
      */
-    public function setId($id)
+    public function setId($id): void
     {
         $this->id = (string) $id;
     }
@@ -166,7 +166,7 @@ class Stat
         return $this->dynamicContent;
     }
 
-    public function setDynamicContent(DynamicContent $dynamicContent)
+    public function setDynamicContent(DynamicContent $dynamicContent): void
     {
         $this->dynamicContent = $dynamicContent;
     }
@@ -182,7 +182,7 @@ class Stat
     /**
      * @param Lead $lead
      */
-    public function setLead($lead)
+    public function setLead($lead): void
     {
         $this->lead = $lead;
     }
@@ -198,7 +198,7 @@ class Stat
     /**
      * @param \DateTime $dateSent
      */
-    public function setDateSent($dateSent)
+    public function setDateSent($dateSent): void
     {
         $this->dateSent = $dateSent;
     }
@@ -214,7 +214,7 @@ class Stat
     /**
      * @param int $sentCount
      */
-    public function setSentCount($sentCount)
+    public function setSentCount($sentCount): void
     {
         $this->sentCount = $sentCount;
     }
@@ -230,7 +230,7 @@ class Stat
     /**
      * @param int $lastSent
      */
-    public function setLastSent($lastSent)
+    public function setLastSent($lastSent): void
     {
         $this->lastSent = $lastSent;
     }
@@ -246,7 +246,7 @@ class Stat
     /**
      * @param array $sentDetails
      */
-    public function setSentDetails($sentDetails)
+    public function setSentDetails($sentDetails): void
     {
         $this->sentDetails = $sentDetails;
     }
@@ -262,7 +262,7 @@ class Stat
     /**
      * @param string $source
      */
-    public function setSource($source)
+    public function setSource($source): void
     {
         $this->source = $source;
     }
@@ -278,7 +278,7 @@ class Stat
     /**
      * @param int $sourceId
      */
-    public function setSourceId($sourceId)
+    public function setSourceId($sourceId): void
     {
         $this->sourceId = $sourceId;
     }
@@ -294,7 +294,7 @@ class Stat
     /**
      * @param array $tokens
      */
-    public function setTokens($tokens)
+    public function setTokens($tokens): void
     {
         $this->tokens = $tokens;
     }

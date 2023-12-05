@@ -19,7 +19,7 @@ class ChannelSubscriber implements EventSubscriberInterface
         ];
     }
 
-    public function onAddChannel(ChannelEvent $event)
+    public function onAddChannel(ChannelEvent $event): void
     {
         $event->addChannel(
             'dynamicContent',

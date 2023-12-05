@@ -88,7 +88,7 @@ class DynamicContentSubscriber implements EventSubscriberInterface
     /**
      * Add an entry to the audit log.
      */
-    public function onPostSave(Events\DynamicContentEvent $event)
+    public function onPostSave(Events\DynamicContentEvent $event): void
     {
         $entity = $event->getDynamicContent();
         if ($details = $event->getChanges()) {
@@ -106,7 +106,7 @@ class DynamicContentSubscriber implements EventSubscriberInterface
     /**
      * Add a delete entry to the audit log.
      */
-    public function onDelete(Events\DynamicContentEvent $event)
+    public function onDelete(Events\DynamicContentEvent $event): void
     {
         $entity = $event->getDynamicContent();
         $log    = [
@@ -119,7 +119,7 @@ class DynamicContentSubscriber implements EventSubscriberInterface
         $this->auditLogModel->writeToLog($log);
     }
 
-    public function onTokenReplacement(MauticEvents\TokenReplacementEvent $event)
+    public function onTokenReplacement(MauticEvents\TokenReplacementEvent $event): void
     {
         /** @var Lead $lead */
         $lead         = $event->getLead();
@@ -162,7 +162,7 @@ class DynamicContentSubscriber implements EventSubscriberInterface
         }
     }
 
-    public function decodeTokens(PageDisplayEvent $event)
+    public function decodeTokens(PageDisplayEvent $event): void
     {
         $lead = $this->security->isAnonymous() ? $this->contactTracker->getContact() : null;
         if (!$lead) {

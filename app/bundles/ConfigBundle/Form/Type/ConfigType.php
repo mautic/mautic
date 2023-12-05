@@ -22,7 +22,7 @@ class ConfigType extends AbstractType
         $this->escapeTransformer = $escapeTransformer;
     }
 
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         // TODO very dirty quick fix for https://github.com/mautic/mautic/issues/8854
         if (isset($options['data']['apiconfig']['parameters']['api_oauth2_access_token_lifetime'])
@@ -58,7 +58,7 @@ class ConfigType extends AbstractType
 
         $builder->addEventListener(
             FormEvents::PRE_SET_DATA,
-            function (FormEvent $event) {
+            function (FormEvent $event): void {
                 $form = $event->getForm();
 
                 foreach ($form as $configForm) {
@@ -83,7 +83,7 @@ class ConfigType extends AbstractType
         }
     }
 
-    public function configureOptions(OptionsResolver $resolver)
+    public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults(
             [

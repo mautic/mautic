@@ -38,7 +38,7 @@ class AggregateStatRequestEvent extends Event
     /**
      * Note if the listener handled collecting these stats.
      */
-    public function statsCollected()
+    public function statsCollected(): void
     {
         $this->stopPropagation();
     }

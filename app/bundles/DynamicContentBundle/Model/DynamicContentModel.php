@@ -164,7 +164,7 @@ class DynamicContentModel extends FormModel implements AjaxLookupModelInterface
      * @param Lead|array $lead
      * @param string     $source
      */
-    public function createStatEntry(DynamicContent $dynamicContent, $lead, $source = null)
+    public function createStatEntry(DynamicContent $dynamicContent, $lead, $source = null): void
     {
         if (empty($lead)) {
             return;
@@ -236,7 +236,7 @@ class DynamicContentModel extends FormModel implements AjaxLookupModelInterface
     /**
      * Joins the page table and limits created_by to currently logged in user.
      */
-    public function limitQueryToCreator(QueryBuilder &$q)
+    public function limitQueryToCreator(QueryBuilder &$q): void
     {
         $q->join('t', MAUTIC_TABLE_PREFIX.'dynamic_content', 'd', 'd.id = t.dynamic_content_id')
             ->andWhere('d.created_by = :userId')

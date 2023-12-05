@@ -48,7 +48,7 @@ class BuildJsSubscriber implements EventSubscriberInterface
      * JS functions for use in Bundles. This
      * must retain top priority of 1000.
      */
-    public function onBuildJs(BuildJsEvent $event)
+    public function onBuildJs(BuildJsEvent $event): void
     {
         $dwcUrl = $this->router->generate('mautic_api_dynamicContent_action', ['objectAlias' => 'slotNamePlaceholder'], UrlGeneratorInterface::ABSOLUTE_URL);
 

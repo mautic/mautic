@@ -42,7 +42,7 @@ class LeadSubscriber implements EventSubscriberInterface
     /**
      * Compile events for the lead timeline.
      */
-    public function onTimelineGenerate(LeadTimelineEvent $event)
+    public function onTimelineGenerate(LeadTimelineEvent $event): void
     {
         // Set available event types
         $eventTypeKey      = 'dynamic.content.sent';
@@ -92,7 +92,7 @@ class LeadSubscriber implements EventSubscriberInterface
         }
     }
 
-    public function onLeadMerge(LeadMergeEvent $event)
+    public function onLeadMerge(LeadMergeEvent $event): void
     {
         $this->statRepository->updateLead(
             $event->getLoser()->getId(),

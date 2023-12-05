@@ -282,7 +282,7 @@ class InstallController extends CommonController
     /**
      * Handle installer errors.
      */
-    private function handleInstallerErrors(Form $form, array $messages)
+    private function handleInstallerErrors(Form $form, array $messages): void
     {
         foreach ($messages as $type => $message) {
             switch ($type) {
