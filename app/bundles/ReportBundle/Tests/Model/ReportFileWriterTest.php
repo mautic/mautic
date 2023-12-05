@@ -50,12 +50,10 @@ class ReportFileWriterTest extends \PHPUnit\Framework\TestCase
 
         $csvExporter->expects($this->once())
             ->method('export')
-            ->with($reportDataResult, $handler, 1)
-            ->willReturn($handler);
+            ->with($reportDataResult, $handler, 1);
 
         $exportHandler->expects($this->once())
-            ->method('closeHandler')
-            ->willReturn($handler);
+            ->method('closeHandler');
 
         $reportFileWriter = new ReportFileWriter($csvExporter, $exportHandler);
 

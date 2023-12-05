@@ -307,7 +307,7 @@ final class MauticReportBuilder implements ReportBuilderInterface
         $countSql = sprintf('(%s)', $countQuery->getSQL());
 
         // Replace {{count}} with the count query
-        array_walk($selectColumns, function (&$columnValue, $columnIndex) use ($countSql) {
+        array_walk($selectColumns, function (&$columnValue, $columnIndex) use ($countSql): void {
             if (false !== strpos($columnValue, '{{count}}')) {
                 $columnValue = str_replace('{{count}}', $countSql, $columnValue);
             }

@@ -22,7 +22,7 @@ class ReportFileWriter
     /**
      * @throws FileIOException
      */
-    public function writeReportData(Scheduler $scheduler, ReportDataResult $reportDataResult, ReportExportOptions $reportExportOptions)
+    public function writeReportData(Scheduler $scheduler, ReportDataResult $reportDataResult, ReportExportOptions $reportExportOptions): void
     {
         $fileName = $this->getFileName($scheduler);
         $handler  = $this->exportHandler->getHandler($fileName);
@@ -30,7 +30,7 @@ class ReportFileWriter
         $this->exportHandler->closeHandler($handler);
     }
 
-    public function clear(Scheduler $scheduler)
+    public function clear(Scheduler $scheduler): void
     {
         $fileName = $this->getFileName($scheduler);
         $this->exportHandler->removeFile($fileName);

@@ -38,7 +38,7 @@ class ReportGraphEvent extends AbstractReportEvent
      * @param string $graph
      * @param array  $data  prepared for this chart
      */
-    public function setGraph($graph, $data)
+    public function setGraph($graph, $data): void
     {
         if (!isset($this->requestedGraphs[$graph]['data'])) {
             $this->requestedGraphs[$graph]['data'] = [];
@@ -67,7 +67,7 @@ class ReportGraphEvent extends AbstractReportEvent
      * @param string $key
      * @param string $value
      */
-    public function setOption($graph, $key, $value)
+    public function setOption($graph, $key, $value): void
     {
         if (!isset($this->requestedGraphs[$graph]['options'])) {
             $this->requestedGraphs[$graph]['options'] = [];
@@ -81,7 +81,7 @@ class ReportGraphEvent extends AbstractReportEvent
      * @param string $graph
      * @param array  $options
      */
-    public function setOptions($graph, $options)
+    public function setOptions($graph, $options): void
     {
         $this->requestedGraphs[$graph]['options'] = $options;
     }
@@ -104,7 +104,7 @@ class ReportGraphEvent extends AbstractReportEvent
         return $this->queryBuilder;
     }
 
-    public function setQueryBuilder(QueryBuilder $queryBuilder)
+    public function setQueryBuilder(QueryBuilder $queryBuilder): void
     {
         $this->queryBuilder = $queryBuilder;
     }

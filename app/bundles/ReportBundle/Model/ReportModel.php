@@ -431,7 +431,7 @@ class ReportModel extends FormModel
                 }
 
                 $response = new StreamedResponse(
-                    function () use ($reportDataResult) {
+                    function () use ($reportDataResult): void {
                         $handle = fopen('php://output', 'r+');
                         $this->csvExporter->export($reportDataResult, $handle);
                         fclose($handle);
@@ -461,7 +461,7 @@ class ReportModel extends FormModel
                 }
 
                 $response = new StreamedResponse(
-                    function () use ($reportDataResult, $name) {
+                    function () use ($reportDataResult, $name): void {
                         $this->excelExporter->export($reportDataResult, $name);
                     }
                 );

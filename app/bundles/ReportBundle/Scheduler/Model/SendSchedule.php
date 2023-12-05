@@ -28,7 +28,7 @@ class SendSchedule
     /**
      * @param string $filePath
      */
-    public function send(Scheduler $scheduler, $csvFilePath)
+    public function send(Scheduler $scheduler, $csvFilePath): void
     {
         $this->mailer->reset(true);
 

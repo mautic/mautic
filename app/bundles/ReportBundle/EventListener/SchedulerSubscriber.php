@@ -26,7 +26,7 @@ class SchedulerSubscriber implements EventSubscriberInterface
         ];
     }
 
-    public function onScheduleSend(ReportScheduleSendEvent $event)
+    public function onScheduleSend(ReportScheduleSendEvent $event): void
     {
         $scheduler = $event->getScheduler();
         $file      = $event->getFile();

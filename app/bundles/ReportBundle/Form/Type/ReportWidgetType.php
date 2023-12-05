@@ -17,7 +17,7 @@ class ReportWidgetType extends AbstractType
         $this->model = $reportModel;
     }
 
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $choices = [];
         if ($reports = $this->model->getReportsWithGraphs()) {
