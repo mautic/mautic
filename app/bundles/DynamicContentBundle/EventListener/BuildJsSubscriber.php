@@ -13,25 +13,13 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class BuildJsSubscriber implements EventSubscriberInterface
 {
-    /**
-     * @var AssetsHelper
-     */
-    private $assetsHelper;
+    private \Mautic\CoreBundle\Twig\Helper\AssetsHelper $assetsHelper;
 
-    /**
-     * @var TranslatorInterface
-     */
-    private $translator;
+    private \Symfony\Contracts\Translation\TranslatorInterface $translator;
 
-    /**
-     * @var RequestStack
-     */
-    private $requestStack;
+    private \Symfony\Component\HttpFoundation\RequestStack $requestStack;
 
-    /**
-     * @var RouterInterface
-     */
-    private $router;
+    private \Symfony\Component\Routing\RouterInterface $router;
 
     public function __construct(
         AssetsHelper $assetsHelper,

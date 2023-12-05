@@ -28,55 +28,25 @@ class DynamicContentSubscriber implements EventSubscriberInterface
 {
     use MatchFilterForLeadTrait;
 
-    /**
-     * @var TrackableModel
-     */
-    private $trackableModel;
+    private \Mautic\PageBundle\Model\TrackableModel $trackableModel;
 
-    /**
-     * @var PageTokenHelper
-     */
-    private $pageTokenHelper;
+    private PageTokenHelper $pageTokenHelper;
 
-    /**
-     * @var AssetTokenHelper
-     */
-    private $assetTokenHelper;
+    private AssetTokenHelper $assetTokenHelper;
 
-    /**
-     * @var FormTokenHelper
-     */
-    private $formTokenHelper;
+    private FormTokenHelper $formTokenHelper;
 
-    /**
-     * @var FocusTokenHelper
-     */
-    private $focusTokenHelper;
+    private FocusTokenHelper $focusTokenHelper;
 
-    /**
-     * @var AuditLogModel
-     */
-    private $auditLogModel;
+    private \Mautic\CoreBundle\Model\AuditLogModel $auditLogModel;
 
-    /**
-     * @var DynamicContentHelper
-     */
-    private $dynamicContentHelper;
+    private \Mautic\DynamicContentBundle\Helper\DynamicContentHelper $dynamicContentHelper;
 
-    /**
-     * @var DynamicContentModel
-     */
-    private $dynamicContentModel;
+    private \Mautic\DynamicContentBundle\Model\DynamicContentModel $dynamicContentModel;
 
-    /**
-     * @var CorePermissions
-     */
-    private $security;
+    private \Mautic\CoreBundle\Security\Permissions\CorePermissions $security;
 
-    /**
-     * @var ContactTracker
-     */
-    private $contactTracker;
+    private \Mautic\LeadBundle\Tracker\ContactTracker $contactTracker;
 
     public function __construct(
         TrackableModel $trackableModel,
