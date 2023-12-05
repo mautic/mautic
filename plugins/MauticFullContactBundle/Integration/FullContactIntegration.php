@@ -47,7 +47,7 @@ class FullContactIntegration extends AbstractIntegration
      * @param array            $data
      * @param string           $formArea
      */
-    public function appendToForm(&$builder, $data, $formArea)
+    public function appendToForm(&$builder, $data, $formArea): void
     {
         if ('keys' === $formArea) {
             $builder->add(
@@ -83,7 +83,7 @@ class FullContactIntegration extends AbstractIntegration
                 YesNoButtonGroupType::class,
                 [
                     'label' => 'mautic.plugin.fullcontact.auto_update',
-                    'data'  => (isset($data['auto_update'])) ? (bool) $data['auto_update'] : false,
+                    'data'  => isset($data['auto_update']) && (bool) $data['auto_update'],
                     'attr'  => [
                         'tooltip' => 'mautic.plugin.fullcontact.auto_update.tooltip',
                     ],
@@ -96,7 +96,7 @@ class FullContactIntegration extends AbstractIntegration
     {
         $featureSettings = $this->getKeys();
 
-        return (isset($featureSettings['auto_update'])) ? (bool) $featureSettings['auto_update'] : false;
+        return isset($featureSettings['auto_update']) && (bool) $featureSettings['auto_update'];
     }
 
     /**

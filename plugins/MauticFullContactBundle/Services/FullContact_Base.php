@@ -36,7 +36,7 @@ class FullContact_Base
     /**
      * Slow down calls to the FullContact API if needed.
      */
-    private function _wait_for_rate_limit()
+    private function _wait_for_rate_limit(): void
     {
         $now = new \DateTime();
         if ($this->_next_req_time && $this->_next_req_time->getTimestamp() > $now->getTimestamp()) {
@@ -48,7 +48,7 @@ class FullContact_Base
     /**
      * @param string $hdr
      */
-    private function _update_rate_limit($hdr)
+    private function _update_rate_limit($hdr): void
     {
         $remaining            = (float) $hdr['X-Rate-Limit-Remaining'];
         $reset                = (float) $hdr['X-Rate-Limit-Reset'];

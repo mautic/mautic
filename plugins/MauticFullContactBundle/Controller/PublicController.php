@@ -22,7 +22,7 @@ class PublicController extends FormController
      * @param string    $iconClass Font Awesome CSS class for the icon (e.g. fa-eye)
      * @param User|null $user      User object; defaults to current user
      */
-    public function addNewNotification($message, $header, $iconClass, User $user)
+    public function addNewNotification($message, $header, $iconClass, User $user): void
     {
         /** @var \Mautic\CoreBundle\Model\NotificationModel $notificationModel */
         $notificationModel = $this->getModel('core.notification');

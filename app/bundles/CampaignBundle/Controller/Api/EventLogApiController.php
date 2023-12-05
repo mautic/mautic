@@ -48,7 +48,7 @@ class EventLogApiController extends FetchCommonApiController
     /**
      * @var EventLogModel|null
      */
-    protected $model = null;
+    protected $model;
 
     public function __construct(
         CorePermissions $security,

@@ -25,7 +25,7 @@ class SocialLoginType extends AbstractType
         $this->coreParametersHelper = $coreParametersHelper;
     }
 
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $integrations       = '';
         $integrationObjects = $this->helper->getIntegrationObjects(null, 'login_button');

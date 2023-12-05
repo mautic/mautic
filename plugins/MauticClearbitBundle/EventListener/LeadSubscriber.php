@@ -31,12 +31,12 @@ class LeadSubscriber implements EventSubscriberInterface
         ];
     }
 
-    public function leadPostSave(LeadEvent $event)
+    public function leadPostSave(LeadEvent $event): void
     {
         $this->lookupHelper->lookupContact($event->getLead(), true, true);
     }
 
-    public function companyPostSave(CompanyEvent $event)
+    public function companyPostSave(CompanyEvent $event): void
     {
         $this->lookupHelper->lookupCompany($event->getCompany(), true, true);
     }

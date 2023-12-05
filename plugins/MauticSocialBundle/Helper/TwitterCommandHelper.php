@@ -115,7 +115,7 @@ class TwitterCommandHelper
         return $this->manipulatedLeads;
     }
 
-    public function setOutput(OutputInterface $output)
+    public function setOutput(OutputInterface $output): void
     {
         $this->output = $output;
     }
@@ -124,7 +124,7 @@ class TwitterCommandHelper
      * @param string $message
      * @param bool   $newLine
      */
-    private function output($message, $newLine = true)
+    private function output($message, $newLine = true): void
     {
         if ($this->output instanceof OutputInterface) {
             if ($newLine) {
@@ -353,7 +353,7 @@ class TwitterCommandHelper
      *
      * @param array $searchMeta
      */
-    public function setMonitorStats(Monitoring $monitor, $searchMeta)
+    public function setMonitorStats(Monitoring $monitor, $searchMeta): void
     {
         $monitor->setStats($searchMeta);
 
@@ -399,7 +399,7 @@ class TwitterCommandHelper
      * @param Monitoring $monitor
      * @param Lead       $lead
      */
-    private function setMonitorLeadStat($monitor, $lead)
+    private function setMonitorLeadStat($monitor, $lead): void
     {
         // track the lead in our monitor_leads table
         $monitorLead = new \MauticPlugin\MauticSocialBundle\Entity\Lead();
@@ -418,7 +418,7 @@ class TwitterCommandHelper
      *
      * @param Monitoring $monitor
      */
-    private function incrementPostCount($monitor, $tweet)
+    private function incrementPostCount($monitor, $tweet): void
     {
         $date = new \DateTime($tweet['created_at']);
 

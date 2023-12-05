@@ -245,7 +245,7 @@ class ConnectwiseIntegration extends CrmAbstractIntegration
      * @param array                                             $data
      * @param string                                            $formArea
      */
-    public function appendToForm(&$builder, $data, $formArea)
+    public function appendToForm(&$builder, $data, $formArea): void
     {
         if ('features' == $formArea) {
             $builder->add(
@@ -904,7 +904,7 @@ class ConnectwiseIntegration extends CrmAbstractIntegration
         return false;
     }
 
-    public function saveCampaignMembers($allCampaignMembers, $campaignMemberObject, $campaignId)
+    public function saveCampaignMembers($allCampaignMembers, $campaignMemberObject, $campaignId): void
     {
         if (empty($allCampaignMembers)) {
             return;

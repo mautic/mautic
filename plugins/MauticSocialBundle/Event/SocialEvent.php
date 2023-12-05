@@ -29,7 +29,7 @@ class SocialEvent extends CommonEvent
     /**
      * Sets the Monitoring entity.
      */
-    public function setMonitoring(Monitoring $monitoring)
+    public function setMonitoring(Monitoring $monitoring): void
     {
         $this->entity = $monitoring;
     }

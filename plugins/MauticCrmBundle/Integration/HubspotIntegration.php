@@ -328,7 +328,7 @@ class HubspotIntegration extends CrmAbstractIntegration
      * @param array       $data
      * @param string      $formArea
      */
-    public function appendToForm(&$builder, $data, $formArea)
+    public function appendToForm(&$builder, $data, $formArea): void
     {
         if ('keys' === $formArea) {
             $builder->add(
@@ -666,7 +666,7 @@ class HubspotIntegration extends CrmAbstractIntegration
     /**
      * Amend mapped lead data before pushing to CRM.
      */
-    public function amendLeadDataBeforePush(&$mappedData)
+    public function amendLeadDataBeforePush(&$mappedData): void
     {
         foreach ($mappedData as &$data) {
             $data = str_replace('|', ';', $data);

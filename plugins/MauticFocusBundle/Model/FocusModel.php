@@ -167,7 +167,7 @@ class FocusModel extends FormModel
      * @param Focus      $entity
      * @param bool|false $unlock
      */
-    public function saveEntity($entity, $unlock = true)
+    public function saveEntity($entity, $unlock = true): void
     {
         parent::saveEntity($entity, $unlock);
 
@@ -458,7 +458,7 @@ class FocusModel extends FormModel
     /**
      * Joins the email table and limits created_by to currently logged in user.
      */
-    public function limitQueryToCreator(QueryBuilder $q)
+    public function limitQueryToCreator(QueryBuilder $q): void
     {
         $q->join('t', MAUTIC_TABLE_PREFIX.'focus', 'm', 'e.id = t.focus_id')
             ->andWhere('m.created_by = :userId')
