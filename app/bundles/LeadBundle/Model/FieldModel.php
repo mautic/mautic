@@ -597,8 +597,6 @@ class FieldModel extends FormModel
      * @param array $entities
      * @param bool  $unlock
      *
-     * @return array|void
-     *
      * @throws AbortColumnCreateException
      * @throws \Doctrine\DBAL\Exception
      * @throws DriverException
