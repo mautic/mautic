@@ -40,6 +40,10 @@ class EmailValidator
             throw new InvalidEmailException($address, $this->translator->trans('mautic.email.address.invalid_format', ['%email%' => $address ?: '?']));
         }
 
+        if (!$this->isValidLength($address)) {
+            throw new InvalidEmailException($address, $this->translator->trans('mautic.email.address.invalid_length', ['%email%' => $address ?: '?']));
+        }
+
         if ($this->hasValidCharacters($address)) {
             throw new InvalidEmailException($address, $this->translator->trans('mautic.email.address.invalid_characters', ['%email%' => $address]));
         }
@@ -58,7 +62,19 @@ class EmailValidator
      */
     public function isValidFormat($address): bool
     {
-        return !empty($address) && filter_var($address, FILTER_VALIDATE_EMAIL);
+        return !empty($address) && filter_var($address, FILTER_VALIDATE_EMAIL, FILTER_FLAG_EMAIL_UNICODE);
+    }
+
+    /**
+     * Validates that email has an acceptable length (254).
+     *
+     * @param string $address
+     *
+     * @return bool
+     */
+    public function isValidLength($address)
+    {
+        return strlen($address) <= 254;
     }
 
     /**

@@ -101,6 +101,20 @@ class EmailValidatorTest extends \PHPUnit\Framework\TestCase
         $this->emailValidator->validate('john@mail.email');
     }
 
+    public function testValidEmailWithUtfCharacters(): void
+    {
+        $this->dispatcher->expects($this->once())
+          ->method('dispatch')
+          ->with($this->isInstanceOf(EmailValidationEvent::class), EmailEvents::ON_EMAIL_VALIDATION)
+          ->willReturn($this->event);
+
+        $this->event->expects($this->once())
+          ->method('isValid')
+          ->willReturn(true);
+
+        $this->emailValidator->validate('jöhn@mail.email');
+    }
+
     public function testValidateEmailWithoutTld()
     {
         $this->expectException(InvalidEmailException::class);
