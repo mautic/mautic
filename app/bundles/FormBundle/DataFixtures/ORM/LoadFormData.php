@@ -20,20 +20,11 @@ class LoadFormData extends AbstractFixture implements OrderedFixtureInterface
 {
     public const FORM_PREFIX = 'form-';
 
-    /**
-     * @var FormModel
-     */
-    private $formModel;
+    private \Mautic\FormBundle\Model\FormModel $formModel;
 
-    /**
-     * @var FieldModel
-     */
-    private $formFieldModel;
+    private \Mautic\FormBundle\Model\FieldModel $formFieldModel;
 
-    /**
-     * @var ActionModel
-     */
-    private $actionModel;
+    private \Mautic\FormBundle\Model\ActionModel $actionModel;
 
     /**
      * @var array<int, Form>

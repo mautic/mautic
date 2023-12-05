@@ -8,10 +8,7 @@ use Mautic\FormBundle\Entity\Form;
 
 class ValidationEvent extends CommonEvent
 {
-    /**
-     * @var Field
-     */
-    private $field;
+    private \Mautic\FormBundle\Entity\Field $field;
 
     /**
      * @var mixed
