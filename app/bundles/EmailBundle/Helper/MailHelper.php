@@ -1501,8 +1501,6 @@ class MailHelper
 
     /**
      * Dispatch send event to generate tokens.
-     *
-     * @return array
      */
     public function dispatchSendEvent(): void
     {

@@ -209,8 +209,6 @@ class EmailSendEvent extends CommonEvent
 
     /**
      * @param string $subject
-     *
-     * @return EmailSendEvent
      */
     public function setSubject($subject): void
     {
