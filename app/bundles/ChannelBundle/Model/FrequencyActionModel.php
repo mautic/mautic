@@ -26,7 +26,7 @@ class FrequencyActionModel
      *
      * @param string $preferredChannel
      */
-    public function update(array $contactIds, array $params, $preferredChannel)
+    public function update(array $contactIds, array $params, $preferredChannel): void
     {
         $contacts = $this->contactModel->getLeadsByIds($contactIds);
 
@@ -42,7 +42,7 @@ class FrequencyActionModel
     /**
      * @param string $preferredChannel
      */
-    private function updateFrequencyRules(Lead $contact, array $params, $preferredChannel)
+    private function updateFrequencyRules(Lead $contact, array $params, $preferredChannel): void
     {
         $frequencyRules = $contact->getFrequencyRules()->toArray();
         $channels       = $this->contactModel->getPreferenceChannels();

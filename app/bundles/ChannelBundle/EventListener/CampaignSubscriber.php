@@ -103,7 +103,7 @@ class CampaignSubscriber implements EventSubscriberInterface
      * @throws \Mautic\CampaignBundle\Executioner\Dispatcher\Exception\LogPassedAndFailedException
      * @throws \ReflectionException
      */
-    public function onCampaignTriggerAction(PendingEvent $pendingEvent)
+    public function onCampaignTriggerAction(PendingEvent $pendingEvent): void
     {
         $this->pseudoEvent = clone $pendingEvent->getEvent();
         $this->pseudoEvent->setCampaign($pendingEvent->getEvent()->getCampaign());

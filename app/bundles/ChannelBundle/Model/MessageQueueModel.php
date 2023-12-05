@@ -293,7 +293,7 @@ class MessageQueueModel extends FormModel
     /**
      * @param bool $persist
      */
-    public function reschedule($message, \DateInterval $rescheduleInterval, $leadId = null, $channel = null, $channelId = null, $persist = false)
+    public function reschedule($message, \DateInterval $rescheduleInterval, $leadId = null, $channel = null, $channelId = null, $persist = false): void
     {
         if (!$message instanceof MessageQueue && $leadId && $channel && $channelId) {
             $message = $this->getRepository()->findMessage($channel, $channelId, $leadId);
