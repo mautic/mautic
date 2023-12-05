@@ -39,6 +39,11 @@ return static function (Rector\Config\RectorConfig $rectorConfig): void {
             // unset variable to clear garbage collector
             __DIR__.'/app/bundles/LeadBundle/Model/ImportModel.php',
         ],
+
+        \Rector\TypeDeclaration\Rector\Property\TypedPropertyFromStrictConstructorRector::class => [
+            // entities magic
+            __DIR__.'/app/bundles/LeadBundle/Entity',
+        ],
     ]);
 
     foreach (['dev', 'test', 'prod'] as $environment) {

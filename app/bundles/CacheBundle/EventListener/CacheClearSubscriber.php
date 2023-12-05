@@ -14,11 +14,8 @@ class CacheClearSubscriber implements CacheClearerInterface
     /**
      * @var CacheProvider
      */
-    private $cacheProvider;
-    /**
-     * @var LoggerInterface
-     */
-    private $logger;
+    private \Symfony\Component\Cache\Adapter\AdapterInterface $cacheProvider;
+    private \Psr\Log\LoggerInterface $logger;
 
     public function __construct(AdapterInterface $cacheProvider, LoggerInterface $logger)
     {
