@@ -6,7 +6,7 @@ use Mautic\EmailBundle\Entity\Stat;
 
 class Reference
 {
-    private int $emailId;
+    private ?int $emailId;
 
     /**
      * @var int
@@ -20,7 +20,7 @@ class Reference
         $this->statId  = $stat->getId();
         $this->emailId = $stat->getEmail()->getId();
         if ($lead = $stat->getLead()) {
-            $this->leadId = $stat->getLead()->getId();
+            $this->leadId = $lead->getId();
         }
     }
 
