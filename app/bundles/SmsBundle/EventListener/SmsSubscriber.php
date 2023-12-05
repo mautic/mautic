@@ -58,7 +58,7 @@ class SmsSubscriber implements EventSubscriberInterface
     /**
      * Add an entry to the audit log.
      */
-    public function onPostSave(SmsEvent $event)
+    public function onPostSave(SmsEvent $event): void
     {
         $entity = $event->getSms();
         if ($details = $event->getChanges()) {
@@ -76,7 +76,7 @@ class SmsSubscriber implements EventSubscriberInterface
     /**
      * Add a delete entry to the audit log.
      */
-    public function onDelete(SmsEvent $event)
+    public function onDelete(SmsEvent $event): void
     {
         $entity = $event->getSms();
         $log    = [
@@ -89,7 +89,7 @@ class SmsSubscriber implements EventSubscriberInterface
         $this->auditLogModel->writeToLog($log);
     }
 
-    public function onTokenReplacement(TokenReplacementEvent $event)
+    public function onTokenReplacement(TokenReplacementEvent $event): void
     {
         /** @var Lead $lead */
         $lead         = $event->getLead();

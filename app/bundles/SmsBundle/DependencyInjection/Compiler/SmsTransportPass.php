@@ -13,7 +13,7 @@ class SmsTransportPass implements CompilerPassInterface
      */
     private $container;
 
-    public function process(ContainerBuilder $container)
+    public function process(ContainerBuilder $container): void
     {
         $this->container = $container;
 
@@ -21,7 +21,7 @@ class SmsTransportPass implements CompilerPassInterface
         $this->registerCallbacks();
     }
 
-    private function registerTransports()
+    private function registerTransports(): void
     {
         if (!$this->container->has('mautic.sms.transport_chain')) {
             return;
@@ -39,7 +39,7 @@ class SmsTransportPass implements CompilerPassInterface
         }
     }
 
-    private function registerCallbacks()
+    private function registerCallbacks(): void
     {
         if (!$this->container->has('mautic.sms.callback_handler_container')) {
             return;

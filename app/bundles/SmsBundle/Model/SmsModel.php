@@ -439,7 +439,7 @@ class SmsModel extends FormModel implements AjaxLookupModelInterface
     /**
      * Joins the page table and limits created_by to currently logged in user.
      */
-    public function limitQueryToCreator(QueryBuilder &$q)
+    public function limitQueryToCreator(QueryBuilder &$q): void
     {
         $q->join('t', MAUTIC_TABLE_PREFIX.'sms_messages', 's', 's.id = t.sms_id')
             ->andWhere('s.created_by = :userId')

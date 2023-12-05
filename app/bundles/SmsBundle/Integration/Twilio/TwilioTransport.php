@@ -106,7 +106,7 @@ class TwilioTransport implements TransportInterface
     /**
      * @throws ConfigurationException
      */
-    private function configureClient()
+    private function configureClient(): void
     {
         if ($this->client) {
             // Already configured
