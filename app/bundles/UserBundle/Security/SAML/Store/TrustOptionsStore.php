@@ -8,15 +8,9 @@ use Mautic\CoreBundle\Helper\CoreParametersHelper;
 
 class TrustOptionsStore implements TrustOptionsStoreInterface
 {
-    /**
-     * @var CoreParametersHelper
-     */
-    private $coreParametersHelper;
+    private \Mautic\CoreBundle\Helper\CoreParametersHelper $coreParametersHelper;
 
-    /**
-     * @var string
-     */
-    private $entityId;
+    private string $entityId;
 
     /**
      * @var TrustOptions

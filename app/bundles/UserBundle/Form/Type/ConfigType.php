@@ -16,15 +16,9 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class ConfigType extends AbstractType
 {
-    /**
-     * @var CoreParametersHelper
-     */
-    protected $parameters;
+    protected \Mautic\CoreBundle\Helper\CoreParametersHelper $parameters;
 
-    /**
-     * @var TranslatorInterface
-     */
-    protected $translator;
+    protected \Symfony\Contracts\Translation\TranslatorInterface $translator;
 
     public function __construct(CoreParametersHelper $parametersHelper, TranslatorInterface $translator)
     {

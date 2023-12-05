@@ -20,30 +20,15 @@ use Symfony\Component\Security\Core\User\UserProviderInterface;
 
 class UserProvider implements UserProviderInterface
 {
-    /**
-     * @var UserRepository
-     */
-    protected $userRepository;
+    protected \Mautic\UserBundle\Entity\UserRepository $userRepository;
 
-    /**
-     * @var PermissionRepository
-     */
-    protected $permissionRepository;
+    protected \Mautic\UserBundle\Entity\PermissionRepository $permissionRepository;
 
-    /**
-     * @var Session
-     */
-    protected $session;
+    protected \Symfony\Component\HttpFoundation\Session\Session $session;
 
-    /**
-     * @var EventDispatcherInterface
-     */
-    protected $dispatcher;
+    protected \Symfony\Component\EventDispatcher\EventDispatcherInterface $dispatcher;
 
-    /**
-     * @var UserPasswordHasher
-     */
-    protected $encoder;
+    protected \Symfony\Component\PasswordHasher\Hasher\UserPasswordHasher $encoder;
 
     public function __construct(
         UserRepository $userRepository,

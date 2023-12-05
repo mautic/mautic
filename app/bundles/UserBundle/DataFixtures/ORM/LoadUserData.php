@@ -19,10 +19,7 @@ class LoadUserData extends AbstractFixture implements OrderedFixtureInterface, F
         return ['group_mautic_install_data'];
     }
 
-    /**
-     * @var UserPasswordHasher
-     */
-    private $hasher;
+    private \Symfony\Component\PasswordHasher\Hasher\UserPasswordHasher $hasher;
 
     /**
      * {@inheritdoc}

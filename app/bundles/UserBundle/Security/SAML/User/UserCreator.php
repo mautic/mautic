@@ -19,27 +19,15 @@ class UserCreator implements UserCreatorInterface
     /**
      * @var EntityManager
      */
-    private $entityManager;
+    private \Doctrine\ORM\EntityManagerInterface $entityManager;
 
-    /**
-     * @var UserMapper
-     */
-    private $userMapper;
+    private \Mautic\UserBundle\Security\SAML\User\UserMapper $userMapper;
 
-    /**
-     * @var UserModel
-     */
-    private $userModel;
+    private \Mautic\UserBundle\Model\UserModel $userModel;
 
-    /**
-     * @var UserPasswordHasher
-     */
-    private $hasher;
+    private \Symfony\Component\PasswordHasher\Hasher\UserPasswordHasher $hasher;
 
-    /**
-     * @var int
-     */
-    private $defaultRole;
+    private int $defaultRole;
 
     /**
      * @var array
