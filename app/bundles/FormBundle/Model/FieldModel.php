@@ -150,7 +150,7 @@ class FieldModel extends CommonFormModel
     }
 
     /**
-     * @return FormFieldEvent|Event|void|null
+     * @return FormFieldEvent|Event|null
      *
      * @throws MethodNotAllowedHttpException
      */
@@ -185,8 +185,8 @@ class FieldModel extends CommonFormModel
             $this->dispatcher->dispatch($event, $name);
 
             return $event;
-        } else {
-            return null;
         }
+
+        return null;
     }
 }
