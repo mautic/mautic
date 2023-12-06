@@ -13,7 +13,7 @@ class RemovedContactTracker
      * @param int $campaignId
      * @param int $contactId
      */
-    public function addRemovedContact($campaignId, $contactId)
+    public function addRemovedContact($campaignId, $contactId): void
     {
         if (!isset($this->removedContacts[$campaignId])) {
             $this->removedContacts[$campaignId] = [];
@@ -26,7 +26,7 @@ class RemovedContactTracker
      * @param int   $campaignId
      * @param array $contacts
      */
-    public function addRemovedContacts($campaignId, array $contactIds)
+    public function addRemovedContacts($campaignId, array $contactIds): void
     {
         foreach ($contactIds as $contactId) {
             $this->addRemovedContact($campaignId, $contactId);
@@ -36,7 +36,7 @@ class RemovedContactTracker
     /**
      * @param int $campaignId
      */
-    public function clearRemovedContact($campaignId, $contactId)
+    public function clearRemovedContact($campaignId, $contactId): void
     {
         unset($this->removedContacts[$campaignId][$contactId]);
     }

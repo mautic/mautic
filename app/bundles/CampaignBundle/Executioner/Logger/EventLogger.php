@@ -63,7 +63,7 @@ class EventLogger
         $this->logs         = new ArrayCollection();
     }
 
-    public function queueToPersist(LeadEventLog $log)
+    public function queueToPersist(LeadEventLog $log): void
     {
         $this->persistQueue->add($log);
 
@@ -72,7 +72,7 @@ class EventLogger
         }
     }
 
-    public function persistLog(LeadEventLog $log)
+    public function persistLog(LeadEventLog $log): void
     {
         $this->leadEventLogRepository->saveEntity($log);
         $this->summaryModel->updateSummary([$log]);
@@ -204,13 +204,13 @@ class EventLogger
     /**
      * @param int $campaignId
      */
-    public function hydrateContactRotationsForNewLogs(array $contactIds, $campaignId)
+    public function hydrateContactRotationsForNewLogs(array $contactIds, $campaignId): void
     {
         $this->contactRotations                  = $this->leadRepository->getContactRotations($contactIds, $campaignId);
         $this->lastUsedCampaignIdToFetchRotation = $campaignId;
     }
 
-    private function persistPendingAndInsertIntoLogStack()
+    private function persistPendingAndInsertIntoLogStack(): void
     {
         if (!$this->persistQueue->count()) {
             return;

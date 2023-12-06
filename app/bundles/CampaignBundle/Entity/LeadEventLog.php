@@ -419,7 +419,7 @@ class LeadEventLog implements ChannelInterface
     /**
      * @param mixed[] $metadata
      */
-    public function appendToMetadata($metadata)
+    public function appendToMetadata($metadata): void
     {
         if (!is_array($metadata)) {
             // Assumed output for timeline BC for <2.14
@@ -456,14 +456,10 @@ class LeadEventLog implements ChannelInterface
 
     /**
      * @param string $channel
-     *
-     * @return LeadEventLog|$this
      */
-    public function setChannel($channel)
+    public function setChannel($channel): void
     {
         $this->channel = $channel;
-
-        return $this;
     }
 
     /**
@@ -476,14 +472,10 @@ class LeadEventLog implements ChannelInterface
 
     /**
      * @param int|null $channelId
-     *
-     * @return LeadEventLog
      */
-    public function setChannelId($channelId)
+    public function setChannelId($channelId): void
     {
         $this->channelId = $channelId;
-
-        return $this;
     }
 
     /**

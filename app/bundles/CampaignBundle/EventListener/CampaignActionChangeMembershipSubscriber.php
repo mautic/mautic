@@ -37,7 +37,7 @@ class CampaignActionChangeMembershipSubscriber implements EventSubscriberInterfa
     /**
      * Add change membership action.
      */
-    public function addAction(CampaignBuilderEvent $event)
+    public function addAction(CampaignBuilderEvent $event): void
     {
         $event->addAction(
             'campaign.addremovelead',
@@ -53,7 +53,7 @@ class CampaignActionChangeMembershipSubscriber implements EventSubscriberInterfa
         );
     }
 
-    public function changeMembership(PendingEvent $event)
+    public function changeMembership(PendingEvent $event): void
     {
         $properties          = $event->getEvent()->getProperties();
         $contacts            = $event->getContactsKeyedById();

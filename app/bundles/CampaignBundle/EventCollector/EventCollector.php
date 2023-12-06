@@ -83,7 +83,7 @@ class EventCollector
         return $this->eventsArray;
     }
 
-    private function buildEventList()
+    private function buildEventList(): void
     {
         // build them
         $event  = new CampaignBuilderEvent($this->translator);

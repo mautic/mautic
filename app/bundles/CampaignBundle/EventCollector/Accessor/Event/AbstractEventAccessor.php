@@ -135,7 +135,7 @@ abstract class AbstractEventAccessor
     /**
      * Calculate the difference in systemProperties and what was fed to the class.
      */
-    private function filterExtraProperties()
+    private function filterExtraProperties(): void
     {
         $this->extraProperties = array_diff_key($this->config, array_flip($this->systemProperties));
     }

@@ -444,7 +444,7 @@ class CampaignModel extends CommonFormModel
     /**
      * Add and/or delete lead sources from a campaign.
      */
-    public function setLeadSources(Campaign $entity, $addedSources, $deletedSources)
+    public function setLeadSources(Campaign $entity, $addedSources, $deletedSources): void
     {
         foreach ($addedSources as $type => $sources) {
             foreach ($sources as $id => $label) {

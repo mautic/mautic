@@ -8,7 +8,7 @@ use Mautic\CampaignBundle\EventCollector\Accessor\Event\AbstractEventAccessor;
 
 class ChannelExtractor
 {
-    public static function setChannel(ChannelInterface $entity, Event $event, AbstractEventAccessor $eventConfig)
+    public static function setChannel(ChannelInterface $entity, Event $event, AbstractEventAccessor $eventConfig): void
     {
         // Allow event to update itself
         $isSelf = $entity === $event;

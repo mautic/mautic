@@ -85,7 +85,7 @@ class ActionDispatcher
         return $pendingEvent;
     }
 
-    private function dispatchExecutedEvent(AbstractEventAccessor $config, Event $event, ArrayCollection $logs)
+    private function dispatchExecutedEvent(AbstractEventAccessor $config, Event $event, ArrayCollection $logs): void
     {
         if (!$logs->count()) {
             return;
@@ -104,7 +104,7 @@ class ActionDispatcher
         );
     }
 
-    private function dispatchedFailedEvent(AbstractEventAccessor $config, ArrayCollection $logs)
+    private function dispatchedFailedEvent(AbstractEventAccessor $config, ArrayCollection $logs): void
     {
         if (!$logs->count()) {
             return;

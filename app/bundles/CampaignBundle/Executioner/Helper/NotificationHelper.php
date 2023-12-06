@@ -38,7 +38,7 @@ class NotificationHelper
         $this->coreParametersHelper = $coreParametersHelper;
     }
 
-    public function notifyOfFailure(Lead $contact, Event $event)
+    public function notifyOfFailure(Lead $contact, Event $event): void
     {
         $user = $this->getUser($contact, $event);
         if (!$user || !$user->getId()) {

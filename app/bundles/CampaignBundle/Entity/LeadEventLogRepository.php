@@ -317,7 +317,7 @@ class LeadEventLogRepository extends CommonRepository
     /**
      * Updates lead ID (e.g. after a lead merge).
      */
-    public function updateLead($fromLeadId, $toLeadId)
+    public function updateLead($fromLeadId, $toLeadId): void
     {
         // First check to ensure the $toLead doesn't already exist
         $results = $this->_em->getConnection()->createQueryBuilder()
@@ -575,7 +575,7 @@ class LeadEventLogRepository extends CommonRepository
      *
      * @throws \Doctrine\DBAL\Exception
      */
-    public function unscheduleEvents(Lead $campaignMember, $message)
+    public function unscheduleEvents(Lead $campaignMember, $message): void
     {
         $contactId  = $campaignMember->getLead()->getId();
         $campaignId = $campaignMember->getCampaign()->getId();
@@ -627,7 +627,7 @@ SQL;
      *
      * @param int $eventId
      */
-    public function removeEventLogs($eventId)
+    public function removeEventLogs($eventId): void
     {
         $conn = $this->_em->getConnection();
         $conn->delete(MAUTIC_TABLE_PREFIX.'campaign_lead_event_log', [

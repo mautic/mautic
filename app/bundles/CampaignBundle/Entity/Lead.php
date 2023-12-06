@@ -111,7 +111,7 @@ class Lead
     /**
      * @param \DateTime $date
      */
-    public function setDateAdded($date)
+    public function setDateAdded($date): void
     {
         $this->dateAdded = $date;
     }
@@ -124,7 +124,7 @@ class Lead
         return $this->lead;
     }
 
-    public function setLead(\Mautic\LeadBundle\Entity\Lead $lead)
+    public function setLead(\Mautic\LeadBundle\Entity\Lead $lead): void
     {
         $this->lead = $lead;
     }
@@ -137,7 +137,7 @@ class Lead
         return $this->campaign;
     }
 
-    public function setCampaign(Campaign $campaign)
+    public function setCampaign(Campaign $campaign): void
     {
         $this->campaign = $campaign;
     }
@@ -153,7 +153,7 @@ class Lead
     /**
      * @param bool $manuallyRemoved
      */
-    public function setManuallyRemoved($manuallyRemoved)
+    public function setManuallyRemoved($manuallyRemoved): void
     {
         $this->manuallyRemoved = $manuallyRemoved;
     }
@@ -177,7 +177,7 @@ class Lead
     /**
      * @param bool $manuallyAdded
      */
-    public function setManuallyAdded($manuallyAdded)
+    public function setManuallyAdded($manuallyAdded): void
     {
         $this->manuallyAdded = $manuallyAdded;
     }

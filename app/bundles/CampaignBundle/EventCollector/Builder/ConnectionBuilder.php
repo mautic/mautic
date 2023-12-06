@@ -41,7 +41,7 @@ class ConnectionBuilder
      * @param string $eventType
      * @param string $key
      */
-    private static function addTypeConnection($eventType, $key, array $event)
+    private static function addTypeConnection($eventType, $key, array $event): void
     {
         if (!isset(self::$connectionRestrictions[$key])) {
             self::$connectionRestrictions[$key] = [
@@ -67,7 +67,7 @@ class ConnectionBuilder
      * @param string $key
      * @param string $restrictionType
      */
-    private static function addRestriction($key, $restrictionType, array $restrictions)
+    private static function addRestriction($key, $restrictionType, array $restrictions): void
     {
         switch ($restrictionType) {
             case 'source':
@@ -92,7 +92,7 @@ class ConnectionBuilder
      * @param string $eventType
      * @param string $key
      */
-    private static function addDeprecatedAnchorRestrictions($eventType, $key, array $event)
+    private static function addDeprecatedAnchorRestrictions($eventType, $key, array $event): void
     {
         switch ($eventType) {
             case Event::TYPE_DECISION:

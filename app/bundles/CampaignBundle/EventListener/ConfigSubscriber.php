@@ -21,7 +21,7 @@ class ConfigSubscriber implements EventSubscriberInterface
         ];
     }
 
-    public function onConfigGenerate(ConfigBuilderEvent $event)
+    public function onConfigGenerate(ConfigBuilderEvent $event): void
     {
         $event->addForm(
             [
@@ -34,7 +34,7 @@ class ConfigSubscriber implements EventSubscriberInterface
         );
     }
 
-    public function onConfigSave(ConfigEvent $event)
+    public function onConfigSave(ConfigEvent $event): void
     {
         /** @var array $values */
         $values = $event->getConfig();
