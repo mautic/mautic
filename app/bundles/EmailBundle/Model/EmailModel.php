@@ -997,8 +997,6 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
 
     /**
      * @param bool $includeVariants
-     *
-     * @return array|int
      */
     public function getQueuedCounts(Email $email, $includeVariants = true): int
     {

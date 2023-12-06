@@ -693,8 +693,6 @@ class Mailbox
      *  Unread - number of unread messages
      *  Deleted - number of deleted messages
      *  Size - mailbox size
-     *
-     * @return object Object with info | FALSE on failure
      */
     public function getMailboxInfo(): \stdClass
     {
