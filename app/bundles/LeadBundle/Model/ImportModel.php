@@ -92,10 +92,8 @@ class ImportModel extends FormModel
 
     /**
      * Compares current number of imports in progress with the limit from the configuration.
-     *
-     * @return bool
      */
-    public function checkParallelImportLimit()
+    public function checkParallelImportLimit(): bool
     {
         $parallelImportLimit = $this->getParallelImportLimit();
         $importsInProgress   = $this->getRepository()->countImportsInProgress();
@@ -117,10 +115,8 @@ class ImportModel extends FormModel
 
     /**
      * Generates a HTML link to the import detail.
-     *
-     * @return string
      */
-    public function generateLink(Import $import)
+    public function generateLink(Import $import): string
     {
         return '<a href="'.$this->router->generate(
             'mautic_import_action',
@@ -442,10 +438,8 @@ class ImportModel extends FormModel
 
     /**
      * Trim all values in a one dymensional array.
-     *
-     * @return array
      */
-    public function trimArrayValues(array $data)
+    public function trimArrayValues(array $data): array
     {
         return array_map('trim', $data);
     }
@@ -454,10 +448,8 @@ class ImportModel extends FormModel
      * Decide whether the CSV row is empty.
      *
      * @param mixed $row
-     *
-     * @return bool
      */
-    public function isEmptyCsvRow($row)
+    public function isEmptyCsvRow($row): bool
     {
         if (!is_array($row) || empty($row)) {
             return true;
@@ -572,30 +564,24 @@ class ImportModel extends FormModel
 
     /**
      * {@inheritdoc}
-     *
-     * @return string
      */
-    public function getPermissionBase()
+    public function getPermissionBase(): string
     {
         return 'lead:imports';
     }
 
     /**
      * Returns a unique name of a CSV file based on time.
-     *
-     * @return string
      */
-    public function getUniqueFileName()
+    public function getUniqueFileName(): string
     {
         return (new DateTimeHelper())->toUtcString('YmdHis').'.csv';
     }
 
     /**
      * Returns a full path to the import dir.
-     *
-     * @return string
      */
-    public function getImportDir()
+    public function getImportDir(): string
     {
         $tmpDir = $this->pathsHelper->getSystemPath('tmp', true);
 

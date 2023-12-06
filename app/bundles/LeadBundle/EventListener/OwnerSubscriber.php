@@ -137,10 +137,8 @@ class OwnerSubscriber implements EventSubscriberInterface
      * Creates a token using defined pattern.
      *
      * @param string $field
-     *
-     * @return string
      */
-    private function buildToken($field)
+    private function buildToken($field): string
     {
         return sprintf($this->ownerFieldSprintf, $field);
     }
@@ -149,10 +147,8 @@ class OwnerSubscriber implements EventSubscriberInterface
      * Creates translation ready label Owner Firstname etc.
      *
      * @param string $field
-     *
-     * @return string
      */
-    private function buildLabel($field)
+    private function buildLabel($field): string
     {
         return sprintf(
             '%s %s',

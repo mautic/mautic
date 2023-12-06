@@ -32,10 +32,8 @@ class DynamicContentModel extends FormModel implements AjaxLookupModelInterface
 
     /**
      * Retrieve the permissions base.
-     *
-     * @return string
      */
-    public function getPermissionBase()
+    public function getPermissionBase(): string
     {
         return 'dynamiccontent:dynamiccontents';
     }

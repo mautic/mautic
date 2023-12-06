@@ -560,10 +560,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
         }
     }
 
-    /**
-     * @return array
-     */
-    public function convertToArray()
+    public function convertToArray(): array
     {
         return get_object_vars($this);
     }
@@ -584,10 +581,8 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
 
     /**
      * Get id.
-     *
-     * @return int
      */
-    public function getId()
+    public function getId(): int
     {
         return (int) $this->id;
     }
@@ -745,10 +740,8 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
 
     /**
      * Get the location for the lead.
-     *
-     * @return string
      */
-    public function getLocation()
+    public function getLocation(): string
     {
         $location = '';
 
@@ -1179,10 +1172,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
         $this->color = $color;
     }
 
-    /**
-     * @return bool
-     */
-    public function isAnonymous()
+    public function isAnonymous(): bool
     {
         return !($this->getName()
             || $this->getFirstname()
@@ -1457,10 +1447,8 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
 
     /**
      * Get attribution value.
-     *
-     * @return bool
      */
-    public function getAttribution()
+    public function getAttribution(): float
     {
         return (float) $this->getFieldValue('attribution');
     }
@@ -1914,7 +1902,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
         /* @var FrequencyRule $rule */
         usort(
             $frequencyRules,
-            function ($a, $b) {
+            function ($a, $b): int {
                 if ($a['pause_from_date'] && $a['pause_to_date']) {
                     $now = new \DateTime();
                     if ($now >= $a['pause_from_date'] && $now <= $a['pause_to_date']) {

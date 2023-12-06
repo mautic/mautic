@@ -139,7 +139,7 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
     /**
      * {@inheritdoc}
      */
-    public function getPermissionBase()
+    public function getPermissionBase(): string
     {
         // We are using lead:leads in the CompanyController so this should match to prevent a BC break
         return 'lead:leads';
@@ -147,10 +147,8 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
 
     /**
      * {@inheritdoc}
-     *
-     * @return string
      */
-    public function getNameGetter()
+    public function getNameGetter(): string
     {
         return 'getPrimaryIdentifier';
     }
@@ -295,11 +293,10 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
      * @param array|Company $companies
      * @param array|Lead    $lead
      *
-     * @return bool
      *
      * @throws \Doctrine\ORM\ORMException
      */
-    public function addLeadToCompany($companies, $lead)
+    public function addLeadToCompany($companies, $lead): bool
     {
         // Primary company name to be persisted to the lead's contact company field
         $companyName        = '';
@@ -753,7 +750,7 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
      *
      * @throws \Exception
      */
-    public function import($fields, $data, $owner = null, $skipIfExists = false)
+    public function import($fields, $data, $owner = null, $skipIfExists = false): bool
     {
         $company = $this->importCompany($fields, $data, $owner, false, $skipIfExists);
 

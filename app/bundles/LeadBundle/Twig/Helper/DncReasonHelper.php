@@ -54,7 +54,7 @@ final class DncReasonHelper
      *
      * @return string The canonical name
      */
-    public function getName()
+    public function getName(): string
     {
         return 'lead_dnc_reason';
     }

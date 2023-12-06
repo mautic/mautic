@@ -29,10 +29,7 @@ class LeadPermissions extends AbstractPermissions
         $this->addStandardPermissions('imports');
     }
 
-    /**
-     * @return string
-     */
-    public function getName()
+    public function getName(): string
     {
         return 'lead';
     }

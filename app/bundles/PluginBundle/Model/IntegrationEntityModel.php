@@ -58,7 +58,7 @@ class IntegrationEntityModel extends FormModel
         return $recordList;
     }
 
-    public function formatListOfContacts($recordList)
+    public function formatListOfContacts($recordList): ?string
     {
         if (empty($recordList)) {
             return null;

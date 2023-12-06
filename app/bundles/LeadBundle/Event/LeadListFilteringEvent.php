@@ -129,18 +129,12 @@ class LeadListFilteringEvent extends CommonEvent
         $this->setFilteringStatus(true);
     }
 
-    /**
-     * @return bool
-     */
-    public function isFilteringDone()
+    public function isFilteringDone(): bool
     {
         return $this->isFilteringDone;
     }
 
-    /**
-     * @return string
-     */
-    public function getSubQuery()
+    public function getSubQuery(): string
     {
         return $this->subQuery;
     }

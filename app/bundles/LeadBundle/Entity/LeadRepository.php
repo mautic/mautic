@@ -199,7 +199,7 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
             ->getArrayResult();
 
         return array_map(
-            function ($row) {
+            function ($row): int {
                 return (int) $row['id'];
             },
             $result
@@ -1117,7 +1117,7 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
      *
      * @return array|false
      */
-    public function checkLeadOwner(Lead $lead, $ownerIds = [])
+    public function checkLeadOwner(Lead $lead, $ownerIds = []): bool
     {
         if (empty($ownerIds)) {
             return false;
@@ -1198,17 +1198,15 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
     /**
      * {@inheritdoc}
      */
-    public function getTableAlias()
+    public function getTableAlias(): string
     {
         return 'l';
     }
 
     /**
      * Get the count of identified contacts.
-     *
-     * @return int
      */
-    public function getIdentifiedContactCount()
+    public function getIdentifiedContactCount(): int
     {
         $qb = $this->getEntityManager()->getConnection()->createQueryBuilder()
             ->select('count(*)')
@@ -1329,7 +1327,7 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
     /**
      * @param int $tries
      */
-    protected function updateContactPoints(array $changes, $id, $tries = 1)
+    protected function updateContactPoints(array $changes, $id, $tries = 1): int
     {
         $qb = $this->getEntityManager()->getConnection()->createQueryBuilder()
             ->update(MAUTIC_TABLE_PREFIX.'leads')

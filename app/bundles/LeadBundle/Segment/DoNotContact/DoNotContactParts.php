@@ -25,18 +25,12 @@ class DoNotContactParts
         }
     }
 
-    /**
-     * @return string
-     */
-    public function getChannel()
+    public function getChannel(): string
     {
         return $this->channel;
     }
 
-    /**
-     * @return int
-     */
-    public function getParameterType()
+    public function getParameterType(): int
     {
         return $this->type;
     }

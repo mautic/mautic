@@ -306,10 +306,7 @@ class QueryBuilder extends BaseQueryBuilder
         return $sql;
     }
 
-    /**
-     * @return bool
-     */
-    public function hasLogicStack()
+    public function hasLogicStack(): bool
     {
         return count($this->logicStack) > 0;
     }

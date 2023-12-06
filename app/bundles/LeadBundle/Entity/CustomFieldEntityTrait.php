@@ -245,10 +245,7 @@ trait CustomFieldEntityTrait
         }
     }
 
-    /**
-     * @return bool
-     */
-    public function hasFields()
+    public function hasFields(): bool
     {
         return !empty($this->fields);
     }

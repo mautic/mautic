@@ -59,7 +59,7 @@ class StageModel extends CommonFormModel
     /**
      * {@inheritdoc}
      */
-    public function getPermissionBase()
+    public function getPermissionBase(): string
     {
         return 'stage:stages';
     }

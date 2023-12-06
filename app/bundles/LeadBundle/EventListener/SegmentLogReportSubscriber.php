@@ -110,10 +110,8 @@ class SegmentLogReportSubscriber implements EventSubscriberInterface
     /**
      * @param string $alias
      * @param string $action
-     *
-     * @return string
      */
-    private function generateLeftJoinCondition($alias, $action)
+    private function generateLeftJoinCondition($alias, $action): string
     {
         return 'l.id = '.$alias.'.lead_id  AND '.$alias.'.bundle = \'lead\' AND '.$alias.'.object = \'segment\'  AND '.$alias.'.`action` =\''.$action.'\' AND '.$alias.'.date_added BETWEEN :dateFrom AND :dateTo';
     }

@@ -125,10 +125,8 @@ class ListModel extends FormModel
 
     /**
      * {@inheritdoc}
-     *
-     * @return string
      */
-    public function getPermissionBase()
+    public function getPermissionBase(): string
     {
         return 'lead:lists';
     }
@@ -294,7 +292,7 @@ class ListModel extends FormModel
 
         // Order choices by label.
         foreach ($choices as $key => $choice) {
-            $cmp = function ($a, $b) {
+            $cmp = function ($a, $b): int {
                 return strcmp($a['label'], $b['label']);
             };
             uasort($choice, $cmp);
@@ -342,11 +340,10 @@ class ListModel extends FormModel
      * @param int      $limit
      * @param bool|int $maxLeads
      *
-     * @return int
      *
      * @throws \Exception
      */
-    public function rebuildListLeads(LeadList $leadList, $limit = 100, $maxLeads = false, OutputInterface $output = null)
+    public function rebuildListLeads(LeadList $leadList, $limit = 100, $maxLeads = false, OutputInterface $output = null): int
     {
         defined('MAUTIC_REBUILDING_LEAD_LISTS') or define('MAUTIC_REBUILDING_LEAD_LISTS', 1);
 
@@ -1122,10 +1119,8 @@ class ListModel extends FormModel
 
     /**
      * Is custom field used in at least one defined segment?
-     *
-     * @return bool
      */
-    public function isFieldUsed(LeadField $field)
+    public function isFieldUsed(LeadField $field): bool
     {
         return 0 < $this->getFieldSegments($field)->count();
     }

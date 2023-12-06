@@ -93,7 +93,7 @@ class PluginController extends FormController
         // sort by name
         uksort(
             $integrations,
-            function ($a, $b) {
+            function ($a, $b): int {
                 return strnatcasecmp($a, $b);
             }
         );

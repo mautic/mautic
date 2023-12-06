@@ -80,18 +80,12 @@ class DateCompanyDecorator implements FilterDecoratorInterface
         return $this->dateDecorator->getWhere($contactSegmentFilterCrate);
     }
 
-    /**
-     * @return string
-     */
-    public function getRelationJoinTable()
+    public function getRelationJoinTable(): string
     {
         return MAUTIC_TABLE_PREFIX.'companies_leads';
     }
 
-    /**
-     * @return string
-     */
-    public function getRelationJoinTableField()
+    public function getRelationJoinTableField(): string
     {
         return 'company_id';
     }

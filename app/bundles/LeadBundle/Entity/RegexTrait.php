@@ -9,7 +9,7 @@ trait RegexTrait
      *
      * @return mixed
      */
-    protected function prepareRegex($regex)
+    protected function prepareRegex($regex): string|array
     {
         $search = [
             '\\\\',

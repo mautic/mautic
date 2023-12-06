@@ -120,10 +120,7 @@ trait LeadDetailsTrait
         return $filters;
     }
 
-    /**
-     * @return int
-     */
-    private function cmp($a, $b)
+    private function cmp($a, $b): int
     {
         if ($a['timestamp'] === $b['timestamp']) {
             return 0;

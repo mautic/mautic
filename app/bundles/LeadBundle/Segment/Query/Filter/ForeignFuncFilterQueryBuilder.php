@@ -9,7 +9,7 @@ use Mautic\LeadBundle\Segment\Query\QueryException;
 
 class ForeignFuncFilterQueryBuilder extends BaseFilterQueryBuilder
 {
-    public static function getServiceId()
+    public static function getServiceId(): string
     {
         return 'mautic.lead.query.builder.foreign.func';
     }

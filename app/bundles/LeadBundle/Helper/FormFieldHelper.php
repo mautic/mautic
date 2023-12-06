@@ -143,7 +143,7 @@ class FormFieldHelper extends AbstractFormFieldHelper
     /**
      * @return array<string, string>
      */
-    public static function getCountryChoices()
+    public static function getCountryChoices(): array
     {
         $countryJson = file_get_contents(__DIR__.'/../../CoreBundle/Assets/json/countries.json');
         $countries   = json_decode($countryJson);
@@ -206,7 +206,7 @@ class FormFieldHelper extends AbstractFormFieldHelper
      *
      * @return array<string, string>
      */
-    public static function getLocaleChoices()
+    public static function getLocaleChoices(): array
     {
         return array_flip(Locales::getNames());
     }

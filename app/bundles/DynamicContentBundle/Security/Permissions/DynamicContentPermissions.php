@@ -23,7 +23,7 @@ class DynamicContentPermissions extends AbstractPermissions
      *
      * @return string|void
      */
-    public function getName()
+    public function getName(): string
     {
         return 'dynamiccontent';
     }

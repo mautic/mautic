@@ -322,10 +322,7 @@ class ContactTracker
         return $this->isUserSession() || $this->systemContact || defined('IN_MAUTIC_CONSOLE') || null === $this->requestStack->getCurrentRequest();
     }
 
-    /**
-     * @return bool
-     */
-    private function isUserSession()
+    private function isUserSession(): bool
     {
         return !$this->security->isAnonymous();
     }

@@ -24,18 +24,12 @@ class IntegrationCampaignParts
         $this->campaignId      = $campaignId;
     }
 
-    /**
-     * @return string
-     */
-    public function getIntegrationName()
+    public function getIntegrationName(): string
     {
         return $this->integrationName;
     }
 
-    /**
-     * @return string
-     */
-    public function getCampaignId()
+    public function getCampaignId(): string
     {
         return $this->campaignId;
     }

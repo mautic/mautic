@@ -604,7 +604,7 @@ class LeadTimelineEvent extends Event
     /**
      * Generate something consistent for this event to identify this log entry.
      */
-    private function generateEventId(array $data)
+    private function generateEventId(array $data): string
     {
         return $data['eventType'].hash('crc32', json_encode($data), false);
     }
