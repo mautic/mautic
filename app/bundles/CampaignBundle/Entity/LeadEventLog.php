@@ -208,9 +208,6 @@ class LeadEventLog implements ChannelInterface
             ->build();
     }
 
-    /**
-     * @return int|null
-     */
     public function getId(): int
     {
         return (int) $this->id;

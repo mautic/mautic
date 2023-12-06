@@ -27,13 +27,13 @@ final class CampaignActionJumpToEventSubscriberTest extends TestCase
         $event    = new Event();
         $campaign = new Campaign();
         $leadLog  = new class() extends LeadEventLog {
-            public function getId()
+            public function getId(): int
             {
                 return 456;
             }
         };
         $contact = new class() extends Lead {
-            public function getId()
+            public function getId(): int
             {
                 return 789;
             }
@@ -130,19 +130,19 @@ final class CampaignActionJumpToEventSubscriberTest extends TestCase
     {
         $event    = new Event();
         $campaign = new class() extends Campaign {
-            public function getId()
+            public function getId(): int
             {
                 return 111;
             }
         };
         $leadLog = new class() extends LeadEventLog {
-            public function getId()
+            public function getId(): int
             {
                 return 456;
             }
         };
         $contact = new class() extends Lead {
-            public function getId()
+            public function getId(): int
             {
                 return 789;
             }

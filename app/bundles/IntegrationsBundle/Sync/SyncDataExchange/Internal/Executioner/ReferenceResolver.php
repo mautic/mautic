@@ -54,8 +54,6 @@ final class ReferenceResolver implements ReferenceResolverInterface
     }
 
     /**
-     * @return mixed
-     *
      * @throws ReferenceNotFoundException
      */
     private function resolveReference(ReferenceValueDAO $value): ?string
