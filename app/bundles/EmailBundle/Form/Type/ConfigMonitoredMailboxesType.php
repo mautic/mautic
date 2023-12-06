@@ -15,6 +15,9 @@ use Symfony\Component\Form\FormView;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Validator\Constraints\Email;
 
+/**
+ * @extends AbstractType<mixed>
+ */
 class ConfigMonitoredMailboxesType extends AbstractType
 {
     public function __construct(

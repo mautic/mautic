@@ -14,6 +14,9 @@ use Symfony\Component\Form\FormView;
 use Symfony\Component\Validator\Constraints\File;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
+/**
+ * @extends AbstractType<array<mixed>>
+ */
 class ConfigType extends AbstractType
 {
     public function __construct(

@@ -6,6 +6,9 @@ use Mautic\LeadBundle\Model\FieldModel;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 
+/**
+ * @extends AbstractType<mixed>
+ */
 class UpdateLeadActionType extends AbstractType
 {
     use EntityFieldsBuildFormTrait;
