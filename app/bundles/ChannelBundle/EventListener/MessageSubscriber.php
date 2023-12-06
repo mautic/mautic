@@ -9,12 +9,8 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class MessageSubscriber implements EventSubscriberInterface
 {
-    private \Mautic\CoreBundle\Model\AuditLogModel $auditLogModel;
-
-    public function __construct(
-        AuditLogModel $auditLogModel
-    ) {
-        $this->auditLogModel = $auditLogModel;
+    public function __construct(private AuditLogModel $auditLogModel)
+    {
     }
 
     /**

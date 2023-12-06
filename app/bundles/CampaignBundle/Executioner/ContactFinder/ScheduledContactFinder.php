@@ -12,14 +12,8 @@ use Psr\Log\LoggerInterface;
 
 class ScheduledContactFinder
 {
-    private \Mautic\LeadBundle\Entity\LeadRepository $leadRepository;
-
-    private \Psr\Log\LoggerInterface $logger;
-
-    public function __construct(LeadRepository $leadRepository, LoggerInterface $logger)
+    public function __construct(private LeadRepository $leadRepository, private LoggerInterface $logger)
     {
-        $this->leadRepository = $leadRepository;
-        $this->logger         = $logger;
     }
 
     /**

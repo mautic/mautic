@@ -7,16 +7,13 @@ use Symfony\Contracts\EventDispatcher\Event;
 
 class CampaignTriggerEvent extends Event
 {
-    protected \Mautic\CampaignBundle\Entity\Campaign $campaign;
-
     /**
      * @var bool
      */
     protected $triggerCampaign = true;
 
-    public function __construct(Campaign $campaign)
+    public function __construct(protected Campaign $campaign)
     {
-        $this->campaign = $campaign;
     }
 
     /**

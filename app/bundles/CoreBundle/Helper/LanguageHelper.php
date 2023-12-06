@@ -14,28 +14,18 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 class LanguageHelper
 {
     private string $cacheFile;
-    private Client $client;
-    private PathsHelper $pathsHelper;
-    private LoggerInterface $logger;
     private Installer $installer;
-    private CoreParametersHelper $coreParametersHelper;
-    private TranslatorInterface $translator;
     private array $supportedLanguages = [];
     private string $installedTranslationsDirectory;
     private string $defaultTranslationsDirectory;
 
     public function __construct(
-        PathsHelper $pathsHelper,
-        LoggerInterface $logger,
-        CoreParametersHelper $coreParametersHelper,
-        Client $client,
-        TranslatorInterface $translator
+        private PathsHelper $pathsHelper,
+        private LoggerInterface $logger,
+        private CoreParametersHelper $coreParametersHelper,
+        private Client $client,
+        private TranslatorInterface $translator
     ) {
-        $this->pathsHelper                    = $pathsHelper;
-        $this->logger                         = $logger;
-        $this->coreParametersHelper           = $coreParametersHelper;
-        $this->client                         = $client;
-        $this->translator                     = $translator;
         $this->defaultTranslationsDirectory   = __DIR__.'/../Translations';
         $this->installedTranslationsDirectory = $this->pathsHelper->getSystemPath('translations_root').'/translations';
         $this->installer                      = new Installer($this->installedTranslationsDirectory);

@@ -12,11 +12,8 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class DynamicContentFilterType extends AbstractType
 {
-    private BuilderIntegrationsHelper $builderIntegrationsHelper;
-
-    public function __construct(BuilderIntegrationsHelper $builderIntegrationsHelper)
+    public function __construct(private BuilderIntegrationsHelper $builderIntegrationsHelper)
     {
-        $this->builderIntegrationsHelper = $builderIntegrationsHelper;
     }
 
     public function buildForm(FormBuilderInterface $builder, array $options): void

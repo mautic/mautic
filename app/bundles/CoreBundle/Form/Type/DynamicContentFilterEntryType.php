@@ -42,11 +42,7 @@ class DynamicContentFilterEntryType extends AbstractType
      */
     private array $localeChoices;
 
-    private \Mautic\StageBundle\Model\StageModel $stageModel;
-
-    private BuilderIntegrationsHelper $builderIntegrationsHelper;
-
-    public function __construct(ListModel $listModel, StageModel $stageModel, BuilderIntegrationsHelper $builderIntegrationsHelper)
+    public function __construct(ListModel $listModel, private StageModel $stageModel, private BuilderIntegrationsHelper $builderIntegrationsHelper)
     {
         $this->fieldChoices = $listModel->getChoiceFields();
 
@@ -56,8 +52,6 @@ class DynamicContentFilterEntryType extends AbstractType
         $this->regionChoices             = FormFieldHelper::getRegionChoices();
         $this->timezoneChoices           = FormFieldHelper::getTimezonesChoices();
         $this->localeChoices             = FormFieldHelper::getLocaleChoices();
-        $this->stageModel                = $stageModel;
-        $this->builderIntegrationsHelper = $builderIntegrationsHelper;
     }
 
     public function buildForm(FormBuilderInterface $builder, array $options): void

@@ -18,14 +18,8 @@ class DecisionExecutioner implements EventInterface
 {
     public const TYPE = 'decision';
 
-    private \Mautic\CampaignBundle\Executioner\Logger\EventLogger $eventLogger;
-
-    private \Mautic\CampaignBundle\Executioner\Dispatcher\DecisionDispatcher $dispatcher;
-
-    public function __construct(EventLogger $eventLogger, DecisionDispatcher $dispatcher)
+    public function __construct(private EventLogger $eventLogger, private DecisionDispatcher $dispatcher)
     {
-        $this->eventLogger = $eventLogger;
-        $this->dispatcher  = $dispatcher;
     }
 
     /**

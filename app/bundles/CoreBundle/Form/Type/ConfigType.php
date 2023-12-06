@@ -30,32 +30,17 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class ConfigType extends AbstractType
 {
-    private Shortener $shortenerFactory;
-
-    private \Symfony\Contracts\Translation\TranslatorInterface $translator;
-
-    private \Mautic\CoreBundle\Helper\LanguageHelper $langHelper;
-
     private array $supportedLanguages;
 
-    private \Mautic\CoreBundle\Factory\IpLookupFactory $ipLookupFactory;
-
-    private ?\Mautic\CoreBundle\IpLookup\AbstractLookup $ipLookup;
-
     public function __construct(
-        TranslatorInterface $translator,
-        LanguageHelper $langHelper,
-        IpLookupFactory $ipLookupFactory,
-        AbstractLookup $ipLookup = null,
-        Shortener $shortenerFactory,
+        private TranslatorInterface $translator,
+        private LanguageHelper $langHelper,
+        private IpLookupFactory $ipLookupFactory,
+        private ?AbstractLookup $ipLookup,
+        private Shortener $shortenerFactory,
         private CoreParametersHelper $coreParametersHelper,
     ) {
-        $this->translator          = $translator;
-        $this->langHelper          = $langHelper;
-        $this->ipLookupFactory     = $ipLookupFactory;
-        $this->ipLookup            = $ipLookup;
         $this->supportedLanguages  = $langHelper->getSupportedLanguages();
-        $this->shortenerFactory    = $shortenerFactory;
     }
 
     public function buildForm(FormBuilderInterface $builder, array $options): void

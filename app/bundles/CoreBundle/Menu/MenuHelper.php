@@ -9,10 +9,6 @@ use Symfony\Component\HttpFoundation\RequestStack;
 
 class MenuHelper
 {
-    protected \Mautic\CoreBundle\Security\Permissions\CorePermissions $security;
-
-    protected \Symfony\Component\HttpFoundation\RequestStack $requestStack;
-
     /**
      * Stores items that are assigned to another parent outside it's bundle.
      *
@@ -20,16 +16,8 @@ class MenuHelper
      */
     private $orphans = [];
 
-    private \Mautic\CoreBundle\Helper\CoreParametersHelper $coreParametersHelper;
-
-    protected \Mautic\PluginBundle\Helper\IntegrationHelper $integrationHelper;
-
-    public function __construct(CorePermissions $security, RequestStack $requestStack, CoreParametersHelper $coreParametersHelper, IntegrationHelper $integrationHelper)
+    public function __construct(protected CorePermissions $security, protected RequestStack $requestStack, private CoreParametersHelper $coreParametersHelper, protected IntegrationHelper $integrationHelper)
     {
-        $this->security              = $security;
-        $this->coreParametersHelper  = $coreParametersHelper;
-        $this->requestStack          = $requestStack;
-        $this->integrationHelper     = $integrationHelper;
     }
 
     /**

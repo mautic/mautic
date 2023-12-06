@@ -9,8 +9,6 @@ use Symfony\Component\HttpFoundation\ParameterBag;
 
 class ParameterLoader
 {
-    private string $rootPath;
-
     private string $configBaseDir;
 
     /**
@@ -33,9 +31,8 @@ class ParameterLoader
      */
     private static $defaultParameters = [];
 
-    public function __construct(string $configRootPath = __DIR__.'/../../../')
+    public function __construct(private string $rootPath = __DIR__.'/../../../')
     {
-        $this->rootPath      = $configRootPath;
         $this->configBaseDir = $this->getLocalConfigBaseDir($this->rootPath);
 
         $this->loadDefaultParameters();

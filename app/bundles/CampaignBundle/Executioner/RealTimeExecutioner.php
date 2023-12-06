@@ -21,10 +21,6 @@ use Psr\Log\LoggerInterface;
 
 class RealTimeExecutioner
 {
-    private \Psr\Log\LoggerInterface $logger;
-
-    private \Mautic\LeadBundle\Model\LeadModel $leadModel;
-
     /**
      * @var Lead
      */
@@ -35,45 +31,13 @@ class RealTimeExecutioner
      */
     private $events;
 
-    private \Mautic\CampaignBundle\Entity\EventRepository $eventRepository;
-
-    private \Mautic\CampaignBundle\Executioner\EventExecutioner $executioner;
-
-    private Executioner $decisionExecutioner;
-
-    private \Mautic\CampaignBundle\EventCollector\EventCollector $collector;
-
-    private \Mautic\CampaignBundle\Executioner\Scheduler\EventScheduler $scheduler;
-
-    private \Mautic\LeadBundle\Tracker\ContactTracker $contactTracker;
-
     /**
      * @var Responses
      */
     private $responses;
 
-    private \Mautic\CampaignBundle\Executioner\Helper\DecisionHelper $decisionHelper;
-
-    public function __construct(
-        LoggerInterface $logger,
-        LeadModel $leadModel,
-        EventRepository $eventRepository,
-        EventExecutioner $executioner,
-        Executioner $decisionExecutioner,
-        EventCollector $collector,
-        EventScheduler $scheduler,
-        ContactTracker $contactTracker,
-        DecisionHelper $decisionHelper
-    ) {
-        $this->logger              = $logger;
-        $this->leadModel           = $leadModel;
-        $this->eventRepository     = $eventRepository;
-        $this->executioner         = $executioner;
-        $this->decisionExecutioner = $decisionExecutioner;
-        $this->collector           = $collector;
-        $this->scheduler           = $scheduler;
-        $this->contactTracker      = $contactTracker;
-        $this->decisionHelper      = $decisionHelper;
+    public function __construct(private LoggerInterface $logger, private LeadModel $leadModel, private EventRepository $eventRepository, private EventExecutioner $executioner, private Executioner $decisionExecutioner, private EventCollector $collector, private EventScheduler $scheduler, private ContactTracker $contactTracker, private DecisionHelper $decisionHelper)
+    {
     }
 
     /**

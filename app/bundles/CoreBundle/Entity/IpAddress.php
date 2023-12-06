@@ -19,11 +19,6 @@ class IpAddress
     private $id;
 
     /**
-     * @var string
-     */
-    private $ipAddress;
-
-    /**
      * @var array<string,string>
      */
     private $ipDetails;
@@ -76,9 +71,8 @@ class IpAddress
      *
      * @param string|null $ipAddress
      */
-    public function __construct($ipAddress = null)
+    public function __construct(private $ipAddress = null)
     {
-        $this->ipAddress = $ipAddress;
     }
 
     /**

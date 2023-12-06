@@ -8,22 +8,11 @@ use Symfony\Contracts\EventDispatcher\Event;
 class BuildJsEvent extends Event
 {
     /**
-     * @var string
+     * @param bool   $debugMode
+     * @param string $js
      */
-    protected $js = '';
-
-    /**
-     * @var bool
-     */
-    protected $debugMode;
-
-    /**
-     * @param bool $debugMode
-     */
-    public function __construct($js, $debugMode = false)
+    public function __construct(protected $js, protected $debugMode = false)
     {
-        $this->js        = $js;
-        $this->debugMode = $debugMode;
     }
 
     /**

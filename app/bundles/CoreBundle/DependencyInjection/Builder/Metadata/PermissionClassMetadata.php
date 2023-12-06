@@ -12,11 +12,8 @@ use Symfony\Component\Finder\Finder;
  */
 class PermissionClassMetadata
 {
-    private \Mautic\CoreBundle\DependencyInjection\Builder\BundleMetadata $metadata;
-
-    public function __construct(BundleMetadata $metadata)
+    public function __construct(private BundleMetadata $metadata)
     {
-        $this->metadata = $metadata;
     }
 
     public function build(): void

@@ -14,17 +14,8 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class UploadSubscriber implements EventSubscriberInterface
 {
-    private \Mautic\CoreBundle\Helper\CoreParametersHelper $coreParametersHelper;
-
-    private \Mautic\AssetBundle\Model\AssetModel $assetModel;
-
-    private \Mautic\CoreBundle\Validator\FileUploadValidator $fileUploadValidator;
-
-    public function __construct(CoreParametersHelper $coreParametersHelper, AssetModel $assetModel, FileUploadValidator $fileUploadValidator)
+    public function __construct(private CoreParametersHelper $coreParametersHelper, private AssetModel $assetModel, private FileUploadValidator $fileUploadValidator)
     {
-        $this->coreParametersHelper = $coreParametersHelper;
-        $this->assetModel           = $assetModel;
-        $this->fileUploadValidator  = $fileUploadValidator;
     }
 
     /**

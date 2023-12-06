@@ -16,14 +16,8 @@ class ReportSubscriber implements EventSubscriberInterface
     public const CONTEXT_ASSET          = 'assets';
     public const CONTEXT_ASSET_DOWNLOAD = 'asset.downloads';
 
-    private \Mautic\LeadBundle\Model\CompanyReportData $companyReportData;
-
-    private \Mautic\AssetBundle\Entity\DownloadRepository $downloadRepository;
-
-    public function __construct(CompanyReportData $companyReportData, DownloadRepository $downloadRepository)
+    public function __construct(private CompanyReportData $companyReportData, private DownloadRepository $downloadRepository)
     {
-        $this->companyReportData  = $companyReportData;
-        $this->downloadRepository = $downloadRepository;
     }
 
     /**

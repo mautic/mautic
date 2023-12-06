@@ -10,17 +10,8 @@ use Psr\Log\LoggerInterface;
 
 class ContactFinder
 {
-    private \Mautic\EmailBundle\Entity\StatRepository $statRepository;
-
-    private \Mautic\LeadBundle\Entity\LeadRepository $leadRepository;
-
-    private \Psr\Log\LoggerInterface $logger;
-
-    public function __construct(StatRepository $statRepository, LeadRepository $leadRepository, LoggerInterface $logger)
+    public function __construct(private StatRepository $statRepository, private LeadRepository $leadRepository, private LoggerInterface $logger)
     {
-        $this->statRepository = $statRepository;
-        $this->leadRepository = $leadRepository;
-        $this->logger         = $logger;
     }
 
     /**

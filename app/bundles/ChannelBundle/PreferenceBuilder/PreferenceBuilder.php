@@ -15,15 +15,8 @@ class PreferenceBuilder
      */
     private $channels = [];
 
-    private \Psr\Log\LoggerInterface $logger;
-
-    private \Mautic\CampaignBundle\Entity\Event $event;
-
-    public function __construct(ArrayCollection $logs, Event $event, array $channels, LoggerInterface $logger)
+    public function __construct(ArrayCollection $logs, private Event $event, array $channels, private LoggerInterface $logger)
     {
-        $this->logger = $logger;
-        $this->event  = $event;
-
         $this->buildRules($logs, $channels);
     }
 

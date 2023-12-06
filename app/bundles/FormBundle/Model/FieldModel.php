@@ -28,15 +28,8 @@ use Symfony\Contracts\EventDispatcher\Event;
  */
 class FieldModel extends CommonFormModel
 {
-    private RequestStack $requestStack;
-
-    protected LeadFieldModel $leadFieldModel;
-
-    public function __construct(LeadFieldModel $leadFieldModel, EntityManager $em, CorePermissions $security, EventDispatcherInterface $dispatcher, UrlGeneratorInterface $router, Translator $translator, UserHelper $userHelper, LoggerInterface $mauticLogger, CoreParametersHelper $coreParametersHelper, RequestStack $requestStack)
+    public function __construct(protected LeadFieldModel $leadFieldModel, EntityManager $em, CorePermissions $security, EventDispatcherInterface $dispatcher, UrlGeneratorInterface $router, Translator $translator, UserHelper $userHelper, LoggerInterface $mauticLogger, CoreParametersHelper $coreParametersHelper, private RequestStack $requestStack)
     {
-        $this->leadFieldModel = $leadFieldModel;
-        $this->requestStack   = $requestStack;
-
         parent::__construct($em, $security, $dispatcher, $router, $translator, $userHelper, $mauticLogger, $coreParametersHelper);
     }
 

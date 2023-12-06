@@ -16,19 +16,13 @@ class Interval implements ScheduleModeInterface
 {
     public const LOG_DATE_FORMAT = 'Y-m-d H:i:s T';
 
-    private \Psr\Log\LoggerInterface $logger;
-
-    private \Mautic\CoreBundle\Helper\CoreParametersHelper $coreParametersHelper;
-
     /**
      * @var \DateTimeZone
      */
     private $defaultTimezone;
 
-    public function __construct(LoggerInterface $logger, CoreParametersHelper $coreParametersHelper)
+    public function __construct(private LoggerInterface $logger, private CoreParametersHelper $coreParametersHelper)
     {
-        $this->logger               = $logger;
-        $this->coreParametersHelper = $coreParametersHelper;
     }
 
     /**

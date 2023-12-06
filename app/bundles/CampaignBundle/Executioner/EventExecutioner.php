@@ -24,52 +24,24 @@ use Psr\Log\LoggerInterface;
 
 class EventExecutioner
 {
-    private \Mautic\CampaignBundle\Executioner\Event\ActionExecutioner $actionExecutioner;
-
-    private \Mautic\CampaignBundle\Executioner\Event\ConditionExecutioner $conditionExecutioner;
-
-    private \Mautic\CampaignBundle\Executioner\Event\DecisionExecutioner $decisionExecutioner;
-
-    private \Mautic\CampaignBundle\EventCollector\EventCollector $collector;
-
-    private \Mautic\CampaignBundle\Executioner\Logger\EventLogger $eventLogger;
-
-    private \Psr\Log\LoggerInterface $logger;
-
-    private \Mautic\CampaignBundle\Executioner\Scheduler\EventScheduler $scheduler;
-
     /**
      * @var Responses
      */
     private $responses;
 
-    private \Mautic\CampaignBundle\Helper\RemovedContactTracker $removedContactTracker;
-
     private \DateTimeInterface $executionDate;
 
-    private \Mautic\CampaignBundle\Entity\LeadRepository $leadRepository;
-
     public function __construct(
-        EventCollector $eventCollector,
-        EventLogger $eventLogger,
-        ActionExecutioner $actionExecutioner,
-        ConditionExecutioner $conditionExecutioner,
-        DecisionExecutioner $decisionExecutioner,
-        LoggerInterface $logger,
-        EventScheduler $scheduler,
-        RemovedContactTracker $removedContactTracker,
-        LeadRepository $leadRepository
+        private EventCollector $collector,
+        private EventLogger $eventLogger,
+        private ActionExecutioner $actionExecutioner,
+        private ConditionExecutioner $conditionExecutioner,
+        private DecisionExecutioner $decisionExecutioner,
+        private LoggerInterface $logger,
+        private EventScheduler $scheduler,
+        private RemovedContactTracker $removedContactTracker,
+        private LeadRepository $leadRepository
     ) {
-        $this->actionExecutioner     = $actionExecutioner;
-        $this->conditionExecutioner  = $conditionExecutioner;
-        $this->decisionExecutioner   = $decisionExecutioner;
-        $this->collector             = $eventCollector;
-        $this->eventLogger           = $eventLogger;
-        $this->logger                = $logger;
-        $this->scheduler             = $scheduler;
-        $this->removedContactTracker = $removedContactTracker;
-        $this->leadRepository        = $leadRepository;
-
         // Be sure that all events are compared using the exact same \DateTime
         $this->executionDate = new \DateTime();
     }

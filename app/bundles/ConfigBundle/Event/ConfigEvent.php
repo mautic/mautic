@@ -16,13 +16,6 @@ class ConfigEvent extends CommonEvent
     /**
      * @var mixed[]
      */
-    private array $config;
-
-    private \Symfony\Component\HttpFoundation\ParameterBag $post;
-
-    /**
-     * @var mixed[]
-     */
     private $errors = [];
 
     /**
@@ -44,10 +37,11 @@ class ConfigEvent extends CommonEvent
      */
     private $normData;
 
-    public function __construct(array $config, ParameterBag $post)
+    /**
+     * @param mixed[] $config
+     */
+    public function __construct(private array $config, private ParameterBag $post)
     {
-        $this->config = $config;
-        $this->post   = $post;
     }
 
     /**

@@ -11,11 +11,6 @@ use Mautic\CoreBundle\Helper\PathsHelper;
  */
 final class ThemeHelper
 {
-    /**
-     * @var string
-     */
-    private $theme;
-
     private string $themeDir;
 
     private string $themePath;
@@ -31,9 +26,8 @@ final class ThemeHelper
      * @throws BadConfigurationException
      * @throws FileNotFoundException
      */
-    public function __construct(PathsHelper $pathsHelper, $theme)
+    public function __construct(PathsHelper $pathsHelper, private $theme)
     {
-        $this->theme     = $theme;
         $this->themeDir  = $pathsHelper->getSystemPath('themes').'/'.$this->theme;
         $this->themePath = $pathsHelper->getSystemPath('themes_root').'/'.$this->themeDir;
 

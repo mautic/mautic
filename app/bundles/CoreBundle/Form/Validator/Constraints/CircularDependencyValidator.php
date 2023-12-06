@@ -14,14 +14,8 @@ use Symfony\Component\Validator\ConstraintValidator;
  */
 class CircularDependencyValidator extends ConstraintValidator
 {
-    private \Mautic\LeadBundle\Model\ListModel $model;
-
-    private \Symfony\Component\HttpFoundation\RequestStack $requestStack;
-
-    public function __construct(ListModel $model, RequestStack $requestStack)
+    public function __construct(private ListModel $model, private RequestStack $requestStack)
     {
-        $this->model        = $model;
-        $this->requestStack = $requestStack;
     }
 
     /**

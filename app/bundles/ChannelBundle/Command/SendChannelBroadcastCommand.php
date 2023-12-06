@@ -19,14 +19,8 @@ use Symfony\Contracts\Translation\TranslatorInterface;
  */
 class SendChannelBroadcastCommand extends ModeratedCommand
 {
-    private EventDispatcherInterface $dispatcher;
-    private TranslatorInterface $translator;
-
-    public function __construct(TranslatorInterface $translator, EventDispatcherInterface $dispatcher, PathsHelper $pathsHelper, CoreParametersHelper $coreParametersHelper)
+    public function __construct(private TranslatorInterface $translator, private EventDispatcherInterface $dispatcher, PathsHelper $pathsHelper, CoreParametersHelper $coreParametersHelper)
     {
-        $this->dispatcher = $dispatcher;
-        $this->translator = $translator;
-
         parent::__construct($pathsHelper, $coreParametersHelper);
     }
 

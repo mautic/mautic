@@ -38,22 +38,12 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
  */
 class CampaignModel extends CommonFormModel
 {
-    protected \Mautic\LeadBundle\Model\ListModel $leadListModel;
-
-    protected \Mautic\FormBundle\Model\FormModel $formModel;
-
-    private \Mautic\CampaignBundle\EventCollector\EventCollector $eventCollector;
-
-    private \Mautic\CampaignBundle\Membership\MembershipBuilder $membershipBuilder;
-
-    private \Mautic\LeadBundle\Tracker\ContactTracker $contactTracker;
-
     public function __construct(
-        ListModel $leadListModel,
-        FormModel $formModel,
-        EventCollector $eventCollector,
-        MembershipBuilder $membershipBuilder,
-        ContactTracker $contactTracker,
+        protected ListModel $leadListModel,
+        protected FormModel $formModel,
+        private EventCollector $eventCollector,
+        private MembershipBuilder $membershipBuilder,
+        private ContactTracker $contactTracker,
         EntityManager $em,
         CorePermissions $security,
         EventDispatcherInterface $dispatcher,
@@ -63,12 +53,6 @@ class CampaignModel extends CommonFormModel
         LoggerInterface $mauticLogger,
         CoreParametersHelper $coreParametersHelper
     ) {
-        $this->leadListModel     = $leadListModel;
-        $this->formModel         = $formModel;
-        $this->eventCollector    = $eventCollector;
-        $this->membershipBuilder = $membershipBuilder;
-        $this->contactTracker    = $contactTracker;
-
         parent::__construct($em, $security, $dispatcher, $router, $translator, $userHelper, $mauticLogger, $coreParametersHelper);
     }
 

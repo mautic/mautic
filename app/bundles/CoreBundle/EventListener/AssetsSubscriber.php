@@ -12,14 +12,8 @@ use Symfony\Component\HttpKernel\KernelEvents;
 
 class AssetsSubscriber implements EventSubscriberInterface
 {
-    private \Mautic\CoreBundle\Twig\Helper\AssetsHelper $assetsHelper;
-
-    private \Symfony\Component\EventDispatcher\EventDispatcherInterface $dispatcher;
-
-    public function __construct(AssetsHelper $assetsHelper, EventDispatcherInterface $dispatcher)
+    public function __construct(private AssetsHelper $assetsHelper, private EventDispatcherInterface $dispatcher)
     {
-        $this->assetsHelper = $assetsHelper;
-        $this->dispatcher   = $dispatcher;
     }
 
     /**

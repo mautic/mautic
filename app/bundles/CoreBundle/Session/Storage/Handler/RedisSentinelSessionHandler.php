@@ -17,12 +17,8 @@ class RedisSentinelSessionHandler extends AbstractSessionHandler
      */
     private \Predis\Client $redis;
 
-    private array $redisConfiguration;
-
-    public function __construct(array $redisConfiguration, CoreParametersHelper $coreParametersHelper)
+    public function __construct(private array $redisConfiguration, CoreParametersHelper $coreParametersHelper)
     {
-        $this->redisConfiguration = $redisConfiguration;
-
         $redisOptions = PRedisConnectionHelper::makeRedisOptions($redisConfiguration, 'session:'.$coreParametersHelper->get('db_name').':');
 
         $redisOptions['primaryOnly'] = $coreParametersHelper->get('redis_primary_only');

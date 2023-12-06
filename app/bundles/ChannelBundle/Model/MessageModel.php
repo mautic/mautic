@@ -31,17 +31,10 @@ class MessageModel extends FormModel implements AjaxLookupModelInterface
 {
     public const CHANNEL_FEATURE = 'marketing_messages';
 
-    protected \Mautic\ChannelBundle\Helper\ChannelListHelper $channelListHelper;
-
-    protected \Mautic\CampaignBundle\Model\CampaignModel $campaignModel;
-
     protected static $channels;
 
-    public function __construct(ChannelListHelper $channelListHelper, CampaignModel $campaignModel, EntityManager $em, CorePermissions $security, EventDispatcherInterface $dispatcher, UrlGeneratorInterface $router, Translator $translator, UserHelper $userHelper, LoggerInterface $mauticLogger, CoreParametersHelper $coreParametersHelper)
+    public function __construct(protected ChannelListHelper $channelListHelper, protected CampaignModel $campaignModel, EntityManager $em, CorePermissions $security, EventDispatcherInterface $dispatcher, UrlGeneratorInterface $router, Translator $translator, UserHelper $userHelper, LoggerInterface $mauticLogger, CoreParametersHelper $coreParametersHelper)
     {
-        $this->channelListHelper = $channelListHelper;
-        $this->campaignModel     = $campaignModel;
-
         parent::__construct($em, $security, $dispatcher, $router, $translator, $userHelper, $mauticLogger, $coreParametersHelper);
     }
 

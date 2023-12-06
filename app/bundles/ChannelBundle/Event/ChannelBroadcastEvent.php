@@ -28,8 +28,6 @@ class ChannelBroadcastEvent extends Event
      */
     protected $results = [];
 
-    protected \Symfony\Component\Console\Output\OutputInterface $output;
-
     /**
      * Min contact ID filter can be used for process parallelization.
      *
@@ -68,11 +66,10 @@ class ChannelBroadcastEvent extends Event
      */
     private $threadId;
 
-    public function __construct($channel, $channelId, OutputInterface $output)
+    public function __construct($channel, $channelId, protected OutputInterface $output)
     {
         $this->channel = $channel;
         $this->id      = $channelId;
-        $this->output  = $output;
     }
 
     /**

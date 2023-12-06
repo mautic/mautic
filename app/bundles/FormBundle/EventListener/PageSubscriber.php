@@ -16,24 +16,8 @@ class PageSubscriber implements EventSubscriberInterface
 {
     private $formRegex = '{form=(.*?)}';
 
-    private \Mautic\FormBundle\Model\FormModel $formModel;
-
-    private \Mautic\CoreBundle\Helper\BuilderTokenHelperFactory $builderTokenHelperFactory;
-
-    private \Symfony\Contracts\Translation\TranslatorInterface $translator;
-
-    private \Mautic\CoreBundle\Security\Permissions\CorePermissions $security;
-
-    public function __construct(
-        FormModel $formModel,
-        BuilderTokenHelperFactory $builderTokenHelperFactory,
-        TranslatorInterface $translator,
-        CorePermissions $security
-    ) {
-        $this->formModel                 = $formModel;
-        $this->builderTokenHelperFactory = $builderTokenHelperFactory;
-        $this->translator                = $translator;
-        $this->security                  = $security;
+    public function __construct(private FormModel $formModel, private BuilderTokenHelperFactory $builderTokenHelperFactory, private TranslatorInterface $translator, private CorePermissions $security)
+    {
     }
 
     /**

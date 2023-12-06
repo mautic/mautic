@@ -10,11 +10,6 @@ class Installer
     /**
      * @var string
      */
-    private $translationsDirectory;
-
-    /**
-     * @var string
-     */
     private $sourceDirectory;
 
     /**
@@ -29,9 +24,8 @@ class Installer
      *
      * @param string $translationsDirectory
      */
-    public function __construct($translationsDirectory)
+    public function __construct(private $translationsDirectory)
     {
-        $this->translationsDirectory = $translationsDirectory;
         $this->filesystem            = new Filesystem();
     }
 

@@ -12,13 +12,8 @@ use Symfony\Component\Validator\Constraints\NotBlank;
 
 class MessageSendType extends AbstractType
 {
-    protected \Symfony\Component\Routing\RouterInterface $router;
-    protected \Mautic\ChannelBundle\Model\MessageModel $messageModel;
-
-    public function __construct(RouterInterface $router, MessageModel $messageModel)
+    public function __construct(protected RouterInterface $router, protected MessageModel $messageModel)
     {
-        $this->router       = $router;
-        $this->messageModel = $messageModel;
     }
 
     public function buildForm(FormBuilderInterface $builder, array $options): void

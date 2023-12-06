@@ -13,19 +13,10 @@ use Mautic\CoreBundle\Exception\SchemaException;
  */
 class TableSchemaHelper
 {
-    protected \Doctrine\DBAL\Connection $db;
-
     /**
      * @var \Doctrine\DBAL\Schema\AbstractSchemaManager<\Doctrine\DBAL\Platforms\AbstractMySQLPlatform>
      */
     protected \Doctrine\DBAL\Schema\AbstractSchemaManager $sm;
-
-    /**
-     * @var string
-     */
-    protected $prefix;
-
-    protected \Mautic\CoreBundle\Doctrine\Helper\ColumnSchemaHelper $columnHelper;
 
     /**
      * @var \Doctrine\DBAL\Schema\Schema
@@ -42,12 +33,12 @@ class TableSchemaHelper
      */
     protected array $addTables = [];
 
-    public function __construct(Connection $db, $prefix, ColumnSchemaHelper $columnHelper)
+    /**
+     * @param string $prefix
+     */
+    public function __construct(protected Connection $db, protected $prefix, protected ColumnSchemaHelper $columnHelper)
     {
-        $this->db           = $db;
         $this->sm           = $db->getSchemaManager();
-        $this->prefix       = $prefix;
-        $this->columnHelper = $columnHelper;
     }
 
     /**

@@ -10,8 +10,6 @@ use Mautic\LeadBundle\Entity\Lead;
 
 class EmailSendEvent extends CommonEvent
 {
-    private ?\Mautic\EmailBundle\Helper\MailHelper $helper;
-
     /**
      * @var Email|null
      */
@@ -63,17 +61,11 @@ class EmailSendEvent extends CommonEvent
     private $textHeaders = [];
 
     /**
-     * @var bool
-     */
-    private $isDynamicContentParsing;
-
-    /**
      * @param array $args
      * @param bool  $isDynamicContentParsing
      */
-    public function __construct(MailHelper $helper = null, $args = [], $isDynamicContentParsing = false)
+    public function __construct(private ?MailHelper $helper = null, $args = [], private $isDynamicContentParsing = false)
     {
-        $this->helper      = $helper;
         $this->content     = $args['content'] ?? '';
         $this->plainText   = $args['plainText'] ?? '';
         $this->subject     = $args['subject'] ?? '';
@@ -93,8 +85,6 @@ class EmailSendEvent extends CommonEvent
         } elseif (null !== $helper) {
             $this->internalSend = $helper->isInternalSend();
         }
-
-        $this->isDynamicContentParsing = $isDynamicContentParsing;
     }
 
     /**

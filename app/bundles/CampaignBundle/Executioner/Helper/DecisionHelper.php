@@ -11,12 +11,8 @@ use Mautic\LeadBundle\Entity\Lead;
 
 class DecisionHelper
 {
-    private LeadRepository $leadRepository;
-
-    public function __construct(
-        LeadRepository $leadRepository
-    ) {
-        $this->leadRepository = $leadRepository;
+    public function __construct(private LeadRepository $leadRepository)
+    {
     }
 
     /**

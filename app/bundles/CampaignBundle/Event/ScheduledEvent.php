@@ -9,37 +9,24 @@ class ScheduledEvent extends CampaignScheduledEvent
 {
     use ContextTrait;
 
-    private \Mautic\CampaignBundle\EventCollector\Accessor\Event\AbstractEventAccessor $eventConfig;
-
-    private \Mautic\CampaignBundle\Entity\LeadEventLog $eventLog;
-
-    /**
-     * @var bool
-     */
-    private $isReschedule;
-
     /**
      * ScheduledEvent constructor.
      *
      * @param bool $isReschedule
      */
-    public function __construct(AbstractEventAccessor $config, LeadEventLog $log, $isReschedule = false)
+    public function __construct(private AbstractEventAccessor $eventConfig, private LeadEventLog $eventLog, private $isReschedule = false)
     {
-        $this->eventConfig  = $config;
-        $this->eventLog     = $log;
-        $this->isReschedule = $isReschedule;
-
         // @deprecated support for pre 2.13.0; to be removed in 3.0
         parent::__construct(
             [
-                'eventSettings'   => $config->getConfig(),
+                'eventSettings'   => $eventConfig->getConfig(),
                 'eventDetails'    => null,
-                'event'           => $log->getEvent(),
-                'lead'            => $log->getLead(),
+                'event'           => $eventLog->getEvent(),
+                'lead'            => $eventLog->getLead(),
                 'systemTriggered' => true,
-                'dateScheduled'   => $log->getTriggerDate(),
+                'dateScheduled'   => $eventLog->getTriggerDate(),
             ],
-            $log
+            $eventLog
         );
     }
 

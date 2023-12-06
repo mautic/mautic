@@ -29,48 +29,8 @@ use Symfony\Component\Security\Http\SecurityEvents;
 
 class CoreSubscriber implements EventSubscriberInterface
 {
-    private \Mautic\CoreBundle\Helper\BundleHelper $bundleHelper;
-
-    private \Mautic\CoreBundle\Menu\MenuHelper $menuHelper;
-
-    private \Mautic\CoreBundle\Helper\UserHelper $userHelper;
-
-    private \Mautic\CoreBundle\Twig\Helper\AssetsHelper $assetsHelper;
-
-    private \Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface $securityContext;
-
-    private \Mautic\UserBundle\Model\UserModel $userModel;
-
-    private \Mautic\CoreBundle\Helper\CoreParametersHelper $coreParametersHelper;
-
-    private \Symfony\Component\EventDispatcher\EventDispatcherInterface $dispatcher;
-
-    private \Symfony\Component\HttpFoundation\RequestStack $requestStack;
-
-    private \Mautic\FormBundle\Entity\FormRepository $formRepository;
-
-    public function __construct(
-        BundleHelper $bundleHelper,
-        MenuHelper $menuHelper,
-        UserHelper $userHelper,
-        AssetsHelper $assetsHelper,
-        CoreParametersHelper $coreParametersHelper,
-        AuthorizationCheckerInterface $securityContext,
-        UserModel $userModel,
-        EventDispatcherInterface $dispatcher,
-        RequestStack $requestStack,
-        FormRepository $formRepository,
-    ) {
-        $this->bundleHelper         = $bundleHelper;
-        $this->menuHelper           = $menuHelper;
-        $this->userHelper           = $userHelper;
-        $this->assetsHelper         = $assetsHelper;
-        $this->securityContext      = $securityContext;
-        $this->userModel            = $userModel;
-        $this->coreParametersHelper = $coreParametersHelper;
-        $this->dispatcher           = $dispatcher;
-        $this->requestStack         = $requestStack;
-        $this->formRepository       = $formRepository;
+    public function __construct(private BundleHelper $bundleHelper, private MenuHelper $menuHelper, private UserHelper $userHelper, private AssetsHelper $assetsHelper, private CoreParametersHelper $coreParametersHelper, private AuthorizationCheckerInterface $securityContext, private UserModel $userModel, private EventDispatcherInterface $dispatcher, private RequestStack $requestStack, private FormRepository $formRepository)
+    {
     }
 
     /**

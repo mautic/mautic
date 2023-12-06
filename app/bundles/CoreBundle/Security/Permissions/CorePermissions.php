@@ -12,16 +12,6 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class CorePermissions
 {
-    private \Symfony\Contracts\Translation\TranslatorInterface $translator;
-
-    protected \Mautic\CoreBundle\Helper\UserHelper $userHelper;
-
-    private \Mautic\CoreBundle\Helper\CoreParametersHelper $coreParametersHelper;
-
-    private array $bundles;
-
-    private array $pluginBundles;
-
     /**
      * @var array
      */
@@ -53,18 +43,12 @@ class CorePermissions
     private $permissionObjectsGenerated = false;
 
     public function __construct(
-        UserHelper $userHelper,
-        TranslatorInterface $translator,
-        CoreParametersHelper $coreParametersHelper,
-        array $bundles,
-        array $pluginBundles
+        protected UserHelper $userHelper,
+        private TranslatorInterface $translator,
+        private CoreParametersHelper $coreParametersHelper,
+        private array $bundles,
+        private array $pluginBundles
     ) {
-        $this->userHelper           = $userHelper;
-        $this->translator           = $translator;
-        $this->coreParametersHelper = $coreParametersHelper;
-        $this->bundles              = $bundles;
-        $this->pluginBundles        = $pluginBundles;
-
         $this->registerPermissionClasses();
     }
 

@@ -7,15 +7,9 @@ use Mautic\CoreBundle\Event\CommonEvent;
 
 class AssetLoadEvent extends CommonEvent
 {
-    /**
-     * @var bool
-     */
-    protected $unique;
-
-    public function __construct(Download $download, $isUnique)
+    public function __construct(Download $download, protected bool $unique)
     {
         $this->entity = $download;
-        $this->unique = $isUnique;
     }
 
     /**
@@ -38,10 +32,8 @@ class AssetLoadEvent extends CommonEvent
 
     /**
      * Returns if this is the first download for the session.
-     *
-     * @return bool
      */
-    public function isUnique()
+    public function isUnique(): bool
     {
         return $this->unique;
     }

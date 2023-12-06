@@ -42,10 +42,6 @@ class FetchCommonApiController extends AbstractFOSRestController implements Maut
     use RequestTrait;
     use FormErrorMessagesTrait;
 
-    protected \Symfony\Component\EventDispatcher\EventDispatcherInterface $dispatcher;
-
-    protected \Mautic\CoreBundle\Helper\CoreParametersHelper $coreParametersHelper;
-
     /**
      * If set to true, serializer will not return null values.
      *
@@ -88,13 +84,6 @@ class FetchCommonApiController extends AbstractFOSRestController implements Maut
      */
     protected $extraGetEntitiesArguments = [];
 
-    protected \Mautic\CoreBundle\Factory\MauticFactory $factory;
-
-    /**
-     * @var ModelFactory<E>
-     */
-    protected \Mautic\CoreBundle\Factory\ModelFactory $modelFactory;
-
     /**
      * @var bool
      */
@@ -128,10 +117,6 @@ class FetchCommonApiController extends AbstractFOSRestController implements Maut
      */
     protected $permissionBase;
 
-    private RequestStack $requestStack;
-
-    protected \Mautic\CoreBundle\Security\Permissions\CorePermissions $security;
-
     /**
      * @var array<int, string>
      */
@@ -144,37 +129,22 @@ class FetchCommonApiController extends AbstractFOSRestController implements Maut
 
     protected ContainerBagInterface $parametersContainer;
 
-    protected EntityResultHelper $entityResultHelper;
-
-    private AppVersion $appVersion;
-
-    protected ManagerRegistry $doctrine;
-
     /**
      * @param ModelFactory<E> $modelFactory
      */
     public function __construct(
-        CorePermissions $security,
+        protected CorePermissions $security,
         Translator $translator,
-        EntityResultHelper $entityResultHelper,
-        AppVersion $appVersion,
-        RequestStack $requestStack,
-        ManagerRegistry $doctrine,
-        ModelFactory $modelFactory,
-        EventDispatcherInterface $dispatcher,
-        CoreParametersHelper $coreParametersHelper,
-        MauticFactory $factory,
+        protected EntityResultHelper $entityResultHelper,
+        private AppVersion $appVersion,
+        private RequestStack $requestStack,
+        protected ManagerRegistry $doctrine,
+        protected ModelFactory $modelFactory,
+        protected EventDispatcherInterface $dispatcher,
+        protected CoreParametersHelper $coreParametersHelper,
+        protected MauticFactory $factory,
     ) {
-        $this->security             = $security;
         $this->translator           = $translator;
-        $this->entityResultHelper   = $entityResultHelper;
-        $this->appVersion           = $appVersion;
-        $this->requestStack         = $requestStack;
-        $this->doctrine             = $doctrine;
-        $this->modelFactory         = $modelFactory;
-        $this->dispatcher           = $dispatcher;
-        $this->coreParametersHelper = $coreParametersHelper;
-        $this->factory              = $factory;
 
         if (null !== $this->model && !$this->permissionBase && method_exists($this->model, 'getPermissionBase')) {
             $this->permissionBase = $this->model->getPermissionBase();

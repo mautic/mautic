@@ -15,33 +15,13 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class Unsubscribe implements ProcessorInterface
 {
-    private \Symfony\Component\Mailer\Transport\TransportInterface $transport;
-
-    private \Mautic\EmailBundle\MonitoredEmail\Search\ContactFinder $contactFinder;
-
-    private \Symfony\Contracts\Translation\TranslatorInterface $translator;
-
-    private \Psr\Log\LoggerInterface $logger;
-
     /**
      * @var Message
      */
     private $message;
 
-    private DoNotContactModel $doNotContact;
-
-    public function __construct(
-        TransportInterface $transport,
-        ContactFinder $contactFinder,
-        TranslatorInterface $translator,
-        LoggerInterface $logger,
-        DoNotContactModel $doNotContact
-    ) {
-        $this->transport     = $transport;
-        $this->contactFinder = $contactFinder;
-        $this->translator    = $translator;
-        $this->logger        = $logger;
-        $this->doNotContact  = $doNotContact;
+    public function __construct(private TransportInterface $transport, private ContactFinder $contactFinder, private TranslatorInterface $translator, private LoggerInterface $logger, private DoNotContactModel $doNotContact)
+    {
     }
 
     public function process(Message $message): bool

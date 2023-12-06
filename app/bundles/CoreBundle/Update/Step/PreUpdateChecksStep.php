@@ -14,13 +14,8 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 final class PreUpdateChecksStep implements StepInterface
 {
-    private TranslatorInterface $translator;
-    private UpdateHelper $updateHelper;
-
-    public function __construct(TranslatorInterface $translator, UpdateHelper $updateHelper)
+    public function __construct(private TranslatorInterface $translator, private UpdateHelper $updateHelper)
     {
-        $this->translator   = $translator;
-        $this->updateHelper = $updateHelper;
     }
 
     public function getOrder(): int

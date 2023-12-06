@@ -15,19 +15,9 @@ class ValidateEventCommand extends Command
 {
     use WriteCountTrait;
 
-    private \Mautic\CampaignBundle\Executioner\InactiveExecutioner $inactiveExecution;
-
-    private \Symfony\Contracts\Translation\TranslatorInterface $translator;
-
-    private \Mautic\CoreBundle\Twig\Helper\FormatterHelper $formatterHelper;
-
-    public function __construct(InactiveExecutioner $inactiveExecutioner, TranslatorInterface $translator, FormatterHelper $formatterHelper)
+    public function __construct(private InactiveExecutioner $inactiveExecution, private TranslatorInterface $translator, private FormatterHelper $formatterHelper)
     {
         parent::__construct();
-
-        $this->inactiveExecution = $inactiveExecutioner;
-        $this->translator        = $translator;
-        $this->formatterHelper   = $formatterHelper;
     }
 
     /**

@@ -11,20 +11,8 @@ use Twig\Environment;
 
 class SearchSubscriber implements EventSubscriberInterface
 {
-    private \Mautic\CampaignBundle\Model\CampaignModel $campaignModel;
-
-    private \Mautic\CoreBundle\Security\Permissions\CorePermissions $security;
-
-    private \Twig\Environment $twig;
-
-    public function __construct(
-        CampaignModel $campaignModel,
-        CorePermissions $security,
-        Environment $twig
-    ) {
-        $this->campaignModel = $campaignModel;
-        $this->security      = $security;
-        $this->twig          = $twig;
+    public function __construct(private CampaignModel $campaignModel, private CorePermissions $security, private Environment $twig)
+    {
     }
 
     /**

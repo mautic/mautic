@@ -15,11 +15,6 @@ class BatchIdToEntityHelper
     private $originalKeys = [];
 
     /**
-     * @var string
-     */
-    private $idKey;
-
-    /**
      * @var array
      */
     private $errors = [];
@@ -34,10 +29,8 @@ class BatchIdToEntityHelper
      *
      * @param string $idKey
      */
-    public function __construct(array $parameters, $idKey = 'id')
+    public function __construct(array $parameters, private $idKey = 'id')
     {
-        $this->idKey = $idKey;
-
         $this->extractIds($parameters);
     }
 

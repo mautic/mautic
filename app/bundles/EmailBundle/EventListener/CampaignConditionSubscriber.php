@@ -12,11 +12,8 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class CampaignConditionSubscriber implements EventSubscriberInterface
 {
-    private \Mautic\EmailBundle\Helper\EmailValidator $validator;
-
-    public function __construct(EmailValidator $validator)
+    public function __construct(private EmailValidator $validator)
     {
-        $this->validator = $validator;
     }
 
     /**

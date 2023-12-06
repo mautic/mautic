@@ -10,11 +10,8 @@ class EmailReplyEvent extends Event
 {
     private ?\Mautic\EmailBundle\Entity\Email $email;
 
-    private \Mautic\EmailBundle\Entity\Stat $stat;
-
-    public function __construct(Stat $stat)
+    public function __construct(private Stat $stat)
     {
-        $this->stat  = $stat;
         $this->email = $stat->getEmail();
     }
 

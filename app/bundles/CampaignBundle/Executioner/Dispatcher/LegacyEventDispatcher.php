@@ -30,32 +30,8 @@ class LegacyEventDispatcher
 {
     use EventArrayTrait;
 
-    private \Symfony\Component\EventDispatcher\EventDispatcherInterface $dispatcher;
-
-    private \Mautic\CampaignBundle\Executioner\Scheduler\EventScheduler $scheduler;
-
-    private \Psr\Log\LoggerInterface $logger;
-
-    private \Mautic\CampaignBundle\Executioner\Helper\NotificationHelper $notificationHelper;
-
-    private \Mautic\CoreBundle\Factory\MauticFactory $factory;
-
-    private \Mautic\LeadBundle\Tracker\ContactTracker $contactTracker;
-
-    public function __construct(
-        EventDispatcherInterface $dispatcher,
-        EventScheduler $scheduler,
-        LoggerInterface $logger,
-        NotificationHelper $notificationHelper,
-        MauticFactory $factory,
-        ContactTracker $contactTracker
-    ) {
-        $this->dispatcher         = $dispatcher;
-        $this->scheduler          = $scheduler;
-        $this->logger             = $logger;
-        $this->notificationHelper = $notificationHelper;
-        $this->factory            = $factory;
-        $this->contactTracker     = $contactTracker;
+    public function __construct(private EventDispatcherInterface $dispatcher, private EventScheduler $scheduler, private LoggerInterface $logger, private NotificationHelper $notificationHelper, private MauticFactory $factory, private ContactTracker $contactTracker)
+    {
     }
 
     public function dispatchCustomEvent(

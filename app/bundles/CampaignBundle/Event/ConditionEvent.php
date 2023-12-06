@@ -9,31 +9,24 @@ class ConditionEvent extends CampaignExecutionEvent
 {
     use ContextTrait;
 
-    private \Mautic\CampaignBundle\EventCollector\Accessor\Event\AbstractEventAccessor $eventConfig;
-
-    private \Mautic\CampaignBundle\Entity\LeadEventLog $eventLog;
-
     /**
      * @var bool
      */
     private $passed = false;
 
-    public function __construct(AbstractEventAccessor $config, LeadEventLog $log)
+    public function __construct(private AbstractEventAccessor $eventConfig, private LeadEventLog $eventLog)
     {
-        $this->eventConfig = $config;
-        $this->eventLog    = $log;
-
         // @deprecated support for pre 2.13.0; to be removed in 3.0
         parent::__construct(
             [
-                'eventSettings'   => $config->getConfig(),
+                'eventSettings'   => $eventConfig->getConfig(),
                 'eventDetails'    => null,
-                'event'           => $log->getEvent(),
-                'lead'            => $log->getLead(),
-                'systemTriggered' => $log->getSystemTriggered(),
+                'event'           => $eventLog->getEvent(),
+                'lead'            => $eventLog->getLead(),
+                'systemTriggered' => $eventLog->getSystemTriggered(),
             ],
             null,
-            $log
+            $eventLog
         );
     }
 

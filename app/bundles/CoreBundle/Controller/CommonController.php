@@ -35,44 +35,14 @@ class CommonController extends AbstractController implements MauticController
 {
     use FormThemeTrait;
 
-    protected \Mautic\CoreBundle\Factory\MauticFactory $factory;
-
-    /**
-     * @var ModelFactory<object>
-     */
-    protected ModelFactory $modelFactory;
-
     protected ?\Mautic\UserBundle\Entity\User $user;
-
-    protected \Mautic\CoreBundle\Helper\CoreParametersHelper $coreParametersHelper;
-
-    protected \Symfony\Component\EventDispatcher\EventDispatcherInterface $dispatcher;
-
-    protected Translator $translator;
-
-    private ?RequestStack $requestStack = null;
-
-    protected ?CorePermissions $security = null;
-
-    private \Mautic\CoreBundle\Service\FlashBag $flashBag;
-
-    protected ManagerRegistry $doctrine;
 
     /**
      * @param ModelFactory<object> $modelFactory
      */
-    public function __construct(ManagerRegistry $doctrine, MauticFactory $factory, ModelFactory $modelFactory, UserHelper $userHelper, CoreParametersHelper $coreParametersHelper, EventDispatcherInterface $dispatcher, Translator $translator, FlashBag $flashBag, RequestStack $requestStack, CorePermissions $security)
+    public function __construct(protected ManagerRegistry $doctrine, protected MauticFactory $factory, protected ModelFactory $modelFactory, UserHelper $userHelper, protected CoreParametersHelper $coreParametersHelper, protected EventDispatcherInterface $dispatcher, protected Translator $translator, private FlashBag $flashBag, private ?RequestStack $requestStack, protected ?CorePermissions $security)
     {
-        $this->doctrine             = $doctrine;
-        $this->factory              = $factory;
-        $this->modelFactory         = $modelFactory;
         $this->user                 = $userHelper->getUser();
-        $this->coreParametersHelper = $coreParametersHelper;
-        $this->dispatcher           = $dispatcher;
-        $this->translator           = $translator;
-        $this->flashBag             = $flashBag;
-        $this->requestStack         = $requestStack;
-        $this->security             = $security;
     }
 
     protected function getCurrentRequest(): Request

@@ -4,8 +4,6 @@ namespace Mautic\CampaignBundle\EventCollector\Accessor\Event;
 
 abstract class AbstractEventAccessor
 {
-    protected array $config;
-
     /**
      * @var array
      */
@@ -26,10 +24,8 @@ abstract class AbstractEventAccessor
      */
     private $extraProperties = [];
 
-    public function __construct(array $config)
+    public function __construct(protected array $config)
     {
-        $this->config = $config;
-
         $this->filterExtraProperties();
     }
 

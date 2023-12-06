@@ -9,8 +9,6 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class ChannelListHelper
 {
-    private Translator $translator;
-
     /**
      * @var array<string,string>
      */
@@ -21,12 +19,8 @@ class ChannelListHelper
      */
     private array $featureChannels = [];
 
-    private EventDispatcherInterface $dispatcher;
-
-    public function __construct(EventDispatcherInterface $dispatcher, Translator $translator)
+    public function __construct(private EventDispatcherInterface $dispatcher, private Translator $translator)
     {
-        $this->translator = $translator;
-        $this->dispatcher = $dispatcher;
     }
 
     /**

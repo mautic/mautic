@@ -16,24 +16,8 @@ class FlashBag
     public const LEVEL_WARNING   = 'warning';
     public const LEVEL_NOTICE    = 'notice';
 
-    private \Symfony\Component\HttpFoundation\Session\Session $session;
-
-    private \Symfony\Contracts\Translation\TranslatorInterface $translator;
-
-    private \Mautic\CoreBundle\Model\NotificationModel $notificationModel;
-
-    private \Symfony\Component\HttpFoundation\RequestStack $requestStack;
-
-    public function __construct(
-        Session $session,
-        TranslatorInterface $translator,
-        RequestStack $requestStack,
-        NotificationModel $notificationModel
-    ) {
-        $this->session           = $session;
-        $this->translator        = $translator;
-        $this->requestStack      = $requestStack;
-        $this->notificationModel = $notificationModel;
+    public function __construct(private Session $session, private TranslatorInterface $translator, private RequestStack $requestStack, private NotificationModel $notificationModel)
+    {
     }
 
     /**

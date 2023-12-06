@@ -8,20 +8,14 @@ use Symfony\Contracts\EventDispatcher\Event;
 
 class RouteEvent extends Event
 {
-    protected \Symfony\Component\Config\Loader\Loader $loader;
-
     protected \Symfony\Component\Routing\RouteCollection $collection;
 
     /**
-     * @var string
+     * @param string $type
      */
-    protected $type;
-
-    public function __construct(Loader $loader, $type = 'main')
+    public function __construct(protected Loader $loader, protected $type = 'main')
     {
-        $this->loader     = $loader;
         $this->collection = new RouteCollection();
-        $this->type       = $type;
     }
 
     /**

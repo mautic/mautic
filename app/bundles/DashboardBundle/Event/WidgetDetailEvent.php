@@ -21,16 +21,14 @@ class WidgetDetailEvent extends CommonEvent
     protected $cacheTimeout;
     protected float $startTime;
     protected $loadTime  = 0;
-    protected \Symfony\Contracts\Translation\TranslatorInterface $translator;
 
     /**
      * @var CorePermissions
      */
     protected $security;
 
-    public function __construct(TranslatorInterface $translator)
+    public function __construct(protected TranslatorInterface $translator)
     {
-        $this->translator = $translator;
         $this->startTime  = microtime(true);
     }
 

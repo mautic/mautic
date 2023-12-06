@@ -14,12 +14,6 @@ use Twig\Environment;
 
 class ThemeHelper implements ThemeHelperInterface
 {
-    private \Mautic\CoreBundle\Helper\PathsHelper $pathsHelper;
-
-    private \Twig\Environment $twig;
-
-    private \Symfony\Contracts\Translation\TranslatorInterface $translator;
-
     /**
      * @var array|mixed
      */
@@ -44,10 +38,6 @@ class ThemeHelper implements ThemeHelperInterface
      * @var twigThemeHelper[]
      */
     private $themeHelpers = [];
-
-    private \Mautic\CoreBundle\Helper\CoreParametersHelper $coreParametersHelper;
-
-    private \Mautic\IntegrationsBundle\Helper\BuilderIntegrationsHelper $builderIntegrationsHelper;
 
     private \Mautic\CoreBundle\Helper\Filesystem $filesystem;
 
@@ -89,19 +79,14 @@ class ThemeHelper implements ThemeHelperInterface
     ];
 
     public function __construct(
-        PathsHelper $pathsHelper,
-        Environment $twig,
-        TranslatorInterface $translator,
-        CoreParametersHelper $coreParametersHelper,
+        private PathsHelper $pathsHelper,
+        private Environment $twig,
+        private TranslatorInterface $translator,
+        private CoreParametersHelper $coreParametersHelper,
         Filesystem $filesystem,
         Finder $finder,
-        BuilderIntegrationsHelper $builderIntegrationsHelper
+        private BuilderIntegrationsHelper $builderIntegrationsHelper
     ) {
-        $this->pathsHelper               = $pathsHelper;
-        $this->twig                      = $twig;
-        $this->translator                = $translator;
-        $this->coreParametersHelper      = $coreParametersHelper;
-        $this->builderIntegrationsHelper = $builderIntegrationsHelper;
         $this->filesystem                = clone $filesystem;
         $this->finder                    = clone $finder;
     }

@@ -13,19 +13,10 @@ class MenuEvent extends Event
     protected $menuItems = ['children' => []];
 
     /**
-     * @var string
-     */
-    protected $type;
-
-    protected \Mautic\CoreBundle\Menu\MenuHelper $helper;
-
-    /**
      * @param string $type
      */
-    public function __construct(MenuHelper $menuHelper, $type = 'main')
+    public function __construct(protected MenuHelper $helper, protected $type = 'main')
     {
-        $this->helper = $menuHelper;
-        $this->type   = $type;
     }
 
     public function setMenuItems(array $menuItems): void

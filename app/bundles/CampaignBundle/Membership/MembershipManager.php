@@ -19,33 +19,13 @@ class MembershipManager
     public const ACTION_ADDED   = 'added';
     public const ACTION_REMOVED = 'removed';
 
-    private \Mautic\CampaignBundle\Membership\Action\Adder $adder;
-
-    private \Mautic\CampaignBundle\Membership\Action\Remover $remover;
-
-    private \Mautic\CampaignBundle\Membership\EventDispatcher $eventDispatcher;
-
-    private \Mautic\CampaignBundle\Entity\LeadRepository $leadRepository;
-
-    private \Psr\Log\LoggerInterface $logger;
-
     /**
      * @var ProgressBar
      */
     private $progressBar;
 
-    public function __construct(
-        Adder $adder,
-        Remover $remover,
-        EventDispatcher $eventDispatcher,
-        LeadRepository $leadRepository,
-        LoggerInterface $logger
-    ) {
-        $this->adder           = $adder;
-        $this->remover         = $remover;
-        $this->eventDispatcher = $eventDispatcher;
-        $this->leadRepository  = $leadRepository;
-        $this->logger          = $logger;
+    public function __construct(private Adder $adder, private Remover $remover, private EventDispatcher $eventDispatcher, private LeadRepository $leadRepository, private LoggerInterface $logger)
+    {
     }
 
     /**

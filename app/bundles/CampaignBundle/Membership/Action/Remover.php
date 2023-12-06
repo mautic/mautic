@@ -13,21 +13,14 @@ class Remover
 {
     public const NAME = 'removed';
 
-    private \Mautic\CampaignBundle\Entity\LeadRepository $leadRepository;
-
-    private \Mautic\CampaignBundle\Entity\LeadEventLogRepository $leadEventLogRepository;
-
     private ?string $unscheduledMessage;
 
     public function __construct(
-        LeadRepository $leadRepository,
-        LeadEventLogRepository $leadEventLogRepository,
+        private LeadRepository $leadRepository,
+        private LeadEventLogRepository $leadEventLogRepository,
         TranslatorInterface $translator,
         DateHelper $dateHelper
     ) {
-        $this->leadRepository         = $leadRepository;
-        $this->leadEventLogRepository = $leadEventLogRepository;
-
         $dateRemoved              = $dateHelper->toFull(new \DateTime());
         $this->unscheduledMessage = $translator->trans('mautic.campaign.member.removed', ['%date%' => $dateRemoved]);
     }

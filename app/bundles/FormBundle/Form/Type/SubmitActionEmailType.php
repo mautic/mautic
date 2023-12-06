@@ -20,14 +20,8 @@ class SubmitActionEmailType extends AbstractType
     use FormFieldTrait;
     use ToBcBccFieldsTrait;
 
-    private \Symfony\Contracts\Translation\TranslatorInterface $translator;
-
-    protected \Mautic\CoreBundle\Helper\CoreParametersHelper $coreParametersHelper;
-
-    public function __construct(TranslatorInterface $translator, CoreParametersHelper $coreParametersHelper)
+    public function __construct(private TranslatorInterface $translator, protected CoreParametersHelper $coreParametersHelper)
     {
-        $this->translator           = $translator;
-        $this->coreParametersHelper = $coreParametersHelper;
     }
 
     /**

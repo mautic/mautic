@@ -10,11 +10,8 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class ThemeListType extends AbstractType
 {
-    private \Mautic\CoreBundle\Helper\ThemeHelperInterface $themeHelper;
-
-    public function __construct(ThemeHelperInterface $helper)
+    public function __construct(private ThemeHelperInterface $themeHelper)
     {
-        $this->themeHelper = $helper;
     }
 
     public function configureOptions(OptionsResolver $resolver): void

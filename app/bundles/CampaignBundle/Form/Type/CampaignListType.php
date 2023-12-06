@@ -12,19 +12,13 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class CampaignListType extends AbstractType
 {
-    private \Mautic\CampaignBundle\Model\CampaignModel $model;
-
-    protected \Symfony\Contracts\Translation\TranslatorInterface $translator;
-
     /**
      * @var bool
      */
     private $canViewOther = false;
 
-    public function __construct(CampaignModel $campaignModel, TranslatorInterface $translator, CorePermissions $security)
+    public function __construct(private CampaignModel $model, protected TranslatorInterface $translator, CorePermissions $security)
     {
-        $this->model        = $campaignModel;
-        $this->translator   = $translator;
         $this->canViewOther = $security->isGranted('campaign:campaigns:viewother');
     }
 

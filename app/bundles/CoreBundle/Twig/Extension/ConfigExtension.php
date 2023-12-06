@@ -10,11 +10,8 @@ use Twig\TwigFunction;
 
 class ConfigExtension extends AbstractExtension
 {
-    private ConfigHelper $configHelper;
-
-    public function __construct(ConfigHelper $configHelper)
+    public function __construct(private ConfigHelper $configHelper)
     {
-        $this->configHelper = $configHelper;
     }
 
     public function getFunctions()

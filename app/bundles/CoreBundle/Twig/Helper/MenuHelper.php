@@ -11,11 +11,8 @@ use Knp\Menu\Twig\Helper as KnpHelper;
  */
 final class MenuHelper
 {
-    private KnpHelper $helper;
-
-    public function __construct(KnpHelper $helper)
+    public function __construct(private KnpHelper $helper)
     {
-        $this->helper = $helper;
     }
 
     public function getName(): string

@@ -14,28 +14,8 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class EmailSubscriber implements EventSubscriberInterface
 {
-    private \Mautic\CoreBundle\Model\AuditLogModel $auditLogModel;
-
-    private \Mautic\CoreBundle\Helper\IpLookupHelper $ipLookupHelper;
-
-    private \Mautic\EmailBundle\Model\EmailModel $emailModel;
-
-    private \Symfony\Contracts\Translation\TranslatorInterface $translator;
-
-    private \Doctrine\ORM\EntityManager $entityManager;
-
-    public function __construct(
-        IpLookupHelper $ipLookupHelper,
-        AuditLogModel $auditLogModel,
-        EmailModel $emailModel,
-        TranslatorInterface $translator,
-        EntityManager $entityManager
-    ) {
-        $this->ipLookupHelper = $ipLookupHelper;
-        $this->auditLogModel  = $auditLogModel;
-        $this->emailModel     = $emailModel;
-        $this->translator     = $translator;
-        $this->entityManager  = $entityManager;
+    public function __construct(private IpLookupHelper $ipLookupHelper, private AuditLogModel $auditLogModel, private EmailModel $emailModel, private TranslatorInterface $translator, private EntityManager $entityManager)
+    {
     }
 
     /**

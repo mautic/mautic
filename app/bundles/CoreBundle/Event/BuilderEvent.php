@@ -12,17 +12,11 @@ class BuilderEvent extends Event
     protected $sections             = [];
     protected $tokens               = [];
     protected $abTestWinnerCriteria = [];
-    protected $translator;
-    protected $entity;
-    protected $requested;
     protected $tokenFilterText;
     protected string $tokenFilterTarget;
 
-    public function __construct($translator, $entity = null, $requested = 'all', protected string $tokenFilter = '')
+    public function __construct(protected $translator, protected $entity = null, protected $requested = 'all', protected string $tokenFilter = '')
     {
-        $this->translator        = $translator;
-        $this->entity            = $entity;
-        $this->requested         = $requested;
         $this->tokenFilterTarget = (0 === strpos($tokenFilter, '{@')) ? 'label' : 'token';
         $this->tokenFilterText   = str_replace(['{@', '{', '}'], '', $tokenFilter);
         $this->tokenFilter       = ('label' == $this->tokenFilterTarget) ? $this->tokenFilterText : str_replace('{@', '{', $tokenFilter);

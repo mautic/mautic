@@ -10,11 +10,8 @@ use Twig\TwigFunction;
 
 class MautibotExtension extends AbstractExtension
 {
-    protected MautibotHelper $mautibotHelper;
-
-    public function __construct(MautibotHelper $mautibotHelper)
+    public function __construct(protected MautibotHelper $mautibotHelper)
     {
-        $this->mautibotHelper = $mautibotHelper;
     }
 
     /**

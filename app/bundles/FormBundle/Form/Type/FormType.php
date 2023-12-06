@@ -22,11 +22,8 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class FormType extends AbstractType
 {
-    private \Mautic\CoreBundle\Security\Permissions\CorePermissions $security;
-
-    public function __construct(CorePermissions $security)
+    public function __construct(private CorePermissions $security)
     {
-        $this->security = $security;
     }
 
     /**

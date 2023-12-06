@@ -12,17 +12,10 @@ use Mautic\CoreBundle\Exception\SchemaException;
  */
 class ColumnSchemaHelper
 {
-    protected \Doctrine\DBAL\Connection $db;
-
     /**
      * @var \Doctrine\DBAL\Schema\AbstractSchemaManager<\Doctrine\DBAL\Platforms\AbstractMySQLPlatform>
      */
     protected \Doctrine\DBAL\Schema\AbstractSchemaManager $sm;
-
-    /**
-     * @var string
-     */
-    protected $prefix;
 
     /**
      * @var string
@@ -44,11 +37,9 @@ class ColumnSchemaHelper
     /**
      * @param string $prefix
      */
-    public function __construct(Connection $db, $prefix)
+    public function __construct(protected Connection $db, protected $prefix)
     {
-        $this->db     = $db;
         $this->sm     = $db->getSchemaManager();
-        $this->prefix = $prefix;
     }
 
     /**
