@@ -9,10 +9,8 @@ trait FormErrorMessagesTrait
 {
     /**
      * @param array<mixed> $formErrors
-     *
-     * @return string
      */
-    public function getFormErrorMessage(array $formErrors)
+    public function getFormErrorMessage(array $formErrors): string
     {
         $msg = '';
 

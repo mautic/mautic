@@ -82,10 +82,7 @@ class CacheStorageHelper
         $this->setCacheAdaptor();
     }
 
-    /**
-     * @return string|false
-     */
-    public function getAdaptorClassName()
+    public function getAdaptorClassName(): string
     {
         return get_class($this->cacheAdaptor);
     }

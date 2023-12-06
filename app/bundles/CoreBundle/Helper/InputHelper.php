@@ -347,10 +347,8 @@ class InputHelper
      * Removes all characters except those allowed in emails.
      *
      * @param bool|false $urldecode
-     *
-     * @return mixed
      */
-    public static function email($value, $urldecode = false)
+    public static function email($value, $urldecode = false): string
     {
         if ($urldecode) {
             $value = urldecode($value);
@@ -425,7 +423,7 @@ class InputHelper
             // Slecial handling for XML tags used in Outlook optimized emails <o:*/> and <w:/>
             $value = preg_replace_callback(
                 "/<\/*[o|w|v]:[^>]*>/is",
-                function ($matches) {
+                function ($matches): string {
                     return '<mencoded>'.htmlspecialchars($matches[0]).'</mencoded>';
                 },
                 $value, -1, $needsDecoding);
@@ -433,7 +431,7 @@ class InputHelper
             // Slecial handling for script tags
             $value = preg_replace_callback(
                 "/<script>(.*?)<\/script>/is",
-                function ($matches) {
+                function ($matches): string {
                     return '<mscript>'.base64_encode($matches[0]).'</mscript>';
                 },
                 $value, -1, $needsScriptDecoding);
@@ -471,7 +469,7 @@ class InputHelper
             if ($needsDecoding) {
                 $value = preg_replace_callback(
                     "/<mencoded>(.*?)<\/mencoded>/is",
-                    function ($matches) {
+                    function ($matches): string {
                         return htmlspecialchars_decode($matches[1]);
                     },
                     $value);
@@ -480,7 +478,7 @@ class InputHelper
             if ($needsScriptDecoding) {
                 $value = preg_replace_callback(
                     "/<mscript>(.*?)<\/mscript>/is",
-                    function ($matches) {
+                    function ($matches): string {
                         return base64_decode($matches[1]);
                     },
                     $value);
@@ -541,7 +539,7 @@ class InputHelper
             return $html;
         }
         // Remove extra white-space(s) between HTML attribute(s)
-        $html = preg_replace_callback('#<([^\/\s<>!]+)(?:\s+([^<>]*?)\s*|\s*)(\/?)>#s', function ($matches) {
+        $html = preg_replace_callback('#<([^\/\s<>!]+)(?:\s+([^<>]*?)\s*|\s*)(\/?)>#s', function ($matches): string {
             return '<'.$matches[1].preg_replace(
                 '#([^\s=]+)(\=([\'"]?)(.*?)\3)?(\s+|$)#s',
                 ' $1$2',
@@ -550,7 +548,7 @@ class InputHelper
         }, str_replace("\r", '', $html));
         // Minify inline CSS declaration(s)
         if (false !== strpos($html, ' style=')) {
-            $html = preg_replace_callback('#<([^<]+?)\s+style=([\'"])(.*?)\2(?=[\/\s>])#s', function ($matches) {
+            $html = preg_replace_callback('#<([^<]+?)\s+style=([\'"])(.*?)\2(?=[\/\s>])#s', function ($matches): string {
                 return '<'.$matches[1].' style='.$matches[2].self::minifyCss($matches[3]).$matches[2];
             }, $html);
         }

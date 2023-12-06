@@ -64,10 +64,8 @@ final class SlotsHelper
      * Returns true if the slot exists.
      *
      * @param string $name The slot name
-     *
-     * @return bool
      */
-    public function has($name)
+    public function has($name): bool
     {
         return isset($this->slots[$name]);
     }
@@ -101,7 +99,7 @@ final class SlotsHelper
      *
      * @return string The canonical name
      */
-    public function getName()
+    public function getName(): string
     {
         return 'slots';
     }

@@ -105,10 +105,8 @@ class AuditLog
 
     /**
      * Get id.
-     *
-     * @return int
      */
-    public function getId()
+    public function getId(): int
     {
         return (int) $this->id;
     }
@@ -177,10 +175,8 @@ class AuditLog
 
     /**
      * Get objectId.
-     *
-     * @return int
      */
-    public function getObjectId()
+    public function getObjectId(): int
     {
         return (int) $this->objectId;
     }

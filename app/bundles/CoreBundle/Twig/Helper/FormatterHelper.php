@@ -128,10 +128,8 @@ final class FormatterHelper
     /**
      * @param string                $delimeter
      * @param array<string, string> $array
-     *
-     * @return string
      */
-    public function simpleArrayToHtml(array $array, $delimeter = '<br />')
+    public function simpleArrayToHtml(array $array, $delimeter = '<br />'): string
     {
         $pairs = [];
         foreach ($array as $key => $value) {
@@ -181,10 +179,7 @@ final class FormatterHelper
         return $string;
     }
 
-    /**
-     * @return string
-     */
-    public function getName()
+    public function getName(): string
     {
         return 'formatter';
     }

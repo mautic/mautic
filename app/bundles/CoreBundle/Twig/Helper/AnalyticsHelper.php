@@ -13,10 +13,7 @@ final class AnalyticsHelper
         $this->code = htmlspecialchars_decode((string) $parametersHelper->get('google_analytics'));
     }
 
-    /**
-     * @return string
-     */
-    public function getCode()
+    public function getCode(): string
     {
         return $this->code;
     }
@@ -41,10 +38,7 @@ final class AnalyticsHelper
         return $content;
     }
 
-    /**
-     * @return string
-     */
-    public function getName()
+    public function getName(): string
     {
         return 'analytics';
     }

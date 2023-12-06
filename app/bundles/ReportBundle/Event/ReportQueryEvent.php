@@ -46,10 +46,7 @@ class ReportQueryEvent extends AbstractReportEvent
         return $this->options;
     }
 
-    /**
-     * @return int
-     */
-    public function getTotalResults()
+    public function getTotalResults(): int
     {
         return $this->totalResults;
     }

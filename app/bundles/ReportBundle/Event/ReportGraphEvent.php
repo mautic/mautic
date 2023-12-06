@@ -88,10 +88,8 @@ class ReportGraphEvent extends AbstractReportEvent
 
     /**
      * Get graphs that are requested.
-     *
-     * @return array
      */
-    public function getRequestedGraphs()
+    public function getRequestedGraphs(): array
     {
         return array_keys($this->requestedGraphs);
     }

@@ -195,7 +195,7 @@ class MenuHelper
 
         uasort(
             $menuItems,
-            function ($a, $b) use ($defaultPriority) {
+            function ($a, $b) use ($defaultPriority): int {
                 $ap = (isset($a['priority']) ? (int) $a['priority'] : $defaultPriority);
                 $bp = (isset($b['priority']) ? (int) $b['priority'] : $defaultPriority);
 
@@ -218,10 +218,8 @@ class MenuHelper
 
     /**
      * @param string $integrationName
-     *
-     * @return bool
      */
-    protected function handleIntegrationChecks($integrationName, array $config)
+    protected function handleIntegrationChecks($integrationName, array $config): bool
     {
         $integration = $this->integrationHelper->getIntegrationObject($integrationName);
 

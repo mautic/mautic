@@ -72,7 +72,7 @@ EOT
             $output->writeln('<info>Step 1: Searching for contacts with data from Do Not Sell List...</info>');
 
             $this->doNotSellList->loadList();
-            $doNotSellListIPs = array_map(function ($item) {
+            $doNotSellListIPs = array_map(function ($item): string|array {
                 // strip subnet mask characters
                 return substr_replace($item['value'], '', strpos($item['value'], '/'), 3);
             }, $this->doNotSellList->getList());

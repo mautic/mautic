@@ -169,10 +169,8 @@ trait TranslationEntityTrait
 
     /**
      * Check if this entity has translations.
-     *
-     * @return int
      */
-    public function hasTranslations()
+    public function hasTranslations(): int
     {
         $children = $this->getTranslationChildren();
 

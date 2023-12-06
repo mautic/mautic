@@ -375,7 +375,7 @@ class ThemeHelper implements ThemeHelperInterface
         }
     }
 
-    public function getExtractError($archive)
+    public function getExtractError($archive): string
     {
         switch ($archive) {
             case \ZipArchive::ER_EXISTS:

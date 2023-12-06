@@ -496,10 +496,8 @@ class ChartQuery extends AbstractChart
 
     /**
      * Fetch the count integet from a query.
-     *
-     * @return int
      */
-    public function fetchCount(QueryBuilder $query)
+    public function fetchCount(QueryBuilder $query): int
     {
         $data = $query->executeQuery()->fetchAssociative();
 
@@ -553,10 +551,8 @@ class ChartQuery extends AbstractChart
      * Count how many rows is between a range of date diff in seconds.
      *
      * @param string $query
-     *
-     * @return int
      */
-    public function fetchCountDateDiff($query)
+    public function fetchCountDateDiff($query): int
     {
         $data = $query->execute()->fetchAssociative();
 
@@ -583,7 +579,7 @@ class ChartQuery extends AbstractChart
      * @param string $tablePrefix
      * @param string $column
      */
-    private function getDateConstruct($tablePrefix, $column)
+    private function getDateConstruct($tablePrefix, $column): string
     {
         if ($this->generatedColumnProvider) {
             $generatedColumns = $this->generatedColumnProvider->getGeneratedColumns();

@@ -31,7 +31,7 @@ class NotificationListType extends AbstractType
                         ],
                     ];
                 },
-                'ajax_lookup_action' => function (Options $options) {
+                'ajax_lookup_action' => function (Options $options): string {
                     $query = [
                         'notification_type' => $options['notification_type'],
                     ];

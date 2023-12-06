@@ -48,10 +48,7 @@ class ReportFileWriter
         return $this->exportHandler->getPath($fileName);
     }
 
-    /**
-     * @return string
-     */
-    private function getFileName(Scheduler $scheduler)
+    private function getFileName(Scheduler $scheduler): string
     {
         $date       = $scheduler->getScheduleDate();
         $dateString = $date->format('Y-m-d');

@@ -35,10 +35,7 @@ final class SecurityHelper
         $this->tokenManager = $tokenManager;
     }
 
-    /**
-     * @return string
-     */
-    public function getName()
+    public function getName(): string
     {
         return 'security';
     }

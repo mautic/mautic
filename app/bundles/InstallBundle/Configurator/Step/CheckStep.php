@@ -250,7 +250,7 @@ class CheckStep implements StepInterface
     /**
      * {@inheritdoc}
      */
-    public function getTemplate()
+    public function getTemplate(): string
     {
         return '@MauticInstall/Install/check.html.twig';
     }

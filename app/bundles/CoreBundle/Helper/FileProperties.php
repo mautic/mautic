@@ -13,7 +13,7 @@ class FileProperties
      *
      * @throws FileInvalidException
      */
-    public function getFileSize($filename)
+    public function getFileSize($filename): int|bool
     {
         if (!file_exists($filename) || !is_readable($filename)) {
             throw new FileInvalidException();

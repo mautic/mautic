@@ -16,10 +16,7 @@ final class VersionHelper
         $this->appVersion = $appVersion;
     }
 
-    /**
-     * @return string
-     */
-    public function getName()
+    public function getName(): string
     {
         return 'version';
     }

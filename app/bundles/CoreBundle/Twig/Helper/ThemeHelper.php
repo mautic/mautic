@@ -100,10 +100,8 @@ final class ThemeHelper
      * Returns path to this theme.
      *
      * @param bool $relative
-     *
-     * @return string
      */
-    public function getThemePath($relative = false)
+    public function getThemePath($relative = false): string
     {
         return ($relative) ? $this->themeDir : $this->themePath;
     }

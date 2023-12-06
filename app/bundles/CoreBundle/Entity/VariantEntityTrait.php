@@ -193,10 +193,8 @@ trait VariantEntityTrait
 
     /**
      * Check if this entity has variants.
-     *
-     * @return int
      */
-    public function hasVariants()
+    public function hasVariants(): int
     {
         $children = $this->getTranslationChildren();
 

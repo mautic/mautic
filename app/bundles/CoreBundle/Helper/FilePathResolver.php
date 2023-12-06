@@ -22,11 +22,9 @@ class FilePathResolver
     /**
      * @param string $uploadDir
      *
-     * @return string
-     *
      * @throws FilePathException
      */
-    public function getUniqueFileName($uploadDir, UploadedFile $file)
+    public function getUniqueFileName($uploadDir, UploadedFile $file): string
     {
         $inputHelper       = $this->inputHelper;
         $fullName          = $file->getClientOriginalName();
@@ -90,18 +88,13 @@ class FilePathResolver
      * @param string $uploadDir
      * @param string $fileName
      * @param string $ext
-     *
-     * @return string
      */
-    private function getFilePath($uploadDir, $fileName, $ext)
+    private function getFilePath($uploadDir, $fileName, $ext): string
     {
         return $uploadDir.DIRECTORY_SEPARATOR.$fileName.$ext;
     }
 
-    /**
-     * @return string
-     */
-    private function getFileExtension(UploadedFile $file)
+    private function getFileExtension(UploadedFile $file): string
     {
         $ext = $file->getClientOriginalExtension();
 

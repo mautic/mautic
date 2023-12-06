@@ -134,10 +134,8 @@ class CustomButtonEvent extends AbstractCustomRequestEvent
 
     /**
      * Generate a button ID that can be overridden by other plugins.
-     *
-     * @return string
      */
-    protected function generateButtonKey($button)
+    protected function generateButtonKey($button): string
     {
         $buttonKey = '';
         if (!empty($button['btnText'])) {

@@ -21,7 +21,7 @@ class UpgradeEvent extends Event
         return $this->status;
     }
 
-    public function isSuccessful()
+    public function isSuccessful(): bool
     {
         if (array_key_exists('success', $this->status)) {
             return (bool) $this->status['success'];

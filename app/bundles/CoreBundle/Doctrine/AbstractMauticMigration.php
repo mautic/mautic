@@ -157,7 +157,7 @@ abstract class AbstractMauticMigration extends AbstractMigration implements Cont
         $hash        = implode(
             '',
             array_map(
-                function ($column) {
+                function ($column): string {
                     return dechex(crc32($column));
                 },
                 $columnNames

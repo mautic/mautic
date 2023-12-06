@@ -156,20 +156,16 @@ class StatsEvent extends Event
 
     /**
      * Returns the start.
-     *
-     * @return int
      */
-    public function getStart()
+    public function getStart(): int
     {
         return $this->start;
     }
 
     /**
      * Returns the limit.
-     *
-     * @return int
      */
-    public function getLimit()
+    public function getLimit(): int
     {
         return $this->limit;
     }

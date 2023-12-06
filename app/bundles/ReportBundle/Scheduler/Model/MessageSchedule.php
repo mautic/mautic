@@ -95,11 +95,9 @@ class MessageSchedule
      *
      * @param string $filePath
      *
-     * @return bool
-     *
      * @throws \Mautic\CoreBundle\Exception\FileInvalidException
      */
-    public function fileCouldBeSend($filePath)
+    public function fileCouldBeSend($filePath): bool
     {
         $filesize    = $this->fileProperties->getFileSize($filePath);
         $maxFileSize = $this->coreParametersHelper->get('report_export_max_filesize_in_bytes');

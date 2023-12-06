@@ -12,10 +12,7 @@ final class ReportHelper
     {
     }
 
-    /**
-     * @return string
-     */
-    public function getName()
+    public function getName(): string
     {
         return 'report';
     }

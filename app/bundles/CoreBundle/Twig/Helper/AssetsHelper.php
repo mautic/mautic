@@ -334,10 +334,8 @@ final class AssetsHelper
 
     /**
      * Outputs the stylesheets and style declarations.
-     *
-     * @return string
      */
-    public function getStyles()
+    public function getStyles(): string
     {
         $styles = '';
         if (isset($this->assets[$this->context]['stylesheets'])) {
@@ -584,10 +582,8 @@ final class AssetsHelper
      * @param string $assetFilePath         The path to the file location. Can use full path or relative to mautic web root
      * @param string $onLoadCallback        Mautic namespaced function to call for the script onload
      * @param string $alreadyLoadedCallback Mautic namespaced function to call if the script has already been loaded
-     *
-     * @return string
      */
-    public function includeScript($assetFilePath, $onLoadCallback = '', $alreadyLoadedCallback = '')
+    public function includeScript($assetFilePath, $onLoadCallback = '', $alreadyLoadedCallback = ''): string
     {
         return '<script async="async" type="text/javascript" data-source="mautic">Mautic.loadScript(\''.$this->getUrl($assetFilePath)."', '$onLoadCallback', '$alreadyLoadedCallback');</script>";
     }
@@ -596,10 +592,8 @@ final class AssetsHelper
      * Include stylesheet.
      *
      * @param string $assetFilePath the path to the file location. Can use full path or relative to mautic web root
-     *
-     * @return string
      */
-    public function includeStylesheet($assetFilePath)
+    public function includeStylesheet($assetFilePath): string
     {
         return '<script async="async" type="text/javascript" data-source="mautic">Mautic.loadStylesheet(\''.$this->getUrl($assetFilePath).'\');</script>';
     }
@@ -611,9 +605,9 @@ final class AssetsHelper
      * @param array<string>         $protocols  http/https, ftp, mail, twitter
      * @param array<string, string> $attributes
      *
-     * @return string
+     * @return string|string[]|null
      */
-    public function makeLinks($text, $protocols = ['http', 'mail'], array $attributes = [])
+    public function makeLinks($text, $protocols = ['http', 'mail'], array $attributes = []): string|array|null
     {
         // clear tags in text
         $text = InputHelper::url($text, false, $protocols);
@@ -627,7 +621,7 @@ final class AssetsHelper
         $links = [];
 
         // Extract existing links and tags
-        $text = preg_replace_callback('~(<a .*?>.*?</a>|<.*?>)~i', function ($match) use (&$links) {
+        $text = preg_replace_callback('~(<a .*?>.*?</a>|<.*?>)~i', function ($match) use (&$links): string {
             return '<'.array_push($links, $match[1]).'>';
         }, $text);
 
@@ -636,7 +630,7 @@ final class AssetsHelper
             switch ($protocol) {
                 case 'http':
                 case 'https':
-                    $text = preg_replace_callback('~(?:(https?)://([^\s<]+)|(www\.[^\s<]+?\.[^\s<]+))(?<![\.,:])~i', function ($match) use ($protocol, &$links, $attr) {
+                    $text = preg_replace_callback('~(?:(https?)://([^\s<]+)|(www\.[^\s<]+?\.[^\s<]+))(?<![\.,:])~i', function ($match) use ($protocol, &$links, $attr): string {
                         if ($match[1]) {
                             $protocol = $match[1];
                         }
@@ -646,14 +640,14 @@ final class AssetsHelper
                     }, $text);
                     break;
                 case 'mail':
-                    $text = preg_replace_callback('~([^\s<]+?@[^\s<]+?\.[^\s<]+)(?<![\.,:])~', function ($match) use (&$links, $attr) {
+                    $text = preg_replace_callback('~([^\s<]+?@[^\s<]+?\.[^\s<]+)(?<![\.,:])~', function ($match) use (&$links, $attr): string {
                         $match[1] = $this->escape($match[1]);
 
                         return '<'.array_push($links, "<a $attr href=\"mailto:{$match[1]}\">{$match[1]}</a>").'>';
                     }, $text);
                     break;
                 case 'twitter':
-                    $text = preg_replace_callback('~(?<!\w)[@#](\w++)~', function ($match) use (&$links, $attr) {
+                    $text = preg_replace_callback('~(?<!\w)[@#](\w++)~', function ($match) use (&$links, $attr): string {
                         $match[0] = $this->escape($match[0]);
                         $match[1] = $this->escape($match[1]);
 
@@ -661,7 +655,7 @@ final class AssetsHelper
                     }, $text);
                     break;
                 default:
-                    $text = preg_replace_callback('~'.preg_quote($protocol, '~').'://([^\s<]+?)(?<![\.,:])~i', function ($match) use ($protocol, &$links, $attr) {
+                    $text = preg_replace_callback('~'.preg_quote($protocol, '~').'://([^\s<]+?)(?<![\.,:])~i', function ($match) use ($protocol, &$links, $attr): string {
                         $match[1] = $this->escape($match[1]);
 
                         return '<'.array_push($links, "<a $attr href=\"$protocol://{$match[1]}\">{$match[1]}</a>").'>';
@@ -671,7 +665,7 @@ final class AssetsHelper
         }
 
         // Insert all link
-        return preg_replace_callback('/<(\d+)>/', function ($match) use (&$links) {
+        return preg_replace_callback('/<(\d+)>/', function ($match) use (&$links): string {
             return $links[(int) $match[1] - 1];
         }, $text);
     }
@@ -720,10 +714,7 @@ final class AssetsHelper
         $this->assets = [];
     }
 
-    /**
-     * @return string
-     */
-    public function getName()
+    public function getName(): string
     {
         return 'assets';
     }
@@ -769,10 +760,7 @@ final class AssetsHelper
         $this->installService = $installService;
     }
 
-    /**
-     * @return string
-     */
-    private function escape(string $string)
+    private function escape(string $string): string
     {
         return htmlspecialchars($string, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8', false);
     }

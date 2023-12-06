@@ -61,10 +61,7 @@ class TrackingPixelHelper
         return $response;
     }
 
-    /**
-     * @return string
-     */
-    public static function getImage()
+    public static function getImage(): string
     {
         return base64_decode('R0lGODlhAQABAJAAAP8AAAAAACH5BAUQAAAALAAAAAABAAEAAAICBAEAOw==');
     }

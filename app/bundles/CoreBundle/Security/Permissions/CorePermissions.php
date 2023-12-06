@@ -410,10 +410,7 @@ class CorePermissions
         return $permissions;
     }
 
-    /**
-     * @return bool
-     */
-    public function isAnonymous()
+    public function isAnonymous(): bool
     {
         $userEntity = $this->userHelper->getUser();
 

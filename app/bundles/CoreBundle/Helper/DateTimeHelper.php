@@ -155,10 +155,8 @@ class DateTimeHelper
 
     /**
      * @param string|null $format
-     *
-     * @return string
      */
-    public function getString($format = null)
+    public function getString($format = null): string
     {
         if (empty($format)) {
             $format = $this->format;
