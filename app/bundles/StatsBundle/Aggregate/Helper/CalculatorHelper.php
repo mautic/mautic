@@ -100,7 +100,6 @@ class CalculatorHelper
     /**
      * @param string $date
      *
-     *
      * @throws \Exception
      */
     public static function getWeekFromDayString($date): string
@@ -111,7 +110,6 @@ class CalculatorHelper
     /**
      * @param string $date
      * @param string $labelFormat
-     *
      *
      * @throws \Exception
      */
