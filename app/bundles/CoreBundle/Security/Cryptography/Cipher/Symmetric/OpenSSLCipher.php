@@ -29,7 +29,6 @@ class OpenSSLCipher implements SymmetricCipherInterface
      * @param string $key
      * @param string $originalInitVector
      *
-     *
      * @throws InvalidDecryptionException
      */
     public function decrypt($encryptedMessage, $key, $originalInitVector): string

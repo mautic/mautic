@@ -95,7 +95,6 @@ class MessageSchedule
      *
      * @param string $filePath
      *
-     *
      * @throws \Mautic\CoreBundle\Exception\FileInvalidException
      */
     public function fileCouldBeSend($filePath): bool

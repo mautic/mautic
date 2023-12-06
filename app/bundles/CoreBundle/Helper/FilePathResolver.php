@@ -22,7 +22,6 @@ class FilePathResolver
     /**
      * @param string $uploadDir
      *
-     *
      * @throws FilePathException
      */
     public function getUniqueFileName($uploadDir, UploadedFile $file): string
