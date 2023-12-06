@@ -29,10 +29,7 @@ class MembershipManager
 
     private \Psr\Log\LoggerInterface $logger;
 
-    /**
-     * @var ProgressBar
-     */
-    private $progressBar;
+    private ?\Symfony\Component\Console\Helper\ProgressBar $progressBar = null;
 
     public function __construct(
         Adder $adder,

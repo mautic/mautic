@@ -18,15 +18,9 @@ final class InstallNewFilesStep implements StepInterface
 
     private \Mautic\CoreBundle\Helper\PathsHelper $pathsHelper;
 
-    /**
-     * @var ProgressBar
-     */
-    private $progressBar;
+    private ?\Symfony\Component\Console\Helper\ProgressBar $progressBar = null;
 
-    /**
-     * @var InputInterface
-     */
-    private $input;
+    private ?\Symfony\Component\Console\Input\InputInterface $input = null;
 
     public function __construct(TranslatorInterface $translator, UpdateHelper $updateHelper, PathsHelper $pathsHelper)
     {

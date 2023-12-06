@@ -20,10 +20,7 @@ class Interval implements ScheduleModeInterface
 
     private \Mautic\CoreBundle\Helper\CoreParametersHelper $coreParametersHelper;
 
-    /**
-     * @var \DateTimeZone
-     */
-    private $defaultTimezone;
+    private ?\DateTimeZone $defaultTimezone = null;
 
     public function __construct(LoggerInterface $logger, CoreParametersHelper $coreParametersHelper)
     {

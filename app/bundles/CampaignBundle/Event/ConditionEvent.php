@@ -13,10 +13,7 @@ class ConditionEvent extends CampaignExecutionEvent
 
     private \Mautic\CampaignBundle\Entity\LeadEventLog $eventLog;
 
-    /**
-     * @var bool
-     */
-    private $passed = false;
+    private bool $passed = false;
 
     public function __construct(AbstractEventAccessor $config, LeadEventLog $log)
     {

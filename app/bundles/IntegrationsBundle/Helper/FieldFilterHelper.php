@@ -9,15 +9,12 @@ use Mautic\IntegrationsBundle\Mapping\MappedFieldInfoInterface;
 
 class FieldFilterHelper
 {
-    /**
-     * @var int
-     */
-    private $totalFieldCount = 0;
+    private int $totalFieldCount = 0;
 
     /**
      * @var MappedFieldInfoInterface[]
      */
-    private $filteredFields = [];
+    private array $filteredFields = [];
 
     private \Mautic\IntegrationsBundle\Integration\Interfaces\ConfigFormSyncInterface $integrationObject;
 

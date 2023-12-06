@@ -26,20 +26,11 @@ class Plugin extends CommonEntity
      */
     private $description;
 
-    /**
-     * @var string
-     */
-    private $primaryDescription;
+    private ?string $primaryDescription = null;
 
-    /**
-     * @var string
-     */
-    private $secondaryDescription;
+    private ?string $secondaryDescription = null;
 
-    /**
-     * @var bool
-     */
-    private $isMissing = false;
+    private bool $isMissing = false;
 
     /**
      * @var string
@@ -59,7 +50,7 @@ class Plugin extends CommonEntity
     /**
      * @var ArrayCollection<int, \Mautic\PluginBundle\Entity\Integration>
      */
-    private $integrations;
+    private \Doctrine\Common\Collections\ArrayCollection $integrations;
 
     public function __construct()
     {

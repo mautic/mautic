@@ -43,25 +43,19 @@ class Webhook extends FormEntity
      */
     private $secret;
 
-    /**
-     * @var \Mautic\CategoryBundle\Entity\Category|null
-     **/
-    private $category;
+    private ?\Mautic\CategoryBundle\Entity\Category $category = null;
 
     /**
      * @var ArrayCollection<int, \Mautic\WebhookBundle\Entity\Event>
      */
-    private $events;
+    private \Doctrine\Common\Collections\ArrayCollection|array $events;
 
     /**
      * @var ArrayCollection<int, \Mautic\WebhookBundle\Entity\Log>
      */
-    private $logs;
+    private \Doctrine\Common\Collections\ArrayCollection|array $logs;
 
-    /**
-     * @var array
-     */
-    private $removedEvents = [];
+    private array $removedEvents = [];
 
     /**
      * @var array
@@ -71,10 +65,8 @@ class Webhook extends FormEntity
     /**
      * Holds a simplified array of events, just an array of event types.
      * It's used for API serializaiton.
-     *
-     * @var array
      */
-    private $triggers = [];
+    private array $triggers = [];
 
     /**
      * ASC or DESC order for fetching order of the events when queue mode is on.

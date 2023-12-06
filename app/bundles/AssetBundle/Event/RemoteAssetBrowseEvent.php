@@ -9,10 +9,7 @@ use Mautic\PluginBundle\Integration\UnifiedIntegrationInterface;
 
 class RemoteAssetBrowseEvent extends CommonEvent
 {
-    /**
-     * @var Adapter
-     */
-    private $adapter;
+    private ?\Gaufrette\Adapter $adapter = null;
 
     /**
      * @var AbstractIntegration

@@ -13,10 +13,7 @@ class InternalObjectRouteEvent extends Event
 
     private int $id;
 
-    /**
-     * @var string|null
-     */
-    private $route;
+    private ?string $route = null;
 
     public function __construct(ObjectInterface $object, int $id)
     {

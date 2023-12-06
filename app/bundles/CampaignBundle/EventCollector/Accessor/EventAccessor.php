@@ -12,20 +12,11 @@ use Mautic\CampaignBundle\EventCollector\Builder\EventBuilder;
 
 class EventAccessor
 {
-    /**
-     * @var array
-     */
-    private $actions = [];
+    private array $actions = [];
 
-    /**
-     * @var array
-     */
-    private $conditions = [];
+    private array $conditions = [];
 
-    /**
-     * @var array
-     */
-    private $decisions = [];
+    private array $decisions = [];
 
     public function __construct(array $events)
     {

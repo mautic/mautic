@@ -29,10 +29,7 @@ final class GeneratedColumnsProvider implements GeneratedColumnsProviderInterfac
 
     private \Symfony\Component\EventDispatcher\EventDispatcherInterface $dispatcher;
 
-    /**
-     * @var GeneratedColumns
-     */
-    private $generatedColumns;
+    private ?\Mautic\CoreBundle\Doctrine\GeneratedColumn\GeneratedColumns $generatedColumns = null;
 
     public function __construct(
         VersionProviderInterface $versionProvider,

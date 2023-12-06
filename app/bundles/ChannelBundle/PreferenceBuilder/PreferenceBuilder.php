@@ -13,7 +13,7 @@ class PreferenceBuilder
     /**
      * @var ChannelPreferences[]
      */
-    private $channels = [];
+    private array $channels = [];
 
     private \Psr\Log\LoggerInterface $logger;
 

@@ -14,20 +14,14 @@ class ObjectMappingDAO
 
     private string $integrationObjectName;
 
-    /**
-     * @var array
-     */
-    private $internalIdMapping = [];
+    private array $internalIdMapping = [];
 
-    /**
-     * @var array
-     */
-    private $integrationIdMapping = [];
+    private array $integrationIdMapping = [];
 
     /**
      * @var FieldMappingDAO[]
      */
-    private $fieldMappings = [];
+    private array $fieldMappings = [];
 
     public function __construct(string $internalObjectName, string $integrationObjectName)
     {

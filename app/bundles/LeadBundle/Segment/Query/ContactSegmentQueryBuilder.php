@@ -30,7 +30,7 @@ class ContactSegmentQueryBuilder
     private \Symfony\Component\EventDispatcher\EventDispatcherInterface $dispatcher;
 
     /** @var array Contains segment edges mapping */
-    private $dependencyMap = [];
+    private array $dependencyMap = [];
 
     public function __construct(EntityManager $entityManager, RandomParameterName $randomParameterName, EventDispatcherInterface $dispatcher)
     {

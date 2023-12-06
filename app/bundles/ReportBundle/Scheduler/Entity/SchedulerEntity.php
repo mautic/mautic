@@ -7,10 +7,7 @@ use Mautic\ReportBundle\Scheduler\SchedulerInterface;
 
 class SchedulerEntity implements SchedulerInterface
 {
-    /**
-     * @var bool
-     */
-    private $isScheduled = false;
+    private bool $isScheduled = false;
 
     /**
      * @var string|null

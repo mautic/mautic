@@ -26,22 +26,13 @@ class InactiveExecutioner implements ExecutionerInterface
      */
     private $campaign;
 
-    /**
-     * @var ContactLimiter
-     */
-    private $limiter;
+    private ?\Mautic\CampaignBundle\Executioner\ContactFinder\Limiter\ContactLimiter $limiter = null;
 
-    /**
-     * @var OutputInterface
-     */
-    private $output;
+    private ?\Symfony\Component\Console\Output\OutputInterface $output = null;
 
     private \Psr\Log\LoggerInterface $logger;
 
-    /**
-     * @var ProgressBar
-     */
-    private $progressBar;
+    private ?\Symfony\Component\Console\Helper\ProgressBar $progressBar = null;
 
     private \Symfony\Contracts\Translation\TranslatorInterface $translator;
 
@@ -49,17 +40,11 @@ class InactiveExecutioner implements ExecutionerInterface
 
     private \Mautic\CampaignBundle\Executioner\EventExecutioner $executioner;
 
-    /**
-     * @var Counter
-     */
-    private $counter;
+    private ?\Mautic\CampaignBundle\Executioner\Result\Counter $counter = null;
 
     private \Mautic\CampaignBundle\Executioner\ContactFinder\InactiveContactFinder $inactiveContactFinder;
 
-    /**
-     * @var ArrayCollection
-     */
-    private $decisions;
+    private ?\Doctrine\Common\Collections\ArrayCollection $decisions = null;
 
     private \Mautic\CampaignBundle\Executioner\Helper\InactiveHelper $helper;
 

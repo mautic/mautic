@@ -10,10 +10,7 @@ class LogoutEvent extends Event
 {
     private \Mautic\UserBundle\Entity\User $user;
 
-    /**
-     * @var array
-     */
-    private $session = [];
+    private array $session = [];
 
     private \Symfony\Component\HttpFoundation\Request $request;
 

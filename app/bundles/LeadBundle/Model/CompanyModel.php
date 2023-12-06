@@ -61,10 +61,7 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
      */
     private $fields = [];
 
-    /**
-     * @var bool
-     */
-    private $repoSetup = false;
+    private bool $repoSetup = false;
 
     protected \Mautic\LeadBundle\Deduplicate\CompanyDeduper $companyDeduper;
 

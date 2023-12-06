@@ -27,25 +27,19 @@ class Role extends FormEntity
      */
     private $description;
 
-    /**
-     * @var bool
-     */
-    private $isAdmin = false;
+    private bool $isAdmin = false;
 
     /**
      * @var ArrayCollection<int, \Mautic\UserBundle\Entity\Permission>
      */
-    private $permissions;
+    private \Doctrine\Common\Collections\ArrayCollection|array $permissions;
 
-    /**
-     * @var array
-     */
-    private $rawPermissions;
+    private ?array $rawPermissions = null;
 
     /**
      * @var ArrayCollection<int, \Mautic\UserBundle\Entity\User>
      */
-    private $users;
+    private \Doctrine\Common\Collections\ArrayCollection|array $users;
 
     /**
      * Constructor.

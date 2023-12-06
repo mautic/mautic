@@ -52,7 +52,7 @@ class IntegrationEntity extends CommonEntity
     /**
      * @var array
      */
-    private $internal;
+    private \Doctrine\Common\Collections\ArrayCollection $internal;
 
     public function __construct()
     {

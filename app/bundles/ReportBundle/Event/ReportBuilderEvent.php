@@ -12,17 +12,13 @@ class ReportBuilderEvent extends AbstractReportEvent
 {
     /**
      * Container with registered tables and columns.
-     *
-     * @var array
      */
-    private $tableArray = [];
+    private array $tableArray = [];
 
     /**
      * Supported graphs.
-     *
-     * @var array
      */
-    private $supportedGraphs = [
+    private array $supportedGraphs = [
         'table',
         'bar',
         'pie',
@@ -35,17 +31,13 @@ class ReportBuilderEvent extends AbstractReportEvent
 
     /**
      * Container with registered graphs.
-     *
-     * @var array
      */
-    private $graphArray = [];
+    private array $graphArray = [];
 
     /**
      * List of published array of lead fields.
-     *
-     * @var array
      */
-    private $leadFields = [];
+    private array $leadFields = [];
 
     private \Mautic\ReportBundle\Helper\ReportHelper $reportHelper;
 

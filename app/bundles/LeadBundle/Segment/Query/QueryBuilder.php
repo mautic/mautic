@@ -9,17 +9,12 @@ use Mautic\LeadBundle\Segment\Query\Expression\ExpressionBuilder;
 
 class QueryBuilder extends BaseQueryBuilder
 {
-    /**
-     * @var ExpressionBuilder
-     */
-    private $_expr;
+    private ?\Mautic\LeadBundle\Segment\Query\Expression\ExpressionBuilder $_expr = null;
 
     /**
      * Unprocessed logic for segment processing.
-     *
-     * @var array
      */
-    private $logicStack = [];
+    private array $logicStack = [];
 
     private Connection $connection;
 

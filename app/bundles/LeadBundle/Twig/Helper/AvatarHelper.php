@@ -14,7 +14,7 @@ final class AvatarHelper
     /**
      * @var array<string>
      */
-    private $imageTypes = ['jpg', 'jpeg', 'png', 'gif'];
+    private array $imageTypes = ['jpg', 'jpeg', 'png', 'gif'];
     private \Mautic\CoreBundle\Twig\Helper\AssetsHelper $assetsHelper;
 
     private \Mautic\CoreBundle\Helper\PathsHelper $pathsHelper;

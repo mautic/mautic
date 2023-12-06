@@ -19,15 +19,9 @@ class Download
      */
     private $dateDownload;
 
-    /**
-     * @var Asset|null
-     */
-    private $asset;
+    private ?\Mautic\AssetBundle\Entity\Asset $asset = null;
 
-    /**
-     * @var \Mautic\CoreBundle\Entity\IpAddress
-     */
-    private $ipAddress;
+    private ?\Mautic\CoreBundle\Entity\IpAddress $ipAddress = null;
 
     /**
      * @var \Mautic\LeadBundle\Entity\Lead|null
@@ -54,15 +48,9 @@ class Download
      */
     private $source;
 
-    /**
-     * @var int|null
-     */
-    private $sourceId;
+    private ?int $sourceId = null;
 
-    /**
-     * @var \Mautic\EmailBundle\Entity\Email|null
-     */
-    private $email;
+    private ?\Mautic\EmailBundle\Entity\Email $email = null;
 
     private ?string $utmCampaign;
 

@@ -16,7 +16,7 @@ class ConfigChangeLogger
      *
      * @var string[]
      */
-    private $filterKeys = [
+    private array $filterKeys = [
         'transifex_password',
         'mailer_is_owner',
     ];

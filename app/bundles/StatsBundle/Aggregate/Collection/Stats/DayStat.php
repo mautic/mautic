@@ -7,7 +7,7 @@ class DayStat implements StatInterface
     /**
      * @var HourStat[]
      */
-    private $stats = [];
+    private array $stats = [];
 
     /**
      * @var string

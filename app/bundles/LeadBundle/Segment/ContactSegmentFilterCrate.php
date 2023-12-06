@@ -36,7 +36,7 @@ class ContactSegmentFilterCrate
     /**
      * @var string|null
      */
-    private $operator;
+    private string $operator;
 
     private array $sourceArray;
 

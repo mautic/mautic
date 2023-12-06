@@ -32,7 +32,7 @@ class WebhookQueue
     /**
      * @var string|resource|null
      */
-    private $payloadCompressed;
+    private string|bool|null $payloadCompressed = null;
 
     /**
      * @var Event

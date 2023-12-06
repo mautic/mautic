@@ -13,20 +13,11 @@ class FormBuilderEvent extends Event
 {
     use ComponentValidationTrait;
 
-    /**
-     * @var array
-     */
-    private $actions = [];
+    private array $actions = [];
 
-    /**
-     * @var array
-     */
-    private $fields = [];
+    private array $fields = [];
 
-    /**
-     * @var array
-     */
-    private $validators = [];
+    private array $validators = [];
 
     private \Symfony\Contracts\Translation\TranslatorInterface $translator;
 

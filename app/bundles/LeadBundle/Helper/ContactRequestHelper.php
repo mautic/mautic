@@ -39,15 +39,9 @@ class ContactRequestHelper
      */
     private $trackedContact;
 
-    /**
-     * @var array
-     */
-    private $queryFields = [];
+    private array $queryFields = [];
 
-    /**
-     * @var array
-     */
-    private $publiclyUpdatableFieldValues = [];
+    private array $publiclyUpdatableFieldValues = [];
 
     private ContactMerger $contactMerger;
 

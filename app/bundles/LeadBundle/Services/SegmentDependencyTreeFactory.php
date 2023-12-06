@@ -19,7 +19,7 @@ class SegmentDependencyTreeFactory
     /**
      * @var int[]
      */
-    private $usedSegmentIds = [];
+    private array $usedSegmentIds = [];
 
     public function __construct(ListModel $segmentModel, RouterInterface $router)
     {

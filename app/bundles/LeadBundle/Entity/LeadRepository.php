@@ -33,27 +33,16 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
      */
     protected $dispatcher;
 
-    /**
-     * @var array
-     */
-    private $availableSocialFields = [];
+    private array $availableSocialFields = [];
 
-    /**
-     * @var array
-     */
-    private $availableSearchFields = [];
+    private array $availableSearchFields = [];
 
     /**
      * Required to get the color based on a lead's points.
-     *
-     * @var TriggerModel
      */
-    private $triggerModel;
+    private ?\Mautic\PointBundle\Model\TriggerModel $triggerModel = null;
 
-    /**
-     * @var ListLeadRepository
-     */
-    private $listLeadRepository;
+    private ?\Mautic\LeadBundle\Entity\ListLeadRepository $listLeadRepository = null;
 
     /**
      * Used by search functions to search social profiles.

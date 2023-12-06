@@ -23,20 +23,11 @@ class MauticSyncProcess
 
     private \Mautic\IntegrationsBundle\Sync\SyncProcess\Direction\Internal\ObjectChangeGenerator $objectChangeGenerator;
 
-    /**
-     * @var InputOptionsDAO
-     */
-    private $inputOptionsDAO;
+    private ?\Mautic\IntegrationsBundle\Sync\DAO\Sync\InputOptionsDAO $inputOptionsDAO = null;
 
-    /**
-     * @var MappingManualDAO
-     */
-    private $mappingManualDAO;
+    private ?\Mautic\IntegrationsBundle\Sync\DAO\Mapping\MappingManualDAO $mappingManualDAO = null;
 
-    /**
-     * @var MauticSyncDataExchange
-     */
-    private $syncDataExchange;
+    private ?\Mautic\IntegrationsBundle\Sync\SyncDataExchange\MauticSyncDataExchange $syncDataExchange = null;
 
     public function __construct(SyncDateHelper $syncDateHelper, ObjectChangeGenerator $objectChangeGenerator)
     {

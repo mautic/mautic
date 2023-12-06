@@ -38,10 +38,7 @@ class EventExecutioner
 
     private \Mautic\CampaignBundle\Executioner\Scheduler\EventScheduler $scheduler;
 
-    /**
-     * @var Responses
-     */
-    private $responses;
+    private ?\Mautic\CampaignBundle\Executioner\Result\Responses $responses = null;
 
     private \Mautic\CampaignBundle\Helper\RemovedContactTracker $removedContactTracker;
 

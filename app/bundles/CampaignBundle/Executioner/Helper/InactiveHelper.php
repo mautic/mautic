@@ -25,10 +25,7 @@ class InactiveHelper
 
     private DecisionHelper $decisionHelper;
 
-    /**
-     * @var \DateTimeInterface
-     */
-    private $earliestInactiveDate;
+    private ?\DateTime $earliestInactiveDate = null;
 
     public function __construct(
         EventScheduler $scheduler,

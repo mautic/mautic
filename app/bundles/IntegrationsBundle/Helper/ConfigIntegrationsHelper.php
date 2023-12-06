@@ -13,7 +13,7 @@ class ConfigIntegrationsHelper
     /**
      * @var ConfigFormInterface[]
      */
-    private $integrations = [];
+    private array $integrations = [];
 
     private \Mautic\IntegrationsBundle\Helper\IntegrationsHelper $integrationsHelper;
 

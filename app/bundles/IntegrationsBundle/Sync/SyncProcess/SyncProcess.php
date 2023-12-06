@@ -55,10 +55,7 @@ class SyncProcess
 
     private \Mautic\IntegrationsBundle\Sync\DAO\Sync\InputOptionsDAO $inputOptionsDAO;
 
-    /**
-     * @var int
-     */
-    private $syncIteration;
+    private ?int $syncIteration = null;
 
     private \Mautic\IntegrationsBundle\Sync\SyncService\SyncServiceInterface $syncService;
 

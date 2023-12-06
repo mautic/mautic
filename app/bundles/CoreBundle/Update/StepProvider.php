@@ -6,8 +6,8 @@ use Mautic\CoreBundle\Update\Step\StepInterface;
 
 class StepProvider
 {
-    private $initialSteps = [];
-    private $finalSteps   = [];
+    private array $initialSteps = [];
+    private array $finalSteps   = [];
 
     public function addStep(StepInterface $step): void
     {

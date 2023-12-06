@@ -35,7 +35,7 @@ class ReportSubscriber implements EventSubscriberInterface
 
     public const GROUP_CONTACTS = 'contacts';
 
-    private $leadContexts = [
+    private array $leadContexts = [
         self::CONTEXT_LEADS,
         self::CONTEXT_LEAD_POINT_LOG,
         self::CONTEXT_CONTACT_ATTRIBUTION_MULTI,
@@ -43,7 +43,7 @@ class ReportSubscriber implements EventSubscriberInterface
         self::CONTEXT_CONTACT_ATTRIBUTION_LAST,
         self::CONTEXT_CONTACT_FREQUENCYRULES,
     ];
-    private $companyContexts = [self::CONTEXT_COMPANIES];
+    private array $companyContexts = [self::CONTEXT_COMPANIES];
 
     private \Mautic\LeadBundle\Model\LeadModel $leadModel;
 
@@ -57,15 +57,9 @@ class ReportSubscriber implements EventSubscriberInterface
 
     private \Mautic\LeadBundle\Report\FieldsBuilder $fieldsBuilder;
 
-    /**
-     * @var array
-     */
-    private $channels;
+    private ?array $channels = null;
 
-    /**
-     * @var array
-     */
-    private $channelActions;
+    private ?array $channelActions = null;
 
     private \Mautic\LeadBundle\Model\CompanyReportData $companyReportData;
 

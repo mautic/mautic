@@ -12,15 +12,9 @@ class Installer
      */
     private $translationsDirectory;
 
-    /**
-     * @var string
-     */
-    private $sourceDirectory;
+    private ?string $sourceDirectory = null;
 
-    /**
-     * @var string
-     */
-    private $installDirectory;
+    private ?string $installDirectory = null;
 
     private \Symfony\Component\Filesystem\Filesystem $filesystem;
 

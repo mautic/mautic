@@ -25,30 +25,15 @@ class FieldChange
      */
     private $objectId;
 
-    /**
-     * @var string
-     */
-    private $objectType;
+    private ?string $objectType = null;
 
-    /**
-     * @var \DateTimeInterface
-     */
-    private $modifiedAt;
+    private ?\DateTime $modifiedAt = null;
 
-    /**
-     * @var string
-     */
-    private $columnName;
+    private ?string $columnName = null;
 
-    /**
-     * @var string
-     */
-    private $columnType;
+    private ?string $columnType = null;
 
-    /**
-     * @var string
-     */
-    private $columnValue;
+    private ?string $columnValue = null;
 
     public static function loadMetadata(ORM\ClassMetadata $metadata): void
     {

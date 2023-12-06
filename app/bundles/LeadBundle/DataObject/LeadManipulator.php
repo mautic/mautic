@@ -26,10 +26,8 @@ class LeadManipulator
 
     /**
      * If true then the manipulator was logged and should not be logged for the second time.
-     *
-     * @var bool
      */
-    private $logged = false;
+    private bool $logged = false;
 
     /**
      * @param ?string $bundleName

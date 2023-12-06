@@ -9,7 +9,7 @@ use Symfony\Contracts\EventDispatcher\Event;
 class ListChangeEvent extends Event
 {
     private $lead;
-    private $leads;
+    private ?array $leads = null;
     private \Mautic\LeadBundle\Entity\LeadList $list;
     private $added;
     private ?\DateTime $date;

@@ -12,8 +12,7 @@ class TriggerExecutedEvent extends Event
 
     private \Mautic\LeadBundle\Entity\Lead $lead;
 
-    /** @var bool */
-    private $result;
+    private ?bool $result = null;
 
     public function __construct(TriggerEventEntity $triggerEvent, Lead $lead)
     {

@@ -20,35 +20,17 @@ use Twig\Environment;
 
 class AuthorizeController extends \FOS\OAuthServerBundle\Controller\AuthorizeController
 {
-    /**
-     * @var Form
-     */
-    private $authorizeForm;
+    private \Symfony\Component\Form\Form $authorizeForm;
 
-    /**
-     * @var AuthorizeFormHandler
-     */
-    private $authorizeFormHandler;
+    private \FOS\OAuthServerBundle\Form\Handler\AuthorizeFormHandler $authorizeFormHandler;
 
-    /**
-     * @var OAuth2
-     */
-    private $oAuth2Server;
+    private \OAuth2\OAuth2 $oAuth2Server;
 
-    /**
-     * @var Environment
-     */
-    private $twig;
+    private \Twig\Environment $twig;
 
-    /**
-     * @var TokenStorageInterface
-     */
-    private $tokenStorage;
+    private \Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface $tokenStorage;
 
-    /**
-     * @var EventDispatcherInterface
-     */
-    private $eventDispatcher;
+    private \Symfony\Component\EventDispatcher\EventDispatcherInterface $eventDispatcher;
 
     /**
      * This constructor must be duplicated from the extended class so our custom code could access the properties.

@@ -26,20 +26,11 @@ class IntegrationSyncProcess
 
     private \Mautic\IntegrationsBundle\Sync\SyncProcess\Direction\Integration\ObjectChangeGenerator $objectChangeGenerator;
 
-    /**
-     * @var InputOptionsDAO
-     */
-    private $inputOptionsDAO;
+    private ?\Mautic\IntegrationsBundle\Sync\DAO\Sync\InputOptionsDAO $inputOptionsDAO = null;
 
-    /**
-     * @var MappingManualDAO
-     */
-    private $mappingManualDAO;
+    private ?\Mautic\IntegrationsBundle\Sync\DAO\Mapping\MappingManualDAO $mappingManualDAO = null;
 
-    /**
-     * @var SyncDataExchangeInterface
-     */
-    private $syncDataExchange;
+    private ?\Mautic\IntegrationsBundle\Sync\SyncDataExchange\SyncDataExchangeInterface $syncDataExchange = null;
 
     public function __construct(SyncDateHelper $syncDateHelper, MappingHelper $mappingHelper, ObjectChangeGenerator $objectChangeGenerator)
     {

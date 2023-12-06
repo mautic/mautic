@@ -30,25 +30,13 @@ class Action
      */
     private $type;
 
-    /**
-     * @var int
-     */
-    private $order = 0;
+    private int $order = 0;
 
-    /**
-     * @var array
-     */
-    private $properties = [];
+    private array $properties = [];
 
-    /**
-     * @var Form|null
-     */
-    private $form;
+    private ?\Mautic\FormBundle\Entity\Form $form = null;
 
-    /**
-     * @var array
-     */
-    private $changes;
+    private ?array $changes = null;
 
     /**
      * Reset properties on clone.

@@ -9,10 +9,7 @@ class QueueEmailEvent extends Event
 {
     private \Mautic\EmailBundle\Mailer\Message\MauticMessage $message;
 
-    /**
-     * @var bool
-     */
-    private $retry = false;
+    private bool $retry = false;
 
     public function __construct(MauticMessage $message)
     {

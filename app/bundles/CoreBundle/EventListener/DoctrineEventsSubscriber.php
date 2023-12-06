@@ -14,10 +14,7 @@ class DoctrineEventsSubscriber implements EventSubscriber
      */
     private $tablePrefix;
 
-    /**
-     * @var array
-     */
-    private $deprecatedEntityTables = [];
+    private array $deprecatedEntityTables = [];
 
     /**
      * @param string $tablePrefix

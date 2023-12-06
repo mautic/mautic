@@ -25,7 +25,7 @@ class Field
     /**
      * @var bool|null
      */
-    private $showLabel = true;
+    private bool $showLabel = true;
 
     /**
      * @var string
@@ -37,25 +37,16 @@ class Field
      */
     private $type;
 
-    /**
-     * @var bool
-     */
-    private $isCustom = false;
+    private bool $isCustom = false;
 
-    /**
-     * @var array
-     */
-    private $customParameters = [];
+    private array $customParameters = [];
 
     /**
      * @var string|null
      */
     private $defaultValue;
 
-    /**
-     * @var bool
-     */
-    private $isRequired = false;
+    private bool $isRequired = false;
 
     /**
      * @var string|null
@@ -70,27 +61,18 @@ class Field
     /**
      * @var int|null
      */
-    private $order = 0;
+    private int $order = 0;
 
-    /**
-     * @var array
-     */
-    private $properties = [];
+    private array $properties = [];
 
-    /**
-     * @var array
-     */
-    private $validation = [];
+    private array $validation = [];
 
     /**
      * @var array<string,mixed>|null
      */
-    private $conditions = [];
+    private array $conditions = [];
 
-    /**
-     * @var Form|null
-     */
-    private $form;
+    private ?\Mautic\FormBundle\Entity\Form $form = null;
 
     /**
      * @var string|null
@@ -115,17 +97,14 @@ class Field
     /**
      * @var bool|null
      */
-    private $saveResult = true;
+    private bool $saveResult = true;
 
     /**
      * @var bool|null
      */
-    private $isAutoFill = false;
+    private bool $isAutoFill = false;
 
-    /**
-     * @var array
-     */
-    private $changes;
+    private ?array $changes = null;
 
     private $sessionId;
 
@@ -149,15 +128,9 @@ class Field
      */
     private $parent;
 
-    /**
-     * @var string|null
-     */
-    private $mappedObject;
+    private ?string $mappedObject = null;
 
-    /**
-     * @var string|null
-     */
-    private $mappedField;
+    private ?string $mappedField = null;
 
     /**
      * Reset properties on clone.

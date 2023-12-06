@@ -15,10 +15,8 @@ class MenuHelper
 
     /**
      * Stores items that are assigned to another parent outside it's bundle.
-     *
-     * @var array
      */
-    private $orphans = [];
+    private array $orphans = [];
 
     private \Mautic\CoreBundle\Helper\CoreParametersHelper $coreParametersHelper;
 

@@ -14,7 +14,7 @@ use Mautic\IntegrationsBundle\Sync\Exception\ObjectNotFoundException;
 class RelationsHelper
 {
     private \Mautic\IntegrationsBundle\Sync\Helper\MappingHelper $mappingHelper;
-    private $objectsToSynchronize = [];
+    private array $objectsToSynchronize = [];
 
     public function __construct(MappingHelper $mappingsHelper)
     {

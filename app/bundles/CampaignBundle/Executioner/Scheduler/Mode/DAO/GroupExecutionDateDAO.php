@@ -9,10 +9,7 @@ class GroupExecutionDateDAO
 {
     private \DateTimeInterface $executionDate;
 
-    /**
-     * @var ArrayCollection
-     */
-    private $contacts;
+    private \Doctrine\Common\Collections\ArrayCollection $contacts;
 
     public function __construct(\DateTimeInterface $executionDate)
     {

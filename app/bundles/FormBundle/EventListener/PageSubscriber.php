@@ -14,7 +14,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class PageSubscriber implements EventSubscriberInterface
 {
-    private $formRegex = '{form=(.*?)}';
+    private string $formRegex = '{form=(.*?)}';
 
     private \Mautic\FormBundle\Model\FormModel $formModel;
 

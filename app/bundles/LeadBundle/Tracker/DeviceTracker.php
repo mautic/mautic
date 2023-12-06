@@ -19,15 +19,12 @@ class DeviceTracker
 
     private \Psr\Log\LoggerInterface $logger;
 
-    /**
-     * @var bool
-     */
-    private $deviceWasChanged = false;
+    private bool $deviceWasChanged = false;
 
     /**
      * @var LeadDevice[]
      */
-    private $trackedDevice = [];
+    private array $trackedDevice = [];
 
     public function __construct(
         DeviceCreatorServiceInterface $deviceCreatorService,

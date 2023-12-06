@@ -29,25 +29,13 @@ class SendEmailToContact
      */
     private $singleEmailMode;
 
-    /**
-     * @var array
-     */
-    private $failedContacts = [];
+    private array $failedContacts = [];
 
-    /**
-     * @var array
-     */
-    private $errorMessages = [];
+    private array $errorMessages = [];
 
-    /**
-     * @var array
-     */
-    private $badEmails = [];
+    private array $badEmails = [];
 
-    /**
-     * @var array
-     */
-    private $emailSentCounts = [];
+    private array $emailSentCounts = [];
 
     /**
      * @var array|null
@@ -59,20 +47,11 @@ class SendEmailToContact
      */
     private $emailEntityId;
 
-    /**
-     * @var int|null
-     */
-    private $listId;
+    private ?int $listId = null;
 
-    /**
-     * @var int
-     */
-    private $statBatchCounter = 0;
+    private int $statBatchCounter = 0;
 
-    /**
-     * @var array
-     */
-    private $contact = [];
+    private array $contact = [];
 
     public function __construct(MailHelper $mailer, StatHelper $statHelper, DoNotContact $dncModel, TranslatorInterface $translator)
     {

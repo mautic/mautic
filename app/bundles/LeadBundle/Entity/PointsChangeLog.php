@@ -13,15 +13,9 @@ class PointsChangeLog
      */
     private $id;
 
-    /**
-     * @var Lead
-     */
-    private $lead;
+    private ?\Mautic\LeadBundle\Entity\Lead $lead = null;
 
-    /**
-     * @var \Mautic\CoreBundle\Entity\IpAddress
-     */
-    private $ipAddress;
+    private ?\Mautic\CoreBundle\Entity\IpAddress $ipAddress = null;
 
     /**
      * @var string

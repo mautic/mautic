@@ -13,7 +13,7 @@ class BuilderIntegrationsHelper
     /**
      * @var BuilderInterface[]
      */
-    private $builders = [];
+    private array $builders = [];
 
     private \Mautic\IntegrationsBundle\Helper\IntegrationsHelper $integrationsHelper;
 

@@ -29,10 +29,7 @@ class ContactTracker
 
     private \Mautic\CoreBundle\Security\Permissions\CorePermissions $security;
 
-    /**
-     * @var Lead|null
-     */
-    private $systemContact;
+    private ?\Mautic\LeadBundle\Entity\Lead $systemContact = null;
 
     /**
      * @var Lead|null

@@ -20,10 +20,7 @@ class UserSummaryNotificationHelper
 
     private \Symfony\Contracts\Translation\TranslatorInterface $translator;
 
-    /**
-     * @var array
-     */
-    private $userNotifications = [];
+    private array $userNotifications = [];
 
     /**
      * @var string
@@ -35,15 +32,9 @@ class UserSummaryNotificationHelper
      */
     private $objectDisplayName;
 
-    /**
-     * @var string
-     */
-    private $mauticObject;
+    private ?string $mauticObject = null;
 
-    /**
-     * @var string
-     */
-    private $listTranslationKey;
+    private ?string $listTranslationKey = null;
 
     public function __construct(
         Writer $writer,

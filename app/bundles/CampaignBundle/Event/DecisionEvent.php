@@ -20,10 +20,7 @@ class DecisionEvent extends CampaignExecutionEvent
      */
     private $passthrough;
 
-    /**
-     * @var bool
-     */
-    private $applicable = false;
+    private bool $applicable = false;
 
     /**
      * DecisionEvent constructor.

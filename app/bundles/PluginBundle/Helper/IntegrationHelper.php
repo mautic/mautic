@@ -32,13 +32,13 @@ class IntegrationHelper
 
     protected \Mautic\PluginBundle\Model\PluginModel $pluginModel;
 
-    private $integrations = [];
+    private array $integrations = [];
 
-    private $available = [];
+    private array $available = [];
 
-    private $byFeatureList = [];
+    private array $byFeatureList = [];
 
-    private $byPlugin = [];
+    private array $byPlugin = [];
 
     public function __construct(
         ContainerInterface $container,

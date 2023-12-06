@@ -27,10 +27,7 @@ class ObjectMapping
      */
     private $internalObjectName;
 
-    /**
-     * @var string
-     */
-    private $internalObjectId;
+    private ?string $internalObjectId = null;
 
     /**
      * @var string
@@ -44,15 +41,9 @@ class ObjectMapping
 
     private ?\DateTimeInterface $lastSyncDate;
 
-    /**
-     * @var array
-     */
-    private $internalStorage = [];
+    private array $internalStorage = [];
 
-    /**
-     * @var bool
-     */
-    private $isDeleted = false;
+    private bool $isDeleted = false;
 
     /**
      * @var string|null

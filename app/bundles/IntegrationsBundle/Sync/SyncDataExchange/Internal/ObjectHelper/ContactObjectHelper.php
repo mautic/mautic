@@ -31,10 +31,7 @@ class ContactObjectHelper implements ObjectHelperInterface
 
     private \Mautic\LeadBundle\Model\FieldModel $fieldModel;
 
-    /**
-     * @var array
-     */
-    private $availableFields;
+    private ?array $availableFields = null;
 
     private DoNotContactModel $dncModel;
 

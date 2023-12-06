@@ -28,25 +28,13 @@ class PartialObjectReportBuilder
 
     private \Mautic\IntegrationsBundle\Sync\SyncDataExchange\Internal\ReportBuilder\FieldBuilder $fieldBuilder;
 
-    /**
-     * @var array
-     */
-    private $reportObjects = [];
+    private array $reportObjects = [];
 
-    /**
-     * @var array
-     */
-    private $lastProcessedTrackedId = [];
+    private array $lastProcessedTrackedId = [];
 
-    /**
-     * @var array
-     */
-    private $objectsWithMissingFields = [];
+    private array $objectsWithMissingFields = [];
 
-    /**
-     * @var ReportDAO
-     */
-    private $syncReport;
+    private ?\Mautic\IntegrationsBundle\Sync\DAO\Sync\Report\ReportDAO $syncReport = null;
 
     private \Mautic\IntegrationsBundle\Sync\SyncDataExchange\Internal\ObjectProvider $objectProvider;
 

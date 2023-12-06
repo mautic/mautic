@@ -37,20 +37,11 @@ class Trigger extends FormEntity
      */
     private $publishDown;
 
-    /**
-     * @var int
-     */
-    private $points = 0;
+    private int $points = 0;
 
-    /**
-     * @var string
-     */
-    private $color = 'a0acb8';
+    private string $color = 'a0acb8';
 
-    /**
-     * @var bool
-     */
-    private $triggerExistingLeads = false;
+    private bool $triggerExistingLeads = false;
 
     /**
      * @var \Mautic\CategoryBundle\Entity\Category|null
@@ -60,7 +51,7 @@ class Trigger extends FormEntity
     /**
      * @var ArrayCollection<int, \Mautic\PointBundle\Entity\TriggerEvent>
      */
-    private $events;
+    private \Doctrine\Common\Collections\ArrayCollection|array $events;
 
     private ?Group $group = null;
 

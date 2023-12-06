@@ -22,20 +22,14 @@ class Redirect extends FormEntity
 
     private $url;
 
-    /**
-     * @var int
-     */
-    private $hits = 0;
+    private int $hits = 0;
 
-    /**
-     * @var int
-     */
-    private $uniqueHits = 0;
+    private int $uniqueHits = 0;
 
     /**
      * @var ArrayCollection<int, Trackable>
      */
-    private $trackables;
+    private \Doctrine\Common\Collections\ArrayCollection $trackables;
 
     public function __construct()
     {

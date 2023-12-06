@@ -17,15 +17,9 @@ class EventCollector
 
     private \Symfony\Component\EventDispatcher\EventDispatcherInterface $dispatcher;
 
-    /**
-     * @var array
-     */
-    private $eventsArray = [];
+    private array $eventsArray = [];
 
-    /**
-     * @var EventAccessor
-     */
-    private $events;
+    private ?\Mautic\CampaignBundle\EventCollector\Accessor\EventAccessor $events = null;
 
     public function __construct(TranslatorInterface $translator, EventDispatcherInterface $dispatcher)
     {

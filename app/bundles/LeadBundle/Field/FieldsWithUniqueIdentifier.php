@@ -6,10 +6,7 @@ namespace Mautic\LeadBundle\Field;
 
 class FieldsWithUniqueIdentifier
 {
-    /**
-     * @var array
-     */
-    private $uniqueIdentifierFields = [];
+    private array $uniqueIdentifierFields = [];
 
     private \Mautic\LeadBundle\Field\FieldList $fieldList;
 

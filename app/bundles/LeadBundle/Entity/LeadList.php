@@ -33,10 +33,7 @@ class LeadList extends FormEntity
      */
     private $publicName;
 
-    /**
-     * @var Category|null
-     **/
-    private $category;
+    private ?\Mautic\CategoryBundle\Entity\Category $category = null;
 
     /**
      * @var string|null
@@ -48,35 +45,23 @@ class LeadList extends FormEntity
      */
     private $alias;
 
-    /**
-     * @var array
-     */
-    private $filters = [];
+    private array $filters = [];
 
-    /**
-     * @var bool
-     */
-    private $isGlobal = true;
+    private bool $isGlobal = true;
 
-    /**
-     * @var bool
-     */
-    private $isPreferenceCenter = false;
+    private bool $isPreferenceCenter = false;
 
     /**
      * @var ArrayCollection<\Mautic\LeadBundle\Entity\ListLead>
      */
-    private $leads;
+    private \Doctrine\Common\Collections\ArrayCollection $leads;
 
     /**
      * @var \DateTimeInterface|null
      */
-    private $lastBuiltDate;
+    private ?\DateTime $lastBuiltDate = null;
 
-    /**
-     * @var float|null
-     */
-    private $lastBuiltTime;
+    private ?float $lastBuiltTime = null;
 
     public function __construct()
     {

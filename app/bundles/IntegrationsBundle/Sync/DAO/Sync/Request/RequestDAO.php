@@ -17,7 +17,7 @@ class RequestDAO
     /**
      * @var ObjectDAO[]
      */
-    private $objects = [];
+    private array $objects = [];
 
     public function __construct(string $syncToIntegration, int $syncIteration, InputOptionsDAO $inputOptionsDAO)
     {

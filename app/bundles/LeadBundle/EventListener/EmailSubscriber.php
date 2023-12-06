@@ -12,10 +12,7 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class EmailSubscriber implements EventSubscriberInterface
 {
-    /**
-     * @var string
-     */
-    private static $contactFieldRegex = '{contactfield=(.*?)}';
+    private static string $contactFieldRegex = '{contactfield=(.*?)}';
 
     private \Mautic\CoreBundle\Helper\BuilderTokenHelperFactory $builderTokenHelperFactory;
 

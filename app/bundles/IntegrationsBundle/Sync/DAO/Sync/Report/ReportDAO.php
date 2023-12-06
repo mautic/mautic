@@ -17,15 +17,9 @@ class ReportDAO
      */
     private $integration;
 
-    /**
-     * @var array
-     */
-    private $objects = [];
+    private array $objects = [];
 
-    /**
-     * @var array
-     */
-    private $remappedObjects = [];
+    private array $remappedObjects = [];
 
     private \Mautic\IntegrationsBundle\Sync\DAO\Sync\RelationsDAO $relationsDAO;
 

@@ -216,20 +216,12 @@ class MailHelper
 
     /**
      * Simply a md5 of the content so that event listeners can easily determine if the content has been changed.
-     *
-     * @var string
      */
-    private $contentHash;
+    private ?string $contentHash = null;
 
-    /**
-     * @var array
-     */
-    private $copies = [];
+    private array $copies = [];
 
-    /**
-     * @var array
-     */
-    private $embedImagesReplaces = [];
+    private array $embedImagesReplaces = [];
 
     public function __construct(MauticFactory $factory, MailerInterface $mailer, $from = null)
     {

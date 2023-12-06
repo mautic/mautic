@@ -15,32 +15,17 @@ class InternalObjectFindEvent extends Event
     /**
      * @var int[]
      */
-    private $ids = [];
+    private array $ids = [];
 
-    /**
-     * @var array
-     */
-    private $foundObjects = [];
+    private array $foundObjects = [];
 
-    /**
-     * @var DateRange|null
-     */
-    private $dateRange;
+    private ?\Mautic\IntegrationsBundle\Sync\DAO\DateRange $dateRange = null;
 
-    /**
-     * @var int|null
-     */
-    private $start;
+    private ?int $start = null;
 
-    /**
-     * @var int|null
-     */
-    private $limit;
+    private ?int $limit = null;
 
-    /**
-     * @var array
-     */
-    private $fieldValues = [];
+    private array $fieldValues = [];
 
     public function __construct(ObjectInterface $object)
     {

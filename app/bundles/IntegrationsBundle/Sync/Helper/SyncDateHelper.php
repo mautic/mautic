@@ -11,25 +11,19 @@ class SyncDateHelper
 {
     private \Doctrine\DBAL\Connection $connection;
 
-    /**
-     * @var \DateTimeInterface|null
-     */
-    private $syncFromDateTime;
+    private ?\DateTimeInterface $syncFromDateTime = null;
+
+    private ?\DateTimeInterface $syncToDateTime = null;
 
     /**
      * @var \DateTimeInterface|null
      */
-    private $syncToDateTime;
-
-    /**
-     * @var \DateTimeInterface|null
-     */
-    private $syncDateTime;
+    private ?\DateTimeImmutable $syncDateTime = null;
 
     /**
      * @var \DateTimeInterface[]
      */
-    private $lastObjectSyncDates = [];
+    private array $lastObjectSyncDates = [];
 
     public function __construct(Connection $connection)
     {

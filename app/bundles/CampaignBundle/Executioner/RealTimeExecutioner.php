@@ -47,10 +47,7 @@ class RealTimeExecutioner
 
     private \Mautic\LeadBundle\Tracker\ContactTracker $contactTracker;
 
-    /**
-     * @var Responses
-     */
-    private $responses;
+    private ?\Mautic\CampaignBundle\Executioner\Result\Responses $responses = null;
 
     private \Mautic\CampaignBundle\Executioner\Helper\DecisionHelper $decisionHelper;
 

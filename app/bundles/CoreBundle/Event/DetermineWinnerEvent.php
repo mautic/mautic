@@ -23,7 +23,7 @@ class DetermineWinnerEvent extends Event
      *             supportTemplate?: string
      *             }
      */
-    private $abTestResults;
+    private ?array $abTestResults = null;
 
     /**
      * @param array{

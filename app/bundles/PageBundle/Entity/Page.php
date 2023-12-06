@@ -47,10 +47,7 @@ class Page extends FormEntity implements TranslationEntityInterface, VariantEnti
      */
     private $customHtml;
 
-    /**
-     * @var array
-     */
-    private $content = [];
+    private array $content = [];
 
     /**
      * @var \DateTimeInterface
@@ -62,25 +59,13 @@ class Page extends FormEntity implements TranslationEntityInterface, VariantEnti
      */
     private $publishDown;
 
-    /**
-     * @var int
-     */
-    private $hits = 0;
+    private int $hits = 0;
 
-    /**
-     * @var int
-     */
-    private $uniqueHits = 0;
+    private int $uniqueHits = 0;
 
-    /**
-     * @var int
-     */
-    private $variantHits = 0;
+    private int $variantHits = 0;
 
-    /**
-     * @var int
-     */
-    private $revision = 1;
+    private int $revision = 1;
 
     /**
      * @var string|null
@@ -107,20 +92,11 @@ class Page extends FormEntity implements TranslationEntityInterface, VariantEnti
      */
     private $redirectUrl;
 
-    /**
-     * @var \Mautic\CategoryBundle\Entity\Category|null
-     **/
-    private $category;
+    private ?\Mautic\CategoryBundle\Entity\Category $category = null;
 
-    /**
-     * @var bool|null
-     */
-    private $isPreferenceCenter;
+    private ?bool $isPreferenceCenter = null;
 
-    /**
-     * @var bool|null
-     */
-    private $noIndex;
+    private ?bool $noIndex = null;
 
     /**
      * Used to identify the page for the builder.

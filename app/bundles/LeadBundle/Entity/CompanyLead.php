@@ -25,7 +25,7 @@ class CompanyLead
     /**
      * @var bool|null
      */
-    private $primary = false;
+    private bool $primary = false;
 
     public static function loadMetadata(ORM\ClassMetadata $metadata): void
     {

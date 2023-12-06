@@ -25,17 +25,14 @@ class Company extends FormEntity implements CustomFieldEntityInterface, Identifi
     /**
      * @var int|null
      */
-    private $score = 0;
+    private int $score = 0;
 
-    /**
-     * @var User|null
-     */
-    private $owner;
+    private ?\Mautic\UserBundle\Entity\User $owner = null;
 
     /**
      * @var mixed[]
      */
-    private $socialCache = [];
+    private array $socialCache = [];
 
     private $email;
 

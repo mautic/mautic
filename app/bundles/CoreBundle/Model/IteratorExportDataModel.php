@@ -22,7 +22,7 @@ class IteratorExportDataModel implements \Iterator
     private $callback;
     private int $total;
     private $data;
-    private $totalResult;
+    private int $totalResult;
     private bool $skipOrdering;
 
     /**

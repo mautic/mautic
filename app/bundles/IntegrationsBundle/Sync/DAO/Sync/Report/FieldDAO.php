@@ -16,10 +16,7 @@ class FieldDAO
 
     private \Mautic\IntegrationsBundle\Sync\DAO\Value\NormalizedValueDAO $value;
 
-    /**
-     * @var \DateTimeInterface|null
-     */
-    private $changeDateTime;
+    private ?\DateTimeInterface $changeDateTime = null;
 
     private string $state;
 

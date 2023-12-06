@@ -11,10 +11,7 @@ class CoreParametersHelper
 
     private \Symfony\Component\DependencyInjection\ContainerInterface $container;
 
-    /**
-     * @var array
-     */
-    private $resolvedParameters;
+    private ?array $resolvedParameters = null;
 
     public function __construct(ContainerInterface $container)
     {

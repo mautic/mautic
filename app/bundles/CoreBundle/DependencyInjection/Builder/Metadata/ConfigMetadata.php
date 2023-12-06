@@ -9,10 +9,7 @@ class ConfigMetadata
 {
     private \Mautic\CoreBundle\DependencyInjection\Builder\BundleMetadata $metadata;
 
-    /**
-     * @var array
-     */
-    private $ipLookupServices = [];
+    private array $ipLookupServices = [];
 
     public function __construct(BundleMetadata $metadata)
     {

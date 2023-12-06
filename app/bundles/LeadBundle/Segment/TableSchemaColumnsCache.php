@@ -8,10 +8,7 @@ class TableSchemaColumnsCache
 {
     private \Doctrine\ORM\EntityManager $entityManager;
 
-    /**
-     * @var array
-     */
-    private $cache;
+    private array $cache;
 
     public function __construct(EntityManager $entityManager)
     {

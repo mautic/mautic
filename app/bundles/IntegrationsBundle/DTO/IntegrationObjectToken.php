@@ -22,10 +22,7 @@ class IntegrationObjectToken
      */
     private $integration;
 
-    /**
-     * @var string
-     */
-    private $defaultValue = '';
+    private string $defaultValue = '';
 
     /**
      * @var string

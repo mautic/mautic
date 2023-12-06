@@ -36,35 +36,17 @@ class ScheduledExecutioner implements ExecutionerInterface, ResetInterface
 
     private \Mautic\CampaignBundle\Executioner\ContactFinder\ScheduledContactFinder $scheduledContactFinder;
 
-    /**
-     * @var Campaign
-     */
-    private $campaign;
+    private ?\Mautic\CampaignBundle\Entity\Campaign $campaign = null;
 
-    /**
-     * @var ContactLimiter
-     */
-    private $limiter;
+    private ?\Mautic\CampaignBundle\Executioner\ContactFinder\Limiter\ContactLimiter $limiter = null;
 
-    /**
-     * @var OutputInterface
-     */
-    private $output;
+    private ?\Symfony\Component\Console\Output\OutputInterface $output = null;
 
-    /**
-     * @var ProgressBar
-     */
-    private $progressBar;
+    private ?\Symfony\Component\Console\Helper\ProgressBar $progressBar = null;
 
-    /**
-     * @var array
-     */
-    private $scheduledEvents;
+    private ?array $scheduledEvents = null;
 
-    /**
-     * @var Counter
-     */
-    private $counter;
+    private ?\Mautic\CampaignBundle\Executioner\Result\Counter $counter = null;
 
     protected ?\DateTime $now = null;
 

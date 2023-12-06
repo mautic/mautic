@@ -9,12 +9,9 @@ class PluginIntegrationRequestEvent extends AbstractPluginIntegrationEvent
 {
     private $url;
 
-    /**
-     * @var array
-     */
-    private $parameters;
+    private array $parameters;
 
-    private $headers;
+    private array $headers;
 
     /**
      * @var string
@@ -31,7 +28,7 @@ class PluginIntegrationRequestEvent extends AbstractPluginIntegrationEvent
      */
     private $authType;
 
-    private $response;
+    private ?\Psr\Http\Message\ResponseInterface $response = null;
 
     public function __construct(UnifiedIntegrationInterface $integration, $url, $parameters, $headers, $method, $settings, $authType)
     {

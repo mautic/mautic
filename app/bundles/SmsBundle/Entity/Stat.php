@@ -17,25 +17,13 @@ class Stat
      */
     private $id;
 
-    /**
-     * @var Sms|null
-     */
-    private $sms;
+    private ?\Mautic\SmsBundle\Entity\Sms $sms = null;
 
-    /**
-     * @var \Mautic\LeadBundle\Entity\Lead|null
-     */
-    private $lead;
+    private ?\Mautic\LeadBundle\Entity\Lead $lead = null;
 
-    /**
-     * @var \Mautic\LeadBundle\Entity\LeadList|null
-     */
-    private $list;
+    private ?\Mautic\LeadBundle\Entity\LeadList $list = null;
 
-    /**
-     * @var \Mautic\CoreBundle\Entity\IpAddress|null
-     */
-    private $ipAddress;
+    private ?\Mautic\CoreBundle\Entity\IpAddress $ipAddress = null;
 
     /**
      * @var \DateTimeInterface
@@ -57,20 +45,14 @@ class Stat
      */
     private $sourceId;
 
-    /**
-     * @var array
-     */
-    private $tokens = [];
+    private array $tokens = [];
 
-    /**
-     * @var array
-     */
-    private $details = [];
+    private array $details = [];
 
     /**
      * @var bool|null
      */
-    private $isFailed = false;
+    private bool $isFailed = false;
 
     public static function loadMetadata(ORM\ClassMetadata $metadata): void
     {

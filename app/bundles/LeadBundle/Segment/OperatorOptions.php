@@ -28,7 +28,7 @@ class OperatorOptions
     /**
      * @var array<string,array<string,string|bool>>
      */
-    private static $operatorOptions = [
+    private static array $operatorOptions = [
         self::EQUAL_TO => [
             'label'       => 'mautic.lead.list.form.operator.equals',
             'expr'        => 'eq',

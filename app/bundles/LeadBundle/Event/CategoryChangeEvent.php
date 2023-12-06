@@ -9,7 +9,7 @@ use Symfony\Contracts\EventDispatcher\Event;
 class CategoryChangeEvent extends Event
 {
     private $lead;
-    private $leads;
+    private ?array $leads = null;
     private \Mautic\CategoryBundle\Entity\Category $category;
     private $added;
 

@@ -13,17 +13,14 @@ class IntNode implements NodeInterface
     /**
      * @var NodeInterface[]
      */
-    private $children = [];
+    private array $children = [];
 
     /**
      * @var array<string,mixed>
      */
-    private $params = [];
+    private array $params = [];
 
-    /**
-     * @var int
-     */
-    private $position = 0;
+    private int $position = 0;
 
     public function __construct(int $value, NodeInterface $parent = null)
     {

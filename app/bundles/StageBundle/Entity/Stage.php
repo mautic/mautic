@@ -27,10 +27,7 @@ class Stage extends FormEntity
      */
     private $description;
 
-    /**
-     * @var int
-     */
-    private $weight = 0;
+    private int $weight = 0;
 
     /**
      * @var \DateTimeInterface
@@ -45,7 +42,7 @@ class Stage extends FormEntity
     /**
      * @var ArrayCollection<int,\Mautic\StageBundle\Entity\LeadStageLog>
      */
-    private $log;
+    private \Doctrine\Common\Collections\ArrayCollection|array $log;
 
     /**
      * @var \Mautic\CategoryBundle\Entity\Category|null

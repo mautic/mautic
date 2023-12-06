@@ -35,10 +35,7 @@ abstract class ModeratedCommand extends Command
 
     private CoreParametersHelper $coreParametersHelper;
 
-    /**
-     * @var Lock
-     */
-    private $lock;
+    private ?\Symfony\Component\Lock\LockInterface $lock = null;
 
     /**
      * @var OutputInterface

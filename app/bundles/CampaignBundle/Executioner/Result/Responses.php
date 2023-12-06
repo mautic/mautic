@@ -8,15 +8,9 @@ use Mautic\CampaignBundle\Entity\LeadEventLog;
 
 class Responses
 {
-    /**
-     * @var array
-     */
-    private $actionResponses = [];
+    private array $actionResponses = [];
 
-    /**
-     * @var array
-     */
-    private $conditionResponses = [];
+    private array $conditionResponses = [];
 
     public function setFromLogs(ArrayCollection $logs): void
     {

@@ -9,10 +9,7 @@ class ContactIdentificationEvent extends Event
 {
     private array $clickthrough;
 
-    /**
-     * @var Lead
-     */
-    private $identifiedContact;
+    private ?\Mautic\LeadBundle\Entity\Lead $identifiedContact = null;
 
     /**
      * @var string

@@ -10,10 +10,7 @@ final class VersionProvider implements VersionProviderInterface
 {
     private Connection $connection;
 
-    /**
-     * @var string
-     */
-    private $version;
+    private ?string $version = null;
 
     public function __construct(Connection $connection)
     {

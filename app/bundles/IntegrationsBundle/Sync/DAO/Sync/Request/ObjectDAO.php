@@ -24,12 +24,12 @@ class ObjectDAO
     /**
      * @var string[]
      */
-    private $fields = [];
+    private array $fields = [];
 
     /**
      * @var string[]
      */
-    private $requiredFields = [];
+    private array $requiredFields = [];
 
     public function __construct(
         string $object,

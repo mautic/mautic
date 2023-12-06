@@ -17,20 +17,11 @@ class Fetcher
 
     private \Symfony\Contracts\Translation\TranslatorInterface $translator;
 
-    /**
-     * @var array
-     */
-    private $mailboxes;
+    private ?array $mailboxes = null;
 
-    /**
-     * @var array
-     */
-    private $log = [];
+    private array $log = [];
 
-    /**
-     * @var int
-     */
-    private $processedMessageCounter = 0;
+    private int $processedMessageCounter = 0;
 
     public function __construct(Mailbox $imapHelper, EventDispatcherInterface $dispatcher, TranslatorInterface $translator)
     {

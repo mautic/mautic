@@ -20,10 +20,7 @@ class InactiveContactFinder
 
     private \Psr\Log\LoggerInterface $logger;
 
-    /**
-     * @var ArrayCollection
-     */
-    private $campaignMemberDatesAdded;
+    private ?array $campaignMemberDatesAdded = null;
 
     public function __construct(
         LeadRepository $leadRepository,

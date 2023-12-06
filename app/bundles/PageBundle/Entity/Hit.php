@@ -28,25 +28,13 @@ class Hit
 
     private ?Page $page = null;
 
-    /**
-     * @var Redirect|null
-     */
-    private $redirect;
+    private ?\Mautic\PageBundle\Entity\Redirect $redirect = null;
 
-    /**
-     * @var \Mautic\EmailBundle\Entity\Email|null
-     */
-    private $email;
+    private ?\Mautic\EmailBundle\Entity\Email $email = null;
 
-    /**
-     * @var \Mautic\LeadBundle\Entity\Lead|null
-     */
-    private $lead;
+    private ?\Mautic\LeadBundle\Entity\Lead $lead = null;
 
-    /**
-     * @var \Mautic\CoreBundle\Entity\IpAddress
-     */
-    private $ipAddress;
+    private ?\Mautic\CoreBundle\Entity\IpAddress $ipAddress = null;
 
     /**
      * @var string|null
@@ -105,7 +93,7 @@ class Hit
     /**
      * @var array<string>
      */
-    private $browserLanguages = [];
+    private array $browserLanguages = [];
 
     /**
      * @var string
@@ -117,20 +105,11 @@ class Hit
      */
     private $source;
 
-    /**
-     * @var int|null
-     */
-    private $sourceId;
+    private ?int $sourceId = null;
 
-    /**
-     * @var array
-     */
-    private $query = [];
+    private array $query = [];
 
-    /**
-     * @var LeadDevice|null
-     */
-    private $device;
+    private ?\Mautic\LeadBundle\Entity\LeadDevice $device = null;
 
     public static function loadMetadata(ORM\ClassMetadata $metadata): void
     {

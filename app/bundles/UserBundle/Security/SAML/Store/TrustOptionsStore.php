@@ -12,10 +12,7 @@ class TrustOptionsStore implements TrustOptionsStoreInterface
 
     private string $entityId;
 
-    /**
-     * @var TrustOptions
-     */
-    private $trustOptions;
+    private ?\LightSaml\Meta\TrustOptions\TrustOptions $trustOptions = null;
 
     public function __construct(CoreParametersHelper $coreParametersHelper, string $entityId)
     {

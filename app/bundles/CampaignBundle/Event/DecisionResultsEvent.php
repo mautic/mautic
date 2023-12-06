@@ -15,7 +15,7 @@ class DecisionResultsEvent extends Event
     /**
      * @var ArrayCollection|LeadEventLog[]
      */
-    private $eventLogs;
+    private \Doctrine\Common\Collections\ArrayCollection $eventLogs;
 
     private \Mautic\CampaignBundle\Executioner\Result\EvaluatedContacts $evaluatedContacts;
 

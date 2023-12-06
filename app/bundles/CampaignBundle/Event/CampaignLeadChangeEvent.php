@@ -15,10 +15,7 @@ class CampaignLeadChangeEvent extends Event
      */
     private $lead;
 
-    /**
-     * @var array
-     */
-    private $leads = [];
+    private array $leads = [];
 
     /**
      * @var string

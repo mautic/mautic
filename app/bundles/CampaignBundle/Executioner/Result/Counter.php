@@ -4,35 +4,17 @@ namespace Mautic\CampaignBundle\Executioner\Result;
 
 class Counter
 {
-    /**
-     * @var int
-     */
-    private $eventCount = 0;
+    private int $eventCount = 0;
 
-    /**
-     * @var int
-     */
-    private $evaluated = 0;
+    private int $evaluated = 0;
 
-    /**
-     * @var int
-     */
-    private $executed = 0;
+    private int $executed = 0;
 
-    /**
-     * @var int
-     */
-    private $totalEvaluated = 0;
+    private int $totalEvaluated = 0;
 
-    /**
-     * @var int
-     */
-    private $totalExecuted = 0;
+    private int $totalExecuted = 0;
 
-    /**
-     * @var int
-     */
-    private $totalScheduled = 0;
+    private int $totalScheduled = 0;
 
     /**
      * Counter constructor.

@@ -10,10 +10,7 @@ class MiddlewareCacheWarmer implements CacheWarmerInterface
 {
     private string $env;
 
-    /**
-     * @var string
-     */
-    private $cacheFile;
+    private ?string $cacheFile = null;
 
     /**
      * @var \SplPriorityQueue|\ReflectionClass[]

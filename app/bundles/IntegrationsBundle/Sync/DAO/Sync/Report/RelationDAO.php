@@ -16,10 +16,7 @@ class RelationDAO
 
     private string $relObjectIntegrationId;
 
-    /**
-     * @var int
-     */
-    private $relObjectInternalId;
+    private ?int $relObjectInternalId = null;
 
     public function __construct(string $objectName, string $relFieldName, string $relObjectName, string $objectIntegrationId, string $relObjectIntegrationId)
     {

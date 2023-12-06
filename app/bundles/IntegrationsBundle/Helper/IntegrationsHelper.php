@@ -19,7 +19,7 @@ class IntegrationsHelper
     /**
      * @var IntegrationInterface[]
      */
-    private $integrations = [];
+    private array $integrations = [];
 
     private \Mautic\PluginBundle\Entity\IntegrationRepository $integrationRepository;
 
@@ -27,10 +27,7 @@ class IntegrationsHelper
 
     private \Symfony\Component\EventDispatcher\EventDispatcherInterface $eventDispatcher;
 
-    /**
-     * @var array
-     */
-    private $decryptedIntegrationConfigurations = [];
+    private array $decryptedIntegrationConfigurations = [];
 
     public function __construct(
         IntegrationRepository $integrationRepository,

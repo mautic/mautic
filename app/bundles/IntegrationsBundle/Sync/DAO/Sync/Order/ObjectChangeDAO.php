@@ -39,17 +39,14 @@ class ObjectChangeDAO
     /**
      * @var FieldDAO[]
      */
-    private $fields = [];
+    private array $fields = [];
 
-    /**
-     * @var ObjectMapping
-     */
-    private $objectMapping;
+    private ?\Mautic\IntegrationsBundle\Entity\ObjectMapping $objectMapping = null;
 
     /**
      * @var FieldDAO[]
      */
-    private $fieldsByState = [
+    private array $fieldsByState = [
         ReportFieldDAO::FIELD_CHANGED   => [],
         ReportFieldDAO::FIELD_UNCHANGED => [],
         ReportFieldDAO::FIELD_REQUIRED  => [],

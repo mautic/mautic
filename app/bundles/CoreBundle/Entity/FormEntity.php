@@ -10,10 +10,7 @@ use Mautic\UserBundle\Entity\User;
 
 class FormEntity extends CommonEntity
 {
-    /**
-     * @var bool
-     */
-    private $isPublished = true;
+    private bool $isPublished = true;
 
     /**
      * @var \DateTimeInterface|null
@@ -33,7 +30,7 @@ class FormEntity extends CommonEntity
     /**
      * @var \DateTimeInterface|null
      */
-    private $dateModified;
+    private ?\DateTime $dateModified = null;
 
     /**
      * @var int|null

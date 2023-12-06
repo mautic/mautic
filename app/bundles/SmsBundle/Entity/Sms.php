@@ -31,10 +31,7 @@ class Sms extends FormEntity
      */
     private $description;
 
-    /**
-     * @var string
-     */
-    private $language = 'en';
+    private string $language = 'en';
 
     /**
      * @var string
@@ -51,10 +48,7 @@ class Sms extends FormEntity
      */
     private $publishDown;
 
-    /**
-     * @var int
-     */
-    private $sentCount = 0;
+    private int $sentCount = 0;
 
     /**
      * @var \Mautic\CategoryBundle\Entity\Category|null
@@ -64,22 +58,19 @@ class Sms extends FormEntity
     /**
      * @var ArrayCollection<int, \Mautic\LeadBundle\Entity\LeadList>
      */
-    private $lists;
+    private \Doctrine\Common\Collections\ArrayCollection|array $lists;
 
     /**
      * @var ArrayCollection<int, \Mautic\SmsBundle\Entity\Stat>
      */
-    private $stats;
+    private \Doctrine\Common\Collections\ArrayCollection $stats;
 
     /**
      * @var string|null
      */
-    private $smsType = 'template';
+    private string $smsType = 'template';
 
-    /**
-     * @var int
-     */
-    private $pendingCount = 0;
+    private int $pendingCount = 0;
 
     public function __clone()
     {

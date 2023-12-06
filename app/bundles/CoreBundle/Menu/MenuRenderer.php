@@ -13,10 +13,7 @@ class MenuRenderer implements RendererInterface
 
     private \Knp\Menu\Matcher\MatcherInterface $matcher;
 
-    /**
-     * @var array
-     */
-    private $defaultOptions;
+    private array $defaultOptions;
 
     public function __construct(MatcherInterface $matcher, Environment $twig, array $defaultOptions = [])
     {

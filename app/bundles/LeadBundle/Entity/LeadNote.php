@@ -16,10 +16,7 @@ class LeadNote extends FormEntity
      */
     private $id;
 
-    /**
-     * @var \Mautic\LeadBundle\Entity\Lead
-     */
-    private $lead;
+    private ?\Mautic\LeadBundle\Entity\Lead $lead = null;
 
     /**
      * @var string
@@ -29,7 +26,7 @@ class LeadNote extends FormEntity
     /**
      * @var string|null
      */
-    private $type = 'general';
+    private string $type = 'general';
 
     /**
      * @var \DateTimeInterface

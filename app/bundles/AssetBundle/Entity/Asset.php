@@ -36,12 +36,9 @@ class Asset extends FormEntity
     /**
      * @var string|null
      */
-    private $storageLocation = 'local';
+    private string $storageLocation = 'local';
 
-    /**
-     * @var string|null
-     */
-    private $path;
+    private ?string $path = null;
 
     /**
      * @var string|null
@@ -53,10 +50,7 @@ class Asset extends FormEntity
      */
     private $originalFileName;
 
-    /**
-     * @var File
-     */
-    private $file;
+    private ?\Symfony\Component\HttpFoundation\File\File $file = null;
 
     /**
      * Holds upload directory.
@@ -92,10 +86,7 @@ class Asset extends FormEntity
      */
     private $alias;
 
-    /**
-     * @var string
-     */
-    private $language = 'en';
+    private string $language = 'en';
 
     /**
      * @var \DateTimeInterface|null
@@ -107,25 +98,13 @@ class Asset extends FormEntity
      */
     private $publishDown;
 
-    /**
-     * @var int
-     */
-    private $downloadCount = 0;
+    private int $downloadCount = 0;
 
-    /**
-     * @var int
-     */
-    private $uniqueDownloadCount = 0;
+    private int $uniqueDownloadCount = 0;
 
-    /**
-     * @var int
-     */
-    private $revision = 1;
+    private int $revision = 1;
 
-    /**
-     * @var \Mautic\CategoryBundle\Entity\Category|null
-     **/
-    private $category;
+    private ?\Mautic\CategoryBundle\Entity\Category $category = null;
 
     /**
      * @var string|null
@@ -150,7 +129,7 @@ class Asset extends FormEntity
     /**
      * @var bool|null
      */
-    private $disallow = false;
+    private bool $disallow = false;
 
     public static function loadMetadata(ORM\ClassMetadata $metadata): void
     {

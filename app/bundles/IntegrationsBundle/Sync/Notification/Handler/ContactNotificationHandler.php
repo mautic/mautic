@@ -24,15 +24,9 @@ class ContactNotificationHandler implements HandlerInterface
 
     private \Mautic\IntegrationsBundle\Sync\Notification\Helper\UserSummaryNotificationHelper $userNotificationHelper;
 
-    /**
-     * @var string
-     */
-    private $integrationDisplayName;
+    private ?string $integrationDisplayName = null;
 
-    /**
-     * @var string
-     */
-    private $objectDisplayName;
+    private ?string $objectDisplayName = null;
 
     public function __construct(
         Writer $writer,

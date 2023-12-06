@@ -14,10 +14,7 @@ class TokenPersistence implements TokenPersistenceInterface
 {
     private \Mautic\IntegrationsBundle\Helper\IntegrationsHelper $integrationsHelper;
 
-    /**
-     * @var Integration|null
-     */
-    private $integration;
+    private ?\Mautic\PluginBundle\Entity\Integration $integration = null;
 
     public function __construct(IntegrationsHelper $integrationsHelper)
     {

@@ -17,10 +17,7 @@ class WebhookEvent extends CommonEvent
      */
     protected $isNew = false;
 
-    /**
-     * @var string
-     */
-    private $reason = '';
+    private string $reason = '';
 
     /**
      * @param bool $isNew

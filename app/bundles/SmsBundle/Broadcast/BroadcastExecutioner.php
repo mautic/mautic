@@ -15,17 +15,11 @@ class BroadcastExecutioner
 
     private LeadRepository $leadRepository;
 
-    /**
-     * @var ContactLimiter
-     */
-    private $contactLimiter;
+    private ?\Mautic\CampaignBundle\Executioner\ContactFinder\Limiter\ContactLimiter $contactLimiter = null;
 
     private \Mautic\SmsBundle\Broadcast\BroadcastQuery $broadcastQuery;
 
-    /**
-     * @var BroadcastResult
-     */
-    private $result;
+    private ?\Mautic\SmsBundle\Broadcast\BroadcastResult $result = null;
 
     private \Symfony\Contracts\Translation\TranslatorInterface $translator;
 

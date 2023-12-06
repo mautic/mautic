@@ -13,7 +13,7 @@ class AuthIntegrationsHelper
     /**
      * @var AuthenticationInterface[]
      */
-    private $integrations = [];
+    private array $integrations = [];
 
     private \Mautic\IntegrationsBundle\Helper\IntegrationsHelper $integrationsHelper;
 

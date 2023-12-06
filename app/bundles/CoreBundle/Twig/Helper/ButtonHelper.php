@@ -64,20 +64,11 @@ final class ButtonHelper
 
     private \Symfony\Component\EventDispatcher\EventDispatcherInterface $dispatcher;
 
-    /**
-     * @var string|null
-     */
-    private $wrapOpeningTag;
+    private ?string $wrapOpeningTag = null;
 
-    /**
-     * @var string|null
-     */
-    private $wrapClosingTag;
+    private ?string $wrapClosingTag = null;
 
-    /**
-     * @var string
-     */
-    private $groupType = self::TYPE_GROUP;
+    private string $groupType = self::TYPE_GROUP;
 
     /**
      * @var string|null
@@ -89,30 +80,18 @@ final class ButtonHelper
      */
     private $buttons = [];
 
-    /**
-     * @var int
-     */
-    private $buttonCount = 0;
+    private int $buttonCount = 0;
 
-    /**
-     * @var bool
-     */
-    private $buttonsFetched = false;
+    private bool $buttonsFetched = false;
 
-    /**
-     * @var Request
-     */
-    private $request;
+    private ?\Symfony\Component\HttpFoundation\Request $request = null;
 
     /**
      * @var mixed
      */
     private $item;
 
-    /**
-     * @var int
-     */
-    private $listMarker = 3;
+    private int $listMarker = 3;
 
     public function __construct(Environment $twig, TranslatorInterface $translator, EventDispatcherInterface $dispatcher)
     {

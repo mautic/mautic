@@ -19,10 +19,7 @@ class FeedbackLoop implements ProcessorInterface
 
     private \Psr\Log\LoggerInterface $logger;
 
-    /**
-     * @var Message
-     */
-    private $message;
+    private ?\Mautic\EmailBundle\MonitoredEmail\Message $message = null;
 
     private DoNotContactModel $doNotContact;
 

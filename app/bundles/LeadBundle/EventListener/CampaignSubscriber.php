@@ -64,10 +64,7 @@ class CampaignSubscriber implements EventSubscriberInterface
 
     private \Mautic\LeadBundle\Provider\FilterOperatorProvider $filterOperatorProvider;
 
-    /**
-     * @var array
-     */
-    private $fields;
+    private ?array $fields = null;
 
     private DoNotContact $doNotContact;
 

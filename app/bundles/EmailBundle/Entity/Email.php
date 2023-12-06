@@ -82,15 +82,9 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
      */
     private $template;
 
-    /**
-     * @var array
-     */
-    private $content = [];
+    private array $content = [];
 
-    /**
-     * @var array
-     */
-    private $utmTags = [];
+    private array $utmTags = [];
 
     /**
      * @var string|null
@@ -120,22 +114,13 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
     /**
      * @var bool|null
      */
-    private $publicPreview = false;
+    private bool $publicPreview = false;
 
-    /**
-     * @var int
-     */
-    private $readCount = 0;
+    private int $readCount = 0;
 
-    /**
-     * @var int
-     */
-    private $sentCount = 0;
+    private int $sentCount = 0;
 
-    /**
-     * @var int
-     */
-    private $revision = 1;
+    private int $revision = 1;
 
     /**
      * @var \Mautic\CategoryBundle\Entity\Category|null
@@ -145,57 +130,36 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
     /**
      * @var ArrayCollection<\Mautic\LeadBundle\Entity\LeadList>
      */
-    private $lists;
+    private \Doctrine\Common\Collections\ArrayCollection|array $lists;
 
     /**
      * @var ArrayCollection<\Mautic\EmailBundle\Entity\Stat>
      */
-    private $stats;
+    private \Doctrine\Common\Collections\ArrayCollection $stats;
 
-    /**
-     * @var int
-     */
-    private $variantSentCount = 0;
+    private int $variantSentCount = 0;
 
-    /**
-     * @var int
-     */
-    private $variantReadCount = 0;
+    private int $variantReadCount = 0;
 
-    /**
-     * @var \Mautic\FormBundle\Entity\Form|null
-     */
-    private $unsubscribeForm;
+    private ?\Mautic\FormBundle\Entity\Form $unsubscribeForm = null;
 
-    /**
-     * @var \Mautic\PageBundle\Entity\Page|null
-     */
-    private $preferenceCenter;
+    private ?\Mautic\PageBundle\Entity\Page $preferenceCenter = null;
 
     /**
      * @var ArrayCollection<\Mautic\AssetBundle\Entity\Asset>
      */
-    private $assetAttachments;
+    private \Doctrine\Common\Collections\ArrayCollection|array $assetAttachments;
 
     /**
      * Used to identify the page for the builder.
      */
-    private $sessionId;
+    private ?string $sessionId = null;
 
-    /**
-     * @var array
-     */
-    private $headers = [];
+    private array $headers = [];
 
-    /**
-     * @var int
-     */
-    private $pendingCount = 0;
+    private int $pendingCount = 0;
 
-    /**
-     * @var int
-     */
-    private $queuedCount = 0;
+    private int $queuedCount = 0;
 
     /**
      * In some use cases, we need to get the original email ID after it's been cloned.

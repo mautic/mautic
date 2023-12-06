@@ -17,12 +17,12 @@ class SyncIntegrationsHelper
     /**
      * @var SyncInterface[]
      */
-    private $integrations = [];
+    private array $integrations = [];
 
     /**
      * @var array<int,string>|null
      */
-    private $enabled;
+    private ?array $enabled = null;
 
     private \Mautic\IntegrationsBundle\Helper\IntegrationsHelper $integrationsHelper;
 

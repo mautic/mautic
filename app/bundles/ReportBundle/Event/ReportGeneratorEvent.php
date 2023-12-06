@@ -16,10 +16,7 @@ class ReportGeneratorEvent extends AbstractReportEvent
     public const COMPANY_LEAD_PREFIX     = 'companies_lead';
     public const IP_ADDRESS_PREFIX       = 'i';
 
-    /**
-     * @var array
-     */
-    private $selectColumns = [];
+    private array $selectColumns = [];
 
     /**
      * QueryBuilder object.
@@ -33,22 +30,13 @@ class ReportGeneratorEvent extends AbstractReportEvent
      */
     private $contentTemplate;
 
-    /**
-     * @var array
-     */
-    private $options = [];
+    private array $options = [];
 
-    /**
-     * @var ExpressionBuilder|null
-     */
-    private $filterExpression;
+    private ?\Doctrine\DBAL\Query\Expression\ExpressionBuilder $filterExpression = null;
 
     private \Mautic\ChannelBundle\Helper\ChannelListHelper $channelListHelper;
 
-    /**
-     * @var array|null
-     */
-    private $sortedFilters;
+    private ?array $sortedFilters = null;
 
     public function __construct(Report $report, array $options, QueryBuilder $qb, ChannelListHelper $channelListHelper)
     {

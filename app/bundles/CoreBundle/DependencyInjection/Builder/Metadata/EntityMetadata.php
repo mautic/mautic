@@ -10,15 +10,9 @@ class EntityMetadata
 {
     private \Mautic\CoreBundle\DependencyInjection\Builder\BundleMetadata $metadata;
 
-    /**
-     * @var array
-     */
-    private $ormConfig = [];
+    private array $ormConfig = [];
 
-    /**
-     * @var array
-     */
-    private $serializerConfig = [];
+    private array $serializerConfig = [];
 
     public function __construct(BundleMetadata $metadata)
     {

@@ -13,15 +13,12 @@ class FieldMergerHelper
 {
     private \Mautic\IntegrationsBundle\Integration\Interfaces\ConfigFormSyncInterface $integrationObject;
 
-    /**
-     * @var array
-     */
-    private $currentFieldMappings;
+    private array $currentFieldMappings;
 
     /**
      * @var MappedFieldInfoInterface[]
      */
-    private $allFields;
+    private ?array $allFields = null;
 
     public function __construct(ConfigFormSyncInterface $integrationObject, array $currentFieldMappings)
     {

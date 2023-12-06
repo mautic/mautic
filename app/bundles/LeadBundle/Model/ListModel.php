@@ -58,7 +58,7 @@ class ListModel extends FormModel
     /**
      * @var mixed[]
      */
-    private $choiceFieldsCache = [];
+    private array $choiceFieldsCache = [];
 
     private \Mautic\LeadBundle\Segment\Stat\SegmentChartQueryFactory $segmentChartQueryFactory;
 
@@ -92,10 +92,8 @@ class ListModel extends FormModel
 
     /**
      * Used by addLead and removeLead functions.
-     *
-     * @var array
      */
-    private $leadChangeLists = [];
+    private array $leadChangeLists = [];
 
     /**
      * {@inheritdoc}

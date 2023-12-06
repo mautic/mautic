@@ -16,10 +16,7 @@ use Symfony\Component\HttpFoundation\Response;
 
 class PublicController extends CommonFormController
 {
-    /**
-     * @var array
-     */
-    private $tokens = [];
+    private array $tokens = [];
 
     /**
      * @return \Symfony\Component\HttpFoundation\RedirectResponse|Response

@@ -20,20 +20,11 @@ class MappingManualDAO
 {
     private string $integration;
 
-    /**
-     * @var array
-     */
-    private $objectsMapping = [];
+    private array $objectsMapping = [];
 
-    /**
-     * @var array
-     */
-    private $internalObjectsMapping = [];
+    private array $internalObjectsMapping = [];
 
-    /**
-     * @var array
-     */
-    private $integrationObjectsMapping = [];
+    private array $integrationObjectsMapping = [];
 
     public function __construct(string $integration)
     {

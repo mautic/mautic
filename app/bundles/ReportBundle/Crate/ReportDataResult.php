@@ -13,15 +13,9 @@ class ReportDataResult
      */
     private $data;
 
-    /**
-     * @var array
-     */
-    private $headers = [];
+    private array $headers = [];
 
-    /**
-     * @var array
-     */
-    private $types = [];
+    private array $types = [];
 
     /**
      * @var array<mixed>

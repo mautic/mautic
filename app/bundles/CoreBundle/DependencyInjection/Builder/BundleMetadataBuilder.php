@@ -12,30 +12,15 @@ class BundleMetadataBuilder
 
     private array $symfonyBundles;
 
-    /**
-     * @var array
-     */
-    private $ipLookupServices = [];
+    private array $ipLookupServices = [];
 
-    /**
-     * @var array
-     */
-    private $ormConfig = [];
+    private array $ormConfig = [];
 
-    /**
-     * @var array
-     */
-    private $serializerConfig = [];
+    private array $serializerConfig = [];
 
-    /**
-     * @var array
-     */
-    private $pluginMetadata = [];
+    private array $pluginMetadata = [];
 
-    /**
-     * @var array
-     */
-    private $coreMetadata = [];
+    private array $coreMetadata = [];
 
     public function __construct(array $symfonyBundles, array $paths)
     {

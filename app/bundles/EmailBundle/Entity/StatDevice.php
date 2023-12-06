@@ -15,20 +15,11 @@ class StatDevice
      */
     private $id;
 
-    /**
-     * @var \Mautic\EmailBundle\Entity\Stat|null
-     */
-    private $stat;
+    private ?\Mautic\EmailBundle\Entity\Stat $stat = null;
 
-    /**
-     * @var \Mautic\LeadBundle\Entity\LeadDevice|null
-     */
-    private $device;
+    private ?\Mautic\LeadBundle\Entity\LeadDevice $device = null;
 
-    /**
-     * @var \Mautic\CoreBundle\Entity\IpAddress|null
-     */
-    private $ipAddress;
+    private ?\Mautic\CoreBundle\Entity\IpAddress $ipAddress = null;
 
     /**
      * @var \DateTimeInterface

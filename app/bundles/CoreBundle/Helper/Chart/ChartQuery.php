@@ -19,10 +19,7 @@ class ChartQuery extends AbstractChart
 
     private DateTimeHelper $dateTimeHelper;
 
-    /**
-     * @var GeneratedColumnsProviderInterface
-     */
-    private $generatedColumnProvider;
+    private ?\Mautic\CoreBundle\Doctrine\Provider\GeneratedColumnsProviderInterface $generatedColumnProvider = null;
 
     /**
      * Match date/time unit to a SQL datetime format

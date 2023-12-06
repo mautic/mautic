@@ -46,7 +46,7 @@ class Message extends FormEntity
     /**
      * @var ArrayCollection<int,Channel>
      */
-    private $channels;
+    private \Doctrine\Common\Collections\ArrayCollection|array $channels;
 
     public function __clone()
     {

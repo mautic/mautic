@@ -43,20 +43,11 @@ class FrequencyRule extends CommonEntity
      */
     private $channel;
 
-    /**
-     * @var bool
-     */
-    private $preferredChannel = 0;
+    private int $preferredChannel = 0;
 
-    /**
-     * @var \DateTimeInterface
-     */
-    private $pauseFromDate;
+    private ?\DateTime $pauseFromDate = null;
 
-    /**
-     * @var \DateTimeInterface
-     */
-    private $pauseToDate;
+    private ?\DateTime $pauseToDate = null;
 
     public static function loadMetadata(ORM\ClassMetadata $metadata): void
     {

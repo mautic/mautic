@@ -18,10 +18,7 @@ class TwilioTransport implements TransportInterface
 
     private \Psr\Log\LoggerInterface $logger;
 
-    /**
-     * @var Client
-     */
-    private $client;
+    private ?\Twilio\Rest\Client $client = null;
 
     public function __construct(Configuration $configuration, LoggerInterface $logger)
     {

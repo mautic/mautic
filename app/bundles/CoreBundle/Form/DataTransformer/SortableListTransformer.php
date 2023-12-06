@@ -7,15 +7,9 @@ use Symfony\Component\Form\DataTransformerInterface;
 
 class SortableListTransformer implements DataTransformerInterface
 {
-    /**
-     * @var bool
-     */
-    private $withLabels = true;
+    private bool $withLabels = true;
 
-    /**
-     * @var bool
-     */
-    private $useKeyValuePairs = false;
+    private bool $useKeyValuePairs = false;
 
     /**
      * @param bool $withLabels
