@@ -63,10 +63,7 @@ class DayStat implements StatInterface
         return $sum;
     }
 
-    /**
-     * @return int
-     */
-    public function getCount()
+    public function getCount(): int
     {
         return count($this->stats);
     }

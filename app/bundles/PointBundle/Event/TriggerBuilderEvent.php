@@ -70,7 +70,7 @@ class TriggerBuilderEvent extends Event
      */
     public function getEvents()
     {
-        uasort($this->events, function ($a, $b) {
+        uasort($this->events, function ($a, $b): int {
             return strnatcasecmp(
                 $a['label'], $b['label']);
         });

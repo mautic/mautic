@@ -20,7 +20,7 @@ class PointPermissions extends AbstractPermissions
     /**
      * {@inheritdoc}
      */
-    public function getName()
+    public function getName(): string
     {
         return 'point';
     }

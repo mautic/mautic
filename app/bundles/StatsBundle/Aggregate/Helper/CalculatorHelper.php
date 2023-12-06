@@ -7,19 +7,14 @@ use Mautic\StatsBundle\Aggregate\Collection\DAO\StatDAO;
 class CalculatorHelper
 {
     /**
-     * @return string
-     *
      * @throws \Exception
      */
-    public static function getYearLabel($year, $labelFormat)
+    public static function getYearLabel($year, $labelFormat): string
     {
         return (new \DateTime(self::getYearDateString($year)))->format($labelFormat);
     }
 
-    /**
-     * @return string
-     */
-    public static function getYearDateString($year)
+    public static function getYearDateString($year): string
     {
         return "$year-01-01 00:00:00";
     }
@@ -51,19 +46,14 @@ class CalculatorHelper
     }
 
     /**
-     * @return string
-     *
      * @throws \Exception
      */
-    public static function getMonthLabel($month, $labelFormat)
+    public static function getMonthLabel($month, $labelFormat): string
     {
         return (new \DateTime(self::getMonthDateString($month)))->format($labelFormat);
     }
 
-    /**
-     * @return string
-     */
-    public static function getMonthDateString($month)
+    public static function getMonthDateString($month): string
     {
         return "$month-01 00:00:00";
     }
@@ -95,19 +85,14 @@ class CalculatorHelper
     }
 
     /**
-     * @return string
-     *
      * @throws \Exception
      */
-    public static function getDayLabel($day, $labelFormat)
+    public static function getDayLabel($day, $labelFormat): string
     {
         return (new \DateTime(self::getDayDateString($day)))->format($labelFormat);
     }
 
-    /**
-     * @return string
-     */
-    public static function getDayDateString($day)
+    public static function getDayDateString($day): string
     {
         return "$day 00:00:00";
     }
@@ -115,11 +100,9 @@ class CalculatorHelper
     /**
      * @param string $date
      *
-     * @return string
-     *
      * @throws \Exception
      */
-    public static function getWeekFromDayString($date)
+    public static function getWeekFromDayString($date): string
     {
         return (new \DateTime($date))->format('Y-W');
     }
@@ -128,21 +111,17 @@ class CalculatorHelper
      * @param string $date
      * @param string $labelFormat
      *
-     * @return string
-     *
      * @throws \Exception
      */
-    public static function getWeekLabel($date, $labelFormat = 'Y-W')
+    public static function getWeekLabel($date, $labelFormat = 'Y-W'): string
     {
         return (new \DateTime(self::getWeekDateString($date)))->format($labelFormat);
     }
 
     /**
      * @param string $day
-     *
-     * @return string
      */
-    public static function getWeekDateString($date)
+    public static function getWeekDateString($date): string
     {
         if (!preg_match('/^([0-9]{4})-([0-9]{2})$/', $date, $matches)) {
             throw new \InvalidArgumentException('Invalid argument, Y-W format is required.');
@@ -198,19 +177,14 @@ class CalculatorHelper
     }
 
     /**
-     * @return string
-     *
      * @throws \Exception
      */
-    public static function getHourLabel($hour, $labelFormat)
+    public static function getHourLabel($hour, $labelFormat): string
     {
         return (new \DateTime(self::getHourDateString($hour)))->format($labelFormat);
     }
 
-    /**
-     * @return string
-     */
-    public static function getHourDateString($hour)
+    public static function getHourDateString($hour): string
     {
         return "$hour:00:00";
     }
