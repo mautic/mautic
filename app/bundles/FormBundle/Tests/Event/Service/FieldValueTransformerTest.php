@@ -61,7 +61,7 @@ final class FieldValueTransformerTest extends \PHPUnit\Framework\TestCase
         };
         $transformer = new FieldValueTransformer($router);
         $submission  = new class() extends Submission {
-            public function getId()
+            public function getId(): int
             {
                 return 456;
             }

@@ -81,7 +81,7 @@ class FormValidationSubscriber implements EventSubscriberInterface
         $value = $event->getValue();
         if ('email' === $field->getType() && !empty($field->getValidation()['donotsubmit'])) {
             // Check the domains using shell wildcard patterns
-            $donotSubmitFilter = function ($doNotSubmitArray) use ($value) {
+            $donotSubmitFilter = function ($doNotSubmitArray) use ($value): bool {
                 return fnmatch($doNotSubmitArray, $value, FNM_CASEFOLD);
             };
             $notNotSubmitEmails = $this->coreParametersHelper->get('do_not_submit_emails');

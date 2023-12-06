@@ -50,10 +50,7 @@ class DisplayCounter
         return $this->alreadyAlwaysDisplayed;
     }
 
-    /**
-     * @return int
-     */
-    public function getAlwaysDisplayFields()
+    public function getAlwaysDisplayFields(): int
     {
         $i= 0;
         /** @var Field $field */

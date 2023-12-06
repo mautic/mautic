@@ -339,18 +339,12 @@ class AssetModel extends FormModel
         return $this->em->getRepository(\Mautic\AssetBundle\Entity\Download::class);
     }
 
-    /**
-     * @return string
-     */
-    public function getPermissionBase()
+    public function getPermissionBase(): string
     {
         return 'asset:assets';
     }
 
-    /**
-     * @return string
-     */
-    public function getNameGetter()
+    public function getNameGetter(): string
     {
         return 'getTitle';
     }

@@ -119,7 +119,7 @@ class FormModel extends CommonFormModel
     /**
      * {@inheritdoc}
      */
-    public function getPermissionBase()
+    public function getPermissionBase(): string
     {
         return 'form:forms';
     }
@@ -127,7 +127,7 @@ class FormModel extends CommonFormModel
     /**
      * {@inheritdoc}
      */
-    public function getNameGetter()
+    public function getNameGetter(): string
     {
         return 'getName';
     }
@@ -467,10 +467,8 @@ class FormModel extends CommonFormModel
      * Generate the form's html.
      *
      * @param bool $persist
-     *
-     * @return string
      */
-    public function generateHtml(Form $entity, $persist = true)
+    public function generateHtml(Form $entity, $persist = true): string
     {
         $theme         = $entity->getTemplate();
         $submissions   = null;
@@ -501,7 +499,7 @@ class FormModel extends CommonFormModel
         $fields = $entity->getFields()->toArray();
 
         // Ensure the correct order in case this is generated right after a form save with new fields
-        uasort($fields, function ($a, $b) {
+        uasort($fields, function ($a, $b): int {
             if ($a->getOrder() === $b->getOrder()) {
                 return 0;
             }
@@ -724,10 +722,8 @@ class FormModel extends CommonFormModel
 
     /**
      * Get the document write javascript for the form.
-     *
-     * @return string
      */
-    public function getAutomaticJavascript(Form $form)
+    public function getAutomaticJavascript(Form $form): string
     {
         $html       = $this->getContent($form, false);
         $formScript = $this->getFormScript($form);
@@ -755,10 +751,7 @@ class FormModel extends CommonFormModel
         return $script;
     }
 
-    /**
-     * @return string
-     */
-    public function getFormScript(Form $form)
+    public function getFormScript(Form $form): string
     {
         $theme          = $form->getTemplate();
         $scriptToRender = '@MauticForm/Builder/_script.html.twig';
@@ -997,10 +990,8 @@ class FormModel extends CommonFormModel
 
     /**
      * Remove script from html.
-     *
-     * @return string
      */
-    private function removeScriptTag($html)
+    private function removeScriptTag($html): string
     {
         libxml_use_internal_errors(true);
         $dom = new \DOMDocument();
@@ -1027,10 +1018,8 @@ class FormModel extends CommonFormModel
 
     /**
      * Generate dom manipulation javascript to include all script.
-     *
-     * @return string
      */
-    private function generateJsScript($html)
+    private function generateJsScript($html): string
     {
         libxml_use_internal_errors(true);
         $dom = new \DOMDocument();
