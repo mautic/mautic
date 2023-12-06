@@ -240,7 +240,7 @@ class UTF8Helper
         return self::toUTF8(static::utf8_decode($text, $option));
     }
 
-    public static function UTF8FixWin1252Chars($text): string|array
+    public static function UTF8FixWin1252Chars($text): string
     {
         // If you received an UTF-8 string that was converted from Windows-1252 as it was ISO8859-1
         // (ignoring Windows-1252 chars from 80 to 9F) use this function to fix it.

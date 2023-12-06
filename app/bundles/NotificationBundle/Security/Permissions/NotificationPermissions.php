@@ -20,8 +20,6 @@ class NotificationPermissions extends AbstractPermissions
 
     /**
      * {@inheritdoc}
-     *
-     * @return string|void
      */
     public function getName(): string
     {

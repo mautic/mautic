@@ -17,11 +17,6 @@ class WebhookPermissions extends AbstractPermissions
         $this->addStandardPermissions('categories');
     }
 
-    /**
-     * {@inheritdoc}
-     *
-     * @return string|void
-     */
     public function getName(): string
     {
         return 'webhook';

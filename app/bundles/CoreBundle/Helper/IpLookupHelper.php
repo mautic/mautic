@@ -204,8 +204,6 @@ class IpLookupHelper
 
     /**
      * Validates if an IP address if valid.
-     *
-     * @return mixed
      */
     public function ipIsValid($ip): string|bool
     {

@@ -596,8 +596,6 @@ class WebhookModel extends FormModel
 
     /**
      * @param array $groups
-     *
-     * @return mixed|string
      */
     public function serializeData($payload, $groups = [], array $customExclusionStrategies = []): string
     {

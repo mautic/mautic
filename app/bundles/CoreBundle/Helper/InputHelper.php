@@ -347,8 +347,6 @@ class InputHelper
      * Removes all characters except those allowed in emails.
      *
      * @param bool|false $urldecode
-     *
-     * @return mixed
      */
     public static function email($value, $urldecode = false): string
     {

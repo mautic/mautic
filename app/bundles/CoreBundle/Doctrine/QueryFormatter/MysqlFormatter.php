@@ -13,8 +13,6 @@ class MysqlFormatter extends AbstractFormatter
      * Format field to datetime.
      *
      * @param string $format
-     *
-     * @return mixed
      */
     public function toDateTime($field, $format = '%Y-%m-%d %k:%i:%s'): string
     {
@@ -25,8 +23,6 @@ class MysqlFormatter extends AbstractFormatter
      * Format field to date.
      *
      * @param string $format
-     *
-     * @return mixed
      */
     public function toDate($field, $format = '%Y-%m-%d'): string
     {
@@ -37,8 +33,6 @@ class MysqlFormatter extends AbstractFormatter
      * Format field to time.
      *
      * @param string $format
-     *
-     * @return mixed
      */
     public function toTime($field, $format = '%k:%i:%s'): string
     {
