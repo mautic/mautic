@@ -73,7 +73,7 @@ class ClientModel extends FormModel
     /**
      * {@inheritdoc}
      */
-    public function getPermissionBase()
+    public function getPermissionBase(): string
     {
         return 'api:clients';
     }

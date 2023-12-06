@@ -20,7 +20,7 @@ class MessageListType extends AbstractType
                 'modal_route'        => 'mautic_message_action',
                 'model'              => 'channel.message',
                 'multiple'           => true,
-                'ajax_lookup_action' => function (Options $options) {
+                'ajax_lookup_action' => function (Options $options): string {
                     $query = [
                         'is_published' => $options['is_published'],
                     ];

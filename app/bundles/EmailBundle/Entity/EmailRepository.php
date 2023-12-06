@@ -500,7 +500,7 @@ class EmailRepository extends CommonRepository
     /**
      * {@inheritdoc}
      */
-    public function getTableAlias()
+    public function getTableAlias(): string
     {
         return 'e';
     }
@@ -700,10 +700,8 @@ class EmailRepository extends CommonRepository
 
     /**
      * Is one of emails unpublished?
-     *
-     * @return bool
      */
-    public function isOneUnpublished(array $ids)
+    public function isOneUnpublished(array $ids): bool
     {
         $result = $this->getEntityManager()
             ->createQueryBuilder()

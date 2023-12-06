@@ -65,10 +65,7 @@ class MessageModel extends FormModel implements AjaxLookupModelInterface
         }
     }
 
-    /**
-     * @return string
-     */
-    public function getPermissionBase()
+    public function getPermissionBase(): string
     {
         return 'channel:messages';
     }

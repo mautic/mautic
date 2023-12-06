@@ -41,10 +41,7 @@ class BatchIdToEntityHelper
         $this->extractIds($parameters);
     }
 
-    /**
-     * @return bool
-     */
-    public function hasIds()
+    public function hasIds(): bool
     {
         return !empty($this->ids);
     }
@@ -57,10 +54,7 @@ class BatchIdToEntityHelper
         return $this->ids;
     }
 
-    /**
-     * @return bool
-     */
-    public function hasErrors()
+    public function hasErrors(): bool
     {
         return !empty($this->errors);
     }

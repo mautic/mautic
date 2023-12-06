@@ -26,7 +26,7 @@ class ApiPermissions extends AbstractPermissions
     /**
      * {@inheritdoc}
      */
-    public function getName()
+    public function getName(): string
     {
         return 'api';
     }
@@ -66,7 +66,7 @@ class ApiPermissions extends AbstractPermissions
     /**
      * {@inheritdoc}
      */
-    public function isEnabled()
+    public function isEnabled(): bool
     {
         return !empty($this->params['api_enabled']);
     }

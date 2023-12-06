@@ -29,10 +29,8 @@ class RequestStorageHelper
      * Stores the request content into cache and returns the unique key under which it's stored.
      *
      * @param string $transportName
-     *
-     * @return string
      */
-    public function storeRequest($transportName, Request $request)
+    public function storeRequest($transportName, Request $request): string
     {
         $key  = $this->getUniqueCacheHash($transportName);
         $item = $this->cacheStorage->getItem($key);

@@ -348,10 +348,8 @@ class DashboardSubscriber extends MainDashboardSubscriber
 
     /**
      * Count the row limit from the widget height.
-     *
-     * @return int
      */
-    private function getDefaultLimit(Widget $widget)
+    private function getDefaultLimit(Widget $widget): float
     {
         return round((($widget->getHeight() - 80) / 35) - 1);
     }

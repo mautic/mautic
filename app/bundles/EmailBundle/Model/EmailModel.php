@@ -199,7 +199,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
         return $this->em->getRepository(\Mautic\EmailBundle\Entity\StatDevice::class);
     }
 
-    public function getPermissionBase()
+    public function getPermissionBase(): string
     {
         return 'email:emails';
     }
@@ -1000,7 +1000,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
      *
      * @return array|int
      */
-    public function getQueuedCounts(Email $email, $includeVariants = true)
+    public function getQueuedCounts(Email $email, $includeVariants = true): int
     {
         $ids = ($includeVariants) ? $email->getRelatedEntityIds() : null;
         if (!in_array($email->getId(), $ids)) {
@@ -1300,7 +1300,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
             }
 
             // Reorder according to send_weight so that campaigns which currently send one at a time alternate
-            uasort($this->emailSettings[$email->getId()], function ($a, $b) {
+            uasort($this->emailSettings[$email->getId()], function ($a, $b): int {
                 if ($a['weight_deficit'] === $b['weight_deficit']) {
                     if ($a['variantCount'] === $b['variantCount']) {
                         return 0;

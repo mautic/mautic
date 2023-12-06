@@ -690,10 +690,7 @@ class MailHelper
         }
     }
 
-    /**
-     * @return string
-     */
-    public static function getBlankPixel()
+    public static function getBlankPixel(): string
     {
         return 'data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=';
     }
