@@ -33,10 +33,11 @@ return static function (Rector\Config\RectorConfig $rectorConfig): void {
         // lets handle later, once we have more type declaratoins
         \Rector\DeadCode\Rector\Cast\RecastingRemovalRector::class,
 
-        AddVoidReturnTypeWhereNoReturnRector::class => [
-            // handled in separate PRs, remove after merge to avoid conflicts
-            __DIR__.'/app/bundles/ApiBundle',
-            __DIR__.'/app/bundles/CampaignBundle',
+        \Rector\DeadCode\Rector\Property\RemoveUnusedPrivatePropertyRector::class => [
+            // entities
+            __DIR__.'/app/bundles/UserBundle/Entity',
+            // typo fallback
+            __DIR__.'/app/bundles/LeadBundle/Entity/LeadField.php',
         ],
 
         ReturnTypeFromStrictBoolReturnExprRector::class => [
