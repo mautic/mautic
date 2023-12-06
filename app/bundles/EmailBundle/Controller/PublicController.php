@@ -64,7 +64,7 @@ class PublicController extends CommonFormController
                 $subject = EmojiHelper::toEmoji($subject, 'short');
 
                 // Replace tokens
-                if ($tokens !== []) {
+                if ([] !== $tokens) {
                     $content = str_ireplace(array_keys($tokens), $tokens, $content);
                     $subject = str_ireplace(array_keys($tokens), $tokens, $subject);
                 }

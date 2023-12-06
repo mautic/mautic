@@ -59,16 +59,16 @@ return static function (Rector\Config\RectorConfig $rectorConfig): void {
             // entities magic
             __DIR__.'/app/bundles/LeadBundle/Entity',
         ],
-<<<<<<< HEAD
-=======
 
         // handle later, case by case as lot of chnaged code
         \Rector\DeadCode\Rector\If_\RemoveAlwaysTrueIfConditionRector::class => [
             __DIR__.'/app/bundles/PointBundle/Controller/TriggerController.php',
             __DIR__.'/app/bundles/LeadBundle/Controller/ImportController.php',
             __DIR__.'/app/bundles/FormBundle/Controller/FormController.php',
+            // watch out on this one - the variables are set magically via $$name
+            // @see app/bundles/FormBundle/Form/Type/FieldType.php:99
+            __DIR__.'/app/bundles/FormBundle/Form/Type/FieldType.php',
         ],
->>>>>>> 5275b64c6d (cleanup rector config)
     ]);
 
     foreach (['dev', 'test', 'prod'] as $environment) {

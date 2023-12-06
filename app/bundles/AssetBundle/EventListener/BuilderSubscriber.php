@@ -79,7 +79,7 @@ class BuilderSubscriber implements EventSubscriberInterface
         $tokens  = $this->generateTokensFromContent($event, $leadId, ['page', $page->getId()]);
         $content = $event->getContent();
 
-        if ($tokens !== []) {
+        if ([] !== $tokens) {
             $content = str_ireplace(array_keys($tokens), $tokens, $content);
         }
         $event->setContent($content);

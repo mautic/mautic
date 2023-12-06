@@ -96,6 +96,7 @@ class FieldType extends AbstractType
                 'addIsRequired',
                 'addHtml',
             ];
+
             foreach ($addFields as $f) {
                 if (isset($customParams['builderOptions'][$f])) {
                     $$f = (bool) $customParams['builderOptions'][$f];
