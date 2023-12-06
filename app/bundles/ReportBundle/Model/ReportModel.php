@@ -112,7 +112,7 @@ class ReportModel extends FormModel
     /**
      * {@inheritdoc}
      */
-    public function getPermissionBase()
+    public function getPermissionBase(): string
     {
         return 'report:reports';
     }
@@ -721,10 +721,7 @@ class ReportModel extends FormModel
         return $options;
     }
 
-    /**
-     * @return int
-     */
-    private function getTotalCount(QueryBuilder $qb, array &$debugData)
+    private function getTotalCount(QueryBuilder $qb, array &$debugData): int
     {
         $countQb = clone $qb;
         $countQb->resetQueryParts();

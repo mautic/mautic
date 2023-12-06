@@ -37,10 +37,8 @@ class EncryptionHelper
 
     /**
      * Returns a 64 character string.
-     *
-     * @return string
      */
-    public static function generateKey()
+    public static function generateKey(): string
     {
         return hash('sha256', uniqid(mt_rand(), true));
     }
@@ -49,10 +47,8 @@ class EncryptionHelper
      * Encrypt string.
      *
      * @param mixed $data
-     *
-     * @return string
      */
-    public function encrypt($data)
+    public function encrypt($data): string
     {
         $encryptionCipher = reset($this->availableCiphers);
         $initVector       = $encryptionCipher->getRandomInitVector();

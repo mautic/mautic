@@ -157,10 +157,7 @@ class CampaignHelper
         return $this->contactsValues[$contact->getId()];
     }
 
-    /**
-     * @return string
-     */
-    private function ipAddressesToCsv(Collection $ipAddresses)
+    private function ipAddressesToCsv(Collection $ipAddresses): string
     {
         $addresses = [];
         foreach ($ipAddresses as $ipAddress) {

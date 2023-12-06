@@ -18,7 +18,7 @@ class SystemPermissions extends AbstractPermissions
     /**
      * {@inheritdoc}
      */
-    public function getName()
+    public function getName(): string
     {
         return 'core';
     }

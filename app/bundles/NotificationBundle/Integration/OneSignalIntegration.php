@@ -13,15 +13,13 @@ class OneSignalIntegration extends AbstractIntegration
 
     /**
      * {@inheritdoc}
-     *
-     * @return string
      */
-    public function getName()
+    public function getName(): string
     {
         return 'OneSignal';
     }
 
-    public function getIcon()
+    public function getIcon(): string
     {
         return 'app/bundles/NotificationBundle/Assets/img/OneSignal.png';
     }
@@ -59,10 +57,8 @@ class OneSignalIntegration extends AbstractIntegration
 
     /**
      * {@inheritdoc}
-     *
-     * @return string
      */
-    public function getAuthenticationType()
+    public function getAuthenticationType(): string
     {
         return 'none';
     }

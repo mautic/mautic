@@ -18,10 +18,7 @@ class ExportOption
         $this->reportId = (int) $reportId;
     }
 
-    /**
-     * @return int
-     */
-    public function getReportId()
+    public function getReportId(): int
     {
         return $this->reportId;
     }

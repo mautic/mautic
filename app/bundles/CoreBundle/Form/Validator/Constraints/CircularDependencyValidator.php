@@ -44,11 +44,9 @@ class CircularDependencyValidator extends ConstraintValidator
     }
 
     /**
-     * @return int
-     *
      * @throws \UnexpectedValueException
      */
-    private function getSegmentIdFromRequest()
+    private function getSegmentIdFromRequest(): int
     {
         $request     = $this->requestStack->getCurrentRequest();
         $routeParams = $request->get('_route_params');
@@ -79,10 +77,7 @@ class CircularDependencyValidator extends ConstraintValidator
         return $this->flatten($segentIdsInFilter);
     }
 
-    /**
-     * @return array
-     */
-    private function flatten(array $array)
+    private function flatten(array $array): array
     {
         return array_unique(array_reduce($array, 'array_merge', []));
     }

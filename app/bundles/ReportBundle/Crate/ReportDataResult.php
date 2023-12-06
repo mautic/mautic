@@ -83,10 +83,7 @@ class ReportDataResult
         $this->buildTotals($data['aggregatorColumns'] ?? []);
     }
 
-    /**
-     * @return int
-     */
-    public function getTotalResults()
+    public function getTotalResults(): int
     {
         return $this->totalResults;
     }

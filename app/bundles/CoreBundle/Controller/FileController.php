@@ -130,10 +130,8 @@ class FileController extends AjaxController
 
     /**
      * Get the Media directory full file system path.
-     *
-     * @return string
      */
-    public function getMediaUrl(Request $request)
+    public function getMediaUrl(Request $request): string
     {
         return $request->getScheme().'://'
             .$request->getHttpHost()

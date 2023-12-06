@@ -30,10 +30,7 @@ final class ConfigHelper
         return $this->coreParametersHelper->get($name, $default);
     }
 
-    /**
-     * @return string
-     */
-    public function getName()
+    public function getName(): string
     {
         return 'config';
     }

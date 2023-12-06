@@ -10,7 +10,7 @@ class NotificationRepository extends CommonRepository
     /**
      * {@inheritdoc}
      */
-    public function getTableAlias()
+    public function getTableAlias(): string
     {
         return 'n';
     }

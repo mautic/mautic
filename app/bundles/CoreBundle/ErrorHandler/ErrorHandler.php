@@ -424,7 +424,7 @@ namespace Mautic\CoreBundle\ErrorHandler {
                     // Renumber backtrace items.
                     $error['trace'] = preg_replace_callback(
                         '/^#(\d+)/m',
-                        function ($matches) {
+                        function ($matches): string {
                             return '#'.($matches[1] + 1).'&nbsp;&nbsp;';
                         },
                         $error['trace']

@@ -342,10 +342,8 @@ final class MauticReportBuilder implements ReportBuilderInterface
      * Build a CASE select statement.
      *
      * @param array $channelData ['channelName' => ['prefix' => XX, 'column' => 'XX.XX']
-     *
-     * @return string
      */
-    private function buildCaseSelect(array $channelData)
+    private function buildCaseSelect(array $channelData): string
     {
         $case = 'CASE';
 

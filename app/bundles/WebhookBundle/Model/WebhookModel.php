@@ -371,10 +371,8 @@ class WebhookModel extends FormModel
     /**
      * Look into the history and check if all the responses we care about had failed.
      * But let it run for a while after the user modified it. Lets not aggravate the user.
-     *
-     * @return bool
      */
-    public function isSick(Webhook $webhook)
+    public function isSick(Webhook $webhook): bool
     {
         // Do not mess with the user will! (at least not now)
         if ($webhook->wasModifiedRecently()) {
@@ -601,7 +599,7 @@ class WebhookModel extends FormModel
      *
      * @return mixed|string
      */
-    public function serializeData($payload, $groups = [], array $customExclusionStrategies = [])
+    public function serializeData($payload, $groups = [], array $customExclusionStrategies = []): string
     {
         $context = SerializationContext::create();
         if (!empty($groups)) {
@@ -624,10 +622,7 @@ class WebhookModel extends FormModel
         return $this->serializer->serialize($payload, 'json', $context);
     }
 
-    /**
-     * @return string
-     */
-    public function getPermissionBase()
+    public function getPermissionBase(): string
     {
         return 'webhook:webhooks';
     }

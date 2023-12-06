@@ -33,10 +33,8 @@ class WebhookQueueRepository extends CommonRepository
      * Gets a count of the webhook queues filtered by the webhook id.
      *
      * @param $id int (for Webhooks)
-     *
-     * @return int
      */
-    public function getQueueCountByWebhookId($id)
+    public function getQueueCountByWebhookId($id): int
     {
         // if no id was sent (the hook was deleted) then return a count of 0
         if (!$id) {

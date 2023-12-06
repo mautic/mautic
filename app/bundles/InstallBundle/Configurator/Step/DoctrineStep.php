@@ -134,7 +134,7 @@ class DoctrineStep implements StepInterface
     /**
      * {@inheritdoc}
      */
-    public function getTemplate()
+    public function getTemplate(): string
     {
         return '@MauticInstall/Install/doctrine.html.twig';
     }
@@ -144,10 +144,8 @@ class DoctrineStep implements StepInterface
      * Required in step.
      *
      * @see \Mautic\InstallBundle\Configurator\Form\DoctrineStepType::buildForm()
-     *
-     * @return array
      */
-    public static function getDriverKeys()
+    public static function getDriverKeys(): array
     {
         return array_keys(static::getDrivers());
     }

@@ -204,10 +204,8 @@ class FileApiController extends CommonApiController
 
     /**
      * Get the Media directory full file system path.
-     *
-     * @return string
      */
-    protected function getMediaUrl(Request $request)
+    protected function getMediaUrl(Request $request): string
     {
         return $request->getScheme().'://'
             .$request->getHttpHost()

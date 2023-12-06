@@ -16,7 +16,7 @@ class MysqlFormatter extends AbstractFormatter
      *
      * @return mixed
      */
-    public function toDateTime($field, $format = '%Y-%m-%d %k:%i:%s')
+    public function toDateTime($field, $format = '%Y-%m-%d %k:%i:%s'): string
     {
         return "STR_TO_DATE($field, '$format')";
     }
@@ -28,7 +28,7 @@ class MysqlFormatter extends AbstractFormatter
      *
      * @return mixed
      */
-    public function toDate($field, $format = '%Y-%m-%d')
+    public function toDate($field, $format = '%Y-%m-%d'): string
     {
         return "STR_TO_DATE($field, '$format')";
     }
@@ -40,7 +40,7 @@ class MysqlFormatter extends AbstractFormatter
      *
      * @return mixed
      */
-    public function toTime($field, $format = '%k:%i:%s')
+    public function toTime($field, $format = '%k:%i:%s'): string
     {
         return "STR_TO_DATE($field, '$format')";
     }

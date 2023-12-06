@@ -103,7 +103,7 @@ class BuilderEvent extends Event
     {
         uasort(
             $this->abTestWinnerCriteria,
-            function ($a, $b) {
+            function ($a, $b): int {
                 return strnatcasecmp(
                     $a['group'],
                     $b['group']
@@ -356,10 +356,7 @@ class BuilderEvent extends Event
         return $this->getRequested('sections');
     }
 
-    /**
-     * @return bool
-     */
-    protected function getRequested($type)
+    protected function getRequested($type): bool
     {
         if (is_array($this->requested)) {
             return in_array($type, $this->requested);

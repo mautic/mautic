@@ -207,7 +207,7 @@ class IpLookupHelper
      *
      * @return mixed
      */
-    public function ipIsValid($ip)
+    public function ipIsValid($ip): string|bool
     {
         $filterFlagNoPrivRange = $this->trackPrivateIPRanges ? 0 : FILTER_FLAG_NO_PRIV_RANGE;
 

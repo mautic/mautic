@@ -31,10 +31,8 @@ class GlobalSearchEvent extends Event
 
     /**
      * Returns the string to be searched.
-     *
-     * @return string
      */
-    public function getSearchString()
+    public function getSearchString(): string
     {
         return $this->searchString;
     }

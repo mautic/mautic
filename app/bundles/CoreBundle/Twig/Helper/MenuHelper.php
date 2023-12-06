@@ -28,10 +28,8 @@ final class MenuHelper
      *
      * @param array<string, mixed> $attributes
      * @param array<string, mixed> $overrides
-     *
-     * @return string
      */
-    public function parseAttributes($attributes, $overrides = [])
+    public function parseAttributes($attributes, $overrides = []): string
     {
         if (!is_array($attributes)) {
             $attributes = [];

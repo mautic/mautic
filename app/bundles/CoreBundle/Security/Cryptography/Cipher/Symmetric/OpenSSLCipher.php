@@ -16,7 +16,7 @@ class OpenSSLCipher implements SymmetricCipherInterface
      *
      * @return string
      */
-    public function encrypt($secretMessage, $key, $randomInitVector)
+    public function encrypt($secretMessage, $key, $randomInitVector): string|bool
     {
         $key  = pack('H*', $key);
         $data = $secretMessage.$this->getHash($secretMessage, $this->getHashKey($key));
@@ -29,11 +29,10 @@ class OpenSSLCipher implements SymmetricCipherInterface
      * @param string $key
      * @param string $originalInitVector
      *
-     * @return string
      *
      * @throws InvalidDecryptionException
      */
-    public function decrypt($encryptedMessage, $key, $originalInitVector)
+    public function decrypt($encryptedMessage, $key, $originalInitVector): string
     {
         if (strlen($originalInitVector) !== $this->getInitVectorSize()) {
             throw new InvalidDecryptionException();
@@ -51,10 +50,7 @@ class OpenSSLCipher implements SymmetricCipherInterface
         return $secretMessage;
     }
 
-    /**
-     * @return string
-     */
-    public function getRandomInitVector()
+    public function getRandomInitVector(): string
     {
         return openssl_random_pseudo_bytes($this->getInitVectorSize());
     }
@@ -72,7 +68,7 @@ class OpenSSLCipher implements SymmetricCipherInterface
     /**
      * @return int
      */
-    private function getInitVectorSize()
+    private function getInitVectorSize(): int|bool
     {
         return openssl_cipher_iv_length($this->cipher);
     }
@@ -80,18 +76,13 @@ class OpenSSLCipher implements SymmetricCipherInterface
     /**
      * @param string $data
      * @param string $key
-     *
-     * @return string
      */
-    private function getHash($data, $key)
+    private function getHash($data, $key): string
     {
         return hash_hmac('sha256', $data, $key);
     }
 
-    /**
-     * @return string
-     */
-    private function getHashKey($binaryKey)
+    private function getHashKey($binaryKey): string
     {
         $hexKey = bin2hex($binaryKey);
         // Get second half of hexKey version (stable but different than original key)

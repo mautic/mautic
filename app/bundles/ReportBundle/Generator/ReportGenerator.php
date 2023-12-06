@@ -96,7 +96,7 @@ class ReportGenerator
      *
      * @throws \Symfony\Component\DependencyInjection\Exception\RuntimeException
      */
-    protected function getBuilder()
+    protected function getBuilder(): \Mautic\ReportBundle\Builder\MauticReportBuilder
     {
         $className = '\\Mautic\\ReportBundle\\Builder\\MauticReportBuilder';
 

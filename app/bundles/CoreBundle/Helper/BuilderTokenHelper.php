@@ -144,10 +144,8 @@ class BuilderTokenHelper
 
     /**
      * @deprecated 2.6.0 to be removed in 3.0
-     *
-     * @return string
      */
-    public static function getVisualTokenHtml($token, $description, $forPregReplace = false)
+    public static function getVisualTokenHtml($token, $description, $forPregReplace = false): string
     {
         if ($forPregReplace) {
             return preg_quote('<strong contenteditable="false" data-token="', '/').'(.*?)'.preg_quote('">**', '/')
