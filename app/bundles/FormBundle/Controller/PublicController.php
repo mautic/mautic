@@ -399,6 +399,9 @@ class PublicController extends CommonFormController
         return new Response('', Response::HTTP_NOT_FOUND);
     }
 
+    /**
+     * @return string|string[]
+     */
     private function replacePostSubmitTokens($string, SubmissionEvent $submissionEvent): string|array
     {
         if (empty($this->tokens)) {
