@@ -13,7 +13,6 @@ class ExpressionBuilder extends BaseExpressionBuilder
     /**
      * Creates a between comparison expression.
      *
-     *
      * @throws SegmentQueryException
      */
     public function between($x, $arr): string
@@ -34,7 +33,6 @@ class ExpressionBuilder extends BaseExpressionBuilder
      *     [php]
      *     // u.id = ?
      *     $expr->eq('u.id', '?');
-     *
      *
      * @throws SegmentQueryException
      */

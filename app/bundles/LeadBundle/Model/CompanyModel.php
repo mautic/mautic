@@ -293,7 +293,6 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
      * @param array|Company $companies
      * @param array|Lead    $lead
      *
-     *
      * @throws \Doctrine\ORM\ORMException
      */
     public function addLeadToCompany($companies, $lead): bool
@@ -745,8 +744,6 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
      * @param mixed[] $data
      * @param null    $owner
      * @param bool    $skipIfExists
-     *
-     * @return bool|null
      *
      * @throws \Exception
      */

@@ -6,8 +6,6 @@ trait RegexTrait
 {
     /**
      * Ensure that special characters are escaped correctly.
-     *
-     * @return mixed
      */
     protected function prepareRegex($regex): string|array
     {

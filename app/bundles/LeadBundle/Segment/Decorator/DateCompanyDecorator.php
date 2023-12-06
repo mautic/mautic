@@ -64,10 +64,7 @@ class DateCompanyDecorator implements FilterDecoratorInterface
         return ComplexRelationValueFilterQueryBuilder::getServiceId();
     }
 
-    /**
-     * @return bool|string
-     */
-    public function getAggregateFunc(ContactSegmentFilterCrate $contactSegmentFilterCrate)
+    public function getAggregateFunc(ContactSegmentFilterCrate $contactSegmentFilterCrate): string|bool
     {
         return $this->dateDecorator->getAggregateFunc($contactSegmentFilterCrate);
     }

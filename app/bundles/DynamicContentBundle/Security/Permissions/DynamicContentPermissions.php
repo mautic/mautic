@@ -18,11 +18,6 @@ class DynamicContentPermissions extends AbstractPermissions
         $this->addExtendedPermissions('dynamiccontents');
     }
 
-    /**
-     * {@inheritdoc}
-     *
-     * @return string|void
-     */
     public function getName(): string
     {
         return 'dynamiccontent';

@@ -1164,8 +1164,6 @@ class LeadModel extends FormModel
      * @param null  $importId
      * @param bool  $skipIfExists
      *
-     * @return bool|null
-     *
      * @throws \Exception
      */
     public function import($fields, $data, $owner = null, $list = null, $tags = null, $persist = true, LeadEventLog $eventLog = null, $importId = null, $skipIfExists = false): bool

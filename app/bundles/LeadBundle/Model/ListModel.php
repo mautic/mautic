@@ -340,7 +340,6 @@ class ListModel extends FormModel
      * @param int      $limit
      * @param bool|int $maxLeads
      *
-     *
      * @throws \Exception
      */
     public function rebuildListLeads(LeadList $leadList, $limit = 100, $maxLeads = false, OutputInterface $output = null): int
