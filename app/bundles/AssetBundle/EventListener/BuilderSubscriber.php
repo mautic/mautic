@@ -79,7 +79,7 @@ class BuilderSubscriber implements EventSubscriberInterface
         $tokens  = $this->generateTokensFromContent($event, $leadId, ['page', $page->getId()]);
         $content = $event->getContent();
 
-        if (!empty($tokens)) {
+        if ($tokens !== []) {
             $content = str_ireplace(array_keys($tokens), $tokens, $content);
         }
         $event->setContent($content);
@@ -91,9 +91,9 @@ class BuilderSubscriber implements EventSubscriberInterface
      * @param array                           $source
      * @param null                            $emailId
      *
-     * @return array
+     * @return mixed[]
      */
-    private function generateTokensFromContent($event, $leadId, $source = [], $emailId = null)
+    private function generateTokensFromContent($event, $leadId, $source = [], $emailId = null): array
     {
         if ($event instanceof PageDisplayEvent || ($event instanceof EmailSendEvent && $event->shouldAppendClickthrough())) {
             $clickthrough = [
