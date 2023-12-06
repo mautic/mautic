@@ -3,12 +3,16 @@
 declare(strict_types=1);
 
 use Rector\Caching\ValueObject\Storage\FileCacheStorage;
+use Rector\CodeQuality\Rector\FunctionLike\SimplifyUselessVariableRector;
 use Rector\DeadCode\Rector\Assign\RemoveUnusedVariableAssignRector;
 use Rector\DeadCode\Rector\Property\RemoveUselessVarTagRector;
 use Rector\Symfony\Symfony42\Rector\MethodCall\ContainerGetToConstructorInjectionRector;
 use Rector\TypeDeclaration\Rector\ClassMethod\AddVoidReturnTypeWhereNoReturnRector;
 use Rector\TypeDeclaration\Rector\ClassMethod\ReturnTypeFromReturnDirectArrayRector;
 use Rector\TypeDeclaration\Rector\ClassMethod\ReturnTypeFromStrictBoolReturnExprRector;
+use Rector\TypeDeclaration\Rector\ClassMethod\ReturnTypeFromStrictConstantReturnRector;
+use Rector\TypeDeclaration\Rector\Property\TypedPropertyFromStrictConstructorRector;
+use Rector\TypeDeclaration\Rector\Property\TypedPropertyFromStrictSetUpRector;
 
 return static function (Rector\Config\RectorConfig $rectorConfig): void {
     $rectorConfig->paths([
@@ -51,10 +55,20 @@ return static function (Rector\Config\RectorConfig $rectorConfig): void {
             __DIR__.'/app/bundles/LeadBundle/Model/ImportModel.php',
         ],
 
-        \Rector\TypeDeclaration\Rector\Property\TypedPropertyFromStrictConstructorRector::class => [
+        TypedPropertyFromStrictConstructorRector::class => [
             // entities magic
             __DIR__.'/app/bundles/LeadBundle/Entity',
         ],
+<<<<<<< HEAD
+=======
+
+        // handle later, case by case as lot of chnaged code
+        \Rector\DeadCode\Rector\If_\RemoveAlwaysTrueIfConditionRector::class => [
+            __DIR__.'/app/bundles/PointBundle/Controller/TriggerController.php',
+            __DIR__.'/app/bundles/LeadBundle/Controller/ImportController.php',
+            __DIR__.'/app/bundles/FormBundle/Controller/FormController.php',
+        ],
+>>>>>>> 5275b64c6d (cleanup rector config)
     ]);
 
     foreach (['dev', 'test', 'prod'] as $environment) {
@@ -87,35 +101,20 @@ return static function (Rector\Config\RectorConfig $rectorConfig): void {
         // \Rector\Doctrine\Set\DoctrineSetList::DOCTRINE_REPOSITORY_AS_SERVICE, will break code in Mautic, needs to be fixed first
         \Rector\Doctrine\Set\DoctrineSetList::DOCTRINE_ORM_25,
 
-        // @todo implement the whole set. Start rule by rule below.
         \Rector\Set\ValueObject\SetList::DEAD_CODE,
     ]);
 
     // Define what single rules will be applied
     $rectorConfig->rules([
         AddVoidReturnTypeWhereNoReturnRector::class,
-        \Rector\TypeDeclaration\Rector\Property\TypedPropertyFromStrictConstructorRector::class,
-        \Rector\TypeDeclaration\Rector\Property\TypedPropertyFromStrictSetUpRector::class,
+        TypedPropertyFromStrictConstructorRector::class,
+        TypedPropertyFromStrictSetUpRector::class,
         RemoveUnusedVariableAssignRector::class,
         RemoveUselessVarTagRector::class,
-        \Rector\DeadCode\Rector\Ternary\TernaryToBooleanOrFalseToBooleanAndRector::class,
-        \Rector\DeadCode\Rector\PropertyProperty\RemoveNullPropertyInitializationRector::class,
-        \Rector\DeadCode\Rector\ClassMethod\RemoveUselessReturnTagRector::class,
-        \Rector\DeadCode\Rector\ClassMethod\RemoveUselessParamTagRector::class,
-        \Rector\CodeQuality\Rector\FunctionLike\SimplifyUselessVariableRector::class,
+        SimplifyUselessVariableRector::class,
         ReturnTypeFromStrictBoolReturnExprRector::class,
-        \Rector\TypeDeclaration\Rector\ClassMethod\ReturnTypeFromStrictConstantReturnRector::class,
-        \Rector\TypeDeclaration\Rector\ClassMethod\ReturnTypeFromReturnDirectArrayRector::class,
-        \Rector\DeadCode\Rector\If_\RemoveUnusedNonEmptyArrayBeforeForeachRector::class,
-        \Rector\DeadCode\Rector\Stmt\RemoveUnreachableStatementRector::class,
-        \Rector\DeadCode\Rector\BooleanAnd\RemoveAndTrueRector::class,
-        \Rector\DeadCode\Rector\ClassConst\RemoveUnusedPrivateClassConstantRector::class,
-        \Rector\DeadCode\Rector\ClassMethod\RemoveUnusedPrivateMethodParameterRector::class,
-        \Rector\DeadCode\Rector\Concat\RemoveConcatAutocastRector::class,
-        \Rector\DeadCode\Rector\Return_\RemoveDeadConditionAboveReturnRector::class,
-        \Rector\DeadCode\Rector\For_\RemoveDeadContinueRector::class,
-        \Rector\DeadCode\Rector\For_\RemoveDeadIfForeachForRector::class,
-        \Rector\DeadCode\Rector\If_\RemoveDeadInstanceOfRector::class,
+        ReturnTypeFromStrictConstantReturnRector::class,
+        ReturnTypeFromReturnDirectArrayRector::class,
         ContainerGetToConstructorInjectionRector::class,
     ]);
 };
