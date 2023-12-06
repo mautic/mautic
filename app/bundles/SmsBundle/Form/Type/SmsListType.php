@@ -31,7 +31,7 @@ class SmsListType extends AbstractType
                         ],
                     ];
                 },
-                'ajax_lookup_action' => function (Options $options) {
+                'ajax_lookup_action' => function (Options $options): string {
                     $query = [
                         'sms_type' => $options['sms_type'],
                     ];

@@ -299,7 +299,7 @@ class TrackableModel extends AbstractCommonModel
         $content          = str_ireplace($firstPassSearch, $firstPassReplace, $content);
 
         // Sort longer to shorter strings to ensure that URLs that share the same base are appropriately replaced
-        uksort($this->contentReplacements['second_pass'], function ($a, $b) {
+        uksort($this->contentReplacements['second_pass'], function ($a, $b): int {
             return strlen($b) - strlen($a);
         });
 
@@ -342,10 +342,8 @@ class TrackableModel extends AbstractCommonModel
      * Find URLs in HTML and parse into trackables.
      *
      * @param string $html HTML content
-     *
-     * @return array
      */
-    protected function extractTrackablesFromHtml($html)
+    protected function extractTrackablesFromHtml($html): array
     {
         // Find links using DOM to only find <a> tags
         $libxmlPreviousState = libxml_use_internal_errors(true);
@@ -490,10 +488,8 @@ class TrackableModel extends AbstractCommonModel
      * Validates that a token is trackable as a URL.
      *
      * @param null $tokenizedHost
-     *
-     * @return bool
      */
-    protected function validateTokenIsTrackable($token, $tokenizedHost = null)
+    protected function validateTokenIsTrackable($token, $tokenizedHost = null): bool
     {
         // Validate if this token is listed as not to be tracked
         if ($this->isInDoNotTrack($token)) {
@@ -783,7 +779,7 @@ class TrackableModel extends AbstractCommonModel
         // http_build_query likely encoded tokens so that has to be fixed so they get replaced
         $query = preg_replace_callback(
             '/%7B(\S+?)%7D/i',
-            function ($matches) {
+            function ($matches): string {
                 return urldecode($matches[0]);
             },
             $query

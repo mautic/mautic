@@ -44,7 +44,7 @@ class RemovedContactTracker
     /**
      * @param int $campaignId
      */
-    public function wasContactRemoved($campaignId, $contactId)
+    public function wasContactRemoved($campaignId, $contactId): bool
     {
         return !empty($this->removedContacts[$campaignId][$contactId]);
     }

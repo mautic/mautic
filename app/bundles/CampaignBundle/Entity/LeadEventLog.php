@@ -211,7 +211,7 @@ class LeadEventLog implements ChannelInterface
     /**
      * @return int|null
      */
-    public function getId()
+    public function getId(): int
     {
         return (int) $this->id;
     }
@@ -516,20 +516,14 @@ class LeadEventLog implements ChannelInterface
         return $this;
     }
 
-    /**
-     * @return bool
-     */
-    public function isFailed()
+    public function isFailed(): bool
     {
         $log = $this->getFailedLog();
 
         return !empty($log);
     }
 
-    /**
-     * @return bool
-     */
-    public function isSuccess()
+    public function isSuccess(): bool
     {
         return !$this->isFailed();
     }

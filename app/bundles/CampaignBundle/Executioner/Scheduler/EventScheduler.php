@@ -233,7 +233,7 @@ class EventScheduler
 
         uasort(
             $eventExecutionDates,
-            function (\DateTimeInterface $a, \DateTimeInterface $b) {
+            function (\DateTimeInterface $a, \DateTimeInterface $b): int {
                 if ($a === $b) {
                     return 0;
                 }

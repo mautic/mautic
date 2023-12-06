@@ -20,10 +20,8 @@ class HitRepository extends CommonRepository
      *
      * @param Page|Redirect $page
      * @param string        $trackingId
-     *
-     * @return bool
      */
-    public function isUniquePageHit($page, $trackingId, Lead $lead = null)
+    public function isUniquePageHit($page, $trackingId, Lead $lead = null): bool
     {
         $q  = $this->getEntityManager()->getConnection()->createQueryBuilder();
         $q2 = $this->getEntityManager()->getConnection()->createQueryBuilder();
@@ -158,10 +156,8 @@ class HitRepository extends CommonRepository
 
     /**
      * Count returning IP addresses.
-     *
-     * @return int
      */
-    public function countReturningIp()
+    public function countReturningIp(): int
     {
         $q = $this->createQueryBuilder('h');
         $q->select('COUNT(h.ipAddress) as returning')
@@ -191,10 +187,8 @@ class HitRepository extends CommonRepository
      *
      * @param int  $seconds
      * @param bool $notLeft
-     *
-     * @return int
      */
-    public function countVisitors($seconds = 60, $notLeft = false)
+    public function countVisitors($seconds = 60, $notLeft = false): int
     {
         $now         = new \DateTime();
         $viewingTime = new \DateInterval('PT'.$seconds.'S');

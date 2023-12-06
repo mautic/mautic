@@ -13,10 +13,7 @@ class RunLimitReachedException extends \Exception
         parent::__construct();
     }
 
-    /**
-     * @return int
-     */
-    public function getContactsProcessed()
+    public function getContactsProcessed(): int
     {
         return $this->contactsProcessed;
     }

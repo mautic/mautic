@@ -255,10 +255,8 @@ class WidgetDetailEvent extends CommonEvent
 
     /**
      * Check if the user has at least one permission of defined array of permissions.
-     *
-     * @return bool
      */
-    public function hasPermissions(array $permissions)
+    public function hasPermissions(array $permissions): bool
     {
         if (!$this->security) {
             return true;

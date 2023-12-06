@@ -90,10 +90,7 @@ class ContactLimiter
         }
     }
 
-    /**
-     * @return int
-     */
-    public function getBatchLimit()
+    public function getBatchLimit(): int
     {
         return $this->batchLimit;
     }

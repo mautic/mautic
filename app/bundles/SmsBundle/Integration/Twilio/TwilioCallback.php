@@ -23,10 +23,7 @@ class TwilioCallback implements CallbackInterface
         $this->configuration = $configuration;
     }
 
-    /**
-     * @return string
-     */
-    public function getTransportName()
+    public function getTransportName(): string
     {
         return 'twilio';
     }
@@ -45,10 +42,7 @@ class TwilioCallback implements CallbackInterface
         return $this->contactHelper->findContactsByNumber($number);
     }
 
-    /**
-     * @return string
-     */
-    public function getMessage(Request $request)
+    public function getMessage(Request $request): string
     {
         $this->validateRequest($request->request);
 

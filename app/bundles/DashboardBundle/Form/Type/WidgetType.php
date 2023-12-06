@@ -49,7 +49,7 @@ class WidgetType extends AbstractType
         $event->setSecurity($this->security);
         $this->dispatcher->dispatch($event, DashboardEvents::DASHBOARD_ON_MODULE_LIST_GENERATE);
 
-        $types = array_map(function ($category) {
+        $types = array_map(function ($category): array {
             return array_flip($category);
         }, $event->getTypes());
 

@@ -513,7 +513,7 @@ class DashboardController extends AbstractFormController
 
             // Sort by name
             uasort($tempDashboard,
-                function ($a, $b) {
+                function ($a, $b): int {
                     return strnatcasecmp($a['name'], $b['name']);
                 }
             );

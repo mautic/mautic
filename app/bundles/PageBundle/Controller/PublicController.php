@@ -176,7 +176,7 @@ class PublicController extends CommonFormController
                             // Reorder according to send_weight so that campaigns which currently send one at a time alternate
                             uasort(
                                 $variants,
-                                function ($a, $b) {
+                                function ($a, $b): int {
                                     if ($a['weight_deficit'] === $b['weight_deficit']) {
                                         if ($a['hits'] === $b['hits']) {
                                             return 0;
@@ -571,7 +571,7 @@ class PublicController extends CommonFormController
                 // Order slides
                 usort(
                     $options['slides'],
-                    function ($a, $b) {
+                    function ($a, $b): int {
                         return strcmp($a['order'], $b['order']);
                     }
                 );

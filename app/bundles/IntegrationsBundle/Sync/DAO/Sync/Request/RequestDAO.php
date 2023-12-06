@@ -72,10 +72,8 @@ class RequestDAO
 
     /**
      * Returns true if there are objects to sync.
-     *
-     * @return bool
      */
-    public function shouldSync()
+    public function shouldSync(): bool
     {
         return !empty($this->objects);
     }
