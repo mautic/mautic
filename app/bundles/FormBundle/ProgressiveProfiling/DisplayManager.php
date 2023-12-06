@@ -51,11 +51,11 @@ class DisplayManager
     {
         $fields = $this->form->getFields()->toArray();
         foreach ($fields as $fieldFromArray) {
-            /** @var Field $fieldFromArray */
             if (in_array($field->getType(), $this->viewOnlyFields)) {
                 continue;
             }
 
+            /** @var Field $fieldFromArray */
             if ($field->getId() === $fieldFromArray->getId()) {
                 if (($this->displayCounter->getDisplayFields() + ($this->displayCounter->getAlwaysDisplayFields() - $this->displayCounter->getAlreadyAlwaysDisplayed())) >= $this->form->getProgressiveProfilingLimit()) {
                     return false;
