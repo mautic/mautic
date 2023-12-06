@@ -130,10 +130,8 @@ class LeadRepository extends CommonRepository
      *
      * @param Lead  $lead
      * @param array $options
-     *
-     * @return bool
      */
-    public function checkLeadInCampaigns($lead, $options = [])
+    public function checkLeadInCampaigns($lead, $options = []): bool
     {
         if (empty($options['campaigns'])) {
             return false;
@@ -251,10 +249,8 @@ class LeadRepository extends CommonRepository
 
     /**
      * This is approximate because the query that fetches contacts per decision is based on if the grandparent has been executed or not.
-     *
-     * @return int
      */
-    public function getInactiveContactCount($campaignId, array $decisionIds, ContactLimiter $limiter)
+    public function getInactiveContactCount($campaignId, array $decisionIds, ContactLimiter $limiter): int
     {
         // We have to loop over each decision to get a count or else any contact that has executed any single one of the decision IDs
         // will not be included potentially resulting in not having the inactive path analyzed

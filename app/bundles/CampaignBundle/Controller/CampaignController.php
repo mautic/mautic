@@ -813,10 +813,7 @@ class CampaignController extends AbstractStandardFormController
         );
     }
 
-    /**
-     * @return string
-     */
-    protected function getModelName()
+    protected function getModelName(): string
     {
         return 'campaign';
     }

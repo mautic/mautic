@@ -55,7 +55,7 @@ class VideoModel extends FormModel
     /**
      * {@inheritdoc}
      */
-    public function getPermissionBase()
+    public function getPermissionBase(): string
     {
         return 'page:pages';
     }
@@ -63,7 +63,7 @@ class VideoModel extends FormModel
     /**
      * {@inheritdoc}
      */
-    public function getNameGetter()
+    public function getNameGetter(): string
     {
         return 'getTitle';
     }

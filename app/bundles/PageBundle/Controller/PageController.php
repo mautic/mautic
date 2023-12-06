@@ -1231,7 +1231,7 @@ class PageController extends FormController
         return 'page';
     }
 
-    protected function getDefaultOrderDirection()
+    protected function getDefaultOrderDirection(): string
     {
         return 'DESC';
     }

@@ -54,11 +54,9 @@ final class ReferenceResolver implements ReferenceResolverInterface
     }
 
     /**
-     * @return mixed
-     *
      * @throws ReferenceNotFoundException
      */
-    private function resolveReference(ReferenceValueDAO $value)
+    private function resolveReference(ReferenceValueDAO $value): ?string
     {
         if (MauticSyncDataExchange::OBJECT_COMPANY === $value->getType() && 0 < $value->getValue()) {
             return $this->getCompanyNameById($value->getValue());

@@ -326,10 +326,7 @@ class ContactObjectHelper implements ObjectHelperInterface
         }
     }
 
-    /**
-     * @return int
-     */
-    private function getDoNotContactReason($value)
+    private function getDoNotContactReason($value): int
     {
         $value = (int) $value;
 

@@ -39,10 +39,8 @@ class PointActionHelper
 
     /**
      * @param MauticFactory $factory
-     *
-     * @return bool
      */
-    public static function validateUrlHit($factory, $eventDetails, $action)
+    public static function validateUrlHit($factory, $eventDetails, $action): bool
     {
         $changePoints = [];
         $url          = $eventDetails->getUrl();

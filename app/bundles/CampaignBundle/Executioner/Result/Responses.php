@@ -86,10 +86,7 @@ class Responses
         return $this->conditionResponses;
     }
 
-    /**
-     * @return int
-     */
-    public function containsResponses()
+    public function containsResponses(): int
     {
         return count($this->actionResponses) + count($this->conditionResponses);
     }

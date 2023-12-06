@@ -330,7 +330,7 @@ class ScheduledExecutioner implements ExecutionerInterface, ResetInterface
     /**
      * @return ArrayCollection[]
      */
-    private function organizeByEvent(ArrayCollection $logs)
+    private function organizeByEvent(ArrayCollection $logs): array
     {
         $jumpTo = [];
         $other  = [];

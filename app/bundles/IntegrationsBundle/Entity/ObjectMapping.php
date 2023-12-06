@@ -204,10 +204,7 @@ class ObjectMapping
         return $this;
     }
 
-    /**
-     * @return int
-     */
-    public function getInternalObjectId()
+    public function getInternalObjectId(): int
     {
         return (int) $this->internalObjectId;
     }

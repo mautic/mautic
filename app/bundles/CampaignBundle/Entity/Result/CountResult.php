@@ -17,26 +17,17 @@ class CountResult
         $this->maxId = (int) $maxId;
     }
 
-    /**
-     * @return int
-     */
-    public function getCount()
+    public function getCount(): int
     {
         return $this->count;
     }
 
-    /**
-     * @return int
-     */
-    public function getMinId()
+    public function getMinId(): int
     {
         return $this->minId;
     }
 
-    /**
-     * @return int
-     */
-    public function getMaxId()
+    public function getMaxId(): int
     {
         return $this->maxId;
     }

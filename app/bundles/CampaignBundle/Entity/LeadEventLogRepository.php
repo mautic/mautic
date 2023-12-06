@@ -49,7 +49,7 @@ class LeadEventLogRepository extends CommonRepository
     /**
      * {@inheritdoc}
      */
-    public function getTableAlias()
+    public function getTableAlias(): string
     {
         return 'll';
     }
@@ -545,10 +545,8 @@ class LeadEventLogRepository extends CommonRepository
      * @param int $contactId
      * @param int $campaignId
      * @param int $rotation
-     *
-     * @return bool
      */
-    public function hasBeenInCampaignRotation($contactId, $campaignId, $rotation)
+    public function hasBeenInCampaignRotation($contactId, $campaignId, $rotation): bool
     {
         $qb = $this->getReplicaConnection()->createQueryBuilder();
         $qb->select('log.rotation')

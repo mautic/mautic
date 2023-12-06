@@ -111,10 +111,8 @@ class CampaignModel extends CommonFormModel
 
     /**
      * {@inheritdoc}
-     *
-     * @return string
      */
-    public function getPermissionBase()
+    public function getPermissionBase(): string
     {
         return 'campaign:campaigns';
     }
@@ -333,7 +331,7 @@ class CampaignModel extends CommonFormModel
 
         uasort(
             $events,
-            function ($a, $b) {
+            function ($a, $b): int {
                 $aOrder = $a->getOrder();
                 $bOrder = $b->getOrder();
                 if ($aOrder == $bOrder) {

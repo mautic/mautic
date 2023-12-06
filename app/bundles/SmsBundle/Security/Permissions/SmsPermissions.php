@@ -17,12 +17,7 @@ class SmsPermissions extends AbstractPermissions
         $this->addExtendedPermissions('smses');
     }
 
-    /**
-     * {@inheritdoc}
-     *
-     * @return string|void
-     */
-    public function getName()
+    public function getName(): string
     {
         return 'sms';
     }

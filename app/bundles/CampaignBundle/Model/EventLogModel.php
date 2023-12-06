@@ -61,10 +61,8 @@ class EventLogModel extends AbstractCommonModel
 
     /**
      * {@inheritdoc}
-     *
-     * @return string
      */
-    public function getPermissionBase()
+    public function getPermissionBase(): string
     {
         return 'campaign:campaigns';
     }

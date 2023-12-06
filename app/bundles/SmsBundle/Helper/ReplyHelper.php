@@ -33,10 +33,8 @@ class ReplyHelper
     /**
      * @param string $pattern
      * @param string $replyBody
-     *
-     * @return bool
      */
-    public static function matches($pattern, $replyBody)
+    public static function matches($pattern, $replyBody): bool
     {
         return fnmatch($pattern, $replyBody, FNM_CASEFOLD);
     }

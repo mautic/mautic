@@ -63,10 +63,8 @@ class DashboardModel extends FormModel
 
     /**
      * {@inheritdoc}
-     *
-     * @return string
      */
-    public function getPermissionBase()
+    public function getPermissionBase(): string
     {
         return 'dashboard:widgets';
     }
@@ -146,10 +144,8 @@ class DashboardModel extends FormModel
 
     /**
      * Generates a translatable description for a dashboard.
-     *
-     * @return string
      */
-    public function generateDescription()
+    public function generateDescription(): string
     {
         return $this->translator->trans(
             'mautic.dashboard.generated_by',

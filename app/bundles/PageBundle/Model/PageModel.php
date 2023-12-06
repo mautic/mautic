@@ -147,12 +147,12 @@ class PageModel extends FormModel
         return $this->em->getRepository(\Mautic\PageBundle\Entity\Hit::class);
     }
 
-    public function getPermissionBase()
+    public function getPermissionBase(): string
     {
         return 'page:pages';
     }
 
-    public function getNameGetter()
+    public function getNameGetter(): string
     {
         return 'getTitle';
     }
@@ -348,10 +348,8 @@ class PageModel extends FormModel
 
     /**
      * Generates slug string.
-     *
-     * @return string
      */
-    public function generateSlug($entity)
+    public function generateSlug($entity): string
     {
         $pageSlug = $entity->getAlias();
 

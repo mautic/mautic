@@ -504,10 +504,7 @@ class BuilderSubscriber implements EventSubscriberInterface
         return $content;
     }
 
-    /**
-     * @return string
-     */
-    private function getAttributeForFirtSlot()
+    private function getAttributeForFirtSlot(): string
     {
         return 'data-prefs-center-first="1"';
     }
@@ -665,7 +662,7 @@ class BuilderSubscriber implements EventSubscriberInterface
             // sort by language
             uasort(
                 $related,
-                function ($a, $b) {
+                function ($a, $b): int {
                     return strnatcasecmp($a['lang'], $b['lang']);
                 }
             );

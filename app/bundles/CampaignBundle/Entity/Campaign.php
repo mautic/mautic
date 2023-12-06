@@ -196,10 +196,7 @@ class Campaign extends FormEntity implements PublishStatusIconAttributesInterfac
             ->build();
     }
 
-    /**
-     * @return array
-     */
-    public function convertToArray()
+    public function convertToArray(): array
     {
         return get_object_vars($this);
     }
@@ -564,10 +561,7 @@ class Campaign extends FormEntity implements PublishStatusIconAttributesInterfac
         $this->canvasSettings = $canvasSettings;
     }
 
-    /**
-     * @return bool
-     */
-    public function getAllowRestart()
+    public function getAllowRestart(): bool
     {
         return (bool) $this->allowRestart;
     }
