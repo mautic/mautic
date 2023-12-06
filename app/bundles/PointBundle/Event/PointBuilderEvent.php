@@ -71,7 +71,7 @@ class PointBuilderEvent extends Event
      */
     public function getActions()
     {
-        uasort($this->actions, function ($a, $b) {
+        uasort($this->actions, function ($a, $b): int {
             return strnatcasecmp(
                 $a['label'], $b['label']);
         });

@@ -91,10 +91,7 @@ class AggregateStatRequestEvent extends Event
         return $this->statName === $context;
     }
 
-    /**
-     * @return bool
-     */
-    public function checkContexts(array $contexts)
+    public function checkContexts(array $contexts): bool
     {
         return in_array($this->statName, $contexts, true);
     }
