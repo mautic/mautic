@@ -5,17 +5,14 @@ declare(strict_types=1);
 namespace Mautic\EmailBundle\Stats;
 
 use Mautic\CampaignBundle\Model\CampaignModel;
+use Mautic\LeadBundle\Model\ListModel;
 
 class EmailDependencies
 {
-    private CampaignModel $campaignModel;
-
-    /**
-     * SegmentCampaignShare constructor.
-     */
-    public function __construct(CampaignModel $campaignModel)
-    {
-        $this->campaignModel      = $campaignModel;
+    public function __construct(
+        private CampaignModel $campaignModel,
+        private ListModel $listModel
+    ) {
     }
 
     /**
@@ -28,6 +25,11 @@ class EmailDependencies
                 'label' => 'mautic.campaign.campaigns',
                 'route' => 'mautic_campaign_index',
                 'ids'   => $this->campaignModel->getCampaignIdsWithDependenciesOnEmail($emailId),
+            ],
+            [
+                'label' => 'mautic.lead.lead.lists',
+                'route' => 'mautic_segment_index',
+                'ids'   => $this->listModel->getSegmentIdsWithDependenciesOnEmail($emailId),
             ],
         ];
     }
