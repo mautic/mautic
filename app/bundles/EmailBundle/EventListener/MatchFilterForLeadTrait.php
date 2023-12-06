@@ -9,10 +9,7 @@ use Mautic\LeadBundle\Segment\OperatorOptions;
  */
 trait MatchFilterForLeadTrait
 {
-    /**
-     * @return bool
-     */
-    protected function matchFilterForLead(array $filter, array $lead)
+    protected function matchFilterForLead(array $filter, array $lead): bool
     {
         if (empty($lead['id'])) {
             // Lead in generated for preview with faked data

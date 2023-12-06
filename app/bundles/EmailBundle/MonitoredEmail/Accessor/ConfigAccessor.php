@@ -49,10 +49,7 @@ class ConfigAccessor
         return $this->getProperty('folder');
     }
 
-    /**
-     * @return string
-     */
-    public function getKey()
+    public function getKey(): string
     {
         return $this->getPath().'_'.$this->getUser();
     }

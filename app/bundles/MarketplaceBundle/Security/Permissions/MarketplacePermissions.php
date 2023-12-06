@@ -30,7 +30,7 @@ class MarketplacePermissions extends AbstractPermissions
         $this->addStandardPermissions(self::PACKAGES, false);
     }
 
-    public function isEnabled()
+    public function isEnabled(): bool
     {
         return $this->config->marketplaceIsEnabled();
     }

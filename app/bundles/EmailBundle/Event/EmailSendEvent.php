@@ -109,10 +109,8 @@ class EmailSendEvent extends CommonEvent
 
     /**
      * Return if the transport and mailer is in batch mode (tokenized emails).
-     *
-     * @return bool
      */
-    public function inTokenizationMode()
+    public function inTokenizationMode(): bool
     {
         return null !== $this->helper && $this->helper->inTokenizationMode();
     }

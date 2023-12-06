@@ -22,7 +22,7 @@ class EmailListType extends AbstractType
                 'force_popup'        => true,
                 'model'              => 'email',
                 'multiple'           => true,
-                'ajax_lookup_action' => function (Options $options) {
+                'ajax_lookup_action' => function (Options $options): string {
                     $query = [
                         'email_type'     => $options['email_type'],
                         'top_level'      => $options['top_level'],

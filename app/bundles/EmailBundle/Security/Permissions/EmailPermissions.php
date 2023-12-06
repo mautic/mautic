@@ -17,19 +17,11 @@ class EmailPermissions extends AbstractPermissions
         $this->addExtendedPermissions('emails');
     }
 
-    /**
-     * {@inheritdoc}
-     *
-     * @return string|void
-     */
-    public function getName()
+    public function getName(): string
     {
         return 'email';
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function buildForm(FormBuilderInterface &$builder, array $options, array $data): void
     {
         $this->addStandardFormFields('email', 'categories', $builder, $data);

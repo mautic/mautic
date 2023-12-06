@@ -398,17 +398,15 @@ class Mailbox
      *
      * @return \stdClass
      */
-    public function checkMailbox()
+    public function checkMailbox(): \stdClass|bool
     {
         return imap_check($this->getImapStream());
     }
 
     /**
      * Creates a new mailbox specified by mailbox.
-     *
-     * @return bool
      */
-    public function createMailbox()
+    public function createMailbox(): bool
     {
         return imap_createmailbox($this->getImapStream(), imap_utf7_encode($this->imapFullPath));
     }
@@ -421,7 +419,7 @@ class Mailbox
      *
      * @return \stdClass if the box doesn't exist
      */
-    public function statusMailbox()
+    public function statusMailbox(): \stdClass|bool
     {
         return imap_status($this->getImapStream(), $this->imapFullPath, SA_ALL);
     }
@@ -530,20 +528,16 @@ class Mailbox
      * Save mail body.
      *
      * @param string $filename
-     *
-     * @return bool
      */
-    public function saveMail($mailId, $filename = 'email.eml')
+    public function saveMail($mailId, $filename = 'email.eml'): bool
     {
         return imap_savebody($this->getImapStream(), $filename, $mailId, '', FT_UID);
     }
 
     /**
      * Marks mails listed in mailId for deletion.
-     *
-     * @return bool
      */
-    public function deleteMail($mailId)
+    public function deleteMail($mailId): bool
     {
         return imap_delete($this->getImapStream(), $mailId, FT_UID);
     }
@@ -558,10 +552,8 @@ class Mailbox
 
     /**
      * Deletes all the mails marked for deletion by imap_delete(), imap_mail_move(), or imap_setflag_full().
-     *
-     * @return bool
      */
-    public function expungeDeletedMails()
+    public function expungeDeletedMails(): bool
     {
         return imap_expunge($this->getImapStream());
     }
@@ -630,10 +622,8 @@ class Mailbox
      * Causes a store to add the specified flag to the flags set for the mails in the specified sequence.
      *
      * @param string $flag which you can set are \Seen, \Answered, \Flagged, \Deleted, and \Draft as defined by RFC2060
-     *
-     * @return bool
      */
-    public function setFlag(array $mailsIds, $flag)
+    public function setFlag(array $mailsIds, $flag): bool
     {
         return imap_setflag_full($this->getImapStream(), implode(',', $mailsIds), $flag, ST_UID);
     }
@@ -642,10 +632,8 @@ class Mailbox
      * Cause a store to delete the specified flag to the flags set for the mails in the specified sequence.
      *
      * @param string $flag which you can set are \Seen, \Answered, \Flagged, \Deleted, and \Draft as defined by RFC2060
-     *
-     * @return bool
      */
-    public function clearFlag(array $mailsIds, $flag)
+    public function clearFlag(array $mailsIds, $flag): bool
     {
         return imap_clearflag_full($this->getImapStream(), implode(',', $mailsIds), $flag, ST_UID);
     }
@@ -705,10 +693,8 @@ class Mailbox
      *  Unread - number of unread messages
      *  Deleted - number of deleted messages
      *  Size - mailbox size
-     *
-     * @return object Object with info | FALSE on failure
      */
-    public function getMailboxInfo()
+    public function getMailboxInfo(): \stdClass
     {
         return imap_mailboxmsginfo($this->getImapStream());
     }
@@ -730,7 +716,7 @@ class Mailbox
      *
      * @return array Mails ids
      */
-    public function sortMails($criteria = SORTARRIVAL, $reverse = true)
+    public function sortMails($criteria = SORTARRIVAL, $reverse = true): array|bool
     {
         return imap_sort($this->getImapStream(), $criteria, $reverse, SE_UID);
     }
@@ -740,7 +726,7 @@ class Mailbox
      *
      * @return int
      */
-    public function countMails()
+    public function countMails(): int|bool
     {
         return imap_num_msg($this->getImapStream());
     }
@@ -750,7 +736,7 @@ class Mailbox
      *
      * @return array - FALSE in the case of call failure
      */
-    protected function getQuota()
+    protected function getQuota(): array|bool
     {
         return imap_get_quotaroot($this->getImapStream(), 'INBOX');
     }
@@ -1030,10 +1016,8 @@ class Mailbox
 
     /**
      * @param string $charset
-     *
-     * @return string
      */
-    protected function decodeMimeStr($string, $charset = 'utf-8')
+    protected function decodeMimeStr($string, $charset = 'utf-8'): string
     {
         $newString = '';
         $elements  = imap_mime_header_decode($string);

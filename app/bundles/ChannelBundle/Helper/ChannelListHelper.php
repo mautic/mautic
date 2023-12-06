@@ -106,10 +106,7 @@ class ChannelListHelper
         }
     }
 
-    /**
-     * @return string
-     */
-    public function getName()
+    public function getName(): string
     {
         return 'chanel';
     }

@@ -214,7 +214,7 @@ class MessageController extends AbstractStandardFormController
     /**
      * {@inheritdoc}
      */
-    protected function getJsLoadMethodPrefix()
+    protected function getJsLoadMethodPrefix(): string
     {
         return 'messages';
     }
@@ -222,7 +222,7 @@ class MessageController extends AbstractStandardFormController
     /**
      * {@inheritdoc}
      */
-    protected function getModelName()
+    protected function getModelName(): string
     {
         return 'channel.message';
     }
@@ -230,7 +230,7 @@ class MessageController extends AbstractStandardFormController
     /**
      * {@inheritdoc}
      */
-    protected function getRouteBase()
+    protected function getRouteBase(): string
     {
         return 'message';
     }
@@ -240,7 +240,7 @@ class MessageController extends AbstractStandardFormController
      *
      * @return string
      */
-    protected function getSessionBase($objectId = null)
+    protected function getSessionBase($objectId = null): string
     {
         return 'message'.(($objectId) ? '.'.$objectId : '');
     }
@@ -248,7 +248,7 @@ class MessageController extends AbstractStandardFormController
     /**
      * {@inheritdoc}
      */
-    protected function getTranslationBase()
+    protected function getTranslationBase(): string
     {
         return 'mautic.channel.message';
     }

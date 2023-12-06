@@ -78,7 +78,7 @@ class EmailValidator
      *
      * @returns bool
      */
-    public function hasValidDomain($address)
+    public function hasValidDomain($address): bool
     {
         list($user, $domain) = explode('@', $address);
 

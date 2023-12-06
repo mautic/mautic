@@ -78,7 +78,7 @@ class CopyRepository extends CommonRepository
     /**
      * {@inheritdoc}
      */
-    public function getTableAlias()
+    public function getTableAlias(): string
     {
         return 'ec';
     }

@@ -17,10 +17,7 @@ class EmailToUserAccessor
         $this->transformer = new ArrayStringTransformer();
     }
 
-    /**
-     * @return int
-     */
-    public function getEmailID()
+    public function getEmailID(): int
     {
         return (int) $this->config['useremail']['email'];
     }

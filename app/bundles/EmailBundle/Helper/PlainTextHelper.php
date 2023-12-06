@@ -245,10 +245,8 @@ class PlainTextHelper
 
     /**
      * Returns the text, converted from HTML.
-     *
-     * @return string
      */
-    public function getText()
+    public function getText(): string
     {
         if (!$this->converted) {
             $this->convert();
@@ -495,7 +493,7 @@ class PlainTextHelper
      *
      * @return string Converted text
      */
-    private function toupper($str)
+    private function toupper($str): string
     {
         // string can contain HTML tags
         $chunks = preg_split('/(<[^>]*>)/', $str, -1, PREG_SPLIT_NO_EMPTY | PREG_SPLIT_DELIM_CAPTURE);
@@ -517,7 +515,7 @@ class PlainTextHelper
      *
      * @return string Converted text
      */
-    private function strtoupper($str)
+    private function strtoupper($str): string
     {
         $str = html_entity_decode($str, ENT_COMPAT, self::ENCODING);
 
@@ -533,10 +531,8 @@ class PlainTextHelper
     /**
      * @param string     $breakline
      * @param bool|false $cut
-     *
-     * @return string
      */
-    private function linewrap($text, $width, $breakline = "\n", $cut = false)
+    private function linewrap($text, $width, $breakline = "\n", $cut = false): string
     {
         $lines = explode("\n", $text);
         $text  = '';

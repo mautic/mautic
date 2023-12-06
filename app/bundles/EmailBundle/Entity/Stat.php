@@ -294,10 +294,7 @@ class Stat
         $this->email = $email;
     }
 
-    /**
-     * @return int|null
-     */
-    public function getId()
+    public function getId(): int
     {
         return (int) $this->id;
     }
