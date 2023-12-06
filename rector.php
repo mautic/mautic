@@ -30,6 +30,9 @@ return static function (Rector\Config\RectorConfig $rectorConfig): void {
             __DIR__.'/app/bundles/LeadBundle/Model/LeadModel.php',
         ],
 
+        // lets handle later, once we have more type declaratoins
+        \Rector\DeadCode\Rector\Cast\RecastingRemovalRector::class,
+
         AddVoidReturnTypeWhereNoReturnRector::class => [
             // handled in separate PRs, remove after merge to avoid conflicts
             __DIR__.'/app/bundles/ApiBundle',
@@ -84,7 +87,7 @@ return static function (Rector\Config\RectorConfig $rectorConfig): void {
         \Rector\Doctrine\Set\DoctrineSetList::DOCTRINE_ORM_25,
 
         // @todo implement the whole set. Start rule by rule below.
-        // \Rector\Set\ValueObject\SetList::DEAD_CODE
+        \Rector\Set\ValueObject\SetList::DEAD_CODE,
     ]);
 
     // Define what single rules will be applied
