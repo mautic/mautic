@@ -38,7 +38,7 @@ class CategoryTypesEvent extends CommonEvent
      * @param string $type
      * @param string $label
      */
-    public function addCategoryType($type, $label = null)
+    public function addCategoryType($type, $label = null): void
     {
         if (is_int($type)) {
             $type = $label;

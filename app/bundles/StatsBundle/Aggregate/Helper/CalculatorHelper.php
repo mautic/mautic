@@ -31,7 +31,7 @@ class CalculatorHelper
      *
      * @throws \Exception
      */
-    public static function fillInMissingYears(StatDAO $statDAO, $lastYear, $thisYear, $labelFormat)
+    public static function fillInMissingYears(StatDAO $statDAO, $lastYear, $thisYear, $labelFormat): void
     {
         if (!$lastYear) {
             return;
@@ -75,7 +75,7 @@ class CalculatorHelper
      *
      * @throws \Exception
      */
-    public static function fillInMissingMonths(StatDAO $statDAO, $lastMonth, $thisMonth, $labelFormat)
+    public static function fillInMissingMonths(StatDAO $statDAO, $lastMonth, $thisMonth, $labelFormat): void
     {
         if (!$lastMonth) {
             return;
@@ -160,7 +160,7 @@ class CalculatorHelper
      *
      * @throws \Exception
      */
-    public static function fillInMissingWeeks(StatDAO $statDAO, $yesterday, $today, $labelFormat)
+    public static function fillInMissingWeeks(StatDAO $statDAO, $yesterday, $today, $labelFormat): void
     {
         if (!$yesterday) {
             return;
@@ -182,7 +182,7 @@ class CalculatorHelper
      *
      * @throws \Exception
      */
-    public static function fillInMissingDays(StatDAO $statDAO, $yesterday, $today, $labelFormat)
+    public static function fillInMissingDays(StatDAO $statDAO, $yesterday, $today, $labelFormat): void
     {
         if (!$yesterday) {
             return;
@@ -222,7 +222,7 @@ class CalculatorHelper
      *
      * @throws \Exception
      */
-    public static function fillInMissingHours(StatDAO $statDAO, $lastHour, $thisHour, $labelFormat)
+    public static function fillInMissingHours(StatDAO $statDAO, $lastHour, $thisHour, $labelFormat): void
     {
         if (!$lastHour) {
             return;

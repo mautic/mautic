@@ -130,7 +130,7 @@ class StatRepository extends CommonRepository
     /**
      * Updates lead ID (e.g. after a lead merge).
      */
-    public function updateLead($fromLeadId, $toLeadId)
+    public function updateLead($fromLeadId, $toLeadId): void
     {
         $q = $this->_em->getConnection()->createQueryBuilder();
         $q->update(MAUTIC_TABLE_PREFIX.'dynamic_content_stats')
@@ -142,7 +142,7 @@ class StatRepository extends CommonRepository
     /**
      * Delete a stat.
      */
-    public function deleteStat($id)
+    public function deleteStat($id): void
     {
         $this->_em->getConnection()->delete(MAUTIC_TABLE_PREFIX.'dynamic_content_stats', ['id' => (int) $id]);
     }

@@ -25,7 +25,7 @@ class DwcEntryFiltersType extends AbstractType
         $this->translator = $translator;
     }
 
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder->add(
             'glue',
@@ -43,20 +43,20 @@ class DwcEntryFiltersType extends AbstractType
             ]
         );
 
-        $formModifier = function (FormEvent $event, $eventName) {
+        $formModifier = function (FormEvent $event, $eventName): void {
             $this->buildFiltersForm($eventName, $event, $this->translator);
         };
 
         $builder->addEventListener(
             FormEvents::PRE_SET_DATA,
-            function (FormEvent $event) use ($formModifier) {
+            function (FormEvent $event) use ($formModifier): void {
                 $formModifier($event, FormEvents::PRE_SET_DATA);
             }
         );
 
         $builder->addEventListener(
             FormEvents::PRE_SUBMIT,
-            function (FormEvent $event) use ($formModifier) {
+            function (FormEvent $event) use ($formModifier): void {
                 $formModifier($event, FormEvents::PRE_SUBMIT);
             }
         );
@@ -69,7 +69,7 @@ class DwcEntryFiltersType extends AbstractType
     /**
      * @throws \Symfony\Component\OptionsResolver\Exception\AccessException
      */
-    public function configureOptions(OptionsResolver $resolver)
+    public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setRequired(
             [
@@ -96,7 +96,7 @@ class DwcEntryFiltersType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function buildView(FormView $view, FormInterface $form, array $options)
+    public function buildView(FormView $view, FormInterface $form, array $options): void
     {
         $view->vars['fields'] = $options['fields'];
     }

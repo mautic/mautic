@@ -30,12 +30,12 @@ class LoadReportData extends AbstractFixture implements OrderedFixtureInterface,
     /**
      * {@inheritdoc}
      */
-    public function setContainer(ContainerInterface $container = null)
+    public function setContainer(ContainerInterface $container = null): void
     {
         $this->container = $container;
     }
 
-    public function load(ObjectManager $manager)
+    public function load(ObjectManager $manager): void
     {
         $reports = CsvHelper::csv_to_array(__DIR__.'/fakereportdata.csv');
         foreach ($reports as $count => $rows) {

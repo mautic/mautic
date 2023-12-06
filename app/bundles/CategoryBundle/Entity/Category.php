@@ -63,7 +63,7 @@ class Category extends FormEntity
             ->build();
     }
 
-    public static function loadValidatorMetadata(ClassMetadata $metadata)
+    public static function loadValidatorMetadata(ClassMetadata $metadata): void
     {
         $metadata->addPropertyConstraint(
             'title',
@@ -196,13 +196,9 @@ class Category extends FormEntity
     }
 
     /**
-     * Set color.
-     *
      * @param string $color
-     *
-     * @return Category
      */
-    public function setColor($color)
+    public function setColor($color): void
     {
         $this->isChanged('color', $color);
         $this->color = $color;
@@ -222,10 +218,8 @@ class Category extends FormEntity
      * Set bundle.
      *
      * @param string $bundle
-     *
-     * @return Category
      */
-    public function setBundle($bundle)
+    public function setBundle($bundle): void
     {
         $this->isChanged('bundle', $bundle);
         $this->bundle = $bundle;

@@ -31,7 +31,7 @@ class CategoryListType extends AbstractType
         $this->router     = $router;
     }
 
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         if (true === $options['return_entity']) {
             $transformer = new IdToEntityModelTransformer($this->em, \Mautic\CategoryBundle\Entity\Category::class, 'id');
@@ -39,7 +39,7 @@ class CategoryListType extends AbstractType
         }
     }
 
-    public function configureOptions(OptionsResolver $resolver)
+    public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults([
             'choices' => function (Options $options) {

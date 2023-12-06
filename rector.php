@@ -6,6 +6,7 @@ use Rector\Caching\ValueObject\Storage\FileCacheStorage;
 use Rector\DeadCode\Rector\Assign\RemoveUnusedVariableAssignRector;
 use Rector\DeadCode\Rector\Property\RemoveUselessVarTagRector;
 use Rector\Symfony\Symfony42\Rector\MethodCall\ContainerGetToConstructorInjectionRector;
+use Rector\TypeDeclaration\Rector\ClassMethod\AddVoidReturnTypeWhereNoReturnRector;
 use Rector\TypeDeclaration\Rector\ClassMethod\ReturnTypeFromReturnDirectArrayRector;
 use Rector\TypeDeclaration\Rector\ClassMethod\ReturnTypeFromStrictBoolReturnExprRector;
 
@@ -27,6 +28,12 @@ return static function (Rector\Config\RectorConfig $rectorConfig): void {
         ReturnTypeFromReturnDirectArrayRector::class => [
             // require bit test update
             __DIR__.'/app/bundles/LeadBundle/Model/LeadModel.php',
+        ],
+
+        AddVoidReturnTypeWhereNoReturnRector::class => [
+            // handled in separate PRs, remove after merge to avoid conflicts
+            __DIR__.'/app/bundles/ApiBundle',
+            __DIR__.'/app/bundles/CampaignBundle',
         ],
 
         ReturnTypeFromStrictBoolReturnExprRector::class => [
@@ -82,6 +89,9 @@ return static function (Rector\Config\RectorConfig $rectorConfig): void {
 
     // Define what single rules will be applied
     $rectorConfig->rules([
+        AddVoidReturnTypeWhereNoReturnRector::class,
+        \Rector\TypeDeclaration\Rector\Property\TypedPropertyFromStrictConstructorRector::class,
+        \Rector\TypeDeclaration\Rector\Property\TypedPropertyFromStrictSetUpRector::class,
         RemoveUnusedVariableAssignRector::class,
         RemoveUselessVarTagRector::class,
         \Rector\DeadCode\Rector\Ternary\TernaryToBooleanOrFalseToBooleanAndRector::class,

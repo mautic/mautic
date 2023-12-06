@@ -1351,7 +1351,7 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
     /**
      * Get an array of public data.
      *
-     * @return array
+     * @return mixed[]|void
      */
     public function getUserData($identifier, &$socialCache)
     {

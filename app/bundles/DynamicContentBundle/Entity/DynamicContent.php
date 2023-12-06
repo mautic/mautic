@@ -110,7 +110,7 @@ class DynamicContent extends FormEntity implements VariantEntityInterface, Trans
     /**
      * Clear stats.
      */
-    public function clearStats()
+    public function clearStats(): void
     {
         $this->stats = new ArrayCollection();
     }
@@ -173,12 +173,12 @@ class DynamicContent extends FormEntity implements VariantEntityInterface, Trans
      * @throws \Symfony\Component\Validator\Exception\InvalidOptionsException
      * @throws \Symfony\Component\Validator\Exception\MissingOptionsException
      */
-    public static function loadValidatorMetaData(ClassMetadata $metadata)
+    public static function loadValidatorMetaData(ClassMetadata $metadata): void
     {
         $metadata->addPropertyConstraint('name', new NotBlank(['message' => 'mautic.core.name.required']));
 
         $metadata->addConstraint(new Callback([
-            'callback' => function (self $dwc, ExecutionContextInterface $context) {
+            'callback' => function (self $dwc, ExecutionContextInterface $context): void {
                 if (!$dwc->getIsCampaignBased()) {
                     $validator  = $context->getValidator();
                     $violations = $validator->validate(
@@ -464,7 +464,7 @@ class DynamicContent extends FormEntity implements VariantEntityInterface, Trans
     /**
      * Lifecycle callback to clear the slot name if is_campaign is true.
      */
-    public function cleanSlotName()
+    public function cleanSlotName(): void
     {
         if ($this->getIsCampaignBased()) {
             $this->setSlotName('');
