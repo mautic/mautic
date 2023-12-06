@@ -112,14 +112,12 @@ class ConfigChangeLogger
 
     /**
      * Filter unused keys from post data.
-     *
-     * @return array
      */
-    private function filterData(array $data)
+    private function filterData(array $data): array
     {
         $keys = $this->filterKeys;
 
-        return array_filter($data, function ($key) use ($keys) {
+        return array_filter($data, function ($key) use ($keys): bool {
             return !in_array($key, $keys);
         },
             ARRAY_FILTER_USE_KEY);

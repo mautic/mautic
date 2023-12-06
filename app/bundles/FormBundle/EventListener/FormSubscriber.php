@@ -372,10 +372,7 @@ class FormSubscriber implements EventSubscriberInterface
         return $redirect;
     }
 
-    /**
-     * @return string
-     */
-    private function postToHtml($post)
+    private function postToHtml($post): string
     {
         $output = '<table>';
         foreach ($post as $key => $row) {

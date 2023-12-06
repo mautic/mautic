@@ -81,7 +81,7 @@ class FormBuilderEvent extends Event
     {
         uasort(
             $this->actions,
-            function ($a, $b) {
+            function ($a, $b): int {
                 return strnatcasecmp(
                     $a['label'],
                     $b['label']

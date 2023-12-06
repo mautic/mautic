@@ -444,7 +444,7 @@ class Form extends FormEntity
         return $this->postActionProperty;
     }
 
-    public function getResultCount()
+    public function getResultCount(): int
     {
         return count($this->submissions);
     }

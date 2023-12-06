@@ -16,10 +16,8 @@ class DownloadRepository extends CommonRepository
 
     /**
      * Determine if the download is a unique download.
-     *
-     * @return bool
      */
-    public function isUniqueDownload($assetId, $trackingId)
+    public function isUniqueDownload($assetId, $trackingId): bool
     {
         $q  = $this->getEntityManager()->getConnection()->createQueryBuilder();
         $q2 = $this->getEntityManager()->getConnection()->createQueryBuilder();

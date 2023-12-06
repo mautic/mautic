@@ -92,7 +92,7 @@ class FieldModel extends CommonFormModel
         return $this->em->getRepository(\Mautic\FormBundle\Entity\Field::class);
     }
 
-    public function getPermissionBase()
+    public function getPermissionBase(): string
     {
         return 'form:forms';
     }
@@ -108,10 +108,8 @@ class FieldModel extends CommonFormModel
 
     /**
      * Get the fields saved in session.
-     *
-     * @return array
      */
-    public function getSessionFields($formId)
+    public function getSessionFields($formId): array
     {
         $fields = $this->getSession()->get('mautic.form.'.$formId.'.fields.modified', []);
         $remove = $this->getSession()->get('mautic.form.'.$formId.'.fields.deleted', []);

@@ -76,10 +76,10 @@ class EscapeTransformer implements DataTransformerInterface
             return $escaped;
         }
 
-        $search  = array_map(function (string $value) {
+        $search  = array_map(function (string $value): string {
             return "%%{$value}%%";
         }, $this->allowedParameters);
-        $replace = array_map(function (string $value) {
+        $replace = array_map(function (string $value): string {
             return "%{$value}%";
         }, $this->allowedParameters);
 

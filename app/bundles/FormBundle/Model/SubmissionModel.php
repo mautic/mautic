@@ -905,7 +905,7 @@ class SubmissionModel extends CommonFormModel
         $customComponents = $this->formModel->getCustomComponents();
         $availableActions = $customComponents['actions'] ?? [];
 
-        $actions->filter(function (Action $action) use ($availableActions) {
+        $actions->filter(function (Action $action) use ($availableActions): bool {
             return array_key_exists($action->getType(), $availableActions);
         })->map(function (Action $action) use ($event, $availableActions): void {
             $event->setAction($action);

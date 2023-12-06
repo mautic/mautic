@@ -394,26 +394,17 @@ class ResultController extends CommonFormController
         return $this->batchDeleteStandard($request);
     }
 
-    /**
-     * @return string
-     */
-    protected function getModelName()
+    protected function getModelName(): string
     {
         return 'form.submission';
     }
 
-    /**
-     * @return string
-     */
-    protected function getIndexRoute()
+    protected function getIndexRoute(): string
     {
         return 'mautic_form_results';
     }
 
-    /**
-     * @return string
-     */
-    protected function getActionRoute()
+    protected function getActionRoute(): string
     {
         return 'mautic_form_results_action';
     }

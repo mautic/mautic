@@ -946,10 +946,8 @@ class Asset extends FormEntity
 
     /**
      * Returns Font Awesome icon class based on file type.
-     *
-     * @return string
      */
-    public function getIconClass()
+    public function getIconClass(): string
     {
         $fileType = $this->getFileType();
 
@@ -1103,7 +1101,7 @@ class Asset extends FormEntity
      *
      * @return string
      */
-    public function getFileContents()
+    public function getFileContents(): string|bool
     {
         $path = $this->getFilePath();
 
@@ -1304,10 +1302,8 @@ class Asset extends FormEntity
 
     /**
      * @param string $unit
-     *
-     * @return string
      */
-    public static function convertBytesToHumanReadable($size, $unit = '')
+    public static function convertBytesToHumanReadable($size, $unit = ''): string
     {
         list($number, $unit) = self::convertBytesToUnit($size, $unit);
 

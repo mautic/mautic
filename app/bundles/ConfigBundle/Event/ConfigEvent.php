@@ -159,10 +159,7 @@ class ConfigEvent extends CommonEvent
         return $this->fieldErrors;
     }
 
-    /**
-     * @return string
-     */
-    public function getFileContent(UploadedFile $file)
+    public function getFileContent(UploadedFile $file): string
     {
         $tmpFile = $file->getRealPath();
         $content = trim(file_get_contents($tmpFile));
@@ -171,10 +168,7 @@ class ConfigEvent extends CommonEvent
         return $content;
     }
 
-    /**
-     * @return string
-     */
-    public function encodeFileContents($content)
+    public function encodeFileContents($content): string
     {
         return base64_encode($content);
     }
