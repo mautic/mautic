@@ -2,6 +2,7 @@
 
 namespace Mautic\ReportBundle\Event;
 
+use Doctrine\ORM\Tools\Pagination\Paginator;
 use Mautic\ChannelBundle\Helper\ChannelListHelper;
 use Mautic\ReportBundle\Builder\MauticReportBuilder;
 use Mautic\ReportBundle\Helper\ReportHelper;
@@ -18,11 +19,9 @@ class ReportBuilderEvent extends AbstractReportEvent
     private $tableArray = [];
 
     /**
-     * Supported graphs.
-     *
-     * @var array
+     * @var string[]
      */
-    private $supportedGraphs = [
+    private array $supportedGraphs = [
         'table',
         'bar',
         'pie',
@@ -30,24 +29,31 @@ class ReportBuilderEvent extends AbstractReportEvent
     ];
 
     /**
-     * Container with registered graphs.
-     *
-     * @var array
+     * @var mixed[]
      */
-    private $graphArray = [];
+    private array $graphArray = [];
 
     /**
-     * ReportBuilderEvent constructor.
-     *
-     * @param string  $context
-     * @param mixed[] $leadFields
-     */
-    public function __construct(private TranslatorInterface $translator, private ChannelListHelper $channelListHelper, $context, /**
      * List of published array of lead fields.
+     *
+     * @var mixed[]|Paginator|array
      */
-    private $leadFields, private ReportHelper $reportHelper, private ?string $reportSource = null)
-    {
+    private $leadFields = [];
+
+    /**
+     * @param string                  $context
+     * @param mixed[]|Paginator|array $leadFields
+     */
+    public function __construct(
+        private TranslatorInterface $translator,
+        private ChannelListHelper $channelListHelper,
+        $context,
+        $leadFields,
+        private ReportHelper $reportHelper,
+        private ?string $reportSource = null
+    ) {
         $this->context           = $context;
+        $this->leadFields        = $leadFields;
     }
 
     /**

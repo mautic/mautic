@@ -8,7 +8,7 @@ use Mautic\ReportBundle\Entity\Report;
 class ReportGraphEvent extends AbstractReportEvent
 {
     /**
-     * Constructor.
+     * @param mixed[] $requestedGraphs
      */
     public function __construct(Report $report, private array $requestedGraphs, private QueryBuilder $queryBuilder)
     {
