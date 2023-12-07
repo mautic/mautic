@@ -33,7 +33,7 @@ class PointSubscriber implements EventSubscriberInterface
             'group'       => 'mautic.form.point.action',
             'label'       => 'mautic.form.point.action.submit',
             'description' => 'mautic.form.point.action.submit_descr',
-            'callback'    => ['\\'.\Mautic\FormBundle\Helper\PointActionHelper::class, 'validateFormSubmit'],
+            'callback'    => [\Mautic\FormBundle\Helper\PointActionHelper::class, 'validateFormSubmit'],
             'formType'    => PointActionFormSubmitType::class,
         ];
 
