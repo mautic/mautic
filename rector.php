@@ -62,7 +62,7 @@ return static function (Rector\Config\RectorConfig $rectorConfig): void {
         ],
 
         \Rector\Php80\Rector\Class_\ClassPropertyAssignToConstructorPromotionRector::class => [
-            __DIR__ . '/app/bundles/CacheBundle/EventListener/CacheClearSubscriber.php',
+            __DIR__.'/app/bundles/CacheBundle/EventListener/CacheClearSubscriber.php',
         ],
 
         // handle later, case by case as lot of chnaged code
