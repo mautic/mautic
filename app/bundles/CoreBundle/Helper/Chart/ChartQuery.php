@@ -63,10 +63,7 @@ class ChartQuery extends AbstractChart
      *
      * @param string|null $unit
      */
-    public function __construct(/**
-     * Doctrine's Connetion object.
-     */
-    protected Connection $connection, \DateTime $dateFrom, \DateTime $dateTo, $unit = null)
+    public function __construct(protected Connection $connection, \DateTime $dateFrom, \DateTime $dateTo, $unit = null)
     {
         $this->dateTimeHelper = new DateTimeHelper();
         $this->unit           = (null === $unit) ? $this->getTimeUnitFromDateRange($dateFrom, $dateTo) : $unit;
