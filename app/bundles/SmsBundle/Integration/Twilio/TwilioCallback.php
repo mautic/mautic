@@ -13,14 +13,8 @@ use Twilio\Exceptions\ConfigurationException;
 
 class TwilioCallback implements CallbackInterface
 {
-    private \Mautic\SmsBundle\Helper\ContactHelper $contactHelper;
-
-    private \Mautic\SmsBundle\Integration\Twilio\Configuration $configuration;
-
-    public function __construct(ContactHelper $contactHelper, Configuration $configuration)
+    public function __construct(private ContactHelper $contactHelper, private Configuration $configuration)
     {
-        $this->contactHelper = $contactHelper;
-        $this->configuration = $configuration;
     }
 
     public function getTransportName(): string

@@ -10,11 +10,8 @@ use Symfony\Component\Form\FormBuilderInterface;
 
 class ReportWidgetType extends AbstractType
 {
-    protected \Mautic\ReportBundle\Model\ReportModel $model;
-
-    public function __construct(ReportModel $reportModel)
+    public function __construct(protected ReportModel $model)
     {
-        $this->model = $reportModel;
     }
 
     public function buildForm(FormBuilderInterface $builder, array $options): void

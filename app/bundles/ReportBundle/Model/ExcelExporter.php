@@ -12,14 +12,8 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class ExcelExporter
 {
-    protected \Mautic\CoreBundle\Twig\Helper\FormatterHelper $formatterHelper;
-
-    private TranslatorInterface $translator;
-
-    public function __construct(FormatterHelper $formatterHelper, TranslatorInterface $translator)
+    public function __construct(protected FormatterHelper $formatterHelper, private TranslatorInterface $translator)
     {
-        $this->formatterHelper      = $formatterHelper;
-        $this->translator           = $translator;
     }
 
     /**

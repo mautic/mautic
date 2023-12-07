@@ -10,11 +10,8 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class StopSubscriber implements EventSubscriberInterface
 {
-    private DoNotContactModel $doNotContactModel;
-
-    public function __construct(DoNotContactModel $doNotContactModel)
+    public function __construct(private DoNotContactModel $doNotContactModel)
     {
-        $this->doNotContactModel         = $doNotContactModel;
     }
 
     /**

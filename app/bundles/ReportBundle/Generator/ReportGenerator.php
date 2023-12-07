@@ -8,7 +8,6 @@ use Mautic\ReportBundle\Builder\MauticReportBuilder;
 use Mautic\ReportBundle\Entity\Report;
 use Mautic\ReportBundle\Form\Type\ReportType;
 use Symfony\Component\DependencyInjection\Exception\RuntimeException;
-use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\FormFactoryInterface;
 
@@ -17,17 +16,6 @@ use Symfony\Component\Form\FormFactoryInterface;
  */
 class ReportGenerator
 {
-    private \Doctrine\DBAL\Connection $db;
-
-    /**
-     * @var EventDispatcher
-     */
-    private \Symfony\Component\EventDispatcher\EventDispatcherInterface $dispatcher;
-
-    private ?\Symfony\Component\Form\FormFactoryInterface $formFactory;
-
-    private \Mautic\ReportBundle\Entity\Report $entity;
-
     /**
      * @var string
      */
@@ -38,15 +26,8 @@ class ReportGenerator
      */
     private $contentTemplate;
 
-    private \Mautic\ChannelBundle\Helper\ChannelListHelper $channelListHelper;
-
-    public function __construct(EventDispatcherInterface $dispatcher, Connection $db, Report $entity, ChannelListHelper $channelListHelper, FormFactoryInterface $formFactory = null)
+    public function __construct(private EventDispatcherInterface $dispatcher, private Connection $db, private Report $entity, private ChannelListHelper $channelListHelper, private ?FormFactoryInterface $formFactory = null)
     {
-        $this->db                = $db;
-        $this->dispatcher        = $dispatcher;
-        $this->formFactory       = $formFactory;
-        $this->channelListHelper = $channelListHelper;
-        $this->entity            = $entity;
     }
 
     /**

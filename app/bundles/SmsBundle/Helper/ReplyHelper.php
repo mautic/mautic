@@ -17,17 +17,8 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 class ReplyHelper
 {
-    private \Symfony\Component\EventDispatcher\EventDispatcherInterface $eventDispatcher;
-
-    private \Psr\Log\LoggerInterface $logger;
-
-    private \Mautic\LeadBundle\Tracker\ContactTracker $contactTracker;
-
-    public function __construct(EventDispatcherInterface $eventDispatcher, LoggerInterface $logger, ContactTracker $contactTracker)
+    public function __construct(private EventDispatcherInterface $eventDispatcher, private LoggerInterface $logger, private ContactTracker $contactTracker)
     {
-        $this->eventDispatcher = $eventDispatcher;
-        $this->logger          = $logger;
-        $this->contactTracker  = $contactTracker;
     }
 
     /**

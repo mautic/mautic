@@ -41,24 +41,8 @@ use Symfony\Contracts\EventDispatcher\Event;
  */
 class SmsModel extends FormModel implements AjaxLookupModelInterface
 {
-    protected \Mautic\PageBundle\Model\TrackableModel $pageTrackableModel;
-
-    protected \Mautic\LeadBundle\Model\LeadModel $leadModel;
-
-    protected \Mautic\ChannelBundle\Model\MessageQueueModel $messageQueueModel;
-
-    protected \Mautic\SmsBundle\Sms\TransportChain $transport;
-
-    private \Mautic\CoreBundle\Helper\CacheStorageHelper $cacheStorageHelper;
-
-    public function __construct(TrackableModel $pageTrackableModel, LeadModel $leadModel, MessageQueueModel $messageQueueModel, TransportChain $transport, CacheStorageHelper $cacheStorageHelper, EntityManagerInterface $em, CorePermissions $security, EventDispatcherInterface $dispatcher, UrlGeneratorInterface $router, Translator $translator, UserHelper $userHelper, LoggerInterface $mauticLogger, CoreParametersHelper $coreParametersHelper)
+    public function __construct(protected TrackableModel $pageTrackableModel, protected LeadModel $leadModel, protected MessageQueueModel $messageQueueModel, protected TransportChain $transport, private CacheStorageHelper $cacheStorageHelper, EntityManagerInterface $em, CorePermissions $security, EventDispatcherInterface $dispatcher, UrlGeneratorInterface $router, Translator $translator, UserHelper $userHelper, LoggerInterface $mauticLogger, CoreParametersHelper $coreParametersHelper)
     {
-        $this->pageTrackableModel = $pageTrackableModel;
-        $this->leadModel          = $leadModel;
-        $this->messageQueueModel  = $messageQueueModel;
-        $this->transport          = $transport;
-        $this->cacheStorageHelper = $cacheStorageHelper;
-
         parent::__construct($em, $security, $dispatcher, $router, $translator, $userHelper, $mauticLogger, $coreParametersHelper);
     }
 
