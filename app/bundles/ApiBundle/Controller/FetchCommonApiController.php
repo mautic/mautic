@@ -425,7 +425,7 @@ class FetchCommonApiController extends AbstractFOSRestController implements Maut
      *
      * @return array|mixed
      */
-    protected function getBatchEntities($parameters, array &$errors, $prepareForSerialization = false, $requestIdColumn = 'id', $model = null, $returnWithOriginalKeys = true)
+    protected function getBatchEntities($parameters, ?array &$errors, $prepareForSerialization = false, $requestIdColumn = 'id', $model = null, $returnWithOriginalKeys = true)
     {
         $idHelper = new BatchIdToEntityHelper($parameters, $requestIdColumn);
 
