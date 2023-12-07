@@ -16,13 +16,10 @@ class UntrackableUrlsEvent extends Event
     ];
 
     /**
-     * @var string
+     * @param string $content
      */
-    private $content;
-
-    public function __construct($content)
+    public function __construct(private $content)
     {
-        $this->content = $content;
     }
 
     /**

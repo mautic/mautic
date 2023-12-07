@@ -9,27 +9,12 @@ use Symfony\Component\Form\Exception\TransformationFailedException;
 
 class TagEntityModelTransformer implements DataTransformerInterface
 {
-    private \Doctrine\ORM\EntityManager $em;
-
     /**
-     * @var string
-     */
-    private $repository;
-
-    /**
-     * @var bool
-     */
-    private $isArray;
-
-    /**
-     * @param string $repo
+     * @param string $repository
      * @param bool   $isArray
      */
-    public function __construct(EntityManager $em, $repo = '', $isArray = false)
+    public function __construct(private EntityManager $em, private $repository = '', private $isArray = false)
     {
-        $this->em         = $em;
-        $this->repository = $repo;
-        $this->isArray    = $isArray;
     }
 
     /**

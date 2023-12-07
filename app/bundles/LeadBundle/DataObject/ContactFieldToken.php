@@ -12,8 +12,6 @@ use Mautic\LeadBundle\Exception\InvalidContactFieldTokenException;
  */
 class ContactFieldToken
 {
-    private string $fullToken;
-
     private string $fieldAlias;
 
     private ?string $defaultValue;
@@ -21,9 +19,8 @@ class ContactFieldToken
     /**
      * @throws InvalidContactFieldTokenException
      */
-    public function __construct(string $fullToken)
+    public function __construct(private string $fullToken)
     {
-        $this->fullToken = $fullToken;
         $this->parse(trim($fullToken));
     }
 

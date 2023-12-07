@@ -28,11 +28,8 @@ use Symfony\Contracts\EventDispatcher\Event;
  */
 class NoteModel extends FormModel
 {
-    private RequestStack $requestStack;
-
-    public function __construct(EntityManagerInterface $em, CorePermissions $security, EventDispatcherInterface $dispatcher, UrlGeneratorInterface $router, Translator $translator, UserHelper $userHelper, LoggerInterface $mauticLogger, CoreParametersHelper $coreParametersHelper, RequestStack $requestStack)
+    public function __construct(EntityManagerInterface $em, CorePermissions $security, EventDispatcherInterface $dispatcher, UrlGeneratorInterface $router, Translator $translator, UserHelper $userHelper, LoggerInterface $mauticLogger, CoreParametersHelper $coreParametersHelper, private RequestStack $requestStack)
     {
-        $this->requestStack = $requestStack;
         parent::__construct($em, $security, $dispatcher, $router, $translator, $userHelper, $mauticLogger, $coreParametersHelper);
     }
 

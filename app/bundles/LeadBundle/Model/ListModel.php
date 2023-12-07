@@ -51,28 +51,18 @@ class ListModel extends FormModel
 {
     use OperatorListTrait;
 
-    protected \Mautic\CategoryBundle\Model\CategoryModel $categoryModel;
-
-    private \Mautic\LeadBundle\Segment\ContactSegmentService $leadSegmentService;
-
     /**
      * @var mixed[]
      */
     private $choiceFieldsCache = [];
 
-    private \Mautic\LeadBundle\Segment\Stat\SegmentChartQueryFactory $segmentChartQueryFactory;
-
-    private \Symfony\Component\HttpFoundation\RequestStack $requestStack;
-
-    private \Mautic\LeadBundle\Helper\SegmentCountCacheHelper $segmentCountCacheHelper;
-
     public function __construct(
-        CategoryModel $categoryModel,
+        protected CategoryModel $categoryModel,
         CoreParametersHelper $coreParametersHelper,
-        ContactSegmentService $leadSegment,
-        SegmentChartQueryFactory $segmentChartQueryFactory,
-        RequestStack $requestStack,
-        SegmentCountCacheHelper $segmentCountCacheHelper,
+        private ContactSegmentService $leadSegmentService,
+        private SegmentChartQueryFactory $segmentChartQueryFactory,
+        private RequestStack $requestStack,
+        private SegmentCountCacheHelper $segmentCountCacheHelper,
         EntityManagerInterface $em,
         CorePermissions $security,
         EventDispatcherInterface $dispatcher,
@@ -81,12 +71,6 @@ class ListModel extends FormModel
         UserHelper $userHelper,
         LoggerInterface $mauticLogger
     ) {
-        $this->categoryModel            = $categoryModel;
-        $this->leadSegmentService       = $leadSegment;
-        $this->segmentChartQueryFactory = $segmentChartQueryFactory;
-        $this->requestStack             = $requestStack;
-        $this->segmentCountCacheHelper  = $segmentCountCacheHelper;
-
         parent::__construct($em, $security, $dispatcher, $router, $translator, $userHelper, $mauticLogger, $coreParametersHelper);
     }
 

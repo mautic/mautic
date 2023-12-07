@@ -27,32 +27,17 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class FormSubscriber implements EventSubscriberInterface
 {
-    /**
-     * @param LeadModel
-     */
-    protected \Mautic\LeadBundle\Model\LeadModel $leadModel;
-
-    protected \Mautic\LeadBundle\Tracker\ContactTracker $contactTracker;
-
-    protected \Mautic\CoreBundle\Helper\IpLookupHelper $ipLookupHelper;
-
-    protected \Mautic\LeadBundle\Entity\LeadFieldRepository $leadFieldRepository;
-
-    private DoNotContact $doNotContact;
-
     public function __construct(
-        LeadModel $leadModel,
-        ContactTracker $contactTracker,
-        IpLookupHelper $ipLookupHelper,
-        LeadFieldRepository $leadFieldRepository,
+        /**
+         * @param LeadModel
+         */
+        protected LeadModel $leadModel,
+        protected ContactTracker $contactTracker,
+        protected IpLookupHelper $ipLookupHelper,
+        protected LeadFieldRepository $leadFieldRepository,
         private PointGroupModel $groupModel,
-        DoNotContact $doNotContact
+        private DoNotContact $doNotContact
     ) {
-        $this->leadModel           = $leadModel;
-        $this->contactTracker      = $contactTracker;
-        $this->ipLookupHelper      = $ipLookupHelper;
-        $this->leadFieldRepository = $leadFieldRepository;
-        $this->doNotContact        = $doNotContact;
     }
 
     /**

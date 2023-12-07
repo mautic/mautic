@@ -9,14 +9,11 @@ use Mautic\LeadBundle\Services\ContactSegmentFilterDictionary;
 
 class CustomMappedDecorator extends BaseDecorator implements ContactDecoratorForeignInterface
 {
-    protected \Mautic\LeadBundle\Services\ContactSegmentFilterDictionary $dictionary;
-
     public function __construct(
         ContactSegmentFilterOperator $contactSegmentFilterOperator,
-        ContactSegmentFilterDictionary $contactSegmentFilterDictionary
+        protected ContactSegmentFilterDictionary $dictionary
     ) {
         parent::__construct($contactSegmentFilterOperator);
-        $this->dictionary = $contactSegmentFilterDictionary;
     }
 
     /**

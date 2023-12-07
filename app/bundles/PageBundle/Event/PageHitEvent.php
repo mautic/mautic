@@ -8,36 +8,18 @@ use Mautic\PageBundle\Entity\Page;
 
 class PageHitEvent extends CommonEvent
 {
-    protected $request;
-
-    protected $code;
-
     protected ?\Mautic\PageBundle\Entity\Page $page = null;
-
-    /**
-     * @var array
-     */
-    protected $clickthroughData = [];
-
-    /**
-     * @var bool
-     */
-    protected $unique;
 
     /**
      * PageHitEvent constructor.
      *
-     * @param array $clickthrough
-     * @param bool  $isUnique
+     * @param array $clickthroughData
+     * @param bool  $unique
      */
-    public function __construct(Hit $hit, $request, $code, $clickthrough = [], $isUnique = false)
+    public function __construct(Hit $hit, protected $request, protected $code, protected $clickthroughData = [], protected $unique = false)
     {
         $this->entity           = $hit;
         $this->page             = $hit->getPage();
-        $this->request          = $request;
-        $this->code             = $code;
-        $this->clickthroughData = $clickthrough;
-        $this->unique           = $isUnique;
     }
 
     /**

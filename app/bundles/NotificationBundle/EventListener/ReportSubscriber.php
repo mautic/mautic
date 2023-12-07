@@ -17,17 +17,8 @@ class ReportSubscriber implements EventSubscriberInterface
     public const MOBILE_NOTIFICATIONS       = 'mobile_notifications';
     public const MOBILE_NOTIFICATIONS_STATS = 'mobile_notifications.stats';
 
-    private \Doctrine\DBAL\Connection $db;
-
-    private \Mautic\LeadBundle\Model\CompanyReportData $companyReportData;
-
-    private \Mautic\NotificationBundle\Entity\StatRepository $statRepository;
-
-    public function __construct(Connection $db, CompanyReportData $companyReportData, StatRepository $statRepository)
+    public function __construct(private Connection $db, private CompanyReportData $companyReportData, private StatRepository $statRepository)
     {
-        $this->db                = $db;
-        $this->companyReportData = $companyReportData;
-        $this->statRepository    = $statRepository;
     }
 
     /**

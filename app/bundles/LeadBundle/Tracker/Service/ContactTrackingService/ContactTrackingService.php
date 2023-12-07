@@ -16,28 +16,8 @@ use Symfony\Component\HttpFoundation\RequestStack;
  */
 final class ContactTrackingService implements ContactTrackingServiceInterface
 {
-    private \Mautic\CoreBundle\Helper\CookieHelper $cookieHelper;
-
-    private \Mautic\LeadBundle\Entity\LeadDeviceRepository $leadDeviceRepository;
-
-    private \Mautic\LeadBundle\Entity\LeadRepository $leadRepository;
-
-    private \Mautic\LeadBundle\Entity\MergeRecordRepository $mergeRecordRepository;
-
-    private \Symfony\Component\HttpFoundation\RequestStack $requestStack;
-
-    public function __construct(
-        CookieHelper $cookieHelper,
-        LeadDeviceRepository $leadDeviceRepository,
-        LeadRepository $leadRepository,
-        MergeRecordRepository $mergeRecordRepository,
-        RequestStack $requestStack
-    ) {
-        $this->cookieHelper          = $cookieHelper;
-        $this->leadDeviceRepository  = $leadDeviceRepository;
-        $this->leadRepository        = $leadRepository;
-        $this->mergeRecordRepository = $mergeRecordRepository;
-        $this->requestStack          = $requestStack;
+    public function __construct(private CookieHelper $cookieHelper, private LeadDeviceRepository $leadDeviceRepository, private LeadRepository $leadRepository, private MergeRecordRepository $mergeRecordRepository, private RequestStack $requestStack)
+    {
     }
 
     /**

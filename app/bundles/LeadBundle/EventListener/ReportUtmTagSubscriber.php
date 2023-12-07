@@ -13,16 +13,8 @@ class ReportUtmTagSubscriber implements EventSubscriberInterface
 {
     public const UTM_TAG = 'lead.utmTag';
 
-    private \Mautic\LeadBundle\Report\FieldsBuilder $fieldsBuilder;
-
-    private \Mautic\LeadBundle\Model\CompanyReportData $companyReportData;
-
-    public function __construct(
-        FieldsBuilder $fieldsBuilder,
-        CompanyReportData $companyReportData
-    ) {
-        $this->fieldsBuilder     = $fieldsBuilder;
-        $this->companyReportData = $companyReportData;
+    public function __construct(private FieldsBuilder $fieldsBuilder, private CompanyReportData $companyReportData)
+    {
     }
 
     /**

@@ -22,11 +22,8 @@ class ContactSegmentFilterDictionary
      */
     private $filters = [];
 
-    private \Symfony\Component\EventDispatcher\EventDispatcherInterface $dispatcher;
-
-    public function __construct(EventDispatcherInterface $dispatcher)
+    public function __construct(private EventDispatcherInterface $dispatcher)
     {
-        $this->dispatcher = $dispatcher;
     }
 
     /**

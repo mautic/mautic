@@ -11,35 +11,15 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 class LeadListFiltersChoicesEvent extends AbstractCustomRequestEvent
 {
     /**
-     * Please refer to ListModel.php, inside getChoiceFields method, for examples of choices.
-     *
-     * @var mixed
-     */
-    protected $choices;
-
-    /**
-     * Please refer to ListModel.php, inside getChoiceFields method, for default operators availabled.
-     *
-     * @var mixed[]
-     */
-    protected $operators;
-
-    protected \Symfony\Contracts\Translation\TranslatorInterface $translator;
-
-    private string $search;
-
-    /**
      * @param mixed[] $choices
      * @param mixed[] $operators
      */
-    public function __construct($choices, $operators, TranslatorInterface $translator, Request $request = null, string $search = '')
+    public function __construct(protected $choices, /**
+     * Please refer to ListModel.php, inside getChoiceFields method, for default operators availabled.
+     */
+    protected $operators, protected TranslatorInterface $translator, Request $request = null, private string $search = '')
     {
         parent::__construct($request);
-
-        $this->choices    = $choices;
-        $this->operators  = $operators;
-        $this->translator = $translator;
-        $this->search     = $search;
     }
 
     /**

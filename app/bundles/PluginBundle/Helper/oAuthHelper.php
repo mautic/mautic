@@ -24,9 +24,7 @@ class oAuthHelper
 
     private $settings;
 
-    private ?\Symfony\Component\HttpFoundation\Request $request;
-
-    public function __construct(UnifiedIntegrationInterface $integration, Request $request = null, $settings = [])
+    public function __construct(UnifiedIntegrationInterface $integration, private ?Request $request = null, $settings = [])
     {
         $clientId                = $integration->getClientIdKey();
         $clientSecret            = $integration->getClientSecretKey();
@@ -38,7 +36,6 @@ class oAuthHelper
         $this->accessTokenSecret = (isset($settings['token_secret'])) ? $settings['token_secret'] : '';
         $this->callback          = $integration->getAuthCallbackUrl();
         $this->settings          = $settings;
-        $this->request           = $request;
     }
 
     public function getAuthorizationHeader($url, $parameters, $method): array

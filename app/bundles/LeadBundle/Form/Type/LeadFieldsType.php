@@ -11,11 +11,8 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class LeadFieldsType extends AbstractType
 {
-    protected \Mautic\LeadBundle\Model\FieldModel $fieldModel;
-
-    public function __construct(FieldModel $fieldModel)
+    public function __construct(protected FieldModel $fieldModel)
     {
-        $this->fieldModel = $fieldModel;
     }
 
     public function configureOptions(OptionsResolver $resolver): void

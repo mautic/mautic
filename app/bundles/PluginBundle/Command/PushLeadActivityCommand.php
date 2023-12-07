@@ -11,15 +11,9 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class PushLeadActivityCommand extends Command
 {
-    private TranslatorInterface $translator;
-    private IntegrationHelper $integrationHelper;
-
-    public function __construct(TranslatorInterface $translator, IntegrationHelper $integrationHelper)
+    public function __construct(private TranslatorInterface $translator, private IntegrationHelper $integrationHelper)
     {
         parent::__construct();
-
-        $this->translator        = $translator;
-        $this->integrationHelper = $integrationHelper;
     }
 
     protected function configure()

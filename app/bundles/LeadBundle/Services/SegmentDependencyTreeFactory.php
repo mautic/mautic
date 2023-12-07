@@ -12,19 +12,13 @@ use Symfony\Component\Routing\RouterInterface;
 
 class SegmentDependencyTreeFactory
 {
-    private \Mautic\LeadBundle\Model\ListModel $segmentModel;
-
-    private \Symfony\Component\Routing\RouterInterface $router;
-
     /**
      * @var int[]
      */
     private $usedSegmentIds = [];
 
-    public function __construct(ListModel $segmentModel, RouterInterface $router)
+    public function __construct(private ListModel $segmentModel, private RouterInterface $router)
     {
-        $this->segmentModel = $segmentModel;
-        $this->router       = $router;
     }
 
     public function buildTree(LeadList $segment, NodeInterface $rootNode = null): NodeInterface

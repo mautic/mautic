@@ -13,11 +13,8 @@ use Symfony\Component\Validator\Exception\UnexpectedTypeException;
 
 class SegmentInUseValidator extends ConstraintValidator
 {
-    private \Mautic\LeadBundle\Model\ListModel $listModel;
-
-    public function __construct(ListModel $listModel)
+    public function __construct(private ListModel $listModel)
     {
-        $this->listModel = $listModel;
     }
 
     /**

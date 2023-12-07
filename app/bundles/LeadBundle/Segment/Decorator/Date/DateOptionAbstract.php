@@ -9,14 +9,8 @@ use Mautic\LeadBundle\Segment\Decorator\FilterDecoratorInterface;
 
 abstract class DateOptionAbstract implements FilterDecoratorInterface
 {
-    protected \Mautic\LeadBundle\Segment\Decorator\DateDecorator $dateDecorator;
-
-    protected \Mautic\LeadBundle\Segment\Decorator\Date\DateOptionParameters $dateOptionParameters;
-
-    public function __construct(DateDecorator $dateDecorator, DateOptionParameters $dateOptionParameters)
+    public function __construct(protected DateDecorator $dateDecorator, protected DateOptionParameters $dateOptionParameters)
     {
-        $this->dateDecorator        = $dateDecorator;
-        $this->dateOptionParameters = $dateOptionParameters;
     }
 
     /**

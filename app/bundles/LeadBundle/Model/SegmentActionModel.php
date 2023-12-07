@@ -4,11 +4,8 @@ namespace Mautic\LeadBundle\Model;
 
 class SegmentActionModel
 {
-    private \Mautic\LeadBundle\Model\LeadModel $contactModel;
-
-    public function __construct(LeadModel $contactModel)
+    public function __construct(private LeadModel $contactModel)
     {
-        $this->contactModel = $contactModel;
     }
 
     public function addContacts(array $contactIds, array $segmentIds): void

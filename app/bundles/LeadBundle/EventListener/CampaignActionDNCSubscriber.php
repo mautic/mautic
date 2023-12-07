@@ -15,14 +15,8 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class CampaignActionDNCSubscriber implements EventSubscriberInterface
 {
-    private \Mautic\LeadBundle\Model\DoNotContact $doNotContact;
-
-    private \Mautic\LeadBundle\Model\LeadModel $leadModel;
-
-    public function __construct(DoNotContact $doNotContact, LeadModel $leadModel)
+    public function __construct(private DoNotContact $doNotContact, private LeadModel $leadModel)
     {
-        $this->doNotContact = $doNotContact;
-        $this->leadModel    = $leadModel;
     }
 
     /**

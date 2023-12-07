@@ -27,21 +27,14 @@ class CreateCustomFieldCommand extends ModeratedCommand
 
     protected static $defaultDescription = 'Create custom field column in the background';
 
-    private BackgroundService $backgroundService;
-    private TranslatorInterface $translator;
-    private LeadFieldRepository $leadFieldRepository;
-
     public function __construct(
-        BackgroundService $backgroundService,
-        TranslatorInterface $translator,
-        LeadFieldRepository $leadFieldRepository,
+        private BackgroundService $backgroundService,
+        private TranslatorInterface $translator,
+        private LeadFieldRepository $leadFieldRepository,
         PathsHelper $pathsHelper,
         CoreParametersHelper $coreParametersHelper
     ) {
         parent::__construct($pathsHelper, $coreParametersHelper);
-        $this->backgroundService   = $backgroundService;
-        $this->translator          = $translator;
-        $this->leadFieldRepository = $leadFieldRepository;
     }
 
     public function configure(): void

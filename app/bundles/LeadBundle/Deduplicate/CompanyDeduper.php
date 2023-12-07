@@ -10,12 +10,9 @@ class CompanyDeduper
 {
     use DeduperTrait;
 
-    private \Mautic\LeadBundle\Entity\CompanyRepository $companyRepository;
-
-    public function __construct(FieldModel $fieldModel, CompanyRepository $companyRepository)
+    public function __construct(FieldModel $fieldModel, private CompanyRepository $companyRepository)
     {
         $this->fieldModel        = $fieldModel;
-        $this->companyRepository = $companyRepository;
         $this->object            = 'company';
     }
 

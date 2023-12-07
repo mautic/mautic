@@ -48,15 +48,12 @@ class ImportController extends FormController
     public const STEP_PROGRESS_BAR    = 3;
     public const STEP_IMPORT_FROM_CSV = 4;
 
-    private \Psr\Log\LoggerInterface $logger;
-
     private \Symfony\Component\HttpFoundation\Session\SessionInterface $session;
 
     private \Mautic\LeadBundle\Model\ImportModel $importModel;
 
-    public function __construct(FormFactoryInterface $formFactory, FormFieldHelper $fieldHelper, LoggerInterface $mauticLogger, ManagerRegistry $doctrine, MauticFactory $factory, ModelFactory $modelFactory, UserHelper $userHelper, CoreParametersHelper $coreParametersHelper, EventDispatcherInterface $dispatcher, Translator $translator, FlashBag $flashBag, RequestStack $requestStack, CorePermissions $security)
+    public function __construct(FormFactoryInterface $formFactory, FormFieldHelper $fieldHelper, private LoggerInterface $logger, ManagerRegistry $doctrine, MauticFactory $factory, ModelFactory $modelFactory, UserHelper $userHelper, CoreParametersHelper $coreParametersHelper, EventDispatcherInterface $dispatcher, Translator $translator, FlashBag $flashBag, RequestStack $requestStack, CorePermissions $security)
     {
-        $this->logger = $mauticLogger;
         /** @var ImportModel $model */
         $model = $modelFactory->getModel($this->getModelName());
 

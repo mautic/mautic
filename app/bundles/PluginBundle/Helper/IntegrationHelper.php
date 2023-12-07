@@ -18,20 +18,6 @@ use Twig\Environment;
 
 class IntegrationHelper
 {
-    private \Symfony\Component\DependencyInjection\ContainerInterface $container;
-
-    protected \Doctrine\ORM\EntityManager $em;
-
-    protected \Mautic\CoreBundle\Helper\PathsHelper $pathsHelper;
-
-    protected \Mautic\CoreBundle\Helper\BundleHelper $bundleHelper;
-
-    protected \Mautic\CoreBundle\Helper\CoreParametersHelper $coreParametersHelper;
-
-    protected \Twig\Environment $twig;
-
-    protected \Mautic\PluginBundle\Model\PluginModel $pluginModel;
-
     private $integrations = [];
 
     private $available = [];
@@ -40,22 +26,8 @@ class IntegrationHelper
 
     private $byPlugin = [];
 
-    public function __construct(
-        ContainerInterface $container,
-        EntityManager $em,
-        PathsHelper $pathsHelper,
-        BundleHelper $bundleHelper,
-        CoreParametersHelper $coreParametersHelper,
-        Environment $twig,
-        PluginModel $pluginModel
-    ) {
-        $this->container            = $container;
-        $this->em                   = $em;
-        $this->pathsHelper          = $pathsHelper;
-        $this->bundleHelper         = $bundleHelper;
-        $this->pluginModel          = $pluginModel;
-        $this->coreParametersHelper = $coreParametersHelper;
-        $this->twig                 = $twig;
+    public function __construct(private ContainerInterface $container, protected EntityManager $em, protected PathsHelper $pathsHelper, protected BundleHelper $bundleHelper, protected CoreParametersHelper $coreParametersHelper, protected Environment $twig, protected PluginModel $pluginModel)
+    {
     }
 
     /**

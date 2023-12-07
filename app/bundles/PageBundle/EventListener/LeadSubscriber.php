@@ -19,12 +19,6 @@ class LeadSubscriber implements EventSubscriberInterface
 {
     use ChannelTrait;
 
-    private \Mautic\PageBundle\Model\PageModel $pageModel;
-
-    private \Mautic\PageBundle\Model\VideoModel $pageVideoModel;
-
-    private \Symfony\Contracts\Translation\TranslatorInterface $translator;
-
     /**
      * @var RouterInterface
      */
@@ -34,15 +28,12 @@ class LeadSubscriber implements EventSubscriberInterface
      * @param ModelFactory<object> $modelFactory
      */
     public function __construct(
-        PageModel $pageModel,
-        VideoModel $pageVideoModel,
-        TranslatorInterface $translator,
+        private PageModel $pageModel,
+        private VideoModel $pageVideoModel,
+        private TranslatorInterface $translator,
         RouterInterface $router,
         ModelFactory $modelFactory
     ) {
-        $this->pageModel      = $pageModel;
-        $this->pageVideoModel = $pageVideoModel;
-        $this->translator     = $translator;
         $this->router         = $router;
 
         $this->setModelFactory($modelFactory);

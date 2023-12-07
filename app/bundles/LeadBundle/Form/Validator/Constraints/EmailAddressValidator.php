@@ -9,11 +9,8 @@ use Symfony\Component\Validator\ConstraintValidator;
 
 class EmailAddressValidator extends ConstraintValidator
 {
-    private \Mautic\EmailBundle\Helper\EmailValidator $emailValidator;
-
-    public function __construct(EmailValidator $emailValidator)
+    public function __construct(private EmailValidator $emailValidator)
     {
-        $this->emailValidator = $emailValidator;
     }
 
     /**

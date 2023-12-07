@@ -52,20 +52,13 @@ class TrackableModel extends AbstractCommonModel
      */
     protected $usingClickthrough = true;
 
-    protected \Mautic\PageBundle\Model\RedirectModel $redirectModel;
-
-    private \Mautic\LeadBundle\Entity\LeadFieldRepository $leadFieldRepository;
-
     /**
      * @var array|null
      */
     private $contactFieldUrlTokens;
 
-    public function __construct(RedirectModel $redirectModel, LeadFieldRepository $leadFieldRepository, EntityManagerInterface $em, CorePermissions $security, EventDispatcherInterface $dispatcher, UrlGeneratorInterface $router, Translator $translator, UserHelper $userHelper, LoggerInterface $mauticLogger, CoreParametersHelper $coreParametersHelper)
+    public function __construct(protected RedirectModel $redirectModel, private LeadFieldRepository $leadFieldRepository, EntityManagerInterface $em, CorePermissions $security, EventDispatcherInterface $dispatcher, UrlGeneratorInterface $router, Translator $translator, UserHelper $userHelper, LoggerInterface $mauticLogger, CoreParametersHelper $coreParametersHelper)
     {
-        $this->redirectModel       = $redirectModel;
-        $this->leadFieldRepository = $leadFieldRepository;
-
         parent::__construct($em, $security, $dispatcher, $router, $translator, $userHelper, $mauticLogger, $coreParametersHelper);
     }
 

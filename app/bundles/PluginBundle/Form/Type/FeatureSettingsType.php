@@ -15,20 +15,8 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class FeatureSettingsType extends AbstractType
 {
-    protected \Symfony\Component\HttpFoundation\Session\SessionInterface $session;
-
-    protected \Mautic\CoreBundle\Helper\CoreParametersHelper $coreParametersHelper;
-
-    protected \Psr\Log\LoggerInterface $logger;
-
-    public function __construct(
-        SessionInterface $session,
-        CoreParametersHelper $coreParametersHelper,
-        LoggerInterface $logger
-    ) {
-        $this->session              = $session;
-        $this->coreParametersHelper = $coreParametersHelper;
-        $this->logger               = $logger;
+    public function __construct(protected SessionInterface $session, protected CoreParametersHelper $coreParametersHelper, protected LoggerInterface $logger)
+    {
     }
 
     public function buildForm(FormBuilderInterface $builder, array $options): void

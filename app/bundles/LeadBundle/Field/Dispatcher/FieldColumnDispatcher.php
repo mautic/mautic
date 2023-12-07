@@ -13,14 +13,8 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class FieldColumnDispatcher
 {
-    private \Symfony\Component\EventDispatcher\EventDispatcherInterface $dispatcher;
-
-    private \Mautic\LeadBundle\Field\Settings\BackgroundSettings $backgroundSettings;
-
-    public function __construct(EventDispatcherInterface $dispatcher, BackgroundSettings $backgroundSettings)
+    public function __construct(private EventDispatcherInterface $dispatcher, private BackgroundSettings $backgroundSettings)
     {
-        $this->dispatcher         = $dispatcher;
-        $this->backgroundSettings = $backgroundSettings;
     }
 
     /**

@@ -10,20 +10,8 @@ use Symfony\Component\HttpFoundation\Request;
 
 class Tracking404Model
 {
-    private \Mautic\LeadBundle\Tracker\ContactTracker $contactTracker;
-
-    private \Mautic\PageBundle\Model\PageModel $pageModel;
-
-    private \Mautic\CoreBundle\Helper\CoreParametersHelper $coreParametersHelper;
-
-    public function __construct(
-        CoreParametersHelper $coreParametersHelper,
-        ContactTracker $contactTracker,
-        PageModel $pageModel
-    ) {
-        $this->coreParametersHelper = $coreParametersHelper;
-        $this->contactTracker       = $contactTracker;
-        $this->pageModel            = $pageModel;
+    public function __construct(private CoreParametersHelper $coreParametersHelper, private ContactTracker $contactTracker, private PageModel $pageModel)
+    {
     }
 
     /**

@@ -16,36 +16,8 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class CustomFieldColumn
 {
-    private \Mautic\CoreBundle\Doctrine\Helper\ColumnSchemaHelper $columnSchemaHelper;
-
-    private \Mautic\LeadBundle\Field\SchemaDefinition $schemaDefinition;
-
-    private \Psr\Log\LoggerInterface $logger;
-
-    private \Mautic\LeadBundle\Field\LeadFieldSaver $leadFieldSaver;
-
-    private \Mautic\LeadBundle\Field\CustomFieldIndex $customFieldIndex;
-
-    private \Mautic\LeadBundle\Field\Dispatcher\FieldColumnDispatcher $fieldColumnDispatcher;
-
-    private \Symfony\Contracts\Translation\TranslatorInterface $translator;
-
-    public function __construct(
-        ColumnSchemaHelper $columnSchemaHelper,
-        SchemaDefinition $schemaDefinition,
-        LoggerInterface $mauticLogger,
-        LeadFieldSaver $leadFieldSaver,
-        CustomFieldIndex $customFieldIndex,
-        FieldColumnDispatcher $fieldColumnDispatcher,
-        TranslatorInterface $translator
-    ) {
-        $this->columnSchemaHelper    = $columnSchemaHelper;
-        $this->schemaDefinition      = $schemaDefinition;
-        $this->logger                = $mauticLogger;
-        $this->leadFieldSaver        = $leadFieldSaver;
-        $this->customFieldIndex      = $customFieldIndex;
-        $this->fieldColumnDispatcher = $fieldColumnDispatcher;
-        $this->translator            = $translator;
+    public function __construct(private ColumnSchemaHelper $columnSchemaHelper, private SchemaDefinition $schemaDefinition, private LoggerInterface $logger, private LeadFieldSaver $leadFieldSaver, private CustomFieldIndex $customFieldIndex, private FieldColumnDispatcher $fieldColumnDispatcher, private TranslatorInterface $translator)
+    {
     }
 
     /**

@@ -12,12 +12,8 @@ class BaseDecorator implements FilterDecoratorInterface
 {
     use RegexTrait;
 
-    protected \Mautic\LeadBundle\Segment\ContactSegmentFilterOperator $contactSegmentFilterOperator;
-
-    public function __construct(
-        ContactSegmentFilterOperator $contactSegmentFilterOperator
-    ) {
-        $this->contactSegmentFilterOperator = $contactSegmentFilterOperator;
+    public function __construct(protected ContactSegmentFilterOperator $contactSegmentFilterOperator)
+    {
     }
 
     /**

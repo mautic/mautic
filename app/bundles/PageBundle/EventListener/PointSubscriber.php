@@ -14,11 +14,8 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class PointSubscriber implements EventSubscriberInterface
 {
-    private \Mautic\PointBundle\Model\PointModel $pointModel;
-
-    public function __construct(PointModel $pointModel)
+    public function __construct(private PointModel $pointModel)
     {
-        $this->pointModel = $pointModel;
     }
 
     /**
