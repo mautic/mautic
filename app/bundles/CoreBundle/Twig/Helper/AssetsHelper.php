@@ -132,13 +132,13 @@ final class AssetsHelper
     public function getUrl($path, $packageName = null, $version = null, $absolute = false, $ignorePrefix = false)
     {
         // if we have http in the url it is absolute and we can just return it
-        if (0 === strpos($path, 'http')) {
+        if (str_starts_with($path, 'http')) {
             return $path;
         }
 
         // otherwise build the complete path
         if (!$ignorePrefix) {
-            $assetPrefix = $this->getAssetPrefix(0 !== strpos($path, '/'));
+            $assetPrefix = $this->getAssetPrefix(!str_starts_with($path, '/'));
             $path        = $assetPrefix.$path;
         }
 

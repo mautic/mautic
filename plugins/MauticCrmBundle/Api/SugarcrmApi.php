@@ -569,10 +569,10 @@ class SugarcrmApi extends CrmApi
                 $fields      = [];
                 $object      = ('Contacts' == $object) ? 'Contacts' : 'Leads';
                 foreach ($mixedFields as $sugarField => $mField) {
-                    if (false !== strpos($sugarField, '__'.$object)) {
+                    if (str_contains($sugarField, '__'.$object)) {
                         $fields[] = str_replace('__'.$object, '', $sugarField);
                     }
-                    if (false !== strpos($sugarField, '-'.$object)) {
+                    if (str_contains($sugarField, '-'.$object)) {
                         $fields[] = str_replace('-'.$object, '', $sugarField);
                     }
                 }

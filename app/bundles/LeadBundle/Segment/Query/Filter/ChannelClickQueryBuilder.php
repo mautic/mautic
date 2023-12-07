@@ -78,6 +78,6 @@ class ChannelClickQueryBuilder extends BaseFilterQueryBuilder
 
     private function isDateBased(string $name): bool
     {
-        return false !== strpos($name, '_date');
+        return str_contains($name, '_date');
     }
 }

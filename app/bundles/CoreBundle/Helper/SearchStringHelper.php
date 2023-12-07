@@ -144,7 +144,7 @@ class SearchStringHelper
                 // the string is a command
                 $command = trim(substr($string, 0, -1));
                 // does this have a negative?
-                if (0 === strpos($command, '!')) {
+                if (str_starts_with($command, '!')) {
                     $filters->{$baseName}[$keyCount]->not = 1;
                     $command                              = substr($command, 1);
                 }
@@ -183,13 +183,13 @@ class SearchStringHelper
                         // found the matching character (accounts for nesting)
 
                         // does group have a negative?
-                        if (0 === strpos($string, '!')) {
+                        if (str_starts_with($string, '!')) {
                             $filters->{$baseName}[$keyCount]->not = 1;
                             $string                               = substr($string, 1);
                         }
 
                         // remove wrapping grouping chars
-                        if (0 === strpos($string, $char) && substr($string, -1) === $c) {
+                        if (str_starts_with($string, $char) && substr($string, -1) === $c) {
                             $string = substr($string, 1, -1);
                         }
 
@@ -198,7 +198,7 @@ class SearchStringHelper
                         if ('"' !== $c) {
                             // check to see if the nested string needs to be parsed as well
                             foreach ($this->needsParsing as $parseMe) {
-                                if (false !== strpos($string, $parseMe)) {
+                                if (str_contains($string, $parseMe)) {
                                     $parsed                                    = $this->splitUpSearchString($string, 'parsed', $command);
                                     $filters->{$baseName}[$keyCount]->children = $parsed->parsed;
                                     $neededParsing                             = true;

@@ -98,7 +98,7 @@ class RequestStorageHelper
      */
     private function removeCachePrefix(string $key): string
     {
-        if (0 === strpos($key, 'mautic:')) {
+        if (str_starts_with($key, 'mautic:')) {
             $key = ltrim($key, 'mautic:');
         }
 

@@ -338,7 +338,7 @@ class SugarcrmIntegration extends CrmAbstractIntegration
                                         )
                                         ) {
                                             $type      = 'string';
-                                            $fieldName = (false === strpos($fieldInfo['name'],
+                                            $fieldName = (!str_contains($fieldInfo['name'],
                                                 'webtolead_email')) ? $fieldInfo['name'] : str_replace('webtolead_',
                                                     '', $fieldInfo['name']);
                                             // make these congruent as some come in with colons and some do not
@@ -382,7 +382,7 @@ class SugarcrmIntegration extends CrmAbstractIntegration
                                             // make these congruent as some come in with colons and some do not
                                             $label = str_replace(':', '', $label);
 
-                                            $fieldName = (false === strpos($fieldInfo['name'], 'webtolead_email'))
+                                            $fieldName = (!str_contains($fieldInfo['name'], 'webtolead_email'))
                                                 ? $fieldInfo['name']
                                                 : str_replace(
                                                     'webtolead_',
@@ -1556,7 +1556,7 @@ class SugarcrmIntegration extends CrmAbstractIntegration
             foreach ($fieldsToUpdateInSugarUpdate as $sugarField => $mauticField) {
                 $required = !empty($availableFields[$object][$sugarField.'__'.$object]['required']);
                 if (isset($lead[$mauticField])) {
-                    if (false !== strpos($lead[$mauticField], '|')) {
+                    if (str_contains($lead[$mauticField], '|')) {
                         // Transform Mautic Multi Select into SugarCRM/SuiteCRM Multi Select format
                         $value = $this->convertMauticToSuiteCrmMultiSelect($lead[$mauticField]);
                     } else {

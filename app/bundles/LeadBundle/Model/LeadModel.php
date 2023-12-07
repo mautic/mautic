@@ -1594,7 +1594,7 @@ class LeadModel extends FormModel
         // See which tags already exist
         $foundTags = $this->getTagRepository()->getTagsByName($tags);
         foreach ($tags as $tag) {
-            if (0 === strpos($tag, '-')) {
+            if (str_starts_with($tag, '-')) {
                 // Tag to be removed
                 $tag = substr($tag, 1);
 

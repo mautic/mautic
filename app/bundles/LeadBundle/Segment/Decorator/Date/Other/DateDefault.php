@@ -59,7 +59,7 @@ class DateDefault implements FilterDecoratorInterface
         switch ($contactSegmentFilterCrate->getOperator()) {
             case 'like':
             case '!like':
-                return false === strpos($filter, '%') ? '%'.$filter.'%' : $filter;
+                return !str_contains($filter, '%') ? '%'.$filter.'%' : $filter;
             case 'contains':
                 return '%'.$filter.'%';
             case 'startsWith':

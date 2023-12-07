@@ -705,7 +705,7 @@ class TrackableModel extends AbstractCommonModel
                             unset($sBasePath);
                         }
 
-                        if (false !== strpos($url['path'], './')) {
+                        if (str_contains($url['path'], './')) {
                             // Remove any '../' and their directories
                             while (preg_match('/\w+\/\.\.\//', $url['path'])) {
                                 $url['path'] = preg_replace('/\w+\/\.\.\//', '', $url['path']);
@@ -784,7 +784,7 @@ class TrackableModel extends AbstractCommonModel
 
     private function isContactFieldToken($token): bool
     {
-        return false !== strpos($token, '{contactfield') || false !== strpos($token, '{leadfield');
+        return str_contains($token, '{contactfield') || str_contains($token, '{leadfield');
     }
 
     /**

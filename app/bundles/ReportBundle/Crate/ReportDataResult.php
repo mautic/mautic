@@ -195,7 +195,7 @@ class ReportDataResult
     {
         foreach ($this->columnKeys as $k) {
             if (isset($data['aggregatorColumns']) && array_key_exists($k, $data['aggregatorColumns'])) {
-                $this->types[$k] = ('AVG' === substr($k, 0, 3)) ? 'float' : 'int';
+                $this->types[$k] = (str_starts_with($k, 'AVG')) ? 'float' : 'int';
             } else {
                 $dataColumn      = $data['dataColumns'][$k];
                 $this->types[$k] = $data['columns'][$dataColumn]['type'];

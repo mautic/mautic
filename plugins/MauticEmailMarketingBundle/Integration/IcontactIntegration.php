@@ -205,7 +205,7 @@ class IcontactIntegration extends EmailAbstractIntegration
             if ($this->isAuthorized()) {
                 $customfields = [];
                 foreach ($mappedData as $k => &$v) {
-                    if (0 === strpos($k, 'cf_')) {
+                    if (str_starts_with($k, 'cf_')) {
                         $customfields[str_replace('cf_', '', $k)] = (string) $v;
                         unset($mappedData[$k]);
                     } else {

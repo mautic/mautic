@@ -364,7 +364,7 @@ class ImportController extends FormController
                                     }
                                 }
                             } catch (FileException $e) {
-                                if (false !== strpos($e->getMessage(), 'upload_max_filesize')) {
+                                if (str_contains($e->getMessage(), 'upload_max_filesize')) {
                                     $errorMessage    = 'mautic.lead.import.filetoolarge';
                                     $errorParameters = [
                                         '%upload_max_filesize%' => ini_get('upload_max_filesize'),

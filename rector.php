@@ -119,5 +119,9 @@ return static function (Rector\Config\RectorConfig $rectorConfig): void {
         ReturnTypeFromStrictConstantReturnRector::class,
         ReturnTypeFromReturnDirectArrayRector::class,
         ContainerGetToConstructorInjectionRector::class,
+
+        // PHP 8.0
+        \Rector\Php80\Rector\NotIdentical\StrContainsRector::class,
+        \Rector\Php80\Rector\Identical\StrStartsWithRector::class,
     ]);
 };

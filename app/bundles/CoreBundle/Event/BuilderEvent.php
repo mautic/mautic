@@ -17,7 +17,7 @@ class BuilderEvent extends Event
 
     public function __construct(protected $translator, protected $entity = null, protected $requested = 'all', protected string $tokenFilter = '')
     {
-        $this->tokenFilterTarget = (0 === strpos($tokenFilter, '{@')) ? 'label' : 'token';
+        $this->tokenFilterTarget = (str_starts_with($tokenFilter, '{@')) ? 'label' : 'token';
         $this->tokenFilterText   = str_replace(['{@', '{', '}'], '', $tokenFilter);
         $this->tokenFilter       = ('label' == $this->tokenFilterTarget) ? $this->tokenFilterText : str_replace('{@', '{', $tokenFilter);
     }
@@ -187,7 +187,7 @@ class BuilderEvent extends Event
         if (false === $withBC) {
             $tokens = [];
             foreach ($this->tokens as $key => $value) {
-                if ('{leadfield' !== substr($key, 0, 10)) {
+                if (!str_starts_with($key, '{leadfield')) {
                     $tokens[$key] = $value;
                 }
             }

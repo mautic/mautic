@@ -112,7 +112,7 @@ class UrlHelper
         $urls = [];
         // Check if there are any tokens that URL based fields
         foreach ($contactUrlFields as $field) {
-            if (false !== strpos($text, "{contactfield=$field}")) {
+            if (str_contains($text, "{contactfield=$field}")) {
                 $urls[] = "{contactfield=$field}";
             }
         }
@@ -171,19 +171,19 @@ class UrlHelper
      */
     private static function sanitizeUrlScheme($url)
     {
-        $isRelative = 0 === strpos($url, '//');
+        $isRelative = str_starts_with($url, '//');
 
         if ($isRelative) {
             return $url;
         }
 
-        $isMailto = 0 === strpos($url, 'mailto:');
+        $isMailto = str_starts_with($url, 'mailto:');
 
         if ($isMailto) {
             return $url;
         }
 
-        $containSlashes = false !== strpos($url, '://');
+        $containSlashes = str_contains($url, '://');
 
         if (!$containSlashes) {
             $url = sprintf('://%s', $url);
@@ -286,7 +286,7 @@ class UrlHelper
      */
     public static function decodeAmpersands($url)
     {
-        while (false !== strpos($url, '&amp;') || false !== strpos($url, '&#38;') || false !== strpos($url, '&#x26;')) {
+        while (str_contains($url, '&amp;') || str_contains($url, '&#38;') || str_contains($url, '&#x26;')) {
             $url = str_replace(['&amp;', '&#38;', '&#x26;'], '&', $url);
         }
 

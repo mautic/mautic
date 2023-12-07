@@ -90,7 +90,7 @@ class ContactExportSchedulerModel extends AbstractCommonModel
                 ],
             ];
         } else {
-            if ('list' !== $indexMode || (false === strpos($search, $anonymous))) {
+            if ('list' !== $indexMode || (!str_contains($search, $anonymous))) {
                 // Remove anonymous leads unless requested to prevent clutter.
                 $filter['force'] = [
                     [

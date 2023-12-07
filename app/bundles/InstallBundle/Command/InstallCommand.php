@@ -215,9 +215,9 @@ class InstallCommand extends Command
 
         // Initialize DB and admin params from local.php
         foreach ((array) $allParams as $opt => $value) {
-            if (0 === strpos($opt, 'db_')) {
+            if (str_starts_with($opt, 'db_')) {
                 $dbParams[substr($opt, 3)] = $value;
-            } elseif (0 === strpos($opt, 'admin_')) {
+            } elseif (str_starts_with($opt, 'admin_')) {
                 $adminParam[substr($opt, 6)] = $value;
             }
         }
@@ -225,10 +225,10 @@ class InstallCommand extends Command
         // Initialize DB and admin params from cli options
         foreach ($options as $opt => $value) {
             if (isset($value)) {
-                if (0 === strpos($opt, 'db_')) {
+                if (str_starts_with($opt, 'db_')) {
                     $dbParams[substr($opt, 3)] = $value;
                     $allParams[$opt]           = $value;
-                } elseif (0 === strpos($opt, 'admin_')) {
+                } elseif (str_starts_with($opt, 'admin_')) {
                     $adminParam[substr($opt, 6)] = $value;
                 }
             }

@@ -50,7 +50,7 @@ final class GravatarHelper
             $default = $localDefault;
         }
 
-        $default = (false !== strpos($default, '.') && 0 !== strpos($default, 'http')) ? UrlHelper::rel2abs($default) : $default;
+        $default = (str_contains($default, '.') && !str_starts_with($default, 'http')) ? UrlHelper::rel2abs($default) : $default;
 
         return $url.('&d='.urlencode($default));
     }

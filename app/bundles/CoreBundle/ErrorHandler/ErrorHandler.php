@@ -207,7 +207,7 @@ namespace Mautic\CoreBundle\ErrorHandler {
                         $handlingFatal = true;
                         $this->log(LogLevel::ERROR, "PHP $name: {$error['message']} - in file {$error['file']} - at line {$error['line']}");
 
-                        if (0 === strpos($error['message'], 'Allowed memory') || 0 === strpos($error['message'], 'Out of memory')) {
+                        if (str_starts_with($error['message'], 'Allowed memory') || str_starts_with($error['message'], 'Out of memory')) {
                             $exception = new OutOfMemoryError(
                                 $this->getErrorName($error['type']).': '.$error['message'],
                                 0,

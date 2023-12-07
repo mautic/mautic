@@ -104,7 +104,7 @@ class ApiSubscriber implements EventSubscriberInterface
         // Ignore if this does not contain an error response
         $response = $event->getResponse();
         $content  = $response->getContent();
-        if (false === strpos($content, 'error')) {
+        if (!str_contains($content, 'error')) {
             return;
         }
 

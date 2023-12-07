@@ -313,7 +313,7 @@ class ThemeHelper implements ThemeHelperInterface
         $config = [];
         for ($i = 0; $i < $zipper->numFiles; ++$i) {
             $entry = $zipper->getNameIndex($i);
-            if (0 === strpos($entry, '/')) {
+            if (str_starts_with($entry, '/')) {
                 $entry = substr($entry, 1);
             }
 

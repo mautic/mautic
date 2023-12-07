@@ -134,7 +134,7 @@ trait TranslationModelTrait
      */
     protected function getTranslationLocaleCore($locale)
     {
-        if (false !== strpos($locale, '_')) {
+        if (str_contains($locale, '_')) {
             $locale = substr($locale, 0, 2);
         }
 

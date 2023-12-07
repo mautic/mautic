@@ -155,7 +155,7 @@ class IpAddress
     public function isTrackable(): bool
     {
         foreach ($this->doNotTrack as $ip) {
-            if (false !== strpos($ip, '/')) {
+            if (str_contains($ip, '/')) {
                 // has a netmask range
                 // https://gist.github.com/tott/7684443
                 list($range, $netmask) = explode('/', $ip, 2);

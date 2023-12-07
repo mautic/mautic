@@ -73,7 +73,7 @@ class IpLookupHelper
                 if ($request->server->get($key)) {
                     $ip = trim($request->server->get($key));
 
-                    if (false !== strpos($ip, ',')) {
+                    if (str_contains($ip, ',')) {
                         $ip = $this->getClientIpFromProxyList($ip);
                     }
 
@@ -146,7 +146,7 @@ class IpLookupHelper
             if ($ipAddress->isTrackable() && $request) {
                 $userAgent = $request->headers->get('User-Agent', '');
                 foreach ($this->doNotTrackBots as $bot) {
-                    if (false !== strpos($userAgent, $bot)) {
+                    if (str_contains($userAgent, $bot)) {
                         $doNotTrack[] = $ip;
                         $ipAddress->setDoNotTrackList($doNotTrack);
                         continue;
