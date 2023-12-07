@@ -7,11 +7,8 @@ use Symfony\Contracts\EventDispatcher\Event;
 
 class LoginEvent extends Event
 {
-    private \Mautic\UserBundle\Entity\User $user;
-
-    public function __construct(User $user)
+    public function __construct(private User $user)
     {
-        $this->user = $user;
     }
 
     /**

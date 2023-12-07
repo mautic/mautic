@@ -9,14 +9,8 @@ use Mautic\UserBundle\Entity\IdEntry;
 
 class IdStore implements IdStoreInterface
 {
-    private \Doctrine\Persistence\ObjectManager $manager;
-
-    private \LightSaml\Provider\TimeProvider\TimeProviderInterface $timeProvider;
-
-    public function __construct(ObjectManager $manager, TimeProviderInterface $timeProvider)
+    public function __construct(private ObjectManager $manager, private TimeProviderInterface $timeProvider)
     {
-        $this->manager      = $manager;
-        $this->timeProvider = $timeProvider;
     }
 
     /**
