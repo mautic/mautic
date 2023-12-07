@@ -161,7 +161,7 @@ class ClientType extends AbstractType
      */
     public function configureOptions(OptionsResolver $resolver): void
     {
-        $dataClass = 'Mautic\ApiBundle\Entity\oAuth2\Client';
+        $dataClass = \Mautic\ApiBundle\Entity\oAuth2\Client::class;
         $resolver->setDefaults(
             [
                 'data_class' => $dataClass,

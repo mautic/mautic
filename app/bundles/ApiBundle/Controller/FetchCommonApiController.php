@@ -438,7 +438,7 @@ class FetchCommonApiController extends AbstractFOSRestController implements Maut
         }
 
         /** @var AbstractCommonModel<object> $model */
-        $model    = ($model) ? $model : $this->model;
+        $model    = $model ?: $this->model;
         $entities = $model->getEntities(
             [
                 'filter' => [

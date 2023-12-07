@@ -392,7 +392,7 @@ class EmailController extends FormController
                     'email'        => $email,
                     'trackables'   => $trackableLinks,
                     'logs'         => $logs,
-                    'isEmbedded'   => $request->get('isEmbedded') ? $request->get('isEmbedded') : false,
+                    'isEmbedded'   => $request->get('isEmbedded') ?: false,
                     'variants'     => [
                         'parent'     => $parent,
                         'children'   => $children,

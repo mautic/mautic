@@ -363,7 +363,7 @@ class Import extends FormEntity
      */
     public function getName()
     {
-        return $this->getOriginalFile() ? $this->getOriginalFile() : $this->getId();
+        return $this->getOriginalFile() ?: $this->getId();
     }
 
     /**

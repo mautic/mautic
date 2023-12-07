@@ -115,7 +115,7 @@ class CampaignType extends AbstractType
     public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults([
-            'data_class' => 'Mautic\CampaignBundle\Entity\Campaign',
+            'data_class' => \Mautic\CampaignBundle\Entity\Campaign::class,
         ]);
     }
 }

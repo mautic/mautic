@@ -239,7 +239,7 @@ abstract class CrmAbstractIntegration extends AbstractIntegration
                 ++$page;
 
                 // Lots of entities will be loaded into memory while compiling these events so let's prevent memory overload by clearing the EM
-                $entityToNotDetach = ['Mautic\PluginBundle\Entity\Integration', 'Mautic\PluginBundle\Entity\Plugin'];
+                $entityToNotDetach = [\Mautic\PluginBundle\Entity\Integration::class, \Mautic\PluginBundle\Entity\Plugin::class];
                 $loadedEntities    = $this->em->getUnitOfWork()->getIdentityMap();
                 foreach ($loadedEntities as $name => $loadedEntitySet) {
                     if (!in_array($name, $entityToNotDetach, true)) {

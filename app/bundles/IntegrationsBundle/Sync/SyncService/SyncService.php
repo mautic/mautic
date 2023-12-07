@@ -52,7 +52,7 @@ final class SyncService implements SyncServiceInterface
                 $inputOptionsDAO->isFirstTimeSync() ? 'first time' : 'subsequent',
                 $inputOptionsDAO->getStartDateTime() ? $inputOptionsDAO->getStartDateTime()->format('Y-m-d H:i:s') : 'yet to be determined'
             ),
-            __CLASS__.':'.__FUNCTION__
+            self::class.':'.__FUNCTION__
         );
 
         try {

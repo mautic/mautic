@@ -142,7 +142,7 @@ class FormBuilderEvent extends Event
         if (isset($field['valueFilter'])
             && (!is_string($field['valueFilter'])
                 || !is_callable(
-                    ['\Mautic\CoreBundle\Helper\InputHelper', $field['valueFilter']]
+                    ['\\'.\Mautic\CoreBundle\Helper\InputHelper::class, $field['valueFilter']]
                 ))
         ) {
             $callbacks = ['valueFilter'];

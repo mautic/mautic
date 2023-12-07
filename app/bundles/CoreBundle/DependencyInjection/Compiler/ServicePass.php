@@ -76,7 +76,7 @@ final class ServicePass implements CompilerPassInterface
                         if ('menus' == $type) {
                             $details = array_merge(
                                 [
-                                    'class'   => 'Knp\Menu\MenuItem',
+                                    'class'   => \Knp\Menu\MenuItem::class,
                                     'factory' => ['@mautic.menu.builder', $details['alias'].'Menu'],
                                 ],
                                 $details

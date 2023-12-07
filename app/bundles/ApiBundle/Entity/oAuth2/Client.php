@@ -103,7 +103,7 @@ class Client extends BaseClient
             ->columnName('allowed_grant_types')
             ->build();
 
-        $builder->createManyToOne('role', 'Mautic\UserBundle\Entity\Role')
+        $builder->createManyToOne('role', \Mautic\UserBundle\Entity\Role::class)
             ->addJoinColumn('role_id', 'id', true, false)
             ->cascadePersist()
             ->build();

@@ -72,7 +72,7 @@ class ContactObjectHelper implements ObjectHelperInterface
                     'Created lead ID %d',
                     $contact->getId()
                 ),
-                __CLASS__.':'.__FUNCTION__
+                self::class.':'.__FUNCTION__
             );
 
             $objectMapping = new ObjectMapping();
@@ -104,7 +104,7 @@ class ContactObjectHelper implements ObjectHelperInterface
                 count($contacts),
                 implode(', ', $ids)
             ),
-            __CLASS__.':'.__FUNCTION__
+            self::class.':'.__FUNCTION__
         );
 
         $availableFields      = $this->getAvailableFields();
@@ -141,7 +141,7 @@ class ContactObjectHelper implements ObjectHelperInterface
                     'Updated lead ID %d',
                     $contact->getId()
                 ),
-                __CLASS__.':'.__FUNCTION__
+                self::class.':'.__FUNCTION__
             );
 
             // Integration name and ID are stored in the change's mappedObject/mappedObjectId

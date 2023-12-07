@@ -31,7 +31,7 @@ class PointSubscriber implements EventSubscriberInterface
             [
                 'group'    => 'mautic.lead.point.trigger',
                 'label'    => 'mautic.lead.point.trigger.changelists',
-                'callback' => ['\\Mautic\\LeadBundle\\Helper\\PointEventHelper', 'changeLists'],
+                'callback' => ['\\'.\Mautic\LeadBundle\Helper\PointEventHelper::class, 'changeLists'],
                 'formType' => ListActionType::class,
             ]
         );

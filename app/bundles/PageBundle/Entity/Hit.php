@@ -137,7 +137,7 @@ class Hit
         $builder = new ClassMetadataBuilder($metadata);
 
         $builder->setTable('page_hits')
-            ->setCustomRepositoryClass('Mautic\PageBundle\Entity\HitRepository')
+            ->setCustomRepositoryClass(\Mautic\PageBundle\Entity\HitRepository::class)
             ->addIndex(['tracking_id'], 'page_hit_tracking_search')
             ->addIndex(['code'], 'page_hit_code_search')
             ->addIndex(['source', 'source_id'], 'page_hit_source_search')
@@ -163,7 +163,7 @@ class Hit
             ->addJoinColumn('redirect_id', 'id', true, false, 'SET NULL')
             ->build();
 
-        $builder->createManyToOne('email', 'Mautic\EmailBundle\Entity\Email')
+        $builder->createManyToOne('email', \Mautic\EmailBundle\Entity\Email::class)
             ->addJoinColumn('email_id', 'id', true, false, 'SET NULL')
             ->build();
 
@@ -241,7 +241,7 @@ class Hit
 
         $builder->addNullableField('query', 'array');
 
-        $builder->createManyToOne('device', 'Mautic\LeadBundle\Entity\LeadDevice')
+        $builder->createManyToOne('device', \Mautic\LeadBundle\Entity\LeadDevice::class)
             ->addJoinColumn('device_id', 'id', true, false, 'SET NULL')
             ->cascadePersist()
             ->build();

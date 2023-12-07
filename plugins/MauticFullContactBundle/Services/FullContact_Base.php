@@ -108,7 +108,7 @@ class FullContact_Base
     protected function _execute($params = [], $postData = null)
     {
         if (null === $postData && !in_array($params['method'], $this->_supportedMethods, true)) {
-            throw new NotImplementedException(__CLASS__.' does not support the ['.$params['method'].'] method');
+            throw new NotImplementedException(self::class.' does not support the ['.$params['method'].'] method');
         }
 
         if (array_key_exists('method', $params)) {

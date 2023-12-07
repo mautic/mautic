@@ -28,7 +28,7 @@ class IpAddress
         $builder = new ClassMetadataBuilder($metadata);
 
         $builder->setTable('ip_addresses')
-            ->setCustomRepositoryClass('Mautic\CoreBundle\Entity\IpAddressRepository')
+            ->setCustomRepositoryClass(\Mautic\CoreBundle\Entity\IpAddressRepository::class)
             ->addIndex(['ip_address'], 'ip_search');
 
         $builder->addId();
@@ -161,7 +161,7 @@ class IpAddress
                 [$range, $netmask]     = explode('/', $ip, 2);
                 $range_decimal         = ip2long($range);
                 $ip_decimal            = ip2long($this->ipAddress);
-                $wildcard_decimal      = pow(2, 32 - $netmask) - 1;
+                $wildcard_decimal      = 2 ** (32 - $netmask) - 1;
                 $netmask_decimal       = ~$wildcard_decimal;
 
                 if (($ip_decimal & $netmask_decimal) == ($range_decimal & $netmask_decimal)) {

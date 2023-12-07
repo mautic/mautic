@@ -640,7 +640,7 @@ class ImportController extends FormController
                         'importedRowsChart' => $entity->getDateStarted() ? $this->importModel->getImportedRowsLineChartData(
                             'i',
                             $entity->getDateStarted(),
-                            $entity->getDateEnded() ? $entity->getDateEnded() : $entity->getDateModified(),
+                            $entity->getDateEnded() ?: $entity->getDateModified(),
                             null,
                             [
                                 'object_id' => $entity->getId(),
@@ -657,8 +657,6 @@ class ImportController extends FormController
 
     /**
      * Support non-index pages such as modal forms.
-     *
-     * @return bool|string
      */
     protected function generateUrl(string $route, array $parameters = [], int $referenceType = UrlGeneratorInterface::ABSOLUTE_PATH): string
     {

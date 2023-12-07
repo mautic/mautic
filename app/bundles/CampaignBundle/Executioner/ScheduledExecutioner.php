@@ -73,7 +73,7 @@ class ScheduledExecutioner implements ExecutionerInterface, ResetInterface
     {
         $this->campaign   = $campaign;
         $this->limiter    = $limiter;
-        $this->output     = ($output) ? $output : new NullOutput();
+        $this->output     = $output ?: new NullOutput();
         $this->counter    = new Counter();
 
         $this->logger->debug('CAMPAIGN: Triggering scheduled events');
@@ -103,7 +103,7 @@ class ScheduledExecutioner implements ExecutionerInterface, ResetInterface
      */
     public function executeByIds(array $logIds, OutputInterface $output = null)
     {
-        $this->output  = ($output) ? $output : new NullOutput();
+        $this->output  = $output ?: new NullOutput();
         $this->counter = new Counter();
 
         if (!$logIds) {

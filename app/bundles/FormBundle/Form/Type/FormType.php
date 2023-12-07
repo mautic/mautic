@@ -111,7 +111,7 @@ class FormType extends AbstractType
             YesNoButtonGroupType::class,
             [
                 'label' => 'mautic.form.form.no_index',
-                'data'  => $options['data']->getNoIndex() ? $options['data']->getNoIndex() : false,
+                'data'  => $options['data']->getNoIndex() ?: false,
             ]
         );
 
@@ -126,7 +126,7 @@ class FormType extends AbstractType
                     'tooltip'     => 'mautic.form.form.progressive_profiling_limit.max_fields.tooltip',
                     'placeholder' => 'mautic.form.form.progressive_profiling_limit_unlimited',
                 ],
-                'data'  => $options['data']->getProgressiveProfilingLimit() ? $options['data']->getProgressiveProfilingLimit() : '',
+                'data'  => $options['data']->getProgressiveProfilingLimit() ?: '',
             ]
         );
 

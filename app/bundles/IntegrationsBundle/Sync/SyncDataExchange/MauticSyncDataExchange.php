@@ -92,7 +92,7 @@ class MauticSyncDataExchange implements SyncDataExchangeInterface
                 DebugLogger::log(
                     self::NAME,
                     $exception->getMessage(),
-                    __CLASS__.':'.__FUNCTION__
+                    self::class.':'.__FUNCTION__
                 );
             }
         }

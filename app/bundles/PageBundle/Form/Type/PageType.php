@@ -108,7 +108,7 @@ class PageType extends AbstractType
             YesNoButtonGroupType::class,
             [
                 'label' => 'mautic.page.form.preference_center',
-                'data'  => $options['data']->isPreferenceCenter() ? $options['data']->isPreferenceCenter() : false,
+                'data'  => $options['data']->isPreferenceCenter() ?: false,
                 'attr'  => [
                     'tooltip' => 'mautic.page.form.preference_center.tooltip',
                 ],
@@ -120,7 +120,7 @@ class PageType extends AbstractType
             YesNoButtonGroupType::class,
             [
                 'label' => 'mautic.page.config.no_index',
-                'data'  => $options['data']->getNoIndex() ? $options['data']->getNoIndex() : false,
+                'data'  => $options['data']->getNoIndex() ?: false,
             ]
         );
 

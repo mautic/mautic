@@ -43,7 +43,7 @@ class StagesChangeLog
         $builder = new ClassMetadataBuilder($metadata);
 
         $builder->setTable('lead_stages_change_log')
-            ->setCustomRepositoryClass('Mautic\LeadBundle\Entity\StagesChangeLogRepository');
+            ->setCustomRepositoryClass(\Mautic\LeadBundle\Entity\StagesChangeLogRepository::class);
 
         $builder->addId();
 
@@ -57,7 +57,7 @@ class StagesChangeLog
             ->columnName('action_name')
             ->build();
 
-        $builder->createManyToOne('stage', 'Mautic\StageBundle\Entity\Stage')
+        $builder->createManyToOne('stage', \Mautic\StageBundle\Entity\Stage::class)
             ->inversedBy('log')
             ->addJoinColumn('stage_id', 'id', true, false, 'CASCADE')
             ->build();

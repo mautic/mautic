@@ -157,7 +157,7 @@ class Asset extends FormEntity
         $builder = new ClassMetadataBuilder($metadata);
 
         $builder->setTable('assets')
-            ->setCustomRepositoryClass('Mautic\AssetBundle\Entity\AssetRepository')
+            ->setCustomRepositoryClass(\Mautic\AssetBundle\Entity\AssetRepository::class)
             ->addIndex(['alias'], 'asset_alias_search');
 
         $builder->addIdColumns('title');
@@ -1098,8 +1098,6 @@ class Asset extends FormEntity
 
     /**
      * Load content of the file from it's path.
-     *
-     * @return string
      */
     public function getFileContents(): string|bool
     {
@@ -1137,7 +1135,7 @@ class Asset extends FormEntity
     public static function loadValidatorMetadata(ClassMetadata $metadata): void
     {
         // Add a constraint to manage the file upload data
-        $metadata->addConstraint(new Assert\Callback([__CLASS__, 'validateFile']));
+        $metadata->addConstraint(new Assert\Callback([self::class, 'validateFile']));
     }
 
     /**
