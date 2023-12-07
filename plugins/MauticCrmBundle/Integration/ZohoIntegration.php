@@ -728,9 +728,9 @@ class ZohoIntegration extends CrmAbstractIntegration
     }
 
     /**
-     * @param array $settings
+     * @param mixed[] $settings
      *
-     * @return array|mixed
+     * @return mixed[]
      */
     public function getFormLeadFields($settings = []): array
     {

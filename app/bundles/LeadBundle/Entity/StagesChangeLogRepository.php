@@ -57,8 +57,6 @@ class StagesChangeLogRepository extends CommonRepository
      * Get the current stage assigned to a lead.
      *
      * @param int $leadId
-     *
-     * @return mixed
      */
     public function getCurrentLeadStage($leadId): ?int
     {

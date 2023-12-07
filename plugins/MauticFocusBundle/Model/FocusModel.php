@@ -179,7 +179,7 @@ class FocusModel extends FormModel
     }
 
     /**
-     * @return string
+     * @return string|string[]
      */
     public function generateJavascript(Focus $focus, $isPreview = false, $byPassCache = false): array|string
     {
@@ -371,13 +371,9 @@ class FocusModel extends FormModel
     }
 
     /**
-     * {@inheritdoc}
-     *
-     * @return Event|void|null
-     *
      * @throws \Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException
      */
-    protected function dispatchEvent($action, &$entity, $isNew = false, Event $event = null)
+    protected function dispatchEvent($action, &$entity, $isNew = false, Event $event = null): ?Event
     {
         if (!$entity instanceof Focus) {
             throw new MethodNotAllowedHttpException(['Focus']);

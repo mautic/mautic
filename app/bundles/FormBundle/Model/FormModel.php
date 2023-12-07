@@ -134,13 +134,9 @@ class FormModel extends CommonFormModel
     }
 
     /**
-     * {@inheritdoc}
-     *
-     * @return bool|FormEvent|Event|void|null
-     *
      * @throws \Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException
      */
-    protected function dispatchEvent($action, &$entity, $isNew = false, Event $event = null)
+    protected function dispatchEvent($action, &$entity, $isNew = false, Event $event = null): ?Event
     {
         if (!$entity instanceof Form) {
             throw new MethodNotAllowedHttpException(['Form']);

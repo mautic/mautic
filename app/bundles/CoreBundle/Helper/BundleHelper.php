@@ -21,7 +21,7 @@ class BundleHelper
     /**
      * @param bool $includePlugins
      *
-     * @return mixed
+     * @return mixed[]
      */
     public function getMauticBundles($includePlugins = true): array
     {

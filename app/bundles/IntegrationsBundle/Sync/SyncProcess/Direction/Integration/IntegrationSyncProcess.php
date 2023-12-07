@@ -47,11 +47,9 @@ class IntegrationSyncProcess
     }
 
     /**
-     * @return ReportDAO
-     *
      * @throws ObjectNotFoundException
      */
-    public function getSyncReport(int $syncIteration)
+    public function getSyncReport(int $syncIteration): ReportDAO
     {
         $integrationRequestDAO   = new RequestDAO(MauticSyncDataExchange::NAME, $syncIteration, $this->inputOptionsDAO);
         $integrationObjectsNames = $this->mappingManualDAO->getIntegrationObjectNames();

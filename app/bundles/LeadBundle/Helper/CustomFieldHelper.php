@@ -78,6 +78,11 @@ class CustomFieldHelper
 
     /**
      * Transform all fields values.
+     *
+     * @param mixed[] $fields
+     * @param mixed[] $values
+     *
+     * @return mixed[]
      */
     public static function fieldsValuesTransformer(array $fields, array $values): array
     {

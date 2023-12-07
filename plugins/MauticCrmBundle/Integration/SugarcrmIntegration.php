@@ -1179,10 +1179,8 @@ class SugarcrmIntegration extends CrmAbstractIntegration
 
     /**
      * Return key recognized by integration.
-     *
-     * @return mixed
      */
-    public function convertLeadFieldKey($key, $field): string|array
+    public function convertLeadFieldKey(string $key, $field): string
     {
         $search = [];
         foreach ($this->objects as $object) {
@@ -1790,8 +1788,6 @@ class SugarcrmIntegration extends CrmAbstractIntegration
 
     /**
      * Converts Mautic Multi-Select String into the format used to store Multi-Select values used by SuiteCRM / SugarCRM 6.x.
-     *
-     * @param  string
      */
     public function convertMauticToSuiteCrmMultiSelect($mauticMultiSelectStringToConvert): string
     {

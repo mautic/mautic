@@ -427,7 +427,7 @@ class ResultController extends CommonFormController
         return parent::generateUrl($route, $parameters, $referenceType);
     }
 
-    public function getPostActionRedirectArguments(array $args, $action)
+    public function getPostActionRedirectArguments(array $args, $action): array
     {
         switch ($action) {
             case 'batchDelete':

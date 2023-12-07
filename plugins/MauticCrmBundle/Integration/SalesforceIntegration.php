@@ -215,13 +215,13 @@ class SalesforceIntegration extends CrmAbstractIntegration
     }
 
     /**
-     * @param array $settings
+     * @param mixed[] $settings
      *
-     * @return array|mixed
+     * @return mixed[]
      *
      * @throws \Exception
      */
-    public function getFormLeadFields($settings = []): array
+    public function getFormLeadFields(array $settings = []): array
     {
         $leadFields    = $this->getFormFieldsByObject('Lead', $settings);
         $contactFields = $this->getFormFieldsByObject('Contact', $settings);
@@ -1050,10 +1050,8 @@ class SalesforceIntegration extends CrmAbstractIntegration
 
     /**
      * Return key recognized by integration.
-     *
-     * @return mixed
      */
-    public function convertLeadFieldKey($key, $field): string|array
+    public function convertLeadFieldKey(string $key, $field): string
     {
         $search = [];
         foreach ($this->objects as $object) {

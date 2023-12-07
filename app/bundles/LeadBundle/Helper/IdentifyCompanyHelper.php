@@ -90,6 +90,11 @@ class IdentifyCompanyHelper
         return false;
     }
 
+    /**
+     * @param mixed[] $parameters
+     *
+     * @return mixed[]
+     */
     private static function normalizeParameters(array $parameters): array
     {
         if (isset($parameters['company'])) {
