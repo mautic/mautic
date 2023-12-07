@@ -823,7 +823,7 @@ class PageController extends FormController
         $model = $this->getModel('page.page');
 
         // permission check
-        if (str_contains($objectId, 'new')) {
+        if (str_contains((string) $objectId, 'new')) {
             $isNew = true;
             if (!$this->security->isGranted('page:pages:create')) {
                 return $this->accessDenied();

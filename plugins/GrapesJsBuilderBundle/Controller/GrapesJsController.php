@@ -52,7 +52,7 @@ class GrapesJsController extends CommonController
         }
 
         // permission check
-        if (str_contains($objectId, 'new')) {
+        if (str_contains((string) $objectId, 'new')) {
             $isNew = true;
 
             if (!$this->security->isGranted($aclToCheck.'create')) {
