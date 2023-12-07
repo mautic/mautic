@@ -37,30 +37,15 @@ use Twig\Environment;
  */
 class FocusModel extends FormModel
 {
-    /**
-     * @var \Mautic\FormBundle\Model\FormModel
-     */
-    protected $formModel;
+    protected \Mautic\FormBundle\Model\FormModel $formModel;
 
-    /**
-     * @var TrackableModel
-     */
-    protected $trackableModel;
+    protected \Mautic\PageBundle\Model\TrackableModel $trackableModel;
 
-    /**
-     * @var Environment
-     */
-    protected $twig;
+    protected \Twig\Environment $twig;
 
-    /**
-     * @var FieldModel
-     */
-    protected $leadFieldModel;
+    protected \Mautic\LeadBundle\Model\FieldModel $leadFieldModel;
 
-    /**
-     * @var ContactTracker
-     */
-    protected $contactTracker;
+    protected \Mautic\LeadBundle\Tracker\ContactTracker $contactTracker;
 
     public function __construct(
         \Mautic\FormBundle\Model\FormModel $formModel,
@@ -346,15 +331,12 @@ class FocusModel extends FormModel
 
         switch ($type) {
             case Stat::TYPE_FORM:
-                /** @var \Mautic\FormBundle\Entity\Submission $data */
+            case Stat::TYPE_CLICK:
+                /** @var \Mautic\PageBundle\Entity\Hit $data */
                 $typeId = $data->getId();
                 break;
             case Stat::TYPE_NOTIFICATION:
                 $typeId = null;
-                break;
-            case Stat::TYPE_CLICK:
-                /** @var \Mautic\PageBundle\Entity\Hit $data */
-                $typeId = $data->getId();
                 break;
         }
 

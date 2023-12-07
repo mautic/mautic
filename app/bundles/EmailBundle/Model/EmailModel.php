@@ -543,7 +543,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
                 'contact_id'    => $stat['lead_id'],
                 'contact_email' => $stat['email_address'],
                 'open'          => $stat['is_read'],
-                'click'         => (null !== $stat['link_hits']) ? $stat['link_hits'] : 0,
+                'click'         => $stat['link_hits'] ?? 0,
                 'links_clicked' => [],
                 'email_id'      => (string) $stat['email_id'],
                 'email_name'    => (string) $stat['email_name'],
@@ -670,12 +670,12 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
             $bouncedCounts      = $dncRepo->getCount('email', $emailIds, DoNotContact::BOUNCED, $lists->getKeys(), $query);
 
             foreach ($lists as $l) {
-                $sentCount         = isset($sentCounts[$l->getId()]) ? $sentCounts[$l->getId()] : 0;
-                $readCount         = isset($readCounts[$l->getId()]) ? $readCounts[$l->getId()] : 0;
-                $failedCount       = isset($failedCounts[$l->getId()]) ? $failedCounts[$l->getId()] : 0;
-                $clickCount        = isset($clickCounts[$l->getId()]) ? $clickCounts[$l->getId()] : 0;
-                $unsubscribedCount = isset($unsubscribedCounts[$l->getId()]) ? $unsubscribedCounts[$l->getId()] : 0;
-                $bouncedCount      = isset($bouncedCounts[$l->getId()]) ? $bouncedCounts[$l->getId()] : 0;
+                $sentCount         = $sentCounts[$l->getId()] ?? 0;
+                $readCount         = $readCounts[$l->getId()] ?? 0;
+                $failedCount       = $failedCounts[$l->getId()] ?? 0;
+                $clickCount        = $clickCounts[$l->getId()] ?? 0;
+                $unsubscribedCount = $unsubscribedCounts[$l->getId()] ?? 0;
+                $bouncedCount      = $bouncedCounts[$l->getId()] ?? 0;
 
                 $chart->setDataset(
                     $l->getName(),
@@ -1299,7 +1299,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
         $errors              = [];
 
         if (empty($channel)) {
-            $channel = (isset($options['source'])) ? $options['source'] : [];
+            $channel = $options['source'] ?? [];
         }
 
         if (!$email->getId()) {

@@ -82,7 +82,7 @@ class ExceptionController extends CommonController
             $template = "@MauticCore/{$layout}/base.html.twig";
         }
 
-        $statusText = isset(Response::$statusTexts[$code]) ? Response::$statusTexts[$code] : '';
+        $statusText = Response::$statusTexts[$code] ?? '';
 
         $url      = $request->getRequestUri();
         $urlParts = parse_url($url);

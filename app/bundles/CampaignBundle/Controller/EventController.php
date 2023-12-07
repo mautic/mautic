@@ -372,9 +372,7 @@ class EventController extends CommonFormController
         if (!$cancelled && $valid) {
             // Prevent undefined errors
             $event    = array_merge((new Event())->convertToArray(), $event);
-            $template = isset($event['settings']['template'])
-                ? $event['settings']['template']
-                : '@MauticCampaign/Event/_generic.html.twig';
+            $template = $event['settings']['template'] ?? '@MauticCampaign/Event/_generic.html.twig';
 
             $passthroughVars = array_merge($passthroughVars, [
                 'event'      => $event,

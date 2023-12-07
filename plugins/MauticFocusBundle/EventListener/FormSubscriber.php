@@ -9,10 +9,7 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class FormSubscriber implements EventSubscriberInterface
 {
-    /**
-     * @var FocusModel
-     */
-    private $model;
+    private \MauticPlugin\MauticFocusBundle\Model\FocusModel $model;
 
     public function __construct(FocusModel $model)
     {

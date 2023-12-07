@@ -238,11 +238,7 @@ class MessageModel extends FormModel implements AjaxLookupModelInterface
             ->setParameter('id', (int) $id);
         $result = $qb->getQuery()->getOneOrNullResult();
 
-        if (isset($result[$nameColumn])) {
-            return $result[$nameColumn];
-        }
-
-        return null;
+        return $result[$nameColumn] ?? null;
     }
 
     /**

@@ -82,7 +82,7 @@ final class ServicePass implements CompilerPassInterface
                                 $details
                             );
 
-                            $menus[$details['alias']] = (isset($details['options'])) ? $details['options'] : [];
+                            $menus[$details['alias']] = $details['options'] ?? [];
                         }
 
                         // Set service alias

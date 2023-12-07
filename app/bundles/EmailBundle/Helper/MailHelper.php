@@ -36,10 +36,7 @@ class MailHelper
     public const QUEUE_RETURN_ERRORS      = 'RETURN_ERRORS';
     public const EMAIL_TYPE_TRANSACTIONAL = 'transactional';
     public const EMAIL_TYPE_MARKETING     = 'marketing';
-    /**
-     * @var MauticFactory
-     */
-    protected $factory;
+    protected \Mautic\CoreBundle\Factory\MauticFactory $factory;
 
     protected $transport;
 
@@ -1875,7 +1872,7 @@ class MailHelper
                 $slotConfig = [];
             }
 
-            $value = isset($content[$slot]) ? $content[$slot] : '';
+            $value = $content[$slot] ?? '';
             $slotsHelper->set($slot, $value);
         }
     }
@@ -2010,7 +2007,7 @@ class MailHelper
      *
      * @throws InvalidEmailException
      */
-    public static function validateEmail($address)
+    public static function validateEmail($address): void
     {
         $invalidChar = strpbrk($address, '\'^&*%');
         if (false !== $invalidChar) {

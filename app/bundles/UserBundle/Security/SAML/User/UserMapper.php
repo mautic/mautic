@@ -34,9 +34,6 @@ class UserMapper implements UsernameMapperInterface
         return $user->getUsername();
     }
 
-    /**
-     * @return string|null
-     */
     private function setValuesFromAssertion(Assertion $assertion, User $user): void
     {
         $attributes = $this->extractAttributes($assertion);

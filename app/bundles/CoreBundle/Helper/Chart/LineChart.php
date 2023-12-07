@@ -37,7 +37,7 @@ class LineChart extends AbstractChart implements ChartInterface
      */
     public function __construct(?string $unit = null, $dateFrom = null, $dateTo = null, protected $dateFormat = null)
     {
-        $this->unit       = (null === $unit) ? $this->getTimeUnitFromDateRange($dateFrom, $dateTo) : $unit;
+        $this->unit       = $unit ?? $this->getTimeUnitFromDateRange($dateFrom, $dateTo);
         $this->isTimeUnit = in_array($this->unit, ['H', 'i', 's']);
         $this->setDateRange($dateFrom, $dateTo);
         $this->amount     = $this->countAmountFromDateRange();
@@ -82,7 +82,7 @@ class LineChart extends AbstractChart implements ChartInterface
      *
      * @param int $amount
      */
-    public function generateTimeLabels($amount)
+    public function generateTimeLabels($amount): void
     {
         if (!isset($this->labelFormats[$this->unit])) {
             throw new \UnexpectedValueException('Date/Time unit "'.$this->unit.'" is not available for a label.');

@@ -167,12 +167,12 @@ abstract class AbstractCommonModel implements MauticModelInterface
 
         switch (true) {
             case 3 === $slugCount:
-                list($lang, $category, $idSlug) = $slugs;
+                [$lang, $category, $idSlug] = $slugs;
 
                 break;
 
             case 2 === $slugCount:
-                list($category, $idSlug) = $slugs;
+                [$category, $idSlug] = $slugs;
 
                 // Check if the first slug is actually a locale
                 if (isset($locales[$category])) {

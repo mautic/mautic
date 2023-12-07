@@ -184,7 +184,7 @@ class ContactRequestHelper
                 'page',
                 'hit',
                 null,
-                (isset($this->queryFields['page_url'])) ? $this->queryFields['page_url'] : ''
+                $this->queryFields['page_url'] ?? ''
             )
         );
 

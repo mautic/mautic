@@ -16,30 +16,18 @@ use Monolog\Logger;
 
 class LookupHelper
 {
-    /**
-     * @var UserHelper
-     */
-    protected $userHelper;
+    protected \Mautic\CoreBundle\Helper\UserHelper $userHelper;
 
     /**
      * @var bool|ClearbitIntegration
      */
     protected $integration;
 
-    /**
-     * @var Logger
-     */
-    protected $logger;
+    protected \Monolog\Logger $logger;
 
-    /**
-     * @var LeadModel
-     */
-    protected $leadModel;
+    protected \Mautic\LeadBundle\Model\LeadModel $leadModel;
 
-    /**
-     * @var CompanyModel
-     */
-    protected $companyModel;
+    protected \Mautic\LeadBundle\Model\CompanyModel $companyModel;
 
     public function __construct(
         IntegrationHelper $integrationHelper,
@@ -69,7 +57,7 @@ class LookupHelper
         if ($clearbit = $this->getClearbit()) {
             if (!$checkAuto || ($checkAuto && $this->integration->shouldAutoUpdate())) {
                 try {
-                    list($cacheId, $webhookId, $cache) = $this->getCache($lead, $notify);
+                    [$cacheId, $webhookId, $cache] = $this->getCache($lead, $notify);
 
                     if (!array_key_exists($cacheId, $cache['clearbit'])) {
                         $clearbit->setWebhookId($webhookId);
@@ -109,7 +97,7 @@ class LookupHelper
             if (!$checkAuto || ($checkAuto && $this->integration->shouldAutoUpdate())) {
                 try {
                     $parse                             = parse_url($company->getFieldValue('companywebsite'));
-                    list($cacheId, $webhookId, $cache) = $this->getCache($company, $notify);
+                    [$cacheId, $webhookId, $cache]     = $this->getCache($company, $notify);
 
                     if (isset($parse['host']) && !array_key_exists($cacheId, $cache['clearbit'])) {
                         /* @var Router $router */
@@ -137,7 +125,7 @@ class LookupHelper
     public function validateRequest($oid, $type)
     {
         // prefix#entityId#hour#userId#nonce
-        list($w, $id, $hour, $uid, $nonce) = explode('#', $oid, 5);
+        [$w, $id, $hour, $uid, $nonce]     = explode('#', $oid, 5);
         $notify                            = (str_contains($w, '_notify') && $uid) ? $uid : false;
 
         switch ($type) {

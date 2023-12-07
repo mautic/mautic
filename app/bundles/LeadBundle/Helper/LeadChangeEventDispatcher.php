@@ -83,7 +83,7 @@ class LeadChangeEventDispatcher
         }
 
         foreach ($this->changes['dnc_channel_status'] as $channel => $status) {
-            $oldStatus = isset($status['old_reason']) ? $status['old_reason'] : DoNotContact::IS_CONTACTABLE;
+            $oldStatus = $status['old_reason'] ?? DoNotContact::IS_CONTACTABLE;
             $newStatus = $status['reason'];
 
             $event = new Events\ChannelSubscriptionChange($this->lead, $channel, $oldStatus, $newStatus);

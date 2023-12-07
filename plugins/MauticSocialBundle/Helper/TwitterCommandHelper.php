@@ -16,35 +16,17 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 class TwitterCommandHelper
 {
-    /**
-     * @var LeadModel
-     */
-    private $leadModel;
+    private \Mautic\LeadBundle\Model\LeadModel $leadModel;
 
-    /**
-     * @var FieldModel
-     */
-    private $fieldModel;
+    private \Mautic\LeadBundle\Model\FieldModel $fieldModel;
 
-    /**
-     * @var MonitoringModel
-     */
-    private $monitoringModel;
+    private \MauticPlugin\MauticSocialBundle\Model\MonitoringModel $monitoringModel;
 
-    /**
-     * @var PostCountModel
-     */
-    private $postCountModel;
+    private \MauticPlugin\MauticSocialBundle\Model\PostCountModel $postCountModel;
 
-    /**
-     * @var Translator
-     */
-    private $translator;
+    private \Mautic\CoreBundle\Translation\Translator $translator;
 
-    /**
-     * @var EntityManagerInterface
-     */
-    private $em;
+    private \Doctrine\ORM\EntityManagerInterface $em;
 
     /**
      * @var OutputInterface
@@ -181,7 +163,7 @@ class TwitterCommandHelper
 
             // Split the twitter user's name into its parts if we're matching to contacts by name
             if ($monitorProperties['checknames'] && $status['user']['name'] && str_contains($status['user']['name'], ' ')) {
-                list($firstName, $lastName) = $this->splitName($status['user']['name']);
+                [$firstName, $lastName] = $this->splitName($status['user']['name']);
 
                 if (!empty($firstName) && !empty($lastName)) {
                     $usersByName['firstnames'][] = $expr->literal($firstName);
@@ -294,7 +276,7 @@ class TwitterCommandHelper
                     $leadEntity = new Lead();
                     $leadEntity->setNewlyCreated(true);
 
-                    list($firstName, $lastName) = $this->splitName($status['user']['name']);
+                    [$firstName, $lastName] = $this->splitName($status['user']['name']);
 
                     // build new lead fields
                     $fields = [

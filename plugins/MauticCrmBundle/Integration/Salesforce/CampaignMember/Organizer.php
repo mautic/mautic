@@ -7,10 +7,7 @@ use MauticPlugin\MauticCrmBundle\Integration\Salesforce\Object\Lead;
 
 class Organizer
 {
-    /**
-     * @var array
-     */
-    private $records;
+    private array $records;
 
     /**
      * @var array

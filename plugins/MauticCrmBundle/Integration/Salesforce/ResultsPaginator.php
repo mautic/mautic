@@ -7,10 +7,7 @@ use Psr\Log\LoggerInterface;
 
 class ResultsPaginator
 {
-    /**
-     * @var LoggerInterface
-     */
-    private $logger;
+    private \Psr\Log\LoggerInterface $logger;
 
     /**
      * @var array

@@ -70,7 +70,7 @@ trait PushToIntegrationTrait
             }
 
             if ($success && $integrationCampaign && method_exists($s, 'pushLeadToCampaign')) {
-                if (!$s->resetLastIntegrationError()->pushLeadToCampaign($lead, $integrationCampaign, $integrationMemberStatus, $personIds)) {
+                if (!$s->resetLastIntegrationError()->pushLeadToCampaign($lead, $integrationCampaign, $integrationMemberStatus)) {
                     $success = false;
                     if ($error = $s->getLastIntegrationError()) {
                         $errors[] = $error;

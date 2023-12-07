@@ -273,7 +273,7 @@ class UserModel extends FormModel
     /**
      * @throws \RuntimeException
      */
-    public function sendResetEmail(User $user)
+    public function sendResetEmail(User $user): void
     {
         $mailer = $this->mailHelper->getMailer();
 
@@ -363,7 +363,7 @@ class UserModel extends FormModel
         }
         $preferences = $user->getPreferences();
 
-        return (isset($preferences[$key])) ? $preferences[$key] : $default;
+        return $preferences[$key] ?? $default;
     }
 
     /**

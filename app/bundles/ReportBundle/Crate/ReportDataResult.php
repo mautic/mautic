@@ -102,7 +102,7 @@ class ReportDataResult
      */
     public function getType($column)
     {
-        return isset($this->types[$column]) ? $this->types[$column] : 'string';
+        return $this->types[$column] ?? 'string';
     }
 
     /**

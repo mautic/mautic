@@ -166,7 +166,7 @@ class ApiMetadataDriver extends BaseAnnotationDriver implements DriverInterface
             if (!empty($prop)) {
                 $serializedName = null;
                 if (is_array($prop)) {
-                    list($prop, $serializedName) = $prop;
+                    [$prop, $serializedName] = $prop;
                 }
                 $this->addProperty($prop, $serializedName, $useGetter);
 

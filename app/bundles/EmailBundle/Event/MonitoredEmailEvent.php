@@ -50,7 +50,7 @@ class MonitoredEmailEvent extends Event
     {
         $keyName = $bundleKey.'_'.$folderKey;
 
-        return (isset($this->data[$keyName])) ? $this->data[$keyName] : $default;
+        return $this->data[$keyName] ?? $default;
     }
 
     /**

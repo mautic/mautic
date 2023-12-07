@@ -41,7 +41,7 @@ abstract class CommonStatsSubscriber implements EventSubscriberInterface
         ];
     }
 
-    public function onStatsFetch(StatsEvent $event)
+    public function onStatsFetch(StatsEvent $event): void
     {
         /** @var CommonRepository<object> $repository */
         foreach ($this->repositories as $repository) {
@@ -51,7 +51,7 @@ abstract class CommonStatsSubscriber implements EventSubscriberInterface
                 continue;
             }
 
-            $permissions  = (isset($this->permissions[$table])) ? $this->permissions[$table] : [];
+            $permissions  = $this->permissions[$table] ?? [];
             $allowedJoins = [];
 
             foreach ($permissions as $tableAlias => $permBase) {
@@ -93,7 +93,7 @@ abstract class CommonStatsSubscriber implements EventSubscriberInterface
                 throw new AccessDeniedException(sprintf('You do not have the view permission to load data from the %s table', $tableAlias));
             }
 
-            $select = (isset($this->selects[$table])) ? $this->selects[$table] : null;
+            $select = $this->selects[$table] ?? null;
             $event->setSelect($select)->setRepository($repository, $allowedJoins);
         }
     }

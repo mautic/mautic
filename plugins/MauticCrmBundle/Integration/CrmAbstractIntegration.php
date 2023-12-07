@@ -214,7 +214,7 @@ abstract class CrmAbstractIntegration extends AbstractIntegration
                 // inject lead into events
                 foreach ($events as $event) {
                     $link  = '';
-                    $label = (isset($event['eventLabel'])) ? $event['eventLabel'] : $event['eventType'];
+                    $label = $event['eventLabel'] ?? $event['eventType'];
                     if (is_array($label)) {
                         $link  = $label['href'];
                         $label = $label['label'];
@@ -364,7 +364,7 @@ abstract class CrmAbstractIntegration extends AbstractIntegration
                 $uniqueLeadFieldData[$leadField] = $value;
             }
 
-            $fieldType                 = isset($leadFieldTypes[$leadField]['type']) ? $leadFieldTypes[$leadField]['type'] : '';
+            $fieldType                 = $leadFieldTypes[$leadField]['type'] ?? '';
             $matchedFields[$leadField] = $this->limitString($value, $fieldType);
         }
 
@@ -467,7 +467,7 @@ abstract class CrmAbstractIntegration extends AbstractIntegration
 
         $fields = ($this->isAuthorized()) ? $this->getAvailableLeadFields($settings) : [];
 
-        return (isset($fields[$object])) ? $fields[$object] : [];
+        return $fields[$object] ?? [];
     }
 
     /**
@@ -523,11 +523,7 @@ abstract class CrmAbstractIntegration extends AbstractIntegration
             return $fieldsToUpdate['leadFields'];
         }
 
-        if (isset($fieldsToUpdate['leadFields'][$objects])) {
-            return $fieldsToUpdate['leadFields'][$objects];
-        }
-
-        return $fieldsToUpdate;
+        return $fieldsToUpdate['leadFields'][$objects] ?? $fieldsToUpdate;
     }
 
     /**

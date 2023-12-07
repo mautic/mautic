@@ -63,7 +63,7 @@ class LeadSubscriber implements EventSubscriberInterface
         $eventTypeKey  = 'page.hit';
         $eventTypeName = $this->translator->trans('mautic.page.event.hit');
         $event->addEventType($eventTypeKey, $eventTypeName);
-        $event->addSerializerGroup('pageList', 'hitDetails');
+        $event->addSerializerGroup('pageList');
 
         if (!$event->isApplicable($eventTypeKey)) {
             return;
@@ -129,7 +129,7 @@ class LeadSubscriber implements EventSubscriberInterface
                     ];
                 } else {
                     $eventLabel = [
-                        'label'      => (isset($hit['urlTitle'])) ? $hit['urlTitle'] : $hit['url'],
+                        'label'      => $hit['urlTitle'] ?? $hit['url'],
                         'href'       => $hit['url'],
                         'isExternal' => true,
                     ];
@@ -166,7 +166,7 @@ class LeadSubscriber implements EventSubscriberInterface
         $eventTypeKey  = 'page.videohit';
         $eventTypeName = $this->translator->trans('mautic.page.event.videohit');
         $event->addEventType($eventTypeKey, $eventTypeName);
-        $event->addSerializerGroup('pageList', 'hitDetails');
+        $event->addSerializerGroup('pageList');
 
         if (!$event->isApplicable($eventTypeKey)) {
             return;

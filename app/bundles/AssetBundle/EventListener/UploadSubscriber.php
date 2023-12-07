@@ -56,7 +56,7 @@ class UploadSubscriber implements EventSubscriberInterface
      *
      * @throws ValidationException
      */
-    public function onUploadValidation(ValidationEvent $event)
+    public function onUploadValidation(ValidationEvent $event): void
     {
         $file       = $event->getFile();
         $extensions = $this->coreParametersHelper->get('allowed_extensions');

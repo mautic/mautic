@@ -14,15 +14,9 @@ use Symfony\Component\Routing\RouterInterface;
 
 class CampaignSubscriber implements EventSubscriberInterface
 {
-    /**
-     * @var TrackingHelper
-     */
-    private $trackingHelper;
+    private \Mautic\PageBundle\Helper\TrackingHelper $trackingHelper;
 
-    /**
-     * @var RouterInterface
-     */
-    private $router;
+    private \Symfony\Component\Routing\RouterInterface $router;
 
     public function __construct(TrackingHelper $trackingHelper, RouterInterface $router)
     {

@@ -30,9 +30,7 @@ class DateBuilder
 
         try {
             $recurrences = $this->schedulerBuilder->getNextEvents($entity, $count);
-        } catch (InvalidSchedulerException $e) {
-            return [];
-        } catch (NotSupportedScheduleTypeException $e) {
+        } catch (InvalidSchedulerException|NotSupportedScheduleTypeException $e) {
             return [];
         }
 
@@ -53,9 +51,7 @@ class DateBuilder
     {
         try {
             $recurrences = $this->schedulerBuilder->getNextEvent($scheduler);
-        } catch (InvalidSchedulerException $e) {
-            throw new NoScheduleException();
-        } catch (NotSupportedScheduleTypeException $e) {
+        } catch (InvalidSchedulerException|NotSupportedScheduleTypeException $e) {
             throw new NoScheduleException();
         }
 

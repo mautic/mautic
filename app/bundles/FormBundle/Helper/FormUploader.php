@@ -19,7 +19,7 @@ class FormUploader
     /**
      * @throws FileUploadException
      */
-    public function uploadFiles(UploadFileCrate $filesToUpload, Submission $submission)
+    public function uploadFiles(UploadFileCrate $filesToUpload, Submission $submission): void
     {
         $uploadedFiles = [];
         $result        = $submission->getResults();

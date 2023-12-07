@@ -208,7 +208,7 @@ class Mailbox
      *
      * @throws MailboxException
      */
-    public function switchMailbox($bundle, $mailbox = '')
+    public function switchMailbox($bundle, $mailbox = ''): void
     {
         $key = $bundle.(!empty($mailbox) ? '_'.$mailbox : '');
 
@@ -723,8 +723,6 @@ class Mailbox
 
     /**
      * Get mails count in mail box.
-     *
-     * @return int
      */
     public function countMails(): int|bool
     {

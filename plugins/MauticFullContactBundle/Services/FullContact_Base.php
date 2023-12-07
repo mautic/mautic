@@ -16,7 +16,7 @@ class FullContact_Base
     public const REQUEST_LATENCY = 0.2;
     public const USER_AGENT      = 'caseysoftware/fullcontact-php-0.9.0';
 
-    private $_next_req_time;
+    private \DateTime $_next_req_time;
 
 //    protected $_baseUri = 'https://requestbin.fullcontact.com/1ailj6d1?';
     protected $_baseUri     = 'https://api.fullcontact.com/';
@@ -149,7 +149,7 @@ class FullContact_Base
         // execute request
         $resp = curl_exec($connection);
 
-        list($response_headers, $this->response_json) = explode("\r\n\r\n", $resp, 2);
+        [$response_headers, $this->response_json] = explode("\r\n\r\n", $resp, 2);
         // $response_headers now has a string of the HTTP headers
         // $response_json is the body of the HTTP response
 
@@ -159,7 +159,7 @@ class FullContact_Base
             if (0 === $i) {
                 $headers['http_code'] = $line;
             } else {
-                list($key, $value) = explode(': ', $line);
+                [$key, $value]     = explode(': ', $line);
                 $headers[$key]     = $value;
             }
         }

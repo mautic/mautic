@@ -6,10 +6,7 @@ use GuzzleHttp\Client;
 
 class Transport implements TransportInterface
 {
-    /**
-     * @var Client
-     */
-    private $client;
+    private \GuzzleHttp\Client $client;
 
     public function __construct(Client $client)
     {

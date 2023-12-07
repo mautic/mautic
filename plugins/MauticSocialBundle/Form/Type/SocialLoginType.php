@@ -11,12 +11,9 @@ use Symfony\Component\Form\FormBuilderInterface;
 
 class SocialLoginType extends AbstractType
 {
-    /**
-     * @var IntegrationHelper
-     */
-    private $helper;
-    private $formModel;
-    private $coreParametersHelper;
+    private \Mautic\PluginBundle\Helper\IntegrationHelper $helper;
+    private \Mautic\FormBundle\Model\FormModel $formModel;
+    private \Mautic\CoreBundle\Helper\CoreParametersHelper $coreParametersHelper;
 
     public function __construct(IntegrationHelper $helper, FormModel $form, CoreParametersHelper $coreParametersHelper)
     {

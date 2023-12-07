@@ -264,7 +264,7 @@ class WebhookSubscriber implements EventSubscriberInterface
 
     public function onSegmentChange(ListChangeEvent $changeEvent): void
     {
-        $contacts = null !== $changeEvent->getLeads() ? $changeEvent->getLeads() : [$changeEvent->getLead()];
+        $contacts = $changeEvent->getLeads() ?? [$changeEvent->getLead()];
         foreach ($contacts as $contact) {
             if (is_array($contact)) {
                 $contact = $this->leadModel->getEntity($contact['id']);

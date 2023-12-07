@@ -483,7 +483,7 @@ class ConfigType extends AbstractType
             $data = $event->getData();
             $form = $event->getForm();
 
-            $ipServiceName = (isset($data['ip_lookup_service'])) ? $data['ip_lookup_service'] : null;
+            $ipServiceName = $data['ip_lookup_service'] ?? null;
             if ($ipServiceName && $lookupService = $ipLookupFactory->getService($ipServiceName)) {
                 if ($lookupService instanceof IpLookupFormInterface && $formType = $lookupService->getConfigFormService()) {
                     $form->add(

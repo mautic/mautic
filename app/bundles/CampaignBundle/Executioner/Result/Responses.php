@@ -66,7 +66,7 @@ class Responses
     public function getActionResponses($type = null)
     {
         if ($type) {
-            return (isset($this->actionResponses[$type])) ? $this->actionResponses[$type] : [];
+            return $this->actionResponses[$type] ?? [];
         }
 
         return $this->actionResponses;
@@ -80,7 +80,7 @@ class Responses
     public function getConditionResponses($type = null)
     {
         if ($type) {
-            return (isset($this->conditionResponses[$type])) ? $this->conditionResponses[$type] : [];
+            return $this->conditionResponses[$type] ?? [];
         }
 
         return $this->conditionResponses;

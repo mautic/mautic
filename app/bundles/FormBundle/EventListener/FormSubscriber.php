@@ -186,7 +186,7 @@ class FormSubscriber implements EventSubscriberInterface
         }
     }
 
-    public function onFormSubmitActionRepost(Events\SubmissionEvent $event)
+    public function onFormSubmitActionRepost(Events\SubmissionEvent $event): void
     {
         if (!$event->checkContext('form.repost')) {
             return;
@@ -216,7 +216,7 @@ class FormSubscriber implements EventSubscriberInterface
             $key = (!empty($config[$field['alias']])) ? $config[$field['alias']] : $field['alias'];
 
             // Use the cleaned value by default - but if set to not save result, get from post
-            $value               = (isset($results[$field['alias']])) ? $results[$field['alias']] : $post[$field['alias']];
+            $value               = $results[$field['alias']] ?? $post[$field['alias']];
             $matchedFields[$key] = $field['alias'];
 
             // decode html chars and quotes before posting to next form
@@ -231,7 +231,7 @@ class FormSubscriber implements EventSubscriberInterface
 
         if (!empty($config['authorization_header'])) {
             if (str_contains($config['authorization_header'], ':')) {
-                list($key, $value) = explode(':', $config['authorization_header']);
+                [$key, $value] = explode(':', $config['authorization_header']);
             } else {
                 $key   = 'Authorization';
                 $value = $config['authorization_header'];

@@ -17,10 +17,7 @@ class TokenReplacementEvent extends CommonEvent
      */
     protected $content;
 
-    /**
-     * @var array
-     */
-    protected $clickthrough = [];
+    protected array $clickthrough;
 
     /**
      * @var array

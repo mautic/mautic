@@ -27,10 +27,7 @@ final class EmailOrEmailTokenListValidator extends ConstraintValidator
         $this->transformer          = new ArrayStringTransformer();
     }
 
-    /**
-     * @return void
-     */
-    public function validate($csv, Constraint $constraint)
+    public function validate($csv, Constraint $constraint): void
     {
         if (!$constraint instanceof EmailOrEmailTokenList) {
             throw new UnexpectedTypeException($constraint, EmailOrEmailTokenList::class);

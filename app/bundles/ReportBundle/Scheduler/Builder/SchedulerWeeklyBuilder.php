@@ -29,9 +29,7 @@ class SchedulerWeeklyBuilder implements BuilderInterface
             }
 
             $rule->setByDay($days);
-        } catch (InvalidArgument $e) {
-            throw new InvalidSchedulerException();
-        } catch (InvalidRRule $e) {
+        } catch (InvalidArgument|InvalidRRule $e) {
             throw new InvalidSchedulerException();
         }
 

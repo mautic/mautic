@@ -7,10 +7,7 @@ use Symfony\Contracts\EventDispatcher\Event;
 
 class FocusViewEvent extends Event
 {
-    /**
-     * @var Stat
-     */
-    private $stat;
+    private \MauticPlugin\MauticFocusBundle\Entity\Stat $stat;
 
     public function __construct(Stat $stat)
     {

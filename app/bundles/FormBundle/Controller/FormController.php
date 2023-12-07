@@ -440,7 +440,7 @@ class FormController extends CommonFormController
         }
 
         // fire the form builder event
-        $customComponents = $model->getCustomComponents($sessionId);
+        $customComponents = $model->getCustomComponents();
 
         return $this->delegateView(
             [
@@ -489,7 +489,7 @@ class FormController extends CommonFormController
         /** @var \Mautic\FormBundle\Model\FormModel $model */
         $model            = $this->getModel('form');
         $formData         = $request->request->get('mauticform');
-        $sessionId        = isset($formData['sessionId']) ? $formData['sessionId'] : null;
+        $sessionId        = $formData['sessionId'] ?? null;
         $customComponents = $model->getCustomComponents();
         $modifiedFields   = [];
         $deletedFields    = [];
@@ -777,11 +777,7 @@ class FormController extends CommonFormController
                 uasort(
                     $modifiedFields,
                     function ($a, $b): int {
-                        if ($a['order'] == $b['order']) {
-                            return 0;
-                        }
-
-                        return $a['order'] < $b['order'] ? -1 : 1;
+                        return $a['order'] <=> $b['order'];
                     }
                 );
             }
@@ -815,11 +811,7 @@ class FormController extends CommonFormController
                 uasort(
                     $modifiedActions,
                     function ($a, $b): int {
-                        if ($a['order'] == $b['order']) {
-                            return 0;
-                        }
-
-                        return $a['order'] < $b['order'] ? -1 : 1;
+                        return $a['order'] <=> $b['order'];
                     }
                 );
             }

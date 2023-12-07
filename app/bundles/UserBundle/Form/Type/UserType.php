@@ -72,7 +72,7 @@ class UserType extends AbstractType
             ]
         );
 
-        $positions = $this->model->getLookupResults('position', null, 0, true);
+        $positions = $this->model->getLookupResults('position', null, 0);
         $builder->add(
             'position',
             TextType::class,

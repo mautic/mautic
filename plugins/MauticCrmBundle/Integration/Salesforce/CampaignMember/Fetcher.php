@@ -12,15 +12,9 @@ use MauticPlugin\MauticCrmBundle\Integration\Salesforce\QueryBuilder;
 
 class Fetcher
 {
-    /**
-     * @var IntegrationEntityRepository
-     */
-    private $repo;
+    private \Mautic\PluginBundle\Entity\IntegrationEntityRepository $repo;
 
-    /**
-     * @var Organizer
-     */
-    private $organizer;
+    private \MauticPlugin\MauticCrmBundle\Integration\Salesforce\CampaignMember\Organizer $organizer;
 
     /**
      * @var string

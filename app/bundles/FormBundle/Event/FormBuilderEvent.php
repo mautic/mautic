@@ -51,7 +51,7 @@ class FormBuilderEvent extends Event
      *
      * @throws BadConfigurationException
      */
-    public function addSubmitAction(string $key, array $action)
+    public function addSubmitAction(string $key, array $action): void
     {
         if (array_key_exists($key, $this->actions)) {
             throw new \InvalidArgumentException("The key, '$key' is already used by another action. Please use a different key.");
@@ -130,7 +130,7 @@ class FormBuilderEvent extends Event
      * @throws \InvalidArgumentException
      * @throws BadConfigurationException
      */
-    public function addFormField($key, array $field)
+    public function addFormField($key, array $field): void
     {
         if (array_key_exists($key, $this->fields)) {
             throw new \InvalidArgumentException("The key, '$key' is already used by another field. Please use a different key.");
@@ -172,7 +172,7 @@ class FormBuilderEvent extends Event
      *                         will be sent through the validation event
      *                         ]
      */
-    public function addValidator($key, array $validator)
+    public function addValidator($key, array $validator): void
     {
         if (array_key_exists($key, $this->fields)) {
             throw new \InvalidArgumentException("The key, '$key' is already used by another validator. Please use a different key.");
@@ -190,7 +190,7 @@ class FormBuilderEvent extends Event
     public function addValidatorsToBuilder(FormInterface $form): void
     {
         if (!empty($this->validators)) {
-            $validationData = (isset($form->getData()['validation'])) ? $form->getData()['validation'] : [];
+            $validationData = $form->getData()['validation'] ?? [];
             foreach ($this->validators as $validator) {
                 if (isset($validator['formType']) && isset($validator['fieldType']) && $validator['fieldType'] == $form->getData()['type']) {
                     $form->add(

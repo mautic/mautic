@@ -463,11 +463,7 @@ class FormModel extends CommonFormModel
 
         // Ensure the correct order in case this is generated right after a form save with new fields
         uasort($fields, function ($a, $b): int {
-            if ($a->getOrder() === $b->getOrder()) {
-                return 0;
-            }
-
-            return ($a->getOrder() < $b->getOrder()) ? -1 : 1;
+            return $a->getOrder() <=> $b->getOrder();
         });
 
         $viewOnlyFields     = $this->getCustomComponents()['viewOnlyFields'];

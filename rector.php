@@ -107,6 +107,8 @@ return static function (Rector\Config\RectorConfig $rectorConfig): void {
         \Rector\Doctrine\Set\DoctrineSetList::DOCTRINE_ORM_25,
 
         \Rector\Set\ValueObject\SetList::DEAD_CODE,
+        \Rector\Set\ValueObject\SetList::PHP_70,
+        \Rector\Set\ValueObject\SetList::PHP_71,
     ]);
 
     // Define what single rules will be applied

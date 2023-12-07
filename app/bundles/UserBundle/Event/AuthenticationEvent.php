@@ -276,6 +276,6 @@ class AuthenticationEvent extends Event
      */
     public function getIntegration($integrationName)
     {
-        return (isset($this->integrations[$integrationName])) ? $this->integrations[$integrationName] : false;
+        return $this->integrations[$integrationName] ?? false;
     }
 }

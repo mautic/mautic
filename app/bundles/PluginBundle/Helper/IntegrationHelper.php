@@ -172,7 +172,7 @@ class IntegrationHelper
                         }
 
                         /** @var \Mautic\PluginBundle\Entity\Integration $settings */
-                        $settings                          = isset($coreIntegrationSettings[$integrationName]) ? $coreIntegrationSettings[$integrationName] : $newIntegration;
+                        $settings                          = $coreIntegrationSettings[$integrationName] ?? $newIntegration;
                         $this->available[$integrationName] = [
                             'isPlugin'    => false,
                             'integration' => $integrationName,
@@ -258,11 +258,7 @@ class IntegrationHelper
                 $aP = (int) $a->getPriority();
                 $bP = (int) $b->getPriority();
 
-                if ($aP === $bP) {
-                    return 0;
-                }
-
-                return ($aP < $bP) ? -1 : 1;
+                return $aP <=> $bP;
             });
         } else {
             // Sort by display name
@@ -286,7 +282,7 @@ class IntegrationHelper
     {
         $integrationObjects = $this->getIntegrationObjects($name);
 
-        return (isset($integrationObjects[$name])) ? $integrationObjects[$name] : false;
+        return $integrationObjects[$name] ?? false;
     }
 
     /**
@@ -499,7 +495,7 @@ class IntegrationHelper
                 $featureSettings = $settings->getFeatureSettings();
                 $apiKeys         = $details->decryptApiKeys($settings->getApiKeys());
                 $plugin          = $settings->getPlugin();
-                $shareSettings   = isset($featureSettings['shareButton']) ? $featureSettings['shareButton'] : [];
+                $shareSettings   = $featureSettings['shareButton'] ?? [];
 
                 // add the api keys for use within the share buttons
                 $shareSettings['keys']   = $apiKeys;

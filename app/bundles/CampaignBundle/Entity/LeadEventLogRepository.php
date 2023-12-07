@@ -103,7 +103,7 @@ class LeadEventLogRepository extends CommonRepository
                         $query->expr()->eq('ll.is_scheduled', ':scheduled'),
                         $query->expr()->and(
                             $query->expr()->eq('ll.is_scheduled', 0),
-                            $query->expr()->isNull('ll.date_triggered', 0)
+                            $query->expr()->isNull('ll.date_triggered')
                         )
                     )
                 );

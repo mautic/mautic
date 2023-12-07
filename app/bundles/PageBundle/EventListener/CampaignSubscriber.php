@@ -163,14 +163,14 @@ class CampaignSubscriber implements EventSubscriberInterface
 
         // Check Landing Pages
         if ($pageHit instanceof Page) {
-            list($parent, $children) = $pageHit->getVariants();
+            [$parent, $children] = $pageHit->getVariants();
             // use the parent (self or configured parent)
             $pageHitId = $parent->getId();
         } else {
             $pageHitId = 0;
         }
 
-        $limitToPages = (isset($config['pages'])) ? $config['pages'] : [];
+        $limitToPages = $config['pages'] ?? [];
 
         $urlMatches = [];
 

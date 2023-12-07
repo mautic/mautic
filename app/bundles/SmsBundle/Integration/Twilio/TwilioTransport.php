@@ -46,7 +46,7 @@ class TwilioTransport implements TransportInterface
             );
 
             return true;
-        } catch (NumberParseException $exception) {
+        } catch (NumberParseException|TwilioException $exception) {
             $this->logger->warning(
                 $exception->getMessage(),
                 ['exception' => $exception]
@@ -61,13 +61,6 @@ class TwilioTransport implements TransportInterface
             );
 
             return $message;
-        } catch (TwilioException $exception) {
-            $this->logger->warning(
-                $exception->getMessage(),
-                ['exception' => $exception]
-            );
-
-            return $exception->getMessage();
         }
     }
 

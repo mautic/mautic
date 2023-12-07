@@ -355,7 +355,7 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
             ->where('l.id = '.$id);
         $results = $fq->executeQuery()->fetchAllAssociative();
 
-        return (isset($results[0])) ? $results[0] : [];
+        return $results[0] ?? [];
     }
 
     /**
@@ -512,8 +512,8 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
                 }
 
                 if ($withPreferences) {
-                    $contactFrequencyRules = (isset($frequencyRules[$id])) ? $frequencyRules[$id] : [];
-                    $contactDncRules       = (isset($dncRules[$id])) ? $dncRules[$id] : [];
+                    $contactFrequencyRules = $frequencyRules[$id] ?? [];
+                    $contactDncRules       = $dncRules[$id] ?? [];
 
                     $channelRules = Lead::generateChannelRules($contactFrequencyRules, $contactDncRules);
                     if (is_array($tmpContacts[$id])) {
@@ -1137,10 +1137,7 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
         return (bool) $q->executeQuery()->fetchOne();
     }
 
-    /**
-     * @return array
-     */
-    public function getContacts(array $contactIds)
+    public function getContacts(array $contactIds): array
     {
         $qb = $this->getEntityManager()->getConnection()->createQueryBuilder();
 

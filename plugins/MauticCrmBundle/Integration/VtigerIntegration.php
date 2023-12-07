@@ -159,13 +159,13 @@ class VtigerIntegration extends CrmAbstractIntegration
     public function getAvailableLeadFields($settings = []): array
     {
         $vTigerFields      = [];
-        $silenceExceptions = (isset($settings['silence_exceptions'])) ? $settings['silence_exceptions'] : true;
+        $silenceExceptions = $settings['silence_exceptions'] ?? true;
 
         if (isset($settings['feature_settings']['objects'])) {
             $vTigerObjects = $settings['feature_settings']['objects'];
         } else {
             $settings      = $this->settings->getFeatureSettings();
-            $vTigerObjects = isset($settings['objects']) ? $settings['objects'] : ['contacts'];
+            $vTigerObjects = $settings['objects'] ?? ['contacts'];
         }
 
         try {

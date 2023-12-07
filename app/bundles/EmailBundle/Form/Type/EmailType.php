@@ -370,9 +370,9 @@ class EmailType extends AbstractType
                 );
 
                 if (isset($data['emailType']) && 'list' == $data['emailType']) {
-                    $data['translationParent'] = isset($data['segmentTranslationParent']) ? $data['segmentTranslationParent'] : null;
+                    $data['translationParent'] = $data['segmentTranslationParent'] ?? null;
                 } else {
-                    $data['translationParent'] = isset($data['templateTranslationParent']) ? $data['templateTranslationParent'] : null;
+                    $data['translationParent'] = $data['templateTranslationParent'] ?? null;
                 }
 
                 $event->setData($data);

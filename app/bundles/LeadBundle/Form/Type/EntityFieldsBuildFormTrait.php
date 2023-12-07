@@ -66,10 +66,9 @@ trait EntityFieldsBuildFormTrait
             }
 
             if ($isObject) {
-                $value = (isset($fieldValues[$group][$alias]['value'])) ?
-                    $fieldValues[$group][$alias]['value'] : $field['defaultValue'];
+                $value = $fieldValues[$group][$alias]['value'] ?? $field['defaultValue'];
             } else {
-                $value = (isset($fieldValues[$alias])) ? $fieldValues[$alias] : '';
+                $value = $fieldValues[$alias] ?? '';
             }
 
             $constraints = [];

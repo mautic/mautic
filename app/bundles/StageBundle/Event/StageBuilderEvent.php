@@ -42,7 +42,7 @@ class StageBuilderEvent extends Event
      *
      * @throws InvalidArgumentException
      */
-    public function addAction($key, array $action)
+    public function addAction($key, array $action): void
     {
         if (array_key_exists($key, $this->actions)) {
             throw new InvalidArgumentException("The key, '$key' is already used by another action. Please use a different key.");
@@ -108,7 +108,7 @@ class StageBuilderEvent extends Event
     /**
      * @throws InvalidArgumentException
      */
-    private function verifyComponent(array $keys, array $methods, array $component)
+    private function verifyComponent(array $keys, array $methods, array $component): void
     {
         foreach ($keys as $k) {
             if (!array_key_exists($k, $component)) {

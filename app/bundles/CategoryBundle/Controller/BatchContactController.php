@@ -35,8 +35,8 @@ class BatchContactController extends AbstractFormController
         $ids    = empty($params['ids']) ? [] : json_decode($params['ids']);
 
         if ($ids && is_array($ids)) {
-            $categoriesToAdd    = isset($params['add']) ? $params['add'] : [];
-            $categoriesToRemove = isset($params['remove']) ? $params['remove'] : [];
+            $categoriesToAdd    = $params['add'] ?? [];
+            $categoriesToRemove = $params['remove'] ?? [];
             $contactIds         = json_decode($params['ids']);
 
             $this->actionModel->addContactsToCategories($contactIds, $categoriesToAdd);

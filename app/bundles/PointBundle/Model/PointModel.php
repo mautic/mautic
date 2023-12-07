@@ -250,8 +250,7 @@ class PointModel extends CommonFormModel
                 'eventDetails' => $eventDetails,
             ];
 
-            $callback = (isset($settings['callback'])) ? $settings['callback'] :
-                ['\\Mautic\\PointBundle\\Helper\\EventHelper', 'engagePointAction'];
+            $callback = $settings['callback'] ?? ['\\Mautic\\PointBundle\\Helper\\EventHelper', 'engagePointAction'];
 
             if (is_callable($callback)) {
                 if (is_array($callback)) {

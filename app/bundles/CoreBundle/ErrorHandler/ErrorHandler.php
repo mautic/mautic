@@ -170,7 +170,7 @@ namespace Mautic\CoreBundle\ErrorHandler {
 
             $content = $this->generateResponse($error, $inTemplate);
 
-            $message = isset($error['logMessage']) ? $error['logMessage'] : $error['message'];
+            $message = $error['logMessage'] ?? $error['message'];
             $this->log(LogLevel::ERROR, "$message - in file {$error['file']} - at line {$error['line']}", [], $error['trace']);
 
             if ($returnContent) {
@@ -468,7 +468,7 @@ namespace Mautic\CoreBundle\ErrorHandler {
 
             if ('dev' == self::$environment || $this->displayErrors) {
                 $error['file']          = str_replace(self::$root, '', $error['file']);
-                $errorMessage           = (isset($error['logMessage'])) ? $error['logMessage'] : $error['message'];
+                $errorMessage           = $error['logMessage'] ?? $error['message'];
                 $error['message']       = "$errorMessage - in file {$error['file']} - at line {$error['line']}";
             } else {
                 if (empty($error['showExceptionMessage'])) {

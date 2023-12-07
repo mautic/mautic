@@ -65,7 +65,7 @@ class Configuration
     /**
      * @throws ConfigurationException
      */
-    private function setConfiguration()
+    private function setConfiguration(): void
     {
         if ($this->accountSid) {
             return;

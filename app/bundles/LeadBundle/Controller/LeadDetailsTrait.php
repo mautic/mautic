@@ -122,11 +122,7 @@ trait LeadDetailsTrait
 
     private function cmp($a, $b): int
     {
-        if ($a['timestamp'] === $b['timestamp']) {
-            return 0;
-        }
-
-        return ($a['timestamp'] < $b['timestamp']) ? +1 : -1;
+        return $b['timestamp'] <=> $a['timestamp'];
     }
 
     /**

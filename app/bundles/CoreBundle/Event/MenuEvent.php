@@ -29,8 +29,8 @@ class MenuEvent extends Event
      */
     public function addMenuItems(array $menuItems): void
     {
-        $defaultPriority = isset($menuItems['priority']) ? $menuItems['priority'] : 9999;
-        $items           = isset($menuItems['items']) ? $menuItems['items'] : $menuItems;
+        $defaultPriority = $menuItems['priority'] ?? 9999;
+        $items           = $menuItems['items'] ?? $menuItems;
 
         $isRoot = isset($items['name']) && ('root' == $items['name'] || $items['name'] == $items['name']);
         if (!$isRoot) {

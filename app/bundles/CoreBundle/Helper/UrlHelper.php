@@ -48,8 +48,8 @@ class UrlHelper
         $scheme = substr($scheme, 0, strpos($scheme, '/')).($ssl ? 's' : '');
         $port   = $_SERVER['SERVER_PORT'];
         $port   = ((!$ssl && '80' == $port) || ($ssl && '443' == $port)) ? '' : ":$port";
-        $host   = isset($_SERVER['HTTP_HOST']) ? $_SERVER['HTTP_HOST'] : null;
-        $host   = isset($host) ? $host : $_SERVER['SERVER_NAME'].$port;
+        $host   = $_SERVER['HTTP_HOST'] ?? null;
+        $host   = $host ?? $_SERVER['SERVER_NAME'].$port;
         $base   = "$scheme://$host".$_SERVER['REQUEST_URI'];
 
         $base = str_replace('/index.php', '', $base);
