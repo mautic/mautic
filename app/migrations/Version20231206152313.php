@@ -6,9 +6,8 @@ namespace Mautic\Migrations;
 
 use Doctrine\DBAL\Schema\Schema;
 use Mautic\CoreBundle\Doctrine\PreUpAssertionMigration;
-use Throwable;
 
-final class Version20230307105705 extends PreUpAssertionMigration
+final class Version20231206152313 extends PreUpAssertionMigration
 {
     protected function preUpAssertions(): void
     {
@@ -54,7 +53,7 @@ final class Version20230307105705 extends PreUpAssertionMigration
     {
         try {
             $this->connection->executeStatement(sprintf('DROP INDEX %s ON %s', $this->generatePropertyName('email_stats', 'idx', $columnNames), $this->getTableName()));
-        } catch (Throwable $e) {
+        } catch (\Throwable) {
         }
     }
 }
