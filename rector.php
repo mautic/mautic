@@ -61,6 +61,10 @@ return static function (Rector\Config\RectorConfig $rectorConfig): void {
             __DIR__.'/app/bundles/LeadBundle/Entity',
         ],
 
+        \Rector\Php80\Rector\Class_\ClassPropertyAssignToConstructorPromotionRector::class => [
+            __DIR__ . '/app/bundles/CacheBundle/EventListener/CacheClearSubscriber.php',
+        ],
+
         // handle later, case by case as lot of chnaged code
         \Rector\DeadCode\Rector\If_\RemoveAlwaysTrueIfConditionRector::class => [
             __DIR__.'/app/bundles/PointBundle/Controller/TriggerController.php',
