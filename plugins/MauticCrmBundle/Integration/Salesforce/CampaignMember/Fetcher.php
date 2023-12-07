@@ -92,14 +92,11 @@ class Fetcher
      */
     public function getQueryForUnknownObjects(array $fields, $object)
     {
-        switch ($object) {
-            case Lead::OBJECT:
-                return QueryBuilder::getLeadQuery($fields, $this->unknownLeadIds);
-            case Contact::OBJECT:
-                return QueryBuilder::getContactQuery($fields, $this->unknownContactIds);
-            default:
-                throw new InvalidObjectException();
-        }
+        return match ($object) {
+            Lead::OBJECT    => QueryBuilder::getLeadQuery($fields, $this->unknownLeadIds),
+            Contact::OBJECT => QueryBuilder::getContactQuery($fields, $this->unknownContactIds),
+            default         => throw new InvalidObjectException(),
+        };
     }
 
     /**

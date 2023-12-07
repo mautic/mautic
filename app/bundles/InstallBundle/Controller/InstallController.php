@@ -278,17 +278,10 @@ class InstallController extends CommonController
     private function handleInstallerErrors(Form $form, array $messages): void
     {
         foreach ($messages as $type => $message) {
-            switch ($type) {
-                case 'warning':
-                case 'error':
-                case 'notice':
-                    $this->addFlashMessage($message, [], $type);
-                    break;
-                default:
-                    // If type not a flash type, assume form field error
-                    $form[$type]->addError(new FormError($message));
-                    break;
-            }
+            match ($type) {
+                'warning', 'error', 'notice' => $this->addFlashMessage($message, [], $type),
+                default => $form[$type]->addError(new FormError($message)),
+            };
         }
     }
 }

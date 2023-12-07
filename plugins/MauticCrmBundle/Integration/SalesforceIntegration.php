@@ -301,15 +301,12 @@ class SalesforceIntegration extends CrmAbstractIntegration
                                     ) {
                                         continue;
                                     }
-                                    switch ($fieldInfo['type']) {
-                                        case 'boolean': $type = 'boolean';
-                                            break;
-                                        case 'datetime': $type = 'datetime';
-                                            break;
-                                        case 'date': $type = 'date';
-                                            break;
-                                        default: $type = 'string';
-                                    }
+                                    $type = match ($fieldInfo['type']) {
+                                        'boolean'  => 'boolean',
+                                        'datetime' => 'datetime',
+                                        'date'     => 'date',
+                                        default    => 'string',
+                                    };
                                     if ('company' !== $sfObject) {
                                         if ('AccountId' == $fieldInfo['name']) {
                                             $fieldInfo['label'] = 'Company';

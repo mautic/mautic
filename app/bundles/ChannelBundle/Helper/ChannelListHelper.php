@@ -90,14 +90,11 @@ class ChannelListHelper
      */
     public function getChannelLabel($channel)
     {
-        switch (true) {
-            case $this->translator->hasId('mautic.channel.'.$channel):
-                return $this->translator->trans('mautic.channel.'.$channel);
-            case $this->translator->hasId('mautic.'.$channel.'.'.$channel):
-                return $this->translator->trans('mautic.'.$channel.'.'.$channel);
-            default:
-                return ucfirst($channel);
-        }
+        return match (true) {
+            $this->translator->hasId('mautic.channel.'.$channel)      => $this->translator->trans('mautic.channel.'.$channel),
+            $this->translator->hasId('mautic.'.$channel.'.'.$channel) => $this->translator->trans('mautic.'.$channel.'.'.$channel),
+            default                                                   => ucfirst($channel),
+        };
     }
 
     public function getName(): string

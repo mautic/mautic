@@ -28,19 +28,12 @@ class CustomFieldHelper
             return null;
         }
 
-        switch ($type) {
-            case self::TYPE_NUMBER:
-                $value = (float) $value;
-                break;
-            case self::TYPE_BOOLEAN:
-                $value = (bool) $value;
-                break;
-            case self::TYPE_SELECT:
-                $value = (string) $value;
-                break;
-        }
-
-        return $value;
+        return match ($type) {
+            self::TYPE_NUMBER  => (float) $value,
+            self::TYPE_BOOLEAN => (bool) $value,
+            self::TYPE_SELECT  => (string) $value,
+            default            => $value,
+        };
     }
 
     /**

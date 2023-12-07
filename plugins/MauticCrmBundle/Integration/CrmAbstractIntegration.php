@@ -225,21 +225,12 @@ abstract class CrmAbstractIntegration extends AbstractIntegration
                     $activity[$i]['description'] = $link;
                     $activity[$i]['dateAdded']   = $event['timestamp'];
 
-                    // We must keep BC with pre 2.11.0 formatting in order to prevent duplicates
-                    switch ($event['eventType']) {
-                        case 'point.gained':
-                            $id = str_replace($event['eventType'], 'pointChange', $event['eventId']);
-                            break;
-                        case 'form.submitted':
-                            $id = str_replace($event['eventType'], 'formSubmission', $event['eventId']);
-                            break;
-                        case 'email.read':
-                            $id = str_replace($event['eventType'], 'emailStat', $event['eventId']);
-                            break;
-                        default:
-                            // Just to keep congruent formatting with the three above
-                            $id = str_replace(' ', '', ucwords(str_replace('.', ' ', $event['eventId'])));
-                    }
+                    $id = match ($event['eventType']) {
+                        'point.gained'   => str_replace($event['eventType'], 'pointChange', $event['eventId']),
+                        'form.submitted' => str_replace($event['eventType'], 'formSubmission', $event['eventId']),
+                        'email.read'     => str_replace($event['eventType'], 'emailStat', $event['eventId']),
+                        default          => str_replace(' ', '', ucwords(str_replace('.', ' ', $event['eventId']))),
+                    };
 
                     $activity[$i]['id'] = $id;
                     ++$i;

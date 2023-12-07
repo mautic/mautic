@@ -44,19 +44,12 @@ class DateTimeToken
         $modifier      = $parseModifier[0] ?? '';
         $relativeDate  = $parseModifier[1] ?? '';
 
-        switch ($modifier) {
-            case 'datetime':
-                $format = $defaultDatetimeFormat;
-                break;
-            case 'date':
-                $format = $defaultDateFormat;
-                break;
-            case 'time':
-                $format = $defaultTimeFormat;
-                break;
-            default:
-                $format  = $modifier ?: $defaultDatetimeFormat;
-        }
+        $format = match ($modifier) {
+            'datetime' => $defaultDatetimeFormat,
+            'date'     => $defaultDateFormat,
+            'time'     => $defaultTimeFormat,
+            default    => $modifier ?: $defaultDatetimeFormat,
+        };
 
         if ($relativeDate) {
             $dateTime->modify($relativeDate);

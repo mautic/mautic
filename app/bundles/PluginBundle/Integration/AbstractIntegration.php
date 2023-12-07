@@ -458,16 +458,12 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
      */
     public function getClientIdKey()
     {
-        switch ($this->getAuthenticationType()) {
-            case 'oauth1a':
-                return 'consumer_id';
-            case 'oauth2':
-                return 'client_id';
-            case 'key':
-                return 'key';
-            default:
-                return '';
-        }
+        return match ($this->getAuthenticationType()) {
+            'oauth1a' => 'consumer_id',
+            'oauth2'  => 'client_id',
+            'key'     => 'key',
+            default   => '',
+        };
     }
 
     /**
@@ -477,16 +473,12 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
      */
     public function getClientSecretKey()
     {
-        switch ($this->getAuthenticationType()) {
-            case 'oauth1a':
-                return 'consumer_secret';
-            case 'oauth2':
-                return 'client_secret';
-            case 'basic':
-                return 'password';
-            default:
-                return '';
-        }
+        return match ($this->getAuthenticationType()) {
+            'oauth1a' => 'consumer_secret',
+            'oauth2'  => 'client_secret',
+            'basic'   => 'password',
+            default   => '',
+        };
     }
 
     /**
@@ -506,14 +498,11 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
      */
     public function getAuthTokenKey()
     {
-        switch ($this->getAuthenticationType()) {
-            case 'oauth2':
-                return 'access_token';
-            case 'oauth1a':
-                return 'oauth_token';
-            default:
-                return '';
-        }
+        return match ($this->getAuthenticationType()) {
+            'oauth2'  => 'access_token',
+            'oauth1a' => 'oauth_token',
+            default   => '',
+        };
     }
 
     /**
@@ -533,29 +522,24 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
      */
     public function getRequiredKeyFields()
     {
-        switch ($this->getAuthenticationType()) {
-            case 'oauth1a':
-                return [
-                    'consumer_id'     => 'mautic.integration.keyfield.consumerid',
-                    'consumer_secret' => 'mautic.integration.keyfield.consumersecret',
-                ];
-            case 'oauth2':
-                return [
-                    'client_id'     => 'mautic.integration.keyfield.clientid',
-                    'client_secret' => 'mautic.integration.keyfield.clientsecret',
-                ];
-            case 'key':
-                return [
-                    'key' => 'mautic.integration.keyfield.api',
-                ];
-            case 'basic':
-                return [
-                    'username' => 'mautic.integration.keyfield.username',
-                    'password' => 'mautic.integration.keyfield.password',
-                ];
-            default:
-                return [];
-        }
+        return match ($this->getAuthenticationType()) {
+            'oauth1a' => [
+                'consumer_id'     => 'mautic.integration.keyfield.consumerid',
+                'consumer_secret' => 'mautic.integration.keyfield.consumersecret',
+            ],
+            'oauth2' => [
+                'client_id'     => 'mautic.integration.keyfield.clientid',
+                'client_secret' => 'mautic.integration.keyfield.clientsecret',
+            ],
+            'key' => [
+                'key' => 'mautic.integration.keyfield.api',
+            ],
+            'basic' => [
+                'username' => 'mautic.integration.keyfield.username',
+                'password' => 'mautic.integration.keyfield.password',
+            ],
+            default => [],
+        };
     }
 
     /**

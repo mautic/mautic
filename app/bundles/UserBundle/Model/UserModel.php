@@ -219,19 +219,13 @@ class UserModel extends FormModel
     public function getLookupResults($type, $filter = '', $limit = 10)
     {
         $results = [];
-        switch ($type) {
-            case 'role':
-                $results = $this->em->getRepository(Role::class)->getRoleList($filter, $limit);
-                break;
-            case 'user':
-                $results = $this->em->getRepository(User::class)->getUserList($filter, $limit);
-                break;
-            case 'position':
-                $results = $this->em->getRepository(User::class)->getPositionList($filter, $limit);
-                break;
-        }
 
-        return $results;
+        return match ($type) {
+            'role'     => $this->em->getRepository(Role::class)->getRoleList($filter, $limit),
+            'user'     => $this->em->getRepository(User::class)->getUserList($filter, $limit),
+            'position' => $this->em->getRepository(User::class)->getPositionList($filter, $limit),
+            default    => $results,
+        };
     }
 
     /**

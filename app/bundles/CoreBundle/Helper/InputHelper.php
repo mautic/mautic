@@ -36,18 +36,11 @@ class InputHelper
      */
     public static function boolean($value)
     {
-        // Common strings used that filter_var does not parse yet.
-        switch (strtoupper((string) $value)) {
-            case 'T':
-            case 'Y':
-                return true;
-
-            case 'F':
-            case 'N':
-                return false;
-        }
-
-        return filter_var($value, FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE);
+        return match (strtoupper((string) $value)) {
+            'T', 'Y' => true,
+            'F', 'N' => false,
+            default => filter_var($value, FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE),
+        };
     }
 
     /**
@@ -102,12 +95,10 @@ class InputHelper
             self::$stringFilter = new InputFilter();
         }
 
-        switch (true) {
-            case $html:
-                return ($strict) ? self::$strictHtmlFilter : self::$htmlFilter;
-            default:
-                return self::$stringFilter;
-        }
+        return match (true) {
+            $html   => ($strict) ? self::$strictHtmlFilter : self::$htmlFilter,
+            default => self::$stringFilter,
+        };
     }
 
     /**

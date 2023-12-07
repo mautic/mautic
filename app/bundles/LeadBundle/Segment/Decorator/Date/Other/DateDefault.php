@@ -56,19 +56,13 @@ class DateDefault implements FilterDecoratorInterface
     {
         $filter = $this->originalValue;
 
-        switch ($contactSegmentFilterCrate->getOperator()) {
-            case 'like':
-            case '!like':
-                return !str_contains($filter, '%') ? '%'.$filter.'%' : $filter;
-            case 'contains':
-                return '%'.$filter.'%';
-            case 'startsWith':
-                return $filter.'%';
-            case 'endsWith':
-                return '%'.$filter;
-        }
-
-        return $this->originalValue;
+        return match ($contactSegmentFilterCrate->getOperator()) {
+            'like', '!like' => false === strpos($filter, '%') ? '%'.$filter.'%' : $filter,
+            'contains'   => '%'.$filter.'%',
+            'startsWith' => $filter.'%',
+            'endsWith'   => '%'.$filter,
+            default      => $this->originalValue,
+        };
     }
 
     /**

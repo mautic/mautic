@@ -533,28 +533,13 @@ namespace Mautic\CoreBundle\ErrorHandler {
          */
         private function getErrorName($bit)
         {
-            switch ($bit) {
-                case E_PARSE:
-                    return 'Parse Error';
-
-                case E_ERROR:
-                case E_USER_ERROR:
-                case E_CORE_ERROR:
-                case E_RECOVERABLE_ERROR:
-                    return 'Error';
-
-                case E_WARNING:
-                case E_USER_WARNING:
-                case E_CORE_WARNING:
-                    return 'Warning';
-
-                case E_DEPRECATED:
-                case E_USER_DEPRECATED:
-                    return 'Deprecation';
-
-                default:
-                    return 'Notice';
-            }
+            return match ($bit) {
+                E_PARSE => 'Parse Error',
+                E_ERROR, E_USER_ERROR, E_CORE_ERROR, E_RECOVERABLE_ERROR => 'Error',
+                E_WARNING, E_USER_WARNING, E_CORE_WARNING => 'Warning',
+                E_DEPRECATED, E_USER_DEPRECATED => 'Deprecation',
+                default => 'Notice',
+            };
         }
     }
 }

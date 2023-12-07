@@ -935,14 +935,11 @@ class Mailbox
                     : '';
                 switch ($partStructure->type) {
                     case TYPETEXT:
-                        switch ($subtype) {
-                            case 'plain':
-                                $mail->textPlain .= $data;
-                                break;
-                            case 'html':
-                            default:
-                                $mail->textHtml .= $data;
-                        }
+                        match ($subtype) {
+                            'plain' => $mail->textPlain .= $data,
+                            // no break
+                            default => $mail->textHtml .= $data,
+                        };
                         break;
                     case TYPEMULTIPART:
                         if (

@@ -178,58 +178,40 @@ abstract class AbstractStandardFormController extends AbstractFormController
         }
 
         if ($entity) {
-            switch ($action) {
-                case 'new':
-                    return $this->security->isGranted($this->getPermissionBase().':create');
-                case 'view':
-                case 'index':
-                    return ($entity) ? $this->security->hasEntityAccess(
-                        $this->getPermissionBase().':viewown',
-                        $this->getPermissionBase().':viewother',
-                        $permissionUser
-                    ) : $this->security->isGranted($this->getPermissionBase().':view');
-                case 'clone':
-                    return
-                        $this->security->isGranted($this->getPermissionBase().':create')
-                        && $this->security->hasEntityAccess(
-                            $this->getPermissionBase().':viewown',
-                            $this->getPermissionBase().':viewother',
-                            $permissionUser
-                        );
-                case 'delete':
-                case 'batchDelete':
-                    return $this->security->hasEntityAccess(
-                        $this->getPermissionBase().':deleteown',
-                        $this->getPermissionBase().':deleteother',
-                        $permissionUser
-                    );
-                default:
-                    return $this->security->hasEntityAccess(
-                        $this->getPermissionBase().':'.$action.'own',
-                        $this->getPermissionBase().':'.$action.'other',
-                        $permissionUser
-                    );
-            }
+            return match ($action) {
+                'new' => $this->security->isGranted($this->getPermissionBase().':create'),
+                'view', 'index' => ($entity) ? $this->security->hasEntityAccess(
+                    $this->getPermissionBase().':viewown',
+                    $this->getPermissionBase().':viewother',
+                    $permissionUser
+                ) : $this->security->isGranted($this->getPermissionBase().':view'),
+                'clone' => $this->security->isGranted($this->getPermissionBase().':create')
+                && $this->security->hasEntityAccess(
+                    $this->getPermissionBase().':viewown',
+                    $this->getPermissionBase().':viewother',
+                    $permissionUser
+                ),
+                'delete', 'batchDelete' => $this->security->hasEntityAccess(
+                    $this->getPermissionBase().':deleteown',
+                    $this->getPermissionBase().':deleteother',
+                    $permissionUser
+                ),
+                default => $this->security->hasEntityAccess(
+                    $this->getPermissionBase().':'.$action.'own',
+                    $this->getPermissionBase().':'.$action.'other',
+                    $permissionUser
+                ),
+            };
         } else {
-            switch ($action) {
-                case 'new':
-                    return $this->security->isGranted($this->getPermissionBase().':create');
-                case 'view':
-                case 'index':
-                    return $this->security->isGranted($this->getPermissionBase().':view');
-                case 'clone':
-                    return
-                        $this->security->isGranted($this->getPermissionBase().':create')
-                        && $this->security->isGranted($this->getPermissionBase().':view');
-                case 'delete':
-                case 'batchDelete':
-                    return $this->security->isGranted($this->getPermissionBase().':delete');
-                default:
-                    return $this->security->isGranted($this->getPermissionBase().':'.$action);
-            }
+            return match ($action) {
+                'new' => $this->security->isGranted($this->getPermissionBase().':create'),
+                'view', 'index' => $this->security->isGranted($this->getPermissionBase().':view'),
+                'clone' => $this->security->isGranted($this->getPermissionBase().':create')
+                && $this->security->isGranted($this->getPermissionBase().':view'),
+                'delete', 'batchDelete' => $this->security->isGranted($this->getPermissionBase().':delete'),
+                default => $this->security->isGranted($this->getPermissionBase().':'.$action),
+            };
         }
-
-        return false;
     }
 
     /**

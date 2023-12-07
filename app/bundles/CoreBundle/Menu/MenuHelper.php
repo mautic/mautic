@@ -263,12 +263,10 @@ class MenuHelper
      */
     protected function handleAccessCheck($accessLevel)
     {
-        switch ($accessLevel) {
-            case 'admin':
-                return $this->security->isAdmin();
-            default:
-                return $this->security->isGranted($accessLevel, 'MATCH_ONE');
-        }
+        return match ($accessLevel) {
+            'admin' => $this->security->isAdmin(),
+            default => $this->security->isGranted($accessLevel, 'MATCH_ONE'),
+        };
     }
 
     /**

@@ -40,14 +40,10 @@ class BaseDecorator implements FilterDecoratorInterface
     {
         $operator = $this->contactSegmentFilterOperator->fixOperator($contactSegmentFilterCrate->getOperator());
 
-        switch ($operator) {
-            case 'startsWith':
-            case 'endsWith':
-            case 'contains':
-                return 'like';
-        }
-
-        return $operator;
+        return match ($operator) {
+            'startsWith', 'endsWith', 'contains' => 'like',
+            default => $operator,
+        };
     }
 
     /**
