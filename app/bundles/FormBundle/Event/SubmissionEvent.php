@@ -77,14 +77,11 @@ class SubmissionEvent extends CommonEvent
     private $postSubmitPayload;
 
     /**
-     * @param mixed[]                 $post
+     * @param mixed[]                 $post   raw POST results
      * @param mixed[]|array|ServerBag $server
      */
     public function __construct(
         Submission $submission,
-        /**
-         * Raw POST results.
-         */
         private $post,
         private $server,
         private Request $request

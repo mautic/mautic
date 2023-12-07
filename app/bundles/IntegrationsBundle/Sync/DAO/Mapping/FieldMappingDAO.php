@@ -9,8 +9,6 @@ class FieldMappingDAO
     private bool $isRequired;
 
     /**
-     * FieldMappingDAO constructor.
-     *
      * @param string $internalObject
      * @param string $internalField
      * @param string $integrationObject

@@ -21,8 +21,6 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 /**
  * This class subscribes to events related to building and providing
  * tokens for emails, particularly the IntegrationObjectToken.
- *
- * Class EmailSubscriber
  */
 class EmailSubscriber implements EventSubscriberInterface
 {

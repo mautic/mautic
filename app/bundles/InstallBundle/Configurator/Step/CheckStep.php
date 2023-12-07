@@ -53,9 +53,6 @@ class CheckStep implements StepInterface
      */
     public function __construct(
         Configurator $configurator,
-        /**
-         * Path to the kernel root.
-         */
         private string $projectDir,
         RequestStack $requestStack,
         private OpenSSLCipher $openSSLCipher
