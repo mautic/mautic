@@ -106,7 +106,12 @@ return static function (Rector\Config\RectorConfig $rectorConfig): void {
 
     // Define what single rules will be applied
     $rectorConfig->rules([
+<<<<<<< HEAD
         // \Rector\Php80\Rector\Class_\ClassPropertyAssignToConstructorPromotionRector::class,
+=======
+        \Rector\TypeDeclaration\Rector\ClassMethod\BoolReturnTypeFromStrictScalarReturnsRector::class,
+
+>>>>>>> fcb275e286 ([type-declarations] Add known bool return type declaratoins)
         AddVoidReturnTypeWhereNoReturnRector::class,
         TypedPropertyFromStrictConstructorRector::class,
         TypedPropertyFromStrictSetUpRector::class,

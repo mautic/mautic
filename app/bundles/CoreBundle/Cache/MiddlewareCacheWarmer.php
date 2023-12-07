@@ -34,7 +34,7 @@ class MiddlewareCacheWarmer implements CacheWarmerInterface
         return [];
     }
 
-    public function isOptional()
+    public function isOptional(): bool
     {
         return false;
     }
