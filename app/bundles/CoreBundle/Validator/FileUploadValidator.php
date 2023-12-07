@@ -8,12 +8,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class FileUploadValidator
 {
-    public function __construct(
-        /**
-         * @param TranslatorInterface $translator
-         */
-        protected TranslatorInterface $translator
-    ) {
+    public function __construct(protected TranslatorInterface $translator) {
     }
 
     /**
