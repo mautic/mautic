@@ -21,11 +21,10 @@ class UserController extends FormController
     /**
      * Generate's default user list.
      *
-     * @param int $page
      *
      * @return \Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\Response
      */
-    public function indexAction(Request $request, PageHelperFactoryInterface $pageHelperFactory, $page = 1)
+    public function indexAction(Request $request, PageHelperFactoryInterface $pageHelperFactory, int $page = 1)
     {
         if (!$this->security->isGranted('user:users:view')) {
             return $this->accessDenied();

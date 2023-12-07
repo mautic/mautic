@@ -470,7 +470,7 @@ class SubmissionModel extends CommonFormModel
      *
      * @throws \Exception
      */
-    public function exportResults($format, $form, $queryArgs)
+    public function exportResults($format, \Mautic\FormBundle\Entity\Form $form, array $queryArgs)
     {
         $viewOnlyFields              = $this->formModel->getCustomComponents()['viewOnlyFields'];
         $queryArgs['viewOnlyFields'] = $viewOnlyFields;
@@ -581,7 +581,7 @@ class SubmissionModel extends CommonFormModel
      *
      * @throws \Exception
      */
-    public function exportResultsForPage($format, $page, $queryArgs)
+    public function exportResultsForPage($format, $page, array $queryArgs)
     {
         $results    = $this->getEntitiesByPage($queryArgs);
         $results    = $results['results'];
@@ -946,7 +946,7 @@ class SubmissionModel extends CommonFormModel
         $uniqueLeadFields = $this->leadFieldModel->getUniqueIdentifierFields();
 
         // Closure to get data and unique fields
-        $getData = function ($currentFields, $uniqueOnly = false) use ($leadFields, $uniqueLeadFields) {
+        $getData = function ($currentFields, $uniqueOnly = false) use ($leadFields, $uniqueLeadFields): array {
             $uniqueFieldsWithData = $data = [];
             foreach ($leadFields as $alias => $properties) {
                 if (isset($currentFields[$alias])) {

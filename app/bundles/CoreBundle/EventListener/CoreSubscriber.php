@@ -262,7 +262,7 @@ class CoreSubscriber implements EventSubscriberInterface
         }
     }
 
-    private function addRouteToCollection(RouteCollection $collection, $type, $name, $details): void
+    private function addRouteToCollection(RouteCollection $collection, $type, string $name, $details): void
     {
         // Set defaults and controller
         $defaults = (!empty($details['defaults'])) ? $details['defaults'] : [];

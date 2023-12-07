@@ -45,7 +45,7 @@ class DateTimeHelper
      * @param string                    $fromFormat Format the string is in
      * @param string                    $timezone   Timezone the string is in
      */
-    public function __construct($string = '', $fromFormat = self::FORMAT_DB, $timezone = 'UTC')
+    public function __construct($string = '', ?string $fromFormat = self::FORMAT_DB, string $timezone = 'UTC')
     {
         $this->setDefaultTimezone();
         $this->setDateTime($string, $fromFormat, $timezone);

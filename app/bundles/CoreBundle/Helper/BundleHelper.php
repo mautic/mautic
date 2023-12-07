@@ -23,7 +23,7 @@ class BundleHelper
      *
      * @return mixed
      */
-    public function getMauticBundles($includePlugins = true)
+    public function getMauticBundles($includePlugins = true): array
     {
         return $includePlugins ? $this->allBundles : $this->coreBundles;
     }

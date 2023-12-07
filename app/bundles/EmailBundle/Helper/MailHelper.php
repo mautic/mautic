@@ -698,12 +698,9 @@ class MailHelper
     /**
      * Add an attachment to email.
      *
-     * @param string $filePath
-     * @param string $fileName
-     * @param string $contentType
      * @param bool   $inline
      */
-    public function attachFile($filePath, $fileName = null, $contentType = null, $inline = false): void
+    public function attachFile(string $filePath, string $fileName = null, string $contentType = null, $inline = false): void
     {
         if (true === $inline) {
             $this->message->embedFromPath($filePath, $fileName, $contentType);
@@ -738,13 +735,11 @@ class MailHelper
      * Use a template as the body.
      *
      * @param string $template
-     * @param array  $vars
      * @param bool   $returnContent
      * @param null   $charset
-     *
      * @return void|string
      */
-    public function setTemplate($template, $vars = [], $returnContent = false, $charset = null)
+    public function setTemplate($template, array $vars = [], $returnContent = false, $charset = null)
     {
         if (null == $this->twig) {
             $this->twig = $this->factory->getTwig();

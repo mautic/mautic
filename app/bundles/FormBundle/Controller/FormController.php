@@ -48,11 +48,9 @@ class FormController extends CommonFormController
     }
 
     /**
-     * @param int $page
-     *
      * @return \Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|Response
      */
-    public function indexAction(Request $request, PageHelperFactoryInterface $pageHelperFactory, $page = 1)
+    public function indexAction(Request $request, PageHelperFactoryInterface $pageHelperFactory, int $page = 1)
     {
         // set some permissions
         $permissions = $this->security->isGranted(

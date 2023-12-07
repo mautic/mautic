@@ -464,10 +464,8 @@ class CampaignModel extends CommonFormModel
      *
      * @param string $sourceType
      * @param bool   $globalOnly
-     *
-     * @return array
      */
-    public function getSourceLists($sourceType = null, $globalOnly = false)
+    public function getSourceLists($sourceType = null, $globalOnly = false): array
     {
         $choices = [];
         switch ($sourceType) {

@@ -77,7 +77,7 @@ class TranslationLoader extends ArrayLoader implements LoaderInterface
      *
      * @throws \Exception
      */
-    private function loadTranslations($catalogue, $locale, $file)
+    private function loadTranslations($catalogue, string $locale, $file)
     {
         $iniFile  = $file->getRealpath();
         $content  = file_get_contents($iniFile);

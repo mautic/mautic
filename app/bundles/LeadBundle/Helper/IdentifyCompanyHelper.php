@@ -9,10 +9,9 @@ use Mautic\LeadBundle\Model\CompanyModel;
 class IdentifyCompanyHelper
 {
     /**
-     * @param array $data
      * @param mixed $lead
      */
-    public static function identifyLeadsCompany($data, $lead, CompanyModel $companyModel): array
+    public static function identifyLeadsCompany(array $data, $lead, CompanyModel $companyModel): array
     {
         $addContactToCompany = true;
 
@@ -90,7 +89,7 @@ class IdentifyCompanyHelper
         return false;
     }
 
-    private static function normalizeParameters(array $parameters)
+    private static function normalizeParameters(array $parameters): array
     {
         if (isset($parameters['company'])) {
             $parameters['companyname'] = filter_var($parameters['company']);

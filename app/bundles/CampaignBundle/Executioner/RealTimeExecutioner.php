@@ -145,7 +145,7 @@ class RealTimeExecutioner
      * @throws DecisionNotApplicableException
      * @throws Exception\CannotProcessEventException
      */
-    private function evaluateDecisionForContact(Event $event, $passthrough = null, $channel = null, $channelId = null): void
+    private function evaluateDecisionForContact(Event $event, $passthrough = null, ?string $channel = null, ?int $channelId = null): void
     {
         $this->logger->debug('CAMPAIGN: Executing '.$event->getType().' ID '.$event->getId().' for contact ID '.$this->contact->getId());
 

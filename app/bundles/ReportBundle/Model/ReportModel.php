@@ -255,10 +255,8 @@ class ReportModel extends FormModel
 
     /**
      * Prevent same aliases using numeric suffixes for each alias.
-     *
-     * @return array
      */
-    private function preventSameAliases(array $columns)
+    private function preventSameAliases(array $columns): array
     {
         $existingAliases = [];
 

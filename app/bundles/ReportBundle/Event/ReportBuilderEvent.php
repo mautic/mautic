@@ -128,11 +128,10 @@ class ReportBuilderEvent extends AbstractReportEvent
     /**
      * Returns standard form fields such as id, name, publish_up, etc.
      *
-     * @param string $prefix
      *
      * @return array<string,array<string,string>>
      */
-    public function getStandardColumns($prefix, $removeColumns = [], $idLink = null)
+    public function getStandardColumns(string $prefix, array $removeColumns = [], $idLink = null)
     {
         return $this->reportHelper->getStandardColumns($prefix, $removeColumns, (string) $idLink);
     }

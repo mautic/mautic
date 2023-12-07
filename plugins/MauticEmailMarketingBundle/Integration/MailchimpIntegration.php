@@ -27,7 +27,7 @@ class MailchimpIntegration extends EmailAbstractIntegration
     /**
      * {@inheritdoc}
      */
-    public function getAuthenticationType()
+    public function getAuthenticationType(): string
     {
         return (empty($this->keys['client_id'])) ? 'basic' : 'oauth2';
     }

@@ -42,12 +42,10 @@ final class DateHelper
     /**
      * @param string           $type
      * @param \DateTime|string $datetime
-     * @param string           $timezone
      * @param string           $fromFormat
-     *
      * @return string
      */
-    private function format($type, $datetime, $timezone, $fromFormat)
+    private function format($type, $datetime, string $timezone, ?string $fromFormat)
     {
         if (empty($datetime)) {
             return '';
@@ -78,12 +76,10 @@ final class DateHelper
      * Returns date and time concat eg 2014-08-02 5:00am.
      *
      * @param \DateTime|string $datetime
-     * @param string           $timezone
      * @param string           $fromFormat
-     *
      * @return string
      */
-    public function toFullConcat($datetime, $timezone = 'local', $fromFormat = 'Y-m-d H:i:s')
+    public function toFullConcat($datetime, string $timezone = 'local', ?string $fromFormat = 'Y-m-d H:i:s')
     {
         $this->helper->setDateTime($datetime, $fromFormat, $timezone);
 
@@ -138,11 +134,10 @@ final class DateHelper
      * Returns date/time like Today, 10:00 AM.
      *
      * @param string|int<min, -1>|int<1, max>|\DateTime $datetime
-     * @param string                                    $timezone
      * @param string                                    $fromFormat
      * @param bool                                      $forceDateForNonText If true, return as full date/time rather than "29 days ago"
      */
-    public function toText($datetime, $timezone = 'local', $fromFormat = 'Y-m-d H:i:s', $forceDateForNonText = false): string
+    public function toText($datetime, string $timezone = 'local', ?string $fromFormat = 'Y-m-d H:i:s', $forceDateForNonText = false): string
     {
         if (empty($datetime)) {
             return '';

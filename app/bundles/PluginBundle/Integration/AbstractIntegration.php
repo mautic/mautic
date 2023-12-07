@@ -2160,7 +2160,7 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
      *
      * @return array
      */
-    protected function dispatchIntegrationKeyEvent($eventName, $keys = [])
+    protected function dispatchIntegrationKeyEvent(string $eventName, $keys = [])
     {
         /** @var PluginIntegrationKeyEvent $event */
         $event = $this->dispatcher->dispatch(

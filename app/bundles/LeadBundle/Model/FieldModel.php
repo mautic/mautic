@@ -817,11 +817,10 @@ class FieldModel extends FormModel
      *
      * @param bool|true $byGroup
      * @param bool|true $alphabetical
-     * @param array     $filters
      *
      * @return array
      */
-    public function getFieldList($byGroup = true, $alphabetical = true, $filters = ['isPublished' => true, 'object' => 'lead'])
+    public function getFieldList(bool $byGroup = true, bool $alphabetical = true, array $filters = ['isPublished' => true, 'object' => 'lead'])
     {
         return $this->fieldList->getFieldList($byGroup, $alphabetical, $filters);
     }
@@ -949,11 +948,10 @@ class FieldModel extends FormModel
      *
      * @deprecated Use FieldsWithUniqueIdentifier::getFieldsWithUniqueIdentifier method instead
      *
-     * @param array $filters
      *
      * @return mixed
      */
-    public function getUniqueIdentifierFields($filters = [])
+    public function getUniqueIdentifierFields(array $filters = [])
     {
         return $this->fieldsWithUniqueIdentifier->getFieldsWithUniqueIdentifier($filters);
     }
@@ -965,11 +963,10 @@ class FieldModel extends FormModel
      *
      * @deprecated Use SchemaDefinition::getSchemaDefinition method instead
      *
-     * @param bool $isUnique
      *
      * @return array
      */
-    public static function getSchemaDefinition($alias, $type, $isUnique = false)
+    public static function getSchemaDefinition(string $alias, string $type, bool $isUnique = false)
     {
         return SchemaDefinition::getSchemaDefinition($alias, $type, $isUnique);
     }

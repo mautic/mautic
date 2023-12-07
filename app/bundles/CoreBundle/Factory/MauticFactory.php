@@ -38,7 +38,7 @@ class MauticFactory
      *
      * @throws \InvalidArgumentException
      */
-    public function getModel($modelNameKey)
+    public function getModel(string $modelNameKey)
     {
         return $this->modelFactory->getModel($modelNameKey);
     }
@@ -401,7 +401,7 @@ class MauticFactory
     /**
      * @return bool
      */
-    public function serviceExists($service)
+    public function serviceExists(string $service)
     {
         return $this->container->has($service);
     }

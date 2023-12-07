@@ -45,11 +45,10 @@ class FileUploadValidator
 
     /**
      * @param string $extension
-     * @param string $extensionErrorMsg
      *
      * @throws FileInvalidException
      */
-    public function checkExtension($extension, array $allowedExtensions, $extensionErrorMsg)
+    public function checkExtension($extension, array $allowedExtensions, string $extensionErrorMsg)
     {
         if (!in_array(strtolower($extension), array_map('strtolower', $allowedExtensions), true)) {
             $error = $this->translator->trans($extensionErrorMsg, [
@@ -64,11 +63,10 @@ class FileUploadValidator
     /**
      * @param int    $fileSize
      * @param string $maxUploadSizeMB Max file size in MB
-     * @param string $sizeErrorMsg
      *
      * @throws FileInvalidException
      */
-    public function checkFileSize($fileSize, $maxUploadSizeMB, $sizeErrorMsg)
+    public function checkFileSize($fileSize, $maxUploadSizeMB, string $sizeErrorMsg)
     {
         if (!$maxUploadSizeMB) {
             return;

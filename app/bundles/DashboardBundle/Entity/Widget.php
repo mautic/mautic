@@ -118,11 +118,10 @@ class Widget extends FormEntity
     /**
      * Set name.
      *
-     * @param string $name
      *
      * @return Widget
      */
-    public function setName($name)
+    public function setName(string $name)
     {
         $this->name = InputHelper::string($name);
         $this->isChanged('name', $this->name);
@@ -143,11 +142,10 @@ class Widget extends FormEntity
     /**
      * Set type.
      *
-     * @param string $type
      *
      * @return Widget
      */
-    public function setType($type)
+    public function setType(string $type)
     {
         $this->type = InputHelper::string($type);
         $this->isChanged('type', $this->type);

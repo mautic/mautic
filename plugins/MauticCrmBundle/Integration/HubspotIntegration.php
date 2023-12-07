@@ -149,10 +149,8 @@ class HubspotIntegration extends CrmAbstractIntegration
 
     /**
      * {@inheritdoc}
-     *
-     * @return string
      */
-    public function getAuthenticationType()
+    public function getAuthenticationType(): string
     {
         return $this->getBearerToken() ? 'oauth2' : 'key';
     }

@@ -778,7 +778,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
      *
      * @return array
      */
-    public function getEmailDeviceStats($email, $includeVariants = false, $dateFrom = null, $dateTo = null)
+    public function getEmailDeviceStats($email, $includeVariants = false, \DateTime $dateFrom = null, \DateTime $dateTo = null)
     {
         if (!$email instanceof Email) {
             $email = $this->getEntity($email);
@@ -2014,7 +2014,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
      *
      * @return array
      */
-    public function getDeviceGranularityPieChartData($dateFrom, $dateTo)
+    public function getDeviceGranularityPieChartData(\DateTime $dateFrom, \DateTime $dateTo)
     {
         $chart = new PieChart();
 
@@ -2199,16 +2199,14 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
     /**
      * Send an email to lead(s).
      *
-     * @param array                   $tokens
      * @param array                   $assetAttachments
      * @param array<string>|Lead|null $leadFields
      * @param bool                    $saveStat
      *
      * @return bool|string[]
-     *
      * @throws \Doctrine\ORM\ORMException
      */
-    public function sendSampleEmailToUser($email, $users, $leadFields = null, $tokens = [], $assetAttachments = [], $saveStat = true)
+    public function sendSampleEmailToUser($email, $users, $leadFields = null, array $tokens = [], $assetAttachments = [], $saveStat = true)
     {
         if (!$emailId = $email->getId()) {
             return false;

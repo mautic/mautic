@@ -129,7 +129,7 @@ final class AssetsHelper
      *
      * @return string
      */
-    public function getUrl($path, $packageName = null, $version = null, $absolute = false, $ignorePrefix = false)
+    public function getUrl($path, string $packageName = null, string $version = null, $absolute = false, $ignorePrefix = false)
     {
         // if we have http in the url it is absolute and we can just return it
         if (0 === strpos($path, 'http')) {

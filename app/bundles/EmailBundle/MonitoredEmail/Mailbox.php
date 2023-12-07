@@ -507,7 +507,7 @@ class Mailbox
      *
      * @return array Mails ids
      */
-    public function searchMailbox($criteria = self::CRITERIA_ALL)
+    public function searchMailbox($criteria = self::CRITERIA_ALL): array
     {
         if (preg_match('/'.self::CRITERIA_UID.' ((\d+):(\d+|\*))/', $criteria, $matches)) {
             // PHP imap_search does not support UID n:* so use imap_fetch_overview instead

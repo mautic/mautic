@@ -21,11 +21,9 @@ use Symfony\Component\HttpFoundation\ResponseHeaderBag;
 class ReportController extends FormController
 {
     /**
-     * @param int $page
-     *
      * @return HttpFoundation\JsonResponse|HttpFoundation\RedirectResponse|HttpFoundation\Response
      */
-    public function indexAction(Request $request, PageHelperFactoryInterface $pageHelperFactory, $page = 1)
+    public function indexAction(Request $request, PageHelperFactoryInterface $pageHelperFactory, int $page = 1)
     {
         /* @type \Mautic\ReportBundle\Model\ReportModel $model */
         $model = $this->getModel('report');
@@ -157,7 +155,7 @@ class ReportController extends FormController
      *
      * @return array<string, string|array<string, string>>|bool|HttpFoundation\JsonResponse|HttpFoundation\RedirectResponse|HttpFoundation\Response
      */
-    public function deleteAction(Request $request, $objectId)
+    public function deleteAction(Request $request, int $objectId)
     {
         $page      = $request->getSession()->get('mautic.report.page', 1);
         $returnUrl = $this->generateUrl('mautic_report_index', ['page' => $page]);
@@ -296,7 +294,7 @@ class ReportController extends FormController
      *
      * @return HttpFoundation\JsonResponse|HttpFoundation\RedirectResponse|HttpFoundation\Response
      */
-    public function editAction(Request $request, $objectId, $ignorePost = false)
+    public function editAction(Request $request, int $objectId, $ignorePost = false)
     {
         $model = $this->getModel('report');
         \assert($model instanceof ReportModel);

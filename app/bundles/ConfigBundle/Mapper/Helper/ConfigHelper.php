@@ -8,10 +8,8 @@ class ConfigHelper
      * Map local config values with form fields.
      *
      * @param mixed $defaults
-     *
-     * @return array
      */
-    public static function bindNestedConfigValues(array $configValues, $defaults)
+    public static function bindNestedConfigValues(array $configValues, $defaults): array
     {
         if (!is_array($defaults)) {
             // Return all config values

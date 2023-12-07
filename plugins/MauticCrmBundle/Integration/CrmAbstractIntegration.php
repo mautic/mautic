@@ -488,7 +488,7 @@ abstract class CrmAbstractIntegration extends AbstractIntegration
      *
      * @return array
      */
-    protected function getPriorityFieldsForMautic($config, $entityObject = null, $priorityObject = 'mautic')
+    protected function getPriorityFieldsForMautic(array $config, $entityObject = null, $priorityObject = 'mautic')
     {
         return $this->cleanPriorityFields(
             $this->getFieldsByPriority($config, $priorityObject, 1),
@@ -502,7 +502,7 @@ abstract class CrmAbstractIntegration extends AbstractIntegration
      *
      * @return array
      */
-    protected function getPriorityFieldsForIntegration($config, $entityObject = null, $priorityObject = 'mautic')
+    protected function getPriorityFieldsForIntegration(array $config, $entityObject = null, $priorityObject = 'mautic')
     {
         return $this->cleanPriorityFields(
             $this->getFieldsByPriority($config, $priorityObject, 0),

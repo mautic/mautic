@@ -35,11 +35,10 @@ class ClientController extends FormController
     /**
      * Generate's default client list.
      *
-     * @param int $page
      *
      * @return Response
      */
-    public function indexAction(Request $request, PageHelperFactoryInterface $pageHelperFactory, $page = 1)
+    public function indexAction(Request $request, PageHelperFactoryInterface $pageHelperFactory, int $page = 1)
     {
         if (!$this->security->isGranted('api:clients:view')) {
             return $this->accessDenied();

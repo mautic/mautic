@@ -326,10 +326,7 @@ class MessageQueueModel extends FormModel
         $this->reschedule($message, new \DateInterval($rescheduleInterval), $leadId, $channel, $channelId, $persist);
     }
 
-    /**
-     * @param array $channelIds
-     */
-    public function getQueuedChannelCount($channel, $channelIds = [])
+    public function getQueuedChannelCount($channel, array $channelIds = [])
     {
         return $this->getRepository()->getQueuedChannelCount($channel, $channelIds);
     }

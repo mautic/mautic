@@ -138,10 +138,8 @@ class SugarcrmIntegration extends CrmAbstractIntegration
 
     /**
      * Get the array key for the auth token.
-     *
-     * @return string
      */
-    public function getAuthTokenKey()
+    public function getAuthTokenKey(): string
     {
         return (isset($this->keys['version']) && '6' == $this->keys['version']) ? 'id' : 'access_token';
     }
@@ -638,10 +636,8 @@ class SugarcrmIntegration extends CrmAbstractIntegration
 
     /**
      * {@inheritdoc}
-     *
-     * @return string
      */
-    public function getAuthenticationType()
+    public function getAuthenticationType(): string
     {
         return (isset($this->keys['version']) && '6' == $this->keys['version']) ? 'rest' : 'oauth2';
     }
@@ -1223,11 +1219,9 @@ class SugarcrmIntegration extends CrmAbstractIntegration
     }
 
     /**
-     * @param array $params
-     *
      * @return mixed
      */
-    public function pushLeads($params = [])
+    public function pushLeads(array $params = [])
     {
         list($fromDate, $toDate) = $this->getSyncTimeframeDates($params);
         $limit                   = $params['limit'];

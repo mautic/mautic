@@ -571,9 +571,8 @@ class ChartQuery extends AbstractChart
 
     /**
      * @param string $tablePrefix
-     * @param string $column
      */
-    private function getDateConstruct($tablePrefix, $column): string
+    private function getDateConstruct($tablePrefix, string $column): string
     {
         if ($this->generatedColumnProvider) {
             $generatedColumns = $this->generatedColumnProvider->getGeneratedColumns();

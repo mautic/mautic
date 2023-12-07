@@ -68,11 +68,10 @@ final class SecurityHelper
     /**
      * Returns CSRF token string for an intention.
      *
-     * @param string $intention
      *
      * @return string
      */
-    public function getCsrfToken($intention)
+    public function getCsrfToken(string $intention)
     {
         return $this->tokenManager->getToken($intention)->getValue();
     }

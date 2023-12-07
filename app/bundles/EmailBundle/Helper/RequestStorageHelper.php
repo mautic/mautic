@@ -27,10 +27,8 @@ class RequestStorageHelper
 
     /**
      * Stores the request content into cache and returns the unique key under which it's stored.
-     *
-     * @param string $transportName
      */
-    public function storeRequest($transportName, Request $request): string
+    public function storeRequest(string $transportName, Request $request): string
     {
         $key  = $this->getUniqueCacheHash($transportName);
         $item = $this->cacheStorage->getItem($key);
@@ -65,10 +63,7 @@ class RequestStorageHelper
         return new Request([], $item->get());
     }
 
-    /**
-     * @param string $key
-     */
-    public function deleteCachedRequest($key): void
+    public function deleteCachedRequest(string $key): void
     {
         $this->cacheStorage->deleteItem($this->removeCachePrefix($key));
     }

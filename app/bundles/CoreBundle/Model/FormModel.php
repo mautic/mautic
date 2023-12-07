@@ -116,7 +116,7 @@ class FormModel extends AbstractCommonModel
      *
      * @param bool $unlock
      */
-    public function saveAndDetachEntity($entity, $unlock = true): void
+    public function saveAndDetachEntity(object $entity, $unlock = true): void
     {
         $this->saveEntity($entity, $unlock);
 
@@ -346,7 +346,7 @@ class FormModel extends AbstractCommonModel
      *
      * @return Event|null
      */
-    protected function dispatchEvent($action, &$entity, $isNew = false, Event $event = null)
+    protected function dispatchEvent($action, &$entity, $isNew = false, Event $event = null): Event
     {
         // ...
 

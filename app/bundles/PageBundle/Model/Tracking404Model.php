@@ -19,7 +19,7 @@ class Tracking404Model
      *
      * @throws \Exception
      */
-    public function hitPage($entity, Request $request): void
+    public function hitPage(\Mautic\PageBundle\Entity\Redirect|\Mautic\PageBundle\Entity\Page|null $entity, Request $request): void
     {
         $this->pageModel->hitPage($entity, $request, 404);
     }

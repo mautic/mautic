@@ -65,7 +65,7 @@ class DynamicListType extends AbstractType
                         },
                     ],
 
-                    'constraints'    => function (Options $options) {
+                    'constraints'    => function (Options $options): array {
                         return ($options['option_notblank']) ? [
                             new NotBlank(
                                 ['message' => 'mautic.form.lists.notblank']
@@ -77,7 +77,7 @@ class DynamicListType extends AbstractType
                 'allow_add'       => true,
                 'allow_delete'    => true,
                 'prototype'       => true,
-                'constraints'     => function (Options $options) {
+                'constraints'     => function (Options $options): array {
                     return ($options['option_required']) ? [
                         new Count(
                             [

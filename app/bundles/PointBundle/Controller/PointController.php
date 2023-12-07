@@ -14,11 +14,9 @@ use Symfony\Component\HttpFoundation\Response;
 class PointController extends AbstractFormController
 {
     /**
-     * @param int $page
-     *
      * @return JsonResponse|Response
      */
-    public function indexAction(Request $request, PageHelperFactoryInterface $pageHelperFactory, $page = 1)
+    public function indexAction(Request $request, PageHelperFactoryInterface $pageHelperFactory, int $page = 1)
     {
         // set some permissions
         $permissions = $this->security->isGranted([

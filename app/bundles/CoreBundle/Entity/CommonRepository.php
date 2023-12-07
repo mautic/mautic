@@ -96,10 +96,8 @@ class CommonRepository extends ServiceEntityRepository
      * Examines the arguments passed to getEntities and converts ORM properties to dBAL column names.
      *
      * @param string $entityClass
-     *
-     * @return array
      */
-    public function convertOrmProperties($entityClass, array $args)
+    public function convertOrmProperties($entityClass, array $args): array
     {
         $properties = $this->getBaseColumns($entityClass);
 
@@ -195,10 +193,9 @@ class CommonRepository extends ServiceEntityRepository
     /**
      * Delete an entity through the repository.
      *
-     * @param object $entity
      * @param bool   $flush  true by default; use false if persisting in batches
      */
-    public function deleteEntity($entity, $flush = true): void
+    public function deleteEntity(object $entity, $flush = true): void
     {
         // delete entity
         $this->_em->remove($entity);
@@ -218,7 +215,7 @@ class CommonRepository extends ServiceEntityRepository
     /**
      * @param mixed $entity
      */
-    public function detachEntity($entity): void
+    public function detachEntity(object $entity): void
     {
         $this->getEntityManager()->detach($entity);
     }
@@ -798,10 +795,9 @@ class CommonRepository extends ServiceEntityRepository
     /**
      * Save an entity through the repository.
      *
-     * @param object $entity
      * @param bool   $flush  true by default; use false if persisting in batches
      */
-    public function saveEntity($entity, $flush = true): void
+    public function saveEntity(object $entity, $flush = true): void
     {
         $this->getEntityManager()->persist($entity);
 
@@ -934,11 +930,10 @@ class CommonRepository extends ServiceEntityRepository
      *
      * @param array $clause ['expr' => 'expression', 'col' => 'DB column', 'val' => 'value to search for']
      *
-     * @return array
      *
      * @throws \InvalidArgumentException
      */
-    protected function validateWhereClause(array $clause)
+    protected function validateWhereClause(array $clause): array
     {
         $msg = '"%s" is missing in the where clause array.';
         if (empty($clause['expr'])) {
@@ -1759,12 +1754,10 @@ class CommonRepository extends ServiceEntityRepository
     /**
      * Sanitizes a string to alphanum plus characters in the second argument.
      *
-     * @param string $sqlAttr
-     * @param array  $allowedCharacters
      *
      * @return string
      */
-    protected function sanitize($sqlAttr, $allowedCharacters = [])
+    protected function sanitize(string $sqlAttr, array $allowedCharacters = [])
     {
         return InputHelper::alphanum($sqlAttr, false, null, $allowedCharacters);
     }

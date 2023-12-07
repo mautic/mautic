@@ -449,10 +449,8 @@ class ImportModel extends FormModel
 
     /**
      * Save log about errored line.
-     *
-     * @param string $errorMessage
      */
-    public function logImportRowError(LeadEventLog $eventLog, $errorMessage): void
+    public function logImportRowError(LeadEventLog $eventLog, string $errorMessage): void
     {
         $eventLog->addProperty('error', $this->translator->trans($errorMessage))
             ->setAction('failed');

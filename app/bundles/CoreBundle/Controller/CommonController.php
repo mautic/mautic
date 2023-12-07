@@ -80,11 +80,10 @@ class CommonController extends AbstractController implements MauticController
     /**
      * Get a model instance from the service container.
      *
-     * @param string $modelNameKey
      *
      * @return AbstractCommonModel<object>
      */
-    protected function getModel($modelNameKey)
+    protected function getModel(string $modelNameKey)
     {
         return $this->modelFactory->getModel($modelNameKey);
     }
@@ -176,7 +175,7 @@ class CommonController extends AbstractController implements MauticController
      *
      * @return JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse
      */
-    public function delegateRedirect($url)
+    public function delegateRedirect(string $url)
     {
         $request = $this->getCurrentRequest();
 
@@ -428,7 +427,7 @@ class CommonController extends AbstractController implements MauticController
      *
      * @throws AccessDeniedHttpException
      */
-    public function accessDenied($batch = false, $msg = 'mautic.core.url.error.401')
+    public function accessDenied($batch = false, string $msg = 'mautic.core.url.error.401')
     {
         $request = $this->getCurrentRequest();
 
@@ -449,11 +448,10 @@ class CommonController extends AbstractController implements MauticController
     /**
      * Generate 404 not found message.
      *
-     * @param string $msg
      *
      * @return Response
      */
-    public function notFound($msg = 'mautic.core.url.error.404')
+    public function notFound(string $msg = 'mautic.core.url.error.404')
     {
         $request = $this->getCurrentRequest();
 
@@ -483,11 +481,10 @@ class CommonController extends AbstractController implements MauticController
     /**
      * Returns a json encoded access denied error for modal windows.
      *
-     * @param string $msg
      *
      * @return JsonResponse
      */
-    public function modalAccessDenied($msg = 'mautic.core.error.accessdenied')
+    public function modalAccessDenied(string $msg = 'mautic.core.error.accessdenied')
     {
         return new JsonResponse([
             'error' => $this->translator->trans($msg, [], 'flashes'),
@@ -606,13 +603,12 @@ class CommonController extends AbstractController implements MauticController
     }
 
     /**
-     * @param string       $message
      * @param array<mixed> $messageVars
      * @param string|null  $level
      * @param string|null  $domain
      * @param bool|null    $addNotification
      */
-    public function addFlashMessage($message, $messageVars = [], $level = FlashBag::LEVEL_NOTICE, $domain = 'flashes', $addNotification = false): void
+    public function addFlashMessage(string $message, $messageVars = [], string $level = FlashBag::LEVEL_NOTICE, $domain = 'flashes', $addNotification = false): void
     {
         $this->flashBag->add($message, $messageVars, $level, $domain, $addNotification);
     }

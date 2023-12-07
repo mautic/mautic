@@ -20,11 +20,9 @@ class ConfigMapper
     }
 
     /**
-     * @return array
-     *
      * @throws BadFormConfigException
      */
-    public function bindFormConfigsWithRealValues(array $forms)
+    public function bindFormConfigsWithRealValues(array $forms): array
     {
         foreach ($forms as $bundle => $config) {
             if (!isset($config['parameters'])) {

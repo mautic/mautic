@@ -134,13 +134,11 @@ abstract class AbstractCommonModel implements MauticModelInterface
     }
 
     /**
-     * @param array $routeParams
      * @param bool  $absolute
      * @param array $clickthrough
-     *
      * @return string
      */
-    public function buildUrl($route, $routeParams = [], $absolute = true, $clickthrough = [])
+    public function buildUrl(string $route, array $routeParams = [], $absolute = true, $clickthrough = [])
     {
         $referenceType = ($absolute) ? UrlGeneratorInterface::ABSOLUTE_URL : UrlGeneratorInterface::ABSOLUTE_PATH;
         $url           = $this->router->generate($route, $routeParams, $referenceType);

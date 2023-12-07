@@ -86,7 +86,7 @@ class CustomFieldHelper
     /**
      * Transform all fields values.
      */
-    public static function fieldsValuesTransformer(array $fields, array $values)
+    public static function fieldsValuesTransformer(array $fields, array $values): array
     {
         foreach ($values as $alias => &$value) {
             if (!empty($fields[$alias])) {

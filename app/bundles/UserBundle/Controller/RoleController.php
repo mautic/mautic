@@ -15,11 +15,10 @@ class RoleController extends FormController
     /**
      * Generate's default role list view.
      *
-     * @param int $page
      *
      * @return \Symfony\Component\HttpFoundation\Response
      */
-    public function indexAction(Request $request, PageHelperFactoryInterface $pageHelperFactory, $page = 1)
+    public function indexAction(Request $request, PageHelperFactoryInterface $pageHelperFactory, int $page = 1)
     {
         if (!$this->security->isGranted('user:roles:view')) {
             return $this->accessDenied();

@@ -849,10 +849,8 @@ class FormModel extends CommonFormModel
 
     /**
      * @param null $operator
-     *
-     * @return array
      */
-    public function getFilterExpressionFunctions($operator = null)
+    public function getFilterExpressionFunctions($operator = null): array
     {
         $operatorOptions = [
             '=' => [
