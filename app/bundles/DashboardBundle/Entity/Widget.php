@@ -118,7 +118,6 @@ class Widget extends FormEntity
     /**
      * Set name.
      *
-     *
      * @return Widget
      */
     public function setName(string $name)
@@ -141,7 +140,6 @@ class Widget extends FormEntity
 
     /**
      * Set type.
-     *
      *
      * @return Widget
      */

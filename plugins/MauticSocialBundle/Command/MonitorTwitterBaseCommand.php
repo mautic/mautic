@@ -203,10 +203,9 @@ abstract class MonitorTwitterBaseCommand extends Command
      * @Note: Keeping this method here instead of in the twitterCommandHelper
      *        so that the hashtag and mention commands can easily extend it.
      *
-     *
      * @return bool
      */
-    protected function processMonitor(\MauticPlugin\MauticSocialBundle\Entity\Monitoring $monitor)
+    protected function processMonitor(Monitoring $monitor)
     {
         $results = $this->getTweets($monitor);
 

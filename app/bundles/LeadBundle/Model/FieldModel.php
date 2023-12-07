@@ -780,7 +780,7 @@ class FieldModel extends FormModel
      *
      * @throws \Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException
      */
-    protected function dispatchEvent($action, &$entity, $isNew = false, Event $event = null)
+    protected function dispatchEvent($action, &$entity, $isNew = false, Event $event = null): ?Event
     {
         switch ($action) {
             case 'pre_save':
@@ -948,7 +948,6 @@ class FieldModel extends FormModel
      *
      * @deprecated Use FieldsWithUniqueIdentifier::getFieldsWithUniqueIdentifier method instead
      *
-     *
      * @return mixed
      */
     public function getUniqueIdentifierFields(array $filters = [])
@@ -962,7 +961,6 @@ class FieldModel extends FormModel
      * without causing a circular service injection error.
      *
      * @deprecated Use SchemaDefinition::getSchemaDefinition method instead
-     *
      *
      * @return array
      */

@@ -14,8 +14,8 @@ class FileUploader
     }
 
     /**
-     *
      * @return string
+     *
      * @throws FileUploadException
      */
     public function upload(string $uploadDir, UploadedFile $file)

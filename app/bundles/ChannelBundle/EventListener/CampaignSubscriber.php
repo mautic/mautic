@@ -134,7 +134,6 @@ class CampaignSubscriber implements EventSubscriberInterface
     }
 
     /**
-     *
      * @return bool|ArrayCollection
      *
      * @throws \Mautic\CampaignBundle\Executioner\Dispatcher\Exception\LogNotProcessedException

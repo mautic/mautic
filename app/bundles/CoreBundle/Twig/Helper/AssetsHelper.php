@@ -121,11 +121,9 @@ final class AssetsHelper
     /**
      * Set asset url path.
      *
-     * @param string      $path
-     * @param string|null $packageName
-     * @param string|null $version
-     * @param bool|false  $absolute
-     * @param bool|false  $ignorePrefix
+     * @param string     $path
+     * @param bool|false $absolute
+     * @param bool|false $ignorePrefix
      *
      * @return string
      */

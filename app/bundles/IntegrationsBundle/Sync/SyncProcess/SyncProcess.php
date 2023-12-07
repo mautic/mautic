@@ -297,7 +297,7 @@ class SyncProcess
     /**
      * @throws IntegrationNotFoundException
      */
-    private function processParallelSync(\Mautic\IntegrationsBundle\Sync\DAO\Sync\InputOptionsDAO $inputOptions): void
+    private function processParallelSync(InputOptionsDAO $inputOptions): void
     {
         $currentSyncProcess = clone $this->integrationSyncProcess;
         $this->syncService->processIntegrationSync($inputOptions);

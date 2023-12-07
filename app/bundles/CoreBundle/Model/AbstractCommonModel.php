@@ -136,6 +136,7 @@ abstract class AbstractCommonModel implements MauticModelInterface
     /**
      * @param bool  $absolute
      * @param array $clickthrough
+     *
      * @return string
      */
     public function buildUrl(string $route, array $routeParams = [], $absolute = true, $clickthrough = [])

@@ -698,7 +698,7 @@ class MailHelper
     /**
      * Add an attachment to email.
      *
-     * @param bool   $inline
+     * @param bool $inline
      */
     public function attachFile(string $filePath, string $fileName = null, string $contentType = null, $inline = false): void
     {
@@ -737,6 +737,7 @@ class MailHelper
      * @param string $template
      * @param bool   $returnContent
      * @param null   $charset
+     *
      * @return void|string
      */
     public function setTemplate($template, array $vars = [], $returnContent = false, $charset = null)

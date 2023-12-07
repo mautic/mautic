@@ -624,9 +624,9 @@ class ImportController extends FormController
     }
 
     /**
-     * @return array
+     * @return mixed[]
      */
-    public function getViewArguments(array $args, $action)
+    public function getViewArguments(array $args, $action): array
     {
         switch ($action) {
             case 'view':

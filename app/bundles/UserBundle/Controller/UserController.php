@@ -21,7 +21,6 @@ class UserController extends FormController
     /**
      * Generate's default user list.
      *
-     *
      * @return \Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\Response
      */
     public function indexAction(Request $request, PageHelperFactoryInterface $pageHelperFactory, int $page = 1)

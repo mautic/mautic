@@ -80,10 +80,9 @@ class CommonController extends AbstractController implements MauticController
     /**
      * Get a model instance from the service container.
      *
-     *
      * @return AbstractCommonModel<object>
      */
-    protected function getModel(string $modelNameKey)
+    protected function getModel(string $modelNameKey): AbstractCommonModel
     {
         return $this->modelFactory->getModel($modelNameKey);
     }
@@ -448,7 +447,6 @@ class CommonController extends AbstractController implements MauticController
     /**
      * Generate 404 not found message.
      *
-     *
      * @return Response
      */
     public function notFound(string $msg = 'mautic.core.url.error.404')
@@ -480,7 +478,6 @@ class CommonController extends AbstractController implements MauticController
 
     /**
      * Returns a json encoded access denied error for modal windows.
-     *
      *
      * @return JsonResponse
      */

@@ -5,10 +5,12 @@ declare(strict_types=1);
 namespace Mautic\CoreBundle\Controller;
 
 use Mautic\CoreBundle\Helper\InputHelper;
+use Mautic\CoreBundle\Model\AbstractCommonModel;
 use Mautic\CoreBundle\Model\AjaxLookupModelInterface;
 use Symfony\Component\HttpFoundation\Exception\BadRequestException;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 
 trait AjaxLookupControllerTrait
 {
@@ -72,11 +74,9 @@ trait AjaxLookupControllerTrait
     /**
      * Get a model instance from the service container.
      *
-     * @param string $modelNameKey
-     *
      * @return AbstractCommonModel<object>
      */
-    abstract protected function getModel($modelNameKey);
+    abstract protected function getModel(string $modelNameKey): AbstractCommonModel;
 
     /**
      * Get's the content of error page.

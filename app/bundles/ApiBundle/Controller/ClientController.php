@@ -35,7 +35,6 @@ class ClientController extends FormController
     /**
      * Generate's default client list.
      *
-     *
      * @return Response
      */
     public function indexAction(Request $request, PageHelperFactoryInterface $pageHelperFactory, int $page = 1)

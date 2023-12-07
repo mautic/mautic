@@ -128,11 +128,11 @@ class FocusController extends AbstractStandardFormController
     }
 
     /**
-     * @return array
+     * @return mixed[]
      *
      * @throws \Exception
      */
-    public function getViewArguments(array $args, $action)
+    public function getViewArguments(array $args, $action): array
     {
         $cacheTimeout = (int) $this->coreParametersHelper->get('cached_data_timeout');
 
@@ -200,9 +200,9 @@ class FocusController extends AbstractStandardFormController
     }
 
     /**
-     * @return array
+     * @return mixed[]
      */
-    protected function getPostActionRedirectArguments(array $args, $action)
+    protected function getPostActionRedirectArguments(array $args, $action): array
     {
         $focus        = $this->getCurrentRequest()->request->get('focus') ?? [];
         $updateSelect = 'POST' === $this->getCurrentRequest()->getMethod()

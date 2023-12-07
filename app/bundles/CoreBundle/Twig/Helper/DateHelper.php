@@ -43,6 +43,7 @@ final class DateHelper
      * @param string           $type
      * @param \DateTime|string $datetime
      * @param string           $fromFormat
+     *
      * @return string
      */
     private function format($type, $datetime, string $timezone, ?string $fromFormat)
@@ -77,6 +78,7 @@ final class DateHelper
      *
      * @param \DateTime|string $datetime
      * @param string           $fromFormat
+     *
      * @return string
      */
     public function toFullConcat($datetime, string $timezone = 'local', ?string $fromFormat = 'Y-m-d H:i:s')

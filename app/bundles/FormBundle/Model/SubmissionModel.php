@@ -470,7 +470,7 @@ class SubmissionModel extends CommonFormModel
      *
      * @throws \Exception
      */
-    public function exportResults($format, \Mautic\FormBundle\Entity\Form $form, array $queryArgs)
+    public function exportResults($format, Form $form, array $queryArgs)
     {
         $viewOnlyFields              = $this->formModel->getCustomComponents()['viewOnlyFields'];
         $queryArgs['viewOnlyFields'] = $viewOnlyFields;

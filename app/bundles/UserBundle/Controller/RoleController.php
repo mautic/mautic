@@ -15,7 +15,6 @@ class RoleController extends FormController
     /**
      * Generate's default role list view.
      *
-     *
      * @return \Symfony\Component\HttpFoundation\Response
      */
     public function indexAction(Request $request, PageHelperFactoryInterface $pageHelperFactory, int $page = 1)

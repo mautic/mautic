@@ -378,7 +378,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
     /**
      * @throws \Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException
      */
-    protected function dispatchEvent($action, &$entity, $isNew = false, Event $event = null)
+    protected function dispatchEvent($action, &$entity, $isNew = false, Event $event = null): ?Event
     {
         if (!$entity instanceof Email) {
             throw new MethodNotAllowedHttpException(['Email']);
@@ -2204,6 +2204,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
      * @param bool                    $saveStat
      *
      * @return bool|string[]
+     *
      * @throws \Doctrine\ORM\ORMException
      */
     public function sendSampleEmailToUser($email, $users, $leadFields = null, array $tokens = [], $assetAttachments = [], $saveStat = true)

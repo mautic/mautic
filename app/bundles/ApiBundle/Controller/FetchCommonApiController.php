@@ -367,7 +367,6 @@ class FetchCommonApiController extends AbstractFOSRestController implements Maut
     /**
      * Returns a 403 Access Denied.
      *
-     *
      * @return Response
      */
     protected function accessDenied(string $msg = 'mautic.core.error.accessdenied')
@@ -382,7 +381,6 @@ class FetchCommonApiController extends AbstractFOSRestController implements Maut
 
     /**
      * Returns a 400 Bad Request.
-     *
      *
      * @return Response
      */

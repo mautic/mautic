@@ -193,7 +193,7 @@ class CommonRepository extends ServiceEntityRepository
     /**
      * Delete an entity through the repository.
      *
-     * @param bool   $flush  true by default; use false if persisting in batches
+     * @param bool $flush true by default; use false if persisting in batches
      */
     public function deleteEntity(object $entity, $flush = true): void
     {
@@ -795,7 +795,7 @@ class CommonRepository extends ServiceEntityRepository
     /**
      * Save an entity through the repository.
      *
-     * @param bool   $flush  true by default; use false if persisting in batches
+     * @param bool $flush true by default; use false if persisting in batches
      */
     public function saveEntity(object $entity, $flush = true): void
     {
@@ -929,7 +929,6 @@ class CommonRepository extends ServiceEntityRepository
      * Validate the array for one where condition.
      *
      * @param array $clause ['expr' => 'expression', 'col' => 'DB column', 'val' => 'value to search for']
-     *
      *
      * @throws \InvalidArgumentException
      */
@@ -1753,7 +1752,6 @@ class CommonRepository extends ServiceEntityRepository
 
     /**
      * Sanitizes a string to alphanum plus characters in the second argument.
-     *
      *
      * @return string
      */

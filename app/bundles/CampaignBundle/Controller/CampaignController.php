@@ -811,7 +811,7 @@ class CampaignController extends AbstractStandardFormController
     /**
      * @return array
      */
-    protected function getPostActionRedirectArguments(array $args, $action)
+    protected function dispatchEvent($action, &$entity, $isNew = false, Event $event = null): ?Event
     {
         switch ($action) {
             case 'new':
