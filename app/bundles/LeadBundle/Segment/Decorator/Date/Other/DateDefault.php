@@ -57,7 +57,7 @@ class DateDefault implements FilterDecoratorInterface
         $filter = $this->originalValue;
 
         return match ($contactSegmentFilterCrate->getOperator()) {
-            'like', '!like' => false === strpos($filter, '%') ? '%'.$filter.'%' : $filter,
+            'like', '!like' => !str_contains($filter, '%') ? '%'.$filter.'%' : $filter,
             'contains'   => '%'.$filter.'%',
             'startsWith' => $filter.'%',
             'endsWith'   => '%'.$filter,
