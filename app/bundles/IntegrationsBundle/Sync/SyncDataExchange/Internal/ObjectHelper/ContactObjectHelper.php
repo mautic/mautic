@@ -281,7 +281,7 @@ class ContactObjectHelper implements ObjectHelperInterface
     private function processPseudoFields(Lead $contact, array $fields, string $integration): void
     {
         foreach ($fields as $name => $field) {
-            if (0 === strpos($name, 'mautic_internal_dnc_')) {
+            if (str_starts_with($name, 'mautic_internal_dnc_')) {
                 $channel   = str_replace('mautic_internal_dnc_', '', $name);
 
                 $dncReason = $this->getDoNotContactReason($field->getValue()->getNormalizedValue());

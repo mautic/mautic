@@ -486,10 +486,10 @@ class CampaignSubscriber implements EventSubscriberInterface
                 $triggerDate = new \DateTime('now', new \DateTimeZone($this->coreParametersHelper->get('default_timezone')));
                 $interval    = substr($event->getConfig()['value'], 1); // remove 1st character + or -
 
-                if (false !== strpos($event->getConfig()['value'], '+P')) { // add date
+                if (str_contains($event->getConfig()['value'], '+P')) { // add date
                     $triggerDate->add(new \DateInterval($interval)); // add the today date with interval
                     $result = $this->compareDateValue($lead, $event, $triggerDate);
-                } elseif (false !== strpos($event->getConfig()['value'], '-P')) { // subtract date
+                } elseif (str_contains($event->getConfig()['value'], '-P')) { // subtract date
                     $triggerDate->sub(new \DateInterval($interval)); // subtract the today date with interval
                     $result = $this->compareDateValue($lead, $event, $triggerDate);
                 } elseif ('anniversary' === $event->getConfig()['value']) {

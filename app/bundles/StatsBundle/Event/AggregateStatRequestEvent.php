@@ -86,13 +86,13 @@ class AggregateStatRequestEvent extends Event
      */
     public function checkContextPrefix($prefix): bool
     {
-        return 0 === strpos($this->statName, $prefix);
+        return str_starts_with($this->statName, $prefix);
     }
 
     public function checkContextPrefixes(array $prefixes): bool
     {
         foreach ($prefixes as $string) {
-            if (0 === strpos($this->statName, $string)) {
+            if (str_starts_with($this->statName, $string)) {
                 return true;
             }
         }

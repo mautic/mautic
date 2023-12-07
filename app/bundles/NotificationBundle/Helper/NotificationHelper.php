@@ -159,7 +159,7 @@ JS;
             return false;
         }
 
-        if (false === strpos($server->get('HTTP_REFERER'), $this->coreParametersHelper->get('site_url'))) {
+        if (!str_contains($server->get('HTTP_REFERER'), $this->coreParametersHelper->get('site_url'))) {
             $landingPage = false;
         }
 

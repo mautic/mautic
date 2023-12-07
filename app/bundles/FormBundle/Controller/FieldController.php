@@ -244,7 +244,7 @@ class FieldController extends CommonFormController
                         // overwrite with updated data
                         $formField = array_merge($fields[$objectId], $formData);
 
-                        if (false !== strpos($objectId, 'new')) {
+                        if (str_contains((string) $objectId, 'new')) {
                             // Get aliases in order to generate update for this one
                             $aliases = [];
                             foreach ($fields as $k => $f) {

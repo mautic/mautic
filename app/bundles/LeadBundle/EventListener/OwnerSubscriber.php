@@ -86,7 +86,7 @@ class OwnerSubscriber implements EventSubscriberInterface
         $combinedContent = $event->getCombinedContent();
         foreach (self::onwerColumns as $ownerColumn) {
             $token = $this->buildToken($ownerColumn);
-            if (false !== strpos($combinedContent, $token)) {
+            if (str_contains($combinedContent, $token)) {
                 $ownerColumnNormalized = str_replace(['firstname', 'lastname'], ['first_name', 'last_name'], $ownerColumn);
                 $tokens[$token]        = $owner[$ownerColumnNormalized] ?? null;
             }

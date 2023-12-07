@@ -69,7 +69,7 @@ class EventModel extends FormModel
                 $deleteMe = $deleteMe->getId();
             }
 
-            if (0 === strpos($deleteMe, 'new')) {
+            if (str_starts_with($deleteMe, 'new')) {
                 unset($deletedEvents[$k]);
             }
 

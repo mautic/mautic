@@ -28,7 +28,7 @@ final class VersionProvider implements VersionProviderInterface
 
     public function isMariaDb(): bool
     {
-        return false !== strpos($this->getVersion(), 'MariaDB');
+        return str_contains($this->getVersion(), 'MariaDB');
     }
 
     public function isMySql(): bool

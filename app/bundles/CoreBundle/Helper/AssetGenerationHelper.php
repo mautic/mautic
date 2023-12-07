@@ -270,7 +270,7 @@ class AssetGenerationHelper
                 foreach ($files as $file) {
                     $fullPath = $file->getPathname();
                     $relPath  = str_replace($rootPath, '', $file->getPathname());
-                    if (0 === strpos($relPath, '/')) {
+                    if (str_starts_with($relPath, '/')) {
                         $relPath = substr($relPath, 1);
                     }
 

@@ -25,7 +25,7 @@ class ModelFactory
         }
 
         // Shortcut for models with the same name as the bundle
-        if (false === strpos($modelNameKey, '.')) {
+        if (!str_contains($modelNameKey, '.')) {
             $modelNameKey = "$modelNameKey.$modelNameKey";
         }
 

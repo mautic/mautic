@@ -20,7 +20,7 @@ class SecurityController extends CommonController implements EventSubscriberInte
         $controller = $event->getRequest()->attributes->get('_controller');
         \assert(is_string($controller));
 
-        if (false === strpos($controller, self::class)) {
+        if (!str_contains($controller, self::class)) {
             return;
         }
 

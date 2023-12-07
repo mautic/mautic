@@ -225,7 +225,7 @@ class FieldsBuilder
      */
     private function sanitizePrefix($prefix): string
     {
-        if (false === strpos($prefix, '.')) {
+        if (!str_contains($prefix, '.')) {
             $prefix .= '.';
         }
 

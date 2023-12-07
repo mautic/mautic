@@ -54,7 +54,7 @@ class SearchSubscriber implements EventSubscriberInterface
         $filter    = ['string' => $str, 'force' => ''];
 
         // only show results that are not anonymous so as to not clutter up things
-        if (false === strpos($str, "$anonymous")) {
+        if (!str_contains($str, "$anonymous")) {
             $filter['force'] = " !$anonymous";
         }
 

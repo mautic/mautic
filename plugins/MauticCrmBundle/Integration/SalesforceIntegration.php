@@ -1435,10 +1435,10 @@ class SalesforceIntegration extends CrmAbstractIntegration
         $mixedFields = array_filter($fields['leadFields']);
         $fields      = [];
         foreach ($mixedFields as $sfField => $mField) {
-            if (false !== strpos($sfField, '__'.$object)) {
+            if (str_contains($sfField, '__'.$object)) {
                 $fields[] = str_replace('__'.$object, '', $sfField);
             }
-            if (false !== strpos($sfField, '-'.$object)) {
+            if (str_contains($sfField, '-'.$object)) {
                 $fields[] = str_replace('-'.$object, '', $sfField);
             }
         }
@@ -2489,10 +2489,10 @@ class SalesforceIntegration extends CrmAbstractIntegration
                 $mixedFields = array_filter($fields['leadFields']);
                 $fields      = [];
                 foreach ($mixedFields as $sfField => $mField) {
-                    if (false !== strpos($sfField, '__'.$object)) {
+                    if (str_contains($sfField, '__'.$object)) {
                         $fields[] = str_replace('__'.$object, '', $sfField);
                     }
-                    if (false !== strpos($sfField, '-'.$object)) {
+                    if (str_contains($sfField, '-'.$object)) {
                         $fields[] = str_replace('-'.$object, '', $sfField);
                     }
                 }

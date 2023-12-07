@@ -24,7 +24,7 @@ class ButtonSubscriber implements EventSubscriberInterface
 
     public function injectViewButtons(CustomButtonEvent $event): void
     {
-        if (false === strpos($event->getRoute(), 'mautic_contact_index')) {
+        if (!str_contains($event->getRoute(), 'mautic_contact_index')) {
             return;
         }
 

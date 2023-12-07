@@ -160,8 +160,8 @@ class LookupHelper
     {
         // prefix#entityId#hour#userId#nonce
         list($w, $id, $hour, $uid, $nonce) = explode('#', $oid, 5);
-        $notify                            = (false !== strpos($w, '_notify') && $uid) ? $uid : false;
-        $type                              = (0 === strpos($w, 'fullcontactcomp')) ? 'company' : 'person';
+        $notify                            = (str_contains($w, '_notify') && $uid) ? $uid : false;
+        $type                              = (str_starts_with($w, 'fullcontactcomp')) ? 'company' : 'person';
 
         switch ($type) {
             case 'person':
