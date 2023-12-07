@@ -13,7 +13,8 @@ final class AlreadyMappedFieldCollector implements AlreadyMappedFieldCollectorIn
 {
     private const EXPIRATION_IN_SECONDS = 18000;
 
-    public function __construct(private CacheProviderInterface $cacheProvider) {
+    public function __construct(private CacheProviderInterface $cacheProvider)
+    {
     }
 
     public function getFields(string $formId, string $object): array
