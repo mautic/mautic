@@ -24,12 +24,9 @@ class WidgetType extends AbstractType
      */
     protected $dispatcher;
 
-    protected \Mautic\CoreBundle\Security\Permissions\CorePermissions $security;
-
-    public function __construct(EventDispatcherInterface $dispatcher, CorePermissions $security)
+    public function __construct(EventDispatcherInterface $dispatcher, protected CorePermissions $security)
     {
         $this->dispatcher = $dispatcher;
-        $this->security   = $security;
     }
 
     public function buildForm(FormBuilderInterface $builder, array $options): void

@@ -10,16 +10,8 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class ClientSubscriber implements EventSubscriberInterface
 {
-    private \Mautic\CoreBundle\Helper\IpLookupHelper $ipLookupHelper;
-
-    private \Mautic\CoreBundle\Model\AuditLogModel $auditLogModel;
-
-    public function __construct(
-        IpLookupHelper $ipLookupHelper,
-        AuditLogModel $auditLogModel
-    ) {
-        $this->ipLookupHelper       = $ipLookupHelper;
-        $this->auditLogModel        = $auditLogModel;
+    public function __construct(private IpLookupHelper $ipLookupHelper, private AuditLogModel $auditLogModel)
+    {
     }
 
     public static function getSubscribedEvents(): array

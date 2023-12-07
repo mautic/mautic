@@ -11,13 +11,10 @@ use Mautic\CacheBundle\Cache\CacheProviderInterface;
  */
 final class AlreadyMappedFieldCollector implements AlreadyMappedFieldCollectorInterface
 {
-    private const EXPIRATION_IN_SECONDS = 18000; // 5 hours
+    private const EXPIRATION_IN_SECONDS = 18000;
 
-    private CacheProviderInterface $cacheProvider;
-
-    public function __construct(CacheProviderInterface $cacheProvider)
+    public function __construct(private CacheProviderInterface $cacheProvider)
     {
-        $this->cacheProvider = $cacheProvider;
     }
 
     public function getFields(string $formId, string $object): array

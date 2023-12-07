@@ -12,20 +12,8 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 final class FinalizeUpdateStep implements StepInterface
 {
-    private \Symfony\Contracts\Translation\TranslatorInterface $translator;
-
-    private \Mautic\CoreBundle\Helper\PathsHelper $pathsHelper;
-
-    private \Symfony\Component\HttpFoundation\Session\Session $session;
-
-    private \Mautic\CoreBundle\Helper\AppVersion $appVersion;
-
-    public function __construct(TranslatorInterface $translator, PathsHelper $pathsHelper, Session $session, AppVersion $appVersion)
+    public function __construct(private TranslatorInterface $translator, private PathsHelper $pathsHelper, private Session $session, private AppVersion $appVersion)
     {
-        $this->translator  = $translator;
-        $this->pathsHelper = $pathsHelper;
-        $this->session     = $session;
-        $this->appVersion  = $appVersion;
     }
 
     public function getOrder(): int

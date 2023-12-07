@@ -35,8 +35,6 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class DynamicContentType extends AbstractType
 {
-    private $em;
-    private $translator;
     private $fieldChoices;
     private $countryChoices;
     private $regionChoices;
@@ -46,19 +44,12 @@ class DynamicContentType extends AbstractType
     private $deviceBrandsChoices;
     private $deviceOsChoices;
     private $tagChoices = [];
-    /**
-     * @var LeadModel
-     */
-    private $leadModel;
 
     /**
      * @throws \InvalidArgumentException
      */
-    public function __construct(EntityManager $entityManager, ListModel $listModel, TranslatorInterface $translator, LeadModel $leadModel)
+    public function __construct(private EntityManager $em, ListModel $listModel, private TranslatorInterface $translator, private LeadModel $leadModel)
     {
-        $this->em              = $entityManager;
-        $this->translator      = $translator;
-        $this->leadModel       = $leadModel;
         $this->fieldChoices    = $listModel->getChoiceFields();
         $this->timezoneChoices = FormFieldHelper::getTimezonesChoices();
         $this->countryChoices  = FormFieldHelper::getCountryChoices();

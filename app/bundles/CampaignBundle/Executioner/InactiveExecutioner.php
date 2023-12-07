@@ -36,49 +36,25 @@ class InactiveExecutioner implements ExecutionerInterface
      */
     private $output;
 
-    private \Psr\Log\LoggerInterface $logger;
-
     /**
      * @var ProgressBar
      */
     private $progressBar;
-
-    private \Symfony\Contracts\Translation\TranslatorInterface $translator;
-
-    private \Mautic\CampaignBundle\Executioner\Scheduler\EventScheduler $scheduler;
-
-    private \Mautic\CampaignBundle\Executioner\EventExecutioner $executioner;
 
     /**
      * @var Counter
      */
     private $counter;
 
-    private \Mautic\CampaignBundle\Executioner\ContactFinder\InactiveContactFinder $inactiveContactFinder;
-
     /**
      * @var ArrayCollection
      */
     private $decisions;
 
-    private \Mautic\CampaignBundle\Executioner\Helper\InactiveHelper $helper;
-
     protected ?\DateTime $now = null;
 
-    public function __construct(
-        InactiveContactFinder $inactiveContactFinder,
-        LoggerInterface $logger,
-        TranslatorInterface $translator,
-        EventScheduler $scheduler,
-        InactiveHelper $helper,
-        EventExecutioner $executioner
-    ) {
-        $this->inactiveContactFinder = $inactiveContactFinder;
-        $this->logger                = $logger;
-        $this->translator            = $translator;
-        $this->scheduler             = $scheduler;
-        $this->helper                = $helper;
-        $this->executioner           = $executioner;
+    public function __construct(private InactiveContactFinder $inactiveContactFinder, private LoggerInterface $logger, private TranslatorInterface $translator, private EventScheduler $scheduler, private InactiveHelper $helper, private EventExecutioner $executioner)
+    {
     }
 
     /**

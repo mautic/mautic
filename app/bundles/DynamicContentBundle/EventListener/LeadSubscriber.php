@@ -12,20 +12,8 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class LeadSubscriber implements EventSubscriberInterface
 {
-    private \Symfony\Contracts\Translation\TranslatorInterface $translator;
-
-    private \Symfony\Component\Routing\RouterInterface $router;
-
-    private \Mautic\DynamicContentBundle\Entity\StatRepository $statRepository;
-
-    public function __construct(
-        TranslatorInterface $translator,
-        RouterInterface $router,
-        StatRepository $statRepository
-    ) {
-        $this->translator     = $translator;
-        $this->router         = $router;
-        $this->statRepository = $statRepository;
+    public function __construct(private TranslatorInterface $translator, private RouterInterface $router, private StatRepository $statRepository)
+    {
     }
 
     /**

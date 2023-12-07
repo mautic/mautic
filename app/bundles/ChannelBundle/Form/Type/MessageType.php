@@ -14,11 +14,8 @@ use Symfony\Component\Validator\Constraints\Valid;
 
 class MessageType extends AbstractFormStandardType
 {
-    protected MessageModel $model;
-
-    public function __construct(MessageModel $messageModel, CorePermissions $security)
+    public function __construct(protected MessageModel $model, CorePermissions $security)
     {
-        $this->model    = $messageModel;
         $this->security = $security;
     }
 

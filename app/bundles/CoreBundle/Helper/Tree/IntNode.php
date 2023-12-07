@@ -6,10 +6,6 @@ namespace Mautic\CoreBundle\Helper\Tree;
 
 class IntNode implements NodeInterface
 {
-    private int $value;
-
-    private ?\Mautic\CoreBundle\Helper\Tree\NodeInterface $parent;
-
     /**
      * @var NodeInterface[]
      */
@@ -25,10 +21,8 @@ class IntNode implements NodeInterface
      */
     private $position = 0;
 
-    public function __construct(int $value, NodeInterface $parent = null)
+    public function __construct(private int $value, private ?NodeInterface $parent = null)
     {
-        $this->value  = $value;
-        $this->parent = $parent;
     }
 
     public function getValue(): int

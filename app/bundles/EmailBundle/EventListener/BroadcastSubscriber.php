@@ -11,17 +11,8 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class BroadcastSubscriber implements EventSubscriberInterface
 {
-    private \Mautic\EmailBundle\Model\EmailModel $model;
-
-    private \Doctrine\ORM\EntityManager $em;
-
-    private \Symfony\Contracts\Translation\TranslatorInterface $translator;
-
-    public function __construct(EmailModel $emailModel, EntityManager $em, TranslatorInterface $translator)
+    public function __construct(private EmailModel $model, private EntityManager $em, private TranslatorInterface $translator)
     {
-        $this->model      = $emailModel;
-        $this->em         = $em;
-        $this->translator = $translator;
     }
 
     /**

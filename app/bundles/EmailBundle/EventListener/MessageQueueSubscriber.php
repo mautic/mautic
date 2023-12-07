@@ -11,11 +11,8 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class MessageQueueSubscriber implements EventSubscriberInterface
 {
-    private \Mautic\EmailBundle\Model\EmailModel $emailModel;
-
-    public function __construct(EmailModel $emailModel)
+    public function __construct(private EmailModel $emailModel)
     {
-        $this->emailModel = $emailModel;
     }
 
     /**

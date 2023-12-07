@@ -11,11 +11,8 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class ConfigSubscriber implements EventSubscriberInterface
 {
-    private \Mautic\CoreBundle\Helper\LanguageHelper $languageHelper;
-
-    public function __construct(LanguageHelper $languageHelper)
+    public function __construct(private LanguageHelper $languageHelper)
     {
-        $this->languageHelper = $languageHelper;
     }
 
     /**

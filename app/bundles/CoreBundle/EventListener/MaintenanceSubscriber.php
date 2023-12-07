@@ -11,20 +11,8 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class MaintenanceSubscriber implements EventSubscriberInterface
 {
-    private \Doctrine\DBAL\Connection $db;
-
-    private \Mautic\UserBundle\Entity\UserTokenRepositoryInterface $userTokenRepository;
-
-    private \Symfony\Contracts\Translation\TranslatorInterface $translator;
-
-    public function __construct(
-        Connection $db,
-        UserTokenRepositoryInterface $userTokenRepository,
-        TranslatorInterface $translator
-    ) {
-        $this->db                  = $db;
-        $this->userTokenRepository = $userTokenRepository;
-        $this->translator          = $translator;
+    public function __construct(private Connection $db, private UserTokenRepositoryInterface $userTokenRepository, private TranslatorInterface $translator)
+    {
     }
 
     /**

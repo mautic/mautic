@@ -10,13 +10,8 @@ final class FormatterHelper
 {
     public const FLOAT_PRECISION = 4;
 
-    private \Mautic\CoreBundle\Twig\Helper\DateHelper $dateHelper;
-    private \Symfony\Contracts\Translation\TranslatorInterface $translator;
-
-    public function __construct(DateHelper $dateHelper, TranslatorInterface $translator)
+    public function __construct(private DateHelper $dateHelper, private TranslatorInterface $translator)
     {
-        $this->dateHelper = $dateHelper;
-        $this->translator = $translator;
     }
 
     /**

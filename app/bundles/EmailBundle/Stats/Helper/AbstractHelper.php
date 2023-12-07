@@ -17,22 +17,13 @@ abstract class AbstractHelper implements StatHelperInterface
     use FilterTrait;
     use DateRangeUnitTrait;
 
-    private \Mautic\StatsBundle\Aggregate\Collector $collector;
-
-    private \Mautic\CoreBundle\Helper\UserHelper $userHelper;
-
-    protected \Mautic\CoreBundle\Doctrine\Provider\GeneratedColumnsProviderInterface $generatedColumnsProvider;
-
     public function __construct(
-        Collector $collector,
+        private Collector $collector,
         Connection $connection,
-        GeneratedColumnsProviderInterface $generatedColumnsProvider,
-        UserHelper $userHelper
+        protected GeneratedColumnsProviderInterface $generatedColumnsProvider,
+        private UserHelper $userHelper
     ) {
-        $this->collector                = $collector;
         $this->connection               = $connection;
-        $this->generatedColumnsProvider = $generatedColumnsProvider;
-        $this->userHelper               = $userHelper;
     }
 
     /**

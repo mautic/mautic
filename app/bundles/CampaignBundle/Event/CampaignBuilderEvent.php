@@ -26,8 +26,6 @@ class CampaignBuilderEvent extends Event
      */
     private $actions = [];
 
-    private \Symfony\Contracts\Translation\TranslatorInterface $translator;
-
     /**
      * Holds info if some property has been already sorted or not.
      *
@@ -35,9 +33,8 @@ class CampaignBuilderEvent extends Event
      */
     private $sortCache = [];
 
-    public function __construct(TranslatorInterface $translator)
+    public function __construct(private TranslatorInterface $translator)
     {
-        $this->translator = $translator;
     }
 
     /**

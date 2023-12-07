@@ -24,46 +24,11 @@ use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
  */
 class MauticFactory
 {
-    private ContainerInterface $container;
-
-    /**
-     * @var ModelFactory<object>
-     */
-    private ModelFactory $modelFactory;
-
-    private CorePermissions $security;
-
-    private AuthorizationCheckerInterface $authorizationChecker;
-
-    private UserHelper $userHelper;
-
-    private RequestStack $requestStack;
-
-    private ManagerRegistry $doctrine;
-
-    private Translator $translator;
-
     /**
      * @param ModelFactory<object> $modelFactory
      */
-    public function __construct(
-        ContainerInterface $container,
-        ModelFactory $modelFactory,
-        CorePermissions $security,
-        AuthorizationCheckerInterface $authorizationChecker,
-        UserHelper $userHelper,
-        RequestStack $requestStack,
-        ManagerRegistry $doctrine,
-        Translator $translator
-    ) {
-        $this->container            = $container;
-        $this->modelFactory         = $modelFactory;
-        $this->security             = $security;
-        $this->authorizationChecker = $authorizationChecker;
-        $this->userHelper           = $userHelper;
-        $this->requestStack         = $requestStack;
-        $this->doctrine             = $doctrine;
-        $this->translator           = $translator;
+    public function __construct(private ContainerInterface $container, private ModelFactory $modelFactory, private CorePermissions $security, private AuthorizationCheckerInterface $authorizationChecker, private UserHelper $userHelper, private RequestStack $requestStack, private ManagerRegistry $doctrine, private Translator $translator)
+    {
     }
 
     /**

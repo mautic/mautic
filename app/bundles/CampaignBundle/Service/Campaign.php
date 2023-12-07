@@ -7,14 +7,8 @@ use Mautic\EmailBundle\Entity\EmailRepository;
 
 class Campaign
 {
-    private \Mautic\CampaignBundle\Entity\CampaignRepository $campaignRepository;
-
-    private \Mautic\EmailBundle\Entity\EmailRepository $emailRepository;
-
-    public function __construct(CampaignRepository $campaignRepository, EmailRepository $emailRepository)
+    public function __construct(private CampaignRepository $campaignRepository, private EmailRepository $emailRepository)
     {
-        $this->campaignRepository = $campaignRepository;
-        $this->emailRepository    = $emailRepository;
     }
 
     /**

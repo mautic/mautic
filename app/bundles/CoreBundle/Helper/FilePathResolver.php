@@ -9,14 +9,8 @@ use Symfony\Component\HttpFoundation\File\UploadedFile;
 
 class FilePathResolver
 {
-    private \Symfony\Component\Filesystem\Filesystem $filesystem;
-
-    private \Mautic\CoreBundle\Helper\InputHelper $inputHelper;
-
-    public function __construct(Filesystem $filesystem, InputHelper $inputHelper)
+    public function __construct(private Filesystem $filesystem, private InputHelper $inputHelper)
     {
-        $this->filesystem  = $filesystem;
-        $this->inputHelper = $inputHelper;
     }
 
     /**

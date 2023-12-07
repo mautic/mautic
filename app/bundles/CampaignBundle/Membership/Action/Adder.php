@@ -13,14 +13,8 @@ class Adder
 {
     public const NAME = 'added';
 
-    private \Mautic\CampaignBundle\Entity\LeadRepository $leadRepository;
-
-    private \Mautic\CampaignBundle\Entity\LeadEventLogRepository $leadEventLogRepository;
-
-    public function __construct(LeadRepository $leadRepository, LeadEventLogRepository $leadEventLogRepository)
+    public function __construct(private LeadRepository $leadRepository, private LeadEventLogRepository $leadEventLogRepository)
     {
-        $this->leadRepository         = $leadRepository;
-        $this->leadEventLogRepository = $leadEventLogRepository;
     }
 
     public function createNewMembership(Lead $contact, Campaign $campaign, $isManualAction): CampaignMember

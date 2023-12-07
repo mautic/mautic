@@ -9,14 +9,8 @@ use Twig\Environment;
 
 final class ContentHelper
 {
-    private \Twig\Environment $twig;
-
-    private \Symfony\Component\EventDispatcher\EventDispatcherInterface $dispatcher;
-
-    public function __construct(Environment $twig, EventDispatcherInterface $dispatcher)
+    public function __construct(private Environment $twig, private EventDispatcherInterface $dispatcher)
     {
-        $this->twig       = $twig;
-        $this->dispatcher = $dispatcher;
     }
 
     /**

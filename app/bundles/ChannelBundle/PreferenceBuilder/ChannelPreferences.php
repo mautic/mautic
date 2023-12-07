@@ -8,16 +8,13 @@ use Mautic\CampaignBundle\Entity\LeadEventLog;
 
 class ChannelPreferences
 {
-    private \Mautic\CampaignBundle\Entity\Event $event;
-
     /**
      * @var ArrayCollection[]
      */
     private $organizedByPriority = [];
 
-    public function __construct(Event $event)
+    public function __construct(private Event $event)
     {
-        $this->event   = $event;
     }
 
     /**

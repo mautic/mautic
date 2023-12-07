@@ -8,16 +8,13 @@ use Doctrine\DBAL\Connection;
 
 final class VersionProvider implements VersionProviderInterface
 {
-    private Connection $connection;
-
     /**
      * @var string
      */
     private $version;
 
-    public function __construct(Connection $connection)
+    public function __construct(private Connection $connection)
     {
-        $this->connection = $connection;
     }
 
     public function getVersion(): string

@@ -58,12 +58,6 @@ final class ButtonHelper
      */
     private $location;
 
-    private \Twig\Environment $twig;
-
-    private \Symfony\Contracts\Translation\TranslatorInterface $translator;
-
-    private \Symfony\Component\EventDispatcher\EventDispatcherInterface $dispatcher;
-
     /**
      * @var string|null
      */
@@ -114,11 +108,8 @@ final class ButtonHelper
      */
     private $listMarker = 3;
 
-    public function __construct(Environment $twig, TranslatorInterface $translator, EventDispatcherInterface $dispatcher)
+    public function __construct(private Environment $twig, private TranslatorInterface $translator, private EventDispatcherInterface $dispatcher)
     {
-        $this->twig       = $twig;
-        $this->translator = $translator;
-        $this->dispatcher = $dispatcher;
     }
 
     /**

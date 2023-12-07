@@ -18,19 +18,13 @@ use Symfony\Component\Validator\Exception\UnexpectedTypeException;
 
 final class EmailOrEmailTokenListValidator extends ConstraintValidator
 {
-    private EmailValidator $emailValidator;
-
-    private CustomFieldValidator $customFieldValidator;
-
     private ArrayStringTransformer $transformer;
 
     public function __construct(
-        EmailValidator $emailValidator,
-        CustomFieldValidator $customFieldValidator
+        private EmailValidator $emailValidator,
+        private CustomFieldValidator $customFieldValidator
     ) {
         $this->transformer          = new ArrayStringTransformer();
-        $this->emailValidator       = $emailValidator;
-        $this->customFieldValidator = $customFieldValidator;
     }
 
     /**

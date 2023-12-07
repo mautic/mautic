@@ -13,37 +13,13 @@ use Psr\Log\LoggerInterface;
 
 class InactiveHelper
 {
-    private \Mautic\CampaignBundle\Executioner\Scheduler\EventScheduler $scheduler;
-
-    private \Mautic\CampaignBundle\Executioner\ContactFinder\InactiveContactFinder $inactiveContactFinder;
-
-    private \Mautic\CampaignBundle\Entity\LeadEventLogRepository $eventLogRepository;
-
-    private \Mautic\CampaignBundle\Entity\EventRepository $eventRepository;
-
-    private \Psr\Log\LoggerInterface $logger;
-
-    private DecisionHelper $decisionHelper;
-
     /**
      * @var \DateTimeInterface
      */
     private $earliestInactiveDate;
 
-    public function __construct(
-        EventScheduler $scheduler,
-        InactiveContactFinder $inactiveContactFinder,
-        LeadEventLogRepository $eventLogRepository,
-        EventRepository $eventRepository,
-        LoggerInterface $logger,
-        DecisionHelper $decisionHelper
-    ) {
-        $this->scheduler               = $scheduler;
-        $this->inactiveContactFinder   = $inactiveContactFinder;
-        $this->eventLogRepository      = $eventLogRepository;
-        $this->eventRepository         = $eventRepository;
-        $this->logger                  = $logger;
-        $this->decisionHelper          = $decisionHelper;
+    public function __construct(private EventScheduler $scheduler, private InactiveContactFinder $inactiveContactFinder, private LeadEventLogRepository $eventLogRepository, private EventRepository $eventRepository, private LoggerInterface $logger, private DecisionHelper $decisionHelper)
+    {
     }
 
     /**

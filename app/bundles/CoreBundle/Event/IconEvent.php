@@ -12,11 +12,8 @@ class IconEvent extends Event
      */
     protected $icons = [];
 
-    protected \Mautic\CoreBundle\Security\Permissions\CorePermissions $security;
-
-    public function __construct(CorePermissions $security)
+    public function __construct(protected CorePermissions $security)
     {
-        $this->security = $security;
     }
 
     /**

@@ -22,36 +22,8 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class EventScheduler
 {
-    private \Psr\Log\LoggerInterface $logger;
-
-    private \Mautic\CampaignBundle\Executioner\Logger\EventLogger $eventLogger;
-
-    private \Symfony\Component\EventDispatcher\EventDispatcherInterface $dispatcher;
-
-    private \Mautic\CampaignBundle\Executioner\Scheduler\Mode\Interval $intervalScheduler;
-
-    private \Mautic\CampaignBundle\Executioner\Scheduler\Mode\DateTime $dateTimeScheduler;
-
-    private \Mautic\CampaignBundle\EventCollector\EventCollector $collector;
-
-    private \Mautic\CoreBundle\Helper\CoreParametersHelper $coreParametersHelper;
-
-    public function __construct(
-        LoggerInterface $logger,
-        EventLogger $eventLogger,
-        Interval $intervalScheduler,
-        DateTime $dateTimeScheduler,
-        EventCollector $collector,
-        EventDispatcherInterface $dispatcher,
-        CoreParametersHelper $coreParametersHelper
-    ) {
-        $this->logger               = $logger;
-        $this->dispatcher           = $dispatcher;
-        $this->eventLogger          = $eventLogger;
-        $this->intervalScheduler    = $intervalScheduler;
-        $this->dateTimeScheduler    = $dateTimeScheduler;
-        $this->collector            = $collector;
-        $this->coreParametersHelper = $coreParametersHelper;
+    public function __construct(private LoggerInterface $logger, private EventLogger $eventLogger, private Interval $intervalScheduler, private DateTime $dateTimeScheduler, private EventCollector $collector, private EventDispatcherInterface $dispatcher, private CoreParametersHelper $coreParametersHelper)
+    {
     }
 
     public function scheduleForContact(Event $event, \DateTimeInterface $executionDate, Lead $contact): void

@@ -24,18 +24,6 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class ScheduledExecutioner implements ExecutionerInterface, ResetInterface
 {
-    private \Mautic\CampaignBundle\Entity\LeadEventLogRepository $repo;
-
-    private \Psr\Log\LoggerInterface $logger;
-
-    private \Symfony\Contracts\Translation\TranslatorInterface $translator;
-
-    private \Mautic\CampaignBundle\Executioner\EventExecutioner $executioner;
-
-    private \Mautic\CampaignBundle\Executioner\Scheduler\EventScheduler $scheduler;
-
-    private \Mautic\CampaignBundle\Executioner\ContactFinder\ScheduledContactFinder $scheduledContactFinder;
-
     /**
      * @var Campaign
      */
@@ -68,20 +56,8 @@ class ScheduledExecutioner implements ExecutionerInterface, ResetInterface
 
     protected ?\DateTime $now = null;
 
-    public function __construct(
-        LeadEventLogRepository $repository,
-        LoggerInterface $logger,
-        TranslatorInterface $translator,
-        EventExecutioner $executioner,
-        EventScheduler $scheduler,
-        ScheduledContactFinder $scheduledContactFinder
-    ) {
-        $this->repo                   = $repository;
-        $this->logger                 = $logger;
-        $this->translator             = $translator;
-        $this->executioner            = $executioner;
-        $this->scheduler              = $scheduler;
-        $this->scheduledContactFinder = $scheduledContactFinder;
+    public function __construct(private LeadEventLogRepository $repo, private LoggerInterface $logger, private TranslatorInterface $translator, private EventExecutioner $executioner, private EventScheduler $scheduler, private ScheduledContactFinder $scheduledContactFinder)
+    {
     }
 
     /**

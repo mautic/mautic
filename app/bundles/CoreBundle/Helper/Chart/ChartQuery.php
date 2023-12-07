@@ -12,11 +12,6 @@ use Mautic\CoreBundle\Helper\DateTimeHelper;
  */
 class ChartQuery extends AbstractChart
 {
-    /**
-     * Doctrine's Connetion object.
-     */
-    protected \Doctrine\DBAL\Connection $connection;
-
     private DateTimeHelper $dateTimeHelper;
 
     /**
@@ -68,12 +63,11 @@ class ChartQuery extends AbstractChart
      *
      * @param string|null $unit
      */
-    public function __construct(Connection $connection, \DateTime $dateFrom, \DateTime $dateTo, $unit = null)
+    public function __construct(protected Connection $connection, \DateTime $dateFrom, \DateTime $dateTo, $unit = null)
     {
         $this->dateTimeHelper = new DateTimeHelper();
         $this->unit           = (null === $unit) ? $this->getTimeUnitFromDateRange($dateFrom, $dateTo) : $unit;
         $this->isTimeUnit     = in_array($this->unit, ['H', 'i', 's']);
-        $this->connection     = $connection;
         $this->setDateRange($dateFrom, $dateTo);
     }
 

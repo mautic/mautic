@@ -16,18 +16,12 @@ final class GravatarHelper
      */
     private array $devHosts;
 
-    private \Mautic\LeadBundle\Twig\Helper\DefaultAvatarHelper $defaultAvatarHelper;
-
-    private \Symfony\Component\HttpFoundation\RequestStack $requestStack;
-
     public function __construct(
-        DefaultAvatarHelper $defaultAvatarHelper,
+        private DefaultAvatarHelper $defaultAvatarHelper,
         CoreParametersHelper $coreParametersHelper,
-        RequestStack $requestStack
+        private RequestStack $requestStack
     ) {
         $this->devMode             = MAUTIC_ENV === 'dev';
-        $this->defaultAvatarHelper = $defaultAvatarHelper;
-        $this->requestStack        = $requestStack;
         $this->devHosts            = (array) $coreParametersHelper->get('dev_hosts');
     }
 

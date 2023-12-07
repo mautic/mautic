@@ -9,11 +9,8 @@ use Mautic\InstallBundle\Configurator\Step\DoctrineStep;
 
 class CheckDatabaseDriverAndVersion extends AbstractPreUpdateCheck
 {
-    private EntityManager $em;
-
-    public function __construct(EntityManager $em)
+    public function __construct(private EntityManager $em)
     {
-        $this->em = $em;
     }
 
     public function runCheck(): PreUpdateCheckResult

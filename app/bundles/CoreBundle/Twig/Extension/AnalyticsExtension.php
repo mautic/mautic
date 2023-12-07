@@ -10,11 +10,8 @@ use Twig\TwigFunction;
 
 class AnalyticsExtension extends AbstractExtension
 {
-    protected AnalyticsHelper $helper;
-
-    public function __construct(AnalyticsHelper $helper)
+    public function __construct(protected AnalyticsHelper $helper)
     {
-        $this->helper = $helper;
     }
 
     /**

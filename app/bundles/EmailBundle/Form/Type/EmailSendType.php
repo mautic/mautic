@@ -16,11 +16,8 @@ use Symfony\Component\Validator\Constraints\NotBlank;
 
 class EmailSendType extends AbstractType
 {
-    private \Symfony\Component\Routing\RouterInterface $router;
-
-    public function __construct(RouterInterface $router)
+    public function __construct(private RouterInterface $router)
     {
-        $this->router = $router;
     }
 
     public function buildForm(FormBuilderInterface $builder, array $options): void

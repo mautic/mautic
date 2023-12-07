@@ -12,24 +12,8 @@ use Twig\Environment;
 
 class SearchSubscriber implements EventSubscriberInterface
 {
-    private \Mautic\CoreBundle\Helper\UserHelper $userHelper;
-
-    private \Mautic\FormBundle\Model\FormModel $formModel;
-
-    private \Mautic\CoreBundle\Security\Permissions\CorePermissions $security;
-
-    private \Twig\Environment $twig;
-
-    public function __construct(
-        UserHelper $userHelper,
-        FormModel $formModel,
-        CorePermissions $security,
-        Environment $twig
-    ) {
-        $this->userHelper = $userHelper;
-        $this->formModel  = $formModel;
-        $this->security   = $security;
-        $this->twig       = $twig;
+    public function __construct(private UserHelper $userHelper, private FormModel $formModel, private CorePermissions $security, private Environment $twig)
+    {
     }
 
     /**

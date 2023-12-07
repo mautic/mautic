@@ -26,29 +26,11 @@ class EntityLookupChoiceLoader implements ChoiceLoaderInterface
     protected $choices = [];
 
     /**
-     * @var Options
-     */
-    protected $options;
-
-    /**
-     * @var ModelFactory<object>
-     */
-    protected \Mautic\CoreBundle\Factory\ModelFactory $modelFactory;
-
-    protected \Symfony\Contracts\Translation\TranslatorInterface $translator;
-
-    protected \Doctrine\DBAL\Connection $connection;
-
-    /**
      * @param ModelFactory<object> $modelFactory
      * @param array                $options
      */
-    public function __construct(ModelFactory $modelFactory, TranslatorInterface $translator, Connection $connection, $options = [])
+    public function __construct(protected ModelFactory $modelFactory, protected TranslatorInterface $translator, protected Connection $connection, protected $options = [])
     {
-        $this->modelFactory = $modelFactory;
-        $this->translator   = $translator;
-        $this->connection   = $connection;
-        $this->options      = $options;
     }
 
     /**

@@ -27,22 +27,12 @@ class PullTransifexCommand extends Command
 {
     public const NAME = 'mautic:transifex:pull';
 
-    private TransifexFactory $transifexFactory;
-    private TranslatorInterface $translator;
-    private PathsHelper $pathsHelper;
-    private LanguageHelper $languageHelper;
-
     public function __construct(
-        TransifexFactory $transifexFactory,
-        TranslatorInterface $translator,
-        PathsHelper $pathsHelper,
-        LanguageHelper $languageHelper
+        private TransifexFactory $transifexFactory,
+        private TranslatorInterface $translator,
+        private PathsHelper $pathsHelper,
+        private LanguageHelper $languageHelper
     ) {
-        $this->transifexFactory = $transifexFactory;
-        $this->translator       = $translator;
-        $this->pathsHelper      = $pathsHelper;
-        $this->languageHelper   = $languageHelper;
-
         parent::__construct();
     }
 

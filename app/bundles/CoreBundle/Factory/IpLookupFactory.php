@@ -8,17 +8,8 @@ use Psr\Log\LoggerInterface;
 
 class IpLookupFactory
 {
-    protected ?LoggerInterface $logger;
-    protected ?string $cacheDir;
-    protected array $lookupServices;
-    protected ?Client $client;
-
-    public function __construct(array $lookupServices, ?LoggerInterface $logger = null, ?Client $client = null, ?string $cacheDir = null)
+    public function __construct(protected array $lookupServices, protected ?LoggerInterface $logger = null, protected ?Client $client = null, protected ?string $cacheDir = null)
     {
-        $this->lookupServices = $lookupServices;
-        $this->logger         = $logger;
-        $this->cacheDir       = $cacheDir;
-        $this->client         = $client;
     }
 
     /**

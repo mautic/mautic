@@ -20,46 +20,18 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class Bounce implements ProcessorInterface
 {
-    protected \Symfony\Component\Mailer\Transport\TransportInterface $transport;
-
-    protected \Mautic\EmailBundle\MonitoredEmail\Search\ContactFinder $contactFinder;
-
-    protected \Mautic\EmailBundle\Entity\StatRepository $statRepository;
-
-    protected \Mautic\LeadBundle\Model\LeadModel $leadModel;
-
-    protected \Symfony\Contracts\Translation\TranslatorInterface $translator;
-
     /**
      * @var string
      */
     protected $bouncerAddress;
-
-    protected \Psr\Log\LoggerInterface $logger;
 
     /**
      * @var Message
      */
     protected $message;
 
-    protected \Mautic\LeadBundle\Model\DoNotContact $doNotContact;
-
-    public function __construct(
-        TransportInterface $transport,
-        ContactFinder $contactFinder,
-        StatRepository $statRepository,
-        LeadModel $leadModel,
-        TranslatorInterface $translator,
-        LoggerInterface $logger,
-        DoNotContact $doNotContact
-    ) {
-        $this->transport      = $transport;
-        $this->contactFinder  = $contactFinder;
-        $this->statRepository = $statRepository;
-        $this->leadModel      = $leadModel;
-        $this->translator     = $translator;
-        $this->logger         = $logger;
-        $this->doNotContact   = $doNotContact;
+    public function __construct(protected TransportInterface $transport, protected ContactFinder $contactFinder, protected StatRepository $statRepository, protected LeadModel $leadModel, protected TranslatorInterface $translator, protected LoggerInterface $logger, protected DoNotContact $doNotContact)
+    {
     }
 
     public function process(Message $message): bool

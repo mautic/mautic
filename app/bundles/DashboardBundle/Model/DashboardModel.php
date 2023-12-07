@@ -30,17 +30,11 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
  */
 class DashboardModel extends FormModel
 {
-    private RequestStack $requestStack;
-
-    private PathsHelper $pathsHelper;
-
-    private Filesystem $filesystem;
-
     public function __construct(
         CoreParametersHelper $coreParametersHelper,
-        PathsHelper $pathsHelper,
-        Filesystem $filesystem,
-        RequestStack $requestStack,
+        private PathsHelper $pathsHelper,
+        private Filesystem $filesystem,
+        private RequestStack $requestStack,
         EntityManagerInterface $em,
         CorePermissions $security,
         EventDispatcherInterface $dispatcher,
@@ -49,10 +43,6 @@ class DashboardModel extends FormModel
         UserHelper $userHelper,
         LoggerInterface $mauticLogger
     ) {
-        $this->pathsHelper  = $pathsHelper;
-        $this->filesystem   = $filesystem;
-        $this->requestStack = $requestStack;
-
         parent::__construct($em, $security, $dispatcher, $router, $translator, $userHelper, $mauticLogger, $coreParametersHelper);
     }
 

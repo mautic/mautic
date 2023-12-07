@@ -11,14 +11,8 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class ButtonSubscriber implements EventSubscriberInterface
 {
-    private \Symfony\Component\Routing\RouterInterface $router;
-
-    private \Symfony\Contracts\Translation\TranslatorInterface $translator;
-
-    public function __construct(RouterInterface $router, TranslatorInterface $translator)
+    public function __construct(private RouterInterface $router, private TranslatorInterface $translator)
     {
-        $this->router     = $router;
-        $this->translator = $translator;
     }
 
     public static function getSubscribedEvents()

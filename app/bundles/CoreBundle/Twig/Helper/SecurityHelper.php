@@ -15,24 +15,8 @@ use Symfony\Component\Security\Csrf\CsrfTokenManagerInterface;
  */
 final class SecurityHelper
 {
-    private \Mautic\CoreBundle\Security\Permissions\CorePermissions $security;
-
-    private \Symfony\Component\HttpFoundation\RequestStack $requestStack;
-
-    private \Symfony\Component\EventDispatcher\EventDispatcherInterface $dispatcher;
-
-    private \Symfony\Component\Security\Csrf\CsrfTokenManagerInterface $tokenManager;
-
-    public function __construct(
-        CorePermissions $security,
-        RequestStack $requestStack,
-        EventDispatcherInterface $dispatcher,
-        CsrfTokenManagerInterface $tokenManager
-    ) {
-        $this->security     = $security;
-        $this->requestStack = $requestStack;
-        $this->dispatcher   = $dispatcher;
-        $this->tokenManager = $tokenManager;
+    public function __construct(private CorePermissions $security, private RequestStack $requestStack, private EventDispatcherInterface $dispatcher, private CsrfTokenManagerInterface $tokenManager)
+    {
     }
 
     public function getName(): string

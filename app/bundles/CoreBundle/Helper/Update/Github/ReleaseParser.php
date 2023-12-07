@@ -11,11 +11,8 @@ use Mautic\CoreBundle\Release\Metadata;
 
 class ReleaseParser
 {
-    private \GuzzleHttp\Client $client;
-
-    public function __construct(Client $client)
+    public function __construct(private Client $client)
     {
-        $this->client = $client;
     }
 
     /**

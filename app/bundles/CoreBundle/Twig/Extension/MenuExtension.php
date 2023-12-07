@@ -12,11 +12,8 @@ use Twig\TwigFunction;
 
 class MenuExtension extends AbstractExtension
 {
-    protected MenuHelper $menuHelper;
-
-    public function __construct(MenuHelper $menuHelper)
+    public function __construct(protected MenuHelper $menuHelper)
     {
-        $this->menuHelper = $menuHelper;
     }
 
     /**

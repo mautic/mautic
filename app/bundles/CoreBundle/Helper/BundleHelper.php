@@ -7,26 +7,14 @@ class BundleHelper
     /**
      * @var mixed[]
      */
-    private array $coreBundles;
-
-    /**
-     * @var mixed[]
-     */
-    private array $pluginBundles;
-
-    /**
-     * @var mixed[]
-     */
     private array $allBundles;
 
     /**
      * @param mixed[] $coreBundles
      * @param mixed[] $pluginBundles
      */
-    public function __construct(array $coreBundles, array $pluginBundles)
+    public function __construct(private array $coreBundles, private array $pluginBundles)
     {
-        $this->coreBundles   = $coreBundles;
-        $this->pluginBundles = $pluginBundles;
         $this->allBundles    = array_merge($coreBundles, $pluginBundles);
     }
 

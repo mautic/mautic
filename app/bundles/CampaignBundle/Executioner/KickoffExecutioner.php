@@ -36,16 +36,6 @@ class KickoffExecutioner implements ExecutionerInterface
      */
     private $output;
 
-    private \Psr\Log\LoggerInterface $logger;
-
-    private \Mautic\CampaignBundle\Executioner\ContactFinder\KickoffContactFinder $kickoffContactFinder;
-
-    private \Symfony\Contracts\Translation\TranslatorInterface $translator;
-
-    private \Mautic\CampaignBundle\Executioner\EventExecutioner $executioner;
-
-    private \Mautic\CampaignBundle\Executioner\Scheduler\EventScheduler $scheduler;
-
     /**
      * @var ProgressBar
      */
@@ -61,18 +51,8 @@ class KickoffExecutioner implements ExecutionerInterface
      */
     private $counter;
 
-    public function __construct(
-        LoggerInterface $logger,
-        KickoffContactFinder $kickoffContactFinder,
-        TranslatorInterface $translator,
-        EventExecutioner $executioner,
-        EventScheduler $scheduler
-    ) {
-        $this->logger               = $logger;
-        $this->kickoffContactFinder = $kickoffContactFinder;
-        $this->translator           = $translator;
-        $this->executioner          = $executioner;
-        $this->scheduler            = $scheduler;
+    public function __construct(private LoggerInterface $logger, private KickoffContactFinder $kickoffContactFinder, private TranslatorInterface $translator, private EventExecutioner $executioner, private EventScheduler $scheduler)
+    {
     }
 
     /**

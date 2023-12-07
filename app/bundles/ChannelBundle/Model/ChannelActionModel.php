@@ -10,20 +10,8 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class ChannelActionModel
 {
-    private \Mautic\LeadBundle\Model\LeadModel $contactModel;
-
-    private \Mautic\LeadBundle\Model\DoNotContact $doNotContact;
-
-    private \Symfony\Contracts\Translation\TranslatorInterface $translator;
-
-    public function __construct(
-        LeadModel $contactModel,
-        DoNotContact $doNotContact,
-        TranslatorInterface $translator
-    ) {
-        $this->contactModel = $contactModel;
-        $this->doNotContact = $doNotContact;
-        $this->translator   = $translator;
+    public function __construct(private LeadModel $contactModel, private DoNotContact $doNotContact, private TranslatorInterface $translator)
+    {
     }
 
     /**

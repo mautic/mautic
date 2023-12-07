@@ -28,8 +28,6 @@ class ContactLimiter
      */
     private $maxContactId;
 
-    private array $contactIdList;
-
     /**
      * @var int|null
      */
@@ -64,7 +62,7 @@ class ContactLimiter
         $contactId = null,
         $minContactId = null,
         $maxContactId = null,
-        array $contactIdList = [],
+        private array $contactIdList = [],
         $threadId = null,
         $maxThreads = null,
         $campaignLimit = null
@@ -73,7 +71,6 @@ class ContactLimiter
         $this->contactId     = ($contactId) ? (int) $contactId : null;
         $this->minContactId  = ($minContactId) ? (int) $minContactId : null;
         $this->maxContactId  = ($maxContactId) ? (int) $maxContactId : null;
-        $this->contactIdList = $contactIdList;
 
         if ($threadId && $maxThreads) {
             $this->threadId     = (int) $threadId;

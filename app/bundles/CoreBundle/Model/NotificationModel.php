@@ -31,15 +31,9 @@ class NotificationModel extends FormModel
      */
     protected $disableUpdates;
 
-    protected \Mautic\CoreBundle\Helper\PathsHelper $pathsHelper;
-
-    protected \Mautic\CoreBundle\Helper\UpdateHelper $updateHelper;
-
-    private RequestStack $requestStack;
-
     public function __construct(
-        PathsHelper $pathsHelper,
-        UpdateHelper $updateHelper,
+        protected PathsHelper $pathsHelper,
+        protected UpdateHelper $updateHelper,
         CoreParametersHelper $coreParametersHelper,
         EntityManager $em,
         CorePermissions $security,
@@ -48,12 +42,8 @@ class NotificationModel extends FormModel
         Translator $translator,
         UserHelper $userHelper,
         LoggerInterface $mauticLogger,
-        RequestStack $requestStack,
+        private RequestStack $requestStack,
     ) {
-        $this->pathsHelper  = $pathsHelper;
-        $this->updateHelper = $updateHelper;
-        $this->requestStack = $requestStack;
-
         parent::__construct($em, $security, $dispatcher, $router, $translator, $userHelper, $mauticLogger, $coreParametersHelper);
     }
 

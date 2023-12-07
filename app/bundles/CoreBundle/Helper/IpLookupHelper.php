@@ -9,12 +9,6 @@ use Symfony\Component\HttpFoundation\RequestStack;
 
 class IpLookupHelper
 {
-    protected \Symfony\Component\HttpFoundation\RequestStack $requestStack;
-
-    protected \Doctrine\ORM\EntityManager $em;
-
-    protected ?\Mautic\CoreBundle\IpLookup\AbstractLookup $ipLookup;
-
     /**
      * @var array
      */
@@ -43,14 +37,11 @@ class IpLookupHelper
     private \Mautic\CoreBundle\Helper\CoreParametersHelper $coreParametersHelper;
 
     public function __construct(
-        RequestStack $requestStack,
-        EntityManager $em,
+        protected RequestStack $requestStack,
+        protected EntityManager $em,
         CoreParametersHelper $coreParametersHelper,
-        AbstractLookup $ipLookup = null
+        protected ?AbstractLookup $ipLookup = null
     ) {
-        $this->requestStack          = $requestStack;
-        $this->em                    = $em;
-        $this->ipLookup              = $ipLookup;
         $this->doNotTrackIps         = $coreParametersHelper->get('do_not_track_ips');
         $this->doNotTrackBots        = $coreParametersHelper->get('do_not_track_bots');
         $this->doNotTrackInternalIps = $coreParametersHelper->get('do_not_track_internal_ips');

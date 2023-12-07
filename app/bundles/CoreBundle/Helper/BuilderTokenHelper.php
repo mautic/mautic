@@ -11,16 +11,6 @@ class BuilderTokenHelper
 {
     private $isConfigured = false;
 
-    private \Mautic\CoreBundle\Security\Permissions\CorePermissions $security;
-
-    /**
-     * @var ModelFactory<object>
-     */
-    private \Mautic\CoreBundle\Factory\ModelFactory $modelFactory;
-
-    private \Doctrine\DBAL\Connection $connection;
-    private \Mautic\CoreBundle\Helper\UserHelper $userHelper;
-
     protected $permissionSet;
     protected $modelName;
     protected $viewPermissionBase;
@@ -30,16 +20,8 @@ class BuilderTokenHelper
     /**
      * @param ModelFactory<object> $modelFactory
      */
-    public function __construct(
-        CorePermissions $security,
-        ModelFactory $modelFactory,
-        Connection $connection,
-        UserHelper $userHelper
-    ) {
-        $this->security      = $security;
-        $this->modelFactory  = $modelFactory;
-        $this->connection    = $connection;
-        $this->userHelper    = $userHelper;
+    public function __construct(private CorePermissions $security, private ModelFactory $modelFactory, private Connection $connection, private UserHelper $userHelper)
+    {
     }
 
     /**

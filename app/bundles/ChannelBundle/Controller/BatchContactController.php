@@ -22,16 +22,10 @@ use Symfony\Component\HttpFoundation\RequestStack;
 
 class BatchContactController extends AbstractFormController
 {
-    private \Mautic\ChannelBundle\Model\ChannelActionModel $channelActionModel;
-
-    private \Mautic\ChannelBundle\Model\FrequencyActionModel $frequencyActionModel;
-
-    private \Mautic\LeadBundle\Model\LeadModel $contactModel;
-
     public function __construct(
-        ChannelActionModel $channelActionModel,
-        FrequencyActionModel $frequencyActionModel,
-        LeadModel $leadModel,
+        private ChannelActionModel $channelActionModel,
+        private FrequencyActionModel $frequencyActionModel,
+        private LeadModel $contactModel,
         ManagerRegistry $doctrine,
         MauticFactory $factory,
         ModelFactory $modelFactory,
@@ -43,9 +37,6 @@ class BatchContactController extends AbstractFormController
         RequestStack $requestStack,
         CorePermissions $security
     ) {
-        $this->channelActionModel   = $channelActionModel;
-        $this->frequencyActionModel = $frequencyActionModel;
-        $this->contactModel         = $leadModel;
         parent::__construct($doctrine, $factory, $modelFactory, $userHelper, $coreParametersHelper, $dispatcher, $translator, $flashBag, $requestStack, $security);
     }
 

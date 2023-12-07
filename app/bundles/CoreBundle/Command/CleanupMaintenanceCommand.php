@@ -19,15 +19,9 @@ use Symfony\Contracts\Translation\TranslatorInterface;
  */
 class CleanupMaintenanceCommand extends ModeratedCommand
 {
-    private TranslatorInterface $translator;
-    private EventDispatcherInterface $dispatcher;
-
-    public function __construct(TranslatorInterface $translator, EventDispatcherInterface $dispatcher, PathsHelper $pathsHelper, CoreParametersHelper $coreParametersHelper)
+    public function __construct(private TranslatorInterface $translator, private EventDispatcherInterface $dispatcher, PathsHelper $pathsHelper, CoreParametersHelper $coreParametersHelper)
     {
         parent::__construct($pathsHelper, $coreParametersHelper);
-
-        $this->translator = $translator;
-        $this->dispatcher = $dispatcher;
     }
 
     protected function configure()

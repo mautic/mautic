@@ -20,32 +20,8 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
  */
 abstract class AbstractCommonModel implements MauticModelInterface
 {
-    protected \Doctrine\ORM\EntityManagerInterface $em;
-
-    protected \Mautic\CoreBundle\Security\Permissions\CorePermissions $security;
-
-    protected \Symfony\Component\EventDispatcher\EventDispatcherInterface $dispatcher;
-
-    protected \Symfony\Component\Routing\Generator\UrlGeneratorInterface $router;
-
-    protected \Mautic\CoreBundle\Translation\Translator $translator;
-
-    protected \Mautic\CoreBundle\Helper\UserHelper $userHelper;
-
-    protected \Psr\Log\LoggerInterface $logger;
-
-    protected \Mautic\CoreBundle\Helper\CoreParametersHelper $coreParametersHelper;
-
-    public function __construct(EntityManagerInterface $em, CorePermissions $security, EventDispatcherInterface $dispatcher, UrlGeneratorInterface $router, Translator $translator, UserHelper $userHelper, LoggerInterface $mauticLogger, CoreParametersHelper $coreParametersHelper)
+    public function __construct(protected EntityManagerInterface $em, protected CorePermissions $security, protected EventDispatcherInterface $dispatcher, protected UrlGeneratorInterface $router, protected Translator $translator, protected UserHelper $userHelper, protected LoggerInterface $logger, protected CoreParametersHelper $coreParametersHelper)
     {
-        $this->em                   = $em;
-        $this->security             = $security;
-        $this->dispatcher           = $dispatcher;
-        $this->router               = $router;
-        $this->translator           = $translator;
-        $this->userHelper           = $userHelper;
-        $this->logger               = $mauticLogger;
-        $this->coreParametersHelper = $coreParametersHelper;
     }
 
     /**

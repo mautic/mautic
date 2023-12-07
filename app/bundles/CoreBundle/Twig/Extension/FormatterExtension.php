@@ -11,11 +11,8 @@ use Twig\TwigFunction;
 
 class FormatterExtension extends AbstractExtension
 {
-    protected FormatterHelper $formatterHelper;
-
-    public function __construct(FormatterHelper $formatterHelper)
+    public function __construct(protected FormatterHelper $formatterHelper)
     {
-        $this->formatterHelper = $formatterHelper;
     }
 
     /**
