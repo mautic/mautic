@@ -18,10 +18,7 @@ class CompanyReportData
         $this->translator = $translator;
     }
 
-    /**
-     * @return array
-     */
-    public function getCompanyData()
+    public function getCompanyData(): array
     {
         $companyColumns = $this->getCompanyColumns();
         $companyFields  = $this->fieldModel->getEntities([

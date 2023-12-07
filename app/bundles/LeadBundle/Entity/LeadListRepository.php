@@ -193,10 +193,8 @@ class LeadListRepository extends CommonRepository
 
     /**
      * Check Lead segments by ids.
-     *
-     * @return bool
      */
-    public function checkLeadSegmentsByIds(Lead $lead, $ids)
+    public function checkLeadSegmentsByIds(Lead $lead, $ids): bool
     {
         if (empty($ids)) {
             return false;
@@ -512,7 +510,7 @@ class LeadListRepository extends CommonRepository
     /**
      * {@inheritdoc}
      */
-    public function getTableAlias()
+    public function getTableAlias(): string
     {
         return 'l';
     }

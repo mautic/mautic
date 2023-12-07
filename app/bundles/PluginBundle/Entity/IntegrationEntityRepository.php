@@ -227,7 +227,7 @@ class IntegrationEntityRepository extends CommonRepository
                 $q->expr()->notIn(
                     'i.integration_entity_id',
                     array_map(
-                        function ($x) {
+                        function ($x): string {
                             return "'".$x."'";
                         },
                         $excludeIntegrationIds
@@ -454,7 +454,7 @@ class IntegrationEntityRepository extends CommonRepository
                 ->from(MAUTIC_TABLE_PREFIX.'plugin_integration_settings', 'p')
                 ->where('p.is_published = 1');
             $rows    = $pq->executeQuery()->fetchAllAssociative();
-            $plugins = array_map(static function ($i) {
+            $plugins = array_map(static function ($i): string {
                 return "'{$i['name']}'";
             }, $rows);
             if (count($plugins) > 0) {

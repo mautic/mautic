@@ -16,14 +16,8 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class ConfigType extends AbstractType
 {
-    protected \Mautic\CoreBundle\Helper\CoreParametersHelper $parameters;
-
-    protected \Symfony\Contracts\Translation\TranslatorInterface $translator;
-
-    public function __construct(CoreParametersHelper $parametersHelper, TranslatorInterface $translator)
+    public function __construct(protected CoreParametersHelper $parameters, protected TranslatorInterface $translator)
     {
-        $this->parameters = $parametersHelper;
-        $this->translator = $translator;
     }
 
     public function buildForm(FormBuilderInterface $builder, array $options): void

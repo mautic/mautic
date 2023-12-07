@@ -97,8 +97,6 @@ class WebhookModel extends FormModel
      */
     protected $logMax;
 
-    protected \JMS\Serializer\SerializerInterface $serializer;
-
     /**
      * Queued events default order by dir
      * Possible values: ['ASC', 'DESC'].
@@ -106,8 +104,6 @@ class WebhookModel extends FormModel
      * @var string
      */
     protected $eventsOrderByDir;
-
-    private \Mautic\WebhookBundle\Http\Client $httpClient;
 
     /**
      * Timestamp when the webhook processing starts.
@@ -118,8 +114,8 @@ class WebhookModel extends FormModel
 
     public function __construct(
         CoreParametersHelper $coreParametersHelper,
-        SerializerInterface $serializer,
-        Client $httpClient,
+        protected SerializerInterface $serializer,
+        private Client $httpClient,
         EntityManager $em,
         CorePermissions $security,
         EventDispatcherInterface $dispatcher,
@@ -129,8 +125,6 @@ class WebhookModel extends FormModel
         LoggerInterface $mauticLogger
     ) {
         $this->setConfigProps($coreParametersHelper);
-        $this->serializer        = $serializer;
-        $this->httpClient        = $httpClient;
 
         parent::__construct($em, $security, $dispatcher, $router, $translator, $userHelper, $mauticLogger, $coreParametersHelper);
     }

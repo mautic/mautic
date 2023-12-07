@@ -65,10 +65,8 @@ class SegmentCampaignShare
     /**
      * @param int $segmentId
      * @param int $campaignId
-     *
-     * @return string
      */
-    private function getCachedKey($segmentId, $campaignId)
+    private function getCachedKey($segmentId, $campaignId): string
     {
         return sprintf('%s|%s|%s|%s|%s', 'campaign', $campaignId, 'segment', $segmentId, 'share');
     }

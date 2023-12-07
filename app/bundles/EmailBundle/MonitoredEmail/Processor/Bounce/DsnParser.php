@@ -1222,10 +1222,10 @@ class DsnParser
                     $result['rule_cat'] = Category::DELAYED;
                     $result['rule_no']  = '0110';
                     break;
+                    // unhandled cases
                 case 'delivered':
                 case 'relayed':
-                case 'expanded': // unhandled cases
-                    break;
+                case 'expanded':
                 default:
                     break;
             }

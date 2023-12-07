@@ -56,10 +56,8 @@ class ImportRepository extends CommonRepository
 
     /**
      * Count how many imports with the status is there.
-     *
-     * @return int
      */
-    public function countImportsWithStatuses(array $statuses)
+    public function countImportsWithStatuses(array $statuses): int
     {
         $q = $this->getQueryForStatuses($statuses);
         $q->select('COUNT(DISTINCT '.$this->getTableAlias().'.id) as theCount');
@@ -91,7 +89,7 @@ class ImportRepository extends CommonRepository
     /**
      * {@inheritdoc}
      */
-    public function getTableAlias()
+    public function getTableAlias(): string
     {
         return 'i';
     }

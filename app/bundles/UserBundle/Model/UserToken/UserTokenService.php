@@ -8,16 +8,8 @@ use Mautic\UserBundle\Entity\UserTokenRepositoryInterface;
 
 final class UserTokenService implements UserTokenServiceInterface
 {
-    private \Mautic\CoreBundle\Helper\RandomHelper\RandomHelperInterface $randomHelper;
-
-    private \Mautic\UserBundle\Entity\UserTokenRepositoryInterface $userTokenRepository;
-
-    public function __construct(
-        RandomHelperInterface $randomHelper,
-        UserTokenRepositoryInterface $userTokenRepository
-    ) {
-        $this->randomHelper        = $randomHelper;
-        $this->userTokenRepository = $userTokenRepository;
+    public function __construct(private RandomHelperInterface $randomHelper, private UserTokenRepositoryInterface $userTokenRepository)
+    {
     }
 
     /**

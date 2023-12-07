@@ -51,7 +51,7 @@ class PluginModel extends FormModel
     /**
      * {@inheritdoc}
      */
-    public function getPermissionBase()
+    public function getPermissionBase(): string
     {
         return 'plugin:plugins';
     }

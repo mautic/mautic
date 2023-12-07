@@ -19,14 +19,11 @@ class LoadRoleData extends AbstractFixture implements OrderedFixtureInterface, F
         return ['group_mautic_install_data'];
     }
 
-    private \Mautic\UserBundle\Model\RoleModel $roleModel;
-
     /**
      * {@inheritdoc}
      */
-    public function __construct(RoleModel $roleModel)
+    public function __construct(private RoleModel $roleModel)
     {
-        $this->roleModel = $roleModel;
     }
 
     public function load(ObjectManager $manager): void

@@ -37,10 +37,7 @@ class SegmentReferenceFilterQueryBuilder extends BaseFilterQueryBuilder
         $this->entityManager            = $entityManager;
     }
 
-    /**
-     * @return string
-     */
-    public static function getServiceId()
+    public static function getServiceId(): string
     {
         return 'mautic.lead.query.builder.special.leadlist';
     }

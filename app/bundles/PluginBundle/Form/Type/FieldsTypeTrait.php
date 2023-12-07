@@ -78,7 +78,7 @@ trait FieldsTypeTrait
                 ksort($requiredFields, SORT_NATURAL);
                 ksort($optionalFields, SORT_NATURAL);
 
-                $sortFieldsFunction = function ($a, $b) {
+                $sortFieldsFunction = function ($a, $b): int {
                     if (is_array($a)) {
                         $aLabel = (isset($a['optionLabel'])) ? $a['optionLabel'] : $a['label'];
                     } else {
@@ -248,14 +248,14 @@ trait FieldsTypeTrait
                 },
                 'allow_extra_fields'   => true,
                 'enable_data_priority' => false,
-                'totalFields'          => function (Options $options) {
+                'totalFields'          => function (Options $options): int {
                     return count($options['integration_fields']);
                 },
-                'fixedPageNum' => function (Options $options) {
+                'fixedPageNum' => function (Options $options): float {
                     return ceil($options['totalFields'] / $options['limit']);
                 },
                 'limit' => 10,
-                'start' => function (Options $options) {
+                'start' => function (Options $options): int {
                     return (1 === (int) $options['page']) ? 0 : ((int) $options['page'] - 1) * (int) $options['limit'];
                 },
             ]

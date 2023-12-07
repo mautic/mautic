@@ -599,10 +599,8 @@ class ImportController extends FormController
      * Return full absolute path to the CSV file.
      *
      * @param string $object
-     *
-     * @return string
      */
-    protected function getFullCsvPath($object)
+    protected function getFullCsvPath($object): string
     {
         return $this->getImportDirName().'/'.$this->getImportFileName($object);
     }
@@ -676,7 +674,7 @@ class ImportController extends FormController
         return parent::generateUrl($route, $parameters, $referenceType);
     }
 
-    protected function getModelName()
+    protected function getModelName(): string
     {
         return 'lead.import';
     }
@@ -686,7 +684,7 @@ class ImportController extends FormController
      *
      * @return string
      */
-    protected function getSessionBase($objectId = null)
+    protected function getSessionBase($objectId = null): string
     {
         $initEvent = $this->dispatchImportOnInit();
         $object    = $initEvent->objectSingular;
@@ -699,35 +697,28 @@ class ImportController extends FormController
         return $this->getModel($this->getModelName())->getPermissionBase();
     }
 
-    protected function getRouteBase()
+    protected function getRouteBase(): string
     {
         return 'import';
     }
 
-    /**
-     * @return string
-     */
-    protected function getTemplateBase()
+    protected function getTemplateBase(): string
     {
         return '@MauticLead/Import';
     }
 
     /**
      * Provide the name of the column which is used for default ordering.
-     *
-     * @return string
      */
-    protected function getDefaultOrderColumn()
+    protected function getDefaultOrderColumn(): string
     {
         return 'dateAdded';
     }
 
     /**
      * Provide the direction for default ordering.
-     *
-     * @return string
      */
-    protected function getDefaultOrderDirection()
+    protected function getDefaultOrderDirection(): string
     {
         return 'DESC';
     }

@@ -152,11 +152,9 @@ class InputHelper
 
                 if (is_array($v)) {
                     $v = self::_($v, $useMask, $urldecode);
-                } elseif (null === $v) {
-                    $v = $v;
                 } elseif ('filter' === $useMask) {
                     $v = self::getFilter()->clean($v, $useMask);
-                } else {
+                } elseif (null !== $v) {
                     $v = self::$useMask($v, $urldecode);
                 }
             }

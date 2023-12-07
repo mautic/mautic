@@ -29,20 +29,16 @@ class PointsChangeEvent extends CommonEvent
 
     /**
      * Returns the new points.
-     *
-     * @return int
      */
-    public function getNewPoints()
+    public function getNewPoints(): int
     {
         return $this->new;
     }
 
     /**
      * Returns the old points.
-     *
-     * @return int
      */
-    public function getOldPoints()
+    public function getOldPoints(): int
     {
         return $this->old;
     }

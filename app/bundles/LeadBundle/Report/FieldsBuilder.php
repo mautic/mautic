@@ -28,10 +28,8 @@ class FieldsBuilder
 
     /**
      * @param string $prefix
-     *
-     * @return array
      */
-    public function getLeadFieldsColumns($prefix)
+    public function getLeadFieldsColumns($prefix): array
     {
         $baseColumns  = $this->getBaseLeadColumns();
         $leadFields   = $this->fieldModel->getLeadFields();
@@ -107,10 +105,8 @@ class FieldsBuilder
 
     /**
      * @param string $prefix
-     *
-     * @return array
      */
-    public function getCompanyFieldsColumns($prefix)
+    public function getCompanyFieldsColumns($prefix): array
     {
         $baseColumns   = $this->getBaseCompanyColumns();
         $companyFields = $this->fieldModel->getCompanyFields();
@@ -238,10 +234,8 @@ class FieldsBuilder
 
     /**
      * @param string $prefix
-     *
-     * @return string
      */
-    private function sanitizePrefix($prefix)
+    private function sanitizePrefix($prefix): string
     {
         if (false === strpos($prefix, '.')) {
             $prefix .= '.';

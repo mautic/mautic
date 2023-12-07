@@ -65,10 +65,7 @@ class CategoryChangeEvent extends Event
         return $this->added;
     }
 
-    /**
-     * @return bool
-     */
-    public function wasRemoved()
+    public function wasRemoved(): bool
     {
         return !$this->added;
     }

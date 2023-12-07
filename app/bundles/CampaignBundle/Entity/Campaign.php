@@ -221,8 +221,6 @@ class Campaign extends FormEntity implements PublishStatusIconAttributesInterfac
     }
 
     /**
-     * Get id.
-     *
      * @return int
      */
     public function getId()

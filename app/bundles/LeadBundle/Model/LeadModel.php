@@ -317,20 +317,16 @@ class LeadModel extends FormModel
 
     /**
      * {@inheritdoc}
-     *
-     * @return string
      */
-    public function getPermissionBase()
+    public function getPermissionBase(): string
     {
         return 'lead:leads';
     }
 
     /**
      * {@inheritdoc}
-     *
-     * @return string
      */
-    public function getNameGetter()
+    public function getNameGetter(): string
     {
         return 'getPrimaryIdentifier';
     }
@@ -1168,11 +1164,9 @@ class LeadModel extends FormModel
      * @param null  $importId
      * @param bool  $skipIfExists
      *
-     * @return bool|null
-     *
      * @throws \Exception
      */
-    public function import($fields, $data, $owner = null, $list = null, $tags = null, $persist = true, LeadEventLog $eventLog = null, $importId = null, $skipIfExists = false)
+    public function import($fields, $data, $owner = null, $list = null, $tags = null, $persist = true, LeadEventLog $eventLog = null, $importId = null, $skipIfExists = false): bool
     {
         $fields    = array_flip($fields);
         $fieldData = [];
@@ -1612,10 +1606,8 @@ class LeadModel extends FormModel
      * Modify tags with support to remove via a prefixed minus sign.
      *
      * @param bool $persist True if tags modified
-     *
-     * @return bool
      */
-    public function modifyTags(Lead $lead, $tags, array $removeTags = null, $persist = true)
+    public function modifyTags(Lead $lead, $tags, array $removeTags = null, $persist = true): bool
     {
         $tagsModified = false;
         $leadTags     = $lead->getTags();
@@ -2181,10 +2173,7 @@ class LeadModel extends FormModel
         return ['oldPrimary' => $oldPrimaryCompany, 'newPrimary' => $companyId];
     }
 
-    /**
-     * @return bool
-     */
-    public function scoreContactsCompany(Lead $lead, $score)
+    public function scoreContactsCompany(Lead $lead, $score): bool
     {
         $success          = false;
         $entities         = [];

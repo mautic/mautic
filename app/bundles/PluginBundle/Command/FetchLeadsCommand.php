@@ -148,7 +148,7 @@ class FetchLeadsCommand extends Command
                     $leadObjectName = 'Leads';
                 }
                 $contactObjectName = 'Contact';
-                if (in_array(strtolower('Contacts'), array_map(function ($i) {
+                if (in_array(strtolower('Contacts'), array_map(function ($i): string {
                     return strtolower($i);
                 }, $config['objects']), true)) {
                     $contactObjectName = 'Contacts';
@@ -166,7 +166,7 @@ class FetchLeadsCommand extends Command
                         $processed += (int) $results;
                     }
                 }
-                if (in_array(strtolower($contactObjectName), array_map(function ($i) {
+                if (in_array(strtolower($contactObjectName), array_map(function ($i): string {
                     return strtolower($i);
                 }, $config['objects']), true)) {
                     $output->writeln('');

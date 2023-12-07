@@ -71,10 +71,7 @@ class SegmentContactsLineChartQuery extends ChartQuery
         $this->init();
     }
 
-    /**
-     * @return array
-     */
-    public function getTotalStats(int $total)
+    public function getTotalStats(int $total): array
     {
         $totalCountDateTo = $this->getTotalToDateRange($total);
         // count array SUM and then reverse
