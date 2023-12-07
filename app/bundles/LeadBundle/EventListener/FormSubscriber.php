@@ -28,9 +28,6 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 class FormSubscriber implements EventSubscriberInterface
 {
     public function __construct(
-        /**
-         * @param LeadModel
-         */
         protected LeadModel $leadModel,
         protected ContactTracker $contactTracker,
         protected IpLookupHelper $ipLookupHelper,

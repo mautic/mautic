@@ -198,12 +198,13 @@ class TrackableModel extends AbstractCommonModel
     /**
      * Returns a list of tokens and/or URLs that should not be converted to trackables.
      *
-     * @param null $content
+     * @param mixed|null $content
      *
      * @return array
      */
-    public function getDoNotTrackList($content = null)
+    public function getDoNotTrackList($content)
     {
+        /** @var UntrackableUrlsEvent $event */
         $event = $this->dispatcher->dispatch(
             new UntrackableUrlsEvent($content),
             PageEvents::REDIRECT_DO_NOT_TRACK

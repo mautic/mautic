@@ -8,19 +8,14 @@ use Mautic\LeadBundle\Entity\Lead;
 class LeadUtmTagsEvent extends CommonEvent
 {
     /**
-     * @param bool $utmtags
+     * @param mixed[] $utmtags
      */
-    public function __construct(Lead $lead, protected $utmtags)
+    public function __construct(Lead $lead, protected array $utmtags)
     {
         $this->entity  = $lead;
     }
 
-    /**
-     * Returns the Lead entity.
-     *
-     * @return Lead
-     */
-    public function getLead()
+    public function getLead(): Lead
     {
         return $this->entity;
     }
@@ -28,9 +23,9 @@ class LeadUtmTagsEvent extends CommonEvent
     /**
      * Returns the new points.
      *
-     * @return int
+     * @return mixed[]
      */
-    public function getUtmTags()
+    public function getUtmTags(): array
     {
         return $this->utmtags;
     }

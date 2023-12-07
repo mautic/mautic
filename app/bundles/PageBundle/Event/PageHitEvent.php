@@ -11,10 +11,8 @@ class PageHitEvent extends CommonEvent
     protected ?\Mautic\PageBundle\Entity\Page $page = null;
 
     /**
-     * PageHitEvent constructor.
-     *
-     * @param array $clickthroughData
-     * @param bool  $unique
+     * @param mixed[] $clickthroughData
+     * @param bool    $unique
      */
     public function __construct(Hit $hit, protected $request, protected $code, protected $clickthroughData = [], protected $unique = false)
     {
