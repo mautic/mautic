@@ -8,7 +8,7 @@ use Mautic\LeadBundle\Segment\Query\QueryException;
 
 class IntegrationCampaignFilterQueryBuilder extends BaseFilterQueryBuilder
 {
-    public static function getServiceId()
+    public static function getServiceId(): string
     {
         return 'mautic.lead.query.builder.special.integration';
     }

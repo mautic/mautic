@@ -282,7 +282,7 @@ class IntegrationHelper
 
         if (empty($alphabetical)) {
             // Sort by priority
-            uasort($returnServices, function ($a, $b) {
+            uasort($returnServices, function ($a, $b): int {
                 $aP = (int) $a->getPriority();
                 $bP = (int) $b->getPriority();
 
@@ -294,7 +294,7 @@ class IntegrationHelper
             });
         } else {
             // Sort by display name
-            uasort($returnServices, function ($a, $b) {
+            uasort($returnServices, function ($a, $b): int {
                 $aName = $a->getDisplayName();
                 $bName = $b->getDisplayName();
 
@@ -319,10 +319,8 @@ class IntegrationHelper
 
     /**
      * Gets a count of integrations.
-     *
-     * @return int
      */
-    public function getIntegrationCount($plugin)
+    public function getIntegrationCount($plugin): int
     {
         if (!is_array($plugin)) {
             $plugins = $this->coreParametersHelper->get('plugin.bundles');

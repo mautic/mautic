@@ -50,10 +50,7 @@ class DynamicContentDecisionType extends DynamicContentSendType
         );
     }
 
-    /**
-     * @return string
-     */
-    public function getBlockPrefix()
+    public function getBlockPrefix(): string
     {
         return 'dwcdecision_list';
     }

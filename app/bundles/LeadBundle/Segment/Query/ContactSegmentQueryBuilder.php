@@ -218,10 +218,8 @@ class ContactSegmentQueryBuilder
 
     /**
      * Generate a unique parameter name.
-     *
-     * @return string
      */
-    private function generateRandomParameterName()
+    private function generateRandomParameterName(): string
     {
         return $this->randomParameterName->generateRandomParameterName();
     }

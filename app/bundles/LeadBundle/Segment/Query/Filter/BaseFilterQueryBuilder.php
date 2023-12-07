@@ -23,7 +23,7 @@ class BaseFilterQueryBuilder implements FilterQueryBuilderInterface
         $this->dispatcher             = $dispatcher;
     }
 
-    public static function getServiceId()
+    public static function getServiceId(): string
     {
         return 'mautic.lead.query.builder.basic';
     }
@@ -68,10 +68,7 @@ class BaseFilterQueryBuilder implements FilterQueryBuilderInterface
         return $this;
     }
 
-    /**
-     * @return string
-     */
-    protected function generateRandomParameterName()
+    protected function generateRandomParameterName(): string
     {
         return $this->parameterNameGenerator->generateRandomParameterName();
     }

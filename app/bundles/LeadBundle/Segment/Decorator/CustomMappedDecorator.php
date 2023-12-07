@@ -33,10 +33,7 @@ class CustomMappedDecorator extends BaseDecorator implements ContactDecoratorFor
         }
     }
 
-    /**
-     * @return string
-     */
-    public function getTable(ContactSegmentFilterCrate $contactSegmentFilterCrate)
+    public function getTable(ContactSegmentFilterCrate $contactSegmentFilterCrate): string
     {
         $originalField = $contactSegmentFilterCrate->getField();
 
@@ -61,10 +58,7 @@ class CustomMappedDecorator extends BaseDecorator implements ContactDecoratorFor
         }
     }
 
-    /**
-     * @return string|bool if no func needed
-     */
-    public function getAggregateFunc(ContactSegmentFilterCrate $contactSegmentFilterCrate)
+    public function getAggregateFunc(ContactSegmentFilterCrate $contactSegmentFilterCrate): string|bool
     {
         $originalField = $contactSegmentFilterCrate->getField();
 

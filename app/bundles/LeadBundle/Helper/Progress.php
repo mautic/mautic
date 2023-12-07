@@ -108,10 +108,8 @@ class Progress
 
     /**
      * Checked if the progress is 100 or more %.
-     *
-     * @return bool
      */
-    public function isFinished()
+    public function isFinished(): bool
     {
         return $this->done >= $this->total;
     }

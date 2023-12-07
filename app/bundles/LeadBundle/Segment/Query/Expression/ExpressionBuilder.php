@@ -13,11 +13,9 @@ class ExpressionBuilder extends BaseExpressionBuilder
     /**
      * Creates a between comparison expression.
      *
-     * @return string
-     *
      * @throws SegmentQueryException
      */
-    public function between($x, $arr)
+    public function between($x, $arr): string
     {
         if (!is_array($arr) || 2 != count($arr)) {
             throw new SegmentQueryException('Between expression expects second argument to be an array with exactly two elements');
@@ -36,11 +34,9 @@ class ExpressionBuilder extends BaseExpressionBuilder
      *     // u.id = ?
      *     $expr->eq('u.id', '?');
      *
-     * @return string
-     *
      * @throws SegmentQueryException
      */
-    public function notBetween($x, $arr)
+    public function notBetween($x, $arr): string
     {
         return 'NOT '.$this->between($x, $arr);
     }
@@ -77,10 +73,8 @@ class ExpressionBuilder extends BaseExpressionBuilder
      *
      * @param mixed $x the left expression
      * @param mixed $y the right expression
-     *
-     * @return string
      */
-    public function notRegexp($x, $y)
+    public function notRegexp($x, $y): string
     {
         return 'NOT '.$this->comparison($x, self::REGEXP, $y);
     }
@@ -111,10 +105,8 @@ class ExpressionBuilder extends BaseExpressionBuilder
      * @param string       $func any function to be applied on $x
      * @param mixed        $x    the left expression
      * @param string|array $y    the placeholder or the array of values to be used by IN() comparison
-     *
-     * @return string
      */
-    public function func($func, $x, $y = null)
+    public function func($func, $x, $y = null): string
     {
         $functionArguments = func_get_args();
         $additionArguments = array_splice($functionArguments, 2);

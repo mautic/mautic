@@ -73,10 +73,8 @@ class oAuthHelper
 
     /**
      * Get composite key for OAuth 1 signature signing.
-     *
-     * @return string
      */
-    private function getCompositeKey()
+    private function getCompositeKey(): string
     {
         if (strlen($this->accessTokenSecret) > 0) {
             $composite_key = $this->encode($this->clientSecret).'&'.$this->encode($this->accessTokenSecret);
@@ -116,10 +114,8 @@ class oAuthHelper
 
     /**
      * Build base string for OAuth 1 signature signing.
-     *
-     * @return string
      */
-    private function buildBaseString($baseURI, $method, $params)
+    private function buildBaseString($baseURI, $method, $params): string
     {
         $r = $this->normalizeParameters($params);
 
@@ -128,10 +124,8 @@ class oAuthHelper
 
     /**
      * Build header for OAuth 1 authorization.
-     *
-     * @return string
      */
-    private function buildAuthorizationHeader($oauth)
+    private function buildAuthorizationHeader($oauth): string
     {
         $r      = 'Authorization: OAuth ';
         $values = $this->normalizeParameters($oauth, true, true);
@@ -174,10 +168,8 @@ class oAuthHelper
 
     /**
      * Returns an encoded string according to the RFC3986.
-     *
-     * @return string
      */
-    public function encode($string)
+    public function encode($string): string
     {
         return str_replace('%7E', '~', rawurlencode($string));
     }
@@ -186,10 +178,8 @@ class oAuthHelper
      * OAuth1.0 nonce generator.
      *
      * @param int $bits
-     *
-     * @return string
      */
-    private function generateNonce($bits = 64)
+    private function generateNonce($bits = 64): string
     {
         $result          = '';
         $accumulatedBits = 0;

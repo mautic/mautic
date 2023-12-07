@@ -156,18 +156,12 @@ class LeadDevice
             ->build();
     }
 
-    /**
-     * @return int
-     */
-    public function getId()
+    public function getId(): int
     {
         return (int) $this->id;
     }
 
-    /**
-     * @return string
-     */
-    public function getSignature()
+    public function getSignature(): string
     {
         return md5(json_encode($this->clientInfo).$this->device.$this->deviceOsName.$this->deviceOsPlatform.$this->deviceBrand.$this->deviceModel);
     }

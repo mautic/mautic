@@ -984,7 +984,7 @@ class ListController extends FormController
         );
     }
 
-    protected function getDefaultOrderDirection()
+    protected function getDefaultOrderDirection(): string
     {
         return 'DESC';
     }

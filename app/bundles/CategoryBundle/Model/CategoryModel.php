@@ -40,12 +40,12 @@ class CategoryModel extends FormModel
         return $this->em->getRepository(Category::class);
     }
 
-    public function getNameGetter()
+    public function getNameGetter(): string
     {
         return 'getTitle';
     }
 
-    public function getPermissionBase($bundle = null)
+    public function getPermissionBase($bundle = null): string
     {
         if (null === $bundle) {
             $bundle = $this->requestStack->getCurrentRequest()->get('bundle');

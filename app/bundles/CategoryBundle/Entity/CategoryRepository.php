@@ -166,7 +166,7 @@ class CategoryRepository extends CommonRepository
     /**
      * {@inheritdoc}
      */
-    public function getTableAlias()
+    public function getTableAlias(): string
     {
         return 'c';
     }

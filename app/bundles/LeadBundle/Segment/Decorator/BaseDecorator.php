@@ -28,10 +28,7 @@ class BaseDecorator implements FilterDecoratorInterface
         return $contactSegmentFilterCrate->getField();
     }
 
-    /**
-     * @return string
-     */
-    public function getTable(ContactSegmentFilterCrate $contactSegmentFilterCrate)
+    public function getTable(ContactSegmentFilterCrate $contactSegmentFilterCrate): string
     {
         if ($contactSegmentFilterCrate->isContactType()) {
             return MAUTIC_TABLE_PREFIX.'leads';
@@ -125,7 +122,7 @@ class BaseDecorator implements FilterDecoratorInterface
         return $filter;
     }
 
-    public function getAggregateFunc(ContactSegmentFilterCrate $contactSegmentFilterCrate)
+    public function getAggregateFunc(ContactSegmentFilterCrate $contactSegmentFilterCrate): bool|string
     {
         return false;
     }

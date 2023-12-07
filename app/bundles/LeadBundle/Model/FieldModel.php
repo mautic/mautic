@@ -484,10 +484,8 @@ class FieldModel extends FormModel
 
     /**
      * {@inheritdoc}
-     *
-     * @return string
      */
-    public function getPermissionBase()
+    public function getPermissionBase(): string
     {
         return 'lead:fields';
     }
@@ -679,10 +677,8 @@ class FieldModel extends FormModel
 
     /**
      * Filter used field ids.
-     *
-     * @return array
      */
-    public function filterUsedFieldIds(array $ids)
+    public function filterUsedFieldIds(array $ids): array
     {
         return array_filter($ids, function ($id): bool {
             return false === $this->isUsedField($this->getEntity($id));

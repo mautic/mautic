@@ -246,10 +246,8 @@ class Import extends FormEntity
     /**
      * Decides if this import entity is triggered as the background
      * job or as UI process.
-     *
-     * @return bool
      */
-    public function isBackgroundProcess()
+    public function isBackgroundProcess(): bool
     {
         return !(self::MANUAL === $this->getStatus());
     }
@@ -298,10 +296,8 @@ class Import extends FormEntity
 
     /**
      * Get import file path.
-     *
-     * @return string
      */
-    public function getFilePath()
+    public function getFilePath(): string
     {
         return $this->getDir().'/'.$this->getFile();
     }

@@ -139,10 +139,8 @@ class LeadEventLogRepository extends CommonRepository
 
     /**
      * Defines default table alias for lead_event_log table.
-     *
-     * @return string
      */
-    public function getTableAlias()
+    public function getTableAlias(): string
     {
         return 'lel';
     }

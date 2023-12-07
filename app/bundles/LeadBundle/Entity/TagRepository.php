@@ -63,10 +63,8 @@ class TagRepository extends CommonRepository
     /**
      * Goes through each element in the array expecting it to be a tag label and removes the '-' character infront of it.
      * The minus character is used to identify that the tag should be removed.
-     *
-     * @return array
      */
-    public function removeMinusFromTags(array $tags)
+    public function removeMinusFromTags(array $tags): array
     {
         return array_map(function ($val) {
             return (0 === strpos($val, '-')) ? substr($val, 1) : $val;
@@ -75,10 +73,8 @@ class TagRepository extends CommonRepository
 
     /**
      * Check Lead tags by Ids.
-     *
-     * @return bool
      */
-    public function checkLeadByTags(Lead $lead, $tags)
+    public function checkLeadByTags(Lead $lead, $tags): bool
     {
         if (empty($tags)) {
             return false;

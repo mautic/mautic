@@ -97,7 +97,7 @@ class LeadFieldRepository extends CommonRepository
     /**
      * {@inheritdoc}
      */
-    public function getTableAlias()
+    public function getTableAlias(): string
     {
         return 'f';
     }
@@ -182,7 +182,7 @@ class LeadFieldRepository extends CommonRepository
      * @param string                                                       $field
      * @param \Doctrine\ORM\QueryBuilder|\Doctrine\DBAL\Query\QueryBuilder $q
      */
-    public function getPropertyByField($field, $q)
+    public function getPropertyByField($field, $q): string
     {
         $columnAlias = 'l.';
         // Join company tables If we're trying search by company fields
@@ -364,10 +364,8 @@ class LeadFieldRepository extends CommonRepository
      * @param int    $lead  ID
      * @param int    $field alias
      * @param string $value to compare with
-     *
-     * @return bool
      */
-    public function compareDateValue($lead, $field, $value)
+    public function compareDateValue($lead, $field, $value): bool
     {
         $q        = $this->_em->getConnection()->createQueryBuilder();
         $property = $this->getPropertyByField($field, $q);
@@ -394,10 +392,8 @@ class LeadFieldRepository extends CommonRepository
      * @param int    $lead  ID
      * @param int    $field alias
      * @param object $value Date object to compare with
-     *
-     * @return bool
      */
-    public function compareDateMonthValue($lead, $field, $value)
+    public function compareDateMonthValue($lead, $field, $value): bool
     {
         $q = $this->_em->getConnection()->createQueryBuilder();
         $q->select('l.id')

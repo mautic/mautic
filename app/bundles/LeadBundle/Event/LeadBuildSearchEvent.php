@@ -117,18 +117,12 @@ class LeadBuildSearchEvent extends CommonEvent
         $this->setSearchStatus(true);
     }
 
-    /**
-     * @return bool
-     */
-    public function isSearchDone()
+    public function isSearchDone(): bool
     {
         return $this->isSearchDone;
     }
 
-    /**
-     * @return string
-     */
-    public function getSubQuery()
+    public function getSubQuery(): string
     {
         return $this->subQuery;
     }
@@ -141,10 +135,7 @@ class LeadBuildSearchEvent extends CommonEvent
         $this->string = $string;
     }
 
-    /**
-     * @return bool
-     */
-    public function getStrict()
+    public function getStrict(): bool
     {
         return $this->strict;
     }
@@ -157,10 +148,7 @@ class LeadBuildSearchEvent extends CommonEvent
         $this->strict = $val;
     }
 
-    /**
-     * @return bool
-     */
-    public function getReturnParameters()
+    public function getReturnParameters(): bool
     {
         return $this->returnParameters;
     }

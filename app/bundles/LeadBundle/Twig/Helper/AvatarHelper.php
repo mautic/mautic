@@ -102,10 +102,8 @@ final class AvatarHelper
      * Get avatar path.
      *
      * @param bool $absolute
-     *
-     * @return string
      */
-    public function getAvatarPath($absolute = false)
+    public function getAvatarPath($absolute = false): string
     {
         $imageDir = $this->pathsHelper->getSystemPath('images', $absolute);
 
@@ -122,10 +120,7 @@ final class AvatarHelper
         return $this->defaultAvatarHelper->getDefaultAvatar($absolute);
     }
 
-    /**
-     * @return string
-     */
-    public function getName()
+    public function getName(): string
     {
         return 'lead_avatar';
     }
