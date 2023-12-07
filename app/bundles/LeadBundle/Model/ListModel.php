@@ -365,7 +365,7 @@ class ListModel extends FormModel
         }
 
         // Handle by batches
-        $start = $lastRoundPercentage = $leadsProcessed = 0;
+        $start = $leadsProcessed = 0;
 
         // Try to save some memory
         gc_enable();
@@ -449,7 +449,7 @@ class ListModel extends FormModel
         $batchLimiters['maxId'] = (int) $orphanLeadsCount[$segmentId]['maxId'];
 
         // Restart batching
-        $start     = $lastRoundPercentage     = 0;
+        $start     = 0;
         $leadCount = $orphanLeadsCount[$segmentId]['count'];
 
         if ($output) {
