@@ -232,11 +232,11 @@ class SalesforceIntegration extends CrmAbstractIntegration
     /**
      * @param array $settings
      *
-     * @return array|mixed
+     * @return mixed[]
      *
      * @throws \Exception
      */
-    public function getAvailableLeadFields($settings = [])
+    public function getAvailableLeadFields($settings = []): array
     {
         $silenceExceptions = (isset($settings['silence_exceptions'])) ? $settings['silence_exceptions'] : true;
         $salesForceObjects = [];
@@ -1554,9 +1554,6 @@ class SalesforceIntegration extends CrmAbstractIntegration
         return false;
     }
 
-    /**
-     * @return mixed|string
-     */
     protected function getSyncKey($email): string
     {
         return mb_strtolower($this->cleanPushData($email));

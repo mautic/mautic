@@ -1822,8 +1822,6 @@ class SugarcrmIntegration extends CrmAbstractIntegration
 
     /**
      * Converts a SuiteCRM / SugarCRM 6.x Multi-Select String into the format used to store Multi-Select values used by Mautic.
-     *
-     * @param  string
      */
     public function convertSuiteCrmToMauticMultiSelect($suiteCrmMultiSelectStringToConvert): string
     {

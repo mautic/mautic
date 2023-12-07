@@ -741,13 +741,11 @@ class ZohoIntegration extends CrmAbstractIntegration
     }
 
     /**
-     * @param array $settings
-     *
-     * @return array|bool
+     * @param mixed[] $settings
      *
      * @throws ApiErrorException
      */
-    public function getAvailableLeadFields($settings = [])
+    public function getAvailableLeadFields($settings = []): array
     {
         $zohoFields        = [];
         $silenceExceptions = isset($settings['silence_exceptions']) ? $settings['silence_exceptions'] : true;
@@ -812,7 +810,7 @@ class ZohoIntegration extends CrmAbstractIntegration
                 throw $exception;
             }
 
-            return false;
+            return [];
         }
 
         return $zohoFields;

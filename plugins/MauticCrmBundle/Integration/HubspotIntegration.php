@@ -194,9 +194,9 @@ class HubspotIntegration extends CrmAbstractIntegration
     }
 
     /**
-     * @return array|mixed
+     * @return mixed[]
      */
-    public function getAvailableLeadFields($settings = [])
+    public function getAvailableLeadFields($settings = []): array
     {
         if ($fields = parent::getAvailableLeadFields()) {
             return $fields;

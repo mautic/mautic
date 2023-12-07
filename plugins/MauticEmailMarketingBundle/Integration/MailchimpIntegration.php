@@ -91,9 +91,9 @@ class MailchimpIntegration extends EmailAbstractIntegration
     /**
      * @param array $settings
      *
-     * @return mixed
+     * @return mixed[]
      */
-    public function getAvailableLeadFields($settings = [])
+    public function getAvailableLeadFields($settings = []): array
     {
         if (isset($settings['list'])) {
             // Ajax update

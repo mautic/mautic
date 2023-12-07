@@ -192,9 +192,9 @@ class ConnectwiseIntegration extends CrmAbstractIntegration
     }
 
     /**
-     * @return array|mixed
+     * @return mixed[]
      */
-    public function getAvailableLeadFields($settings = [])
+    public function getAvailableLeadFields($settings = []): array
     {
         $cwFields = [];
         if (isset($settings['feature_settings']['objects'])) {
