@@ -43,10 +43,7 @@ class AuthenticationContentEvent extends Event
         $this->content[] = $content;
     }
 
-    /**
-     * @return string
-     */
-    public function getContent()
+    public function getContent(): string
     {
         return implode("\n\n", $this->content);
     }

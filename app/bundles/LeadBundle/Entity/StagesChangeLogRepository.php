@@ -60,7 +60,7 @@ class StagesChangeLogRepository extends CommonRepository
      *
      * @return mixed
      */
-    public function getCurrentLeadStage($leadId)
+    public function getCurrentLeadStage($leadId): ?int
     {
         $query = $this->getEntityManager()->getConnection()->createQueryBuilder();
 

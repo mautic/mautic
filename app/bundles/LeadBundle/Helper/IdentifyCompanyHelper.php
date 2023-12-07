@@ -90,7 +90,7 @@ class IdentifyCompanyHelper
         return false;
     }
 
-    private static function normalizeParameters(array $parameters)
+    private static function normalizeParameters(array $parameters): array
     {
         if (isset($parameters['company'])) {
             $parameters['companyname'] = filter_var($parameters['company']);

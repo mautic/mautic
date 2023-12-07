@@ -95,10 +95,7 @@ class ZohoIntegration extends CrmAbstractIntegration
         return !empty($featureSettings['datacenter']) ? $featureSettings['datacenter'] : 'zoho.com';
     }
 
-    /**
-     * @return string
-     */
-    public function getApiUrl()
+    public function getApiUrl(): string
     {
         return sprintf('https://accounts.%s', $this->getDatacenter());
     }
@@ -735,7 +732,7 @@ class ZohoIntegration extends CrmAbstractIntegration
      *
      * @return array|mixed
      */
-    public function getFormLeadFields($settings = [])
+    public function getFormLeadFields($settings = []): array
     {
         $leadFields    = $this->getFormFieldsByObject('Leads', $settings);
         $contactFields = $this->getFormFieldsByObject('Contacts', $settings);

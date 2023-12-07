@@ -67,10 +67,7 @@ class VtigerIntegration extends CrmAbstractIntegration
         return 'sessionName';
     }
 
-    /**
-     * @return string
-     */
-    public function getApiUrl()
+    public function getApiUrl(): string
     {
         return sprintf('%s/webservice.php', $this->keys['url']);
     }

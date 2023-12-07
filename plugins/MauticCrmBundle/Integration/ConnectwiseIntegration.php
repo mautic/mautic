@@ -107,10 +107,7 @@ class ConnectwiseIntegration extends CrmAbstractIntegration
         ];
     }
 
-    /**
-     * @return string
-     */
-    public function getApiUrl()
+    public function getApiUrl(): string
     {
         return sprintf('%s/v4_6_release/apis/3.0', $this->keys['site']);
     }

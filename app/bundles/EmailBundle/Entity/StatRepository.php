@@ -322,10 +322,8 @@ class StatRepository extends CommonRepository
 
     /**
      * @param array<int,int|string>|int $emailIds
-     *
-     * @return array
      */
-    public function getOpenedRates($emailIds, \DateTime $fromDate = null)
+    public function getOpenedRates($emailIds, \DateTime $fromDate = null): array
     {
         $inIds = (!is_array($emailIds)) ? [$emailIds] : $emailIds;
 

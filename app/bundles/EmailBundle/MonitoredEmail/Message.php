@@ -48,7 +48,7 @@ class Message
      *
      * @return array attachmentId => link placeholder
      */
-    public function getInternalLinksPlaceholders()
+    public function getInternalLinksPlaceholders(): array
     {
         return preg_match_all('/=["\'](ci?d:([\w\.%*@-]+))["\']/i', $this->textHtml, $matches) ? array_combine($matches[2], $matches[1]) : [];
     }

@@ -194,7 +194,7 @@ class QueryBuilder extends BaseQueryBuilder
         return false;
     }
 
-    public function getTableJoins($tableName)
+    public function getTableJoins($tableName): array
     {
         $found = [];
         foreach ($this->getQueryParts()['join'] as $join) {

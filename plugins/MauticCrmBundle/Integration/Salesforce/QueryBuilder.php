@@ -40,10 +40,7 @@ class QueryBuilder
         return ($idString) ? "SELECT $fieldString from Contact where Id in ('$idString')" : '';
     }
 
-    /**
-     * @return string
-     */
-    private static function getFieldString(array $fields)
+    private static function getFieldString(array $fields): string
     {
         $fields[] = 'Id';
 

@@ -262,7 +262,7 @@ class TwitterIntegration extends SocialIntegration
     /**
      * {@inheritdoc}
      */
-    public function cleanIdentifier($identifier)
+    public function cleanIdentifier($identifier): string
     {
         if (preg_match('#https?://twitter.com/(.*?)(/.*?|$)#i', $identifier, $match)) {
             // extract the handle

@@ -101,10 +101,8 @@ class Fetcher
 
     /**
      * Fetch the Mautic contact IDs that are not already tracked as SF campaign members.
-     *
-     * @return array
      */
-    public function getUnknownCampaignMembers()
+    public function getUnknownCampaignMembers(): array
     {
         // First, find those already tracked as part of this campaign
         $this->fetchCampaignMembers();

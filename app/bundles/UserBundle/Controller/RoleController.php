@@ -335,7 +335,7 @@ class RoleController extends FormController
         }
 
         // order permissions by label
-        uasort($permissions, function ($a, $b) {
+        uasort($permissions, function ($a, $b): int {
             return strnatcmp($a['label'], $b['label']);
         });
 
