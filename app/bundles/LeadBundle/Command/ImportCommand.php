@@ -18,15 +18,10 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 class ImportCommand extends Command
 {
     public const COMMAND_NAME = 'mautic:import';
-    private TranslatorInterface $translator;
-    private ImportModel $importModel;
 
-    public function __construct(TranslatorInterface $translator, ImportModel $importModel)
+    public function __construct(private TranslatorInterface $translator, private ImportModel $importModel)
     {
         parent::__construct();
-
-        $this->translator  = $translator;
-        $this->importModel = $importModel;
     }
 
     protected function configure()

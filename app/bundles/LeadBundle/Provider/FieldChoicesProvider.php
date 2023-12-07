@@ -11,8 +11,6 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 final class FieldChoicesProvider implements FieldChoicesProviderInterface
 {
-    private EventDispatcherInterface $dispatcher;
-
     /**
      * @var mixed[]
      */
@@ -23,9 +21,8 @@ final class FieldChoicesProvider implements FieldChoicesProviderInterface
      */
     private array $cachedAliasChoices = [];
 
-    public function __construct(EventDispatcherInterface $dispatcher)
+    public function __construct(private EventDispatcherInterface $dispatcher)
     {
-        $this->dispatcher = $dispatcher;
     }
 
     /**

@@ -10,20 +10,8 @@ use Mautic\UserBundle\Model\UserModel;
 
 class FieldsBuilder
 {
-    private \Mautic\LeadBundle\Model\FieldModel $fieldModel;
-
-    private \Mautic\LeadBundle\Model\ListModel $listModel;
-
-    private \Mautic\UserBundle\Model\UserModel $userModel;
-
-    private \Mautic\LeadBundle\Model\LeadModel $leadModel;
-
-    public function __construct(FieldModel $fieldModel, ListModel $listModel, UserModel $userModel, LeadModel $leadModel)
+    public function __construct(private FieldModel $fieldModel, private ListModel $listModel, private UserModel $userModel, private LeadModel $leadModel)
     {
-        $this->fieldModel = $fieldModel;
-        $this->listModel  = $listModel;
-        $this->userModel  = $userModel;
-        $this->leadModel  = $leadModel;
     }
 
     /**

@@ -10,14 +10,8 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class PageSubscriber implements EventSubscriberInterface
 {
-    private \Mautic\CoreBundle\Twig\Helper\AssetsHelper $assetsHelper;
-
-    private \Mautic\PluginBundle\Helper\IntegrationHelper $integrationHelper;
-
-    public function __construct(AssetsHelper $assetsHelper, IntegrationHelper $integrationHelper)
+    public function __construct(private AssetsHelper $assetsHelper, private IntegrationHelper $integrationHelper)
     {
-        $this->assetsHelper      = $assetsHelper;
-        $this->integrationHelper = $integrationHelper;
     }
 
     /**

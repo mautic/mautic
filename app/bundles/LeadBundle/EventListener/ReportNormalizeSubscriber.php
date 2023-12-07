@@ -10,11 +10,8 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class ReportNormalizeSubscriber implements EventSubscriberInterface
 {
-    private FieldModel $fieldModel;
-
-    public function __construct(FieldModel $fieldModel)
+    public function __construct(private FieldModel $fieldModel)
     {
-        $this->fieldModel = $fieldModel;
     }
 
     /**

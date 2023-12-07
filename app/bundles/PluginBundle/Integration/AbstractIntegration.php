@@ -62,22 +62,11 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
     public const FIELD_TYPE_DATE     = 'date';
 
     protected bool $coreIntegration = false;
-    protected \Symfony\Component\EventDispatcher\EventDispatcherInterface $dispatcher;
     protected Integration $settings;
     protected array $keys = [];
     protected ?CacheStorageHelper $cache;
-    protected \Doctrine\ORM\EntityManager $em;
     protected ?SessionInterface $session;
     protected ?Request $request;
-    protected RouterInterface $router;
-    protected LoggerInterface $logger;
-    protected TranslatorInterface $translator;
-    protected EncryptionHelper $encryptionHelper;
-    protected LeadModel $leadModel;
-    protected CompanyModel $companyModel;
-    protected PathsHelper $pathsHelper;
-    protected NotificationModel $notificationModel;
-    protected FieldModel $fieldModel;
 
     /**
      * Used for notifications.
@@ -92,44 +81,29 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
     protected array $salesforceIdMapping        = [];
     protected array $deleteIntegrationEntities  = [];
     protected array $persistIntegrationEntities = [];
-    protected IntegrationEntityModel $integrationEntityModel;
-    protected DoNotContactModel $doNotContact;
-    protected array  $commandParameters = [];
+    protected array  $commandParameters         = [];
 
     public function __construct(
-        EventDispatcherInterface $eventDispatcher,
+        protected EventDispatcherInterface $dispatcher,
         CacheStorageHelper $cacheStorageHelper,
-        EntityManager $entityManager,
+        protected EntityManager $em,
         SessionInterface $session,
         RequestStack $requestStack,
-        RouterInterface $router,
-        TranslatorInterface $translator,
-        LoggerInterface $logger,
-        EncryptionHelper $encryptionHelper,
-        LeadModel $leadModel,
-        CompanyModel $companyModel,
-        PathsHelper $pathsHelper,
-        NotificationModel $notificationModel,
-        FieldModel $fieldModel,
-        IntegrationEntityModel $integrationEntityModel,
-        DoNotContactModel $doNotContact
+        protected RouterInterface $router,
+        protected TranslatorInterface $translator,
+        protected LoggerInterface $logger,
+        protected EncryptionHelper $encryptionHelper,
+        protected LeadModel $leadModel,
+        protected CompanyModel $companyModel,
+        protected PathsHelper $pathsHelper,
+        protected NotificationModel $notificationModel,
+        protected FieldModel $fieldModel,
+        protected IntegrationEntityModel $integrationEntityModel,
+        protected DoNotContactModel $doNotContact
     ) {
-        $this->dispatcher             = $eventDispatcher;
         $this->cache                  = $cacheStorageHelper->getCache($this->getName());
-        $this->em                     = $entityManager;
         $this->session                = (!defined('IN_MAUTIC_CONSOLE')) ? $session : null;
         $this->request                = (!defined('IN_MAUTIC_CONSOLE')) ? $requestStack->getCurrentRequest() : null;
-        $this->router                 = $router;
-        $this->translator             = $translator;
-        $this->logger                 = $logger;
-        $this->encryptionHelper       = $encryptionHelper;
-        $this->leadModel              = $leadModel;
-        $this->companyModel           = $companyModel;
-        $this->pathsHelper            = $pathsHelper;
-        $this->notificationModel      = $notificationModel;
-        $this->fieldModel             = $fieldModel;
-        $this->integrationEntityModel = $integrationEntityModel;
-        $this->doNotContact           = $doNotContact;
     }
 
     public function setCommandParameters(array $params): void

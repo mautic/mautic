@@ -43,14 +43,8 @@ class DashboardSubscriber extends MainDashboardSubscriber
         'page:pages:viewother',
     ];
 
-    protected \Mautic\PageBundle\Model\PageModel $pageModel;
-
-    protected \Symfony\Component\Routing\RouterInterface $router;
-
-    public function __construct(PageModel $pageModel, RouterInterface $router)
+    public function __construct(protected PageModel $pageModel, protected RouterInterface $router)
     {
-        $this->pageModel = $pageModel;
-        $this->router    = $router;
     }
 
     /**

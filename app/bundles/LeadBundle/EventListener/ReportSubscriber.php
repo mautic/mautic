@@ -45,18 +45,6 @@ class ReportSubscriber implements EventSubscriberInterface
     ];
     private $companyContexts = [self::CONTEXT_COMPANIES];
 
-    private \Mautic\LeadBundle\Model\LeadModel $leadModel;
-
-    private \Mautic\StageBundle\Model\StageModel $stageModel;
-
-    private \Mautic\CampaignBundle\Model\CampaignModel $campaignModel;
-
-    private \Mautic\CampaignBundle\EventCollector\EventCollector $eventCollector;
-
-    private \Mautic\LeadBundle\Model\CompanyModel $companyModel;
-
-    private \Mautic\LeadBundle\Report\FieldsBuilder $fieldsBuilder;
-
     /**
      * @var array
      */
@@ -67,31 +55,8 @@ class ReportSubscriber implements EventSubscriberInterface
      */
     private $channelActions;
 
-    private \Mautic\LeadBundle\Model\CompanyReportData $companyReportData;
-
-    private \Mautic\CoreBundle\Translation\Translator $translator;
-    private FieldModel $fieldModel;
-
-    public function __construct(
-        LeadModel $leadModel,
-        FieldModel $fieldModel,
-        StageModel $stageModel,
-        CampaignModel $campaignModel,
-        EventCollector $eventCollector,
-        CompanyModel $companyModel,
-        CompanyReportData $companyReportData,
-        FieldsBuilder $fieldsBuilder,
-        Translator $translator
-    ) {
-        $this->fieldModel        = $fieldModel;
-        $this->leadModel         = $leadModel;
-        $this->stageModel        = $stageModel;
-        $this->campaignModel     = $campaignModel;
-        $this->eventCollector    = $eventCollector;
-        $this->companyModel      = $companyModel;
-        $this->companyReportData = $companyReportData;
-        $this->fieldsBuilder     = $fieldsBuilder;
-        $this->translator        = $translator;
+    public function __construct(private LeadModel $leadModel, private FieldModel $fieldModel, private StageModel $stageModel, private CampaignModel $campaignModel, private EventCollector $eventCollector, private CompanyModel $companyModel, private CompanyReportData $companyReportData, private FieldsBuilder $fieldsBuilder, private Translator $translator)
+    {
     }
 
     /**

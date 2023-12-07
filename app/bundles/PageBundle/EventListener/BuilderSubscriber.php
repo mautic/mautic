@@ -36,21 +36,6 @@ use Twig\Environment;
 
 class BuilderSubscriber implements EventSubscriberInterface
 {
-    private \Mautic\PageBundle\Helper\TokenHelper $tokenHelper;
-
-    private \Mautic\PluginBundle\Helper\IntegrationHelper $integrationHelper;
-
-    private \Symfony\Contracts\Translation\TranslatorInterface $translator;
-
-    private \Doctrine\DBAL\Connection $connection;
-
-    private \Mautic\CoreBundle\Security\Permissions\CorePermissions $security;
-
-    private \Twig\Environment $twig;
-
-    private \Mautic\CoreBundle\Helper\BuilderTokenHelperFactory $builderTokenHelperFactory;
-
-    private \Mautic\PageBundle\Model\PageModel $pageModel;
     private $pageTokenRegex      = '{pagelink=(.*?)}';
     private $dwcTokenRegex       = '{dwc=(.*?)}';
     private $langBarRegex        = '{langbar}';
@@ -66,24 +51,8 @@ class BuilderSubscriber implements EventSubscriberInterface
     public const successmessage    = '{successmessage}';
     public const identifierToken   = '{leadidentifier}';
 
-    public function __construct(
-        CorePermissions $security,
-        TokenHelper $tokenHelper,
-        IntegrationHelper $integrationHelper,
-        PageModel $pageModel,
-        BuilderTokenHelperFactory $builderTokenHelperFactory,
-        TranslatorInterface $translator,
-        Connection $connection,
-        Environment $twig
-    ) {
-        $this->security                  = $security;
-        $this->tokenHelper               = $tokenHelper;
-        $this->integrationHelper         = $integrationHelper;
-        $this->pageModel                 = $pageModel;
-        $this->builderTokenHelperFactory = $builderTokenHelperFactory;
-        $this->translator                = $translator;
-        $this->connection                = $connection;
-        $this->twig                      = $twig;
+    public function __construct(private CorePermissions $security, private TokenHelper $tokenHelper, private IntegrationHelper $integrationHelper, private PageModel $pageModel, private BuilderTokenHelperFactory $builderTokenHelperFactory, private TranslatorInterface $translator, private Connection $connection, private Environment $twig)
+    {
     }
 
     /**

@@ -4,20 +4,11 @@ namespace Mautic\LeadBundle\Helper;
 
 use Mautic\LeadBundle\Entity\CompanyLeadRepository;
 use Mautic\LeadBundle\Entity\Lead;
-use Mautic\LeadBundle\Entity\LeadRepository;
 
 class PrimaryCompanyHelper
 {
-    private \Mautic\LeadBundle\Entity\CompanyLeadRepository $companyLeadRepository;
-
-    /**
-     * PrimaryCompanyHelper constructor.
-     *
-     * @param LeadRepository $companyLeadRepository
-     */
-    public function __construct(CompanyLeadRepository $companyLeadRepository)
+    public function __construct(private CompanyLeadRepository $companyLeadRepository)
     {
-        $this->companyLeadRepository = $companyLeadRepository;
     }
 
     /**

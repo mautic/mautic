@@ -12,17 +12,8 @@ use Symfony\Component\Routing\RouterInterface;
 
 class BuildJsSubscriber implements EventSubscriberInterface
 {
-    private \Mautic\CoreBundle\Twig\Helper\AssetsHelper $assetsHelper;
-
-    private \Mautic\PageBundle\Helper\TrackingHelper $trackingHelper;
-
-    private \Symfony\Component\Routing\RouterInterface $router;
-
-    public function __construct(AssetsHelper $assetsHelper, TrackingHelper $trackingHelper, RouterInterface $router)
+    public function __construct(private AssetsHelper $assetsHelper, private TrackingHelper $trackingHelper, private RouterInterface $router)
     {
-        $this->assetsHelper   = $assetsHelper;
-        $this->trackingHelper = $trackingHelper;
-        $this->router         = $router;
     }
 
     /**

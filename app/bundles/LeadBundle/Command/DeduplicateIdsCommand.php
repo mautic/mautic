@@ -16,13 +16,9 @@ class DeduplicateIdsCommand extends Command
 {
     public const NAME = 'mautic:contacts:deduplicate:ids';
 
-    private ContactDeduper $contactDeduper;
-
-    public function __construct(ContactDeduper $contactDeduper)
+    public function __construct(private ContactDeduper $contactDeduper)
     {
         parent::__construct();
-
-        $this->contactDeduper = $contactDeduper;
     }
 
     public function configure(): void

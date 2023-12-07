@@ -6,9 +6,7 @@ use Mautic\PluginBundle\Integration\UnifiedIntegrationInterface;
 use Symfony\Component\HttpFoundation\Request;
 
 /**
- * Class oAuthHelper.
- *
- * Portions modified from https://code.google.com/p/simple-php-oauth/
+ * Portions modified from https://code.google.com/p/simple-php-oauth/.
  */
 class oAuthHelper
 {
@@ -24,9 +22,7 @@ class oAuthHelper
 
     private $settings;
 
-    private ?\Symfony\Component\HttpFoundation\Request $request;
-
-    public function __construct(UnifiedIntegrationInterface $integration, Request $request = null, $settings = [])
+    public function __construct(UnifiedIntegrationInterface $integration, private ?Request $request = null, $settings = [])
     {
         $clientId                = $integration->getClientIdKey();
         $clientSecret            = $integration->getClientSecretKey();
@@ -38,7 +34,6 @@ class oAuthHelper
         $this->accessTokenSecret = (isset($settings['token_secret'])) ? $settings['token_secret'] : '';
         $this->callback          = $integration->getAuthCallbackUrl();
         $this->settings          = $settings;
-        $this->request           = $request;
     }
 
     public function getAuthorizationHeader($url, $parameters, $method): array

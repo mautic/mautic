@@ -27,20 +27,8 @@ class ContactMerger
      */
     protected $loser;
 
-    protected \Mautic\LeadBundle\Model\LeadModel $leadModel;
-
-    protected \Mautic\LeadBundle\Entity\MergeRecordRepository $repo;
-
-    protected \Psr\Log\LoggerInterface $logger;
-
-    protected \Symfony\Component\EventDispatcher\EventDispatcherInterface $dispatcher;
-
-    public function __construct(LeadModel $leadModel, MergeRecordRepository $repo, EventDispatcherInterface $dispatcher, LoggerInterface $logger)
+    public function __construct(protected LeadModel $leadModel, protected MergeRecordRepository $repo, protected EventDispatcherInterface $dispatcher, protected LoggerInterface $logger)
     {
-        $this->leadModel  = $leadModel;
-        $this->repo       = $repo;
-        $this->logger     = $logger;
-        $this->dispatcher = $dispatcher;
     }
 
     /**

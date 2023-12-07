@@ -13,8 +13,6 @@ use Mautic\LeadBundle\Segment\Exception\SegmentNotFoundException;
 
 class SegmentContactsLineChartQuery extends ChartQuery
 {
-    private array $filters;
-
     /**
      * @var int
      */
@@ -50,13 +48,12 @@ class SegmentContactsLineChartQuery extends ChartQuery
      *
      * @throws SegmentNotFoundException
      */
-    public function __construct(Connection $connection, \DateTime $dateFrom, \DateTime $dateTo, array $filters = [], $unit = null)
+    public function __construct(Connection $connection, \DateTime $dateFrom, \DateTime $dateTo, private array $filters = [], $unit = null)
     {
         $this->connection = $connection;
         $this->dateFrom   = $dateFrom;
         $this->dateTo     = $dateTo;
         $this->unit       = $unit;
-        $this->filters    = $filters;
 
         if (!isset($this->filters['leadlist_id']['value'])) {
             throw new SegmentNotFoundException('Segment ID required');

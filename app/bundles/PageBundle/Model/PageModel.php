@@ -63,42 +63,21 @@ class PageModel extends FormModel
      */
     protected $catInUrl;
 
-    protected \Mautic\CoreBundle\Helper\CookieHelper $cookieHelper;
-
-    protected \Mautic\CoreBundle\Helper\IpLookupHelper $ipLookupHelper;
-
-    protected \Mautic\LeadBundle\Model\LeadModel $leadModel;
-
-    protected \Mautic\LeadBundle\Model\FieldModel $leadFieldModel;
-
-    protected \Mautic\PageBundle\Model\RedirectModel $pageRedirectModel;
-
-    protected \Mautic\PageBundle\Model\TrackableModel $pageTrackableModel;
-
     protected \Mautic\CoreBundle\Helper\DateTimeHelper $dateTimeHelper;
 
-    private \Mautic\LeadBundle\Tracker\DeviceTracker $deviceTracker;
-
-    private \Mautic\LeadBundle\Model\CompanyModel $companyModel;
-
-    private \Mautic\LeadBundle\Tracker\ContactTracker $contactTracker;
-    private MessageBusInterface $messageBus;
-
-    private ContactRequestHelper $contactRequestHelper;
-
     public function __construct(
-        CookieHelper $cookieHelper,
-        IpLookupHelper $ipLookupHelper,
-        LeadModel $leadModel,
-        FieldModel $leadFieldModel,
-        RedirectModel $pageRedirectModel,
-        TrackableModel $pageTrackableModel,
-        MessageBusInterface $messageBus,
-        CompanyModel $companyModel,
-        DeviceTracker $deviceTracker,
-        ContactTracker $contactTracker,
+        protected CookieHelper $cookieHelper,
+        protected IpLookupHelper $ipLookupHelper,
+        protected LeadModel $leadModel,
+        protected FieldModel $leadFieldModel,
+        protected RedirectModel $pageRedirectModel,
+        protected TrackableModel $pageTrackableModel,
+        private MessageBusInterface $messageBus,
+        private CompanyModel $companyModel,
+        private DeviceTracker $deviceTracker,
+        private ContactTracker $contactTracker,
         CoreParametersHelper $coreParametersHelper,
-        ContactRequestHelper $contactRequestHelper,
+        private ContactRequestHelper $contactRequestHelper,
         EntityManager $em,
         CorePermissions $security,
         EventDispatcherInterface $dispatcher,
@@ -107,18 +86,7 @@ class PageModel extends FormModel
         UserHelper $userHelper,
         LoggerInterface $mauticLogger
     ) {
-        $this->cookieHelper         = $cookieHelper;
-        $this->ipLookupHelper       = $ipLookupHelper;
-        $this->leadModel            = $leadModel;
-        $this->leadFieldModel       = $leadFieldModel;
-        $this->pageRedirectModel    = $pageRedirectModel;
-        $this->pageTrackableModel   = $pageTrackableModel;
         $this->dateTimeHelper       = new DateTimeHelper();
-        $this->companyModel         = $companyModel;
-        $this->deviceTracker        = $deviceTracker;
-        $this->contactTracker       = $contactTracker;
-        $this->contactRequestHelper = $contactRequestHelper;
-        $this->messageBus           = $messageBus;
 
         parent::__construct($em, $security, $dispatcher, $router, $translator, $userHelper, $mauticLogger, $coreParametersHelper);
     }

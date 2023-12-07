@@ -15,13 +15,8 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class GeneratedColumnSubscriber implements EventSubscriberInterface
 {
-    private ListModel $segmentModel;
-    private TranslatorInterface $translator;
-
-    public function __construct(ListModel $segmentModel, TranslatorInterface $translator)
+    public function __construct(private ListModel $segmentModel, private TranslatorInterface $translator)
     {
-        $this->segmentModel = $segmentModel;
-        $this->translator   = $translator;
     }
 
     /**

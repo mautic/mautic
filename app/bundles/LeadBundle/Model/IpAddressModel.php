@@ -14,14 +14,8 @@ class IpAddressModel
 {
     private const DELETE_SIZE = 10000;
 
-    protected \Psr\Log\LoggerInterface $logger;
-
-    protected \Doctrine\ORM\EntityManager $entityManager;
-
-    public function __construct(EntityManager $entityManager, LoggerInterface $logger)
+    public function __construct(protected EntityManager $entityManager, protected LoggerInterface $logger)
     {
-        $this->entityManager = $entityManager;
-        $this->logger        = $logger;
     }
 
     /**

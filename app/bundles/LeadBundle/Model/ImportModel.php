@@ -38,24 +38,14 @@ use Symfony\Contracts\EventDispatcher\Event;
  */
 class ImportModel extends FormModel
 {
-    protected \Mautic\CoreBundle\Helper\PathsHelper $pathsHelper;
-
-    protected \Mautic\LeadBundle\Model\LeadModel $leadModel;
-
-    protected \Mautic\LeadBundle\Model\CompanyModel $companyModel;
-
-    protected \Mautic\CoreBundle\Model\NotificationModel $notificationModel;
-
-    protected \Mautic\CoreBundle\Helper\CoreParametersHelper $config;
-
     protected \Mautic\LeadBundle\Entity\LeadEventLogRepository $leadEventLogRepo;
 
     public function __construct(
-        PathsHelper $pathsHelper,
-        LeadModel $leadModel,
-        NotificationModel $notificationModel,
-        CoreParametersHelper $config,
-        CompanyModel $companyModel,
+        protected PathsHelper $pathsHelper,
+        protected LeadModel $leadModel,
+        protected NotificationModel $notificationModel,
+        protected CoreParametersHelper $config,
+        protected CompanyModel $companyModel,
         EntityManagerInterface $em,
         CorePermissions $security,
         EventDispatcherInterface $dispatcher,
@@ -64,12 +54,7 @@ class ImportModel extends FormModel
         UserHelper $userHelper,
         LoggerInterface $mauticLogger
     ) {
-        $this->pathsHelper       = $pathsHelper;
-        $this->leadModel         = $leadModel;
-        $this->notificationModel = $notificationModel;
-        $this->config            = $config;
         $this->leadEventLogRepo  = $leadModel->getEventLogRepository();
-        $this->companyModel      = $companyModel;
 
         parent::__construct($em, $security, $dispatcher, $router, $translator, $userHelper, $mauticLogger, $config);
     }

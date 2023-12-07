@@ -22,21 +22,8 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 final class ImportContactSubscriber implements EventSubscriberInterface
 {
-    private FieldList $fieldList;
-    private CorePermissions $corePermissions;
-    private LeadModel $contactModel;
-    private TranslatorInterface $translator;
-
-    public function __construct(
-        FieldList $fieldList,
-        CorePermissions $corePermissions,
-        LeadModel $contactModel,
-        TranslatorInterface $translator
-    ) {
-        $this->fieldList       = $fieldList;
-        $this->corePermissions = $corePermissions;
-        $this->contactModel    = $contactModel;
-        $this->translator      = $translator;
+    public function __construct(private FieldList $fieldList, private CorePermissions $corePermissions, private LeadModel $contactModel, private TranslatorInterface $translator)
+    {
     }
 
     public static function getSubscribedEvents(): array

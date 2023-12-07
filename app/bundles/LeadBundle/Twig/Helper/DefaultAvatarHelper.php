@@ -6,11 +6,8 @@ use Mautic\CoreBundle\Twig\Helper\AssetsHelper;
 
 final class DefaultAvatarHelper
 {
-    private \Mautic\CoreBundle\Twig\Helper\AssetsHelper $assetsHelper;
-
-    public function __construct(AssetsHelper $assetsHelper)
+    public function __construct(private AssetsHelper $assetsHelper)
     {
-        $this->assetsHelper = $assetsHelper;
     }
 
     public function getDefaultAvatar(bool $absolute = false): string

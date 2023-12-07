@@ -24,20 +24,8 @@ use Mautic\LeadBundle\Segment\RelativeDate;
 
 class DateOptionFactory
 {
-    private \Mautic\LeadBundle\Segment\Decorator\DateDecorator $dateDecorator;
-
-    private \Mautic\LeadBundle\Segment\RelativeDate $relativeDate;
-
-    private \Mautic\LeadBundle\Segment\Decorator\Date\TimezoneResolver $timezoneResolver;
-
-    public function __construct(
-        DateDecorator $dateDecorator,
-        RelativeDate $relativeDate,
-        TimezoneResolver $timezoneResolver
-    ) {
-        $this->dateDecorator    = $dateDecorator;
-        $this->relativeDate     = $relativeDate;
-        $this->timezoneResolver = $timezoneResolver;
+    public function __construct(private DateDecorator $dateDecorator, private RelativeDate $relativeDate, private TimezoneResolver $timezoneResolver)
+    {
     }
 
     /**

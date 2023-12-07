@@ -10,14 +10,8 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class DetermineWinnerSubscriber implements EventSubscriberInterface
 {
-    private \Mautic\PageBundle\Entity\HitRepository $hitRepository;
-
-    private \Symfony\Contracts\Translation\TranslatorInterface $translator;
-
-    public function __construct(HitRepository $hitRepository, TranslatorInterface $translator)
+    public function __construct(private HitRepository $hitRepository, private TranslatorInterface $translator)
     {
-        $this->hitRepository = $hitRepository;
-        $this->translator    = $translator;
     }
 
     /**

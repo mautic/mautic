@@ -8,15 +8,8 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class ReloadFacade
 {
-    private \Mautic\PluginBundle\Model\PluginModel $pluginModel;
-    private \Mautic\PluginBundle\Helper\ReloadHelper $reloadHelper;
-    private \Symfony\Contracts\Translation\TranslatorInterface $translator;
-
-    public function __construct(PluginModel $pluginModel, ReloadHelper $reloadHelper, TranslatorInterface $translator)
+    public function __construct(private PluginModel $pluginModel, private ReloadHelper $reloadHelper, private TranslatorInterface $translator)
     {
-        $this->pluginModel  = $pluginModel;
-        $this->reloadHelper = $reloadHelper;
-        $this->translator   = $translator;
     }
 
     /**
