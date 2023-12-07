@@ -10,7 +10,6 @@ use Symfony\Contracts\EventDispatcher\Event;
 
 class ImportValidateEvent extends Event
 {
-    private string $routeObjectName;
     private bool $skipIfExists;
     private FormInterface $form;
     private ?int $ownerId = null;
