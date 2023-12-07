@@ -10,9 +10,6 @@ use Mautic\CategoryBundle\Model\CategoryModel;
 
 class LoadPageCategoryData extends AbstractFixture implements OrderedFixtureInterface
 {
-    /**
-     * {@inheritdoc}
-     */
     public function __construct(private CategoryModel $categoryModel)
     {
     }

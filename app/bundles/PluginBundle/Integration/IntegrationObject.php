@@ -5,8 +5,6 @@ namespace Mautic\PluginBundle\Integration;
 class IntegrationObject
 {
     /**
-     * Constructor.
-     *
      * @param string $type
      * @param string $internalType
      */

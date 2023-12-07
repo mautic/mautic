@@ -10,9 +10,7 @@ use Mautic\LeadBundle\Entity\MergeRecordRepository;
 use Symfony\Component\HttpFoundation\RequestStack;
 
 /**
- * Class ContactTrackingService.
- *
- * Used to ensure that contacts tracked under the old method are continued to be tracked under the new
+ * Used to ensure that contacts tracked under the old method are continued to be tracked under the new.
  */
 final class ContactTrackingService implements ContactTrackingServiceInterface
 {

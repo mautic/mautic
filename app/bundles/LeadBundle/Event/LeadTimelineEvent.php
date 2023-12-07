@@ -83,15 +83,13 @@ class LeadTimelineEvent extends Event
     ];
 
     /**
+     * @param Lead|null   $lead        Lead entity for the lead the timeline is being generated for
      * @param int         $page
      * @param int         $limit       Limit per type
      * @param bool        $forTimeline
      * @param string|null $siteDomain
      */
     public function __construct(
-        /**
-         * Lead entity for the lead the timeline is being generated for.
-         */
         protected ?Lead $lead = null,
         array $filters = [],
         protected ?array $orderBy = null,

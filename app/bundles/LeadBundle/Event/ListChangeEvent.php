@@ -12,8 +12,6 @@ class ListChangeEvent extends Event
     private $leads;
 
     /**
-     * ListChangeEvent constructor.
-     *
      * @param bool $added
      */
     public function __construct($leads, private LeadList $list, private $added = true, private ?\DateTime $date = null)

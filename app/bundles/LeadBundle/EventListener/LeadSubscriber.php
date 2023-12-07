@@ -36,7 +36,7 @@ class LeadSubscriber implements EventSubscriberInterface
 
     /**
      * @param ModelFactory<object> $modelFactory
-     * @param bool                 $isTest
+     * @param bool                 $isTest       whether or not we're running in a test environment
      */
     public function __construct(
         private IpLookupHelper $ipLookupHelper,
@@ -47,9 +47,6 @@ class LeadSubscriber implements EventSubscriberInterface
         private TranslatorInterface $translator,
         RouterInterface $router,
         ModelFactory $modelFactory,
-        /**
-         * Whether or not we're running in a test environment.
-         */
         private $isTest = false
     ) {
         $this->router              = $router;

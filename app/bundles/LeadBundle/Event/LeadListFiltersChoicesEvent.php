@@ -12,13 +12,15 @@ class LeadListFiltersChoicesEvent extends AbstractCustomRequestEvent
 {
     /**
      * @param mixed[] $choices
-     * @param mixed[] $operators
+     * @param mixed[] $operators Please refer to ListModel.php, inside getChoiceFields method, for default operators availabled.
      */
-    public function __construct(protected $choices, /**
-     * Please refer to ListModel.php, inside getChoiceFields method, for default operators availabled.
-     */
-    protected $operators, protected TranslatorInterface $translator, Request $request = null, private string $search = '')
-    {
+    public function __construct(
+        protected $choices,
+        protected $operators,
+        protected TranslatorInterface $translator,
+        Request $request = null,
+        private string $search = ''
+    ) {
         parent::__construct($request);
     }
 

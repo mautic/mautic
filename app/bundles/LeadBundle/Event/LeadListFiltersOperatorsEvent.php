@@ -15,9 +15,6 @@ class LeadListFiltersOperatorsEvent extends CommonEvent
      */
     public function __construct(
         protected $operators,
-        /**
-         * @deprecated to be removed in Mautic 3
-         */
         protected TranslatorInterface $translator
     ) {
     }

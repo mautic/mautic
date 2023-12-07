@@ -6,9 +6,7 @@ use Mautic\PluginBundle\Integration\UnifiedIntegrationInterface;
 use Symfony\Component\HttpFoundation\Request;
 
 /**
- * Class oAuthHelper.
- *
- * Portions modified from https://code.google.com/p/simple-php-oauth/
+ * Portions modified from https://code.google.com/p/simple-php-oauth/.
  */
 class oAuthHelper
 {
