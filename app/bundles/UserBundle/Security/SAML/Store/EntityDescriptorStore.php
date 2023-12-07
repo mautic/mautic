@@ -8,16 +8,13 @@ use Mautic\CoreBundle\Helper\CoreParametersHelper;
 
 class EntityDescriptorStore implements EntityDescriptorStoreInterface
 {
-    private \Mautic\CoreBundle\Helper\CoreParametersHelper $coreParametersHelper;
-
     /**
      * @var EntityDescriptor
      */
     private $entityDescriptor;
 
-    public function __construct(CoreParametersHelper $coreParametersHelper)
+    public function __construct(private CoreParametersHelper $coreParametersHelper)
     {
-        $this->coreParametersHelper = $coreParametersHelper;
     }
 
     public function get($entityId): ?EntityDescriptor

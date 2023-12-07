@@ -10,11 +10,8 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class Collector
 {
-    private \Symfony\Component\EventDispatcher\EventDispatcherInterface $eventDispatcher;
-
-    public function __construct(EventDispatcherInterface $eventDispatcher)
+    public function __construct(private EventDispatcherInterface $eventDispatcher)
     {
-        $this->eventDispatcher = $eventDispatcher;
     }
 
     /**

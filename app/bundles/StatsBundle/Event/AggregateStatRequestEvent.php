@@ -8,30 +8,15 @@ use Symfony\Contracts\EventDispatcher\Event;
 
 class AggregateStatRequestEvent extends Event
 {
-    /**
-     * @var string
-     */
-    private $statName;
-
-    private \DateTimeInterface $fromDateTime;
-
-    private \DateTimeInterface $toDateTime;
-
     private \Mautic\StatsBundle\Aggregate\Collection\StatCollection $statCollection;
-
-    private \Mautic\StatsBundle\Event\Options\FetchOptions $options;
 
     /**
      * AggregateStatRequestEvent constructor.
      *
      * @param string $statName
      */
-    public function __construct($statName, \DateTimeInterface $fromDateTime, \DateTimeInterface $toDateTime, FetchOptions $eventOptions)
+    public function __construct(private $statName, private \DateTimeInterface $fromDateTime, private \DateTimeInterface $toDateTime, private FetchOptions $options)
     {
-        $this->statName       = $statName;
-        $this->fromDateTime   = $fromDateTime;
-        $this->toDateTime     = $toDateTime;
-        $this->options        = $eventOptions;
         $this->statCollection = new StatCollection();
     }
 

@@ -26,20 +26,8 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class UserType extends AbstractType
 {
-    private \Symfony\Contracts\Translation\TranslatorInterface $translator;
-
-    private \Mautic\UserBundle\Model\UserModel $model;
-
-    private \Mautic\CoreBundle\Helper\LanguageHelper $languageHelper;
-
-    public function __construct(
-        TranslatorInterface $translator,
-        UserModel $model,
-        LanguageHelper $languageHelper
-    ) {
-        $this->translator       = $translator;
-        $this->model            = $model;
-        $this->languageHelper   = $languageHelper;
+    public function __construct(private TranslatorInterface $translator, private UserModel $model, private LanguageHelper $languageHelper)
+    {
     }
 
     /**

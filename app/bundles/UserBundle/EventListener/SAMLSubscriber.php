@@ -11,14 +11,8 @@ use Symfony\Component\Routing\RouterInterface;
 
 class SAMLSubscriber implements EventSubscriberInterface
 {
-    private CoreParametersHelper $coreParametersHelper;
-
-    private RouterInterface $router;
-
-    public function __construct(CoreParametersHelper $coreParametersHelper, RouterInterface $router)
+    public function __construct(private CoreParametersHelper $coreParametersHelper, private RouterInterface $router)
     {
-        $this->coreParametersHelper = $coreParametersHelper;
-        $this->router               = $router;
     }
 
     public static function getSubscribedEvents()

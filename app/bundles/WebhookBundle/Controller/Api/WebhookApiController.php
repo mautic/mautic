@@ -28,8 +28,6 @@ class WebhookApiController extends CommonApiController
      */
     protected $model;
 
-    private RequestStack $requestStack;
-
     public function __construct(
         CorePermissions $security,
         Translator $translator,
@@ -37,15 +35,13 @@ class WebhookApiController extends CommonApiController
         RouterInterface $router,
         FormFactoryInterface $formFactory,
         AppVersion $appVersion,
-        RequestStack $requestStack,
+        private RequestStack $requestStack,
         ManagerRegistry $doctrine,
         ModelFactory $modelFactory,
         EventDispatcherInterface $dispatcher,
         CoreParametersHelper $coreParametersHelper,
         MauticFactory $factory
     ) {
-        $this->requestStack = $requestStack;
-
         $webhookModel = $modelFactory->getModel('webhook');
         \assert($webhookModel instanceof WebhookModel);
 
