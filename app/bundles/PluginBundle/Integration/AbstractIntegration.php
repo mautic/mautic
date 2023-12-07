@@ -62,22 +62,11 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
     public const FIELD_TYPE_DATE     = 'date';
 
     protected bool $coreIntegration = false;
-    protected \Symfony\Component\EventDispatcher\EventDispatcherInterface $dispatcher;
     protected Integration $settings;
     protected array $keys = [];
     protected ?CacheStorageHelper $cache;
-    protected \Doctrine\ORM\EntityManager $em;
     protected ?SessionInterface $session;
     protected ?Request $request;
-    protected RouterInterface $router;
-    protected LoggerInterface $logger;
-    protected TranslatorInterface $translator;
-    protected EncryptionHelper $encryptionHelper;
-    protected LeadModel $leadModel;
-    protected CompanyModel $companyModel;
-    protected PathsHelper $pathsHelper;
-    protected NotificationModel $notificationModel;
-    protected FieldModel $fieldModel;
 
     /**
      * Used for notifications.
@@ -92,44 +81,29 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
     protected array $salesforceIdMapping        = [];
     protected array $deleteIntegrationEntities  = [];
     protected array $persistIntegrationEntities = [];
-    protected IntegrationEntityModel $integrationEntityModel;
-    protected DoNotContactModel $doNotContact;
-    protected array  $commandParameters = [];
+    protected array  $commandParameters         = [];
 
     public function __construct(
-        EventDispatcherInterface $eventDispatcher,
+        protected EventDispatcherInterface $dispatcher,
         CacheStorageHelper $cacheStorageHelper,
-        EntityManager $entityManager,
+        protected EntityManager $em,
         SessionInterface $session,
         RequestStack $requestStack,
-        RouterInterface $router,
-        TranslatorInterface $translator,
-        LoggerInterface $logger,
-        EncryptionHelper $encryptionHelper,
-        LeadModel $leadModel,
-        CompanyModel $companyModel,
-        PathsHelper $pathsHelper,
-        NotificationModel $notificationModel,
-        FieldModel $fieldModel,
-        IntegrationEntityModel $integrationEntityModel,
-        DoNotContactModel $doNotContact
+        protected RouterInterface $router,
+        protected TranslatorInterface $translator,
+        protected LoggerInterface $logger,
+        protected EncryptionHelper $encryptionHelper,
+        protected LeadModel $leadModel,
+        protected CompanyModel $companyModel,
+        protected PathsHelper $pathsHelper,
+        protected NotificationModel $notificationModel,
+        protected FieldModel $fieldModel,
+        protected IntegrationEntityModel $integrationEntityModel,
+        protected DoNotContactModel $doNotContact
     ) {
-        $this->dispatcher             = $eventDispatcher;
         $this->cache                  = $cacheStorageHelper->getCache($this->getName());
-        $this->em                     = $entityManager;
         $this->session                = (!defined('IN_MAUTIC_CONSOLE')) ? $session : null;
         $this->request                = (!defined('IN_MAUTIC_CONSOLE')) ? $requestStack->getCurrentRequest() : null;
-        $this->router                 = $router;
-        $this->translator             = $translator;
-        $this->logger                 = $logger;
-        $this->encryptionHelper       = $encryptionHelper;
-        $this->leadModel              = $leadModel;
-        $this->companyModel           = $companyModel;
-        $this->pathsHelper            = $pathsHelper;
-        $this->notificationModel      = $notificationModel;
-        $this->fieldModel             = $fieldModel;
-        $this->integrationEntityModel = $integrationEntityModel;
-        $this->doNotContact           = $doNotContact;
     }
 
     public function setCommandParameters(array $params): void
@@ -173,10 +147,8 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
 
     /**
      * Determines if DNC records should be updated by date or by priority.
-     *
-     * @return int
      */
-    public function updateDncByDate()
+    public function updateDncByDate(): bool
     {
         return false;
     }
@@ -724,10 +696,10 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
         if ('GET' == $method && !empty($parameters)) {
             $parameters = array_merge($settings['query'], $parameters);
             $query      = http_build_query($parameters);
-            $url .= (false === strpos($url, '?')) ? '?'.$query : '&'.$query;
+            $url .= (!str_contains($url, '?')) ? '?'.$query : '&'.$query;
         } elseif (!empty($settings['query'])) {
             $query = http_build_query($settings['query']);
-            $url .= (false === strpos($url, '?')) ? '?'.$query : '&'.$query;
+            $url .= (!str_contains($url, '?')) ? '?'.$query : '&'.$query;
         }
 
         if (isset($postAppend)) {
@@ -787,7 +759,7 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
         if (is_array($parseHeaders)) {
             foreach ($parseHeaders as $key => $value) {
                 // Ignore string keys which assume it is already parsed and avoids splitting up a value that includes colons (such as a date/time)
-                if (!is_string($key) && false !== strpos($value, ':')) {
+                if (!is_string($key) && str_contains($value, ':')) {
                     [$key, $value]     = explode(':', $value);
                     $key               = trim($key);
                     $value             = trim($value);
@@ -1199,10 +1171,8 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
 
     /**
      * Checks to see if the integration is configured by checking that required keys are populated.
-     *
-     * @return bool
      */
-    public function isConfigured()
+    public function isConfigured(): bool
     {
         $requiredTokens = $this->getRequiredKeyFields();
         foreach ($requiredTokens as $token => $label) {
@@ -1828,7 +1798,7 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
     /**
      * Sets whether fields should be sorted alphabetically or by the order the integration feeds.
      */
-    public function sortFieldsAlphabetically()
+    public function sortFieldsAlphabetically(): bool
     {
         return true;
     }
@@ -1927,10 +1897,8 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
      * Checks to ensure an image still exists before caching.
      *
      * @param string $url
-     *
-     * @return bool
      */
-    public function checkImageExists($url)
+    public function checkImageExists($url): bool
     {
         $ch = curl_init($url);
         curl_setopt($ch, CURLOPT_NOBODY, true);

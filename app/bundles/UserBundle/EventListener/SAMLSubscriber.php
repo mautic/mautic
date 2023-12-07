@@ -34,7 +34,7 @@ class SAMLSubscriber implements EventSubscriberInterface
         $request = $event->getRequest();
         $route   = (string) $request->attributes->get('_route');
         $url     = (string) $request->getRequestUri();
-        if (false === strpos($route, 'lightsaml') && false === strpos($url, '/saml/')) {
+        if (!str_contains($route, 'lightsaml') && !str_contains($url, '/saml/')) {
             return;
         }
 

@@ -20,12 +20,6 @@ class LoadFormData extends AbstractFixture implements OrderedFixtureInterface
 {
     public const FORM_PREFIX = 'form-';
 
-    private \Mautic\FormBundle\Model\FormModel $formModel;
-
-    private \Mautic\FormBundle\Model\FieldModel $formFieldModel;
-
-    private \Mautic\FormBundle\Model\ActionModel $actionModel;
-
     /**
      * @var array<int, Form>
      */
@@ -41,12 +35,8 @@ class LoadFormData extends AbstractFixture implements OrderedFixtureInterface
      */
     private array $actionEntities = [];
 
-    public function __construct(FormModel $formModel, FieldModel $formFieldModel, ActionModel $actionModel, EventDispatcherInterface $eventDispatcher)
+    public function __construct(private FormModel $formModel, private FieldModel $formFieldModel, private ActionModel $actionModel, EventDispatcherInterface $eventDispatcher)
     {
-        $this->formModel      = $formModel;
-        $this->formFieldModel = $formFieldModel;
-        $this->actionModel    = $actionModel;
-
         // this will load the data before fixtures are loaded
         $eventDispatcher->addListener(PreExecuteEvent::class, function (PreExecuteEvent $event) {
             $formEntities = $this->getFormEntities();

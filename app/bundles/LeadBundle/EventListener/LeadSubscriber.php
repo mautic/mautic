@@ -29,52 +29,27 @@ class LeadSubscriber implements EventSubscriberInterface
 {
     use ChannelTrait;
 
-    private \Mautic\CoreBundle\Model\AuditLogModel $auditLogModel;
-
-    private \Mautic\CoreBundle\Helper\IpLookupHelper $ipLookupHelper;
-
-    private \Mautic\LeadBundle\Helper\LeadChangeEventDispatcher $leadEventDispatcher;
-
-    private \Mautic\LeadBundle\Twig\Helper\DncReasonHelper $dncReasonHelper;
-
-    private \Doctrine\ORM\EntityManager $entityManager;
-
-    private \Symfony\Contracts\Translation\TranslatorInterface $translator;
-
     /**
      * @var RouterInterface
      */
     private $router;
 
     /**
-     * Whether or not we're running in a test environment.
-     *
-     * @var bool
-     */
-    private $isTest;
-
-    /**
      * @param ModelFactory<object> $modelFactory
+     * @param bool                 $isTest       whether or not we're running in a test environment
      */
     public function __construct(
-        IpLookupHelper $ipLookupHelper,
-        AuditLogModel $auditLogModel,
-        LeadChangeEventDispatcher $eventDispatcher,
-        DncReasonHelper $dncReasonHelper,
-        EntityManager $entityManager,
-        TranslatorInterface $translator,
+        private IpLookupHelper $ipLookupHelper,
+        private AuditLogModel $auditLogModel,
+        private LeadChangeEventDispatcher $leadEventDispatcher,
+        private DncReasonHelper $dncReasonHelper,
+        private EntityManager $entityManager,
+        private TranslatorInterface $translator,
         RouterInterface $router,
         ModelFactory $modelFactory,
-        $isTest = false
+        private $isTest = false
     ) {
-        $this->ipLookupHelper      = $ipLookupHelper;
-        $this->auditLogModel       = $auditLogModel;
-        $this->leadEventDispatcher = $eventDispatcher;
-        $this->dncReasonHelper     = $dncReasonHelper;
-        $this->entityManager       = $entityManager;
-        $this->translator          = $translator;
         $this->router              = $router;
-        $this->isTest              = $isTest;
 
         $this->setModelFactory($modelFactory);
     }

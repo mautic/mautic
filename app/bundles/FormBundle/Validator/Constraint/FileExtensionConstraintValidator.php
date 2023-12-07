@@ -8,11 +8,8 @@ use Symfony\Component\Validator\ConstraintValidator;
 
 class FileExtensionConstraintValidator extends ConstraintValidator
 {
-    private \Mautic\CoreBundle\Helper\CoreParametersHelper $coreParametersHelper;
-
-    public function __construct(CoreParametersHelper $coreParametersHelper)
+    public function __construct(private CoreParametersHelper $coreParametersHelper)
     {
-        $this->coreParametersHelper = $coreParametersHelper;
     }
 
     /**

@@ -54,8 +54,6 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
      */
     protected $companyFields;
 
-    protected \Mautic\EmailBundle\Helper\EmailValidator $emailValidator;
-
     /**
      * @var array
      */
@@ -66,13 +64,9 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
      */
     private $repoSetup = false;
 
-    protected \Mautic\LeadBundle\Deduplicate\CompanyDeduper $companyDeduper;
-
-    public function __construct(FieldModel $leadFieldModel, EmailValidator $validator, CompanyDeduper $companyDeduper, EntityManager $em, CorePermissions $security, EventDispatcherInterface $dispatcher, UrlGeneratorInterface $router, Translator $translator, UserHelper $userHelper, LoggerInterface $mauticLogger, CoreParametersHelper $coreParametersHelper)
+    public function __construct(FieldModel $leadFieldModel, protected EmailValidator $emailValidator, protected CompanyDeduper $companyDeduper, EntityManager $em, CorePermissions $security, EventDispatcherInterface $dispatcher, UrlGeneratorInterface $router, Translator $translator, UserHelper $userHelper, LoggerInterface $mauticLogger, CoreParametersHelper $coreParametersHelper)
     {
         $this->leadFieldModel = $leadFieldModel;
-        $this->emailValidator = $validator;
-        $this->companyDeduper = $companyDeduper;
 
         parent::__construct($em, $security, $dispatcher, $router, $translator, $userHelper, $mauticLogger, $coreParametersHelper);
     }

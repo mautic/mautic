@@ -20,20 +20,8 @@ class ReportSubscriber implements EventSubscriberInterface
     public const CONTEXT_PAGE_HITS  = 'page.hits';
     public const CONTEXT_VIDEO_HITS = 'video.hits';
 
-    private \Mautic\LeadBundle\Model\CompanyReportData $companyReportData;
-
-    private \Mautic\PageBundle\Entity\HitRepository $hitRepository;
-
-    private \Symfony\Contracts\Translation\TranslatorInterface $translator;
-
-    public function __construct(
-        CompanyReportData $companyReportData,
-        HitRepository $hitRepository,
-        TranslatorInterface $translator
-    ) {
-        $this->companyReportData = $companyReportData;
-        $this->hitRepository     = $hitRepository;
-        $this->translator        = $translator;
+    public function __construct(private CompanyReportData $companyReportData, private HitRepository $hitRepository, private TranslatorInterface $translator)
+    {
     }
 
     /**

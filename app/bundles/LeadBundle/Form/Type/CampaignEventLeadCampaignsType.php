@@ -12,11 +12,8 @@ use Symfony\Component\Form\FormBuilderInterface;
 
 class CampaignEventLeadCampaignsType extends AbstractType
 {
-    protected \Mautic\LeadBundle\Model\ListModel $listModel;
-
-    public function __construct(ListModel $listModel)
+    public function __construct(protected ListModel $listModel)
     {
-        $this->listModel = $listModel;
     }
 
     /**

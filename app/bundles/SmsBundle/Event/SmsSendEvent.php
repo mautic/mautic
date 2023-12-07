@@ -13,19 +13,10 @@ class SmsSendEvent extends CommonEvent
     protected $smsId;
 
     /**
-     * @var string
-     */
-    protected $content;
-
-    protected \Mautic\LeadBundle\Entity\Lead $lead;
-
-    /**
      * @param string $content
      */
-    public function __construct($content, Lead $lead)
+    public function __construct(protected $content, protected Lead $lead)
     {
-        $this->content = $content;
-        $this->lead    = $lead;
     }
 
     /**

@@ -8,14 +8,8 @@ use Mautic\PointBundle\Entity\Point;
 
 class PointActionEvent extends CommonEvent
 {
-    protected \Mautic\PointBundle\Entity\Point $point;
-
-    protected \Mautic\LeadBundle\Entity\Lead $lead;
-
-    public function __construct(Point $point, Lead $lead)
+    public function __construct(protected Point $point, protected Lead $lead)
     {
-        $this->point = $point;
-        $this->lead  = $lead;
     }
 
     /**

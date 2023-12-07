@@ -31,7 +31,7 @@ class DecisionHelper
         }
 
         // If channels do not match up at all (not even fuzzy logic i.e. page vs page.redirect), there's no need to go further
-        if ($channel && $event->getChannel() && false === strpos($channel, $event->getChannel())) {
+        if ($channel && $event->getChannel() && !str_contains($channel, $event->getChannel())) {
             throw new DecisionNotApplicableException("Channels, $channel and {$event->getChannel()}, do not match.");
         }
 

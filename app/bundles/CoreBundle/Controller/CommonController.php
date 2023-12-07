@@ -58,10 +58,8 @@ class CommonController extends AbstractController implements MauticController
 
     /**
      * Check if a security level is granted.
-     *
-     * @return bool
      */
-    protected function accessGranted($level)
+    protected function accessGranted($level): bool
     {
         return in_array($level, $this->getPermissions());
     }

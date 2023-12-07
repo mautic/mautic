@@ -10,11 +10,8 @@ class BackgroundSettings
 {
     public const CREATE_CUSTOM_FIELD_IN_BACKGROUND = 'create_custom_field_in_background';
 
-    private \Mautic\CoreBundle\Helper\CoreParametersHelper $coreParametersHelper;
-
-    public function __construct(CoreParametersHelper $coreParametersHelper)
+    public function __construct(private CoreParametersHelper $coreParametersHelper)
     {
-        $this->coreParametersHelper = $coreParametersHelper;
     }
 
     public function shouldProcessColumnChangeInBackground(): bool

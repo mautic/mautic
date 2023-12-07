@@ -13,8 +13,6 @@ class ProcessBounceSubscriber implements EventSubscriberInterface
     public const BUNDLE     = 'EmailBundle';
     public const FOLDER_KEY = 'bounces';
 
-    private \Mautic\EmailBundle\MonitoredEmail\Processor\Bounce $bouncer;
-
     /**
      * @return array
      */
@@ -26,9 +24,8 @@ class ProcessBounceSubscriber implements EventSubscriberInterface
         ];
     }
 
-    public function __construct(Bounce $bouncer)
+    public function __construct(private Bounce $bouncer)
     {
-        $this->bouncer = $bouncer;
     }
 
     public function onEmailConfig(MonitoredEmailEvent $event): void

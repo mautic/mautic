@@ -117,7 +117,7 @@ class CommonRepository extends ServiceEntityRepository
             if (is_array($args['order'])) {
                 foreach ($args['order'] as &$o) {
                     $alias = '';
-                    if (false !== strpos($o, '.')) {
+                    if (str_contains($o, '.')) {
                         [$alias, $o] = explode('.', $o);
                     }
 
@@ -451,7 +451,7 @@ class CommonRepository extends ServiceEntityRepository
                 }
                 $expr->add($groupExpr);
             }
-        } elseif (false !== strpos($filter['column'], ',')) {
+        } elseif (str_contains($filter['column'], ',')) {
             $columns      = explode(',', $filter['column']);
             $expr         = $q->expr()->orX();
             $setParameter = false;
@@ -605,7 +605,7 @@ class CommonRepository extends ServiceEntityRepository
 
         if ($select) {
             foreach ($select as &$column) {
-                if (false === strpos($column, '.')) {
+                if (!str_contains($column, '.')) {
                     $column = $alias.'.'.$column;
                 }
             }
@@ -1090,7 +1090,7 @@ class CommonRepository extends ServiceEntityRepository
         $string = $filter->string;
 
         if (!$filter->strict) {
-            if (false === strpos($string, '%')) {
+            if (!str_contains($string, '%')) {
                 $string = "%$string%";
             }
         }
@@ -1178,7 +1178,7 @@ class CommonRepository extends ServiceEntityRepository
                 foreach ($joins as $joinStatements) {
                     /** @var Query\Expr\Join $join */
                     foreach ($joinStatements as $join) {
-                        if (false !== strpos($join->getJoin(), '.category')) {
+                        if (str_contains($join->getJoin(), '.category')) {
                             $catPrefix = $join->getAlias();
                             break;
                         }
@@ -1211,7 +1211,7 @@ class CommonRepository extends ServiceEntityRepository
         } else {
             $string = $filter->string;
             if (!$filter->strict) {
-                if (false === strpos($string, '%')) {
+                if (!str_contains($string, '%')) {
                     $string = "$string%";
                 }
             }
@@ -1235,10 +1235,8 @@ class CommonRepository extends ServiceEntityRepository
 
     /**
      * @param \Doctrine\ORM\QueryBuilder $q
-     *
-     * @return bool
      */
-    protected function buildClauses($q, array $args)
+    protected function buildClauses($q, array $args): bool
     {
         $this->buildSelectClause($q, $args);
         $this->buildIndexByClause($q, $args);
@@ -1298,7 +1296,7 @@ class CommonRepository extends ServiceEntityRepository
                 $indexAlias = $this->getTableAlias();
                 $indexBy    = $args['index_by'];
             }
-            if (0 !== strpos($indexBy, $indexAlias)) {
+            if (!str_starts_with($indexBy, $indexAlias)) {
                 $indexBy = $indexAlias.'.'.$indexBy;
             }
             $q->indexBy($indexAlias, $indexBy);
@@ -1361,7 +1359,7 @@ class CommonRepository extends ServiceEntityRepository
         if ($clauses && is_array($clauses)) {
             foreach ($clauses as $clause) {
                 $clause = $this->validateOrderByClause($clause);
-                $column = (false === strpos($clause['col'], '.')) ? $this->getTableAlias().'.'.$clause['col'] : $clause['col'];
+                $column = (!str_contains($clause['col'], '.')) ? $this->getTableAlias().'.'.$clause['col'] : $clause['col'];
                 $query->addOrderBy($column, $clause['dir']);
             }
         }
@@ -1381,7 +1379,7 @@ class CommonRepository extends ServiceEntityRepository
 
             $selects = [];
             foreach ($args['select'] as $select) {
-                if (false !== strpos($select, '.')) {
+                if (str_contains($select, '.')) {
                     [$alias, $select] = explode('.', $select);
                 } else {
                     $alias = $this->getTableAlias();
@@ -1420,9 +1418,9 @@ class CommonRepository extends ServiceEntityRepository
                 } else {
                     if (!$select || $this->getTableAlias() === $select || $this->getTableAlias().'.*' === $select) {
                         $q->select($newSelect);
-                    } elseif (is_string($select) && false !== strpos($select, $this->getTableAlias().',')) {
+                    } elseif (is_string($select) && str_contains($select, $this->getTableAlias().',')) {
                         $q->select(str_replace($this->getTableAlias().',', $newSelect.',', $select));
-                    } elseif (is_string($select) && false !== strpos($select, $this->getTableAlias().'.*,')) {
+                    } elseif (is_string($select) && str_contains($select, $this->getTableAlias().'.*,')) {
                         $q->select(str_replace($this->getTableAlias().'.*,', $newSelect.',', $select));
                     }
                 }
@@ -1585,7 +1583,7 @@ class CommonRepository extends ServiceEntityRepository
                     }
                 } else {
                     $clause = $this->validateWhereClause($clause);
-                    $column = (false === strpos($clause['col'], '.')) ? $this->getTableAlias().'.'.$clause['col'] : $clause['col'];
+                    $column = (!str_contains($clause['col'], '.')) ? $this->getTableAlias().'.'.$clause['col'] : $clause['col'];
 
                     $whereClause = null;
                     switch ($clause['expr']) {
@@ -1697,10 +1695,8 @@ class CommonRepository extends ServiceEntityRepository
      *
      * @param string $command
      * @param string $subcommand
-     *
-     * @return bool
      */
-    protected function isSupportedSearchCommand(&$command, &$subcommand)
+    protected function isSupportedSearchCommand(&$command, &$subcommand): bool
     {
         $commands = $this->getSearchCommands();
         foreach ($commands as $k => $c) {
@@ -1775,7 +1771,7 @@ class CommonRepository extends ServiceEntityRepository
             $key   = (isset($f['col'])) ? 'col' : 'column';
             $col   = $f[$key];
             $alias = '';
-            if (false !== strpos($col, '.')) {
+            if (str_contains($col, '.')) {
                 [$alias, $col] = explode('.', $col);
             }
 

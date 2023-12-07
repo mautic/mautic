@@ -8,22 +8,10 @@ use Mautic\LeadBundle\Entity\Lead;
 class NotificationSendEvent extends CommonEvent
 {
     /**
-     * @var string
-     */
-    protected $message;
-
-    protected $heading;
-
-    protected \Mautic\LeadBundle\Entity\Lead $lead;
-
-    /**
      * @param string $message
      */
-    public function __construct($message, $heading, Lead $lead)
+    public function __construct(protected $message, protected $heading, protected Lead $lead)
     {
-        $this->message = $message;
-        $this->heading = $heading;
-        $this->lead    = $lead;
     }
 
     /**

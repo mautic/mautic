@@ -16,10 +16,6 @@ class OwnerSubscriber implements EventSubscriberInterface
      */
     private $ownerFieldSprintf = '{ownerfield=%s}';
 
-    private \Symfony\Contracts\Translation\TranslatorInterface $translator;
-
-    private \Mautic\LeadBundle\Model\LeadModel $leadModel;
-
     /**
      * @var array
      */
@@ -27,10 +23,8 @@ class OwnerSubscriber implements EventSubscriberInterface
 
     public const onwerColumns = ['email', 'firstname', 'lastname', 'position', 'signature'];
 
-    public function __construct(LeadModel $leadModel, TranslatorInterface $translator)
+    public function __construct(private LeadModel $leadModel, private TranslatorInterface $translator)
     {
-        $this->translator = $translator;
-        $this->leadModel  = $leadModel;
     }
 
     /**
@@ -92,7 +86,7 @@ class OwnerSubscriber implements EventSubscriberInterface
         $combinedContent = $event->getCombinedContent();
         foreach (self::onwerColumns as $ownerColumn) {
             $token = $this->buildToken($ownerColumn);
-            if (false !== strpos($combinedContent, $token)) {
+            if (str_contains($combinedContent, $token)) {
                 $ownerColumnNormalized = str_replace(['firstname', 'lastname'], ['first_name', 'last_name'], $ownerColumn);
                 $tokens[$token]        = $owner[$ownerColumnNormalized] ?? null;
             }

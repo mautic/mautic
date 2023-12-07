@@ -9,13 +9,9 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 class ReloadCommand extends Command
 {
-    private ReloadFacade $reloadFacade;
-
-    public function __construct(ReloadFacade $reloadFacade)
+    public function __construct(private ReloadFacade $reloadFacade)
     {
         parent::__construct();
-
-        $this->reloadFacade = $reloadFacade;
     }
 
     protected function configure()

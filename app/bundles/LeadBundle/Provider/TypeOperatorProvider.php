@@ -14,10 +14,6 @@ final class TypeOperatorProvider implements TypeOperatorProviderInterface
 {
     use OperatorListTrait;
 
-    private EventDispatcherInterface $dispatcher;
-
-    private FilterOperatorProviderInterface $filterOperatorProvider;
-
     /**
      * @var array<string,mixed[]>
      */
@@ -28,12 +24,8 @@ final class TypeOperatorProvider implements TypeOperatorProviderInterface
      */
     private array $cachedTypeOperatorsChoices = [];
 
-    public function __construct(
-        EventDispatcherInterface $dispatcher,
-        FilterOperatorProviderInterface $filterOperatorProvider
-    ) {
-        $this->dispatcher             = $dispatcher;
-        $this->filterOperatorProvider = $filterOperatorProvider;
+    public function __construct(private EventDispatcherInterface $dispatcher, private FilterOperatorProviderInterface $filterOperatorProvider)
+    {
     }
 
     public function getOperatorsIncluding(array $operators): array

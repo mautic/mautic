@@ -12,11 +12,8 @@ use Mautic\PageBundle\Model\PageModel;
 
 class LoadPageData extends AbstractFixture implements OrderedFixtureInterface
 {
-    private \Mautic\PageBundle\Model\PageModel $pageModel;
-
-    public function __construct(PageModel $pageModel)
+    public function __construct(private PageModel $pageModel)
     {
-        $this->pageModel = $pageModel;
     }
 
     public function load(ObjectManager $manager): void

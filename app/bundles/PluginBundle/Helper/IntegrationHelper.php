@@ -18,20 +18,6 @@ use Twig\Environment;
 
 class IntegrationHelper
 {
-    private \Symfony\Component\DependencyInjection\ContainerInterface $container;
-
-    protected \Doctrine\ORM\EntityManager $em;
-
-    protected \Mautic\CoreBundle\Helper\PathsHelper $pathsHelper;
-
-    protected \Mautic\CoreBundle\Helper\BundleHelper $bundleHelper;
-
-    protected \Mautic\CoreBundle\Helper\CoreParametersHelper $coreParametersHelper;
-
-    protected \Twig\Environment $twig;
-
-    protected \Mautic\PluginBundle\Model\PluginModel $pluginModel;
-
     private $integrations = [];
 
     private $available = [];
@@ -40,22 +26,8 @@ class IntegrationHelper
 
     private $byPlugin = [];
 
-    public function __construct(
-        ContainerInterface $container,
-        EntityManager $em,
-        PathsHelper $pathsHelper,
-        BundleHelper $bundleHelper,
-        CoreParametersHelper $coreParametersHelper,
-        Environment $twig,
-        PluginModel $pluginModel
-    ) {
-        $this->container            = $container;
-        $this->em                   = $em;
-        $this->pathsHelper          = $pathsHelper;
-        $this->bundleHelper         = $bundleHelper;
-        $this->pluginModel          = $pluginModel;
-        $this->coreParametersHelper = $coreParametersHelper;
-        $this->twig                 = $twig;
+    public function __construct(private ContainerInterface $container, protected EntityManager $em, protected PathsHelper $pathsHelper, protected BundleHelper $bundleHelper, protected CoreParametersHelper $coreParametersHelper, protected Environment $twig, protected PluginModel $pluginModel)
+    {
     }
 
     /**
@@ -165,7 +137,7 @@ class IntegrationHelper
             foreach ($this->bundleHelper->getMauticBundles() as $coreBundle) {
                 if (
                     // Skip plugin bundles
-                    false !== strpos($coreBundle['relative'], 'app/bundles')
+                    str_contains($coreBundle['relative'], 'app/bundles')
                     // Skip core bundles without an Integration directory
                     && is_dir($coreBundle['directory'].'/Integration')
                 ) {
@@ -557,7 +529,7 @@ class IntegrationHelper
                 foreach ($identifierField as $idf) {
                     $value = (is_array($fields[$f]) && isset($fields[$f]['value'])) ? $fields[$f]['value'] : $fields[$f];
 
-                    if (!in_array($value, $identifier) && false !== strpos($f, $idf)) {
+                    if (!in_array($value, $identifier) && str_contains($f, $idf)) {
                         $identifier[$f] = $value;
                         if (count($identifier) === count($identifierField)) {
                             // found enough matches so break
@@ -566,7 +538,7 @@ class IntegrationHelper
                         }
                     }
                 }
-            } elseif ($identifierField === $f || false !== strpos($f, $identifierField)) {
+            } elseif ($identifierField === $f || str_contains($f, $identifierField)) {
                 $matchFound = true;
                 $identifier = (is_array($fields[$f])) ? $fields[$f]['value'] : $fields[$f];
             }

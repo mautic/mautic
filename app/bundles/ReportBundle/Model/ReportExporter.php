@@ -13,28 +13,8 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class ReportExporter
 {
-    private \Mautic\ReportBundle\Model\ScheduleModel $schedulerModel;
-
-    private \Mautic\ReportBundle\Adapter\ReportDataAdapter $reportDataAdapter;
-
-    private \Mautic\ReportBundle\Model\ReportExportOptions $reportExportOptions;
-
-    private \Mautic\ReportBundle\Model\ReportFileWriter $reportFileWriter;
-
-    private \Symfony\Component\EventDispatcher\EventDispatcherInterface $eventDispatcher;
-
-    public function __construct(
-        ScheduleModel $schedulerModel,
-        ReportDataAdapter $reportDataAdapter,
-        ReportExportOptions $reportExportOptions,
-        ReportFileWriter $reportFileWriter,
-        EventDispatcherInterface $eventDispatcher
-    ) {
-        $this->schedulerModel      = $schedulerModel;
-        $this->reportDataAdapter   = $reportDataAdapter;
-        $this->reportExportOptions = $reportExportOptions;
-        $this->reportFileWriter    = $reportFileWriter;
-        $this->eventDispatcher     = $eventDispatcher;
+    public function __construct(private ScheduleModel $schedulerModel, private ReportDataAdapter $reportDataAdapter, private ReportExportOptions $reportExportOptions, private ReportFileWriter $reportFileWriter, private EventDispatcherInterface $eventDispatcher)
+    {
     }
 
     /**

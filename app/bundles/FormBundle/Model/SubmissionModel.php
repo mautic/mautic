@@ -64,58 +64,24 @@ use Twig\Environment;
  */
 class SubmissionModel extends CommonFormModel
 {
-    protected \Mautic\CoreBundle\Helper\IpLookupHelper $ipLookupHelper;
-
-    protected \Twig\Environment $twig;
-
-    protected \Mautic\FormBundle\Model\FormModel $formModel;
-
-    protected \Mautic\PageBundle\Model\PageModel $pageModel;
-
-    protected \Mautic\LeadBundle\Model\LeadModel $leadModel;
-
-    protected \Mautic\CampaignBundle\Model\CampaignModel $campaignModel;
-
-    protected \Mautic\CampaignBundle\Membership\MembershipManager $membershipManager;
-
-    protected LeadFieldModel $leadFieldModel;
-
-    protected \Mautic\LeadBundle\Model\CompanyModel $companyModel;
-
-    protected \Mautic\FormBundle\Helper\FormFieldHelper $fieldHelper;
-
-    private \Mautic\FormBundle\Validator\UploadFieldValidator $uploadFieldValidator;
-
-    private \Mautic\FormBundle\Helper\FormUploader $formUploader;
-
-    private \Mautic\LeadBundle\Tracker\Service\DeviceTrackingService\DeviceTrackingServiceInterface $deviceTrackingService;
-
-    private \Mautic\FormBundle\Event\Service\FieldValueTransformer $fieldValueTransformer;
-
-    private \Mautic\CoreBundle\Twig\Helper\DateHelper $dateHelper;
-
-    private \Mautic\LeadBundle\Tracker\ContactTracker $contactTracker;
-
-    private ContactMerger $contactMerger;
-
     public function __construct(
-        IpLookupHelper $ipLookupHelper,
-        Environment $twig,
-        FormModel $formModel,
-        PageModel $pageModel,
-        LeadModel $leadModel,
-        CampaignModel $campaignModel,
-        MembershipManager $membershipManager,
-        LeadFieldModel $leadFieldModel,
-        CompanyModel $companyModel,
-        FormFieldHelper $fieldHelper,
-        UploadFieldValidator $uploadFieldValidator,
-        FormUploader $formUploader,
-        DeviceTrackingServiceInterface $deviceTrackingService,
-        FieldValueTransformer $fieldValueTransformer,
-        DateHelper $dateHelper,
-        ContactTracker $contactTracker,
-        ContactMerger $contactMerger,
+        protected IpLookupHelper $ipLookupHelper,
+        protected Environment $twig,
+        protected FormModel $formModel,
+        protected PageModel $pageModel,
+        protected LeadModel $leadModel,
+        protected CampaignModel $campaignModel,
+        protected MembershipManager $membershipManager,
+        protected LeadFieldModel $leadFieldModel,
+        protected CompanyModel $companyModel,
+        protected FormFieldHelper $fieldHelper,
+        private UploadFieldValidator $uploadFieldValidator,
+        private FormUploader $formUploader,
+        private DeviceTrackingServiceInterface $deviceTrackingService,
+        private FieldValueTransformer $fieldValueTransformer,
+        private DateHelper $dateHelper,
+        private ContactTracker $contactTracker,
+        private ContactMerger $contactMerger,
         EntityManager $em,
         CorePermissions $security,
         EventDispatcherInterface $dispatcher,
@@ -125,24 +91,6 @@ class SubmissionModel extends CommonFormModel
         LoggerInterface $mauticLogger,
         CoreParametersHelper $coreParametersHelper
     ) {
-        $this->ipLookupHelper         = $ipLookupHelper;
-        $this->twig                   = $twig;
-        $this->formModel              = $formModel;
-        $this->pageModel              = $pageModel;
-        $this->leadModel              = $leadModel;
-        $this->campaignModel          = $campaignModel;
-        $this->membershipManager      = $membershipManager;
-        $this->leadFieldModel         = $leadFieldModel;
-        $this->companyModel           = $companyModel;
-        $this->fieldHelper            = $fieldHelper;
-        $this->uploadFieldValidator   = $uploadFieldValidator;
-        $this->formUploader           = $formUploader;
-        $this->deviceTrackingService  = $deviceTrackingService;
-        $this->fieldValueTransformer  = $fieldValueTransformer;
-        $this->dateHelper             = $dateHelper;
-        $this->contactTracker         = $contactTracker;
-        $this->contactMerger          = $contactMerger;
-
         parent::__construct($em, $security, $dispatcher, $router, $translator, $userHelper, $mauticLogger, $coreParametersHelper);
     }
 

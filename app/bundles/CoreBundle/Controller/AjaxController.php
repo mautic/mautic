@@ -73,7 +73,7 @@ class AjaxController extends CommonController
         }
 
         if ($authorizationChecker->isGranted('IS_AUTHENTICATED_REMEMBERED')) {
-            if (false !== strpos($action, ':')) {
+            if (str_contains($action, ':')) {
                 // call the specified bundle's ajax action
                 $parts     = explode(':', $action);
                 $namespace = 'Mautic';
@@ -172,13 +172,13 @@ class AjaxController extends CommonController
             if (is_array($c)) {
                 foreach ($c as $subc) {
                     $command = $translator->trans($k);
-                    $command = (false === strpos($command, ':')) ? $command.':' : $command;
+                    $command = (!str_contains($command, ':')) ? $command.':' : $command;
 
                     $dataArray[$command.$translator->trans($subc)] = ['value' => $command.$translator->trans($subc)];
                 }
             } else {
                 $command = $translator->trans($c);
-                $command = (false === strpos($command, ':')) ? $command.':' : $command;
+                $command = (!str_contains($command, ':')) ? $command.':' : $command;
 
                 $dataArray[$command] = ['value' => $command];
             }
@@ -207,7 +207,7 @@ class AjaxController extends CommonController
             foreach ($commands as $k => $c) {
                 if (is_array($c)) {
                     $command = $translator->trans($k);
-                    $command = (false === strpos($command, ':')) ? $command.':' : $command;
+                    $command = (!str_contains($command, ':')) ? $command.':' : $command;
 
                     foreach ($c as $subc) {
                         $subcommand = $command.$translator->trans($subc);
@@ -218,7 +218,7 @@ class AjaxController extends CommonController
                     }
                 } else {
                     $command = $translator->trans($k);
-                    $command = (false === strpos($command, ':')) ? $command.':' : $command;
+                    $command = (!str_contains($command, ':')) ? $command.':' : $command;
 
                     if (!in_array($command, $dupChecker)) {
                         $dataArray[]  = ['value' => $command];

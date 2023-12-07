@@ -6,36 +6,9 @@ namespace Mautic\IntegrationsBundle\Sync\DAO\Mapping;
 
 class FieldMappingDAO
 {
-    /**
-     * @var string
-     */
-    private $internalObject;
-
-    /**
-     * @var string
-     */
-    private $internalField;
-
-    /**
-     * @var string
-     */
-    private $integrationObject;
-
-    /**
-     * @var string
-     */
-    private $integrationField;
-
-    /**
-     * @var string
-     */
-    private $syncDirection;
-
     private bool $isRequired;
 
     /**
-     * FieldMappingDAO constructor.
-     *
      * @param string $internalObject
      * @param string $internalField
      * @param string $integrationObject
@@ -43,13 +16,8 @@ class FieldMappingDAO
      * @param string $syncDirection
      * @param bool   $isRequired
      */
-    public function __construct($internalObject, $internalField, $integrationObject, $integrationField, $syncDirection, $isRequired)
+    public function __construct(private $internalObject, private $internalField, private $integrationObject, private $integrationField, private $syncDirection, $isRequired)
     {
-        $this->internalObject    = $internalObject;
-        $this->internalField     = $internalField;
-        $this->integrationObject = $integrationObject;
-        $this->integrationField  = $integrationField;
-        $this->syncDirection     = $syncDirection;
         $this->isRequired        = (bool) $isRequired;
     }
 

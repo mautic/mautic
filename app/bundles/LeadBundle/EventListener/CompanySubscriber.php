@@ -10,14 +10,8 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class CompanySubscriber implements EventSubscriberInterface
 {
-    private \Mautic\CoreBundle\Model\AuditLogModel $auditLogModel;
-
-    private \Mautic\CoreBundle\Helper\IpLookupHelper $ipLookupHelper;
-
-    public function __construct(IpLookupHelper $ipLookupHelper, AuditLogModel $auditLogModel)
+    public function __construct(private IpLookupHelper $ipLookupHelper, private AuditLogModel $auditLogModel)
     {
-        $this->ipLookupHelper = $ipLookupHelper;
-        $this->auditLogModel  = $auditLogModel;
     }
 
     /**

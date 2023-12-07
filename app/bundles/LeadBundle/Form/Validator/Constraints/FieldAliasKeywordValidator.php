@@ -22,23 +22,8 @@ class FieldAliasKeywordValidator extends ConstraintValidator
         'company_id',
     ];
 
-    private ContactSegmentFilterDictionary $contactSegmentFilterDictionary;
-
-    private \Mautic\LeadBundle\Model\ListModel $listModel;
-
-    private \Mautic\LeadBundle\Helper\FieldAliasHelper $aliasHelper;
-
-    private \Doctrine\ORM\EntityManager $em;
-
-    private \Symfony\Contracts\Translation\TranslatorInterface $translator;
-
-    public function __construct(ListModel $listModel, FieldAliasHelper $aliasHelper, EntityManager $em, TranslatorInterface $translator, ContactSegmentFilterDictionary $contactSegmentFilterDictionary)
+    public function __construct(private ListModel $listModel, private FieldAliasHelper $aliasHelper, private EntityManager $em, private TranslatorInterface $translator, private ContactSegmentFilterDictionary $contactSegmentFilterDictionary)
     {
-        $this->listModel                      = $listModel;
-        $this->aliasHelper                    = $aliasHelper;
-        $this->em                             = $em;
-        $this->translator                     = $translator;
-        $this->contactSegmentFilterDictionary = $contactSegmentFilterDictionary;
     }
 
     /**

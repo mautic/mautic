@@ -431,31 +431,15 @@ class FieldModel extends FormModel
         ],
     ];
 
-    private \Mautic\CoreBundle\Doctrine\Helper\ColumnSchemaHelper $columnSchemaHelper;
-
-    private \Mautic\LeadBundle\Field\CustomFieldColumn $customFieldColumn;
-
-    private \Mautic\LeadBundle\Field\Dispatcher\FieldSaveDispatcher $fieldSaveDispatcher;
-
-    private \Mautic\LeadBundle\Entity\LeadFieldRepository $leadFieldRepository;
-
-    private \Mautic\LeadBundle\Model\ListModel $leadListModel;
-
-    private \Mautic\LeadBundle\Field\FieldsWithUniqueIdentifier $fieldsWithUniqueIdentifier;
-
-    private \Mautic\LeadBundle\Field\FieldList $fieldList;
-
-    private \Mautic\LeadBundle\Field\LeadFieldSaver $leadFieldSaver;
-
     public function __construct(
-        ColumnSchemaHelper $columnSchemaHelper,
-        ListModel $leadListModel,
-        CustomFieldColumn $customFieldColumn,
-        FieldSaveDispatcher $fieldSaveDispatcher,
-        LeadFieldRepository $leadFieldRepository,
-        FieldsWithUniqueIdentifier $fieldsWithUniqueIdentifier,
-        FieldList $fieldList,
-        LeadFieldSaver $leadFieldSaver,
+        private ColumnSchemaHelper $columnSchemaHelper,
+        private ListModel $leadListModel,
+        private CustomFieldColumn $customFieldColumn,
+        private FieldSaveDispatcher $fieldSaveDispatcher,
+        private LeadFieldRepository $leadFieldRepository,
+        private FieldsWithUniqueIdentifier $fieldsWithUniqueIdentifier,
+        private FieldList $fieldList,
+        private LeadFieldSaver $leadFieldSaver,
         EntityManagerInterface $em,
         CorePermissions $security,
         EventDispatcherInterface $dispatcher,
@@ -465,15 +449,6 @@ class FieldModel extends FormModel
         LoggerInterface $mauticLogger,
         CoreParametersHelper $coreParametersHelper
     ) {
-        $this->columnSchemaHelper         = $columnSchemaHelper;
-        $this->leadListModel              = $leadListModel;
-        $this->customFieldColumn          = $customFieldColumn;
-        $this->fieldSaveDispatcher        = $fieldSaveDispatcher;
-        $this->leadFieldRepository        = $leadFieldRepository;
-        $this->fieldsWithUniqueIdentifier = $fieldsWithUniqueIdentifier;
-        $this->fieldList                  = $fieldList;
-        $this->leadFieldSaver             = $leadFieldSaver;
-
         parent::__construct($em, $security, $dispatcher, $router, $translator, $userHelper, $mauticLogger, $coreParametersHelper);
     }
 

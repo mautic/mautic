@@ -28,10 +28,8 @@ use Symfony\Contracts\EventDispatcher\Event;
  */
 class StageModel extends CommonFormModel
 {
-    protected \Mautic\LeadBundle\Model\LeadModel $leadModel;
-
     public function __construct(
-        LeadModel $leadModel,
+        protected LeadModel $leadModel,
         UserHelper $userHelper,
         EntityManager $em,
         CorePermissions $security,
@@ -41,8 +39,6 @@ class StageModel extends CommonFormModel
         LoggerInterface $mauticLogger,
         CoreParametersHelper $coreParametersHelper
     ) {
-        $this->leadModel  = $leadModel;
-
         parent::__construct($em, $security, $dispatcher, $router, $translator, $userHelper, $mauticLogger, $coreParametersHelper);
     }
 

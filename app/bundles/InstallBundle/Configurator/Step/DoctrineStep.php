@@ -72,7 +72,7 @@ class DoctrineStep implements StepInterface
         $parameters = $configurator->getParameters();
 
         foreach ($parameters as $key => $value) {
-            if (0 === strpos($key, 'db_')) {
+            if (str_starts_with($key, 'db_')) {
                 $parameters[substr($key, 3)] = $value;
                 $key                         = substr($key, 3);
                 $this->$key                  = $value;

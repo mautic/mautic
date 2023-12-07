@@ -51,7 +51,7 @@ class ButtonSubscriber implements EventSubscriberInterface
             return;
         }
 
-        if (0 === strpos($event->getRoute(), 'mautic_contact_')) {
+        if (str_starts_with($event->getRoute(), 'mautic_contact_')) {
             $event->addButton(
                 [
                     'attr' => [
@@ -103,7 +103,7 @@ class ButtonSubscriber implements EventSubscriberInterface
                 );
             }
         } else {
-            if (0 === strpos($event->getRoute(), 'mautic_company_')) {
+            if (str_starts_with($event->getRoute(), 'mautic_company_')) {
                 $event->addButton(
                     [
                         'attr' => [

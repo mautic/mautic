@@ -23,24 +23,8 @@ class FieldType extends AbstractType
 {
     use FormFieldTrait;
 
-    private \Symfony\Contracts\Translation\TranslatorInterface $translator;
-
-    private \Mautic\FormBundle\Collector\ObjectCollectorInterface $objectCollector;
-
-    private \Mautic\FormBundle\Collector\FieldCollectorInterface $fieldCollector;
-
-    private \Mautic\FormBundle\Collector\AlreadyMappedFieldCollectorInterface $mappedFieldCollector;
-
-    public function __construct(
-        TranslatorInterface $translator,
-        ObjectCollectorInterface $objectCollector,
-        FieldCollectorInterface $fieldCollector,
-        AlreadyMappedFieldCollectorInterface $mappedFieldCollector
-    ) {
-        $this->translator           = $translator;
-        $this->objectCollector      = $objectCollector;
-        $this->fieldCollector       = $fieldCollector;
-        $this->mappedFieldCollector = $mappedFieldCollector;
+    public function __construct(private TranslatorInterface $translator, private ObjectCollectorInterface $objectCollector, private FieldCollectorInterface $fieldCollector, private AlreadyMappedFieldCollectorInterface $mappedFieldCollector)
+    {
     }
 
     public function buildForm(FormBuilderInterface $builder, array $options): void
@@ -199,7 +183,7 @@ class FieldType extends AbstractType
                         'class'   => 'form-control',
                         'tooltip' => 'mautic.form.field.form.alias.tooltip',
                     ],
-                    'disabled' => (!empty($options['data']['id']) && false === strpos($options['data']['id'], 'new')) ? true : false,
+                    'disabled' => (!empty($options['data']['id']) && !str_contains($options['data']['id'], 'new')) ? true : false,
                     'required' => false,
                 ]
             );

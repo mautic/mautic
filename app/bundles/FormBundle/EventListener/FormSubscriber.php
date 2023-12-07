@@ -24,26 +24,14 @@ class FormSubscriber implements EventSubscriberInterface
 {
     private MailHelper $mailer;
 
-    private AuditLogModel $auditLogModel;
-
-    private IpLookupHelper $ipLookupHelper;
-
-    private TranslatorInterface $translator;
-
-    private RouterInterface $router;
-
     public function __construct(
-        IpLookupHelper $ipLookupHelper,
-        AuditLogModel $auditLogModel,
+        private IpLookupHelper $ipLookupHelper,
+        private AuditLogModel $auditLogModel,
         MailHelper $mailer,
-        TranslatorInterface $translator,
-        RouterInterface $router
+        private TranslatorInterface $translator,
+        private RouterInterface $router
     ) {
-        $this->ipLookupHelper       = $ipLookupHelper;
-        $this->auditLogModel        = $auditLogModel;
         $this->mailer               = $mailer->getMailer();
-        $this->translator           = $translator;
-        $this->router               = $router;
     }
 
     /**
@@ -242,7 +230,7 @@ class FormSubscriber implements EventSubscriberInterface
         ];
 
         if (!empty($config['authorization_header'])) {
-            if (false !== strpos($config['authorization_header'], ':')) {
+            if (str_contains($config['authorization_header'], ':')) {
                 list($key, $value) = explode(':', $config['authorization_header']);
             } else {
                 $key   = 'Authorization';

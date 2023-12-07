@@ -284,7 +284,7 @@ class CoreSubscriber implements EventSubscriberInterface
         $requirements = (!empty($details['requirements'])) ? $details['requirements'] : [];
 
         // Set some very commonly used defaults and requirements
-        if (false !== strpos($details['path'], '{page}')) {
+        if (str_contains($details['path'], '{page}')) {
             if (!isset($defaults['page'])) {
                 $defaults['page'] = 0;
             }
@@ -292,7 +292,7 @@ class CoreSubscriber implements EventSubscriberInterface
                 $requirements['page'] = '\d+';
             }
         }
-        if (false !== strpos($details['path'], '{objectId}')) {
+        if (str_contains($details['path'], '{objectId}')) {
             if (!isset($defaults['objectId'])) {
                 // Set default to 0 for the "new" actions
                 $defaults['objectId'] = 0;
@@ -303,7 +303,7 @@ class CoreSubscriber implements EventSubscriberInterface
             }
         }
         if ('api' == $type) {
-            if (false !== strpos($details['path'], '{id}')) {
+            if (str_contains($details['path'], '{id}')) {
                 if (!isset($requirements['page'])) {
                     $requirements['id'] = '\d+';
                 }

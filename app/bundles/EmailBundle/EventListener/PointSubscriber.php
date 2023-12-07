@@ -18,14 +18,8 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class PointSubscriber implements EventSubscriberInterface
 {
-    private \Mautic\PointBundle\Model\PointModel $pointModel;
-
-    private \Doctrine\ORM\EntityManager $entityManager;
-
-    public function __construct(PointModel $pointModel, EntityManager $entityManager)
+    public function __construct(private PointModel $pointModel, private EntityManager $entityManager)
     {
-        $this->pointModel    = $pointModel;
-        $this->entityManager = $entityManager;
     }
 
     public static function getSubscribedEvents()

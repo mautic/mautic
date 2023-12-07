@@ -8,20 +8,11 @@ use Mautic\LeadBundle\Segment\Decorator\FilterDecoratorInterface;
 
 class DateDefault implements FilterDecoratorInterface
 {
-    private \Mautic\LeadBundle\Segment\Decorator\DateDecorator $dateDecorator;
-
-    /**
-     * @var string
-     */
-    private $originalValue;
-
     /**
      * @param string $originalValue
      */
-    public function __construct(DateDecorator $dateDecorator, $originalValue)
+    public function __construct(private DateDecorator $dateDecorator, private $originalValue)
     {
-        $this->dateDecorator = $dateDecorator;
-        $this->originalValue = $originalValue;
     }
 
     /**
@@ -68,7 +59,7 @@ class DateDefault implements FilterDecoratorInterface
         switch ($contactSegmentFilterCrate->getOperator()) {
             case 'like':
             case '!like':
-                return false === strpos($filter, '%') ? '%'.$filter.'%' : $filter;
+                return !str_contains($filter, '%') ? '%'.$filter.'%' : $filter;
             case 'contains':
                 return '%'.$filter.'%';
             case 'startsWith':

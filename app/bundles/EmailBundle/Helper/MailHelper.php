@@ -41,8 +41,6 @@ class MailHelper
      */
     protected $factory;
 
-    protected MailerInterface $mailer;
-
     protected $transport;
 
     /**
@@ -231,10 +229,9 @@ class MailHelper
      */
     private $embedImagesReplaces = [];
 
-    public function __construct(MauticFactory $factory, MailerInterface $mailer, $from = null)
+    public function __construct(MauticFactory $factory, protected MailerInterface $mailer, $from = null)
     {
         $this->factory   = $factory;
-        $this->mailer    = $mailer;
         $this->transport = $this->getTransport();
 
         $systemFromEmail    = $factory->getParameter('mailer_from_email');
@@ -818,7 +815,7 @@ class MailHelper
         if (!$ignoreTrackingPixel && $this->factory->getParameter('mailer_append_tracking_pixel')) {
             // Append tracking pixel
             $trackingImg = '<img height="1" width="1" src="{tracking_pixel}" alt="" />';
-            if (false !== strpos($content, '</body>')) {
+            if (str_contains($content, '</body>')) {
                 $content = str_replace('</body>', $trackingImg.'</body>', $content);
             } else {
                 $content .= $trackingImg;
@@ -844,7 +841,7 @@ class MailHelper
         if (preg_match_all('/<img.+?src=[\"\'](.+?)[\"\'].*?>/i', $content, $matches) > 0) {
             foreach ($matches[1] as $match) {
                 // skip items that already embedded, or have token {tracking_pixel}
-                if (false !== strpos($match, 'cid:') || false !== strpos($match, '{tracking_pixel}') || array_key_exists($match, $this->embedImagesReplaces)) {
+                if (str_contains($match, 'cid:') || str_contains($match, '{tracking_pixel}') || array_key_exists($match, $this->embedImagesReplaces)) {
                     continue;
                 }
 
@@ -1387,7 +1384,7 @@ class MailHelper
         $listUnsubscribeHeader = $this->getUnsubscribeHeader();
         if ($listUnsubscribeHeader) {
             if (!empty($headers['List-Unsubscribe'])) {
-                if (false === strpos($headers['List-Unsubscribe'], $listUnsubscribeHeader)) {
+                if (!str_contains($headers['List-Unsubscribe'], $listUnsubscribeHeader)) {
                     // Ensure Mautic's is always part of this header
                     $headers['List-Unsubscribe'] .= ','.$listUnsubscribeHeader;
                 }
@@ -1685,7 +1682,7 @@ class MailHelper
     public function getTrackableLink($url)
     {
         // Ensure a valid URL and that it has not already been found
-        if ('http' !== substr($url, 0, 4) && 'ftp' !== substr($url, 0, 3)) {
+        if (!str_starts_with($url, 'http') && !str_starts_with($url, 'ftp')) {
             return null;
         }
 

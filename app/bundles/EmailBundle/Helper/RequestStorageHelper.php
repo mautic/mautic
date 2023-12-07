@@ -18,11 +18,8 @@ class RequestStorageHelper
      */
     public const KEY_SEPARATOR = ';webhook_request;';
 
-    private CacheProviderInterface $cacheStorage;
-
-    public function __construct(CacheProviderInterface $cacheStorage)
+    public function __construct(private CacheProviderInterface $cacheStorage)
     {
-        $this->cacheStorage = $cacheStorage;
     }
 
     /**
@@ -98,7 +95,7 @@ class RequestStorageHelper
      */
     private function removeCachePrefix(string $key): string
     {
-        if (0 === strpos($key, 'mautic:')) {
+        if (str_starts_with($key, 'mautic:')) {
             $key = ltrim($key, 'mautic:');
         }
 

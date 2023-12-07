@@ -90,10 +90,7 @@ class PreAuthAuthenticator implements AuthenticationProviderInterface
         );
     }
 
-    /**
-     * @return mixed
-     */
-    public function supports(TokenInterface $token)
+    public function supports(TokenInterface $token): bool
     {
         return $token instanceof PluginToken && $token->getProviderKey() === $this->providerKey;
     }

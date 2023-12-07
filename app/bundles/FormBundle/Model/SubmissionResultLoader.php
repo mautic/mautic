@@ -9,12 +9,8 @@ use Mautic\FormBundle\Entity\SubmissionRepository;
 
 class SubmissionResultLoader implements MauticModelInterface
 {
-    private \Doctrine\ORM\EntityManager $entityManager;
-
-    public function __construct(
-        EntityManager $entityManager
-    ) {
-        $this->entityManager = $entityManager;
+    public function __construct(private EntityManager $entityManager)
+    {
     }
 
     /**

@@ -11,11 +11,8 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class GroupScoreSubscriber implements EventSubscriberInterface
 {
-    private TriggerModel $triggerModel;
-
-    public function __construct(TriggerModel $triggerModel)
+    public function __construct(private TriggerModel $triggerModel)
     {
-        $this->triggerModel = $triggerModel;
     }
 
     /**

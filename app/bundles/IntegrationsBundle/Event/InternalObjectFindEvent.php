@@ -10,8 +10,6 @@ use Symfony\Contracts\EventDispatcher\Event;
 
 class InternalObjectFindEvent extends Event
 {
-    private \Mautic\IntegrationsBundle\Sync\SyncDataExchange\Internal\Object\ObjectInterface $object;
-
     /**
      * @var int[]
      */
@@ -42,9 +40,8 @@ class InternalObjectFindEvent extends Event
      */
     private $fieldValues = [];
 
-    public function __construct(ObjectInterface $object)
+    public function __construct(private ObjectInterface $object)
     {
-        $this->object = $object;
     }
 
     public function getObject(): ObjectInterface

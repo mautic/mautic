@@ -10,14 +10,8 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class MaintenanceSubscriber implements EventSubscriberInterface
 {
-    private \Doctrine\DBAL\Connection $db;
-
-    private \Symfony\Contracts\Translation\TranslatorInterface $translator;
-
-    public function __construct(Connection $db, TranslatorInterface $translator)
+    public function __construct(private Connection $db, private TranslatorInterface $translator)
     {
-        $this->db         = $db;
-        $this->translator = $translator;
     }
 
     /**

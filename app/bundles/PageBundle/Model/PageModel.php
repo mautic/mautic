@@ -63,42 +63,21 @@ class PageModel extends FormModel
      */
     protected $catInUrl;
 
-    protected \Mautic\CoreBundle\Helper\CookieHelper $cookieHelper;
-
-    protected \Mautic\CoreBundle\Helper\IpLookupHelper $ipLookupHelper;
-
-    protected \Mautic\LeadBundle\Model\LeadModel $leadModel;
-
-    protected \Mautic\LeadBundle\Model\FieldModel $leadFieldModel;
-
-    protected \Mautic\PageBundle\Model\RedirectModel $pageRedirectModel;
-
-    protected \Mautic\PageBundle\Model\TrackableModel $pageTrackableModel;
-
     protected \Mautic\CoreBundle\Helper\DateTimeHelper $dateTimeHelper;
 
-    private \Mautic\LeadBundle\Tracker\DeviceTracker $deviceTracker;
-
-    private \Mautic\LeadBundle\Model\CompanyModel $companyModel;
-
-    private \Mautic\LeadBundle\Tracker\ContactTracker $contactTracker;
-    private MessageBusInterface $messageBus;
-
-    private ContactRequestHelper $contactRequestHelper;
-
     public function __construct(
-        CookieHelper $cookieHelper,
-        IpLookupHelper $ipLookupHelper,
-        LeadModel $leadModel,
-        FieldModel $leadFieldModel,
-        RedirectModel $pageRedirectModel,
-        TrackableModel $pageTrackableModel,
-        MessageBusInterface $messageBus,
-        CompanyModel $companyModel,
-        DeviceTracker $deviceTracker,
-        ContactTracker $contactTracker,
+        protected CookieHelper $cookieHelper,
+        protected IpLookupHelper $ipLookupHelper,
+        protected LeadModel $leadModel,
+        protected FieldModel $leadFieldModel,
+        protected RedirectModel $pageRedirectModel,
+        protected TrackableModel $pageTrackableModel,
+        private MessageBusInterface $messageBus,
+        private CompanyModel $companyModel,
+        private DeviceTracker $deviceTracker,
+        private ContactTracker $contactTracker,
         CoreParametersHelper $coreParametersHelper,
-        ContactRequestHelper $contactRequestHelper,
+        private ContactRequestHelper $contactRequestHelper,
         EntityManager $em,
         CorePermissions $security,
         EventDispatcherInterface $dispatcher,
@@ -107,18 +86,7 @@ class PageModel extends FormModel
         UserHelper $userHelper,
         LoggerInterface $mauticLogger
     ) {
-        $this->cookieHelper         = $cookieHelper;
-        $this->ipLookupHelper       = $ipLookupHelper;
-        $this->leadModel            = $leadModel;
-        $this->leadFieldModel       = $leadFieldModel;
-        $this->pageRedirectModel    = $pageRedirectModel;
-        $this->pageTrackableModel   = $pageTrackableModel;
         $this->dateTimeHelper       = new DateTimeHelper();
-        $this->companyModel         = $companyModel;
-        $this->deviceTracker        = $deviceTracker;
-        $this->contactTracker       = $contactTracker;
-        $this->contactRequestHelper = $contactRequestHelper;
-        $this->messageBus           = $messageBus;
 
         parent::__construct($em, $security, $dispatcher, $router, $translator, $userHelper, $mauticLogger, $coreParametersHelper);
     }
@@ -1031,7 +999,7 @@ class PageModel extends FormModel
         $queryHasUtmTags = false;
         $query           = $hit->getQuery();
         foreach ($query as $key => $value) {
-            if (false !== strpos($key, 'utm_')) {
+            if (str_contains($key, 'utm_')) {
                 $queryHasUtmTags = true;
                 break;
             }
@@ -1109,13 +1077,13 @@ class PageModel extends FormModel
 
         // Use the current URL
         $isPageEvent = false;
-        if (false !== strpos($request->server->get('REQUEST_URI'), $this->router->generate('mautic_page_tracker'))) {
+        if (str_contains($request->server->get('REQUEST_URI'), $this->router->generate('mautic_page_tracker'))) {
             // Tracking pixel is used
             if ($request->server->get('QUERY_STRING')) {
                 parse_str($request->server->get('QUERY_STRING'), $query);
                 $isPageEvent = true;
             }
-        } elseif (false !== strpos($request->server->get('REQUEST_URI'), $this->router->generate('mautic_page_tracker_cors'))) {
+        } elseif (str_contains($request->server->get('REQUEST_URI'), $this->router->generate('mautic_page_tracker_cors'))) {
             $query       = $request->request->all();
             $isPageEvent = true;
         }

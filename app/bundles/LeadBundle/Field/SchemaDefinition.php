@@ -55,7 +55,7 @@ class SchemaDefinition
                 $options['length'] = $length;
                 break;
             case 'text':
-                $schemaType        = (false !== strpos($alias, 'description')) ? 'text' : 'string';
+                $schemaType        = (str_contains($alias, 'description')) ? 'text' : 'string';
                 $options['length'] = $length;
                 break;
             case 'multiselect':

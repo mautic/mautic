@@ -8,29 +8,11 @@ use Symfony\Contracts\EventDispatcher\Event;
 
 class ChannelSubscriptionChange extends Event
 {
-    private \Mautic\LeadBundle\Entity\Lead $lead;
-
     /**
-     * @var string
+     * @param string $channel
      */
-    private $channel;
-
-    /**
-     * @var string
-     */
-    private $oldStatus;
-
-    /**
-     * @var string
-     */
-    private $newStatus;
-
-    public function __construct(Lead $lead, $channel, $oldStatus, $newStatus)
+    public function __construct(private Lead $lead, private $channel, private int $oldStatus, private int $newStatus)
     {
-        $this->lead      = $lead;
-        $this->channel   = $channel;
-        $this->oldStatus = $oldStatus;
-        $this->newStatus = $newStatus;
     }
 
     /**

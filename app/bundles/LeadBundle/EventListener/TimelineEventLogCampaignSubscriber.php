@@ -18,12 +18,9 @@ class TimelineEventLogCampaignSubscriber implements EventSubscriberInterface
 {
     use TimelineEventLogTrait;
 
-    private \Mautic\CoreBundle\Helper\UserHelper $userHelper;
-
-    public function __construct(LeadEventLogRepository $eventLogRepository, UserHelper $userHelper, Translator $translator)
+    public function __construct(LeadEventLogRepository $eventLogRepository, private UserHelper $userHelper, Translator $translator)
     {
         $this->eventLogRepository = $eventLogRepository;
-        $this->userHelper         = $userHelper;
         $this->translator         = $translator;
     }
 

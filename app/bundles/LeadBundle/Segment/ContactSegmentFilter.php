@@ -21,32 +21,17 @@ class ContactSegmentFilter
      */
     public $contactSegmentFilterCrate;
 
-    private \Mautic\LeadBundle\Segment\Decorator\FilterDecoratorInterface $filterDecorator;
-
-    private \Mautic\LeadBundle\Segment\Query\Filter\FilterQueryBuilderInterface $filterQueryBuilder;
-
-    private \Mautic\LeadBundle\Segment\TableSchemaColumnsCache $schemaCache;
-
-    /**
-     * @var array<string, mixed>
-     */
-    private array $batchLimiters = [];
-
     /**
      * @param array<string, mixed> $batchLimiters
      */
     public function __construct(
         ContactSegmentFilterCrate $contactSegmentFilterCrate,
-        FilterDecoratorInterface $filterDecorator,
-        TableSchemaColumnsCache $cache,
-        FilterQueryBuilderInterface $filterQueryBuilder,
-        array $batchLimiters = []
+        private FilterDecoratorInterface $filterDecorator,
+        private TableSchemaColumnsCache $schemaCache,
+        private FilterQueryBuilderInterface $filterQueryBuilder,
+        private array $batchLimiters = []
     ) {
         $this->contactSegmentFilterCrate = $contactSegmentFilterCrate;
-        $this->filterDecorator           = $filterDecorator;
-        $this->schemaCache               = $cache;
-        $this->filterQueryBuilder        = $filterQueryBuilder;
-        $this->batchLimiters             = $batchLimiters;
     }
 
     /**

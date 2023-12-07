@@ -8,6 +8,7 @@ use Rector\DeadCode\Rector\Assign\RemoveUnusedVariableAssignRector;
 use Rector\DeadCode\Rector\Property\RemoveUselessVarTagRector;
 use Rector\Symfony\Symfony42\Rector\MethodCall\ContainerGetToConstructorInjectionRector;
 use Rector\TypeDeclaration\Rector\ClassMethod\AddVoidReturnTypeWhereNoReturnRector;
+use Rector\TypeDeclaration\Rector\ClassMethod\BoolReturnTypeFromStrictScalarReturnsRector;
 use Rector\TypeDeclaration\Rector\ClassMethod\ReturnTypeFromReturnDirectArrayRector;
 use Rector\TypeDeclaration\Rector\ClassMethod\ReturnTypeFromStrictBoolReturnExprRector;
 use Rector\TypeDeclaration\Rector\ClassMethod\ReturnTypeFromStrictConstantReturnRector;
@@ -60,6 +61,10 @@ return static function (Rector\Config\RectorConfig $rectorConfig): void {
             __DIR__.'/app/bundles/LeadBundle/Entity',
         ],
 
+        \Rector\Php80\Rector\Class_\ClassPropertyAssignToConstructorPromotionRector::class => [
+            __DIR__.'/app/bundles/CacheBundle/EventListener/CacheClearSubscriber.php',
+        ],
+
         // handle later, case by case as lot of chnaged code
         \Rector\DeadCode\Rector\If_\RemoveAlwaysTrueIfConditionRector::class => [
             __DIR__.'/app/bundles/PointBundle/Controller/TriggerController.php',
@@ -106,6 +111,8 @@ return static function (Rector\Config\RectorConfig $rectorConfig): void {
 
     // Define what single rules will be applied
     $rectorConfig->rules([
+        // \Rector\Php80\Rector\Class_\ClassPropertyAssignToConstructorPromotionRector::class,
+        BoolReturnTypeFromStrictScalarReturnsRector::class,
         AddVoidReturnTypeWhereNoReturnRector::class,
         TypedPropertyFromStrictConstructorRector::class,
         TypedPropertyFromStrictSetUpRector::class,
@@ -116,5 +123,9 @@ return static function (Rector\Config\RectorConfig $rectorConfig): void {
         ReturnTypeFromStrictConstantReturnRector::class,
         ReturnTypeFromReturnDirectArrayRector::class,
         ContainerGetToConstructorInjectionRector::class,
+
+        // PHP 8.0
+        \Rector\Php80\Rector\NotIdentical\StrContainsRector::class,
+        \Rector\Php80\Rector\Identical\StrStartsWithRector::class,
     ]);
 };

@@ -9,11 +9,8 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class ReportSchedulerSubscriber implements EventSubscriberInterface
 {
-    private \Mautic\ReportBundle\Scheduler\Model\SchedulerPlanner $schedulerPlanner;
-
-    public function __construct(SchedulerPlanner $schedulerPlanner)
+    public function __construct(private SchedulerPlanner $schedulerPlanner)
     {
-        $this->schedulerPlanner = $schedulerPlanner;
     }
 
     /**

@@ -28,22 +28,10 @@ use Symfony\Component\HttpFoundation\Response;
 
 class FieldController extends CommonFormController
 {
-    private FormModel $formModel;
-
-    private FieldModel $formFieldModel;
-
-    private \Mautic\FormBundle\Collector\MappedObjectCollectorInterface $mappedObjectCollector;
-
-    private \Mautic\FormBundle\Collector\AlreadyMappedFieldCollectorInterface $alreadyMappedFieldCollector;
-
-    public function __construct(FormModel $formModel, FieldModel $formFieldModel, FormFieldHelper $fieldHelper, FormFactoryInterface $formFactory, MappedObjectCollectorInterface $mappedObjectCollector, AlreadyMappedFieldCollectorInterface $alreadyMappedFieldCollector, ManagerRegistry $doctrine, MauticFactory $factory, ModelFactory $modelFactory, UserHelper $userHelper, CoreParametersHelper $coreParametersHelper, EventDispatcherInterface $dispatcher, Translator $translator, FlashBag $flashBag, RequestStack $requestStack, CorePermissions $security)
+    public function __construct(private FormModel $formModel, private FieldModel $formFieldModel, FormFieldHelper $fieldHelper, FormFactoryInterface $formFactory, private MappedObjectCollectorInterface $mappedObjectCollector, private AlreadyMappedFieldCollectorInterface $alreadyMappedFieldCollector, ManagerRegistry $doctrine, MauticFactory $factory, ModelFactory $modelFactory, UserHelper $userHelper, CoreParametersHelper $coreParametersHelper, EventDispatcherInterface $dispatcher, Translator $translator, FlashBag $flashBag, RequestStack $requestStack, CorePermissions $security)
     {
-        $this->formModel                   = $formModel;
-        $this->formFieldModel              = $formFieldModel;
         $this->fieldHelper                 = $fieldHelper;
         $this->formFactory                 = $formFactory;
-        $this->mappedObjectCollector       = $mappedObjectCollector;
-        $this->alreadyMappedFieldCollector = $alreadyMappedFieldCollector;
 
         parent::__construct($formFactory, $fieldHelper, $doctrine, $factory, $modelFactory, $userHelper, $coreParametersHelper, $dispatcher, $translator, $flashBag, $requestStack, $security);
     }
@@ -256,7 +244,7 @@ class FieldController extends CommonFormController
                         // overwrite with updated data
                         $formField = array_merge($fields[$objectId], $formData);
 
-                        if (false !== strpos($objectId, 'new')) {
+                        if (str_contains((string) $objectId, 'new')) {
                             // Get aliases in order to generate update for this one
                             $aliases = [];
                             foreach ($fields as $k => $f) {

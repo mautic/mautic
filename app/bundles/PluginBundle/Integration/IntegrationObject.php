@@ -5,22 +5,11 @@ namespace Mautic\PluginBundle\Integration;
 class IntegrationObject
 {
     /**
-     * @var string
+     * @param string $type
+     * @param string $internalType
      */
-    private $type;
-
-    /**
-     * @var string
-     */
-    private $internalType;
-
-    /**
-     * Constructor.
-     */
-    public function __construct($type, $internalType)
+    public function __construct(private $type, private $internalType)
     {
-        $this->type         = $type;
-        $this->internalType = $internalType;
     }
 
     /**

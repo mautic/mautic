@@ -18,12 +18,6 @@ class FieldBuilder
 {
     private \Mautic\IntegrationsBundle\Sync\ValueNormalizer\ValueNormalizer $valueNormalizer;
 
-    private \Symfony\Component\Routing\Router $router;
-
-    private \Mautic\IntegrationsBundle\Sync\SyncDataExchange\Helper\FieldHelper $fieldHelper;
-
-    private \Mautic\IntegrationsBundle\Sync\SyncDataExchange\Internal\ObjectHelper\ContactObjectHelper $contactObjectHelper;
-
     /**
      * @var array
      */
@@ -34,13 +28,9 @@ class FieldBuilder
      */
     private $requestObject;
 
-    public function __construct(Router $router, FieldHelper $fieldHelper, ContactObjectHelper $contactObjectHelper)
+    public function __construct(private Router $router, private FieldHelper $fieldHelper, private ContactObjectHelper $contactObjectHelper)
     {
         $this->valueNormalizer = new ValueNormalizer();
-
-        $this->router              = $router;
-        $this->fieldHelper         = $fieldHelper;
-        $this->contactObjectHelper = $contactObjectHelper;
     }
 
     /**
@@ -69,7 +59,7 @@ class FieldBuilder
         }
 
         // Special handling of DNC fields
-        if (0 === strpos($field, 'mautic_internal_dnc_')) {
+        if (str_starts_with($field, 'mautic_internal_dnc_')) {
             return $this->addDoNotContactField($field);
         }
 

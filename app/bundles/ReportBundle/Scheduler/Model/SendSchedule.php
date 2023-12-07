@@ -11,18 +11,12 @@ class SendSchedule
 {
     private \Mautic\EmailBundle\Helper\MailHelper $mailer;
 
-    private \Mautic\ReportBundle\Scheduler\Model\MessageSchedule $messageSchedule;
-
-    private \Mautic\ReportBundle\Scheduler\Model\FileHandler $fileHandler;
-
     public function __construct(
         MailHelper $mailer,
-        MessageSchedule $messageSchedule,
-        FileHandler $fileHandler
+        private MessageSchedule $messageSchedule,
+        private FileHandler $fileHandler
     ) {
         $this->mailer          = $mailer->getMailer();
-        $this->messageSchedule = $messageSchedule;
-        $this->fileHandler     = $fileHandler;
     }
 
     /**

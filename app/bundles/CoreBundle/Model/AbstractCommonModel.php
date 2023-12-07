@@ -200,7 +200,7 @@ abstract class AbstractCommonModel implements MauticModelInterface
         }
 
         $entity = false;
-        if (false !== strpos($idSlug, ':')) {
+        if (str_contains($idSlug, ':')) {
             $parts = explode(':', $idSlug);
             if (2 == count($parts)) {
                 $entity = $this->getEntity($parts[0]);

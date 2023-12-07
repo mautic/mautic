@@ -7,29 +7,7 @@ use Mautic\CoreBundle\Event\CommonEvent;
 
 class LeadBuildSearchEvent extends CommonEvent
 {
-    /**
-     * @var string
-     */
-    protected $string;
-
-    protected \Doctrine\DBAL\Query\QueryBuilder $queryBuilder;
-
-    /**
-     * @var string
-     */
-    protected $alias;
-
-    /**
-     * @var string
-     */
-    protected $command;
-
     protected string $subQuery;
-
-    /**
-     * @var bool
-     */
-    protected $negate;
 
     protected bool $isSearchDone;
 
@@ -43,15 +21,9 @@ class LeadBuildSearchEvent extends CommonEvent
      * @param string $string
      * @param string $command
      * @param string $alias
-     * @param string $negate
      */
-    public function __construct($string, $command, $alias, $negate, QueryBuilder $queryBuilder)
+    public function __construct(protected $string, protected $command, protected $alias, protected bool $negate, protected QueryBuilder $queryBuilder)
     {
-        $this->string           = $string;
-        $this->command          = $command;
-        $this->alias            = $alias;
-        $this->negate           = $negate;
-        $this->queryBuilder     = $queryBuilder;
         $this->subQuery         = '';
         $this->isSearchDone     = false;
         $this->strict           = false;

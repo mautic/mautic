@@ -25,16 +25,10 @@ use Mautic\IntegrationsBundle\Sync\SyncProcess\Direction\Helper\ValueHelper;
 
 class ObjectChangeGenerator
 {
-    private \Mautic\IntegrationsBundle\Sync\SyncJudge\SyncJudgeInterface $syncJudge;
-
     /**
      * @var ReportDAO
      */
     private $syncReport;
-
-    private \Mautic\IntegrationsBundle\Sync\SyncProcess\Direction\Helper\ValueHelper $valueHelper;
-
-    private \Mautic\IntegrationsBundle\Sync\SyncDataExchange\Helper\FieldHelper $fieldHelper;
 
     /**
      * @var MappingManualDAO
@@ -65,11 +59,8 @@ class ObjectChangeGenerator
         SyncJudgeInterface::FUZZY_EVIDENCE_MODE,
     ];
 
-    public function __construct(SyncJudgeInterface $syncJudge, ValueHelper $valueHelper, FieldHelper $fieldHelper)
+    public function __construct(private SyncJudgeInterface $syncJudge, private ValueHelper $valueHelper, private FieldHelper $fieldHelper)
     {
-        $this->syncJudge   = $syncJudge;
-        $this->valueHelper = $valueHelper;
-        $this->fieldHelper = $fieldHelper;
     }
 
     /**

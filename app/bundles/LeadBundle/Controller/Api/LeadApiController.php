@@ -52,18 +52,9 @@ class LeadApiController extends CommonApiController
 
     private DoNotContactModel $doNotContactModel;
 
-    private ContactMerger $contactMerger;
-
-    private UserHelper $userHelper;
-
-    private IpLookupHelper $ipLookupHelper;
-
-    public function __construct(CorePermissions $security, Translator $translator, EntityResultHelper $entityResultHelper, RouterInterface $router, FormFactoryInterface $formFactory, DoNotContactModel $doNotContactModel, AppVersion $appVersion, ContactMerger $contactMerger, UserHelper $userHelper, IpLookupHelper $ipLookupHelper, RequestStack $requestStack, ManagerRegistry $doctrine, ModelFactory $modelFactory, EventDispatcherInterface $dispatcher, CoreParametersHelper $coreParametersHelper, MauticFactory $factory)
+    public function __construct(CorePermissions $security, Translator $translator, EntityResultHelper $entityResultHelper, RouterInterface $router, FormFactoryInterface $formFactory, DoNotContactModel $doNotContactModel, AppVersion $appVersion, private ContactMerger $contactMerger, private UserHelper $userHelper, private IpLookupHelper $ipLookupHelper, RequestStack $requestStack, ManagerRegistry $doctrine, ModelFactory $modelFactory, EventDispatcherInterface $dispatcher, CoreParametersHelper $coreParametersHelper, MauticFactory $factory)
     {
         $this->doNotContactModel = $doNotContactModel;
-        $this->contactMerger     = $contactMerger;
-        $this->userHelper        = $userHelper;
-        $this->ipLookupHelper    = $ipLookupHelper;
 
         $leadModel = $modelFactory->getModel(self::MODEL_ID);
         \assert($leadModel instanceof LeadModel);

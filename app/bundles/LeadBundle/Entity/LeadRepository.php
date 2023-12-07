@@ -642,7 +642,7 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
                 if (is_array($value)) {
                     $this->buildWhereClauseFromArray($qb, [$value]);
                 } else {
-                    if (false === strpos($column, '.')) {
+                    if (!str_contains($column, '.')) {
                         $column = "entity.$column";
                     }
                     if (null === $expr) {

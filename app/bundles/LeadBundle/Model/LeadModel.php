@@ -79,14 +79,6 @@ class LeadModel extends FormModel
 
     public const CHANNEL_FEATURE = 'contact_preference';
 
-    protected \Symfony\Component\HttpFoundation\RequestStack $requestStack;
-
-    protected \Mautic\CoreBundle\Helper\IpLookupHelper $ipLookupHelper;
-
-    protected \Mautic\CoreBundle\Helper\PathsHelper $pathsHelper;
-
-    protected \Mautic\PluginBundle\Helper\IntegrationHelper $integrationHelper;
-
     /**
      * @var FieldModel
      */
@@ -96,18 +88,6 @@ class LeadModel extends FormModel
      * @var array
      */
     protected $leadFields = [];
-
-    protected \Mautic\LeadBundle\Model\ListModel $leadListModel;
-
-    protected \Mautic\LeadBundle\Model\CompanyModel $companyModel;
-
-    protected \Mautic\CategoryBundle\Model\CategoryModel $categoryModel;
-
-    protected \Symfony\Component\Form\FormFactoryInterface $formFactory;
-
-    protected \Mautic\ChannelBundle\Helper\ChannelListHelper $channelListHelper;
-
-    protected \Mautic\UserBundle\Security\Provider\UserProvider $userProvider;
 
     protected $leadTrackingId;
 
@@ -120,14 +100,6 @@ class LeadModel extends FormModel
      * @var array
      */
     protected $availableLeadFields = [];
-
-    protected \Mautic\EmailBundle\Helper\EmailValidator $emailValidator;
-
-    private \Mautic\LeadBundle\Tracker\ContactTracker $contactTracker;
-
-    private \Mautic\LeadBundle\Tracker\DeviceTracker $deviceTracker;
-
-    private \Mautic\LeadBundle\Model\IpAddressModel $ipAddressModel;
 
     /**
      * @var bool
@@ -145,22 +117,22 @@ class LeadModel extends FormModel
     private $fieldsByGroup = [];
 
     public function __construct(
-        RequestStack $requestStack,
-        IpLookupHelper $ipLookupHelper,
-        PathsHelper $pathsHelper,
-        IntegrationHelper $integrationHelper,
+        protected RequestStack $requestStack,
+        protected IpLookupHelper $ipLookupHelper,
+        protected PathsHelper $pathsHelper,
+        protected IntegrationHelper $integrationHelper,
         FieldModel $leadFieldModel,
-        ListModel $leadListModel,
-        FormFactoryInterface $formFactory,
-        CompanyModel $companyModel,
-        CategoryModel $categoryModel,
-        ChannelListHelper $channelListHelper,
+        protected ListModel $leadListModel,
+        protected FormFactoryInterface $formFactory,
+        protected CompanyModel $companyModel,
+        protected CategoryModel $categoryModel,
+        protected ChannelListHelper $channelListHelper,
         CoreParametersHelper $coreParametersHelper,
-        EmailValidator $emailValidator,
-        UserProvider $userProvider,
-        ContactTracker $contactTracker,
-        DeviceTracker $deviceTracker,
-        IpAddressModel $ipAddressModel,
+        protected EmailValidator $emailValidator,
+        protected UserProvider $userProvider,
+        private ContactTracker $contactTracker,
+        private DeviceTracker $deviceTracker,
+        private IpAddressModel $ipAddressModel,
         EntityManager $em,
         CorePermissions $security,
         EventDispatcherInterface $dispatcher,
@@ -169,21 +141,7 @@ class LeadModel extends FormModel
         UserHelper $userHelper,
         LoggerInterface $mauticLogger
     ) {
-        $this->requestStack         = $requestStack;
-        $this->ipLookupHelper       = $ipLookupHelper;
-        $this->pathsHelper          = $pathsHelper;
-        $this->integrationHelper    = $integrationHelper;
         $this->leadFieldModel       = $leadFieldModel;
-        $this->leadListModel        = $leadListModel;
-        $this->companyModel         = $companyModel;
-        $this->formFactory          = $formFactory;
-        $this->categoryModel        = $categoryModel;
-        $this->channelListHelper    = $channelListHelper;
-        $this->emailValidator       = $emailValidator;
-        $this->userProvider         = $userProvider;
-        $this->contactTracker       = $contactTracker;
-        $this->deviceTracker        = $deviceTracker;
-        $this->ipAddressModel       = $ipAddressModel;
 
         parent::__construct($em, $security, $dispatcher, $router, $translator, $userHelper, $mauticLogger, $coreParametersHelper);
     }
@@ -1636,7 +1594,7 @@ class LeadModel extends FormModel
         // See which tags already exist
         $foundTags = $this->getTagRepository()->getTagsByName($tags);
         foreach ($tags as $tag) {
-            if (0 === strpos($tag, '-')) {
+            if (str_starts_with($tag, '-')) {
                 // Tag to be removed
                 $tag = substr($tag, 1);
 

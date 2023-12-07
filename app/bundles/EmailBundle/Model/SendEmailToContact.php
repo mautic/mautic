@@ -16,14 +16,6 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class SendEmailToContact
 {
-    private \Mautic\EmailBundle\Helper\MailHelper $mailer;
-
-    private \Mautic\EmailBundle\Stat\StatHelper $statHelper;
-
-    private \Mautic\LeadBundle\Model\DoNotContact $dncModel;
-
-    private \Symfony\Contracts\Translation\TranslatorInterface $translator;
-
     /**
      * @var string|null
      */
@@ -74,12 +66,8 @@ class SendEmailToContact
      */
     private $contact = [];
 
-    public function __construct(MailHelper $mailer, StatHelper $statHelper, DoNotContact $dncModel, TranslatorInterface $translator)
+    public function __construct(private MailHelper $mailer, private StatHelper $statHelper, private DoNotContact $dncModel, private TranslatorInterface $translator)
     {
-        $this->mailer     = $mailer;
-        $this->statHelper = $statHelper;
-        $this->dncModel   = $dncModel;
-        $this->translator = $translator;
     }
 
     /**

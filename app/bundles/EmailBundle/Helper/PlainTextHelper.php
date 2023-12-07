@@ -334,7 +334,7 @@ class PlainTextHelper
             $url = $link;
         } else {
             $url = $this->options['base_url'];
-            if ('/' != substr($link, 0, 1)) {
+            if (!str_starts_with($link, '/')) {
                 $url .= '/';
             }
             $url .= $link;

@@ -1311,7 +1311,7 @@ class Asset extends FormEntity
         $number = number_format($number, 2);
 
         // Remove trailing .00
-        $number = false !== strpos($number, '.') ? rtrim(rtrim($number, '0'), '.') : $number;
+        $number = str_contains($number, '.') ? rtrim(rtrim($number, '0'), '.') : $number;
 
         return $number.' '.$unit;
     }

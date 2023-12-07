@@ -64,10 +64,7 @@ abstract class AbstractCustomRequestEvent extends Event
         return ($withParams) ? [$this->route, $this->routeParams] : $this->route;
     }
 
-    /**
-     * @return bool
-     */
-    public function checkRouteContext($route)
+    public function checkRouteContext($route): bool
     {
         if (null == $this->request) {
             return false;

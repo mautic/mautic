@@ -11,24 +11,8 @@ use Symfony\Component\HttpFoundation\Session\Session;
 
 class TrackingHelper
 {
-    protected \Symfony\Component\HttpFoundation\Session\Session $session;
-
-    protected \Mautic\CoreBundle\Helper\CoreParametersHelper $coreParametersHelper;
-
-    protected \Symfony\Component\HttpFoundation\RequestStack $requestStack;
-
-    protected \Mautic\LeadBundle\Tracker\ContactTracker $contactTracker;
-
-    public function __construct(
-        Session $session,
-        CoreParametersHelper $coreParametersHelper,
-        RequestStack $requestStack,
-        ContactTracker $contactTracker
-    ) {
-        $this->session              = $session;
-        $this->coreParametersHelper = $coreParametersHelper;
-        $this->requestStack         = $requestStack;
-        $this->contactTracker       = $contactTracker;
+    public function __construct(protected Session $session, protected CoreParametersHelper $coreParametersHelper, protected RequestStack $requestStack, protected ContactTracker $contactTracker)
+    {
     }
 
     public function getEnabledServices()
@@ -115,7 +99,7 @@ class TrackingHelper
     protected function isLandingPage(): bool
     {
         $server = $this->requestStack->getCurrentRequest()->server;
-        if (false === strpos((string) $server->get('HTTP_REFERER'), $this->coreParametersHelper->get('site_url'))) {
+        if (!str_contains((string) $server->get('HTTP_REFERER'), $this->coreParametersHelper->get('site_url'))) {
             return false;
         }
 

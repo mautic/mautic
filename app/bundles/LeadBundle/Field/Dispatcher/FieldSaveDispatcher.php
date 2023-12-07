@@ -13,14 +13,8 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class FieldSaveDispatcher
 {
-    private \Symfony\Component\EventDispatcher\EventDispatcherInterface $dispatcher;
-
-    private \Doctrine\ORM\EntityManager $entityManager;
-
-    public function __construct(EventDispatcherInterface $dispatcher, EntityManager $entityManager)
+    public function __construct(private EventDispatcherInterface $dispatcher, private EntityManager $entityManager)
     {
-        $this->dispatcher    = $dispatcher;
-        $this->entityManager = $entityManager;
     }
 
     /**

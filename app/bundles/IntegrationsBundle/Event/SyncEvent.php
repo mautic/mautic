@@ -9,11 +9,8 @@ use Symfony\Contracts\EventDispatcher\Event;
 
 class SyncEvent extends Event
 {
-    private \Mautic\IntegrationsBundle\Sync\DAO\Sync\InputOptionsDAO $inputOptionsDAO;
-
-    public function __construct(InputOptionsDAO $inputOptionsDAO)
+    public function __construct(private InputOptionsDAO $inputOptionsDAO)
     {
-        $this->inputOptionsDAO = $inputOptionsDAO;
     }
 
     public function getIntegrationName(): string

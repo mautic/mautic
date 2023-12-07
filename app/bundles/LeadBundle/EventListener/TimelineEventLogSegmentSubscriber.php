@@ -18,20 +18,14 @@ class TimelineEventLogSegmentSubscriber implements EventSubscriberInterface
 {
     use TimelineEventLogTrait;
 
-    private \Mautic\CoreBundle\Helper\UserHelper $userHelper;
-
-    private \Doctrine\ORM\EntityManagerInterface $em;
-
     public function __construct(
         LeadEventLogRepository $eventLogRepository,
-        UserHelper $userHelper,
+        private UserHelper $userHelper,
         Translator $translator,
-        EntityManagerInterface $em
+        private EntityManagerInterface $em
     ) {
         $this->eventLogRepository = $eventLogRepository;
-        $this->userHelper         = $userHelper;
         $this->translator         = $translator;
-        $this->em                 = $em;
     }
 
     /**

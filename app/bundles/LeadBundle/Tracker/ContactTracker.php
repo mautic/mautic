@@ -21,13 +21,6 @@ use Symfony\Component\HttpFoundation\RequestStack;
 class ContactTracker
 {
     use DefaultValueTrait;
-    private \Mautic\LeadBundle\Entity\LeadRepository $leadRepository;
-
-    private \Mautic\LeadBundle\Tracker\Service\ContactTrackingService\ContactTrackingServiceInterface $contactTrackingService;
-
-    private \Mautic\LeadBundle\Tracker\DeviceTracker $deviceTracker;
-
-    private \Mautic\CoreBundle\Security\Permissions\CorePermissions $security;
 
     /**
      * @var Lead|null
@@ -39,42 +32,23 @@ class ContactTracker
      */
     private $trackedContact;
 
-    private \Psr\Log\LoggerInterface $logger;
-
-    private \Mautic\CoreBundle\Helper\IpLookupHelper $ipLookupHelper;
-
-    private \Symfony\Component\HttpFoundation\RequestStack $requestStack;
-
-    private \Mautic\CoreBundle\Helper\CoreParametersHelper $coreParametersHelper;
-
-    private \Symfony\Component\EventDispatcher\EventDispatcherInterface $dispatcher;
-
     /**
      * @var FieldModel
      */
     private $leadFieldModel;
 
     public function __construct(
-        LeadRepository $leadRepository,
-        ContactTrackingServiceInterface $contactTrackingService,
-        DeviceTracker $deviceTracker,
-        CorePermissions $security,
-        LoggerInterface $mauticLogger,
-        IpLookupHelper $ipLookupHelper,
-        RequestStack $requestStack,
-        CoreParametersHelper $coreParametersHelper,
-        EventDispatcherInterface $dispatcher,
+        private LeadRepository $leadRepository,
+        private ContactTrackingServiceInterface $contactTrackingService,
+        private DeviceTracker $deviceTracker,
+        private CorePermissions $security,
+        private LoggerInterface $logger,
+        private IpLookupHelper $ipLookupHelper,
+        private RequestStack $requestStack,
+        private CoreParametersHelper $coreParametersHelper,
+        private EventDispatcherInterface $dispatcher,
         FieldModel $leadFieldModel
     ) {
-        $this->leadRepository         = $leadRepository;
-        $this->contactTrackingService = $contactTrackingService;
-        $this->deviceTracker          = $deviceTracker;
-        $this->security               = $security;
-        $this->logger                 = $mauticLogger;
-        $this->ipLookupHelper         = $ipLookupHelper;
-        $this->requestStack           = $requestStack;
-        $this->coreParametersHelper   = $coreParametersHelper;
-        $this->dispatcher             = $dispatcher;
         $this->leadFieldModel         = $leadFieldModel;
     }
 

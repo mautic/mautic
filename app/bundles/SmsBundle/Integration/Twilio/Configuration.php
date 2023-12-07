@@ -7,8 +7,6 @@ use Twilio\Exceptions\ConfigurationException;
 
 class Configuration
 {
-    private \Mautic\PluginBundle\Helper\IntegrationHelper $integrationHelper;
-
     /**
      * @var string
      */
@@ -24,9 +22,8 @@ class Configuration
      */
     private $authToken;
 
-    public function __construct(IntegrationHelper $integrationHelper)
+    public function __construct(private IntegrationHelper $integrationHelper)
     {
-        $this->integrationHelper = $integrationHelper;
     }
 
     /**

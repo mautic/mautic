@@ -58,10 +58,8 @@ abstract class AbstractPermissions
 
     /**
      * Allows permission classes to be disabled if criteria is not met (such as bundle is disabled).
-     *
-     * @return bool
      */
-    public function isEnabled()
+    public function isEnabled(): bool
     {
         return true;
     }
@@ -212,7 +210,7 @@ abstract class AbstractPermissions
      *
      * @return bool Return true if a second round is required after all other bundles have analyzed it's permissions
      */
-    public function analyzePermissions(array &$permissions, $allPermissions, $isSecondRound = false)
+    public function analyzePermissions(array &$permissions, $allPermissions, $isSecondRound = false): bool
     {
         $hasViewAccess = false;
         foreach ($permissions as $level => &$perms) {

@@ -468,7 +468,7 @@ class EventController extends CommonFormController
             // Add the field to the delete list
             if (!in_array($objectId, $deletedEvents)) {
                 // If event is new don't add to deleted list
-                if (false === strpos($objectId, 'new')) {
+                if (!str_contains($objectId, 'new')) {
                     $deletedEvents[] = $objectId;
                     $session->set('mautic.campaign.'.$campaignId.'.events.deleted', $deletedEvents);
                 }

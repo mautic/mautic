@@ -9,14 +9,8 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class FieldList
 {
-    private \Mautic\LeadBundle\Entity\LeadFieldRepository $leadFieldRepository;
-
-    private \Symfony\Contracts\Translation\TranslatorInterface $translator;
-
-    public function __construct(LeadFieldRepository $leadFieldRepository, TranslatorInterface $translator)
+    public function __construct(private LeadFieldRepository $leadFieldRepository, private TranslatorInterface $translator)
     {
-        $this->leadFieldRepository = $leadFieldRepository;
-        $this->translator          = $translator;
     }
 
     /**

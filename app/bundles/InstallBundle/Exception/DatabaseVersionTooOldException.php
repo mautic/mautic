@@ -6,12 +6,9 @@ namespace Mautic\InstallBundle\Exception;
 
 class DatabaseVersionTooOldException extends \Exception
 {
-    private string $currentVersion;
-
-    public function __construct(string $currentVersion)
+    public function __construct(private string $currentVersion)
     {
         parent::__construct();
-        $this->currentVersion = $currentVersion;
     }
 
     /**

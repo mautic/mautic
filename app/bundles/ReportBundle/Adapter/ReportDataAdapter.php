@@ -9,11 +9,8 @@ use Mautic\ReportBundle\Model\ReportModel;
 
 class ReportDataAdapter
 {
-    private \Mautic\ReportBundle\Model\ReportModel $reportModel;
-
-    public function __construct(ReportModel $reportModel)
+    public function __construct(private ReportModel $reportModel)
     {
-        $this->reportModel = $reportModel;
     }
 
     public function getReportData(Report $report, ReportExportOptions $reportExportOptions): ReportDataResult

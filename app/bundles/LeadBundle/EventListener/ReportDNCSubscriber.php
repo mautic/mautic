@@ -17,28 +17,8 @@ class ReportDNCSubscriber implements EventSubscriberInterface
 {
     public const DNC = 'contact.dnc';
 
-    private \Mautic\LeadBundle\Report\FieldsBuilder $fieldsBuilder;
-
-    private \Mautic\LeadBundle\Model\CompanyReportData $companyReportData;
-
-    private \Symfony\Contracts\Translation\TranslatorInterface $translator;
-
-    private \Symfony\Component\Routing\RouterInterface $router;
-
-    private \Mautic\ChannelBundle\Helper\ChannelListHelper $channelListHelper;
-
-    public function __construct(
-        FieldsBuilder $fieldsBuilder,
-        CompanyReportData $companyReportData,
-        TranslatorInterface $translator,
-        RouterInterface $router,
-        ChannelListHelper $channelListHelper
-    ) {
-        $this->fieldsBuilder     = $fieldsBuilder;
-        $this->companyReportData = $companyReportData;
-        $this->translator        = $translator;
-        $this->router            = $router;
-        $this->channelListHelper = $channelListHelper;
+    public function __construct(private FieldsBuilder $fieldsBuilder, private CompanyReportData $companyReportData, private TranslatorInterface $translator, private RouterInterface $router, private ChannelListHelper $channelListHelper)
+    {
     }
 
     /**

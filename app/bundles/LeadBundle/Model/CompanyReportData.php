@@ -8,14 +8,8 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class CompanyReportData
 {
-    private \Mautic\LeadBundle\Model\FieldModel $fieldModel;
-
-    private \Symfony\Contracts\Translation\TranslatorInterface $translator;
-
-    public function __construct(FieldModel $fieldModel, TranslatorInterface $translator)
+    public function __construct(private FieldModel $fieldModel, private TranslatorInterface $translator)
     {
-        $this->fieldModel = $fieldModel;
-        $this->translator = $translator;
     }
 
     public function getCompanyData(): array

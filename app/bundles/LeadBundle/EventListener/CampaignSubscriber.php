@@ -46,53 +46,13 @@ class CampaignSubscriber implements EventSubscriberInterface
 {
     public const ACTION_LEAD_CHANGE_OWNER = 'lead.changeowner';
 
-    private \Mautic\CoreBundle\Helper\IpLookupHelper $ipLookupHelper;
-
-    private \Mautic\LeadBundle\Model\LeadModel $leadModel;
-
-    private \Mautic\LeadBundle\Model\FieldModel $leadFieldModel;
-
-    private \Mautic\LeadBundle\Model\ListModel $listModel;
-
-    private \Mautic\LeadBundle\Model\CompanyModel $companyModel;
-
-    private \Mautic\CampaignBundle\Model\CampaignModel $campaignModel;
-
-    private \Mautic\PointBundle\Model\PointGroupModel $groupModel;
-
-    private \Mautic\CoreBundle\Helper\CoreParametersHelper $coreParametersHelper;
-
-    private \Mautic\LeadBundle\Provider\FilterOperatorProvider $filterOperatorProvider;
-
     /**
      * @var array
      */
     private $fields;
 
-    private DoNotContact $doNotContact;
-
-    public function __construct(
-        IpLookupHelper $ipLookupHelper,
-        LeadModel $leadModel,
-        FieldModel $leadFieldModel,
-        ListModel $listModel,
-        CompanyModel $companyModel,
-        CampaignModel $campaignModel,
-        CoreParametersHelper $coreParametersHelper,
-        DoNotContact $doNotContact,
-        PointGroupModel $groupModel,
-        FilterOperatorProvider $filterOperatorProvider,
-    ) {
-        $this->ipLookupHelper         = $ipLookupHelper;
-        $this->leadModel              = $leadModel;
-        $this->leadFieldModel         = $leadFieldModel;
-        $this->listModel              = $listModel;
-        $this->companyModel           = $companyModel;
-        $this->campaignModel          = $campaignModel;
-        $this->coreParametersHelper   = $coreParametersHelper;
-        $this->doNotContact           = $doNotContact;
-        $this->groupModel             = $groupModel;
-        $this->filterOperatorProvider = $filterOperatorProvider;
+    public function __construct(private IpLookupHelper $ipLookupHelper, private LeadModel $leadModel, private FieldModel $leadFieldModel, private ListModel $listModel, private CompanyModel $companyModel, private CampaignModel $campaignModel, private CoreParametersHelper $coreParametersHelper, private DoNotContact $doNotContact, private PointGroupModel $groupModel, private FilterOperatorProvider $filterOperatorProvider)
+    {
     }
 
     /**
@@ -526,10 +486,10 @@ class CampaignSubscriber implements EventSubscriberInterface
                 $triggerDate = new \DateTime('now', new \DateTimeZone($this->coreParametersHelper->get('default_timezone')));
                 $interval    = substr($event->getConfig()['value'], 1); // remove 1st character + or -
 
-                if (false !== strpos($event->getConfig()['value'], '+P')) { // add date
+                if (str_contains($event->getConfig()['value'], '+P')) { // add date
                     $triggerDate->add(new \DateInterval($interval)); // add the today date with interval
                     $result = $this->compareDateValue($lead, $event, $triggerDate);
-                } elseif (false !== strpos($event->getConfig()['value'], '-P')) { // subtract date
+                } elseif (str_contains($event->getConfig()['value'], '-P')) { // subtract date
                     $triggerDate->sub(new \DateInterval($interval)); // subtract the today date with interval
                     $result = $this->compareDateValue($lead, $event, $triggerDate);
                 } elseif ('anniversary' === $event->getConfig()['value']) {

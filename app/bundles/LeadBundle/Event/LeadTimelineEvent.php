@@ -33,13 +33,6 @@ class LeadTimelineEvent extends Event
      */
     protected $filters = [];
 
-    protected ?array $orderBy;
-
-    /**
-     * Lead entity for the lead the timeline is being generated for.
-     */
-    protected ?\Mautic\LeadBundle\Entity\Lead $lead;
-
     /**
      * @var array<string, int>
      */
@@ -49,16 +42,6 @@ class LeadTimelineEvent extends Event
      * @var array
      */
     protected $totalEventsByUnit = [];
-
-    /**
-     * @var int
-     */
-    protected $page = 1;
-
-    /**
-     * @var int
-     */
-    protected $limit;
 
     /**
      * @var bool
@@ -90,13 +73,6 @@ class LeadTimelineEvent extends Event
     /**
      * @var bool
      */
-    protected $forTimeline = true;
-
-    protected $siteDomain;
-
-    /**
-     * @var bool
-     */
     protected $fetchTypesOnly = false;
 
     /**
@@ -107,21 +83,21 @@ class LeadTimelineEvent extends Event
     ];
 
     /**
+     * @param Lead|null   $lead        Lead entity for the lead the timeline is being generated for
      * @param int         $page
      * @param int         $limit       Limit per type
      * @param bool        $forTimeline
      * @param string|null $siteDomain
      */
     public function __construct(
-        Lead $lead = null,
+        protected ?Lead $lead = null,
         array $filters = [],
-        array $orderBy = null,
-        $page = 1,
-        $limit = 25,
-        $forTimeline = true,
-        $siteDomain = null
+        protected ?array $orderBy = null,
+        protected $page = 1,
+        protected $limit = 25,
+        protected $forTimeline = true,
+        protected $siteDomain = null
     ) {
-        $this->lead    = $lead;
         $this->filters = !empty($filters)
             ? $filters
             :
@@ -130,11 +106,6 @@ class LeadTimelineEvent extends Event
                 'includeEvents' => [],
                 'excludeEvents' => [],
             ];
-        $this->orderBy     = $orderBy;
-        $this->page        = $page;
-        $this->limit       = $limit;
-        $this->forTimeline = $forTimeline;
-        $this->siteDomain  = $siteDomain;
 
         if (!empty($filters['dateFrom'])) {
             $this->dateFrom = ($filters['dateFrom'] instanceof \DateTime) ? $filters['dateFrom'] : new \DateTime($filters['dateFrom']);
@@ -204,7 +175,7 @@ class LeadTimelineEvent extends Event
                 // Ensure a full URL
                 if ($this->siteDomain && isset($data['eventLabel']) && is_array($data['eventLabel']) && isset($data['eventLabel']['href'])) {
                     // If this does not have a http, then assume a Mautic URL
-                    if (false === strpos($data['eventLabel']['href'], '://')) {
+                    if (!str_contains($data['eventLabel']['href'], '://')) {
                         $data['eventLabel']['href'] = $this->siteDomain.$data['eventLabel']['href'];
                     }
                 }

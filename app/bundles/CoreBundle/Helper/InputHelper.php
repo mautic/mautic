@@ -409,7 +409,7 @@ class InputHelper
                     $from[]   = $match;
                     $startTag = '<mcondition>';
                     $endTag   = '</mcondition>';
-                    if (false !== strpos($match, '<!--<![endif]-->')) {
+                    if (str_contains($match, '<!--<![endif]-->')) {
                         $startTag = '<mconditionnonoutlook>';
                         $endTag   = '</mconditionnonoutlook>';
                     }
@@ -545,7 +545,7 @@ class InputHelper
             ).$matches[3].'>';
         }, str_replace("\r", '', $html));
         // Minify inline CSS declaration(s)
-        if (false !== strpos($html, ' style=')) {
+        if (str_contains($html, ' style=')) {
             $html = preg_replace_callback('#<([^<]+?)\s+style=([\'"])(.*?)\2(?=[\/\s>])#s', function ($matches): string {
                 return '<'.$matches[1].' style='.$matches[2].self::minifyCss($matches[3]).$matches[2];
             }, $html);

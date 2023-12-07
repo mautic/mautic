@@ -18,20 +18,8 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class CampaignSubscriber implements EventSubscriberInterface
 {
-    private \Mautic\FormBundle\Model\FormModel $formModel;
-
-    private \Mautic\FormBundle\Model\SubmissionModel $formSubmissionModel;
-
-    private \Mautic\CampaignBundle\Executioner\RealTimeExecutioner $realTimeExecutioner;
-
-    private \Mautic\FormBundle\Helper\FormFieldHelper $formFieldHelper;
-
-    public function __construct(FormModel $formModel, SubmissionModel $formSubmissionModel, RealTimeExecutioner $realTimeExecutioner, FormFieldHelper $formFieldHelper)
+    public function __construct(private FormModel $formModel, private SubmissionModel $formSubmissionModel, private RealTimeExecutioner $realTimeExecutioner, private FormFieldHelper $formFieldHelper)
     {
-        $this->formModel           = $formModel;
-        $this->formSubmissionModel = $formSubmissionModel;
-        $this->realTimeExecutioner = $realTimeExecutioner;
-        $this->formFieldHelper     = $formFieldHelper;
     }
 
     /**

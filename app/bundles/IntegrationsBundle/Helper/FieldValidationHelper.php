@@ -16,19 +16,13 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class FieldValidationHelper
 {
-    private \Mautic\IntegrationsBundle\Sync\SyncDataExchange\Helper\FieldHelper $fieldHelper;
-
-    private \Symfony\Contracts\Translation\TranslatorInterface $translator;
-
     /**
      * @var ConfigFormSyncInterface|BasicInterface
      */
     private $integrationObject;
 
-    public function __construct(FieldHelper $fieldHelper, TranslatorInterface $translator)
+    public function __construct(private FieldHelper $fieldHelper, private TranslatorInterface $translator)
     {
-        $this->fieldHelper = $fieldHelper;
-        $this->translator  = $translator;
     }
 
     /**

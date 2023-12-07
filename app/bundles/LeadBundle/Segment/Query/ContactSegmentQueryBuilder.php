@@ -23,20 +23,11 @@ class ContactSegmentQueryBuilder
 {
     use LeadBatchLimiterTrait;
 
-    private \Doctrine\ORM\EntityManager $entityManager;
-
-    private \Mautic\LeadBundle\Segment\RandomParameterName $randomParameterName;
-
-    private \Symfony\Component\EventDispatcher\EventDispatcherInterface $dispatcher;
-
     /** @var array Contains segment edges mapping */
     private $dependencyMap = [];
 
-    public function __construct(EntityManager $entityManager, RandomParameterName $randomParameterName, EventDispatcherInterface $dispatcher)
+    public function __construct(private EntityManager $entityManager, private RandomParameterName $randomParameterName, private EventDispatcherInterface $dispatcher)
     {
-        $this->entityManager       = $entityManager;
-        $this->randomParameterName = $randomParameterName;
-        $this->dispatcher          = $dispatcher;
     }
 
     /**

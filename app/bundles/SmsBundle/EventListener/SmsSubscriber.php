@@ -18,29 +18,8 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class SmsSubscriber implements EventSubscriberInterface
 {
-    private \Mautic\CoreBundle\Model\AuditLogModel $auditLogModel;
-
-    private \Mautic\PageBundle\Model\TrackableModel $trackableModel;
-
-    private PageTokenHelper $pageTokenHelper;
-
-    private AssetTokenHelper $assetTokenHelper;
-
-    private \Mautic\SmsBundle\Helper\SmsHelper $smsHelper;
-
-    public function __construct(
-        AuditLogModel $auditLogModel,
-        TrackableModel $trackableModel,
-        PageTokenHelper $pageTokenHelper,
-        AssetTokenHelper $assetTokenHelper,
-        SmsHelper $smsHelper,
-        private CoreParametersHelper $coreParametersHelper
-    ) {
-        $this->auditLogModel    = $auditLogModel;
-        $this->trackableModel   = $trackableModel;
-        $this->pageTokenHelper  = $pageTokenHelper;
-        $this->assetTokenHelper = $assetTokenHelper;
-        $this->smsHelper        = $smsHelper;
+    public function __construct(private AuditLogModel $auditLogModel, private TrackableModel $trackableModel, private PageTokenHelper $pageTokenHelper, private AssetTokenHelper $assetTokenHelper, private SmsHelper $smsHelper, private CoreParametersHelper $coreParametersHelper)
+    {
     }
 
     /**

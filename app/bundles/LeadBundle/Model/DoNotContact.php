@@ -11,14 +11,8 @@ use Mautic\LeadBundle\Entity\Lead;
 
 class DoNotContact implements MauticModelInterface
 {
-    protected \Mautic\LeadBundle\Model\LeadModel $leadModel;
-
-    protected \Mautic\LeadBundle\Entity\DoNotContactRepository $dncRepo;
-
-    public function __construct(LeadModel $leadModel, DoNotContactRepository $dncRepo)
+    public function __construct(protected LeadModel $leadModel, protected DoNotContactRepository $dncRepo)
     {
-        $this->leadModel = $leadModel;
-        $this->dncRepo   = $dncRepo;
     }
 
     /**

@@ -16,10 +16,6 @@ class ProcessReplySubscriber implements EventSubscriberInterface
     public const FOLDER_KEY = 'replies';
     public const CACHE_KEY  = self::BUNDLE.'_'.self::FOLDER_KEY;
 
-    private \Mautic\EmailBundle\MonitoredEmail\Processor\Reply $replier;
-
-    private \Mautic\CoreBundle\Helper\CacheStorageHelper $cache;
-
     /**
      * @return array
      */
@@ -32,10 +28,8 @@ class ProcessReplySubscriber implements EventSubscriberInterface
         ];
     }
 
-    public function __construct(Reply $replier, CacheStorageHelper $cache)
+    public function __construct(private Reply $replier, private CacheStorageHelper $cache)
     {
-        $this->replier = $replier;
-        $this->cache   = $cache;
     }
 
     public function onEmailConfig(MonitoredEmailEvent $event): void

@@ -15,11 +15,8 @@ class ConfigIntegrationsHelper
      */
     private $integrations = [];
 
-    private \Mautic\IntegrationsBundle\Helper\IntegrationsHelper $integrationsHelper;
-
-    public function __construct(IntegrationsHelper $integrationsHelper)
+    public function __construct(private IntegrationsHelper $integrationsHelper)
     {
-        $this->integrationsHelper = $integrationsHelper;
     }
 
     public function addIntegration(ConfigFormInterface $integration): void

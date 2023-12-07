@@ -13,29 +13,8 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 class NotificationHelper
 {
-    protected \Doctrine\ORM\EntityManager $em;
-
-    protected \Mautic\PluginBundle\Helper\IntegrationHelper $integrationHelper;
-
-    protected \Mautic\CoreBundle\Helper\CoreParametersHelper $coreParametersHelper;
-
-    protected \Mautic\CoreBundle\Twig\Helper\AssetsHelper $assetsHelper;
-
-    protected \Symfony\Bundle\FrameworkBundle\Routing\Router $router;
-
-    protected \Symfony\Component\HttpFoundation\RequestStack $requestStack;
-
-    private \Mautic\LeadBundle\Model\DoNotContact $doNotContact;
-
-    public function __construct(EntityManager $em, AssetsHelper $assetsHelper, CoreParametersHelper $coreParametersHelper, IntegrationHelper $integrationHelper, Router $router, RequestStack $requestStack, \Mautic\LeadBundle\Model\DoNotContact $doNotContact)
+    public function __construct(protected EntityManager $em, protected AssetsHelper $assetsHelper, protected CoreParametersHelper $coreParametersHelper, protected IntegrationHelper $integrationHelper, protected Router $router, protected RequestStack $requestStack, private \Mautic\LeadBundle\Model\DoNotContact $doNotContact)
     {
-        $this->em                   = $em;
-        $this->assetsHelper         = $assetsHelper;
-        $this->coreParametersHelper = $coreParametersHelper;
-        $this->integrationHelper    = $integrationHelper;
-        $this->router               = $router;
-        $this->requestStack         = $requestStack;
-        $this->doNotContact         = $doNotContact;
     }
 
     /**
@@ -180,7 +159,7 @@ JS;
             return false;
         }
 
-        if (false === strpos($server->get('HTTP_REFERER'), $this->coreParametersHelper->get('site_url'))) {
+        if (!str_contains($server->get('HTTP_REFERER'), $this->coreParametersHelper->get('site_url'))) {
             $landingPage = false;
         }
 
