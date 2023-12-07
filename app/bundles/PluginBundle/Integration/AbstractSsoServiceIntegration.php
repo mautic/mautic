@@ -44,10 +44,8 @@ abstract class AbstractSsoServiceIntegration extends AbstractIntegration
 
     /**
      * Returns if a new user should be created if authenticated and not found locally.
-     *
-     * @return bool
      */
-    public function shouldAutoCreateNewUser()
+    public function shouldAutoCreateNewUser(): bool
     {
         $featureSettings = $this->settings->getFeatureSettings();
 

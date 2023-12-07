@@ -141,10 +141,7 @@ abstract class CrmAbstractIntegration extends AbstractIntegration
         return 'client_secret';
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function sortFieldsAlphabetically()
+    public function sortFieldsAlphabetically(): bool
     {
         return false;
     }

@@ -37,10 +37,8 @@ class FormModel extends AbstractCommonModel
      * Check to see if the entity is locked.
      *
      * @param object $entity
-     *
-     * @return bool
      */
-    public function isLocked($entity)
+    public function isLocked($entity): bool
     {
         if (method_exists($entity, 'getCheckedOut')) {
             $checkedOut = $entity->getCheckedOut();
@@ -184,7 +182,7 @@ class FormModel extends AbstractCommonModel
      *
      * @return bool Force browser refresh
      */
-    public function togglePublishStatus($entity)
+    public function togglePublishStatus($entity): bool
     {
         if (method_exists($entity, 'setIsPublished')) {
             $status = $entity->getPublishStatus();

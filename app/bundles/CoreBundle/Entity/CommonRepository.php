@@ -1235,10 +1235,8 @@ class CommonRepository extends ServiceEntityRepository
 
     /**
      * @param \Doctrine\ORM\QueryBuilder $q
-     *
-     * @return bool
      */
-    protected function buildClauses($q, array $args)
+    protected function buildClauses($q, array $args): bool
     {
         $this->buildSelectClause($q, $args);
         $this->buildIndexByClause($q, $args);
@@ -1697,10 +1695,8 @@ class CommonRepository extends ServiceEntityRepository
      *
      * @param string $command
      * @param string $subcommand
-     *
-     * @return bool
      */
-    protected function isSupportedSearchCommand(&$command, &$subcommand)
+    protected function isSupportedSearchCommand(&$command, &$subcommand): bool
     {
         $commands = $this->getSearchCommands();
         foreach ($commands as $k => $c) {

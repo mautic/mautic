@@ -147,10 +147,8 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
 
     /**
      * Determines if DNC records should be updated by date or by priority.
-     *
-     * @return int
      */
-    public function updateDncByDate()
+    public function updateDncByDate(): bool
     {
         return false;
     }
@@ -1173,10 +1171,8 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
 
     /**
      * Checks to see if the integration is configured by checking that required keys are populated.
-     *
-     * @return bool
      */
-    public function isConfigured()
+    public function isConfigured(): bool
     {
         $requiredTokens = $this->getRequiredKeyFields();
         foreach ($requiredTokens as $token => $label) {
@@ -1802,7 +1798,7 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
     /**
      * Sets whether fields should be sorted alphabetically or by the order the integration feeds.
      */
-    public function sortFieldsAlphabetically()
+    public function sortFieldsAlphabetically(): bool
     {
         return true;
     }
@@ -1901,10 +1897,8 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
      * Checks to ensure an image still exists before caching.
      *
      * @param string $url
-     *
-     * @return bool
      */
-    public function checkImageExists($url)
+    public function checkImageExists($url): bool
     {
         $ch = curl_init($url);
         curl_setopt($ch, CURLOPT_NOBODY, true);
