@@ -5,6 +5,7 @@ namespace Mautic\UserBundle\Entity;
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
+use Mautic\CoreBundle\Entity\CacheInvalidateInterface;
 use Mautic\CoreBundle\Entity\FormEntity;
 use Mautic\UserBundle\Form\Validator\Constraints\NotWeak;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
@@ -15,8 +16,10 @@ use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
 
-class User extends FormEntity implements UserInterface, EquatableInterface, PasswordAuthenticatedUserInterface
+class User extends FormEntity implements UserInterface, EquatableInterface, PasswordAuthenticatedUserInterface, CacheInvalidateInterface
 {
+    public const CACHE_NAMESPACE = 'User';
+
     /**
      * @var int
      */
@@ -813,5 +816,10 @@ class User extends FormEntity implements UserInterface, EquatableInterface, Pass
     public function isGuest()
     {
         return $this->guest;
+    }
+
+    public function getCacheNamespacesToDelete(): array
+    {
+        return [self::CACHE_NAMESPACE];
     }
 }

@@ -2,9 +2,11 @@
 
 namespace Mautic\LeadBundle\Controller\Api;
 
+use Mautic\CoreBundle\Cache\ResultCacheOptions;
 use Mautic\LeadBundle\Entity\Company;
 use Mautic\LeadBundle\Entity\CustomFieldEntityInterface;
 use Mautic\LeadBundle\Entity\Lead;
+use Mautic\LeadBundle\Entity\LeadField;
 use Mautic\LeadBundle\Model\FieldModel;
 use Mautic\LeadBundle\Model\LeadModel;
 use Symfony\Component\Form\Form;
@@ -131,6 +133,7 @@ trait CustomFieldsApiControllerTrait
                     ],
                 ],
                 'hydration_mode' => 'HYDRATE_ARRAY',
+                'result_cache'   => new ResultCacheOptions(LeadField::CACHE_NAMESPACE),
             ]
         );
 

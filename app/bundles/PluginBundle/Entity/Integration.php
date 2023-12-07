@@ -4,13 +4,16 @@ namespace Mautic\PluginBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
+use Mautic\CoreBundle\Entity\CacheInvalidateInterface;
 use Mautic\CoreBundle\Entity\CommonEntity;
 
 /**
  * Class Integration.
  */
-class Integration extends CommonEntity
+class Integration extends CommonEntity implements CacheInvalidateInterface
 {
+    public const CACHE_NAMESPACE = 'IntegrationSettings';
+
     /**
      * @var int
      */
@@ -223,5 +226,10 @@ class Integration extends CommonEntity
         $this->featureSettings = $featureSettings;
 
         return $this;
+    }
+
+    public function getCacheNamespacesToDelete(): array
+    {
+        return [self::CACHE_NAMESPACE];
     }
 }

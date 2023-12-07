@@ -4,12 +4,15 @@ namespace Mautic\UserBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
+use Mautic\CoreBundle\Entity\CacheInvalidateInterface;
 
 /**
  * Class Permission.
  */
-class Permission
+class Permission implements CacheInvalidateInterface
 {
+    public const CACHE_NAMESPACE = 'Permission';
+
     /**
      * @var int
      */
@@ -165,5 +168,10 @@ class Permission
     public function getName()
     {
         return $this->name;
+    }
+
+    public function getCacheNamespacesToDelete(): array
+    {
+        return [self::CACHE_NAMESPACE];
     }
 }

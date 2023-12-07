@@ -4,6 +4,8 @@ namespace Mautic\LeadBundle\Entity;
 
 use Doctrine\DBAL\Query\Expression\CompositeExpression;
 use Doctrine\DBAL\Query\QueryBuilder;
+use Mautic\CoreBundle\Cache\ResultCacheHelper;
+use Mautic\CoreBundle\Cache\ResultCacheOptions;
 use Mautic\LeadBundle\Controller\ListController;
 use Mautic\LeadBundle\Helper\CustomFieldHelper;
 
@@ -374,8 +376,8 @@ trait CustomFieldRepositoryTrait
                 ->setParameter('published', true, 'boolean')
                 ->setParameter('object', $object)
                 ->addOrderBy('f.field_order', 'asc');
-
-            $results = $fq->executeQuery()->fetchAllAssociative();
+            $result  = ResultCacheHelper::executeCachedDbalQuery($fq, new ResultCacheOptions(LeadField::CACHE_NAMESPACE));
+            $results = $result->fetchAllAssociative();
 
             $fields      = [];
             $fixedFields = [];
@@ -385,8 +387,6 @@ trait CustomFieldRepositoryTrait
                     $fixedFields[$r['alias']] = $r['alias'];
                 }
             }
-
-            unset($results);
 
             $this->customFieldList = [$fields, $fixedFields];
         }

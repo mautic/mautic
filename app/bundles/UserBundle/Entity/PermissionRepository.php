@@ -3,6 +3,8 @@
 namespace Mautic\UserBundle\Entity;
 
 use Doctrine\ORM\Query;
+use Mautic\CoreBundle\Cache\ResultCacheHelper;
+use Mautic\CoreBundle\Cache\ResultCacheOptions;
 use Mautic\CoreBundle\Entity\CommonRepository;
 
 /**
@@ -33,14 +35,14 @@ class PermissionRepository extends CommonRepository
      */
     public function getPermissionsByRole(Role $role, $forForm = false)
     {
-        $results = $this
+        $query = $this
             ->createQueryBuilder('p')
             ->where('p.role = :role')
             ->orderBy('p.bundle')
-            ->setParameter('role', $role)
-            ->getQuery()
-            ->useResultCache(false)
-            ->getResult(Query::HYDRATE_ARRAY);
+            ->setParameter(':role', $role)
+            ->getQuery();
+        ResultCacheHelper::enableOrmQueryCache($query, new ResultCacheOptions(Permission::CACHE_NAMESPACE));
+        $results = $query->getResult(Query::HYDRATE_ARRAY);
 
         // rearrange the array to meet needs
         $permissions = [];

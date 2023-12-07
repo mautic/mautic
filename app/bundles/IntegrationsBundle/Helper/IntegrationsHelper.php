@@ -105,7 +105,7 @@ class IntegrationsHelper
     {
         if (!$integration->hasIntegrationConfiguration()) {
             /** @var Integration $configuration */
-            $configuration = $this->integrationRepository->findOneBy(['name' => $integration->getName()]);
+            $configuration = $this->integrationRepository->findOneByName($integration->getName());
 
             if (!$configuration) {
                 throw new IntegrationNotFoundException("{$integration->getName()} doesn't exist in the database");
