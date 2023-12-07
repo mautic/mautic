@@ -34,7 +34,7 @@ class OwnerProvider
 
         try {
             $object = $this->objectProvider->getObjectByName($objectName);
-        } catch (ObjectNotFoundException $e) {
+        } catch (ObjectNotFoundException) {
             // Throw this exception for BC.
             throw new ObjectNotSupportedException(MauticSyncDataExchange::NAME, $objectName);
         }

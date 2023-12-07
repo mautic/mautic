@@ -31,7 +31,7 @@ class SchedulerPlanner
     {
         try {
             $date = $this->dateBuilder->getNextEvent($report);
-        } catch (NoScheduleException $e) {
+        } catch (NoScheduleException) {
             return;
         }
 

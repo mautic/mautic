@@ -58,7 +58,7 @@ class CompanyRepository extends CommonRepository implements CustomFieldRepositor
             }
             $q->andWhere($this->getTableAlias().'.id = '.(int) $companyId);
             $entity = $q->getQuery()->getSingleResult();
-        } catch (\Exception $e) {
+        } catch (\Exception) {
             $entity = null;
         }
 

@@ -27,7 +27,7 @@ class ReplyController extends AbstractController
 
         try {
             $handler = $this->callbackHandler->getHandler($transport);
-        } catch (CallbackHandlerNotFound $exception) {
+        } catch (CallbackHandlerNotFound) {
             throw new NotFoundHttpException();
         }
 

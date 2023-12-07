@@ -66,7 +66,7 @@ class SyncIntegrationsHelper
                 if ($integrationConfiguration->getIsPublished()) {
                     $this->enabled[] = $name;
                 }
-            } catch (IntegrationNotFoundException $exception) {
+            } catch (IntegrationNotFoundException) {
                 // Just ignore as the plugin hasn't been installed yet
             }
         }
@@ -110,7 +110,7 @@ class SyncIntegrationsHelper
                         return true;
                     }
                 }
-            } catch (ObjectNotFoundException $exception) {
+            } catch (ObjectNotFoundException) {
                 // Object is not supported so just continue
             }
         }

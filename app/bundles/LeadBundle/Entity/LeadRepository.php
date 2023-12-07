@@ -381,7 +381,7 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
             $q->andWhere($this->getTableAlias().'.id = :id')
                 ->setParameter('id', (int) $contactId);
             $entity = $q->getQuery()->getSingleResult();
-        } catch (\Exception $e) {
+        } catch (\Exception) {
             $entity = null;
         }
 

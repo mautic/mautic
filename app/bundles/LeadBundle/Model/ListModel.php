@@ -344,10 +344,10 @@ class ListModel extends FormModel
         try {
             // Get a count of leads to add
             $newLeadsCount = $this->leadSegmentService->getNewLeadListLeadsCount($leadList, $batchLimiters);
-        } catch (FieldNotFoundException $e) {
+        } catch (FieldNotFoundException) {
             // A field from filter does not exist anymore. Do not rebuild.
             return 0;
-        } catch (SegmentNotFoundException $e) {
+        } catch (SegmentNotFoundException) {
             // A segment from filter does not exist anymore. Do not rebuild.
             return 0;
         }

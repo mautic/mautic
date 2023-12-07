@@ -73,9 +73,9 @@ class KickoffExecutioner implements ExecutionerInterface
         try {
             $this->prepareForExecution();
             $this->executeOrScheduleEvent();
-        } catch (NoContactsFoundException $exception) {
+        } catch (NoContactsFoundException) {
             $this->logger->debug('CAMPAIGN: No more contacts to process');
-        } catch (NoEventsFoundException $exception) {
+        } catch (NoEventsFoundException) {
             $this->logger->debug('CAMPAIGN: No events to process');
         } finally {
             if ($this->progressBar) {
@@ -164,7 +164,7 @@ class KickoffExecutioner implements ExecutionerInterface
                     $rootEvents->remove($key);
 
                     continue;
-                } catch (NotSchedulableException $exception) {
+                } catch (NotSchedulableException) {
                     // Execute the event
                 }
             }

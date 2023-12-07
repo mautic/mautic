@@ -66,7 +66,7 @@ class ContactSegmentQueryBuilder
         foreach ($segmentFilters as $filter) {
             try {
                 $this->dispatchPluginFilteringEvent($filter, $queryBuilder);
-            } catch (PluginHandledFilterException $exception) {
+            } catch (PluginHandledFilterException) {
                 continue;
             }
 

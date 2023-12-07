@@ -44,7 +44,7 @@ final class HtmlExtension extends AbstractExtension
 
         try {
             $attributes = current((array) new \SimpleXMLElement("<element $attributes />"));
-        } catch (\Exception $e) {
+        } catch (\Exception) {
             return [];
         }
 

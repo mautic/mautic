@@ -51,7 +51,7 @@ class RequestStorageHelper
 
         try {
             $item = $this->cacheStorage->getItem($key);
-        } catch (InvalidArgumentException $e) {
+        } catch (InvalidArgumentException) {
             throw new \UnexpectedValueException($error);
         }
 

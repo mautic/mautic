@@ -50,7 +50,7 @@ class ControllerSubscriber implements EventSubscriberInterface
 
                 $controller = $this->resolver->getController($request);
                 $event->setController($controller);
-            } catch (IntegrationNotFoundException $exception) {
+            } catch (IntegrationNotFoundException) {
                 // Old integration so ignore and let old PluginBundle code handle it
             }
         }

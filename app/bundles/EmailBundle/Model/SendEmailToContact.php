@@ -173,7 +173,7 @@ class SendEmailToContact
             if (!$this->mailer->addTo($contact['email'], $contact['firstname'].' '.$contact['lastname'])) {
                 $this->failContact();
             }
-        } catch (BatchQueueMaxException $e) {
+        } catch (BatchQueueMaxException) {
             // Queue full so flush then try again
             $this->flush(false);
 
@@ -268,7 +268,7 @@ class SendEmailToContact
             $stat = $this->statHelper->getStat($this->contact['email']);
             $this->downEmailSentCount($stat->getEmailId());
             $this->statHelper->markForDeletion($stat);
-        } catch (StatNotFoundException $exception) {
+        } catch (StatNotFoundException) {
         }
 
         if ($hasBadEmail) {
@@ -289,7 +289,7 @@ class SendEmailToContact
             try {
                 /** @var Reference $stat */
                 $stat = $this->statHelper->getStat($failedEmail);
-            } catch (StatNotFoundException $exception) {
+            } catch (StatNotFoundException) {
                 continue;
             }
 

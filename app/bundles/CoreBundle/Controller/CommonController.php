@@ -288,7 +288,7 @@ class CommonController extends AbstractController implements MauticController
                         '_route_params' => $routeParams,
                     ]
                 );
-            } catch (\Exception $e) {
+            } catch (\Exception) {
                 // do nothing
             }
 

@@ -741,7 +741,7 @@ class ConnectwiseIntegration extends CrmAbstractIntegration
                     ]);
 
                     $matched['company'] = ['identifier' => $foundCompanies[0]['identifier']];
-                } catch (ApiErrorException $e) {
+                } catch (ApiErrorException) {
                     // No matching companies were found
                 }
 

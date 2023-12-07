@@ -40,7 +40,7 @@ final class ReferenceResolver implements ReferenceResolverInterface
 
                 try {
                     $resolvedReference = $this->resolveReference($normalizedValue);
-                } catch (ReferenceNotFoundException $e) {
+                } catch (ReferenceNotFoundException) {
                     $resolvedReference = null;
                 }
 

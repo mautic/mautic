@@ -58,9 +58,9 @@ class ReplyHelper
                     $response = $eventResponse;
                 }
             }
-        } catch (BadRequestHttpException $exception) {
+        } catch (BadRequestHttpException) {
             return new Response('invalid request', 400);
-        } catch (NotFoundHttpException $exception) {
+        } catch (NotFoundHttpException) {
             return new Response('', 404);
         } catch (NumberNotFoundException $exception) {
             $this->logger->debug(

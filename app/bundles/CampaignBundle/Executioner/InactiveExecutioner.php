@@ -77,9 +77,9 @@ class InactiveExecutioner implements ExecutionerInterface
 
             $this->prepareForExecution();
             $this->executeEvents();
-        } catch (NoContactsFoundException $exception) {
+        } catch (NoContactsFoundException) {
             $this->logger->debug('CAMPAIGN: No more contacts to process');
-        } catch (NoEventsFoundException $exception) {
+        } catch (NoEventsFoundException) {
             $this->logger->debug('CAMPAIGN: No events to process');
         } finally {
             if ($this->progressBar) {
@@ -112,9 +112,9 @@ class InactiveExecutioner implements ExecutionerInterface
             $this->checkCampaignIsPublished();
             $this->prepareForExecution();
             $this->executeEvents();
-        } catch (NoContactsFoundException $exception) {
+        } catch (NoContactsFoundException) {
             $this->logger->debug('CAMPAIGN: No more contacts to process');
-        } catch (NoEventsFoundException $exception) {
+        } catch (NoEventsFoundException) {
             $this->logger->debug('CAMPAIGN: No events to process');
         } finally {
             if ($this->progressBar) {
@@ -239,7 +239,7 @@ class InactiveExecutioner implements ExecutionerInterface
                     // Get the next batch, starting with the max contact ID
                     $contacts = $this->inactiveContactFinder->getContacts($this->campaign->getId(), $decisionEvent, $this->limiter);
                 }
-            } catch (NoContactsFoundException $exception) {
+            } catch (NoContactsFoundException) {
                 // On to the next decision
                 $this->logger->debug('CAMPAIGN: No more contacts to process for decision ID #'.$decisionEvent->getId());
             }

@@ -242,7 +242,7 @@ class AssetController extends FormController
                 // set the uploadDir
                 $activeAsset->setUploadDir($this->coreParametersHelper->get('upload_dir'));
                 $contents = $activeAsset->getFileContents();
-            } catch (\Exception $e) {
+            } catch (\Exception) {
                 return $this->notFound();
             }
 

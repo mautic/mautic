@@ -24,7 +24,7 @@ class IdentifyCompanyHelper
 
         try {
             $companies = $companyModel->checkForDuplicateCompanies($parameters);
-        } catch (UniqueFieldNotFoundException $uniqueFieldNotFoundException) {
+        } catch (UniqueFieldNotFoundException) {
             return [null, false, null];
         }
 
@@ -62,7 +62,7 @@ class IdentifyCompanyHelper
 
         try {
             $companyEntities = $companyModel->checkForDuplicateCompanies($parameters);
-        } catch (UniqueFieldNotFoundException $uniqueFieldNotFoundException) {
+        } catch (UniqueFieldNotFoundException) {
             return [[], []];
         }
 

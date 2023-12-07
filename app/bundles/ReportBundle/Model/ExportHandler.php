@@ -51,7 +51,7 @@ class ExportHandler
         try {
             $path = $this->getPath($fileName);
             $this->filePathResolver->delete($path);
-        } catch (FileIOException $e) {
+        } catch (FileIOException) {
         }
     }
 

@@ -73,7 +73,7 @@ EOT
 
         try {
             $this->importModel->beginImport($import, $progress, $limit);
-        } catch (ImportFailedException $e) {
+        } catch (ImportFailedException) {
             $output->writeln('<error>'.$this->translator->trans(
                 'mautic.lead.import.failed',
                 [
@@ -82,7 +82,7 @@ EOT
             ).'</error>');
 
             return \Symfony\Component\Console\Command\Command::FAILURE;
-        } catch (ImportDelayedException $e) {
+        } catch (ImportDelayedException) {
             $output->writeln('<info>'.$this->translator->trans(
                 'mautic.lead.import.delayed',
                 [

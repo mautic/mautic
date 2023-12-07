@@ -250,7 +250,7 @@ class Interval implements ScheduleModeInterface
                 $groupExecutionDate->setTime($groupHour->format('H'), $groupHour->format('i'));
 
                 return $groupExecutionDate;
-            } catch (\Exception $exception) {
+            } catch (\Exception) {
                 // Timezone is not recognized so use the default
                 $this->logger->debug(
                     'CAMPAIGN: ('.$eventId.') '.$timezone.' for contact '.$contact->getId().' is not recognized'
@@ -304,7 +304,7 @@ class Interval implements ScheduleModeInterface
                 /** @var \DateTime $groupExecutionDate */
                 $groupExecutionDate = clone $compareFromDateTime;
                 $groupExecutionDate->setTimezone($contactTimezone);
-            } catch (\Exception $exception) {
+            } catch (\Exception) {
                 // Timezone is not recognized so use the default
                 $this->logger->debug(
                     'CAMPAIGN: ('.$eventId.') '.$timezone.' for contact '.$contact->getId().' is not recognized'

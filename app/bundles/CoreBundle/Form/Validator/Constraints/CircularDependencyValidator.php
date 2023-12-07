@@ -32,7 +32,7 @@ class CircularDependencyValidator extends ConstraintValidator
             if (in_array($segmentId, $dependentSegmentIds)) {
                 $this->context->addViolation($constraint->message);
             }
-        } catch (\UnexpectedValueException $e) {
+        } catch (\UnexpectedValueException) {
             // Segment ID is not in the request. May be new segment.
         }
     }

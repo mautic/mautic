@@ -1445,7 +1445,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
                         if (!empty($emailSettings[$parentId]['isVariant'])) {
                             ++$emailSettings[$parentId]['variantCount'];
                         }
-                    } catch (FailedToSendToContactException $exception) {
+                    } catch (FailedToSendToContactException) {
                         // move along to the next contact
                     }
                 }

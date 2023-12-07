@@ -1359,7 +1359,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
                             // from caching the timestamp that will cause contacts to not be pulled/added to the segment
                             throw new ApiErrorException($this->failureFetchingLeads);
                         }
-                    } catch (NoObjectsToFetchException $exception) {
+                    } catch (NoObjectsToFetchException) {
                         // No more IDs to fetch so break and continue on
                         continue;
                     }

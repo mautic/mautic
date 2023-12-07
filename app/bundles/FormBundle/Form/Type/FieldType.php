@@ -418,7 +418,7 @@ class FieldType extends AbstractType
                             if ($field->isListType()) {
                                 return ['data-list-type' => 1];
                             }
-                        } catch (FieldNotFoundException $e) {
+                        } catch (FieldNotFoundException) {
                         }
 
                         return [];

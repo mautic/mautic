@@ -479,7 +479,7 @@ final class AssetsHelper
             try {
                 $builder     = $this->builderIntegrationsHelper->getBuilder('email');
                 $builderName = $builder->getName();
-            } catch (IntegrationNotFoundException $exception) {
+            } catch (IntegrationNotFoundException) {
                 // Assume legacy builder
                 $builderName = 'legacy';
             }

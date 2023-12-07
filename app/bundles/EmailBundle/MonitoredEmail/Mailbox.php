@@ -191,7 +191,7 @@ class Mailbox
         if (null !== $bundleKey) {
             try {
                 $this->switchMailbox($bundleKey, $folderKey);
-            } catch (MailboxException $e) {
+            } catch (MailboxException) {
                 return false;
             }
         }

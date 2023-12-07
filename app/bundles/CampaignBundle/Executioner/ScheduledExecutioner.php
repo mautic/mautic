@@ -81,7 +81,7 @@ class ScheduledExecutioner implements ExecutionerInterface, ResetInterface
         try {
             $this->prepareForExecution();
             $this->executeOrRescheduleEvent();
-        } catch (NoEventsFoundException $exception) {
+        } catch (NoEventsFoundException) {
             $this->logger->debug('CAMPAIGN: No events to process');
         } finally {
             if ($this->progressBar) {
@@ -152,7 +152,7 @@ class ScheduledExecutioner implements ExecutionerInterface, ResetInterface
                     $this->scheduledContactFinder->hydrateContacts($organizedLogs);
 
                     $this->executioner->executeLogs($event, $organizedLogs, $this->counter);
-                } catch (NoContactsFoundException $e) {
+                } catch (NoContactsFoundException) {
                     // All of the events were rescheduled
                 }
             } else {
@@ -239,7 +239,7 @@ class ScheduledExecutioner implements ExecutionerInterface, ResetInterface
         while ($logs->count()) {
             try {
                 $fetchedContacts = $this->scheduledContactFinder->hydrateContacts($logs);
-            } catch (NoContactsFoundException $e) {
+            } catch (NoContactsFoundException) {
                 break;
             }
 

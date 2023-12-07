@@ -63,7 +63,7 @@ class SalesforceApi extends CrmApi
 
         try {
             $this->analyzeResponse($response, $isRetry);
-        } catch (RetryRequestException $exception) {
+        } catch (RetryRequestException) {
             return $this->request($operation, $elementData, $method, true, $object, $queryUrl);
         }
 

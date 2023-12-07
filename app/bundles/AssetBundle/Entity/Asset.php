@@ -1089,7 +1089,7 @@ class Asset extends FormEntity
 
         try {
             $file = new File($path);
-        } catch (FileNotFoundException $e) {
+        } catch (FileNotFoundException) {
             $file = null;
         }
 

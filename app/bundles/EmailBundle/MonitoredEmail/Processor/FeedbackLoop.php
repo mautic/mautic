@@ -37,7 +37,7 @@ class FeedbackLoop implements ProcessorInterface
                 // A contact email was not found in the FBL report
                 return false;
             }
-        } catch (FeedbackLoopNotFound $exception) {
+        } catch (FeedbackLoopNotFound) {
             return false;
         }
 

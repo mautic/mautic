@@ -208,7 +208,7 @@ class LegacyEventDispatcher
             }
 
             return $reflection->invokeArgs($this, $pass);
-        } catch (\ReflectionException $exception) {
+        } catch (\ReflectionException) {
             return false;
         }
     }

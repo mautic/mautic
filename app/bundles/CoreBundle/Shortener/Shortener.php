@@ -55,7 +55,7 @@ class Shortener
     {
         try {
             return $this->getService()->shortenUrl($url);
-        } catch (\InvalidArgumentException $exception) {
+        } catch (\InvalidArgumentException) {
             return $url;
         }
     }

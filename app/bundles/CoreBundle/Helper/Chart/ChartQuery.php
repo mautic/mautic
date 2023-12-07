@@ -582,7 +582,7 @@ class ChartQuery extends AbstractChart
                 $generatedColumn = $generatedColumns->getForOriginalDateColumnAndUnit($column, $this->unit);
 
                 return $tablePrefix.'.'.$generatedColumn->getColumnName();
-            } catch (\UnexpectedValueException $e) {
+            } catch (\UnexpectedValueException) {
                 // Alright. Use the original column then.
             }
         }

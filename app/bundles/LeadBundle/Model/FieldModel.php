@@ -807,7 +807,7 @@ class FieldModel extends FormModel
 
         try {
             return $this->fieldSaveDispatcher->dispatchEvent($action, $entity, $isNew, $event);
-        } catch (NoListenerException $exception) {
+        } catch (NoListenerException) {
             return $event;
         }
     }

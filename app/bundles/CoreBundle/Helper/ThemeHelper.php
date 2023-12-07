@@ -265,7 +265,7 @@ class ThemeHelper implements ThemeHelperInterface
                                 $found = true;
                                 break;
                             }
-                        } catch (FileNotFoundException $e) {
+                        } catch (FileNotFoundException) {
                             continue;
                         }
                     }
@@ -503,7 +503,7 @@ class ThemeHelper implements ThemeHelperInterface
         try {
             $builder     = $this->builderIntegrationsHelper->getBuilder($featureRequested);
             $builderName = $builder->getName();
-        } catch (IntegrationNotFoundException $exception) {
+        } catch (IntegrationNotFoundException) {
             // Assume legacy builder
             $builderName = 'legacy';
         }

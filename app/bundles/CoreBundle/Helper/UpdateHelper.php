@@ -100,12 +100,12 @@ class UpdateHelper
         // Fetch the latest version
         try {
             $release = $this->fetchLatestCompatibleVersion($updateStability);
-        } catch (LatestVersionSupportedException $exception) {
+        } catch (LatestVersionSupportedException) {
             return [
                 'error'   => false,
                 'message' => 'mautic.core.updater.running.latest.version',
             ];
-        } catch (CouldNotFetchLatestVersionException $exception) {
+        } catch (CouldNotFetchLatestVersionException) {
             return [
                 'error'   => true,
                 'message' => 'mautic.core.updater.error.fetching.updates',

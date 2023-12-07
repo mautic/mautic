@@ -71,7 +71,7 @@ class OrderExecutioner
                 $syncOrderDAO->getIdentifiedObjectIds($objectName),
                 $updateObjects
             );
-        } catch (ObjectNotFoundException $e) {
+        } catch (ObjectNotFoundException) {
             DebugLogger::log(
                 MauticSyncDataExchange::NAME,
                 $objectName,
@@ -122,7 +122,7 @@ class OrderExecutioner
                 $this->objectProvider->getObjectByName($objectName),
                 $createObjects
             );
-        } catch (ObjectNotFoundException $e) {
+        } catch (ObjectNotFoundException) {
             DebugLogger::log(
                 MauticSyncDataExchange::NAME,
                 $objectName,

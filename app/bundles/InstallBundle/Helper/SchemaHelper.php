@@ -90,7 +90,7 @@ class SchemaHelper
     {
         try {
             $this->db->connect();
-        } catch (\Exception $exception) {
+        } catch (\Exception) {
             // it failed to connect so remove the dbname and try to create it
             $dbName                   = $this->dbParams['dbname'];
             $this->dbParams['dbname'] = null;
@@ -105,7 +105,7 @@ class SchemaHelper
                 $this->dbParams['dbname'] = $dbName;
                 $this->db                 = DriverManager::getConnection($this->dbParams);
                 $this->db->close();
-            } catch (\Exception $e) {
+            } catch (\Exception) {
                 return false;
             }
         }

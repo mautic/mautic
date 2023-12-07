@@ -37,7 +37,7 @@ class FormUploader
                 $uploadedFiles[] =$uploadedFile;
             }
             $submission->setResults($result);
-        } catch (FileUploadException $e) {
+        } catch (FileUploadException) {
             foreach ($uploadedFiles as $filePath) {
                 $this->fileUploader->delete($filePath);
             }

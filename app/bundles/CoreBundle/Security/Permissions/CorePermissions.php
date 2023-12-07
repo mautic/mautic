@@ -72,7 +72,7 @@ class CorePermissions
         foreach ($this->getPermissionClasses() as $class) {
             try {
                 $this->getPermissionObject($class);
-            } catch (\InvalidArgumentException $e) {
+            } catch (\InvalidArgumentException) {
             }
         }
 

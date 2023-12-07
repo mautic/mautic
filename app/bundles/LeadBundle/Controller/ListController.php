@@ -249,9 +249,9 @@ class ListController extends FormController
                 $this->generateUrl('mautic_segment_action', ['objectAction' => 'clone', 'objectId' => $objectId]),
                 $ignorePost
             );
-        } catch (AccessDeniedException $exception) {
+        } catch (AccessDeniedException) {
             return $this->accessDenied();
-        } catch (EntityNotFoundException $exception) {
+        } catch (EntityNotFoundException) {
             return $this->postActionRedirect(
                 array_merge($postActionVars, [
                     'flashes' => [
@@ -294,9 +294,9 @@ class ListController extends FormController
                 $this->generateUrl('mautic_segment_action', ['objectAction' => 'edit', 'objectId' => $objectId]),
                 $ignorePost
             );
-        } catch (AccessDeniedException $exception) {
+        } catch (AccessDeniedException) {
             return $this->accessDenied();
-        } catch (EntityNotFoundException $exception) {
+        } catch (EntityNotFoundException) {
             return $this->postActionRedirect(
                 array_merge($postActionVars, [
                     'flashes' => [

@@ -94,7 +94,7 @@ class ContactDeduper
         while ($winner = next($duplicates)) {
             try {
                 $this->contactMerger->merge($winner, $loser);
-            } catch (SameContactException $exception) {
+            } catch (SameContactException) {
             }
 
             $loser = $winner;

@@ -33,7 +33,7 @@ class RouteHelper
     {
         try {
             $event = new InternalObjectRouteEvent($this->objectProvider->getObjectByName($object), $id);
-        } catch (ObjectNotFoundException $e) {
+        } catch (ObjectNotFoundException) {
             // Throw this exception instead to keep BC.
             throw new ObjectNotSupportedException(MauticSyncDataExchange::NAME, $object);
         }
