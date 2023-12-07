@@ -89,10 +89,6 @@ class CheckStep implements StepInterface
     {
         $messages = [];
 
-        if (version_compare(PHP_VERSION, '7.2.21', '<')) {
-            $messages[] = 'mautic.install.php.version.not.supported';
-        }
-
         if (!is_dir($this->projectDir.'/vendor/composer')) {
             $messages[] = 'mautic.install.composer.dependencies';
         }

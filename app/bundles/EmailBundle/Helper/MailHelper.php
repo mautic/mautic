@@ -1431,11 +1431,9 @@ class MailHelper
     }
 
     /**
-     * Get tokens.
-     *
-     * @return array
+     * @return mixed[]
      */
-    public function getTokens()
+    public function getTokens(): array
     {
         $tokens = array_merge($this->globalTokens, $this->eventTokens);
 

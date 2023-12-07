@@ -462,7 +462,7 @@ class BuilderSubscriber implements EventSubscriberInterface
         $clickThrough = ['source' => ['page', $page->getId()]];
         $tokens       = $this->tokenHelper->findPageTokens($content, $clickThrough);
 
-        if (count($tokens)) {
+        if ([] !== $tokens) {
             $content = str_ireplace(array_keys($tokens), $tokens, $content);
         }
 
