@@ -26,16 +26,6 @@ class NormalizedValueDAO
     public const REFERENCE_TYPE   = 'reference';
 
     /**
-     * @var string
-     */
-    private $type;
-
-    /**
-     * @var mixed
-     */
-    private $value;
-
-    /**
      * @var mixed
      */
     private $normalizedValue;
@@ -45,10 +35,8 @@ class NormalizedValueDAO
      * @param mixed  $value
      * @param mixed  $normalizedValue
      */
-    public function __construct($type, $value, $normalizedValue = null)
+    public function __construct(private $type, private $value, $normalizedValue = null)
     {
-        $this->type            = $type;
-        $this->value           = $value;
         $this->normalizedValue = $normalizedValue ?: $value;
     }
 

@@ -8,11 +8,8 @@ use Doctrine\DBAL\Connection;
 
 class UserHelper
 {
-    private \Doctrine\DBAL\Connection $connection;
-
-    public function __construct(Connection $connection)
+    public function __construct(private Connection $connection)
     {
-        $this->connection = $connection;
     }
 
     public function getAdminUsers(): array

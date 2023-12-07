@@ -12,8 +12,6 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class ObjectProvider
 {
-    private \Symfony\Component\EventDispatcher\EventDispatcherInterface $dispatcher;
-
     /**
      * Cached internal objects.
      *
@@ -21,9 +19,8 @@ class ObjectProvider
      */
     private $objects = [];
 
-    public function __construct(EventDispatcherInterface $dispatcher)
+    public function __construct(private EventDispatcherInterface $dispatcher)
     {
-        $this->dispatcher = $dispatcher;
     }
 
     /**

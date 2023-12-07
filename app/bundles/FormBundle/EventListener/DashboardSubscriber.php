@@ -39,17 +39,8 @@ class DashboardSubscriber extends MainDashboardSubscriber
         'form:forms:viewother',
     ];
 
-    protected \Mautic\FormBundle\Model\SubmissionModel $formSubmissionModel;
-
-    protected \Mautic\FormBundle\Model\FormModel $formModel;
-
-    private \Symfony\Component\Routing\RouterInterface $router;
-
-    public function __construct(SubmissionModel $formSubmissionModel, FormModel $formModel, RouterInterface $router)
+    public function __construct(protected SubmissionModel $formSubmissionModel, protected FormModel $formModel, private RouterInterface $router)
     {
-        $this->formModel           = $formModel;
-        $this->formSubmissionModel = $formSubmissionModel;
-        $this->router              = $router;
     }
 
     /**

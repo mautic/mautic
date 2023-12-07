@@ -12,17 +12,8 @@ use Mautic\IntegrationsBundle\Sync\SyncDataExchange\MauticSyncDataExchange;
 
 class CompanyNotificationHandler implements HandlerInterface
 {
-    private \Mautic\IntegrationsBundle\Sync\Notification\Writer $writer;
-
-    private \Mautic\IntegrationsBundle\Sync\Notification\Helper\UserNotificationHelper $userNotificationHelper;
-
-    private \Mautic\IntegrationsBundle\Sync\Notification\Helper\CompanyHelper $companyHelper;
-
-    public function __construct(Writer $writer, UserNotificationHelper $userNotificationHelper, CompanyHelper $companyHelper)
+    public function __construct(private Writer $writer, private UserNotificationHelper $userNotificationHelper, private CompanyHelper $companyHelper)
     {
-        $this->writer                 = $writer;
-        $this->userNotificationHelper = $userNotificationHelper;
-        $this->companyHelper          = $companyHelper;
     }
 
     public function getIntegration(): string

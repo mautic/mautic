@@ -21,24 +21,8 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class SendEmailToUser
 {
-    private EmailModel $emailModel;
-
-    private EventDispatcherInterface $dispatcher;
-
-    private CustomFieldValidator $customFieldValidator;
-
-    private EmailValidator $emailValidator;
-
-    public function __construct(
-        EmailModel $emailModel,
-        EventDispatcherInterface $dispatcher,
-        CustomFieldValidator $customFieldValidator,
-        EmailValidator $emailValidator
-    ) {
-        $this->emailModel           = $emailModel;
-        $this->dispatcher           = $dispatcher;
-        $this->customFieldValidator = $customFieldValidator;
-        $this->emailValidator       = $emailValidator;
+    public function __construct(private EmailModel $emailModel, private EventDispatcherInterface $dispatcher, private CustomFieldValidator $customFieldValidator, private EmailValidator $emailValidator)
+    {
     }
 
     /**

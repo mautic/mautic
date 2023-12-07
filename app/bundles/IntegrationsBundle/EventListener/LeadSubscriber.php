@@ -26,28 +26,8 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class LeadSubscriber implements EventSubscriberInterface
 {
-    private \Mautic\IntegrationsBundle\Entity\FieldChangeRepository $fieldChangeRepo;
-
-    private \Mautic\IntegrationsBundle\Entity\ObjectMappingRepository $objectMappingRepository;
-
-    private \Mautic\IntegrationsBundle\Sync\VariableExpresser\VariableExpresserHelperInterface $variableExpressor;
-
-    private \Mautic\IntegrationsBundle\Helper\SyncIntegrationsHelper $syncIntegrationsHelper;
-
-    private \Symfony\Component\EventDispatcher\EventDispatcherInterface $dispatcher;
-
-    public function __construct(
-        FieldChangeRepository $fieldChangeRepo,
-        ObjectMappingRepository $objectMappingRepository,
-        VariableExpresserHelperInterface $variableExpressor,
-        SyncIntegrationsHelper $syncIntegrationsHelper,
-        EventDispatcherInterface $dispatcher
-    ) {
-        $this->fieldChangeRepo         = $fieldChangeRepo;
-        $this->objectMappingRepository = $objectMappingRepository;
-        $this->variableExpressor       = $variableExpressor;
-        $this->syncIntegrationsHelper  = $syncIntegrationsHelper;
-        $this->dispatcher              = $dispatcher;
+    public function __construct(private FieldChangeRepository $fieldChangeRepo, private ObjectMappingRepository $objectMappingRepository, private VariableExpresserHelperInterface $variableExpressor, private SyncIntegrationsHelper $syncIntegrationsHelper, private EventDispatcherInterface $dispatcher)
+    {
     }
 
     public static function getSubscribedEvents(): array

@@ -41,44 +41,8 @@ class InstallService
 
     public const FINAL_STEP = 3;
 
-    private Configurator $configurator;
-
-    private CacheHelper $cacheHelper;
-
-    protected PathsHelper $pathsHelper;
-
-    private EntityManager $entityManager;
-
-    private TranslatorInterface $translator;
-
-    private KernelInterface $kernel;
-
-    private ValidatorInterface $validator;
-
-    private UserPasswordHasher $hasher;
-
-    private FixturesLoaderInterface $fixturesLoader;
-
-    public function __construct(
-        Configurator $configurator,
-        CacheHelper $cacheHelper,
-        PathsHelper $pathsHelper,
-        EntityManager $entityManager,
-        TranslatorInterface $translator,
-        KernelInterface $kernel,
-        ValidatorInterface $validator,
-        UserPasswordHasher $hasher,
-        FixturesLoaderInterface $fixturesLoader
-    ) {
-        $this->configurator   = $configurator;
-        $this->cacheHelper    = $cacheHelper;
-        $this->pathsHelper    = $pathsHelper;
-        $this->entityManager  = $entityManager;
-        $this->translator     = $translator;
-        $this->kernel         = $kernel;
-        $this->validator      = $validator;
-        $this->hasher         = $hasher;
-        $this->fixturesLoader = $fixturesLoader;
+    public function __construct(private Configurator $configurator, private CacheHelper $cacheHelper, protected PathsHelper $pathsHelper, private EntityManager $entityManager, private TranslatorInterface $translator, private KernelInterface $kernel, private ValidatorInterface $validator, private UserPasswordHasher $hasher, private FixturesLoaderInterface $fixturesLoader)
+    {
     }
 
     /**

@@ -12,17 +12,11 @@ use Mautic\PageBundle\Model\PageModel;
 
 class LoadFormResultData extends AbstractFixture implements OrderedFixtureInterface
 {
-    private \Mautic\PageBundle\Model\PageModel $pageModel;
-
-    private \Mautic\FormBundle\Model\SubmissionModel $submissionModel;
-
     /**
      * {@inheritdoc}
      */
-    public function __construct(PageModel $pageModel, SubmissionModel $submissionModel)
+    public function __construct(private PageModel $pageModel, private SubmissionModel $submissionModel)
     {
-        $this->pageModel       = $pageModel;
-        $this->submissionModel = $submissionModel;
     }
 
     public function load(ObjectManager $manager): void

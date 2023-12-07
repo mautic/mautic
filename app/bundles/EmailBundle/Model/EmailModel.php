@@ -77,24 +77,6 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
     use BuilderModelTrait;
     use FilterTrait;
 
-    protected \Mautic\CoreBundle\Helper\IpLookupHelper $ipLookupHelper;
-
-    protected \Mautic\CoreBundle\Helper\ThemeHelperInterface $themeHelper;
-
-    protected \Mautic\EmailBundle\MonitoredEmail\Mailbox $mailboxHelper;
-
-    protected \Mautic\EmailBundle\Helper\MailHelper $mailHelper;
-
-    protected \Mautic\LeadBundle\Model\LeadModel $leadModel;
-
-    protected \Mautic\LeadBundle\Model\CompanyModel $companyModel;
-
-    protected \Mautic\PageBundle\Model\TrackableModel $pageTrackableModel;
-
-    protected \Mautic\UserBundle\Model\UserModel $userModel;
-
-    protected \Mautic\ChannelBundle\Model\MessageQueueModel $messageQueueModel;
-
     /**
      * @var bool
      */
@@ -105,37 +87,23 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
      */
     protected $emailSettings = [];
 
-    protected \Mautic\EmailBundle\Model\SendEmailToContact $sendModel;
-
-    private \Mautic\LeadBundle\Tracker\DeviceTracker $deviceTracker;
-
-    private \Mautic\PageBundle\Entity\RedirectRepository $redirectRepository;
-
-    private \Mautic\CoreBundle\Helper\CacheStorageHelper $cacheStorageHelper;
-
-    private \Mautic\LeadBundle\Tracker\ContactTracker $contactTracker;
-
-    private DNC $doNotContact;
-
-    private \Mautic\EmailBundle\Helper\StatsCollectionHelper $statsCollectionHelper;
-
     public function __construct(
-        IpLookupHelper $ipLookupHelper,
-        ThemeHelperInterface $themeHelper,
-        Mailbox $mailboxHelper,
-        MailHelper $mailHelper,
-        LeadModel $leadModel,
-        CompanyModel $companyModel,
-        TrackableModel $pageTrackableModel,
-        UserModel $userModel,
-        MessageQueueModel $messageQueueModel,
-        SendEmailToContact $sendModel,
-        DeviceTracker $deviceTracker,
-        RedirectRepository $redirectRepository,
-        CacheStorageHelper $cacheStorageHelper,
-        ContactTracker $contactTracker,
-        DNC $doNotContact,
-        StatsCollectionHelper $statsCollectionHelper,
+        protected IpLookupHelper $ipLookupHelper,
+        protected ThemeHelperInterface $themeHelper,
+        protected Mailbox $mailboxHelper,
+        protected MailHelper $mailHelper,
+        protected LeadModel $leadModel,
+        protected CompanyModel $companyModel,
+        protected TrackableModel $pageTrackableModel,
+        protected UserModel $userModel,
+        protected MessageQueueModel $messageQueueModel,
+        protected SendEmailToContact $sendModel,
+        private DeviceTracker $deviceTracker,
+        private RedirectRepository $redirectRepository,
+        private CacheStorageHelper $cacheStorageHelper,
+        private ContactTracker $contactTracker,
+        private DNC $doNotContact,
+        private StatsCollectionHelper $statsCollectionHelper,
         CorePermissions $security,
         Connection $connection,
         EntityManagerInterface $em,
@@ -146,22 +114,6 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
         LoggerInterface $mauticLogger,
         CoreParametersHelper $coreParametersHelper
     ) {
-        $this->ipLookupHelper           = $ipLookupHelper;
-        $this->themeHelper              = $themeHelper;
-        $this->mailboxHelper            = $mailboxHelper;
-        $this->mailHelper               = $mailHelper;
-        $this->leadModel                = $leadModel;
-        $this->companyModel             = $companyModel;
-        $this->pageTrackableModel       = $pageTrackableModel;
-        $this->userModel                = $userModel;
-        $this->messageQueueModel        = $messageQueueModel;
-        $this->sendModel                = $sendModel;
-        $this->deviceTracker            = $deviceTracker;
-        $this->redirectRepository       = $redirectRepository;
-        $this->cacheStorageHelper       = $cacheStorageHelper;
-        $this->contactTracker           = $contactTracker;
-        $this->doNotContact             = $doNotContact;
-        $this->statsCollectionHelper    = $statsCollectionHelper;
         $this->connection               = $connection;
 
         parent::__construct($em, $security, $dispatcher, $router, $translator, $userHelper, $mauticLogger, $coreParametersHelper);

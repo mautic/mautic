@@ -9,11 +9,8 @@ use Symfony\Contracts\EventDispatcher\Event;
 
 class FormLoadEvent extends Event
 {
-    private \Mautic\PluginBundle\Entity\Integration $integrationConfiguration;
-
-    public function __construct(Integration $integration)
+    public function __construct(private Integration $integrationConfiguration)
     {
-        $this->integrationConfiguration = $integration;
     }
 
     public function getIntegrationConfiguration(): Integration

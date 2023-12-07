@@ -28,32 +28,8 @@ class MauticSyncDataExchange implements SyncDataExchangeInterface
     public const OBJECT_CONTACT = 'lead'; // kept as lead for BC
     public const OBJECT_COMPANY = 'company';
 
-    private \Mautic\IntegrationsBundle\Entity\FieldChangeRepository $fieldChangeRepository;
-
-    private \Mautic\IntegrationsBundle\Sync\SyncDataExchange\Helper\FieldHelper $fieldHelper;
-
-    private \Mautic\IntegrationsBundle\Sync\Helper\MappingHelper $mappingHelper;
-
-    private \Mautic\IntegrationsBundle\Sync\SyncDataExchange\Internal\ReportBuilder\FullObjectReportBuilder $fullObjectReportBuilder;
-
-    private \Mautic\IntegrationsBundle\Sync\SyncDataExchange\Internal\ReportBuilder\PartialObjectReportBuilder $partialObjectReportBuilder;
-
-    private \Mautic\IntegrationsBundle\Sync\SyncDataExchange\Internal\Executioner\OrderExecutioner $orderExecutioner;
-
-    public function __construct(
-        FieldChangeRepository $fieldChangeRepository,
-        FieldHelper $fieldHelper,
-        MappingHelper $mappingHelper,
-        FullObjectReportBuilder $fullObjectReportBuilder,
-        PartialObjectReportBuilder $partialObjectReportBuilder,
-        OrderExecutioner $orderExecutioner
-    ) {
-        $this->fieldChangeRepository      = $fieldChangeRepository;
-        $this->fieldHelper                = $fieldHelper;
-        $this->mappingHelper              = $mappingHelper;
-        $this->fullObjectReportBuilder    = $fullObjectReportBuilder;
-        $this->partialObjectReportBuilder = $partialObjectReportBuilder;
-        $this->orderExecutioner           = $orderExecutioner;
+    public function __construct(private FieldChangeRepository $fieldChangeRepository, private FieldHelper $fieldHelper, private MappingHelper $mappingHelper, private FullObjectReportBuilder $fullObjectReportBuilder, private PartialObjectReportBuilder $partialObjectReportBuilder, private OrderExecutioner $orderExecutioner)
+    {
     }
 
     public function getSyncReport(RequestDAO $requestDAO): ReportDAO

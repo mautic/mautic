@@ -8,11 +8,8 @@ use Mautic\FormBundle\Model\FormModel;
 
 class PropertiesAccessor
 {
-    private \Mautic\FormBundle\Model\FormModel $formModel;
-
-    public function __construct(FormModel $formModel)
+    public function __construct(private FormModel $formModel)
     {
-        $this->formModel = $formModel;
     }
 
     /**

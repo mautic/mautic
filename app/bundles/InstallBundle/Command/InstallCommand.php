@@ -23,15 +23,8 @@ class InstallCommand extends Command
 {
     public const COMMAND = 'mautic:install';
 
-    private InstallService $installer;
-
-    private ManagerRegistry $doctrineRegistry;
-
-    public function __construct(InstallService $installer, ManagerRegistry $doctrineRegistry)
+    public function __construct(private InstallService $installer, private ManagerRegistry $doctrineRegistry)
     {
-        $this->installer        = $installer;
-        $this->doctrineRegistry = $doctrineRegistry;
-
         parent::__construct();
     }
 

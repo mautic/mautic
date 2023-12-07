@@ -24,26 +24,14 @@ class FormSubscriber implements EventSubscriberInterface
 {
     private MailHelper $mailer;
 
-    private AuditLogModel $auditLogModel;
-
-    private IpLookupHelper $ipLookupHelper;
-
-    private TranslatorInterface $translator;
-
-    private RouterInterface $router;
-
     public function __construct(
-        IpLookupHelper $ipLookupHelper,
-        AuditLogModel $auditLogModel,
+        private IpLookupHelper $ipLookupHelper,
+        private AuditLogModel $auditLogModel,
         MailHelper $mailer,
-        TranslatorInterface $translator,
-        RouterInterface $router
+        private TranslatorInterface $translator,
+        private RouterInterface $router
     ) {
-        $this->ipLookupHelper       = $ipLookupHelper;
-        $this->auditLogModel        = $auditLogModel;
         $this->mailer               = $mailer->getMailer();
-        $this->translator           = $translator;
-        $this->router               = $router;
     }
 
     /**

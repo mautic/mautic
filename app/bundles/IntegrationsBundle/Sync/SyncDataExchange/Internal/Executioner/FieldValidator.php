@@ -13,19 +13,13 @@ use Mautic\LeadBundle\Field\SchemaDefinition;
 
 final class FieldValidator implements FieldValidatorInterface
 {
-    private \Mautic\LeadBundle\Entity\LeadFieldRepository $leadFieldRepository;
-
-    private \Mautic\IntegrationsBundle\Sync\Notification\BulkNotification $bulkNotification;
-
     /**
      * @var mixed[]
      */
     private $fieldSchemaData = [];
 
-    public function __construct(LeadFieldRepository $leadFieldRepository, BulkNotification $bulkNotification)
+    public function __construct(private LeadFieldRepository $leadFieldRepository, private BulkNotification $bulkNotification)
     {
-        $this->leadFieldRepository = $leadFieldRepository;
-        $this->bulkNotification    = $bulkNotification;
     }
 
     /**

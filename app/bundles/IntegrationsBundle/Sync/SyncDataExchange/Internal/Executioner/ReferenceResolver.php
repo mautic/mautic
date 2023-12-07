@@ -15,11 +15,8 @@ use Mautic\IntegrationsBundle\Sync\SyncDataExchange\MauticSyncDataExchange;
 
 final class ReferenceResolver implements ReferenceResolverInterface
 {
-    private \Doctrine\DBAL\Connection $connection;
-
-    public function __construct(Connection $connection)
+    public function __construct(private Connection $connection)
     {
-        $this->connection = $connection;
     }
 
     /**

@@ -19,11 +19,8 @@ class FieldFilterHelper
      */
     private $filteredFields = [];
 
-    private \Mautic\IntegrationsBundle\Integration\Interfaces\ConfigFormSyncInterface $integrationObject;
-
-    public function __construct(ConfigFormSyncInterface $integrationObject)
+    public function __construct(private ConfigFormSyncInterface $integrationObject)
     {
-        $this->integrationObject = $integrationObject;
     }
 
     public function filterFieldsByPage(string $objectName, int $page, int $limit = 15): void

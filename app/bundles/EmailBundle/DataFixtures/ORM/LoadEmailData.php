@@ -12,11 +12,8 @@ use Mautic\EmailBundle\Model\EmailModel;
 
 class LoadEmailData extends AbstractFixture implements OrderedFixtureInterface
 {
-    private \Mautic\EmailBundle\Model\EmailModel $emailModel;
-
-    public function __construct(EmailModel $emailModel)
+    public function __construct(private EmailModel $emailModel)
     {
-        $this->emailModel = $emailModel;
     }
 
     public function load(ObjectManager $manager): void

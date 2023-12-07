@@ -12,14 +12,8 @@ use Mautic\FormBundle\Entity\Submission;
 
 class FormUploader
 {
-    private \Mautic\CoreBundle\Helper\FileUploader $fileUploader;
-
-    private \Mautic\CoreBundle\Helper\CoreParametersHelper $coreParametersHelper;
-
-    public function __construct(FileUploader $fileUploader, CoreParametersHelper $coreParametersHelper)
+    public function __construct(private FileUploader $fileUploader, private CoreParametersHelper $coreParametersHelper)
     {
-        $this->fileUploader         = $fileUploader;
-        $this->coreParametersHelper = $coreParametersHelper;
     }
 
     /**

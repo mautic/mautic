@@ -10,16 +10,6 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class UserSummaryNotificationHelper
 {
-    private \Mautic\IntegrationsBundle\Sync\Notification\Writer $writer;
-
-    private \Mautic\IntegrationsBundle\Sync\Notification\Helper\UserHelper $userHelper;
-
-    private \Mautic\IntegrationsBundle\Sync\Notification\Helper\OwnerProvider $ownerProvider;
-
-    private \Mautic\IntegrationsBundle\Sync\Notification\Helper\RouteHelper $routeHelper;
-
-    private \Symfony\Contracts\Translation\TranslatorInterface $translator;
-
     /**
      * @var array
      */
@@ -45,18 +35,8 @@ class UserSummaryNotificationHelper
      */
     private $listTranslationKey;
 
-    public function __construct(
-        Writer $writer,
-        UserHelper $userHelper,
-        OwnerProvider $ownerProvider,
-        RouteHelper $routeHelper,
-        TranslatorInterface $translator
-    ) {
-        $this->writer        = $writer;
-        $this->userHelper    = $userHelper;
-        $this->ownerProvider = $ownerProvider;
-        $this->routeHelper   = $routeHelper;
-        $this->translator    = $translator;
+    public function __construct(private Writer $writer, private UserHelper $userHelper, private OwnerProvider $ownerProvider, private RouteHelper $routeHelper, private TranslatorInterface $translator)
+    {
     }
 
     /**

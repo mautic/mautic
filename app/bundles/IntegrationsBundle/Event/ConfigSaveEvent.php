@@ -9,11 +9,8 @@ use Symfony\Contracts\EventDispatcher\Event;
 
 class ConfigSaveEvent extends Event
 {
-    private \Mautic\PluginBundle\Entity\Integration $integrationConfiguration;
-
-    public function __construct(Integration $integrationConfiguration)
+    public function __construct(private Integration $integrationConfiguration)
     {
-        $this->integrationConfiguration = $integrationConfiguration;
     }
 
     public function getIntegrationConfiguration(): Integration

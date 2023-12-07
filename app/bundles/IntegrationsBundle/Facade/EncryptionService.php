@@ -8,11 +8,8 @@ use Mautic\CoreBundle\Helper\EncryptionHelper;
 
 class EncryptionService
 {
-    private \Mautic\CoreBundle\Helper\EncryptionHelper $encryptionHelper;
-
-    public function __construct(EncryptionHelper $encryptionHelper)
+    public function __construct(private EncryptionHelper $encryptionHelper)
     {
-        $this->encryptionHelper = $encryptionHelper;
     }
 
     /**

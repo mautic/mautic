@@ -23,14 +23,6 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class FieldHelper
 {
-    private \Mautic\LeadBundle\Model\FieldModel $fieldModel;
-
-    private \Mautic\IntegrationsBundle\Sync\VariableExpresser\VariableExpresserHelperInterface $variableExpresserHelper;
-
-    private \Mautic\ChannelBundle\Helper\ChannelListHelper $channelListHelper;
-
-    private \Symfony\Contracts\Translation\TranslatorInterface $translator;
-
     /**
      * @var array
      */
@@ -51,22 +43,15 @@ class FieldHelper
      */
     private $eventDispatcher;
 
-    private \Mautic\IntegrationsBundle\Sync\SyncDataExchange\Internal\ObjectProvider $objectProvider;
-
     public function __construct(
-        FieldModel $fieldModel,
-        VariableExpresserHelperInterface $variableExpresserHelper,
-        ChannelListHelper $channelListHelper,
-        TranslatorInterface $translator,
+        private FieldModel $fieldModel,
+        private VariableExpresserHelperInterface $variableExpresserHelper,
+        private ChannelListHelper $channelListHelper,
+        private TranslatorInterface $translator,
         EventDispatcherInterface $eventDispatcher,
-        ObjectProvider $objectProvider
+        private ObjectProvider $objectProvider
     ) {
-        $this->fieldModel              = $fieldModel;
-        $this->variableExpresserHelper = $variableExpresserHelper;
-        $this->channelListHelper       = $channelListHelper;
-        $this->translator              = $translator;
         $this->eventDispatcher         = $eventDispatcher;
-        $this->objectProvider          = $objectProvider;
     }
 
     public function getFieldList(string $object): array

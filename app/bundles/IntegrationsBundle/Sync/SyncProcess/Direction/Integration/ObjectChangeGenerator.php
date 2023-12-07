@@ -19,8 +19,6 @@ use Mautic\IntegrationsBundle\Sync\SyncProcess\Direction\Helper\ValueHelper;
 
 class ObjectChangeGenerator
 {
-    private \Mautic\IntegrationsBundle\Sync\SyncProcess\Direction\Helper\ValueHelper $valueHelper;
-
     /**
      * @var ReportDAO
      */
@@ -46,9 +44,8 @@ class ObjectChangeGenerator
      */
     private $objectChange;
 
-    public function __construct(ValueHelper $valueHelper)
+    public function __construct(private ValueHelper $valueHelper)
     {
-        $this->valueHelper = $valueHelper;
     }
 
     /**

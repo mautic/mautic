@@ -13,11 +13,6 @@ use Mautic\IntegrationsBundle\Sync\Exception\ObjectNotFoundException;
 class ReportDAO
 {
     /**
-     * @var string
-     */
-    private $integration;
-
-    /**
      * @var array
      */
     private $objects = [];
@@ -29,9 +24,11 @@ class ReportDAO
 
     private \Mautic\IntegrationsBundle\Sync\DAO\Sync\RelationsDAO $relationsDAO;
 
-    public function __construct($integration)
+    /**
+     * @param string $integration
+     */
+    public function __construct(private $integration)
     {
-        $this->integration     = $integration;
         $this->relationsDAO    = new RelationsDAO();
     }
 

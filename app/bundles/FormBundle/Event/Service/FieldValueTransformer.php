@@ -9,8 +9,6 @@ use Symfony\Component\Routing\RouterInterface;
 
 class FieldValueTransformer
 {
-    private \Symfony\Component\Routing\RouterInterface $router;
-
     /**
      * @var array
      */
@@ -26,9 +24,8 @@ class FieldValueTransformer
      */
     private $isTransformed = false;
 
-    public function __construct(RouterInterface $router)
+    public function __construct(private RouterInterface $router)
     {
-        $this->router = $router;
     }
 
     public function transformValuesAfterSubmit(SubmissionEvent $submissionEvent): void

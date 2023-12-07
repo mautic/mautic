@@ -19,14 +19,8 @@ class StatsCollectionHelper
 
     public const GENERAL_STAT_PREFIX = 'email';
 
-    /**
-     * @var StatHelperContainer
-     */
-    private $helperContainer;
-
-    public function __construct(StatHelperContainer $helperContainer)
+    public function __construct(private StatHelperContainer $helperContainer)
     {
-        $this->helperContainer = $helperContainer;
     }
 
     /**
