@@ -420,7 +420,7 @@ class ImportController extends FormController
                         ->setDefault('owner', $validateEvent->getOwnerId())
                         ->setDefault('list', $validateEvent->getList())
                         ->setDefault('tags', $validateEvent->getTags())
-                        ->setDefault('skip_if_exists', $validateEvent->getSkipIfExists() ?? false)
+                        ->setDefault('skip_if_exists', $validateEvent->getSkipIfExists())
                         ->setHeaders($this->session->get('mautic.'.$object.'.import.headers'))
                         ->setParserConfig($this->session->get('mautic.'.$object.'.import.config'));
 
