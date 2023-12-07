@@ -1517,9 +1517,7 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
 
         foreach ($availableFields as $key => $field) {
             $integrationKey = $matchIntegrationKey = $this->convertLeadFieldKey($key, $field);
-            if (is_array($integrationKey)) {
-                [$integrationKey, $matchIntegrationKey] = $integrationKey;
-            } elseif (!isset($config['leadFields'][$integrationKey])) {
+            if (!isset($config['leadFields'][$integrationKey])) {
                 continue;
             }
 
