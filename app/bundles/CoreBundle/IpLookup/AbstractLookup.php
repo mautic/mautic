@@ -42,9 +42,6 @@ abstract class AbstractLookup
      * @param null $cacheDir
      */
     public function __construct(
-        /**
-         * Authorization for lookup service.
-         */
         protected ?string $auth = null,
         protected $config = null,
         protected ?string $cacheDir = null,
