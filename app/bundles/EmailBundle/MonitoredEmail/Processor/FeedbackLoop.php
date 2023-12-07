@@ -56,9 +56,6 @@ class FeedbackLoop implements ProcessorInterface
         return true;
     }
 
-    /**
-     * @return int
-     */
     protected function isApplicable(): int|bool
     {
         return preg_match('/.*feedback-type: abuse.*/is', $this->message->fblReport);

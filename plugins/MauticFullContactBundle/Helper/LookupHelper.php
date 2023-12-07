@@ -19,49 +19,19 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 class LookupHelper
 {
     /**
-     * @var UserHelper
-     */
-    protected $userHelper;
-
-    /**
      * @var bool|FullContactIntegration
      */
     protected $integration;
 
-    /**
-     * @var Logger
-     */
-    protected $logger;
-
-    /**
-     * @var Router
-     */
-    protected $router;
-
-    /**
-     * @var LeadModel
-     */
-    protected $leadModel;
-
-    /**
-     * @var CompanyModel
-     */
-    protected $companyModel;
-
     public function __construct(
         IntegrationHelper $integrationHelper,
-        UserHelper $userHelper,
-        Logger $logger,
-        Router $router,
-        LeadModel $leadModel,
-        CompanyModel $companyModel
+        protected \Mautic\CoreBundle\Helper\UserHelper $userHelper,
+        protected \Monolog\Logger $logger,
+        protected \Symfony\Bundle\FrameworkBundle\Routing\Router $router,
+        protected \Mautic\LeadBundle\Model\LeadModel $leadModel,
+        protected \Mautic\LeadBundle\Model\CompanyModel $companyModel
     ) {
         $this->integration  = $integrationHelper->getIntegrationObject('FullContact');
-        $this->userHelper   = $userHelper;
-        $this->logger       = $logger;
-        $this->router       = $router;
-        $this->leadModel    = $leadModel;
-        $this->companyModel = $companyModel;
     }
 
     /**

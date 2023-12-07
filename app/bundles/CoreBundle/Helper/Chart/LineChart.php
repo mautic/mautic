@@ -82,7 +82,7 @@ class LineChart extends AbstractChart implements ChartInterface
      *
      * @param int $amount
      */
-    public function generateTimeLabels($amount)
+    public function generateTimeLabels($amount): void
     {
         if (!isset($this->labelFormats[$this->unit])) {
             throw new \UnexpectedValueException('Date/Time unit "'.$this->unit.'" is not available for a label.');

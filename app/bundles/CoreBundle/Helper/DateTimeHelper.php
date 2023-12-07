@@ -379,7 +379,7 @@ class DateTimeHelper
      *
      * @throws \InvalidArgumentException
      */
-    public static function validateMysqlDateTimeUnit($unit)
+    public static function validateMysqlDateTimeUnit($unit): void
     {
         $possibleUnits   = ['s', 'i', 'H', 'd', 'W', 'm', 'Y'];
 

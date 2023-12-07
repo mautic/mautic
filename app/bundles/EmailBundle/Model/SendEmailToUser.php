@@ -29,7 +29,7 @@ class SendEmailToUser
      * @throws EmailCouldNotBeSentException
      * @throws ORMException
      */
-    public function sendEmailToUsers(array $config, Lead $lead)
+    public function sendEmailToUsers(array $config, Lead $lead): void
     {
         $emailToUserAccessor = new EmailToUserAccessor($config);
 
@@ -70,7 +70,7 @@ class SendEmailToUser
         return function (string $emailAddressOrToken) use ($lead): string {
             try {
                 $contactFieldToken = new ContactFieldToken($emailAddressOrToken);
-            } catch (InvalidContactFieldTokenException $e) {
+            } catch (InvalidContactFieldTokenException) {
                 try {
                     $this->emailValidator->validate($emailAddressOrToken);
 

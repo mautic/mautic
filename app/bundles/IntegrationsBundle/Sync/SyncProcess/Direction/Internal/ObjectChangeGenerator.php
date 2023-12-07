@@ -142,7 +142,7 @@ class ObjectChangeGenerator
                 $this->integrationObject->getObjectId(),
                 $fieldMappingDAO->getIntegrationField()
             );
-        } catch (FieldNotFoundException $e) {
+        } catch (FieldNotFoundException) {
             return;
         }
 

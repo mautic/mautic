@@ -8,11 +8,6 @@ use Psr\Log\LoggerInterface;
 class ResultsPaginator
 {
     /**
-     * @var LoggerInterface
-     */
-    private $logger;
-
-    /**
      * @var array
      */
     private $results;
@@ -38,17 +33,10 @@ class ResultsPaginator
     private $nextRecordsUrl;
 
     /**
-     * @var string
-     */
-    private $salesforceBaseUrl;
-
-    /**
      * @param string $salesforceBaseUrl
      */
-    public function __construct(LoggerInterface $logger, $salesforceBaseUrl)
+    public function __construct(private LoggerInterface $logger, private $salesforceBaseUrl)
     {
-        $this->logger            = $logger;
-        $this->salesforceBaseUrl = $salesforceBaseUrl;
     }
 
     /**

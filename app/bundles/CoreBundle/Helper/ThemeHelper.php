@@ -128,7 +128,7 @@ class ThemeHelper implements ThemeHelperInterface
         return $this->filesystem->exists($root.$dirName);
     }
 
-    public function copy($theme, $newName, $newDirName = null)
+    public function copy($theme, $newName, $newDirName = null): void
     {
         $root   = $this->pathsHelper->getSystemPath('themes', true).'/';
         $themes = $this->getInstalledThemes();
@@ -149,7 +149,7 @@ class ThemeHelper implements ThemeHelperInterface
         $this->updateConfig($root.$dirName, $newName);
     }
 
-    public function rename($theme, $newName)
+    public function rename($theme, $newName): void
     {
         $root   = $this->pathsHelper->getSystemPath('themes', true).'/';
         $themes = $this->getInstalledThemes();
@@ -170,7 +170,7 @@ class ThemeHelper implements ThemeHelperInterface
         $this->updateConfig($root.$theme, $dirName);
     }
 
-    public function delete($theme)
+    public function delete($theme): void
     {
         $root   = $this->pathsHelper->getSystemPath('themes', true).'/';
         $themes = $this->getInstalledThemes();

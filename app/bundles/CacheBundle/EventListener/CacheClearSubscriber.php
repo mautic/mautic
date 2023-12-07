@@ -33,7 +33,7 @@ class CacheClearSubscriber implements CacheClearerInterface
         try {
             $reflect = new \ReflectionClass($this->cacheProvider->getCacheAdapter());
             $adapter = $reflect->getShortName();
-        } catch (\ReflectionException $e) {
+        } catch (\ReflectionException) {
             $adapter = 'unknown';
         }
 

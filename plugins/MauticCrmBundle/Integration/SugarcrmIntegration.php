@@ -40,12 +40,6 @@ class SugarcrmIntegration extends CrmAbstractIntegration
 
     private $sugarDncKeys = ['email_opt_out', 'invalid_email'];
     private $authorizationError;
-    private $userModel;
-
-    /**
-     * @var DoNotContact
-     */
-    protected $doNotContactModel;
 
     public function __construct(
         EventDispatcherInterface $eventDispatcher,
@@ -63,12 +57,9 @@ class SugarcrmIntegration extends CrmAbstractIntegration
         NotificationModel $notificationModel,
         FieldModel $fieldModel,
         IntegrationEntityModel $integrationEntityModel,
-        DoNotContact $doNotContactModel,
-        UserModel $userModel
+        protected \Mautic\LeadBundle\Model\DoNotContact $doNotContactModel,
+        private UserModel $userModel
     ) {
-        $this->doNotContactModel = $doNotContactModel;
-        $this->userModel         = $userModel;
-
         parent::__construct(
             $eventDispatcher,
             $cacheStorageHelper,

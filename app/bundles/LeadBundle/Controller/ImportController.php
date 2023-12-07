@@ -657,8 +657,6 @@ class ImportController extends FormController
 
     /**
      * Support non-index pages such as modal forms.
-     *
-     * @return bool|string
      */
     protected function generateUrl(string $route, array $parameters = [], int $referenceType = UrlGeneratorInterface::ABSOLUTE_PATH): string
     {

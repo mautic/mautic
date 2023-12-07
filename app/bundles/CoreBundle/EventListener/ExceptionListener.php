@@ -27,7 +27,7 @@ class ExceptionListener extends ErrorListener
         parent::__construct($controller, $logger);
     }
 
-    public function onKernelException(ExceptionEvent $event, string $eventName = null, EventDispatcherInterface $eventDispatcher = null)
+    public function onKernelException(ExceptionEvent $event, string $eventName = null, EventDispatcherInterface $eventDispatcher = null): void
     {
         $exception = $event->getThrowable();
 

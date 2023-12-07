@@ -37,37 +37,12 @@ use Twig\Environment;
  */
 class FocusModel extends FormModel
 {
-    /**
-     * @var \Mautic\FormBundle\Model\FormModel
-     */
-    protected $formModel;
-
-    /**
-     * @var TrackableModel
-     */
-    protected $trackableModel;
-
-    /**
-     * @var Environment
-     */
-    protected $twig;
-
-    /**
-     * @var FieldModel
-     */
-    protected $leadFieldModel;
-
-    /**
-     * @var ContactTracker
-     */
-    protected $contactTracker;
-
     public function __construct(
-        \Mautic\FormBundle\Model\FormModel $formModel,
-        TrackableModel $trackableModel,
-        Environment $twig,
-        FieldModel $leadFieldModel,
-        ContactTracker $contactTracker,
+        protected \Mautic\FormBundle\Model\FormModel $formModel,
+        protected \Mautic\PageBundle\Model\TrackableModel $trackableModel,
+        protected \Twig\Environment $twig,
+        protected \Mautic\LeadBundle\Model\FieldModel $leadFieldModel,
+        protected \Mautic\LeadBundle\Tracker\ContactTracker $contactTracker,
         EntityManagerInterface $em,
         CorePermissions $security,
         EventDispatcherInterface $dispatcher,
@@ -77,12 +52,7 @@ class FocusModel extends FormModel
         LoggerInterface $mauticLogger,
         CoreParametersHelper $coreParametersHelper
     ) {
-        $this->formModel      = $formModel;
-        $this->trackableModel = $trackableModel;
-        $this->twig           = $twig;
         $this->dispatcher     = $dispatcher;
-        $this->leadFieldModel = $leadFieldModel;
-        $this->contactTracker = $contactTracker;
 
         parent::__construct($em, $security, $dispatcher, $router, $translator, $userHelper, $mauticLogger, $coreParametersHelper);
     }
@@ -346,15 +316,12 @@ class FocusModel extends FormModel
 
         switch ($type) {
             case Stat::TYPE_FORM:
-                /** @var \Mautic\FormBundle\Entity\Submission $data */
+            case Stat::TYPE_CLICK:
+                /** @var \Mautic\PageBundle\Entity\Hit $data */
                 $typeId = $data->getId();
                 break;
             case Stat::TYPE_NOTIFICATION:
                 $typeId = null;
-                break;
-            case Stat::TYPE_CLICK:
-                /** @var \Mautic\PageBundle\Entity\Hit $data */
-                $typeId = $data->getId();
                 break;
         }
 

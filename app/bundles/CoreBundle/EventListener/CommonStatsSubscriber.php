@@ -41,7 +41,7 @@ abstract class CommonStatsSubscriber implements EventSubscriberInterface
         ];
     }
 
-    public function onStatsFetch(StatsEvent $event)
+    public function onStatsFetch(StatsEvent $event): void
     {
         /** @var CommonRepository<object> $repository */
         foreach ($this->repositories as $repository) {

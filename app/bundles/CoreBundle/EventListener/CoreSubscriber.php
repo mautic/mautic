@@ -128,7 +128,7 @@ class CoreSubscriber implements EventSubscriberInterface
         }
     }
 
-    public function onBuildRoute(RouteEvent $event)
+    public function onBuildRoute(RouteEvent $event): void
     {
         $type       = $event->getType();
         $bundles    = $this->bundleHelper->getMauticBundles(true);

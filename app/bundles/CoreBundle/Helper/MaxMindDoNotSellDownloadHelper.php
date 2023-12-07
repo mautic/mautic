@@ -16,7 +16,7 @@ class MaxMindDoNotSellDownloadHelper
     /**
      * @var array<string>
      */
-    private $auth;
+    private array $auth;
 
     /**
      * @var string

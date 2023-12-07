@@ -36,10 +36,6 @@ class MailHelper
     public const QUEUE_RETURN_ERRORS      = 'RETURN_ERRORS';
     public const EMAIL_TYPE_TRANSACTIONAL = 'transactional';
     public const EMAIL_TYPE_MARKETING     = 'marketing';
-    /**
-     * @var MauticFactory
-     */
-    protected $factory;
 
     protected $transport;
 
@@ -229,9 +225,8 @@ class MailHelper
      */
     private $embedImagesReplaces = [];
 
-    public function __construct(MauticFactory $factory, protected MailerInterface $mailer, $from = null)
+    public function __construct(protected \Mautic\CoreBundle\Factory\MauticFactory $factory, protected MailerInterface $mailer, $from = null)
     {
-        $this->factory   = $factory;
         $this->transport = $this->getTransport();
 
         $systemFromEmail    = $factory->getParameter('mailer_from_email');
@@ -2010,7 +2005,7 @@ class MailHelper
      *
      * @throws InvalidEmailException
      */
-    public static function validateEmail($address)
+    public static function validateEmail($address): void
     {
         $invalidChar = strpbrk($address, '\'^&*%');
         if (false !== $invalidChar) {

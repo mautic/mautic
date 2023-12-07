@@ -412,7 +412,7 @@ class FieldType extends AbstractType
                 ChoiceType::class,
                 [
                     'choices'     => $fields->toChoices(),
-                    'choice_attr' => function ($val) use ($fields) {
+                    'choice_attr' => function ($val) use ($fields): array {
                         try {
                             $field = $fields->getFieldByKey($val);
                             if ($field->isListType()) {

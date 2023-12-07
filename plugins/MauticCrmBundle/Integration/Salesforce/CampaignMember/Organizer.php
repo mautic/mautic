@@ -10,11 +10,6 @@ class Organizer
     /**
      * @var array
      */
-    private $records;
-
-    /**
-     * @var array
-     */
     private $leads = [];
 
     /**
@@ -22,10 +17,8 @@ class Organizer
      */
     private $contacts = [];
 
-    public function __construct(array $records)
+    public function __construct(private array $records)
     {
-        $this->records = $records;
-
         $this->organize();
     }
 

@@ -37,11 +37,6 @@ class HubspotIntegration extends CrmAbstractIntegration
 {
     public const ACCESS_KEY = 'accessKey';
 
-    /**
-     * @var UserHelper
-     */
-    protected $userHelper;
-
     public function __construct(
         EventDispatcherInterface $eventDispatcher,
         CacheStorageHelper $cacheStorageHelper,
@@ -59,10 +54,8 @@ class HubspotIntegration extends CrmAbstractIntegration
         FieldModel $fieldModel,
         IntegrationEntityModel $integrationEntityModel,
         DoNotContact $doNotContact,
-        UserHelper $userHelper
+        protected \Mautic\CoreBundle\Helper\UserHelper $userHelper
     ) {
-        $this->userHelper = $userHelper;
-
         parent::__construct(
             $eventDispatcher,
             $cacheStorageHelper,

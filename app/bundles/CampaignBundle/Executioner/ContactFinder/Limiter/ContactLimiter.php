@@ -8,25 +8,16 @@ class ContactLimiter
 {
     private int $batchLimit;
 
-    /**
-     * @var int|null
-     */
-    private $contactId;
+    private ?int $contactId;
 
-    /**
-     * @var int|null
-     */
-    private $minContactId;
+    private ?int $minContactId;
 
     /**
      * @var int|null
      */
     private $batchMinContactId;
 
-    /**
-     * @var int|null
-     */
-    private $maxContactId;
+    private ?int $maxContactId;
 
     /**
      * @var int|null

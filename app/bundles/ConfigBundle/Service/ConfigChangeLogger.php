@@ -46,7 +46,7 @@ class ConfigChangeLogger
      *
      * @see Form::getNormData()
      */
-    public function log(array $postNormData)
+    public function log(array $postNormData): void
     {
         if (null === $this->originalNormData) {
             throw new \RuntimeException('Set original normalized data at first');

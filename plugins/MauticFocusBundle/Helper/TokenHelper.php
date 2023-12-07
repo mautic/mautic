@@ -11,26 +11,8 @@ class TokenHelper
 {
     private $regex = '{focus=(.*?)}';
 
-    /**
-     * @var FocusModel
-     */
-    protected $model;
-
-    /**
-     * @var RouterInterface
-     */
-    protected $router;
-
-    /**
-     * @var CorePermissions
-     */
-    protected $security;
-
-    public function __construct(FocusModel $model, RouterInterface $router, CorePermissions $security)
+    public function __construct(protected \MauticPlugin\MauticFocusBundle\Model\FocusModel $model, protected \Symfony\Component\Routing\RouterInterface $router, protected \Mautic\CoreBundle\Security\Permissions\CorePermissions $security)
     {
-        $this->router   = $router;
-        $this->model    = $model;
-        $this->security = $security;
     }
 
     public function findFocusTokens($content): array

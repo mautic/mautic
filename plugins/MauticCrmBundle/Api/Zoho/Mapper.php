@@ -14,11 +14,6 @@ class Mapper
     /**
      * @var array
      */
-    private $fields = [];
-
-    /**
-     * @var array
-     */
     private $mappedFields = [];
 
     private $object;
@@ -42,9 +37,8 @@ class Mapper
      */
     private $contactMapper = [];
 
-    public function __construct(array $fields)
+    public function __construct(private array $fields)
     {
-        $this->fields = $fields;
     }
 
     /**

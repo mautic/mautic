@@ -1330,7 +1330,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
     /**
      * @throws \Exception
      */
-    public function getCampaignMembers($campaignId)
+    public function getCampaignMembers($campaignId): void
     {
         $this->failureFetchingLeads = false;
 

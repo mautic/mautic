@@ -24,26 +24,6 @@ abstract class MonitorTwitterBaseCommand extends Command
     protected $twitter;
 
     /**
-     * @var Translator
-     */
-    protected $translator;
-
-    /**
-     * @var EventDispatcherInterface
-     */
-    protected $dispatcher;
-
-    /**
-     * @var IntegrationHelper
-     */
-    protected $integrationHelper;
-
-    /**
-     * @var TwitterCommandHelper
-     */
-    private $twitterCommandHelper;
-
-    /**
      * @var InputInterface
      */
     protected $input;
@@ -69,17 +49,12 @@ abstract class MonitorTwitterBaseCommand extends Command
     protected $queryCount = 100;
 
     public function __construct(
-        EventDispatcherInterface $dispatcher,
-        Translator $translator,
-        IntegrationHelper $integrationHelper,
-        TwitterCommandHelper $twitterCommandHelper,
+        protected \Symfony\Component\EventDispatcher\EventDispatcherInterface $dispatcher,
+        protected \Mautic\CoreBundle\Translation\Translator $translator,
+        protected \Mautic\PluginBundle\Helper\IntegrationHelper $integrationHelper,
+        private TwitterCommandHelper $twitterCommandHelper,
         CoreParametersHelper $coreParametersHelper
     ) {
-        $this->dispatcher           = $dispatcher;
-        $this->translator           = $translator;
-        $this->integrationHelper    = $integrationHelper;
-        $this->twitterCommandHelper = $twitterCommandHelper;
-
         $this->translator->setLocale($coreParametersHelper->get('locale', 'en_US'));
 
         parent::__construct();

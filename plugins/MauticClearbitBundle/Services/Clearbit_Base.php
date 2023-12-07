@@ -10,13 +10,11 @@ class Clearbit_Base
     public const REQUEST_LATENCY = 0.2;
     public const USER_AGENT      = 'mautic/clearbit-php-0.1.0';
 
-    private $_next_req_time;
+    private \DateTime $_next_req_time;
 
     protected $_baseUri     = '';
     protected $_resourceUri = '';
     protected $_version     = 'v2';
-
-    protected $_apiKey;
     protected $_webhookId;
 
     public $response_obj;
@@ -51,11 +49,10 @@ class Clearbit_Base
      * The base constructor Sets the API key available from here:
      * https://dashboard.clearbit.com/keys.
      *
-     * @param string $api_key
+     * @param string $_apiKey
      */
-    public function __construct($api_key)
+    public function __construct(protected $_apiKey)
     {
-        $this->_apiKey        = $api_key;
         $this->_next_req_time = new \DateTime('@0');
     }
 

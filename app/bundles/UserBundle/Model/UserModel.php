@@ -279,7 +279,7 @@ class UserModel extends FormModel
     /**
      * @throws \RuntimeException
      */
-    public function sendResetEmail(User $user)
+    public function sendResetEmail(User $user): void
     {
         $mailer = $this->mailHelper->getMailer();
 

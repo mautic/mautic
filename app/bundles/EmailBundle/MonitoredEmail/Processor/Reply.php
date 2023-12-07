@@ -71,7 +71,7 @@ class Reply implements ProcessorInterface
      * @param string $trackingHash
      * @param string $messageId
      */
-    public function createReplyByHash($trackingHash, $messageId)
+    public function createReplyByHash($trackingHash, $messageId): void
     {
         /** @var Stat|null $stat */
         $stat = $this->statRepo->findOneBy(['trackingHash' => $trackingHash]);

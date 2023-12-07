@@ -122,7 +122,7 @@ class ObjectChangeGenerator
                 $this->internalObject->getObjectId(),
                 $fieldMappingDAO->getInternalField()
             );
-        } catch (FieldNotFoundException $e) {
+        } catch (FieldNotFoundException) {
             return;
         }
 

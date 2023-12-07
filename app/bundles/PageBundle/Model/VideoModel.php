@@ -78,7 +78,7 @@ class VideoModel extends FormModel
      * @throws \Doctrine\ORM\ORMException
      * @throws \Exception
      */
-    public function hitVideo($request, $code = '200')
+    public function hitVideo($request, $code = '200'): void
     {
         // don't skew results with in-house hits
         if (!$this->security->isAnonymous()) {
