@@ -12,14 +12,8 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 final class FormConditionalSubscriber implements EventSubscriberInterface
 {
-    private \Mautic\FormBundle\Model\FormModel $formModel;
-
-    private \Mautic\FormBundle\Model\FieldModel $fieldModel;
-
-    public function __construct(FormModel $formModel, FieldModel $fieldModel)
+    public function __construct(private FormModel $formModel, private FieldModel $fieldModel)
     {
-        $this->formModel  = $formModel;
-        $this->fieldModel = $fieldModel;
     }
 
     /**

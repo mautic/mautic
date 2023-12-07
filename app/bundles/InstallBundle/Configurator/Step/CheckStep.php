@@ -17,13 +17,6 @@ class CheckStep implements StepInterface
     private bool $configIsWritable;
 
     /**
-     * Path to the kernel root.
-     */
-    private string $projectDir;
-
-    private \Mautic\CoreBundle\Security\Cryptography\Cipher\Symmetric\OpenSSLCipher $openSSLCipher;
-
-    /**
      * Absolute path to cache directory.
      * Required in step.
      *
@@ -60,18 +53,19 @@ class CheckStep implements StepInterface
      */
     public function __construct(
         Configurator $configurator,
-        string $projectDir,
+        /**
+         * Path to the kernel root.
+         */
+        private string $projectDir,
         RequestStack $requestStack,
-        OpenSSLCipher $openSSLCipher
+        private OpenSSLCipher $openSSLCipher
     ) {
         $request = $requestStack->getCurrentRequest();
 
         $this->configIsWritable = $configurator->isFileWritable();
-        $this->projectDir       = $projectDir;
         if (!empty($request)) {
             $this->site_url     = $request->getSchemeAndHttpHost().$request->getBasePath();
         }
-        $this->openSSLCipher    = $openSSLCipher;
     }
 
     /**

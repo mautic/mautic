@@ -21,44 +21,8 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 final class SyncService implements SyncServiceInterface
 {
-    private \Mautic\IntegrationsBundle\Sync\SyncDataExchange\MauticSyncDataExchange $internalSyncDataExchange;
-
-    private \Mautic\IntegrationsBundle\Sync\Helper\SyncDateHelper $syncDateHelper;
-
-    private \Mautic\IntegrationsBundle\Sync\Helper\MappingHelper $mappingHelper;
-
-    private \Mautic\IntegrationsBundle\Sync\Helper\RelationsHelper $relationsHelper;
-
-    private \Mautic\IntegrationsBundle\Sync\SyncProcess\Direction\Integration\IntegrationSyncProcess $integratinSyncProcess;
-
-    private \Mautic\IntegrationsBundle\Sync\SyncProcess\Direction\Internal\MauticSyncProcess $mauticSyncProcess;
-
-    private \Mautic\IntegrationsBundle\Helper\SyncIntegrationsHelper $syncIntegrationsHelper;
-
-    private \Symfony\Component\EventDispatcher\EventDispatcherInterface $eventDispatcher;
-
-    private \Mautic\IntegrationsBundle\Sync\Notification\Notifier $notifier;
-
-    public function __construct(
-        MauticSyncDataExchange $internalSyncDataExchange,
-        SyncDateHelper $syncDateHelper,
-        MappingHelper $mappingHelper,
-        RelationsHelper $relationsHelper,
-        SyncIntegrationsHelper $syncIntegrationsHelper,
-        EventDispatcherInterface $eventDispatcher,
-        Notifier $notifier,
-        IntegrationSyncProcess $integrationSyncProcess,
-        MauticSyncProcess $mauticSyncProcess
-    ) {
-        $this->internalSyncDataExchange = $internalSyncDataExchange;
-        $this->syncDateHelper           = $syncDateHelper;
-        $this->mappingHelper            = $mappingHelper;
-        $this->relationsHelper          = $relationsHelper;
-        $this->syncIntegrationsHelper   = $syncIntegrationsHelper;
-        $this->eventDispatcher          = $eventDispatcher;
-        $this->notifier                 = $notifier;
-        $this->integratinSyncProcess    = $integrationSyncProcess;
-        $this->mauticSyncProcess        = $mauticSyncProcess;
+    public function __construct(private MauticSyncDataExchange $internalSyncDataExchange, private SyncDateHelper $syncDateHelper, private MappingHelper $mappingHelper, private RelationsHelper $relationsHelper, private SyncIntegrationsHelper $syncIntegrationsHelper, private EventDispatcherInterface $eventDispatcher, private Notifier $notifier, private IntegrationSyncProcess $integratinSyncProcess, private MauticSyncProcess $mauticSyncProcess)
+    {
     }
 
     /**

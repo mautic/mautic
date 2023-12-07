@@ -19,10 +19,6 @@ use Mautic\IntegrationsBundle\Sync\SyncDataExchange\MauticSyncDataExchange;
 
 class MauticSyncProcess
 {
-    private \Mautic\IntegrationsBundle\Sync\Helper\SyncDateHelper $syncDateHelper;
-
-    private \Mautic\IntegrationsBundle\Sync\SyncProcess\Direction\Internal\ObjectChangeGenerator $objectChangeGenerator;
-
     /**
      * @var InputOptionsDAO
      */
@@ -33,15 +29,10 @@ class MauticSyncProcess
      */
     private $mappingManualDAO;
 
-    /**
-     * @var MauticSyncDataExchange
-     */
-    private $syncDataExchange;
+    private ?MauticSyncDataExchange $syncDataExchange = null;
 
-    public function __construct(SyncDateHelper $syncDateHelper, ObjectChangeGenerator $objectChangeGenerator)
+    public function __construct(private SyncDateHelper $syncDateHelper, private ObjectChangeGenerator $objectChangeGenerator)
     {
-        $this->syncDateHelper        = $syncDateHelper;
-        $this->objectChangeGenerator = $objectChangeGenerator;
     }
 
     public function setupSync(InputOptionsDAO $inputOptionsDAO, MappingManualDAO $mappingManualDAO, MauticSyncDataExchange $syncDataExchange): void

@@ -7,21 +7,10 @@ use Mautic\FormBundle\Entity\Action;
 use Mautic\FormBundle\Entity\Submission;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\ServerBag;
 
 class SubmissionEvent extends CommonEvent
 {
-    /**
-     * Raw POST results.
-     *
-     * @var array
-     */
-    private $post = [];
-
-    /**
-     * @var array
-     */
-    private $server = [];
-
     /**
      * Cleaned post results.
      *
@@ -77,8 +66,6 @@ class SubmissionEvent extends CommonEvent
      */
     private $context;
 
-    private \Symfony\Component\HttpFoundation\Request $request;
-
     /**
      * @var array|Response|null
      */
@@ -89,20 +76,23 @@ class SubmissionEvent extends CommonEvent
      */
     private $postSubmitPayload;
 
-    public function __construct(Submission $submission, $post, $server, Request $request)
-    {
+    /**
+     * @param mixed[]                 $post
+     * @param mixed[]|array|ServerBag $server
+     */
+    public function __construct(
+        Submission $submission,
+        /**
+         * Raw POST results.
+         */
+        private $post,
+        private $server,
+        private Request $request
+    ) {
         $this->entity  = $submission;
-        $this->post    = $post;
-        $this->server  = $server;
-        $this->request = $request;
     }
 
-    /**
-     * Returns the Submission entity.
-     *
-     * @return Submission
-     */
-    public function getSubmission()
+    public function getSubmission(): Submission
     {
         return $this->entity;
     }

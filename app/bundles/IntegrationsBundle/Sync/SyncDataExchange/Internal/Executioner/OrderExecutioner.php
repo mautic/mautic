@@ -19,28 +19,8 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class OrderExecutioner
 {
-    private \Mautic\IntegrationsBundle\Sync\Helper\MappingHelper $mappingHelper;
-
-    private \Symfony\Component\EventDispatcher\EventDispatcherInterface $dispatcher;
-
-    private \Mautic\IntegrationsBundle\Sync\SyncDataExchange\Internal\ObjectProvider $objectProvider;
-
-    private \Mautic\IntegrationsBundle\Sync\SyncDataExchange\Internal\Executioner\ReferenceResolverInterface $referenceResolver;
-
-    private \Mautic\IntegrationsBundle\Sync\SyncDataExchange\Internal\Executioner\FieldValidatorInterface $fieldValidator;
-
-    public function __construct(
-        MappingHelper $mappingHelper,
-        EventDispatcherInterface $dispatcher,
-        ObjectProvider $objectProvider,
-        ReferenceResolverInterface $referenceResolver,
-        FieldValidatorInterface $fieldValidator
-    ) {
-        $this->mappingHelper     = $mappingHelper;
-        $this->dispatcher        = $dispatcher;
-        $this->objectProvider    = $objectProvider;
-        $this->referenceResolver = $referenceResolver;
-        $this->fieldValidator    = $fieldValidator;
+    public function __construct(private MappingHelper $mappingHelper, private EventDispatcherInterface $dispatcher, private ObjectProvider $objectProvider, private ReferenceResolverInterface $referenceResolver, private FieldValidatorInterface $fieldValidator)
+    {
     }
 
     public function execute(OrderDAO $syncOrderDAO): ObjectMappingsDAO

@@ -26,15 +26,8 @@ use Symfony\Component\HttpFoundation\Response;
 
 class InstallController extends CommonController
 {
-    private Configurator $configurator;
-
-    private InstallService $installer;
-
-    public function __construct(Configurator $configurator, InstallService $installer, ManagerRegistry $doctrine, MauticFactory $factory, ModelFactory $modelFactory, UserHelper $userHelper, CoreParametersHelper $coreParametersHelper, EventDispatcherInterface $dispatcher, Translator $translator, FlashBag $flashBag, RequestStack $requestStack, CorePermissions $security)
+    public function __construct(private Configurator $configurator, private InstallService $installer, ManagerRegistry $doctrine, MauticFactory $factory, ModelFactory $modelFactory, UserHelper $userHelper, CoreParametersHelper $coreParametersHelper, EventDispatcherInterface $dispatcher, Translator $translator, FlashBag $flashBag, RequestStack $requestStack, CorePermissions $security)
     {
-        $this->configurator = $configurator;
-        $this->installer    = $installer;
-
         parent::__construct($doctrine, $factory, $modelFactory, $userHelper, $coreParametersHelper, $dispatcher, $translator, $flashBag, $requestStack, $security);
     }
 

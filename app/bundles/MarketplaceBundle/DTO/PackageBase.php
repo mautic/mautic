@@ -6,31 +6,22 @@ namespace Mautic\MarketplaceBundle\DTO;
 
 final class PackageBase
 {
-    /**
-     * Original name in format "vendor/name".
-     */
-    public string $name;
-    public ?string $displayName;
-    public string $url;
-    public string $repository;
-    public string $description;
-    public int $downloads;
-    public int $favers;
-    /**
-     * E.g. mautic-plugin.
-     */
-    public ?string $type;
-
-    public function __construct(string $name, string $url, string $repository, string $description, int $downloads, int $favers, ?string $type, ?string $displayName = null)
-    {
-        $this->name        = $name;
-        $this->displayName = $displayName;
-        $this->url         = $url;
-        $this->repository  = $repository;
-        $this->description = $description;
-        $this->downloads   = $downloads;
-        $this->favers      = $favers;
-        $this->type        = $type;
+    public function __construct(
+        /**
+         * Original name in format "vendor/name".
+         */
+        public string $name,
+        public string $url,
+        public string $repository,
+        public string $description,
+        public int $downloads,
+        public int $favers,
+        /**
+         * E.g. mautic-plugin.
+         */
+        public ?string $type,
+        public ?string $displayName = null
+    ) {
     }
 
     public static function fromArray(array $array): self

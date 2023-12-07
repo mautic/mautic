@@ -6,28 +6,13 @@ namespace Mautic\IntegrationsBundle\Sync\DAO\Sync\Report;
 
 class RelationDAO
 {
-    private string $objectName;
-
-    private string $relFieldName;
-
-    private string $relObjectName;
-
-    private string $objectIntegrationId;
-
-    private string $relObjectIntegrationId;
-
     /**
      * @var int
      */
     private $relObjectInternalId;
 
-    public function __construct(string $objectName, string $relFieldName, string $relObjectName, string $objectIntegrationId, string $relObjectIntegrationId)
+    public function __construct(private string $objectName, private string $relFieldName, private string $relObjectName, private string $objectIntegrationId, private string $relObjectIntegrationId)
     {
-        $this->objectName             = $objectName;
-        $this->relFieldName           = $relFieldName;
-        $this->relObjectName          = $relObjectName;
-        $this->objectIntegrationId    = $objectIntegrationId;
-        $this->relObjectIntegrationId = $relObjectIntegrationId;
     }
 
     public function getObjectName(): string

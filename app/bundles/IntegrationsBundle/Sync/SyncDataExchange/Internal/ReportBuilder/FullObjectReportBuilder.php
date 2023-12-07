@@ -26,20 +26,8 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class FullObjectReportBuilder
 {
-    private \Mautic\IntegrationsBundle\Sync\SyncDataExchange\Internal\ReportBuilder\FieldBuilder $fieldBuilder;
-
-    private \Mautic\IntegrationsBundle\Sync\SyncDataExchange\Internal\ObjectProvider $objectProvider;
-
-    private \Symfony\Component\EventDispatcher\EventDispatcherInterface $dispatcher;
-
-    public function __construct(
-        FieldBuilder $fieldBuilder,
-        ObjectProvider $objectProvider,
-        EventDispatcherInterface $dispatcher
-    ) {
-        $this->fieldBuilder   = $fieldBuilder;
-        $this->objectProvider = $objectProvider;
-        $this->dispatcher     = $dispatcher;
+    public function __construct(private FieldBuilder $fieldBuilder, private ObjectProvider $objectProvider, private EventDispatcherInterface $dispatcher)
+    {
     }
 
     public function buildReport(RequestDAO $requestDAO): ReportDAO

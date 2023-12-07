@@ -16,17 +16,8 @@ use Mautic\LeadBundle\Model\CompanyModel;
 
 class CompanyObjectHelper implements ObjectHelperInterface
 {
-    private \Mautic\LeadBundle\Model\CompanyModel $model;
-
-    private \Mautic\LeadBundle\Entity\CompanyRepository $repository;
-
-    private \Doctrine\DBAL\Connection $connection;
-
-    public function __construct(CompanyModel $model, CompanyRepository $repository, Connection $connection)
+    public function __construct(private CompanyModel $model, private CompanyRepository $repository, private Connection $connection)
     {
-        $this->model      = $model;
-        $this->repository = $repository;
-        $this->connection = $connection;
     }
 
     /**

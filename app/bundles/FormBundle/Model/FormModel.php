@@ -43,44 +43,20 @@ use Twig\Environment;
  */
 class FormModel extends CommonFormModel
 {
-    protected \Symfony\Component\HttpFoundation\RequestStack $requestStack;
-
-    protected \Twig\Environment $twig;
-
-    protected \Mautic\CoreBundle\Helper\ThemeHelperInterface $themeHelper;
-
-    protected \Mautic\FormBundle\Model\ActionModel $formActionModel;
-
-    protected \Mautic\FormBundle\Model\FieldModel $formFieldModel;
-
-    protected \Mautic\FormBundle\Helper\FormFieldHelper $fieldHelper;
-
-    protected LeadFieldModel $leadFieldModel;
-
-    private \Mautic\FormBundle\Helper\FormUploader $formUploader;
-
-    private \Mautic\LeadBundle\Tracker\ContactTracker $contactTracker;
-
-    private \Mautic\CoreBundle\Doctrine\Helper\ColumnSchemaHelper $columnSchemaHelper;
-
-    private \Mautic\CoreBundle\Doctrine\Helper\TableSchemaHelper $tableSchemaHelper;
-
-    private \Mautic\FormBundle\Collector\MappedObjectCollectorInterface $mappedObjectCollector;
-
     public function __construct(
-        RequestStack $requestStack,
-        Environment $twig,
-        ThemeHelperInterface $themeHelper,
-        ActionModel $formActionModel,
-        FieldModel $formFieldModel,
-        FormFieldHelper $fieldHelper,
+        protected RequestStack $requestStack,
+        protected Environment $twig,
+        protected ThemeHelperInterface $themeHelper,
+        protected ActionModel $formActionModel,
+        protected FieldModel $formFieldModel,
+        protected FormFieldHelper $fieldHelper,
         private PrimaryCompanyHelper $primaryCompanyHelper,
-        LeadFieldModel $leadFieldModel,
-        FormUploader $formUploader,
-        ContactTracker $contactTracker,
-        ColumnSchemaHelper $columnSchemaHelper,
-        TableSchemaHelper $tableSchemaHelper,
-        MappedObjectCollectorInterface $mappedObjectCollector,
+        protected LeadFieldModel $leadFieldModel,
+        private FormUploader $formUploader,
+        private ContactTracker $contactTracker,
+        private ColumnSchemaHelper $columnSchemaHelper,
+        private TableSchemaHelper $tableSchemaHelper,
+        private MappedObjectCollectorInterface $mappedObjectCollector,
         EntityManagerInterface $em,
         CorePermissions $security,
         EventDispatcherInterface $dispatcher,
@@ -90,19 +66,6 @@ class FormModel extends CommonFormModel
         LoggerInterface $mauticLogger,
         CoreParametersHelper $coreParametersHelper
     ) {
-        $this->requestStack           = $requestStack;
-        $this->twig                   = $twig;
-        $this->themeHelper            = $themeHelper;
-        $this->formActionModel        = $formActionModel;
-        $this->formFieldModel         = $formFieldModel;
-        $this->fieldHelper            = $fieldHelper;
-        $this->leadFieldModel         = $leadFieldModel;
-        $this->formUploader           = $formUploader;
-        $this->contactTracker         = $contactTracker;
-        $this->columnSchemaHelper     = $columnSchemaHelper;
-        $this->tableSchemaHelper      = $tableSchemaHelper;
-        $this->mappedObjectCollector  = $mappedObjectCollector;
-
         parent::__construct($em, $security, $dispatcher, $router, $translator, $userHelper, $mauticLogger, $coreParametersHelper);
     }
 

@@ -11,12 +11,6 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class Fetcher
 {
-    private \Mautic\EmailBundle\MonitoredEmail\Mailbox $imapHelper;
-
-    private \Symfony\Component\EventDispatcher\EventDispatcherInterface $dispatcher;
-
-    private \Symfony\Contracts\Translation\TranslatorInterface $translator;
-
     /**
      * @var array
      */
@@ -32,11 +26,8 @@ class Fetcher
      */
     private $processedMessageCounter = 0;
 
-    public function __construct(Mailbox $imapHelper, EventDispatcherInterface $dispatcher, TranslatorInterface $translator)
+    public function __construct(private Mailbox $imapHelper, private EventDispatcherInterface $dispatcher, private TranslatorInterface $translator)
     {
-        $this->imapHelper = $imapHelper;
-        $this->dispatcher = $dispatcher;
-        $this->translator = $translator;
     }
 
     /**

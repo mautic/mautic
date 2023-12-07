@@ -12,14 +12,8 @@ use Symfony\Component\HttpKernel\KernelEvents;
 
 class ControllerSubscriber implements EventSubscriberInterface
 {
-    private \Mautic\IntegrationsBundle\Helper\IntegrationsHelper $integrationsHelper;
-
-    private \Symfony\Component\HttpKernel\Controller\ControllerResolverInterface $resolver;
-
-    public function __construct(IntegrationsHelper $integrationsHelper, ControllerResolverInterface $resolver)
+    public function __construct(private IntegrationsHelper $integrationsHelper, private ControllerResolverInterface $resolver)
     {
-        $this->integrationsHelper = $integrationsHelper;
-        $this->resolver           = $resolver;
     }
 
     /**

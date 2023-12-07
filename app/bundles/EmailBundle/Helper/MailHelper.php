@@ -41,8 +41,6 @@ class MailHelper
      */
     protected $factory;
 
-    protected MailerInterface $mailer;
-
     protected $transport;
 
     /**
@@ -231,10 +229,9 @@ class MailHelper
      */
     private $embedImagesReplaces = [];
 
-    public function __construct(MauticFactory $factory, MailerInterface $mailer, $from = null)
+    public function __construct(MauticFactory $factory, protected MailerInterface $mailer, $from = null)
     {
         $this->factory   = $factory;
-        $this->mailer    = $mailer;
         $this->transport = $this->getTransport();
 
         $systemFromEmail    = $factory->getParameter('mailer_from_email');

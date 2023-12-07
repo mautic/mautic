@@ -10,10 +10,6 @@ class ObjectMappingDAO
     public const SYNC_TO_INTEGRATION  = 'integration';
     public const SYNC_BIDIRECTIONALLY = 'bidirectional';
 
-    private string $internalObjectName;
-
-    private string $integrationObjectName;
-
     /**
      * @var array
      */
@@ -29,10 +25,8 @@ class ObjectMappingDAO
      */
     private $fieldMappings = [];
 
-    public function __construct(string $internalObjectName, string $integrationObjectName)
+    public function __construct(private string $internalObjectName, private string $integrationObjectName)
     {
-        $this->internalObjectName    = $internalObjectName;
-        $this->integrationObjectName = $integrationObjectName;
     }
 
     /**
