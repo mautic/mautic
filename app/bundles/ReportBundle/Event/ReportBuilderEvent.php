@@ -29,10 +29,6 @@ class ReportBuilderEvent extends AbstractReportEvent
         'line',
     ];
 
-    private \Mautic\ChannelBundle\Helper\ChannelListHelper $channelListHelper;
-
-    private \Symfony\Contracts\Translation\TranslatorInterface $translator;
-
     /**
      * Container with registered graphs.
      *
@@ -41,29 +37,17 @@ class ReportBuilderEvent extends AbstractReportEvent
     private $graphArray = [];
 
     /**
-     * List of published array of lead fields.
-     *
-     * @var array
-     */
-    private $leadFields = [];
-
-    private \Mautic\ReportBundle\Helper\ReportHelper $reportHelper;
-
-    private ?string $reportSource;
-
-    /**
      * ReportBuilderEvent constructor.
      *
-     * @param string $context
+     * @param string  $context
+     * @param mixed[] $leadFields
      */
-    public function __construct(TranslatorInterface $translator, ChannelListHelper $channelListHelper, $context, $leadFields, ReportHelper $reportHelper, ?string $reportSource = null)
+    public function __construct(private TranslatorInterface $translator, private ChannelListHelper $channelListHelper, $context, /**
+     * List of published array of lead fields.
+     */
+    private $leadFields, private ReportHelper $reportHelper, private ?string $reportSource = null)
     {
         $this->context           = $context;
-        $this->translator        = $translator;
-        $this->channelListHelper = $channelListHelper;
-        $this->leadFields        = $leadFields;
-        $this->reportHelper      = $reportHelper;
-        $this->reportSource      = $reportSource;
     }
 
     /**

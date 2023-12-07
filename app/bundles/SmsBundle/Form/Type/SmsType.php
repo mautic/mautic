@@ -23,11 +23,8 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class SmsType extends AbstractType
 {
-    private \Doctrine\ORM\EntityManager $em;
-
-    public function __construct(EntityManager $em)
+    public function __construct(private EntityManager $em)
     {
-        $this->em = $em;
     }
 
     public function buildForm(FormBuilderInterface $builder, array $options): void

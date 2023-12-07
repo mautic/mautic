@@ -31,8 +31,6 @@ class TriggerApiController extends CommonApiController
      */
     protected $model;
 
-    private ?RequestStack $requestStack = null;
-
     public function __construct(
         CorePermissions $security,
         Translator $translator,
@@ -40,15 +38,13 @@ class TriggerApiController extends CommonApiController
         RouterInterface $router,
         FormFactoryInterface $formFactory,
         AppVersion $appVersion,
-        RequestStack $requestStack,
+        private ?RequestStack $requestStack,
         ManagerRegistry $doctrine,
         ModelFactory $modelFactory,
         EventDispatcherInterface $dispatcher,
         CoreParametersHelper $coreParametersHelper,
         MauticFactory $factory
     ) {
-        $this->requestStack = $requestStack;
-
         $triggerModel = $modelFactory->getModel('point.trigger');
         \assert($triggerModel instanceof TriggerModel);
 

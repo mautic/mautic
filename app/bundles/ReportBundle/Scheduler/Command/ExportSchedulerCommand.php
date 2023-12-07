@@ -13,15 +13,9 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class ExportSchedulerCommand extends Command
 {
-    private \Mautic\ReportBundle\Model\ReportExporter $reportExporter;
-
-    private \Symfony\Contracts\Translation\TranslatorInterface $translator;
-
-    public function __construct(ReportExporter $reportExporter, TranslatorInterface $translator)
+    public function __construct(private ReportExporter $reportExporter, private TranslatorInterface $translator)
     {
         parent::__construct();
-        $this->reportExporter = $reportExporter;
-        $this->translator     = $translator;
     }
 
     /**

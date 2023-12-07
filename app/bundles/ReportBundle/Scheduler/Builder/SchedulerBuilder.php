@@ -12,11 +12,8 @@ use Recurr\Transformer\ArrayTransformer;
 
 class SchedulerBuilder
 {
-    private \Mautic\ReportBundle\Scheduler\Factory\SchedulerTemplateFactory $schedulerTemplateFactory;
-
-    public function __construct(SchedulerTemplateFactory $schedulerTemplateFactory)
+    public function __construct(private SchedulerTemplateFactory $schedulerTemplateFactory)
     {
-        $this->schedulerTemplateFactory = $schedulerTemplateFactory;
     }
 
     /**

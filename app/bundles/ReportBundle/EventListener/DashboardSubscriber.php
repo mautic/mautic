@@ -10,10 +10,6 @@ use Mautic\ReportBundle\Model\ReportModel;
 
 class DashboardSubscriber extends MainDashboardSubscriber
 {
-    protected \Mautic\ReportBundle\Model\ReportModel $reportModel;
-
-    protected \Mautic\CoreBundle\Security\Permissions\CorePermissions $security;
-
     /**
      * Define the name of the bundle/category of the widget(s).
      *
@@ -42,10 +38,8 @@ class DashboardSubscriber extends MainDashboardSubscriber
         'report:reports:viewother',
     ];
 
-    public function __construct(ReportModel $reportModel, CorePermissions $security)
+    public function __construct(protected ReportModel $reportModel, protected CorePermissions $security)
     {
-        $this->reportModel = $reportModel;
-        $this->security    = $security;
     }
 
     /**

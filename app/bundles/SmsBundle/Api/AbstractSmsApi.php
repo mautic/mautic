@@ -13,11 +13,8 @@ use Mautic\SmsBundle\Sms\TransportInterface;
  */
 abstract class AbstractSmsApi implements TransportInterface
 {
-    protected \Mautic\PageBundle\Model\TrackableModel $pageTrackableModel;
-
-    public function __construct(TrackableModel $pageTrackableModel)
+    public function __construct(protected TrackableModel $pageTrackableModel)
     {
-        $this->pageTrackableModel = $pageTrackableModel;
     }
 
     /**

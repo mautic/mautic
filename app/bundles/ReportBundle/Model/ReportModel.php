@@ -56,28 +56,14 @@ class ReportModel extends FormModel
      */
     protected $defaultPageLimit;
 
-    protected \Twig\Environment $twig;
-
-    protected \Mautic\ChannelBundle\Helper\ChannelListHelper $channelListHelper;
-
-    private RequestStack $requestStack;
-
-    protected \Mautic\LeadBundle\Model\FieldModel $fieldModel;
-
-    protected \Mautic\ReportBundle\Helper\ReportHelper $reportHelper;
-
-    private \Mautic\ReportBundle\Model\CsvExporter $csvExporter;
-
-    private \Mautic\ReportBundle\Model\ExcelExporter $excelExporter;
-
     public function __construct(
         CoreParametersHelper $coreParametersHelper,
-        Environment $twig,
-        ChannelListHelper $channelListHelper,
-        FieldModel $fieldModel,
-        ReportHelper $reportHelper,
-        CsvExporter $csvExporter,
-        ExcelExporter $excelExporter,
+        protected Environment $twig,
+        protected ChannelListHelper $channelListHelper,
+        protected FieldModel $fieldModel,
+        protected ReportHelper $reportHelper,
+        private CsvExporter $csvExporter,
+        private ExcelExporter $excelExporter,
         EntityManagerInterface $em,
         CorePermissions $security,
         EventDispatcherInterface $dispatcher,
@@ -85,16 +71,9 @@ class ReportModel extends FormModel
         Translator $translator,
         UserHelper $userHelper,
         LoggerInterface $mauticLogger,
-        RequestStack $requestStack
+        private RequestStack $requestStack
     ) {
         $this->defaultPageLimit  = $coreParametersHelper->get('default_pagelimit');
-        $this->twig              = $twig;
-        $this->channelListHelper = $channelListHelper;
-        $this->fieldModel        = $fieldModel;
-        $this->reportHelper      = $reportHelper;
-        $this->csvExporter       = $csvExporter;
-        $this->excelExporter     = $excelExporter;
-        $this->requestStack      = $requestStack;
 
         parent::__construct($em, $security, $dispatcher, $router, $translator, $userHelper, $mauticLogger, $coreParametersHelper);
     }

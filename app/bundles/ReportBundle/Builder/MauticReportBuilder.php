@@ -10,7 +10,6 @@ use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\ReportBundle\Entity\Report;
 use Mautic\ReportBundle\Event\ReportGeneratorEvent;
 use Mautic\ReportBundle\ReportEvents;
-use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 final class MauticReportBuilder implements ReportBuilderInterface
@@ -77,28 +76,13 @@ final class MauticReportBuilder implements ReportBuilderInterface
     public const CHANNEL_COLUMN_CREATED_BY      = 'channel.created_by';
     public const CHANNEL_COLUMN_CREATED_BY_USER = 'channel.created_by_user';
 
-    private \Doctrine\DBAL\Connection $db;
-
-    private \Mautic\ReportBundle\Entity\Report $entity;
-
     /**
      * @var string
      */
     private $contentTemplate;
 
-    /**
-     * @var EventDispatcher
-     */
-    private \Symfony\Component\EventDispatcher\EventDispatcherInterface $dispatcher;
-
-    private \Mautic\ChannelBundle\Helper\ChannelListHelper $channelListHelper;
-
-    public function __construct(EventDispatcherInterface $dispatcher, Connection $db, Report $entity, ChannelListHelper $channelListHelper)
+    public function __construct(private EventDispatcherInterface $dispatcher, private Connection $db, private Report $entity, private ChannelListHelper $channelListHelper)
     {
-        $this->entity            = $entity;
-        $this->dispatcher        = $dispatcher;
-        $this->db                = $db;
-        $this->channelListHelper = $channelListHelper;
     }
 
     /**

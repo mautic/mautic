@@ -14,12 +14,9 @@ class ExportHandler
      */
     private $dir;
 
-    private \Mautic\CoreBundle\Helper\FilePathResolver $filePathResolver;
-
-    public function __construct(CoreParametersHelper $coreParametersHelper, FilePathResolver $filePathResolver)
+    public function __construct(CoreParametersHelper $coreParametersHelper, private FilePathResolver $filePathResolver)
     {
         $this->dir              = $coreParametersHelper->get('report_temp_dir');
-        $this->filePathResolver = $filePathResolver;
     }
 
     /**

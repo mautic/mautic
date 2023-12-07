@@ -13,11 +13,8 @@ class PointBuilderEvent extends Event
      */
     private $actions = [];
 
-    private \Symfony\Contracts\Translation\TranslatorInterface $translator;
-
-    public function __construct(TranslatorInterface $translator)
+    public function __construct(private TranslatorInterface $translator)
     {
-        $this->translator = $translator;
     }
 
     /**

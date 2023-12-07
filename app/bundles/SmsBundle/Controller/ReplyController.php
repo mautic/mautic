@@ -12,14 +12,8 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 class ReplyController extends AbstractController
 {
-    private \Mautic\SmsBundle\Callback\HandlerContainer $callbackHandler;
-
-    private \Mautic\SmsBundle\Helper\ReplyHelper $replyHelper;
-
-    public function __construct(HandlerContainer $callbackHandler, ReplyHelper $replyHelper)
+    public function __construct(private HandlerContainer $callbackHandler, private ReplyHelper $replyHelper)
     {
-        $this->callbackHandler = $callbackHandler;
-        $this->replyHelper     = $replyHelper;
     }
 
     /**

@@ -12,24 +12,8 @@ use Twig\Environment;
 
 class SearchSubscriber implements EventSubscriberInterface
 {
-    private \Mautic\PointBundle\Model\PointModel $pointModel;
-
-    private \Mautic\PointBundle\Model\TriggerModel $pointTriggerModel;
-
-    private \Mautic\CoreBundle\Security\Permissions\CorePermissions $security;
-
-    private \Twig\Environment $twig;
-
-    public function __construct(
-        PointModel $pointModel,
-        TriggerModel $pointTriggerModel,
-        CorePermissions $security,
-        Environment $twig
-    ) {
-        $this->pointModel        = $pointModel;
-        $this->pointTriggerModel = $pointTriggerModel;
-        $this->security          = $security;
-        $this->twig              = $twig;
+    public function __construct(private PointModel $pointModel, private TriggerModel $pointTriggerModel, private CorePermissions $security, private Environment $twig)
+    {
     }
 
     /**

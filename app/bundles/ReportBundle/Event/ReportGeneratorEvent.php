@@ -22,11 +22,6 @@ class ReportGeneratorEvent extends AbstractReportEvent
     private $selectColumns = [];
 
     /**
-     * QueryBuilder object.
-     */
-    private \Doctrine\DBAL\Query\QueryBuilder $queryBuilder;
-
-    /**
      * contentTemplate.
      *
      * @var string
@@ -34,29 +29,22 @@ class ReportGeneratorEvent extends AbstractReportEvent
     private $contentTemplate;
 
     /**
-     * @var array
-     */
-    private $options = [];
-
-    /**
      * @var ExpressionBuilder|null
      */
     private $filterExpression;
-
-    private \Mautic\ChannelBundle\Helper\ChannelListHelper $channelListHelper;
 
     /**
      * @var array|null
      */
     private $sortedFilters;
 
-    public function __construct(Report $report, array $options, QueryBuilder $qb, ChannelListHelper $channelListHelper)
+    public function __construct(Report $report, private array $options, /**
+     * QueryBuilder object.
+     */
+    private QueryBuilder $queryBuilder, private ChannelListHelper $channelListHelper)
     {
         $this->report            = $report;
         $this->context           = $report->getSource();
-        $this->options           = $options;
-        $this->queryBuilder      = $qb;
-        $this->channelListHelper = $channelListHelper;
     }
 
     /**

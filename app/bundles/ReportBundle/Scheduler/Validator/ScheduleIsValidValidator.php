@@ -12,11 +12,8 @@ use Symfony\Component\Validator\ConstraintValidator;
 
 class ScheduleIsValidValidator extends ConstraintValidator
 {
-    private \Mautic\ReportBundle\Scheduler\Builder\SchedulerBuilder $schedulerBuilder;
-
-    public function __construct(SchedulerBuilder $schedulerBuilder)
+    public function __construct(private SchedulerBuilder $schedulerBuilder)
     {
-        $this->schedulerBuilder = $schedulerBuilder;
     }
 
     /**
