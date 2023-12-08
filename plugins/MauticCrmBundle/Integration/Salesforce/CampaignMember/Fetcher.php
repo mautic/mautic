@@ -92,9 +92,7 @@ class Fetcher
         $this->fetchNewlyCreated();
 
         $mauticLeadIds = array_map(
-            function ($entity) {
-                return $entity['internal_entity_id'];
-            },
+            fn($entity) => $entity['internal_entity_id'],
             $this->knownCampaignMembers
         );
 

@@ -262,9 +262,7 @@ class AssetGenerationHelper
                 $thisDirectory = str_replace('\\', '/', $directory->getRealPath());
                 $files->files()->depth('0')->name('*.'.$ext)->in($thisDirectory);
 
-                $sort = function (\SplFileInfo $a, \SplFileInfo $b): int {
-                    return strnatcmp($a->getRealpath(), $b->getRealpath());
-                };
+                $sort = fn(\SplFileInfo $a, \SplFileInfo $b): int => strnatcmp($a->getRealpath(), $b->getRealpath());
                 $files->sort($sort);
 
                 foreach ($files as $file) {
@@ -297,9 +295,7 @@ class AssetGenerationHelper
         $files = new Finder();
         $files->files()->depth('0')->ignoreDotFiles(true)->name('*.'.$ext)->in($dir);
 
-        $sort = function (\SplFileInfo $a, \SplFileInfo $b): int {
-            return strnatcmp($a->getRealpath(), $b->getRealpath());
-        };
+        $sort = fn(\SplFileInfo $a, \SplFileInfo $b): int => strnatcmp($a->getRealpath(), $b->getRealpath());
         $files->sort($sort);
 
         foreach ($files as $file) {

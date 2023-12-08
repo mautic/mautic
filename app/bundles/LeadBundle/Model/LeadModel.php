@@ -1147,7 +1147,7 @@ class LeadModel extends FormModel
             $lead = $this->getEntity($fieldData['id']);
         }
 
-        $lead   = $lead ?? $this->checkForDuplicateContact($fieldData);
+        $lead ??= $this->checkForDuplicateContact($fieldData);
         $merged = (bool) $lead->getId();
 
         if (!empty($fields['dateAdded']) && !empty($data[$fields['dateAdded']])) {
@@ -1672,10 +1672,9 @@ class LeadModel extends FormModel
 
         // Remove companies that are not in the array of given companies
         $removeCompanies = $currentCompanies->reject(
-            function (array $company) use ($requestedCompanies) {
+            fn(array $company) =>
                 // Reject if the found company is still in the list of companies given
-                return $requestedCompanies->contains($company['company_id']);
-            }
+                $requestedCompanies->contains($company['company_id'])
         );
         if ($removeCompanies->count()) {
             $this->companyModel->removeLeadFromCompany($removeCompanies->keys()->toArray(), $lead);

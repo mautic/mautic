@@ -293,9 +293,7 @@ class TrackableModel extends AbstractCommonModel
         $content          = str_ireplace($firstPassSearch, $firstPassReplace, $content);
 
         // Sort longer to shorter strings to ensure that URLs that share the same base are appropriately replaced
-        uksort($this->contentReplacements['second_pass'], function ($a, $b): int {
-            return strlen($b) - strlen($a);
-        });
+        uksort($this->contentReplacements['second_pass'], fn($a, $b): int => strlen($b) - strlen($a));
 
         if ('html' == $type) {
             // For HTML, replace only the links; leaving the link text (if a URL) intact
@@ -773,9 +771,7 @@ class TrackableModel extends AbstractCommonModel
         // http_build_query likely encoded tokens so that has to be fixed so they get replaced
         $query = preg_replace_callback(
             '/%7B(\S+?)%7D/i',
-            function ($matches): string {
-                return urldecode($matches[0]);
-            },
+            fn($matches): string => urldecode($matches[0]),
             $query
         );
 

@@ -52,9 +52,7 @@ class SubmissionRepository extends CommonRepository
             $args['viewOnlyFields'] = ['button', 'freetext', 'freehtml', 'pagebreak', 'captcha'];
         }
         $viewOnlyFields = array_map(
-            function ($value): string {
-                return '"'.$value.'"';
-            },
+            fn($value): string => '"'.$value.'"',
             $args['viewOnlyFields']
         );
 

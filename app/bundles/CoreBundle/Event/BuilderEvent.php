@@ -101,12 +101,10 @@ class BuilderEvent extends Event
     {
         uasort(
             $this->abTestWinnerCriteria,
-            function ($a, $b): int {
-                return strnatcasecmp(
-                    $a['group'],
-                    $b['group']
-                );
-            }
+            fn($a, $b): int => strnatcasecmp(
+                $a['group'],
+                $b['group']
+            )
         );
         $array = ['criteria' => $this->abTestWinnerCriteria];
 
@@ -265,17 +263,13 @@ class BuilderEvent extends Event
             // Do a search against the label
             $tokens = array_filter(
                 $tokens,
-                function ($v) use ($filter): bool {
-                    return 0 === stripos($v, $filter);
-                }
+                fn($v): bool => 0 === stripos($v, $filter)
             );
         } else {
             // Do a search against the token
             $found = array_filter(
                 array_keys($tokens),
-                function ($k) use ($filter): bool {
-                    return 0 === stripos($k, $filter);
-                }
+                fn($k): bool => 0 === stripos($k, $filter)
             );
 
             $tokens = array_intersect_key($tokens, array_flip($found));

@@ -109,9 +109,7 @@ class DashboardModel extends FormModel
             'name'        => $name,
             'description' => $this->generateDescription(),
             'widgets'     => array_map(
-                function ($widget) {
-                    return $widget->toArray();
-                },
+                fn($widget) => $widget->toArray(),
                 $this->getWidgets(true)
             ),
         ];

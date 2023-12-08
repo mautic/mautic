@@ -93,9 +93,7 @@ class PluginController extends FormController
         // sort by name
         uksort(
             $integrations,
-            function ($a, $b): int {
-                return strnatcasecmp($a, $b);
-            }
+            fn($a, $b): int => strnatcasecmp($a, $b)
         );
 
         $tmpl = $request->isXmlHttpRequest() ? $request->get('tmpl', 'index') : 'index';

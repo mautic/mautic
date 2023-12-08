@@ -45,8 +45,6 @@ class HandlerContainer
      */
     public function getHandlers(): array
     {
-        return array_reduce($this->handlers, function ($accumulator, $integrationHandlers): array {
-            return array_merge($accumulator, $integrationHandlers);
-        }, []);
+        return array_reduce($this->handlers, fn($accumulator, $integrationHandlers): array => array_merge($accumulator, $integrationHandlers), []);
     }
 }

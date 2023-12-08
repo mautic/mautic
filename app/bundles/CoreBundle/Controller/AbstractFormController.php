@@ -241,7 +241,7 @@ abstract class AbstractFormController extends CommonController
         $routeCtrlr  = explode('\\', $actionRoute['_controller']);
 
         $defaultContentTemplate  = $routeCtrlr[0].$routeCtrlr[1].':'.ucfirst(str_replace('Bundle', '', $routeCtrlr[1])).':'.$objAction;
-        $vars['contentTemplate'] = $vars['contentTemplate'] ?? $defaultContentTemplate;
+        $vars['contentTemplate'] ??= $defaultContentTemplate;
 
         $vars['passthroughVars']['activeLink'] = '#'.str_replace('_action', '_'.$objAction, $actionRoute['_route']);
 

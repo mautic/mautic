@@ -424,9 +424,7 @@ namespace Mautic\CoreBundle\ErrorHandler {
                     // Renumber backtrace items.
                     $error['trace'] = preg_replace_callback(
                         '/^#(\d+)/m',
-                        function ($matches): string {
-                            return '#'.($matches[1] + 1).'&nbsp;&nbsp;';
-                        },
+                        fn($matches): string => '#'.($matches[1] + 1).'&nbsp;&nbsp;',
                         $error['trace']
                     );
                 }
@@ -507,9 +505,7 @@ namespace Mautic\CoreBundle\ErrorHandler {
                 $loader             = new \Twig\Loader\FilesystemLoader(['app/bundles/CoreBundle/Resources/views/Offline', 'app/bundles/CoreBundle/Resources/views/Exception']);
                 $twig               = new \Twig\Environment($loader);
                 // This is the same filter Located at Mautic\CoreBundle\Twig\Extension\ExceptionExtension;
-                $twig->addFunction(new \Twig\TwigFunction('getRootPath', function () {
-                    return realpath(__DIR__.'/../../../../');
-                }));
+                $twig->addFunction(new \Twig\TwigFunction('getRootPath', fn() => realpath(__DIR__.'/../../../../')));
 
                 if ($loader->exists('custom_offline.html.twig')) {
                     $content = $twig->render('custom_offline.html.twig', ['error' => $error]);

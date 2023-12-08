@@ -36,9 +36,7 @@ class TagType extends AbstractType
             [
                 'label'         => 'mautic.lead.tags',
                 'class'         => \Mautic\LeadBundle\Entity\Tag::class,
-                'query_builder' => function (EntityRepository $er) {
-                    return $er->createQueryBuilder('t')->orderBy('t.tag', \Doctrine\Common\Collections\Criteria::ASC);
-                },
+                'query_builder' => fn(EntityRepository $er) => $er->createQueryBuilder('t')->orderBy('t.tag', \Doctrine\Common\Collections\Criteria::ASC),
                 'choice_label'    => 'tag',
                 'multiple'        => true,
                 'required'        => false,

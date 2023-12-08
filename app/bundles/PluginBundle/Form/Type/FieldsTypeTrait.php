@@ -248,16 +248,10 @@ trait FieldsTypeTrait
                 },
                 'allow_extra_fields'   => true,
                 'enable_data_priority' => false,
-                'totalFields'          => function (Options $options): int {
-                    return count($options['integration_fields']);
-                },
-                'fixedPageNum' => function (Options $options): float {
-                    return ceil($options['totalFields'] / $options['limit']);
-                },
+                'totalFields'          => fn(Options $options): int => count($options['integration_fields']),
+                'fixedPageNum' => fn(Options $options): float => ceil($options['totalFields'] / $options['limit']),
                 'limit' => 10,
-                'start' => function (Options $options): int {
-                    return (1 === (int) $options['page']) ? 0 : ((int) $options['page'] - 1) * (int) $options['limit'];
-                },
+                'start' => fn(Options $options): int => (1 === (int) $options['page']) ? 0 : ((int) $options['page'] - 1) * (int) $options['limit'],
             ]
         );
     }
