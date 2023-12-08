@@ -58,6 +58,8 @@
   --timing: .3s ease;
     @media (prefers-reduced-motion: reduce) {
     --timing: linear;
+    --background-blur: none;
+    --background-inverse-transparent: var(--background-inverse);
     }
   --background: #ffffff;
   --background-hover: #8d8d8d1f;
@@ -66,7 +68,9 @@
   --background-selected-hover: #8d8d8d52;
   --background-inverse: #161616;
   --background-inverse-hover: #8d8d8d29;
+  --background-inverse-transparent: #000000e8;
   --background-brand: #3358FF;
+  --background-blur: blur(8px);
   --layer: #f4f4f4;
   --layer-alternate: #ffffff;
   --layer-hover: #e8e8e8;
@@ -216,13 +220,14 @@ body > #app-wrapper {
   -webkit-transition: all 0.3s ease;
   -o-transition: all 0.3s ease;
   transition: all 0.3s ease;
-  background-color: var(--background-inverse);
+  background-color: var(--background-inverse-transparent);
   float: left;
   z-index: 1005;
   height: 48px;
-  border-bottom: 1px solid var(--border-subtle);
+  border-bottom: 1px solid var(--border-inverse);
   border-radius: 0;
   margin-bottom: 0;
+  backdrop-filter: var(--background-blur);
 }
 .header-fixed #app-header.navbar {
   position: fixed;
@@ -509,7 +514,7 @@ body > #app-wrapper {
 .app-sidebar.sidebar-left {
   width: 230px;
   left: -230px;
-  background-color: var(--layer);
+
   box-shadow: inset -1px 0 0 0 rgba(0, 0, 0, 0.05);
   color: rgba(255, 255, 255, 0.55);
   -webkit-transition: all 0.3s ease;
@@ -547,6 +552,7 @@ body > #app-wrapper {
   color: var(--text-primary);
   display: flex;
   flex-grow: 1;
+  justify-content: space-between;
 }
 .app-sidebar.sidebar-left .nav-sidebar > .nav > li > a:hover,
 .app-sidebar.sidebar-left .nav-sidebar > .nav > li > a:focus {
@@ -590,7 +596,7 @@ body > #app-wrapper {
 }
 .app-sidebar.sidebar-left .nav.sidebar-left-dark,
 .app-sidebar.sidebar-left .nav.sidebar-left-dark > li > a:hover {
-  background: #0c0f12;
+  background: var(--layer);
 }
 .app-sidebar.sidebar-right {
   width: 230px;
@@ -605,7 +611,6 @@ body > #app-wrapper {
 .app-sidebar.sidebar-right .sidebar-header,
 .app-sidebar.sidebar-right .sidebar-footer {
   width: 230px;
-  background-color: #232b34;
 }
 .app-sidebar.sidebar-right .sidebar-content {
   padding-left: 1px;
@@ -730,7 +735,8 @@ body > #app-wrapper {
   -webkit-transition: all 0.15s ease;
   -o-transition: all 0.15s ease;
   transition: all 0.15s ease;
-  height: 48PX;
+  height: 48px;
+  justify-content: space-between;
 }
 .app-sidebar .nav-sidebar > .nav > li > a .text {
   -webkit-transition: opacity .3s ease .1s, margin-left 0s ease .2s;
@@ -747,6 +753,9 @@ body > #app-wrapper {
   font-size: 14px;
   min-width: 26px;
   display: block;
+  order: 2;
+  margin-left: 30px;
+
 }
 .app-sidebar .nav-sidebar > .nav > li > a .arrow {
   -webkit-transition: opacity .3s ease .1s, margin-left 0s ease .2s;
@@ -1746,6 +1755,7 @@ label.list-group-item:focus {
 }
 .dropdown-menu > li > a .fa {
   min-width: 15px;
+  margin-left: 30px;
 }
 .dropdown-menu > .active > a,
 .dropdown-menu > .active > a:hover,
