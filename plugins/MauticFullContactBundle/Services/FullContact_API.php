@@ -7,7 +7,7 @@ use MauticPlugin\MauticFullContactBundle\Exception\BaseException;
 
 class FullContact_API extends FullContact_Person
 {
-    public function __construct($api_key)
+    public function __construct(string $api_key)
     {
         parent::__construct($api_key);
         trigger_error('The FullContactAPI class has been deprecated. Please use FullContact instead.', E_USER_NOTICE);

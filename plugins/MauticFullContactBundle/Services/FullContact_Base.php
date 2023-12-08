@@ -22,8 +22,6 @@ class FullContact_Base
     protected $_baseUri     = 'https://api.fullcontact.com/';
     protected $_version     = 'v2';
     protected $_resourceUri = '';
-
-    protected $_apiKey;
     protected $_webhookUrl;
     protected $_webhookId;
     protected $_webhookJson      = false;
@@ -61,11 +59,10 @@ class FullContact_Base
      * The base constructor Sets the API key available from here:
      * http://fullcontact.com/getkey.
      *
-     * @param string $api_key
+     * @param string $_apiKey
      */
-    public function __construct($api_key)
+    public function __construct(protected $_apiKey)
     {
-        $this->_apiKey        = $api_key;
         $this->_next_req_time = new \DateTime('@0');
     }
 

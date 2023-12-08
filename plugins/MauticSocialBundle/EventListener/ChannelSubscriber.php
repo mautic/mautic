@@ -11,14 +11,8 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class ChannelSubscriber implements EventSubscriberInterface
 {
-    /**
-     * @var IntegrationHelper
-     */
-    private $helper;
-
-    public function __construct(IntegrationHelper $helper)
+    public function __construct(private IntegrationHelper $helper)
     {
-        $this->helper = $helper;
     }
 
     /**

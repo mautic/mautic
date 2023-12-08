@@ -13,21 +13,6 @@ use MauticPlugin\MauticCrmBundle\Integration\Salesforce\QueryBuilder;
 class Fetcher
 {
     /**
-     * @var IntegrationEntityRepository
-     */
-    private $repo;
-
-    /**
-     * @var Organizer
-     */
-    private $organizer;
-
-    /**
-     * @var string
-     */
-    private $campaignId;
-
-    /**
      * @var array
      */
     private $leads = [];
@@ -72,12 +57,8 @@ class Fetcher
      *
      * @param string $campaignId
      */
-    public function __construct(IntegrationEntityRepository $repo, Organizer $organizer, $campaignId)
+    public function __construct(private IntegrationEntityRepository $repo, private Organizer $organizer, private $campaignId)
     {
-        $this->repo       = $repo;
-        $this->organizer  = $organizer;
-        $this->campaignId = $campaignId;
-
         $this->fetchLeads();
         $this->fetchContacts();
     }

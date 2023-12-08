@@ -15,8 +15,6 @@ class Clearbit_Base
     protected $_baseUri     = '';
     protected $_resourceUri = '';
     protected $_version     = 'v2';
-
-    protected $_apiKey;
     protected $_webhookId;
 
     public $response_obj;
@@ -53,9 +51,8 @@ class Clearbit_Base
      *
      * @param string $api_key
      */
-    public function __construct($api_key)
+    public function __construct(protected $api_key)
     {
-        $this->_apiKey        = $api_key;
         $this->_next_req_time = new \DateTime('@0');
     }
 
@@ -92,7 +89,7 @@ class Clearbit_Base
         curl_setopt($connection, CURLOPT_RETURNTRANSFER, 1);
         curl_setopt($connection, CURLOPT_USERAGENT, self::USER_AGENT);
         curl_setopt($connection, CURLOPT_HEADER, 1); // return HTTP headers with response
-        curl_setopt($connection, CURLOPT_HTTPHEADER, ['Authorization: Bearer '.$this->_apiKey]);
+        curl_setopt($connection, CURLOPT_HTTPHEADER, ['Authorization: Bearer '.$this->api_key]);
 
         // execute request
         $resp = curl_exec($connection);
