@@ -24,9 +24,9 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class CampaignSubscriber implements EventSubscriberInterface
 {
-    private ?Event $pseudoEvent;
+    private ?Event $pseudoEvent = null;
 
-    private ?ArrayCollection $mmLogs;
+    private ?ArrayCollection $mmLogs = null;
 
     /**
      * @var mixed[]

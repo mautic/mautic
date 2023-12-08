@@ -53,7 +53,7 @@ trait RequestTrait
             if ($type instanceof ResolvedFormTypeInterface) {
                 $type = $type->getInnerType();
             }
-            switch (get_class($type)) {
+            switch ($type::class) {
                 case YesNoButtonGroupType::class:
                 case BooleanType::class:
                     if (!is_object($entity)) {
@@ -134,7 +134,7 @@ trait RequestTrait
                         break;
                     }
 
-                    switch (get_class($type)) {
+                    switch ($type::class) {
                         case DateTimeType::class:
                             $params[$name] = (new \DateTime(date('Y-m-d H:i:s', $timestamp)))->format('Y-m-d H:i');
                             break;

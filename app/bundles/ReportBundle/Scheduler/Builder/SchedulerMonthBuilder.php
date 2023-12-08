@@ -33,9 +33,7 @@ class SchedulerMonthBuilder implements BuilderInterface
             }
 
             $rule->setByDay($days);
-        } catch (InvalidArgument) {
-            throw new InvalidSchedulerException();
-        } catch (InvalidRRule) {
+        } catch (InvalidArgument|InvalidRRule) {
             throw new InvalidSchedulerException();
         }
 

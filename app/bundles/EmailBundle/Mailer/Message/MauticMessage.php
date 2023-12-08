@@ -13,7 +13,7 @@ class MauticMessage extends Email
      */
     protected $metadata = [];
 
-    protected ?string $leadIdHash;
+    protected ?string $leadIdHash = null;
 
     /**
      * @param array<string, string> $metadata

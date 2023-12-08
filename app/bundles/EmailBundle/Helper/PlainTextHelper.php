@@ -495,7 +495,7 @@ class PlainTextHelper
             }
         }
 
-        return implode($chunks);
+        return implode('', $chunks);
     }
 
     /**

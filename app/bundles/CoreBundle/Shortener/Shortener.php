@@ -21,7 +21,7 @@ class Shortener
 
     public function addService(ShortenerServiceInterface $shortener): void
     {
-        $this->services[get_class($shortener)] = $shortener;
+        $this->services[$shortener::class] = $shortener;
     }
 
     public function getService(): ShortenerServiceInterface

@@ -33,7 +33,7 @@ class RedisSentinelSessionHandler extends AbstractSessionHandler
 
     protected function doWrite(string $sessionId, string $data): bool
     {
-        $expireTime = isset($this->redisConfiguration['session_expire_time']) ? (int) $this->redisConfiguration['session_expire_time'] : 1209600;
+        $expireTime = isset($this->redisConfiguration['session_expire_time']) ? (int) $this->redisConfiguration['session_expire_time'] : 1_209_600;
         $result     = $this->redis->setEx($sessionId, $expireTime, $data);
 
         return $result && !$result instanceof ErrorInterface;
@@ -58,7 +58,7 @@ class RedisSentinelSessionHandler extends AbstractSessionHandler
 
     public function updateTimestamp($sessionId, $data): bool
     {
-        $expireTime = isset($this->redisConfiguration['session_expire_time']) ? (int) $this->redisConfiguration['session_expire_time'] : 1209600;
+        $expireTime = isset($this->redisConfiguration['session_expire_time']) ? (int) $this->redisConfiguration['session_expire_time'] : 1_209_600;
 
         return (bool) $this->redis->expire($sessionId, $expireTime);
     }

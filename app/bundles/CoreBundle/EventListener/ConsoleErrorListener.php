@@ -21,7 +21,7 @@ class ConsoleErrorListener
         // Log error with trace
         $message = sprintf(
             '%s: %s (uncaught exception) at %s line %s while running console command `%s`%s',
-            get_class($exception),
+            $exception::class,
             $exception->getMessage(),
             $exception->getFile(),
             $exception->getLine(),

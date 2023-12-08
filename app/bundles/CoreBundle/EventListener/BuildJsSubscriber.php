@@ -25,7 +25,7 @@ class BuildJsSubscriber implements EventSubscriberInterface
      */
     public function onBuildJs(BuildJsEvent $event): void
     {
-        $js = <<<'JS'
+        $js = <<<'JS_WRAP'
 // Polyfill for CustomEvent to support IE 9+
 (function () {
     if ( typeof window.CustomEvent === "function" ) return false;
@@ -388,7 +388,7 @@ MauticJS.ensureEventContext = function(event, context0, context1) {
         && event.detail[0] === context0
         && event.detail[1] === context1);
 };
-JS;
+JS_WRAP;
         $event->appendJs($js, 'Mautic Core');
     }
 }

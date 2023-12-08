@@ -440,7 +440,7 @@ class FormController extends CommonFormController
         }
 
         // fire the form builder event
-        $customComponents = $model->getCustomComponents($sessionId);
+        $customComponents = $model->getCustomComponents();
 
         return $this->delegateView(
             [
@@ -776,9 +776,7 @@ class FormController extends CommonFormController
             if (!empty($reorder)) {
                 uasort(
                     $modifiedFields,
-                    function ($a, $b): int {
-                        return $a['order'] <=> $b['order'];
-                    }
+                    fn ($a, $b): int => $a['order'] <=> $b['order']
                 );
             }
 
@@ -810,9 +808,7 @@ class FormController extends CommonFormController
             if (!empty($reorder)) {
                 uasort(
                     $modifiedActions,
-                    function ($a, $b): int {
-                        return $a['order'] <=> $b['order'];
-                    }
+                    fn ($a, $b): int => $a['order'] <=> $b['order']
                 );
             }
 

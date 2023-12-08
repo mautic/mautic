@@ -426,7 +426,7 @@ class DashboardController extends AbstractFormController
 
             $filter = $model->getDefaultFilter();
             foreach ($widgets as $widget) {
-                $widget = $model->populateWidgetEntity($widget, $filter);
+                $widget = $model->populateWidgetEntity($widget);
                 $model->saveEntity($widget);
             }
         }
