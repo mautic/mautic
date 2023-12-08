@@ -3,7 +3,6 @@
 namespace MauticPlugin\MauticSocialBundle\Form\Type;
 
 use Mautic\LeadBundle\Field\FieldList;
-use Mautic\LeadBundle\Model\FieldModel;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\FormBuilderInterface;

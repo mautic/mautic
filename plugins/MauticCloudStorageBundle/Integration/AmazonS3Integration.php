@@ -11,7 +11,6 @@ use MauticPlugin\MauticCloudStorageBundle\Exception\NoFormNeededException;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\Form;
 use Symfony\Component\Form\FormBuilder;
-use Symfony\Component\Form\FormInterface;
 
 class AmazonS3Integration extends CloudStorageIntegration
 {

@@ -7,7 +7,7 @@ use Mautic\PluginBundle\Exception\ApiErrorException;
 use MauticPlugin\MauticCrmBundle\Integration\HubspotIntegration;
 
 /**
- * @property-read HubspotIntegration $integration
+ * @property HubspotIntegration $integration
  */
 class HubspotApi extends CrmApi
 {

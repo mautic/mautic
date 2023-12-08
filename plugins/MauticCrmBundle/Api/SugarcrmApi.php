@@ -6,7 +6,7 @@ use Mautic\PluginBundle\Exception\ApiErrorException;
 use MauticPlugin\MauticCrmBundle\Integration\SugarcrmIntegration;
 
 /**
- * @property-read SugarcrmIntegration $integration
+ * @property SugarcrmIntegration $integration
  */
 class SugarcrmApi extends CrmApi
 {
