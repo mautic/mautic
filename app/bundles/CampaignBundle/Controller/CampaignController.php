@@ -84,17 +84,11 @@ class CampaignController extends AbstractStandardFormController
 
     protected $sessionId;
 
-    private RequestStack $requestStack;
-
-    private EventCollector $eventCollector;
-
-    private DateHelper $dateHelper;
-
     public function __construct(
         FormFactoryInterface $formFactory,
         FormFieldHelper $fieldHelper,
-        EventCollector $eventCollector,
-        DateHelper $dateHelper,
+        private EventCollector $eventCollector,
+        private DateHelper $dateHelper,
         ManagerRegistry $managerRegistry,
         MauticFactory $factory,
         ModelFactory $modelFactory,
@@ -103,13 +97,9 @@ class CampaignController extends AbstractStandardFormController
         EventDispatcherInterface $dispatcher,
         Translator $translator,
         FlashBag $flashBag,
-        RequestStack $requestStack,
+        private RequestStack $requestStack,
         CorePermissions $security
     ) {
-        $this->requestStack   = $requestStack;
-        $this->eventCollector = $eventCollector;
-        $this->dateHelper     = $dateHelper;
-
         parent::__construct($formFactory, $fieldHelper, $managerRegistry, $factory, $modelFactory, $userHelper, $coreParametersHelper, $dispatcher, $translator, $flashBag, $requestStack, $security);
     }
 
@@ -813,18 +803,15 @@ class CampaignController extends AbstractStandardFormController
         );
     }
 
-    /**
-     * @return string
-     */
-    protected function getModelName()
+    protected function getModelName(): string
     {
         return 'campaign';
     }
 
     /**
-     * @return array
+     * @return mixed[]
      */
-    protected function getPostActionRedirectArguments(array $args, $action)
+    protected function getPostActionRedirectArguments(array $args, $action): array
     {
         switch ($action) {
             case 'new':

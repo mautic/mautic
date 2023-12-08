@@ -10,11 +10,8 @@ use Twig\TwigFunction;
 
 class AssetExtension extends AbstractExtension
 {
-    protected \Mautic\CoreBundle\Twig\Helper\AssetsHelper $assetsHelper;
-
-    public function __construct(AssetsHelper $assetsHelper)
+    public function __construct(protected AssetsHelper $assetsHelper)
     {
-        $this->assetsHelper = $assetsHelper;
     }
 
     /**

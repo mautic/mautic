@@ -10,11 +10,6 @@ class Installer
     /**
      * @var string
      */
-    private $translationsDirectory;
-
-    /**
-     * @var string
-     */
     private $sourceDirectory;
 
     /**
@@ -29,9 +24,8 @@ class Installer
      *
      * @param string $translationsDirectory
      */
-    public function __construct($translationsDirectory)
+    public function __construct(private $translationsDirectory)
     {
-        $this->translationsDirectory = $translationsDirectory;
         $this->filesystem            = new Filesystem();
     }
 
@@ -53,7 +47,7 @@ class Installer
         return $this;
     }
 
-    public function cleanup()
+    public function cleanup(): void
     {
         if (!$this->sourceDirectory) {
             return;
@@ -66,7 +60,7 @@ class Installer
         $this->installDirectory = null;
     }
 
-    private function createLanguageDirectory()
+    private function createLanguageDirectory(): void
     {
         if (is_dir($this->installDirectory)) {
             return;
@@ -75,12 +69,12 @@ class Installer
         $this->filesystem->mkdir($this->installDirectory, 0755);
     }
 
-    private function copyConfig()
+    private function copyConfig(): void
     {
         $this->filesystem->copy($this->sourceDirectory.'/config.json', $this->installDirectory.'/config.json', true);
     }
 
-    private function copyBundles()
+    private function copyBundles(): void
     {
         $bundles = new Finder();
         $bundles->directories()->name('*Bundle')->in($this->sourceDirectory);
@@ -91,7 +85,7 @@ class Installer
         }
     }
 
-    private function copyBundle(\SplFileInfo $bundle)
+    private function copyBundle(\SplFileInfo $bundle): void
     {
         $name            = $bundle->getFilename();
         $targetDirectory = $this->installDirectory.'/'.$name;

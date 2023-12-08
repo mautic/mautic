@@ -28,48 +28,8 @@ class DynamicContentSubscriber implements EventSubscriberInterface
 {
     use MatchFilterForLeadTrait;
 
-    private \Mautic\PageBundle\Model\TrackableModel $trackableModel;
-
-    private PageTokenHelper $pageTokenHelper;
-
-    private AssetTokenHelper $assetTokenHelper;
-
-    private FormTokenHelper $formTokenHelper;
-
-    private FocusTokenHelper $focusTokenHelper;
-
-    private \Mautic\CoreBundle\Model\AuditLogModel $auditLogModel;
-
-    private \Mautic\DynamicContentBundle\Helper\DynamicContentHelper $dynamicContentHelper;
-
-    private \Mautic\DynamicContentBundle\Model\DynamicContentModel $dynamicContentModel;
-
-    private \Mautic\CoreBundle\Security\Permissions\CorePermissions $security;
-
-    private \Mautic\LeadBundle\Tracker\ContactTracker $contactTracker;
-
-    public function __construct(
-        TrackableModel $trackableModel,
-        PageTokenHelper $pageTokenHelper,
-        AssetTokenHelper $assetTokenHelper,
-        FormTokenHelper $formTokenHelper,
-        FocusTokenHelper $focusTokenHelper,
-        AuditLogModel $auditLogModel,
-        DynamicContentHelper $dynamicContentHelper,
-        DynamicContentModel $dynamicContentModel,
-        CorePermissions $security,
-        ContactTracker $contactTracker
-    ) {
-        $this->trackableModel       = $trackableModel;
-        $this->pageTokenHelper      = $pageTokenHelper;
-        $this->assetTokenHelper     = $assetTokenHelper;
-        $this->formTokenHelper      = $formTokenHelper;
-        $this->focusTokenHelper     = $focusTokenHelper;
-        $this->auditLogModel        = $auditLogModel;
-        $this->dynamicContentHelper = $dynamicContentHelper;
-        $this->dynamicContentModel  = $dynamicContentModel;
-        $this->security             = $security;
-        $this->contactTracker       = $contactTracker;
+    public function __construct(private TrackableModel $trackableModel, private PageTokenHelper $pageTokenHelper, private AssetTokenHelper $assetTokenHelper, private FormTokenHelper $formTokenHelper, private FocusTokenHelper $focusTokenHelper, private AuditLogModel $auditLogModel, private DynamicContentHelper $dynamicContentHelper, private DynamicContentModel $dynamicContentModel, private CorePermissions $security, private ContactTracker $contactTracker)
+    {
     }
 
     /**
@@ -88,7 +48,7 @@ class DynamicContentSubscriber implements EventSubscriberInterface
     /**
      * Add an entry to the audit log.
      */
-    public function onPostSave(Events\DynamicContentEvent $event)
+    public function onPostSave(Events\DynamicContentEvent $event): void
     {
         $entity = $event->getDynamicContent();
         if ($details = $event->getChanges()) {
@@ -106,7 +66,7 @@ class DynamicContentSubscriber implements EventSubscriberInterface
     /**
      * Add a delete entry to the audit log.
      */
-    public function onDelete(Events\DynamicContentEvent $event)
+    public function onDelete(Events\DynamicContentEvent $event): void
     {
         $entity = $event->getDynamicContent();
         $log    = [
@@ -119,7 +79,7 @@ class DynamicContentSubscriber implements EventSubscriberInterface
         $this->auditLogModel->writeToLog($log);
     }
 
-    public function onTokenReplacement(MauticEvents\TokenReplacementEvent $event)
+    public function onTokenReplacement(MauticEvents\TokenReplacementEvent $event): void
     {
         /** @var Lead $lead */
         $lead         = $event->getLead();
@@ -135,7 +95,7 @@ class DynamicContentSubscriber implements EventSubscriberInterface
                 $this->focusTokenHelper->findFocusTokens($content)
             );
 
-            list($content, $trackables) = $this->trackableModel->parseContentForTrackables(
+            [$content, $trackables] = $this->trackableModel->parseContentForTrackables(
                 $content,
                 $tokens,
                 'dynamicContent',
@@ -162,7 +122,7 @@ class DynamicContentSubscriber implements EventSubscriberInterface
         }
     }
 
-    public function decodeTokens(PageDisplayEvent $event)
+    public function decodeTokens(PageDisplayEvent $event): void
     {
         $lead = $this->security->isAnonymous() ? $this->contactTracker->getContact() : null;
         if (!$lead) {

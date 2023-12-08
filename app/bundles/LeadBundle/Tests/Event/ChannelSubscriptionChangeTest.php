@@ -37,7 +37,7 @@ class ChannelSubscriptionChangeTest extends \PHPUnit\Framework\TestCase
         $channel   = 'email';
         $oldStatus = DoNotContact::IS_CONTACTABLE;
 
-        $event = new ChannelSubscriptionChange($lead, $channel, $oldStatus, 'foobar');
+        $event = new ChannelSubscriptionChange($lead, $channel, $oldStatus, 456);
 
         $this->assertEquals('unsubscribed', $event->getNewStatusVerb());
     }

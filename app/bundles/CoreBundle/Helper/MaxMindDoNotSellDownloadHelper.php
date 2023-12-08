@@ -18,27 +18,18 @@ class MaxMindDoNotSellDownloadHelper
      */
     private $auth;
 
-    private \Psr\Log\LoggerInterface $logger;
-
-    private \Symfony\Contracts\HttpClient\HttpClientInterface $httpClient;
-
     /**
      * @var string
      */
     private $listPath;
 
-    public function __construct($auth, LoggerInterface $logger, HttpClientInterface $httpClient, CoreParametersHelper $coreParametersHelper)
+    public function __construct($auth, private LoggerInterface $logger, private HttpClientInterface $httpClient, CoreParametersHelper $coreParametersHelper)
     {
-        $this->logger     = $logger;
         $this->auth       = explode(':', (string) $auth, 2);
-        $this->httpClient = $httpClient;
         $this->listPath   = $coreParametersHelper->get('maxmind_do_not_sell_list_path') ?? '';
     }
 
-    /**
-     * @return bool
-     */
-    public function downloadRemoteDataStore()
+    public function downloadRemoteDataStore(): bool
     {
         if (empty($this->getUser()) || empty($this->getPassword())) {
             $this->logger->error('Missing user ID or license key for MaxMind');
@@ -118,10 +109,8 @@ class MaxMindDoNotSellDownloadHelper
 
     /**
      * @param int $position
-     *
-     * @return string
      */
-    private function getAuthPart($position)
+    private function getAuthPart($position): string
     {
         if (array_key_exists($position, $this->auth)) {
             return $this->auth[$position];

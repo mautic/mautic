@@ -13,24 +13,8 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class SegmentSubscriber implements EventSubscriberInterface
 {
-    private \Mautic\CoreBundle\Helper\IpLookupHelper $ipLookupHelper;
-
-    private \Mautic\CoreBundle\Model\AuditLogModel $auditLogModel;
-
-    private \Symfony\Contracts\Translation\TranslatorInterface $translator;
-
-    private \Mautic\LeadBundle\Model\ListModel $listModel;
-
-    public function __construct(
-        IpLookupHelper $ipLookupHelper,
-        AuditLogModel $auditLogModel,
-        ListModel $listModel,
-        TranslatorInterface $translator
-    ) {
-        $this->ipLookupHelper    = $ipLookupHelper;
-        $this->auditLogModel     = $auditLogModel;
-        $this->listModel         = $listModel;
-        $this->translator        = $translator;
+    public function __construct(private IpLookupHelper $ipLookupHelper, private AuditLogModel $auditLogModel, private ListModel $listModel, private TranslatorInterface $translator)
+    {
     }
 
     /**
@@ -48,7 +32,7 @@ class SegmentSubscriber implements EventSubscriberInterface
     /**
      * Add a segment entry to the audit log.
      */
-    public function onSegmentPostSave(SegmentEvent $event)
+    public function onSegmentPostSave(SegmentEvent $event): void
     {
         $segment = $event->getList();
         if ($details = $event->getChanges()) {
@@ -79,7 +63,7 @@ class SegmentSubscriber implements EventSubscriberInterface
     /**
      * Add a segment delete entry to the audit log.
      */
-    public function onSegmentDelete(SegmentEvent $event)
+    public function onSegmentDelete(SegmentEvent $event): void
     {
         $segment = $event->getList();
         $log     = [

@@ -72,7 +72,7 @@ class Client extends BaseClient
         $this->authCodes = new ArrayCollection();
     }
 
-    public static function loadMetadata(ORM\ClassMetadata $metadata)
+    public static function loadMetadata(ORM\ClassMetadata $metadata): void
     {
         $builder = new ClassMetadataBuilder($metadata);
 
@@ -103,13 +103,13 @@ class Client extends BaseClient
             ->columnName('allowed_grant_types')
             ->build();
 
-        $builder->createManyToOne('role', 'Mautic\UserBundle\Entity\Role')
+        $builder->createManyToOne('role', \Mautic\UserBundle\Entity\Role::class)
             ->addJoinColumn('role_id', 'id', true, false)
             ->cascadePersist()
             ->build();
     }
 
-    public static function loadValidatorMetadata(ClassMetadata $metadata)
+    public static function loadValidatorMetadata(ClassMetadata $metadata): void
     {
         $metadata->addPropertyConstraint('name', new Assert\NotBlank(
             ['message' => 'mautic.core.name.required']
@@ -175,7 +175,7 @@ class Client extends BaseClient
     /**
      * {@inheritdoc}
      */
-    public function setRedirectUris(array $redirectUris)
+    public function setRedirectUris(array $redirectUris): void
     {
         $this->isChanged('redirectUris', $redirectUris);
 
@@ -192,7 +192,7 @@ class Client extends BaseClient
         return $this;
     }
 
-    public function removeAuthCode(AuthCode $authCodes)
+    public function removeAuthCode(AuthCode $authCodes): void
     {
         $this->authCodes->removeElement($authCodes);
     }
@@ -227,7 +227,7 @@ class Client extends BaseClient
         return $this;
     }
 
-    public function removeUser(User $users)
+    public function removeUser(User $users): void
     {
         $this->users->removeElement($users);
     }

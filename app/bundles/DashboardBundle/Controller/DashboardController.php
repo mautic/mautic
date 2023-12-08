@@ -505,15 +505,15 @@ class DashboardController extends AbstractFormController
                 // Check for name, description, etc
                 $tempDashboard[$dashboard] = [
                     'type'        => $type,
-                    'name'        => (isset($config['name'])) ? $config['name'] : $dashboard,
-                    'description' => (isset($config['description'])) ? $config['description'] : '',
-                    'widgets'     => (isset($config['widgets'])) ? $config['widgets'] : $config,
+                    'name'        => $config['name'] ?? $dashboard,
+                    'description' => $config['description'] ?? '',
+                    'widgets'     => $config['widgets'] ?? $config,
                 ];
             }
 
             // Sort by name
             uasort($tempDashboard,
-                function ($a, $b) {
+                function ($a, $b): int {
                     return strnatcasecmp($a['name'], $b['name']);
                 }
             );

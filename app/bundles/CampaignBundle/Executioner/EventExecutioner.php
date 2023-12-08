@@ -24,52 +24,24 @@ use Psr\Log\LoggerInterface;
 
 class EventExecutioner
 {
-    private \Mautic\CampaignBundle\Executioner\Event\ActionExecutioner $actionExecutioner;
-
-    private \Mautic\CampaignBundle\Executioner\Event\ConditionExecutioner $conditionExecutioner;
-
-    private \Mautic\CampaignBundle\Executioner\Event\DecisionExecutioner $decisionExecutioner;
-
-    private \Mautic\CampaignBundle\EventCollector\EventCollector $collector;
-
-    private \Mautic\CampaignBundle\Executioner\Logger\EventLogger $eventLogger;
-
-    private \Psr\Log\LoggerInterface $logger;
-
-    private \Mautic\CampaignBundle\Executioner\Scheduler\EventScheduler $scheduler;
-
     /**
      * @var Responses
      */
     private $responses;
 
-    private \Mautic\CampaignBundle\Helper\RemovedContactTracker $removedContactTracker;
-
     private \DateTimeInterface $executionDate;
 
-    private \Mautic\CampaignBundle\Entity\LeadRepository $leadRepository;
-
     public function __construct(
-        EventCollector $eventCollector,
-        EventLogger $eventLogger,
-        ActionExecutioner $actionExecutioner,
-        ConditionExecutioner $conditionExecutioner,
-        DecisionExecutioner $decisionExecutioner,
-        LoggerInterface $logger,
-        EventScheduler $scheduler,
-        RemovedContactTracker $removedContactTracker,
-        LeadRepository $leadRepository
+        private EventCollector $collector,
+        private EventLogger $eventLogger,
+        private ActionExecutioner $actionExecutioner,
+        private ConditionExecutioner $conditionExecutioner,
+        private DecisionExecutioner $decisionExecutioner,
+        private LoggerInterface $logger,
+        private EventScheduler $scheduler,
+        private RemovedContactTracker $removedContactTracker,
+        private LeadRepository $leadRepository
     ) {
-        $this->actionExecutioner     = $actionExecutioner;
-        $this->conditionExecutioner  = $conditionExecutioner;
-        $this->decisionExecutioner   = $decisionExecutioner;
-        $this->collector             = $eventCollector;
-        $this->eventLogger           = $eventLogger;
-        $this->logger                = $logger;
-        $this->scheduler             = $scheduler;
-        $this->removedContactTracker = $removedContactTracker;
-        $this->leadRepository        = $leadRepository;
-
         // Be sure that all events are compared using the exact same \DateTime
         $this->executionDate = new \DateTime();
     }
@@ -80,7 +52,7 @@ class EventExecutioner
      * @throws Exception\CannotProcessEventException
      * @throws Scheduler\Exception\NotSchedulableException
      */
-    public function executeForContact(Event $event, Lead $contact, Responses $responses = null, Counter $counter = null)
+    public function executeForContact(Event $event, Lead $contact, Responses $responses = null, Counter $counter = null): void
     {
         if ($responses) {
             $this->responses = $responses;
@@ -97,7 +69,7 @@ class EventExecutioner
      * @throws Exception\CannotProcessEventException
      * @throws Scheduler\Exception\NotSchedulableException
      */
-    public function executeEventsForContact(ArrayCollection $events, Lead $contact, Responses $responses = null, Counter $counter = null)
+    public function executeEventsForContact(ArrayCollection $events, Lead $contact, Responses $responses = null, Counter $counter = null): void
     {
         if ($responses) {
             $this->responses = $responses;
@@ -112,14 +84,12 @@ class EventExecutioner
      * @param ArrayCollection<int,Lead> $contacts
      * @param bool                      $isInactiveEvent
      *
-     * @return void
-     *
      * @throws Dispatcher\Exception\LogNotProcessedException
      * @throws Dispatcher\Exception\LogPassedAndFailedException
      * @throws Exception\CannotProcessEventException
      * @throws Scheduler\Exception\NotSchedulableException
      */
-    public function executeForContacts(Event $event, ArrayCollection $contacts, Counter $counter = null, $isInactiveEvent = false)
+    public function executeForContacts(Event $event, ArrayCollection $contacts, Counter $counter = null, $isInactiveEvent = false): void
     {
         if (!$contacts->count()) {
             $this->logger->debug('CAMPAIGN: No contacts to process for event ID '.$event->getId());
@@ -187,7 +157,7 @@ class EventExecutioner
      * @throws Exception\CannotProcessEventException
      * @throws Scheduler\Exception\NotSchedulableException
      */
-    public function executeEventsForContacts(ArrayCollection $events, ArrayCollection $contacts, Counter $childrenCounter = null, $isInactive = false)
+    public function executeEventsForContacts(ArrayCollection $events, ArrayCollection $contacts, Counter $childrenCounter = null, $isInactive = false): void
     {
         if (!$contacts->count()) {
             return;
@@ -236,7 +206,7 @@ class EventExecutioner
     /**
      * @param bool $isInactiveEvent
      */
-    public function recordLogsAsExecutedForEvent(Event $event, ArrayCollection $contacts, $isInactiveEvent = false)
+    public function recordLogsAsExecutedForEvent(Event $event, ArrayCollection $contacts, $isInactiveEvent = false): void
     {
         $config = $this->collector->getEventConfig($event);
         $logs   = $this->eventLogger->generateLogsFromContacts($event, $config, $contacts, $isInactiveEvent);
@@ -249,7 +219,7 @@ class EventExecutioner
     /**
      * @param bool $isInactiveEvent
      */
-    public function recordLogsAsFailedForEvent(Event $event, ArrayCollection $contacts, $reason, $isInactiveEvent = false)
+    public function recordLogsAsFailedForEvent(Event $event, ArrayCollection $contacts, $reason, $isInactiveEvent = false): void
     {
         $config = $this->collector->getEventConfig($event);
         $logs   = $this->eventLogger->generateLogsFromContacts($event, $config, $contacts, $isInactiveEvent);
@@ -269,7 +239,7 @@ class EventExecutioner
      * @param ArrayCollection|LeadEventLog[] $logs
      * @param string                         $error
      */
-    public function recordLogsWithError(ArrayCollection $logs, $error)
+    public function recordLogsWithError(ArrayCollection $logs, $error): void
     {
         foreach ($logs as $log) {
             $log->appendToMetadata(
@@ -337,7 +307,7 @@ class EventExecutioner
         return $events;
     }
 
-    private function persistLogs(ArrayCollection $logs)
+    private function persistLogs(ArrayCollection $logs): void
     {
         if ($this->responses) {
             // Extract responses
@@ -351,7 +321,7 @@ class EventExecutioner
             ->clearCollection($logs);
     }
 
-    private function checkForRemovedContacts(ArrayCollection $logs)
+    private function checkForRemovedContacts(ArrayCollection $logs): void
     {
         /**
          * @var int          $key
@@ -379,7 +349,7 @@ class EventExecutioner
      * @throws \Mautic\CampaignBundle\Executioner\Exception\CannotProcessEventException
      * @throws \Mautic\CampaignBundle\Executioner\Scheduler\Exception\NotSchedulableException
      */
-    private function executeActionEventsForContacts(Event $event, ArrayCollection $contacts, Counter $counter = null)
+    private function executeActionEventsForContacts(Event $event, ArrayCollection $contacts, Counter $counter = null): void
     {
         $childrenCounter = new Counter();
         $actions         = $event->getChildrenByEventType(Event::TYPE_ACTION);
@@ -401,7 +371,7 @@ class EventExecutioner
      * @throws \Mautic\CampaignBundle\Executioner\Exception\CannotProcessEventException
      * @throws \Mautic\CampaignBundle\Executioner\Scheduler\Exception\NotSchedulableException
      */
-    private function executeConditionEventsForContacts(Event $event, ArrayCollection $contacts, Counter $counter = null)
+    private function executeConditionEventsForContacts(Event $event, ArrayCollection $contacts, Counter $counter = null): void
     {
         $childrenCounter = new Counter();
         $conditions      = $event->getChildrenByEventType(Event::TYPE_CONDITION);
@@ -423,7 +393,7 @@ class EventExecutioner
      * @throws Exception\CannotProcessEventException
      * @throws Scheduler\Exception\NotSchedulableException
      */
-    private function executeBranchedEventsForContacts(Event $event, EvaluatedContacts $contacts, Counter $counter = null)
+    private function executeBranchedEventsForContacts(Event $event, EvaluatedContacts $contacts, Counter $counter = null): void
     {
         $childrenCounter = new Counter();
         $this->executePositivePathEventsForContacts($event, $contacts->getPassed(), $childrenCounter);
@@ -443,7 +413,7 @@ class EventExecutioner
      * @throws Exception\CannotProcessEventException
      * @throws Scheduler\Exception\NotSchedulableException
      */
-    private function executePositivePathEventsForContacts(Event $event, ArrayCollection $contacts, Counter $counter)
+    private function executePositivePathEventsForContacts(Event $event, ArrayCollection $contacts, Counter $counter): void
     {
         if (!$contacts->count()) {
             return;
@@ -465,7 +435,7 @@ class EventExecutioner
      * @throws Exception\CannotProcessEventException
      * @throws Scheduler\Exception\NotSchedulableException
      */
-    private function executeNegativePathEventsForContacts(Event $event, ArrayCollection $contacts, Counter $counter)
+    private function executeNegativePathEventsForContacts(Event $event, ArrayCollection $contacts, Counter $counter): void
     {
         if (!$contacts->count()) {
             return;

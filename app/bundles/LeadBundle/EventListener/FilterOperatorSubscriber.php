@@ -19,28 +19,8 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 final class FilterOperatorSubscriber implements EventSubscriberInterface
 {
-    private OperatorOptions $operatorOptions;
-
-    private LeadFieldRepository $leadFieldRepository;
-
-    private TypeOperatorProviderInterface $typeOperatorProvider;
-
-    private FieldChoicesProviderInterface $fieldChoicesProvider;
-
-    private TranslatorInterface $translator;
-
-    public function __construct(
-        OperatorOptions $operatorOptions,
-        LeadFieldRepository $leadFieldRepository,
-        TypeOperatorProviderInterface $typeOperatorProvider,
-        FieldChoicesProviderInterface $fieldChoicesProvider,
-        TranslatorInterface $translator
-    ) {
-        $this->operatorOptions      = $operatorOptions;
-        $this->leadFieldRepository  = $leadFieldRepository;
-        $this->typeOperatorProvider = $typeOperatorProvider;
-        $this->fieldChoicesProvider = $fieldChoicesProvider;
-        $this->translator           = $translator;
+    public function __construct(private OperatorOptions $operatorOptions, private LeadFieldRepository $leadFieldRepository, private TypeOperatorProviderInterface $typeOperatorProvider, private FieldChoicesProviderInterface $fieldChoicesProvider, private TranslatorInterface $translator)
+    {
     }
 
     public static function getSubscribedEvents(): array
@@ -64,7 +44,7 @@ final class FilterOperatorSubscriber implements EventSubscriberInterface
 
     public function onGenerateSegmentFiltersAddCustomFields(LeadListFiltersChoicesEvent $event): void
     {
-        $this->leadFieldRepository->getListablePublishedFields()->map(function (LeadField $field) use ($event) {
+        $this->leadFieldRepository->getListablePublishedFields()->map(function (LeadField $field) use ($event): void {
             $type               = $field->getType();
             $properties         = $field->getProperties();
             $properties['type'] = $type;
@@ -79,7 +59,7 @@ final class FilterOperatorSubscriber implements EventSubscriberInterface
             } else {
                 try {
                     $properties['list'] = $this->fieldChoicesProvider->getChoicesForField($type, $field->getAlias());
-                } catch (ChoicesNotFoundException $e) {
+                } catch (ChoicesNotFoundException) {
                     // That's fine. Not all fields should have choices.
                 }
             }

@@ -8,17 +8,14 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class CampaignEventLeadTagsType extends AbstractType
 {
-    private \Symfony\Contracts\Translation\TranslatorInterface $translator;
-
-    public function __construct(TranslatorInterface $translator)
+    public function __construct(private TranslatorInterface $translator)
     {
-        $this->translator = $translator;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder->add(
             'tags',

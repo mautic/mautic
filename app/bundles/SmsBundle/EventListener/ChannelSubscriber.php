@@ -13,11 +13,8 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class ChannelSubscriber implements EventSubscriberInterface
 {
-    private \Mautic\SmsBundle\Sms\TransportChain $transportChain;
-
-    public function __construct(TransportChain $transportChain)
+    public function __construct(private TransportChain $transportChain)
     {
-        $this->transportChain = $transportChain;
     }
 
     /**

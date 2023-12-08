@@ -41,7 +41,7 @@ class FocusShowType extends AbstractType
                         ['message' => 'mautic.focus.choosefocus.notblank']
                     ),
                 ],
-                'data' => isset($options['data']['focus']) ? $options['data']['focus'] : null,
+                'data' => $options['data']['focus'] ?? null,
             ]
         );
 

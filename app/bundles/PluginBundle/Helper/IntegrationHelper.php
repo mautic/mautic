@@ -18,20 +18,6 @@ use Twig\Environment;
 
 class IntegrationHelper
 {
-    private \Symfony\Component\DependencyInjection\ContainerInterface $container;
-
-    protected \Doctrine\ORM\EntityManager $em;
-
-    protected \Mautic\CoreBundle\Helper\PathsHelper $pathsHelper;
-
-    protected \Mautic\CoreBundle\Helper\BundleHelper $bundleHelper;
-
-    protected \Mautic\CoreBundle\Helper\CoreParametersHelper $coreParametersHelper;
-
-    protected \Twig\Environment $twig;
-
-    protected \Mautic\PluginBundle\Model\PluginModel $pluginModel;
-
     private $integrations = [];
 
     private $available = [];
@@ -40,22 +26,8 @@ class IntegrationHelper
 
     private $byPlugin = [];
 
-    public function __construct(
-        ContainerInterface $container,
-        EntityManager $em,
-        PathsHelper $pathsHelper,
-        BundleHelper $bundleHelper,
-        CoreParametersHelper $coreParametersHelper,
-        Environment $twig,
-        PluginModel $pluginModel
-    ) {
-        $this->container            = $container;
-        $this->em                   = $em;
-        $this->pathsHelper          = $pathsHelper;
-        $this->bundleHelper         = $bundleHelper;
-        $this->pluginModel          = $pluginModel;
-        $this->coreParametersHelper = $coreParametersHelper;
-        $this->twig                 = $twig;
+    public function __construct(private ContainerInterface $container, protected EntityManager $em, protected PathsHelper $pathsHelper, protected BundleHelper $bundleHelper, protected CoreParametersHelper $coreParametersHelper, protected Environment $twig, protected PluginModel $pluginModel)
+    {
     }
 
     /**
@@ -165,7 +137,7 @@ class IntegrationHelper
             foreach ($this->bundleHelper->getMauticBundles() as $coreBundle) {
                 if (
                     // Skip plugin bundles
-                    false !== strpos($coreBundle['relative'], 'app/bundles')
+                    str_contains($coreBundle['relative'], 'app/bundles')
                     // Skip core bundles without an Integration directory
                     && is_dir($coreBundle['directory'].'/Integration')
                 ) {
@@ -200,7 +172,7 @@ class IntegrationHelper
                         }
 
                         /** @var \Mautic\PluginBundle\Entity\Integration $settings */
-                        $settings                          = isset($coreIntegrationSettings[$integrationName]) ? $coreIntegrationSettings[$integrationName] : $newIntegration;
+                        $settings                          = $coreIntegrationSettings[$integrationName] ?? $newIntegration;
                         $this->available[$integrationName] = [
                             'isPlugin'    => false,
                             'integration' => $integrationName,
@@ -282,7 +254,7 @@ class IntegrationHelper
 
         if (empty($alphabetical)) {
             // Sort by priority
-            uasort($returnServices, function ($a, $b) {
+            uasort($returnServices, function ($a, $b): int {
                 $aP = (int) $a->getPriority();
                 $bP = (int) $b->getPriority();
 
@@ -294,7 +266,7 @@ class IntegrationHelper
             });
         } else {
             // Sort by display name
-            uasort($returnServices, function ($a, $b) {
+            uasort($returnServices, function ($a, $b): int {
                 $aName = $a->getDisplayName();
                 $bName = $b->getDisplayName();
 
@@ -314,15 +286,13 @@ class IntegrationHelper
     {
         $integrationObjects = $this->getIntegrationObjects($name);
 
-        return (isset($integrationObjects[$name])) ? $integrationObjects[$name] : false;
+        return $integrationObjects[$name] ?? false;
     }
 
     /**
      * Gets a count of integrations.
-     *
-     * @return int
      */
-    public function getIntegrationCount($plugin)
+    public function getIntegrationCount($plugin): int
     {
         if (!is_array($plugin)) {
             $plugins = $this->coreParametersHelper->get('plugin.bundles');
@@ -529,7 +499,7 @@ class IntegrationHelper
                 $featureSettings = $settings->getFeatureSettings();
                 $apiKeys         = $details->decryptApiKeys($settings->getApiKeys());
                 $plugin          = $settings->getPlugin();
-                $shareSettings   = isset($featureSettings['shareButton']) ? $featureSettings['shareButton'] : [];
+                $shareSettings   = $featureSettings['shareButton'] ?? [];
 
                 // add the api keys for use within the share buttons
                 $shareSettings['keys']   = $apiKeys;
@@ -559,7 +529,7 @@ class IntegrationHelper
                 foreach ($identifierField as $idf) {
                     $value = (is_array($fields[$f]) && isset($fields[$f]['value'])) ? $fields[$f]['value'] : $fields[$f];
 
-                    if (!in_array($value, $identifier) && false !== strpos($f, $idf)) {
+                    if (!in_array($value, $identifier) && str_contains($f, $idf)) {
                         $identifier[$f] = $value;
                         if (count($identifier) === count($identifierField)) {
                             // found enough matches so break
@@ -568,7 +538,7 @@ class IntegrationHelper
                         }
                     }
                 }
-            } elseif ($identifierField === $f || false !== strpos($f, $identifierField)) {
+            } elseif ($identifierField === $f || str_contains($f, $identifierField)) {
                 $matchFound = true;
                 $identifier = (is_array($fields[$f])) ? $fields[$f]['value'] : $fields[$f];
             }

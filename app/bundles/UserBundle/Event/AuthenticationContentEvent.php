@@ -7,8 +7,6 @@ use Symfony\Contracts\EventDispatcher\Event;
 
 class AuthenticationContentEvent extends Event
 {
-    protected \Symfony\Component\HttpFoundation\Request $request;
-
     /**
      * @var array
      */
@@ -19,9 +17,8 @@ class AuthenticationContentEvent extends Event
      */
     protected $postLogout = false;
 
-    public function __construct(Request $request)
+    public function __construct(protected Request $request)
     {
-        $this->request    = $request;
         $this->postLogout = $request->getSession()->get('post_logout', false);
     }
 
@@ -46,10 +43,7 @@ class AuthenticationContentEvent extends Event
         $this->content[] = $content;
     }
 
-    /**
-     * @return string
-     */
-    public function getContent()
+    public function getContent(): string
     {
         return implode("\n\n", $this->content);
     }

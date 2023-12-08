@@ -40,12 +40,12 @@ class StatDevice
         $builder = new ClassMetadataBuilder($metadata);
 
         $builder->setTable('email_stats_devices')
-            ->setCustomRepositoryClass('Mautic\EmailBundle\Entity\StatDeviceRepository')
+            ->setCustomRepositoryClass(\Mautic\EmailBundle\Entity\StatDeviceRepository::class)
             ->addIndex(['date_opened'], 'date_opened_search');
 
         $builder->addBigIntIdField();
 
-        $builder->createManyToOne('device', 'Mautic\LeadBundle\Entity\LeadDevice')
+        $builder->createManyToOne('device', \Mautic\LeadBundle\Entity\LeadDevice::class)
             ->addJoinColumn('device_id', 'id', true, false, 'CASCADE')
             ->build();
 
@@ -77,10 +77,7 @@ class StatDevice
             ->build();
     }
 
-    /**
-     * @return int
-     */
-    public function getId()
+    public function getId(): int
     {
         return (int) $this->id;
     }

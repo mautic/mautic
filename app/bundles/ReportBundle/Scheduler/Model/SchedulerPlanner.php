@@ -11,19 +11,13 @@ use Mautic\ReportBundle\Scheduler\Exception\NoScheduleException;
 
 class SchedulerPlanner
 {
-    private \Mautic\ReportBundle\Scheduler\Date\DateBuilder $dateBuilder;
-
     /**
      * @var SchedulerRepository
      */
     private \Doctrine\ORM\EntityRepository $schedulerRepository;
 
-    private \Doctrine\ORM\EntityManager $entityManager;
-
-    public function __construct(DateBuilder $dateBuilder, EntityManager $entityManager)
+    public function __construct(private DateBuilder $dateBuilder, private EntityManager $entityManager)
     {
-        $this->dateBuilder         = $dateBuilder;
-        $this->entityManager       = $entityManager;
         $this->schedulerRepository = $entityManager->getRepository(Scheduler::class);
     }
 
@@ -37,7 +31,7 @@ class SchedulerPlanner
     {
         try {
             $date = $this->dateBuilder->getNextEvent($report);
-        } catch (NoScheduleException $e) {
+        } catch (NoScheduleException) {
             return;
         }
 

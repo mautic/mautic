@@ -11,11 +11,8 @@ use Monolog\Logger;
 
 class DoctrineSubscriber implements EventSubscriber
 {
-    private \Monolog\Logger $logger;
-
-    public function __construct(Logger $logger)
+    public function __construct(private Logger $logger)
     {
-        $this->logger = $logger;
     }
 
     /**
@@ -28,7 +25,7 @@ class DoctrineSubscriber implements EventSubscriber
         ];
     }
 
-    public function postGenerateSchema(GenerateSchemaEventArgs $args)
+    public function postGenerateSchema(GenerateSchemaEventArgs $args): void
     {
         $schema = $args->getSchema();
 

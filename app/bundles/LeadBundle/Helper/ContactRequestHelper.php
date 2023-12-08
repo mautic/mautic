@@ -20,20 +20,6 @@ use Symfony\Component\HttpFoundation\RequestStack;
 
 class ContactRequestHelper
 {
-    private \Mautic\LeadBundle\Model\LeadModel $leadModel;
-
-    private \Mautic\CoreBundle\Helper\CoreParametersHelper $coreParametersHelper;
-
-    private \Symfony\Component\EventDispatcher\EventDispatcherInterface $eventDispatcher;
-
-    private \Mautic\CoreBundle\Helper\IpLookupHelper $ipLookupHelper;
-
-    private \Mautic\LeadBundle\Tracker\ContactTracker $contactTracker;
-
-    private \Symfony\Component\HttpFoundation\RequestStack $requestStack;
-
-    private \Monolog\Logger $logger;
-
     /**
      * @var Lead|null
      */
@@ -49,26 +35,8 @@ class ContactRequestHelper
      */
     private $publiclyUpdatableFieldValues = [];
 
-    private ContactMerger $contactMerger;
-
-    public function __construct(
-        LeadModel $leadModel,
-        ContactTracker $contactTracker,
-        CoreParametersHelper $coreParametersHelper,
-        IpLookupHelper $ipLookupHelper,
-        RequestStack $requestStack,
-        Logger $logger,
-        EventDispatcherInterface $eventDispatcher,
-        ContactMerger $contactMerger
-    ) {
-        $this->leadModel            = $leadModel;
-        $this->contactTracker       = $contactTracker;
-        $this->coreParametersHelper = $coreParametersHelper;
-        $this->ipLookupHelper       = $ipLookupHelper;
-        $this->requestStack         = $requestStack;
-        $this->logger               = $logger;
-        $this->eventDispatcher      = $eventDispatcher;
-        $this->contactMerger        = $contactMerger;
+    public function __construct(private LeadModel $leadModel, private ContactTracker $contactTracker, private CoreParametersHelper $coreParametersHelper, private IpLookupHelper $ipLookupHelper, private RequestStack $requestStack, private Logger $logger, private EventDispatcherInterface $eventDispatcher, private ContactMerger $contactMerger)
+    {
     }
 
     /**
@@ -83,7 +51,7 @@ class ContactRequestHelper
             $foundContact         = $this->getContactFromUrl();
             $this->trackedContact = $foundContact;
             $this->contactTracker->setTrackedContact($this->trackedContact);
-        } catch (ContactNotFoundException $exception) {
+        } catch (ContactNotFoundException) {
         }
 
         if (!$this->trackedContact) {
@@ -119,7 +87,7 @@ class ContactRequestHelper
 
         try {
             return $this->getContactFromClickthrough($clickthrough);
-        } catch (ContactNotFoundException $exception) {
+        } catch (ContactNotFoundException) {
         }
 
         $this->setEmailFromClickthroughIdentification($clickthrough);
@@ -135,7 +103,7 @@ class ContactRequestHelper
             if ($this->trackedContact && $this->trackedContact->getId() && $foundContact->getId()) {
                 try {
                     $foundContact = $this->contactMerger->merge($this->trackedContact, $foundContact);
-                } catch (SameContactException $exception) {
+                } catch (SameContactException) {
                 }
             }
 
@@ -172,7 +140,7 @@ class ContactRequestHelper
         throw new ContactNotFoundException();
     }
 
-    private function setEmailFromClickthroughIdentification(array $clickthrough)
+    private function setEmailFromClickthroughIdentification(array $clickthrough): void
     {
         if (!$this->coreParametersHelper->get('track_by_tracking_url') || !empty($queryFields['email'])) {
             return;
@@ -192,7 +160,7 @@ class ContactRequestHelper
         }
     }
 
-    private function prepareContactFromRequest()
+    private function prepareContactFromRequest(): void
     {
         $ipAddress          = $this->ipLookupHelper->getIpAddress();
         $contactIpAddresses = $this->trackedContact->getIpAddresses();
@@ -216,7 +184,7 @@ class ContactRequestHelper
                 'page',
                 'hit',
                 null,
-                (isset($this->queryFields['page_url'])) ? $this->queryFields['page_url'] : ''
+                $this->queryFields['page_url'] ?? ''
             )
         );
 
@@ -233,7 +201,7 @@ class ContactRequestHelper
         if ($this->trackedContact && $this->trackedContact->getId() && $this->trackedContact->isAnonymous()) {
             try {
                 return $this->contactMerger->merge($this->trackedContact, $foundContact);
-            } catch (SameContactException $exception) {
+            } catch (SameContactException) {
             }
         }
 

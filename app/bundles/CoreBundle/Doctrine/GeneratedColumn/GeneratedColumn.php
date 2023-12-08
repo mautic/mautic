@@ -6,18 +6,12 @@ namespace Mautic\CoreBundle\Doctrine\GeneratedColumn;
 
 final class GeneratedColumn implements GeneratedColumnInterface
 {
-    private string $tableName;
-
     /**
      * @var string
      */
     private $tablePrefix = '';
 
     private string $columnName;
-
-    private string $columnType;
-
-    private string $as;
 
     /**
      * @var string|null
@@ -34,14 +28,11 @@ final class GeneratedColumn implements GeneratedColumnInterface
      */
     private $indexColumns = [];
 
-    public function __construct(string $tableName, string $columnName, string $columnType, string $as)
+    public function __construct(private string $tableName, string $columnName, private string $columnType, private string $as)
     {
-        $this->as             = $as;
-        $this->tableName      = $tableName;
         $this->indexColumns[] = $columnName;
         $this->tablePrefix    = MAUTIC_TABLE_PREFIX;
         $this->columnName     = $columnName;
-        $this->columnType     = $columnType;
     }
 
     public function getTableName(): string

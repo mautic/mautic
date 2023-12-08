@@ -10,18 +10,12 @@ class DayStat implements StatInterface
     private $stats = [];
 
     /**
-     * @var string
-     */
-    private $day;
-
-    /**
      * DayStat constructor.
      *
      * @param string $day "2019-11-07" format
      */
-    public function __construct($day)
+    public function __construct(private $day)
     {
-        $this->day = $day;
     }
 
     /**
@@ -63,10 +57,7 @@ class DayStat implements StatInterface
         return $sum;
     }
 
-    /**
-     * @return int
-     */
-    public function getCount()
+    public function getCount(): int
     {
         return count($this->stats);
     }

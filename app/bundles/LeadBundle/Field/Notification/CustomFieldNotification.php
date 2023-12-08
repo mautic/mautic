@@ -13,27 +13,15 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class CustomFieldNotification
 {
-    private \Mautic\CoreBundle\Model\NotificationModel $notificationModel;
-
-    private \Mautic\UserBundle\Model\UserModel $userModel;
-
-    private \Symfony\Contracts\Translation\TranslatorInterface $translator;
-
-    public function __construct(
-        NotificationModel $notificationModel,
-        UserModel $userModel,
-        TranslatorInterface $translator
-    ) {
-        $this->notificationModel = $notificationModel;
-        $this->userModel         = $userModel;
-        $this->translator        = $translator;
+    public function __construct(private NotificationModel $notificationModel, private UserModel $userModel, private TranslatorInterface $translator)
+    {
     }
 
     public function customFieldWasCreated(LeadField $leadField, ?int $userId): void
     {
         try {
             $user = $this->getUser($userId);
-        } catch (NoUserException $e) {
+        } catch (NoUserException) {
             return;
         }
 
@@ -50,7 +38,7 @@ class CustomFieldNotification
     {
         try {
             $user = $this->getUser($userId);
-        } catch (NoUserException $e) {
+        } catch (NoUserException) {
             return;
         }
 
@@ -67,7 +55,7 @@ class CustomFieldNotification
     {
         try {
             $user = $this->getUser($userId);
-        } catch (NoUserException $e) {
+        } catch (NoUserException) {
             return;
         }
 

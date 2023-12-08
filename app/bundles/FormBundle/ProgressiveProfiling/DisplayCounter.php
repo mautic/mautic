@@ -17,11 +17,8 @@ class DisplayCounter
      */
     private $alreadyAlwaysDisplayed = 0;
 
-    private \Mautic\FormBundle\Entity\Form $form;
-
-    public function __construct(Form $form)
+    public function __construct(private Form $form)
     {
-        $this->form = $form;
     }
 
     public function increaseDisplayedFields(): void
@@ -50,10 +47,7 @@ class DisplayCounter
         return $this->alreadyAlwaysDisplayed;
     }
 
-    /**
-     * @return int
-     */
-    public function getAlwaysDisplayFields()
+    public function getAlwaysDisplayFields(): int
     {
         $i= 0;
         /** @var Field $field */

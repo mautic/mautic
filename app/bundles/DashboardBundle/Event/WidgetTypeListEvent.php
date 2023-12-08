@@ -65,10 +65,8 @@ class WidgetTypeListEvent extends CommonEvent
 
     /**
      * Check if the user has permission to see the widgets.
-     *
-     * @return bool
      */
-    public function hasPermissions(array $permissions)
+    public function hasPermissions(array $permissions): bool
     {
         if (!$this->security) {
             return true;

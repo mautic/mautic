@@ -168,12 +168,12 @@ class Event implements ChannelInterface
         $this->channelId = null;
     }
 
-    public static function loadMetadata(ORM\ClassMetadata $metadata)
+    public static function loadMetadata(ORM\ClassMetadata $metadata): void
     {
         $builder = new ClassMetadataBuilder($metadata);
 
         $builder->setTable('campaign_events')
-            ->setCustomRepositoryClass('Mautic\CampaignBundle\Entity\EventRepository')
+            ->setCustomRepositoryClass(\Mautic\CampaignBundle\Entity\EventRepository::class)
             ->addIndex(['type', 'event_type'], 'campaign_event_search')
             ->addIndex(['event_type'], 'campaign_event_type')
             ->addIndex(['channel', 'channel_id'], 'campaign_event_channel');
@@ -284,7 +284,7 @@ class Event implements ChannelInterface
     /**
      * Prepares the metadata for API usage.
      */
-    public static function loadApiMetadata(ApiMetadataDriver $metadata)
+    public static function loadApiMetadata(ApiMetadataDriver $metadata): void
     {
         $metadata->setGroupPrefix('campaignEvent')
             ->addListProperties(
@@ -389,7 +389,7 @@ class Event implements ChannelInterface
      * @param string $prop
      * @param mixed  $val
      */
-    private function isChanged($prop, $val)
+    private function isChanged($prop, $val): void
     {
         $getter  = 'get'.ucfirst($prop);
         $current = $this->$getter();
@@ -422,7 +422,7 @@ class Event implements ChannelInterface
         return $this->id;
     }
 
-    public function nullId()
+    public function nullId(): void
     {
         $this->id = null;
     }
@@ -526,10 +526,7 @@ class Event implements ChannelInterface
         return $this->type;
     }
 
-    /**
-     * @return array
-     */
-    public function convertToArray()
+    public function convertToArray(): array
     {
         return get_object_vars($this);
     }
@@ -599,7 +596,7 @@ class Event implements ChannelInterface
     /**
      * Remove log.
      */
-    public function removeLog(LeadEventLog $log)
+    public function removeLog(LeadEventLog $log): void
     {
         $this->log->removeElement($log);
     }
@@ -650,7 +647,7 @@ class Event implements ChannelInterface
     /**
      * Remove children.
      */
-    public function removeChild(Event $children)
+    public function removeChild(Event $children): void
     {
         $this->children->removeElement($children);
     }
@@ -719,7 +716,7 @@ class Event implements ChannelInterface
     /**
      * Remove parent.
      */
-    public function removeParent()
+    public function removeParent(): void
     {
         $this->isChanged('parent', '');
         $this->parent = null;
@@ -746,7 +743,7 @@ class Event implements ChannelInterface
     /**
      * @param mixed $triggerDate
      */
-    public function setTriggerDate($triggerDate)
+    public function setTriggerDate($triggerDate): void
     {
         $this->isChanged('triggerDate', $triggerDate);
         $this->triggerDate = $triggerDate;
@@ -763,7 +760,7 @@ class Event implements ChannelInterface
     /**
      * @param int $triggerInterval
      */
-    public function setTriggerInterval($triggerInterval)
+    public function setTriggerInterval($triggerInterval): void
     {
         $this->isChanged('triggerInterval', $triggerInterval);
         $this->triggerInterval = $triggerInterval;
@@ -807,7 +804,7 @@ class Event implements ChannelInterface
     /**
      * @param mixed $triggerIntervalUnit
      */
-    public function setTriggerIntervalUnit($triggerIntervalUnit)
+    public function setTriggerIntervalUnit($triggerIntervalUnit): void
     {
         $this->isChanged('triggerIntervalUnit', $triggerIntervalUnit);
         $this->triggerIntervalUnit = $triggerIntervalUnit;
@@ -843,7 +840,7 @@ class Event implements ChannelInterface
     /**
      * @param mixed $triggerMode
      */
-    public function setTriggerMode($triggerMode)
+    public function setTriggerMode($triggerMode): void
     {
         $this->isChanged('triggerMode', $triggerMode);
         $this->triggerMode = $triggerMode;
@@ -860,7 +857,7 @@ class Event implements ChannelInterface
     /**
      * @param mixed $decisionPath
      */
-    public function setDecisionPath($decisionPath)
+    public function setDecisionPath($decisionPath): void
     {
         $this->isChanged('decisionPath', $decisionPath);
         $this->decisionPath = $decisionPath;
@@ -877,7 +874,7 @@ class Event implements ChannelInterface
     /**
      * @param mixed $tempId
      */
-    public function setTempId($tempId)
+    public function setTempId($tempId): void
     {
         $this->isChanged('tempId', $tempId);
         $this->tempId = $tempId;
@@ -894,7 +891,7 @@ class Event implements ChannelInterface
     /**
      * @param mixed $channel
      */
-    public function setChannel($channel)
+    public function setChannel($channel): void
     {
         $this->isChanged('channel', $channel);
         $this->channel = $channel;
@@ -911,7 +908,7 @@ class Event implements ChannelInterface
     /**
      * @param int $channelId
      */
-    public function setChannelId($channelId)
+    public function setChannelId($channelId): void
     {
         $this->isChanged('channelId', $channelId);
         $this->channelId = (int) $channelId;

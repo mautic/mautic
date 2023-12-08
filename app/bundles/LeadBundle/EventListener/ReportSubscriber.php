@@ -45,18 +45,6 @@ class ReportSubscriber implements EventSubscriberInterface
     ];
     private $companyContexts = [self::CONTEXT_COMPANIES];
 
-    private \Mautic\LeadBundle\Model\LeadModel $leadModel;
-
-    private \Mautic\StageBundle\Model\StageModel $stageModel;
-
-    private \Mautic\CampaignBundle\Model\CampaignModel $campaignModel;
-
-    private \Mautic\CampaignBundle\EventCollector\EventCollector $eventCollector;
-
-    private \Mautic\LeadBundle\Model\CompanyModel $companyModel;
-
-    private \Mautic\LeadBundle\Report\FieldsBuilder $fieldsBuilder;
-
     /**
      * @var array
      */
@@ -67,31 +55,8 @@ class ReportSubscriber implements EventSubscriberInterface
      */
     private $channelActions;
 
-    private \Mautic\LeadBundle\Model\CompanyReportData $companyReportData;
-
-    private \Mautic\CoreBundle\Translation\Translator $translator;
-    private FieldModel $fieldModel;
-
-    public function __construct(
-        LeadModel $leadModel,
-        FieldModel $fieldModel,
-        StageModel $stageModel,
-        CampaignModel $campaignModel,
-        EventCollector $eventCollector,
-        CompanyModel $companyModel,
-        CompanyReportData $companyReportData,
-        FieldsBuilder $fieldsBuilder,
-        Translator $translator
-    ) {
-        $this->fieldModel        = $fieldModel;
-        $this->leadModel         = $leadModel;
-        $this->stageModel        = $stageModel;
-        $this->campaignModel     = $campaignModel;
-        $this->eventCollector    = $eventCollector;
-        $this->companyModel      = $companyModel;
-        $this->companyReportData = $companyReportData;
-        $this->fieldsBuilder     = $fieldsBuilder;
-        $this->translator        = $translator;
+    public function __construct(private LeadModel $leadModel, private FieldModel $fieldModel, private StageModel $stageModel, private CampaignModel $campaignModel, private EventCollector $eventCollector, private CompanyModel $companyModel, private CompanyReportData $companyReportData, private FieldsBuilder $fieldsBuilder, private Translator $translator)
+    {
     }
 
     /**
@@ -111,7 +76,7 @@ class ReportSubscriber implements EventSubscriberInterface
     /**
      * Add available tables and columns to the report builder lookup.
      */
-    public function onReportBuilder(ReportBuilderEvent $event)
+    public function onReportBuilder(ReportBuilderEvent $event): void
     {
         if (!$event->checkContext($this->leadContexts) && !$event->checkContext($this->companyContexts)) {
             return;
@@ -214,7 +179,7 @@ class ReportSubscriber implements EventSubscriberInterface
     /**
      * Initialize the QueryBuilder object to generate reports from.
      */
-    public function onReportGenerate(ReportGeneratorEvent $event)
+    public function onReportGenerate(ReportGeneratorEvent $event): void
     {
         if (!$event->checkContext($this->leadContexts) && !$event->checkContext($this->companyContexts)) {
             return;
@@ -398,7 +363,7 @@ class ReportSubscriber implements EventSubscriberInterface
     /**
      * Initialize the QueryBuilder object to generate reports from.
      */
-    public function onReportGraphGenerate(ReportGraphEvent $event)
+    public function onReportGraphGenerate(ReportGraphEvent $event): void
     {
         if (!$event->checkContext([
             self::CONTEXT_LEADS,
@@ -480,17 +445,11 @@ class ReportSubscriber implements EventSubscriberInterface
                     $data  = $outerQb->executeQuery()->fetchAllAssociative();
 
                     foreach ($data as $row) {
-                        switch ($groupBy) {
-                            case 'actions':
-                                $label = $this->channelActions[$row['slice']];
-                                break;
-                            case 'channels':
-                                $label = $this->channels[$row['slice']];
-                                break;
-
-                            default:
-                                $label = (empty($row['slice'])) ? $this->translator->trans('mautic.core.none') : $row['slice'];
-                        }
+                        $label = match ($groupBy) {
+                            'actions'  => $this->channelActions[$row['slice']],
+                            'channels' => $this->channels[$row['slice']],
+                            default    => (empty($row['slice'])) ? $this->translator->trans('mautic.core.none') : $row['slice'],
+                        };
                         $chart->setDataset($label, $row['total_attribution']);
                     }
 
@@ -709,7 +668,7 @@ class ReportSubscriber implements EventSubscriberInterface
         $event->addColumns($fields);
     }
 
-    private function injectPointsReportData(ReportBuilderEvent $event, array $columns, array $filters)
+    private function injectPointsReportData(ReportBuilderEvent $event, array $columns, array $filters): void
     {
         $pointColumns = [
             'lp.id' => [
@@ -765,7 +724,7 @@ class ReportSubscriber implements EventSubscriberInterface
             ->addGraph($context, 'table', 'mautic.lead.table.top.actions');
     }
 
-    private function injectFrequencyReportData(ReportBuilderEvent $event, array $columns, array $filters)
+    private function injectFrequencyReportData(ReportBuilderEvent $event, array $columns, array $filters): void
     {
         $frequencyColumns = [
             'lf.frequency_number' => [
@@ -809,7 +768,7 @@ class ReportSubscriber implements EventSubscriberInterface
     /**
      * @param string $type
      */
-    private function injectAttributionReportData(ReportBuilderEvent $event, array $columns, array $filters, $type)
+    private function injectAttributionReportData(ReportBuilderEvent $event, array $columns, array $filters, $type): void
     {
         $attributionColumns = [
             'log.campaign_id' => [
@@ -932,7 +891,7 @@ class ReportSubscriber implements EventSubscriberInterface
         $event->addTable($context, $data, self::GROUP_CONTACTS);
     }
 
-    public function onReportDisplay(ReportDataEvent $event)
+    public function onReportDisplay(ReportDataEvent $event): void
     {
         $data = $event->getData();
 

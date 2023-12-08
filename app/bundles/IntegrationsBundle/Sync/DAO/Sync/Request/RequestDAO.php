@@ -10,20 +10,14 @@ class RequestDAO
 {
     private int $syncIteration;
 
-    private \Mautic\IntegrationsBundle\Sync\DAO\Sync\InputOptionsDAO $inputOptionsDAO;
-
-    private string $syncToIntegration;
-
     /**
      * @var ObjectDAO[]
      */
     private $objects = [];
 
-    public function __construct(string $syncToIntegration, int $syncIteration, InputOptionsDAO $inputOptionsDAO)
+    public function __construct(private string $syncToIntegration, int $syncIteration, private InputOptionsDAO $inputOptionsDAO)
     {
         $this->syncIteration     = (int) $syncIteration;
-        $this->inputOptionsDAO   = $inputOptionsDAO;
-        $this->syncToIntegration = $syncToIntegration;
     }
 
     /**
@@ -72,10 +66,8 @@ class RequestDAO
 
     /**
      * Returns true if there are objects to sync.
-     *
-     * @return bool
      */
-    public function shouldSync()
+    public function shouldSync(): bool
     {
         return !empty($this->objects);
     }

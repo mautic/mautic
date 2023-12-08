@@ -15,16 +15,8 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class OwnerProvider
 {
-    private \Symfony\Component\EventDispatcher\EventDispatcherInterface $dispatcher;
-
-    private \Mautic\IntegrationsBundle\Sync\SyncDataExchange\Internal\ObjectProvider $objectProvider;
-
-    public function __construct(
-        EventDispatcherInterface $dispatcher,
-        ObjectProvider $objectProvider
-    ) {
-        $this->dispatcher     = $dispatcher;
-        $this->objectProvider = $objectProvider;
+    public function __construct(private EventDispatcherInterface $dispatcher, private ObjectProvider $objectProvider)
+    {
     }
 
     /**
@@ -42,7 +34,7 @@ class OwnerProvider
 
         try {
             $object = $this->objectProvider->getObjectByName($objectName);
-        } catch (ObjectNotFoundException $e) {
+        } catch (ObjectNotFoundException) {
             // Throw this exception for BC.
             throw new ObjectNotSupportedException(MauticSyncDataExchange::NAME, $objectName);
         }

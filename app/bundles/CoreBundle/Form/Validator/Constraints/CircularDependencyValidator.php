@@ -14,20 +14,14 @@ use Symfony\Component\Validator\ConstraintValidator;
  */
 class CircularDependencyValidator extends ConstraintValidator
 {
-    private \Mautic\LeadBundle\Model\ListModel $model;
-
-    private \Symfony\Component\HttpFoundation\RequestStack $requestStack;
-
-    public function __construct(ListModel $model, RequestStack $requestStack)
+    public function __construct(private ListModel $model, private RequestStack $requestStack)
     {
-        $this->model        = $model;
-        $this->requestStack = $requestStack;
     }
 
     /**
      * @param array $filters
      */
-    public function validate($filters, Constraint $constraint)
+    public function validate($filters, Constraint $constraint): void
     {
         $dependentSegmentIds = $this->flatten(array_map(function ($id) {
             return $this->reduceToSegmentIds($this->model->getEntity($id)->getFilters());
@@ -38,17 +32,15 @@ class CircularDependencyValidator extends ConstraintValidator
             if (in_array($segmentId, $dependentSegmentIds)) {
                 $this->context->addViolation($constraint->message);
             }
-        } catch (\UnexpectedValueException $e) {
+        } catch (\UnexpectedValueException) {
             // Segment ID is not in the request. May be new segment.
         }
     }
 
     /**
-     * @return int
-     *
      * @throws \UnexpectedValueException
      */
-    private function getSegmentIdFromRequest()
+    private function getSegmentIdFromRequest(): int
     {
         $request     = $this->requestStack->getCurrentRequest();
         $routeParams = $request->get('_route_params');
@@ -79,10 +71,7 @@ class CircularDependencyValidator extends ConstraintValidator
         return $this->flatten($segentIdsInFilter);
     }
 
-    /**
-     * @return array
-     */
-    private function flatten(array $array)
+    private function flatten(array $array): array
     {
         return array_unique(array_reduce($array, 'array_merge', []));
     }

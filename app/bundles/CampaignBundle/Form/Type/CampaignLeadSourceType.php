@@ -12,7 +12,7 @@ use Symfony\Component\Validator\Constraints\NotBlank;
 
 class CampaignLeadSourceType extends AbstractType
 {
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $sourceType    = $options['data']['sourceType'];
         $sourceChoices = $options['source_choices'] ?? [];
@@ -93,7 +93,7 @@ class CampaignLeadSourceType extends AbstractType
         ]);
     }
 
-    public function configureOptions(OptionsResolver $resolver)
+    public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setRequired(['source_choices']);
     }

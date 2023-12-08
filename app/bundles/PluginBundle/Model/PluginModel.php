@@ -21,15 +21,8 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
  */
 class PluginModel extends FormModel
 {
-    protected \Mautic\LeadBundle\Model\FieldModel $leadFieldModel;
-
-    private \Mautic\CoreBundle\Helper\BundleHelper $bundleHelper;
-
-    public function __construct(FieldModel $leadFieldModel, CoreParametersHelper $coreParametersHelper, BundleHelper $bundleHelper, EntityManager $em, CorePermissions $security, EventDispatcherInterface $dispatcher, UrlGeneratorInterface $router, Translator $translator, UserHelper $userHelper, LoggerInterface $mauticLogger)
+    public function __construct(protected FieldModel $leadFieldModel, CoreParametersHelper $coreParametersHelper, private BundleHelper $bundleHelper, EntityManager $em, CorePermissions $security, EventDispatcherInterface $dispatcher, UrlGeneratorInterface $router, Translator $translator, UserHelper $userHelper, LoggerInterface $mauticLogger)
     {
-        $this->leadFieldModel       = $leadFieldModel;
-        $this->bundleHelper         = $bundleHelper;
-
         parent::__construct($em, $security, $dispatcher, $router, $translator, $userHelper, $mauticLogger, $coreParametersHelper);
     }
 
@@ -51,7 +44,7 @@ class PluginModel extends FormModel
     /**
      * {@inheritdoc}
      */
-    public function getPermissionBase()
+    public function getPermissionBase(): string
     {
         return 'plugin:plugins';
     }
@@ -113,7 +106,7 @@ class PluginModel extends FormModel
         foreach ($allMetadata as $meta) {
             $namespace = $meta->namespace;
 
-            if (false !== strpos($namespace, 'MauticPlugin')) {
+            if (str_contains($namespace, 'MauticPlugin')) {
                 $bundleName = preg_replace('/\\\Entity$/', '', $namespace);
                 if (!isset($pluginsMetadata[$bundleName])) {
                     $pluginsMetadata[$bundleName] = [];

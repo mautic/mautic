@@ -29,15 +29,8 @@ class MessageQueueModel extends FormModel
     /** @var string A default message reschedule interval */
     public const DEFAULT_RESCHEDULE_INTERVAL = 'PT15M';
 
-    protected \Mautic\LeadBundle\Model\LeadModel $leadModel;
-
-    protected \Mautic\LeadBundle\Model\CompanyModel $companyModel;
-
-    public function __construct(LeadModel $leadModel, CompanyModel $companyModel, CoreParametersHelper $coreParametersHelper, EntityManagerInterface $em, CorePermissions $security, EventDispatcherInterface $dispatcher, UrlGeneratorInterface $router, Translator $translator, UserHelper $userHelper, LoggerInterface $mauticLogger)
+    public function __construct(protected LeadModel $leadModel, protected CompanyModel $companyModel, CoreParametersHelper $coreParametersHelper, EntityManagerInterface $em, CorePermissions $security, EventDispatcherInterface $dispatcher, UrlGeneratorInterface $router, Translator $translator, UserHelper $userHelper, LoggerInterface $mauticLogger)
     {
-        $this->leadModel            = $leadModel;
-        $this->companyModel         = $companyModel;
-
         parent::__construct($em, $security, $dispatcher, $router, $translator, $userHelper, $mauticLogger, $coreParametersHelper);
     }
 
@@ -53,7 +46,7 @@ class MessageQueueModel extends FormModel
      * @param null   $campaignEventId
      * @param int    $attempts
      * @param int    $priority
-     * @param null   $messageQueue
+     * @param mixed  $messageQueue
      * @param string $statTableName
      * @param string $statContactColumn
      * @param string $statSentColumn
@@ -197,10 +190,7 @@ class MessageQueueModel extends FormModel
         return $counter;
     }
 
-    /**
-     * @return int
-     */
-    public function processMessageQueue($queue)
+    public function processMessageQueue($queue): int
     {
         if (!is_array($queue)) {
             if (!$queue instanceof MessageQueue) {
@@ -226,7 +216,7 @@ class MessageQueueModel extends FormModel
             $contactData = $this->leadModel->getRepository()->getContacts($contacts);
             $companyData = $this->companyModel->getRepository()->getCompaniesForContacts($contacts);
             foreach ($contacts as $messageId => $contactId) {
-                $contactData[$contactId]['companies'] = isset($companyData[$contactId]) ? $companyData[$contactId] : null;
+                $contactData[$contactId]['companies'] = $companyData[$contactId] ?? null;
                 $queue[$messageId]->getLead()->setFields($contactData[$contactId]);
             }
         }
@@ -349,7 +339,7 @@ class MessageQueueModel extends FormModel
      *
      * @throws \Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException
      */
-    protected function dispatchEvent($action, &$entity, $isNew = false, Event $event = null)
+    protected function dispatchEvent($action, &$entity, $isNew = false, Event $event = null): ?Event
     {
         switch ($action) {
             case 'process_message_queue':

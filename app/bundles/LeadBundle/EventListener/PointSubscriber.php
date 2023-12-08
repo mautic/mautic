@@ -12,11 +12,8 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class PointSubscriber implements EventSubscriberInterface
 {
-    private \Mautic\LeadBundle\Model\LeadModel $leadModel;
-
-    public function __construct(LeadModel $leadModel)
+    public function __construct(private LeadModel $leadModel)
     {
-        $this->leadModel = $leadModel;
     }
 
     public static function getSubscribedEvents()
@@ -27,14 +24,14 @@ class PointSubscriber implements EventSubscriberInterface
         ];
     }
 
-    public function onTriggerBuild(TriggerBuilderEvent $event)
+    public function onTriggerBuild(TriggerBuilderEvent $event): void
     {
         $event->addEvent(
             'lead.changelists',
             [
                 'group'    => 'mautic.lead.point.trigger',
                 'label'    => 'mautic.lead.point.trigger.changelists',
-                'callback' => ['\\Mautic\\LeadBundle\\Helper\\PointEventHelper', 'changeLists'],
+                'callback' => [\Mautic\LeadBundle\Helper\PointEventHelper::class, 'changeLists'],
                 'formType' => ListActionType::class,
             ]
         );

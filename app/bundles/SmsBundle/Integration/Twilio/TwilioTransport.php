@@ -14,19 +14,13 @@ use Twilio\Rest\Client;
 
 class TwilioTransport implements TransportInterface
 {
-    private \Mautic\SmsBundle\Integration\Twilio\Configuration $configuration;
-
-    private \Psr\Log\LoggerInterface $logger;
-
     /**
      * @var Client
      */
     private $client;
 
-    public function __construct(Configuration $configuration, LoggerInterface $logger)
+    public function __construct(private Configuration $configuration, private LoggerInterface $logger)
     {
-        $this->logger        = $logger;
-        $this->configuration = $configuration;
     }
 
     /**
@@ -60,7 +54,7 @@ class TwilioTransport implements TransportInterface
 
             return $exception->getMessage();
         } catch (ConfigurationException $exception) {
-            $message = ($exception->getMessage()) ? $exception->getMessage() : 'mautic.sms.transport.twilio.not_configured';
+            $message = $exception->getMessage() ?: 'mautic.sms.transport.twilio.not_configured';
             $this->logger->warning(
                 $message,
                 ['exception' => $exception]

@@ -32,8 +32,6 @@ class UserApiController extends CommonApiController
      */
     protected $model;
 
-    private UserPasswordHasherInterface $hasher;
-
     public function __construct(
         CorePermissions $security,
         Translator $translator,
@@ -41,7 +39,7 @@ class UserApiController extends CommonApiController
         RouterInterface $router,
         FormFactoryInterface $formFactory,
         AppVersion $appVersion,
-        UserPasswordHasherInterface $hasher,
+        private UserPasswordHasherInterface $hasher,
         RequestStack $requestStack,
         ManagerRegistry $doctrine,
         ModelFactory $modelFactory,
@@ -49,7 +47,6 @@ class UserApiController extends CommonApiController
         CoreParametersHelper $coreParametersHelper,
         MauticFactory $factory
     ) {
-        $this->hasher  = $hasher;
         $userModel     = $modelFactory->getModel('user.user');
         \assert($userModel instanceof UserModel);
 

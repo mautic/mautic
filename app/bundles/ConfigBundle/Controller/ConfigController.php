@@ -245,7 +245,7 @@ class ConfigController extends FormController
 
                 $cacheHelper->refreshConfig();
                 $success = 1;
-            } catch (\Exception $exception) {
+            } catch (\Exception) {
             }
         }
 

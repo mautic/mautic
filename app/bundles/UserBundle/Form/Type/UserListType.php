@@ -9,11 +9,8 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class UserListType extends AbstractType
 {
-    private \Mautic\UserBundle\Model\UserModel $userModel;
-
-    public function __construct(UserModel $userModel)
+    public function __construct(private UserModel $userModel)
     {
-        $this->userModel = $userModel;
     }
 
     /**

@@ -47,11 +47,6 @@ class StatsEvent extends Event
     protected $tableColumns = [];
 
     /**
-     * Array of order by statements.
-     */
-    protected array $order;
-
-    /**
      * Array of where filters.
      *
      * @var array
@@ -79,22 +74,18 @@ class StatsEvent extends Event
      */
     protected $repository;
 
-    protected \Mautic\UserBundle\Entity\User $user;
-
     /**
      * StatsEvent constructor.
      *
      * @param int $start
      * @param int $limit
      */
-    public function __construct($table, $start, $limit, array $order, array $where, User $user)
+    public function __construct($table, $start, $limit, protected array $order, array $where, protected User $user)
     {
         $this->table = strtolower(trim(str_replace(MAUTIC_TABLE_PREFIX, '', strip_tags($table))));
         $this->start = (int) $start;
         $this->limit = (int) $limit;
-        $this->order = $order;
         $this->where = $where;
-        $this->user  = $user;
     }
 
     /**
@@ -156,20 +147,16 @@ class StatsEvent extends Event
 
     /**
      * Returns the start.
-     *
-     * @return int
      */
-    public function getStart()
+    public function getStart(): int
     {
         return $this->start;
     }
 
     /**
      * Returns the limit.
-     *
-     * @return int
      */
-    public function getLimit()
+    public function getLimit(): int
     {
         return $this->limit;
     }
@@ -207,7 +194,7 @@ class StatsEvent extends Event
     /**
      * Add an array of results and if so, stop propagation.
      */
-    public function setResults(array $results)
+    public function setResults(array $results): void
     {
         $this->results    = $results;
         $this->hasResults = true;

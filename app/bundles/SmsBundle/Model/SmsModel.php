@@ -41,24 +41,8 @@ use Symfony\Contracts\EventDispatcher\Event;
  */
 class SmsModel extends FormModel implements AjaxLookupModelInterface
 {
-    protected \Mautic\PageBundle\Model\TrackableModel $pageTrackableModel;
-
-    protected \Mautic\LeadBundle\Model\LeadModel $leadModel;
-
-    protected \Mautic\ChannelBundle\Model\MessageQueueModel $messageQueueModel;
-
-    protected \Mautic\SmsBundle\Sms\TransportChain $transport;
-
-    private \Mautic\CoreBundle\Helper\CacheStorageHelper $cacheStorageHelper;
-
-    public function __construct(TrackableModel $pageTrackableModel, LeadModel $leadModel, MessageQueueModel $messageQueueModel, TransportChain $transport, CacheStorageHelper $cacheStorageHelper, EntityManagerInterface $em, CorePermissions $security, EventDispatcherInterface $dispatcher, UrlGeneratorInterface $router, Translator $translator, UserHelper $userHelper, LoggerInterface $mauticLogger, CoreParametersHelper $coreParametersHelper)
+    public function __construct(protected TrackableModel $pageTrackableModel, protected LeadModel $leadModel, protected MessageQueueModel $messageQueueModel, protected TransportChain $transport, private CacheStorageHelper $cacheStorageHelper, EntityManagerInterface $em, CorePermissions $security, EventDispatcherInterface $dispatcher, UrlGeneratorInterface $router, Translator $translator, UserHelper $userHelper, LoggerInterface $mauticLogger, CoreParametersHelper $coreParametersHelper)
     {
-        $this->pageTrackableModel = $pageTrackableModel;
-        $this->leadModel          = $leadModel;
-        $this->messageQueueModel  = $messageQueueModel;
-        $this->transport          = $transport;
-        $this->cacheStorageHelper = $cacheStorageHelper;
-
         parent::__construct($em, $security, $dispatcher, $router, $translator, $userHelper, $mauticLogger, $coreParametersHelper);
     }
 
@@ -83,7 +67,7 @@ class SmsModel extends FormModel implements AjaxLookupModelInterface
     /**
      * {@inheritdoc}
      */
-    public function getPermissionBase()
+    public function getPermissionBase(): string
     {
         return 'sms:smses';
     }
@@ -190,8 +174,8 @@ class SmsModel extends FormModel implements AjaxLookupModelInterface
      */
     public function sendSms(Sms $sms, $sendTo, $options = [], array &$leads = [])
     {
-        $channel = (isset($options['channel'])) ? $options['channel'] : null;
-        $listId  = (isset($options['listId'])) ? $options['listId'] : null;
+        $channel = $options['channel'] ?? null;
+        $listId  = $options['listId'] ?? null;
 
         if ($sendTo instanceof Lead) {
             $sendTo = [$sendTo];
@@ -253,7 +237,7 @@ class SmsModel extends FormModel implements AjaxLookupModelInterface
         }
 
         if (!empty($contacts)) {
-            $messageQueue    = (isset($options['resend_message_queue'])) ? $options['resend_message_queue'] : null;
+            $messageQueue    = $options['resend_message_queue'] ?? null;
             $campaignEventId = (is_array($channel) && 'campaign.event' === $channel[0] && !empty($channel[1])) ? $channel[1] : null;
 
             $queued = $this->messageQueueModel->processFrequencyRules(
@@ -399,7 +383,7 @@ class SmsModel extends FormModel implements AjaxLookupModelInterface
      *
      * @throws \Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException
      */
-    protected function dispatchEvent($action, &$entity, $isNew = false, Event $event = null)
+    protected function dispatchEvent($action, &$entity, $isNew = false, Event $event = null): ?Event
     {
         if (!$entity instanceof Sms) {
             throw new MethodNotAllowedHttpException(['Sms']);
@@ -545,7 +529,7 @@ class SmsModel extends FormModel implements AjaxLookupModelInterface
                     $limit,
                     $start,
                     $this->security->isGranted($this->getPermissionBase().':viewother'),
-                    isset($options['sms_type']) ? $options['sms_type'] : null
+                    $options['sms_type'] ?? null
                 );
 
                 foreach ($entities as $entity) {

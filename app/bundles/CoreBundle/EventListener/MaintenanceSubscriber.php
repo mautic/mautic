@@ -11,20 +11,8 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class MaintenanceSubscriber implements EventSubscriberInterface
 {
-    private \Doctrine\DBAL\Connection $db;
-
-    private \Mautic\UserBundle\Entity\UserTokenRepositoryInterface $userTokenRepository;
-
-    private \Symfony\Contracts\Translation\TranslatorInterface $translator;
-
-    public function __construct(
-        Connection $db,
-        UserTokenRepositoryInterface $userTokenRepository,
-        TranslatorInterface $translator
-    ) {
-        $this->db                  = $db;
-        $this->userTokenRepository = $userTokenRepository;
-        $this->translator          = $translator;
+    public function __construct(private Connection $db, private UserTokenRepositoryInterface $userTokenRepository, private TranslatorInterface $translator)
+    {
     }
 
     /**
@@ -37,7 +25,7 @@ class MaintenanceSubscriber implements EventSubscriberInterface
         ];
     }
 
-    public function onDataCleanup(MaintenanceEvent $event)
+    public function onDataCleanup(MaintenanceEvent $event): void
     {
         $this->cleanupData($event, 'audit_log');
         $this->cleanupData($event, 'notifications');
@@ -49,7 +37,7 @@ class MaintenanceSubscriber implements EventSubscriberInterface
     /**
      * @param string $table
      */
-    private function cleanupData(MaintenanceEvent $event, $table)
+    private function cleanupData(MaintenanceEvent $event, $table): void
     {
         $qb = $this->db->createQueryBuilder()
             ->setParameter('date', $event->getDate()->format('Y-m-d H:i:s'));

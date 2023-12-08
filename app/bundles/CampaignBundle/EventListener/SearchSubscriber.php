@@ -11,20 +11,8 @@ use Twig\Environment;
 
 class SearchSubscriber implements EventSubscriberInterface
 {
-    private \Mautic\CampaignBundle\Model\CampaignModel $campaignModel;
-
-    private \Mautic\CoreBundle\Security\Permissions\CorePermissions $security;
-
-    private \Twig\Environment $twig;
-
-    public function __construct(
-        CampaignModel $campaignModel,
-        CorePermissions $security,
-        Environment $twig
-    ) {
-        $this->campaignModel = $campaignModel;
-        $this->security      = $security;
-        $this->twig          = $twig;
+    public function __construct(private CampaignModel $campaignModel, private CorePermissions $security, private Environment $twig)
+    {
     }
 
     /**
@@ -38,7 +26,7 @@ class SearchSubscriber implements EventSubscriberInterface
         ];
     }
 
-    public function onGlobalSearch(MauticEvents\GlobalSearchEvent $event)
+    public function onGlobalSearch(MauticEvents\GlobalSearchEvent $event): void
     {
         if ($this->security->isGranted('campaign:campaigns:view')) {
             $str = $event->getSearchString();
@@ -78,7 +66,7 @@ class SearchSubscriber implements EventSubscriberInterface
         }
     }
 
-    public function onBuildCommandList(MauticEvents\CommandListEvent $event)
+    public function onBuildCommandList(MauticEvents\CommandListEvent $event): void
     {
         $security = $this->security;
         if ($security->isGranted('campaign:campaigns:view')) {

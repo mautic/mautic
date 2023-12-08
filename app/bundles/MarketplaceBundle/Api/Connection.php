@@ -12,14 +12,8 @@ use Psr\Log\LoggerInterface;
 
 class Connection
 {
-    private ClientInterface $httpClient;
-
-    private LoggerInterface $logger;
-
-    public function __construct(ClientInterface $httpClient, LoggerInterface $logger)
+    public function __construct(private ClientInterface $httpClient, private LoggerInterface $logger)
     {
-        $this->httpClient = $httpClient;
-        $this->logger     = $logger;
     }
 
     /**

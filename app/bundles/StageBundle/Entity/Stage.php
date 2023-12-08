@@ -71,7 +71,7 @@ class Stage extends FormEntity
     {
         $builder = new ClassMetadataBuilder($metadata);
         $builder->setTable('stages')
-            ->setCustomRepositoryClass('Mautic\StageBundle\Entity\StageRepository');
+            ->setCustomRepositoryClass(\Mautic\StageBundle\Entity\StageRepository::class);
 
         $builder->addIdColumns();
 
@@ -153,10 +153,7 @@ class Stage extends FormEntity
         return $this->weight;
     }
 
-    /**
-     * @return array
-     */
-    public function convertToArray()
+    public function convertToArray(): array
     {
         return get_object_vars($this);
     }

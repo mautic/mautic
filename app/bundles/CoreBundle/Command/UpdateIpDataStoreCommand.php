@@ -14,16 +14,10 @@ use Symfony\Contracts\Translation\TranslatorInterface;
  */
 class UpdateIpDataStoreCommand extends Command
 {
-    private TranslatorInterface $translator;
-    private AbstractLookup $ipService;
-
     public function __construct(
-        TranslatorInterface $translator,
-        AbstractLookup $ipService
+        private TranslatorInterface $translator,
+        private AbstractLookup $ipService
     ) {
-        $this->translator = $translator;
-        $this->ipService  = $ipService;
-
         parent::__construct();
     }
 

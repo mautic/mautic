@@ -9,11 +9,8 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class GraphAggregateStatsSubscriber implements EventSubscriberInterface
 {
-    private \Mautic\EmailBundle\Helper\StatsCollectionHelper $statsCollectionHelper;
-
-    public function __construct(StatsCollectionHelper $statsCollectionHelper)
+    public function __construct(private StatsCollectionHelper $statsCollectionHelper)
     {
-        $this->statsCollectionHelper = $statsCollectionHelper;
     }
 
     /**

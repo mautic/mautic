@@ -141,28 +141,8 @@ class ReportSubscriber implements EventSubscriberInterface
         ],
     ];
 
-    private \Doctrine\DBAL\Connection $db;
-
-    private \Mautic\LeadBundle\Model\CompanyReportData $companyReportData;
-
-    private \Mautic\CoreBundle\Doctrine\Provider\GeneratedColumnsProviderInterface $generatedColumnsProvider;
-
-    private \Mautic\EmailBundle\Entity\StatRepository $statRepository;
-
-    private \Mautic\LeadBundle\Report\FieldsBuilder $fieldsBuilder;
-
-    public function __construct(
-        Connection $db,
-        CompanyReportData $companyReportData,
-        StatRepository $statRepository,
-        GeneratedColumnsProviderInterface $generatedColumnsProvider,
-        FieldsBuilder $fieldsBuilder
-    ) {
-        $this->db                       = $db;
-        $this->companyReportData        = $companyReportData;
-        $this->statRepository           = $statRepository;
-        $this->generatedColumnsProvider = $generatedColumnsProvider;
-        $this->fieldsBuilder            = $fieldsBuilder;
+    public function __construct(private Connection $db, private CompanyReportData $companyReportData, private StatRepository $statRepository, private GeneratedColumnsProviderInterface $generatedColumnsProvider, private FieldsBuilder $fieldsBuilder)
+    {
     }
 
     /**

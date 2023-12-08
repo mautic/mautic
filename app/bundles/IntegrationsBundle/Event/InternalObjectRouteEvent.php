@@ -9,19 +9,13 @@ use Symfony\Contracts\EventDispatcher\Event;
 
 class InternalObjectRouteEvent extends Event
 {
-    private \Mautic\IntegrationsBundle\Sync\SyncDataExchange\Internal\Object\ObjectInterface $object;
-
-    private int $id;
-
     /**
      * @var string|null
      */
     private $route;
 
-    public function __construct(ObjectInterface $object, int $id)
+    public function __construct(private ObjectInterface $object, private int $id)
     {
-        $this->object = $object;
-        $this->id     = $id;
     }
 
     public function getObject(): ObjectInterface

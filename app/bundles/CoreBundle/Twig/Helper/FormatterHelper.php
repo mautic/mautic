@@ -10,13 +10,8 @@ final class FormatterHelper
 {
     public const FLOAT_PRECISION = 4;
 
-    private \Mautic\CoreBundle\Twig\Helper\DateHelper $dateHelper;
-    private \Symfony\Contracts\Translation\TranslatorInterface $translator;
-
-    public function __construct(DateHelper $dateHelper, TranslatorInterface $translator)
+    public function __construct(private DateHelper $dateHelper, private TranslatorInterface $translator)
     {
-        $this->dateHelper = $dateHelper;
-        $this->translator = $translator;
     }
 
     /**
@@ -128,10 +123,8 @@ final class FormatterHelper
     /**
      * @param string                $delimeter
      * @param array<string, string> $array
-     *
-     * @return string
      */
-    public function simpleArrayToHtml(array $array, $delimeter = '<br />')
+    public function simpleArrayToHtml(array $array, $delimeter = '<br />'): string
     {
         $pairs = [];
         foreach ($array as $key => $value) {
@@ -181,10 +174,7 @@ final class FormatterHelper
         return $string;
     }
 
-    /**
-     * @return string
-     */
-    public function getName()
+    public function getName(): string
     {
         return 'formatter';
     }

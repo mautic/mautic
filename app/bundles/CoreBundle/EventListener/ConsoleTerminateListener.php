@@ -7,14 +7,11 @@ use Symfony\Component\Console\Event\ConsoleTerminateEvent;
 
 class ConsoleTerminateListener
 {
-    private \Psr\Log\LoggerInterface $logger;
-
-    public function __construct(LoggerInterface $logger)
+    public function __construct(private LoggerInterface $logger)
     {
-        $this->logger = $logger;
     }
 
-    public function onConsoleTerminate(ConsoleTerminateEvent $event)
+    public function onConsoleTerminate(ConsoleTerminateEvent $event): void
     {
         $statusCode = $event->getExitCode();
         $command    = $event->getCommand();

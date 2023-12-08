@@ -10,24 +10,8 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class MessageSchedule
 {
-    private \Symfony\Contracts\Translation\TranslatorInterface $translator;
-
-    private \Mautic\CoreBundle\Helper\FileProperties $fileProperties;
-
-    private \Mautic\CoreBundle\Helper\CoreParametersHelper $coreParametersHelper;
-
-    private \Symfony\Component\Routing\Generator\UrlGeneratorInterface $router;
-
-    public function __construct(
-        TranslatorInterface $translator,
-        FileProperties $fileProperties,
-        CoreParametersHelper $coreParametersHelper,
-        UrlGeneratorInterface $router
-    ) {
-        $this->translator           = $translator;
-        $this->fileProperties       = $fileProperties;
-        $this->coreParametersHelper = $coreParametersHelper;
-        $this->router               = $router;
+    public function __construct(private TranslatorInterface $translator, private FileProperties $fileProperties, private CoreParametersHelper $coreParametersHelper, private UrlGeneratorInterface $router)
+    {
     }
 
     /**
@@ -95,11 +79,9 @@ class MessageSchedule
      *
      * @param string $filePath
      *
-     * @return bool
-     *
      * @throws \Mautic\CoreBundle\Exception\FileInvalidException
      */
-    public function fileCouldBeSend($filePath)
+    public function fileCouldBeSend($filePath): bool
     {
         $filesize    = $this->fileProperties->getFileSize($filePath);
         $maxFileSize = $this->coreParametersHelper->get('report_export_max_filesize_in_bytes');

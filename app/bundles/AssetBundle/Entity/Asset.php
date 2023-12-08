@@ -157,7 +157,7 @@ class Asset extends FormEntity
         $builder = new ClassMetadataBuilder($metadata);
 
         $builder->setTable('assets')
-            ->setCustomRepositoryClass('Mautic\AssetBundle\Entity\AssetRepository')
+            ->setCustomRepositoryClass(\Mautic\AssetBundle\Entity\AssetRepository::class)
             ->addIndex(['alias'], 'asset_alias_search');
 
         $builder->addIdColumns('title');
@@ -946,10 +946,8 @@ class Asset extends FormEntity
 
     /**
      * Returns Font Awesome icon class based on file type.
-     *
-     * @return string
      */
-    public function getIconClass()
+    public function getIconClass(): string
     {
         $fileType = $this->getFileType();
 
@@ -1091,7 +1089,7 @@ class Asset extends FormEntity
 
         try {
             $file = new File($path);
-        } catch (FileNotFoundException $e) {
+        } catch (FileNotFoundException) {
             $file = null;
         }
 
@@ -1100,10 +1098,8 @@ class Asset extends FormEntity
 
     /**
      * Load content of the file from it's path.
-     *
-     * @return string
      */
-    public function getFileContents()
+    public function getFileContents(): string|bool
     {
         $path = $this->getFilePath();
 
@@ -1139,7 +1135,7 @@ class Asset extends FormEntity
     public static function loadValidatorMetadata(ClassMetadata $metadata): void
     {
         // Add a constraint to manage the file upload data
-        $metadata->addConstraint(new Assert\Callback([__CLASS__, 'validateFile']));
+        $metadata->addConstraint(new Assert\Callback([self::class, 'validateFile']));
     }
 
     /**
@@ -1304,18 +1300,16 @@ class Asset extends FormEntity
 
     /**
      * @param string $unit
-     *
-     * @return string
      */
-    public static function convertBytesToHumanReadable($size, $unit = '')
+    public static function convertBytesToHumanReadable($size, $unit = ''): string
     {
-        list($number, $unit) = self::convertBytesToUnit($size, $unit);
+        [$number, $unit] = self::convertBytesToUnit($size, $unit);
 
         // Format number
         $number = number_format($number, 2);
 
         // Remove trailing .00
-        $number = false !== strpos($number, '.') ? rtrim(rtrim($number, '0'), '.') : $number;
+        $number = str_contains($number, '.') ? rtrim(rtrim($number, '0'), '.') : $number;
 
         return $number.' '.$unit;
     }

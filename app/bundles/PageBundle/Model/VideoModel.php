@@ -25,13 +25,9 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
  */
 class VideoModel extends FormModel
 {
-    protected \Mautic\CoreBundle\Helper\IpLookupHelper $ipLookupHelper;
-
-    protected \Mautic\LeadBundle\Tracker\ContactTracker $contactTracker;
-
     public function __construct(
-        IpLookupHelper $ipLookupHelper,
-        ContactTracker $contactTracker,
+        protected IpLookupHelper $ipLookupHelper,
+        protected ContactTracker $contactTracker,
         EntityManager $em,
         CorePermissions $security,
         EventDispatcherInterface $dispatcher,
@@ -41,9 +37,6 @@ class VideoModel extends FormModel
         LoggerInterface $mauticLogger,
         CoreParametersHelper $coreParametersHelper
     ) {
-        $this->ipLookupHelper = $ipLookupHelper;
-        $this->contactTracker = $contactTracker;
-
         parent::__construct($em, $security, $dispatcher, $router, $translator, $userHelper, $mauticLogger, $coreParametersHelper);
     }
 
@@ -55,7 +48,7 @@ class VideoModel extends FormModel
     /**
      * {@inheritdoc}
      */
-    public function getPermissionBase()
+    public function getPermissionBase(): string
     {
         return 'page:pages';
     }
@@ -63,7 +56,7 @@ class VideoModel extends FormModel
     /**
      * {@inheritdoc}
      */
-    public function getNameGetter()
+    public function getNameGetter(): string
     {
         return 'getTitle';
     }

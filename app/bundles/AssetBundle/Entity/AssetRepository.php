@@ -80,7 +80,7 @@ class AssetRepository extends CommonRepository
      */
     protected function addSearchCommandWhereClause($q, $filter): array
     {
-        list($expr, $parameters) = $this->addStandardSearchCommandWhereClause($q, $filter);
+        [$expr, $parameters] = $this->addStandardSearchCommandWhereClause($q, $filter);
         if ($expr) {
             return [$expr, $parameters];
         }
@@ -150,17 +150,15 @@ class AssetRepository extends CommonRepository
     /**
      * {@inheritdoc}
      */
-    public function getTableAlias()
+    public function getTableAlias(): string
     {
         return 'a';
     }
 
     /**
      * Gets the sum size of assets.
-     *
-     * @return int
      */
-    public function getAssetSize(array $assets)
+    public function getAssetSize(array $assets): int
     {
         $q = $this->_em->getConnection()->createQueryBuilder();
         $q->select('sum(a.size) as total_size')

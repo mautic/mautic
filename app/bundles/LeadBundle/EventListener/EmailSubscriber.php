@@ -17,11 +17,8 @@ class EmailSubscriber implements EventSubscriberInterface
      */
     private static $contactFieldRegex = '{contactfield=(.*?)}';
 
-    private \Mautic\CoreBundle\Helper\BuilderTokenHelperFactory $builderTokenHelperFactory;
-
-    public function __construct(BuilderTokenHelperFactory $builderTokenHelperFactory)
+    public function __construct(private BuilderTokenHelperFactory $builderTokenHelperFactory)
     {
-        $this->builderTokenHelperFactory = $builderTokenHelperFactory;
     }
 
     /**
@@ -37,7 +34,7 @@ class EmailSubscriber implements EventSubscriberInterface
         ];
     }
 
-    public function onEmailBuild(EmailBuilderEvent $event)
+    public function onEmailBuild(EmailBuilderEvent $event): void
     {
         $tokenHelper = $this->builderTokenHelperFactory->getBuilderTokenHelper('lead.field', 'lead:fields', 'MauticLeadBundle');
         // the permissions are for viewing contact data, not for managing contact fields
@@ -48,12 +45,12 @@ class EmailSubscriber implements EventSubscriberInterface
         }
     }
 
-    public function onEmailDisplay(EmailSendEvent $event)
+    public function onEmailDisplay(EmailSendEvent $event): void
     {
         $this->onEmailGenerate($event);
     }
 
-    public function onEmailGenerate(EmailSendEvent $event)
+    public function onEmailGenerate(EmailSendEvent $event): void
     {
         // Combine all possible content to find tokens across them
         $content = $event->getSubject();

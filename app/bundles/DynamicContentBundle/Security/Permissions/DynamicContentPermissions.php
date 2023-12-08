@@ -18,12 +18,7 @@ class DynamicContentPermissions extends AbstractPermissions
         $this->addExtendedPermissions('dynamiccontents');
     }
 
-    /**
-     * {@inheritdoc}
-     *
-     * @return string|void
-     */
-    public function getName()
+    public function getName(): string
     {
         return 'dynamiccontent';
     }
@@ -31,7 +26,7 @@ class DynamicContentPermissions extends AbstractPermissions
     /**
      * {@inheritdoc}
      */
-    public function buildForm(FormBuilderInterface &$builder, array $options, array $data)
+    public function buildForm(FormBuilderInterface &$builder, array $options, array $data): void
     {
         $this->addStandardFormFields('dynamiccontent', 'categories', $builder, $data);
         $this->addExtendedFormFields('dynamiccontent', 'dynamiccontents', $builder, $data);

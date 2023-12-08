@@ -27,28 +27,8 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class BuilderSubscriber implements EventSubscriberInterface
 {
-    private \Mautic\CoreBundle\Helper\CoreParametersHelper $coreParametersHelper;
-
-    private \Mautic\EmailBundle\Model\EmailModel $emailModel;
-
-    private \Mautic\PageBundle\Model\TrackableModel $pageTrackableModel;
-
-    private \Mautic\PageBundle\Model\RedirectModel $pageRedirectModel;
-
-    private \Symfony\Contracts\Translation\TranslatorInterface $translator;
-
-    public function __construct(
-        CoreParametersHelper $coreParametersHelper,
-        EmailModel $emailModel,
-        TrackableModel $trackableModel,
-        RedirectModel $redirectModel,
-        TranslatorInterface $translator
-    ) {
-        $this->coreParametersHelper = $coreParametersHelper;
-        $this->emailModel           = $emailModel;
-        $this->pageTrackableModel   = $trackableModel;
-        $this->pageRedirectModel    = $redirectModel;
-        $this->translator           = $translator;
+    public function __construct(private CoreParametersHelper $coreParametersHelper, private EmailModel $emailModel, private TrackableModel $pageTrackableModel, private RedirectModel $pageRedirectModel, private TranslatorInterface $translator)
+    {
     }
 
     /**

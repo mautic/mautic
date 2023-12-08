@@ -13,8 +13,6 @@ use Mautic\LeadBundle\Segment\Exception\SegmentNotFoundException;
 
 class SegmentContactsLineChartQuery extends ChartQuery
 {
-    private array $filters;
-
     /**
      * @var int
      */
@@ -50,13 +48,12 @@ class SegmentContactsLineChartQuery extends ChartQuery
      *
      * @throws SegmentNotFoundException
      */
-    public function __construct(Connection $connection, \DateTime $dateFrom, \DateTime $dateTo, array $filters = [], $unit = null)
+    public function __construct(Connection $connection, \DateTime $dateFrom, \DateTime $dateTo, private array $filters = [], $unit = null)
     {
         $this->connection = $connection;
         $this->dateFrom   = $dateFrom;
         $this->dateTo     = $dateTo;
         $this->unit       = $unit;
-        $this->filters    = $filters;
 
         if (!isset($this->filters['leadlist_id']['value'])) {
             throw new SegmentNotFoundException('Segment ID required');
@@ -65,16 +62,13 @@ class SegmentContactsLineChartQuery extends ChartQuery
         parent::__construct($connection, $dateFrom, $dateTo, $unit);
     }
 
-    public function setDateRange(\DateTimeInterface $dateFrom, \DateTimeInterface $dateTo)
+    public function setDateRange(\DateTimeInterface $dateFrom, \DateTimeInterface $dateTo): void
     {
         parent::setDateRange($dateFrom, $dateTo);
         $this->init();
     }
 
-    /**
-     * @return array
-     */
-    public function getTotalStats(int $total)
+    public function getTotalStats(int $total): array
     {
         $totalCountDateTo = $this->getTotalToDateRange($total);
         // count array SUM and then reverse
@@ -241,7 +235,7 @@ class SegmentContactsLineChartQuery extends ChartQuery
         $compositeExpressionReflectionParts->setAccessible(true);
         $parts    = $compositeExpressionReflectionParts->getValue($compositeExpression);
         $newParts = array_filter($parts, function ($val) use ($joinAlias): bool {
-            return 0 !== strpos($val, "$joinAlias.");
+            return !str_starts_with($val, "$joinAlias.");
         });
         $compositeExpressionReflectionParts->setValue($compositeExpression, $newParts);
         $compositeExpressionReflectionParts->setAccessible(false);

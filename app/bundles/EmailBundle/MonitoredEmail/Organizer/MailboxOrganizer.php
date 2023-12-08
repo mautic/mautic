@@ -8,19 +8,13 @@ use Mautic\EmailBundle\MonitoredEmail\Mailbox;
 
 class MailboxOrganizer
 {
-    protected \Mautic\EmailBundle\Event\ParseEmailEvent $event;
-
-    protected array $mailboxes;
-
     /**
      * @var MailboxContainer[]
      */
     protected $containers = [];
 
-    public function __construct(ParseEmailEvent $event, array $mailboxes)
+    public function __construct(protected ParseEmailEvent $event, protected array $mailboxes)
     {
-        $this->event     = $event;
-        $this->mailboxes = $mailboxes;
     }
 
     /**
@@ -42,8 +36,8 @@ class MailboxOrganizer
                 continue;
             }
 
-            $criteria   = isset($criteriaRequested[$name]) ? $criteriaRequested[$name] : Mailbox::CRITERIA_UNSEEN;
-            $markAsSeen = isset($markAsSeenInstructions[$name]) ? $markAsSeenInstructions[$name] : true;
+            $criteria   = $criteriaRequested[$name] ?? Mailbox::CRITERIA_UNSEEN;
+            $markAsSeen = $markAsSeenInstructions[$name] ?? true;
 
             $container = $this->getContainer($config);
             if (!$markAsSeen) {

@@ -12,14 +12,8 @@ use Mautic\FormBundle\Entity\Submission;
 
 class FormUploader
 {
-    private \Mautic\CoreBundle\Helper\FileUploader $fileUploader;
-
-    private \Mautic\CoreBundle\Helper\CoreParametersHelper $coreParametersHelper;
-
-    public function __construct(FileUploader $fileUploader, CoreParametersHelper $coreParametersHelper)
+    public function __construct(private FileUploader $fileUploader, private CoreParametersHelper $coreParametersHelper)
     {
-        $this->fileUploader         = $fileUploader;
-        $this->coreParametersHelper = $coreParametersHelper;
     }
 
     /**
@@ -43,7 +37,7 @@ class FormUploader
                 $uploadedFiles[] =$uploadedFile;
             }
             $submission->setResults($result);
-        } catch (FileUploadException $e) {
+        } catch (FileUploadException) {
             foreach ($uploadedFiles as $filePath) {
                 $this->fileUploader->delete($filePath);
             }
@@ -53,10 +47,8 @@ class FormUploader
 
     /**
      * @param string $fileName
-     *
-     * @return string
      */
-    public function getCompleteFilePath(Field $field, $fileName)
+    public function getCompleteFilePath(Field $field, $fileName): string
     {
         $uploadDir = $this->getUploadDir($field);
 
@@ -105,10 +97,7 @@ class FormUploader
         $this->fileUploader->delete($filePath);
     }
 
-    /**
-     * @return string
-     */
-    private function getUploadDir(Field $field)
+    private function getUploadDir(Field $field): string
     {
         $fieldId       = $field->getId();
         $formUploadDir = $this->getUploadDirOfForm($field->getForm()->getId());
@@ -117,11 +106,9 @@ class FormUploader
     }
 
     /**
-     * @return string
-     *
      * @throws \LogicException If formId is null
      */
-    private function getUploadDirOfForm(int $formId)
+    private function getUploadDirOfForm(int $formId): string
     {
         $uploadDir = $this->coreParametersHelper->get('form_upload_dir');
 

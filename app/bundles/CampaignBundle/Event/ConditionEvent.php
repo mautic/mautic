@@ -9,31 +9,24 @@ class ConditionEvent extends CampaignExecutionEvent
 {
     use ContextTrait;
 
-    private \Mautic\CampaignBundle\EventCollector\Accessor\Event\AbstractEventAccessor $eventConfig;
-
-    private \Mautic\CampaignBundle\Entity\LeadEventLog $eventLog;
-
     /**
      * @var bool
      */
     private $passed = false;
 
-    public function __construct(AbstractEventAccessor $config, LeadEventLog $log)
+    public function __construct(private AbstractEventAccessor $eventConfig, private LeadEventLog $eventLog)
     {
-        $this->eventConfig = $config;
-        $this->eventLog    = $log;
-
         // @deprecated support for pre 2.13.0; to be removed in 3.0
         parent::__construct(
             [
-                'eventSettings'   => $config->getConfig(),
+                'eventSettings'   => $eventConfig->getConfig(),
                 'eventDetails'    => null,
-                'event'           => $log->getEvent(),
-                'lead'            => $log->getLead(),
-                'systemTriggered' => $log->getSystemTriggered(),
+                'event'           => $eventLog->getEvent(),
+                'lead'            => $eventLog->getLead(),
+                'systemTriggered' => $eventLog->getSystemTriggered(),
             ],
             null,
-            $log
+            $eventLog
         );
     }
 
@@ -56,7 +49,7 @@ class ConditionEvent extends CampaignExecutionEvent
     /**
      * Pass this condition.
      */
-    public function pass()
+    public function pass(): void
     {
         $this->passed = true;
     }
@@ -64,7 +57,7 @@ class ConditionEvent extends CampaignExecutionEvent
     /**
      * Fail this condition.
      */
-    public function fail()
+    public function fail(): void
     {
         $this->passed = false;
     }
@@ -81,10 +74,10 @@ class ConditionEvent extends CampaignExecutionEvent
      * @param string   $channel
      * @param int|null $channelId
      */
-    public function setChannel($channel, $channelId = null)
+    public function setChannel($channel, $channelId = null): void
     {
-        $this->log->setChannel($this->channel)
-            ->setChannelId($this->channelId);
+        $this->log->setChannel($this->channel);
+        $this->log->setChannelId($this->channelId);
     }
 
     /**

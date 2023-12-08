@@ -68,7 +68,7 @@ class CopyRepository extends CommonRepository
 
         try {
             $result = $q->getQuery()->getSingleResult();
-        } catch (NoResultException $exception) {
+        } catch (NoResultException) {
             $result = null;
         }
 
@@ -78,7 +78,7 @@ class CopyRepository extends CommonRepository
     /**
      * {@inheritdoc}
      */
-    public function getTableAlias()
+    public function getTableAlias(): string
     {
         return 'ec';
     }

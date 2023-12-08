@@ -13,17 +13,8 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class SetContactAvatarFormSubscriber implements EventSubscriberInterface
 {
-    private \Mautic\LeadBundle\Twig\Helper\AvatarHelper $avatarHelper;
-
-    private \Mautic\FormBundle\Helper\FormUploader $uploader;
-
-    private \Mautic\LeadBundle\Model\LeadModel $leadModel;
-
-    public function __construct(AvatarHelper $avatarHelper, FormUploader $uploader, LeadModel $leadModel)
+    public function __construct(private AvatarHelper $avatarHelper, private FormUploader $uploader, private LeadModel $leadModel)
     {
-        $this->avatarHelper = $avatarHelper;
-        $this->uploader     = $uploader;
-        $this->leadModel    = $leadModel;
     }
 
     /**
@@ -36,7 +27,7 @@ class SetContactAvatarFormSubscriber implements EventSubscriberInterface
         ];
     }
 
-    public function onFormSubmit(SubmissionEvent $submissionEvent)
+    public function onFormSubmit(SubmissionEvent $submissionEvent): void
     {
         $fields  = $submissionEvent->getForm()->getFields();
         $contact = $submissionEvent->getLead();
@@ -64,7 +55,7 @@ class SetContactAvatarFormSubscriber implements EventSubscriberInterface
                         $this->leadModel->saveEntity($contact);
 
                         return;
-                    } catch (\Exception $exception) {
+                    } catch (\Exception) {
                     }
 
                     break;

@@ -6,31 +6,8 @@ namespace Mautic\MarketplaceBundle\DTO;
 
 final class Version
 {
-    public string $version;
-    public array $license;
-    public string $homepage;
-    public string $issues;
-    public string $wiki;
-    public \DateTimeInterface $time;
-    public array $require;
-    public array $keywords;
-    public ?string $type;
-    public ?string $directoryName;
-    public ?string $displayName;
-
-    public function __construct(string $version, array $license, \DateTimeInterface $time, string $homepage, string $issues, string $wiki, array $require, array $keywords, ?string $type, ?string $directoryName, ?string $displayName)
+    public function __construct(public string $version, public array $license, public \DateTimeInterface $time, public string $homepage, public string $issues, public string $wiki, public array $require, public array $keywords, public ?string $type, public ?string $directoryName, public ?string $displayName)
     {
-        $this->version       = $version;
-        $this->license       = $license;
-        $this->time          = $time;
-        $this->homepage      = $homepage;
-        $this->issues        = $issues;
-        $this->wiki          = $wiki;
-        $this->require       = $require;
-        $this->keywords      = $keywords;
-        $this->type          = $type;
-        $this->directoryName = $directoryName;
-        $this->displayName   = $displayName;
     }
 
     public static function fromArray(array $array): Version

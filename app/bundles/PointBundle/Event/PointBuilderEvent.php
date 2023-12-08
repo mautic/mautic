@@ -13,11 +13,8 @@ class PointBuilderEvent extends Event
      */
     private $actions = [];
 
-    private \Symfony\Contracts\Translation\TranslatorInterface $translator;
-
-    public function __construct(TranslatorInterface $translator)
+    public function __construct(private TranslatorInterface $translator)
     {
-        $this->translator = $translator;
     }
 
     /**
@@ -71,7 +68,7 @@ class PointBuilderEvent extends Event
      */
     public function getActions()
     {
-        uasort($this->actions, function ($a, $b) {
+        uasort($this->actions, function ($a, $b): int {
             return strnatcasecmp(
                 $a['label'], $b['label']);
         });

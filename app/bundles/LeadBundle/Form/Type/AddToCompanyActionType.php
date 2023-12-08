@@ -10,14 +10,11 @@ use Symfony\Component\Validator\Constraints\NotBlank;
 
 class AddToCompanyActionType extends AbstractType
 {
-    protected \Symfony\Component\Routing\RouterInterface $router;
-
-    public function __construct(RouterInterface $router)
+    public function __construct(protected RouterInterface $router)
     {
-        $this->router = $router;
     }
 
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder->add(
             'company',

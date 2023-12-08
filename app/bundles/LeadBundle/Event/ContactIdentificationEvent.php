@@ -7,8 +7,6 @@ use Symfony\Contracts\EventDispatcher\Event;
 
 class ContactIdentificationEvent extends Event
 {
-    private array $clickthrough;
-
     /**
      * @var Lead
      */
@@ -19,9 +17,8 @@ class ContactIdentificationEvent extends Event
      */
     private $identifiedByChannel;
 
-    public function __construct(array $clickthrough)
+    public function __construct(private array $clickthrough)
     {
-        $this->clickthrough = $clickthrough;
     }
 
     /**
@@ -35,7 +32,7 @@ class ContactIdentificationEvent extends Event
     /**
      * @param string $channel
      */
-    public function setIdentifiedContact(Lead $contact, $channel)
+    public function setIdentifiedContact(Lead $contact, $channel): void
     {
         $this->identifiedContact   = $contact;
         $this->identifiedByChannel = $channel;

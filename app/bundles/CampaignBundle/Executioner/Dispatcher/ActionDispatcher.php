@@ -21,28 +21,8 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class ActionDispatcher
 {
-    private \Symfony\Component\EventDispatcher\EventDispatcherInterface $dispatcher;
-
-    private \Psr\Log\LoggerInterface $logger;
-
-    private \Mautic\CampaignBundle\Executioner\Scheduler\EventScheduler $scheduler;
-
-    private \Mautic\CampaignBundle\Executioner\Helper\NotificationHelper $notificationHelper;
-
-    private \Mautic\CampaignBundle\Executioner\Dispatcher\LegacyEventDispatcher $legacyDispatcher;
-
-    public function __construct(
-        EventDispatcherInterface $dispatcher,
-        LoggerInterface $logger,
-        EventScheduler $scheduler,
-        NotificationHelper $notificationHelper,
-        LegacyEventDispatcher $legacyDispatcher
-    ) {
-        $this->dispatcher         = $dispatcher;
-        $this->logger             = $logger;
-        $this->scheduler          = $scheduler;
-        $this->notificationHelper = $notificationHelper;
-        $this->legacyDispatcher   = $legacyDispatcher;
+    public function __construct(private EventDispatcherInterface $dispatcher, private LoggerInterface $logger, private EventScheduler $scheduler, private NotificationHelper $notificationHelper, private LegacyEventDispatcher $legacyDispatcher)
+    {
     }
 
     /**
@@ -85,7 +65,7 @@ class ActionDispatcher
         return $pendingEvent;
     }
 
-    private function dispatchExecutedEvent(AbstractEventAccessor $config, Event $event, ArrayCollection $logs)
+    private function dispatchExecutedEvent(AbstractEventAccessor $config, Event $event, ArrayCollection $logs): void
     {
         if (!$logs->count()) {
             return;
@@ -104,7 +84,7 @@ class ActionDispatcher
         );
     }
 
-    private function dispatchedFailedEvent(AbstractEventAccessor $config, ArrayCollection $logs)
+    private function dispatchedFailedEvent(AbstractEventAccessor $config, ArrayCollection $logs): void
     {
         if (!$logs->count()) {
             return;

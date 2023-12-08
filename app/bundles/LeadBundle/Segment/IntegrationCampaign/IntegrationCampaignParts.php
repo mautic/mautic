@@ -13,8 +13,8 @@ class IntegrationCampaignParts
      */
     public function __construct($field)
     {
-        if (false !== strpos($field, '::')) {
-            list($integrationName, $campaignId) = explode('::', $field);
+        if (str_contains($field, '::')) {
+            [$integrationName, $campaignId] = explode('::', $field);
         } else {
             // Assuming this is a Salesforce integration for BC with pre 2.11.0
             $integrationName = 'Salesforce';
@@ -24,18 +24,12 @@ class IntegrationCampaignParts
         $this->campaignId      = $campaignId;
     }
 
-    /**
-     * @return string
-     */
-    public function getIntegrationName()
+    public function getIntegrationName(): string
     {
         return $this->integrationName;
     }
 
-    /**
-     * @return string
-     */
-    public function getCampaignId()
+    public function getCampaignId(): string
     {
         return $this->campaignId;
     }

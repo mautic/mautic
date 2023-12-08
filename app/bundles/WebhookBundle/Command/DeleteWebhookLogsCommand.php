@@ -19,12 +19,9 @@ class DeleteWebhookLogsCommand extends Command
 
     private \Mautic\WebhookBundle\Entity\LogRepository $logRepository;
 
-    private \Mautic\CoreBundle\Helper\CoreParametersHelper $coreParametersHelper;
-
-    public function __construct(WebhookModel $webhookModel, CoreParametersHelper $coreParametersHelper)
+    public function __construct(WebhookModel $webhookModel, private CoreParametersHelper $coreParametersHelper)
     {
         $this->logRepository        = $webhookModel->getLogRepository();
-        $this->coreParametersHelper = $coreParametersHelper;
 
         parent::__construct();
     }

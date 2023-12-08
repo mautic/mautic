@@ -36,30 +36,20 @@ class TriggerModel extends CommonFormModel
 {
     protected $triggers = [];
 
-    protected \Mautic\CoreBundle\Helper\IpLookupHelper $ipLookupHelper;
-
-    protected \Mautic\LeadBundle\Model\LeadModel $leadModel;
-
-    protected \Mautic\PointBundle\Model\TriggerEventModel $pointTriggerEventModel;
-
-    /**
-     * @deprecated https://github.com/mautic/mautic/issues/8229
-     */
-    protected \Mautic\CoreBundle\Factory\MauticFactory $mauticFactory;
-
-    private \Mautic\LeadBundle\Tracker\ContactTracker $contactTracker;
-
     /**
      * @var array<string,array<string,mixed>>
      */
     private static array $events;
 
     public function __construct(
-        IpLookupHelper $ipLookupHelper,
-        LeadModel $leadModel,
-        TriggerEventModel $pointTriggerEventModel,
-        MauticFactory $mauticFactory,
-        ContactTracker $contactTracker,
+        protected IpLookupHelper $ipLookupHelper,
+        protected LeadModel $leadModel,
+        protected TriggerEventModel $pointTriggerEventModel,
+        /**
+         * @deprecated https://github.com/mautic/mautic/issues/8229
+         */
+        protected MauticFactory $mauticFactory,
+        private ContactTracker $contactTracker,
         EntityManagerInterface $em,
         CorePermissions $security,
         EventDispatcherInterface $dispatcher,
@@ -69,12 +59,6 @@ class TriggerModel extends CommonFormModel
         LoggerInterface $mauticLogger,
         CoreParametersHelper $coreParametersHelper
     ) {
-        $this->ipLookupHelper         = $ipLookupHelper;
-        $this->leadModel              = $leadModel;
-        $this->pointTriggerEventModel = $pointTriggerEventModel;
-        $this->mauticFactory          = $mauticFactory;
-        $this->contactTracker         = $contactTracker;
-
         parent::__construct($em, $security, $dispatcher, $router, $translator, $userHelper, $mauticLogger, $coreParametersHelper);
     }
 
@@ -101,7 +85,7 @@ class TriggerModel extends CommonFormModel
     /**
      * {@inheritdoc}
      */
-    public function getPermissionBase()
+    public function getPermissionBase(): string
     {
         return 'point:triggers';
     }
@@ -235,7 +219,7 @@ class TriggerModel extends CommonFormModel
      *
      * @throws MethodNotAllowedHttpException
      */
-    protected function dispatchEvent($action, &$entity, $isNew = false, Event $event = null)
+    protected function dispatchEvent($action, &$entity, $isNew = false, Event $event = null): ?Event
     {
         if (!$entity instanceof Trigger) {
             throw new MethodNotAllowedHttpException(['Trigger']);
@@ -406,7 +390,7 @@ class TriggerModel extends CommonFormModel
 
         if (is_array($settings['callback'])) {
             $reflection = new \ReflectionMethod($settings['callback'][0], $settings['callback'][1]);
-        } elseif (false !== strpos($settings['callback'], '::')) {
+        } elseif (str_contains($settings['callback'], '::')) {
             $parts      = explode('::', $settings['callback']);
             $reflection = new \ReflectionMethod($parts[0], $parts[1]);
         } else {

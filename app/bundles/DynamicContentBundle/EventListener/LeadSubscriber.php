@@ -12,20 +12,8 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class LeadSubscriber implements EventSubscriberInterface
 {
-    private \Symfony\Contracts\Translation\TranslatorInterface $translator;
-
-    private \Symfony\Component\Routing\RouterInterface $router;
-
-    private \Mautic\DynamicContentBundle\Entity\StatRepository $statRepository;
-
-    public function __construct(
-        TranslatorInterface $translator,
-        RouterInterface $router,
-        StatRepository $statRepository
-    ) {
-        $this->translator     = $translator;
-        $this->router         = $router;
-        $this->statRepository = $statRepository;
+    public function __construct(private TranslatorInterface $translator, private RouterInterface $router, private StatRepository $statRepository)
+    {
     }
 
     /**
@@ -42,7 +30,7 @@ class LeadSubscriber implements EventSubscriberInterface
     /**
      * Compile events for the lead timeline.
      */
-    public function onTimelineGenerate(LeadTimelineEvent $event)
+    public function onTimelineGenerate(LeadTimelineEvent $event): void
     {
         // Set available event types
         $eventTypeKey      = 'dynamic.content.sent';
@@ -92,7 +80,7 @@ class LeadSubscriber implements EventSubscriberInterface
         }
     }
 
-    public function onLeadMerge(LeadMergeEvent $event)
+    public function onLeadMerge(LeadMergeEvent $event): void
     {
         $this->statRepository->updateLead(
             $event->getLoser()->getId(),

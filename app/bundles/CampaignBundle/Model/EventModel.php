@@ -41,10 +41,8 @@ class EventModel extends FormModel
 
     /**
      * {@inheritdoc}
-     *
-     * @return string
      */
-    public function getPermissionBase()
+    public function getPermissionBase(): string
     {
         return 'campaign:campaigns';
     }
@@ -63,7 +61,7 @@ class EventModel extends FormModel
         return parent::getEntity($id);
     }
 
-    public function deleteEvents($currentEvents, $deletedEvents)
+    public function deleteEvents($currentEvents, $deletedEvents): void
     {
         $deletedKeys = [];
         foreach ($deletedEvents as $k => $deleteMe) {
@@ -71,7 +69,7 @@ class EventModel extends FormModel
                 $deleteMe = $deleteMe->getId();
             }
 
-            if (0 === strpos($deleteMe, 'new')) {
+            if (str_starts_with($deleteMe, 'new')) {
                 unset($deletedEvents[$k]);
             }
 

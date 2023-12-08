@@ -13,16 +13,16 @@ class EvaluatedContacts
 
     public function __construct(ArrayCollection $passed = null, ArrayCollection $failed = null)
     {
-        $this->passed = (null === $passed) ? new ArrayCollection() : $passed;
-        $this->failed = (null === $failed) ? new ArrayCollection() : $failed;
+        $this->passed = $passed ?? new ArrayCollection();
+        $this->failed = $failed ?? new ArrayCollection();
     }
 
-    public function pass(Lead $contact)
+    public function pass(Lead $contact): void
     {
         $this->passed->set($contact->getId(), $contact);
     }
 
-    public function fail(Lead $contact)
+    public function fail(Lead $contact): void
     {
         $this->failed->set($contact->getId(), $contact);
     }

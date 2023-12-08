@@ -23,20 +23,11 @@ class ContactSegmentQueryBuilder
 {
     use LeadBatchLimiterTrait;
 
-    private \Doctrine\ORM\EntityManager $entityManager;
-
-    private \Mautic\LeadBundle\Segment\RandomParameterName $randomParameterName;
-
-    private \Symfony\Component\EventDispatcher\EventDispatcherInterface $dispatcher;
-
     /** @var array Contains segment edges mapping */
     private $dependencyMap = [];
 
-    public function __construct(EntityManager $entityManager, RandomParameterName $randomParameterName, EventDispatcherInterface $dispatcher)
+    public function __construct(private EntityManager $entityManager, private RandomParameterName $randomParameterName, private EventDispatcherInterface $dispatcher)
     {
-        $this->entityManager       = $entityManager;
-        $this->randomParameterName = $randomParameterName;
-        $this->dispatcher          = $dispatcher;
     }
 
     /**
@@ -75,7 +66,7 @@ class ContactSegmentQueryBuilder
         foreach ($segmentFilters as $filter) {
             try {
                 $this->dispatchPluginFilteringEvent($filter, $queryBuilder);
-            } catch (PluginHandledFilterException $exception) {
+            } catch (PluginHandledFilterException) {
                 continue;
             }
 
@@ -206,7 +197,7 @@ class ContactSegmentQueryBuilder
         return $queryBuilder;
     }
 
-    public function queryBuilderGenerated(LeadList $segment, QueryBuilder $queryBuilder)
+    public function queryBuilderGenerated(LeadList $segment, QueryBuilder $queryBuilder): void
     {
         if (!$this->dispatcher->hasListeners(LeadEvents::LIST_FILTERS_QUERYBUILDER_GENERATED)) {
             return;
@@ -218,10 +209,8 @@ class ContactSegmentQueryBuilder
 
     /**
      * Generate a unique parameter name.
-     *
-     * @return string
      */
-    private function generateRandomParameterName()
+    private function generateRandomParameterName(): string
     {
         return $this->randomParameterName->generateRandomParameterName();
     }

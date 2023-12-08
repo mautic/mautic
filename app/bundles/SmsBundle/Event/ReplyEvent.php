@@ -8,13 +8,6 @@ use Symfony\Contracts\EventDispatcher\Event;
 
 class ReplyEvent extends Event
 {
-    private \Mautic\LeadBundle\Entity\Lead $contact;
-
-    /**
-     * @var string
-     */
-    private $message;
-
     /**
      * @var Response|null
      */
@@ -25,10 +18,8 @@ class ReplyEvent extends Event
      *
      * @param string $message
      */
-    public function __construct(Lead $contact, $message)
+    public function __construct(private Lead $contact, private $message)
     {
-        $this->contact = $contact;
-        $this->message = $message;
     }
 
     /**

@@ -10,17 +10,8 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class PreAuthorizationEventListener
 {
-    private \Doctrine\ORM\EntityManager $em;
-
-    private \Mautic\CoreBundle\Security\Permissions\CorePermissions $mauticSecurity;
-
-    private \Symfony\Contracts\Translation\TranslatorInterface $translator;
-
-    public function __construct(EntityManager $entityManager, CorePermissions $corePermissions, TranslatorInterface $translator)
+    public function __construct(private EntityManager $em, private CorePermissions $mauticSecurity, private TranslatorInterface $translator)
     {
-        $this->em             = $entityManager;
-        $this->mauticSecurity = $corePermissions;
-        $this->translator     = $translator;
     }
 
     /**
@@ -40,7 +31,7 @@ class PreAuthorizationEventListener
         }
     }
 
-    public function onPostAuthorizationProcess(PreAuthorizationEvent $event)
+    public function onPostAuthorizationProcess(PreAuthorizationEvent $event): void
     {
         if ($event->isAuthorizedClient()) {
             if (null !== $client = $event->getClient()) {

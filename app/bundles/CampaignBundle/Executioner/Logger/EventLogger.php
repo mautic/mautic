@@ -16,16 +16,6 @@ use Mautic\LeadBundle\Tracker\ContactTracker;
 
 class EventLogger
 {
-    private \Mautic\CoreBundle\Helper\IpLookupHelper $ipLookupHelper;
-
-    private \Mautic\LeadBundle\Tracker\ContactTracker $contactTracker;
-
-    private \Mautic\CampaignBundle\Entity\LeadEventLogRepository $leadEventLogRepository;
-
-    private \Mautic\CampaignBundle\Model\SummaryModel $summaryModel;
-
-    private \Mautic\CampaignBundle\Entity\LeadRepository $leadRepository;
-
     /**
      * @var ArrayCollection
      */
@@ -47,23 +37,17 @@ class EventLogger
     private $lastUsedCampaignIdToFetchRotation;
 
     public function __construct(
-        IpLookupHelper $ipLookupHelper,
-        ContactTracker $contactTracker,
-        LeadEventLogRepository $leadEventLogRepository,
-        LeadRepository $leadRepository,
-        SummaryModel $summaryModel
+        private IpLookupHelper $ipLookupHelper,
+        private ContactTracker $contactTracker,
+        private LeadEventLogRepository $leadEventLogRepository,
+        private LeadRepository $leadRepository,
+        private SummaryModel $summaryModel
     ) {
-        $this->ipLookupHelper         = $ipLookupHelper;
-        $this->contactTracker         = $contactTracker;
-        $this->leadEventLogRepository = $leadEventLogRepository;
-        $this->leadRepository         = $leadRepository;
-        $this->summaryModel           = $summaryModel;
-
         $this->persistQueue = new ArrayCollection();
         $this->logs         = new ArrayCollection();
     }
 
-    public function queueToPersist(LeadEventLog $log)
+    public function queueToPersist(LeadEventLog $log): void
     {
         $this->persistQueue->add($log);
 
@@ -72,7 +56,7 @@ class EventLogger
         }
     }
 
-    public function persistLog(LeadEventLog $log)
+    public function persistLog(LeadEventLog $log): void
     {
         $this->leadEventLogRepository->saveEntity($log);
         $this->summaryModel->updateSummary([$log]);
@@ -204,13 +188,13 @@ class EventLogger
     /**
      * @param int $campaignId
      */
-    public function hydrateContactRotationsForNewLogs(array $contactIds, $campaignId)
+    public function hydrateContactRotationsForNewLogs(array $contactIds, $campaignId): void
     {
         $this->contactRotations                  = $this->leadRepository->getContactRotations($contactIds, $campaignId);
         $this->lastUsedCampaignIdToFetchRotation = $campaignId;
     }
 
-    private function persistPendingAndInsertIntoLogStack()
+    private function persistPendingAndInsertIntoLogStack(): void
     {
         if (!$this->persistQueue->count()) {
             return;

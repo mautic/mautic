@@ -7,29 +7,7 @@ use Mautic\CoreBundle\Event\CommonEvent;
 
 class LeadBuildSearchEvent extends CommonEvent
 {
-    /**
-     * @var string
-     */
-    protected $string;
-
-    protected \Doctrine\DBAL\Query\QueryBuilder $queryBuilder;
-
-    /**
-     * @var string
-     */
-    protected $alias;
-
-    /**
-     * @var string
-     */
-    protected $command;
-
     protected string $subQuery;
-
-    /**
-     * @var bool
-     */
-    protected $negate;
 
     protected bool $isSearchDone;
 
@@ -43,15 +21,9 @@ class LeadBuildSearchEvent extends CommonEvent
      * @param string $string
      * @param string $command
      * @param string $alias
-     * @param string $negate
      */
-    public function __construct($string, $command, $alias, $negate, QueryBuilder $queryBuilder)
+    public function __construct(protected $string, protected $command, protected $alias, protected bool $negate, protected QueryBuilder $queryBuilder)
     {
-        $this->string           = $string;
-        $this->command          = $command;
-        $this->alias            = $alias;
-        $this->negate           = $negate;
-        $this->queryBuilder     = $queryBuilder;
         $this->subQuery         = '';
         $this->isSearchDone     = false;
         $this->strict           = false;
@@ -102,7 +74,7 @@ class LeadBuildSearchEvent extends CommonEvent
     /**
      * @param bool $status
      */
-    public function setSearchStatus($status)
+    public function setSearchStatus($status): void
     {
         $this->isSearchDone = $status;
     }
@@ -110,25 +82,19 @@ class LeadBuildSearchEvent extends CommonEvent
     /**
      * @param string $query
      */
-    public function setSubQuery($query)
+    public function setSubQuery($query): void
     {
         $this->subQuery = $query;
 
         $this->setSearchStatus(true);
     }
 
-    /**
-     * @return bool
-     */
-    public function isSearchDone()
+    public function isSearchDone(): bool
     {
         return $this->isSearchDone;
     }
 
-    /**
-     * @return string
-     */
-    public function getSubQuery()
+    public function getSubQuery(): string
     {
         return $this->subQuery;
     }
@@ -136,15 +102,12 @@ class LeadBuildSearchEvent extends CommonEvent
     /**
      * @param array $string
      */
-    public function setString($string)
+    public function setString($string): void
     {
         $this->string = $string;
     }
 
-    /**
-     * @return bool
-     */
-    public function getStrict()
+    public function getStrict(): bool
     {
         return $this->strict;
     }
@@ -152,15 +115,12 @@ class LeadBuildSearchEvent extends CommonEvent
     /**
      * @param bool $val
      */
-    public function setStrict($val)
+    public function setStrict($val): void
     {
         $this->strict = $val;
     }
 
-    /**
-     * @return bool
-     */
-    public function getReturnParameters()
+    public function getReturnParameters(): bool
     {
         return $this->returnParameters;
     }
@@ -168,7 +128,7 @@ class LeadBuildSearchEvent extends CommonEvent
     /**
      * @param bool $val
      */
-    public function setReturnParameters($val)
+    public function setReturnParameters($val): void
     {
         $this->returnParameters = $val;
     }
@@ -184,7 +144,7 @@ class LeadBuildSearchEvent extends CommonEvent
     /**
      * @param array $val
      */
-    public function setParameters($val)
+    public function setParameters($val): void
     {
         $this->parameters = $val;
     }

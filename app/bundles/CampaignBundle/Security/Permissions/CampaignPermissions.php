@@ -20,15 +20,12 @@ class CampaignPermissions extends AbstractPermissions
     /**
      * {@inheritdoc}
      */
-    public function getName()
+    public function getName(): string
     {
         return 'campaign';
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function buildForm(FormBuilderInterface &$builder, array $options, array $data)
+    public function buildForm(FormBuilderInterface &$builder, array $options, array $data): void
     {
         $this->addStandardFormFields('campaign', 'categories', $builder, $data);
         $this->addExtendedFormFields('campaign', 'campaigns', $builder, $data);

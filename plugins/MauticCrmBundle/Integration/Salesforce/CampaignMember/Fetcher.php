@@ -92,22 +92,17 @@ class Fetcher
      */
     public function getQueryForUnknownObjects(array $fields, $object)
     {
-        switch ($object) {
-            case Lead::OBJECT:
-                return QueryBuilder::getLeadQuery($fields, $this->unknownLeadIds);
-            case Contact::OBJECT:
-                return QueryBuilder::getContactQuery($fields, $this->unknownContactIds);
-            default:
-                throw new InvalidObjectException();
-        }
+        return match ($object) {
+            Lead::OBJECT    => QueryBuilder::getLeadQuery($fields, $this->unknownLeadIds),
+            Contact::OBJECT => QueryBuilder::getContactQuery($fields, $this->unknownContactIds),
+            default         => throw new InvalidObjectException(),
+        };
     }
 
     /**
      * Fetch the Mautic contact IDs that are not already tracked as SF campaign members.
-     *
-     * @return array
      */
-    public function getUnknownCampaignMembers()
+    public function getUnknownCampaignMembers(): array
     {
         // First, find those already tracked as part of this campaign
         $this->fetchCampaignMembers();

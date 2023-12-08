@@ -12,12 +12,8 @@ class BaseDecorator implements FilterDecoratorInterface
 {
     use RegexTrait;
 
-    protected \Mautic\LeadBundle\Segment\ContactSegmentFilterOperator $contactSegmentFilterOperator;
-
-    public function __construct(
-        ContactSegmentFilterOperator $contactSegmentFilterOperator
-    ) {
-        $this->contactSegmentFilterOperator = $contactSegmentFilterOperator;
+    public function __construct(protected ContactSegmentFilterOperator $contactSegmentFilterOperator)
+    {
     }
 
     /**
@@ -28,10 +24,7 @@ class BaseDecorator implements FilterDecoratorInterface
         return $contactSegmentFilterCrate->getField();
     }
 
-    /**
-     * @return string
-     */
-    public function getTable(ContactSegmentFilterCrate $contactSegmentFilterCrate)
+    public function getTable(ContactSegmentFilterCrate $contactSegmentFilterCrate): string
     {
         if ($contactSegmentFilterCrate->isContactType()) {
             return MAUTIC_TABLE_PREFIX.'leads';
@@ -47,14 +40,10 @@ class BaseDecorator implements FilterDecoratorInterface
     {
         $operator = $this->contactSegmentFilterOperator->fixOperator($contactSegmentFilterCrate->getOperator());
 
-        switch ($operator) {
-            case 'startsWith':
-            case 'endsWith':
-            case 'contains':
-                return 'like';
-        }
-
-        return $operator;
+        return match ($operator) {
+            'startsWith', 'endsWith', 'contains' => 'like',
+            default => $operator,
+        };
     }
 
     /**
@@ -101,7 +90,7 @@ class BaseDecorator implements FilterDecoratorInterface
                 return !is_array($filter) ? explode('|', $filter) : $filter;
             case 'like':
             case '!like':
-                return false === strpos($filter, '%') ? '%'.$filter.'%' : $filter;
+                return !str_contains($filter, '%') ? '%'.$filter.'%' : $filter;
             case 'contains':
                 return '%'.$filter.'%';
             case 'startsWith':
@@ -125,7 +114,7 @@ class BaseDecorator implements FilterDecoratorInterface
         return $filter;
     }
 
-    public function getAggregateFunc(ContactSegmentFilterCrate $contactSegmentFilterCrate)
+    public function getAggregateFunc(ContactSegmentFilterCrate $contactSegmentFilterCrate): bool|string
     {
         return false;
     }

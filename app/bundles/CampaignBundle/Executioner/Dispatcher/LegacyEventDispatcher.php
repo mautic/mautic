@@ -30,32 +30,8 @@ class LegacyEventDispatcher
 {
     use EventArrayTrait;
 
-    private \Symfony\Component\EventDispatcher\EventDispatcherInterface $dispatcher;
-
-    private \Mautic\CampaignBundle\Executioner\Scheduler\EventScheduler $scheduler;
-
-    private \Psr\Log\LoggerInterface $logger;
-
-    private \Mautic\CampaignBundle\Executioner\Helper\NotificationHelper $notificationHelper;
-
-    private \Mautic\CoreBundle\Factory\MauticFactory $factory;
-
-    private \Mautic\LeadBundle\Tracker\ContactTracker $contactTracker;
-
-    public function __construct(
-        EventDispatcherInterface $dispatcher,
-        EventScheduler $scheduler,
-        LoggerInterface $logger,
-        NotificationHelper $notificationHelper,
-        MauticFactory $factory,
-        ContactTracker $contactTracker
-    ) {
-        $this->dispatcher         = $dispatcher;
-        $this->scheduler          = $scheduler;
-        $this->logger             = $logger;
-        $this->notificationHelper = $notificationHelper;
-        $this->factory            = $factory;
-        $this->contactTracker     = $contactTracker;
+    public function __construct(private EventDispatcherInterface $dispatcher, private EventScheduler $scheduler, private LoggerInterface $logger, private NotificationHelper $notificationHelper, private MauticFactory $factory, private ContactTracker $contactTracker)
+    {
     }
 
     public function dispatchCustomEvent(
@@ -63,7 +39,7 @@ class LegacyEventDispatcher
         ArrayCollection $logs,
         $wasBatchProcessed,
         PendingEvent $pendingEvent
-    ) {
+    ): void {
         $settings = $config->getConfig();
 
         if (!isset($settings['eventName']) && !isset($settings['callback'])) {
@@ -132,7 +108,7 @@ class LegacyEventDispatcher
     /**
      * Execute the new ON_EVENT_FAILED and ON_EVENT_EXECUTED events for logs processed by BC code.
      */
-    public function dispatchExecutionEvents(AbstractEventAccessor $config, ArrayCollection $success, ArrayCollection $failures)
+    public function dispatchExecutionEvents(AbstractEventAccessor $config, ArrayCollection $success, ArrayCollection $failures): void
     {
         foreach ($success as $log) {
             $this->dispatchExecutionEvent($config, $log, true);
@@ -143,7 +119,7 @@ class LegacyEventDispatcher
         }
     }
 
-    public function dispatchDecisionEvent(DecisionEvent $decisionEvent)
+    public function dispatchDecisionEvent(DecisionEvent $decisionEvent): void
     {
         if ($this->dispatcher->hasListeners(CampaignEvents::ON_EVENT_DECISION_TRIGGER)) {
             $log   = $decisionEvent->getLog();
@@ -187,8 +163,8 @@ class LegacyEventDispatcher
         $this->dispatcher->dispatch($campaignEvent, $eventName);
 
         if ($channel = $campaignEvent->getChannel()) {
-            $log->setChannel($channel)
-                ->setChannelId($campaignEvent->getChannelId());
+            $log->setChannel($channel);
+            $log->setChannelId($campaignEvent->getChannelId());
         }
 
         return $campaignEvent;
@@ -215,7 +191,7 @@ class LegacyEventDispatcher
         try {
             if (is_array($settings['callback'])) {
                 $reflection = new \ReflectionMethod($settings['callback'][0], $settings['callback'][1]);
-            } elseif (false !== strpos($settings['callback'], '::')) {
+            } elseif (str_contains($settings['callback'], '::')) {
                 $parts      = explode('::', $settings['callback']);
                 $reflection = new \ReflectionMethod($parts[0], $parts[1]);
             } else {
@@ -232,12 +208,12 @@ class LegacyEventDispatcher
             }
 
             return $reflection->invokeArgs($this, $pass);
-        } catch (\ReflectionException $exception) {
+        } catch (\ReflectionException) {
             return false;
         }
     }
 
-    private function dispatchExecutionEvent(AbstractEventAccessor $config, LeadEventLog $log, $result)
+    private function dispatchExecutionEvent(AbstractEventAccessor $config, LeadEventLog $log, $result): void
     {
         $eventArray = $this->getEventArray($log->getEvent());
 
@@ -258,7 +234,7 @@ class LegacyEventDispatcher
         );
     }
 
-    private function dispatchExecutedEvent(AbstractEventAccessor $config, LeadEventLog $log)
+    private function dispatchExecutedEvent(AbstractEventAccessor $config, LeadEventLog $log): void
     {
         $this->dispatcher->dispatch(
             new ExecutedEvent($config, $log),
@@ -273,7 +249,7 @@ class LegacyEventDispatcher
         );
     }
 
-    private function dispatchFailedEvent(AbstractEventAccessor $config, LeadEventLog $log)
+    private function dispatchFailedEvent(AbstractEventAccessor $config, LeadEventLog $log): void
     {
         $this->dispatcher->dispatch(
             new FailedEvent($config, $log),
@@ -290,7 +266,7 @@ class LegacyEventDispatcher
             || (is_array($result) && isset($result['result']) && false === $result['result']);
     }
 
-    private function processFailedLog(LeadEventLog $log, PendingEvent $pendingEvent)
+    private function processFailedLog(LeadEventLog $log, PendingEvent $pendingEvent): void
     {
         $this->logger->debug(
             'CAMPAIGN: '.ucfirst($log->getEvent()->getEventType() ?? 'unknown event').' ID# '.$log->getEvent()->getId().' for contact ID# '.$log->getLead()->getId()

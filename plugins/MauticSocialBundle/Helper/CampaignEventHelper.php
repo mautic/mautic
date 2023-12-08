@@ -116,13 +116,13 @@ class CampaignEventHelper
      * @param array  $lead
      * @param int    $channelId
      *
-     * @return string
+     * @return string|string[]
      */
-    protected function parseTweetText($text, $lead, $channelId = -1)
+    protected function parseTweetText($text, $lead, $channelId = -1): array|string
     {
         $tweetHandle = $lead['twitter'];
         $tokens      = [
-            '{twitter_handle}' => (false !== strpos($tweetHandle, '@')) ? $tweetHandle : "@$tweetHandle",
+            '{twitter_handle}' => (str_contains($tweetHandle, '@')) ? $tweetHandle : "@$tweetHandle",
         ];
 
         $tokens = array_merge(
@@ -132,7 +132,7 @@ class CampaignEventHelper
             $this->assetTokenHelper->findAssetTokens($text, $this->clickthrough)
         );
 
-        list($text, $trackables) = $this->trackableModel->parseContentForTrackables(
+        [$text, $trackables] = $this->trackableModel->parseContentForTrackables(
             $text,
             $tokens,
             'social_twitter',

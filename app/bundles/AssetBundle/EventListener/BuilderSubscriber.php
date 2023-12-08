@@ -20,24 +20,8 @@ class BuilderSubscriber implements EventSubscriberInterface
      */
     private $assetToken = '{assetlink=(.*?)}';
 
-    private \Mautic\CoreBundle\Security\Permissions\CorePermissions $security;
-
-    private \Mautic\AssetBundle\Helper\TokenHelper $tokenHelper;
-
-    private \Mautic\LeadBundle\Tracker\ContactTracker $contactTracker;
-
-    private \Mautic\CoreBundle\Helper\BuilderTokenHelperFactory $builderTokenHelperFactory;
-
-    public function __construct(
-        CorePermissions $security,
-        TokenHelper $tokenHelper,
-        ContactTracker $contactTracker,
-        BuilderTokenHelperFactory $builderTokenHelperFactory
-    ) {
-        $this->security                  = $security;
-        $this->tokenHelper               = $tokenHelper;
-        $this->contactTracker            = $contactTracker;
-        $this->builderTokenHelperFactory = $builderTokenHelperFactory;
+    public function __construct(private CorePermissions $security, private TokenHelper $tokenHelper, private ContactTracker $contactTracker, private BuilderTokenHelperFactory $builderTokenHelperFactory)
+    {
     }
 
     /**
@@ -79,7 +63,7 @@ class BuilderSubscriber implements EventSubscriberInterface
         $tokens  = $this->generateTokensFromContent($event, $leadId, ['page', $page->getId()]);
         $content = $event->getContent();
 
-        if (!empty($tokens)) {
+        if ([] !== $tokens) {
             $content = str_ireplace(array_keys($tokens), $tokens, $content);
         }
         $event->setContent($content);
@@ -91,9 +75,9 @@ class BuilderSubscriber implements EventSubscriberInterface
      * @param array                           $source
      * @param null                            $emailId
      *
-     * @return array
+     * @return mixed[]
      */
-    private function generateTokensFromContent($event, $leadId, $source = [], $emailId = null)
+    private function generateTokensFromContent($event, $leadId, $source = [], $emailId = null): array
     {
         if ($event instanceof PageDisplayEvent || ($event instanceof EmailSendEvent && $event->shouldAppendClickthrough())) {
             $clickthrough = [

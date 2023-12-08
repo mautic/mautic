@@ -7,19 +7,13 @@ use Mautic\ReportBundle\Entity\Report;
 
 class ReportGraphEvent extends AbstractReportEvent
 {
-    private array $requestedGraphs;
-
-    private \Doctrine\DBAL\Query\QueryBuilder $queryBuilder;
-
     /**
-     * Constructor.
+     * @param mixed[] $requestedGraphs
      */
-    public function __construct(Report $report, array $graphs, QueryBuilder $queryBuilder)
+    public function __construct(Report $report, private array $requestedGraphs, private QueryBuilder $queryBuilder)
     {
         $this->report          = $report;
         $this->context         = $report->getSource();
-        $this->requestedGraphs = $graphs;
-        $this->queryBuilder    = $queryBuilder;
     }
 
     /**
@@ -88,10 +82,8 @@ class ReportGraphEvent extends AbstractReportEvent
 
     /**
      * Get graphs that are requested.
-     *
-     * @return array
      */
-    public function getRequestedGraphs()
+    public function getRequestedGraphs(): array
     {
         return array_keys($this->requestedGraphs);
     }

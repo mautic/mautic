@@ -19,7 +19,7 @@ class AssetPermissions extends AbstractPermissions
         $this->addStandardPermissions('categories');
     }
 
-    public function getName()
+    public function getName(): string
     {
         return 'asset';
     }

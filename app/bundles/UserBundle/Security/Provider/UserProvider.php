@@ -20,28 +20,8 @@ use Symfony\Component\Security\Core\User\UserProviderInterface;
 
 class UserProvider implements UserProviderInterface
 {
-    protected \Mautic\UserBundle\Entity\UserRepository $userRepository;
-
-    protected \Mautic\UserBundle\Entity\PermissionRepository $permissionRepository;
-
-    protected \Symfony\Component\HttpFoundation\Session\Session $session;
-
-    protected \Symfony\Component\EventDispatcher\EventDispatcherInterface $dispatcher;
-
-    protected \Symfony\Component\PasswordHasher\Hasher\UserPasswordHasher $encoder;
-
-    public function __construct(
-        UserRepository $userRepository,
-        PermissionRepository $permissionRepository,
-        Session $session,
-        EventDispatcherInterface $dispatcher,
-        UserPasswordHasher $encoder
-    ) {
-        $this->userRepository       = $userRepository;
-        $this->permissionRepository = $permissionRepository;
-        $this->session              = $session;
-        $this->dispatcher           = $dispatcher;
-        $this->encoder              = $encoder;
+    public function __construct(protected UserRepository $userRepository, protected PermissionRepository $permissionRepository, protected Session $session, protected EventDispatcherInterface $dispatcher, protected UserPasswordHasher $encoder)
+    {
     }
 
     /**
@@ -95,7 +75,7 @@ class UserProvider implements UserProviderInterface
     /**
      * {@inheritdoc}
      */
-    public function supportsClass(string $class)
+    public function supportsClass(string $class): bool
     {
         return User::class === $class || is_subclass_of($class, User::class);
     }
@@ -176,11 +156,11 @@ class UserProvider implements UserProviderInterface
             $user = $this->loadUserByUsername($user->getUsername());
 
             return $user;
-        } catch (UserNotFoundException $exception) {
+        } catch (UserNotFoundException) {
             // Try by email
             try {
                 return $this->loadUserByUsername($user->getEmail());
-            } catch (UserNotFoundException $exception) {
+            } catch (UserNotFoundException) {
             }
         }
 

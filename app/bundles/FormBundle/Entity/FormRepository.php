@@ -84,7 +84,7 @@ class FormRepository extends CommonRepository
      */
     protected function addSearchCommandWhereClause($q, $filter): array
     {
-        list($expr, $standardSearchParameters) = $this->addStandardSearchCommandWhereClause($q, $filter);
+        [$expr, $standardSearchParameters] = $this->addStandardSearchCommandWhereClause($q, $filter);
         if ($expr) {
             return [$expr, $standardSearchParameters];
         }
@@ -193,10 +193,8 @@ class FormRepository extends CommonRepository
      *
      * @param int    $formId
      * @param string $formAlias
-     *
-     * @return string
      */
-    public function getResultsTableName($formId, $formAlias)
+    public function getResultsTableName($formId, $formAlias): string
     {
         return MAUTIC_TABLE_PREFIX.'form_results_'.$formId.'_'.$formAlias;
     }
@@ -242,7 +240,7 @@ class FormRepository extends CommonRepository
     /**
      * {@inheritdoc}
      */
-    public function getTableAlias()
+    public function getTableAlias(): string
     {
         return 'f';
     }

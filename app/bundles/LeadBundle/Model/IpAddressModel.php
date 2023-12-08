@@ -14,21 +14,15 @@ class IpAddressModel
 {
     private const DELETE_SIZE = 10000;
 
-    protected \Psr\Log\LoggerInterface $logger;
-
-    protected \Doctrine\ORM\EntityManager $entityManager;
-
-    public function __construct(EntityManager $entityManager, LoggerInterface $logger)
+    public function __construct(protected EntityManager $entityManager, protected LoggerInterface $logger)
     {
-        $this->entityManager = $entityManager;
-        $this->logger        = $logger;
     }
 
     /**
      * Saving IP Address references sometimes throws UniqueConstraintViolationException exception on Lead entity save.
      * Rather pre-save the IP references here and catch the exception.
      */
-    public function saveIpAddressesReferencesForContact(Lead $contact)
+    public function saveIpAddressesReferencesForContact(Lead $contact): void
     {
         foreach ($contact->getIpAddresses() as $ipAddress) {
             $this->insertIpAddressReference($contact, $ipAddress);
@@ -48,7 +42,7 @@ class IpAddressModel
     /**
      * Tries to insert the Lead/IP relation and continues even if UniqueConstraintViolationException is thrown.
      */
-    private function insertIpAddressReference(Lead $contact, IpAddress $ipAddress)
+    private function insertIpAddressReference(Lead $contact, IpAddress $ipAddress): void
     {
         $ipAddressAdded = isset($contact->getChanges()['ipAddressList'][$ipAddress->getIpAddress()]);
         if (!$ipAddressAdded || !$ipAddress->getId() || !$contact->getId()) {
@@ -68,9 +62,9 @@ class IpAddressModel
 
         try {
             $qb->executeStatement();
-        } catch (UniqueConstraintViolationException $e) {
+        } catch (UniqueConstraintViolationException) {
             $this->logger->warning("The reference for contact {$contact->getId()} and IP address {$ipAddress->getId()} is already there. (Unique constraint)");
-        } catch (ForeignKeyConstraintViolationException $e) {
+        } catch (ForeignKeyConstraintViolationException) {
             $this->logger->warning("The reference for contact {$contact->getId()} and IP address {$ipAddress->getId()} is already there. (Foreign key constraint)");
         }
 

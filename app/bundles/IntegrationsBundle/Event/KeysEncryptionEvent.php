@@ -9,14 +9,8 @@ use Symfony\Contracts\EventDispatcher\Event;
 
 class KeysEncryptionEvent extends Event
 {
-    private \Mautic\PluginBundle\Entity\Integration $integrationConfiguration;
-
-    private array $keys;
-
-    public function __construct(Integration $integrationConfiguration, array $keys)
+    public function __construct(private Integration $integrationConfiguration, private array $keys)
     {
-        $this->integrationConfiguration = $integrationConfiguration;
-        $this->keys                     = $keys;
     }
 
     public function getIntegrationConfiguration(): Integration

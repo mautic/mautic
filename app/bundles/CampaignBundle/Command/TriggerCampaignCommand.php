@@ -28,15 +28,6 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 class TriggerCampaignCommand extends ModeratedCommand
 {
     use WriteCountTrait;
-
-    private CampaignRepository $campaignRepository;
-    private EventDispatcherInterface $dispatcher;
-    private TranslatorInterface $translator;
-    private KickoffExecutioner $kickoffExecutioner;
-    private ScheduledExecutioner $scheduledExecutioner;
-    private InactiveExecutioner $inactiveExecutioner;
-    private LoggerInterface $logger;
-    private FormatterHelper $formatterHelper;
     private bool $kickoffOnly  = false;
     private bool $inactiveOnly = false;
     private bool $scheduleOnly = false;
@@ -56,36 +47,21 @@ class TriggerCampaignCommand extends ModeratedCommand
      */
     private $campaign;
 
-    private \Mautic\LeadBundle\Model\ListModel $listModel;
-
-    private \Mautic\LeadBundle\Helper\SegmentCountCacheHelper $segmentCountCacheHelper;
-
     public function __construct(
-        CampaignRepository $campaignRepository,
-        EventDispatcherInterface $dispatcher,
-        TranslatorInterface $translator,
-        KickoffExecutioner $kickoffExecutioner,
-        ScheduledExecutioner $scheduledExecutioner,
-        InactiveExecutioner $inactiveExecutioner,
-        LoggerInterface $logger,
-        FormatterHelper $formatterHelper,
-        ListModel $listModel,
-        SegmentCountCacheHelper $segmentCountCacheHelper,
+        private CampaignRepository $campaignRepository,
+        private EventDispatcherInterface $dispatcher,
+        private TranslatorInterface $translator,
+        private KickoffExecutioner $kickoffExecutioner,
+        private ScheduledExecutioner $scheduledExecutioner,
+        private InactiveExecutioner $inactiveExecutioner,
+        private LoggerInterface $logger,
+        private FormatterHelper $formatterHelper,
+        private ListModel $listModel,
+        private SegmentCountCacheHelper $segmentCountCacheHelper,
         PathsHelper $pathsHelper,
         CoreParametersHelper $coreParametersHelper
     ) {
         parent::__construct($pathsHelper, $coreParametersHelper);
-
-        $this->campaignRepository        = $campaignRepository;
-        $this->dispatcher                = $dispatcher;
-        $this->translator                = $translator;
-        $this->kickoffExecutioner        = $kickoffExecutioner;
-        $this->scheduledExecutioner      = $scheduledExecutioner;
-        $this->inactiveExecutioner       = $inactiveExecutioner;
-        $this->logger                    = $logger;
-        $this->formatterHelper           = $formatterHelper;
-        $this->listModel                 = $listModel;
-        $this->segmentCountCacheHelper   = $segmentCountCacheHelper;
     }
 
     protected function configure()
@@ -326,7 +302,7 @@ class TriggerCampaignCommand extends ModeratedCommand
      * @throws \Mautic\CampaignBundle\Executioner\Exception\CannotProcessEventException
      * @throws \Mautic\CampaignBundle\Executioner\Scheduler\Exception\NotSchedulableException
      */
-    private function executeKickoff()
+    private function executeKickoff(): void
     {
         // trigger starting action events for newly added contacts
         $this->output->writeln('<comment>'.$this->translator->trans('mautic.campaign.trigger.starting').'</comment>');
@@ -343,7 +319,7 @@ class TriggerCampaignCommand extends ModeratedCommand
      * @throws \Mautic\CampaignBundle\Executioner\Exception\CannotProcessEventException
      * @throws \Mautic\CampaignBundle\Executioner\Scheduler\Exception\NotSchedulableException
      */
-    private function executeScheduled()
+    private function executeScheduled(): void
     {
         $this->output->writeln('<comment>'.$this->translator->trans('mautic.campaign.trigger.scheduled').'</comment>');
 
@@ -358,7 +334,7 @@ class TriggerCampaignCommand extends ModeratedCommand
      * @throws \Mautic\CampaignBundle\Executioner\Exception\CannotProcessEventException
      * @throws \Mautic\CampaignBundle\Executioner\Scheduler\Exception\NotSchedulableException
      */
-    private function executeInactive()
+    private function executeInactive(): void
     {
         // find and trigger "no" path events
         $this->output->writeln('<comment>'.$this->translator->trans('mautic.campaign.trigger.negative').'</comment>');

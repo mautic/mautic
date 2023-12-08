@@ -11,11 +11,8 @@ use Mautic\CoreBundle\Release\Metadata;
 
 class ReleaseParser
 {
-    private \GuzzleHttp\Client $client;
-
-    public function __construct(Client $client)
+    public function __construct(private Client $client)
     {
-        $this->client = $client;
     }
 
     /**
@@ -27,7 +24,7 @@ class ReleaseParser
         foreach ($releases as $release) {
             try {
                 $metadata = $this->getMetadata($release['html_url']);
-            } catch (MetadataNotFoundException $exception) {
+            } catch (MetadataNotFoundException) {
                 continue;
             }
 
@@ -84,7 +81,7 @@ class ReleaseParser
             }
 
             return new Metadata($metadata);
-        } catch (GuzzleException $exception) {
+        } catch (GuzzleException) {
             throw new MetadataNotFoundException();
         }
     }

@@ -16,15 +16,8 @@ use Symfony\Component\Validator\ConstraintValidator;
 
 class UniqueCustomFieldValidator extends ConstraintValidator
 {
-    private LeadModel $leadModel;
-    private CompanyModel $companyModel;
-    private FieldsWithUniqueIdentifier $fieldsWithUniqueIdentifier;
-
-    public function __construct(LeadModel $leadModel, CompanyModel $companyModel, FieldsWithUniqueIdentifier $fieldsWithUniqueIdentifier)
+    public function __construct(private LeadModel $leadModel, private CompanyModel $companyModel, private FieldsWithUniqueIdentifier $fieldsWithUniqueIdentifier)
     {
-        $this->leadModel                  = $leadModel;
-        $this->companyModel               = $companyModel;
-        $this->fieldsWithUniqueIdentifier = $fieldsWithUniqueIdentifier;
     }
 
     /**

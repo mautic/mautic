@@ -11,13 +11,8 @@ use Symfony\Component\Routing\RouteCollection;
 
 class RouteLoader extends Loader
 {
-    private \Symfony\Component\EventDispatcher\EventDispatcherInterface $dispatcher;
-    private \Mautic\CoreBundle\Helper\CoreParametersHelper $coreParameters;
-
-    public function __construct(EventDispatcherInterface $dispatcher, CoreParametersHelper $parametersHelper)
+    public function __construct(private EventDispatcherInterface $dispatcher, private CoreParametersHelper $coreParameters)
     {
-        $this->dispatcher     = $dispatcher;
-        $this->coreParameters = $parametersHelper;
     }
 
     /**
@@ -95,10 +90,8 @@ class RouteLoader extends Loader
     /**
      * @param mixed $resource
      * @param null  $type
-     *
-     * @return bool
      */
-    public function supports($resource, $type = null)
+    public function supports($resource, $type = null): bool
     {
         return 'mautic' === $type;
     }

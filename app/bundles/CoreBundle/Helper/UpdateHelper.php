@@ -19,16 +19,6 @@ use Monolog\Logger;
  */
 class UpdateHelper
 {
-    private \Mautic\CoreBundle\Helper\PathsHelper $pathsHelper;
-
-    private \Monolog\Logger $logger;
-
-    private \Mautic\CoreBundle\Helper\CoreParametersHelper $coreParametersHelper;
-
-    private \GuzzleHttp\Client $client;
-
-    private \Mautic\CoreBundle\Helper\Update\Github\ReleaseParser $releaseParser;
-
     private string $phpVersion;
 
     /**
@@ -36,23 +26,14 @@ class UpdateHelper
      */
     private $mauticVersion;
 
-    private PreUpdateCheckHelper $preUpdateCheckHelper;
-
     public function __construct(
-        PathsHelper $pathsHelper,
-        Logger $logger,
-        CoreParametersHelper $coreParametersHelper,
-        Client $client,
-        ReleaseParser $releaseParser,
-        PreUpdateCheckHelper $preUpdateCheckHelper
+        private PathsHelper $pathsHelper,
+        private Logger $logger,
+        private CoreParametersHelper $coreParametersHelper,
+        private Client $client,
+        private ReleaseParser $releaseParser,
+        private PreUpdateCheckHelper $preUpdateCheckHelper
     ) {
-        $this->pathsHelper          = $pathsHelper;
-        $this->logger               = $logger;
-        $this->coreParametersHelper = $coreParametersHelper;
-        $this->client               = $client;
-        $this->releaseParser        = $releaseParser;
-        $this->preUpdateCheckHelper = $preUpdateCheckHelper;
-
         $this->mauticVersion = defined('MAUTIC_VERSION') ? MAUTIC_VERSION : 'unknown';
         $this->phpVersion    = defined('PHP_VERSION') ? PHP_VERSION : 'unknown';
     }
@@ -119,12 +100,12 @@ class UpdateHelper
         // Fetch the latest version
         try {
             $release = $this->fetchLatestCompatibleVersion($updateStability);
-        } catch (LatestVersionSupportedException $exception) {
+        } catch (LatestVersionSupportedException) {
             return [
                 'error'   => false,
                 'message' => 'mautic.core.updater.running.latest.version',
             ];
-        } catch (CouldNotFetchLatestVersionException $exception) {
+        } catch (CouldNotFetchLatestVersionException) {
             return [
                 'error'   => true,
                 'message' => 'mautic.core.updater.error.fetching.updates',
@@ -216,7 +197,7 @@ class UpdateHelper
         return $checkResults;
     }
 
-    private function sendStats()
+    private function sendStats(): void
     {
         if (!$statUrl = $this->coreParametersHelper->get('stats_update_url')) {
             // Stat collection disabled

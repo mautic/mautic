@@ -18,11 +18,8 @@ class EmailType extends AbstractType
 {
     public const REPLY_TO_ADDRESS = 'replyToAddress';
 
-    private \Mautic\CoreBundle\Helper\UserHelper $userHelper;
-
-    public function __construct(UserHelper $userHelper)
+    public function __construct(private UserHelper $userHelper)
     {
-        $this->userHelper = $userHelper;
     }
 
     public function buildForm(FormBuilderInterface $builder, array $options): void

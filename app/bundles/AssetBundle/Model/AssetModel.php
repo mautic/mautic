@@ -42,36 +42,20 @@ use Symfony\Contracts\EventDispatcher\Event;
  */
 class AssetModel extends FormModel
 {
-    protected \Mautic\CategoryBundle\Model\CategoryModel $categoryModel;
-
-    protected \Mautic\LeadBundle\Model\LeadModel $leadModel;
-
-    protected \Mautic\CoreBundle\Helper\IpLookupHelper $ipLookupHelper;
-
     /**
      * @var int
      */
     protected $maxAssetSize;
 
-    private \Mautic\LeadBundle\Tracker\Service\DeviceCreatorService\DeviceCreatorServiceInterface $deviceCreatorService;
-
-    private \Mautic\LeadBundle\Tracker\Factory\DeviceDetectorFactory\DeviceDetectorFactoryInterface $deviceDetectorFactory;
-
-    private \Mautic\LeadBundle\Tracker\Service\DeviceTrackingService\DeviceTrackingServiceInterface $deviceTrackingService;
-
-    private \Mautic\LeadBundle\Tracker\ContactTracker $contactTracker;
-
-    private \Symfony\Component\HttpFoundation\RequestStack $requestStack;
-
     public function __construct(
-        LeadModel $leadModel,
-        CategoryModel $categoryModel,
-        RequestStack $requestStack,
-        IpLookupHelper $ipLookupHelper,
-        DeviceCreatorServiceInterface $deviceCreatorService,
-        DeviceDetectorFactoryInterface $deviceDetectorFactory,
-        DeviceTrackingServiceInterface $deviceTrackingService,
-        ContactTracker $contactTracker,
+        protected LeadModel $leadModel,
+        protected CategoryModel $categoryModel,
+        private RequestStack $requestStack,
+        protected IpLookupHelper $ipLookupHelper,
+        private DeviceCreatorServiceInterface $deviceCreatorService,
+        private DeviceDetectorFactoryInterface $deviceDetectorFactory,
+        private DeviceTrackingServiceInterface $deviceTrackingService,
+        private ContactTracker $contactTracker,
         EntityManager $em,
         CorePermissions $security,
         EventDispatcherInterface $dispatcher,
@@ -81,14 +65,6 @@ class AssetModel extends FormModel
         LoggerInterface $logger,
         CoreParametersHelper $coreParametersHelper
     ) {
-        $this->leadModel              = $leadModel;
-        $this->categoryModel          = $categoryModel;
-        $this->requestStack           = $requestStack;
-        $this->ipLookupHelper         = $ipLookupHelper;
-        $this->deviceCreatorService   = $deviceCreatorService;
-        $this->deviceDetectorFactory  = $deviceDetectorFactory;
-        $this->deviceTrackingService  = $deviceTrackingService;
-        $this->contactTracker         = $contactTracker;
         $this->maxAssetSize           = $coreParametersHelper->get('max_size');
 
         parent::__construct($em, $security, $dispatcher, $router, $translator, $userHelper, $logger, $coreParametersHelper);
@@ -339,18 +315,12 @@ class AssetModel extends FormModel
         return $this->em->getRepository(\Mautic\AssetBundle\Entity\Download::class);
     }
 
-    /**
-     * @return string
-     */
-    public function getPermissionBase()
+    public function getPermissionBase(): string
     {
         return 'asset:assets';
     }
 
-    /**
-     * @return string
-     */
-    public function getNameGetter()
+    public function getNameGetter(): string
     {
         return 'getTitle';
     }
@@ -394,7 +364,7 @@ class AssetModel extends FormModel
      *
      * @throws \Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException
      */
-    protected function dispatchEvent($action, &$entity, $isNew = false, Event $event = null)
+    protected function dispatchEvent($action, &$entity, $isNew = false, Event $event = null): ?Event
     {
         if (!$entity instanceof Asset) {
             throw new MethodNotAllowedHttpException(['Asset']);
@@ -501,7 +471,7 @@ class AssetModel extends FormModel
         if ($humanReadable) {
             $number = Asset::convertBytesToHumanReadable($maxAllowed);
         } else {
-            list($number, $unit) = Asset::convertBytesToUnit($maxAllowed, $unit);
+            [$number, $unit] = Asset::convertBytesToUnit($maxAllowed, $unit);
         }
 
         return $number;

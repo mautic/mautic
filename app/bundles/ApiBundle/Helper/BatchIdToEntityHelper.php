@@ -15,11 +15,6 @@ class BatchIdToEntityHelper
     private $originalKeys = [];
 
     /**
-     * @var string
-     */
-    private $idKey;
-
-    /**
      * @var array
      */
     private $errors = [];
@@ -34,17 +29,12 @@ class BatchIdToEntityHelper
      *
      * @param string $idKey
      */
-    public function __construct(array $parameters, $idKey = 'id')
+    public function __construct(array $parameters, private $idKey = 'id')
     {
-        $this->idKey = $idKey;
-
         $this->extractIds($parameters);
     }
 
-    /**
-     * @return bool
-     */
-    public function hasIds()
+    public function hasIds(): bool
     {
         return !empty($this->ids);
     }
@@ -57,10 +47,7 @@ class BatchIdToEntityHelper
         return $this->ids;
     }
 
-    /**
-     * @return bool
-     */
-    public function hasErrors()
+    public function hasErrors(): bool
     {
         return !empty($this->errors);
     }
@@ -108,7 +95,7 @@ class BatchIdToEntityHelper
         return $orderedEntities;
     }
 
-    private function extractIds(array $parameters)
+    private function extractIds(array $parameters): void
     {
         $this->ids = [];
 
@@ -124,7 +111,7 @@ class BatchIdToEntityHelper
     /**
      * @param mixed $ids
      */
-    private function extractIdsFromIdKey($ids)
+    private function extractIdsFromIdKey($ids): void
     {
         // ['ids' => [1,2,3]]
         if (is_array($ids)) {
@@ -136,7 +123,7 @@ class BatchIdToEntityHelper
         }
 
         // ['ids' => '1,2,3'] OR ['ids' => '1']
-        if (false !== strpos($ids, ',') || is_numeric($ids)) {
+        if (str_contains($ids, ',') || is_numeric($ids)) {
             $this->ids           = str_getcsv($ids);
             $this->originalKeys  = array_keys($this->ids);
             $this->isAssociative = false;
@@ -149,7 +136,7 @@ class BatchIdToEntityHelper
         $this->errors[] = 'mautic.api.call.id_missing';
     }
 
-    private function extractIdsFromParams(array $parameters)
+    private function extractIdsFromParams(array $parameters): void
     {
         $this->isAssociative = $this->isAssociativeArray($parameters);
         $this->originalKeys  = array_keys($parameters);

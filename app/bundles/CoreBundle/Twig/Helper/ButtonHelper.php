@@ -58,12 +58,6 @@ final class ButtonHelper
      */
     private $location;
 
-    private \Twig\Environment $twig;
-
-    private \Symfony\Contracts\Translation\TranslatorInterface $translator;
-
-    private \Symfony\Component\EventDispatcher\EventDispatcherInterface $dispatcher;
-
     /**
      * @var string|null
      */
@@ -114,11 +108,8 @@ final class ButtonHelper
      */
     private $listMarker = 3;
 
-    public function __construct(Environment $twig, TranslatorInterface $translator, EventDispatcherInterface $dispatcher)
+    public function __construct(private Environment $twig, private TranslatorInterface $translator, private EventDispatcherInterface $dispatcher)
     {
-        $this->twig       = $twig;
-        $this->translator = $translator;
-        $this->dispatcher = $dispatcher;
     }
 
     /**
@@ -196,10 +187,8 @@ final class ButtonHelper
     /**
      * @param string $dropdownHtml
      * @param string $closingDropdownHtml
-     *
-     * @return string
      */
-    public function renderButtons($dropdownHtml = '', $closingDropdownHtml = '')
+    public function renderButtons($dropdownHtml = '', $closingDropdownHtml = ''): string
     {
         $this->fetchCustomButtons();
         $this->orderButtons();
@@ -275,10 +264,7 @@ final class ButtonHelper
         return $this;
     }
 
-    /**
-     * @return string
-     */
-    public function getName()
+    public function getName(): string
     {
         return 'buttons';
     }
@@ -286,10 +272,8 @@ final class ButtonHelper
     /**
      * @param array<string,mixed> $button
      * @param int                 $buttonCount
-     *
-     * @return string
      */
-    private function buildButton($button, $buttonCount = 0)
+    private function buildButton($button, $buttonCount = 0): string
     {
         $buttons = '';
 
@@ -366,7 +350,7 @@ final class ButtonHelper
 
         uasort(
             $this->buttons,
-            function ($a, $b) {
+            function ($a, $b): int {
                 $ap = (isset($a['priority']) ? (int) $a['priority'] : 0);
                 $bp = (isset($b['priority']) ? (int) $b['priority'] : 0);
 
@@ -429,10 +413,8 @@ final class ButtonHelper
 
     /**
      * @param array<string,mixed> $button
-     *
-     * @return string
      */
-    private function generateTextAttributes(&$button)
+    private function generateTextAttributes(&$button): string
     {
         $btnTextAttr = '';
         if (isset($button['btnTextAttr'])) {
@@ -451,10 +433,8 @@ final class ButtonHelper
 
     /**
      * @param array<string,mixed> $button
-     *
-     * @return string
      */
-    private function generateTooltipAttributes($button)
+    private function generateTooltipAttributes($button): string
     {
         $tooltip = '';
         if (isset($button['tooltip'])) {

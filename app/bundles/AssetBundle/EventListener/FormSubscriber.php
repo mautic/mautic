@@ -22,36 +22,8 @@ use Twig\Environment;
 
 class FormSubscriber implements EventSubscriberInterface
 {
-    private \Mautic\AssetBundle\Model\AssetModel $assetModel;
-
-    protected \Symfony\Contracts\Translation\TranslatorInterface $translator;
-
-    private \Mautic\CoreBundle\Twig\Helper\AnalyticsHelper $analyticsHelper;
-
-    private \Mautic\CoreBundle\Twig\Helper\AssetsHelper $assetsHelper;
-
-    private \Mautic\CoreBundle\Helper\ThemeHelperInterface $themeHelper;
-
-    private \Twig\Environment $twig;
-
-    private \Mautic\CoreBundle\Helper\CoreParametersHelper $coreParametersHelper;
-
-    public function __construct(
-        AssetModel $assetModel,
-        TranslatorInterface $translator,
-        AnalyticsHelper $analyticsHelper,
-        AssetsHelper $assetsHelper,
-        ThemeHelperInterface $themeHelper,
-        Environment $twig,
-        CoreParametersHelper $coreParametersHelper
-    ) {
-        $this->assetModel           = $assetModel;
-        $this->translator           = $translator;
-        $this->analyticsHelper      = $analyticsHelper;
-        $this->assetsHelper         = $assetsHelper;
-        $this->themeHelper          = $themeHelper;
-        $this->twig                 = $twig;
-        $this->coreParametersHelper = $coreParametersHelper;
+    public function __construct(private AssetModel $assetModel, protected TranslatorInterface $translator, private AnalyticsHelper $analyticsHelper, private AssetsHelper $assetsHelper, private ThemeHelperInterface $themeHelper, private Environment $twig, private CoreParametersHelper $coreParametersHelper)
+    {
     }
 
     /**
@@ -100,7 +72,7 @@ class FormSubscriber implements EventSubscriberInterface
         } elseif (null !== $categoryId) {
             try {
                 $asset = $this->assetModel->getRepository()->getLatestAssetForCategory($categoryId);
-            } catch (NoResultException|NonUniqueResultException $e) {
+            } catch (NoResultException|NonUniqueResultException) {
                 $asset = null;
             }
         }

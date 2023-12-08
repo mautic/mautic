@@ -9,26 +9,11 @@ use Mautic\LeadBundle\Segment\Decorator\FilterDecoratorInterface;
 
 class DateRelativeInterval implements FilterDecoratorInterface
 {
-    private \Mautic\LeadBundle\Segment\Decorator\DateDecorator $dateDecorator;
-
-    /**
-     * @var string
-     */
-    private $originalValue;
-
-    private \Mautic\LeadBundle\Segment\Decorator\Date\DateOptionParameters $dateOptionParameters;
-
     /**
      * @param string $originalValue
      */
-    public function __construct(
-        DateDecorator $dateDecorator,
-        $originalValue,
-        DateOptionParameters $dateOptionParameters
-    ) {
-        $this->dateDecorator        = $dateDecorator;
-        $this->originalValue        = $originalValue;
-        $this->dateOptionParameters = $dateOptionParameters;
+    public function __construct(private DateDecorator $dateDecorator, private $originalValue, private DateOptionParameters $dateOptionParameters)
+    {
     }
 
     /**
@@ -97,10 +82,7 @@ class DateRelativeInterval implements FilterDecoratorInterface
         return $this->dateDecorator->getQueryType($contactSegmentFilterCrate);
     }
 
-    /**
-     * @return bool|string
-     */
-    public function getAggregateFunc(ContactSegmentFilterCrate $contactSegmentFilterCrate)
+    public function getAggregateFunc(ContactSegmentFilterCrate $contactSegmentFilterCrate): string|bool
     {
         return $this->dateDecorator->getAggregateFunc($contactSegmentFilterCrate);
     }

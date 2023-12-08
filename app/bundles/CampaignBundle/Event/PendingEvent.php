@@ -57,7 +57,7 @@ class PendingEvent extends AbstractLogCollectionEvent
     /**
      * @param string $reason
      */
-    public function fail(LeadEventLog $log, $reason, \DateInterval $rescheduleInterval = null)
+    public function fail(LeadEventLog $log, $reason, \DateInterval $rescheduleInterval = null): void
     {
         if (!$failedLog = $log->getFailedLog()) {
             $failedLog = new FailedLeadEventLog();
@@ -88,7 +88,7 @@ class PendingEvent extends AbstractLogCollectionEvent
     /**
      * @param string $reason
      */
-    public function failAll($reason)
+    public function failAll($reason): void
     {
         foreach ($this->logs as $log) {
             $this->fail($log, $reason);
@@ -100,7 +100,7 @@ class PendingEvent extends AbstractLogCollectionEvent
      *
      * @param string $reason
      */
-    public function failRemaining($reason)
+    public function failRemaining($reason): void
     {
         foreach ($this->logs as $log) {
             if (!$this->successful->contains($log)) {
@@ -113,14 +113,14 @@ class PendingEvent extends AbstractLogCollectionEvent
      * @param LeadEventLog[]|ArrayCollection $logs
      * @param string                         $reason
      */
-    public function failLogs(ArrayCollection $logs, $reason)
+    public function failLogs(ArrayCollection $logs, $reason): void
     {
         foreach ($logs as $log) {
             $this->fail($log, $reason);
         }
     }
 
-    public function pass(LeadEventLog $log)
+    public function pass(LeadEventLog $log): void
     {
         $metadata = $log->getMetadata();
         unset($metadata['errors']);
@@ -135,7 +135,7 @@ class PendingEvent extends AbstractLogCollectionEvent
     /**
      * @param string $error
      */
-    public function passWithError(LeadEventLog $log, $error)
+    public function passWithError(LeadEventLog $log, $error): void
     {
         $log->appendToMetadata(
             [
@@ -150,7 +150,7 @@ class PendingEvent extends AbstractLogCollectionEvent
     /**
      * @param string $error
      */
-    public function passAllWithError($error)
+    public function passAllWithError($error): void
     {
         /** @var LeadEventLog $log */
         foreach ($this->logs as $log) {
@@ -161,7 +161,7 @@ class PendingEvent extends AbstractLogCollectionEvent
     /**
      * Pass all remainging logs that have not failed failed nor suceeded yet.
      */
-    public function passRemainingWithError(string $error)
+    public function passRemainingWithError(string $error): void
     {
         foreach ($this->logs as $log) {
             if (!$this->failures->contains($log) && !$this->successful->contains($log)) {
@@ -173,7 +173,7 @@ class PendingEvent extends AbstractLogCollectionEvent
     /**
      * Pass all pending.
      */
-    public function passAll()
+    public function passAll(): void
     {
         /** @var LeadEventLog $log */
         foreach ($this->logs as $log) {
@@ -184,7 +184,7 @@ class PendingEvent extends AbstractLogCollectionEvent
     /**
      * @param LeadEventLog[]|ArrayCollection $logs
      */
-    public function passLogs(ArrayCollection $logs)
+    public function passLogs(ArrayCollection $logs): void
     {
         foreach ($logs as $log) {
             $this->pass($log);
@@ -194,7 +194,7 @@ class PendingEvent extends AbstractLogCollectionEvent
     /**
      * Pass all that have not failed yet.
      */
-    public function passRemaining()
+    public function passRemaining(): void
     {
         foreach ($this->logs as $log) {
             if (!$this->failures->contains($log)) {
@@ -223,13 +223,13 @@ class PendingEvent extends AbstractLogCollectionEvent
      * @param string   $channel
      * @param int|null $channelId
      */
-    public function setChannel($channel, $channelId = null)
+    public function setChannel($channel, $channelId = null): void
     {
         $this->channel   = $channel;
         $this->channelId = $channelId;
     }
 
-    private function passLog(LeadEventLog $log)
+    private function passLog(LeadEventLog $log): void
     {
         if ($failedLog = $log->getFailedLog()) {
             // Delete existing entries
@@ -243,11 +243,11 @@ class PendingEvent extends AbstractLogCollectionEvent
         $this->successful->set($log->getId(), $log);
     }
 
-    private function logChannel(LeadEventLog $log)
+    private function logChannel(LeadEventLog $log): void
     {
         if ($this->channel) {
-            $log->setChannel($this->channel)
-                ->setChannelId($this->channelId);
+            $log->setChannel($this->channel);
+            $log->setChannelId($this->channelId);
         }
     }
 }

@@ -23,14 +23,8 @@ final class CacheProvider implements CacheProviderInterface
      */
     private $psr16;
 
-    private \Mautic\CoreBundle\Helper\CoreParametersHelper $coreParametersHelper;
-
-    private \Symfony\Component\DependencyInjection\ContainerInterface $container;
-
-    public function __construct(CoreParametersHelper $coreParametersHelper, ContainerInterface $container)
+    public function __construct(private CoreParametersHelper $coreParametersHelper, private ContainerInterface $container)
     {
-        $this->coreParametersHelper = $coreParametersHelper;
-        $this->container            = $container;
     }
 
     public function getCacheAdapter(): TagAwareAdapterInterface

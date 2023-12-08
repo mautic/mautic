@@ -24,18 +24,6 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class ScheduledExecutioner implements ExecutionerInterface, ResetInterface
 {
-    private \Mautic\CampaignBundle\Entity\LeadEventLogRepository $repo;
-
-    private \Psr\Log\LoggerInterface $logger;
-
-    private \Symfony\Contracts\Translation\TranslatorInterface $translator;
-
-    private \Mautic\CampaignBundle\Executioner\EventExecutioner $executioner;
-
-    private \Mautic\CampaignBundle\Executioner\Scheduler\EventScheduler $scheduler;
-
-    private \Mautic\CampaignBundle\Executioner\ContactFinder\ScheduledContactFinder $scheduledContactFinder;
-
     /**
      * @var Campaign
      */
@@ -68,20 +56,8 @@ class ScheduledExecutioner implements ExecutionerInterface, ResetInterface
 
     protected ?\DateTime $now = null;
 
-    public function __construct(
-        LeadEventLogRepository $repository,
-        LoggerInterface $logger,
-        TranslatorInterface $translator,
-        EventExecutioner $executioner,
-        EventScheduler $scheduler,
-        ScheduledContactFinder $scheduledContactFinder
-    ) {
-        $this->repo                   = $repository;
-        $this->logger                 = $logger;
-        $this->translator             = $translator;
-        $this->executioner            = $executioner;
-        $this->scheduler              = $scheduler;
-        $this->scheduledContactFinder = $scheduledContactFinder;
+    public function __construct(private LeadEventLogRepository $repo, private LoggerInterface $logger, private TranslatorInterface $translator, private EventExecutioner $executioner, private EventScheduler $scheduler, private ScheduledContactFinder $scheduledContactFinder)
+    {
     }
 
     /**
@@ -97,7 +73,7 @@ class ScheduledExecutioner implements ExecutionerInterface, ResetInterface
     {
         $this->campaign   = $campaign;
         $this->limiter    = $limiter;
-        $this->output     = ($output) ? $output : new NullOutput();
+        $this->output     = $output ?: new NullOutput();
         $this->counter    = new Counter();
 
         $this->logger->debug('CAMPAIGN: Triggering scheduled events');
@@ -105,7 +81,7 @@ class ScheduledExecutioner implements ExecutionerInterface, ResetInterface
         try {
             $this->prepareForExecution();
             $this->executeOrRescheduleEvent();
-        } catch (NoEventsFoundException $exception) {
+        } catch (NoEventsFoundException) {
             $this->logger->debug('CAMPAIGN: No events to process');
         } finally {
             if ($this->progressBar) {
@@ -127,7 +103,7 @@ class ScheduledExecutioner implements ExecutionerInterface, ResetInterface
      */
     public function executeByIds(array $logIds, OutputInterface $output = null)
     {
-        $this->output  = ($output) ? $output : new NullOutput();
+        $this->output  = $output ?: new NullOutput();
         $this->counter = new Counter();
 
         if (!$logIds) {
@@ -176,7 +152,7 @@ class ScheduledExecutioner implements ExecutionerInterface, ResetInterface
                     $this->scheduledContactFinder->hydrateContacts($organizedLogs);
 
                     $this->executioner->executeLogs($event, $organizedLogs, $this->counter);
-                } catch (NoContactsFoundException $e) {
+                } catch (NoContactsFoundException) {
                     // All of the events were rescheduled
                 }
             } else {
@@ -237,7 +213,7 @@ class ScheduledExecutioner implements ExecutionerInterface, ResetInterface
      * @throws Scheduler\Exception\NotSchedulableException
      * @throws \Doctrine\ORM\Query\QueryException
      */
-    private function executeOrRescheduleEvent()
+    private function executeOrRescheduleEvent(): void
     {
         // Use the same timestamp across all contacts processed
         $now = $this->now ?? new \DateTime();
@@ -257,13 +233,13 @@ class ScheduledExecutioner implements ExecutionerInterface, ResetInterface
      * @throws Scheduler\Exception\NotSchedulableException
      * @throws \Doctrine\ORM\Query\QueryException
      */
-    private function executeScheduled($eventId, \DateTime $now)
+    private function executeScheduled($eventId, \DateTime $now): void
     {
         $logs = $this->repo->getScheduled($eventId, $this->now, $this->limiter);
         while ($logs->count()) {
             try {
                 $fetchedContacts = $this->scheduledContactFinder->hydrateContacts($logs);
-            } catch (NoContactsFoundException $e) {
+            } catch (NoContactsFoundException) {
                 break;
             }
 
@@ -288,7 +264,7 @@ class ScheduledExecutioner implements ExecutionerInterface, ResetInterface
      *
      * @throws Scheduler\Exception\NotSchedulableException
      */
-    private function validateSchedule(ArrayCollection $logs, \DateTime $now, $scheduleTogether = false)
+    private function validateSchedule(ArrayCollection $logs, \DateTime $now, $scheduleTogether = false): void
     {
         $toBeRescheduled     = new ArrayCollection();
         $latestExecutionDate = $now;
@@ -330,7 +306,7 @@ class ScheduledExecutioner implements ExecutionerInterface, ResetInterface
     /**
      * @return ArrayCollection[]
      */
-    private function organizeByEvent(ArrayCollection $logs)
+    private function organizeByEvent(ArrayCollection $logs): array
     {
         $jumpTo = [];
         $other  = [];

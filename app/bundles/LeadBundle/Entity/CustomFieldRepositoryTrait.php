@@ -35,7 +35,7 @@ trait CustomFieldRepositoryTrait
 
         // DBAL
         /** @var QueryBuilder $dq */
-        $dq = isset($args['qb']) ? $args['qb'] : $this->getEntitiesDbalQueryBuilder();
+        $dq = $args['qb'] ?? $this->getEntitiesDbalQueryBuilder();
 
         // Generate where clause first to know if we need to use distinct on primary ID or not
         $this->useDistinctCount = false;
@@ -239,7 +239,7 @@ trait CustomFieldRepositoryTrait
      *
      * @param array $entities
      */
-    public function saveEntities($entities)
+    public function saveEntities($entities): void
     {
         foreach ($entities as $entity) {
             // Leads cannot be batched due to requiring the ID to update the fields

@@ -15,10 +15,6 @@ final class DateHelper
 
     private \Mautic\CoreBundle\Helper\DateTimeHelper $helper;
 
-    private \Symfony\Contracts\Translation\TranslatorInterface $translator;
-
-    private \Mautic\CoreBundle\Helper\CoreParametersHelper $coreParametersHelper;
-
     /**
      * @param string $dateFullFormat
      * @param string $dateShortFormat
@@ -30,8 +26,8 @@ final class DateHelper
         $dateShortFormat,
         $dateOnlyFormat,
         $timeOnlyFormat,
-        TranslatorInterface $translator,
-        CoreParametersHelper $coreParametersHelper
+        private TranslatorInterface $translator,
+        private CoreParametersHelper $coreParametersHelper
     ) {
         $this->formats = [
             'datetime' => $dateFullFormat,
@@ -41,8 +37,6 @@ final class DateHelper
         ];
 
         $this->helper               = new DateTimeHelper('', 'Y-m-d H:i:s', 'local');
-        $this->translator           = $translator;
-        $this->coreParametersHelper = $coreParametersHelper;
     }
 
     /**

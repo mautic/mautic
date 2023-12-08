@@ -13,19 +13,10 @@ use Mautic\CoreBundle\Exception\SchemaException;
  */
 class TableSchemaHelper
 {
-    protected \Doctrine\DBAL\Connection $db;
-
     /**
      * @var \Doctrine\DBAL\Schema\AbstractSchemaManager<\Doctrine\DBAL\Platforms\AbstractMySQLPlatform>
      */
     protected \Doctrine\DBAL\Schema\AbstractSchemaManager $sm;
-
-    /**
-     * @var string
-     */
-    protected $prefix;
-
-    protected \Mautic\CoreBundle\Doctrine\Helper\ColumnSchemaHelper $columnHelper;
 
     /**
      * @var \Doctrine\DBAL\Schema\Schema
@@ -42,12 +33,12 @@ class TableSchemaHelper
      */
     protected array $addTables = [];
 
-    public function __construct(Connection $db, $prefix, ColumnSchemaHelper $columnHelper)
+    /**
+     * @param string $prefix
+     */
+    public function __construct(protected Connection $db, protected $prefix, protected ColumnSchemaHelper $columnHelper)
     {
-        $this->db           = $db;
         $this->sm           = $db->getSchemaManager();
-        $this->prefix       = $prefix;
-        $this->columnHelper = $columnHelper;
     }
 
     /**
@@ -125,8 +116,8 @@ class TableSchemaHelper
 
         $this->addTables[] = $table;
 
-        $options = (isset($table['options'])) ? $table['options'] : [];
-        $columns = (isset($table['columns'])) ? $table['columns'] : [];
+        $options = $table['options'] ?? [];
+        $columns = $table['columns'] ?? [];
 
         $newTable = $this->getSchema()->createTable($this->prefix.$table['name']);
 
@@ -139,8 +130,8 @@ class TableSchemaHelper
                 }
 
                 if (!isset($columns[$column['name']])) {
-                    $type       = (isset($column['type'])) ? $column['type'] : 'text';
-                    $colOptions = (isset($column['options'])) ? $column['options'] : [];
+                    $type       = $column['type'] ?? 'text';
+                    $colOptions = $column['options'] ?? [];
 
                     $newTable->addColumn($column['name'], $type, $colOptions);
                     $columnsAdded[] = $column['name'];
@@ -175,7 +166,7 @@ class TableSchemaHelper
     /**
      * Executes the changes.
      */
-    public function executeChanges()
+    public function executeChanges(): void
     {
         $platform = $this->db->getDatabasePlatform();
 

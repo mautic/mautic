@@ -20,7 +20,7 @@ use Mautic\LeadBundle\Segment\Query\QueryBuilder;
 class ComplexRelationValueFilterQueryBuilder extends BaseFilterQueryBuilder
 {
     /** {@inheritdoc} */
-    public static function getServiceId()
+    public static function getServiceId(): string
     {
         return 'mautic.lead.query.builder.complex_relation.value';
     }

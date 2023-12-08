@@ -52,7 +52,7 @@ class SubmissionRepository extends CommonRepository
             $args['viewOnlyFields'] = ['button', 'freetext', 'freehtml', 'pagebreak', 'captcha'];
         }
         $viewOnlyFields = array_map(
-            function ($value) {
+            function ($value): string {
                 return '"'.$value.'"';
             },
             $args['viewOnlyFields']
@@ -465,10 +465,8 @@ class SubmissionRepository extends CommonRepository
      * @param string      $value        to compare with
      * @param string      $operatorExpr for WHERE clause
      * @param string|null $type
-     *
-     * @return bool
      */
-    public function compareValue($lead, $form, $formAlias, $field, $value, $operatorExpr, $type = null)
+    public function compareValue($lead, $form, $formAlias, $field, $value, $operatorExpr, $type = null): bool
     {
         // Modify operator
         switch ($operatorExpr) {
@@ -500,16 +498,11 @@ class SubmissionRepository extends CommonRepository
             ->setParameter('lead', (int) $lead)
             ->setParameter('form', (int) $form);
 
-        switch ($type) {
-            case 'boolean':
-            case 'number':
-                $q->andWhere($q->expr()->$operatorExpr('r.'.$field, $value));
-                break;
-            default:
-                $q->andWhere($q->expr()->$operatorExpr('r.'.$field, ':value'))
-                    ->setParameter('value', $value);
-                break;
-        }
+        match ($type) {
+            'boolean', 'number' => $q->andWhere($q->expr()->$operatorExpr('r.'.$field, $value)),
+            default => $q->andWhere($q->expr()->$operatorExpr('r.'.$field, ':value'))
+                ->setParameter('value', $value),
+        };
 
         $result = $q->executeQuery()->fetchAssociative();
 
@@ -535,10 +528,8 @@ class SubmissionRepository extends CommonRepository
      *
      * @param int    $formId
      * @param string $formAlias
-     *
-     * @return string
      */
-    public function getResultsTableName($formId, $formAlias)
+    public function getResultsTableName($formId, $formAlias): string
     {
         return MAUTIC_TABLE_PREFIX.'form_results_'.$formId.'_'.$formAlias;
     }
@@ -546,7 +537,7 @@ class SubmissionRepository extends CommonRepository
     /**
      * {@inheritdoc}
      */
-    public function getTableAlias()
+    public function getTableAlias(): string
     {
         return 'fs';
     }

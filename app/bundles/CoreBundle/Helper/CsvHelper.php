@@ -32,10 +32,7 @@ class CsvHelper
         return $data;
     }
 
-    /**
-     * @return array
-     */
-    public static function sanitizeHeaders(array $headers)
+    public static function sanitizeHeaders(array $headers): array
     {
         return array_map('trim', $headers);
     }

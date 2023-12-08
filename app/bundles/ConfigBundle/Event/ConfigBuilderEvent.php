@@ -20,16 +20,13 @@ class ConfigBuilderEvent extends Event
         '@MauticConfig/FormTheme/dsn_row.html.twig',
     ];
 
-    private BundleHelper $bundleHelper;
-
     /**
      * @var string[]
      */
     protected array $encodedFields = [];
 
-    public function __construct(BundleHelper $bundleHelper)
+    public function __construct(private BundleHelper $bundleHelper)
     {
-        $this->bundleHelper = $bundleHelper;
     }
 
     /**

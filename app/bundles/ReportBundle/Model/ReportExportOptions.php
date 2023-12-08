@@ -47,10 +47,7 @@ class ReportExportOptions
         return $this->batchSize;
     }
 
-    /**
-     * @return int
-     */
-    public function getPage()
+    public function getPage(): int
     {
         return $this->page;
     }

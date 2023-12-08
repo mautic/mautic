@@ -9,14 +9,8 @@ use Mautic\ReportBundle\Exception\FileIOException;
 
 class ReportFileWriter
 {
-    private \Mautic\ReportBundle\Model\CsvExporter $csvExporter;
-
-    private \Mautic\ReportBundle\Model\ExportHandler $exportHandler;
-
-    public function __construct(CsvExporter $csvExporter, ExportHandler $exportHandler)
+    public function __construct(private CsvExporter $csvExporter, private ExportHandler $exportHandler)
     {
-        $this->csvExporter   = $csvExporter;
-        $this->exportHandler = $exportHandler;
     }
 
     /**
@@ -48,10 +42,7 @@ class ReportFileWriter
         return $this->exportHandler->getPath($fileName);
     }
 
-    /**
-     * @return string
-     */
-    private function getFileName(Scheduler $scheduler)
+    private function getFileName(Scheduler $scheduler): string
     {
         $date       = $scheduler->getScheduleDate();
         $dateString = $date->format('Y-m-d');

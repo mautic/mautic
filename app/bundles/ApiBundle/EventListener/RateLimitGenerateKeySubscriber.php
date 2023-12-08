@@ -9,11 +9,8 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class RateLimitGenerateKeySubscriber implements EventSubscriberInterface
 {
-    private \Mautic\CoreBundle\Helper\CoreParametersHelper $coreParametersHelper;
-
-    public function __construct(CoreParametersHelper $coreParametersHelper)
+    public function __construct(private CoreParametersHelper $coreParametersHelper)
     {
-        $this->coreParametersHelper = $coreParametersHelper;
     }
 
     /**
@@ -26,7 +23,7 @@ class RateLimitGenerateKeySubscriber implements EventSubscriberInterface
         ];
     }
 
-    public function onGenerateKey(GenerateKeyEvent $event)
+    public function onGenerateKey(GenerateKeyEvent $event): void
     {
         $suffix = rawurlencode($this->coreParametersHelper->get('site_url'));
         $event->addToKey($suffix);

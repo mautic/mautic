@@ -32,13 +32,9 @@ use Symfony\Contracts\EventDispatcher\Event;
  */
 class UserModel extends FormModel
 {
-    protected \Mautic\EmailBundle\Helper\MailHelper $mailHelper;
-
-    private \Mautic\UserBundle\Model\UserToken\UserTokenServiceInterface $userTokenService;
-
     public function __construct(
-        MailHelper $mailHelper,
-        UserTokenServiceInterface $userTokenService,
+        protected MailHelper $mailHelper,
+        private UserTokenServiceInterface $userTokenService,
         EntityManager $em,
         CorePermissions $security,
         EventDispatcherInterface $dispatcher,
@@ -48,9 +44,6 @@ class UserModel extends FormModel
         LoggerInterface $mauticLogger,
         CoreParametersHelper $coreParametersHelper
     ) {
-        $this->mailHelper       = $mailHelper;
-        $this->userTokenService = $userTokenService;
-
         parent::__construct($em, $security, $dispatcher, $router, $translator, $userHelper, $mauticLogger, $coreParametersHelper);
     }
 
@@ -178,7 +171,7 @@ class UserModel extends FormModel
      *
      * @throws \Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException
      */
-    protected function dispatchEvent($action, &$entity, $isNew = false, Event $event = null)
+    protected function dispatchEvent($action, &$entity, $isNew = false, Event $event = null): ?Event
     {
         if (!$entity instanceof User) {
             throw new MethodNotAllowedHttpException(['User'], 'Entity must be of class User()');
@@ -226,19 +219,13 @@ class UserModel extends FormModel
     public function getLookupResults($type, $filter = '', $limit = 10)
     {
         $results = [];
-        switch ($type) {
-            case 'role':
-                $results = $this->em->getRepository(Role::class)->getRoleList($filter, $limit);
-                break;
-            case 'user':
-                $results = $this->em->getRepository(User::class)->getUserList($filter, $limit);
-                break;
-            case 'position':
-                $results = $this->em->getRepository(User::class)->getPositionList($filter, $limit);
-                break;
-        }
 
-        return $results;
+        return match ($type) {
+            'role'     => $this->em->getRepository(Role::class)->getRoleList($filter, $limit),
+            'user'     => $this->em->getRepository(User::class)->getUserList($filter, $limit),
+            'position' => $this->em->getRepository(User::class)->getPositionList($filter, $limit),
+            default    => $results,
+        };
     }
 
     /**
@@ -376,7 +363,7 @@ class UserModel extends FormModel
         }
         $preferences = $user->getPreferences();
 
-        return (isset($preferences[$key])) ? $preferences[$key] : $default;
+        return $preferences[$key] ?? $default;
     }
 
     /**

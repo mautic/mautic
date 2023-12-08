@@ -13,16 +13,8 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class DecisionDispatcher
 {
-    private \Symfony\Component\EventDispatcher\EventDispatcherInterface $dispatcher;
-
-    private \Mautic\CampaignBundle\Executioner\Dispatcher\LegacyEventDispatcher $legacyDispatcher;
-
-    public function __construct(
-        EventDispatcherInterface $dispatcher,
-        LegacyEventDispatcher $legacyDispatcher
-    ) {
-        $this->dispatcher       = $dispatcher;
-        $this->legacyDispatcher = $legacyDispatcher;
+    public function __construct(private EventDispatcherInterface $dispatcher, private LegacyEventDispatcher $legacyDispatcher)
+    {
     }
 
     /**
@@ -46,7 +38,7 @@ class DecisionDispatcher
         return $event;
     }
 
-    public function dispatchDecisionResultsEvent(DecisionAccessor $config, ArrayCollection $logs, EvaluatedContacts $evaluatedContacts)
+    public function dispatchDecisionResultsEvent(DecisionAccessor $config, ArrayCollection $logs, EvaluatedContacts $evaluatedContacts): void
     {
         if (!$logs->count()) {
             return;

@@ -64,7 +64,7 @@ class TriggerEvent
         $builder = new ClassMetadataBuilder($metadata);
 
         $builder->setTable('point_trigger_events')
-            ->setCustomRepositoryClass('Mautic\PointBundle\Entity\TriggerEventRepository')
+            ->setCustomRepositoryClass(\Mautic\PointBundle\Entity\TriggerEventRepository::class)
             ->addIndex(['type'], 'trigger_type_search');
 
         $builder->addIdColumns();
@@ -217,10 +217,7 @@ class TriggerEvent
         return $this->type;
     }
 
-    /**
-     * @return array
-     */
-    public function convertToArray()
+    public function convertToArray(): array
     {
         return get_object_vars($this);
     }

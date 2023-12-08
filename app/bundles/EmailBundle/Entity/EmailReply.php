@@ -11,14 +11,7 @@ class EmailReply
 {
     private string $id;
 
-    private \Mautic\EmailBundle\Entity\Stat $stat;
-
     private \DateTimeInterface $dateReplied;
-
-    /**
-     * @var string
-     */
-    private $messageId;
 
     public static function loadMetadata(ORM\ClassMetadata $metadata): void
     {
@@ -64,18 +57,13 @@ class EmailReply
     /**
      * @param string $messageId
      */
-    public function __construct(Stat $stat, $messageId, \DateTime $dateReplied = null)
+    public function __construct(private Stat $stat, private $messageId, \DateTime $dateReplied = null)
     {
         $this->id          = Uuid::uuid4()->toString();
-        $this->stat        = $stat;
-        $this->messageId   = $messageId;
-        $this->dateReplied = (null === $dateReplied) ? new \DateTime() : $dateReplied;
+        $this->dateReplied = $dateReplied ?? new \DateTime();
     }
 
-    /**
-     * @return int
-     */
-    public function getId()
+    public function getId(): string
     {
         return $this->id;
     }

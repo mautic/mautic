@@ -31,14 +31,10 @@ class CampaignApiController extends CommonApiController
 {
     use LeadAccessTrait;
 
-    private MembershipManager $membershipManager;
-
     /**
      * @var CampaignModel|null
      */
     protected $model;
-
-    private RequestStack $requestStack;
 
     public function __construct(
         CorePermissions $security,
@@ -47,17 +43,14 @@ class CampaignApiController extends CommonApiController
         RouterInterface $router,
         FormFactoryInterface $formFactory,
         AppVersion $appVersion,
-        RequestStack $requestStack,
-        MembershipManager $membershipManager,
+        private RequestStack $requestStack,
+        private MembershipManager $membershipManager,
         ManagerRegistry $doctrine,
         ModelFactory $modelFactory,
         EventDispatcherInterface $dispatcher,
         CoreParametersHelper $coreParametersHelper,
         MauticFactory $factory
     ) {
-        $this->requestStack      = $requestStack;
-        $this->membershipManager = $membershipManager;
-
         $campaignModel = $modelFactory->getModel('campaign');
         \assert($campaignModel instanceof CampaignModel);
 

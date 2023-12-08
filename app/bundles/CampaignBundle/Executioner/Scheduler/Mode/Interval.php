@@ -16,19 +16,13 @@ class Interval implements ScheduleModeInterface
 {
     public const LOG_DATE_FORMAT = 'Y-m-d H:i:s T';
 
-    private \Psr\Log\LoggerInterface $logger;
-
-    private \Mautic\CoreBundle\Helper\CoreParametersHelper $coreParametersHelper;
-
     /**
      * @var \DateTimeZone
      */
     private $defaultTimezone;
 
-    public function __construct(LoggerInterface $logger, CoreParametersHelper $coreParametersHelper)
+    public function __construct(private LoggerInterface $logger, private CoreParametersHelper $coreParametersHelper)
     {
-        $this->logger               = $logger;
-        $this->coreParametersHelper = $coreParametersHelper;
     }
 
     /**
@@ -256,7 +250,7 @@ class Interval implements ScheduleModeInterface
                 $groupExecutionDate->setTime($groupHour->format('H'), $groupHour->format('i'));
 
                 return $groupExecutionDate;
-            } catch (\Exception $exception) {
+            } catch (\Exception) {
                 // Timezone is not recognized so use the default
                 $this->logger->debug(
                     'CAMPAIGN: ('.$eventId.') '.$timezone.' for contact '.$contact->getId().' is not recognized'
@@ -310,7 +304,7 @@ class Interval implements ScheduleModeInterface
                 /** @var \DateTime $groupExecutionDate */
                 $groupExecutionDate = clone $compareFromDateTime;
                 $groupExecutionDate->setTimezone($contactTimezone);
-            } catch (\Exception $exception) {
+            } catch (\Exception) {
                 // Timezone is not recognized so use the default
                 $this->logger->debug(
                     'CAMPAIGN: ('.$eventId.') '.$timezone.' for contact '.$contact->getId().' is not recognized'

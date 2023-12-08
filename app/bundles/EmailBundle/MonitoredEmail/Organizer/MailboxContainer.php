@@ -6,8 +6,6 @@ use Mautic\EmailBundle\MonitoredEmail\Accessor\ConfigAccessor;
 
 class MailboxContainer
 {
-    protected \Mautic\EmailBundle\MonitoredEmail\Accessor\ConfigAccessor $config;
-
     /**
      * @var array
      */
@@ -23,9 +21,8 @@ class MailboxContainer
      */
     protected $messages = [];
 
-    public function __construct(ConfigAccessor $config)
+    public function __construct(protected ConfigAccessor $config)
     {
-        $this->config = $config;
     }
 
     public function addCriteria($criteria, $mailbox): void

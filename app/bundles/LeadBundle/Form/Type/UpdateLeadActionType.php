@@ -10,14 +10,11 @@ class UpdateLeadActionType extends AbstractType
 {
     use EntityFieldsBuildFormTrait;
 
-    private \Mautic\LeadBundle\Model\FieldModel $fieldModel;
-
-    public function __construct(FieldModel $fieldModel)
+    public function __construct(private FieldModel $fieldModel)
     {
-        $this->fieldModel = $fieldModel;
     }
 
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $leadFields = $this->fieldModel->getEntities(
             [

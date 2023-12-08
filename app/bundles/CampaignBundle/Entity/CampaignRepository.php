@@ -42,7 +42,7 @@ class CampaignRepository extends CommonRepository
      * @param object $entity
      * @param bool   $flush
      */
-    public function deleteEntity($entity, $flush = true)
+    public function deleteEntity($entity, $flush = true): void
     {
         // Null parents of associated events first
         $q = $this->getEntityManager()->getConnection()->createQueryBuilder();
@@ -257,7 +257,7 @@ class CampaignRepository extends CommonRepository
     /**
      * {@inheritdoc}
      */
-    public function getTableAlias()
+    public function getTableAlias(): string
     {
         return 'c';
     }
@@ -423,11 +423,9 @@ class CampaignRepository extends CommonRepository
      * @param int   $leadId        Optional lead ID to check if lead is part of campaign
      * @param array $pendingEvents List of specific events to rule out
      *
-     * @return int
-     *
      * @throws \Doctrine\DBAL\Cache\CacheException
      */
-    public function getCampaignLeadCount($campaignId, $leadId = null, $pendingEvents = [], \DateTimeInterface $dateFrom = null, \DateTimeInterface $dateTo = null)
+    public function getCampaignLeadCount($campaignId, $leadId = null, $pendingEvents = [], \DateTimeInterface $dateFrom = null, \DateTimeInterface $dateTo = null): int
     {
         $q = $this->getReplicaConnection()->createQueryBuilder();
 

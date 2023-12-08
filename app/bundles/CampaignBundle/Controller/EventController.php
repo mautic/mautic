@@ -30,15 +30,11 @@ class EventController extends CommonFormController
         Event::TYPE_CONDITION,
     ];
 
-    private EventCollector $eventCollector;
-
-    private DateHelper $dateHelper;
-
     public function __construct(
         FormFactoryInterface $formFactory,
         FormFieldHelper $fieldHelper,
-        EventCollector $eventCollector,
-        DateHelper $dateHelper,
+        private EventCollector $eventCollector,
+        private DateHelper $dateHelper,
         ManagerRegistry $doctrine,
         MauticFactory $factory,
         ModelFactory $modelFactory,
@@ -50,9 +46,6 @@ class EventController extends CommonFormController
         RequestStack $requestStack,
         CorePermissions $security
     ) {
-        $this->eventCollector = $eventCollector;
-        $this->dateHelper     = $dateHelper;
-
         parent::__construct($formFactory, $fieldHelper, $doctrine, $factory, $modelFactory, $userHelper, $coreParametersHelper, $dispatcher, $translator, $flashBag, $requestStack, $security);
     }
 
@@ -379,9 +372,7 @@ class EventController extends CommonFormController
         if (!$cancelled && $valid) {
             // Prevent undefined errors
             $event    = array_merge((new Event())->convertToArray(), $event);
-            $template = isset($event['settings']['template'])
-                ? $event['settings']['template']
-                : '@MauticCampaign/Event/_generic.html.twig';
+            $template = $event['settings']['template'] ?? '@MauticCampaign/Event/_generic.html.twig';
 
             $passthroughVars = array_merge($passthroughVars, [
                 'event'      => $event,
@@ -475,7 +466,7 @@ class EventController extends CommonFormController
             // Add the field to the delete list
             if (!in_array($objectId, $deletedEvents)) {
                 // If event is new don't add to deleted list
-                if (false === strpos($objectId, 'new')) {
+                if (!str_contains($objectId, 'new')) {
                     $deletedEvents[] = $objectId;
                     $session->set('mautic.campaign.'.$campaignId.'.events.deleted', $deletedEvents);
                 }

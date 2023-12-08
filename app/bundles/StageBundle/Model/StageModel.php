@@ -28,10 +28,8 @@ use Symfony\Contracts\EventDispatcher\Event;
  */
 class StageModel extends CommonFormModel
 {
-    protected \Mautic\LeadBundle\Model\LeadModel $leadModel;
-
     public function __construct(
-        LeadModel $leadModel,
+        protected LeadModel $leadModel,
         UserHelper $userHelper,
         EntityManager $em,
         CorePermissions $security,
@@ -41,8 +39,6 @@ class StageModel extends CommonFormModel
         LoggerInterface $mauticLogger,
         CoreParametersHelper $coreParametersHelper
     ) {
-        $this->leadModel  = $leadModel;
-
         parent::__construct($em, $security, $dispatcher, $router, $translator, $userHelper, $mauticLogger, $coreParametersHelper);
     }
 
@@ -59,7 +55,7 @@ class StageModel extends CommonFormModel
     /**
      * {@inheritdoc}
      */
-    public function getPermissionBase()
+    public function getPermissionBase(): string
     {
         return 'stage:stages';
     }
@@ -100,7 +96,7 @@ class StageModel extends CommonFormModel
      *
      * @throws MethodNotAllowedHttpException
      */
-    protected function dispatchEvent($action, &$entity, $isNew = false, Event $event = null)
+    protected function dispatchEvent($action, &$entity, $isNew = false, Event $event = null): ?Event
     {
         if (!$entity instanceof Stage) {
             throw new MethodNotAllowedHttpException(['Stage']);

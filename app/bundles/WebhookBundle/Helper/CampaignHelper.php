@@ -14,21 +14,13 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class CampaignHelper
 {
-    protected Client $client;
-    protected CompanyModel $companyModel;
-
     /**
      * Cached contact values in format [contact_id => [key1 => val1, key2 => val1]].
      */
     private array $contactsValues = [];
 
-    private EventDispatcherInterface $dispatcher;
-
-    public function __construct(Client $client, CompanyModel $companyModel, EventDispatcherInterface $dispatcher)
+    public function __construct(protected Client $client, protected CompanyModel $companyModel, private EventDispatcherInterface $dispatcher)
     {
-        $this->client       = $client;
-        $this->companyModel = $companyModel;
-        $this->dispatcher   = $dispatcher;
     }
 
     /**
@@ -157,10 +149,7 @@ class CampaignHelper
         return $this->contactsValues[$contact->getId()];
     }
 
-    /**
-     * @return string
-     */
-    private function ipAddressesToCsv(Collection $ipAddresses)
+    private function ipAddressesToCsv(Collection $ipAddresses): string
     {
         $addresses = [];
         foreach ($ipAddresses as $ipAddress) {

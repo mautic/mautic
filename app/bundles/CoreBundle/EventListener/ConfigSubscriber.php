@@ -11,11 +11,8 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class ConfigSubscriber implements EventSubscriberInterface
 {
-    private \Mautic\CoreBundle\Helper\LanguageHelper $languageHelper;
-
-    public function __construct(LanguageHelper $languageHelper)
+    public function __construct(private LanguageHelper $languageHelper)
     {
-        $this->languageHelper = $languageHelper;
     }
 
     /**
@@ -29,7 +26,7 @@ class ConfigSubscriber implements EventSubscriberInterface
         ];
     }
 
-    public function onConfigGenerate(ConfigBuilderEvent $event)
+    public function onConfigGenerate(ConfigBuilderEvent $event): void
     {
         $coreParams = $event->getParametersFromConfig('MauticCoreBundle');
         unset($coreParams['theme']);
@@ -43,7 +40,7 @@ class ConfigSubscriber implements EventSubscriberInterface
         ]);
     }
 
-    public function onConfigBeforeSave(ConfigEvent $event)
+    public function onConfigBeforeSave(ConfigEvent $event): void
     {
         $values = $event->getConfig();
 

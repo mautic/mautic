@@ -12,17 +12,8 @@ use Symfony\Component\Routing\RouterInterface;
 
 class BuildJsSubscriber implements EventSubscriberInterface
 {
-    private \Mautic\NotificationBundle\Helper\NotificationHelper $notificationHelper;
-
-    private \Mautic\PluginBundle\Helper\IntegrationHelper $integrationHelper;
-
-    private \Symfony\Component\Routing\RouterInterface $router;
-
-    public function __construct(NotificationHelper $notificationHelper, IntegrationHelper $integrationHelper, RouterInterface $router)
+    public function __construct(private NotificationHelper $notificationHelper, private IntegrationHelper $integrationHelper, private RouterInterface $router)
     {
-        $this->notificationHelper = $notificationHelper;
-        $this->integrationHelper  = $integrationHelper;
-        $this->router             = $router;
     }
 
     /**

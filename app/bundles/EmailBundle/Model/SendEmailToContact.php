@@ -16,14 +16,6 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class SendEmailToContact
 {
-    private \Mautic\EmailBundle\Helper\MailHelper $mailer;
-
-    private \Mautic\EmailBundle\Stat\StatHelper $statHelper;
-
-    private \Mautic\LeadBundle\Model\DoNotContact $dncModel;
-
-    private \Symfony\Contracts\Translation\TranslatorInterface $translator;
-
     /**
      * @var string|null
      */
@@ -74,12 +66,8 @@ class SendEmailToContact
      */
     private $contact = [];
 
-    public function __construct(MailHelper $mailer, StatHelper $statHelper, DoNotContact $dncModel, TranslatorInterface $translator)
+    public function __construct(private MailHelper $mailer, private StatHelper $statHelper, private DoNotContact $dncModel, private TranslatorInterface $translator)
     {
-        $this->mailer     = $mailer;
-        $this->statHelper = $statHelper;
-        $this->dncModel   = $dncModel;
-        $this->translator = $translator;
     }
 
     /**
@@ -185,7 +173,7 @@ class SendEmailToContact
             if (!$this->mailer->addTo($contact['email'], $contact['firstname'].' '.$contact['lastname'])) {
                 $this->failContact();
             }
-        } catch (BatchQueueMaxException $e) {
+        } catch (BatchQueueMaxException) {
             // Queue full so flush then try again
             $this->flush(false);
 
@@ -203,9 +191,9 @@ class SendEmailToContact
     public function send(): void
     {
         if ($this->mailer->inTokenizationMode()) {
-            list($success, $errors) = $this->queueTokenizedEmail();
+            [$success, $errors] = $this->queueTokenizedEmail();
         } else {
-            list($success, $errors) = $this->sendStandardEmail();
+            [$success, $errors] = $this->sendStandardEmail();
         }
 
         // queue or send the message
@@ -280,7 +268,7 @@ class SendEmailToContact
             $stat = $this->statHelper->getStat($this->contact['email']);
             $this->downEmailSentCount($stat->getEmailId());
             $this->statHelper->markForDeletion($stat);
-        } catch (StatNotFoundException $exception) {
+        } catch (StatNotFoundException) {
         }
 
         if ($hasBadEmail) {
@@ -301,7 +289,7 @@ class SendEmailToContact
             try {
                 /** @var Reference $stat */
                 $stat = $this->statHelper->getStat($failedEmail);
-            } catch (StatNotFoundException $exception) {
+            } catch (StatNotFoundException) {
                 continue;
             }
 
@@ -372,7 +360,7 @@ class SendEmailToContact
 
     protected function queueTokenizedEmail(): array
     {
-        list($queued, $queueErrors) = $this->mailer->queue(true, MailHelper::QUEUE_RETURN_ERRORS);
+        [$queued, $queueErrors] = $this->mailer->queue(true, MailHelper::QUEUE_RETURN_ERRORS);
 
         if ($queued) {
             // Create stat first to ensure it is available for emails sent immediately

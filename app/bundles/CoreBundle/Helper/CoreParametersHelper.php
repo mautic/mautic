@@ -9,19 +9,16 @@ class CoreParametersHelper
 {
     private \Symfony\Component\HttpFoundation\ParameterBag $parameters;
 
-    private \Symfony\Component\DependencyInjection\ContainerInterface $container;
-
     /**
      * @var array
      */
     private $resolvedParameters;
 
-    public function __construct(ContainerInterface $container)
+    public function __construct(private ContainerInterface $container)
     {
         $loader = new ParameterLoader();
 
         $this->parameters = $loader->getParameterBag();
-        $this->container  = $container;
 
         $this->resolveParameters();
     }

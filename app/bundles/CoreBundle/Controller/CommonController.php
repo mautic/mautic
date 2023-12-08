@@ -35,44 +35,14 @@ class CommonController extends AbstractController implements MauticController
 {
     use FormThemeTrait;
 
-    protected \Mautic\CoreBundle\Factory\MauticFactory $factory;
-
-    /**
-     * @var ModelFactory<object>
-     */
-    protected ModelFactory $modelFactory;
-
     protected ?\Mautic\UserBundle\Entity\User $user;
-
-    protected \Mautic\CoreBundle\Helper\CoreParametersHelper $coreParametersHelper;
-
-    protected \Symfony\Component\EventDispatcher\EventDispatcherInterface $dispatcher;
-
-    protected Translator $translator;
-
-    private ?RequestStack $requestStack = null;
-
-    protected ?CorePermissions $security = null;
-
-    private \Mautic\CoreBundle\Service\FlashBag $flashBag;
-
-    protected ManagerRegistry $doctrine;
 
     /**
      * @param ModelFactory<object> $modelFactory
      */
-    public function __construct(ManagerRegistry $doctrine, MauticFactory $factory, ModelFactory $modelFactory, UserHelper $userHelper, CoreParametersHelper $coreParametersHelper, EventDispatcherInterface $dispatcher, Translator $translator, FlashBag $flashBag, RequestStack $requestStack, CorePermissions $security)
+    public function __construct(protected ManagerRegistry $doctrine, protected MauticFactory $factory, protected ModelFactory $modelFactory, UserHelper $userHelper, protected CoreParametersHelper $coreParametersHelper, protected EventDispatcherInterface $dispatcher, protected Translator $translator, private FlashBag $flashBag, private ?RequestStack $requestStack, protected ?CorePermissions $security)
     {
-        $this->doctrine             = $doctrine;
-        $this->factory              = $factory;
-        $this->modelFactory         = $modelFactory;
         $this->user                 = $userHelper->getUser();
-        $this->coreParametersHelper = $coreParametersHelper;
-        $this->dispatcher           = $dispatcher;
-        $this->translator           = $translator;
-        $this->flashBag             = $flashBag;
-        $this->requestStack         = $requestStack;
-        $this->security             = $security;
     }
 
     protected function getCurrentRequest(): Request
@@ -88,10 +58,8 @@ class CommonController extends AbstractController implements MauticController
 
     /**
      * Check if a security level is granted.
-     *
-     * @return bool
      */
-    protected function accessGranted($level)
+    protected function accessGranted($level): bool
     {
         return in_array($level, $this->getPermissions());
     }
@@ -181,10 +149,10 @@ class CommonController extends AbstractController implements MauticController
             return $this->ajaxAction($request, $args);
         }
 
-        $parameters = (isset($args['viewParameters'])) ? $args['viewParameters'] : [];
+        $parameters = $args['viewParameters'] ?? [];
         $template   = $args['contentTemplate'];
 
-        $code     = (isset($args['responseCode'])) ? $args['responseCode'] : 200;
+        $code     = $args['responseCode'] ?? 200;
         $response = new Response('', $code);
 
         if ($this->dispatcher->hasListeners(CoreEvents::VIEW_INJECT_CUSTOM_TEMPLATE)) {
@@ -268,7 +236,7 @@ class CommonController extends AbstractController implements MauticController
         }
 
         if (!$request->isXmlHttpRequest() || !empty($args['ignoreAjax'])) {
-            $code = (isset($args['responseCode'])) ? $args['responseCode'] : 302;
+            $code = $args['responseCode'] ?? 302;
 
             return $this->redirect($returnUrl, $code);
         }
@@ -320,7 +288,7 @@ class CommonController extends AbstractController implements MauticController
                         '_route_params' => $routeParams,
                     ]
                 );
-            } catch (\Exception $e) {
+            } catch (\Exception) {
                 // do nothing
             }
 
@@ -371,7 +339,7 @@ class CommonController extends AbstractController implements MauticController
             $passthrough['notifications'] = $this->getNotificationContent();
         }
 
-        $tmpl = (isset($parameters['tmpl'])) ? $parameters['tmpl'] : $request->get('tmpl', 'index');
+        $tmpl = $parameters['tmpl'] ?? $request->get('tmpl', 'index');
         if ('index' == $tmpl) {
             $updatedContent = [];
             if (!empty($newContent)) {
@@ -628,7 +596,7 @@ class CommonController extends AbstractController implements MauticController
      *
      * @deprecated Will be removed in Mautic 3.0 as unused.
      */
-    public function addNotification($message, $type = null, $isRead = true, $header = null, $iconClass = null, \DateTime $datetime = null)
+    public function addNotification($message, $type = null, $isRead = true, $header = null, $iconClass = null, \DateTime $datetime = null): void
     {
         /** @var \Mautic\CoreBundle\Model\NotificationModel $notificationModel */
         $notificationModel = $this->getModel('core.notification');

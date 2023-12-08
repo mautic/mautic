@@ -392,7 +392,7 @@ class EmailController extends FormController
                     'email'        => $email,
                     'trackables'   => $trackableLinks,
                     'logs'         => $logs,
-                    'isEmbedded'   => $request->get('isEmbedded') ? $request->get('isEmbedded') : false,
+                    'isEmbedded'   => $request->get('isEmbedded') ?: false,
                     'variants'     => [
                         'parent'     => $parent,
                         'children'   => $children,
@@ -946,7 +946,7 @@ class EmailController extends FormController
         $model = $this->getModel('email');
 
         // permission check
-        if (false !== strpos($objectId, 'new')) {
+        if (str_contains($objectId, 'new')) {
             $isNew = true;
             if (!$this->security->isGranted('email:emails:create')) {
                 return $this->accessDenied();
@@ -1453,7 +1453,7 @@ class EmailController extends FormController
                 $slotConfig = [];
             }
 
-            $value = isset($content[$slot]) ? $content[$slot] : '';
+            $value = $content[$slot] ?? '';
             $slotsHelper->set($slot, "<div data-slot=\"text\" id=\"slot-{$slot}\">{$value}</div>");
         }
 

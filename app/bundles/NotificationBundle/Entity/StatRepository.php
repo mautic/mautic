@@ -160,17 +160,12 @@ class StatRepository extends CommonRepository
         }
 
         if (isset($options['order'])) {
-            list($orderBy, $orderByDir) = $options['order'];
+            [$orderBy, $orderByDir] = $options['order'];
 
-            switch ($orderBy) {
-                case 'eventLabel':
-                    $orderBy = 'e.title';
-                    break;
-                case 'timestamp':
-                default:
-                    $orderBy = 'e.dateRead, e.dateSent';
-                    break;
-            }
+            $orderBy = match ($orderBy) {
+                'eventLabel' => 'e.title',
+                default      => 'e.dateRead, e.dateSent',
+            };
 
             $query->orderBy($orderBy, $orderByDir);
         }
@@ -274,7 +269,7 @@ class StatRepository extends CommonRepository
     /**
      * {@inheritdoc}
      */
-    public function getTableAlias()
+    public function getTableAlias(): string
     {
         return 's';
     }

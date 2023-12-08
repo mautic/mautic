@@ -11,11 +11,8 @@ use Knp\Menu\Twig\Helper as KnpHelper;
  */
 final class MenuHelper
 {
-    private KnpHelper $helper;
-
-    public function __construct(KnpHelper $helper)
+    public function __construct(private KnpHelper $helper)
     {
-        $this->helper = $helper;
     }
 
     public function getName(): string
@@ -28,10 +25,8 @@ final class MenuHelper
      *
      * @param array<string, mixed> $attributes
      * @param array<string, mixed> $overrides
-     *
-     * @return string
      */
-    public function parseAttributes($attributes, $overrides = [])
+    public function parseAttributes($attributes, $overrides = []): string
     {
         if (!is_array($attributes)) {
             $attributes = [];

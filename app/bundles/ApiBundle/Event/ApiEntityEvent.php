@@ -8,22 +8,10 @@ use Symfony\Component\HttpFoundation\Request;
 class ApiEntityEvent extends CommonEvent
 {
     /**
-     * @var object
-     */
-    protected $entity;
-
-    protected array $entityRequestParameters;
-
-    private \Symfony\Component\HttpFoundation\Request $request;
-
-    /**
      * @param object $entity
      */
-    public function __construct($entity, array $entityRequestParameters, Request $request)
+    public function __construct(protected $entity, protected array $entityRequestParameters, private Request $request)
     {
-        $this->entity                  = $entity;
-        $this->entityRequestParameters = $entityRequestParameters;
-        $this->request                 = $request;
     }
 
     /**

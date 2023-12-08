@@ -42,11 +42,7 @@ class DynamicContentFilterEntryType extends AbstractType
      */
     private array $localeChoices;
 
-    private \Mautic\StageBundle\Model\StageModel $stageModel;
-
-    private BuilderIntegrationsHelper $builderIntegrationsHelper;
-
-    public function __construct(ListModel $listModel, StageModel $stageModel, BuilderIntegrationsHelper $builderIntegrationsHelper)
+    public function __construct(ListModel $listModel, private StageModel $stageModel, private BuilderIntegrationsHelper $builderIntegrationsHelper)
     {
         $this->fieldChoices = $listModel->getChoiceFields();
 
@@ -56,18 +52,16 @@ class DynamicContentFilterEntryType extends AbstractType
         $this->regionChoices             = FormFieldHelper::getRegionChoices();
         $this->timezoneChoices           = FormFieldHelper::getTimezonesChoices();
         $this->localeChoices             = FormFieldHelper::getLocaleChoices();
-        $this->stageModel                = $stageModel;
-        $this->builderIntegrationsHelper = $builderIntegrationsHelper;
     }
 
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $extraClasses = '';
 
         try {
             $mauticBuilder = $this->builderIntegrationsHelper->getBuilder('email');
             $mauticBuilder->getName();
-        } catch (IntegrationNotFoundException $exception) {
+        } catch (IntegrationNotFoundException) {
             // Assume legacy builder
             $extraClasses = ' legacy-builder';
         }
@@ -114,12 +108,12 @@ class DynamicContentFilterEntryType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function buildView(FormView $view, FormInterface $form, array $options)
+    public function buildView(FormView $view, FormInterface $form, array $options): void
     {
         $view->vars['fields'] = $this->fieldChoices;
     }
 
-    public function configureOptions(OptionsResolver $resolver)
+    public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults(
             [
@@ -129,11 +123,11 @@ class DynamicContentFilterEntryType extends AbstractType
         );
     }
 
-    private function filterFieldChoices()
+    private function filterFieldChoices(): void
     {
         $this->fieldChoices['lead'] = array_filter(
             $this->fieldChoices['lead'],
-            function ($key) {
+            function ($key): bool {
                 return !in_array(
                     $key,
                     [

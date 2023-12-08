@@ -7,11 +7,8 @@ use Mautic\EmailBundle\MonitoredEmail\Message;
 
 class Parser
 {
-    protected \Mautic\EmailBundle\MonitoredEmail\Message $message;
-
-    public function __construct(Message $message)
+    public function __construct(protected Message $message)
     {
-        $this->message = $message;
     }
 
     /**
@@ -21,7 +18,7 @@ class Parser
     {
         $unsubscriptionEmail = null;
         foreach ($this->message->to as $to => $name) {
-            if (false !== strpos($to, '+unsubscribe')) {
+            if (str_contains($to, '+unsubscribe')) {
                 $unsubscriptionEmail = $to;
 
                 break;

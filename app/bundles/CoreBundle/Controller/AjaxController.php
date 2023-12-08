@@ -73,7 +73,7 @@ class AjaxController extends CommonController
         }
 
         if ($authorizationChecker->isGranted('IS_AUTHENTICATED_REMEMBERED')) {
-            if (false !== strpos($action, ':')) {
+            if (str_contains($action, ':')) {
                 // call the specified bundle's ajax action
                 $parts     = explode(':', $action);
                 $namespace = 'Mautic';
@@ -172,13 +172,13 @@ class AjaxController extends CommonController
             if (is_array($c)) {
                 foreach ($c as $subc) {
                     $command = $translator->trans($k);
-                    $command = (false === strpos($command, ':')) ? $command.':' : $command;
+                    $command = (!str_contains($command, ':')) ? $command.':' : $command;
 
                     $dataArray[$command.$translator->trans($subc)] = ['value' => $command.$translator->trans($subc)];
                 }
             } else {
                 $command = $translator->trans($c);
-                $command = (false === strpos($command, ':')) ? $command.':' : $command;
+                $command = (!str_contains($command, ':')) ? $command.':' : $command;
 
                 $dataArray[$command] = ['value' => $command];
             }
@@ -207,7 +207,7 @@ class AjaxController extends CommonController
             foreach ($commands as $k => $c) {
                 if (is_array($c)) {
                     $command = $translator->trans($k);
-                    $command = (false === strpos($command, ':')) ? $command.':' : $command;
+                    $command = (!str_contains($command, ':')) ? $command.':' : $command;
 
                     foreach ($c as $subc) {
                         $subcommand = $command.$translator->trans($subc);
@@ -218,7 +218,7 @@ class AjaxController extends CommonController
                     }
                 } else {
                     $command = $translator->trans($k);
-                    $command = (false === strpos($command, ':')) ? $command.':' : $command;
+                    $command = (!str_contains($command, ':')) ? $command.':' : $command;
 
                     if (!in_array($command, $dupChecker)) {
                         $dataArray[]  = ['value' => $command];
@@ -303,7 +303,7 @@ class AjaxController extends CommonController
                                 'item'          => $entity,
                                 'model'         => $name,
                                 'query'         => $extra,
-                                'size'          => (isset($post['size'])) ? $post['size'] : '',
+                                'size'          => $post['size'] ?? '',
                                 'onclick'       => $onclickMethod,
                                 'attributes'    => $dataAttr,
                                 'transKeys'     => $attrTransKeys,
@@ -472,29 +472,13 @@ class AjaxController extends CommonController
         $archive = $zipper->open($zipFile);
 
         if (true !== $archive) {
-            // Get the exact error
-            switch ($archive) {
-                case \ZipArchive::ER_EXISTS:
-                    $error = 'mautic.core.update.archive_file_exists';
-                    break;
-                case \ZipArchive::ER_INCONS:
-                case \ZipArchive::ER_INVAL:
-                case \ZipArchive::ER_MEMORY:
-                    $error = 'mautic.core.update.archive_zip_corrupt';
-                    break;
-                case \ZipArchive::ER_NOENT:
-                    $error = 'mautic.core.update.archive_no_such_file';
-                    break;
-                case \ZipArchive::ER_NOZIP:
-                    $error = 'mautic.core.update.archive_not_valid_zip';
-                    break;
-                case \ZipArchive::ER_READ:
-                case \ZipArchive::ER_SEEK:
-                case \ZipArchive::ER_OPEN:
-                default:
-                    $error = 'mautic.core.update.archive_could_not_open';
-                    break;
-            }
+            $error = match ($archive) {
+                \ZipArchive::ER_EXISTS => 'mautic.core.update.archive_file_exists',
+                \ZipArchive::ER_INCONS, \ZipArchive::ER_INVAL, \ZipArchive::ER_MEMORY => 'mautic.core.update.archive_zip_corrupt',
+                \ZipArchive::ER_NOENT => 'mautic.core.update.archive_no_such_file',
+                \ZipArchive::ER_NOZIP => 'mautic.core.update.archive_not_valid_zip',
+                default               => 'mautic.core.update.archive_could_not_open',
+            };
 
             $dataArray['stepStatus'] = $translator->trans('mautic.core.update.step.failed');
             $dataArray['message']    = $translator->trans('mautic.core.update.error', ['%error%' => $translator->trans($error)]);

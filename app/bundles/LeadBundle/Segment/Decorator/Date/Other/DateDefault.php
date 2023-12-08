@@ -8,20 +8,11 @@ use Mautic\LeadBundle\Segment\Decorator\FilterDecoratorInterface;
 
 class DateDefault implements FilterDecoratorInterface
 {
-    private \Mautic\LeadBundle\Segment\Decorator\DateDecorator $dateDecorator;
-
-    /**
-     * @var string
-     */
-    private $originalValue;
-
     /**
      * @param string $originalValue
      */
-    public function __construct(DateDecorator $dateDecorator, $originalValue)
+    public function __construct(private DateDecorator $dateDecorator, private $originalValue)
     {
-        $this->dateDecorator = $dateDecorator;
-        $this->originalValue = $originalValue;
     }
 
     /**
@@ -65,19 +56,13 @@ class DateDefault implements FilterDecoratorInterface
     {
         $filter = $this->originalValue;
 
-        switch ($contactSegmentFilterCrate->getOperator()) {
-            case 'like':
-            case '!like':
-                return false === strpos($filter, '%') ? '%'.$filter.'%' : $filter;
-            case 'contains':
-                return '%'.$filter.'%';
-            case 'startsWith':
-                return $filter.'%';
-            case 'endsWith':
-                return '%'.$filter;
-        }
-
-        return $this->originalValue;
+        return match ($contactSegmentFilterCrate->getOperator()) {
+            'like', '!like' => !str_contains($filter, '%') ? '%'.$filter.'%' : $filter,
+            'contains'   => '%'.$filter.'%',
+            'startsWith' => $filter.'%',
+            'endsWith'   => '%'.$filter,
+            default      => $this->originalValue,
+        };
     }
 
     /**
@@ -88,10 +73,7 @@ class DateDefault implements FilterDecoratorInterface
         return $this->dateDecorator->getQueryType($contactSegmentFilterCrate);
     }
 
-    /**
-     * @return bool|string
-     */
-    public function getAggregateFunc(ContactSegmentFilterCrate $contactSegmentFilterCrate)
+    public function getAggregateFunc(ContactSegmentFilterCrate $contactSegmentFilterCrate): string|bool
     {
         return $this->dateDecorator->getAggregateFunc($contactSegmentFilterCrate);
     }

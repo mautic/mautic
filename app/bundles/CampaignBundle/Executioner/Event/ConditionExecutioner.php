@@ -16,11 +16,8 @@ class ConditionExecutioner implements EventInterface
 {
     public const TYPE = 'condition';
 
-    private \Mautic\CampaignBundle\Executioner\Dispatcher\ConditionDispatcher $dispatcher;
-
-    public function __construct(ConditionDispatcher $dispatcher)
+    public function __construct(private ConditionDispatcher $dispatcher)
     {
-        $this->dispatcher = $dispatcher;
     }
 
     /**
@@ -37,7 +34,7 @@ class ConditionExecutioner implements EventInterface
                 /* @var ConditionAccessor $config */
                 $this->dispatchEvent($config, $log);
                 $evaluatedContacts->pass($log->getLead());
-            } catch (ConditionFailedException $exception) {
+            } catch (ConditionFailedException) {
                 $evaluatedContacts->fail($log->getLead());
                 $log->setNonActionPathTaken(true);
             }

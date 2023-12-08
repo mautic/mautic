@@ -33,7 +33,7 @@ class PhoneNumberConstraintValidator extends ConstraintValidator
             $value = (string) $value;
             try {
                 $phoneNumber = $phoneUtil->parse($value, PhoneNumberUtil::UNKNOWN_REGION);
-            } catch (NumberParseException $e) {
+            } catch (NumberParseException) {
                 $this->addViolation($value, $constraint);
 
                 return;

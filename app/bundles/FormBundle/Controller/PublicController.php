@@ -34,17 +34,17 @@ class PublicController extends CommonFormController
         $post          = $request->request->get('mauticform');
         $messengerMode = (!empty($post['messenger']));
         $server        = $request->server->all();
-        $return        = (isset($post['return'])) ? $post['return'] : false;
+        $return        = $post['return'] ?? false;
 
         if (empty($return)) {
             // try to get it from the HTTP_REFERER
-            $return = (isset($server['HTTP_REFERER'])) ? $server['HTTP_REFERER'] : false;
+            $return = $server['HTTP_REFERER'] ?? false;
         }
 
         if (!empty($return)) {
             // remove mauticError and mauticMessage from the referer so it doesn't get sent back
             $return = InputHelper::url($return, null, null, null, ['mauticError', 'mauticMessage'], true);
-            $query  = (false === strpos($return, '?')) ? '?' : '&';
+            $query  = (!str_contains($return, '?')) ? '?' : '&';
         }
 
         $translator = $this->translator;
@@ -399,7 +399,10 @@ class PublicController extends CommonFormController
         return new Response('', Response::HTTP_NOT_FOUND);
     }
 
-    private function replacePostSubmitTokens($string, SubmissionEvent $submissionEvent)
+    /**
+     * @return string|string[]
+     */
+    private function replacePostSubmitTokens($string, SubmissionEvent $submissionEvent): string|array
     {
         if (empty($this->tokens)) {
             if ($lead = $submissionEvent->getLead()) {

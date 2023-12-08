@@ -28,11 +28,8 @@ class FormBuilderEvent extends Event
      */
     private $validators = [];
 
-    private \Symfony\Contracts\Translation\TranslatorInterface $translator;
-
-    public function __construct(TranslatorInterface $translator)
+    public function __construct(private TranslatorInterface $translator)
     {
-        $this->translator = $translator;
     }
 
     /**
@@ -81,7 +78,7 @@ class FormBuilderEvent extends Event
     {
         uasort(
             $this->actions,
-            function ($a, $b) {
+            function ($a, $b): int {
                 return strnatcasecmp(
                     $a['label'],
                     $b['label']
@@ -145,7 +142,7 @@ class FormBuilderEvent extends Event
         if (isset($field['valueFilter'])
             && (!is_string($field['valueFilter'])
                 || !is_callable(
-                    ['\Mautic\CoreBundle\Helper\InputHelper', $field['valueFilter']]
+                    [\Mautic\CoreBundle\Helper\InputHelper::class, $field['valueFilter']]
                 ))
         ) {
             $callbacks = ['valueFilter'];
@@ -193,7 +190,7 @@ class FormBuilderEvent extends Event
     public function addValidatorsToBuilder(FormInterface $form): void
     {
         if (!empty($this->validators)) {
-            $validationData = (isset($form->getData()['validation'])) ? $form->getData()['validation'] : [];
+            $validationData = $form->getData()['validation'] ?? [];
             foreach ($this->validators as $validator) {
                 if (isset($validator['formType']) && isset($validator['fieldType']) && $validator['fieldType'] == $form->getData()['type']) {
                     $form->add(

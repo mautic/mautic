@@ -31,15 +31,9 @@ class NotificationModel extends FormModel
      */
     protected $disableUpdates;
 
-    protected \Mautic\CoreBundle\Helper\PathsHelper $pathsHelper;
-
-    protected \Mautic\CoreBundle\Helper\UpdateHelper $updateHelper;
-
-    private RequestStack $requestStack;
-
     public function __construct(
-        PathsHelper $pathsHelper,
-        UpdateHelper $updateHelper,
+        protected PathsHelper $pathsHelper,
+        protected UpdateHelper $updateHelper,
         CoreParametersHelper $coreParametersHelper,
         EntityManager $em,
         CorePermissions $security,
@@ -48,12 +42,8 @@ class NotificationModel extends FormModel
         Translator $translator,
         UserHelper $userHelper,
         LoggerInterface $mauticLogger,
-        RequestStack $requestStack,
+        private RequestStack $requestStack,
     ) {
-        $this->pathsHelper  = $pathsHelper;
-        $this->updateHelper = $updateHelper;
-        $this->requestStack = $requestStack;
-
         parent::__construct($em, $security, $dispatcher, $router, $translator, $userHelper, $mauticLogger, $coreParametersHelper);
     }
 
@@ -68,7 +58,7 @@ class NotificationModel extends FormModel
     /**
      * @param bool $disableUpdates
      */
-    public function setDisableUpdates($disableUpdates)
+    public function setDisableUpdates($disableUpdates): void
     {
         $this->disableUpdates = $disableUpdates;
     }
@@ -105,7 +95,7 @@ class NotificationModel extends FormModel
         User $user = null,
         string $deduplicateValue = null,
         \DateTime $deduplicateDateTimeFrom = null
-    ) {
+    ): void {
         if (null === $user) {
             $user = $this->userHelper->getUser();
         }
@@ -141,7 +131,7 @@ class NotificationModel extends FormModel
     /**
      * Mark notifications read for a user.
      */
-    public function markAllRead()
+    public function markAllRead(): void
     {
         $this->getRepository()->markAllReadForUser($this->userHelper->getUser()->getId());
     }
@@ -152,7 +142,7 @@ class NotificationModel extends FormModel
      * @param $id       Notification to clear; will clear all if empty
      * @param $limit    Maximum number of notifications to clear if $id is empty
      */
-    public function clearNotification($id, $limit = null)
+    public function clearNotification($id, $limit = null): void
     {
         $this->getRepository()->clearNotificationsForUser($this->userHelper->getUser()->getId(), $id, $limit);
     }

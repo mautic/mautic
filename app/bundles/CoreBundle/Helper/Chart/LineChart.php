@@ -10,13 +10,6 @@ namespace Mautic\CoreBundle\Helper\Chart;
 class LineChart extends AbstractChart implements ChartInterface
 {
     /**
-     * Configurable date format.
-     *
-     * @var string
-     */
-    protected $dateFormat;
-
-    /**
      * Match date/time unit to a humanly readable label
      * {@link php.net/manual/en/function.date.php#refsect1-function.date-parameters}.
      *
@@ -42,13 +35,11 @@ class LineChart extends AbstractChart implements ChartInterface
      * @param \DateTime   $dateTo
      * @param string      $dateFormat
      */
-    public function __construct(?string $unit = null, $dateFrom = null, $dateTo = null, $dateFormat = null)
+    public function __construct(?string $unit = null, $dateFrom = null, $dateTo = null, protected $dateFormat = null)
     {
-        $this->unit       = (null === $unit) ? $this->getTimeUnitFromDateRange($dateFrom, $dateTo) : $unit;
+        $this->unit       = $unit ?? $this->getTimeUnitFromDateRange($dateFrom, $dateTo);
         $this->isTimeUnit = in_array($this->unit, ['H', 'i', 's']);
         $this->setDateRange($dateFrom, $dateTo);
-
-        $this->dateFormat = $dateFormat;
         $this->amount     = $this->countAmountFromDateRange();
         $this->generateTimeLabels($this->amount);
         $this->addOneUnitMinusOneSec($this->dateTo);

@@ -54,14 +54,8 @@ class DashboardSubscriber extends MainDashboardSubscriber
         'email:emails:viewother',
     ];
 
-    protected \Mautic\EmailBundle\Model\EmailModel $emailModel;
-
-    private \Symfony\Component\Routing\RouterInterface $router;
-
-    public function __construct(EmailModel $emailModel, RouterInterface $router)
+    public function __construct(protected EmailModel $emailModel, private RouterInterface $router)
     {
-        $this->emailModel = $emailModel;
-        $this->router     = $router;
     }
 
     /**
@@ -348,10 +342,8 @@ class DashboardSubscriber extends MainDashboardSubscriber
 
     /**
      * Count the row limit from the widget height.
-     *
-     * @return int
      */
-    private function getDefaultLimit(Widget $widget)
+    private function getDefaultLimit(Widget $widget): float
     {
         return round((($widget->getHeight() - 80) / 35) - 1);
     }

@@ -89,7 +89,7 @@ trait RequestTrait
                         // Manually handled so remove from form processing
                         unset($form[$name], $params[$name]);
                         break;
-                    } catch (\InvalidArgumentException $exception) {
+                    } catch (\InvalidArgumentException) {
                     }
 
                     // If not manually handled cast to int because Symfony form processing take false as empty
@@ -109,7 +109,7 @@ trait RequestTrait
 
                     // Ensure the value is an array
                     if (!is_array($params[$name])) {
-                        $params[$name] = (false !== strpos($params[$name], '|')) ? explode('|', $params[$name]) : ($params[$name] ? [$params[$name]] : []);
+                        $params[$name] = (str_contains($params[$name], '|')) ? explode('|', $params[$name]) : ($params[$name] ? [$params[$name]] : []);
                     }
 
                     break;
@@ -207,7 +207,7 @@ trait RequestTrait
                 break;
             case 'multiselect':
                 if (!is_array($fieldData[$leadField['alias']])) {
-                    if (false !== strpos($fieldData[$leadField['alias']], '|')) {
+                    if (str_contains($fieldData[$leadField['alias']], '|')) {
                         $fieldData[$leadField['alias']] = explode('|', $fieldData[$leadField['alias']]);
                     } else {
                         $fieldData[$leadField['alias']] = [$fieldData[$leadField['alias']]];

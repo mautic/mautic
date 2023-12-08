@@ -16,24 +16,8 @@ class FlashBag
     public const LEVEL_WARNING   = 'warning';
     public const LEVEL_NOTICE    = 'notice';
 
-    private \Symfony\Component\HttpFoundation\Session\Session $session;
-
-    private \Symfony\Contracts\Translation\TranslatorInterface $translator;
-
-    private \Mautic\CoreBundle\Model\NotificationModel $notificationModel;
-
-    private \Symfony\Component\HttpFoundation\RequestStack $requestStack;
-
-    public function __construct(
-        Session $session,
-        TranslatorInterface $translator,
-        RequestStack $requestStack,
-        NotificationModel $notificationModel
-    ) {
-        $this->session           = $session;
-        $this->translator        = $translator;
-        $this->requestStack      = $requestStack;
-        $this->notificationModel = $notificationModel;
+    public function __construct(private Session $session, private TranslatorInterface $translator, private RequestStack $requestStack, private NotificationModel $notificationModel)
+    {
     }
 
     /**
@@ -43,7 +27,7 @@ class FlashBag
      * @param string     $domain
      * @param bool       $addNotification
      */
-    public function add($message, $messageVars = [], $level = self::LEVEL_NOTICE, $domain = 'flashes', $addNotification = false)
+    public function add($message, $messageVars = [], $level = self::LEVEL_NOTICE, $domain = 'flashes', $addNotification = false): void
     {
         if (false === $domain) {
             // message is already translated
@@ -59,17 +43,11 @@ class FlashBag
         $this->session->getFlashBag()->add($level, $translatedMessage);
 
         if (!defined('MAUTIC_INSTALLER') && $addNotification) {
-            switch ($level) {
-                case self::LEVEL_WARNING:
-                    $iconClass = 'text-warning fa-exclamation-triangle';
-                    break;
-                case self::LEVEL_ERROR:
-                    $iconClass = 'text-danger fa-exclamation-circle';
-                    break;
-                default:
-                    $iconClass = 'fa-info-circle';
-                    break;
-            }
+            $iconClass = match ($level) {
+                self::LEVEL_WARNING => 'text-warning fa-exclamation-triangle',
+                self::LEVEL_ERROR   => 'text-danger fa-exclamation-circle',
+                default             => 'fa-info-circle',
+            };
 
             // If the user has not interacted with the browser for the last 30 seconds, consider the message unread
             $lastActive = $this->requestStack->getCurrentRequest()->get('mauticUserLastActive', 0);

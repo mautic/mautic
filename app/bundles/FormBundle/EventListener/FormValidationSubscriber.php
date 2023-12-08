@@ -15,14 +15,8 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class FormValidationSubscriber implements EventSubscriberInterface
 {
-    private \Symfony\Contracts\Translation\TranslatorInterface $translator;
-
-    private \Mautic\CoreBundle\Helper\CoreParametersHelper $coreParametersHelper;
-
-    public function __construct(TranslatorInterface $translator, CoreParametersHelper $coreParametersHelper)
+    public function __construct(private TranslatorInterface $translator, private CoreParametersHelper $coreParametersHelper)
     {
-        $this->translator           = $translator;
-        $this->coreParametersHelper = $coreParametersHelper;
     }
 
     /**
@@ -81,7 +75,7 @@ class FormValidationSubscriber implements EventSubscriberInterface
         $value = $event->getValue();
         if ('email' === $field->getType() && !empty($field->getValidation()['donotsubmit'])) {
             // Check the domains using shell wildcard patterns
-            $donotSubmitFilter = function ($doNotSubmitArray) use ($value) {
+            $donotSubmitFilter = function ($doNotSubmitArray) use ($value): bool {
                 return fnmatch($doNotSubmitArray, $value, FNM_CASEFOLD);
             };
             $notNotSubmitEmails = $this->coreParametersHelper->get('do_not_submit_emails');
@@ -100,7 +94,7 @@ class FormValidationSubscriber implements EventSubscriberInterface
             $phoneUtil = PhoneNumberUtil::getInstance();
             try {
                 $phoneUtil->parse($value, PhoneNumberUtil::UNKNOWN_REGION);
-            } catch (NumberParseException $e) {
+            } catch (NumberParseException) {
                 if (!empty($field->getValidation()['international_validationmsg'])) {
                     $event->failedValidation($field->getValidation()['international_validationmsg']);
                 } else {

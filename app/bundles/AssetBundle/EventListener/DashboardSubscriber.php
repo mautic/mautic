@@ -38,14 +38,8 @@ class DashboardSubscriber extends MainDashboardSubscriber
         'asset:assets:viewother',
     ];
 
-    protected \Mautic\AssetBundle\Model\AssetModel $assetModel;
-
-    protected \Symfony\Component\Routing\RouterInterface $router;
-
-    public function __construct(AssetModel $assetModel, RouterInterface $router)
+    public function __construct(protected AssetModel $assetModel, protected RouterInterface $router)
     {
-        $this->assetModel = $assetModel;
-        $this->router     = $router;
     }
 
     /**

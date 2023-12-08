@@ -14,9 +14,6 @@ class InternalObjectEvent extends Event
      */
     private $objects = [];
 
-    /**
-     * @return Integration
-     */
     public function addObject(ObjectInterface $object): void
     {
         $this->objects[] = $object;

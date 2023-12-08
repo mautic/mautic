@@ -121,10 +121,7 @@ class TokenHelper
         }
     }
 
-    /**
-     * @return string
-     */
-    private static function getTokenDefaultValue($match)
+    private static function getTokenDefaultValue($match): string
     {
         $fallbackCheck = explode('|', $match);
         if (!isset($fallbackCheck[1])) {
@@ -134,10 +131,7 @@ class TokenHelper
         return $fallbackCheck[1];
     }
 
-    /**
-     * @return mixed
-     */
-    private static function getFieldAlias($match)
+    private static function getFieldAlias($match): string
     {
         $fallbackCheck = explode('|', $match);
 

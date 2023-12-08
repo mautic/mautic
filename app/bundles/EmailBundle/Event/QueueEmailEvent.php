@@ -7,16 +7,13 @@ use Symfony\Contracts\EventDispatcher\Event;
 
 class QueueEmailEvent extends Event
 {
-    private \Mautic\EmailBundle\Mailer\Message\MauticMessage $message;
-
     /**
      * @var bool
      */
     private $retry = false;
 
-    public function __construct(MauticMessage $message)
+    public function __construct(private MauticMessage $message)
     {
-        $this->message = $message;
     }
 
     /**

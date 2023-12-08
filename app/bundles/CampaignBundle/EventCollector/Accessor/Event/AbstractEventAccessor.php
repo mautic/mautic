@@ -4,8 +4,6 @@ namespace Mautic\CampaignBundle\EventCollector\Accessor\Event;
 
 abstract class AbstractEventAccessor
 {
-    protected array $config;
-
     /**
      * @var array
      */
@@ -26,10 +24,8 @@ abstract class AbstractEventAccessor
      */
     private $extraProperties = [];
 
-    public function __construct(array $config)
+    public function __construct(protected array $config)
     {
-        $this->config = $config;
-
         $this->filterExtraProperties();
     }
 
@@ -129,13 +125,13 @@ abstract class AbstractEventAccessor
      */
     protected function getProperty($property, $default = null)
     {
-        return (isset($this->config[$property])) ? $this->config[$property] : $default;
+        return $this->config[$property] ?? $default;
     }
 
     /**
      * Calculate the difference in systemProperties and what was fed to the class.
      */
-    private function filterExtraProperties()
+    private function filterExtraProperties(): void
     {
         $this->extraProperties = array_diff_key($this->config, array_flip($this->systemProperties));
     }

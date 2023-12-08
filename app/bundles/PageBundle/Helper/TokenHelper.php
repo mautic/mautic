@@ -6,11 +6,8 @@ use Mautic\PageBundle\Model\PageModel;
 
 class TokenHelper
 {
-    protected \Mautic\PageBundle\Model\PageModel $model;
-
-    public function __construct(PageModel $model)
+    public function __construct(protected PageModel $model)
     {
-        $this->model = $model;
     }
 
     public function findPageTokens($content, $clickthrough = []): array

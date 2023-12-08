@@ -3,11 +3,17 @@
 declare(strict_types=1);
 
 use Rector\Caching\ValueObject\Storage\FileCacheStorage;
+use Rector\CodeQuality\Rector\FunctionLike\SimplifyUselessVariableRector;
 use Rector\DeadCode\Rector\Assign\RemoveUnusedVariableAssignRector;
 use Rector\DeadCode\Rector\Property\RemoveUselessVarTagRector;
 use Rector\Symfony\Symfony42\Rector\MethodCall\ContainerGetToConstructorInjectionRector;
+use Rector\TypeDeclaration\Rector\ClassMethod\AddVoidReturnTypeWhereNoReturnRector;
+use Rector\TypeDeclaration\Rector\ClassMethod\BoolReturnTypeFromStrictScalarReturnsRector;
 use Rector\TypeDeclaration\Rector\ClassMethod\ReturnTypeFromReturnDirectArrayRector;
 use Rector\TypeDeclaration\Rector\ClassMethod\ReturnTypeFromStrictBoolReturnExprRector;
+use Rector\TypeDeclaration\Rector\ClassMethod\ReturnTypeFromStrictConstantReturnRector;
+use Rector\TypeDeclaration\Rector\Property\TypedPropertyFromStrictConstructorRector;
+use Rector\TypeDeclaration\Rector\Property\TypedPropertyFromStrictSetUpRector;
 
 return static function (Rector\Config\RectorConfig $rectorConfig): void {
     $rectorConfig->paths([
@@ -29,6 +35,16 @@ return static function (Rector\Config\RectorConfig $rectorConfig): void {
             __DIR__.'/app/bundles/LeadBundle/Model/LeadModel.php',
         ],
 
+        // lets handle later, once we have more type declaratoins
+        \Rector\DeadCode\Rector\Cast\RecastingRemovalRector::class,
+
+        \Rector\DeadCode\Rector\Property\RemoveUnusedPrivatePropertyRector::class => [
+            // entities
+            __DIR__.'/app/bundles/UserBundle/Entity',
+            // typo fallback
+            __DIR__.'/app/bundles/LeadBundle/Entity/LeadField.php',
+        ],
+
         ReturnTypeFromStrictBoolReturnExprRector::class => [
             __DIR__.'/app/bundles/LeadBundle/Segment/Decorator/BaseDecorator.php',
             // requires quite a refactoring
@@ -40,9 +56,27 @@ return static function (Rector\Config\RectorConfig $rectorConfig): void {
             __DIR__.'/app/bundles/LeadBundle/Model/ImportModel.php',
         ],
 
-        \Rector\TypeDeclaration\Rector\Property\TypedPropertyFromStrictConstructorRector::class => [
+        TypedPropertyFromStrictConstructorRector::class => [
             // entities magic
             __DIR__.'/app/bundles/LeadBundle/Entity',
+        ],
+
+        \Rector\Php80\Rector\Class_\ClassPropertyAssignToConstructorPromotionRector::class => [
+            __DIR__.'/app/bundles/CacheBundle/EventListener/CacheClearSubscriber.php',
+        ],
+
+        // handle later with full PHP 8.0 upgrade
+        \Rector\Php80\Rector\Switch_\ChangeSwitchToMatchRector::class,
+        \Rector\Php80\Rector\FunctionLike\MixedTypeRector::class,
+
+        // handle later, case by case as lot of chnaged code
+        \Rector\DeadCode\Rector\If_\RemoveAlwaysTrueIfConditionRector::class => [
+            __DIR__.'/app/bundles/PointBundle/Controller/TriggerController.php',
+            __DIR__.'/app/bundles/LeadBundle/Controller/ImportController.php',
+            __DIR__.'/app/bundles/FormBundle/Controller/FormController.php',
+            // watch out on this one - the variables are set magically via $$name
+            // @see app/bundles/FormBundle/Form/Type/FieldType.php:99
+            __DIR__.'/app/bundles/FormBundle/Form/Type/FieldType.php',
         ],
     ]);
 
@@ -76,32 +110,36 @@ return static function (Rector\Config\RectorConfig $rectorConfig): void {
         // \Rector\Doctrine\Set\DoctrineSetList::DOCTRINE_REPOSITORY_AS_SERVICE, will break code in Mautic, needs to be fixed first
         \Rector\Doctrine\Set\DoctrineSetList::DOCTRINE_ORM_25,
 
-        // @todo implement the whole set. Start rule by rule below.
-        // \Rector\Set\ValueObject\SetList::DEAD_CODE
+        \Rector\Set\ValueObject\SetList::DEAD_CODE,
+        \Rector\Set\ValueObject\LevelSetList::UP_TO_PHP_56,
     ]);
 
     // Define what single rules will be applied
     $rectorConfig->rules([
+        \Rector\Php80\Rector\Switch_\ChangeSwitchToMatchRector::class,
+        \Rector\TypeDeclaration\Rector\ClassMethod\NumericReturnTypeFromStrictScalarReturnsRector::class,
+        \Rector\TypeDeclaration\Rector\ClassMethod\ReturnTypeFromReturnNewRector::class,
+        \Rector\TypeDeclaration\Rector\ClassMethod\ReturnTypeFromStrictNativeCallRector::class,
+        \Rector\TypeDeclaration\Rector\ClassMethod\ReturnTypeFromStrictNewArrayRector::class,
+        \Rector\TypeDeclaration\Rector\ClassMethod\ReturnTypeFromStrictParamRector::class,
+        \Rector\TypeDeclaration\Rector\Class_\ReturnTypeFromStrictTernaryRector::class,
+
+        // \Rector\Php80\Rector\Catch_\RemoveUnusedVariableInCatchRector::class,
+        \Rector\Php80\Rector\Class_\ClassPropertyAssignToConstructorPromotionRector::class,
+        BoolReturnTypeFromStrictScalarReturnsRector::class,
+        AddVoidReturnTypeWhereNoReturnRector::class,
+        TypedPropertyFromStrictConstructorRector::class,
+        TypedPropertyFromStrictSetUpRector::class,
         RemoveUnusedVariableAssignRector::class,
         RemoveUselessVarTagRector::class,
-        \Rector\DeadCode\Rector\Ternary\TernaryToBooleanOrFalseToBooleanAndRector::class,
-        \Rector\DeadCode\Rector\PropertyProperty\RemoveNullPropertyInitializationRector::class,
-        \Rector\DeadCode\Rector\ClassMethod\RemoveUselessReturnTagRector::class,
-        \Rector\DeadCode\Rector\ClassMethod\RemoveUselessParamTagRector::class,
-        \Rector\CodeQuality\Rector\FunctionLike\SimplifyUselessVariableRector::class,
+        SimplifyUselessVariableRector::class,
         ReturnTypeFromStrictBoolReturnExprRector::class,
-        \Rector\TypeDeclaration\Rector\ClassMethod\ReturnTypeFromStrictConstantReturnRector::class,
-        \Rector\TypeDeclaration\Rector\ClassMethod\ReturnTypeFromReturnDirectArrayRector::class,
-        \Rector\DeadCode\Rector\If_\RemoveUnusedNonEmptyArrayBeforeForeachRector::class,
-        \Rector\DeadCode\Rector\Stmt\RemoveUnreachableStatementRector::class,
-        \Rector\DeadCode\Rector\BooleanAnd\RemoveAndTrueRector::class,
-        \Rector\DeadCode\Rector\ClassConst\RemoveUnusedPrivateClassConstantRector::class,
-        \Rector\DeadCode\Rector\ClassMethod\RemoveUnusedPrivateMethodParameterRector::class,
-        \Rector\DeadCode\Rector\Concat\RemoveConcatAutocastRector::class,
-        \Rector\DeadCode\Rector\Return_\RemoveDeadConditionAboveReturnRector::class,
-        \Rector\DeadCode\Rector\For_\RemoveDeadContinueRector::class,
-        \Rector\DeadCode\Rector\For_\RemoveDeadIfForeachForRector::class,
-        \Rector\DeadCode\Rector\If_\RemoveDeadInstanceOfRector::class,
+        ReturnTypeFromStrictConstantReturnRector::class,
+        ReturnTypeFromReturnDirectArrayRector::class,
         ContainerGetToConstructorInjectionRector::class,
+
+        // PHP 8.0
+        \Rector\Php80\Rector\NotIdentical\StrContainsRector::class,
+        \Rector\Php80\Rector\Identical\StrStartsWithRector::class,
     ]);
 };

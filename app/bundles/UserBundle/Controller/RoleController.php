@@ -316,7 +316,7 @@ class RoleController extends FormController
                 $data = $object->convertBitsToPermissionNames($permissionsArray);
 
                 // get the ratio of granted/total
-                list($granted, $total) = $object->getPermissionRatio($data);
+                [$granted, $total] = $object->getPermissionRatio($data);
 
                 $permissions[$bundle] = [
                     'label'            => $label,
@@ -335,7 +335,7 @@ class RoleController extends FormController
         }
 
         // order permissions by label
-        uasort($permissions, function ($a, $b) {
+        uasort($permissions, function ($a, $b): int {
             return strnatcmp($a['label'], $b['label']);
         });
 

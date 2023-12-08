@@ -22,11 +22,6 @@ class ReportGeneratorEvent extends AbstractReportEvent
     private $selectColumns = [];
 
     /**
-     * QueryBuilder object.
-     */
-    private \Doctrine\DBAL\Query\QueryBuilder $queryBuilder;
-
-    /**
      * contentTemplate.
      *
      * @var string
@@ -34,29 +29,22 @@ class ReportGeneratorEvent extends AbstractReportEvent
     private $contentTemplate;
 
     /**
-     * @var array
-     */
-    private $options = [];
-
-    /**
      * @var ExpressionBuilder|null
      */
     private $filterExpression;
-
-    private \Mautic\ChannelBundle\Helper\ChannelListHelper $channelListHelper;
 
     /**
      * @var array|null
      */
     private $sortedFilters;
 
-    public function __construct(Report $report, array $options, QueryBuilder $qb, ChannelListHelper $channelListHelper)
+    public function __construct(Report $report, private array $options, /**
+     * QueryBuilder object.
+     */
+    private QueryBuilder $queryBuilder, private ChannelListHelper $channelListHelper)
     {
         $this->report            = $report;
         $this->context           = $report->getSource();
-        $this->options           = $options;
-        $this->queryBuilder      = $qb;
-        $this->channelListHelper = $channelListHelper;
     }
 
     /**
@@ -392,10 +380,8 @@ class ReportGeneratorEvent extends AbstractReportEvent
      * Check if the report has a specific column.
      *
      * @param array|string $column
-     *
-     * @return bool
      */
-    public function hasColumn($column)
+    public function hasColumn($column): bool
     {
         $columns = $this->getReport()->getSelectAndAggregatorAndOrderAndGroupByColumns();
 
@@ -416,10 +402,8 @@ class ReportGeneratorEvent extends AbstractReportEvent
      * Check if the report has a specific filter.
      *
      * @param array|string $column
-     *
-     * @return bool
      */
-    public function hasFilter($column)
+    public function hasFilter($column): bool
     {
         $this->buildSortedFilters();
 
@@ -476,10 +460,7 @@ class ReportGeneratorEvent extends AbstractReportEvent
         return false;
     }
 
-    /**
-     * @return string
-     */
-    public function createParameterName()
+    public function createParameterName(): string
     {
         $alpha_numeric = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz';
 

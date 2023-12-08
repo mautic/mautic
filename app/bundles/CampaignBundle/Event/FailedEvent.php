@@ -7,14 +7,8 @@ use Mautic\CampaignBundle\EventCollector\Accessor\Event\AbstractEventAccessor;
 
 class FailedEvent extends \Symfony\Contracts\EventDispatcher\Event
 {
-    private \Mautic\CampaignBundle\EventCollector\Accessor\Event\AbstractEventAccessor $config;
-
-    private \Mautic\CampaignBundle\Entity\LeadEventLog $log;
-
-    public function __construct(AbstractEventAccessor $config, LeadEventLog $log)
+    public function __construct(private AbstractEventAccessor $config, private LeadEventLog $log)
     {
-        $this->config = $config;
-        $this->log    = $log;
     }
 
     /**

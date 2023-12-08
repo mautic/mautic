@@ -10,13 +10,6 @@ use Mautic\CoreBundle\Exception\SchemaException;
 
 class IndexSchemaHelper
 {
-    protected \Doctrine\DBAL\Connection $db;
-
-    /**
-     * @var string
-     */
-    protected $prefix;
-
     /**
      * @var \Doctrine\DBAL\Schema\AbstractSchemaManager<\Doctrine\DBAL\Platforms\AbstractMySQLPlatform>
      */
@@ -55,10 +48,8 @@ class IndexSchemaHelper
     /**
      * @param string $prefix
      */
-    public function __construct(Connection $db, $prefix)
+    public function __construct(protected Connection $db, protected $prefix)
     {
-        $this->db     = $db;
-        $this->prefix = $prefix;
         $this->sm     = $this->db->getSchemaManager();
     }
 
@@ -78,7 +69,7 @@ class IndexSchemaHelper
         return $this;
     }
 
-    public function allowColumn($name)
+    public function allowColumn($name): void
     {
         $this->allowedColumns[] = $name;
     }
@@ -131,7 +122,7 @@ class IndexSchemaHelper
     /**
      * Execute changes.
      */
-    public function executeChanges()
+    public function executeChanges(): void
     {
         $platform = $this->sm->getDatabasePlatform();
 

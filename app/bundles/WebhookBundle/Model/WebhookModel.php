@@ -97,8 +97,6 @@ class WebhookModel extends FormModel
      */
     protected $logMax;
 
-    protected \JMS\Serializer\SerializerInterface $serializer;
-
     /**
      * Queued events default order by dir
      * Possible values: ['ASC', 'DESC'].
@@ -106,8 +104,6 @@ class WebhookModel extends FormModel
      * @var string
      */
     protected $eventsOrderByDir;
-
-    private \Mautic\WebhookBundle\Http\Client $httpClient;
 
     /**
      * Timestamp when the webhook processing starts.
@@ -118,8 +114,8 @@ class WebhookModel extends FormModel
 
     public function __construct(
         CoreParametersHelper $coreParametersHelper,
-        SerializerInterface $serializer,
-        Client $httpClient,
+        protected SerializerInterface $serializer,
+        private Client $httpClient,
         EntityManager $em,
         CorePermissions $security,
         EventDispatcherInterface $dispatcher,
@@ -129,8 +125,6 @@ class WebhookModel extends FormModel
         LoggerInterface $mauticLogger
     ) {
         $this->setConfigProps($coreParametersHelper);
-        $this->serializer        = $serializer;
-        $this->httpClient        = $httpClient;
 
         parent::__construct($em, $security, $dispatcher, $router, $translator, $userHelper, $mauticLogger, $coreParametersHelper);
     }
@@ -223,7 +217,7 @@ class WebhookModel extends FormModel
         return $this->getEventRepository()->getEntitiesByEventType($type);
     }
 
-    public function queueWebhooksByType($type, $payload, array $groups = [])
+    public function queueWebhooksByType($type, $payload, array $groups = []): void
     {
         $this->queueWebhooks(
             $this->getEventWebooksByType($type),
@@ -371,10 +365,8 @@ class WebhookModel extends FormModel
     /**
      * Look into the history and check if all the responses we care about had failed.
      * But let it run for a while after the user modified it. Lets not aggravate the user.
-     *
-     * @return bool
      */
-    public function isSick(Webhook $webhook)
+    public function isSick(Webhook $webhook): bool
     {
         // Do not mess with the user will! (at least not now)
         if ($webhook->wasModifiedRecently()) {
@@ -560,7 +552,7 @@ class WebhookModel extends FormModel
      *
      * @throws \Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException
      */
-    protected function dispatchEvent($action, &$entity, $isNew = false, SymfonyEvent $event = null)
+    protected function dispatchEvent($action, &$entity, $isNew = false, SymfonyEvent $event = null): ?SymfonyEvent
     {
         if (!$entity instanceof Webhook) {
             throw new MethodNotAllowedHttpException(['Webhook'], 'Entity must be of class Webhook()');
@@ -598,10 +590,8 @@ class WebhookModel extends FormModel
 
     /**
      * @param array $groups
-     *
-     * @return mixed|string
      */
-    public function serializeData($payload, $groups = [], array $customExclusionStrategies = [])
+    public function serializeData($payload, $groups = [], array $customExclusionStrategies = []): string
     {
         $context = SerializationContext::create();
         if (!empty($groups)) {
@@ -624,10 +614,7 @@ class WebhookModel extends FormModel
         return $this->serializer->serialize($payload, 'json', $context);
     }
 
-    /**
-     * @return string
-     */
-    public function getPermissionBase()
+    public function getPermissionBase(): string
     {
         return 'webhook:webhooks';
     }

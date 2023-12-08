@@ -15,10 +15,6 @@ class ProcessUnsubscribeSubscriber implements EventSubscriberInterface
     public const BUNDLE     = 'EmailBundle';
     public const FOLDER_KEY = 'unsubscribes';
 
-    private \Mautic\EmailBundle\MonitoredEmail\Processor\Unsubscribe $unsubscriber;
-
-    private \Mautic\EmailBundle\MonitoredEmail\Processor\FeedbackLoop $looper;
-
     /**
      * @return array
      */
@@ -31,10 +27,8 @@ class ProcessUnsubscribeSubscriber implements EventSubscriberInterface
         ];
     }
 
-    public function __construct(Unsubscribe $unsubscriber, FeedbackLoop $looper)
+    public function __construct(private Unsubscribe $unsubscriber, private FeedbackLoop $looper)
     {
-        $this->unsubscriber = $unsubscriber;
-        $this->looper       = $looper;
     }
 
     public function onEmailConfig(MonitoredEmailEvent $event): void
@@ -63,10 +57,10 @@ class ProcessUnsubscribeSubscriber implements EventSubscriberInterface
         $helper = $event->getHelper();
         if ($helper && $unsubscribeEmail = $helper->generateUnsubscribeEmail()) {
             $headers          = $event->getTextHeaders();
-            $existing         = (isset($headers['List-Unsubscribe'])) ? $headers['List-Unsubscribe'] : '';
+            $existing         = $headers['List-Unsubscribe'] ?? '';
             $unsubscribeEmail = "<mailto:$unsubscribeEmail>";
             if ($existing) {
-                if (false === strpos($existing, $unsubscribeEmail)) {
+                if (!str_contains($existing, $unsubscribeEmail)) {
                     $updatedHeader = $unsubscribeEmail.', '.$existing;
                 } else {
                     $updatedHeader = $existing;

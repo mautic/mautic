@@ -14,14 +14,6 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class MembershipBuilder
 {
-    private \Mautic\CampaignBundle\Membership\MembershipManager $manager;
-
-    private CampaignLeadRepository $campaignLeadRepository;
-
-    private \Mautic\LeadBundle\Entity\LeadRepository $leadRepository;
-
-    private \Symfony\Contracts\Translation\TranslatorInterface $translator;
-
     /**
      * @var Campaign
      */
@@ -47,16 +39,8 @@ class MembershipBuilder
      */
     private $progressBar;
 
-    public function __construct(
-        MembershipManager $manager,
-        CampaignLeadRepository $campaignMemberRepository,
-        LeadRepository $leadRepository,
-        TranslatorInterface $translator
-    ) {
-        $this->manager                = $manager;
-        $this->campaignLeadRepository = $campaignMemberRepository;
-        $this->leadRepository         = $leadRepository;
-        $this->translator             = $translator;
+    public function __construct(private MembershipManager $manager, private CampaignLeadRepository $campaignLeadRepository, private LeadRepository $leadRepository, private TranslatorInterface $translator)
+    {
     }
 
     /**

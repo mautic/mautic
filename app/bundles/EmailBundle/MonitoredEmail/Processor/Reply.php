@@ -16,44 +16,12 @@ use Mautic\EmailBundle\MonitoredEmail\Search\ContactFinder;
 use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\LeadBundle\Tracker\ContactTracker;
 use Psr\Log\LoggerInterface;
-use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class Reply implements ProcessorInterface
 {
-    private \Mautic\CoreBundle\Helper\EmailAddressHelper $addressHelper;
-
-    private \Mautic\EmailBundle\Entity\StatRepository $statRepo;
-
-    private \Mautic\EmailBundle\MonitoredEmail\Search\ContactFinder $contactFinder;
-
-    private \Mautic\LeadBundle\Model\LeadModel $leadModel;
-
-    /**
-     * @var EventDispatcher
-     */
-    private \Symfony\Component\EventDispatcher\EventDispatcherInterface $dispatcher;
-
-    private \Psr\Log\LoggerInterface $logger;
-
-    private \Mautic\LeadBundle\Tracker\ContactTracker $contactTracker;
-
-    public function __construct(
-        StatRepository $statRepository,
-        ContactFinder $contactFinder,
-        LeadModel $leadModel,
-        EventDispatcherInterface $dispatcher,
-        LoggerInterface $logger,
-        ContactTracker $contactTracker,
-        EmailAddressHelper $addressHelper
-    ) {
-        $this->statRepo         = $statRepository;
-        $this->contactFinder    = $contactFinder;
-        $this->leadModel        = $leadModel;
-        $this->dispatcher       = $dispatcher;
-        $this->logger           = $logger;
-        $this->contactTracker   = $contactTracker;
-        $this->addressHelper    = $addressHelper;
+    public function __construct(private StatRepository $statRepo, private ContactFinder $contactFinder, private LeadModel $leadModel, private EventDispatcherInterface $dispatcher, private LoggerInterface $logger, private ContactTracker $contactTracker, private EmailAddressHelper $addressHelper)
+    {
     }
 
     public function process(Message $message): void
@@ -63,7 +31,7 @@ class Reply implements ProcessorInterface
         try {
             $parser       = new Parser($message);
             $repliedEmail = $parser->parse();
-        } catch (ReplyNotFound $exception) {
+        } catch (ReplyNotFound) {
             // No hash found so bail as we won't consider this a reply
             $this->logger->debug('MONITORED EMAIL: No hash ID found in the email body');
 

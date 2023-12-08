@@ -15,11 +15,8 @@ use Mautic\IntegrationsBundle\Sync\SyncDataExchange\MauticSyncDataExchange;
 
 final class ReferenceResolver implements ReferenceResolverInterface
 {
-    private \Doctrine\DBAL\Connection $connection;
-
-    public function __construct(Connection $connection)
+    public function __construct(private Connection $connection)
     {
-        $this->connection = $connection;
     }
 
     /**
@@ -43,7 +40,7 @@ final class ReferenceResolver implements ReferenceResolverInterface
 
                 try {
                     $resolvedReference = $this->resolveReference($normalizedValue);
-                } catch (ReferenceNotFoundException $e) {
+                } catch (ReferenceNotFoundException) {
                     $resolvedReference = null;
                 }
 
@@ -54,11 +51,9 @@ final class ReferenceResolver implements ReferenceResolverInterface
     }
 
     /**
-     * @return mixed
-     *
      * @throws ReferenceNotFoundException
      */
-    private function resolveReference(ReferenceValueDAO $value)
+    private function resolveReference(ReferenceValueDAO $value): ?string
     {
         if (MauticSyncDataExchange::OBJECT_COMPANY === $value->getType() && 0 < $value->getValue()) {
             return $this->getCompanyNameById($value->getValue());

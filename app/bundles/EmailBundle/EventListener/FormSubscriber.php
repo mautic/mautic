@@ -15,16 +15,8 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class FormSubscriber implements EventSubscriberInterface
 {
-    private \Mautic\EmailBundle\Model\EmailModel $emailModel;
-
-    private \Mautic\LeadBundle\Tracker\ContactTracker $contactTracker;
-
-    public function __construct(
-        EmailModel $emailModel,
-        ContactTracker $contactTracker
-    ) {
-        $this->emailModel     = $emailModel;
-        $this->contactTracker = $contactTracker;
+    public function __construct(private EmailModel $emailModel, private ContactTracker $contactTracker)
+    {
     }
 
     /**

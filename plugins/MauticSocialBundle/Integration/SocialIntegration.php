@@ -92,7 +92,7 @@ abstract class SocialIntegration extends AbstractIntegration
                 $builder->add('shareButton', $formType, [
                     'label'    => 'mautic.integration.form.sharebutton',
                     'required' => false,
-                    'data'     => (isset($data['shareButton'])) ? $data['shareButton'] : [],
+                    'data'     => $data['shareButton'] ?? [],
                 ]);
             }
         }
@@ -180,6 +180,8 @@ abstract class SocialIntegration extends AbstractIntegration
     public function getFormCompanyFields($settings = [])
     {
         $settings['feature_settings']['objects'] = ['Company'];
+
+        return [];
     }
 
     /**

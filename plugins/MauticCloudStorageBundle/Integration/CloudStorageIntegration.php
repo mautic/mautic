@@ -29,10 +29,10 @@ abstract class CloudStorageIntegration extends AbstractIntegration
                 [
                     'label'    => 'mautic.integration.form.provider.settings',
                     'required' => false,
-                    'data'     => (isset($data['provider'])) ? $data['provider'] : [],
+                    'data'     => $data['provider'] ?? [],
                 ]
             );
-        } catch (NoFormNeededException $e) {
+        } catch (NoFormNeededException) {
         }
     }
 

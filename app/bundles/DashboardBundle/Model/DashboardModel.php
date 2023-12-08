@@ -30,17 +30,11 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
  */
 class DashboardModel extends FormModel
 {
-    private RequestStack $requestStack;
-
-    private PathsHelper $pathsHelper;
-
-    private Filesystem $filesystem;
-
     public function __construct(
         CoreParametersHelper $coreParametersHelper,
-        PathsHelper $pathsHelper,
-        Filesystem $filesystem,
-        RequestStack $requestStack,
+        private PathsHelper $pathsHelper,
+        private Filesystem $filesystem,
+        private RequestStack $requestStack,
         EntityManagerInterface $em,
         CorePermissions $security,
         EventDispatcherInterface $dispatcher,
@@ -49,10 +43,6 @@ class DashboardModel extends FormModel
         UserHelper $userHelper,
         LoggerInterface $mauticLogger
     ) {
-        $this->pathsHelper  = $pathsHelper;
-        $this->filesystem   = $filesystem;
-        $this->requestStack = $requestStack;
-
         parent::__construct($em, $security, $dispatcher, $router, $translator, $userHelper, $mauticLogger, $coreParametersHelper);
     }
 
@@ -63,10 +53,8 @@ class DashboardModel extends FormModel
 
     /**
      * {@inheritdoc}
-     *
-     * @return string
      */
-    public function getPermissionBase()
+    public function getPermissionBase(): string
     {
         return 'dashboard:widgets';
     }
@@ -146,10 +134,8 @@ class DashboardModel extends FormModel
 
     /**
      * Generates a translatable description for a dashboard.
-     *
-     * @return string
      */
-    public function generateDescription()
+    public function generateDescription(): string
     {
         return $this->translator->trans(
             'mautic.dashboard.generated_by',

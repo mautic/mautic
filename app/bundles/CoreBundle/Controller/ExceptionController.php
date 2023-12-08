@@ -30,15 +30,15 @@ class ExceptionController extends CommonController
 
         // Special handling for oauth and api urls
         if (
-            (false !== strpos($request->getUri(), '/oauth') && false === strpos($request->getUri(), 'authorize'))
+            (str_contains($request->getUri(), '/oauth') && !str_contains($request->getUri(), 'authorize'))
             || RequestHelper::isApiRequest($request)
-            || (!defined('MAUTIC_AJAX_VIEW') && false !== strpos($request->server->get('HTTP_ACCEPT', ''), 'application/json'))
+            || (!defined('MAUTIC_AJAX_VIEW') && str_contains($request->server->get('HTTP_ACCEPT', ''), 'application/json'))
         ) {
             $allowRealMessage =
                 'dev' === MAUTIC_ENV ||
-                false !== strpos($class, 'UnexpectedValueException') ||
-                false !== strpos($class, 'NotFoundHttpException') ||
-                false !== strpos($class, 'AccessDeniedHttpException');
+                str_contains($class, 'UnexpectedValueException') ||
+                str_contains($class, 'NotFoundHttpException') ||
+                str_contains($class, 'AccessDeniedHttpException');
 
             $message   = $allowRealMessage
                 ? $exception->getMessage()
@@ -82,7 +82,7 @@ class ExceptionController extends CommonController
             $template = "@MauticCore/{$layout}/base.html.twig";
         }
 
-        $statusText = isset(Response::$statusTexts[$code]) ? Response::$statusTexts[$code] : '';
+        $statusText = Response::$statusTexts[$code] ?? '';
 
         $url      = $request->getRequestUri();
         $urlParts = parse_url($url);

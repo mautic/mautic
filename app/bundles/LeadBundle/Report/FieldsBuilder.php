@@ -10,28 +10,14 @@ use Mautic\UserBundle\Model\UserModel;
 
 class FieldsBuilder
 {
-    private \Mautic\LeadBundle\Model\FieldModel $fieldModel;
-
-    private \Mautic\LeadBundle\Model\ListModel $listModel;
-
-    private \Mautic\UserBundle\Model\UserModel $userModel;
-
-    private \Mautic\LeadBundle\Model\LeadModel $leadModel;
-
-    public function __construct(FieldModel $fieldModel, ListModel $listModel, UserModel $userModel, LeadModel $leadModel)
+    public function __construct(private FieldModel $fieldModel, private ListModel $listModel, private UserModel $userModel, private LeadModel $leadModel)
     {
-        $this->fieldModel = $fieldModel;
-        $this->listModel  = $listModel;
-        $this->userModel  = $userModel;
-        $this->leadModel  = $leadModel;
     }
 
     /**
      * @param string $prefix
-     *
-     * @return array
      */
-    public function getLeadFieldsColumns($prefix)
+    public function getLeadFieldsColumns($prefix): array
     {
         $baseColumns  = $this->getBaseLeadColumns();
         $leadFields   = $this->fieldModel->getLeadFields();
@@ -107,10 +93,8 @@ class FieldsBuilder
 
     /**
      * @param string $prefix
-     *
-     * @return array
      */
-    public function getCompanyFieldsColumns($prefix)
+    public function getCompanyFieldsColumns($prefix): array
     {
         $baseColumns   = $this->getBaseCompanyColumns();
         $companyFields = $this->fieldModel->getCompanyFields();
@@ -201,32 +185,16 @@ class FieldsBuilder
 
         $columns = [];
         foreach ($fields as $field) {
-            switch ($field->getType()) {
-                case 'boolean':
-                    $type = 'bool';
-                    break;
-                case 'date':
-                    $type = 'date';
-                    break;
-                case 'datetime':
-                    $type = 'datetime';
-                    break;
-                case 'time':
-                    $type = 'time';
-                    break;
-                case 'url':
-                    $type = 'url';
-                    break;
-                case 'email':
-                    $type = 'email';
-                    break;
-                case 'number':
-                    $type = 'float';
-                    break;
-                default:
-                    $type = 'string';
-                    break;
-            }
+            $type = match ($field->getType()) {
+                'boolean'  => 'bool',
+                'date'     => 'date',
+                'datetime' => 'datetime',
+                'time'     => 'time',
+                'url'      => 'url',
+                'email'    => 'email',
+                'number'   => 'float',
+                default    => 'string',
+            };
             $columns[$prefix.$field->getAlias()] = [
                 'label' => $field->getLabel(),
                 'type'  => $type,
@@ -238,12 +206,10 @@ class FieldsBuilder
 
     /**
      * @param string $prefix
-     *
-     * @return string
      */
-    private function sanitizePrefix($prefix)
+    private function sanitizePrefix($prefix): string
     {
-        if (false === strpos($prefix, '.')) {
+        if (!str_contains($prefix, '.')) {
             $prefix .= '.';
         }
 

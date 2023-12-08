@@ -13,15 +13,13 @@ class TwilioIntegration extends AbstractIntegration
 
     /**
      * {@inheritdoc}
-     *
-     * @return string
      */
-    public function getName()
+    public function getName(): string
     {
         return 'Twilio';
     }
 
-    public function getIcon()
+    public function getIcon(): string
     {
         return 'app/bundles/SmsBundle/Assets/img/Twilio.png';
     }
@@ -44,10 +42,8 @@ class TwilioIntegration extends AbstractIntegration
 
     /**
      * {@inheritdoc}
-     *
-     * @return string
      */
-    public function getAuthenticationType()
+    public function getAuthenticationType(): string
     {
         return 'none';
     }

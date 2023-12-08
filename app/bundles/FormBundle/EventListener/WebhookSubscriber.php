@@ -11,11 +11,8 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class WebhookSubscriber implements EventSubscriberInterface
 {
-    private \Mautic\WebhookBundle\Model\WebhookModel $webhookModel;
-
-    public function __construct(WebhookModel $webhookModel)
+    public function __construct(private WebhookModel $webhookModel)
     {
-        $this->webhookModel = $webhookModel;
     }
 
     /**

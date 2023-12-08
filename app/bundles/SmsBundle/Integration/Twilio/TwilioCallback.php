@@ -13,20 +13,11 @@ use Twilio\Exceptions\ConfigurationException;
 
 class TwilioCallback implements CallbackInterface
 {
-    private \Mautic\SmsBundle\Helper\ContactHelper $contactHelper;
-
-    private \Mautic\SmsBundle\Integration\Twilio\Configuration $configuration;
-
-    public function __construct(ContactHelper $contactHelper, Configuration $configuration)
+    public function __construct(private ContactHelper $contactHelper, private Configuration $configuration)
     {
-        $this->contactHelper = $contactHelper;
-        $this->configuration = $configuration;
     }
 
-    /**
-     * @return string
-     */
-    public function getTransportName()
+    public function getTransportName(): string
     {
         return 'twilio';
     }
@@ -45,10 +36,7 @@ class TwilioCallback implements CallbackInterface
         return $this->contactHelper->findContactsByNumber($number);
     }
 
-    /**
-     * @return string
-     */
-    public function getMessage(Request $request)
+    public function getMessage(Request $request): string
     {
         $this->validateRequest($request->request);
 
@@ -59,7 +47,7 @@ class TwilioCallback implements CallbackInterface
     {
         try {
             $accountSid = $this->configuration->getAccountSid();
-        } catch (ConfigurationException $exception) {
+        } catch (ConfigurationException) {
             // Not published or not configured
             throw new NotFoundHttpException();
         }

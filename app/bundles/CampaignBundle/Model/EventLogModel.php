@@ -24,19 +24,11 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
  */
 class EventLogModel extends AbstractCommonModel
 {
-    protected EventModel $eventModel;
-
-    protected CampaignModel $campaignModel;
-
-    protected IpLookupHelper $ipLookupHelper;
-
-    protected EventScheduler $eventScheduler;
-
     public function __construct(
-        EventModel $eventModel,
-        CampaignModel $campaignModel,
-        IpLookupHelper $ipLookupHelper,
-        EventScheduler $eventScheduler,
+        protected EventModel $eventModel,
+        protected CampaignModel $campaignModel,
+        protected IpLookupHelper $ipLookupHelper,
+        protected EventScheduler $eventScheduler,
         EntityManager $em,
         CorePermissions $security,
         EventDispatcherInterface $dispatcher,
@@ -46,11 +38,6 @@ class EventLogModel extends AbstractCommonModel
         LoggerInterface $mauticLogger,
         CoreParametersHelper $coreParametersHelper
     ) {
-        $this->eventModel     = $eventModel;
-        $this->campaignModel  = $campaignModel;
-        $this->ipLookupHelper = $ipLookupHelper;
-        $this->eventScheduler = $eventScheduler;
-
         parent::__construct($em, $security, $dispatcher, $router, $translator, $userHelper, $mauticLogger, $coreParametersHelper);
     }
 
@@ -61,10 +48,8 @@ class EventLogModel extends AbstractCommonModel
 
     /**
      * {@inheritdoc}
-     *
-     * @return string
      */
-    public function getPermissionBase()
+    public function getPermissionBase(): string
     {
         return 'campaign:campaigns';
     }
@@ -220,7 +205,7 @@ class EventLogModel extends AbstractCommonModel
         return [$log, $created];
     }
 
-    public function saveEntity(LeadEventLog $entity)
+    public function saveEntity(LeadEventLog $entity): void
     {
         $triggerDate = $entity->getTriggerDate();
         if (null === $triggerDate) {

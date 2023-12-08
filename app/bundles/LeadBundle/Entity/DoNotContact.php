@@ -61,12 +61,12 @@ class DoNotContact
 
     private $channelId;
 
-    public static function loadMetadata(ORM\ClassMetadata $metadata)
+    public static function loadMetadata(ORM\ClassMetadata $metadata): void
     {
         $builder = new ClassMetadataBuilder($metadata);
 
         $builder->setTable('lead_donotcontact')
-            ->setCustomRepositoryClass('Mautic\LeadBundle\Entity\DoNotContactRepository')
+            ->setCustomRepositoryClass(\Mautic\LeadBundle\Entity\DoNotContactRepository::class)
             ->addIndex(['reason'], 'dnc_reason_search');
 
         $builder->addId();
@@ -91,7 +91,7 @@ class DoNotContact
     /**
      * Prepares the metadata for API usage.
      */
-    public static function loadApiMetadata(ApiMetadataDriver $metadata)
+    public static function loadApiMetadata(ApiMetadataDriver $metadata): void
     {
         $metadata->setGroupPrefix('doNotContact')
             ->addListProperties(

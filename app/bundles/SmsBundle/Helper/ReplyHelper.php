@@ -17,26 +17,15 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 class ReplyHelper
 {
-    private \Symfony\Component\EventDispatcher\EventDispatcherInterface $eventDispatcher;
-
-    private \Psr\Log\LoggerInterface $logger;
-
-    private \Mautic\LeadBundle\Tracker\ContactTracker $contactTracker;
-
-    public function __construct(EventDispatcherInterface $eventDispatcher, LoggerInterface $logger, ContactTracker $contactTracker)
+    public function __construct(private EventDispatcherInterface $eventDispatcher, private LoggerInterface $logger, private ContactTracker $contactTracker)
     {
-        $this->eventDispatcher = $eventDispatcher;
-        $this->logger          = $logger;
-        $this->contactTracker  = $contactTracker;
     }
 
     /**
      * @param string $pattern
      * @param string $replyBody
-     *
-     * @return bool
      */
-    public static function matches($pattern, $replyBody)
+    public static function matches($pattern, $replyBody): bool
     {
         return fnmatch($pattern, $replyBody, FNM_CASEFOLD);
     }
@@ -69,9 +58,9 @@ class ReplyHelper
                     $response = $eventResponse;
                 }
             }
-        } catch (BadRequestHttpException $exception) {
+        } catch (BadRequestHttpException) {
             return new Response('invalid request', 400);
-        } catch (NotFoundHttpException $exception) {
+        } catch (NotFoundHttpException) {
             return new Response('', 404);
         } catch (NumberNotFoundException $exception) {
             $this->logger->debug(

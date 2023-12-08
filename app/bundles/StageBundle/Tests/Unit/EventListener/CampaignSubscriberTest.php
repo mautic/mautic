@@ -24,7 +24,7 @@ final class CampaignSubscriberTest extends TestCase
     public function testOnCampaignTriggerStageChangeWhenStageNotFound(): void
     {
         $contact = new class() extends Lead {
-            public function getId()
+            public function getId(): int
             {
                 return 333;
             }
@@ -76,7 +76,7 @@ final class CampaignSubscriberTest extends TestCase
     public function testOnCampaignTriggerStageChangeWhenStageUnpublished(): void
     {
         $contact = new class() extends Lead {
-            public function getId()
+            public function getId(): int
             {
                 return 333;
             }
@@ -137,7 +137,7 @@ final class CampaignSubscriberTest extends TestCase
     public function testOnCampaignTriggerStageChangeWhenContactHasNoStage(): void
     {
         $contact = new class() extends Lead {
-            public function getId()
+            public function getId(): int
             {
                 return 333;
             }
@@ -202,7 +202,7 @@ final class CampaignSubscriberTest extends TestCase
     public function testOnCampaignTriggerStageChangeWhenContactHasTheSameStage(): void
     {
         $contact = new class() extends Lead {
-            public function getId()
+            public function getId(): int
             {
                 return 333;
             }
@@ -281,7 +281,7 @@ final class CampaignSubscriberTest extends TestCase
     public function testOnCampaignTriggerStageChangeWhenContactHasStageWithGreaterWeight(): void
     {
         $contact = new class() extends Lead {
-            public function getId()
+            public function getId(): int
             {
                 return 333;
             }
@@ -363,7 +363,7 @@ final class CampaignSubscriberTest extends TestCase
     public function testOnCampaignTriggerStageChangeWhenContactHasStageWithLowerWeight(): void
     {
         $contact = new class() extends Lead {
-            public function getId()
+            public function getId(): int
             {
                 return 333;
             }

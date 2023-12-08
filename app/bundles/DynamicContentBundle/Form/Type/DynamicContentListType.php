@@ -12,7 +12,7 @@ class DynamicContentListType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function configureOptions(OptionsResolver $resolver)
+    public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults(
             [
@@ -33,7 +33,7 @@ class DynamicContentListType extends AbstractType
                         ],
                     ];
                 },
-                'ajax_lookup_action' => function (Options $options) {
+                'ajax_lookup_action' => function (Options $options): string {
                     $query = [
                         'top_level'  => $options['top_level'],
                         'ignore_ids' => $options['ignore_ids'],

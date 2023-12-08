@@ -87,7 +87,7 @@ class IcontactType extends AbstractType
 
             $fields = $object->getFormLeadFields();
 
-            list($specialInstructions, $alertType) = $object->getFormNotes('leadfield_match');
+            [$specialInstructions, $alertType] = $object->getFormNotes('leadfield_match');
             $builder->add('leadFields', FieldsType::class, [
                 'label'                => 'mautic.integration.leadfield_matches',
                 'required'             => true,
@@ -96,7 +96,7 @@ class IcontactType extends AbstractType
                 'integration_object'   => $object,
                 'limit'                => $limit,
                 'page'                 => $page,
-                'data'                 => isset($options['data']) ? $options['data'] : [],
+                'data'                 => $options['data'] ?? [],
                 'integration_fields'   => $fields,
                 'special_instructions' => $specialInstructions,
                 'mapped'               => true,

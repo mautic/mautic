@@ -11,17 +11,14 @@ use Mautic\LeadBundle\Model\CompanyModel;
 
 class LoadCompanyData extends AbstractFixture implements OrderedFixtureInterface
 {
-    private \Mautic\LeadBundle\Model\CompanyModel $companyModel;
-
     /**
      * {@inheritdoc}
      */
-    public function __construct(CompanyModel $companyModel)
+    public function __construct(private CompanyModel $companyModel)
     {
-        $this->companyModel = $companyModel;
     }
 
-    public function load(ObjectManager $manager)
+    public function load(ObjectManager $manager): void
     {
         $today     = new \DateTime();
         $companies = CsvHelper::csv_to_array(__DIR__.'/fakecompanydata.csv');

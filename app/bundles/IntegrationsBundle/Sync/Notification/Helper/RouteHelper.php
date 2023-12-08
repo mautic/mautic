@@ -14,18 +14,15 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class RouteHelper
 {
-    private \Mautic\IntegrationsBundle\Sync\SyncDataExchange\Internal\ObjectProvider $objectProvider;
-
     /**
      * @var RouEventDispatcherInterfaceter
      */
     private $dispatcher;
 
     public function __construct(
-        ObjectProvider $objectProvider,
+        private ObjectProvider $objectProvider,
         EventDispatcherInterface $dispatcher
     ) {
-        $this->objectProvider = $objectProvider;
         $this->dispatcher     = $dispatcher;
     }
 
@@ -36,7 +33,7 @@ class RouteHelper
     {
         try {
             $event = new InternalObjectRouteEvent($this->objectProvider->getObjectByName($object), $id);
-        } catch (ObjectNotFoundException $e) {
+        } catch (ObjectNotFoundException) {
             // Throw this exception instead to keep BC.
             throw new ObjectNotSupportedException(MauticSyncDataExchange::NAME, $object);
         }

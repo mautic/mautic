@@ -17,14 +17,8 @@ class CampaignReplySubscriber implements EventSubscriberInterface
 {
     public const TYPE = 'sms.reply';
 
-    private \Mautic\SmsBundle\Sms\TransportChain $transportChain;
-
-    private \Mautic\CampaignBundle\Executioner\RealTimeExecutioner $realTimeExecutioner;
-
-    public function __construct(TransportChain $transportChain, RealTimeExecutioner $realTimeExecutioner)
+    public function __construct(private TransportChain $transportChain, private RealTimeExecutioner $realTimeExecutioner)
     {
-        $this->transportChain      = $transportChain;
-        $this->realTimeExecutioner = $realTimeExecutioner;
     }
 
     /**

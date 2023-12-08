@@ -9,16 +9,8 @@ use Mautic\LeadBundle\Model\LeadModel;
 
 class FrequencyActionModel
 {
-    private \Mautic\LeadBundle\Model\LeadModel $contactModel;
-
-    private \Mautic\LeadBundle\Entity\FrequencyRuleRepository $frequencyRuleRepository;
-
-    public function __construct(
-        LeadModel $contactModel,
-        FrequencyRuleRepository $frequencyRuleRepository
-    ) {
-        $this->contactModel            = $contactModel;
-        $this->frequencyRuleRepository = $frequencyRuleRepository;
+    public function __construct(private LeadModel $contactModel, private FrequencyRuleRepository $frequencyRuleRepository)
+    {
     }
 
     /**
@@ -52,7 +44,7 @@ class FrequencyActionModel
                 $preferredChannel = $channel;
             }
 
-            $frequencyRule = isset($frequencyRules[$channel]) ? $frequencyRules[$channel] : new FrequencyRule();
+            $frequencyRule = $frequencyRules[$channel] ?? new FrequencyRule();
             $frequencyRule->setChannel($channel);
             $frequencyRule->setLead($contact);
 

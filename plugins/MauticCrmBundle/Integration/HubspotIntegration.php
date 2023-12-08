@@ -149,10 +149,8 @@ class HubspotIntegration extends CrmAbstractIntegration
 
     /**
      * {@inheritdoc}
-     *
-     * @return string
      */
-    public function getAuthenticationType()
+    public function getAuthenticationType(): string
     {
         return $this->getBearerToken() ? 'oauth2' : 'key';
     }
@@ -196,22 +194,22 @@ class HubspotIntegration extends CrmAbstractIntegration
     }
 
     /**
-     * @return array|mixed
+     * @return mixed[]
      */
-    public function getAvailableLeadFields($settings = [])
+    public function getAvailableLeadFields($settings = []): array
     {
         if ($fields = parent::getAvailableLeadFields()) {
             return $fields;
         }
 
         $hubsFields        = [];
-        $silenceExceptions = (isset($settings['silence_exceptions'])) ? $settings['silence_exceptions'] : true;
+        $silenceExceptions = $settings['silence_exceptions'] ?? true;
 
         if (isset($settings['feature_settings']['objects'])) {
             $hubspotObjects = $settings['feature_settings']['objects'];
         } else {
             $settings       = $this->settings->getFeatureSettings();
-            $hubspotObjects = isset($settings['objects']) ? $settings['objects'] : ['contacts'];
+            $hubspotObjects = $settings['objects'] ?? ['contacts'];
         }
 
         try {
@@ -678,7 +676,7 @@ class HubspotIntegration extends CrmAbstractIntegration
      *
      * @throws \Exception
      */
-    private function getReadOnlyFields($object)
+    private function getReadOnlyFields($object): ?array
     {
         $fields = ArrayHelper::getValue($object, $this->getAvailableLeadFields(), []);
 

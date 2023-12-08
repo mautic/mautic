@@ -17,23 +17,14 @@ use Symfony\Component\Validator\Constraints\NotBlank;
 
 class CampaignEventLeadFieldValueType extends AbstractType
 {
-    protected \Mautic\CoreBundle\Translation\Translator $translator;
-
-    protected \Mautic\LeadBundle\Model\LeadModel $leadModel;
-
-    protected \Mautic\LeadBundle\Model\FieldModel $fieldModel;
-
-    public function __construct(Translator $translator, LeadModel $leadModel, FieldModel $fieldModel)
+    public function __construct(protected Translator $translator, protected LeadModel $leadModel, protected FieldModel $fieldModel)
     {
-        $this->translator = $translator;
-        $this->leadModel  = $leadModel;
-        $this->fieldModel = $fieldModel;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder->add(
             'field',
@@ -61,7 +52,7 @@ class CampaignEventLeadFieldValueType extends AbstractType
         );
 
         // function to add 'template' choice field dynamically
-        $func = function (FormEvent $e) {
+        $func = function (FormEvent $e): void {
             $data = $e->getData();
             $form = $e->getForm();
 

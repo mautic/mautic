@@ -13,24 +13,8 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class CampaignSubscriber implements EventSubscriberInterface
 {
-    private \Mautic\CoreBundle\Helper\IpLookupHelper $ipLookupHelper;
-
-    private \Mautic\CoreBundle\Model\AuditLogModel $auditLogModel;
-
-    private CampaignService $campaignService;
-
-    private \Mautic\CoreBundle\Service\FlashBag $flashBag;
-
-    public function __construct(
-        IpLookupHelper $ipLookupHelper,
-        AuditLogModel $auditLogModel,
-        CampaignService $campaignService,
-        FlashBag $flashBag
-    ) {
-        $this->ipLookupHelper   = $ipLookupHelper;
-        $this->auditLogModel    = $auditLogModel;
-        $this->campaignService  = $campaignService;
-        $this->flashBag         = $flashBag;
+    public function __construct(private IpLookupHelper $ipLookupHelper, private AuditLogModel $auditLogModel, private CampaignService $campaignService, private FlashBag $flashBag)
+    {
     }
 
     /**
@@ -47,7 +31,7 @@ class CampaignSubscriber implements EventSubscriberInterface
     /**
      * Add an entry to the audit log.
      */
-    public function onCampaignPostSave(Events\CampaignEvent $event)
+    public function onCampaignPostSave(Events\CampaignEvent $event): void
     {
         $campaign = $event->getCampaign();
         $details  = $event->getChanges();
@@ -75,7 +59,7 @@ class CampaignSubscriber implements EventSubscriberInterface
     /**
      * Add a delete entry to the audit log.
      */
-    public function onCampaignDelete(Events\CampaignEvent $event)
+    public function onCampaignDelete(Events\CampaignEvent $event): void
     {
         $campaign = $event->getCampaign();
         $log      = [
@@ -89,7 +73,7 @@ class CampaignSubscriber implements EventSubscriberInterface
         $this->auditLogModel->writeToLog($log);
     }
 
-    private function setUnpublishedMailFlashMessage(Campaign $campaign)
+    private function setUnpublishedMailFlashMessage(Campaign $campaign): void
     {
         $this->flashBag->add(
             'mautic.core.notice.campaign.unpublished.email',

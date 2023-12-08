@@ -15,11 +15,8 @@ class BuilderIntegrationsHelper
      */
     private $builders = [];
 
-    private \Mautic\IntegrationsBundle\Helper\IntegrationsHelper $integrationsHelper;
-
-    public function __construct(IntegrationsHelper $integrationsHelper)
+    public function __construct(private IntegrationsHelper $integrationsHelper)
     {
-        $this->integrationsHelper = $integrationsHelper;
     }
 
     /**

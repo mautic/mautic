@@ -11,26 +11,8 @@ use Mautic\ReportBundle\Model\ReportModel;
 
 class SegmentDependencies
 {
-    private \Mautic\EmailBundle\Model\EmailModel $emailModel;
-
-    private \Mautic\CampaignBundle\Model\CampaignModel $campaignModel;
-
-    private \Mautic\FormBundle\Model\ActionModel $actionModel;
-
-    private \Mautic\LeadBundle\Model\ListModel $listModel;
-
-    private \Mautic\PointBundle\Model\TriggerEventModel $triggerEventModel;
-
-    private \Mautic\ReportBundle\Model\ReportModel $reportModel;
-
-    public function __construct(EmailModel $emailModel, CampaignModel $campaignModel, ActionModel $actionModel, ListModel $listModel, TriggerEventModel $triggerEventModel, ReportModel $reportModel)
+    public function __construct(private EmailModel $emailModel, private CampaignModel $campaignModel, private ActionModel $actionModel, private ListModel $listModel, private TriggerEventModel $triggerEventModel, private ReportModel $reportModel)
     {
-        $this->emailModel        = $emailModel;
-        $this->campaignModel     = $campaignModel;
-        $this->actionModel       = $actionModel;
-        $this->listModel         = $listModel;
-        $this->triggerEventModel = $triggerEventModel;
-        $this->reportModel       = $reportModel;
     }
 
     public function getChannelsIds($segmentId): array

@@ -15,20 +15,8 @@ use Mautic\IntegrationsBundle\Sync\SyncDataExchange\MauticSyncDataExchange;
 
 class Notifier
 {
-    private \Mautic\IntegrationsBundle\Sync\Notification\Handler\HandlerContainer $handlerContainer;
-
-    private \Mautic\IntegrationsBundle\Helper\SyncIntegrationsHelper $syncIntegrationsHelper;
-
-    private \Mautic\IntegrationsBundle\Helper\ConfigIntegrationsHelper $configIntegrationsHelper;
-
-    public function __construct(
-        HandlerContainer $handlerContainer,
-        SyncIntegrationsHelper $syncIntegrationsHelper,
-        ConfigIntegrationsHelper $configIntegrationsHelper
-    ) {
-        $this->handlerContainer         = $handlerContainer;
-        $this->syncIntegrationsHelper   = $syncIntegrationsHelper;
-        $this->configIntegrationsHelper = $configIntegrationsHelper;
+    public function __construct(private HandlerContainer $handlerContainer, private SyncIntegrationsHelper $syncIntegrationsHelper, private ConfigIntegrationsHelper $configIntegrationsHelper)
+    {
     }
 
     /**
@@ -67,7 +55,7 @@ class Notifier
     {
         try {
             $configIntegration = $this->configIntegrationsHelper->getIntegration($integration);
-        } catch (IntegrationNotFoundException $exception) {
+        } catch (IntegrationNotFoundException) {
             return ucfirst($object);
         }
 

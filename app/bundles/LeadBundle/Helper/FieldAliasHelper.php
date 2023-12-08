@@ -7,19 +7,14 @@ use Mautic\LeadBundle\Model\FieldModel;
 
 class FieldAliasHelper
 {
-    private \Mautic\LeadBundle\Model\FieldModel $fieldModel;
-
-    public function __construct(FieldModel $fieldModel)
+    public function __construct(private FieldModel $fieldModel)
     {
-        $this->fieldModel = $fieldModel;
     }
 
     /**
      * Cleans the alias and if it's not unique it will make it unique.
-     *
-     * @return LeadField
      */
-    public function makeAliasUnique(LeadField $field)
+    public function makeAliasUnique(LeadField $field): LeadField
     {
         // alias cannot be changed for existing fields
         if ($field->getId()) {

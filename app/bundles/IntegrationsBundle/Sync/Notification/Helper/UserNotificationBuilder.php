@@ -9,24 +9,8 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class UserNotificationBuilder
 {
-    private \Mautic\IntegrationsBundle\Sync\Notification\Helper\UserHelper $userHelper;
-
-    private \Mautic\IntegrationsBundle\Sync\Notification\Helper\OwnerProvider $ownerProvider;
-
-    private \Mautic\IntegrationsBundle\Sync\Notification\Helper\RouteHelper $routeHelper;
-
-    private \Symfony\Contracts\Translation\TranslatorInterface $translator;
-
-    public function __construct(
-        UserHelper $userHelper,
-        OwnerProvider $ownerProvider,
-        RouteHelper $routeHelper,
-        TranslatorInterface $translator
-    ) {
-        $this->userHelper    = $userHelper;
-        $this->ownerProvider = $ownerProvider;
-        $this->routeHelper   = $routeHelper;
-        $this->translator    = $translator;
+    public function __construct(private UserHelper $userHelper, private OwnerProvider $ownerProvider, private RouteHelper $routeHelper, private TranslatorInterface $translator)
+    {
     }
 
     /**

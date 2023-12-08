@@ -16,18 +16,12 @@ final class GravatarHelper
      */
     private array $devHosts;
 
-    private \Mautic\LeadBundle\Twig\Helper\DefaultAvatarHelper $defaultAvatarHelper;
-
-    private \Symfony\Component\HttpFoundation\RequestStack $requestStack;
-
     public function __construct(
-        DefaultAvatarHelper $defaultAvatarHelper,
+        private DefaultAvatarHelper $defaultAvatarHelper,
         CoreParametersHelper $coreParametersHelper,
-        RequestStack $requestStack
+        private RequestStack $requestStack
     ) {
         $this->devMode             = MAUTIC_ENV === 'dev';
-        $this->defaultAvatarHelper = $defaultAvatarHelper;
-        $this->requestStack        = $requestStack;
         $this->devHosts            = (array) $coreParametersHelper->get('dev_hosts');
     }
 
@@ -35,10 +29,8 @@ final class GravatarHelper
      * @param string $email
      * @param string $size
      * @param string $default
-     *
-     * @return string
      */
-    public function getImage($email, $size = '250', $default = null)
+    public function getImage($email, $size = '250', $default = null): string
     {
         $request      = $this->requestStack->getCurrentRequest();
         $localDefault = ($this->devMode
@@ -58,7 +50,7 @@ final class GravatarHelper
             $default = $localDefault;
         }
 
-        $default = (false !== strpos($default, '.') && 0 !== strpos($default, 'http')) ? UrlHelper::rel2abs($default) : $default;
+        $default = (str_contains($default, '.') && !str_starts_with($default, 'http')) ? UrlHelper::rel2abs($default) : $default;
 
         return $url.('&d='.urlencode($default));
     }

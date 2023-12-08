@@ -59,13 +59,13 @@ class ColorHelper
     {
         if (4 === strlen($hex)) {
             $format          = '#%1s%1s%1s';
-            list($r, $g, $b) = sscanf($hex, $format);
+            [$r, $g, $b]     = sscanf($hex, $format);
             $this->red       = hexdec("$r$r");
             $this->green     = hexdec("$g$g");
             $this->blue      = hexdec("$b$b");
         } else {
             $format                                     = '#%2x%2x%2x';
-            list($this->red, $this->green, $this->blue) = sscanf($hex, $format);
+            [$this->red, $this->green, $this->blue]     = sscanf($hex, $format);
         }
 
         return $this;
@@ -81,10 +81,8 @@ class ColorHelper
 
     /**
      * Returns array of [R, G, B] of current state.
-     *
-     * @return string
      */
-    public function toRgb()
+    public function toRgb(): string
     {
         return sprintf('rgb(%d,%d,%d)', $this->red, $this->green, $this->blue);
     }
@@ -93,20 +91,16 @@ class ColorHelper
      * Returns array of [R, G, B] of current state with alpha.
      *
      * @param  float (0 - 1)
-     *
-     * @return string
      */
-    public function toRgba($alpha = 1)
+    public function toRgba($alpha = 1): string
     {
         return sprintf('rgba(%d,%d,%d,%g)', $this->red, $this->green, $this->blue, (float) $alpha);
     }
 
     /**
      * Returns current color to hexadecimal hash.
-     *
-     * @return string
      */
-    public function toHex()
+    public function toHex(): string
     {
         $hex = '#';
         $hex .= str_pad(dechex($this->red), 2, '0', STR_PAD_LEFT);

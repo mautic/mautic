@@ -130,7 +130,7 @@ class Stat
         $builder = new ClassMetadataBuilder($metadata);
 
         $builder->setTable('email_stats')
-            ->setCustomRepositoryClass('Mautic\EmailBundle\Entity\StatRepository')
+            ->setCustomRepositoryClass(\Mautic\EmailBundle\Entity\StatRepository::class)
             ->addIndex(['email_id', 'lead_id'], 'stat_email_search')
             ->addIndex(['lead_id', 'email_id'], 'stat_email_search2')
             ->addIndex(['is_failed'], 'stat_email_failed_search')
@@ -153,7 +153,7 @@ class Stat
             ->columnName('email_address')
             ->build();
 
-        $builder->createManyToOne('list', 'Mautic\LeadBundle\Entity\LeadList')
+        $builder->createManyToOne('list', \Mautic\LeadBundle\Entity\LeadList::class)
             ->addJoinColumn('list_id', 'id', true, false, 'SET NULL')
             ->build();
 
@@ -203,7 +203,7 @@ class Stat
             ->nullable()
             ->build();
 
-        $builder->createManyToOne('storedCopy', 'Mautic\EmailBundle\Entity\Copy')
+        $builder->createManyToOne('storedCopy', \Mautic\EmailBundle\Entity\Copy::class)
             ->addJoinColumn('copy_id', 'id', true, false, 'SET NULL')
             ->build();
 
@@ -294,10 +294,7 @@ class Stat
         $this->email = $email;
     }
 
-    /**
-     * @return int|null
-     */
-    public function getId()
+    public function getId(): int
     {
         return (int) $this->id;
     }

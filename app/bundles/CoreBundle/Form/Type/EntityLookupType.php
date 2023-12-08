@@ -19,17 +19,6 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class EntityLookupType extends AbstractType
 {
-    private \Symfony\Contracts\Translation\TranslatorInterface $translator;
-
-    private \Symfony\Component\Routing\RouterInterface $router;
-
-    /**
-     * @var ModelFactory<object>
-     */
-    private \Mautic\CoreBundle\Factory\ModelFactory $modelFactory;
-
-    private \Doctrine\DBAL\Connection $connection;
-
     /**
      * @var EntityLookupChoiceLoader[]
      */
@@ -38,18 +27,14 @@ class EntityLookupType extends AbstractType
     /**
      * @param ModelFactory<object> $modelFactory
      */
-    public function __construct(ModelFactory $modelFactory, TranslatorInterface $translator, Connection $connection, RouterInterface $router)
+    public function __construct(private ModelFactory $modelFactory, private TranslatorInterface $translator, private Connection $connection, private RouterInterface $router)
     {
-        $this->translator   = $translator;
-        $this->router       = $router;
-        $this->connection   = $connection;
-        $this->modelFactory = $modelFactory;
     }
 
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         // Let the form builder notify us about initial/submitted choices
-        $formModifier = function (FormEvent $event) {
+        $formModifier = function (FormEvent $event): void {
             $options = $event->getForm()->getConfig()->getOptions();
             $model   = $this->getModelName($options);
             $this->choiceLoaders[$model]->setOptions($options);
@@ -70,7 +55,7 @@ class EntityLookupType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function configureOptions(OptionsResolver $resolver)
+    public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setRequired(['model', 'ajax_lookup_action']);
         $resolver->setDefined(['model_lookup_method', 'repo_lookup_method', 'lookup_arguments', 'model_key']);
@@ -112,7 +97,7 @@ class EntityLookupType extends AbstractType
         return ChoiceType::class;
     }
 
-    public function buildView(FormView $view, FormInterface $form, array $options)
+    public function buildView(FormView $view, FormInterface $form, array $options): void
     {
         $attr =
             [

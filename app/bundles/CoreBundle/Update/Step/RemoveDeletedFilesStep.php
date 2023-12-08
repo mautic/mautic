@@ -11,17 +11,11 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 final class RemoveDeletedFilesStep implements StepInterface
 {
-    private \Symfony\Contracts\Translation\TranslatorInterface $translator;
-
-    private \Psr\Log\LoggerInterface $logger;
-
     private string $appRoot;
 
-    public function __construct(TranslatorInterface $translator, PathsHelper $pathsHelper, LoggerInterface $logger)
+    public function __construct(private TranslatorInterface $translator, PathsHelper $pathsHelper, private LoggerInterface $logger)
     {
-        $this->translator = $translator;
         $this->appRoot    = $pathsHelper->getRootPath();
-        $this->logger     = $logger;
     }
 
     public function getOrder(): int
@@ -56,7 +50,7 @@ final class RemoveDeletedFilesStep implements StepInterface
         @unlink($this->appRoot.'/deleted_files.txt');
     }
 
-    private function deleteFile(string $file)
+    private function deleteFile(string $file): void
     {
         $path = $this->appRoot.'/'.$file;
 

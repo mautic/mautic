@@ -8,8 +8,6 @@ use Symfony\Contracts\EventDispatcher\Event;
 
 class CampaignLeadChangeEvent extends Event
 {
-    private \Mautic\CampaignBundle\Entity\Campaign $campaign;
-
     /**
      * @var Lead
      */
@@ -21,19 +19,15 @@ class CampaignLeadChangeEvent extends Event
     private $leads = [];
 
     /**
-     * @var string
+     * @param string $action
      */
-    private $action;
-
-    public function __construct(Campaign $campaign, $leads, $action)
+    public function __construct(private Campaign $campaign, $leads, private $action)
     {
-        $this->campaign = $campaign;
         if (is_array($leads)) {
             $this->leads = $leads;
         } else {
             $this->lead = $leads;
         }
-        $this->action = $action;
     }
 
     /**

@@ -64,7 +64,7 @@ class Action
         $builder = new ClassMetadataBuilder($metadata);
 
         $builder->setTable('form_actions')
-            ->setCustomRepositoryClass('Mautic\FormBundle\Entity\ActionRepository')
+            ->setCustomRepositoryClass(\Mautic\FormBundle\Entity\ActionRepository::class)
             ->addIndex(['type'], 'form_action_type_search');
 
         $builder->addIdColumns();
@@ -236,10 +236,7 @@ class Action
         return $this->type;
     }
 
-    /**
-     * @return array
-     */
-    public function convertToArray()
+    public function convertToArray(): array
     {
         return get_object_vars($this);
     }

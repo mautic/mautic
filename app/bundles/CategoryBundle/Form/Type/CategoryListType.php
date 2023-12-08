@@ -15,23 +15,11 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class CategoryListType extends AbstractType
 {
-    private \Doctrine\ORM\EntityManager $em;
-
-    private \Mautic\CategoryBundle\Model\CategoryModel $model;
-
-    private \Symfony\Contracts\Translation\TranslatorInterface $translator;
-
-    private \Symfony\Component\Routing\RouterInterface $router;
-
-    public function __construct(EntityManager $em, TranslatorInterface $translator, CategoryModel $model, RouterInterface $router)
+    public function __construct(private EntityManager $em, private TranslatorInterface $translator, private CategoryModel $model, private RouterInterface $router)
     {
-        $this->em         = $em;
-        $this->translator = $translator;
-        $this->model      = $model;
-        $this->router     = $router;
     }
 
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         if (true === $options['return_entity']) {
             $transformer = new IdToEntityModelTransformer($this->em, \Mautic\CategoryBundle\Entity\Category::class, 'id');
@@ -39,7 +27,7 @@ class CategoryListType extends AbstractType
         }
     }
 
-    public function configureOptions(OptionsResolver $resolver)
+    public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults([
             'choices' => function (Options $options) {

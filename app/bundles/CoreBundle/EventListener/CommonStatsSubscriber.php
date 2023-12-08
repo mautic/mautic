@@ -18,25 +18,17 @@ abstract class CommonStatsSubscriber implements EventSubscriberInterface
     protected $repositories = [];
 
     /**
-     * @var null
+     * @var array<string, mixed>
      */
-    protected $selects;
+    protected array $selects = [];
 
     /**
      * @var array
      */
     protected $permissions = [];
 
-    protected \Mautic\CoreBundle\Security\Permissions\CorePermissions $security;
-
-    protected \Doctrine\ORM\EntityManager $entityManager;
-
-    public function __construct(
-        CorePermissions $security,
-        EntityManager $entityManager
-    ) {
-        $this->security      = $security;
-        $this->entityManager = $entityManager;
+    public function __construct(protected CorePermissions $security, protected EntityManager $entityManager)
+    {
     }
 
     /**
@@ -59,7 +51,7 @@ abstract class CommonStatsSubscriber implements EventSubscriberInterface
                 continue;
             }
 
-            $permissions  = (isset($this->permissions[$table])) ? $this->permissions[$table] : [];
+            $permissions  = $this->permissions[$table] ?? [];
             $allowedJoins = [];
 
             foreach ($permissions as $tableAlias => $permBase) {
@@ -101,7 +93,7 @@ abstract class CommonStatsSubscriber implements EventSubscriberInterface
                 throw new AccessDeniedException(sprintf('You do not have the view permission to load data from the %s table', $tableAlias));
             }
 
-            $select = (isset($this->selects[$table])) ? $this->selects[$table] : null;
+            $select = $this->selects[$table] ?? null;
             $event->setSelect($select)->setRepository($repository, $allowedJoins);
         }
     }

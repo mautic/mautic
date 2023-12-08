@@ -19,7 +19,7 @@ class SchedulerDailyBuilder implements BuilderInterface
     {
         try {
             $rule->setFreq('DAILY');
-        } catch (InvalidArgument $e) {
+        } catch (InvalidArgument) {
             throw new InvalidSchedulerException();
         }
 

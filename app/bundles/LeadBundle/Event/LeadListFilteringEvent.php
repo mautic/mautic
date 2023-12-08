@@ -12,34 +12,9 @@ use Mautic\LeadBundle\Segment\Query\QueryBuilder;
  */
 class LeadListFilteringEvent extends CommonEvent
 {
-    /**
-     * @var array
-     */
-    protected $details;
-
-    /**
-     * @var int
-     */
-    protected $leadId;
-
-    /**
-     * @var QueryBuilder
-     */
-    protected $queryBuilder;
-
     protected bool $isFilteringDone;
 
-    /**
-     * @var string
-     */
-    protected $alias;
-
     protected string $subQuery;
-
-    /**
-     * @var string
-     */
-    protected $func;
 
     private string $leadsTableAlias;
 
@@ -50,13 +25,8 @@ class LeadListFilteringEvent extends CommonEvent
      * @param string       $func
      * @param QueryBuilder $queryBuilder
      */
-    public function __construct($details, $leadId, $alias, $func, $queryBuilder, EntityManager $entityManager)
+    public function __construct(protected $details, protected $leadId, protected $alias, protected $func, protected $queryBuilder, EntityManager $entityManager)
     {
-        $this->details         = $details;
-        $this->leadId          = $leadId;
-        $this->alias           = $alias;
-        $this->func            = $func;
-        $this->queryBuilder    = $queryBuilder;
         $this->em              = $entityManager;
         $this->isFilteringDone = false;
         $this->subQuery        = '';
@@ -114,7 +84,7 @@ class LeadListFilteringEvent extends CommonEvent
     /**
      * @param bool $status
      */
-    public function setFilteringStatus($status)
+    public function setFilteringStatus($status): void
     {
         $this->isFilteringDone = $status;
     }
@@ -122,25 +92,19 @@ class LeadListFilteringEvent extends CommonEvent
     /**
      * @param string $query
      */
-    public function setSubQuery($query)
+    public function setSubQuery($query): void
     {
         $this->subQuery = $query;
 
         $this->setFilteringStatus(true);
     }
 
-    /**
-     * @return bool
-     */
-    public function isFilteringDone()
+    public function isFilteringDone(): bool
     {
         return $this->isFilteringDone;
     }
 
-    /**
-     * @return string
-     */
-    public function getSubQuery()
+    public function getSubQuery(): string
     {
         return $this->subQuery;
     }
@@ -148,7 +112,7 @@ class LeadListFilteringEvent extends CommonEvent
     /**
      * @param array $details
      */
-    public function setDetails($details)
+    public function setDetails($details): void
     {
         $this->details = $details;
     }

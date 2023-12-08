@@ -58,7 +58,7 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
     /**
      * Used by search functions to search social profiles.
      */
-    public function setAvailableSocialFields(array $fields)
+    public function setAvailableSocialFields(array $fields): void
     {
         $this->availableSocialFields = $fields;
     }
@@ -66,7 +66,7 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
     /**
      * Used by search functions to search using aliases as commands.
      */
-    public function setAvailableSearchFields(array $fields)
+    public function setAvailableSearchFields(array $fields): void
     {
         $this->availableSearchFields = $fields;
     }
@@ -74,12 +74,12 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
     /**
      * Sets trigger model.
      */
-    public function setTriggerModel(TriggerModel $triggerModel)
+    public function setTriggerModel(TriggerModel $triggerModel): void
     {
         $this->triggerModel = $triggerModel;
     }
 
-    public function setDispatcher(EventDispatcherInterface $dispatcher)
+    public function setDispatcher(EventDispatcherInterface $dispatcher): void
     {
         $this->dispatcher = $dispatcher;
     }
@@ -199,7 +199,7 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
             ->getArrayResult();
 
         return array_map(
-            function ($row) {
+            function ($row): int {
                 return (int) $row['id'];
             },
             $result
@@ -355,7 +355,7 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
             ->where('l.id = '.$id);
         $results = $fq->executeQuery()->fetchAllAssociative();
 
-        return (isset($results[0])) ? $results[0] : [];
+        return $results[0] ?? [];
     }
 
     /**
@@ -381,7 +381,7 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
             $q->andWhere($this->getTableAlias().'.id = :id')
                 ->setParameter('id', (int) $contactId);
             $entity = $q->getQuery()->getSingleResult();
-        } catch (\Exception $e) {
+        } catch (\Exception) {
             $entity = null;
         }
 
@@ -456,7 +456,7 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
         $contacts = $this->getEntitiesWithCustomFields(
             'lead',
             $args,
-            function ($r) {
+            function ($r): void {
                 if (!empty($this->triggerModel)) {
                     $r->setColor($this->triggerModel->getColorForLeadPoints($r->getPoints()));
                 }
@@ -512,8 +512,8 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
                 }
 
                 if ($withPreferences) {
-                    $contactFrequencyRules = (isset($frequencyRules[$id])) ? $frequencyRules[$id] : [];
-                    $contactDncRules       = (isset($dncRules[$id])) ? $dncRules[$id] : [];
+                    $contactFrequencyRules = $frequencyRules[$id] ?? [];
+                    $contactDncRules       = $dncRules[$id] ?? [];
 
                     $channelRules = Lead::generateChannelRules($contactFrequencyRules, $contactDncRules);
                     if (is_array($tmpContacts[$id])) {
@@ -642,7 +642,7 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
                 if (is_array($value)) {
                     $this->buildWhereClauseFromArray($qb, [$value]);
                 } else {
-                    if (false === strpos($column, '.')) {
+                    if (!str_contains($column, '.')) {
                         $column = "entity.$column";
                     }
                     if (null === $expr) {
@@ -1021,10 +1021,8 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
      * Updates lead's lastActive with now date/time.
      *
      * @param int $leadId
-     *
-     * @return void
      */
-    public function updateLastActive($leadId, ?\DateTimeInterface $lastActiveDate = null)
+    public function updateLastActive($leadId, ?\DateTimeInterface $lastActiveDate = null): void
     {
         if (!$leadId) {
             // Prevent unnecessary queries like:
@@ -1116,10 +1114,8 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
      * Check lead owner.
      *
      * @param array $ownerIds
-     *
-     * @return array|false
      */
-    public function checkLeadOwner(Lead $lead, $ownerIds = [])
+    public function checkLeadOwner(Lead $lead, $ownerIds = []): bool
     {
         if (empty($ownerIds)) {
             return false;
@@ -1200,17 +1196,15 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
     /**
      * {@inheritdoc}
      */
-    public function getTableAlias()
+    public function getTableAlias(): string
     {
         return 'l';
     }
 
     /**
      * Get the count of identified contacts.
-     *
-     * @return int
      */
-    public function getIdentifiedContactCount()
+    public function getIdentifiedContactCount(): int
     {
         $qb = $this->getEntityManager()->getConnection()->createQueryBuilder()
             ->select('count(*)')
@@ -1279,7 +1273,7 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
      * @param mixed $whereExpression
      * @param mixed $having
      */
-    public function applySearchQueryRelationship(QueryBuilder $q, array $tables, $innerJoinTables, $whereExpression = null, $having = null)
+    public function applySearchQueryRelationship(QueryBuilder $q, array $tables, $innerJoinTables, $whereExpression = null, $having = null): void
     {
         $primaryTable = $tables[0];
         unset($tables[0]);
@@ -1331,7 +1325,7 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
     /**
      * @param int $tries
      */
-    protected function updateContactPoints(array $changes, $id, $tries = 1)
+    protected function updateContactPoints(array $changes, $id, $tries = 1): int
     {
         $qb = $this->getEntityManager()->getConnection()->createQueryBuilder()
             ->update(MAUTIC_TABLE_PREFIX.'leads')

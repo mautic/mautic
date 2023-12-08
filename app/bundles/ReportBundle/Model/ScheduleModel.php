@@ -16,15 +16,9 @@ class ScheduleModel
      */
     private \Doctrine\ORM\EntityRepository $schedulerRepository;
 
-    private \Mautic\ReportBundle\Scheduler\Model\SchedulerPlanner $schedulerPlanner;
-
-    private \Doctrine\ORM\EntityManager $entityManager;
-
-    public function __construct(EntityManager $entityManager, SchedulerPlanner $schedulerPlanner)
+    public function __construct(private EntityManager $entityManager, private SchedulerPlanner $schedulerPlanner)
     {
-        $this->entityManager       = $entityManager;
         $this->schedulerRepository = $entityManager->getRepository(Scheduler::class);
-        $this->schedulerPlanner    = $schedulerPlanner;
     }
 
     /**

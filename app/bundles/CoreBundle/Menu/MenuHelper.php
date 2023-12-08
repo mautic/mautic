@@ -9,10 +9,6 @@ use Symfony\Component\HttpFoundation\RequestStack;
 
 class MenuHelper
 {
-    protected \Mautic\CoreBundle\Security\Permissions\CorePermissions $security;
-
-    protected \Symfony\Component\HttpFoundation\RequestStack $requestStack;
-
     /**
      * Stores items that are assigned to another parent outside it's bundle.
      *
@@ -20,16 +16,8 @@ class MenuHelper
      */
     private $orphans = [];
 
-    private \Mautic\CoreBundle\Helper\CoreParametersHelper $coreParametersHelper;
-
-    protected \Mautic\PluginBundle\Helper\IntegrationHelper $integrationHelper;
-
-    public function __construct(CorePermissions $security, RequestStack $requestStack, CoreParametersHelper $coreParametersHelper, IntegrationHelper $integrationHelper)
+    public function __construct(protected CorePermissions $security, protected RequestStack $requestStack, private CoreParametersHelper $coreParametersHelper, protected IntegrationHelper $integrationHelper)
     {
-        $this->security              = $security;
-        $this->coreParametersHelper  = $coreParametersHelper;
-        $this->requestStack          = $requestStack;
-        $this->integrationHelper     = $integrationHelper;
     }
 
     /**
@@ -39,7 +27,7 @@ class MenuHelper
      * @param int    $defaultPriority
      * @param string $type
      */
-    public function createMenuStructure(&$items, $depth = 0, $defaultPriority = 9999, $type = 'main')
+    public function createMenuStructure(&$items, $depth = 0, $defaultPriority = 9999, $type = 'main'): void
     {
         foreach ($items as $k => &$i) {
             if (!is_array($i) || empty($i)) {
@@ -133,7 +121,7 @@ class MenuHelper
      */
     public function resetOrphans($type = 'main')
     {
-        $orphans              = (isset($this->orphans[$type])) ? $this->orphans[$type] : [];
+        $orphans              = $this->orphans[$type] ?? [];
         $this->orphans[$type] = [];
 
         return $orphans;
@@ -145,11 +133,11 @@ class MenuHelper
      * @param bool $appendOrphans
      * @param int  $depth
      */
-    public function placeOrphans(array &$menuItems, $appendOrphans = false, $depth = 1, $type = 'main')
+    public function placeOrphans(array &$menuItems, $appendOrphans = false, $depth = 1, $type = 'main'): void
     {
         foreach ($menuItems as $key => &$items) {
             if (isset($this->orphans[$type]) && isset($this->orphans[$type][$key])) {
-                $priority = (isset($items['priority'])) ? $items['priority'] : 9999;
+                $priority = $items['priority'] ?? 9999;
                 foreach ($this->orphans[$type][$key] as &$orphan) {
                     if (!isset($orphan['extras'])) {
                         $orphan['extras'] = [];
@@ -184,10 +172,10 @@ class MenuHelper
     /**
      * Sort menu items by priority.
      */
-    public function sortByPriority(&$menuItems, $defaultPriority = 9999)
+    public function sortByPriority(&$menuItems, $defaultPriority = 9999): void
     {
         foreach ($menuItems as &$items) {
-            $parentPriority = (isset($items['priority'])) ? $items['priority'] : $defaultPriority;
+            $parentPriority = $items['priority'] ?? $defaultPriority;
             if (isset($items['children'])) {
                 $this->sortByPriority($items['children'], $parentPriority);
             }
@@ -195,7 +183,7 @@ class MenuHelper
 
         uasort(
             $menuItems,
-            function ($a, $b) use ($defaultPriority) {
+            function ($a, $b) use ($defaultPriority): int {
                 $ap = (isset($a['priority']) ? (int) $a['priority'] : $defaultPriority);
                 $bp = (isset($b['priority']) ? (int) $b['priority'] : $defaultPriority);
 
@@ -218,10 +206,8 @@ class MenuHelper
 
     /**
      * @param string $integrationName
-     *
-     * @return bool
      */
-    protected function handleIntegrationChecks($integrationName, array $config)
+    protected function handleIntegrationChecks($integrationName, array $config): bool
     {
         $integration = $this->integrationHelper->getIntegrationObject($integrationName);
 
@@ -277,12 +263,10 @@ class MenuHelper
      */
     protected function handleAccessCheck($accessLevel)
     {
-        switch ($accessLevel) {
-            case 'admin':
-                return $this->security->isAdmin();
-            default:
-                return $this->security->isGranted($accessLevel, 'MATCH_ONE');
-        }
+        return match ($accessLevel) {
+            'admin' => $this->security->isAdmin(),
+            default => $this->security->isGranted($accessLevel, 'MATCH_ONE'),
+        };
     }
 
     /**

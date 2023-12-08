@@ -17,30 +17,17 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class SegmentReferenceFilterQueryBuilder extends BaseFilterQueryBuilder
 {
-    private \Mautic\LeadBundle\Segment\Query\ContactSegmentQueryBuilder $leadSegmentQueryBuilder;
-
-    private \Mautic\LeadBundle\Segment\ContactSegmentFilterFactory $leadSegmentFilterFactory;
-
-    private \Doctrine\ORM\EntityManager $entityManager;
-
     public function __construct(
         RandomParameterName $randomParameterNameService,
-        ContactSegmentQueryBuilder $leadSegmentQueryBuilder,
-        EntityManager $entityManager,
-        ContactSegmentFilterFactory $leadSegmentFilterFactory,
+        private ContactSegmentQueryBuilder $leadSegmentQueryBuilder,
+        private EntityManager $entityManager,
+        private ContactSegmentFilterFactory $leadSegmentFilterFactory,
         EventDispatcherInterface $dispatcher
     ) {
         parent::__construct($randomParameterNameService, $dispatcher);
-
-        $this->leadSegmentQueryBuilder  = $leadSegmentQueryBuilder;
-        $this->leadSegmentFilterFactory = $leadSegmentFilterFactory;
-        $this->entityManager            = $entityManager;
     }
 
-    /**
-     * @return string
-     */
-    public static function getServiceId()
+    public static function getServiceId(): string
     {
         return 'mautic.lead.query.builder.special.leadlist';
     }

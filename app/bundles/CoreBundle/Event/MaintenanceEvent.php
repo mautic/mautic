@@ -40,10 +40,8 @@ class MaintenanceEvent extends Event
 
     /**
      * Get integer for number of days ago to purge data.
-     *
-     * @return int
      */
-    public function getDays()
+    public function getDays(): int
     {
         return $this->daysOld;
     }
@@ -64,7 +62,7 @@ class MaintenanceEvent extends Event
      * @param string $key
      * @param int    $recordCount
      */
-    public function setStat($key, $recordCount, $sql = null, $parameters = [])
+    public function setStat($key, $recordCount, $sql = null, $parameters = []): void
     {
         $this->stats[$key] = (int) $recordCount;
 
@@ -88,10 +86,8 @@ class MaintenanceEvent extends Event
 
     /**
      * Return if this is to be a dry run.
-     *
-     * @return bool
      */
-    public function isDryRun()
+    public function isDryRun(): bool
     {
         return $this->dryRun;
     }
@@ -104,10 +100,7 @@ class MaintenanceEvent extends Event
         return $this->debug;
     }
 
-    /**
-     * @return bool
-     */
-    public function isGdpr()
+    public function isGdpr(): bool
     {
         return $this->gdpr;
     }

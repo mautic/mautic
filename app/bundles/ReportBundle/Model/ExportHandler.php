@@ -14,12 +14,9 @@ class ExportHandler
      */
     private $dir;
 
-    private \Mautic\CoreBundle\Helper\FilePathResolver $filePathResolver;
-
-    public function __construct(CoreParametersHelper $coreParametersHelper, FilePathResolver $filePathResolver)
+    public function __construct(CoreParametersHelper $coreParametersHelper, private FilePathResolver $filePathResolver)
     {
         $this->dir              = $coreParametersHelper->get('report_temp_dir');
-        $this->filePathResolver = $filePathResolver;
     }
 
     /**
@@ -54,16 +51,14 @@ class ExportHandler
         try {
             $path = $this->getPath($fileName);
             $this->filePathResolver->delete($path);
-        } catch (FileIOException $e) {
+        } catch (FileIOException) {
         }
     }
 
     /**
-     * @return string
-     *
      * @throws FileIOException
      */
-    public function getPath($fileName)
+    public function getPath($fileName): string
     {
         try {
             $this->filePathResolver->createDirectory($this->dir);

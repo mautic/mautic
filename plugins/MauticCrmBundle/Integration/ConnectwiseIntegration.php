@@ -107,10 +107,7 @@ class ConnectwiseIntegration extends CrmAbstractIntegration
         ];
     }
 
-    /**
-     * @return string
-     */
-    public function getApiUrl()
+    public function getApiUrl(): string
     {
         return sprintf('%s/v4_6_release/apis/3.0', $this->keys['site']);
     }
@@ -195,9 +192,9 @@ class ConnectwiseIntegration extends CrmAbstractIntegration
     }
 
     /**
-     * @return array|mixed
+     * @return mixed[]
      */
-    public function getAvailableLeadFields($settings = [])
+    public function getAvailableLeadFields($settings = []): array
     {
         $cwFields = [];
         if (isset($settings['feature_settings']['objects'])) {
@@ -305,7 +302,7 @@ class ConnectwiseIntegration extends CrmAbstractIntegration
                         'attr'  => [
                             'data-hide-on' => '{"campaignevent_properties_config_push_activities_0":"checked"}',
                         ],
-                        'data' => (isset($data['campaign_task'])) ? $data['campaign_task'] : [],
+                        'data' => $data['campaign_task'] ?? [],
                     ]);
             }
         }
@@ -652,7 +649,7 @@ class ConnectwiseIntegration extends CrmAbstractIntegration
 
         $cwContactExists = $this->amendLeadDataBeforeMauticPopulate($cwContactData, $object);
 
-        $communicationItems = isset($cwContactData['communicationItems']) ? $cwContactData['communicationItems'] : [];
+        $communicationItems = $cwContactData['communicationItems'] ?? [];
 
         $leadFields = array_diff_key($leadFields, array_flip($fieldsToUpdateInCW));
         $leadFields = $this->getBlankFieldsToUpdate($leadFields, $cwContactExists, $objectFields, $config);
@@ -744,7 +741,7 @@ class ConnectwiseIntegration extends CrmAbstractIntegration
                     ]);
 
                     $matched['company'] = ['identifier' => $foundCompanies[0]['identifier']];
-                } catch (ApiErrorException $e) {
+                } catch (ApiErrorException) {
                     // No matching companies were found
                 }
 

@@ -431,7 +431,7 @@ class EmailRepository extends CommonRepository
      */
     protected function addSearchCommandWhereClause($q, $filter): array
     {
-        list($expr, $parameters) = $this->addStandardSearchCommandWhereClause($q, $filter);
+        [$expr, $parameters] = $this->addStandardSearchCommandWhereClause($q, $filter);
         if ($expr) {
             return [$expr, $parameters];
         }
@@ -500,7 +500,7 @@ class EmailRepository extends CommonRepository
     /**
      * {@inheritdoc}
      */
-    public function getTableAlias()
+    public function getTableAlias(): string
     {
         return 'e';
     }
@@ -680,10 +680,8 @@ class EmailRepository extends CommonRepository
      * @param string $column
      * @param int    $minContactId
      * @param int    $maxContactId
-     *
-     * @return QueryBuilder
      */
-    private function setMinMaxIds(QueryBuilder $q, $column, $minContactId, $maxContactId)
+    private function setMinMaxIds(QueryBuilder $q, $column, $minContactId, $maxContactId): QueryBuilder
     {
         if ($minContactId && is_numeric($minContactId)) {
             $q->andWhere($column.' >= :minContactId');
@@ -700,10 +698,8 @@ class EmailRepository extends CommonRepository
 
     /**
      * Is one of emails unpublished?
-     *
-     * @return bool
      */
-    public function isOneUnpublished(array $ids)
+    public function isOneUnpublished(array $ids): bool
     {
         $result = $this->getEntityManager()
             ->createQueryBuilder()

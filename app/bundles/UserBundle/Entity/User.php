@@ -106,16 +106,10 @@ class User extends FormEntity implements UserInterface, EquatableInterface, Pass
     private $signature;
 
     /**
-     * @var bool
+     * @param bool $guest
      */
-    private $guest = false;
-
-    /**
-     * @param bool $isGuest
-     */
-    public function __construct($isGuest = false)
+    public function __construct(private $guest = false)
     {
-        $this->guest = $isGuest;
     }
 
     public static function loadMetadata(ORM\ClassMetadata $metadata): void
@@ -767,7 +761,7 @@ class User extends FormEntity implements UserInterface, EquatableInterface, Pass
     /**
      * Needed for SAML to work correctly.
      */
-    public function isEqualTo(UserInterface $user)
+    public function isEqualTo(UserInterface $user): bool
     {
         $thisUser = $this->getId().$this->getUsername().$this->getPassword();
         $thatUser = $user->getId().$user->getUsername().$user->getPassword();

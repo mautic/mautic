@@ -10,16 +10,10 @@ use Mautic\LeadBundle\Entity\LeadEventLog;
 
 final class ImportProcessEvent extends CommonEvent
 {
-    public Import $import;
-    public LeadEventLog $eventLog;
-    public array $rowData;
     private ?bool $wasMerged = null;
 
-    public function __construct(Import $import, LeadEventLog $eventLog, array $rowData)
+    public function __construct(public Import $import, public LeadEventLog $eventLog, public array $rowData)
     {
-        $this->import   = $import;
-        $this->eventLog = $eventLog;
-        $this->rowData  = $rowData;
     }
 
     public function setWasMerged(bool $wasMerged): void

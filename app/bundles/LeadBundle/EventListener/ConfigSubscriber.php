@@ -24,7 +24,7 @@ class ConfigSubscriber implements EventSubscriberInterface
         ];
     }
 
-    public function onConfigGenerate(ConfigBuilderEvent $event)
+    public function onConfigGenerate(ConfigBuilderEvent $event): void
     {
         $leadParameters = $event->getParametersFromConfig('MauticLeadBundle');
         unset($leadParameters['company_unique_identifiers_operator']);
@@ -52,7 +52,7 @@ class ConfigSubscriber implements EventSubscriberInterface
         ]);
     }
 
-    public function onConfigCompanyGenerate(ConfigBuilderEvent $event)
+    public function onConfigCompanyGenerate(ConfigBuilderEvent $event): void
     {
         $parameters = $event->getParametersFromConfig('MauticLeadBundle');
         $event->addForm([

@@ -11,14 +11,6 @@ use Psr\Log\LoggerInterface;
 
 class DeviceTracker
 {
-    private \Mautic\LeadBundle\Tracker\Service\DeviceCreatorService\DeviceCreatorServiceInterface $deviceCreatorService;
-
-    private \Mautic\LeadBundle\Tracker\Factory\DeviceDetectorFactory\DeviceDetectorFactoryInterface $deviceDetectorFactory;
-
-    private \Mautic\LeadBundle\Tracker\Service\DeviceTrackingService\DeviceTrackingServiceInterface $deviceTrackingService;
-
-    private \Psr\Log\LoggerInterface $logger;
-
     /**
      * @var bool
      */
@@ -29,16 +21,8 @@ class DeviceTracker
      */
     private $trackedDevice = [];
 
-    public function __construct(
-        DeviceCreatorServiceInterface $deviceCreatorService,
-        DeviceDetectorFactoryInterface $deviceDetectorFactory,
-        DeviceTrackingServiceInterface $deviceTrackingService,
-        LoggerInterface $mauticLogger
-    ) {
-        $this->deviceCreatorService  = $deviceCreatorService;
-        $this->deviceDetectorFactory = $deviceDetectorFactory;
-        $this->deviceTrackingService = $deviceTrackingService;
-        $this->logger                = $mauticLogger;
+    public function __construct(private DeviceCreatorServiceInterface $deviceCreatorService, private DeviceDetectorFactoryInterface $deviceDetectorFactory, private DeviceTrackingServiceInterface $deviceTrackingService, private LoggerInterface $logger)
+    {
     }
 
     /**
@@ -99,7 +83,7 @@ class DeviceTracker
         return $this->deviceWasChanged;
     }
 
-    public function clearTrackingCookies()
+    public function clearTrackingCookies(): void
     {
         $this->deviceTrackingService->clearTrackingCookies();
     }

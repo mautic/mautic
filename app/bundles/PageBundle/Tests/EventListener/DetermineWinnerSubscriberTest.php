@@ -84,11 +84,11 @@ class DetermineWinnerSubscriberTest extends TestCase
 
         $parentMock
             ->method('hasTranslations')
-            ->willReturn(true);
+            ->willReturn(1);
 
         $childMock
             ->method('hasTranslations')
-            ->willReturn(true);
+            ->willReturn(1);
 
         $transChildren->method('getKeys')
             ->willReturnOnConsecutiveCalls([2], [4]);

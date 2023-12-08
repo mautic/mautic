@@ -20,17 +20,11 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class CampaignType extends AbstractType
 {
-    private \Mautic\CoreBundle\Security\Permissions\CorePermissions $security;
-
-    private \Symfony\Contracts\Translation\TranslatorInterface $translator;
-
-    public function __construct(CorePermissions $security, TranslatorInterface $translator)
+    public function __construct(private CorePermissions $security, private TranslatorInterface $translator)
     {
-        $this->security   = $security;
-        $this->translator = $translator;
     }
 
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder->addEventSubscriber(new CleanFormSubscriber(['description' => 'html']));
         $builder->addEventSubscriber(new FormExitSubscriber('campaign', $options));
@@ -118,10 +112,10 @@ class CampaignType extends AbstractType
         ]);
     }
 
-    public function configureOptions(OptionsResolver $resolver)
+    public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults([
-            'data_class' => 'Mautic\CampaignBundle\Entity\Campaign',
+            'data_class' => \Mautic\CampaignBundle\Entity\Campaign::class,
         ]);
     }
 }
