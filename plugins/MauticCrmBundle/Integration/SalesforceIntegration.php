@@ -1068,13 +1068,8 @@ class SalesforceIntegration extends CrmAbstractIntegration
      */
     public function pushLeads($params = []): array
     {
-<<<<<<< HEAD
-        $limit                   = (isset($params['limit'])) ? $params['limit'] : 100;
-        [$fromDate, $toDate]     = $this->getSyncTimeframeDates($params);
-=======
         $limit                   = $params['limit'] ?? 100;
-        list($fromDate, $toDate) = $this->getSyncTimeframeDates($params);
->>>>>>> 78696d62fd ([PHP 7.0] Make use of coalsece)
+        [$fromDate, $toDate]     = $this->getSyncTimeframeDates($params);
         $config                  = $this->mergeConfigToFeatureSettings($params);
         $integrationEntityRepo   = $this->getIntegrationEntityRepository();
 
@@ -2589,13 +2584,8 @@ class SalesforceIntegration extends CrmAbstractIntegration
      */
     public function pushCompanies($params = []): array
     {
-<<<<<<< HEAD
-        $limit                   = (isset($params['limit'])) ? $params['limit'] : 100;
-        [$fromDate, $toDate]     = $this->getSyncTimeframeDates($params);
-=======
         $limit                   = $params['limit'] ?? 100;
-        list($fromDate, $toDate) = $this->getSyncTimeframeDates($params);
->>>>>>> 78696d62fd ([PHP 7.0] Make use of coalsece)
+        [$fromDate, $toDate]     = $this->getSyncTimeframeDates($params);
         $config                  = $this->mergeConfigToFeatureSettings($params);
         $integrationEntityRepo   = $this->getIntegrationEntityRepository();
 
