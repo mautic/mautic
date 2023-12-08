@@ -28,9 +28,7 @@ class IteratorExportDataModelTest extends \PHPUnit\Framework\TestCase
         $this->commonModel      = $this->createMock(AbstractCommonModel::class);
         $this->commonRepository = $this->createMock(CommonRepository::class);
         $args                   = ['limit' => 1000];
-        $callback               = function ($var) {
-            return $var;
-        };
+        $callback               = fn ($var) => $var;
 
         $this->iteratorExportDataModel = new IteratorExportDataModel($this->commonModel, $args, $callback);
     }

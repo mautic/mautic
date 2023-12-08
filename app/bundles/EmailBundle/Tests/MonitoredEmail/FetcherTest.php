@@ -61,9 +61,7 @@ class FetcherTest extends \PHPUnit\Framework\TestCase
             ->getMock();
         $mailbox->method('getMailboxSettings')
             ->willReturnCallback(
-                function ($mailbox) {
-                    return $this->mailboxes[$mailbox];
-                }
+                fn ($mailbox) => $this->mailboxes[$mailbox]
             );
         $mailbox->method('searchMailBox')
             ->willReturn([1]);

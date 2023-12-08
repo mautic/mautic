@@ -269,7 +269,7 @@ final class DeviceTrackingServiceTest extends \PHPUnit\Framework\TestCase
             ->willReturn(new Lead());
 
         $this->cookieHelperMock->method('setCookie')
-            ->withConsecutive(['mautic_device_id', $uniqueTrackingIdentifier, 31536000]);
+            ->withConsecutive(['mautic_device_id', $uniqueTrackingIdentifier, 31_536_000]);
 
         $deviceTrackingService = $this->getDeviceTrackingService();
         $this->assertInstanceOf(LeadDevice::class, $deviceTrackingService->trackCurrentDevice($leadDeviceMock, true));
@@ -321,7 +321,7 @@ final class DeviceTrackingServiceTest extends \PHPUnit\Framework\TestCase
             ->willReturn(new Lead());
 
         $this->cookieHelperMock->method('setCookie')
-            ->withConsecutive(['mautic_device_id', $uniqueTrackingIdentifier, 31536000]);
+            ->withConsecutive(['mautic_device_id', $uniqueTrackingIdentifier, 31_536_000]);
 
         $this->entityManagerMock->expects($this->once())
             ->method('persist')

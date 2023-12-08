@@ -190,7 +190,7 @@ class ConfigSubscriberTest extends TestCase
         $subscriber = new ConfigSubscriber();
 
         $file = $this->createMock(UploadedFile::class);
-        $key  = <<<KEY
+        $key  = <<<KEY_WRAP
 -----BEGIN ENCRYPTED PRIVATE KEY-----
 MIICxjBABgkqhkiG9w0BBQ0wMzAbBgkqhkiG9w0BBQwwDgQI+tgT3QFhjEgCAggA
 MBQGCCqGSIb3DQMHBAg1HGrSHb7zVwSCAoBG89zqAxAx+vPvhQVW6dfJFBTSpAGq
@@ -208,7 +208,7 @@ ZTJUgHdZ6Tfe2jPFJjSZVoU/en0W5BQXgy1u3BDX68C8nAfZ4xmeyELcMub9hTYb
 HTDmYIBozZNIcYHB6OGZnURuGeofMVJqMkNfnEuSuoCJsXGIhLznDKp8G00F9eR2
 1L+B0ZUZv/O82qEGzC/IX7+CFmSDStV9R400cDvi+8BsdMMB+WV6SMnK
 -----END ENCRYPTED PRIVATE KEY-----
-KEY;
+KEY_WRAP;
 
         $this->configEvent->expects($this->once())
             ->method('getFileContent')
@@ -235,7 +235,7 @@ KEY;
         $subscriber = new ConfigSubscriber();
 
         $file = $this->createMock(UploadedFile::class);
-        $key  = <<<KEY
+        $key  = <<<KEY_WRAP
 -----BEGIN ENCRYPTED PRIVATE KEY-----
 MIICxjBABgkqhkiG9w0BBQ0wMzAbBgkqhkiG9w0BBQwwDgQI+tgT3QFhjEgCAggA
 MBQGCCqGSIb3DQMHBAg1HGrSHb7zVwSCAoBG89zqAxAx+vPvhQVW6dfJFBTSpAGq
@@ -253,7 +253,7 @@ ZTJUgHdZ6Tfe2jPFJjSZVoU/en0W5BQXgy1u3BDX68C8nAfZ4xmeyELcMub9hTYb
 HTDmYIBozZNIcYHB6OGZnURuGeofMVJqMkNfnEuSuoCJsXGIhLznDKp8G00F9eR2
 1L+B0ZUZv/O82qEGzC/IX7+CFmSDStV9R400cDvi+8BsdMMB+WV6SMnK
 -----END ENCRYPTED PRIVATE KEY-----
-KEY;
+KEY_WRAP;
 
         $this->configEvent->expects($this->once())
             ->method('getFileContent')
@@ -281,7 +281,7 @@ KEY;
         $subscriber = new ConfigSubscriber();
 
         $file = $this->createMock(UploadedFile::class);
-        $key  = <<<KEY
+        $key  = <<<KEY_WRAP
 -----BEGIN ENCRYPTED PRIVATE KEY-----
 MIICxjBABgkqhkiG9w0BBQ0wMzAbBgkqhkiG9w0BBQwwDgQI+tgT3QFhjEgCAggA
 MBQGCCqGSIb3DQMHBAg1HGrSHb7zVwSCAoBG89zqAxAx+vPvhQVW6dfJFBTSpAGq
@@ -299,7 +299,7 @@ ZTJUgHdZ6Tfe2jPFJjSZVoU/en0W5BQXgy1u3BDX68C8nAfZ4xmeyELcMub9hTYb
 HTDmYIBozZNIcYHB6OGZnURuGeofMVJqMkNfnEuSuoCJsXGIhLznDKp8G00F9eR2
 1L+B0ZUZv/O82qEGzC/IX7+CFmSDStV9R400cDvi+8BsdMMB+WV6SMnK
 -----END ENCRYPTED PRIVATE KEY-----
-KEY;
+KEY_WRAP;
 
         $this->configEvent->expects($this->once())
             ->method('getFileContent')

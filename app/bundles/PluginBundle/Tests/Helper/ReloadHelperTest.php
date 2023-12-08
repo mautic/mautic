@@ -57,7 +57,7 @@ class ReloadHelperTest extends \PHPUnit\Framework\TestCase
                 'bundle'            => 'MauticZapierBundle',
                 'namespace'         => 'MauticPlugin\MauticZapierBundle',
                 'symfonyBundleName' => 'MauticZapierBundle',
-                'bundleClass'       => 'Mautic\PluginBundle\Tests\Helper\PluginBundleBaseStub',
+                'bundleClass'       => \Mautic\PluginBundle\Tests\Helper\PluginBundleBaseStub::class,
                 'permissionClasses' => [],
                 'relative'          => 'plugins/MauticZapierBundle',
                 'directory'         => '/Users/jan/dev/mautic/plugins/MauticZapierBundle',

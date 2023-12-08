@@ -252,7 +252,7 @@ class EmailControllerTest extends \PHPUnit\Framework\TestCase
 
         $this->formFactoryMock->expects($this->once())
             ->method('create')
-            ->with('Mautic\EmailBundle\Form\Type\ExampleSendType',
+            ->with(\Mautic\EmailBundle\Form\Type\ExampleSendType::class,
                 [
                     'emails' => [
                         'list' => [

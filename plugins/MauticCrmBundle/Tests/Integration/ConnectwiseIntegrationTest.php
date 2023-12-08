@@ -27,9 +27,7 @@ class ConnectwiseIntegrationTest extends AbstractIntegrationTestCase
         $apiHelper->expects($this->exactly(2))
             ->method('getContacts')
             ->willReturnCallback(
-                function () {
-                    return $this->generateData(2);
-                }
+                fn () => $this->generateData(2)
             );
 
         $integration = $this->getMockBuilder(ConnectwiseIntegration::class)
@@ -64,9 +62,7 @@ class ConnectwiseIntegrationTest extends AbstractIntegrationTestCase
         $apiHelper->expects($this->exactly(2))
             ->method('getCampaignMembers')
             ->willReturnCallback(
-                function () {
-                    return $this->generateData(2);
-                }
+                fn () => $this->generateData(2)
             );
 
         $integrationEntityModel = $this->getMockBuilder(IntegrationEntityModel::class)

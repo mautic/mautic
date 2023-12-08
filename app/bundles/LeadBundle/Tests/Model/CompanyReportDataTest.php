@@ -24,9 +24,7 @@ class CompanyReportDataTest extends \PHPUnit\Framework\TestCase
 
         $this->translator->method('trans')
             ->willReturnCallback(
-                function ($key) {
-                    return $key;
-                }
+                fn ($key) => $key
             );
     }
 

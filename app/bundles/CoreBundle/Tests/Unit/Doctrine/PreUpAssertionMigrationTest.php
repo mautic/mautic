@@ -83,7 +83,7 @@ class PreUpAssertionMigrationTest extends TestCase
         try {
             $migration->preUp($this->createMock(Schema::class));
             $this->fail(sprintf('Exception %s should have been thrown', SkipMigration::class));
-        } catch (SkipMigration $e) {
+        } catch (SkipMigration) {
         }
 
         Assert::assertCount(3, $migration->messages);

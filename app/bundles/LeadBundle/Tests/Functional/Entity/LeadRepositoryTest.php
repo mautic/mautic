@@ -71,9 +71,7 @@ final class LeadRepositoryTest extends MauticMysqlTestCase
 
         $finalQueries = array_filter(
             $queries['default'],
-            function (array $query) {
-                return false !== strpos($query['sql'], 'SELECT (CASE WHEN t0_.id = 1 THEN 1 ELSE 2 END)');
-            }
+            fn (array $query) => str_contains($query['sql'], 'SELECT (CASE WHEN t0_.id = 1 THEN 1 ELSE 2 END)')
         );
 
         foreach ($finalQueries as $query) {

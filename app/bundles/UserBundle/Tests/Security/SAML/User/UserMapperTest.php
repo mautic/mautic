@@ -49,17 +49,11 @@ class UserMapperTest extends TestCase
         $statement = $this->createMock(AttributeStatement::class);
         $statement->method('getFirstAttributeByName')
             ->willReturnCallback(
-                function ($attributeName) use ($emailAttribute, $firstnameAttribute, $lastnameAttribute, $defaultAttribute) {
-                    switch ($attributeName) {
-                        case 'EmailAddress':
-                            return $emailAttribute;
-                        case 'FirstName':
-                            return $firstnameAttribute;
-                        case 'LastName':
-                            return $lastnameAttribute;
-                        default:
-                            return $defaultAttribute;
-                    }
+                fn ($attributeName) => match ($attributeName) {
+                    'EmailAddress' => $emailAttribute,
+                    'FirstName'    => $firstnameAttribute,
+                    'LastName'     => $lastnameAttribute,
+                    default        => $defaultAttribute,
                 }
             );
 
