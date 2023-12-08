@@ -11,13 +11,7 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class ChannelSubscriber implements EventSubscriberInterface
 {
-<<<<<<< HEAD
     public function __construct(private IntegrationHelper $helper)
-=======
-    private \Mautic\PluginBundle\Helper\IntegrationHelper $helper;
-
-    public function __construct(IntegrationHelper $helper)
->>>>>>> 11b4805f88 ([type-declarations] Re-run rector rules on plugins, Report, Sms, User, Lead, Dynamic, Config bundles)
     {
     }
 

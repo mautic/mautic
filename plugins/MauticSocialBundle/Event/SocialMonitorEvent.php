@@ -7,18 +7,7 @@ use MauticPlugin\MauticSocialBundle\Entity\Monitoring;
 
 class SocialMonitorEvent extends CommonEvent
 {
-    /**
-<<<<<<< HEAD
-     * @var int
-     */
-    protected $newLeadCount = 0;
-=======
-     * @var string
-     */
-    protected $integrationName;
-
     protected int $newLeadCount;
->>>>>>> 11b4805f88 ([type-declarations] Re-run rector rules on plugins, Report, Sms, User, Lead, Dynamic, Config bundles)
 
     protected int $updatedLeadCount;
 

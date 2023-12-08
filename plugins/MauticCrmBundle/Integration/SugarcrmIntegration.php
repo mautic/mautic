@@ -40,10 +40,6 @@ class SugarcrmIntegration extends CrmAbstractIntegration
 
     private $sugarDncKeys = ['email_opt_out', 'invalid_email'];
     private $authorizationError;
-<<<<<<< HEAD
-=======
-    private \Mautic\UserBundle\Model\UserModel $userModel;
->>>>>>> 11b4805f88 ([type-declarations] Re-run rector rules on plugins, Report, Sms, User, Lead, Dynamic, Config bundles)
 
     protected \Mautic\LeadBundle\Model\DoNotContact $doNotContactModel;
 

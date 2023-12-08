@@ -11,15 +11,7 @@ use Symfony\Component\Form\FormBuilderInterface;
 
 class SocialLoginType extends AbstractType
 {
-<<<<<<< HEAD
     public function __construct(private IntegrationHelper $helper, private FormModel $formModel, private CoreParametersHelper $coreParametersHelper)
-=======
-    private \Mautic\PluginBundle\Helper\IntegrationHelper $helper;
-    private \Mautic\FormBundle\Model\FormModel $formModel;
-    private \Mautic\CoreBundle\Helper\CoreParametersHelper $coreParametersHelper;
-
-    public function __construct(IntegrationHelper $helper, FormModel $form, CoreParametersHelper $coreParametersHelper)
->>>>>>> 11b4805f88 ([type-declarations] Re-run rector rules on plugins, Report, Sms, User, Lead, Dynamic, Config bundles)
     {
     }
 

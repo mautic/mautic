@@ -19,13 +19,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class MonitoringType extends AbstractType
 {
-<<<<<<< HEAD
     public function __construct(private MonitoringModel $monitoringModel)
-=======
-    private \MauticPlugin\MauticSocialBundle\Model\MonitoringModel $monitoringModel;
-
-    public function __construct(MonitoringModel $monitoringModel)
->>>>>>> 11b4805f88 ([type-declarations] Re-run rector rules on plugins, Report, Sms, User, Lead, Dynamic, Config bundles)
     {
     }
 

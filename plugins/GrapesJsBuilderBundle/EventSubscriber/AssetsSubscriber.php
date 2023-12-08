@@ -12,15 +12,7 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class AssetsSubscriber implements EventSubscriberInterface
 {
-<<<<<<< HEAD
     public function __construct(private Config $config, private InstallService $installer)
-=======
-    private \MauticPlugin\GrapesJsBuilderBundle\Integration\Config $config;
-
-    private \Mautic\InstallBundle\Install\InstallService $installer;
-
-    public function __construct(Config $config, InstallService $installer)
->>>>>>> 11b4805f88 ([type-declarations] Re-run rector rules on plugins, Report, Sms, User, Lead, Dynamic, Config bundles)
     {
     }
 

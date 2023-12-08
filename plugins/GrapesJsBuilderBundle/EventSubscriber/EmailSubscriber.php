@@ -12,15 +12,7 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class EmailSubscriber implements EventSubscriberInterface
 {
-<<<<<<< HEAD
     public function __construct(private Config $config, private GrapesJsBuilderModel $grapesJsBuilderModel)
-=======
-    private \MauticPlugin\GrapesJsBuilderBundle\Integration\Config $config;
-
-    private \MauticPlugin\GrapesJsBuilderBundle\Model\GrapesJsBuilderModel $grapesJsBuilderModel;
-
-    public function __construct(Config $config, GrapesJsBuilderModel $grapesJsBuilderModel)
->>>>>>> 11b4805f88 ([type-declarations] Re-run rector rules on plugins, Report, Sms, User, Lead, Dynamic, Config bundles)
     {
     }
 

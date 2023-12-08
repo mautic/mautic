@@ -15,17 +15,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class LeadListSubscriber implements EventSubscriberInterface
 {
-<<<<<<< HEAD
     public function __construct(private IntegrationHelper $helper, private ListModel $listModel, private TranslatorInterface $translator)
-=======
-    private \Mautic\PluginBundle\Helper\IntegrationHelper $helper;
-
-    private \Mautic\LeadBundle\Model\ListModel $listModel;
-
-    private \Symfony\Contracts\Translation\TranslatorInterface $translator;
-
-    public function __construct(IntegrationHelper $helper, ListModel $listModel, TranslatorInterface $translator)
->>>>>>> 11b4805f88 ([type-declarations] Re-run rector rules on plugins, Report, Sms, User, Lead, Dynamic, Config bundles)
     {
     }
 

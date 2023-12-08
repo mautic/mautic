@@ -12,18 +12,6 @@ use MauticPlugin\MauticCrmBundle\Integration\Salesforce\QueryBuilder;
 
 class Fetcher
 {
-<<<<<<< HEAD
-=======
-    private \Mautic\PluginBundle\Entity\IntegrationEntityRepository $repo;
-
-    private \MauticPlugin\MauticCrmBundle\Integration\Salesforce\CampaignMember\Organizer $organizer;
-
-    /**
-     * @var string
-     */
-    private $campaignId;
-
->>>>>>> 11b4805f88 ([type-declarations] Re-run rector rules on plugins, Report, Sms, User, Lead, Dynamic, Config bundles)
     /**
      * @var array
      */

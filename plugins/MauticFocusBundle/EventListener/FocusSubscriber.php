@@ -24,45 +24,8 @@ use Symfony\Component\Routing\RouterInterface;
 
 class FocusSubscriber implements EventSubscriberInterface
 {
-<<<<<<< HEAD
     public function __construct(private RouterInterface $router, private IpLookupHelper $ipHelper, private AuditLogModel $auditLogModel, private TrackableModel $trackableModel, private PageTokenHelper $pageTokenHelper, private AssetTokenHelper $assetTokenHelper, private FocusModel $focusModel, private RequestStack $requestStack)
     {
-=======
-    private \Symfony\Component\Routing\RouterInterface $router;
-
-    private \Mautic\CoreBundle\Helper\IpLookupHelper $ipHelper;
-
-    private \Mautic\CoreBundle\Model\AuditLogModel $auditLogModel;
-
-    private \Mautic\PageBundle\Model\TrackableModel $trackableModel;
-
-    private PageTokenHelper $pageTokenHelper;
-
-    private AssetTokenHelper $assetTokenHelper;
-
-    private \MauticPlugin\MauticFocusBundle\Model\FocusModel $focusModel;
-
-    private \Symfony\Component\HttpFoundation\RequestStack $requestStack;
-
-    public function __construct(
-        RouterInterface $router,
-        IpLookupHelper $ipLookupHelper,
-        AuditLogModel $auditLogModel,
-        TrackableModel $trackableModel,
-        PageTokenHelper $pageTokenHelper,
-        AssetTokenHelper $assetTokenHelper,
-        FocusModel $focusModel,
-        RequestStack $requestStack
-    ) {
-        $this->router           = $router;
-        $this->ipHelper         = $ipLookupHelper;
-        $this->auditLogModel    = $auditLogModel;
-        $this->trackableModel   = $trackableModel;
-        $this->pageTokenHelper  = $pageTokenHelper;
-        $this->assetTokenHelper = $assetTokenHelper;
-        $this->focusModel       = $focusModel;
-        $this->requestStack     = $requestStack;
->>>>>>> 11b4805f88 ([type-declarations] Re-run rector rules on plugins, Report, Sms, User, Lead, Dynamic, Config bundles)
     }
 
     /**

@@ -29,11 +29,6 @@ abstract class MonitorTwitterBaseCommand extends Command
 
     protected \Mautic\PluginBundle\Helper\IntegrationHelper $integrationHelper;
 
-<<<<<<< HEAD
-=======
-    private \MauticPlugin\MauticSocialBundle\Helper\TwitterCommandHelper $twitterCommandHelper;
-
->>>>>>> 11b4805f88 ([type-declarations] Re-run rector rules on plugins, Report, Sms, User, Lead, Dynamic, Config bundles)
     /**
      * @var InputInterface
      */

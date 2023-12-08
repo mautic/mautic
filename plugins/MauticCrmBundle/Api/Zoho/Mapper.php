@@ -11,11 +11,6 @@ class Mapper
      */
     private $contact = [];
 
-<<<<<<< HEAD
-=======
-    private array $fields;
-
->>>>>>> 11b4805f88 ([type-declarations] Re-run rector rules on plugins, Report, Sms, User, Lead, Dynamic, Config bundles)
     /**
      * @var array
      */
