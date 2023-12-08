@@ -69,6 +69,8 @@ return static function (Rector\Config\RectorConfig $rectorConfig): void {
         \Rector\Php80\Rector\Class_\ClassPropertyAssignToConstructorPromotionRector::class => [
             __DIR__.'/app/bundles/CacheBundle/EventListener/CacheClearSubscriber.php',
             __DIR__.'/app/bundles/ReportBundle/Event/ReportBuilderEvent.php',
+            // false positive
+            __DIR__.'/app/bundles/CoreBundle/DependencyInjection/Builder/BundleMetadata.php',
         ],
 
         // handle later with full PHP 8.0 upgrade
