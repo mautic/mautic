@@ -68,11 +68,7 @@ class ConfigController extends FormController
                     // Bind request to the form
                     $post     = $request->request;
 
-<<<<<<< HEAD
-                    /** @var mixed $formData */
-=======
                     /** @var mixed[] $formData */
->>>>>>> 2f9daeb36f (form data is array)
                     $formData = $form->getData();
 
                     // Dispatch pre-save event. Bundles may need to modify some field values like passwords before save

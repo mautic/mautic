@@ -4,15 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-<<<<<<< HEAD
-<<<<<<< HEAD
-    "content-hash": "73d936dafd9da1756588ac9773f2d53f",
-=======
     "content-hash": "59a4566065a8111f2e3e17e67a8e6f14",
->>>>>>> be55788e20 (bump rector and phpstan)
-=======
-    "content-hash": "1aad637e0c695a10103cc82e0b3b6cc1",
->>>>>>> 2f9daeb36f (form data is array)
     "packages": [
         {
             "name": "aws/aws-crt-php",
