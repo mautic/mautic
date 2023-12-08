@@ -126,22 +126,13 @@ class PointGroupModel extends CommonFormModel
         $oldScore = $contactScore->getScore();
         $newScore = $oldScore;
 
-        switch ($operator) {
-            case Lead::POINTS_ADD:
-                $newScore += $points;
-                break;
-            case Lead::POINTS_SUBTRACT:
-                $newScore -= $points;
-                break;
-            case Lead::POINTS_MULTIPLY:
-                $newScore *= $points;
-                break;
-            case Lead::POINTS_DIVIDE:
-                $newScore /= $points;
-                break;
-            default:
-                throw new \UnexpectedValueException('Invalid operator');
-        }
+        match ($operator) {
+            Lead::POINTS_ADD      => $newScore += $points,
+            Lead::POINTS_SUBTRACT => $newScore -= $points,
+            Lead::POINTS_MULTIPLY => $newScore *= $points,
+            Lead::POINTS_DIVIDE   => $newScore /= $points,
+            default               => throw new \UnexpectedValueException('Invalid operator'),
+        };
         $contactScore->setScore($newScore);
         $this->em->persist($contactScore);
         $this->em->flush();

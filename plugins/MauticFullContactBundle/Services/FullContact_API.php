@@ -33,19 +33,12 @@ class FullContact_API extends FullContact_Person
             throw new BaseException('To search, you must supply a search term.');
         }
 
-        switch ($type) {
-            case 'email':
-                $this->lookupByEmail($search);
-                break;
-            case 'phone':
-                $this->lookupByPhone($search);
-                break;
-            case 'twitter':
-                $this->lookupByTwitter($search);
-                break;
-            default:
-                throw new ApiException("UnsupportedLookupMethodException: Invalid lookup method specified [{$type}]");
-        }
+        match ($type) {
+            'email'   => $this->lookupByEmail($search),
+            'phone'   => $this->lookupByPhone($search),
+            'twitter' => $this->lookupByTwitter($search),
+            default   => throw new ApiException("UnsupportedLookupMethodException: Invalid lookup method specified [{$type}]"),
+        };
 
         $result             = json_decode($this->response_json, true);
         $result['is_error'] = !in_array($this->response_code, [200, 201, 204], true);

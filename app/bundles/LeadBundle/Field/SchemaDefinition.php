@@ -86,15 +86,11 @@ class SchemaDefinition
         $length = $schemaDefinition['options']['length'] ?? null;
         $type   = $schemaDefinition['type'] ?? null;
 
-        switch ($type) {
-            case 'string':
-                return $length ?? ClassMetadataBuilder::MAX_VARCHAR_INDEXED_LENGTH;
-
-            case 'text':
-                return $length;
-        }
-
-        return null;
+        return match ($type) {
+            'string' => $length ?? ClassMetadataBuilder::MAX_VARCHAR_INDEXED_LENGTH,
+            'text'   => $length,
+            default  => null,
+        };
     }
 
     /**

@@ -61,7 +61,7 @@ class ClearbitIntegration extends AbstractIntegration
         }
     }
 
-    public function shouldAutoUpdate()
+    public function shouldAutoUpdate(): bool
     {
         $featureSettings = $this->getKeys();
 

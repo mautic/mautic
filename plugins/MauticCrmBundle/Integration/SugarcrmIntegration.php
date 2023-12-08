@@ -299,14 +299,10 @@ class SugarcrmIntegration extends CrmAbstractIntegration
         }
 
         $isRequired = function (array $field, $object) {
-            switch (true) {
-                case 'Leads' === $object && ('webtolead_email1' === $field['name'] || 'email1' === $field['name']):
-                case 'Contacts' === $object && 'email1' === $field['name']:
-                case 'id' !== $field['name'] && !empty($field['required']):
-                    return true;
-                default:
-                    return false;
-            }
+            return match (true) {
+                'Leads' === $object && ('webtolead_email1' === $field['name'] || 'email1' === $field['name']), 'Contacts' === $object && 'email1' === $field['name'], 'id' !== $field['name'] && !empty($field['required']) => true,
+                default => false,
+            };
         };
 
         try {

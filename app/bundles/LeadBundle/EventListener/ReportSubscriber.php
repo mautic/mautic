@@ -445,17 +445,11 @@ class ReportSubscriber implements EventSubscriberInterface
                     $data  = $outerQb->executeQuery()->fetchAllAssociative();
 
                     foreach ($data as $row) {
-                        switch ($groupBy) {
-                            case 'actions':
-                                $label = $this->channelActions[$row['slice']];
-                                break;
-                            case 'channels':
-                                $label = $this->channels[$row['slice']];
-                                break;
-
-                            default:
-                                $label = (empty($row['slice'])) ? $this->translator->trans('mautic.core.none') : $row['slice'];
-                        }
+                        $label = match ($groupBy) {
+                            'actions'  => $this->channelActions[$row['slice']],
+                            'channels' => $this->channels[$row['slice']],
+                            default    => (empty($row['slice'])) ? $this->translator->trans('mautic.core.none') : $row['slice'],
+                        };
                         $chart->setDataset($label, $row['total_attribution']);
                     }
 

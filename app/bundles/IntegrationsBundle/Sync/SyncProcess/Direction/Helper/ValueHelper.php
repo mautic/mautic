@@ -78,20 +78,11 @@ class ValueHelper
             return $value;
         }
 
-        switch ($this->normalizedValueDAO->getType()) {
-            case NormalizedValueDAO::EMAIL_TYPE:
-            case NormalizedValueDAO::DATE_TYPE:
-            case NormalizedValueDAO::DATETIME_TYPE:
-            case NormalizedValueDAO::BOOLEAN_TYPE:
-                // we can't assume anything with these so just return null and let the integration handle the error
-                return $this->normalizedValueDAO->getOriginalValue();
-            case NormalizedValueDAO::INT_TYPE:
-                return 0;
-            case NormalizedValueDAO::DOUBLE_TYPE:
-            case NormalizedValueDAO::FLOAT_TYPE:
-                return 1.0;
-            default:
-                throw new InvalidValueException("Required field can't be empty");
-        }
+        return match ($this->normalizedValueDAO->getType()) {
+            NormalizedValueDAO::EMAIL_TYPE, NormalizedValueDAO::DATE_TYPE, NormalizedValueDAO::DATETIME_TYPE, NormalizedValueDAO::BOOLEAN_TYPE => $this->normalizedValueDAO->getOriginalValue(),
+            NormalizedValueDAO::INT_TYPE => 0,
+            NormalizedValueDAO::DOUBLE_TYPE, NormalizedValueDAO::FLOAT_TYPE => 1.0,
+            default => throw new InvalidValueException("Required field can't be empty"),
+        };
     }
 }

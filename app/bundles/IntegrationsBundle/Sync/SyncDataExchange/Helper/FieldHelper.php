@@ -65,22 +65,14 @@ class FieldHelper
 
     public function getNormalizedFieldType(string $type): string
     {
-        switch ($type) {
-            case 'boolean':
-                return NormalizedValueDAO::BOOLEAN_TYPE;
-            case 'date':
-            case 'datetime':
-            case 'time':
-                return NormalizedValueDAO::DATETIME_TYPE;
-            case 'number':
-                return NormalizedValueDAO::FLOAT_TYPE;
-            case 'select':
-                return NormalizedValueDAO::SELECT_TYPE;
-            case 'multiselect':
-                return NormalizedValueDAO::MULTISELECT_TYPE;
-            default:
-                return NormalizedValueDAO::STRING_TYPE;
-        }
+        return match ($type) {
+            'boolean' => NormalizedValueDAO::BOOLEAN_TYPE,
+            'date', 'datetime', 'time' => NormalizedValueDAO::DATETIME_TYPE,
+            'number'      => NormalizedValueDAO::FLOAT_TYPE,
+            'select'      => NormalizedValueDAO::SELECT_TYPE,
+            'multiselect' => NormalizedValueDAO::MULTISELECT_TYPE,
+            default       => NormalizedValueDAO::STRING_TYPE,
+        };
     }
 
     /**

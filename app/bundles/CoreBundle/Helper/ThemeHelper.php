@@ -360,32 +360,18 @@ class ThemeHelper implements ThemeHelperInterface
         }
     }
 
-    public function getExtractError($archive): string
+    /**
+     * @param \ZipArchive::ER_* $archive
+     */
+    public function getExtractError(int $archive): string
     {
-        switch ($archive) {
-            case \ZipArchive::ER_EXISTS:
-                $error = 'mautic.core.update.archive_file_exists';
-                break;
-            case \ZipArchive::ER_INCONS:
-            case \ZipArchive::ER_INVAL:
-            case \ZipArchive::ER_MEMORY:
-                $error = 'mautic.core.update.archive_zip_corrupt';
-                break;
-            case \ZipArchive::ER_NOENT:
-                $error = 'mautic.core.update.archive_no_such_file';
-                break;
-            case \ZipArchive::ER_NOZIP:
-                $error = 'mautic.core.update.archive_not_valid_zip';
-                break;
-            case \ZipArchive::ER_READ:
-            case \ZipArchive::ER_SEEK:
-            case \ZipArchive::ER_OPEN:
-            default:
-                $error = 'mautic.core.update.archive_could_not_open';
-                break;
-        }
-
-        return $error;
+        return match ($archive) {
+            \ZipArchive::ER_EXISTS => 'mautic.core.update.archive_file_exists',
+            \ZipArchive::ER_INCONS, \ZipArchive::ER_INVAL, \ZipArchive::ER_MEMORY => 'mautic.core.update.archive_zip_corrupt',
+            \ZipArchive::ER_NOENT => 'mautic.core.update.archive_no_such_file',
+            \ZipArchive::ER_NOZIP => 'mautic.core.update.archive_not_valid_zip',
+            default               => 'mautic.core.update.archive_could_not_open',
+        };
     }
 
     public function zip($themeName)

@@ -70,32 +70,16 @@ class CompanyReportData
     {
         $columns = [];
         foreach ($fields as $f) {
-            switch ($f->getType()) {
-                case 'boolean':
-                    $type = 'bool';
-                    break;
-                case 'date':
-                    $type = 'date';
-                    break;
-                case 'datetime':
-                    $type = 'datetime';
-                    break;
-                case 'time':
-                    $type = 'time';
-                    break;
-                case 'url':
-                    $type = 'url';
-                    break;
-                case 'email':
-                    $type = 'email';
-                    break;
-                case 'number':
-                    $type = 'float';
-                    break;
-                default:
-                    $type = 'string';
-                    break;
-            }
+            $type = match ($f->getType()) {
+                'boolean'  => 'bool',
+                'date'     => 'date',
+                'datetime' => 'datetime',
+                'time'     => 'time',
+                'url'      => 'url',
+                'email'    => 'email',
+                'number'   => 'float',
+                default    => 'string',
+            };
             $columns[$prefix.$f->getAlias()] = [
                 'label' => $this->translator->trans('mautic.report.field.company.label', ['%field%' => $f->getLabel()]),
                 'type'  => $type,

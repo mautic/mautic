@@ -65,15 +65,10 @@ trait TimelineTrait
         if (isset($options['order'])) {
             list($orderBy, $orderByDir) = $options['order'];
 
-            switch ($orderBy) {
-                case 'eventLabel':
-                    $orderBy = $eventNameColumn;
-                    break;
-                case 'timestamp':
-                default:
-                    $orderBy = $timestampColumn;
-                    break;
-            }
+            $orderBy = match ($orderBy) {
+                'eventLabel' => $eventNameColumn,
+                default      => $timestampColumn,
+            };
 
             $query->orderBy($orderBy, $orderByDir);
         }

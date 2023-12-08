@@ -36,25 +36,13 @@ abstract class AbstractHelper implements StatHelperInterface
         $statCollection = $this->collector->fetchStats($this->getName(), $fromDateTime, $toDateTime, $options);
         $calculator     = $statCollection->getCalculator($fromDateTime, $toDateTime);
 
-        // Format into what is required for the graphs
-        switch ($this->getTimeUnitFromDateRange($fromDateTime, $toDateTime)) {
-            case 'Y': // year
-                $stats = $calculator->getSumsByYear();
-                break;
-            case 'm': // month
-                $stats = $calculator->getSumsByMonth();
-                break;
-            case 'W':
-                $stats = $calculator->getSumsByWeek();
-                break;
-            case 'd': // day
-                $stats = $calculator->getSumsByDay();
-                break;
-            case 'H': // hour
-            default:
-                $stats = $calculator->getCountsByHour();
-                break;
-        }
+        $stats = match ($this->getTimeUnitFromDateRange($fromDateTime, $toDateTime)) {
+            'Y'     => $calculator->getSumsByYear(),
+            'm'     => $calculator->getSumsByMonth(),
+            'W'     => $calculator->getSumsByWeek(),
+            'd'     => $calculator->getSumsByDay(),
+            default => $calculator->getCountsByHour(),
+        };
 
         // Chart.js only care about the values
         return array_values($stats->getStats());

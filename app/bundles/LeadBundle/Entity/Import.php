@@ -549,22 +549,14 @@ class Import extends FormEntity
      */
     public function getSatusLabelClass()
     {
-        switch ($this->status) {
-            case self::QUEUED:
-                return 'info';
-            case self::IN_PROGRESS:
-            case self::MANUAL:
-                return 'primary';
-            case self::IMPORTED:
-                return 'success';
-            case self::FAILED:
-                return 'danger';
-            case self::STOPPED:
-            case self::DELAYED:
-                return 'warning';
-            default:
-                return 'default';
-        }
+        return match ($this->status) {
+            self::QUEUED => 'info',
+            self::IN_PROGRESS, self::MANUAL => 'primary',
+            self::IMPORTED => 'success',
+            self::FAILED   => 'danger',
+            self::STOPPED, self::DELAYED => 'warning',
+            default => 'default',
+        };
     }
 
     /**
