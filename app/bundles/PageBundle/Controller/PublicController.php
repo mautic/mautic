@@ -190,11 +190,7 @@ class PublicController extends CommonFormController
                                     return ($a['weight_deficit'] > $b['weight_deficit']) ? -1 : 1;
                                 }
                             );
-
-                            // find the one with the most difference from weight
-
-                            reset($variants);
-                            $useId = key($variants);
+                            $useId = array_key_first($variants);
 
                             // set the cookie - 14 days
                             $cookieHelper->setCookie(

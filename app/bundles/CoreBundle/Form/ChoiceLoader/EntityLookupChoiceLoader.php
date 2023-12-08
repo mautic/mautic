@@ -249,9 +249,7 @@ class EntityLookupChoiceLoader implements ChoiceLoaderInterface
 
     protected function formatChoices(array &$choices)
     {
-        // Get the first key
-        reset($choices);
-        $firstKey = key($choices);
+        $firstKey = array_key_first($choices);
 
         if (is_array($choices[$firstKey])) {
             $validChoices = [];
