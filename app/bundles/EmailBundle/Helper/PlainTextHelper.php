@@ -200,19 +200,12 @@ class PlainTextHelper
     protected array $options;
 
     /**
-     * @param string $html    Source HTML
-     * @param array  $options Set configuration options
+     * @param array<string, mixed> $options Set configuration options
      */
-    public function __construct($html = '', $options = [])
+    public function __construct(array $options = [])
     {
-        if (is_array($html)) {
-            // Options were passed in without html
-            $options = $html;
-            $html    = '';
-        }
-
-        $this->html    = $html;
-        $this->options = array_merge($this->options, $options);
+        $this->html    = '';
+        $this->options = $options;
     }
 
     /**

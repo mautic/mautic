@@ -108,11 +108,9 @@ class AjaxController extends CommonAjaxController
     {
         $custom = $request->request->get('custom');
 
-        $parser = new PlainTextHelper(
-            [
-                'base_url' => $request->getSchemeAndHttpHost().$request->getBasePath(),
-            ]
-        );
+        $parser = new PlainTextHelper([
+            'base_url' => $request->getSchemeAndHttpHost().$request->getBasePath(),
+        ]);
 
         $dataArray = [
             'text' => $parser->setHtml($custom)->getText(),
