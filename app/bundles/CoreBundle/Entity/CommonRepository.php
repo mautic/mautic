@@ -645,11 +645,7 @@ class CommonRepository extends ServiceEntityRepository
 
         $result = $q->executeQuery()->fetchAssociative();
 
-        if (isset($result[$column])) {
-            return $result[$column];
-        }
-
-        return null;
+        return $result[$column] ?? null;
     }
 
     /**

@@ -110,11 +110,7 @@ class ObjectChangeDAO
      */
     public function getField($name)
     {
-        if (isset($this->fields[$name])) {
-            return $this->fields[$name];
-        }
-
-        return null;
+        return $this->fields[$name] ?? null;
     }
 
     /**

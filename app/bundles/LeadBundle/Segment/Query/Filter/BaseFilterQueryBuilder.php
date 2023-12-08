@@ -20,7 +20,7 @@ class BaseFilterQueryBuilder implements FilterQueryBuilderInterface
         return 'mautic.lead.query.builder.basic';
     }
 
-    public function applyQuery(QueryBuilder $queryBuilder, ContactSegmentFilter $filter)
+    public function applyQuery(QueryBuilder $queryBuilder, ContactSegmentFilter $filter): QueryBuilder
     {
         // Check if the column exists in the table
         $filter->getColumn();

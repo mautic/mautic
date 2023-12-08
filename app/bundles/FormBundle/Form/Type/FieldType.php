@@ -83,7 +83,7 @@ class FieldType extends AbstractType
 
             foreach ($addFields as $f) {
                 if (isset($customParams['builderOptions'][$f])) {
-                    $$f = (bool) $customParams['builderOptions'][$f];
+                    ${$f} = (bool) $customParams['builderOptions'][$f];
                 }
             }
         } else {

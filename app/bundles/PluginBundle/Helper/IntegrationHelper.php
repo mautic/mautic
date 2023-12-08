@@ -258,11 +258,7 @@ class IntegrationHelper
                 $aP = (int) $a->getPriority();
                 $bP = (int) $b->getPriority();
 
-                if ($aP === $bP) {
-                    return 0;
-                }
-
-                return ($aP < $bP) ? -1 : 1;
+                return $aP <=> $bP;
             });
         } else {
             // Sort by display name

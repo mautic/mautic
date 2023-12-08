@@ -86,11 +86,7 @@ class ChannelEvent extends CommonEvent
      */
     public function getNameColumn($channel)
     {
-        if (isset($this->channels[$channel][MessageModel::CHANNEL_FEATURE]['nameColumn'])) {
-            return $this->channels[$channel][MessageModel::CHANNEL_FEATURE]['nameColumn'];
-        }
-
-        return 'name';
+        return $this->channels[$channel][MessageModel::CHANNEL_FEATURE]['nameColumn'] ?? 'name';
     }
 
     /**

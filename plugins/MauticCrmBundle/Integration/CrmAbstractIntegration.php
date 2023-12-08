@@ -523,11 +523,7 @@ abstract class CrmAbstractIntegration extends AbstractIntegration
             return $fieldsToUpdate['leadFields'];
         }
 
-        if (isset($fieldsToUpdate['leadFields'][$objects])) {
-            return $fieldsToUpdate['leadFields'][$objects];
-        }
-
-        return $fieldsToUpdate;
+        return $fieldsToUpdate['leadFields'][$objects] ?? $fieldsToUpdate;
     }
 
     /**

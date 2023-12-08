@@ -164,10 +164,6 @@ class LeadImportFieldType extends AbstractType
      */
     public function getDefaultValue($fieldName, array $importFields)
     {
-        if (isset($importFields[$fieldName])) {
-            return $importFields[$fieldName];
-        }
-
-        return null;
+        return $importFields[$fieldName] ?? null;
     }
 }
