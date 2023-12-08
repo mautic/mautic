@@ -100,7 +100,7 @@ class DynamicContentModel extends FormModel implements AjaxLookupModelInterface
      *
      * @throws \InvalidArgumentException
      */
-    public function createForm($entity, FormFactoryInterface $formFactory, $action = null, $options = [])
+    public function createForm($entity, FormFactoryInterface $formFactory, $action = null, $options = []): \Symfony\Component\Form\FormInterface
     {
         if (!$entity instanceof DynamicContent) {
             throw new \InvalidArgumentException('Entity must be of class DynamicContent');
