@@ -15,7 +15,7 @@ use Symfony\Component\HttpFoundation\Request;
 
 class PageModelTest extends PageTestAbstract
 {
-    public function testUtf8CharsInTitleWithTransletirationEnabled()
+    public function testUtf8CharsInTitleWithTransletirationEnabled(): void
     {
         $providedTitle = '你好，世界';
         $expectedTitle = 'ni hao, shi jie';
@@ -34,7 +34,7 @@ class PageModelTest extends PageTestAbstract
         $this->assertSame(['page_title' => $expectedTitle], $hit->getQuery());
     }
 
-    public function testUtf8CharsInTitleWithTransletirationDisabled()
+    public function testUtf8CharsInTitleWithTransletirationDisabled(): void
     {
         $providedTitle = '你好，世界';
         $expectedTitle = '你好，世界';
@@ -53,7 +53,7 @@ class PageModelTest extends PageTestAbstract
         $this->assertSame(['page_title' => $expectedTitle], $hit->getQuery());
     }
 
-    public function testGenerateUrlWhenCalledReturnsValidUrl()
+    public function testGenerateUrlWhenCalledReturnsValidUrl(): void
     {
         $page = new Page();
         $page->setAlias('this-is-a-test');
@@ -95,7 +95,7 @@ class PageModelTest extends PageTestAbstract
         $this->assertSame($expectedTitle, $hit->getUrlTitle());
     }
 
-    public function testCleanQueryWhenCalledReturnsSafeAndValidData()
+    public function testCleanQueryWhenCalledReturnsSafeAndValidData(): void
     {
         $pageModel           = $this->getPageModel();
         $pageModelReflection = new \ReflectionClass(get_class($pageModel));
@@ -147,7 +147,7 @@ class PageModelTest extends PageTestAbstract
         }
     }
 
-    private function assertUtmQuery(array $query)
+    private function assertUtmQuery(array $query): void
     {
         $this->assertArrayHasKey('utm_source', $query, 'utm_source not found');
         $this->assertArrayHasKey('utm_medium', $query, 'utm_medium not found');

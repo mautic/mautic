@@ -54,7 +54,7 @@ final class MaxMindDoNotSellDownloadHelperTest extends \PHPUnit\Framework\TestCa
     /**
      * Test downloading data store without license.
      */
-    public function testDownloadRemoteDataStoreWhenNoLicense()
+    public function testDownloadRemoteDataStoreWhenNoLicense(): void
     {
         $maxMindDoNotSellDownloadHelper = new MaxMindDoNotSellDownloadHelper('id', $this->loggerMock, $this->httpClientMock, $this->coreParametersHelperMock);
         $this->loggerMock->expects($this->once())
@@ -67,7 +67,7 @@ final class MaxMindDoNotSellDownloadHelperTest extends \PHPUnit\Framework\TestCa
     /**
      * Test downloading data store when transport exception.
      */
-    public function testDownloadRemoteDataStoreWhenTransportException()
+    public function testDownloadRemoteDataStoreWhenTransportException(): void
     {
         $maxMindDoNotSellDownloadHelper = new MaxMindDoNotSellDownloadHelper('id:license', $this->loggerMock, $this->httpClientMock, $this->coreParametersHelperMock);
         $this->loggerMock->expects($this->once())
@@ -84,7 +84,7 @@ final class MaxMindDoNotSellDownloadHelperTest extends \PHPUnit\Framework\TestCa
     /**
      * Test downloading data store when status code 500.
      */
-    public function testDownloadRemoteDataStoreWhenStatusCode500()
+    public function testDownloadRemoteDataStoreWhenStatusCode500(): void
     {
         $maxMindDoNotSellDownloadHelper = new MaxMindDoNotSellDownloadHelper('id:license', $this->loggerMock, $this->httpClientMock, $this->coreParametersHelperMock);
         $this->loggerMock->expects($this->once())
@@ -105,7 +105,7 @@ final class MaxMindDoNotSellDownloadHelperTest extends \PHPUnit\Framework\TestCa
     /**
      * Test downloading data store when getContent error.
      */
-    public function testDownloadRemoteDataStoreWhenGetContentError()
+    public function testDownloadRemoteDataStoreWhenGetContentError(): void
     {
         $maxMindDoNotSellDownloadHelper = new MaxMindDoNotSellDownloadHelper('id:license', $this->loggerMock, $this->httpClientMock, $this->coreParametersHelperMock);
         $this->loggerMock->expects($this->once())
@@ -129,7 +129,7 @@ final class MaxMindDoNotSellDownloadHelperTest extends \PHPUnit\Framework\TestCa
     /**
      * Test downloading data store when OK.
      */
-    public function testDownloadRemoteDataStoreWhenOK()
+    public function testDownloadRemoteDataStoreWhenOK(): void
     {
         $maxMindDoNotSellDownloadHelper = new MaxMindDoNotSellDownloadHelper('id:license', $this->loggerMock, $this->httpClientMock, $this->coreParametersHelperMock);
         $responseMock                   = $this->createMock(ResponseInterface::class);

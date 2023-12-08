@@ -237,7 +237,7 @@ final class FilterTypeTest extends \PHPUnit\Framework\TestCase
                 ],
                 [
                     FormEvents::PRE_SUBMIT,
-                    function (callable $formModifier) {
+                    function (callable $formModifier): void {
                         // don't do anything for this test
                     },
                 ]

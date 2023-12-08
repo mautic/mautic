@@ -77,7 +77,7 @@ class ReplyTest extends \PHPUnit\Framework\TestCase
      * @covers  \Mautic\EmailBundle\MonitoredEmail\Search\Result::setContacts()
      * @covers  \Mautic\EmailBundle\MonitoredEmail\Search\Result::getContacts()
      */
-    public function testContactIsFoundFromMessageAndDncRecordAdded()
+    public function testContactIsFoundFromMessageAndDncRecordAdded(): void
     {
         // This tells us that a reply was found and processed
         $this->statRepo->expects($this->once())
@@ -120,7 +120,7 @@ BODY;
         $this->processor->process($message);
     }
 
-    public function testCreateReplyByHashIfStatNotFound()
+    public function testCreateReplyByHashIfStatNotFound(): void
     {
         $trackingHash = '@Stat#';
 
@@ -134,7 +134,7 @@ BODY;
         $this->processor->createReplyByHash($trackingHash, 'api-msg1d');
     }
 
-    public function testCreateReplyByHash()
+    public function testCreateReplyByHash(): void
     {
         $trackingHash = '@Stat#';
         $stat         = $this->createMock(Stat::class);

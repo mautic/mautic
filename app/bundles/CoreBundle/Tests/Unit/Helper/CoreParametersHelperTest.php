@@ -22,7 +22,7 @@ class CoreParametersHelperTest extends TestCase
         $this->container = $this->createMock(ContainerInterface::class);
     }
 
-    public function testAllReturnsResolvedParameters()
+    public function testAllReturnsResolvedParameters(): void
     {
         $this->container->method('hasParameter')
             ->willReturnCallback(

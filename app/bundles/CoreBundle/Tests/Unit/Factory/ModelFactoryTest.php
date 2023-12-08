@@ -26,7 +26,7 @@ class ModelFactoryTest extends TestCase
         $this->factory   = new ModelFactory($this->container);
     }
 
-    public function testModelKeyIsLowerCaseToMatchServiceKeys()
+    public function testModelKeyIsLowerCaseToMatchServiceKeys(): void
     {
         $pointTriggerModel = $this->createMock(TriggerModel::class);
         $modelName         = 'point.triggerEvent';

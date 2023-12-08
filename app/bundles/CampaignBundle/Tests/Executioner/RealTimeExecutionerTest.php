@@ -102,7 +102,7 @@ class RealTimeExecutionerTest extends \PHPUnit\Framework\TestCase
         $this->decisionHelper = new DecisionHelper($this->leadRepository);
     }
 
-    public function testContactNotFoundResultsInEmptyResponses()
+    public function testContactNotFoundResultsInEmptyResponses(): void
     {
         $this->contactTracker->expects($this->once())
             ->method('getContact')
@@ -116,7 +116,7 @@ class RealTimeExecutionerTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals(0, $responses->containsResponses());
     }
 
-    public function testNoRelatedEventsResultInEmptyResponses()
+    public function testNoRelatedEventsResultInEmptyResponses(): void
     {
         $lead = $this->getMockBuilder(Lead::class)
             ->getMock();
@@ -140,7 +140,7 @@ class RealTimeExecutionerTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals(0, $responses->containsResponses());
     }
 
-    public function testChannelMisMatchResultsInEmptyResponses()
+    public function testChannelMisMatchResultsInEmptyResponses(): void
     {
         $lead = $this->getMockBuilder(Lead::class)
             ->getMock();
@@ -172,7 +172,7 @@ class RealTimeExecutionerTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals(0, $responses->containsResponses());
     }
 
-    public function testChannelFuzzyMatchResultsInNonEmptyResponses()
+    public function testChannelFuzzyMatchResultsInNonEmptyResponses(): void
     {
         $lead = $this->getMockBuilder(Lead::class)
             ->getMock();
@@ -227,7 +227,7 @@ class RealTimeExecutionerTest extends \PHPUnit\Framework\TestCase
         $this->getExecutioner()->execute('something', null, 'page.redirect');
     }
 
-    public function testChannelIdMisMatchResultsInEmptyResponses()
+    public function testChannelIdMisMatchResultsInEmptyResponses(): void
     {
         $lead = $this->getMockBuilder(Lead::class)
             ->getMock();
@@ -262,7 +262,7 @@ class RealTimeExecutionerTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals(0, $responses->containsResponses());
     }
 
-    public function testEmptyPositiveactionsResultsInEmptyResponses()
+    public function testEmptyPositiveactionsResultsInEmptyResponses(): void
     {
         $lead = $this->getMockBuilder(Lead::class)
             ->getMock();
@@ -304,7 +304,7 @@ class RealTimeExecutionerTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals(0, $responses->containsResponses());
     }
 
-    public function testAssociatedEventsAreExecuted()
+    public function testAssociatedEventsAreExecuted(): void
     {
         $lead = $this->getMockBuilder(Lead::class)
             ->getMock();
@@ -371,7 +371,7 @@ class RealTimeExecutionerTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals(0, $responses->containsResponses());
     }
 
-    public function testNonDecisionEventsAreIgnored()
+    public function testNonDecisionEventsAreIgnored(): void
     {
         $lead = $this->getMockBuilder(Lead::class)
             ->getMock();

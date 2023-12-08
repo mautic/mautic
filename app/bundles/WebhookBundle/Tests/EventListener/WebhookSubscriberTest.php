@@ -23,7 +23,7 @@ class WebhookSubscriberTest extends \PHPUnit\Framework\TestCase
         $this->webhookKillNotificator = $this->createMock(WebhookKillNotificator::class);
     }
 
-    public function testGetSubscribedEvents()
+    public function testGetSubscribedEvents(): void
     {
         $this->assertSame(
             [
@@ -35,7 +35,7 @@ class WebhookSubscriberTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testOnWebhookKill()
+    public function testOnWebhookKill(): void
     {
         $webhookMock = $this->createMock(Webhook::class);
         $reason      = 'reason';

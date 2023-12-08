@@ -49,7 +49,7 @@ class MembershipManagerTest extends \PHPUnit\Framework\TestCase
         $this->logger          = new NullLogger();
     }
 
-    public function testMembershipCreatedIfNotFound()
+    public function testMembershipCreatedIfNotFound(): void
     {
         $contact  = new Lead();
         $campaign = new Campaign();
@@ -67,7 +67,7 @@ class MembershipManagerTest extends \PHPUnit\Framework\TestCase
         $this->getManager()->addContact($contact, $campaign);
     }
 
-    public function testMembershipUpdatedIfFound()
+    public function testMembershipUpdatedIfFound(): void
     {
         $contact        = new Lead();
         $campaign       = new Campaign();
@@ -88,7 +88,7 @@ class MembershipManagerTest extends \PHPUnit\Framework\TestCase
         $this->getManager()->addContact($contact, $campaign);
     }
 
-    public function testMembershipIsUpdatedWhenRemoved()
+    public function testMembershipIsUpdatedWhenRemoved(): void
     {
         $contact        = new Lead();
         $campaign       = new Campaign();
@@ -109,7 +109,7 @@ class MembershipManagerTest extends \PHPUnit\Framework\TestCase
         $this->getManager()->removeContact($contact, $campaign);
     }
 
-    public function testContactsAreAddedOrUpdated()
+    public function testContactsAreAddedOrUpdated(): void
     {
         $contact = $this->createMock(Lead::class);
         $contact->method('getId')
@@ -143,7 +143,7 @@ class MembershipManagerTest extends \PHPUnit\Framework\TestCase
         $this->getManager()->addContacts(new ArrayCollection([1 => $contact, 2 => $contact2]), $campaign);
     }
 
-    public function testContactsAreRemoved()
+    public function testContactsAreRemoved(): void
     {
         $contact = $this->createMock(Lead::class);
         $contact->method('getId')

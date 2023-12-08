@@ -210,7 +210,7 @@ class CampaignSubscriberTest extends \PHPUnit\Framework\TestCase
         $this->dispatcher->addListener(SmsEvents::ON_CAMPAIGN_TRIGGER_ACTION, [$this, 'sendMarketingMessageSms']);
     }
 
-    public function testCorrectChannelIsUsed()
+    public function testCorrectChannelIsUsed(): void
     {
         $event  = $this->getEvent();
         $config = new ActionAccessor(
@@ -255,7 +255,7 @@ class CampaignSubscriberTest extends \PHPUnit\Framework\TestCase
         $this->assertTrue(empty($successful->get(1)->getMetadata()));
     }
 
-    public function sendMarketingMessageEmail(PendingEvent $event)
+    public function sendMarketingMessageEmail(PendingEvent $event): void
     {
         $contacts = $event->getContacts();
         $logs     = $event->getPending();
@@ -279,7 +279,7 @@ class CampaignSubscriberTest extends \PHPUnit\Framework\TestCase
     /**
      * BC support for old campaign.
      */
-    public function sendMarketingMessageSms(CampaignExecutionEvent $event)
+    public function sendMarketingMessageSms(CampaignExecutionEvent $event): void
     {
         $lead = $event->getLead();
         if (1 === $lead->getId()) {

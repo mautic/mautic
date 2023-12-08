@@ -30,7 +30,7 @@ class CompanyDeduperTest extends \PHPUnit\Framework\TestCase
             ->getMock();
     }
 
-    public function testUniqueFieldNotFoundException()
+    public function testUniqueFieldNotFoundException(): void
     {
         $this->expectException(UniqueFieldNotFoundException::class);
         $this->fieldModel->method('getFieldList')->willReturn([]);

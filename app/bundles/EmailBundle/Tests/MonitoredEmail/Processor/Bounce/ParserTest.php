@@ -13,7 +13,7 @@ class ParserTest extends \PHPUnit\Framework\TestCase
      *
      * @covers  \Mautic\EmailBundle\MonitoredEmail\Processor\Bounce\Parser::parse()
      */
-    public function testBouncedEmailIsReturnedFromParsedDsnReport()
+    public function testBouncedEmailIsReturnedFromParsedDsnReport(): void
     {
         $message            = new Message();
         $message->dsnReport = <<<'DSN'
@@ -35,7 +35,7 @@ DSN;
      *
      * @covers  \Mautic\EmailBundle\MonitoredEmail\Processor\Bounce\Parser::parse()
      */
-    public function testBouncedEmailIsReturnedFromParsedBody()
+    public function testBouncedEmailIsReturnedFromParsedBody(): void
     {
         $message            = new Message();
         $message->textPlain = <<<'BODY'

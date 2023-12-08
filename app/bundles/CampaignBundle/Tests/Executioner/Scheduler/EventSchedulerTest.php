@@ -91,7 +91,7 @@ class EventSchedulerTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testShouldScheduleIgnoresSeconds()
+    public function testShouldScheduleIgnoresSeconds(): void
     {
         $this->assertFalse(
             $this->scheduler->shouldSchedule(
@@ -101,7 +101,7 @@ class EventSchedulerTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testShouldSchedule()
+    public function testShouldSchedule(): void
     {
         $this->assertTrue(
             $this->scheduler->shouldSchedule(
@@ -111,7 +111,7 @@ class EventSchedulerTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testShouldScheduleForInactive()
+    public function testShouldScheduleForInactive(): void
     {
         $date  = new \DateTime();
         $now   = clone $date;
@@ -135,7 +135,7 @@ class EventSchedulerTest extends \PHPUnit\Framework\TestCase
         $this->assertTrue($this->scheduler->shouldScheduleEvent($event, $date, $now));
     }
 
-    public function testGetExecutionDateForInactivity()
+    public function testGetExecutionDateForInactivity(): void
     {
         $date = new \DateTime();
         $now  = clone $date;
@@ -152,7 +152,7 @@ class EventSchedulerTest extends \PHPUnit\Framework\TestCase
         $this->assertSame($date, $resultDate);
     }
 
-    public function testEventDoesNotGetRescheduledForRelativeTimeWhenValidated()
+    public function testEventDoesNotGetRescheduledForRelativeTimeWhenValidated(): void
     {
         $campaign = $this->createMock(Campaign::class);
         $campaign->method('getId')
@@ -205,7 +205,7 @@ class EventSchedulerTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals('America/New_York', $executionDate->getTimezone()->getName());
     }
 
-    public function testEventIsRescheduledForRelativeTimeIfAppropriate()
+    public function testEventIsRescheduledForRelativeTimeIfAppropriate(): void
     {
         $campaign = $this->createMock(Campaign::class);
         $campaign->method('getId')
@@ -258,7 +258,7 @@ class EventSchedulerTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals('America/New_York', $executionDate->getTimezone()->getName());
     }
 
-    public function testEventDoesNotGetRescheduledForRelativeTimeWithDowWhenValidated()
+    public function testEventDoesNotGetRescheduledForRelativeTimeWithDowWhenValidated(): void
     {
         $campaign = $this->createMock(Campaign::class);
         $campaign->method('getId')

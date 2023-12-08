@@ -66,7 +66,7 @@ class InactiveExecutionerTest extends \PHPUnit\Framework\TestCase
             ->getMock();
     }
 
-    public function testNoContactsFoundResultsInNothingExecuted()
+    public function testNoContactsFoundResultsInNothingExecuted(): void
     {
         $campaign = $this->getMockBuilder(Campaign::class)
             ->getMock();
@@ -83,7 +83,7 @@ class InactiveExecutionerTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals(0, $counter->getEvaluated());
     }
 
-    public function testNoEventsFoundResultsInNothingExecuted()
+    public function testNoEventsFoundResultsInNothingExecuted(): void
     {
         $campaign = $this->getMockBuilder(Campaign::class)
             ->getMock();
@@ -101,7 +101,7 @@ class InactiveExecutionerTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals(0, $counter->getTotalEvaluated());
     }
 
-    public function testNextBatchOfContactsAreExecuted()
+    public function testNextBatchOfContactsAreExecuted(): void
     {
         $decision = new Event();
         $campaign = $this->getMockBuilder(Campaign::class)
@@ -136,7 +136,7 @@ class InactiveExecutionerTest extends \PHPUnit\Framework\TestCase
         $this->getExecutioner()->execute($campaign, $limiter, new BufferedOutput());
     }
 
-    public function testValidationExecutesNothingIfCampaignUnpublished()
+    public function testValidationExecutesNothingIfCampaignUnpublished(): void
     {
         $campaign = $this->getMockBuilder(Campaign::class)
             ->getMock();
@@ -161,7 +161,7 @@ class InactiveExecutionerTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals(0, $counter->getTotalEvaluated());
     }
 
-    public function testValidationEvaluatesFoundEvents()
+    public function testValidationEvaluatesFoundEvents(): void
     {
         $campaign = $this->getMockBuilder(Campaign::class)
             ->getMock();

@@ -7,7 +7,7 @@ use Mautic\LeadBundle\Model\CompanyModel;
 
 class IdentifyCompanyHelperTest extends \PHPUnit\Framework\TestCase
 {
-    public function testDomainExistsRealDomain()
+    public function testDomainExistsRealDomain(): void
     {
         $helper     = new IdentifyCompanyHelper();
         $reflection = new \ReflectionClass(IdentifyCompanyHelper::class);
@@ -19,7 +19,7 @@ class IdentifyCompanyHelperTest extends \PHPUnit\Framework\TestCase
         $this->assertGreaterThan(0, strlen($result));
     }
 
-    public function testDomainExistsWithFakeDomain()
+    public function testDomainExistsWithFakeDomain(): void
     {
         $helper     = new IdentifyCompanyHelper();
         $reflection = new \ReflectionClass(IdentifyCompanyHelper::class);
@@ -30,7 +30,7 @@ class IdentifyCompanyHelperTest extends \PHPUnit\Framework\TestCase
         $this->assertFalse($result);
     }
 
-    public function testFindCompanyByName()
+    public function testFindCompanyByName(): void
     {
         $company = [
             'company' => 'Mautic',
@@ -61,7 +61,7 @@ class IdentifyCompanyHelperTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expected, $resultCompany);
     }
 
-    public function testFindCompanyByNameWithValidEmail()
+    public function testFindCompanyByNameWithValidEmail(): void
     {
         $company = [
             'company'      => 'Mautic',
@@ -94,7 +94,7 @@ class IdentifyCompanyHelperTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expected, $resultCompany);
     }
 
-    public function testFindCompanyByNameWithValidEmailAndCustomWebsite()
+    public function testFindCompanyByNameWithValidEmailAndCustomWebsite(): void
     {
         $company = [
             'company'        => 'Mautic',

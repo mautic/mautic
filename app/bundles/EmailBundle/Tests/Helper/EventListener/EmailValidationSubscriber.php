@@ -15,7 +15,7 @@ class EmailValidationSubscriber implements EventSubscriberInterface
         ];
     }
 
-    public function onEmailValidation(EmailValidationEvent $event)
+    public function onEmailValidation(EmailValidationEvent $event): void
     {
         if ('bad@gmail.com' === $event->getAddress()) {
             $event->setInvalid('bad email');

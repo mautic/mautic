@@ -16,7 +16,7 @@ use Symfony\Component\HttpFoundation\Request;
 
 class AjaxControllerFunctionalTest extends MauticMysqlTestCase
 {
-    public function testCancelScheduledCampaignEventAction()
+    public function testCancelScheduledCampaignEventAction(): void
     {
         $contact  = $this->createContact();
         $campaign = $this->createCampaign();

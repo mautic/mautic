@@ -74,7 +74,7 @@ class CampaignHelperTest extends \PHPUnit\Framework\TestCase
             ->willReturn($this->ipCollection);
     }
 
-    public function testFireWebhookWithGet()
+    public function testFireWebhookWithGet(): void
     {
         $expectedUrl = 'https://mautic.org?test=tee&email=john%40doe.email&IP=127.0.0.1%2C127.0.0.2';
 
@@ -89,7 +89,7 @@ class CampaignHelperTest extends \PHPUnit\Framework\TestCase
         $this->campaignHelper->fireWebhook($this->provideSampleConfig(), $this->contact);
     }
 
-    public function testFireWebhookWithPost()
+    public function testFireWebhookWithPost(): void
     {
         $config      = $this->provideSampleConfig('post');
         $expectedUrl = 'https://mautic.org?test=tee&email=john%40doe.email&IP=127.0.0.1%2C127.0.0.2';
@@ -106,7 +106,7 @@ class CampaignHelperTest extends \PHPUnit\Framework\TestCase
         $this->campaignHelper->fireWebhook($config, $this->contact);
     }
 
-    public function testFireWebhookWithPostJson()
+    public function testFireWebhookWithPostJson(): void
     {
         $config      = $this->provideSampleConfig('post');
         $expectedUrl = 'https://mautic.org?test=tee&email=john%40doe.email&IP=127.0.0.1%2C127.0.0.2';
@@ -130,7 +130,7 @@ class CampaignHelperTest extends \PHPUnit\Framework\TestCase
         $this->campaignHelper->fireWebhook($config, $this->contact);
     }
 
-    public function testFireWebhookWhenReturningNotFound()
+    public function testFireWebhookWhenReturningNotFound(): void
     {
         $this->client->expects($this->once())
             ->method('get')

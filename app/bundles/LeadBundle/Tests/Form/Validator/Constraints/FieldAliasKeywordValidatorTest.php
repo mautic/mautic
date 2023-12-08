@@ -85,7 +85,7 @@ class FieldAliasKeywordValidatorTest extends \PHPUnit\Framework\TestCase
         $this->validator->initialize($this->executionContextMock);
     }
 
-    public function testAddValidationFailure()
+    public function testAddValidationFailure(): void
     {
         $originalField = [];
 
@@ -102,7 +102,7 @@ class FieldAliasKeywordValidatorTest extends \PHPUnit\Framework\TestCase
         $this->validator->validate($field, new FieldAliasKeyword());
     }
 
-    public function testAddValidationSuccess()
+    public function testAddValidationSuccess(): void
     {
         $originalField = [];
 
@@ -119,7 +119,7 @@ class FieldAliasKeywordValidatorTest extends \PHPUnit\Framework\TestCase
         $this->validator->validate($field, new FieldAliasKeyword());
     }
 
-    public function testEditValidationFailure()
+    public function testEditValidationFailure(): void
     {
         $originalField = [
             'alias' => 'old_alias',
@@ -138,7 +138,7 @@ class FieldAliasKeywordValidatorTest extends \PHPUnit\Framework\TestCase
         $this->validator->validate($field, new FieldAliasKeyword());
     }
 
-    public function testEditValidationSuccess()
+    public function testEditValidationSuccess(): void
     {
         $originalField = [
             'alias' => 'old_alias',
@@ -157,7 +157,7 @@ class FieldAliasKeywordValidatorTest extends \PHPUnit\Framework\TestCase
         $this->validator->validate($field, new FieldAliasKeyword());
     }
 
-    public function testEditWithoutChangesValidationSuccess()
+    public function testEditWithoutChangesValidationSuccess(): void
     {
         $originalField = [
             'alias' => 'date_added',

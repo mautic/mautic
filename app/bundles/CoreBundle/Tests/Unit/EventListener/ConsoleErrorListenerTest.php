@@ -42,7 +42,7 @@ class ConsoleErrorListenerTest extends \PHPUnit\Framework\TestCase
     /**
      * Should not throw an error when command is null.
      */
-    public function testConsoleErrorWithNullCommand()
+    public function testConsoleErrorWithNullCommand(): void
     {
         $event = new ConsoleErrorEvent(
             $this->input,

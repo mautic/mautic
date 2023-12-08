@@ -35,7 +35,7 @@ class VersionProviderTest extends \PHPUnit\Framework\TestCase
         $this->provider             = new VersionProvider($this->connection);
     }
 
-    public function testGetVersionForMySql()
+    public function testGetVersionForMySql(): void
     {
         $this->connection->expects($this->once())
             ->method('executeQuery')
@@ -53,7 +53,7 @@ class VersionProviderTest extends \PHPUnit\Framework\TestCase
         $this->assertTrue($this->provider->isMySql());
     }
 
-    public function testGetVersionForMariaDb()
+    public function testGetVersionForMariaDb(): void
     {
         $this->connection->expects($this->once())
             ->method('executeQuery')

@@ -6,7 +6,7 @@ use Mautic\CampaignBundle\Executioner\ScheduledExecutioner;
 
 class ExecuteEventCommandTest extends AbstractCampaignCommand
 {
-    public function testEventsAreExecutedForInactiveEventWithSingleContact()
+    public function testEventsAreExecutedForInactiveEventWithSingleContact(): void
     {
         putenv('CAMPAIGN_EXECUTIONER_SCHEDULER_ACKNOWLEDGE_SECONDS=1');
 

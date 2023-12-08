@@ -282,7 +282,7 @@ class ExportHelperTest extends TestCase
 
         $iteratorExportDataModelMock->method('rewind')
             ->willReturnCallback(
-                function () use ($iteratorData) {
+                function () use ($iteratorData): void {
                     $iteratorData->position = 0;
                 }
             );
@@ -303,7 +303,7 @@ class ExportHelperTest extends TestCase
 
         $iteratorExportDataModelMock->method('next')
             ->willReturnCallback(
-                function () use ($iteratorData) {
+                function () use ($iteratorData): void {
                     ++$iteratorData->position;
                 }
             );

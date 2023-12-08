@@ -29,7 +29,7 @@ class EntityMetadataTest extends TestCase
         $this->metadata = new BundleMetadata($metadataArray);
     }
 
-    public function testOrmAndSerializerConfigsFound()
+    public function testOrmAndSerializerConfigsFound(): void
     {
         $entityMetadata = new EntityMetadata($this->metadata);
         $entityMetadata->build();

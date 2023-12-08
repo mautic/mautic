@@ -31,7 +31,7 @@ class DBALMocker
         $this->testCase = $testCase;
     }
 
-    public function setQueryResponse($queryResponse)
+    public function setQueryResponse($queryResponse): void
     {
         $this->queryResponse = $queryResponse;
     }
@@ -50,7 +50,7 @@ class DBALMocker
         throw new \UnexpectedValueException(sprintf('The requested query part (%s) does not exist. It must be one of %s.', $part, implode(', ', array_keys($this->queryParts))));
     }
 
-    public function resetQueryParts()
+    public function resetQueryParts(): void
     {
         $this->queryParts = [
             'select'     => [],
@@ -60,17 +60,17 @@ class DBALMocker
         ];
     }
 
-    public function resetUpdated()
+    public function resetUpdated(): void
     {
         $this->connectionUpdated = [];
     }
 
-    public function resetInserted()
+    public function resetInserted(): void
     {
         $this->connectionInserted = [];
     }
 
-    public function reset()
+    public function reset(): void
     {
         $this->resetQueryParts();
         $this->resetUpdated();
@@ -137,13 +137,13 @@ class DBALMocker
 
             $mock->expects($this->testCase->any())
                 ->method('update')
-                ->willReturnCallback(function () {
+                ->willReturnCallback(function (): void {
                     $this->connectionUpdated[] = func_get_args();
                 });
 
             $mock->expects($this->testCase->any())
                 ->method('insert')
-                ->willReturnCallback(function () {
+                ->willReturnCallback(function (): void {
                     $this->connectionInserted[] = func_get_args();
                 });
 

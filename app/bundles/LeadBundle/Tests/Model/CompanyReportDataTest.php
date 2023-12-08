@@ -33,7 +33,7 @@ class CompanyReportDataTest extends \PHPUnit\Framework\TestCase
     /**
      * @covers \Mautic\LeadBundle\Model\CompanyReportData::getCompanyData
      */
-    public function testGetCompanyData()
+    public function testGetCompanyData(): void
     {
         $fieldModelMock = $this->getMockBuilder(FieldModel::class)
             ->disableOriginalConstructor()
@@ -93,7 +93,7 @@ class CompanyReportDataTest extends \PHPUnit\Framework\TestCase
     /**
      * @covers \Mautic\LeadBundle\Model\CompanyReportData::eventHasCompanyColumns
      */
-    public function testEventHasCompanyColumns()
+    public function testEventHasCompanyColumns(): void
     {
         $fieldModelMock = $this->getMockBuilder(FieldModel::class)
             ->disableOriginalConstructor()
@@ -127,7 +127,7 @@ class CompanyReportDataTest extends \PHPUnit\Framework\TestCase
     /**
      * @covers \Mautic\LeadBundle\Model\CompanyReportData::eventHasCompanyColumns
      */
-    public function testEventDoesNotHaveCompanyColumns()
+    public function testEventDoesNotHaveCompanyColumns(): void
     {
         $fieldModelMock = $this->getMockBuilder(FieldModel::class)
             ->disableOriginalConstructor()

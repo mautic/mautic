@@ -48,7 +48,7 @@ class FinalizeUpdateStepTest extends AbstractStepTest
         $this->step = new FinalizeUpdateStep($this->translator, $this->pathsHelper, $this->session, $this->appVersion);
     }
 
-    public function testFinalizationCleansUpFiles()
+    public function testFinalizationCleansUpFiles(): void
     {
         file_put_contents(__DIR__.'/resources/upgrade.php', '');
         file_put_contents(__DIR__.'/resources/lastUpdateCheck.txt', '');
@@ -87,7 +87,7 @@ class FinalizeUpdateStepTest extends AbstractStepTest
         $this->assertEquals($updateSuccessfulKey, trim($this->progressBar->getMessage()));
     }
 
-    public function testFinalizationWithPostUpgradeMessage()
+    public function testFinalizationWithPostUpgradeMessage(): void
     {
         file_put_contents(__DIR__.'/resources/upgrade.php', '');
         file_put_contents(__DIR__.'/resources/lastUpdateCheck.txt', '');
