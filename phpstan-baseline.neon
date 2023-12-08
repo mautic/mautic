@@ -1,4 +1,4 @@
-psparameters:
+parameters:
 	ignoreErrors:
 		-
 			message: """
