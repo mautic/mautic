@@ -16,7 +16,7 @@ class TrackingHelper
     }
 
     /**
-     * @return 'facebook_pixel'[]|'google_analytics'[]
+     * @return array<string, 'facebook_pixel'|'google_analytics'>
      */
     public function getEnabledServices(): array
     {

@@ -3,7 +3,11 @@
 namespace MauticPlugin\MauticCrmBundle\Api;
 
 use Mautic\PluginBundle\Exception\ApiErrorException;
+use MauticPlugin\MauticCrmBundle\Integration\SugarcrmIntegration;
 
+/**
+ * @property-read SugarcrmIntegration $integration
+ */
 class SugarcrmApi extends CrmApi
 {
     protected $object = 'Leads';

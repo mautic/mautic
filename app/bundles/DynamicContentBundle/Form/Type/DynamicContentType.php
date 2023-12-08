@@ -36,13 +36,36 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 class DynamicContentType extends AbstractType
 {
     private $fieldChoices;
+
+    /**
+     * @var mixed[]
+     */
     private array $countryChoices;
+
+    /**
+     * @var mixed[]
+     */
     private array $regionChoices;
+
     private $timezoneChoices;
+
+    /**
+     * @var mixed[]
+     */
     private array $localeChoices;
+
+    /**
+     * @var mixed[]
+     */
     private array $deviceTypesChoices;
+
     private $deviceBrandsChoices;
+
+    /**
+     * @var mixed[]
+     */
     private array $deviceOsChoices;
+
     private $tagChoices = [];
 
     /**
