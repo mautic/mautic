@@ -11,7 +11,6 @@ use Symfony\Contracts\EventDispatcher\Event;
 class ImportValidateEvent extends Event
 {
     private bool $skipIfExists;
-    private FormInterface $form;
     private ?int $ownerId = null;
     private ?int $list    = null;
 
