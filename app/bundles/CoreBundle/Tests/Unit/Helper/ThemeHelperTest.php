@@ -9,7 +9,6 @@ use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\Filesystem;
 use Mautic\CoreBundle\Helper\PathsHelper;
 use Mautic\CoreBundle\Helper\ThemeHelper;
-use Mautic\CoreBundle\Helper\ThemeHelperInterface;
 use Mautic\IntegrationsBundle\Exception\IntegrationNotFoundException;
 use Mautic\IntegrationsBundle\Helper\BuilderIntegrationsHelper;
 use Mautic\IntegrationsBundle\Integration\Interfaces\BuilderInterface;
@@ -55,9 +54,6 @@ class ThemeHelperTest extends TestCase
      */
     private \PHPUnit\Framework\MockObject\MockObject $builderIntegrationsHelper;
 
-    /**
-     * @var ThemeHelperInterface
-     */
     private \Mautic\CoreBundle\Helper\ThemeHelper $themeHelper;
 
     protected function setUp(): void

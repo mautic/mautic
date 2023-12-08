@@ -11,9 +11,6 @@ class ChannelBroadcastEventTest extends TestCase
 {
     private string $channel;
 
-    /**
-     * @var int|string
-     */
     private int $channelId;
     private OutputInterface $output;
 

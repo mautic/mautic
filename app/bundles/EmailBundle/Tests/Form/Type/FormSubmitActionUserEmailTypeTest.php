@@ -5,9 +5,7 @@ declare(strict_types=1);
 namespace Mautic\EmailBundle\Tests\Form\Type;
 
 use Doctrine\ORM\EntityManager;
-use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\EmailBundle\Form\Type\EmailSendType;
-use Mautic\EmailBundle\Form\Type\EmailType;
 use Mautic\EmailBundle\Form\Type\FormSubmitActionUserEmailType;
 use Mautic\StageBundle\Model\StageModel;
 use Mautic\UserBundle\Form\Type\UserListType;
@@ -38,22 +36,13 @@ class FormSubmitActionUserEmailTypeTest extends \PHPUnit\Framework\TestCase
      */
     private \PHPUnit\Framework\MockObject\MockObject $formBuilder;
 
-    /**
-     * @var EmailType
-     */
     private \Mautic\EmailBundle\Form\Type\FormSubmitActionUserEmailType $form;
-
-    /**
-     * @var CoreParametersHelper|MockObject
-     */
-    private \PHPUnit\Framework\MockObject\MockObject $coreParametersHelper;
 
     protected function setUp(): void
     {
         parent::setUp();
 
         $this->formBuilder          = $this->createMock(FormBuilderInterface::class);
-        $this->coreParametersHelper = $this->createMock(CoreParametersHelper::class);
         $this->form                 = new FormSubmitActionUserEmailType();
         $this->formBuilder->method('create')->willReturnSelf();
     }

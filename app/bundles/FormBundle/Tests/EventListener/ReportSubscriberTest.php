@@ -46,9 +46,6 @@ class ReportSubscriberTest extends AbstractMauticTestCase
      */
     private \PHPUnit\Framework\MockObject\MockObject $formRepository;
 
-    /**
-     * @var ReportHelper|MockObject
-     */
     private \Mautic\ReportBundle\Helper\ReportHelper $reportHelper;
 
     /**

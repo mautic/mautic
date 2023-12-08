@@ -34,9 +34,6 @@ class MigrationCommandSubscriberTest extends \PHPUnit\Framework\TestCase
      */
     private \PHPUnit\Framework\MockObject\MockObject $connection;
 
-    /**
-     * @var MockObject|ConsoleCommandEvent
-     */
     private \Symfony\Component\Console\Event\ConsoleCommandEvent $event;
 
     /**

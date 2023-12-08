@@ -90,9 +90,6 @@ class ReportSubscriberTest extends \PHPUnit\Framework\TestCase
      */
     private \Mautic\ChannelBundle\Helper\ChannelListHelper $channelListHelperMock;
 
-    /**
-     * @var MockObject|ReportHelper
-     */
     private \Mautic\ReportBundle\Helper\ReportHelper $reportHelperMock;
 
     /**

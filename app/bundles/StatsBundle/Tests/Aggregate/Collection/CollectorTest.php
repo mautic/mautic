@@ -7,13 +7,9 @@ use Mautic\StatsBundle\Event\AggregateStatRequestEvent;
 use Mautic\StatsBundle\StatEvents;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\EventDispatcher\EventDispatcher;
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class CollectorTest extends TestCase
 {
-    /**
-     * @var EventDispatcherInterface|\PHPUnit_Framework_MockObject_MockObject
-     */
     private \Symfony\Component\EventDispatcher\EventDispatcher $eventDispatcher;
 
     protected function setUp(): void

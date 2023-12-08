@@ -104,9 +104,6 @@ class SubmissionModelTest extends \PHPUnit\Framework\TestCase
      */
     private \PHPUnit\Framework\MockObject\MockObject $translator;
 
-    /**
-     * @var MockObject|DateHelper
-     */
     private \Mautic\CoreBundle\Twig\Helper\DateHelper $dateHelper;
 
     /**
