@@ -548,7 +548,7 @@ class Form extends FormEntity
     {
         return array_filter(
             array_map(
-                fn(Field $field): array => [
+                fn (Field $field): array => [
                     'formFieldId'  => $field->getId(),
                     'mappedObject' => $field->getMappedObject(),
                     'mappedField'  => $field->getMappedField(),
@@ -571,7 +571,7 @@ class Form extends FormEntity
             array_filter(
                 array_unique(
                     $this->getFields()->map(
-                        fn(Field $field) => $field->getMappedObject()
+                        fn (Field $field) => $field->getMappedObject()
                     )->toArray()
                 )
             )

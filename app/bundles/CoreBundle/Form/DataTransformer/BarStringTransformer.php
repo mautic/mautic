@@ -33,7 +33,7 @@ class BarStringTransformer implements DataTransformerInterface
         }
 
         return array_map(
-            fn(string $element): string => trim($element),
+            fn (string $element): string => trim($element),
             explode('|', $string)
         );
     }

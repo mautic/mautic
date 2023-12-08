@@ -412,13 +412,13 @@ class InputHelper
             // Slecial handling for XML tags used in Outlook optimized emails <o:*/> and <w:/>
             $value = preg_replace_callback(
                 "/<\/*[o|w|v]:[^>]*>/is",
-                fn($matches): string => '<mencoded>'.htmlspecialchars($matches[0]).'</mencoded>',
+                fn ($matches): string => '<mencoded>'.htmlspecialchars($matches[0]).'</mencoded>',
                 $value, -1, $needsDecoding);
 
             // Slecial handling for script tags
             $value = preg_replace_callback(
                 "/<script>(.*?)<\/script>/is",
-                fn($matches): string => '<mscript>'.base64_encode($matches[0]).'</mscript>',
+                fn ($matches): string => '<mscript>'.base64_encode($matches[0]).'</mscript>',
                 $value, -1, $needsScriptDecoding);
 
             // Special handling for HTML comments
@@ -454,14 +454,14 @@ class InputHelper
             if ($needsDecoding) {
                 $value = preg_replace_callback(
                     "/<mencoded>(.*?)<\/mencoded>/is",
-                    fn($matches): string => htmlspecialchars_decode($matches[1]),
+                    fn ($matches): string => htmlspecialchars_decode($matches[1]),
                     $value);
             }
 
             if ($needsScriptDecoding) {
                 $value = preg_replace_callback(
                     "/<mscript>(.*?)<\/mscript>/is",
-                    fn($matches): string => base64_decode($matches[1]),
+                    fn ($matches): string => base64_decode($matches[1]),
                     $value);
             }
         }
@@ -520,14 +520,14 @@ class InputHelper
             return $html;
         }
         // Remove extra white-space(s) between HTML attribute(s)
-        $html = preg_replace_callback('#<([^\/\s<>!]+)(?:\s+([^<>]*?)\s*|\s*)(\/?)>#s', fn($matches): string => '<'.$matches[1].preg_replace(
+        $html = preg_replace_callback('#<([^\/\s<>!]+)(?:\s+([^<>]*?)\s*|\s*)(\/?)>#s', fn ($matches): string => '<'.$matches[1].preg_replace(
             '#([^\s=]+)(\=([\'"]?)(.*?)\3)?(\s+|$)#s',
             ' $1$2',
             $matches[2]
         ).$matches[3].'>', str_replace("\r", '', $html));
         // Minify inline CSS declaration(s)
         if (str_contains($html, ' style=')) {
-            $html = preg_replace_callback('#<([^<]+?)\s+style=([\'"])(.*?)\2(?=[\/\s>])#s', fn($matches): string => '<'.$matches[1].' style='.$matches[2].self::minifyCss($matches[3]).$matches[2], $html);
+            $html = preg_replace_callback('#<([^<]+?)\s+style=([\'"])(.*?)\2(?=[\/\s>])#s', fn ($matches): string => '<'.$matches[1].' style='.$matches[2].self::minifyCss($matches[3]).$matches[2], $html);
         }
 
         $html = preg_replace(

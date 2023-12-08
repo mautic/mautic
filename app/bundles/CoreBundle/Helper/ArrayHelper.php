@@ -43,7 +43,7 @@ class ArrayHelper
      */
     public static function select(array $keys, array $origin): array
     {
-        return array_filter($origin, fn($value, $key): bool => in_array($key, $keys, true), ARRAY_FILTER_USE_BOTH);
+        return array_filter($origin, fn ($value, $key): bool => in_array($key, $keys, true), ARRAY_FILTER_USE_BOTH);
     }
 
     /**
@@ -75,7 +75,7 @@ class ArrayHelper
     {
         return array_filter(
             $array,
-            fn($value): bool => !is_null($value) && '' !== $value
+            fn ($value): bool => !is_null($value) && '' !== $value
         );
     }
 

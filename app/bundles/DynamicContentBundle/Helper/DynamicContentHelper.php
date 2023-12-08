@@ -211,7 +211,7 @@ class DynamicContentHelper
             $lead->getProfileFields(),
             [
                 'tags' => array_map(
-                    fn(Tag $v) => $v->getId(),
+                    fn (Tag $v) => $v->getId(),
                     $lead->getTags()->toArray()
                 ),
             ]

@@ -106,7 +106,7 @@ class EntityLookupChoiceLoader implements ChoiceLoaderInterface
 
             if ($data) {
                 $data = array_map(
-                    fn($v): int => (int) $v,
+                    fn ($v): int => (int) $v,
                     (array) $data
                 );
             }
@@ -177,7 +177,7 @@ class EntityLookupChoiceLoader implements ChoiceLoaderInterface
             $counts     = array_count_values($prepped);
             $duplicates = array_filter(
                 $prepped,
-                fn($value): bool => $counts[$value] > 1
+                fn ($value): bool => $counts[$value] > 1
             );
 
             if (count($duplicates)) {

@@ -21,7 +21,7 @@ class EscapeTransformer implements DataTransformerInterface
     public function transform($value)
     {
         if (is_array($value)) {
-            return array_map(fn($value) => $this->unescape($value), $value);
+            return array_map(fn ($value) => $this->unescape($value), $value);
         }
 
         return $this->unescape($value);
@@ -30,7 +30,7 @@ class EscapeTransformer implements DataTransformerInterface
     public function reverseTransform($value)
     {
         if (is_array($value)) {
-            return array_map(fn($value) => $this->escape($value), $value);
+            return array_map(fn ($value) => $this->escape($value), $value);
         }
 
         return $this->escape($value);
@@ -72,8 +72,8 @@ class EscapeTransformer implements DataTransformerInterface
             return $escaped;
         }
 
-        $search  = array_map(fn(string $value): string => "%%{$value}%%", $this->allowedParameters);
-        $replace = array_map(fn(string $value): string => "%{$value}%", $this->allowedParameters);
+        $search  = array_map(fn (string $value): string => "%%{$value}%%", $this->allowedParameters);
+        $replace = array_map(fn (string $value): string => "%{$value}%", $this->allowedParameters);
 
         return str_ireplace($search, $replace, $escaped);
     }

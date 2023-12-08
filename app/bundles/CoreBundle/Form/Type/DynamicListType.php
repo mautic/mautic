@@ -52,14 +52,14 @@ class DynamicListType extends AbstractType
                     'required' => false,
                     'attr'     => [
                         'class'         => 'form-control',
-                        'preaddon'      => fn(Options $options) => $options['remove_icon'],
-                        'preaddon_attr' => fn(Options $options): array => [
+                        'preaddon'      => fn (Options $options) => $options['remove_icon'],
+                        'preaddon_attr' => fn (Options $options): array => [
                             'onclick' => $options['remove_onclick'],
                         ],
-                        'postaddon'     => fn(Options $options) => $options['sortable'],
+                        'postaddon'     => fn (Options $options) => $options['sortable'],
                     ],
 
-                    'constraints'    => fn(Options $options): array => ($options['option_notblank']) ? [
+                    'constraints'    => fn (Options $options): array => ($options['option_notblank']) ? [
                         new NotBlank(
                             ['message' => 'mautic.form.lists.notblank']
                         ),
@@ -69,7 +69,7 @@ class DynamicListType extends AbstractType
                 'allow_add'       => true,
                 'allow_delete'    => true,
                 'prototype'       => true,
-                'constraints'     => fn(Options $options): array => ($options['option_required']) ? [
+                'constraints'     => fn (Options $options): array => ($options['option_required']) ? [
                     new Count(
                         [
                             'minMessage' => 'mautic.form.lists.count',

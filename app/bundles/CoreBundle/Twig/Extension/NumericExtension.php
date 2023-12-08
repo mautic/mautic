@@ -20,8 +20,8 @@ class NumericExtension extends AbstractExtension
     public function getFilters()
     {
         return [
-            new TwigFilter('int', fn($value): int => (int) $value),
-            new TwigFilter('array', fn($value) => (array) $value),
+            new TwigFilter('int', fn ($value): int => (int) $value),
+            new TwigFilter('array', fn ($value) => (array) $value),
         ];
     }
 }

@@ -23,7 +23,7 @@ class CircularDependencyValidator extends ConstraintValidator
      */
     public function validate($filters, Constraint $constraint): void
     {
-        $dependentSegmentIds = $this->flatten(array_map(fn($id) => $this->reduceToSegmentIds($this->model->getEntity($id)->getFilters()), $this->reduceToSegmentIds($filters)));
+        $dependentSegmentIds = $this->flatten(array_map(fn ($id) => $this->reduceToSegmentIds($this->model->getEntity($id)->getFilters()), $this->reduceToSegmentIds($filters)));
 
         try {
             $segmentId = $this->getSegmentIdFromRequest();
@@ -55,7 +55,7 @@ class CircularDependencyValidator extends ConstraintValidator
      */
     private function reduceToSegmentIds(array $filters)
     {
-        $segmentFilters = array_filter($filters, fn(array $filter): bool => 'leadlist' === $filter['type']
+        $segmentFilters = array_filter($filters, fn (array $filter): bool => 'leadlist' === $filter['type']
             && in_array($filter['operator'], [OperatorOptions::IN, OperatorOptions::NOT_IN]));
 
         $segentIdsInFilter = array_map(function (array $filter) {

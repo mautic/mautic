@@ -227,7 +227,7 @@ trait LeadDetailsTrait
         $logCount = $repo->getAuditLogsCount($lead, $filters);
         $logs     = $repo->getAuditLogs($lead, $filters, $orderBy, $page, $limit);
 
-        $logEvents = array_map(fn($l): array => [
+        $logEvents = array_map(fn ($l): array => [
             'eventType'       => $l['action'],
             'eventLabel'      => $l['userName'],
             'timestamp'       => $l['dateAdded'],
@@ -344,8 +344,8 @@ trait LeadDetailsTrait
             }
             $engagementsData = $this->getStatsCount($lead);
 
-            $engagements = array_map(fn($a, $b) => $a + $b, $engagementsData['engagements']['byUnit'], $engagements);
-            $points = array_map(fn($points_first_user, $points_second_user) => $points_first_user + $points_second_user, $engagementsData['points'], $points);
+            $engagements = array_map(fn ($a, $b) => $a + $b, $engagementsData['engagements']['byUnit'], $engagements);
+            $points      = array_map(fn ($points_first_user, $points_second_user) => $points_first_user + $points_second_user, $engagementsData['points'], $points);
         }
 
         return [

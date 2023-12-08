@@ -20,7 +20,7 @@ class MobileNotificationListType extends AbstractType
                 'modal_header'        => 'mautic.notification.mobile.header.new',
                 'model'               => 'notification',
                 'model_lookup_method' => 'getLookupResults',
-                'lookup_arguments'    => fn(Options $options): array => [
+                'lookup_arguments'    => fn (Options $options): array => [
                     'type'    => 'mobile_notification',
                     'filter'  => '$data',
                     'limit'   => 0,

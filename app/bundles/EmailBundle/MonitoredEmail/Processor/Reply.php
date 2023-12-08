@@ -101,7 +101,7 @@ class Reply implements ProcessorInterface
     protected function createReply(Stat $stat, $messageId)
     {
         $replies = $stat->getReplies()->filter(
-            fn(EmailReply $reply): bool => $reply->getMessageId() === $messageId
+            fn (EmailReply $reply): bool => $reply->getMessageId() === $messageId
         );
 
         if (!$replies->count()) {

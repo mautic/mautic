@@ -1672,7 +1672,7 @@ class LeadModel extends FormModel
 
         // Remove companies that are not in the array of given companies
         $removeCompanies = $currentCompanies->reject(
-            fn(array $company) =>
+            fn (array $company) =>
                 // Reject if the found company is still in the list of companies given
                 $requestedCompanies->contains($company['company_id'])
         );

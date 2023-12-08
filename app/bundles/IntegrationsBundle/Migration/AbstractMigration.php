@@ -97,7 +97,7 @@ abstract class AbstractMigration implements MigrationInterface
         $hash        = implode(
             '',
             array_map(
-                fn($column): string => dechex(crc32($column)),
+                fn ($column): string => dechex(crc32($column)),
                 $columnNames
             )
         );

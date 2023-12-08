@@ -31,7 +31,7 @@ class YesNoButtonGroupType extends AbstractType
     {
         $resolver->setDefaults(
             [
-                'choices'           => fn(Options $options): array => [
+                'choices'           => fn (Options $options): array => [
                     $options['no_label']  => $options['no_value'],
                     $options['yes_label'] => $options['yes_value'],
                 ],

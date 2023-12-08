@@ -33,7 +33,7 @@ class EmailListType extends AbstractType
                     return 'email:getLookupChoiceList&'.http_build_query($query);
                 },
                 'model_lookup_method' => 'getLookupResults',
-                'lookup_arguments'    => fn(Options $options): array => [
+                'lookup_arguments'    => fn (Options $options): array => [
                     'type'    => 'email',
                     'filter'  => '$data',
                     'limit'   => 0,

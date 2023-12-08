@@ -110,7 +110,7 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
             return $results;
         }
 
-        return array_combine(array_map(fn(Lead $lead) => $lead->getFieldValue($field), $results), $results);
+        return array_combine(array_map(fn (Lead $lead) => $lead->getFieldValue($field), $results), $results);
     }
 
     /**
@@ -197,7 +197,7 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
             ->getArrayResult();
 
         return array_map(
-            fn($row): int => (int) $row['id'],
+            fn ($row): int => (int) $row['id'],
             $result
         );
     }

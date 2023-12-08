@@ -47,7 +47,7 @@ class WebhookBuilderEvent extends Event
         static $sorted = false;
 
         if (empty($sorted)) {
-            uasort($this->events, fn($a, $b): int => strnatcasecmp(
+            uasort($this->events, fn ($a, $b): int => strnatcasecmp(
                 $a['label'], $b['label']));
             $sorted = true;
         }

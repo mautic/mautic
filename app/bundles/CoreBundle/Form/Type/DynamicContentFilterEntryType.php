@@ -127,7 +127,7 @@ class DynamicContentFilterEntryType extends AbstractType
     {
         $this->fieldChoices['lead'] = array_filter(
             $this->fieldChoices['lead'],
-            fn($key): bool => !in_array(
+            fn ($key): bool => !in_array(
                 $key,
                 [
                     'company',

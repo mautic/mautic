@@ -69,7 +69,7 @@ class AjaxController extends CommonAjaxController
         return $this->sendJsonResponse(
             [
                 'fields' => array_map(
-                    fn(FieldCrate $field): array => [
+                    fn (FieldCrate $field): array => [
                         'label'      => $field->getName(),
                         'value'      => $field->getKey(),
                         'isListType' => $field->isListType(),

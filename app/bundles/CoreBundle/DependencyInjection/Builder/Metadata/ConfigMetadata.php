@@ -72,7 +72,7 @@ class ConfigMetadata
 
                 $serviceGroup = new \Tightenco\Collect\Support\Collection($serviceGroup);
                 $filtered     = $serviceGroup->reject(
-                    fn($serviceDefinition): bool =>
+                    fn ($serviceDefinition): bool =>
                         // Remove optional services (has argument optional = true) if the service class does not exist
                         is_array($serviceDefinition)
                         && isset($serviceDefinition['optional'])
@@ -82,7 +82,7 @@ class ConfigMetadata
                 );
 
                 $filtered->transform(
-                    fn($serviceDefinition) => $this->encodeParameters($serviceDefinition)
+                    fn ($serviceDefinition) => $this->encodeParameters($serviceDefinition)
                 );
 
                 return $filtered->toArray();
@@ -95,7 +95,7 @@ class ConfigMetadata
     private function prepareParameters(Collection $parameters): array
     {
         $parameters->transform(
-            fn($parameterValue) => $this->encodeParameters($parameterValue)
+            fn ($parameterValue) => $this->encodeParameters($parameterValue)
         );
 
         return $parameters->toArray();
