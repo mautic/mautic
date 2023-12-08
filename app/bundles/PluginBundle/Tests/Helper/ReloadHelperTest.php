@@ -15,32 +15,20 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class ReloadHelperTest extends \PHPUnit\Framework\TestCase
 {
-    private $factoryMock;
+    private \PHPUnit\Framework\MockObject\MockObject $factoryMock;
 
-    /**
-     * @var ReloadHelper
-     */
-    private $helper;
+    private \Mautic\PluginBundle\Helper\ReloadHelper $helper;
 
-    /**
-     * @var array
-     */
-    private $sampleAllPlugins = [];
+    private array $sampleAllPlugins = [];
 
-    /**
-     * @var array
-     */
-    private $sampleMetaData = [];
+    private array $sampleMetaData = [];
 
-    /**
-     * @var array
-     */
-    private $sampleSchemas = [];
+    private array $sampleSchemas = [];
 
     /**
      * @var MockObject&EventDispatcherInterface
      */
-    private $eventDispatcher;
+    private \PHPUnit\Framework\MockObject\MockObject $eventDispatcher;
 
     protected function setUp(): void
     {
@@ -69,7 +57,7 @@ class ReloadHelperTest extends \PHPUnit\Framework\TestCase
                 'bundle'            => 'MauticZapierBundle',
                 'namespace'         => 'MauticPlugin\MauticZapierBundle',
                 'symfonyBundleName' => 'MauticZapierBundle',
-                'bundleClass'       => 'Mautic\PluginBundle\Tests\Helper\PluginBundleBaseStub',
+                'bundleClass'       => \Mautic\PluginBundle\Tests\Helper\PluginBundleBaseStub::class,
                 'permissionClasses' => [],
                 'relative'          => 'plugins/MauticZapierBundle',
                 'directory'         => '/Users/jan/dev/mautic/plugins/MauticZapierBundle',
@@ -83,7 +71,7 @@ class ReloadHelperTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    public function testDisableMissingPlugins()
+    public function testDisableMissingPlugins(): void
     {
         $sampleInstalledPlugins = [
             'MauticZapierBundle'  => $this->createSampleZapierPlugin(),
@@ -97,7 +85,7 @@ class ReloadHelperTest extends \PHPUnit\Framework\TestCase
         $this->assertTrue($disabledPlugins['MauticHappierBundle']->isMissing());
     }
 
-    public function testEnableFoundPlugins()
+    public function testEnableFoundPlugins(): void
     {
         $zapierPlugin = $this->createSampleZapierPlugin();
         $zapierPlugin->setIsMissing(true);
@@ -112,7 +100,7 @@ class ReloadHelperTest extends \PHPUnit\Framework\TestCase
         $this->assertFalse($enabledPlugins['MauticZapierBundle']->isMissing());
     }
 
-    public function testUpdatePlugins()
+    public function testUpdatePlugins(): void
     {
         $this->sampleAllPlugins['MauticZapierBundle']['config']['version']     = '1.0.1';
         $this->sampleAllPlugins['MauticZapierBundle']['config']['description'] = 'Updated description';
@@ -133,7 +121,7 @@ class ReloadHelperTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals('Updated description', $updatedPlugins['MauticZapierBundle']->getDescription());
     }
 
-    public function testInstallPlugins()
+    public function testInstallPlugins(): void
     {
         $sampleInstalledPlugins = [
             'MauticHappierBundle' => $this->createSampleHappierPlugin(),
@@ -152,7 +140,7 @@ class ReloadHelperTest extends \PHPUnit\Framework\TestCase
         $this->assertFalse($installedPlugins['MauticZapierBundle']->isMissing());
     }
 
-    private function createSampleZapierPlugin()
+    private function createSampleZapierPlugin(): Plugin
     {
         $plugin = new Plugin();
         $plugin->setName('Zapier Integration');
@@ -165,7 +153,7 @@ class ReloadHelperTest extends \PHPUnit\Framework\TestCase
         return $plugin;
     }
 
-    private function createSampleHappierPlugin()
+    private function createSampleHappierPlugin(): Plugin
     {
         $plugin = new Plugin();
         $plugin->setName('Happier Integration');

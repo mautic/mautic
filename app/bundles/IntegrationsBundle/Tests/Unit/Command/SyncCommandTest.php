@@ -23,12 +23,9 @@ class SyncCommandTest extends TestCase
     /**
      * @var SyncServiceInterface|\PHPUnit\Framework\MockObject\MockObject
      */
-    private $syncService;
+    private \PHPUnit\Framework\MockObject\MockObject $syncService;
 
-    /**
-     * @var CommandTester
-     */
-    private $commandTester;
+    private \Symfony\Component\Console\Tester\CommandTester $commandTester;
 
     public function setUp(): void
     {
@@ -69,7 +66,7 @@ class SyncCommandTest extends TestCase
     {
         $this->syncService->expects($this->once())
             ->method('processIntegrationSync')
-            ->with($this->callback(function (InputOptionsDAO $inputOptionsDAO) {
+            ->with($this->callback(function (InputOptionsDAO $inputOptionsDAO): bool {
                 $this->assertSame(self::INTEGRATION_NAME, $inputOptionsDAO->getIntegration());
                 $this->assertSame(['123', '345'], $inputOptionsDAO->getMauticObjectIds()->getObjectIdsFor(Contact::NAME));
                 $this->assertNull($inputOptionsDAO->getIntegrationObjectIds());
@@ -97,7 +94,7 @@ class SyncCommandTest extends TestCase
     {
         $this->syncService->expects($this->once())
             ->method('processIntegrationSync')
-            ->with($this->callback(function (InputOptionsDAO $inputOptionsDAO) {
+            ->with($this->callback(function (InputOptionsDAO $inputOptionsDAO): bool {
                 $this->assertSame(self::INTEGRATION_NAME, $inputOptionsDAO->getIntegration());
 
                 return true;

@@ -11,7 +11,7 @@ use MauticPlugin\MauticCrmBundle\Integration\Salesforce\Object\Lead;
 
 class FetcherTest extends \PHPUnit\Framework\TestCase
 {
-    public function testEntitiesAreFetchedFromOrganizerResults()
+    public function testEntitiesAreFetchedFromOrganizerResults(): void
     {
         $organizer = $this->getOrgnanizer();
         $repo      = $this->getMockBuilder(IntegrationEntityRepository::class)
@@ -29,7 +29,7 @@ class FetcherTest extends \PHPUnit\Framework\TestCase
         new Fetcher($repo, $organizer, '701f10000021UnkAAE');
     }
 
-    public function testThatCampaignMembersAreFetched()
+    public function testThatCampaignMembersAreFetched(): void
     {
         $organizer = $this->getOrgnanizer();
         $repo      = $this->getMockBuilder(IntegrationEntityRepository::class)
@@ -128,10 +128,7 @@ class FetcherTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    /**
-     * @return Organizer
-     */
-    private function getOrgnanizer()
+    private function getOrgnanizer(): Organizer
     {
         $records = [
             [

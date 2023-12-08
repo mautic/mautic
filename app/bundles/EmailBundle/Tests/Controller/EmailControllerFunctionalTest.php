@@ -47,7 +47,7 @@ final class EmailControllerFunctionalTest extends MauticMysqlTestCase
 
         $this->client->request('GET', '/s/emails');
         $clientResponse = $this->client->getResponse();
-        $this->assertSame(200, $clientResponse->getStatusCode(), 'Return code must be 200');
+        $this->assertResponseIsSuccessful('Return code must be 200');
         $this->assertStringContainsString('February 7, 2020', $clientResponse->getContent());
         $this->assertStringContainsString('March 21, 2020', $clientResponse->getContent());
         $this->assertStringContainsString('Test User', $clientResponse->getContent());
@@ -67,8 +67,8 @@ final class EmailControllerFunctionalTest extends MauticMysqlTestCase
     public function testIndexActionWhenFiltering(): void
     {
         $this->client->request('GET', '/s/emails?search=has%3Aresults&tmpl=list');
-        $clientResponse = $this->client->getResponse();
-        $this->assertSame(200, $clientResponse->getStatusCode(), 'Return code must be 200.');
+        $this->client->getResponse();
+        $this->assertResponseIsSuccessful('Return code must be 200.');
     }
 
     /**
@@ -97,7 +97,7 @@ final class EmailControllerFunctionalTest extends MauticMysqlTestCase
         /** @var DoctrineDataCollector $dbCollector */
         $dbCollector = $profile->getCollector('db');
         $queries     = $dbCollector->getQueries();
-        $prefix      = self::$container->getParameter('mautic.db_table_prefix');
+        $prefix      = self::getContainer()->getParameter('mautic.db_table_prefix');
 
         $dncQueries = array_filter(
             $queries['default'],
@@ -139,7 +139,7 @@ final class EmailControllerFunctionalTest extends MauticMysqlTestCase
         /** @var DoctrineDataCollector $dbCollector */
         $dbCollector = $profile->getCollector('db');
         $queries     = $dbCollector->getQueries();
-        $prefix      = self::$container->getParameter('mautic.db_table_prefix');
+        $prefix      = self::getContainer()->getParameter('mautic.db_table_prefix');
 
         $dncQueries = array_filter(
             $queries['default'],
@@ -337,7 +337,7 @@ final class EmailControllerFunctionalTest extends MauticMysqlTestCase
         return $segment;
     }
 
-    private function createEmail(string $suffix = 'A', string $emailType = 'list')
+    private function createEmail(string $suffix = 'A', string $emailType = 'list'): Email
     {
         $email = new Email();
         $email->setName("Email $suffix");
@@ -378,7 +378,7 @@ final class EmailControllerFunctionalTest extends MauticMysqlTestCase
         /** @var DoctrineDataCollector $dbCollector */
         $dbCollector = $profile->getCollector('db');
         $queries     = $dbCollector->getQueries();
-        $prefix      = self::$container->getParameter('mautic.db_table_prefix');
+        $prefix      = self::getContainer()->getParameter('mautic.db_table_prefix');
 
         $pendingCountQuery = array_filter(
             $queries['default'],

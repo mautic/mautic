@@ -110,7 +110,7 @@ final class FormApiControllerFunctionalTest extends MauticMysqlTestCase
         if (!empty($response['errors'][0])) {
             $this->fail($response['errors'][0]['code'].': '.$response['errors'][0]['message']);
         }
-        $this->assertSame(Response::HTTP_CREATED, $clientResponse->getStatusCode(), 'Return code must be 201.');
+        $this->assertResponseStatusCodeSame(Response::HTTP_CREATED, 'Return code must be 201.');
 
         $formId = $response['form']['id'];
         $this->assertGreaterThan(0, $formId);
@@ -131,7 +131,7 @@ final class FormApiControllerFunctionalTest extends MauticMysqlTestCase
         $this->client->request('PATCH', "/api/forms/{$formId}/edit", ['name' => 'Form API renamed']);
         $clientResponse = $this->client->getResponse();
         $response       = json_decode($clientResponse->getContent(), true);
-        $this->assertSame(Response::HTTP_OK, $clientResponse->getStatusCode());
+        $this->assertResponseIsSuccessful();
         $this->assertSame($formId, $response['form']['id'], 'ID of the created form does not match with the edited one.');
         $this->assertEquals('Form API renamed', $response['form']['name']);
         $this->assertEquals($payload['formType'], $response['form']['formType']);
@@ -156,7 +156,7 @@ final class FormApiControllerFunctionalTest extends MauticMysqlTestCase
         $response       = json_decode($clientResponse->getContent(), true);
         $formId         = $response['form']['id'];
 
-        $this->assertSame(Response::HTTP_CREATED, $clientResponse->getStatusCode(), $clientResponse->getContent());
+        $this->assertResponseStatusCodeSame(Response::HTTP_CREATED, $clientResponse->getContent());
         $this->assertGreaterThan(0, $formId);
         $this->assertEquals($payload['name'], $response['form']['name']);
         $this->assertEquals($payload['description'], $response['form']['description']);
@@ -228,7 +228,7 @@ final class FormApiControllerFunctionalTest extends MauticMysqlTestCase
         $response       = json_decode($clientResponse->getContent(), true);
         $fieldCount     = $fieldCount + 1;
 
-        $this->assertSame(Response::HTTP_OK, $clientResponse->getStatusCode(), $clientResponse->getContent());
+        $this->assertResponseIsSuccessful($clientResponse->getContent());
         $this->assertSame($formId, $response['form']['id']);
         $this->assertEquals('API form renamed', $response['form']['name']);
         $this->assertEquals($payload['description'], $response['form']['description']);
@@ -243,7 +243,7 @@ final class FormApiControllerFunctionalTest extends MauticMysqlTestCase
         $this->client->request(Request::METHOD_PUT, "/api/forms/{$formId}/edit", $payload);
         $clientResponse = $this->client->getResponse();
         $response       = json_decode($clientResponse->getContent(), true);
-        $this->assertSame(Response::HTTP_OK, $clientResponse->getStatusCode(), $clientResponse->getContent());
+        $this->assertResponseIsSuccessful($clientResponse->getContent());
         $this->assertSame($formId, $response['form']['id']);
         $this->assertEquals($payload['name'], $response['form']['name']);
         $this->assertEquals('Form created via API test renamed', $response['form']['description']);
@@ -256,7 +256,7 @@ final class FormApiControllerFunctionalTest extends MauticMysqlTestCase
         $clientResponse = $this->client->getResponse();
         $response       = json_decode($clientResponse->getContent(), true);
 
-        $this->assertSame(Response::HTTP_OK, $clientResponse->getStatusCode(), $clientResponse->getContent());
+        $this->assertResponseIsSuccessful($clientResponse->getContent());
         $this->assertSame($formId, $response['form']['id']);
         $this->assertEquals($payload['name'], $response['form']['name']);
         $this->assertEquals($payload['description'], $response['form']['description']);
@@ -324,7 +324,7 @@ final class FormApiControllerFunctionalTest extends MauticMysqlTestCase
         $clientResponse = $this->client->getResponse();
         $response       = json_decode($clientResponse->getContent(), true);
 
-        $this->assertSame(Response::HTTP_OK, $clientResponse->getStatusCode(), $clientResponse->getContent());
+        $this->assertResponseIsSuccessful($clientResponse->getContent());
         $this->assertNull($response['form']['id']);
         $this->assertEquals($payload['name'], $response['form']['name']);
         $this->assertEquals($payload['description'], $response['form']['description']);
@@ -337,11 +337,11 @@ final class FormApiControllerFunctionalTest extends MauticMysqlTestCase
         $clientResponse = $this->client->getResponse();
         $response       = json_decode($clientResponse->getContent(), true);
 
-        $this->assertSame(Response::HTTP_NOT_FOUND, $clientResponse->getStatusCode(), $clientResponse->getContent());
+        $this->assertResponseStatusCodeSame(Response::HTTP_NOT_FOUND, $clientResponse->getContent());
         $this->assertSame(Response::HTTP_NOT_FOUND, $response['errors'][0]['code']);
     }
 
-    public function testFormWithChangeTagsAction()
+    public function testFormWithChangeTagsAction(): void
     {
         // Create tag:
         $tag1Payload = ['tag' => 'add this'];
@@ -392,7 +392,7 @@ final class FormApiControllerFunctionalTest extends MauticMysqlTestCase
         if (!empty($response['errors'][0])) {
             $this->fail($response['errors'][0]['code'].': '.$response['errors'][0]['message']);
         }
-        $this->assertSame(Response::HTTP_CREATED, $clientResponse->getStatusCode(), 'Return code must be 201.');
+        $this->assertResponseStatusCodeSame(Response::HTTP_CREATED, 'Return code must be 201.');
 
         $formId = $response['form']['id'];
         $this->assertGreaterThan(0, $formId);

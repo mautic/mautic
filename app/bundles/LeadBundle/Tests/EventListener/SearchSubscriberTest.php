@@ -36,7 +36,7 @@ class SearchSubscriberTest extends TestCase
 
         $contactRepository->method('applySearchQueryRelationship')
             ->willReturnCallback(
-                function (QueryBuilder $q, array $tables, $innerJoinTables, $whereExpression = null, $having = null) {
+                function (QueryBuilder $q, array $tables, $innerJoinTables, $whereExpression = null, $having = null): void {
                     // the following code is taken from LeadRepository class
                     $primaryTable = $tables[0];
                     unset($tables[0]);
@@ -80,7 +80,7 @@ class SearchSubscriberTest extends TestCase
 
         $translator->expects($this->any())
             ->method('trans')
-            ->willReturnCallback(function ($key) {
+            ->willReturnCallback(function ($key): string|array|null {
                 return preg_replace('/^.*\.([^\.]*)$/', '\1', $key); // return command name
             });
 

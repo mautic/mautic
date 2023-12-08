@@ -23,10 +23,7 @@ class CampaignTestAbstract extends \PHPUnit\Framework\TestCase
     protected static $mockId   = 232;
     protected static $mockName = 'Mock name';
 
-    /**
-     * @return CampaignModel
-     */
-    protected function initCampaignModel()
+    protected function initCampaignModel(): CampaignModel
     {
         $entityManager = $this
             ->getMockBuilder(EntityManager::class)
@@ -76,7 +73,7 @@ class CampaignTestAbstract extends \PHPUnit\Framework\TestCase
 
         $contactTracker = $this->createMock(ContactTracker::class);
 
-        $campaignModel = new CampaignModel(
+        return new CampaignModel(
             $leadListModel,
             $formModel,
             $eventCollector,
@@ -91,7 +88,5 @@ class CampaignTestAbstract extends \PHPUnit\Framework\TestCase
             $this->createMock(LoggerInterface::class),
             $this->createMock(CoreParametersHelper::class)
         );
-
-        return $campaignModel;
     }
 }

@@ -14,7 +14,7 @@ class StatTest extends TestCase
      *
      * @dataProvider addOpenDetailsTestProvider
      */
-    public function testAddOpenDetails(int $count)
+    public function testAddOpenDetails(int $count): void
     {
         $stat = new Stat();
 

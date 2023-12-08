@@ -28,27 +28,24 @@ class MappingHelperTest extends TestCase
     /**
      * @var FieldModel|\PHPUnit\Framework\MockObject\MockObject
      */
-    private $fieldModel;
+    private \PHPUnit\Framework\MockObject\MockObject $fieldModel;
 
     /**
      * @var ObjectProvider|\PHPUnit\Framework\MockObject\MockObject
      */
-    private $objectProvider;
+    private \PHPUnit\Framework\MockObject\MockObject $objectProvider;
 
     /**
      * @var EventDispatcherInterface|\PHPUnit\Framework\MockObject\MockObject
      */
-    private $dispatcher;
+    private \PHPUnit\Framework\MockObject\MockObject $dispatcher;
 
     /**
      * @var ObjectMappingRepository|\PHPUnit\Framework\MockObject\MockObject
      */
-    private $objectMappingRepository;
+    private \PHPUnit\Framework\MockObject\MockObject $objectMappingRepository;
 
-    /**
-     * @var MappingHelper
-     */
-    private $mappingHelper;
+    private \Mautic\IntegrationsBundle\Sync\Helper\MappingHelper $mappingHelper;
 
     protected function setUp(): void
     {
@@ -133,7 +130,7 @@ class MappingHelperTest extends TestCase
             ->method('dispatch')
             ->with(
                 $this->callback(
-                    function (InternalObjectFindEvent $event) use ($internalObject) {
+                    function (InternalObjectFindEvent $event) use ($internalObject): bool {
                         Assert::assertSame($internalObject, $event->getObject());
                         Assert::assertSame(['email' => 'test@test.com'], $event->getFieldValues());
 
@@ -183,7 +180,7 @@ class MappingHelperTest extends TestCase
             ->method('dispatch')
             ->with(
                 $this->callback(
-                    function (InternalObjectFindEvent $event) use ($internalObject) {
+                    function (InternalObjectFindEvent $event) use ($internalObject): bool {
                         Assert::assertSame($internalObject, $event->getObject());
                         Assert::assertSame(['email' => 'test@test.com'], $event->getFieldValues());
 
@@ -242,7 +239,7 @@ class MappingHelperTest extends TestCase
             ->method('dispatch')
             ->with(
                 $this->callback(
-                    function (InternalObjectFindEvent $event) use ($internalObject) {
+                    function (InternalObjectFindEvent $event) use ($internalObject): bool {
                         Assert::assertSame($internalObject, $event->getObject());
                         Assert::assertSame(['email' => 'test@test.com'], $event->getFieldValues());
 

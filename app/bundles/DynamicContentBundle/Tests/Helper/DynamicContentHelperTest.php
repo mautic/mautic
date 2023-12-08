@@ -22,27 +22,24 @@ class DynamicContentHelperTest extends \PHPUnit\Framework\TestCase
     /**
      * @var MockObject&DynamicContentModel
      */
-    private $mockModel;
+    private \PHPUnit\Framework\MockObject\MockObject $mockModel;
 
     /**
      * @var MockObject&RealTimeExecutioner
      */
-    private $realTimeExecutioner;
+    private \PHPUnit\Framework\MockObject\MockObject $realTimeExecutioner;
 
     /**
      * @var MockObject&EventDispatcher
      */
-    private $mockDispatcher;
+    private \PHPUnit\Framework\MockObject\MockObject $mockDispatcher;
 
     /**
      * @var MockObject&LeadModel
      */
-    private $leadModel;
+    private \PHPUnit\Framework\MockObject\MockObject $leadModel;
 
-    /**
-     * @var DynamicContentHelper
-     */
-    private $helper;
+    private \Mautic\DynamicContentBundle\Helper\DynamicContentHelper $helper;
 
     protected function setUp(): void
     {
@@ -135,7 +132,7 @@ class DynamicContentHelperTest extends \PHPUnit\Framework\TestCase
             ->withConsecutive(
                 [
                     $this->callback(
-                        function (ContactFiltersEvaluateEvent $event) use ($contact, $slot) {
+                        function (ContactFiltersEvaluateEvent $event) use ($contact, $slot): bool {
                             $this->assertSame($contact, $event->getContact());
                             $this->assertSame($slot->getFilters(), $event->getFilters());
 
@@ -149,7 +146,7 @@ class DynamicContentHelperTest extends \PHPUnit\Framework\TestCase
                 ],
                 [
                     $this->callback(
-                        function (TokenReplacementEvent $event) use ($contact, $slot) {
+                        function (TokenReplacementEvent $event) use ($contact, $slot): bool {
                             $this->assertSame($contact, $event->getLead());
                             $this->assertSame($slot->getContent(), $event->getContent());
 
@@ -195,7 +192,7 @@ class DynamicContentHelperTest extends \PHPUnit\Framework\TestCase
             ->withConsecutive(
                 [
                     $this->callback(
-                        function (ContactFiltersEvaluateEvent $event) use ($contact, $slot) {
+                        function (ContactFiltersEvaluateEvent $event) use ($contact, $slot): bool {
                             $this->assertSame($contact, $event->getContact());
                             $this->assertSame($slot->getFilters(), $event->getFilters());
 
@@ -242,7 +239,7 @@ class DynamicContentHelperTest extends \PHPUnit\Framework\TestCase
             ->withConsecutive(
                 [
                     $this->callback(
-                        function (TokenReplacementEvent $event) use ($contact, $slot) {
+                        function (TokenReplacementEvent $event) use ($contact, $slot): bool {
                             $this->assertSame($contact, $event->getLead());
                             $this->assertSame($slot->getContent(), $event->getContent());
 

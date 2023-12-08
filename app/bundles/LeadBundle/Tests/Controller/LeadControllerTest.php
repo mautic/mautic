@@ -295,7 +295,7 @@ class LeadControllerTest extends MauticMysqlTestCase
         $contactExportScheduler = $this->em->getRepository(ContactExportScheduler::class)->findOneBy([]);
         $data                   = $contactExportScheduler->getData();
         /** @var CoreParametersHelper $coreParametersHelper */
-        $coreParametersHelper = self::$container->get('mautic.helper.core_parameters');
+        $coreParametersHelper = self::getContainer()->get('mautic.helper.core_parameters');
 
         Assert::assertSame(
             [
@@ -409,7 +409,7 @@ class LeadControllerTest extends MauticMysqlTestCase
     {
         $crawler             = $this->client->request('GET', '/s/contacts/new');
         $elementPlaceholder  = $crawler->filter('#lead_timezone')->filter('select')->attr('data-placeholder');
-        $expectedPlaceholder = self::$container->get('translator')->trans('mautic.lead.field.timezone');
+        $expectedPlaceholder = self::getContainer()->get('translator')->trans('mautic.lead.field.timezone');
         $this->assertEquals($expectedPlaceholder, $elementPlaceholder);
 
         // Test that a locale option is present correctly.
@@ -460,7 +460,7 @@ class LeadControllerTest extends MauticMysqlTestCase
     {
         $contactA = $this->createContact('contact@a.email');
         $contactB = $this->createContact('contact@b.email');
-        $contactC = $this->createContact('contact@c.email');
+        $this->createContact('contact@c.email');
 
         $companyName = 'Doe Corp';
         $company     = new Company();
@@ -497,7 +497,7 @@ class LeadControllerTest extends MauticMysqlTestCase
                 'lead_quickemail[replyToAddress]' => $replyTo,
             ]
         );
-        $crawler = $this->client->submit($form);
+        $this->client->submit($form);
         $this->assertTrue($this->client->getResponse()->isOk());
         $this->assertQueuedEmailCount(1);
 
@@ -670,7 +670,7 @@ class LeadControllerTest extends MauticMysqlTestCase
         $this->assertEquals($expectedCompanies, $collection->keys()->toArray());
         // Only one should be primary
         $primary = $collection->reject(
-            function (array $company) {
+            function (array $company): bool {
                 return empty($company['is_primary']);
             }
         );
@@ -686,9 +686,9 @@ class LeadControllerTest extends MauticMysqlTestCase
     public function testContactCompanyEditShowsOldCompanyNameInAuditLog(): void
     {
         /** @var CompanyModel $companyModel */
-        $companyModel = self::$container->get('mautic.lead.model.company');
+        $companyModel = self::getContainer()->get('mautic.lead.model.company');
         /** @var LeadModel $contactModel */
-        $contactModel = self::$container->get('mautic.lead.model.lead');
+        $contactModel = self::getContainer()->get('mautic.lead.model.lead');
 
         // Create companies
         $company = (new Company())
@@ -735,7 +735,7 @@ class LeadControllerTest extends MauticMysqlTestCase
     public function testSetNullCompanyToContact(): void
     {
         /** @var LeadModel $contactModel */
-        $contactModel = self::$container->get('mautic.lead.model.lead');
+        $contactModel = self::getContainer()->get('mautic.lead.model.lead');
 
         $company = new Company();
         $company->setName('Doe Corp');

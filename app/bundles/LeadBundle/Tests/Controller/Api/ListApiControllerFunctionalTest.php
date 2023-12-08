@@ -18,10 +18,10 @@ class ListApiControllerFunctionalTest extends MauticMysqlTestCase
     {
         parent::setUp();
         /* @var ListModel $listModel */
-        $this->listModel = self::$container->get('mautic.lead.model.list');
+        $this->listModel = self::getContainer()->get('mautic.lead.model.list');
     }
 
-    public function testSingleSegmentWorkflow()
+    public function testSingleSegmentWorkflow(): void
     {
         $payload = [
             'name'        => 'API segment',
@@ -90,7 +90,7 @@ class ListApiControllerFunctionalTest extends MauticMysqlTestCase
 
         $segmentId = $response['list']['id'];
 
-        $this->assertSame(201, $clientResponse->getStatusCode());
+        $this->assertResponseStatusCodeSame(201);
         $this->assertGreaterThan(0, $segmentId);
         $this->assertEquals($payload['name'], $response['list']['name']);
         $this->assertEquals($payload['description'], $response['list']['description']);
@@ -152,7 +152,7 @@ class ListApiControllerFunctionalTest extends MauticMysqlTestCase
         $clientResponse = $this->client->getResponse();
         $response       = json_decode($clientResponse->getContent(), true);
 
-        $this->assertSame(200, $clientResponse->getStatusCode());
+        $this->assertResponseIsSuccessful();
         $this->assertSame($segmentId, $response['list']['id'], 'ID of the created segment does not match with the edited one.');
         $this->assertEquals('API segment renamed', $response['list']['name']);
         $this->assertEquals($payload['description'], $response['list']['description']);
@@ -162,7 +162,7 @@ class ListApiControllerFunctionalTest extends MauticMysqlTestCase
         $clientResponse = $this->client->getResponse();
         $response       = json_decode($clientResponse->getContent(), true);
 
-        $this->assertSame(200, $clientResponse->getStatusCode());
+        $this->assertResponseIsSuccessful();
         $this->assertSame($segmentId, $response['list']['id'], 'ID of the created segment does not match with the fetched one.');
         $this->assertEquals('API segment renamed', $response['list']['name']);
         $this->assertEquals($payload['description'], $response['list']['description']);
@@ -172,7 +172,7 @@ class ListApiControllerFunctionalTest extends MauticMysqlTestCase
         $clientResponse = $this->client->getResponse();
         $response       = json_decode($clientResponse->getContent(), true);
 
-        $this->assertSame(200, $clientResponse->getStatusCode());
+        $this->assertResponseIsSuccessful();
         $this->assertNull($response['list']['id']);
         $this->assertEquals('API segment renamed', $response['list']['name']);
         $this->assertEquals($payload['description'], $response['list']['description']);
@@ -182,11 +182,11 @@ class ListApiControllerFunctionalTest extends MauticMysqlTestCase
         $clientResponse = $this->client->getResponse();
         $response       = json_decode($clientResponse->getContent(), true);
 
-        $this->assertSame(404, $clientResponse->getStatusCode());
+        $this->assertResponseStatusCodeSame(404);
         $this->assertSame(404, $response['errors'][0]['code']);
     }
 
-    public function testBatchSegmentWorkflow()
+    public function testBatchSegmentWorkflow(): void
     {
         $payload = [
             [
@@ -325,7 +325,7 @@ class ListApiControllerFunctionalTest extends MauticMysqlTestCase
         $this->client->request('PATCH', "/api/segments/{$list1->getId()}/edit", ['name' => 'API segment renamed', 'isPublished' => false]);
         $clientResponse = $this->client->getResponse();
         $response       = json_decode($clientResponse->getContent(), true);
-        $this->assertSame(Response::HTTP_UNPROCESSABLE_ENTITY, $clientResponse->getStatusCode());
+        $this->assertResponseStatusCodeSame(Response::HTTP_UNPROCESSABLE_ENTITY);
         $this->assertSame($response['errors'][0]['message'], $expectedErrorMessage);
     }
 

@@ -19,7 +19,7 @@ class UserApiControllerFunctionalTest extends MauticMysqlTestCase
         // Assuming user with id 99999 does not exist
         $this->client->request(Request::METHOD_PATCH, '/api/users/99999/edit', ['role' => 1]);
         $clientResponse = $this->client->getResponse();
-        Assert::assertSame(Response::HTTP_NOT_FOUND, $clientResponse->getStatusCode());
+        self::assertResponseStatusCodeSame(Response::HTTP_NOT_FOUND);
         Assert::assertStringContainsString('"message":"Item was not found."', $clientResponse->getContent());
     }
 
@@ -28,7 +28,7 @@ class UserApiControllerFunctionalTest extends MauticMysqlTestCase
         // Assuming role with id 99999 does not exist
         $this->client->request(Request::METHOD_PATCH, '/api/users/1/edit', ['role' => 99999]);
         $clientResponse = $this->client->getResponse();
-        Assert::assertSame(Response::HTTP_BAD_REQUEST, $clientResponse->getStatusCode());
+        self::assertResponseStatusCodeSame(Response::HTTP_BAD_REQUEST);
         Assert::assertStringContainsString('"message":"role: This value is not valid."', $clientResponse->getContent());
     }
 
@@ -37,7 +37,7 @@ class UserApiControllerFunctionalTest extends MauticMysqlTestCase
         // Correct request format is ['role' => 2]
         $this->client->request(Request::METHOD_PATCH, '/api/users/1/edit', ['role' => ['id' => 2]]);
         $clientResponse = $this->client->getResponse();
-        Assert::assertSame(Response::HTTP_BAD_REQUEST, $clientResponse->getStatusCode());
+        self::assertResponseStatusCodeSame(Response::HTTP_BAD_REQUEST);
         Assert::assertStringContainsString('"message":"role: This value is not valid."', $clientResponse->getContent());
     }
 
@@ -59,7 +59,7 @@ class UserApiControllerFunctionalTest extends MauticMysqlTestCase
 
         $this->client->request(Request::METHOD_PATCH, "/api/users/{$user->getId()}/edit", ['role' => $role->getId()]);
         $clientResponse = $this->client->getResponse();
-        Assert::assertSame(Response::HTTP_FORBIDDEN, $clientResponse->getStatusCode());
+        self::assertResponseStatusCodeSame(Response::HTTP_FORBIDDEN);
         Assert::assertStringContainsString(
             '"message":"You do not have access to the requested area\/action."',
             $clientResponse->getContent()
@@ -82,7 +82,7 @@ class UserApiControllerFunctionalTest extends MauticMysqlTestCase
 
         $this->client->request(Request::METHOD_PATCH, "/api/users/{$user->getId()}/edit", ['role' => $role->getId()]);
         $clientResponse = $this->client->getResponse();
-        Assert::assertSame(Response::HTTP_OK, $clientResponse->getStatusCode());
+        self::assertResponseIsSuccessful();
         Assert::assertStringContainsString('"username":"'.$user->getUsername().'"', $clientResponse->getContent());
     }
 
@@ -103,7 +103,7 @@ class UserApiControllerFunctionalTest extends MauticMysqlTestCase
 
         $this->client->request(Request::METHOD_PATCH, "/api/users/{$user->getId()}/edit", ['role' => $role->getId()]);
         $clientResponse = $this->client->getResponse();
-        Assert::assertSame(Response::HTTP_OK, $clientResponse->getStatusCode());
+        self::assertResponseIsSuccessful();
         Assert::assertStringContainsString('"username":"'.$user->getUsername().'"', $clientResponse->getContent());
     }
 
@@ -135,7 +135,7 @@ class UserApiControllerFunctionalTest extends MauticMysqlTestCase
         $user->setLastName('Doe');
         $user->setUsername('john.doe');
         $user->setEmail('john.doe@email.com');
-        $encoder = self::$container->get('security.encoder_factory')->getEncoder($user);
+        $encoder = self::getContainer()->get('security.encoder_factory')->getEncoder($user);
         $user->setPassword($encoder->encodePassword('mautic', null));
         $user->setRole($role);
         $this->em->persist($user);

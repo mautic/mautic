@@ -11,7 +11,7 @@ use Mautic\UserBundle\Model\UserModel;
 
 class FieldsBuilderTest extends \PHPUnit\Framework\TestCase
 {
-    public function testGetLeadColumns()
+    public function testGetLeadColumns(): void
     {
         $fieldModel = $this->getMockBuilder(FieldModel::class)
             ->disableOriginalConstructor()
@@ -98,7 +98,7 @@ class FieldsBuilderTest extends \PHPUnit\Framework\TestCase
         $this->assertSame($expected, $columns);
     }
 
-    public function testGetLeadFilter()
+    public function testGetLeadFilter(): void
     {
         $fieldModel = $this->getMockBuilder(FieldModel::class)
             ->disableOriginalConstructor()
@@ -268,7 +268,7 @@ class FieldsBuilderTest extends \PHPUnit\Framework\TestCase
         $this->assertSame($expected, $columns);
     }
 
-    public function testGetCompanyColumns()
+    public function testGetCompanyColumns(): void
     {
         $fieldModel = $this->getMockBuilder(FieldModel::class)
             ->disableOriginalConstructor()
@@ -355,10 +355,7 @@ class FieldsBuilderTest extends \PHPUnit\Framework\TestCase
         $this->assertSame($expected, $columns);
     }
 
-    /**
-     * @return array
-     */
-    private function getFields()
+    private function getFields(): array
     {
         $titleField = new Field();
         $titleField->setLabel('Title');

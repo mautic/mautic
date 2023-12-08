@@ -26,7 +26,7 @@ class PublicControllerFunctionalTest extends MauticMysqlTestCase
     {
         $this->client->request('POST', '/mailer/callback');
 
-        Assert::assertSame(Response::HTTP_NOT_FOUND, $this->client->getResponse()->getStatusCode());
+        self::assertResponseStatusCodeSame(Response::HTTP_NOT_FOUND);
         Assert::assertSame('No email transport that could process this callback was found', $this->client->getResponse()->getContent());
     }
 
@@ -35,7 +35,7 @@ class PublicControllerFunctionalTest extends MauticMysqlTestCase
         self::getContainer()->get('event_dispatcher')->addListener(EmailEvents::ON_TRANSPORT_WEBHOOK, fn () => null /* exists but does nothing */);
         $this->client->request('POST', '/mailer/callback');
 
-        Assert::assertSame(Response::HTTP_NOT_FOUND, $this->client->getResponse()->getStatusCode());
+        self::assertResponseStatusCodeSame(Response::HTTP_NOT_FOUND);
         Assert::assertSame('No email transport that could process this callback was found', $this->client->getResponse()->getContent());
     }
 
@@ -44,7 +44,7 @@ class PublicControllerFunctionalTest extends MauticMysqlTestCase
         self::getContainer()->get('event_dispatcher')->addListener(EmailEvents::ON_TRANSPORT_WEBHOOK, fn (TransportWebhookEvent $event) => $event->setResponse(new Response('OK')));
         $this->client->request('POST', '/mailer/callback');
 
-        Assert::assertSame(Response::HTTP_OK, $this->client->getResponse()->getStatusCode());
+        self::assertResponseIsSuccessful();
         Assert::assertSame('OK', $this->client->getResponse()->getContent());
     }
 
@@ -73,7 +73,7 @@ class PublicControllerFunctionalTest extends MauticMysqlTestCase
         $crawler = $this->client->submitForm('Save');
 
         $this->assertEquals(1, $crawler->filter('#success-message-text')->count());
-        $expectedMessage = self::$container->get('translator')->trans('mautic.email.preferences_center_success_message.text');
+        $expectedMessage = self::getContainer()->get('translator')->trans('mautic.email.preferences_center_success_message.text');
         $this->assertEquals($expectedMessage, trim($crawler->filter('#success-message-text')->text(null, false)));
         $this->assertTrue($this->client->getResponse()->isOk());
     }

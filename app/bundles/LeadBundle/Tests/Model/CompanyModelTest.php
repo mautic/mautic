@@ -2,41 +2,14 @@
 
 namespace Mautic\LeadBundle\Tests\Model;
 
-use Mautic\EmailBundle\Helper\EmailValidator;
 use Mautic\LeadBundle\Deduplicate\CompanyDeduper;
 use Mautic\LeadBundle\Entity\Company;
 use Mautic\LeadBundle\Model\CompanyModel;
-use Mautic\LeadBundle\Model\FieldModel;
-use Symfony\Component\HttpFoundation\Session\Session;
 
 class CompanyModelTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var FieldModel|\PHPUnit\Framework\MockObject\MockObject
-     */
-    private $leadFieldModel;
-
-    /**
-     * @var \PHPUnit\Framework\MockObject\MockObject|Session
-     */
-    private $session;
-
-    /**
-     * @var EmailValidator|\PHPUnit\Framework\MockObject\MockObject
-     */
-    private $emailValidator;
-
-    /**
-     * @var CompanyDeduper|\PHPUnit\Framework\MockObject\MockObject
-     */
-    private $companyDeduper;
-
     public function setUp(): void
     {
-        $this->leadFieldModel = $this->createMock(FieldModel::class);
-        $this->session        = $this->createMock(Session::class);
-        $this->emailValidator = $this->createMock(EmailValidator::class);
-        $this->companyDeduper = $this->createMock(CompanyDeduper::class);
     }
 
     /**
@@ -44,7 +17,7 @@ class CompanyModelTest extends \PHPUnit\Framework\TestCase
      *
      * @covers  \Mautic\CoreBundle\Helper\AbstractFormFieldHelper::parseList
      */
-    public function testArrayValueIsFlattenedBeforeSave()
+    public function testArrayValueIsFlattenedBeforeSave(): void
     {
         /** @var CompanyModel $companyModel */
         $companyModel = $this->getMockBuilder(CompanyModel::class)
@@ -77,7 +50,7 @@ class CompanyModelTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testImportCompanySkipIfExistsTrue()
+    public function testImportCompanySkipIfExistsTrue(): void
     {
         $companyModel = $this->getCompanyModelForImport();
 
@@ -90,7 +63,7 @@ class CompanyModelTest extends \PHPUnit\Framework\TestCase
         $companyModel->importCompany([], [], null, false, true);
     }
 
-    public function testImportCompanySkipIfExistsFalse()
+    public function testImportCompanySkipIfExistsFalse(): void
     {
         $companyModel = $this->getCompanyModelForImport();
 
@@ -148,7 +121,7 @@ class CompanyModelTest extends \PHPUnit\Framework\TestCase
         $reflectedProp->setValue($object, $value);
     }
 
-    public function testExtractCompanyDataFromImport()
+    public function testExtractCompanyDataFromImport(): void
     {
         /** @var CompanyModel $companyModel */
         $companyModel = $this->getMockBuilder(CompanyModel::class)

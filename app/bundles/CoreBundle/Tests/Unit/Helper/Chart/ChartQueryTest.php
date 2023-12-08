@@ -16,36 +16,30 @@ use PHPUnit\Framework\MockObject\MockObject;
 class ChartQueryTest extends \PHPUnit\Framework\TestCase
 {
     /**
-     * @var \DateTime
+     * @var \DateTimeInterface
      */
-    private $dateFrom;
+    private \DateTime $dateFrom;
 
     private DateTimeHelper $dateTimeHelper;
 
     /**
-     * @var \DateTime
+     * @var \DateTimeInterface
      */
-    private $dateTo;
+    private \DateTime $dateTo;
 
     /**
      * @var MockObject|Connection
      */
-    private $connection;
+    private \PHPUnit\Framework\MockObject\MockObject $connection;
 
     /**
      * @var MockObject|QueryBuilder
      */
-    private $queryBuilder;
+    private \PHPUnit\Framework\MockObject\MockObject $queryBuilder;
 
-    /**
-     * @var string
-     */
-    private $dateColumn;
+    private string $dateColumn;
 
-    /**
-     * @var string
-     */
-    private $unit;
+    private string $unit;
 
     /**
      * @var ChartQuery

@@ -20,17 +20,14 @@ class RouteHelperTest extends TestCase
     /**
      * @var ObjectProvider|\PHPUnit\Framework\MockObject\MockObject
      */
-    private $objectProvider;
+    private \PHPUnit\Framework\MockObject\MockObject $objectProvider;
 
     /**
      * @var EventDispatcherInterface|\PHPUnit\Framework\MockObject\MockObject
      */
-    private $dispatcher;
+    private \PHPUnit\Framework\MockObject\MockObject $dispatcher;
 
-    /**
-     * @var RouteHelper
-     */
-    private $routeHelper;
+    private \Mautic\IntegrationsBundle\Sync\Notification\Helper\RouteHelper $routeHelper;
 
     protected function setUp(): void
     {
@@ -50,7 +47,7 @@ class RouteHelperTest extends TestCase
         $this->dispatcher->expects($this->once())
             ->method('dispatch')
             ->with(
-                $this->callback(function (InternalObjectRouteEvent $event) use ($internalObject) {
+                $this->callback(function (InternalObjectRouteEvent $event) use ($internalObject): bool {
                     $this->assertSame($internalObject, $event->getObject());
                     $this->assertSame(1, $event->getId());
 
@@ -76,7 +73,7 @@ class RouteHelperTest extends TestCase
         $this->dispatcher->expects($this->once())
             ->method('dispatch')
             ->with(
-                $this->callback(function (InternalObjectRouteEvent $event) use ($internalObject) {
+                $this->callback(function (InternalObjectRouteEvent $event) use ($internalObject): bool {
                     $this->assertSame($internalObject, $event->getObject());
                     $this->assertSame(1, $event->getId());
 
@@ -116,7 +113,7 @@ class RouteHelperTest extends TestCase
         $this->dispatcher->expects($this->once())
             ->method('dispatch')
             ->with(
-                $this->callback(function (InternalObjectRouteEvent $event) use ($internalObject) {
+                $this->callback(function (InternalObjectRouteEvent $event) use ($internalObject): bool {
                     $this->assertSame($internalObject, $event->getObject());
                     $this->assertSame(1, $event->getId());
 
@@ -144,7 +141,7 @@ class RouteHelperTest extends TestCase
             ->method('dispatch')
             ->withConsecutive(
                 [
-                    $this->callback(function (InternalObjectRouteEvent $event) use ($internalObject) {
+                    $this->callback(function (InternalObjectRouteEvent $event) use ($internalObject): bool {
                         $this->assertSame($internalObject, $event->getObject());
                         $this->assertSame(1, $event->getId());
 
@@ -156,7 +153,7 @@ class RouteHelperTest extends TestCase
                     IntegrationEvents::INTEGRATION_BUILD_INTERNAL_OBJECT_ROUTE,
                 ],
                 [
-                    $this->callback(function (InternalObjectRouteEvent $event) use ($internalObject) {
+                    $this->callback(function (InternalObjectRouteEvent $event) use ($internalObject): bool {
                         $this->assertSame($internalObject, $event->getObject());
                         $this->assertSame(2, $event->getId());
 

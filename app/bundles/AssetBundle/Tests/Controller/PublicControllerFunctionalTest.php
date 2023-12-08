@@ -4,7 +4,6 @@ namespace Mautic\AssetBundle\Tests\Controller;
 
 use Mautic\AssetBundle\Entity\Download;
 use Mautic\AssetBundle\Tests\Asset\AbstractAssetTest;
-use Symfony\Component\HttpFoundation\Response;
 
 class PublicControllerFunctionalTest extends AbstractAssetTest
 {
@@ -22,7 +21,7 @@ class PublicControllerFunctionalTest extends AbstractAssetTest
         $content = ob_get_contents();
         ob_end_clean();
 
-        $this->assertSame(Response::HTTP_OK, $response->getStatusCode());
+        $this->assertResponseIsSuccessful();
         $this->assertSame($this->expectedMimeType, $response->headers->get('Content-Type'));
         $this->assertNotSame($this->expectedContentDisposition.$this->asset->getOriginalFileName(), $response->headers->get('Content-Disposition'));
         $this->assertEquals($this->expectedPngContent, $content);
@@ -42,7 +41,7 @@ class PublicControllerFunctionalTest extends AbstractAssetTest
         $content = ob_get_contents();
         ob_end_clean();
 
-        $this->assertSame(Response::HTTP_OK, $response->getStatusCode());
+        $this->assertResponseIsSuccessful();
         $this->assertSame($this->expectedContentDisposition.$this->asset->getOriginalFileName(), $response->headers->get('Content-Disposition'));
         $this->assertEquals($this->expectedPngContent, $content);
     }
@@ -61,7 +60,7 @@ class PublicControllerFunctionalTest extends AbstractAssetTest
         $content = ob_get_contents();
         ob_end_clean();
 
-        $this->assertSame(Response::HTTP_OK, $response->getStatusCode());
+        $this->assertResponseIsSuccessful();
         $this->assertSame($this->expectedMimeType, $response->headers->get('Content-Type'));
         $this->assertNotSame($this->expectedContentDisposition.$this->asset->getOriginalFileName(), $response->headers->get('Content-Disposition'));
         $this->assertEquals($this->expectedPngContent, $content);

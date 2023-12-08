@@ -27,27 +27,27 @@ class ContactObjectHelperTest extends TestCase
     /**
      * @var LeadModel|MockObject
      */
-    private $model;
+    private \PHPUnit\Framework\MockObject\MockObject $model;
 
     /**
      * @var LeadRepository|MockObject
      */
-    private $repository;
+    private \PHPUnit\Framework\MockObject\MockObject $repository;
 
     /**
      * @var Connection|MockObject
      */
-    private $connection;
+    private \PHPUnit\Framework\MockObject\MockObject $connection;
 
     /**
      * @var FieldModel|MockObject
      */
-    private $fieldModel;
+    private \PHPUnit\Framework\MockObject\MockObject $fieldModel;
 
     /**
      * @var DoNotContact|MockObject
      */
-    private $doNotContactModel;
+    private \PHPUnit\Framework\MockObject\MockObject $doNotContactModel;
 
     protected function setUp(): void
     {
@@ -253,10 +253,7 @@ class ContactObjectHelperTest extends TestCase
         $this->getObjectHelper()->setFieldValues($contact);
     }
 
-    /**
-     * @return ContactObjectHelper
-     */
-    private function getObjectHelper()
+    private function getObjectHelper(): ContactObjectHelper
     {
         return new ContactObjectHelper($this->model, $this->repository, $this->connection, $this->fieldModel, $this->doNotContactModel);
     }

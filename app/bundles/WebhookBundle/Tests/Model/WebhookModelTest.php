@@ -28,42 +28,39 @@ class WebhookModelTest extends TestCase
     /**
      * @var MockObject|CoreParametersHelper
      */
-    private $parametersHelperMock;
+    private \PHPUnit\Framework\MockObject\MockObject $parametersHelperMock;
 
     /**
      * @var MockObject|SerializerInterface
      */
-    private $serializerMock;
+    private \PHPUnit\Framework\MockObject\MockObject $serializerMock;
 
     /**
      * @var MockObject|EntityManager
      */
-    private $entityManagerMock;
+    private \PHPUnit\Framework\MockObject\MockObject $entityManagerMock;
 
     /**
      * @var MockObject|WebhookRepository
      */
-    private $webhookRepository;
+    private \PHPUnit\Framework\MockObject\MockObject $webhookRepository;
 
     /**
      * @var MockObject|UserHelper
      */
-    private $userHelper;
+    private \PHPUnit\Framework\MockObject\MockObject $userHelper;
 
     /**
      * @var MockObject|EventDispatcherInterface
      */
-    private $eventDispatcherMock;
+    private \PHPUnit\Framework\MockObject\MockObject $eventDispatcherMock;
 
-    /**
-     * @var WebhookModel
-     */
-    private $model;
+    private \Mautic\WebhookBundle\Model\WebhookModel $model;
 
     /**
      * @var MockObject|Client
      */
-    private $httpClientMock;
+    private \PHPUnit\Framework\MockObject\MockObject $httpClientMock;
 
     protected function setUp(): void
     {
@@ -91,7 +88,7 @@ class WebhookModelTest extends TestCase
 
         $this->webhookRepository->expects($this->once())
             ->method('saveEntity')
-            ->with($this->callback(function (Webhook $entity) {
+            ->with($this->callback(function (Webhook $entity): bool {
                 // The secret hash is not empty on save.
                 $this->assertNotEmpty($entity->getSecret());
 
@@ -253,7 +250,7 @@ class WebhookModelTest extends TestCase
 
     private function initModel(): WebhookModel
     {
-        $model = new WebhookModel(
+        return new WebhookModel(
             $this->parametersHelperMock,
             $this->serializerMock,
             $this->httpClientMock,
@@ -265,7 +262,5 @@ class WebhookModelTest extends TestCase
             $this->userHelper,
             $this->createMock(LoggerInterface::class)
         );
-
-        return $model;
     }
 }

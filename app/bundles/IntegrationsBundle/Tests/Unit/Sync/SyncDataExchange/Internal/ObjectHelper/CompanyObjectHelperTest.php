@@ -19,17 +19,17 @@ class CompanyObjectHelperTest extends TestCase
     /**
      * @var CompanyModel|\PHPUnit\Framework\MockObject\MockObject
      */
-    private $model;
+    private \PHPUnit\Framework\MockObject\MockObject $model;
 
     /**
      * @var CompanyRepository|\PHPUnit\Framework\MockObject\MockObject
      */
-    private $repository;
+    private \PHPUnit\Framework\MockObject\MockObject $repository;
 
     /**
      * @var Connection|\PHPUnit\Framework\MockObject\MockObject
      */
-    private $connection;
+    private \PHPUnit\Framework\MockObject\MockObject $connection;
 
     protected function setUp(): void
     {
@@ -135,10 +135,7 @@ class CompanyObjectHelperTest extends TestCase
         Assert::assertSame([], $objectMappings);
     }
 
-    /**
-     * @return CompanyObjectHelper
-     */
-    private function getObjectHelper()
+    private function getObjectHelper(): CompanyObjectHelper
     {
         return new CompanyObjectHelper($this->model, $this->repository, $this->connection);
     }

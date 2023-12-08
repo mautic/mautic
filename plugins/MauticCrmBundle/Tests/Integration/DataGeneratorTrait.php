@@ -21,10 +21,7 @@ trait DataGeneratorTrait
      */
     protected $generatedRecords = [];
 
-    /**
-     * @return array
-     */
-    protected function generateData($maxPages)
+    protected function generateData($maxPages): array
     {
         $pageSize = ($this->page === $maxPages) ? ConnectwiseIntegration::PAGESIZE / 2 : ConnectwiseIntegration::PAGESIZE;
         $fakeData = [];

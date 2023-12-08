@@ -18,17 +18,14 @@ final class GeneratedColumnsProviderTest extends \PHPUnit\Framework\TestCase
     /**
      * @var MockObject|VersionProviderInterface
      */
-    private $versionProvider;
+    private \PHPUnit\Framework\MockObject\MockObject $versionProvider;
 
     /**
      * @var MockObject|EventDispatcherInterface
      */
-    private $dispatcher;
+    private \PHPUnit\Framework\MockObject\MockObject $dispatcher;
 
-    /**
-     * @var GeneratedColumnsProvider
-     */
-    private $provider;
+    private \Mautic\CoreBundle\Doctrine\Provider\GeneratedColumnsProvider $provider;
 
     protected function setUp(): void
     {
@@ -70,7 +67,7 @@ final class GeneratedColumnsProviderTest extends \PHPUnit\Framework\TestCase
             ->with(
                 $this->callback(
                     // Emulate a subscriber.
-                    function (GeneratedColumnsEvent $event) {
+                    function (GeneratedColumnsEvent $event): bool {
                         $event->addGeneratedColumn(new GeneratedColumn('page_hits', 'generated_hit_date', 'DATE', 'not important'));
 
                         return true;

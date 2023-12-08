@@ -41,7 +41,7 @@ class DashboardControllerFunctionalTest extends MauticMysqlTestCase
         ]);
 
         $response = $this->client->getResponse();
-        Assert::assertSame(200, $response->getStatusCode());
+        self::assertResponseIsSuccessful();
 
         $content = $response->getContent();
         Assert::assertJson($content);
@@ -85,7 +85,7 @@ class DashboardControllerFunctionalTest extends MauticMysqlTestCase
         ]);
 
         $response = $this->client->getResponse();
-        Assert::assertSame(200, $response->getStatusCode());
+        self::assertResponseIsSuccessful();
 
         $content = $response->getContent();
         Assert::assertJson($content);
@@ -134,7 +134,7 @@ class DashboardControllerFunctionalTest extends MauticMysqlTestCase
         $crawlerTable = $crawler->filter('table')->first();
 
         return array_slice($crawlerTable->filter('tr')->each(function ($tr) {
-            return $tr->filter('td')->each(function ($td) {
+            return $tr->filter('td')->each(function ($td): string {
                 return trim($td->text());
             });
         }), 1);

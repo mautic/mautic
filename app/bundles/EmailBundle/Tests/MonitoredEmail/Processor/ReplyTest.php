@@ -27,17 +27,14 @@ class ReplyTest extends \PHPUnit\Framework\TestCase
 {
     private EmailAddressHelper $emailAddressHelper;
 
-    private $statRepo;
-    private $contactFinder;
-    private $leadModel;
-    private $dispatcher;
-    private $logger;
-    private $contactTracker;
+    private \PHPUnit\Framework\MockObject\MockObject $statRepo;
+    private \PHPUnit\Framework\MockObject\MockObject $contactFinder;
+    private \PHPUnit\Framework\MockObject\MockObject $leadModel;
+    private \PHPUnit\Framework\MockObject\MockObject $dispatcher;
+    private \PHPUnit\Framework\MockObject\MockObject $logger;
+    private \PHPUnit\Framework\MockObject\MockObject $contactTracker;
 
-    /**
-     * @var Reply
-     */
-    private $processor;
+    private \Mautic\EmailBundle\MonitoredEmail\Processor\Reply $processor;
 
     /**
      * @var MockObject&LeadRepository
@@ -77,7 +74,7 @@ class ReplyTest extends \PHPUnit\Framework\TestCase
      * @covers  \Mautic\EmailBundle\MonitoredEmail\Search\Result::setContacts()
      * @covers  \Mautic\EmailBundle\MonitoredEmail\Search\Result::getContacts()
      */
-    public function testContactIsFoundFromMessageAndDncRecordAdded()
+    public function testContactIsFoundFromMessageAndDncRecordAdded(): void
     {
         // This tells us that a reply was found and processed
         $this->statRepo->expects($this->once())
@@ -88,7 +85,7 @@ class ReplyTest extends \PHPUnit\Framework\TestCase
 
         $this->contactFinder->method('findByHash')
             ->willReturnCallback(
-                function ($hash) {
+                function ($hash): Result {
                     $stat = new Stat();
                     $stat->setTrackingHash($hash);
 
@@ -120,7 +117,7 @@ BODY;
         $this->processor->process($message);
     }
 
-    public function testCreateReplyByHashIfStatNotFound()
+    public function testCreateReplyByHashIfStatNotFound(): void
     {
         $trackingHash = '@Stat#';
 
@@ -134,7 +131,7 @@ BODY;
         $this->processor->createReplyByHash($trackingHash, 'api-msg1d');
     }
 
-    public function testCreateReplyByHash()
+    public function testCreateReplyByHash(): void
     {
         $trackingHash = '@Stat#';
         $stat         = $this->createMock(Stat::class);
@@ -163,7 +160,7 @@ BODY;
 
         $stat->expects($this->once())
             ->method('addReply')
-            ->with($this->callback(function (EmailReply $emailReply) use ($stat) {
+            ->with($this->callback(function (EmailReply $emailReply) use ($stat): bool {
                 $this->assertSame($stat, $emailReply->getStat());
                 $this->assertSame('api-msg1d', $emailReply->getMessageId());
 

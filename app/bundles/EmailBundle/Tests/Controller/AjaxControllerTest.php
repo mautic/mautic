@@ -28,37 +28,34 @@ class AjaxControllerTest extends \PHPUnit\Framework\TestCase
     /**
      * @var MockObject|Session
      */
-    private $sessionMock;
+    private \PHPUnit\Framework\MockObject\MockObject $sessionMock;
 
     /**
      * @var MockObject|ModelFactory<EmailModel>
      */
-    private $modelFactoryMock;
+    private \PHPUnit\Framework\MockObject\MockObject $modelFactoryMock;
 
     /**
      * @var MockObject|Container
      */
-    private $containerMock;
+    private \PHPUnit\Framework\MockObject\MockObject $containerMock;
 
     /**
      * @var MockObject|EmailModel
      */
-    private $modelMock;
+    private \PHPUnit\Framework\MockObject\MockObject $modelMock;
 
     /**
      * @var MockObject|Email
      */
-    private $emailMock;
+    private \PHPUnit\Framework\MockObject\MockObject $emailMock;
 
-    /**
-     * @var AjaxController
-     */
-    private $controller;
+    private \Mautic\EmailBundle\Controller\AjaxController $controller;
 
     /**
      * @var MockObject&ManagerRegistry
      */
-    private $managerRegistry;
+    private \PHPUnit\Framework\MockObject\MockObject $managerRegistry;
 
     protected function setUp(): void
     {
@@ -70,7 +67,7 @@ class AjaxControllerTest extends \PHPUnit\Framework\TestCase
         $this->emailMock        = $this->createMock(Email::class);
 
         $this->managerRegistry  = $this->createMock(ManagerRegistry::class);
-        $doctrine               = $this->createMock(ManagerRegistry::class);
+        $this->createMock(ManagerRegistry::class);
         $factory                = $this->createMock(MauticFactory::class);
         $this->modelFactoryMock = $this->createMock(ModelFactory::class);
         $userHelper             = $this->createMock(UserHelper::class);

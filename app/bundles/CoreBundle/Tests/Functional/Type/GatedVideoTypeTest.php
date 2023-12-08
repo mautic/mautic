@@ -22,7 +22,7 @@ class GatedVideoTypeTest extends MauticMysqlTestCase
         $this->em->flush();
 
         /** @var FormFactory $formFactory */
-        $formFactory = self::$container->get('form.factory');
+        $formFactory = self::getContainer()->get('form.factory');
 
         $form            = $formFactory->create(GatedVideoType::class);
         $formChoiceField = $form->get('formid');

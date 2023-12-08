@@ -30,7 +30,7 @@ class ReportControllerFunctionalTest extends MauticMysqlTestCase
 
     public function testEmailReportWithAggregatedColumnsAndTotals(): void
     {
-        $contactModel = self::$container->get('mautic.lead.model.lead');
+        $contactModel = self::getContainer()->get('mautic.lead.model.lead');
 
         // Create and save contacts
         $payload = [
@@ -112,7 +112,7 @@ class ReportControllerFunctionalTest extends MauticMysqlTestCase
                 'function'  => 'AVG',
             ],
         ]);
-        self::$container->get('mautic.report.model.report')->saveEntity($report);
+        self::getContainer()->get('mautic.report.model.report')->saveEntity($report);
 
         // Expected report table values [ID, Company name, MIN Points, Max Points, SUM Points, COUNT Points, AVG Points]
         $expected = [

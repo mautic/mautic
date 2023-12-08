@@ -15,8 +15,8 @@ final class ResultControllerFunctionalTest extends MauticMysqlTestCase
 
     public function testDownloadFileByFileNameAction(): void
     {
-        $fieldModel   = self::$container->get('mautic.form.model.field');
-        $formUploader = self::$container->get('mautic.form.helper.form_uploader');
+        $fieldModel   = self::getContainer()->get('mautic.form.model.field');
+        $formUploader = self::getContainer()->get('mautic.form.helper.form_uploader');
         $fileName     = 'image.png';
 
         $this->createFile($fileName);
@@ -44,7 +44,7 @@ final class ResultControllerFunctionalTest extends MauticMysqlTestCase
         $this->client->request('POST', '/api/forms/new', $formPayload);
         $clientResponse = $this->client->getResponse();
 
-        $this->assertSame(Response::HTTP_CREATED, $clientResponse->getStatusCode(), $clientResponse->getContent());
+        $this->assertResponseStatusCodeSame(Response::HTTP_CREATED, $clientResponse->getContent());
         $response = json_decode($clientResponse->getContent(), true);
         $form     = $response['form'];
         $formId   = $form['id'];

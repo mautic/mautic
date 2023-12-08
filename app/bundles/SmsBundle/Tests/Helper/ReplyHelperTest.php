@@ -17,17 +17,14 @@ class ReplyHelperTest extends \PHPUnit\Framework\TestCase
     /**
      * @var EventDispatcherInterface|\PHPUnit\Framework\MockObject\MockObject
      */
-    private $eventDispatcher;
+    private \PHPUnit\Framework\MockObject\MockObject $eventDispatcher;
 
-    /**
-     * @var NullLogger
-     */
-    private $logger;
+    private \Psr\Log\NullLogger $logger;
 
     /**
      * @var ContactTracker|\PHPUnit\Framework\MockObject\MockObject
      */
-    private $contactTracker;
+    private \PHPUnit\Framework\MockObject\MockObject $contactTracker;
 
     protected function setUp(): void
     {
@@ -36,7 +33,7 @@ class ReplyHelperTest extends \PHPUnit\Framework\TestCase
         $this->contactTracker  = $this->createMock(ContactTracker::class);
     }
 
-    public function testFoundContactsDispatchEvent()
+    public function testFoundContactsDispatchEvent(): void
     {
         $handler = $this->createMock(CallbackInterface::class);
         $handler->expects($this->once())
@@ -54,13 +51,13 @@ class ReplyHelperTest extends \PHPUnit\Framework\TestCase
         $this->getHelper()->handleRequest($handler, new Request());
     }
 
-    public function testContactsNotFoundDoesNotDispatchEvent()
+    public function testContactsNotFoundDoesNotDispatchEvent(): void
     {
         $handler = $this->createMock(CallbackInterface::class);
         $handler->expects($this->once())
             ->method('getContacts')
             ->willReturnCallback(
-                function () {
+                function (): void {
                     throw new NumberNotFoundException('');
                 }
             );
@@ -74,10 +71,7 @@ class ReplyHelperTest extends \PHPUnit\Framework\TestCase
         $this->getHelper()->handleRequest($handler, new Request());
     }
 
-    /**
-     * @return ReplyHelper
-     */
-    private function getHelper()
+    private function getHelper(): ReplyHelper
     {
         return new ReplyHelper($this->eventDispatcher, $this->logger, $this->contactTracker);
     }

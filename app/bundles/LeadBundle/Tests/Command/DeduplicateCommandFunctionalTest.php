@@ -28,7 +28,7 @@ final class DeduplicateCommandFunctionalTest extends MauticMysqlTestCase
     {
         $contactRepository = $this->em->getRepository(Lead::class);
 
-        $contactDeduper = self::$container->get('mautic.lead.deduper');
+        $contactDeduper = self::getContainer()->get('mautic.lead.deduper');
 
         Assert::assertSame(0, $contactRepository->count([]), 'Some contacts were forgotten to remove from other tests');
 

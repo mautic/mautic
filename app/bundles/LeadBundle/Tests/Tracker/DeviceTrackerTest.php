@@ -17,25 +17,19 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 
 class DeviceTrackerTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var DeviceCreatorService
-     */
-    private $deviceCreatorService;
+    private \Mautic\LeadBundle\Tracker\Service\DeviceCreatorService\DeviceCreatorService $deviceCreatorService;
 
-    /**
-     * @var DeviceDetectorFactory
-     */
-    private $deviceDetectorFactory;
+    private \Mautic\LeadBundle\Tracker\Factory\DeviceDetectorFactory\DeviceDetectorFactory $deviceDetectorFactory;
 
     /**
      * @var DeviceTrackingServiceInterface
      */
-    private $deviceTrackingService;
+    private \PHPUnit\Framework\MockObject\MockObject $deviceTrackingService;
 
     /**
      * @var Logger
      */
-    private $logger;
+    private \PHPUnit\Framework\MockObject\MockObject $logger;
 
     /**
      * @var string
@@ -45,7 +39,7 @@ class DeviceTrackerTest extends \PHPUnit\Framework\TestCase
     protected function setUp(): void
     {
         $createCacheItem = \Closure::bind(
-            function ($key) {
+            function ($key): CacheItem {
                 $item        = new CacheItem();
                 $item->key   = $key;
                 $item->isHit = false;
@@ -95,7 +89,7 @@ class DeviceTrackerTest extends \PHPUnit\Framework\TestCase
             ->getMock();
     }
 
-    public function testDeviceCreatedByUserAgent()
+    public function testDeviceCreatedByUserAgent(): void
     {
         $lead    = new Lead();
         $device  = new LeadDevice();

@@ -50,7 +50,7 @@ class WebhookFunctionalTest extends MauticMysqlTestCase
 
         // One resource is going to be found in the Transifex project:
         $handlerStack->append(
-            function (RequestInterface $request) use (&$sendRequestCounter) {
+            function (RequestInterface $request) use (&$sendRequestCounter): \GuzzleHttp\Psr7\Response {
                 Assert::assertSame('://whatever.url', $request->getUri()->getPath());
                 $jsonPayload = json_decode($request->getBody()->getContents(), true);
                 Assert::assertCount(3, $jsonPayload['mautic.lead_post_save_new']);

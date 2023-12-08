@@ -10,7 +10,7 @@ use Mautic\FormBundle\Form\Type\CampaignEventFormFieldValueType;
 
 class CampaignBuilderEventTest extends CampaignTestAbstract
 {
-    public function testAddGetDecision()
+    public function testAddGetDecision(): void
     {
         $decisionKey = 'email.open';
         $decision    = [
@@ -35,7 +35,7 @@ class CampaignBuilderEventTest extends CampaignTestAbstract
         $this->assertSame([$decisionKey => $decision], $decisions);
     }
 
-    public function testEventDecisionSort()
+    public function testEventDecisionSort(): void
     {
         $decision = [
             'label'                  => 'mautic.email.campaign.event.open',
@@ -69,7 +69,7 @@ class CampaignBuilderEventTest extends CampaignTestAbstract
         }
     }
 
-    public function testEventConditionSort()
+    public function testEventConditionSort(): void
     {
         $condition = [
             'label'       => 'mautic.form.campaign.event.field_value',
@@ -98,7 +98,7 @@ class CampaignBuilderEventTest extends CampaignTestAbstract
         }
     }
 
-    public function testEventActionSort()
+    public function testEventActionSort(): void
     {
         $action = [
             'group'       => 'mautic.asset.actions',
@@ -127,7 +127,7 @@ class CampaignBuilderEventTest extends CampaignTestAbstract
         }
     }
 
-    protected function initEvent()
+    protected function initEvent(): CampaignBuilderEvent
     {
         $translator = $this->getMockBuilder(Translator::class)
             ->disableOriginalConstructor()

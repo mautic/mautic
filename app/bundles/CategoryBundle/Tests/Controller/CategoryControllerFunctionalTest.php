@@ -30,7 +30,7 @@ class CategoryControllerFunctionalTest extends MauticMysqlTestCase
             ],
         ];
         /** @var CategoryModel $model */
-        $model      = self::$container->get('mautic.category.model.category');
+        $model      = self::getContainer()->get('mautic.category.model.category');
 
         foreach ($categoriesData as $categoryData) {
             $category = new Category();
@@ -50,7 +50,7 @@ class CategoryControllerFunctionalTest extends MauticMysqlTestCase
         $clientResponse         = $this->client->getResponse();
         $clientResponseContent  = $clientResponse->getContent();
 
-        $this->assertSame(200, $clientResponse->getStatusCode(), 'Return code must be 200.');
+        $this->assertResponseIsSuccessful('Return code must be 200.');
         $this->assertStringContainsString('TestTitleCategoryController1', $clientResponseContent, 'The return must contain TestTitleCategoryController1');
         $this->assertStringContainsString('TestTitleCategoryController2', $clientResponseContent, 'The return must contain TestTitleCategoryController2');
     }
@@ -64,12 +64,12 @@ class CategoryControllerFunctionalTest extends MauticMysqlTestCase
         $clientResponse         = $this->client->getResponse();
         $clientResponseContent  = $clientResponse->getContent();
 
-        $this->assertSame(200, $clientResponse->getStatusCode(), 'Return code must be 200.');
+        $this->assertResponseIsSuccessful('Return code must be 200.');
         $this->assertStringContainsString('TestTitleCategoryController1', $clientResponseContent, 'The return must contain TestTitleCategoryController1');
         $this->assertStringNotContainsString('TestTitleCategoryController2', $clientResponseContent, 'The return must not contain TestTitleCategoryController2');
     }
 
-    public function testNewActionWithInForm()
+    public function testNewActionWithInForm(): void
     {
         $crawler                = $this->client->request(Request::METHOD_GET, 's/categories/category/new');
         $clientResponse         = json_decode($this->client->getResponse()->getContent(), true);

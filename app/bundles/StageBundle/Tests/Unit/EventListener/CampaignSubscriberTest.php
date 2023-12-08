@@ -101,12 +101,12 @@ final class CampaignSubscriberTest extends TestCase
             {
             }
 
-            public function getEntity($id = null)
+            public function getEntity($id = null): \AnonymousClass0ca84960bc70b35c728ee8f329b40583
             {
                 Assert::assertSame(123, $id);
 
                 $stage = new class() extends Stage {
-                    public function getId()
+                    public function getId(): int
                     {
                         return 123;
                     }
@@ -170,12 +170,12 @@ final class CampaignSubscriberTest extends TestCase
             {
             }
 
-            public function getEntity($id = null)
+            public function getEntity($id = null): \AnonymousClassed19c7a8b0e18c171d8aee050bbad59c
             {
                 Assert::assertSame(123, $id);
 
                 $stage = new class() extends Stage {
-                    public function getId()
+                    public function getId(): int
                     {
                         return 123;
                     }
@@ -207,16 +207,14 @@ final class CampaignSubscriberTest extends TestCase
                 return 333;
             }
 
-            public function getStage()
+            public function getStage(): Stage
             {
-                $stage = new class() extends Stage {
-                    public function getId()
+                return new class() extends Stage {
+                    public function getId(): int
                     {
                         return 123;
                     }
                 };
-
-                return $stage;
             }
         };
         $campaign = new Campaign();
@@ -243,12 +241,12 @@ final class CampaignSubscriberTest extends TestCase
             {
             }
 
-            public function getEntity($id = null)
+            public function getEntity($id = null): \AnonymousClass399f6307f5d29cf21bd4c28190de6589
             {
                 Assert::assertSame(123, $id);
 
                 $stage = new class() extends Stage {
-                    public function getId()
+                    public function getId(): int
                     {
                         return 123;
                     }
@@ -286,10 +284,10 @@ final class CampaignSubscriberTest extends TestCase
                 return 333;
             }
 
-            public function getStage()
+            public function getStage(): \AnonymousClass32754426480188f06ae6a6b9679fe04b
             {
                 $stage = new class() extends Stage {
-                    public function getId()
+                    public function getId(): int
                     {
                         return 444;
                     }
@@ -324,12 +322,12 @@ final class CampaignSubscriberTest extends TestCase
             {
             }
 
-            public function getEntity($id = null)
+            public function getEntity($id = null): \AnonymousClass3cbc08961713e1770b34658eaeef5a57
             {
                 Assert::assertSame(123, $id);
 
                 $stage = new class() extends Stage {
-                    public function getId()
+                    public function getId(): int
                     {
                         return 123;
                     }
@@ -368,10 +366,10 @@ final class CampaignSubscriberTest extends TestCase
                 return 333;
             }
 
-            public function getStage()
+            public function getStage(): \AnonymousClass6dfef4e5fd7bc059dfbb8f91ed767cb5
             {
                 $stage = new class() extends Stage {
-                    public function getId()
+                    public function getId(): int
                     {
                         return 444;
                     }
@@ -410,12 +408,12 @@ final class CampaignSubscriberTest extends TestCase
             {
             }
 
-            public function getEntity($id = null)
+            public function getEntity($id = null): \AnonymousClass6d7fa2111d9035b9642be19e071ea604
             {
                 Assert::assertSame(123, $id);
 
                 $stage = new class() extends Stage {
-                    public function getId()
+                    public function getId(): int
                     {
                         return 123;
                     }
@@ -443,7 +441,7 @@ final class CampaignSubscriberTest extends TestCase
     private function createTranslatorMock(): TranslatorInterface
     {
         return new class() implements TranslatorInterface {
-            public function trans($id, array $parameters = [], string $domain = null, string $locale = null): string
+            public function trans(string $id, array $parameters = [], string $domain = null, string $locale = null): string
             {
                 return '[trans]'.$id.'[/trans]';
             }

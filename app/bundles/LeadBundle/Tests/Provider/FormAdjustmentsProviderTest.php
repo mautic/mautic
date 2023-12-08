@@ -17,17 +17,14 @@ final class FormAdjustmentsProviderTest extends \PHPUnit\Framework\TestCase
     /**
      * @var MockObject&EventDispatcherInterface
      */
-    private $dispatcher;
+    private \PHPUnit\Framework\MockObject\MockObject $dispatcher;
 
     /**
      * @var MockObject&FormInterface<FormInterface>
      */
-    private $form;
+    private \PHPUnit\Framework\MockObject\MockObject $form;
 
-    /**
-     * @var FormAdjustmentsProvider
-     */
-    private $provider;
+    private \Mautic\LeadBundle\Provider\FormAdjustmentsProvider $provider;
 
     protected function setUp(): void
     {
@@ -43,7 +40,7 @@ final class FormAdjustmentsProviderTest extends \PHPUnit\Framework\TestCase
         $this->dispatcher->expects($this->once())
             ->method('dispatch')
             ->with(
-                $this->callback(function (FormAdjustmentEvent $event) {
+                $this->callback(function (FormAdjustmentEvent $event): bool {
                     $this->assertSame($this->form, $event->getForm());
                     $this->assertSame('email', $event->getFieldAlias());
                     $this->assertSame('lead', $event->getFieldObject());

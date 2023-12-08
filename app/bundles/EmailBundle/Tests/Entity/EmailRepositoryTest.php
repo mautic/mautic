@@ -22,7 +22,7 @@ class EmailRepositoryTest extends TestCase
         parent::setUp();
 
         $this->repo = $this->configureRepository(Email::class);
-        $this->connection->method('createQueryBuilder')->willReturnCallback(fn () => new QueryBuilder($this->connection));
+        $this->connection->method('createQueryBuilder')->willReturnCallback(fn (): \Doctrine\DBAL\Query\QueryBuilder => new QueryBuilder($this->connection));
     }
 
     /**
@@ -122,7 +122,7 @@ class EmailRepositoryTest extends TestCase
     {
         $resultMock = $this->createMock(Result::class);
         $resultMock->method('fetchAllAssociative')
-            ->willReturn(array_map(fn (int $id) => [$id], $excludedListIds));
+            ->willReturn(array_map(fn (int $id): array => [$id], $excludedListIds));
         $this->connection->method('executeQuery')
             ->willReturn($resultMock);
     }

@@ -29,7 +29,7 @@ final class CompanyRepositoryTest extends MauticMysqlTestCase
     protected function beforeTearDown(): void
     {
         // Clear owners cache (to leave a clean environment for future tests):
-        $mailHelper = self::$container->get('mautic.helper.mailer');
+        $mailHelper = self::getContainer()->get('mautic.helper.mailer');
         $this->setPrivateProperty($mailHelper, 'leadOwners', []);
     }
 
@@ -60,7 +60,7 @@ final class CompanyRepositoryTest extends MauticMysqlTestCase
     private function createCompany(string $name, string $address1 = ''): Company
     {
         /** @var CompanyModel $model */
-        $model   = self::$container->get('mautic.lead.model.company');
+        $model   = self::getContainer()->get('mautic.lead.model.company');
         $company = new Company();
         $company->setIsPublished(true)->setName($name)->setAddress1($address1);
         $model->saveEntity($company);
@@ -157,7 +157,7 @@ final class CompanyRepositoryTest extends MauticMysqlTestCase
 
     private function setUpMailer(): void
     {
-        $mailHelper = self::$container->get('mautic.helper.mailer');
+        $mailHelper = self::getContainer()->get('mautic.helper.mailer');
         $transport  = new SmtpTransport();
         $mailer     = new Mailer($transport);
         $this->setPrivateProperty($mailHelper, 'mailer', $mailer);
@@ -179,7 +179,7 @@ final class CompanyRepositoryTest extends MauticMysqlTestCase
     {
         $this->client->request('POST', "/api/emails/{$emailId}/send");
         $clientResponse = $this->client->getResponse();
-        Assert::assertSame(200, $clientResponse->getStatusCode(), $clientResponse->getContent());
+        self::assertResponseIsSuccessful($clientResponse->getContent());
         Assert::assertSame(
             json_decode($clientResponse->getContent(), true, 512, JSON_THROW_ON_ERROR),
             [

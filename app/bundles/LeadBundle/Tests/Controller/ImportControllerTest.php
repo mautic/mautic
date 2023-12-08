@@ -11,7 +11,6 @@ use Mautic\LeadBundle\Entity\ImportRepository;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadField;
 use Mautic\LeadBundle\Entity\LeadFieldRepository;
-use Mautic\LeadBundle\Entity\LeadRepository;
 use PHPUnit\Framework\Assert;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\Request;
@@ -37,7 +36,7 @@ final class ImportControllerTest extends MauticMysqlTestCase
 
         $crawler    = $this->client->request(Request::METHOD_GET, '/s/contacts/import/new');
         $uploadForm = $crawler->selectButton('Upload')->form();
-        $file       = new UploadedFile(dirname(__FILE__).'/../Fixtures/contacts.csv', 'contacs.csv', 'itext/csv');
+        $file       = new UploadedFile(__DIR__.'/../Fixtures/contacts.csv', 'contacs.csv', 'itext/csv');
 
         $uploadForm['lead_import[file]']->setValue((string) $file);
 
@@ -52,7 +51,7 @@ final class ImportControllerTest extends MauticMysqlTestCase
     {
         $crawler    = $this->client->request(Request::METHOD_GET, '/s/contacts/import/new');
         $uploadForm = $crawler->selectButton('Upload')->form();
-        $file       = new UploadedFile(dirname(__FILE__).'/../Fixtures/contacts.csv', 'contacs.csv', 'itext/csv');
+        $file       = new UploadedFile(__DIR__.'/../Fixtures/contacts.csv', 'contacs.csv', 'itext/csv');
 
         $uploadForm['lead_import[file]']->setValue((string) $file);
 
@@ -89,7 +88,6 @@ final class ImportControllerTest extends MauticMysqlTestCase
         Assert::assertSame(2, $importEntity->getInsertedCount());
         Assert::assertSame(Import::IMPORTED, $importEntity->getStatus());
 
-        /** @var LeadRepository $importRepository */
         $leadRepository = $this->em->getRepository(Lead::class);
 
         /** @var Lead[] $contacts */

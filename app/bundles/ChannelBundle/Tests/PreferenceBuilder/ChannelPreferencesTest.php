@@ -9,13 +9,13 @@ use Mautic\ChannelBundle\PreferenceBuilder\ChannelPreferences;
 
 class ChannelPreferencesTest extends \PHPUnit\Framework\TestCase
 {
-    public function testLogsAreOrganizedByPriority()
+    public function testLogsAreOrganizedByPriority(): void
     {
         $campaign = new Campaign();
         $event    = new Event();
         $event->setCampaign($campaign);
 
-        $channelPreferences = $this->getChannelPreference('email', $event);
+        $channelPreferences = $this->getChannelPreference($event);
 
         $log1 = new LeadEventLog();
         $log1->setEvent($event);
@@ -36,10 +36,7 @@ class ChannelPreferencesTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($organized->first()->getMetadata()['log'], 2);
     }
 
-    /**
-     * @return ChannelPreferences
-     */
-    private function getChannelPreference($channel, Event $event)
+    private function getChannelPreference(Event $event): ChannelPreferences
     {
         return new ChannelPreferences($event);
     }

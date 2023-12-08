@@ -14,17 +14,12 @@ use PHPUnit\Runner\AfterTestHook;
  */
 class SlowTestExtension implements AfterTestHook, AfterLastTestHook
 {
-    /**
-     * @var bool
-     */
-    private $enabled;
+    private bool $enabled;
 
     /**
      * Threshold in seconds.
-     *
-     * @var float
      */
-    private $threshold;
+    private float $threshold;
 
     /**
      * @var array<string, float>

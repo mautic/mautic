@@ -19,14 +19,14 @@ final class DetailControllerTest extends MauticMysqlTestCase
     public function testMarketplaceDetailPage(string $requestedPackage, int $responseCode, string $foundPackageName, string $foundPackageDesc, string $latestVersion = ''): void
     {
         /** @var MockHandler $handlerStack */
-        $handlerStack = self::$container->get(MockHandler::class);
+        $handlerStack = self::getContainer()->get(MockHandler::class);
         $handlerStack->append(
             new Response(SymfonyResponse::HTTP_OK, [], file_get_contents(__DIR__.'/../../ApiResponse/allowlist.json')), // Getting Allow list from Github API.
             new Response(SymfonyResponse::HTTP_OK, [], file_get_contents(__DIR__.'/../../ApiResponse/detail.json')) // Getting package detail from Packagist API.
         );
 
         /** @var Allowlist $allowlist */
-        $allowlist = self::$container->get('marketplace.service.allowlist');
+        $allowlist = self::getContainer()->get('marketplace.service.allowlist');
         $allowlist->clearCache();
 
         $this->client->request('GET', "s/marketplace/detail/{$requestedPackage}");

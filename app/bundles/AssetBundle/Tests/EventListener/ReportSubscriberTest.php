@@ -20,30 +20,24 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class ReportSubscriberTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var ChannelListHelper
-     */
-    private $channelListHelper;
+    private \Mautic\ChannelBundle\Helper\ChannelListHelper $channelListHelper;
 
     /**
      * @var CompanyReportData|\PHPUnit\Framework\MockObject\MockObject
      */
-    private $companyReportData;
+    private \PHPUnit\Framework\MockObject\MockObject $companyReportData;
 
     /**
      * @var DownloadRepository|\PHPUnit\Framework\MockObject\MockObject
      */
-    private $downloadRepository;
+    private \PHPUnit\Framework\MockObject\MockObject $downloadRepository;
 
     /**
      * @var QueryBuilder|\PHPUnit\Framework\MockObject\MockObject
      */
-    private $queryBuilder;
+    private \PHPUnit\Framework\MockObject\MockObject $queryBuilder;
 
-    /**
-     * @var ReportHelper
-     */
-    private $reportHelper;
+    private \Mautic\ReportBundle\Helper\ReportHelper $reportHelper;
 
     public function setUp(): void
     {
@@ -155,7 +149,7 @@ class ReportSubscriberTest extends \PHPUnit\Framework\TestCase
             /**
              * @param array<int|string> $parameters
              */
-            public function trans($id, array $parameters = [], string $domain = null, string $locale = null): string
+            public function trans(string $id, array $parameters = [], string $domain = null, string $locale = null): string
             {
                 return '[trans]'.$id.'[/trans]';
             }

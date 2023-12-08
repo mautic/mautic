@@ -15,7 +15,7 @@ use Symfony\Component\HttpFoundation\Request;
 
 class PageModelTest extends PageTestAbstract
 {
-    public function testUtf8CharsInTitleWithTransletirationEnabled()
+    public function testUtf8CharsInTitleWithTransletirationEnabled(): void
     {
         $providedTitle = '你好，世界';
         $expectedTitle = 'ni hao, shi jie';
@@ -34,7 +34,7 @@ class PageModelTest extends PageTestAbstract
         $this->assertSame(['page_title' => $expectedTitle], $hit->getQuery());
     }
 
-    public function testUtf8CharsInTitleWithTransletirationDisabled()
+    public function testUtf8CharsInTitleWithTransletirationDisabled(): void
     {
         $providedTitle = '你好，世界';
         $expectedTitle = '你好，世界';
@@ -53,7 +53,7 @@ class PageModelTest extends PageTestAbstract
         $this->assertSame(['page_title' => $expectedTitle], $hit->getQuery());
     }
 
-    public function testGenerateUrlWhenCalledReturnsValidUrl()
+    public function testGenerateUrlWhenCalledReturnsValidUrl(): void
     {
         $page = new Page();
         $page->setAlias('this-is-a-test');
@@ -95,7 +95,7 @@ class PageModelTest extends PageTestAbstract
         $this->assertSame($expectedTitle, $hit->getUrlTitle());
     }
 
-    public function testCleanQueryWhenCalledReturnsSafeAndValidData()
+    public function testCleanQueryWhenCalledReturnsSafeAndValidData(): void
     {
         $pageModel           = $this->getPageModel();
         $pageModelReflection = new \ReflectionClass(get_class($pageModel));
@@ -147,7 +147,7 @@ class PageModelTest extends PageTestAbstract
         }
     }
 
-    private function assertUtmQuery(array $query)
+    private function assertUtmQuery(array $query): void
     {
         $this->assertArrayHasKey('utm_source', $query, 'utm_source not found');
         $this->assertArrayHasKey('utm_medium', $query, 'utm_medium not found');
@@ -155,7 +155,7 @@ class PageModelTest extends PageTestAbstract
         $this->assertArrayHasKey('utm_content', $query, 'utm_content not found');
         // evaluate all utm tags that they contain the key name in the value
         foreach ($query as $key => $value) {
-            if (false !== strpos($key, 'utm_')) {
+            if (str_contains($key, 'utm_')) {
                 $this->assertNotFalse(strpos($value, $key), sprintf('%s not found in %s', $key, $value));
             }
         }
@@ -185,7 +185,7 @@ class PageModelTest extends PageTestAbstract
             ];
         $ct      = ClickthroughHelper::encodeArrayForUrl($ctParams);
 
-        $params = [[
+        return [[
             'page_title'      => 'Testpage',
             'page_language'   => 'en-GB',
             'page_referrer'   => '',
@@ -225,7 +225,5 @@ class PageModelTest extends PageTestAbstract
             'adblock'         => false,
             'fingerprint'     => 'fec25ab2d659c4153c7f1d5724841132',
         ]];
-
-        return $params;
     }
 }

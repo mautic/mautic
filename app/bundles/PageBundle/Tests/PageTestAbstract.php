@@ -150,7 +150,7 @@ class PageTestAbstract extends TestCase
 
         $deviceTrackerMock = $this->createMock(DeviceTracker::class);
 
-        $pageModel = new PageModel(
+        return new PageModel(
             $cookieHelper,
             $ipLookupHelper,
             $leadModel,
@@ -171,8 +171,6 @@ class PageTestAbstract extends TestCase
             $userHelper,
             $this->createMock(LoggerInterface::class)
         );
-
-        return $pageModel;
     }
 
     /**
@@ -185,7 +183,7 @@ class PageTestAbstract extends TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $mockRedirectModel = $this->getMockBuilder('Mautic\PageBundle\Model\RedirectModel')
+        $mockRedirectModel = $this->getMockBuilder(\Mautic\PageBundle\Model\RedirectModel::class)
             ->setConstructorArgs([
                 $this->createMock(EntityManagerInterface::class),
                 $this->createMock(CorePermissions::class),
@@ -200,7 +198,7 @@ class PageTestAbstract extends TestCase
             ->setMethods(['createRedirectEntity', 'generateRedirectUrl'])
             ->getMock();
 
-        $mockRedirect = $this->getMockBuilder('Mautic\PageBundle\Entity\Redirect')
+        $mockRedirect = $this->getMockBuilder(\Mautic\PageBundle\Entity\Redirect::class)
             ->getMock();
 
         $mockRedirectModel->expects($this->any())

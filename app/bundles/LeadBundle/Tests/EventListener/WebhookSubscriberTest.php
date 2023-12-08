@@ -22,7 +22,7 @@ class WebhookSubscriberTest extends \PHPUnit\Framework\TestCase
     /**
      * @var EventDispatcherInterface
      */
-    private $dispatcher;
+    private \Symfony\Component\EventDispatcher\EventDispatcher $dispatcher;
 
     private LeadModel|\PHPUnit\Framework\MockObject\MockObject $leadModel;
 
@@ -35,13 +35,13 @@ class WebhookSubscriberTest extends \PHPUnit\Framework\TestCase
         $this->leadModel  = $this->createMock(LeadModel::class);
     }
 
-    public function testNewContactEventIsFiredWhenIdentified()
+    public function testNewContactEventIsFiredWhenIdentified(): void
     {
         $this->mockModel->expects($this->once())
             ->method('queueWebhooksByType')
             ->with(
                 $this->callback(
-                    function ($type) {
+                    function ($type): bool {
                         return LeadEvents::LEAD_POST_SAVE.'_new' === $type;
                     }
                 )
@@ -58,7 +58,7 @@ class WebhookSubscriberTest extends \PHPUnit\Framework\TestCase
         $this->dispatcher->dispatch($event, LeadEvents::LEAD_POST_SAVE);
     }
 
-    public function testUpdateContactEventIsFiredWhenUpdatedButWithoutDateIdentified()
+    public function testUpdateContactEventIsFiredWhenUpdatedButWithoutDateIdentified(): void
     {
         $this->mockModel  = $this->createMock(WebhookModel::class);
 
@@ -66,7 +66,7 @@ class WebhookSubscriberTest extends \PHPUnit\Framework\TestCase
             ->method('queueWebhooksByType')
             ->with(
                 $this->callback(
-                    function ($type) {
+                    function ($type): bool {
                         return LeadEvents::LEAD_POST_SAVE.'_update' === $type;
                     }
                 )
@@ -84,7 +84,7 @@ class WebhookSubscriberTest extends \PHPUnit\Framework\TestCase
         $this->dispatcher->dispatch($event, LeadEvents::LEAD_POST_SAVE);
     }
 
-    public function testWebhookIsNotDeliveredIfContactIsAVisitor()
+    public function testWebhookIsNotDeliveredIfContactIsAVisitor(): void
     {
         $this->mockModel  = $this->createMock(WebhookModel::class);
 
@@ -122,7 +122,7 @@ class WebhookSubscriberTest extends \PHPUnit\Framework\TestCase
     /**
      * @testdox Test that webhook is queued for channel subscription changes
      */
-    public function testChannelChangeIsPickedUpByWebhook()
+    public function testChannelChangeIsPickedUpByWebhook(): void
     {
         $this->mockModel = $this->getMockBuilder(WebhookModel::class)
             ->disableOriginalConstructor()
@@ -163,7 +163,7 @@ class WebhookSubscriberTest extends \PHPUnit\Framework\TestCase
     /**
      * @testdox Test that webhook is queued for lead company changes
      */
-    public function testLeadCompanyChangeIsPickedUpByWebhook()
+    public function testLeadCompanyChangeIsPickedUpByWebhook(): void
     {
         $this->mockModel = $this->getMockBuilder(WebhookModel::class)
             ->disableOriginalConstructor()
@@ -193,7 +193,7 @@ class WebhookSubscriberTest extends \PHPUnit\Framework\TestCase
         $this->dispatcher->dispatch($event, LeadEvents::LEAD_COMPANY_CHANGE);
     }
 
-    public function testOnCompanySaveAndDelete()
+    public function testOnCompanySaveAndDelete(): void
     {
         $dispatcher       = new EventDispatcher();
         $this->mockModel  = $this->createMock(WebhookModel::class);

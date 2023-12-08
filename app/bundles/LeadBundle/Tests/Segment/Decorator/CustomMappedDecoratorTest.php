@@ -66,10 +66,7 @@ class CustomMappedDecoratorTest extends \PHPUnit\Framework\TestCase
         $this->assertSame('lead_id', $customMappedDecorator->getForeignContactColumn($contactSegmentFilterCrate));
     }
 
-    /**
-     * @return CustomMappedDecorator
-     */
-    private function getDecorator()
+    private function getDecorator(): CustomMappedDecorator
     {
         $contactSegmentFilterOperator   = $this->createMock(ContactSegmentFilterOperator::class);
         $dispatcherMock                 = $this->createMock(EventDispatcherInterface::class);

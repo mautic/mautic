@@ -18,17 +18,14 @@ final class ReportTypeTest extends \PHPUnit\Framework\TestCase
     /**
      * @var MockObject|ReportModel
      */
-    private $reportModel;
+    private \PHPUnit\Framework\MockObject\MockObject $reportModel;
 
     /**
      * @var MockObject|FormBuilderInterface
      */
-    private $formBuilder;
+    private \PHPUnit\Framework\MockObject\MockObject $formBuilder;
 
-    /**
-     * @var ReportType
-     */
-    private $reportType;
+    private \Mautic\ReportBundle\Form\Type\ReportType $reportType;
 
     protected function setUp(): void
     {
@@ -85,7 +82,7 @@ final class ReportTypeTest extends \PHPUnit\Framework\TestCase
                 [
                     FormEvents::PRE_SET_DATA,
                     $this->callback(
-                        function (callable $listener) use ($report) {
+                        function (callable $listener) use ($report): bool {
                             /** @var FormInterface $form */
                             $form      = $this->createMock(FormInterface::class);
                             $formEvent = new FormEvent($form, $report);

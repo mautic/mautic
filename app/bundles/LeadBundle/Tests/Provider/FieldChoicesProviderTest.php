@@ -16,12 +16,9 @@ final class FieldChoicesProviderTest extends \PHPUnit\Framework\TestCase
     /**
      * @var MockObject|EventDispatcherInterface
      */
-    private $dispatcher;
+    private \PHPUnit\Framework\MockObject\MockObject $dispatcher;
 
-    /**
-     * @var FieldChoicesProvider
-     */
-    private $provider;
+    private \Mautic\LeadBundle\Provider\FieldChoicesProvider $provider;
 
     protected function setUp(): void
     {
@@ -78,7 +75,7 @@ final class FieldChoicesProviderTest extends \PHPUnit\Framework\TestCase
 
     private function setSomeChoicesLikeASubscriber(): callable
     {
-        return function (ListFieldChoicesEvent $event) {
+        return function (ListFieldChoicesEvent $event): bool {
             $event->setChoicesForFieldAlias(
                 'select_a',
                 ['Choice A' => 'choice_a']

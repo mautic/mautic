@@ -14,12 +14,9 @@ final class LeadFieldsTypeTest extends \PHPUnit\Framework\TestCase
     /**
      * @var MockObject|FieldModel
      */
-    private $fieldModel;
+    private \PHPUnit\Framework\MockObject\MockObject $fieldModel;
 
-    /**
-     * @var LeadFieldsType
-     */
-    private $form;
+    private \Mautic\LeadBundle\Form\Type\LeadFieldsType $form;
 
     protected function setUp(): void
     {
@@ -54,7 +51,7 @@ final class LeadFieldsTypeTest extends \PHPUnit\Framework\TestCase
         $optionsResolver->expects($this->once())
             ->method('setDefaults')
             ->with($this->callback(
-                function (array $defaults) use ($optionsResolver) {
+                function (array $defaults) use ($optionsResolver): bool {
                     $choices = $defaults['choices']($optionsResolver);
 
                     // Notice the labels and values are switched.

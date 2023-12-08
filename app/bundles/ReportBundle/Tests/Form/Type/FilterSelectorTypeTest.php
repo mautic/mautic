@@ -19,7 +19,7 @@ final class FilterSelectorTypeTest extends \PHPUnit\Framework\TestCase
     /**
      * @var MockObject|FormBuilderInterface
      */
-    private $formBuilder;
+    private \PHPUnit\Framework\MockObject\MockObject $formBuilder;
     private FilterSelectorType $FilterSelectorType;
 
     protected function setUp(): void
@@ -48,7 +48,7 @@ final class FilterSelectorTypeTest extends \PHPUnit\Framework\TestCase
                 [
                     FormEvents::PRE_SET_DATA,
                     $this->callback(
-                        function (callable $formModifier) {
+                        function (callable $formModifier): bool {
                             /** @var FormInterface<FormBuilderInterface>|MockObject $form */
                             $form = $this->createMock(FormInterface::class);
                             $data = [

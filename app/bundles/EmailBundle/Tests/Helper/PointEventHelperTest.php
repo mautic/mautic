@@ -11,7 +11,7 @@ use Mautic\LeadBundle\Model\LeadModel;
 
 class PointEventHelperTest extends \PHPUnit\Framework\TestCase
 {
-    public function testSendEmail()
+    public function testSendEmail(): void
     {
         $helper = new PointEventHelper();
         $lead   = new Lead();
@@ -74,11 +74,9 @@ class PointEventHelperTest extends \PHPUnit\Framework\TestCase
      */
     private function getMockLead()
     {
-        $mock = $this->getMockBuilder(LeadModel::class)
+        return $this->getMockBuilder(LeadModel::class)
             ->disableOriginalConstructor()
             ->getMock();
-
-        return $mock;
     }
 
     /**
@@ -98,7 +96,7 @@ class PointEventHelperTest extends \PHPUnit\Framework\TestCase
 
         $mock->expects($this->any())
             ->method('getEntity')
-            ->willReturnCallback(function ($id) use ($published) {
+            ->willReturnCallback(function ($id) use ($published): \Mautic\EmailBundle\Entity\Email {
                 $email = new Email();
                 $email->setIsPublished($published);
 

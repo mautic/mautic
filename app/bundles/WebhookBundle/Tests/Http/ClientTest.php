@@ -11,7 +11,7 @@ use PHPUnit\Framework\TestCase;
 
 class ClientTest extends TestCase
 {
-    public function testPost()
+    public function testPost(): void
     {
         $method  = 'POST';
         $url     = 'url';
@@ -34,7 +34,7 @@ class ClientTest extends TestCase
 
         $httpClientMock->expects($this->once())
             ->method('sendRequest')
-            ->with($this->callback(function (Request $request) use ($method, $url, $headers, $payload) {
+            ->with($this->callback(function (Request $request) use ($method, $url, $headers, $payload): bool {
                 $this->assertSame($method, $request->getMethod());
                 $this->assertSame($url, $request->getUri()->getPath());
 

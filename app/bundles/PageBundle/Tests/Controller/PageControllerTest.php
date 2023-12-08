@@ -31,14 +31,14 @@ class PageControllerTest extends MauticMysqlTestCase
     protected function setUp(): void
     {
         parent::setUp();
-        $this->prefix = self::$container->getParameter('mautic.db_table_prefix');
+        $this->prefix = self::getContainer()->getParameter('mautic.db_table_prefix');
 
         $pageData = [
             'title'    => 'Test Page',
             'template' => 'blank',
         ];
 
-        $model = self::$container->get('mautic.page.model.page');
+        $model = self::getContainer()->get('mautic.page.model.page');
         $page  = new Page();
         $page->setTitle($pageData['title'])
             ->setTemplate($pageData['template']);
@@ -102,7 +102,7 @@ class PageControllerTest extends MauticMysqlTestCase
     /**
      * Skipped for now.
      */
-    public function LandingPageTrackingSecondVisit()
+    public function LandingPageTrackingSecondVisit(): void
     {
         $this->connection->insert($this->prefix.'pages', [
             'is_published' => true,
@@ -201,7 +201,7 @@ class PageControllerTest extends MauticMysqlTestCase
         $this->client->request('GET', '/s/pages/view/'.$this->id);
         $clientResponse         = $this->client->getResponse();
         $clientResponseContent  = $clientResponse->getContent();
-        $model                  = self::$container->get('mautic.page.model.page');
+        $model                  = self::getContainer()->get('mautic.page.model.page');
         $page                   = $model->getEntity($this->id);
         $this->assertEquals(Response::HTTP_OK, $clientResponse->getStatusCode());
         $this->assertStringContainsString($page->getTitle(), $clientResponseContent, 'The return must contain the title of page');
@@ -214,7 +214,7 @@ class PageControllerTest extends MauticMysqlTestCase
     {
         $this->client->request('GET', '/s/pages/new/');
         $clientResponse         = $this->client->getResponse();
-        $clientResponseContent  = $clientResponse->getContent();
+        $clientResponse->getContent();
         $this->assertEquals(Response::HTTP_OK, $clientResponse->getStatusCode());
     }
 
@@ -223,24 +223,21 @@ class PageControllerTest extends MauticMysqlTestCase
     {
         $this->client->request('GET', 's/pages/results/'.$this->id);
         $clientResponse         = $this->client->getResponse();
-        $clientResponseContent  = $clientResponse->getContent();
-        $model                  = self::$container->get('mautic.page.model.page');
-        $page                   = $model->getEntity($this->id);
+        $clientResponse->getContent();
+        $model                  = self::getContainer()->get('mautic.page.model.page');
+        $model->getEntity($this->id);
         $this->assertEquals(Response::HTTP_OK, $clientResponse->getStatusCode());
     }
 
     /**
      * Only tests if an actual CSV file is returned.
-     *
-     * @return void
      */
-    public function testCsvIsExportedCorrectly()
+    public function testCsvIsExportedCorrectly(): void
     {
         $this->loadFixtures([LoadPageCategoryData::class, LoadPageData::class]);
 
         ob_start();
         $this->client->request(Request::METHOD_GET, '/s/pages/results/'.$this->id.'/export');
-        $content = ob_get_contents();
         ob_end_clean();
 
         $clientResponse = $this->client->getResponse();
@@ -251,16 +248,13 @@ class PageControllerTest extends MauticMysqlTestCase
 
     /**
      * Only tests if an actual Excel file is returned.
-     *
-     * @return void
      */
-    public function testExcelIsExportedCorrectly()
+    public function testExcelIsExportedCorrectly(): void
     {
         $this->loadFixtures([LoadPageCategoryData::class, LoadPageData::class]);
 
         ob_start();
         $this->client->request(Request::METHOD_GET, '/s/pages/results/'.$this->id.'/export/xlsx');
-        $content = ob_get_contents();
         ob_end_clean();
 
         $clientResponse = $this->client->getResponse();
@@ -271,16 +265,13 @@ class PageControllerTest extends MauticMysqlTestCase
 
     /**
      * Only tests if an actual HTML file is returned.
-     *
-     * @return void
      */
-    public function testHTMLIsExportedCorrectly()
+    public function testHTMLIsExportedCorrectly(): void
     {
         $this->loadFixtures([LoadPageCategoryData::class, LoadPageData::class]);
 
         ob_start();
         $this->client->request(Request::METHOD_GET, '/s/pages/results/'.$this->id.'/export/html');
-        $content = ob_get_contents();
         ob_end_clean();
 
         $clientResponse = $this->client->getResponse();

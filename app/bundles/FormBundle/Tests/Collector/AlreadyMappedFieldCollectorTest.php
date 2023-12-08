@@ -14,12 +14,9 @@ final class AlreadyMappedFieldCollectorTest extends \PHPUnit\Framework\TestCase
     /**
      * @var MockObject&CacheProviderInterface
      */
-    private $cacheProvider;
+    private \PHPUnit\Framework\MockObject\MockObject $cacheProvider;
 
-    /**
-     * @var AlreadyMappedFieldCollector
-     */
-    private $collector;
+    private \Mautic\FormBundle\Collector\AlreadyMappedFieldCollector $collector;
 
     protected function setup(): void
     {
@@ -32,7 +29,7 @@ final class AlreadyMappedFieldCollectorTest extends \PHPUnit\Framework\TestCase
     public function testWorkflow(): void
     {
         $createCacheItem = \Closure::bind(
-            function () {
+            function (): CacheItem {
                 $item             = new CacheItem();
                 $item->isHit      = false;
                 $item->isTaggable = true;

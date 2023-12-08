@@ -20,7 +20,7 @@ final class ObjectMappingRepositoryTest extends TestCase
     /**
      * @var MockObject&AbstractQuery<mixed>
      */
-    private $query;
+    private \PHPUnit\Framework\MockObject\MockObject $query;
 
     private ObjectMappingRepository $repository;
 
@@ -30,7 +30,7 @@ final class ObjectMappingRepositoryTest extends TestCase
 
         $this->repository = $this->configureRepository(ObjectMapping::class);
 
-        $this->entityManager->method('createQueryBuilder')->willReturnCallback(fn () => new QueryBuilder($this->entityManager));
+        $this->entityManager->method('createQueryBuilder')->willReturnCallback(fn (): \Doctrine\ORM\QueryBuilder => new QueryBuilder($this->entityManager));
 
         // This is terrible, but the Query class is final and AbstractQuery doesn't have some methods used.
         $this->query = $this->getMockBuilder(AbstractQuery::class)
@@ -57,7 +57,7 @@ final class ObjectMappingRepositoryTest extends TestCase
 
         $this->query->expects($this->once())
             ->method('setParameters')
-            ->with($this->callback(function (ArrayCollection $collection) {
+            ->with($this->callback(function (ArrayCollection $collection): bool {
                 /** @var Parameter $parameter */
                 $parameter = $collection[0];
                 $this->assertSame('internalObject', $parameter->getName());

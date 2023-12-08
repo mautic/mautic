@@ -423,10 +423,7 @@ class BaseDecoratorTest extends \PHPUnit\Framework\TestCase
         $this->assertSame($expected, $baseDecorator->getParameterValue($contactSegmentFilterCrate));
     }
 
-    /**
-     * @return BaseDecorator
-     */
-    private function getDecorator()
+    private function getDecorator(): BaseDecorator
     {
         $contactSegmentFilterOperator = $this->createMock(ContactSegmentFilterOperator::class);
 

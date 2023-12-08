@@ -22,11 +22,11 @@ class ConfigFormTest extends KernelTestCase
         self::bootKernel();
     }
 
-    public function testConfigForm()
+    public function testConfigForm(): void
     {
         $plugins = $this->getIntegrationObject()->getIntegrationObjects();
 
-        foreach ($plugins as $name => $s) {
+        foreach ($plugins as $s) {
             $featureSettings = $s->getFormSettings();
 
             $this->assertArrayHasKey('requires_callback', $featureSettings);
@@ -37,7 +37,7 @@ class ConfigFormTest extends KernelTestCase
         }
     }
 
-    public function testOauth()
+    public function testOauth(): void
     {
         $plugins    = $this->getIntegrationObject()->getIntegrationObjects();
         $url        = 'https://test.com';
@@ -61,7 +61,7 @@ class ConfigFormTest extends KernelTestCase
         }
     }
 
-    public function testAmendLeadDataBeforeMauticPopulate()
+    public function testAmendLeadDataBeforeMauticPopulate(): void
     {
         $plugins = $this->getIntegrationObject()->getIntegrationObjects();
         $object  = 'company';
@@ -79,7 +79,7 @@ class ConfigFormTest extends KernelTestCase
         }
     }
 
-    public function getIntegrationObject()
+    public function getIntegrationObject(): IntegrationHelper
     {
         // create an integration object
         $pathsHelper          = $this->getMockBuilder(PathsHelper::class)->disableOriginalConstructor()->getMock();
@@ -97,8 +97,8 @@ class ConfigFormTest extends KernelTestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $registeredPluginBundles = self::$container->getParameter('mautic.plugin.bundles');
-        $mauticPlugins           = self::$container->getParameter('mautic.bundles');
+        $registeredPluginBundles = self::getContainer()->getParameter('mautic.plugin.bundles');
+        $mauticPlugins           = self::getContainer()->getParameter('mautic.bundles');
         $bundleHelper->expects($this->any())->method('getPluginBundles')->willReturn([$registeredPluginBundles]);
 
         $bundleHelper->expects($this->any())->method('getMauticBundles')->willReturn(array_merge($mauticPlugins, $registeredPluginBundles));
@@ -125,7 +125,7 @@ class ConfigFormTest extends KernelTestCase
                     )
                 );
 
-        $integrationHelper = new IntegrationHelper(
+        return new IntegrationHelper(
             self::$kernel->getContainer(),
             $entityManager,
             $pathsHelper,
@@ -134,8 +134,6 @@ class ConfigFormTest extends KernelTestCase
             $twig,
             $pluginModel
         );
-
-        return $integrationHelper;
     }
 
     /**

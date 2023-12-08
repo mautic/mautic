@@ -23,17 +23,17 @@ class ObjectChangeGeneratorTest extends TestCase
     /**
      * @var SyncJudgeInterface|\PHPUnit\Framework\MockObject\MockObject
      */
-    private $syncJudge;
+    private \PHPUnit\Framework\MockObject\MockObject $syncJudge;
 
     /**
      * @var ValueHelper|\PHPUnit\Framework\MockObject\MockObject
      */
-    private $valueHelper;
+    private \PHPUnit\Framework\MockObject\MockObject $valueHelper;
 
     /**
      * @var FieldHelper|\PHPUnit\Framework\MockObject\MockObject
      */
-    private $fieldHelper;
+    private \PHPUnit\Framework\MockObject\MockObject $fieldHelper;
 
     protected function setUp(): void
     {
@@ -46,7 +46,7 @@ class ObjectChangeGeneratorTest extends TestCase
     {
         $this->valueHelper->method('getValueForMautic')
             ->willReturnCallback(
-                function (NormalizedValueDAO $normalizedValueDAO, string $fieldState, string $syncDirection) {
+                function (NormalizedValueDAO $normalizedValueDAO, string $fieldState, string $syncDirection): NormalizedValueDAO {
                     return $normalizedValueDAO;
                 }
             );
@@ -64,7 +64,7 @@ class ObjectChangeGeneratorTest extends TestCase
         $this->syncJudge->expects($this->exactly(2))
             ->method('adjudicate')
             ->willReturnCallback(
-                function ($mode, InformationChangeRequestDAO $internalInformationChangeRequest, InformationChangeRequestDAO $integrationInformationChangeRequest) {
+                function ($mode, InformationChangeRequestDAO $internalInformationChangeRequest, InformationChangeRequestDAO $integrationInformationChangeRequest): InformationChangeRequestDAO {
                     return $integrationInformationChangeRequest;
                 }
             );
@@ -107,7 +107,7 @@ class ObjectChangeGeneratorTest extends TestCase
     {
         $this->valueHelper->method('getValueForMautic')
             ->willReturnCallback(
-                function (NormalizedValueDAO $normalizedValueDAO, string $fieldState, string $syncDirection) {
+                function (NormalizedValueDAO $normalizedValueDAO, string $fieldState, string $syncDirection): NormalizedValueDAO {
                     return $normalizedValueDAO;
                 }
             );
@@ -125,7 +125,7 @@ class ObjectChangeGeneratorTest extends TestCase
         $this->syncJudge->expects($this->exactly(2))
             ->method('adjudicate')
             ->willReturnCallback(
-                function ($mode, InformationChangeRequestDAO $internalInformationChangeRequest, InformationChangeRequestDAO $integrationInformationChangeRequest) {
+                function ($mode, InformationChangeRequestDAO $internalInformationChangeRequest, InformationChangeRequestDAO $integrationInformationChangeRequest): InformationChangeRequestDAO {
                     return $internalInformationChangeRequest;
                 }
             );
@@ -164,10 +164,7 @@ class ObjectChangeGeneratorTest extends TestCase
         $this->assertEquals('Bob', $changedFields['firstname']->getValue()->getNormalizedValue());
     }
 
-    /**
-     * @return MappingManualDAO
-     */
-    private function getMappingManual(string $integration, string $objectName)
+    private function getMappingManual(string $integration, string $objectName): MappingManualDAO
     {
         $mappingManual = new MappingManualDAO($integration);
         $objectMapping = new ObjectMappingDAO(Contact::NAME, $objectName);
@@ -178,10 +175,7 @@ class ObjectChangeGeneratorTest extends TestCase
         return $mappingManual;
     }
 
-    /**
-     * @return ReportDAO
-     */
-    private function getIntegrationSyncReport(string $integration, string $objectName)
+    private function getIntegrationSyncReport(string $integration, string $objectName): ReportDAO
     {
         $syncReport   = new ReportDAO($integration);
         $reportObject = new ReportObjectDAO($objectName, 2);
@@ -193,10 +187,7 @@ class ObjectChangeGeneratorTest extends TestCase
         return $syncReport;
     }
 
-    /**
-     * @return ObjectChangeGenerator
-     */
-    private function getObjectGenerator()
+    private function getObjectGenerator(): ObjectChangeGenerator
     {
         return new ObjectChangeGenerator($this->syncJudge, $this->valueHelper, $this->fieldHelper);
     }

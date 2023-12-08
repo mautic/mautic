@@ -48,7 +48,7 @@ final class ImportCompanySubscriberTest extends \PHPUnit\Framework\TestCase
                 /**
                  * @param array<mixed> $requestedPermission
                  */
-                public function isGranted($requestedPermission, $mode = 'MATCH_ALL', $userEntity = null, $allowUnknown = false)
+                public function isGranted($requestedPermission, $mode = 'MATCH_ALL', $userEntity = null, $allowUnknown = false): bool
                 {
                     Assert::assertSame('lead:imports:create', $requestedPermission);
 
@@ -75,7 +75,7 @@ final class ImportCompanySubscriberTest extends \PHPUnit\Framework\TestCase
                 /**
                  * @param array<mixed> $requestedPermission
                  */
-                public function isGranted($requestedPermission, $mode = 'MATCH_ALL', $userEntity = null, $allowUnknown = false)
+                public function isGranted($requestedPermission, $mode = 'MATCH_ALL', $userEntity = null, $allowUnknown = false): bool
                 {
                     Assert::assertSame('lead:imports:create', $requestedPermission);
 

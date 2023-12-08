@@ -4,34 +4,15 @@ namespace Mautic\FormBundle\Tests\ProgressiveProfiling;
 
 use Mautic\FormBundle\Entity\Field;
 use Mautic\FormBundle\Entity\Form;
-use Mautic\FormBundle\ProgressiveProfiling\DisplayCounter;
 use Mautic\FormBundle\ProgressiveProfiling\DisplayManager;
 
 class DisplayManagerTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var Form
-     */
-    private $form;
-
-    /**
-     * @var array
-     */
-    private $viewOnlyFields;
-
-    /**
-     * @var DisplayCounter
-     */
-    private $displayCounter;
-
     public function setUp(): void
     {
-        $this->viewOnlyFields = [];
-        $this->form           = new Form();
-        $this->displayCounter = new DisplayCounter($this->form);
     }
 
-    public function testShowForField()
+    public function testShowForField(): void
     {
         $form           = new Form();
         $viewOnlyFields = ['button'];

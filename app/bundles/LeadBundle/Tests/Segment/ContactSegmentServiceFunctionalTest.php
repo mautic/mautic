@@ -59,7 +59,7 @@ class ContactSegmentServiceFunctionalTest extends MauticMysqlTestCase
             false
         )->getReferenceRepository();
 
-        $this->contactSegmentService = self::$container->get('mautic.lead.model.lead_segment_service');
+        $this->contactSegmentService = self::getContainer()->get('mautic.lead.model.lead_segment_service');
     }
 
     protected function beforeBeginTransaction(): void

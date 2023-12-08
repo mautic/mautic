@@ -47,137 +47,134 @@ class SubmissionModelTest extends \PHPUnit\Framework\TestCase
     /**
      * @var MockObject|IpLookupHelper
      */
-    private $ipLookupHelper;
+    private \PHPUnit\Framework\MockObject\MockObject $ipLookupHelper;
 
     /**
      * @var MockObject|Environment
      */
-    private $twigMock;
+    private \PHPUnit\Framework\MockObject\MockObject $twigMock;
 
     /**
      * @var MockObject|FormModel
      */
-    private $formModel;
+    private \PHPUnit\Framework\MockObject\MockObject $formModel;
 
     /**
      * @var MockObject|PageModel
      */
-    private $pageModel;
+    private \PHPUnit\Framework\MockObject\MockObject $pageModel;
 
     /**
      * @var MockObject|LeadModel
      */
-    private $leadModel;
+    private \PHPUnit\Framework\MockObject\MockObject $leadModel;
 
     /**
      * @var MockObject|CampaignModel
      */
-    private $campaignModel;
+    private \PHPUnit\Framework\MockObject\MockObject $campaignModel;
 
     /**
      * @var MockObject|MembershipManager
      */
-    private $membershipManager;
+    private \PHPUnit\Framework\MockObject\MockObject $membershipManager;
 
     /**
      * @var MockObject|LeadFieldModel
      */
-    private $leadFieldModel;
+    private \PHPUnit\Framework\MockObject\MockObject $leadFieldModel;
 
     /**
      * @var MockObject|CompanyModel
      */
-    private $companyModel;
+    private \PHPUnit\Framework\MockObject\MockObject $companyModel;
 
     /**
      * @var MockObject|FormFieldHelper
      */
-    private $fieldHelper;
+    private \PHPUnit\Framework\MockObject\MockObject $fieldHelper;
 
     /**
      * @var MockObject|EventDispatcherInterface
      */
-    private $dispatcher;
+    private \PHPUnit\Framework\MockObject\MockObject $dispatcher;
 
     /**
      * @var MockObject|Translator
      */
-    private $translator;
+    private \PHPUnit\Framework\MockObject\MockObject $translator;
 
     /**
      * @var MockObject|DateHelper
      */
-    private $dateHelper;
+    private \Mautic\CoreBundle\Twig\Helper\DateHelper $dateHelper;
 
     /**
      * @var MockObject|UserHelper
      */
-    private $userHelper;
+    private \PHPUnit\Framework\MockObject\MockObject $userHelper;
 
     /**
      * @var MockObject|EntityManager
      */
-    private $entityManager;
+    private \PHPUnit\Framework\MockObject\MockObject $entityManager;
 
     /**
      * @var MockObject|SubmissionRepository
      */
-    private $submissioRepository;
+    private \PHPUnit\Framework\MockObject\MockObject $submissioRepository;
 
     /**
      * @var MockObject|LeadRepository
      */
-    private $leadRepository;
+    private \PHPUnit\Framework\MockObject\MockObject $leadRepository;
 
     /**
      * @var MockObject|Logger
      */
-    private $mockLogger;
+    private \PHPUnit\Framework\MockObject\MockObject $mockLogger;
 
     /**
      * @var MockObject|UploadFieldValidator
      */
-    private $uploadFieldValidatorMock;
+    private \PHPUnit\Framework\MockObject\MockObject $uploadFieldValidatorMock;
 
     /**
      * @var MockObject|FormUploader
      */
-    private $formUploaderMock;
+    private \PHPUnit\Framework\MockObject\MockObject $formUploaderMock;
 
     /**
      * @var MockObject|DeviceTrackingServiceInterface
      */
-    private $deviceTrackingService;
+    private \PHPUnit\Framework\MockObject\MockObject $deviceTrackingService;
 
     /**
      * @var MockObject|UploadedFile
      */
-    private $file1Mock;
+    private \PHPUnit\Framework\MockObject\MockObject $file1Mock;
 
     /**
      * @var MockObject|RouterInterface
      */
-    private $router;
+    private \PHPUnit\Framework\MockObject\MockObject $router;
 
     /**
      * @var MockObject|ContactTracker
      */
-    private $contactTracker;
+    private \PHPUnit\Framework\MockObject\MockObject $contactTracker;
 
     /**
      * @var MockObject|ContactMerger
      */
-    private $contactMerger;
+    private \PHPUnit\Framework\MockObject\MockObject $contactMerger;
 
-    /**
-     * @var SubmissionModel
-     */
-    private $submissionModel;
+    private \Mautic\FormBundle\Model\SubmissionModel $submissionModel;
 
     /**
      * @var \ReflectionClass<SubmissionModel>
      */
-    private $submissionModelReflection;
+    private \ReflectionClass $submissionModelReflection;
 
     protected function setUp(): void
     {
@@ -345,7 +342,7 @@ class SubmissionModelTest extends \PHPUnit\Framework\TestCase
         $this->assertFalse($this->submissionModel->saveSubmission($post, $server, $form, $request));
     }
 
-    public function testNormalizeValues()
+    public function testNormalizeValues(): void
     {
         $reflection = new \ReflectionClass(SubmissionModel::class);
         $method     = $reflection->getMethod('normalizeValue');
@@ -444,7 +441,7 @@ class SubmissionModelTest extends \PHPUnit\Framework\TestCase
         $this->setUpExport();
         $response = $this->submissionModel->exportResults('csv', new Form(), []);
 
-        $this->assertSame(get_class($response), 'Symfony\Component\HttpFoundation\StreamedResponse');
+        $this->assertSame(get_class($response), \Symfony\Component\HttpFoundation\StreamedResponse::class);
         $this->assertStringContainsString('.csv', $response->headers->get('Content-Disposition'));
         $this->assertSame('0', $response->headers->get('Expires'));
     }
@@ -454,7 +451,7 @@ class SubmissionModelTest extends \PHPUnit\Framework\TestCase
         $this->setUpExport();
         $response = $this->submissionModel->exportResults('xlsx', new Form(), []);
 
-        $this->assertSame(get_class($response), 'Symfony\Component\HttpFoundation\StreamedResponse');
+        $this->assertSame(get_class($response), \Symfony\Component\HttpFoundation\StreamedResponse::class);
         $this->assertStringContainsString('.xlsx', $response->headers->get('Content-Disposition'));
         $this->assertSame('0', $response->headers->get('Expires'));
     }

@@ -66,7 +66,7 @@ trait RepositoryConfiguratorTrait
         $this->managerRegistry->method('getManagerForClass')->with($entityClass)->willReturn($this->entityManager);
         $this->entityManager->method('getClassMetadata')->with($entityClass)->willReturn($this->classMetadata);
         $this->entityManager->method('getConnection')->willReturn($this->connection);
-        $this->connection->method('getExpressionBuilder')->willReturnCallback(fn () => new ExpressionBuilder($this->connection));
+        $this->connection->method('getExpressionBuilder')->willReturnCallback(fn (): \Doctrine\DBAL\Query\Expression\ExpressionBuilder => new ExpressionBuilder($this->connection));
         $this->connection->method('executeQuery')->willReturn($this->result);
         $this->connection->method('quote')->willReturnCallback(fn ($value) => "'$value'");
     }

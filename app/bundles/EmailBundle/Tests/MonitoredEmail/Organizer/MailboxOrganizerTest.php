@@ -53,7 +53,7 @@ class MailboxOrganizerTest extends \PHPUnit\Framework\TestCase
      * @covers  \Mautic\EmailBundle\MonitoredEmail\Organizer\MailboxOrganizer::getContainer()
      * @covers  \Mautic\EmailBundle\MonitoredEmail\Organizer\MailboxOrganizer::getContainers()
      */
-    public function testMailboxesAreConvertedIntoASingleContainer()
+    public function testMailboxesAreConvertedIntoASingleContainer(): void
     {
         $configs   = $this->getConfigs($this->mailboxes);
         $event     = new ParseEmailEvent();
@@ -76,7 +76,7 @@ class MailboxOrganizerTest extends \PHPUnit\Framework\TestCase
      * @covers  \Mautic\EmailBundle\MonitoredEmail\Organizer\MailboxOrganizer::getContainer()
      * @covers  \Mautic\EmailBundle\MonitoredEmail\Organizer\MailboxOrganizer::getContainers()
      */
-    public function testMailboxesWithDifferentPathsAreConvertedIntoMultipleContainers()
+    public function testMailboxesWithDifferentPathsAreConvertedIntoMultipleContainers(): void
     {
         $mailboxes = [
             'EmailBundle_bounces' => [
@@ -123,7 +123,7 @@ class MailboxOrganizerTest extends \PHPUnit\Framework\TestCase
 
         $this->assertCount(3, $containers);
 
-        foreach ($containers as $key => $container) {
+        foreach ($containers as $container) {
             $this->assertInstanceOf(MailboxContainer::class, $container);
         }
     }
@@ -137,7 +137,7 @@ class MailboxOrganizerTest extends \PHPUnit\Framework\TestCase
      * @covers  \Mautic\EmailBundle\Event\ParseEmailEvent::setCriteriaRequest()
      * @covers  \Mautic\EmailBundle\Event\ParseEmailEvent::getCriteriaRequests()
      */
-    public function testMailboxesWithDifferentCriteriaAreAddedToContainer()
+    public function testMailboxesWithDifferentCriteriaAreAddedToContainer(): void
     {
         $configs = $this->getConfigs($this->mailboxes);
         $event   = new ParseEmailEvent();
@@ -173,7 +173,7 @@ class MailboxOrganizerTest extends \PHPUnit\Framework\TestCase
      * @covers  \Mautic\EmailBundle\Event\ParseEmailEvent::getCriteriaRequests()
      * @covers  \Mautic\EmailBundle\Event\ParseEmailEvent::getMarkAsSeenInstructions()
      */
-    public function testMailboxesWithDifferentCriteriaWithUnseenFlagMarksContainer()
+    public function testMailboxesWithDifferentCriteriaWithUnseenFlagMarksContainer(): void
     {
         $configs = $this->getConfigs($this->mailboxes);
         $event   = new ParseEmailEvent();
@@ -188,10 +188,7 @@ class MailboxOrganizerTest extends \PHPUnit\Framework\TestCase
         $this->assertTrue($containers[$key]->shouldMarkAsSeen());
     }
 
-    /**
-     * @return array
-     */
-    protected function getConfigs($mailboxes)
+    protected function getConfigs($mailboxes): array
     {
         $configs = [];
 

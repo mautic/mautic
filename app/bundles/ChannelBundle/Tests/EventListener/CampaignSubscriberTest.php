@@ -33,40 +33,34 @@ use Symfony\Component\EventDispatcher\EventDispatcher;
 
 class CampaignSubscriberTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var EventDispatcher
-     */
-    private $dispatcher;
+    private \Symfony\Component\EventDispatcher\EventDispatcher $dispatcher;
 
     /**
      * @var \PHPUnit\Framework\MockObject\MockObject|MessageModel
      */
-    private $messageModel;
+    private \PHPUnit\Framework\MockObject\MockObject $messageModel;
 
-    /**
-     * @var ActionDispatcher
-     */
-    private $eventDispatcher;
+    private \Mautic\CampaignBundle\Executioner\Dispatcher\ActionDispatcher $eventDispatcher;
 
     /**
      * @var \PHPUnit\Framework\MockObject\MockObject|EventCollector
      */
-    private $eventCollector;
+    private \PHPUnit\Framework\MockObject\MockObject $eventCollector;
 
     /**
      * @var \PHPUnit\Framework\MockObject\MockObject|Translator
      */
-    private $translator;
+    private \PHPUnit\Framework\MockObject\MockObject $translator;
 
     /**
      * @var \PHPUnit\Framework\MockObject\MockObject|EventScheduler
      */
-    private $scheduler;
+    private \PHPUnit\Framework\MockObject\MockObject $scheduler;
 
     /**
      * @var \PHPUnit\Framework\MockObject\MockObject|LegacyEventDispatcher
      */
-    private $legacyDispatcher;
+    private \Mautic\CampaignBundle\Executioner\Dispatcher\LegacyEventDispatcher $legacyDispatcher;
 
     protected function setUp(): void
     {
@@ -210,7 +204,7 @@ class CampaignSubscriberTest extends \PHPUnit\Framework\TestCase
         $this->dispatcher->addListener(SmsEvents::ON_CAMPAIGN_TRIGGER_ACTION, [$this, 'sendMarketingMessageSms']);
     }
 
-    public function testCorrectChannelIsUsed()
+    public function testCorrectChannelIsUsed(): void
     {
         $event  = $this->getEvent();
         $config = new ActionAccessor(
@@ -255,7 +249,7 @@ class CampaignSubscriberTest extends \PHPUnit\Framework\TestCase
         $this->assertTrue(empty($successful->get(1)->getMetadata()));
     }
 
-    public function sendMarketingMessageEmail(PendingEvent $event)
+    public function sendMarketingMessageEmail(PendingEvent $event): void
     {
         $contacts = $event->getContacts();
         $logs     = $event->getPending();
@@ -279,7 +273,7 @@ class CampaignSubscriberTest extends \PHPUnit\Framework\TestCase
     /**
      * BC support for old campaign.
      */
-    public function sendMarketingMessageSms(CampaignExecutionEvent $event)
+    public function sendMarketingMessageSms(CampaignExecutionEvent $event): void
     {
         $lead = $event->getLead();
         if (1 === $lead->getId()) {
@@ -343,10 +337,7 @@ class CampaignSubscriberTest extends \PHPUnit\Framework\TestCase
         return $event;
     }
 
-    /**
-     * @return ArrayCollection
-     */
-    private function getLogs()
+    private function getLogs(): ArrayCollection
     {
         $lead = $this->getMockBuilder(Lead::class)
             ->getMock();

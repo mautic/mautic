@@ -20,37 +20,31 @@ class DecoratorFactoryTest extends \PHPUnit\Framework\TestCase
     /**
      * @var MockObject|EventDispatcherInterface
      */
-    private $eventDispatcherMock;
+    private \PHPUnit\Framework\MockObject\MockObject $eventDispatcherMock;
 
-    /**
-     * @var ContactSegmentFilterDictionary
-     */
-    private $contactSegmentFilterDictionary;
+    private \Mautic\LeadBundle\Services\ContactSegmentFilterDictionary $contactSegmentFilterDictionary;
 
     /**
      * @var MockObject|BaseDecorator
      */
-    private $baseDecorator;
+    private \PHPUnit\Framework\MockObject\MockObject $baseDecorator;
 
     /**
      * @var MockObject|CustomMappedDecorator
      */
-    private $customMappedDecorator;
+    private \PHPUnit\Framework\MockObject\MockObject $customMappedDecorator;
 
     /**
      * @var MockObject|CompanyDecorator
      */
-    private $companyDecorator;
+    private \PHPUnit\Framework\MockObject\MockObject $companyDecorator;
 
     /**
      * @var MockObject|DateOptionFactory
      */
-    private $dateOptionFactory;
+    private \PHPUnit\Framework\MockObject\MockObject $dateOptionFactory;
 
-    /**
-     * @var DecoratorFactory
-     */
-    private $decoratorFactory;
+    private \Mautic\LeadBundle\Segment\Decorator\DecoratorFactory $decoratorFactory;
 
     protected function setUp(): void
     {
@@ -111,7 +105,7 @@ class DecoratorFactoryTest extends \PHPUnit\Framework\TestCase
             ->method('dispatch')
             ->with(
                 $this->callback(
-                    function (LeadListFiltersDecoratorDelegateEvent $event) use ($contactSegmentFilterCrate) {
+                    function (LeadListFiltersDecoratorDelegateEvent $event) use ($contactSegmentFilterCrate): bool {
                         $this->assertNull($event->getDecorator());
                         $this->assertSame($contactSegmentFilterCrate, $event->getCrate());
 
@@ -139,7 +133,7 @@ class DecoratorFactoryTest extends \PHPUnit\Framework\TestCase
             ->method('dispatch')
             ->with(
                 $this->callback(
-                    function (LeadListFiltersDecoratorDelegateEvent $event) use ($contactSegmentFilterCrate, $filterDecoratorInterface) {
+                    function (LeadListFiltersDecoratorDelegateEvent $event) use ($contactSegmentFilterCrate, $filterDecoratorInterface): bool {
                         $this->assertNull($event->getDecorator());
                         $this->assertSame($contactSegmentFilterCrate, $event->getCrate());
 

@@ -44,7 +44,7 @@ class RequestStorageHelperTest extends MauticMysqlTestCase
 
         $this->expectException(\UnexpectedValueException::class);
         $this->expectExceptionMessage("Request with key '{$key}' was not found.");
-        $request = $this->helper->getRequest($key);
+        $this->helper->getRequest($key);
     }
 
     public function testGetRequestIfNotFound(): void

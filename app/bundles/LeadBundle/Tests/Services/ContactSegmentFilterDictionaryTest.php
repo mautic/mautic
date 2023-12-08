@@ -24,7 +24,7 @@ class ContactSegmentFilterDictionaryTest extends TestCase
         // Subscribe new filter like a plugin would.
         $dispatcher->expects($this->once())
             ->method('dispatch')
-            ->with($this->callback(function (SegmentDictionaryGenerationEvent $event) {
+            ->with($this->callback(function (SegmentDictionaryGenerationEvent $event): bool {
                 $event->addTranslation('plugin_key', ['type' => 'blah blah']);
 
                 return true;

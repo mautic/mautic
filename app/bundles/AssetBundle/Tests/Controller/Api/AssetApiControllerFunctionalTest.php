@@ -15,7 +15,7 @@ class AssetApiControllerFunctionalTest extends MauticMysqlTestCase
         ];
         $this->client->request('POST', 'api/assets/new', $payload);
         $clientResponse = $this->client->getResponse();
-        $this->assertSame(201, $clientResponse->getStatusCode(), $clientResponse->getContent());
+        $this->assertResponseStatusCodeSame(201, $clientResponse->getContent());
         $response = json_decode($clientResponse->getContent(), true);
         $this->assertEquals($payload['title'], $response['asset']['title']);
         $this->assertEquals($payload['storageLocation'], $response['asset']['storageLocation']);
@@ -36,7 +36,7 @@ class AssetApiControllerFunctionalTest extends MauticMysqlTestCase
         ];
         $this->client->request('POST', 'api/assets/new', $payload);
         $clientResponse = $this->client->getResponse();
-        $this->assertSame(201, $clientResponse->getStatusCode(), $clientResponse->getContent());
+        $this->assertResponseStatusCodeSame(201, $clientResponse->getContent());
         $response = json_decode($clientResponse->getContent(), true);
         $this->assertEquals($payload['title'], $response['asset']['title']);
         $this->assertEquals($payload['storageLocation'], $response['asset']['storageLocation']);

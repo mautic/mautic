@@ -76,10 +76,7 @@ class FormTestAbstract extends TestCase
         $this->mockTrackingId = hash('sha1', uniqid((string) mt_rand()));
     }
 
-    /**
-     * @return FormModel
-     */
-    protected function getFormModel()
+    protected function getFormModel(): FormModel
     {
         $requestStack          = $this->createMock(RequestStack::class);
         $twigMock              = $this->createMock(Environment::class);
@@ -118,7 +115,7 @@ class FormTestAbstract extends TestCase
                 )
             );
 
-        $formModel = new FormModel(
+        return new FormModel(
             $requestStack,
             $twigMock,
             $themeHelper,
@@ -141,14 +138,9 @@ class FormTestAbstract extends TestCase
             $this->createMock(LoggerInterface::class),
             $this->createMock(CoreParametersHelper::class),
         );
-
-        return $formModel;
     }
 
-    /**
-     * @return SubmissionModel
-     */
-    protected function getSubmissionModel()
+    protected function getSubmissionModel(): SubmissionModel
     {
         $ipLookupHelper             = $this->createMock(IpLookupHelper::class);
         $twigMock                   = $this->createMock(Environment::class);
@@ -245,7 +237,8 @@ class FormTestAbstract extends TestCase
         $companyModel->expects($this->any())
             ->method('fetchCompanyFields')
             ->willReturn([]);
-        $submissionModel = new SubmissionModel(
+
+        return new SubmissionModel(
             $ipLookupHelper,
             $twigMock,
             $formModel,
@@ -272,8 +265,6 @@ class FormTestAbstract extends TestCase
             $mockLogger,
             $this->coreParametersHelper,
         );
-
-        return $submissionModel;
     }
 
     /**

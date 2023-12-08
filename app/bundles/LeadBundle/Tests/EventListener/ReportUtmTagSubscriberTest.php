@@ -208,9 +208,8 @@ class ReportUtmTagSubscriberTest extends \PHPUnit\Framework\TestCase
     {
         $fieldsBuilderMock      = $this->createMock(FieldsBuilder::class);
         $companyReportDataMock  = $this->createMock(CompanyReportData::class);
-        $reportUtmTagSubscriber = new ReportUtmTagSubscriber($fieldsBuilderMock, $companyReportDataMock);
 
-        return $reportUtmTagSubscriber;
+        return new ReportUtmTagSubscriber($fieldsBuilderMock, $companyReportDataMock);
     }
 
     /**

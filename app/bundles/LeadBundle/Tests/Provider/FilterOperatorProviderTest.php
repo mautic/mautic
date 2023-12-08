@@ -17,17 +17,14 @@ final class FilterOperatorProviderTest extends \PHPUnit\Framework\TestCase
     /**
      * @var MockObject|EventDispatcherInterface
      */
-    private $dispatcher;
+    private \PHPUnit\Framework\MockObject\MockObject $dispatcher;
 
     /**
      * @var MockObject|TranslatorInterface
      */
-    private $translator;
+    private \PHPUnit\Framework\MockObject\MockObject $translator;
 
-    /**
-     * @var FilterOperatorProvider
-     */
-    private $provider;
+    private \Mautic\LeadBundle\Provider\FilterOperatorProvider $provider;
 
     protected function setUp(): void
     {
@@ -46,7 +43,7 @@ final class FilterOperatorProviderTest extends \PHPUnit\Framework\TestCase
         $this->dispatcher->expects($this->once())
             ->method('dispatch')
             ->with(
-                $this->callback(function (LeadListFiltersOperatorsEvent $event) {
+                $this->callback(function (LeadListFiltersOperatorsEvent $event): bool {
                     // Emulate a subscriber.
                     $event->addOperator(
                         OperatorOptions::EQUAL_TO,

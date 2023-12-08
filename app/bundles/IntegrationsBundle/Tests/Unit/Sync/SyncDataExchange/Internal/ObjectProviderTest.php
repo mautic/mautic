@@ -18,12 +18,9 @@ class ObjectProviderTest extends TestCase
     /**
      * @var EventDispatcherInterface|\PHPUnit\Framework\MockObject\MockObject
      */
-    private $dispatcher;
+    private \PHPUnit\Framework\MockObject\MockObject $dispatcher;
 
-    /**
-     * @var ObjectProvider
-     */
-    private $objectProvider;
+    private \Mautic\IntegrationsBundle\Sync\SyncDataExchange\Internal\ObjectProvider $objectProvider;
 
     protected function setUp(): void
     {
@@ -50,7 +47,7 @@ class ObjectProviderTest extends TestCase
         $this->dispatcher->expects($this->once())
             ->method('dispatch')
             ->with(
-                $this->callback(function (InternalObjectEvent $e) use ($contact) {
+                $this->callback(function (InternalObjectEvent $e) use ($contact): bool {
                     // Fake a subscriber.
                     $e->addObject($contact);
 
@@ -81,7 +78,7 @@ class ObjectProviderTest extends TestCase
         $this->dispatcher->expects($this->once())
             ->method('dispatch')
             ->with(
-                $this->callback(function (InternalObjectEvent $e) use ($contact) {
+                $this->callback(function (InternalObjectEvent $e) use ($contact): bool {
                     // Fake a subscriber.
                     $e->addObject($contact);
 

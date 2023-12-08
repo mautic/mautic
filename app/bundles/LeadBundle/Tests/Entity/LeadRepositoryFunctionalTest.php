@@ -7,10 +7,7 @@ use Mautic\LeadBundle\Entity\Lead;
 
 class LeadRepositoryFunctionalTest extends MauticMysqlTestCase
 {
-    /**
-     * @var Lead
-     */
-    private $lead;
+    private \Mautic\LeadBundle\Entity\Lead $lead;
 
     protected function setUp(): void
     {
@@ -19,9 +16,9 @@ class LeadRepositoryFunctionalTest extends MauticMysqlTestCase
         $this->lead = $this->createLead();
     }
 
-    public function testPointsAreAdded()
+    public function testPointsAreAdded(): void
     {
-        $model = self::$container->get('mautic.lead.model.lead');
+        $model = self::getContainer()->get('mautic.lead.model.lead');
 
         $this->lead->adjustPoints(100);
 
@@ -33,9 +30,9 @@ class LeadRepositoryFunctionalTest extends MauticMysqlTestCase
         $this->assertEquals(200, $changes['points'][1]);
     }
 
-    public function testPointsAreSubtracted()
+    public function testPointsAreSubtracted(): void
     {
-        $model = self::$container->get('mautic.lead.model.lead');
+        $model = self::getContainer()->get('mautic.lead.model.lead');
 
         $this->lead->adjustPoints(100, Lead::POINTS_SUBTRACT);
 
@@ -47,9 +44,9 @@ class LeadRepositoryFunctionalTest extends MauticMysqlTestCase
         $this->assertEquals(0, $changes['points'][1]);
     }
 
-    public function testPointsAreMultiplied()
+    public function testPointsAreMultiplied(): void
     {
-        $model = self::$container->get('mautic.lead.model.lead');
+        $model = self::getContainer()->get('mautic.lead.model.lead');
 
         $this->lead->adjustPoints(2, Lead::POINTS_MULTIPLY);
 
@@ -61,9 +58,9 @@ class LeadRepositoryFunctionalTest extends MauticMysqlTestCase
         $this->assertEquals(200, $changes['points'][1]);
     }
 
-    public function testPointsAreDivided()
+    public function testPointsAreDivided(): void
     {
-        $model = self::$container->get('mautic.lead.model.lead');
+        $model = self::getContainer()->get('mautic.lead.model.lead');
 
         $this->lead->adjustPoints(2, Lead::POINTS_DIVIDE);
 
@@ -75,9 +72,9 @@ class LeadRepositoryFunctionalTest extends MauticMysqlTestCase
         $this->assertEquals(50, $changes['points'][1]);
     }
 
-    public function testMixedOperatorPointsAreCalculated()
+    public function testMixedOperatorPointsAreCalculated(): void
     {
-        $model = self::$container->get('mautic.lead.model.lead');
+        $model = self::getContainer()->get('mautic.lead.model.lead');
 
         $this->lead->adjustPoints(100, Lead::POINTS_SUBTRACT);
         $this->lead->adjustPoints(120, Lead::POINTS_ADD);
@@ -92,9 +89,9 @@ class LeadRepositoryFunctionalTest extends MauticMysqlTestCase
         $this->assertEquals(60, $changes['points'][1]);
     }
 
-    public function testMixedModelAndRepositorySavesDoNotDoublePoints()
+    public function testMixedModelAndRepositorySavesDoNotDoublePoints(): void
     {
-        $model = self::$container->get('mautic.lead.model.lead');
+        $model = self::getContainer()->get('mautic.lead.model.lead');
         $this->lead->adjustPoints(120, Lead::POINTS_ADD);
         $model->saveEntity($this->lead);
         // Changes should be stored with points

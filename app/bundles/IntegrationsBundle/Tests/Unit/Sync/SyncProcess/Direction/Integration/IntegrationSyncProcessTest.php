@@ -31,22 +31,22 @@ class IntegrationSyncProcessTest extends TestCase
     /**
      * @var SyncDateHelper|\PHPUnit\Framework\MockObject\MockObject
      */
-    private $syncDateHelper;
+    private \PHPUnit\Framework\MockObject\MockObject $syncDateHelper;
 
     /**
      * @var MappingHelper|\PHPUnit\Framework\MockObject\MockObject
      */
-    private $mappingHelper;
+    private \PHPUnit\Framework\MockObject\MockObject $mappingHelper;
 
     /**
      * @var ObjectChangeGenerator|\PHPUnit\Framework\MockObject\MockObject
      */
-    private $objectChangeGenerator;
+    private \PHPUnit\Framework\MockObject\MockObject $objectChangeGenerator;
 
     /**
      * @var SyncDataExchangeInterface|\PHPUnit\Framework\MockObject\MockObject
      */
-    private $syncDataExchange;
+    private \PHPUnit\Framework\MockObject\MockObject $syncDataExchange;
 
     protected function setUp(): void
     {
@@ -85,7 +85,7 @@ class IntegrationSyncProcessTest extends TestCase
         $this->syncDataExchange->expects($this->once())
             ->method('getSyncReport')
             ->willReturnCallback(
-                function (RequestDAO $requestDAO) use ($objectName) {
+                function (RequestDAO $requestDAO) use ($objectName): \Mautic\IntegrationsBundle\Sync\DAO\Sync\Report\ReportDAO {
                     $requestObjects = $requestDAO->getObjects();
                     $this->assertCount(1, $requestObjects);
 
@@ -161,10 +161,7 @@ class IntegrationSyncProcessTest extends TestCase
         $this->assertEquals([$objectName => [2 => $objectChangeDAO]], $syncOrder->getIdentifiedObjects());
     }
 
-    /**
-     * @return IntegrationSyncProcess
-     */
-    private function getSyncProcess(MappingManualDAO $mappingManualDAO)
+    private function getSyncProcess(MappingManualDAO $mappingManualDAO): IntegrationSyncProcess
     {
         $syncProcess = new IntegrationSyncProcess($this->syncDateHelper, $this->mappingHelper, $this->objectChangeGenerator);
 

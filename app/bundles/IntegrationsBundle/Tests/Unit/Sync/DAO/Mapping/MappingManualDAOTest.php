@@ -94,7 +94,7 @@ class MappingManualDAOTest extends TestCase
         );
     }
 
-    private function getMappingManualDAO()
+    private function getMappingManualDAO(): MappingManualDAO
     {
         $mappingManual = new MappingManualDAO($this->integrationName);
         $objectMapping = new ObjectMappingDAO(Contact::NAME, $this->integrationObjectName);

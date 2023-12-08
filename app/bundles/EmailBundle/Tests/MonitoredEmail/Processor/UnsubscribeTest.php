@@ -26,7 +26,7 @@ class UnsubscribeTest extends \PHPUnit\Framework\TestCase
      * @covers  \Mautic\EmailBundle\MonitoredEmail\Search\Result::setContacts()
      * @covers  \Mautic\EmailBundle\MonitoredEmail\Search\Result::getContacts()
      */
-    public function testProcessorInterfaceProcessesMessage()
+    public function testProcessorInterfaceProcessesMessage(): void
     {
         $transport     = new TestTransport();
         $contactFinder = $this->getMockBuilder(ContactFinder::class)
@@ -34,7 +34,7 @@ class UnsubscribeTest extends \PHPUnit\Framework\TestCase
             ->getMock();
         $contactFinder->method('find')
             ->willReturnCallback(
-                function ($email) {
+                function ($email): Result {
                     $stat = new Stat();
 
                     $lead = new Lead();
@@ -83,7 +83,7 @@ class UnsubscribeTest extends \PHPUnit\Framework\TestCase
      * @covers  \Mautic\EmailBundle\MonitoredEmail\Search\Result::setContacts()
      * @covers  \Mautic\EmailBundle\MonitoredEmail\Search\Result::getContacts()
      */
-    public function testContactIsFoundFromMessageAndDncRecordAdded()
+    public function testContactIsFoundFromMessageAndDncRecordAdded(): void
     {
         $transport     = new NullTransport();
         $contactFinder = $this->getMockBuilder(ContactFinder::class)
@@ -91,7 +91,7 @@ class UnsubscribeTest extends \PHPUnit\Framework\TestCase
             ->getMock();
         $contactFinder->method('find')
             ->willReturnCallback(
-                function ($email) {
+                function ($email): Result {
                     $stat = new Stat();
 
                     $lead = new Lead();

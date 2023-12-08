@@ -40,7 +40,7 @@ final class LeadRepositoryTest extends MauticMysqlTestCase
     {
         $contactRepo = $this->em->getRepository(Lead::class);
 
-        $ipRepo = $this->em->getRepository(IpAddress::class);
+        $this->em->getRepository(IpAddress::class);
 
         $ip      = new IpAddress('127.0.0.1');
         $contact = new Lead();
@@ -71,8 +71,8 @@ final class LeadRepositoryTest extends MauticMysqlTestCase
 
         $finalQueries = array_filter(
             $queries['default'],
-            function (array $query) {
-                return false !== strpos($query['sql'], 'SELECT (CASE WHEN t0_.id = 1 THEN 1 ELSE 2 END)');
+            function (array $query): bool {
+                return str_contains($query['sql'], 'SELECT (CASE WHEN t0_.id = 1 THEN 1 ELSE 2 END)');
             }
         );
 

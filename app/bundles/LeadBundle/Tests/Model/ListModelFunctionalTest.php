@@ -13,7 +13,7 @@ use PHPUnit\Framework\Assert;
 
 class ListModelFunctionalTest extends MauticMysqlTestCase
 {
-    public function testPublicSegmentsInContactPreferences()
+    public function testPublicSegmentsInContactPreferences(): void
     {
         $user           = $this->em->getRepository(User::class)->findBy([], [], 1)[0];
         $firstLeadList  = $this->createLeadList($user, 'First', true);
@@ -51,7 +51,7 @@ class ListModelFunctionalTest extends MauticMysqlTestCase
     public function testSegmentLineChartData(): void
     {
         /** @var ListModel $segmentModel */
-        $segmentModel = self::$container->get('mautic.lead.model.list');
+        $segmentModel = self::getContainer()->get('mautic.lead.model.list');
 
         /** @var LeadRepository $contactRepository */
         $contactRepository = $this->em->getRepository(Lead::class);

@@ -8,7 +8,7 @@ use MauticPlugin\MauticCrmBundle\Integration\Salesforce\Object\Lead;
 
 class OrganizerTest extends \PHPUnit\Framework\TestCase
 {
-    public function testRecordsAreOrganizedIntoLeadsAndContacts()
+    public function testRecordsAreOrganizedIntoLeadsAndContacts(): void
     {
         $records = [
             [
@@ -129,7 +129,6 @@ class OrganizerTest extends \PHPUnit\Framework\TestCase
         $contacts  = ['00Qf100000YjYvTEAV', '00Qf100000X1NR5EAN', '00Qf100000YjYvYEAV', '00Qf100000YjYvdEAF', '00Qf100000YjYviEAF'];
         $this->assertEquals($contacts, $organizer->getContactIds());
 
-        /** @var Contact[] $organizedLeads */
         $organizedContacts = $organizer->getContacts();
         foreach ($contacts as $id) {
             $this->assertArrayHasKey($id, $organizedContacts);

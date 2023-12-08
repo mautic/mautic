@@ -14,12 +14,12 @@ class TwilioCallbackTest extends \PHPUnit\Framework\TestCase
     /**
      * @var ContactHelper|\PHPUnit\Framework\MockObject\MockObject
      */
-    private $contactHelper;
+    private \PHPUnit\Framework\MockObject\MockObject $contactHelper;
 
     /**
      * @var Configuration|\PHPUnit\Framework\MockObject\MockObject
      */
-    private $configuration;
+    private \PHPUnit\Framework\MockObject\MockObject $configuration;
 
     protected function setUp(): void
     {
@@ -29,7 +29,7 @@ class TwilioCallbackTest extends \PHPUnit\Framework\TestCase
             ->willReturn('123');
     }
 
-    public function testMissingFromThrowsBadRequestException()
+    public function testMissingFromThrowsBadRequestException(): void
     {
         $this->expectException(BadRequestHttpException::class);
 
@@ -44,7 +44,7 @@ class TwilioCallbackTest extends \PHPUnit\Framework\TestCase
         $this->getCallback()->getMessage($request);
     }
 
-    public function testMissingBodyThrowsBadRequestException()
+    public function testMissingBodyThrowsBadRequestException(): void
     {
         $this->expectException(BadRequestHttpException::class);
 
@@ -60,7 +60,7 @@ class TwilioCallbackTest extends \PHPUnit\Framework\TestCase
         $this->getCallback()->getMessage($request);
     }
 
-    public function testMismatchedAccountSidThrowsBadRequestException()
+    public function testMismatchedAccountSidThrowsBadRequestException(): void
     {
         $this->expectException(BadRequestHttpException::class);
 
@@ -74,7 +74,7 @@ class TwilioCallbackTest extends \PHPUnit\Framework\TestCase
         $this->getCallback()->getMessage($request);
     }
 
-    public function testMessageIsReturned()
+    public function testMessageIsReturned(): void
     {
         $request      = $this->createMock(Request::class);
         $request->method('get')
@@ -91,10 +91,7 @@ class TwilioCallbackTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals('Hello', $this->getCallback()->getMessage($request));
     }
 
-    /**
-     * @return TwilioCallback
-     */
-    private function getCallback()
+    private function getCallback(): TwilioCallback
     {
         return new TwilioCallback($this->contactHelper, $this->configuration);
     }

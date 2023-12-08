@@ -13,7 +13,7 @@ use Psr\Log\NullLogger;
 
 class PreferenceBuilderTest extends \PHPUnit\Framework\TestCase
 {
-    public function testChannelsArePrioritized()
+    public function testChannelsArePrioritized(): void
     {
         $lead = $this->getMockBuilder(Lead::class)
             ->getMock();
@@ -72,7 +72,6 @@ class PreferenceBuilderTest extends \PHPUnit\Framework\TestCase
         $this->assertTrue(isset($preferences['sms']));
         $this->assertTrue(isset($preferences['push']));
 
-        /** @var ChannelPreferences $emailLogs */
         $email = $preferences['email'];
 
         // First priority
@@ -102,7 +101,7 @@ class PreferenceBuilderTest extends \PHPUnit\Framework\TestCase
         $this->assertCount(0, $pushLogs);
     }
 
-    public function testLogIsRemovedFromAllChannels()
+    public function testLogIsRemovedFromAllChannels(): void
     {
         $lead = $this->getMockBuilder(Lead::class)
             ->getMock();

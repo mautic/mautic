@@ -20,10 +20,6 @@ class BcInterfaceTokenTransport implements TransportInterface
 
     private $metadatas = [];
 
-    private $validate = false;
-
-    private $numberToFail;
-
     private $message;
 
     /**
@@ -31,10 +27,8 @@ class BcInterfaceTokenTransport implements TransportInterface
      *
      * @param bool $validate
      */
-    public function __construct($validate = false, $numberToFail = 1)
+    public function __construct()
     {
-        $this->validate           = $validate;
-        $this->numberToFail       = (int) $numberToFail;
         $this->transports['main'] = $this;
     }
 

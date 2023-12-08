@@ -22,8 +22,8 @@ return static function (Rector\Config\RectorConfig $rectorConfig): void {
     ]);
 
     $rectorConfig->skip([
-        '*/Test/*',
-        '*/Tests/*',
+//        '*/Test/*',
+//        '*/Tests/*',
         '*.html.php',
         ContainerGetToConstructorInjectionRector::class => [
             // Requires quite a refactoring

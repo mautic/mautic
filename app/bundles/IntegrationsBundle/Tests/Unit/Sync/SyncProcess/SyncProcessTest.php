@@ -35,67 +35,64 @@ class SyncProcessTest extends TestCase
     /**
      * @var MockObject|MappingManualDAO
      */
-    private $mappingManualDAO;
+    private \PHPUnit\Framework\MockObject\MockObject $mappingManualDAO;
 
     /**
      * @var MockObject|MauticSyncDataExchange
      */
-    private $internalSyncDataExchange;
+    private \PHPUnit\Framework\MockObject\MockObject $internalSyncDataExchange;
 
     /**
      * @var MockObject|SyncDataExchangeInterface
      */
-    private $integrationSyncDataExchange;
+    private \PHPUnit\Framework\MockObject\MockObject $integrationSyncDataExchange;
 
     /**
      * @var MockObject|SyncDateHelper
      */
-    private $syncDateHelper;
+    private \PHPUnit\Framework\MockObject\MockObject $syncDateHelper;
 
     /**
      * @var MockObject|MappingHelper
      */
-    private $mappingHelper;
+    private \PHPUnit\Framework\MockObject\MockObject $mappingHelper;
 
     /**
      * @var MockObject|RelationsHelper
      */
-    private $relationsHelper;
+    private \PHPUnit\Framework\MockObject\MockObject $relationsHelper;
 
     /**
      * @var MockObject|IntegrationSyncProcess
      */
-    private $integrationSyncProcess;
+    private \PHPUnit\Framework\MockObject\MockObject $integrationSyncProcess;
 
     /**
      * @var MockObject|MauticSyncProcess
      */
-    private $mauticSyncProcess;
+    private \PHPUnit\Framework\MockObject\MockObject $mauticSyncProcess;
 
     /**
      * @var MockObject|EventDispatcherInterface
      */
-    private $eventDispatcher;
+    private \PHPUnit\Framework\MockObject\MockObject $eventDispatcher;
 
     /**
      * @var MockObject|Notifier
      */
-    private $notifier;
+    private \PHPUnit\Framework\MockObject\MockObject $notifier;
 
     /**
      * @var MockObject|InputOptionsDAO
      */
-    private $inputOptionsDAO;
+    private \PHPUnit\Framework\MockObject\MockObject $inputOptionsDAO;
 
     /**
      * @var MockObject|SyncServiceInterface
      */
-    private $syncService;
+    private \PHPUnit\Framework\MockObject\MockObject $syncService;
 
-    /**
-     * @var SyncProcess
-     */
-    private $syncProcess;
+    private \Mautic\IntegrationsBundle\Sync\SyncProcess\SyncProcess $syncProcess;
 
     protected function setUp(): void
     {
@@ -183,7 +180,7 @@ class SyncProcessTest extends TestCase
             ->withConsecutive(
                 [
                     // the integration to mautic batch event should be dispatched
-                    $this->callback(function (CompletedSyncIterationEvent $event) {
+                    $this->callback(function (CompletedSyncIterationEvent $event): bool {
                         $orderResult = $event->getOrderResults();
                         Assert::assertCount(1, $orderResult->getUpdatedObjectMappings('bar'));
                         Assert::assertCount(1, $orderResult->getNewObjectMappings('foo'));
@@ -196,7 +193,7 @@ class SyncProcessTest extends TestCase
                 ],
                 [
                     // the integration to mautic batch event should be dispatched
-                    $this->callback(function (CompletedSyncIterationEvent $event) {
+                    $this->callback(function (CompletedSyncIterationEvent $event): bool {
                         $orderResult = $event->getOrderResults();
                         Assert::assertCount(1, $orderResult->getNewObjectMappings('bar'));
                         Assert::assertCount(1, $orderResult->getUpdatedObjectMappings('foo'));

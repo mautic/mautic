@@ -87,14 +87,14 @@ class LeadListModelTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider segmentTestDataProvider
      */
-    public function testSegmentsCanBeDeletedCorrecty(array $arg, array $expected, $message)
+    public function testSegmentsCanBeDeletedCorrecty(array $arg, array $expected, $message): void
     {
         $result = $this->fixture->canNotBeDeleted($arg);
 
         $this->assertEquals($expected, $result, $message);
     }
 
-    public function segmentTestDataProvider()
+    public function segmentTestDataProvider(): array
     {
         return [
             [

@@ -163,7 +163,7 @@ class ReportSubscriberFunctionalTest extends MauticMysqlTestCase
 
     private function createTestContactWithGroupPoints(): void
     {
-        $contactModel = self::$container->get('mautic.lead.model.lead');
+        $contactModel = self::getContainer()->get('mautic.lead.model.lead');
 
         $groupA = $this->createGroup('Group A');
         $groupB = $this->createGroup('Group B');
@@ -230,7 +230,7 @@ class ReportSubscriberFunctionalTest extends MauticMysqlTestCase
     private function domTableToArray(Crawler $crawler): array
     {
         return $crawler->filter('tr')->each(function ($tr) {
-            return $tr->filter('td')->each(function ($td) {
+            return $tr->filter('td')->each(function ($td): string {
                 return trim($td->text());
             });
         });

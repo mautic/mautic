@@ -39,7 +39,7 @@ final class LeadSubscriberTest extends MauticMysqlTestCase
                     return true;
                 }
 
-                public function getEnabledIntegrations()
+                public function getEnabledIntegrations(): array
                 {
                     return ['unicorn'];
                 }

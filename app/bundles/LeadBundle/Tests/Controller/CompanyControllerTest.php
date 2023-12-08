@@ -131,7 +131,7 @@ class CompanyControllerTest extends MauticMysqlTestCase
     {
         $this->client->request('GET', '/s/companies/new/');
         $clientResponse         = $this->client->getResponse();
-        $clientResponseContent  = $clientResponse->getContent();
+        $clientResponse->getContent();
         $this->assertEquals(Response::HTTP_OK, $clientResponse->getStatusCode());
     }
 }

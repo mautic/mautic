@@ -9,7 +9,7 @@ class RandomHelperTest extends \PHPUnit\Framework\TestCase
     /**
      * Based on https://github.com/nette/utils/blob/master/tests/Utils/Random.generate().phpt.
      */
-    public function testGenerate()
+    public function testGenerate(): void
     {
         $randomHelper = $this->getRandomHelper();
         $this->assertSame(10, strlen($randomHelper->generate(10)));
@@ -36,10 +36,7 @@ class RandomHelperTest extends \PHPUnit\Framework\TestCase
         }
     }
 
-    /**
-     * @return RandomHelper
-     */
-    private function getRandomHelper()
+    private function getRandomHelper(): RandomHelper
     {
         return new RandomHelper();
     }

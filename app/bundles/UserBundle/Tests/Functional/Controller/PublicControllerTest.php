@@ -15,7 +15,7 @@ class PublicControllerTest extends MauticMysqlTestCase
     {
         $this->client->request('GET', '/passwordreset?bundle=%27-alert("XSS%20TEST%20Mautic")-%27');
         $clientResponse = $this->client->getResponse();
-        $this->assertSame(200, $clientResponse->getStatusCode(), 'Return code must be 200.');
+        $this->assertResponseIsSuccessful('Return code must be 200.');
         $responseData = $clientResponse->getContent();
         // Tests that actual string is not present.
         $this->assertStringNotContainsString('-alert("xss test mautic")-', $responseData, 'XSS injection attempt is filtered.');
@@ -27,7 +27,7 @@ class PublicControllerTest extends MauticMysqlTestCase
     {
         $this->client->request('GET', '/passwordreset');
         $clientResponse = $this->client->getResponse();
-        $this->assertSame(200, $clientResponse->getStatusCode(), 'Return code must be 200.');
+        $this->assertResponseIsSuccessful('Return code must be 200.');
         $responseData = $clientResponse->getContent();
         $this->assertStringContainsString('Enter either your username or email to reset your password. Instructions to reset your password will be sent to the email in your profile.', $responseData);
     }
@@ -39,7 +39,7 @@ class PublicControllerTest extends MauticMysqlTestCase
         $form       = $saveButton->form();
         $form['passwordreset[identifier]']->setValue('test@example.com');
 
-        $crawler        = $this->client->submit($form);
+        $this->client->submit($form);
         $clientResponse = $this->client->getResponse();
         $this->assertTrue($clientResponse->isOk(), $clientResponse->getContent());
 

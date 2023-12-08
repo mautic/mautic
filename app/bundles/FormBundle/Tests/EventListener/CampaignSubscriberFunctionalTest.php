@@ -64,7 +64,7 @@ class CampaignSubscriberFunctionalTest extends MauticMysqlTestCase
         $this->client->request('POST', '/api/forms/new', $formPayload);
         $clientResponse = $this->client->getResponse();
 
-        $this->assertSame(Response::HTTP_CREATED, $clientResponse->getStatusCode(), $clientResponse->getContent());
+        $this->assertResponseStatusCodeSame(Response::HTTP_CREATED, $clientResponse->getContent());
         $response = json_decode($clientResponse->getContent(), true);
         $formId   = $response['form']['id'];
 
@@ -117,7 +117,7 @@ class CampaignSubscriberFunctionalTest extends MauticMysqlTestCase
         );
 
         /** @var EventDispatcherInterface $dispatcher */
-        $dispatcher = self::$container->get('event_dispatcher');
+        $dispatcher = self::getContainer()->get('event_dispatcher');
 
         $dispatcher->dispatch($event, FormEvents::ON_CAMPAIGN_TRIGGER_CONDITION);
 
@@ -142,7 +142,7 @@ class CampaignSubscriberFunctionalTest extends MauticMysqlTestCase
 
     protected function beforeTearDown(): void
     {
-        $tablePrefix = self::$container->getParameter('mautic.db_table_prefix');
+        $tablePrefix = self::getContainer()->getParameter('mautic.db_table_prefix');
 
         if ($this->connection->getSchemaManager()->tablesExist("{$tablePrefix}form_results_1_test_form")) {
             $this->connection->executeQuery("DROP TABLE {$tablePrefix}form_results_1_test_form");

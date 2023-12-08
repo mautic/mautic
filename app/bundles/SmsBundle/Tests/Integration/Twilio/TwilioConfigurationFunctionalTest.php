@@ -8,7 +8,6 @@ use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\PluginBundle\Entity\Integration;
 use PHPUnit\Framework\Assert;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\Response;
 
 class TwilioConfigurationFunctionalTest extends MauticMysqlTestCase
 {
@@ -19,7 +18,7 @@ class TwilioConfigurationFunctionalTest extends MauticMysqlTestCase
         $crawler             = $this->client->request(Request::METHOD_GET, 's/plugins/config/'.$integration->getName());
         $response            = $this->client->getResponse();
 
-        Assert::assertSame(Response::HTTP_OK, $response->getStatusCode(), $response->getContent());
+        self::assertResponseIsSuccessful($response->getContent());
 
         $saveButton = $crawler->selectButton('integration_details[buttons][save]');
         $form       = $saveButton->form();
@@ -32,7 +31,7 @@ class TwilioConfigurationFunctionalTest extends MauticMysqlTestCase
         $this->client->submit($form);
 
         $response = $this->client->getResponse();
-        Assert::assertSame(Response::HTTP_OK, $response->getStatusCode(), $response->getContent());
+        self::assertResponseIsSuccessful($response->getContent());
 
         $integrationRepository = $this->em->getRepository(Integration::class);
 

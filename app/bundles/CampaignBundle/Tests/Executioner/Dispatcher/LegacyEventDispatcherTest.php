@@ -31,37 +31,37 @@ class LegacyEventDispatcherTest extends TestCase
     /**
      * @var MockObject|EventDispatcherInterface
      */
-    private $dispatcher;
+    private \PHPUnit\Framework\MockObject\MockObject $dispatcher;
 
     /**
      * @var MockObject|EventScheduler
      */
-    private $scheduler;
+    private \PHPUnit\Framework\MockObject\MockObject $scheduler;
 
     /**
      * @var MockObject|NotificationHelper
      */
-    private $notificationHelper;
+    private \PHPUnit\Framework\MockObject\MockObject $notificationHelper;
 
     /**
      * @var MockObject|MauticFactory
      */
-    private $mauticFactory;
+    private \PHPUnit\Framework\MockObject\MockObject $mauticFactory;
 
     /**
      * @var MockObject|ContactTracker
      */
-    private $contactTracker;
+    private \PHPUnit\Framework\MockObject\MockObject $contactTracker;
 
     /**
      * @var MockObject|AbstractEventAccessor
      */
-    private $config;
+    private \PHPUnit\Framework\MockObject\MockObject $config;
 
     /**
      * @var MockObject|PendingEvent
      */
-    private $pendingEvent;
+    private \PHPUnit\Framework\MockObject\MockObject $pendingEvent;
 
     protected function setUp(): void
     {
@@ -192,7 +192,7 @@ class LegacyEventDispatcherTest extends TestCase
             )
             ->willReturnOnConsecutiveCalls(
                 $this->returnCallback(
-                    function (CampaignExecutionEvent $event, string $eventName) {
+                    function (CampaignExecutionEvent $event, string $eventName): CampaignExecutionEvent {
                         $event->setResult(['foo' => 'bar']);
 
                         return $event;
@@ -242,7 +242,7 @@ class LegacyEventDispatcherTest extends TestCase
             )
             ->willReturnOnConsecutiveCalls(
                 $this->returnCallback(
-                    function (CampaignExecutionEvent $event, string $eventName) {
+                    function (CampaignExecutionEvent $event, string $eventName): CampaignExecutionEvent {
                         $event->setResult(false);
 
                         return $event;
@@ -294,7 +294,7 @@ class LegacyEventDispatcherTest extends TestCase
             )
             ->willReturnOnConsecutiveCalls(
                 $this->returnCallback(
-                    function (CampaignExecutionEvent $event, string $eventName) {
+                    function (CampaignExecutionEvent $event, string $eventName): CampaignExecutionEvent {
                         $event->setResult(['result' => false, 'foo' => 'bar']);
 
                         return $event;
@@ -381,7 +381,7 @@ class LegacyEventDispatcherTest extends TestCase
             ->withConsecutive([$this->isInstanceOf(CampaignExecutionEvent::class), 'something'])
             ->willReturnOnConsecutiveCalls(
                 $this->returnCallback(
-                    function (CampaignExecutionEvent $event, $eventName) {
+                    function (CampaignExecutionEvent $event, $eventName): CampaignExecutionEvent {
                         $event->setResult(true);
 
                         return $event;

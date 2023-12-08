@@ -23,6 +23,6 @@ final class NoteTest extends TestCase
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage(sprintf('Type value can be either "%s" or "%s".', Note::TYPE_INFO, Note::TYPE_WARNING));
 
-        $noteObject = new Note('Notes', 'randomType');
+        new Note('Notes', 'randomType');
     }
 }

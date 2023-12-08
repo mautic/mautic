@@ -7,7 +7,7 @@ use Symfony\Component\HttpFoundation\Response;
 
 class TagApiControllerFunctionalTest extends MauticMysqlTestCase
 {
-    public function testTagWorkflow()
+    public function testTagWorkflow(): void
     {
         $tag1Payload = ['tag' => 'test_tag'];
 
@@ -17,7 +17,7 @@ class TagApiControllerFunctionalTest extends MauticMysqlTestCase
         $response       = json_decode($clientResponse->getContent(), true);
         $tagId          = $response['tag']['id'];
 
-        $this->assertSame(Response::HTTP_CREATED, $clientResponse->getStatusCode(), 'Return code must be 201.');
+        $this->assertResponseStatusCodeSame(Response::HTTP_CREATED, 'Return code must be 201.');
         $this->assertGreaterThan(0, $tagId);
         $this->assertEquals($tag1Payload['tag'], $response['tag']['tag']);
 
@@ -25,7 +25,7 @@ class TagApiControllerFunctionalTest extends MauticMysqlTestCase
         $this->client->request('POST', '/api/tags/new', $tag1Payload);
         $clientResponse = $this->client->getResponse();
         $response       = json_decode($clientResponse->getContent(), true);
-        $this->assertSame(Response::HTTP_OK, $clientResponse->getStatusCode(), 'Return code must be 200.');
+        $this->assertResponseIsSuccessful('Return code must be 200.');
         // The same tag id should be returned
         $this->assertEquals($tagId, $response['tag']['id'], 'ID of created tag with the same name does not match. Possible duplicates.');
         $this->assertEquals($tag1Payload['tag'], $response['tag']['tag']);
@@ -35,7 +35,7 @@ class TagApiControllerFunctionalTest extends MauticMysqlTestCase
         $this->client->request('PATCH', "/api/tags/{$tagId}/edit", $tag1RenamePayload);
         $clientResponse = $this->client->getResponse();
         $response       = json_decode($clientResponse->getContent(), true);
-        $this->assertSame(Response::HTTP_OK, $clientResponse->getStatusCode(), 'Return code must be 200.');
+        $this->assertResponseIsSuccessful('Return code must be 200.');
         $this->assertSame($tagId, $response['tag']['id'], 'ID of the created tag does not match with the edited one.');
         $this->assertEquals($tag1RenamePayload['tag'], $response['tag']['tag']);
 
@@ -43,28 +43,28 @@ class TagApiControllerFunctionalTest extends MauticMysqlTestCase
         $this->client->request('GET', "/api/tags/{$tagId}");
         $clientResponse = $this->client->getResponse();
         $response       = json_decode($clientResponse->getContent(), true);
-        $this->assertSame(Response::HTTP_OK, $clientResponse->getStatusCode());
+        $this->assertResponseIsSuccessful();
         $this->assertSame($tagId, $response['tag']['id'], 'ID of the created tag does not match with the fetched one.');
         $this->assertEquals($tag1RenamePayload['tag'], $response['tag']['tag']);
 
         // Delete:
         $this->client->request('DELETE', "/api/tags/{$tagId}/delete");
         $clientResponse = $this->client->getResponse();
-        $this->assertSame(Response::HTTP_OK, $clientResponse->getStatusCode());
+        $this->assertResponseIsSuccessful();
 
         // Get (ensure it's deleted):
         $this->client->request('GET', "/api/tags/{$tagId}");
         $clientResponse = $this->client->getResponse();
         $response       = json_decode($clientResponse->getContent(), true);
 
-        $this->assertSame(404, $clientResponse->getStatusCode());
+        $this->assertResponseStatusCodeSame(404);
         $this->assertSame(404, $response['errors'][0]['code']);
     }
 
     /**
      * Test if whitespace before or after tag name is removed and duplicates are not created.
      */
-    public function testWhitespaceBeforeAndAfterNameNotCreatingDuplicates()
+    public function testWhitespaceBeforeAndAfterNameNotCreatingDuplicates(): void
     {
         $tagName               = 'test';
         $whitespaceTestPayload = ['test', 'test ', ' test', "test\t", "\ttest"];
@@ -87,7 +87,7 @@ class TagApiControllerFunctionalTest extends MauticMysqlTestCase
     /**
      * Test if special characters in tag name are encoded and duplicates are not created.
      */
-    public function testEncodedCharactersNotCreatingDuplicates()
+    public function testEncodedCharactersNotCreatingDuplicates(): void
     {
         $tagInputName    = 'hello" world';
 
@@ -105,13 +105,13 @@ class TagApiControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertSame($tagId, $response['tag']['id'], 'ID of created tag does not match. Possible duplicates.');
     }
 
-    public function testTagCreationWithoutRequiredData()
+    public function testTagCreationWithoutRequiredData(): void
     {
         // Sending an empty payload should return a 500 server error
         // TODO ensure that the server sends back a 400 status code instead
         $this->client->request('POST', '/api/tags/new', []);
-        $clientResponse = $this->client->getResponse();
+        $this->client->getResponse();
 
-        $this->assertSame(500, $clientResponse->getStatusCode());
+        $this->assertResponseStatusCodeSame(500);
     }
 }

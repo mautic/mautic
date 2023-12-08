@@ -12,12 +12,12 @@ class CompanyDeduperTest extends \PHPUnit\Framework\TestCase
     /**
      * @var \PHPUnit\Framework\MockObject\MockObject|FieldModel
      */
-    private $fieldModel;
+    private \PHPUnit\Framework\MockObject\MockObject $fieldModel;
 
     /**
      * @var \PHPUnit\Framework\MockObject\MockObject|CompanyRepository
      */
-    private $companyRepository;
+    private \PHPUnit\Framework\MockObject\MockObject $companyRepository;
 
     protected function setUp(): void
     {
@@ -30,17 +30,14 @@ class CompanyDeduperTest extends \PHPUnit\Framework\TestCase
             ->getMock();
     }
 
-    public function testUniqueFieldNotFoundException()
+    public function testUniqueFieldNotFoundException(): void
     {
         $this->expectException(UniqueFieldNotFoundException::class);
         $this->fieldModel->method('getFieldList')->willReturn([]);
         $this->getDeduper()->checkForDuplicateCompanies([]);
     }
 
-    /**
-     * @return CompanyDeduper
-     */
-    private function getDeduper()
+    private function getDeduper(): CompanyDeduper
     {
         return new CompanyDeduper(
             $this->fieldModel,

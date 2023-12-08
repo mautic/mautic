@@ -18,22 +18,19 @@ final class SegmentOperatorQuerySubscriberTest extends TestCase
     /**
      * @var MockObject|QueryBuilder
      */
-    private $queryBuilder;
+    private \PHPUnit\Framework\MockObject\MockObject $queryBuilder;
 
     /**
      * @var MockObject|ExpressionBuilder
      */
-    private $expressionBuilder;
+    private \PHPUnit\Framework\MockObject\MockObject $expressionBuilder;
 
     /**
      * @var MockObject|ContactSegmentFilter
      */
-    private $contactSegmentFilter;
+    private \PHPUnit\Framework\MockObject\MockObject $contactSegmentFilter;
 
-    /**
-     * @var SegmentOperatorQuerySubscriber
-     */
-    private $subscriber;
+    private \Mautic\LeadBundle\EventListener\SegmentOperatorQuerySubscriber $subscriber;
 
     protected function setUp(): void
     {
@@ -93,7 +90,7 @@ final class SegmentOperatorQuerySubscriberTest extends TestCase
         $this->queryBuilder->expects($this->once())
             ->method('addLogic')
             ->with(
-                $this->callback(function (CompositeExpression $expression) use ($expectedExpression) {
+                $this->callback(function (CompositeExpression $expression) use ($expectedExpression): bool {
                     $this->assertSame($expectedExpression, (string) $expression);
 
                     return true;
@@ -179,7 +176,7 @@ final class SegmentOperatorQuerySubscriberTest extends TestCase
         $this->queryBuilder->expects($this->once())
             ->method('addLogic')
             ->with(
-                $this->callback(function (CompositeExpression $expression) use ($expectedExpression) {
+                $this->callback(function (CompositeExpression $expression) use ($expectedExpression): bool {
                     $this->assertSame($expectedExpression, (string) $expression);
 
                     return true;

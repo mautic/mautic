@@ -21,7 +21,7 @@ class ObjectChangeGeneratorTest extends TestCase
     /**
      * @var ValueHelper|\PHPUnit\Framework\MockObject\MockObject
      */
-    private $valueHelper;
+    private \PHPUnit\Framework\MockObject\MockObject $valueHelper;
 
     protected function setUp(): void
     {
@@ -32,7 +32,7 @@ class ObjectChangeGeneratorTest extends TestCase
     {
         $this->valueHelper->method('getValueForIntegration')
             ->willReturnCallback(
-                function (NormalizedValueDAO $normalizedValueDAO, string $fieldState, string $syncDirection) {
+                function (NormalizedValueDAO $normalizedValueDAO, string $fieldState, string $syncDirection): NormalizedValueDAO {
                     return $normalizedValueDAO;
                 }
             );
@@ -83,7 +83,7 @@ class ObjectChangeGeneratorTest extends TestCase
     {
         $this->valueHelper->method('getValueForIntegration')
             ->willReturnCallback(
-                function (NormalizedValueDAO $normalizedValueDAO, string $fieldState, string $syncDirection) {
+                function (NormalizedValueDAO $normalizedValueDAO, string $fieldState, string $syncDirection): NormalizedValueDAO {
                     return $normalizedValueDAO;
                 }
             );
@@ -126,10 +126,7 @@ class ObjectChangeGeneratorTest extends TestCase
         $this->assertFalse(isset($fields['first_name']));
     }
 
-    /**
-     * @return MappingManualDAO
-     */
-    private function getMappingManual(string $integration, string $objectName)
+    private function getMappingManual(string $integration, string $objectName): MappingManualDAO
     {
         $mappingManual = new MappingManualDAO($integration);
         $objectMapping = new ObjectMappingDAO(Contact::NAME, $objectName);
@@ -142,10 +139,8 @@ class ObjectChangeGeneratorTest extends TestCase
 
     /**
      * @param bool $includeFirstNameField
-     *
-     * @return ReportDAO
      */
-    private function getInternalSyncReport($includeFirstNameField = true)
+    private function getInternalSyncReport($includeFirstNameField = true): ReportDAO
     {
         $syncReport           = new ReportDAO(MauticSyncDataExchange::NAME);
         $internalReportObject = new ReportObjectDAO(Contact::NAME, 1);
@@ -162,10 +157,7 @@ class ObjectChangeGeneratorTest extends TestCase
         return $syncReport;
     }
 
-    /**
-     * @return ObjectChangeGenerator
-     */
-    private function getObjectChangeGenerator()
+    private function getObjectChangeGenerator(): ObjectChangeGenerator
     {
         return new ObjectChangeGenerator($this->valueHelper);
     }

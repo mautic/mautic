@@ -43,7 +43,7 @@ final class ContactChannelsTypeTest extends AbstractMauticTestCase
      */
     private function createForm(bool $publicView): FormInterface
     {
-        return self::$container->get('form.factory')->create(
+        return self::getContainer()->get('form.factory')->create(
             ContactChannelsType::class,
             null,
             [

@@ -18,17 +18,14 @@ final class TypeOperatorProviderTest extends \PHPUnit\Framework\TestCase
     /**
      * @var MockObject|EventDispatcherInterface
      */
-    private $dispatcher;
+    private \PHPUnit\Framework\MockObject\MockObject $dispatcher;
 
     /**
      * @var MockObject|FilterOperatorProviderInterface
      */
-    private $filterOperatorPovider;
+    private \PHPUnit\Framework\MockObject\MockObject $filterOperatorPovider;
 
-    /**
-     * @var TypeOperatorProvider
-     */
-    private $provider;
+    private \Mautic\LeadBundle\Provider\TypeOperatorProvider $provider;
 
     protected function setUp(): void
     {
@@ -113,7 +110,7 @@ final class TypeOperatorProviderTest extends \PHPUnit\Framework\TestCase
         $this->dispatcher->expects($this->once())
             ->method('dispatch')
             ->with(
-                $this->callback(function (TypeOperatorsEvent $event) {
+                $this->callback(function (TypeOperatorsEvent $event): bool {
                     // Emulate a subscriber.
                     $event->setOperatorsForFieldType('text', [
                         'include' => [
@@ -162,7 +159,7 @@ final class TypeOperatorProviderTest extends \PHPUnit\Framework\TestCase
             ->method('dispatch')
             ->withConsecutive(
                 [
-                    $this->callback(function (TypeOperatorsEvent $event) {
+                    $this->callback(function (TypeOperatorsEvent $event): bool {
                         // Emulate a subscriber.
                         $event->setOperatorsForFieldType('text', [
                             'include' => [
@@ -176,7 +173,7 @@ final class TypeOperatorProviderTest extends \PHPUnit\Framework\TestCase
                     LeadEvents::COLLECT_OPERATORS_FOR_FIELD_TYPE,
                 ],
                 [
-                    $this->callback(function (FieldOperatorsEvent $event) {
+                    $this->callback(function (FieldOperatorsEvent $event): bool {
                         // Emulate a subscriber.
                         $this->assertSame('text', $event->getType());
                         $this->assertSame('email', $event->getField());

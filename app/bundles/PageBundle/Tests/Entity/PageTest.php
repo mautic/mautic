@@ -55,10 +55,8 @@ class PageTest extends \PHPUnit\Framework\TestCase
 
     /**
      * Test setHeadScript and getHeadScript.
-     *
-     * @return void
      */
-    public function testSetHeadScript()
+    public function testSetHeadScript(): void
     {
         $script = '<script>console.log("test")';
         $page   = new Page();
@@ -69,10 +67,8 @@ class PageTest extends \PHPUnit\Framework\TestCase
 
     /**
      * Test setFooterScript and getFooterScript.
-     *
-     * @return void
      */
-    public function testSetFooterScript()
+    public function testSetFooterScript(): void
     {
         $script = '<script>console.log("test")';
         $page   = new Page();

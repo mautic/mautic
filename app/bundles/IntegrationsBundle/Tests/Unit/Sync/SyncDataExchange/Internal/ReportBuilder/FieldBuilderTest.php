@@ -19,17 +19,17 @@ class FieldBuilderTest extends TestCase
     /**
      * @var Router|\PHPUnit\Framework\MockObject\MockObject
      */
-    private $router;
+    private \PHPUnit\Framework\MockObject\MockObject $router;
 
     /**
      * @var FieldHelper|\PHPUnit\Framework\MockObject\MockObject
      */
-    private $fieldHelper;
+    private \PHPUnit\Framework\MockObject\MockObject $fieldHelper;
 
     /**
      * @var ContactObjectHelper|\PHPUnit\Framework\MockObject\MockObject
      */
-    private $contactObjectHelper;
+    private \PHPUnit\Framework\MockObject\MockObject $contactObjectHelper;
 
     protected function setUp(): void
     {
@@ -138,7 +138,7 @@ class FieldBuilderTest extends TestCase
         $this->getFieldBuilder()->buildObjectField('badfield', ['id' => 1, 'email' => 'test@test.com'], new ObjectDAO('Test'), 'Test');
     }
 
-    public function getFieldBuilder()
+    public function getFieldBuilder(): FieldBuilder
     {
         return new FieldBuilder($this->router, $this->fieldHelper, $this->contactObjectHelper);
     }

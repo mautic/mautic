@@ -103,10 +103,7 @@ class ValueHelperTest extends TestCase
         );
     }
 
-    /**
-     * @return ValueHelper
-     */
-    private function getValueHelper()
+    private function getValueHelper(): ValueHelper
     {
         return new ValueHelper();
     }

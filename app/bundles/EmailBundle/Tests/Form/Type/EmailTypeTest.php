@@ -20,37 +20,34 @@ class EmailTypeTest extends \PHPUnit\Framework\TestCase
     /**
      * @var MockObject|TranslatorInterface
      */
-    private $translator;
+    private \PHPUnit\Framework\MockObject\MockObject $translator;
 
     /**
      * @var MockObject|EntityManager
      */
-    private $entityManager;
+    private \PHPUnit\Framework\MockObject\MockObject $entityManager;
 
     /**
      * @var MockObject|StageModel
      */
-    private $stageModel;
+    private \PHPUnit\Framework\MockObject\MockObject $stageModel;
 
     /**
      * @var MockObject|FormBuilderInterface
      */
-    private $formBuilder;
+    private \PHPUnit\Framework\MockObject\MockObject $formBuilder;
 
-    /**
-     * @var EmailType
-     */
-    private $form;
+    private \Mautic\EmailBundle\Form\Type\EmailType $form;
 
     /**
      * @var CoreParametersHelper|MockObject
      */
-    private $coreParametersHelper;
+    private \PHPUnit\Framework\MockObject\MockObject $coreParametersHelper;
 
     /**
      * @var ThemeHelperInterface|MockObject
      */
-    private $themeHelper;
+    private \PHPUnit\Framework\MockObject\MockObject $themeHelper;
 
     protected function setUp(): void
     {
@@ -86,7 +83,7 @@ class EmailTypeTest extends \PHPUnit\Framework\TestCase
         $this->formBuilder->method('add')
             ->with(
                 $this->callback(
-                    function ($name) use (&$names) {
+                    function ($name) use (&$names): bool {
                         $names[] = $name;
 
                         return true;

@@ -7,7 +7,7 @@ use PHPUnit\Framework\TestCase;
 
 class WeekStatTest extends TestCase
 {
-    public function testAll()
+    public function testAll(): void
     {
         $weekStat = new WeekStat();
         $this->assertSame(0, $weekStat->getCount());
@@ -15,6 +15,6 @@ class WeekStatTest extends TestCase
         $weekStat->setCount($count);
         $this->assertSame($count, $weekStat->getCount());
         $weekStat->addToCount($count);
-        $this->assertSame($count * 2, $weekStat->getCount());
+        $this->assertSame(2, $weekStat->getCount());
     }
 }

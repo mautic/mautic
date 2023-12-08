@@ -22,7 +22,7 @@ class TriggerCampaignCommandTest extends AbstractCampaignCommand
 
         putenv('CAMPAIGN_EXECUTIONER_SCHEDULER_ACKNOWLEDGE_SECONDS=1');
 
-        $this->segmentCountCacheHelper = self::$container->get('mautic.helper.segment.count.cache');
+        $this->segmentCountCacheHelper = self::getContainer()->get('mautic.helper.segment.count.cache');
     }
 
     public function beforeTearDown(): void
@@ -37,7 +37,7 @@ class TriggerCampaignCommandTest extends AbstractCampaignCommand
     /**
      * @throws \Exception
      */
-    public function testCampaignExecutionForAll()
+    public function testCampaignExecutionForAll(): void
     {
         // Process in batches of 10 to ensure batching is working as expected
         $this->runCommand('mautic:campaigns:trigger', ['-i' => 1, '-l' => 10]);
@@ -204,7 +204,7 @@ class TriggerCampaignCommandTest extends AbstractCampaignCommand
     /**
      * @throws \Exception
      */
-    public function testCampaignExecutionForOne()
+    public function testCampaignExecutionForOne(): void
     {
         $this->runCommand('mautic:campaigns:trigger', ['-i' => 1, '--contact-id' => 1]);
 
@@ -365,7 +365,7 @@ class TriggerCampaignCommandTest extends AbstractCampaignCommand
         $this->assertTrue(empty($tags['EmailNotOpen']));
     }
 
-    public function testCampaignExecutionForSome()
+    public function testCampaignExecutionForSome(): void
     {
         $this->runCommand('mautic:campaigns:trigger', ['-i' => 1, '--contact-ids' => '1,2,3,4,19']);
 
@@ -609,10 +609,7 @@ class TriggerCampaignCommandTest extends AbstractCampaignCommand
         self::assertEquals(50, $count);
     }
 
-    /**
-     * @return array
-     */
-    private function getTagCounts()
+    private function getTagCounts(): array
     {
         $tags = $this->db->createQueryBuilder()
             ->select('t.tag, count(*) as the_count')
@@ -630,10 +627,7 @@ class TriggerCampaignCommandTest extends AbstractCampaignCommand
         return $tagCounts;
     }
 
-    /**
-     * @return int
-     */
-    private function getNonActionPathTakenCount(array $logs)
+    private function getNonActionPathTakenCount(array $logs): int
     {
         $nonActionCount = 0;
         foreach ($logs as $log) {

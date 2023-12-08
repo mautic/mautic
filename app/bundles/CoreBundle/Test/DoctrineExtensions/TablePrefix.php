@@ -7,10 +7,7 @@ use Doctrine\ORM\Mapping\ClassMetadataInfo;
 
 class TablePrefix
 {
-    /**
-     * @var string
-     */
-    protected $prefix = '';
+    protected string $prefix;
 
     /**
      * TablePrefix constructor.
@@ -22,7 +19,7 @@ class TablePrefix
         $this->prefix = (string) $prefix;
     }
 
-    public function loadClassMetadata(LoadClassMetadataEventArgs $eventArgs)
+    public function loadClassMetadata(LoadClassMetadataEventArgs $eventArgs): void
     {
         /** @var ClassMetadataInfo $classMetadata */
         $classMetadata = $eventArgs->getClassMetadata();
@@ -37,7 +34,7 @@ class TablePrefix
         }
     }
 
-    private function addPrefixToIndexes($prefix, array &$table, $key)
+    private function addPrefixToIndexes($prefix, array &$table, $key): void
     {
         if (!isset($table[$key])) {
             return;

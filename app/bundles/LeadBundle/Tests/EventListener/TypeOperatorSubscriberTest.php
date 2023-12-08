@@ -30,57 +30,54 @@ final class TypeOperatorSubscriberTest extends \PHPUnit\Framework\TestCase
     /**
      * @var MockObject|LeadModel
      */
-    private $leadModel;
+    private \PHPUnit\Framework\MockObject\MockObject $leadModel;
 
     /**
      * @var MockObject&ListModel
      */
-    private $listModel;
+    private \PHPUnit\Framework\MockObject\MockObject $listModel;
 
     /**
      * @var MockObject&campaignModel
      */
-    private $campaignModel;
+    private \PHPUnit\Framework\MockObject\MockObject $campaignModel;
 
     /**
      * @var MockObject&emailModel
      */
-    private $emailModel;
+    private \PHPUnit\Framework\MockObject\MockObject $emailModel;
 
     /**
      * @var MockObject&StageModel
      */
-    private $stageModel;
+    private \PHPUnit\Framework\MockObject\MockObject $stageModel;
 
     /**
      * @var MockObject&StageRepository
      */
-    private $stageRepository;
+    private \PHPUnit\Framework\MockObject\MockObject $stageRepository;
 
     /**
      * @var MockObject&CategoryModel
      */
-    private $categoryModel;
+    private \PHPUnit\Framework\MockObject\MockObject $categoryModel;
 
     /**
      * @var MockObject&AssetModel
      */
-    private $assetModel;
+    private \PHPUnit\Framework\MockObject\MockObject $assetModel;
 
     /**
      * @var MockObject&TranslatorInterface
      */
-    private $translator;
+    private \PHPUnit\Framework\MockObject\MockObject $translator;
 
     /**
      * @var MockObject&FormInterface<FormInterface>
      */
-    private $form;
+    private \PHPUnit\Framework\MockObject\MockObject $form;
 
-    /**
-     * @var TypeOperatorSubscriber
-     */
-    private $subscriber;
+    private \Mautic\LeadBundle\EventListener\TypeOperatorSubscriber $subscriber;
 
     protected function setUp(): void
     {
@@ -287,7 +284,7 @@ final class TypeOperatorSubscriberTest extends \PHPUnit\Framework\TestCase
                     'display',
                     TextType::class,
                     $this->callback(
-                        function (array $options) {
+                        function (array $options): bool {
                             $this->assertSame('', $options['data']);
                             $this->assertSame(
                                 [
@@ -308,7 +305,7 @@ final class TypeOperatorSubscriberTest extends \PHPUnit\Framework\TestCase
                     'filter',
                     HiddenType::class,
                     $this->callback(
-                        function (array $options) {
+                        function (array $options): bool {
                             $this->assertSame('', $options['data']);
                             $this->assertSame(['class' => 'form-control'], $options['attr']);
 
@@ -343,7 +340,7 @@ final class TypeOperatorSubscriberTest extends \PHPUnit\Framework\TestCase
                     'display',
                     TextType::class,
                     $this->callback(
-                        function (array $options) {
+                        function (array $options): bool {
                             $this->assertSame('', $options['data']);
                             $this->assertSame(
                                 [
@@ -365,7 +362,7 @@ final class TypeOperatorSubscriberTest extends \PHPUnit\Framework\TestCase
                     'filter',
                     HiddenType::class,
                     $this->callback(
-                        function (array $options) {
+                        function (array $options): bool {
                             $this->assertSame('', $options['data']);
                             $this->assertSame(['class' => 'form-control'], $options['attr']);
 

@@ -20,27 +20,24 @@ class UpdateSchemaStepTest extends AbstractStepTest
     /**
      * @var MockObject|TranslatorInterface
      */
-    private $translator;
+    private \PHPUnit\Framework\MockObject\MockObject $translator;
 
     /**
      * @var MockObject|KernelInterface
      */
-    private $kernel;
+    private \PHPUnit\Framework\MockObject\MockObject $kernel;
 
     /**
      * @var MockObject|MigrateCommand
      */
-    private $migrateCommand;
+    private \PHPUnit\Framework\MockObject\MockObject $migrateCommand;
 
     /**
      * @var MockObject|EventDispatcherInterface
      */
-    private $eventDispatcher;
+    private \PHPUnit\Framework\MockObject\MockObject $eventDispatcher;
 
-    /**
-     * @var UpdateSchemaStep
-     */
-    private $step;
+    private \Mautic\CoreBundle\Update\Step\UpdateSchemaStep $step;
 
     protected function setUp(): void
     {
@@ -104,7 +101,7 @@ class UpdateSchemaStepTest extends AbstractStepTest
         $this->step = new UpdateSchemaStep($this->translator, $container);
     }
 
-    public function testUpdateFailedExceptionThrownIfMigrationsFailed()
+    public function testUpdateFailedExceptionThrownIfMigrationsFailed(): void
     {
         $this->expectException(UpdateFailedException::class);
 
@@ -113,7 +110,7 @@ class UpdateSchemaStepTest extends AbstractStepTest
 
         $this->eventDispatcher->method('dispatch')
             ->willReturnCallback(
-                function (ConsoleEvent $event, string $eventName) {
+                function (ConsoleEvent $event, string $eventName): ConsoleEvent {
                     switch (true) {
                         case $event instanceof ConsoleCommandEvent:
                             $event->enableCommand();
@@ -131,14 +128,14 @@ class UpdateSchemaStepTest extends AbstractStepTest
         $this->step->execute($this->progressBar, $this->input, $this->output);
     }
 
-    public function testExceptionNotThrownIfMigrationsWereSuccessful()
+    public function testExceptionNotThrownIfMigrationsWereSuccessful(): void
     {
         $this->migrateCommand->method('run')
             ->willReturn(0);
 
         $this->eventDispatcher->method('dispatch')
             ->willReturnCallback(
-                function (ConsoleEvent $event, string $eventName) {
+                function (ConsoleEvent $event, string $eventName): ConsoleEvent {
                     switch (true) {
                         case $event instanceof ConsoleCommandEvent:
                             $event->enableCommand();

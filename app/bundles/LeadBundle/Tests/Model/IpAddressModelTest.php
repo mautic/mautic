@@ -20,17 +20,14 @@ class IpAddressModelTest extends TestCase
     /**
      * @var EntityManager|MockObject
      */
-    private $entityManager;
+    private \PHPUnit\Framework\MockObject\MockObject $entityManager;
 
     /**
      * @var MockObject|LoggerInterface
      */
-    private $logger;
+    private \PHPUnit\Framework\MockObject\MockObject $logger;
 
-    /**
-     * @var IpAddressModel
-     */
-    private $ipAddressModel;
+    private \Mautic\LeadBundle\Model\IpAddressModel $ipAddressModel;
 
     protected function setUp(): void
     {
@@ -57,8 +54,8 @@ class IpAddressModelTest extends TestCase
         $contact      = $this->createMock(Lead::class);
         $ipAddress    = $this->createMock(IpAddress::class);
         $ipAddresses  = new ArrayCollection(['1.2.3.4' => $ipAddress]);
-        $connection   = $this->createMock(Connection::class);
-        $queryBuilder = $this->createMock(QueryBuilder::class);
+        $this->createMock(Connection::class);
+        $this->createMock(QueryBuilder::class);
 
         $contact->expects($this->exactly(1))
             ->method('getIpAddresses')

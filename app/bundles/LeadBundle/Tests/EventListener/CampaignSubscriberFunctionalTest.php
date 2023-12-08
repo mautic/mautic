@@ -185,7 +185,7 @@ class CampaignSubscriberFunctionalTest extends MauticMysqlTestCase
             $event  = new CampaignExecutionEvent($args, true);
 
             /** @var EventDispatcherInterface $dispatcher */
-            $dispatcher = self::$container->get('event_dispatcher');
+            $dispatcher = self::getContainer()->get('event_dispatcher');
             $result     = $dispatcher->dispatch(
                 $event,
                 LeadEvents::ON_CAMPAIGN_TRIGGER_CONDITION
@@ -899,7 +899,7 @@ class CampaignSubscriberFunctionalTest extends MauticMysqlTestCase
         ];
 
         $event           = new CampaignExecutionEvent($args, false);
-        $eventDispatcher = self::$container->get('event_dispatcher');
+        $eventDispatcher = self::getContainer()->get('event_dispatcher');
         $eventDispatcher->dispatch($event, 'mautic.lead.on_campaign_trigger_action');
 
         $leadManipulator = $lead->getManipulator();

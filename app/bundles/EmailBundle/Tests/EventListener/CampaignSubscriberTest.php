@@ -18,42 +18,26 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 class CampaignSubscriberTest extends \PHPUnit\Framework\TestCase
 {
     /**
-     * @var array
-     */
-    private $config = [
-        'useremail' => [
-            'email' => 0,
-        ],
-        'user_id'  => [6, 7],
-        'to_owner' => true,
-        'to'       => 'hello@there.com, bob@bobek.cz',
-        'bcc'      => 'hidden@translation.in',
-    ];
-
-    /**
      * @var EmailModel|\PHPUnit\Framework\MockObject\MockObject
      */
-    private $emailModel;
+    private \PHPUnit\Framework\MockObject\MockObject $emailModel;
 
     /**
      * @var RealTimeExecutioner|\PHPUnit_Framework_MockObject_MockObject
      */
-    private $realTimeExecutioner;
+    private \PHPUnit\Framework\MockObject\MockObject $realTimeExecutioner;
 
     /**
      * @var SendEmailToUser|\PHPUnit\Framework\MockObject\MockObject
      */
-    private $sendEmailToUser;
+    private \PHPUnit\Framework\MockObject\MockObject $sendEmailToUser;
 
     /**
      * @var TranslatorInterface|\PHPUnit\Framework\MockObject\MockObject
      */
-    private $translator;
+    private \PHPUnit\Framework\MockObject\MockObject $translator;
 
-    /**
-     * @var CampaignSubscriber
-     */
-    private $subscriber;
+    private \Mautic\EmailBundle\EventListener\CampaignSubscriber $subscriber;
 
     protected function setUp(): void
     {
@@ -72,7 +56,7 @@ class CampaignSubscriberTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testOnCampaignTriggerActionSendEmailToUserWithWrongEventType()
+    public function testOnCampaignTriggerActionSendEmailToUserWithWrongEventType(): void
     {
         $eventAccessor = $this->createMock(ActionAccessor::class);
         $event         = new Event();
@@ -97,7 +81,7 @@ class CampaignSubscriberTest extends \PHPUnit\Framework\TestCase
         $this->assertCount(0, $pendingEvent->getFailures());
     }
 
-    public function testOnCampaignTriggerActionSendEmailToUserWithSendingTheEmail()
+    public function testOnCampaignTriggerActionSendEmailToUserWithSendingTheEmail(): void
     {
         $eventAccessor = $this->createMock(ActionAccessor::class);
         $event         = (new Event())->setType('email.send.to.user');
@@ -124,7 +108,7 @@ class CampaignSubscriberTest extends \PHPUnit\Framework\TestCase
         $this->assertCount(0, $pendingEvent->getFailures());
     }
 
-    public function testOnCampaignTriggerActionSendEmailToUserWithError()
+    public function testOnCampaignTriggerActionSendEmailToUserWithError(): void
     {
         $eventAccessor = $this->createMock(ActionAccessor::class);
         $event         = (new Event())->setType('email.send.to.user');

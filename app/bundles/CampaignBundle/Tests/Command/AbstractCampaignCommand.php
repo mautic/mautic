@@ -35,7 +35,7 @@ class AbstractCampaignCommand extends MauticMysqlTestCase
     protected $prefix;
 
     /**
-     * @var \DateTime
+     * @var \DateTimeInterface
      */
     protected $eventDate;
 
@@ -51,7 +51,7 @@ class AbstractCampaignCommand extends MauticMysqlTestCase
         parent::setUp();
 
         $this->db     = $this->em->getConnection();
-        $this->prefix = self::$container->getParameter('mautic.db_table_prefix');
+        $this->prefix = self::getContainer()->getParameter('mautic.db_table_prefix');
 
         // Populate contacts
         $this->installDatabaseFixtures([LeadFieldData::class, LoadLeadData::class]);
@@ -60,7 +60,7 @@ class AbstractCampaignCommand extends MauticMysqlTestCase
         $sql = file_get_contents(__DIR__.'/campaign_schema.sql');
 
         // Update table prefix
-        $sql = str_replace('#__', self::$container->getParameter('mautic.db_table_prefix'), $sql);
+        $sql = str_replace('#__', self::getContainer()->getParameter('mautic.db_table_prefix'), $sql);
 
         // Schedule event
         date_default_timezone_set('UTC');
@@ -91,10 +91,7 @@ class AbstractCampaignCommand extends MauticMysqlTestCase
         ]);
     }
 
-    /**
-     * @return array
-     */
-    protected function getCampaignEventLogs(array $ids)
+    protected function getCampaignEventLogs(array $ids): array
     {
         $logs = $this->db->createQueryBuilder()
             ->select('l.email, l.country, event.name, event.event_type, event.type, log.*')

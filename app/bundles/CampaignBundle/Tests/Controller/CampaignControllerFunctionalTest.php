@@ -40,8 +40,8 @@ class CampaignControllerFunctionalTest extends AbstractCampaignTest
         $this->configParams[self::CAMPAIGN_SUMMARY_PARAM] = in_array($this->getName(), $functionForUseSummary);
         $this->configParams[self::CAMPAIGN_RANGE_PARAM]   = in_array($this->getName(), $functionForUseRange);
         parent::setUp();
-        $this->campaignModel      = self::$container->get('mautic.model.factory')->getModel('campaign');
-        $this->campaignLeadsLabel = self::$container->get('translator')->trans('mautic.campaign.campaign.leads');
+        $this->campaignModel      = self::getContainer()->get('mautic.model.factory')->getModel('campaign');
+        $this->campaignLeadsLabel = self::getContainer()->get('translator')->trans('mautic.campaign.campaign.leads');
     }
 
     public function testCampaignContactCountThroughStatsWithSummary(): void

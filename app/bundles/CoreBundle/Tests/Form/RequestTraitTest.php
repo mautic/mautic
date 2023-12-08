@@ -15,10 +15,7 @@ class RequestTraitTest extends \PHPUnit\Framework\TestCase
 {
     use RequestTrait;
 
-    /**
-     * @var Form
-     */
-    private $form;
+    private \Symfony\Component\Form\Form $form;
 
     protected function setUp(): void
     {
@@ -34,7 +31,7 @@ class RequestTraitTest extends \PHPUnit\Framework\TestCase
         $this->form = new Form($fooConfig);
     }
 
-    public function testMultiSelectPrepareParametersFromRequest()
+    public function testMultiSelectPrepareParametersFromRequest(): void
     {
         $params = [
             'multiselect'  => '',

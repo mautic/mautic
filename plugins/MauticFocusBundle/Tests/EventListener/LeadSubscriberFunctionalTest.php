@@ -21,10 +21,10 @@ class LeadSubscriberFunctionalTest extends MauticMysqlTestCase
     {
         parent::setUp();
 
-        $this->focusModel = self::$container->get('mautic.focus.model.focus');
+        $this->focusModel = self::getContainer()->get('mautic.focus.model.focus');
         $this->lead       = $this->createLead();
 
-        $this->setTestsData($this->lead, $this->focusModel);
+        $this->setTestsData($this->lead);
     }
 
     public function testSearchPhraseInNameFocusStat(): void
@@ -51,7 +51,7 @@ class LeadSubscriberFunctionalTest extends MauticMysqlTestCase
         return array_merge($searchViewStats, $searchClickStats);
     }
 
-    private function setTestsData(Lead $lead, FocusModel $focusModel): void
+    private function setTestsData(Lead $lead): void
     {
         $focusPopupA = $this->createFocus('popup focus A');
         $focusPopupB = $this->createFocus('popup focus B');

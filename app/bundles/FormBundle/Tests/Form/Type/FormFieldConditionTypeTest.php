@@ -17,22 +17,19 @@ final class FormFieldConditionTypeTest extends \PHPUnit\Framework\TestCase
     /**
      * @var MockObject|FieldModel
      */
-    private $fieldModel;
+    private \PHPUnit\Framework\MockObject\MockObject $fieldModel;
 
     /**
      * @var MockObject|PropertiesAccessor
      */
-    private $propertiesAccessor;
+    private \PHPUnit\Framework\MockObject\MockObject $propertiesAccessor;
 
     /**
      * @var MockObject&FormBuilderInterface<string|FormBuilderInterface>
      */
-    private $formBuilder;
+    private \PHPUnit\Framework\MockObject\MockObject $formBuilder;
 
-    /**
-     * @var FormFieldConditionType
-     */
-    private $form;
+    private \Mautic\FormBundle\Form\Type\FormFieldConditionType $form;
 
     protected function setUp(): void
     {

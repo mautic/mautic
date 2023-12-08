@@ -11,7 +11,7 @@ class FieldModelFunctionalTest extends MauticMysqlTestCase
     public function testGetObjectFieldsUnpublishedField(): void
     {
         /** @var \Mautic\FormBundle\Model\FieldModel $fieldModel */
-        $fieldModel   = self::$container->get('mautic.form.model.field');
+        $fieldModel   = self::getContainer()->get('mautic.form.model.field');
         $fieldsBefore = $fieldModel->getObjectFields('lead');
 
         /** @var LeadFieldRepository $leadFieldRepository */

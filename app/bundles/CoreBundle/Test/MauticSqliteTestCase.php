@@ -26,13 +26,13 @@ abstract class MauticSqliteTestCase extends AbstractMauticTestCase
         }
     }
 
-    private function createDatabase()
+    private function createDatabase(): void
     {
         // fix problem with prefixes in sqlite
         $tablePrefix = new TablePrefix('prefix_');
         $this->em->getEventManager()->addEventListener(Events::loadClassMetadata, $tablePrefix);
 
-        $dbParams = array_merge(self::$container->get('doctrine')->getConnection()->getParams(), [
+        $dbParams = array_merge(self::getContainer()->get('doctrine')->getConnection()->getParams(), [
             'table_prefix'  => null,
             'backup_tables' => 0,
         ]);
@@ -47,12 +47,12 @@ abstract class MauticSqliteTestCase extends AbstractMauticTestCase
         $this->em->getConnection()->close();
     }
 
-    private function createDatabaseFromFile()
+    private function createDatabaseFromFile(): void
     {
         copy($this->getOriginalDatabasePath(), $this->getDatabasePath());
     }
 
-    private function backupOrginalDatabase()
+    private function backupOrginalDatabase(): void
     {
         copy($this->getDatabasePath(), $this->getOriginalDatabasePath());
     }
@@ -64,6 +64,6 @@ abstract class MauticSqliteTestCase extends AbstractMauticTestCase
 
     private function getDatabasePath()
     {
-        return self::$container->get('doctrine')->getConnection()->getParams()['path'];
+        return self::getContainer()->get('doctrine')->getConnection()->getParams()['path'];
     }
 }

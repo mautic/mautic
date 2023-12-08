@@ -29,17 +29,17 @@ class MauticSyncProcessTest extends TestCase
     /**
      * @var SyncDateHelper|\PHPUnit\Framework\MockObject\MockObject
      */
-    private $syncDateHelper;
+    private \PHPUnit\Framework\MockObject\MockObject $syncDateHelper;
 
     /**
      * @var ObjectChangeGenerator|\PHPUnit\Framework\MockObject\MockObject
      */
-    private $objectChangeGenerator;
+    private \PHPUnit\Framework\MockObject\MockObject $objectChangeGenerator;
 
     /**
      * @var MauticSyncDataExchange|\PHPUnit\Framework\MockObject\MockObject
      */
-    private $syncDataExchange;
+    private \PHPUnit\Framework\MockObject\MockObject $syncDataExchange;
 
     protected function setUp(): void
     {
@@ -72,7 +72,7 @@ class MauticSyncProcessTest extends TestCase
         $this->syncDataExchange->expects($this->once())
             ->method('getSyncReport')
             ->willReturnCallback(
-                function (RequestDAO $requestDAO) {
+                function (RequestDAO $requestDAO): ReportDAO {
                     $requestObjects = $requestDAO->getObjects();
                     $this->assertCount(1, $requestObjects);
 
@@ -148,10 +148,7 @@ class MauticSyncProcessTest extends TestCase
         $this->assertEquals([Contact::NAME => [1 => $objectChangeDAO]], $syncOrder->getIdentifiedObjects());
     }
 
-    /**
-     * @return MauticSyncProcess
-     */
-    private function getSyncProcess(MappingManualDAO $mappingManualDAO)
+    private function getSyncProcess(MappingManualDAO $mappingManualDAO): MauticSyncProcess
     {
         $syncProcess = new MauticSyncProcess($this->syncDateHelper, $this->objectChangeGenerator);
 

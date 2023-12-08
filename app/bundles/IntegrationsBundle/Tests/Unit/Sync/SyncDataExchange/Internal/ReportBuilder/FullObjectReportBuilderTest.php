@@ -34,22 +34,19 @@ class FullObjectReportBuilderTest extends TestCase
     /**
      * @var ObjectProvider|\PHPUnit\Framework\MockObject\MockObject
      */
-    private $objectProvider;
+    private \PHPUnit\Framework\MockObject\MockObject $objectProvider;
 
     /**
      * @var EventDispatcherInterface|\PHPUnit\Framework\MockObject\MockObject
      */
-    private $dispatcher;
+    private \PHPUnit\Framework\MockObject\MockObject $dispatcher;
 
     /**
      * @var FieldBuilder|\PHPUnit\Framework\MockObject\MockObject
      */
-    private $fieldBuilder;
+    private \PHPUnit\Framework\MockObject\MockObject $fieldBuilder;
 
-    /**
-     * @var FullObjectReportBuilder
-     */
-    private $reportBuilder;
+    private \Mautic\IntegrationsBundle\Sync\SyncDataExchange\Internal\ReportBuilder\FullObjectReportBuilder $reportBuilder;
 
     protected function setUp(): void
     {
@@ -89,7 +86,7 @@ class FullObjectReportBuilderTest extends TestCase
         $this->dispatcher->expects($this->once())
             ->method('dispatch')
             ->with(
-                $this->callback(function (InternalObjectFindEvent $event) use ($internalObject, $fromDateTime, $toDateTime) {
+                $this->callback(function (InternalObjectFindEvent $event) use ($internalObject, $fromDateTime, $toDateTime): bool {
                     $this->assertSame($internalObject, $event->getObject());
                     $this->assertSame($fromDateTime, $event->getDateRange()->getFromDate());
                     $this->assertSame($toDateTime, $event->getDateRange()->getToDate());
@@ -143,7 +140,7 @@ class FullObjectReportBuilderTest extends TestCase
         $this->dispatcher->expects($this->once())
             ->method('dispatch')
             ->with(
-                $this->callback(function (InternalObjectFindEvent $event) use ($internalObject, $fromDateTime, $toDateTime) {
+                $this->callback(function (InternalObjectFindEvent $event) use ($internalObject, $fromDateTime, $toDateTime): bool {
                     $this->assertSame($internalObject, $event->getObject());
                     $this->assertSame($fromDateTime, $event->getDateRange()->getFromDate());
                     $this->assertSame($toDateTime, $event->getDateRange()->getToDate());
@@ -222,7 +219,7 @@ class FullObjectReportBuilderTest extends TestCase
                             $internalObject,
                             $fromDateTime,
                             $toDateTime
-                        ) {
+                        ): bool {
                             $this->assertSame($internalObject, $event->getObject());
                             $this->assertSame($fromDateTime, $event->getDateRange()->getFromDate());
                             $this->assertSame($toDateTime, $event->getDateRange()->getToDate());
@@ -247,7 +244,7 @@ class FullObjectReportBuilderTest extends TestCase
                 ],
                 [
                     $this->callback(
-                        function (InternalObjectFindByIdEvent $event) use ($internalObject, $contactEntity) {
+                        function (InternalObjectFindByIdEvent $event) use ($internalObject, $contactEntity): bool {
                             $this->assertSame($internalObject, $event->getObject());
                             $event->setId($contactEntity->getId());
                             $event->setEntity($contactEntity);
@@ -259,7 +256,7 @@ class FullObjectReportBuilderTest extends TestCase
                 ],
                 [
                     $this->callback(
-                        function (InternalContactEvent $event) use ($contactEntity) {
+                        function (InternalContactEvent $event) use ($contactEntity): bool {
                             $this->assertSame($contactEntity, $event->getContact());
 
                             return true;
@@ -327,7 +324,7 @@ class FullObjectReportBuilderTest extends TestCase
                             $internalObject,
                             $fromDateTime,
                             $toDateTime
-                        ) {
+                        ): bool {
                             $this->assertSame($internalObject, $event->getObject());
                             $this->assertSame($fromDateTime, $event->getDateRange()->getFromDate());
                             $this->assertSame($toDateTime, $event->getDateRange()->getToDate());
@@ -352,7 +349,7 @@ class FullObjectReportBuilderTest extends TestCase
                 ],
                 [
                     $this->callback(
-                        function (InternalObjectFindByIdEvent $event) use ($internalObject, $companyEntity) {
+                        function (InternalObjectFindByIdEvent $event) use ($internalObject, $companyEntity): bool {
                             $this->assertSame($internalObject, $event->getObject());
                             $event->setId($companyEntity->getId());
                             $event->setEntity($companyEntity);
@@ -364,7 +361,7 @@ class FullObjectReportBuilderTest extends TestCase
                 ],
                 [
                     $this->callback(
-                        function (InternalCompanyEvent $event) use ($companyEntity) {
+                        function (InternalCompanyEvent $event) use ($companyEntity): bool {
                             $this->assertSame($companyEntity, $event->getCompany());
 
                             return true;

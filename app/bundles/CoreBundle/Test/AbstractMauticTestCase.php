@@ -97,10 +97,10 @@ abstract class AbstractMauticTestCase extends WebTestCase
         $this->client->disableReboot();
         $this->client->followRedirects(true);
 
-        $this->em         = self::$container->get('doctrine')->getManager();
+        $this->em         = self::getContainer()->get('doctrine')->getManager();
         $this->connection = $this->em->getConnection();
 
-        $this->router = self::$container->get('router');
+        $this->router = self::getContainer()->get('router');
         $scheme       = $this->router->getContext()->getScheme();
         $secure       = 0 === strcasecmp($scheme, 'https');
 
@@ -112,7 +112,7 @@ abstract class AbstractMauticTestCase extends WebTestCase
      */
     protected static function getContainer(): ContainerInterface
     {
-        return self::$container;
+        return self::getContainer();
     }
 
     /**
@@ -136,7 +136,7 @@ abstract class AbstractMauticTestCase extends WebTestCase
         $input  = new ArgvInput(['console', 'doctrine:migrations:version', '--add', '--all', '--no-interaction']);
         $output = new BufferedOutput();
 
-        $application = new Application(self::$container->get('kernel'));
+        $application = new Application(self::getContainer()->get('kernel'));
         $application->setAutoExit(false);
         $application->run($input, $output);
     }
@@ -180,7 +180,7 @@ abstract class AbstractMauticTestCase extends WebTestCase
     protected function runCommand(string $name, array $params = [], Command $command = null, int $expectedStatusCode = 0, bool $catchExceptions = false): string
     {
         $params      = array_merge(['command' => $name], $params);
-        $kernel      = self::$container->get('kernel');
+        $kernel      = self::getContainer()->get('kernel');
         $application = new Application($kernel);
         $application->setAutoExit(false);
         $application->setCatchExceptions($catchExceptions);
@@ -211,7 +211,7 @@ abstract class AbstractMauticTestCase extends WebTestCase
         }
 
         $firewall = 'mautic';
-        $session  = self::$container->get('session');
+        $session  = self::getContainer()->get('session');
         $token    = new UsernamePasswordToken($user, $firewall, $user->getRoles());
         $session->set('_security_'.$firewall, serialize($token));
         $session->save();
@@ -226,7 +226,7 @@ abstract class AbstractMauticTestCase extends WebTestCase
      */
     protected function testSymfonyCommand(string $name, array $params = [], Command $command = null): CommandTester
     {
-        $kernel      = self::$container->get('kernel');
+        $kernel      = self::getContainer()->get('kernel');
         $application = new Application($kernel);
 
         if ($command) {

@@ -37,7 +37,7 @@ class WebhookSubscriberFunctionalTest extends MauticMysqlTestCase
         $contactRepository = $this->em->getRepository(Lead::class);
 
         /** @var ListModel $segmentModel */
-        $segmentModel = self::$container->get('mautic.lead.model.list');
+        $segmentModel = self::getContainer()->get('mautic.lead.model.list');
 
         /** @var WebhookQueueRepository $webhookQueueRepository */
         $webhookQueueRepository = $this->em->getRepository(WebhookQueue::class);

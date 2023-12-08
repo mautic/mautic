@@ -30,17 +30,14 @@ class FormFieldHelperTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider fieldProvider
      */
-    public function testPopulateField($field, $value, $formHtml, $expectedValue, $message)
+    public function testPopulateField($field, $value, $formHtml, $expectedValue, $message): void
     {
         $this->fixture->populateField($field, $value, 'mautic', $formHtml);
 
         $this->assertEquals($expectedValue, $formHtml, $message);
     }
 
-    /**
-     * @return array
-     */
-    public function fieldProvider()
+    public function fieldProvider(): array
     {
         return [
             [
@@ -112,10 +109,8 @@ class FormFieldHelperTest extends \PHPUnit\Framework\TestCase
     /**
      * @param string $name
      * @param string $type
-     *
-     * @return Field
      */
-    protected function getField($name, $type)
+    protected function getField($name, $type): Field
     {
         $field = new Field();
 
@@ -128,10 +123,8 @@ class FormFieldHelperTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @param string $name
-     *
-     * @return string
      */
-    private function getAliasFromName($name)
+    private function getAliasFromName($name): string
     {
         return strtolower(str_replace(' ', '', $name));
     }

@@ -32,25 +32,22 @@ class ListModelTest extends TestCase
      */
     protected $fixture;
 
-    /**
-     * @var ListModel
-     */
-    private $model;
+    private \Mautic\LeadBundle\Model\ListModel $model;
 
     /**
      * @var LeadListRepository|MockObject
      */
-    private $leadListRepositoryMock;
+    private \PHPUnit\Framework\MockObject\MockObject $leadListRepositoryMock;
 
     /**
      * @var SegmentCountCacheHelper|MockObject
      */
-    private $segmentCountCacheHelper;
+    private \PHPUnit\Framework\MockObject\MockObject $segmentCountCacheHelper;
 
     /**
      * @var ContactSegmentService|MockObject
      */
-    private $contactSegmentServiceMock;
+    private \PHPUnit\Framework\MockObject\MockObject $contactSegmentServiceMock;
 
     protected function setUp(): void
     {
@@ -343,14 +340,8 @@ class ListModelTest extends TestCase
     private function mockLeadList(int $id): LeadList
     {
         return new class($id) extends LeadList {
-            /**
-             * @var int
-             */
-            private $id;
-
-            public function __construct(int $id)
+            public function __construct(private int $id)
             {
-                $this->id = $id;
                 parent::__construct();
             }
 
@@ -364,14 +355,8 @@ class ListModelTest extends TestCase
     private function mockLead(int $id): Lead
     {
         return new class($id) extends Lead {
-            /**
-             * @var int
-             */
-            private $id;
-
-            public function __construct(int $id)
+            public function __construct(private int $id)
             {
-                $this->id = $id;
                 parent::__construct();
             }
 

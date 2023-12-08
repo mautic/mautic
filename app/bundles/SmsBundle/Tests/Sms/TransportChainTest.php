@@ -14,12 +14,12 @@ class TransportChainTest extends MauticMysqlTestCase
     /**
      * @var TransportChain|MockObject
      */
-    private $transportChain;
+    private \Mautic\SmsBundle\Sms\TransportChain $transportChain;
 
     /**
      * @var TransportInterface|MockObject
      */
-    private $twilioTransport;
+    private \PHPUnit\Framework\MockObject\MockObject $twilioTransport;
 
     /**
      * Call protected/private method of a class.
@@ -47,7 +47,7 @@ class TransportChainTest extends MauticMysqlTestCase
 
         $this->transportChain = new TransportChain(
             'mautic.test.twilio.mock',
-            self::$container->get('mautic.helper.integration')
+            self::getContainer()->get('mautic.helper.integration')
         );
 
         $this->twilioTransport = $this->createMock(TwilioTransport::class);
@@ -57,16 +57,16 @@ class TransportChainTest extends MauticMysqlTestCase
             ->will($this->returnValue('lol'));
     }
 
-    public function testAddTransport()
+    public function testAddTransport(): void
     {
         $count = count($this->transportChain->getTransports());
 
-        $this->transportChain->addTransport('mautic.transport.test', self::$container->get('mautic.sms.twilio.transport'), 'mautic.transport.test', 'Twilio');
+        $this->transportChain->addTransport('mautic.transport.test', self::getContainer()->get('mautic.sms.twilio.transport'), 'mautic.transport.test', 'Twilio');
 
         $this->assertCount($count + 1, $this->transportChain->getTransports());
     }
 
-    public function testSendSms()
+    public function testSendSms(): void
     {
         $this->testAddTransport();
 

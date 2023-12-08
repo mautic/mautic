@@ -24,14 +24,14 @@ class FeedbackLoopTest extends \PHPUnit\Framework\TestCase
      * @covers  \Mautic\EmailBundle\MonitoredEmail\Search\Result::setContacts()
      * @covers  \Mautic\EmailBundle\MonitoredEmail\Search\Result::getContacts()
      */
-    public function testContactIsFoundFromMessage()
+    public function testContactIsFoundFromMessage(): void
     {
         $contactFinder = $this->getMockBuilder(ContactFinder::class)
             ->disableOriginalConstructor()
             ->getMock();
         $contactFinder->method('find')
             ->willReturnCallback(
-                function ($email) {
+                function ($email): Result {
                     $stat = new Stat();
 
                     $lead = new Lead();

@@ -12,7 +12,6 @@ use Mautic\PageBundle\Entity\PageRepository;
 use Mautic\PageBundle\Form\Type\PageListType;
 use Mautic\PageBundle\Model\PageModel;
 use Symfony\Component\Form\Extension\Validator\ValidatorExtension;
-use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\PreloadedExtension;
 use Symfony\Component\Form\Test\TypeTestCase;
 use Symfony\Component\Validator\Validation;
@@ -20,17 +19,12 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class ConfigTypeTest extends TypeTestCase
 {
-    private $formBuilder;
-    private $formType;
-
     protected function setUp(): void
     {
-        $this->formBuilder = $this->createMock(FormBuilderInterface::class);
-        $this->formType    = $this->getConfigFormType();
         parent::setUp();
     }
 
-    public function testSubmitValidData()
+    public function testSubmitValidData(): void
     {
         $formData = [
             'site_url'             => 'http://example.com',
@@ -57,7 +51,7 @@ class ConfigTypeTest extends TypeTestCase
         $this->assertTrue($form->isValid());
     }
 
-    private function getConfigFormType()
+    private function getConfigFormType(): ConfigType
     {
         $translator                 = $this->createMock(TranslatorInterface::class);
         $languageHelper             = $this->createMock(LanguageHelper::class);

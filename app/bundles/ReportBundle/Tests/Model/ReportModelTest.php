@@ -24,10 +24,7 @@ use Twig\Environment;
 
 class ReportModelTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var ReportModel
-     */
-    private $reportModel;
+    private \Mautic\ReportBundle\Model\ReportModel $reportModel;
 
     protected function setUp(): void
     {
@@ -37,7 +34,7 @@ class ReportModelTest extends \PHPUnit\Framework\TestCase
         $mockDispatcher = $this->createMock(EventDispatcher::class);
         $mockDispatcher->method('dispatch')
             ->willReturnCallback(
-                function (ReportBuilderEvent $event) {
+                function (ReportBuilderEvent $event): ReportBuilderEvent {
                     $reportBuilderData = Fixtures::getReportBuilderEventData();
                     $event->addTable('assets', $reportBuilderData['all']['tables']['assets']);
 

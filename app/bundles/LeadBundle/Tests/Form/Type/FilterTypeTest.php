@@ -20,17 +20,14 @@ final class FilterTypeTest extends \PHPUnit\Framework\TestCase
     /**
      * @var MockObject|FormAdjustmentsProviderInterface
      */
-    private $formAdjustmentsProvider;
+    private \PHPUnit\Framework\MockObject\MockObject $formAdjustmentsProvider;
 
     /**
      * @var MockObject|ListModel
      */
-    private $listModel;
+    private \PHPUnit\Framework\MockObject\MockObject $listModel;
 
-    /**
-     * @var FilterType
-     */
-    private $form;
+    private \Mautic\LeadBundle\Form\Type\FilterType $form;
 
     protected function setUp(): void
     {
@@ -76,7 +73,7 @@ final class FilterTypeTest extends \PHPUnit\Framework\TestCase
                 [
                     FormEvents::PRE_SET_DATA,
                     $this->callback(
-                        function (callable $formModifier) {
+                        function (callable $formModifier): bool {
                             /** @var FormInterface<FormBuilderInterface>|MockObject $form */
                             $form = $this->createMock(FormInterface::class);
                             $data = [
@@ -105,7 +102,7 @@ final class FilterTypeTest extends \PHPUnit\Framework\TestCase
                 [
                     FormEvents::PRE_SUBMIT,
                     $this->callback(
-                        function (callable $formModifier) {
+                        function (callable $formModifier): bool {
                             /** @var FormInterface<FormBuilderInterface>|MockObject $form */
                             $form = $this->createMock(FormInterface::class);
                             $data = [
@@ -170,7 +167,7 @@ final class FilterTypeTest extends \PHPUnit\Framework\TestCase
                 [
                     FormEvents::PRE_SET_DATA,
                     $this->callback(
-                        function (callable $formModifier) {
+                        function (callable $formModifier): bool {
                             $form = new class() extends Form {
                                 public int $addMethodCallCounter = 0;
 
@@ -209,7 +206,7 @@ final class FilterTypeTest extends \PHPUnit\Framework\TestCase
                                  * @param FormInterface<FormInterface>|string $child
                                  * @param mixed[]                             $options
                                  */
-                                public function add($child, $type = null, array $options = [])
+                                public function add($child, string $type = null, array $options = [])
                                 {
                                     ++$this->addMethodCallCounter;
 
@@ -237,7 +234,7 @@ final class FilterTypeTest extends \PHPUnit\Framework\TestCase
                 ],
                 [
                     FormEvents::PRE_SUBMIT,
-                    function (callable $formModifier) {
+                    function (callable $formModifier): void {
                         // don't do anything for this test
                     },
                 ]

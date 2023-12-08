@@ -50,40 +50,39 @@ class PublicControllerTest extends MauticMysqlTestCase
     /**
      * @var \PHPUnit\Framework\MockObject\MockObject|Container
      */
-    private $internalContainer;
+    private \PHPUnit\Framework\MockObject\MockObject $internalContainer;
 
     /** @var \Psr\Log\LoggerInterface */
-    private $logger;
+    private \PHPUnit\Framework\MockObject\MockObject $logger;
 
     /** @var ModelFactory<object>&MockObject */
-    private $modelFactory;
+    private \PHPUnit\Framework\MockObject\MockObject $modelFactory;
 
     /** @var RedirectModel */
-    private $redirectModel;
+    private \PHPUnit\Framework\MockObject\MockObject $redirectModel;
 
     /** @var Redirect */
-    private $redirect;
+    private \PHPUnit\Framework\MockObject\MockObject $redirect;
 
-    /** @var Request */
-    private $request;
+    private \Symfony\Component\HttpFoundation\Request $request;
 
     /** @var IpLookupHelper */
-    private $ipLookupHelper;
+    private \PHPUnit\Framework\MockObject\MockObject $ipLookupHelper;
 
     /** @var IpAddress */
-    private $ipAddress;
+    private \PHPUnit\Framework\MockObject\MockObject $ipAddress;
 
     /** @var LeadModel */
-    private $leadModel;
+    private \PHPUnit\Framework\MockObject\MockObject $leadModel;
 
     /** @var PageModel */
-    private $pageModel;
+    private \PHPUnit\Framework\MockObject\MockObject $pageModel;
 
     /** @var PrimaryCompanyHelper */
-    private $primaryCompanyHelper;
+    private \PHPUnit\Framework\MockObject\MockObject $primaryCompanyHelper;
 
     /** @var ContactRequestHelper&MockObject */
-    private $contactRequestHelper;
+    private \PHPUnit\Framework\MockObject\MockObject $contactRequestHelper;
 
     protected function setUp(): void
     {
@@ -499,7 +498,7 @@ class PublicControllerTest extends MauticMysqlTestCase
         );
         self::assertInstanceOf(RedirectResponse::class, $response);
         self::assertSame($targetUrl, $response->getTargetUrl());
-        self::assertSame(Response::HTTP_FOUND, $response->getStatusCode());
+        self::assertResponseStatusCodeSame(Response::HTTP_FOUND);
     }
 
     /**
@@ -509,7 +508,7 @@ class PublicControllerTest extends MauticMysqlTestCase
      *
      * @throws \Exception
      */
-    public function testMtcTrackingEvent()
+    public function testMtcTrackingEvent(): void
     {
         $request = new Request(
             [
@@ -528,7 +527,7 @@ class PublicControllerTest extends MauticMysqlTestCase
             ->method('dispatch')
             ->with($event, PageEvents::ON_CONTACT_TRACKED)
             ->willReturnCallback(
-                function (TrackingEvent $event) {
+                function (TrackingEvent $event): TrackingEvent {
                     $contact  = $event->getContact()->getEmail();
                     $request  = $event->getRequest();
                     $response = $event->getResponse();
@@ -607,13 +606,13 @@ class PublicControllerTest extends MauticMysqlTestCase
         );
     }
 
-    public function testTrackingActionWithInvalidCt()
+    public function testTrackingActionWithInvalidCt(): void
     {
         $request = new Request();
 
         $pageModel    = $this->createMock(PageModel::class);
         $pageModel->expects($this->once())->method('hitPage')->willReturnCallback(
-            function () {
+            function (): void {
                 throw new InvalidDecodedStringException();
             }
         );
@@ -667,7 +666,7 @@ class PublicControllerTest extends MauticMysqlTestCase
         );
     }
 
-    public function testTrackingImageAction()
+    public function testTrackingImageAction(): void
     {
         $this->client->request('GET', '/mtracking.gif?url=http%3A%2F%2Fmautic.org');
 

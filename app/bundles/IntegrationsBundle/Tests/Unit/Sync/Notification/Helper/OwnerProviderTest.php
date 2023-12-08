@@ -19,17 +19,14 @@ class OwnerProviderTest extends TestCase
     /**
      * @var ObjectProvider|\PHPUnit\Framework\MockObject\MockObject
      */
-    private $objectProvider;
+    private \PHPUnit\Framework\MockObject\MockObject $objectProvider;
 
     /**
      * @var EventDispatcherInterface|\PHPUnit\Framework\MockObject\MockObject
      */
-    private $dispatcher;
+    private \PHPUnit\Framework\MockObject\MockObject $dispatcher;
 
-    /**
-     * @var OwnerProvider
-     */
-    private $ownerProvider;
+    private \Mautic\IntegrationsBundle\Sync\Notification\Helper\OwnerProvider $ownerProvider;
 
     protected function setUp(): void
     {
@@ -69,7 +66,7 @@ class OwnerProviderTest extends TestCase
         $this->dispatcher->expects($this->once())
             ->method('dispatch')
             ->with(
-                $this->callback(function (InternalObjectOwnerEvent $event) use ($internalObject) {
+                $this->callback(function (InternalObjectOwnerEvent $event) use ($internalObject): bool {
                     $this->assertSame($internalObject, $event->getObject());
                     $this->assertSame([123], $event->getObjectIds());
 
