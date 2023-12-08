@@ -12,12 +12,8 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 class MauticSocialMonitoringCommand extends Command
 {
-    private MonitoringModel $monitoringModel;
-
-    public function __construct(MonitoringModel $monitoringModel)
+    public function __construct(private MonitoringModel $monitoringModel)
     {
-        $this->monitoringModel = $monitoringModel;
-
         parent::__construct();
     }
 

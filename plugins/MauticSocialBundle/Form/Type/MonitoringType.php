@@ -19,12 +19,8 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class MonitoringType extends AbstractType
 {
-    /** @var MonitoringModel */
-    private $monitoringModel;
-
-    public function __construct(MonitoringModel $monitoringModel)
+    public function __construct(private MonitoringModel $monitoringModel)
     {
-        $this->monitoringModel = $monitoringModel;
     }
 
     /**
