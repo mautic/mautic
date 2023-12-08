@@ -8,7 +8,6 @@ use Mautic\CampaignBundle\Executioner\ContactFinder\Limiter\ContactLimiter;
 use Mautic\CampaignBundle\Membership\Exception\RunLimitReachedException;
 use Mautic\CoreBundle\Helper\ProgressBarHelper;
 use Mautic\LeadBundle\Entity\LeadRepository;
-use Symfony\Component\Console\Helper\ProgressBar;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
