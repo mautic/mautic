@@ -33,6 +33,8 @@ return static function (Rector\Config\RectorConfig $rectorConfig): void {
         ReturnTypeFromReturnDirectArrayRector::class => [
             // require bit test update
             __DIR__.'/app/bundles/LeadBundle/Model/LeadModel.php',
+            // array vs doctrine collection
+            __DIR__.'/app/bundles/CoreBundle/Entity/TranslationEntityTrait.php',
         ],
 
         // lets handle later, once we have more type declaratoins
