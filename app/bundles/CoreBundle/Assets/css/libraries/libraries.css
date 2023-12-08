@@ -2372,7 +2372,7 @@ th {
 .table-hover > tbody > tr:hover, .table tr:hover {
   background-color: var(--layer-hover);
 }
-.table > thead > tr > th a {
+.table > thead > tr > th .thead-filter > a {
   color: var(--text-primary);
 }
 .table > tbody > tr > td, .table > tfoot > tr > td {
@@ -3352,18 +3352,15 @@ fieldset[disabled] .btn-success.focus {
   background-color: #fff;
 }
 .btn-info {
-  color: #fff;
   background-color: #35B4B9;
   border-color: #35B4B9;
 }
 .btn-info:focus,
 .btn-info.focus {
-  color: #fff;
   background-color: #2a8d91;
   border-color: #195456;
 }
 .btn-info:hover {
-  color: #fff;
   background-color: #2a8d91;
   border-color: #278689;
 }
