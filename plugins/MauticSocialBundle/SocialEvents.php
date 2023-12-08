@@ -3,7 +3,7 @@
 namespace MauticPlugin\MauticSocialBundle;
 
 /**
- * Events available for MauticSocialBundle
+ * Events available for MauticSocialBundle.
  */
 final class SocialEvents
 {

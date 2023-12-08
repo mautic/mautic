@@ -7,7 +7,7 @@ use Mautic\CoreBundle\Event\GlobalSearchEvent;
 use Symfony\Component\HttpFoundation\Request;
 
 /**
- * Almost all other Mautic Bundle controllers extend this default controller
+ * Almost all other Mautic Bundle controllers extend this default controller.
  */
 class DefaultController extends CommonController
 {

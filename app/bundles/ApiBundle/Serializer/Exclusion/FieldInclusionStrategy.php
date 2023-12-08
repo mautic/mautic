@@ -8,7 +8,7 @@ use JMS\Serializer\Metadata\ClassMetadata;
 use JMS\Serializer\Metadata\PropertyMetadata;
 
 /**
- * Include specific fields at a specific level
+ * Include specific fields at a specific level.
  */
 class FieldInclusionStrategy implements ExclusionStrategyInterface
 {

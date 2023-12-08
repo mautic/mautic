@@ -3,7 +3,7 @@
 namespace Mautic\PageBundle;
 
 /**
- * Events available for PageBundle
+ * Events available for PageBundle.
  */
 final class PageEvents
 {

@@ -3,7 +3,7 @@
 namespace Mautic\CoreBundle\Helper\Chart;
 
 /**
- * Line chart requires the same data as Bar chart
+ * Line chart requires the same data as Bar chart.
  */
 class LineChart extends AbstractChart implements ChartInterface
 {

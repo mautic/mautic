@@ -3,7 +3,7 @@
 namespace Mautic\ReportBundle;
 
 /**
- * Events available for ReportBundle
+ * Events available for ReportBundle.
  */
 final class ReportEvents
 {

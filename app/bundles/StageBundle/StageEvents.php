@@ -3,7 +3,7 @@
 namespace Mautic\StageBundle;
 
 /**
- * Events available for StageBundle
+ * Events available for StageBundle.
  */
 final class StageEvents
 {

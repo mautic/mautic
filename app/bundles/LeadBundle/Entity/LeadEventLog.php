@@ -8,7 +8,7 @@ use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 
 /**
- * Store here contact events
+ * Store here contact events.
  */
 class LeadEventLog
 {

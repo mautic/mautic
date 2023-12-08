@@ -3,7 +3,7 @@
 namespace MauticPlugin\MauticFocusBundle;
 
 /**
- * Events available for MauticFocusBundle
+ * Events available for MauticFocusBundle.
  */
 final class FocusEvents
 {

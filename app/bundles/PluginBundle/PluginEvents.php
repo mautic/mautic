@@ -3,7 +3,7 @@
 namespace Mautic\PluginBundle;
 
 /**
- * Events available for PluginEvents
+ * Events available for PluginEvents.
  */
 final class PluginEvents
 {
