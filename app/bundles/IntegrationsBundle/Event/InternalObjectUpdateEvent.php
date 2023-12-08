@@ -36,6 +36,9 @@ class InternalObjectUpdateEvent extends Event
         return $this->identifiedObjectIds;
     }
 
+    /**
+     * @return ObjectChangeDAO[]
+     */
     public function getUpdateObjects(): array
     {
         return $this->updateObjects;

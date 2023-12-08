@@ -4,7 +4,6 @@ namespace Mautic\AssetBundle\Event;
 
 use Gaufrette\Adapter;
 use Mautic\CoreBundle\Event\CommonEvent;
-use Mautic\PluginBundle\Integration\AbstractIntegration;
 use Mautic\PluginBundle\Integration\UnifiedIntegrationInterface;
 
 class RemoteAssetBrowseEvent extends CommonEvent
