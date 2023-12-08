@@ -212,7 +212,7 @@ class PlainTextHelper
         }
 
         $this->html    = $html;
-        $this->options = array_merge($this->options, $options);
+        $this->options = $options;
     }
 
     /**
