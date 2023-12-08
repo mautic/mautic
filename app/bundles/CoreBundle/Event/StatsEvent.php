@@ -75,8 +75,6 @@ class StatsEvent extends Event
     protected $repository;
 
     /**
-     * StatsEvent constructor.
-     *
      * @param int $start
      * @param int $limit
      */

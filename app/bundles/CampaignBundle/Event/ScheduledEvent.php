@@ -10,8 +10,6 @@ class ScheduledEvent extends CampaignScheduledEvent
     use ContextTrait;
 
     /**
-     * ScheduledEvent constructor.
-     *
      * @param bool $isReschedule
      */
     public function __construct(

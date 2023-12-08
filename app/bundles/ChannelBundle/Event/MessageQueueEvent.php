@@ -8,8 +8,6 @@ use Mautic\CoreBundle\Event\CommonEvent;
 class MessageQueueEvent extends CommonEvent
 {
     /**
-     * MessageQueueEvent constructor.
-     *
      * @param bool $isNew
      */
     public function __construct(MessageQueue $entity, $isNew = false)

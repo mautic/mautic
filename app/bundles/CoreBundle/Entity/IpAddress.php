@@ -67,8 +67,6 @@ class IpAddress
     }
 
     /**
-     * IpAddress constructor.
-     *
      * @param string|null $ipAddress
      */
     public function __construct(

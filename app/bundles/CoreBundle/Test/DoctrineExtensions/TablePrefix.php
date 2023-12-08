@@ -13,8 +13,6 @@ class TablePrefix
     protected $prefix = '';
 
     /**
-     * TablePrefix constructor.
-     *
      * @param string $prefix
      */
     public function __construct($prefix)

@@ -71,9 +71,6 @@ class Trigger extends FormEntity
         parent::__clone();
     }
 
-    /**
-     * Constructor.
-     */
     public function __construct()
     {
         $this->events = new ArrayCollection();

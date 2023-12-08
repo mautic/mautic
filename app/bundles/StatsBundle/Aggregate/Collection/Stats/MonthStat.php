@@ -10,8 +10,6 @@ class MonthStat implements StatInterface
     private $stats = [];
 
     /**
-     * MonthStat constructor.
-     *
      * @param string $month "2019-01" format
      */
     public function __construct(

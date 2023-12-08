@@ -20,8 +20,6 @@ class Installer
     private \Symfony\Component\Filesystem\Filesystem $filesystem;
 
     /**
-     * Installer constructor.
-     *
      * @param string $translationsDirectory
      */
     public function __construct(

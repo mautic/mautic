@@ -25,8 +25,6 @@ class BcInterfaceTokenTransport implements TransportInterface
     private $message;
 
     /**
-     * BatchTransport constructor.
-     *
      * @param bool $validate
      */
     public function __construct(

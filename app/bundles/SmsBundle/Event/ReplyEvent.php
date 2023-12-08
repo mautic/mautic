@@ -14,8 +14,6 @@ class ReplyEvent extends Event
     private $response;
 
     /**
-     * ReplyEvent constructor.
-     *
      * @param string $message
      */
     public function __construct(

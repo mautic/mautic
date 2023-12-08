@@ -53,8 +53,6 @@ class Fetcher
     private $knownCampaignMembers = [];
 
     /**
-     * Fetcher constructor.
-     *
      * @param string $campaignId
      */
     public function __construct(

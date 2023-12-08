@@ -12,8 +12,6 @@ class YearStat implements StatInterface
     private int $year;
 
     /**
-     * YearStat constructor.
-     *
      * @param int $year
      */
     public function __construct($year)

@@ -23,8 +23,6 @@ class ColorHelper
     protected $blue = 0;
 
     /**
-     * Constructor.
-     *
      * @param  string in format #xxxxxx or #xxx
      */
     public function __construct($hex = null)

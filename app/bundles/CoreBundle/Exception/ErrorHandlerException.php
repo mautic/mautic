@@ -5,8 +5,6 @@ namespace Mautic\CoreBundle\Exception;
 class ErrorHandlerException extends \Exception
 {
     /**
-     * ErrorHandlerException constructor.
-     *
      * @param string $message
      * @param bool   $showMessage
      * @param int    $code

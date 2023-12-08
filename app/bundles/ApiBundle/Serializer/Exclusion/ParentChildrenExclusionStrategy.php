@@ -10,8 +10,6 @@ namespace Mautic\ApiBundle\Serializer\Exclusion;
 class ParentChildrenExclusionStrategy extends FieldExclusionStrategy
 {
     /**
-     * ParentChildrenExclusionStrategy constructor.
-     *
      * @param int $level
      */
     public function __construct($level = 3)
