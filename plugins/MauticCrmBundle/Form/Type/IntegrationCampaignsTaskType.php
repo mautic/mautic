@@ -12,7 +12,13 @@ use Symfony\Component\Validator\Context\ExecutionContextInterface;
 
 class IntegrationCampaignsTaskType extends AbstractType
 {
+<<<<<<< HEAD
     public function __construct(private ConnectwiseIntegration $connectwiseIntegration)
+=======
+    private \MauticPlugin\MauticCrmBundle\Integration\ConnectwiseIntegration $connectwiseIntegration;
+
+    public function __construct(ConnectwiseIntegration $connectwiseIntegration)
+>>>>>>> 11b4805f88 ([type-declarations] Re-run rector rules on plugins, Report, Sms, User, Lead, Dynamic, Config bundles)
     {
     }
 

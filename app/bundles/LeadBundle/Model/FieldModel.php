@@ -663,7 +663,7 @@ class FieldModel extends FormModel
     /**
      * Reorder fields based on passed entity position.
      */
-    public function reorderFieldsByEntity($entity)
+    public function reorderFieldsByEntity($entity): void
     {
         if (!$entity instanceof LeadField) {
             throw new MethodNotAllowedHttpException(['LeadEntity']);
@@ -895,10 +895,8 @@ class FieldModel extends FormModel
      * Get the fields for a specific group.
      *
      * @param array $filters
-     *
-     * @return array
      */
-    public function getGroupFields($group, $filters = ['isPublished' => true])
+    public function getGroupFields($group, $filters = ['isPublished' => true]): array
     {
         $forceFilters = [
             [

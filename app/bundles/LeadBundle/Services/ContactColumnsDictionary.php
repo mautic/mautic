@@ -17,10 +17,7 @@ class ContactColumnsDictionary
     {
     }
 
-    /**
-     * @return array
-     */
-    public function getColumns()
+    public function getColumns(): array
     {
         $columns = array_flip($this->coreParametersHelper->get('contact_columns', []));
         $fields  = $this->getFields();

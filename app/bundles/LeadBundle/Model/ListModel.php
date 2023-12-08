@@ -1166,10 +1166,8 @@ class ListModel extends FormModel
      * Get segments which are used as a dependent by other segments to prevent batch deletion of them.
      *
      * @param array $segmentIds
-     *
-     * @return array
      */
-    public function canNotBeDeleted($segmentIds)
+    public function canNotBeDeleted($segmentIds): array
     {
         $entities = $this->getEntities(
             [

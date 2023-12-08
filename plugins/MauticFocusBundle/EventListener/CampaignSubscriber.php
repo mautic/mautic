@@ -14,7 +14,15 @@ use Symfony\Component\Routing\RouterInterface;
 
 class CampaignSubscriber implements EventSubscriberInterface
 {
+<<<<<<< HEAD
     public function __construct(private TrackingHelper $trackingHelper, private RouterInterface $router)
+=======
+    private \Mautic\PageBundle\Helper\TrackingHelper $trackingHelper;
+
+    private \Symfony\Component\Routing\RouterInterface $router;
+
+    public function __construct(TrackingHelper $trackingHelper, RouterInterface $router)
+>>>>>>> 11b4805f88 ([type-declarations] Re-run rector rules on plugins, Report, Sms, User, Lead, Dynamic, Config bundles)
     {
     }
 

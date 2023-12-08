@@ -7,6 +7,11 @@ use MauticPlugin\MauticCrmBundle\Integration\Salesforce\Object\Lead;
 
 class Organizer
 {
+<<<<<<< HEAD
+=======
+    private array $records;
+
+>>>>>>> 11b4805f88 ([type-declarations] Re-run rector rules on plugins, Report, Sms, User, Lead, Dynamic, Config bundles)
     /**
      * @var array
      */

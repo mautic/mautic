@@ -11,10 +11,7 @@ use Symfony\Component\Validator\Constraints\NotBlank;
 
 class TweetSendType extends AbstractType
 {
-    /**
-     * @var RouterInterface
-     */
-    protected $router;
+    protected \Symfony\Component\Routing\RouterInterface $router;
 
     public function __construct(RouterInterface $router)
     {

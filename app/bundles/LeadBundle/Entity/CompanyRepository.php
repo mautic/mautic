@@ -338,10 +338,7 @@ class CompanyRepository extends CommonRepository implements CustomFieldRepositor
         return ($results) ? $results[0] : null;
     }
 
-    /**
-     * @return array
-     */
-    public function getCompaniesForContacts(array $contacts)
+    public function getCompaniesForContacts(array $contacts): array
     {
         if (!$contacts) {
             return [];

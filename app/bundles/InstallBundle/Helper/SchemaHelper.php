@@ -28,10 +28,7 @@ class SchemaHelper
      */
     protected $platform;
 
-    /**
-     * @var array
-     */
-    protected $dbParams = [];
+    protected array $dbParams;
 
     /**
      * @throws \Doctrine\DBAL\Exception
@@ -203,11 +200,9 @@ class SchemaHelper
     }
 
     /**
-     * @return array
-     *
      * @throws \Doctrine\DBAL\Exception
      */
-    protected function backupExistingSchema($tables, $mauticTables, $backupPrefix)
+    protected function backupExistingSchema($tables, $mauticTables, $backupPrefix): array
     {
         $sql = [];
         $sm  = $this->db->getSchemaManager();

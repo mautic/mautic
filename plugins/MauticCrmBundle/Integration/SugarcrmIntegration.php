@@ -40,11 +40,12 @@ class SugarcrmIntegration extends CrmAbstractIntegration
 
     private $sugarDncKeys = ['email_opt_out', 'invalid_email'];
     private $authorizationError;
+<<<<<<< HEAD
+=======
+    private \Mautic\UserBundle\Model\UserModel $userModel;
+>>>>>>> 11b4805f88 ([type-declarations] Re-run rector rules on plugins, Report, Sms, User, Lead, Dynamic, Config bundles)
 
-    /**
-     * @var DoNotContact
-     */
-    protected $doNotContactModel;
+    protected \Mautic\LeadBundle\Model\DoNotContact $doNotContactModel;
 
     public function __construct(
         EventDispatcherInterface $eventDispatcher,
@@ -235,10 +236,8 @@ class SugarcrmIntegration extends CrmAbstractIntegration
      * Get available fields for choices in the config UI.
      *
      * @param array $settings
-     *
-     * @return array
      */
-    public function getFormLeadFields($settings = [])
+    public function getFormLeadFields($settings = []): array
     {
         if (!$this->isAuthorized()) {
             return [];
@@ -731,10 +730,8 @@ class SugarcrmIntegration extends CrmAbstractIntegration
      *
      * @param array  $data
      * @param string $object
-     *
-     * @return int
      */
-    public function amendLeadDataBeforeMauticPopulate($data, $object)
+    public function amendLeadDataBeforeMauticPopulate($data, $object): int
     {
         $settings['feature_settings']['objects'][] = $object;
         $fields                                    = array_keys($this->getAvailableLeadFields($settings));
@@ -1747,10 +1744,7 @@ class SugarcrmIntegration extends CrmAbstractIntegration
         return ($object && isset($fields[$object])) ? $fields[$object] : $fields;
     }
 
-    /**
-     * @return array
-     */
-    protected function prepareFieldsForPush($fields)
+    protected function prepareFieldsForPush($fields): array
     {
         $fieldMappings = [];
         $required      = [];

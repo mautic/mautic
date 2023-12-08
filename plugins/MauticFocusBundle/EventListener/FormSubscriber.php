@@ -9,7 +9,13 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class FormSubscriber implements EventSubscriberInterface
 {
+<<<<<<< HEAD
     public function __construct(private FocusModel $model)
+=======
+    private \MauticPlugin\MauticFocusBundle\Model\FocusModel $model;
+
+    public function __construct(FocusModel $model)
+>>>>>>> 11b4805f88 ([type-declarations] Re-run rector rules on plugins, Report, Sms, User, Lead, Dynamic, Config bundles)
     {
     }
 

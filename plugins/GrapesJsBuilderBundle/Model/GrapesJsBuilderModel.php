@@ -24,7 +24,15 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
  */
 class GrapesJsBuilderModel extends AbstractCommonModel
 {
+<<<<<<< HEAD
     public function __construct(private RequestStack $requestStack, private EmailModel $emailModel, EntityManager $em, CorePermissions $security, EventDispatcherInterface $dispatcher, UrlGeneratorInterface $router, Translator $translator, UserHelper $userHelper, LoggerInterface $mauticLogger, CoreParametersHelper $coreParametersHelper)
+=======
+    private \Symfony\Component\HttpFoundation\RequestStack $requestStack;
+
+    private \Mautic\EmailBundle\Model\EmailModel $emailModel;
+
+    public function __construct(RequestStack $requestStack, EmailModel $emailModel, EntityManager $em, CorePermissions $security, EventDispatcherInterface $dispatcher, UrlGeneratorInterface $router, Translator $translator, UserHelper $userHelper, LoggerInterface $mauticLogger, CoreParametersHelper $coreParametersHelper)
+>>>>>>> 11b4805f88 ([type-declarations] Re-run rector rules on plugins, Report, Sms, User, Lead, Dynamic, Config bundles)
     {
         parent::__construct($em, $security, $dispatcher, $router, $translator, $userHelper, $mauticLogger, $coreParametersHelper);
     }

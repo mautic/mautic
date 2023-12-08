@@ -29,10 +29,8 @@ class FieldsBuilder
     /**
      * @param string $prefix
      * @param string $segmentPrefix
-     *
-     * @return array
      */
-    public function getLeadFilter($prefix, $segmentPrefix)
+    public function getLeadFilter($prefix, $segmentPrefix): array
     {
         $filters = $this->getLeadFieldsColumns($prefix);
 

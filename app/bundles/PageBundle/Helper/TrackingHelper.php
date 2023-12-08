@@ -15,7 +15,10 @@ class TrackingHelper
     {
     }
 
-    public function getEnabledServices()
+    /**
+     * @return 'facebook_pixel'[]|'google_analytics'[]
+     */
+    public function getEnabledServices(): array
     {
         $keys = [
             'google_analytics' => 'Google Analytics',

@@ -439,7 +439,7 @@ class ConnectwiseIntegration extends CrmAbstractIntegration
         return $this->getRecords($params, 'company');
     }
 
-    public function getRecords($params, $object)
+    public function getRecords($params, $object): int
     {
         if (!$this->isAuthorized()) {
             return 0;
@@ -498,8 +498,9 @@ class ConnectwiseIntegration extends CrmAbstractIntegration
 
     /**
      * Ammend mapped lead data before creating to Mautic.
+     * @return mixed[]
      */
-    public function amendLeadDataBeforeMauticPopulate($data, $object)
+    public function amendLeadDataBeforeMauticPopulate($data, $object): array
     {
         $fieldsValues = [];
 
@@ -670,10 +671,8 @@ class ConnectwiseIntegration extends CrmAbstractIntegration
 
     /**
      * Match lead data with integration fields.
-     *
-     * @return array
      */
-    public function populateLeadData($lead, $config = [])
+    public function populateLeadData($lead, $config = []): array
     {
         if ($lead instanceof Lead) {
             $fields = $lead->getFields(true);

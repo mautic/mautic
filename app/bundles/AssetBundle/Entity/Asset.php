@@ -1280,10 +1280,8 @@ class Asset extends FormEntity
      *
      * @param string    $setting
      * @param bool|true $convertToBytes
-     *
-     * @return int
      */
-    public static function getIniValue($setting, $convertToBytes = true)
+    public static function getIniValue($setting, $convertToBytes = true): int
     {
         $value = ini_get($setting);
 

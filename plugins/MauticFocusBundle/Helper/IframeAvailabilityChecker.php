@@ -14,7 +14,13 @@ use Symfony\Contracts\Translation\TranslatorInterface;
  */
 class IframeAvailabilityChecker
 {
+<<<<<<< HEAD
     public function __construct(private TranslatorInterface $translator)
+=======
+    private \Symfony\Contracts\Translation\TranslatorInterface $translator;
+
+    public function __construct(TranslatorInterface $translator)
+>>>>>>> 11b4805f88 ([type-declarations] Re-run rector rules on plugins, Report, Sms, User, Lead, Dynamic, Config bundles)
     {
     }
 

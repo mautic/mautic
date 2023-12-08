@@ -13,7 +13,15 @@ use Symfony\Component\HttpFoundation\RequestStack;
 
 class StatSubscriber implements EventSubscriberInterface
 {
+<<<<<<< HEAD
     public function __construct(private FocusModel $model, private RequestStack $requestStack)
+=======
+    private \MauticPlugin\MauticFocusBundle\Model\FocusModel $model;
+
+    private \Symfony\Component\HttpFoundation\RequestStack $requestStack;
+
+    public function __construct(FocusModel $model, RequestStack $requestStack)
+>>>>>>> 11b4805f88 ([type-declarations] Re-run rector rules on plugins, Report, Sms, User, Lead, Dynamic, Config bundles)
     {
     }
 

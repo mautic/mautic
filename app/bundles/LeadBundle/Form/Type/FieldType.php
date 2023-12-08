@@ -218,7 +218,7 @@ class FieldType extends AbstractType
             ]
         );
 
-        $formModifier = function (FormEvent $event) use ($listChoices, $type, $options, $disableDefaultValue) {
+        $formModifier = function (FormEvent $event) use ($listChoices, $type, $options, $disableDefaultValue): array {
             $cleaningRules = [];
             $form          = $event->getForm();
             $data          = $event->getData();

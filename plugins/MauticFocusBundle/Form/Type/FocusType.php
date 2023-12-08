@@ -23,7 +23,13 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class FocusType extends AbstractType
 {
+<<<<<<< HEAD
     public function __construct(private CorePermissions $security)
+=======
+    private \Mautic\CoreBundle\Security\Permissions\CorePermissions $security;
+
+    public function __construct(CorePermissions $security)
+>>>>>>> 11b4805f88 ([type-declarations] Re-run rector rules on plugins, Report, Sms, User, Lead, Dynamic, Config bundles)
     {
     }
 

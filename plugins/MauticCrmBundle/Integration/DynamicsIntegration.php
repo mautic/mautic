@@ -381,10 +381,8 @@ class DynamicsIntegration extends CrmAbstractIntegration
     /**
      * @param array      $params
      * @param array|null $query
-     *
-     * @return int|null
      */
-    public function getLeads($params = [], $query = null, &$executed = null, $result = [], $object = 'contacts')
+    public function getLeads($params = [], $query = null, &$executed = null, $result = [], $object = 'contacts'): int
     {
         if ('Contact' === $object) {
             $object = 'contacts';
@@ -454,10 +452,8 @@ class DynamicsIntegration extends CrmAbstractIntegration
 
     /**
      * @param array $params
-     *
-     * @return int|null
      */
-    public function getCompanies($params = [])
+    public function getCompanies($params = []): int
     {
         $executed    = 0;
         $MAX_RECORDS = 200; // Default max records is 5000

@@ -19,10 +19,8 @@ class LeadFieldRepository extends CommonRepository
      * @param bool   $publishedOnly
      * @param bool   $includeEntityFields
      * @param string $object              name of object using the custom fields
-     *
-     * @return array
      */
-    public function getAliases($exludingId, $publishedOnly = false, $includeEntityFields = true, $object = 'lead')
+    public function getAliases($exludingId, $publishedOnly = false, $includeEntityFields = true, $object = 'lead'): array
     {
         $q = $this->_em->getConnection()->createQueryBuilder()
             ->select('l.alias')

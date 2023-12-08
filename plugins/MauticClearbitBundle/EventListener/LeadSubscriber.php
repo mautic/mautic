@@ -10,7 +10,13 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class LeadSubscriber implements EventSubscriberInterface
 {
+<<<<<<< HEAD
     public function __construct(private LookupHelper $lookupHelper)
+=======
+    private \MauticPlugin\MauticClearbitBundle\Helper\LookupHelper $lookupHelper;
+
+    public function __construct(LookupHelper $lookupHelper)
+>>>>>>> 11b4805f88 ([type-declarations] Re-run rector rules on plugins, Report, Sms, User, Lead, Dynamic, Config bundles)
     {
     }
 

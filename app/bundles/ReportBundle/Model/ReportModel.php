@@ -714,10 +714,8 @@ class ReportModel extends FormModel
 
     /**
      * @param int $segmentId
-     *
-     * @return array
      */
-    public function getReportsIdsWithDependenciesOnSegment($segmentId)
+    public function getReportsIdsWithDependenciesOnSegment($segmentId): array
     {
         $search = 'lll.leadlist_id';
         $filter = [

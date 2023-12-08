@@ -17,7 +17,21 @@ use Twig\Environment;
 
 class InjectCustomContentSubscriber implements EventSubscriberInterface
 {
+<<<<<<< HEAD
     public function __construct(private Config $config, private GrapesJsBuilderModel $grapesJsBuilderModel, private Environment $twig, private RequestStack $requestStack, private RouterInterface $router)
+=======
+    private \MauticPlugin\GrapesJsBuilderBundle\Integration\Config $config;
+
+    private \MauticPlugin\GrapesJsBuilderBundle\Model\GrapesJsBuilderModel $grapesJsBuilderModel;
+
+    private \Twig\Environment $twig;
+
+    private \Symfony\Component\HttpFoundation\RequestStack $requestStack;
+
+    private \Symfony\Component\Routing\RouterInterface $router;
+
+    public function __construct(Config $config, GrapesJsBuilderModel $grapesJsBuilderModel, Environment $twig, RequestStack $requestStack, RouterInterface $router)
+>>>>>>> 11b4805f88 ([type-declarations] Re-run rector rules on plugins, Report, Sms, User, Lead, Dynamic, Config bundles)
     {
     }
 

@@ -15,8 +15,29 @@ class PageSubscriber implements EventSubscriberInterface
 {
     private $regex = '{focus=(.*?)}';
 
+<<<<<<< HEAD
     public function __construct(private CorePermissions $security, private FocusModel $model, private RouterInterface $router, private BuilderTokenHelperFactory $builderTokenHelperFactory)
     {
+=======
+    private \MauticPlugin\MauticFocusBundle\Model\FocusModel $model;
+
+    private \Symfony\Component\Routing\RouterInterface $router;
+
+    private \Mautic\CoreBundle\Security\Permissions\CorePermissions $security;
+
+    private \Mautic\CoreBundle\Helper\BuilderTokenHelperFactory $builderTokenHelperFactory;
+
+    public function __construct(
+        CorePermissions $security,
+        FocusModel $model,
+        RouterInterface $router,
+        BuilderTokenHelperFactory $builderTokenHelperFactory
+    ) {
+        $this->security                  = $security;
+        $this->router                    = $router;
+        $this->model                     = $model;
+        $this->builderTokenHelperFactory = $builderTokenHelperFactory;
+>>>>>>> 11b4805f88 ([type-declarations] Re-run rector rules on plugins, Report, Sms, User, Lead, Dynamic, Config bundles)
     }
 
     /**

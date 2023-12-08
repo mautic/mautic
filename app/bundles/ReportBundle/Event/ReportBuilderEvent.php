@@ -139,10 +139,8 @@ class ReportBuilderEvent extends AbstractReportEvent
 
     /**
      * Returns lead columns.
-     *
-     * @return array
      */
-    public function getLeadColumns($prefix = 'l.')
+    public function getLeadColumns($prefix = 'l.'): array
     {
         $fields = [];
 

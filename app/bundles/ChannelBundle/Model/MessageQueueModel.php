@@ -167,10 +167,8 @@ class MessageQueueModel extends FormModel
     /**
      * @param null $channel
      * @param null $channelId
-     *
-     * @return int
      */
-    public function sendMessages($channel = null, $channelId = null)
+    public function sendMessages($channel = null, $channelId = null): int
     {
         // Note when the process started for batch purposes
         $processStarted = new \DateTime();

@@ -19,15 +19,20 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class MailchimpType extends AbstractType
 {
+<<<<<<< HEAD
     /**
      * @var SessionInterface
      */
     protected $session;
+=======
+    private \Mautic\PluginBundle\Helper\IntegrationHelper $integrationHelper;
 
-    /**
-     * @var CoreParametersHelper
-     */
-    protected $coreParametersHelper;
+    private \Mautic\PluginBundle\Model\PluginModel $pluginModel;
+
+    protected \Symfony\Component\HttpFoundation\Session\SessionInterface $session;
+>>>>>>> 11b4805f88 ([type-declarations] Re-run rector rules on plugins, Report, Sms, User, Lead, Dynamic, Config bundles)
+
+    protected \Mautic\CoreBundle\Helper\CoreParametersHelper $coreParametersHelper;
 
     public function __construct(private IntegrationHelper $integrationHelper, private PluginModel $pluginModel, SessionInterface $session, CoreParametersHelper $coreParametersHelper)
     {

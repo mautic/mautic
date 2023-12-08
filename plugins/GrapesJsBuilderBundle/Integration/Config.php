@@ -10,7 +10,13 @@ use Mautic\PluginBundle\Entity\Integration;
 
 class Config
 {
+<<<<<<< HEAD
     public function __construct(private IntegrationsHelper $integrationsHelper)
+=======
+    private \Mautic\IntegrationsBundle\Helper\IntegrationsHelper $integrationsHelper;
+
+    public function __construct(IntegrationsHelper $integrationsHelper)
+>>>>>>> 11b4805f88 ([type-declarations] Re-run rector rules on plugins, Report, Sms, User, Lead, Dynamic, Config bundles)
     {
     }
 

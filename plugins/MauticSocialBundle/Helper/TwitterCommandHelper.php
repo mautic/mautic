@@ -16,6 +16,21 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 class TwitterCommandHelper
 {
+<<<<<<< HEAD
+=======
+    private \Mautic\LeadBundle\Model\LeadModel $leadModel;
+
+    private \Mautic\LeadBundle\Model\FieldModel $fieldModel;
+
+    private \MauticPlugin\MauticSocialBundle\Model\MonitoringModel $monitoringModel;
+
+    private \MauticPlugin\MauticSocialBundle\Model\PostCountModel $postCountModel;
+
+    private \Mautic\CoreBundle\Translation\Translator $translator;
+
+    private \Doctrine\ORM\EntityManagerInterface $em;
+
+>>>>>>> 11b4805f88 ([type-declarations] Re-run rector rules on plugins, Report, Sms, User, Lead, Dynamic, Config bundles)
     /**
      * @var OutputInterface
      */
@@ -103,10 +118,8 @@ class TwitterCommandHelper
      *
      * @param array      $statusList
      * @param Monitoring $monitor
-     *
-     * @return int
      */
-    public function createLeadsFromStatuses($statusList, $monitor)
+    public function createLeadsFromStatuses($statusList, $monitor): int
     {
         $leadField = $this->fieldModel->getRepository()->findOneBy(['alias' => $this->twitterHandleField]);
 

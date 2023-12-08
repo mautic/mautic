@@ -6,7 +6,7 @@ use Mautic\PluginBundle\Integration\UnifiedIntegrationInterface;
 
 class EmailMarketingApi
 {
-    protected $integration;
+    protected \Mautic\PluginBundle\Integration\UnifiedIntegrationInterface $integration;
     protected $keys;
 
     public function __construct(UnifiedIntegrationInterface $integration)

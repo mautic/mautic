@@ -14,8 +14,25 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class CampaignSubscriber implements EventSubscriberInterface
 {
+<<<<<<< HEAD
     public function __construct(private CampaignEventHelper $campaignEventHelper, private IntegrationHelper $integrationHelper, private TranslatorInterface $translator)
     {
+=======
+    private \MauticPlugin\MauticSocialBundle\Helper\CampaignEventHelper $campaignEventHelper;
+
+    private \Mautic\PluginBundle\Helper\IntegrationHelper $integrationHelper;
+
+    private \Symfony\Contracts\Translation\TranslatorInterface $translator;
+
+    public function __construct(
+        CampaignEventHelper $campaignEventHelper,
+        IntegrationHelper $integrationHelper,
+        TranslatorInterface $translator
+    ) {
+        $this->campaignEventHelper = $campaignEventHelper;
+        $this->integrationHelper   = $integrationHelper;
+        $this->translator          = $translator;
+>>>>>>> 11b4805f88 ([type-declarations] Re-run rector rules on plugins, Report, Sms, User, Lead, Dynamic, Config bundles)
     }
 
     /**

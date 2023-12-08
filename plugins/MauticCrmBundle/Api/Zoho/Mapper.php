@@ -11,6 +11,11 @@ class Mapper
      */
     private $contact = [];
 
+<<<<<<< HEAD
+=======
+    private array $fields;
+
+>>>>>>> 11b4805f88 ([type-declarations] Re-run rector rules on plugins, Report, Sms, User, Lead, Dynamic, Config bundles)
     /**
      * @var array
      */
@@ -77,7 +82,7 @@ class Mapper
      *
      * @return int If any single field is mapped, return 1 to count as one contact to be updated
      */
-    public function map($mauticContactId, $zohoId = null)
+    public function map($mauticContactId, $zohoId = null): int
     {
         $mapped             = 0;
         $objectMappedValues = [];

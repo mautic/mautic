@@ -16,8 +16,25 @@ class FileManager
 {
     public const GRAPESJS_IMAGES_DIRECTORY = '';
 
+<<<<<<< HEAD
     public function __construct(private FileUploader $fileUploader, private CoreParametersHelper $coreParametersHelper, private PathsHelper $pathsHelper)
     {
+=======
+    private \Mautic\CoreBundle\Helper\FileUploader $fileUploader;
+
+    private \Mautic\CoreBundle\Helper\CoreParametersHelper $coreParametersHelper;
+
+    private \Mautic\CoreBundle\Helper\PathsHelper $pathsHelper;
+
+    public function __construct(
+        FileUploader $fileUploader,
+        CoreParametersHelper $coreParametersHelper,
+        PathsHelper $pathsHelper
+    ) {
+        $this->fileUploader         = $fileUploader;
+        $this->coreParametersHelper = $coreParametersHelper;
+        $this->pathsHelper          = $pathsHelper;
+>>>>>>> 11b4805f88 ([type-declarations] Re-run rector rules on plugins, Report, Sms, User, Lead, Dynamic, Config bundles)
     }
 
     /**
@@ -96,10 +113,7 @@ class FileManager
             .self::GRAPESJS_IMAGES_DIRECTORY;
     }
 
-    /**
-     * @return array
-     */
-    public function getImages()
+    public function getImages(): array
     {
         $files      = [];
         $uploadDir  = $this->getUploadDir();

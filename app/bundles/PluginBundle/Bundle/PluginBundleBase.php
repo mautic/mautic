@@ -35,7 +35,7 @@ abstract class PluginBundleBase extends Bundle
      *
      * @throws \Exception
      */
-    public static function installPluginSchema(array $metadata, MauticFactory $factory, $installedSchema = null)
+    public static function installPluginSchema(array $metadata, MauticFactory $factory, $installedSchema = null): void
     {
         if (null !== $installedSchema) {
             // Schema exists so bail
@@ -85,7 +85,7 @@ abstract class PluginBundleBase extends Bundle
      * @throws \Doctrine\DBAL\ConnectionException
      * @throws \Exception
      */
-    public static function updatePluginSchema(array $metadata, Schema $installedSchema, MauticFactory $factory)
+    public static function updatePluginSchema(array $metadata, Schema $installedSchema, MauticFactory $factory): void
     {
         $db         = $factory->getDatabase();
         $schemaTool = new SchemaTool($factory->getEntityManager());
@@ -121,7 +121,7 @@ abstract class PluginBundleBase extends Bundle
      * @throws \Doctrine\DBAL\ConnectionException
      * @throws \Exception
      */
-    public static function dropPluginSchema(array $metadata, MauticFactory $factory)
+    public static function dropPluginSchema(array $metadata, MauticFactory $factory): void
     {
         $db          = $factory->getDatabase();
         $schemaTool  = new SchemaTool($factory->getEntityManager());

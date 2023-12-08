@@ -13,8 +13,25 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class ButtonSubscriber implements EventSubscriberInterface
 {
+<<<<<<< HEAD
     public function __construct(private IntegrationHelper $helper, private TranslatorInterface $translator, private RouterInterface $router)
     {
+=======
+    private \Mautic\PluginBundle\Helper\IntegrationHelper $helper;
+
+    private \Symfony\Contracts\Translation\TranslatorInterface $translator;
+
+    private \Symfony\Component\Routing\RouterInterface $router;
+
+    public function __construct(
+        IntegrationHelper $helper,
+        TranslatorInterface $translator,
+        RouterInterface $router
+    ) {
+        $this->helper     = $helper;
+        $this->translator = $translator;
+        $this->router     = $router;
+>>>>>>> 11b4805f88 ([type-declarations] Re-run rector rules on plugins, Report, Sms, User, Lead, Dynamic, Config bundles)
     }
 
     public static function getSubscribedEvents()

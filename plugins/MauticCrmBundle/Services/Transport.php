@@ -6,7 +6,13 @@ use GuzzleHttp\Client;
 
 class Transport implements TransportInterface
 {
+<<<<<<< HEAD
     public function __construct(private Client $client)
+=======
+    private \GuzzleHttp\Client $client;
+
+    public function __construct(Client $client)
+>>>>>>> 11b4805f88 ([type-declarations] Re-run rector rules on plugins, Report, Sms, User, Lead, Dynamic, Config bundles)
     {
     }
 

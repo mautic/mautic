@@ -7,6 +7,11 @@ use Psr\Log\LoggerInterface;
 
 class ResultsPaginator
 {
+<<<<<<< HEAD
+=======
+    private \Psr\Log\LoggerInterface $logger;
+
+>>>>>>> 11b4805f88 ([type-declarations] Re-run rector rules on plugins, Report, Sms, User, Lead, Dynamic, Config bundles)
     /**
      * @var array
      */
@@ -96,10 +101,7 @@ class ResultsPaginator
         return '';
     }
 
-    /**
-     * @return int
-     */
-    public function getTotal()
+    public function getTotal(): int
     {
         return (int) $this->totalRecords;
     }

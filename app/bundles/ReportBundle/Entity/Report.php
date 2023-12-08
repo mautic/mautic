@@ -356,11 +356,10 @@ class Report extends FormEntity implements SchedulerInterface
      *
      * @param string $column
      *
-     * @return array
      *
      * @throws \UnexpectedValueException
      */
-    public function getFilterValues($column)
+    public function getFilterValues($column): array
     {
         $values = [];
         foreach ($this->getFilters() as $field) {
@@ -606,7 +605,7 @@ class Report extends FormEntity implements SchedulerInterface
     /**
      * @throws ScheduleNotValidException
      */
-    public function ensureIsMonthlyScheduled()
+    public function ensureIsMonthlyScheduled(): void
     {
         if (
             !in_array($this->getScheduleMonthFrequency(), SchedulerEnum::getMonthFrequencyForSelect()) ||
@@ -621,7 +620,7 @@ class Report extends FormEntity implements SchedulerInterface
     /**
      * @throws ScheduleNotValidException
      */
-    public function ensureIsWeeklyScheduled()
+    public function ensureIsWeeklyScheduled(): void
     {
         if (!in_array($this->getScheduleDay(), SchedulerEnum::getDayEnumForSelect())) {
             throw new ScheduleNotValidException();
