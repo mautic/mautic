@@ -11,10 +11,7 @@ class DateTime implements ScheduleModeInterface
     {
     }
 
-    /**
-     * @return \DateTimeInterface
-     */
-    public function getExecutionDateTime(Event $event, \DateTimeInterface $compareFromDateTime, \DateTimeInterface $comparedToDateTime)
+    public function getExecutionDateTime(Event $event, \DateTimeInterface $compareFromDateTime, \DateTimeInterface $comparedToDateTime): \DateTimeInterface
     {
         $triggerDate = $event->getTriggerDate();
 

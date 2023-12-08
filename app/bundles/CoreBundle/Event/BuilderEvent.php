@@ -12,6 +12,10 @@ class BuilderEvent extends Event
     protected $sections             = [];
     protected $tokens               = [];
     protected $abTestWinnerCriteria = [];
+
+    /**
+     * @var string|string[]
+     */
     protected string|array $tokenFilterText;
     protected string $tokenFilterTarget;
 
