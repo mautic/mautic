@@ -140,6 +140,8 @@ class BatchIdToEntityHelper
     {
         $this->isAssociative = $this->isAssociativeArray($parameters);
         $this->originalKeys  = array_keys($parameters);
+
+        // [1,2,3]
         $firstKey            = array_key_first($parameters);
         if (!is_array($parameters[$firstKey])) {
             $this->ids = array_values($parameters);
