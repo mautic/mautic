@@ -16,31 +16,19 @@ use Monolog\Logger;
 
 class LookupHelper
 {
-    protected \Mautic\CoreBundle\Helper\UserHelper $userHelper;
-
     /**
      * @var bool|ClearbitIntegration
      */
     protected $integration;
 
-    protected \Monolog\Logger $logger;
-
-    protected \Mautic\LeadBundle\Model\LeadModel $leadModel;
-
-    protected \Mautic\LeadBundle\Model\CompanyModel $companyModel;
-
     public function __construct(
         IntegrationHelper $integrationHelper,
-        UserHelper $userHelper,
-        Logger $logger,
-        LeadModel $leadModel,
-        CompanyModel $companyModel
+        protected UserHelper $userHelper,
+        protected Logger $logger,
+        protected LeadModel $leadModel,
+        protected CompanyModel $companyModel
     ) {
         $this->integration  = $integrationHelper->getIntegrationObject('Clearbit');
-        $this->userHelper   = $userHelper;
-        $this->logger       = $logger;
-        $this->leadModel    = $leadModel;
-        $this->companyModel = $companyModel;
     }
 
     /**

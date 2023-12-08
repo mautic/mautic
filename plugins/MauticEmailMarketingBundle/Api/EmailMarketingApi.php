@@ -7,18 +7,13 @@ use Mautic\PluginBundle\Integration\UnifiedIntegrationInterface;
 
 class EmailMarketingApi
 {
-    /**
-     * @var AbstractIntegration
-     */
-    protected \Mautic\PluginBundle\Integration\UnifiedIntegrationInterface $integration;
     protected $keys;
 
     /**
      * @param AbstractIntegration $integration
      */
-    public function __construct(UnifiedIntegrationInterface $integration)
+    public function __construct(protected UnifiedIntegrationInterface $integration)
     {
-        $this->integration = $integration;
         $this->keys        = $integration->getKeys();
     }
 }

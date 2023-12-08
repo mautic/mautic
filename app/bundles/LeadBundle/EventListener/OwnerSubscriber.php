@@ -62,10 +62,8 @@ class OwnerSubscriber implements EventSubscriberInterface
      * * If contact[owner_id] === 0, then we need fake data
      * * If contact[owner_id] === null, then we should blank out tokens
      * * If contact[owner_id] > 0 AND User exists, then we should fill in tokens
-     *
-     * @return array
      */
-    private function getGeneratedTokens(EmailSendEvent $event)
+    private function getGeneratedTokens(EmailSendEvent $event): array
     {
         $contact = $event->getLead();
 

@@ -38,22 +38,12 @@ use Twig\Environment;
  */
 class FocusModel extends FormModel
 {
-    protected \Mautic\FormBundle\Model\FormModel $formModel;
-
-    protected \Mautic\PageBundle\Model\TrackableModel $trackableModel;
-
-    protected \Twig\Environment $twig;
-
-    protected \Mautic\LeadBundle\Model\FieldModel $leadFieldModel;
-
-    protected \Mautic\LeadBundle\Tracker\ContactTracker $contactTracker;
-
     public function __construct(
-        \Mautic\FormBundle\Model\FormModel $formModel,
-        TrackableModel $trackableModel,
-        Environment $twig,
-        FieldModel $leadFieldModel,
-        ContactTracker $contactTracker,
+        protected \Mautic\FormBundle\Model\FormModel $formModel,
+        protected TrackableModel $trackableModel,
+        protected Environment $twig,
+        protected FieldModel $leadFieldModel,
+        protected ContactTracker $contactTracker,
         EntityManagerInterface $em,
         CorePermissions $security,
         EventDispatcherInterface $dispatcher,
@@ -63,12 +53,7 @@ class FocusModel extends FormModel
         LoggerInterface $mauticLogger,
         CoreParametersHelper $coreParametersHelper
     ) {
-        $this->formModel      = $formModel;
-        $this->trackableModel = $trackableModel;
-        $this->twig           = $twig;
         $this->dispatcher     = $dispatcher;
-        $this->leadFieldModel = $leadFieldModel;
-        $this->contactTracker = $contactTracker;
 
         parent::__construct($em, $security, $dispatcher, $router, $translator, $userHelper, $mauticLogger, $coreParametersHelper);
     }

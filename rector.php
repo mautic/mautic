@@ -146,4 +146,6 @@ return static function (Rector\Config\RectorConfig $rectorConfig): void {
         \Rector\Php80\Rector\NotIdentical\StrContainsRector::class,
         \Rector\Php80\Rector\Identical\StrStartsWithRector::class,
     ]);
+
+    $rectorConfig->phpVersion(\Rector\Core\ValueObject\PhpVersion::PHP_80);
 };

@@ -11,17 +11,14 @@ class SocialMonitorEvent extends CommonEvent
 
     protected int $updatedLeadCount;
 
-    protected array $leadIds;
-
     /**
      * @param string $integrationName
      * @param int    $newLeadCount
      * @param int    $updatedLeadCount
      */
-    public function __construct(protected $integrationName, Monitoring $monitoring, array $leadIds, $newLeadCount, $updatedLeadCount)
+    public function __construct(protected $integrationName, Monitoring $monitoring, protected array $leadIds, $newLeadCount, $updatedLeadCount)
     {
         $this->entity           = $monitoring;
-        $this->leadIds          = $leadIds;
         $this->newLeadCount     = (int) $newLeadCount;
         $this->updatedLeadCount = (int) $updatedLeadCount;
     }
@@ -38,20 +35,16 @@ class SocialMonitorEvent extends CommonEvent
 
     /**
      * Get count of new leads.
-     *
-     * @return int
      */
-    public function getNewLeadCount()
+    public function getNewLeadCount(): int
     {
         return $this->newLeadCount;
     }
 
     /**
      * Get count of updated leads.
-     *
-     * @return int
      */
-    public function getUpdatedLeadCount()
+    public function getUpdatedLeadCount(): int
     {
         return $this->updatedLeadCount;
     }
@@ -59,7 +52,7 @@ class SocialMonitorEvent extends CommonEvent
     /**
      * @return array|int
      */
-    public function getTotalLeadCount()
+    public function getTotalLeadCount(): int
     {
         return $this->updatedLeadCount + $this->newLeadCount;
     }
