@@ -90,7 +90,7 @@ class KickoffExecutioner implements ExecutionerInterface
     /**
      * @throws NoEventsFoundException
      */
-    private function prepareForExecution()
+    private function prepareForExecution(): void
     {
         $this->logger->debug('CAMPAIGN: Triggering kickoff events');
 

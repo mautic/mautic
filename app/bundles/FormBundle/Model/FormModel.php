@@ -98,7 +98,7 @@ class FormModel extends CommonFormModel
     /**
      * {@inheritdoc}
      */
-    public function createForm($entity, FormFactoryInterface $formFactory, $action = null, $options = [])
+    public function createForm($entity, FormFactoryInterface $formFactory, $action = null, $options = []): \Symfony\Component\Form\FormInterface
     {
         if (!$entity instanceof Form) {
             throw new MethodNotAllowedHttpException(['Form']);
@@ -617,10 +617,8 @@ class FormModel extends CommonFormModel
 
     /**
      * Generate an array of columns from fields.
-     *
-     * @return array
      */
-    public function generateFieldColumns(Form $form)
+    public function generateFieldColumns(Form $form): array
     {
         $fields = $form->getFields()->toArray();
 

@@ -76,10 +76,7 @@ class SortableListTransformer implements DataTransformerInterface
         return ['list' => $formattedArray];
     }
 
-    /**
-     * @return array
-     */
-    private function reverseTransformKeyValuePair($array)
+    private function reverseTransformKeyValuePair($array): array
     {
         if (null === $array || !isset($array['list'])) {
             return [];

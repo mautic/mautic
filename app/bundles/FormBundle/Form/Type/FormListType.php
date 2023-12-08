@@ -30,7 +30,7 @@ class FormListType extends AbstractType
         $repo      = $this->repo;
 
         $resolver->setDefaults([
-            'choices' => function (Options $options) use ($repo, $viewOther) {
+            'choices' => function (Options $options) use ($repo, $viewOther): array {
                 static $choices;
 
                 if (is_array($choices)) {

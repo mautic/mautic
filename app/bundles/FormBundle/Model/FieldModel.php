@@ -42,10 +42,8 @@ class FieldModel extends CommonFormModel
      * @param object|array<mixed> $entity
      * @param string|null         $action
      * @param array               $options
-     *
-     * @return \Symfony\Component\Form\FormInterface
      */
-    public function createForm($entity, FormFactoryInterface $formFactory, $action = null, $options = [])
+    public function createForm($entity, FormFactoryInterface $formFactory, $action = null, $options = []): \Symfony\Component\Form\FormInterface
     {
         if ($action) {
             $options['action'] = $action;

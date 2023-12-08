@@ -5,14 +5,6 @@ namespace Mautic\CoreBundle\DependencyInjection\Builder;
 class BundleMetadata
 {
     /**
-     * @var array
-     */
-    private $metadata = [
-        'config'            => [],
-        'permissionClasses' => [],
-    ];
-
-    /**
      * @var string
      */
     private $directory;
@@ -32,10 +24,8 @@ class BundleMetadata
      */
     private $bundleName;
 
-    public function __construct(array $metadata)
+    public function __construct(private array $metadata)
     {
-        $this->metadata = $metadata;
-
         if (!isset($this->metadata['permissionClasses'])) {
             $this->metadata['permissionClasses'] = [];
         }

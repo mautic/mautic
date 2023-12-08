@@ -10,20 +10,8 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class EmailValidator
 {
-    /**
-     * @var TranslatorInterface
-     */
-    protected $translator;
-
-    /**
-     * @var EventDispatcherInterface
-     */
-    protected $dispatcher;
-
-    public function __construct(TranslatorInterface $translator, EventDispatcherInterface $dispatcher)
+    public function __construct(protected TranslatorInterface $translator, protected EventDispatcherInterface $dispatcher)
     {
-        $this->translator = $translator;
-        $this->dispatcher = $dispatcher;
     }
 
     /**
@@ -34,7 +22,7 @@ class EmailValidator
      *
      * @throws InvalidEmailException
      */
-    public function validate($address, $doDnsCheck = false)
+    public function validate($address, $doDnsCheck = false): void
     {
         if (!$this->isValidFormat($address)) {
             throw new InvalidEmailException($address, $this->translator->trans('mautic.email.address.invalid_format', ['%email%' => $address ?: '?']));
@@ -90,7 +78,7 @@ class EmailValidator
      *
      * @throws InvalidEmailException
      */
-    public function doPluginValidation($address)
+    public function doPluginValidation($address): void
     {
         $event = $this->dispatcher->dispatch(
             new EmailValidationEvent($address),

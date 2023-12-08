@@ -29,7 +29,7 @@ class SendEmailToUser
      * @throws EmailCouldNotBeSentException
      * @throws ORMException
      */
-    public function sendEmailToUsers(array $config, Lead $lead)
+    public function sendEmailToUsers(array $config, Lead $lead): void
     {
         $emailToUserAccessor = new EmailToUserAccessor($config);
 
