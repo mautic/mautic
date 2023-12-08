@@ -364,7 +364,7 @@ final class AssetsHelper
     {
         if (isset($this->assets[$this->context]['scripts'][$location])) {
             foreach (array_reverse($this->assets[$this->context]['scripts'][$location]) as $s) {
-                list($script, $async) = $s;
+                [$script, $async] = $s;
                 echo '<script src="'.$this->getUrl($script).'"'.($async ? ' async' : '').' data-source="mautic"></script>'."\n";
             }
         }
@@ -413,7 +413,7 @@ final class AssetsHelper
                             $headOutput .= "\n</script>";
                             $scriptOpen = false;
                         }
-                        list($script, $async) = $output;
+                        [$script, $async] = $output;
 
                         $headOutput .= "\n".'<script src="'.$this->getUrl($script).'"'.($async ? ' async' : '').' data-source="mautic"></script>';
                         break;

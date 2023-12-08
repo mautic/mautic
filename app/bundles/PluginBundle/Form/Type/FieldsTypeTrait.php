@@ -237,12 +237,12 @@ trait FieldsTypeTrait
         $resolver->setDefaults(
             [
                 'special_instructions' => function (Options $options) {
-                    list($specialInstructions, $alertType) = $options['integration_object']->getFormNotes('leadfield_match');
+                    [$specialInstructions, $alertType] = $options['integration_object']->getFormNotes('leadfield_match');
 
                     return $specialInstructions;
                 },
                 'alert_type' => function (Options $options) {
-                    list($specialInstructions, $alertType) = $options['integration_object']->getFormNotes('leadfield_match');
+                    [$specialInstructions, $alertType] = $options['integration_object']->getFormNotes('leadfield_match');
 
                     return $alertType;
                 },

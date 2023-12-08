@@ -59,13 +59,13 @@ class ColorHelper
     {
         if (4 === strlen($hex)) {
             $format          = '#%1s%1s%1s';
-            list($r, $g, $b) = sscanf($hex, $format);
+            [$r, $g, $b]     = sscanf($hex, $format);
             $this->red       = hexdec("$r$r");
             $this->green     = hexdec("$g$g");
             $this->blue      = hexdec("$b$b");
         } else {
             $format                                     = '#%2x%2x%2x';
-            list($this->red, $this->green, $this->blue) = sscanf($hex, $format);
+            [$this->red, $this->green, $this->blue]     = sscanf($hex, $format);
         }
 
         return $this;

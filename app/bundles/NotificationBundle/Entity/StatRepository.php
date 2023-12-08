@@ -160,7 +160,7 @@ class StatRepository extends CommonRepository
         }
 
         if (isset($options['order'])) {
-            list($orderBy, $orderByDir) = $options['order'];
+            [$orderBy, $orderByDir] = $options['order'];
 
             $orderBy = match ($orderBy) {
                 'eventLabel' => 'e.title',

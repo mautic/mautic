@@ -181,7 +181,7 @@ class TwitterCommandHelper
 
             // Split the twitter user's name into its parts if we're matching to contacts by name
             if ($monitorProperties['checknames'] && $status['user']['name'] && str_contains($status['user']['name'], ' ')) {
-                list($firstName, $lastName) = $this->splitName($status['user']['name']);
+                [$firstName, $lastName] = $this->splitName($status['user']['name']);
 
                 if (!empty($firstName) && !empty($lastName)) {
                     $usersByName['firstnames'][] = $expr->literal($firstName);
@@ -294,7 +294,7 @@ class TwitterCommandHelper
                     $leadEntity = new Lead();
                     $leadEntity->setNewlyCreated(true);
 
-                    list($firstName, $lastName) = $this->splitName($status['user']['name']);
+                    [$firstName, $lastName] = $this->splitName($status['user']['name']);
 
                     // build new lead fields
                     $fields = [

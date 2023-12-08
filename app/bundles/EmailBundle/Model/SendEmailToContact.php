@@ -191,9 +191,9 @@ class SendEmailToContact
     public function send(): void
     {
         if ($this->mailer->inTokenizationMode()) {
-            list($success, $errors) = $this->queueTokenizedEmail();
+            [$success, $errors] = $this->queueTokenizedEmail();
         } else {
-            list($success, $errors) = $this->sendStandardEmail();
+            [$success, $errors] = $this->sendStandardEmail();
         }
 
         // queue or send the message
@@ -360,7 +360,7 @@ class SendEmailToContact
 
     protected function queueTokenizedEmail(): array
     {
-        list($queued, $queueErrors) = $this->mailer->queue(true, MailHelper::QUEUE_RETURN_ERRORS);
+        [$queued, $queueErrors] = $this->mailer->queue(true, MailHelper::QUEUE_RETURN_ERRORS);
 
         if ($queued) {
             // Create stat first to ensure it is available for emails sent immediately

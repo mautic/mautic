@@ -129,7 +129,7 @@ class MailchimpType extends AbstractType
                     $page   = 1;
                 }
 
-                list($specialInstructions) = $mailchimp->getFormNotes('leadfield_match');
+                [$specialInstructions] = $mailchimp->getFormNotes('leadfield_match');
                 $form->add('leadFields', FieldsType::class, [
                     'label'                => 'mautic.integration.leadfield_matches',
                     'required'             => true,

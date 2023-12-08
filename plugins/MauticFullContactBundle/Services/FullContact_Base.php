@@ -149,7 +149,7 @@ class FullContact_Base
         // execute request
         $resp = curl_exec($connection);
 
-        list($response_headers, $this->response_json) = explode("\r\n\r\n", $resp, 2);
+        [$response_headers, $this->response_json] = explode("\r\n\r\n", $resp, 2);
         // $response_headers now has a string of the HTTP headers
         // $response_json is the body of the HTTP response
 
@@ -159,7 +159,7 @@ class FullContact_Base
             if (0 === $i) {
                 $headers['http_code'] = $line;
             } else {
-                list($key, $value) = explode(': ', $line);
+                [$key, $value]     = explode(': ', $line);
                 $headers[$key]     = $value;
             }
         }

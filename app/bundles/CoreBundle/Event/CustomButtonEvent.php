@@ -150,7 +150,7 @@ class CustomButtonEvent extends AbstractCustomRequestEvent
 
         if (ButtonHelper::LOCATION_NAVBAR !== $this->location) {
             // Include the request
-            list($currentRoute, $routeParams) = $this->getRoute(true);
+            [$currentRoute, $routeParams] = $this->getRoute(true);
 
             $buttonKey .= $currentRoute;
 

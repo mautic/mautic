@@ -22,7 +22,7 @@ trait TranslationModelTrait
      */
     public function getTranslatedEntity(TranslationEntityInterface $entity, $lead = null, Request $request = null): array
     {
-        list($translationParent, $translationChildren) = $entity->getTranslations();
+        [$translationParent, $translationChildren] = $entity->getTranslations();
 
         $leadPreference = $chosenLanguage = null;
 
