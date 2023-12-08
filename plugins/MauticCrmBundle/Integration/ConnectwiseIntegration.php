@@ -302,7 +302,7 @@ class ConnectwiseIntegration extends CrmAbstractIntegration
                         'attr'  => [
                             'data-hide-on' => '{"campaignevent_properties_config_push_activities_0":"checked"}',
                         ],
-                        'data' => (isset($data['campaign_task'])) ? $data['campaign_task'] : [],
+                        'data' => $data['campaign_task'] ?? [],
                     ]);
             }
         }
@@ -649,7 +649,7 @@ class ConnectwiseIntegration extends CrmAbstractIntegration
 
         $cwContactExists = $this->amendLeadDataBeforeMauticPopulate($cwContactData, $object);
 
-        $communicationItems = isset($cwContactData['communicationItems']) ? $cwContactData['communicationItems'] : [];
+        $communicationItems = $cwContactData['communicationItems'] ?? [];
 
         $leadFields = array_diff_key($leadFields, array_flip($fieldsToUpdateInCW));
         $leadFields = $this->getBlankFieldsToUpdate($leadFields, $cwContactExists, $objectFields, $config);

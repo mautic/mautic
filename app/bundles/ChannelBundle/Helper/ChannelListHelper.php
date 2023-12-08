@@ -51,7 +51,7 @@ class ChannelListHelper
         }
         $channels = [];
         foreach ($features as $feature) {
-            $featureChannels = (isset($this->featureChannels[$feature])) ? $this->featureChannels[$feature] : [];
+            $featureChannels = $this->featureChannels[$feature] ?? [];
             $returnChannels  = [];
             foreach ($featureChannels as $channel => $details) {
                 if (!isset($details['label'])) {

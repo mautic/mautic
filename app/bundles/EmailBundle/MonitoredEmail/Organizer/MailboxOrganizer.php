@@ -36,8 +36,8 @@ class MailboxOrganizer
                 continue;
             }
 
-            $criteria   = isset($criteriaRequested[$name]) ? $criteriaRequested[$name] : Mailbox::CRITERIA_UNSEEN;
-            $markAsSeen = isset($markAsSeenInstructions[$name]) ? $markAsSeenInstructions[$name] : true;
+            $criteria   = $criteriaRequested[$name] ?? Mailbox::CRITERIA_UNSEEN;
+            $markAsSeen = $markAsSeenInstructions[$name] ?? true;
 
             $container = $this->getContainer($config);
             if (!$markAsSeen) {

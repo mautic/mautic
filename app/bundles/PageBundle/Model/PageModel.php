@@ -551,7 +551,7 @@ class PageModel extends FormModel
         }
 
         $hit->setQuery($query);
-        $hit->setUrl((isset($query['page_url'])) ? $query['page_url'] : $request->getRequestUri());
+        $hit->setUrl($query['page_url'] ?? $request->getRequestUri());
 
         // Add entry to contact log table
         $this->setLeadManipulator($page, $hit, $lead);

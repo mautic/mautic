@@ -140,10 +140,6 @@ class Mapper
      */
     private function getField($fieldName)
     {
-        return isset($this->fields[$this->object][$fieldName])
-            ?
-            $this->fields[$this->object][$fieldName]
-            :
-            null;
+        return $this->fields[$this->object][$fieldName] ?? null;
     }
 }

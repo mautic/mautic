@@ -33,7 +33,7 @@ abstract class AbstractSsoServiceIntegration extends AbstractIntegration
     {
         $featureSettings = $this->settings->getFeatureSettings();
 
-        $role = (isset($featureSettings['new_user_role'])) ? $featureSettings['new_user_role'] : false;
+        $role = $featureSettings['new_user_role'] ?? false;
 
         if ($role) {
             return $this->em->getReference(Role::class, $role);

@@ -170,7 +170,7 @@ class CampaignSubscriber implements EventSubscriberInterface
             $pageHitId = 0;
         }
 
-        $limitToPages = (isset($config['pages'])) ? $config['pages'] : [];
+        $limitToPages = $config['pages'] ?? [];
 
         $urlMatches = [];
 

@@ -34,11 +34,11 @@ class PublicController extends CommonFormController
         $post          = $request->request->get('mauticform');
         $messengerMode = (!empty($post['messenger']));
         $server        = $request->server->all();
-        $return        = (isset($post['return'])) ? $post['return'] : false;
+        $return        = $post['return'] ?? false;
 
         if (empty($return)) {
             // try to get it from the HTTP_REFERER
-            $return = (isset($server['HTTP_REFERER'])) ? $server['HTTP_REFERER'] : false;
+            $return = $server['HTTP_REFERER'] ?? false;
         }
 
         if (!empty($return)) {

@@ -238,7 +238,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
      */
     public function getAvailableLeadFields($settings = []): array
     {
-        $silenceExceptions = (isset($settings['silence_exceptions'])) ? $settings['silence_exceptions'] : true;
+        $silenceExceptions = $settings['silence_exceptions'] ?? true;
         $salesForceObjects = [];
 
         if (isset($settings['feature_settings']['objects'])) {
@@ -645,7 +645,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
 
         $objects = (!is_array($object)) ? [$object] : $object;
         if (is_string($object) && 'Account' === $object) {
-            return isset($fields['companyFields']) ? $fields['companyFields'] : $fields;
+            return $fields['companyFields'] ?? $fields;
         }
 
         if (isset($fields['leadFields'])) {
@@ -699,8 +699,8 @@ class SalesforceIntegration extends CrmAbstractIntegration
             if ($this->isAuthorized()) {
                 $existingPersons = $this->getApiHelper()->getPerson(
                     [
-                        'Lead'    => isset($mappedData['Lead']['create']) ? $mappedData['Lead']['create'] : null,
-                        'Contact' => isset($mappedData['Contact']['create']) ? $mappedData['Contact']['create'] : null,
+                        'Lead'    => $mappedData['Lead']['create'] ?? null,
+                        'Contact' => $mappedData['Contact']['create'] ?? null,
                     ]
                 );
 
@@ -1068,8 +1068,13 @@ class SalesforceIntegration extends CrmAbstractIntegration
      */
     public function pushLeads($params = []): array
     {
+<<<<<<< HEAD
         $limit                   = (isset($params['limit'])) ? $params['limit'] : 100;
         [$fromDate, $toDate]     = $this->getSyncTimeframeDates($params);
+=======
+        $limit                   = $params['limit'] ?? 100;
+        list($fromDate, $toDate) = $this->getSyncTimeframeDates($params);
+>>>>>>> 78696d62fd ([PHP 7.0] Make use of coalsece)
         $config                  = $this->mergeConfigToFeatureSettings($params);
         $integrationEntityRepo   = $this->getIntegrationEntityRepository();
 
@@ -1848,7 +1853,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
             if (isset($availableFields[$object])) {
                 $fieldData = $this->prepareFieldsForSync($availableFields[$object], array_keys($availableFields[$object]), $object);
                 foreach ($fieldData as $fieldName => $field) {
-                    $objectFields[$object]['types'][$fieldName] = (isset($field['type'])) ? $field['type'] : 'string';
+                    $objectFields[$object]['types'][$fieldName] = $field['type'] ?? 'string';
                 }
             }
 
@@ -2092,7 +2097,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
                 return;
             }
 
-            $leadData  = (isset($processedLeads[$key])) ? $processedLeads[$key] : $checkEmailsInSF[$key];
+            $leadData  = $processedLeads[$key] ?? $checkEmailsInSF[$key];
             $contactId = $leadData['internal_entity_id'];
 
             if (
@@ -2584,8 +2589,13 @@ class SalesforceIntegration extends CrmAbstractIntegration
      */
     public function pushCompanies($params = []): array
     {
+<<<<<<< HEAD
         $limit                   = (isset($params['limit'])) ? $params['limit'] : 100;
         [$fromDate, $toDate]     = $this->getSyncTimeframeDates($params);
+=======
+        $limit                   = $params['limit'] ?? 100;
+        list($fromDate, $toDate) = $this->getSyncTimeframeDates($params);
+>>>>>>> 78696d62fd ([PHP 7.0] Make use of coalsece)
         $config                  = $this->mergeConfigToFeatureSettings($params);
         $integrationEntityRepo   = $this->getIntegrationEntityRepository();
 
@@ -2803,14 +2813,14 @@ class SalesforceIntegration extends CrmAbstractIntegration
 
             $id = $sfEntityRecord['Id'];
             if (isset($checkCompaniesInSF[$key])) {
-                $companyData = (isset($processedCompanies[$key])) ? $processedCompanies[$key] : $checkCompaniesInSF[$key];
+                $companyData = $processedCompanies[$key] ?? $checkCompaniesInSF[$key];
                 $update      = true;
             } else {
                 foreach ($checkCompaniesInSF as $mauticKey => $mauticCompanies) {
                     $key = $mauticKey;
 
                     if (isset($mauticCompanies['companyname']) && $mauticCompanies['companyname'] == $sfEntityRecord['Name']) {
-                        $companyData = (isset($processedCompanies[$key])) ? $processedCompanies[$key] : $checkCompaniesInSF[$key];
+                        $companyData = $processedCompanies[$key] ?? $checkCompaniesInSF[$key];
                         $companyId   = $companyData['internal_entity_id'];
 
                         $integrationEntity = $this->createIntegrationEntity(

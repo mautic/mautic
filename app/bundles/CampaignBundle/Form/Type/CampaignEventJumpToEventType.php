@@ -12,7 +12,7 @@ class CampaignEventJumpToEventType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $jumpProps = $builder->getData();
-        $selected  = isset($jumpProps['jumpToEvent']) ? $jumpProps['jumpToEvent'] : null;
+        $selected  = $jumpProps['jumpToEvent'] ?? null;
 
         $builder->add(
             'jumpToEvent',

@@ -85,7 +85,7 @@ class FormFieldFileType extends AbstractType
             YesNoButtonGroupType::class,
             [
                 'label'       => 'mautic.form.field.file.set_as_profile_image',
-                'data'        => isset($options['data'][self::PROPERTY_PREFERED_PROFILE_IMAGE]) ? $options['data'][self::PROPERTY_PREFERED_PROFILE_IMAGE] : false,
+                'data'        => $options['data'][self::PROPERTY_PREFERED_PROFILE_IMAGE] ?? false,
             ]
         );
     }

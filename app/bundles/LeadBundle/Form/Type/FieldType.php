@@ -128,7 +128,7 @@ class FieldType extends AbstractType
                 'attr'        => ['class' => 'form-control'],
                 'required'    => false,
                 'mapped'      => false,
-                'data'        => isset($options['data']->getProperties()['allowHtml']) ? $options['data']->getProperties()['allowHtml'] : false,
+                'data'        => $options['data']->getProperties()['allowHtml'] ?? false,
             ]
         );
 
@@ -222,7 +222,7 @@ class FieldType extends AbstractType
             $cleaningRules = [];
             $form          = $event->getForm();
             $data          = $event->getData();
-            $type          = (is_array($data)) ? (isset($data['type']) ? $data['type'] : $type) : $data->getType();
+            $type          = (is_array($data)) ? ($data['type'] ?? $type) : $data->getType();
 
             switch ($type) {
                 case 'multiselect':
@@ -231,7 +231,7 @@ class FieldType extends AbstractType
                     $cleaningRules['defaultValue'] = 'raw';
 
                     if (is_array($data)) {
-                        $properties = isset($data['properties']) ? $data['properties'] : [];
+                        $properties = $data['properties'] ?? [];
                     } else {
                         $properties = $data->getProperties();
                     }
@@ -285,7 +285,7 @@ class FieldType extends AbstractType
                     break;
                 case 'boolean':
                     if (is_array($data)) {
-                        $value    = isset($data['defaultValue']) ? $data['defaultValue'] : false;
+                        $value    = $data['defaultValue'] ?? false;
                         $yesLabel = !empty($data['properties']['yes']) ? $data['properties']['yes'] : 'mautic.core.form.yes';
                         $noLabel  = !empty($data['properties']['no']) ? $data['properties']['no'] : 'mautic.core.form.no';
                     } else {

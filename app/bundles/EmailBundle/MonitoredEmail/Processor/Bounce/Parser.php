@@ -16,7 +16,7 @@ class Parser
      */
     public function getFailedRecipients()
     {
-        return (isset($this->message->xHeaders['x-failed-recipients'])) ? $this->message->xHeaders['x-failed-recipients'] : null;
+        return $this->message->xHeaders['x-failed-recipients'] ?? null;
     }
 
     /**

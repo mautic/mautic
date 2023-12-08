@@ -212,7 +212,7 @@ class EntityLookupChoiceLoader implements ChoiceLoaderInterface
             throw new \InvalidArgumentException(get_class($model).' must implement '.AjaxLookupModelInterface::class);
         }
 
-        $args = (isset($this->options['lookup_arguments'])) ? $this->options['lookup_arguments'] : [];
+        $args = $this->options['lookup_arguments'] ?? [];
         if ($dataPlaceholder = array_search('$data', $args)) {
             $args[$dataPlaceholder] = $data;
         }

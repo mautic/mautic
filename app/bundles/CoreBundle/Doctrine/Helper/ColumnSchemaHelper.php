@@ -144,8 +144,8 @@ class ColumnSchemaHelper
             $this->checkColumnExists($column['name'], true);
         }
 
-        $type    = (isset($column['type'])) ? $column['type'] : 'text';
-        $options = (isset($column['options'])) ? $column['options'] : [];
+        $type    = $column['type'] ?? 'text';
+        $options = $column['options'] ?? [];
 
         $this->toTable->addColumn($column['name'], $type, $options);
 

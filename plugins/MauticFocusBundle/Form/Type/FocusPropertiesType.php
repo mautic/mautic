@@ -22,7 +22,7 @@ class FocusPropertiesType extends AbstractType
                     YesNoButtonGroupType::class,
                     [
                         'label' => 'mautic.focus.form.bar.allow_hide',
-                        'data'  => (isset($options['data']['allow_hide'])) ? $options['data']['allow_hide'] : true,
+                        'data'  => $options['data']['allow_hide'] ?? true,
                         'attr'  => [
                             'onchange' => 'Mautic.focusUpdatePreview()',
                         ],
@@ -38,7 +38,7 @@ class FocusPropertiesType extends AbstractType
                             'tooltip'  => 'mautic.focus.form.bar.push_page.tooltip',
                             'onchange' => 'Mautic.focusUpdatePreview()',
                         ],
-                        'data' => (isset($options['data']['push_page'])) ? $options['data']['push_page'] : true,
+                        'data' => $options['data']['push_page'] ?? true,
                     ]
                 );
 
@@ -51,7 +51,7 @@ class FocusPropertiesType extends AbstractType
                             'tooltip'  => 'mautic.focus.form.bar.sticky.tooltip',
                             'onchange' => 'Mautic.focusUpdatePreview()',
                         ],
-                        'data' => (isset($options['data']['sticky'])) ? $options['data']['sticky'] : true,
+                        'data' => $options['data']['sticky'] ?? true,
                     ]
                 );
 

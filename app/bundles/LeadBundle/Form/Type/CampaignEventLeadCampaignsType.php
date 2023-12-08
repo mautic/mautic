@@ -36,7 +36,7 @@ class CampaignEventLeadCampaignsType extends AbstractType
             YesNoButtonGroupType::class,
             [
                 'label' => 'mautic.lead.lead.events.campaigns.date.added.filter',
-                'data'  => (isset($options['data']['dataAddedLimit'])) ? $options['data']['dataAddedLimit'] : false,
+                'data'  => $options['data']['dataAddedLimit'] ?? false,
             ]
         );
 

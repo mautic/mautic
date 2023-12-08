@@ -226,7 +226,7 @@ class EventType extends AbstractType
             HiddenType::class,
             [
                 'mapped' => false,
-                'data'   => (isset($options['data']['anchorEventType'])) ? $options['data']['anchorEventType'] : '',
+                'data'   => $options['data']['anchorEventType'] ?? '',
             ]
         );
 

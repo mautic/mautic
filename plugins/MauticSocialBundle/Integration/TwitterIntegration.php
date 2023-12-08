@@ -217,7 +217,7 @@ class TwitterIntegration extends SocialIntegration
                     foreach ($d['entities']['media'] as $m) {
                         if ('photo' == $m['type']) {
                             $photo = [
-                                'url' => (isset($m['media_url_https']) ? $m['media_url_https'] : $m['media_url']),
+                                'url' => ($m['media_url_https'] ?? $m['media_url']),
                             ];
 
                             $socialCache['activity']['photos'][] = $photo;

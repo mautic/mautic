@@ -385,8 +385,8 @@ class ReportType extends AbstractType
                 FormEvents::PRE_SUBMIT,
                 function (FormEvent $event) use ($formModifier): void {
                     $data    = $event->getData();
-                    $graphs  = (isset($data['graphs'])) ? $data['graphs'] : [];
-                    $columns = (isset($data['columns'])) ? $data['columns'] : [];
+                    $graphs  = $data['graphs'] ?? [];
+                    $columns = $data['columns'] ?? [];
                     $formModifier($event->getForm(), $data['source'], $columns, $graphs, $data);
                 }
             );

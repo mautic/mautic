@@ -58,6 +58,6 @@ class ConfigAccessor
      */
     protected function getProperty($property)
     {
-        return isset($this->config[$property]) ? $this->config[$property] : null;
+        return $this->config[$property] ?? null;
     }
 }

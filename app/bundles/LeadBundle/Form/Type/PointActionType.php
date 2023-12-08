@@ -20,7 +20,7 @@ class PointActionType extends AbstractType
                 'attr'        => ['class' => 'form-control'],
                 'label_attr'  => ['class' => 'control-label'],
                 'scale'       => 0,
-                'data'        => (isset($options['data']['points'])) ? $options['data']['points'] : 0,
+                'data'        => $options['data']['points'] ?? 0,
                 'constraints' => [
                     new NotEqualTo(
                         [

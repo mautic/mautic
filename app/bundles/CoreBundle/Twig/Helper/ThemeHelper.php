@@ -87,7 +87,7 @@ final class ThemeHelper
      */
     public function getSlots($type)
     {
-        return (isset($this->config['slots'][$type])) ? $this->config['slots'][$type] : [];
+        return $this->config['slots'][$type] ?? [];
     }
 
     /**

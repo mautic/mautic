@@ -489,7 +489,7 @@ class FormController extends CommonFormController
         /** @var \Mautic\FormBundle\Model\FormModel $model */
         $model            = $this->getModel('form');
         $formData         = $request->request->get('mauticform');
-        $sessionId        = isset($formData['sessionId']) ? $formData['sessionId'] : null;
+        $sessionId        = $formData['sessionId'] ?? null;
         $customComponents = $model->getCustomComponents();
         $modifiedFields   = [];
         $deletedFields    = [];

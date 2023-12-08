@@ -505,9 +505,9 @@ class DashboardController extends AbstractFormController
                 // Check for name, description, etc
                 $tempDashboard[$dashboard] = [
                     'type'        => $type,
-                    'name'        => (isset($config['name'])) ? $config['name'] : $dashboard,
-                    'description' => (isset($config['description'])) ? $config['description'] : '',
-                    'widgets'     => (isset($config['widgets'])) ? $config['widgets'] : $config,
+                    'name'        => $config['name'] ?? $dashboard,
+                    'description' => $config['description'] ?? '',
+                    'widgets'     => $config['widgets'] ?? $config,
                 ];
             }
 

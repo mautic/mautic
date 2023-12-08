@@ -283,7 +283,7 @@ class SugarcrmIntegration extends CrmAbstractIntegration
     public function getAvailableLeadFields($settings = []): array
     {
         $sugarFields       = [];
-        $silenceExceptions = (isset($settings['silence_exceptions'])) ? $settings['silence_exceptions'] : true;
+        $silenceExceptions = $settings['silence_exceptions'] ?? true;
         $sugarObjects      = [];
 
         if (!empty($settings['feature_settings']['objects'])) {
@@ -1707,7 +1707,7 @@ class SugarcrmIntegration extends CrmAbstractIntegration
 
         $objects = (!is_array($object)) ? [$object] : $object;
         if (is_string($object) && 'Accounts' === $object) {
-            return isset($fields['companyFields']) ? $fields['companyFields'] : $fields;
+            return $fields['companyFields'] ?? $fields;
         }
 
         if (isset($fields['leadFields'])) {

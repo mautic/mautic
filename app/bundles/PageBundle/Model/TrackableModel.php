@@ -753,9 +753,9 @@ class TrackableModel extends AbstractCommonModel
             return
                 ((isset($url['scheme'])) ? 'mailto' == $url['scheme'] ? $url['scheme'].':' : $url['scheme'].'://' : '')
                 .((isset($url['user'])) ? $url['user'].((isset($url['pass'])) ? ':'.$url['pass'] : '').'@' : '')
-                .((isset($url['host'])) ? $url['host'] : '')
+                .($url['host'] ?? '')
                 .((isset($url['port'])) ? ':'.$url['port'] : '')
-                .((isset($url['path'])) ? $url['path'] : '')
+                .($url['path'] ?? '')
                 .((!empty($url['query'])) ? '?'.$url['query'] : '')
                 .((!empty($url['fragment'])) ? '#'.$url['fragment'] : '');
         }

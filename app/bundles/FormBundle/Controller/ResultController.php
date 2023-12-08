@@ -452,8 +452,8 @@ class ResultController extends CommonFormController
         } elseif ($request->request->has('formId')) {
             $formId = $request->request->get('formId');
         } else {
-            $objectId = isset($parameters['objectId']) ? $parameters['objectId'] : 0;
-            $formId   = (isset($parameters['formId'])) ? $parameters['formId'] : $request->query->get('formId', $objectId);
+            $objectId = $parameters['objectId'] ?? 0;
+            $formId   = $parameters['formId'] ?? $request->query->get('formId', $objectId);
         }
 
         return $formId;

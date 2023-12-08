@@ -129,7 +129,7 @@ class LeadSubscriber implements EventSubscriberInterface
                     ];
                 } else {
                     $eventLabel = [
-                        'label'      => (isset($hit['urlTitle'])) ? $hit['urlTitle'] : $hit['url'],
+                        'label'      => $hit['urlTitle'] ?? $hit['url'],
                         'href'       => $hit['url'],
                         'isExternal' => true,
                     ];

@@ -363,7 +363,7 @@ class UserModel extends FormModel
         }
         $preferences = $user->getPreferences();
 
-        return (isset($preferences[$key])) ? $preferences[$key] : $default;
+        return $preferences[$key] ?? $default;
     }
 
     /**

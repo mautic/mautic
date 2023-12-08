@@ -20,7 +20,7 @@ class Address
                 'default.domain.name' != $parsedAddress->host
             ) {
                 $email           = $parsedAddress->mailbox.'@'.$parsedAddress->host;
-                $name            = isset($parsedAddress->personal) ? $parsedAddress->personal : null;
+                $name            = $parsedAddress->personal ?? null;
                 $results[$email] = $name;
             }
         }

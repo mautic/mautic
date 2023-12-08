@@ -738,7 +738,7 @@ class Import extends FormEntity
      */
     public function getLastLineImported()
     {
-        return isset($this->properties['line']) ? $this->properties['line'] : 0;
+        return $this->properties['line'] ?? 0;
     }
 
     /**

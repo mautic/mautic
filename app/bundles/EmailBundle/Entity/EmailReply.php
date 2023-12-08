@@ -60,7 +60,7 @@ class EmailReply
     public function __construct(private Stat $stat, private $messageId, \DateTime $dateReplied = null)
     {
         $this->id          = Uuid::uuid4()->toString();
-        $this->dateReplied = (null === $dateReplied) ? new \DateTime() : $dateReplied;
+        $this->dateReplied = $dateReplied ?? new \DateTime();
     }
 
     public function getId(): string
