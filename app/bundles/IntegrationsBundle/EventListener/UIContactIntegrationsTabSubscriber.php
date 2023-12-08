@@ -13,14 +13,8 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class UIContactIntegrationsTabSubscriber implements EventSubscriberInterface
 {
-    /**
-     * @var ObjectMappingRepository
-     */
-    private $objectMappingRepository;
-
-    public function __construct(ObjectMappingRepository $objectMappingRepository)
+    public function __construct(private ObjectMappingRepository $objectMappingRepository)
     {
-        $this->objectMappingRepository = $objectMappingRepository;
     }
 
     /**

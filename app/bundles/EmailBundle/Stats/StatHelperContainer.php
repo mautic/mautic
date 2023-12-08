@@ -9,7 +9,7 @@ class StatHelperContainer
 {
     private $helpers = [];
 
-    public function addHelper(StatHelperInterface $helper)
+    public function addHelper(StatHelperInterface $helper): void
     {
         $this->helpers[$helper->getName()] = $helper;
     }

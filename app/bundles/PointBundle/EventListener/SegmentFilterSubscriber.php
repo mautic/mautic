@@ -14,20 +14,8 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class SegmentFilterSubscriber implements EventSubscriberInterface
 {
-    private GroupRepository $groupRepository;
-
-    private TypeOperatorProviderInterface $typeOperatorProvider;
-
-    private TranslatorInterface $translator;
-
-    public function __construct(
-        GroupRepository $groupRepository,
-        TypeOperatorProviderInterface $typeOperatorProvider,
-        TranslatorInterface $translator)
+    public function __construct(private GroupRepository $groupRepository, private TypeOperatorProviderInterface $typeOperatorProvider, private TranslatorInterface $translator)
     {
-        $this->groupRepository      = $groupRepository;
-        $this->typeOperatorProvider = $typeOperatorProvider;
-        $this->translator           = $translator;
     }
 
     /**

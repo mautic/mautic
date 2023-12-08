@@ -2,9 +2,6 @@
 
 namespace Mautic\CoreBundle\Helper\RandomHelper;
 
-/**
- * Class RandomHelper.
- */
 final class RandomHelper implements RandomHelperInterface
 {
     /**
@@ -12,12 +9,10 @@ final class RandomHelper implements RandomHelperInterface
      *
      * @param int    $length
      * @param string $charlist
-     *
-     * @return string
      */
-    public function generate($length = 10, $charlist = '0-9a-z')
+    public function generate($length = 10, $charlist = '0-9a-z'): string
     {
-        $charlist = count_chars(preg_replace_callback('#.-.#', function (array $m) {
+        $charlist = count_chars(preg_replace_callback('#.-.#', function (array $m): string {
             return implode('', range($m[0][0], $m[0][2]));
         }, $charlist), 3);
         $chLen = strlen($charlist);

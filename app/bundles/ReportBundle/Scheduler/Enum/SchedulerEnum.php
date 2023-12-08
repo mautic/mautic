@@ -21,10 +21,7 @@ class SchedulerEnum
     public const MONTH_FREQUENCY_FIRST = '1';
     public const MONTH_FREQUENCY_LAST  = '-1';
 
-    /**
-     * @return array
-     */
-    public static function getUnitEnumForSelect()
+    public static function getUnitEnumForSelect(): array
     {
         return [
             'mautic.report.schedule.unit.now'   => self::UNIT_NOW,
@@ -34,10 +31,7 @@ class SchedulerEnum
         ];
     }
 
-    /**
-     * @return array
-     */
-    public static function getDayEnumForSelect()
+    public static function getDayEnumForSelect(): array
     {
         return [
             'mautic.report.schedule.day.monday'    => self::DAY_MO,
@@ -51,10 +45,7 @@ class SchedulerEnum
         ];
     }
 
-    /**
-     * @return array
-     */
-    public static function getMonthFrequencyForSelect()
+    public static function getMonthFrequencyForSelect(): array
     {
         return [
             'mautic.report.schedule.month_frequency.first' => self::MONTH_FREQUENCY_FIRST,
@@ -62,10 +53,7 @@ class SchedulerEnum
         ];
     }
 
-    /**
-     * @return array
-     */
-    public static function getWeekDays()
+    public static function getWeekDays(): array
     {
         return [
             self::DAY_MO,

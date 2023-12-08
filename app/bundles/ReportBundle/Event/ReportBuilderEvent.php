@@ -2,15 +2,13 @@
 
 namespace Mautic\ReportBundle\Event;
 
+use Doctrine\ORM\Tools\Pagination\Paginator;
 use Mautic\ChannelBundle\Helper\ChannelListHelper;
 use Mautic\ReportBundle\Builder\MauticReportBuilder;
 use Mautic\ReportBundle\Helper\ReportHelper;
 use Mautic\ReportBundle\Model\ReportModel;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-/**
- * Class ReportBuilderEvent.
- */
 class ReportBuilderEvent extends AbstractReportEvent
 {
     /**
@@ -21,11 +19,9 @@ class ReportBuilderEvent extends AbstractReportEvent
     private $tableArray = [];
 
     /**
-     * Supported graphs.
-     *
-     * @var array
+     * @var string[]
      */
-    private $supportedGraphs = [
+    private array $supportedGraphs = [
         'table',
         'bar',
         'pie',
@@ -33,46 +29,31 @@ class ReportBuilderEvent extends AbstractReportEvent
     ];
 
     /**
-     * @var ChannelListHelper
+     * @var mixed[]
      */
-    private $channelListHelper;
-
-    /**
-     * @var TranslatorInterface
-     */
-    private $translator;
-
-    /**
-     * Container with registered graphs.
-     *
-     * @var array
-     */
-    private $graphArray = [];
+    private array $graphArray = [];
 
     /**
      * List of published array of lead fields.
      *
-     * @var array
+     * @var mixed[]|Paginator|array
      */
     private $leadFields = [];
 
-    private $reportHelper;
-
-    private ?string $reportSource;
-
     /**
-     * ReportBuilderEvent constructor.
-     *
-     * @param string $context
+     * @param string                  $context
+     * @param mixed[]|Paginator|array $leadFields
      */
-    public function __construct(TranslatorInterface $translator, ChannelListHelper $channelListHelper, $context, $leadFields, ReportHelper $reportHelper, ?string $reportSource = null)
-    {
+    public function __construct(
+        private TranslatorInterface $translator,
+        private ChannelListHelper $channelListHelper,
+        $context,
+        $leadFields,
+        private ReportHelper $reportHelper,
+        private ?string $reportSource = null
+    ) {
         $this->context           = $context;
-        $this->translator        = $translator;
-        $this->channelListHelper = $channelListHelper;
         $this->leadFields        = $leadFields;
-        $this->reportHelper      = $reportHelper;
-        $this->reportSource      = $reportSource;
     }
 
     /**
@@ -149,7 +130,7 @@ class ReportBuilderEvent extends AbstractReportEvent
      *
      * @param string $prefix
      *
-     * @return string[]
+     * @return array<string,array<string,string>>
      */
     public function getStandardColumns($prefix, $removeColumns = [], $idLink = null)
     {
@@ -186,10 +167,8 @@ class ReportBuilderEvent extends AbstractReportEvent
      * Get IP Address column.
      *
      * @param string $prefix
-     *
-     * @return array
      */
-    public function getIpColumn($prefix = 'i.')
+    public function getIpColumn($prefix = 'i.'): array
     {
         return [
             $prefix.'ip_address' => [
@@ -203,10 +182,8 @@ class ReportBuilderEvent extends AbstractReportEvent
      * Add category columns.
      *
      * @param string $prefix
-     *
-     * @return array
      */
-    public function getCategoryColumns($prefix = 'c.')
+    public function getCategoryColumns($prefix = 'c.'): array
     {
         return [
             $prefix.'id' => [
@@ -224,10 +201,8 @@ class ReportBuilderEvent extends AbstractReportEvent
 
     /**
      * Add campaign columns joined by the campaign lead event log table.
-     *
-     * @return array
      */
-    public function getCampaignByChannelColumns()
+    public function getCampaignByChannelColumns(): array
     {
         return [
             'clel.campaign_id' => [
@@ -241,7 +216,10 @@ class ReportBuilderEvent extends AbstractReportEvent
         ];
     }
 
-    public function getChannelColumns()
+    /**
+     * @return array<MauticReportBuilder::*, mixed[]>
+     */
+    public function getChannelColumns(): array
     {
         $channelColumns = [
             MauticReportBuilder::CHANNEL_COLUMN_CATEGORY_ID => [

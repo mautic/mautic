@@ -10,20 +10,8 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class DetermineWinnerSubscriber implements EventSubscriberInterface
 {
-    /**
-     * @var HitRepository
-     */
-    private $hitRepository;
-
-    /**
-     * @var TranslatorInterface
-     */
-    private $translator;
-
-    public function __construct(HitRepository $hitRepository, TranslatorInterface $translator)
+    public function __construct(private HitRepository $hitRepository, private TranslatorInterface $translator)
     {
-        $this->hitRepository = $hitRepository;
-        $this->translator    = $translator;
     }
 
     /**
@@ -40,7 +28,7 @@ class DetermineWinnerSubscriber implements EventSubscriberInterface
     /**
      * Determines the winner of A/B test based on bounce rates.
      */
-    public function onDetermineBounceRateWinner(DetermineWinnerEvent $event)
+    public function onDetermineBounceRateWinner(DetermineWinnerEvent $event): void
     {
         // find the hits that did not go any further
         $parent    = $event->getParameters()['parent'];
@@ -125,7 +113,7 @@ class DetermineWinnerSubscriber implements EventSubscriberInterface
     /**
      * Determines the winner of A/B test based on dwell time rates.
      */
-    public function onDetermineDwellTimeWinner(DetermineWinnerEvent $event)
+    public function onDetermineDwellTimeWinner(DetermineWinnerEvent $event): void
     {
         // find the hits that did not go any further
         $parent    = $event->getParameters()['parent'];

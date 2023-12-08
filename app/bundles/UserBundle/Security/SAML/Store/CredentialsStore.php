@@ -12,27 +12,12 @@ use RobRichards\XMLSecLibs\XMLSecurityKey;
 class CredentialsStore implements CredentialStoreInterface
 {
     /**
-     * @var CoreParametersHelper
-     */
-    private $coreParametersHelper;
-
-    /**
-     * @var string
-     */
-    private $entityId;
-
-    /**
      * @var X509Credential|null
      */
     private $credentials;
 
-    /**
-     * CredentialsStore constructor.
-     */
-    public function __construct(CoreParametersHelper $coreParametersHelper, string $entityId)
+    public function __construct(private CoreParametersHelper $coreParametersHelper, private string $entityId)
     {
-        $this->coreParametersHelper = $coreParametersHelper;
-        $this->entityId             = $entityId;
     }
 
     public function getByEntityId($entityId): array

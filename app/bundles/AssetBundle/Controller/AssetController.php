@@ -42,7 +42,6 @@ class AssetController extends FormController
 
         $this->setListFilters();
 
-        // set limits
         $limit = $request->getSession()->get('mautic.asset.limit', $parametersHelper->get('default_assetlimit'));
         $start = (1 === $page) ? 0 : (($page - 1) * $limit);
         if ($start < 0) {
@@ -243,7 +242,7 @@ class AssetController extends FormController
                 // set the uploadDir
                 $activeAsset->setUploadDir($this->coreParametersHelper->get('upload_dir'));
                 $contents = $activeAsset->getFileContents();
-            } catch (\Exception $e) {
+            } catch (\Exception) {
                 return $this->notFound();
             }
 

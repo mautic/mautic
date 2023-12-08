@@ -33,7 +33,7 @@ class FormApiController extends CommonApiController
     /**
      * @var FormModel|null
      */
-    protected $model = null;
+    protected $model;
 
     public function __construct(
         CorePermissions $security,

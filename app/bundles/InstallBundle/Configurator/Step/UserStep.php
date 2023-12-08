@@ -35,7 +35,7 @@ class UserStep implements StepInterface
     /**
      * {@inheritdoc}
      */
-    public function getFormType()
+    public function getFormType(): string
     {
         return UserStepType::class;
     }
@@ -43,7 +43,7 @@ class UserStep implements StepInterface
     /**
      * {@inheritdoc}
      */
-    public function checkRequirements()
+    public function checkRequirements(): array
     {
         return [];
     }
@@ -51,7 +51,7 @@ class UserStep implements StepInterface
     /**
      * {@inheritdoc}
      */
-    public function checkOptionalSettings()
+    public function checkOptionalSettings(): array
     {
         return [];
     }
@@ -59,7 +59,7 @@ class UserStep implements StepInterface
     /**
      * {@inheritdoc}
      */
-    public function getTemplate()
+    public function getTemplate(): string
     {
         return '@MauticInstall/Install/user.html.twig';
     }
@@ -67,7 +67,7 @@ class UserStep implements StepInterface
     /**
      * {@inheritdoc}
      */
-    public function update(StepInterface $data)
+    public function update(StepInterface $data): array
     {
         return [];
     }

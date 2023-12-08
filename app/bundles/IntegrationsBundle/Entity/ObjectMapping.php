@@ -15,10 +15,7 @@ class ObjectMapping
      */
     private $id;
 
-    /**
-     * @var \DateTimeInterface|null
-     */
-    private $dateCreated;
+    private ?\DateTimeInterface $dateCreated;
 
     /**
      * @var string
@@ -45,10 +42,7 @@ class ObjectMapping
      */
     private $integrationObjectId;
 
-    /**
-     * @var \DateTimeInterface
-     */
-    private $lastSyncDate;
+    private ?\DateTimeInterface $lastSyncDate;
 
     /**
      * @var array
@@ -210,10 +204,7 @@ class ObjectMapping
         return $this;
     }
 
-    /**
-     * @return int
-     */
-    public function getInternalObjectId()
+    public function getInternalObjectId(): int
     {
         return (int) $this->internalObjectId;
     }

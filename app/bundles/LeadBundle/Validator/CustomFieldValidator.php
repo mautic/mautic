@@ -13,14 +13,8 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class CustomFieldValidator
 {
-    private FieldModel $fieldModel;
-
-    private TranslatorInterface $translator;
-
-    public function __construct(FieldModel $fieldModel, TranslatorInterface $translator)
+    public function __construct(private FieldModel $fieldModel, private TranslatorInterface $translator)
     {
-        $this->fieldModel = $fieldModel;
-        $this->translator = $translator;
     }
 
     /**
@@ -57,10 +51,9 @@ class CustomFieldValidator
      */
     private function getFieldByAlias(string $alias): LeadField
     {
-        /** @var LeadField|null */
         $field = $this->fieldModel->getEntityByAlias($alias);
 
-        if (!$field) {
+        if (!$field instanceof LeadField) {
             throw new RecordNotFoundException($this->translator->trans('mautic.lead.contact.field.not.found', ['%alias%' => $alias], 'validators'));
         }
 

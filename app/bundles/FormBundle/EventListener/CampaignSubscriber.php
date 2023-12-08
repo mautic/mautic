@@ -18,32 +18,8 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class CampaignSubscriber implements EventSubscriberInterface
 {
-    /**
-     * @var FormModel
-     */
-    private $formModel;
-
-    /**
-     * @var SubmissionModel
-     */
-    private $formSubmissionModel;
-
-    /**
-     * @var RealTimeExecutioner
-     */
-    private $realTimeExecutioner;
-
-    /**
-     * @var FormFieldHelper
-     */
-    private $formFieldHelper;
-
-    public function __construct(FormModel $formModel, SubmissionModel $formSubmissionModel, RealTimeExecutioner $realTimeExecutioner, FormFieldHelper $formFieldHelper)
+    public function __construct(private FormModel $formModel, private SubmissionModel $formSubmissionModel, private RealTimeExecutioner $realTimeExecutioner, private FormFieldHelper $formFieldHelper)
     {
-        $this->formModel           = $formModel;
-        $this->formSubmissionModel = $formSubmissionModel;
-        $this->realTimeExecutioner = $realTimeExecutioner;
-        $this->formFieldHelper     = $formFieldHelper;
     }
 
     /**
@@ -62,7 +38,7 @@ class CampaignSubscriber implements EventSubscriberInterface
     /**
      * Add the option to the list.
      */
-    public function onCampaignBuild(CampaignBuilderEvent $event)
+    public function onCampaignBuild(CampaignBuilderEvent $event): void
     {
         $trigger = [
             'label'       => 'mautic.form.campaign.event.submit',
@@ -85,7 +61,7 @@ class CampaignSubscriber implements EventSubscriberInterface
     /**
      * Trigger campaign event for when a form is submitted.
      */
-    public function onFormSubmit(SubmissionEvent $event)
+    public function onFormSubmit(SubmissionEvent $event): void
     {
         $form = $event->getSubmission()->getForm();
         $this->realTimeExecutioner->execute('form.submit', $form, 'form', $form->getId());

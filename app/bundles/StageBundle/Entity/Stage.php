@@ -10,9 +10,6 @@ use Mautic\CoreBundle\Entity\FormEntity;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
 
-/**
- * Class Stage.
- */
 class Stage extends FormEntity
 {
     /**
@@ -70,11 +67,11 @@ class Stage extends FormEntity
         $this->log = new ArrayCollection();
     }
 
-    public static function loadMetadata(ORM\ClassMetadata $metadata)
+    public static function loadMetadata(ORM\ClassMetadata $metadata): void
     {
         $builder = new ClassMetadataBuilder($metadata);
         $builder->setTable('stages')
-            ->setCustomRepositoryClass('Mautic\StageBundle\Entity\StageRepository');
+            ->setCustomRepositoryClass(\Mautic\StageBundle\Entity\StageRepository::class);
 
         $builder->addIdColumns();
 
@@ -93,7 +90,7 @@ class Stage extends FormEntity
         $builder->addCategory();
     }
 
-    public static function loadValidatorMetadata(ClassMetadata $metadata)
+    public static function loadValidatorMetadata(ClassMetadata $metadata): void
     {
         $metadata->addPropertyConstraint('name', new Assert\NotBlank([
             'message' => 'mautic.core.name.required',
@@ -103,7 +100,7 @@ class Stage extends FormEntity
     /**
      * Prepares the metadata for API usage.
      */
-    public static function loadApiMetadata(ApiMetadataDriver $metadata)
+    public static function loadApiMetadata(ApiMetadataDriver $metadata): void
     {
         $metadata->setGroupPrefix('stage')
             ->addListProperties(
@@ -156,10 +153,7 @@ class Stage extends FormEntity
         return $this->weight;
     }
 
-    /**
-     * @return array
-     */
-    public function convertToArray()
+    public function convertToArray(): array
     {
         return get_object_vars($this);
     }
@@ -229,7 +223,7 @@ class Stage extends FormEntity
     /**
      * Remove log.
      */
-    public function removeLog(LeadStageLog $log)
+    public function removeLog(LeadStageLog $log): void
     {
         $this->log->removeElement($log);
     }
@@ -305,7 +299,7 @@ class Stage extends FormEntity
     /**
      * @param mixed $category
      */
-    public function setCategory($category)
+    public function setCategory($category): void
     {
         $this->category = $category;
     }

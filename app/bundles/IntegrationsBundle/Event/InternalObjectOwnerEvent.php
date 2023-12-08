@@ -10,16 +10,6 @@ use Symfony\Contracts\EventDispatcher\Event;
 class InternalObjectOwnerEvent extends Event
 {
     /**
-     * @var ObjectInterface
-     */
-    private $object;
-
-    /**
-     * @var int[]
-     */
-    private $objectIds;
-
-    /**
      * Format: [object_id => owner_id].
      *
      * @var array
@@ -29,10 +19,8 @@ class InternalObjectOwnerEvent extends Event
     /**
      * @param int[] $objectIds
      */
-    public function __construct(ObjectInterface $object, array $objectIds)
+    public function __construct(private ObjectInterface $object, private array $objectIds)
     {
-        $this->object    = $object;
-        $this->objectIds = $objectIds;
     }
 
     public function getObject(): ObjectInterface

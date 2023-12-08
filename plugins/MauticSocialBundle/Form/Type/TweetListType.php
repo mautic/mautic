@@ -7,15 +7,12 @@ use Symfony\Component\Form\AbstractType;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
-/**
- * Class TweetListType.
- */
 class TweetListType extends AbstractType
 {
     /**
      * {@inheritdoc}
      */
-    public function configureOptions(OptionsResolver $resolver)
+    public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults(
             [
@@ -23,7 +20,7 @@ class TweetListType extends AbstractType
                 'modal_header'        => 'mautic.integration.Twitter.new.tweet',
                 'model'               => 'social.tweet',
                 'model_lookup_method' => 'getLookupResults',
-                'lookup_arguments'    => function (Options $options) {
+                'lookup_arguments'    => function (Options $options): array {
                     return [
                         'type'   => 'tweet',
                         'filter' => '$data',

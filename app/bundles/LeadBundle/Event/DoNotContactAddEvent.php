@@ -12,50 +12,8 @@ final class DoNotContactAddEvent extends Event
 {
     public const ADD_DONOT_CONTACT = 'mautic.lead.add_donot_contact';
 
-    /**
-     * @var Lead
-     */
-    private $lead;
-
-    /**
-     * @var string
-     */
-    private $channel;
-
-    /**
-     * @var string
-     */
-    private $comments;
-
-    /**
-     * @var int
-     */
-    private $reason;
-
-    /**
-     * @var bool
-     */
-    private $persist;
-
-    /**
-     * @var bool
-     */
-    private $checkCurrentStatus;
-
-    /**
-     * @var bool
-     */
-    private $override;
-
-    public function __construct(Lead $lead, string $channel, string $comments = '', int $reason = DNC::BOUNCED, bool $persist = true, bool $checkCurrentStatus = true, bool $override = true)
+    public function __construct(private Lead $lead, private string $channel, private string $comments = '', private int $reason = DNC::BOUNCED, private bool $persist = true, private bool $checkCurrentStatus = true, private bool $override = true)
     {
-        $this->lead               = $lead;
-        $this->channel            = $channel;
-        $this->comments           = $comments;
-        $this->reason             = $reason;
-        $this->persist            = $persist;
-        $this->checkCurrentStatus = $checkCurrentStatus;
-        $this->override           = $override;
     }
 
     public function getLead(): Lead

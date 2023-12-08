@@ -19,7 +19,7 @@ class FormSubscriber implements EventSubscriberInterface
         ];
     }
 
-    public function onFormBuild(FormBuilderEvent $event)
+    public function onFormBuild(FormBuilderEvent $event): void
     {
         $action = [
             'label'          => 'mautic.plugin.actions.socialLogin',

@@ -12,26 +12,8 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class CategorySubscriber implements EventSubscriberInterface
 {
-    /**
-     * @var BundleHelper
-     */
-    private $bundleHelper;
-
-    /**
-     * @var IpLookupHelper
-     */
-    private $ipLookupHelper;
-
-    /**
-     * @var AuditLogModel
-     */
-    private $auditLogModel;
-
-    public function __construct(BundleHelper $bundleHelper, IpLookupHelper $ipLookupHelper, AuditLogModel $auditLogModel)
+    public function __construct(private BundleHelper $bundleHelper, private IpLookupHelper $ipLookupHelper, private AuditLogModel $auditLogModel)
     {
-        $this->bundleHelper   = $bundleHelper;
-        $this->ipLookupHelper = $ipLookupHelper;
-        $this->auditLogModel  = $auditLogModel;
     }
 
     /**
@@ -49,7 +31,7 @@ class CategorySubscriber implements EventSubscriberInterface
     /**
      * Add bundle to the category.
      */
-    public function onCategoryBundleListBuild(CategoryTypesEvent $event)
+    public function onCategoryBundleListBuild(CategoryTypesEvent $event): void
     {
         $bundles = $this->bundleHelper->getMauticBundles(true);
 
@@ -65,7 +47,7 @@ class CategorySubscriber implements EventSubscriberInterface
     /**
      * Add an entry to the audit log.
      */
-    public function onCategoryPostSave(Events\CategoryEvent $event)
+    public function onCategoryPostSave(Events\CategoryEvent $event): void
     {
         $category = $event->getCategory();
         if ($details = $event->getChanges()) {
@@ -84,7 +66,7 @@ class CategorySubscriber implements EventSubscriberInterface
     /**
      * Add a delete entry to the audit log.
      */
-    public function onCategoryDelete(Events\CategoryEvent $event)
+    public function onCategoryDelete(Events\CategoryEvent $event): void
     {
         $category = $event->getCategory();
         $log      = [

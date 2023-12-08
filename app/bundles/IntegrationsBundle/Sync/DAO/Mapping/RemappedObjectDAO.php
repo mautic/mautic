@@ -7,41 +7,11 @@ namespace Mautic\IntegrationsBundle\Sync\DAO\Mapping;
 class RemappedObjectDAO
 {
     /**
-     * @var string
-     */
-    private $integration;
-
-    /**
-     * @var mixed
-     */
-    private $oldObjectId;
-
-    /**
-     * @var string
-     */
-    private $oldObjectName;
-
-    /**
-     * @var string
-     */
-    private $newObjectName;
-
-    /**
-     * @var mixed
-     */
-    private $newObjectId;
-
-    /**
      * @param mixed $oldObjectId
      * @param mixed $newObjectId
      */
-    public function __construct(string $integration, string $oldObjectName, $oldObjectId, string $newObjectName, $newObjectId)
+    public function __construct(private string $integration, private string $oldObjectName, private $oldObjectId, private string $newObjectName, private $newObjectId)
     {
-        $this->integration   = $integration;
-        $this->oldObjectName = $oldObjectName;
-        $this->oldObjectId   = $oldObjectId;
-        $this->newObjectName = $newObjectName;
-        $this->newObjectId   = $newObjectId;
     }
 
     public function getIntegration(): string

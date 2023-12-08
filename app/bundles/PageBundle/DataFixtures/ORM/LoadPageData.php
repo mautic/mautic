@@ -12,17 +12,11 @@ use Mautic\PageBundle\Model\PageModel;
 
 class LoadPageData extends AbstractFixture implements OrderedFixtureInterface
 {
-    /**
-     * @var PageModel
-     */
-    private $pageModel;
-
-    public function __construct(PageModel $pageModel)
+    public function __construct(private PageModel $pageModel)
     {
-        $this->pageModel = $pageModel;
     }
 
-    public function load(ObjectManager $manager)
+    public function load(ObjectManager $manager): void
     {
         $pages = CsvHelper::csv_to_array(__DIR__.'/fakepagedata.csv');
         foreach ($pages as $count => $rows) {

@@ -6,9 +6,6 @@ use Mautic\CoreBundle\Controller\FormController;
 use Symfony\Component\Form\Form;
 use Symfony\Component\HttpFoundation\Request;
 
-/**
- * Class TweetController.
- */
 class TweetController extends FormController
 {
     /**
@@ -71,10 +68,8 @@ class TweetController extends FormController
 
     /**
      * Define options to pass to the form when it's being created.
-     *
-     * @return array
      */
-    protected function getEntityFormOptions()
+    protected function getEntityFormOptions(): array
     {
         return [
             'update_select'      => $this->getUpdateSelect(),

@@ -16,25 +16,14 @@ class ConditionExecutioner implements EventInterface
 {
     public const TYPE = 'condition';
 
-    /**
-     * @var ConditionDispatcher
-     */
-    private $dispatcher;
-
-    /**
-     * ConditionExecutioner constructor.
-     */
-    public function __construct(ConditionDispatcher $dispatcher)
+    public function __construct(private ConditionDispatcher $dispatcher)
     {
-        $this->dispatcher = $dispatcher;
     }
 
     /**
-     * @return EvaluatedContacts
-     *
      * @throws CannotProcessEventException
      */
-    public function execute(AbstractEventAccessor $config, ArrayCollection $logs)
+    public function execute(AbstractEventAccessor $config, ArrayCollection $logs): EvaluatedContacts
     {
         \assert($config instanceof ConditionAccessor);
         $evaluatedContacts = new EvaluatedContacts();
@@ -45,7 +34,7 @@ class ConditionExecutioner implements EventInterface
                 /* @var ConditionAccessor $config */
                 $this->dispatchEvent($config, $log);
                 $evaluatedContacts->pass($log->getLead());
-            } catch (ConditionFailedException $exception) {
+            } catch (ConditionFailedException) {
                 $evaluatedContacts->fail($log->getLead());
                 $log->setNonActionPathTaken(true);
             }

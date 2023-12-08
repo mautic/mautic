@@ -882,7 +882,7 @@ class AjaxController extends CommonAjaxController
         return $this->sendJsonResponse($dataArray);
     }
 
-    public function getCampaignShareStatsAction(Request $request, SegmentCampaignShare $segmentCampaignShareService)
+    public function getCampaignShareStatsAction(Request $request, SegmentCampaignShare $segmentCampaignShareService): JsonResponse
     {
         $ids      = $request->query->all()['ids'] ?? [];
         $entityid = $request->query->get('entityId');

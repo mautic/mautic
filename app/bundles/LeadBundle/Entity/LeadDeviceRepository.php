@@ -28,7 +28,7 @@ class LeadDeviceRepository extends CommonRepository
     /**
      * {@inheritdoc}
      */
-    public function getTableAlias()
+    public function getTableAlias(): string
     {
         return 'd';
     }
@@ -128,10 +128,8 @@ class LeadDeviceRepository extends CommonRepository
 
     /**
      * Check if there is at least one device with filled tracking code assigned to Lead.
-     *
-     * @return bool
      */
-    public function isAnyLeadDeviceTracked(Lead $lead)
+    public function isAnyLeadDeviceTracked(Lead $lead): bool
     {
         $alias = $this->getTableAlias();
         $qb    = $this->createQueryBuilder($alias);
@@ -167,7 +165,7 @@ class LeadDeviceRepository extends CommonRepository
     /**
      * Updates lead ID (e.g. after a lead merge).
      */
-    public function updateLead($fromLeadId, $toLeadId)
+    public function updateLead($fromLeadId, $toLeadId): void
     {
         $q = $this->getEntityManager()->getConnection()->createQueryBuilder();
         $q->update(MAUTIC_TABLE_PREFIX.'lead_devices')

@@ -19,19 +19,13 @@ class SummarizeCommand extends ModeratedCommand
 
     public const NAME = 'mautic:campaigns:summarize';
 
-    private SummaryModel $summaryModel;
-    private TranslatorInterface $translator;
-
     public function __construct(
-        TranslatorInterface $translator,
-        SummaryModel $summaryModel,
+        private TranslatorInterface $translator,
+        private SummaryModel $summaryModel,
         PathsHelper $pathsHelper,
         CoreParametersHelper $coreParametersHelper
     ) {
         parent::__construct($pathsHelper, $coreParametersHelper);
-
-        $this->translator   = $translator;
-        $this->summaryModel = $summaryModel;
     }
 
     protected function configure(): void

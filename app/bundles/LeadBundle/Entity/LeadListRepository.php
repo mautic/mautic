@@ -59,7 +59,7 @@ class LeadListRepository extends CommonRepository
                 ->setParameter('listId', $id)
                 ->getQuery()
                 ->getSingleResult();
-        } catch (\Exception $e) {
+        } catch (\Exception) {
             $entity = null;
         }
 
@@ -193,10 +193,8 @@ class LeadListRepository extends CommonRepository
 
     /**
      * Check Lead segments by ids.
-     *
-     * @return bool
      */
-    public function checkLeadSegmentsByIds(Lead $lead, $ids)
+    public function checkLeadSegmentsByIds(Lead $lead, $ids): bool
     {
         if (empty($ids)) {
             return false;
@@ -328,7 +326,7 @@ class LeadListRepository extends CommonRepository
             $objectFilters['lead'][] = $filters;
         }
         foreach ($filters as $filter) {
-            $object = (isset($filter['object'])) ? $filter['object'] : 'lead';
+            $object = $filter['object'] ?? 'lead';
             switch ($object) {
                 case 'company':
                     $objectFilters['company'][] = $filter;
@@ -342,7 +340,7 @@ class LeadListRepository extends CommonRepository
         return $objectFilters;
     }
 
-    public function setDispatcher(EventDispatcherInterface $dispatcher)
+    public function setDispatcher(EventDispatcherInterface $dispatcher): void
     {
         $this->dispatcher = $dispatcher;
     }
@@ -413,10 +411,8 @@ class LeadListRepository extends CommonRepository
 
     /**
      * @param \Doctrine\ORM\QueryBuilder|\Doctrine\DBAL\Query\QueryBuilder $q
-     *
-     * @return array
      */
-    protected function addSearchCommandWhereClause($q, $filter)
+    protected function addSearchCommandWhereClause($q, $filter): array
     {
         [$expr, $parameters] = parent::addStandardSearchCommandWhereClause($q, $filter);
         if ($expr) {
@@ -470,10 +466,7 @@ class LeadListRepository extends CommonRepository
         return array_merge($commands, parent::getSearchCommands());
     }
 
-    /**
-     * @return array
-     */
-    public function getRelativeDateStrings()
+    public function getRelativeDateStrings(): array
     {
         $keys = self::getRelativeDateTranslationKeys();
 
@@ -485,10 +478,7 @@ class LeadListRepository extends CommonRepository
         return $strings;
     }
 
-    /**
-     * @return array
-     */
-    public static function getRelativeDateTranslationKeys()
+    public static function getRelativeDateTranslationKeys(): array
     {
         return [
             'mautic.lead.list.month_last',
@@ -510,7 +500,7 @@ class LeadListRepository extends CommonRepository
     /**
      * @return array<array<string>>
      */
-    protected function getDefaultOrder()
+    protected function getDefaultOrder(): array
     {
         return [
             ['l.name', 'ASC'],
@@ -520,7 +510,7 @@ class LeadListRepository extends CommonRepository
     /**
      * {@inheritdoc}
      */
-    public function getTableAlias()
+    public function getTableAlias(): string
     {
         return 'l';
     }

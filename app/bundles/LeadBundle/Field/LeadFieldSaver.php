@@ -11,34 +11,22 @@ use Mautic\LeadBundle\Field\Dispatcher\FieldSaveDispatcher;
 
 class LeadFieldSaver
 {
-    /**
-     * @var LeadFieldRepository
-     */
-    private $leadFieldRepository;
-
-    /**
-     * @var FieldSaveDispatcher
-     */
-    private $fieldSaveDispatcher;
-
-    public function __construct(LeadFieldRepository $leadFieldRepository, FieldSaveDispatcher $fieldSaveDispatcher)
+    public function __construct(private LeadFieldRepository $leadFieldRepository, private FieldSaveDispatcher $fieldSaveDispatcher)
     {
-        $this->leadFieldRepository = $leadFieldRepository;
-        $this->fieldSaveDispatcher = $fieldSaveDispatcher;
     }
 
     public function saveLeadFieldEntity(LeadField $leadField, bool $isNew): void
     {
         try {
             $this->fieldSaveDispatcher->dispatchPreSaveEvent($leadField, $isNew);
-        } catch (NoListenerException $e) {
+        } catch (NoListenerException) {
         }
 
         $this->leadFieldRepository->saveEntity($leadField);
 
         try {
             $this->fieldSaveDispatcher->dispatchPostSaveEvent($leadField, $isNew);
-        } catch (NoListenerException $e) {
+        } catch (NoListenerException) {
         }
     }
 

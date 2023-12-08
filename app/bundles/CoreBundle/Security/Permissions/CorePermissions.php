@@ -13,31 +13,6 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 class CorePermissions
 {
     /**
-     * @var TranslatorInterface
-     */
-    private $translator;
-
-    /**
-     * @var UserHelper
-     */
-    protected $userHelper;
-
-    /**
-     * @var CoreParametersHelper
-     */
-    private $coreParametersHelper;
-
-    /**
-     * @var array
-     */
-    private $bundles;
-
-    /**
-     * @var array
-     */
-    private $pluginBundles;
-
-    /**
      * @var array
      */
     private $permissionClasses = [];
@@ -68,18 +43,12 @@ class CorePermissions
     private $permissionObjectsGenerated = false;
 
     public function __construct(
-        UserHelper $userHelper,
-        TranslatorInterface $translator,
-        CoreParametersHelper $coreParametersHelper,
-        array $bundles,
-        array $pluginBundles
+        protected UserHelper $userHelper,
+        private TranslatorInterface $translator,
+        private CoreParametersHelper $coreParametersHelper,
+        private array $bundles,
+        private array $pluginBundles
     ) {
-        $this->userHelper           = $userHelper;
-        $this->translator           = $translator;
-        $this->coreParametersHelper = $coreParametersHelper;
-        $this->bundles              = $bundles;
-        $this->pluginBundles        = $pluginBundles;
-
         $this->registerPermissionClasses();
     }
 
@@ -103,7 +72,7 @@ class CorePermissions
         foreach ($this->getPermissionClasses() as $class) {
             try {
                 $this->getPermissionObject($class);
-            } catch (\InvalidArgumentException $e) {
+            } catch (\InvalidArgumentException) {
             }
         }
 
@@ -153,11 +122,9 @@ class CorePermissions
     /**
      * Generates the bit value for the bundle's permission.
      *
-     * @return array
-     *
      * @throws \InvalidArgumentException
      */
-    public function generatePermissions(array $permissions)
+    public function generatePermissions(array $permissions): array
     {
         $entities = [];
 
@@ -406,10 +373,8 @@ class CorePermissions
      * Retrieves all permissions.
      *
      * @param bool $forJs
-     *
-     * @return array
      */
-    public function getAllPermissions($forJs = false)
+    public function getAllPermissions($forJs = false): array
     {
         $permissionObjects = $this->getPermissionObjects();
         $permissions       = [];
@@ -429,10 +394,7 @@ class CorePermissions
         return $permissions;
     }
 
-    /**
-     * @return bool
-     */
-    public function isAnonymous()
+    public function isAnonymous(): bool
     {
         $userEntity = $this->userHelper->getUser();
 
@@ -520,7 +482,7 @@ class CorePermissions
     /**
      * Register permission classes.
      */
-    private function registerPermissionClasses()
+    private function registerPermissionClasses(): void
     {
         foreach ($this->getBundles() as $bundle) {
             if (!empty($bundle['permissionClasses'])) {

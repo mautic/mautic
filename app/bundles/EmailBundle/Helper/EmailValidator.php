@@ -8,9 +8,6 @@ use Mautic\EmailBundle\Exception\InvalidEmailException;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-/**
- * Class EmailValidator.
- */
 class EmailValidator
 {
     /**
@@ -23,9 +20,6 @@ class EmailValidator
      */
     protected $dispatcher;
 
-    /**
-     * EmailValidator constructor.
-     */
     public function __construct(TranslatorInterface $translator, EventDispatcherInterface $dispatcher)
     {
         $this->translator = $translator;
@@ -62,7 +56,7 @@ class EmailValidator
      *
      * @returns bool
      */
-    public function isValidFormat($address)
+    public function isValidFormat($address): bool
     {
         return !empty($address) && filter_var($address, FILTER_VALIDATE_EMAIL);
     }
@@ -84,9 +78,9 @@ class EmailValidator
      *
      * @returns bool
      */
-    public function hasValidDomain($address)
+    public function hasValidDomain($address): bool
     {
-        list($user, $domain) = explode('@', $address);
+        [$user, $domain] = explode('@', $address);
 
         return checkdnsrr($domain, 'MX');
     }

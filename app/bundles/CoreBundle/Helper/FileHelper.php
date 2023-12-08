@@ -6,7 +6,7 @@ class FileHelper
 {
     public const BYTES_TO_MEGABYTES_RATIO = 1048576;
 
-    public static function convertBytesToMegabytes($b)
+    public static function convertBytesToMegabytes($b): float
     {
         return round($b / self::BYTES_TO_MEGABYTES_RATIO, 2);
     }
@@ -16,7 +16,7 @@ class FileHelper
         return $mb * self::BYTES_TO_MEGABYTES_RATIO;
     }
 
-    public static function getMaxUploadSizeInBytes()
+    public static function getMaxUploadSizeInBytes(): int
     {
         $maxPostSize   = self::convertPHPSizeToBytes(ini_get('post_max_size'));
         $maxUploadSize = self::convertPHPSizeToBytes(ini_get('upload_max_filesize'));
@@ -34,10 +34,8 @@ class FileHelper
 
     /**
      * @param string $sSize
-     *
-     * @return int
      */
-    public static function convertPHPSizeToBytes($sSize)
+    public static function convertPHPSizeToBytes($sSize): int
     {
         $sSize = trim($sSize);
 

@@ -12,21 +12,6 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 class Fetcher
 {
     /**
-     * @var Mailbox
-     */
-    private $imapHelper;
-
-    /**
-     * @var EventDispatcherInterface
-     */
-    private $dispatcher;
-
-    /**
-     * @var TranslatorInterface
-     */
-    private $translator;
-
-    /**
      * @var array
      */
     private $mailboxes;
@@ -41,14 +26,8 @@ class Fetcher
      */
     private $processedMessageCounter = 0;
 
-    /**
-     * Fetcher constructor.
-     */
-    public function __construct(Mailbox $imapHelper, EventDispatcherInterface $dispatcher, TranslatorInterface $translator)
+    public function __construct(private Mailbox $imapHelper, private EventDispatcherInterface $dispatcher, private TranslatorInterface $translator)
     {
-        $this->imapHelper = $imapHelper;
-        $this->dispatcher = $dispatcher;
-        $this->translator = $translator;
     }
 
     /**
@@ -64,7 +43,7 @@ class Fetcher
     /**
      * @param int $limit
      */
-    public function fetch($limit = null)
+    public function fetch($limit = null): void
     {
         /** @var ParseEmailEvent $event */
         $event = $this->dispatcher->dispatch(new ParseEmailEvent(), EmailEvents::EMAIL_PRE_FETCH);
@@ -146,10 +125,7 @@ class Fetcher
         return $messages;
     }
 
-    /**
-     * @return array
-     */
-    private function getConfigs()
+    private function getConfigs(): array
     {
         $mailboxes = [];
         foreach ($this->mailboxes as $mailbox) {

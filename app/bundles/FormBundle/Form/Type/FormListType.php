@@ -4,24 +4,17 @@ namespace Mautic\FormBundle\Form\Type;
 
 use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
-use Mautic\FormBundle\Entity\FormRepository;
 use Mautic\FormBundle\Model\FormModel;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
-/**
- * Class PointActionFormSubmitType.
- */
 class FormListType extends AbstractType
 {
     private $viewOther;
 
-    /**
-     * @var FormRepository
-     */
-    private $repo;
+    private \Mautic\FormBundle\Entity\FormRepository $repo;
 
     public function __construct(CorePermissions $security, FormModel $model, UserHelper $userHelper)
     {
@@ -31,7 +24,7 @@ class FormListType extends AbstractType
         $this->repo->setCurrentUser($userHelper->getUser());
     }
 
-    public function configureOptions(OptionsResolver $resolver)
+    public function configureOptions(OptionsResolver $resolver): void
     {
         $viewOther = $this->viewOther;
         $repo      = $this->repo;

@@ -15,36 +15,9 @@ final class AvatarHelper
      * @var array<string>
      */
     private $imageTypes = ['jpg', 'jpeg', 'png', 'gif'];
-    /**
-     * @var AssetsHelper
-     */
-    private $assetsHelper;
 
-    /**
-     * @var PathsHelper
-     */
-    private $pathsHelper;
-
-    /**
-     * @var GravatarHelper
-     */
-    private $gravatarHelper;
-
-    /**
-     * @var DefaultAvatarHelper
-     */
-    private $defaultAvatarHelper;
-
-    public function __construct(
-        AssetsHelper $assetsHelper,
-        PathsHelper $pathsHelper,
-        GravatarHelper $gravatarHelper,
-        DefaultAvatarHelper $defaultAvatarHelper
-    ) {
-        $this->assetsHelper        = $assetsHelper;
-        $this->pathsHelper         = $pathsHelper;
-        $this->gravatarHelper      = $gravatarHelper;
-        $this->defaultAvatarHelper = $defaultAvatarHelper;
+    public function __construct(private AssetsHelper $assetsHelper, private PathsHelper $pathsHelper, private GravatarHelper $gravatarHelper, private DefaultAvatarHelper $defaultAvatarHelper)
+    {
     }
 
     /**
@@ -114,10 +87,8 @@ final class AvatarHelper
      * Get avatar path.
      *
      * @param bool $absolute
-     *
-     * @return string
      */
-    public function getAvatarPath($absolute = false)
+    public function getAvatarPath($absolute = false): string
     {
         $imageDir = $this->pathsHelper->getSystemPath('images', $absolute);
 
@@ -134,10 +105,7 @@ final class AvatarHelper
         return $this->defaultAvatarHelper->getDefaultAvatar($absolute);
     }
 
-    /**
-     * @return string
-     */
-    public function getName()
+    public function getName(): string
     {
         return 'lead_avatar';
     }

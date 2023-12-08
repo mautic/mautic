@@ -9,17 +9,8 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class GraphAggregateStatsSubscriber implements EventSubscriberInterface
 {
-    /**
-     * @var StatsCollectionHelper
-     */
-    private $statsCollectionHelper;
-
-    /**
-     * GraphAggregateStatsSubscriber constructor.
-     */
-    public function __construct(StatsCollectionHelper $statsCollectionHelper)
+    public function __construct(private StatsCollectionHelper $statsCollectionHelper)
     {
-        $this->statsCollectionHelper = $statsCollectionHelper;
     }
 
     /**
@@ -32,7 +23,7 @@ class GraphAggregateStatsSubscriber implements EventSubscriberInterface
         ];
     }
 
-    public function onStatRequest(AggregateStatRequestEvent $event)
+    public function onStatRequest(AggregateStatRequestEvent $event): void
     {
         if (!$event->checkContextPrefix(StatsCollectionHelper::GENERAL_STAT_PREFIX.'-')) {
             return;

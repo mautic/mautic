@@ -27,21 +27,14 @@ class CreateCustomFieldCommand extends ModeratedCommand
 
     protected static $defaultDescription = 'Create custom field column in the background';
 
-    private BackgroundService $backgroundService;
-    private TranslatorInterface $translator;
-    private LeadFieldRepository $leadFieldRepository;
-
     public function __construct(
-        BackgroundService $backgroundService,
-        TranslatorInterface $translator,
-        LeadFieldRepository $leadFieldRepository,
+        private BackgroundService $backgroundService,
+        private TranslatorInterface $translator,
+        private LeadFieldRepository $leadFieldRepository,
         PathsHelper $pathsHelper,
         CoreParametersHelper $coreParametersHelper
     ) {
         parent::__construct($pathsHelper, $coreParametersHelper);
-        $this->backgroundService   = $backgroundService;
-        $this->translator          = $translator;
-        $this->leadFieldRepository = $leadFieldRepository;
     }
 
     public function configure(): void
@@ -94,15 +87,15 @@ EOT
 
         try {
             $this->backgroundService->addColumn($leadFieldId, $userId);
-        } catch (LeadFieldWasNotFoundException $e) {
+        } catch (LeadFieldWasNotFoundException) {
             $output->writeln('<error>'.$this->translator->trans('mautic.lead.field.notfound').'</error>');
 
             return Command::FAILURE;
-        } catch (ColumnAlreadyCreatedException $e) {
+        } catch (ColumnAlreadyCreatedException) {
             $output->writeln('<error>'.$this->translator->trans('mautic.lead.field.column_already_created').'</error>');
 
             return Command::SUCCESS;
-        } catch (AbortColumnCreateException $e) {
+        } catch (AbortColumnCreateException) {
             $output->writeln('<error>'.$this->translator->trans('mautic.lead.field.column_creation_aborted').'</error>');
 
             return Command::SUCCESS;

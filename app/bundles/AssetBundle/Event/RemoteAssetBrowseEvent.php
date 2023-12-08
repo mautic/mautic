@@ -7,9 +7,6 @@ use Mautic\CoreBundle\Event\CommonEvent;
 use Mautic\PluginBundle\Integration\AbstractIntegration;
 use Mautic\PluginBundle\Integration\UnifiedIntegrationInterface;
 
-/**
- * Class RemoteAssetBrowseEvent.
- */
 class RemoteAssetBrowseEvent extends CommonEvent
 {
     /**
@@ -20,7 +17,7 @@ class RemoteAssetBrowseEvent extends CommonEvent
     /**
      * @var AbstractIntegration
      */
-    private $integration;
+    private \Mautic\PluginBundle\Integration\UnifiedIntegrationInterface $integration;
 
     public function __construct(UnifiedIntegrationInterface $integration)
     {

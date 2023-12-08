@@ -23,34 +23,20 @@ class ContactSegmentQueryBuilder
 {
     use LeadBatchLimiterTrait;
 
-    /** @var EntityManager */
-    private $entityManager;
-
-    /** @var RandomParameterName */
-    private $randomParameterName;
-
-    /** @var EventDispatcherInterface */
-    private $dispatcher;
-
     /** @var array Contains segment edges mapping */
     private $dependencyMap = [];
 
-    public function __construct(EntityManager $entityManager, RandomParameterName $randomParameterName, EventDispatcherInterface $dispatcher)
+    public function __construct(private EntityManager $entityManager, private RandomParameterName $randomParameterName, private EventDispatcherInterface $dispatcher)
     {
-        $this->entityManager       = $entityManager;
-        $this->randomParameterName = $randomParameterName;
-        $this->dispatcher          = $dispatcher;
     }
 
     /**
      * @param int                   $segmentId
      * @param ContactSegmentFilters $segmentFilters
      *
-     * @return QueryBuilder
-     *
      * @throws SegmentQueryException
      */
-    public function assembleContactsSegmentQueryBuilder($segmentId, $segmentFilters, bool $changeAlias = false)
+    public function assembleContactsSegmentQueryBuilder($segmentId, $segmentFilters, bool $changeAlias = false): QueryBuilder
     {
         /** @var Connection $connection */
         $connection = $this->entityManager->getConnection();
@@ -80,7 +66,7 @@ class ContactSegmentQueryBuilder
         foreach ($segmentFilters as $filter) {
             try {
                 $this->dispatchPluginFilteringEvent($filter, $queryBuilder);
-            } catch (PluginHandledFilterException $exception) {
+            } catch (PluginHandledFilterException) {
                 continue;
             }
 
@@ -98,11 +84,9 @@ class ContactSegmentQueryBuilder
     }
 
     /**
-     * @return QueryBuilder
-     *
      * @throws \Doctrine\DBAL\Exception
      */
-    public function wrapInCount(QueryBuilder $qb)
+    public function wrapInCount(QueryBuilder $qb): QueryBuilder
     {
         /** @var Connection $connection */
         $connection = $this->entityManager->getConnection();
@@ -213,7 +197,7 @@ class ContactSegmentQueryBuilder
         return $queryBuilder;
     }
 
-    public function queryBuilderGenerated(LeadList $segment, QueryBuilder $queryBuilder)
+    public function queryBuilderGenerated(LeadList $segment, QueryBuilder $queryBuilder): void
     {
         if (!$this->dispatcher->hasListeners(LeadEvents::LIST_FILTERS_QUERYBUILDER_GENERATED)) {
             return;
@@ -225,10 +209,8 @@ class ContactSegmentQueryBuilder
 
     /**
      * Generate a unique parameter name.
-     *
-     * @return string
      */
-    private function generateRandomParameterName()
+    private function generateRandomParameterName(): string
     {
         return $this->randomParameterName->generateRandomParameterName();
     }

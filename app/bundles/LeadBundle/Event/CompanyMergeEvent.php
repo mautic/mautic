@@ -9,14 +9,8 @@ use Symfony\Contracts\EventDispatcher\Event;
 
 final class CompanyMergeEvent extends Event
 {
-    private Company $victor;
-
-    private Company $loser;
-
-    public function __construct(Company $victor, Company $loser)
+    public function __construct(private Company $victor, private Company $loser)
     {
-        $this->victor = $victor;
-        $this->loser  = $loser;
     }
 
     /**

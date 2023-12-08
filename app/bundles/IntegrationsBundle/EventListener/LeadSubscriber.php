@@ -26,43 +26,8 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class LeadSubscriber implements EventSubscriberInterface
 {
-    /**
-     * @var FieldChangeRepository
-     */
-    private $fieldChangeRepo;
-
-    /**
-     * @var ObjectMappingRepository
-     */
-    private $objectMappingRepository;
-
-    /**
-     * @var VariableExpresserHelperInterface
-     */
-    private $variableExpressor;
-
-    /**
-     * @var SyncIntegrationsHelper
-     */
-    private $syncIntegrationsHelper;
-
-    /**
-     * @var EventDispatcherInterface
-     */
-    private $dispatcher;
-
-    public function __construct(
-        FieldChangeRepository $fieldChangeRepo,
-        ObjectMappingRepository $objectMappingRepository,
-        VariableExpresserHelperInterface $variableExpressor,
-        SyncIntegrationsHelper $syncIntegrationsHelper,
-        EventDispatcherInterface $dispatcher
-    ) {
-        $this->fieldChangeRepo         = $fieldChangeRepo;
-        $this->objectMappingRepository = $objectMappingRepository;
-        $this->variableExpressor       = $variableExpressor;
-        $this->syncIntegrationsHelper  = $syncIntegrationsHelper;
-        $this->dispatcher              = $dispatcher;
+    public function __construct(private FieldChangeRepository $fieldChangeRepo, private ObjectMappingRepository $objectMappingRepository, private VariableExpresserHelperInterface $variableExpressor, private SyncIntegrationsHelper $syncIntegrationsHelper, private EventDispatcherInterface $dispatcher)
+    {
     }
 
     public static function getSubscribedEvents(): array
@@ -201,7 +166,7 @@ class LeadSubscriber implements EventSubscriberInterface
         foreach ($this->syncIntegrationsHelper->getEnabledIntegrations() as $integrationName) {
             try {
                 $this->dispatchBeforeFieldChangesEvent($integrationName, $object);
-            } catch (InvalidValueException $e) {
+            } catch (InvalidValueException) {
                 continue; // Do not record changes for object and integration that has an invalid value.
             }
 

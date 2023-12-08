@@ -11,14 +11,8 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 final class DoNotContactSubscriber implements EventSubscriberInterface
 {
-    /**
-     * @var DoNotContact
-     */
-    private $doNotContact;
-
-    public function __construct(DoNotContact $doNotContact)
+    public function __construct(private DoNotContact $doNotContact)
     {
-        $this->doNotContact = $doNotContact;
     }
 
     public static function getSubscribedEvents(): array

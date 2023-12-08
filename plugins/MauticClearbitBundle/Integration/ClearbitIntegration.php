@@ -29,9 +29,9 @@ class ClearbitIntegration extends AbstractIntegration
      * Return array of key => label elements that will be converted to inputs to
      * obtain from the user.
      *
-     * @return array
+     * @return array<string, string>
      */
-    public function getRequiredKeyFields()
+    public function getRequiredKeyFields(): array
     {
         // Do not rename field. clearbit.js depends on it
         return [
@@ -44,7 +44,7 @@ class ClearbitIntegration extends AbstractIntegration
      * @param array            $data
      * @param string           $formArea
      */
-    public function appendToForm(&$builder, $data, $formArea)
+    public function appendToForm(&$builder, $data, $formArea): void
     {
         if ('keys' === $formArea) {
             $builder->add(
@@ -52,7 +52,7 @@ class ClearbitIntegration extends AbstractIntegration
                 YesNoButtonGroupType::class,
                 [
                     'label' => 'mautic.plugin.clearbit.auto_update',
-                    'data'  => (isset($data['auto_update'])) ? (bool) $data['auto_update'] : false,
+                    'data'  => isset($data['auto_update']) && (bool) $data['auto_update'],
                     'attr'  => [
                         'tooltip' => 'mautic.plugin.clearbit.auto_update.tooltip',
                     ],
@@ -61,11 +61,11 @@ class ClearbitIntegration extends AbstractIntegration
         }
     }
 
-    public function shouldAutoUpdate()
+    public function shouldAutoUpdate(): bool
     {
         $featureSettings = $this->getKeys();
 
-        return (isset($featureSettings['auto_update'])) ? (bool) $featureSettings['auto_update'] : false;
+        return isset($featureSettings['auto_update']) && (bool) $featureSettings['auto_update'];
     }
 
     /**

@@ -10,23 +10,14 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class EventDispatcher
 {
-    /**
-     * @var EventDispatcherInterface
-     */
-    private $dispatcher;
-
-    /**
-     * EventDispatcher constructor.
-     */
-    public function __construct(EventDispatcherInterface $dispatcher)
+    public function __construct(private EventDispatcherInterface $dispatcher)
     {
-        $this->dispatcher = $dispatcher;
     }
 
     /**
      * @param string $action
      */
-    public function dispatchMembershipChange(Lead $contact, Campaign $campaign, $action)
+    public function dispatchMembershipChange(Lead $contact, Campaign $campaign, $action): void
     {
         $this->dispatcher->dispatch(
             new CampaignLeadChangeEvent($campaign, $contact, $action),
@@ -34,7 +25,7 @@ class EventDispatcher
         );
     }
 
-    public function dispatchBatchMembershipChange(array $contacts, Campaign $campaign, $action)
+    public function dispatchBatchMembershipChange(array $contacts, Campaign $campaign, $action): void
     {
         $this->dispatcher->dispatch(
             new CampaignLeadChangeEvent($campaign, $contacts, $action),

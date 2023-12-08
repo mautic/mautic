@@ -5,9 +5,6 @@ namespace MauticPlugin\MauticSocialBundle\Security\Permissions;
 use Mautic\CoreBundle\Security\Permissions\AbstractPermissions;
 use Symfony\Component\Form\FormBuilderInterface;
 
-/**
- * Class MauticSocialPermissions.
- */
 class MauticSocialPermissions extends AbstractPermissions
 {
     /**
@@ -34,7 +31,7 @@ class MauticSocialPermissions extends AbstractPermissions
     /**
      * {@inheritdoc}
      */
-    public function buildForm(FormBuilderInterface &$builder, array $options, array $data)
+    public function buildForm(FormBuilderInterface &$builder, array $options, array $data): void
     {
         $this->addStandardFormFields('mauticSocial', 'categories', $builder, $data);
         $this->addStandardFormFields('mauticSocial', 'monitoring', $builder, $data);

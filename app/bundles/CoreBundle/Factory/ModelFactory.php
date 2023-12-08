@@ -11,11 +11,8 @@ use Psr\Container\ContainerInterface;
  */
 class ModelFactory
 {
-    private ContainerInterface $container;
-
-    public function __construct(ContainerInterface $container)
+    public function __construct(private ContainerInterface $container)
     {
-        $this->container = $container;
     }
 
     /**
@@ -28,7 +25,7 @@ class ModelFactory
         }
 
         // Shortcut for models with the same name as the bundle
-        if (false === strpos($modelNameKey, '.')) {
+        if (!str_contains($modelNameKey, '.')) {
             $modelNameKey = "$modelNameKey.$modelNameKey";
         }
 
@@ -59,7 +56,7 @@ class ModelFactory
             $this->getModel($modelNameKey);
 
             return true;
-        } catch (\InvalidArgumentException $exception) {
+        } catch (\InvalidArgumentException) {
             return false;
         }
     }

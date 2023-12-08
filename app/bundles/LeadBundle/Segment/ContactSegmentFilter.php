@@ -22,40 +22,16 @@ class ContactSegmentFilter
     public $contactSegmentFilterCrate;
 
     /**
-     * @var FilterDecoratorInterface
-     */
-    private $filterDecorator;
-
-    /**
-     * @var FilterQueryBuilderInterface
-     */
-    private $filterQueryBuilder;
-
-    /**
-     * @var TableSchemaColumnsCache
-     */
-    private $schemaCache;
-
-    /**
-     * @var array<string, mixed>
-     */
-    private $batchLimiters = [];
-
-    /**
      * @param array<string, mixed> $batchLimiters
      */
     public function __construct(
         ContactSegmentFilterCrate $contactSegmentFilterCrate,
-        FilterDecoratorInterface $filterDecorator,
-        TableSchemaColumnsCache $cache,
-        FilterQueryBuilderInterface $filterQueryBuilder,
-        array $batchLimiters = []
+        private FilterDecoratorInterface $filterDecorator,
+        private TableSchemaColumnsCache $schemaCache,
+        private FilterQueryBuilderInterface $filterQueryBuilder,
+        private array $batchLimiters = []
     ) {
         $this->contactSegmentFilterCrate = $contactSegmentFilterCrate;
-        $this->filterDecorator           = $filterDecorator;
-        $this->schemaCache               = $cache;
-        $this->filterQueryBuilder        = $filterQueryBuilder;
-        $this->batchLimiters             = $batchLimiters;
     }
 
     /**
@@ -182,10 +158,8 @@ class ContactSegmentFilter
 
     /**
      * Whether the filter references another ContactSegment.
-     *
-     * @return bool
      */
-    public function isContactSegmentReference()
+    public function isContactSegmentReference(): bool
     {
         return 'leadlist' === $this->getField();
     }
@@ -206,18 +180,12 @@ class ContactSegmentFilter
         return $this->contactSegmentFilterCrate->getNullValue();
     }
 
-    /**
-     * @return DoNotContactParts
-     */
-    public function getDoNotContactParts()
+    public function getDoNotContactParts(): DoNotContactParts
     {
         return new DoNotContactParts($this->contactSegmentFilterCrate->getField());
     }
 
-    /**
-     * @return IntegrationCampaignParts
-     */
-    public function getIntegrationCampaignParts()
+    public function getIntegrationCampaignParts(): IntegrationCampaignParts
     {
         return new IntegrationCampaignParts($this->getParameterValue());
     }

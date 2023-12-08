@@ -13,14 +13,8 @@ class TriggerBuilderEvent extends Event
      */
     private $events = [];
 
-    /**
-     * @var TranslatorInterface
-     */
-    private $translator;
-
-    public function __construct(TranslatorInterface $translator)
+    public function __construct(private TranslatorInterface $translator)
     {
-        $this->translator = $translator;
     }
 
     /**
@@ -73,7 +67,7 @@ class TriggerBuilderEvent extends Event
      */
     public function getEvents()
     {
-        uasort($this->events, function ($a, $b) {
+        uasort($this->events, function ($a, $b): int {
             return strnatcasecmp(
                 $a['label'], $b['label']);
         });

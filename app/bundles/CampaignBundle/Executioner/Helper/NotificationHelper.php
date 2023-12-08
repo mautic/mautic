@@ -14,46 +14,11 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class NotificationHelper
 {
-    /**
-     * @var UserModel
-     */
-    private $userModel;
-
-    /**
-     * @var NotificationModel
-     */
-    private $notificationModel;
-
-    /**
-     * @var TranslatorInterface
-     */
-    private $translator;
-
-    /**
-     * @var Router
-     */
-    private $router;
-
-    /**
-     * @var CoreParametersHelper
-     */
-    private $coreParametersHelper;
-
-    public function __construct(
-        UserModel $userModel,
-        NotificationModel $notificationModel,
-        TranslatorInterface $translator,
-        Router $router,
-        CoreParametersHelper $coreParametersHelper
-    ) {
-        $this->userModel            = $userModel;
-        $this->notificationModel    = $notificationModel;
-        $this->translator           = $translator;
-        $this->router               = $router;
-        $this->coreParametersHelper = $coreParametersHelper;
+    public function __construct(private UserModel $userModel, private NotificationModel $notificationModel, private TranslatorInterface $translator, private Router $router, private CoreParametersHelper $coreParametersHelper)
+    {
     }
 
-    public function notifyOfFailure(Lead $contact, Event $event)
+    public function notifyOfFailure(Lead $contact, Event $event): void
     {
         $user = $this->getUser($contact, $event);
         if (!$user || !$user->getId()) {

@@ -141,43 +141,8 @@ class ReportSubscriber implements EventSubscriberInterface
         ],
     ];
 
-    /**
-     * @var Connection
-     */
-    private $db;
-
-    /**
-     * @var CompanyReportData
-     */
-    private $companyReportData;
-
-    /**
-     * @var GeneratedColumnsProviderInterface
-     */
-    private $generatedColumnsProvider;
-
-    /**
-     * @var StatRepository
-     */
-    private $statRepository;
-
-    /**
-     * @var FieldsBuilder
-     */
-    private $fieldsBuilder;
-
-    public function __construct(
-        Connection $db,
-        CompanyReportData $companyReportData,
-        StatRepository $statRepository,
-        GeneratedColumnsProviderInterface $generatedColumnsProvider,
-        FieldsBuilder $fieldsBuilder
-    ) {
-        $this->db                       = $db;
-        $this->companyReportData        = $companyReportData;
-        $this->statRepository           = $statRepository;
-        $this->generatedColumnsProvider = $generatedColumnsProvider;
-        $this->fieldsBuilder            = $fieldsBuilder;
+    public function __construct(private Connection $db, private CompanyReportData $companyReportData, private StatRepository $statRepository, private GeneratedColumnsProviderInterface $generatedColumnsProvider, private FieldsBuilder $fieldsBuilder)
+    {
     }
 
     /**
@@ -195,7 +160,7 @@ class ReportSubscriber implements EventSubscriberInterface
     /**
      * Add available tables and columns to the report builder lookup.
      */
-    public function onReportBuilder(ReportBuilderEvent $event)
+    public function onReportBuilder(ReportBuilderEvent $event): void
     {
         if (!$event->checkContext([self::CONTEXT_EMAILS, self::CONTEXT_EMAIL_STATS])) {
             return;
@@ -353,7 +318,7 @@ class ReportSubscriber implements EventSubscriberInterface
     /**
      * Initialize the QueryBuilder object to generate reports from.
      */
-    public function onReportGenerate(ReportGeneratorEvent $event)
+    public function onReportGenerate(ReportGeneratorEvent $event): void
     {
         $context    = $event->getContext();
         $qb         = $event->getQueryBuilder();
@@ -488,7 +453,7 @@ class ReportSubscriber implements EventSubscriberInterface
     /**
      * Initialize the QueryBuilder object to generate reports from.
      */
-    public function onReportGraphGenerate(ReportGraphEvent $event)
+    public function onReportGraphGenerate(ReportGraphEvent $event): void
     {
         $graphs = $event->getRequestedGraphs();
 
@@ -779,7 +744,7 @@ class ReportSubscriber implements EventSubscriberInterface
     /**
      * Add the Do Not Contact table to the query builder.
      */
-    private function addDNCTableForEmailStats(QueryBuilder $qb)
+    private function addDNCTableForEmailStats(QueryBuilder $qb): void
     {
         $table = MAUTIC_TABLE_PREFIX.'lead_donotcontact';
 
@@ -793,7 +758,7 @@ class ReportSubscriber implements EventSubscriberInterface
         }
     }
 
-    private function isJoined($query, $table, $fromAlias, $alias)
+    private function isJoined($query, $table, $fromAlias, $alias): bool
     {
         $joins = $query->getQueryParts()['join'];
         if (empty($joins) || (!empty($joins) && empty($joins[$fromAlias]))) {

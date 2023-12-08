@@ -7,29 +7,14 @@ use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 
-/**
- * Class FormExitSubscriber.
- */
 class FormExitSubscriber implements EventSubscriberInterface
 {
-    /**
-     * @var string
-     */
-    private $model;
-
-    /**
-     * @var array
-     */
-    private $options;
-
     /**
      * @param string $model
      * @param array  $options
      */
-    public function __construct($model, $options = [])
+    public function __construct(private $model, private $options = [])
     {
-        $this->model   = $model;
-        $this->options = $options;
     }
 
     /**
@@ -40,7 +25,7 @@ class FormExitSubscriber implements EventSubscriberInterface
         return [FormEvents::PRE_SET_DATA => 'preSetData'];
     }
 
-    public function preSetData(FormEvent $event)
+    public function preSetData(FormEvent $event): void
     {
         $id = !empty($this->options['data']) ? $this->options['data']->getId() : 0;
         if ($id && empty($this->options['ignore_formexit'])) {

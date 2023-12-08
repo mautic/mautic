@@ -424,7 +424,7 @@ return [
             ],
             // Error handler
             'mautic.core.errorhandler.subscriber' => [
-                'class'     => 'Mautic\CoreBundle\EventListener\ErrorHandlingListener',
+                'class'     => \Mautic\CoreBundle\EventListener\ErrorHandlingListener::class,
                 'arguments' => [
                     'monolog.logger.mautic',
                     'monolog.logger',
@@ -435,7 +435,7 @@ return [
 
             // Configurator (used in installer and managing global config]
             'mautic.configurator' => [
-                'class'     => 'Mautic\CoreBundle\Configurator\Configurator',
+                'class'     => \Mautic\CoreBundle\Configurator\Configurator::class,
                 'arguments' => [
                     'mautic.helper.paths',
                 ],
@@ -459,7 +459,7 @@ return [
                 'arguments' => ['%kernel.environment%'],
             ],
             'mautic.route_loader' => [
-                'class'     => 'Mautic\CoreBundle\Loader\RouteLoader',
+                'class'     => \Mautic\CoreBundle\Loader\RouteLoader::class,
                 'arguments' => [
                     'event_dispatcher',
                     'mautic.helper.core_parameters',
@@ -467,7 +467,7 @@ return [
                 'tag' => 'routing.loader',
             ],
             'mautic.security' => [
-                'class'     => 'Mautic\CoreBundle\Security\Permissions\CorePermissions',
+                'class'     => \Mautic\CoreBundle\Security\Permissions\CorePermissions::class,
                 'arguments' => [
                     'mautic.helper.user',
                     'translator',
@@ -493,7 +493,7 @@ return [
                 'alias'     => 'mautic',
             ],
             'mautic.tblprefix_subscriber' => [
-                'class'     => 'Mautic\CoreBundle\EventListener\DoctrineEventsSubscriber',
+                'class'     => \Mautic\CoreBundle\EventListener\DoctrineEventsSubscriber::class,
                 'tag'       => 'doctrine.event_subscriber',
                 'arguments' => '%mautic.db_table_prefix%',
             ],
@@ -518,7 +518,7 @@ return [
                 ],
             ],
             'mautic.exception.listener' => [
-                'class'     => 'Mautic\CoreBundle\EventListener\ExceptionListener',
+                'class'     => \Mautic\CoreBundle\EventListener\ExceptionListener::class,
                 'arguments' => [
                     'router',
                     'Mautic\CoreBundle\Controller\ExceptionController::showAction',
@@ -622,7 +622,7 @@ return [
             ],
             // Menu
             'mautic.helper.menu' => [
-                'class'     => 'Mautic\CoreBundle\Menu\MenuHelper',
+                'class'     => \Mautic\CoreBundle\Menu\MenuHelper::class,
                 'arguments' => [
                     'mautic.security',
                     'request_stack',
@@ -683,7 +683,7 @@ return [
                 'factory'   => [Symfony\Component\HttpClient\HttpClient::class, 'create'],
             ],
 
-            'twig.controller.exception.class' => 'Mautic\CoreBundle\Controller\ExceptionController',
+            'twig.controller.exception.class' => \Mautic\CoreBundle\Controller\ExceptionController::class,
 
             'mautic.doctrine.loader.mautic_fixtures_loader' => [
                 'class'     => \Mautic\CoreBundle\Doctrine\Loader\MauticFixturesLoader::class,
@@ -693,21 +693,21 @@ return [
             ],
             // Schema
             'mautic.schema.helper.column' => [
-                'class'     => 'Mautic\CoreBundle\Doctrine\Helper\ColumnSchemaHelper',
+                'class'     => \Mautic\CoreBundle\Doctrine\Helper\ColumnSchemaHelper::class,
                 'arguments' => [
                     'database_connection',
                     '%mautic.db_table_prefix%',
                 ],
             ],
             'mautic.schema.helper.index' => [
-                'class'     => 'Mautic\CoreBundle\Doctrine\Helper\IndexSchemaHelper',
+                'class'     => \Mautic\CoreBundle\Doctrine\Helper\IndexSchemaHelper::class,
                 'arguments' => [
                     'database_connection',
                     '%mautic.db_table_prefix%',
                 ],
             ],
             'mautic.schema.helper.table' => [
-                'class'     => 'Mautic\CoreBundle\Doctrine\Helper\TableSchemaHelper',
+                'class'     => \Mautic\CoreBundle\Doctrine\Helper\TableSchemaHelper::class,
                 'arguments' => [
                     'database_connection',
                     '%mautic.db_table_prefix%',
@@ -827,51 +827,51 @@ return [
     'ip_lookup_services' => [
         'extreme-ip' => [
             'display_name' => 'Extreme-IP',
-            'class'        => 'Mautic\CoreBundle\IpLookup\ExtremeIpLookup',
+            'class'        => \Mautic\CoreBundle\IpLookup\ExtremeIpLookup::class,
         ],
         'freegeoip' => [
             'display_name' => 'Ipstack.com',
-            'class'        => 'Mautic\CoreBundle\IpLookup\IpstackLookup',
+            'class'        => \Mautic\CoreBundle\IpLookup\IpstackLookup::class,
         ],
         'geobytes' => [
             'display_name' => 'Geobytes',
-            'class'        => 'Mautic\CoreBundle\IpLookup\GeobytesLookup',
+            'class'        => \Mautic\CoreBundle\IpLookup\GeobytesLookup::class,
         ],
         'geoips' => [
             'display_name' => 'GeoIPs',
-            'class'        => 'Mautic\CoreBundle\IpLookup\GeoipsLookup',
+            'class'        => \Mautic\CoreBundle\IpLookup\GeoipsLookup::class,
         ],
         'ipinfodb' => [
             'display_name' => 'IPInfoDB',
-            'class'        => 'Mautic\CoreBundle\IpLookup\IpinfodbLookup',
+            'class'        => \Mautic\CoreBundle\IpLookup\IpinfodbLookup::class,
         ],
         'maxmind_country' => [
             'display_name' => 'MaxMind - Country Geolocation',
-            'class'        => 'Mautic\CoreBundle\IpLookup\MaxmindCountryLookup',
+            'class'        => \Mautic\CoreBundle\IpLookup\MaxmindCountryLookup::class,
         ],
         'maxmind_omni' => [
             'display_name' => 'MaxMind - Insights (formerly Omni]',
-            'class'        => 'Mautic\CoreBundle\IpLookup\MaxmindOmniLookup',
+            'class'        => \Mautic\CoreBundle\IpLookup\MaxmindOmniLookup::class,
         ],
         'maxmind_precision' => [
             'display_name' => 'MaxMind - GeoIP2 Precision',
-            'class'        => 'Mautic\CoreBundle\IpLookup\MaxmindPrecisionLookup',
+            'class'        => \Mautic\CoreBundle\IpLookup\MaxmindPrecisionLookup::class,
         ],
         'maxmind_download' => [
             'display_name' => 'MaxMind - GeoLite2 City Download',
-            'class'        => 'Mautic\CoreBundle\IpLookup\MaxmindDownloadLookup',
+            'class'        => \Mautic\CoreBundle\IpLookup\MaxmindDownloadLookup::class,
         ],
         'telize' => [
             'display_name' => 'Telize',
-            'class'        => 'Mautic\CoreBundle\IpLookup\TelizeLookup',
+            'class'        => \Mautic\CoreBundle\IpLookup\TelizeLookup::class,
         ],
         'ip2loctionlocal' => [
             'display_name' => 'IP2Location Local Bin File',
-            'class'        => 'Mautic\CoreBundle\IpLookup\IP2LocationBinLookup',
+            'class'        => \Mautic\CoreBundle\IpLookup\IP2LocationBinLookup::class,
         ],
         'ip2loctionapi' => [
             'display_name' => 'IP2Location Web Service',
-            'class'        => 'Mautic\CoreBundle\IpLookup\IP2LocationAPILookup',
+            'class'        => \Mautic\CoreBundle\IpLookup\IP2LocationAPILookup::class,
         ],
     ],
 

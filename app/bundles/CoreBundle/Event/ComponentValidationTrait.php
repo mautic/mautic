@@ -19,11 +19,9 @@ trait ComponentValidationTrait
             }
         }
 
-        if ($callbacks) {
-            foreach ($callbacks as $m) {
-                if (isset($component[$m]) && !is_callable($component[$m])) {
-                    throw new BadConfigurationException($component[$m].' is not callable.');
-                }
+        foreach ($callbacks as $m) {
+            if (isset($component[$m]) && !is_callable($component[$m])) {
+                throw new BadConfigurationException($component[$m].' is not callable.');
             }
         }
     }

@@ -47,79 +47,12 @@ class CampaignSubscriber implements EventSubscriberInterface
     public const ACTION_LEAD_CHANGE_OWNER = 'lead.changeowner';
 
     /**
-     * @var IpLookupHelper
-     */
-    private $ipLookupHelper;
-
-    /**
-     * @var LeadModel
-     */
-    private $leadModel;
-
-    /**
-     * @var FieldModel
-     */
-    private $leadFieldModel;
-
-    /**
-     * @var ListModel
-     */
-    private $listModel;
-
-    /**
-     * @var CompanyModel
-     */
-    private $companyModel;
-
-    /**
-     * @var CampaignModel
-     */
-    private $campaignModel;
-
-    /**
-     * @var PointGroupModel
-     */
-    private $groupModel;
-
-    /**
-     * @var CoreParametersHelper
-     */
-    private $coreParametersHelper;
-
-    /**
-     * @var FilterOperatorProvider
-     */
-    private $filterOperatorProvider;
-
-    /**
      * @var array
      */
     private $fields;
 
-    private DoNotContact $doNotContact;
-
-    public function __construct(
-        IpLookupHelper $ipLookupHelper,
-        LeadModel $leadModel,
-        FieldModel $leadFieldModel,
-        ListModel $listModel,
-        CompanyModel $companyModel,
-        CampaignModel $campaignModel,
-        CoreParametersHelper $coreParametersHelper,
-        DoNotContact $doNotContact,
-        PointGroupModel $groupModel,
-        FilterOperatorProvider $filterOperatorProvider,
-    ) {
-        $this->ipLookupHelper         = $ipLookupHelper;
-        $this->leadModel              = $leadModel;
-        $this->leadFieldModel         = $leadFieldModel;
-        $this->listModel              = $listModel;
-        $this->companyModel           = $companyModel;
-        $this->campaignModel          = $campaignModel;
-        $this->coreParametersHelper   = $coreParametersHelper;
-        $this->doNotContact           = $doNotContact;
-        $this->groupModel             = $groupModel;
-        $this->filterOperatorProvider = $filterOperatorProvider;
+    public function __construct(private IpLookupHelper $ipLookupHelper, private LeadModel $leadModel, private FieldModel $leadFieldModel, private ListModel $listModel, private CompanyModel $companyModel, private CampaignModel $campaignModel, private CoreParametersHelper $coreParametersHelper, private DoNotContact $doNotContact, private PointGroupModel $groupModel, private FilterOperatorProvider $filterOperatorProvider)
+    {
     }
 
     /**
@@ -147,7 +80,7 @@ class CampaignSubscriber implements EventSubscriberInterface
     /**
      * Add event triggers and actions.
      */
-    public function onCampaignBuild(CampaignBuilderEvent $event)
+    public function onCampaignBuild(CampaignBuilderEvent $event): void
     {
         // Add actions
         $action = [
@@ -425,7 +358,7 @@ class CampaignSubscriber implements EventSubscriberInterface
         return $event->setResult(true);
     }
 
-    public function onCampaignTriggerActionAddToCompany(CampaignExecutionEvent $event)
+    public function onCampaignTriggerActionAddToCompany(CampaignExecutionEvent $event): void
     {
         if (!$event->checkContext('lead.addtocompany')) {
             return;
@@ -553,10 +486,10 @@ class CampaignSubscriber implements EventSubscriberInterface
                 $triggerDate = new \DateTime('now', new \DateTimeZone($this->coreParametersHelper->get('default_timezone')));
                 $interval    = substr($event->getConfig()['value'], 1); // remove 1st character + or -
 
-                if (false !== strpos($event->getConfig()['value'], '+P')) { // add date
+                if (str_contains($event->getConfig()['value'], '+P')) { // add date
                     $triggerDate->add(new \DateInterval($interval)); // add the today date with interval
                     $result = $this->compareDateValue($lead, $event, $triggerDate);
-                } elseif (false !== strpos($event->getConfig()['value'], '-P')) { // subtract date
+                } elseif (str_contains($event->getConfig()['value'], '-P')) { // subtract date
                     $triggerDate->sub(new \DateInterval($interval)); // subtract the today date with interval
                     $result = $this->compareDateValue($lead, $event, $triggerDate);
                 } elseif ('anniversary' === $event->getConfig()['value']) {

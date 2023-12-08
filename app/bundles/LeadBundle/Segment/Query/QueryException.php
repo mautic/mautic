@@ -7,20 +7,14 @@ namespace Mautic\LeadBundle\Segment\Query;
  */
 class QueryException extends \Doctrine\DBAL\Exception
 {
-    /**
-     * @return QueryException
-     */
-    public static function unknownAlias($alias, $registeredAliases)
+    public static function unknownAlias($alias, $registeredAliases): self
     {
         return new self("The given alias '".$alias."' is not part of ".
             'any FROM or JOIN clause table. The currently registered '.
             'aliases are: '.implode(', ', $registeredAliases).'.');
     }
 
-    /**
-     * @return QueryException
-     */
-    public static function nonUniqueAlias($alias, $registeredAliases)
+    public static function nonUniqueAlias($alias, $registeredAliases): self
     {
         return new self("The given alias '".$alias."' is not unique ".
             'in FROM and JOIN clause table. The currently registered '.

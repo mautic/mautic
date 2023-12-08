@@ -140,10 +140,8 @@ class DoNotContactRepository extends CommonRepository
 
     /**
      * @param array $contacts Array of contacts to filter by
-     *
-     * @return array
      */
-    public function getChannelList($channel, array $contacts = null)
+    public function getChannelList($channel, array $contacts = null): array
     {
         $q = $this->getEntityManager()->getConnection()->createQueryBuilder()
             ->from(MAUTIC_TABLE_PREFIX.'lead_donotcontact', 'dnc')

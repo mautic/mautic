@@ -83,7 +83,7 @@ abstract class SocialIntegration extends AbstractIntegration
      * @param array                                             $data
      * @param string                                            $formArea
      */
-    public function appendToForm(&$builder, $data, $formArea)
+    public function appendToForm(&$builder, $data, $formArea): void
     {
         if ('features' == $formArea) {
             $name     = strtolower($this->getName());
@@ -92,7 +92,7 @@ abstract class SocialIntegration extends AbstractIntegration
                 $builder->add('shareButton', $formType, [
                     'label'    => 'mautic.integration.form.sharebutton',
                     'required' => false,
-                    'data'     => (isset($data['shareButton'])) ? $data['shareButton'] : [],
+                    'data'     => $data['shareButton'] ?? [],
                 ]);
             }
         }
@@ -177,12 +177,11 @@ abstract class SocialIntegration extends AbstractIntegration
         return $fields;
     }
 
-    /**
-     * @param array $settings
-     */
     public function getFormCompanyFields($settings = [])
     {
         $settings['feature_settings']['objects'] = ['Company'];
+
+        return [];
     }
 
     /**

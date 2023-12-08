@@ -10,9 +10,6 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
-/**
- * Class FileController.
- */
 class FileController extends AjaxController
 {
     public const EDITOR_FROALA   = 'froala';
@@ -93,7 +90,6 @@ class FileController extends AjaxController
     public function deleteAction(Request $request, PathsHelper $pathsHelper)
     {
         $src       = InputHelper::clean($request->request->get('src'));
-        $response  = ['deleted' => false];
         $imagePath = $this->getMediaAbsolutePath($pathsHelper).'/'.basename($src);
 
         if (!file_exists($imagePath)) {
@@ -134,10 +130,8 @@ class FileController extends AjaxController
 
     /**
      * Get the Media directory full file system path.
-     *
-     * @return string
      */
-    public function getMediaUrl(Request $request)
+    public function getMediaUrl(Request $request): string
     {
         return $request->getScheme().'://'
             .$request->getHttpHost()

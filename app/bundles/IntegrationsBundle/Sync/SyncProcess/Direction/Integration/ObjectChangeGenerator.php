@@ -20,11 +20,6 @@ use Mautic\IntegrationsBundle\Sync\SyncProcess\Direction\Helper\ValueHelper;
 class ObjectChangeGenerator
 {
     /**
-     * @var ValueHelper
-     */
-    private $valueHelper;
-
-    /**
      * @var ReportDAO
      */
     private $syncReport;
@@ -49,9 +44,8 @@ class ObjectChangeGenerator
      */
     private $objectChange;
 
-    public function __construct(ValueHelper $valueHelper)
+    public function __construct(private ValueHelper $valueHelper)
     {
-        $this->valueHelper = $valueHelper;
     }
 
     /**
@@ -89,7 +83,7 @@ class ObjectChangeGenerator
                     $internalObject->getObject(),
                     (string) $internalObject->getObjectId()
                 ),
-                __CLASS__.':'.__FUNCTION__
+                self::class.':'.__FUNCTION__
             );
         } else {
             DebugLogger::log(
@@ -99,7 +93,7 @@ class ObjectChangeGenerator
                     $internalObject->getObject(),
                     (string) $internalObject->getObjectId()
                 ),
-                __CLASS__.':'.__FUNCTION__
+                self::class.':'.__FUNCTION__
             );
         }
 
@@ -128,7 +122,7 @@ class ObjectChangeGenerator
                 $this->internalObject->getObjectId(),
                 $fieldMappingDAO->getInternalField()
             );
-        } catch (FieldNotFoundException $e) {
+        } catch (FieldNotFoundException) {
             return;
         }
 
@@ -138,7 +132,7 @@ class ObjectChangeGenerator
                 $fieldState,
                 $fieldMappingDAO->getSyncDirection()
             );
-        } catch (InvalidValueException $e) {
+        } catch (InvalidValueException) {
             return; // Field has to be skipped
         }
 
@@ -163,7 +157,7 @@ class ObjectChangeGenerator
                     $fieldMappingDAO->getIntegrationField(),
                     $fieldState
                 ),
-                __CLASS__.':'.__FUNCTION__
+                self::class.':'.__FUNCTION__
             );
 
             return;
@@ -180,7 +174,7 @@ class ObjectChangeGenerator
                 $fieldMappingDAO->getIntegrationField(),
                 var_export($newValue->getNormalizedValue(), true)
             ),
-            __CLASS__.':'.__FUNCTION__
+            self::class.':'.__FUNCTION__
         );
     }
 }

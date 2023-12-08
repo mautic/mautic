@@ -24,20 +24,8 @@ class SyncIntegrationsHelper
      */
     private $enabled;
 
-    /**
-     * @var IntegrationsHelper
-     */
-    private $integrationsHelper;
-
-    /**
-     * @var ObjectProvider
-     */
-    private $objectProvider;
-
-    public function __construct(IntegrationsHelper $integrationsHelper, ObjectProvider $objectProvider)
+    public function __construct(private IntegrationsHelper $integrationsHelper, private ObjectProvider $objectProvider)
     {
-        $this->integrationsHelper = $integrationsHelper;
-        $this->objectProvider     = $objectProvider;
     }
 
     public function addIntegration(SyncInterface $integration): void
@@ -78,7 +66,7 @@ class SyncIntegrationsHelper
                 if ($integrationConfiguration->getIsPublished()) {
                     $this->enabled[] = $name;
                 }
-            } catch (IntegrationNotFoundException $exception) {
+            } catch (IntegrationNotFoundException) {
                 // Just ignore as the plugin hasn't been installed yet
             }
         }
@@ -122,7 +110,7 @@ class SyncIntegrationsHelper
                         return true;
                     }
                 }
-            } catch (ObjectNotFoundException $exception) {
+            } catch (ObjectNotFoundException) {
                 // Object is not supported so just continue
             }
         }

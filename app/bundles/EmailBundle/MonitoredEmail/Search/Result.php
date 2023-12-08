@@ -63,9 +63,9 @@ class Result
     }
 
     /**
-     * @return Lead[]
+     * @param Lead[] $contacts
      */
-    public function setContacts(array $contacts)
+    public function setContacts(array $contacts): void
     {
         $this->contacts = $contacts;
     }

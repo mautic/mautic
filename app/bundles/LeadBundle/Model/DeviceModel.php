@@ -25,16 +25,8 @@ use Symfony\Contracts\EventDispatcher\Event;
  */
 class DeviceModel extends FormModel
 {
-    /**
-     * @var LeadDeviceRepository
-     */
-    private $leadDeviceRepository;
-
-    /**
-     * DeviceModel constructor.
-     */
     public function __construct(
-        LeadDeviceRepository $leadDeviceRepository,
+        private LeadDeviceRepository $leadDeviceRepository,
         EntityManager $em,
         CorePermissions $security,
         EventDispatcherInterface $dispatcher,
@@ -44,8 +36,6 @@ class DeviceModel extends FormModel
         LoggerInterface $mauticLogger,
         CoreParametersHelper $coreParametersHelper
     ) {
-        $this->leadDeviceRepository = $leadDeviceRepository;
-
         parent::__construct($em, $security, $dispatcher, $router, $translator, $userHelper, $mauticLogger, $coreParametersHelper);
     }
 
@@ -61,10 +51,8 @@ class DeviceModel extends FormModel
 
     /**
      * {@inheritdoc}
-     *
-     * @return string
      */
-    public function getPermissionBase()
+    public function getPermissionBase(): string
     {
         return 'lead:leads';
     }
@@ -111,7 +99,7 @@ class DeviceModel extends FormModel
      *
      * @throws \Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException
      */
-    protected function dispatchEvent($action, &$entity, $isNew = false, Event $event = null)
+    protected function dispatchEvent($action, &$entity, $isNew = false, Event $event = null): ?Event
     {
         if (!$entity instanceof LeadDevice) {
             throw new MethodNotAllowedHttpException(['LeadDevice']);

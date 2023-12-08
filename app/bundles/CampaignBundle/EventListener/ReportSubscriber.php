@@ -14,14 +14,8 @@ class ReportSubscriber implements EventSubscriberInterface
 {
     public const CONTEXT_CAMPAIGN_LEAD_EVENT_LOG = 'campaign_lead_event_log';
 
-    /**
-     * @var CompanyReportData
-     */
-    private $companyReportData;
-
-    public function __construct(CompanyReportData $companyReportData)
+    public function __construct(private CompanyReportData $companyReportData)
     {
-        $this->companyReportData = $companyReportData;
     }
 
     /**
@@ -39,7 +33,7 @@ class ReportSubscriber implements EventSubscriberInterface
     /**
      * Add available tables and columns to the report builder lookup.
      */
-    public function onReportBuilder(ReportBuilderEvent $event)
+    public function onReportBuilder(ReportBuilderEvent $event): void
     {
         if (!$event->checkContext(self::CONTEXT_CAMPAIGN_LEAD_EVENT_LOG)) {
             return;
@@ -167,7 +161,7 @@ class ReportSubscriber implements EventSubscriberInterface
     /**
      * Initialize the QueryBuilder object to generate reports from.
      */
-    public function onReportGenerate(ReportGeneratorEvent $event)
+    public function onReportGenerate(ReportGeneratorEvent $event): void
     {
         if (!$event->checkContext(self::CONTEXT_CAMPAIGN_LEAD_EVENT_LOG)) {
             return;
@@ -197,7 +191,7 @@ class ReportSubscriber implements EventSubscriberInterface
     /**
      * Initialize the QueryBuilder object to generate reports from.
      */
-    public function onReportGraphGenerate(ReportGraphEvent $event)
+    public function onReportGraphGenerate(ReportGraphEvent $event): void
     {
         if (!$event->checkContext(self::CONTEXT_CAMPAIGN_LEAD_EVENT_LOG)) {
             return;

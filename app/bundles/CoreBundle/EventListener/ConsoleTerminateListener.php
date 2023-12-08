@@ -5,22 +5,13 @@ namespace Mautic\CoreBundle\EventListener;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Console\Event\ConsoleTerminateEvent;
 
-/**
- * Class ConsoleTerminateListener.
- */
 class ConsoleTerminateListener
 {
-    /**
-     * @var LoggerInterface
-     */
-    private $logger;
-
-    public function __construct(LoggerInterface $logger)
+    public function __construct(private LoggerInterface $logger)
     {
-        $this->logger = $logger;
     }
 
-    public function onConsoleTerminate(ConsoleTerminateEvent $event)
+    public function onConsoleTerminate(ConsoleTerminateEvent $event): void
     {
         $statusCode = $event->getExitCode();
         $command    = $event->getCommand();

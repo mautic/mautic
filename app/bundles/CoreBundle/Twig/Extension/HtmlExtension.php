@@ -44,7 +44,7 @@ final class HtmlExtension extends AbstractExtension
 
         try {
             $attributes = current((array) new \SimpleXMLElement("<element $attributes />"));
-        } catch (\Exception $e) {
+        } catch (\Exception) {
             return [];
         }
 
@@ -55,7 +55,7 @@ final class HtmlExtension extends AbstractExtension
         foreach ($attributes as $attr => $value) {
             $value = trim($value);
 
-            if (false !== strpos($value, ' ')) {
+            if (str_contains($value, ' ')) {
                 $dirty = explode(' ', $value);
                 foreach ($dirty as $i => $v) {
                     if (empty($v)) {

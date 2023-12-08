@@ -11,16 +11,13 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 final class FieldCollector implements FieldCollectorInterface
 {
-    private EventDispatcherInterface $dispatcher;
-
     /**
      * @var FieldCollection[]
      */
     private array $fieldCollections = [];
 
-    public function __construct(EventDispatcherInterface $dispatcher)
+    public function __construct(private EventDispatcherInterface $dispatcher)
     {
-        $this->dispatcher = $dispatcher;
     }
 
     public function getFields(string $object): FieldCollection

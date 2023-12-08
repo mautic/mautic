@@ -9,20 +9,8 @@ use Mautic\LeadBundle\Segment\Decorator\FilterDecoratorInterface;
 
 abstract class DateOptionAbstract implements FilterDecoratorInterface
 {
-    /**
-     * @var DateDecorator
-     */
-    protected $dateDecorator;
-
-    /**
-     * @var DateOptionParameters
-     */
-    protected $dateOptionParameters;
-
-    public function __construct(DateDecorator $dateDecorator, DateOptionParameters $dateOptionParameters)
+    public function __construct(protected DateDecorator $dateDecorator, protected DateOptionParameters $dateOptionParameters)
     {
-        $this->dateDecorator        = $dateDecorator;
-        $this->dateOptionParameters = $dateOptionParameters;
     }
 
     /**
@@ -124,10 +112,7 @@ abstract class DateOptionAbstract implements FilterDecoratorInterface
         return $this->dateDecorator->getQueryType($contactSegmentFilterCrate);
     }
 
-    /**
-     * @return bool|string
-     */
-    public function getAggregateFunc(ContactSegmentFilterCrate $contactSegmentFilterCrate)
+    public function getAggregateFunc(ContactSegmentFilterCrate $contactSegmentFilterCrate): string|bool
     {
         return $this->dateDecorator->getAggregateFunc($contactSegmentFilterCrate);
     }

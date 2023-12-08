@@ -100,7 +100,7 @@ class FocusSubscriber implements EventSubscriberInterface
     /*
      * Check and hijack the form's generate link if the ID has mf- in it
      */
-    public function onKernelRequest(RequestEvent $event)
+    public function onKernelRequest(RequestEvent $event): void
     {
         if ($event->isMainRequest()) {
             // get the current event request
@@ -109,9 +109,9 @@ class FocusSubscriber implements EventSubscriberInterface
 
             $formGenerateUrl = $this->router->generate('mautic_form_generateform');
 
-            if (false !== strpos($requestUri, $formGenerateUrl)) {
+            if (str_contains($requestUri, $formGenerateUrl)) {
                 $id = InputHelper::_($this->requestStack->getCurrentRequest()->get('id'));
-                if (0 === strpos($id, 'mf-')) {
+                if (str_starts_with($id, 'mf-')) {
                     $mfId             = str_replace('mf-', '', $id);
                     $focusGenerateUrl = $this->router->generate('mautic_focus_generate', ['id' => $mfId]);
 
@@ -124,7 +124,7 @@ class FocusSubscriber implements EventSubscriberInterface
     /**
      * Add an entry to the audit log.
      */
-    public function onFocusPostSave(FocusEvent $event)
+    public function onFocusPostSave(FocusEvent $event): void
     {
         $entity = $event->getFocus();
         if ($details = $event->getChanges()) {
@@ -143,7 +143,7 @@ class FocusSubscriber implements EventSubscriberInterface
     /**
      * Add a delete entry to the audit log.
      */
-    public function onFocusDelete(FocusEvent $event)
+    public function onFocusDelete(FocusEvent $event): void
     {
         $entity = $event->getFocus();
         $log    = [
@@ -157,7 +157,7 @@ class FocusSubscriber implements EventSubscriberInterface
         $this->auditLogModel->writeToLog($log);
     }
 
-    public function onTokenReplacement(MauticEvents\TokenReplacementEvent $event)
+    public function onTokenReplacement(MauticEvents\TokenReplacementEvent $event): void
     {
         /** @var Lead $lead */
         $lead         = $event->getLead();
@@ -174,7 +174,7 @@ class FocusSubscriber implements EventSubscriberInterface
                 $tokens = array_merge($tokens, TokenHelper::findLeadTokens($content, $lead->getProfileFields()));
             }
 
-            list($content, $trackables) = $this->trackableModel->parseContentForTrackables(
+            [$content, $trackables] = $this->trackableModel->parseContentForTrackables(
                 $content,
                 $tokens,
                 'focus',
@@ -184,7 +184,7 @@ class FocusSubscriber implements EventSubscriberInterface
             $focus = $this->focusModel->getEntity($clickthrough['focus_id']);
 
             /**
-             * @var string
+             * @var string    $token
              * @var Trackable $trackable
              */
             foreach ($trackables as $token => $trackable) {

@@ -17,24 +17,12 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 class FieldValidationHelper
 {
     /**
-     * @var FieldHelper
-     */
-    private $fieldHelper;
-
-    /**
-     * @var TranslatorInterface
-     */
-    private $translator;
-
-    /**
      * @var ConfigFormSyncInterface|BasicInterface
      */
     private $integrationObject;
 
-    public function __construct(FieldHelper $fieldHelper, TranslatorInterface $translator)
+    public function __construct(private FieldHelper $fieldHelper, private TranslatorInterface $translator)
     {
-        $this->fieldHelper = $fieldHelper;
-        $this->translator  = $translator;
     }
 
     /**

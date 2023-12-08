@@ -10,17 +10,8 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class StopSubscriber implements EventSubscriberInterface
 {
-    /**
-     * @var DoNotContactModel
-     */
-    private $doNotContactModel;
-
-    /**
-     * StopSubscriber constructor.
-     */
-    public function __construct(DoNotContactModel $doNotContactModel)
+    public function __construct(private DoNotContactModel $doNotContactModel)
     {
-        $this->doNotContactModel         = $doNotContactModel;
     }
 
     /**
@@ -33,7 +24,7 @@ class StopSubscriber implements EventSubscriberInterface
         ];
     }
 
-    public function onReply(ReplyEvent $event)
+    public function onReply(ReplyEvent $event): void
     {
         $message = $event->getMessage();
 

@@ -23,12 +23,10 @@ use Symfony\Component\Mailer\MailerInterface;
 use Symfony\Component\Mailer\Transport\TransportInterface;
 use Symfony\Component\Mime\Address;
 use Symfony\Component\Mime\Header\HeaderInterface;
+use Symfony\Component\Mime\Header\UnstructuredHeader;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Twig\Environment;
 
-/**
- * Class MailHelper.
- */
 class MailHelper
 {
     public const QUEUE_RESET_TO           = 'RESET_TO';
@@ -42,8 +40,6 @@ class MailHelper
      * @var MauticFactory
      */
     protected $factory;
-
-    protected MailerInterface $mailer;
 
     protected $transport;
 
@@ -233,10 +229,9 @@ class MailHelper
      */
     private $embedImagesReplaces = [];
 
-    public function __construct(MauticFactory $factory, MailerInterface $mailer, $from = null)
+    public function __construct(MauticFactory $factory, protected MailerInterface $mailer, $from = null)
     {
         $this->factory   = $factory;
-        $this->mailer    = $mailer;
         $this->transport = $this->getTransport();
 
         $systemFromEmail    = $factory->getParameter('mailer_from_email');
@@ -392,17 +387,15 @@ class MailHelper
             }
 
             // Attach assets
-            if (!empty($this->assets)) {
-                /** @var \Mautic\AssetBundle\Entity\Asset $asset */
-                foreach ($this->assets as $asset) {
-                    if (!in_array($asset->getId(), $this->attachedAssets)) {
-                        $this->attachedAssets[] = $asset->getId();
-                        $this->attachFile(
-                            $asset->getFilePath(),
-                            $asset->getOriginalFileName(),
-                            $asset->getMime()
-                        );
-                    }
+            /** @var \Mautic\AssetBundle\Entity\Asset $asset */
+            foreach ($this->assets as $asset) {
+                if (!in_array($asset->getId(), $this->attachedAssets)) {
+                    $this->attachedAssets[] = $asset->getId();
+                    $this->attachFile(
+                        $asset->getFilePath(),
+                        $asset->getOriginalFileName(),
+                        $asset->getMime()
+                    );
                 }
             }
 
@@ -611,7 +604,7 @@ class MailHelper
      *
      * @param bool $cleanSlate
      */
-    public function reset($cleanSlate = true)
+    public function reset($cleanSlate = true): void
     {
         $this->eventTokens      = [];
         $this->queuedRecipients = [];
@@ -654,7 +647,7 @@ class MailHelper
      * @param array $search
      * @param array $replace
      */
-    public static function searchReplaceTokens($search, $replace, MauticMessage &$message)
+    public static function searchReplaceTokens($search, $replace, MauticMessage &$message): void
     {
         // Body
         $body         = $message->getHtmlBody();
@@ -676,34 +669,13 @@ class MailHelper
         // Headers
         /** @var HeaderInterface $header */
         foreach ($message->getHeaders()->all() as $header) {
-            $headerBody = $header->getBody();
-            if ($headerBody instanceof \DateTimeInterface) {
-                // It's not possible to replace tokens in \DateTime objects
-                // because they can't contain tokens
+            // It only makes sense to tokenize headers that can be interpreted as text.
+            if (!$header instanceof UnstructuredHeader) {
                 continue;
             }
-
-            $updated = false;
-            if (is_array($headerBody)) {
-                $bodyReplaced = [];
-                foreach ($headerBody as $key => $value) {
-                    $count1             = $count2             = 0;
-                    $key                = is_string($key) ? str_ireplace($search, $replace, $key, $count1) : $key;
-                    $value              = is_string($value) ? str_ireplace($search, $replace, $value, $count2) : $value;
-                    $bodyReplaced[$key] = $value;
-                    if ($count1 + $count2) {
-                        $updated = true;
-                    }
-                }
-            } else {
-                $bodyReplaced = str_ireplace($search, $replace, $headerBody, $updated);
-            }
-
-            if (!empty($updated)) {
-                $header->setBody($bodyReplaced);
-            }
-
-            unset($headerBody, $bodyReplaced);
+            $headerBody   = $header->getBody();
+            $bodyReplaced = str_ireplace($search, $replace, $headerBody);
+            $header->setBody($bodyReplaced);
         }
 
         // Parts (plaintext)
@@ -715,10 +687,7 @@ class MailHelper
         }
     }
 
-    /**
-     * @return string
-     */
-    public static function getBlankPixel()
+    public static function getBlankPixel(): string
     {
         return 'data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=';
     }
@@ -731,7 +700,7 @@ class MailHelper
      * @param string $contentType
      * @param bool   $inline
      */
-    public function attachFile($filePath, $fileName = null, $contentType = null, $inline = false)
+    public function attachFile($filePath, $fileName = null, $contentType = null, $inline = false): void
     {
         if (true === $inline) {
             $this->message->embedFromPath($filePath, $fileName, $contentType);
@@ -744,7 +713,7 @@ class MailHelper
     /**
      * @param int|Asset $asset
      */
-    public function attachAsset($asset)
+    public function attachAsset($asset): void
     {
         $model = $this->factory->getModel('asset');
 
@@ -790,10 +759,7 @@ class MailHelper
         unset($content);
     }
 
-    /**
-     * Set subject.
-     */
-    public function setSubject($subject)
+    public function setSubject($subject): void
     {
         $this->subject = $subject;
     }
@@ -809,7 +775,7 @@ class MailHelper
     /**
      * Set a plain text part.
      */
-    public function setPlainText($content)
+    public function setPlainText($content): void
     {
         $this->plainText = $content;
 
@@ -844,12 +810,12 @@ class MailHelper
      * @param null   $charset
      * @param bool   $ignoreTrackingPixel
      */
-    public function setBody($content, $contentType = 'text/html', $charset = null, $ignoreTrackingPixel = false)
+    public function setBody($content, $contentType = 'text/html', $charset = null, $ignoreTrackingPixel = false): void
     {
         if (!$ignoreTrackingPixel && $this->factory->getParameter('mailer_append_tracking_pixel')) {
             // Append tracking pixel
             $trackingImg = '<img height="1" width="1" src="{tracking_pixel}" alt="" />';
-            if (false !== strpos($content, '</body>')) {
+            if (str_contains($content, '</body>')) {
                 $content = str_replace('</body>', $trackingImg.'</body>', $content);
             } else {
                 $content .= $trackingImg;
@@ -875,7 +841,7 @@ class MailHelper
         if (preg_match_all('/<img.+?src=[\"\'](.+?)[\"\'].*?>/i', $content, $matches) > 0) {
             foreach ($matches[1] as $match) {
                 // skip items that already embedded, or have token {tracking_pixel}
-                if (false !== strpos($match, 'cid:') || false !== strpos($match, '{tracking_pixel}') || array_key_exists($match, $this->embedImagesReplaces)) {
+                if (str_contains($match, 'cid:') || str_contains($match, '{tracking_pixel}') || array_key_exists($match, $this->embedImagesReplaces)) {
                     continue;
                 }
 
@@ -1114,7 +1080,7 @@ class MailHelper
      * @param array<string>|string $addresses
      * @param string               $name
      */
-    public function setReplyTo($addresses, $name = null)
+    public function setReplyTo($addresses, $name = null): void
     {
         try {
             $name      = $this->cleanName($name);
@@ -1132,7 +1098,7 @@ class MailHelper
      *
      * @param string $address
      */
-    public function setReturnPath($address)
+    public function setReturnPath($address): void
     {
         try {
             $this->message->returnPath($address);
@@ -1147,7 +1113,7 @@ class MailHelper
      * @param string|array $fromEmail
      * @param string       $fromName
      */
-    public function setFrom($fromEmail, $fromName = null)
+    public function setFrom($fromEmail, $fromName = null): void
     {
         $address = null;
 
@@ -1180,7 +1146,7 @@ class MailHelper
      * @param string|null $idHash
      * @param bool        $statToBeGenerated Pass false if a stat entry is not to be created
      */
-    public function setIdHash($idHash = null, $statToBeGenerated = true)
+    public function setIdHash($idHash = null, $statToBeGenerated = true): void
     {
         if (null === $idHash) {
             $idHash = str_replace('.', '', uniqid('', true));
@@ -1207,7 +1173,7 @@ class MailHelper
     /**
      * @param array|Lead $lead
      */
-    public function setLead($lead, $interalSend = false)
+    public function setLead($lead, $interalSend = false): void
     {
         $this->lead         = $lead;
         $this->internalSend = $interalSend;
@@ -1234,7 +1200,7 @@ class MailHelper
     /**
      * @param array $source
      */
-    public function setSource($source)
+    public function setSource($source): void
     {
         $this->source = $source;
     }
@@ -1265,7 +1231,7 @@ class MailHelper
      *
      * @return bool Returns false if there were errors with the email configuration
      */
-    public function setEmail(Email $email, $allowBcc = true, $slots = [], $assetAttachments = [], $ignoreTrackingPixel = false)
+    public function setEmail(Email $email, $allowBcc = true, $slots = [], $assetAttachments = [], $ignoreTrackingPixel = false): bool
     {
         if ($this->factory->getParameter(ConfigType::MINIFY_EMAIL_HTML)) {
             $email->setCustomHtml(InputHelper::minifyHTML($email->getCustomHtml()));
@@ -1386,7 +1352,7 @@ class MailHelper
      *
      * @param bool $merge
      */
-    public function setCustomHeaders(array $headers, $merge = true)
+    public function setCustomHeaders(array $headers, $merge = true): void
     {
         if ($merge) {
             $this->headers = array_merge($this->headers, $headers);
@@ -1397,7 +1363,7 @@ class MailHelper
         $this->headers = $headers;
     }
 
-    public function addCustomHeader($name, $value)
+    public function addCustomHeader($name, $value): void
     {
         $this->headers[$name] = $value;
     }
@@ -1418,7 +1384,7 @@ class MailHelper
         $listUnsubscribeHeader = $this->getUnsubscribeHeader();
         if ($listUnsubscribeHeader) {
             if (!empty($headers['List-Unsubscribe'])) {
-                if (false === strpos($headers['List-Unsubscribe'], $listUnsubscribeHeader)) {
+                if (!str_contains($headers['List-Unsubscribe'], $listUnsubscribeHeader)) {
                     // Ensure Mautic's is always part of this header
                     $headers['List-Unsubscribe'] .= ','.$listUnsubscribeHeader;
                 }
@@ -1451,25 +1417,20 @@ class MailHelper
     /**
      * Append tokens.
      */
-    public function addTokens(array $tokens)
+    public function addTokens(array $tokens): void
     {
         $this->globalTokens = array_merge($this->globalTokens, $tokens);
     }
 
-    /**
-     * Set tokens.
-     */
-    public function setTokens(array $tokens)
+    public function setTokens(array $tokens): void
     {
         $this->globalTokens = $tokens;
     }
 
     /**
-     * Get tokens.
-     *
-     * @return array
+     * @return mixed[]
      */
-    public function getTokens()
+    public function getTokens(): array
     {
         $tokens = array_merge($this->globalTokens, $this->eventTokens);
 
@@ -1502,7 +1463,7 @@ class MailHelper
      *
      * @param string $content
      */
-    public function parsePlainText($content = null)
+    public function parsePlainText($content = null): void
     {
         if (null == $content) {
             if (!$content = $this->message->getHtmlBody()) {
@@ -1523,7 +1484,7 @@ class MailHelper
      *
      * @param bool $enabled
      */
-    public function enableQueue($enabled = true)
+    public function enableQueue($enabled = true): void
     {
         if ($this->tokenizationEnabled) {
             $this->queueEnabled = $enabled;
@@ -1532,10 +1493,8 @@ class MailHelper
 
     /**
      * Dispatch send event to generate tokens.
-     *
-     * @return array
      */
-    public function dispatchSendEvent()
+    public function dispatchSendEvent(): void
     {
         if (null == $this->dispatcher) {
             $this->dispatcher = $this->factory->getDispatcher();
@@ -1605,7 +1564,7 @@ class MailHelper
     /**
      * Clears the errors from a previous send.
      */
-    public function clearErrors()
+    public function clearErrors(): void
     {
         $this->errors = [];
         $this->fatal  = false;
@@ -1723,7 +1682,7 @@ class MailHelper
     public function getTrackableLink($url)
     {
         // Ensure a valid URL and that it has not already been found
-        if ('http' !== substr($url, 0, 4) && 'ftp' !== substr($url, 0, 3)) {
+        if (!str_starts_with($url, 'http') && !str_starts_with($url, 'ftp')) {
             return null;
         }
 
@@ -1748,10 +1707,8 @@ class MailHelper
      * @param bool|true   $persist
      * @param string|null $emailAddress
      * @param null        $listId
-     *
-     * @return Stat
      */
-    public function createEmailStat($persist = true, $emailAddress = null, $listId = null)
+    public function createEmailStat($persist = true, $emailAddress = null, $listId = null): Stat
     {
         // create a stat
         $stat = new Stat();
@@ -1762,7 +1719,7 @@ class MailHelper
         if (null !== $this->lead) {
             try {
                 $stat->setLead($this->factory->getEntityManager()->getReference(\Mautic\LeadBundle\Entity\Lead::class, $this->lead['id']));
-            } catch (ORMException $exception) {
+            } catch (ORMException) {
                 // keep IDE happy
             }
             $emailAddress = $this->lead['email'];
@@ -1784,7 +1741,7 @@ class MailHelper
         if (null !== $listId) {
             try {
                 $stat->setList($this->factory->getEntityManager()->getReference(\Mautic\LeadBundle\Entity\LeadList::class, $listId));
-            } catch (ORMException $exception) {
+            } catch (ORMException) {
                 // keep IDE happy
             }
         }
@@ -1825,7 +1782,7 @@ class MailHelper
         if (isset($this->copies[$id])) {
             try {
                 $stat->setStoredCopy($this->factory->getEntityManager()->getReference(\Mautic\EmailBundle\Entity\Copy::class, $this->copies[$id]));
-            } catch (ORMException $exception) {
+            } catch (ORMException) {
                 // keep IDE happy
             }
         }
@@ -1905,7 +1862,7 @@ class MailHelper
     /**
      * @param Email $entity
      */
-    public function processSlots($slots, $entity)
+    public function processSlots($slots, $entity): void
     {
         /** @var \Mautic\CoreBundle\Twig\Helper\SlotsHelper $slotsHelper */
         $slotsHelper = $this->factory->getHelper('template.slots');
@@ -1918,7 +1875,7 @@ class MailHelper
                 $slotConfig = [];
             }
 
-            $value = isset($content[$slot]) ? $content[$slot] : '';
+            $value = $content[$slot] ?? '';
             $slotsHelper->set($slot, $value);
         }
     }
@@ -2008,7 +1965,7 @@ class MailHelper
     /**
      * Merge system headers into custom headers if applicable.
      */
-    private function setMessageHeaders()
+    private function setMessageHeaders(): void
     {
         $headers = $this->getCustomHeaders();
 
@@ -2031,10 +1988,7 @@ class MailHelper
         }
     }
 
-    /**
-     * @return array
-     */
-    private function buildMetadata($name, array $tokens)
+    private function buildMetadata($name, array $tokens): array
     {
         return [
             'name'        => $name,
@@ -2067,7 +2021,7 @@ class MailHelper
         }
     }
 
-    private function setDefaultFrom($overrideFrom, array $systemFrom)
+    private function setDefaultFrom($overrideFrom, array $systemFrom): void
     {
         if (is_array($overrideFrom)) {
             $fromEmail    = key($overrideFrom);
@@ -2081,7 +2035,7 @@ class MailHelper
         $this->from       = $this->systemFrom;
     }
 
-    private function setDefaultReplyTo($systemReplyToEmail = null, $systemFromEmail = null)
+    private function setDefaultReplyTo($systemReplyToEmail = null, $systemFromEmail = null): void
     {
         $fromEmail = null;
         if (is_array($systemFromEmail)) {

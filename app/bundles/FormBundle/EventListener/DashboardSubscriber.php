@@ -39,32 +39,14 @@ class DashboardSubscriber extends MainDashboardSubscriber
         'form:forms:viewother',
     ];
 
-    /**
-     * @var SubmissionModel
-     */
-    protected $formSubmissionModel;
-
-    /**
-     * @var FormModel
-     */
-    protected $formModel;
-
-    /**
-     * @var RouterInterface
-     */
-    private $router;
-
-    public function __construct(SubmissionModel $formSubmissionModel, FormModel $formModel, RouterInterface $router)
+    public function __construct(protected SubmissionModel $formSubmissionModel, protected FormModel $formModel, private RouterInterface $router)
     {
-        $this->formModel           = $formModel;
-        $this->formSubmissionModel = $formSubmissionModel;
-        $this->router              = $router;
     }
 
     /**
      * Set a widget detail when needed.
      */
-    public function onWidgetDetailGenerate(WidgetDetailEvent $event)
+    public function onWidgetDetailGenerate(WidgetDetailEvent $event): void
     {
         $this->checkPermissions($event);
         $canViewOthers = $event->hasPermission('form:forms:viewother');
@@ -106,21 +88,19 @@ class DashboardSubscriber extends MainDashboardSubscriber
                 $items     = [];
 
                 // Build table rows with links
-                if ($referrers) {
-                    foreach ($referrers as &$referrer) {
-                        $row = [
-                            [
-                                'value'    => $referrer['referer'],
-                                'type'     => 'link',
-                                'external' => true,
-                                'link'     => $referrer['referer'],
-                            ],
-                            [
-                                'value' => $referrer['submissions'],
-                            ],
-                        ];
-                        $items[] = $row;
-                    }
+                foreach ($referrers as &$referrer) {
+                    $row = [
+                        [
+                            'value'    => $referrer['referer'],
+                            'type'     => 'link',
+                            'external' => true,
+                            'link'     => $referrer['referer'],
+                        ],
+                        [
+                            'value' => $referrer['submissions'],
+                        ],
+                    ];
+                    $items[] = $row;
                 }
 
                 $event->setTemplateData([
@@ -152,28 +132,26 @@ class DashboardSubscriber extends MainDashboardSubscriber
                 $items      = [];
 
                 // Build table rows with links
-                if ($submitters) {
-                    foreach ($submitters as &$submitter) {
-                        $name    = $submitter['lead_id'];
-                        $leadUrl = $this->router->generate('mautic_contact_action', ['objectAction' => 'view', 'objectId' => $submitter['lead_id']]);
-                        if ($submitter['firstname'] || $submitter['lastname']) {
-                            $name = trim($submitter['firstname'].' '.$submitter['lastname']);
-                        } elseif ($submitter['email']) {
-                            $name = $submitter['email'];
-                        }
-
-                        $row = [
-                            [
-                                'value' => $name,
-                                'type'  => 'link',
-                                'link'  => $leadUrl,
-                            ],
-                            [
-                                'value' => $submitter['submissions'],
-                            ],
-                        ];
-                        $items[] = $row;
+                foreach ($submitters as &$submitter) {
+                    $name    = $submitter['lead_id'];
+                    $leadUrl = $this->router->generate('mautic_contact_action', ['objectAction' => 'view', 'objectId' => $submitter['lead_id']]);
+                    if ($submitter['firstname'] || $submitter['lastname']) {
+                        $name = trim($submitter['firstname'].' '.$submitter['lastname']);
+                    } elseif ($submitter['email']) {
+                        $name = $submitter['email'];
                     }
+
+                    $row = [
+                        [
+                            'value' => $name,
+                            'type'  => 'link',
+                            'link'  => $leadUrl,
+                        ],
+                        [
+                            'value' => $submitter['submissions'],
+                        ],
+                    ];
+                    $items[] = $row;
                 }
 
                 $event->setTemplateData([
@@ -205,18 +183,16 @@ class DashboardSubscriber extends MainDashboardSubscriber
                 $items = [];
 
                 // Build table rows with links
-                if ($forms) {
-                    foreach ($forms as &$form) {
-                        $formUrl = $this->router->generate('mautic_form_action', ['objectAction' => 'view', 'objectId' => $form['id']]);
-                        $row     = [
-                            [
-                                'value' => $form['name'],
-                                'type'  => 'link',
-                                'link'  => $formUrl,
-                            ],
-                        ];
-                        $items[] = $row;
-                    }
+                foreach ($forms as &$form) {
+                    $formUrl = $this->router->generate('mautic_form_action', ['objectAction' => 'view', 'objectId' => $form['id']]);
+                    $row     = [
+                        [
+                            'value' => $form['name'],
+                            'type'  => 'link',
+                            'link'  => $formUrl,
+                        ],
+                    ];
+                    $items[] = $row;
                 }
 
                 $event->setTemplateData([

@@ -6,17 +6,12 @@ use Doctrine\ORM\Mapping as ORM;
 use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 
-/**
- * Class IpAddress.
- */
 class IpAddress
 {
     /**
      * Set by factory of configured IPs to not track.
-     *
-     * @var array
      */
-    private $doNotTrack = [];
+    private array $doNotTrack = [];
 
     /**
      * @var int
@@ -24,21 +19,16 @@ class IpAddress
     private $id;
 
     /**
-     * @var string
-     */
-    private $ipAddress;
-
-    /**
      * @var array<string,string>
      */
     private $ipDetails;
 
-    public static function loadMetadata(ORM\ClassMetadata $metadata)
+    public static function loadMetadata(ORM\ClassMetadata $metadata): void
     {
         $builder = new ClassMetadataBuilder($metadata);
 
         $builder->setTable('ip_addresses')
-            ->setCustomRepositoryClass('Mautic\CoreBundle\Entity\IpAddressRepository')
+            ->setCustomRepositoryClass(\Mautic\CoreBundle\Entity\IpAddressRepository::class)
             ->addIndex(['ip_address'], 'ip_search');
 
         $builder->addId();
@@ -57,7 +47,7 @@ class IpAddress
     /**
      * Prepares the metadata for API usage.
      */
-    public static function loadApiMetadata(ApiMetadataDriver $metadata)
+    public static function loadApiMetadata(ApiMetadataDriver $metadata): void
     {
         $metadata->setGroupPrefix('ipAddress')
             ->addListProperties(
@@ -81,9 +71,8 @@ class IpAddress
      *
      * @param string|null $ipAddress
      */
-    public function __construct($ipAddress = null)
+    public function __construct(private $ipAddress = null)
     {
-        $this->ipAddress = $ipAddress;
     }
 
     /**
@@ -145,7 +134,7 @@ class IpAddress
     /**
      * Set list of IPs to not track.
      */
-    public function setDoNotTrackList(array $ips)
+    public function setDoNotTrackList(array $ips): void
     {
         $this->doNotTrack = $ips;
     }
@@ -163,33 +152,31 @@ class IpAddress
     /**
      * Determine if this IP is trackable.
      */
-    public function isTrackable()
+    public function isTrackable(): bool
     {
-        if (!empty($this->doNotTrack)) {
-            foreach ($this->doNotTrack as $ip) {
-                if (false !== strpos($ip, '/')) {
-                    // has a netmask range
-                    // https://gist.github.com/tott/7684443
-                    list($range, $netmask) = explode('/', $ip, 2);
-                    $range_decimal         = ip2long($range);
-                    $ip_decimal            = ip2long($this->ipAddress);
-                    $wildcard_decimal      = pow(2, 32 - $netmask) - 1;
-                    $netmask_decimal       = ~$wildcard_decimal;
+        foreach ($this->doNotTrack as $ip) {
+            if (str_contains($ip, '/')) {
+                // has a netmask range
+                // https://gist.github.com/tott/7684443
+                [$range, $netmask]     = explode('/', $ip, 2);
+                $range_decimal         = ip2long($range);
+                $ip_decimal            = ip2long($this->ipAddress);
+                $wildcard_decimal      = 2 ** (32 - $netmask) - 1;
+                $netmask_decimal       = ~$wildcard_decimal;
 
-                    if (($ip_decimal & $netmask_decimal) == ($range_decimal & $netmask_decimal)) {
-                        return false;
-                    }
-
-                    continue;
-                }
-
-                if ($ip === $this->ipAddress) {
+                if (($ip_decimal & $netmask_decimal) == ($range_decimal & $netmask_decimal)) {
                     return false;
                 }
 
-                if (preg_match('/'.str_replace('.', '\\.', $ip).'/', $this->ipAddress)) {
-                    return false;
-                }
+                continue;
+            }
+
+            if ($ip === $this->ipAddress) {
+                return false;
+            }
+
+            if (preg_match('/'.str_replace('.', '\\.', $ip).'/', $this->ipAddress)) {
+                return false;
             }
         }
 

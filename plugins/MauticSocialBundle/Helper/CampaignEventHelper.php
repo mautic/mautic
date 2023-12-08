@@ -11,9 +11,6 @@ use Mautic\PageBundle\Model\TrackableModel;
 use Mautic\PluginBundle\Helper\IntegrationHelper;
 use MauticPlugin\MauticSocialBundle\Model\TweetModel;
 
-/**
- * Class CampaignEventHelper.
- */
 class CampaignEventHelper
 {
     /**
@@ -46,9 +43,6 @@ class CampaignEventHelper
      */
     protected $clickthrough = [];
 
-    /**
-     * CampaignEventHelper constructor.
-     */
     public function __construct(
         IntegrationHelper $integrationHelper,
         TrackableModel $trackableModel,
@@ -122,13 +116,13 @@ class CampaignEventHelper
      * @param array  $lead
      * @param int    $channelId
      *
-     * @return string
+     * @return string|string[]
      */
-    protected function parseTweetText($text, $lead, $channelId = -1)
+    protected function parseTweetText($text, $lead, $channelId = -1): array|string
     {
         $tweetHandle = $lead['twitter'];
         $tokens      = [
-            '{twitter_handle}' => (false !== strpos($tweetHandle, '@')) ? $tweetHandle : "@$tweetHandle",
+            '{twitter_handle}' => (str_contains($tweetHandle, '@')) ? $tweetHandle : "@$tweetHandle",
         ];
 
         $tokens = array_merge(
@@ -138,7 +132,7 @@ class CampaignEventHelper
             $this->assetTokenHelper->findAssetTokens($text, $this->clickthrough)
         );
 
-        list($text, $trackables) = $this->trackableModel->parseContentForTrackables(
+        [$text, $trackables] = $this->trackableModel->parseContentForTrackables(
             $text,
             $tokens,
             'social_twitter',
@@ -146,7 +140,7 @@ class CampaignEventHelper
         );
 
         /**
-         * @var string
+         * @var string    $token
          * @var Trackable $trackable
          */
         foreach ($trackables as $token => $trackable) {

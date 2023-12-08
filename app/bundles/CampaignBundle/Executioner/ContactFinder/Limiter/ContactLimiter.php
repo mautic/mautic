@@ -4,15 +4,9 @@ namespace Mautic\CampaignBundle\Executioner\ContactFinder\Limiter;
 
 use Mautic\CampaignBundle\Executioner\Exception\NoContactsFoundException;
 
-/**
- * Class ContactLimiter.
- */
 class ContactLimiter
 {
-    /**
-     * @var int|null
-     */
-    private $batchLimit;
+    private int $batchLimit;
 
     /**
      * @var int|null
@@ -35,11 +29,6 @@ class ContactLimiter
     private $maxContactId;
 
     /**
-     * @var array
-     */
-    private $contactIdList;
-
-    /**
      * @var int|null
      */
     private $threadId;
@@ -60,8 +49,6 @@ class ContactLimiter
     private $campaignLimitUsed;
 
     /**
-     * ContactLimiter constructor.
-     *
      * @param int      $batchLimit
      * @param int|null $contactId
      * @param int|null $minContactId
@@ -75,7 +62,7 @@ class ContactLimiter
         $contactId = null,
         $minContactId = null,
         $maxContactId = null,
-        array $contactIdList = [],
+        private array $contactIdList = [],
         $threadId = null,
         $maxThreads = null,
         $campaignLimit = null
@@ -84,7 +71,6 @@ class ContactLimiter
         $this->contactId     = ($contactId) ? (int) $contactId : null;
         $this->minContactId  = ($minContactId) ? (int) $minContactId : null;
         $this->maxContactId  = ($maxContactId) ? (int) $maxContactId : null;
-        $this->contactIdList = $contactIdList;
 
         if ($threadId && $maxThreads) {
             $this->threadId     = (int) $threadId;
@@ -101,10 +87,7 @@ class ContactLimiter
         }
     }
 
-    /**
-     * @return int
-     */
-    public function getBatchLimit()
+    public function getBatchLimit(): int
     {
         return $this->batchLimit;
     }
@@ -122,7 +105,7 @@ class ContactLimiter
      */
     public function getMinContactId()
     {
-        return ($this->batchMinContactId) ? $this->batchMinContactId : $this->minContactId;
+        return $this->batchMinContactId ?: $this->minContactId;
     }
 
     /**
@@ -204,10 +187,7 @@ class ContactLimiter
         return $this->campaignLimit;
     }
 
-    /**
-     * @return bool
-     */
-    public function hasCampaignLimit()
+    public function hasCampaignLimit(): bool
     {
         return null !== $this->campaignLimit;
     }

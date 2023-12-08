@@ -17,30 +17,27 @@ class MarketplacePermissions extends AbstractPermissions
     public const CAN_INSTALL_PACKAGES = self::BASE.':'.self::PACKAGES.':create';
     public const CAN_REMOVE_PACKAGES  = self::BASE.':'.self::PACKAGES.':remove';
 
-    private Config $config;
-
-    public function __construct(CoreParametersHelper $coreParametersHelper, Config $config)
+    public function __construct(CoreParametersHelper $coreParametersHelper, private Config $config)
     {
         parent::__construct($coreParametersHelper->all());
-        $this->config = $config;
     }
 
-    public function definePermissions()
+    public function definePermissions(): void
     {
         $this->addStandardPermissions(self::PACKAGES, false);
     }
 
-    public function isEnabled()
+    public function isEnabled(): bool
     {
         return $this->config->marketplaceIsEnabled();
     }
 
-    public function getName()
+    public function getName(): string
     {
         return self::BASE;
     }
 
-    public function buildForm(FormBuilderInterface &$builder, array $options, array $data)
+    public function buildForm(FormBuilderInterface &$builder, array $options, array $data): void
     {
         $this->addStandardFormFields(self::BASE, self::PACKAGES, $builder, $data, false);
     }

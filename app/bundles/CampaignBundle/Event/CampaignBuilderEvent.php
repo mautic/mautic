@@ -27,23 +27,14 @@ class CampaignBuilderEvent extends Event
     private $actions = [];
 
     /**
-     * @var TranslatorInterface
-     */
-    private $translator;
-
-    /**
      * Holds info if some property has been already sorted or not.
      *
      * @var array
      */
     private $sortCache = [];
 
-    /**
-     * CampaignBuilderEvent constructor.
-     */
-    public function __construct(TranslatorInterface $translator)
+    public function __construct(private TranslatorInterface $translator)
     {
-        $this->translator = $translator;
     }
 
     /**
@@ -205,7 +196,7 @@ class CampaignBuilderEvent extends Event
         if (empty($this->sortCache[$property])) {
             uasort(
                 $this->{$property},
-                function ($a, $b) {
+                function ($a, $b): int {
                     return strnatcasecmp(
                         $a['label'],
                         $b['label']

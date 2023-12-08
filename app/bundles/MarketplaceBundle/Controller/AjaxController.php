@@ -24,16 +24,8 @@ use Symfony\Component\HttpFoundation\RequestStack;
 
 class AjaxController extends CommonAjaxController
 {
-    private ComposerHelper $composer;
-    private CacheHelper $cacheHelper;
-    private LoggerInterface $logger;
-
-    public function __construct(ComposerHelper $composer, CacheHelper $cacheHelper, LoggerInterface $logger, ManagerRegistry $doctrine, MauticFactory $factory, ModelFactory $modelFactory, UserHelper $userHelper, CoreParametersHelper $coreParametersHelper, EventDispatcherInterface $dispatcher, Translator $translator, FlashBag $flashBag, RequestStack $requestStack, CorePermissions $security)
+    public function __construct(private ComposerHelper $composer, private CacheHelper $cacheHelper, private LoggerInterface $logger, ManagerRegistry $doctrine, MauticFactory $factory, ModelFactory $modelFactory, UserHelper $userHelper, CoreParametersHelper $coreParametersHelper, EventDispatcherInterface $dispatcher, Translator $translator, FlashBag $flashBag, RequestStack $requestStack, CorePermissions $security)
     {
-        $this->composer    = $composer;
-        $this->cacheHelper = $cacheHelper;
-        $this->logger      = $logger;
-
         parent::__construct($doctrine, $factory, $modelFactory, $userHelper, $coreParametersHelper, $dispatcher, $translator, $flashBag, $requestStack, $security);
     }
 

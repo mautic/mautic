@@ -18,10 +18,7 @@ class Responses
      */
     private $conditionResponses = [];
 
-    /**
-     * DecisionResponses constructor.
-     */
-    public function setFromLogs(ArrayCollection $logs)
+    public function setFromLogs(ArrayCollection $logs): void
     {
         /** @var LeadEventLog $log */
         foreach ($logs as $log) {
@@ -43,7 +40,7 @@ class Responses
     /**
      * @param mixed $response
      */
-    public function setResponse(Event $event, $response)
+    public function setResponse(Event $event, $response): void
     {
         switch ($event->getEventType()) {
             case Event::TYPE_ACTION:
@@ -69,7 +66,7 @@ class Responses
     public function getActionResponses($type = null)
     {
         if ($type) {
-            return (isset($this->actionResponses[$type])) ? $this->actionResponses[$type] : [];
+            return $this->actionResponses[$type] ?? [];
         }
 
         return $this->actionResponses;
@@ -83,16 +80,13 @@ class Responses
     public function getConditionResponses($type = null)
     {
         if ($type) {
-            return (isset($this->conditionResponses[$type])) ? $this->conditionResponses[$type] : [];
+            return $this->conditionResponses[$type] ?? [];
         }
 
         return $this->conditionResponses;
     }
 
-    /**
-     * @return int
-     */
-    public function containsResponses()
+    public function containsResponses(): int
     {
         return count($this->actionResponses) + count($this->conditionResponses);
     }

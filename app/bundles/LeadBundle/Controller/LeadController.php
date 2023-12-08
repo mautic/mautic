@@ -112,10 +112,10 @@ class LeadController extends FormController
         $session->set('mautic.lead.indexmode', $indexMode);
 
         $anonymousShowing = false;
-        if ('list' != $indexMode || ('list' == $indexMode && false === strpos($search, $anonymous))) {
+        if ('list' != $indexMode || ('list' == $indexMode && !str_contains($search, $anonymous))) {
             // remove anonymous leads unless requested to prevent clutter
             $filter['force'] .= " !$anonymous";
-        } elseif (false !== strpos($search, $anonymous) && false === strpos($search, '!'.$anonymous)) {
+        } elseif (str_contains($search, $anonymous) && !str_contains($search, '!'.$anonymous)) {
             $anonymousShowing = true;
         }
 
@@ -363,18 +363,16 @@ class LeadController extends FormController
         $companiesRepo = $companyModel->getRepository();
         $companies     = $companiesRepo->getCompaniesByLeadId($objectId);
         // Set the social profile templates
-        if ($socialProfiles) {
-            foreach ($socialProfiles as $integration => &$details) {
-                if ($integrationObject = $integrationHelper->getIntegrationObject($integration)) {
-                    if ($template = $integrationObject->getSocialProfileTemplate()) {
-                        $details['social_profile_template'] = $template;
-                    }
+        foreach ($socialProfiles as $integration => &$details) {
+            if ($integrationObject = $integrationHelper->getIntegrationObject($integration)) {
+                if ($template = $integrationObject->getSocialProfileTemplate()) {
+                    $details['social_profile_template'] = $template;
                 }
+            }
 
-                if (!isset($details['social_profile_template'])) {
-                    // No profile template found
-                    unset($socialProfiles[$integration]);
-                }
+            if (!isset($details['social_profile_template'])) {
+                // No profile template found
+                unset($socialProfiles[$integration]);
             }
         }
 
@@ -794,7 +792,7 @@ class LeadController extends FormController
     /**
      * Upload an asset.
      */
-    private function uploadAvatar(Request $request, AvatarHelper $avatarHelper, Lead $lead)
+    private function uploadAvatar(Request $request, AvatarHelper $avatarHelper, Lead $lead): void
     {
         $leadInformation = $request->files->get('lead', []);
         $file            = $leadInformation['custom_avatar'] ?? null;
@@ -941,7 +939,7 @@ class LeadController extends FormController
                     // Both leads are good so now we merge them
                     try {
                         $mainLead = $contactMerger->merge($mainLead, $secLead);
-                    } catch (SameContactException $exception) {
+                    } catch (SameContactException) {
                     }
                 }
             }
@@ -1683,17 +1681,11 @@ class LeadController extends FormController
             }
 
             if ($count = count($entities)) {
-                $persistEntities = [];
                 foreach ($entities as $lead) {
                     if ($this->security->hasEntityAccess('lead:leads:editown', 'lead:leads:editother', $lead->getPermissionUser())) {
-                        if ($doNotContact->addDncForContact($lead->getId(), 'email', DoNotContact::MANUAL, $data['reason'])) {
-                            $persistEntities[] = $lead;
-                        }
+                        $doNotContact->addDncForContact($lead->getId(), 'email', DoNotContact::MANUAL, $data['reason']);
                     }
                 }
-
-                // Save entities
-                $model->saveEntities($persistEntities);
             }
 
             $this->addFlashMessage(
@@ -1998,7 +1990,7 @@ class LeadController extends FormController
                 ],
             ];
         } else {
-            if ('list' != $indexMode || ('list' == $indexMode && false === strpos($search, $anonymous))) {
+            if ('list' != $indexMode || ('list' == $indexMode && !str_contains($search, $anonymous))) {
                 // remove anonymous leads unless requested to prevent clutter
                 $filter['force'] .= " !$anonymous";
             }
@@ -2077,7 +2069,7 @@ class LeadController extends FormController
 
         try {
             return $model->getExportFileToDownload($fileName);
-        } catch (FileNotFoundException $exception) {
+        } catch (FileNotFoundException) {
             return $this->notFound();
         }
     }

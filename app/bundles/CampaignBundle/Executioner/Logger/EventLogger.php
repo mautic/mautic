@@ -17,31 +17,6 @@ use Mautic\LeadBundle\Tracker\ContactTracker;
 class EventLogger
 {
     /**
-     * @var IpLookupHelper
-     */
-    private $ipLookupHelper;
-
-    /**
-     * @var ContactTracker
-     */
-    private $contactTracker;
-
-    /**
-     * @var LeadEventLogRepository
-     */
-    private $leadEventLogRepository;
-
-    /**
-     * @var SummaryModel
-     */
-    private $summaryModel;
-
-    /**
-     * @var LeadRepository
-     */
-    private $leadRepository;
-
-    /**
      * @var ArrayCollection
      */
     private $persistQueue;
@@ -61,27 +36,18 @@ class EventLogger
      */
     private $lastUsedCampaignIdToFetchRotation;
 
-    /**
-     * EventLogger constructor.
-     */
     public function __construct(
-        IpLookupHelper $ipLookupHelper,
-        ContactTracker $contactTracker,
-        LeadEventLogRepository $leadEventLogRepository,
-        LeadRepository $leadRepository,
-        SummaryModel $summaryModel
+        private IpLookupHelper $ipLookupHelper,
+        private ContactTracker $contactTracker,
+        private LeadEventLogRepository $leadEventLogRepository,
+        private LeadRepository $leadRepository,
+        private SummaryModel $summaryModel
     ) {
-        $this->ipLookupHelper         = $ipLookupHelper;
-        $this->contactTracker         = $contactTracker;
-        $this->leadEventLogRepository = $leadEventLogRepository;
-        $this->leadRepository         = $leadRepository;
-        $this->summaryModel           = $summaryModel;
-
         $this->persistQueue = new ArrayCollection();
         $this->logs         = new ArrayCollection();
     }
 
-    public function queueToPersist(LeadEventLog $log)
+    public function queueToPersist(LeadEventLog $log): void
     {
         $this->persistQueue->add($log);
 
@@ -90,7 +56,7 @@ class EventLogger
         }
     }
 
-    public function persistLog(LeadEventLog $log)
+    public function persistLog(LeadEventLog $log): void
     {
         $this->leadEventLogRepository->saveEntity($log);
         $this->summaryModel->updateSummary([$log]);
@@ -98,10 +64,8 @@ class EventLogger
 
     /**
      * @param bool $isInactiveEvent
-     *
-     * @return LeadEventLog
      */
-    public function buildLogEntry(Event $event, Lead $contact = null, $isInactiveEvent = false)
+    public function buildLogEntry(Event $event, Lead $contact = null, $isInactiveEvent = false): LeadEventLog
     {
         $log = new LeadEventLog();
 
@@ -150,10 +114,7 @@ class EventLogger
         return $logs;
     }
 
-    /**
-     * @return $this
-     */
-    public function persistCollection(ArrayCollection $collection)
+    public function persistCollection(ArrayCollection $collection): self
     {
         if (!$collection->count()) {
             return $this;
@@ -165,20 +126,14 @@ class EventLogger
         return $this;
     }
 
-    /**
-     * @return $this
-     */
-    public function clearCollection(ArrayCollection $collection)
+    public function clearCollection(ArrayCollection $collection): self
     {
         $this->leadEventLogRepository->detachEntities($collection->getValues());
 
         return $this;
     }
 
-    /**
-     * @return ArrayCollection
-     */
-    public function extractContactsFromLogs(ArrayCollection $logs)
+    public function extractContactsFromLogs(ArrayCollection $logs): ArrayCollection
     {
         $contacts = new ArrayCollection();
 
@@ -233,13 +188,13 @@ class EventLogger
     /**
      * @param int $campaignId
      */
-    public function hydrateContactRotationsForNewLogs(array $contactIds, $campaignId)
+    public function hydrateContactRotationsForNewLogs(array $contactIds, $campaignId): void
     {
         $this->contactRotations                  = $this->leadRepository->getContactRotations($contactIds, $campaignId);
         $this->lastUsedCampaignIdToFetchRotation = $campaignId;
     }
 
-    private function persistPendingAndInsertIntoLogStack()
+    private function persistPendingAndInsertIntoLogStack(): void
     {
         if (!$this->persistQueue->count()) {
             return;

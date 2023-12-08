@@ -35,21 +35,8 @@ use Symfony\Component\HttpFoundation\Response;
 
 class FormController extends CommonFormController
 {
-    /**
-     * @var AlreadyMappedFieldCollectorInterface
-     */
-    private $alreadyMappedFieldCollector;
-
-    /**
-     * @var MappedObjectCollector
-     */
-    private $mappedObjectCollector;
-
-    public function __construct(FormFactoryInterface $formFactory, FormFieldHelper $fieldHelper, AlreadyMappedFieldCollectorInterface $alreadyMappedFieldCollector, MappedObjectCollector $mappedObjectCollector, ManagerRegistry $doctrine, MauticFactory $factory, ModelFactory $modelFactory, UserHelper $userHelper, CoreParametersHelper $coreParametersHelper, EventDispatcherInterface $dispatcher, Translator $translator, FlashBag $flashBag, RequestStack $requestStack, CorePermissions $security)
+    public function __construct(FormFactoryInterface $formFactory, FormFieldHelper $fieldHelper, private AlreadyMappedFieldCollectorInterface $alreadyMappedFieldCollector, private MappedObjectCollector $mappedObjectCollector, ManagerRegistry $doctrine, MauticFactory $factory, ModelFactory $modelFactory, UserHelper $userHelper, CoreParametersHelper $coreParametersHelper, EventDispatcherInterface $dispatcher, Translator $translator, FlashBag $flashBag, RequestStack $requestStack, CorePermissions $security)
     {
-        $this->alreadyMappedFieldCollector = $alreadyMappedFieldCollector;
-        $this->mappedObjectCollector       = $mappedObjectCollector;
-
         parent::__construct($formFactory, $fieldHelper, $doctrine, $factory, $modelFactory, $userHelper, $coreParametersHelper, $dispatcher, $translator, $flashBag, $requestStack, $security);
     }
 
@@ -502,7 +489,7 @@ class FormController extends CommonFormController
         /** @var \Mautic\FormBundle\Model\FormModel $model */
         $model            = $this->getModel('form');
         $formData         = $request->request->get('mauticform');
-        $sessionId        = isset($formData['sessionId']) ? $formData['sessionId'] : null;
+        $sessionId        = $formData['sessionId'] ?? null;
         $customComponents = $model->getCustomComponents();
         $modifiedFields   = [];
         $deletedFields    = [];
@@ -789,7 +776,7 @@ class FormController extends CommonFormController
             if (!empty($reorder)) {
                 uasort(
                     $modifiedFields,
-                    function ($a, $b) {
+                    function ($a, $b): int {
                         if ($a['order'] == $b['order']) {
                             return 0;
                         }
@@ -827,7 +814,7 @@ class FormController extends CommonFormController
             if (!empty($reorder)) {
                 uasort(
                     $modifiedActions,
-                    function ($a, $b) {
+                    function ($a, $b): int {
                         if ($a['order'] == $b['order']) {
                             return 0;
                         }
@@ -1151,7 +1138,7 @@ class FormController extends CommonFormController
     /**
      * Clear field and actions from the session.
      */
-    public function clearSessionComponents(Request $request, $sessionId)
+    public function clearSessionComponents(Request $request, $sessionId): void
     {
         $session = $request->getSession();
         $session->remove('mautic.form.'.$sessionId.'.fields.modified');

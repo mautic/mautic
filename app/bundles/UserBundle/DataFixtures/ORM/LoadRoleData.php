@@ -20,19 +20,13 @@ class LoadRoleData extends AbstractFixture implements OrderedFixtureInterface, F
     }
 
     /**
-     * @var RoleModel
-     */
-    private $roleModel;
-
-    /**
      * {@inheritdoc}
      */
-    public function __construct(RoleModel $roleModel)
+    public function __construct(private RoleModel $roleModel)
     {
-        $this->roleModel = $roleModel;
     }
 
-    public function load(ObjectManager $manager)
+    public function load(ObjectManager $manager): void
     {
         if (!$this->hasReference('admin-role')) {
             $role = new Role();

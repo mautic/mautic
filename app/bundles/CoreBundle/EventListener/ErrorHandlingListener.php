@@ -22,8 +22,6 @@ class ErrorHandlingListener implements EventSubscriberInterface
 
     /**
      * ErrorHandlingListener constructor.
-     *
-     * @param LoggerInterface $debugLogger
      */
     public function __construct(LoggerInterface $logger, LoggerInterface $mainLogger, LoggerInterface $debugLogger = null)
     {
@@ -33,7 +31,7 @@ class ErrorHandlingListener implements EventSubscriberInterface
             ->setDebugLogger($debugLogger);
     }
 
-    public function onKernelRequest(RequestEvent $event)
+    public function onKernelRequest(RequestEvent $event): void
     {
         // Do nothing.  Just want symfony to call the class to set the error handling functions
     }

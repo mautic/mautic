@@ -11,20 +11,14 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class LeadListType extends AbstractType
 {
-    /**
-     * @var ListModel
-     */
-    private $segmentModel;
-
-    public function __construct(ListModel $segmentModel)
+    public function __construct(private ListModel $segmentModel)
     {
-        $this->segmentModel = $segmentModel;
     }
 
-    public function configureOptions(OptionsResolver $resolver)
+    public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults([
-            'choices' => function (Options $options) {
+            'choices' => function (Options $options): array {
                 $lists = (empty($options['global_only'])) ? $this->segmentModel->getUserLists() : $this->segmentModel->getGlobalLists();
                 $lists = (empty($options['preference_center_only'])) ? $lists : $this->segmentModel->getPreferenceCenterLists();
 

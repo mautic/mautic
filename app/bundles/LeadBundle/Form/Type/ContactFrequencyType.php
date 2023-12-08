@@ -10,17 +10,11 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class ContactFrequencyType extends AbstractType
 {
-    /**
-     * @var CoreParametersHelper
-     */
-    protected $coreParametersHelper;
-
-    public function __construct(CoreParametersHelper $coreParametersHelper)
+    public function __construct(protected CoreParametersHelper $coreParametersHelper)
     {
-        $this->coreParametersHelper = $coreParametersHelper;
     }
 
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $showContactCategories = $this->coreParametersHelper->get('show_contact_categories');
         $showContactSegments   = $this->coreParametersHelper->get('show_contact_segments');
@@ -97,7 +91,7 @@ class ContactFrequencyType extends AbstractType
         }
     }
 
-    public function configureOptions(OptionsResolver $resolver)
+    public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setRequired(['channels']);
         $resolver->setDefaults(

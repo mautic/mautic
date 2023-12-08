@@ -7,21 +7,10 @@ use Mautic\FormBundle\Entity\Action;
 use Mautic\FormBundle\Entity\Submission;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\ServerBag;
 
 class SubmissionEvent extends CommonEvent
 {
-    /**
-     * Raw POST results.
-     *
-     * @var array
-     */
-    private $post = [];
-
-    /**
-     * @var array
-     */
-    private $server = [];
-
     /**
      * Cleaned post results.
      *
@@ -78,11 +67,6 @@ class SubmissionEvent extends CommonEvent
     private $context;
 
     /**
-     * @var Request
-     */
-    private $request;
-
-    /**
      * @var array|Response|null
      */
     private $postSubmitResponse;
@@ -93,22 +77,19 @@ class SubmissionEvent extends CommonEvent
     private $postSubmitPayload;
 
     /**
-     * SubmissionEvent constructor.
+     * @param mixed[]                 $post   raw POST results
+     * @param mixed[]|array|ServerBag $server
      */
-    public function __construct(Submission $submission, $post, $server, Request $request)
-    {
+    public function __construct(
+        Submission $submission,
+        private $post,
+        private $server,
+        private Request $request
+    ) {
         $this->entity  = $submission;
-        $this->post    = $post;
-        $this->server  = $server;
-        $this->request = $request;
     }
 
-    /**
-     * Returns the Submission entity.
-     *
-     * @return Submission
-     */
-    public function getSubmission()
+    public function getSubmission(): Submission
     {
         return $this->entity;
     }
@@ -225,7 +206,7 @@ class SubmissionEvent extends CommonEvent
         return $this;
     }
 
-    public function setActionFeedback($key, $feedback)
+    public function setActionFeedback($key, $feedback): void
     {
         $this->feedback[$key] = $feedback;
     }
@@ -258,7 +239,7 @@ class SubmissionEvent extends CommonEvent
         $this->context = $context;
     }
 
-    public function setAction(?Action $action = null)
+    public function setAction(?Action $action = null): void
     {
         $this->action = $action;
         if (!is_null($action)) {
@@ -298,10 +279,7 @@ class SubmissionEvent extends CommonEvent
         return (null === $key) ? $this->callbacks : $this->callbacks[$key];
     }
 
-    /**
-     * @return int
-     */
-    public function hasPostSubmitCallbacks()
+    public function hasPostSubmitCallbacks(): bool
     {
         return count($this->callbacks) || count($this->callbackResponses);
     }

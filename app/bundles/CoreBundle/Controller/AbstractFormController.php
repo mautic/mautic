@@ -121,10 +121,8 @@ abstract class AbstractFormController extends CommonController
 
     /**
      * Checks to see if the form was cancelled.
-     *
-     * @return bool
      */
-    protected function isFormCancelled(FormInterface $form)
+    protected function isFormCancelled(FormInterface $form): bool
     {
         $request = $this->getCurrentRequest();
         if (null === $request) {
@@ -138,10 +136,8 @@ abstract class AbstractFormController extends CommonController
 
     /**
      * Checks to see if the form was applied or saved.
-     *
-     * @return bool
      */
-    protected function isFormApplied(FormInterface $form)
+    protected function isFormApplied(FormInterface $form): bool
     {
         $request = $this->getCurrentRequest();
         if (null === $request) {
@@ -157,10 +153,8 @@ abstract class AbstractFormController extends CommonController
      * Binds form data, checks validity, and determines cancel request.
      *
      * @param array $data
-     *
-     * @return bool
      */
-    protected function isFormValid(FormInterface $form)
+    protected function isFormValid(FormInterface $form): bool
     {
         $request = $this->getCurrentRequest();
         if (null === $request) {
@@ -242,11 +236,11 @@ abstract class AbstractFormController extends CommonController
 
         $urlMatcher  = explode('/s/', $returnUrl);
         $actionRoute = $this->get('router')->match('/s/'.$urlMatcher[1]);
-        $objAction   = isset($actionRoute['objectAction']) ? $actionRoute['objectAction'] : 'index';
+        $objAction   = $actionRoute['objectAction'] ?? 'index';
         $routeCtrlr  = explode('\\', $actionRoute['_controller']);
 
         $defaultContentTemplate  = $routeCtrlr[0].$routeCtrlr[1].':'.ucfirst(str_replace('Bundle', '', $routeCtrlr[1])).':'.$objAction;
-        $vars['contentTemplate'] = isset($vars['contentTemplate']) ? $vars['contentTemplate'] : $defaultContentTemplate;
+        $vars['contentTemplate'] = $vars['contentTemplate'] ?? $defaultContentTemplate;
 
         $vars['passthroughVars']['activeLink'] = '#'.str_replace('_action', '_'.$objAction, $actionRoute['_route']);
 

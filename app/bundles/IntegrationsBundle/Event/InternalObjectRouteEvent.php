@@ -10,24 +10,12 @@ use Symfony\Contracts\EventDispatcher\Event;
 class InternalObjectRouteEvent extends Event
 {
     /**
-     * @var ObjectInterface
-     */
-    private $object;
-
-    /**
-     * @var int
-     */
-    private $id;
-
-    /**
      * @var string|null
      */
     private $route;
 
-    public function __construct(ObjectInterface $object, int $id)
+    public function __construct(private ObjectInterface $object, private int $id)
     {
-        $this->object = $object;
-        $this->id     = $id;
     }
 
     public function getObject(): ObjectInterface

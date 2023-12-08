@@ -84,17 +84,11 @@ class CampaignController extends AbstractStandardFormController
 
     protected $sessionId;
 
-    private RequestStack $requestStack;
-
-    private EventCollector $eventCollector;
-
-    private DateHelper $dateHelper;
-
     public function __construct(
         FormFactoryInterface $formFactory,
         FormFieldHelper $fieldHelper,
-        EventCollector $eventCollector,
-        DateHelper $dateHelper,
+        private EventCollector $eventCollector,
+        private DateHelper $dateHelper,
         ManagerRegistry $managerRegistry,
         MauticFactory $factory,
         ModelFactory $modelFactory,
@@ -103,13 +97,9 @@ class CampaignController extends AbstractStandardFormController
         EventDispatcherInterface $dispatcher,
         Translator $translator,
         FlashBag $flashBag,
-        RequestStack $requestStack,
+        private RequestStack $requestStack,
         CorePermissions $security
     ) {
-        $this->requestStack   = $requestStack;
-        $this->eventCollector = $eventCollector;
-        $this->dateHelper     = $dateHelper;
-
         parent::__construct($formFactory, $fieldHelper, $managerRegistry, $factory, $modelFactory, $userHelper, $coreParametersHelper, $dispatcher, $translator, $flashBag, $requestStack, $security);
     }
 
@@ -259,7 +249,6 @@ class CampaignController extends AbstractStandardFormController
             $page = $session->get('mautic.campaign.page', 1);
         }
 
-        // set limits
         $limit = $session->get('mautic.campaign.limit', $this->coreParametersHelper->get('default_pagelimit'));
         $start = (1 === $page) ? 0 : (($page - 1) * $limit);
         if ($start < 0) {
@@ -617,10 +606,8 @@ class CampaignController extends AbstractStandardFormController
      * @param Campaign $entity
      * @param null     $objectId
      * @param bool     $isClone
-     *
-     * @return bool
      */
-    protected function beforeEntitySave($entity, Form $form, $action, $objectId = null, $isClone = false)
+    protected function beforeEntitySave($entity, Form $form, $action, $objectId = null, $isClone = false): bool
     {
         if (empty($this->campaignEvents)) {
             // set the error
@@ -816,18 +803,15 @@ class CampaignController extends AbstractStandardFormController
         );
     }
 
-    /**
-     * @return string
-     */
-    protected function getModelName()
+    protected function getModelName(): string
     {
         return 'campaign';
     }
 
     /**
-     * @return array
+     * @return mixed[]
      */
-    protected function getPostActionRedirectArguments(array $args, $action)
+    protected function getPostActionRedirectArguments(array $args, $action): array
     {
         switch ($action) {
             case 'new':
@@ -844,10 +828,8 @@ class CampaignController extends AbstractStandardFormController
 
     /**
      * Get events from session.
-     *
-     * @return array
      */
-    protected function getSessionEvents($id)
+    protected function getSessionEvents($id): array
     {
         $session = $this->getCurrentRequest()->getSession();
 
@@ -861,10 +843,8 @@ class CampaignController extends AbstractStandardFormController
 
     /**
      * Get events from session.
-     *
-     * @return array
      */
-    protected function getSessionSources($id, $isClone = false)
+    protected function getSessionSources($id, $isClone = false): array
     {
         $session = $this->getCurrentRequest()->getSession();
 

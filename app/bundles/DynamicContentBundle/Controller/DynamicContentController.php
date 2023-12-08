@@ -51,7 +51,6 @@ class DynamicContentController extends FormController
 
         $this->setListFilters();
 
-        // set limits
         $limit = $request->getSession()->get('mautic.dynamicContent.limit', $this->coreParametersHelper->get('default_pagelimit'));
         $start = (1 === $page) ? 0 : (($page - 1) * $limit);
         if ($start < 0) {
@@ -385,7 +384,7 @@ class DynamicContentController extends FormController
 
         /* @var DynamicContent $parent */
         /* @var DynamicContent[] $children */
-        list($translationParent, $translationChildren) = $entity->getTranslations();
+        [$translationParent, $translationChildren] = $entity->getTranslations();
 
         // Audit Log
         $auditLogModel = $this->getModel('core.auditlog');

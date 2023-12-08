@@ -14,26 +14,8 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class UploadSubscriber implements EventSubscriberInterface
 {
-    /**
-     * @var CoreParametersHelper
-     */
-    private $coreParametersHelper;
-
-    /**
-     * @var AssetModel
-     */
-    private $assetModel;
-
-    /**
-     * @var FileUploadValidator
-     */
-    private $fileUploadValidator;
-
-    public function __construct(CoreParametersHelper $coreParametersHelper, AssetModel $assetModel, FileUploadValidator $fileUploadValidator)
+    public function __construct(private CoreParametersHelper $coreParametersHelper, private AssetModel $assetModel, private FileUploadValidator $fileUploadValidator)
     {
-        $this->coreParametersHelper = $coreParametersHelper;
-        $this->assetModel           = $assetModel;
-        $this->fileUploadValidator  = $fileUploadValidator;
     }
 
     /**
@@ -51,7 +33,7 @@ class UploadSubscriber implements EventSubscriberInterface
      * Moves upladed file to temporary directory where it can be found later
      * and all uploaded files in there cleared. Also sets file name to the response.
      */
-    public function onPostUpload(PostUploadEvent $event)
+    public function onPostUpload(PostUploadEvent $event): void
     {
         $request   = $event->getRequest()->request;
         $response  = $event->getResponse();

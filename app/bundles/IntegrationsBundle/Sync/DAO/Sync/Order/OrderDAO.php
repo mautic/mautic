@@ -12,21 +12,6 @@ use Mautic\IntegrationsBundle\Sync\DAO\Mapping\UpdatedObjectMappingDAO;
 class OrderDAO
 {
     /**
-     * @var \DateTimeInterface
-     */
-    private $syncDateTime;
-
-    /**
-     * @var bool
-     */
-    private $isFirstTimeSync;
-
-    /**
-     * @var string
-     */
-    private $integration;
-
-    /**
      * @var ObjectChangeDAO[][]
      */
     private $identifiedObjects = [];
@@ -78,18 +63,12 @@ class OrderDAO
      */
     private $notifications = [];
 
-    private array $options;
-
     /**
      * @param bool   $isFirstTimeSync
      * @param string $integration
      */
-    public function __construct(\DateTimeInterface $syncDateTime, $isFirstTimeSync, $integration, array $options = [])
+    public function __construct(private \DateTimeInterface $syncDateTime, private $isFirstTimeSync, private $integration, private array $options = [])
     {
-        $this->syncDateTime    = $syncDateTime;
-        $this->isFirstTimeSync = $isFirstTimeSync;
-        $this->integration     = $integration;
-        $this->options         = $options;
     }
 
     public function addObjectChange(ObjectChangeDAO $objectChangeDAO): self
@@ -273,7 +252,7 @@ class OrderDAO
     /**
      * @return ObjectChangeDAO[]
      */
-    public function getSuccessfullySyncedObjects()
+    public function getSuccessfullySyncedObjects(): array
     {
         $synced = [];
         foreach ($this->changedObjects as $objectChanges) {

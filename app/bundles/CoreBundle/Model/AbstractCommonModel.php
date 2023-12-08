@@ -20,56 +20,8 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
  */
 abstract class AbstractCommonModel implements MauticModelInterface
 {
-    /**
-     * @var EntityManagerInterface
-     */
-    protected $em;
-
-    /**
-     * @var \Mautic\CoreBundle\Security\Permissions\CorePermissions
-     */
-    protected $security;
-
-    /**
-     * @var EventDispatcherInterface
-     */
-    protected $dispatcher;
-
-    /**
-     * @var UrlGeneratorInterface
-     */
-    protected $router;
-
-    /**
-     * @var Translator
-     */
-    protected $translator;
-
-    /**
-     * @var UserHelper
-     */
-    protected $userHelper;
-
-    /**
-     * @var LoggerInterface
-     */
-    protected $logger;
-
-    /**
-     * @var CoreParametersHelper
-     */
-    protected $coreParametersHelper;
-
-    public function __construct(EntityManagerInterface $em, CorePermissions $security, EventDispatcherInterface $dispatcher, UrlGeneratorInterface $router, Translator $translator, UserHelper $userHelper, LoggerInterface $mauticLogger, CoreParametersHelper $coreParametersHelper)
+    public function __construct(protected EntityManagerInterface $em, protected CorePermissions $security, protected EventDispatcherInterface $dispatcher, protected UrlGeneratorInterface $router, protected Translator $translator, protected UserHelper $userHelper, protected LoggerInterface $logger, protected CoreParametersHelper $coreParametersHelper)
     {
-        $this->em                   = $em;
-        $this->security             = $security;
-        $this->dispatcher           = $dispatcher;
-        $this->router               = $router;
-        $this->translator           = $translator;
-        $this->userHelper           = $userHelper;
-        $this->logger               = $mauticLogger;
-        $this->coreParametersHelper = $coreParametersHelper;
     }
 
     /**
@@ -215,12 +167,12 @@ abstract class AbstractCommonModel implements MauticModelInterface
 
         switch (true) {
             case 3 === $slugCount:
-                list($lang, $category, $idSlug) = $slugs;
+                [$lang, $category, $idSlug] = $slugs;
 
                 break;
 
             case 2 === $slugCount:
-                list($category, $idSlug) = $slugs;
+                [$category, $idSlug] = $slugs;
 
                 // Check if the first slug is actually a locale
                 if (isset($locales[$category])) {
@@ -248,7 +200,7 @@ abstract class AbstractCommonModel implements MauticModelInterface
         }
 
         $entity = false;
-        if (false !== strpos($idSlug, ':')) {
+        if (str_contains($idSlug, ':')) {
             $parts = explode(':', $idSlug);
             if (2 == count($parts)) {
                 $entity = $this->getEntity($parts[0]);
@@ -274,6 +226,7 @@ abstract class AbstractCommonModel implements MauticModelInterface
      */
     public function getEntityByAlias($alias, $categoryAlias = null, $lang = null)
     {
+        return null;
     }
 
     /**

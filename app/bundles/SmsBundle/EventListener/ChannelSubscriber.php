@@ -13,14 +13,8 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class ChannelSubscriber implements EventSubscriberInterface
 {
-    /**
-     * @var TransportChain
-     */
-    private $transportChain;
-
-    public function __construct(TransportChain $transportChain)
+    public function __construct(private TransportChain $transportChain)
     {
-        $this->transportChain = $transportChain;
     }
 
     /**
@@ -33,7 +27,7 @@ class ChannelSubscriber implements EventSubscriberInterface
         ];
     }
 
-    public function onAddChannel(ChannelEvent $event)
+    public function onAddChannel(ChannelEvent $event): void
     {
         if (count($this->transportChain->getEnabledTransports()) > 0) {
             $event->addChannel(

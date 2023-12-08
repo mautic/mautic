@@ -33,36 +33,8 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class CampaignSubscriber implements EventSubscriberInterface
 {
-    /**
-     * @var EmailModel
-     */
-    private $emailModel;
-
-    /**
-     * @var RealTimeExecutioner
-     */
-    private $realTimeExecutioner;
-
-    /**
-     * @var SendEmailToUser
-     */
-    private $sendEmailToUser;
-
-    /**
-     * @var TranslatorInterface
-     */
-    private $translator;
-
-    public function __construct(
-        EmailModel $emailModel,
-        RealTimeExecutioner $realTimeExecutioner,
-        SendEmailToUser $sendEmailToUser,
-        TranslatorInterface $translator
-    ) {
-        $this->emailModel          = $emailModel;
-        $this->realTimeExecutioner = $realTimeExecutioner;
-        $this->sendEmailToUser     = $sendEmailToUser;
-        $this->translator          = $translator;
+    public function __construct(private EmailModel $emailModel, private RealTimeExecutioner $realTimeExecutioner, private SendEmailToUser $sendEmailToUser, private TranslatorInterface $translator)
+    {
     }
 
     /**
@@ -260,11 +232,11 @@ class CampaignSubscriber implements EventSubscriberInterface
 
         $event->setChannel('email', $emailId);
 
-        $type    = (isset($config['email_type'])) ? $config['email_type'] : MailHelper::EMAIL_TYPE_TRANSACTIONAL;
+        $type    = $config['email_type'] ?? MailHelper::EMAIL_TYPE_TRANSACTIONAL;
         $options = [
             'source'         => ['campaign.event', $event->getEvent()->getId()],
-            'email_attempts' => (isset($config['attempts'])) ? $config['attempts'] : 3,
-            'email_priority' => (isset($config['priority'])) ? $config['priority'] : 2,
+            'email_attempts' => $config['attempts'] ?? 3,
+            'email_priority' => $config['priority'] ?? 2,
             'email_type'     => $type,
             'return_errors'  => true,
             'dnc_as_error'   => true,
@@ -358,7 +330,7 @@ class CampaignSubscriber implements EventSubscriberInterface
         $pending  = $event->getPending();
 
         /**
-         * @var int
+         * @var int  $logId
          * @var Lead $contact
          */
         foreach ($contacts as $logId => $contact) {

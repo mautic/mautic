@@ -496,6 +496,8 @@ class LeadModelTest extends \PHPUnit\Framework\TestCase
             ->onlyMethods(['extractCompanyDataFromImport'])
             ->getMock();
 
+        $mockCompanyModel->expects($this->once())->method('extractCompanyDataFromImport')->willReturn([[], []]);
+
         $this->setProperty($mockLeadModel, LeadModel::class, 'companyModel', $mockCompanyModel);
         $this->setProperty($mockLeadModel, LeadModel::class, 'leadFields', [['alias' => 'email', 'type' => 'email', 'defaultValue' => '']]);
 

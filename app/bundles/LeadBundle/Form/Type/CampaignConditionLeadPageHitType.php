@@ -72,7 +72,7 @@ class CampaignConditionLeadPageHitType extends AbstractType
             ]
         );
 
-        $formModifier = function (FormInterface $form, $data) use ($builder) {
+        $formModifier = function (FormInterface $form, $data) use ($builder): void {
             $unit = 's';
             $form->add('accumulative_time_unit', HiddenType::class, [
                 'data' => $unit,
@@ -101,14 +101,14 @@ class CampaignConditionLeadPageHitType extends AbstractType
         };
 
         $builder->addEventListener(FormEvents::PRE_SET_DATA,
-            function (FormEvent $event) use ($formModifier) {
+            function (FormEvent $event) use ($formModifier): void {
                 $data = $event->getData();
                 $formModifier($event->getForm(), $data);
             }
         );
 
         $builder->addEventListener(FormEvents::PRE_SUBMIT,
-            function (FormEvent $event) use ($formModifier) {
+            function (FormEvent $event) use ($formModifier): void {
                 $data = $event->getData();
                 $formModifier($event->getForm(), $data);
             }

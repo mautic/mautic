@@ -20,18 +20,11 @@ use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 class ExceptionListener extends ErrorListener
 {
     /**
-     * @var Router
-     */
-    protected $router;
-
-    /**
      * @param LoggerInterface $controller
      */
-    public function __construct(Router $router, $controller, LoggerInterface $logger = null)
+    public function __construct(protected Router $router, $controller, LoggerInterface $logger = null)
     {
         parent::__construct($controller, $logger);
-
-        $this->router = $router;
     }
 
     public function onKernelException(ExceptionEvent $event, string $eventName = null, EventDispatcherInterface $eventDispatcher = null)

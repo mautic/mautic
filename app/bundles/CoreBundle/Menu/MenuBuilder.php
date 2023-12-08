@@ -9,40 +9,16 @@ use Mautic\CoreBundle\CoreEvents;
 use Mautic\CoreBundle\Event\MenuEvent;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
-/**
- * Class MenuBuilder.
- */
 class MenuBuilder
 {
-    /**
-     * @var FactoryInterface
-     */
-    private $factory;
-
-    /**
-     * @var MatcherInterface
-     */
-    private $matcher;
-
     /**
      * @var \Symfony\Component\EventDispatcher\ContainerAwareEventDispatcher
      */
     private $dispatcher;
 
-    /**
-     * @var \Mautic\CoreBundle\Menu\MenuHelper
-     */
-    private $menuHelper;
-
-    /**
-     * MenuBuilder constructor.
-     */
-    public function __construct(FactoryInterface $knpFactory, MatcherInterface $matcher, EventDispatcherInterface $dispatcher, MenuHelper $menuHelper)
+    public function __construct(private FactoryInterface $factory, private MatcherInterface $matcher, EventDispatcherInterface $dispatcher, private MenuHelper $menuHelper)
     {
-        $this->factory    = $knpFactory;
-        $this->matcher    = $matcher;
         $this->dispatcher = $dispatcher;
-        $this->menuHelper = $menuHelper;
     }
 
     /**
@@ -84,7 +60,7 @@ class MenuBuilder
                     return $current_child;
                 }
             }
-        } catch (\Exception $e) {
+        } catch (\Exception) {
             // do nothing
         }
 
