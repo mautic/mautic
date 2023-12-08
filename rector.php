@@ -124,19 +124,8 @@ return static function (Rector\Config\RectorConfig $rectorConfig): void {
         \Rector\TypeDeclaration\Rector\ClassMethod\ReturnTypeFromStrictParamRector::class,
         \Rector\TypeDeclaration\Rector\Class_\ReturnTypeFromStrictTernaryRector::class,
 
-        // \Rector\Php80\Rector\Class_\ClassPropertyAssignToConstructorPromotionRector::class,
-<<<<<<< HEAD
-<<<<<<< HEAD
         // \Rector\Php80\Rector\Catch_\RemoveUnusedVariableInCatchRector::class,
         \Rector\Php80\Rector\Class_\ClassPropertyAssignToConstructorPromotionRector::class,
-=======
-=======
-        \Rector\Php80\Rector\Class_\ClassPropertyAssignToConstructorPromotionRector::class,
->>>>>>> 8413f73fcb (rerun rector)
->>>>>>> 86f8ea3bac (rerun rector)
-=======
-        \Rector\Php80\Rector\Class_\ClassPropertyAssignToConstructorPromotionRector::class,
->>>>>>> 9282e5a53c (remove unused variable)
         BoolReturnTypeFromStrictScalarReturnsRector::class,
         AddVoidReturnTypeWhereNoReturnRector::class,
         TypedPropertyFromStrictConstructorRector::class,
