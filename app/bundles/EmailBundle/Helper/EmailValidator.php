@@ -80,7 +80,7 @@ class EmailValidator
      */
     public function hasValidDomain($address): bool
     {
-        list($user, $domain) = explode('@', $address);
+        [$user, $domain] = explode('@', $address);
 
         return checkdnsrr($domain, 'MX');
     }

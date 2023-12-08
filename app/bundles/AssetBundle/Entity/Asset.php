@@ -1305,7 +1305,7 @@ class Asset extends FormEntity
      */
     public static function convertBytesToHumanReadable($size, $unit = ''): string
     {
-        list($number, $unit) = self::convertBytesToUnit($size, $unit);
+        [$number, $unit] = self::convertBytesToUnit($size, $unit);
 
         // Format number
         $number = number_format($number, 2);

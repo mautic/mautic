@@ -80,7 +80,7 @@ class NotificationSubscriber implements EventSubscriberInterface
                 $this->assetTokenHelper->findAssetTokens($content, $clickthrough)
             );
 
-            list($content, $trackables) = $this->trackableModel->parseContentForTrackables(
+            [$content, $trackables] = $this->trackableModel->parseContentForTrackables(
                 $content,
                 $tokens,
                 'notification',

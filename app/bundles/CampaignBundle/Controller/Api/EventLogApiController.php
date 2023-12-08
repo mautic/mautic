@@ -179,7 +179,7 @@ class EventLogApiController extends FetchCommonApiController
         if (is_string($result)) {
             return $this->returnError($result, Response::HTTP_CONFLICT);
         } else {
-            list($log, $created) = $result;
+            [$log, $created] = $result;
         }
 
         $event->addContactLog($log);
@@ -245,7 +245,7 @@ class EventLogApiController extends FetchCommonApiController
             if (is_string($result)) {
                 $errors[$key] = $this->returnError($result, Response::HTTP_CONFLICT);
             } else {
-                list($log, $created) = $result;
+                [$log, $created] = $result;
                 $event->addContactLog($log);
             }
         }
@@ -275,7 +275,7 @@ class EventLogApiController extends FetchCommonApiController
             $data['campaign'] = $this->campaign;
 
             if ($this->contact) {
-                list($data['membership'], $ignore) = $this->prepareEntitiesForView($this->campaign->getContactMembership($this->contact));
+                [$data['membership'], $ignore] = $this->prepareEntitiesForView($this->campaign->getContactMembership($this->contact));
             }
         }
 

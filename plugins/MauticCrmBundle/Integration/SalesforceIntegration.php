@@ -898,7 +898,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
                         $params['progress'] = $progress;
                     }
 
-                    list($justUpdated, $justCreated) = $this->amendLeadDataBeforeMauticPopulate($result, $object, $params);
+                    [$justUpdated, $justCreated] = $this->amendLeadDataBeforeMauticPopulate($result, $object, $params);
 
                     $executed[0] += $justUpdated;
                     $executed[1] += $justCreated;
@@ -1080,7 +1080,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
     public function pushLeads($params = []): array
     {
         $limit                   = (isset($params['limit'])) ? $params['limit'] : 100;
-        list($fromDate, $toDate) = $this->getSyncTimeframeDates($params);
+        [$fromDate, $toDate]     = $this->getSyncTimeframeDates($params);
         $config                  = $this->mergeConfigToFeatureSettings($params);
         $integrationEntityRepo   = $this->getIntegrationEntityRepository();
 
@@ -1088,7 +1088,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
         $totalCreated = 0;
         $totalErrors  = 0;
 
-        list($fieldMapping, $mauticLeadFieldString, $supportedObjects) = $this->prepareFieldsForPush($config);
+        [$fieldMapping, $mauticLeadFieldString, $supportedObjects] = $this->prepareFieldsForPush($config);
 
         if (empty($fieldMapping)) {
             return [0, 0, 0, 0];
@@ -1866,7 +1866,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
                 }
             }
 
-            list($fields, $string) = $this->getRequiredFieldString(
+            [$fields, $string] = $this->getRequiredFieldString(
                 $config,
                 $availableFields,
                 $object
@@ -1923,11 +1923,11 @@ class SalesforceIntegration extends CrmAbstractIntegration
                 if (!empty($item['referenceId'])) {
                     $reference = explode('-', $item['referenceId']);
                     if (3 === count($reference)) {
-                        list($contactId, $object, $integrationEntityId) = $reference;
+                        [$contactId, $object, $integrationEntityId] = $reference;
                     } elseif (4 === count($reference)) {
-                        list($contactId, $object, $integrationEntityId, $campaignId) = $reference;
+                        [$contactId, $object, $integrationEntityId, $campaignId] = $reference;
                     } else {
-                        list($contactId, $object) = $reference;
+                        [$contactId, $object] = $reference;
                     }
                 }
                 if (strstr($object, 'CampaignMember')) {
@@ -2599,7 +2599,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
     public function pushCompanies($params = []): array
     {
         $limit                   = (isset($params['limit'])) ? $params['limit'] : 100;
-        list($fromDate, $toDate) = $this->getSyncTimeframeDates($params);
+        [$fromDate, $toDate]     = $this->getSyncTimeframeDates($params);
         $config                  = $this->mergeConfigToFeatureSettings($params);
         $integrationEntityRepo   = $this->getIntegrationEntityRepository();
 
@@ -2628,7 +2628,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
             'create' => $fieldsToCreate,
         ];
 
-        list($fields, $string) = $this->getRequiredFieldString(
+        [$fields, $string] = $this->getRequiredFieldString(
             $config,
             $availableFields,
             'company'

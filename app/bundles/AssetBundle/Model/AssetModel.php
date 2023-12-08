@@ -471,7 +471,7 @@ class AssetModel extends FormModel
         if ($humanReadable) {
             $number = Asset::convertBytesToHumanReadable($maxAllowed);
         } else {
-            list($number, $unit) = Asset::convertBytesToUnit($maxAllowed, $unit);
+            [$number, $unit] = Asset::convertBytesToUnit($maxAllowed, $unit);
         }
 
         return $number;

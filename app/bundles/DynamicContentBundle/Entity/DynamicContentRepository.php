@@ -37,12 +37,12 @@ class DynamicContentRepository extends CommonRepository
      */
     protected function addSearchCommandWhereClause($q, $filter): array
     {
-        list($expr, $parameters) = $this->addStandardSearchCommandWhereClause($q, $filter);
+        [$expr, $parameters] = $this->addStandardSearchCommandWhereClause($q, $filter);
         if ($expr) {
             return [$expr, $parameters];
         }
 
-        list($expr, $parameters) = parent::addSearchCommandWhereClause($q, $filter);
+        [$expr, $parameters] = parent::addSearchCommandWhereClause($q, $filter);
         if ($expr) {
             return [$expr, $parameters];
         }

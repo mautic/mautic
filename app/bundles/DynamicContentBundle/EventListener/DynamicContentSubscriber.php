@@ -95,7 +95,7 @@ class DynamicContentSubscriber implements EventSubscriberInterface
                 $this->focusTokenHelper->findFocusTokens($content)
             );
 
-            list($content, $trackables) = $this->trackableModel->parseContentForTrackables(
+            [$content, $trackables] = $this->trackableModel->parseContentForTrackables(
                 $content,
                 $tokens,
                 'dynamicContent',

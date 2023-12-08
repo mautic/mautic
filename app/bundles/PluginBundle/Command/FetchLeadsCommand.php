@@ -153,7 +153,7 @@ class FetchLeadsCommand extends Command
                     $leadList = [];
                     $results  = $integrationObject->getLeads($params, null, $leadsExecuted, $leadList, $leadObjectName);
                     if (is_array($results)) {
-                        list($justUpdated, $justCreated) = $results;
+                        [$justUpdated, $justCreated] = $results;
                         $updated += (int) $justUpdated;
                         $created += (int) $justCreated;
                     } else {
@@ -168,7 +168,7 @@ class FetchLeadsCommand extends Command
                     $contactList = [];
                     $results     = $integrationObject->getLeads($params, null, $contactsExecuted, $contactList, $contactObjectName);
                     if (is_array($results)) {
-                        list($justUpdated, $justCreated) = $results;
+                        [$justUpdated, $justCreated] = $results;
                         $updated += (int) $justUpdated;
                         $created += (int) $justCreated;
                     } else {
@@ -206,7 +206,7 @@ class FetchLeadsCommand extends Command
 
                 $results = $integrationObject->getCompanies($params);
                 if (is_array($results)) {
-                    list($justUpdated, $justCreated) = $results;
+                    [$justUpdated, $justCreated] = $results;
                     $updated += (int) $justUpdated;
                     $created += (int) $justCreated;
                 } else {
@@ -236,12 +236,12 @@ class FetchLeadsCommand extends Command
             $ignored = 0;
 
             if (4 === count($result)) {
-                list($updated, $created, $errored, $ignored) = $result;
+                [$updated, $created, $errored, $ignored] = $result;
             } elseif (3 === count($result)) {
-                list($updated, $created, $errored) = $result;
+                [$updated, $created, $errored] = $result;
             } else {
                 $errored                 = '?';
-                list($updated, $created) = $result;
+                [$updated, $created]     = $result;
             }
             $output->writeln(
                 '<comment>'.$this->translator->trans(
@@ -262,12 +262,12 @@ class FetchLeadsCommand extends Command
                 $ignored = 0;
 
                 if (4 === count($result)) {
-                    list($updated, $created, $errored, $ignored) = $result;
+                    [$updated, $created, $errored, $ignored] = $result;
                 } elseif (3 === count($result)) {
-                    list($updated, $created, $errored) = $result;
+                    [$updated, $created, $errored] = $result;
                 } else {
                     $errored                 = '?';
-                    list($updated, $created) = $result;
+                    [$updated, $created]     = $result;
                 }
                 $output->writeln(
                     '<comment>'.$this->translator->trans(

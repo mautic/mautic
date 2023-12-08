@@ -225,7 +225,7 @@ trait TranslationEntityTrait
     {
         $count = 0;
 
-        list($parent, $children) = $this->getTranslations();
+        [$parent, $children] = $this->getTranslations();
         if ($variantParent != $parent) {
             $count = $parent->$getter();
         }

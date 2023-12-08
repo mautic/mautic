@@ -384,7 +384,7 @@ class DynamicContentController extends FormController
 
         /* @var DynamicContent $parent */
         /* @var DynamicContent[] $children */
-        list($translationParent, $translationChildren) = $entity->getTranslations();
+        [$translationParent, $translationChildren] = $entity->getTranslations();
 
         // Audit Log
         $auditLogModel = $this->getModel('core.auditlog');

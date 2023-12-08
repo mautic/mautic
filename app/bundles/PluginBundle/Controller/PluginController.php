@@ -326,7 +326,7 @@ class PluginController extends FormController
             if ('custom' === $section) {
                 $formNotes[$section] = $integrationObject->getFormNotes($section);
             } else {
-                list($specialInstructions, $alertType) = $integrationObject->getFormNotes($section);
+                [$specialInstructions, $alertType] = $integrationObject->getFormNotes($section);
 
                 if (!empty($specialInstructions)) {
                     $formNotes[$section] = [

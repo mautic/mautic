@@ -132,7 +132,7 @@ class CampaignEventHelper
             $this->assetTokenHelper->findAssetTokens($text, $this->clickthrough)
         );
 
-        list($text, $trackables) = $this->trackableModel->parseContentForTrackables(
+        [$text, $trackables] = $this->trackableModel->parseContentForTrackables(
             $text,
             $tokens,
             'social_twitter',

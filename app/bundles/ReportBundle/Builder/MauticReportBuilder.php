@@ -184,7 +184,7 @@ final class MauticReportBuilder implements ReportBuilderInterface
                 if (isset($options['order']['column'])) {
                     $queryBuilder->orderBy($options['order']['column'], $options['order']['direction']);
                 } elseif (!empty($options['order'][0][1])) {
-                    list($column, $dir) = $options['order'];
+                    [$column, $dir] = $options['order'];
                     $queryBuilder->orderBy($column, $dir);
                 } else {
                     foreach ($options['order'] as $order) {
