@@ -9,10 +9,7 @@ use PHPUnit\Framework\TestCase;
 
 class ObjectMappingTest extends TestCase
 {
-    /**
-     * @var \DateTime
-     */
-    private $dateCreated;
+    private \DateTime $dateCreated;
 
     public function setUp(): void
     {

@@ -15,32 +15,20 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class ReloadHelperTest extends \PHPUnit\Framework\TestCase
 {
-    private $factoryMock;
+    private \PHPUnit\Framework\MockObject\MockObject $factoryMock;
 
-    /**
-     * @var ReloadHelper
-     */
-    private $helper;
+    private \Mautic\PluginBundle\Helper\ReloadHelper $helper;
 
-    /**
-     * @var array
-     */
-    private $sampleAllPlugins = [];
+    private array $sampleAllPlugins = [];
 
-    /**
-     * @var array
-     */
-    private $sampleMetaData = [];
+    private array $sampleMetaData = [];
 
-    /**
-     * @var array
-     */
-    private $sampleSchemas = [];
+    private array $sampleSchemas = [];
 
     /**
      * @var MockObject&EventDispatcherInterface
      */
-    private $eventDispatcher;
+    private \PHPUnit\Framework\MockObject\MockObject $eventDispatcher;
 
     protected function setUp(): void
     {

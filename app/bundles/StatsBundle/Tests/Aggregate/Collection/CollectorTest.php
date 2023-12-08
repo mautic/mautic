@@ -14,7 +14,7 @@ class CollectorTest extends TestCase
     /**
      * @var EventDispatcherInterface|\PHPUnit_Framework_MockObject_MockObject
      */
-    private $eventDispatcher;
+    private \Symfony\Component\EventDispatcher\EventDispatcher $eventDispatcher;
 
     protected function setUp(): void
     {

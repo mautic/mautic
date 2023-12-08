@@ -13,12 +13,12 @@ class ConfigurationTest extends \PHPUnit\Framework\TestCase
     /**
      * @var IntegrationHelper|\PHPUnit\Framework\MockObject\MockObject
      */
-    private $integrationHelper;
+    private \PHPUnit\Framework\MockObject\MockObject $integrationHelper;
 
     /**
      * @var AbstractIntegration|\PHPUnit\Framework\MockObject\MockObject
      */
-    private $integrationObject;
+    private \PHPUnit\Framework\MockObject\MockObject $integrationObject;
 
     protected function setUp(): void
     {

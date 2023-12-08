@@ -18,17 +18,14 @@ class DetermineWinnerSubscriberTest extends TestCase
     /**
      * @var MockObject|HitRepository
      */
-    private $hitRepository;
+    private \PHPUnit\Framework\MockObject\MockObject $hitRepository;
 
     /**
      * @var MockObject|TranslatorInterface
      */
-    private $translator;
+    private \PHPUnit\Framework\MockObject\MockObject $translator;
 
-    /**
-     * @var DetermineWinnerSubscriber
-     */
-    private $subscriber;
+    private \Mautic\PageBundle\EventListener\DetermineWinnerSubscriber $subscriber;
 
     protected function setUp(): void
     {

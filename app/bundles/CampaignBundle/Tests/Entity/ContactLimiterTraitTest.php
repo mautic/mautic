@@ -19,12 +19,12 @@ class ContactLimiterTraitTest extends \PHPUnit\Framework\TestCase
     /**
      * @var \PHPUnit\Framework\MockObject\MockObject|Connection
      */
-    private $connection;
+    private \PHPUnit\Framework\MockObject\MockObject $connection;
 
     /**
      * @var \PHPUnit\Framework\MockObject\MockObject|EntityManagerInterface
      */
-    private $entityManager;
+    private \PHPUnit\Framework\MockObject\MockObject $entityManager;
 
     protected function setUp(): void
     {

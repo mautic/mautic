@@ -25,22 +25,22 @@ class KickoffExecutionerTest extends \PHPUnit\Framework\TestCase
     /**
      * @var MockObject|KickoffContactFinder
      */
-    private $kickoffContactFinder;
+    private \PHPUnit\Framework\MockObject\MockObject $kickoffContactFinder;
 
     /**
      * @var MockObject|Translator
      */
-    private $translator;
+    private \PHPUnit\Framework\MockObject\MockObject $translator;
 
     /**
      * @var MockObject|EventExecutioner
      */
-    private $executioner;
+    private \PHPUnit\Framework\MockObject\MockObject $executioner;
 
     /**
      * @var MockObject|EventScheduler
      */
-    private $scheduler;
+    private \PHPUnit\Framework\MockObject\MockObject $scheduler;
 
     protected function setUp(): void
     {

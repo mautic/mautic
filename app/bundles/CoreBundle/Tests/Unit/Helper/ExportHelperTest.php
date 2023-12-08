@@ -20,9 +20,9 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 class ExportHelperTest extends TestCase
 {
     /** @var MockObject|TranslatorInterface */
-    private $translatorInterfaceMock;
+    private \PHPUnit\Framework\MockObject\MockObject $translatorInterfaceMock;
     /** @var MockObject|CoreParametersHelper */
-    private $coreParametersHelperMock;
+    private \PHPUnit\Framework\MockObject\MockObject $coreParametersHelperMock;
     private ExportHelper $exportHelper;
     /** @var array<array<string, int|string>> */
     private array $dummyData = [
@@ -42,7 +42,7 @@ class ExportHelperTest extends TestCase
     /** @var array<string> */
     private array $filePaths = [];
     /** @var FilePathResolver|MockObject */
-    private $filePathResolver;
+    private \PHPUnit\Framework\MockObject\MockObject $filePathResolver;
 
     protected function setUp(): void
     {

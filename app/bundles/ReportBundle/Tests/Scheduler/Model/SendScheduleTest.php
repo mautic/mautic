@@ -13,35 +13,26 @@ use PHPUnit\Framework\MockObject\MockObject;
 
 class SendScheduleTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var Report
-     */
-    private $report;
+    private \Mautic\ReportBundle\Entity\Report $report;
 
-    /**
-     * @var Scheduler
-     */
-    private $scheduler;
+    private \Mautic\ReportBundle\Entity\Scheduler $scheduler;
 
-    /**
-     * @var SendSchedule
-     */
-    private $sendSchedule;
+    private \Mautic\ReportBundle\Scheduler\Model\SendSchedule $sendSchedule;
 
     /**
      * @var MockObject|MailHelper
      */
-    private $mailHelperMock;
+    private \PHPUnit\Framework\MockObject\MockObject $mailHelperMock;
 
     /**
      * @var MockObject|MessageSchedule
      */
-    private $messageSchedule;
+    private \PHPUnit\Framework\MockObject\MockObject $messageSchedule;
 
     /**
      * @var MockObject|FileHandler
      */
-    private $fileHandler;
+    private \PHPUnit\Framework\MockObject\MockObject $fileHandler;
 
     protected function setUp(): void
     {

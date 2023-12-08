@@ -36,17 +36,17 @@ class FormSubmitActionUserEmailTypeTest extends \PHPUnit\Framework\TestCase
     /**
      * @var MockObject|FormBuilderInterface
      */
-    private $formBuilder;
+    private \PHPUnit\Framework\MockObject\MockObject $formBuilder;
 
     /**
      * @var EmailType
      */
-    private $form;
+    private \Mautic\EmailBundle\Form\Type\FormSubmitActionUserEmailType $form;
 
     /**
      * @var CoreParametersHelper|MockObject
      */
-    private $coreParametersHelper;
+    private \PHPUnit\Framework\MockObject\MockObject $coreParametersHelper;
 
     protected function setUp(): void
     {

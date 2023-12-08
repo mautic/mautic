@@ -33,27 +33,24 @@ class CampaignSubscriberTest extends \PHPUnit\Framework\TestCase
     /**
      * @var EmailModel|\PHPUnit\Framework\MockObject\MockObject
      */
-    private $emailModel;
+    private \PHPUnit\Framework\MockObject\MockObject $emailModel;
 
     /**
      * @var RealTimeExecutioner|\PHPUnit_Framework_MockObject_MockObject
      */
-    private $realTimeExecutioner;
+    private \PHPUnit\Framework\MockObject\MockObject $realTimeExecutioner;
 
     /**
      * @var SendEmailToUser|\PHPUnit\Framework\MockObject\MockObject
      */
-    private $sendEmailToUser;
+    private \PHPUnit\Framework\MockObject\MockObject $sendEmailToUser;
 
     /**
      * @var TranslatorInterface|\PHPUnit\Framework\MockObject\MockObject
      */
-    private $translator;
+    private \PHPUnit\Framework\MockObject\MockObject $translator;
 
-    /**
-     * @var CampaignSubscriber
-     */
-    private $subscriber;
+    private \Mautic\EmailBundle\EventListener\CampaignSubscriber $subscriber;
 
     protected function setUp(): void
     {

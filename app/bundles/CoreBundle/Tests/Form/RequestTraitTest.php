@@ -15,10 +15,7 @@ class RequestTraitTest extends \PHPUnit\Framework\TestCase
 {
     use RequestTrait;
 
-    /**
-     * @var Form
-     */
-    private $form;
+    private \Symfony\Component\Form\Form $form;
 
     protected function setUp(): void
     {

@@ -14,22 +14,22 @@ class CompanyModelTest extends \PHPUnit\Framework\TestCase
     /**
      * @var FieldModel|\PHPUnit\Framework\MockObject\MockObject
      */
-    private $leadFieldModel;
+    private \PHPUnit\Framework\MockObject\MockObject $leadFieldModel;
 
     /**
      * @var \PHPUnit\Framework\MockObject\MockObject|Session
      */
-    private $session;
+    private \PHPUnit\Framework\MockObject\MockObject $session;
 
     /**
      * @var EmailValidator|\PHPUnit\Framework\MockObject\MockObject
      */
-    private $emailValidator;
+    private \PHPUnit\Framework\MockObject\MockObject $emailValidator;
 
     /**
      * @var CompanyDeduper|\PHPUnit\Framework\MockObject\MockObject
      */
-    private $companyDeduper;
+    private \PHPUnit\Framework\MockObject\MockObject $companyDeduper;
 
     public function setUp(): void
     {

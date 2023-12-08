@@ -16,17 +16,17 @@ class ConsoleErrorListenerTest extends \PHPUnit\Framework\TestCase
     /**
      * @var MockObject|LoggerInterface
      */
-    private $logger;
+    private \PHPUnit\Framework\MockObject\MockObject $logger;
 
     /**
      * @var MockObject|InputInterface
      */
-    private $input;
+    private \PHPUnit\Framework\MockObject\MockObject $input;
 
     /**
      * @var MockObject|OutputInterface
      */
-    private $output;
+    private \PHPUnit\Framework\MockObject\MockObject $output;
 
     private ?ConsoleErrorListener $listener;
 

@@ -12,7 +12,7 @@ class RequestHelperTest extends TestCase
     /**
      * @var \PHPUnit\Framework\MockObject\MockObject|Request
      */
-    private $request;
+    private \PHPUnit\Framework\MockObject\MockObject $request;
 
     protected function setUp(): void
     {

@@ -7,10 +7,7 @@ use Mautic\LeadBundle\Entity\Lead;
 
 class LeadRepositoryFunctionalTest extends MauticMysqlTestCase
 {
-    /**
-     * @var Lead
-     */
-    private $lead;
+    private \Mautic\LeadBundle\Entity\Lead $lead;
 
     protected function setUp(): void
     {

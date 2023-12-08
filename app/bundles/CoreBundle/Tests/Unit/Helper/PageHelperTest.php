@@ -10,9 +10,9 @@ use Symfony\Component\HttpFoundation\Session\SessionInterface;
 
 class PageHelperTest extends \PHPUnit\Framework\TestCase
 {
-    private $session;
-    private $coreParametersHelper;
-    private $pageHelper;
+    private \PHPUnit\Framework\MockObject\MockObject $session;
+    private \PHPUnit\Framework\MockObject\MockObject $coreParametersHelper;
+    private \Mautic\CoreBundle\Helper\PageHelper $pageHelper;
 
     protected function setUp(): void
     {

@@ -10,9 +10,9 @@ use Mautic\LeadBundle\Model\DoNotContact;
 
 class DoNotContactSubscriberTest extends \PHPUnit\Framework\TestCase
 {
-    private $doNotContactSubscriber;
+    private \Mautic\LeadBundle\EventListener\DoNotContactSubscriber $doNotContactSubscriber;
 
-    private $doNotContact;
+    private \PHPUnit\Framework\MockObject\MockObject $doNotContact;
 
     protected function setUp(): void
     {

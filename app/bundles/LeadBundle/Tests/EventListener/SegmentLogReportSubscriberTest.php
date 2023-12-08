@@ -14,12 +14,9 @@ class SegmentLogReportSubscriberTest extends TestCase
     /**
      * @var FieldsBuilder
      */
-    private $fieldsBuilder;
+    private \PHPUnit\Framework\MockObject\MockObject $fieldsBuilder;
 
-    /**
-     * @var SegmentLogReportSubscriber
-     */
-    private $subscriber;
+    private \Mautic\LeadBundle\EventListener\SegmentLogReportSubscriber $subscriber;
 
     public function setUp(): void
     {

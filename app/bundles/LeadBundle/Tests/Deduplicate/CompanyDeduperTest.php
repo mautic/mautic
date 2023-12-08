@@ -12,12 +12,12 @@ class CompanyDeduperTest extends \PHPUnit\Framework\TestCase
     /**
      * @var \PHPUnit\Framework\MockObject\MockObject|FieldModel
      */
-    private $fieldModel;
+    private \PHPUnit\Framework\MockObject\MockObject $fieldModel;
 
     /**
      * @var \PHPUnit\Framework\MockObject\MockObject|CompanyRepository
      */
-    private $companyRepository;
+    private \PHPUnit\Framework\MockObject\MockObject $companyRepository;
 
     protected function setUp(): void
     {

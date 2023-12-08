@@ -24,27 +24,24 @@ class SendEmailToUserTest extends \PHPUnit\Framework\TestCase
     /**
      * @var MockObject|EmailModel
      */
-    private $emailModel;
+    private \PHPUnit\Framework\MockObject\MockObject $emailModel;
 
     /**
      * @var MockObject|EventDispatcherInterface
      */
-    private $dispatcher;
+    private \PHPUnit\Framework\MockObject\MockObject $dispatcher;
 
     /**
      * @var MockObject|CustomFieldValidator
      */
-    private $customFieldValidator;
+    private \PHPUnit\Framework\MockObject\MockObject $customFieldValidator;
 
     /**
      * @var MockObject|EmailValidator
      */
-    private $emailValidator;
+    private \PHPUnit\Framework\MockObject\MockObject $emailValidator;
 
-    /**
-     * @var SendEmailToUser
-     */
-    private $sendEmailToUser;
+    private \Mautic\EmailBundle\Model\SendEmailToUser $sendEmailToUser;
 
     protected function setUp(): void
     {

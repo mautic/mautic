@@ -15,27 +15,24 @@ class CircularDependencyValidatorTest extends \PHPUnit\Framework\TestCase
     /**
      * @var \PHPUnit\Framework\MockObject\MockObject|ListModel
      */
-    private $mockListModel;
+    private \PHPUnit\Framework\MockObject\MockObject $mockListModel;
 
     /**
      * @var \PHPUnit\Framework\MockObject\MockObject|ExecutionContext
      */
-    private $context;
+    private \PHPUnit\Framework\MockObject\MockObject $context;
 
     /**
      * @var \PHPUnit\Framework\MockObject\MockObject|RequestStack
      */
-    private $requestStack;
+    private \PHPUnit\Framework\MockObject\MockObject $requestStack;
 
     /**
      * @var \PHPUnit\Framework\MockObject\MockObject|Request
      */
-    private $request;
+    private \PHPUnit\Framework\MockObject\MockObject $request;
 
-    /**
-     * @var CircularDependencyValidator
-     */
-    private $validator;
+    private \Mautic\CoreBundle\Form\Validator\Constraints\CircularDependencyValidator $validator;
 
     protected function setUp(): void
     {

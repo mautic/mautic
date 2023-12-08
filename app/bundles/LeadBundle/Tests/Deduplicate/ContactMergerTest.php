@@ -20,27 +20,27 @@ class ContactMergerTest extends \PHPUnit\Framework\TestCase
     /**
      * @var \PHPUnit\Framework\MockObject\MockObject|LeadModel
      */
-    private $leadModel;
+    private \PHPUnit\Framework\MockObject\MockObject $leadModel;
 
     /**
      * @var \PHPUnit\Framework\MockObject\MockObject|MergeRecordRepository
      */
-    private $leadRepo;
+    private \PHPUnit\Framework\MockObject\MockObject $leadRepo;
 
     /**
      * @var \PHPUnit\Framework\MockObject\MockObject|MergeRecordRepository
      */
-    private $mergeRecordRepo;
+    private \PHPUnit\Framework\MockObject\MockObject $mergeRecordRepo;
 
     /**
      * @var \PHPUnit\Framework\MockObject\MockObject|EventDispatcher
      */
-    private $dispatcher;
+    private \PHPUnit\Framework\MockObject\MockObject $dispatcher;
 
     /**
      * @var \PHPUnit\Framework\MockObject\MockObject|Logger
      */
-    private $logger;
+    private \PHPUnit\Framework\MockObject\MockObject $logger;
 
     protected function setUp(): void
     {

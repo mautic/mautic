@@ -14,7 +14,7 @@ class TrackingSubscriberTest extends \PHPUnit\Framework\TestCase
     /**
      * @var \PHPUnit\Framework\MockObject\MockObject|StatRepository
      */
-    private $statRepository;
+    private \PHPUnit\Framework\MockObject\MockObject $statRepository;
 
     protected function setUp(): void
     {

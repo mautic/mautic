@@ -21,27 +21,27 @@ class ScheduledExecutionerTest extends \PHPUnit\Framework\TestCase
     /**
      * @var \PHPUnit\Framework\MockObject\MockObject|LeadEventLogRepository
      */
-    private $repository;
+    private \PHPUnit\Framework\MockObject\MockObject $repository;
 
     /**
      * @var \PHPUnit\Framework\MockObject\MockObject|Translator
      */
-    private $translator;
+    private \PHPUnit\Framework\MockObject\MockObject $translator;
 
     /**
      * @var \PHPUnit\Framework\MockObject\MockObject|EventExecutioner
      */
-    private $executioner;
+    private \PHPUnit\Framework\MockObject\MockObject $executioner;
 
     /**
      * @var \PHPUnit\Framework\MockObject\MockObject|EventScheduler
      */
-    private $scheduler;
+    private \PHPUnit\Framework\MockObject\MockObject $scheduler;
 
     /**
      * @var \PHPUnit\Framework\MockObject\MockObject|ScheduledContactFinder
      */
-    private $contactFinder;
+    private \PHPUnit\Framework\MockObject\MockObject $contactFinder;
 
     protected function setUp(): void
     {

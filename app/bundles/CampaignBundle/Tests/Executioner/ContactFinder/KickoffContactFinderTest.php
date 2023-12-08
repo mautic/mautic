@@ -16,12 +16,12 @@ class KickoffContactFinderTest extends \PHPUnit\Framework\TestCase
     /**
      * @var \PHPUnit\Framework\MockObject\MockObject|LeadRepository
      */
-    private $leadRepository;
+    private \PHPUnit\Framework\MockObject\MockObject $leadRepository;
 
     /**
      * @var \PHPUnit\Framework\MockObject\MockObject|CampaignRepository
      */
-    private $campaignRepository;
+    private \PHPUnit\Framework\MockObject\MockObject $campaignRepository;
 
     protected function setUp(): void
     {
