@@ -131,9 +131,9 @@ class IcontactIntegration extends EmailAbstractIntegration
     }
 
     /**
-     * @return array
+     * @return mixed[]
      */
-    public function getAvailableLeadFields($settings = [])
+    public function getAvailableLeadFields($settings = []): array
     {
         if (!$this->isAuthorized()) {
             return [];

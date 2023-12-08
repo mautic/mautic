@@ -253,10 +253,8 @@ class HitRepository extends CommonRepository
      *
      * @param array|string $pageIds
      * @param bool         $isVariantCheck
-     *
-     * @return array
      */
-    public function getBounces($pageIds, \DateTime $fromDate = null, $isVariantCheck = false)
+    public function getBounces($pageIds, \DateTime $fromDate = null, $isVariantCheck = false): array
     {
         $inOrEq = (!is_array($pageIds)) ? 'eq' : 'in';
 

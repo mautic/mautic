@@ -126,10 +126,7 @@ class ReloadHelper
         return $installedPlugins;
     }
 
-    /**
-     * @return Plugin
-     */
-    private function mapConfigToPluginEntity(Plugin $plugin, array $config)
+    private function mapConfigToPluginEntity(Plugin $plugin, array $config): Plugin
     {
         $plugin->setBundle($config['bundle']);
 

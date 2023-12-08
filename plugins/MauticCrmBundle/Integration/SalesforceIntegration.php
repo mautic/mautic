@@ -145,26 +145,17 @@ class SalesforceIntegration extends CrmAbstractIntegration
         return 'api refresh_token';
     }
 
-    /**
-     * @return string
-     */
-    public function getApiUrl()
+    public function getApiUrl(): string
     {
         return sprintf('%s/services/data/v34.0/sobjects', $this->keys['instance_url']);
     }
 
-    /**
-     * @return string
-     */
-    public function getQueryUrl()
+    public function getQueryUrl(): string
     {
         return sprintf('%s/services/data/v34.0', $this->keys['instance_url']);
     }
 
-    /**
-     * @return string
-     */
-    public function getCompositeUrl()
+    public function getCompositeUrl(): string
     {
         return sprintf('%s/services/data/v38.0', $this->keys['instance_url']);
     }
@@ -224,13 +215,13 @@ class SalesforceIntegration extends CrmAbstractIntegration
     }
 
     /**
-     * @param array $settings
+     * @param mixed[] $settings
      *
-     * @return array|mixed
+     * @return mixed[]
      *
      * @throws \Exception
      */
-    public function getFormLeadFields($settings = [])
+    public function getFormLeadFields(array $settings = []): array
     {
         $leadFields    = $this->getFormFieldsByObject('Lead', $settings);
         $contactFields = $this->getFormFieldsByObject('Contact', $settings);
@@ -241,11 +232,11 @@ class SalesforceIntegration extends CrmAbstractIntegration
     /**
      * @param array $settings
      *
-     * @return array|mixed
+     * @return mixed[]
      *
      * @throws \Exception
      */
-    public function getAvailableLeadFields($settings = [])
+    public function getAvailableLeadFields($settings = []): array
     {
         $silenceExceptions = (isset($settings['silence_exceptions'])) ? $settings['silence_exceptions'] : true;
         $salesForceObjects = [];
@@ -1059,10 +1050,8 @@ class SalesforceIntegration extends CrmAbstractIntegration
 
     /**
      * Return key recognized by integration.
-     *
-     * @return mixed
      */
-    public function convertLeadFieldKey($key, $field)
+    public function convertLeadFieldKey(string $key, $field): string
     {
         $search = [];
         foreach ($this->objects as $object) {
@@ -1565,10 +1554,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
         return false;
     }
 
-    /**
-     * @return mixed|string
-     */
-    protected function getSyncKey($email)
+    protected function getSyncKey($email): string
     {
         return mb_strtolower($this->cleanPushData($email));
     }
@@ -2061,7 +2047,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
     {
         // Salesforce craps out with double quotes and unescaped single quotes
         $findEmailsInSF = array_map(
-            function ($lead) {
+            function ($lead): string {
                 return str_replace("'", "\'", $this->cleanPushData($lead['email']));
             },
             $checkEmailsInSF
@@ -2981,13 +2967,11 @@ class SalesforceIntegration extends CrmAbstractIntegration
     }
 
     /**
-     * @return array
-     *
      * @throws ApiErrorException
      * @throws \Doctrine\ORM\ORMException
      * @throws \Exception
      */
-    protected function getSalesforceAccountsByName(&$checkIdsInSF, $requiredFieldString)
+    protected function getSalesforceAccountsByName(&$checkIdsInSF, $requiredFieldString): array
     {
         $searchForIds   = [];
         $searchForNames = [];

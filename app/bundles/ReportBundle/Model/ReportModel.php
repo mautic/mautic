@@ -152,7 +152,7 @@ class ReportModel extends FormModel
      *
      * @throws \Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException
      */
-    protected function dispatchEvent($action, &$entity, $isNew = false, Event $event = null)
+    protected function dispatchEvent($action, &$entity, $isNew = false, Event $event = null): ?Event
     {
         if (!$entity instanceof Report) {
             throw new MethodNotAllowedHttpException(['Report']);
@@ -255,10 +255,8 @@ class ReportModel extends FormModel
 
     /**
      * Prevent same aliases using numeric suffixes for each alias.
-     *
-     * @return array
      */
-    private function preventSameAliases(array $columns)
+    private function preventSameAliases(array $columns): array
     {
         $existingAliases = [];
 

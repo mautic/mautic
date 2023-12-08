@@ -27,7 +27,7 @@ class MailchimpIntegration extends EmailAbstractIntegration
     /**
      * {@inheritdoc}
      */
-    public function getAuthenticationType()
+    public function getAuthenticationType(): string
     {
         return (empty($this->keys['client_id'])) ? 'basic' : 'oauth2';
     }
@@ -91,9 +91,9 @@ class MailchimpIntegration extends EmailAbstractIntegration
     /**
      * @param array $settings
      *
-     * @return mixed
+     * @return mixed[]
      */
-    public function getAvailableLeadFields($settings = [])
+    public function getAvailableLeadFields($settings = []): array
     {
         if (isset($settings['list'])) {
             // Ajax update

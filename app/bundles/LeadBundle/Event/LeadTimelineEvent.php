@@ -546,10 +546,8 @@ class LeadTimelineEvent extends Event
 
     /**
      * Convert all snake case keys o camel case for API congruency.
-     *
-     * @return array
      */
-    private function prepareDetailsForAPI(array $details)
+    private function prepareDetailsForAPI(array $details): array
     {
         foreach ($details as $key => &$detailValues) {
             if (is_array($detailValues)) {

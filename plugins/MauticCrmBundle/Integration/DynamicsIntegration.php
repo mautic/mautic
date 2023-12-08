@@ -238,11 +238,9 @@ class DynamicsIntegration extends CrmAbstractIntegration
     /**
      * @param array $settings
      *
-     * @return array|bool
-     *
      * @throws ApiErrorException
      */
-    public function getAvailableLeadFields($settings = [])
+    public function getAvailableLeadFields($settings = []): array
     {
         $dynamicsFields    = [];
         $silenceExceptions = isset($settings['silence_exceptions']) ? $settings['silence_exceptions'] : true;
@@ -307,7 +305,7 @@ class DynamicsIntegration extends CrmAbstractIntegration
                 throw $exception;
             }
 
-            return false;
+            return [];
         }
 
         return $dynamicsFields;

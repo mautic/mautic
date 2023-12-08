@@ -239,7 +239,7 @@ class GrapesJsController extends CommonController
                 // Order slides
                 usort(
                     $options['slides'],
-                    function ($a, $b) {
+                    function ($a, $b): int {
                         return strcmp($a['order'], $b['order']);
                     }
                 );

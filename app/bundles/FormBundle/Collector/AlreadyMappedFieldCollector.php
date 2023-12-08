@@ -26,7 +26,7 @@ final class AlreadyMappedFieldCollector implements AlreadyMappedFieldCollectorIn
 
     public function addField(string $formId, string $object, string $fieldKey): void
     {
-        $this->fetchAndSave($formId, $object, function (array $fields) use ($fieldKey) {
+        $this->fetchAndSave($formId, $object, function (array $fields) use ($fieldKey): array {
             if (!in_array($fieldKey, $fields, true)) {
                 $fields[] = $fieldKey;
             }

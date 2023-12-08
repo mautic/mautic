@@ -96,10 +96,8 @@ class CommonRepository extends ServiceEntityRepository
      * Examines the arguments passed to getEntities and converts ORM properties to dBAL column names.
      *
      * @param string $entityClass
-     *
-     * @return array
      */
-    public function convertOrmProperties($entityClass, array $args)
+    public function convertOrmProperties($entityClass, array $args): array
     {
         $properties = $this->getBaseColumns($entityClass);
 
@@ -934,11 +932,9 @@ class CommonRepository extends ServiceEntityRepository
      *
      * @param array $clause ['expr' => 'expression', 'col' => 'DB column', 'val' => 'value to search for']
      *
-     * @return array
-     *
      * @throws \InvalidArgumentException
      */
-    protected function validateWhereClause(array $clause)
+    protected function validateWhereClause(array $clause): array
     {
         $msg = '"%s" is missing in the where clause array.';
         if (empty($clause['expr'])) {

@@ -155,7 +155,7 @@ class CampaignModel extends CommonFormModel
      *
      * @throws \Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException
      */
-    protected function dispatchEvent($action, &$entity, $isNew = false, \Symfony\Contracts\EventDispatcher\Event $event = null)
+    protected function dispatchEvent($action, &$entity, $isNew = false, \Symfony\Contracts\EventDispatcher\Event $event = null): ?\Symfony\Contracts\EventDispatcher\Event
     {
         if ($entity instanceof \Mautic\CampaignBundle\Entity\Lead) {
             return null;
@@ -464,10 +464,8 @@ class CampaignModel extends CommonFormModel
      *
      * @param string $sourceType
      * @param bool   $globalOnly
-     *
-     * @return array
      */
-    public function getSourceLists($sourceType = null, $globalOnly = false)
+    public function getSourceLists($sourceType = null, $globalOnly = false): array
     {
         $choices = [];
         switch ($sourceType) {

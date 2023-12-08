@@ -594,10 +594,8 @@ abstract class AbstractStandardFormController extends AbstractFormController
 
     /**
      * Amend the parameters sent through postActionRedirect.
-     *
-     * @return array
      */
-    protected function getPostActionRedirectArguments(array $args, $action)
+    protected function getPostActionRedirectArguments(array $args, $action): array
     {
         return $args;
     }
@@ -710,10 +708,8 @@ abstract class AbstractStandardFormController extends AbstractFormController
 
     /**
      * Amend the parameters sent through delegateView.
-     *
-     * @return array
      */
-    protected function getViewArguments(array $args, $action)
+    protected function getViewArguments(array $args, $action): array
     {
         return $args;
     }

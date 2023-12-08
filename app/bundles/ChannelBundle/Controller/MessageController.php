@@ -85,9 +85,9 @@ class MessageController extends AbstractStandardFormController
     }
 
     /**
-     * @return mixed
+     * @return mixed[]
      */
-    protected function getViewArguments(array $args, $action)
+    protected function getViewArguments(array $args, $action): array
     {
         /** @var MessageModel $model */
         $model          = $this->getModel($this->getModelName());

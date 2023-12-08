@@ -116,9 +116,9 @@ class CampaignEventHelper
      * @param array  $lead
      * @param int    $channelId
      *
-     * @return string
+     * @return string|string[]
      */
-    protected function parseTweetText($text, $lead, $channelId = -1)
+    protected function parseTweetText($text, $lead, $channelId = -1): array|string
     {
         $tweetHandle = $lead['twitter'];
         $tokens      = [

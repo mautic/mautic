@@ -32,11 +32,9 @@ class ContactMerger
     }
 
     /**
-     * @return Lead
-     *
      * @throws SameContactException
      */
-    public function merge(Lead $winner, Lead $loser)
+    public function merge(Lead $winner, Lead $loser): Lead
     {
         if ($winner->getId() === $loser->getId()) {
             throw new SameContactException();
