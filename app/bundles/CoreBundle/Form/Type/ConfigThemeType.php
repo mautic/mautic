@@ -49,6 +49,7 @@ class ConfigThemeType extends AbstractType
                     'class'   => 'form-control',
                     'tooltip' => 'mautic.core.config.form.theme_email.tooltip',
                 ],
+                'feature' => 'email',
             ]
         );
     }
