@@ -30,30 +30,18 @@ class Monitoring extends FormEntity
      */
     private $category;
 
-    /**
-     * @var array
-     */
-    private $lists = [];
+    private array $lists = [];
 
     /**
      * @var string|null
      */
     private $networkType;
 
-    /**
-     * @var int
-     */
-    private $revision = 1;
+    private int $revision = 1;
 
-    /**
-     * @var array
-     */
-    private $stats = [];
+    private array $stats = [];
 
-    /**
-     * @var array
-     */
-    private $properties = [];
+    private array $properties = [];
 
     /**
      * @var \DateTimeInterface

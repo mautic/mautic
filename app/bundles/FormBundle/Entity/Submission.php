@@ -16,20 +16,11 @@ class Submission
      */
     private $id;
 
-    /**
-     * @var Form
-     **/
-    private $form;
+    private ?\Mautic\FormBundle\Entity\Form $form = null;
 
-    /**
-     * @var \Mautic\CoreBundle\Entity\IpAddress
-     */
-    private $ipAddress;
+    private ?\Mautic\CoreBundle\Entity\IpAddress $ipAddress = null;
 
-    /**
-     * @var \Mautic\LeadBundle\Entity\Lead|null
-     */
-    private $lead;
+    private ?\Mautic\LeadBundle\Entity\Lead $lead = null;
 
     /**
      * @var string|null
@@ -46,15 +37,9 @@ class Submission
      */
     private $referer;
 
-    /**
-     * @var \Mautic\PageBundle\Entity\Page|null
-     */
-    private $page;
+    private ?\Mautic\PageBundle\Entity\Page $page = null;
 
-    /**
-     * @var array
-     */
-    private $results = [];
+    private array $results = [];
 
     public static function loadMetadata(ORM\ClassMetadata $metadata): void
     {

@@ -13,15 +13,9 @@ class LeadDevice
      */
     private $id;
 
-    /**
-     * @var \Mautic\LeadBundle\Entity\Lead
-     */
-    private $lead;
+    private ?\Mautic\LeadBundle\Entity\Lead $lead = null;
 
-    /**
-     * @var array
-     */
-    private $clientInfo = [];
+    private array $clientInfo = [];
 
     /**
      * @var string|null

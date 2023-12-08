@@ -23,20 +23,11 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class FieldHelper
 {
-    /**
-     * @var array
-     */
-    private $fieldList = [];
+    private array $fieldList = [];
 
-    /**
-     * @var array
-     */
-    private $requiredFieldList = [];
+    private array $requiredFieldList = [];
 
-    /**
-     * @var array
-     */
-    private $syncFields = [];
+    private array $syncFields = [];
 
     /**
      * @var EventDispatcher

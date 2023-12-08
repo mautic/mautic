@@ -67,10 +67,8 @@ class Import extends FormEntity
 
     /**
      * File name of the CSV file which is in the $dir.
-     *
-     * @var string
      */
-    private $file = 'import.csv';
+    private string $file = 'import.csv';
 
     /**
      * Name of the original uploaded file.
@@ -81,31 +79,23 @@ class Import extends FormEntity
 
     /**
      * Tolal line count of the CSV file.
-     *
-     * @var int
      */
-    private $lineCount = 0;
+    private int $lineCount = 0;
 
     /**
      * Count of entities which were newly created.
-     *
-     * @var int
      */
-    private $insertedCount = 0;
+    private int $insertedCount = 0;
 
     /**
      * Count of entities which were updated.
-     *
-     * @var int
      */
-    private $updatedCount = 0;
+    private int $updatedCount = 0;
 
     /**
      * Count of ignored items.
-     *
-     * @var int
      */
-    private $ignoredCount = 0;
+    private int $ignoredCount = 0;
 
     /**
      * @var int
@@ -117,25 +107,16 @@ class Import extends FormEntity
      */
     private $status;
 
-    /**
-     * @var \DateTimeInterface
-     */
-    private $dateStarted;
+    private ?\DateTime $dateStarted = null;
 
-    /**
-     * @var \DateTimeInterface
-     */
-    private $dateEnded;
+    private ?\DateTime $dateEnded = null;
 
-    /**
-     * @var string
-     */
-    private $object = 'lead';
+    private string $object = 'lead';
 
     /**
      * @var array<mixed>|null
      */
-    private $properties = [];
+    private array $properties = [];
 
     public function __clone()
     {

@@ -14,54 +14,48 @@ class OrderDAO
     /**
      * @var ObjectChangeDAO[][]
      */
-    private $identifiedObjects = [];
+    private array $identifiedObjects = [];
 
     /**
      * @var ObjectChangeDAO[][]
      */
-    private $unidentifiedObjects = [];
+    private array $unidentifiedObjects = [];
 
     /**
      * Array of all changed objects.
      *
      * @var ObjectChangeDAO[][]
      */
-    private $changedObjects = [];
+    private array $changedObjects = [];
 
     /**
      * @var array|ObjectMapping
      */
-    private $objectMappings = [];
+    private array $objectMappings = [];
 
     /**
      * @var UpdatedObjectMappingDAO[]
      */
-    private $updatedObjectMappings = [];
+    private array $updatedObjectMappings = [];
 
     /**
      * @var RemappedObjectDAO[]
      */
-    private $remappedObjects = [];
+    private array $remappedObjects = [];
 
     /**
      * @var ObjectChangeDAO[]
      */
-    private $deleteTheseObjects = [];
+    private array $deleteTheseObjects = [];
 
-    /**
-     * @var array
-     */
-    private $retryTheseLater = [];
+    private array $retryTheseLater = [];
 
-    /**
-     * @var int
-     */
-    private $objectCounter = 0;
+    private int $objectCounter = 0;
 
     /**
      * @var NotificationDAO[]
      */
-    private $notifications = [];
+    private array $notifications = [];
 
     /**
      * @param bool   $isFirstTimeSync

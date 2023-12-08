@@ -15,10 +15,7 @@ class LeadChangeEventDispatcher
      */
     private $lead;
 
-    /**
-     * @var array
-     */
-    private $changes;
+    private ?array $changes = null;
 
     public function __construct(private EventDispatcherInterface $dispatcher)
     {

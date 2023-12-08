@@ -61,25 +61,16 @@ class DynamicContent extends FormEntity implements VariantEntityInterface, Trans
      */
     private $content;
 
-    /**
-     * @var array|null
-     */
-    private $utmTags = [];
+    private array $utmTags = [];
 
-    /**
-     * @var int
-     */
-    private $sentCount = 0;
+    private int $sentCount = 0;
 
     /**
      * @var ArrayCollection<\Mautic\DynamicContentBundle\Entity\Stat>
      */
-    private $stats;
+    private \Doctrine\Common\Collections\ArrayCollection $stats;
 
-    /**
-     * @var bool
-     */
-    private $isCampaignBased = true;
+    private bool $isCampaignBased = true;
 
     /**
      * @var string|null

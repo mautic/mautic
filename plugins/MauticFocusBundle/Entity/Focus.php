@@ -69,12 +69,9 @@ class Focus extends FormEntity
      */
     private $publishDown;
 
-    private $properties = [];
+    private array $properties = [];
 
-    /**
-     * @var array
-     */
-    private $utmTags = [];
+    private array $utmTags = [];
 
     /**
      * @var int|null

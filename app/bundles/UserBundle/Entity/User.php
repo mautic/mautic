@@ -65,20 +65,11 @@ class User extends FormEntity implements UserInterface, EquatableInterface, Pass
      */
     private $position;
 
-    /**
-     * @var Role
-     */
-    private $role;
+    private ?\Mautic\UserBundle\Entity\Role $role = null;
 
-    /**
-     * @var string|null
-     */
-    private $timezone = '';
+    private string $timezone = '';
 
-    /**
-     * @var string|null
-     */
-    private $locale = '';
+    private string $locale = '';
 
     /**
      * @var \DateTimeInterface
@@ -93,12 +84,9 @@ class User extends FormEntity implements UserInterface, EquatableInterface, Pass
     /**
      * Stores active role permissions.
      */
-    private $activePermissions;
+    private ?array $activePermissions = null;
 
-    /**
-     * @var array
-     */
-    private $preferences = [];
+    private array $preferences = [];
 
     /**
      * @var string|null

@@ -7,10 +7,7 @@ use Symfony\Contracts\EventDispatcher\Event;
 
 class QueueEmailEvent extends Event
 {
-    /**
-     * @var bool
-     */
-    private $retry = false;
+    private bool $retry = false;
 
     public function __construct(private MauticMessage $message)
     {

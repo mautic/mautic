@@ -8,22 +8,15 @@ class InputHelper
 {
     /**
      * String filter.
-     *
-     * @var InputFilter
      */
-    private static $stringFilter;
+    private static ?\Joomla\Filter\InputFilter $stringFilter = null;
 
     /**
      * HTML filter.
-     *
-     * @var InputFilter
      */
-    private static $htmlFilter;
+    private static ?\Joomla\Filter\InputFilter $htmlFilter = null;
 
-    /**
-     * @var InputFilter
-     */
-    private static $strictHtmlFilter;
+    private static ?\Joomla\Filter\InputFilter $strictHtmlFilter = null;
 
     /**
      * Adjust the boolean values from text to boolean.

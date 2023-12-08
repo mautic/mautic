@@ -9,7 +9,7 @@ use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 
 class BuilderTokenHelper
 {
-    private $isConfigured = false;
+    private bool $isConfigured = false;
 
     protected $permissionSet;
     protected $modelName;

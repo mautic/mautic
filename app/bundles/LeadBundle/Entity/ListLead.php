@@ -27,15 +27,9 @@ class ListLead
      */
     private $dateAdded;
 
-    /**
-     * @var bool
-     */
-    private $manuallyRemoved = false;
+    private bool $manuallyRemoved = false;
 
-    /**
-     * @var bool
-     */
-    private $manuallyAdded = false;
+    private bool $manuallyAdded = false;
 
     public static function loadMetadata(ORM\ClassMetadata $metadata): void
     {

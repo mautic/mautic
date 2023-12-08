@@ -14,10 +14,7 @@ class Event
      */
     private $id;
 
-    /**
-     * @var Webhook
-     */
-    private $webhook;
+    private ?\Mautic\WebhookBundle\Entity\Webhook $webhook = null;
 
     /**
      * @var ArrayCollection<int, \Mautic\WebhookBundle\Entity\WebhookQueue>

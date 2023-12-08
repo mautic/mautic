@@ -23,25 +23,13 @@ class Integration extends CommonEntity
      */
     private $name;
 
-    /**
-     * @var bool
-     */
-    private $isPublished = false;
+    private bool $isPublished = false;
 
-    /**
-     * @var array
-     */
-    private $supportedFeatures = [];
+    private array $supportedFeatures = [];
 
-    /**
-     * @var array
-     */
-    private $apiKeys = [];
+    private array $apiKeys = [];
 
-    /**
-     * @var array
-     */
-    private $featureSettings = [];
+    private array $featureSettings = [];
 
     public static function loadMetadata(ORM\ClassMetadata $metadata): void
     {

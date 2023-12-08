@@ -10,20 +10,14 @@ use Metadata\Driver\DriverInterface;
 
 class ApiMetadataDriver extends BaseAnnotationDriver implements DriverInterface
 {
-    /**
-     * @var ClassMetadata
-     */
-    private $metadata;
+    private ?\JMS\Serializer\Metadata\ClassMetadata $metadata = null;
 
     /**
      * @var PropertyMetadata[]
      */
     private $properties = [];
 
-    /**
-     * @var string
-     */
-    private $groupPrefix = '';
+    private string $groupPrefix = '';
 
     /**
      * @var null

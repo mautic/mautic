@@ -30,50 +30,26 @@ class LeadField extends FormEntity
      */
     private $alias;
 
-    /**
-     * @var string
-     */
-    private $type = 'text';
+    private string $type = 'text';
 
-    /**
-     * @var string|null
-     */
-    private $group = 'core';
+    private string $group = 'core';
 
     /**
      * @var string|null
      */
     private $defaultValue;
 
-    /**
-     * @var bool
-     */
-    private $isRequired = false;
+    private bool $isRequired = false;
 
-    /**
-     * @var bool
-     */
-    private $isFixed = false;
+    private bool $isFixed = false;
 
-    /**
-     * @var bool
-     */
-    private $isVisible = true;
+    private bool $isVisible = true;
 
-    /**
-     * @var bool
-     */
-    private $isShortVisible = true;
+    private bool $isShortVisible = true;
 
-    /**
-     * @var bool
-     */
-    private $isListable = true;
+    private bool $isListable = true;
 
-    /**
-     * @var bool
-     */
-    private $isPubliclyUpdatable = false;
+    private bool $isPubliclyUpdatable = false;
 
     /**
      * @var bool|null
@@ -82,33 +58,20 @@ class LeadField extends FormEntity
 
     /**
      * Workaround for incorrectly spelled $isUniqueIdentifer.
-     *
-     * @var bool
      */
-    private $isUniqueIdentifier = false;
+    private bool $isUniqueIdentifier = false;
 
-    /**
-     * @var int|null
-     */
-    private $order = 1;
+    private int $order = 1;
 
-    /**
-     * @var string|null
-     */
-    private $object = 'lead';
+    private string $object = 'lead';
 
-    /**
-     * @var array
-     */
-    private $properties = [];
+    private array $properties = [];
 
     /**
      * The column in lead_fields table was not created yet if this property is true.
      * Entity cannot be published and we cannot work with it until column is created.
-     *
-     * @var bool
      */
-    private $columnIsNotCreated = false;
+    private bool $columnIsNotCreated = false;
 
     /**
      * This property contains an original value for $isPublished.
@@ -118,10 +81,7 @@ class LeadField extends FormEntity
      */
     private $originalIsPublishedValue = false;
 
-    /**
-     * @var CustomFieldObject
-     */
-    private $customFieldObject;
+    private ?\Mautic\LeadBundle\Field\DTO\CustomFieldObject $customFieldObject = null;
 
     public function __clone()
     {

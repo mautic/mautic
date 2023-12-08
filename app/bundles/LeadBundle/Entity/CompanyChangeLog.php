@@ -12,10 +12,7 @@ class CompanyChangeLog
      */
     private $id;
 
-    /**
-     * @var Lead
-     */
-    private $lead;
+    private ?\Mautic\LeadBundle\Entity\Lead $lead = null;
 
     /**
      * @var string

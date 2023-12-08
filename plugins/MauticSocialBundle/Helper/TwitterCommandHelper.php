@@ -16,25 +16,13 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 class TwitterCommandHelper
 {
-    /**
-     * @var OutputInterface
-     */
-    private $output;
+    private ?\Symfony\Component\Console\Output\OutputInterface $output = null;
 
-    /**
-     * @var int
-     */
-    private $updatedLeads = 0;
+    private int $updatedLeads = 0;
 
-    /**
-     * @var int
-     */
-    private $newLeads = 0;
+    private int $newLeads = 0;
 
-    /**
-     * @var array
-     */
-    private $manipulatedLeads = [];
+    private array $manipulatedLeads = [];
 
     /**
      * @var string

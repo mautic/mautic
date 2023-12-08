@@ -8,10 +8,7 @@ use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 
 class Trackable
 {
-    /**
-     * @var Redirect
-     */
-    private $redirect;
+    private ?\Mautic\PageBundle\Entity\Redirect $redirect = null;
 
     /**
      * @var string
@@ -23,15 +20,9 @@ class Trackable
      */
     private $channelId;
 
-    /**
-     * @var int
-     */
-    private $hits = 0;
+    private int $hits = 0;
 
-    /**
-     * @var int
-     */
-    private $uniqueHits = 0;
+    private int $uniqueHits = 0;
 
     public static function loadMetadata(ORM\ClassMetadata $metadata): void
     {

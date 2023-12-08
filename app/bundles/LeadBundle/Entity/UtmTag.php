@@ -14,20 +14,11 @@ class UtmTag
      */
     private $id;
 
-    /**
-     * @var \DateTimeInterface
-     */
-    private $dateAdded;
+    private ?\DateTimeInterface $dateAdded = null;
 
-    /**
-     * @var \Mautic\LeadBundle\Entity\Lead
-     */
-    private $lead;
+    private ?\Mautic\LeadBundle\Entity\Lead $lead = null;
 
-    /**
-     * @var array
-     */
-    private $query = [];
+    private array $query = [];
 
     /**
      * @var string|null

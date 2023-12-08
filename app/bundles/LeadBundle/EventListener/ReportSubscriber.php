@@ -35,7 +35,7 @@ class ReportSubscriber implements EventSubscriberInterface
 
     public const GROUP_CONTACTS = 'contacts';
 
-    private $leadContexts = [
+    private array $leadContexts = [
         self::CONTEXT_LEADS,
         self::CONTEXT_LEAD_POINT_LOG,
         self::CONTEXT_CONTACT_ATTRIBUTION_MULTI,
@@ -43,17 +43,11 @@ class ReportSubscriber implements EventSubscriberInterface
         self::CONTEXT_CONTACT_ATTRIBUTION_LAST,
         self::CONTEXT_CONTACT_FREQUENCYRULES,
     ];
-    private $companyContexts = [self::CONTEXT_COMPANIES];
+    private array $companyContexts = [self::CONTEXT_COMPANIES];
 
-    /**
-     * @var array
-     */
-    private $channels;
+    private ?array $channels = null;
 
-    /**
-     * @var array
-     */
-    private $channelActions;
+    private ?array $channelActions = null;
 
     public function __construct(private LeadModel $leadModel, private FieldModel $fieldModel, private StageModel $stageModel, private CampaignModel $campaignModel, private EventCollector $eventCollector, private CompanyModel $companyModel, private CompanyReportData $companyReportData, private FieldsBuilder $fieldsBuilder, private Translator $translator)
     {

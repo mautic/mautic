@@ -4,10 +4,7 @@ namespace Mautic\StatsBundle\Aggregate\Collection\Stats;
 
 class WeekStat
 {
-    /**
-     * @var int
-     */
-    private $count = 0;
+    private int $count = 0;
 
     /**
      * @return int

@@ -34,10 +34,7 @@ class Point extends FormEntity
      */
     private $type;
 
-    /**
-     * @var bool
-     */
-    private $repeatable = false;
+    private bool $repeatable = false;
 
     /**
      * @var \DateTimeInterface
@@ -49,20 +46,14 @@ class Point extends FormEntity
      */
     private $publishDown;
 
-    /**
-     * @var int
-     */
-    private $delta = 0;
+    private int $delta = 0;
 
-    /**
-     * @var array
-     */
-    private $properties = [];
+    private array $properties = [];
 
     /**
      * @var ArrayCollection<int,\Mautic\PointBundle\Entity\LeadPointLog>
      */
-    private $log;
+    private \Doctrine\Common\Collections\ArrayCollection|array $log;
 
     /**
      * @var Category|null

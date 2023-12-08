@@ -68,10 +68,7 @@ final class ButtonHelper
      */
     private $wrapClosingTag;
 
-    /**
-     * @var string
-     */
-    private $groupType = self::TYPE_GROUP;
+    private string $groupType = self::TYPE_GROUP;
 
     /**
      * @var string|null
@@ -88,15 +85,9 @@ final class ButtonHelper
      */
     private $buttonCount = 0;
 
-    /**
-     * @var bool
-     */
-    private $buttonsFetched = false;
+    private bool $buttonsFetched = false;
 
-    /**
-     * @var Request
-     */
-    private $request;
+    private ?\Symfony\Component\HttpFoundation\Request $request = null;
 
     /**
      * @var mixed

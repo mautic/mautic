@@ -49,25 +49,16 @@ class Event implements ChannelInterface
      */
     private $eventType;
 
-    /**
-     * @var int
-     */
-    private $order = 0;
+    private int $order = 0;
 
-    /**
-     * @var array
-     */
-    private $properties = [];
+    private array $properties = [];
 
     /**
      * @var \DateTimeInterface|null
      */
     private $triggerDate;
 
-    /**
-     * @var int|null
-     */
-    private $triggerInterval = 0;
+    private int $triggerInterval = 0;
 
     /**
      * @var string|null
@@ -77,42 +68,33 @@ class Event implements ChannelInterface
     /**
      * @var \DateTimeInterface|null
      */
-    private $triggerHour;
+    private ?\DateTime $triggerHour = null;
 
     /**
      * @var \DateTimeInterface|null
      */
-    private $triggerRestrictedStartHour;
+    private ?\DateTime $triggerRestrictedStartHour = null;
 
     /**
      * @var \DateTimeInterface|null
      */
-    private $triggerRestrictedStopHour;
+    private ?\DateTime $triggerRestrictedStopHour = null;
 
-    /**
-     * @var array|null
-     */
-    private $triggerRestrictedDaysOfWeek = [];
+    private ?array $triggerRestrictedDaysOfWeek = [];
 
     /**
      * @var string|null
      */
     private $triggerMode;
 
-    /**
-     * @var Campaign
-     */
-    private $campaign;
+    private ?\Mautic\CampaignBundle\Entity\Campaign $campaign = null;
 
     /**
      * @var ArrayCollection<int, \Mautic\CampaignBundle\Entity\Event>
      **/
-    private $children;
+    private \Doctrine\Common\Collections\ArrayCollection|array $children;
 
-    /**
-     * @var Event|null
-     **/
-    private $parent;
+    private ?\Mautic\CampaignBundle\Entity\Event $parent = null;
 
     /**
      * @var string|null
@@ -127,29 +109,21 @@ class Event implements ChannelInterface
     /**
      * @var ArrayCollection<int, \Mautic\CampaignBundle\Entity\LeadEventLog>
      */
-    private $log;
+    private \Doctrine\Common\Collections\ArrayCollection|array $log;
 
     /**
      * Used by API to house contact specific logs.
-     *
-     * @var array
      */
-    private $contactLog = [];
+    private array $contactLog = [];
 
     /**
      * @var string|null
      */
     private $channel;
 
-    /**
-     * @var int|null
-     */
-    private $channelId;
+    private ?int $channelId = null;
 
-    /**
-     * @var array
-     */
-    private $changes = [];
+    private array $changes = [];
 
     public function __construct()
     {

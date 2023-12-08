@@ -39,20 +39,11 @@ class VideoHit
      */
     private $duration;
 
-    /**
-     * @var Redirect
-     */
-    private $redirect;
+    private ?\Mautic\PageBundle\Entity\Redirect $redirect = null;
 
-    /**
-     * @var \Mautic\LeadBundle\Entity\Lead|null
-     */
-    private $lead;
+    private ?\Mautic\LeadBundle\Entity\Lead $lead = null;
 
-    /**
-     * @var \Mautic\CoreBundle\Entity\IpAddress
-     */
-    private $ipAddress;
+    private ?\Mautic\CoreBundle\Entity\IpAddress $ipAddress = null;
 
     /**
      * @var string|null
@@ -106,22 +97,16 @@ class VideoHit
     /**
      * @var array<string>
      */
-    private $browserLanguages = [];
+    private array $browserLanguages = [];
 
     /**
      * @var string|null
      */
     private $channel;
 
-    /**
-     * @var int|null
-     */
-    private $channelId;
+    private ?int $channelId = null;
 
-    /**
-     * @var array
-     */
-    private $query = [];
+    private array $query = [];
 
     public static function loadMetadata(ORM\ClassMetadata $metadata): void
     {

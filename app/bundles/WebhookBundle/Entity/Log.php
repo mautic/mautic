@@ -13,25 +13,16 @@ class Log
      */
     private $id;
 
-    /**
-     * @var Webhook
-     */
-    private $webhook;
+    private ?\Mautic\WebhookBundle\Entity\Webhook $webhook = null;
 
     /**
      * @var string
      */
     private $statusCode;
 
-    /**
-     * @var \DateTimeInterface
-     */
-    private $dateAdded;
+    private ?\DateTime $dateAdded = null;
 
-    /**
-     * @var float|null
-     */
-    private $runtime;
+    private ?float $runtime = null;
 
     private ?string $note;
 

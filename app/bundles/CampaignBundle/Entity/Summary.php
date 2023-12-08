@@ -17,45 +17,21 @@ class Summary
      */
     private $id;
 
-    /**
-     * @var \DateTimeImmutable|null
-     **/
-    private $dateTriggered;
+    private ?\DateTimeImmutable $dateTriggered = null;
 
-    /**
-     * @var int
-     */
-    private $scheduledCount = 0;
+    private int $scheduledCount = 0;
 
-    /**
-     * @var int
-     */
-    private $triggeredCount = 0;
+    private int $triggeredCount = 0;
 
-    /**
-     * @var int
-     */
-    private $nonActionPathTakenCount = 0;
+    private int $nonActionPathTakenCount = 0;
 
-    /**
-     * @var int
-     */
-    private $failedCount = 0;
+    private int $failedCount = 0;
 
-    /**
-     * @var Event|null
-     */
-    private $event;
+    private ?\Mautic\CampaignBundle\Entity\Event $event = null;
 
-    /**
-     * @var Campaign|null
-     */
-    private $campaign;
+    private ?\Mautic\CampaignBundle\Entity\Campaign $campaign = null;
 
-    /**
-     * @var int|null
-     */
-    private $logCountsProcessed = 0;
+    private ?int $logCountsProcessed = 0;
 
     public static function loadMetadata(ORM\ClassMetadata $metadata): void
     {

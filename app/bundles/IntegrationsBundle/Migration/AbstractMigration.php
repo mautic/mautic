@@ -12,7 +12,7 @@ abstract class AbstractMigration implements MigrationInterface
     /**
      * @var string[]
      */
-    private $queries = [];
+    private array $queries = [];
 
     public function __construct(protected EntityManager $entityManager, protected string $tablePrefix)
     {

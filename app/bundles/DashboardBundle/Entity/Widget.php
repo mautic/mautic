@@ -17,35 +17,17 @@ class Widget extends FormEntity
      */
     private $id;
 
-    /**
-     * @var string
-     */
-    private $name;
+    private ?string $name = null;
 
-    /**
-     * @var int
-     */
-    private $width;
+    private ?int $width = null;
 
-    /**
-     * @var int
-     */
-    private $height;
+    private ?int $height = null;
 
-    /**
-     * @var int|null
-     */
-    private $ordering;
+    private ?int $ordering = null;
 
-    /**
-     * @var string
-     */
-    private $type;
+    private ?string $type = null;
 
-    /**
-     * @var array
-     */
-    private $params = [];
+    private array $params = [];
 
     /**
      * @var string
@@ -57,25 +39,16 @@ class Widget extends FormEntity
      */
     private $errorMessage;
 
-    /**
-     * @var bool
-     */
-    private $cached = false;
+    private bool $cached = false;
 
-    /**
-     * @var int
-     */
-    private $loadTime = 0;
+    private int $loadTime = 0;
 
     /**
      * @var int|null (minutes)
      */
     private $cacheTimeout;
 
-    /**
-     * @var array
-     */
-    private $templateData = [];
+    private array $templateData = [];
 
     public function __clone()
     {

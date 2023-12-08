@@ -38,10 +38,7 @@ class Stat
      */
     private $dateAdded;
 
-    /**
-     * @var ?Lead
-     */
-    private $lead;
+    private ?\Mautic\LeadBundle\Entity\Lead $lead = null;
 
     public static function loadMetadata(ORM\ClassMetadata $metadata): void
     {

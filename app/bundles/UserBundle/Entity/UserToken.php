@@ -32,10 +32,7 @@ class UserToken
      */
     private $expiration;
 
-    /**
-     * @var bool
-     */
-    private $oneTimeOnly = true;
+    private bool $oneTimeOnly = true;
 
     public static function loadMetadata(ORM\ClassMetadata $metadata): void
     {

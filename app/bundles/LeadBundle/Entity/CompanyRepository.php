@@ -16,15 +16,9 @@ class CompanyRepository extends CommonRepository implements CustomFieldRepositor
 {
     use CustomFieldRepositoryTrait;
 
-    /**
-     * @var array
-     */
-    private $availableSearchFields = [];
+    private array $availableSearchFields = [];
 
-    /**
-     * @var EventDispatcherInterface|null
-     */
-    private $dispatcher;
+    private ?\Symfony\Component\EventDispatcher\EventDispatcherInterface $dispatcher = null;
 
     /**
      * Used by search functions to search using aliases as commands.

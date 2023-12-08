@@ -17,10 +17,7 @@ class UserCreator implements UserCreatorInterface
 {
     private int $defaultRole;
 
-    /**
-     * @var array
-     */
-    private $requiredFields = [
+    private array $requiredFields = [
         'username',
         'firstname',
         'lastname',

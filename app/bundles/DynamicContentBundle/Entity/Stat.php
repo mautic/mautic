@@ -9,15 +9,9 @@ use Mautic\LeadBundle\Entity\Lead;
 
 class Stat
 {
-    /**
-     * @var string
-     */
-    private $id;
+    private ?string $id = null;
 
-    /**
-     * @var DynamicContent|null
-     */
-    private $dynamicContent;
+    private ?\Mautic\DynamicContentBundle\Entity\DynamicContent $dynamicContent = null;
 
     /**
      * @var \Mautic\LeadBundle\Entity\Lead|null
@@ -39,10 +33,7 @@ class Stat
      */
     private $lastSent;
 
-    /**
-     * @var array
-     */
-    private $sentDetails = [];
+    private array $sentDetails = [];
 
     /**
      * @var string|null
@@ -54,10 +45,7 @@ class Stat
      */
     private $sourceId;
 
-    /**
-     * @var array
-     */
-    private $tokens = [];
+    private array $tokens = [];
 
     public static function loadMetadata(ORM\ClassMetadata $metadata): void
     {

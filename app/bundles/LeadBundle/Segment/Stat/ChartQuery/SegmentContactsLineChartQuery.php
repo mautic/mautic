@@ -38,10 +38,7 @@ class SegmentContactsLineChartQuery extends ChartQuery
      */
     private $addedLeadListStats;
 
-    /**
-     * @var bool
-     */
-    private $statsFromEventLog;
+    private ?bool $statsFromEventLog = null;
 
     /**
      * @param string|null $unit

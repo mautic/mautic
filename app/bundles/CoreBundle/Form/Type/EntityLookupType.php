@@ -22,7 +22,7 @@ class EntityLookupType extends AbstractType
     /**
      * @var EntityLookupChoiceLoader[]
      */
-    private $choiceLoaders;
+    private ?array $choiceLoaders = null;
 
     /**
      * @param ModelFactory<object> $modelFactory

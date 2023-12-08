@@ -64,10 +64,7 @@ class LeadEventLog
      */
     protected $dateAdded;
 
-    /**
-     * @var array|null
-     */
-    private $properties = [];
+    private array $properties = [];
 
     public function __construct()
     {

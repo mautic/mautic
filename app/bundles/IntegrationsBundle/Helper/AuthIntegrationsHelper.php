@@ -13,7 +13,7 @@ class AuthIntegrationsHelper
     /**
      * @var AuthenticationInterface[]
      */
-    private $integrations = [];
+    private array $integrations = [];
 
     public function __construct(private IntegrationsHelper $integrationsHelper)
     {

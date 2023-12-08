@@ -17,10 +17,7 @@ use Symfony\Component\Validator\Mapping\ClassMetadata;
 
 class Report extends FormEntity implements SchedulerInterface
 {
-    /**
-     * @var int
-     */
-    private $id;
+    private ?int $id = null;
 
     /**
      * @var string
@@ -32,55 +29,28 @@ class Report extends FormEntity implements SchedulerInterface
      */
     private $description;
 
-    /**
-     * @var bool
-     */
-    private $system = false;
+    private bool $system = false;
 
     /**
      * @var string
      */
     private $source;
 
-    /**
-     * @var array
-     */
-    private $columns = [];
+    private array $columns = [];
 
-    /**
-     * @var array
-     */
-    private $filters = [];
+    private array $filters = [];
 
-    /**
-     * @var array
-     */
-    private $tableOrder = [];
+    private array $tableOrder = [];
 
-    /**
-     * @var array
-     */
-    private $graphs = [];
+    private array $graphs = [];
 
-    /**
-     * @var array
-     */
-    private $groupBy = [];
+    private array $groupBy = [];
 
-    /**
-     * @var array
-     */
-    private $aggregators = [];
+    private array $aggregators = [];
 
-    /**
-     * @var array|null
-     */
-    private $settings = [];
+    private array $settings = [];
 
-    /**
-     * @var bool
-     */
-    private $isScheduled = false;
+    private bool $isScheduled = false;
 
     /**
      * @var string|null

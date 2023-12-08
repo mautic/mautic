@@ -15,55 +15,25 @@ class LeadEventLog implements ChannelInterface
      */
     private $id;
 
-    /**
-     * @var Event
-     */
-    private $event;
+    private ?\Mautic\CampaignBundle\Entity\Event $event = null;
 
-    /**
-     * @var LeadEntity
-     */
-    private $lead;
+    private ?\Mautic\LeadBundle\Entity\Lead $lead = null;
 
-    /**
-     * @var Campaign|null
-     */
-    private $campaign;
+    private ?\Mautic\CampaignBundle\Entity\Campaign $campaign = null;
 
-    /**
-     * @var IpAddress|null
-     */
-    private $ipAddress;
+    private ?\Mautic\CoreBundle\Entity\IpAddress $ipAddress = null;
 
-    /**
-     * @var \DateTimeInterface|null
-     **/
-    private $dateTriggered;
+    private ?\DateTimeInterface $dateTriggered = null;
 
-    /**
-     * @var bool
-     */
-    private $isScheduled = false;
+    private bool $isScheduled = false;
 
-    /**
-     * @var \DateTimeInterface|null
-     */
-    private $triggerDate;
+    private ?\DateTimeInterface $triggerDate = null;
 
-    /**
-     * @var bool
-     */
-    private $systemTriggered = false;
+    private bool $systemTriggered = false;
 
-    /**
-     * @var array
-     */
-    private $metadata = [];
+    private array $metadata = [];
 
-    /**
-     * @var bool|null
-     */
-    private $nonActionPathTaken = false;
+    private bool $nonActionPathTaken = false;
 
     /**
      * @var string|null
@@ -80,22 +50,14 @@ class LeadEventLog implements ChannelInterface
      */
     private $previousScheduledState;
 
-    /**
-     * @var int
-     */
-    private $rotation = 1;
+    private int $rotation = 1;
 
-    /**
-     * @var FailedLeadEventLog|null
-     */
-    private $failedLog;
+    private ?\Mautic\CampaignBundle\Entity\FailedLeadEventLog $failedLog = null;
 
     /**
      * Subscribers can fail log with custom reschedule interval.
-     *
-     * @var \DateInterval|null
      */
-    private $rescheduleInterval;
+    private ?\DateInterval $rescheduleInterval = null;
 
     public static function loadMetadata(ORM\ClassMetadata $metadata): void
     {

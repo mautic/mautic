@@ -30,20 +30,11 @@ class Channel extends CommonEntity
      */
     private $channelName;
 
-    /**
-     * @var Message
-     */
-    private $message;
+    private ?\Mautic\ChannelBundle\Entity\Message $message = null;
 
-    /**
-     * @var array
-     */
-    private $properties = [];
+    private array $properties = [];
 
-    /**
-     * @var bool
-     */
-    private $isEnabled = false;
+    private bool $isEnabled = false;
 
     public static function loadMetadata(ClassMetadata $metadata): void
     {

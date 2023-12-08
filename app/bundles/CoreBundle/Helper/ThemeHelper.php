@@ -17,17 +17,11 @@ class ThemeHelper implements ThemeHelperInterface
     /**
      * @var array|mixed
      */
-    private $themes = [];
+    private array $themes = [];
 
-    /**
-     * @var array
-     */
-    private $themesInfo = [];
+    private array $themesInfo = [];
 
-    /**
-     * @var array
-     */
-    private $steps = [];
+    private array $steps = [];
 
     /**
      * @var string
@@ -37,16 +31,13 @@ class ThemeHelper implements ThemeHelperInterface
     /**
      * @var twigThemeHelper[]
      */
-    private $themeHelpers = [];
+    private array $themeHelpers = [];
 
     private \Mautic\CoreBundle\Helper\Filesystem $filesystem;
 
     private \Symfony\Component\Finder\Finder $finder;
 
-    /**
-     * @var bool
-     */
-    private $themesLoadedFromFilesystem = false;
+    private bool $themesLoadedFromFilesystem = false;
 
     /**
      * Default themes which cannot be deleted.

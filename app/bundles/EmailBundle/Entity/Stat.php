@@ -20,15 +20,9 @@ class Stat
      */
     private $id;
 
-    /**
-     * @var Email|null
-     */
-    private $email;
+    private ?\Mautic\EmailBundle\Entity\Email $email = null;
 
-    /**
-     * @var Lead|null
-     */
-    private $lead;
+    private ?\Mautic\LeadBundle\Entity\Lead $lead = null;
 
     /**
      * @var string
@@ -40,30 +34,18 @@ class Stat
      */
     private $list;
 
-    /**
-     * @var IpAddress|null
-     */
-    private $ipAddress;
+    private ?\Mautic\CoreBundle\Entity\IpAddress $ipAddress = null;
 
     /**
      * @var \DateTimeInterface|null
      */
     private $dateSent;
 
-    /**
-     * @var bool
-     */
-    private $isRead = false;
+    private bool $isRead = false;
 
-    /**
-     * @var bool
-     */
-    private $isFailed = false;
+    private bool $isFailed = false;
 
-    /**
-     * @var bool
-     */
-    private $viewedInBrowser = false;
+    private bool $viewedInBrowser = false;
 
     /**
      * @var \DateTimeInterface|null
@@ -75,50 +57,32 @@ class Stat
      */
     private $trackingHash;
 
-    /**
-     * @var int|null
-     */
-    private $retryCount = 0;
+    private int $retryCount = 0;
 
     /**
      * @var string|null
      */
     private $source;
 
-    /**
-     * @var int|null
-     */
-    private $sourceId;
+    private ?int $sourceId = null;
 
-    /**
-     * @var array
-     */
-    private $tokens = [];
+    private array $tokens = [];
 
-    /**
-     * @var Copy|null
-     */
-    private $storedCopy;
+    private ?\Mautic\EmailBundle\Entity\Copy $storedCopy = null;
 
-    /**
-     * @var int|null
-     */
-    private $openCount = 0;
+    private int $openCount = 0;
 
     /**
      * @var \DateTimeInterface|null
      */
     private $lastOpened;
 
-    /**
-     * @var array
-     */
-    private $openDetails = [];
+    private array $openDetails = [];
 
     /**
      * @var ArrayCollection|EmailReply[]
      */
-    private $replies;
+    private \Doctrine\Common\Collections\ArrayCollection|array $replies;
 
     public function __construct()
     {

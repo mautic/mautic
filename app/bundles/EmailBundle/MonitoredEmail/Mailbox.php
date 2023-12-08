@@ -152,7 +152,7 @@ class Mailbox
     protected $isGmail = false;
     protected $mailboxes;
 
-    private $folders = [];
+    private array $folders = [];
 
     public function __construct(CoreParametersHelper $parametersHelper, PathsHelper $pathsHelper)
     {

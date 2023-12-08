@@ -13,15 +13,9 @@ class StagesChangeLog
      */
     private $id;
 
-    /**
-     * @var Lead
-     */
-    private $lead;
+    private ?\Mautic\LeadBundle\Entity\Lead $lead = null;
 
-    /**
-     * @var Stage|null
-     */
-    private $stage;
+    private ?\Mautic\StageBundle\Entity\Stage $stage = null;
 
     /**
      * @var string

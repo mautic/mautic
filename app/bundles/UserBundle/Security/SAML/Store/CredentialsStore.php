@@ -11,10 +11,7 @@ use RobRichards\XMLSecLibs\XMLSecurityKey;
 
 class CredentialsStore implements CredentialStoreInterface
 {
-    /**
-     * @var X509Credential|null
-     */
-    private $credentials;
+    private ?\LightSaml\Credential\X509Credential $credentials = null;
 
     public function __construct(private CoreParametersHelper $coreParametersHelper, private string $entityId)
     {

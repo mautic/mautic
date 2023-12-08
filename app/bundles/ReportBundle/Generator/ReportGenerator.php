@@ -16,10 +16,7 @@ use Symfony\Component\Form\FormFactoryInterface;
  */
 class ReportGenerator
 {
-    /**
-     * @var string
-     */
-    private $validInterface = \Mautic\ReportBundle\Builder\ReportBuilderInterface::class;
+    private string $validInterface = \Mautic\ReportBundle\Builder\ReportBuilderInterface::class;
 
     /**
      * @var string

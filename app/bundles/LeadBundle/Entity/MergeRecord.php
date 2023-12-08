@@ -12,25 +12,16 @@ class MergeRecord
      */
     private $id;
 
-    /**
-     * @var Lead
-     */
-    private $contact;
+    private ?\Mautic\LeadBundle\Entity\Lead $contact = null;
 
-    /**
-     * @var \DateTimeInterface
-     */
-    private $dateAdded;
+    private ?\DateTime $dateAdded = null;
 
     /**
      * @var string
      */
     private $name;
 
-    /**
-     * @var int
-     */
-    private $mergedId;
+    private ?int $mergedId = null;
 
     public static function loadMetadata(ORM\ClassMetadata $metadata): void
     {

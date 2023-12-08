@@ -60,45 +60,24 @@ class Tweet extends FormEntity
      */
     private $description;
 
-    /**
-     * @var string|null
-     */
-    private $language = 'en';
+    private string $language = 'en';
 
-    /**
-     * @var int|null
-     */
-    private $sentCount = 0;
+    private int $sentCount = 0;
 
-    /**
-     * @var int|null
-     */
-    private $favoriteCount = 0;
+    private int $favoriteCount = 0;
 
-    /**
-     * @var int|null
-     */
-    private $retweetCount = 0;
+    private int $retweetCount = 0;
 
-    /**
-     * @var Page|null
-     */
-    private $page;
+    private ?\Mautic\PageBundle\Entity\Page $page = null;
 
-    /**
-     * @var Asset|null
-     */
-    private $asset;
+    private ?\Mautic\AssetBundle\Entity\Asset $asset = null;
 
-    /**
-     * @var Category|null
-     **/
-    private $category;
+    private ?\Mautic\CategoryBundle\Entity\Category $category = null;
 
     /**
      * @var ArrayCollection<int, TweetStat>
      */
-    private $stats;
+    private \Doctrine\Common\Collections\ArrayCollection $stats;
 
     public function __construct()
     {

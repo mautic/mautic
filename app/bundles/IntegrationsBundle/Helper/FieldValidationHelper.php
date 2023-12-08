@@ -19,7 +19,7 @@ class FieldValidationHelper
     /**
      * @var ConfigFormSyncInterface|BasicInterface
      */
-    private $integrationObject;
+    private ?\Mautic\IntegrationsBundle\Integration\Interfaces\ConfigFormSyncInterface $integrationObject = null;
 
     public function __construct(private FieldHelper $fieldHelper, private TranslatorInterface $translator)
     {

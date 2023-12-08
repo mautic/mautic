@@ -34,25 +34,13 @@ class DoNotContact
      */
     private $id;
 
-    /**
-     * @var Lead|null
-     */
-    private $lead;
+    private ?\Mautic\LeadBundle\Entity\Lead $lead = null;
 
-    /**
-     * @var \DateTimeInterface
-     */
-    private $dateAdded;
+    private ?\DateTime $dateAdded = null;
 
-    /**
-     * @var int
-     */
-    private $reason = 0;
+    private int $reason = 0;
 
-    /**
-     * @var string|null
-     */
-    private $comments;
+    private ?string $comments = null;
 
     /**
      * @var string

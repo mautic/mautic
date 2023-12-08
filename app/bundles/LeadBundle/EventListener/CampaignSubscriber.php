@@ -46,10 +46,7 @@ class CampaignSubscriber implements EventSubscriberInterface
 {
     public const ACTION_LEAD_CHANGE_OWNER = 'lead.changeowner';
 
-    /**
-     * @var array
-     */
-    private $fields;
+    private ?array $fields = null;
 
     public function __construct(private IpLookupHelper $ipLookupHelper, private LeadModel $leadModel, private FieldModel $leadFieldModel, private ListModel $listModel, private CompanyModel $companyModel, private CampaignModel $campaignModel, private CoreParametersHelper $coreParametersHelper, private DoNotContact $doNotContact, private PointGroupModel $groupModel, private FilterOperatorProvider $filterOperatorProvider)
     {

@@ -20,10 +20,7 @@ class FormFieldHelper extends AbstractFormFieldHelper
 {
     private ?\Symfony\Component\Validator\Validator\ValidatorInterface $validator;
 
-    /**
-     * @var array
-     */
-    private $types = [
+    private array $types = [
         'captcha' => [
             'constraints' => [
                 NotBlank::class => ['message' => 'mautic.form.submission.captcha.invalid'],

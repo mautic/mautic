@@ -32,10 +32,8 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
 
     /**
      * Used to determine social identity.
-     *
-     * @var array
      */
-    private $availableSocialFields = [];
+    private array $availableSocialFields = [];
 
     /**
      * @var string
@@ -75,15 +73,9 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
 
     private $country;
 
-    /**
-     * @var User|null
-     */
-    private $owner;
+    private ?\Mautic\UserBundle\Entity\User $owner = null;
 
-    /**
-     * @var int
-     */
-    private $points = 0;
+    private int $points = 0;
 
     /**
      * @var array
@@ -98,7 +90,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
     /**
      * @var \Doctrine\Common\Collections\Collection<int, \Mautic\LeadBundle\Entity\PointsChangeLog>
      */
-    private $pointsChangeLog;
+    private \Doctrine\Common\Collections\ArrayCollection|array $pointsChangeLog;
 
     /**
      * @var null
@@ -108,42 +100,36 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
     /**
      * @var \Doctrine\Common\Collections\Collection<int, \Mautic\LeadBundle\Entity\CompanyChangeLog>
      */
-    private $companyChangeLog;
+    private \Doctrine\Common\Collections\ArrayCollection|array $companyChangeLog;
 
     /**
      * @var \Doctrine\Common\Collections\Collection<int, \Mautic\LeadBundle\Entity\DoNotContact>
      */
-    private $doNotContact;
+    private \Doctrine\Common\Collections\ArrayCollection|array $doNotContact;
 
     /**
      * @var \Doctrine\Common\Collections\Collection<int, \Mautic\CoreBundle\Entity\IpAddress>
      */
-    private $ipAddresses;
+    private \Doctrine\Common\Collections\ArrayCollection|array $ipAddresses;
 
     /**
      * @var \Doctrine\Common\Collections\Collection<int, \Mautic\NotificationBundle\Entity\PushID>
      */
-    private $pushIds;
+    private \Doctrine\Common\Collections\ArrayCollection|array $pushIds;
 
     /**
      * @var \Doctrine\Common\Collections\Collection<int, \Mautic\LeadBundle\Entity\LeadEventLog>
      */
-    private $eventLog;
+    private \Doctrine\Common\Collections\ArrayCollection|array $eventLog;
 
     /**
      * @var \DateTimeInterface
      */
     private $lastActive;
 
-    /**
-     * @var array
-     */
-    private $internal = [];
+    private array $internal = [];
 
-    /**
-     * @var array
-     */
-    private $socialCache = [];
+    private array $socialCache = [];
 
     /**
      * Used to populate trigger color.
@@ -152,15 +138,9 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
      */
     private $color;
 
-    /**
-     * @var LeadManipulator
-     */
-    private $manipulator;
+    private ?\Mautic\LeadBundle\DataObject\LeadManipulator $manipulator = null;
 
-    /**
-     * @var bool
-     */
-    private $newlyCreated = false;
+    private bool $newlyCreated = false;
 
     /**
      * @var \DateTimeInterface
@@ -172,10 +152,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
      */
     private $notes;
 
-    /**
-     * @var string|null
-     */
-    private $preferredProfileImage = 'gravatar';
+    private string $preferredProfileImage = 'gravatar';
 
     /**
      * @var bool
@@ -187,15 +164,12 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
      */
     private $tags;
 
-    /**
-     * @var Stage|null
-     */
-    private $stage;
+    private ?\Mautic\StageBundle\Entity\Stage $stage = null;
 
     /**
      * @var \Doctrine\Common\Collections\Collection<int, \Mautic\LeadBundle\Entity\StagesChangeLog>
      */
-    private $stageChangeLog;
+    private \Doctrine\Common\Collections\ArrayCollection|array $stageChangeLog;
 
     /**
      * @var \Doctrine\Common\Collections\Collection<int, \Mautic\LeadBundle\Entity\UtmTag>
@@ -205,7 +179,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
     /**
      * @var \Doctrine\Common\Collections\Collection<int, \Mautic\LeadBundle\Entity\FrequencyRule>
      */
-    private $frequencyRules;
+    private \Doctrine\Common\Collections\ArrayCollection|array $frequencyRules;
 
     /**
      * @var ArrayCollection<int,GroupContactScore>
@@ -216,10 +190,8 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
 
     /**
      * Used to determine order of preferred channels.
-     *
-     * @var array
      */
-    private $channelRules = [];
+    private array $channelRules = [];
 
     public function __construct()
     {

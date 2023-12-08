@@ -54,7 +54,7 @@ class ListModel extends FormModel
     /**
      * @var mixed[]
      */
-    private $choiceFieldsCache = [];
+    private array $choiceFieldsCache = [];
 
     public function __construct(
         protected CategoryModel $categoryModel,
@@ -76,10 +76,8 @@ class ListModel extends FormModel
 
     /**
      * Used by addLead and removeLead functions.
-     *
-     * @var array
      */
-    private $leadChangeLists = [];
+    private array $leadChangeLists = [];
 
     /**
      * {@inheritdoc}

@@ -29,40 +29,19 @@ class MessageQueue
 
     private $channelId;
 
-    /**
-     * @var Event|null
-     */
-    private $event;
+    private ?\Mautic\CampaignBundle\Entity\Event $event = null;
 
-    /**
-     * @var \Mautic\LeadBundle\Entity\Lead
-     */
-    private $lead;
+    private ?\Mautic\LeadBundle\Entity\Lead $lead = null;
 
-    /**
-     * @var int
-     */
-    private $priority = 2;
+    private int $priority = 2;
 
-    /**
-     * @var int
-     */
-    private $maxAttempts = 3;
+    private int $maxAttempts = 3;
 
-    /**
-     * @var int
-     */
-    private $attempts = 0;
+    private int $attempts = 0;
 
-    /**
-     * @var bool
-     */
-    private $success = false;
+    private bool $success = false;
 
-    /**
-     * @var string
-     */
-    private $status = self::STATUS_PENDING;
+    private string $status = self::STATUS_PENDING;
 
     /**
      * @var \DateTimeInterface
@@ -84,26 +63,19 @@ class MessageQueue
      */
     private $dateSent;
 
-    private $options = [];
+    private array $options = [];
 
     /**
      * Used by listeners to note if the message had been processed in bulk.
-     *
-     * @var bool
      */
-    private $processed = false;
+    private bool $processed = false;
 
     /**
      * Used by listeners to tell the event dispatcher the message needs to be retried in 15 minutes.
-     *
-     * @var bool
      */
-    private $failed = false;
+    private bool $failed = false;
 
-    /**
-     * @var bool
-     */
-    private $metadataUpdated = false;
+    private bool $metadataUpdated = false;
 
     public static function loadMetadata(ORM\ClassMetadata $metadata): void
     {

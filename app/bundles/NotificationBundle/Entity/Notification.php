@@ -31,10 +31,7 @@ class Notification extends FormEntity
      */
     private $description;
 
-    /**
-     * @var string
-     */
-    private $language = 'en';
+    private string $language = 'en';
 
     /**
      * @var string|null
@@ -56,10 +53,7 @@ class Notification extends FormEntity
      */
     private $button;
 
-    /**
-     * @var array
-     */
-    private $utmTags = [];
+    private array $utmTags = [];
 
     /**
      * @var \DateTimeInterface
@@ -71,15 +65,9 @@ class Notification extends FormEntity
      */
     private $publishDown;
 
-    /**
-     * @var int
-     */
-    private $readCount = 0;
+    private int $readCount = 0;
 
-    /**
-     * @var int
-     */
-    private $sentCount = 0;
+    private int $sentCount = 0;
 
     /**
      * @var \Mautic\CategoryBundle\Entity\Category|null
@@ -89,27 +77,18 @@ class Notification extends FormEntity
     /**
      * @var ArrayCollection<int, \Mautic\LeadBundle\Entity\LeadList>
      */
-    private $lists;
+    private \Doctrine\Common\Collections\ArrayCollection|array $lists;
 
     /**
      * @var ArrayCollection<int, \Mautic\NotificationBundle\Entity\Stat>
      */
-    private $stats;
+    private \Doctrine\Common\Collections\ArrayCollection $stats;
 
-    /**
-     * @var string|null
-     */
-    private $notificationType = 'template';
+    private string $notificationType = 'template';
 
-    /**
-     * @var bool
-     */
-    private $mobile = false;
+    private bool $mobile = false;
 
-    /**
-     * @var array
-     */
-    private $mobileSettings;
+    private ?array $mobileSettings = null;
 
     public function __clone()
     {

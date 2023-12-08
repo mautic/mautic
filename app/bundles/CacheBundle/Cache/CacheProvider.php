@@ -18,10 +18,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  */
 final class CacheProvider implements CacheProviderInterface
 {
-    /**
-     * @var Psr16Cache|null
-     */
-    private $psr16;
+    private ?\Symfony\Component\Cache\Psr16Cache $psr16 = null;
 
     public function __construct(private CoreParametersHelper $coreParametersHelper, private ContainerInterface $container)
     {

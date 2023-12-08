@@ -20,17 +20,11 @@ class Copy
      */
     private $dateCreated;
 
-    /**
-     * @var string|null
-     */
-    private $body;
+    private ?string $body = null;
 
     private ?string $bodyText;
 
-    /**
-     * @var string|null
-     */
-    private $subject;
+    private ?string $subject = null;
 
     public static function loadMetadata(ORM\ClassMetadata $metadata): void
     {

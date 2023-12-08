@@ -33,10 +33,7 @@ abstract class ModeratedCommand extends Command
     protected $lockExpiration;
     protected $lockFile;
 
-    /**
-     * @var Lock
-     */
-    private $lock;
+    private ?\Symfony\Component\Lock\LockInterface $lock = null;
 
     /**
      * @var OutputInterface

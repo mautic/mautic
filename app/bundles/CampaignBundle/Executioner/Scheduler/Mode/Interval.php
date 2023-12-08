@@ -16,10 +16,7 @@ class Interval implements ScheduleModeInterface
 {
     public const LOG_DATE_FORMAT = 'Y-m-d H:i:s T';
 
-    /**
-     * @var \DateTimeZone
-     */
-    private $defaultTimezone;
+    private ?\DateTimeZone $defaultTimezone = null;
 
     public function __construct(private LoggerInterface $logger, private CoreParametersHelper $coreParametersHelper)
     {

@@ -18,13 +18,13 @@ use Twig\Environment;
 
 class IntegrationHelper
 {
-    private $integrations = [];
+    private array $integrations = [];
 
     private $available = [];
 
-    private $byFeatureList = [];
+    private array $byFeatureList = [];
 
-    private $byPlugin = [];
+    private array $byPlugin = [];
 
     public function __construct(private ContainerInterface $container, protected EntityManager $em, protected PathsHelper $pathsHelper, protected BundleHelper $bundleHelper, protected CoreParametersHelper $coreParametersHelper, protected Environment $twig, protected PluginModel $pluginModel)
     {

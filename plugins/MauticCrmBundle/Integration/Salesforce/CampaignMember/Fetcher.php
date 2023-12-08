@@ -17,35 +17,20 @@ class Fetcher
      */
     private $leads = [];
 
-    /**
-     * @var array
-     */
-    private $knownLeadIds = [];
+    private array $knownLeadIds = [];
 
-    /**
-     * @var array
-     */
-    private $unknownLeadIds = [];
+    private array $unknownLeadIds = [];
 
     /**
      * @var array
      */
     private $contacts = [];
 
-    /**
-     * @var array
-     */
-    private $knownContactIds = [];
+    private array $knownContactIds = [];
 
-    /**
-     * @var array
-     */
-    private $unknownContactIds = [];
+    private array $unknownContactIds = [];
 
-    /**
-     * @var array
-     */
-    private $mauticIds = [];
+    private array $mauticIds = [];
 
     /**
      * @var array

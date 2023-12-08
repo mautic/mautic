@@ -25,7 +25,7 @@ class FormController extends AbstractStandardFormController
     private $deprecatedModelName;
     private $deprecatedPermissionBase;
     private $deprecatedRouteBase;
-    private $deprecatedSessionBase;
+    private ?string $deprecatedSessionBase = null;
     private $deprecatedTranslationBase;
     private $deprecatedTemplateBase;
     private $deprecatedMauticContent;

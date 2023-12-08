@@ -25,15 +25,9 @@ class UserSummaryNotificationHelper
      */
     private $objectDisplayName;
 
-    /**
-     * @var string
-     */
-    private $mauticObject;
+    private ?string $mauticObject = null;
 
-    /**
-     * @var string
-     */
-    private $listTranslationKey;
+    private ?string $listTranslationKey = null;
 
     public function __construct(private Writer $writer, private UserHelper $userHelper, private OwnerProvider $ownerProvider, private RouteHelper $routeHelper, private TranslatorInterface $translator)
     {

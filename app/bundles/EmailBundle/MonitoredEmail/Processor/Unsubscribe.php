@@ -15,10 +15,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class Unsubscribe implements ProcessorInterface
 {
-    /**
-     * @var Message
-     */
-    private $message;
+    private ?\Mautic\EmailBundle\MonitoredEmail\Message $message = null;
 
     public function __construct(private TransportInterface $transport, private ContactFinder $contactFinder, private TranslatorInterface $translator, private LoggerInterface $logger, private DoNotContactModel $doNotContact)
     {

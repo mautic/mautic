@@ -29,30 +29,18 @@ class TriggerEvent
      */
     private $type;
 
-    /**
-     * @var int
-     */
-    private $order = 0;
+    private int $order = 0;
 
-    /**
-     * @var array
-     */
-    private $properties = [];
+    private array $properties = [];
 
-    /**
-     * @var Trigger
-     */
-    private $trigger;
+    private ?\Mautic\PointBundle\Entity\Trigger $trigger = null;
 
     /**
      * @var ArrayCollection<int,\Mautic\PointBundle\Entity\LeadTriggerLog>
      */
-    private $log;
+    private \Doctrine\Common\Collections\ArrayCollection|array $log;
 
-    /**
-     * @var array
-     */
-    private $changes;
+    private ?array $changes = null;
 
     public function __construct()
     {

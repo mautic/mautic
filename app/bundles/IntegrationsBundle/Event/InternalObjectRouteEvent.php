@@ -9,10 +9,7 @@ use Symfony\Contracts\EventDispatcher\Event;
 
 class InternalObjectRouteEvent extends Event
 {
-    /**
-     * @var string|null
-     */
-    private $route;
+    private ?string $route = null;
 
     public function __construct(private ObjectInterface $object, private int $id)
     {

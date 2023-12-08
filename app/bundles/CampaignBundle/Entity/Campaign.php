@@ -50,32 +50,26 @@ class Campaign extends FormEntity implements PublishStatusIconAttributesInterfac
     /**
      * @var ArrayCollection<int, \Mautic\CampaignBundle\Entity\Event>
      */
-    private $events;
+    private \Doctrine\Common\Collections\ArrayCollection|array $events;
 
     /**
      * @var ArrayCollection<int, \Mautic\CampaignBundle\Entity\Lead>
      */
-    private $leads;
+    private \Doctrine\Common\Collections\ArrayCollection|array $leads;
 
     /**
      * @var ArrayCollection<int, \Mautic\LeadBundle\Entity\LeadList>
      */
-    private $lists;
+    private \Doctrine\Common\Collections\ArrayCollection|array $lists;
 
     /**
      * @var ArrayCollection<int, \Mautic\FormBundle\Entity\Form>
      */
-    private $forms;
+    private \Doctrine\Common\Collections\ArrayCollection|array $forms;
 
-    /**
-     * @var array
-     */
-    private $canvasSettings = [];
+    private array $canvasSettings = [];
 
-    /**
-     * @var int
-     */
-    private $allowRestart = 0;
+    private int $allowRestart = 0;
 
     public function __construct()
     {

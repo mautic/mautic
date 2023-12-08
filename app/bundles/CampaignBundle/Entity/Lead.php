@@ -8,40 +8,22 @@ use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 
 class Lead
 {
-    /**
-     * @var Campaign
-     */
-    private $campaign;
+    private ?\Mautic\CampaignBundle\Entity\Campaign $campaign = null;
 
-    /**
-     * @var \Mautic\LeadBundle\Entity\Lead
-     */
-    private $lead;
+    private ?\Mautic\LeadBundle\Entity\Lead $lead = null;
 
     /**
      * @var \DateTimeInterface
      **/
     private $dateAdded;
 
-    /**
-     * @var \DateTimeInterface
-     */
-    private $dateLastExited;
+    private ?\DateTime $dateLastExited = null;
 
-    /**
-     * @var bool
-     */
-    private $manuallyRemoved = false;
+    private bool $manuallyRemoved = false;
 
-    /**
-     * @var bool
-     */
-    private $manuallyAdded = false;
+    private bool $manuallyAdded = false;
 
-    /**
-     * @var int
-     */
-    private $rotation = 1;
+    private int $rotation = 1;
 
     public static function loadMetadata(ORM\ClassMetadata $metadata): void
     {

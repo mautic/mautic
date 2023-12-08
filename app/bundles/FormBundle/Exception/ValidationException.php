@@ -4,7 +4,7 @@ namespace Mautic\FormBundle\Exception;
 
 class ValidationException extends \Exception
 {
-    private $violations = [];
+    private array $violations = [];
 
     public function __construct($message = 'Validation failed', $code = 0, \Exception $previous = null)
     {

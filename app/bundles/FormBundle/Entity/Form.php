@@ -50,10 +50,7 @@ class Form extends FormEntity
      */
     private $cachedHtml;
 
-    /**
-     * @var string
-     */
-    private $postAction = 'return';
+    private string $postAction = 'return';
 
     /**
      * @var string|null
@@ -73,27 +70,21 @@ class Form extends FormEntity
     /**
      * @var ArrayCollection<int, \Mautic\FormBundle\Entity\Field>
      */
-    private $fields;
+    private \Doctrine\Common\Collections\ArrayCollection|array $fields;
 
     /**
      * @var ArrayCollection<string, \Mautic\FormBundle\Entity\Action>
      */
-    private $actions;
+    private \Doctrine\Common\Collections\ArrayCollection|array $actions;
 
     /**
      * @var string|null
      */
     private $template;
 
-    /**
-     * @var bool|null
-     */
-    private $inKioskMode = false;
+    private bool $inKioskMode = false;
 
-    /**
-     * @var bool|null
-     */
-    private $renderStyle = false;
+    private bool $renderStyle = false;
 
     /**
      * @var Collection<int, Submission>
@@ -112,10 +103,7 @@ class Form extends FormEntity
      */
     private $formType;
 
-    /**
-     * @var bool|null
-     */
-    private $noIndex;
+    private ?bool $noIndex = null;
 
     /**
      * @var int|null
@@ -124,10 +112,8 @@ class Form extends FormEntity
 
     /**
      * This var is used to cache the result once gained from the loop.
-     *
-     * @var bool
      */
-    private $usesProgressiveProfiling;
+    private ?bool $usesProgressiveProfiling = null;
 
     public function __clone()
     {

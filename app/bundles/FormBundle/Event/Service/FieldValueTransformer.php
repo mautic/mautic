@@ -9,20 +9,11 @@ use Symfony\Component\Routing\RouterInterface;
 
 class FieldValueTransformer
 {
-    /**
-     * @var array
-     */
-    private $contactFieldsToUpdate = [];
+    private array $contactFieldsToUpdate = [];
 
-    /**
-     * @var array
-     */
-    private $tokensToUpdate = [];
+    private array $tokensToUpdate = [];
 
-    /**
-     * @var bool
-     */
-    private $isTransformed = false;
+    private bool $isTransformed = false;
 
     public function __construct(private RouterInterface $router)
     {

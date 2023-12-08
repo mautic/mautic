@@ -14,10 +14,7 @@ use Psr\Log\LoggerInterface;
 
 class InactiveContactFinder
 {
-    /**
-     * @var ArrayCollection
-     */
-    private $campaignMemberDatesAdded;
+    private ?array $campaignMemberDatesAdded = null;
 
     public function __construct(private LeadRepository $leadRepository, private CampaignLeadRepository $campaignLeadRepository, private LoggerInterface $logger)
     {

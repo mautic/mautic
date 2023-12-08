@@ -15,25 +15,16 @@ class Stat
      */
     private $id;
 
-    /**
-     * @var Notification|null
-     */
-    private $notification;
+    private ?\Mautic\NotificationBundle\Entity\Notification $notification = null;
 
-    /**
-     * @var \Mautic\LeadBundle\Entity\Lead|null
-     */
-    private $lead;
+    private ?\Mautic\LeadBundle\Entity\Lead $lead = null;
 
     /**
      * @var \Mautic\LeadBundle\Entity\LeadList|null
      */
     private $list;
 
-    /**
-     * @var \Mautic\CoreBundle\Entity\IpAddress|null
-     */
-    private $ipAddress;
+    private ?\Mautic\CoreBundle\Entity\IpAddress $ipAddress = null;
 
     /**
      * @var \DateTimeInterface
@@ -45,10 +36,7 @@ class Stat
      */
     private $dateRead;
 
-    /**
-     * @var bool
-     */
-    private $isClicked = false;
+    private bool $isClicked = false;
 
     /**
      * @var \DateTimeInterface
@@ -60,40 +48,25 @@ class Stat
      */
     private $trackingHash;
 
-    /**
-     * @var int|null
-     */
-    private $retryCount = 0;
+    private int $retryCount = 0;
 
     /**
      * @var string|null
      */
     private $source;
 
-    /**
-     * @var int|null
-     */
-    private $sourceId;
+    private ?int $sourceId = null;
 
-    /**
-     * @var array
-     */
-    private $tokens = [];
+    private array $tokens = [];
 
     /**
      * @var int|null
      */
     private $clickCount;
 
-    /**
-     * @var array
-     */
-    private $clickDetails = [];
+    private array $clickDetails = [];
 
-    /**
-     * @var \DateTimeInterface
-     */
-    private $lastClicked;
+    private ?\DateTime $lastClicked = null;
 
     public static function loadMetadata(ORM\ClassMetadata $metadata): void
     {

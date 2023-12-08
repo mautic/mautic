@@ -22,15 +22,9 @@ class TweetStat
      */
     private $twitterTweetId;
 
-    /**
-     * @var Tweet|null
-     */
-    private $tweet;
+    private ?\MauticPlugin\MauticSocialBundle\Entity\Tweet $tweet = null;
 
-    /**
-     * @var TheLead|null
-     */
-    private $lead;
+    private ?\Mautic\LeadBundle\Entity\Lead $lead = null;
 
     /**
      * @var string
@@ -42,40 +36,22 @@ class TweetStat
      */
     private $dateSent;
 
-    /**
-     * @var bool|null
-     */
-    private $isFailed = false;
+    private bool $isFailed = false;
 
-    /**
-     * @var int|null
-     */
-    private $retryCount = 0;
+    private int $retryCount = 0;
 
     /**
      * @var string|null
      */
     private $source;
 
-    /**
-     * @var int|null
-     */
-    private $sourceId;
+    private ?int $sourceId = null;
 
-    /**
-     * @var int|null
-     */
-    private $favoriteCount = 0;
+    private int $favoriteCount = 0;
 
-    /**
-     * @var int|null
-     */
-    private $retweetCount = 0;
+    private int $retweetCount = 0;
 
-    /**
-     * @var array|null
-     */
-    private $responseDetails = [];
+    private array $responseDetails = [];
 
     public static function loadMetadata(ORM\ClassMetadata $metadata): void
     {
