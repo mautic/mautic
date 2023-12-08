@@ -303,7 +303,7 @@ class AjaxController extends CommonController
                                 'item'          => $entity,
                                 'model'         => $name,
                                 'query'         => $extra,
-                                'size'          => (isset($post['size'])) ? $post['size'] : '',
+                                'size'          => $post['size'] ?? '',
                                 'onclick'       => $onclickMethod,
                                 'attributes'    => $dataAttr,
                                 'transKeys'     => $attrTransKeys,

@@ -27,11 +27,11 @@ class oAuthHelper
         $clientId                = $integration->getClientIdKey();
         $clientSecret            = $integration->getClientSecretKey();
         $keys                    = $integration->getDecryptedApiKeys();
-        $this->clientId          = isset($keys[$clientId]) ? $keys[$clientId] : null;
-        $this->clientSecret      = isset($keys[$clientSecret]) ? $keys[$clientSecret] : null;
+        $this->clientId          = $keys[$clientId] ?? null;
+        $this->clientSecret      = $keys[$clientSecret] ?? null;
         $authToken               = $integration->getAuthTokenKey();
-        $this->accessToken       = (isset($keys[$authToken])) ? $keys[$authToken] : '';
-        $this->accessTokenSecret = (isset($settings['token_secret'])) ? $settings['token_secret'] : '';
+        $this->accessToken       = $keys[$authToken] ?? '';
+        $this->accessTokenSecret = $settings['token_secret'] ?? '';
         $this->callback          = $integration->getAuthCallbackUrl();
         $this->settings          = $settings;
     }

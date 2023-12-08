@@ -513,7 +513,7 @@ class ImportController extends FormController
     {
         $progress = $this->session->get('mautic.'.$object.'.import.progress', [0, 0]);
 
-        return isset($progress[1]) ? $progress[1] : 0;
+        return $progress[1] ?? 0;
     }
 
     /**

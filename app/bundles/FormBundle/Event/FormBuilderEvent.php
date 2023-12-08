@@ -190,7 +190,7 @@ class FormBuilderEvent extends Event
     public function addValidatorsToBuilder(FormInterface $form): void
     {
         if (!empty($this->validators)) {
-            $validationData = (isset($form->getData()['validation'])) ? $form->getData()['validation'] : [];
+            $validationData = $form->getData()['validation'] ?? [];
             foreach ($this->validators as $validator) {
                 if (isset($validator['formType']) && isset($validator['fieldType']) && $validator['fieldType'] == $form->getData()['type']) {
                     $form->add(

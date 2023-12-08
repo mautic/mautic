@@ -23,7 +23,7 @@ class ConfigHelper
                 continue;
             }
 
-            $configValues[$key] = (isset($configValues[$key])) ? $configValues[$key] : $defaultValue;
+            $configValues[$key] = $configValues[$key] ?? $defaultValue;
         }
 
         return $configValues;

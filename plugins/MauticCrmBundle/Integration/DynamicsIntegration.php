@@ -243,12 +243,12 @@ class DynamicsIntegration extends CrmAbstractIntegration
     public function getAvailableLeadFields($settings = []): array
     {
         $dynamicsFields    = [];
-        $silenceExceptions = isset($settings['silence_exceptions']) ? $settings['silence_exceptions'] : true;
+        $silenceExceptions = $settings['silence_exceptions'] ?? true;
         if (isset($settings['feature_settings']['objects'])) {
             $dynamicsObjects = $settings['feature_settings']['objects'];
         } else {
             $settings        = $this->settings->getFeatureSettings();
-            $dynamicsObjects = isset($settings['objects']) ? $settings['objects'] : ['contacts'];
+            $dynamicsObjects = $settings['objects'] ?? ['contacts'];
         }
         try {
             if ($this->isAuthorized()) {

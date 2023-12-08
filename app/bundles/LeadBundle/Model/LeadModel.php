@@ -599,7 +599,7 @@ class LeadModel extends FormModel
                         $this->cleanFields($data, $field);
                     }
                     $curValue = $field['value'];
-                    $newValue = isset($data[$alias]) ? $data[$alias] : '';
+                    $newValue = $data[$alias] ?? '';
 
                     if (is_array($newValue)) {
                         $newValue = implode('|', $newValue);
@@ -982,7 +982,7 @@ class LeadModel extends FormModel
                 $data['lead_channels']['preferred_channel'] = $ch;
             }
 
-            $frequencyRule = (isset($frequencyRules[$ch])) ? $frequencyRules[$ch] : new FrequencyRule();
+            $frequencyRule = $frequencyRules[$ch] ?? new FrequencyRule();
             $frequencyRule->setChannel($ch);
             $frequencyRule->setLead($lead);
             $frequencyRule->setDateAdded(new \DateTime());

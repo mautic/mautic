@@ -49,8 +49,8 @@ class BatchContactController extends AbstractFormController
         $ids    = empty($params['ids']) ? [] : json_decode($params['ids']);
 
         if ($ids && is_array($ids)) {
-            $subscribedChannels = isset($params['subscribed_channels']) ? $params['subscribed_channels'] : [];
-            $preferredChannel   = isset($params['preferred_channel']) ? $params['preferred_channel'] : null;
+            $subscribedChannels = $params['subscribed_channels'] ?? [];
+            $preferredChannel   = $params['preferred_channel'] ?? null;
 
             $this->channelActionModel->update($ids, $subscribedChannels);
             $this->frequencyActionModel->update($ids, $params, $preferredChannel);

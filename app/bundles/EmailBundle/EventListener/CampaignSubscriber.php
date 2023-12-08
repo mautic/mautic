@@ -232,11 +232,11 @@ class CampaignSubscriber implements EventSubscriberInterface
 
         $event->setChannel('email', $emailId);
 
-        $type    = (isset($config['email_type'])) ? $config['email_type'] : MailHelper::EMAIL_TYPE_TRANSACTIONAL;
+        $type    = $config['email_type'] ?? MailHelper::EMAIL_TYPE_TRANSACTIONAL;
         $options = [
             'source'         => ['campaign.event', $event->getEvent()->getId()],
-            'email_attempts' => (isset($config['attempts'])) ? $config['attempts'] : 3,
-            'email_priority' => (isset($config['priority'])) ? $config['priority'] : 2,
+            'email_attempts' => $config['attempts'] ?? 3,
+            'email_priority' => $config['priority'] ?? 2,
             'email_type'     => $type,
             'return_errors'  => true,
             'dnc_as_error'   => true,

@@ -44,7 +44,7 @@ class AjaxController extends CommonAjaxController
 
             if ($integrationObject) {
                 if (!$object = $request->attributes->get('object')) {
-                    $object = (isset($settings['object'])) ? $settings['object'] : 'lead';
+                    $object = $settings['object'] ?? 'lead';
                 }
 
                 $isLead            = ('lead' === $object);
@@ -68,7 +68,7 @@ class AjaxController extends CommonAjaxController
                     $formType           = $isLead ? FieldsType::class : CompanyFieldsType::class;
                     $form               = $this->createForm(
                         $formType,
-                        isset($featureSettings[$object.'Fields']) ? $featureSettings[$object.'Fields'] : [],
+                        $featureSettings[$object.'Fields'] ?? [],
                         [
                             'mautic_fields'        => $mauticFields,
                             'data'                 => $featureSettings,

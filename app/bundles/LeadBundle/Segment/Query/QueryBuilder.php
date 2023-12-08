@@ -179,7 +179,7 @@ class QueryBuilder extends BaseQueryBuilder
         if (is_null($joinType)) {
             $tables = $this->getTableAliases();
 
-            return isset($tables[$table]) ? $tables[$table] : false;
+            return $tables[$table] ?? false;
         }
 
         $tableJoins = $this->getTableJoins($table);

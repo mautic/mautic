@@ -174,8 +174,8 @@ class SmsModel extends FormModel implements AjaxLookupModelInterface
      */
     public function sendSms(Sms $sms, $sendTo, $options = [], array &$leads = [])
     {
-        $channel = (isset($options['channel'])) ? $options['channel'] : null;
-        $listId  = (isset($options['listId'])) ? $options['listId'] : null;
+        $channel = $options['channel'] ?? null;
+        $listId  = $options['listId'] ?? null;
 
         if ($sendTo instanceof Lead) {
             $sendTo = [$sendTo];
@@ -237,7 +237,7 @@ class SmsModel extends FormModel implements AjaxLookupModelInterface
         }
 
         if (!empty($contacts)) {
-            $messageQueue    = (isset($options['resend_message_queue'])) ? $options['resend_message_queue'] : null;
+            $messageQueue    = $options['resend_message_queue'] ?? null;
             $campaignEventId = (is_array($channel) && 'campaign.event' === $channel[0] && !empty($channel[1])) ? $channel[1] : null;
 
             $queued = $this->messageQueueModel->processFrequencyRules(
@@ -529,7 +529,7 @@ class SmsModel extends FormModel implements AjaxLookupModelInterface
                     $limit,
                     $start,
                     $this->security->isGranted($this->getPermissionBase().':viewother'),
-                    isset($options['sms_type']) ? $options['sms_type'] : null
+                    $options['sms_type'] ?? null
                 );
 
                 foreach ($entities as $entity) {

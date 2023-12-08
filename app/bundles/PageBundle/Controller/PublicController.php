@@ -583,7 +583,7 @@ class PublicController extends CommonFormController
                 $slotsHelper->set($slot, $value);
             } else {
                 // Fallback for other types like html, text, textarea and all unknown
-                $value = isset($content[$slot]) ? $content[$slot] : '';
+                $value = $content[$slot] ?? '';
                 $slotsHelper->set($slot, $value);
             }
         }

@@ -112,7 +112,7 @@ class ReportDAO
             return $returnedObjects;
         }
 
-        return isset($this->objects[$objectName]) ? $this->objects[$objectName] : [];
+        return $this->objects[$objectName] ?? [];
     }
 
     /**

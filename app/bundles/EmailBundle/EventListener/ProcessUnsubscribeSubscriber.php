@@ -57,7 +57,7 @@ class ProcessUnsubscribeSubscriber implements EventSubscriberInterface
         $helper = $event->getHelper();
         if ($helper && $unsubscribeEmail = $helper->generateUnsubscribeEmail()) {
             $headers          = $event->getTextHeaders();
-            $existing         = (isset($headers['List-Unsubscribe'])) ? $headers['List-Unsubscribe'] : '';
+            $existing         = $headers['List-Unsubscribe'] ?? '';
             $unsubscribeEmail = "<mailto:$unsubscribeEmail>";
             if ($existing) {
                 if (!str_contains($existing, $unsubscribeEmail)) {

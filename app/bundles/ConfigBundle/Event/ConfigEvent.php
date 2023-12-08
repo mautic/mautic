@@ -54,7 +54,7 @@ class ConfigEvent extends CommonEvent
     public function getConfig($key = null)
     {
         if ($key) {
-            return (isset($this->config[$key])) ? $this->config[$key] : [];
+            return $this->config[$key] ?? [];
         }
 
         return $this->config;

@@ -116,8 +116,8 @@ class TableSchemaHelper
 
         $this->addTables[] = $table;
 
-        $options = (isset($table['options'])) ? $table['options'] : [];
-        $columns = (isset($table['columns'])) ? $table['columns'] : [];
+        $options = $table['options'] ?? [];
+        $columns = $table['columns'] ?? [];
 
         $newTable = $this->getSchema()->createTable($this->prefix.$table['name']);
 
@@ -130,8 +130,8 @@ class TableSchemaHelper
                 }
 
                 if (!isset($columns[$column['name']])) {
-                    $type       = (isset($column['type'])) ? $column['type'] : 'text';
-                    $colOptions = (isset($column['options'])) ? $column['options'] : [];
+                    $type       = $column['type'] ?? 'text';
+                    $colOptions = $column['options'] ?? [];
 
                     $newTable->addColumn($column['name'], $type, $colOptions);
                     $columnsAdded[] = $column['name'];

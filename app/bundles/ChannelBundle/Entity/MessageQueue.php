@@ -459,7 +459,7 @@ class MessageQueue
      */
     public function getMetadata()
     {
-        return (isset($this->options['metadata'])) ? $this->options['metadata'] : [];
+        return $this->options['metadata'] ?? [];
     }
 
     public function setMetadata(array $metadata = []): void

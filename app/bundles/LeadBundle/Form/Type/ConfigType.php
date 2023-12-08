@@ -83,7 +83,7 @@ class ConfigType extends AbstractType
             FormEvents::PRE_SET_DATA,
             function (FormEvent $event) use ($formModifier): void {
                 $data    = $event->getData();
-                $columns = isset($data['contact_columns']) ? $data['contact_columns'] : [];
+                $columns = $data['contact_columns'] ?? [];
                 $formModifier($event->getForm(), $columns);
             }
         );
@@ -93,7 +93,7 @@ class ConfigType extends AbstractType
             FormEvents::PRE_SUBMIT,
             function (FormEvent $event) use ($formModifier): void {
                 $data    = $event->getData();
-                $columns = isset($data['contact_columns']) ? $data['contact_columns'] : [];
+                $columns = $data['contact_columns'] ?? [];
                 $formModifier($event->getForm(), $columns);
             }
         );

@@ -47,7 +47,7 @@ class FeatureSettingsType extends AbstractType
             try {
                 if (empty($fields)) {
                     $fields = $integrationObject->getFormLeadFields($settings);
-                    $fields = (isset($fields[0])) ? $fields[0] : $fields;
+                    $fields = $fields[0] ?? $fields;
                 }
 
                 if (isset($settings['feature_settings']['objects']) and in_array('company', $settings['feature_settings']['objects'])) {

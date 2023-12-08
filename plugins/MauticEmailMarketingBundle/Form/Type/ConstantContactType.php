@@ -102,7 +102,7 @@ class ConstantContactType extends AbstractType
                 'integration_object'   => $object,
                 'limit'                => $limit,
                 'page'                 => $page,
-                'data'                 => isset($options['data']) ? $options['data'] : [],
+                'data'                 => $options['data'] ?? [],
                 'integration_fields'   => $fields,
                 'special_instructions' => $specialInstructions,
                 'mapped'               => true,

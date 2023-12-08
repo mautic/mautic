@@ -121,7 +121,7 @@ class MenuHelper
      */
     public function resetOrphans($type = 'main')
     {
-        $orphans              = (isset($this->orphans[$type])) ? $this->orphans[$type] : [];
+        $orphans              = $this->orphans[$type] ?? [];
         $this->orphans[$type] = [];
 
         return $orphans;
@@ -137,7 +137,7 @@ class MenuHelper
     {
         foreach ($menuItems as $key => &$items) {
             if (isset($this->orphans[$type]) && isset($this->orphans[$type][$key])) {
-                $priority = (isset($items['priority'])) ? $items['priority'] : 9999;
+                $priority = $items['priority'] ?? 9999;
                 foreach ($this->orphans[$type][$key] as &$orphan) {
                     if (!isset($orphan['extras'])) {
                         $orphan['extras'] = [];
@@ -175,7 +175,7 @@ class MenuHelper
     public function sortByPriority(&$menuItems, $defaultPriority = 9999): void
     {
         foreach ($menuItems as &$items) {
-            $parentPriority = (isset($items['priority'])) ? $items['priority'] : $defaultPriority;
+            $parentPriority = $items['priority'] ?? $defaultPriority;
             if (isset($items['children'])) {
                 $this->sortByPriority($items['children'], $parentPriority);
             }

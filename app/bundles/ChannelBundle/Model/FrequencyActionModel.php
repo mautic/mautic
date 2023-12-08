@@ -44,7 +44,7 @@ class FrequencyActionModel
                 $preferredChannel = $channel;
             }
 
-            $frequencyRule = isset($frequencyRules[$channel]) ? $frequencyRules[$channel] : new FrequencyRule();
+            $frequencyRule = $frequencyRules[$channel] ?? new FrequencyRule();
             $frequencyRule->setChannel($channel);
             $frequencyRule->setLead($contact);
 

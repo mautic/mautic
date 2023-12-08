@@ -216,7 +216,7 @@ class FormSubscriber implements EventSubscriberInterface
             $key = (!empty($config[$field['alias']])) ? $config[$field['alias']] : $field['alias'];
 
             // Use the cleaned value by default - but if set to not save result, get from post
-            $value               = (isset($results[$field['alias']])) ? $results[$field['alias']] : $post[$field['alias']];
+            $value               = $results[$field['alias']] ?? $post[$field['alias']];
             $matchedFields[$key] = $field['alias'];
 
             // decode html chars and quotes before posting to next form

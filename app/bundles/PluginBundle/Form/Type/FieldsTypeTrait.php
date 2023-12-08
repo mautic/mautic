@@ -52,7 +52,7 @@ trait FieldsTypeTrait
                             if (!isset($choices[$details['group']])) {
                                 $choices[$details['group']] = [];
                             }
-                            $label           = (isset($details['optionLabel'])) ? $details['optionLabel'] : $details['label'];
+                            $label           = $details['optionLabel'] ?? $details['label'];
                             $group[$field]   = $groupName = $details['group'];
                             $choices[$field] = $label;
                         } else {
@@ -80,13 +80,13 @@ trait FieldsTypeTrait
 
                 $sortFieldsFunction = function ($a, $b): int {
                     if (is_array($a)) {
-                        $aLabel = (isset($a['optionLabel'])) ? $a['optionLabel'] : $a['label'];
+                        $aLabel = $a['optionLabel'] ?? $a['label'];
                     } else {
                         $aLabel = $a;
                     }
 
                     if (is_array($b)) {
-                        $bLabel = (isset($b['optionLabel'])) ? $b['optionLabel'] : $b['label'];
+                        $bLabel = $b['optionLabel'] ?? $b['label'];
                     } else {
                         $bLabel = $b;
                     }
@@ -134,7 +134,7 @@ trait FieldsTypeTrait
                                 'class'         => 'form-control integration-fields',
                                 'data-required' => $required,
                                 'data-label'    => $choices[$field],
-                                'placeholder'   => isset($group[$field]) ? $group[$field] : '',
+                                'placeholder'   => $group[$field] ?? '',
                                 'readonly'      => true,
                             ],
                             'by_reference' => true,

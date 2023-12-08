@@ -950,7 +950,7 @@ class CommonRepository extends ServiceEntityRepository
         }
 
         $clause['expr'] = $this->sanitize($clause['expr']);
-        $clause['col']  = $this->sanitize(isset($clause['column']) ? $clause['column'] : $clause['col'], ['_', '.']);
+        $clause['col']  = $this->sanitize($clause['column'] ?? $clause['col'], ['_', '.']);
         if (isset($clause['value'])) {
             $clause['val'] = $clause['value'];
         }

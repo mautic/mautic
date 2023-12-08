@@ -154,7 +154,7 @@ class CommonApiController extends FetchCommonApiController
 
         foreach ($parameters as $key => $params) {
             $method = $request->getMethod();
-            $entity = (isset($entities[$key])) ? $entities[$key] : null;
+            $entity = $entities[$key] ?? null;
 
             $statusCode = Response::HTTP_OK;
             if (null === $entity || !$entity->getId()) {

@@ -132,7 +132,7 @@ class ButtonExtension extends AbstractExtension
                     $path = $this->router->generate($actionRoute, array_merge(['objectAction' => $action], $actionQuery, $query));
                     break;
                 case 'close':
-                    $closeParameters = isset($routeVars['close']) ? $routeVars['close'] : [];
+                    $closeParameters = $routeVars['close'] ?? [];
                     $icon            = 'remove';
                     $path            = $this->router->generate($indexRoute, $closeParameters);
                     $primary         = true;
