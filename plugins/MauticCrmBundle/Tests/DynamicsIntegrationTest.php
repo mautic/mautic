@@ -34,7 +34,7 @@ class DynamicsIntegrationTest extends AbstractIntegrationTestCase
         );
     }
 
-    public function testIntegration()
+    public function testIntegration(): void
     {
         $this->assertSame('Dynamics', $this->integration->getName());
     }

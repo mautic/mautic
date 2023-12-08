@@ -23,14 +23,14 @@ class CredentialsStoreTest extends TestCase
         $this->cacheDir             = dirname((new \ReflectionClass(\Composer\Autoload\ClassLoader::class))->getFileName(), 3);
     }
 
-    public function testEmptyArrayReturnedIfEntityIdsDoNotMatch()
+    public function testEmptyArrayReturnedIfEntityIdsDoNotMatch(): void
     {
         $store = new CredentialsStore($this->coreParametersHelper, 'foobar');
 
         $this->assertEquals([], $store->getByEntityId('barfoo'));
     }
 
-    public function testDefaultCredentialsAreUsedIfSamlIsDisabled()
+    public function testDefaultCredentialsAreUsedIfSamlIsDisabled(): void
     {
         $this->coreParametersHelper->method('get')
           ->withConsecutive(['saml_idp_metadata'], ['cache_path'])
@@ -44,7 +44,7 @@ class CredentialsStoreTest extends TestCase
         $this->assertInstanceOf(X509Credential::class, $credentials[0]);
     }
 
-    public function testDefaultCredentialsAreUsedIfCustomCertificateIsNotProvided()
+    public function testDefaultCredentialsAreUsedIfCustomCertificateIsNotProvided(): void
     {
         $this->coreParametersHelper->method('get')
             ->withConsecutive(['saml_idp_metadata'], ['saml_idp_own_certificate'], ['cache_path'])
@@ -58,7 +58,7 @@ class CredentialsStoreTest extends TestCase
         $this->assertInstanceOf(X509Credential::class, $credentials[0]);
     }
 
-    public function testOwnCredentialsAreUsedIfProvided()
+    public function testOwnCredentialsAreUsedIfProvided(): void
     {
         $this->coreParametersHelper->method('get')
             ->withConsecutive(

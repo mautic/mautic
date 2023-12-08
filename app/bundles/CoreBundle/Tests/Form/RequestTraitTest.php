@@ -34,7 +34,7 @@ class RequestTraitTest extends \PHPUnit\Framework\TestCase
         $this->form = new Form($fooConfig);
     }
 
-    public function testMultiSelectPrepareParametersFromRequest()
+    public function testMultiSelectPrepareParametersFromRequest(): void
     {
         $params = [
             'multiselect'  => '',

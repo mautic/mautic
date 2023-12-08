@@ -434,7 +434,7 @@ class LeadModelTest extends \PHPUnit\Framework\TestCase
     /**
      * Test that the Lead will be set to the LeadEventLog if the Lead save succeed.
      */
-    public function testImportWillSetLeadToLeadEventLogWhenLeadSaveSucceed()
+    public function testImportWillSetLeadToLeadEventLogWhenLeadSaveSucceed(): void
     {
         $leadEventLog  = new LeadEventLog();
         $lead          = new Lead();
@@ -688,7 +688,7 @@ class LeadModelTest extends \PHPUnit\Framework\TestCase
         $reflectedProp->setValue($object, $value);
     }
 
-    private function mockGetLeadRepository()
+    private function mockGetLeadRepository(): void
     {
         $this->entityManagerMock->expects($this->any())
             ->method('getRepository')

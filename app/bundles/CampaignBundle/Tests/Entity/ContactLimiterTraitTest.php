@@ -43,7 +43,7 @@ class ContactLimiterTraitTest extends \PHPUnit\Framework\TestCase
             ->willReturn(new Expr());
     }
 
-    public function testSpecificContactId()
+    public function testSpecificContactId(): void
     {
         $contactLimiter = new ContactLimiter(50, 1);
 
@@ -59,7 +59,7 @@ class ContactLimiterTraitTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals(50, $qb->getMaxResults());
     }
 
-    public function testListOfContacts()
+    public function testListOfContacts(): void
     {
         $contactLimiter = new ContactLimiter(50, null, null, null, [1, 2, 3]);
 
@@ -75,7 +75,7 @@ class ContactLimiterTraitTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals(50, $qb->getMaxResults());
     }
 
-    public function testMinContactId()
+    public function testMinContactId(): void
     {
         $contactLimiter = new ContactLimiter(50, null, 4, null);
 
@@ -91,7 +91,7 @@ class ContactLimiterTraitTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals(50, $qb->getMaxResults());
     }
 
-    public function testBatchMinContactId()
+    public function testBatchMinContactId(): void
     {
         $contactLimiter = new ContactLimiter(50, null, 4, null);
 
@@ -108,7 +108,7 @@ class ContactLimiterTraitTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals(50, $qb->getMaxResults());
     }
 
-    public function testMaxContactId()
+    public function testMaxContactId(): void
     {
         $contactLimiter = new ContactLimiter(50, null, null, 10);
 
@@ -124,7 +124,7 @@ class ContactLimiterTraitTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals(50, $qb->getMaxResults());
     }
 
-    public function testMinAndMaxContactId()
+    public function testMinAndMaxContactId(): void
     {
         $contactLimiter = new ContactLimiter(50, null, 1, 10);
 
@@ -141,7 +141,7 @@ class ContactLimiterTraitTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals(50, $qb->getMaxResults());
     }
 
-    public function testThreads()
+    public function testThreads(): void
     {
         $contactLimiter = new ContactLimiter(50, null, null, null, [], 1, 5);
 
@@ -158,7 +158,7 @@ class ContactLimiterTraitTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals(50, $qb->getMaxResults());
     }
 
-    public function testMaxResultsIgnoredForCountQueries()
+    public function testMaxResultsIgnoredForCountQueries(): void
     {
         $contactLimiter = new ContactLimiter(50, 1);
 

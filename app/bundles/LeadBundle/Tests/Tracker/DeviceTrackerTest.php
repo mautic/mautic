@@ -95,7 +95,7 @@ class DeviceTrackerTest extends \PHPUnit\Framework\TestCase
             ->getMock();
     }
 
-    public function testDeviceCreatedByUserAgent()
+    public function testDeviceCreatedByUserAgent(): void
     {
         $lead    = new Lead();
         $device  = new LeadDevice();

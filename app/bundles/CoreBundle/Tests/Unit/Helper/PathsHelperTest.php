@@ -51,57 +51,57 @@ class PathsHelperTest extends TestCase
         );
     }
 
-    public function testGetLocalConfigFile()
+    public function testGetLocalConfigFile(): void
     {
         $this->assertEquals(__DIR__.'/resource/paths/config/local.php', realpath($this->helper->getLocalConfigurationFile()));
     }
 
-    public function testGetCachePath()
+    public function testGetCachePath(): void
     {
         $this->assertEquals($this->cacheDir, $this->helper->getCachePath());
     }
 
-    public function testGetRootPath()
+    public function testGetRootPath(): void
     {
         $this->assertEquals(__DIR__.'/resource/paths', $this->helper->getRootPath());
     }
 
-    public function testGetTemporaryPath()
+    public function testGetTemporaryPath(): void
     {
         $this->assertEquals(__DIR__.'/resource/paths/tmp', $this->helper->getTemporaryPath());
     }
 
-    public function testGetLogsPath()
+    public function testGetLogsPath(): void
     {
         $this->assertEquals($this->logsDir, $this->helper->getLogsPath());
     }
 
-    public function testGetImagesPath()
+    public function testGetImagesPath(): void
     {
         $this->assertEquals(__DIR__.'/resource/paths/media/images', $this->helper->getImagePath());
     }
 
-    public function testGetTranslationsPath()
+    public function testGetTranslationsPath(): void
     {
         $this->assertEquals(__DIR__.'/resource/paths/translations', $this->helper->getTranslationsPath());
     }
 
-    public function testGetThemesPath()
+    public function testGetThemesPath(): void
     {
         $this->assertEquals(__DIR__.'/resource/paths/themes', $this->helper->getThemesPath());
     }
 
-    public function testGetAssetsPath()
+    public function testGetAssetsPath(): void
     {
         $this->assertEquals(__DIR__.'/resource/paths/media', $this->helper->getAssetsPath());
     }
 
-    public function testGetCoreBundlesPath()
+    public function testGetCoreBundlesPath(): void
     {
         $this->assertEquals(__DIR__.'/resource/paths/app/bundles', $this->helper->getCoreBundlesPath());
     }
 
-    public function testGetPluginsPath()
+    public function testGetPluginsPath(): void
     {
         $this->assertEquals(__DIR__.'/resource/paths/plugins', $this->helper->getPluginsPath());
     }

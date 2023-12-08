@@ -27,12 +27,12 @@ class RedirectListTypeTest extends TestCase
         $this->form                 = new RedirectListType($this->coreParametersHelper);
     }
 
-    public function testGetParent()
+    public function testGetParent(): void
     {
         $this->assertSame(ChoiceType::class, $this->form->getParent());
     }
 
-    public function testConfigureOptionsChoicesUndefined()
+    public function testConfigureOptionsChoicesUndefined(): void
     {
         $resolver = new OptionsResolver();
         $this->form->configureOptions($resolver);
@@ -56,7 +56,7 @@ class RedirectListTypeTest extends TestCase
         $this->assertSame($expectedOptions, $resolver->resolve());
     }
 
-    public function testConfigureOptionsChoicesDefined()
+    public function testConfigureOptionsChoicesDefined(): void
     {
         $choices = [
             '1' => 'Jarda',
@@ -89,7 +89,7 @@ class RedirectListTypeTest extends TestCase
         $this->assertSame($expectedOptions, $resolver->resolve());
     }
 
-    public function testGetBlockPrefix()
+    public function testGetBlockPrefix(): void
     {
         $this->assertSame('redirect_list', $this->form->getBlockPrefix());
     }

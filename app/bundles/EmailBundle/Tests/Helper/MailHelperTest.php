@@ -62,7 +62,7 @@ class MailHelperTest extends TestCase
         defined('MAUTIC_ENV') or define('MAUTIC_ENV', 'test');
     }
 
-    public function testBatchIsEnabledWithBcTokenInterface()
+    public function testBatchIsEnabledWithBcTokenInterface(): void
     {
         $mockFactory = $this->getMockFactory();
 
@@ -94,7 +94,7 @@ class MailHelperTest extends TestCase
         $this->assertEquals(4, count($metadatas));
     }
 
-    public function testGlobalFromThatAllFromAddressesAreTheSame()
+    public function testGlobalFromThatAllFromAddressesAreTheSame(): void
     {
         $mockFactory = $this->getMockFactory();
 
@@ -120,7 +120,7 @@ class MailHelperTest extends TestCase
         $this->assertEquals(['override@owner.com'], array_unique($fromAddresses));
     }
 
-    public function testStandardEmailFrom()
+    public function testStandardEmailFrom(): void
     {
         $mockFactory   = $this->getMockFactory(true);
         $transport     = new SmtpTransport();
@@ -145,7 +145,7 @@ class MailHelperTest extends TestCase
         }
     }
 
-    public function testStandardEmailReplyTo()
+    public function testStandardEmailReplyTo(): void
     {
         $mockFactory   = $this->getMockFactory(true);
         $transport     = new SmtpTransport();
@@ -206,7 +206,7 @@ class MailHelperTest extends TestCase
         $this->assertEquals('admin@mautic.com', $replyTo);
     }
 
-    public function testStandardOwnerAsMailer()
+    public function testStandardOwnerAsMailer(): void
     {
         $mockFactory = $this->getMockFactory();
 
@@ -276,7 +276,7 @@ class MailHelperTest extends TestCase
         ];
     }
 
-    public function testGlobalHeadersAreSet()
+    public function testGlobalHeadersAreSet(): void
     {
         $parameterMap = [
             ['mailer_custom_headers', [], ['X-Mautic-Test' => 'test', 'X-Mautic-Test2' => 'test']],
@@ -335,7 +335,7 @@ class MailHelperTest extends TestCase
         }
     }
 
-    public function testEmailHeadersAreSet()
+    public function testEmailHeadersAreSet(): void
     {
         $parameterMap = [
             ['mailer_custom_headers', [], ['X-Mautic-Test' => 'test', 'X-Mautic-Test2' => 'test']],
@@ -505,7 +505,7 @@ class MailHelperTest extends TestCase
         return $mockFactory;
     }
 
-    public function testArrayOfAddressesAreRemappedIntoEmailToNameKeyValuePair()
+    public function testArrayOfAddressesAreRemappedIntoEmailToNameKeyValuePair(): void
     {
         $mockFactory = $this->getMockBuilder(MauticFactory::class)
             ->disableOriginalConstructor()

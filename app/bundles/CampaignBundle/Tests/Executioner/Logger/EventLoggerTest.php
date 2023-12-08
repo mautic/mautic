@@ -78,7 +78,7 @@ class EventLoggerTest extends TestCase
         $this->assertEquals($logCollection->getValues(), $persistedLogs->getValues());
     }
 
-    public function testBuildLogEntry()
+    public function testBuildLogEntry(): void
     {
         $this->ipLookupHelper->method('getIpAddress')->willReturn(new IpAddress());
 

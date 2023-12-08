@@ -72,7 +72,7 @@ class CampaignSubscriberTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testOnCampaignTriggerActionSendEmailToUserWithWrongEventType()
+    public function testOnCampaignTriggerActionSendEmailToUserWithWrongEventType(): void
     {
         $eventAccessor = $this->createMock(ActionAccessor::class);
         $event         = new Event();
@@ -97,7 +97,7 @@ class CampaignSubscriberTest extends \PHPUnit\Framework\TestCase
         $this->assertCount(0, $pendingEvent->getFailures());
     }
 
-    public function testOnCampaignTriggerActionSendEmailToUserWithSendingTheEmail()
+    public function testOnCampaignTriggerActionSendEmailToUserWithSendingTheEmail(): void
     {
         $eventAccessor = $this->createMock(ActionAccessor::class);
         $event         = (new Event())->setType('email.send.to.user');
@@ -124,7 +124,7 @@ class CampaignSubscriberTest extends \PHPUnit\Framework\TestCase
         $this->assertCount(0, $pendingEvent->getFailures());
     }
 
-    public function testOnCampaignTriggerActionSendEmailToUserWithError()
+    public function testOnCampaignTriggerActionSendEmailToUserWithError(): void
     {
         $eventAccessor = $this->createMock(ActionAccessor::class);
         $event         = (new Event())->setType('email.send.to.user');

@@ -57,7 +57,7 @@ class CircularDependencyValidatorTest extends \PHPUnit\Framework\TestCase
     /**
      * Checks that the validator won't break if the segment ID is not present in the request.
      */
-    public function testIfSegmentIdIsNotInTheRequest()
+    public function testIfSegmentIdIsNotInTheRequest(): void
     {
         $this->context->expects($this->never())
             ->method('addViolation');
@@ -174,7 +174,7 @@ class CircularDependencyValidatorTest extends \PHPUnit\Framework\TestCase
      *
      * @dataProvider validateDataProvider
      */
-    public function testValidateOnInvalid($message, $currentSegmentId, $filters)
+    public function testValidateOnInvalid($message, $currentSegmentId, $filters): void
     {
         $this->configureValidator($message, $currentSegmentId)
             ->validate($filters, new CircularDependency(['message' => 'mautic.core.segment.circular_dependency_exists']));

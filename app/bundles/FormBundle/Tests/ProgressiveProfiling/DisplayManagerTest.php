@@ -31,7 +31,7 @@ class DisplayManagerTest extends \PHPUnit\Framework\TestCase
         $this->displayCounter = new DisplayCounter($this->form);
     }
 
-    public function testShowForField()
+    public function testShowForField(): void
     {
         $form           = new Form();
         $viewOnlyFields = ['button'];

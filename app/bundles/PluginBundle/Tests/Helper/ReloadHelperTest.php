@@ -83,7 +83,7 @@ class ReloadHelperTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    public function testDisableMissingPlugins()
+    public function testDisableMissingPlugins(): void
     {
         $sampleInstalledPlugins = [
             'MauticZapierBundle'  => $this->createSampleZapierPlugin(),
@@ -97,7 +97,7 @@ class ReloadHelperTest extends \PHPUnit\Framework\TestCase
         $this->assertTrue($disabledPlugins['MauticHappierBundle']->isMissing());
     }
 
-    public function testEnableFoundPlugins()
+    public function testEnableFoundPlugins(): void
     {
         $zapierPlugin = $this->createSampleZapierPlugin();
         $zapierPlugin->setIsMissing(true);
@@ -112,7 +112,7 @@ class ReloadHelperTest extends \PHPUnit\Framework\TestCase
         $this->assertFalse($enabledPlugins['MauticZapierBundle']->isMissing());
     }
 
-    public function testUpdatePlugins()
+    public function testUpdatePlugins(): void
     {
         $this->sampleAllPlugins['MauticZapierBundle']['config']['version']     = '1.0.1';
         $this->sampleAllPlugins['MauticZapierBundle']['config']['description'] = 'Updated description';
@@ -133,7 +133,7 @@ class ReloadHelperTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals('Updated description', $updatedPlugins['MauticZapierBundle']->getDescription());
     }
 
-    public function testInstallPlugins()
+    public function testInstallPlugins(): void
     {
         $sampleInstalledPlugins = [
             'MauticHappierBundle' => $this->createSampleHappierPlugin(),

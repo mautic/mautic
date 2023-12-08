@@ -99,7 +99,7 @@ class ThemeHelperTest extends TestCase
             ->method('trans')
             ->with('mautic.core.theme.missing.files', $this->anything(), 'validators')
             ->willReturnCallback(
-                function ($key, array $parameters) {
+                function ($key, array $parameters): void {
                     $this->assertStringContainsString('config.json', $parameters['%files%']);
                 }
             );
@@ -119,7 +119,7 @@ class ThemeHelperTest extends TestCase
             ->method('trans')
             ->with('mautic.core.theme.missing.files', $this->anything(), 'validators')
             ->willReturnCallback(
-                function ($key, array $parameters) {
+                function ($key, array $parameters): void {
                     $this->assertStringContainsString('message.html.twig', $parameters['%files%']);
                 }
             );
@@ -139,7 +139,7 @@ class ThemeHelperTest extends TestCase
             ->method('trans')
             ->with('mautic.core.theme.missing.files', $this->anything(), 'validators')
             ->willReturnCallback(
-                function ($key, array $parameters) {
+                function ($key, array $parameters): void {
                     $this->assertStringContainsString('page.html.twig', $parameters['%files%']);
                 }
             );
@@ -388,10 +388,7 @@ class ThemeHelperTest extends TestCase
                     return '{"name":"Origin Theme"}';
                 }
 
-                /**
-                 * @return void
-                 */
-                public function dumpFile(string $filename, $content)
+                public function dumpFile(string $filename, $content): void
                 {
                     Assert::assertSame('/path/to/themes/requested-theme-dir/config.json', $filename);
                     Assert::assertSame('{"name":"New Theme Name"}', $content);

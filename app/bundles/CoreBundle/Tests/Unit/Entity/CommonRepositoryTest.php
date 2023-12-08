@@ -62,7 +62,7 @@ class CommonRepositoryTest extends \PHPUnit\Framework\TestCase
      * @covers  \Mautic\CoreBundle\Entity\CommonRepository::buildClauses
      * @covers  \Mautic\CoreBundle\Entity\CommonRepository::buildOrderByClause
      */
-    public function testBuildingQueryWithUndefinedOrder()
+    public function testBuildingQueryWithUndefinedOrder(): void
     {
         $this->callProtectedMethod('buildClauses', [$this->qb, []]);
         $this->assertSame('SELECT e', (string) $this->qb);
@@ -74,7 +74,7 @@ class CommonRepositoryTest extends \PHPUnit\Framework\TestCase
      * @covers  \Mautic\CoreBundle\Entity\CommonRepository::buildClauses
      * @covers  \Mautic\CoreBundle\Entity\CommonRepository::buildOrderByClause
      */
-    public function testBuildingQueryWithBasicOrder()
+    public function testBuildingQueryWithBasicOrder(): void
     {
         $args = [
             'orderBy'    => 'e.someCol',
@@ -91,7 +91,7 @@ class CommonRepositoryTest extends \PHPUnit\Framework\TestCase
      * @covers  \Mautic\CoreBundle\Entity\CommonRepository::buildOrderByClause
      * @covers  \Mautic\CoreBundle\Entity\CommonRepository::buildOrderByClauseFromArray
      */
-    public function testBuildingQueryWithOrderArray()
+    public function testBuildingQueryWithOrderArray(): void
     {
         $args = [
             'filter' => [
@@ -112,7 +112,7 @@ class CommonRepositoryTest extends \PHPUnit\Framework\TestCase
      *
      * @covers  \Mautic\CoreBundle\Entity\CommonRepository::validateOrderByClause
      */
-    public function testValidateOrderByClauseWithColContainingAliasWillNotRemoveTheDot()
+    public function testValidateOrderByClauseWithColContainingAliasWillNotRemoveTheDot(): void
     {
         $provided = [
             'col' => 'e.someCol',
@@ -133,7 +133,7 @@ class CommonRepositoryTest extends \PHPUnit\Framework\TestCase
      *
      * @covers  \Mautic\CoreBundle\Entity\CommonRepository::validateOrderByClause
      */
-    public function testValidateOrderByClauseWillRemoveFunkyChars()
+    public function testValidateOrderByClauseWillRemoveFunkyChars(): void
     {
         $provided = [
             'col' => '" DELETE * FROM users',
@@ -153,7 +153,7 @@ class CommonRepositoryTest extends \PHPUnit\Framework\TestCase
      *
      * @covers  \Mautic\CoreBundle\Entity\CommonRepository::validateOrderByClause
      */
-    public function testValidateOrderByClauseWithMissingCol()
+    public function testValidateOrderByClauseWithMissingCol(): void
     {
         $this->expectException(\InvalidArgumentException::class);
         $this->callProtectedMethod('validateOrderByClause', [[]]);
@@ -164,7 +164,7 @@ class CommonRepositoryTest extends \PHPUnit\Framework\TestCase
      *
      * @see \Mautic\LeadBundle\Tests\Segment\RandomParameterNameTest::testGenerateRandomParameterName
      */
-    public function testGenerateRandomParameterName()
+    public function testGenerateRandomParameterName(): void
     {
         $expectedValues = [
             'par0',
@@ -231,7 +231,7 @@ class CommonRepositoryTest extends \PHPUnit\Framework\TestCase
         return $method->invokeArgs($this->repo, $args);
     }
 
-    public function testArgumentCSVArray()
+    public function testArgumentCSVArray(): void
     {
         $qb   = new \Doctrine\DBAL\Query\QueryBuilder($this->connectionMock);
         $args = [
@@ -242,7 +242,7 @@ class CommonRepositoryTest extends \PHPUnit\Framework\TestCase
             ],
         ];
         $matchArgs = explode(',', $args[0]['val']);
-        array_walk($matchArgs, function (&$element) { $element = trim($element, '"'); });
+        array_walk($matchArgs, function (&$element): void { $element = trim($element, '"'); });
 
         $this->callBuildWhereClauseFromArray($qb, $args);
 
@@ -259,7 +259,7 @@ class CommonRepositoryTest extends \PHPUnit\Framework\TestCase
             ],
         ];
         $matchArgs = explode(',', $args[0]['val']);
-        array_walk($matchArgs, function (&$element) { $element = trim($element, '"'); });
+        array_walk($matchArgs, function (&$element): void { $element = trim($element, '"'); });
 
         $this->callBuildWhereClauseFromArray($qb, $args);
 
@@ -268,7 +268,7 @@ class CommonRepositoryTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($matchArgs, array_shift($parameters));
     }
 
-    public function testNoEnquotedArgumentCSVArray()
+    public function testNoEnquotedArgumentCSVArray(): void
     {
         $qb   = new \Doctrine\DBAL\Query\QueryBuilder($this->connectionMock);
         $args = [
@@ -279,7 +279,7 @@ class CommonRepositoryTest extends \PHPUnit\Framework\TestCase
             ],
         ];
         $matchArgs = explode(',', $args[0]['val']);
-        array_walk($matchArgs, function (&$element) { $element = trim($element, '"'); });
+        array_walk($matchArgs, function (&$element): void { $element = trim($element, '"'); });
 
         $this->callBuildWhereClauseFromArray($qb, $args);
 
@@ -297,7 +297,7 @@ class CommonRepositoryTest extends \PHPUnit\Framework\TestCase
             ],
         ];
         $matchArgs = explode(',', $args[0]['val']);
-        array_walk($matchArgs, function (&$element) { $element = trim($element, '"'); });
+        array_walk($matchArgs, function (&$element): void { $element = trim($element, '"'); });
 
         $this->callBuildWhereClauseFromArray($qb, $args);
 
@@ -307,7 +307,7 @@ class CommonRepositoryTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($matchArgs, array_shift($parameters));
     }
 
-    public function testNoEnquotedStringArgumentCSVArray()
+    public function testNoEnquotedStringArgumentCSVArray(): void
     {
         $qb   = new \Doctrine\DBAL\Query\QueryBuilder($this->connectionMock);
         $args = [
@@ -318,7 +318,7 @@ class CommonRepositoryTest extends \PHPUnit\Framework\TestCase
             ],
         ];
         $matchArgs = explode(',', $args[0]['val']);
-        array_walk($matchArgs, function (&$element) { $element = trim($element, '"'); });
+        array_walk($matchArgs, function (&$element): void { $element = trim($element, '"'); });
 
         $this->callBuildWhereClauseFromArray($qb, $args);
 
@@ -336,7 +336,7 @@ class CommonRepositoryTest extends \PHPUnit\Framework\TestCase
             ],
         ];
         $matchArgs = explode(',', $args[0]['val']);
-        array_walk($matchArgs, function (&$element) { $element = trim($element, '"'); });
+        array_walk($matchArgs, function (&$element): void { $element = trim($element, '"'); });
 
         $this->callBuildWhereClauseFromArray($qb, $args);
 
@@ -346,7 +346,7 @@ class CommonRepositoryTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($matchArgs, array_shift($parameters));
     }
 
-    public function testStringArgumentInterpretedAsSingleValueEnquoted()
+    public function testStringArgumentInterpretedAsSingleValueEnquoted(): void
     {
         $qb   = new \Doctrine\DBAL\Query\QueryBuilder($this->connectionMock);
         $args = [

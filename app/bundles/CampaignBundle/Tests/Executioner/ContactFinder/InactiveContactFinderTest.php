@@ -30,7 +30,7 @@ class InactiveContactFinderTest extends \PHPUnit\Framework\TestCase
         $this->campaignLeadRepository = $this->createMock(CampaignLeadRepository::class);
     }
 
-    public function testNoContactsFoundExceptionIsThrown()
+    public function testNoContactsFoundExceptionIsThrown(): void
     {
         $this->campaignLeadRepository->expects($this->once())
             ->method('getInactiveContacts')
@@ -42,7 +42,7 @@ class InactiveContactFinderTest extends \PHPUnit\Framework\TestCase
         $this->getContactFinder()->getContacts(1, new Event(), $limiter);
     }
 
-    public function testNoContactsFoundExceptionIsThrownIfEntitiesAreNotFound()
+    public function testNoContactsFoundExceptionIsThrownIfEntitiesAreNotFound(): void
     {
         $contactMemberDates = [
             1 => new \DateTime(),
@@ -62,7 +62,7 @@ class InactiveContactFinderTest extends \PHPUnit\Framework\TestCase
         $this->getContactFinder()->getContacts(1, new Event(), $limiter);
     }
 
-    public function testContactsAreFoundAndStoredInCampaignMemberDatesAdded()
+    public function testContactsAreFoundAndStoredInCampaignMemberDatesAdded(): void
     {
         $contactMemberDates = [
             1 => new \DateTime(),

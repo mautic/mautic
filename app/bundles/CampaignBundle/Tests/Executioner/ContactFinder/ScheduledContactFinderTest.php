@@ -34,7 +34,7 @@ class ScheduledContactFinderTest extends \PHPUnit\Framework\TestCase
             ->getMock();
     }
 
-    public function testHydratedLeadsFromRepositoryAreFoundAndPushedIntoLogs()
+    public function testHydratedLeadsFromRepositoryAreFoundAndPushedIntoLogs(): void
     {
         $lead1 = $this->getMockBuilder(Lead::class)
             ->getMock();
@@ -85,7 +85,7 @@ class ScheduledContactFinderTest extends \PHPUnit\Framework\TestCase
         $this->getContactFinder()->hydrateContacts($logs);
     }
 
-    public function testHydratedLeadsFromRepositoryWithMissingLeadResultsLogBeingRemoved()
+    public function testHydratedLeadsFromRepositoryWithMissingLeadResultsLogBeingRemoved(): void
     {
         $lead1 = $this->getMockBuilder(Lead::class)
             ->getMock();
@@ -137,7 +137,7 @@ class ScheduledContactFinderTest extends \PHPUnit\Framework\TestCase
         $this->assertCount(1, $logs);
     }
 
-    public function testNoContactsFoundExceptionIsThrownIfEntitiesAreNotFound()
+    public function testNoContactsFoundExceptionIsThrownIfEntitiesAreNotFound(): void
     {
         $this->leadRepository->expects($this->never())
             ->method('getContactCollection');

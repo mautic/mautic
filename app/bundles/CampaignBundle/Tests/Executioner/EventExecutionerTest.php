@@ -108,7 +108,7 @@ class EventExecutionerTest extends \PHPUnit\Framework\TestCase
             ->getMock();
     }
 
-    public function testJumpToEventsAreProcessedAfterOtherEvents()
+    public function testJumpToEventsAreProcessedAfterOtherEvents(): void
     {
         $campaign = new Campaign();
 
@@ -223,7 +223,7 @@ class EventExecutionerTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testJumpToEventsExecutedWithoutTarget()
+    public function testJumpToEventsExecutedWithoutTarget(): void
     {
         $campaign = new Campaign();
 

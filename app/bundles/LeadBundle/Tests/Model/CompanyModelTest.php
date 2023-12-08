@@ -44,7 +44,7 @@ class CompanyModelTest extends \PHPUnit\Framework\TestCase
      *
      * @covers  \Mautic\CoreBundle\Helper\AbstractFormFieldHelper::parseList
      */
-    public function testArrayValueIsFlattenedBeforeSave()
+    public function testArrayValueIsFlattenedBeforeSave(): void
     {
         /** @var CompanyModel $companyModel */
         $companyModel = $this->getMockBuilder(CompanyModel::class)
@@ -77,7 +77,7 @@ class CompanyModelTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testImportCompanySkipIfExistsTrue()
+    public function testImportCompanySkipIfExistsTrue(): void
     {
         $companyModel = $this->getCompanyModelForImport();
 
@@ -90,7 +90,7 @@ class CompanyModelTest extends \PHPUnit\Framework\TestCase
         $companyModel->importCompany([], [], null, false, true);
     }
 
-    public function testImportCompanySkipIfExistsFalse()
+    public function testImportCompanySkipIfExistsFalse(): void
     {
         $companyModel = $this->getCompanyModelForImport();
 
@@ -148,7 +148,7 @@ class CompanyModelTest extends \PHPUnit\Framework\TestCase
         $reflectedProp->setValue($object, $value);
     }
 
-    public function testExtractCompanyDataFromImport()
+    public function testExtractCompanyDataFromImport(): void
     {
         /** @var CompanyModel $companyModel */
         $companyModel = $this->getMockBuilder(CompanyModel::class)

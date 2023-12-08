@@ -56,7 +56,7 @@ class ActionDispatcherTest extends \PHPUnit\Framework\TestCase
         $this->legacyDispatcher   = $this->createMock(LegacyEventDispatcher::class);
     }
 
-    public function testActionBatchEventIsDispatchedWithSuccessAndFailedLogs()
+    public function testActionBatchEventIsDispatchedWithSuccessAndFailedLogs(): void
     {
         $event = new Event();
         $lead1 = $this->createMock(Lead::class);
@@ -126,7 +126,7 @@ class ActionDispatcherTest extends \PHPUnit\Framework\TestCase
         $this->scheduler->expects($this->once())
             ->method('rescheduleFailures')
             ->willReturnCallback(
-                function (ArrayCollection $logs) use ($log2) {
+                function (ArrayCollection $logs) use ($log2): void {
                     if ($logs->count() > 1) {
                         $this->fail('Only one log was supposed to fail');
                     }
@@ -145,7 +145,7 @@ class ActionDispatcherTest extends \PHPUnit\Framework\TestCase
         $this->getEventDispatcher()->dispatchEvent($config, $event, $logs);
     }
 
-    public function testActionLogNotProcessedExceptionIsThrownIfLogNotProcessedWithSuccess()
+    public function testActionLogNotProcessedExceptionIsThrownIfLogNotProcessedWithSuccess(): void
     {
         $this->expectException(LogNotProcessedException::class);
 
@@ -205,7 +205,7 @@ class ActionDispatcherTest extends \PHPUnit\Framework\TestCase
         $this->getEventDispatcher()->dispatchEvent($config, $event, $logs);
     }
 
-    public function testActionLogNotProcessedExceptionIsThrownIfLogNotProcessedWithFailed()
+    public function testActionLogNotProcessedExceptionIsThrownIfLogNotProcessedWithFailed(): void
     {
         $this->expectException(LogNotProcessedException::class);
 
@@ -266,7 +266,7 @@ class ActionDispatcherTest extends \PHPUnit\Framework\TestCase
         $this->getEventDispatcher()->dispatchEvent($config, $event, $logs);
     }
 
-    public function testActionBatchEventIsIgnoredWithLegacy()
+    public function testActionBatchEventIsIgnoredWithLegacy(): void
     {
         $event  = new Event();
         $config = $this->createMock(ActionAccessor::class);

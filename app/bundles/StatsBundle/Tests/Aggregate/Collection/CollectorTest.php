@@ -21,11 +21,11 @@ class CollectorTest extends TestCase
         $this->eventDispatcher = new EventDispatcher();
     }
 
-    public function testEventIsDispatched()
+    public function testEventIsDispatched(): void
     {
         $this->eventDispatcher->addListener(
             StatEvents::AGGREGATE_STAT_REQUEST,
-            function (AggregateStatRequestEvent $event) {
+            function (AggregateStatRequestEvent $event): void {
                 $statCollection = $event->getStatCollection();
 
                 $statCollection->addStat(2018, 12, 7, 1, 100);

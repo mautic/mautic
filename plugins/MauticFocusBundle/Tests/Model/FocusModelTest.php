@@ -68,7 +68,7 @@ class FocusModelTest extends TestCase
     /**
      * @dataProvider focusTypeProvider
      */
-    public function testGetContentWithForm(string $type, InvokedCount $count)
+    public function testGetContentWithForm(string $type, InvokedCount $count): void
     {
         $this->formModel->expects(self::once())->method('getPages')->willReturn(['', '']);
 

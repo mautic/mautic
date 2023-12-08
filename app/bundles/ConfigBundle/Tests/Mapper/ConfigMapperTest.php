@@ -138,7 +138,7 @@ class ConfigMapperTest extends \PHPUnit\Framework\TestCase
      * @covers  \Mautic\ConfigBundle\Exception\BadFormConfigException
      * @covers  \Mautic\ConfigBundle\Mapper\ConfigMapper::bindFormConfigsWithRealValues()
      */
-    public function testExceptionIsThrownOnBadFormConfig()
+    public function testExceptionIsThrownOnBadFormConfig(): void
     {
         $this->expectException(BadFormConfigException::class);
 
@@ -165,7 +165,7 @@ class ConfigMapperTest extends \PHPUnit\Framework\TestCase
      * @covers  \Mautic\ConfigBundle\Mapper\ConfigMapper::bindFormConfigsWithRealValues()
      * @covers  \Mautic\ConfigBundle\Mapper\ConfigMapper::mergeWithLocalParameters()
      */
-    public function testParametersAreBoundToDefaults()
+    public function testParametersAreBoundToDefaults(): void
     {
         $parameterHelper = $this->getMockBuilder(CoreParametersHelper::class)
             ->disableOriginalConstructor()
@@ -184,7 +184,7 @@ class ConfigMapperTest extends \PHPUnit\Framework\TestCase
      * @covers  \Mautic\ConfigBundle\Mapper\ConfigMapper::bindFormConfigsWithRealValues()
      * @covers  \Mautic\ConfigBundle\Mapper\ConfigMapper::mergeWithLocalParameters()
      */
-    public function testParametersAreBoundToDefaultsWithLocalConfig()
+    public function testParametersAreBoundToDefaultsWithLocalConfig(): void
     {
         $parameterHelper = $this->getMockBuilder(CoreParametersHelper::class)
             ->disableOriginalConstructor()
@@ -253,7 +253,7 @@ class ConfigMapperTest extends \PHPUnit\Framework\TestCase
      * @covers  \Mautic\ConfigBundle\Mapper\ConfigMapper::bindFormConfigsWithRealValues()
      * @covers  \Mautic\ConfigBundle\Mapper\ConfigMapper::mergeWithLocalParameters()
      */
-    public function testParametersAreBoundToDefaultsWithLocalConfigAndRestrictionsAppied()
+    public function testParametersAreBoundToDefaultsWithLocalConfigAndRestrictionsAppied(): void
     {
         $parameterHelper = $this->getMockBuilder(CoreParametersHelper::class)
             ->disableOriginalConstructor()

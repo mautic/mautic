@@ -40,7 +40,7 @@ class DynamicsApiTest extends AbstractIntegrationTestCase
         $this->api         = new DynamicsApi($this->integration);
     }
 
-    public function testIntegration()
+    public function testIntegration(): void
     {
         $this->assertSame('Dynamics', $this->integration->getName());
     }

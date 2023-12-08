@@ -61,7 +61,7 @@ class SendEmailToUserTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testEmailNotFound()
+    public function testEmailNotFound(): void
     {
         $lead = new Lead();
 
@@ -78,7 +78,7 @@ class SendEmailToUserTest extends \PHPUnit\Framework\TestCase
         $this->sendEmailToUser->sendEmailToUsers($config, $lead);
     }
 
-    public function testEmailNotPublished()
+    public function testEmailNotPublished(): void
     {
         $lead  = new Lead();
         $email = new Email();
@@ -97,7 +97,7 @@ class SendEmailToUserTest extends \PHPUnit\Framework\TestCase
         $this->sendEmailToUser->sendEmailToUsers($config, $lead);
     }
 
-    public function testSendEmailWithNoError()
+    public function testSendEmailWithNoError(): void
     {
         $lead  = new Lead();
         $owner = new class() extends User {
@@ -193,7 +193,7 @@ class SendEmailToUserTest extends \PHPUnit\Framework\TestCase
         $this->emailModel
             ->expects($this->once())
             ->method('sendEmailToUser')
-            ->will($this->returnCallback(function ($email, $users, $leadCredentials, $tokens, $assetAttachments, $saveStat, $to, $cc, $bcc) {
+            ->will($this->returnCallback(function ($email, $users, $leadCredentials, $tokens, $assetAttachments, $saveStat, $to, $cc, $bcc): void {
                 $expectedUsers = [
                     ['id' => 6],
                     ['id' => 7],

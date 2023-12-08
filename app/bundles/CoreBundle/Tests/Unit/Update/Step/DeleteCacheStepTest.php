@@ -33,7 +33,7 @@ class DeleteCacheStepTest extends AbstractStepTest
         $this->step        = new DeleteCacheStep($this->cacheHelper, $this->translator);
     }
 
-    public function testCacheIsNukedAndProgressNoted()
+    public function testCacheIsNukedAndProgressNoted(): void
     {
         $stepOutput = 'mautic.core.update.clear.cache';
         $this->translator->expects($this->once())
