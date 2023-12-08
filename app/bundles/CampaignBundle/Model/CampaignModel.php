@@ -743,10 +743,8 @@ class CampaignModel extends CommonFormModel
     /**
      * @param int  $limit
      * @param bool $maxLeads
-     *
-     * @return int
      */
-    public function rebuildCampaignLeads(Campaign $campaign, $limit = 1000, $maxLeads = false, OutputInterface $output = null)
+    public function rebuildCampaignLeads(Campaign $campaign, $limit = 1000, $maxLeads = false, OutputInterface $output = null): int
     {
         $contactLimiter = new ContactLimiter($limit);
 

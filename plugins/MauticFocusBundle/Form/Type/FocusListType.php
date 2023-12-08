@@ -10,13 +10,10 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class FocusListType extends AbstractType
 {
-    protected \MauticPlugin\MauticFocusBundle\Model\FocusModel $focusModel;
-
     private $repo;
 
-    public function __construct(FocusModel $focusModel)
+    public function __construct(protected FocusModel $focusModel)
     {
-        $this->focusModel = $focusModel;
         $this->repo       = $this->focusModel->getRepository();
     }
 

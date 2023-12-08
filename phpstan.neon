@@ -43,6 +43,10 @@ parameters:
 			message: '#Call to an undefined method Mautic(.*?)Integration::getApiUrl\(\)#'
 			path: plugins/*/Api/*
 		- '#Parameter \$integration of method MauticPlugin\\MauticEmailMarketingBundle\\Api\\EmailMarketingApi::__construct\(\) has typehint with deprecated class Mautic\\PluginBundle\\Integration\\AbstractIntegration#'
+		# collection vs array
+		-
+			message: '#PHPDoc tag @return with type array|Doctrine\Common\Collections\ArrayCollection is not subtype of native type array#'
+			path: app/bundles/CoreBundle/Entity/TranslationEntityTrait.php
 	scanFiles:
 		# This is here because a few functions in the global namespace are defined in this file
 		- vendor/twig/twig/src/Extension/EscaperExtension.php

@@ -426,7 +426,7 @@ class ConnectwiseIntegration extends CrmAbstractIntegration
      * @param array $params
      * @param null  $query
      */
-    public function getLeads($params = [], $query = null, &$executed = null, $result = [], $object = 'Contact')
+    public function getLeads($params = [], $query = null, &$executed = null, $result = [], $object = 'Contact'): int
     {
         return $this->getRecords($params, $object);
     }
@@ -434,7 +434,7 @@ class ConnectwiseIntegration extends CrmAbstractIntegration
     /**
      * Get Companies from connectwise.
      */
-    public function getCompanies(array $params = [])
+    public function getCompanies(array $params = []): int
     {
         return $this->getRecords($params, 'company');
     }

@@ -33,6 +33,8 @@ return static function (Rector\Config\RectorConfig $rectorConfig): void {
         ReturnTypeFromReturnDirectArrayRector::class => [
             // require bit test update
             __DIR__.'/app/bundles/LeadBundle/Model/LeadModel.php',
+            // array vs doctrine collection
+            __DIR__.'/app/bundles/CoreBundle/Entity/TranslationEntityTrait.php',
         ],
 
         // lets handle later, once we have more type declaratoins
@@ -67,6 +69,8 @@ return static function (Rector\Config\RectorConfig $rectorConfig): void {
         \Rector\Php80\Rector\Class_\ClassPropertyAssignToConstructorPromotionRector::class => [
             __DIR__.'/app/bundles/CacheBundle/EventListener/CacheClearSubscriber.php',
             __DIR__.'/app/bundles/ReportBundle/Event/ReportBuilderEvent.php',
+            // false positive
+            __DIR__.'/app/bundles/CoreBundle/DependencyInjection/Builder/BundleMetadata.php',
         ],
 
         // handle later with full PHP 8.0 upgrade
@@ -146,4 +150,6 @@ return static function (Rector\Config\RectorConfig $rectorConfig): void {
         \Rector\Php80\Rector\NotIdentical\StrContainsRector::class,
         \Rector\Php80\Rector\Identical\StrStartsWithRector::class,
     ]);
+
+    $rectorConfig->phpVersion(\Rector\Core\ValueObject\PhpVersion::PHP_80);
 };
