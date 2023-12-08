@@ -37,15 +37,11 @@ class FocusListType extends AbstractType
 
                     return $choices;
                 },
-                'expanded'    => false,
-                'multiple'    => true,
-                'required'    => false,
-                'placeholder' => function (Options $options): string {
-                    return (empty($options['choices'])) ? 'mautic.focus.no.focusitem.note' : 'mautic.core.form.chooseone';
-                },
-                'disabled' => function (Options $options): bool {
-                    return empty($options['choices']);
-                },
+                'expanded'       => false,
+                'multiple'       => true,
+                'required'       => false,
+                'placeholder'    => fn (Options $options): string => (empty($options['choices'])) ? 'mautic.focus.no.focusitem.note' : 'mautic.core.form.chooseone',
+                'disabled'       => fn (Options $options): bool => empty($options['choices']),
                 'top_level'      => 'variant',
                 'variant_parent' => null,
                 'ignore_ids'     => [],

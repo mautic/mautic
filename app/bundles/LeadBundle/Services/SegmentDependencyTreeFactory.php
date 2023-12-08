@@ -23,7 +23,7 @@ class SegmentDependencyTreeFactory
 
     public function buildTree(LeadList $segment, NodeInterface $rootNode = null): NodeInterface
     {
-        $rootNode      = $rootNode ?? new IntNode($segment->getId());
+        $rootNode ??= new IntNode($segment->getId());
         $childSegments = $this->findChildSegments($segment);
 
         $rootNode->addParam('name', $segment->getName());
@@ -56,9 +56,7 @@ class SegmentDependencyTreeFactory
     {
         $segmentMembershipFilters = array_filter(
             $segment->getFilters(),
-            function (array $filter): bool {
-                return 'leadlist' === $filter['type'];
-            }
+            fn (array $filter): bool => 'leadlist' === $filter['type']
         );
 
         if (!$segmentMembershipFilters) {

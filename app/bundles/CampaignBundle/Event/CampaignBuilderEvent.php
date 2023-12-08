@@ -196,12 +196,10 @@ class CampaignBuilderEvent extends Event
         if (empty($this->sortCache[$property])) {
             uasort(
                 $this->{$property},
-                function ($a, $b): int {
-                    return strnatcasecmp(
-                        $a['label'],
-                        $b['label']
-                    );
-                }
+                fn ($a, $b): int => strnatcasecmp(
+                    $a['label'],
+                    $b['label']
+                )
             );
             $this->sortCache[$property] = true;
         }

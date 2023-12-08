@@ -2009,9 +2009,7 @@ class LeadController extends FormController
             'withTotalCount' => true,
         ];
 
-        $iterator = new IteratorExportDataModel($model, $args, function ($contact) use ($exportHelper) {
-            return $exportHelper->parseLeadToExport($contact);
-        });
+        $iterator = new IteratorExportDataModel($model, $args, fn ($contact) => $exportHelper->parseLeadToExport($contact));
 
         return $this->exportResultsAs($iterator, $fileType, 'contacts', $exportHelper);
     }

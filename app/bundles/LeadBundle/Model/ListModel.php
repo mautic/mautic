@@ -274,9 +274,7 @@ class ListModel extends FormModel
 
         // Order choices by label.
         foreach ($choices as $key => $choice) {
-            $cmp = function ($a, $b): int {
-                return strcmp($a['label'], $b['label']);
-            };
+            $cmp = fn ($a, $b): int => strcmp($a['label'], $b['label']);
             uasort($choice, $cmp);
             $choices[$key] = $choice;
         }

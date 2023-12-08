@@ -180,7 +180,7 @@ class ScheduledExecutioner implements ExecutionerInterface, ResetInterface
      */
     private function prepareForExecution(): void
     {
-        $this->now = $this->now ?? new \DateTime();
+        $this->now ??= new \DateTime();
 
         // Get counts by event
         $scheduledEvents       = $this->repo->getScheduledCounts($this->campaign->getId(), $this->now, $this->limiter);

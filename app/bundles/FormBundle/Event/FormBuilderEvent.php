@@ -64,7 +64,7 @@ class FormBuilderEvent extends Event
         );
 
         $action['label']       = $this->translator->trans($action['label']);
-        $action['description'] = $action['description'] ?? '';
+        $action['description'] ??= '';
 
         $this->actions[$key] = $action;
     }
@@ -78,12 +78,10 @@ class FormBuilderEvent extends Event
     {
         uasort(
             $this->actions,
-            function ($a, $b): int {
-                return strnatcasecmp(
-                    $a['label'],
-                    $b['label']
-                );
-            }
+            fn ($a, $b): int => strnatcasecmp(
+                $a['label'],
+                $b['label']
+            )
         );
 
         return $this->actions;

@@ -445,16 +445,12 @@ class Report extends FormEntity implements SchedulerInterface
 
     public function getAggregatorColumns(): array
     {
-        return array_map(function ($aggregator) {
-            return $aggregator['column'];
-        }, $this->getAggregators());
+        return array_map(fn ($aggregator) => $aggregator['column'], $this->getAggregators());
     }
 
     public function getOrderColumns(): array
     {
-        return array_map(function ($order) {
-            return $order['column'];
-        }, $this->getTableOrder());
+        return array_map(fn ($order) => $order['column'], $this->getTableOrder());
     }
 
     public function getSelectAndAggregatorAndOrderAndGroupByColumns(): array

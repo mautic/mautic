@@ -127,26 +127,24 @@ class DynamicContentFilterEntryType extends AbstractType
     {
         $this->fieldChoices['lead'] = array_filter(
             $this->fieldChoices['lead'],
-            function ($key): bool {
-                return !in_array(
-                    $key,
-                    [
-                        'company',
-                        'leadlist',
-                        'campaign',
-                        'device_type',
-                        'device_brand',
-                        'device_os',
-                        'lead_email_received',
-                        'tags',
-                        'dnc_bounced',
-                        'dnc_unsubscribed',
-                        'dnc_bounced_sms',
-                        'dnc_unsubscribed_sms',
-                        'hit_url',
-                    ]
-                );
-            },
+            fn ($key): bool => !in_array(
+                $key,
+                [
+                    'company',
+                    'leadlist',
+                    'campaign',
+                    'device_type',
+                    'device_brand',
+                    'device_os',
+                    'lead_email_received',
+                    'tags',
+                    'dnc_bounced',
+                    'dnc_unsubscribed',
+                    'dnc_bounced_sms',
+                    'dnc_unsubscribed_sms',
+                    'hit_url',
+                ]
+            ),
             ARRAY_FILTER_USE_KEY
         );
     }

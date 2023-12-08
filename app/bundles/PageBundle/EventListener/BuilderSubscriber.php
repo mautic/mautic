@@ -631,9 +631,7 @@ class BuilderSubscriber implements EventSubscriberInterface
             // sort by language
             uasort(
                 $related,
-                function ($a, $b): int {
-                    return strnatcasecmp($a['lang'], $b['lang']);
-                }
+                fn ($a, $b): int => strnatcasecmp($a['lang'], $b['lang'])
             );
 
             if (empty($related)) {
