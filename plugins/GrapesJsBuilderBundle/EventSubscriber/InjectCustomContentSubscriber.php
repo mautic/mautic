@@ -17,38 +17,8 @@ use Twig\Environment;
 
 class InjectCustomContentSubscriber implements EventSubscriberInterface
 {
-    /**
-     * @var Config
-     */
-    private $config;
-
-    /**
-     * @var GrapesJsBuilderModel
-     */
-    private $grapesJsBuilderModel;
-
-    /**
-     * @var Environment
-     */
-    private $twig;
-
-    /**
-     * @var RequestStack
-     */
-    private $requestStack;
-
-    /**
-     * @var RouterInterface
-     */
-    private $router;
-
-    public function __construct(Config $config, GrapesJsBuilderModel $grapesJsBuilderModel, Environment $twig, RequestStack $requestStack, RouterInterface $router)
+    public function __construct(private Config $config, private GrapesJsBuilderModel $grapesJsBuilderModel, private Environment $twig, private RequestStack $requestStack, private RouterInterface $router)
     {
-        $this->config               = $config;
-        $this->grapesJsBuilderModel = $grapesJsBuilderModel;
-        $this->twig                 = $twig;
-        $this->requestStack         = $requestStack;
-        $this->router               = $router;
     }
 
     public static function getSubscribedEvents()

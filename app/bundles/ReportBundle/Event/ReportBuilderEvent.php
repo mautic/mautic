@@ -34,13 +34,6 @@ class ReportBuilderEvent extends AbstractReportEvent
     private array $graphArray = [];
 
     /**
-     * List of published array of lead fields.
-     *
-     * @var mixed[]|Paginator|array
-     */
-    private $leadFields = [];
-
-    /**
      * @param string                  $context
      * @param mixed[]|Paginator|array $leadFields
      */
@@ -48,12 +41,14 @@ class ReportBuilderEvent extends AbstractReportEvent
         private TranslatorInterface $translator,
         private ChannelListHelper $channelListHelper,
         $context,
-        $leadFields,
+        /**
+         * List of published array of lead fields.
+         */
+        private $leadFields,
         private ReportHelper $reportHelper,
         private ?string $reportSource = null
     ) {
         $this->context           = $context;
-        $this->leadFields        = $leadFields;
     }
 
     /**

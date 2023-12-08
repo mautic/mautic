@@ -15,8 +15,6 @@ class Clearbit_Base
     protected $_baseUri     = '';
     protected $_resourceUri = '';
     protected $_version     = 'v2';
-
-    protected $_apiKey;
     protected $_webhookId;
 
     public $response_obj;
@@ -51,11 +49,10 @@ class Clearbit_Base
      * The base constructor Sets the API key available from here:
      * https://dashboard.clearbit.com/keys.
      *
-     * @param string $api_key
+     * @param string $_apiKey
      */
-    public function __construct($api_key)
+    public function __construct(protected $_apiKey)
     {
-        $this->_apiKey        = $api_key;
         $this->_next_req_time = new \DateTime('@0');
     }
 

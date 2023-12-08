@@ -39,11 +39,6 @@ abstract class MonitorTwitterBaseCommand extends Command
     protected $integrationHelper;
 
     /**
-     * @var TwitterCommandHelper
-     */
-    private $twitterCommandHelper;
-
-    /**
      * @var InputInterface
      */
     protected $input;
@@ -72,13 +67,12 @@ abstract class MonitorTwitterBaseCommand extends Command
         EventDispatcherInterface $dispatcher,
         Translator $translator,
         IntegrationHelper $integrationHelper,
-        TwitterCommandHelper $twitterCommandHelper,
+        private TwitterCommandHelper $twitterCommandHelper,
         CoreParametersHelper $coreParametersHelper
     ) {
         $this->dispatcher           = $dispatcher;
         $this->translator           = $translator;
         $this->integrationHelper    = $integrationHelper;
-        $this->twitterCommandHelper = $twitterCommandHelper;
 
         $this->translator->setLocale($coreParametersHelper->get('locale', 'en_US'));
 

@@ -20,14 +20,6 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 class MailchimpType extends AbstractType
 {
     /**
-     * @var IntegrationHelper
-     */
-    private $integrationHelper;
-
-    /** @var PluginModel */
-    private $pluginModel;
-
-    /**
      * @var SessionInterface
      */
     protected $session;
@@ -37,10 +29,8 @@ class MailchimpType extends AbstractType
      */
     protected $coreParametersHelper;
 
-    public function __construct(IntegrationHelper $integrationHelper, PluginModel $pluginModel, SessionInterface $session, CoreParametersHelper $coreParametersHelper)
+    public function __construct(private IntegrationHelper $integrationHelper, private PluginModel $pluginModel, SessionInterface $session, CoreParametersHelper $coreParametersHelper)
     {
-        $this->integrationHelper    = $integrationHelper;
-        $this->pluginModel          = $pluginModel;
         $this->session              = $session;
         $this->coreParametersHelper = $coreParametersHelper;
     }
