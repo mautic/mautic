@@ -799,14 +799,7 @@ class Form extends FormEntity
         return $this->formAttributes;
     }
 
-    /**
-     * Set language.
-     *
-     * @param ?string $language
-     *
-     * @return $this
-     */
-    public function setLanguage($language)
+    public function setLanguage(?string $language): self
     {
         $this->isChanged('language', $language);
         $this->language = $language;
@@ -814,12 +807,7 @@ class Form extends FormEntity
         return $this;
     }
 
-    /**
-     * Get language.
-     *
-     * @return ?string
-     */
-    public function getLanguage()
+    public function getLanguage(): ?string
     {
         return $this->language;
     }
