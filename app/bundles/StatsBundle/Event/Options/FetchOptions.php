@@ -55,10 +55,6 @@ class FetchOptions
      */
     public function getOption($key, $default = null)
     {
-        if (isset($this->options[$key])) {
-            return $this->options[$key];
-        }
-
-        return $default;
+        return $this->options[$key] ?? $default;
     }
 }

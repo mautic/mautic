@@ -204,11 +204,7 @@ class EventScheduler
         uasort(
             $eventExecutionDates,
             function (\DateTimeInterface $a, \DateTimeInterface $b): int {
-                if ($a === $b) {
-                    return 0;
-                }
-
-                return $a < $b ? -1 : 1;
+                return $a <=> $b;
             }
         );
 

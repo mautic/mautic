@@ -116,11 +116,7 @@ class FormFieldHelper extends AbstractFormFieldHelper
     public function getFieldFilter($type)
     {
         if (array_key_exists($type, $this->types)) {
-            if (isset($this->types[$type]['filter'])) {
-                return $this->types[$type]['filter'];
-            }
-
-            return 'clean';
+            return $this->types[$type]['filter'] ?? 'clean';
         }
 
         return 'alphanum';

@@ -1934,11 +1934,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
                         $aFrequency = $convertToMonth($a['frequency_number'], $a['frequency_time']);
                         $bFrequency = $convertToMonth($b['frequency_number'], $b['frequency_time']);
 
-                        if ($aFrequency === $bFrequency) {
-                            return 0;
-                        }
-
-                        return ($aFrequency > $bFrequency) ? -1 : 1;
+                        return $bFrequency <=> $aFrequency;
                     }
                 }
 

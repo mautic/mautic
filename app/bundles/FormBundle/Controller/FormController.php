@@ -777,11 +777,7 @@ class FormController extends CommonFormController
                 uasort(
                     $modifiedFields,
                     function ($a, $b): int {
-                        if ($a['order'] == $b['order']) {
-                            return 0;
-                        }
-
-                        return $a['order'] < $b['order'] ? -1 : 1;
+                        return $a['order'] <=> $b['order'];
                     }
                 );
             }
@@ -815,11 +811,7 @@ class FormController extends CommonFormController
                 uasort(
                     $modifiedActions,
                     function ($a, $b): int {
-                        if ($a['order'] == $b['order']) {
-                            return 0;
-                        }
-
-                        return $a['order'] < $b['order'] ? -1 : 1;
+                        return $a['order'] <=> $b['order'];
                     }
                 );
             }

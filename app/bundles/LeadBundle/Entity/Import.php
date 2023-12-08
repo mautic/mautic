@@ -779,11 +779,7 @@ class Import extends FormEntity
      */
     public function getDefaults()
     {
-        if (isset($this->properties['defaults'])) {
-            return $this->properties['defaults'];
-        }
-
-        return [];
+        return $this->properties['defaults'] ?? [];
     }
 
     /**

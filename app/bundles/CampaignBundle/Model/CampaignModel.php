@@ -316,11 +316,8 @@ class CampaignModel extends CommonFormModel
             function ($a, $b): int {
                 $aOrder = $a->getOrder();
                 $bOrder = $b->getOrder();
-                if ($aOrder == $bOrder) {
-                    return 0;
-                }
 
-                return ($aOrder < $bOrder) ? -1 : 1;
+                return $aOrder <=> $bOrder;
             }
         );
 
