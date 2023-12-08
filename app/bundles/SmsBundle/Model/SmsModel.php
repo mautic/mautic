@@ -112,8 +112,6 @@ class SmsModel extends FormModel implements AjaxLookupModelInterface
      * @param null  $action
      * @param array $options
      *
-     * @return mixed
-     *
      * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
      * @throws MethodNotAllowedHttpException
      */

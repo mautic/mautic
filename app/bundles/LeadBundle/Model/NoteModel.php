@@ -67,8 +67,6 @@ class NoteModel extends FormModel
      * @param string|null $action
      * @param array       $options
      *
-     * @return mixed
-     *
      * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
      */
     public function createForm($entity, FormFactoryInterface $formFactory, $action = null, $options = []): FormInterface
