@@ -440,7 +440,7 @@ class FormController extends CommonFormController
         }
 
         // fire the form builder event
-        $customComponents = $model->getCustomComponents($sessionId);
+        $customComponents = $model->getCustomComponents();
 
         return $this->delegateView(
             [

@@ -585,7 +585,7 @@ class DynamicsIntegration extends CrmAbstractIntegration
                         }
 
                         if (count($newMatchedFields)) {
-                            $this->companyModel->setFieldValues($entity, $newMatchedFields, false, false);
+                            $this->companyModel->setFieldValues($entity, $newMatchedFields, false);
                             $this->companyModel->saveEntity($entity, false);
                             $isModified = true;
                         }

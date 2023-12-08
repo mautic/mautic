@@ -329,8 +329,7 @@ class DashboardSubscriber extends MainDashboardSubscriber
                     'chartHeight' => $widget->getHeight() - 80,
                     'chartData'   => $this->emailModel->getDeviceGranularityPieChartData(
                         $params['dateFrom'],
-                        $params['dateTo'],
-                        $canViewOthers
+                        $params['dateTo']
                     ),
                 ]);
             }

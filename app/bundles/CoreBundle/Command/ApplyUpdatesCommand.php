@@ -74,9 +74,13 @@ EOT
         $progressBar->setFormat('Step %current% [%bar%] <info>%message%</info>');
 
         // Define this just in case
+<<<<<<< HEAD
         if (!defined('MAUTIC_ENV')) {
             define('MAUTIC_ENV', $options['env'] ?? 'prod');
         }
+=======
+        defined('MAUTIC_ENV') or define('MAUTIC_ENV', $options['env'] ?? 'prod');
+>>>>>>> 69d2884c70 ([PHP 8.0] Make use of PHP 8.0 features)
 
         if (true === $this->coreParametersHelper->get('composer_updates', false)) {
             $output->writeln('<error>'.$this->translator->trans('mautic.core.command.update.composer').'</error>');

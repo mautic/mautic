@@ -906,7 +906,7 @@ class CompanyController extends FormController
                     }
 
                     // Both leads are good so now we merge them
-                    $model->companyMerge($primaryCompany, $secondaryCompany, false);
+                    $model->companyMerge($primaryCompany, $secondaryCompany);
                 }
 
                 if ($valid) {

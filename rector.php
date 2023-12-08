@@ -119,7 +119,7 @@ return static function (Rector\Config\RectorConfig $rectorConfig): void {
         \Rector\Doctrine\Set\DoctrineSetList::DOCTRINE_ORM_25,
 
         \Rector\Set\ValueObject\SetList::DEAD_CODE,
-        \Rector\Set\ValueObject\LevelSetList::UP_TO_PHP_56,
+        \Rector\Set\ValueObject\LevelSetList::UP_TO_PHP_74,
     ]);
 
     // Define what single rules will be applied
