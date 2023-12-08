@@ -46,21 +46,28 @@ class TwilioTransport implements TransportInterface
             );
 
             return true;
-        } catch (NumberParseException|TwilioException $exception) {
+        } catch (NumberParseException $numberParseException) {
             $this->logger->warning(
-                $exception->getMessage(),
-                ['exception' => $exception]
+                $numberParseException->getMessage(),
+                ['exception' => $numberParseException]
             );
 
-            return $exception->getMessage();
-        } catch (ConfigurationException $exception) {
-            $message = $exception->getMessage() ?: 'mautic.sms.transport.twilio.not_configured';
+            return $numberParseException->getMessage();
+        } catch (ConfigurationException $configurationException) {
+            $message = $configurationException->getMessage() ?: 'mautic.sms.transport.twilio.not_configured';
             $this->logger->warning(
                 $message,
-                ['exception' => $exception]
+                ['exception' => $configurationException]
             );
 
             return $message;
+        } catch (TwilioException $twilioException) {
+            $this->logger->warning(
+                $twilioException->getMessage(),
+                ['exception' => $twilioException]
+            );
+
+            return $twilioException->getMessage();
         }
     }
 
