@@ -3,8 +3,6 @@
 namespace Mautic\PointBundle;
 
 /**
- * Class PointEvents.
- *
  * Events available for PointBundle
  */
 final class PointEvents

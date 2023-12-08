@@ -14,7 +14,7 @@ use Symfony\Component\Cache\Psr16Cache;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
- * Class CacheProvider provides caching mechanism using adapters, it provides both PSR-6 and PSR-16.
+ * Povides caching mechanism using adapters, it provides both PSR-6 and PSR-16.
  */
 final class CacheProvider implements CacheProviderInterface
 {

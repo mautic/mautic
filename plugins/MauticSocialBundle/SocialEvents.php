@@ -3,8 +3,6 @@
 namespace MauticPlugin\MauticSocialBundle;
 
 /**
- * Class SocialEvents.
- *
  * Events available for MauticSocialBundle
  */
 final class SocialEvents

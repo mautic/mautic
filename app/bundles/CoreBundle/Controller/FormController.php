@@ -16,8 +16,6 @@ use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 
 /**
- * Class FormController.
- *
  * @deprecated 2.3 - to be removed in 3.0; use AbstractFormController instead
  */
 class FormController extends AbstractStandardFormController

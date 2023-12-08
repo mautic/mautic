@@ -7,8 +7,6 @@ use Symfony\Component\Cache\Adapter\DoctrineDbalAdapter;
 use Symfony\Component\Cache\Adapter\FilesystemAdapter;
 
 /**
- * Class CacheStorageHelper.
- *
  * @deprecated This helper is deprecated in favor of CacheBundle
  */
 class CacheStorageHelper

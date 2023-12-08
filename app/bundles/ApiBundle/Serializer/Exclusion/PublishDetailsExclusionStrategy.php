@@ -3,8 +3,6 @@
 namespace Mautic\ApiBundle\Serializer\Exclusion;
 
 /**
- * Class PublishDetailsExclusionStrategy.
- *
  * Only include FormEntity properties for the top level entity and not the associated entities
  */
 class PublishDetailsExclusionStrategy extends FieldExclusionStrategy

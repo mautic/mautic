@@ -7,7 +7,7 @@ use Mautic\LeadBundle\Segment\ContactSegmentFilter;
 use Mautic\LeadBundle\Segment\Query\QueryBuilder;
 
 /**
- * Class ComplexRelationValueFilterQueryBuilder is used to connect foreign tables using third table.
+ * Used to connect foreign tables using third table.
  *
  * Currently only company decorator uses this functionality but it may be used by plugins in the future
  *

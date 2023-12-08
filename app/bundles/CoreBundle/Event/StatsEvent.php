@@ -7,7 +7,6 @@ use Mautic\UserBundle\Entity\User;
 use Symfony\Contracts\EventDispatcher\Event;
 
 /**
- * Class StatsEvent.
  * Used to get statistical data from subscribed tables.
  */
 class StatsEvent extends Event

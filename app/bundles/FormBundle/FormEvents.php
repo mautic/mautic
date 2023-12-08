@@ -3,8 +3,6 @@
 namespace Mautic\FormBundle;
 
 /**
- * Class FormEvents.
- *
  * Events available for FormBundle
  */
 final class FormEvents
