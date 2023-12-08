@@ -68,10 +68,8 @@ class TriggerEventModel extends CommonFormModel
      * Get segments which are dependent on given segment.
      *
      * @param int $segmentId
-     *
-     * @return array
      */
-    public function getReportIdsWithDependenciesOnSegment($segmentId)
+    public function getReportIdsWithDependenciesOnSegment($segmentId): array
     {
         $filter = [
             'force'  => [

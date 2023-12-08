@@ -24,10 +24,7 @@ class MailchimpType extends AbstractType
      */
     protected $session;
 
-    /**
-     * @var CoreParametersHelper
-     */
-    protected $coreParametersHelper;
+    protected \Mautic\CoreBundle\Helper\CoreParametersHelper $coreParametersHelper;
 
     public function __construct(private IntegrationHelper $integrationHelper, private PluginModel $pluginModel, SessionInterface $session, CoreParametersHelper $coreParametersHelper)
     {

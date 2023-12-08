@@ -2,23 +2,23 @@
 
 namespace MauticPlugin\MauticSocialBundle\Form\Type;
 
-use Mautic\LeadBundle\Model\FieldModel;
+use Mautic\LeadBundle\Field\FieldList;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\FormBuilderInterface;
 
 class ConfigType extends AbstractType
 {
-    protected $fieldModel;
+    private FieldList $fieldList;
 
-    public function __construct(FieldModel $fieldModel)
+    public function __construct(FieldList $fieldList)
     {
-        $this->fieldModel = $fieldModel;
+        $this->fieldList = $fieldList;
     }
 
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
-        $leadFields = $this->fieldModel->getFieldList(false, false);
+        $leadFields = $this->fieldList->getFieldList(false, false);
 
         $builder->add(
             'twitter_handle_field',

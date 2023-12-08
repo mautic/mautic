@@ -54,11 +54,9 @@ abstract class CloudStorageIntegration extends AbstractIntegration
     /**
      * Retrieves FQCN form type class name.
      *
-     * @return string
-     *
      * @throws NoFormNeededException
      */
-    abstract public function getForm();
+    abstract public function getForm(): string;
 
     /**
      * Retrieves the public URL for a given key.

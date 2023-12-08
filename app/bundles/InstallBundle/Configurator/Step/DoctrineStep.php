@@ -91,7 +91,7 @@ class DoctrineStep implements StepInterface
     /**
      * {@inheritdoc}
      */
-    public function checkRequirements()
+    public function checkRequirements(): array
     {
         $messages = [];
 
@@ -152,10 +152,8 @@ class DoctrineStep implements StepInterface
 
     /**
      * Fetches the available database drivers for the environment.
-     *
-     * @return array
      */
-    public static function getDrivers()
+    public static function getDrivers(): array
     {
         $mauticSupported = [
             'pdo_mysql' => 'MySQL PDO (Recommended)',

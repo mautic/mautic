@@ -20,10 +20,8 @@ class DateBuilder
      * @param string $scheduleUnit
      * @param string $scheduleDay
      * @param string $scheduleMonthFrequency
-     *
-     * @return array
      */
-    public function getPreviewDays($isScheduled, $scheduleUnit, $scheduleDay, $scheduleMonthFrequency)
+    public function getPreviewDays($isScheduled, $scheduleUnit, $scheduleDay, $scheduleMonthFrequency): array
     {
         $entity = new SchedulerEntity($isScheduled, $scheduleUnit, $scheduleDay, $scheduleMonthFrequency);
         $count  = $entity->isScheduledNow() ? 1 : 10;

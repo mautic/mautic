@@ -31,10 +31,7 @@ class PointApiController extends CommonApiController
 {
     use LeadAccessTrait;
 
-    /**
-     * @var LeadModel
-     */
-    protected $leadModel;
+    protected \Mautic\LeadBundle\Model\LeadModel $leadModel;
 
     /**
      * @var PointModel|null

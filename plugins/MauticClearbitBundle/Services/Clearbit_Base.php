@@ -10,7 +10,7 @@ class Clearbit_Base
     public const REQUEST_LATENCY = 0.2;
     public const USER_AGENT      = 'mautic/clearbit-php-0.1.0';
 
-    private $_next_req_time;
+    private \DateTime $_next_req_time;
 
     protected $_baseUri     = '';
     protected $_resourceUri = '';
@@ -27,7 +27,7 @@ class Clearbit_Base
     private function _wait_for_rate_limit(): void
     {
         $now = new \DateTime();
-        if ($this->_next_req_time && $this->_next_req_time->getTimestamp() > $now->getTimestamp()) {
+        if ($this->_next_req_time->getTimestamp() > $now->getTimestamp()) {
             $t = $this->_next_req_time->getTimestamp() - $now->getTimestamp();
             sleep($t);
         }

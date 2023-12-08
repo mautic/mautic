@@ -37,10 +37,7 @@ class HubspotIntegration extends CrmAbstractIntegration
 {
     public const ACCESS_KEY = 'accessKey';
 
-    /**
-     * @var UserHelper
-     */
-    protected $userHelper;
+    protected \Mautic\CoreBundle\Helper\UserHelper $userHelper;
 
     public function __construct(
         EventDispatcherInterface $eventDispatcher,
@@ -279,10 +276,8 @@ class HubspotIntegration extends CrmAbstractIntegration
      * Format the lead data to the structure that HubSpot requires for the createOrUpdate request.
      *
      * @param array $leadData All the lead fields mapped
-     *
-     * @return array
      */
-    public function formatLeadDataForCreateOrUpdate($leadData, $lead, $updateLink = false)
+    public function formatLeadDataForCreateOrUpdate($leadData, $lead, $updateLink = false): array
     {
         $formattedLeadData = [];
 

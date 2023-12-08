@@ -37,10 +37,8 @@ class ConfigMapper
 
     /**
      * Merges default parameters from each subscribed bundle with the local (real) params.
-     *
-     * @return array
      */
-    private function mergeWithLocalParameters(array $formParameters)
+    private function mergeWithLocalParameters(array $formParameters): array
     {
         $formParameters = RestrictionHelper::applyRestrictions($formParameters, $this->restrictedParameters);
 

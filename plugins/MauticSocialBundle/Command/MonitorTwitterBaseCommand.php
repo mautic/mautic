@@ -23,20 +23,11 @@ abstract class MonitorTwitterBaseCommand extends Command
      */
     protected $twitter;
 
-    /**
-     * @var Translator
-     */
-    protected $translator;
+    protected \Mautic\CoreBundle\Translation\Translator $translator;
 
-    /**
-     * @var EventDispatcherInterface
-     */
-    protected $dispatcher;
+    protected \Symfony\Component\EventDispatcher\EventDispatcherInterface $dispatcher;
 
-    /**
-     * @var IntegrationHelper
-     */
-    protected $integrationHelper;
+    protected \Mautic\PluginBundle\Helper\IntegrationHelper $integrationHelper;
 
     /**
      * @var InputInterface

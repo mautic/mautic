@@ -16,7 +16,7 @@ class FullContact_Base
     public const REQUEST_LATENCY = 0.2;
     public const USER_AGENT      = 'caseysoftware/fullcontact-php-0.9.0';
 
-    private $_next_req_time;
+    private \DateTime $_next_req_time;
 
 //    protected $_baseUri = 'https://requestbin.fullcontact.com/1ailj6d1?';
     protected $_baseUri     = 'https://api.fullcontact.com/';
@@ -37,7 +37,7 @@ class FullContact_Base
     private function _wait_for_rate_limit(): void
     {
         $now = new \DateTime();
-        if ($this->_next_req_time && $this->_next_req_time->getTimestamp() > $now->getTimestamp()) {
+        if ($this->_next_req_time->getTimestamp() > $now->getTimestamp()) {
             $t = $this->_next_req_time->getTimestamp() - $now->getTimestamp();
             sleep($t);
         }

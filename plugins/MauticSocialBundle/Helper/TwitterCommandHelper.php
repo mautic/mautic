@@ -103,10 +103,8 @@ class TwitterCommandHelper
      *
      * @param array      $statusList
      * @param Monitoring $monitor
-     *
-     * @return int
      */
-    public function createLeadsFromStatuses($statusList, $monitor)
+    public function createLeadsFromStatuses($statusList, $monitor): int
     {
         $leadField = $this->fieldModel->getRepository()->findOneBy(['alias' => $this->twitterHandleField]);
 

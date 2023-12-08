@@ -1137,10 +1137,7 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
         return (bool) $q->executeQuery()->fetchOne();
     }
 
-    /**
-     * @return array
-     */
-    public function getContacts(array $contactIds)
+    public function getContacts(array $contactIds): array
     {
         $qb = $this->getEntityManager()->getConnection()->createQueryBuilder();
 

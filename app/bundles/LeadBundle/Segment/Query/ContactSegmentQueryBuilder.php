@@ -218,7 +218,7 @@ class ContactSegmentQueryBuilder
     /**
      * @throws PluginHandledFilterException
      */
-    private function dispatchPluginFilteringEvent(ContactSegmentFilter $filter, QueryBuilder $queryBuilder)
+    private function dispatchPluginFilteringEvent(ContactSegmentFilter $filter, QueryBuilder $queryBuilder): void
     {
         if ($this->dispatcher->hasListeners(LeadEvents::LIST_FILTERS_ON_FILTERING)) {
             //  This has to run for every filter
@@ -272,10 +272,8 @@ class ContactSegmentQueryBuilder
 
     /**
      * @param int $segmentId
-     *
-     * @return array
      */
-    private function getSegmentEdges($segmentId)
+    private function getSegmentEdges($segmentId): array
     {
         $segment = $this->entityManager->getRepository(\Mautic\LeadBundle\Entity\LeadList::class)->find($segmentId);
         if (null === $segment) {

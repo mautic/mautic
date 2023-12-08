@@ -96,10 +96,7 @@ class FileManager
             .self::GRAPESJS_IMAGES_DIRECTORY;
     }
 
-    /**
-     * @return array
-     */
-    public function getImages()
+    public function getImages(): array
     {
         $files      = [];
         $uploadDir  = $this->getUploadDir();

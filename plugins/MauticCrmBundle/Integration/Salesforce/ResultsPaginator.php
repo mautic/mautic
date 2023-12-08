@@ -96,10 +96,7 @@ class ResultsPaginator
         return '';
     }
 
-    /**
-     * @return int
-     */
-    public function getTotal()
+    public function getTotal(): int
     {
         return (int) $this->totalRecords;
     }

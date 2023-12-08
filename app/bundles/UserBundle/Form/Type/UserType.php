@@ -252,10 +252,7 @@ class UserType extends AbstractType
         );
     }
 
-    /**
-     * @return array
-     */
-    private function getSupportedLanguageChoices()
+    private function getSupportedLanguageChoices(): array
     {
         // Get the list of available languages
         $languages = $this->languageHelper->fetchLanguages(false, false);

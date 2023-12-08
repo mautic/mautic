@@ -440,10 +440,8 @@ class ZohoIntegration extends CrmAbstractIntegration
      * @param string $query
      * @param array  $result
      * @param string $object
-     *
-     * @return int
      */
-    public function getLeads($params, $query, &$executed, $result = [], $object = 'Lead')
+    public function getLeads($params, $query, &$executed, $result = [], $object = 'Lead'): int
     {
         if ('Lead' === $object || 'Contact' === $object) {
             $object .= 's'; // pluralize object name for Zoho
@@ -516,10 +514,8 @@ class ZohoIntegration extends CrmAbstractIntegration
      * @param null  $query
      * @param null  $executed
      * @param array $result
-     *
-     * @return int|null
      */
-    public function getCompanies($params = [], $query = null, &$executed = null, &$result = [])
+    public function getCompanies($params = [], $query = null, &$executed = null, &$result = []): int
     {
         $executed = 0;
         $object   = 'company';
@@ -1145,11 +1141,9 @@ class ZohoIntegration extends CrmAbstractIntegration
      * @param string $zObject
      * @param bool   $createIntegrationEntity
      *
-     * @return int
-     *
      * @throws \MauticPlugin\MauticCrmBundle\Api\Zoho\Exception\MatchingKeyNotFoundException
      */
-    private function consumeResponse($response, $zObject, $createIntegrationEntity = false, Mapper $mapper = null)
+    private function consumeResponse($response, $zObject, $createIntegrationEntity = false, Mapper $mapper = null): int
     {
         $rows = $response;
         if (isset($rows['data'][0])) {
@@ -1213,10 +1207,7 @@ class ZohoIntegration extends CrmAbstractIntegration
         return $this->parseZohoRecord($records, array_merge($availableFields[$object], $idField));
     }
 
-    /**
-     * @return array
-     */
-    private function parseZohoRecord($data, $fields)
+    private function parseZohoRecord($data, $fields): array
     {
         $parsedData = [];
         if (empty($data['data'])) {

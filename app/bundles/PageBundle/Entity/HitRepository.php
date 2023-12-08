@@ -343,10 +343,8 @@ class HitRepository extends CommonRepository
 
     /**
      * Get the dwell times for bunch of pages.
-     *
-     * @return array
      */
-    public function getDwellTimesForPages(array $pageIds, array $options)
+    public function getDwellTimesForPages(array $pageIds, array $options): array
     {
         $q = $this->_em->getConnection()->createQueryBuilder();
         $q->from(MAUTIC_TABLE_PREFIX.'page_hits', 'ph')

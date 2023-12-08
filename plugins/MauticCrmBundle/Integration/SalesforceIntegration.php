@@ -1316,7 +1316,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
     /**
      * @throws \Exception
      */
-    public function getCampaignMembers($campaignId)
+    public function getCampaignMembers($campaignId): void
     {
         $this->failureFetchingLeads = false;
 
@@ -1692,8 +1692,6 @@ class SalesforceIntegration extends CrmAbstractIntegration
     /**
      * @param null $objectId
      * @param null $sfRecord
-     *
-     * @return array
      */
     protected function buildCompositeBody(
         &$mauticData,
@@ -1702,7 +1700,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
         &$entity,
         $objectId = null,
         $sfRecord = null
-    ) {
+    ): array {
         $body         = [];
         $updateEntity = [];
         $company      = null;
@@ -2346,10 +2344,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
         return $this->prepareFieldsForSync($fields, $fieldsToUpdate, $objects);
     }
 
-    /**
-     * @return array
-     */
-    protected function mapContactDataForPush(Lead $lead, $config)
+    protected function mapContactDataForPush(Lead $lead, $config): array
     {
         $fields             = array_keys($config['leadFields']);
         $fieldsToUpdateInSf = $this->getPriorityFieldsForIntegration($config);
@@ -2396,10 +2391,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
         return $mappedData;
     }
 
-    /**
-     * @return array
-     */
-    protected function mapCompanyDataForPush(Company $company, $config)
+    protected function mapCompanyDataForPush(Company $company, $config): array
     {
         $object     = 'company';
         $entity     = [];

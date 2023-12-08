@@ -97,10 +97,8 @@ class OwnerSubscriber implements EventSubscriberInterface
 
     /**
      * Used to replace all owner tokens with emptiness so not to email out tokens.
-     *
-     * @return array
      */
-    private function getEmptyTokens()
+    private function getEmptyTokens(): array
     {
         $tokens = [];
 
@@ -113,10 +111,8 @@ class OwnerSubscriber implements EventSubscriberInterface
 
     /**
      * Used to replace all owner tokens with emptiness so not to email out tokens.
-     *
-     * @return array
      */
-    private function getFakeTokens()
+    private function getFakeTokens(): array
     {
         $tokens = [];
 
