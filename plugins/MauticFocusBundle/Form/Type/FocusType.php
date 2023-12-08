@@ -23,10 +23,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class FocusType extends AbstractType
 {
-    /**
-     * @var CorePermissions
-     */
-    private $security;
+    private \Mautic\CoreBundle\Security\Permissions\CorePermissions $security;
 
     public function __construct(CorePermissions $security)
     {

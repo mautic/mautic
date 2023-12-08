@@ -99,7 +99,7 @@ class Form extends FormEntity
      * @var Collection<int, Submission>
      */
     #[ORM\OneToMany(targetEntity: \Mautic\FormBundle\Entity\Submission::class, mappedBy: 'form', fetch: 'EXTRA_LAZY')]
-    #[ORM\OrderBy(['dateSubmitted' => 'DESC'])]
+    #[ORM\OrderBy(['dateSubmitted' => \Doctrine\Common\Collections\Criteria::DESC])]
     private \Doctrine\Common\Collections\Collection $submissions;
 
     /**

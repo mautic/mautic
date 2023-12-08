@@ -12,20 +12,11 @@ class SocialMonitorEvent extends CommonEvent
      */
     protected $integrationName;
 
-    /**
-     * @var int
-     */
-    protected $newLeadCount = 0;
+    protected int $newLeadCount;
 
-    /**
-     * @var int
-     */
-    protected $updatedLeadCount = 0;
+    protected int $updatedLeadCount;
 
-    /**
-     * @var array
-     */
-    protected $leadIds = [];
+    protected array $leadIds;
 
     /**
      * @param string $integrationName

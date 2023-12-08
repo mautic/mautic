@@ -128,7 +128,7 @@ class InactiveExecutioner implements ExecutionerInterface
     /**
      * @throws NoEventsFoundException
      */
-    private function checkCampaignIsPublished()
+    private function checkCampaignIsPublished(): void
     {
         if (!$this->decisions->count()) {
             throw new NoEventsFoundException();
@@ -144,7 +144,7 @@ class InactiveExecutioner implements ExecutionerInterface
      * @throws NoContactsFoundException
      * @throws NoEventsFoundException
      */
-    private function prepareForExecution()
+    private function prepareForExecution(): void
     {
         $this->logger->debug('CAMPAIGN: Triggering inaction events');
 

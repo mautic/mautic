@@ -107,7 +107,7 @@ class CampaignEventLeadFieldValueType extends AbstractType
                                         $fieldValues
                                     );
 
-                                    $choiceAttr = function ($value, $key, $index) use ($customValue) {
+                                    $choiceAttr = function ($value, $key, $index) use ($customValue): array {
                                         if ($customValue === $value) {
                                             return ['data-custom' => 1];
                                         }

@@ -186,7 +186,7 @@ class FormSubscriber implements EventSubscriberInterface
         }
     }
 
-    public function onFormSubmitActionRepost(Events\SubmissionEvent $event)
+    public function onFormSubmitActionRepost(Events\SubmissionEvent $event): void
     {
         if (!$event->checkContext('form.repost')) {
             return;

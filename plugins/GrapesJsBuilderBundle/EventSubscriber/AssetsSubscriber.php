@@ -12,15 +12,9 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class AssetsSubscriber implements EventSubscriberInterface
 {
-    /**
-     * @var Config
-     */
-    private $config;
+    private \MauticPlugin\GrapesJsBuilderBundle\Integration\Config $config;
 
-    /**
-     * @var InstallService
-     */
-    private $installer;
+    private \Mautic\InstallBundle\Install\InstallService $installer;
 
     public function __construct(Config $config, InstallService $installer)
     {

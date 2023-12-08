@@ -663,7 +663,7 @@ class FieldModel extends FormModel
     /**
      * Reorder fields based on passed entity position.
      */
-    public function reorderFieldsByEntity($entity)
+    public function reorderFieldsByEntity($entity): void
     {
         if (!$entity instanceof LeadField) {
             throw new MethodNotAllowedHttpException(['LeadEntity']);

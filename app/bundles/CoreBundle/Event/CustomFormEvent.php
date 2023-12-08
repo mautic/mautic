@@ -71,7 +71,7 @@ class CustomFormEvent extends Event
         return $this->subscribers;
     }
 
-    public function addListener($eventName, $listener)
+    public function addListener($eventName, $listener): void
     {
         if (!is_callable($listener)) {
             throw new \InvalidArgumentException('$listener must be callable');

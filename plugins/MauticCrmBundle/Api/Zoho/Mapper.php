@@ -11,10 +11,7 @@ class Mapper
      */
     private $contact = [];
 
-    /**
-     * @var array
-     */
-    private $fields = [];
+    private array $fields;
 
     /**
      * @var array

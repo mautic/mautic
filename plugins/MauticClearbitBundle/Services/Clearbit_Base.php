@@ -10,7 +10,7 @@ class Clearbit_Base
     public const REQUEST_LATENCY = 0.2;
     public const USER_AGENT      = 'mautic/clearbit-php-0.1.0';
 
-    private $_next_req_time;
+    private \DateTime $_next_req_time;
 
     protected $_baseUri     = '';
     protected $_resourceUri = '';

@@ -16,30 +16,18 @@ use Monolog\Logger;
 
 class LookupHelper
 {
-    /**
-     * @var UserHelper
-     */
-    protected $userHelper;
+    protected \Mautic\CoreBundle\Helper\UserHelper $userHelper;
 
     /**
      * @var bool|ClearbitIntegration
      */
     protected $integration;
 
-    /**
-     * @var Logger
-     */
-    protected $logger;
+    protected \Monolog\Logger $logger;
 
-    /**
-     * @var LeadModel
-     */
-    protected $leadModel;
+    protected \Mautic\LeadBundle\Model\LeadModel $leadModel;
 
-    /**
-     * @var CompanyModel
-     */
-    protected $companyModel;
+    protected \Mautic\LeadBundle\Model\CompanyModel $companyModel;
 
     public function __construct(
         IntegrationHelper $integrationHelper,

@@ -15,25 +15,13 @@ class PageSubscriber implements EventSubscriberInterface
 {
     private $regex = '{focus=(.*?)}';
 
-    /**
-     * @var FocusModel
-     */
-    private $model;
+    private \MauticPlugin\MauticFocusBundle\Model\FocusModel $model;
 
-    /**
-     * @var RouterInterface
-     */
-    private $router;
+    private \Symfony\Component\Routing\RouterInterface $router;
 
-    /**
-     * @var CorePermissions
-     */
-    private $security;
+    private \Mautic\CoreBundle\Security\Permissions\CorePermissions $security;
 
-    /**
-     * @var BuilderTokenHelperFactory
-     */
-    private $builderTokenHelperFactory;
+    private \Mautic\CoreBundle\Helper\BuilderTokenHelperFactory $builderTokenHelperFactory;
 
     public function __construct(
         CorePermissions $security,

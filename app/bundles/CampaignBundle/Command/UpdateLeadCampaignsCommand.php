@@ -158,7 +158,7 @@ class UpdateLeadCampaignsCommand extends ModeratedCommand
     /**
      * @throws \Exception
      */
-    private function updateCampaign(Campaign $campaign)
+    private function updateCampaign(Campaign $campaign): void
     {
         if (!$campaign->isPublished()) {
             return;

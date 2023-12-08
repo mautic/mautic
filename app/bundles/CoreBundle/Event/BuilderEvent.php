@@ -12,7 +12,7 @@ class BuilderEvent extends Event
     protected $sections             = [];
     protected $tokens               = [];
     protected $abTestWinnerCriteria = [];
-    protected $tokenFilterText;
+    protected string|array $tokenFilterText;
     protected string $tokenFilterTarget;
 
     public function __construct(protected $translator, protected $entity = null, protected $requested = 'all', protected string $tokenFilter = '')
@@ -132,7 +132,7 @@ class BuilderEvent extends Event
      *  - formType - (optional) name of the form type SERVICE for the criteria
      *  - formTypeOptions - (optional) array of options to pass to the formType service
      */
-    public function addAbTestWinnerCriteria($key, array $criteria)
+    public function addAbTestWinnerCriteria($key, array $criteria): void
     {
         if (array_key_exists($key, $this->abTestWinnerCriteria)) {
             throw new InvalidArgumentException("The key, '$key' is already used by another criteria. Please use a different key.");
@@ -149,7 +149,7 @@ class BuilderEvent extends Event
         $this->abTestWinnerCriteria[$key] = $criteria;
     }
 
-    private function verifyCriteria(array $keys, array $criteria)
+    private function verifyCriteria(array $keys, array $criteria): void
     {
         foreach ($keys as $k) {
             if (!array_key_exists($k, $criteria)) {

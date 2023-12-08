@@ -218,7 +218,7 @@ class ContactSegmentQueryBuilder
     /**
      * @throws PluginHandledFilterException
      */
-    private function dispatchPluginFilteringEvent(ContactSegmentFilter $filter, QueryBuilder $queryBuilder)
+    private function dispatchPluginFilteringEvent(ContactSegmentFilter $filter, QueryBuilder $queryBuilder): void
     {
         if ($this->dispatcher->hasListeners(LeadEvents::LIST_FILTERS_ON_FILTERING)) {
             //  This has to run for every filter

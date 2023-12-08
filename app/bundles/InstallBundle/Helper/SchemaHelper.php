@@ -28,10 +28,7 @@ class SchemaHelper
      */
     protected $platform;
 
-    /**
-     * @var array
-     */
-    protected $dbParams = [];
+    protected array $dbParams;
 
     /**
      * @throws \Doctrine\DBAL\Exception

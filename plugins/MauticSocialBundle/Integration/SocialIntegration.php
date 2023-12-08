@@ -32,10 +32,7 @@ abstract class SocialIntegration extends AbstractIntegration
      */
     protected TranslatorInterface $translator;
 
-    /**
-     * @var IntegrationHelper
-     */
-    protected $integrationHelper;
+    protected \Mautic\PluginBundle\Helper\IntegrationHelper $integrationHelper;
 
     public function __construct(
         EventDispatcherInterface $eventDispatcher,

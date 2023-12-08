@@ -1098,8 +1098,6 @@ class Asset extends FormEntity
 
     /**
      * Load content of the file from it's path.
-     *
-     * @return string
      */
     public function getFileContents(): string|bool
     {

@@ -13,30 +13,15 @@ use MauticPlugin\MauticSocialBundle\Model\TweetModel;
 
 class CampaignEventHelper
 {
-    /**
-     * @var IntegrationHelper
-     */
-    protected $integrationHelper;
+    protected \Mautic\PluginBundle\Helper\IntegrationHelper $integrationHelper;
 
-    /**
-     * @var TrackableModel
-     */
-    protected $trackableModel;
+    protected \Mautic\PageBundle\Model\TrackableModel $trackableModel;
 
-    /**
-     * @var PageTokenHelper
-     */
-    protected $pageTokenHelper;
+    protected PageTokenHelper $pageTokenHelper;
 
-    /**
-     * @var AssetTokenHelper
-     */
-    protected $assetTokenHelper;
+    protected AssetTokenHelper $assetTokenHelper;
 
-    /**
-     * @var TweetModel
-     */
-    protected $tweetModel;
+    protected \MauticPlugin\MauticSocialBundle\Model\TweetModel $tweetModel;
 
     /**
      * @var array
