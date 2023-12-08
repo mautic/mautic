@@ -32,10 +32,7 @@ class DynamicContentSubscriber implements EventSubscriberInterface
     {
     }
 
-    /**
-     * @return array
-     */
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             DynamicContentEvents::POST_SAVE         => ['onPostSave', 0],

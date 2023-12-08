@@ -14,10 +14,7 @@ class ImportSubscriber implements EventSubscriberInterface
     {
     }
 
-    /**
-     * @return array
-     */
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             LeadEvents::IMPORT_POST_SAVE   => ['onImportPostSave', 0],

@@ -8,10 +8,7 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class EmailValidationSubscriber implements EventSubscriberInterface
 {
-    /**
-     * @return array
-     */
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             EmailEvents::ON_EMAIL_VALIDATION => ['onEmailValidation', 0],

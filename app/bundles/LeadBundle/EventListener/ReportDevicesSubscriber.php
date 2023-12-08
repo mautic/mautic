@@ -20,9 +20,6 @@ class ReportDevicesSubscriber implements EventSubscriberInterface
     {
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public static function getSubscribedEvents(): array
     {
         return [

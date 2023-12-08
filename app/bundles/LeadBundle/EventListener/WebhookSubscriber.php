@@ -21,10 +21,7 @@ class WebhookSubscriber implements EventSubscriberInterface
     {
     }
 
-    /**
-     * @return array
-     */
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             WebhookEvents::WEBHOOK_ON_BUILD          => ['onWebhookBuild', 0],

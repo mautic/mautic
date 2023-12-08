@@ -10,10 +10,7 @@ use Symfony\Component\HttpKernel\KernelEvents;
 
 class ErrorHandlingListener implements EventSubscriberInterface
 {
-    /**
-     * {@inheritdoc}
-     */
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             KernelEvents::REQUEST => ['onKernelRequest', 2047],

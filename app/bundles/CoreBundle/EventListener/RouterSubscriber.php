@@ -26,10 +26,7 @@ class RouterSubscriber implements EventSubscriberInterface
         $this->httpPort  = $httpPort ?? 80;
     }
 
-    /**
-     * @return array
-     */
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             KernelEvents::REQUEST => ['setRouterRequestContext', 1],

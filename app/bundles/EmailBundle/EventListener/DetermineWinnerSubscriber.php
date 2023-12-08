@@ -17,10 +17,7 @@ class DetermineWinnerSubscriber implements EventSubscriberInterface
     {
     }
 
-    /**
-     * @return array
-     */
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             EmailEvents::ON_DETERMINE_OPEN_RATE_WINNER         => ['onDetermineOpenRateWinner', 0],

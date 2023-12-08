@@ -14,10 +14,7 @@ class EmailToUserSubscriber implements EventSubscriberInterface
     {
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [EmailEvents::ON_SENT_EMAIL_TO_USER => ['onEmailToUser', 0]];
     }

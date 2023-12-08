@@ -16,10 +16,7 @@ class BuildJsSubscriber implements EventSubscriberInterface
     {
     }
 
-    /**
-     * @return array
-     */
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             CoreEvents::BUILD_MAUTIC_JS => ['onBuildJs', 254],
