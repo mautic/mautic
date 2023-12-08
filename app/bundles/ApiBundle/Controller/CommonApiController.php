@@ -320,10 +320,7 @@ class CommonApiController extends FetchCommonApiController
         return $this->processForm($request, $entity, $parameters, 'POST');
     }
 
-    /**
-     * Creates the form instance.
-     */
-    protected function createEntityForm($entity): Form
+    protected function createEntityForm($entity): FormInterface
     {
         return $this->model->createForm(
             $entity,
