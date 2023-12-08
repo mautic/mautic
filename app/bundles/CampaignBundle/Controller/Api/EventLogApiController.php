@@ -265,10 +265,6 @@ class EventLogApiController extends FetchCommonApiController
         return $this->handleView($view);
     }
 
-    /**
-     * @param null $data
-     * @param null $statusCode
-     */
     protected function view($data = null, ?int $statusCode = null, array $headers = []): View
     {
         if ($this->campaign) {
