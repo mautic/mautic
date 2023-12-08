@@ -25,7 +25,7 @@ class FileHelper
         return min($maxPostSize, $maxUploadSize, $memoryLimit);
     }
 
-    public static function getMaxUploadSizeInMegabytes()
+    public static function getMaxUploadSizeInMegabytes(): float
     {
         $maxUploadSizeInBytes = self::getMaxUploadSizeInBytes();
 

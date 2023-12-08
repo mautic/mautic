@@ -178,7 +178,7 @@ class ScheduledExecutioner implements ExecutionerInterface, ResetInterface
     /**
      * @throws NoEventsFoundException
      */
-    private function prepareForExecution()
+    private function prepareForExecution(): void
     {
         $this->now = $this->now ?? new \DateTime();
 

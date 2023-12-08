@@ -157,11 +157,9 @@ class IndexSchemaHelper
     }
 
     /**
-     * @return array
-     *
      * @throws \Doctrine\DBAL\Schema\SchemaException
      */
-    private function getTextColumns($columns)
+    private function getTextColumns($columns): array
     {
         if (!is_array($columns)) {
             $columns = [$columns];

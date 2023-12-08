@@ -8,7 +8,7 @@ parameters:
 	reportUnmatchedIgnoredErrors: false
 	checkGenericClassInNonGenericObjectType: false
 	parallel:
-		maximumNumberOfProcesses: 4
+		# maximumNumberOfProcesses: 4
 		processTimeout: 1000.0
 	paths:
 		- app/bundles

@@ -47,7 +47,7 @@ class FilePathResolver
      *
      * @throws FilePathException
      */
-    public function createDirectory($directory)
+    public function createDirectory($directory): void
     {
         if ($this->filesystem->exists($directory)) {
             return;

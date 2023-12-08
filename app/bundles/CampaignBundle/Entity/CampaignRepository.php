@@ -357,10 +357,8 @@ class CampaignRepository extends CommonRepository
 
     /**
      * Get pending contact IDs for a campaign.
-     *
-     * @return array
      */
-    public function getPendingContactIds($campaignId, ContactLimiter $limiter)
+    public function getPendingContactIds($campaignId, ContactLimiter $limiter): array
     {
         if ($limiter->hasCampaignLimit() && 0 === $limiter->getCampaignLimitRemaining()) {
             return [];
