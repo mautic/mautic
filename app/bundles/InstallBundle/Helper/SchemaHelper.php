@@ -179,7 +179,7 @@ class SchemaHelper
         $version  = $this->db->executeQuery('SELECT VERSION()')->fetchOne();
 
         // Platform class names are in the format Doctrine\DBAL\Platforms\MariaDb1027Platform
-        $platform = strtolower(get_class($this->db->getDatabasePlatform()));
+        $platform = strtolower($this->db->getDatabasePlatform()::class);
         $metadata = ThisRelease::getMetadata();
 
         /**

@@ -48,7 +48,7 @@ class RestrictionHelper
             case self::MODE_MASK:
                 $parentType->add(
                     $childType->getName(),
-                    get_class($childType->getConfig()->getType()->getInnerType()),
+                    $childType->getConfig()->getType()->getInnerType()::class,
                     array_merge(
                         $childType->getConfig()->getOptions(),
                         [

@@ -25,7 +25,7 @@ class SecondsConversionTransformer implements DataTransformerInterface
             'i'     => $value *= 60,
             'H'     => $value *= 3600,
             'd'     => $value *= 86400,
-            'm'     => $value *= 2592000,
+            'm'     => $value *= 2_592_000,
             default => $value,
         };
 
@@ -47,7 +47,7 @@ class SecondsConversionTransformer implements DataTransformerInterface
             'i'     => $value /= 60,
             'H'     => $value /= 3600,
             'd'     => $value /= 86400,
-            'm'     => $value /= 2592000,
+            'm'     => $value /= 2_592_000,
             default => $value,
         };
 

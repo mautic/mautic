@@ -260,7 +260,7 @@ namespace Mautic\CoreBundle\ErrorHandler {
                     $logMessage = $exception->getMessage();
 
                     if ('dev' === self::$environment) {
-                        $message = '<strong>'.get_class($exception).':</strong> '.$exception->getMessage();
+                        $message = '<strong>'.$exception::class.':</strong> '.$exception->getMessage();
                     }
                 }
             } elseif ($exception instanceof DatabaseConnectionException) {
@@ -491,7 +491,7 @@ namespace Mautic\CoreBundle\ErrorHandler {
 
                 $assetPrefix = $paths['asset_prefix'];
                 if (!empty($assetPrefix)) {
-                    if ('/' == substr($assetPrefix, -1)) {
+                    if (str_ends_with($assetPrefix, '/')) {
                         $assetPrefix = substr($assetPrefix, 0, -1);
                     }
                 }

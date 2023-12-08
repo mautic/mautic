@@ -66,7 +66,7 @@ class BuilderTokenHelper
         CompositeExpression $expr = null
     ) {
         if (!$this->isConfigured) {
-            throw new \BadMethodCallException('You must call the "'.get_class($this).'::configure()" method first.');
+            throw new \BadMethodCallException('You must call the "'.static::class.'::configure()" method first.');
         }
 
         // set some permissions

@@ -96,7 +96,7 @@ class AjaxController extends CommonAjaxController
                     }
 
                     $idPrefix = str_replace(['][', '[', ']'], '_', $prefix);
-                    if ('_' == substr($idPrefix, -1)) {
+                    if (str_ends_with($idPrefix, '_')) {
                         $idPrefix = substr($idPrefix, 0, -1);
                     }
                     $html                 = preg_replace('/'.$form->getName().'\[(.*?)\]/', $prefix.'[$1]', $html);
@@ -156,7 +156,7 @@ class AjaxController extends CommonAjaxController
 
                 $prefix   = str_replace('[integration]', '[config]', $settings['name']);
                 $idPrefix = str_replace(['][', '[', ']'], '_', $prefix);
-                if ('_' == substr($idPrefix, -1)) {
+                if (str_ends_with($idPrefix, '_')) {
                     $idPrefix = substr($idPrefix, 0, -1);
                 }
 
@@ -211,7 +211,7 @@ class AjaxController extends CommonAjaxController
 
                 $idPrefix = str_replace(['][', '[', ']'], '_', $prefix);
 
-                if ('_' == substr($idPrefix, -1)) {
+                if (str_ends_with($idPrefix, '_')) {
                     $idPrefix = substr($idPrefix, 0, -1);
                 }
 

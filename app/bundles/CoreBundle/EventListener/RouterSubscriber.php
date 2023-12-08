@@ -55,7 +55,7 @@ class RouterSubscriber implements EventSubscriberInterface
 
         // Remove index.php, and ending forward slash from the URL to match what is configured in SiteUrlEnvVars
         $originalBaseUrl = str_replace(['index.php'], '', $originalContext->getBaseUrl());
-        if ('/' == substr($originalBaseUrl, -1)) {
+        if (str_ends_with($originalBaseUrl, '/')) {
             $originalBaseUrl = substr($originalBaseUrl, 0, -1);
         }
 

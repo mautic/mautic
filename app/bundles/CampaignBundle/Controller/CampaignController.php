@@ -104,10 +104,7 @@ class CampaignController extends AbstractStandardFormController
         parent::__construct($formFactory, $fieldHelper, $managerRegistry, $factory, $modelFactory, $userHelper, $coreParametersHelper, $dispatcher, $translator, $flashBag, $requestStack, $security);
     }
 
-    /**
-     * @return array
-     */
-    protected function getPermissions()
+    protected function getPermissions(): array
     {
         // set some permissions
         return (array) $this->security->isGranted(

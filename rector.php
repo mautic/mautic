@@ -74,8 +74,10 @@ return static function (Rector\Config\RectorConfig $rectorConfig): void {
         ],
 
         // handle later with full PHP 8.0 upgrade
-        \Rector\Php80\Rector\Switch_\ChangeSwitchToMatchRector::class,
         \Rector\Php80\Rector\FunctionLike\MixedTypeRector::class,
+        \Rector\TypeDeclaration\Rector\Property\TypedPropertyFromAssignsRector::class,
+        \Rector\Php73\Rector\FuncCall\JsonThrowOnErrorRector::class,
+        \Rector\CodeQuality\Rector\ClassMethod\OptionalParametersAfterRequiredRector::class,
 
         // handle later, case by case as lot of chnaged code
         \Rector\DeadCode\Rector\If_\RemoveAlwaysTrueIfConditionRector::class => [
@@ -119,7 +121,7 @@ return static function (Rector\Config\RectorConfig $rectorConfig): void {
         \Rector\Doctrine\Set\DoctrineSetList::DOCTRINE_ORM_25,
 
         \Rector\Set\ValueObject\SetList::DEAD_CODE,
-        \Rector\Set\ValueObject\LevelSetList::UP_TO_PHP_74,
+        \Rector\Set\ValueObject\LevelSetList::UP_TO_PHP_80,
     ]);
 
     // Define what single rules will be applied

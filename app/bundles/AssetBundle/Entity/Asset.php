@@ -842,7 +842,7 @@ class Asset extends FormEntity
             return $this->maxSize;
         }
 
-        return 6000000;
+        return 6_000_000;
     }
 
     /**

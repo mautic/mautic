@@ -14,7 +14,7 @@ use Mautic\LeadBundle\Segment\Query\QueryBuilder;
 /**
  * Class ContactSegmentFilter is used for accessing $filter as an object and to keep logic in an object.
  */
-class ContactSegmentFilter
+class ContactSegmentFilter implements \Stringable
 {
     /**
      * @var ContactSegmentFilterCrate
@@ -190,7 +190,7 @@ class ContactSegmentFilter
         return new IntegrationCampaignParts($this->getParameterValue());
     }
 
-    public function __toString()
+    public function __toString(): string
     {
         return sprintf(
             'table: %s,  %s on %s %s %s',

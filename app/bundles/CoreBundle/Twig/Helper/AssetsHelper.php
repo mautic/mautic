@@ -73,9 +73,9 @@ final class AssetsHelper
     {
         $prefix = $this->pathsHelper->getSystemPath('asset_prefix');
         if (!empty($prefix)) {
-            if ($includeEndingSlash && '/' != substr($prefix, -1)) {
+            if ($includeEndingSlash && !str_ends_with($prefix, '/')) {
                 $prefix .= '/';
-            } elseif (!$includeEndingSlash && '/' == substr($prefix, -1)) {
+            } elseif (!$includeEndingSlash && str_ends_with($prefix, '/')) {
                 $prefix = substr($prefix, 0, -1);
             }
         }
@@ -720,7 +720,7 @@ final class AssetsHelper
      */
     public function setSiteUrl($siteUrl): void
     {
-        if ($siteUrl && '/' === substr($siteUrl, -1)) {
+        if ($siteUrl && str_ends_with($siteUrl, '/')) {
             $siteUrl = substr($siteUrl, 0, -1);
         }
 

@@ -411,7 +411,7 @@ class FormModel extends AbstractCommonModel
             $alias = substr($alias, 0, $maxLength);
         }
 
-        if ('_' == substr($alias, -1)) {
+        if (str_ends_with($alias, '_')) {
             $alias = substr($alias, 0, -1);
         }
 

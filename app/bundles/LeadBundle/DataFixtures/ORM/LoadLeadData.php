@@ -14,13 +14,6 @@ use Mautic\LeadBundle\Entity\LeadRepository;
 
 class LoadLeadData extends AbstractFixture implements OrderedFixtureInterface
 {
-    /**
-     * {@inheritdoc}
-     */
-    public function __construct()
-    {
-    }
-
     public function load(ObjectManager $manager): void
     {
         /** @var LeadRepository $leadRepo */

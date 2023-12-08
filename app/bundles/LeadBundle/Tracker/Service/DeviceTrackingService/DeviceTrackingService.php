@@ -131,7 +131,7 @@ final class DeviceTrackingService implements DeviceTrackingServiceInterface
     private function createTrackingCookies(LeadDevice $device): void
     {
         // Device cookie
-        $this->cookieHelper->setCookie('mautic_device_id', $device->getTrackingId(), 31536000, sameSite: Cookie::SAMESITE_NONE);
+        $this->cookieHelper->setCookie('mautic_device_id', $device->getTrackingId(), 31_536_000, sameSite: Cookie::SAMESITE_NONE);
 
         // Mainly for landing pages so that JS has the same access as 3rd party tracking code
         $this->cookieHelper->setCookie('mtc_id', $device->getLead()->getId(), null, sameSite: Cookie::SAMESITE_NONE);

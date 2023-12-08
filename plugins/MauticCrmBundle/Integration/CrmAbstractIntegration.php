@@ -19,7 +19,7 @@ abstract class CrmAbstractIntegration extends AbstractIntegration
     {
         // make sure URL does not have ending /
         $keys = $this->getDecryptedApiKeys($settings);
-        if (isset($keys['url']) && '/' == substr($keys['url'], -1)) {
+        if (isset($keys['url']) && str_ends_with($keys['url'], '/')) {
             $keys['url'] = substr($keys['url'], 0, -1);
             $this->encryptAndSetApiKeys($keys, $settings);
         }

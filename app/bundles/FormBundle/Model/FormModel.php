@@ -458,9 +458,7 @@ class FormModel extends CommonFormModel
         $fields = $entity->getFields()->toArray();
 
         // Ensure the correct order in case this is generated right after a form save with new fields
-        uasort($fields, function ($a, $b): int {
-            return $a->getOrder() <=> $b->getOrder();
-        });
+        uasort($fields, fn ($a, $b): int => $a->getOrder() <=> $b->getOrder());
 
         $viewOnlyFields     = $this->getCustomComponents()['viewOnlyFields'];
         $displayManager     = new DisplayManager($entity, !empty($viewOnlyFields) ? $viewOnlyFields : []);

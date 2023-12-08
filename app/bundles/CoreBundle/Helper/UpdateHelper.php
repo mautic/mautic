@@ -188,7 +188,7 @@ class UpdateHelper
                 $checkResults[] = $check->runCheck();
             } catch (\Exception $e) {
                 // Checks are supposed to catch errors themselves and return them in their PreUpdateCheckResult, but we catch here just in case.
-                $checkResults[] = new PreUpdateCheckResult(false, $check, [new PreUpdateCheckError('Unknown error while running '.get_class($check).': '.$e->getMessage())]);
+                $checkResults[] = new PreUpdateCheckResult(false, $check, [new PreUpdateCheckError('Unknown error while running '.$check::class.': '.$e->getMessage())]);
             }
         }
 
