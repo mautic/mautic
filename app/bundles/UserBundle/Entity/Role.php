@@ -61,7 +61,7 @@ class Role extends FormEntity
         $builder = new ClassMetadataBuilder($metadata);
 
         $builder->setTable('roles')
-            ->setCustomRepositoryClass('Mautic\UserBundle\Entity\RoleRepository');
+            ->setCustomRepositoryClass(\Mautic\UserBundle\Entity\RoleRepository::class);
 
         $builder->addIdColumns();
 

@@ -65,6 +65,10 @@ return static function (Rector\Config\RectorConfig $rectorConfig): void {
             __DIR__.'/app/bundles/CacheBundle/EventListener/CacheClearSubscriber.php',
         ],
 
+        // handle later with full PHP 8.0 upgrade
+        \Rector\Php80\Rector\Switch_\ChangeSwitchToMatchRector::class,
+        \Rector\Php80\Rector\FunctionLike\MixedTypeRector::class,
+
         // handle later, case by case as lot of chnaged code
         \Rector\DeadCode\Rector\If_\RemoveAlwaysTrueIfConditionRector::class => [
             __DIR__.'/app/bundles/PointBundle/Controller/TriggerController.php',
@@ -107,6 +111,7 @@ return static function (Rector\Config\RectorConfig $rectorConfig): void {
         \Rector\Doctrine\Set\DoctrineSetList::DOCTRINE_ORM_25,
 
         \Rector\Set\ValueObject\SetList::DEAD_CODE,
+        \Rector\Set\ValueObject\LevelSetList::UP_TO_PHP_56,
     ]);
 
     // Define what single rules will be applied
@@ -120,6 +125,8 @@ return static function (Rector\Config\RectorConfig $rectorConfig): void {
         \Rector\TypeDeclaration\Rector\Class_\ReturnTypeFromStrictTernaryRector::class,
 
         // \Rector\Php80\Rector\Class_\ClassPropertyAssignToConstructorPromotionRector::class,
+        // \Rector\Php80\Rector\Catch_\RemoveUnusedVariableInCatchRector::class,
+        \Rector\Php80\Rector\Class_\ClassPropertyAssignToConstructorPromotionRector::class,
         BoolReturnTypeFromStrictScalarReturnsRector::class,
         AddVoidReturnTypeWhereNoReturnRector::class,
         TypedPropertyFromStrictConstructorRector::class,

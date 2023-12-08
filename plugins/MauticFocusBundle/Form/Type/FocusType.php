@@ -240,7 +240,7 @@ class FocusType extends AbstractType
     {
         $resolver->setDefaults(
             [
-                'data_class' => 'MauticPlugin\MauticFocusBundle\Entity\Focus',
+                'data_class' => \MauticPlugin\MauticFocusBundle\Entity\Focus::class,
             ]
         );
         $resolver->setDefined(['update_select']);

@@ -100,7 +100,7 @@ class Company extends FormEntity implements CustomFieldEntityInterface, Identifi
             ->nullable()
             ->build();
 
-        $builder->createManyToOne('owner', 'Mautic\UserBundle\Entity\User')
+        $builder->createManyToOne('owner', \Mautic\UserBundle\Entity\User::class)
             ->cascadeMerge()
             ->addJoinColumn('owner_id', 'id', true, false, 'SET NULL')
             ->build();

@@ -371,7 +371,7 @@ class ListModel extends FormModel
         gc_enable();
 
         if ($leadCount) {
-            $maxCount = ($maxLeads) ? $maxLeads : $leadCount;
+            $maxCount = $maxLeads ?: $leadCount;
 
             if ($output) {
                 $progress = ProgressBarHelper::init($output, $maxCount);
@@ -457,7 +457,7 @@ class ListModel extends FormModel
         }
 
         if ($leadCount) {
-            $maxCount = ($maxLeads) ? $maxLeads : $leadCount;
+            $maxCount = $maxLeads ?: $leadCount;
 
             if ($output) {
                 $progress = ProgressBarHelper::init($output, $maxCount);

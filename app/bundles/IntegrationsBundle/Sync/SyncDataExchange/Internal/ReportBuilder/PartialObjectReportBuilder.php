@@ -77,14 +77,14 @@ class PartialObjectReportBuilder
                     DebugLogger::log(
                         MauticSyncDataExchange::NAME,
                         $exception->getMessage(),
-                        __CLASS__.':'.__FUNCTION__
+                        self::class.':'.__FUNCTION__
                     );
                 }
             } catch (ObjectNotFoundException $exception) {
                 DebugLogger::log(
                     MauticSyncDataExchange::NAME,
                     $exception->getMessage(),
-                    __CLASS__.':'.__FUNCTION__
+                    self::class.':'.__FUNCTION__
                 );
             }
         }
@@ -189,7 +189,7 @@ class PartialObjectReportBuilder
                     DebugLogger::log(
                         MauticSyncDataExchange::NAME,
                         $exception->getMessage(),
-                        __CLASS__.':'.__FUNCTION__
+                        self::class.':'.__FUNCTION__
                     );
                 }
             }

@@ -130,14 +130,14 @@ class InputHelper
                     if (array_key_exists($k, $mask)) {
                         if (is_array($mask[$k])) {
                             $useMask = $mask[$k];
-                        } elseif (method_exists(__CLASS__, $mask[$k])) {
+                        } elseif (method_exists(self::class, $mask[$k])) {
                             $useMask = $mask[$k];
                         }
                     } elseif (is_array($v)) {
                         // Likely a collection so use the same mask
                         $useMask = $mask;
                     }
-                } elseif (method_exists(__CLASS__, $mask)) {
+                } elseif (method_exists(self::class, $mask)) {
                     $useMask = $mask;
                 }
 
@@ -153,7 +153,7 @@ class InputHelper
             return $value;
         } elseif (null === $value) {
             return $value;
-        } elseif (is_string($mask) && method_exists(__CLASS__, $mask)) {
+        } elseif (is_string($mask) && method_exists(self::class, $mask)) {
             return self::$mask($value, $urldecode);
         } else {
             return self::getFilter()->clean($value, $mask);

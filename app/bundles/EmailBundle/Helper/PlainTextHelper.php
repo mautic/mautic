@@ -320,7 +320,7 @@ class PlainTextHelper
      */
     protected function buildlinkList($link, $display, $linkOverride = null)
     {
-        $linkMethod = ($linkOverride) ? $linkOverride : $this->options['do_links'];
+        $linkMethod = $linkOverride ?: $this->options['do_links'];
         if ('none' == $linkMethod) {
             return $display;
         }

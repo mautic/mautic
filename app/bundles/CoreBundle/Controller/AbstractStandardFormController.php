@@ -37,8 +37,6 @@ abstract class AbstractStandardFormController extends AbstractFormController
 
     /**
      * Support non-index pages such as modal forms.
-     *
-     * @return bool|string
      */
     protected function generateUrl(string $route, array $parameters = [], int $referenceType = UrlGeneratorInterface::ABSOLUTE_PATH): string
     {
@@ -1029,7 +1027,7 @@ abstract class AbstractStandardFormController extends AbstractFormController
      */
     protected function setListFilters($name = null)
     {
-        return parent::setListFilters(($name) ? $name : $this->getSessionBase());
+        return parent::setListFilters($name ?: $this->getSessionBase());
     }
 
     /**

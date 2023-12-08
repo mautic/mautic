@@ -150,7 +150,7 @@ class Page extends FormEntity implements TranslationEntityInterface, VariantEnti
         $builder = new ClassMetadataBuilder($metadata);
 
         $builder->setTable('pages')
-            ->setCustomRepositoryClass('Mautic\PageBundle\Entity\PageRepository')
+            ->setCustomRepositoryClass(\Mautic\PageBundle\Entity\PageRepository::class)
             ->addIndex(['alias'], 'page_alias_search');
 
         $builder->addId();

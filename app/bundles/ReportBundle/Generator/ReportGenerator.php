@@ -19,7 +19,7 @@ class ReportGenerator
     /**
      * @var string
      */
-    private $validInterface = 'Mautic\\ReportBundle\\Builder\\ReportBuilderInterface';
+    private $validInterface = \Mautic\ReportBundle\Builder\ReportBuilderInterface::class;
 
     /**
      * @var string

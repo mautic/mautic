@@ -128,7 +128,7 @@ class VideoHit
         $builder = new ClassMetadataBuilder($metadata);
 
         $builder->setTable('video_hits')
-            ->setCustomRepositoryClass('Mautic\PageBundle\Entity\VideoHitRepository')
+            ->setCustomRepositoryClass(\Mautic\PageBundle\Entity\VideoHitRepository::class)
             ->addIndex(['date_hit'], 'video_date_hit')
             ->addIndex(['channel', 'channel_id'], 'video_channel_search')
             ->addIndex(['guid', 'lead_id'], 'video_guid_lead_search');

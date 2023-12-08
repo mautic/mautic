@@ -54,7 +54,7 @@ class TwilioTransport implements TransportInterface
 
             return $exception->getMessage();
         } catch (ConfigurationException $exception) {
-            $message = ($exception->getMessage()) ? $exception->getMessage() : 'mautic.sms.transport.twilio.not_configured';
+            $message = $exception->getMessage() ?: 'mautic.sms.transport.twilio.not_configured';
             $this->logger->warning(
                 $message,
                 ['exception' => $exception]

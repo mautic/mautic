@@ -16,7 +16,7 @@ class DsnParser
     public function getBounce(Message $message): BouncedEmail
     {
         // Parse the bounce
-        $dsnMessage = ($message->dsnMessage) ? $message->dsnMessage : $message->textPlain;
+        $dsnMessage = $message->dsnMessage ?: $message->textPlain;
         $dsnReport  = $message->dsnReport;
 
         // Try parsing the report

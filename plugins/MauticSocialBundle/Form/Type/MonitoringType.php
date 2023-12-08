@@ -104,7 +104,7 @@ class MonitoringType extends AbstractType
     public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults([
-                'data_class' => 'MauticPlugin\MauticSocialBundle\Entity\Monitoring',
+                'data_class' => \MauticPlugin\MauticSocialBundle\Entity\Monitoring::class,
             ]);
 
         // allow network types to be sent through - list

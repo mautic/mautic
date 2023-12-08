@@ -24,7 +24,7 @@ class PointSubscriber implements EventSubscriberInterface
         $changeLists = [
             'group'    => 'mautic.campaign.point.trigger',
             'label'    => 'mautic.campaign.point.trigger.changecampaigns',
-            'callback' => ['\\Mautic\\CampaignBundle\\Helper\\CampaignEventHelper', 'addRemoveLead'],
+            'callback' => [\Mautic\CampaignBundle\Helper\CampaignEventHelper::class, 'addRemoveLead'],
             'formType' => CampaignEventAddRemoveLeadType::class,
         ];
 

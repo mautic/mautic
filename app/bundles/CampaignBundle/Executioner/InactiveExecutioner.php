@@ -69,7 +69,7 @@ class InactiveExecutioner implements ExecutionerInterface
     {
         $this->campaign = $campaign;
         $this->limiter  = $limiter;
-        $this->output   = ($output) ? $output : new NullOutput();
+        $this->output   = $output ?: new NullOutput();
         $this->counter  = new Counter();
 
         try {
@@ -103,7 +103,7 @@ class InactiveExecutioner implements ExecutionerInterface
     public function validate($decisionId, ContactLimiter $limiter, OutputInterface $output = null)
     {
         $this->limiter = $limiter;
-        $this->output  = ($output) ? $output : new NullOutput();
+        $this->output  = $output ?: new NullOutput();
         $this->counter = new Counter();
 
         try {

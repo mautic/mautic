@@ -48,7 +48,7 @@ class CommonEntity
      */
     public function __toString()
     {
-        $string = get_called_class();
+        $string = static::class;
         if (method_exists($this, 'getId')) {
             $string .= ' with ID #'.$this->getId();
         }

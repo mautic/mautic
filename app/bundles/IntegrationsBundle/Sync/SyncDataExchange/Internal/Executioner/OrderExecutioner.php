@@ -58,7 +58,7 @@ class OrderExecutioner
                 $updateCount,
                 $objectName
             ),
-            __CLASS__.':'.__FUNCTION__
+            self::class.':'.__FUNCTION__
         );
 
         if (0 === $updateCount) {
@@ -75,7 +75,7 @@ class OrderExecutioner
             DebugLogger::log(
                 MauticSyncDataExchange::NAME,
                 $objectName,
-                __CLASS__.':'.__FUNCTION__
+                self::class.':'.__FUNCTION__
             );
 
             return;
@@ -110,7 +110,7 @@ class OrderExecutioner
                 $createCount,
                 $objectName
             ),
-            __CLASS__.':'.__FUNCTION__
+            self::class.':'.__FUNCTION__
         );
 
         if (0 === $createCount) {
@@ -126,7 +126,7 @@ class OrderExecutioner
             DebugLogger::log(
                 MauticSyncDataExchange::NAME,
                 $objectName,
-                __CLASS__.':'.__FUNCTION__
+                self::class.':'.__FUNCTION__
             );
 
             return;

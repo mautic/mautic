@@ -64,7 +64,7 @@ class IntegrationSyncProcess
                         'Integration to Mautic; there are no fields for the %s object',
                         $integrationObjectName
                     ),
-                    __CLASS__.':'.__FUNCTION__
+                    self::class.':'.__FUNCTION__
                 );
 
                 continue;
@@ -83,7 +83,7 @@ class IntegrationSyncProcess
                     $integrationObjectName,
                     count($integrationObjectFields)
                 ),
-                __CLASS__.':'.__FUNCTION__
+                self::class.':'.__FUNCTION__
             );
 
             $integrationRequestObject = new RequestObjectDAO(
@@ -130,7 +130,7 @@ class IntegrationSyncProcess
                         $internalObjectName,
                         $mappedIntegrationObjectName
                     ),
-                    __CLASS__.':'.__FUNCTION__
+                    self::class.':'.__FUNCTION__
                 );
 
                 foreach ($internalObjects as $internalObject) {
@@ -160,7 +160,7 @@ class IntegrationSyncProcess
                                 $internalObject->getObject(),
                                 $internalObject->getObjectId()
                             ),
-                            __CLASS__.':'.__FUNCTION__
+                            self::class.':'.__FUNCTION__
                         );
 
                         continue;

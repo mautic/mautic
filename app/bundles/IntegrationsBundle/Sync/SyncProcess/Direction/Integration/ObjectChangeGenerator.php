@@ -83,7 +83,7 @@ class ObjectChangeGenerator
                     $internalObject->getObject(),
                     (string) $internalObject->getObjectId()
                 ),
-                __CLASS__.':'.__FUNCTION__
+                self::class.':'.__FUNCTION__
             );
         } else {
             DebugLogger::log(
@@ -93,7 +93,7 @@ class ObjectChangeGenerator
                     $internalObject->getObject(),
                     (string) $internalObject->getObjectId()
                 ),
-                __CLASS__.':'.__FUNCTION__
+                self::class.':'.__FUNCTION__
             );
         }
 
@@ -157,7 +157,7 @@ class ObjectChangeGenerator
                     $fieldMappingDAO->getIntegrationField(),
                     $fieldState
                 ),
-                __CLASS__.':'.__FUNCTION__
+                self::class.':'.__FUNCTION__
             );
 
             return;
@@ -174,7 +174,7 @@ class ObjectChangeGenerator
                 $fieldMappingDAO->getIntegrationField(),
                 var_export($newValue->getNormalizedValue(), true)
             ),
-            __CLASS__.':'.__FUNCTION__
+            self::class.':'.__FUNCTION__
         );
     }
 }

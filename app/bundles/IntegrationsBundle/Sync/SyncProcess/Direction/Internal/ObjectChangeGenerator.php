@@ -98,7 +98,7 @@ class ObjectChangeGenerator
                     $integrationObject->getObject(),
                     (string) $integrationObject->getObjectId()
                 ),
-                __CLASS__.':'.__FUNCTION__
+                self::class.':'.__FUNCTION__
             );
         } else {
             DebugLogger::log(
@@ -108,7 +108,7 @@ class ObjectChangeGenerator
                     $integrationObject->getObject(),
                     (string) $integrationObject->getObjectId()
                 ),
-                __CLASS__.':'.__FUNCTION__
+                self::class.':'.__FUNCTION__
             );
         }
 
@@ -183,7 +183,7 @@ class ObjectChangeGenerator
                     $fieldMappingDAO->getInternalField(),
                     var_export($newValue->getNormalizedValue(), true)
                 ),
-                __CLASS__.':'.__FUNCTION__
+                self::class.':'.__FUNCTION__
             );
 
             return;
@@ -198,7 +198,7 @@ class ObjectChangeGenerator
                 $internalFieldState,
                 $fieldMappingDAO->getInternalField()
             ),
-            __CLASS__.':'.__FUNCTION__
+            self::class.':'.__FUNCTION__
         );
     }
 
@@ -234,7 +234,7 @@ class ObjectChangeGenerator
                     $fieldMappingDAO->getInternalField(),
                     var_export($newValue->getNormalizedValue(), true)
                 ),
-                __CLASS__.':'.__FUNCTION__
+                self::class.':'.__FUNCTION__
             );
 
             return;
@@ -281,7 +281,7 @@ class ObjectChangeGenerator
                         $this->internalObject->getObject(),
                         $fieldMappingDAO->getInternalField()
                     ),
-                    __CLASS__.':'.__FUNCTION__
+                    self::class.':'.__FUNCTION__
                 );
             }
         }
@@ -325,7 +325,7 @@ class ObjectChangeGenerator
                 var_export($newValue->getNormalizedValue(), true),
                 $judgeMode
             ),
-            __CLASS__.':'.__FUNCTION__
+            self::class.':'.__FUNCTION__
         );
     }
 

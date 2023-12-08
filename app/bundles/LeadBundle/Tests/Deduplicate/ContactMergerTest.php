@@ -149,10 +149,10 @@ class ContactMergerTest extends \PHPUnit\Framework\TestCase
 
         $winnerDateModified = new \DateTime('-30 minutes');
         $loserDateModified  = new \DateTime();
-        $winner->expects($this->exactly(2))
+        $winner->expects($this->exactly(1))
             ->method('getDateModified')
             ->willReturn($winnerDateModified);
-        $loser->expects($this->exactly(2))
+        $loser->expects($this->exactly(1))
             ->method('getDateModified')
             ->willReturn($loserDateModified);
         $winner->expects($this->once())
@@ -222,7 +222,7 @@ class ContactMergerTest extends \PHPUnit\Framework\TestCase
 
         $winnerDateModified = new \DateTime();
         $loserDateModified  = new \DateTime('-30 minutes');
-        $winner->expects($this->exactly(2))
+        $winner->expects($this->exactly(1))
             ->method('getDateModified')
             ->willReturn($winnerDateModified);
 
@@ -246,7 +246,7 @@ class ContactMergerTest extends \PHPUnit\Framework\TestCase
             ->with('email')
             ->willReturn('winner@test.com');
 
-        $loser->expects($this->exactly(2))
+        $loser->expects($this->exactly(1))
             ->method('getDateModified')
             ->willReturn($loserDateModified);
 
@@ -295,7 +295,7 @@ class ContactMergerTest extends \PHPUnit\Framework\TestCase
 
         $winnerDateModified = new \DateTime('-30 minutes');
         $loserDateModified  = new \DateTime();
-        $winner->expects($this->exactly(2))
+        $winner->expects($this->exactly(1))
             ->method('getDateModified')
             ->willReturn($winnerDateModified);
 
@@ -400,7 +400,7 @@ class ContactMergerTest extends \PHPUnit\Framework\TestCase
             ->with('email')
             ->willReturn('winner@test.com');
 
-        $loser->expects($this->exactly(2))
+        $loser->expects($this->exactly(1))
             ->method('getDateModified')
             ->willReturn($loserDateModified);
 
@@ -453,6 +453,7 @@ class ContactMergerTest extends \PHPUnit\Framework\TestCase
 
         $winner->method('getDateModified')->willReturn($winnerDateModified);
         $winner->method('getId')->willReturn(1);
+
         $loser->method('getDateModified')->willReturn($loserDateModified);
         $loser->method('getId')->willReturn(2);
         $loser->method('isAnonymous')->willReturn(true);
@@ -591,7 +592,7 @@ class ContactMergerTest extends \PHPUnit\Framework\TestCase
                     'email'  => 'winner@test.com',
                 ]
             );
-        $winner->expects($this->exactly(2))
+        $winner->expects($this->exactly(1))
             ->method('getDateModified')
             ->willReturn(new \DateTime('-30 minutes'));
 
@@ -609,7 +610,7 @@ class ContactMergerTest extends \PHPUnit\Framework\TestCase
                     'email'  => 'loser@test.com',
                 ]
             );
-        $loser->expects($this->exactly(2))
+        $loser->expects($this->exactly(1))
             ->method('getDateModified')
             ->willReturn(new \DateTime());
 
@@ -680,11 +681,11 @@ class ContactMergerTest extends \PHPUnit\Framework\TestCase
         $loser  = $this->createMock(Lead::class);
         $winner = $this->createMock(Lead::class);
 
-        $loser->expects($this->exactly(2))
+        $loser->expects($this->exactly(1))
             ->method('getDateModified')
             ->willReturn(new \DateTime('-10 minutes'));
 
-        $winner->expects($this->exactly(2))
+        $winner->expects($this->exactly(1))
             ->method('getDateModified')
             ->willReturn(new \DateTime());
 

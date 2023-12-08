@@ -70,7 +70,7 @@ trait LeadDetailsTrait
             foreach ($events as &$event) {
                 $event['leadId']    = $lead->getId();
                 $event['leadEmail'] = $lead->getEmail();
-                $event['leadName']  = $lead->getName() ? $lead->getName() : $lead->getEmail();
+                $event['leadName']  = $lead->getName() ?: $lead->getEmail();
             }
 
             $result['events'] = array_merge($result['events'], $events);

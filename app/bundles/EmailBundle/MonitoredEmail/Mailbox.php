@@ -521,7 +521,7 @@ class Mailbox
             $mailIds = imap_search($this->getImapStream(), $criteria, SE_UID);
         }
 
-        return $mailIds ? $mailIds : [];
+        return $mailIds ?: [];
     }
 
     /**
@@ -723,8 +723,6 @@ class Mailbox
 
     /**
      * Get mails count in mail box.
-     *
-     * @return int
      */
     public function countMails(): int|bool
     {

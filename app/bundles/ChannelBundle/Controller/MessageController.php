@@ -307,7 +307,7 @@ class MessageController extends AbstractStandardFormController
             ],
             null,
             [
-                'channel' => ($channel) ? $channel : 'all',
+                'channel' => $channel ?: 'all',
             ],
             '.message-'.$channel
         );
