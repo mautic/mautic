@@ -1141,7 +1141,6 @@ class ZohoIntegration extends CrmAbstractIntegration
      * @param string $zObject
      * @param bool   $createIntegrationEntity
      *
-     *
      * @throws \MauticPlugin\MauticCrmBundle\Api\Zoho\Exception\MatchingKeyNotFoundException
      */
     private function consumeResponse($response, $zObject, $createIntegrationEntity = false, Mapper $mapper = null): int

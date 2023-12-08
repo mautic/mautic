@@ -356,7 +356,6 @@ class Report extends FormEntity implements SchedulerInterface
      *
      * @param string $column
      *
-     *
      * @throws \UnexpectedValueException
      */
     public function getFilterValues($column): array

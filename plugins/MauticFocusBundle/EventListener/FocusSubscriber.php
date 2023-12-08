@@ -36,14 +36,8 @@ class FocusSubscriber implements EventSubscriberInterface
 
     private \Mautic\PageBundle\Model\TrackableModel $trackableModel;
 
-    /**
-     * @var PageTokenHelper
-     */
     private PageTokenHelper $pageTokenHelper;
 
-    /**
-     * @var AssetTokenHelper
-     */
     private AssetTokenHelper $assetTokenHelper;
 
     private \MauticPlugin\MauticFocusBundle\Model\FocusModel $focusModel;

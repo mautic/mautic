@@ -498,6 +498,7 @@ class ConnectwiseIntegration extends CrmAbstractIntegration
 
     /**
      * Ammend mapped lead data before creating to Mautic.
+     *
      * @return mixed[]
      */
     public function amendLeadDataBeforeMauticPopulate($data, $object): array

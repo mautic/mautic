@@ -17,14 +17,8 @@ class CampaignEventHelper
 
     protected \Mautic\PageBundle\Model\TrackableModel $trackableModel;
 
-    /**
-     * @var PageTokenHelper
-     */
     protected PageTokenHelper $pageTokenHelper;
 
-    /**
-     * @var AssetTokenHelper
-     */
     protected AssetTokenHelper $assetTokenHelper;
 
     protected \MauticPlugin\MauticSocialBundle\Model\TweetModel $tweetModel;
