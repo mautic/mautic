@@ -327,7 +327,7 @@ trait FilterTrait
                                     ->setParameter('regex', $this->prepareRegex($regex))
                                     ->setMaxResults(1);
                                 $qb->executeQuery()->fetchAllAssociative();
-                            } catch (\Exception $exception) {
+                            } catch (\Exception) {
                                 $context->buildViolation('mautic.core.regex.invalid')->addViolation();
                             }
                         }

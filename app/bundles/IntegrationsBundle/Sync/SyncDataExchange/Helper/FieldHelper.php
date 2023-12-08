@@ -82,7 +82,7 @@ class FieldHelper
     {
         try {
             return $this->objectProvider->getObjectByName($objectName)->getEntityName();
-        } catch (ObjectNotFoundException $e) {
+        } catch (ObjectNotFoundException) {
             // Throwing different exception to keep BC.
             throw new ObjectNotSupportedException(MauticSyncDataExchange::NAME, $objectName);
         }

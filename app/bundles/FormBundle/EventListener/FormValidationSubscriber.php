@@ -94,7 +94,7 @@ class FormValidationSubscriber implements EventSubscriberInterface
             $phoneUtil = PhoneNumberUtil::getInstance();
             try {
                 $phoneUtil->parse($value, PhoneNumberUtil::UNKNOWN_REGION);
-            } catch (NumberParseException $e) {
+            } catch (NumberParseException) {
                 if (!empty($field->getValidation()['international_validationmsg'])) {
                     $event->failedValidation($field->getValidation()['international_validationmsg']);
                 } else {

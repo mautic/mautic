@@ -56,7 +56,7 @@ final class EmailOrEmailTokenListValidator extends ConstraintValidator
             try {
                 // Try to validate if the value is an email address.
                 $this->emailValidator->validate($emailOrToken);
-            } catch (InvalidEmailException $emailException) {
+            } catch (InvalidEmailException) {
                 try {
                     // The token syntax is validated during creation of new ContactFieldToken object.
                     $contactFieldToken = new ContactFieldToken($emailOrToken);

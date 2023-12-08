@@ -142,7 +142,7 @@ class ObjectChangeGenerator
                 $this->integrationObject->getObjectId(),
                 $fieldMappingDAO->getIntegrationField()
             );
-        } catch (FieldNotFoundException $e) {
+        } catch (FieldNotFoundException) {
             return;
         }
 
@@ -159,7 +159,7 @@ class ObjectChangeGenerator
                 $internalFieldState,
                 $fieldMappingDAO->getSyncDirection()
             );
-        } catch (InvalidValueException $e) {
+        } catch (InvalidValueException) {
             return; // Field has to be skipped
         }
 
@@ -209,7 +209,7 @@ class ObjectChangeGenerator
     ): void {
         try {
             $internalField = $this->internalObject->getField($fieldMappingDAO->getInternalField());
-        } catch (FieldNotFoundException $exception) {
+        } catch (FieldNotFoundException) {
             $internalField = null;
         }
 
@@ -272,7 +272,7 @@ class ObjectChangeGenerator
                 );
 
                 break;
-            } catch (ConflictUnresolvedException $exception) {
+            } catch (ConflictUnresolvedException) {
                 DebugLogger::log(
                     $this->mappingManual->getIntegration(),
                     sprintf(

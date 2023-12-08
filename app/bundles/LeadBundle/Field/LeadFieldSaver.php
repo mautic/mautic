@@ -19,14 +19,14 @@ class LeadFieldSaver
     {
         try {
             $this->fieldSaveDispatcher->dispatchPreSaveEvent($leadField, $isNew);
-        } catch (NoListenerException $e) {
+        } catch (NoListenerException) {
         }
 
         $this->leadFieldRepository->saveEntity($leadField);
 
         try {
             $this->fieldSaveDispatcher->dispatchPostSaveEvent($leadField, $isNew);
-        } catch (NoListenerException $e) {
+        } catch (NoListenerException) {
         }
     }
 

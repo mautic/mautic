@@ -60,7 +60,7 @@ class MenuBuilder
                     return $current_child;
                 }
             }
-        } catch (\Exception $e) {
+        } catch (\Exception) {
             // do nothing
         }
 

@@ -35,7 +35,7 @@ class Unsubscribe implements ProcessorInterface
         if ($this->transport instanceof UnsubscriptionProcessorInterface) {
             try {
                 $unsubscription = $this->transport->processUnsubscription($this->message);
-            } catch (UnsubscriptionNotFound $exception) {
+            } catch (UnsubscriptionNotFound) {
                 // Attempt to parse a unsubscription the standard way
             }
         }
@@ -44,7 +44,7 @@ class Unsubscribe implements ProcessorInterface
             try {
                 $parser         = new Parser($message);
                 $unsubscription = $parser->parse();
-            } catch (UnsubscriptionNotFound $exception) {
+            } catch (UnsubscriptionNotFound) {
                 // No stat found so bail as we won't consider this a reply
                 $this->logger->debug('MONITORED EMAIL: Unsubscription email was not found');
 

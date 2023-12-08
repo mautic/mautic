@@ -344,10 +344,10 @@ class ListModel extends FormModel
         try {
             // Get a count of leads to add
             $newLeadsCount = $this->leadSegmentService->getNewLeadListLeadsCount($leadList, $batchLimiters);
-        } catch (FieldNotFoundException $e) {
+        } catch (FieldNotFoundException) {
             // A field from filter does not exist anymore. Do not rebuild.
             return 0;
-        } catch (SegmentNotFoundException $e) {
+        } catch (SegmentNotFoundException) {
             // A segment from filter does not exist anymore. Do not rebuild.
             return 0;
         }
@@ -365,7 +365,7 @@ class ListModel extends FormModel
         }
 
         // Handle by batches
-        $start = $lastRoundPercentage = $leadsProcessed = 0;
+        $start = $leadsProcessed = 0;
 
         // Try to save some memory
         gc_enable();
@@ -449,7 +449,7 @@ class ListModel extends FormModel
         $batchLimiters['maxId'] = (int) $orphanLeadsCount[$segmentId]['maxId'];
 
         // Restart batching
-        $start     = $lastRoundPercentage     = 0;
+        $start     = 0;
         $leadCount = $orphanLeadsCount[$segmentId]['count'];
 
         if ($output) {

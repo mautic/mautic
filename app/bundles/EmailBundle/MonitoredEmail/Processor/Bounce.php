@@ -45,7 +45,7 @@ class Bounce implements ProcessorInterface
         if ($this->transport instanceof BounceProcessorInterface) {
             try {
                 $bounce = $this->transport->processBounce($this->message);
-            } catch (BounceNotFound $exception) {
+            } catch (BounceNotFound) {
                 // Attempt to parse a bounce the standard way
             }
         }
@@ -53,7 +53,7 @@ class Bounce implements ProcessorInterface
         if (!$bounce) {
             try {
                 $bounce = (new Parser($this->message))->parse();
-            } catch (BounceNotFound $exception) {
+            } catch (BounceNotFound) {
                 return false;
             }
         }

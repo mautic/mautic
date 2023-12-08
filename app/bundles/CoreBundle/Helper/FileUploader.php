@@ -30,7 +30,7 @@ class FileUploader
                 $file->move($uploadDir, $fileName);
 
                 return $fileName;
-            } catch (FileException $e) {
+            } catch (FileException) {
                 throw new FileUploadException('Could not upload file');
             }
         } catch (FilePathException $e) {

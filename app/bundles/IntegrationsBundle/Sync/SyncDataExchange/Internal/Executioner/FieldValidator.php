@@ -33,7 +33,7 @@ final class FieldValidator implements FieldValidatorInterface
 
                 try {
                     $schema = $this->getFieldSchema($objectName, $fieldName);
-                } catch (FieldSchemaNotFoundException $e) {
+                } catch (FieldSchemaNotFoundException) {
                     continue;
                 }
 

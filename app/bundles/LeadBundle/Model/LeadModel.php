@@ -1289,7 +1289,7 @@ class LeadModel extends FormModel
                 $lead->setOwner($newOwner);
                 // reset default import owner if exists owner for contact
                 $owner = null;
-            } catch (NonUniqueResultException $exception) {
+            } catch (NonUniqueResultException) {
                 // user not found
             }
         }

@@ -87,15 +87,15 @@ EOT
 
         try {
             $this->backgroundService->addColumn($leadFieldId, $userId);
-        } catch (LeadFieldWasNotFoundException $e) {
+        } catch (LeadFieldWasNotFoundException) {
             $output->writeln('<error>'.$this->translator->trans('mautic.lead.field.notfound').'</error>');
 
             return Command::FAILURE;
-        } catch (ColumnAlreadyCreatedException $e) {
+        } catch (ColumnAlreadyCreatedException) {
             $output->writeln('<error>'.$this->translator->trans('mautic.lead.field.column_already_created').'</error>');
 
             return Command::SUCCESS;
-        } catch (AbortColumnCreateException $e) {
+        } catch (AbortColumnCreateException) {
             $output->writeln('<error>'.$this->translator->trans('mautic.lead.field.column_creation_aborted').'</error>');
 
             return Command::SUCCESS;

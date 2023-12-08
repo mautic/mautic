@@ -147,7 +147,7 @@ class PartialObjectReportBuilder
             foreach ($fields as $field) {
                 try {
                     $syncObject->getField($field);
-                } catch (FieldNotFoundException $exception) {
+                } catch (FieldNotFoundException) {
                     $missingFields[] = $field;
                 }
             }

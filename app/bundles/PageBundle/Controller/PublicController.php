@@ -395,7 +395,7 @@ class PublicController extends CommonFormController
 
         try {
             $model->hitPage(null, $request);
-        } catch (InvalidDecodedStringException $invalidDecodedStringException) {
+        } catch (InvalidDecodedStringException) {
             // do not track invalid ct
             return $notSuccessResponse;
         }
@@ -605,7 +605,7 @@ class PublicController extends CommonFormController
 
             try {
                 $model->hitVideo($request);
-            } catch (\Exception $e) {
+            } catch (\Exception) {
                 return new JsonResponse(['success' => false]);
             }
 

@@ -54,7 +54,7 @@ class FilePathResolver
         }
         try {
             $this->filesystem->mkdir($directory);
-        } catch (IOException $e) {
+        } catch (IOException) {
             throw new FilePathException('Could not create directory');
         }
     }
@@ -69,7 +69,7 @@ class FilePathResolver
         }
         try {
             $this->filesystem->remove($path);
-        } catch (IOException $e) {
+        } catch (IOException) {
         }
     }
 

@@ -31,7 +31,7 @@ class EmailToUserSubscriber implements EventSubscriberInterface
         try {
             $this->sendEmailToUser->sendEmailToUsers($config, $lead);
             $event->setSucceded();
-        } catch (EmailCouldNotBeSentException $e) {
+        } catch (EmailCouldNotBeSentException) {
             $event->setFailed();
         }
 

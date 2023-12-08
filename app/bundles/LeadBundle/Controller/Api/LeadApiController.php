@@ -588,7 +588,7 @@ class LeadApiController extends CommonApiController
             if ($entity->getId() && $existingEntity->getId()) {
                 try {
                     $entity = $contactMerger->merge($entity, $existingEntity);
-                } catch (SameContactException $exception) {
+                } catch (SameContactException) {
                 }
             } elseif ($existingEntity->getId()) {
                 $entity = $existingEntity;

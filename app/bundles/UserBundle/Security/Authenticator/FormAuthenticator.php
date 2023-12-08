@@ -79,7 +79,7 @@ class FormAuthenticator extends AbstractFormLoginAuthenticator implements Passwo
         try {
             /** @var User $user */
             $user = $userProvider->loadUserByUsername($credentials['username']);
-        } catch (UserNotFoundException $e) {
+        } catch (UserNotFoundException) {
             /** @var string $user */
             $user = $credentials['username'];
         }

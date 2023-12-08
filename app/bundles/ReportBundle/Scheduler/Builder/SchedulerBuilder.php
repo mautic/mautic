@@ -56,7 +56,7 @@ class SchedulerBuilder
             $transformer    = new ArrayTransformer();
 
             return $transformer->transform($finalScheduler);
-        } catch (InvalidWeekday $e) {
+        } catch (InvalidWeekday) {
             throw new InvalidSchedulerException();
         }
     }

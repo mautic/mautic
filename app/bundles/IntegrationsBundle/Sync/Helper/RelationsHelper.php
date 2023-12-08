@@ -49,9 +49,9 @@ class RelationsHelper
             $internalObjectName = $this->getInternalObjectName($mappingManualDao, $relationObject->getRelObjectName());
             $internalObjectId   = $this->getInternalObjectId($mappingManualDao, $relationObject, $relObjectDao);
             $this->addObjectInternalId($internalObjectId, $internalObjectName, $relationObject, $syncReport);
-        } catch (ObjectNotFoundException $e) {
+        } catch (ObjectNotFoundException) {
             return; // We are not mapping this object
-        } catch (InternalIdNotFoundException  $e) {
+        } catch (InternalIdNotFoundException) {
             $this->objectsToSynchronize[] = $relObjectDao;
         }
     }

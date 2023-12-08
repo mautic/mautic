@@ -131,7 +131,7 @@ class InputOptionsDAO
         } else {
             try {
                 return is_string($input[$optionName]) ? new \DateTimeImmutable($input[$optionName], new \DateTimeZone('UTC')) : null;
-            } catch (\Throwable $e) {
+            } catch (\Throwable) {
                 throw new InvalidValueException("'$input[$optionName]' is not valid. Use 'Y-m-d H:i:s' format like '2018-12-24 20:30:00' or something like '-10 minutes'");
             }
         }

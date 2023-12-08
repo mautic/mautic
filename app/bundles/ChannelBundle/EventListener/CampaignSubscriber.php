@@ -214,7 +214,7 @@ class CampaignSubscriber implements EventSubscriberInterface
                 if ($metadata = $channelLog->getMetadata()) {
                     $log->appendToMetadata([$channel => $metadata]);
                 }
-            } catch (NoContactsFoundException $exception) {
+            } catch (NoContactsFoundException) {
                 continue;
             }
         }

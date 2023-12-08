@@ -84,7 +84,7 @@ class DashboardSubscriber extends MainDashboardSubscriber
                     } else {
                         $log['route'] = false;
                     }
-                } catch (\Exception $e) {
+                } catch (\Exception) {
                     unset($logs[$key]);
                 }
             }

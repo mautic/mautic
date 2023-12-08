@@ -99,7 +99,7 @@ class EventScheduler
     {
         try {
             $this->reschedule($log, $this->getRescheduleDate($log));
-        } catch (IntervalNotConfiguredException $e) {
+        } catch (IntervalNotConfiguredException) {
             // Do not reschedule if an interval was not configured.
         }
     }
@@ -113,7 +113,7 @@ class EventScheduler
         foreach ($logs as $log) {
             try {
                 $this->reschedule($log, $this->getRescheduleDate($log));
-            } catch (IntervalNotConfiguredException $e) {
+            } catch (IntervalNotConfiguredException) {
                 // Do not reschedule if an interval was not configured.
             }
         }
@@ -367,7 +367,7 @@ class EventScheduler
 
         try {
             return $rescheduleDate->add(new \DateInterval($defaultIntervalString));
-        } catch (\Exception $exception) {
+        } catch (\Exception) {
             // Bad interval
             throw new IntervalNotConfiguredException("'{$defaultIntervalString}' is not valid interval string for campaign_time_wait_on_event_false config key.");
         }

@@ -44,7 +44,7 @@ class DecoratorFactory
             $this->contactSegmentFilterDictionary->getFilter($originalField);
 
             return $this->customMappedDecorator;
-        } catch (FilterNotFoundException $e) {
+        } catch (FilterNotFoundException) {
             if ($contactSegmentFilterCrate->isCompanyType()) {
                 return $this->companyDecorator;
             }

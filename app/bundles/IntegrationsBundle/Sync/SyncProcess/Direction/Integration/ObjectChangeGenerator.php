@@ -122,7 +122,7 @@ class ObjectChangeGenerator
                 $this->internalObject->getObjectId(),
                 $fieldMappingDAO->getInternalField()
             );
-        } catch (FieldNotFoundException $e) {
+        } catch (FieldNotFoundException) {
             return;
         }
 
@@ -132,7 +132,7 @@ class ObjectChangeGenerator
                 $fieldState,
                 $fieldMappingDAO->getSyncDirection()
             );
-        } catch (InvalidValueException $e) {
+        } catch (InvalidValueException) {
             return; // Field has to be skipped
         }
 

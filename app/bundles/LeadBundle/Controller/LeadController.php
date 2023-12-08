@@ -939,7 +939,7 @@ class LeadController extends FormController
                     // Both leads are good so now we merge them
                     try {
                         $mainLead = $contactMerger->merge($mainLead, $secLead);
-                    } catch (SameContactException $exception) {
+                    } catch (SameContactException) {
                     }
                 }
             }
@@ -2069,7 +2069,7 @@ class LeadController extends FormController
 
         try {
             return $model->getExportFileToDownload($fileName);
-        } catch (FileNotFoundException $exception) {
+        } catch (FileNotFoundException) {
             return $this->notFound();
         }
     }

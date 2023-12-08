@@ -24,7 +24,7 @@ class ReleaseParser
         foreach ($releases as $release) {
             try {
                 $metadata = $this->getMetadata($release['html_url']);
-            } catch (MetadataNotFoundException $exception) {
+            } catch (MetadataNotFoundException) {
                 continue;
             }
 
@@ -81,7 +81,7 @@ class ReleaseParser
             }
 
             return new Metadata($metadata);
-        } catch (GuzzleException $exception) {
+        } catch (GuzzleException) {
             throw new MetadataNotFoundException();
         }
     }

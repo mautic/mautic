@@ -193,7 +193,7 @@ class SmsRepository extends CommonRepository
                 ->where('id = '.(int) $id);
 
             $q->executeStatement();
-        } catch (\Exception $exception) {
+        } catch (\Exception) {
             // not important
         }
     }

@@ -1719,7 +1719,7 @@ class MailHelper
         if (null !== $this->lead) {
             try {
                 $stat->setLead($this->factory->getEntityManager()->getReference(\Mautic\LeadBundle\Entity\Lead::class, $this->lead['id']));
-            } catch (ORMException $exception) {
+            } catch (ORMException) {
                 // keep IDE happy
             }
             $emailAddress = $this->lead['email'];
@@ -1741,7 +1741,7 @@ class MailHelper
         if (null !== $listId) {
             try {
                 $stat->setList($this->factory->getEntityManager()->getReference(\Mautic\LeadBundle\Entity\LeadList::class, $listId));
-            } catch (ORMException $exception) {
+            } catch (ORMException) {
                 // keep IDE happy
             }
         }
@@ -1782,7 +1782,7 @@ class MailHelper
         if (isset($this->copies[$id])) {
             try {
                 $stat->setStoredCopy($this->factory->getEntityManager()->getReference(\Mautic\EmailBundle\Entity\Copy::class, $this->copies[$id]));
-            } catch (ORMException $exception) {
+            } catch (ORMException) {
                 // keep IDE happy
             }
         }

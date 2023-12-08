@@ -592,9 +592,11 @@ class FormModel extends CommonFormModel
     }
 
     /**
-     * {@inheritdoc}
+     * @param mixed[] $ids
+     *
+     * @return mixed[]
      */
-    public function deleteEntities($ids)
+    public function deleteEntities($ids): array
     {
         $entities     = parent::deleteEntities($ids);
         foreach ($entities as $id => $entity) {

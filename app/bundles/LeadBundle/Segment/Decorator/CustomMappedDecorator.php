@@ -25,7 +25,7 @@ class CustomMappedDecorator extends BaseDecorator implements ContactDecoratorFor
 
         try {
             return $this->dictionary->getFilterProperty($originalField, 'field');
-        } catch (FilterNotFoundException $e) {
+        } catch (FilterNotFoundException) {
             return parent::getField($contactSegmentFilterCrate);
         }
     }
@@ -36,7 +36,7 @@ class CustomMappedDecorator extends BaseDecorator implements ContactDecoratorFor
 
         try {
             return MAUTIC_TABLE_PREFIX.$this->dictionary->getFilterProperty($originalField, 'foreign_table');
-        } catch (FilterNotFoundException $e) {
+        } catch (FilterNotFoundException) {
             return parent::getTable($contactSegmentFilterCrate);
         }
     }
@@ -50,7 +50,7 @@ class CustomMappedDecorator extends BaseDecorator implements ContactDecoratorFor
 
         try {
             return $this->dictionary->getFilterProperty($originalField, 'type');
-        } catch (FilterNotFoundException $e) {
+        } catch (FilterNotFoundException) {
             return parent::getQueryType($contactSegmentFilterCrate);
         }
     }
@@ -61,7 +61,7 @@ class CustomMappedDecorator extends BaseDecorator implements ContactDecoratorFor
 
         try {
             return $this->dictionary->getFilterProperty($originalField, 'func');
-        } catch (FilterNotFoundException $e) {
+        } catch (FilterNotFoundException) {
             return false;
         }
     }
@@ -75,7 +75,7 @@ class CustomMappedDecorator extends BaseDecorator implements ContactDecoratorFor
 
         try {
             return $this->dictionary->getFilterProperty($originalField, 'where');
-        } catch (FilterNotFoundException $e) {
+        } catch (FilterNotFoundException) {
             return parent::getWhere($contactSegmentFilterCrate);
         }
     }
@@ -89,7 +89,7 @@ class CustomMappedDecorator extends BaseDecorator implements ContactDecoratorFor
 
         try {
             return $this->dictionary->getFilterProperty($originalField, 'foreign_table_field');
-        } catch (FilterNotFoundException $e) {
+        } catch (FilterNotFoundException) {
             return 'lead_id';
         }
     }

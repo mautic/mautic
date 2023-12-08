@@ -78,7 +78,7 @@ class EncryptionHelper
             }
             try {
                 return Serializer::decode($availableCipher->decrypt($encryptedMessage, $this->key, $initVector));
-            } catch (InvalidDecryptionException $ex) {
+            } catch (InvalidDecryptionException) {
             }
             $mainTried = true;
         }

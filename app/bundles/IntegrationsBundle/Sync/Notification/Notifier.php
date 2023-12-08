@@ -55,7 +55,7 @@ class Notifier
     {
         try {
             $configIntegration = $this->configIntegrationsHelper->getIntegration($integration);
-        } catch (IntegrationNotFoundException $exception) {
+        } catch (IntegrationNotFoundException) {
             return ucfirst($object);
         }
 

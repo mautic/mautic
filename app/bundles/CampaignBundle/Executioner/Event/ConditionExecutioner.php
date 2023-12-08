@@ -34,7 +34,7 @@ class ConditionExecutioner implements EventInterface
                 /* @var ConditionAccessor $config */
                 $this->dispatchEvent($config, $log);
                 $evaluatedContacts->pass($log->getLead());
-            } catch (ConditionFailedException $exception) {
+            } catch (ConditionFailedException) {
                 $evaluatedContacts->fail($log->getLead());
                 $log->setNonActionPathTaken(true);
             }

@@ -66,7 +66,7 @@ class ConfigController extends AbstractFormController
         try {
             $this->integrationObject        = $integrationsHelper->getIntegration($integration);
             $this->integrationConfiguration = $this->integrationObject->getIntegrationConfiguration();
-        } catch (IntegrationNotFoundException $exception) {
+        } catch (IntegrationNotFoundException) {
             return $this->notFound();
         }
 

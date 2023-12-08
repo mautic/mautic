@@ -153,7 +153,7 @@ class FieldController extends FormController
                             $model->saveEntity($field);
                         } catch (\Doctrine\DBAL\Exception $ee) {
                             $flashMessage = $ee->getMessage();
-                        } catch (AbortColumnCreateException $e) {
+                        } catch (AbortColumnCreateException) {
                             $flashMessage = $this->translator->trans('mautic.lead.field.pushed_to_background');
                         } catch (SchemaException $e) {
                             $flashMessage = $e->getMessage();

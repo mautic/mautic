@@ -54,7 +54,7 @@ class FileManager
             foreach ($files as $file) {
                 try {
                     $uploadedFiles[] =  $this->getFullUrl($this->fileUploader->upload($uploadDir, $file));
-                } catch (FileUploadException $e) {
+                } catch (FileUploadException) {
                 }
             }
         }
@@ -130,7 +130,7 @@ class FileManager
         if (!$fileSystem->exists($uploadDir)) {
             try {
                 $fileSystem->mkdir($uploadDir);
-            } catch (IOException $exception) {
+            } catch (IOException) {
                 return $files;
             }
         }

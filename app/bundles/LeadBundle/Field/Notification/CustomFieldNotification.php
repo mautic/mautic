@@ -21,7 +21,7 @@ class CustomFieldNotification
     {
         try {
             $user = $this->getUser($userId);
-        } catch (NoUserException $e) {
+        } catch (NoUserException) {
             return;
         }
 
@@ -38,7 +38,7 @@ class CustomFieldNotification
     {
         try {
             $user = $this->getUser($userId);
-        } catch (NoUserException $e) {
+        } catch (NoUserException) {
             return;
         }
 
@@ -55,7 +55,7 @@ class CustomFieldNotification
     {
         try {
             $user = $this->getUser($userId);
-        } catch (NoUserException $e) {
+        } catch (NoUserException) {
             return;
         }
 

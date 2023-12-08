@@ -35,7 +35,7 @@ class BroadcastExecutioner
             $this->result         = new BroadcastResult();
             try {
                 $this->send($sms);
-            } catch (\Exception $exception) {
+            } catch (\Exception) {
             }
             $event->setResults(
                 sprintf('%s: %s', $this->translator->trans('mautic.sms.sms'), $sms->getName()),

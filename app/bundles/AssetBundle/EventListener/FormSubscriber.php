@@ -72,7 +72,7 @@ class FormSubscriber implements EventSubscriberInterface
         } elseif (null !== $categoryId) {
             try {
                 $asset = $this->assetModel->getRepository()->getLatestAssetForCategory($categoryId);
-            } catch (NoResultException|NonUniqueResultException $e) {
+            } catch (NoResultException|NonUniqueResultException) {
                 $asset = null;
             }
         }

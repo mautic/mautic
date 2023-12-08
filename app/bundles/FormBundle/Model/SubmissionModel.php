@@ -178,7 +178,7 @@ class SubmissionModel extends CommonFormModel
                     $file  = $this->uploadFieldValidator->processFileValidation($f, $request);
                     $value = $file->getClientOriginalName();
                     $filesToUpload->addFile($file, $f);
-                } catch (NoFileGivenException $e) { // No error here, we just move to another validation, eg. if a field is required
+                } catch (NoFileGivenException) { // No error here, we just move to another validation, eg. if a field is required
                 } catch (FileValidationException $e) {
                     $validationErrors[$alias] = $e->getMessage();
                 }
@@ -991,7 +991,7 @@ class SubmissionModel extends CommonFormModel
                 // Merge the found lead with currently tracked lead
                 try {
                     $lead = $this->contactMerger->merge($lead, $foundLead);
-                } catch (SameContactException $exception) {
+                } catch (SameContactException) {
                 }
             }
 

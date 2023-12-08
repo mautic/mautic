@@ -51,7 +51,7 @@ class ContactRequestHelper
             $foundContact         = $this->getContactFromUrl();
             $this->trackedContact = $foundContact;
             $this->contactTracker->setTrackedContact($this->trackedContact);
-        } catch (ContactNotFoundException $exception) {
+        } catch (ContactNotFoundException) {
         }
 
         if (!$this->trackedContact) {
@@ -87,7 +87,7 @@ class ContactRequestHelper
 
         try {
             return $this->getContactFromClickthrough($clickthrough);
-        } catch (ContactNotFoundException $exception) {
+        } catch (ContactNotFoundException) {
         }
 
         $this->setEmailFromClickthroughIdentification($clickthrough);
@@ -103,7 +103,7 @@ class ContactRequestHelper
             if ($this->trackedContact && $this->trackedContact->getId() && $foundContact->getId()) {
                 try {
                     $foundContact = $this->contactMerger->merge($this->trackedContact, $foundContact);
-                } catch (SameContactException $exception) {
+                } catch (SameContactException) {
                 }
             }
 
@@ -201,7 +201,7 @@ class ContactRequestHelper
         if ($this->trackedContact && $this->trackedContact->getId() && $this->trackedContact->isAnonymous()) {
             try {
                 return $this->contactMerger->merge($this->trackedContact, $foundContact);
-            } catch (SameContactException $exception) {
+            } catch (SameContactException) {
             }
         }
 

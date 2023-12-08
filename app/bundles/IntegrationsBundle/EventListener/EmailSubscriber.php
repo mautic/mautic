@@ -91,7 +91,7 @@ class EmailSubscriber implements EventSubscriberInterface
                 $url  = $token->getBaseURL().'/'.$integrationObject['integration_object_id'];
                 $link = "<a href=\"{$url}\" >".$token->getLinkText().'</a>';
                 $event->addToken($token->getToken(), $link);
-            } catch (EntityNotFoundException $e) {
+            } catch (EntityNotFoundException) {
                 return;
             }
         });

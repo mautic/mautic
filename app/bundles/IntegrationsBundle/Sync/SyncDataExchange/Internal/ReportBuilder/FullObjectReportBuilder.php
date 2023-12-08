@@ -122,7 +122,7 @@ class FullObjectReportBuilder
 
                 try {
                     $this->dispatchBeforeFieldChangesEvent($syncReport->getIntegration(), $event->getEntity());
-                } catch (InvalidValueException $e) {
+                } catch (InvalidValueException) {
                     // Object is not eligible, continue.
                     continue;
                 }

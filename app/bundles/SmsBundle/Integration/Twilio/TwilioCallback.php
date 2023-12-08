@@ -47,7 +47,7 @@ class TwilioCallback implements CallbackInterface
     {
         try {
             $accountSid = $this->configuration->getAccountSid();
-        } catch (ConfigurationException $exception) {
+        } catch (ConfigurationException) {
             // Not published or not configured
             throw new NotFoundHttpException();
         }

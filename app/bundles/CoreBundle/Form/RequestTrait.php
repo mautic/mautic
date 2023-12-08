@@ -89,7 +89,7 @@ trait RequestTrait
                         // Manually handled so remove from form processing
                         unset($form[$name], $params[$name]);
                         break;
-                    } catch (\InvalidArgumentException $exception) {
+                    } catch (\InvalidArgumentException) {
                     }
 
                     // If not manually handled cast to int because Symfony form processing take false as empty

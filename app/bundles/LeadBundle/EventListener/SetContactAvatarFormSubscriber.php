@@ -55,7 +55,7 @@ class SetContactAvatarFormSubscriber implements EventSubscriberInterface
                         $this->leadModel->saveEntity($contact);
 
                         return;
-                    } catch (\Exception $exception) {
+                    } catch (\Exception) {
                     }
 
                     break;

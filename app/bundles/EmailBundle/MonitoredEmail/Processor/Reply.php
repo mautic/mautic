@@ -31,7 +31,7 @@ class Reply implements ProcessorInterface
         try {
             $parser       = new Parser($message);
             $repliedEmail = $parser->parse();
-        } catch (ReplyNotFound $exception) {
+        } catch (ReplyNotFound) {
             // No hash found so bail as we won't consider this a reply
             $this->logger->debug('MONITORED EMAIL: No hash ID found in the email body');
 

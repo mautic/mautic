@@ -59,7 +59,7 @@ final class FilterOperatorSubscriber implements EventSubscriberInterface
             } else {
                 try {
                     $properties['list'] = $this->fieldChoicesProvider->getChoicesForField($type, $field->getAlias());
-                } catch (ChoicesNotFoundException $e) {
+                } catch (ChoicesNotFoundException) {
                     // That's fine. Not all fields should have choices.
                 }
             }

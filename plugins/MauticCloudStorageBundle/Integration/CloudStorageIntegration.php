@@ -32,7 +32,7 @@ abstract class CloudStorageIntegration extends AbstractIntegration
                     'data'     => $data['provider'] ?? [],
                 ]
             );
-        } catch (NoFormNeededException $e) {
+        } catch (NoFormNeededException) {
         }
     }
 

@@ -372,7 +372,7 @@ class ImportController extends FormController
                                 } else {
                                     $errorMessage = 'mautic.lead.import.filenotreadable';
                                 }
-                            } catch (\Exception $e) {
+                            } catch (\Exception) {
                                 $errorMessage = 'mautic.lead.import.filenotreadable';
                             } finally {
                                 if (!is_null($errorMessage)) {
