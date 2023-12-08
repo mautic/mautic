@@ -19,43 +19,8 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class OrderExecutioner
 {
-    /**
-     * @var MappingHelper
-     */
-    private $mappingHelper;
-
-    /**
-     * @var EventDispatcherInterface
-     */
-    private $dispatcher;
-
-    /**
-     * @var ObjectProvider
-     */
-    private $objectProvider;
-
-    /**
-     * @var ReferenceResolverInterface
-     */
-    private $referenceResolver;
-
-    /**
-     * @var FieldValidatorInterface
-     */
-    private $fieldValidator;
-
-    public function __construct(
-        MappingHelper $mappingHelper,
-        EventDispatcherInterface $dispatcher,
-        ObjectProvider $objectProvider,
-        ReferenceResolverInterface $referenceResolver,
-        FieldValidatorInterface $fieldValidator
-    ) {
-        $this->mappingHelper     = $mappingHelper;
-        $this->dispatcher        = $dispatcher;
-        $this->objectProvider    = $objectProvider;
-        $this->referenceResolver = $referenceResolver;
-        $this->fieldValidator    = $fieldValidator;
+    public function __construct(private MappingHelper $mappingHelper, private EventDispatcherInterface $dispatcher, private ObjectProvider $objectProvider, private ReferenceResolverInterface $referenceResolver, private FieldValidatorInterface $fieldValidator)
+    {
     }
 
     public function execute(OrderDAO $syncOrderDAO): ObjectMappingsDAO
@@ -93,7 +58,7 @@ class OrderExecutioner
                 $updateCount,
                 $objectName
             ),
-            __CLASS__.':'.__FUNCTION__
+            self::class.':'.__FUNCTION__
         );
 
         if (0 === $updateCount) {
@@ -106,11 +71,11 @@ class OrderExecutioner
                 $syncOrderDAO->getIdentifiedObjectIds($objectName),
                 $updateObjects
             );
-        } catch (ObjectNotFoundException $e) {
+        } catch (ObjectNotFoundException) {
             DebugLogger::log(
                 MauticSyncDataExchange::NAME,
                 $objectName,
-                __CLASS__.':'.__FUNCTION__
+                self::class.':'.__FUNCTION__
             );
 
             return;
@@ -145,7 +110,7 @@ class OrderExecutioner
                 $createCount,
                 $objectName
             ),
-            __CLASS__.':'.__FUNCTION__
+            self::class.':'.__FUNCTION__
         );
 
         if (0 === $createCount) {
@@ -157,11 +122,11 @@ class OrderExecutioner
                 $this->objectProvider->getObjectByName($objectName),
                 $createObjects
             );
-        } catch (ObjectNotFoundException $e) {
+        } catch (ObjectNotFoundException) {
             DebugLogger::log(
                 MauticSyncDataExchange::NAME,
                 $objectName,
-                __CLASS__.':'.__FUNCTION__
+                self::class.':'.__FUNCTION__
             );
 
             return;

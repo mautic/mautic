@@ -3,20 +3,14 @@
 namespace Mautic\FormBundle\Model;
 
 use Doctrine\ORM\EntityManager;
+use Mautic\CoreBundle\Model\MauticModelInterface;
 use Mautic\FormBundle\Entity\Submission;
 use Mautic\FormBundle\Entity\SubmissionRepository;
 
-class SubmissionResultLoader
+class SubmissionResultLoader implements MauticModelInterface
 {
-    /**
-     * @var EntityManager
-     */
-    private $entityManager;
-
-    public function __construct(
-        EntityManager $entityManager
-    ) {
-        $this->entityManager = $entityManager;
+    public function __construct(private EntityManager $entityManager)
+    {
     }
 
     /**

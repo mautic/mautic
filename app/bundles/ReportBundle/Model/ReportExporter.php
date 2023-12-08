@@ -13,49 +13,14 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class ReportExporter
 {
-    /**
-     * @var ScheduleModel
-     */
-    private $schedulerModel;
-
-    /**
-     * @var ReportDataAdapter
-     */
-    private $reportDataAdapter;
-
-    /**
-     * @var ReportExportOptions
-     */
-    private $reportExportOptions;
-
-    /**
-     * @var ReportFileWriter
-     */
-    private $reportFileWriter;
-
-    /**
-     * @var EventDispatcherInterface
-     */
-    private $eventDispatcher;
-
-    public function __construct(
-        ScheduleModel $schedulerModel,
-        ReportDataAdapter $reportDataAdapter,
-        ReportExportOptions $reportExportOptions,
-        ReportFileWriter $reportFileWriter,
-        EventDispatcherInterface $eventDispatcher
-    ) {
-        $this->schedulerModel      = $schedulerModel;
-        $this->reportDataAdapter   = $reportDataAdapter;
-        $this->reportExportOptions = $reportExportOptions;
-        $this->reportFileWriter    = $reportFileWriter;
-        $this->eventDispatcher     = $eventDispatcher;
+    public function __construct(private ScheduleModel $schedulerModel, private ReportDataAdapter $reportDataAdapter, private ReportExportOptions $reportExportOptions, private ReportFileWriter $reportFileWriter, private EventDispatcherInterface $eventDispatcher)
+    {
     }
 
     /**
      * @throws FileIOException
      */
-    public function processExport(ExportOption $exportOption)
+    public function processExport(ExportOption $exportOption): void
     {
         $schedulers = $this->schedulerModel->getScheduledReportsForExport($exportOption);
         foreach ($schedulers as $scheduler) {
@@ -66,34 +31,32 @@ class ReportExporter
     /**
      * @throws FileIOException
      */
-    private function processReport(Scheduler $scheduler)
+    private function processReport(Scheduler $scheduler): void
     {
         $report = $scheduler->getReport();
 
-        if (!is_null($scheduler->getScheduleDate())) {
-            $dateTo = clone $scheduler->getScheduleDate();
-            $dateTo->setTime(0, 0, 0);
+        $dateTo = clone $scheduler->getScheduleDate();
+        $dateTo->setTime(0, 0, 0);
 
-            $dateFrom = clone $dateTo;
-            switch ($report->getScheduleUnit()) {
-                case SchedulerEnum::UNIT_NOW:
-                    $dateFrom->sub(new \DateInterval('P10Y'));
-                    $this->schedulerModel->turnOffScheduler($report);
-                    break;
-                case SchedulerEnum::UNIT_DAILY:
-                    $dateFrom->sub(new \DateInterval('P1D'));
-                    break;
-                case SchedulerEnum::UNIT_WEEKLY:
-                    $dateFrom->sub(new \DateInterval('P7D'));
-                    break;
-                case SchedulerEnum::UNIT_MONTHLY:
-                    $dateFrom->sub(new \DateInterval('P1M'));
-                    break;
-            }
-
-            $this->reportExportOptions->setDateFrom($dateFrom);
-            $this->reportExportOptions->setDateTo($dateTo->sub(new \DateInterval('PT1S')));
+        $dateFrom = clone $dateTo;
+        switch ($report->getScheduleUnit()) {
+            case SchedulerEnum::UNIT_NOW:
+                $dateFrom->sub(new \DateInterval('P10Y'));
+                $this->schedulerModel->turnOffScheduler($report);
+                break;
+            case SchedulerEnum::UNIT_DAILY:
+                $dateFrom->sub(new \DateInterval('P1D'));
+                break;
+            case SchedulerEnum::UNIT_WEEKLY:
+                $dateFrom->sub(new \DateInterval('P7D'));
+                break;
+            case SchedulerEnum::UNIT_MONTHLY:
+                $dateFrom->sub(new \DateInterval('P1M'));
+                break;
         }
+
+        $this->reportExportOptions->setDateFrom($dateFrom);
+        $this->reportExportOptions->setDateTo($dateTo->sub(new \DateInterval('PT1S')));
 
         // just published reports, but schedule continue
         if ($report->isPublished()) {

@@ -8,22 +8,16 @@ use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
-/**
- * Class StageActionType.
- */
 class StageActionListType extends AbstractType
 {
-    private $model;
-
-    public function __construct(StageModel $model)
+    public function __construct(private StageModel $model)
     {
-        $this->model = $model;
     }
 
-    public function configureOptions(OptionsResolver $resolver)
+    public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults([
-            'choices' => function (Options $options) {
+            'choices' => function (Options $options): array {
                 $stages = $this->model->getUserStages();
 
                 $choices = [];

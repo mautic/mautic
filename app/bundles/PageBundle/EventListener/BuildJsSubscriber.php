@@ -12,26 +12,8 @@ use Symfony\Component\Routing\RouterInterface;
 
 class BuildJsSubscriber implements EventSubscriberInterface
 {
-    /**
-     * @var AssetsHelper
-     */
-    private $assetsHelper;
-
-    /**
-     * @var TrackingHelper
-     */
-    private $trackingHelper;
-
-    /**
-     * @var RouterInterface
-     */
-    private $router;
-
-    public function __construct(AssetsHelper $assetsHelper, TrackingHelper $trackingHelper, RouterInterface $router)
+    public function __construct(private AssetsHelper $assetsHelper, private TrackingHelper $trackingHelper, private RouterInterface $router)
     {
-        $this->assetsHelper   = $assetsHelper;
-        $this->trackingHelper = $trackingHelper;
-        $this->router         = $router;
     }
 
     /**
@@ -49,7 +31,7 @@ class BuildJsSubscriber implements EventSubscriberInterface
         ];
     }
 
-    public function onBuildJs(BuildJsEvent $event)
+    public function onBuildJs(BuildJsEvent $event): void
     {
         $pageTrackingUrl = $this->router->generate('mautic_page_tracker', [], UrlGeneratorInterface::ABSOLUTE_URL);
         // Determine if this is https
@@ -205,7 +187,7 @@ JS;
         $event->appendJs($js, 'Mautic Tracking Pixel');
     }
 
-    public function onBuildJsForVideo(BuildJsEvent $event)
+    public function onBuildJsForVideo(BuildJsEvent $event): void
     {
         $formSubmitUrl = $this->router->generate(
             'mautic_form_postresults_ajax',
@@ -504,7 +486,7 @@ JS;
         $event->appendJs($js, 'Mautic Gated Videos');
     }
 
-    public function onBuildJsForTrackingEvent(BuildJsEvent $event)
+    public function onBuildJsForTrackingEvent(BuildJsEvent $event): void
     {
         $js = '';
 

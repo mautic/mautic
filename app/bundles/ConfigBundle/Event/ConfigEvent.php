@@ -9,27 +9,17 @@ use Symfony\Component\HttpFoundation\ParameterBag;
 class ConfigEvent extends CommonEvent
 {
     /**
-     * @var array
+     * @var mixed[]
      */
     private $preserve = [];
 
     /**
-     * @param array
-     */
-    private $config;
-
-    /**
-     * @param ParameterBag
-     */
-    private $post;
-
-    /**
-     * @var array
+     * @var mixed[]
      */
     private $errors = [];
 
     /**
-     * @var array
+     * @var mixed[]
      */
     private $fieldErrors = [];
 
@@ -47,10 +37,11 @@ class ConfigEvent extends CommonEvent
      */
     private $normData;
 
-    public function __construct(array $config, ParameterBag $post)
+    /**
+     * @param mixed[] $config
+     */
+    public function __construct(private array $config, private ParameterBag $post)
     {
-        $this->config = $config;
-        $this->post   = $post;
     }
 
     /**
@@ -63,7 +54,7 @@ class ConfigEvent extends CommonEvent
     public function getConfig($key = null)
     {
         if ($key) {
-            return (isset($this->config[$key])) ? $this->config[$key] : [];
+            return $this->config[$key] ?? [];
         }
 
         return $this->config;
@@ -74,7 +65,7 @@ class ConfigEvent extends CommonEvent
      *
      * @param string $key
      */
-    public function setConfig(array $config, $key = null)
+    public function setConfig(array $config, $key = null): void
     {
         if ($key) {
             $this->config[$key] = $config;
@@ -94,7 +85,7 @@ class ConfigEvent extends CommonEvent
      *
      * @param array|string $fields
      */
-    public function unsetIfEmpty($fields)
+    public function unsetIfEmpty($fields): void
     {
         if (!is_array($fields)) {
             $fields = [$fields];
@@ -162,10 +153,7 @@ class ConfigEvent extends CommonEvent
         return $this->fieldErrors;
     }
 
-    /**
-     * @return string
-     */
-    public function getFileContent(UploadedFile $file)
+    public function getFileContent(UploadedFile $file): string
     {
         $tmpFile = $file->getRealPath();
         $content = trim(file_get_contents($tmpFile));
@@ -174,10 +162,7 @@ class ConfigEvent extends CommonEvent
         return $content;
     }
 
-    /**
-     * @return string
-     */
-    public function encodeFileContents($content)
+    public function encodeFileContents($content): string
     {
         return base64_encode($content);
     }
@@ -211,7 +196,7 @@ class ConfigEvent extends CommonEvent
     /**
      * @param array $normData
      */
-    public function setNormData($normData)
+    public function setNormData($normData): void
     {
         $this->normData = $normData;
     }

@@ -24,26 +24,6 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 class FieldHelper
 {
     /**
-     * @var FieldModel
-     */
-    private $fieldModel;
-
-    /**
-     * @var VariableExpresserHelperInterface
-     */
-    private $variableExpresserHelper;
-
-    /**
-     * @var ChannelListHelper
-     */
-    private $channelListHelper;
-
-    /**
-     * @var TranslatorInterface
-     */
-    private $translator;
-
-    /**
      * @var array
      */
     private $fieldList = [];
@@ -63,25 +43,15 @@ class FieldHelper
      */
     private $eventDispatcher;
 
-    /**
-     * @var ObjectProvider
-     */
-    private $objectProvider;
-
     public function __construct(
-        FieldModel $fieldModel,
-        VariableExpresserHelperInterface $variableExpresserHelper,
-        ChannelListHelper $channelListHelper,
-        TranslatorInterface $translator,
+        private FieldModel $fieldModel,
+        private VariableExpresserHelperInterface $variableExpresserHelper,
+        private ChannelListHelper $channelListHelper,
+        private TranslatorInterface $translator,
         EventDispatcherInterface $eventDispatcher,
-        ObjectProvider $objectProvider
+        private ObjectProvider $objectProvider
     ) {
-        $this->fieldModel              = $fieldModel;
-        $this->variableExpresserHelper = $variableExpresserHelper;
-        $this->channelListHelper       = $channelListHelper;
-        $this->translator              = $translator;
         $this->eventDispatcher         = $eventDispatcher;
-        $this->objectProvider          = $objectProvider;
     }
 
     public function getFieldList(string $object): array
@@ -95,22 +65,14 @@ class FieldHelper
 
     public function getNormalizedFieldType(string $type): string
     {
-        switch ($type) {
-            case 'boolean':
-                return NormalizedValueDAO::BOOLEAN_TYPE;
-            case 'date':
-            case 'datetime':
-            case 'time':
-                return NormalizedValueDAO::DATETIME_TYPE;
-            case 'number':
-                return NormalizedValueDAO::FLOAT_TYPE;
-            case 'select':
-                return NormalizedValueDAO::SELECT_TYPE;
-            case 'multiselect':
-                return NormalizedValueDAO::MULTISELECT_TYPE;
-            default:
-                return NormalizedValueDAO::STRING_TYPE;
-        }
+        return match ($type) {
+            'boolean' => NormalizedValueDAO::BOOLEAN_TYPE,
+            'date', 'datetime', 'time' => NormalizedValueDAO::DATETIME_TYPE,
+            'number'      => NormalizedValueDAO::FLOAT_TYPE,
+            'select'      => NormalizedValueDAO::SELECT_TYPE,
+            'multiselect' => NormalizedValueDAO::MULTISELECT_TYPE,
+            default       => NormalizedValueDAO::STRING_TYPE,
+        };
     }
 
     /**
@@ -120,7 +82,7 @@ class FieldHelper
     {
         try {
             return $this->objectProvider->getObjectByName($objectName)->getEntityName();
-        } catch (ObjectNotFoundException $e) {
+        } catch (ObjectNotFoundException) {
             // Throwing different exception to keep BC.
             throw new ObjectNotSupportedException(MauticSyncDataExchange::NAME, $objectName);
         }

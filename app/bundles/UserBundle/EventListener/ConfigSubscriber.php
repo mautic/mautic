@@ -28,7 +28,7 @@ class ConfigSubscriber implements EventSubscriberInterface
         ];
     }
 
-    public function onConfigGenerate(ConfigBuilderEvent $event)
+    public function onConfigGenerate(ConfigBuilderEvent $event): void
     {
         $event->addFileFields($this->fileFields)
             ->addForm(
@@ -42,7 +42,7 @@ class ConfigSubscriber implements EventSubscriberInterface
             );
     }
 
-    public function onConfigSave(ConfigEvent $event)
+    public function onConfigSave(ConfigEvent $event): void
     {
         // Preserve existing value
         $event->unsetIfEmpty('saml_idp_own_password');
@@ -63,13 +63,13 @@ class ConfigSubscriber implements EventSubscriberInterface
                     }
                     break;
                 case 'saml_idp_own_certificate':
-                    if (0 !== strpos($data[$field], '-----BEGIN CERTIFICATE-----')) {
+                    if (!str_starts_with($data[$field], '-----BEGIN CERTIFICATE-----')) {
                         $event->setError('mautic.user.saml.certificate.invalid', [], 'userconfig', $field);
                     }
                     break;
                 case 'saml_idp_own_private_key':
-                    $encryptedKey = (0 === strpos($data[$field], '-----BEGIN ENCRYPTED PRIVATE KEY-----'));
-                    $decryptedKey = (0 === strpos($data[$field], '-----BEGIN RSA PRIVATE KEY-----'));
+                    $encryptedKey = str_starts_with($data[$field], '-----BEGIN ENCRYPTED PRIVATE KEY-----');
+                    $decryptedKey = str_starts_with($data[$field], '-----BEGIN RSA PRIVATE KEY-----');
 
                     if (!$encryptedKey && !$decryptedKey) {
                         $event->setError('mautic.user.saml.private_key.invalid', [], 'userconfig', $field);

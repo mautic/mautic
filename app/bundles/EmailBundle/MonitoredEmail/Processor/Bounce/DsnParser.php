@@ -8,20 +8,15 @@ use Mautic\EmailBundle\MonitoredEmail\Processor\Address;
 use Mautic\EmailBundle\MonitoredEmail\Processor\Bounce\Definition\Category;
 use Mautic\EmailBundle\MonitoredEmail\Processor\Bounce\Mapper\CategoryMapper;
 
-/**
- * Class DsnParser.
- */
 class DsnParser
 {
     /**
-     * @return BouncedEmail
-     *
      * @throws BounceNotFound
      */
-    public function getBounce(Message $message)
+    public function getBounce(Message $message): BouncedEmail
     {
         // Parse the bounce
-        $dsnMessage = ($message->dsnMessage) ? $message->dsnMessage : $message->textPlain;
+        $dsnMessage = $message->dsnMessage ?: $message->textPlain;
         $dsnReport  = $message->dsnReport;
 
         // Try parsing the report
@@ -1227,10 +1222,10 @@ class DsnParser
                     $result['rule_cat'] = Category::DELAYED;
                     $result['rule_no']  = '0110';
                     break;
+                    // unhandled cases
                 case 'delivered':
                 case 'relayed':
-                case 'expanded': // unhandled cases
-                    break;
+                case 'expanded':
                 default:
                     break;
             }

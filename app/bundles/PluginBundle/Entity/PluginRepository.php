@@ -45,7 +45,7 @@ class PluginRepository extends CommonRepository
     /**
      * {@inheritdoc}
      */
-    protected function getDefaultOrder()
+    protected function getDefaultOrder(): array
     {
         return [
             ['p.name', 'ASC'],
@@ -55,7 +55,7 @@ class PluginRepository extends CommonRepository
     /**
      * {@inheritdoc}
      */
-    public function getTableAlias()
+    public function getTableAlias(): string
     {
         return 'p';
     }

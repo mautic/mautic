@@ -22,57 +22,8 @@ use Twig\Environment;
 
 class FormSubscriber implements EventSubscriberInterface
 {
-    /**
-     * @var AssetModel
-     */
-    private $assetModel;
-
-    /**
-     * @var TranslatorInterface
-     */
-    protected $translator;
-
-    /**
-     * @var AnalyticsHelper
-     */
-    private $analyticsHelper;
-
-    /**
-     * @var AssetsHelper
-     */
-    private $assetsHelper;
-
-    /**
-     * @var ThemeHelperInterface
-     */
-    private $themeHelper;
-
-    /**
-     * @var Environment
-     */
-    private $twig;
-
-    /**
-     * @var CoreParametersHelper
-     */
-    private $coreParametersHelper;
-
-    public function __construct(
-        AssetModel $assetModel,
-        TranslatorInterface $translator,
-        AnalyticsHelper $analyticsHelper,
-        AssetsHelper $assetsHelper,
-        ThemeHelperInterface $themeHelper,
-        Environment $twig,
-        CoreParametersHelper $coreParametersHelper
-    ) {
-        $this->assetModel           = $assetModel;
-        $this->translator           = $translator;
-        $this->analyticsHelper      = $analyticsHelper;
-        $this->assetsHelper         = $assetsHelper;
-        $this->themeHelper          = $themeHelper;
-        $this->twig                 = $twig;
-        $this->coreParametersHelper = $coreParametersHelper;
+    public function __construct(private AssetModel $assetModel, protected TranslatorInterface $translator, private AnalyticsHelper $analyticsHelper, private AssetsHelper $assetsHelper, private ThemeHelperInterface $themeHelper, private Environment $twig, private CoreParametersHelper $coreParametersHelper)
+    {
     }
 
     /**
@@ -92,7 +43,7 @@ class FormSubscriber implements EventSubscriberInterface
     /**
      * Add a lead generation action to available form submit actions.
      */
-    public function onFormBuilder(FormBuilderEvent $event)
+    public function onFormBuilder(FormBuilderEvent $event): void
     {
         $event->addSubmitAction('asset.download', [
             'group'              => 'mautic.asset.actions',
@@ -121,7 +72,7 @@ class FormSubscriber implements EventSubscriberInterface
         } elseif (null !== $categoryId) {
             try {
                 $asset = $this->assetModel->getRepository()->getLatestAssetForCategory($categoryId);
-            } catch (NoResultException|NonUniqueResultException $e) {
+            } catch (NoResultException|NonUniqueResultException) {
                 $asset = null;
             }
         }
@@ -149,7 +100,7 @@ class FormSubscriber implements EventSubscriberInterface
         $event->stopPropagation();
 
         /**
-         * @var Form
+         * @var Form   $form
          * @var Asset  $asset
          * @var string $message
          * @var bool   $messengerMode

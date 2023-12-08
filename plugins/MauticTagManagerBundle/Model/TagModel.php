@@ -22,9 +22,7 @@ class TagModel extends BaseTagModel
      */
     public function getRepository()
     {
-        $result = $this->em->getRepository(Tag::class);
-
-        return $result;
+        return $this->em->getRepository(Tag::class);
     }
 
     /**

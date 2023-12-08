@@ -7,17 +7,9 @@ use Doctrine\DBAL\Query\Expression\CompositeExpression;
 use Mautic\CoreBundle\Factory\ModelFactory;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 
-/**
- * Class BuilderTokenHelper.
- */
 class BuilderTokenHelper
 {
     private $isConfigured = false;
-
-    private $security;
-    private $modelFactory;
-    private $connection;
-    private $userHelper;
 
     protected $permissionSet;
     protected $modelName;
@@ -28,16 +20,8 @@ class BuilderTokenHelper
     /**
      * @param ModelFactory<object> $modelFactory
      */
-    public function __construct(
-        CorePermissions $security,
-        ModelFactory $modelFactory,
-        Connection $connection,
-        UserHelper $userHelper
-    ) {
-        $this->security      = $security;
-        $this->modelFactory  = $modelFactory;
-        $this->connection    = $connection;
-        $this->userHelper    = $userHelper;
+    public function __construct(private CorePermissions $security, private ModelFactory $modelFactory, private Connection $connection, private UserHelper $userHelper)
+    {
     }
 
     /**
@@ -101,7 +85,7 @@ class BuilderTokenHelper
             $prefix .= '.';
         }
 
-        $exprBuilder = $this->connection->getExpressionBuilder();
+        $exprBuilder = $this->connection->createExpressionBuilder();
 
         if (isset($permissions[$this->viewPermissionBase.':viewother']) && !$permissions[$this->viewPermissionBase.':viewother']) {
             $expr = $expr->with(
@@ -135,17 +119,15 @@ class BuilderTokenHelper
     /**
      * Override default permission set of viewown and viewother.
      */
-    public function setPermissionSet(array $permissions)
+    public function setPermissionSet(array $permissions): void
     {
         $this->permissionSet = $permissions;
     }
 
     /**
      * @deprecated 2.6.0 to be removed in 3.0
-     *
-     * @return string
      */
-    public static function getVisualTokenHtml($token, $description, $forPregReplace = false)
+    public static function getVisualTokenHtml($token, $description, $forPregReplace = false): string
     {
         if ($forPregReplace) {
             return preg_quote('<strong contenteditable="false" data-token="', '/').'(.*?)'.preg_quote('">**', '/')

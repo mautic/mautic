@@ -20,16 +20,13 @@ class ConfigBuilderEvent extends Event
         '@MauticConfig/FormTheme/dsn_row.html.twig',
     ];
 
-    private BundleHelper $bundleHelper;
-
     /**
      * @var string[]
      */
     protected array $encodedFields = [];
 
-    public function __construct(BundleHelper $bundleHelper)
+    public function __construct(private BundleHelper $bundleHelper)
     {
-        $this->bundleHelper = $bundleHelper;
     }
 
     /**
@@ -52,10 +49,8 @@ class ConfigBuilderEvent extends Event
      * Remove a form to the forms array.
      *
      * @param string $formAlias
-     *
-     * @return bool
      */
-    public function removeForm($formAlias)
+    public function removeForm($formAlias): bool
     {
         if (isset($this->forms[$formAlias])) {
             unset($this->forms[$formAlias]);

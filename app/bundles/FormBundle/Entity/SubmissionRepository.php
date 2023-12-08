@@ -15,10 +15,7 @@ class SubmissionRepository extends CommonRepository
 {
     use TimelineTrait;
 
-    /**
-     * {@inheritdoc}
-     */
-    public function saveEntity($entity, $flush = true)
+    public function saveEntity($entity, $flush = true): void
     {
         parent::saveEntity($entity, $flush);
 
@@ -55,7 +52,7 @@ class SubmissionRepository extends CommonRepository
             $args['viewOnlyFields'] = ['button', 'freetext', 'freehtml', 'pagebreak', 'captcha'];
         }
         $viewOnlyFields = array_map(
-            function ($value) {
+            function ($value): string {
                 return '"'.$value.'"';
             },
             $args['viewOnlyFields']
@@ -219,7 +216,7 @@ class SubmissionRepository extends CommonRepository
      *
      * @return array<mixed>
      */
-    public function getEntitiesByPage(array $args = [])
+    public function getEntitiesByPage(array $args = []): array
     {
         $activePage = $args['activePage'];
 
@@ -277,7 +274,7 @@ class SubmissionRepository extends CommonRepository
     /**
      * {@inheritdoc}
      */
-    protected function getDefaultOrder()
+    protected function getDefaultOrder(): array
     {
         return [
             ['s.date_submitted', 'ASC'],
@@ -393,8 +390,6 @@ class SubmissionRepository extends CommonRepository
      * Get submission count by email by linking emails that have been associated with a page hit that has the
      * same tracking ID as a form submission tracking ID and thus assumed happened in the same session.
      *
-     * @param \DateTime $fromDate
-     *
      * @return mixed
      */
     public function getSubmissionCountsByEmail($emailId, \DateTime $fromDate = null)
@@ -426,7 +421,7 @@ class SubmissionRepository extends CommonRepository
     /**
      * Updates lead ID (e.g. after a lead merge).
      */
-    public function updateLead($fromLeadId, $toLeadId)
+    public function updateLead($fromLeadId, $toLeadId): void
     {
         $q = $this->_em->getConnection()->createQueryBuilder();
         $q->update(MAUTIC_TABLE_PREFIX.'form_submissions')
@@ -437,10 +432,8 @@ class SubmissionRepository extends CommonRepository
 
     /**
      * Validates that an array of submission IDs belong to a specific form.
-     *
-     * @return array
      */
-    public function validateSubmissions($ids, $formId)
+    public function validateSubmissions($ids, $formId): array
     {
         $q = $this->_em->getConnection()->createQueryBuilder();
         $q->select('s.id')
@@ -472,10 +465,8 @@ class SubmissionRepository extends CommonRepository
      * @param string      $value        to compare with
      * @param string      $operatorExpr for WHERE clause
      * @param string|null $type
-     *
-     * @return bool
      */
-    public function compareValue($lead, $form, $formAlias, $field, $value, $operatorExpr, $type = null)
+    public function compareValue($lead, $form, $formAlias, $field, $value, $operatorExpr, $type = null): bool
     {
         // Modify operator
         switch ($operatorExpr) {
@@ -507,16 +498,11 @@ class SubmissionRepository extends CommonRepository
             ->setParameter('lead', (int) $lead)
             ->setParameter('form', (int) $form);
 
-        switch ($type) {
-            case 'boolean':
-            case 'number':
-                $q->andWhere($q->expr()->$operatorExpr('r.'.$field, $value));
-                break;
-            default:
-                $q->andWhere($q->expr()->$operatorExpr('r.'.$field, ':value'))
-                    ->setParameter('value', $value);
-                break;
-        }
+        match ($type) {
+            'boolean', 'number' => $q->andWhere($q->expr()->$operatorExpr('r.'.$field, $value)),
+            default => $q->andWhere($q->expr()->$operatorExpr('r.'.$field, ':value'))
+                ->setParameter('value', $value),
+        };
 
         $result = $q->executeQuery()->fetchAssociative();
 
@@ -542,10 +528,8 @@ class SubmissionRepository extends CommonRepository
      *
      * @param int    $formId
      * @param string $formAlias
-     *
-     * @return string
      */
-    public function getResultsTableName($formId, $formAlias)
+    public function getResultsTableName($formId, $formAlias): string
     {
         return MAUTIC_TABLE_PREFIX.'form_results_'.$formId.'_'.$formAlias;
     }
@@ -553,7 +537,7 @@ class SubmissionRepository extends CommonRepository
     /**
      * {@inheritdoc}
      */
-    public function getTableAlias()
+    public function getTableAlias(): string
     {
         return 'fs';
     }

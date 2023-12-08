@@ -12,23 +12,8 @@ use Psr\Log\LoggerInterface;
 
 class ScheduledContactFinder
 {
-    /**
-     * @var LeadRepository
-     */
-    private $leadRepository;
-
-    /**
-     * @var LoggerInterface
-     */
-    private $logger;
-
-    /**
-     * ScheduledContactFinder constructor.
-     */
-    public function __construct(LeadRepository $leadRepository, LoggerInterface $logger)
+    public function __construct(private LeadRepository $leadRepository, private LoggerInterface $logger)
     {
-        $this->leadRepository = $leadRepository;
-        $this->logger         = $logger;
     }
 
     /**

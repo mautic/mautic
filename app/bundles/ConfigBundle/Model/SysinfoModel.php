@@ -5,6 +5,7 @@ namespace Mautic\ConfigBundle\Model;
 use Doctrine\DBAL\Connection;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\PathsHelper;
+use Mautic\CoreBundle\Loader\ParameterLoader;
 use Mautic\InstallBundle\Configurator\Step\CheckStep;
 use Mautic\InstallBundle\Install\InstallService;
 use Symfony\Contracts\Translation\TranslatorInterface;
@@ -21,27 +22,8 @@ class SysinfoModel
      */
     protected $folders;
 
-    protected PathsHelper $pathsHelper;
-    protected CoreParametersHelper $coreParametersHelper;
-    protected Connection $connection;
-    private TranslatorInterface $translator;
-    private InstallService $installService;
-    private CheckStep $checkStep;
-
-    public function __construct(
-        PathsHelper $pathsHelper,
-        CoreParametersHelper $coreParametersHelper,
-        TranslatorInterface $translator,
-        Connection $connection,
-        InstallService $installService,
-        CheckStep $checkStep
-    ) {
-        $this->pathsHelper          = $pathsHelper;
-        $this->coreParametersHelper = $coreParametersHelper;
-        $this->translator           = $translator;
-        $this->connection           = $connection;
-        $this->installService       = $installService;
-        $this->checkStep            = $checkStep;
+    public function __construct(protected PathsHelper $pathsHelper, protected CoreParametersHelper $coreParametersHelper, private TranslatorInterface $translator, protected Connection $connection, private InstallService $installService, private CheckStep $checkStep)
+    {
     }
 
     /**
@@ -110,7 +92,7 @@ class SysinfoModel
         }
 
         $importantFolders = [
-            $this->pathsHelper->getSystemPath('local_config'),
+            ParameterLoader::getLocalConfigFile($this->pathsHelper->getSystemPath('root').'/app'),
             $this->coreParametersHelper->get('cache_path'),
             $this->coreParametersHelper->get('log_path'),
             $this->coreParametersHelper->get('upload_dir'),
@@ -120,8 +102,8 @@ class SysinfoModel
 
         foreach ($importantFolders as $folder) {
             $folderPath = realpath($folder);
-            $folderKey  = ($folderPath) ? $folderPath : $folder;
-            $isWritable = ($folderPath) ? is_writable($folderPath) : false;
+            $folderKey  = $folderPath ?: $folder;
+            $isWritable = $folderPath && is_writable($folderPath);
 
             $this->folders[$folderKey] = $isWritable;
         }
@@ -161,10 +143,8 @@ class SysinfoModel
      *
      * @param int $lines
      * @param int $buffer
-     *
-     * @return string
      */
-    public function tail($filename, $lines = 10, $buffer = 4096)
+    public function tail($filename, $lines = 10, $buffer = 4096): string
     {
         $f      = fopen($filename, 'rb');
         $output = '';

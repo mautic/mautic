@@ -12,13 +12,8 @@ use Twig\TwigFunction;
 
 class ChannelExtension extends AbstractExtension
 {
-    private DncReasonHelper $dncReasonHelper;
-    private ChannelListHelper $channelListHelper;
-
-    public function __construct(DncReasonHelper $dncReasonHelper, ChannelListHelper $channelListHelper)
+    public function __construct(private DncReasonHelper $dncReasonHelper, private ChannelListHelper $channelListHelper)
     {
-        $this->dncReasonHelper   = $dncReasonHelper;
-        $this->channelListHelper = $channelListHelper;
     }
 
     /**

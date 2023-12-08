@@ -20,9 +20,7 @@ class RoleModel extends FormModel
 {
     public function getRepository(): RoleRepository
     {
-        $result = $this->em->getRepository(Role::class);
-
-        return $result;
+        return $this->em->getRepository(Role::class);
     }
 
     /**
@@ -38,7 +36,7 @@ class RoleModel extends FormModel
      *
      * @throws \Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException
      */
-    public function saveEntity($entity, $unlock = true)
+    public function saveEntity($entity, $unlock = true): void
     {
         if (!$entity instanceof Role) {
             throw new MethodNotAllowedHttpException(['Role'], 'Entity must be of class Role()');
@@ -59,7 +57,7 @@ class RoleModel extends FormModel
      *
      * @param array $rawPermissions (i.e. from request)
      */
-    public function setRolePermissions(Role &$entity, $rawPermissions)
+    public function setRolePermissions(Role &$entity, $rawPermissions): void
     {
         if (!is_array($rawPermissions)) {
             return;
@@ -82,7 +80,7 @@ class RoleModel extends FormModel
      *
      * @throws PreconditionRequiredHttpException
      */
-    public function deleteEntity($entity)
+    public function deleteEntity($entity): void
     {
         if (!$entity instanceof Role) {
             throw new MethodNotAllowedHttpException(['Role'], 'Entity must be of class Role()');
@@ -131,7 +129,7 @@ class RoleModel extends FormModel
      *
      * @throws \Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException
      */
-    protected function dispatchEvent($action, &$entity, $isNew = false, Event $event = null)
+    protected function dispatchEvent($action, &$entity, $isNew = false, Event $event = null): ?Event
     {
         if (!$entity instanceof Role) {
             throw new MethodNotAllowedHttpException(['Role'], 'Entity must be of class Role()');

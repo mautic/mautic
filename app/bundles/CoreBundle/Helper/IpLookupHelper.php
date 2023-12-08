@@ -10,21 +10,6 @@ use Symfony\Component\HttpFoundation\RequestStack;
 class IpLookupHelper
 {
     /**
-     * @var RequestStack
-     */
-    protected $requestStack;
-
-    /**
-     * @var EntityManager
-     */
-    protected $em;
-
-    /**
-     * @var AbstractLookup
-     */
-    protected $ipLookup;
-
-    /**
      * @var array
      */
     protected $doNotTrackIps;
@@ -49,20 +34,14 @@ class IpLookupHelper
      */
     private $realIp;
 
-    /**
-     * @var CoreParametersHelper
-     */
-    private $coreParametersHelper;
+    private \Mautic\CoreBundle\Helper\CoreParametersHelper $coreParametersHelper;
 
     public function __construct(
-        RequestStack $requestStack,
-        EntityManager $em,
+        protected RequestStack $requestStack,
+        protected EntityManager $em,
         CoreParametersHelper $coreParametersHelper,
-        AbstractLookup $ipLookup = null
+        protected ?AbstractLookup $ipLookup = null
     ) {
-        $this->requestStack          = $requestStack;
-        $this->em                    = $em;
-        $this->ipLookup              = $ipLookup;
         $this->doNotTrackIps         = $coreParametersHelper->get('do_not_track_ips');
         $this->doNotTrackBots        = $coreParametersHelper->get('do_not_track_bots');
         $this->doNotTrackInternalIps = $coreParametersHelper->get('do_not_track_internal_ips');
@@ -94,7 +73,7 @@ class IpLookupHelper
                 if ($request->server->get($key)) {
                     $ip = trim($request->server->get($key));
 
-                    if (false !== strpos($ip, ',')) {
+                    if (str_contains($ip, ',')) {
                         $ip = $this->getClientIpFromProxyList($ip);
                     }
 
@@ -167,7 +146,7 @@ class IpLookupHelper
             if ($ipAddress->isTrackable() && $request) {
                 $userAgent = $request->headers->get('User-Agent', '');
                 foreach ($this->doNotTrackBots as $bot) {
-                    if (false !== strpos($userAgent, $bot)) {
+                    if (str_contains($userAgent, $bot)) {
                         $doNotTrack[] = $ip;
                         $ipAddress->setDoNotTrackList($doNotTrack);
                         continue;
@@ -216,10 +195,8 @@ class IpLookupHelper
 
     /**
      * Validates if an IP address if valid.
-     *
-     * @return mixed
      */
-    public function ipIsValid($ip)
+    public function ipIsValid($ip): string|bool
     {
         $filterFlagNoPrivRange = $this->trackPrivateIPRanges ? 0 : FILTER_FLAG_NO_PRIV_RANGE;
 
@@ -236,7 +213,7 @@ class IpLookupHelper
         $ips = explode(',', $ip);
         array_walk(
             $ips,
-            function (&$val) {
+            function (&$val): void {
                 $val = trim($val);
             }
         );

@@ -73,7 +73,7 @@ class ConnectwiseApi extends CrmApi
             'page'     => $page,
             'pageSize' => ConnectwiseIntegration::PAGESIZE,
         ];
-        $conditions = isset($params['conditions']) ? $params['conditions'] : [];
+        $conditions = $params['conditions'] ?? [];
 
         if (isset($params['start'])) {
             $conditions[] = 'lastUpdated > ['.$params['start'].']';

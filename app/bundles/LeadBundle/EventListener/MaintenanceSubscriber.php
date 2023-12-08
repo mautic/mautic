@@ -10,20 +10,8 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class MaintenanceSubscriber implements EventSubscriberInterface
 {
-    /**
-     * @var Connection
-     */
-    private $db;
-
-    /**
-     * @var TranslatorInterface
-     */
-    private $translator;
-
-    public function __construct(Connection $db, TranslatorInterface $translator)
+    public function __construct(private Connection $db, private TranslatorInterface $translator)
     {
-        $this->db         = $db;
-        $this->translator = $translator;
     }
 
     /**
@@ -36,7 +24,7 @@ class MaintenanceSubscriber implements EventSubscriberInterface
         ];
     }
 
-    public function onDataCleanup(MaintenanceEvent $event)
+    public function onDataCleanup(MaintenanceEvent $event): void
     {
         $qb = $this->db->createQueryBuilder()
             ->setParameter('date', $event->getDate()->format('Y-m-d H:i:s'));

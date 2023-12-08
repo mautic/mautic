@@ -6,9 +6,6 @@ use Symfony\Component\Process\Exception\InvalidArgumentException;
 use Symfony\Contracts\EventDispatcher\Event;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-/**
- * Class StageBuilderEvent.
- */
 class StageBuilderEvent extends Event
 {
     /**
@@ -16,14 +13,8 @@ class StageBuilderEvent extends Event
      */
     private $actions = [];
 
-    /**
-     * @var TranslatorInterface
-     */
-    private $translator;
-
-    public function __construct(TranslatorInterface $translator)
+    public function __construct(private TranslatorInterface $translator)
     {
-        $this->translator = $translator;
     }
 
     /**
@@ -78,7 +69,7 @@ class StageBuilderEvent extends Event
      */
     public function getActions()
     {
-        uasort($this->actions, function ($a, $b) {
+        uasort($this->actions, function ($a, $b): int {
             return strnatcasecmp(
                 $a['label'], $b['label']);
         });
@@ -88,10 +79,8 @@ class StageBuilderEvent extends Event
 
     /**
      * Gets a list of actions supported by the choice form field.
-     *
-     * @return array
      */
-    public function getActionList()
+    public function getActionList(): array
     {
         $list    = [];
         $actions = $this->getActions();
@@ -102,10 +91,13 @@ class StageBuilderEvent extends Event
         return $list;
     }
 
-    public function getActionChoices()
+    /**
+     * @return mixed[]
+     */
+    public function getActionChoices(): array
     {
         $choices = [];
-        $actions = $this->getActions();
+        $this->getActions();
         foreach ($this->actions as $k => $c) {
             $choices[$c['group']][$k] = $c['label'];
         }

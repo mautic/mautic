@@ -20,20 +20,12 @@ use Symfony\Contracts\Translation\TranslatorInterface;
  */
 class ApplyUpdatesCommand extends Command
 {
-    private TranslatorInterface $translator;
-    private StepProvider $stepProvider;
-    private CoreParametersHelper $coreParametersHelper;
-
     public function __construct(
-        TranslatorInterface $translator,
-        StepProvider $stepProvider,
-        CoreParametersHelper $coreParametersHelper
+        private TranslatorInterface $translator,
+        private StepProvider $stepProvider,
+        private CoreParametersHelper $coreParametersHelper
     ) {
         parent::__construct();
-
-        $this->translator           = $translator;
-        $this->stepProvider         = $stepProvider;
-        $this->coreParametersHelper = $coreParametersHelper;
     }
 
     protected function configure()

@@ -9,6 +9,7 @@ use Mautic\InstallBundle\Configurator\Step\CheckStep;
 use Mautic\InstallBundle\Configurator\Step\DoctrineStep;
 use Mautic\InstallBundle\Install\InstallService;
 use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Console\Helper\QuestionHelper;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -22,15 +23,8 @@ class InstallCommand extends Command
 {
     public const COMMAND = 'mautic:install';
 
-    private InstallService $installer;
-
-    private ManagerRegistry $doctrineRegistry;
-
-    public function __construct(InstallService $installer, ManagerRegistry $doctrineRegistry)
+    public function __construct(private InstallService $installer, private ManagerRegistry $doctrineRegistry)
     {
-        $this->installer        = $installer;
-        $this->doctrineRegistry = $doctrineRegistry;
-
         parent::__construct();
     }
 
@@ -41,7 +35,7 @@ class InstallCommand extends Command
     {
         $this
             ->setName(self::COMMAND)
-            ->setHelp('This command allows you to trigger the install process. It will try to get configuration values both from app/config/local.php and command line options/arguments, where the latter takes precedence.')
+            ->setHelp('This command allows you to trigger the install process. It will try to get configuration values both from the local config file and command line options/arguments, where the latter takes precedence.')
             ->addArgument(
                 'site_url',
                 InputArgument::REQUIRED,
@@ -214,9 +208,9 @@ class InstallCommand extends Command
 
         // Initialize DB and admin params from local.php
         foreach ((array) $allParams as $opt => $value) {
-            if (0 === strpos($opt, 'db_')) {
+            if (str_starts_with($opt, 'db_')) {
                 $dbParams[substr($opt, 3)] = $value;
-            } elseif (0 === strpos($opt, 'admin_')) {
+            } elseif (str_starts_with($opt, 'admin_')) {
                 $adminParam[substr($opt, 6)] = $value;
             }
         }
@@ -224,10 +218,10 @@ class InstallCommand extends Command
         // Initialize DB and admin params from cli options
         foreach ($options as $opt => $value) {
             if (isset($value)) {
-                if (0 === strpos($opt, 'db_')) {
+                if (str_starts_with($opt, 'db_')) {
                     $dbParams[substr($opt, 3)] = $value;
                     $allParams[$opt]           = $value;
-                } elseif (0 === strpos($opt, 'admin_')) {
+                } elseif (str_starts_with($opt, 'admin_')) {
                     $adminParam[substr($opt, 6)] = $value;
                 }
             }
@@ -261,6 +255,8 @@ class InstallCommand extends Command
 
                         if (empty($options['force'])) {
                             // Ask user to confirm install when optional settings missing
+
+                            /** @var QuestionHelper $helper */
                             $helper   = $this->getHelper('question');
                             $question = new ConfirmationQuestion('Continue with install anyway? [yes/no]', false);
 
@@ -446,7 +442,7 @@ class InstallCommand extends Command
      *
      * @param array<string,string> $messages
      */
-    private function handleInstallerErrors(OutputInterface $output, array $messages)
+    private function handleInstallerErrors(OutputInterface $output, array $messages): void
     {
         foreach ($messages as $type => $message) {
             $output->writeln("  - [$type] $message");

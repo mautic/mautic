@@ -7,19 +7,10 @@ use Mautic\ReportBundle\ReportEvents;
 use Mautic\ReportBundle\Scheduler\Model\SendSchedule;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-/**
- * Class SchedulerSubscriber.
- */
 class SchedulerSubscriber implements EventSubscriberInterface
 {
-    /**
-     * @var SendSchedule
-     */
-    private $sendSchedule;
-
-    public function __construct(SendSchedule $sendSchedule)
+    public function __construct(private SendSchedule $sendSchedule)
     {
-        $this->sendSchedule = $sendSchedule;
     }
 
     /**
@@ -32,7 +23,7 @@ class SchedulerSubscriber implements EventSubscriberInterface
         ];
     }
 
-    public function onScheduleSend(ReportScheduleSendEvent $event)
+    public function onScheduleSend(ReportScheduleSendEvent $event): void
     {
         $scheduler = $event->getScheduler();
         $file      = $event->getFile();

@@ -38,26 +38,14 @@ class DashboardSubscriber extends MainDashboardSubscriber
         'asset:assets:viewother',
     ];
 
-    /**
-     * @var AssetModel
-     */
-    protected $assetModel;
-
-    /**
-     * @var RouterInterface
-     */
-    protected $router;
-
-    public function __construct(AssetModel $assetModel, RouterInterface $router)
+    public function __construct(protected AssetModel $assetModel, protected RouterInterface $router)
     {
-        $this->assetModel = $assetModel;
-        $this->router     = $router;
     }
 
     /**
      * Set a widget detail when needed.
      */
-    public function onWidgetDetailGenerate(WidgetDetailEvent $event)
+    public function onWidgetDetailGenerate(WidgetDetailEvent $event): void
     {
         $this->checkPermissions($event);
         $canViewOthers = $event->hasPermission('asset:assets:viewother');
@@ -113,21 +101,19 @@ class DashboardSubscriber extends MainDashboardSubscriber
                 $items  = [];
 
                 // Build table rows with links
-                if ($assets) {
-                    foreach ($assets as &$asset) {
-                        $assetUrl = $this->router->generate('mautic_asset_action', ['objectAction' => 'view', 'objectId' => $asset['id']]);
-                        $row      = [
-                            [
-                                'value' => $asset['title'],
-                                'type'  => 'link',
-                                'link'  => $assetUrl,
-                            ],
-                            [
-                                'value' => $asset['download_count'],
-                            ],
-                        ];
-                        $items[] = $row;
-                    }
+                foreach ($assets as &$asset) {
+                    $assetUrl = $this->router->generate('mautic_asset_action', ['objectAction' => 'view', 'objectId' => $asset['id']]);
+                    $row      = [
+                        [
+                            'value' => $asset['title'],
+                            'type'  => 'link',
+                            'link'  => $assetUrl,
+                        ],
+                        [
+                            'value' => $asset['download_count'],
+                        ],
+                    ];
+                    $items[] = $row;
                 }
 
                 $event->setTemplateData([
@@ -159,18 +145,16 @@ class DashboardSubscriber extends MainDashboardSubscriber
                 $items  = [];
 
                 // Build table rows with links
-                if ($assets) {
-                    foreach ($assets as &$asset) {
-                        $assetUrl = $this->router->generate('mautic_asset_action', ['objectAction' => 'view', 'objectId' => $asset['id']]);
-                        $row      = [
-                            [
-                                'value' => $asset['name'],
-                                'type'  => 'link',
-                                'link'  => $assetUrl,
-                            ],
-                        ];
-                        $items[] = $row;
-                    }
+                foreach ($assets as &$asset) {
+                    $assetUrl = $this->router->generate('mautic_asset_action', ['objectAction' => 'view', 'objectId' => $asset['id']]);
+                    $row      = [
+                        [
+                            'value' => $asset['name'],
+                            'type'  => 'link',
+                            'link'  => $assetUrl,
+                        ],
+                    ];
+                    $items[] = $row;
                 }
 
                 $event->setTemplateData([

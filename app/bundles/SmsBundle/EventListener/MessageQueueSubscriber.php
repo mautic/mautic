@@ -10,14 +10,8 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class MessageQueueSubscriber implements EventSubscriberInterface
 {
-    /**
-     * @var SmsModel
-     */
-    private $model;
-
-    public function __construct(SmsModel $model)
+    public function __construct(private SmsModel $model)
     {
-        $this->model = $model;
     }
 
     /**
@@ -33,7 +27,7 @@ class MessageQueueSubscriber implements EventSubscriberInterface
     /**
      * Sends campaign emails.
      */
-    public function onProcessMessageQueueBatch(MessageQueueBatchProcessEvent $event)
+    public function onProcessMessageQueueBatch(MessageQueueBatchProcessEvent $event): void
     {
         if (!$event->checkContext('sms')) {
             return;

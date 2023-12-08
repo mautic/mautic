@@ -11,25 +11,16 @@ use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
-/**
- * Class VariantType.
- */
 class VariantType extends AbstractType
 {
-    /**
-     * @var PageModel
-     */
-    private $pageModel;
-
-    public function __construct(PageModel $pageModel)
+    public function __construct(private PageModel $pageModel)
     {
-        $this->pageModel = $pageModel;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder->add(
             'weight',
@@ -75,7 +66,7 @@ class VariantType extends AbstractType
                     ]
             );
 
-            $builder->addEventListener(FormEvents::PRE_SET_DATA, function (FormEvent $event) use ($criteria) {
+            $builder->addEventListener(FormEvents::PRE_SET_DATA, function (FormEvent $event) use ($criteria): void {
                 $form = $event->getForm();
                 $data = $event->getData();
                 if (isset($data['winnerCriteria'])) {

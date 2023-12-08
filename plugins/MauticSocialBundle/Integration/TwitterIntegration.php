@@ -5,9 +5,6 @@ namespace MauticPlugin\MauticSocialBundle\Integration;
 use Mautic\CoreBundle\Helper\EmojiHelper;
 use MauticPlugin\MauticSocialBundle\Form\Type\TwitterType;
 
-/**
- * Class TwitterIntegration.
- */
 class TwitterIntegration extends SocialIntegration
 {
     /**
@@ -37,7 +34,7 @@ class TwitterIntegration extends SocialIntegration
     /**
      * {@inheritdoc}
      */
-    public function getSupportedFeatures()
+    public function getSupportedFeatures(): array
     {
         return [
             'public_profile',
@@ -173,10 +170,7 @@ class TwitterIntegration extends SocialIntegration
         return $data;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getPublicActivity($identifier, &$socialCache)
+    public function getPublicActivity($identifier, &$socialCache): void
     {
         if (!isset($socialCache['id'])) {
             $this->getUserData($identifier, $socialCache);
@@ -223,7 +217,7 @@ class TwitterIntegration extends SocialIntegration
                     foreach ($d['entities']['media'] as $m) {
                         if ('photo' == $m['type']) {
                             $photo = [
-                                'url' => (isset($m['media_url_https']) ? $m['media_url_https'] : $m['media_url']),
+                                'url' => ($m['media_url_https'] ?? $m['media_url']),
                             ];
 
                             $socialCache['activity']['photos'][] = $photo;
@@ -251,7 +245,7 @@ class TwitterIntegration extends SocialIntegration
     /**
      * {@inheritdoc}
      */
-    public function getAvailableLeadFields($settings = [])
+    public function getAvailableLeadFields($settings = []): array
     {
         return [
             'profileHandle' => ['type' => 'string'],
@@ -268,12 +262,12 @@ class TwitterIntegration extends SocialIntegration
     /**
      * {@inheritdoc}
      */
-    public function cleanIdentifier($identifier)
+    public function cleanIdentifier($identifier): string
     {
         if (preg_match('#https?://twitter.com/(.*?)(/.*?|$)#i', $identifier, $match)) {
             // extract the handle
             $identifier = $match[1];
-        } elseif ('@' == substr($identifier, 0, 1)) {
+        } elseif (str_starts_with($identifier, '@')) {
             $identifier = substr($identifier, 1);
         }
 
@@ -302,7 +296,7 @@ class TwitterIntegration extends SocialIntegration
     /**
      * {@inheritdoc}
      */
-    public function getFormType()
+    public function getFormType(): string
     {
         return TwitterType::class;
     }

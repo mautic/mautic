@@ -9,14 +9,8 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class ReportSchedulerSubscriber implements EventSubscriberInterface
 {
-    /**
-     * @var SchedulerPlanner
-     */
-    private $schedulerPlanner;
-
-    public function __construct(SchedulerPlanner $schedulerPlanner)
+    public function __construct(private SchedulerPlanner $schedulerPlanner)
     {
-        $this->schedulerPlanner = $schedulerPlanner;
     }
 
     /**
@@ -27,7 +21,7 @@ class ReportSchedulerSubscriber implements EventSubscriberInterface
         return [ReportEvents::REPORT_POST_SAVE => ['onReportSave', 0]];
     }
 
-    public function onReportSave(ReportEvent $event)
+    public function onReportSave(ReportEvent $event): ReportEvent
     {
         $report = $event->getReport();
 

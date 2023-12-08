@@ -26,12 +26,12 @@ trait FilterTrait
      */
     protected $connection;
 
-    public function setConnection(Connection $connection)
+    public function setConnection(Connection $connection): void
     {
         $this->connection = $connection;
     }
 
-    public function buildFiltersForm($eventName, FormEvent $event, TranslatorInterface $translator, $currentListId = null)
+    public function buildFiltersForm($eventName, FormEvent $event, TranslatorInterface $translator, $currentListId = null): void
     {
         $data    = $event->getData();
         $form    = $event->getForm();
@@ -49,7 +49,7 @@ trait FilterTrait
         $attr        = ['class' => 'form-control filter-value'];
         $displayType = HiddenType::class;
         $displayAttr = [];
-        $operator    = isset($data['operator']) ? $data['operator'] : '';
+        $operator    = $data['operator'] ?? '';
         $field       = [];
 
         if (isset($options['fields']['behaviors'][$fieldName])) {
@@ -228,9 +228,9 @@ trait FilterTrait
                         'class'                => 'form-control',
                         'data-toggle'          => 'field-lookup',
                         'data-target'          => $data['field'],
-                        'data-action'          => isset($field['properties']['data-action']) ? $field['properties']['data-action'] : 'lead:fieldList',
-                        'data-lookup-callback' => isset($field['properties']['data-lookup-callback']) ? $field['properties']['data-lookup-callback'] : 'updateLookupListFilter',
-                        'data-callback'        => isset($field['properties']['callback']) ? $field['properties']['callback'] : 'activateFieldTypeahead',
+                        'data-action'          => $field['properties']['data-action'] ?? 'lead:fieldList',
+                        'data-lookup-callback' => $field['properties']['data-lookup-callback'] ?? 'updateLookupListFilter',
+                        'data-callback'        => $field['properties']['callback'] ?? 'activateFieldTypeahead',
                         'placeholder'          => $translator->trans(
                             'mautic.lead.list.form.filtervalue'
                         ),
@@ -290,7 +290,7 @@ trait FilterTrait
                     $attr,
                     [
                         'data-toggle' => 'field-lookup',
-                        'data-target' => isset($data['field']) ? $data['field'] : '',
+                        'data-target' => $data['field'] ?? '',
                         'data-action' => 'lead:fieldList',
                         'placeholder' => $translator->trans('mautic.lead.list.form.filtervalue'),
                     ]
@@ -317,7 +317,7 @@ trait FilterTrait
                 // Let's add a custom valdiator to test the regex
                 $customOptions['constraints'][] =
                     new Callback(
-                        function ($regex, ExecutionContextInterface $context) {
+                        function ($regex, ExecutionContextInterface $context): void {
                             // Let's test the regex's syntax by making a fake query
                             try {
                                 $qb = $this->connection->createQueryBuilder();
@@ -327,7 +327,7 @@ trait FilterTrait
                                     ->setParameter('regex', $this->prepareRegex($regex))
                                     ->setMaxResults(1);
                                 $qb->executeQuery()->fetchAllAssociative();
-                            } catch (\Exception $exception) {
+                            } catch (\Exception) {
                                 $context->buildViolation('mautic.core.regex.invalid')->addViolation();
                             }
                         }
@@ -350,11 +350,9 @@ trait FilterTrait
                 ]
             );
         } else {
-            if (!empty($customOptions['constraints'])) {
-                foreach ($customOptions['constraints'] as $i => $constraint) {
-                    if ('NotBlank' === get_class($constraint)) {
-                        array_splice($customOptions['constraints'], $i, 1);
-                    }
+            foreach ($customOptions['constraints'] as $i => $constraint) {
+                if ('NotBlank' === get_class($constraint)) {
+                    array_splice($customOptions['constraints'], $i, 1);
                 }
             }
             $form->add(

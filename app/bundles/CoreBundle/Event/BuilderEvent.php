@@ -6,27 +6,18 @@ use Mautic\CoreBundle\Helper\BuilderTokenHelper;
 use Symfony\Component\Process\Exception\InvalidArgumentException;
 use Symfony\Contracts\EventDispatcher\Event;
 
-/**
- * Class BuilderEvent.
- */
 class BuilderEvent extends Event
 {
     protected $slotTypes            = [];
     protected $sections             = [];
     protected $tokens               = [];
     protected $abTestWinnerCriteria = [];
-    protected $translator;
-    protected $entity;
-    protected $requested;
     protected $tokenFilterText;
-    protected $tokenFilterTarget;
+    protected string $tokenFilterTarget;
 
-    public function __construct($translator, $entity = null, $requested = 'all', protected string $tokenFilter = '')
+    public function __construct(protected $translator, protected $entity = null, protected $requested = 'all', protected string $tokenFilter = '')
     {
-        $this->translator        = $translator;
-        $this->entity            = $entity;
-        $this->requested         = $requested;
-        $this->tokenFilterTarget = (0 === strpos($tokenFilter, '{@')) ? 'label' : 'token';
+        $this->tokenFilterTarget = (str_starts_with($tokenFilter, '{@')) ? 'label' : 'token';
         $this->tokenFilterText   = str_replace(['{@', '{', '}'], '', $tokenFilter);
         $this->tokenFilter       = ('label' == $this->tokenFilterTarget) ? $this->tokenFilterText : str_replace('{@', '{', $tokenFilter);
     }
@@ -34,7 +25,7 @@ class BuilderEvent extends Event
     /**
      * @param int $priority
      */
-    public function addSlotType($key, $header, $icon, $content, $form, $priority = 0, array $params = [])
+    public function addSlotType($key, $header, $icon, $content, $form, $priority = 0, array $params = []): void
     {
         $this->slotTypes[$key] = [
             'header'   => $this->translator->trans($header),
@@ -70,7 +61,7 @@ class BuilderEvent extends Event
         return $this->slotTypes;
     }
 
-    public function addSection($key, $header, $icon, $content, $form, $priority = 0)
+    public function addSection($key, $header, $icon, $content, $form, $priority = 0): void
     {
         $this->sections[$key] = [
             'header'   => $this->translator->trans($header),
@@ -101,14 +92,12 @@ class BuilderEvent extends Event
 
     /**
      * Get list of AB Test winner criteria.
-     *
-     * @return array
      */
-    public function getAbTestWinnerCriteria()
+    public function getAbTestWinnerCriteria(): array
     {
         uasort(
             $this->abTestWinnerCriteria,
-            function ($a, $b) {
+            function ($a, $b): int {
                 return strnatcasecmp(
                     $a['group'],
                     $b['group']
@@ -172,10 +161,10 @@ class BuilderEvent extends Event
     /**
      * @param bool $convertToLinks
      */
-    public function addTokens(array $tokens, $convertToLinks = false)
+    public function addTokens(array $tokens, $convertToLinks = false): void
     {
         if ($convertToLinks) {
-            array_walk($tokens, function (&$val, $key) {
+            array_walk($tokens, function (&$val, $key): void {
                 $val = 'a:'.$val;
             });
         }
@@ -183,7 +172,7 @@ class BuilderEvent extends Event
         $this->tokens = array_merge($this->tokens, $tokens);
     }
 
-    public function addToken($key, $value)
+    public function addToken($key, $value): void
     {
         $this->tokens[$key] = $value;
     }
@@ -198,7 +187,7 @@ class BuilderEvent extends Event
         if (false === $withBC) {
             $tokens = [];
             foreach ($this->tokens as $key => $value) {
-                if ('{leadfield' !== substr($key, 0, 10)) {
+                if (!str_starts_with($key, '{leadfield')) {
                     $tokens[$key] = $value;
                 }
             }
@@ -244,10 +233,8 @@ class BuilderEvent extends Event
 
     /**
      * Get text of the search filter.
-     *
-     * @return array
      */
-    public function getTokenFilter()
+    public function getTokenFilter(): array
     {
         return [
             'target' => $this->tokenFilterTarget,
@@ -274,7 +261,7 @@ class BuilderEvent extends Event
             // Do a search against the label
             $tokens = array_filter(
                 $tokens,
-                function ($v) use ($filter) {
+                function ($v) use ($filter): bool {
                     return 0 === stripos($v, $filter);
                 }
             );
@@ -282,7 +269,7 @@ class BuilderEvent extends Event
             // Do a search against the token
             $found = array_filter(
                 array_keys($tokens),
-                function ($k) use ($filter) {
+                function ($k) use ($filter): bool {
                     return 0 === stripos($k, $filter);
                 }
             );
@@ -306,7 +293,7 @@ class BuilderEvent extends Event
         $labelColumn = 'name',
         $valueColumn = 'id',
         $convertToLinks = false
-    ) {
+    ): void {
         $tokens = $this->getTokensFromHelper($tokenHelper, $tokens, $labelColumn, $valueColumn);
         if (null == $tokens) {
             $tokens = [];
@@ -363,10 +350,7 @@ class BuilderEvent extends Event
         return $this->getRequested('sections');
     }
 
-    /**
-     * @return bool
-     */
-    protected function getRequested($type)
+    protected function getRequested($type): bool
     {
         if (is_array($this->requested)) {
             return in_array($type, $this->requested);

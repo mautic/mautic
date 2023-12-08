@@ -17,20 +17,11 @@ class DisplayCounter
      */
     private $alreadyAlwaysDisplayed = 0;
 
-    /**
-     * @var Form
-     */
-    private $form;
-
-    /**
-     * DisplayCounter constructor.
-     */
-    public function __construct(Form $form)
+    public function __construct(private Form $form)
     {
-        $this->form = $form;
     }
 
-    public function increaseDisplayedFields()
+    public function increaseDisplayedFields(): void
     {
         ++$this->displayedFields;
     }
@@ -43,7 +34,7 @@ class DisplayCounter
         return $this->displayedFields;
     }
 
-    public function increaseAlreadyAlwaysDisplayed()
+    public function increaseAlreadyAlwaysDisplayed(): void
     {
         ++$this->alreadyAlwaysDisplayed;
     }
@@ -56,10 +47,7 @@ class DisplayCounter
         return $this->alreadyAlwaysDisplayed;
     }
 
-    /**
-     * @return int
-     */
-    public function getAlwaysDisplayFields()
+    public function getAlwaysDisplayFields(): int
     {
         $i= 0;
         /** @var Field $field */

@@ -128,11 +128,9 @@ class FocusController extends AbstractStandardFormController
     }
 
     /**
-     * @return array
-     *
      * @throws \Exception
      */
-    public function getViewArguments(array $args, $action)
+    public function getViewArguments(array $args, $action): array
     {
         $cacheTimeout = (int) $this->coreParametersHelper->get('cached_data_timeout');
 
@@ -180,12 +178,12 @@ class FocusController extends AbstractStandardFormController
                     $trackableModel = $this->getModel('page.trackable');
                     \assert($trackableModel instanceof TrackableModel);
                     $trackables = $trackableModel->getTrackableList('focus', $item->getId());
-                }
 
-                $cacheItem->set([$stats, $trackables]);
-                $cacheItem->expiresAfter($cacheTimeout * 60);
-                $cacheItem->tag("focus.{$item->getId()}");
-                $this->cacheProvider->save($cacheItem);
+                    $cacheItem->set([$stats, $trackables]);
+                    $cacheItem->expiresAfter($cacheTimeout * 60);
+                    $cacheItem->tag("focus.{$item->getId()}");
+                    $this->cacheProvider->save($cacheItem);
+                }
             }
 
             $args['viewParameters']['stats']                 = $stats;
@@ -200,9 +198,9 @@ class FocusController extends AbstractStandardFormController
     }
 
     /**
-     * @return array
+     * @return mixed[]
      */
-    protected function getPostActionRedirectArguments(array $args, $action)
+    protected function getPostActionRedirectArguments(array $args, $action): array
     {
         $focus        = $this->getCurrentRequest()->request->get('focus') ?? [];
         $updateSelect = 'POST' === $this->getCurrentRequest()->getMethod()
@@ -252,10 +250,8 @@ class FocusController extends AbstractStandardFormController
      * @param object $entity
      * @param string $nameMethod   name of the entity method holding the name
      * @param string $groupMethod  name of the entity method holding the select group
-     *
-     * @return array
      */
-    protected function getUpdateSelectParams($updateSelect, $entity, $nameMethod = 'getName', $groupMethod = 'getLanguage')
+    protected function getUpdateSelectParams($updateSelect, $entity, $nameMethod = 'getName', $groupMethod = 'getLanguage'): array
     {
         return [
             'updateSelect' => $updateSelect,

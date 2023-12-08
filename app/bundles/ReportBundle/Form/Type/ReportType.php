@@ -23,20 +23,14 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class ReportType extends AbstractType
 {
-    /**
-     * @var ReportModel
-     */
-    private $reportModel;
-
-    public function __construct(ReportModel $reportModel)
+    public function __construct(private ReportModel $reportModel)
     {
-        $this->reportModel = $reportModel;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder->addEventSubscriber(new CleanFormSubscriber(['description' => 'html']));
         $builder->addEventSubscriber(new FormExitSubscriber('report', $options));
@@ -131,7 +125,7 @@ class ReportType extends AbstractType
                 ]
             );
 
-            $formModifier = function (FormInterface $form, $source, $currentColumns, $currentGraphs, $formData) use ($tables) {
+            $formModifier = function (FormInterface $form, $source, $currentColumns, $currentGraphs, $formData) use ($tables): void {
                 if (empty($source)) {
                     $firstGroup           = array_key_first($tables);
                     $firstKeyInFirstGroup = array_key_first($tables[$firstGroup]);
@@ -381,7 +375,7 @@ class ReportType extends AbstractType
 
             $builder->addEventListener(
                 FormEvents::PRE_SET_DATA,
-                function (FormEvent $event) use ($formModifier) {
+                function (FormEvent $event) use ($formModifier): void {
                     $data = $event->getData();
                     $formModifier($event->getForm(), $data->getSource(), $data->getColumns(), $data->getGraphs(), $data);
                 }
@@ -389,10 +383,10 @@ class ReportType extends AbstractType
 
             $builder->addEventListener(
                 FormEvents::PRE_SUBMIT,
-                function (FormEvent $event) use ($formModifier) {
+                function (FormEvent $event) use ($formModifier): void {
                     $data    = $event->getData();
-                    $graphs  = (isset($data['graphs'])) ? $data['graphs'] : [];
-                    $columns = (isset($data['columns'])) ? $data['columns'] : [];
+                    $graphs  = $data['graphs'] ?? [];
+                    $columns = $data['columns'] ?? [];
                     $formModifier($event->getForm(), $data['source'], $columns, $graphs, $data);
                 }
             );
@@ -405,7 +399,7 @@ class ReportType extends AbstractType
         }
     }
 
-    public function configureOptions(OptionsResolver $resolver)
+    public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults(
             [
@@ -419,10 +413,8 @@ class ReportType extends AbstractType
      * Extracts the keys from the table_list option and builds an array of tables for the select list.
      *
      * @param array $tables Array with the table list and columns
-     *
-     * @return array
      */
-    private function buildTableSourceList($tables)
+    private function buildTableSourceList($tables): array
     {
         $temp = array_keys($tables);
 

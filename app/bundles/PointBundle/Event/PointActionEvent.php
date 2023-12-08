@@ -8,20 +8,8 @@ use Mautic\PointBundle\Entity\Point;
 
 class PointActionEvent extends CommonEvent
 {
-    /**
-     * @var Point
-     */
-    protected $point;
-
-    /**
-     * @var Lead
-     */
-    protected $lead;
-
-    public function __construct(Point $point, Lead $lead)
+    public function __construct(protected Point $point, protected Lead $lead)
     {
-        $this->point = $point;
-        $this->lead  = $lead;
     }
 
     /**
@@ -32,7 +20,7 @@ class PointActionEvent extends CommonEvent
         return $this->point;
     }
 
-    public function setPoint(Point $point)
+    public function setPoint(Point $point): void
     {
         $this->point = $point;
     }
@@ -45,7 +33,7 @@ class PointActionEvent extends CommonEvent
         return $this->lead;
     }
 
-    public function setLead(Lead $lead)
+    public function setLead(Lead $lead): void
     {
         $this->lead = $lead;
     }

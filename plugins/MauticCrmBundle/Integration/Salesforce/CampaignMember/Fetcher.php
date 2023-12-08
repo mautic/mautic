@@ -92,22 +92,17 @@ class Fetcher
      */
     public function getQueryForUnknownObjects(array $fields, $object)
     {
-        switch ($object) {
-            case Lead::OBJECT:
-                return QueryBuilder::getLeadQuery($fields, $this->unknownLeadIds);
-            case Contact::OBJECT:
-                return QueryBuilder::getContactQuery($fields, $this->unknownContactIds);
-            default:
-                throw new InvalidObjectException();
-        }
+        return match ($object) {
+            Lead::OBJECT    => QueryBuilder::getLeadQuery($fields, $this->unknownLeadIds),
+            Contact::OBJECT => QueryBuilder::getContactQuery($fields, $this->unknownContactIds),
+            default         => throw new InvalidObjectException(),
+        };
     }
 
     /**
      * Fetch the Mautic contact IDs that are not already tracked as SF campaign members.
-     *
-     * @return array
      */
-    public function getUnknownCampaignMembers()
+    public function getUnknownCampaignMembers(): array
     {
         // First, find those already tracked as part of this campaign
         $this->fetchCampaignMembers();
@@ -128,7 +123,7 @@ class Fetcher
     /**
      * Fetch SF leads already identified.
      */
-    private function fetchLeads()
+    private function fetchLeads(): void
     {
         if (!$campaignMembers = $this->organizer->getLeadIds()) {
             return;
@@ -158,7 +153,7 @@ class Fetcher
     /**
      * Fetch SF contacts already identified.
      */
-    private function fetchContacts()
+    private function fetchContacts(): void
     {
         if (!$campaignMembers = $this->organizer->getContactIds()) {
             return;
@@ -188,7 +183,7 @@ class Fetcher
     /**
      * Fetch SF campaign members already identified.
      */
-    private function fetchCampaignMembers()
+    private function fetchCampaignMembers(): void
     {
         if (!$this->mauticIds) {
             return;
@@ -211,7 +206,7 @@ class Fetcher
     /**
      * Fetch a list of all identified objects for SF contacts and leads.
      */
-    private function fetchNewlyCreated()
+    private function fetchNewlyCreated(): void
     {
         if (!$allUnknownContacts = array_merge($this->unknownLeadIds, $this->unknownContactIds)) {
             return;

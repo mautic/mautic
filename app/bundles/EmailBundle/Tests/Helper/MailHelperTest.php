@@ -588,4 +588,36 @@ class MailHelperTest extends TestCase
             [true, $html, InputHelper::minifyHTML($html)],
         ];
     }
+
+    public function testHeadersAreTokenized(): void
+    {
+        $parameterMap = [
+          ['mailer_custom_headers', [], ['X-Mautic-Test-1' => '{tracking_pixel}']],
+        ];
+        $mockFactory = $this->getMockFactory(true, $parameterMap);
+
+        $transport     = new SmtpTransport();
+        $symfonyMailer = new Mailer($transport);
+
+        $mailer = new MailHelper($mockFactory, $symfonyMailer, ['nobody@nowhere.com' => '{tracking_pixel}']);
+        $mailer->addTo($this->contacts[0]['email']);
+
+        $email = new Email();
+        $email->setSubject('Test');
+        $email->setCustomHtml('content');
+        $email->setHeaders(['X-Mautic-Test-2' => '{tracking_pixel}']);
+        $mailer->setEmail($email);
+        $mailer->send();
+
+        /** @var array<\Symfony\Component\Mime\Header\AbstractHeader> $headers */
+        $headers = $mailer->message->getHeaders()->all();
+
+        foreach ($headers as $header) {
+            if ('X-Mautic-Test-1' === $header->getName() || 'X-Mautic-Test-2' === $header->getName()) {
+                $this->assertEquals(MailHelper::getBlankPixel(), $header->getBody());
+            } elseif ('from' === $header->getName()) {
+                $this->assertEquals('{tracking_pixel}', $header->getBody()->getName());
+            }
+        }
+    }
 }

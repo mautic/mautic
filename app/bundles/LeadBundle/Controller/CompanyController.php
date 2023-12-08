@@ -606,10 +606,8 @@ class CompanyController extends FormController
      * @param int        $companyId
      * @param int        $page
      * @param array<int> $leadIds   filter to get only company's contacts
-     *
-     * @return array
      */
-    public function getCompanyContacts(Request $request, $companyId, $page = 0, $leadIds = [])
+    public function getCompanyContacts(Request $request, $companyId, $page = 0, $leadIds = []): array
     {
         $this->setListFilters();
 
@@ -664,7 +662,7 @@ class CompanyController extends FormController
      *
      * @return array|JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|Response
      */
-    public function cloneAction($objectId)
+    public function cloneAction(Request $request, $objectId)
     {
         $model  = $this->getModel('lead.company');
         $entity = $model->getEntity($objectId);
@@ -677,7 +675,7 @@ class CompanyController extends FormController
             $entity = clone $entity;
         }
 
-        return $this->newAction($entity);
+        return $this->newAction($request, $entity);
     }
 
     /**

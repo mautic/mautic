@@ -21,7 +21,7 @@ abstract class PluginBundleBase extends Bundle
      *
      * @deprecated To be removed in 5.0. Listen to PluginEvents::ON_PLUGIN_INSTALL instead
      */
-    public static function onPluginInstall(Plugin $plugin, MauticFactory $factory, $metadata = null, $installedSchema = null)
+    public static function onPluginInstall(Plugin $plugin, MauticFactory $factory, $metadata = null, $installedSchema = null): void
     {
         if (null !== $metadata) {
             self::installPluginSchema($metadata, $factory, $installedSchema);
@@ -63,14 +63,13 @@ abstract class PluginBundleBase extends Bundle
     /**
      * Called by PluginController::reloadAction when the addon version does not match what's installed.
      *
-     * @param null   $metadata
-     * @param Schema $installedSchema
+     * @param null $metadata
      *
      * @throws \Exception
      *
      * @deprecated To be removed in 5.0. Listen to PluginEvents::ON_PLUGIN_UPDATE instead
      */
-    public static function onPluginUpdate(Plugin $plugin, MauticFactory $factory, $metadata = null, Schema $installedSchema = null)
+    public static function onPluginUpdate(Plugin $plugin, MauticFactory $factory, $metadata = null, Schema $installedSchema = null): void
     {
         // Not recommended although availalbe for simple schema changes - see updatePluginSchema docblock
         // self::updatePluginSchema($metadata, $installedSchema, $factory);
@@ -112,7 +111,7 @@ abstract class PluginBundleBase extends Bundle
      *
      * @param null $metadata
      */
-    public static function onPluginUninstall(Plugin $plugin, MauticFactory $factory, $metadata = null)
+    public static function onPluginUninstall(Plugin $plugin, MauticFactory $factory, $metadata = null): void
     {
     }
 

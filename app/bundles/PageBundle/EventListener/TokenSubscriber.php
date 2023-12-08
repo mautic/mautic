@@ -18,7 +18,7 @@ class TokenSubscriber implements EventSubscriberInterface
         ];
     }
 
-    public function decodeTokens(PageDisplayEvent $event)
+    public function decodeTokens(PageDisplayEvent $event): void
     {
         // Find and replace encoded tokens for trackable URL conversion
         $content = $event->getContent();

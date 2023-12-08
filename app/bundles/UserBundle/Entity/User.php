@@ -106,19 +106,13 @@ class User extends FormEntity implements UserInterface, EquatableInterface, Pass
     private $signature;
 
     /**
-     * @var bool
+     * @param bool $guest
      */
-    private $guest = false;
-
-    /**
-     * @param bool $isGuest
-     */
-    public function __construct($isGuest = false)
+    public function __construct(private $guest = false)
     {
-        $this->guest = $isGuest;
     }
 
-    public static function loadMetadata(ORM\ClassMetadata $metadata)
+    public static function loadMetadata(ORM\ClassMetadata $metadata): void
     {
         $builder = new ClassMetadataBuilder($metadata);
 
@@ -189,7 +183,7 @@ class User extends FormEntity implements UserInterface, EquatableInterface, Pass
             ->build();
     }
 
-    public static function loadValidatorMetadata(ClassMetadata $metadata)
+    public static function loadValidatorMetadata(ClassMetadata $metadata): void
     {
         $metadata->addPropertyConstraint('username', new Assert\NotBlank(
             ['message' => 'mautic.user.user.username.notblank']
@@ -252,10 +246,7 @@ class User extends FormEntity implements UserInterface, EquatableInterface, Pass
         $metadata->setGroupSequence(['User', 'SecondPass', 'CheckPassword']);
     }
 
-    /**
-     * @return array
-     */
-    public static function determineValidationGroups(Form $form)
+    public static function determineValidationGroups(Form $form): array
     {
         $data   = $form->getData();
         $groups = ['User', 'SecondPass'];
@@ -271,7 +262,7 @@ class User extends FormEntity implements UserInterface, EquatableInterface, Pass
     /**
      * Prepares the metadata for API usage.
      */
-    public static function loadApiMetadata(ApiMetadataDriver $metadata)
+    public static function loadApiMetadata(ApiMetadataDriver $metadata): void
     {
         $metadata->setGroupPrefix('user')
             ->addListProperties(
@@ -574,8 +565,6 @@ class User extends FormEntity implements UserInterface, EquatableInterface, Pass
     /**
      * Set role.
      *
-     * @param Role $role
-     *
      * @return User
      */
     public function setRole(Role $role = null)
@@ -718,7 +707,7 @@ class User extends FormEntity implements UserInterface, EquatableInterface, Pass
     /**
      * @param mixed $lastLogin
      */
-    public function setLastLogin($lastLogin = null)
+    public function setLastLogin($lastLogin = null): void
     {
         if (empty($lastLogin)) {
             $lastLogin = new \DateTime();
@@ -737,7 +726,7 @@ class User extends FormEntity implements UserInterface, EquatableInterface, Pass
     /**
      * @param mixed $lastActive
      */
-    public function setLastActive($lastActive = null)
+    public function setLastActive($lastActive = null): void
     {
         if (empty($lastActive)) {
             $lastActive = new \DateTime();
@@ -756,7 +745,7 @@ class User extends FormEntity implements UserInterface, EquatableInterface, Pass
     /**
      * @param mixed $preferences
      */
-    public function setPreferences(array $preferences)
+    public function setPreferences(array $preferences): void
     {
         $this->preferences = $preferences;
     }
@@ -787,11 +776,9 @@ class User extends FormEntity implements UserInterface, EquatableInterface, Pass
     }
 
     /**
-     * @param UserInterface $user
-     *
-     * Needed for SAML to work correctly
+     * Needed for SAML to work correctly.
      */
-    public function isEqualTo(UserInterface $user)
+    public function isEqualTo(UserInterface $user): bool
     {
         $thisUser = $this->getId().$this->getUsername().$this->getPassword();
         $thatUser = $user->getId().$user->getUsername().$user->getPassword();

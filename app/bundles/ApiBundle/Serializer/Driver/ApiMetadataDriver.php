@@ -57,7 +57,7 @@ class ApiMetadataDriver extends BaseAnnotationDriver implements DriverInterface
         }
     }
 
-    private function resetDefaults()
+    private function resetDefaults(): void
     {
         $this->metadata       = null;
         $this->properties     = [];
@@ -166,7 +166,7 @@ class ApiMetadataDriver extends BaseAnnotationDriver implements DriverInterface
             if (!empty($prop)) {
                 $serializedName = null;
                 if (is_array($prop)) {
-                    list($prop, $serializedName) = $prop;
+                    [$prop, $serializedName] = $prop;
                 }
                 $this->addProperty($prop, $serializedName, $useGetter);
 
@@ -317,7 +317,7 @@ class ApiMetadataDriver extends BaseAnnotationDriver implements DriverInterface
     /**
      * Push the properties into ClassMetadata.
      */
-    public function build()
+    public function build(): void
     {
         foreach ($this->properties as $prop) {
             $this->metadata->addPropertyMetadata($prop);

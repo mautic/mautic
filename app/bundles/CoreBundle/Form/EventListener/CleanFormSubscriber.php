@@ -13,16 +13,10 @@ use Symfony\Component\Form\FormEvents;
 class CleanFormSubscriber implements EventSubscriberInterface
 {
     /**
-     * @var string|mixed[]
-     */
-    private $masks;
-
-    /**
      * @param string|mixed[] $masks
      */
-    public function __construct($masks = 'clean')
+    public function __construct(private $masks = 'clean')
     {
-        $this->masks = $masks;
     }
 
     /**
@@ -35,7 +29,7 @@ class CleanFormSubscriber implements EventSubscriberInterface
         ];
     }
 
-    public function preSubmitData(FormEvent $event)
+    public function preSubmitData(FormEvent $event): void
     {
         $data = $event->getData();
 

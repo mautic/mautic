@@ -5,9 +5,6 @@ namespace Mautic\CoreBundle\Security\Permissions;
 use Mautic\UserBundle\Form\Type\PermissionListType;
 use Symfony\Component\Form\FormBuilderInterface;
 
-/**
- * Class AbstractPermissions.
- */
 abstract class AbstractPermissions
 {
     /**
@@ -15,21 +12,15 @@ abstract class AbstractPermissions
      */
     protected $permissions = [];
 
-    /**
-     * @var array
-     */
-    protected $params = [];
-
-    public function __construct(array $params)
+    public function __construct(protected array $params)
     {
-        $this->params = $params;
     }
 
     /**
      * This method is called before the permissions object is used.
      * Define permissions with `addExtendedPermissions` here instead of constructor.
      */
-    public function definePermissions()
+    public function definePermissions(): void
     {
         // Override this method in the final class
     }
@@ -54,7 +45,7 @@ abstract class AbstractPermissions
      */
     public function isSupported($name, $level = '')
     {
-        list($name, $level) = $this->getSynonym($name, $level);
+        [$name, $level] = $this->getSynonym($name, $level);
 
         if (empty($level)) {
             // verify permission name only
@@ -67,10 +58,8 @@ abstract class AbstractPermissions
 
     /**
      * Allows permission classes to be disabled if criteria is not met (such as bundle is disabled).
-     *
-     * @return bool
      */
-    public function isEnabled()
+    public function isEnabled(): bool
     {
         return true;
     }
@@ -91,7 +80,7 @@ abstract class AbstractPermissions
     /**
      * Builds the bundle's specific form elements for its permissions.
      */
-    public function buildForm(FormBuilderInterface &$builder, array $options, array $data)
+    public function buildForm(FormBuilderInterface &$builder, array $options, array $data): void
     {
     }
 
@@ -201,7 +190,7 @@ abstract class AbstractPermissions
      */
     public function isGranted($userPermissions, $name, $level)
     {
-        list($name, $level) = $this->getSynonym($name, $level);
+        [$name, $level] = $this->getSynonym($name, $level);
 
         if (!isset($userPermissions[$name])) {
             // the user doesn't have implicit access
@@ -221,7 +210,7 @@ abstract class AbstractPermissions
      *
      * @return bool Return true if a second round is required after all other bundles have analyzed it's permissions
      */
-    public function analyzePermissions(array &$permissions, $allPermissions, $isSecondRound = false)
+    public function analyzePermissions(array &$permissions, $allPermissions, $isSecondRound = false): bool
     {
         $hasViewAccess = false;
         foreach ($permissions as $level => &$perms) {
@@ -248,12 +237,10 @@ abstract class AbstractPermissions
                         $required = ['viewown'];
                         break;
                 }
-                if (!empty($required)) {
-                    foreach ($required as $r) {
-                        list($ignore, $r) = $this->getSynonym($level, $r);
-                        if ($this->isSupported($level, $r) && !in_array($r, $perms)) {
-                            $perms[] = $r;
-                        }
+                foreach ($required as $r) {
+                    [$ignore, $r] = $this->getSynonym($level, $r);
+                    if ($this->isSupported($level, $r) && !in_array($r, $perms)) {
+                        $perms[] = $r;
                     }
                 }
             }
@@ -310,7 +297,7 @@ abstract class AbstractPermissions
     /**
      * Gives the bundle an opportunity to change how JavaScript calculates permissions granted.
      */
-    public function parseForJavascript(array &$perms)
+    public function parseForJavascript(array &$perms): void
     {
     }
 

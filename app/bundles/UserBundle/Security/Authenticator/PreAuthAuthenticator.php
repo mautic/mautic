@@ -18,40 +18,8 @@ use Symfony\Component\Security\Core\User\UserProviderInterface;
 
 class PreAuthAuthenticator implements AuthenticationProviderInterface
 {
-    /**
-     * @var EventDispatcherInterface
-     */
-    protected $dispatcher;
-
-    protected $providerKey;
-
-    /**
-     * @var UserProviderInterface
-     */
-    protected $userProvider;
-
-    /**
-     * @var IntegrationHelper
-     */
-    protected $integrationHelper;
-
-    /**
-     * @var requestStack|null
-     */
-    protected $requestStack;
-
-    public function __construct(
-        IntegrationHelper $integrationHelper,
-        EventDispatcherInterface $dispatcher,
-        RequestStack $requestStack,
-        UserProviderInterface $userProvider,
-        $providerKey
-    ) {
-        $this->dispatcher        = $dispatcher;
-        $this->providerKey       = $providerKey;
-        $this->userProvider      = $userProvider;
-        $this->integrationHelper = $integrationHelper;
-        $this->requestStack      = $requestStack;
+    public function __construct(protected IntegrationHelper $integrationHelper, protected EventDispatcherInterface $dispatcher, protected RequestStack $requestStack, protected UserProviderInterface $userProvider, protected $providerKey)
+    {
     }
 
     /**
@@ -122,10 +90,7 @@ class PreAuthAuthenticator implements AuthenticationProviderInterface
         );
     }
 
-    /**
-     * @return mixed
-     */
-    public function supports(TokenInterface $token)
+    public function supports(TokenInterface $token): bool
     {
         return $token instanceof PluginToken && $token->getProviderKey() === $this->providerKey;
     }

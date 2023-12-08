@@ -10,21 +10,10 @@ use Psr\Http\Message\ResponseInterface;
 class Client
 {
     /**
-     * @var CoreParametersHelper
+     * @param GuzzleClient $httpClient
      */
-    private $coreParametersHelper;
-
-    /**
-     * @var GuzzleClient
-     */
-    private $httpClient;
-
-    public function __construct(
-        CoreParametersHelper $coreParametersHelper,
-        $httpClient
-    ) {
-        $this->coreParametersHelper = $coreParametersHelper;
-        $this->httpClient           = $httpClient;
+    public function __construct(private CoreParametersHelper $coreParametersHelper, private $httpClient)
+    {
     }
 
     /**

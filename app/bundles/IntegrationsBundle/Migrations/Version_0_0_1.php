@@ -22,7 +22,7 @@ class Version_0_0_1 extends AbstractMigration
     {
         try {
             return !$schema->getTable($this->concatPrefix($this->table))->hasColumn('integration_reference_id');
-        } catch (SchemaException $e) {
+        } catch (SchemaException) {
             return false;
         }
     }

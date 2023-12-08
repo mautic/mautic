@@ -15,16 +15,10 @@ use Mautic\CoreBundle\Event\CommonEvent;
 class SegmentDictionaryGenerationEvent extends CommonEvent
 {
     /**
-     * @var array<string,mixed[]>
-     */
-    private array $translations;
-
-    /**
      * @param array<string,mixed[]> $translations
      */
-    public function __construct($translations = [])
+    public function __construct(private array $translations = [])
     {
-        $this->translations = $translations;
     }
 
     /**

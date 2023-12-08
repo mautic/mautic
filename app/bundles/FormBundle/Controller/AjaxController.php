@@ -22,21 +22,8 @@ use Symfony\Component\HttpFoundation\RequestStack;
 
 class AjaxController extends CommonAjaxController
 {
-    /**
-     * @var FieldCollectorInterface
-     */
-    private $fieldCollector;
-
-    /**
-     * @var AlreadyMappedFieldCollectorInterface
-     */
-    private $mappedFieldCollector;
-
-    public function __construct(FieldCollectorInterface $fieldCollector, AlreadyMappedFieldCollectorInterface $mappedFieldCollector, ManagerRegistry $doctrine, MauticFactory $factory, ModelFactory $modelFactory, UserHelper $userHelper, CoreParametersHelper $coreParametersHelper, EventDispatcherInterface $dispatcher, Translator $translator, FlashBag $flashBag, RequestStack $requestStack, CorePermissions $security)
+    public function __construct(private FieldCollectorInterface $fieldCollector, private AlreadyMappedFieldCollectorInterface $mappedFieldCollector, ManagerRegistry $doctrine, MauticFactory $factory, ModelFactory $modelFactory, UserHelper $userHelper, CoreParametersHelper $coreParametersHelper, EventDispatcherInterface $dispatcher, Translator $translator, FlashBag $flashBag, RequestStack $requestStack, CorePermissions $security)
     {
-        $this->fieldCollector       = $fieldCollector;
-        $this->mappedFieldCollector = $mappedFieldCollector;
-
         parent::__construct($doctrine, $factory, $modelFactory, $userHelper, $coreParametersHelper, $dispatcher, $translator, $flashBag, $requestStack, $security);
     }
 
@@ -82,7 +69,7 @@ class AjaxController extends CommonAjaxController
         return $this->sendJsonResponse(
             [
                 'fields' => array_map(
-                    function (FieldCrate $field) {
+                    function (FieldCrate $field): array {
                         return [
                             'label'      => $field->getName(),
                             'value'      => $field->getKey(),

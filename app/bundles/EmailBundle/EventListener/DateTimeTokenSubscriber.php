@@ -11,14 +11,8 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class DateTimeTokenSubscriber implements EventSubscriberInterface
 {
-    private DateTimeToken $dateTokenHelper;
-
-    private TranslatorInterface $translator;
-
-    public function __construct(TranslatorInterface $translator, DateTimeToken $dateTokenHelper)
+    public function __construct(private TranslatorInterface $translator, private DateTimeToken $dateTokenHelper)
     {
-        $this->translator      = $translator;
-        $this->dateTokenHelper = $dateTokenHelper;
     }
 
     public static function getSubscribedEvents(): array

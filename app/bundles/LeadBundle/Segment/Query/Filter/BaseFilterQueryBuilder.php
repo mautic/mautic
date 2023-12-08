@@ -11,25 +11,11 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class BaseFilterQueryBuilder implements FilterQueryBuilderInterface
 {
-    /**
-     * @var RandomParameterName
-     */
-    private $parameterNameGenerator;
-
-    /**
-     * @var EventDispatcherInterface
-     */
-    private $dispatcher;
-
-    public function __construct(
-        RandomParameterName $randomParameterNameService,
-        EventDispatcherInterface $dispatcher
-    ) {
-        $this->parameterNameGenerator = $randomParameterNameService;
-        $this->dispatcher             = $dispatcher;
+    public function __construct(private RandomParameterName $parameterNameGenerator, private EventDispatcherInterface $dispatcher)
+    {
     }
 
-    public static function getServiceId()
+    public static function getServiceId(): string
     {
         return 'mautic.lead.query.builder.basic';
     }
@@ -74,10 +60,7 @@ class BaseFilterQueryBuilder implements FilterQueryBuilderInterface
         return $this;
     }
 
-    /**
-     * @return string
-     */
-    protected function generateRandomParameterName()
+    protected function generateRandomParameterName(): string
     {
         return $this->parameterNameGenerator->generateRandomParameterName();
     }

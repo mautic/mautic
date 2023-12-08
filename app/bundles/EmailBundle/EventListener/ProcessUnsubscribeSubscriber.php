@@ -16,16 +16,6 @@ class ProcessUnsubscribeSubscriber implements EventSubscriberInterface
     public const FOLDER_KEY = 'unsubscribes';
 
     /**
-     * @var Unsubscribe
-     */
-    private $unsubscriber;
-
-    /**
-     * @var FeedbackLoop
-     */
-    private $looper;
-
-    /**
      * @return array
      */
     public static function getSubscribedEvents()
@@ -37,21 +27,16 @@ class ProcessUnsubscribeSubscriber implements EventSubscriberInterface
         ];
     }
 
-    /**
-     * ProcessUnsubscribeSubscriber constructor.
-     */
-    public function __construct(Unsubscribe $unsubscriber, FeedbackLoop $looper)
+    public function __construct(private Unsubscribe $unsubscriber, private FeedbackLoop $looper)
     {
-        $this->unsubscriber = $unsubscriber;
-        $this->looper       = $looper;
     }
 
-    public function onEmailConfig(MonitoredEmailEvent $event)
+    public function onEmailConfig(MonitoredEmailEvent $event): void
     {
         $event->addFolder(self::BUNDLE, self::FOLDER_KEY, 'mautic.email.config.monitored_email.unsubscribe_folder');
     }
 
-    public function onEmailParse(ParseEmailEvent $event)
+    public function onEmailParse(ParseEmailEvent $event): void
     {
         if ($event->isApplicable(self::BUNDLE, self::FOLDER_KEY)) {
             // Process the messages
@@ -67,15 +52,15 @@ class ProcessUnsubscribeSubscriber implements EventSubscriberInterface
     /**
      * Add an unsubscribe email to the List-Unsubscribe header if applicable.
      */
-    public function onEmailSend(EmailSendEvent $event)
+    public function onEmailSend(EmailSendEvent $event): void
     {
         $helper = $event->getHelper();
         if ($helper && $unsubscribeEmail = $helper->generateUnsubscribeEmail()) {
             $headers          = $event->getTextHeaders();
-            $existing         = (isset($headers['List-Unsubscribe'])) ? $headers['List-Unsubscribe'] : '';
+            $existing         = $headers['List-Unsubscribe'] ?? '';
             $unsubscribeEmail = "<mailto:$unsubscribeEmail>";
             if ($existing) {
-                if (false === strpos($existing, $unsubscribeEmail)) {
+                if (!str_contains($existing, $unsubscribeEmail)) {
                     $updatedHeader = $unsubscribeEmail.', '.$existing;
                 } else {
                     $updatedHeader = $existing;

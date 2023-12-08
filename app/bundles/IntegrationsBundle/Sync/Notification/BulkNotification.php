@@ -11,29 +11,8 @@ use Mautic\UserBundle\Entity\User;
 
 class BulkNotification
 {
-    /**
-     * @var BulkNotificationInterface
-     */
-    private $bulkNotification;
-
-    /**
-     * @var UserNotificationBuilder
-     */
-    private $userNotificationBuilder;
-
-    /**
-     * @var EntityManagerInterface
-     */
-    private $entityManager;
-
-    public function __construct(
-        BulkNotificationInterface $bulkNotification,
-        UserNotificationBuilder $userNotificationBuilder,
-        EntityManagerInterface $entityManager
-    ) {
-        $this->bulkNotification        = $bulkNotification;
-        $this->userNotificationBuilder = $userNotificationBuilder;
-        $this->entityManager           = $entityManager;
+    public function __construct(private BulkNotificationInterface $bulkNotification, private UserNotificationBuilder $userNotificationBuilder, private EntityManagerInterface $entityManager)
+    {
     }
 
     public function addNotification(

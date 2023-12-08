@@ -11,11 +11,9 @@ use Mautic\LeadBundle\Segment\Decorator\FilterDecoratorInterface;
 final class LeadListFiltersDecoratorDelegateEvent extends CommonEvent
 {
     private ?FilterDecoratorInterface $decorator = null;
-    private ContactSegmentFilterCrate $crate;
 
-    public function __construct(ContactSegmentFilterCrate $crate)
+    public function __construct(private ContactSegmentFilterCrate $crate)
     {
-        $this->crate = $crate;
     }
 
     public function getDecorator(): ?FilterDecoratorInterface

@@ -12,26 +12,8 @@ use Symfony\Component\Routing\RouterInterface;
 
 class BuildJsSubscriber implements EventSubscriberInterface
 {
-    /**
-     * @var NotificationHelper
-     */
-    private $notificationHelper;
-
-    /**
-     * @var IntegrationHelper
-     */
-    private $integrationHelper;
-
-    /**
-     * @var RouterInterface
-     */
-    private $router;
-
-    public function __construct(NotificationHelper $notificationHelper, IntegrationHelper $integrationHelper, RouterInterface $router)
+    public function __construct(private NotificationHelper $notificationHelper, private IntegrationHelper $integrationHelper, private RouterInterface $router)
     {
-        $this->notificationHelper = $notificationHelper;
-        $this->integrationHelper  = $integrationHelper;
-        $this->router             = $router;
     }
 
     /**
@@ -44,7 +26,7 @@ class BuildJsSubscriber implements EventSubscriberInterface
         ];
     }
 
-    public function onBuildJs(BuildJsEvent $event)
+    public function onBuildJs(BuildJsEvent $event): void
     {
         $integration = $this->integrationHelper->getIntegrationObject('OneSignal');
 

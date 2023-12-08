@@ -4,6 +4,7 @@ namespace Mautic\CoreBundle\Configurator;
 
 use Mautic\CoreBundle\Configurator\Step\StepInterface;
 use Mautic\CoreBundle\Helper\PathsHelper;
+use Mautic\CoreBundle\Loader\ParameterLoader;
 use Symfony\Component\Process\Exception\RuntimeException;
 
 /**
@@ -13,10 +14,8 @@ class Configurator
 {
     /**
      * Configuration filename.
-     *
-     * @var string
      */
-    protected $filename;
+    protected string $filename;
 
     /**
      * Array containing the steps.
@@ -37,20 +36,18 @@ class Configurator
      *
      * @var array<string, mixed>
      */
-    protected $parameters;
+    protected array $parameters;
 
     public function __construct(PathsHelper $pathsHelper)
     {
-        $this->filename   = $pathsHelper->getSystemPath('local_config');
+        $this->filename   = ParameterLoader::getLocalConfigFile($pathsHelper->getSystemPath('root').'/app');
         $this->parameters = $this->read();
     }
 
     /**
      * Check if the configuration path is writable.
-     *
-     * @return bool
      */
-    public function isFileWritable()
+    public function isFileWritable(): bool
     {
         // If there's already a file, check it
         if (file_exists($this->filename)) {
@@ -138,10 +135,8 @@ class Configurator
 
     /**
      * Return the number of steps in the configurator.
-     *
-     * @return int
      */
-    public function getStepCount()
+    public function getStepCount(): int
     {
         return count($this->getSteps());
     }
@@ -194,10 +189,8 @@ class Configurator
 
     /**
      * Renders parameters as a string.
-     *
-     * @return string
      */
-    public function render()
+    public function render(): string
     {
         $string = "<?php\n";
         $string .= "\$parameters = array(\n";
@@ -224,10 +217,8 @@ class Configurator
     /**
      * @param array<mixed> $array
      * @param int          $level
-     *
-     * @return string
      */
-    protected function renderArray($array, $level = 1)
+    protected function renderArray($array, $level = 1): string
     {
         $string = "array(\n";
 
@@ -256,11 +247,9 @@ class Configurator
     /**
      * Writes parameters to file.
      *
-     * @return int
-     *
      * @throws \Symfony\Component\Process\Exception\RuntimeException
      */
-    public function write()
+    public function write(): int
     {
         if (!$this->isFileWritable()) {
             throw new RuntimeException('Cannot write the config file, the destination is unwritable.');

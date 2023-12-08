@@ -11,7 +11,7 @@ class TwitterMentionType extends TwitterAbstractType
     /**
      * {@inheritdoc}
      */
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder->add('handle', TextType::class, [
             'label'      => 'mautic.social.monitoring.twitter.handle',

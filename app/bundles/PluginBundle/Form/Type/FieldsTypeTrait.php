@@ -29,7 +29,7 @@ trait FieldsTypeTrait
     ) {
         $builder->addEventListener(
             FormEvents::PRE_SET_DATA,
-            function (FormEvent $event) use ($options, $integrationFields, $mauticFields, $fieldObject, $limit, $start) {
+            function (FormEvent $event) use ($options, $integrationFields, $mauticFields, $fieldObject, $limit, $start): void {
                 $form           = $event->getForm();
                 $index          = 0;
                 $choices        = [];
@@ -52,7 +52,7 @@ trait FieldsTypeTrait
                             if (!isset($choices[$details['group']])) {
                                 $choices[$details['group']] = [];
                             }
-                            $label           = (isset($details['optionLabel'])) ? $details['optionLabel'] : $details['label'];
+                            $label           = $details['optionLabel'] ?? $details['label'];
                             $group[$field]   = $groupName = $details['group'];
                             $choices[$field] = $label;
                         } else {
@@ -78,15 +78,15 @@ trait FieldsTypeTrait
                 ksort($requiredFields, SORT_NATURAL);
                 ksort($optionalFields, SORT_NATURAL);
 
-                $sortFieldsFunction = function ($a, $b) {
+                $sortFieldsFunction = function ($a, $b): int {
                     if (is_array($a)) {
-                        $aLabel = (isset($a['optionLabel'])) ? $a['optionLabel'] : $a['label'];
+                        $aLabel = $a['optionLabel'] ?? $a['label'];
                     } else {
                         $aLabel = $a;
                     }
 
                     if (is_array($b)) {
-                        $bLabel = (isset($b['optionLabel'])) ? $b['optionLabel'] : $b['label'];
+                        $bLabel = $b['optionLabel'] ?? $b['label'];
                     } else {
                         $bLabel = $b;
                     }
@@ -134,7 +134,7 @@ trait FieldsTypeTrait
                                 'class'         => 'form-control integration-fields',
                                 'data-required' => $required,
                                 'data-label'    => $choices[$field],
-                                'placeholder'   => isset($group[$field]) ? $group[$field] : '',
+                                'placeholder'   => $group[$field] ?? '',
                                 'readonly'      => true,
                             ],
                             'by_reference' => true,
@@ -237,25 +237,25 @@ trait FieldsTypeTrait
         $resolver->setDefaults(
             [
                 'special_instructions' => function (Options $options) {
-                    list($specialInstructions, $alertType) = $options['integration_object']->getFormNotes('leadfield_match');
+                    [$specialInstructions, $alertType] = $options['integration_object']->getFormNotes('leadfield_match');
 
                     return $specialInstructions;
                 },
                 'alert_type' => function (Options $options) {
-                    list($specialInstructions, $alertType) = $options['integration_object']->getFormNotes('leadfield_match');
+                    [$specialInstructions, $alertType] = $options['integration_object']->getFormNotes('leadfield_match');
 
                     return $alertType;
                 },
                 'allow_extra_fields'   => true,
                 'enable_data_priority' => false,
-                'totalFields'          => function (Options $options) {
+                'totalFields'          => function (Options $options): int {
                     return count($options['integration_fields']);
                 },
-                'fixedPageNum' => function (Options $options) {
+                'fixedPageNum' => function (Options $options): float {
                     return ceil($options['totalFields'] / $options['limit']);
                 },
                 'limit' => 10,
-                'start' => function (Options $options) {
+                'start' => function (Options $options): int {
                     return (1 === (int) $options['page']) ? 0 : ((int) $options['page'] - 1) * (int) $options['limit'];
                 },
             ]

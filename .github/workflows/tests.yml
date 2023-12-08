@@ -80,13 +80,12 @@ jobs:
         echo "MAUTIC_ENV=test" >> $GITHUB_ENV
 
     - name: Install dependencies
-      run: |
-        composer validate
-        composer install --prefer-dist --no-progress --no-suggest
-        rm -rf var/cache
+      # composer install cache - https://github.com/ramsey/composer-install
+      uses: "ramsey/composer-install@v2"
 
     - name: Run tests - database = ${{ matrix.db-types }}
       run: |
+        rm -rf var/cache
         export DB_PORT="${{ job.services.database.ports[3306] }}"
 
         if [[ "${{ matrix.php-versions }}" == "8.1" ]] && [[ "${{ matrix.db-types }}" == "mariadb" ]]; then
@@ -164,6 +163,15 @@ jobs:
           ${{ runner.os }}-phpstan-${{ hashFiles('**/composer.lock') }}
           ${{ runner.os }}-phpstan-
 
+    - name: NPM Cache
+      uses: actions/cache@v3
+      with:
+        path: ./var/cache/js
+        key: ${{ runner.os }}-js-${{ hashFiles('**/package-lock.json', 'webpack.config.js') }}-${{ github.run_id }}
+        restore-keys: |
+          ${{ runner.os }}-js-${{ hashFiles('**/package-lock.json', 'webpack.config.js') }}
+          ${{ runner.os }}-js-
+
     - name: Get changed files
       id: changed-files
       uses: tj-actions/changed-files@v35
@@ -177,6 +185,8 @@ jobs:
     - name: Install dependencies
       # composer install cache - https://github.com/ramsey/composer-install
       uses: "ramsey/composer-install@v2"
+      env:
+        NPM_CONFIG_CACHE: ./var/cache/js/npm
 
     - name: Run ${{ matrix.commands }}
       run: |
@@ -188,9 +198,7 @@ jobs:
         elif [[ "${{ matrix.commands }}" == "Rector" ]]; then
           export SYMFONY_ENV=test
           bin/console cache:warmup
-          composer rector
-          git reset --hard
-          composer rector -- --dry-run --no-progress-bar
+          bin/rector --dry-run --ansi
         elif [[ "${{ matrix.commands }}" == "Twig Lint" ]]; then
           bin/console lint:twig app plugins
         elif [[ "${{ matrix.commands }}" == "CS Fixer" ]]; then

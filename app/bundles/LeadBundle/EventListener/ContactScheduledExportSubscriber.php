@@ -11,11 +11,8 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class ContactScheduledExportSubscriber implements EventSubscriberInterface
 {
-    private ContactExportSchedulerModel $contactExportSchedulerModel;
-
-    public function __construct(ContactExportSchedulerModel $contactExportSchedulerModel)
+    public function __construct(private ContactExportSchedulerModel $contactExportSchedulerModel)
     {
-        $this->contactExportSchedulerModel = $contactExportSchedulerModel;
     }
 
     /**

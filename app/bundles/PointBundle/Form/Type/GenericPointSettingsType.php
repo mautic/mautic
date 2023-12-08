@@ -12,7 +12,7 @@ class GenericPointSettingsType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $default = (empty($options['data']['delta'])) ? 0 : (int) $options['data']['delta'];
         $builder->add(
@@ -31,7 +31,7 @@ class GenericPointSettingsType extends AbstractType
                     new NotEqualTo(
                         [
                             'value'   => '0',
-                            'message' => 'mautic.core.required.value',
+                            'message' => 'mautic.core.value.required',
                         ]
                     ),
                 ],

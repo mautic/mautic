@@ -38,37 +38,12 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
  */
 class CampaignModel extends CommonFormModel
 {
-    /**
-     * @var ListModel
-     */
-    protected $leadListModel;
-
-    /**
-     * @var FormModel
-     */
-    protected $formModel;
-
-    /**
-     * @var EventCollector
-     */
-    private $eventCollector;
-
-    /**
-     * @var MembershipBuilder
-     */
-    private $membershipBuilder;
-
-    /**
-     * @var ContactTracker
-     */
-    private $contactTracker;
-
     public function __construct(
-        ListModel $leadListModel,
-        FormModel $formModel,
-        EventCollector $eventCollector,
-        MembershipBuilder $membershipBuilder,
-        ContactTracker $contactTracker,
+        protected ListModel $leadListModel,
+        protected FormModel $formModel,
+        private EventCollector $eventCollector,
+        private MembershipBuilder $membershipBuilder,
+        private ContactTracker $contactTracker,
         EntityManager $em,
         CorePermissions $security,
         EventDispatcherInterface $dispatcher,
@@ -78,12 +53,6 @@ class CampaignModel extends CommonFormModel
         LoggerInterface $mauticLogger,
         CoreParametersHelper $coreParametersHelper
     ) {
-        $this->leadListModel     = $leadListModel;
-        $this->formModel         = $formModel;
-        $this->eventCollector    = $eventCollector;
-        $this->membershipBuilder = $membershipBuilder;
-        $this->contactTracker    = $contactTracker;
-
         parent::__construct($em, $security, $dispatcher, $router, $translator, $userHelper, $mauticLogger, $coreParametersHelper);
     }
 
@@ -126,10 +95,8 @@ class CampaignModel extends CommonFormModel
 
     /**
      * {@inheritdoc}
-     *
-     * @return string
      */
-    public function getPermissionBase()
+    public function getPermissionBase(): string
     {
         return 'campaign:campaigns';
     }
@@ -175,7 +142,7 @@ class CampaignModel extends CommonFormModel
     /**
      * @param object $entity
      */
-    public function deleteEntity($entity)
+    public function deleteEntity($entity): void
     {
         // Null all the event parents for this campaign to avoid database constraints
         $this->getEventRepository()->nullEventParents($entity->getId());
@@ -188,7 +155,7 @@ class CampaignModel extends CommonFormModel
      *
      * @throws \Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException
      */
-    protected function dispatchEvent($action, &$entity, $isNew = false, \Symfony\Contracts\EventDispatcher\Event $event = null)
+    protected function dispatchEvent($action, &$entity, $isNew = false, \Symfony\Contracts\EventDispatcher\Event $event = null): ?\Symfony\Contracts\EventDispatcher\Event
     {
         if ($entity instanceof \Mautic\CampaignBundle\Entity\Lead) {
             return null;
@@ -242,7 +209,7 @@ class CampaignModel extends CommonFormModel
             $event = !$isNew ? $existingEvents[$properties['id']] : new Event();
 
             foreach ($properties as $f => $v) {
-                if ('id' == $f && 0 === strpos($v, 'new')) {
+                if ('id' == $f && str_starts_with($v, 'new')) {
                     // set the temp ID used to be able to match up connections
                     $event->setTempId($v);
                 }
@@ -348,7 +315,7 @@ class CampaignModel extends CommonFormModel
 
         uasort(
             $events,
-            function ($a, $b) {
+            function ($a, $b): int {
                 $aOrder = $a->getOrder();
                 $bOrder = $b->getOrder();
                 if ($aOrder == $bOrder) {
@@ -394,7 +361,7 @@ class CampaignModel extends CommonFormModel
         }
 
         foreach ($settings['nodes'] as &$node) {
-            if (false !== strpos($node['id'], 'new')) {
+            if (str_contains($node['id'], 'new')) {
                 // Find the real one and update the node
                 $node['id'] = str_replace($node['id'], $tempIds[$node['id']], $node['id']);
             }
@@ -406,13 +373,13 @@ class CampaignModel extends CommonFormModel
 
         foreach ($settings['connections'] as &$connection) {
             // Check source
-            if (false !== strpos($connection['sourceId'], 'new')) {
+            if (str_contains($connection['sourceId'], 'new')) {
                 // Find the real one and update the node
                 $connection['sourceId'] = str_replace($connection['sourceId'], $tempIds[$connection['sourceId']], $connection['sourceId']);
             }
 
             // Check target
-            if (false !== strpos($connection['targetId'], 'new')) {
+            if (str_contains($connection['targetId'], 'new')) {
                 // Find the real one and update the node
                 $connection['targetId'] = str_replace($connection['targetId'], $tempIds[$connection['targetId']], $connection['targetId']);
             }
@@ -440,10 +407,8 @@ class CampaignModel extends CommonFormModel
 
     /**
      * Get list of sources for a campaign.
-     *
-     * @return array
      */
-    public function getLeadSources($campaign)
+    public function getLeadSources($campaign): array
     {
         $campaignId = ($campaign instanceof Campaign) ? $campaign->getId() : $campaign;
 
@@ -461,7 +426,7 @@ class CampaignModel extends CommonFormModel
     /**
      * Add and/or delete lead sources from a campaign.
      */
-    public function setLeadSources(Campaign $entity, $addedSources, $deletedSources)
+    public function setLeadSources(Campaign $entity, $addedSources, $deletedSources): void
     {
         foreach ($addedSources as $type => $sources) {
             foreach ($sources as $id => $label) {
@@ -499,10 +464,8 @@ class CampaignModel extends CommonFormModel
      *
      * @param string $sourceType
      * @param bool   $globalOnly
-     *
-     * @return array
      */
-    public function getSourceLists($sourceType = null, $globalOnly = false)
+    public function getSourceLists($sourceType = null, $globalOnly = false): array
     {
         $choices = [];
         switch ($sourceType) {
@@ -527,10 +490,8 @@ class CampaignModel extends CommonFormModel
 
                 $forms = $repo->getFormList('', 0, 0, $viewOther, 'campaign');
 
-                if ($forms) {
-                    foreach ($forms as $form) {
-                        $choices['forms'][$form['id']] = $form['name'];
-                    }
+                foreach ($forms as $form) {
+                    $choices['forms'][$form['id']] = $form['name'];
                 }
         }
 
@@ -556,7 +517,6 @@ class CampaignModel extends CommonFormModel
     /**
      * Gets the campaigns a specific lead is part of.
      *
-     * @param Lead $lead
      * @param bool $forList
      *
      * @return mixed
@@ -717,13 +677,11 @@ class CampaignModel extends CommonFormModel
             $rawEvents = $this->getEventRepository()->getCampaignEvents($filter['campaign_id']);
 
             // Group events by type
-            if ($rawEvents) {
-                foreach ($rawEvents as $event) {
-                    if (isset($events[$event['type']])) {
-                        $events[$event['type']][] = $event['id'];
-                    } else {
-                        $events[$event['type']] = [$event['id']];
-                    }
+            foreach ($rawEvents as $event) {
+                if (isset($events[$event['type']])) {
+                    $events[$event['type']][] = $event['id'];
+                } else {
+                    $events[$event['type']] = [$event['id']];
                 }
             }
 
@@ -788,9 +746,8 @@ class CampaignModel extends CommonFormModel
     }
 
     /**
-     * @param int             $limit
-     * @param bool            $maxLeads
-     * @param OutputInterface $output
+     * @param int  $limit
+     * @param bool $maxLeads
      *
      * @return int
      */
@@ -801,10 +758,7 @@ class CampaignModel extends CommonFormModel
         return $this->membershipBuilder->build($campaign, $contactLimiter, $maxLeads, $output);
     }
 
-    /**
-     * @return array
-     */
-    public function getCampaignIdsWithDependenciesOnSegment($segmentId)
+    public function getCampaignIdsWithDependenciesOnSegment($segmentId): array
     {
         $entities = $this->getRepository()->getEntities(
             [

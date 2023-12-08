@@ -9,36 +9,8 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class UserNotificationBuilder
 {
-    /**
-     * @var UserHelper
-     */
-    private $userHelper;
-
-    /**
-     * @var OwnerProvider
-     */
-    private $ownerProvider;
-
-    /**
-     * @var RouteHelper
-     */
-    private $routeHelper;
-
-    /**
-     * @var TranslatorInterface
-     */
-    private $translator;
-
-    public function __construct(
-        UserHelper $userHelper,
-        OwnerProvider $ownerProvider,
-        RouteHelper $routeHelper,
-        TranslatorInterface $translator
-    ) {
-        $this->userHelper    = $userHelper;
-        $this->ownerProvider = $ownerProvider;
-        $this->routeHelper   = $routeHelper;
-        $this->translator    = $translator;
+    public function __construct(private UserHelper $userHelper, private OwnerProvider $ownerProvider, private RouteHelper $routeHelper, private TranslatorInterface $translator)
+    {
     }
 
     /**

@@ -56,7 +56,7 @@ class KickoffContactFinderTest extends \PHPUnit\Framework\TestCase
 
         $this->leadRepository->expects($this->once())
             ->method('getContactCollection')
-            ->willReturn([]);
+            ->willReturn(new ArrayCollection([]));
 
         $this->expectException(NoContactsFoundException::class);
 

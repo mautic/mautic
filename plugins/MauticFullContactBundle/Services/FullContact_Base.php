@@ -36,7 +36,7 @@ class FullContact_Base
     /**
      * Slow down calls to the FullContact API if needed.
      */
-    private function _wait_for_rate_limit()
+    private function _wait_for_rate_limit(): void
     {
         $now = new \DateTime();
         if ($this->_next_req_time && $this->_next_req_time->getTimestamp() > $now->getTimestamp()) {
@@ -48,7 +48,7 @@ class FullContact_Base
     /**
      * @param string $hdr
      */
-    private function _update_rate_limit($hdr)
+    private function _update_rate_limit($hdr): void
     {
         $remaining            = (float) $hdr['X-Rate-Limit-Remaining'];
         $reset                = (float) $hdr['X-Rate-Limit-Reset'];
@@ -108,7 +108,7 @@ class FullContact_Base
     protected function _execute($params = [], $postData = null)
     {
         if (null === $postData && !in_array($params['method'], $this->_supportedMethods, true)) {
-            throw new NotImplementedException(__CLASS__.' does not support the ['.$params['method'].'] method');
+            throw new NotImplementedException(self::class.' does not support the ['.$params['method'].'] method');
         }
 
         if (array_key_exists('method', $params)) {
@@ -149,7 +149,7 @@ class FullContact_Base
         // execute request
         $resp = curl_exec($connection);
 
-        list($response_headers, $this->response_json) = explode("\r\n\r\n", $resp, 2);
+        [$response_headers, $this->response_json] = explode("\r\n\r\n", $resp, 2);
         // $response_headers now has a string of the HTTP headers
         // $response_json is the body of the HTTP response
 
@@ -159,7 +159,7 @@ class FullContact_Base
             if (0 === $i) {
                 $headers['http_code'] = $line;
             } else {
-                list($key, $value) = explode(': ', $line);
+                [$key, $value]     = explode(': ', $line);
                 $headers[$key]     = $value;
             }
         }

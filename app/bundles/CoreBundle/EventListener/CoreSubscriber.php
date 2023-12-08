@@ -29,78 +29,8 @@ use Symfony\Component\Security\Http\SecurityEvents;
 
 class CoreSubscriber implements EventSubscriberInterface
 {
-    /**
-     * @var BundleHelper
-     */
-    private $bundleHelper;
-
-    /**
-     * @var MenuHelper
-     */
-    private $menuHelper;
-
-    /**
-     * @var UserHelper
-     */
-    private $userHelper;
-
-    /**
-     * @var AssetsHelper
-     */
-    private $assetsHelper;
-
-    /**
-     * @var AuthorizationCheckerInterface
-     */
-    private $securityContext;
-
-    /**
-     * @var UserModel
-     */
-    private $userModel;
-
-    /**
-     * @var CoreParametersHelper
-     */
-    private $coreParametersHelper;
-
-    /**
-     * @var EventDispatcherInterface
-     */
-    private $dispatcher;
-
-    /**
-     * @var RequestStack
-     */
-    private $requestStack;
-
-    /**
-     * @var FormRepository
-     */
-    private $formRepository;
-
-    public function __construct(
-        BundleHelper $bundleHelper,
-        MenuHelper $menuHelper,
-        UserHelper $userHelper,
-        AssetsHelper $assetsHelper,
-        CoreParametersHelper $coreParametersHelper,
-        AuthorizationCheckerInterface $securityContext,
-        UserModel $userModel,
-        EventDispatcherInterface $dispatcher,
-        RequestStack $requestStack,
-        FormRepository $formRepository,
-    ) {
-        $this->bundleHelper         = $bundleHelper;
-        $this->menuHelper           = $menuHelper;
-        $this->userHelper           = $userHelper;
-        $this->assetsHelper         = $assetsHelper;
-        $this->securityContext      = $securityContext;
-        $this->userModel            = $userModel;
-        $this->coreParametersHelper = $coreParametersHelper;
-        $this->dispatcher           = $dispatcher;
-        $this->requestStack         = $requestStack;
-        $this->formRepository       = $formRepository;
+    public function __construct(private BundleHelper $bundleHelper, private MenuHelper $menuHelper, private UserHelper $userHelper, private AssetsHelper $assetsHelper, private CoreParametersHelper $coreParametersHelper, private AuthorizationCheckerInterface $securityContext, private UserModel $userModel, private EventDispatcherInterface $dispatcher, private RequestStack $requestStack, private FormRepository $formRepository)
+    {
     }
 
     /**
@@ -122,7 +52,7 @@ class CoreSubscriber implements EventSubscriberInterface
     /**
      * Add mauticForms in js script tag for Froala.
      */
-    public function onKernelRequestAddGlobalJS(ControllerEvent $event)
+    public function onKernelRequestAddGlobalJS(ControllerEvent $event): void
     {
         if (defined('MAUTIC_INSTALLER') || $this->userHelper->getUser()->isGuest() || !$event->isMainRequest()) {
             return;
@@ -137,7 +67,7 @@ class CoreSubscriber implements EventSubscriberInterface
     /**
      * Set vars on login.
      */
-    public function onSecurityInteractiveLogin(InteractiveLoginEvent $event)
+    public function onSecurityInteractiveLogin(InteractiveLoginEvent $event): void
     {
         if (defined('MAUTIC_INSTALLER')) {
             return;
@@ -181,7 +111,7 @@ class CoreSubscriber implements EventSubscriberInterface
         }
     }
 
-    public function onBuildMenu(MenuEvent $event)
+    public function onBuildMenu(MenuEvent $event): void
     {
         $name    = $event->getType();
         $bundles = $this->bundleHelper->getMauticBundles(true);
@@ -294,7 +224,7 @@ class CoreSubscriber implements EventSubscriberInterface
         }
     }
 
-    public function onFetchIcons(IconEvent $event)
+    public function onFetchIcons(IconEvent $event): void
     {
         $session = $this->requestStack->getCurrentRequest()->getSession();
         $icons   = $session->get('mautic.menu.icons', []);
@@ -332,7 +262,7 @@ class CoreSubscriber implements EventSubscriberInterface
         }
     }
 
-    private function addRouteToCollection(RouteCollection $collection, $type, $name, $details)
+    private function addRouteToCollection(RouteCollection $collection, $type, $name, $details): void
     {
         // Set defaults and controller
         $defaults = (!empty($details['defaults'])) ? $details['defaults'] : [];
@@ -354,7 +284,7 @@ class CoreSubscriber implements EventSubscriberInterface
         $requirements = (!empty($details['requirements'])) ? $details['requirements'] : [];
 
         // Set some very commonly used defaults and requirements
-        if (false !== strpos($details['path'], '{page}')) {
+        if (str_contains($details['path'], '{page}')) {
             if (!isset($defaults['page'])) {
                 $defaults['page'] = 0;
             }
@@ -362,7 +292,7 @@ class CoreSubscriber implements EventSubscriberInterface
                 $requirements['page'] = '\d+';
             }
         }
-        if (false !== strpos($details['path'], '{objectId}')) {
+        if (str_contains($details['path'], '{objectId}')) {
             if (!isset($defaults['objectId'])) {
                 // Set default to 0 for the "new" actions
                 $defaults['objectId'] = 0;
@@ -373,7 +303,7 @@ class CoreSubscriber implements EventSubscriberInterface
             }
         }
         if ('api' == $type) {
-            if (false !== strpos($details['path'], '{id}')) {
+            if (str_contains($details['path'], '{id}')) {
                 if (!isset($requirements['page'])) {
                     $requirements['id'] = '\d+';
                 }

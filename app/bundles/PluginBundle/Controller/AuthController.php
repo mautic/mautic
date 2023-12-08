@@ -9,9 +9,6 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 
-/**
- * Class AuthController.
- */
 class AuthController extends FormController
 {
     /**
@@ -101,10 +98,7 @@ class AuthController extends FormController
         return $this->render($postAuthTemplate, ['message' => $message, 'alert' => $alert, 'data' => $userData]);
     }
 
-    /**
-     * @return RedirectResponse
-     */
-    public function authUserAction($integration)
+    public function authUserAction($integration): RedirectResponse
     {
         /** @var \Mautic\PluginBundle\Helper\IntegrationHelper $integrationHelper */
         $integrationHelper = $this->factory->getHelper('integration');

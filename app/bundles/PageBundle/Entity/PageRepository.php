@@ -131,9 +131,9 @@ class PageRepository extends CommonRepository
     /**
      * {@inheritdoc}
      */
-    protected function addSearchCommandWhereClause($q, $filter)
+    protected function addSearchCommandWhereClause($q, $filter): array
     {
-        list($expr, $parameters) = $this->addStandardSearchCommandWhereClause($q, $filter);
+        [$expr, $parameters] = $this->addStandardSearchCommandWhereClause($q, $filter);
         if ($expr) {
             return [$expr, $parameters];
         }
@@ -199,7 +199,7 @@ class PageRepository extends CommonRepository
     /**
      * {@inheritdoc}
      */
-    protected function getDefaultOrder()
+    protected function getDefaultOrder(): array
     {
         return [
             ['p.title', 'ASC'],
@@ -209,7 +209,7 @@ class PageRepository extends CommonRepository
     /**
      * {@inheritdoc}
      */
-    public function getTableAlias()
+    public function getTableAlias(): string
     {
         return 'p';
     }
@@ -217,7 +217,7 @@ class PageRepository extends CommonRepository
     /**
      * Resets variant_start_date and variant_hits.
      */
-    public function resetVariants($relatedIds, $date)
+    public function resetVariants($relatedIds, $date): void
     {
         if (!is_array($relatedIds)) {
             $relatedIds = [(int) $relatedIds];
@@ -241,7 +241,7 @@ class PageRepository extends CommonRepository
      * @param bool|false $unique
      * @param bool|false $variant
      */
-    public function upHitCount($id, $increaseBy = 1, $unique = false, $variant = false)
+    public function upHitCount($id, $increaseBy = 1, $unique = false, $variant = false): void
     {
         $q = $this->getEntityManager()->getConnection()->createQueryBuilder();
 

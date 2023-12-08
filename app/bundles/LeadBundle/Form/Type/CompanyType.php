@@ -21,32 +21,14 @@ class CompanyType extends AbstractType
 {
     use EntityFieldsBuildFormTrait;
 
-    /**
-     * @var EntityManager
-     */
-    private $em;
-
-    /**
-     * @var RouterInterface
-     */
-    protected $router;
-
-    /**
-     * @var TranslatorInterface
-     */
-    protected $translator;
-
-    public function __construct(EntityManager $entityManager, RouterInterface $router, TranslatorInterface $translator)
+    public function __construct(private EntityManager $em, protected RouterInterface $router, protected TranslatorInterface $translator)
     {
-        $this->em         = $entityManager;
-        $this->router     = $router;
-        $this->translator = $translator;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $cleaningRules                 = $this->getFormFields($builder, $options, 'company');
         $cleaningRules['companyemail'] = 'email';
@@ -138,7 +120,7 @@ class CompanyType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function configureOptions(OptionsResolver $resolver)
+    public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults(
             [

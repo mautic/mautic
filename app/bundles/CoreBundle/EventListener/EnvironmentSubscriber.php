@@ -9,11 +9,8 @@ use Symfony\Component\HttpKernel\KernelEvents;
 
 class EnvironmentSubscriber implements EventSubscriberInterface
 {
-    private CoreParametersHelper $coreParametersHelper;
-
-    public function __construct(CoreParametersHelper $coreParametersHelper)
+    public function __construct(private CoreParametersHelper $coreParametersHelper)
     {
-        $this->coreParametersHelper = $coreParametersHelper;
     }
 
     /**
@@ -32,10 +29,7 @@ class EnvironmentSubscriber implements EventSubscriberInterface
         ];
     }
 
-    /**
-     * Set timezone.
-     */
-    public function onKernelRequestSetTimezone(RequestEvent $event)
+    public function onKernelRequestSetTimezone(RequestEvent $event): void
     {
         $request = $event->getRequest();
         if (!$request->hasPreviousSession()) {

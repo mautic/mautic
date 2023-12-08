@@ -28,78 +28,8 @@ class DynamicContentSubscriber implements EventSubscriberInterface
 {
     use MatchFilterForLeadTrait;
 
-    /**
-     * @var TrackableModel
-     */
-    private $trackableModel;
-
-    /**
-     * @var PageTokenHelper
-     */
-    private $pageTokenHelper;
-
-    /**
-     * @var AssetTokenHelper
-     */
-    private $assetTokenHelper;
-
-    /**
-     * @var FormTokenHelper
-     */
-    private $formTokenHelper;
-
-    /**
-     * @var FocusTokenHelper
-     */
-    private $focusTokenHelper;
-
-    /**
-     * @var AuditLogModel
-     */
-    private $auditLogModel;
-
-    /**
-     * @var DynamicContentHelper
-     */
-    private $dynamicContentHelper;
-
-    /**
-     * @var DynamicContentModel
-     */
-    private $dynamicContentModel;
-
-    /**
-     * @var CorePermissions
-     */
-    private $security;
-
-    /**
-     * @var ContactTracker
-     */
-    private $contactTracker;
-
-    public function __construct(
-        TrackableModel $trackableModel,
-        PageTokenHelper $pageTokenHelper,
-        AssetTokenHelper $assetTokenHelper,
-        FormTokenHelper $formTokenHelper,
-        FocusTokenHelper $focusTokenHelper,
-        AuditLogModel $auditLogModel,
-        DynamicContentHelper $dynamicContentHelper,
-        DynamicContentModel $dynamicContentModel,
-        CorePermissions $security,
-        ContactTracker $contactTracker
-    ) {
-        $this->trackableModel       = $trackableModel;
-        $this->pageTokenHelper      = $pageTokenHelper;
-        $this->assetTokenHelper     = $assetTokenHelper;
-        $this->formTokenHelper      = $formTokenHelper;
-        $this->focusTokenHelper     = $focusTokenHelper;
-        $this->auditLogModel        = $auditLogModel;
-        $this->dynamicContentHelper = $dynamicContentHelper;
-        $this->dynamicContentModel  = $dynamicContentModel;
-        $this->security             = $security;
-        $this->contactTracker       = $contactTracker;
+    public function __construct(private TrackableModel $trackableModel, private PageTokenHelper $pageTokenHelper, private AssetTokenHelper $assetTokenHelper, private FormTokenHelper $formTokenHelper, private FocusTokenHelper $focusTokenHelper, private AuditLogModel $auditLogModel, private DynamicContentHelper $dynamicContentHelper, private DynamicContentModel $dynamicContentModel, private CorePermissions $security, private ContactTracker $contactTracker)
+    {
     }
 
     /**
@@ -118,7 +48,7 @@ class DynamicContentSubscriber implements EventSubscriberInterface
     /**
      * Add an entry to the audit log.
      */
-    public function onPostSave(Events\DynamicContentEvent $event)
+    public function onPostSave(Events\DynamicContentEvent $event): void
     {
         $entity = $event->getDynamicContent();
         if ($details = $event->getChanges()) {
@@ -136,7 +66,7 @@ class DynamicContentSubscriber implements EventSubscriberInterface
     /**
      * Add a delete entry to the audit log.
      */
-    public function onDelete(Events\DynamicContentEvent $event)
+    public function onDelete(Events\DynamicContentEvent $event): void
     {
         $entity = $event->getDynamicContent();
         $log    = [
@@ -149,7 +79,7 @@ class DynamicContentSubscriber implements EventSubscriberInterface
         $this->auditLogModel->writeToLog($log);
     }
 
-    public function onTokenReplacement(MauticEvents\TokenReplacementEvent $event)
+    public function onTokenReplacement(MauticEvents\TokenReplacementEvent $event): void
     {
         /** @var Lead $lead */
         $lead         = $event->getLead();
@@ -165,7 +95,7 @@ class DynamicContentSubscriber implements EventSubscriberInterface
                 $this->focusTokenHelper->findFocusTokens($content)
             );
 
-            list($content, $trackables) = $this->trackableModel->parseContentForTrackables(
+            [$content, $trackables] = $this->trackableModel->parseContentForTrackables(
                 $content,
                 $tokens,
                 'dynamicContent',
@@ -179,7 +109,7 @@ class DynamicContentSubscriber implements EventSubscriberInterface
             }
 
             /**
-             * @var string
+             * @var string    $token
              * @var Trackable $trackable
              */
             foreach ($trackables as $token => $trackable) {
@@ -192,7 +122,7 @@ class DynamicContentSubscriber implements EventSubscriberInterface
         }
     }
 
-    public function decodeTokens(PageDisplayEvent $event)
+    public function decodeTokens(PageDisplayEvent $event): void
     {
         $lead = $this->security->isAnonymous() ? $this->contactTracker->getContact() : null;
         if (!$lead) {

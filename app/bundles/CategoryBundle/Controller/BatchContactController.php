@@ -21,37 +21,22 @@ use Symfony\Component\HttpFoundation\RequestStack;
 
 class BatchContactController extends AbstractFormController
 {
-    /**
-     * @var ContactActionModel
-     */
-    private $actionModel;
-
-    /**
-     * @var CategoryModel
-     */
-    private $categoryModel;
-
-    public function __construct(ContactActionModel $actionModel, CategoryModel $categoryModel, ManagerRegistry $doctrine, MauticFactory $factory, ModelFactory $modelFactory, UserHelper $userHelper, CoreParametersHelper $coreParametersHelper, EventDispatcherInterface $dispatcher, Translator $translator, FlashBag $flashBag, RequestStack $requestStack, CorePermissions $security)
+    public function __construct(private ContactActionModel $actionModel, private CategoryModel $categoryModel, ManagerRegistry $doctrine, MauticFactory $factory, ModelFactory $modelFactory, UserHelper $userHelper, CoreParametersHelper $coreParametersHelper, EventDispatcherInterface $dispatcher, Translator $translator, FlashBag $flashBag, RequestStack $requestStack, CorePermissions $security)
     {
-        $this->actionModel   = $actionModel;
-        $this->categoryModel = $categoryModel;
-
         parent::__construct($doctrine, $factory, $modelFactory, $userHelper, $coreParametersHelper, $dispatcher, $translator, $flashBag, $requestStack, $security);
     }
 
     /**
      * Adds or removes categories to multiple contacts defined by contact ID.
-     *
-     * @return JsonResponse
      */
-    public function execAction(Request $request)
+    public function execAction(Request $request): JsonResponse
     {
         $params = $request->get('lead_batch');
         $ids    = empty($params['ids']) ? [] : json_decode($params['ids']);
 
         if ($ids && is_array($ids)) {
-            $categoriesToAdd    = isset($params['add']) ? $params['add'] : [];
-            $categoriesToRemove = isset($params['remove']) ? $params['remove'] : [];
+            $categoriesToAdd    = $params['add'] ?? [];
+            $categoriesToRemove = $params['remove'] ?? [];
             $contactIds         = json_decode($params['ids']);
 
             $this->actionModel->addContactsToCategories($contactIds, $categoriesToAdd);
