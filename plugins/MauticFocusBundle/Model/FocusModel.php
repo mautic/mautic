@@ -14,6 +14,7 @@ use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Model\FormModel;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\CoreBundle\Translation\Translator;
+use Mautic\FormBundle\Entity\Submission;
 use Mautic\FormBundle\ProgressiveProfiling\DisplayManager;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Model\FieldModel;
@@ -322,9 +323,9 @@ class FocusModel extends FormModel
     /**
      * Add a stat entry.
      *
-     * @param mixed                                         $type
-     * @param mixed                                         $data
-     * @param array<int|string|array<int|string>>|Lead|null $lead
+     * @param mixed                                                    $type
+     * @param mixed                                                    $data
+     * @param array<int|string|array<int|string>>|Lead|Submission|null $lead
      */
     public function addStat(Focus $focus, $type, $data = null, $lead = null): ?Stat
     {
@@ -347,7 +348,7 @@ class FocusModel extends FormModel
         switch ($type) {
             case Stat::TYPE_FORM:
             case Stat::TYPE_CLICK:
-                /** @var \Mautic\PageBundle\Entity\Hit $data */
+                /** @var \Mautic\PageBundle\Entity\Hit|Submission $data */
                 $typeId = $data->getId();
                 break;
             case Stat::TYPE_NOTIFICATION:
