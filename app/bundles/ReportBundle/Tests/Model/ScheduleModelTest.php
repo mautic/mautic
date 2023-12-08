@@ -53,7 +53,7 @@ class ScheduleModelTest extends \PHPUnit\Framework\TestCase
         $this->scheduleModel = new ScheduleModel($this->entityManager, $this->schedulerPlanner);
     }
 
-    public function testGetScheduledReportsForExport()
+    public function testGetScheduledReportsForExport(): void
     {
         $this->schedulerRepository->expects($this->once())
             ->method('getScheduledReportsForExport')
@@ -62,7 +62,7 @@ class ScheduleModelTest extends \PHPUnit\Framework\TestCase
         $this->scheduleModel->getScheduledReportsForExport($this->exportOption);
     }
 
-    public function testReportWasScheduled()
+    public function testReportWasScheduled(): void
     {
         $report = new Report();
 
@@ -73,7 +73,7 @@ class ScheduleModelTest extends \PHPUnit\Framework\TestCase
         $this->scheduleModel->reportWasScheduled($report);
     }
 
-    public function testTurnOffScheduler()
+    public function testTurnOffScheduler(): void
     {
         $report = new Report();
 

@@ -27,7 +27,7 @@ class PointSubscriberTest extends \PHPUnit\Framework\TestCase
         $this->subscriber = new PointSubscriber($this->leadModel);
     }
 
-    public function testOnPointTriggerExecutedIfNotChangeTagsTyoe()
+    public function testOnPointTriggerExecutedIfNotChangeTagsTyoe(): void
     {
         $triggerEvent = new TriggerEvent();
         $contact      = new Lead();
@@ -39,7 +39,7 @@ class PointSubscriberTest extends \PHPUnit\Framework\TestCase
         $this->subscriber->onTriggerExecute(new TriggerExecutedEvent($triggerEvent, $contact));
     }
 
-    public function testOnPointTriggerExecutedForChangeTagsTyoe()
+    public function testOnPointTriggerExecutedForChangeTagsTyoe(): void
     {
         $triggerEvent = new TriggerEvent();
         $contact      = new Lead();

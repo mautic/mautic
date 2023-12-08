@@ -20,7 +20,7 @@ class EmailSendEventTest extends \PHPUnit\Framework\TestCase
     /**
      * Firstly set HTML content, then set empty plain content. Plain text should be generated.
      */
-    public function testSetPlainTextWhenNeedGeneratedPlainText()
+    public function testSetPlainTextWhenNeedGeneratedPlainText(): void
     {
         $this->emailSendEvent->setContent('<h1>HTML content</h1>');
         $this->emailSendEvent->setPlainText('');
@@ -30,7 +30,7 @@ class EmailSendEventTest extends \PHPUnit\Framework\TestCase
     /**
      * Firstly set HTML content, then set plain content. Plain text should not be generated.
      */
-    public function testSetPlainTextWhenNotNeedGeneratedPlainText()
+    public function testSetPlainTextWhenNotNeedGeneratedPlainText(): void
     {
         $this->emailSendEvent->setContent('<h1>HTML content</h1>');
         $this->emailSendEvent->setPlainText('plain content');
@@ -40,7 +40,7 @@ class EmailSendEventTest extends \PHPUnit\Framework\TestCase
     /**
      * Firstly set empty plain content, then set HTML content. Plain text should be generated.
      */
-    public function testSetContentWhenNeedGeneratedPlainText()
+    public function testSetContentWhenNeedGeneratedPlainText(): void
     {
         $this->emailSendEvent->setPlainText('');
         $this->emailSendEvent->setContent('<h1>HTML content</h1>');
@@ -50,7 +50,7 @@ class EmailSendEventTest extends \PHPUnit\Framework\TestCase
     /**
      * Firstly set plain content, then set HTML content. Plain text should not be generated.
      */
-    public function testSetContentWhenNotNeedGeneratedPlainText()
+    public function testSetContentWhenNotNeedGeneratedPlainText(): void
     {
         $this->emailSendEvent->setPlainText('plain content');
         $this->emailSendEvent->setContent('<h1>HTML content</h1>');

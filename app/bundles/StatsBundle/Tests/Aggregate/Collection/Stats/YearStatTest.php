@@ -19,7 +19,7 @@ class YearStatTest extends TestCase
         $this->monthStat = $this->yearStat->getMonth($this->month);
     }
 
-    public function testGetMonth()
+    public function testGetMonth(): void
     {
         $this->assertInstanceOf(MonthStat::class, $this->monthStat);
         $month = $this->yearStat->getMonth($this->month);
@@ -32,13 +32,13 @@ class YearStatTest extends TestCase
         $this->assertSame(2, $this->yearStat->getCount());
     }
 
-    public function testGetStats()
+    public function testGetStats(): void
     {
         $result = $this->yearStat->getStats();
         $this->assertSame(["$this->year-$this->month" => $this->monthStat], $result);
     }
 
-    public function testGetSum()
+    public function testGetSum(): void
     {
         $this->yearStat  = new YearStat($this->year);
         $this->yearStat->getMonth($this->month);
@@ -49,7 +49,7 @@ class YearStatTest extends TestCase
         $this->assertSame(2, $this->yearStat->getCount());
     }
 
-    public function testGetCount()
+    public function testGetCount(): void
     {
         $this->yearStat  = new YearStat($this->year);
         $this->yearStat->getMonth($this->month);

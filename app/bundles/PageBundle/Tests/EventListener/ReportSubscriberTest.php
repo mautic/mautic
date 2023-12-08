@@ -87,7 +87,7 @@ class ReportSubscriberTest extends TestCase
 
         $mockEvent->expects($this->exactly(3))
             ->method('addTable')
-            ->willReturnCallback(function () use (&$setTables) {
+            ->willReturnCallback(function () use (&$setTables): void {
                 $args = func_get_args();
 
                 $setTables[] = $args;
@@ -95,7 +95,7 @@ class ReportSubscriberTest extends TestCase
 
         $mockEvent->expects($this->exactly(9))
             ->method('addGraph')
-            ->willReturnCallback(function () use (&$setGraphs) {
+            ->willReturnCallback(function () use (&$setGraphs): void {
                 $args = func_get_args();
 
                 $setGraphs[] = $args;

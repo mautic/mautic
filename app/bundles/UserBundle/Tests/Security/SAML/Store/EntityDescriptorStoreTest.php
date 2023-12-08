@@ -19,7 +19,7 @@ class EntityDescriptorStoreTest extends TestCase
         $this->coreParametersHelper = $this->createMock(CoreParametersHelper::class);
     }
 
-    public function testNullIsReturnedIfEntityIdDoesNotMatch()
+    public function testNullIsReturnedIfEntityIdDoesNotMatch(): void
     {
         $store = new EntityDescriptorStore($this->coreParametersHelper);
 
@@ -34,7 +34,7 @@ class EntityDescriptorStoreTest extends TestCase
         $this->assertNull($descriptor);
     }
 
-    public function testHasReturnsFalseIfSamlIsDisabled()
+    public function testHasReturnsFalseIfSamlIsDisabled(): void
     {
         $store = new EntityDescriptorStore($this->coreParametersHelper);
 
@@ -45,7 +45,7 @@ class EntityDescriptorStoreTest extends TestCase
         $this->assertFalse($store->has('foobar'));
     }
 
-    public function testHasReturnsFalseIfEntityIdDoesNotMatch()
+    public function testHasReturnsFalseIfEntityIdDoesNotMatch(): void
     {
         $store = new EntityDescriptorStore($this->coreParametersHelper);
 

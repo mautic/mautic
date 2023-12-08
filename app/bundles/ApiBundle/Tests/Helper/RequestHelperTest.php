@@ -19,28 +19,28 @@ class RequestHelperTest extends TestCase
         $this->request = $this->createMock(Request::class);
     }
 
-    public function testIsBasicAuthWithValidBasicAuth()
+    public function testIsBasicAuthWithValidBasicAuth(): void
     {
         $this->request->headers = new HeaderBag(['Authorization' => 'Basic dXNlcm5hbWU6cGFzc3dvcmQ=']);
 
         $this->assertTrue(RequestHelper::hasBasicAuth($this->request));
     }
 
-    public function testIsBasicAuthWithInvalidBasicAuth()
+    public function testIsBasicAuthWithInvalidBasicAuth(): void
     {
         $this->request->headers = new HeaderBag(['Authorization' => 'Invalid Basic Auth value']);
 
         $this->assertFalse(RequestHelper::hasBasicAuth($this->request));
     }
 
-    public function testIsBasicAuthWithMissingBasicAuth()
+    public function testIsBasicAuthWithMissingBasicAuth(): void
     {
         $this->request->headers = new HeaderBag([]);
 
         $this->assertFalse(RequestHelper::hasBasicAuth($this->request));
     }
 
-    public function testIsApiRequestWithOauthUrl()
+    public function testIsApiRequestWithOauthUrl(): void
     {
         $this->request->expects($this->once())
             ->method('getRequestUri')
@@ -49,7 +49,7 @@ class RequestHelperTest extends TestCase
         $this->assertTrue(RequestHelper::isApiRequest($this->request));
     }
 
-    public function testIsApiRequestWithApiUrl()
+    public function testIsApiRequestWithApiUrl(): void
     {
         $this->request->expects($this->once())
             ->method('getRequestUri')
@@ -58,7 +58,7 @@ class RequestHelperTest extends TestCase
         $this->assertTrue(RequestHelper::isApiRequest($this->request));
     }
 
-    public function testIsNotApiRequest()
+    public function testIsNotApiRequest(): void
     {
         $this->request->expects($this->once())
             ->method('getRequestUri')

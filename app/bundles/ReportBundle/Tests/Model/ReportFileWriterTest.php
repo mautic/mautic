@@ -14,7 +14,7 @@ use Mautic\ReportBundle\Tests\Fixtures;
 
 class ReportFileWriterTest extends \PHPUnit\Framework\TestCase
 {
-    public function testWriteReportData()
+    public function testWriteReportData(): void
     {
         $csvExporter = $this->getMockBuilder(CsvExporter::class)
             ->disableOriginalConstructor()
@@ -60,7 +60,7 @@ class ReportFileWriterTest extends \PHPUnit\Framework\TestCase
         $reportFileWriter->writeReportData($scheduler, $reportDataResult, $reportExportOptions);
     }
 
-    public function testClear()
+    public function testClear(): void
     {
         $csvExporter = $this->getMockBuilder(CsvExporter::class)
             ->disableOriginalConstructor()
@@ -83,7 +83,7 @@ class ReportFileWriterTest extends \PHPUnit\Framework\TestCase
         $reportFileWriter->clear($scheduler);
     }
 
-    public function testGetFilePath()
+    public function testGetFilePath(): void
     {
         $csvExporter = $this->getMockBuilder(CsvExporter::class)
             ->disableOriginalConstructor()

@@ -509,7 +509,7 @@ class PublicControllerTest extends MauticMysqlTestCase
      *
      * @throws \Exception
      */
-    public function testMtcTrackingEvent()
+    public function testMtcTrackingEvent(): void
     {
         $request = new Request(
             [
@@ -607,13 +607,13 @@ class PublicControllerTest extends MauticMysqlTestCase
         );
     }
 
-    public function testTrackingActionWithInvalidCt()
+    public function testTrackingActionWithInvalidCt(): void
     {
         $request = new Request();
 
         $pageModel    = $this->createMock(PageModel::class);
         $pageModel->expects($this->once())->method('hitPage')->willReturnCallback(
-            function () {
+            function (): void {
                 throw new InvalidDecodedStringException();
             }
         );
@@ -667,7 +667,7 @@ class PublicControllerTest extends MauticMysqlTestCase
         );
     }
 
-    public function testTrackingImageAction()
+    public function testTrackingImageAction(): void
     {
         $this->client->request('GET', '/mtracking.gif?url=http%3A%2F%2Fmautic.org');
 

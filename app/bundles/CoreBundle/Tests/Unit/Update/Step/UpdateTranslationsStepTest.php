@@ -41,7 +41,7 @@ class UpdateTranslationsStepTest extends AbstractStepTest
         $this->step = new UpdateTranslationsStep($this->translator, $this->languageHelper, $this->logger);
     }
 
-    public function testLanguageUnpackingSkippedIfJustOneLanguageIsEnabled()
+    public function testLanguageUnpackingSkippedIfJustOneLanguageIsEnabled(): void
     {
         $this->languageHelper->expects($this->once())
             ->method('getSupportedLanguages')
@@ -53,7 +53,7 @@ class UpdateTranslationsStepTest extends AbstractStepTest
         $this->step->execute($this->progressBar, $this->input, $this->output);
     }
 
-    public function testFetchingLanguagesLogError()
+    public function testFetchingLanguagesLogError(): void
     {
         $this->languageHelper->expects($this->once())
             ->method('getSupportedLanguages')
@@ -79,7 +79,7 @@ class UpdateTranslationsStepTest extends AbstractStepTest
         $this->step->execute($this->progressBar, $this->input, $this->output);
     }
 
-    public function testUsPackageSkipped()
+    public function testUsPackageSkipped(): void
     {
         $this->languageHelper->expects($this->once())
             ->method('getSupportedLanguages')
@@ -106,7 +106,7 @@ class UpdateTranslationsStepTest extends AbstractStepTest
         $this->step->execute($this->progressBar, $this->input, $this->output);
     }
 
-    public function testExtractionErrorIsLogged()
+    public function testExtractionErrorIsLogged(): void
     {
         $this->languageHelper->expects($this->once())
             ->method('getSupportedLanguages')

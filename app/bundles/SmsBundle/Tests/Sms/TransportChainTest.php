@@ -57,7 +57,7 @@ class TransportChainTest extends MauticMysqlTestCase
             ->will($this->returnValue('lol'));
     }
 
-    public function testAddTransport()
+    public function testAddTransport(): void
     {
         $count = count($this->transportChain->getTransports());
 
@@ -66,7 +66,7 @@ class TransportChainTest extends MauticMysqlTestCase
         $this->assertCount($count + 1, $this->transportChain->getTransports());
     }
 
-    public function testSendSms()
+    public function testSendSms(): void
     {
         $this->testAddTransport();
 

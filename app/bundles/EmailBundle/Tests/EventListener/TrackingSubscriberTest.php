@@ -21,7 +21,7 @@ class TrackingSubscriberTest extends \PHPUnit\Framework\TestCase
         $this->statRepository = $this->createMock(StatRepository::class);
     }
 
-    public function testIdentifyContactByStat()
+    public function testIdentifyContactByStat(): void
     {
         $ct = [
                 'lead'    => 2,
@@ -55,7 +55,7 @@ class TrackingSubscriberTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($lead->getId(), $event->getIdentifiedContact()->getId());
     }
 
-    public function testChannelMismatchDoesNotIdentify()
+    public function testChannelMismatchDoesNotIdentify(): void
     {
         $ct = [
             'lead'    => 2,
@@ -72,7 +72,7 @@ class TrackingSubscriberTest extends \PHPUnit\Framework\TestCase
         $this->assertNull($event->getIdentifiedContact());
     }
 
-    public function testChannelIdMismatchDoesNotIdentify()
+    public function testChannelIdMismatchDoesNotIdentify(): void
     {
         $ct = [
             'lead'    => 2,
@@ -106,7 +106,7 @@ class TrackingSubscriberTest extends \PHPUnit\Framework\TestCase
         $this->assertNull($event->getIdentifiedContact());
     }
 
-    public function testStatEmptyLeadDoesNotIdentify()
+    public function testStatEmptyLeadDoesNotIdentify(): void
     {
         $ct = [
             'lead'    => 2,

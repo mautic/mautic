@@ -863,7 +863,7 @@ class EmailModelTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetEmailListStatsOneSegment()
+    public function testGetEmailListStatsOneSegment(): void
     {
         $list = $this->createMock(LeadList::class);
         $list->method('getName')->willReturn(self::SEGMENT_A);
@@ -876,7 +876,7 @@ class EmailModelTest extends \PHPUnit\Framework\TestCase
         self::assertEquals(self::SEGMENT_A, $result['datasets'][0]['label']);
     }
 
-    public function testGetEmailListStatsTwoSegments()
+    public function testGetEmailListStatsTwoSegments(): void
     {
         $list = $this->createMock(LeadList::class);
         $list->method('getName')->willReturn(self::SEGMENT_A);
@@ -923,7 +923,7 @@ class EmailModelTest extends \PHPUnit\Framework\TestCase
         return $this->emailModel->getEmailListStats($this->emailEntity, true, $dateFromObject, $dateToObject);
     }
 
-    public function testGetBestHours()
+    public function testGetBestHours(): void
     {
         $dbalMock = new DBALMocker($this);
         $dbalMock->setQueryResponse(
@@ -965,7 +965,7 @@ class EmailModelTest extends \PHPUnit\Framework\TestCase
         $email = new Email();
         $email->setEmailType('list');
         $email->addTranslationChild($child = new Email());
-        $listener   = function (EmailEvent $event) use ($child) {
+        $listener   = function (EmailEvent $event) use ($child): void {
             $isChild = $event->getEmail() === $child;
             $this->assertSame($isChild, $this->emailModel->isUpdatingTranslationChildren());
         };

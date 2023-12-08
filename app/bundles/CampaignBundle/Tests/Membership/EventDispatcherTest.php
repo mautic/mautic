@@ -22,7 +22,7 @@ class EventDispatcherTest extends \PHPUnit\Framework\TestCase
         $this->eventDispatcher = $this->createMock(EventDispatcherInterface::class);
     }
 
-    public function testLeadChangeEventDispatched()
+    public function testLeadChangeEventDispatched(): void
     {
         $this->eventDispatcher->expects($this->once())
             ->method('dispatch')
@@ -31,7 +31,7 @@ class EventDispatcherTest extends \PHPUnit\Framework\TestCase
         $this->getDispatcher()->dispatchMembershipChange(new Lead(), new Campaign(), Adder::NAME);
     }
 
-    public function testBatchChangeEventDispatched()
+    public function testBatchChangeEventDispatched(): void
     {
         $this->eventDispatcher->expects($this->once())
             ->method('dispatch')

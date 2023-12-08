@@ -34,7 +34,7 @@ class RemoveDeletedFilesStepTest extends AbstractStepTest
         $this->pathsHelper = $this->createMock(PathsHelper::class);
     }
 
-    public function testNothingDoneIfDeletedFileListDoesNotExist()
+    public function testNothingDoneIfDeletedFileListDoesNotExist(): void
     {
         $this->pathsHelper->method('getRootPath')
             ->willReturn(__DIR__);
@@ -45,7 +45,7 @@ class RemoveDeletedFilesStepTest extends AbstractStepTest
         $this->assertEquals(0, $this->progressBar->getProgress());
     }
 
-    public function testFileIsDeleted()
+    public function testFileIsDeleted(): void
     {
         $resourcePath = __DIR__.'/resources';
 
@@ -69,7 +69,7 @@ class RemoveDeletedFilesStepTest extends AbstractStepTest
         $this->assertFileDoesNotExist($resourcePath.'/deleted_files.txt');
     }
 
-    public function testNonExistentFileIsIgnored()
+    public function testNonExistentFileIsIgnored(): void
     {
         $resourcePath = __DIR__.'/resources';
         file_put_contents($resourcePath.'/deleted_files.txt', '["delete_me.txt"]');

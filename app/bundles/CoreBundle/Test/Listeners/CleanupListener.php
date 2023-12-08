@@ -28,7 +28,7 @@ class CleanupListener implements TestListener
 
     private function unsetProperty(object $object, string $property): void
     {
-        $closure = function (object $object) use ($property) {
+        $closure = function (object $object) use ($property): void {
             unset($object->$property);
         };
 

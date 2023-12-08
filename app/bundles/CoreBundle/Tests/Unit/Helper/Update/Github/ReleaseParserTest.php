@@ -56,7 +56,7 @@ class ReleaseParserTest extends TestCase
         $this->releaseParser = new ReleaseParser($client);
     }
 
-    public function testMatchingReleaseReturnedForAlphaStability()
+    public function testMatchingReleaseReturnedForAlphaStability(): void
     {
         $expects       = '3.0.1-beta';
         $mauticVersion = '3.0.0-alpha';
@@ -67,7 +67,7 @@ class ReleaseParserTest extends TestCase
         $this->assertSame($expects, $release->getVersion());
     }
 
-    public function testMatchingReleaseReturnedForBetaStability()
+    public function testMatchingReleaseReturnedForBetaStability(): void
     {
         $expects       = '3.0.1-beta';
         $mauticVersion = '3.0.0-alpha';
@@ -78,7 +78,7 @@ class ReleaseParserTest extends TestCase
         $this->assertSame($expects, $release->getVersion());
     }
 
-    public function testMatchingReleaseReturnedForStableStability()
+    public function testMatchingReleaseReturnedForStableStability(): void
     {
         $expects       = '3.0.0';
         $mauticVersion = '2.20.0';
@@ -89,7 +89,7 @@ class ReleaseParserTest extends TestCase
         $this->assertSame($expects, $release->getVersion());
     }
 
-    public function testMatchingReleaseReturnedForMinimumMauticVersion()
+    public function testMatchingReleaseReturnedForMinimumMauticVersion(): void
     {
         $expects       = '2.15.0';
         $mauticVersion = '2.1.0';
@@ -100,7 +100,7 @@ class ReleaseParserTest extends TestCase
         $this->assertSame($expects, $release->getVersion());
     }
 
-    public function testLatestVersionSupportedExceptionThrownIfMetadataErrors()
+    public function testLatestVersionSupportedExceptionThrownIfMetadataErrors(): void
     {
         $this->expectException(LatestVersionSupportedException::class);
 
@@ -122,7 +122,7 @@ class ReleaseParserTest extends TestCase
         (new ReleaseParser($client))->getLatestSupportedRelease([['html_url' => 'foo://bar']], $mauticVersion, $stability);
     }
 
-    public function testLatestVersionSupportedExceptionThrownIfMetadataNotFound()
+    public function testLatestVersionSupportedExceptionThrownIfMetadataNotFound(): void
     {
         $this->expectException(LatestVersionSupportedException::class);
 

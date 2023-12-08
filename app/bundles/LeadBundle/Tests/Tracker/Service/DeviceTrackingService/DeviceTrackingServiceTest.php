@@ -198,7 +198,7 @@ final class DeviceTrackingServiceTest extends \PHPUnit\Framework\TestCase
         $this->assertNull($this->getDeviceTrackingService()->getTrackedDevice());
     }
 
-    public function testGetTrackedDeviceNoRequest()
+    public function testGetTrackedDeviceNoRequest(): void
     {
         $deviceTrackingService = $this->getDeviceTrackingService();
         $this->assertNull($deviceTrackingService->getTrackedDevice());

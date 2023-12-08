@@ -145,7 +145,7 @@ class RestrictionHelperTest extends TypeTestCase
      * @covers \Mautic\ConfigBundle\Form\Helper\RestrictionHelper::applyRestrictions()
      * @covers \Mautic\ConfigBundle\Form\Helper\RestrictionHelper::restrictField()
      */
-    public function testRestrictedFieldsAreRemoved()
+    public function testRestrictedFieldsAreRemoved(): void
     {
         $form = $this->factory->create(ConfigType::class, $this->forms);
 
@@ -179,7 +179,7 @@ class RestrictionHelperTest extends TypeTestCase
      * @covers \Mautic\ConfigBundle\Form\Helper\RestrictionHelper::applyRestrictions()
      * @covers \Mautic\ConfigBundle\Form\Helper\RestrictionHelper::restrictField()
      */
-    public function testRestrictedFieldsAreMasked()
+    public function testRestrictedFieldsAreMasked(): void
     {
         $this->displayMode = RestrictionHelper::MODE_MASK;
 

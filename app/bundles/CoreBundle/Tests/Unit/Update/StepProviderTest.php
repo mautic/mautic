@@ -51,7 +51,7 @@ class StepProviderTest extends TestCase
         $this->provider->addStep($step4);
     }
 
-    public function testInitialStepsAreOrdered()
+    public function testInitialStepsAreOrdered(): void
     {
         $steps = $this->provider->getInitialSteps();
         $this->assertCount(2, $steps);
@@ -59,7 +59,7 @@ class StepProviderTest extends TestCase
         $this->assertEquals(10, $steps[1]->getOrder());
     }
 
-    public function testsFinalStepsAreOrdered()
+    public function testsFinalStepsAreOrdered(): void
     {
         $steps = $this->provider->getFinalSteps();
         $this->assertCount(2, $steps);

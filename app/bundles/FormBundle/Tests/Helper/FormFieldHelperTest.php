@@ -30,7 +30,7 @@ class FormFieldHelperTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider fieldProvider
      */
-    public function testPopulateField($field, $value, $formHtml, $expectedValue, $message)
+    public function testPopulateField($field, $value, $formHtml, $expectedValue, $message): void
     {
         $this->fixture->populateField($field, $value, 'mautic', $formHtml);
 

@@ -7,7 +7,7 @@ use PHPUnit\Framework\TestCase;
 
 class NullableProcessorTest extends TestCase
 {
-    public function testNullReturnedIfEmptyString()
+    public function testNullReturnedIfEmptyString(): void
     {
         $getEnv = function (string $name) {
             return '';
@@ -20,7 +20,7 @@ class NullableProcessorTest extends TestCase
         $this->assertNull($value);
     }
 
-    public function testValueReturnedIfNotEmptyString()
+    public function testValueReturnedIfNotEmptyString(): void
     {
         $getEnv = function (string $name) {
             return 'foobar';

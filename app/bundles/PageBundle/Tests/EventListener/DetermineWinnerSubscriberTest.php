@@ -133,7 +133,7 @@ class DetermineWinnerSubscriberTest extends TestCase
         self::assertEquals($expectedData, $abTestResults['support']['data'][$translation]);
     }
 
-    public function testOnDetermineDwellTimeWinner()
+    public function testOnDetermineDwellTimeWinner(): void
     {
         $parentMock  = $this->createMock(Page::class);
         $ids         = [1, 2];

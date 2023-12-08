@@ -77,7 +77,7 @@ class LeadSubscriberTest extends CommonMocks
         $this->modelFacotry        = $this->createMock(ModelFactory::class);
     }
 
-    public function testOnLeadPostSaveWillNotProcessTheSameLeadTwice()
+    public function testOnLeadPostSaveWillNotProcessTheSameLeadTwice(): void
     {
         $lead = new Lead();
 
@@ -150,7 +150,7 @@ class LeadSubscriberTest extends CommonMocks
      * Make sure that an timeline entry is created for a lead
      * that was created through the API.
      */
-    public function testAddTimelineApiCreatedEntries()
+    public function testAddTimelineApiCreatedEntries(): void
     {
         $eventTypeKey  = 'lead.apiadded';
         $eventTypeName = 'Added through API';

@@ -6,7 +6,7 @@ use MauticPlugin\MauticCrmBundle\Integration\Salesforce\Helper\StateValidationHe
 
 class StateValidationHelperTest extends \PHPUnit\Framework\TestCase
 {
-    public function testStateIsRemovedWhenCountryIsUnknown()
+    public function testStateIsRemovedWhenCountryIsUnknown(): void
     {
         $payload = [
             'State' => 'Paris',
@@ -15,7 +15,7 @@ class StateValidationHelperTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals([], StateValidationHelper::validate($payload));
     }
 
-    public function testStateIsRemovedWhenCountryIsNotSupported()
+    public function testStateIsRemovedWhenCountryIsNotSupported(): void
     {
         $payload = [
             'Country' => 'France',
@@ -25,7 +25,7 @@ class StateValidationHelperTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals(['Country' => 'France'], StateValidationHelper::validate($payload));
     }
 
-    public function testStateIsLeftWhenCountryIsSupported()
+    public function testStateIsLeftWhenCountryIsSupported(): void
     {
         $payload = [
             'Country' => 'United States',

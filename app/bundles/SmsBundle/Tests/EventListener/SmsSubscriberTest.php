@@ -27,7 +27,7 @@ class SmsSubscriberTest extends TestCase
         parent::setUp();
     }
 
-    public function testOnTokenReplacementWithTrackableUrls()
+    public function testOnTokenReplacementWithTrackableUrls(): void
     {
         $mockAuditLogModel = $this->createMock(AuditLogModel::class);
 
@@ -61,7 +61,7 @@ class SmsSubscriberTest extends TestCase
         $this->assertNotSame($this->messageText, $tokenReplacementEvent->getContent());
     }
 
-    public function testOnTokenReplacementWithDisableTrackableUrls()
+    public function testOnTokenReplacementWithDisableTrackableUrls(): void
     {
         $mockAuditLogModel = $this->createMock(AuditLogModel::class);
 

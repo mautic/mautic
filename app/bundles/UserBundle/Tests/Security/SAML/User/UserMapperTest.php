@@ -75,7 +75,7 @@ class UserMapperTest extends TestCase
             ->willReturn([$assertion]);
     }
 
-    public function testUserEntityIsPopulatedFromAssertions()
+    public function testUserEntityIsPopulatedFromAssertions(): void
     {
         $user = $this->mapper->getUser($this->response);
         $this->assertEquals('hello@there.com', $user->getEmail());
@@ -84,7 +84,7 @@ class UserMapperTest extends TestCase
         $this->assertEquals('Smith', $user->getLastName());
     }
 
-    public function testUsernameIsReturned()
+    public function testUsernameIsReturned(): void
     {
         $username = $this->mapper->getUsername($this->response);
         $this->assertEquals('hello@there.com', $username);

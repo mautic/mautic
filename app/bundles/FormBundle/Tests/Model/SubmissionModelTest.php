@@ -345,7 +345,7 @@ class SubmissionModelTest extends \PHPUnit\Framework\TestCase
         $this->assertFalse($this->submissionModel->saveSubmission($post, $server, $form, $request));
     }
 
-    public function testNormalizeValues()
+    public function testNormalizeValues(): void
     {
         $reflection = new \ReflectionClass(SubmissionModel::class);
         $method     = $reflection->getMethod('normalizeValue');

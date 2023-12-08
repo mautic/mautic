@@ -20,7 +20,7 @@ class DoNotContactSubscriberTest extends \PHPUnit\Framework\TestCase
         $this->doNotContactSubscriber     = new DoNotContactSubscriber($this->doNotContact);
     }
 
-    public function testGetSubscribedEvents()
+    public function testGetSubscribedEvents(): void
     {
         $this->assertEquals(
             [
@@ -31,7 +31,7 @@ class DoNotContactSubscriberTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testAddDncForLeadForNewContacts()
+    public function testAddDncForLeadForNewContacts(): void
     {
         $lead              = new Lead();
         $doNotContactEvent = new DoNotContactAddEvent($lead, 'email');
@@ -42,7 +42,7 @@ class DoNotContactSubscriberTest extends \PHPUnit\Framework\TestCase
         $this->doNotContactSubscriber->addDncForLead($doNotContactEvent);
     }
 
-    public function testAddDncForLeadForExistedContacts()
+    public function testAddDncForLeadForExistedContacts(): void
     {
         $lead = new Lead();
         $lead->setId(1);

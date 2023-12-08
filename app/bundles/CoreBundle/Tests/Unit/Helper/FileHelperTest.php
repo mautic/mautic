@@ -13,7 +13,7 @@ class FileHelperTest extends \PHPUnit\Framework\TestCase
      *
      * @dataProvider bytesToMegabytesProvider
      */
-    public function testConversionFromBytesToMegabytes(int $byte, float $megabyte)
+    public function testConversionFromBytesToMegabytes(int $byte, float $megabyte): void
     {
         $fileHelper = new FileHelper();
 
@@ -37,7 +37,7 @@ class FileHelperTest extends \PHPUnit\Framework\TestCase
      *
      * @dataProvider megabytesToBytesProvider
      */
-    public function testConversionFromMegabytesToBytes(int $megabyte, int $byte)
+    public function testConversionFromMegabytesToBytes(int $megabyte, int $byte): void
     {
         $fileHelper = new FileHelper();
 
@@ -60,7 +60,7 @@ class FileHelperTest extends \PHPUnit\Framework\TestCase
      *
      * @dataProvider phpSizeToBytesProvider
      */
-    public function testConvertPHPSizeToBytes(string $phpSize, int $bytes)
+    public function testConvertPHPSizeToBytes(string $phpSize, int $bytes): void
     {
         $fileHelper = new FileHelper();
 

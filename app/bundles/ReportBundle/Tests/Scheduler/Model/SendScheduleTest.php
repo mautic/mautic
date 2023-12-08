@@ -64,7 +64,7 @@ class SendScheduleTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testSendScheduleWithCsvFile()
+    public function testSendScheduleWithCsvFile(): void
     {
         $this->report->setToAddress('john@doe.com, doe@john.com');
 
@@ -109,7 +109,7 @@ class SendScheduleTest extends \PHPUnit\Framework\TestCase
         $this->sendSchedule->send($this->scheduler, '/path/to/report.csv');
     }
 
-    public function testSendScheduleWithZipFile()
+    public function testSendScheduleWithZipFile(): void
     {
         $this->report->setToAddress('john@doe.com, doe@john.com');
 
@@ -166,7 +166,7 @@ class SendScheduleTest extends \PHPUnit\Framework\TestCase
         $this->sendSchedule->send($this->scheduler, '/path/to/report.csv');
     }
 
-    public function testSendScheduleWithoutFile()
+    public function testSendScheduleWithoutFile(): void
     {
         $this->report->setToAddress('john@doe.com, doe@john.com');
 

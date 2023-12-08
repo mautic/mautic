@@ -22,7 +22,7 @@ class EmailToUserSubscriberTest extends \PHPUnit\Framework\TestCase
         'bcc'      => 'hidden@translation.in',
     ];
 
-    public function testOnCampaignTriggerActionSendEmailToUserWithSendingTheEmail()
+    public function testOnCampaignTriggerActionSendEmailToUserWithSendingTheEmail(): void
     {
         $lead = new Lead();
 
@@ -50,7 +50,7 @@ class EmailToUserSubscriberTest extends \PHPUnit\Framework\TestCase
         $this->assertTrue($event->getResult());
     }
 
-    public function testOnCampaignTriggerActionSendEmailToUserWithError()
+    public function testOnCampaignTriggerActionSendEmailToUserWithError(): void
     {
         $lead = new Lead();
 

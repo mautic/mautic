@@ -37,7 +37,7 @@ class DetermineWinnerSubscriberTest extends \PHPUnit\Framework\TestCase
         $this->subscriber           = new DetermineWinnerSubscriber($this->submissionRepository, $this->translator);
     }
 
-    public function testOnDetermineSubmissionWinner()
+    public function testOnDetermineSubmissionWinner(): void
     {
         $parentMock       = $this->createMock(Page::class);
         $childMock        = $this->createMock(Page::class);

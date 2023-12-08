@@ -20,7 +20,7 @@ class ConfigSubscriberTest extends TestCase
         $this->configEvent = $this->createMock(ConfigEvent::class);
     }
 
-    public function testOwnPasswordIsNotWipedOutOnConfigSaveIfEmpty()
+    public function testOwnPasswordIsNotWipedOutOnConfigSaveIfEmpty(): void
     {
         $subscriber = new ConfigSubscriber();
         $this->configEvent->expects($this->once())
@@ -35,7 +35,7 @@ class ConfigSubscriberTest extends TestCase
         $subscriber->onConfigSave($this->configEvent);
     }
 
-    public function testMetadataFileIsDetectedAsXml()
+    public function testMetadataFileIsDetectedAsXml(): void
     {
         $subscriber = new ConfigSubscriber();
         $this->configEvent->expects($this->once())
@@ -62,7 +62,7 @@ class ConfigSubscriberTest extends TestCase
         $subscriber->onConfigSave($this->configEvent);
     }
 
-    public function testMetadataFileFailsValidationIfNotXml()
+    public function testMetadataFileFailsValidationIfNotXml(): void
     {
         $subscriber = new ConfigSubscriber();
 
@@ -87,7 +87,7 @@ class ConfigSubscriberTest extends TestCase
         $subscriber->onConfigSave($this->configEvent);
     }
 
-    public function testCertificatePassesValidationIfValid()
+    public function testCertificatePassesValidationIfValid(): void
     {
         $subscriber = new ConfigSubscriber();
 
@@ -111,7 +111,7 @@ class ConfigSubscriberTest extends TestCase
         $subscriber->onConfigSave($this->configEvent);
     }
 
-    public function testCertificateFailsValidationIfNotValid()
+    public function testCertificateFailsValidationIfNotValid(): void
     {
         $subscriber = new ConfigSubscriber();
 
@@ -136,7 +136,7 @@ class ConfigSubscriberTest extends TestCase
         $subscriber->onConfigSave($this->configEvent);
     }
 
-    public function testPrivateKeyPassesValidationIfValid()
+    public function testPrivateKeyPassesValidationIfValid(): void
     {
         $subscriber = new ConfigSubscriber();
 
@@ -160,7 +160,7 @@ class ConfigSubscriberTest extends TestCase
         $subscriber->onConfigSave($this->configEvent);
     }
 
-    public function testPrivateKeyFailsValidationIfNotValid()
+    public function testPrivateKeyFailsValidationIfNotValid(): void
     {
         $subscriber = new ConfigSubscriber();
 
@@ -185,7 +185,7 @@ class ConfigSubscriberTest extends TestCase
         $subscriber->onConfigSave($this->configEvent);
     }
 
-    public function testEncryptedPrivateKeyPassesValidationIfValid()
+    public function testEncryptedPrivateKeyPassesValidationIfValid(): void
     {
         $subscriber = new ConfigSubscriber();
 
@@ -230,7 +230,7 @@ KEY;
         $subscriber->onConfigSave($this->configEvent);
     }
 
-    public function testPrivateKeyFailsValidationIfPasswordNotValid()
+    public function testPrivateKeyFailsValidationIfPasswordNotValid(): void
     {
         $subscriber = new ConfigSubscriber();
 
@@ -276,7 +276,7 @@ KEY;
         $subscriber->onConfigSave($this->configEvent);
     }
 
-    public function testPrivateKeyFailsValidationIfPasswordMissing()
+    public function testPrivateKeyFailsValidationIfPasswordMissing(): void
     {
         $subscriber = new ConfigSubscriber();
 

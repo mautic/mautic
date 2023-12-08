@@ -104,7 +104,7 @@ class UpdateSchemaStepTest extends AbstractStepTest
         $this->step = new UpdateSchemaStep($this->translator, $container);
     }
 
-    public function testUpdateFailedExceptionThrownIfMigrationsFailed()
+    public function testUpdateFailedExceptionThrownIfMigrationsFailed(): void
     {
         $this->expectException(UpdateFailedException::class);
 
@@ -131,7 +131,7 @@ class UpdateSchemaStepTest extends AbstractStepTest
         $this->step->execute($this->progressBar, $this->input, $this->output);
     }
 
-    public function testExceptionNotThrownIfMigrationsWereSuccessful()
+    public function testExceptionNotThrownIfMigrationsWereSuccessful(): void
     {
         $this->migrateCommand->method('run')
             ->willReturn(0);

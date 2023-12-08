@@ -59,7 +59,7 @@ class SegmentLogReportSubscriberTest extends TestCase
         $setTables = [];
         $mockEvent->expects($this->exactly(1))
             ->method('addTable')
-            ->willReturnCallback(function () use (&$setTables) {
+            ->willReturnCallback(function () use (&$setTables): void {
                 $args = func_get_args();
 
                 $setTables[] = $args;
