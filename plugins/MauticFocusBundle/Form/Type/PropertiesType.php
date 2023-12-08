@@ -157,6 +157,18 @@ class PropertiesType extends AbstractType
                 ],
             ]
         );
+
+        $builder->add(
+            'stop_after_close',
+            YesNoButtonGroupType::class,
+            [
+                'label' => 'mautic.focus.form.stop_after_close',
+                'data'  => (isset($options['data']['stop_after_close'])) ? $options['data']['stop_after_close'] : false,
+                'attr'  => [
+                    'tooltip' => 'mautic.focus.form.stop_after_close.tooltip',
+                ],
+            ]
+        );
     }
 
     /**

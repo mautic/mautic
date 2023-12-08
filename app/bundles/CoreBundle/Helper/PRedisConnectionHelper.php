@@ -4,10 +4,15 @@ declare(strict_types=1);
 
 namespace Mautic\CoreBundle\Helper;
 
+use Mautic\CoreBundle\Predis\Command\Unlink;
 use Mautic\CoreBundle\Predis\Replication\MasterOnlyStrategy;
 use Mautic\CoreBundle\Predis\Replication\StrategyConfig;
 use Predis\Client;
+use Predis\Cluster\ClusterStrategy;
+use Predis\Connection\Aggregate\PredisCluster;
+use Predis\Connection\Aggregate\RedisCluster;
 use Predis\Connection\Aggregate\SentinelReplication;
+use Predis\Profile\RedisProfile;
 
 /**
  * Helper functions for simpler operations with arrays.
@@ -69,6 +74,12 @@ class PRedisConnectionHelper
             $redisOptions['parameters'] = ['password' => $redisConfiguration['password']];
         }
 
+        foreach (['cluster', 'scheme', 'ssl'] as $key) {
+            if (isset($redisConfiguration[$key])) {
+                $redisOptions[$key] = $redisConfiguration[$key];
+            }
+        }
+
         return $redisOptions;
     }
 
@@ -89,6 +100,24 @@ class PRedisConnectionHelper
             );
         }
 
-        return new Client($endpoints, $inputOptions);
+        $client  = new Client($endpoints, $inputOptions);
+        $profile = $client->getProfile();
+        \assert($profile instanceof RedisProfile);
+
+        if (!$profile->getCommandClass(Unlink::ID)) {
+            $profile->defineCommand(Unlink::ID, Unlink::class);
+        }
+
+        $connection = $client->getConnection();
+
+        if ($connection instanceof RedisCluster || $connection instanceof PredisCluster) {
+            $clusterStrategy = $connection->getClusterStrategy();
+
+            if ($clusterStrategy instanceof ClusterStrategy && !in_array(Unlink::ID, $clusterStrategy->getSupportedCommands())) {
+                $clusterStrategy->setCommandHandler(Unlink::ID, [$clusterStrategy, 'getKeyFromAllArguments']);
+            }
+        }
+
+        return $client;
     }
 }

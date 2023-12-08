@@ -107,7 +107,8 @@
     "symfony/mailer": "~5.4",
     "symfony/mime": "~5.4",
     "wikimedia/less.php": "^4.1",
-    "matthiasmullie/minify": "^1.3"
+    "matthiasmullie/minify": "^1.3",
+    "bjeavons/zxcvbn-php": "^1.3"
   },
   "conflict": {
     "psr/simple-cache": ">=3.0.0"

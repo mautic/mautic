@@ -1683,17 +1683,11 @@ class LeadController extends FormController
             }
 
             if ($count = count($entities)) {
-                $persistEntities = [];
                 foreach ($entities as $lead) {
                     if ($this->security->hasEntityAccess('lead:leads:editown', 'lead:leads:editother', $lead->getPermissionUser())) {
-                        if ($doNotContact->addDncForContact($lead->getId(), 'email', DoNotContact::MANUAL, $data['reason'])) {
-                            $persistEntities[] = $lead;
-                        }
+                        $doNotContact->addDncForContact($lead->getId(), 'email', DoNotContact::MANUAL, $data['reason']);
                     }
                 }
-
-                // Save entities
-                $model->saveEntities($persistEntities);
             }
 
             $this->addFlashMessage(

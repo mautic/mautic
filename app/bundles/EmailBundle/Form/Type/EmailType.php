@@ -98,7 +98,10 @@ class EmailType extends AbstractType
                 [
                     'label'      => 'mautic.email.subject',
                     'label_attr' => ['class' => 'control-label'],
-                    'attr'       => ['class' => 'form-control'],
+                    'attr'       => [
+                        'class'   => 'form-control',
+                        'onBlur'  => 'Mautic.copySubjectToName(mQuery(this))',
+                    ],
                 ]
             )
         );
@@ -265,7 +268,7 @@ class EmailType extends AbstractType
             )
         );
 
-        $transformer = new IdToEntityModelTransformer($this->em, 'MauticFormBundle:Form', 'id');
+        $transformer = new IdToEntityModelTransformer($this->em, \Mautic\FormBundle\Entity\Form::class, 'id');
         $builder->add(
             $builder->create(
                 'unsubscribeForm',
@@ -286,7 +289,7 @@ class EmailType extends AbstractType
                 ->addModelTransformer($transformer)
         );
 
-        $transformer = new IdToEntityModelTransformer($this->em, 'MauticPageBundle:Page', 'id');
+        $transformer = new IdToEntityModelTransformer($this->em, \Mautic\PageBundle\Entity\Page::class, 'id');
         $builder->add(
             $builder->create(
                 'preferenceCenter',

@@ -14,6 +14,7 @@ use Mautic\CoreBundle\Helper\PathsHelper;
 use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Model\FormModel;
 use Mautic\CoreBundle\Model\NotificationModel;
+use Mautic\CoreBundle\ProcessSignal\ProcessSignalService;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\CoreBundle\Translation\Translator;
 use Mautic\LeadBundle\Entity\Company;
@@ -67,6 +68,7 @@ class ImportModel extends FormModel
      * @var LeadEventLogRepository
      */
     protected $leadEventLogRepo;
+    private ProcessSignalService $processSignalService;
 
     /**
      * ImportModel constructor.
@@ -83,14 +85,16 @@ class ImportModel extends FormModel
         UrlGeneratorInterface $router,
         Translator $translator,
         UserHelper $userHelper,
-        LoggerInterface $mauticLogger
+        LoggerInterface $mauticLogger,
+        ProcessSignalService $processSignalService
     ) {
-        $this->pathsHelper       = $pathsHelper;
-        $this->leadModel         = $leadModel;
-        $this->notificationModel = $notificationModel;
-        $this->config            = $config;
-        $this->leadEventLogRepo  = $leadModel->getEventLogRepository();
-        $this->companyModel      = $companyModel;
+        $this->pathsHelper          = $pathsHelper;
+        $this->leadModel            = $leadModel;
+        $this->notificationModel    = $notificationModel;
+        $this->config               = $config;
+        $this->leadEventLogRepo     = $leadModel->getEventLogRepository();
+        $this->companyModel         = $companyModel;
+        $this->processSignalService = $processSignalService;
 
         parent::__construct($em, $security, $dispatcher, $router, $translator, $userHelper, $mauticLogger, $config);
     }
@@ -423,12 +427,19 @@ class ImportModel extends FormModel
                 $batchSize = $config['batchlimit'];
             }
 
-            ++$counter;
-            if ($limit && $counter >= $limit) {
-                $import->setStatus($import::DELAYED);
-                $this->saveEntity($import);
+            if ($this->processSignalService->isSignalCaught()) {
                 break;
             }
+
+            ++$counter;
+            if ($limit && $counter >= $limit) {
+                break;
+            }
+        }
+
+        if ($import->getLastLineImported() < $import->getLineCount()) {
+            $import->setStatus($import::DELAYED);
+            $this->saveEntity($import);
         }
 
         // Close the file

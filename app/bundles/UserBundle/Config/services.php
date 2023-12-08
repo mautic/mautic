@@ -24,4 +24,5 @@ return function (ContainerConfigurator $configurator) {
 
     $services->alias('mautic.user.model.role', \Mautic\UserBundle\Model\RoleModel::class);
     $services->alias('mautic.user.model.user', \Mautic\UserBundle\Model\UserModel::class);
+    $services->get(\Mautic\UserBundle\Form\Validator\Constraints\NotWeakValidator::class)->tag('validator.constraint_validator');
 };
