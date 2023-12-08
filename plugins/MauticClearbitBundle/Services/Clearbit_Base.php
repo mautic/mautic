@@ -27,7 +27,7 @@ class Clearbit_Base
     private function _wait_for_rate_limit(): void
     {
         $now = new \DateTime();
-        if ($this->_next_req_time && $this->_next_req_time->getTimestamp() > $now->getTimestamp()) {
+        if ($this->_next_req_time->getTimestamp() > $now->getTimestamp()) {
             $t = $this->_next_req_time->getTimestamp() - $now->getTimestamp();
             sleep($t);
         }
