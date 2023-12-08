@@ -9,6 +9,8 @@
     - inForm (optional, bool)
     - required (optional, bool)
 #}
+{% import '@MauticForm//Field/macros.html.twig' as macros %}
+
 {% set containerType = type|default('text') %}
 {% set defaultInputClass = inputClass|default('input') %}
 
@@ -136,15 +138,15 @@
 {% endif %}
 {# end: field_helper #}
 
-<div {% for attrName, attrValue in containerAttributes %}{{ attrName }}="{% if attrValue is iterable %}{{ attrValue|join(' ') }}{% else %}{{ attrValue }}{% endif %}"{% endfor %}>
-  {% if field.showLabel %}<label {% for attrName, attrValue in labelAttributes %}{{ attrName }}="{% if attrValue is iterable %}{{ attrValue|join(' ') }}{% else %}{{ attrValue }}{% endif %}"{% endfor %}>{{ field.label }}</label>{% endif %}
+<div {{ macros.tag_attr(containerAttributes) }} >
+  {% if field.showLabel %}<label {{ tag_attr(labelAttributes) }} >{{ field.label }}</label>{% endif %}
 
   {% if field.helpMessage is not empty %}<span class="mauticform-helpmessage">{{ field.helpMessage|purify }}</span>{% endif %}
 
   {% if 'textarea' == field.type %}
-    <textarea {% for attrName, attrValue in inputAttributes %}{{ attrName }}="{% if attrValue is iterable %}{{ attrValue|join(' ') }}{% else %}{{ attrValue }}{% endif %}"{% endfor %}>{{ field.defaultValue }}</textarea>
+    <textarea {{ tag_attr(inputAttributes) }} >{{ field.defaultValue }}</textarea>
   {% else %}
-    <input type="{{ containerType }}" {% for attrName, attrValue in inputAttributes %}{{ attrName }}="{% if attrValue is iterable %}{{ attrValue|join(' ') }}{% else %}{{ attrValue }}{% endif %}"{% endfor %} />
+    <input type="{{ containerType }}" {{ tag_attr(inputAttributes) }}  />
   {% endif %}
 
   <span class="mauticform-errormsg" style="display:none;">{{ validationMessage }}</span>
