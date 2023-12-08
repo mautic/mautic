@@ -196,10 +196,10 @@ class TagController extends FormController
                 }
             }
 
-            /** @var SubmitButton $saveButton */
-            $saveButton = $form->get('buttons')->get('save');
+            /** @var SubmitButton $saveSubmitButton */
+            $saveSubmitButton = $form->get('buttons')->get('save');
 
-            if ($cancelled || ($valid && $saveButton->isClicked())) {
+            if ($cancelled || ($valid && $saveSubmitButton->isClicked())) {
                 return $this->postActionRedirect([
                     'returnUrl'       => $returnUrl,
                     'viewParameters'  => ['page' => $page],
