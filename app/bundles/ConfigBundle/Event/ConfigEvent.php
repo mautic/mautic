@@ -38,9 +38,9 @@ class ConfigEvent extends CommonEvent
     private $normData;
 
     /**
-     * @param mixed[] $config
+     * @param mixed[]|null $config
      */
-    public function __construct(private array $config, private ParameterBag $post)
+    public function __construct(private ?array $config, private ParameterBag $post)
     {
     }
 
