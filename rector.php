@@ -116,8 +116,6 @@ return static function (Rector\Config\RectorConfig $rectorConfig): void {
 
     // Define what single rules will be applied
     $rectorConfig->rules([
-<<<<<<< HEAD
-<<<<<<< HEAD
         \Rector\Php80\Rector\Switch_\ChangeSwitchToMatchRector::class,
         \Rector\TypeDeclaration\Rector\ClassMethod\NumericReturnTypeFromStrictScalarReturnsRector::class,
         \Rector\TypeDeclaration\Rector\ClassMethod\ReturnTypeFromReturnNewRector::class,
@@ -127,13 +125,8 @@ return static function (Rector\Config\RectorConfig $rectorConfig): void {
         \Rector\TypeDeclaration\Rector\Class_\ReturnTypeFromStrictTernaryRector::class,
 
         // \Rector\Php80\Rector\Class_\ClassPropertyAssignToConstructorPromotionRector::class,
-=======
-=======
         // \Rector\Php80\Rector\Catch_\RemoveUnusedVariableInCatchRector::class,
-
->>>>>>> cf999b0b86 (Make use of up to PHP 5.6 features)
         \Rector\Php80\Rector\Class_\ClassPropertyAssignToConstructorPromotionRector::class,
->>>>>>> 8413f73fcb (rerun rector)
         BoolReturnTypeFromStrictScalarReturnsRector::class,
         AddVoidReturnTypeWhereNoReturnRector::class,
         TypedPropertyFromStrictConstructorRector::class,
