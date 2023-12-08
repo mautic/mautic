@@ -140,8 +140,7 @@ class BatchIdToEntityHelper
         $this->originalKeys  = array_keys($parameters);
 
         // [1,2,3]
-        reset($parameters);
-        $firstKey = key($parameters);
+        $firstKey            = array_key_first($parameters);
         if (!is_array($parameters[$firstKey])) {
             $this->ids = array_values($parameters);
 
@@ -166,9 +165,7 @@ class BatchIdToEntityHelper
         if (empty($array)) {
             return false;
         }
-
-        reset($array);
-        $firstKey = key($array);
+        $firstKey = array_key_first($array);
 
         return array_keys($array) !== range(0, count($array) - 1) && 0 !== $firstKey;
     }

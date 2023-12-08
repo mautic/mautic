@@ -192,9 +192,7 @@ class PublicController extends CommonFormController
                             );
 
                             // find the one with the most difference from weight
-
-                            reset($variants);
-                            $useId = key($variants);
+                            $useId = array_key_first($variants);
 
                             // set the cookie - 14 days
                             $cookieHelper->setCookie(

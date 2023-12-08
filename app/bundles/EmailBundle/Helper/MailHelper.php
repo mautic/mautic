@@ -1723,8 +1723,7 @@ class MailHelper
             $emailAddresses = $this->message->getTo();
 
             if (count($emailAddresses)) {
-                end($emailAddresses);
-                $emailAddress = key($emailAddresses);
+                $emailAddress = array_key_last($emailAddresses);
             }
         }
         $stat->setEmailAddress($emailAddress);

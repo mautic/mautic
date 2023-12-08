@@ -839,9 +839,7 @@ class AjaxController extends CommonAjaxController
                 foreach ($dataArray['operators'] as $value => $label) {
                     $dataArray['operators'][$value] = $this->translator->trans($label);
                 }
-
-                reset($dataArray['operators']);
-                $operator = key($dataArray['operators']);
+                $operator = array_key_first($dataArray['operators']);
             }
 
             $disabled = false;
