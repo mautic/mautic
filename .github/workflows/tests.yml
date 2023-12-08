@@ -82,7 +82,7 @@ jobs:
     - name: Install dependencies
       # composer install cache - https://github.com/ramsey/composer-install
       uses: "ramsey/composer-install@v2"
-  
+
     - name: Run tests - database = ${{ matrix.db-types }}
       run: |
         rm -rf var/cache
@@ -198,9 +198,7 @@ jobs:
         elif [[ "${{ matrix.commands }}" == "Rector" ]]; then
           export SYMFONY_ENV=test
           bin/console cache:warmup
-          composer rector
-          git reset --hard
-          composer rector -- --dry-run --no-progress-bar
+          bin/rector --dry-run --ansi
         elif [[ "${{ matrix.commands }}" == "Twig Lint" ]]; then
           bin/console lint:twig app plugins
         elif [[ "${{ matrix.commands }}" == "CS Fixer" ]]; then
