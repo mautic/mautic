@@ -49,9 +49,9 @@ class Clearbit_Base
      * The base constructor Sets the API key available from here:
      * https://dashboard.clearbit.com/keys.
      *
-     * @param string $_apiKey
+     * @param string $api_key
      */
-    public function __construct(protected $_apiKey)
+    public function __construct(protected $api_key)
     {
         $this->_next_req_time = new \DateTime('@0');
     }
@@ -89,7 +89,7 @@ class Clearbit_Base
         curl_setopt($connection, CURLOPT_RETURNTRANSFER, 1);
         curl_setopt($connection, CURLOPT_USERAGENT, self::USER_AGENT);
         curl_setopt($connection, CURLOPT_HEADER, 1); // return HTTP headers with response
-        curl_setopt($connection, CURLOPT_HTTPHEADER, ['Authorization: Bearer '.$this->_apiKey]);
+        curl_setopt($connection, CURLOPT_HTTPHEADER, ['Authorization: Bearer '.$this->api_key]);
 
         // execute request
         $resp = curl_exec($connection);

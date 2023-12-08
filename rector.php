@@ -61,11 +61,12 @@ return static function (Rector\Config\RectorConfig $rectorConfig): void {
             __DIR__.'/app/bundles/LeadBundle/Entity',
 
             // fixed in rector dev-main
-            __DIR__ . '/app/bundles/CoreBundle/DependencyInjection/Builder/BundleMetadata.php',
+            __DIR__.'/app/bundles/CoreBundle/DependencyInjection/Builder/BundleMetadata.php',
         ],
 
         \Rector\Php80\Rector\Class_\ClassPropertyAssignToConstructorPromotionRector::class => [
             __DIR__.'/app/bundles/CacheBundle/EventListener/CacheClearSubscriber.php',
+            __DIR__.'/app/bundles/ReportBundle/Event/ReportBuilderEvent.php',
         ],
 
         // handle later with full PHP 8.0 upgrade
