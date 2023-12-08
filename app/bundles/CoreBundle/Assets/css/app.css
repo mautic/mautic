@@ -2016,9 +2016,6 @@ ul.dropdown-menu-form {
 .mautic-brand > svg.mautic-logo-text .c {
   fill: #ffffff;
 }
-label {
-  font-weight: 600;
-}
 .label-tag {
   white-space: normal;
   text-align: left;
@@ -4234,7 +4231,9 @@ lesshat-selector { -lh-property: 0 ;
 }
 .pa-15,
 .pa-md {
-  padding: 15px !important;
+  padding: 15px;
+  gap: 70px;
+  display: flex;
 }
 .pa-10,
 .pa-sm {
