@@ -743,9 +743,9 @@ class CommonRepository extends ServiceEntityRepository
     }
 
     /**
-     * @return array
+     * @return mixed[]
      */
-    public function getTableColumns()
+    public function getTableColumns(): array
     {
         $columns = $this->getClassMetadata()->getColumnNames();
 

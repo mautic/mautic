@@ -605,13 +605,13 @@ class FieldModel extends FormModel
     /**
      * Delete an array of entities.
      *
-     * @param array $ids
+     * @param mixed[] $ids
      *
-     * @return array
+     * @return mixed[]
      *
      * @throws \Mautic\CoreBundle\Exception\SchemaException
      */
-    public function deleteEntities($ids)
+    public function deleteEntities($ids): array
     {
         $entities = parent::deleteEntities($ids);
 

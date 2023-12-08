@@ -291,11 +291,11 @@ class FormModel extends AbstractCommonModel
     /**
      * Delete an array of entities.
      *
-     * @param array $ids
+     * @param mixed[] $ids
      *
-     * @return array
+     * @return mixed[]
      */
-    public function deleteEntities($ids)
+    public function deleteEntities($ids): array
     {
         $entities = [];
         // iterate over the results so the events are dispatched on each delete
