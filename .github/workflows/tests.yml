@@ -248,7 +248,7 @@ jobs:
           # test if console is executable
           ./bin/console cache:clear
         elif [[ "${{ matrix.commands }}" == "composer lock check" ]]; then
-          composer validate
+          composer validate --ansi
         else
           echo "Invalid command"
           exit 1
