@@ -7,15 +7,12 @@ use Symfony\Component\Form\AbstractType;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
-/**
- * Class DynamicContentListType.
- */
 class DynamicContentListType extends AbstractType
 {
     /**
      * {@inheritdoc}
      */
-    public function configureOptions(OptionsResolver $resolver)
+    public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults(
             [
@@ -23,7 +20,7 @@ class DynamicContentListType extends AbstractType
                 'modal_header'        => 'mautic.dynamicContent.header.new',
                 'model'               => 'dynamicContent',
                 'model_lookup_method' => 'getLookupResults',
-                'lookup_arguments'    => function (Options $options) {
+                'lookup_arguments'    => function (Options $options): array {
                     return [
                         'type'    => 'dynamicContent',
                         'filter'  => '$data',
@@ -36,7 +33,7 @@ class DynamicContentListType extends AbstractType
                         ],
                     ];
                 },
-                'ajax_lookup_action' => function (Options $options) {
+                'ajax_lookup_action' => function (Options $options): string {
                     $query = [
                         'top_level'  => $options['top_level'],
                         'ignore_ids' => $options['ignore_ids'],

@@ -5,28 +5,17 @@ namespace Mautic\LeadBundle\Event;
 use Mautic\CoreBundle\Event\CommonEvent;
 use Mautic\LeadBundle\Entity\Lead;
 
-/**
- * Class PointsChangeEvent.
- */
 class LeadUtmTagsEvent extends CommonEvent
 {
-    protected $utmtags;
-
     /**
-     * @param bool $utmTag
+     * @param mixed[] $utmtags
      */
-    public function __construct(Lead $lead, $utmTag)
+    public function __construct(Lead $lead, protected array $utmtags)
     {
         $this->entity  = $lead;
-        $this->utmtags = $utmTag;
     }
 
-    /**
-     * Returns the Lead entity.
-     *
-     * @return Lead
-     */
-    public function getLead()
+    public function getLead(): Lead
     {
         return $this->entity;
     }
@@ -34,9 +23,9 @@ class LeadUtmTagsEvent extends CommonEvent
     /**
      * Returns the new points.
      *
-     * @return int
+     * @return mixed[]
      */
-    public function getUtmTags()
+    public function getUtmTags(): array
     {
         return $this->utmtags;
     }

@@ -10,36 +10,6 @@ use Mautic\IntegrationsBundle\Sync\DAO\Sync\Report\FieldDAO as ReportFieldDAO;
 class ObjectChangeDAO
 {
     /**
-     * @var string
-     */
-    private $integration;
-
-    /**
-     * @var string
-     */
-    private $object;
-
-    /**
-     * @var mixed
-     */
-    private $objectId;
-
-    /**
-     * @var string
-     */
-    private $mappedObject;
-
-    /**
-     * @var mixed
-     */
-    private $mappedId;
-
-    /**
-     * @var \DateTimeInterface
-     */
-    private $changeDateTime;
-
-    /**
      * @var FieldDAO[]
      */
     private $fields = [];
@@ -66,14 +36,8 @@ class ObjectChangeDAO
      * @param mixed              $mappedId       ID of the source object
      * @param \DateTimeInterface $changeDateTime Date\Time the object was last changed
      */
-    public function __construct($integration, $object, $objectId, $mappedObject, $mappedId, ?\DateTimeInterface $changeDateTime = null)
+    public function __construct(private $integration, private $object, private $objectId, private $mappedObject, private $mappedId, private ?\DateTimeInterface $changeDateTime = null)
     {
-        $this->integration    = $integration;
-        $this->object         = $object;
-        $this->objectId       = $objectId;
-        $this->mappedObject   = $mappedObject;
-        $this->mappedId       = $mappedId;
-        $this->changeDateTime = $changeDateTime;
     }
 
     public function getIntegration(): string

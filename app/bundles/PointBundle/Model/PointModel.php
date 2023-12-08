@@ -36,38 +36,15 @@ use Symfony\Contracts\EventDispatcher\Event;
  */
 class PointModel extends CommonFormModel
 {
-    protected RequestStack $requestStack;
-
-    /**
-     * @var IpLookupHelper
-     */
-    protected $ipLookupHelper;
-
-    /**
-     * @var LeadModel
-     */
-    protected $leadModel;
-
-    /**
-     * @deprecated https://github.com/mautic/mautic/issues/8229
-     *
-     * @var MauticFactory
-     */
-    protected $mauticFactory;
-
-    /**
-     * @var ContactTracker
-     */
-    private $contactTracker;
-
-    private PointGroupModel $pointGroupModel;
-
     public function __construct(
-        RequestStack $requestStack,
-        IpLookupHelper $ipLookupHelper,
-        LeadModel $leadModel,
-        MauticFactory $mauticFactory,
-        ContactTracker $contactTracker,
+        protected RequestStack $requestStack,
+        protected IpLookupHelper $ipLookupHelper,
+        protected LeadModel $leadModel,
+        /**
+         * @deprecated https://github.com/mautic/mautic/issues/8229
+         */
+        protected MauticFactory $mauticFactory,
+        private ContactTracker $contactTracker,
         EntityManager $em,
         CorePermissions $security,
         EventDispatcherInterface $dispatcher,
@@ -76,15 +53,8 @@ class PointModel extends CommonFormModel
         UserHelper $userHelper,
         LoggerInterface $mauticLogger,
         CoreParametersHelper $coreParametersHelper,
-        PointGroupModel $pointGroupModel
+        private PointGroupModel $pointGroupModel
     ) {
-        $this->requestStack       = $requestStack;
-        $this->ipLookupHelper     = $ipLookupHelper;
-        $this->leadModel          = $leadModel;
-        $this->mauticFactory      = $mauticFactory;
-        $this->contactTracker     = $contactTracker;
-        $this->pointGroupModel    = $pointGroupModel;
-
         parent::__construct($em, $security, $dispatcher, $router, $translator, $userHelper, $mauticLogger, $coreParametersHelper);
     }
 
@@ -101,7 +71,7 @@ class PointModel extends CommonFormModel
     /**
      * {@inheritdoc}
      */
-    public function getPermissionBase()
+    public function getPermissionBase(): string
     {
         return 'point:points';
     }
@@ -147,7 +117,7 @@ class PointModel extends CommonFormModel
      *
      * @throws MethodNotAllowedHttpException
      */
-    protected function dispatchEvent($action, &$entity, $isNew = false, Event $event = null)
+    protected function dispatchEvent($action, &$entity, $isNew = false, Event $event = null): ?Event
     {
         if (!$entity instanceof Point) {
             throw new MethodNotAllowedHttpException(['Point']);
@@ -211,12 +181,11 @@ class PointModel extends CommonFormModel
      *
      * @param mixed $eventDetails     passthrough from function triggering action to the callback function
      * @param mixed $typeId           Something unique to the triggering event to prevent  unnecessary duplicate calls
-     * @param Lead  $lead
      * @param bool  $allowUserRequest
      *
      * @throws \ReflectionException
      */
-    public function triggerAction($type, $eventDetails = null, $typeId = null, Lead $lead = null, $allowUserRequest = false)
+    public function triggerAction($type, $eventDetails = null, $typeId = null, Lead $lead = null, $allowUserRequest = false): void
     {
         // only trigger actions for not logged Mautic users
         if (!$this->security->isAnonymous() && !$allowUserRequest) {
@@ -281,13 +250,12 @@ class PointModel extends CommonFormModel
                 'eventDetails' => $eventDetails,
             ];
 
-            $callback = (isset($settings['callback'])) ? $settings['callback'] :
-                ['\\Mautic\\PointBundle\\Helper\\EventHelper', 'engagePointAction'];
+            $callback = $settings['callback'] ?? [\Mautic\PointBundle\Helper\EventHelper::class, 'engagePointAction'];
 
             if (is_callable($callback)) {
                 if (is_array($callback)) {
                     $reflection = new \ReflectionMethod($callback[0], $callback[1]);
-                } elseif (false !== strpos($callback, '::')) {
+                } elseif (str_contains($callback, '::')) {
                     $parts      = explode('::', $callback);
                     $reflection = new \ReflectionMethod($parts[0], $parts[1]);
                 } else {

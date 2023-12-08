@@ -48,22 +48,13 @@ class LeadApiController extends CommonApiController
     /**
      * @var LeadModel|null
      */
-    protected $model = null;
+    protected $model;
 
     private DoNotContactModel $doNotContactModel;
 
-    private ContactMerger $contactMerger;
-
-    private UserHelper $userHelper;
-
-    private IpLookupHelper $ipLookupHelper;
-
-    public function __construct(CorePermissions $security, Translator $translator, EntityResultHelper $entityResultHelper, RouterInterface $router, FormFactoryInterface $formFactory, DoNotContactModel $doNotContactModel, AppVersion $appVersion, ContactMerger $contactMerger, UserHelper $userHelper, IpLookupHelper $ipLookupHelper, RequestStack $requestStack, ManagerRegistry $doctrine, ModelFactory $modelFactory, EventDispatcherInterface $dispatcher, CoreParametersHelper $coreParametersHelper, MauticFactory $factory)
+    public function __construct(CorePermissions $security, Translator $translator, EntityResultHelper $entityResultHelper, RouterInterface $router, FormFactoryInterface $formFactory, DoNotContactModel $doNotContactModel, AppVersion $appVersion, private ContactMerger $contactMerger, private UserHelper $userHelper, private IpLookupHelper $ipLookupHelper, RequestStack $requestStack, ManagerRegistry $doctrine, ModelFactory $modelFactory, EventDispatcherInterface $dispatcher, CoreParametersHelper $coreParametersHelper, MauticFactory $factory)
     {
         $this->doNotContactModel = $doNotContactModel;
-        $this->contactMerger     = $contactMerger;
-        $this->userHelper        = $userHelper;
-        $this->ipLookupHelper    = $ipLookupHelper;
 
         $leadModel = $modelFactory->getModel(self::MODEL_ID);
         \assert($leadModel instanceof LeadModel);
@@ -563,10 +554,8 @@ class LeadApiController extends CommonApiController
         }
 
         // keep existing tags
-        if (count($entity->getTags()) > 0) {
-            foreach ($entity->getTags() as $tag) {
-                $parameters['tags'][] = $tag->getId();
-            }
+        foreach ($entity->getTags() as $tag) {
+            $parameters['tags'][] = $tag->getId();
         }
 
         // keep existing owner if it is not set or should be reset to null
@@ -599,7 +588,7 @@ class LeadApiController extends CommonApiController
             if ($entity->getId() && $existingEntity->getId()) {
                 try {
                     $entity = $contactMerger->merge($entity, $existingEntity);
-                } catch (SameContactException $exception) {
+                } catch (SameContactException) {
                 }
             } elseif ($existingEntity->getId()) {
                 $entity = $existingEntity;
@@ -707,22 +696,16 @@ class LeadApiController extends CommonApiController
      * Helper method to be used in FrequencyRuleTrait.
      *
      * @param Form $form
-     *
-     * @return bool
      */
-    protected function isFormCancelled($form = null)
+    protected function isFormCancelled($form = null): bool
     {
         return false;
     }
 
     /**
      * Helper method to be used in FrequencyRuleTrait.
-     *
-     * @param array $data
-     *
-     * @return bool
      */
-    protected function isFormValid(Form $form, array $data = null)
+    protected function isFormValid(Form $form, array $data = null): bool
     {
         $form->submit($data, 'PATCH' !== $this->requestStack->getCurrentRequest()->getMethod());
 

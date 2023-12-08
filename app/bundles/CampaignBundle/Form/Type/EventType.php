@@ -16,14 +16,11 @@ use Symfony\Component\Form\Extension\Core\Type\TimeType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
-/**
- * Class EventType.
- */
 class EventType extends AbstractType
 {
     use PropertiesTrait;
 
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $masks = [];
 
@@ -229,7 +226,7 @@ class EventType extends AbstractType
             HiddenType::class,
             [
                 'mapped' => false,
-                'data'   => (isset($options['data']['anchorEventType'])) ? $options['data']['anchorEventType'] : '',
+                'data'   => $options['data']['anchorEventType'] ?? '',
             ]
         );
 
@@ -277,7 +274,7 @@ class EventType extends AbstractType
         }
     }
 
-    public function configureOptions(OptionsResolver $resolver)
+    public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setRequired(['settings']);
     }

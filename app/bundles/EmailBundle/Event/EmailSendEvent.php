@@ -11,11 +11,6 @@ use Mautic\LeadBundle\Entity\Lead;
 class EmailSendEvent extends CommonEvent
 {
     /**
-     * @var MailHelper
-     */
-    private $helper;
-
-    /**
      * @var Email|null
      */
     private $email;
@@ -66,17 +61,11 @@ class EmailSendEvent extends CommonEvent
     private $textHeaders = [];
 
     /**
-     * @var bool
-     */
-    private $isDynamicContentParsing;
-
-    /**
      * @param array $args
      * @param bool  $isDynamicContentParsing
      */
-    public function __construct(MailHelper $helper = null, $args = [], $isDynamicContentParsing = false)
+    public function __construct(private ?MailHelper $helper = null, $args = [], private $isDynamicContentParsing = false)
     {
-        $this->helper      = $helper;
         $this->content     = $args['content'] ?? '';
         $this->plainText   = $args['plainText'] ?? '';
         $this->subject     = $args['subject'] ?? '';
@@ -96,8 +85,6 @@ class EmailSendEvent extends CommonEvent
         } elseif (null !== $helper) {
             $this->internalSend = $helper->isInternalSend();
         }
-
-        $this->isDynamicContentParsing = $isDynamicContentParsing;
     }
 
     /**
@@ -112,12 +99,10 @@ class EmailSendEvent extends CommonEvent
 
     /**
      * Return if the transport and mailer is in batch mode (tokenized emails).
-     *
-     * @return bool
      */
-    public function inTokenizationMode()
+    public function inTokenizationMode(): bool
     {
-        return (null !== $this->helper) ? $this->helper->inTokenizationMode() : false;
+        return null !== $this->helper && $this->helper->inTokenizationMode();
     }
 
     /**
@@ -149,7 +134,7 @@ class EmailSendEvent extends CommonEvent
     /**
      * Set email content.
      */
-    public function setContent($content)
+    public function setContent($content): void
     {
         if (null !== $this->helper) {
             $this->helper->setBody($content, 'text/html', null, true);
@@ -173,7 +158,7 @@ class EmailSendEvent extends CommonEvent
         }
     }
 
-    public function setPlainText($content)
+    public function setPlainText($content): void
     {
         if (null !== $this->helper) {
             $this->helper->setPlainText($content);
@@ -186,7 +171,7 @@ class EmailSendEvent extends CommonEvent
     /**
      * Check if plain text is empty. If yes, generate it.
      */
-    private function setGeneratedPlainText()
+    private function setGeneratedPlainText(): void
     {
         $htmlContent = $this->getContent();
         if ('' === $this->getPlainText() && '' !== $htmlContent) {
@@ -212,10 +197,8 @@ class EmailSendEvent extends CommonEvent
 
     /**
      * @param string $subject
-     *
-     * @return EmailSendEvent
      */
-    public function setSubject($subject)
+    public function setSubject($subject): void
     {
         if (null !== $this->helper) {
             $this->helper->setSubject($subject);
@@ -258,12 +241,12 @@ class EmailSendEvent extends CommonEvent
         return (null !== $this->helper) ? $this->helper->getSource() : $this->source;
     }
 
-    public function addTokens(array $tokens)
+    public function addTokens(array $tokens): void
     {
         $this->tokens = array_merge($this->tokens, $tokens);
     }
 
-    public function addToken($key, $value)
+    public function addToken($key, $value): void
     {
         $this->tokens[$key] = $value;
     }
@@ -284,7 +267,7 @@ class EmailSendEvent extends CommonEvent
         return $tokens;
     }
 
-    public function addTextHeader($name, $value)
+    public function addTextHeader($name, $value): void
     {
         if (null !== $this->helper) {
             $this->helper->addCustomHeader($name, $value);
@@ -303,20 +286,16 @@ class EmailSendEvent extends CommonEvent
 
     /**
      * Check if the listener should append it's own clickthrough in URLs or if the email tracking URL conversion process should take care of it.
-     *
-     * @return bool
      */
-    public function shouldAppendClickthrough()
+    public function shouldAppendClickthrough(): bool
     {
         return !$this->isInternalSend() && null === $this->getEmail();
     }
 
     /**
      * Generate a clickthrough array for URLs.
-     *
-     * @return array
      */
-    public function generateClickthrough()
+    public function generateClickthrough(): array
     {
         $source       = $this->getSource();
         $email        = $this->getEmail();
@@ -363,8 +342,7 @@ class EmailSendEvent extends CommonEvent
         $content .= $this->getContent();
         $content .= $this->getPlainText();
         $content .= $this->getEmail() ? $this->getEmail()->getCustomHtml() : '';
-        $content .= implode(' ', $this->getTextHeaders());
 
-        return $content;
+        return $content.implode(' ', $this->getTextHeaders());
     }
 }

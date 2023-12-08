@@ -100,10 +100,8 @@ trait FrequencyRuleTrait
      * @param null $leadChannels
      * @param bool $isPublic
      * @param null $frequencyRules
-     *
-     * @return array
      */
-    protected function getFrequencyRuleFormData(Lead $lead, array $allChannels = null, $leadChannels = null, $isPublic = false, $frequencyRules = null, $isPreferenceCenter = false)
+    protected function getFrequencyRuleFormData(Lead $lead, array $allChannels = null, $leadChannels = null, $isPublic = false, $frequencyRules = null, $isPreferenceCenter = false): array
     {
         $data = [];
 
@@ -140,11 +138,9 @@ trait FrequencyRuleTrait
             }
         }
 
-        $data['global_categories'] = (isset($frequencyRules['global_categories']))
-            ? $frequencyRules['global_categories']
-            : $model->getLeadCategories(
-                $lead
-            );
+        $data['global_categories'] = $frequencyRules['global_categories'] ?? $model->getLeadCategories(
+            $lead
+        );
         $this->leadLists    = $model->getLists($lead, false, false, $isPublic, $isPreferenceCenter);
         $data['lead_lists'] = [];
         foreach ($this->leadLists as $leadList) {
@@ -181,13 +177,11 @@ trait FrequencyRuleTrait
                 }
             }
             $dncChannels = array_diff($allChannels, $formData['lead_channels']['subscribed_channels']);
-            if (!empty($dncChannels)) {
-                foreach ($dncChannels as $channel) {
-                    if ($currentChannelId) {
-                        $channel = [$channel => $currentChannelId];
-                    }
-                    $dncModel->addDncForContact($lead->getId(), $channel, ($this->isPublicView) ? DoNotContact::UNSUBSCRIBED : DoNotContact::MANUAL, 'user');
+            foreach ($dncChannels as $channel) {
+                if ($currentChannelId) {
+                    $channel = [$channel => $currentChannelId];
                 }
+                $dncModel->addDncForContact($lead->getId(), $channel, ($this->isPublicView) ? DoNotContact::UNSUBSCRIBED : DoNotContact::MANUAL, 'user');
             }
         }
         $leadModel->setFrequencyRules($lead, $formData, $this->leadLists);

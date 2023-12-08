@@ -41,7 +41,7 @@ class StepProvider
      */
     private function orderSteps(array $steps): array
     {
-        usort($steps, function (StepInterface $step1, StepInterface $step2) {
+        usort($steps, function (StepInterface $step1, StepInterface $step2): int {
             if ($step1->getOrder() === $step2->getOrder()) {
                 return 0;
             }

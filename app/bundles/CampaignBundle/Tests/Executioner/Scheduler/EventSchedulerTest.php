@@ -185,7 +185,7 @@ class EventSchedulerTest extends \PHPUnit\Framework\TestCase
 
         $contact = $this->createMock(Lead::class);
         $contact->method('getId')
-            ->willReturn('1');
+            ->willReturn(1);
         $contact->method('getTimezone')
             ->willReturn('America/New_York');
 
@@ -238,7 +238,7 @@ class EventSchedulerTest extends \PHPUnit\Framework\TestCase
 
         $contact = $this->createMock(Lead::class);
         $contact->method('getId')
-            ->willReturn('1');
+            ->willReturn(1);
         $contact->method('getTimezone')
             ->willReturn('America/New_York');
 
@@ -291,7 +291,7 @@ class EventSchedulerTest extends \PHPUnit\Framework\TestCase
 
         $contact = $this->createMock(Lead::class);
         $contact->method('getId')
-            ->willReturn('1');
+            ->willReturn(1);
         $contact->method('getTimezone')
             ->willReturn('America/New_York');
 

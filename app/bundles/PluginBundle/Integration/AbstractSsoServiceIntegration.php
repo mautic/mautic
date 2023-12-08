@@ -33,7 +33,7 @@ abstract class AbstractSsoServiceIntegration extends AbstractIntegration
     {
         $featureSettings = $this->settings->getFeatureSettings();
 
-        $role = (isset($featureSettings['new_user_role'])) ? $featureSettings['new_user_role'] : false;
+        $role = $featureSettings['new_user_role'] ?? false;
 
         if ($role) {
             return $this->em->getReference(Role::class, $role);
@@ -44,14 +44,12 @@ abstract class AbstractSsoServiceIntegration extends AbstractIntegration
 
     /**
      * Returns if a new user should be created if authenticated and not found locally.
-     *
-     * @return bool
      */
-    public function shouldAutoCreateNewUser()
+    public function shouldAutoCreateNewUser(): bool
     {
         $featureSettings = $this->settings->getFeatureSettings();
 
-        return (isset($featureSettings['auto_create_user'])) ? (bool) $featureSettings['auto_create_user'] : false;
+        return isset($featureSettings['auto_create_user']) && (bool) $featureSettings['auto_create_user'];
     }
 
     /**
@@ -92,7 +90,7 @@ abstract class AbstractSsoServiceIntegration extends AbstractIntegration
         $data = $this->prepareResponseForExtraction($data);
 
         // parse the response
-        $authTokenKey = ($tokenOverride) ? $tokenOverride : $this->getAuthTokenKey();
+        $authTokenKey = $tokenOverride ?: $this->getAuthTokenKey();
         if (is_array($data) && isset($data[$authTokenKey])) {
             return $data;
         }
@@ -118,9 +116,9 @@ abstract class AbstractSsoServiceIntegration extends AbstractIntegration
     /**
      * Get form settings; authorization is not needed since it is done when a user logs in.
      *
-     * @return array
+     * @return array<string, mixed>
      */
-    public function getFormSettings()
+    public function getFormSettings(): array
     {
         return [
             'requires_callback'      => true,
@@ -135,14 +133,14 @@ abstract class AbstractSsoServiceIntegration extends AbstractIntegration
      * @param array                                    $data
      * @param string                                   $formArea
      */
-    public function appendToForm(&$builder, $data, $formArea)
+    public function appendToForm(&$builder, $data, $formArea): void
     {
         if ('features' == $formArea) {
             $builder->add('auto_create_user',
                 YesNoButtonGroupType::class,
                 [
                     'label' => 'mautic.integration.sso.auto_create_user',
-                    'data'  => (isset($data['auto_create_user'])) ? (bool) $data['auto_create_user'] : false,
+                    'data'  => isset($data['auto_create_user']) && (bool) $data['auto_create_user'],
                     'attr'  => [
                         'tooltip' => 'mautic.integration.sso.auto_create_user.tooltip',
                     ],

@@ -8,7 +8,6 @@ use Mautic\CoreBundle\Event\CommonEvent;
 
 final class ImportInitEvent extends CommonEvent
 {
-    public string $routeObjectName;
     public bool $objectSupported = false;
     public ?string $objectSingular;
     public ?string $objectName; // Object name for humans. Will go through translator.
@@ -16,12 +15,11 @@ final class ImportInitEvent extends CommonEvent
     public ?string $indexRoute;
     public array $indexRouteParams = [];
 
-    public function __construct(string $routeObjectName)
+    public function __construct(public string $routeObjectName)
     {
-        $this->routeObjectName = $routeObjectName;
     }
 
-    public function setIndexRoute(?string $indexRoute, array $routeParams = [])
+    public function setIndexRoute(?string $indexRoute, array $routeParams = []): void
     {
         $this->indexRoute       = $indexRoute;
         $this->indexRouteParams = $routeParams;

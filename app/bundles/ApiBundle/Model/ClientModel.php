@@ -33,14 +33,10 @@ class ClientModel extends FormModel
 
     private ?string $apiMode = null;
 
-    private RequestStack $requestStack;
-
     private const DEFAULT_API_MODE = 'oauth2';
 
-    public function __construct(RequestStack $requestStack, EntityManager $em, CorePermissions $security, EventDispatcherInterface $dispatcher, UrlGeneratorInterface $router, Translator $translator, UserHelper $userHelper, LoggerInterface $mauticLogger, CoreParametersHelper $coreParametersHelper)
+    public function __construct(private RequestStack $requestStack, EntityManager $em, CorePermissions $security, EventDispatcherInterface $dispatcher, UrlGeneratorInterface $router, Translator $translator, UserHelper $userHelper, LoggerInterface $mauticLogger, CoreParametersHelper $coreParametersHelper)
     {
-        $this->requestStack = $requestStack;
-
         parent::__construct($em, $security, $dispatcher, $router, $translator, $userHelper, $mauticLogger, $coreParametersHelper);
     }
 
@@ -57,7 +53,7 @@ class ClientModel extends FormModel
         return self::DEFAULT_API_MODE;
     }
 
-    public function setApiMode($apiMode)
+    public function setApiMode($apiMode): void
     {
         $this->apiMode = $apiMode;
     }
@@ -73,7 +69,7 @@ class ClientModel extends FormModel
     /**
      * {@inheritdoc}
      */
-    public function getPermissionBase()
+    public function getPermissionBase(): string
     {
         return 'api:clients';
     }
@@ -111,7 +107,7 @@ class ClientModel extends FormModel
      *
      * @throws MethodNotAllowedHttpException
      */
-    protected function dispatchEvent($action, &$entity, $isNew = false, Event $event = null)
+    protected function dispatchEvent($action, &$entity, $isNew = false, Event $event = null): ?Event
     {
         if (!$entity instanceof Client) {
             throw new MethodNotAllowedHttpException(['Client']);

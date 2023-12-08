@@ -94,11 +94,9 @@ class HubspotIntegration extends CrmAbstractIntegration
     }
 
     /**
-     * {@inheritdoc}
-     *
-     * @return array
+     * @return array<string, string>
      */
-    public function getRequiredKeyFields()
+    public function getRequiredKeyFields(): array
     {
         return [];
     }
@@ -121,10 +119,7 @@ class HubspotIntegration extends CrmAbstractIntegration
         return 'hapikey';
     }
 
-    /**
-     * @return array
-     */
-    public function getSupportedFeatures()
+    public function getSupportedFeatures(): array
     {
         return ['push_lead', 'get_leads'];
     }
@@ -142,9 +137,9 @@ class HubspotIntegration extends CrmAbstractIntegration
     }
 
     /**
-     * @return array<string,bool>
+     * @return array<string, bool>
      */
-    public function getFormSettings()
+    public function getFormSettings(): array
     {
         return [
             'requires_callback'      => false,
@@ -154,10 +149,8 @@ class HubspotIntegration extends CrmAbstractIntegration
 
     /**
      * {@inheritdoc}
-     *
-     * @return string
      */
-    public function getAuthenticationType()
+    public function getAuthenticationType(): string
     {
         return $this->getBearerToken() ? 'oauth2' : 'key';
     }
@@ -172,10 +165,8 @@ class HubspotIntegration extends CrmAbstractIntegration
 
     /**
      * Get if data priority is enabled in the integration or not default is false.
-     *
-     * @return string
      */
-    public function getDataPriority()
+    public function getDataPriority(): bool
     {
         return true;
     }
@@ -203,22 +194,22 @@ class HubspotIntegration extends CrmAbstractIntegration
     }
 
     /**
-     * @return array|mixed
+     * @return mixed[]
      */
-    public function getAvailableLeadFields($settings = [])
+    public function getAvailableLeadFields($settings = []): array
     {
         if ($fields = parent::getAvailableLeadFields()) {
             return $fields;
         }
 
         $hubsFields        = [];
-        $silenceExceptions = (isset($settings['silence_exceptions'])) ? $settings['silence_exceptions'] : true;
+        $silenceExceptions = $settings['silence_exceptions'] ?? true;
 
         if (isset($settings['feature_settings']['objects'])) {
             $hubspotObjects = $settings['feature_settings']['objects'];
         } else {
             $settings       = $this->settings->getFeatureSettings();
-            $hubspotObjects = isset($settings['objects']) ? $settings['objects'] : ['contacts'];
+            $hubspotObjects = $settings['objects'] ?? ['contacts'];
         }
 
         try {
@@ -312,10 +303,8 @@ class HubspotIntegration extends CrmAbstractIntegration
 
     /**
      * {@inheritdoc}
-     *
-     * @return bool
      */
-    public function isAuthorized()
+    public function isAuthorized(): bool
     {
         $keys = $this->getKeys();
 
@@ -337,7 +326,7 @@ class HubspotIntegration extends CrmAbstractIntegration
      * @param array       $data
      * @param string      $formArea
      */
-    public function appendToForm(&$builder, $data, $formArea)
+    public function appendToForm(&$builder, $data, $formArea): void
     {
         if ('keys' === $formArea) {
             $builder->add(
@@ -616,14 +605,7 @@ class HubspotIntegration extends CrmAbstractIntegration
         }
 
         $object         = 'contacts';
-        $fieldsToUpdate = $this->getPriorityFieldsForIntegration($config);
         $createFields   = $config['leadFields'];
-
-        // @todo Hubspot's createLead uses createOrUpdate endpoint which means we don't know before we send mapped data if the contact will be updated or created; so we have to send all mapped fields
-        $updateFields = array_intersect_key(
-            $createFields,
-            $fieldsToUpdate
-        );
 
         $readOnlyFields = $this->getReadOnlyFields($object);
 
@@ -682,7 +664,7 @@ class HubspotIntegration extends CrmAbstractIntegration
     /**
      * Amend mapped lead data before pushing to CRM.
      */
-    public function amendLeadDataBeforePush(&$mappedData)
+    public function amendLeadDataBeforePush(&$mappedData): void
     {
         foreach ($mappedData as &$data) {
             $data = str_replace('|', ';', $data);
@@ -694,7 +676,7 @@ class HubspotIntegration extends CrmAbstractIntegration
      *
      * @throws \Exception
      */
-    private function getReadOnlyFields($object)
+    private function getReadOnlyFields($object): ?array
     {
         $fields = ArrayHelper::getValue($object, $this->getAvailableLeadFields(), []);
 

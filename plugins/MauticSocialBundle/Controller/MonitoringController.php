@@ -455,7 +455,7 @@ class MonitoringController extends FormController
                 'viewParameters' => [
                     'activeMonitoring' => $monitoringEntity,
                     'logs'             => $logs,
-                    'isEmbedded'       => $request->get('isEmbedded') ? $request->get('isEmbedded') : false,
+                    'isEmbedded'       => $request->get('isEmbedded') ?: false,
                     'tmpl'             => $tmpl,
                     'security'         => $security,
                     'leadStats'        => $chart->render(),
@@ -648,7 +648,7 @@ class MonitoringController extends FormController
     /*
      * Update the audit log
      */
-    public function updateAuditLog(Monitoring $monitoring, IpLookupHelper $ipLookupHelper, $action)
+    public function updateAuditLog(Monitoring $monitoring, IpLookupHelper $ipLookupHelper, $action): void
     {
         $log = [
             'bundle'    => 'plugin.mauticSocial',

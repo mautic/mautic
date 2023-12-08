@@ -8,19 +8,11 @@ use Symfony\Contracts\EventDispatcher\Event;
 
 class TriggerExecutedEvent extends Event
 {
-    /** @var TriggerEventEntity */
-    private $triggerEvent;
-
-    /** @var Lead */
-    private $lead;
-
     /** @var bool */
     private $result;
 
-    public function __construct(TriggerEventEntity $triggerEvent, Lead $lead)
+    public function __construct(private TriggerEventEntity $triggerEvent, private Lead $lead)
     {
-        $this->triggerEvent = $triggerEvent;
-        $this->lead         = $lead;
     }
 
     /**
@@ -47,12 +39,12 @@ class TriggerExecutedEvent extends Event
         return $this->result;
     }
 
-    public function setSucceded()
+    public function setSucceded(): void
     {
         $this->result = true;
     }
 
-    public function setFailed()
+    public function setFailed(): void
     {
         $this->result = false;
     }

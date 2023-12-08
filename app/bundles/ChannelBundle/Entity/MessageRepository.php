@@ -28,7 +28,7 @@ class MessageRepository extends CommonRepository
     /**
      * {@inheritdoc}
      */
-    public function getTableAlias()
+    public function getTableAlias(): string
     {
         return 'm';
     }
@@ -66,10 +66,7 @@ class MessageRepository extends CommonRepository
         return $q->getQuery()->getArrayResult();
     }
 
-    /**
-     * @return array
-     */
-    public function getMessageChannels($messageId)
+    public function getMessageChannels($messageId): array
     {
         $q = $this->_em->getConnection()->createQueryBuilder();
         $q->from(MAUTIC_TABLE_PREFIX.'message_channels', 'mc')

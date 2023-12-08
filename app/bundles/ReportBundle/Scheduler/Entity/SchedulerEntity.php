@@ -8,31 +8,13 @@ use Mautic\ReportBundle\Scheduler\SchedulerInterface;
 class SchedulerEntity implements SchedulerInterface
 {
     /**
-     * @var bool
+     * @param bool        $isScheduled
+     * @param string|null $scheduleUnit
+     * @param string|null $scheduleDay
+     * @param string|null $scheduleMonthFrequency
      */
-    private $isScheduled = false;
-
-    /**
-     * @var string|null
-     */
-    private $scheduleUnit;
-
-    /**
-     * @var string|null
-     */
-    private $scheduleDay;
-
-    /**
-     * @var string|null
-     */
-    private $scheduleMonthFrequency;
-
-    public function __construct($isScheduled, $scheduleUnit, $scheduleDay, $scheduleMonthFrequency)
+    public function __construct(private $isScheduled, private $scheduleUnit, private $scheduleDay, private $scheduleMonthFrequency)
     {
-        $this->isScheduled            = $isScheduled;
-        $this->scheduleUnit           = $scheduleUnit;
-        $this->scheduleDay            = $scheduleDay;
-        $this->scheduleMonthFrequency = $scheduleMonthFrequency;
     }
 
     /**
@@ -72,22 +54,22 @@ class SchedulerEntity implements SchedulerInterface
         return SchedulerEnum::UNIT_NOW === $this->getScheduleUnit();
     }
 
-    public function isScheduledDaily()
+    public function isScheduledDaily(): bool
     {
         return SchedulerEnum::UNIT_DAILY === $this->getScheduleUnit();
     }
 
-    public function isScheduledWeekly()
+    public function isScheduledWeekly(): bool
     {
         return SchedulerEnum::UNIT_WEEKLY === $this->getScheduleUnit();
     }
 
-    public function isScheduledMonthly()
+    public function isScheduledMonthly(): bool
     {
         return SchedulerEnum::UNIT_MONTHLY === $this->getScheduleUnit();
     }
 
-    public function isScheduledWeekDays()
+    public function isScheduledWeekDays(): bool
     {
         return SchedulerEnum::DAY_WEEK_DAYS === $this->getScheduleDay();
     }

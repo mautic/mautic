@@ -10,37 +10,22 @@ use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-/**
- * Class CampaignListType.
- */
 class CampaignListType extends AbstractType
 {
-    /**
-     * @var CampaignModel
-     */
-    private $model;
-
-    /**
-     * @var TranslatorInterface
-     */
-    protected $translator;
-
     /**
      * @var bool
      */
     private $canViewOther = false;
 
-    public function __construct(CampaignModel $campaignModel, TranslatorInterface $translator, CorePermissions $security)
+    public function __construct(private CampaignModel $model, protected TranslatorInterface $translator, CorePermissions $security)
     {
-        $this->model        = $campaignModel;
-        $this->translator   = $translator;
         $this->canViewOther = $security->isGranted('campaign:campaigns:viewother');
     }
 
     /**
      * {@inheritdoc}
      */
-    public function configureOptions(OptionsResolver $resolver)
+    public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults(
             [

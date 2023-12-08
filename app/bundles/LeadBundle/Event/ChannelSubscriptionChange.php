@@ -9,34 +9,10 @@ use Symfony\Contracts\EventDispatcher\Event;
 class ChannelSubscriptionChange extends Event
 {
     /**
-     * @var Lead
+     * @param string $channel
      */
-    private $lead;
-
-    /**
-     * @var string
-     */
-    private $channel;
-
-    /**
-     * @var string
-     */
-    private $oldStatus;
-
-    /**
-     * @var string
-     */
-    private $newStatus;
-
-    /**
-     * ContactStatusChange constructor.
-     */
-    public function __construct(Lead $lead, $channel, $oldStatus, $newStatus)
+    public function __construct(private Lead $lead, private $channel, private int $oldStatus, private int $newStatus)
     {
-        $this->lead      = $lead;
-        $this->channel   = $channel;
-        $this->oldStatus = $oldStatus;
-        $this->newStatus = $newStatus;
     }
 
     /**
@@ -92,16 +68,11 @@ class ChannelSubscriptionChange extends Event
      */
     private function getDncReasonVerb($reason)
     {
-        // use true matching or else 'foobar' == DoNotContact::IS_CONTACTABLE
-        switch (true) {
-            case DoNotContact::IS_CONTACTABLE === $reason:
-                return 'contactable';
-            case DoNotContact::BOUNCED === $reason:
-                return 'bounced';
-            case DoNotContact::MANUAL === $reason:
-                return 'manual';
-            default:
-                return 'unsubscribed';
-        }
+        return match (true) {
+            DoNotContact::IS_CONTACTABLE === $reason => 'contactable',
+            DoNotContact::BOUNCED === $reason        => 'bounced',
+            DoNotContact::MANUAL === $reason         => 'manual',
+            default                                  => 'unsubscribed',
+        };
     }
 }

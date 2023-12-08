@@ -17,29 +17,14 @@ class OwnerSubscriber implements EventSubscriberInterface
     private $ownerFieldSprintf = '{ownerfield=%s}';
 
     /**
-     * @var TranslatorInterface
-     */
-    private $translator;
-
-    /**
-     * @var LeadModel
-     */
-    private $leadModel;
-
-    /**
      * @var array
      */
     private $owners;
 
     public const onwerColumns = ['email', 'firstname', 'lastname', 'position', 'signature'];
 
-    /**
-     * OwnerSubscriber constructor.
-     */
-    public function __construct(LeadModel $leadModel, TranslatorInterface $translator)
+    public function __construct(private LeadModel $leadModel, private TranslatorInterface $translator)
     {
-        $this->translator = $translator;
-        $this->leadModel  = $leadModel;
     }
 
     /**
@@ -54,19 +39,19 @@ class OwnerSubscriber implements EventSubscriberInterface
         ];
     }
 
-    public function onEmailBuild(EmailBuilderEvent $event)
+    public function onEmailBuild(EmailBuilderEvent $event): void
     {
         foreach (self::onwerColumns as $ownerAlias) {
             $event->addToken($this->buildToken($ownerAlias), $this->buildLabel($ownerAlias));
         }
     }
 
-    public function onEmailDisplay(EmailSendEvent $event)
+    public function onEmailDisplay(EmailSendEvent $event): void
     {
         $this->onEmailGenerate($event);
     }
 
-    public function onEmailGenerate(EmailSendEvent $event)
+    public function onEmailGenerate(EmailSendEvent $event): void
     {
         $event->addTokens($this->getGeneratedTokens($event));
     }
@@ -101,7 +86,7 @@ class OwnerSubscriber implements EventSubscriberInterface
         $combinedContent = $event->getCombinedContent();
         foreach (self::onwerColumns as $ownerColumn) {
             $token = $this->buildToken($ownerColumn);
-            if (false !== strpos($combinedContent, $token)) {
+            if (str_contains($combinedContent, $token)) {
                 $ownerColumnNormalized = str_replace(['firstname', 'lastname'], ['first_name', 'last_name'], $ownerColumn);
                 $tokens[$token]        = $owner[$ownerColumnNormalized] ?? null;
             }
@@ -146,10 +131,8 @@ class OwnerSubscriber implements EventSubscriberInterface
      * Creates a token using defined pattern.
      *
      * @param string $field
-     *
-     * @return string
      */
-    private function buildToken($field)
+    private function buildToken($field): string
     {
         return sprintf($this->ownerFieldSprintf, $field);
     }
@@ -158,10 +141,8 @@ class OwnerSubscriber implements EventSubscriberInterface
      * Creates translation ready label Owner Firstname etc.
      *
      * @param string $field
-     *
-     * @return string
      */
-    private function buildLabel($field)
+    private function buildLabel($field): string
     {
         return sprintf(
             '%s %s',

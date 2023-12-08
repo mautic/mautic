@@ -7,31 +7,6 @@ namespace Mautic\IntegrationsBundle\Sync\DAO\Sync\Request;
 class ObjectDAO
 {
     /**
-     * @var string
-     */
-    private $object;
-
-    /**
-     * Date/time based on last synced date for the object or the start date/time fed through the command's arguments.
-     * This value does not change between iterations.
-     *
-     * @var \DateTimeInterface|null
-     */
-    private $fromDateTime;
-
-    /**
-     * Date/Time the sync started.
-     *
-     * @var \DateTimeInterface|null
-     */
-    private $toDateTime;
-
-    /**
-     * @var \DateTimeInterface|null
-     */
-    private $objectLastSyncDateTime;
-
-    /**
      * @var string[]
      */
     private $fields = [];
@@ -42,15 +17,18 @@ class ObjectDAO
     private $requiredFields = [];
 
     public function __construct(
-        string $object,
-        ?\DateTimeInterface $fromDateTime = null,
-        ?\DateTimeInterface $toDateTime = null,
-        ?\DateTimeInterface $objectLastSyncDateTime = null
+        private string $object,
+        /**
+         * Date/time based on last synced date for the object or the start date/time fed through the command's arguments.
+         * This value does not change between iterations.
+         */
+        private ?\DateTimeInterface $fromDateTime = null,
+        /**
+         * Date/Time the sync started.
+         */
+        private ?\DateTimeInterface $toDateTime = null,
+        private ?\DateTimeInterface $objectLastSyncDateTime = null
     ) {
-        $this->object                 = $object;
-        $this->fromDateTime           = $fromDateTime;
-        $this->toDateTime             = $toDateTime;
-        $this->objectLastSyncDateTime = $objectLastSyncDateTime;
     }
 
     public function getObject(): string

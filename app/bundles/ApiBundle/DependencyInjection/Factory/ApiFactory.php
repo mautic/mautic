@@ -8,9 +8,6 @@ use Symfony\Component\DependencyInjection\ChildDefinition;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
 
-/**
- * Class ApiFactory.
- */
 class ApiFactory implements SecurityFactoryInterface
 {
     /**
@@ -48,7 +45,7 @@ class ApiFactory implements SecurityFactoryInterface
     /**
      * {@inheritdoc}
      */
-    public function addConfiguration(NodeDefinition $node)
+    public function addConfiguration(NodeDefinition $node): void
     {
     }
 }

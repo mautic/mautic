@@ -9,27 +9,9 @@ final class GeneratedColumn implements GeneratedColumnInterface
     /**
      * @var string
      */
-    private $tableName;
-
-    /**
-     * @var string
-     */
     private $tablePrefix = '';
 
-    /**
-     * @var string
-     */
-    private $columnName;
-
-    /**
-     * @var string
-     */
-    private $columnType;
-
-    /**
-     * @var string
-     */
-    private $as;
+    private string $columnName;
 
     /**
      * @var string|null
@@ -46,14 +28,11 @@ final class GeneratedColumn implements GeneratedColumnInterface
      */
     private $indexColumns = [];
 
-    public function __construct(string $tableName, string $columnName, string $columnType, string $as)
+    public function __construct(private string $tableName, string $columnName, private string $columnType, private string $as)
     {
-        $this->as             = $as;
-        $this->tableName      = $tableName;
         $this->indexColumns[] = $columnName;
         $this->tablePrefix    = MAUTIC_TABLE_PREFIX;
         $this->columnName     = $columnName;
-        $this->columnType     = $columnType;
     }
 
     public function getTableName(): string

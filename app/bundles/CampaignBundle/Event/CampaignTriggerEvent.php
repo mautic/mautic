@@ -8,18 +8,12 @@ use Symfony\Contracts\EventDispatcher\Event;
 class CampaignTriggerEvent extends Event
 {
     /**
-     * @var Campaign
-     */
-    protected $campaign;
-
-    /**
      * @var bool
      */
     protected $triggerCampaign = true;
 
-    public function __construct(Campaign $campaign)
+    public function __construct(protected Campaign $campaign)
     {
-        $this->campaign = $campaign;
     }
 
     /**
@@ -43,7 +37,7 @@ class CampaignTriggerEvent extends Event
     /**
      * Do not trigger this campaign.
      */
-    public function doNotTrigger()
+    public function doNotTrigger(): void
     {
         $this->triggerCampaign = false;
 

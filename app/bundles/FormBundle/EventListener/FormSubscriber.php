@@ -24,26 +24,14 @@ class FormSubscriber implements EventSubscriberInterface
 {
     private MailHelper $mailer;
 
-    private AuditLogModel $auditLogModel;
-
-    private IpLookupHelper $ipLookupHelper;
-
-    private TranslatorInterface $translator;
-
-    private RouterInterface $router;
-
     public function __construct(
-        IpLookupHelper $ipLookupHelper,
-        AuditLogModel $auditLogModel,
+        private IpLookupHelper $ipLookupHelper,
+        private AuditLogModel $auditLogModel,
         MailHelper $mailer,
-        TranslatorInterface $translator,
-        RouterInterface $router
+        private TranslatorInterface $translator,
+        private RouterInterface $router
     ) {
-        $this->ipLookupHelper       = $ipLookupHelper;
-        $this->auditLogModel        = $auditLogModel;
         $this->mailer               = $mailer->getMailer();
-        $this->translator           = $translator;
-        $this->router               = $router;
     }
 
     /**
@@ -65,7 +53,7 @@ class FormSubscriber implements EventSubscriberInterface
     /**
      * Add an entry to the audit log.
      */
-    public function onFormPostSave(Events\FormEvent $event)
+    public function onFormPostSave(Events\FormEvent $event): void
     {
         $form = $event->getForm();
         if ($details = $event->getChanges()) {
@@ -84,7 +72,7 @@ class FormSubscriber implements EventSubscriberInterface
     /**
      * Add a delete entry to the audit log.
      */
-    public function onFormDelete(Events\FormEvent $event)
+    public function onFormDelete(Events\FormEvent $event): void
     {
         $form = $event->getForm();
         $log  = [
@@ -101,7 +89,7 @@ class FormSubscriber implements EventSubscriberInterface
     /**
      * Add a simple email form.
      */
-    public function onFormBuilder(Events\FormBuilderEvent $event)
+    public function onFormBuilder(Events\FormBuilderEvent $event): void
     {
         $event->addSubmitAction('form.email', [
             'group'              => 'mautic.email.actions',
@@ -228,7 +216,7 @@ class FormSubscriber implements EventSubscriberInterface
             $key = (!empty($config[$field['alias']])) ? $config[$field['alias']] : $field['alias'];
 
             // Use the cleaned value by default - but if set to not save result, get from post
-            $value               = (isset($results[$field['alias']])) ? $results[$field['alias']] : $post[$field['alias']];
+            $value               = $results[$field['alias']] ?? $post[$field['alias']];
             $matchedFields[$key] = $field['alias'];
 
             // decode html chars and quotes before posting to next form
@@ -242,8 +230,8 @@ class FormSubscriber implements EventSubscriberInterface
         ];
 
         if (!empty($config['authorization_header'])) {
-            if (false !== strpos($config['authorization_header'], ':')) {
-                list($key, $value) = explode(':', $config['authorization_header']);
+            if (str_contains($config['authorization_header'], ':')) {
+                [$key, $value] = explode(':', $config['authorization_header']);
             } else {
                 $key   = 'Authorization';
                 $value = $config['authorization_header'];
@@ -372,10 +360,7 @@ class FormSubscriber implements EventSubscriberInterface
         return $redirect;
     }
 
-    /**
-     * @return string
-     */
-    private function postToHtml($post)
+    private function postToHtml($post): string
     {
         $output = '<table>';
         foreach ($post as $key => $row) {

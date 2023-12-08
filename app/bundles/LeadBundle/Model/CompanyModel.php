@@ -55,11 +55,6 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
     protected $companyFields;
 
     /**
-     * @var EmailValidator
-     */
-    protected $emailValidator;
-
-    /**
      * @var array
      */
     private $fields = [];
@@ -69,19 +64,9 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
      */
     private $repoSetup = false;
 
-    /**
-     * @var CompanyDeduper
-     */
-    protected $companyDeduper;
-
-    /**
-     * CompanyModel constructor.
-     */
-    public function __construct(FieldModel $leadFieldModel, EmailValidator $validator, CompanyDeduper $companyDeduper, EntityManager $em, CorePermissions $security, EventDispatcherInterface $dispatcher, UrlGeneratorInterface $router, Translator $translator, UserHelper $userHelper, LoggerInterface $mauticLogger, CoreParametersHelper $coreParametersHelper)
+    public function __construct(FieldModel $leadFieldModel, protected EmailValidator $emailValidator, protected CompanyDeduper $companyDeduper, EntityManager $em, CorePermissions $security, EventDispatcherInterface $dispatcher, UrlGeneratorInterface $router, Translator $translator, UserHelper $userHelper, LoggerInterface $mauticLogger, CoreParametersHelper $coreParametersHelper)
     {
         $this->leadFieldModel = $leadFieldModel;
-        $this->emailValidator = $validator;
-        $this->companyDeduper = $companyDeduper;
 
         parent::__construct($em, $security, $dispatcher, $router, $translator, $userHelper, $mauticLogger, $coreParametersHelper);
     }
@@ -90,7 +75,7 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
      * @param Company $entity
      * @param bool    $unlock
      */
-    public function saveEntity($entity, $unlock = true)
+    public function saveEntity($entity, $unlock = true): void
     {
         // Update leads primary company name
         $this->setEntityDefaultValues($entity, 'company');
@@ -104,10 +89,8 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
      *
      * @param array $entities
      * @param bool  $unlock
-     *
-     * @return array
      */
-    public function saveEntities($entities, $unlock = true)
+    public function saveEntities($entities, $unlock = true): void
     {
         // Update leads primary company name
         foreach ($entities as $entity) {
@@ -150,7 +133,7 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
     /**
      * {@inheritdoc}
      */
-    public function getPermissionBase()
+    public function getPermissionBase(): string
     {
         // We are using lead:leads in the CompanyController so this should match to prevent a BC break
         return 'lead:leads';
@@ -158,10 +141,8 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
 
     /**
      * {@inheritdoc}
-     *
-     * @return string
      */
-    public function getNameGetter()
+    public function getNameGetter(): string
     {
         return 'getPrimaryIdentifier';
     }
@@ -210,10 +191,8 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
 
     /**
      * Reorganizes a field list to be keyed by field's group then alias.
-     *
-     * @return array
      */
-    public function organizeFieldsByGroup($fields)
+    public function organizeFieldsByGroup($fields): array
     {
         $array = [];
 
@@ -258,7 +237,7 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
      *
      * @param bool|false $overwriteWithBlank
      */
-    public function setFieldValues(Company $company, array $data, $overwriteWithBlank = false)
+    public function setFieldValues(Company $company, array $data, $overwriteWithBlank = false): void
     {
         // save the field values
         $fieldValues = $company->getFields();
@@ -308,11 +287,9 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
      * @param array|Company $companies
      * @param array|Lead    $lead
      *
-     * @return bool
-     *
      * @throws \Doctrine\ORM\ORMException
      */
-    public function addLeadToCompany($companies, $lead)
+    public function addLeadToCompany($companies, $lead): bool
     {
         // Primary company name to be persisted to the lead's contact company field
         $companyName        = '';
@@ -412,7 +389,7 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
                 $lead->addUpdatedField('company', $companyName)
                     ->setDateModified(new \DateTime());
 
-                /** @var LeadRepository */
+                /** @var LeadRepository $leadRepository */
                 $leadRepository = $this->em->getRepository(Lead::class);
                 $leadRepository->saveEntity($lead);
             }
@@ -438,7 +415,7 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
      *
      * @throws \Doctrine\ORM\ORMException
      */
-    public function removeLeadFromCompany($companies, $lead)
+    public function removeLeadFromCompany($companies, $lead): void
     {
         if (!$lead instanceof Lead) {
             $leadId = (is_array($lead) && isset($lead['id'])) ? $lead['id'] : $lead;
@@ -601,7 +578,7 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
      *
      * @throws \Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException
      */
-    protected function dispatchEvent($action, &$entity, $isNew = false, Event $event = null)
+    protected function dispatchEvent($action, &$entity, $isNew = false, Event $event = null): ?Event
     {
         if (!$entity instanceof Company) {
             throw new MethodNotAllowedHttpException(['Email']);
@@ -729,10 +706,7 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
         return $this->companyFields;
     }
 
-    /**
-     * @return array
-     */
-    public function extractCompanyDataFromImport(array &$mappedFields, array &$data)
+    public function extractCompanyDataFromImport(array &$mappedFields, array &$data): array
     {
         $companyData    = [];
         $companyFields  = [];
@@ -765,11 +739,9 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
      * @param null    $owner
      * @param bool    $skipIfExists
      *
-     * @return bool|null
-     *
      * @throws \Exception
      */
-    public function import($fields, $data, $owner = null, $skipIfExists = false)
+    public function import($fields, $data, $owner = null, $skipIfExists = false): bool
     {
         $company = $this->importCompany($fields, $data, $owner, false, $skipIfExists);
 
@@ -797,7 +769,7 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
     {
         try {
             $duplicateCompanies = $this->companyDeduper->checkForDuplicateCompanies($this->getFieldData($fields, $data));
-        } catch (UniqueFieldNotFoundException $uniqueFieldNotFoundException) {
+        } catch (UniqueFieldNotFoundException) {
             return null;
         }
 

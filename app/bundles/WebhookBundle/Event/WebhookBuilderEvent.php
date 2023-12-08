@@ -6,9 +6,6 @@ use Symfony\Component\Process\Exception\InvalidArgumentException;
 use Symfony\Contracts\EventDispatcher\Event;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-/**
- * Class WebhookBuilderEvent.
- */
 class WebhookBuilderEvent extends Event
 {
     /**
@@ -16,14 +13,8 @@ class WebhookBuilderEvent extends Event
      */
     private $events = [];
 
-    /**
-     * @var TranslatorInterface
-     */
-    private $translator;
-
-    public function __construct(TranslatorInterface $translator)
+    public function __construct(private TranslatorInterface $translator)
     {
-        $this->translator = $translator;
     }
 
     /**
@@ -56,7 +47,7 @@ class WebhookBuilderEvent extends Event
         static $sorted = false;
 
         if (empty($sorted)) {
-            uasort($this->events, function ($a, $b) {
+            uasort($this->events, function ($a, $b): int {
                 return strnatcasecmp(
                     $a['label'], $b['label']);
             });

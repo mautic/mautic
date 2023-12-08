@@ -26,7 +26,7 @@ class UserRepository extends CommonRepository
         return (!empty($result)) ? $result[0] : null;
     }
 
-    public function setLastLogin($user)
+    public function setLastLogin($user): void
     {
         $now      = new DateTimeHelper();
         $datetime = $now->toUtcString();
@@ -37,7 +37,7 @@ class UserRepository extends CommonRepository
         ], ['id' => (int) $user->getId()]);
     }
 
-    public function setLastActive($user)
+    public function setLastActive($user): void
     {
         $now  = new DateTimeHelper();
         $conn = $this->_em->getConnection();
@@ -153,10 +153,8 @@ class UserRepository extends CommonRepository
 
     /**
      * Return list of Users for formType Choice.
-     *
-     * @return array
      */
-    public function getOwnerListChoices()
+    public function getOwnerListChoices(): array
     {
         $q = $this->createQueryBuilder('u');
 
@@ -228,12 +226,12 @@ class UserRepository extends CommonRepository
     /**
      * {@inheritdoc}
      */
-    protected function addSearchCommandWhereClause($q, $filter)
+    protected function addSearchCommandWhereClause($q, $filter): array
     {
         $command                 = $filter->command;
         $unique                  = $this->generateRandomParameterName();
         $returnParameter         = false; // returning a parameter that is not used will lead to a Doctrine error
-        list($expr, $parameters) = parent::addSearchCommandWhereClause($q, $filter);
+        [$expr, $parameters]     = parent::addSearchCommandWhereClause($q, $filter);
 
         switch ($command) {
             case $this->translator->trans('mautic.core.searchcommand.ispublished'):
@@ -323,7 +321,7 @@ class UserRepository extends CommonRepository
     /**
      * {@inheritdoc}
      */
-    protected function getDefaultOrder()
+    protected function getDefaultOrder(): array
     {
         return [
             ['u.lastName', 'ASC'],

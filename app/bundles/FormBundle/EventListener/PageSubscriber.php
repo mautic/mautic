@@ -16,39 +16,8 @@ class PageSubscriber implements EventSubscriberInterface
 {
     private $formRegex = '{form=(.*?)}';
 
-    /**
-     * @var FormModel
-     */
-    private $formModel;
-
-    /**
-     * @var BuilderTokenHelperFactory
-     */
-    private $builderTokenHelperFactory;
-
-    /**
-     * @var TranslatorInterface
-     */
-    private $translator;
-
-    /**
-     * @var CorePermissions
-     */
-    private $security;
-
-    /**
-     * PageSubscriber constructor.
-     */
-    public function __construct(
-        FormModel $formModel,
-        BuilderTokenHelperFactory $builderTokenHelperFactory,
-        TranslatorInterface $translator,
-        CorePermissions $security
-    ) {
-        $this->formModel                 = $formModel;
-        $this->builderTokenHelperFactory = $builderTokenHelperFactory;
-        $this->translator                = $translator;
-        $this->security                  = $security;
+    public function __construct(private FormModel $formModel, private BuilderTokenHelperFactory $builderTokenHelperFactory, private TranslatorInterface $translator, private CorePermissions $security)
+    {
     }
 
     /**
@@ -65,7 +34,7 @@ class PageSubscriber implements EventSubscriberInterface
     /**
      * Add forms to available page tokens.
      */
-    public function onPageBuild(PageBuilderEvent $event)
+    public function onPageBuild(PageBuilderEvent $event): void
     {
         if ($event->abTestWinnerCriteriaRequested()) {
             // add AB Test Winner Criteria
@@ -83,7 +52,7 @@ class PageSubscriber implements EventSubscriberInterface
         }
     }
 
-    public function onPageDisplay(PageDisplayEvent $event)
+    public function onPageDisplay(PageDisplayEvent $event): void
     {
         $content = $event->getContent();
         $page    = $event->getPage();

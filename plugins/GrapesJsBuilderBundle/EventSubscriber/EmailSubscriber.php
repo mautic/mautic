@@ -22,9 +22,6 @@ class EmailSubscriber implements EventSubscriberInterface
      */
     private $grapesJsBuilderModel;
 
-    /**
-     * EmailSubscriber constructor.
-     */
     public function __construct(Config $config, GrapesJsBuilderModel $grapesJsBuilderModel)
     {
         $this->config               = $config;
@@ -45,7 +42,7 @@ class EmailSubscriber implements EventSubscriberInterface
     /**
      * Add an entry.
      */
-    public function onEmailPostSave(Events\EmailEvent $event)
+    public function onEmailPostSave(Events\EmailEvent $event): void
     {
         if (!$this->config->isPublished()) {
             return;
@@ -57,7 +54,7 @@ class EmailSubscriber implements EventSubscriberInterface
     /**
      * Delete an entry.
      */
-    public function onEmailDelete(Events\EmailEvent $event)
+    public function onEmailDelete(Events\EmailEvent $event): void
     {
         if (!$this->config->isPublished()) {
             return;

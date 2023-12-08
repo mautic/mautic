@@ -11,9 +11,6 @@ use Symfony\Component\Validator\Constraints\Email;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\Constraints\Url;
 
-/**
- * Class SubmitActionEmailType.
- */
 class SubmitActionRepostType extends AbstractType
 {
     use FormFieldTrait;
@@ -21,7 +18,7 @@ class SubmitActionRepostType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder->add(
             'post_url',

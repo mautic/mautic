@@ -17,43 +17,8 @@ class ReportDNCSubscriber implements EventSubscriberInterface
 {
     public const DNC = 'contact.dnc';
 
-    /**
-     * @var FieldsBuilder
-     */
-    private $fieldsBuilder;
-
-    /**
-     * @var CompanyReportData
-     */
-    private $companyReportData;
-
-    /**
-     * @var TranslatorInterface
-     */
-    private $translator;
-
-    /**
-     * @var RouterInterface
-     */
-    private $router;
-
-    /**
-     * @var ChannelListHelper
-     */
-    private $channelListHelper;
-
-    public function __construct(
-        FieldsBuilder $fieldsBuilder,
-        CompanyReportData $companyReportData,
-        TranslatorInterface $translator,
-        RouterInterface $router,
-        ChannelListHelper $channelListHelper
-    ) {
-        $this->fieldsBuilder     = $fieldsBuilder;
-        $this->companyReportData = $companyReportData;
-        $this->translator        = $translator;
-        $this->router            = $router;
-        $this->channelListHelper = $channelListHelper;
+    public function __construct(private FieldsBuilder $fieldsBuilder, private CompanyReportData $companyReportData, private TranslatorInterface $translator, private RouterInterface $router, private ChannelListHelper $channelListHelper)
+    {
     }
 
     /**
@@ -71,7 +36,7 @@ class ReportDNCSubscriber implements EventSubscriberInterface
     /**
      * Add available tables and columns to the report builder lookup.
      */
-    public function onReportBuilder(ReportBuilderEvent $event)
+    public function onReportBuilder(ReportBuilderEvent $event): void
     {
         if (!$event->checkContext([self::DNC])) {
             return;
@@ -116,7 +81,7 @@ class ReportDNCSubscriber implements EventSubscriberInterface
     /**
      * Initialize the QueryBuilder object to generate reports from.
      */
-    public function onReportGenerate(ReportGeneratorEvent $event)
+    public function onReportGenerate(ReportGeneratorEvent $event): void
     {
         if (!$event->checkContext([self::DNC])) {
             return;
@@ -146,7 +111,7 @@ class ReportDNCSubscriber implements EventSubscriberInterface
         $event->setQueryBuilder($qb);
     }
 
-    public function onReportDisplay(ReportDataEvent $event)
+    public function onReportDisplay(ReportDataEvent $event): void
     {
         if (!$event->checkContext([self::DNC])) {
             return;
@@ -174,10 +139,7 @@ class ReportDNCSubscriber implements EventSubscriberInterface
         }
     }
 
-    /**
-     * @return array
-     */
-    private function getDncReasons()
+    private function getDncReasons(): array
     {
         return [
             0 => $this->translator->trans('mautic.lead.report.dnc_contactable'),

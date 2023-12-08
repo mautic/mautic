@@ -21,7 +21,7 @@ class ConfigSubscriber implements EventSubscriberInterface
         ];
     }
 
-    public function onConfigGenerate(ConfigBuilderEvent $event)
+    public function onConfigGenerate(ConfigBuilderEvent $event): void
     {
         $event->addForm([
             'bundle'     => 'ApiBundle',
@@ -32,7 +32,7 @@ class ConfigSubscriber implements EventSubscriberInterface
         ]);
     }
 
-    public function onConfigSave(ConfigEvent $event)
+    public function onConfigSave(ConfigEvent $event): void
     {
         // Symfony craps out with integer for firewall settings
         $data = $event->getConfig('apiconfig');

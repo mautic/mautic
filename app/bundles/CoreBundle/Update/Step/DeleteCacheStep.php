@@ -10,20 +10,8 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 final class DeleteCacheStep implements StepInterface
 {
-    /**
-     * @var CacheHelper
-     */
-    private $cacheHelper;
-
-    /**
-     * @var TranslatorInterface
-     */
-    private $translator;
-
-    public function __construct(CacheHelper $cacheHelper, TranslatorInterface $translator)
+    public function __construct(private CacheHelper $cacheHelper, private TranslatorInterface $translator)
     {
-        $this->cacheHelper = $cacheHelper;
-        $this->translator  = $translator;
     }
 
     public function getOrder(): int

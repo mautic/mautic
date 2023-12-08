@@ -56,9 +56,9 @@ class AmazonS3Integration extends CloudStorageIntegration
     }
 
     /**
-     * {@inheritdoc}
+     * @return array<string, string>
      */
-    public function getRequiredKeyFields()
+    public function getRequiredKeyFields(): array
     {
         return [
             'client_id'     => 'mautic.integration.keyfield.clientid',
@@ -72,7 +72,7 @@ class AmazonS3Integration extends CloudStorageIntegration
      * @param array            $data
      * @param string           $formArea
      */
-    public function appendToForm(&$builder, $data, $formArea)
+    public function appendToForm(&$builder, $data, $formArea): void
     {
         if ('keys' === $formArea) {
             $builder->add(

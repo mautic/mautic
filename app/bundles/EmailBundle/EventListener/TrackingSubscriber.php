@@ -10,17 +10,8 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class TrackingSubscriber implements EventSubscriberInterface
 {
-    /**
-     * @var StatRepository
-     */
-    private $statRepository;
-
-    /**
-     * TrackingSubscriber constructor.
-     */
-    public function __construct(StatRepository $statRepository)
+    public function __construct(private StatRepository $statRepository)
     {
-        $this->statRepository = $statRepository;
     }
 
     /**
@@ -33,7 +24,7 @@ class TrackingSubscriber implements EventSubscriberInterface
         ];
     }
 
-    public function onIdentifyContact(ContactIdentificationEvent $event)
+    public function onIdentifyContact(ContactIdentificationEvent $event): void
     {
         $clickthrough = $event->getClickthrough();
 

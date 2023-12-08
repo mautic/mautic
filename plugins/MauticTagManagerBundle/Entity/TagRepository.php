@@ -4,15 +4,12 @@ namespace MauticPlugin\MauticTagManagerBundle\Entity;
 
 use Mautic\LeadBundle\Entity\TagRepository as BaseTagRepository;
 
-/**
- * Class TagRepository.
- */
 class TagRepository extends BaseTagRepository
 {
     /**
      * @return string[][]
      */
-    protected function getDefaultOrder()
+    protected function getDefaultOrder(): array
     {
         return [
             ['lt.tag', 'ASC'],

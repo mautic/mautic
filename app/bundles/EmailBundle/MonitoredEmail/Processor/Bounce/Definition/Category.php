@@ -2,9 +2,6 @@
 
 namespace Mautic\EmailBundle\MonitoredEmail\Processor\Bounce\Definition;
 
-/**
- * Class Category.
- */
 final class Category
 {
     public const ANTISPAM       = 'antispam';

@@ -38,10 +38,7 @@ class ContactSegmentFilterCrate
      */
     private $operator;
 
-    /**
-     * @var array
-     */
-    private $sourceArray;
+    private array $sourceArray;
 
     private $nullValue;
 
@@ -75,18 +72,12 @@ class ContactSegmentFilterCrate
         return $this->field;
     }
 
-    /**
-     * @return bool
-     */
-    public function isContactType()
+    public function isContactType(): bool
     {
         return self::CONTACT_OBJECT === $this->object;
     }
 
-    /**
-     * @return bool
-     */
-    public function isCompanyType()
+    public function isCompanyType(): bool
     {
         return self::COMPANY_OBJECT === $this->object;
     }
@@ -101,14 +92,11 @@ class ContactSegmentFilterCrate
      */
     public function getFilter()
     {
-        switch ($this->getType()) {
-            case 'number':
-                return (float) $this->filter;
-            case 'boolean':
-                return (bool) $this->filter;
-        }
-
-        return $this->filter;
+        return match ($this->getType()) {
+            'number'  => (float) $this->filter,
+            'boolean' => (bool) $this->filter,
+            default   => $this->filter,
+        };
     }
 
     /**
@@ -119,44 +107,30 @@ class ContactSegmentFilterCrate
         return $this->operator;
     }
 
-    /**
-     * @return bool
-     */
-    public function isBooleanType()
+    public function isBooleanType(): bool
     {
         return 'boolean' === $this->getType();
     }
 
-    /**
-     * @return bool
-     */
-    public function isNumberType()
+    public function isNumberType(): bool
     {
         return 'number' === $this->getType();
     }
 
-    /**
-     * @return bool
-     */
-    public function isDateType()
+    public function isDateType(): bool
     {
         return 'date' === $this->getType() || $this->hasTimeParts();
     }
 
-    /**
-     * @return bool
-     */
-    public function hasTimeParts()
+    public function hasTimeParts(): bool
     {
         return 'datetime' === $this->getType();
     }
 
     /**
      * Filter value could be used directly - no modification (like regex etc.) needed.
-     *
-     * @return bool
      */
-    public function filterValueDoNotNeedAdjustment()
+    public function filterValueDoNotNeedAdjustment(): bool
     {
         return $this->isNumberType() || $this->isBooleanType();
     }
@@ -177,12 +151,12 @@ class ContactSegmentFilterCrate
         return $this->sourceArray;
     }
 
-    private function setOperator(array $filter)
+    private function setOperator(array $filter): void
     {
-        $operator = isset($filter['operator']) ? $filter['operator'] : null;
+        $operator = $filter['operator'] ?? null;
 
         if ('multiselect' === $this->getType() && in_array($operator, ['in', '!in'])) {
-            $neg            = false === strpos($operator, '!') ? '' : '!';
+            $neg            = !str_contains($operator, '!') ? '' : '!';
             $this->operator = $neg.$this->getType();
 
             return;

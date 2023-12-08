@@ -74,7 +74,6 @@ trait EntityContactsTrait
         $orderBy    = $orderBy ?: $request->getSession()->get('mautic.'.$sessionVar.'.contact.orderby', 'l.id');
         $orderByDir = $orderByDir ?: $request->getSession()->get('mautic.'.$sessionVar.'.contact.orderbydir', 'DESC');
 
-        // set limits
         $limit = $request->getSession()->get(
             'mautic.'.$sessionVar.'.contact.limit',
             $this->coreParametersHelper->get('default_pagelimit')

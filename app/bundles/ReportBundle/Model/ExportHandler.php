@@ -14,15 +14,9 @@ class ExportHandler
      */
     private $dir;
 
-    /**
-     * @var FilePathResolver
-     */
-    private $filePathResolver;
-
-    public function __construct(CoreParametersHelper $coreParametersHelper, FilePathResolver $filePathResolver)
+    public function __construct(CoreParametersHelper $coreParametersHelper, private FilePathResolver $filePathResolver)
     {
         $this->dir              = $coreParametersHelper->get('report_temp_dir');
-        $this->filePathResolver = $filePathResolver;
     }
 
     /**
@@ -44,7 +38,7 @@ class ExportHandler
     /**
      * @param resource $handler
      */
-    public function closeHandler($handler)
+    public function closeHandler($handler): void
     {
         fclose($handler);
     }
@@ -52,21 +46,19 @@ class ExportHandler
     /**
      * @param string $fileName
      */
-    public function removeFile($fileName)
+    public function removeFile($fileName): void
     {
         try {
             $path = $this->getPath($fileName);
             $this->filePathResolver->delete($path);
-        } catch (FileIOException $e) {
+        } catch (FileIOException) {
         }
     }
 
     /**
-     * @return string
-     *
      * @throws FileIOException
      */
-    public function getPath($fileName)
+    public function getPath($fileName): string
     {
         try {
             $this->filePathResolver->createDirectory($this->dir);

@@ -26,7 +26,7 @@ class StageRepository extends CommonRepository
     /**
      * {@inheritdoc}
      */
-    public function getTableAlias()
+    public function getTableAlias(): string
     {
         return 's';
     }
@@ -55,10 +55,8 @@ class StageRepository extends CommonRepository
     /**
      * @param string $type
      * @param int    $leadId
-     *
-     * @return array
      */
-    public function getCompletedLeadActions($type, $leadId)
+    public function getCompletedLeadActions($type, $leadId): array
     {
         $q = $this->_em->getConnection()->createQueryBuilder()
             ->select('s.*')

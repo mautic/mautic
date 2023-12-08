@@ -26,41 +26,17 @@ class EntityLookupChoiceLoader implements ChoiceLoaderInterface
     protected $choices = [];
 
     /**
-     * @var Options
-     */
-    protected $options;
-
-    /**
-     * @var ModelFactory<object>
-     */
-    protected $modelFactory;
-
-    /**
-     * @var TranslatorInterface
-     */
-    protected $translator;
-
-    /**
-     * @var Connection
-     */
-    protected $connection;
-
-    /**
      * @param ModelFactory<object> $modelFactory
      * @param array                $options
      */
-    public function __construct(ModelFactory $modelFactory, TranslatorInterface $translator, Connection $connection, $options = [])
+    public function __construct(protected ModelFactory $modelFactory, protected TranslatorInterface $translator, protected Connection $connection, protected $options = [])
     {
-        $this->modelFactory = $modelFactory;
-        $this->translator   = $translator;
-        $this->connection   = $connection;
-        $this->options      = $options;
     }
 
     /**
      * @param Options|array $options
      */
-    public function setOptions($options)
+    public function setOptions($options): void
     {
         $this->options = $options;
     }
@@ -104,7 +80,7 @@ class EntityLookupChoiceLoader implements ChoiceLoaderInterface
     /**
      * Take note of the selected values for loadChoiceList.
      */
-    public function onFormPostSetData(FormEvent $event)
+    public function onFormPostSetData(FormEvent $event): void
     {
         $this->selected = (array) $event->getData();
     }
@@ -130,7 +106,7 @@ class EntityLookupChoiceLoader implements ChoiceLoaderInterface
 
             if ($data) {
                 $data = array_map(
-                    function ($v) {
+                    function ($v): int {
                         return (int) $v;
                     },
                     (array) $data
@@ -203,7 +179,7 @@ class EntityLookupChoiceLoader implements ChoiceLoaderInterface
             $counts     = array_count_values($prepped);
             $duplicates = array_filter(
                 $prepped,
-                function ($value) use ($counts) {
+                function ($value) use ($counts): bool {
                     return $counts[$value] > 1;
                 }
             );
@@ -236,7 +212,7 @@ class EntityLookupChoiceLoader implements ChoiceLoaderInterface
             throw new \InvalidArgumentException(get_class($model).' must implement '.AjaxLookupModelInterface::class);
         }
 
-        $args = (isset($this->options['lookup_arguments'])) ? $this->options['lookup_arguments'] : [];
+        $args = $this->options['lookup_arguments'] ?? [];
         if ($dataPlaceholder = array_search('$data', $args)) {
             $args[$dataPlaceholder] = $data;
         }

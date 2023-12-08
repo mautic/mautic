@@ -5,9 +5,6 @@ namespace Mautic\StageBundle\Security\Permissions;
 use Mautic\CoreBundle\Security\Permissions\AbstractPermissions;
 use Symfony\Component\Form\FormBuilderInterface;
 
-/**
- * Class StagePermissions.
- */
 class StagePermissions extends AbstractPermissions
 {
     /**
@@ -24,7 +21,7 @@ class StagePermissions extends AbstractPermissions
     /**
      * {@inheritdoc}
      */
-    public function getName()
+    public function getName(): string
     {
         return 'stage';
     }
@@ -32,7 +29,7 @@ class StagePermissions extends AbstractPermissions
     /**
      * {@inheritdoc}
      */
-    public function buildForm(FormBuilderInterface &$builder, array $options, array $data)
+    public function buildForm(FormBuilderInterface &$builder, array $options, array $data): void
     {
         $this->addStandardFormFields('stage', 'categories', $builder, $data);
         $this->addStandardFormFields('stage', 'stages', $builder, $data);

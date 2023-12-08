@@ -42,7 +42,7 @@ class CommonApiController extends FetchCommonApiController
      *
      * @var FormModel<E>|null
      */
-    protected $model = null;
+    protected $model;
 
     /**
      * @var array
@@ -54,16 +54,9 @@ class CommonApiController extends FetchCommonApiController
      */
     protected $entityRequestParameters = [];
 
-    protected RouterInterface $router;
-
-    protected FormFactoryInterface $formFactory;
-
-    public function __construct(CorePermissions $security, Translator $translator, EntityResultHelper $entityResultHelper, RouterInterface $router, FormFactoryInterface $formFactory, AppVersion $appVersion, RequestStack $requestStack, ManagerRegistry $doctrine, ModelFactory $modelFactory, EventDispatcherInterface $dispatcher, CoreParametersHelper $coreParametersHelper, MauticFactory $factory)
+    public function __construct(CorePermissions $security, Translator $translator, EntityResultHelper $entityResultHelper, protected RouterInterface $router, protected FormFactoryInterface $formFactory, AppVersion $appVersion, RequestStack $requestStack, ManagerRegistry $doctrine, ModelFactory $modelFactory, EventDispatcherInterface $dispatcher, CoreParametersHelper $coreParametersHelper, MauticFactory $factory)
     {
         parent::__construct($security, $translator, $entityResultHelper, $appVersion, $requestStack, $doctrine, $modelFactory, $dispatcher, $coreParametersHelper, $factory);
-
-        $this->router      = $router;
-        $this->formFactory = $formFactory;
     }
 
     /**
@@ -161,7 +154,7 @@ class CommonApiController extends FetchCommonApiController
 
         foreach ($parameters as $key => $params) {
             $method = $request->getMethod();
-            $entity = (isset($entities[$key])) ? $entities[$key] : null;
+            $entity = $entities[$key] ?? null;
 
             $statusCode = Response::HTTP_OK;
             if (null === $entity || !$entity->getId()) {

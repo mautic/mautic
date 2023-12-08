@@ -34,7 +34,7 @@ class SecurityController extends CommonController
         }
 
         if ($session->has('_security.target_path')) {
-            if (false !== strpos($session->get('_security.target_path'), $this->generateUrl('fos_oauth_server_authorize'))) {
+            if (str_contains($session->get('_security.target_path'), $this->generateUrl('fos_oauth_server_authorize'))) {
                 $session->set('_fos_oauth_server.ensure_logout', true);
             }
         }
@@ -48,10 +48,7 @@ class SecurityController extends CommonController
         );
     }
 
-    /**
-     * @return Response
-     */
-    public function loginCheckAction()
+    public function loginCheckAction(): Response
     {
         return new Response('', 400);
     }

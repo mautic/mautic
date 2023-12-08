@@ -122,11 +122,11 @@ interface ThemeHelperInterface
     /**
      * Get the error message from the zip archive.
      *
-     * @param \ZipArchive $archive
+     * @param \ZipArchive::ER_* $archive
      *
      * @return string
      */
-    public function getExtractError($archive);
+    public function getExtractError(int $archive);
 
     /**
      * Creates a zip file from a theme and returns the path where it's stored.

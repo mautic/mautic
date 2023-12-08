@@ -5,9 +5,6 @@ namespace MauticPlugin\MauticTagManagerBundle\Security\Permissions;
 use Mautic\CoreBundle\Security\Permissions\AbstractPermissions;
 use Symfony\Component\Form\FormBuilderInterface;
 
-/**
- * Class TagManagerPermissions.
- */
 class TagManagerPermissions extends AbstractPermissions
 {
     /**
@@ -31,7 +28,7 @@ class TagManagerPermissions extends AbstractPermissions
     /**
      * {@inheritdoc}
      */
-    public function buildForm(FormBuilderInterface &$builder, array $options, array $data)
+    public function buildForm(FormBuilderInterface &$builder, array $options, array $data): void
     {
         $this->addStandardFormFields('tagManager', 'tagManager', $builder, $data);
     }

@@ -27,22 +27,12 @@ class PullTransifexCommand extends Command
 {
     public const NAME = 'mautic:transifex:pull';
 
-    private TransifexFactory $transifexFactory;
-    private TranslatorInterface $translator;
-    private PathsHelper $pathsHelper;
-    private LanguageHelper $languageHelper;
-
     public function __construct(
-        TransifexFactory $transifexFactory,
-        TranslatorInterface $translator,
-        PathsHelper $pathsHelper,
-        LanguageHelper $languageHelper
+        private TransifexFactory $transifexFactory,
+        private TranslatorInterface $translator,
+        private PathsHelper $pathsHelper,
+        private LanguageHelper $languageHelper
     ) {
-        $this->transifexFactory = $transifexFactory;
-        $this->translator       = $translator;
-        $this->pathsHelper      = $pathsHelper;
-        $this->languageHelper   = $languageHelper;
-
         parent::__construct();
     }
 
@@ -74,7 +64,7 @@ EOT
 
         try {
             $transifex = $this->transifexFactory->getTransifex();
-        } catch (InvalidConfigurationException $e) {
+        } catch (InvalidConfigurationException) {
             $output->writeln($this->translator->trans('mautic.core.command.transifex_no_credentials'));
 
             return \Symfony\Component\Console\Command\Command::FAILURE;
@@ -139,14 +129,14 @@ EOT
 
         $transifex->getApiConnector()->fulfillPromises(
             $queue,
-            function (ResponseInterface $response, Promise $promise) use ($output) {
+            function (ResponseInterface $response, Promise $promise) use ($output): void {
                 try {
                     $this->languageHelper->createLanguageFile($promise->getFilePath(), $response->getBody()->__toString());
                 } catch (\Exception $exception) {
                     $output->writeln($exception->getMessage());
                 }
             },
-            function (ResponseException $exception) use ($output) {
+            function (ResponseException $exception) use ($output): void {
                 $output->writeln($exception->getMessage());
             }
         );

@@ -107,7 +107,6 @@ class AjaxController extends CommonAjaxController
     public function generatePlaintTextAction(Request $request)
     {
         $custom = $request->request->get('custom');
-        $id     = $request->request->get('id');
 
         $parser = new PlainTextHelper(
             [
@@ -201,7 +200,7 @@ class AjaxController extends CommonAjaxController
         return $this->sendJsonResponse(['success' => $success, 'message' => $message]);
     }
 
-    public function getEmailCountStatsAction(Request $request)
+    public function getEmailCountStatsAction(Request $request): JsonResponse
     {
         /** @var EmailModel $model */
         $model = $this->getModel('email');

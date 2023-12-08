@@ -9,25 +9,20 @@ use Mautic\CoreBundle\Helper\CoreParametersHelper;
 
 class ConfigMapper
 {
-    private CoreParametersHelper $parametersHelper;
-
     /**
      * @var mixed[]
      */
     private array $restrictedParameters;
 
-    public function __construct(CoreParametersHelper $parametersHelper, array $restrictedParameters = [])
+    public function __construct(private CoreParametersHelper $parametersHelper, array $restrictedParameters = [])
     {
-        $this->parametersHelper     = $parametersHelper;
         $this->restrictedParameters = RestrictionHelper::prepareRestrictions($restrictedParameters);
     }
 
     /**
-     * @return array
-     *
      * @throws BadFormConfigException
      */
-    public function bindFormConfigsWithRealValues(array $forms)
+    public function bindFormConfigsWithRealValues(array $forms): array
     {
         foreach ($forms as $bundle => $config) {
             if (!isset($config['parameters'])) {

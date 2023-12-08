@@ -22,9 +22,6 @@ class Organizer
      */
     private $contacts = [];
 
-    /**
-     * ObjectOrganizer constructor.
-     */
     public function __construct(array $records)
     {
         $this->records = $records;
@@ -40,10 +37,7 @@ class Organizer
         return $this->leads;
     }
 
-    /**
-     * @return array
-     */
-    public function getLeadIds()
+    public function getLeadIds(): array
     {
         return array_keys($this->leads);
     }
@@ -56,15 +50,12 @@ class Organizer
         return $this->contacts;
     }
 
-    /**
-     * @return array
-     */
-    public function getContactIds()
+    public function getContactIds(): array
     {
         return array_keys($this->contacts);
     }
 
-    private function organize()
+    private function organize(): void
     {
         foreach ($this->records as $campaignMember) {
             $object    = !empty($campaignMember['LeadId']) ? 'Lead' : 'Contact';

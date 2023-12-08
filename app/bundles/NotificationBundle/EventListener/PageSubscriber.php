@@ -10,20 +10,8 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class PageSubscriber implements EventSubscriberInterface
 {
-    /**
-     * @var AssetsHelper
-     */
-    private $assetsHelper;
-
-    /**
-     * @var IntegrationHelper
-     */
-    private $integrationHelper;
-
-    public function __construct(AssetsHelper $assetsHelper, IntegrationHelper $integrationHelper)
+    public function __construct(private AssetsHelper $assetsHelper, private IntegrationHelper $integrationHelper)
     {
-        $this->assetsHelper      = $assetsHelper;
-        $this->integrationHelper = $integrationHelper;
     }
 
     /**
@@ -36,7 +24,7 @@ class PageSubscriber implements EventSubscriberInterface
         ];
     }
 
-    public function onPageDisplay(PageDisplayEvent $event)
+    public function onPageDisplay(PageDisplayEvent $event): void
     {
         $integrationObject = $this->integrationHelper->getIntegrationObject('OneSignal');
         $settings          = $integrationObject->getIntegrationSettings();

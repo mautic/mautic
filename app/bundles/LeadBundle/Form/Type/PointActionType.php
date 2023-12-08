@@ -10,7 +10,7 @@ use Symfony\Component\Validator\Constraints\NotEqualTo;
 
 class PointActionType extends AbstractType
 {
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder->add(
             'points',
@@ -20,7 +20,7 @@ class PointActionType extends AbstractType
                 'attr'        => ['class' => 'form-control'],
                 'label_attr'  => ['class' => 'control-label'],
                 'scale'       => 0,
-                'data'        => (isset($options['data']['points'])) ? $options['data']['points'] : 0,
+                'data'        => $options['data']['points'] ?? 0,
                 'constraints' => [
                     new NotEqualTo(
                         [

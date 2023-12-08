@@ -18,15 +18,10 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 class ImportCommand extends Command
 {
     public const COMMAND_NAME = 'mautic:import';
-    private TranslatorInterface $translator;
-    private ImportModel $importModel;
 
-    public function __construct(TranslatorInterface $translator, ImportModel $importModel)
+    public function __construct(private TranslatorInterface $translator, private ImportModel $importModel)
     {
         parent::__construct();
-
-        $this->translator  = $translator;
-        $this->importModel = $importModel;
     }
 
     protected function configure()
@@ -78,7 +73,7 @@ EOT
 
         try {
             $this->importModel->beginImport($import, $progress, $limit);
-        } catch (ImportFailedException $e) {
+        } catch (ImportFailedException) {
             $output->writeln('<error>'.$this->translator->trans(
                 'mautic.lead.import.failed',
                 [
@@ -87,7 +82,7 @@ EOT
             ).'</error>');
 
             return \Symfony\Component\Console\Command\Command::FAILURE;
-        } catch (ImportDelayedException $e) {
+        } catch (ImportDelayedException) {
             $output->writeln('<info>'.$this->translator->trans(
                 'mautic.lead.import.delayed',
                 [

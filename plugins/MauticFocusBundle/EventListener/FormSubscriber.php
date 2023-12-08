@@ -33,7 +33,7 @@ class FormSubscriber implements EventSubscriberInterface
     /**
      * Add an entry to the audit log.
      */
-    public function onFormPostSave(Events\FormEvent $event)
+    public function onFormPostSave(Events\FormEvent $event): void
     {
         $form = $event->getForm();
 
@@ -61,7 +61,7 @@ class FormSubscriber implements EventSubscriberInterface
     /**
      * Add a delete entry to the audit log.
      */
-    public function onFormDelete(Events\FormEvent $event)
+    public function onFormDelete(Events\FormEvent $event): void
     {
         $form   = $event->getForm();
         $formId = $form->deletedId;

@@ -35,19 +35,9 @@ class CampaignExecutionEvent extends Event
     protected $systemTriggered;
 
     /**
-     * @var bool|mixed[]|string|null
-     */
-    protected $result;
-
-    /**
      * @var array
      */
     protected $eventSettings;
-
-    /**
-     * @var LeadEventLog|null
-     */
-    protected $log;
 
     /**
      * @var bool
@@ -67,15 +57,13 @@ class CampaignExecutionEvent extends Event
     /**
      * @param bool|mixed[]|string|null $result
      */
-    public function __construct(array $args, $result, LeadEventLog $log = null)
+    public function __construct(array $args, protected $result, protected ?LeadEventLog $log = null)
     {
         $this->lead            = $args['lead'];
         $this->event           = $args['event'];
         $this->eventDetails    = $args['eventDetails'];
         $this->systemTriggered = $args['systemTriggered'];
         $this->eventSettings   = $args['eventSettings'];
-        $this->result          = $result;
-        $this->log             = $log;
     }
 
     /**
@@ -218,21 +206,17 @@ class CampaignExecutionEvent extends Event
     /**
      * @param string          $channel
      * @param string|int|null $channelId
-     *
-     * @return $this
      */
-    public function setChannel($channel, $channelId = null)
+    public function setChannel($channel, $channelId = null): void
     {
         if (null !== $this->log) {
             // Set the channel since we have the resource
-            $this->log->setChannel($channel)
-                      ->setChannelId($channelId);
+            $this->log->setChannel($channel);
+            $this->log->setChannelId($channelId);
         }
 
         $this->channel   = $channel;
         $this->channelId = $channelId;
-
-        return $this;
     }
 
     /**

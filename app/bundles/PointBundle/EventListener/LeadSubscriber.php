@@ -16,43 +16,8 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class LeadSubscriber implements EventSubscriberInterface
 {
-    /**
-     * @var TriggerModel
-     */
-    private $triggerModel;
-
-    /**
-     * @var TranslatorInterface
-     */
-    private $translator;
-
-    /**
-     * @var PointsChangeLogRepository
-     */
-    private $pointsChangeLogRepository;
-
-    /**
-     * @var LeadPointLogRepository
-     */
-    private $leadPointLogRepository;
-
-    /**
-     * @var LeadTriggerLogRepository
-     */
-    private $leadTriggerLogRepository;
-
-    public function __construct(
-        TriggerModel $triggerModel,
-        TranslatorInterface $translator,
-        PointsChangeLogRepository $pointsChangeLogRepository,
-        LeadPointLogRepository $leadPointLogRepository,
-        LeadTriggerLogRepository $leadTriggerLogRepository
-    ) {
-        $this->triggerModel              = $triggerModel;
-        $this->translator                = $translator;
-        $this->pointsChangeLogRepository = $pointsChangeLogRepository;
-        $this->leadPointLogRepository    = $leadPointLogRepository;
-        $this->leadTriggerLogRepository  = $leadTriggerLogRepository;
+    public function __construct(private TriggerModel $triggerModel, private TranslatorInterface $translator, private PointsChangeLogRepository $pointsChangeLogRepository, private LeadPointLogRepository $leadPointLogRepository, private LeadTriggerLogRepository $leadTriggerLogRepository)
+    {
     }
 
     /**
@@ -71,7 +36,7 @@ class LeadSubscriber implements EventSubscriberInterface
     /**
      * Trigger applicable events for the lead.
      */
-    public function onLeadPointsChange(PointsChangeEvent $event)
+    public function onLeadPointsChange(PointsChangeEvent $event): void
     {
         $this->triggerModel->triggerEvents($event->getLead());
     }
@@ -79,7 +44,7 @@ class LeadSubscriber implements EventSubscriberInterface
     /**
      * Handle point triggers for new leads (including 0 point triggers).
      */
-    public function onLeadSave(LeadEvent $event)
+    public function onLeadSave(LeadEvent $event): void
     {
         if ($event->isNew()) {
             $this->triggerModel->triggerEvents($event->getLead());
@@ -89,7 +54,7 @@ class LeadSubscriber implements EventSubscriberInterface
     /**
      * Compile events for the lead timeline.
      */
-    public function onTimelineGenerate(LeadTimelineEvent $event)
+    public function onTimelineGenerate(LeadTimelineEvent $event): void
     {
         // Set available event types
         $eventTypeKey  = 'point.gained';
@@ -132,7 +97,7 @@ class LeadSubscriber implements EventSubscriberInterface
         }
     }
 
-    public function onLeadMerge(LeadMergeEvent $event)
+    public function onLeadMerge(LeadMergeEvent $event): void
     {
         $this->leadPointLogRepository->updateLead(
             $event->getLoser()->getId(),

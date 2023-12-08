@@ -12,36 +12,8 @@ use Twig\Environment;
 
 class SearchSubscriber implements EventSubscriberInterface
 {
-    /**
-     * @var EmailModel
-     */
-    private $emailModel;
-
-    /**
-     * @var UserHelper
-     */
-    private $userHelper;
-
-    /**
-     * @var CorePermissions
-     */
-    private $security;
-
-    /**
-     * @var Environment
-     */
-    private $twig;
-
-    public function __construct(
-        UserHelper $userHelper,
-        EmailModel $emailModel,
-        CorePermissions $security,
-        Environment $twig
-    ) {
-        $this->userHelper = $userHelper;
-        $this->emailModel = $emailModel;
-        $this->security   = $security;
-        $this->twig       = $twig;
+    public function __construct(private UserHelper $userHelper, private EmailModel $emailModel, private CorePermissions $security, private Environment $twig)
+    {
     }
 
     /**
@@ -55,7 +27,7 @@ class SearchSubscriber implements EventSubscriberInterface
         ];
     }
 
-    public function onGlobalSearch(MauticEvents\GlobalSearchEvent $event)
+    public function onGlobalSearch(MauticEvents\GlobalSearchEvent $event): void
     {
         $str = $event->getSearchString();
         if (empty($str)) {
@@ -107,7 +79,7 @@ class SearchSubscriber implements EventSubscriberInterface
         }
     }
 
-    public function onBuildCommandList(MauticEvents\CommandListEvent $event)
+    public function onBuildCommandList(MauticEvents\CommandListEvent $event): void
     {
         if ($this->security->isGranted(['email:emails:viewown', 'email:emails:viewother'], 'MATCH_ONE')) {
             $event->addCommands(

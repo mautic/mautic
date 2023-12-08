@@ -14,10 +14,8 @@ class StatsEvent extends Event
 {
     /**
      * Database table containing statistical data available to get the results from.
-     *
-     * @var string
      */
-    protected $table;
+    protected string $table;
 
     /**
      * Array of columns to fetch.
@@ -28,17 +26,13 @@ class StatsEvent extends Event
 
     /**
      * The page where to start with.
-     *
-     * @var int
      */
-    protected $start;
+    protected int $start;
 
     /**
      * The rows per page limit.
-     *
-     * @var int
      */
-    protected $limit;
+    protected int $limit;
 
     /**
      * Database tables which the subscribers already asked for.
@@ -51,13 +45,6 @@ class StatsEvent extends Event
      * @var array
      */
     protected $tableColumns = [];
-
-    /**
-     * Array of order by statements.
-     *
-     * @var array
-     */
-    protected $order = [];
 
     /**
      * Array of where filters.
@@ -88,34 +75,25 @@ class StatsEvent extends Event
     protected $repository;
 
     /**
-     * @var User
-     */
-    protected $user;
-
-    /**
      * StatsEvent constructor.
      *
      * @param int $start
      * @param int $limit
      */
-    public function __construct($table, $start, $limit, array $order, array $where, User $user)
+    public function __construct($table, $start, $limit, protected array $order, array $where, protected User $user)
     {
         $this->table = strtolower(trim(str_replace(MAUTIC_TABLE_PREFIX, '', strip_tags($table))));
         $this->start = (int) $start;
         $this->limit = (int) $limit;
-        $this->order = $order;
         $this->where = $where;
-        $this->user  = $user;
     }
 
     /**
      * Returns if event is for this table.
      *
      * @param CommonRepository<object>|null $repository
-     *
-     * @return bool
      */
-    public function isLookingForTable($table, CommonRepository $repository = null)
+    public function isLookingForTable($table, CommonRepository $repository = null): bool
     {
         $this->tables[] = $table = str_replace(MAUTIC_TABLE_PREFIX, '', $table);
         if ($repository) {
@@ -169,20 +147,16 @@ class StatsEvent extends Event
 
     /**
      * Returns the start.
-     *
-     * @return int
      */
-    public function getStart()
+    public function getStart(): int
     {
         return $this->start;
     }
 
     /**
      * Returns the limit.
-     *
-     * @return int
      */
-    public function getLimit()
+    public function getLimit(): int
     {
         return $this->limit;
     }
@@ -220,7 +194,7 @@ class StatsEvent extends Event
     /**
      * Add an array of results and if so, stop propagation.
      */
-    public function setResults(array $results)
+    public function setResults(array $results): void
     {
         $this->results    = $results;
         $this->hasResults = true;

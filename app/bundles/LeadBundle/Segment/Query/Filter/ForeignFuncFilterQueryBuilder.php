@@ -9,7 +9,7 @@ use Mautic\LeadBundle\Segment\Query\QueryException;
 
 class ForeignFuncFilterQueryBuilder extends BaseFilterQueryBuilder
 {
-    public static function getServiceId()
+    public static function getServiceId(): string
     {
         return 'mautic.lead.query.builder.foreign.func';
     }
@@ -22,7 +22,6 @@ class ForeignFuncFilterQueryBuilder extends BaseFilterQueryBuilder
     {
         $leadsTableAlias = $queryBuilder->getTableAlias(MAUTIC_TABLE_PREFIX.'leads');
         $filterOperator  = $filter->getOperator();
-        $filterGlue      = $filter->getGlue();
         $filterAggr      = $filter->getAggregateFunction();
 
         $filterParameters = $filter->getParameterValue();
@@ -40,8 +39,6 @@ class ForeignFuncFilterQueryBuilder extends BaseFilterQueryBuilder
         $filter->getColumn();
 
         $filterParametersHolder = $filter->getParameterHolder($parameters);
-
-        $filterGlueFunc = $filterGlue.'Where';
 
         $tableAlias = $queryBuilder->getTableAlias($filter->getTable());
 

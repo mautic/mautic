@@ -20,19 +20,13 @@ class LoadUserData extends AbstractFixture implements OrderedFixtureInterface, F
     }
 
     /**
-     * @var UserPasswordHasher
-     */
-    private $hasher;
-
-    /**
      * {@inheritdoc}
      */
-    public function __construct(UserPasswordHasher $hasher)
+    public function __construct(private UserPasswordHasher $hasher)
     {
-        $this->hasher = $hasher;
     }
 
-    public function load(ObjectManager $manager)
+    public function load(ObjectManager $manager): void
     {
         $user = new User();
         $user->setFirstName('Admin');

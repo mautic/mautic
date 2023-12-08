@@ -29,12 +29,12 @@ class CompanyRepository extends CommonRepository implements CustomFieldRepositor
     /**
      * Used by search functions to search using aliases as commands.
      */
-    public function setAvailableSearchFields(array $fields)
+    public function setAvailableSearchFields(array $fields): void
     {
         $this->availableSearchFields = $fields;
     }
 
-    public function setDispatcher(EventDispatcherInterface $dispatcher)
+    public function setDispatcher(EventDispatcherInterface $dispatcher): void
     {
         $this->dispatcher = $dispatcher;
     }
@@ -58,7 +58,7 @@ class CompanyRepository extends CommonRepository implements CustomFieldRepositor
             }
             $q->andWhere($this->getTableAlias().'.id = '.(int) $companyId);
             $entity = $q->getQuery()->getSingleResult();
-        } catch (\Exception $e) {
+        } catch (\Exception) {
             $entity = null;
         }
 
@@ -112,10 +112,8 @@ class CompanyRepository extends CommonRepository implements CustomFieldRepositor
 
     /**
      * Get the groups available for fields.
-     *
-     * @return array
      */
-    public function getFieldGroups()
+    public function getFieldGroups(): array
     {
         return ['core', 'professional', 'other'];
     }
@@ -146,7 +144,7 @@ class CompanyRepository extends CommonRepository implements CustomFieldRepositor
     /**
      * {@inheritdoc}
      */
-    public function getTableAlias()
+    public function getTableAlias(): string
     {
         return 'comp';
     }
@@ -169,9 +167,9 @@ class CompanyRepository extends CommonRepository implements CustomFieldRepositor
     /**
      * {@inheritdoc}
      */
-    protected function addSearchCommandWhereClause($q, $filter)
+    protected function addSearchCommandWhereClause($q, $filter): array
     {
-        list($expr, $parameters) = $this->addStandardSearchCommandWhereClause($q, $filter);
+        [$expr, $parameters]     = $this->addStandardSearchCommandWhereClause($q, $filter);
         $unique                  = $this->generateRandomParameterName();
         $returnParameter         = true;
         $command                 = $filter->command;
@@ -531,7 +529,6 @@ class CompanyRepository extends CommonRepository implements CustomFieldRepositor
             $companies[(int) $r['id']] = $r;
         }
 
-        // Get entities
         $q = $this->getEntityManager()->createQueryBuilder()
             ->select('c')
             ->from(Company::class, 'c');

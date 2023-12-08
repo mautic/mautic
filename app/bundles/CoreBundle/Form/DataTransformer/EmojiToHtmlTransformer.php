@@ -5,9 +5,6 @@ namespace Mautic\CoreBundle\Form\DataTransformer;
 use Mautic\CoreBundle\Helper\EmojiHelper;
 use Symfony\Component\Form\DataTransformerInterface;
 
-/**
- * Class EmojiToHtmlTransformer.
- */
 class EmojiToHtmlTransformer implements DataTransformerInterface
 {
     /**

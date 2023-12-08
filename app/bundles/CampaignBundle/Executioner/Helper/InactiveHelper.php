@@ -14,63 +14,21 @@ use Psr\Log\LoggerInterface;
 class InactiveHelper
 {
     /**
-     * @var EventScheduler
-     */
-    private $scheduler;
-
-    /**
-     * @var InactiveContactFinder
-     */
-    private $inactiveContactFinder;
-
-    /**
-     * @var LeadEventLogRepository
-     */
-    private $eventLogRepository;
-
-    /**
-     * @var EventRepository
-     */
-    private $eventRepository;
-
-    /**
-     * @var LoggerInterface
-     */
-    private $logger;
-
-    private DecisionHelper $decisionHelper;
-
-    /**
      * @var \DateTimeInterface
      */
     private $earliestInactiveDate;
 
-    /**
-     * InactiveHelper constructor.
-     */
-    public function __construct(
-        EventScheduler $scheduler,
-        InactiveContactFinder $inactiveContactFinder,
-        LeadEventLogRepository $eventLogRepository,
-        EventRepository $eventRepository,
-        LoggerInterface $logger,
-        DecisionHelper $decisionHelper
-    ) {
-        $this->scheduler               = $scheduler;
-        $this->inactiveContactFinder   = $inactiveContactFinder;
-        $this->eventLogRepository      = $eventLogRepository;
-        $this->eventRepository         = $eventRepository;
-        $this->logger                  = $logger;
-        $this->decisionHelper          = $decisionHelper;
+    public function __construct(private EventScheduler $scheduler, private InactiveContactFinder $inactiveContactFinder, private LeadEventLogRepository $eventLogRepository, private EventRepository $eventRepository, private LoggerInterface $logger, private DecisionHelper $decisionHelper)
+    {
     }
 
     /**
-     * @param ArrayCollection|Event[] $decisions
+     * @param ArrayCollection<int, Event> $decisions
      */
-    public function removeDecisionsWithoutNegativeChildren(ArrayCollection $decisions)
+    public function removeDecisionsWithoutNegativeChildren(ArrayCollection $decisions): void
     {
         /**
-         * @var int
+         * @var int   $key
          * @var Event $decision
          */
         foreach ($decisions as $key => $decision) {
@@ -92,7 +50,7 @@ class InactiveHelper
         $lastActiveEventId,
         ArrayCollection $negativeChildren,
         Event $event
-    ) {
+    ): void {
         $contactIds                 = $contacts->getKeys();
         $lastActiveDates            = $this->getLastActiveDates($lastActiveEventId, $contactIds);
         $this->earliestInactiveDate = $now;
@@ -146,10 +104,7 @@ class InactiveHelper
         return $this->earliestInactiveDate;
     }
 
-    /**
-     * @return ArrayCollection
-     */
-    public function getCollectionByDecisionId($decisionId)
+    public function getCollectionByDecisionId($decisionId): ArrayCollection
     {
         $collection = new ArrayCollection();
 

@@ -4,10 +4,10 @@ namespace Mautic\ReportBundle\Generator;
 
 use Doctrine\DBAL\Connection;
 use Mautic\ChannelBundle\Helper\ChannelListHelper;
+use Mautic\ReportBundle\Builder\MauticReportBuilder;
 use Mautic\ReportBundle\Entity\Report;
 use Mautic\ReportBundle\Form\Type\ReportType;
 use Symfony\Component\DependencyInjection\Exception\RuntimeException;
-use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\FormFactoryInterface;
 
@@ -17,50 +17,17 @@ use Symfony\Component\Form\FormFactoryInterface;
 class ReportGenerator
 {
     /**
-     * @var Connection
-     */
-    private $db;
-
-    /**
-     * @var EventDispatcher
-     */
-    private $dispatcher;
-
-    /**
-     * @var \Symfony\Component\Form\FormFactoryInterface
-     */
-    private $formFactory;
-
-    /**
-     * @var \Mautic\ReportBundle\Entity\Report
-     */
-    private $entity;
-
-    /**
      * @var string
      */
-    private $validInterface = 'Mautic\\ReportBundle\\Builder\\ReportBuilderInterface';
+    private $validInterface = \Mautic\ReportBundle\Builder\ReportBuilderInterface::class;
 
     /**
      * @var string
      */
     private $contentTemplate;
 
-    /**
-     * @var ChannelListHelper
-     */
-    private $channelListHelper;
-
-    /**
-     * ReportGenerator constructor.
-     */
-    public function __construct(EventDispatcherInterface $dispatcher, Connection $db, Report $entity, ChannelListHelper $channelListHelper, FormFactoryInterface $formFactory = null)
+    public function __construct(private EventDispatcherInterface $dispatcher, private Connection $db, private Report $entity, private ChannelListHelper $channelListHelper, private ?FormFactoryInterface $formFactory = null)
     {
-        $this->db                = $db;
-        $this->dispatcher        = $dispatcher;
-        $this->formFactory       = $formFactory;
-        $this->channelListHelper = $channelListHelper;
-        $this->entity            = $entity;
     }
 
     /**
@@ -105,15 +72,11 @@ class ReportGenerator
     }
 
     /**
-     * Gets report builder.
-     *
-     * @return \Mautic\ReportBundle\Builder\ReportBuilderInterface
-     *
      * @throws \Symfony\Component\DependencyInjection\Exception\RuntimeException
      */
-    protected function getBuilder()
+    protected function getBuilder(): MauticReportBuilder
     {
-        $className = '\\Mautic\\ReportBundle\\Builder\\MauticReportBuilder';
+        $className = MauticReportBuilder::class;
 
         if (!class_exists($className)) {
             throw new RuntimeException('The MauticReportBuilder does not exist.');

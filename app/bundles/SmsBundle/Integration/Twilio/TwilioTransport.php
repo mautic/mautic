@@ -15,27 +15,12 @@ use Twilio\Rest\Client;
 class TwilioTransport implements TransportInterface
 {
     /**
-     * @var Configuration
-     */
-    private $configuration;
-
-    /**
-     * @var LoggerInterface
-     */
-    private $logger;
-
-    /**
      * @var Client
      */
     private $client;
 
-    /**
-     * TwilioTransport constructor.
-     */
-    public function __construct(Configuration $configuration, LoggerInterface $logger)
+    public function __construct(private Configuration $configuration, private LoggerInterface $logger)
     {
-        $this->logger        = $logger;
-        $this->configuration = $configuration;
     }
 
     /**
@@ -69,7 +54,7 @@ class TwilioTransport implements TransportInterface
 
             return $exception->getMessage();
         } catch (ConfigurationException $exception) {
-            $message = ($exception->getMessage()) ? $exception->getMessage() : 'mautic.sms.transport.twilio.not_configured';
+            $message = $exception->getMessage() ?: 'mautic.sms.transport.twilio.not_configured';
             $this->logger->warning(
                 $message,
                 ['exception' => $exception]
@@ -106,18 +91,16 @@ class TwilioTransport implements TransportInterface
      */
     private function createPayload(string $messagingServiceSid, string $content): array
     {
-        $payload = [
+        return [
             'messagingServiceSid' => $messagingServiceSid,
             'body'                => $content,
         ];
-
-        return $payload;
     }
 
     /**
      * @throws ConfigurationException
      */
-    private function configureClient()
+    private function configureClient(): void
     {
         if ($this->client) {
             // Already configured

@@ -166,6 +166,8 @@ class IntegrationEntityRepository extends CommonRepository
      * @param null         $toDate
      * @param array|string $integrationEntity
      * @param array        $excludeIntegrationIds
+     *
+     * @return mixed[]
      */
     public function findLeadsToUpdate(
         $integration,
@@ -176,7 +178,7 @@ class IntegrationEntityRepository extends CommonRepository
         $toDate = null,
         $integrationEntity = ['Contact', 'Lead'],
         $excludeIntegrationIds = []
-    ) {
+    ): array {
         if ('company' == $internalEntity) {
             $joinTable = 'companies';
         } else {
@@ -225,7 +227,7 @@ class IntegrationEntityRepository extends CommonRepository
                 $q->expr()->notIn(
                     'i.integration_entity_id',
                     array_map(
-                        function ($x) {
+                        function ($x): string {
                             return "'".$x."'";
                         },
                         $excludeIntegrationIds
@@ -452,7 +454,7 @@ class IntegrationEntityRepository extends CommonRepository
                 ->from(MAUTIC_TABLE_PREFIX.'plugin_integration_settings', 'p')
                 ->where('p.is_published = 1');
             $rows    = $pq->executeQuery()->fetchAllAssociative();
-            $plugins = array_map(static function ($i) {
+            $plugins = array_map(static function ($i): string {
                 return "'{$i['name']}'";
             }, $rows);
             if (count($plugins) > 0) {
@@ -493,7 +495,7 @@ class IntegrationEntityRepository extends CommonRepository
         return $results;
     }
 
-    public function markAsDeleted(array $integrationIds, $integration, $internalEntityType)
+    public function markAsDeleted(array $integrationIds, $integration, $internalEntityType): void
     {
         $q = $this->_em->getConnection()->createQueryBuilder();
         $q->update(MAUTIC_TABLE_PREFIX.'integration_entity')
@@ -509,10 +511,7 @@ class IntegrationEntityRepository extends CommonRepository
             ->executeStatement();
     }
 
-    /**
-     * @return array
-     */
-    public function findLeadsToDelete($internalEntity, $leadId)
+    public function findLeadsToDelete($internalEntity, $leadId): void
     {
         $q = $this->_em->getConnection()->createQueryBuilder()
             ->delete(MAUTIC_TABLE_PREFIX.'integration_entity')
@@ -525,7 +524,7 @@ class IntegrationEntityRepository extends CommonRepository
             ->executeStatement();
     }
 
-    public function updateErrorLeads($internalEntity, $leadId)
+    public function updateErrorLeads($internalEntity, $leadId): void
     {
         $q = $this->_em->getConnection()->createQueryBuilder()
             ->update(MAUTIC_TABLE_PREFIX.'integration_entity')

@@ -6,9 +6,6 @@ use Symfony\Component\Form\AbstractType;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
-/**
- * Class YesNoButtonGroupType.
- */
 class YesNoButtonGroupType extends AbstractType
 {
     /**
@@ -30,11 +27,11 @@ class YesNoButtonGroupType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function configureOptions(OptionsResolver $resolver)
+    public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults(
             [
-                'choices'           => function (Options $options) {
+                'choices'           => function (Options $options): array {
                     return [
                         $options['no_label']  => $options['no_value'],
                         $options['yes_label'] => $options['yes_value'],

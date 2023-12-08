@@ -7,12 +7,16 @@ use Mautic\LeadBundle\Validator\Constraints\LengthValidator;
 
 class LengthValidatorTest extends \PHPUnit\Framework\TestCase
 {
+    /**
+     * @doesNotPerformAssertions
+     */
     public function testValidate()
     {
         $constraint = new Length(['min' => 3, 'allowEmptyString' => true]);
         $validator  = new LengthValidator();
-        $this->assertNull($validator->validate('valid', $constraint));
+
+        $validator->validate('valid', $constraint);
         // Not thrownig Symfony\Component\Validator\Exception\UnexpectedTypeException
-        $this->assertNull($validator->validate(['0', '1'], $constraint));
+        $validator->validate(['0', '1'], $constraint);
     }
 }

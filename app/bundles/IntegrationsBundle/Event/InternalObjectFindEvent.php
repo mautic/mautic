@@ -11,11 +11,6 @@ use Symfony\Contracts\EventDispatcher\Event;
 class InternalObjectFindEvent extends Event
 {
     /**
-     * @var ObjectInterface
-     */
-    private $object;
-
-    /**
      * @var int[]
      */
     private $ids = [];
@@ -45,9 +40,8 @@ class InternalObjectFindEvent extends Event
      */
     private $fieldValues = [];
 
-    public function __construct(ObjectInterface $object)
+    public function __construct(private ObjectInterface $object)
     {
-        $this->object = $object;
     }
 
     public function getObject(): ObjectInterface

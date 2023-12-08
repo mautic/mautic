@@ -27,7 +27,7 @@ class TriggerEventModel extends CommonFormModel
     /**
      * {@inheritdoc}
      */
-    public function getPermissionBase()
+    public function getPermissionBase(): string
     {
         return 'point:triggers';
     }

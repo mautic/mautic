@@ -4,35 +4,14 @@ namespace Mautic\ReportBundle\Event;
 
 use Mautic\ReportBundle\Entity\Report;
 
-/**
- * Class ReportDataEvent.
- */
 class ReportDataEvent extends AbstractReportEvent
 {
-    /**
-     * @var array
-     */
-    private $data = [];
+    private int $totalResults;
 
-    /**
-     * @var array
-     */
-    private $options = [];
-
-    /**
-     * @var int
-     */
-    private $totalResults = 0;
-
-    /**
-     * ReportDataEvent constructor.
-     */
-    public function __construct(Report $report, array $data, $totalResults, array $options)
+    public function __construct(Report $report, private array $data, $totalResults, private array $options)
     {
         $this->context      = $report->getSource();
         $this->report       = $report;
-        $this->data         = $data;
-        $this->options      = $options;
         $this->totalResults = (int) $totalResults;
     }
 
@@ -46,10 +25,8 @@ class ReportDataEvent extends AbstractReportEvent
 
     /**
      * @param array $data
-     *
-     * @return ReportDataEvent
      */
-    public function setData($data)
+    public function setData($data): void
     {
         $this->data = $data;
     }
@@ -62,10 +39,7 @@ class ReportDataEvent extends AbstractReportEvent
         return $this->options;
     }
 
-    /**
-     * @return int
-     */
-    public function getTotalResults()
+    public function getTotalResults(): int
     {
         return $this->totalResults;
     }

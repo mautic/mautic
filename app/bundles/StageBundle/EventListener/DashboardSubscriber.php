@@ -34,20 +34,14 @@ class DashboardSubscriber extends MainDashboardSubscriber
         'stage:stages:viewother',
     ];
 
-    /**
-     * @var StageModel
-     */
-    protected $stageModel;
-
-    public function __construct(StageModel $stageModel)
+    public function __construct(protected StageModel $stageModel)
     {
-        $this->stageModel = $stageModel;
     }
 
     /**
      * Set a widget detail when needed.
      */
-    public function onWidgetDetailGenerate(WidgetDetailEvent $event)
+    public function onWidgetDetailGenerate(WidgetDetailEvent $event): void
     {
         $this->checkPermissions($event);
         $canViewOthers = $event->hasPermission('stage:stages:viewother');

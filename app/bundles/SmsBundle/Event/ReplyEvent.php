@@ -9,16 +9,6 @@ use Symfony\Contracts\EventDispatcher\Event;
 class ReplyEvent extends Event
 {
     /**
-     * @var Lead
-     */
-    private $contact;
-
-    /**
-     * @var string
-     */
-    private $message;
-
-    /**
      * @var Response|null
      */
     private $response;
@@ -28,10 +18,8 @@ class ReplyEvent extends Event
      *
      * @param string $message
      */
-    public function __construct(Lead $contact, $message)
+    public function __construct(private Lead $contact, private $message)
     {
-        $this->contact = $contact;
-        $this->message = $message;
     }
 
     /**
@@ -50,7 +38,7 @@ class ReplyEvent extends Event
         return $this->message;
     }
 
-    public function setResponse(Response $response)
+    public function setResponse(Response $response): void
     {
         $this->response = $response;
     }

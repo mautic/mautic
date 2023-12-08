@@ -18,10 +18,8 @@ class EmailRepository extends CommonRepository
      * Get an array of do not email.
      *
      * @param array $leadIds
-     *
-     * @return array
      */
-    public function getDoNotEmailList($leadIds = [])
+    public function getDoNotEmailList($leadIds = []): array
     {
         $q = $this->getEntityManager()->getConnection()->createQueryBuilder();
         $q->select('l.id, l.email')
@@ -87,7 +85,7 @@ class EmailRepository extends CommonRepository
      *
      * @param int $id
      */
-    public function deleteDoNotEmailEntry($id)
+    public function deleteDoNotEmailEntry($id): void
     {
         $this->getEntityManager()->getConnection()->delete(MAUTIC_TABLE_PREFIX.'lead_donotcontact', ['id' => (int) $id]);
     }
@@ -123,6 +121,7 @@ class EmailRepository extends CommonRepository
      */
     public function getSentReadCount()
     {
+        // Get entities
         $q = $this->getEntityManager()->createQueryBuilder();
         $q->select('SUM(e.sentCount) as sent_count, SUM(e.readCount) as read_count')
             ->from(\Mautic\EmailBundle\Entity\Email::class, 'e');
@@ -429,12 +428,10 @@ class EmailRepository extends CommonRepository
     /**
      * @param \Doctrine\ORM\QueryBuilder|QueryBuilder $q
      * @param object                                  $filter
-     *
-     * @return array
      */
-    protected function addSearchCommandWhereClause($q, $filter)
+    protected function addSearchCommandWhereClause($q, $filter): array
     {
-        list($expr, $parameters) = $this->addStandardSearchCommandWhereClause($q, $filter);
+        [$expr, $parameters] = $this->addStandardSearchCommandWhereClause($q, $filter);
         if ($expr) {
             return [$expr, $parameters];
         }
@@ -493,7 +490,7 @@ class EmailRepository extends CommonRepository
     /**
      * @return array<array<string>>
      */
-    protected function getDefaultOrder()
+    protected function getDefaultOrder(): array
     {
         return [
             ['e.name', 'ASC'],
@@ -503,7 +500,7 @@ class EmailRepository extends CommonRepository
     /**
      * {@inheritdoc}
      */
-    public function getTableAlias()
+    public function getTableAlias(): string
     {
         return 'e';
     }
@@ -514,7 +511,7 @@ class EmailRepository extends CommonRepository
      * @param string[]|string|int $relatedIds
      * @param string              $date
      */
-    public function resetVariants($relatedIds, $date)
+    public function resetVariants($relatedIds, $date): void
     {
         if (!is_array($relatedIds)) {
             $relatedIds = [(string) $relatedIds];
@@ -683,10 +680,8 @@ class EmailRepository extends CommonRepository
      * @param string $column
      * @param int    $minContactId
      * @param int    $maxContactId
-     *
-     * @return QueryBuilder
      */
-    private function setMinMaxIds(QueryBuilder $q, $column, $minContactId, $maxContactId)
+    private function setMinMaxIds(QueryBuilder $q, $column, $minContactId, $maxContactId): QueryBuilder
     {
         if ($minContactId && is_numeric($minContactId)) {
             $q->andWhere($column.' >= :minContactId');
@@ -703,10 +698,8 @@ class EmailRepository extends CommonRepository
 
     /**
      * Is one of emails unpublished?
-     *
-     * @return bool
      */
-    public function isOneUnpublished(array $ids)
+    public function isOneUnpublished(array $ids): bool
     {
         $result = $this->getEntityManager()
             ->createQueryBuilder()

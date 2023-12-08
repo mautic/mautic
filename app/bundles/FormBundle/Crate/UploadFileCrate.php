@@ -17,7 +17,7 @@ class UploadFileCrate implements \Iterator
      */
     private $position = 0;
 
-    public function addFile(UploadedFile $file, Field $field)
+    public function addFile(UploadedFile $file, Field $field): void
     {
         $this->fileFieldCrate[] = new FileFieldCrate($file, $field);
     }

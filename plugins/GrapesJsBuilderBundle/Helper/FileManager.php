@@ -31,9 +31,6 @@ class FileManager
      */
     private $pathsHelper;
 
-    /**
-     * FileManager constructor.
-     */
     public function __construct(
         FileUploader $fileUploader,
         CoreParametersHelper $coreParametersHelper,
@@ -57,7 +54,7 @@ class FileManager
             foreach ($files as $file) {
                 try {
                     $uploadedFiles[] =  $this->getFullUrl($this->fileUploader->upload($uploadDir, $file));
-                } catch (FileUploadException $e) {
+                } catch (FileUploadException) {
                 }
             }
         }
@@ -68,7 +65,7 @@ class FileManager
     /**
      * @param string $fileName
      */
-    public function deleteFile($fileName)
+    public function deleteFile($fileName): void
     {
         $this->fileUploader->delete($this->getCompleteFilePath($fileName));
     }
@@ -133,7 +130,7 @@ class FileManager
         if (!$fileSystem->exists($uploadDir)) {
             try {
                 $fileSystem->mkdir($uploadDir);
-            } catch (IOException $exception) {
+            } catch (IOException) {
                 return $files;
             }
         }

@@ -48,7 +48,7 @@ class LeadListSubscriber implements EventSubscriberInterface
         ];
     }
 
-    public function onFilterChoiceFieldsGenerate(LeadListFiltersChoicesEvent $event)
+    public function onFilterChoiceFieldsGenerate(LeadListFiltersChoicesEvent $event): void
     {
         $services = $this->helper->getIntegrationObjects();
         $choices  = [];
@@ -67,7 +67,7 @@ class LeadListSubscriber implements EventSubscriberInterface
                     if ('Salesforce' !== $integrationName) {
                         array_walk(
                             $integrationChoices,
-                            function (&$choice) use ($integrationName) {
+                            function (&$choice) use ($integrationName): void {
                                 $choice['value'] = $integrationName.'::'.$choice['value'];
                             }
                         );
@@ -109,8 +109,8 @@ class LeadListSubscriber implements EventSubscriberInterface
 
         foreach ($filters as $filter) {
             if ('integration_campaigns' == $filter['field']) {
-                if (false !== strpos($filter['filter'], '::')) {
-                    list($integrationName, $campaignId) = explode('::', $filter['filter']);
+                if (str_contains($filter['filter'], '::')) {
+                    [$integrationName, $campaignId] = explode('::', $filter['filter']);
                 } else {
                     // Assuming this is a Salesforce integration for BC with pre 2.11.0
                     $integrationName = 'Salesforce';

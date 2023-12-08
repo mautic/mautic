@@ -5,19 +5,10 @@ namespace Mautic\LeadBundle\Segment\Decorator;
 use Mautic\LeadBundle\Segment\ContactSegmentFilterCrate;
 use Mautic\LeadBundle\Segment\Query\Filter\ComplexRelationValueFilterQueryBuilder;
 
-/**
- * Class DateCompanyDecorator.
- */
 class DateCompanyDecorator implements FilterDecoratorInterface
 {
-    /**
-     * @var FilterDecoratorInterface
-     */
-    private $dateDecorator;
-
-    public function __construct(FilterDecoratorInterface $dateDecorator)
+    public function __construct(private FilterDecoratorInterface $dateDecorator)
     {
-        $this->dateDecorator = $dateDecorator;
     }
 
     /**
@@ -70,10 +61,7 @@ class DateCompanyDecorator implements FilterDecoratorInterface
         return ComplexRelationValueFilterQueryBuilder::getServiceId();
     }
 
-    /**
-     * @return bool|string
-     */
-    public function getAggregateFunc(ContactSegmentFilterCrate $contactSegmentFilterCrate)
+    public function getAggregateFunc(ContactSegmentFilterCrate $contactSegmentFilterCrate): string|bool
     {
         return $this->dateDecorator->getAggregateFunc($contactSegmentFilterCrate);
     }
@@ -86,18 +74,12 @@ class DateCompanyDecorator implements FilterDecoratorInterface
         return $this->dateDecorator->getWhere($contactSegmentFilterCrate);
     }
 
-    /**
-     * @return string
-     */
-    public function getRelationJoinTable()
+    public function getRelationJoinTable(): string
     {
         return MAUTIC_TABLE_PREFIX.'companies_leads';
     }
 
-    /**
-     * @return string
-     */
-    public function getRelationJoinTableField()
+    public function getRelationJoinTableField(): string
     {
         return 'company_id';
     }

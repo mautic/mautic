@@ -6,9 +6,6 @@ use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 
-/**
- * Class Scheduler.
- */
 class Scheduler
 {
     /**
@@ -16,17 +13,7 @@ class Scheduler
      */
     private $id;
 
-    /**
-     * @var Report
-     */
-    private $report;
-
-    /**
-     * @var \DateTimeInterface
-     */
-    private $scheduleDate;
-
-    public static function loadMetadata(ORM\ClassMetadata $metadata)
+    public static function loadMetadata(ORM\ClassMetadata $metadata): void
     {
         $builder = new ClassMetadataBuilder($metadata);
 
@@ -45,10 +32,8 @@ class Scheduler
             ->build();
     }
 
-    public function __construct(Report $report, \DateTimeInterface $scheduleDate)
+    public function __construct(private Report $report, private \DateTimeInterface $scheduleDate)
     {
-        $this->report       = $report;
-        $this->scheduleDate = $scheduleDate;
     }
 
     /**

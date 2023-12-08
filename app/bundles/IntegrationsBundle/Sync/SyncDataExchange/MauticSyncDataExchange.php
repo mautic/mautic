@@ -28,50 +28,8 @@ class MauticSyncDataExchange implements SyncDataExchangeInterface
     public const OBJECT_CONTACT = 'lead'; // kept as lead for BC
     public const OBJECT_COMPANY = 'company';
 
-    /**
-     * @var FieldChangeRepository
-     */
-    private $fieldChangeRepository;
-
-    /**
-     * @var FieldHelper
-     */
-    private $fieldHelper;
-
-    /**
-     * @var MappingHelper
-     */
-    private $mappingHelper;
-
-    /**
-     * @var FullObjectReportBuilder
-     */
-    private $fullObjectReportBuilder;
-
-    /**
-     * @var PartialObjectReportBuilder
-     */
-    private $partialObjectReportBuilder;
-
-    /**
-     * @var OrderExecutioner
-     */
-    private $orderExecutioner;
-
-    public function __construct(
-        FieldChangeRepository $fieldChangeRepository,
-        FieldHelper $fieldHelper,
-        MappingHelper $mappingHelper,
-        FullObjectReportBuilder $fullObjectReportBuilder,
-        PartialObjectReportBuilder $partialObjectReportBuilder,
-        OrderExecutioner $orderExecutioner
-    ) {
-        $this->fieldChangeRepository      = $fieldChangeRepository;
-        $this->fieldHelper                = $fieldHelper;
-        $this->mappingHelper              = $mappingHelper;
-        $this->fullObjectReportBuilder    = $fullObjectReportBuilder;
-        $this->partialObjectReportBuilder = $partialObjectReportBuilder;
-        $this->orderExecutioner           = $orderExecutioner;
+    public function __construct(private FieldChangeRepository $fieldChangeRepository, private FieldHelper $fieldHelper, private MappingHelper $mappingHelper, private FullObjectReportBuilder $fullObjectReportBuilder, private PartialObjectReportBuilder $partialObjectReportBuilder, private OrderExecutioner $orderExecutioner)
+    {
     }
 
     public function getSyncReport(RequestDAO $requestDAO): ReportDAO
@@ -134,7 +92,7 @@ class MauticSyncDataExchange implements SyncDataExchangeInterface
                 DebugLogger::log(
                     self::NAME,
                     $exception->getMessage(),
-                    __CLASS__.':'.__FUNCTION__
+                    self::class.':'.__FUNCTION__
                 );
             }
         }

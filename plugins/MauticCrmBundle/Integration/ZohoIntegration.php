@@ -43,11 +43,9 @@ class ZohoIntegration extends CrmAbstractIntegration
     }
 
     /**
-     * {@inheritdoc}
-     *
-     * @return array
+     * @return array<string, string>
      */
-    public function getRequiredKeyFields()
+    public function getRequiredKeyFields(): array
     {
         return [
             $this->getClientIdKey()     => 'mautic.zoho.form.client_id',
@@ -97,10 +95,7 @@ class ZohoIntegration extends CrmAbstractIntegration
         return !empty($featureSettings['datacenter']) ? $featureSettings['datacenter'] : 'zoho.com';
     }
 
-    /**
-     * @return string
-     */
-    public function getApiUrl()
+    public function getApiUrl(): string
     {
         return sprintf('https://accounts.%s', $this->getDatacenter());
     }
@@ -125,10 +120,7 @@ class ZohoIntegration extends CrmAbstractIntegration
         return $this->getApiUrl().'/oauth/v2/auth';
     }
 
-    /**
-     * @return array
-     */
-    public function getSupportedFeatures()
+    public function getSupportedFeatures(): array
     {
         return ['push_lead', 'get_leads', 'push_leads'];
     }
@@ -136,7 +128,7 @@ class ZohoIntegration extends CrmAbstractIntegration
     /**
      * Refresh tokens.
      */
-    public function getRefreshTokenKeys()
+    public function getRefreshTokenKeys(): array
     {
         return [
             'refresh_token',
@@ -162,10 +154,8 @@ class ZohoIntegration extends CrmAbstractIntegration
      *
      * @param array  $data
      * @param string $object
-     *
-     * @return array
      */
-    public function amendLeadDataBeforeMauticPopulate($data, $object = null)
+    public function amendLeadDataBeforeMauticPopulate($data, $object = null): array
     {
         if ('company' === $object) {
             $object = 'Accounts';
@@ -181,8 +171,7 @@ class ZohoIntegration extends CrmAbstractIntegration
             /** @var IntegrationEntityRepository $integrationEntityRepo */
             $integrationEntityRepo = $this->em->getRepository(\Mautic\PluginBundle\Entity\IntegrationEntity::class);
             $objects               = $data['data'];
-            /** @var array $rows */
-            $integrationEntities = [];
+            $integrationEntities   = [];
             /** @var array $objects */
             foreach ($objects as $recordId => $entityData) {
                 $isModified = false;
@@ -600,10 +589,8 @@ class ZohoIntegration extends CrmAbstractIntegration
      * @param array $data
      * @param array $config
      * @param null  $object
-     *
-     * @return array
      */
-    public function populateMauticLeadData($data, $config = [], $object = 'Leads')
+    public function populateMauticLeadData($data, $config = [], $object = 'Leads'): array
     {
         // Match that data with mapped lead fields
         $aFields       = $this->getAvailableLeadFields($config);
@@ -669,7 +656,7 @@ class ZohoIntegration extends CrmAbstractIntegration
      *
      * @throws \InvalidArgumentException
      */
-    public function appendToForm(&$builder, $data, $formArea)
+    public function appendToForm(&$builder, $data, $formArea): void
     {
         if ('features' == $formArea) {
             $builder->add(
@@ -741,11 +728,11 @@ class ZohoIntegration extends CrmAbstractIntegration
     }
 
     /**
-     * @param array $settings
+     * @param mixed[] $settings
      *
-     * @return array|mixed
+     * @return mixed[]
      */
-    public function getFormLeadFields($settings = [])
+    public function getFormLeadFields($settings = []): array
     {
         $leadFields    = $this->getFormFieldsByObject('Leads', $settings);
         $contactFields = $this->getFormFieldsByObject('Contacts', $settings);
@@ -754,22 +741,20 @@ class ZohoIntegration extends CrmAbstractIntegration
     }
 
     /**
-     * @param array $settings
-     *
-     * @return array|bool
+     * @param mixed[] $settings
      *
      * @throws ApiErrorException
      */
-    public function getAvailableLeadFields($settings = [])
+    public function getAvailableLeadFields($settings = []): array
     {
         $zohoFields        = [];
-        $silenceExceptions = isset($settings['silence_exceptions']) ? $settings['silence_exceptions'] : true;
+        $silenceExceptions = $settings['silence_exceptions'] ?? true;
 
         if (isset($settings['feature_settings']['objects'])) {
             $zohoObjects = $settings['feature_settings']['objects'];
         } else {
             $settings    = $this->settings->getFeatureSettings();
-            $zohoObjects = isset($settings['objects']) ? $settings['objects'] : ['Leads'];
+            $zohoObjects = $settings['objects'] ?? ['Leads'];
         }
 
         try {
@@ -817,7 +802,7 @@ class ZohoIntegration extends CrmAbstractIntegration
             $this->logIntegrationError($exception);
 
             if (!$silenceExceptions) {
-                if (false !== strpos($exception->getMessage(), 'Invalid Ticket Id')) {
+                if (str_contains($exception->getMessage(), 'Invalid Ticket Id')) {
                     // Use a bit more friendly message
                     $exception = new ApiErrorException('There was an issue with communicating with Zoho. Please try to reauthorize.');
                 }
@@ -825,7 +810,7 @@ class ZohoIntegration extends CrmAbstractIntegration
                 throw $exception;
             }
 
-            return false;
+            return [];
         }
 
         return $zohoFields;
@@ -834,9 +819,9 @@ class ZohoIntegration extends CrmAbstractIntegration
     /**
      * @param array $params
      *
-     * @return mixed
+     * @return mixed[]
      */
-    public function pushLeads($params = [])
+    public function pushLeads($params = []): array
     {
         $maxRecords = (isset($params['limit']) && $params['limit'] < 100) ? $params['limit'] : 100;
         if (isset($params['fetchAll']) && $params['fetchAll']) {
@@ -1149,10 +1134,8 @@ class ZohoIntegration extends CrmAbstractIntegration
 
     /**
      * Get if data priority is enabled in the integration or not default is false.
-     *
-     * @return string
      */
-    public function getDataPriority()
+    public function getDataPriority(): bool
     {
         return true;
     }
@@ -1258,7 +1241,7 @@ class ZohoIntegration extends CrmAbstractIntegration
      * @param int    $counter
      * @param int    $errorCounter
      */
-    private function updateContactInZoho(Mapper $mapper, $object, &$counter, &$errorCounter)
+    private function updateContactInZoho(Mapper $mapper, $object, &$counter, &$errorCounter): void
     {
         $response     = $this->getApiHelper()->updateLead($mapper->getArray(), $object);
         $failed       = $this->consumeResponse($response, $object, false, $mapper);
@@ -1271,7 +1254,7 @@ class ZohoIntegration extends CrmAbstractIntegration
      * @param int    $counter
      * @param int    $errorCounter
      */
-    private function createContactInZoho(Mapper $mapper, $object, &$counter, &$errorCounter)
+    private function createContactInZoho(Mapper $mapper, $object, &$counter, &$errorCounter): void
     {
         $response     = $this->getApiHelper()->createLead($mapper->getArray(), $object);
         $failed       = $this->consumeResponse($response, $object, true, $mapper);
@@ -1316,7 +1299,7 @@ class ZohoIntegration extends CrmAbstractIntegration
 
         $objects = (!is_array($object)) ? [$object] : $object;
         if (is_string($object) && 'Accounts' === $object) {
-            return isset($fields['companyFields']) ? $fields['companyFields'] : $fields;
+            return $fields['companyFields'] ?? $fields;
         }
 
         if (isset($fields['leadFields'])) {

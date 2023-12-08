@@ -13,24 +13,12 @@ use Symfony\Component\Routing\RouterInterface;
 class SegmentDependencyTreeFactory
 {
     /**
-     * @var ListModel
-     */
-    private $segmentModel;
-
-    /**
-     * @var RouterInterface
-     */
-    private $router;
-
-    /**
      * @var int[]
      */
     private $usedSegmentIds = [];
 
-    public function __construct(ListModel $segmentModel, RouterInterface $router)
+    public function __construct(private ListModel $segmentModel, private RouterInterface $router)
     {
-        $this->segmentModel = $segmentModel;
-        $this->router       = $router;
     }
 
     public function buildTree(LeadList $segment, NodeInterface $rootNode = null): NodeInterface
@@ -68,7 +56,7 @@ class SegmentDependencyTreeFactory
     {
         $segmentMembershipFilters = array_filter(
             $segment->getFilters(),
-            function (array $filter) {
+            function (array $filter): bool {
                 return 'leadlist' === $filter['type'];
             }
         );

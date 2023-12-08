@@ -23,19 +23,12 @@ use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 
-/**
- * Class MessageController.
- */
 class MessageController extends AbstractStandardFormController
 {
     use EntityContactsTrait;
 
-    private RequestStack $requestStack;
-
-    public function __construct(FormFactoryInterface $formFactory, FormFieldHelper $fieldHelper, ManagerRegistry $doctrine, MauticFactory $factory, ModelFactory $modelFactory, UserHelper $userHelper, CoreParametersHelper $coreParametersHelper, EventDispatcherInterface $dispatcher, Translator $translator, FlashBag $flashBag, RequestStack $requestStack, CorePermissions $security)
+    public function __construct(FormFactoryInterface $formFactory, FormFieldHelper $fieldHelper, ManagerRegistry $doctrine, MauticFactory $factory, ModelFactory $modelFactory, UserHelper $userHelper, CoreParametersHelper $coreParametersHelper, EventDispatcherInterface $dispatcher, Translator $translator, FlashBag $flashBag, private RequestStack $requestStack, CorePermissions $security)
     {
-        $this->requestStack = $requestStack;
-
         parent::__construct($formFactory, $fieldHelper, $doctrine, $factory, $modelFactory, $userHelper, $coreParametersHelper, $dispatcher, $translator, $flashBag, $requestStack, $security);
     }
 
@@ -92,9 +85,9 @@ class MessageController extends AbstractStandardFormController
     }
 
     /**
-     * @return mixed
+     * @return mixed[]
      */
-    protected function getViewArguments(array $args, $action)
+    protected function getViewArguments(array $args, $action): array
     {
         /** @var MessageModel $model */
         $model          = $this->getModel($this->getModelName());
@@ -126,7 +119,7 @@ class MessageController extends AbstractStandardFormController
                     ]
                 );
 
-                list($dateFrom, $dateTo) = $this->getViewDateRange($this->requestStack->getCurrentRequest(), $message->getId(), $returnUrl, 'local', $dateRangeForm);
+                [$dateFrom, $dateTo]     = $this->getViewDateRange($this->requestStack->getCurrentRequest(), $message->getId(), $returnUrl, 'local', $dateRangeForm);
                 $chart                   = new LineChart(null, $dateFrom, $dateTo);
 
                 /** @var Channel[] $channels */
@@ -217,7 +210,7 @@ class MessageController extends AbstractStandardFormController
     /**
      * {@inheritdoc}
      */
-    protected function getJsLoadMethodPrefix()
+    protected function getJsLoadMethodPrefix(): string
     {
         return 'messages';
     }
@@ -225,7 +218,7 @@ class MessageController extends AbstractStandardFormController
     /**
      * {@inheritdoc}
      */
-    protected function getModelName()
+    protected function getModelName(): string
     {
         return 'channel.message';
     }
@@ -233,7 +226,7 @@ class MessageController extends AbstractStandardFormController
     /**
      * {@inheritdoc}
      */
-    protected function getRouteBase()
+    protected function getRouteBase(): string
     {
         return 'message';
     }
@@ -243,7 +236,7 @@ class MessageController extends AbstractStandardFormController
      *
      * @return string
      */
-    protected function getSessionBase($objectId = null)
+    protected function getSessionBase($objectId = null): string
     {
         return 'message'.(($objectId) ? '.'.$objectId : '');
     }
@@ -251,7 +244,7 @@ class MessageController extends AbstractStandardFormController
     /**
      * {@inheritdoc}
      */
-    protected function getTranslationBase()
+    protected function getTranslationBase(): string
     {
         return 'mautic.channel.message';
     }
@@ -277,7 +270,7 @@ class MessageController extends AbstractStandardFormController
                     'objectId'     => $objectId,
                 ]
             );
-            list($dateFrom, $dateTo) = $this->getViewDateRange($request, $objectId, $returnUrl, 'UTC');
+            [$dateFrom, $dateTo] = $this->getViewDateRange($request, $objectId, $returnUrl, 'UTC');
 
             $filter = [
                 'channel' => $channel,
@@ -314,7 +307,7 @@ class MessageController extends AbstractStandardFormController
             ],
             null,
             [
-                'channel' => ($channel) ? $channel : 'all',
+                'channel' => $channel ?: 'all',
             ],
             '.message-'.$channel
         );

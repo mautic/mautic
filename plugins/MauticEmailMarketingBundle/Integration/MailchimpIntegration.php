@@ -4,9 +4,6 @@ namespace MauticPlugin\MauticEmailMarketingBundle\Integration;
 
 use MauticPlugin\MauticEmailMarketingBundle\Form\Type\MailchimpType;
 
-/**
- * Class MailchimpIntegration.
- */
 class MailchimpIntegration extends EmailAbstractIntegration
 {
     /**
@@ -30,7 +27,7 @@ class MailchimpIntegration extends EmailAbstractIntegration
     /**
      * {@inheritdoc}
      */
-    public function getAuthenticationType()
+    public function getAuthenticationType(): string
     {
         return (empty($this->keys['client_id'])) ? 'basic' : 'oauth2';
     }
@@ -94,9 +91,9 @@ class MailchimpIntegration extends EmailAbstractIntegration
     /**
      * @param array $settings
      *
-     * @return mixed
+     * @return mixed[]
      */
-    public function getAvailableLeadFields($settings = [])
+    public function getAvailableLeadFields($settings = []): array
     {
         if (isset($settings['list'])) {
             // Ajax update
@@ -143,10 +140,8 @@ class MailchimpIntegration extends EmailAbstractIntegration
 
     /**
      * @param array $config
-     *
-     * @return bool
      */
-    public function pushLead($lead, $config = [])
+    public function pushLead($lead, $config = []): bool
     {
         $config     = $this->mergeConfigToFeatureSettings($config);
         $mappedData = $this->populateLeadData($lead, $config);
@@ -181,9 +176,9 @@ class MailchimpIntegration extends EmailAbstractIntegration
     }
 
     /**
-     * @return array
+     * @return array<string, mixed>
      */
-    public function getFormSettings()
+    public function getFormSettings(): array
     {
         $settings                           = parent::getFormSettings();
         $settings['dynamic_contact_fields'] = true;
@@ -191,12 +186,7 @@ class MailchimpIntegration extends EmailAbstractIntegration
         return $settings;
     }
 
-    /**
-     * {@inheritdoc}
-     *
-     * @return string|null
-     */
-    public function getFormType()
+    public function getFormType(): string
     {
         return MailchimpType::class;
     }

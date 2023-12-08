@@ -17,16 +17,6 @@ class ProcessReplySubscriber implements EventSubscriberInterface
     public const CACHE_KEY  = self::BUNDLE.'_'.self::FOLDER_KEY;
 
     /**
-     * @var Reply
-     */
-    private $replier;
-
-    /**
-     * @var CacheStorageHelper
-     */
-    private $cache;
-
-    /**
      * @return array
      */
     public static function getSubscribedEvents()
@@ -38,21 +28,16 @@ class ProcessReplySubscriber implements EventSubscriberInterface
         ];
     }
 
-    /**
-     * ProcessReplySubscriber constructor.
-     */
-    public function __construct(Reply $replier, CacheStorageHelper $cache)
+    public function __construct(private Reply $replier, private CacheStorageHelper $cache)
     {
-        $this->replier = $replier;
-        $this->cache   = $cache;
     }
 
-    public function onEmailConfig(MonitoredEmailEvent $event)
+    public function onEmailConfig(MonitoredEmailEvent $event): void
     {
         $event->addFolder(self::BUNDLE, self::FOLDER_KEY, 'mautic.email.config.monitored_email.reply_folder');
     }
 
-    public function onEmailPreFetch(ParseEmailEvent $event)
+    public function onEmailPreFetch(ParseEmailEvent $event): void
     {
         if (!$lastFetchedUID = $this->cache->get(self::CACHE_KEY)) {
             return;
@@ -66,7 +51,7 @@ class ProcessReplySubscriber implements EventSubscriberInterface
         $event->setCriteriaRequest(self::BUNDLE, self::FOLDER_KEY, Mailbox::CRITERIA_UID." $startingUID:$endingUID");
     }
 
-    public function onEmailParse(ParseEmailEvent $event)
+    public function onEmailParse(ParseEmailEvent $event): void
     {
         if ($event->isApplicable(self::BUNDLE, self::FOLDER_KEY)) {
             // Process the messages

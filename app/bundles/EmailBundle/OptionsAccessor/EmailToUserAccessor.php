@@ -7,24 +7,14 @@ use Mautic\UserBundle\Entity\User;
 
 class EmailToUserAccessor
 {
-    /** @var array */
-    private $config;
+    private \Mautic\CoreBundle\Form\DataTransformer\ArrayStringTransformer $transformer;
 
-    /**
-     * @var ArrayStringTransformer
-     */
-    private $transformer;
-
-    public function __construct(array $config)
+    public function __construct(private array $config)
     {
-        $this->config      = $config;
         $this->transformer = new ArrayStringTransformer();
     }
 
-    /**
-     * @return int
-     */
-    public function getEmailID()
+    public function getEmailID(): int
     {
         return (int) $this->config['useremail']['email'];
     }
@@ -41,10 +31,8 @@ class EmailToUserAccessor
      * Gets array of User ids formated for EmailModel.
      *
      * @param User|null $owner If Owner is passed in and config is setted for it, adds owner to returned array
-     *
-     * @return array
      */
-    public function getUserIdsToSend(User $owner = null)
+    public function getUserIdsToSend(User $owner = null): array
     {
         $userIds = empty($this->config['user_id']) ? [] : $this->config['user_id'];
 

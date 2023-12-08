@@ -25,14 +25,14 @@ class ArrayType extends \Doctrine\DBAL\Types\ArrayType
         // MySQL will crap out on corrupt UTF8 leading to broken serialized strings
         array_walk(
             $value,
-            function (&$entry) {
+            function (&$entry): void {
                 $entry = UTF8Helper::toUTF8($entry);
             }
         );
 
         $serialized = serialize($value);
 
-        if (false !== strpos($serialized, chr(0))) {
+        if (str_contains($serialized, chr(0))) {
             $serialized = str_replace("\0", '__NULL_BYTE__', $serialized);
             throw new ConversionException('Serialized array includes null-byte. This cannot be saved as a text. Please check if you not provided object with protected or private members. Serialized Array: '.$serialized);
         }
@@ -70,9 +70,9 @@ class ArrayType extends \Doctrine\DBAL\Types\ArrayType
             }
 
             return $value;
-        } catch (ConversionException $exception) {
+        } catch (ConversionException) {
             return [];
-        } catch (\ErrorException $exeption) {
+        } catch (\ErrorException) {
             return [];
         }
     }

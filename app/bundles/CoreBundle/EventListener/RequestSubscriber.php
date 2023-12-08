@@ -15,29 +15,8 @@ use Twig\Environment;
 
 class RequestSubscriber implements EventSubscriberInterface
 {
-    /**
-     * @var CsrfTokenManagerInterface
-     */
-    private $tokenManager;
-
-    /**
-     * @var TranslatorInterface
-     */
-    private $translator;
-
-    /**
-     * @var Environment
-     */
-    private $twig;
-
-    public function __construct(
-        CsrfTokenManagerInterface $tokenManager,
-        TranslatorInterface $translator,
-        Environment $twig
-    ) {
-        $this->tokenManager = $tokenManager;
-        $this->translator   = $translator;
-        $this->twig         = $twig;
+    public function __construct(private CsrfTokenManagerInterface $tokenManager, private TranslatorInterface $translator, private Environment $twig)
+    {
     }
 
     /**
@@ -50,7 +29,7 @@ class RequestSubscriber implements EventSubscriberInterface
         ];
     }
 
-    public function validateCsrfTokenForAjaxPost(RequestEvent $event)
+    public function validateCsrfTokenForAjaxPost(RequestEvent $event): void
     {
         $request = $event->getRequest();
 
@@ -64,18 +43,12 @@ class RequestSubscriber implements EventSubscriberInterface
         }
     }
 
-    /**
-     * @return bool
-     */
-    private function isAjaxPost(Request $request)
+    private function isAjaxPost(Request $request): bool
     {
         return $request->isXmlHttpRequest() && Request::METHOD_POST === $request->getMethod();
     }
 
-    /**
-     * @return bool
-     */
-    private function isSecurePath(Request $request)
+    private function isSecurePath(Request $request): bool
     {
         return 1 === preg_match('/^\/s\//', $request->getPathinfo());
     }

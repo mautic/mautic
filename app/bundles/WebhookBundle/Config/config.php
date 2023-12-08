@@ -17,7 +17,7 @@ return [
                 'standard_entity' => true,
                 'name'            => 'hooks',
                 'path'            => '/hooks',
-                'controller'      => 'Mautic\WebhookBundle\Controller\Api\WebhookApiController',
+                'controller'      => \Mautic\WebhookBundle\Controller\Api\WebhookApiController::class,
             ],
             'mautic_api_webhookevents' => [
                 'path'       => '/hooks/triggers',

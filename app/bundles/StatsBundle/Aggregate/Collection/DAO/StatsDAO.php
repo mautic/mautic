@@ -43,7 +43,7 @@ class StatsDAO
      *
      * @throws \Exception
      */
-    public function getMonths()
+    public function getMonths(): array
     {
         $flattenedMonths = [];
         foreach ($this->years as $yearStats) {
@@ -63,7 +63,7 @@ class StatsDAO
      *
      * @throws \Exception
      */
-    public function getWeeks()
+    public function getWeeks(): array
     {
         $flattenedWeeks = [];
 
@@ -87,7 +87,7 @@ class StatsDAO
      *
      * @throws \Exception
      */
-    public function getDays()
+    public function getDays(): array
     {
         $flattenedDays = [];
 
@@ -110,7 +110,7 @@ class StatsDAO
      *
      * @throws \Exception
      */
-    public function getHours()
+    public function getHours(): array
     {
         $flattenedHours = [];
 

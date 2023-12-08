@@ -4,9 +4,6 @@ namespace Mautic\CoreBundle\IpLookup;
 
 use Mautic\CoreBundle\Form\Type\IpLookupDownloadDataStoreButtonType;
 
-/**
- * Class AbstractLocalDataLookup.
- */
 abstract class AbstractLocalDataLookup extends AbstractLookup implements IpLookupFormInterface
 {
     /**
@@ -191,10 +188,8 @@ abstract class AbstractLocalDataLookup extends AbstractLookup implements IpLooku
      *
      * @param string $haystack
      * @param string $needle
-     *
-     * @return bool
      */
-    private function endsWith($haystack, $needle)
+    private function endsWith($haystack, $needle): bool
     {
         return 0 === substr_compare($haystack, $needle, -strlen($needle));
     }

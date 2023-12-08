@@ -42,7 +42,7 @@ class PhoneNumberHelper
     /**
      * @return string
      */
-    public function formatNumericalInternational($number)
+    public function formatNumericalInternational($number): ?string
     {
         return preg_replace('/[^0-9]/', '', $this->format($number, PhoneNumberFormat::INTERNATIONAL));
     }
@@ -50,7 +50,7 @@ class PhoneNumberHelper
     /**
      * @return string
      */
-    public function formatNumericalNational($number)
+    public function formatNumericalNational($number): ?string
     {
         return preg_replace('/[^0-9]/', '', $this->format($number, PhoneNumberFormat::NATIONAL));
     }
@@ -61,7 +61,7 @@ class PhoneNumberHelper
      *
      * @return string
      */
-    public function formatDelimitedNational($number, $delimiter = '-')
+    public function formatDelimitedNational($number, $delimiter = '-'): ?string
     {
         $national = $this->format($number, PhoneNumberFormat::NATIONAL);
         $national = str_replace([') ', '-'], $delimiter, $national);

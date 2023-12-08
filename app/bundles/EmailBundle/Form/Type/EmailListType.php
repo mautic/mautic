@@ -12,7 +12,7 @@ class EmailListType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function configureOptions(OptionsResolver $resolver)
+    public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults(
             [
@@ -22,7 +22,7 @@ class EmailListType extends AbstractType
                 'force_popup'        => true,
                 'model'              => 'email',
                 'multiple'           => true,
-                'ajax_lookup_action' => function (Options $options) {
+                'ajax_lookup_action' => function (Options $options): string {
                     $query = [
                         'email_type'     => $options['email_type'],
                         'top_level'      => $options['top_level'],
@@ -33,7 +33,7 @@ class EmailListType extends AbstractType
                     return 'email:getLookupChoiceList&'.http_build_query($query);
                 },
                 'model_lookup_method' => 'getLookupResults',
-                'lookup_arguments'    => function (Options $options) {
+                'lookup_arguments'    => function (Options $options): array {
                     return [
                         'type'    => 'email',
                         'filter'  => '$data',

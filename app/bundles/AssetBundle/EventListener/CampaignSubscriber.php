@@ -13,14 +13,8 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class CampaignSubscriber implements EventSubscriberInterface
 {
-    /**
-     * @var RealTimeExecutioner
-     */
-    private $realTimeExecutioner;
-
-    public function __construct(RealTimeExecutioner $realTimeExecutioner)
+    public function __construct(private RealTimeExecutioner $realTimeExecutioner)
     {
-        $this->realTimeExecutioner = $realTimeExecutioner;
     }
 
     /**
@@ -35,7 +29,7 @@ class CampaignSubscriber implements EventSubscriberInterface
         ];
     }
 
-    public function onCampaignBuild(CampaignBuilderEvent $event)
+    public function onCampaignBuild(CampaignBuilderEvent $event): void
     {
         $trigger = [
             'label'          => 'mautic.asset.campaign.event.download',
@@ -52,7 +46,7 @@ class CampaignSubscriber implements EventSubscriberInterface
     /**
      * Trigger point actions for asset download.
      */
-    public function onAssetDownload(AssetLoadEvent $event)
+    public function onAssetDownload(AssetLoadEvent $event): void
     {
         $asset = $event->getRecord()->getAsset();
 

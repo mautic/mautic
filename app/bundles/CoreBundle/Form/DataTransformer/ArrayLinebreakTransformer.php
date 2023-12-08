@@ -4,9 +4,6 @@ namespace Mautic\CoreBundle\Form\DataTransformer;
 
 use Symfony\Component\Form\DataTransformerInterface;
 
-/**
- * Class ArrayLinebreakTransformer.
- */
 class ArrayLinebreakTransformer implements DataTransformerInterface
 {
     /**

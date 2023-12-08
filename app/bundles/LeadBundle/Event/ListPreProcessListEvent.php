@@ -4,24 +4,15 @@ namespace Mautic\LeadBundle\Event;
 
 use Mautic\CoreBundle\Event\CommonEvent;
 
-/**
- * Class ListPreProcessListEvent.
- */
 class ListPreProcessListEvent extends CommonEvent
 {
-    /**
-     * @var array
-     */
-    protected $list;
-
     protected $result;
 
     /**
      * @param bool $isNew
      */
-    public function __construct(array $list, $isNew = false)
+    public function __construct(protected array $list, $isNew = false)
     {
-        $this->list  = $list;
         $this->isNew = $isNew;
     }
 
@@ -38,7 +29,7 @@ class ListPreProcessListEvent extends CommonEvent
     /**
      * Sets the lead list entity.
      */
-    public function setList(array $list)
+    public function setList(array $list): void
     {
         $this->list = $list;
     }

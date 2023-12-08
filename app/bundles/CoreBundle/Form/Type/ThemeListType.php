@@ -8,25 +8,13 @@ use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
-/**
- * Class ThemeListType.
- */
 class ThemeListType extends AbstractType
 {
-    /**
-     * @var ThemeHelperInterface
-     */
-    private $themeHelper;
-
-    /**
-     * ThemeListType constructor.
-     */
-    public function __construct(ThemeHelperInterface $helper)
+    public function __construct(private ThemeHelperInterface $themeHelper)
     {
-        $this->themeHelper = $helper;
     }
 
-    public function configureOptions(OptionsResolver $resolver)
+    public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults(
             [

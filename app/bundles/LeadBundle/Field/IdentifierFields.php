@@ -10,13 +10,8 @@ use Mautic\LeadBundle\Entity\Lead;
 
 class IdentifierFields
 {
-    private FieldsWithUniqueIdentifier $fieldsWithUniqueIdentifier;
-    private FieldList $fieldList;
-
-    public function __construct(FieldsWithUniqueIdentifier $fieldsWithUniqueIdentifier, FieldList $fieldList)
+    public function __construct(private FieldsWithUniqueIdentifier $fieldsWithUniqueIdentifier, private FieldList $fieldList)
     {
-        $this->fieldsWithUniqueIdentifier = $fieldsWithUniqueIdentifier;
-        $this->fieldList                  = $fieldList;
     }
 
     /**

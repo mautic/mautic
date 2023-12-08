@@ -5,26 +5,6 @@ namespace Mautic\LeadBundle\DataObject;
 class LeadManipulator
 {
     /**
-     * @var string|null
-     */
-    private $bundleName;
-
-    /**
-     * @var string|null
-     */
-    private $objectName;
-
-    /**
-     * @var int|null
-     */
-    private $objectId;
-
-    /**
-     * @var string|null
-     */
-    private $objectDescription;
-
-    /**
      * If true then the manipulator was logged and should not be logged for the second time.
      *
      * @var bool
@@ -37,12 +17,8 @@ class LeadManipulator
      * @param ?int    $objectId
      * @param ?string $objectDescription
      */
-    public function __construct($bundleName = null, $objectName = null, $objectId = null, $objectDescription = null)
+    public function __construct(private $bundleName = null, private $objectName = null, private $objectId = null, private $objectDescription = null)
     {
-        $this->bundleName        = $bundleName;
-        $this->objectName        = $objectName;
-        $this->objectId          = $objectId;
-        $this->objectDescription = $objectDescription;
     }
 
     /**
@@ -90,7 +66,7 @@ class LeadManipulator
     /**
      * Set manipulator as logged so it wouldn't be logged for the second time in the same request.
      */
-    public function setAsLogged()
+    public function setAsLogged(): void
     {
         $this->logged = true;
     }

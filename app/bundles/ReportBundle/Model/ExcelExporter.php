@@ -10,22 +10,10 @@ use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-/**
- * Class CsvExporter.
- */
 class ExcelExporter
 {
-    /**
-     * @var FormatterHelper
-     */
-    protected $formatterHelper;
-
-    private TranslatorInterface $translator;
-
-    public function __construct(FormatterHelper $formatterHelper, TranslatorInterface $translator)
+    public function __construct(protected FormatterHelper $formatterHelper, private TranslatorInterface $translator)
     {
-        $this->formatterHelper      = $formatterHelper;
-        $this->translator           = $translator;
     }
 
     /**

@@ -9,24 +9,12 @@ use Mautic\CoreBundle\Helper\CoreParametersHelper;
 class TrustOptionsStore implements TrustOptionsStoreInterface
 {
     /**
-     * @var CoreParametersHelper
-     */
-    private $coreParametersHelper;
-
-    /**
-     * @var string
-     */
-    private $entityId;
-
-    /**
      * @var TrustOptions
      */
     private $trustOptions;
 
-    public function __construct(CoreParametersHelper $coreParametersHelper, string $entityId)
+    public function __construct(private CoreParametersHelper $coreParametersHelper, private string $entityId)
     {
-        $this->coreParametersHelper = $coreParametersHelper;
-        $this->entityId             = $entityId;
     }
 
     public function get($entityId): TrustOptions

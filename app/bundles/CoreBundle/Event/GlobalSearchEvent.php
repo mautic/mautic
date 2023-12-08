@@ -5,9 +5,6 @@ namespace Mautic\CoreBundle\Event;
 use Mautic\CoreBundle\Translation\Translator;
 use Symfony\Contracts\EventDispatcher\Event;
 
-/**
- * Class GlobalSearchEvent.
- */
 class GlobalSearchEvent extends Event
 {
     /**
@@ -15,32 +12,21 @@ class GlobalSearchEvent extends Event
      */
     protected $results = [];
 
-    /**
-     * @var string
-     */
-    protected $searchString;
-
-    /**
-     * @var Translator
-     */
-    protected $translator;
+    protected string $searchString;
 
     /**
      * @param string     $searchString
      * @param Translator $translator
      */
-    public function __construct($searchString, $translator)
+    public function __construct($searchString, protected $translator)
     {
         $this->searchString = strtolower(trim(strip_tags($searchString)));
-        $this->translator   = $translator;
     }
 
     /**
      * Returns the string to be searched.
-     *
-     * @return string
      */
-    public function getSearchString()
+    public function getSearchString(): string
     {
         return $this->searchString;
     }
@@ -52,7 +38,7 @@ class GlobalSearchEvent extends Event
      * @param string $header  String name for section header
      * @param array  $results Array of HTML output that will be wrapped in <li /> elements
      */
-    public function addResults($header, array $results)
+    public function addResults($header, array $results): void
     {
         $header                 = $this->translator->trans($header);
         $this->results[$header] = $results;
