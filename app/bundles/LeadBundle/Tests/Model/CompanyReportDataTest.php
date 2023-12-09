@@ -14,7 +14,7 @@ class CompanyReportDataTest extends \PHPUnit\Framework\TestCase
     /**
      * @var TranslatorInterface
      */
-    private $translator;
+    private \PHPUnit\Framework\MockObject\MockObject $translator;
 
     protected function setUp(): void
     {

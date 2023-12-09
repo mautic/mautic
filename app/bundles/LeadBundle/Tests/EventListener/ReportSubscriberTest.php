@@ -38,112 +38,106 @@ class ReportSubscriberTest extends \PHPUnit\Framework\TestCase
     /**
      * @var MockObject|LeadModel
      */
-    private $leadModelMock;
+    private \PHPUnit\Framework\MockObject\MockObject $leadModelMock;
 
     /**
      * @var MockObject|FieldModel
      */
-    private $leadFieldModelMock;
+    private \PHPUnit\Framework\MockObject\MockObject $leadFieldModelMock;
 
     /**
      * @var MockObject|StageModel
      */
-    private $stageModelMock;
+    private \PHPUnit\Framework\MockObject\MockObject $stageModelMock;
 
     /**
      * @var MockObject|CampaignModel
      */
-    private $campaignModelMock;
+    private \PHPUnit\Framework\MockObject\MockObject $campaignModelMock;
 
     /**
      * @var MockObject|EventCollector
      */
-    private $eventCollectorMock;
+    private \PHPUnit\Framework\MockObject\MockObject $eventCollectorMock;
 
     /**
      * @var MockObject|CompanyModel
      */
-    private $companyModelMock;
+    private \PHPUnit\Framework\MockObject\MockObject $companyModelMock;
 
     /**
      * @var MockObject|CompanyReportData
      */
-    private $companyReportDataMock;
+    private \PHPUnit\Framework\MockObject\MockObject $companyReportDataMock;
 
     /**
      * @var MockObject|FieldsBuilder
      */
-    private $fieldsBuilderMock;
+    private \PHPUnit\Framework\MockObject\MockObject $fieldsBuilderMock;
 
     /**
      * @var MockObject|Translator
      */
-    private $translatorMock;
+    private \PHPUnit\Framework\MockObject\MockObject $translatorMock;
 
     /**
      * @var MockObject|ReportGeneratorEvent
      */
-    private $reportGeneratorEventMock;
+    private \PHPUnit\Framework\MockObject\MockObject $reportGeneratorEventMock;
 
     /**
      * @var MockObject|ChannelListHelper
      */
-    private $channelListHelperMock;
+    private \Mautic\ChannelBundle\Helper\ChannelListHelper $channelListHelperMock;
 
-    /**
-     * @var MockObject|ReportHelper
-     */
-    private $reportHelperMock;
+    private \Mautic\ReportBundle\Helper\ReportHelper $reportHelperMock;
 
     /**
      * @var MockObject|CampaignRepository
      */
-    private $campaignRepositoryMock;
+    private \PHPUnit\Framework\MockObject\MockObject $campaignRepositoryMock;
 
     /**
      * @var MockObject|ReportBuilderEvent
      */
-    private $reportBuilderEventMock;
+    private \PHPUnit\Framework\MockObject\MockObject $reportBuilderEventMock;
 
     /**
      * @var MockObject|QueryBuilder
      */
-    private $queryBuilderMock;
+    private \PHPUnit\Framework\MockObject\MockObject $queryBuilderMock;
 
     /**
      * @var MockObject|ExpressionBuilder
      */
-    private $expressionBuilderMock;
+    private \PHPUnit\Framework\MockObject\MockObject $expressionBuilderMock;
 
     /**
      * @var MockObject|ReportGraphEvent
      */
-    private $reportGraphEventMock;
+    private \PHPUnit\Framework\MockObject\MockObject $reportGraphEventMock;
 
     /**
      * @var MockObject|CompanyRepository
      */
-    private $companyRepositoryMock;
+    private \PHPUnit\Framework\MockObject\MockObject $companyRepositoryMock;
 
     /**
      * @var MockObject|PointsChangeLogRepository
      */
-    private $pointsChangeLogRepositoryMock;
+    private \PHPUnit\Framework\MockObject\MockObject $pointsChangeLogRepositoryMock;
 
     /**
      * @var MockObject|ReportMock
      */
-    private $reportMock;
+    private \PHPUnit\Framework\MockObject\MockObject $reportMock;
 
     /**
      * @var MockObject|ReportDataEventMock
      */
-    private $reportDataEventMock;
+    private \PHPUnit\Framework\MockObject\MockObject $reportDataEventMock;
 
-    /**
-     * @var ReportSubscriber
-     */
-    private $reportSubscriber;
+    private \Mautic\LeadBundle\EventListener\ReportSubscriber $reportSubscriber;
 
     /**
      * @var array

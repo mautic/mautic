@@ -15,30 +15,24 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class CampaignHelperTest extends \PHPUnit\Framework\TestCase
 {
-    private $contact;
+    private \PHPUnit\Framework\MockObject\MockObject $contact;
 
     /**
      * @var \PHPUnit\Framework\MockObject\MockObject|Client
      */
-    private $client;
+    private \PHPUnit\Framework\MockObject\MockObject $client;
 
-    private $companyModel;
-    private $companyRepository;
+    private \PHPUnit\Framework\MockObject\MockObject $companyModel;
+    private \PHPUnit\Framework\MockObject\MockObject $companyRepository;
 
-    /**
-     * @var ArrayCollection
-     */
-    private $ipCollection;
+    private \Doctrine\Common\Collections\ArrayCollection $ipCollection;
 
-    /**
-     * @var CampaignHelper
-     */
-    private $campaignHelper;
+    private \Mautic\WebhookBundle\Helper\CampaignHelper $campaignHelper;
 
     /**
      * @var \PHPUnit\Framework\MockObject\MockObject|EventDispatcherInterface
      */
-    private $dispatcher;
+    private \PHPUnit\Framework\MockObject\MockObject $dispatcher;
 
     protected function setUp(): void
     {

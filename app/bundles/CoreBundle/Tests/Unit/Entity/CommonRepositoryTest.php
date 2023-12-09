@@ -17,17 +17,14 @@ class CommonRepositoryTest extends \PHPUnit\Framework\TestCase
     /**
      * @var MockObject&CommonRepository<object>
      */
-    private $repo;
+    private \PHPUnit\Framework\MockObject\MockObject $repo;
 
-    /**
-     * @var QueryBuilder
-     */
-    private $qb;
+    private \Doctrine\ORM\QueryBuilder $qb;
 
     /**
      * @var MockObject|Connection
      */
-    private $connectionMock;
+    private \PHPUnit\Framework\MockObject\MockObject $connectionMock;
 
     /**
      * Sets up objects used in the tests.

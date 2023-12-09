@@ -18,20 +18,20 @@ class FieldAliasKeywordValidatorTest extends \PHPUnit\Framework\TestCase
     /**
      * @var ContactSegmentFilterDictionary|\PHPUnit\Framework\MockObject\MockObject
      */
-    private $contactSegmentFilterDictionary;
+    private \PHPUnit\Framework\MockObject\MockObject $contactSegmentFilterDictionary;
 
-    private $listModelMock;
-    private $fieldAliasHelperlMock;
-    private $executionContextMock;
-    private $entityManagerMock;
+    private \PHPUnit\Framework\MockObject\MockObject $listModelMock;
+    private \PHPUnit\Framework\MockObject\MockObject $fieldAliasHelperlMock;
+    private \PHPUnit\Framework\MockObject\MockObject $executionContextMock;
+    private \PHPUnit\Framework\MockObject\MockObject $entityManagerMock;
 
     /**
      * @var \PHPUnit\Framework\MockObject\MockObject|TranslatorInterface
      */
-    private $translatorMock;
+    private \PHPUnit\Framework\MockObject\MockObject $translatorMock;
 
-    private $unitOfWorkMock;
-    private $validator;
+    private \PHPUnit\Framework\MockObject\MockObject $unitOfWorkMock;
+    private \Mautic\LeadBundle\Form\Validator\Constraints\FieldAliasKeywordValidator $validator;
 
     protected function setUp(): void
     {

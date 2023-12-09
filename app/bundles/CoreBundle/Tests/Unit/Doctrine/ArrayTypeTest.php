@@ -2,7 +2,6 @@
 
 namespace Mautic\CoreBundle\Tests\Unit\Doctrine;
 
-use Doctrine\DBAL\Platforms\AbstractPlatform;
 use Doctrine\DBAL\Platforms\MySQLPlatform;
 use Doctrine\DBAL\Types\Type;
 
@@ -31,8 +30,7 @@ class ArrayTypeTest extends \PHPUnit\Framework\TestCase
     /** @var Type */
     private $arrayType;
 
-    /** @var AbstractPlatform */
-    private $platform;
+    private \Doctrine\DBAL\Platforms\MySQLPlatform $platform;
 
     protected function setUp(): void
     {

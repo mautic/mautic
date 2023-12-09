@@ -12,7 +12,7 @@ class PrimaryCompanyHelperTest extends \PHPUnit\Framework\TestCase
     /**
      * @var CompanyLeadRepository|Exception
      */
-    private $leadRepository;
+    private \PHPUnit\Framework\MockObject\MockObject $leadRepository;
 
     protected function setUp(): void
     {

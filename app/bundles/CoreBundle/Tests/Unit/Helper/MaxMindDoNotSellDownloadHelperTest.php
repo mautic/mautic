@@ -19,17 +19,17 @@ final class MaxMindDoNotSellDownloadHelperTest extends \PHPUnit\Framework\TestCa
     /**
      * @var \PHPUnit\Framework\MockObject\MockObject|LoggerInterface
      */
-    private $loggerMock;
+    private \PHPUnit\Framework\MockObject\MockObject $loggerMock;
 
     /**
      * @var \PHPUnit\Framework\MockObject\MockObject|HttpClientInterface
      */
-    private $httpClientMock;
+    private \PHPUnit\Framework\MockObject\MockObject $httpClientMock;
 
     /**
      * @var \PHPUnit\Framework\MockObject\MockObject|CoreParametersHelper
      */
-    private $coreParametersHelperMock;
+    private \PHPUnit\Framework\MockObject\MockObject $coreParametersHelperMock;
 
     protected function setUp(): void
     {

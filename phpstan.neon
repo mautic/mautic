@@ -47,6 +47,12 @@ parameters:
 		-
 			message: '#PHPDoc tag @return with type array|Doctrine\Common\Collections\ArrayCollection is not subtype of native type array#'
 			path: app/bundles/CoreBundle/Entity/TranslationEntityTrait.php
+		# mocks
+		- '#is not subtype of native type PHPUnit\\Framework\\MockObject\\MockObject#'
+		- '#Call to an undefined method PHPUnit\\Framework\\MockObject\\MockObject#'
+		- '#expects (.*?) PHPUnit\\Framework\\MockObject\\MockObject given#'
+		# on purpose
+		- '#Call to method PHPUnit\\Framework\\Assert::assertInstanceOf\(\) with (.*?) and (.*?) will always evaluate to#'
 	scanFiles:
 		# This is here because a few functions in the global namespace are defined in this file
 		- vendor/twig/twig/src/Extension/EscaperExtension.php

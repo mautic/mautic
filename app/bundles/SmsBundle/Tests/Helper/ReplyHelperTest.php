@@ -17,17 +17,14 @@ class ReplyHelperTest extends \PHPUnit\Framework\TestCase
     /**
      * @var EventDispatcherInterface|\PHPUnit\Framework\MockObject\MockObject
      */
-    private $eventDispatcher;
+    private \PHPUnit\Framework\MockObject\MockObject $eventDispatcher;
 
-    /**
-     * @var NullLogger
-     */
-    private $logger;
+    private \Psr\Log\NullLogger $logger;
 
     /**
      * @var ContactTracker|\PHPUnit\Framework\MockObject\MockObject
      */
-    private $contactTracker;
+    private \PHPUnit\Framework\MockObject\MockObject $contactTracker;
 
     protected function setUp(): void
     {

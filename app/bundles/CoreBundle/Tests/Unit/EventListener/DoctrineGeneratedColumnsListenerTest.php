@@ -18,32 +18,29 @@ class DoctrineGeneratedColumnsListenerTest extends \PHPUnit\Framework\TestCase
     /**
      * @var GeneratedColumnsProviderInterface|\PHPUnit\Framework\MockObject\MockObject
      */
-    private $generatedColumnsProvider;
+    private \PHPUnit\Framework\MockObject\MockObject $generatedColumnsProvider;
 
     /**
      * @var \PHPUnit\Framework\MockObject\MockObject|LoggerInterface
      */
-    private $logger;
+    private \PHPUnit\Framework\MockObject\MockObject $logger;
 
     /**
      * @var GenerateSchemaEventArgs|\PHPUnit\Framework\MockObject\MockObject
      */
-    private $event;
+    private \PHPUnit\Framework\MockObject\MockObject $event;
 
     /**
      * @var Schema|\PHPUnit\Framework\MockObject\MockObject
      */
-    private $schema;
+    private \PHPUnit\Framework\MockObject\MockObject $schema;
 
     /**
      * @var Table|\PHPUnit\Framework\MockObject\MockObject
      */
-    private $table;
+    private \PHPUnit\Framework\MockObject\MockObject $table;
 
-    /**
-     * @var DoctrineGeneratedColumnsListener
-     */
-    private $listener;
+    private \Mautic\CoreBundle\EventListener\DoctrineGeneratedColumnsListener $listener;
 
     protected function setUp(): void
     {

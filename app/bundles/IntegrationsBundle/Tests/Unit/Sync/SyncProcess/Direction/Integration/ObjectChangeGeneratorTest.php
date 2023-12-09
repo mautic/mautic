@@ -21,7 +21,7 @@ class ObjectChangeGeneratorTest extends TestCase
     /**
      * @var ValueHelper|\PHPUnit\Framework\MockObject\MockObject
      */
-    private $valueHelper;
+    private \PHPUnit\Framework\MockObject\MockObject $valueHelper;
 
     protected function setUp(): void
     {

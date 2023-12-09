@@ -22,20 +22,19 @@ use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInt
 
 class AuthenticationListenerTest extends TestCase
 {
-    /** @var AuthenticationListener */
-    private $authenticationListener;
+    private \Mautic\UserBundle\Security\Firewall\AuthenticationListener $authenticationListener;
 
     /** @var TokenStorageInterface */
-    private $tokenStorage;
+    private \PHPUnit\Framework\MockObject\MockObject $tokenStorage;
 
     /** @var EntityManagerInterface */
-    private $entityManager;
+    private \PHPUnit\Framework\MockObject\MockObject $entityManager;
 
     /** @var ObjectRepository<User>&MockObject */
-    private $objectRepository;
+    private \PHPUnit\Framework\MockObject\MockObject $objectRepository;
 
     /** @var OAuthToken */
-    private $token;
+    private \PHPUnit\Framework\MockObject\MockObject $token;
 
     /** @var AccessToken */
     private $accessToken;

@@ -14,12 +14,9 @@ class RedirectListTypeTest extends TestCase
     /**
      * @var CoreParametersHelper|MockObject
      */
-    private $coreParametersHelper;
+    private \PHPUnit\Framework\MockObject\MockObject $coreParametersHelper;
 
-    /**
-     * @var RedirectListType
-     */
-    private $form;
+    private \Mautic\PageBundle\Form\Type\RedirectListType $form;
 
     public function setUp(): void
     {

@@ -12,15 +12,12 @@ use PHPUnit\Framework\TestCase;
 
 class UserMapperTest extends TestCase
 {
-    /**
-     * @var UserMapper
-     */
-    private $mapper;
+    private \Mautic\UserBundle\Security\SAML\User\UserMapper $mapper;
 
     /**
      * @var Response|MockObject
      */
-    private $response;
+    private \PHPUnit\Framework\MockObject\MockObject $response;
 
     protected function setUp(): void
     {

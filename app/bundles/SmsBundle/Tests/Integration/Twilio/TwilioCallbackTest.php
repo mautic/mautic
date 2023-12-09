@@ -14,12 +14,12 @@ class TwilioCallbackTest extends \PHPUnit\Framework\TestCase
     /**
      * @var ContactHelper|\PHPUnit\Framework\MockObject\MockObject
      */
-    private $contactHelper;
+    private \PHPUnit\Framework\MockObject\MockObject $contactHelper;
 
     /**
      * @var Configuration|\PHPUnit\Framework\MockObject\MockObject
      */
-    private $configuration;
+    private \PHPUnit\Framework\MockObject\MockObject $configuration;
 
     protected function setUp(): void
     {
