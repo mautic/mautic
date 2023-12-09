@@ -1,0 +1,42 @@
+name: Rector
+
+on:
+    pull_request:
+
+jobs:
+    rector:
+        runs-on: ubuntu-latest
+
+        name: Rector
+
+        steps:
+            - uses: actions/checkout@v3
+
+            - name: Rector Cache
+              uses: actions/cache@v3
+              with:
+                  path: ./var/cache/rector
+                  key: ${{ runner.os }}-rector-${{ hashFiles('**/composer.lock') }}-${{ github.run_id }}
+                  restore-keys: |
+                      ${{ runner.os }}-rector-${{ hashFiles('**/composer.lock') }}
+                      ${{ runner.os }}-rector-
+
+            - name: Setup PHP
+              uses: shivammathur/setup-php@v2
+              with:
+                  php-version: 8.0
+                  extensions: mbstring, xml, ctype, iconv, intl, pdo_sqlite, mysql, pdo_mysql
+              env:
+                  SYMFONY_ENV: test
+                  APP_ENV: dev
+                  APP_DEBUG: 1
+
+            # composer install https://github.com/ramsey/composer-install
+            - name: Install dependencies
+              uses: "ramsey/composer-install@v2"
+
+            # @todo check if needed
+            - run: bin/console cache:warmup
+
+            # --dry-run makes CI fail if there are some changes noted
+            - run: bin/rector --dry-run --ansi

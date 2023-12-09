@@ -29,14 +29,6 @@ jobs:
                         run: bin/console lint:twig app plugins
 
                     -
-                        name: 'Rector'
-                        env:
-                            SYMFONY_ENV: test
-                        run: |
-                            bin/console cache:warmup
-                            bin/rector --dry-run --ansi
-
-                    -
                         name: 'Composer Validate'
                         run: 'composer validate --ansi'
 
