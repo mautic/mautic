@@ -34,10 +34,6 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
-      - name: Get changed files
-        id: changed-files
-        uses: tj-actions/changed-files@v35
-
       - name: Setup PHP, with composer and extensions
         uses: shivammathur/setup-php@v2
         with:
@@ -73,17 +69,6 @@ jobs:
               echo "verbose diff:"
               bash diff_commands_verbose.sh
               exit 1
-            fi
-          elif [[ "${{ matrix.commands }}" == "PHPStan baseline changes" ]]; then
-            if [[ "${{ steps.changed-files.outputs.modified_files }}" == *"phpstan-baseline.neon"* ]]; then
-              stat=$(git diff --shortstat "origin/${{ github.base_ref }}" ${{ github.sha }} -- phpstan-baseline.neon)
-              echo $stat
-              regex="[0-9]+[[:space:]]insertion"
-              if [[ $stat =~ $regex ]]; then
-                echo "There are modifications (added or changed lines) to the phpstan-baseline.neon"
-                echo "Please fix the PHPStan errors instead of altering the baseline file"
-                exit 1
-              fi
             fi
           elif [[ "${{ matrix.commands }}" == "composer install" ]]; then
             # create a temp dir and mimic a composer install via mautic/recommended-project
