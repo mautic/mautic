@@ -19,7 +19,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        commands: ['PHPSTAN', 'Rector', 'Twig Lint', 'scaffolded files mismatch']
+        commands: ['Twig Lint', 'scaffolded files mismatch']
         php-versions: ['8.1']
         actions:
           -
@@ -29,6 +29,11 @@ jobs:
           -
             name: 'Composer Validate'
             run: 'composer validate --ansi'
+
+          -
+            name: 'PHPStan'
+            run: |
+              composer phpstan -- --no-progress
 
           -
             name: 'Composer Install'
@@ -50,6 +55,11 @@ jobs:
 
     steps:
       - uses: actions/checkout@v3
+        # shared environment variables
+        env:
+          SYMFONY_ENV: dev
+          APP_ENV: dev
+          APP_DEBUG: 1
 
       - name: Setup PHP, with composer and extensions
         uses: shivammathur/setup-php@v2
@@ -63,12 +73,7 @@ jobs:
 
       - name: Run ${{ matrix.commands }}
         run: |
-          if [[ "${{ matrix.commands }}" == "PHPSTAN" ]]; then
-            export SYMFONY_ENV=dev
-            export APP_ENV=dev
-            export APP_DEBUG=1
-            composer phpstan -- --no-progress
-          elif [[ "${{ matrix.commands }}" == "Rector" ]]; then
+          if [[ "${{ matrix.commands }}" == "Rector" ]]; then
             export SYMFONY_ENV=test
             bin/console cache:warmup
             bin/rector --dry-run --ansi
