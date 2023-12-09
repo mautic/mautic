@@ -39,7 +39,7 @@ class CustomFieldValueHelper
     /**
      * @return mixed
      */
-    private static function normalizeValue(array $field)
+    public static function normalizeValue(array $field)
     {
         $value      = $field['value'] ?? '';
         $type       = $field['type'] ?? null;

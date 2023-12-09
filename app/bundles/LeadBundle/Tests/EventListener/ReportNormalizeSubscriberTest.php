@@ -22,17 +22,16 @@ class ReportNormalizeSubscriberTest extends MauticMysqlTestCase
      */
     public function testOnReportDisplay(string $value, string $type, array $properties, string $expected): void
     {
+        /** @var FieldModel $fieldModel */
         $fieldModel = self::$container->get('mautic.lead.model.field');
         \assert($fieldModel instanceof FieldModel);
-        $field = new LeadField();
+        $field =  new LeadField();
         $field->setType($type);
         $field->setObject('lead');
         $field->setAlias('field1');
         $field->setName($field->getAlias());
         $field->setProperties($properties);
-
         $fieldModel->saveEntity($field);
-
         $rows = [
             [
                 'field1' => $value,
@@ -42,6 +41,12 @@ class ReportNormalizeSubscriberTest extends MauticMysqlTestCase
         $report = new Report();
         $report->setColumns(['l.firstname' => 'l.firstname']);
         $event      = new ReportDataEvent($report, $rows, [], []);
+
+        $repo      = $fieldModel->getRepository();
+        $reflector = new \ReflectionProperty(get_class($repo), 'fields');
+        $reflector->setAccessible(true);
+        $reflector->setValue($repo, null);
+
         $subscriber = new ReportNormalizeSubscriber($fieldModel);
         $subscriber->onReportDisplay($event);
 
