@@ -10,9 +10,6 @@ on:
     # Run every day at 10:45 AM UTC to discover potential issues with dependencies like PHP updates etc.
     - cron: '45 10 * * *'
 
-permissions:
-  contents: read # to fetch code (actions/checkout)
-
 jobs:
   phpunit:
     # We don't want the scheduled jobs to run on forks of Mautic
@@ -142,16 +139,6 @@ jobs:
     - uses: actions/checkout@v3
       with:
         fetch-depth: 0
-
-    - name: Rector Cache
-      if: ${{matrix.commands == 'Rector'}}
-      uses: actions/cache@v3
-      with:
-        path: ./var/cache/rector
-        key: ${{ runner.os }}-rector-${{ hashFiles('**/composer.lock') }}-${{ github.run_id }}
-        restore-keys: |
-          ${{ runner.os }}-rector-${{ hashFiles('**/composer.lock') }}
-          ${{ runner.os }}-rector-
 
     - name: PHPStan Cache
       if: ${{matrix.commands == 'PHPSTAN'}}
