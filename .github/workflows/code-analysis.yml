@@ -27,15 +27,15 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
-      - name: PHPStan Cache
-        if: ${{matrix.commands == 'PHPSTAN'}}
-        uses: actions/cache@v3
-        with:
-          path: ./var/cache/phpstan
-          key: ${{ runner.os }}-phpstan-${{ hashFiles('**/composer.lock') }}-${{ github.run_id }}
-          restore-keys: |
-            ${{ runner.os }}-phpstan-${{ hashFiles('**/composer.lock') }}
-            ${{ runner.os }}-phpstan-
+#      - name: PHPStan Cache
+#        if: ${{matrix.commands == 'PHPSTAN'}}
+#        uses: actions/cache@v3
+#        with:
+#          path: ./var/cache/phpstan
+#          key: ${{ runner.os }}-phpstan-${{ hashFiles('**/composer.lock') }}-${{ github.run_id }}
+#          restore-keys: |
+#            ${{ runner.os }}-phpstan-${{ hashFiles('**/composer.lock') }}
+#            ${{ runner.os }}-phpstan-
 
       - name: Get changed files
         id: changed-files
