@@ -41,7 +41,6 @@
     "symfony/browser-kit": "~5.4.0",
     "symfony/dom-crawler": "~5.4.0",
     "symfony/maker-bundle": "^1.38",
-    "symfony/phpunit-bridge": "~5.4.0",
     "symfony/var-dumper": "~5.4.0",
     "symfony/web-profiler-bundle": "~5.4.0"
   },
