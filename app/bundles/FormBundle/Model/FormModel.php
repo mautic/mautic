@@ -437,8 +437,8 @@ class FormModel extends CommonFormModel
         $formToRender  = '@MauticForm/Builder/form.html.twig';
 
         if (!empty($theme)) {
-            if ($this->twig->getLoader()->exists('@themes/'.$theme.'/html/MauticFormBundle/Builder/_style.html.twig')) {
-                $styleToRender = '@themes/'.$theme.'/html/MauticFormBundle/Builder/_style.html.twig';
+            if ($this->twig->getLoader()->exists('@themes/'.$theme.'/html/MauticFormBundle/Builder/style.html.twig')) {
+                $styleToRender = '@themes/'.$theme.'/html/MauticFormBundle/Builder/style.html.twig';
             }
             if ($this->twig->getLoader()->exists('@themes/'.$theme.'/html/MauticFormBundle/Builder/form.html.twig')) {
                 $formToRender = '@themes/'.$theme.'/html/MauticFormBundle/Builder/form.html.twig';
@@ -473,7 +473,7 @@ class FormModel extends CommonFormModel
                 'fields'                 => $fields,
                 'mappedFields'           => $this->mappedObjectCollector->buildCollection(...$entity->getMappedFieldObjects()),
                 'form'                   => $entity,
-                'theme'                  => '@themes/'.$entity->getTemplate().'/Field/',
+                'theme'                  => '@themes/'.$entity->getTemplate().'/html/MauticFormBundle/Field/',
                 'submissions'            => $submissions,
                 'lead'                   => $lead,
                 'formPages'              => $pages,
