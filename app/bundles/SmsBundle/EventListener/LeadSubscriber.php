@@ -5,6 +5,7 @@ namespace Mautic\SmsBundle\EventListener;
 use Doctrine\ORM\EntityManager;
 use Mautic\LeadBundle\Event\LeadTimelineEvent;
 use Mautic\LeadBundle\LeadEvents;
+use Mautic\SmsBundle\Entity\Stat;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Routing\RouterInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
@@ -45,7 +46,7 @@ class LeadSubscriber implements EventSubscriberInterface
         }
 
         /** @var \Mautic\SmsBundle\Entity\StatRepository $statRepository */
-        $statRepository        = $this->em->getRepository(\Mautic\SmsBundle\Entity\Stat::class);
+        $statRepository        = $this->em->getRepository(Stat::class);
         $queryOptions          = $event->getQueryOptions();
         $queryOptions['state'] = $state;
         $stats                 = $statRepository->getLeadStats($event->getLeadId(), $queryOptions);

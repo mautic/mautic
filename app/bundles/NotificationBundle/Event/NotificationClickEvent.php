@@ -8,7 +8,7 @@ use Mautic\NotificationBundle\Entity\Stat;
 
 class NotificationClickEvent extends CommonEvent
 {
-    private \Mautic\NotificationBundle\Entity\Notification $notification;
+    private Notification $notification;
 
     public function __construct(Stat $stat, private $request)
     {

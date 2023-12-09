@@ -1,5 +1,7 @@
 <?php
 
+use MauticPlugin\MauticFullContactBundle\Helper\LookupHelper;
+use MauticPlugin\MauticFullContactBundle\Integration\FullContactIntegration;
 return [
     'name'        => 'FullContact',
     'description' => 'Enables integration with FullContact for contact and company lookup',
@@ -24,7 +26,7 @@ return [
     'services' => [
         'others' => [
             'mautic.plugin.fullcontact.lookup_helper' => [
-                'class'     => \MauticPlugin\MauticFullContactBundle\Helper\LookupHelper::class,
+                'class'     => LookupHelper::class,
                 'arguments' => [
                     'mautic.helper.integration',
                     'mautic.helper.user',
@@ -37,7 +39,7 @@ return [
         ],
         'integrations' => [
             'mautic.integration.fullcontact' => [
-                'class'     => \MauticPlugin\MauticFullContactBundle\Integration\FullContactIntegration::class,
+                'class'     => FullContactIntegration::class,
                 'arguments' => [
                     'event_dispatcher',
                     'mautic.helper.cache_storage',

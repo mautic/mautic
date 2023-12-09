@@ -10,7 +10,8 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
-use Symfony\Component\Security\Core\Exception;
+use Symfony\Component\Security\Core\Exception\BadCredentialsException;
+use Symfony\Component\Security\Core\Exception\DisabledException;
 use Symfony\Component\Security\Http\Authentication\AuthenticationUtils;
 
 class SecurityController extends CommonController implements EventSubscriberInterface
@@ -73,9 +74,9 @@ class SecurityController extends CommonController implements EventSubscriberInte
         $error = $authenticationUtils->getLastAuthenticationError();
 
         if (null !== $error) {
-            if ($error instanceof Exception\BadCredentialsException) {
+            if ($error instanceof BadCredentialsException) {
                 $msg = 'mautic.user.auth.error.invalidlogin';
-            } elseif ($error instanceof Exception\DisabledException) {
+            } elseif ($error instanceof DisabledException) {
                 $msg = 'mautic.user.auth.error.disabledaccount';
             } else {
                 $msg = $error->getMessage();

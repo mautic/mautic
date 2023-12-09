@@ -1,5 +1,7 @@
 <?php
 
+use MauticPlugin\MauticClearbitBundle\Helper\LookupHelper;
+use MauticPlugin\MauticClearbitBundle\Integration\ClearbitIntegration;
 return [
     'name'        => 'Clearbit',
     'description' => 'Enables integration with Clearbit for contact and company lookup',
@@ -24,7 +26,7 @@ return [
     'services' => [
         'others' => [
             'mautic.plugin.clearbit.lookup_helper' => [
-                'class'     => \MauticPlugin\MauticClearbitBundle\Helper\LookupHelper::class,
+                'class'     => LookupHelper::class,
                 'arguments' => [
                     'mautic.helper.integration',
                     'mautic.helper.user',
@@ -36,7 +38,7 @@ return [
         ],
         'integrations' => [
             'mautic.integration.clearbit' => [
-                'class'     => \MauticPlugin\MauticClearbitBundle\Integration\ClearbitIntegration::class,
+                'class'     => ClearbitIntegration::class,
                 'arguments' => [
                     'event_dispatcher',
                     'mautic.helper.cache_storage',

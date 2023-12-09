@@ -10,6 +10,7 @@ use Mautic\CoreBundle\Form\Type\PublishDownDateType;
 use Mautic\CoreBundle\Form\Type\PublishUpDateType;
 use Mautic\CoreBundle\Form\Type\YesNoButtonGroupType;
 use Mautic\EmailBundle\Form\Type\EmailUtmTagsType;
+use Mautic\NotificationBundle\Entity\Notification;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Form\Extension\Core\Type\LocaleType;
@@ -173,7 +174,7 @@ class NotificationType extends AbstractType
     {
         $resolver->setDefaults(
             [
-                'data_class' => \Mautic\NotificationBundle\Entity\Notification::class,
+                'data_class' => Notification::class,
             ]
         );
 

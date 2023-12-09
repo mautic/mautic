@@ -16,7 +16,7 @@ use Mautic\InstallBundle\Exception\DatabaseVersionTooOldException;
 
 class SchemaHelper
 {
-    protected \Doctrine\DBAL\Connection $db;
+    protected Connection $db;
 
     /**
      * @var EntityManager

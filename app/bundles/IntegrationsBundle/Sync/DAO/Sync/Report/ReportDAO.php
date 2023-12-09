@@ -22,7 +22,7 @@ class ReportDAO
      */
     private $remappedObjects = [];
 
-    private \Mautic\IntegrationsBundle\Sync\DAO\Sync\RelationsDAO $relationsDAO;
+    private RelationsDAO $relationsDAO;
 
     /**
      * @param string $integration

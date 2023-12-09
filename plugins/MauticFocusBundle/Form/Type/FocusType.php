@@ -2,6 +2,7 @@
 
 namespace MauticPlugin\MauticFocusBundle\Form\Type;
 
+use MauticPlugin\MauticFocusBundle\Entity\Focus;
 use Mautic\CategoryBundle\Form\Type\CategoryListType;
 use Mautic\CoreBundle\Form\EventListener\CleanFormSubscriber;
 use Mautic\CoreBundle\Form\EventListener\FormExitSubscriber;
@@ -234,7 +235,7 @@ class FocusType extends AbstractType
     {
         $resolver->setDefaults(
             [
-                'data_class' => \MauticPlugin\MauticFocusBundle\Entity\Focus::class,
+                'data_class' => Focus::class,
             ]
         );
         $resolver->setDefined(['update_select']);

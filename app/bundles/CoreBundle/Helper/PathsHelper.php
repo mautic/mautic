@@ -2,7 +2,9 @@
 
 namespace Mautic\CoreBundle\Helper;
 
+use Composer\Autoload\ClassLoader;
 use Mautic\CoreBundle\Loader\ParameterLoader;
+use Mautic\UserBundle\Entity\User;
 
 class PathsHelper
 {
@@ -30,7 +32,7 @@ class PathsHelper
 
     private string $temporaryDir;
 
-    private ?\Mautic\UserBundle\Entity\User $user;
+    private ?User $user;
 
     public function __construct(UserHelper $userHelper, CoreParametersHelper $coreParametersHelper, string $cacheDir, string $logsDir, string $rootDir)
     {
@@ -117,7 +119,7 @@ class PathsHelper
      */
     public function getVendorRootPath(): string
     {
-        $reflection = new \ReflectionClass(\Composer\Autoload\ClassLoader::class);
+        $reflection = new \ReflectionClass(ClassLoader::class);
 
         return dirname($reflection->getFileName(), 3);
     }

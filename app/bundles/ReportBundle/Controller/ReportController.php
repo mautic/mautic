@@ -17,6 +17,7 @@ use Symfony\Component\HttpFoundation;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\ResponseHeaderBag;
+use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class ReportController extends FormController
 {
@@ -173,7 +174,7 @@ class ReportController extends FormController
             ],
         ];
 
-        if (HttpFoundation\Request::METHOD_POST === $request->getMethod()) {
+        if (Request::METHOD_POST === $request->getMethod()) {
             $model = $this->getModel('report');
             \assert($model instanceof ReportModel);
             $entity = $model->getEntity($objectId);
@@ -234,7 +235,7 @@ class ReportController extends FormController
             ],
         ];
 
-        if (HttpFoundation\Request::METHOD_POST === $request->getMethod()) {
+        if (Request::METHOD_POST === $request->getMethod()) {
             $model = $this->getModel('report');
             \assert($model instanceof ReportModel);
             $ids       = json_decode($request->query->get('ids', '{}'));
@@ -459,7 +460,7 @@ class ReportController extends FormController
         $form   = $model->createForm($entity, $this->formFactory, $action);
 
         // /Check for a submitted form and process it
-        if (HttpFoundation\Request::METHOD_POST === $request->getMethod()) {
+        if (Request::METHOD_POST === $request->getMethod()) {
             $valid = false;
             if (!$cancelled = $this->isFormCancelled($form)) {
                 if ($valid = $this->isFormValid($form)) {
@@ -788,7 +789,7 @@ class ReportController extends FormController
         $options['dynamicFilters'] = $dynamicFilters;
 
         if ('csv' === $format) {
-            $response = new HttpFoundation\StreamedResponse(
+            $response = new StreamedResponse(
                 function () use ($model, $entity, $format, $options): void {
                     $options['paginate']        = true;
                     $options['ignoreGraphData'] = true;

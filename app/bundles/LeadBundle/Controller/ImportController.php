@@ -2,6 +2,7 @@
 
 namespace Mautic\LeadBundle\Controller;
 
+use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Doctrine\Persistence\ManagerRegistry;
 use Mautic\CoreBundle\Controller\FormController;
 use Mautic\CoreBundle\Factory\MauticFactory;
@@ -48,9 +49,9 @@ class ImportController extends FormController
     public const STEP_PROGRESS_BAR    = 3;
     public const STEP_IMPORT_FROM_CSV = 4;
 
-    private \Symfony\Component\HttpFoundation\Session\SessionInterface $session;
+    private SessionInterface $session;
 
-    private \Mautic\LeadBundle\Model\ImportModel $importModel;
+    private ImportModel $importModel;
 
     public function __construct(FormFactoryInterface $formFactory, FormFieldHelper $fieldHelper, private LoggerInterface $logger, ManagerRegistry $doctrine, MauticFactory $factory, ModelFactory $modelFactory, UserHelper $userHelper, CoreParametersHelper $coreParametersHelper, EventDispatcherInterface $dispatcher, Translator $translator, FlashBag $flashBag, RequestStack $requestStack, CorePermissions $security)
     {

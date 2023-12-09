@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Mautic\CoreBundle\Helper;
 
 use Composer\Console\Application;
+use Composer\InstalledVersions;
 use Mautic\MarketplaceBundle\DTO\ConsoleOutput;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Console\Input\ArrayInput;
@@ -101,7 +102,7 @@ class ComposerHelper
      */
     public function isInstalled(string $packageName): bool
     {
-        return \Composer\InstalledVersions::isInstalled($packageName);
+        return InstalledVersions::isInstalled($packageName);
     }
 
     /**
@@ -111,7 +112,7 @@ class ComposerHelper
      */
     public function getMauticPluginPackages(): array
     {
-        return \Composer\InstalledVersions::getInstalledPackagesByType('mautic-plugin');
+        return InstalledVersions::getInstalledPackagesByType('mautic-plugin');
     }
 
     /**

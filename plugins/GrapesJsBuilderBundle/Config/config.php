@@ -2,6 +2,12 @@
 
 declare(strict_types=1);
 
+use MauticPlugin\GrapesJsBuilderBundle\Integration\Config;
+use MauticPlugin\GrapesJsBuilderBundle\Integration\GrapesJsBuilderIntegration;
+use MauticPlugin\GrapesJsBuilderBundle\Integration\Support\ConfigSupport;
+use MauticPlugin\GrapesJsBuilderBundle\Integration\Support\BuilderSupport;
+use MauticPlugin\GrapesJsBuilderBundle\Helper\FileManager;
+
 return [
     'name'        => 'GrapesJS Builder',
     'description' => 'GrapesJS Builder with MJML support for Mautic',
@@ -34,7 +40,7 @@ return [
         'other'        => [
             // Provides access to configured API keys, settings, field mapping, etc
             'grapesjsbuilder.config' => [
-                'class'     => \MauticPlugin\GrapesJsBuilderBundle\Integration\Config::class,
+                'class'     => Config::class,
                 'arguments' => [
                     'mautic.integrations.helper',
                 ],
@@ -44,7 +50,7 @@ return [
         'integrations' => [
             // Basic definitions with name, display name and icon
             'mautic.integration.grapesjsbuilder' => [
-                'class' => \MauticPlugin\GrapesJsBuilderBundle\Integration\GrapesJsBuilderIntegration::class,
+                'class' => GrapesJsBuilderIntegration::class,
                 'tags'  => [
                     'mautic.integration',
                     'mautic.basic_integration',
@@ -52,14 +58,14 @@ return [
             ],
             // Provides the form types to use for the configuration UI
             'grapesjsbuilder.integration.configuration' => [
-                'class'     => \MauticPlugin\GrapesJsBuilderBundle\Integration\Support\ConfigSupport::class,
+                'class'     => ConfigSupport::class,
                 'tags'      => [
                     'mautic.config_integration',
                 ],
             ],
             // Tells Mautic what themes it should support when enabled
             'grapesjsbuilder.integration.builder' => [
-                'class'     => \MauticPlugin\GrapesJsBuilderBundle\Integration\Support\BuilderSupport::class,
+                'class'     => BuilderSupport::class,
                 'tags'      => [
                     'mautic.builder_integration',
                 ],
@@ -67,7 +73,7 @@ return [
         ],
         'helpers' => [
             'grapesjsbuilder.helper.filemanager' => [
-                'class'     => \MauticPlugin\GrapesJsBuilderBundle\Helper\FileManager::class,
+                'class'     => FileManager::class,
                 'arguments' => [
                     'mautic.helper.file_uploader',
                     'mautic.helper.core_parameters',

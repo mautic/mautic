@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 namespace Mautic\CoreBundle\Translation;
 
-class TranslatorLoader extends \Symfony\Bundle\FrameworkBundle\Translation\Translator
+use Symfony\Bundle\FrameworkBundle\Translation\Translator;
+
+class TranslatorLoader extends Translator
 {
     protected function loadCatalogue(string $locale): void
     {

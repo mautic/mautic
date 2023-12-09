@@ -2,6 +2,7 @@
 
 namespace Mautic\LeadBundle\Entity;
 
+use Mautic\CoreBundle\Entity\IpAddress;
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\PointBundle\Entity\Group;
@@ -55,7 +56,7 @@ class PointsChangeLog
         $builder = new ClassMetadataBuilder($metadata);
 
         $builder->setTable('lead_points_change_log')
-            ->setCustomRepositoryClass(\Mautic\LeadBundle\Entity\PointsChangeLogRepository::class)
+            ->setCustomRepositoryClass(PointsChangeLogRepository::class)
             ->addIndex(['date_added'], 'point_date_added');
 
         $builder->addBigIntIdField();
@@ -240,7 +241,7 @@ class PointsChangeLog
      *
      * @return PointsChangeLog
      */
-    public function setIpAddress(\Mautic\CoreBundle\Entity\IpAddress $ipAddress)
+    public function setIpAddress(IpAddress $ipAddress)
     {
         $this->ipAddress = $ipAddress;
 

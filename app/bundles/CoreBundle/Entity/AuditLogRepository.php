@@ -2,6 +2,7 @@
 
 namespace Mautic\CoreBundle\Entity;
 
+use Doctrine\Common\Collections\Criteria;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\TimelineTrait;
@@ -184,7 +185,7 @@ class AuditLogRepository extends CommonRepository
                 ->setParameter('date', $afterDate);
         }
 
-        $query->orderBy('al.dateAdded', \Doctrine\Common\Collections\Criteria::DESC)
+        $query->orderBy('al.dateAdded', Criteria::DESC)
             ->setMaxResults($limit);
 
         return $query->getQuery()->getArrayResult();

@@ -2,7 +2,10 @@
 
 namespace Mautic\EmailBundle\Entity;
 
+use Doctrine\DBAL\Exception;
+use Doctrine\DBAL\ParameterType;
 use Doctrine\DBAL\Query\QueryBuilder;
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Query;
 use Doctrine\ORM\Tools\Pagination\Paginator;
 use Mautic\ChannelBundle\Entity\MessageQueue;
@@ -100,7 +103,7 @@ class EmailRepository extends CommonRepository
         $q = $this->getEntityManager()
             ->createQueryBuilder()
             ->select('e')
-            ->from(\Mautic\EmailBundle\Entity\Email::class, 'e', 'e.id');
+            ->from(Email::class, 'e', 'e.id');
         if (empty($args['iterator_mode'])) {
             $q->leftJoin('e.category', 'c');
 
@@ -124,7 +127,7 @@ class EmailRepository extends CommonRepository
         // Get entities
         $q = $this->getEntityManager()->createQueryBuilder();
         $q->select('SUM(e.sentCount) as sent_count, SUM(e.readCount) as read_count')
-            ->from(\Mautic\EmailBundle\Entity\Email::class, 'e');
+            ->from(Email::class, 'e');
         $results = $q->getQuery()->getSingleResult(Query::HYDRATE_ARRAY);
 
         if (!isset($results['sent_count'])) {
@@ -231,7 +234,7 @@ class EmailRepository extends CommonRepository
 
         if (null !== $maxDate) {
             $segmentQb->andWhere($segmentQb->expr()->lte('ll.date_added', ':max_date'));
-            $segmentQb->setParameter('max_date', $maxDate, \Doctrine\DBAL\Types\Types::DATETIME_MUTABLE);
+            $segmentQb->setParameter('max_date', $maxDate, Types::DATETIME_MUTABLE);
         }
 
         // Main query
@@ -269,8 +272,8 @@ class EmailRepository extends CommonRepository
         if ($threadId && $maxThreads) {
             if ($threadId <= $maxThreads) {
                 $q->andWhere('MOD((l.id + :threadShift), :maxThreads) = 0')
-                        ->setParameter('threadShift', $threadId - 1, \Doctrine\DBAL\ParameterType::INTEGER)
-                        ->setParameter('maxThreads', $maxThreads, \Doctrine\DBAL\ParameterType::INTEGER);
+                        ->setParameter('threadShift', $threadId - 1, ParameterType::INTEGER)
+                        ->setParameter('maxThreads', $maxThreads, ParameterType::INTEGER);
             }
         }
 
@@ -564,7 +567,7 @@ class EmailRepository extends CommonRepository
                 $q->executeStatement();
 
                 return;
-            } catch (\Doctrine\DBAL\Exception $e) {
+            } catch (Exception $e) {
                 --$retrialLimit;
                 if (0 === $retrialLimit) {
                     throw $e;
@@ -600,7 +603,7 @@ class EmailRepository extends CommonRepository
                 $updateQuery->executeStatement();
 
                 return;
-            } catch (\Doctrine\DBAL\Exception $e) {
+            } catch (Exception $e) {
                 --$retrialLimit;
                 if (0 === $retrialLimit) {
                     throw $e;
@@ -641,7 +644,7 @@ class EmailRepository extends CommonRepository
                 $q->executeStatement();
 
                 return;
-            } catch (\Doctrine\DBAL\Exception $e) {
+            } catch (Exception $e) {
                 --$retrialLimit;
                 if (0 === $retrialLimit) {
                     throw $e;
@@ -704,7 +707,7 @@ class EmailRepository extends CommonRepository
         $result = $this->getEntityManager()
             ->createQueryBuilder()
             ->select($this->getTableAlias().'.id')
-            ->from(\Mautic\EmailBundle\Entity\Email::class, $this->getTableAlias(), $this->getTableAlias().'.id')
+            ->from(Email::class, $this->getTableAlias(), $this->getTableAlias().'.id')
             ->where($this->getTableAlias().'.id IN (:ids)')
             ->setParameter('ids', $ids)
             ->andWhere('e.isPublished = 0')

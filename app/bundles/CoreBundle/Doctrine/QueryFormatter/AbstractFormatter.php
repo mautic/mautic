@@ -3,6 +3,7 @@
 namespace Mautic\CoreBundle\Doctrine\QueryFormatter;
 
 use Doctrine\DBAL\Connection;
+use Doctrine\DBAL\Platforms\AbstractPlatform;
 
 /**
  * Help generate SQL statements to format column data.
@@ -11,7 +12,7 @@ use Doctrine\DBAL\Connection;
  */
 abstract class AbstractFormatter
 {
-    protected \Doctrine\DBAL\Platforms\AbstractPlatform $platform;
+    protected AbstractPlatform $platform;
     protected string $name;
 
     /**

@@ -5,6 +5,7 @@ namespace Mautic\AssetBundle\Entity;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
+use Mautic\CategoryBundle\Entity\Category;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\CoreBundle\Entity\FormEntity;
 use Mautic\CoreBundle\Helper\FileHelper;
@@ -157,7 +158,7 @@ class Asset extends FormEntity
         $builder = new ClassMetadataBuilder($metadata);
 
         $builder->setTable('assets')
-            ->setCustomRepositoryClass(\Mautic\AssetBundle\Entity\AssetRepository::class)
+            ->setCustomRepositoryClass(AssetRepository::class)
             ->addIndex(['alias'], 'asset_alias_search');
 
         $builder->addIdColumns('title');
@@ -620,7 +621,7 @@ class Asset extends FormEntity
      *
      * @return Asset
      */
-    public function setCategory(\Mautic\CategoryBundle\Entity\Category $category = null)
+    public function setCategory(Category $category = null)
     {
         $this->isChanged('category', $category);
         $this->category = $category;

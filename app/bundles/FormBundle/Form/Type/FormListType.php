@@ -4,6 +4,7 @@ namespace Mautic\FormBundle\Form\Type;
 
 use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
+use Mautic\FormBundle\Entity\FormRepository;
 use Mautic\FormBundle\Model\FormModel;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
@@ -14,7 +15,7 @@ class FormListType extends AbstractType
 {
     private $viewOther;
 
-    private \Mautic\FormBundle\Entity\FormRepository $repo;
+    private FormRepository $repo;
 
     public function __construct(CorePermissions $security, FormModel $model, UserHelper $userHelper)
     {

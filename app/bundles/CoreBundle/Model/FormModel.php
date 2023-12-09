@@ -2,6 +2,7 @@
 
 namespace Mautic\CoreBundle\Model;
 
+use Doctrine\ORM\UnitOfWork;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\UserBundle\Entity\User;
 use Symfony\Component\Form\FormFactoryInterface;
@@ -170,7 +171,7 @@ class FormModel extends AbstractCommonModel
         if (method_exists($entity, 'getId')) {
             $isNew = ($entity->getId()) ? false : true;
         } else {
-            $isNew = \Doctrine\ORM\UnitOfWork::STATE_NEW === $this->em->getUnitOfWork()->getEntityState($entity);
+            $isNew = UnitOfWork::STATE_NEW === $this->em->getUnitOfWork()->getEntityState($entity);
         }
 
         return $isNew;

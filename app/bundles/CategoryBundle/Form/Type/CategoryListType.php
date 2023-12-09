@@ -3,6 +3,7 @@
 namespace Mautic\CategoryBundle\Form\Type;
 
 use Doctrine\ORM\EntityManager;
+use Mautic\CategoryBundle\Entity\Category;
 use Mautic\CategoryBundle\Model\CategoryModel;
 use Mautic\CoreBundle\Form\DataTransformer\IdToEntityModelTransformer;
 use Symfony\Component\Form\AbstractType;
@@ -22,7 +23,7 @@ class CategoryListType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         if (true === $options['return_entity']) {
-            $transformer = new IdToEntityModelTransformer($this->em, \Mautic\CategoryBundle\Entity\Category::class, 'id');
+            $transformer = new IdToEntityModelTransformer($this->em, Category::class, 'id');
             $builder->addModelTransformer($transformer);
         }
     }

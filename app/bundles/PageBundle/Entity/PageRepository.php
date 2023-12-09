@@ -3,6 +3,7 @@
 namespace Mautic\PageBundle\Entity;
 
 use Mautic\CoreBundle\Entity\CommonRepository;
+use Mautic\FormBundle\Entity\Submission;
 
 /**
  * @extends CommonRepository<Page>
@@ -20,7 +21,7 @@ class PageRepository extends CommonRepository
             // use a subquery to get a count of submissions otherwise doctrine will not pull all of the results
             $sq = $this->_em->createQueryBuilder()
                 ->select('count(fs.id)')
-                ->from(\Mautic\FormBundle\Entity\Submission::class, 'fs')
+                ->from(Submission::class, 'fs')
                 ->where('fs.page = p');
 
             $select[] = '('.$sq->getDql().') as submission_count';

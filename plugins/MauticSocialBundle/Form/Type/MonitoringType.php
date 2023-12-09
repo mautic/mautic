@@ -2,6 +2,7 @@
 
 namespace MauticPlugin\MauticSocialBundle\Form\Type;
 
+use MauticPlugin\MauticSocialBundle\Entity\Monitoring;
 use Mautic\CategoryBundle\Form\Type\CategoryListType;
 use Mautic\CoreBundle\Form\EventListener\CleanFormSubscriber;
 use Mautic\CoreBundle\Form\Type\FormButtonsType;
@@ -100,7 +101,7 @@ class MonitoringType extends AbstractType
     public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults([
-                'data_class' => \MauticPlugin\MauticSocialBundle\Entity\Monitoring::class,
+                'data_class' => Monitoring::class,
             ]);
 
         // allow network types to be sent through - list

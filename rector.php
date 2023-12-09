@@ -30,7 +30,12 @@ return static function (RectorConfig $rectorConfig): void {
         __DIR__.'/plugins',
     ]);
 
+    $rectorConfig->importNames();
+
     $rectorConfig->skip([
+        \Rector\PostRector\Rector\NameImportingPostRector::class => [
+            __DIR__ . '/app/bundles/*/Config/*',
+        ],
         '*/Test/*',
         '*/Tests/*',
         '*.html.php',

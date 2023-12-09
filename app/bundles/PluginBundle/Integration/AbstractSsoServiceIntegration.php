@@ -2,6 +2,7 @@
 
 namespace Mautic\PluginBundle\Integration;
 
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Mautic\CoreBundle\Form\Type\YesNoButtonGroupType;
 use Mautic\UserBundle\Entity\Role;
 use Mautic\UserBundle\Form\Type\RoleListType;
@@ -59,7 +60,7 @@ abstract class AbstractSsoServiceIntegration extends AbstractIntegration
     {
         return $this->router->generate('mautic_sso_login_check',
             ['integration' => $this->getName()],
-            \Symfony\Component\Routing\Generator\UrlGeneratorInterface::ABSOLUTE_URL // absolute
+            UrlGeneratorInterface::ABSOLUTE_URL // absolute
         );
     }
 

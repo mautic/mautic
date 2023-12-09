@@ -1,6 +1,7 @@
 <?php
 
 declare(strict_types=1);
+use MauticPlugin\MauticTagManagerBundle\Model\TagModel;
 
 use Mautic\CoreBundle\DependencyInjection\MauticCoreExtension;
 use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
@@ -20,5 +21,5 @@ return function (ContainerConfigurator $configurator): void {
 
     $services->load('MauticPlugin\\MauticTagManagerBundle\\Entity\\', '../Entity/*Repository.php');
 
-    $services->alias('mautic.tagmanager.model.tag', \MauticPlugin\MauticTagManagerBundle\Model\TagModel::class);
+    $services->alias('mautic.tagmanager.model.tag', TagModel::class);
 };

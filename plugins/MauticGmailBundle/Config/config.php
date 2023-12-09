@@ -1,5 +1,6 @@
 <?php
 
+use MauticPlugin\MauticGmailBundle\Integration\GmailIntegration;
 return [
     'name'        => 'Gmail',
     'description' => 'Enables integrations with Gmail for email tracking',
@@ -8,7 +9,7 @@ return [
     'services'    => [
         'integrations' => [
             'mautic.integration.gmail' => [
-                'class'     => \MauticPlugin\MauticGmailBundle\Integration\GmailIntegration::class,
+                'class'     => GmailIntegration::class,
                 'arguments' => [
                     'event_dispatcher',
                     'mautic.helper.cache_storage',

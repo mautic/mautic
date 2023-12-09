@@ -2,6 +2,7 @@
 
 namespace Mautic\LeadBundle\Entity;
 
+use Doctrine\DBAL\Connection;
 use Mautic\CoreBundle\Entity\CommonRepository;
 
 /**
@@ -89,7 +90,7 @@ class TagRepository extends CommonRepository
                     $q->expr()->eq('l.id', ':leadId')
                 )
             )
-            ->setParameter('tags', $tags, \Doctrine\DBAL\Connection::PARAM_STR_ARRAY)
+            ->setParameter('tags', $tags, Connection::PARAM_STR_ARRAY)
             ->setParameter('leadId', $lead->getId());
 
         return (bool) $q->executeQuery()->fetchOne();

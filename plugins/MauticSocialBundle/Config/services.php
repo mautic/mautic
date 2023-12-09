@@ -1,6 +1,9 @@
 <?php
 
 declare(strict_types=1);
+use MauticPlugin\MauticSocialBundle\Model\MonitoringModel;
+use MauticPlugin\MauticSocialBundle\Model\PostCountModel;
+use MauticPlugin\MauticSocialBundle\Model\TweetModel;
 
 use Mautic\CoreBundle\DependencyInjection\MauticCoreExtension;
 use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
@@ -20,7 +23,7 @@ return function (ContainerConfigurator $configurator): void {
 
     $services->load('MauticPlugin\\MauticSocialBundle\\Entity\\', '../Entity/*Repository.php');
 
-    $services->alias('mautic.social.model.monitoring', \MauticPlugin\MauticSocialBundle\Model\MonitoringModel::class);
-    $services->alias('mautic.social.model.postcount', \MauticPlugin\MauticSocialBundle\Model\PostCountModel::class);
-    $services->alias('mautic.social.model.tweet', \MauticPlugin\MauticSocialBundle\Model\TweetModel::class);
+    $services->alias('mautic.social.model.monitoring', MonitoringModel::class);
+    $services->alias('mautic.social.model.postcount', PostCountModel::class);
+    $services->alias('mautic.social.model.tweet', TweetModel::class);
 };

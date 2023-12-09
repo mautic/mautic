@@ -1,6 +1,7 @@
 <?php
 
 declare(strict_types=1);
+use MauticPlugin\MauticFocusBundle\Model\FocusModel;
 
 use Mautic\CoreBundle\DependencyInjection\MauticCoreExtension;
 use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
@@ -20,5 +21,5 @@ return function (ContainerConfigurator $configurator): void {
 
     $services->load('MauticPlugin\\MauticFocusBundle\\Entity\\', '../Entity/*Repository.php');
 
-    $services->alias('mautic.focus.model.focus', \MauticPlugin\MauticFocusBundle\Model\FocusModel::class);
+    $services->alias('mautic.focus.model.focus', FocusModel::class);
 };

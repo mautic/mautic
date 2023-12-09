@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\ApiBundle\DependencyInjection\Compiler;
 
+use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 
@@ -19,7 +20,7 @@ class SerializerPass implements CompilerPassInterface
     {
         if ($container->hasDefinition('jms_serializer.metadata.annotation_driver')) {
             $definition = $container->getDefinition('jms_serializer.metadata.annotation_driver');
-            $definition->setClass(\Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver::class);
+            $definition->setClass(ApiMetadataDriver::class);
         }
     }
 }

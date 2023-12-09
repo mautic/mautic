@@ -1,5 +1,6 @@
 <?php
 
+use MauticPlugin\MauticOutlookBundle\Integration\OutlookIntegration;
 return [
     'name'        => 'Outlook',
     'description' => 'Enables integrations with Outlook for email tracking',
@@ -8,7 +9,7 @@ return [
     'services'    => [
         'integrations' => [
             'mautic.integration.outlook' => [
-                'class'     => \MauticPlugin\MauticOutlookBundle\Integration\OutlookIntegration::class,
+                'class'     => OutlookIntegration::class,
                 'arguments' => [
                     'event_dispatcher',
                     'mautic.helper.cache_storage',

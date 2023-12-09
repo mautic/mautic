@@ -8,7 +8,7 @@ use Mautic\StatsBundle\Aggregate\Helper\CalculatorHelper;
 
 class StatCollection
 {
-    private \Mautic\StatsBundle\Aggregate\Collection\DAO\StatsDAO $stats;
+    private StatsDAO $stats;
 
     /**
      * @var Calculator

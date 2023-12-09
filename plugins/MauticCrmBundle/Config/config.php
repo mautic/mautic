@@ -1,5 +1,13 @@
 <?php
 
+use MauticPlugin\MauticCrmBundle\Integration\HubspotIntegration;
+use MauticPlugin\MauticCrmBundle\Integration\SalesforceIntegration;
+use MauticPlugin\MauticCrmBundle\Integration\SugarcrmIntegration;
+use MauticPlugin\MauticCrmBundle\Integration\VtigerIntegration;
+use MauticPlugin\MauticCrmBundle\Integration\ZohoIntegration;
+use MauticPlugin\MauticCrmBundle\Integration\DynamicsIntegration;
+use MauticPlugin\MauticCrmBundle\Integration\ConnectwiseIntegration;
+use MauticPlugin\MauticCrmBundle\Services\Transport;
 return [
     'name'        => 'CRM',
     'description' => 'Enables integration with Mautic supported CRMs.',
@@ -26,7 +34,7 @@ return [
     'services' => [
         'integrations' => [
             'mautic.integration.hubspot' => [
-                'class'     => \MauticPlugin\MauticCrmBundle\Integration\HubspotIntegration::class,
+                'class'     => HubspotIntegration::class,
                 'arguments' => [
                     'event_dispatcher',
                     'mautic.helper.cache_storage',
@@ -48,7 +56,7 @@ return [
                 ],
             ],
             'mautic.integration.salesforce' => [
-                'class'     => \MauticPlugin\MauticCrmBundle\Integration\SalesforceIntegration::class,
+                'class'     => SalesforceIntegration::class,
                 'arguments' => [
                     'event_dispatcher',
                     'mautic.helper.cache_storage',
@@ -69,7 +77,7 @@ return [
                 ],
             ],
             'mautic.integration.sugarcrm' => [
-                'class'     => \MauticPlugin\MauticCrmBundle\Integration\SugarcrmIntegration::class,
+                'class'     => SugarcrmIntegration::class,
                 'arguments' => [
                     'event_dispatcher',
                     'mautic.helper.cache_storage',
@@ -91,7 +99,7 @@ return [
                 ],
             ],
             'mautic.integration.vtiger' => [
-                'class'     => \MauticPlugin\MauticCrmBundle\Integration\VtigerIntegration::class,
+                'class'     => VtigerIntegration::class,
                 'arguments' => [
                     'event_dispatcher',
                     'mautic.helper.cache_storage',
@@ -112,7 +120,7 @@ return [
                 ],
             ],
             'mautic.integration.zoho' => [
-                'class'     => \MauticPlugin\MauticCrmBundle\Integration\ZohoIntegration::class,
+                'class'     => ZohoIntegration::class,
                 'arguments' => [
                     'event_dispatcher',
                     'mautic.helper.cache_storage',
@@ -133,7 +141,7 @@ return [
                 ],
             ],
             'mautic.integration.dynamics' => [
-                'class'     => \MauticPlugin\MauticCrmBundle\Integration\DynamicsIntegration::class,
+                'class'     => DynamicsIntegration::class,
                 'arguments' => [
                     'event_dispatcher',
                     'mautic.helper.cache_storage',
@@ -154,7 +162,7 @@ return [
                 ],
             ],
             'mautic.integration.connectwise' => [
-                'class'     => \MauticPlugin\MauticCrmBundle\Integration\ConnectwiseIntegration::class,
+                'class'     => ConnectwiseIntegration::class,
                 'arguments' => [
                     'event_dispatcher',
                     'mautic.helper.cache_storage',
@@ -177,7 +185,7 @@ return [
         ],
         'other' => [
             'mautic_integration.service.transport' => [
-                'class'     => \MauticPlugin\MauticCrmBundle\Services\Transport::class,
+                'class'     => Transport::class,
                 'arguments' => [
                     'mautic.http.client',
                 ],

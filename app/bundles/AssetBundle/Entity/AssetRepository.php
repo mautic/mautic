@@ -2,6 +2,8 @@
 
 namespace Mautic\AssetBundle\Entity;
 
+use Doctrine\Common\Collections\Criteria;
+use Doctrine\DBAL\ArrayParameterType;
 use Doctrine\ORM\NonUniqueResultException;
 use Doctrine\ORM\NoResultException;
 use Doctrine\ORM\Tools\Pagination\Paginator;
@@ -164,7 +166,7 @@ class AssetRepository extends CommonRepository
         $q->select('sum(a.size) as total_size')
             ->from(MAUTIC_TABLE_PREFIX.'assets', 'a')
             ->where('a.id IN (:assetIds)')
-            ->setParameter('assetIds', $assets, \Doctrine\DBAL\ArrayParameterType::INTEGER);
+            ->setParameter('assetIds', $assets, ArrayParameterType::INTEGER);
 
         $result = $q->executeQuery()->fetchAllAssociative();
 
@@ -204,7 +206,7 @@ class AssetRepository extends CommonRepository
         $q->where($this->getTableAlias().'.category = :categoryId');
         $q->andWhere($this->getTableAlias().'.isPublished = TRUE');
         $q->setParameter('categoryId', $categoryId);
-        $q->orderBy($this->getTableAlias().'.dateAdded', \Doctrine\Common\Collections\Criteria::DESC);
+        $q->orderBy($this->getTableAlias().'.dateAdded', Criteria::DESC);
         $q->setMaxResults(1);
 
         return $q->getQuery()->getSingleResult();

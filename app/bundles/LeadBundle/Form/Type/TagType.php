@@ -2,6 +2,7 @@
 
 namespace Mautic\LeadBundle\Form\Type;
 
+use Doctrine\Common\Collections\Criteria;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\EntityRepository;
 use Mautic\LeadBundle\Entity\Tag;
@@ -35,8 +36,8 @@ class TagType extends AbstractType
         $resolver->setDefaults(
             [
                 'label'           => 'mautic.lead.tags',
-                'class'           => \Mautic\LeadBundle\Entity\Tag::class,
-                'query_builder'   => fn (EntityRepository $er) => $er->createQueryBuilder('t')->orderBy('t.tag', \Doctrine\Common\Collections\Criteria::ASC),
+                'class'           => Tag::class,
+                'query_builder'   => fn (EntityRepository $er) => $er->createQueryBuilder('t')->orderBy('t.tag', Criteria::ASC),
                 'choice_label'    => 'tag',
                 'multiple'        => true,
                 'required'        => false,

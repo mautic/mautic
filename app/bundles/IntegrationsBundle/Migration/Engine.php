@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\IntegrationsBundle\Migration;
 
+use Doctrine\DBAL\Exception;
 use Doctrine\ORM\EntityManager;
 use Mautic\IntegrationsBundle\Exception\PathNotFoundException;
 
@@ -44,7 +45,7 @@ class Engine
             }
 
             $this->entityManager->commit();
-        } catch (\Doctrine\DBAL\Exception $e) {
+        } catch (Exception $e) {
             $this->entityManager->rollback();
 
             throw $e;

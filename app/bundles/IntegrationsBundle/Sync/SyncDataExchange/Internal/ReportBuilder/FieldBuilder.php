@@ -16,7 +16,7 @@ use Symfony\Component\Routing\Router;
 
 class FieldBuilder
 {
-    private \Mautic\IntegrationsBundle\Sync\ValueNormalizer\ValueNormalizer $valueNormalizer;
+    private ValueNormalizer $valueNormalizer;
 
     /**
      * @var array

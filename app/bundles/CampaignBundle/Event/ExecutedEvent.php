@@ -4,8 +4,9 @@ namespace Mautic\CampaignBundle\Event;
 
 use Mautic\CampaignBundle\Entity\LeadEventLog;
 use Mautic\CampaignBundle\EventCollector\Accessor\Event\AbstractEventAccessor;
+use Symfony\Contracts\EventDispatcher\Event;
 
-class ExecutedEvent extends \Symfony\Contracts\EventDispatcher\Event
+class ExecutedEvent extends Event
 {
     public function __construct(private AbstractEventAccessor $config, private LeadEventLog $log)
     {

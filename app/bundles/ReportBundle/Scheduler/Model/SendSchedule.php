@@ -9,7 +9,7 @@ use Mautic\ReportBundle\Exception\FileTooBigException;
 
 class SendSchedule
 {
-    private \Mautic\EmailBundle\Helper\MailHelper $mailer;
+    private MailHelper $mailer;
 
     public function __construct(
         MailHelper $mailer,

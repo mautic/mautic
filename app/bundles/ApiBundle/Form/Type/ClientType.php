@@ -2,6 +2,7 @@
 
 namespace Mautic\ApiBundle\Form\Type;
 
+use Mautic\ApiBundle\Entity\oAuth2\Client;
 use Mautic\ApiBundle\Form\Validator\Constraints\OAuthCallback;
 use Mautic\CoreBundle\Form\DataTransformer as Transformers;
 use Mautic\CoreBundle\Form\EventListener\CleanFormSubscriber;
@@ -161,7 +162,7 @@ class ClientType extends AbstractType
      */
     public function configureOptions(OptionsResolver $resolver): void
     {
-        $dataClass = \Mautic\ApiBundle\Entity\oAuth2\Client::class;
+        $dataClass = Client::class;
         $resolver->setDefaults(
             [
                 'data_class' => $dataClass,

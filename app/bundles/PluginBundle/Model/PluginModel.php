@@ -2,6 +2,7 @@
 
 namespace Mautic\PluginBundle\Model;
 
+use Mautic\PluginBundle\Entity\IntegrationEntity;
 use Doctrine\DBAL\Schema\Schema;
 use Doctrine\ORM\EntityManager;
 use Mautic\CoreBundle\Helper\BundleHelper;
@@ -33,12 +34,12 @@ class PluginModel extends FormModel
      */
     public function getRepository()
     {
-        return $this->em->getRepository(\Mautic\PluginBundle\Entity\Plugin::class);
+        return $this->em->getRepository(Plugin::class);
     }
 
     public function getIntegrationEntityRepository()
     {
-        return $this->em->getRepository(\Mautic\PluginBundle\Entity\IntegrationEntity::class);
+        return $this->em->getRepository(IntegrationEntity::class);
     }
 
     /**

@@ -32,7 +32,7 @@ class LeadPointLog
         $builder = new ClassMetadataBuilder($metadata);
 
         $builder->setTable('point_lead_action_log')
-            ->setCustomRepositoryClass(\Mautic\PointBundle\Entity\LeadPointLogRepository::class);
+            ->setCustomRepositoryClass(LeadPointLogRepository::class);
 
         $builder->createManyToOne('point', 'Point')
             ->isPrimaryKey()

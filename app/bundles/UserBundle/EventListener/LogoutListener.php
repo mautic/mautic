@@ -3,14 +3,16 @@
 namespace Mautic\UserBundle\EventListener;
 
 use Mautic\CoreBundle\Helper\UserHelper;
+use Mautic\UserBundle\Entity\User;
 use Mautic\UserBundle\Event\LogoutEvent;
 use Mautic\UserBundle\Model\UserModel;
 use Mautic\UserBundle\UserEvents;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-class LogoutListener implements \Symfony\Component\EventDispatcher\EventSubscriberInterface
+class LogoutListener implements EventSubscriberInterface
 {
-    protected ?\Mautic\UserBundle\Entity\User $user;
+    protected ?User $user;
 
     public function __construct(protected UserModel $userModel, protected EventDispatcherInterface $dispatcher, UserHelper $userHelper)
     {

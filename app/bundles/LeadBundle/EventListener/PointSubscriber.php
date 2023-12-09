@@ -2,6 +2,7 @@
 
 namespace Mautic\LeadBundle\EventListener;
 
+use Mautic\LeadBundle\Helper\PointEventHelper;
 use Mautic\LeadBundle\Form\Type\ListActionType;
 use Mautic\LeadBundle\Form\Type\ModifyLeadTagsType;
 use Mautic\LeadBundle\Model\LeadModel;
@@ -31,7 +32,7 @@ class PointSubscriber implements EventSubscriberInterface
             [
                 'group'    => 'mautic.lead.point.trigger',
                 'label'    => 'mautic.lead.point.trigger.changelists',
-                'callback' => [\Mautic\LeadBundle\Helper\PointEventHelper::class, 'changeLists'],
+                'callback' => [PointEventHelper::class, 'changeLists'],
                 'formType' => ListActionType::class,
             ]
         );

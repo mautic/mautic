@@ -2,6 +2,8 @@
 
 namespace MauticPlugin\MauticFocusBundle\Model;
 
+use Symfony\Component\Form\FormInterface;
+use MatthiasMullie\Minify\JS;
 use Doctrine\DBAL\Query\QueryBuilder;
 use Doctrine\ORM\EntityManagerInterface;
 use MatthiasMullie\Minify;
@@ -83,7 +85,7 @@ class FocusModel extends FormModel
      *
      * @throws NotFoundHttpException
      */
-    public function createForm($entity, FormFactoryInterface $formFactory, $action = null, $options = []): \Symfony\Component\Form\FormInterface
+    public function createForm($entity, FormFactoryInterface $formFactory, $action = null, $options = []): FormInterface
     {
         if (!$entity instanceof Focus) {
             throw new MethodNotAllowedHttpException(['Focus']);
@@ -103,7 +105,7 @@ class FocusModel extends FormModel
      */
     public function getRepository()
     {
-        return $this->em->getRepository(\MauticPlugin\MauticFocusBundle\Entity\Focus::class);
+        return $this->em->getRepository(Focus::class);
     }
 
     /**
@@ -113,7 +115,7 @@ class FocusModel extends FormModel
      */
     public function getStatRepository()
     {
-        return $this->em->getRepository(\MauticPlugin\MauticFocusBundle\Entity\Stat::class);
+        return $this->em->getRepository(Stat::class);
     }
 
     /**
@@ -175,7 +177,7 @@ class FocusModel extends FormModel
 
             $content = $this->getContent($focusArray, $isPreview, $url);
             $cached  = [
-                'js'    => (new Minify\JS($javascript))->minify(),
+                'js'    => (new JS($javascript))->minify(),
                 'focus' => InputHelper::minifyHTML($content['focus']),
                 'form'  => InputHelper::minifyHTML($content['form']),
             ];

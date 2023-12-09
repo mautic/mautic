@@ -5,6 +5,7 @@ namespace Mautic\ApiBundle\Model;
 use Doctrine\ORM\EntityManager;
 use Mautic\ApiBundle\ApiEvents;
 use Mautic\ApiBundle\Entity\oAuth2\Client;
+use Mautic\ApiBundle\Entity\oAuth2\ClientRepository;
 use Mautic\ApiBundle\Event\ClientEvent;
 use Mautic\ApiBundle\Form\Type\ClientType;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
@@ -16,6 +17,7 @@ use Mautic\UserBundle\Entity\User;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\FormFactoryInterface;
+use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
@@ -61,7 +63,7 @@ class ClientModel extends FormModel
     /**
      * {@inheritdoc}
      */
-    public function getRepository(): \Mautic\ApiBundle\Entity\oAuth2\ClientRepository
+    public function getRepository(): ClientRepository
     {
         return $this->em->getRepository(Client::class);
     }
@@ -79,7 +81,7 @@ class ClientModel extends FormModel
      *
      * @throws MethodNotAllowedHttpException
      */
-    public function createForm($entity, FormFactoryInterface $formFactory, $action = null, $options = []): \Symfony\Component\Form\FormInterface
+    public function createForm($entity, FormFactoryInterface $formFactory, $action = null, $options = []): FormInterface
     {
         if (!$entity instanceof Client) {
             throw new MethodNotAllowedHttpException(['Client']);

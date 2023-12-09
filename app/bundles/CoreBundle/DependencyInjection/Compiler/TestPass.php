@@ -4,9 +4,13 @@ declare(strict_types=1);
 
 namespace Mautic\CoreBundle\DependencyInjection\Compiler;
 
+use GuzzleHttp\Handler\MockHandler;
+use Mautic\CoreBundle\Test\Guzzle\ClientFactory;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
+use Symfony\Component\HttpClient\MockHttpClient;
+use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 final class TestPass implements CompilerPassInterface
 {
@@ -15,11 +19,11 @@ final class TestPass implements CompilerPassInterface
         // Stub Guzzle HTTP client to prevent accidental request to third parties
         $definition = $container->getDefinition('mautic.http.client');
         $definition->setPublic(true)
-            ->setFactory([\Mautic\CoreBundle\Test\Guzzle\ClientFactory::class, 'stub'])
-            ->addArgument(new Reference(\GuzzleHttp\Handler\MockHandler::class));
+            ->setFactory([ClientFactory::class, 'stub'])
+            ->addArgument(new Reference(MockHandler::class));
 
-        $container->removeAlias(\Symfony\Contracts\HttpClient\HttpClientInterface::class);
-        $container->register(\Symfony\Component\HttpClient\MockHttpClient::class, \Symfony\Component\HttpClient\MockHttpClient::class)->setAutowired(true)->setPublic(true);
-        $container->setAlias(\Symfony\Contracts\HttpClient\HttpClientInterface::class, \Symfony\Component\HttpClient\MockHttpClient::class);
+        $container->removeAlias(HttpClientInterface::class);
+        $container->register(MockHttpClient::class, MockHttpClient::class)->setAutowired(true)->setPublic(true);
+        $container->setAlias(HttpClientInterface::class, MockHttpClient::class);
     }
 }

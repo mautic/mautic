@@ -6,6 +6,7 @@ use Oneup\UploaderBundle\Controller\DropzoneController;
 use Oneup\UploaderBundle\Uploader\Response\EmptyResponse;
 use Symfony\Component\HttpFoundation\File\Exception\UploadException;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Contracts\Service\Attribute\Required;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 class UploadController extends DropzoneController
@@ -39,7 +40,7 @@ class UploadController extends DropzoneController
         return $this->createSupportedJsonResponse($response->assemble());
     }
 
-    #[\Symfony\Contracts\Service\Attribute\Required]
+    #[Required]
     public function setTranslator(TranslatorInterface $translator): void
     {
         $this->translator = $translator;

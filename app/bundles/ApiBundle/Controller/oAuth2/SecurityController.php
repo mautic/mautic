@@ -5,7 +5,7 @@ namespace Mautic\ApiBundle\Controller\oAuth2;
 use Mautic\CoreBundle\Controller\CommonController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Security\Core\Exception;
+use Symfony\Component\Security\Core\Exception\BadCredentialsException;
 use Symfony\Component\Security\Core\Security;
 
 class SecurityController extends CommonController
@@ -25,7 +25,7 @@ class SecurityController extends CommonController
             $session->remove(Security::AUTHENTICATION_ERROR);
         }
         if (!empty($error)) {
-            if ($error instanceof Exception\BadCredentialsException) {
+            if ($error instanceof BadCredentialsException) {
                 $msg = 'mautic.user.auth.error.invalidlogin';
             } else {
                 $msg = $error->getMessage();

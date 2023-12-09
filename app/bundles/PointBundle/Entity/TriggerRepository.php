@@ -2,6 +2,7 @@
 
 namespace Mautic\PointBundle\Entity;
 
+use Doctrine\Common\Collections\Criteria;
 use Mautic\CoreBundle\Entity\CommonRepository;
 
 /**
@@ -17,7 +18,7 @@ class TriggerRepository extends CommonRepository
         $q = $this->_em
             ->createQueryBuilder()
             ->select($this->getTableAlias().', cat')
-            ->from(\Mautic\PointBundle\Entity\Trigger::class, $this->getTableAlias())
+            ->from(Trigger::class, $this->getTableAlias())
             ->leftJoin($this->getTableAlias().'.category', 'cat')
             ->leftJoin($this->getTableAlias().'.group', 'pl');
 
@@ -35,11 +36,11 @@ class TriggerRepository extends CommonRepository
     {
         $q = $this->_em->createQueryBuilder()
             ->select('partial t.{id, color, points}')
-            ->from(\Mautic\PointBundle\Entity\Trigger::class, 't', 't.id');
+            ->from(Trigger::class, 't', 't.id');
 
         $q->where($this->getPublishedByDateExpression($q));
 
-        $q->orderBy('t.points', \Doctrine\Common\Collections\Criteria::ASC);
+        $q->orderBy('t.points', Criteria::ASC);
 
         return $q->getQuery()->getArrayResult();
     }

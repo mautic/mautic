@@ -2,7 +2,8 @@
 
 namespace Mautic\CoreBundle\Helper;
 
-use MatthiasMullie\Minify;
+use MatthiasMullie\Minify\CSS;
+use MatthiasMullie\Minify\JS;
 use Symfony\Component\Finder\Finder;
 
 class AssetGenerationHelper
@@ -197,10 +198,10 @@ class AssetGenerationHelper
                                 }
 
                                 if ('css' == $type) {
-                                    $minifier = new Minify\CSS(...array_column($files, 'fullPath'));
+                                    $minifier = new CSS(...array_column($files, 'fullPath'));
                                     $minifier->minify($assetFile);
                                 } else {
-                                    $minifier = new Minify\JS(...array_column($files, 'fullPath'));
+                                    $minifier = new JS(...array_column($files, 'fullPath'));
                                     $minifier->minify($assetFile);
                                 }
                             }

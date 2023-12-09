@@ -2,6 +2,7 @@
 
 namespace Mautic\LeadBundle\Segment\Query;
 
+use Doctrine\DBAL\Connections\PrimaryReadReplicaConnection;
 use Doctrine\DBAL\Connection;
 use Doctrine\ORM\EntityManager;
 use Mautic\LeadBundle\Entity\Lead;
@@ -40,7 +41,7 @@ class ContactSegmentQueryBuilder
     {
         /** @var Connection $connection */
         $connection = $this->entityManager->getConnection();
-        if ($connection instanceof \Doctrine\DBAL\Connections\PrimaryReadReplicaConnection) {
+        if ($connection instanceof PrimaryReadReplicaConnection) {
             // Prefer a replica connection if available.
             $connection->ensureConnectedToReplica();
         }
@@ -90,7 +91,7 @@ class ContactSegmentQueryBuilder
     {
         /** @var Connection $connection */
         $connection = $this->entityManager->getConnection();
-        if ($connection instanceof \Doctrine\DBAL\Connections\PrimaryReadReplicaConnection) {
+        if ($connection instanceof PrimaryReadReplicaConnection) {
             // Prefer a replica connection if available.
             $connection->ensureConnectedToReplica();
         }
@@ -275,7 +276,7 @@ class ContactSegmentQueryBuilder
      */
     private function getSegmentEdges($segmentId): array
     {
-        $segment = $this->entityManager->getRepository(\Mautic\LeadBundle\Entity\LeadList::class)->find($segmentId);
+        $segment = $this->entityManager->getRepository(LeadList::class)->find($segmentId);
         if (null === $segment) {
             return [];
         }

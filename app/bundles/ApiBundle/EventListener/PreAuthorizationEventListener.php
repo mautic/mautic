@@ -5,6 +5,7 @@ namespace Mautic\ApiBundle\EventListener;
 use Doctrine\ORM\EntityManager;
 use FOS\OAuthServerBundle\Event\PreAuthorizationEvent;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
+use Mautic\UserBundle\Entity\User;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
@@ -48,6 +49,6 @@ class PreAuthorizationEventListener
      */
     protected function getUser(PreAuthorizationEvent $event)
     {
-        return $this->em->getRepository(\Mautic\UserBundle\Entity\User::class)->findOneByUsername($event->getUser()->getUsername());
+        return $this->em->getRepository(User::class)->findOneByUsername($event->getUser()->getUsername());
     }
 }

@@ -34,7 +34,7 @@ class IpLookupHelper
      */
     private $realIp;
 
-    private \Mautic\CoreBundle\Helper\CoreParametersHelper $coreParametersHelper;
+    private CoreParametersHelper $coreParametersHelper;
 
     public function __construct(
         protected RequestStack $requestStack,
@@ -117,7 +117,7 @@ class IpLookupHelper
         }
 
         if (empty($ipAddresses[$ip])) {
-            $repo      = $this->em->getRepository(\Mautic\CoreBundle\Entity\IpAddress::class);
+            $repo      = $this->em->getRepository(IpAddress::class);
             $ipAddress = $repo->findOneByIpAddress($ip);
             $saveIp    = (null === $ipAddress);
 

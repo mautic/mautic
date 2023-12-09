@@ -32,7 +32,7 @@ class PostCount
         $builder = new ClassMetadataBuilder($metadata);
 
         $builder->setTable('monitor_post_count')
-            ->setCustomRepositoryClass(\MauticPlugin\MauticSocialBundle\Entity\PostCountRepository::class);
+            ->setCustomRepositoryClass(PostCountRepository::class);
 
         $builder->addId();
 

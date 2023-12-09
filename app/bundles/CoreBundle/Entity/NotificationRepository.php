@@ -2,6 +2,8 @@
 
 namespace Mautic\CoreBundle\Entity;
 
+use Doctrine\Common\Collections\Criteria;
+
 /**
  * @extends CommonRepository<Notification>
  */
@@ -128,7 +130,7 @@ class NotificationRepository extends CommonRepository
         }
 
         $qb->where($expr)
-            ->orderBy('n.dateAdded', \Doctrine\Common\Collections\Criteria::DESC);
+            ->orderBy('n.dateAdded', Criteria::DESC);
 
         if ($limit) {
             $qb->setMaxResults($limit);

@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Mautic\CoreBundle\DependencyInjection\Compiler;
 
+use Knp\Menu\MenuItem;
+use Mautic\CoreBundle\Menu\MenuRenderer;
 use Symfony\Component\DependencyInjection\Alias;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -76,7 +78,7 @@ final class ServicePass implements CompilerPassInterface
                         if ('menus' == $type) {
                             $details = array_merge(
                                 [
-                                    'class'   => \Knp\Menu\MenuItem::class,
+                                    'class'   => MenuItem::class,
                                     'factory' => ['@mautic.menu.builder', $details['alias'].'Menu'],
                                 ],
                                 $details
@@ -251,7 +253,7 @@ final class ServicePass implements CompilerPassInterface
 
         foreach ($menus as $alias => $options) {
             $container->setDefinition('mautic.menu_renderer.'.$alias, new Definition(
-                \Mautic\CoreBundle\Menu\MenuRenderer::class,
+                MenuRenderer::class,
                 [
                     new Reference('knp_menu.matcher'),
                     new Reference('twig'),

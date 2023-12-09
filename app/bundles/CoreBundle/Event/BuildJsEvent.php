@@ -2,7 +2,7 @@
 
 namespace Mautic\CoreBundle\Event;
 
-use MatthiasMullie\Minify;
+use MatthiasMullie\Minify\JS;
 use Symfony\Contracts\EventDispatcher\Event;
 
 class BuildJsEvent extends Event
@@ -20,7 +20,7 @@ class BuildJsEvent extends Event
      */
     public function getJs()
     {
-        return $this->debugMode ? $this->js : (new Minify\JS($this->js))->minify();
+        return $this->debugMode ? $this->js : (new JS($this->js))->minify();
     }
 
     /**

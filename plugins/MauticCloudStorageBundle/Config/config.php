@@ -1,5 +1,6 @@
 <?php
 
+use MauticPlugin\MauticCloudStorageBundle\Integration\AmazonS3Integration;
 return [
     'name'        => 'Cloud Storage',
     'description' => 'Enables integrations with Mautic supported cloud storage services.',
@@ -9,7 +10,7 @@ return [
     'services' => [
         'integrations' => [
             'mautic.integration.amazons3' => [
-                'class'     => \MauticPlugin\MauticCloudStorageBundle\Integration\AmazonS3Integration::class,
+                'class'     => AmazonS3Integration::class,
                 'arguments' => [
                     'event_dispatcher',
                     'mautic.helper.cache_storage',

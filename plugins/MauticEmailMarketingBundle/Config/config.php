@@ -1,5 +1,8 @@
 <?php
 
+use MauticPlugin\MauticEmailMarketingBundle\Integration\ConstantContactIntegration;
+use MauticPlugin\MauticEmailMarketingBundle\Integration\IcontactIntegration;
+use MauticPlugin\MauticEmailMarketingBundle\Integration\MailchimpIntegration;
 return [
     'name'        => 'Email Marketing',
     'description' => 'Enables integration with Mautic supported email marketing services.',
@@ -9,7 +12,7 @@ return [
     'services' => [
         'integrations' => [
             'mautic.integration.constantcontact' => [
-                'class'     => \MauticPlugin\MauticEmailMarketingBundle\Integration\ConstantContactIntegration::class,
+                'class'     => ConstantContactIntegration::class,
                 'arguments' => [
                     'event_dispatcher',
                     'mautic.helper.cache_storage',
@@ -30,7 +33,7 @@ return [
                 ],
             ],
             'mautic.integration.icontact' => [
-                'class'     => \MauticPlugin\MauticEmailMarketingBundle\Integration\IcontactIntegration::class,
+                'class'     => IcontactIntegration::class,
                 'arguments' => [
                     'event_dispatcher',
                     'mautic.helper.cache_storage',
@@ -51,7 +54,7 @@ return [
                 ],
             ],
             'mautic.integration.mailchimp' => [
-                'class'     => \MauticPlugin\MauticEmailMarketingBundle\Integration\MailchimpIntegration::class,
+                'class'     => MailchimpIntegration::class,
                 'arguments' => [
                     'event_dispatcher',
                     'mautic.helper.cache_storage',

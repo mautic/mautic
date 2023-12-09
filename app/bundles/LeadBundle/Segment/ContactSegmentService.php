@@ -2,6 +2,7 @@
 
 namespace Mautic\LeadBundle\Segment;
 
+use Psr\Log\LoggerInterface;
 use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\LeadBundle\Segment\Query\ContactSegmentQueryBuilder;
 use Mautic\LeadBundle\Segment\Query\LeadBatchLimiterTrait;
@@ -11,7 +12,7 @@ class ContactSegmentService
 {
     use LeadBatchLimiterTrait;
 
-    public function __construct(private ContactSegmentFilterFactory $contactSegmentFilterFactory, private ContactSegmentQueryBuilder $contactSegmentQueryBuilder, private \Psr\Log\LoggerInterface $logger)
+    public function __construct(private ContactSegmentFilterFactory $contactSegmentFilterFactory, private ContactSegmentQueryBuilder $contactSegmentQueryBuilder, private LoggerInterface $logger)
     {
     }
 

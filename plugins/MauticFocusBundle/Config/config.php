@@ -1,5 +1,8 @@
 <?php
 
+use MauticPlugin\MauticFocusBundle\Controller\Api\FocusApiController;
+use MauticPlugin\MauticFocusBundle\Helper\TokenHelper;
+use MauticPlugin\MauticFocusBundle\Helper\IframeAvailabilityChecker;
 return [
     'name'        => 'Mautic Focus',
     'description' => 'Drive visitor\'s focus on your website with Mautic Focus',
@@ -32,7 +35,7 @@ return [
                 'standard_entity' => true,
                 'name'            => 'focus',
                 'path'            => '/focus',
-                'controller'      => \MauticPlugin\MauticFocusBundle\Controller\Api\FocusApiController::class,
+                'controller'      => FocusApiController::class,
             ],
             'mautic_api_focusjs' => [
                 'path'       => '/focus/{id}/js',
@@ -45,7 +48,7 @@ return [
     'services' => [
         'other' => [
             'mautic.focus.helper.token' => [
-                'class'     => \MauticPlugin\MauticFocusBundle\Helper\TokenHelper::class,
+                'class'     => TokenHelper::class,
                 'arguments' => [
                     'mautic.focus.model.focus',
                     'router',
@@ -53,7 +56,7 @@ return [
                 ],
             ],
             'mautic.focus.helper.iframe_availability_checker' => [
-                'class'     => \MauticPlugin\MauticFocusBundle\Helper\IframeAvailabilityChecker::class,
+                'class'     => IframeAvailabilityChecker::class,
                 'arguments' => [
                     'translator',
                 ],

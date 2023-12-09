@@ -55,7 +55,7 @@ EOT
             $output->writeln($log);
         }
 
-        return \Symfony\Component\Console\Command\Command::SUCCESS;
+        return Command::SUCCESS;
     }
     protected static $defaultDescription = 'Fetch and process monitored email.';
 }

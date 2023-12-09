@@ -3,6 +3,7 @@
 namespace Mautic\ReportBundle\Scheduler\Model;
 
 use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityRepository;
 use Mautic\ReportBundle\Entity\Report;
 use Mautic\ReportBundle\Entity\Scheduler;
 use Mautic\ReportBundle\Entity\SchedulerRepository;
@@ -14,7 +15,7 @@ class SchedulerPlanner
     /**
      * @var SchedulerRepository
      */
-    private \Doctrine\ORM\EntityRepository $schedulerRepository;
+    private EntityRepository $schedulerRepository;
 
     public function __construct(private DateBuilder $dateBuilder, private EntityManager $entityManager)
     {

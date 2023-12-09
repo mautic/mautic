@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace Mautic\CoreBundle\Command;
 
 use MatthiasMullie\Minify;
+use MatthiasMullie\Minify\CSS;
+use MatthiasMullie\Minify\JS;
 use Mautic\CoreBundle\Helper\AssetGenerationHelper;
 use Mautic\CoreBundle\Helper\Filesystem;
 use Mautic\CoreBundle\Helper\PathsHelper;
@@ -74,12 +76,12 @@ EOT
         $this->moveExtraLibraries($nodeModulesDir, $mediaDir);
 
         foreach (['mediaelementplayer', 'modal'] as $css_file) {
-            $minifier = new Minify\CSS($assetsDir.'/css/'.$css_file.'.css');
+            $minifier = new CSS($assetsDir.'/css/'.$css_file.'.css');
             $minifier->minify($mediaDir.'/css/'.$css_file.'.min.css');
         }
 
         // Minify Mautic Form SDK
-        $minifier = new Minify\JS($assetsDir.'/js/mautic-form-src.js');
+        $minifier = new JS($assetsDir.'/js/mautic-form-src.js');
         $minifier->minify($mediaDir.'/js/mautic-form.js');
 
         // Fix the MauticSDK loader

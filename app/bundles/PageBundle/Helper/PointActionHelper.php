@@ -3,6 +3,7 @@
 namespace Mautic\PageBundle\Helper;
 
 use Mautic\CoreBundle\Factory\MauticFactory;
+use Mautic\PageBundle\Entity\Hit;
 use Mautic\PageBundle\Entity\Page;
 
 class PointActionHelper
@@ -51,7 +52,7 @@ class PointActionHelper
             return false;
         }
 
-        $hitRepository = $factory->getEntityManager()->getRepository(\Mautic\PageBundle\Entity\Hit::class);
+        $hitRepository = $factory->getEntityManager()->getRepository(Hit::class);
         $lead          = $eventDetails->getLead();
         $urlWithSqlWC  = str_replace('*', '%', $limitToUrl);
 

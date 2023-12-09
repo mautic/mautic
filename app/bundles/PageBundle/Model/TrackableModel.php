@@ -69,7 +69,7 @@ class TrackableModel extends AbstractCommonModel
      */
     public function getRepository()
     {
-        return $this->em->getRepository(\Mautic\PageBundle\Entity\Trackable::class);
+        return $this->em->getRepository(Trackable::class);
     }
 
     /**

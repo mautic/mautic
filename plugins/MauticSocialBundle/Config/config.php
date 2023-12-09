@@ -1,5 +1,12 @@
 <?php
 
+use MauticPlugin\MauticSocialBundle\Controller\Api\TweetApiController;
+use MauticPlugin\MauticSocialBundle\Helper\CampaignEventHelper;
+use MauticPlugin\MauticSocialBundle\Helper\TwitterCommandHelper;
+use MauticPlugin\MauticSocialBundle\Integration\FacebookIntegration;
+use MauticPlugin\MauticSocialBundle\Integration\FoursquareIntegration;
+use MauticPlugin\MauticSocialBundle\Integration\InstagramIntegration;
+use MauticPlugin\MauticSocialBundle\Integration\TwitterIntegration;
 return [
     'name'        => 'Social Media',
     'description' => 'Enables integrations with Mautic supported social media services.',
@@ -34,7 +41,7 @@ return [
                 'standard_entity' => true,
                 'name'            => 'tweets',
                 'path'            => '/tweets',
-                'controller'      => \MauticPlugin\MauticSocialBundle\Controller\Api\TweetApiController::class,
+                'controller'      => TweetApiController::class,
             ],
         ],
         'public' => [
@@ -48,7 +55,7 @@ return [
     'services' => [
         'others' => [
             'mautic.social.helper.campaign' => [
-                'class'     => \MauticPlugin\MauticSocialBundle\Helper\CampaignEventHelper::class,
+                'class'     => CampaignEventHelper::class,
                 'arguments' => [
                     'mautic.helper.integration',
                     'mautic.page.model.trackable',
@@ -58,7 +65,7 @@ return [
                 ],
             ],
             'mautic.social.helper.twitter_command' => [
-                'class'     => \MauticPlugin\MauticSocialBundle\Helper\TwitterCommandHelper::class,
+                'class'     => TwitterCommandHelper::class,
                 'arguments' => [
                     'mautic.lead.model.lead',
                     'mautic.lead.model.field',
@@ -72,7 +79,7 @@ return [
         ],
         'integrations' => [
             'mautic.integration.facebook' => [
-                'class'     => \MauticPlugin\MauticSocialBundle\Integration\FacebookIntegration::class,
+                'class'     => FacebookIntegration::class,
                 'arguments' => [
                     'event_dispatcher',
                     'mautic.helper.cache_storage',
@@ -94,7 +101,7 @@ return [
                 ],
             ],
             'mautic.integration.foursquare' => [
-                'class'     => \MauticPlugin\MauticSocialBundle\Integration\FoursquareIntegration::class,
+                'class'     => FoursquareIntegration::class,
                 'arguments' => [
                     'event_dispatcher',
                     'mautic.helper.cache_storage',
@@ -116,7 +123,7 @@ return [
                 ],
             ],
             'mautic.integration.instagram' => [
-                'class'     => \MauticPlugin\MauticSocialBundle\Integration\InstagramIntegration::class,
+                'class'     => InstagramIntegration::class,
                 'arguments' => [
                     'event_dispatcher',
                     'mautic.helper.cache_storage',
@@ -138,7 +145,7 @@ return [
                 ],
             ],
             'mautic.integration.twitter' => [
-                'class'     => \MauticPlugin\MauticSocialBundle\Integration\TwitterIntegration::class,
+                'class'     => TwitterIntegration::class,
                 'arguments' => [
                     'event_dispatcher',
                     'mautic.helper.cache_storage',

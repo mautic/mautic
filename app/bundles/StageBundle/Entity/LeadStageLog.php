@@ -32,7 +32,7 @@ class LeadStageLog
         $builder = new ClassMetadataBuilder($metadata);
 
         $builder->setTable('stage_lead_action_log')
-            ->setCustomRepositoryClass(\Mautic\StageBundle\Entity\LeadStageLogRepository::class);
+            ->setCustomRepositoryClass(LeadStageLogRepository::class);
 
         $builder->createManyToOne('stage', 'Stage')
             ->isPrimaryKey()

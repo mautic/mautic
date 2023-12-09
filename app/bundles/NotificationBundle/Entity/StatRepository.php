@@ -4,6 +4,7 @@ namespace Mautic\NotificationBundle\Entity;
 
 use Mautic\CoreBundle\Entity\CommonRepository;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
+use Mautic\LeadBundle\Entity\LeadList;
 
 /**
  * @extends CommonRepository<Stat>
@@ -145,8 +146,8 @@ class StatRepository extends CommonRepository
         $query = $this->createQueryBuilder('s');
 
         $query->select('IDENTITY(s.notification) AS notification_id, s.id, s.dateRead, s.dateSent, e.title, s.isRead, s.retryCount, IDENTITY(s.list) AS list_id, l.name as list_name, s.trackingHash as idHash, s.clickDetails')
-            ->leftJoin(\Mautic\NotificationBundle\Entity\Notification::class, 'e', 'WITH', 'e.id = s.notification')
-            ->leftJoin(\Mautic\LeadBundle\Entity\LeadList::class, 'l', 'WITH', 'l.id = s.list')
+            ->leftJoin(Notification::class, 'e', 'WITH', 'e.id = s.notification')
+            ->leftJoin(LeadList::class, 'l', 'WITH', 'l.id = s.list')
             ->where(
                 $query->expr()->andX(
                     $query->expr()->eq('IDENTITY(s.lead)', $leadId),

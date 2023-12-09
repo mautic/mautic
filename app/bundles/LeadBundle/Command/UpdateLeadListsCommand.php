@@ -2,6 +2,7 @@
 
 namespace Mautic\LeadBundle\Command;
 
+use Symfony\Component\Console\Command\Command;
 use Mautic\CoreBundle\Command\ModeratedCommand;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\PathsHelper;
@@ -68,7 +69,7 @@ class UpdateLeadListsCommand extends ModeratedCommand
         $output                = ($input->getOption('quiet')) ? new NullOutput() : $output;
 
         if (!$this->checkRunStatus($input, $output, $id)) {
-            return \Symfony\Component\Console\Command\Command::SUCCESS;
+            return Command::SUCCESS;
         }
 
         if ($enableTimeMeasurement) {
@@ -81,7 +82,7 @@ class UpdateLeadListsCommand extends ModeratedCommand
             if (!$list) {
                 $output->writeln('<error>'.$this->translator->trans('mautic.lead.list.rebuild.not_found', ['%id%' => $id]).'</error>');
 
-                return \Symfony\Component\Console\Command\Command::FAILURE;
+                return Command::FAILURE;
             }
 
             $this->rebuildSegment($list, $batch, $max, $output);
@@ -114,7 +115,7 @@ class UpdateLeadListsCommand extends ModeratedCommand
             $output->writeln('<fg=magenta>'.$this->translator->trans('mautic.lead.list.rebuild.total.time', ['%time%' => $totalTime]).'</>'."\n");
         }
 
-        return \Symfony\Component\Console\Command\Command::SUCCESS;
+        return Command::SUCCESS;
     }
 
     private function rebuildSegment(LeadList $segment, int $batch, int $max, OutputInterface $output): void

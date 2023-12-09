@@ -7,6 +7,7 @@ use libphonenumber\PhoneNumberFormat;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\PhoneNumberHelper;
 use Mautic\LeadBundle\Entity\DoNotContact as DoNotContactEntity;
+use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadRepository;
 use Mautic\LeadBundle\Model\DoNotContact;
 use Mautic\LeadBundle\Model\LeadModel;
@@ -25,7 +26,7 @@ class SmsHelper
         $number = $this->phoneNumberHelper->format($number, PhoneNumberFormat::E164);
 
         /** @var LeadRepository $repo */
-        $repo = $this->em->getRepository(\Mautic\LeadBundle\Entity\Lead::class);
+        $repo = $this->em->getRepository(Lead::class);
 
         $args = [
             'filter' => [

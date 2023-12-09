@@ -1,5 +1,8 @@
 <?php
 
+use MauticPlugin\MauticTagManagerBundle\Integration\TagManagerIntegration;
+use Doctrine\ORM\EntityRepository;
+use MauticPlugin\MauticTagManagerBundle\Entity\Tag;
 return [
     'name'        => 'Mautic tag manager bundle',
     'description' => 'Provides an interface for tags management.',
@@ -20,7 +23,7 @@ return [
     'services'    => [
         'integrations' => [
             'mautic.integration.tagmanager' => [
-                'class'     => \MauticPlugin\MauticTagManagerBundle\Integration\TagManagerIntegration::class,
+                'class'     => TagManagerIntegration::class,
                 'arguments' => [
                     'event_dispatcher',
                     'mautic.helper.cache_storage',
@@ -43,10 +46,10 @@ return [
         ],
         'repositories' => [
             'mautic.tagmanager.repository.tag' => [
-                'class'     => Doctrine\ORM\EntityRepository::class,
+                'class'     => EntityRepository::class,
                 'factory'   => ['@doctrine.orm.entity_manager', 'getRepository'],
                 'arguments' => [
-                    \MauticPlugin\MauticTagManagerBundle\Entity\Tag::class,
+                    Tag::class,
                 ],
             ],
         ],

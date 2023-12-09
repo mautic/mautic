@@ -16,6 +16,7 @@ use Mautic\LeadBundle\Model\FieldModel as LeadFieldModel;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\FormFactoryInterface;
+use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
@@ -43,7 +44,7 @@ class FieldModel extends CommonFormModel
      * @param string|null         $action
      * @param array               $options
      */
-    public function createForm($entity, FormFactoryInterface $formFactory, $action = null, $options = []): \Symfony\Component\Form\FormInterface
+    public function createForm($entity, FormFactoryInterface $formFactory, $action = null, $options = []): FormInterface
     {
         if ($action) {
             $options['action'] = $action;
@@ -80,7 +81,7 @@ class FieldModel extends CommonFormModel
      */
     public function getRepository()
     {
-        return $this->em->getRepository(\Mautic\FormBundle\Entity\Field::class);
+        return $this->em->getRepository(Field::class);
     }
 
     public function getPermissionBase(): string

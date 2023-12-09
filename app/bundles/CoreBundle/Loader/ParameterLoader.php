@@ -2,6 +2,14 @@
 
 namespace Mautic\CoreBundle\Loader;
 
+use Mautic\CoreBundle\Loader\EnvVars\ApiEnvVars;
+use Mautic\CoreBundle\Loader\EnvVars\ConfigEnvVars;
+use Mautic\CoreBundle\Loader\EnvVars\ElFinderEnvVars;
+use Mautic\CoreBundle\Loader\EnvVars\MigrationsEnvVars;
+use Mautic\CoreBundle\Loader\EnvVars\SAMLEnvVars;
+use Mautic\CoreBundle\Loader\EnvVars\SessionEnvVars;
+use Mautic\CoreBundle\Loader\EnvVars\SiteUrlEnvVars;
+use Mautic\CoreBundle\Loader\EnvVars\TwigEnvVars;
 use Symfony\Component\Dotenv\Dotenv;
 use Symfony\Component\Filesystem\Path;
 use Symfony\Component\Finder\Finder;
@@ -64,16 +72,16 @@ class ParameterLoader
         $defaultParameters = new ParameterBag(self::$defaultParameters);
 
         // Load from local configuration file first
-        EnvVars\ConfigEnvVars::load($this->parameterBag, $defaultParameters, $envVariables);
+        ConfigEnvVars::load($this->parameterBag, $defaultParameters, $envVariables);
 
         // Load special values used in Mautic configuration files in app/config
-        EnvVars\ApiEnvVars::load($this->parameterBag, $defaultParameters, $envVariables);
-        EnvVars\ElFinderEnvVars::load($this->parameterBag, $defaultParameters, $envVariables);
-        EnvVars\MigrationsEnvVars::load($this->parameterBag, $defaultParameters, $envVariables);
-        EnvVars\SAMLEnvVars::load($this->parameterBag, $defaultParameters, $envVariables);
-        EnvVars\SessionEnvVars::load($this->parameterBag, $defaultParameters, $envVariables);
-        EnvVars\SiteUrlEnvVars::load($this->parameterBag, $defaultParameters, $envVariables);
-        EnvVars\TwigEnvVars::load($this->parameterBag, $defaultParameters, $envVariables);
+        ApiEnvVars::load($this->parameterBag, $defaultParameters, $envVariables);
+        ElFinderEnvVars::load($this->parameterBag, $defaultParameters, $envVariables);
+        MigrationsEnvVars::load($this->parameterBag, $defaultParameters, $envVariables);
+        SAMLEnvVars::load($this->parameterBag, $defaultParameters, $envVariables);
+        SessionEnvVars::load($this->parameterBag, $defaultParameters, $envVariables);
+        SiteUrlEnvVars::load($this->parameterBag, $defaultParameters, $envVariables);
+        TwigEnvVars::load($this->parameterBag, $defaultParameters, $envVariables);
 
         // Load the values into the environment for cache use
         $dotenv = new Dotenv(MAUTIC_ENV);

@@ -27,6 +27,7 @@ use Mautic\LeadBundle\Exception\ImportDelayedException;
 use Mautic\LeadBundle\Exception\ImportFailedException;
 use Mautic\LeadBundle\Helper\Progress;
 use Mautic\LeadBundle\LeadEvents;
+use Mautic\UserBundle\Entity\User;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
@@ -38,7 +39,7 @@ use Symfony\Contracts\EventDispatcher\Event;
  */
 class ImportModel extends FormModel
 {
-    protected \Mautic\LeadBundle\Entity\LeadEventLogRepository $leadEventLogRepo;
+    protected LeadEventLogRepository $leadEventLogRepo;
 
     public function __construct(
         protected PathsHelper $pathsHelper,
@@ -138,7 +139,7 @@ class ImportModel extends FormModel
                     $this->translator->trans('mautic.lead.import.failed'),
                     'fa-download',
                     null,
-                    $this->em->getReference(\Mautic\UserBundle\Entity\User::class, $import->getCreatedBy())
+                    $this->em->getReference(User::class, $import->getCreatedBy())
                 );
             }
         }
@@ -235,7 +236,7 @@ class ImportModel extends FormModel
                 $this->translator->trans('mautic.lead.import.completed'),
                 'fa-download',
                 null,
-                $this->em->getReference(\Mautic\UserBundle\Entity\User::class, $import->getCreatedBy())
+                $this->em->getReference(User::class, $import->getCreatedBy())
             );
         }
     }
@@ -536,7 +537,7 @@ class ImportModel extends FormModel
      */
     public function getRepository()
     {
-        return $this->em->getRepository(\Mautic\LeadBundle\Entity\Import::class);
+        return $this->em->getRepository(Import::class);
     }
 
     /**
@@ -544,7 +545,7 @@ class ImportModel extends FormModel
      */
     public function getEventLogRepository()
     {
-        return $this->em->getRepository(\Mautic\LeadBundle\Entity\LeadEventLog::class);
+        return $this->em->getRepository(LeadEventLog::class);
     }
 
     /**

@@ -5,6 +5,9 @@ namespace Mautic\UserBundle\Controller;
 use Mautic\CoreBundle\Controller\FormController;
 use Mautic\CoreBundle\Factory\PageHelperFactoryInterface;
 use Mautic\UserBundle\Entity;
+use Mautic\UserBundle\Entity\Permission;
+use Mautic\UserBundle\Entity\Role;
+use Mautic\UserBundle\Entity\User;
 use Mautic\UserBundle\Model\RoleModel;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -111,7 +114,7 @@ class RoleController extends FormController
         }
 
         // retrieve the entity
-        $entity = new Entity\Role();
+        $entity = new Role();
         $model  = $this->getModel('user.role');
         \assert($model instanceof RoleModel);
 
@@ -291,13 +294,13 @@ class RoleController extends FormController
         ]);
     }
 
-    private function getPermissionsConfig(Entity\Role $role): array
+    private function getPermissionsConfig(Role $role): array
     {
         $permissionObjects = $this->security->getPermissionObjects();
         $translator        = $this->translator;
 
         $permissionsArray = ($role->getId()) ?
-            $this->get('doctrine')->getRepository(\Mautic\UserBundle\Entity\Permission::class)->getPermissionsByRole($role, true) :
+            $this->get('doctrine')->getRepository(Permission::class)->getPermissionsByRole($role, true) :
             [];
 
         $permissions     = [];
@@ -440,7 +443,7 @@ class RoleController extends FormController
             // Loop over the IDs to perform access checks pre-delete
             foreach ($ids as $objectId) {
                 $entity = $model->getEntity($objectId);
-                $users  = $this->get('doctrine')->getRepository(\Mautic\UserBundle\Entity\User::class)->findByRole($entity);
+                $users  = $this->get('doctrine')->getRepository(User::class)->findByRole($entity);
 
                 if (null === $entity) {
                     $flashes[] = [

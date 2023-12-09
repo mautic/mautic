@@ -2,6 +2,9 @@
 
 namespace Mautic\PluginBundle\Integration;
 
+use Doctrine\ORM\Tools\Pagination\Paginator;
+use GuzzleHttp\Exception\RequestException;
+use Mautic\UserBundle\Entity\User;
 use Doctrine\ORM\EntityManager;
 use GuzzleHttp\Client;
 use GuzzleHttp\Handler\CurlHandler;
@@ -73,7 +76,7 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
      *
      * @var \Doctrine\ORM\Tools\Pagination\Paginator<\Mautic\UserBundle\Entity\User>
      */
-    protected ?\Doctrine\ORM\Tools\Pagination\Paginator $adminUsers = null;
+    protected ?Paginator $adminUsers = null;
 
     protected array $notifications              = [];
     protected ?string $lastIntegrationError     = null;
@@ -779,7 +782,7 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
                     ]);
                     break;
             }
-        } catch (\GuzzleHttp\Exception\RequestException $exception) {
+        } catch (RequestException $exception) {
             return [
                 'error' => [
                     'message' => $exception->getResponse()->getBody()->getContents(),
@@ -825,7 +828,7 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
             ->setInternalEntityId($internalEntityId);
 
         if ($persist) {
-            $this->em->getRepository(\Mautic\PluginBundle\Entity\IntegrationEntity::class)->saveEntity($entity);
+            $this->em->getRepository(IntegrationEntity::class)->saveEntity($entity);
         }
 
         return $entity;
@@ -836,7 +839,7 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
      */
     public function getIntegrationEntityRepository()
     {
-        return $this->em->getRepository(\Mautic\PluginBundle\Entity\IntegrationEntity::class);
+        return $this->em->getRepository(IntegrationEntity::class);
     }
 
     /**
@@ -1691,7 +1694,7 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
         $lead->setNewlyCreated(true);
 
         if (count($uniqueLeadFieldData)) {
-            $existingLeads = $this->em->getRepository(\Mautic\LeadBundle\Entity\Lead::class)
+            $existingLeads = $this->em->getRepository(Lead::class)
                 ->getLeadsByUniqueFields($uniqueLeadFieldData);
 
             if (!empty($existingLeads)) {
@@ -1908,7 +1911,7 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
 
         if ($e instanceof ApiErrorException) {
             if (null === $this->adminUsers) {
-                $this->adminUsers = $this->em->getRepository(\Mautic\UserBundle\Entity\User::class)->getEntities(
+                $this->adminUsers = $this->em->getRepository(User::class)->getEntities(
                     [
                         'filter' => [
                             'force' => [

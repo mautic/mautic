@@ -13,6 +13,8 @@ use Doctrine\DBAL\Query\QueryBuilder as DbalQueryBuilder;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping\ClassMetadataInfo;
 use Doctrine\ORM\Query;
+use Doctrine\ORM\Query\Expr;
+use Doctrine\ORM\Query\Expr\Composite;
 use Doctrine\ORM\QueryBuilder;
 use Doctrine\ORM\Tools\Pagination\Paginator;
 use Doctrine\Persistence\ManagerRegistry;
@@ -1216,7 +1218,7 @@ class CommonRepository extends ServiceEntityRepository
 
     protected function appendExpression($appendTo, $expr)
     {
-        if ($expr instanceof CompositeExpression || $expr instanceof Query\Expr\Composite) {
+        if ($expr instanceof CompositeExpression || $expr instanceof Composite) {
             if ($expr->count()) {
                 $appendTo->add($expr);
             }
@@ -1476,7 +1478,7 @@ class CommonRepository extends ServiceEntityRepository
                     if (is_array($criteria)) {
                         // defined columns with keys of column, expr, value
                         foreach ($criteria as $criterion) {
-                            if ($criterion instanceof Query\Expr || $criterion instanceof CompositeExpression) {
+                            if ($criterion instanceof Expr || $criterion instanceof CompositeExpression) {
                                 $queryExpression->add($criterion);
 
                                 if (isset($criterion->parameters) && is_array($criterion->parameters)) {

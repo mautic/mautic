@@ -17,7 +17,7 @@ class Installer
      */
     private $installDirectory;
 
-    private \Symfony\Component\Filesystem\Filesystem $filesystem;
+    private Filesystem $filesystem;
 
     /**
      * Installer constructor.

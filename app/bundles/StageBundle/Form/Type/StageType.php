@@ -104,7 +104,7 @@ class StageType extends AbstractType
     public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults([
-            'data_class' => \Mautic\StageBundle\Entity\Stage::class,
+            'data_class' => Stage::class,
         ]);
 
         $resolver->setDefined(['stageActions', 'actionType']);

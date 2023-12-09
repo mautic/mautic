@@ -2,6 +2,7 @@
 
 namespace Mautic\LeadBundle\Model;
 
+use Doctrine\DBAL\Exception;
 use Doctrine\DBAL\Exception\DriverException;
 use Doctrine\ORM\EntityManagerInterface;
 use Mautic\CoreBundle\Doctrine\Helper\ColumnSchemaHelper;
@@ -558,7 +559,7 @@ class FieldModel extends FormModel
             $this->customFieldColumn->createLeadColumn($entity);
         } catch (CustomFieldLimitException $e) {
             // Convert to original Exception not to cause BC
-            throw new \Doctrine\DBAL\Exception($this->translator->trans($e->getMessage()));
+            throw new Exception($this->translator->trans($e->getMessage()));
         }
 
         // Update order of the other fields.

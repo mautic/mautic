@@ -2,6 +2,7 @@
 
 namespace Mautic\LeadBundle\Entity;
 
+use Doctrine\Common\Collections\Criteria;
 use Doctrine\DBAL\Query\Expression\CompositeExpression;
 use Doctrine\DBAL\Query\QueryBuilder;
 use Mautic\LeadBundle\Controller\ListController;
@@ -111,7 +112,7 @@ trait CustomFieldRepositoryTrait
                     $alias = $this->getTableAlias();
                     $q     = $this->getEntityManager()->createQueryBuilder();
                     $q->select($alias)
-                        ->from(\Mautic\LeadBundle\Entity\Lead::class, $alias, $alias.'.id')
+                        ->from(Lead::class, $alias, $alias.'.id')
                         ->indexBy($alias, $alias.'.id');
                 } else {
                     // ORM
@@ -136,7 +137,7 @@ trait CustomFieldRepositoryTrait
                     $q = $this->getEntitiesOrmQueryBuilder($order, $args);
                     $this->buildSelectClause($dq, $args);
 
-                    $q->orderBy('ORD', \Doctrine\Common\Collections\Criteria::ASC);
+                    $q->orderBy('ORD', Criteria::ASC);
                 }
 
                 // only pull the leads as filtered via DBAL

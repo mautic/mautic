@@ -2,6 +2,7 @@
 
 namespace MauticPlugin\MauticFocusBundle\EventListener;
 
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Mautic\CoreBundle\Helper\BuilderTokenHelperFactory;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\PageBundle\Event\PageBuilderEvent;
@@ -58,7 +59,7 @@ class PageSubscriber implements EventSubscriberInterface
                         )
                     )
                 ) {
-                    $script = '<script src="'.$this->router->generate('mautic_focus_generate', ['id' => $id], \Symfony\Component\Routing\Generator\UrlGeneratorInterface::ABSOLUTE_URL)
+                    $script = '<script src="'.$this->router->generate('mautic_focus_generate', ['id' => $id], UrlGeneratorInterface::ABSOLUTE_URL)
                         .'" type="text/javascript" charset="utf-8" async="async"></script>';
                     $content = preg_replace('#{focus='.$id.'}#', $script, $content);
                 } else {
