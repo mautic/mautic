@@ -1,107 +1,109 @@
 name: Code Analysis
 
 on:
-  push:
-    branches:
-      - '[0-9].*'
-  pull_request:
-  merge_group:
-  schedule:
-    # Run every day at 10:45 AM UTC to discover potential issues with dependencies like PHP updates etc.
-    - cron: '45 10 * * *'
+    push:
+        branches:
+            - '[0-9].*'
+    pull_request:
+    merge_group:
+    schedule:
+        # Run every day at 10:45 AM UTC to discover potential issues with dependencies like PHP updates etc.
+        - cron: '45 10 * * *'
 
 jobs:
-  misc:
-    # We don't want the scheduled jobs to run on forks of Mautic
-    if: (github.event_name == 'schedule' && (github.repository == 'mautic/mautic' || github.repository == 'mautic/api-library') ) || (github.event_name != 'schedule')
-    runs-on: ubuntu-latest
+    misc:
+        # We don't want the scheduled jobs to run on forks of Mautic
+        if: (github.event_name == 'schedule' && (github.repository == 'mautic/mautic' || github.repository == 'mautic/api-library') ) || (github.event_name != 'schedule')
+        runs-on: ubuntu-latest
 
-    strategy:
-      fail-fast: false
-      matrix:
-        actions:
-          -
-            name: 'CS Fixer'
-            run: 'bin/php-cs-fixer fix'
+        strategy:
+            fail-fast: false
+            matrix:
+                actions:
+                    -
+                        name: 'CS Fixer'
+                        run: 'bin/php-cs-fixer fix'
 
-          -
-            name: 'Twig Lint'
-            run: bin/console lint:twig app plugins
+                    -
+                        name: 'Twig Lint'
+                        run: bin/console lint:twig app plugins
 
-          -
-            name: 'Rector'
-            env:
-              SYMFONY_ENV: test
-            run: |
-              bin/console cache:warmup
-              bin/rector --dry-run --ansi
+                    -
+                        name: 'Rector'
+                        env:
+                            SYMFONY_ENV: test
+                        run: |
+                            bin/console cache:warmup
+                            bin/rector --dry-run --ansi
 
-          -
-            name: 'Composer Validate'
-            run: 'composer validate --ansi'
+                    -
+                        name: 'Composer Validate'
+                        run: 'composer validate --ansi'
 
-          -
-            name: 'PHPStan'
-            run: |
-              composer phpstan -- --no-progress
+                    -
+                        name: 'PHPStan'
+                        run: composer phpstan -- --no-progress
 
-          -
-            name: 'Composer Install'
-            run: |
-              # create a temp dir and mimic a composer install via mautic/recommended-project
-              mkdir test_composer
-              cd test_composer
-              cp ../.github/ci-files/composer.json ./
-              composer install
-              
-              # test if media/css and media/js folder contain the same files as the tarball releases
-              test -z "$(comm -23 <(ls ../media/js  | sort) <(ls docroot/media/js  | sort))"
-              test -z "$(comm -23 <(ls ../media/css | sort) <(ls docroot/media/css | sort))"
-              
-              # test if console is executable
-              ./bin/console cache:clear
+                    -
+                        name: 'Composer Install'
+                        run: |
+                            # create a temp dir and mimic a composer install via mautic/recommended-project
+                            mkdir test_composer
+                            cd test_composer
+                            cp ../.github/ci-files/composer.json ./
+                            composer install
 
-          -
-            name: 'scaffolded files mismatch'
-            run: |
-              wget -q -O /tmp/jq https://github.com/stedolan/jq/releases/download/jq-1.6/jq-linux64 && chmod 755 /tmp/jq
-              /tmp/jq -r '.extra["mautic-scaffold"]["file-mapping"] | to_entries[] | "diff -q \(.key | sub("\\[(project|web)-root\\]";".")) app/\(.value)"' app/composer.json > diff_commands.sh
-              /tmp/jq -r '.extra["mautic-scaffold"]["file-mapping"] | to_entries[] | "diff -rui \(.key | sub("\\[(project|web)-root\\]";".")) app/\(.value)"' app/composer.json > diff_commands_verbose.sh
-              bash diff_commands.sh 2>&1 | tee /tmp/diff_command_output.txt
-              rm diff_commands.sh
-              if [[ $(wc -l </tmp/diff_command_output.txt) -ge 1 ]]; then
-                echo "some scaffolded files were not updated or deleted"
-                echo "Please apply the same changes in the files mentioned above"
-                echo "verbose diff:"
-                bash diff_commands_verbose.sh
-                exit 1
-              fi
+                            # test if media/css and media/js folder contain the same files as the tarball releases
+                            test -z "$(comm -23 <(ls ../media/js  | sort) <(ls docroot/media/js  | sort))"
+                            test -z "$(comm -23 <(ls ../media/css | sort) <(ls docroot/media/css | sort))"
 
-    name: ${{ matrix.actions.name }} - 8.0
+                            # test if console is executable
+                            ./bin/console cache:clear
 
-    steps:
-      - uses: actions/checkout@v3
-        # shared environment variables
-        env:
-          SYMFONY_ENV: dev
-          APP_ENV: dev
-          APP_DEBUG: 1
+                    -
+                        name: 'scaffolded files mismatch'
+                        run: |
+                            wget -q -O /tmp/jq https://github.com/stedolan/jq/releases/download/jq-1.6/jq-linux64 && chmod 755 /tmp/jq
 
-      - name: Setup PHP
-        uses: shivammathur/setup-php@v2
-        with:
-          php-version: 8.0
-          extensions: mbstring, xml, ctype, iconv, intl, pdo_sqlite, mysql, pdo_mysql
+                            /tmp/jq -r '.extra["mautic-scaffold"]["file-mapping"] | to_entries[] | "diff -q \(.key | sub("\\[(project|web)-root\\]";".")) app/\(.value)"' app/composer.json > diff_commands.sh
 
-      # composer install https://github.com/ramsey/composer-install
-      - name: Install dependencies
-        uses: "ramsey/composer-install@v2"
+                            /tmp/jq -r '.extra["mautic-scaffold"]["file-mapping"] | to_entries[] | "diff -rui \(.key | sub("\\[(project|web)-root\\]";".")) app/\(.value)"' app/composer.json > diff_commands_verbose.sh
 
-      - run: ${{ matrix.actions.run }}
+                            bash diff_commands.sh 2>&1 | tee /tmp/diff_command_output.txt
+                            rm diff_commands.sh
+                            if [[ $(wc -l </tmp/diff_command_output.txt) -ge 1 ]]; then
+                              echo "some scaffolded files were not updated or deleted"
+                              echo "Please apply the same changes in the files mentioned above"
+                              echo "verbose diff:"
+                              bash diff_commands_verbose.sh
+                              exit 1
+                            fi
 
-      - name: Slack Notification if tests fail
-        uses: rtCamp/action-slack-notify@v2
-        if: ${{ failure() && github.event_name == 'schedule' }}
-        env:
-          SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
-          SLACK_MESSAGE: 'The daily GitHub Actions tests in mautic/mautic have failed. Most likely something external has changed, like a PHP version update.'
+        name: ${{ matrix.actions.name }} - 8.0
+
+        steps:
+            - uses: actions/checkout@v3
+              # shared environment variables
+              env:
+                  SYMFONY_ENV: dev
+                  APP_ENV: dev
+                  APP_DEBUG: 1
+
+            - name: Setup PHP
+              uses: shivammathur/setup-php@v2
+              with:
+                  php-version: 8.0
+                  extensions: mbstring, xml, ctype, iconv, intl, pdo_sqlite, mysql, pdo_mysql
+
+            # composer install https://github.com/ramsey/composer-install
+            - name: Install dependencies
+              uses: "ramsey/composer-install@v2"
+
+            - run: ${{ matrix.actions.run }}
+
+            - name: Slack Notification if tests fail
+              uses: rtCamp/action-slack-notify@v2
+              if: ${{ failure() && github.event_name == 'schedule' }}
+              env:
+                  SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
+                  SLACK_MESSAGE: 'The daily GitHub Actions tests in mautic/mautic have failed. Most likely something external has changed, like a PHP version update.'
