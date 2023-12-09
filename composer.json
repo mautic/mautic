@@ -34,7 +34,6 @@
     "phpstan/phpstan": "^1.10.47",
     "phpstan/phpstan-deprecation-rules": "^1.1",
     "phpstan/phpstan-doctrine": "^1.3.40",
-    "phpstan/phpstan-php-parser": "^1.1",
     "phpstan/phpstan-phpunit": "^1.3",
     "phpstan/phpstan-symfony": "^1.3",
     "phpunit/phpunit": "^9.5",
