@@ -19,12 +19,22 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        commands: ['Twig Lint', 'scaffolded files mismatch']
-        php-versions: ['8.1']
         actions:
           -
             name: 'CS Fixer'
             run: 'bin/php-cs-fixer fix'
+
+          -
+            name: 'Twig Lint'
+            run: bin/console lint:twig app plugins
+
+          -
+            name: 'Rector'
+            env:
+              SYMFONY_ENV: test
+            run: |
+              bin/console cache:warmup
+              bin/rector --dry-run --ansi
 
           -
             name: 'Composer Validate'
@@ -51,7 +61,23 @@ jobs:
               # test if console is executable
               ./bin/console cache:clear
 
-    name: ${{ matrix.commands }} - ${{ matrix.php-versions }}
+          -
+            name: 'scaffolded files mismatch'
+            run: |
+              wget -q -O /tmp/jq https://github.com/stedolan/jq/releases/download/jq-1.6/jq-linux64 && chmod 755 /tmp/jq
+              /tmp/jq -r '.extra["mautic-scaffold"]["file-mapping"] | to_entries[] | "diff -q \(.key | sub("\\[(project|web)-root\\]";".")) app/\(.value)"' app/composer.json > diff_commands.sh
+              /tmp/jq -r '.extra["mautic-scaffold"]["file-mapping"] | to_entries[] | "diff -rui \(.key | sub("\\[(project|web)-root\\]";".")) app/\(.value)"' app/composer.json > diff_commands_verbose.sh
+              bash diff_commands.sh 2>&1 | tee /tmp/diff_command_output.txt
+              rm diff_commands.sh
+              if [[ $(wc -l </tmp/diff_command_output.txt) -ge 1 ]]; then
+                echo "some scaffolded files were not updated or deleted"
+                echo "Please apply the same changes in the files mentioned above"
+                echo "verbose diff:"
+                bash diff_commands_verbose.sh
+                exit 1
+              fi
+
+    name: ${{ matrix.actions.name }} - 8.0
 
     steps:
       - uses: actions/checkout@v3
@@ -61,41 +87,17 @@ jobs:
           APP_ENV: dev
           APP_DEBUG: 1
 
-      - name: Setup PHP, with composer and extensions
+      - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
-          php-version: ${{ matrix.php-versions }}
+          php-version: 8.0
           extensions: mbstring, xml, ctype, iconv, intl, pdo_sqlite, mysql, pdo_mysql
 
       # composer install https://github.com/ramsey/composer-install
       - name: Install dependencies
         uses: "ramsey/composer-install@v2"
 
-      - name: Run ${{ matrix.commands }}
-        run: |
-          if [[ "${{ matrix.commands }}" == "Rector" ]]; then
-            export SYMFONY_ENV=test
-            bin/console cache:warmup
-            bin/rector --dry-run --ansi
-          elif [[ "${{ matrix.commands }}" == "Twig Lint" ]]; then
-            bin/console lint:twig app plugins
-          elif [[ "${{ matrix.commands }}" == "scaffolded files mismatch" ]]; then
-            wget -q -O /tmp/jq https://github.com/stedolan/jq/releases/download/jq-1.6/jq-linux64 && chmod 755 /tmp/jq
-            /tmp/jq -r '.extra["mautic-scaffold"]["file-mapping"] | to_entries[] | "diff -q \(.key | sub("\\[(project|web)-root\\]";".")) app/\(.value)"' app/composer.json > diff_commands.sh
-            /tmp/jq -r '.extra["mautic-scaffold"]["file-mapping"] | to_entries[] | "diff -rui \(.key | sub("\\[(project|web)-root\\]";".")) app/\(.value)"' app/composer.json > diff_commands_verbose.sh
-            bash diff_commands.sh 2>&1 | tee /tmp/diff_command_output.txt
-            rm diff_commands.sh
-            if [[ $(wc -l </tmp/diff_command_output.txt) -ge 1 ]]; then
-              echo "some scaffolded files were not updated or deleted"
-              echo "Please apply the same changes in the files mentioned above"
-              echo "verbose diff:"
-              bash diff_commands_verbose.sh
-              exit 1
-            fi
-          else
-            # handle elsewhere
-            echo "Else command"
-          fi
+      - run: ${{ matrix.actions.run }}
 
       - name: Slack Notification if tests fail
         uses: rtCamp/action-slack-notify@v2
