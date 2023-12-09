@@ -9,7 +9,6 @@ use Rector\DeadCode\Rector\Cast\RecastingRemovalRector;
 use Rector\DeadCode\Rector\Property\RemoveUnusedPrivatePropertyRector;
 use Rector\DeadCode\Rector\Property\RemoveUselessVarTagRector;
 use Rector\Php80\Rector\Class_\ClassPropertyAssignToConstructorPromotionRector;
-use Rector\Set\ValueObject\LevelSetList;
 use Rector\Set\ValueObject\SetList;
 use Rector\TypeDeclaration\Rector\Class_\ReturnTypeFromStrictTernaryRector;
 use Rector\TypeDeclaration\Rector\ClassMethod\AddVoidReturnTypeWhereNoReturnRector;
@@ -98,7 +97,7 @@ return static function (RectorConfig $rectorConfig): void {
     // Define what rule sets will be applied
     $rectorConfig->sets([
         SetList::DEAD_CODE,
-        LevelSetList::UP_TO_PHP_80,
+        SetList::PHP_80,
     ]);
 
     // Define what single rules will be applied
