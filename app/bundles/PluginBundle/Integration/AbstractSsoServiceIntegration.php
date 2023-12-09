@@ -2,10 +2,10 @@
 
 namespace Mautic\PluginBundle\Integration;
 
-use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Mautic\CoreBundle\Form\Type\YesNoButtonGroupType;
 use Mautic\UserBundle\Entity\Role;
 use Mautic\UserBundle\Form\Type\RoleListType;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
 
 /**

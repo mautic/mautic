@@ -2,14 +2,14 @@
 
 namespace MauticPlugin\MauticCrmBundle\Integration;
 
-use Mautic\PluginBundle\Entity\Plugin;
-use Mautic\UserBundle\Entity\User;
 use Mautic\LeadBundle\DataObject\LeadManipulator;
 use Mautic\LeadBundle\Entity\Company;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Helper\IdentifyCompanyHelper;
 use Mautic\PluginBundle\Entity\Integration;
+use Mautic\PluginBundle\Entity\Plugin;
 use Mautic\PluginBundle\Integration\AbstractIntegration;
+use Mautic\UserBundle\Entity\User;
 use MauticPlugin\MauticCrmBundle\Api\CrmApi;
 
 abstract class CrmAbstractIntegration extends AbstractIntegration

@@ -2,11 +2,11 @@
 
 namespace Mautic\LeadBundle\Segment;
 
-use Psr\Log\LoggerInterface;
 use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\LeadBundle\Segment\Query\ContactSegmentQueryBuilder;
 use Mautic\LeadBundle\Segment\Query\LeadBatchLimiterTrait;
 use Mautic\LeadBundle\Segment\Query\QueryBuilder;
+use Psr\Log\LoggerInterface;
 
 class ContactSegmentService
 {

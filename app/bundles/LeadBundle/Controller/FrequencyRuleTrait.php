@@ -2,7 +2,6 @@
 
 namespace Mautic\LeadBundle\Controller;
 
-use Symfony\Contracts\Service\Attribute\Required;
 use Mautic\EmailBundle\Model\EmailModel;
 use Mautic\LeadBundle\Entity\DoNotContact;
 use Mautic\LeadBundle\Entity\Lead;
@@ -10,6 +9,7 @@ use Mautic\LeadBundle\Form\Type\ContactFrequencyType;
 use Mautic\LeadBundle\Model\LeadModel;
 use Symfony\Component\Form\Form;
 use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Contracts\Service\Attribute\Required;
 
 trait FrequencyRuleTrait
 {

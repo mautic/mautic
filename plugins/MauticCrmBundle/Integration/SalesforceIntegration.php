@@ -2,13 +2,13 @@
 
 namespace MauticPlugin\MauticCrmBundle\Integration;
 
-use Mautic\PluginBundle\Entity\IntegrationEntity;
 use Mautic\CoreBundle\Entity\AuditLog;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\LeadBundle\Entity\Company;
 use Mautic\LeadBundle\Entity\DoNotContact;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Helper\IdentifyCompanyHelper;
+use Mautic\PluginBundle\Entity\IntegrationEntity;
 use Mautic\PluginBundle\Entity\IntegrationEntityRepository;
 use Mautic\PluginBundle\Exception\ApiErrorException;
 use MauticPlugin\MauticCrmBundle\Api\SalesforceApi;

@@ -2,7 +2,6 @@
 
 namespace Mautic\LeadBundle\Controller;
 
-use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Doctrine\Persistence\ManagerRegistry;
 use Mautic\CoreBundle\Controller\FormController;
 use Mautic\CoreBundle\Factory\MauticFactory;
@@ -38,6 +37,7 @@ use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 

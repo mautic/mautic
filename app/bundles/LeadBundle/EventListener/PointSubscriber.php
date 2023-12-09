@@ -2,9 +2,9 @@
 
 namespace Mautic\LeadBundle\EventListener;
 
-use Mautic\LeadBundle\Helper\PointEventHelper;
 use Mautic\LeadBundle\Form\Type\ListActionType;
 use Mautic\LeadBundle\Form\Type\ModifyLeadTagsType;
+use Mautic\LeadBundle\Helper\PointEventHelper;
 use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\PointBundle\Event\TriggerBuilderEvent;
 use Mautic\PointBundle\Event\TriggerExecutedEvent;

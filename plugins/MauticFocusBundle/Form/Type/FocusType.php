@@ -2,7 +2,6 @@
 
 namespace MauticPlugin\MauticFocusBundle\Form\Type;
 
-use MauticPlugin\MauticFocusBundle\Entity\Focus;
 use Mautic\CategoryBundle\Form\Type\CategoryListType;
 use Mautic\CoreBundle\Form\EventListener\CleanFormSubscriber;
 use Mautic\CoreBundle\Form\EventListener\FormExitSubscriber;
@@ -14,6 +13,7 @@ use Mautic\CoreBundle\Form\Type\YesNoButtonGroupType;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\EmailBundle\Form\Type\EmailUtmTagsType;
 use Mautic\FormBundle\Form\Type\FormListType;
+use MauticPlugin\MauticFocusBundle\Entity\Focus;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;

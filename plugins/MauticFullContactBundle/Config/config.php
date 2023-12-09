@@ -2,6 +2,7 @@
 
 use MauticPlugin\MauticFullContactBundle\Helper\LookupHelper;
 use MauticPlugin\MauticFullContactBundle\Integration\FullContactIntegration;
+
 return [
     'name'        => 'FullContact',
     'description' => 'Enables integration with FullContact for contact and company lookup',

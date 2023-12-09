@@ -1,13 +1,14 @@
 <?php
 
+use MauticPlugin\MauticCrmBundle\Integration\ConnectwiseIntegration;
+use MauticPlugin\MauticCrmBundle\Integration\DynamicsIntegration;
 use MauticPlugin\MauticCrmBundle\Integration\HubspotIntegration;
 use MauticPlugin\MauticCrmBundle\Integration\SalesforceIntegration;
 use MauticPlugin\MauticCrmBundle\Integration\SugarcrmIntegration;
 use MauticPlugin\MauticCrmBundle\Integration\VtigerIntegration;
 use MauticPlugin\MauticCrmBundle\Integration\ZohoIntegration;
-use MauticPlugin\MauticCrmBundle\Integration\DynamicsIntegration;
-use MauticPlugin\MauticCrmBundle\Integration\ConnectwiseIntegration;
 use MauticPlugin\MauticCrmBundle\Services\Transport;
+
 return [
     'name'        => 'CRM',
     'description' => 'Enables integration with Mautic supported CRMs.',

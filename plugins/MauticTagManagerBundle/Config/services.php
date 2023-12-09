@@ -1,9 +1,8 @@
 <?php
 
 declare(strict_types=1);
-use MauticPlugin\MauticTagManagerBundle\Model\TagModel;
-
 use Mautic\CoreBundle\DependencyInjection\MauticCoreExtension;
+use MauticPlugin\MauticTagManagerBundle\Model\TagModel;
 use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
 
 return function (ContainerConfigurator $configurator): void {

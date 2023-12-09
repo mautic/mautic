@@ -1,8 +1,9 @@
 <?php
 
 use MauticPlugin\MauticFocusBundle\Controller\Api\FocusApiController;
-use MauticPlugin\MauticFocusBundle\Helper\TokenHelper;
 use MauticPlugin\MauticFocusBundle\Helper\IframeAvailabilityChecker;
+use MauticPlugin\MauticFocusBundle\Helper\TokenHelper;
+
 return [
     'name'        => 'Mautic Focus',
     'description' => 'Drive visitor\'s focus on your website with Mautic Focus',

@@ -2,7 +2,6 @@
 
 namespace Mautic\PluginBundle\Model;
 
-use Mautic\PluginBundle\Entity\IntegrationEntity;
 use Doctrine\DBAL\Schema\Schema;
 use Doctrine\ORM\EntityManager;
 use Mautic\CoreBundle\Helper\BundleHelper;
@@ -12,6 +11,7 @@ use Mautic\CoreBundle\Model\FormModel;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\CoreBundle\Translation\Translator;
 use Mautic\LeadBundle\Model\FieldModel;
+use Mautic\PluginBundle\Entity\IntegrationEntity;
 use Mautic\PluginBundle\Entity\Plugin;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;

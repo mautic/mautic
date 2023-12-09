@@ -2,12 +2,12 @@
 
 namespace Mautic\PluginBundle\Helper;
 
-use Mautic\LeadBundle\Entity\Lead;
 use Doctrine\ORM\EntityManager;
 use Mautic\CoreBundle\Helper\BundleHelper;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\CoreBundle\Helper\PathsHelper;
+use Mautic\LeadBundle\Entity\Lead;
 use Mautic\PluginBundle\Entity\Integration;
 use Mautic\PluginBundle\Entity\Plugin;
 use Mautic\PluginBundle\Integration\AbstractIntegration;

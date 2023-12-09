@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace MauticPlugin\MauticFocusBundle\Twig\Extension;
 
 use MatthiasMullie\Minify\CSS;
-use MatthiasMullie\Minify;
 use MauticPlugin\MauticFocusBundle\Model\FocusModel;
 use Twig\Extension\AbstractExtension;
 use Twig\TwigFilter;

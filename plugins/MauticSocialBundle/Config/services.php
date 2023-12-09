@@ -1,11 +1,10 @@
 <?php
 
 declare(strict_types=1);
+use Mautic\CoreBundle\DependencyInjection\MauticCoreExtension;
 use MauticPlugin\MauticSocialBundle\Model\MonitoringModel;
 use MauticPlugin\MauticSocialBundle\Model\PostCountModel;
 use MauticPlugin\MauticSocialBundle\Model\TweetModel;
-
-use Mautic\CoreBundle\DependencyInjection\MauticCoreExtension;
 use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
 
 return function (ContainerConfigurator $configurator): void {

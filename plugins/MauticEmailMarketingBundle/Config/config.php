@@ -3,6 +3,7 @@
 use MauticPlugin\MauticEmailMarketingBundle\Integration\ConstantContactIntegration;
 use MauticPlugin\MauticEmailMarketingBundle\Integration\IcontactIntegration;
 use MauticPlugin\MauticEmailMarketingBundle\Integration\MailchimpIntegration;
+
 return [
     'name'        => 'Email Marketing',
     'description' => 'Enables integration with Mautic supported email marketing services.',

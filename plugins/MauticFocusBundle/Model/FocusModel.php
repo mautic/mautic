@@ -2,11 +2,9 @@
 
 namespace MauticPlugin\MauticFocusBundle\Model;
 
-use Symfony\Component\Form\FormInterface;
-use MatthiasMullie\Minify\JS;
 use Doctrine\DBAL\Query\QueryBuilder;
 use Doctrine\ORM\EntityManagerInterface;
-use MatthiasMullie\Minify;
+use MatthiasMullie\Minify\JS;
 use Mautic\CoreBundle\Event\TokenReplacementEvent;
 use Mautic\CoreBundle\Helper\Chart\ChartQuery;
 use Mautic\CoreBundle\Helper\Chart\LineChart;
@@ -30,6 +28,7 @@ use MauticPlugin\MauticFocusBundle\Form\Type\FocusType;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\FormFactoryInterface;
+use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Contracts\EventDispatcher\Event;

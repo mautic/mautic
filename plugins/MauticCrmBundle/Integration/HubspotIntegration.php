@@ -2,7 +2,6 @@
 
 namespace MauticPlugin\MauticCrmBundle\Integration;
 
-use Mautic\PluginBundle\Entity\IntegrationEntity;
 use Doctrine\ORM\EntityManager;
 use Mautic\CoreBundle\Helper\ArrayHelper;
 use Mautic\CoreBundle\Helper\CacheStorageHelper;
@@ -17,6 +16,7 @@ use Mautic\LeadBundle\Model\CompanyModel;
 use Mautic\LeadBundle\Model\DoNotContact;
 use Mautic\LeadBundle\Model\FieldModel;
 use Mautic\LeadBundle\Model\LeadModel;
+use Mautic\PluginBundle\Entity\IntegrationEntity;
 use Mautic\PluginBundle\Entity\IntegrationEntityRepository;
 use Mautic\PluginBundle\Model\IntegrationEntityModel;
 use Mautic\StageBundle\Entity\Stage;

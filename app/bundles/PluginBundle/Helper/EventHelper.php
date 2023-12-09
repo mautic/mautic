@@ -2,8 +2,8 @@
 
 namespace Mautic\PluginBundle\Helper;
 
-use Mautic\LeadBundle\Entity\Lead;
 use Mautic\CoreBundle\Factory\MauticFactory;
+use Mautic\LeadBundle\Entity\Lead;
 use Mautic\PluginBundle\EventListener\PushToIntegrationTrait;
 
 class EventHelper

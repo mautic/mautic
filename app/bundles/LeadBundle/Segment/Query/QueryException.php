@@ -3,6 +3,7 @@
 namespace Mautic\LeadBundle\Segment\Query;
 
 use Doctrine\DBAL\Exception;
+
 /**
  * @since 2.1.4
  */

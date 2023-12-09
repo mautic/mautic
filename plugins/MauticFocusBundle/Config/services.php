@@ -1,9 +1,8 @@
 <?php
 
 declare(strict_types=1);
-use MauticPlugin\MauticFocusBundle\Model\FocusModel;
-
 use Mautic\CoreBundle\DependencyInjection\MauticCoreExtension;
+use MauticPlugin\MauticFocusBundle\Model\FocusModel;
 use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
 
 return function (ContainerConfigurator $configurator): void {

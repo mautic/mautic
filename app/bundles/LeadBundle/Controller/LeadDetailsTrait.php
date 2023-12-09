@@ -3,7 +3,6 @@
 namespace Mautic\LeadBundle\Controller;
 
 use Mautic\CampaignBundle\Entity\LeadEventLog;
-use Symfony\Contracts\Service\Attribute\Required;
 use Mautic\CoreBundle\Entity\AuditLogRepository;
 use Mautic\CoreBundle\Helper\Chart\ChartQuery;
 use Mautic\CoreBundle\Helper\Chart\LineChart;
@@ -11,6 +10,7 @@ use Mautic\CoreBundle\Model\AuditLogModel;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Model\LeadModel;
 use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Contracts\Service\Attribute\Required;
 
 trait LeadDetailsTrait
 {

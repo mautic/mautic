@@ -7,6 +7,7 @@ use MauticPlugin\MauticSocialBundle\Integration\FacebookIntegration;
 use MauticPlugin\MauticSocialBundle\Integration\FoursquareIntegration;
 use MauticPlugin\MauticSocialBundle\Integration\InstagramIntegration;
 use MauticPlugin\MauticSocialBundle\Integration\TwitterIntegration;
+
 return [
     'name'        => 'Social Media',
     'description' => 'Enables integrations with Mautic supported social media services.',

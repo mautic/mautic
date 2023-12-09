@@ -2,8 +2,8 @@
 
 namespace Mautic\LeadBundle\Entity;
 
-use Doctrine\Common\Collections\Criteria;
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Criteria;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Exception\DriverException;
 use Doctrine\DBAL\Query\Expression\CompositeExpression;

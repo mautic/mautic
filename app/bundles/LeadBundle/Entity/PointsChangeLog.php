@@ -2,9 +2,9 @@
 
 namespace Mautic\LeadBundle\Entity;
 
-use Mautic\CoreBundle\Entity\IpAddress;
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
+use Mautic\CoreBundle\Entity\IpAddress;
 use Mautic\PointBundle\Entity\Group;
 
 class PointsChangeLog

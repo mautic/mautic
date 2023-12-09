@@ -2,7 +2,6 @@
 
 namespace MauticPlugin\MauticSocialBundle\Model;
 
-use Symfony\Component\Form\FormInterface;
 use Mautic\CoreBundle\Model\FormModel;
 use MauticPlugin\MauticSocialBundle\Entity\Monitoring;
 use MauticPlugin\MauticSocialBundle\Event as Events;
@@ -11,6 +10,7 @@ use MauticPlugin\MauticSocialBundle\Form\Type\TwitterHashtagType;
 use MauticPlugin\MauticSocialBundle\Form\Type\TwitterMentionType;
 use MauticPlugin\MauticSocialBundle\SocialEvents;
 use Symfony\Component\Form\FormFactoryInterface;
+use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 use Symfony\Contracts\EventDispatcher\Event;
 

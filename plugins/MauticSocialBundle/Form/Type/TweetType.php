@@ -2,13 +2,13 @@
 
 namespace MauticPlugin\MauticSocialBundle\Form\Type;
 
-use Mautic\AssetBundle\Entity\Asset;
-use Mautic\PageBundle\Entity\Page;
 use Doctrine\ORM\EntityManager;
+use Mautic\AssetBundle\Entity\Asset;
 use Mautic\AssetBundle\Form\Type\AssetListType;
 use Mautic\CategoryBundle\Form\Type\CategoryListType;
 use Mautic\CoreBundle\Form\DataTransformer\IdToEntityModelTransformer;
 use Mautic\CoreBundle\Form\Type\FormButtonsType;
+use Mautic\PageBundle\Entity\Page;
 use Mautic\PageBundle\Form\Type\PageListType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ButtonType;

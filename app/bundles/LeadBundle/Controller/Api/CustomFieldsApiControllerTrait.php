@@ -2,7 +2,6 @@
 
 namespace Mautic\LeadBundle\Controller\Api;
 
-use Symfony\Contracts\Service\Attribute\Required;
 use Mautic\LeadBundle\Entity\Company;
 use Mautic\LeadBundle\Entity\CustomFieldEntityInterface;
 use Mautic\LeadBundle\Entity\Lead;
@@ -11,6 +10,7 @@ use Mautic\LeadBundle\Model\LeadModel;
 use Symfony\Component\Form\Form;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Contracts\Service\Attribute\Required;
 
 trait CustomFieldsApiControllerTrait
 {

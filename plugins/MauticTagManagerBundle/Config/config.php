@@ -1,8 +1,9 @@
 <?php
 
-use MauticPlugin\MauticTagManagerBundle\Integration\TagManagerIntegration;
 use Doctrine\ORM\EntityRepository;
 use MauticPlugin\MauticTagManagerBundle\Entity\Tag;
+use MauticPlugin\MauticTagManagerBundle\Integration\TagManagerIntegration;
+
 return [
     'name'        => 'Mautic tag manager bundle',
     'description' => 'Provides an interface for tags management.',

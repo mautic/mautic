@@ -2,12 +2,12 @@
 
 namespace MauticPlugin\MauticTagManagerBundle\Model;
 
-use Symfony\Component\Form\FormInterface;
 use Mautic\LeadBundle\Model\TagModel as BaseTagModel;
 use MauticPlugin\MauticTagManagerBundle\Entity\Tag;
 use MauticPlugin\MauticTagManagerBundle\Entity\TagRepository;
 use MauticPlugin\MauticTagManagerBundle\Form\Type\TagEntityType;
 use Symfony\Component\Form\FormFactoryInterface;
+use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 
 /**

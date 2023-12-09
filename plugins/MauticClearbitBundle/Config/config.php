@@ -2,6 +2,7 @@
 
 use MauticPlugin\MauticClearbitBundle\Helper\LookupHelper;
 use MauticPlugin\MauticClearbitBundle\Integration\ClearbitIntegration;
+
 return [
     'name'        => 'Clearbit',
     'description' => 'Enables integration with Clearbit for contact and company lookup',

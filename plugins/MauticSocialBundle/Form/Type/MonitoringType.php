@@ -2,7 +2,6 @@
 
 namespace MauticPlugin\MauticSocialBundle\Form\Type;
 
-use MauticPlugin\MauticSocialBundle\Entity\Monitoring;
 use Mautic\CategoryBundle\Form\Type\CategoryListType;
 use Mautic\CoreBundle\Form\EventListener\CleanFormSubscriber;
 use Mautic\CoreBundle\Form\Type\FormButtonsType;
@@ -10,6 +9,7 @@ use Mautic\CoreBundle\Form\Type\PublishDownDateType;
 use Mautic\CoreBundle\Form\Type\PublishUpDateType;
 use Mautic\CoreBundle\Form\Type\YesNoButtonGroupType;
 use Mautic\LeadBundle\Form\Type\LeadListType;
+use MauticPlugin\MauticSocialBundle\Entity\Monitoring;
 use MauticPlugin\MauticSocialBundle\Model\MonitoringModel;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;

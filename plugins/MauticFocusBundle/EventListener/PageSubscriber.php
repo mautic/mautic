@@ -2,7 +2,6 @@
 
 namespace MauticPlugin\MauticFocusBundle\EventListener;
 
-use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Mautic\CoreBundle\Helper\BuilderTokenHelperFactory;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\PageBundle\Event\PageBuilderEvent;
@@ -10,6 +9,7 @@ use Mautic\PageBundle\Event\PageDisplayEvent;
 use Mautic\PageBundle\PageEvents;
 use MauticPlugin\MauticFocusBundle\Model\FocusModel;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Routing\RouterInterface;
 
 class PageSubscriber implements EventSubscriberInterface

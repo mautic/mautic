@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
+use MauticPlugin\GrapesJsBuilderBundle\Helper\FileManager;
 use MauticPlugin\GrapesJsBuilderBundle\Integration\Config;
 use MauticPlugin\GrapesJsBuilderBundle\Integration\GrapesJsBuilderIntegration;
-use MauticPlugin\GrapesJsBuilderBundle\Integration\Support\ConfigSupport;
 use MauticPlugin\GrapesJsBuilderBundle\Integration\Support\BuilderSupport;
-use MauticPlugin\GrapesJsBuilderBundle\Helper\FileManager;
+use MauticPlugin\GrapesJsBuilderBundle\Integration\Support\ConfigSupport;
 
 return [
     'name'        => 'GrapesJS Builder',

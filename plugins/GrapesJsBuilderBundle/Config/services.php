@@ -1,9 +1,8 @@
 <?php
 
 declare(strict_types=1);
-use MauticPlugin\GrapesJsBuilderBundle\Model\GrapesJsBuilderModel;
-
 use Mautic\CoreBundle\DependencyInjection\MauticCoreExtension;
+use MauticPlugin\GrapesJsBuilderBundle\Model\GrapesJsBuilderModel;
 use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
 
 return function (ContainerConfigurator $configurator): void {
