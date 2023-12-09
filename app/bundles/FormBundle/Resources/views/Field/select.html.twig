@@ -226,11 +226,11 @@
   {% endfor %}
 {%- endmacro -%}
 
-<div {{ tag_attr(containerAttributes) }} >
-  {% if field.showLabel -%}<label {{ tag_attr(labelAttributes) }} >{{ field.label }}</label>{% endif %}
+<div {{ macros.tag_attr(containerAttributes) }} >
+  {% if field.showLabel -%}<label {{ macros.tag_attr(labelAttributes) }} >{{ field.label }}</label>{% endif %}
   {% if field.helpMessage is not empty %}<span class="mauticform-helpmessage">{{ field.helpMessage|purify }}</span>{% endif %}
 
-  <select {{ tag_attr(inputAttributes) }} >
+  <select {{ macros.tag_attr(inputAttributes) }} >
     {# (!empty($properties['placeholder']) || empty($field['defaultValue']) && empty($properties['multiple'])) #}
     {%- if
           (

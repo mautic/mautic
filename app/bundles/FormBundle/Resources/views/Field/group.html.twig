@@ -219,12 +219,12 @@
 {% endif %}
 {% set firstId = 'mauticform_' ~ containerType ~ '_' ~ type ~ '_' ~ field.alias ~ '_' ~ inputAlphanum(inputTransliterate(firstListValue|default(null))) ~ '1' %}
 
-<div {{ tag_attr(containerAttributes) }} >
+<div {{ macros.tag_attr(containerAttributes) }} >
   {% if field.showLabel %}
     {% set labelAttributes = labelAttributes|merge({
             'for': firstId,
     }) %}
-    <label {{ tag_attr(labelAttributes) }} >{{ field.label }}</label>
+    <label {{ macros.tag_attr(labelAttributes) }} >{{ field.label }}</label>
   {% endif %}
   {% if field.helpMessage is not empty %}<span class="mauticform-helpmessage">{{ field.helpMessage|purify }}</span>{% endif %}
 
@@ -245,12 +245,12 @@
 
     {% if wrapDiv %}<div class="mauticform-{{ containerType }}-row">{% endif %}
 
-    <input {{ tag_attr(inputAttributes) }}  />
+    <input {{ macros.tag_attr(inputAttributes) }}  />
     {% set optionLabelAttr = optionLabelAttr|merge({
             'id': 'mauticform_' ~ containerType ~ '_label_' ~ id,
             'for': 'mauticform_' ~ containerType ~ '_' ~ type ~ '_' ~ id,
     }) %}
-    <label {{ tag_attr(optionLabelAttr) }} >{{ listLabel }}</label>
+    <label {{ macros.tag_attr(optionLabelAttr) }} >{{ listLabel }}</label>
 
     {% if wrapDiv %}</div>{% endif %}
   {% endfor %}

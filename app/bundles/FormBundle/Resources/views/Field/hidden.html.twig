@@ -124,13 +124,13 @@
 {# end: field_helper #}
 
 {% if inForm is defined and true == inForm %}
-  <div {{ tag_attr(containerAttributes) }} >
+  <div {{ macros.tag_attr(containerAttributes) }} >
       <label class="text-muted">{{ field.label }}</label>
   </div>
 {% else %}
   {% set inputAttributes = inputAttributes|merge({
           'type': 'hidden',
   }) %}
-  <input {{ tag_attr(inputAttributes) }}  />
+  <input {{ macros.tag_attr(inputAttributes) }}  />
 {% endif %}
 

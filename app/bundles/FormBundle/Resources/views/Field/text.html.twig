@@ -139,14 +139,14 @@
 {# end: field_helper #}
 
 <div {{ macros.tag_attr(containerAttributes) }} >
-  {% if field.showLabel %}<label {{ tag_attr(labelAttributes) }} >{{ field.label }}</label>{% endif %}
+  {% if field.showLabel %}<label {{ macros.tag_attr(labelAttributes) }} >{{ field.label }}</label>{% endif %}
 
   {% if field.helpMessage is not empty %}<span class="mauticform-helpmessage">{{ field.helpMessage|purify }}</span>{% endif %}
 
   {% if 'textarea' == field.type %}
-    <textarea {{ tag_attr(inputAttributes) }} >{{ field.defaultValue }}</textarea>
+    <textarea {{ macros.tag_attr(inputAttributes) }} >{{ field.defaultValue }}</textarea>
   {% else %}
-    <input type="{{ containerType }}" {{ tag_attr(inputAttributes) }}  />
+    <input type="{{ containerType }}" {{ macros.tag_attr(inputAttributes) }}  />
   {% endif %}
 
   <span class="mauticform-errormsg" style="display:none;">{{ validationMessage }}</span>

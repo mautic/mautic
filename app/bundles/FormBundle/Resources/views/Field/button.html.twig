@@ -123,6 +123,6 @@
         'name': 'mauticform[' ~ field.alias ~ ']',
         'value': '1',
 }) %}
-<div tag_attr(containerAttributes) >
-  <button {{ tag_attr(inputAttributes) }} >{{ field.label }}</button>
+<div macros.tag_attr(containerAttributes) >
+  <button {{ macros.tag_attr(inputAttributes) }} >{{ field.label }}</button>
 </div>

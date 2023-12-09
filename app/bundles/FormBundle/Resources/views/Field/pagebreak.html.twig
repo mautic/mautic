@@ -214,7 +214,7 @@
     }) %}
 {% endif %}
 
-<div {{ tag_attr(containerAttributes) }} >
-  <button {{ tag_attr(backButtonAttr) }} >{{ field.properties.prev_page_label }}</button>
-  <button {{ tag_attr(nextButtonAttr) }} >{{ field.properties.next_page_label }}</button>
+<div {{ macros.tag_attr(containerAttributes) }} >
+  <button {{ macros.tag_attr(backButtonAttr) }} >{{ field.properties.prev_page_label }}</button>
+  <button {{ macros.tag_attr(nextButtonAttr) }} >{{ field.properties.next_page_label }}</button>
 </div>
