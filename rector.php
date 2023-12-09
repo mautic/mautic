@@ -22,6 +22,8 @@ return static function (Rector\Config\RectorConfig $rectorConfig): void {
     ]);
 
     $rectorConfig->skip([
+        \Rector\Symfony\CodeQuality\Rector\ClassMethod\ActionSuffixRemoverRector::class,
+
         '*/Test/*',
         '*/Tests/*',
         '*.html.php',
@@ -90,67 +92,21 @@ return static function (Rector\Config\RectorConfig $rectorConfig): void {
         ],
     ]);
 
-    foreach (['dev', 'test', 'prod'] as $environment) {
-        $environmentCap = ucfirst($environment);
-        $xmlPath        = __DIR__."/var/cache/{$environment}/appAppKernel{$environmentCap}DebugContainer.xml";
-        if (file_exists($xmlPath)) {
-            $rectorConfig->symfonyContainerXml($xmlPath);
-            break;
-        }
-    }
+//    foreach (['dev', 'test', 'prod'] as $environment) {
+//        $environmentCap = ucfirst($environment);
+//        $xmlPath        = __DIR__."/var/cache/{$environment}/appAppKernel{$environmentCap}DebugContainer.xml";
+//        if (file_exists($xmlPath)) {
+//            $rectorConfig->symfonyContainerXml($xmlPath);
+//            break;
+//        }
+//    }
+//
+//    $rectorConfig->cacheClass(FileCacheStorage::class);
+//    $rectorConfig->cacheDirectory(__DIR__.'/var/cache/rector');
 
-    $rectorConfig->cacheClass(FileCacheStorage::class);
-    $rectorConfig->cacheDirectory(__DIR__.'/var/cache/rector');
-
-    // Define what rule sets will be applied
     $rectorConfig->sets([
-        // helps with rebase of PRs for Symfony 3 and 4, @see https://github.com/mautic/mautic/pull/12676#issuecomment-1695531274
-        // remove when not needed to keep memory usage lower
-        \Rector\Symfony\Set\SymfonyLevelSetList::UP_TO_SYMFONY_54,
-
-        \Rector\Doctrine\Set\DoctrineSetList::ANNOTATIONS_TO_ATTRIBUTES,
-        \Rector\Doctrine\Set\DoctrineSetList::DOCTRINE_CODE_QUALITY,
-        \Rector\Doctrine\Set\DoctrineSetList::DOCTRINE_COMMON_20,
-        \Rector\Doctrine\Set\DoctrineSetList::DOCTRINE_DBAL_211,
-        \Rector\Doctrine\Set\DoctrineSetList::DOCTRINE_DBAL_30,
-        // \Rector\Doctrine\Set\DoctrineSetList::DOCTRINE_DBAL_40, this rule should run after the upgrade to doctrine 4.0
-        \Rector\Doctrine\Set\DoctrineSetList::DOCTRINE_ORM_213,
-        \Rector\Doctrine\Set\DoctrineSetList::DOCTRINE_ORM_214,
-        \Rector\Doctrine\Set\DoctrineSetList::DOCTRINE_ORM_29,
-        // \Rector\Doctrine\Set\DoctrineSetList::DOCTRINE_REPOSITORY_AS_SERVICE, will break code in Mautic, needs to be fixed first
-        \Rector\Doctrine\Set\DoctrineSetList::DOCTRINE_ORM_25,
-
-        \Rector\Set\ValueObject\SetList::DEAD_CODE,
-        \Rector\Set\ValueObject\LevelSetList::UP_TO_PHP_80,
-    ]);
-
-    // Define what single rules will be applied
-    $rectorConfig->rules([
-        \Rector\Php80\Rector\Switch_\ChangeSwitchToMatchRector::class,
-        \Rector\TypeDeclaration\Rector\ClassMethod\NumericReturnTypeFromStrictScalarReturnsRector::class,
-        \Rector\TypeDeclaration\Rector\ClassMethod\ReturnTypeFromReturnNewRector::class,
-        \Rector\TypeDeclaration\Rector\ClassMethod\ReturnTypeFromStrictNativeCallRector::class,
-        \Rector\TypeDeclaration\Rector\ClassMethod\ReturnTypeFromStrictNewArrayRector::class,
-        \Rector\TypeDeclaration\Rector\ClassMethod\ReturnTypeFromStrictParamRector::class,
-        \Rector\TypeDeclaration\Rector\Class_\ReturnTypeFromStrictTernaryRector::class,
-
-        // \Rector\Php80\Rector\Catch_\RemoveUnusedVariableInCatchRector::class,
-        \Rector\Php80\Rector\Class_\ClassPropertyAssignToConstructorPromotionRector::class,
-        BoolReturnTypeFromStrictScalarReturnsRector::class,
-        AddVoidReturnTypeWhereNoReturnRector::class,
-        TypedPropertyFromStrictConstructorRector::class,
-        TypedPropertyFromStrictSetUpRector::class,
-        RemoveUnusedVariableAssignRector::class,
-        RemoveUselessVarTagRector::class,
-        SimplifyUselessVariableRector::class,
-        ReturnTypeFromStrictBoolReturnExprRector::class,
-        ReturnTypeFromStrictConstantReturnRector::class,
-        ReturnTypeFromReturnDirectArrayRector::class,
-        ContainerGetToConstructorInjectionRector::class,
-
-        // PHP 8.0
-        \Rector\Php80\Rector\NotIdentical\StrContainsRector::class,
-        \Rector\Php80\Rector\Identical\StrStartsWithRector::class,
+        \Rector\Symfony\Set\SymfonySetList::SYMFONY_CODE_QUALITY,
+        \Rector\Symfony\Set\SymfonySetList::ANNOTATIONS_TO_ATTRIBUTES,
     ]);
 
     $rectorConfig->phpVersion(\Rector\Core\ValueObject\PhpVersion::PHP_80);
