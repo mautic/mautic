@@ -126,7 +126,7 @@ class AbstractIntegrationTest extends AbstractIntegrationTestCase
     /**
      * @return iterable<mixed[]>
      */
-    public function requestProvider(): iterable
+    public static function requestProvider(): iterable
     {
         // Test with JSON.
         yield [

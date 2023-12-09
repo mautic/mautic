@@ -107,7 +107,7 @@ class MatchFilterForLeadTraitTest extends TestCase
         $this->assertEquals($expect, $this->matchFilterForLeadTrait->match($filters, $lead));
     }
 
-    public function dateMatchTestProvider(): iterable
+    public static function dateMatchTestProvider(): iterable
     {
         $date = '2021-05-01';
 

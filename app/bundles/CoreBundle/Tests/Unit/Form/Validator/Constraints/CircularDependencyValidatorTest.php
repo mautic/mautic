@@ -177,7 +177,7 @@ class CircularDependencyValidatorTest extends \PHPUnit\Framework\TestCase
             ->validate($filters, new CircularDependency(['message' => 'mautic.core.segment.circular_dependency_exists']));
     }
 
-    public function validateDataProvider()
+    public static function validateDataProvider()
     {
         $constraint = new CircularDependency(['message' => 'mautic.core.segment.circular_dependency_exists']);
 

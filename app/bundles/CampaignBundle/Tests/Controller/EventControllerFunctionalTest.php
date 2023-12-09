@@ -48,7 +48,7 @@ final class EventControllerFunctionalTest extends MauticMysqlTestCase
     /**
      * @return string[][]
      */
-    public function fieldAndValueProvider(): array
+    public static function fieldAndValueProvider(): array
     {
         return [
             'country'  => ['country', 'India'],

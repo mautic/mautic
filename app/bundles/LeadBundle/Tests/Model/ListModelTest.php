@@ -128,7 +128,7 @@ class ListModelTest extends TestCase
         $this->fixture = $mockListModel;
     }
 
-    public function sourceTypeTestDataProvider(): array
+    public static function sourceTypeTestDataProvider(): array
     {
         return [
             [

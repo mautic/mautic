@@ -413,7 +413,7 @@ class FormModelTest extends \PHPUnit\Framework\TestCase
     /**
      * @return array<string[]>
      */
-    public function fieldTypeProvider(): array
+    public static function fieldTypeProvider(): array
     {
         return [
             ['select'],
