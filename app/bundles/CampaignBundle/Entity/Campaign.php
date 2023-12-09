@@ -24,6 +24,7 @@ class Campaign extends FormEntity implements PublishStatusIconAttributesInterfac
 
     /**
      * @var string
+     * @Assert\NotBlank(message="mautic.core.name.required")
      */
     private $name;
 
@@ -142,18 +143,6 @@ class Campaign extends FormEntity implements PublishStatusIconAttributesInterfac
             ->build();
 
         $builder->addNamedField('allowRestart', 'integer', 'allow_restart');
-    }
-
-    public static function loadValidatorMetadata(ClassMetadata $metadata): void
-    {
-        $metadata->addPropertyConstraint(
-            'name',
-            new Assert\NotBlank(
-                [
-                    'message' => 'mautic.core.name.required',
-                ]
-            )
-        );
     }
 
     /**

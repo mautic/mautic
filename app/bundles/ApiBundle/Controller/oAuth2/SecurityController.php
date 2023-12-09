@@ -50,6 +50,6 @@ class SecurityController extends CommonController
 
     public function loginCheckAction(): Response
     {
-        return new Response('', 400);
+        return new Response('', \Symfony\Component\HttpFoundation\Response::HTTP_BAD_REQUEST);
     }
 }

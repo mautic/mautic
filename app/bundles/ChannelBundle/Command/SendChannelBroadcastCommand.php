@@ -19,6 +19,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
  */
 class SendChannelBroadcastCommand extends ModeratedCommand
 {
+    protected static $defaultName = 'mautic:broadcasts:send';
     public function __construct(private TranslatorInterface $translator, private EventDispatcherInterface $dispatcher, PathsHelper $pathsHelper, CoreParametersHelper $coreParametersHelper)
     {
         parent::__construct($pathsHelper, $coreParametersHelper);
@@ -26,7 +27,7 @@ class SendChannelBroadcastCommand extends ModeratedCommand
 
     protected function configure()
     {
-        $this->setName('mautic:broadcasts:send')
+        $this
             ->setHelp(
                 <<<'EOT'
                 The <info>%command.name%</info> command is send a channel broadcast to pending contacts.

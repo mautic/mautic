@@ -12,6 +12,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 class InstallCommand extends Command
 {
+    protected static $defaultName = self::NAME;
     public const NAME = 'mautic:marketplace:install';
 
     public function __construct(private ComposerHelper $composer, private PackageModel $packageModel)
@@ -21,7 +22,6 @@ class InstallCommand extends Command
 
     protected function configure(): void
     {
-        $this->setName(self::NAME);
         $this->addArgument('package', InputArgument::REQUIRED, 'The Packagist package to install (e.g. mautic/example-plugin)');
         $this->addOption('dry-run', null, null, 'Simulate the installation of the package. Doesn\'t actually install it.');
 

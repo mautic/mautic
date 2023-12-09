@@ -14,6 +14,7 @@ use Symfony\Component\Console\Output\OutputInterface;
  */
 class ClearCacheCommand extends Command
 {
+    protected static $defaultName = 'mautic:cache:clear';
     public function __construct(private CacheProviderInterface $cacheProvider)
     {
         parent::__construct();
@@ -21,7 +22,6 @@ class ClearCacheCommand extends Command
 
     protected function configure(): void
     {
-        $this->setName('mautic:cache:clear');
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int

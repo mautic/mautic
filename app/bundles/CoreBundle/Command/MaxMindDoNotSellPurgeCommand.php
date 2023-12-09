@@ -18,6 +18,7 @@ use Symfony\Component\Console\Output\OutputInterface;
  */
 class MaxMindDoNotSellPurgeCommand extends Command
 {
+    protected static $defaultName = 'mautic:max-mind:purge';
     /**
      * @var LeadRepository
      */
@@ -34,7 +35,7 @@ class MaxMindDoNotSellPurgeCommand extends Command
      */
     protected function configure()
     {
-        $this->setName('mautic:max-mind:purge')
+        $this
             ->addOption(
                 'dry-run',
                 'd',

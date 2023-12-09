@@ -27,6 +27,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class TriggerCampaignCommand extends ModeratedCommand
 {
+    protected static $defaultName = 'mautic:campaigns:trigger';
     use WriteCountTrait;
     private bool $kickoffOnly  = false;
     private bool $inactiveOnly = false;
@@ -67,7 +68,6 @@ class TriggerCampaignCommand extends ModeratedCommand
     protected function configure()
     {
         $this
-            ->setName('mautic:campaigns:trigger')
             ->addOption(
                 '--campaign-id',
                 '-i',

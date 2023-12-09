@@ -54,9 +54,9 @@ class NotificationApiController extends CommonApiController
                 $leadModel->saveEntity($currentLead);
             }
 
-            return new JsonResponse(['success' => true, 'osid' => $osid], 200, ['Access-Control-Allow-Origin' => '*']);
+            return new JsonResponse(['success' => true, 'osid' => $osid], \Symfony\Component\HttpFoundation\Response::HTTP_OK, ['Access-Control-Allow-Origin' => '*']);
         }
 
-        return new JsonResponse(['success' => 'false'], 200, ['Access-Control-Allow-Origin' => '*']);
+        return new JsonResponse(['success' => 'false'], \Symfony\Component\HttpFoundation\Response::HTTP_OK, ['Access-Control-Allow-Origin' => '*']);
     }
 }

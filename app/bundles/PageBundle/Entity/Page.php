@@ -17,6 +17,7 @@ use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
 
+#[Callback(callback: ')')]
 class Page extends FormEntity implements TranslationEntityInterface, VariantEntityInterface
 {
     use TranslationEntityTrait;
@@ -29,6 +30,7 @@ class Page extends FormEntity implements TranslationEntityInterface, VariantEnti
 
     /**
      * @var string
+     * @NotBlank(message="mautic.core.title.required")
      */
     private $title;
 
@@ -225,54 +227,6 @@ class Page extends FormEntity implements TranslationEntityInterface, VariantEnti
 
         self::addTranslationMetadata($builder, self::class);
         self::addVariantMetadata($builder, self::class);
-    }
-
-    public static function loadValidatorMetadata(ClassMetadata $metadata): void
-    {
-        $metadata->addPropertyConstraint('title', new NotBlank([
-            'message' => 'mautic.core.title.required',
-        ]));
-
-        $metadata->addConstraint(new Callback([
-            'callback' => function (Page $page, ExecutionContextInterface $context): void {
-                $type = $page->getRedirectType();
-                if (!is_null($type)) {
-                    $validator  = $context->getValidator();
-                    $violations = $validator->validate($page->getRedirectUrl(), [
-                        new Assert\Url(
-                            [
-                                'message' => 'mautic.core.value.required',
-                            ]
-                        ),
-                    ]);
-
-                    if (count($violations) > 0) {
-                        $string = (string) $violations;
-                        $context->buildViolation($string)
-                            ->atPath('redirectUrl')
-                            ->addViolation();
-                    }
-                }
-
-                if ($page->isVariant()) {
-                    // Get a summation of weights
-                    $parent   = $page->getVariantParent();
-                    $children = $parent ? $parent->getVariantChildren() : $page->getVariantChildren();
-
-                    $total = 0;
-                    foreach ($children as $child) {
-                        $settings = $child->getVariantSettings();
-                        $total += (int) $settings['weight'];
-                    }
-
-                    if ($total > 100) {
-                        $context->buildViolation('mautic.core.variant_weights_invalid')
-                            ->atPath('variantSettings[weight]')
-                            ->addViolation();
-                    }
-                }
-            },
-        ]));
     }
 
     /**

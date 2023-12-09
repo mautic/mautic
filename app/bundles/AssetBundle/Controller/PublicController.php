@@ -48,7 +48,7 @@ class PublicController extends CommonFormController
             if ($requestUri != $url) {
                 $model->trackDownload($entity, $request, 301);
 
-                return $this->redirect($url, 301);
+                return $this->redirect($url, \Symfony\Component\HttpFoundation\Response::HTTP_MOVED_PERMANENTLY);
             }
 
             if ($entity->isRemote()) {

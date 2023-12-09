@@ -14,6 +14,10 @@ use Mautic\LeadBundle\Form\Validator\Constraints\UniqueUserAlias;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
 
+/**
+ * @UniqueUserAlias(field="alias", message="mautic.lead.list.alias.unique")
+ * @SegmentInUse
+ */
 class LeadList extends FormEntity
 {
     public const TABLE_NAME = 'lead_lists';
@@ -25,6 +29,7 @@ class LeadList extends FormEntity
 
     /**
      * @var string
+     * @Assert\NotBlank(message="mautic.core.name.required")
      */
     private $name;
 
@@ -126,20 +131,6 @@ class LeadList extends FormEntity
             ->columnName('last_built_time')
             ->nullable()
             ->build();
-    }
-
-    public static function loadValidatorMetadata(ClassMetadata $metadata): void
-    {
-        $metadata->addPropertyConstraint('name', new Assert\NotBlank(
-            ['message' => 'mautic.core.name.required']
-        ));
-
-        $metadata->addConstraint(new UniqueUserAlias([
-            'field'   => 'alias',
-            'message' => 'mautic.lead.list.alias.unique',
-        ]));
-
-        $metadata->addConstraint(new SegmentInUse());
     }
 
     /**

@@ -62,6 +62,7 @@ class Import extends FormEntity
      * Base directory of the import.
      *
      * @var string
+     * @Assert\NotBlank(message="mautic.lead.import.dir.notblank")
      */
     private $dir;
 
@@ -69,6 +70,7 @@ class Import extends FormEntity
      * File name of the CSV file which is in the $dir.
      *
      * @var string
+     * @Assert\NotBlank(message="mautic.lead.import.file.notblank")
      */
     private $file = 'import.csv';
 
@@ -172,17 +174,6 @@ class Import extends FormEntity
             ->addNullableField('dateEnded', Types::DATETIME_MUTABLE, 'date_ended')
             ->addField('object', Types::STRING)
             ->addNullableField('properties', Types::JSON);
-    }
-
-    public static function loadValidatorMetadata(ClassMetadata $metadata): void
-    {
-        $metadata->addPropertyConstraint('dir', new Assert\NotBlank(
-            ['message' => 'mautic.lead.import.dir.notblank']
-        ));
-
-        $metadata->addPropertyConstraint('file', new Assert\NotBlank(
-            ['message' => 'mautic.lead.import.file.notblank']
-        ));
     }
 
     /**

@@ -13,6 +13,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class ValidateEventCommand extends Command
 {
+    protected static $defaultName = 'mautic:campaigns:validate';
     use WriteCountTrait;
 
     public function __construct(private InactiveExecutioner $inactiveExecution, private TranslatorInterface $translator, private FormatterHelper $formatterHelper)
@@ -26,7 +27,6 @@ class ValidateEventCommand extends Command
     protected function configure()
     {
         $this
-            ->setName('mautic:campaigns:validate')
             ->addOption(
                 '--decision-id',
                 null,

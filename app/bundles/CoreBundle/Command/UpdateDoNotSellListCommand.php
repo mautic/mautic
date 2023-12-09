@@ -10,6 +10,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class UpdateDoNotSellListCommand extends Command
 {
+    protected static $defaultName = 'mautic:donotsell:download';
     public function __construct(private MaxMindDoNotSellDownloadHelper $maxMindDoNotSellDownloadHelper, private TranslatorInterface $translator)
     {
         parent::__construct();
@@ -20,7 +21,7 @@ class UpdateDoNotSellListCommand extends Command
      */
     protected function configure()
     {
-        $this->setName('mautic:donotsell:download')
+        $this
             ->setHelp(
                 <<<'EOT'
                 The <info>%command.name%</info> command is used to update MaxMind Do Not Sell list.

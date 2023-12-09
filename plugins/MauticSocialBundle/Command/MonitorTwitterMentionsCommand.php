@@ -6,13 +6,12 @@ use MauticPlugin\MauticSocialBundle\Entity\Monitoring;
 
 class MonitorTwitterMentionsCommand extends MonitorTwitterBaseCommand
 {
+    protected static $defaultName = 'social:monitor:twitter:mentions';
     /**
      * Configure the command, set name and options.
      */
     protected function configure()
     {
-        $this->setName('social:monitor:twitter:mentions');
-
         parent::configure();
     }
 

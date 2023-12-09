@@ -20,6 +20,7 @@ class Message extends FormEntity
 
     /**
      * @var string
+     * @NotBlank(message="mautic.core.name.required")
      */
     private $name;
 
@@ -74,13 +75,6 @@ class Message extends FormEntity
             ->cascadePersist()
             ->cascadeDetach()
             ->build();
-    }
-
-    public static function loadValidatorMetadata(ValidationClassMetadata $metadata): void
-    {
-        $metadata->addPropertyConstraint('name', new NotBlank([
-            'message' => 'mautic.core.name.required',
-        ]));
     }
 
     public static function loadApiMetadata(ApiMetadataDriver $metadata): void

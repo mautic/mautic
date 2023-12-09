@@ -20,6 +20,7 @@ use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
 
+#[Callback(callback: ')')]
 class DynamicContent extends FormEntity implements VariantEntityInterface, TranslationEntityInterface
 {
     use TranslationEntityTrait;
@@ -33,6 +34,7 @@ class DynamicContent extends FormEntity implements VariantEntityInterface, Trans
 
     /**
      * @var string
+     * @NotBlank(message="mautic.core.name.required")
      */
     private $name;
 
@@ -166,55 +168,6 @@ class DynamicContent extends FormEntity implements VariantEntityInterface, Trans
                 ->columnName('slot_name')
                 ->nullable()
                 ->build();
-    }
-
-    /**
-     * @throws \Symfony\Component\Validator\Exception\ConstraintDefinitionException
-     * @throws \Symfony\Component\Validator\Exception\InvalidOptionsException
-     * @throws \Symfony\Component\Validator\Exception\MissingOptionsException
-     */
-    public static function loadValidatorMetaData(ClassMetadata $metadata): void
-    {
-        $metadata->addPropertyConstraint('name', new NotBlank(['message' => 'mautic.core.name.required']));
-
-        $metadata->addConstraint(new Callback([
-            'callback' => function (self $dwc, ExecutionContextInterface $context): void {
-                if (!$dwc->getIsCampaignBased()) {
-                    $validator  = $context->getValidator();
-                    $violations = $validator->validate(
-                        $dwc->getSlotName(),
-                        [
-                            new NotBlank(
-                                [
-                                    'message' => 'mautic.dynamicContent.slot_name.notblank',
-                                ]
-                            ),
-                        ]
-                    );
-                    foreach ($violations as $violation) {
-                        $context->buildViolation($violation->getMessage())
-                                ->atPath('slotName')
-                                ->addViolation();
-                    }
-                    $violations = $validator->validate(
-                        $dwc->getFilters(),
-                        [
-                            new Count(
-                                [
-                                    'minMessage' => 'mautic.dynamicContent.filter.options.empty',
-                                    'min'        => 1,
-                                ]
-                            ),
-                        ]
-                    );
-                    foreach ($violations as $violation) {
-                        $context->buildViolation($violation->getMessage())
-                                ->atPath('filters')
-                                ->addViolation();
-                    }
-                }
-            },
-        ]));
     }
 
     public static function loadApiMetadata(ApiMetadataDriver $metadata): void

@@ -191,7 +191,7 @@ class AjaxController extends CommonController
     /**
      * @return JsonResponse
      */
-    public function globalCommandListAction(Request $request)
+    public function globalCommandListAction()
     {
         $dispatcher = $this->dispatcher;
         $event      = new CommandListEvent();
@@ -230,7 +230,6 @@ class AjaxController extends CommonController
         }
         // ksort($dataArray);
         sort($dataArray);
-
         return $this->sendJsonResponse($dataArray);
     }
 

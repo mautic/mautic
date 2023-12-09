@@ -21,6 +21,7 @@ class Point extends FormEntity
 
     /**
      * @var string
+     * @Assert\NotBlank(message="mautic.core.name.required")
      */
     private $name;
 
@@ -31,6 +32,7 @@ class Point extends FormEntity
 
     /**
      * @var string
+     * @Assert\NotBlank(message="mautic.point.type.notblank")
      */
     private $type;
 
@@ -51,6 +53,8 @@ class Point extends FormEntity
 
     /**
      * @var int
+     * @Assert\NotBlank(message="mautic.point.delta.notblank")
+     * @Assert\Range(min=-2147483648, max=2147483647)
      */
     private $delta = 0;
 
@@ -118,26 +122,6 @@ class Point extends FormEntity
         $builder->createManyToOne('group', Group::class)
             ->addJoinColumn('group_id', 'id', true, false, 'CASCADE')
             ->build();
-    }
-
-    public static function loadValidatorMetadata(ClassMetadata $metadata): void
-    {
-        $metadata->addPropertyConstraint('name', new Assert\NotBlank([
-            'message' => 'mautic.core.name.required',
-        ]));
-
-        $metadata->addPropertyConstraint('type', new Assert\NotBlank([
-            'message' => 'mautic.point.type.notblank',
-        ]));
-
-        $metadata->addPropertyConstraint('delta', new Assert\NotBlank([
-            'message' => 'mautic.point.delta.notblank',
-        ]));
-
-        $metadata->addPropertyConstraint('delta', new Assert\Range([
-            'min' => IntHelper::MIN_INTEGER_VALUE,
-            'max' => IntHelper::MAX_INTEGER_VALUE,
-        ]));
     }
 
     /**

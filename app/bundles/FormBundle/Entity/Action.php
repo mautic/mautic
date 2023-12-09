@@ -27,6 +27,7 @@ class Action
 
     /**
      * @var string
+     * @Assert\NotBlank(message="mautic.core.name.required", groups={"action"})
      */
     private $type;
 
@@ -102,14 +103,6 @@ class Action
                 ]
             )
             ->build();
-    }
-
-    public static function loadValidatorMetadata(ClassMetadata $metadata): void
-    {
-        $metadata->addPropertyConstraint('type', new Assert\NotBlank([
-            'message' => 'mautic.core.name.required',
-            'groups'  => ['action'],
-        ]));
     }
 
     private function isChanged($prop, $val): void

@@ -18,6 +18,7 @@ class Category extends FormEntity
 
     /**
      * @var string
+     * @NotBlank(message="mautic.core.title.required")
      */
     private $title;
 
@@ -38,6 +39,7 @@ class Category extends FormEntity
 
     /**
      * @var string
+     * @NotBlank(message="mautic.core.value.required")
      */
     private $bundle;
 
@@ -61,27 +63,6 @@ class Category extends FormEntity
         $builder->createField('bundle', 'string')
             ->length(50)
             ->build();
-    }
-
-    public static function loadValidatorMetadata(ClassMetadata $metadata): void
-    {
-        $metadata->addPropertyConstraint(
-            'title',
-            new NotBlank(
-                [
-                    'message' => 'mautic.core.title.required',
-                ]
-            )
-        );
-
-        $metadata->addPropertyConstraint(
-            'bundle',
-            new NotBlank(
-                [
-                    'message' => 'mautic.core.value.required',
-                ]
-            )
-        );
     }
 
     /**

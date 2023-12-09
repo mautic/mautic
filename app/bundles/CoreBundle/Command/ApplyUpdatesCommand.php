@@ -20,6 +20,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
  */
 class ApplyUpdatesCommand extends Command
 {
+    protected static $defaultName = 'mautic:update:apply';
     public function __construct(
         private TranslatorInterface $translator,
         private StepProvider $stepProvider,
@@ -30,7 +31,7 @@ class ApplyUpdatesCommand extends Command
 
     protected function configure()
     {
-        $this->setName('mautic:update:apply')
+        $this
             ->setDefinition(
                 [
                     new InputOption(

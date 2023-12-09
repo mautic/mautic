@@ -24,6 +24,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
  */
 class PushTransifexCommand extends Command
 {
+    protected static $defaultName = self::NAME;
     public const NAME = 'mautic:transifex:push';
 
     public function __construct(
@@ -36,7 +37,7 @@ class PushTransifexCommand extends Command
 
     protected function configure(): void
     {
-        $this->setName(self::NAME)
+        $this
             ->addOption('bundle', null, InputOption::VALUE_OPTIONAL, 'Optional bundle to pull. Example value: WebhookBundle', null)
             ->setHelp(<<<'EOT'
 The <info>%command.name%</info> command is used to push translation resources to Transifex

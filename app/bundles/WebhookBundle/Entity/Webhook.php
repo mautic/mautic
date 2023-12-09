@@ -25,6 +25,7 @@ class Webhook extends FormEntity
 
     /**
      * @var string
+     * @NotBlank(message="mautic.core.name.required")
      */
     private $name;
 
@@ -35,6 +36,8 @@ class Webhook extends FormEntity
 
     /**
      * @var string
+     * @Assert\Url(message="mautic.core.valid_url_required")
+     * @Assert\NotBlank(message="mautic.core.valid_url_required")
      */
     private $webhookUrl;
 
@@ -81,6 +84,7 @@ class Webhook extends FormEntity
      * Null means use the global default.
      *
      * @var string|null
+     * @Assert\Choice("null", "ASC", "DESC")
      */
     private $eventsOrderbyDir;
 
@@ -141,47 +145,6 @@ class Webhook extends FormEntity
                 ]
             )
             ->build();
-    }
-
-    public static function loadValidatorMetadata(ClassMetadata $metadata): void
-    {
-        $metadata->addPropertyConstraint(
-            'name',
-            new NotBlank(
-                [
-                    'message' => 'mautic.core.name.required',
-                ]
-            )
-        );
-
-        $metadata->addPropertyConstraint(
-            'webhookUrl',
-            new Assert\Url(
-                [
-                    'message' => 'mautic.core.valid_url_required',
-                ]
-            )
-        );
-
-        $metadata->addPropertyConstraint(
-            'webhookUrl',
-            new Assert\NotBlank(
-                [
-                    'message' => 'mautic.core.valid_url_required',
-                ]
-            )
-        );
-
-        $metadata->addPropertyConstraint(
-            'eventsOrderbyDir',
-            new Assert\Choice(
-                [
-                    null,
-                    Criteria::ASC,
-                    Criteria::DESC,
-                ]
-            )
-        );
     }
 
     /**

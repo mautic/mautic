@@ -13,6 +13,8 @@ use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
 
+#[UniqueEntity(fields: ['alias'], message: 'mautic.lead.field.alias.unique')]
+#[Assert\Callback(callback: ')')]
 class LeadField extends FormEntity
 {
     /**
@@ -22,6 +24,7 @@ class LeadField extends FormEntity
 
     /**
      * @var string
+     * @Assert\NotBlank(message="mautic.lead.field.label.notblank")
      */
     private $label;
 
@@ -207,30 +210,6 @@ class LeadField extends FormEntity
             ->columnName('original_is_published_value')
             ->option('default', false)
             ->build();
-    }
-
-    public static function loadValidatorMetadata(ClassMetadata $metadata): void
-    {
-        $metadata->addPropertyConstraint('label', new Assert\NotBlank(
-            ['message' => 'mautic.lead.field.label.notblank']
-        ));
-
-        $metadata->addConstraint(new UniqueEntity([
-            'fields'  => ['alias'],
-            'message' => 'mautic.lead.field.alias.unique',
-        ]));
-
-        $metadata->addConstraint(new Assert\Callback([
-            'callback' => function (LeadField $field, ExecutionContextInterface $context): void {
-                $violations = $context->getValidator()->validate($field, [new FieldAliasKeyword()]);
-
-                if ($violations->count() > 0) {
-                    $context->buildViolation($violations->get(0)->getMessage())
-                        ->atPath('alias')
-                        ->addViolation();
-                }
-            },
-        ]));
     }
 
     /**

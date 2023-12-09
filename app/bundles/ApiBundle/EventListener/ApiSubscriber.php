@@ -60,7 +60,7 @@ class ApiSubscriber implements EventSubscriberInterface
                         ],
                     ],
                 ],
-                403
+                \Symfony\Component\HttpFoundation\Response::HTTP_FORBIDDEN
             );
 
             $event->setResponse($response);
@@ -83,7 +83,7 @@ class ApiSubscriber implements EventSubscriberInterface
                         ],
                     ],
                 ],
-                403
+                \Symfony\Component\HttpFoundation\Response::HTTP_FORBIDDEN
             );
 
             $event->setResponse($response);

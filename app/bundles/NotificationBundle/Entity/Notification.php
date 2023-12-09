@@ -14,6 +14,7 @@ use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
 
+#[Callback(callback: ')')]
 class Notification extends FormEntity
 {
     /**
@@ -23,6 +24,7 @@ class Notification extends FormEntity
 
     /**
      * @var string
+     * @NotBlank(message="mautic.core.name.required")
      */
     private $name;
 
@@ -43,11 +45,13 @@ class Notification extends FormEntity
 
     /**
      * @var string
+     * @NotBlank(message="mautic.core.title.required")
      */
     private $heading;
 
     /**
      * @var string
+     * @NotBlank(message="mautic.lead.email.body.required")
      */
     private $message;
 
@@ -202,67 +206,6 @@ class Notification extends FormEntity
         $builder->createField('mobile', 'boolean')->build();
 
         $builder->createField('mobileSettings', 'array')->build();
-    }
-
-    public static function loadValidatorMetadata(ClassMetadata $metadata): void
-    {
-        $metadata->addPropertyConstraint(
-            'name',
-            new NotBlank(
-                [
-                    'message' => 'mautic.core.name.required',
-                ]
-            )
-        );
-
-        $metadata->addPropertyConstraint(
-            'heading',
-            new NotBlank(
-                [
-                    'message' => 'mautic.core.title.required',
-                ]
-            )
-        );
-
-        $metadata->addPropertyConstraint(
-            'message',
-            new NotBlank(
-                [
-                    'message' => 'mautic.lead.email.body.required',
-                ]
-            )
-        );
-
-        $metadata->addConstraint(new Callback([
-            'callback' => function (Notification $notification, ExecutionContextInterface $context): void {
-                $type = $notification->getNotificationType();
-                if ('list' == $type) {
-                    $validator  = $context->getValidator();
-                    $violations = $validator->validate(
-                        $notification->getLists(),
-                        [
-                            new LeadListAccess(
-                                [
-                                    'message' => 'mautic.lead.lists.required',
-                                ]
-                            ),
-                            new NotBlank(
-                                [
-                                    'message' => 'mautic.lead.lists.required',
-                                ]
-                            ),
-                        ]
-                    );
-
-                    if (count($violations) > 0) {
-                        $string = (string) $violations;
-                        $context->buildViolation($string)
-                            ->atPath('lists')
-                            ->addViolation();
-                    }
-                }
-            },
-        ]));
     }
 
     /**

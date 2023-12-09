@@ -12,6 +12,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class FetchLeadsCommand extends Command
 {
+    protected static $defaultName = 'mautic:integration:fetchleads';
     public function __construct(private TranslatorInterface $translator, private IntegrationHelper $integrationHelper)
     {
         parent::__construct();
@@ -20,7 +21,6 @@ class FetchLeadsCommand extends Command
     protected function configure()
     {
         $this
-            ->setName('mautic:integration:fetchleads')
             ->setAliases(
                 [
                     'mautic:integration:synccontacts',

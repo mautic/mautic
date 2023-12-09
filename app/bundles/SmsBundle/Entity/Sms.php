@@ -14,6 +14,7 @@ use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
 
+#[Callback(callback: ')')]
 class Sms extends FormEntity
 {
     /**
@@ -23,6 +24,7 @@ class Sms extends FormEntity
 
     /**
      * @var string
+     * @NotBlank(message="mautic.core.name.required")
      */
     private $name;
 
@@ -147,44 +149,6 @@ class Sms extends FormEntity
             ->cascadePersist()
             ->fetchExtraLazy()
             ->build();
-    }
-
-    public static function loadValidatorMetadata(ClassMetadata $metadata): void
-    {
-        $metadata->addPropertyConstraint(
-            'name',
-            new NotBlank(
-                [
-                    'message' => 'mautic.core.name.required',
-                ]
-            )
-        );
-
-        $metadata->addConstraint(new Callback([
-            'callback' => function (Sms $sms, ExecutionContextInterface $context): void {
-                $type = $sms->getSmsType();
-                if ('list' == $type) {
-                    $validator  = $context->getValidator();
-                    $violations = $validator->validate(
-                        $sms->getLists(),
-                        [
-                            new NotBlank(
-                                [
-                                    'message' => 'mautic.lead.lists.required',
-                                ]
-                            ),
-                            new LeadListAccess(),
-                        ]
-                    );
-
-                    foreach ($violations as $violation) {
-                        $context->buildViolation($violation->getMessage())
-                            ->atPath('lists')
-                            ->addViolation();
-                    }
-                }
-            },
-        ]));
     }
 
     /**

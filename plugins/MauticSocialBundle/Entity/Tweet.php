@@ -50,6 +50,7 @@ class Tweet extends FormEntity
      * The actual messge of the tweet.
      *
      * @var string
+     * @Assert\Length(max=280)
      */
     private $text;
 
@@ -178,18 +179,6 @@ class Tweet extends FormEntity
                 ]
             )
             ->build();
-    }
-
-    /**
-     * Constraints for required fields.
-     */
-    public static function loadValidatorMetadata(ClassMetadata $metadata): void
-    {
-        $metadata->addPropertyConstraint('text', new Assert\Length(
-            [
-                'max' => 280,
-            ]
-        ));
     }
 
     /**

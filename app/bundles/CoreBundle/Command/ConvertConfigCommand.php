@@ -13,6 +13,7 @@ use Symfony\Component\Console\Output\OutputInterface;
  */
 class ConvertConfigCommand extends Command
 {
+    protected static $defaultName = 'mautic:theme:json-config';
     public function __construct(private PathsHelper $pathsHelper)
     {
         parent::__construct();
@@ -20,7 +21,7 @@ class ConvertConfigCommand extends Command
 
     protected function configure()
     {
-        $this->setName('mautic:theme:json-config')
+        $this
             ->setDefinition([
                 new InputOption(
                     'theme', null, InputOption::VALUE_REQUIRED,

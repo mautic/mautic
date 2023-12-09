@@ -14,6 +14,7 @@ use Symfony\Component\Stopwatch\Stopwatch;
 
 class ListCommand extends Command
 {
+    protected static $defaultName = self::NAME;
     public const NAME = 'mautic:marketplace:list';
 
     public function __construct(private PluginCollector $pluginCollector)
@@ -23,7 +24,6 @@ class ListCommand extends Command
 
     protected function configure(): void
     {
-        $this->setName(self::NAME);
         $this->addOption('page', 'p', InputOption::VALUE_OPTIONAL, 'Page number', 1);
         $this->addOption('limit', 'l', InputOption::VALUE_OPTIONAL, 'Packages per page', 15);
         $this->addOption('filter', 'f', InputOption::VALUE_OPTIONAL, 'Filter the packages', '');

@@ -59,9 +59,9 @@ class ReplyHelper
                 }
             }
         } catch (BadRequestHttpException) {
-            return new Response('invalid request', 400);
+            return new Response('invalid request', \Symfony\Component\HttpFoundation\Response::HTTP_BAD_REQUEST);
         } catch (NotFoundHttpException) {
-            return new Response('', 404);
+            return new Response('', \Symfony\Component\HttpFoundation\Response::HTTP_NOT_FOUND);
         } catch (NumberNotFoundException $exception) {
             $this->logger->debug(
                 sprintf(

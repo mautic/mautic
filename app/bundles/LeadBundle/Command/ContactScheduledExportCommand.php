@@ -16,6 +16,7 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class ContactScheduledExportCommand extends Command
 {
+    protected static $defaultName = self::COMMAND_NAME;
     private const PICK_SCHEDULED_EXPORTS_LIMIT = 10;
     public const COMMAND_NAME                  = 'mautic:contacts:scheduled_export';
 
@@ -30,7 +31,6 @@ class ContactScheduledExportCommand extends Command
     protected function configure(): void
     {
         $this
-            ->setName(self::COMMAND_NAME)
             ->addOption(
                 '--ids',
                 null,

@@ -19,6 +19,7 @@ class Stage extends FormEntity
 
     /**
      * @var string
+     * @Assert\NotBlank(message="mautic.core.name.required")
      */
     private $name;
 
@@ -88,13 +89,6 @@ class Stage extends FormEntity
             ->build();
 
         $builder->addCategory();
-    }
-
-    public static function loadValidatorMetadata(ClassMetadata $metadata): void
-    {
-        $metadata->addPropertyConstraint('name', new Assert\NotBlank([
-            'message' => 'mautic.core.name.required',
-        ]));
     }
 
     /**

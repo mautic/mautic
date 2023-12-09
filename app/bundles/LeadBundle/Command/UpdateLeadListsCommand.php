@@ -15,6 +15,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class UpdateLeadListsCommand extends ModeratedCommand
 {
+    protected static $defaultName = 'mautic:segments:update';
     public const NAME = 'mautic:segments:update';
 
     public function __construct(private ListModel $listModel, private TranslatorInterface $translator, PathsHelper $pathsHelper, CoreParametersHelper $coreParametersHelper)
@@ -25,7 +26,6 @@ class UpdateLeadListsCommand extends ModeratedCommand
     protected function configure()
     {
         $this
-            ->setName('mautic:segments:update')
             ->setAliases(['mautic:segments:rebuild'])
             ->addOption(
                 '--batch-limit',

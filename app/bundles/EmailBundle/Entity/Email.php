@@ -26,6 +26,7 @@ use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
 
+#[Callback(callback: ')')]
 class Email extends FormEntity implements VariantEntityInterface, TranslationEntityInterface
 {
     use VariantEntityTrait;
@@ -39,6 +40,7 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
 
     /**
      * @var string
+     * @NotBlank(message="mautic.core.name.required")
      */
     private $name;
 
@@ -49,6 +51,7 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
 
     /**
      * @var string|null
+     * @NotBlank(message="mautic.core.subject.required")
      */
     private $subject;
 
@@ -60,6 +63,7 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
     /**
      * @var string|null
      */
+    #[Symfony\Component\Validator\Constraints\Email(message: 'mautic.core.email.required')]
     private $fromAddress;
 
     /**
@@ -70,11 +74,13 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
     /**
      * @var string|null
      */
+    #[Symfony\Component\Validator\Constraints\Email(message: 'mautic.core.email.required')]
     private $replyToAddress;
 
     /**
      * @var string|null
      */
+    #[Symfony\Component\Validator\Constraints\Email(message: 'mautic.core.email.required')]
     private $bccAddress;
 
     /**
@@ -312,99 +318,6 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
         $builder->addField('headers', Types::JSON);
 
         $builder->addNullableField('publicPreview', Types::BOOLEAN, 'public_preview');
-    }
-
-    public static function loadValidatorMetadata(ClassMetadata $metadata): void
-    {
-        $metadata->addPropertyConstraint(
-            'name',
-            new NotBlank(
-                [
-                    'message' => 'mautic.core.name.required',
-                ]
-            )
-        );
-
-        $metadata->addPropertyConstraint(
-            'subject',
-            new NotBlank(
-                [
-                    'message' => 'mautic.core.subject.required',
-                ]
-            )
-        );
-
-        $metadata->addPropertyConstraint(
-            'fromAddress',
-            new \Symfony\Component\Validator\Constraints\Email(
-                [
-                    'message' => 'mautic.core.email.required',
-                ]
-            )
-        );
-
-        $metadata->addPropertyConstraint(
-            'replyToAddress',
-            new \Symfony\Component\Validator\Constraints\Email(
-                [
-                    'message' => 'mautic.core.email.required',
-                ]
-            )
-        );
-
-        $metadata->addPropertyConstraint(
-            'bccAddress',
-            new \Symfony\Component\Validator\Constraints\Email(
-                [
-                    'message' => 'mautic.core.email.required',
-                ]
-            )
-        );
-
-        $metadata->addConstraint(new Callback([
-            'callback' => function (Email $email, ExecutionContextInterface $context): void {
-                $type              = $email->getEmailType();
-                $translationParent = $email->getTranslationParent();
-
-                if ('list' == $type && null == $translationParent) {
-                    $validator  = $context->getValidator();
-                    $violations = $validator->validate(
-                        $email->getLists(),
-                        [
-                            new LeadListAccess(),
-                            new NotBlank(
-                                [
-                                    'message' => 'mautic.lead.lists.required',
-                                ]
-                            ),
-                        ]
-                    );
-                    foreach ($violations as $violation) {
-                        $context->buildViolation($violation->getMessage())
-                            ->atPath('lists')
-                            ->addViolation();
-                    }
-                }
-
-                if ($email->isVariant()) {
-                    // Get a summation of weights
-                    $parent   = $email->getVariantParent();
-                    $children = $parent ? $parent->getVariantChildren() : $email->getVariantChildren();
-
-                    $total = 0;
-                    foreach ($children as $child) {
-                        $settings = $child->getVariantSettings();
-                        $total += (int) $settings['weight'];
-                    }
-
-                    if ($total > 100) {
-                        $context->buildViolation('mautic.core.variant_weights_invalid')
-                            ->atPath('variantSettings[weight]')
-                            ->addViolation();
-                    }
-                }
-            },
-        ]));
     }
 
     /**

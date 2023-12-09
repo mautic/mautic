@@ -297,7 +297,7 @@ class NoteController extends FormController
      *
      * @return Response
      */
-    public function deleteAction(Request $request, $leadId, $objectId)
+    public function deleteAction($leadId, $objectId)
     {
         $lead = $this->checkLeadAccess($leadId, 'view');
         if ($lead instanceof Response) {

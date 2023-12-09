@@ -21,6 +21,7 @@ use Symfony\Component\Console\Question\ConfirmationQuestion;
  */
 class InstallCommand extends Command
 {
+    protected static $defaultName = self::COMMAND;
     public const COMMAND = 'mautic:install';
 
     public function __construct(private InstallService $installer, private ManagerRegistry $doctrineRegistry)
@@ -34,7 +35,6 @@ class InstallCommand extends Command
     protected function configure()
     {
         $this
-            ->setName(self::COMMAND)
             ->setHelp('This command allows you to trigger the install process. It will try to get configuration values both from the local config file and command line options/arguments, where the latter takes precedence.')
             ->addArgument(
                 'site_url',

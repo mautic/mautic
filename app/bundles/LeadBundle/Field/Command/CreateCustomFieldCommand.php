@@ -23,6 +23,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class CreateCustomFieldCommand extends ModeratedCommand
 {
+    protected static $defaultName = self::COMMAND_NAME;
     public const COMMAND_NAME = 'mautic:custom-field:create-column';
 
     protected static $defaultDescription = 'Create custom field column in the background';
@@ -41,7 +42,7 @@ class CreateCustomFieldCommand extends ModeratedCommand
     {
         parent::configure();
 
-        $this->setName(self::COMMAND_NAME)
+        $this
             ->addOption('--id', '-i', InputOption::VALUE_OPTIONAL, 'LeadField ID.')
             ->addOption('--user', '-u', InputOption::VALUE_OPTIONAL, 'User ID - User which receives a notification.')
             ->setHelp(

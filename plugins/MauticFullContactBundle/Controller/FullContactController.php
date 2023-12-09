@@ -108,7 +108,7 @@ class FullContactController extends FormController
             }
         }
 
-        return new Response('Bad Request', 400);
+        return new Response('Bad Request', \Symfony\Component\HttpFoundation\Response::HTTP_BAD_REQUEST);
     }
 
     /**
@@ -263,7 +263,7 @@ class FullContactController extends FormController
             }
         }
 
-        return new Response('Bad Request', 400);
+        return new Response('Bad Request', \Symfony\Component\HttpFoundation\Response::HTTP_BAD_REQUEST);
     }
 
     /***************** COMPANY ***********************/
@@ -361,7 +361,7 @@ class FullContactController extends FormController
             }
         }
 
-        return new Response('Bad Request', 400);
+        return new Response('Bad Request', \Symfony\Component\HttpFoundation\Response::HTTP_BAD_REQUEST);
     }
 
     /**
@@ -515,6 +515,6 @@ class FullContactController extends FormController
             }
         }
 
-        return new Response('Bad Request', 400);
+        return new Response('Bad Request', \Symfony\Component\HttpFoundation\Response::HTTP_BAD_REQUEST);
     }
 }

@@ -19,6 +19,7 @@ class Trigger extends FormEntity
 
     /**
      * @var string
+     * @Assert\NotBlank(message="mautic.core.name.required")
      */
     private $name;
 
@@ -113,13 +114,6 @@ class Trigger extends FormEntity
         $builder->createManyToOne('group', Group::class)
             ->addJoinColumn('group_id', 'id', true, false, 'CASCADE')
             ->build();
-    }
-
-    public static function loadValidatorMetadata(ClassMetadata $metadata): void
-    {
-        $metadata->addPropertyConstraint('name', new Assert\NotBlank([
-            'message' => 'mautic.core.name.required',
-        ]));
     }
 
     /**

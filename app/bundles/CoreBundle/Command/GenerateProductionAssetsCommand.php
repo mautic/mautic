@@ -21,6 +21,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
  */
 class GenerateProductionAssetsCommand extends Command
 {
+    protected static $defaultName = 'mautic:assets:generate';
     public function __construct(
         private AssetGenerationHelper $assetGenerationHelper,
         private PathsHelper $pathsHelper,
@@ -32,7 +33,7 @@ class GenerateProductionAssetsCommand extends Command
 
     protected function configure(): void
     {
-        $this->setName('mautic:assets:generate')
+        $this
             ->setDescription('Combines and minifies asset files into single production files')
             ->setHelp(
                 <<<'EOT'

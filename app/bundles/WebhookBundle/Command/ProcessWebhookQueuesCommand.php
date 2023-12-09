@@ -14,6 +14,7 @@ use Symfony\Component\Console\Output\OutputInterface;
  */
 class ProcessWebhookQueuesCommand extends Command
 {
+    protected static $defaultName = self::COMMAND_NAME;
     public const COMMAND_NAME = 'mautic:webhooks:process';
 
     public function __construct(private CoreParametersHelper $coreParametersHelper, private WebhookModel $webhookModel)
@@ -23,7 +24,7 @@ class ProcessWebhookQueuesCommand extends Command
 
     protected function configure()
     {
-        $this->setName(self::COMMAND_NAME)
+        $this
             ->addOption(
                 '--webhook-id',
                 '-i',

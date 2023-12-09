@@ -28,7 +28,6 @@ class DeleteWebhookLogsCommand extends Command
 
     protected function configure(): void
     {
-        $this->setName(static::COMMAND_NAME);
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int

@@ -21,6 +21,7 @@ class Client extends BaseClient
 
     /**
      * @var string
+     * @Assert\NotBlank(message="mautic.core.name.required")
      */
     protected $name;
 
@@ -46,6 +47,7 @@ class Client extends BaseClient
 
     /**
      * @var array
+     * @Assert\NotBlank(message="mautic.api.client.redirecturis.notblank")
      */
     protected $redirectUris = [];
 
@@ -107,17 +109,6 @@ class Client extends BaseClient
             ->addJoinColumn('role_id', 'id', true, false)
             ->cascadePersist()
             ->build();
-    }
-
-    public static function loadValidatorMetadata(ClassMetadata $metadata): void
-    {
-        $metadata->addPropertyConstraint('name', new Assert\NotBlank(
-            ['message' => 'mautic.core.name.required']
-        ));
-
-        $metadata->addPropertyConstraint('redirectUris', new Assert\NotBlank(
-            ['message' => 'mautic.api.client.redirecturis.notblank']
-        ));
     }
 
     /**

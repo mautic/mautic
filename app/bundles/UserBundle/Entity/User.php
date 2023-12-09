@@ -14,6 +14,8 @@ use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
 
+#[UniqueEntity(fields: ['username'], message: 'mautic.user.user.username.unique', repositoryMethod: 'checkUniqueUsernameEmail')]
+#[UniqueEntity(fields: ['email'], message: 'mautic.user.user.email.unique', repositoryMethod: 'checkUniqueUsernameEmail')]
 class User extends FormEntity implements UserInterface, EquatableInterface, PasswordAuthenticatedUserInterface
 {
     /**
@@ -23,6 +25,7 @@ class User extends FormEntity implements UserInterface, EquatableInterface, Pass
 
     /**
      * @var string
+     * @Assert\NotBlank(message="mautic.user.user.username.notblank")
      */
     protected $username;
 
@@ -35,6 +38,8 @@ class User extends FormEntity implements UserInterface, EquatableInterface, Pass
      * Used for when updating the password.
      *
      * @var ?string
+     * @Assert\NotBlank(message="mautic.user.user.password.notblank", groups={"CheckPassword"})
+     * @Assert\Length(min=6, minMessage="mautic.user.user.password.minlength", groups={"CheckPassword"})
      */
     private $plainPassword;
 
@@ -47,16 +52,20 @@ class User extends FormEntity implements UserInterface, EquatableInterface, Pass
 
     /**
      * @var string
+     * @Assert\NotBlank(message="mautic.user.user.firstname.notblank")
      */
     private $firstName;
 
     /**
      * @var string
+     * @Assert\NotBlank(message="mautic.user.user.lastname.notblank")
      */
     private $lastName;
 
     /**
      * @var string
+     * @Assert\NotBlank(message="mautic.user.user.email.valid")
+     * @Assert\Email(message="mautic.user.user.email.valid", groups={"SecondPass"})
      */
     private $email;
 
@@ -67,6 +76,7 @@ class User extends FormEntity implements UserInterface, EquatableInterface, Pass
 
     /**
      * @var Role
+     * @Assert\NotBlank(message="mautic.user.user.role.notblank")
      */
     private $role;
 
@@ -185,64 +195,6 @@ class User extends FormEntity implements UserInterface, EquatableInterface, Pass
 
     public static function loadValidatorMetadata(ClassMetadata $metadata): void
     {
-        $metadata->addPropertyConstraint('username', new Assert\NotBlank(
-            ['message' => 'mautic.user.user.username.notblank']
-        ));
-
-        $metadata->addConstraint(new UniqueEntity(
-            [
-                'fields'           => ['username'],
-                'message'          => 'mautic.user.user.username.unique',
-                'repositoryMethod' => 'checkUniqueUsernameEmail',
-            ]
-        ));
-
-        $metadata->addPropertyConstraint('firstName', new Assert\NotBlank(
-            ['message' => 'mautic.user.user.firstname.notblank']
-        ));
-
-        $metadata->addPropertyConstraint('lastName', new Assert\NotBlank(
-            ['message' => 'mautic.user.user.lastname.notblank']
-        ));
-
-        $metadata->addPropertyConstraint('email', new Assert\NotBlank(
-            ['message' => 'mautic.user.user.email.valid']
-        ));
-
-        $metadata->addPropertyConstraint('email', new Assert\Email(
-            [
-                'message' => 'mautic.user.user.email.valid',
-                'groups'  => ['SecondPass'],
-            ]
-        ));
-
-        $metadata->addConstraint(new UniqueEntity(
-            [
-                'fields'           => ['email'],
-                'message'          => 'mautic.user.user.email.unique',
-                'repositoryMethod' => 'checkUniqueUsernameEmail',
-            ]
-        ));
-
-        $metadata->addPropertyConstraint('role', new Assert\NotBlank(
-            ['message' => 'mautic.user.user.role.notblank']
-        ));
-
-        $metadata->addPropertyConstraint('plainPassword', new Assert\NotBlank(
-            [
-                'message' => 'mautic.user.user.password.notblank',
-                'groups'  => ['CheckPassword'],
-            ]
-        ));
-
-        $metadata->addPropertyConstraint('plainPassword', new Assert\Length(
-            [
-                'min'        => 6,
-                'minMessage' => 'mautic.user.user.password.minlength',
-                'groups'     => ['CheckPassword'],
-            ]
-        ));
-
         $metadata->setGroupSequence(['User', 'SecondPass', 'CheckPassword']);
     }
 

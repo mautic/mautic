@@ -13,6 +13,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class ProcessMarketingMessagesQueueCommand extends ModeratedCommand
 {
+    protected static $defaultName = 'mautic:messages:send';
     public function __construct(private TranslatorInterface $translator, private MessageQueueModel $messageQueueModel, PathsHelper $pathsHelper, CoreParametersHelper $coreParametersHelper)
     {
         parent::__construct($pathsHelper, $coreParametersHelper);
@@ -21,7 +22,6 @@ class ProcessMarketingMessagesQueueCommand extends ModeratedCommand
     protected function configure()
     {
         $this
-            ->setName('mautic:messages:send')
             ->setAliases(
                 [
                     'mautic:campaigns:messagequeue',

@@ -12,6 +12,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 class MauticSocialMonitoringCommand extends Command
 {
+    protected static $defaultName = 'mautic:social:monitoring';
     public function __construct(private MonitoringModel $monitoringModel)
     {
         parent::__construct();
@@ -19,7 +20,7 @@ class MauticSocialMonitoringCommand extends Command
 
     protected function configure()
     {
-        $this->setName('mautic:social:monitoring')
+        $this
             ->addOption('mid', 'i', InputOption::VALUE_OPTIONAL, 'The id of a specific monitor record to process')
             ->addOption(
                 'batch-size',

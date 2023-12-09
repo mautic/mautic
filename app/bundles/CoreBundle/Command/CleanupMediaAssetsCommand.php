@@ -14,6 +14,7 @@ use Symfony\Component\Finder\Finder;
  */
 class CleanupMediaAssetsCommand extends Command
 {
+    protected static $defaultName = 'mautic:assets:cleanup';
     public function __construct(private PathsHelper $pathsHelper)
     {
         parent::__construct();
@@ -21,7 +22,7 @@ class CleanupMediaAssetsCommand extends Command
 
     protected function configure(): void
     {
-        $this->setName('mautic:assets:cleanup')
+        $this
           ->setHelp(
               <<<'EOT'
                 The <info>%command.name%</info> command is used to clean up obsolete files in the media folder that are present in the app/assets folder.

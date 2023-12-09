@@ -14,6 +14,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
  */
 class UpdateIpDataStoreCommand extends Command
 {
+    protected static $defaultName = 'mautic:iplookup:download';
     public function __construct(
         private TranslatorInterface $translator,
         private AbstractLookup $ipService
@@ -23,7 +24,7 @@ class UpdateIpDataStoreCommand extends Command
 
     protected function configure()
     {
-        $this->setName('mautic:iplookup:download')
+        $this
             ->setHelp(
                 <<<'EOT'
                 The <info>%command.name%</info> command is used to update local IP lookup data if applicable.

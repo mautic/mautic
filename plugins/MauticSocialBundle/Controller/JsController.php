@@ -51,7 +51,7 @@ JS;
 
         return new Response(
             $js,
-            200,
+            \Symfony\Component\HttpFoundation\Response::HTTP_OK,
             [
                 'Content-Type'           => 'application/javascript',
             ]

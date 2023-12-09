@@ -6,13 +6,12 @@ use MauticPlugin\MauticSocialBundle\Entity\Monitoring;
 
 class MonitorTwitterHashtagsCommand extends MonitorTwitterBaseCommand
 {
+    protected static $defaultName = 'social:monitor:twitter:hashtags';
     /**
      * Configure the command, set name and options.
      */
     protected function configure()
     {
-        $this->setName('social:monitor:twitter:hashtags');
-
         parent::configure();
     }
 

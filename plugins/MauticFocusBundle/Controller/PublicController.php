@@ -30,14 +30,14 @@ class PublicController extends CommonController
 
         if ($focus) {
             if (!$focus->isPublished()) {
-                return new Response('', 200, ['Content-Type' => 'application/javascript']);
+                return new Response('', \Symfony\Component\HttpFoundation\Response::HTTP_OK, ['Content-Type' => 'application/javascript']);
             }
 
             $content  = $model->generateJavascript($focus, false, MAUTIC_ENV == 'dev');
 
-            return new Response($content, 200, ['Content-Type' => 'application/javascript']);
+            return new Response($content, \Symfony\Component\HttpFoundation\Response::HTTP_OK, ['Content-Type' => 'application/javascript']);
         } else {
-            return new Response('', 200, ['Content-Type' => 'application/javascript']);
+            return new Response('', \Symfony\Component\HttpFoundation\Response::HTTP_OK, ['Content-Type' => 'application/javascript']);
         }
     }
 

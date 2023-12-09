@@ -17,6 +17,7 @@ class Monitoring extends FormEntity
 
     /**
      * @var string
+     * @Assert\NotBlank(message="mautic.core.title.required")
      */
     private $title;
 
@@ -37,6 +38,7 @@ class Monitoring extends FormEntity
 
     /**
      * @var string|null
+     * @Assert\NotBlank(message="mautic.social.network.type")
      */
     private $networkType;
 
@@ -89,20 +91,6 @@ class Monitoring extends FormEntity
         $builder->addNullableField('properties', 'array');
 
         $builder->addPublishDates();
-    }
-
-    /**
-     * Constraints for required fields.
-     */
-    public static function loadValidatorMetadata(ClassMetadata $metadata): void
-    {
-        $metadata->addPropertyConstraint('title', new Assert\NotBlank(
-            ['message' => 'mautic.core.title.required']
-        ));
-
-        $metadata->addPropertyConstraint('networkType', new Assert\NotBlank(
-            ['message' => 'mautic.social.network.type']
-        ));
     }
 
     /**

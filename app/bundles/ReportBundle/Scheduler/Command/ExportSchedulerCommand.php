@@ -13,6 +13,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class ExportSchedulerCommand extends Command
 {
+    protected static $defaultName = 'mautic:reports:scheduler';
     public function __construct(private ReportExporter $reportExporter, private TranslatorInterface $translator)
     {
         parent::__construct();
@@ -24,7 +25,6 @@ class ExportSchedulerCommand extends Command
     protected function configure()
     {
         $this
-            ->setName('mautic:reports:scheduler')
             ->addOption('--report', 'report', InputOption::VALUE_OPTIONAL, 'ID of report. Process all reports if not set.');
     }
 

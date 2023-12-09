@@ -9,6 +9,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 class ReloadCommand extends Command
 {
+    protected static $defaultName = 'mautic:plugins:reload';
     public function __construct(private ReloadFacade $reloadFacade)
     {
         parent::__construct();
@@ -17,7 +18,6 @@ class ReloadCommand extends Command
     protected function configure()
     {
         $this
-            ->setName('mautic:plugins:reload')
             ->setAliases(
                 [
                     'mautic:plugins:install',

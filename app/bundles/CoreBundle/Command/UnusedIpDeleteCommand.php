@@ -14,6 +14,7 @@ use Symfony\Component\Console\Output\OutputInterface;
  */
 class UnusedIpDeleteCommand extends ModeratedCommand
 {
+    protected static $defaultName = 'mautic:unusedip:delete';
     private const DEFAULT_LIMIT = 10000;
 
     public function __construct(private IpAddressModel $ipAddressModel, PathsHelper $pathsHelper, CoreParametersHelper $coreParametersHelper)
@@ -23,7 +24,7 @@ class UnusedIpDeleteCommand extends ModeratedCommand
 
     protected function configure(): void
     {
-        $this->setName('mautic:unusedip:delete')
+        $this
             ->addOption(
                 '--limit',
                 '-l',

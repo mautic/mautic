@@ -15,6 +15,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
  */
 class InstallDataCommand extends Command
 {
+    protected static $defaultName = 'mautic:install:data';
     public function __construct(private TranslatorInterface $translator)
     {
         parent::__construct();
@@ -22,7 +23,7 @@ class InstallDataCommand extends Command
 
     protected function configure()
     {
-        $this->setName('mautic:install:data')
+        $this
             ->setDefinition([
                 new InputOption(
                     'force', null, InputOption::VALUE_NONE, 'Bypasses the verification check.'

@@ -11,6 +11,9 @@ use Mautic\LeadBundle\Model\FieldModel;
 use Mautic\UserBundle\Entity\User;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
 
+/**
+ * @UniqueCustomField(object="company")
+ */
 class Company extends FormEntity implements CustomFieldEntityInterface, IdentifierFieldEntityInterface
 {
     use CustomFieldEntityTrait;
@@ -159,11 +162,6 @@ class Company extends FormEntity implements CustomFieldEntityInterface, Identifi
                 ]
             )
             ->build();
-    }
-
-    public static function loadValidatorMetadata(ClassMetadata $metadata): void
-    {
-        $metadata->addConstraint(new UniqueCustomField(['object' => 'company']));
     }
 
     public static function getDefaultIdentifierFields(): array

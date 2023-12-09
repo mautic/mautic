@@ -11,6 +11,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 class RemoveCommand extends Command
 {
+    protected static $defaultName = self::NAME;
     public const NAME = 'mautic:marketplace:remove';
 
     public function __construct(private ComposerHelper $composer, private LoggerInterface $logger)
@@ -20,7 +21,6 @@ class RemoveCommand extends Command
 
     protected function configure(): void
     {
-        $this->setName(self::NAME);
         $this->addArgument('package', InputArgument::REQUIRED, 'The Packagist package of the plugin to remove (e.g. mautic/example-plugin)');
 
         parent::configure();

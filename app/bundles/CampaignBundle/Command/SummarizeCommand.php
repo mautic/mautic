@@ -15,6 +15,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class SummarizeCommand extends ModeratedCommand
 {
+    protected static $defaultName = self::NAME;
     use WriteCountTrait;
 
     public const NAME = 'mautic:campaigns:summarize';
@@ -30,7 +31,7 @@ class SummarizeCommand extends ModeratedCommand
 
     protected function configure(): void
     {
-        $this->setName(self::NAME)
+        $this
             ->addOption(
                 '--batch-limit',
                 '-l',

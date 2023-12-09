@@ -16,6 +16,7 @@ use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
 
+#[Assert\Callback('Mautic\AssetBundle\Entity\Asset')]
 class Asset extends FormEntity
 {
     /**
@@ -1130,12 +1131,6 @@ class Asset extends FormEntity
     public function setDescription($description): void
     {
         $this->description = $description;
-    }
-
-    public static function loadValidatorMetadata(ClassMetadata $metadata): void
-    {
-        // Add a constraint to manage the file upload data
-        $metadata->addConstraint(new Assert\Callback([self::class, 'validateFile']));
     }
 
     /**

@@ -15,6 +15,7 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 
 class SyncCommand extends Command
 {
+    protected static $defaultName = self::NAME;
     public const NAME = 'mautic:integrations:sync';
 
     public function __construct(private SyncServiceInterface $syncService)
@@ -24,7 +25,7 @@ class SyncCommand extends Command
 
     protected function configure(): void
     {
-        $this->setName(self::NAME)
+        $this
             ->addArgument(
                 'integration',
                 InputOption::VALUE_REQUIRED,

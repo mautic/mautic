@@ -39,6 +39,7 @@ class Focus extends FormEntity
 
     /**
      * @var string
+     * @NotBlank(message="mautic.core.name.required")
      */
     private $name;
 
@@ -46,6 +47,7 @@ class Focus extends FormEntity
 
     /**
      * @var string
+     * @NotBlank(message="mautic.focus.error.select_type")
      */
     private $type;
 
@@ -56,6 +58,7 @@ class Focus extends FormEntity
 
     /**
      * @var string
+     * @NotBlank(message="mautic.focus.error.select_style")
      */
     private $style;
 
@@ -85,32 +88,6 @@ class Focus extends FormEntity
      * @var string|null
      */
     private $cache;
-
-    public static function loadValidatorMetadata(ClassMetadata $metadata): void
-    {
-        $metadata->addPropertyConstraint(
-            'name',
-            new NotBlank(
-                [
-                    'message' => 'mautic.core.name.required',
-                ]
-            )
-        );
-
-        $metadata->addPropertyConstraint(
-            'type',
-            new NotBlank(
-                ['message' => 'mautic.focus.error.select_type']
-            )
-        );
-
-        $metadata->addPropertyConstraint(
-            'style',
-            new NotBlank(
-                ['message' => 'mautic.focus.error.select_style']
-            )
-        );
-    }
 
     public function __clone()
     {

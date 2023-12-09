@@ -19,6 +19,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
  */
 class CleanupMaintenanceCommand extends ModeratedCommand
 {
+    protected static $defaultName = 'mautic:maintenance:cleanup';
     public function __construct(private TranslatorInterface $translator, private EventDispatcherInterface $dispatcher, PathsHelper $pathsHelper, CoreParametersHelper $coreParametersHelper)
     {
         parent::__construct($pathsHelper, $coreParametersHelper);
@@ -26,7 +27,7 @@ class CleanupMaintenanceCommand extends ModeratedCommand
 
     protected function configure()
     {
-        $this->setName('mautic:maintenance:cleanup')
+        $this
             ->setDefinition(
                 [
                     new InputOption(

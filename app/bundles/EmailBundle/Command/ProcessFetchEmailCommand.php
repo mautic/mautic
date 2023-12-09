@@ -14,6 +14,7 @@ use Symfony\Component\Console\Output\OutputInterface;
  */
 class ProcessFetchEmailCommand extends Command
 {
+    protected static $defaultName = 'mautic:email:fetch';
     public function __construct(private CoreParametersHelper $parametersHelper, private Fetcher $fetcher)
     {
         parent::__construct();
@@ -25,7 +26,6 @@ class ProcessFetchEmailCommand extends Command
     protected function configure()
     {
         $this
-            ->setName('mautic:email:fetch')
             ->setAliases(
                 [
                     'mautic:emails:fetch',

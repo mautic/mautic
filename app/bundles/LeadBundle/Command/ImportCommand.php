@@ -17,6 +17,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
  */
 class ImportCommand extends Command
 {
+    protected static $defaultName = self::COMMAND_NAME;
     public const COMMAND_NAME = 'mautic:import';
 
     public function __construct(private TranslatorInterface $translator, private ImportModel $importModel)
@@ -26,7 +27,7 @@ class ImportCommand extends Command
 
     protected function configure()
     {
-        $this->setName(self::COMMAND_NAME)
+        $this
             ->addOption('--id', '-i', InputOption::VALUE_OPTIONAL, 'Specific ID to import. Defaults to next in the queue.', false)
             ->addOption('--limit', '-l', InputOption::VALUE_OPTIONAL, 'Maximum number of records to import for this script execution.', 0)
             ->setHelp(

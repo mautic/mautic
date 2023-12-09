@@ -19,6 +19,7 @@ class Role extends FormEntity
 
     /**
      * @var string
+     * @Assert\NotBlank(message="mautic.core.name.required")
      */
     private $name;
 
@@ -85,13 +86,6 @@ class Role extends FormEntity
             ->mappedBy('role')
             ->fetchExtraLazy()
             ->build();
-    }
-
-    public static function loadValidatorMetadata(ClassMetadata $metadata): void
-    {
-        $metadata->addPropertyConstraint('name', new Assert\NotBlank(
-            ['message' => 'mautic.core.name.required']
-        ));
     }
 
     /**

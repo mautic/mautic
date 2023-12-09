@@ -12,6 +12,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class ExecuteEventCommand extends Command
 {
+    protected static $defaultName = 'mautic:campaigns:execute';
     use WriteCountTrait;
 
     public function __construct(private ScheduledExecutioner $scheduledExecutioner, private TranslatorInterface $translator, private FormatterHelper $formatterHelper)
@@ -25,7 +26,6 @@ class ExecuteEventCommand extends Command
     protected function configure()
     {
         $this
-            ->setName('mautic:campaigns:execute')
             ->addOption(
                 '--scheduled-log-ids',
                 null,

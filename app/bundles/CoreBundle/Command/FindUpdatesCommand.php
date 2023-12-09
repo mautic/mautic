@@ -13,6 +13,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
  */
 class FindUpdatesCommand extends Command
 {
+    protected static $defaultName = 'mautic:update:find';
     public function __construct(private TranslatorInterface $translator, private UpdateHelper $updateHelper)
     {
         parent::__construct();
@@ -20,7 +21,7 @@ class FindUpdatesCommand extends Command
 
     protected function configure()
     {
-        $this->setName('mautic:update:find')
+        $this
             ->setHelp(<<<'EOT'
 The <info>%command.name%</info> command checks for updates for the Mautic application.
 

@@ -25,6 +25,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
  */
 class PullTransifexCommand extends Command
 {
+    protected static $defaultName = self::NAME;
     public const NAME = 'mautic:transifex:pull';
 
     public function __construct(
@@ -38,7 +39,7 @@ class PullTransifexCommand extends Command
 
     protected function configure(): void
     {
-        $this->setName(self::NAME)
+        $this
             ->addOption('language', null, InputOption::VALUE_OPTIONAL, 'Optional language to pull', null)
             ->addOption('bundle', null, InputOption::VALUE_OPTIONAL, 'Optional bundle to pull. Example value: WebhookBundle', null)
             ->addOption('path', null, InputOption::VALUE_OPTIONAL, 'Optional path to a directory where to store the traslations.', null)

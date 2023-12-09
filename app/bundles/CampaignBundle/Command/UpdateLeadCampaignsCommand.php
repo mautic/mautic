@@ -19,6 +19,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class UpdateLeadCampaignsCommand extends ModeratedCommand
 {
+    protected static $defaultName = 'mautic:campaigns:rebuild';
     private int $runLimit = 0;
     private ContactLimiter $contactLimiter;
     private bool $quiet = false;
@@ -38,7 +39,6 @@ class UpdateLeadCampaignsCommand extends ModeratedCommand
     protected function configure()
     {
         $this
-            ->setName('mautic:campaigns:rebuild')
             ->setAliases(['mautic:campaigns:update'])
             ->addOption('--batch-limit', '-l', InputOption::VALUE_OPTIONAL, 'Set batch size of contacts to process per round. Defaults to 300.', 300)
             ->addOption(

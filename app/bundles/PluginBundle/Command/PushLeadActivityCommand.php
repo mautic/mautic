@@ -11,6 +11,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class PushLeadActivityCommand extends Command
 {
+    protected static $defaultName = 'mautic:integration:pushleadactivity';
     public function __construct(private TranslatorInterface $translator, private IntegrationHelper $integrationHelper)
     {
         parent::__construct();
@@ -19,7 +20,6 @@ class PushLeadActivityCommand extends Command
     protected function configure()
     {
         $this
-            ->setName('mautic:integration:pushleadactivity')
             ->setAliases(
                 [
                     'mautic:integration:pushactivity',

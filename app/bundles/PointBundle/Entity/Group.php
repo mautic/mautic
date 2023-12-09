@@ -13,6 +13,7 @@ class Group extends FormEntity
     public const TABLE_NAME = 'point_groups';
 
     private ?int $id             = null;
+    #[Assert\NotBlank(message: 'mautic.core.name.required')]
     private ?string $name        = '';
     private ?string $description = '';
 
@@ -27,13 +28,6 @@ class Group extends FormEntity
             ->setCustomRepositoryClass(GroupRepository::class);
 
         $builder->addIdColumns();
-    }
-
-    public static function loadValidatorMetadata(ClassMetadata $metadata): void
-    {
-        $metadata->addPropertyConstraint('name', new Assert\NotBlank([
-            'message' => 'mautic.core.name.required',
-        ]));
     }
 
     public function getId(): ?int

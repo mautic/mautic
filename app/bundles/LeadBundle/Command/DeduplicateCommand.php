@@ -17,6 +17,7 @@ use Symfony\Component\Stopwatch\Stopwatch;
 
 class DeduplicateCommand extends Command
 {
+    protected static $defaultName = self::NAME;
     public const NAME = 'mautic:contacts:deduplicate';
 
     public function __construct(private ContactDeduper $contactDeduper, private ParameterBagInterface $params)
@@ -28,7 +29,7 @@ class DeduplicateCommand extends Command
     {
         parent::configure();
 
-        $this->setName(self::NAME)
+        $this
             ->addOption(
                 '--newer-into-older',
                 null,
