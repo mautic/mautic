@@ -17,10 +17,7 @@ class CampaignSubscriber implements EventSubscriberInterface
     {
     }
 
-    /**
-     * @return array
-     */
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             CampaignEvents::CAMPAIGN_POST_SAVE     => ['onCampaignPostSave', 0],

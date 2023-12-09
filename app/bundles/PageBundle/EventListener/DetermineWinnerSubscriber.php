@@ -14,10 +14,7 @@ class DetermineWinnerSubscriber implements EventSubscriberInterface
     {
     }
 
-    /**
-     * @return array
-     */
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             PageEvents::ON_DETERMINE_BOUNCE_RATE_WINNER => ['onDetermineBounceRateWinner', 0],

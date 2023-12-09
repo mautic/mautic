@@ -31,13 +31,10 @@ class FormSubscriber implements EventSubscriberInterface
         private TranslatorInterface $translator,
         private RouterInterface $router
     ) {
-        $this->mailer               = $mailer->getMailer();
+        $this->mailer = $mailer->getMailer();
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             FormEvents::FORM_POST_SAVE           => ['onFormPostSave', 0],

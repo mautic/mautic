@@ -16,10 +16,7 @@ class EmailSubscriber implements EventSubscriberInterface
     {
     }
 
-    /**
-     * @return array
-     */
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             EmailEvents::EMAIL_POST_SAVE   => ['onEmailPostSave', 0],

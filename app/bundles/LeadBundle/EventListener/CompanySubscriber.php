@@ -14,10 +14,7 @@ class CompanySubscriber implements EventSubscriberInterface
     {
     }
 
-    /**
-     * @return array
-     */
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             LeadEvents::COMPANY_POST_SAVE   => ['onCompanyPostSave', 0],

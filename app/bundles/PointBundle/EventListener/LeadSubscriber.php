@@ -20,10 +20,7 @@ class LeadSubscriber implements EventSubscriberInterface
     {
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             LeadEvents::LEAD_POINTS_CHANGE   => ['onLeadPointsChange', 0],

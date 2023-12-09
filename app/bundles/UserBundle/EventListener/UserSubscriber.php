@@ -14,10 +14,7 @@ class UserSubscriber implements EventSubscriberInterface
     {
     }
 
-    /**
-     * @return array
-     */
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             UserEvents::USER_POST_SAVE   => ['onUserPostSave', 0],

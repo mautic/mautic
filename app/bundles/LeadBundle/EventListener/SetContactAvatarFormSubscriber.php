@@ -17,10 +17,7 @@ class SetContactAvatarFormSubscriber implements EventSubscriberInterface
     {
     }
 
-    /**
-     * @return array
-     */
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             FormEvents::FORM_ON_SUBMIT => ['onFormSubmit', 0],

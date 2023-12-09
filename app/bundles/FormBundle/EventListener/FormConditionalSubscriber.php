@@ -16,9 +16,6 @@ final class FormConditionalSubscriber implements EventSubscriberInterface
     {
     }
 
-    /**
-     * @return array<string,mixed[]>
-     */
     public static function getSubscribedEvents(): array
     {
         return [

@@ -16,9 +16,6 @@ class ContactExportSchedulerAuditLogSubscriber implements EventSubscriberInterfa
     {
     }
 
-    /**
-     * @return array<string, string>
-     */
     public static function getSubscribedEvents(): array
     {
         return [

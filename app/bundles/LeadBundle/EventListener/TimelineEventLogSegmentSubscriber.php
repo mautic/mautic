@@ -28,10 +28,7 @@ class TimelineEventLogSegmentSubscriber implements EventSubscriberInterface
         $this->translator         = $translator;
     }
 
-    /**
-     * @return array
-     */
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             LeadEvents::LEAD_LIST_CHANGE       => 'onChange',
