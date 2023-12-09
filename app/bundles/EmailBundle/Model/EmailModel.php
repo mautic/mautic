@@ -877,10 +877,8 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
 
     /**
      * Get an array of tracked links.
-     *
-     * @return array
      */
-    public function getEmailClickStats($emailId)
+    public function getEmailClickStats($emailId): array
     {
         return $this->pageTrackableModel->getTrackableList('email', $emailId);
     }

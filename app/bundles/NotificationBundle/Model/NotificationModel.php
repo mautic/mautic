@@ -271,10 +271,8 @@ class NotificationModel extends FormModel implements AjaxLookupModelInterface
 
     /**
      * Get an array of tracked links.
-     *
-     * @return array
      */
-    public function getNotificationClickStats($notificationId)
+    public function getNotificationClickStats($notificationId): array
     {
         return $this->pageTrackableModel->getTrackableList('notification', $notificationId);
     }

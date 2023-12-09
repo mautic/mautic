@@ -177,10 +177,8 @@ class MessageModel extends FormModel implements AjaxLookupModelInterface
      * @param null $dateFrom
      * @param null $dateTo
      * @param null $channel
-     *
-     * @return array
      */
-    public function getLeadStatsPost($messageId, $dateFrom = null, $dateTo = null, $channel = null)
+    public function getLeadStatsPost($messageId, $dateFrom = null, $dateTo = null, $channel = null): array
     {
         $eventLog = $this->campaignModel->getCampaignLeadEventLogRepository();
 
