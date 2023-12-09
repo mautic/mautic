@@ -94,7 +94,7 @@ class RequestTraitTest extends \PHPUnit\Framework\TestCase
     /**
      * @return iterable<array<?int,int|bool|string|null>>
      */
-    public function boolProvider(): iterable
+    public static function boolProvider(): iterable
     {
         yield [true, '1'];
         yield [true, 1];

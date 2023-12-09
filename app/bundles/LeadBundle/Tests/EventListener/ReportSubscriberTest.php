@@ -346,7 +346,7 @@ class ReportSubscriberTest extends \PHPUnit\Framework\TestCase
     /**
      * @return array<int, array<int, string>>
      */
-    public function eventDataProvider(): array
+    public static function eventDataProvider(): array
     {
         return [
             ['leads'],
@@ -362,7 +362,7 @@ class ReportSubscriberTest extends \PHPUnit\Framework\TestCase
     /**
      * @return array<int, array<int, string>>
      */
-    public function reportGraphEventDataProvider(): array
+    public static function reportGraphEventDataProvider(): array
     {
         return [
             ['leads'],

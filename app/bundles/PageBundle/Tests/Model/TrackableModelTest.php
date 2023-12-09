@@ -802,7 +802,7 @@ CONTENT;
     /**
      * @return array<array<bool|null>> Use null to include both <a> and <map> tags
      */
-    public function trackMapProvider(): array
+    public static function trackMapProvider(): array
     {
         return [
             [true],

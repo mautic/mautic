@@ -89,7 +89,7 @@ class MessageScheduleTest extends \PHPUnit\Framework\TestCase
         $this->messageSchedule->getMessage($this->report, 'path-to-a-file');
     }
 
-    public function sendFileProvider()
+    public static function sendFileProvider()
     {
         return [
             [10, 100],
@@ -129,7 +129,7 @@ class MessageScheduleTest extends \PHPUnit\Framework\TestCase
         $this->messageSchedule->getMessage($this->report, 'path-to-a-file');
     }
 
-    public function doSendFileProvider()
+    public static function doSendFileProvider()
     {
         return [
             [100, 10],

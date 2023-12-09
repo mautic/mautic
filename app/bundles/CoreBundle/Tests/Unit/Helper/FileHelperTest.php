@@ -20,7 +20,7 @@ class FileHelperTest extends \PHPUnit\Framework\TestCase
         $this->assertSame($megabyte, $fileHelper::convertBytesToMegabytes($byte));
     }
 
-    public function bytesToMegabytesProvider()
+    public static function bytesToMegabytesProvider()
     {
         return [
             [0, 0.0],
@@ -44,7 +44,7 @@ class FileHelperTest extends \PHPUnit\Framework\TestCase
         $this->assertSame($byte, $fileHelper::convertMegabytesToBytes($megabyte));
     }
 
-    public function megabytesToBytesProvider()
+    public static function megabytesToBytesProvider()
     {
         return [
             [0, 0],
@@ -67,7 +67,7 @@ class FileHelperTest extends \PHPUnit\Framework\TestCase
         $this->assertSame($bytes, $fileHelper::convertPHPSizeToBytes($phpSize));
     }
 
-    public function phpSizeToBytesProvider()
+    public static function phpSizeToBytesProvider()
     {
         return [
             ['3048M', 3196059648],

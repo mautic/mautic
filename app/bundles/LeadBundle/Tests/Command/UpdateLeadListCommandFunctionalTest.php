@@ -75,7 +75,7 @@ final class UpdateLeadListCommandFunctionalTest extends MauticMysqlTestCase
     /**
      * @return iterable<array<callable>>
      */
-    public function provider(): iterable
+    public static function Provider(): iterable
     {
         // Test that all segments will be rebuilt with no params set.
         yield [

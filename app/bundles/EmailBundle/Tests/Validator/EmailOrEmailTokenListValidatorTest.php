@@ -102,7 +102,7 @@ final class EmailOrEmailTokenListValidatorTest extends TestCase
     /**
      * @return \Generator<mixed[]>
      */
-    public function provider(): \Generator
+    public static function Provider(): \Generator
     {
         // Test null value.
         yield [

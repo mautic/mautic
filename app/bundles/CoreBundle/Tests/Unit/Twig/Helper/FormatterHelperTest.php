@@ -102,7 +102,7 @@ class FormatterHelperTest extends \PHPUnit\Framework\TestCase
     /**
      * @return iterable<array<mixed>>
      */
-    public function stringProvider(): iterable
+    public static function stringProvider(): iterable
     {
         // string
         yield ['random string', 'random string'];

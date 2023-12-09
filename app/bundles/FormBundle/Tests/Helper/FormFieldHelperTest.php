@@ -40,7 +40,7 @@ class FormFieldHelperTest extends \PHPUnit\Framework\TestCase
     /**
      * @return array
      */
-    public function fieldProvider()
+    public static function fieldProvider()
     {
         return [
             [
