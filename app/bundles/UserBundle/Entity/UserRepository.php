@@ -302,7 +302,7 @@ class UserRepository extends CommonRepository
     /**
      * {@inheritdoc}
      */
-    public function getSearchCommands()
+    public function getSearchCommands(): array
     {
         $commands = [
             'mautic.core.searchcommand.email',
@@ -333,7 +333,7 @@ class UserRepository extends CommonRepository
     /**
      * {@inheritdoc}
      */
-    public function getTableAlias()
+    public function getTableAlias(): string
     {
         return 'u';
     }

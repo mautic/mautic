@@ -963,10 +963,8 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
 
     /**
      * Returns the array of search commands.
-     *
-     * @return array
      */
-    public function getSearchCommands()
+    public function getSearchCommands(): array
     {
         $commands = [
             'mautic.lead.lead.searchcommand.isanonymous',

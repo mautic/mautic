@@ -492,10 +492,7 @@ class LeadField extends FormEntity
         return $this->object;
     }
 
-    /**
-     * @return string
-     */
-    public function getCustomFieldObject()
+    public function getCustomFieldObject(): string
     {
         if (!$this->customFieldObject) {
             $this->customFieldObject = new CustomFieldObject($this);

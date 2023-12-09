@@ -52,7 +52,7 @@ class PluginModel extends FormModel
     /**
      * Get lead fields used in selects/matching.
      */
-    public function getLeadFields()
+    public function getLeadFields(): array
     {
         return $this->leadFieldModel->getFieldList();
     }
@@ -60,7 +60,7 @@ class PluginModel extends FormModel
     /**
      * Get Company fields.
      */
-    public function getCompanyFields()
+    public function getCompanyFields(): array
     {
         return $this->leadFieldModel->getFieldList(true, true, ['isPublished' => true, 'object' => 'company']);
     }

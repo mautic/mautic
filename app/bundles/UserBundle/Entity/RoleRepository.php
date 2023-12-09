@@ -150,7 +150,7 @@ class RoleRepository extends CommonRepository
     /**
      * {@inheritdoc}
      */
-    public function getSearchCommands()
+    public function getSearchCommands(): array
     {
         $commands = [
             'mautic.user.user.searchcommand.isadmin',
@@ -173,7 +173,7 @@ class RoleRepository extends CommonRepository
     /**
      * {@inheritdoc}
      */
-    public function getTableAlias()
+    public function getTableAlias(): string
     {
         return 'r';
     }

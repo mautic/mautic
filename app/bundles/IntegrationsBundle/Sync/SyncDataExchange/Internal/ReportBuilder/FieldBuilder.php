@@ -34,8 +34,6 @@ class FieldBuilder
     }
 
     /**
-     * @return ReportFieldDAO
-     *
      * @throws FieldNotFoundException
      */
     public function buildObjectField(
@@ -44,7 +42,7 @@ class FieldBuilder
         RequestObjectDAO $requestObject,
         string $integration,
         string $defaultState = ReportFieldDAO::FIELD_CHANGED
-    ) {
+    ): ReportFieldDAO {
         $this->mauticObject  = $mauticObject;
         $this->requestObject = $requestObject;
 

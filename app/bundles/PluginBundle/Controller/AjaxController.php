@@ -13,10 +13,7 @@ use Symfony\Component\HttpFoundation\Request;
 
 class AjaxController extends CommonAjaxController
 {
-    /**
-     * @return \Symfony\Component\HttpFoundation\JsonResponse
-     */
-    public function setIntegrationFilterAction(Request $request)
+    public function setIntegrationFilterAction(Request $request): \Symfony\Component\HttpFoundation\JsonResponse
     {
         $session      = $request->getSession();
         $pluginFilter = (int) $request->get('plugin');
@@ -27,10 +24,8 @@ class AjaxController extends CommonAjaxController
 
     /**
      * Get the HTML for list of fields.
-     *
-     * @return \Symfony\Component\HttpFoundation\JsonResponse
      */
-    public function getIntegrationFieldsAction(Request $request, IntegrationHelper $helper)
+    public function getIntegrationFieldsAction(Request $request, IntegrationHelper $helper): \Symfony\Component\HttpFoundation\JsonResponse
     {
         $integration = $request->query->get('integration');
         $settings    = $request->query->all()['settings'] ?? [];
@@ -112,10 +107,8 @@ class AjaxController extends CommonAjaxController
 
     /**
      * Get the HTML for integration properties.
-     *
-     * @return \Symfony\Component\HttpFoundation\JsonResponse
      */
-    public function getIntegrationConfigAction(Request $request)
+    public function getIntegrationConfigAction(Request $request): \Symfony\Component\HttpFoundation\JsonResponse
     {
         $integration = $request->query->get('integration');
         $settings    = $request->query->all()['settings'] ?? [];
@@ -171,7 +164,7 @@ class AjaxController extends CommonAjaxController
         return $this->sendJsonResponse($dataArray);
     }
 
-    public function getIntegrationCampaignStatusAction(Request $request)
+    public function getIntegrationCampaignStatusAction(Request $request): \Symfony\Component\HttpFoundation\JsonResponse
     {
         $integration = $request->query->get('integration');
         $campaign    = $request->query->get('campaign');
@@ -227,10 +220,7 @@ class AjaxController extends CommonAjaxController
         return $this->sendJsonResponse($dataArray);
     }
 
-    /**
-     * @return \Symfony\Component\HttpFoundation\JsonResponse
-     */
-    public function getIntegrationCampaignsAction(Request $request)
+    public function getIntegrationCampaignsAction(Request $request): \Symfony\Component\HttpFoundation\JsonResponse
     {
         $integration = $request->query->get('integration');
         $dataArray   = ['success' => 0];
@@ -272,7 +262,7 @@ class AjaxController extends CommonAjaxController
         return $this->sendJsonResponse($dataArray);
     }
 
-    public function matchFieldsAction(Request $request)
+    public function matchFieldsAction(Request $request): \Symfony\Component\HttpFoundation\JsonResponse
     {
         $integration       = $request->request->get('integration');
         $integration_field = $request->request->get('integrationField');

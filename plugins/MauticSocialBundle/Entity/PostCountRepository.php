@@ -20,7 +20,7 @@ class PostCountRepository extends CommonRepository
      * @throws \Doctrine\ORM\NoResultException
      * @throws \Doctrine\ORM\NonUniqueResultException
      */
-    public function getLeadStatsPost($dateFrom, $dateTo, $options)
+    public function getLeadStatsPost($dateFrom, $dateTo, $options): array
     {
         $chartQuery = new ChartQuery($this->getEntityManager()->getConnection(), $dateFrom, $dateTo);
 

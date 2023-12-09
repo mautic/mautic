@@ -15,7 +15,7 @@ class TrackableRepository extends CommonRepository
      *
      * @return mixed
      */
-    public function findByChannel($channel, $channelId)
+    public function findByChannel($channel, $channelId): array
     {
         $q          = $this->getEntityManager()->getConnection()->createQueryBuilder();
         $tableAlias = $this->getTableAlias();

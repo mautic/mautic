@@ -561,10 +561,8 @@ class ImportController extends FormController
 
     /**
      * Generates import directory path.
-     *
-     * @return string
      */
-    protected function getImportDirName()
+    protected function getImportDirName(): string
     {
         return $this->importModel->getImportDir();
     }

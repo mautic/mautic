@@ -38,10 +38,7 @@ class FocusController extends AbstractStandardFormController
         return '@MauticFocus/Focus';
     }
 
-    /**
-     * @return string
-     */
-    protected function getModelName()
+    protected function getModelName(): string
     {
         return 'focus';
     }

@@ -20,10 +20,7 @@ class PhoneNumberHelper
         return $phoneUtil->format($phoneNumber, $format);
     }
 
-    /**
-     * @return array
-     */
-    public function getFormattedNumberList($number)
+    public function getFormattedNumberList($number): array
     {
         return array_unique(
             [

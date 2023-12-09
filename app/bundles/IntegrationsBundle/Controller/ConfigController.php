@@ -90,8 +90,6 @@ class ConfigController extends AbstractFormController
 
     /**
      * @param FormInterface<FormInterface> $form
-     *
-     * @return JsonResponse|Response
      */
     private function submitForm(
         Request $request,
@@ -101,7 +99,7 @@ class ConfigController extends AbstractFormController
         FormFactoryInterface $formFactory,
         FormExtension $formExtension,
         FormInterface $form
-    ) {
+    ): JsonResponse|Response {
         if ($this->isFormCancelled($form)) {
             return $this->closeForm($request);
         }
@@ -178,10 +176,8 @@ class ConfigController extends AbstractFormController
 
     /**
      * @param FormInterface<FormInterface> $form
-     *
-     * @return JsonResponse|Response
      */
-    private function showForm(Request $request, FormInterface $form, FormExtension $formExtension)
+    private function showForm(Request $request, FormInterface $form, FormExtension $formExtension): Response
     {
         $integrationObject = $this->integrationObject;
         $formView          = $form->createView();

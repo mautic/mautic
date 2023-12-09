@@ -132,10 +132,8 @@ class LeadFieldRepository extends CommonRepository
      * Get field aliases for lead table columns.
      *
      * @param string $object name of object using the custom fields
-     *
-     * @return array
      */
-    public function getFieldAliases($object = 'lead')
+    public function getFieldAliases($object = 'lead'): array
     {
         $qb = $this->_em->getConnection()->createQueryBuilder();
 

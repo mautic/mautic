@@ -528,10 +528,8 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
      * @param mixed[]|string $filter
      * @param int            $limit
      * @param int            $start
-     *
-     * @return array
      */
-    public function getLookupResults($type, $filter = '', $limit = 10, $start = 0)
+    public function getLookupResults($type, $filter = '', $limit = 10, $start = 0): array
     {
         $results = [];
         switch ($type) {
@@ -861,7 +859,7 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
         return $company;
     }
 
-    public function checkForDuplicateCompanies(array $queryFields)
+    public function checkForDuplicateCompanies(array $queryFields): array
     {
         return $this->companyDeduper->checkForDuplicateCompanies($queryFields);
     }

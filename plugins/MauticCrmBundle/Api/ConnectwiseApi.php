@@ -136,11 +136,9 @@ class ConnectwiseApi extends CrmApi
     }
 
     /**
-     * @return array
-     *
      * @throws ApiErrorException
      */
-    public function getCampaigns()
+    public function getCampaigns(): array
     {
         return $this->fetchAllRecords('marketing/groups');
     }
@@ -160,11 +158,9 @@ class ConnectwiseApi extends CrmApi
     /**
      * https://{connectwiseSite}/v4_6_release/apis/3.0/sales/activities/types.
      *
-     * @return array
-     *
      * @throws ApiErrorException
      */
-    public function getActivityTypes()
+    public function getActivityTypes(): array
     {
         return $this->fetchAllRecords('sales/activities/types');
     }
@@ -182,11 +178,9 @@ class ConnectwiseApi extends CrmApi
     }
 
     /**
-     * @return array
-     *
      * @throws ApiErrorException
      */
-    public function getMembers()
+    public function getMembers(): array
     {
         return $this->fetchAllRecords('system/members');
     }

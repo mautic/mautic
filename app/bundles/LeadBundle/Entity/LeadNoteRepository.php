@@ -136,10 +136,7 @@ class LeadNoteRepository extends CommonRepository
         ];
     }
 
-    /**
-     * @return array
-     */
-    public function getSearchCommands()
+    public function getSearchCommands(): array
     {
         $commands = [
             'mautic.lead.note.searchcommand.type' => [

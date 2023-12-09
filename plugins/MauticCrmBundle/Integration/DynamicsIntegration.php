@@ -17,12 +17,12 @@ use Symfony\Component\Form\FormBuilder;
 
 class DynamicsIntegration extends CrmAbstractIntegration
 {
-    public function getName()
+    public function getName(): string
     {
         return 'Dynamics';
     }
 
-    public function getDisplayName()
+    public function getDisplayName(): string
     {
         return 'Dynamics CRM';
     }
@@ -34,10 +34,8 @@ class DynamicsIntegration extends CrmAbstractIntegration
 
     /**
      * Return's authentication method such as oauth2, oauth1a, key, etc.
-     *
-     * @return string
      */
-    public function getAuthenticationType()
+    public function getAuthenticationType(): string
     {
         return 'oauth2';
     }
@@ -109,10 +107,8 @@ class DynamicsIntegration extends CrmAbstractIntegration
 
     /**
      * Get the array key for the auth token.
-     *
-     * @return string
      */
-    public function getAuthTokenKey()
+    public function getAuthTokenKey(): string
     {
         return 'access_token';
     }
@@ -135,20 +131,16 @@ class DynamicsIntegration extends CrmAbstractIntegration
 
     /**
      * {@inheritdoc}
-     *
-     * @return string
      */
-    public function getAccessTokenUrl()
+    public function getAccessTokenUrl(): string
     {
         return 'https://login.microsoftonline.com/common/oauth2/token';
     }
 
     /**
      * {@inheritdoc}
-     *
-     * @return string
      */
-    public function getAuthenticationUrl()
+    public function getAuthenticationUrl(): string
     {
         return 'https://login.microsoftonline.com/common/oauth2/authorize';
     }
@@ -156,7 +148,7 @@ class DynamicsIntegration extends CrmAbstractIntegration
     /**
      * {@inheritdoc}
      */
-    public function getAuthLoginUrl()
+    public function getAuthLoginUrl(): string
     {
         $url = parent::getAuthLoginUrl();
 

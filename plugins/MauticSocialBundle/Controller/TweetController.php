@@ -13,7 +13,7 @@ class TweetController extends FormController
     /**
      * @return mixed
      */
-    protected function getModelName()
+    protected function getModelName(): string
     {
         return 'social.tweet';
     }
@@ -21,7 +21,7 @@ class TweetController extends FormController
     /**
      * @return mixed
      */
-    protected function getJsLoadMethodPrefix()
+    protected function getJsLoadMethodPrefix(): string
     {
         return 'socialTweet';
     }
@@ -29,7 +29,7 @@ class TweetController extends FormController
     /**
      * @return mixed
      */
-    protected function getRouteBase()
+    protected function getRouteBase(): string
     {
         return 'mautic_tweet';
     }
@@ -39,7 +39,7 @@ class TweetController extends FormController
      *
      * @return mixed
      */
-    protected function getSessionBase($objectId = null)
+    protected function getSessionBase($objectId = null): string
     {
         return 'mautic_tweet';
     }
@@ -47,7 +47,7 @@ class TweetController extends FormController
     /**
      * @return mixed
      */
-    protected function getTemplateBase()
+    protected function getTemplateBase(): string
     {
         return '@MauticSocial/Tweet';
     }
@@ -55,7 +55,7 @@ class TweetController extends FormController
     /**
      * @return mixed
      */
-    protected function getTranslationBase()
+    protected function getTranslationBase(): string
     {
         return 'mautic.integration.Twitter';
     }
@@ -63,7 +63,7 @@ class TweetController extends FormController
     /**
      * @return mixed
      */
-    protected function getPermissionBase()
+    protected function getPermissionBase(): string
     {
         return 'mauticSocial:tweets';
     }
@@ -125,10 +125,8 @@ class TweetController extends FormController
 
     /**
      * Get the template file.
-     *
-     * @return string
      */
-    protected function getTemplateName($file)
+    protected function getTemplateName($file): string
     {
         if (('form.html.twig' === $file) && 1 == $this->getCurrentRequest()->get('modal')) {
             return '@MauticSocial/Tweet/form_modal.html.twig';
@@ -155,7 +153,7 @@ class TweetController extends FormController
      *
      * @return array|\Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|Response
      */
-    public function viewAction($objectId)
+    public function viewAction($objectId): \Symfony\Component\HttpFoundation\Response
     {
         return $this->forward('MauticPlugin\MauticSocialBundle\Controller\TweetController::editAction', [
             'objectId' => $objectId,

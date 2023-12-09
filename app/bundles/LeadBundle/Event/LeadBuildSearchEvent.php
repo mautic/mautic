@@ -55,10 +55,7 @@ class LeadBuildSearchEvent extends CommonEvent
         return $this->alias;
     }
 
-    /**
-     * @return bool
-     */
-    public function isNegation()
+    public function isNegation(): bool
     {
         return $this->negate;
     }

@@ -20,7 +20,7 @@ class TagManagerPermissions extends AbstractPermissions
     /**
      * {@inheritdoc}
      */
-    public function getName()
+    public function getName(): string
     {
         return 'tagManager';
     }

@@ -129,10 +129,7 @@ class MonitoringModel extends FormModel
         return $this->em->getRepository(Monitoring::class);
     }
 
-    /**
-     * @return string
-     */
-    public function getPermissionBase()
+    public function getPermissionBase(): string
     {
         return 'mauticSocial:monitoring';
     }

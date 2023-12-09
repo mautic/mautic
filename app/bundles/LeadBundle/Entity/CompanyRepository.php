@@ -120,10 +120,8 @@ class CompanyRepository extends CommonRepository implements CustomFieldRepositor
 
     /**
      * Get companies by lead.
-     *
-     * @return array
      */
-    public function getCompaniesByLeadId($leadId, $companyId = null)
+    public function getCompaniesByLeadId($leadId, $companyId = null): array
     {
         $q = $this->getEntityManager()->getConnection()->createQueryBuilder();
 
@@ -411,10 +409,8 @@ class CompanyRepository extends CommonRepository implements CustomFieldRepositor
     /**
      * @param null   $labelColumn
      * @param string $valueColumn
-     *
-     * @return array
      */
-    public function getAjaxSimpleList(CompositeExpression $expr = null, array $parameters = [], $labelColumn = null, $valueColumn = 'id')
+    public function getAjaxSimpleList(CompositeExpression $expr = null, array $parameters = [], $labelColumn = null, $valueColumn = 'id'): array
     {
         $q = $this->_em->getConnection()->createQueryBuilder();
 

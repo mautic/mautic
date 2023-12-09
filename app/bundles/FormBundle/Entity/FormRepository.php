@@ -157,12 +157,10 @@ class FormRepository extends CommonRepository
     /**
      * Fetch the form results.
      *
-     * @return array
-     *
      * @throws \Doctrine\ORM\NoResultException
      * @throws \Doctrine\ORM\NonUniqueResultException
      */
-    public function getFormResults(Form $form, array $options = [])
+    public function getFormResults(Form $form, array $options = []): array
     {
         $query = $this->_em->getConnection()->createQueryBuilder();
 
@@ -210,7 +208,7 @@ class FormRepository extends CommonRepository
     /**
      * {@inheritdoc}
      */
-    public function getSearchCommands()
+    public function getSearchCommands(): array
     {
         $commands = [
             'mautic.core.searchcommand.ispublished',

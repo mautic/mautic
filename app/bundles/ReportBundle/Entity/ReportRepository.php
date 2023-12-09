@@ -86,7 +86,7 @@ class ReportRepository extends CommonRepository
     /**
      * {@inheritdoc}
      */
-    public function getSearchCommands()
+    public function getSearchCommands(): array
     {
         $commands = [
             'mautic.core.searchcommand.ispublished',
@@ -115,7 +115,7 @@ class ReportRepository extends CommonRepository
         return 'r';
     }
 
-    public function findReportsWithGraphs($ownedBy = null)
+    public function findReportsWithGraphs($ownedBy = null): array
     {
         $qb = $this->getEntityManager()->getConnection()->createQueryBuilder();
 

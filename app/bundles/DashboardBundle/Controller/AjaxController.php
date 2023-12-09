@@ -15,10 +15,8 @@ class AjaxController extends CommonAjaxController
 {
     /**
      * Count how many visitors are currently viewing a page.
-     *
-     * @return \Symfony\Component\HttpFoundation\JsonResponse
      */
-    public function viewingVisitorsAction(EntityManagerInterface $entityManager)
+    public function viewingVisitorsAction(EntityManagerInterface $entityManager): \Symfony\Component\HttpFoundation\JsonResponse
     {
         $dataArray = ['success' => 0];
 
@@ -33,10 +31,8 @@ class AjaxController extends CommonAjaxController
 
     /**
      * Returns HTML of a new widget based on its values.
-     *
-     * @return \Symfony\Component\HttpFoundation\JsonResponse
      */
-    public function updateWidgetFormAction(Request $request, FormFactoryInterface $formFactory)
+    public function updateWidgetFormAction(Request $request, FormFactoryInterface $formFactory): \Symfony\Component\HttpFoundation\JsonResponse
     {
         $data      = $request->request->all()['widget'] ?? [];
         $dataArray = ['success' => 0];
@@ -60,10 +56,8 @@ class AjaxController extends CommonAjaxController
 
     /**
      * Saves the new ordering of dashboard widgets.
-     *
-     * @return \Symfony\Component\HttpFoundation\JsonResponse
      */
-    public function updateWidgetOrderingAction(Request $request)
+    public function updateWidgetOrderingAction(Request $request): \Symfony\Component\HttpFoundation\JsonResponse
     {
         $data           = $request->request->all()['ordering'] ?? [];
         $dashboardModel = $this->getModel('dashboard');
@@ -80,7 +74,7 @@ class AjaxController extends CommonAjaxController
      *
      * @return \Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse
      */
-    public function deleteAction(Request $request)
+    public function deleteAction(Request $request): \Symfony\Component\HttpFoundation\JsonResponse
     {
         $objectId  = $request->request->get('widget');
         $dataArray = ['success' => 0];

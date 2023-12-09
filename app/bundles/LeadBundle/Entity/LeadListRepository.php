@@ -446,10 +446,7 @@ class LeadListRepository extends CommonRepository
         ];
     }
 
-    /**
-     * @return array
-     */
-    public function getSearchCommands()
+    public function getSearchCommands(): array
     {
         $commands = [
             'mautic.lead.list.searchcommand.isglobal',

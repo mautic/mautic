@@ -361,7 +361,7 @@ class DashboardController extends AbstractFormController
      *
      * @return JsonResponse|Response
      */
-    public function deleteDashboardFileAction(Request $request, PathsHelper $pathsHelper)
+    public function deleteDashboardFileAction(Request $request, PathsHelper $pathsHelper): RedirectResponse
     {
         $file = $request->get('file');
 
@@ -386,7 +386,7 @@ class DashboardController extends AbstractFormController
      *
      * @return JsonResponse|Response
      */
-    public function applyDashboardFileAction(Request $request, PathsHelper $pathsHelper, $file = null)
+    public function applyDashboardFileAction(Request $request, PathsHelper $pathsHelper, $file = null): RedirectResponse
     {
         if (!$file) {
             $file = $request->get('file');
@@ -434,10 +434,7 @@ class DashboardController extends AbstractFormController
         return $this->redirect($this->get('router')->generate('mautic_dashboard_index'));
     }
 
-    /**
-     * @return JsonResponse|Response
-     */
-    public function importAction(Request $request, FormFactoryInterface $formFactory, PathsHelper $pathsHelper)
+    public function importAction(Request $request, FormFactoryInterface $formFactory, PathsHelper $pathsHelper): Response
     {
         $preview = $request->get('preview');
 

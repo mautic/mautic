@@ -10,10 +10,8 @@ class VtigerIntegration extends CrmAbstractIntegration
 
     /**
      * Returns the name of the social integration that must match the name of the file.
-     *
-     * @return string
      */
-    public function getName()
+    public function getName(): string
     {
         return 'Vtiger';
     }
@@ -23,10 +21,7 @@ class VtigerIntegration extends CrmAbstractIntegration
         return ['push_lead'];
     }
 
-    /**
-     * @return string
-     */
-    public function getDisplayName()
+    public function getDisplayName(): string
     {
         return 'vTiger';
     }
@@ -43,26 +38,17 @@ class VtigerIntegration extends CrmAbstractIntegration
         ];
     }
 
-    /**
-     * @return string
-     */
-    public function getClientIdKey()
+    public function getClientIdKey(): string
     {
         return 'username';
     }
 
-    /**
-     * @return string
-     */
-    public function getClientSecretKey()
+    public function getClientSecretKey(): string
     {
         return 'accessKey';
     }
 
-    /**
-     * @return string
-     */
-    public function getAuthTokenKey()
+    public function getAuthTokenKey(): string
     {
         return 'sessionName';
     }
@@ -276,10 +262,8 @@ class VtigerIntegration extends CrmAbstractIntegration
      * Get available company fields for choices in the config UI.
      *
      * @param array $settings
-     *
-     * @return array
      */
-    public function getFormCompanyFields($settings = [])
+    public function getFormCompanyFields($settings = []): array
     {
         return parent::getAvailableLeadFields(['cache_suffix' => '.company']);
     }

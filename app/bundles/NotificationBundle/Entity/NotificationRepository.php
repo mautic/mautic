@@ -98,10 +98,7 @@ class NotificationRepository extends CommonRepository
         return [$expr, $parameters];
     }
 
-    /**
-     * @return array
-     */
-    public function getSearchCommands()
+    public function getSearchCommands(): array
     {
         $commands = [
             'mautic.core.searchcommand.ispublished',

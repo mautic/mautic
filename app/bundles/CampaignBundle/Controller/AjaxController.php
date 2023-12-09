@@ -26,10 +26,7 @@ class AjaxController extends CommonAjaxController
         parent::__construct($doctrine, $factory, $modelFactory, $userHelper, $coreParametersHelper, $dispatcher, $translator, $flashBag, $requestStack, $security);
     }
 
-    /**
-     * @return \Symfony\Component\HttpFoundation\JsonResponse
-     */
-    public function updateConnectionsAction(Request $request)
+    public function updateConnectionsAction(Request $request): \Symfony\Component\HttpFoundation\JsonResponse
     {
         $session        = $request->getSession();
         $campaignId     = InputHelper::clean($request->query->get('campaignId'));
@@ -45,7 +42,7 @@ class AjaxController extends CommonAjaxController
         return $this->sendJsonResponse($dataArray);
     }
 
-    public function updateScheduledCampaignEventAction(Request $request)
+    public function updateScheduledCampaignEventAction(Request $request): \Symfony\Component\HttpFoundation\JsonResponse
     {
         $eventId      = (int) $request->request->get('eventId');
         $contactId    = (int) $request->request->get('contactId');
@@ -79,10 +76,7 @@ class AjaxController extends CommonAjaxController
         return $this->sendJsonResponse($dataArray);
     }
 
-    /**
-     * @return \Symfony\Component\HttpFoundation\JsonResponse
-     */
-    public function cancelScheduledCampaignEventAction(Request $request)
+    public function cancelScheduledCampaignEventAction(Request $request): \Symfony\Component\HttpFoundation\JsonResponse
     {
         $dataArray = ['success' => 0];
 

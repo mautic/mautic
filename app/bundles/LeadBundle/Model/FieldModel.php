@@ -633,10 +633,8 @@ class FieldModel extends FormModel
 
     /**
      * Is field used in segment filter?
-     *
-     * @return bool
      */
-    public function isUsedField(LeadField $field)
+    public function isUsedField(LeadField $field): bool
     {
         return $this->leadListModel->isFieldUsed($field);
     }
@@ -815,10 +813,8 @@ class FieldModel extends FormModel
      * @param bool|true $byGroup
      * @param bool|true $alphabetical
      * @param array     $filters
-     *
-     * @return array
      */
-    public function getFieldList($byGroup = true, $alphabetical = true, $filters = ['isPublished' => true, 'object' => 'lead'])
+    public function getFieldList($byGroup = true, $alphabetical = true, $filters = ['isPublished' => true, 'object' => 'lead']): array
     {
         return $this->fieldList->getFieldList($byGroup, $alphabetical, $filters);
     }
@@ -961,10 +957,8 @@ class FieldModel extends FormModel
      * @deprecated Use SchemaDefinition::getSchemaDefinition method instead
      *
      * @param bool $isUnique
-     *
-     * @return array
      */
-    public static function getSchemaDefinition($alias, $type, $isUnique = false)
+    public static function getSchemaDefinition($alias, $type, $isUnique = false): array
     {
         return SchemaDefinition::getSchemaDefinition($alias, $type, $isUnique);
     }

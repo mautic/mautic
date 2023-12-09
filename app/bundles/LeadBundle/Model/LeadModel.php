@@ -1698,10 +1698,8 @@ class LeadModel extends FormModel
      * @param string    $dateFormat
      * @param array     $filter
      * @param bool      $canViewOthers
-     *
-     * @return array
      */
-    public function getLeadsLineChartData($unit, $dateFrom, $dateTo, $dateFormat = null, $filter = [], $canViewOthers = true)
+    public function getLeadsLineChartData($unit, $dateFrom, $dateTo, $dateFormat = null, $filter = [], $canViewOthers = true): array
     {
         $flag        = null;
         $topLists    = null;
@@ -1781,10 +1779,8 @@ class LeadModel extends FormModel
      * @param string $dateTo
      * @param array  $filters
      * @param bool   $canViewOthers
-     *
-     * @return array
      */
-    public function getAnonymousVsIdentifiedPieChartData($dateFrom, $dateTo, $filters = [], $canViewOthers = true)
+    public function getAnonymousVsIdentifiedPieChartData($dateFrom, $dateTo, $filters = [], $canViewOthers = true): array
     {
         $chart = new PieChart();
         $query = new ChartQuery($this->em->getConnection(), $dateFrom, $dateTo);
@@ -1987,10 +1983,8 @@ class LeadModel extends FormModel
      * Get engagement counts by time unit.
      *
      * @param string $unit
-     *
-     * @return array
      */
-    public function getEngagementCount(Lead $lead, \DateTime $dateFrom = null, \DateTime $dateTo = null, $unit = 'm', ChartQuery $chartQuery = null)
+    public function getEngagementCount(Lead $lead, \DateTime $dateFrom = null, \DateTime $dateTo = null, $unit = 'm', ChartQuery $chartQuery = null): array
     {
         $event = new LeadTimelineEvent($lead);
         $event->setCountOnly($dateFrom, $dateTo, $unit, $chartQuery);
@@ -2057,10 +2051,7 @@ class LeadModel extends FormModel
         return $channels;
     }
 
-    /**
-     * @return array
-     */
-    public function getPreferenceChannels()
+    public function getPreferenceChannels(): array
     {
         return $this->channelListHelper->getFeatureChannels(self::CHANNEL_FEATURE, true);
     }

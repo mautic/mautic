@@ -138,7 +138,7 @@ class ContactSegmentFilter implements \Stringable
     /**
      * @return mixed
      */
-    public function getAggregateFunction()
+    public function getAggregateFunction(): string|bool
     {
         return $this->filterDecorator->getAggregateFunc($this->contactSegmentFilterCrate);
     }
@@ -164,10 +164,7 @@ class ContactSegmentFilter implements \Stringable
         return 'leadlist' === $this->getField();
     }
 
-    /**
-     * @return bool
-     */
-    public function isColumnTypeBoolean()
+    public function isColumnTypeBoolean(): bool
     {
         return $this->contactSegmentFilterCrate->isBooleanType();
     }

@@ -181,7 +181,7 @@ class PageRepository extends CommonRepository
     /**
      * {@inheritdoc}
      */
-    public function getSearchCommands()
+    public function getSearchCommands(): array
     {
         $commands = [
             'mautic.core.searchcommand.ispublished',

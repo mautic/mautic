@@ -741,7 +741,7 @@ class AssetController extends FormController
      *
      * @return \Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse
      */
-    public function remoteAction(Request $request)
+    public function remoteAction(Request $request): Response
     {
         // Check for integrations to cloud providers
         /** @var \Mautic\PluginBundle\Helper\IntegrationHelper $integrationHelper */

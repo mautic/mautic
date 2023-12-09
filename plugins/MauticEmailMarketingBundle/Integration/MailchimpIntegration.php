@@ -8,18 +8,13 @@ class MailchimpIntegration extends EmailAbstractIntegration
 {
     /**
      * {@inheritdoc}
-     *
-     * @return string
      */
-    public function getName()
+    public function getName(): string
     {
         return 'Mailchimp';
     }
 
-    /**
-     * @return string
-     */
-    public function getDisplayName()
+    public function getDisplayName(): string
     {
         return 'MailChimp';
     }
@@ -34,20 +29,16 @@ class MailchimpIntegration extends EmailAbstractIntegration
 
     /**
      * Get the URL required to obtain an oauth2 access token.
-     *
-     * @return string
      */
-    public function getAccessTokenUrl()
+    public function getAccessTokenUrl(): string
     {
         return 'https://login.mailchimp.com/oauth2/token';
     }
 
     /**
      * Get the authentication/login URL for oauth2 access.
-     *
-     * @return string
      */
-    public function getAuthenticationUrl()
+    public function getAuthenticationUrl(): string
     {
         return 'https://login.mailchimp.com/oauth2/authorize';
     }

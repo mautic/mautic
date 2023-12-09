@@ -226,7 +226,7 @@ class InstallController extends CommonController
      *
      * @throws \Exception
      */
-    public function finalAction(Request $request, PathsHelper $pathsHelper)
+    public function finalAction(Request $request, PathsHelper $pathsHelper): \Symfony\Component\HttpFoundation\RedirectResponse|Response
     {
         $session = $request->getSession();
 

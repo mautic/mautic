@@ -160,10 +160,7 @@ class MessageModel extends FormModel implements AjaxLookupModelInterface
         return $results;
     }
 
-    /**
-     * @return array
-     */
-    public function getMessageChannels($messageId)
+    public function getMessageChannels($messageId): array
     {
         return $this->getRepository()->getMessageChannels($messageId);
     }

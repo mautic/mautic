@@ -66,12 +66,10 @@ class Fetcher
     /**
      * Return SF query to fetch the object information for a CampaignMember.
      *
-     * @return string
-     *
      * @throws NoObjectsToFetchException
      * @throws InvalidObjectException
      */
-    public function getQueryForUnknownObjects(array $fields, $object)
+    public function getQueryForUnknownObjects(array $fields, $object): string
     {
         return match ($object) {
             Lead::OBJECT    => QueryBuilder::getLeadQuery($fields, $this->unknownLeadIds),

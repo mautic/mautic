@@ -38,7 +38,7 @@ class MauticFactory
      *
      * @throws \InvalidArgumentException
      */
-    public function getModel($modelNameKey)
+    public function getModel($modelNameKey): \Mautic\CoreBundle\Model\MauticModelInterface
     {
         return $this->modelFactory->getModel($modelNameKey);
     }
@@ -208,10 +208,8 @@ class MauticFactory
      * Returns local config file path.
      *
      * @param bool $checkExists If true, returns false if file doesn't exist
-     *
-     * @return bool
      */
-    public function getLocalConfigFile($checkExists = true)
+    public function getLocalConfigFile($checkExists = true): string
     {
         /** @var \AppKernel $kernel */
         $kernel = $this->container->get('kernel');
