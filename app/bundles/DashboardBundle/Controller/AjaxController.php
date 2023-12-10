@@ -9,6 +9,7 @@ use Mautic\DashboardBundle\Form\Type\WidgetType;
 use Mautic\DashboardBundle\Model\DashboardModel;
 use Mautic\PageBundle\Entity\Hit;
 use Symfony\Component\Form\FormFactoryInterface;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 
 class AjaxController extends CommonAjaxController
@@ -16,7 +17,7 @@ class AjaxController extends CommonAjaxController
     /**
      * Count how many visitors are currently viewing a page.
      */
-    public function viewingVisitorsAction(EntityManagerInterface $entityManager): \Symfony\Component\HttpFoundation\JsonResponse
+    public function viewingVisitorsAction(EntityManagerInterface $entityManager): JsonResponse
     {
         $dataArray = ['success' => 0];
 
@@ -32,7 +33,7 @@ class AjaxController extends CommonAjaxController
     /**
      * Returns HTML of a new widget based on its values.
      */
-    public function updateWidgetFormAction(Request $request, FormFactoryInterface $formFactory): \Symfony\Component\HttpFoundation\JsonResponse
+    public function updateWidgetFormAction(Request $request, FormFactoryInterface $formFactory): JsonResponse
     {
         $data      = $request->request->all()['widget'] ?? [];
         $dataArray = ['success' => 0];
@@ -57,7 +58,7 @@ class AjaxController extends CommonAjaxController
     /**
      * Saves the new ordering of dashboard widgets.
      */
-    public function updateWidgetOrderingAction(Request $request): \Symfony\Component\HttpFoundation\JsonResponse
+    public function updateWidgetOrderingAction(Request $request): JsonResponse
     {
         $data           = $request->request->all()['ordering'] ?? [];
         $dashboardModel = $this->getModel('dashboard');
@@ -71,10 +72,8 @@ class AjaxController extends CommonAjaxController
 
     /**
      * Deletes the entity.
-     *
-     * @return \Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse
      */
-    public function deleteAction(Request $request): \Symfony\Component\HttpFoundation\JsonResponse
+    public function deleteAction(Request $request): JsonResponse
     {
         $objectId  = $request->request->get('widget');
         $dataArray = ['success' => 0];

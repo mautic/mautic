@@ -51,6 +51,8 @@ class PluginModel extends FormModel
 
     /**
      * Get lead fields used in selects/matching.
+     *
+     * @return mixed[]
      */
     public function getLeadFields(): array
     {
@@ -59,6 +61,8 @@ class PluginModel extends FormModel
 
     /**
      * Get Company fields.
+     *
+     * @return mixed[]
      */
     public function getCompanyFields(): array
     {

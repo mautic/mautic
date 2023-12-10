@@ -512,7 +512,10 @@ class CompanyRepository extends CommonRepository implements CustomFieldRepositor
         return $q->executeQuery()->fetchAllAssociative();
     }
 
-    public function getCompaniesByUniqueFields(array $uniqueFieldsWithData, int $companyId = null, int $limit = null)
+    /**
+     * @return Company[]
+     */
+    public function getCompaniesByUniqueFields(array $uniqueFieldsWithData, int $companyId = null, int $limit = null): array
     {
         $results = $this->getCompanyFieldsByUniqueFields($uniqueFieldsWithData, 'c.*', $companyId, $limit);
 

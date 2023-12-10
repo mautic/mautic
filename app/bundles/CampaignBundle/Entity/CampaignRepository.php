@@ -490,7 +490,7 @@ class CampaignRepository extends CommonRepository
      * @param bool|false $limit
      * @param array      $select
      *
-     * @return mixed
+     * @return mixed[]
      */
     public function getCampaignLeads($campaignId, $start = 0, $limit = false, $select = ['cl.lead_id']): array
     {

@@ -48,6 +48,11 @@ class ArrayHelper
 
     /**
      * Sum between two array.
+     *
+     * @param mixed[] $a1
+     * @param mixed[] $b2
+     *
+     * @return mixed[]
      */
     public static function sum(array $a1, array $b2): array
     {

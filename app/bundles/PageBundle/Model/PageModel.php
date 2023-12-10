@@ -734,7 +734,7 @@ class PageModel extends FormModel
     /**
      * Get number of page bounces.
      *
-     * @return int
+     * @return mixed[]
      */
     public function getBounces(Page $page, \DateTime $fromDate = null): array
     {

@@ -188,7 +188,7 @@ class TrackableModel extends AbstractCommonModel
     /**
      * Get a list of URLs that are tracked by a specific channel.
      *
-     * @return mixed
+     * @return mixed[]
      */
     public function getTrackableList($channel, $channelId): array
     {

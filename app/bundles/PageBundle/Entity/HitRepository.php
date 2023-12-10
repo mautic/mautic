@@ -253,6 +253,8 @@ class HitRepository extends CommonRepository
      *
      * @param array|string $pageIds
      * @param bool         $isVariantCheck
+     *
+     * @return mixed[]
      */
     public function getBounces($pageIds, \DateTime $fromDate = null, $isVariantCheck = false): array
     {

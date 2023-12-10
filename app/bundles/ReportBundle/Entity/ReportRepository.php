@@ -107,14 +107,14 @@ class ReportRepository extends CommonRepository
         ];
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getTableAlias(): string
     {
         return 'r';
     }
 
+    /**
+     * @return mixed[]
+     */
     public function findReportsWithGraphs($ownedBy = null): array
     {
         $qb = $this->getEntityManager()->getConnection()->createQueryBuilder();

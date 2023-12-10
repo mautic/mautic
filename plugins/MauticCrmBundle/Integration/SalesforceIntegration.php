@@ -1427,9 +1427,6 @@ class SalesforceIntegration extends CrmAbstractIntegration
         return $campaignMemberStatus;
     }
 
-    /**
-     * @return array
-     */
     public function pushLeadToCampaign(Lead $lead, $campaignId, $status = '', $personIds = null): bool
     {
         if (empty($personIds)) {

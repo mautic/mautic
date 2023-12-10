@@ -96,6 +96,9 @@ class CompanyLeadRepository extends CommonRepository
         return !empty($result) ? $result[0] : [];
     }
 
+    /**
+     * @return mixed[]
+     */
     public function getCompanyLeadEntity($leadId, $companyId): array
     {
         $qb = $this->getEntityManager()->getConnection()->createQueryBuilder();

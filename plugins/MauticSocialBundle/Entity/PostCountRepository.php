@@ -15,7 +15,7 @@ class PostCountRepository extends CommonRepository
      *
      * @param array $options
      *
-     * @return mixed
+     * @return PostCount[]
      *
      * @throws \Doctrine\ORM\NoResultException
      * @throws \Doctrine\ORM\NonUniqueResultException

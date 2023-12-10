@@ -135,18 +135,12 @@ class ContactSegmentFilter implements \Stringable
         return $this->contactSegmentFilterCrate->getGlue();
     }
 
-    /**
-     * @return mixed
-     */
     public function getAggregateFunction(): string|bool
     {
         return $this->filterDecorator->getAggregateFunc($this->contactSegmentFilterCrate);
     }
 
-    /**
-     * @return FilterQueryBuilderInterface
-     */
-    public function getFilterQueryBuilder()
+    public function getFilterQueryBuilder(): FilterQueryBuilderInterface
     {
         return $this->filterQueryBuilder;
     }

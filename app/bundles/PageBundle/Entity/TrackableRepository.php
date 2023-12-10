@@ -13,7 +13,7 @@ class TrackableRepository extends CommonRepository
     /**
      * Find redirects that are trackable.
      *
-     * @return mixed
+     * @return mixed[]
      */
     public function findByChannel($channel, $channelId): array
     {

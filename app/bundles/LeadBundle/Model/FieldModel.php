@@ -813,6 +813,8 @@ class FieldModel extends FormModel
      * @param bool|true $byGroup
      * @param bool|true $alphabetical
      * @param array     $filters
+     *
+     * @return mixed[]
      */
     public function getFieldList($byGroup = true, $alphabetical = true, $filters = ['isPublished' => true, 'object' => 'lead']): array
     {

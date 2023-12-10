@@ -178,7 +178,7 @@ class ImportController extends FormController
      *
      * @return JsonResponse|Response
      */
-    public function newAction(Request $request, $objectId = 0, $ignorePost = false)
+    public function newAction(Request $request, $objectId = 0, $ignorePost = false): Response
     {
         $dispatcher = $this->dispatcher;
 
@@ -674,8 +674,6 @@ class ImportController extends FormController
 
     /***
      * @param null $objectId
-     *
-     * @return string
      */
     protected function getSessionBase($objectId = null): string
     {

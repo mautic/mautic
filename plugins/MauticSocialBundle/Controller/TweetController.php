@@ -7,28 +7,20 @@ use Symfony\Component\Form\Form;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 
 class TweetController extends FormController
 {
-    /**
-     * @return mixed
-     */
     protected function getModelName(): string
     {
         return 'social.tweet';
     }
 
-    /**
-     * @return mixed
-     */
     protected function getJsLoadMethodPrefix(): string
     {
         return 'socialTweet';
     }
 
-    /**
-     * @return mixed
-     */
     protected function getRouteBase(): string
     {
         return 'mautic_tweet';
@@ -36,33 +28,22 @@ class TweetController extends FormController
 
     /**
      * @param null $objectId
-     *
-     * @return mixed
      */
     protected function getSessionBase($objectId = null): string
     {
         return 'mautic_tweet';
     }
 
-    /**
-     * @return mixed
-     */
     protected function getTemplateBase(): string
     {
         return '@MauticSocial/Tweet';
     }
 
-    /**
-     * @return mixed
-     */
     protected function getTranslationBase(): string
     {
         return 'mautic.integration.Twitter';
     }
 
-    /**
-     * @return mixed
-     */
     protected function getPermissionBase(): string
     {
         return 'mauticSocial:tweets';
@@ -108,7 +89,7 @@ class TweetController extends FormController
      *
      * @return \Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|Response
      */
-    public function indexAction(Request $request, $page = 1)
+    public function indexAction(Request $request, $page = 1): Response
     {
         return parent::indexStandard($request, $page);
     }
@@ -148,12 +129,7 @@ class TweetController extends FormController
         return parent::editStandard($request, $objectId, $ignorePost);
     }
 
-    /**
-     * Displays details.
-     *
-     * @return array|\Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|Response
-     */
-    public function viewAction($objectId): \Symfony\Component\HttpFoundation\Response
+    public function viewAction($objectId): Response
     {
         return $this->forward('MauticPlugin\MauticSocialBundle\Controller\TweetController::editAction', [
             'objectId' => $objectId,
@@ -161,8 +137,6 @@ class TweetController extends FormController
     }
 
     /**
-     * Clone an entity.
-     *
      * @param int $objectId
      *
      * @return \Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|Response

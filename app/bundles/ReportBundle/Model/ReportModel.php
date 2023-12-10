@@ -661,7 +661,7 @@ class ReportModel extends FormModel
     }
 
     /**
-     * @return mixed
+     * @return mixed[]
      */
     public function getReportsWithGraphs(): array
     {

@@ -358,8 +358,6 @@ class DashboardController extends AbstractFormController
 
     /**
      * Exports the widgets of current user into a json file.
-     *
-     * @return JsonResponse|Response
      */
     public function deleteDashboardFileAction(Request $request, PathsHelper $pathsHelper): RedirectResponse
     {
@@ -383,8 +381,6 @@ class DashboardController extends AbstractFormController
      * Applies dashboard layout.
      *
      * @param string|null $file
-     *
-     * @return JsonResponse|Response
      */
     public function applyDashboardFileAction(Request $request, PathsHelper $pathsHelper, $file = null): RedirectResponse
     {

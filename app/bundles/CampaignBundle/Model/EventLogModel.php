@@ -82,7 +82,7 @@ class EventLogModel extends AbstractCommonModel
     }
 
     /**
-     * @return string|LeadEventLog
+     * @return string|mixed[]
      */
     public function updateContactEvent(Event $event, Lead $contact, array $parameters): string|array
     {

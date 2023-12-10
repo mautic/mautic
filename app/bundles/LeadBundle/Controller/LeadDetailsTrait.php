@@ -156,7 +156,7 @@ trait LeadDetailsTrait
     }
 
     /**
-     * @return mixed
+     * @return mixed[]
      */
     protected function getEngagementData(Lead $lead, \DateTime $fromDate = null, \DateTime $toDate = null): array
     {
@@ -185,10 +185,9 @@ trait LeadDetailsTrait
     }
 
     /**
-     * @param int $page
-     * @param int $limit
+     * @return mixed[]
      */
-    protected function getAuditlogs(Lead $lead, array $filters = null, array $orderBy = null, $page = 1, $limit = 25): array
+    protected function getAuditlogs(Lead $lead, array $filters = null, array $orderBy = null, int $page = 1, int $limit = 25): array
     {
         $session = $this->requestStack->getCurrentRequest()->getSession();
 
@@ -351,7 +350,7 @@ trait LeadDetailsTrait
     /**
      * Get company graph for points and engagements.
      *
-     * @return mixed
+     * @return array<string, mixed>
      */
     protected function getCompanyEngagementsForGraph($contacts): array
     {

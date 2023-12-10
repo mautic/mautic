@@ -560,8 +560,6 @@ class ConnectwiseIntegration extends CrmAbstractIntegration
      * @param array|Lead $lead
      * @param array      $config
      *
-     * @return array|bool
-     *
      * @throws ApiErrorException
      */
     public function pushLead($lead, $config = []): bool
