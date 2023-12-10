@@ -373,6 +373,12 @@ class SalesforceApi extends CrmApi
     }
 
     /**
+<<<<<<< HEAD
+=======
+     * @param mixed $modifiedSince
+     * @param null  $queryUrl
+     *
+>>>>>>> d40d311298 (fix password class, fix method format)
      * @return mixed|string
      *
      * @throws ApiErrorException

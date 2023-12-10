@@ -23,7 +23,15 @@ class FullContact_API extends FullContact_Person
      *                        depending on the specified search type)
      * @param string $type    - Search Type (Specify the API search method to use.
      *                        E.g. email -- tested with email and phone)
+<<<<<<< HEAD
+<<<<<<< HEAD
      * @param int    $timeout
+=======
+     * @param string $timeout
+>>>>>>> d40d311298 (fix password class, fix method format)
+=======
+     * @param int    $timeout
+>>>>>>> 3a98831b78 (few fixes)
      *
      * @return array - All information associated with this email address
      */
