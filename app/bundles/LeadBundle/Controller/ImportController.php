@@ -127,7 +127,7 @@ class ImportController extends FormController
     /**
      * Cancel and unpublish the import during manual import.
      *
-     * @return array|JsonResponse|RedirectResponse|Response
+     * @return JsonResponse|RedirectResponse
      */
     public function cancelAction(Request $request): Response
     {
@@ -151,8 +151,6 @@ class ImportController extends FormController
 
     /**
      * Schedules manual import to background queue.
-     *
-     * @return array|JsonResponse|RedirectResponse|Response
      */
     public function queueAction(Request $request): Response
     {

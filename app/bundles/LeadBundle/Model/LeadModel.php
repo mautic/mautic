@@ -1683,6 +1683,8 @@ class LeadModel extends FormModel
 
     /**
      * Get array of available lead tags.
+     *
+     * @return mixed[]
      */
     public function getTagList(): array
     {

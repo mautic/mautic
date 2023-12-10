@@ -662,6 +662,8 @@ class CommonRepository extends ServiceEntityRepository
      * @param string $valueColumn  Column that houses the value
      * @param string $extraColumns String of extra select columns
      * @param int    $limit        Limit for results
+     *
+     * @return mixed[]
      */
     public function getSimpleList(CompositeExpression $expr = null, array $parameters = [], $labelColumn = null, $valueColumn = 'id', $extraColumns = null, $limit = 0): array
     {
