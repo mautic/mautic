@@ -10,7 +10,7 @@ use Symfony\Component\HttpFoundation\Request;
 
 abstract class AbstractFormController extends CommonController
 {
-    protected $permissionBase;
+    protected ?string $permissionBase = null;
 
     /**
      * @return mixed
