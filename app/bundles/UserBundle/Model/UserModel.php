@@ -130,7 +130,7 @@ class UserModel extends FormModel
         return $formFactory->create(UserType::class, $entity, $options);
     }
 
-    public function getEntity($id = null): User
+    public function getEntity($id = null): ?User
     {
         if (null === $id) {
             return new User();
