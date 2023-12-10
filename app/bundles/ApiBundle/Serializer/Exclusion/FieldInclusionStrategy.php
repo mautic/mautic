@@ -16,17 +16,14 @@ class FieldInclusionStrategy implements ExclusionStrategyInterface
 {
     private int $level;
 
-    private $path;
-
     /**
      * FieldInclusionStrategy constructor.
      *
      * @param int $level
      */
-    public function __construct(private array $fields, $level = 3, $path = null)
+    public function __construct(private array $fields, $level = 3, private $path = null)
     {
         $this->level  = (int) $level;
-        $this->path   = $path;
     }
 
     /**
