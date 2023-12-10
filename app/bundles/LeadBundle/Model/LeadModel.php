@@ -1684,7 +1684,7 @@ class LeadModel extends FormModel
     /**
      * Get array of available lead tags.
      */
-    public function getTagList()
+    public function getTagList(): array
     {
         return $this->getTagRepository()->getSimpleList(null, [], 'tag', 'id');
     }

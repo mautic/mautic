@@ -86,8 +86,6 @@ class TweetController extends FormController
 
     /**
      * @param int $page
-     *
-     * @return \Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|Response
      */
     public function indexAction(Request $request, $page = 1): Response
     {

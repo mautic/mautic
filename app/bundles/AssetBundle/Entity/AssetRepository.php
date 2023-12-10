@@ -64,10 +64,8 @@ class AssetRepository extends CommonRepository
 
     /**
      * @param \Doctrine\ORM\QueryBuilder|\Doctrine\DBAL\Query\QueryBuilder $q
-     *
-     * @return array
      */
-    protected function addCatchAllWhereClause($q, $filter)
+    protected function addCatchAllWhereClause($q, $filter): array
     {
         return $this->addStandardCatchAllWhereClause($q, $filter, [
             'a.title',
@@ -120,6 +118,9 @@ class AssetRepository extends CommonRepository
         return [$expr, $parameters];
     }
 
+    /**
+     * @return string[]
+     */
     public function getSearchCommands(): array
     {
         $commands = [

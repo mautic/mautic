@@ -770,7 +770,7 @@ class SalesforceIntegrationTest extends AbstractIntegrationTestCase
                     $invocations         = $spyParentProperties['invocations'];
 
                     if (count($invocations) > $this->getMaxInvocations('getIntegrationsEntityId')) {
-                        return null;
+                        return [];
                     }
 
                     // Just return some bogus entities for testing

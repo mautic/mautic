@@ -391,10 +391,8 @@ class LeadListRepository extends CommonRepository
 
     /**
      * @param \Doctrine\ORM\QueryBuilder|\Doctrine\DBAL\Query\QueryBuilder $q
-     *
-     * @return array
      */
-    protected function addCatchAllWhereClause($q, $filter)
+    protected function addCatchAllWhereClause($q, $filter): array
     {
         return $this->addStandardCatchAllWhereClause(
             $q,
@@ -446,6 +444,9 @@ class LeadListRepository extends CommonRepository
         ];
     }
 
+    /**
+     * @return string[]
+     */
     public function getSearchCommands(): array
     {
         $commands = [

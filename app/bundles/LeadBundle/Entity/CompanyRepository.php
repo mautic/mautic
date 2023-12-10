@@ -150,7 +150,7 @@ class CompanyRepository extends CommonRepository implements CustomFieldRepositor
     /**
      * {@inheritdoc}
      */
-    protected function addCatchAllWhereClause($q, $filter)
+    protected function addCatchAllWhereClause($q, $filter): array
     {
         return $this->addStandardCatchAllWhereClause(
             $q,
@@ -199,9 +199,9 @@ class CompanyRepository extends CommonRepository implements CustomFieldRepositor
     }
 
     /**
-     * {@inheritdoc}
+     * @return string[]
      */
-    public function getSearchCommands()
+    public function getSearchCommands(): array
     {
         $commands = $this->getStandardSearchCommands();
         if (!empty($this->availableSearchFields)) {

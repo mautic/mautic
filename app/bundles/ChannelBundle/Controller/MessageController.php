@@ -65,7 +65,7 @@ class MessageController extends AbstractStandardFormController
      *
      * @return \Mautic\CoreBundle\Controller\Response|\Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse
      */
-    public function indexAction(Request $request, $page = 1)
+    public function indexAction(Request $request, $page = 1): \Symfony\Component\HttpFoundation\Response
     {
         return $this->indexStandard($request, $page);
     }

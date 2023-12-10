@@ -58,7 +58,7 @@ class RoleRepository extends CommonRepository
     /**
      * {@inheritdoc}
      */
-    protected function addCatchAllWhereClause($q, $filter)
+    protected function addCatchAllWhereClause($q, $filter): array
     {
         return $this->addStandardCatchAllWhereClause(
             $q,
@@ -148,7 +148,7 @@ class RoleRepository extends CommonRepository
     }
 
     /**
-     * {@inheritdoc}
+     * @return string[]
      */
     public function getSearchCommands(): array
     {

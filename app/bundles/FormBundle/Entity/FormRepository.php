@@ -71,7 +71,7 @@ class FormRepository extends CommonRepository
     /**
      * {@inheritdoc}
      */
-    protected function addCatchAllWhereClause($q, $filter)
+    protected function addCatchAllWhereClause($q, $filter): array
     {
         return $this->addStandardCatchAllWhereClause($q, $filter, [
             'f.name',
@@ -206,7 +206,7 @@ class FormRepository extends CommonRepository
     }
 
     /**
-     * {@inheritdoc}
+     * @return string[]
      */
     public function getSearchCommands(): array
     {

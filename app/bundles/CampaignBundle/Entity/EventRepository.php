@@ -223,11 +223,11 @@ class EventRepository extends CommonRepository
     }
 
     /**
-     * {@inheritdoc}
+     * For the API.
      *
-     * For the API
+     * @return string[]
      */
-    public function getSearchCommands()
+    public function getSearchCommands(): array
     {
         return $this->getStandardSearchCommands();
     }
@@ -288,7 +288,7 @@ class EventRepository extends CommonRepository
      *
      * For the API
      */
-    protected function addCatchAllWhereClause($q, $filter)
+    protected function addCatchAllWhereClause($q, $filter): array
     {
         return $this->addStandardCatchAllWhereClause(
             $q,
@@ -304,7 +304,7 @@ class EventRepository extends CommonRepository
      *
      * For the API
      */
-    protected function addSearchCommandWhereClause($q, $filter)
+    protected function addSearchCommandWhereClause($q, $filter): array
     {
         return $this->addStandardSearchCommandWhereClause($q, $filter);
     }

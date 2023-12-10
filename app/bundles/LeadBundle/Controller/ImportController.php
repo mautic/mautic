@@ -68,7 +68,7 @@ class ImportController extends FormController
      *
      * @return JsonResponse|RedirectResponse
      */
-    public function indexAction(Request $request, $page = 1)
+    public function indexAction(Request $request, $page = 1): Response
     {
         $initEvent = $this->dispatchImportOnInit();
         $this->session->set('mautic.import.object', $initEvent->objectSingular);
@@ -129,7 +129,7 @@ class ImportController extends FormController
      *
      * @return array|JsonResponse|RedirectResponse|Response
      */
-    public function cancelAction(Request $request)
+    public function cancelAction(Request $request): Response
     {
         $initEvent   = $this->dispatchImportOnInit();
         $object      = $initEvent->objectSingular;
@@ -154,7 +154,7 @@ class ImportController extends FormController
      *
      * @return array|JsonResponse|RedirectResponse|Response
      */
-    public function queueAction(Request $request)
+    public function queueAction(Request $request): Response
     {
         $initEvent   = $this->dispatchImportOnInit();
         $object      = $initEvent->objectSingular;
@@ -175,8 +175,6 @@ class ImportController extends FormController
     /**
      * @param int  $objectId
      * @param bool $ignorePost
-     *
-     * @return JsonResponse|Response
      */
     public function newAction(Request $request, $objectId = 0, $ignorePost = false): Response
     {

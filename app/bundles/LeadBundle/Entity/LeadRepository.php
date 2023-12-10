@@ -189,7 +189,7 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
     {
         $result = $this->getEntityManager()
             ->createQuery("
-                SELECT c.id 
+                SELECT c.id
                 FROM Mautic\LeadBundle\Entity\Lead c
                 WHERE c.email IN (:emails)
             ")
@@ -670,10 +670,8 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
      * Adds the "catch all" where clause to the QueryBuilder.
      *
      * @param \Doctrine\ORM\QueryBuilder|\Doctrine\DBAL\Query\QueryBuilder $q
-     *
-     * @return array
      */
-    protected function addCatchAllWhereClause($q, $filter)
+    protected function addCatchAllWhereClause($q, $filter): array
     {
         $columns = array_merge(
             [
@@ -962,7 +960,7 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
     }
 
     /**
-     * Returns the array of search commands.
+     * @return string[]
      */
     public function getSearchCommands(): array
     {

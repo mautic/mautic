@@ -80,6 +80,9 @@ class DynamicContentRepository extends CommonRepository
         return [$expr, $parameters];
     }
 
+    /**
+     * @return string[]
+     */
     public function getSearchCommands(): array
     {
         $commands = [
