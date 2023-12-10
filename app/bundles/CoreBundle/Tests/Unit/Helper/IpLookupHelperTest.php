@@ -97,9 +97,6 @@ class IpLookupHelperTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @param null $request
-     * @param null $mockCoreParametersHelper
-     *
      * @return IpLookupHelper
      */
     private function getIpHelper($request = null, $mockCoreParametersHelper = null)

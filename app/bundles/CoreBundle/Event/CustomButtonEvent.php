@@ -14,8 +14,6 @@ class CustomButtonEvent extends AbstractCustomRequestEvent
 
     /**
      * CustomButtonEvent constructor.
-     *
-     * @param null $item
      */
     public function __construct(protected $location, Request $request, array $buttons = [], protected $item = null)
     {
@@ -44,9 +42,6 @@ class CustomButtonEvent extends AbstractCustomRequestEvent
 
     /**
      * Add an array of buttons.
-     *
-     * @param null $location
-     * @param null $route
      *
      * @return $this
      */

@@ -74,7 +74,7 @@ class DeviceModel extends FormModel
     /**
      * {@inheritdoc}
      *
-     * @param null  $action
+
      * @param array $options
      *
      * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException

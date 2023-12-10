@@ -237,9 +237,6 @@ class CommonRepository extends ServiceEntityRepository
     }
 
     /**
-     * @param null $catAlias
-     * @param null $lang
-     *
      * @return mixed|null
      */
     public function findOneBySlugs($alias, $catAlias = null, $lang = null)

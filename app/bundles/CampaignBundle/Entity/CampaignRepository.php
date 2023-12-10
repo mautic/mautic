@@ -64,10 +64,10 @@ class CampaignRepository extends CommonRepository
     /**
      * Returns a list of all published (and active) campaigns (optionally for a specific lead).
      *
-     * @param null $specificId
-     * @param null $leadId
-     * @param bool $forList    If true, returns ID and name only
-     * @param bool $viewOther  If true, returns all the campaigns
+
+
+     * @param bool $forList   If true, returns ID and name only
+     * @param bool $viewOther If true, returns all the campaigns
      *
      * @return array
      */
@@ -194,8 +194,6 @@ class CampaignRepository extends CommonRepository
 
     /**
      * Get array of list IDs => name assigned to this campaign.
-     *
-     * @param null $id
      */
     public function getCampaignListSources($id): array
     {

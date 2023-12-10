@@ -511,8 +511,6 @@ class ZohoIntegration extends CrmAbstractIntegration
 
     /**
      * @param array $params
-     * @param null  $query
-     * @param null  $executed
      * @param array $result
      */
     public function getCompanies($params = [], $query = null, &$executed = null, &$result = []): int
@@ -584,7 +582,6 @@ class ZohoIntegration extends CrmAbstractIntegration
      *
      * @param array $data
      * @param array $config
-     * @param null  $object
      */
     public function populateMauticLeadData($data, $config = [], $object = 'Leads'): array
     {

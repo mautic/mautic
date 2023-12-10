@@ -386,7 +386,6 @@ class ReportModel extends FormModel
      * Export report.
      *
      * @param string $format
-     * @param null   $handle
      * @param int    $page
      *
      * @return StreamedResponse|Response

@@ -70,7 +70,6 @@ class BuilderSubscriber implements EventSubscriberInterface
      * @param PageDisplayEvent|EmailSendEvent $event
      * @param int                             $leadId
      * @param array                           $source
-     * @param null                            $emailId
      *
      * @return mixed[]
      */

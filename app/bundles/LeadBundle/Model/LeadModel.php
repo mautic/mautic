@@ -1113,11 +1113,7 @@ class LeadModel extends FormModel
     /**
      * @param array $fields
      * @param array $data
-     * @param null  $owner
-     * @param null  $list
-     * @param null  $tags
      * @param bool  $persist
-     * @param null  $importId
      * @param bool  $skipIfExists
      *
      * @throws \Exception

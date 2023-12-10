@@ -31,7 +31,7 @@ use Symfony\Component\Routing\Router;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
- * @method HubspotApi getApiHelper
+ * @method HubspotApi getApiHelper()
  */
 class HubspotIntegration extends CrmAbstractIntegration
 {
@@ -392,8 +392,6 @@ class HubspotIntegration extends CrmAbstractIntegration
 
     /**
      * @param array  $params
-     * @param null   $query
-     * @param null   $executed
      * @param array  $result
      * @param string $object
      *
@@ -451,7 +449,6 @@ class HubspotIntegration extends CrmAbstractIntegration
     /**
      * @param array $params
      * @param bool  $id
-     * @param null  $executed
      */
     public function getCompanies($params = [], $id = false, &$executed = null)
     {

@@ -115,8 +115,6 @@ class AjaxController extends CommonController
     }
 
     /**
-     * @param null $bundle
-     *
      * @return Response
      */
     public function executeAjaxAction(

@@ -96,9 +96,6 @@ class EventRepository extends CommonRepository
     /**
      * Get array of events by parent.
      *
-     * @param null $decisionPath
-     * @param null $eventType
-     *
      * @return array
      */
     public function getEventsByParent($parentId, $decisionPath = null, $eventType = null)
@@ -233,7 +230,6 @@ class EventRepository extends CommonRepository
     }
 
     /**
-     * @param null   $campaignId
      * @param string $eventType
      */
     public function getEventsByChannel($channel, $campaignId = null, $eventType = 'action')

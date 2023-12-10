@@ -970,9 +970,6 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
         return $this->pointsChangeLog;
     }
 
-    /**
-     * @param null $company
-     */
     public function addCompanyChangeLogEntry($type, $name, $action, $company = null): ?CompanyChangeLog
     {
         if (!$company) {

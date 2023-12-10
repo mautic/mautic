@@ -331,7 +331,6 @@ class CampaignModel extends CommonFormModel
 
     /**
      * @param bool $persist
-     * @param null $events
      *
      * @return array
      */
@@ -582,8 +581,6 @@ class CampaignModel extends CommonFormModel
 
     /**
      * Get details of leads in a campaign.
-     *
-     * @param null $leads
      *
      * @return mixed
      */

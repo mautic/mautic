@@ -34,11 +34,6 @@ class LeadDeviceRepository extends CommonRepository
     }
 
     /**
-     * @param null $deviceNames
-     * @param null $deviceBrands
-     * @param null $deviceModels
-     * @param null $deviceId
-     *
      * @return array
      */
     public function getDevice($lead, $deviceNames = null, $deviceBrands = null, $deviceModels = null, $deviceOss = null, $deviceId = null)

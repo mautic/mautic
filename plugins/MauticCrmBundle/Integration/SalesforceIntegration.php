@@ -24,9 +24,7 @@ use Symfony\Component\Form\FormBuilder;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 /**
- * Class SalesforceIntegration.
- *
- * @method SalesforceApi getApiHelper
+ * @method SalesforceApi getApiHelper()
  */
 class SalesforceIntegration extends CrmAbstractIntegration
 {
@@ -850,8 +848,6 @@ class SalesforceIntegration extends CrmAbstractIntegration
 
     /**
      * @param array  $params
-     * @param null   $query
-     * @param null   $executed
      * @param array  $result
      * @param string $object
      *
@@ -916,8 +912,6 @@ class SalesforceIntegration extends CrmAbstractIntegration
 
     /**
      * @param array $params
-     * @param null  $query
-     * @param null  $executed
      *
      * @return array|null
      */
@@ -1604,8 +1598,6 @@ class SalesforceIntegration extends CrmAbstractIntegration
     }
 
     /**
-     * @param null $progress
-     *
      * @return array
      *
      * @throws ApiErrorException
@@ -1684,10 +1676,6 @@ class SalesforceIntegration extends CrmAbstractIntegration
         return $sfEntityRecords;
     }
 
-    /**
-     * @param null $objectId
-     * @param null $sfRecord
-     */
     protected function buildCompositeBody(
         &$mauticData,
         $objectFields,
@@ -1861,7 +1849,6 @@ class SalesforceIntegration extends CrmAbstractIntegration
     }
 
     /**
-     * @param null   $object
      * @param string $priorityObject
      *
      * @return mixed
@@ -1874,7 +1861,6 @@ class SalesforceIntegration extends CrmAbstractIntegration
     }
 
     /**
-     * @param null   $object
      * @param string $priorityObject
      *
      * @return mixed
@@ -2055,9 +2041,6 @@ class SalesforceIntegration extends CrmAbstractIntegration
         return $this->getApiHelper()->request('query', ['q' => $findQuery], 'GET', false, null, $queryUrl);
     }
 
-    /**
-     * @param null $progress
-     */
     protected function prepareMauticContactsToUpdate(
         &$mauticData,
         &$checkEmailsInSF,
@@ -2759,9 +2742,6 @@ class SalesforceIntegration extends CrmAbstractIntegration
         return [$totalUpdated, $totalCreated, $totalErrors, $totalIgnored];
     }
 
-    /**
-     * @param null $progress
-     */
     protected function prepareMauticCompaniesToUpdate(
         &$mauticData,
         &$checkCompaniesInSF,
@@ -2919,9 +2899,6 @@ class SalesforceIntegration extends CrmAbstractIntegration
         return 0 === $toUpdateCount;
     }
 
-    /**
-     * @param null $progress
-     */
     protected function getMauticEntitesToCreate(
         &$checkIdsInSF,
         $mauticCompanyFieldString,

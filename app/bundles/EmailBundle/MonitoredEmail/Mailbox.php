@@ -181,9 +181,6 @@ class Mailbox
     /**
      * Returns if a mailbox is configured.
      *
-     * @param null $bundleKey
-     * @param null $folderKey
-     *
      * @throws MailboxException
      */
     public function isConfigured($bundleKey = null, $folderKey = null): bool
@@ -237,8 +234,6 @@ class Mailbox
 
     /**
      * Set imap path based on mailbox settings.
-     *
-     * @param null $settings
      */
     public function setImapPath($settings = null): void
     {
@@ -458,8 +453,6 @@ class Mailbox
 
     /**
      * Fetch unread messages.
-     *
-     * @param null $folder
      *
      * @return array
      */

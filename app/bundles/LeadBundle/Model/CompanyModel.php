@@ -736,7 +736,6 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
     /**
      * @param mixed[] $fields
      * @param mixed[] $data
-     * @param null    $owner
      * @param bool    $skipIfExists
      *
      * @throws \Exception
@@ -759,7 +758,6 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
     /**
      * @param array $fields
      * @param array $data
-     * @param null  $owner
      *
      * @return Company|null
      *

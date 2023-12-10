@@ -343,8 +343,6 @@ class LeadListRepository extends CommonRepository
     }
 
     /**
-     * @param null $leadId
-     *
      * @return QueryBuilder
      */
     protected function createFilterExpressionSubQuery($table, $alias, $column, $value, array &$parameters, $leadId = null, array $subQueryFilters = [])

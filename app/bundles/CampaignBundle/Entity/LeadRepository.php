@@ -17,8 +17,6 @@ class LeadRepository extends CommonRepository
 
     /**
      * Get the details of leads added to a campaign.
-     *
-     * @param null $leads
      */
     public function getLeadDetails($campaignId, $leads = null): array
     {
@@ -49,8 +47,6 @@ class LeadRepository extends CommonRepository
 
     /**
      * Get leads for a specific campaign.
-     *
-     * @param null $eventId
      *
      * @return array
      */

@@ -300,8 +300,6 @@ class CompanyRepository extends CommonRepository implements CustomFieldRepositor
     /**
      * Get a list of lists.
      *
-     * @param null $state
-     *
      * @return array
      */
     public function identifyCompany($companyName, $city = null, $country = null, $state = null)
@@ -409,7 +407,6 @@ class CompanyRepository extends CommonRepository implements CustomFieldRepositor
     }
 
     /**
-     * @param null   $labelColumn
      * @param string $valueColumn
      *
      * @return array

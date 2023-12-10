@@ -23,8 +23,6 @@ class Client
      */
 
     /**
-     * @param null $secret
-     *
      * @return mixed|ResponseInterface
      *
      * @throws \Http\Client\Exception

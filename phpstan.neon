@@ -1,6 +1,5 @@
 includes:
 	- phpstan-baseline.neon
-	- vendor/phpstan/phpstan/conf/bleedingEdge.neon
 
 parameters:
 	tmpDir: ./var/cache/phpstan
@@ -19,8 +18,6 @@ parameters:
 		- *.js.php
 		- *.less.php
 		- *.inc.php
-		- app/bundles/CoreBundle/Controller/AbstractFormController.php
-		- app/bundles/CoreBundle/Controller/AbstractStandardFormController.php
 	dynamicConstantNames:
 		- MAUTIC_ENV
 		- MAUTIC_TABLE_PREFIX

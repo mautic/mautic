@@ -143,7 +143,6 @@ class WebhookModel extends FormModel
 
     /**
      * @param Webhook      $entity
-     * @param null         $action
      * @param array<mixed> $options
      *
      * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException

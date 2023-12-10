@@ -110,7 +110,6 @@ class AssetModel extends FormModel
     }
 
     /**
-     * @param null   $request
      * @param string $code
      * @param array  $systemEntry
      *

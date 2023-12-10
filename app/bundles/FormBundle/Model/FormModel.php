@@ -800,9 +800,6 @@ class FormModel extends CommonFormModel
         }
     }
 
-    /**
-     * @param null $operator
-     */
     public function getFilterExpressionFunctions($operator = null): array
     {
         $operatorOptions = [

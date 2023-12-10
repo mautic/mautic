@@ -72,8 +72,6 @@ class MessageModel extends FormModel implements AjaxLookupModelInterface
     }
 
     /**
-     * @param null $id
-     *
      * @return Form
      */
     public function getEntity($id = null)
@@ -87,7 +85,6 @@ class MessageModel extends FormModel implements AjaxLookupModelInterface
 
     /**
      * @param object $entity
-     * @param null   $action
      * @param array  $options
      */
     public function createForm($entity, FormFactoryInterface $formFactory, $action = null, $options = []): \Symfony\Component\Form\FormInterface
@@ -177,10 +174,6 @@ class MessageModel extends FormModel implements AjaxLookupModelInterface
     }
 
     /**
-     * @param null $dateFrom
-     * @param null $dateTo
-     * @param null $channel
-     *
      * @return array
      */
     public function getLeadStatsPost($messageId, $dateFrom = null, $dateTo = null, $channel = null)
@@ -200,9 +193,6 @@ class MessageModel extends FormModel implements AjaxLookupModelInterface
     }
 
     /**
-     * @param null $dateFrom
-     * @param null $dateTo
-     *
      * @return mixed
      */
     public function getMarketingMessagesEventLogs($messageId, $dateFrom = null, $dateTo = null)

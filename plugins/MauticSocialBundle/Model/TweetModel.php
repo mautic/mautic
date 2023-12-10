@@ -126,7 +126,6 @@ class TweetModel extends FormModel implements AjaxLookupModelInterface
      * {@inheritdoc}
      *
      * @param Tweet        $entity
-     * @param null         $action
      * @param array<mixed> $options
      *
      * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException

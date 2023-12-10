@@ -109,7 +109,7 @@ class SmsModel extends FormModel implements AjaxLookupModelInterface
     /**
      * {@inheritdoc}
      *
-     * @param null  $action
+
      * @param array $options
      *
      * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
@@ -346,9 +346,7 @@ class SmsModel extends FormModel implements AjaxLookupModelInterface
     }
 
     /**
-     * @param null $source
      * @param bool $persist
-     * @param null $listId
      *
      * @throws \Exception
      */

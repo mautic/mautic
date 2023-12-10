@@ -13,8 +13,6 @@ class IpLookupFactory
     }
 
     /**
-     * @param null $auth
-     *
      * @return AbstractLookup|null
      */
     public function getService($service, $auth = null, array $ipLookupConfig = [])

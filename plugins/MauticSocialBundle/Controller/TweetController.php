@@ -35,8 +35,6 @@ class TweetController extends FormController
     }
 
     /**
-     * @param null $objectId
-     *
      * @return mixed
      */
     protected function getSessionBase($objectId = null)

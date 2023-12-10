@@ -170,8 +170,6 @@ class QueryBuilder extends BaseQueryBuilder
     }
 
     /**
-     * @param null $joinType allowed values: inner, left, right
-     *
      * @return array|bool|string
      */
     public function getTableAlias(string $table, $joinType = null)

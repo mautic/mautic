@@ -583,10 +583,7 @@ class CommonController extends AbstractController implements MauticController
     }
 
     /**
-     * @param null      $type
      * @param bool|true $isRead
-     * @param null      $header
-     * @param null      $iconClass
      *
      * @deprecated Will be removed in Mautic 3.0 as unused.
      */

@@ -424,7 +424,6 @@ class ConnectwiseIntegration extends CrmAbstractIntegration
      * Get Contacts from connectwise.
      *
      * @param array $params
-     * @param null  $query
      */
     public function getLeads($params = [], $query = null, &$executed = null, $result = [], $object = 'Contact'): int
     {
@@ -796,7 +795,6 @@ class ConnectwiseIntegration extends CrmAbstractIntegration
     }
 
     /**
-     * @param null   $object
      * @param string $priorityObject
      *
      * @return mixed

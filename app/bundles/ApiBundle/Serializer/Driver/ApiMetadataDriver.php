@@ -120,7 +120,7 @@ class ApiMetadataDriver extends BaseAnnotationDriver implements DriverInterface
     /**
      * Add property and set default version and Details group.
      *
-     * @param null $serializedName
+
      * @param bool $useGetter
      *
      * @return $this
@@ -192,8 +192,6 @@ class ApiMetadataDriver extends BaseAnnotationDriver implements DriverInterface
     }
 
     /**
-     * @param null $property
-     *
      * @return $this
      */
     public function setSinceVersion($version, $property = null)
@@ -208,8 +206,6 @@ class ApiMetadataDriver extends BaseAnnotationDriver implements DriverInterface
     }
 
     /**
-     * @param null $property
-     *
      * @return $this
      */
     public function setUntilVersion($version, $property = null)
@@ -224,8 +220,6 @@ class ApiMetadataDriver extends BaseAnnotationDriver implements DriverInterface
     }
 
     /**
-     * @param null $property
-     *
      * @return $this
      */
     public function setSerializedName($name, $property = null)
@@ -262,8 +256,6 @@ class ApiMetadataDriver extends BaseAnnotationDriver implements DriverInterface
     /**
      * Add a group the property belongs to.
      *
-     * @param null $property True to apply to all current properties
-     *
      * @return $this
      */
     public function addGroup($group, $property = null)
@@ -298,8 +290,6 @@ class ApiMetadataDriver extends BaseAnnotationDriver implements DriverInterface
 
     /**
      * Set max depth for the property if an association.
-     *
-     * @param null $property
      *
      * @return $this
      */

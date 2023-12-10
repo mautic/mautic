@@ -379,7 +379,6 @@ class FocusModel extends FormModel
     }
 
     /**
-     * @param null $dateFormat
      * @param bool $canViewOthers
      *
      * @return array

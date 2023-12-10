@@ -27,9 +27,7 @@ trait FrequencyRuleTrait
 
     /**
      * @param array $viewParameters
-     * @param null  $data
      * @param bool  $isPublic
-     * @param null  $action
      * @param bool  $isPreferenceCenter
      *
      * @return true|Form
@@ -97,9 +95,7 @@ trait FrequencyRuleTrait
     }
 
     /**
-     * @param null $leadChannels
      * @param bool $isPublic
-     * @param null $frequencyRules
      */
     protected function getFrequencyRuleFormData(Lead $lead, array $allChannels = null, $leadChannels = null, $isPublic = false, $frequencyRules = null, $isPreferenceCenter = false): array
     {

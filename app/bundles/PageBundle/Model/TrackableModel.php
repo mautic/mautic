@@ -217,8 +217,6 @@ class TrackableModel extends AbstractCommonModel
      * Extract URLs from content and return as trackables.
      *
      * @param mixed      $content
-     * @param null       $channel
-     * @param null       $channelId
      * @param bool|false $usingClickthrough Set to false if not using a clickthrough parameter. This is to ensure that URLs are built correctly with ?
      *                                      or & for URLs tracked that include query parameters
      *
@@ -478,8 +476,6 @@ class TrackableModel extends AbstractCommonModel
 
     /**
      * Validates that a token is trackable as a URL.
-     *
-     * @param null $tokenizedHost
      */
     protected function validateTokenIsTrackable($token, $tokenizedHost = null): bool
     {

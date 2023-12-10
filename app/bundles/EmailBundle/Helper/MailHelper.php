@@ -732,7 +732,6 @@ class MailHelper
      * @param string $template
      * @param array  $vars
      * @param bool   $returnContent
-     * @param null   $charset
      *
      * @return void|string
      */
@@ -802,7 +801,6 @@ class MailHelper
 
     /**
      * @param string $contentType
-     * @param null   $charset
      * @param bool   $ignoreTrackingPixel
      */
     public function setBody($content, $contentType = 'text/html', $charset = null, $ignoreTrackingPixel = false): void
@@ -971,7 +969,6 @@ class MailHelper
      * Add cc address.
      *
      * @param mixed $address
-     * @param null  $name
      *
      * @return bool
      */
@@ -1028,7 +1025,6 @@ class MailHelper
      * Add bcc address.
      *
      * @param string $address
-     * @param null   $name
      *
      * @return bool
      */
@@ -1503,8 +1499,6 @@ class MailHelper
 
     /**
      * Log exception.
-     *
-     * @param null $context
      */
     protected function logError($error, $context = null)
     {
@@ -1625,9 +1619,6 @@ class MailHelper
 
     /**
      * Queues the details to note if a lead received an asset if no errors are generated.
-     *
-     * @param null $contactEmail
-     * @param null $metadata
      */
     protected function queueAssetDownloadEntry($contactEmail = null, array $metadata = null)
     {
@@ -1698,7 +1689,6 @@ class MailHelper
      *
      * @param bool|true   $persist
      * @param string|null $emailAddress
-     * @param null        $listId
      */
     public function createEmailStat($persist = true, $emailAddress = null, $listId = null): Stat
     {
@@ -1805,8 +1795,6 @@ class MailHelper
     /**
      * Generate bounce email for the lead.
      *
-     * @param null $idHash
-     *
      * @return bool|string
      */
     public function generateBounceEmail($idHash = null)
@@ -1828,8 +1816,6 @@ class MailHelper
 
     /**
      * Generate an unsubscribe email for the lead.
-     *
-     * @param null $idHash
      *
      * @return bool|string
      */

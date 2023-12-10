@@ -33,8 +33,6 @@ class SmsRepository extends CommonRepository
     }
 
     /**
-     * @param null $id
-     *
      * @return \Doctrine\ORM\Internal\Hydration\IterableResult
      */
     public function getPublishedBroadcasts($id = null)

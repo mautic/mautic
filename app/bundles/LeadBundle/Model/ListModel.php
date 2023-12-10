@@ -943,7 +943,6 @@ class ListModel extends FormModel
     }
 
     /**
-     * @param null  $dateFormat
      * @param array $filter
      * @param bool  $canViewOthers
      */
@@ -1005,7 +1004,6 @@ class ListModel extends FormModel
     }
 
     /**
-     * @param null  $dateFormat
      * @param array $filter
      * @param bool  $canViewOthers
      */
@@ -1119,8 +1117,7 @@ class ListModel extends FormModel
     }
 
     /**
-     * @param      $segmentId      *
-     * @param null $returnProperty property of entity in returned array, null return all entity
+     * @param $segmentId *
      *
      * @return array
      */

@@ -1722,7 +1722,6 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
      * @param int    $reason
      * @param string $comments
      * @param bool   $flush
-     * @param null   $leadId
      */
     public function setEmailDoNotContact($email, $reason = DoNotContact::BOUNCED, $comments = '', $flush = true, $leadId = null): array
     {

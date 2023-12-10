@@ -302,9 +302,8 @@ class PlainTextHelper
      * appeared. Also makes an effort at identifying and handling absolute
      * and relative links.
      *
-     * @param string $link         URL of the link
-     * @param string $display      Part of the text to associate number with
-     * @param null   $linkOverride
+     * @param string $link    URL of the link
+     * @param string $display Part of the text to associate number with
      *
      * @return string
      */

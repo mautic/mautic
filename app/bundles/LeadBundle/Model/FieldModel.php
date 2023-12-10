@@ -731,7 +731,7 @@ class FieldModel extends FormModel
     /**
      * {@inheritdoc}
      *
-     * @param null  $action
+
      * @param array $options
      *
      * @throws MethodNotAllowedHttpException
