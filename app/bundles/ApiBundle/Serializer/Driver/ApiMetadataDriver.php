@@ -120,7 +120,6 @@ class ApiMetadataDriver extends BaseAnnotationDriver implements DriverInterface
     /**
      * Add property and set default version and Details group.
      *
-
      * @param bool $useGetter
      *
      * @return $this
@@ -255,6 +254,8 @@ class ApiMetadataDriver extends BaseAnnotationDriver implements DriverInterface
 
     /**
      * Add a group the property belongs to.
+     *
+     * @param mixed $property
      *
      * @return $this
      */
