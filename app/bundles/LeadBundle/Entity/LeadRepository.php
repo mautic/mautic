@@ -189,7 +189,7 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
     {
         $result = $this->getEntityManager()
             ->createQuery("
-                SELECT c.id 
+                SELECT c.id
                 FROM Mautic\LeadBundle\Entity\Lead c
                 WHERE c.email IN (:emails)
             ")
@@ -358,10 +358,8 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
      * {@inheritdoc}
      *
      * @param int $id
-     *
-     * @return mixed|null
      */
-    public function getEntity($id = 0)
+    public function getEntity($id = 0): ?Lead
     {
         try {
             $q = $this->createQueryBuilder($this->getTableAlias());

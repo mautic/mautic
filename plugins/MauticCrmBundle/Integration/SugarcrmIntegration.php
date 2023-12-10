@@ -1782,7 +1782,7 @@ class SugarcrmIntegration extends CrmAbstractIntegration
     /**
      * Checks if a string contains SuiteCRM / SugarCRM 6.x Multi-Select values.
      *
-     * @param  string
+     * @param string $stringToCheck
      */
     public function checkIfSugarCrmMultiSelectString($stringToCheck): bool
     {

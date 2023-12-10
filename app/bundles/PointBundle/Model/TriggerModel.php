@@ -200,12 +200,7 @@ class TriggerModel extends CommonFormModel
         }
     }
 
-    /**
-     * {@inheritdoc}
-     *
-     * @return Trigger|null
-     */
-    public function getEntity($id = null)
+    public function getEntity($id = null): ?Trigger
     {
         if (null === $id) {
             return new Trigger();

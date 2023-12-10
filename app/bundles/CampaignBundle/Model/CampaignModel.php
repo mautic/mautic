@@ -125,10 +125,8 @@ class CampaignModel extends CommonFormModel
 
     /**
      * Get a specific entity or generate a new one if id is empty.
-     *
-     * @return Campaign|null
      */
-    public function getEntity($id = null)
+    public function getEntity($id = null): ?Campaign
     {
         if (null === $id) {
             return new Campaign();
@@ -541,11 +539,9 @@ class CampaignModel extends CommonFormModel
     /**
      * Gets a list of published campaigns.
      *
-     * @param bool $forList
-     *
      * @return array
      */
-    public function getPublishedCampaigns($forList = false)
+    public function getPublishedCampaigns(bool $forList = false)
     {
         static $campaigns = [];
 

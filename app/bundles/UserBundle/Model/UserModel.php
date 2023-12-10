@@ -130,10 +130,7 @@ class UserModel extends FormModel
         return $formFactory->create(UserType::class, $entity, $options);
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getEntity($id = null)
+    public function getEntity($id = null): User
     {
         if (null === $id) {
             return new User();

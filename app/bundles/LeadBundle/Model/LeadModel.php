@@ -314,10 +314,8 @@ class LeadModel extends FormModel
 
     /**
      * Get a specific entity or generate a new one if id is empty.
-     *
-     * @return Lead|null
      */
-    public function getEntity($id = null)
+    public function getEntity($id = null): ?Lead
     {
         if (null === $id) {
             return new Lead();

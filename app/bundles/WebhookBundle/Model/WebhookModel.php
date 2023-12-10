@@ -162,10 +162,7 @@ class WebhookModel extends FormModel
         return $formFactory->create(WebhookType::class, $entity, $options);
     }
 
-    /**
-     * @return Webhook|null
-     */
-    public function getEntity($id = null)
+    public function getEntity($id = null): ?Webhook
     {
         if (null === $id) {
             return new Webhook();

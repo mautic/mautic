@@ -129,10 +129,8 @@ class SmsModel extends FormModel implements AjaxLookupModelInterface
 
     /**
      * Get a specific entity or generate a new one if id is empty.
-     *
-     * @return Sms|null
      */
-    public function getEntity($id = null)
+    public function getEntity($id = null): ?Sms
     {
         if (null === $id) {
             $entity = new Sms();

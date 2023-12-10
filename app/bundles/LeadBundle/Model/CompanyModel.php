@@ -164,12 +164,7 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
         return $formFactory->create(CompanyType::class, $entity, $options);
     }
 
-    /**
-     * {@inheritdoc}
-     *
-     * @return Company|null
-     */
-    public function getEntity($id = null)
+    public function getEntity($id = null): ?Company
     {
         if (null === $id) {
             return new Company();

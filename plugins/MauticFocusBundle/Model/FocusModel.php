@@ -120,10 +120,8 @@ class FocusModel extends FormModel
      * {@inheritdoc}
      *
      * @param int|null $id
-     *
-     * @return Focus|null
      */
-    public function getEntity($id = null)
+    public function getEntity($id = null): ?Focus
     {
         if (null === $id) {
             return new Focus();

@@ -6,6 +6,7 @@ use Doctrine\ORM\EntityManager;
 use Mautic\CampaignBundle\Model\CampaignModel;
 use Mautic\ChannelBundle\ChannelEvents;
 use Mautic\ChannelBundle\Entity\Message;
+use Mautic\ChannelBundle\Entity\MessageRepository;
 use Mautic\ChannelBundle\Event\MessageEvent;
 use Mautic\ChannelBundle\Form\Type\MessageType;
 use Mautic\ChannelBundle\Helper\ChannelListHelper;
@@ -63,18 +64,12 @@ class MessageModel extends FormModel implements AjaxLookupModelInterface
         return 'channel:messages';
     }
 
-    /**
-     * @return \Mautic\ChannelBundle\Entity\MessageRepository
-     */
-    public function getRepository()
+    public function getRepository(): ?MessageRepository
     {
         return $this->em->getRepository(\Mautic\ChannelBundle\Entity\Message::class);
     }
 
-    /**
-     * @return Form
-     */
-    public function getEntity($id = null)
+    public function getEntity($id = null): ?Message
     {
         if (null === $id) {
             return new Message();

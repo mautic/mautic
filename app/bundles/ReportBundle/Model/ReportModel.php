@@ -133,12 +133,7 @@ class ReportModel extends FormModel
         return $reportGenerator->getForm($entity, $options);
     }
 
-    /**
-     * {@inheritdoc}
-     *
-     * @return Report|null
-     */
-    public function getEntity($id = null)
+    public function getEntity($id = null): ?Report
     {
         if (null === $id) {
             return new Report();

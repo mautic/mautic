@@ -210,10 +210,7 @@ class PageModel extends FormModel
         return $formFactory->create($formClass, $entity, $options);
     }
 
-    /**
-     * @return Page|null
-     */
-    public function getEntity($id = null)
+    public function getEntity($id = null): ?Page
     {
         if (null === $id) {
             $entity = new Page();

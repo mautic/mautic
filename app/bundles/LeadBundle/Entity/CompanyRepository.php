@@ -40,13 +40,9 @@ class CompanyRepository extends CommonRepository implements CustomFieldRepositor
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @param int $id
-     *
-     * @return mixed|null
      */
-    public function getEntity($id = 0)
+    public function getEntity($id = 0): ?Company
     {
         try {
             $q = $this->createQueryBuilder($this->getTableAlias());
@@ -63,7 +59,7 @@ class CompanyRepository extends CommonRepository implements CustomFieldRepositor
         }
 
         if (null === $entity) {
-            return $entity;
+            return null;
         }
 
         if ($entity->getFields()) {

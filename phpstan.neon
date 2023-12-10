@@ -18,6 +18,8 @@ parameters:
 		- *.js.php
 		- *.less.php
 		- *.inc.php
+		# @todo handle once null params are resolved
+		- app/bundles/CoreBundle/Controller/AbstractStandardFormController.php
 	dynamicConstantNames:
 		- MAUTIC_ENV
 		- MAUTIC_TABLE_PREFIX

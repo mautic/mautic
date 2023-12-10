@@ -13,7 +13,7 @@ use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\FormBuilder;
 
 /**
- * @method \MauticPlugin\MauticCrmBundle\Api\ConnectwiseApi getApiHelper
+ * @method \MauticPlugin\MauticCrmBundle\Api\ConnectwiseApi getApiHelper()
  */
 class ConnectwiseIntegration extends CrmAbstractIntegration
 {

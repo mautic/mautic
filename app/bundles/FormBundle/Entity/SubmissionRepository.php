@@ -180,10 +180,8 @@ class SubmissionRepository extends CommonRepository
      * {@inheritdoc}
      *
      * @param int $id
-     *
-     * @return Submission|null
      */
-    public function getEntity($id = 0)
+    public function getEntity($id = 0): ?Submission
     {
         $entity = parent::getEntity($id);
 

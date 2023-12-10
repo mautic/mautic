@@ -71,7 +71,7 @@ class CampaignRepository extends CommonRepository
      *
      * @return array
      */
-    public function getPublishedCampaigns($specificId = null, $leadId = null, $forList = false, $viewOther = false)
+    public function getPublishedCampaigns($specificId = null, ?int $leadId = null, $forList = false, $viewOther = false)
     {
         $q = $this->getEntityManager()->createQueryBuilder()
             ->from(\Mautic\CampaignBundle\Entity\Campaign::class, 'c', 'c.id');

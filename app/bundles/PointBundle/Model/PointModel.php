@@ -98,12 +98,7 @@ class PointModel extends CommonFormModel
         return $formFactory->create(PointType::class, $entity, $options);
     }
 
-    /**
-     * {@inheritdoc}
-     *
-     * @return Point|null
-     */
-    public function getEntity($id = null)
+    public function getEntity($id = null): ?Point
     {
         if (null === $id) {
             return new Point();
