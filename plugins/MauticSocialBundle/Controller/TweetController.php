@@ -11,15 +11,6 @@ use Symfony\Component\HttpFoundation\Response;
 
 class TweetController extends FormController
 {
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
-    /**
-     * @return mixed
-     */
->>>>>>> b9b280ac6a (model name is string)
-=======
->>>>>>> d40d311298 (fix password class, fix method format)
     protected function getModelName(): string
     {
         return 'social.tweet';

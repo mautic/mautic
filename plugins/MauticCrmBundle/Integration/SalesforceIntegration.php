@@ -24,11 +24,6 @@ use Symfony\Component\Form\FormBuilder;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 /**
-<<<<<<< HEAD
-=======
- * Class SalesforceIntegration.
- *
->>>>>>> d40d311298 (fix password class, fix method format)
  * @method SalesforceApi getApiHelper()
  */
 class SalesforceIntegration extends CrmAbstractIntegration
