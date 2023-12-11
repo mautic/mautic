@@ -76,10 +76,7 @@ class DeviceTracker
         return $trackedDevice;
     }
 
-    /**
-     * @return bool
-     */
-    public function wasDeviceChanged()
+    public function wasDeviceChanged(): bool
     {
         return $this->deviceWasChanged;
     }

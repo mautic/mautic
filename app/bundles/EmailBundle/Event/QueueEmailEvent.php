@@ -30,10 +30,7 @@ class QueueEmailEvent extends Event
         $this->retry = true;
     }
 
-    /**
-     * @return bool
-     */
-    public function shouldTryAgain()
+    public function shouldTryAgain(): bool
     {
         return $this->retry;
     }

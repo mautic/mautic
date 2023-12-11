@@ -128,10 +128,7 @@ class EmailStatOptions extends FetchOptions
         return $this;
     }
 
-    /**
-     * @return bool
-     */
-    public function canViewOthers()
+    public function canViewOthers(): bool
     {
         return $this->canViewOthers;
     }

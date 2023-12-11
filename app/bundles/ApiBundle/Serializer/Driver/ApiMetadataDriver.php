@@ -135,10 +135,7 @@ class ApiMetadataDriver extends BaseAnnotationDriver implements DriverInterface
             $this->setSinceVersion($this->defaultVersion);
         }
 
-        if (null !== $this->groupPrefix) {
-            // Auto add to the Details group
-            $this->addGroup($this->groupPrefix.'Details');
-        }
+        $this->addGroup($this->groupPrefix.'Details');
 
         return $this;
     }

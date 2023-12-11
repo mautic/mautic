@@ -42,18 +42,12 @@ class TwitterCommandHelper
         $this->twitterHandleField = $coreParametersHelper->get('twitter_handle_field', 'twitter');
     }
 
-    /**
-     * @return int
-     */
-    public function getNewLeadsCount()
+    public function getNewLeadsCount(): int
     {
         return $this->newLeads;
     }
 
-    /**
-     * @return int
-     */
-    public function getUpdatedLeadsCount()
+    public function getUpdatedLeadsCount(): int
     {
         return $this->updatedLeads;
     }

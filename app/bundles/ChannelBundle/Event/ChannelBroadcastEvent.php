@@ -160,10 +160,7 @@ class ChannelBroadcastEvent extends Event
         $this->limit = $limit;
     }
 
-    /**
-     * @return int
-     */
-    public function getLimit()
+    public function getLimit(): int
     {
         return $this->limit;
     }
@@ -176,10 +173,7 @@ class ChannelBroadcastEvent extends Event
         $this->batch = $batch;
     }
 
-    /**
-     * @return int
-     */
-    public function getBatch()
+    public function getBatch(): int
     {
         return $this->batch;
     }

@@ -79,10 +79,7 @@ class ContactLimiter
         return $this->contactId;
     }
 
-    /**
-     * @return int|null
-     */
-    public function getMinContactId()
+    public function getMinContactId(): ?int
     {
         return $this->batchMinContactId ?: $this->minContactId;
     }

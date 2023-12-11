@@ -6,10 +6,7 @@ class WeekStat
 {
     private int $count = 0;
 
-    /**
-     * @return int
-     */
-    public function getCount()
+    public function getCount(): int
     {
         return $this->count;
     }

@@ -57,10 +57,8 @@ class LeadManipulator
 
     /**
      * Check if the manipulator was logged already or not.
-     *
-     * @return bool
      */
-    public function wasLogged()
+    public function wasLogged(): bool
     {
         return $this->logged;
     }

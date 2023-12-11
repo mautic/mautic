@@ -21,10 +21,7 @@ class DisplayCounter
         ++$this->displayedFields;
     }
 
-    /**
-     * @return int
-     */
-    public function getDisplayFields()
+    public function getDisplayFields(): int
     {
         return $this->displayedFields;
     }
@@ -34,10 +31,7 @@ class DisplayCounter
         ++$this->alreadyAlwaysDisplayed;
     }
 
-    /**
-     * @return int
-     */
-    public function getAlreadyAlwaysDisplayed()
+    public function getAlreadyAlwaysDisplayed(): int
     {
         return $this->alreadyAlwaysDisplayed;
     }

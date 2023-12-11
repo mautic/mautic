@@ -29,18 +29,12 @@ class BroadcastResult
         ++$this->failedCount;
     }
 
-    /**
-     * @return int
-     */
-    public function getSentCount()
+    public function getSentCount(): int
     {
         return $this->sentCount;
     }
 
-    /**
-     * @return int
-     */
-    public function getFailedCount()
+    public function getFailedCount(): int
     {
         return $this->failedCount;
     }

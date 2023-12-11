@@ -311,10 +311,7 @@ class QueryBuilder extends BaseQueryBuilder
         return $this->logicStack;
     }
 
-    /**
-     * @return array
-     */
-    public function popLogicStack()
+    public function popLogicStack(): array
     {
         $stack            = $this->logicStack;
         $this->logicStack = [];

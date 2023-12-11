@@ -32,10 +32,7 @@ class HourStat
         $this->count = (int) $count;
     }
 
-    /**
-     * @return int
-     */
-    public function getCount()
+    public function getCount(): int
     {
         return $this->count;
     }

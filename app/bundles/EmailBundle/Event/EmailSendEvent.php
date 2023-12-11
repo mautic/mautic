@@ -241,10 +241,8 @@ class EmailSendEvent extends CommonEvent
 
     /**
      * Get token array.
-     *
-     * @return array
      */
-    public function getTokens($includeGlobal = true)
+    public function getTokens($includeGlobal = true): array
     {
         $tokens = $this->tokens;
 
@@ -264,10 +262,7 @@ class EmailSendEvent extends CommonEvent
         }
     }
 
-    /**
-     * @return array
-     */
-    public function getTextHeaders()
+    public function getTextHeaders(): array
     {
         return (null !== $this->helper) ? $this->helper->getCustomHeaders() : $this->textHeaders;
     }

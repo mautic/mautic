@@ -2,7 +2,6 @@
 
 namespace Mautic\CampaignBundle\Executioner;
 
-use Doctrine\Common\Collections\ArrayCollection;
 use Mautic\CampaignBundle\Entity\Campaign;
 use Mautic\CampaignBundle\Entity\Event;
 use Mautic\CampaignBundle\Executioner\ContactFinder\KickoffContactFinder;
@@ -28,10 +27,7 @@ class KickoffExecutioner implements ExecutionerInterface
 
     private ?\Symfony\Component\Console\Helper\ProgressBar $progressBar = null;
 
-    /**
-     * @var ArrayCollection
-     */
-    private $rootEvents;
+    private ?\Doctrine\Common\Collections\ArrayCollection $rootEvents = null;
 
     private ?\Mautic\CampaignBundle\Executioner\Result\Counter $counter = null;
 

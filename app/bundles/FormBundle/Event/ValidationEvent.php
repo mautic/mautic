@@ -46,20 +46,16 @@ class ValidationEvent extends CommonEvent
 
     /**
      * Is the field valid.
-     *
-     * @return bool
      */
-    public function isValid()
+    public function isValid(): bool
     {
         return $this->valid;
     }
 
     /**
      * Get the reason this field was invalidated.
-     *
-     * @return string
      */
-    public function getInvalidReason()
+    public function getInvalidReason(): string
     {
         return $this->invalidReason;
     }

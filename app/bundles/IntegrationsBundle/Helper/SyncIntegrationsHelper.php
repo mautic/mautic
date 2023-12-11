@@ -22,7 +22,7 @@ class SyncIntegrationsHelper
     /**
      * @var array<int,string>|null
      */
-    private $enabled;
+    private ?array $enabled = null;
 
     public function __construct(
         private IntegrationsHelper $integrationsHelper,
