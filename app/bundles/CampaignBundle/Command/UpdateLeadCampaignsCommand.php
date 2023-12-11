@@ -20,7 +20,9 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 class UpdateLeadCampaignsCommand extends ModeratedCommand
 {
     private int $runLimit = 0;
+
     private ContactLimiter $contactLimiter;
+
     private bool $quiet = false;
 
     public function __construct(
@@ -189,5 +191,6 @@ class UpdateLeadCampaignsCommand extends ModeratedCommand
 
         $this->output->writeln('');
     }
+
     protected static $defaultDescription = 'Rebuild campaigns based on contact segments.';
 }

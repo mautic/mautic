@@ -56,6 +56,7 @@ final class AssetsHelper
     private $pathsHelper;
 
     private BuilderIntegrationsHelper $builderIntegrationsHelper;
+
     private InstallService $installService;
 
     public function __construct(

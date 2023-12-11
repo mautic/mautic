@@ -131,5 +131,6 @@ class MauticSocialMonitoringCommand extends Command
 
         return $returnCode;
     }
+
     protected static $defaultDescription = 'Looks at the records of monitors and iterates through them. ';
 }

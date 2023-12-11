@@ -19,7 +19,9 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 final class MobileNotificationSendTypeTest extends TypeTestCase
 {
     private RouterInterface $router;
+
     private TranslatorInterface $translator;
+
     private Connection $connection;
 
     /**

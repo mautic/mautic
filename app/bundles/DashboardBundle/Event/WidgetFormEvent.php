@@ -8,6 +8,7 @@ use Mautic\DashboardBundle\Entity\Widget;
 class WidgetFormEvent extends CommonEvent
 {
     protected $form;
+
     protected $type;
 
     /**

@@ -7,12 +7,19 @@ namespace Mautic\CoreBundle\Release;
 final class Metadata implements \JsonSerializable
 {
     private string $version;
+
     private int $majorVersion;
+
     private int $minorVersion;
+
     private int $patchVersion;
+
     private string $extraVersion;
+
     private string $stability;
+
     private string $minSupportedPHPVersion;
+
     private string $maxSupportedPHPVersion;
 
     /**
@@ -24,8 +31,11 @@ final class Metadata implements \JsonSerializable
     private string $showPHPVersionWarningIfUnder;
 
     private string $minSupportedMauticVersion;
+
     private string $announcementUrl;
+
     private string $minSupportedMySqlVersion;
+
     private string $minSupportedMariaDbVersion;
 
     public function __construct(array $metadata)

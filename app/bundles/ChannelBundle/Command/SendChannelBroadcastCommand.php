@@ -136,5 +136,6 @@ EOT
 
         return \Symfony\Component\Console\Command\Command::SUCCESS;
     }
+
     protected static $defaultDescription = 'Process contacts pending to receive a channel broadcast.';
 }

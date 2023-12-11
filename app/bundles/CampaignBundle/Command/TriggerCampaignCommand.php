@@ -28,8 +28,11 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 class TriggerCampaignCommand extends ModeratedCommand
 {
     use WriteCountTrait;
+
     private bool $kickoffOnly  = false;
+
     private bool $inactiveOnly = false;
+
     private bool $scheduleOnly = false;
 
     /**
@@ -356,5 +359,6 @@ class TriggerCampaignCommand extends ModeratedCommand
             $this->segmentCountCacheHelper->setSegmentContactCount($segmentId, (int) $totalLeadCount);
         }
     }
+
     protected static $defaultDescription = 'Trigger timed events for published campaigns.';
 }

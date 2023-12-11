@@ -18,6 +18,7 @@ return function (ECSConfig $ecsConfig): void {
     $ecsConfig->rules([
         NoUnusedImportsFixer::class,
         \Symplify\CodingStandard\Fixer\Spacing\StandaloneLinePromotedPropertyFixer::class,
+        \PhpCsFixer\Fixer\ClassNotation\ClassAttributesSeparationFixer::class,
     ]);
 
     // this way you can add sets - group of rules

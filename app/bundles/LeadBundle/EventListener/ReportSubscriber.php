@@ -25,12 +25,19 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 class ReportSubscriber implements EventSubscriberInterface
 {
     public const CONTEXT_LEADS                     = 'leads';
+
     public const CONTEXT_LEAD_POINT_LOG            = 'lead.pointlog';
+
     public const CONTEXT_CONTACT_ATTRIBUTION_MULTI = 'contact.attribution.multi';
+
     public const CONTEXT_CONTACT_ATTRIBUTION_FIRST = 'contact.attribution.first';
+
     public const CONTEXT_CONTACT_ATTRIBUTION_LAST  = 'contact.attribution.last';
+
     public const CONTEXT_CONTACT_FREQUENCYRULES    = 'contact.frequencyrules';
+
     public const CONTEXT_CONTACT_MESSAGE_FREQUENCY = 'contact.message.frequency';
+
     public const CONTEXT_COMPANIES                 = 'companies';
 
     public const GROUP_CONTACTS = 'contacts';
@@ -43,6 +50,7 @@ class ReportSubscriber implements EventSubscriberInterface
         self::CONTEXT_CONTACT_ATTRIBUTION_LAST,
         self::CONTEXT_CONTACT_FREQUENCYRULES,
     ];
+
     private $companyContexts = [self::CONTEXT_COMPANIES];
 
     /**

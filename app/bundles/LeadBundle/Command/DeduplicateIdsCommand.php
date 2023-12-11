@@ -78,5 +78,6 @@ EOT
 
         return \Symfony\Component\Console\Command\Command::SUCCESS;
     }
+
     protected static $defaultDescription = 'Merge contacts based on same unique identifiers';
 }

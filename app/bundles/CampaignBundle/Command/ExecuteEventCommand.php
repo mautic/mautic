@@ -50,5 +50,6 @@ class ExecuteEventCommand extends Command
 
         return \Symfony\Component\Console\Command\Command::SUCCESS;
     }
+
     protected static $defaultDescription = 'Execute specific scheduled events.';
 }

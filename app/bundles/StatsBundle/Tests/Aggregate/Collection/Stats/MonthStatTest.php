@@ -9,8 +9,11 @@ use PHPUnit\Framework\TestCase;
 class MonthStatTest extends TestCase
 {
     private $month  = '2019-12';
+
     private $day    = 11;
+
     private \Mautic\StatsBundle\Aggregate\Collection\Stats\MonthStat $monthStat;
+
     private $dayStat;
 
     protected function setUp(): void

@@ -54,5 +54,6 @@ class RemoveCommand extends Command
 
         return \Symfony\Component\Console\Command\Command::SUCCESS;
     }
+
     protected static $defaultDescription = 'Removes a plugin that is currently installed';
 }

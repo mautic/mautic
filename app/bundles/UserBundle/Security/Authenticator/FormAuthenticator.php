@@ -33,6 +33,7 @@ class FormAuthenticator extends AbstractFormLoginAuthenticator implements Passwo
     use TargetPathTrait;
 
     public const LOGIN_ROUTE       = 'login';
+
     public const LOGIN_CHECK_ROUTE = 'mautic_user_logincheck';
 
     /**

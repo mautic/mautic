@@ -9,6 +9,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 class RestrictionHelper
 {
     public const MODE_REMOVE = 'remove';
+
     public const MODE_MASK   = 'mask';
 
     /**

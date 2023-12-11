@@ -12,11 +12,17 @@ use Mautic\LeadBundle\Entity\Lead;
 class DBALMocker
 {
     protected $testCase;
+
     protected $mockEm;
+
     protected $mockConnection;
+
     protected $mockQueryBuilder;
+
     protected $queryResponse;
+
     protected $connectionUpdated;
+
     protected $connectionInserted;
 
     protected $queryParts = [

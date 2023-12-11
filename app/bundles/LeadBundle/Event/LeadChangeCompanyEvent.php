@@ -9,6 +9,7 @@ use Symfony\Contracts\EventDispatcher\Event;
 class LeadChangeCompanyEvent extends Event
 {
     private $lead;
+
     private $leads;
 
     public function __construct(

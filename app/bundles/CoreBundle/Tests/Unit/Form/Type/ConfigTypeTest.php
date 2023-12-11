@@ -21,6 +21,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 class ConfigTypeTest extends TypeTestCase
 {
     private \PHPUnit\Framework\MockObject\MockObject $formBuilder;
+
     private $formType;
 
     protected function setUp(): void

@@ -24,7 +24,6 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
     use CustomFieldRepositoryTrait {
         prepareDbalFieldsForSave as defaultPrepareDbalFieldsForSave;
     }
-
     use ExpressionHelperTrait;
     use OperatorListTrait;
 

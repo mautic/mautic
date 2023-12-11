@@ -41,6 +41,7 @@ class LanguageHelperTest extends TestCase
     private \PHPUnit\Framework\MockObject\MockObject $translator;
 
     private string $translationsPath;
+
     private string $tmpPath;
 
     protected function setUp(): void

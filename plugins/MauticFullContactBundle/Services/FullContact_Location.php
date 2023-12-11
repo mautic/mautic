@@ -16,6 +16,7 @@ class FullContact_Location extends FullContact_Base
      * @var array
      */
     protected $_supportedMethods = ['normalizer', 'enrichment'];
+
     protected $_resourceUri      = '';
 
     /**

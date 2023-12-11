@@ -14,6 +14,7 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 class ReportSubscriber implements EventSubscriberInterface
 {
     public const CONTEXT_ASSET          = 'assets';
+
     public const CONTEXT_ASSET_DOWNLOAD = 'asset.downloads';
 
     public function __construct(

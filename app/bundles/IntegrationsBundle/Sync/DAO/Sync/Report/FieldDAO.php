@@ -9,7 +9,9 @@ use Mautic\IntegrationsBundle\Sync\DAO\Value\NormalizedValueDAO;
 class FieldDAO
 {
     public const FIELD_CHANGED   = 'changed';
+
     public const FIELD_REQUIRED  = 'required';
+
     public const FIELD_UNCHANGED = 'unchanged';
 
     /**

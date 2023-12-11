@@ -13,7 +13,9 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 class ProcessReplySubscriber implements EventSubscriberInterface
 {
     public const BUNDLE     = 'EmailBundle';
+
     public const FOLDER_KEY = 'replies';
+
     public const CACHE_KEY  = self::BUNDLE.'_'.self::FOLDER_KEY;
 
     public static function getSubscribedEvents(): array

@@ -35,5 +35,6 @@ class ReloadCommand extends Command
 
         return \Symfony\Component\Console\Command\Command::SUCCESS;
     }
+
     protected static $defaultDescription = 'Installs, updates, enable and/or disable plugins.';
 }
