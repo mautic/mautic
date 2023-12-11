@@ -15,10 +15,8 @@ class SubmissionResultLoader implements MauticModelInterface
 
     /**
      * @param int $id
-     *
-     * @return Submission|null
      */
-    public function getSubmissionWithResult($id)
+    public function getSubmissionWithResult($id): ?Submission
     {
         $repository = $this->getRepository();
 

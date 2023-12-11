@@ -325,10 +325,8 @@ class TwitterCommandHelper
      * Get monitor record entity.
      *
      * @param int $mid
-     *
-     * @return \MauticPlugin\MauticSocialBundle\Entity\Monitoring
      */
-    public function getMonitor($mid)
+    public function getMonitor($mid): ?Monitoring
     {
         return $this->monitoringModel->getEntity($mid);
     }

@@ -353,10 +353,8 @@ class FormModel extends AbstractCommonModel
      *
      * @param string $subject
      * @param object $entity
-     *
-     * @return mixed
      */
-    public function getUserContactSubject($subject, $entity)
+    public function getUserContactSubject($subject, $entity): string
     {
         $msg = match ($subject) {
             'locked' => 'mautic.user.user.contact.locked',
@@ -373,10 +371,8 @@ class FormModel extends AbstractCommonModel
 
     /**
      * Returns the function used to name the entity.
-     *
-     * @return string
      */
-    public function getNameGetter()
+    public function getNameGetter(): string
     {
         return 'getName';
     }
@@ -389,11 +385,9 @@ class FormModel extends AbstractCommonModel
      * @param int    $maxLength      Maximum number of characters used; 0 to disable
      * @param string $spaceCharacter Character to replace spaces with
      *
-     * @return string
-     *
      * @throws \Doctrine\DBAL\Exception
      */
-    public function cleanAlias(string $alias, string $prefix = '', int $maxLength = 0, string $spaceCharacter = '_')
+    public function cleanAlias(string $alias, string $prefix = '', int $maxLength = 0, string $spaceCharacter = '_'): string
     {
         // Transliterate to latin characters
         $alias = InputHelper::transliterate(trim($alias));
