@@ -13,7 +13,9 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 class FlashBag
 {
     public const LEVEL_ERROR     = 'error';
+
     public const LEVEL_WARNING   = 'warning';
+
     public const LEVEL_NOTICE    = 'notice';
 
     public function __construct(

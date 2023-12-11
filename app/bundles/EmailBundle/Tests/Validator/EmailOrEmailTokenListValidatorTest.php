@@ -30,6 +30,7 @@ final class EmailOrEmailTokenListValidatorTest extends TestCase
              * @var callable
              */
             public $violationResult;
+
             public int $violationCount = 0;
 
             public function __construct()

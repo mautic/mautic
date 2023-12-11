@@ -7,10 +7,15 @@ namespace Mautic\IntegrationsBundle\Sync\DAO\Value;
 class EncodedValueDAO
 {
     public const STRING_TYPE   = 'string';
+
     public const INT_TYPE      = 'int';
+
     public const FLOAT_TYPE    = 'float';
+
     public const DOUBLE_TYPE   = 'double';
+
     public const DATETIME_TYPE = 'datetime';
+
     public const BOOLEAN_TYPE  = 'boolean';
 
     /**

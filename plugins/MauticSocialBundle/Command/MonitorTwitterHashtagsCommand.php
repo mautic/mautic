@@ -52,5 +52,6 @@ class MonitorTwitterHashtagsCommand extends MonitorTwitterBaseCommand
     {
         return 'twitter';
     }
+
     protected static $defaultDescription = 'Looks at our monitoring records and finds hashtags';
 }

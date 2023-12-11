@@ -144,5 +144,6 @@ EOT
 
         return false;
     }
+
     protected static $defaultDescription = 'Purge data connected to MaxMind Do Not Sell list.';
 }

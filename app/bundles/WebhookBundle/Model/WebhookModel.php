@@ -42,6 +42,7 @@ class WebhookModel extends FormModel
      *  2 possible types of the processing of the webhooks.
      */
     public const COMMAND_PROCESS   = 'command_process';
+
     public const IMMEDIATE_PROCESS = 'immediate_process';
 
     private const DELETE_BATCH_LIMIT = 5000;

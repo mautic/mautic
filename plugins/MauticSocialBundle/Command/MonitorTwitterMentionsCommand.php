@@ -52,5 +52,6 @@ class MonitorTwitterMentionsCommand extends MonitorTwitterBaseCommand
     {
         return 'twitter';
     }
+
     protected static $defaultDescription = 'Searches for mentioned tweets';
 }

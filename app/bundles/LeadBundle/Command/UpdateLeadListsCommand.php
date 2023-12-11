@@ -140,5 +140,6 @@ class UpdateLeadListsCommand extends ModeratedCommand
             );
         }
     }
+
     protected static $defaultDescription = 'Update contacts in smart segments based on new contact data.';
 }

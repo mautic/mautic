@@ -5,26 +5,41 @@ namespace Mautic\EmailBundle\MonitoredEmail;
 class Message
 {
     public $id;
+
     public $date;
+
     public $subject;
 
     public $fromName;
+
     public $fromAddress;
 
     public $to = [];
+
     public $toString;
+
     public $cc         = [];
+
     public $replyTo    = [];
+
     public $inReplyTo  = false;
+
     public $returnPath = false;
+
     public $references = [];
 
     public string $textPlain = '';
+
     public $textHtml;
+
     public string $dsnReport  = '';
+
     public string $dsnMessage = '';
+
     public $fblReport;
+
     public $fblMessage;
+
     public $xHeaders = [];
 
     /**

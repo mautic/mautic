@@ -12,9 +12,13 @@ class BuilderTokenHelper
     private $isConfigured = false;
 
     protected $permissionSet;
+
     protected $modelName;
+
     protected $viewPermissionBase;
+
     protected $langVar;
+
     protected $bundleName;
 
     /**

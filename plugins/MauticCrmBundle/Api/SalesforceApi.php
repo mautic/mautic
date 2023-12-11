@@ -14,11 +14,15 @@ use MauticPlugin\MauticCrmBundle\Integration\SalesforceIntegration;
 class SalesforceApi extends CrmApi
 {
     protected $object          = 'Lead';
+
     protected $requestSettings = [
         'encode_parameters' => 'json',
     ];
+
     protected $apiRequestCounter   = 0;
+
     protected $requestCounter      = 1;
+
     protected $maxLockRetries      = 3;
 
     public function __construct(CrmAbstractIntegration $integration)

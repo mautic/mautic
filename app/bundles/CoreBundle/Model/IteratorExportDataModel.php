@@ -7,9 +7,13 @@ use Mautic\CoreBundle\Helper\DataExporterHelper;
 class IteratorExportDataModel implements \Iterator
 {
     private int $position;
+
     private $callback;
+
     private int $total;
+
     private $data;
+
     private $totalResult;
 
     /**

@@ -12,6 +12,7 @@ use Doctrine\DBAL\Connection;
 abstract class AbstractFormatter
 {
     protected \Doctrine\DBAL\Platforms\AbstractPlatform $platform;
+
     protected string $name;
 
     /**

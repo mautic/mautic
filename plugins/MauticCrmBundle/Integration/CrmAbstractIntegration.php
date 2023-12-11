@@ -13,6 +13,7 @@ use MauticPlugin\MauticCrmBundle\Api\CrmApi;
 abstract class CrmAbstractIntegration extends AbstractIntegration
 {
     protected $auth;
+
     protected $helper;
 
     public function setIntegrationSettings(Integration $settings): void

@@ -14,6 +14,7 @@ use Symfony\Component\HttpFoundation\Request;
 class CampaignControllerFunctionalTest extends AbstractCampaignTest
 {
     private const CAMPAIGN_SUMMARY_PARAM = 'campaign_use_summary';
+
     private const CAMPAIGN_RANGE_PARAM   = 'campaign_by_range';
 
     /**

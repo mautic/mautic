@@ -73,5 +73,6 @@ class InstallCommand extends Command
 
         return \Symfony\Component\Console\Command\Command::SUCCESS;
     }
+
     protected static $defaultDescription = 'Installs a plugin that is available at Packagist.org';
 }

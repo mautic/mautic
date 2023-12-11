@@ -23,6 +23,7 @@ class CampaignHelperTest extends \PHPUnit\Framework\TestCase
     private \PHPUnit\Framework\MockObject\MockObject $client;
 
     private \PHPUnit\Framework\MockObject\MockObject $companyModel;
+
     private \PHPUnit\Framework\MockObject\MockObject $companyRepository;
 
     private \Doctrine\Common\Collections\ArrayCollection $ipCollection;

@@ -29,5 +29,6 @@ class ClearCacheCommand extends Command
     {
         return (int) !$this->cacheProvider->clear();
     }
+
     protected static $defaultDescription = 'Clears Mautic\'s cache';
 }

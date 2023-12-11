@@ -11,6 +11,7 @@ final class SlotsHelper
      * @var array<string, mixed>
      */
     private $slots     = [];
+
     /**
      * @var array<string, mixed>
      */

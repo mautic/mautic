@@ -49,5 +49,6 @@ class ExportSchedulerCommand extends Command
 
         return \Symfony\Component\Console\Command\Command::SUCCESS;
     }
+
     protected static $defaultDescription = 'Processes scheduler for report\'s export';
 }

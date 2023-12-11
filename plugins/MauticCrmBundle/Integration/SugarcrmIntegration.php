@@ -39,6 +39,7 @@ class SugarcrmIntegration extends CrmAbstractIntegration
     ];
 
     private $sugarDncKeys = ['email_opt_out', 'invalid_email'];
+
     private $authorizationError;
 
     public function __construct(

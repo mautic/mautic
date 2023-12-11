@@ -450,5 +450,6 @@ class InstallCommand extends Command
             $output->writeln("  - [$type] $message");
         }
     }
+
     protected static $defaultDescription = 'Installs Mautic';
 }
