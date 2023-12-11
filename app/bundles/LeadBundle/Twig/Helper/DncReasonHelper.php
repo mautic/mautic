@@ -18,13 +18,9 @@ final class DncReasonHelper
     /**
      * Convert DNC reason ID to text.
      *
-     * @param int $reasonId
-     *
-     * @return string
-     *
      * @throws UnknownDncReasonException
      */
-    public function toText($reasonId)
+    public function toText(int $reasonId): string
     {
         $reasonKey = match ($reasonId) {
             DoNotContact::IS_CONTACTABLE => 'mautic.lead.event.donotcontact_contactable',
