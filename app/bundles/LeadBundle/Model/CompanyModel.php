@@ -76,8 +76,7 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
         UserHelper $userHelper,
         LoggerInterface $mauticLogger,
         CoreParametersHelper $coreParametersHelper
-    )
-    {
+    ) {
         $this->leadFieldModel = $leadFieldModel;
 
         parent::__construct($em, $security, $dispatcher, $router, $translator, $userHelper, $mauticLogger, $coreParametersHelper);

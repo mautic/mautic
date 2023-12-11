@@ -30,8 +30,7 @@ abstract class AbstractLogCollectionEvent extends \Symfony\Contracts\EventDispat
         protected AbstractEventAccessor $config,
         protected Event $event,
         ArrayCollection $logs
-    )
-    {
+    ) {
         $this->logs     = $logs;
         $this->contacts = new ArrayCollection();
 

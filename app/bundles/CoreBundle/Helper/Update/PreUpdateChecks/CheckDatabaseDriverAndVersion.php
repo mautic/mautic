@@ -11,8 +11,7 @@ class CheckDatabaseDriverAndVersion extends AbstractPreUpdateCheck
 {
     public function __construct(
         private EntityManager $em
-    )
-    {
+    ) {
     }
 
     public function runCheck(): PreUpdateCheckResult

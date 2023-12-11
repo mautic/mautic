@@ -13,8 +13,7 @@ class LoadCompanyData extends AbstractFixture implements OrderedFixtureInterface
 {
     public function __construct(
         private CompanyModel $companyModel
-    )
-    {
+    ) {
     }
 
     public function load(ObjectManager $manager): void

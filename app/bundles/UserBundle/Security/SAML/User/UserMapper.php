@@ -14,8 +14,7 @@ class UserMapper implements UsernameMapperInterface
      */
     public function __construct(
         private array $attributes
-    )
-    {
+    ) {
     }
 
     public function getUser(Response $response): User

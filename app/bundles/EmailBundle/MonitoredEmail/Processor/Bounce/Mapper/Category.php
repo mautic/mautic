@@ -13,8 +13,7 @@ class Category
         private $category,
         private $type,
         private $isPermanent
-    )
-    {
+    ) {
         return $this;
     }
 

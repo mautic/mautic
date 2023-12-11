@@ -24,8 +24,7 @@ class Interval implements ScheduleModeInterface
     public function __construct(
         private LoggerInterface $logger,
         private CoreParametersHelper $coreParametersHelper
-    )
-    {
+    ) {
     }
 
     /**

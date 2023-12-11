@@ -24,8 +24,7 @@ class Configuration
 
     public function __construct(
         private IntegrationHelper $integrationHelper
-    )
-    {
+    ) {
     }
 
     /**

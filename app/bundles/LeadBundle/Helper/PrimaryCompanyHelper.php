@@ -9,8 +9,7 @@ class PrimaryCompanyHelper
 {
     public function __construct(
         private CompanyLeadRepository $companyLeadRepository
-    )
-    {
+    ) {
     }
 
     /**

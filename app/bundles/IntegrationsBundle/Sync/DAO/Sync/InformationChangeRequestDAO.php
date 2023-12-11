@@ -30,8 +30,7 @@ class InformationChangeRequestDAO
         private $objectId,
         private $field,
         private NormalizedValueDAO $newValue
-    )
-    {
+    ) {
     }
 
     public function getIntegration(): string

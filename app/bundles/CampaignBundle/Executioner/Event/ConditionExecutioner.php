@@ -18,8 +18,7 @@ class ConditionExecutioner implements EventInterface
 
     public function __construct(
         private ConditionDispatcher $dispatcher
-    )
-    {
+    ) {
     }
 
     /**

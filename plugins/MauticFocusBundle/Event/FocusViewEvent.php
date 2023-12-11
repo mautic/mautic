@@ -9,8 +9,7 @@ class FocusViewEvent extends Event
 {
     public function __construct(
         private Stat $stat
-    )
-    {
+    ) {
     }
 
     /**

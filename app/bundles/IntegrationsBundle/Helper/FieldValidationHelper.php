@@ -24,8 +24,7 @@ class FieldValidationHelper
     public function __construct(
         private FieldHelper $fieldHelper,
         private TranslatorInterface $translator
-    )
-    {
+    ) {
     }
 
     /**

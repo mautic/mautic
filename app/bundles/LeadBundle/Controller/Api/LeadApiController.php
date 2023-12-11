@@ -69,8 +69,7 @@ class LeadApiController extends CommonApiController
         EventDispatcherInterface $dispatcher,
         CoreParametersHelper $coreParametersHelper,
         MauticFactory $factory
-    )
-    {
+    ) {
         $this->doNotContactModel = $doNotContactModel;
 
         $leadModel = $modelFactory->getModel(self::MODEL_ID);

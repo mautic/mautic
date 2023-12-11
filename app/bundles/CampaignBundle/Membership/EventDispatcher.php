@@ -12,8 +12,7 @@ class EventDispatcher
 {
     public function __construct(
         private EventDispatcherInterface $dispatcher
-    )
-    {
+    ) {
     }
 
     /**

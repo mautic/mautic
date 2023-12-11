@@ -22,8 +22,7 @@ class StatHelper
 
     public function __construct(
         private StatRepository $repo
-    )
-    {
+    ) {
     }
 
     public function storeStat(Stat $stat, $emailAddress): void

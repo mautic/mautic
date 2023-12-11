@@ -13,8 +13,7 @@ class DynamicContentSendType extends AbstractType
 {
     public function __construct(
         protected RouterInterface $router
-    )
-    {
+    ) {
     }
 
     public function buildForm(FormBuilderInterface $builder, array $options): void

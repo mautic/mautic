@@ -86,8 +86,7 @@ final class MauticReportBuilder implements ReportBuilderInterface
         private Connection $db,
         private Report $entity,
         private ChannelListHelper $channelListHelper
-    )
-    {
+    ) {
     }
 
     /**

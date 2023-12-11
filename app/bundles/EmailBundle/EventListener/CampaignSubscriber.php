@@ -38,8 +38,7 @@ class CampaignSubscriber implements EventSubscriberInterface
         private RealTimeExecutioner $realTimeExecutioner,
         private SendEmailToUser $sendEmailToUser,
         private TranslatorInterface $translator
-    )
-    {
+    ) {
     }
 
     public static function getSubscribedEvents(): array

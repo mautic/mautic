@@ -13,8 +13,7 @@ class DecisionHelper
 {
     public function __construct(
         private LeadRepository $leadRepository
-    )
-    {
+    ) {
     }
 
     /**

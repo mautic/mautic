@@ -10,8 +10,7 @@ class PropertiesAccessor
 {
     public function __construct(
         private FormModel $formModel
-    )
-    {
+    ) {
     }
 
     /**

@@ -43,8 +43,7 @@ class DashboardSubscriber extends MainDashboardSubscriber
         protected SubmissionModel $formSubmissionModel,
         protected FormModel $formModel,
         private RouterInterface $router
-    )
-    {
+    ) {
     }
 
     /**

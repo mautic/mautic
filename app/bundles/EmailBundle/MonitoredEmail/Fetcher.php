@@ -30,8 +30,7 @@ class Fetcher
         private Mailbox $imapHelper,
         private EventDispatcherInterface $dispatcher,
         private TranslatorInterface $translator
-    )
-    {
+    ) {
     }
 
     /**

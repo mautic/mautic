@@ -12,8 +12,7 @@ class ReportNormalizeSubscriber implements EventSubscriberInterface
 {
     public function __construct(
         private FieldModel $fieldModel
-    )
-    {
+    ) {
     }
 
     public static function getSubscribedEvents(): array

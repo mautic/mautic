@@ -8,8 +8,7 @@ class UpgradeEvent extends Event
 {
     public function __construct(
         protected array $status
-    )
-    {
+    ) {
     }
 
     /**

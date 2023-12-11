@@ -49,8 +49,7 @@ class FormAuthenticator extends AbstractFormLoginAuthenticator implements Passwo
         private ?RequestStack $requestStack,
         private CsrfTokenManagerInterface $csrfTokenManager,
         private UrlGeneratorInterface $urlGenerator
-    )
-    {
+    ) {
     }
 
     public function supports(Request $request): bool

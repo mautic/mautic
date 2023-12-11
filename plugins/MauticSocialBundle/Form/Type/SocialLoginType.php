@@ -15,8 +15,7 @@ class SocialLoginType extends AbstractType
         private IntegrationHelper $helper,
         private FormModel $formModel,
         private CoreParametersHelper $coreParametersHelper
-    )
-    {
+    ) {
     }
 
     public function buildForm(FormBuilderInterface $builder, array $options): void

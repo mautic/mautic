@@ -29,8 +29,7 @@ class SysinfoModel
         protected Connection $connection,
         private InstallService $installService,
         private CheckStep $checkStep
-    )
-    {
+    ) {
     }
 
     /**

@@ -12,8 +12,7 @@ class ThemeListType extends AbstractType
 {
     public function __construct(
         private ThemeHelperInterface $themeHelper
-    )
-    {
+    ) {
     }
 
     public function configureOptions(OptionsResolver $resolver): void

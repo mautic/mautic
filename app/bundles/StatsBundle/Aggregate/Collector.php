@@ -12,8 +12,7 @@ class Collector
 {
     public function __construct(
         private EventDispatcherInterface $eventDispatcher
-    )
-    {
+    ) {
     }
 
     /**

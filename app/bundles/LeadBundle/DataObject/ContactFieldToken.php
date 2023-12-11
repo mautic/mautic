@@ -21,8 +21,7 @@ class ContactFieldToken
      */
     public function __construct(
         private string $fullToken
-    )
-    {
+    ) {
         $this->parse(trim($fullToken));
     }
 

@@ -14,8 +14,7 @@ class PreAuthorizationEventListener
         private EntityManager $em,
         private CorePermissions $mauticSecurity,
         private TranslatorInterface $translator
-    )
-    {
+    ) {
     }
 
     /**

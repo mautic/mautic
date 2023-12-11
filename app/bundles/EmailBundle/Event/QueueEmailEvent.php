@@ -14,8 +14,7 @@ class QueueEmailEvent extends Event
 
     public function __construct(
         private MauticMessage $message
-    )
-    {
+    ) {
     }
 
     /**

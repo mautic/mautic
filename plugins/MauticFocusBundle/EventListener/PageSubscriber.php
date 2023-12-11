@@ -20,8 +20,7 @@ class PageSubscriber implements EventSubscriberInterface
         private FocusModel $model,
         private RouterInterface $router,
         private BuilderTokenHelperFactory $builderTokenHelperFactory
-    )
-    {
+    ) {
     }
 
     public static function getSubscribedEvents(): array

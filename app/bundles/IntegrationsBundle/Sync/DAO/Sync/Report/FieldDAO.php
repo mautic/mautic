@@ -21,8 +21,7 @@ class FieldDAO
         private string $name,
         private NormalizedValueDAO $value,
         private string $state = self::FIELD_CHANGED
-    )
-    {
+    ) {
     }
 
     public function getName(): string

@@ -20,8 +20,7 @@ class RouteProvider
 
     public function __construct(
         private RouterInterface $router
-    )
-    {
+    ) {
     }
 
     public function buildListRoute(int $page = 1): string

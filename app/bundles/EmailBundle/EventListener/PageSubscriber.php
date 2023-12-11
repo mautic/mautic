@@ -15,8 +15,7 @@ class PageSubscriber implements EventSubscriberInterface
         private EmailModel $emailModel,
         private RealTimeExecutioner $realTimeExecutioner,
         private RequestStack $requestStack
-    )
-    {
+    ) {
     }
 
     public static function getSubscribedEvents(): array

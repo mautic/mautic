@@ -9,8 +9,7 @@ class ConsoleTerminateListener
 {
     public function __construct(
         private LoggerInterface $logger
-    )
-    {
+    ) {
     }
 
     public function onConsoleTerminate(ConsoleTerminateEvent $event): void

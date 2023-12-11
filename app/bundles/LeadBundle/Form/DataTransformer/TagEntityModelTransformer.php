@@ -17,8 +17,7 @@ class TagEntityModelTransformer implements DataTransformerInterface
         private EntityManager $em,
         private $repository = '',
         private $isArray = false
-    )
-    {
+    ) {
     }
 
     public function reverseTransform($entity)

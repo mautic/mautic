@@ -19,8 +19,7 @@ class ReportExporter
         private ReportExportOptions $reportExportOptions,
         private ReportFileWriter $reportFileWriter,
         private EventDispatcherInterface $eventDispatcher
-    )
-    {
+    ) {
     }
 
     /**

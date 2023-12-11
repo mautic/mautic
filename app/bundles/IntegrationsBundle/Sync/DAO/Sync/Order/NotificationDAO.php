@@ -9,8 +9,7 @@ class NotificationDAO
     public function __construct(
         private ObjectChangeDAO $objectChangeDAO,
         private string $message
-    )
-    {
+    ) {
     }
 
     /**

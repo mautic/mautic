@@ -14,8 +14,7 @@ class Config
 
     public function __construct(
         private CoreParametersHelper $coreParametersHelper
-    )
-    {
+    ) {
     }
 
     public function marketplaceIsEnabled(): bool

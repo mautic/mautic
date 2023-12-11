@@ -13,8 +13,7 @@ class CsvExporter
         protected FormatterHelper $formatterHelper,
         private CoreParametersHelper $coreParametersHelper,
         private TranslatorInterface $translator
-    )
-    {
+    ) {
     }
 
     /**

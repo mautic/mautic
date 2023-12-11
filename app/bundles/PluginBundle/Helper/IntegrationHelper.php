@@ -34,8 +34,7 @@ class IntegrationHelper
         protected CoreParametersHelper $coreParametersHelper,
         protected Environment $twig,
         protected PluginModel $pluginModel
-    )
-    {
+    ) {
     }
 
     /**

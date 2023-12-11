@@ -16,8 +16,7 @@ class CoreParametersHelper
 
     public function __construct(
         private ContainerInterface $container
-    )
-    {
+    ) {
         $loader = new ParameterLoader();
 
         $this->parameters = $loader->getParameterBag();

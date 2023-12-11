@@ -20,8 +20,7 @@ final class ContactTrackingService implements ContactTrackingServiceInterface
         private LeadRepository $leadRepository,
         private MergeRecordRepository $mergeRecordRepository,
         private RequestStack $requestStack
-    )
-    {
+    ) {
     }
 
     /**

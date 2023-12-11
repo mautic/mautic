@@ -25,8 +25,7 @@ class SimplePaginator implements \IteratorAggregate, \Countable
      */
     public function __construct(
         private Query $query
-    )
-    {
+    ) {
     }
 
     /**

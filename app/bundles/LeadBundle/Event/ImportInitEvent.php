@@ -17,8 +17,7 @@ final class ImportInitEvent extends CommonEvent
 
     public function __construct(
         public string $routeObjectName
-    )
-    {
+    ) {
     }
 
     public function setIndexRoute(?string $indexRoute, array $routeParams = []): void

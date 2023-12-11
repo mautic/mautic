@@ -11,8 +11,7 @@ class ReportDataAdapter
 {
     public function __construct(
         private ReportModel $reportModel
-    )
-    {
+    ) {
     }
 
     public function getReportData(Report $report, ReportExportOptions $reportExportOptions): ReportDataResult

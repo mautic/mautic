@@ -54,8 +54,7 @@ class SegmentContactsLineChartQuery extends ChartQuery
         \DateTime $dateTo,
         private array $filters = [],
         $unit = null
-    )
-    {
+    ) {
         $this->connection = $connection;
         $this->dateFrom   = $dateFrom;
         $this->dateTo     = $dateTo;

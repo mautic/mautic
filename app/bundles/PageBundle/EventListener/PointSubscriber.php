@@ -16,8 +16,7 @@ class PointSubscriber implements EventSubscriberInterface
 {
     public function __construct(
         private PointModel $pointModel
-    )
-    {
+    ) {
     }
 
     public static function getSubscribedEvents(): array

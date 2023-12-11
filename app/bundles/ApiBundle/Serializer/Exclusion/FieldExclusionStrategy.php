@@ -22,8 +22,7 @@ class FieldExclusionStrategy implements ExclusionStrategyInterface
         private array $fields,
         $level = 3,
         private $path = null
-    )
-    {
+    ) {
         $this->level  = (int) $level;
     }
 

@@ -14,8 +14,7 @@ class CampaignConditionSubscriber implements EventSubscriberInterface
 {
     public function __construct(
         private EmailValidator $validator
-    )
-    {
+    ) {
     }
 
     public static function getSubscribedEvents(): array

@@ -12,8 +12,7 @@ class ReloadFacade
         private PluginModel $pluginModel,
         private ReloadHelper $reloadHelper,
         private TranslatorInterface $translator
-    )
-    {
+    ) {
     }
 
     /**

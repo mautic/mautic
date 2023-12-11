@@ -32,8 +32,7 @@ class ContactMerger
         protected MergeRecordRepository $repo,
         protected EventDispatcherInterface $dispatcher,
         protected LoggerInterface $logger
-    )
-    {
+    ) {
     }
 
     /**

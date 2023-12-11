@@ -17,8 +17,7 @@ class CircularDependencyValidator extends ConstraintValidator
     public function __construct(
         private ListModel $model,
         private RequestStack $requestStack
-    )
-    {
+    ) {
     }
 
     /**

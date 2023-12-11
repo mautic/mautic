@@ -16,8 +16,7 @@ class FormExitSubscriber implements EventSubscriberInterface
     public function __construct(
         private $model,
         private $options = []
-    )
-    {
+    ) {
     }
 
     public static function getSubscribedEvents(): array

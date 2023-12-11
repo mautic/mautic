@@ -13,8 +13,7 @@ class ModelFactory
 {
     public function __construct(
         private ContainerInterface $container
-    )
-    {
+    ) {
     }
 
     /**

@@ -18,8 +18,7 @@ class UploadSubscriber implements EventSubscriberInterface
         private CoreParametersHelper $coreParametersHelper,
         private AssetModel $assetModel,
         private FileUploadValidator $fileUploadValidator
-    )
-    {
+    ) {
     }
 
     public static function getSubscribedEvents(): array

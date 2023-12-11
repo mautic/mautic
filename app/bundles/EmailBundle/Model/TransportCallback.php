@@ -15,8 +15,7 @@ class TransportCallback
         private DoNotContact $dncModel,
         private ContactFinder $finder,
         private StatRepository $statRepository
-    )
-    {
+    ) {
     }
 
     /**

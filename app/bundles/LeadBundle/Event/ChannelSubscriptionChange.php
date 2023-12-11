@@ -16,8 +16,7 @@ class ChannelSubscriptionChange extends Event
         private $channel,
         private int $oldStatus,
         private int $newStatus
-    )
-    {
+    ) {
     }
 
     /**

@@ -14,8 +14,7 @@ class LeadFieldSaver
     public function __construct(
         private LeadFieldRepository $leadFieldRepository,
         private FieldSaveDispatcher $fieldSaveDispatcher
-    )
-    {
+    ) {
     }
 
     public function saveLeadFieldEntity(LeadField $leadField, bool $isNew): void

@@ -14,8 +14,7 @@ final class LeadListFiltersDecoratorDelegateEvent extends CommonEvent
 
     public function __construct(
         private ContactSegmentFilterCrate $crate
-    )
-    {
+    ) {
     }
 
     public function getDecorator(): ?FilterDecoratorInterface

@@ -18,8 +18,7 @@ class CampaignActionDNCSubscriber implements EventSubscriberInterface
     public function __construct(
         private DoNotContact $doNotContact,
         private LeadModel $leadModel
-    )
-    {
+    ) {
     }
 
     public static function getSubscribedEvents(): array

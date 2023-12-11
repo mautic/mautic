@@ -12,8 +12,7 @@ final class CompanyMergeEvent extends Event
     public function __construct(
         private Company $victor,
         private Company $loser
-    )
-    {
+    ) {
     }
 
     /**

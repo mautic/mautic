@@ -39,8 +39,7 @@ class Mapper
 
     public function __construct(
         private array $fields
-    )
-    {
+    ) {
     }
 
     /**

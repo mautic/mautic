@@ -14,8 +14,7 @@ class LeadFieldData extends AbstractFixture implements OrderedFixtureInterface, 
 {
     public function __construct(
         private TranslatorInterface $translator
-    )
-    {
+    ) {
     }
 
     public static function getGroups(): array

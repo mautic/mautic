@@ -18,8 +18,7 @@ class LeadSubscriber implements EventSubscriberInterface
         private LeadStageLogRepository $leadStageLogRepository,
         private TranslatorInterface $translator,
         private RouterInterface $router
-    )
-    {
+    ) {
     }
 
     public static function getSubscribedEvents(): array

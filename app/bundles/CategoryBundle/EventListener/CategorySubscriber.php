@@ -16,8 +16,7 @@ class CategorySubscriber implements EventSubscriberInterface
         private BundleHelper $bundleHelper,
         private IpLookupHelper $ipLookupHelper,
         private AuditLogModel $auditLogModel
-    )
-    {
+    ) {
     }
 
     public static function getSubscribedEvents(): array

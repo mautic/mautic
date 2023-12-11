@@ -21,8 +21,7 @@ class MenuBuilder
         private MatcherInterface $matcher,
         EventDispatcherInterface $dispatcher,
         private MenuHelper $menuHelper
-    )
-    {
+    ) {
         $this->dispatcher = $dispatcher;
     }
 

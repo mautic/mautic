@@ -20,8 +20,7 @@ class EmailType extends AbstractType
 
     public function __construct(
         private UserHelper $userHelper
-    )
-    {
+    ) {
     }
 
     public function buildForm(FormBuilderInterface $builder, array $options): void

@@ -14,8 +14,7 @@ abstract class AbstractNotificationApi
         protected Client $http,
         protected TrackableModel $trackableModel,
         protected IntegrationHelper $integrationHelper
-    )
-    {
+    ) {
     }
 
     /**

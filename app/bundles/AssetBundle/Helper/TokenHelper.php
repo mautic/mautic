@@ -8,8 +8,7 @@ class TokenHelper
 {
     public function __construct(
         protected AssetModel $model
-    )
-    {
+    ) {
     }
 
     public function findAssetTokens($content, $clickthrough = []): array

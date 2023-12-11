@@ -9,8 +9,7 @@ class Parser
 {
     public function __construct(
         private Message $message
-    )
-    {
+    ) {
     }
 
     /**

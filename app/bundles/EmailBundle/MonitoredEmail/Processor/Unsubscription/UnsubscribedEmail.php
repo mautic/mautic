@@ -11,8 +11,7 @@ class UnsubscribedEmail
     public function __construct(
         private $contactEmail,
         private $unsubscriptionAddress
-    )
-    {
+    ) {
     }
 
     /**

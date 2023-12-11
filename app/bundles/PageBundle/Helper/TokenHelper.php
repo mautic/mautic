@@ -8,8 +8,7 @@ class TokenHelper
 {
     public function __construct(
         protected PageModel $model
-    )
-    {
+    ) {
     }
 
     public function findPageTokens($content, $clickthrough = []): array

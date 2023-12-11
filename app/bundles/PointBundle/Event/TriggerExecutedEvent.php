@@ -16,8 +16,7 @@ class TriggerExecutedEvent extends Event
     public function __construct(
         private TriggerEventEntity $triggerEvent,
         private Lead $lead
-    )
-    {
+    ) {
     }
 
     /**

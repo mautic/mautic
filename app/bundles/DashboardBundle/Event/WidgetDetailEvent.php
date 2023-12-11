@@ -29,8 +29,7 @@ class WidgetDetailEvent extends CommonEvent
 
     public function __construct(
         protected TranslatorInterface $translator
-    )
-    {
+    ) {
         $this->startTime  = microtime(true);
     }
 

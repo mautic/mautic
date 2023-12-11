@@ -53,8 +53,7 @@ class Clearbit_Base
      */
     public function __construct(
         protected $api_key
-    )
-    {
+    ) {
         $this->_next_req_time = new \DateTime('@0');
     }
 

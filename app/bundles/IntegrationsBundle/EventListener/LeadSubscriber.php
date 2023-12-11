@@ -32,8 +32,7 @@ class LeadSubscriber implements EventSubscriberInterface
         private VariableExpresserHelperInterface $variableExpressor,
         private SyncIntegrationsHelper $syncIntegrationsHelper,
         private EventDispatcherInterface $dispatcher
-    )
-    {
+    ) {
     }
 
     public static function getSubscribedEvents(): array

@@ -34,8 +34,7 @@ class MauticSyncProcess
     public function __construct(
         private SyncDateHelper $syncDateHelper,
         private ObjectChangeGenerator $objectChangeGenerator
-    )
-    {
+    ) {
     }
 
     public function setupSync(InputOptionsDAO $inputOptionsDAO, MappingManualDAO $mappingManualDAO, MauticSyncDataExchange $syncDataExchange): void

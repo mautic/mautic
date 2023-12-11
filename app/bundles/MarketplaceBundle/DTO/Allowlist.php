@@ -13,8 +13,7 @@ final class Allowlist
      */
     public function __construct(
         public array $entries
-    )
-    {
+    ) {
     }
 
     /**

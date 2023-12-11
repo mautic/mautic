@@ -41,8 +41,7 @@ class ClientController extends FormController
         FlashBag $flashBag,
         RequestStack $requestStack,
         CorePermissions $security
-    )
-    {
+    ) {
         parent::__construct($formFactory, $fieldHelper, $doctrine, $factory, $modelFactory, $userHelper, $coreParametersHelper, $dispatcher, $translator, $flashBag, $requestStack, $security);
     }
 

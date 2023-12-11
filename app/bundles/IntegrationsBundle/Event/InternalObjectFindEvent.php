@@ -42,8 +42,7 @@ class InternalObjectFindEvent extends Event
 
     public function __construct(
         private ObjectInterface $object
-    )
-    {
+    ) {
     }
 
     public function getObject(): ObjectInterface

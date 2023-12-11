@@ -25,8 +25,7 @@ class ReportType extends AbstractType
 {
     public function __construct(
         private ReportModel $reportModel
-    )
-    {
+    ) {
     }
 
     public function buildForm(FormBuilderInterface $builder, array $options): void

@@ -28,8 +28,7 @@ class MaxMindDoNotSellDownloadHelper
         private LoggerInterface $logger,
         private HttpClientInterface $httpClient,
         CoreParametersHelper $coreParametersHelper
-    )
-    {
+    ) {
         $this->auth       = explode(':', (string) $auth, 2);
         $this->listPath   = $coreParametersHelper->get('maxmind_do_not_sell_list_path') ?? '';
     }

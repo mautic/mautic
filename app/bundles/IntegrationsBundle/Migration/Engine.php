@@ -16,8 +16,7 @@ class Engine
         private string $tablePrefix,
         string $pluginPath,
         private string $bundleName
-    )
-    {
+    ) {
         $this->migrationsPath = $pluginPath.'/Migrations/';
     }
 

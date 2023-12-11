@@ -14,8 +14,7 @@ class MauticSocialMonitoringCommand extends Command
 {
     public function __construct(
         private MonitoringModel $monitoringModel
-    )
-    {
+    ) {
         parent::__construct();
     }
 

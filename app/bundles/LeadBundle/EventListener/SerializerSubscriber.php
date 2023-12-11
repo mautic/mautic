@@ -12,8 +12,7 @@ class SerializerSubscriber implements EventSubscriberInterface
 {
     public function __construct(
         private RequestStack $requestStack
-    )
-    {
+    ) {
     }
 
     /**

@@ -16,8 +16,7 @@ class DecisionDispatcher
     public function __construct(
         private EventDispatcherInterface $dispatcher,
         private LegacyEventDispatcher $legacyDispatcher
-    )
-    {
+    ) {
     }
 
     /**

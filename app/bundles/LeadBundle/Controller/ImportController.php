@@ -66,8 +66,7 @@ class ImportController extends FormController
         FlashBag $flashBag,
         RequestStack $requestStack,
         CorePermissions $security
-    )
-    {
+    ) {
         /** @var ImportModel $model */
         $model = $modelFactory->getModel($this->getModelName());
 

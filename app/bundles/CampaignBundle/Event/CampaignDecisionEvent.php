@@ -25,8 +25,7 @@ class CampaignDecisionEvent extends Event
         protected $eventSettings,
         protected $isRootLevel = false,
         protected $logs = []
-    )
-    {
+    ) {
     }
 
     /**

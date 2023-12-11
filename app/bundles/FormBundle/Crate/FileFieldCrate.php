@@ -10,8 +10,7 @@ class FileFieldCrate
     public function __construct(
         private UploadedFile $uploadedFile,
         private Field $field
-    )
-    {
+    ) {
     }
 
     /**

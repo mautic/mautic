@@ -17,8 +17,7 @@ class RelationDAO
         private string $relObjectName,
         private string $objectIntegrationId,
         private string $relObjectIntegrationId
-    )
-    {
+    ) {
     }
 
     public function getObjectName(): string

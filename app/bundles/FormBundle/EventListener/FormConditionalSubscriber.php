@@ -15,8 +15,7 @@ final class FormConditionalSubscriber implements EventSubscriberInterface
     public function __construct(
         private FormModel $formModel,
         private FieldModel $fieldModel
-    )
-    {
+    ) {
     }
 
     public static function getSubscribedEvents(): array

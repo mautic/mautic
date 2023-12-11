@@ -61,8 +61,7 @@ class Fetcher
         private IntegrationEntityRepository $repo,
         private Organizer $organizer,
         private $campaignId
-    )
-    {
+    ) {
         $this->fetchLeads();
         $this->fetchContacts();
     }

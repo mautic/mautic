@@ -22,8 +22,7 @@ class ImportCommand extends Command
     public function __construct(
         private TranslatorInterface $translator,
         private ImportModel $importModel
-    )
-    {
+    ) {
         parent::__construct();
     }
 

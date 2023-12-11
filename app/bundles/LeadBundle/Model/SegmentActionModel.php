@@ -6,8 +6,7 @@ class SegmentActionModel
 {
     public function __construct(
         private LeadModel $contactModel
-    )
-    {
+    ) {
     }
 
     public function addContacts(array $contactIds, array $segmentIds): void

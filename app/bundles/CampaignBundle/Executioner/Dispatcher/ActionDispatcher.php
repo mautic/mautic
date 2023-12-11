@@ -27,8 +27,7 @@ class ActionDispatcher
         private EventScheduler $scheduler,
         private NotificationHelper $notificationHelper,
         private LegacyEventDispatcher $legacyDispatcher
-    )
-    {
+    ) {
     }
 
     /**

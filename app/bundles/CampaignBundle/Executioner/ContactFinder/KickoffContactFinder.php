@@ -17,8 +17,7 @@ class KickoffContactFinder
         private LeadRepository $leadRepository,
         private CampaignRepository $campaignRepository,
         private LoggerInterface $logger
-    )
-    {
+    ) {
     }
 
     /**

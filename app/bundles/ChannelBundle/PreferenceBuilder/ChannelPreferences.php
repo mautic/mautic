@@ -15,8 +15,7 @@ class ChannelPreferences
 
     public function __construct(
         private Event $event
-    )
-    {
+    ) {
     }
 
     /**

@@ -19,8 +19,7 @@ class SyncCommand extends Command
 
     public function __construct(
         private SyncServiceInterface $syncService
-    )
-    {
+    ) {
         parent::__construct();
     }
 

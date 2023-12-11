@@ -14,8 +14,7 @@ class CampaignEventLeadCampaignsType extends AbstractType
 {
     public function __construct(
         protected ListModel $listModel
-    )
-    {
+    ) {
     }
 
     public function buildForm(FormBuilderInterface $builder, array $options): void

@@ -12,8 +12,7 @@ class LoadPageCategoryData extends AbstractFixture implements OrderedFixtureInte
 {
     public function __construct(
         private CategoryModel $categoryModel
-    )
-    {
+    ) {
     }
 
     public function load(ObjectManager $manager): void

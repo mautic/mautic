@@ -16,8 +16,7 @@ class MailboxOrganizer
     public function __construct(
         protected ParseEmailEvent $event,
         protected array $mailboxes
-    )
-    {
+    ) {
     }
 
     /**

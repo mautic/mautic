@@ -16,8 +16,7 @@ class NumberNotFoundException extends \Exception
         $message = '',
         $code = 0,
         \Throwable $previous = null
-    )
-    {
+    ) {
         if (!$message) {
             $message = "Phone number '{$number}' not found";
         }

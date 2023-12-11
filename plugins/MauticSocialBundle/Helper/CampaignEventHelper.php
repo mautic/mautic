@@ -24,8 +24,7 @@ class CampaignEventHelper
         protected PageTokenHelper $pageTokenHelper,
         protected AssetTokenHelper $assetTokenHelper,
         protected TweetModel $tweetModel
-    )
-    {
+    ) {
     }
 
     /**

@@ -13,8 +13,7 @@ class ContactExportSchedulerEvent extends Event
 
     public function __construct(
         private ContactExportScheduler $contactExportScheduler
-    )
-    {
+    ) {
     }
 
     public function getContactExportScheduler(): ContactExportScheduler

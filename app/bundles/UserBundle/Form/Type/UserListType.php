@@ -11,8 +11,7 @@ class UserListType extends AbstractType
 {
     public function __construct(
         private UserModel $userModel
-    )
-    {
+    ) {
     }
 
     public function configureOptions(OptionsResolver $resolver): void

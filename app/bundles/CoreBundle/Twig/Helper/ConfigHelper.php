@@ -15,8 +15,7 @@ final class ConfigHelper
 {
     public function __construct(
         private CoreParametersHelper $coreParametersHelper
-    )
-    {
+    ) {
     }
 
     /**

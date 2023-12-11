@@ -10,8 +10,7 @@ final class GroupEvent
 {
     public function __construct(
         private Group $entity
-    )
-    {
+    ) {
     }
 
     public function getGroup(): Group

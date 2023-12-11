@@ -14,8 +14,7 @@ class MessageQueueBatchProcessEvent extends Event
         private array $messages,
         private $channel,
         private $channelId
-    )
-    {
+    ) {
     }
 
     public function checkContext($channel): bool

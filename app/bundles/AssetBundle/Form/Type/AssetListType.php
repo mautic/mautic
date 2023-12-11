@@ -15,8 +15,7 @@ class AssetListType extends AbstractType
         private CorePermissions $corePermissions,
         private AssetModel $assetModel,
         private UserHelper $userHelper
-    )
-    {
+    ) {
     }
 
     public function configureOptions(OptionsResolver $resolver): void

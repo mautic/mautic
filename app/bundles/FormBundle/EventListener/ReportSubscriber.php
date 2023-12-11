@@ -29,8 +29,7 @@ class ReportSubscriber implements EventSubscriberInterface
         private ReportHelper $reportHelper,
         private CoreParametersHelper $coreParametersHelper,
         private TranslatorInterface $translator
-    )
-    {
+    ) {
     }
 
     public static function getSubscribedEvents(): array

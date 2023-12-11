@@ -13,8 +13,7 @@ class NotificationClickEvent extends CommonEvent
     public function __construct(
         Stat $stat,
         private $request
-    )
-    {
+    ) {
         $this->entity       = $stat;
         $this->notification = $stat->getNotification();
     }

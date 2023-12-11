@@ -16,8 +16,7 @@ class RemappedObjectDAO
         private $oldObjectId,
         private string $newObjectName,
         private $newObjectId
-    )
-    {
+    ) {
     }
 
     public function getIntegration(): string

@@ -26,8 +26,7 @@ class FieldValueTransformer
 
     public function __construct(
         private RouterInterface $router
-    )
-    {
+    ) {
     }
 
     public function transformValuesAfterSubmit(SubmissionEvent $submissionEvent): void

@@ -18,8 +18,7 @@ class DeduplicateIdsCommand extends Command
 
     public function __construct(
         private ContactDeduper $contactDeduper
-    )
-    {
+    ) {
         parent::__construct();
     }
 

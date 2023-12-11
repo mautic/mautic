@@ -14,8 +14,7 @@ class BaseFilterQueryBuilder implements FilterQueryBuilderInterface
     public function __construct(
         private RandomParameterName $parameterNameGenerator,
         private EventDispatcherInterface $dispatcher
-    )
-    {
+    ) {
     }
 
     public static function getServiceId(): string

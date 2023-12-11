@@ -20,8 +20,7 @@ class CategoryListType extends AbstractType
         private TranslatorInterface $translator,
         private CategoryModel $model,
         private RouterInterface $router
-    )
-    {
+    ) {
     }
 
     public function buildForm(FormBuilderInterface $builder, array $options): void

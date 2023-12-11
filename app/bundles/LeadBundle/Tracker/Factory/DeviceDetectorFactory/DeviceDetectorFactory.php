@@ -10,8 +10,7 @@ final class DeviceDetectorFactory implements DeviceDetectorFactoryInterface
 {
     public function __construct(
         private CacheProvider $cacheProvider
-    )
-    {
+    ) {
     }
 
     /**

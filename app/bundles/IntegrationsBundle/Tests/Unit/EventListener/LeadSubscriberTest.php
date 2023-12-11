@@ -493,8 +493,7 @@ class LeadSubscriberTest extends TestCase
             public function __construct(
                 private array $fieldChanges,
                 private int $objectId
-            )
-            {
+            ) {
                 parent::__construct();
             }
 
@@ -527,8 +526,7 @@ class LeadSubscriberTest extends TestCase
             public function __construct(
                 private array $fieldChanges,
                 private int $objectId
-            )
-            {
+            ) {
             }
 
             public function getChanges($includePast = false): array

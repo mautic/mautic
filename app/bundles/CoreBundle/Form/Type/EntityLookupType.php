@@ -32,8 +32,7 @@ class EntityLookupType extends AbstractType
         private TranslatorInterface $translator,
         private Connection $connection,
         private RouterInterface $router
-    )
-    {
+    ) {
     }
 
     public function buildForm(FormBuilderInterface $builder, array $options): void

@@ -20,8 +20,7 @@ class CategoryChangeEvent extends Event
         $leads,
         private Category $category,
         private $added = true
-    )
-    {
+    ) {
         if (is_array($leads)) {
             $this->leads = $leads;
         } else {

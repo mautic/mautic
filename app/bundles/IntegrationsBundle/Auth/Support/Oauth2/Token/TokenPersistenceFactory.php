@@ -12,8 +12,7 @@ class TokenPersistenceFactory
 {
     public function __construct(
         private IntegrationsHelper $integrationsHelper
-    )
-    {
+    ) {
     }
 
     public function create(Integration $integration): TokenPersistence

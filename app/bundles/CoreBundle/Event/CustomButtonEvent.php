@@ -17,8 +17,7 @@ class CustomButtonEvent extends AbstractCustomRequestEvent
         Request $request,
         array $buttons = [],
         protected $item = null
-    )
-    {
+    ) {
         parent::__construct($request);
 
         foreach ($buttons as $button) {

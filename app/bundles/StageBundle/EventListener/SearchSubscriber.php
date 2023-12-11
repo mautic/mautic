@@ -15,8 +15,7 @@ class SearchSubscriber implements EventSubscriberInterface
         private StageModel $stageModel,
         private CorePermissions $security,
         private Environment $twig
-    )
-    {
+    ) {
     }
 
     public static function getSubscribedEvents(): array

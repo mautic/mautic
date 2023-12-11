@@ -19,8 +19,7 @@ class ContactIdentificationEvent extends Event
 
     public function __construct(
         private array $clickthrough
-    )
-    {
+    ) {
     }
 
     /**

@@ -17,8 +17,7 @@ class ContactColumnsDictionary
         protected FieldModel $fieldModel,
         private TranslatorInterface $translator,
         private CoreParametersHelper $coreParametersHelper
-    )
-    {
+    ) {
     }
 
     public function getColumns(): array

@@ -28,8 +28,7 @@ class FieldAliasKeywordValidator extends ConstraintValidator
         private EntityManager $em,
         private TranslatorInterface $translator,
         private ContactSegmentFilterDictionary $contactSegmentFilterDictionary
-    )
-    {
+    ) {
     }
 
     /**

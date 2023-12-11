@@ -13,8 +13,7 @@ class TestMessageFactory
 {
     public function __construct(
         private UserHelper $userHelper
-    )
-    {
+    ) {
     }
 
     public function crateMessageByDsnKey(string $key): object

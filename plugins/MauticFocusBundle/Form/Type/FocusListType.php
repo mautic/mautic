@@ -14,8 +14,7 @@ class FocusListType extends AbstractType
 
     public function __construct(
         protected FocusModel $focusModel
-    )
-    {
+    ) {
         $this->repo       = $this->focusModel->getRepository();
     }
 

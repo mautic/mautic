@@ -51,8 +51,7 @@ class InstallService
         private ValidatorInterface $validator,
         private UserPasswordHasher $hasher,
         private FixturesLoaderInterface $fixturesLoader
-    )
-    {
+    ) {
     }
 
     /**

@@ -14,8 +14,7 @@ class SchedulerBuilder
 {
     public function __construct(
         private SchedulerTemplateFactory $schedulerTemplateFactory
-    )
-    {
+    ) {
     }
 
     /**

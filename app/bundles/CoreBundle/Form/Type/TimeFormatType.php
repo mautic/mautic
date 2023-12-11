@@ -11,8 +11,7 @@ class TimeFormatType extends AbstractType
 {
     public function __construct(
         private TranslatorInterface $translator
-    )
-    {
+    ) {
     }
 
     public function configureOptions(OptionsResolver $resolver): void

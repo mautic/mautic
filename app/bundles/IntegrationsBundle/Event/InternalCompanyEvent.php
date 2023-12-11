@@ -12,8 +12,7 @@ final class InternalCompanyEvent extends Event
     public function __construct(
         private string $integrationName,
         private Company $company
-    )
-    {
+    ) {
     }
 
     public function getIntegrationName(): string

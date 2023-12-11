@@ -15,8 +15,7 @@ class FieldColumnBackgroundJobDispatcher
 {
     public function __construct(
         private EventDispatcherInterface $dispatcher
-    )
-    {
+    ) {
     }
 
     /**

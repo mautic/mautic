@@ -18,8 +18,7 @@ class ListCommand extends Command
 
     public function __construct(
         private PluginCollector $pluginCollector
-    )
-    {
+    ) {
         parent::__construct();
     }
 

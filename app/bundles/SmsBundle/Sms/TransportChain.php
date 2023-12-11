@@ -20,8 +20,7 @@ class TransportChain
     public function __construct(
         private $primaryTransport,
         private IntegrationHelper $integrationHelper
-    )
-    {
+    ) {
         $this->transports        = [];
     }
 

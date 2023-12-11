@@ -9,8 +9,7 @@ class DateRange
     public function __construct(
         private ?\DateTimeInterface $fromDate,
         private ?\DateTimeInterface $toDate
-    )
-    {
+    ) {
     }
 
     /**

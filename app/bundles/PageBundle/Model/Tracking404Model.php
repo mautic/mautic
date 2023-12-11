@@ -14,8 +14,7 @@ class Tracking404Model
         private CoreParametersHelper $coreParametersHelper,
         private ContactTracker $contactTracker,
         private PageModel $pageModel
-    )
-    {
+    ) {
     }
 
     /**

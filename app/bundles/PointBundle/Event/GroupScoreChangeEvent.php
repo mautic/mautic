@@ -13,8 +13,7 @@ final class GroupScoreChangeEvent
         private GroupContactScore $groupContactScore,
         private int $oldScore,
         private int $newScore
-    )
-    {
+    ) {
     }
 
     public function getGroupContactScore(): GroupContactScore

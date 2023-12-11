@@ -14,8 +14,7 @@ class IntegrationCampaignsTaskType extends AbstractType
 {
     public function __construct(
         private ConnectwiseIntegration $connectwiseIntegration
-    )
-    {
+    ) {
     }
 
     public function buildForm(FormBuilderInterface $builder, array $options): void

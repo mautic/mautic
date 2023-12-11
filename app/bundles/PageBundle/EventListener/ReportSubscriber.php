@@ -24,8 +24,7 @@ class ReportSubscriber implements EventSubscriberInterface
         private CompanyReportData $companyReportData,
         private HitRepository $hitRepository,
         private TranslatorInterface $translator
-    )
-    {
+    ) {
     }
 
     public static function getSubscribedEvents(): array

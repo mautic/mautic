@@ -11,8 +11,7 @@ class SubmissionResultLoader implements MauticModelInterface
 {
     public function __construct(
         private EntityManager $entityManager
-    )
-    {
+    ) {
     }
 
     /**

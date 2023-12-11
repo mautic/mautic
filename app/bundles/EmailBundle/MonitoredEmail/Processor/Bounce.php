@@ -38,8 +38,7 @@ class Bounce implements ProcessorInterface
         protected TranslatorInterface $translator,
         protected LoggerInterface $logger,
         protected DoNotContact $doNotContact
-    )
-    {
+    ) {
     }
 
     public function process(Message $message): bool

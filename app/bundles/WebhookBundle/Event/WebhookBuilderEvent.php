@@ -15,8 +15,7 @@ class WebhookBuilderEvent extends Event
 
     public function __construct(
         private TranslatorInterface $translator
-    )
-    {
+    ) {
     }
 
     /**

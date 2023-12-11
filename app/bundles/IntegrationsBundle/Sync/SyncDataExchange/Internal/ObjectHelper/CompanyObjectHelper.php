@@ -20,8 +20,7 @@ class CompanyObjectHelper implements ObjectHelperInterface
         private CompanyModel $model,
         private CompanyRepository $repository,
         private Connection $connection
-    )
-    {
+    ) {
     }
 
     /**

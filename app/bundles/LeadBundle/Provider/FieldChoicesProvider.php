@@ -23,8 +23,7 @@ final class FieldChoicesProvider implements FieldChoicesProviderInterface
 
     public function __construct(
         private EventDispatcherInterface $dispatcher
-    )
-    {
+    ) {
     }
 
     /**

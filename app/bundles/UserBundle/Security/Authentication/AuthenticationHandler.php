@@ -16,8 +16,7 @@ class AuthenticationHandler implements AuthenticationSuccessHandlerInterface, Au
 {
     public function __construct(
         private RouterInterface $router
-    )
-    {
+    ) {
     }
 
     /**

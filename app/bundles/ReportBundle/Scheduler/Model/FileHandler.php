@@ -17,8 +17,7 @@ class FileHandler
         private FilePathResolver $filePathResolver,
         private FileProperties $fileProperties,
         private CoreParametersHelper $coreParametersHelper
-    )
-    {
+    ) {
     }
 
     /**

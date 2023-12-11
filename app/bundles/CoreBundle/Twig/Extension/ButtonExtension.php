@@ -18,8 +18,7 @@ class ButtonExtension extends AbstractExtension
         protected RequestStack $requestStack,
         protected UrlGeneratorInterface $router,
         protected TranslatorInterface $translator
-    )
-    {
+    ) {
     }
 
     public function getFunctions()

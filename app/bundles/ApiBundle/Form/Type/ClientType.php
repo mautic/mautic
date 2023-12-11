@@ -29,8 +29,7 @@ class ClientType extends AbstractType
         private ValidatorInterface $validator,
         private SessionInterface $session,
         private RouterInterface $router
-    )
-    {
+    ) {
     }
 
     /**

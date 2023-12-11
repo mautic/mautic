@@ -17,8 +17,7 @@ class SetContactAvatarFormSubscriber implements EventSubscriberInterface
         private AvatarHelper $avatarHelper,
         private FormUploader $uploader,
         private LeadModel $leadModel
-    )
-    {
+    ) {
     }
 
     public static function getSubscribedEvents(): array

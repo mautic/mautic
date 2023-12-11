@@ -19,8 +19,7 @@ class ListChangeEvent extends Event
         private LeadList $list,
         private $added = true,
         private ?\DateTime $date = null
-    )
-    {
+    ) {
         if (is_array($leads)) {
             $this->leads = $leads;
         } else {

@@ -30,8 +30,7 @@ class FormSubscriber implements EventSubscriberInterface
         private ThemeHelperInterface $themeHelper,
         private Environment $twig,
         private CoreParametersHelper $coreParametersHelper
-    )
-    {
+    ) {
     }
 
     public static function getSubscribedEvents(): array

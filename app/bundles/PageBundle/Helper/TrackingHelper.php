@@ -16,8 +16,7 @@ class TrackingHelper
         protected CoreParametersHelper $coreParametersHelper,
         protected RequestStack $requestStack,
         protected ContactTracker $contactTracker
-    )
-    {
+    ) {
     }
 
     /**

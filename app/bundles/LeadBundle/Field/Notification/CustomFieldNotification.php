@@ -17,8 +17,7 @@ class CustomFieldNotification
         private NotificationModel $notificationModel,
         private UserModel $userModel,
         private TranslatorInterface $translator
-    )
-    {
+    ) {
     }
 
     public function customFieldWasCreated(LeadField $leadField, ?int $userId): void

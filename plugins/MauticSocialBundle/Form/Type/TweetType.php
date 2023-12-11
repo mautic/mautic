@@ -21,8 +21,7 @@ class TweetType extends AbstractType
 {
     public function __construct(
         protected EntityManager $em
-    )
-    {
+    ) {
     }
 
     public function buildForm(FormBuilderInterface $builder, array $options): void

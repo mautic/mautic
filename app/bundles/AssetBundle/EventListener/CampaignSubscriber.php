@@ -15,8 +15,7 @@ class CampaignSubscriber implements EventSubscriberInterface
 {
     public function __construct(
         private RealTimeExecutioner $realTimeExecutioner
-    )
-    {
+    ) {
     }
 
     public static function getSubscribedEvents(): array

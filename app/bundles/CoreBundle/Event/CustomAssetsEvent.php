@@ -9,8 +9,7 @@ class CustomAssetsEvent extends Event
 {
     public function __construct(
         protected AssetsHelper $assetsHelper
-    )
-    {
+    ) {
     }
 
     /**

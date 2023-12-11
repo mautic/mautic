@@ -24,8 +24,7 @@ class MailchimpType extends AbstractType
         private PluginModel $pluginModel,
         protected SessionInterface $session,
         protected CoreParametersHelper $coreParametersHelper
-    )
-    {
+    ) {
     }
 
     public function buildForm(FormBuilderInterface $builder, array $options): void

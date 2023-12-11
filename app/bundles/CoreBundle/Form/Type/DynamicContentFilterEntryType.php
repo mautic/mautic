@@ -46,8 +46,7 @@ class DynamicContentFilterEntryType extends AbstractType
         ListModel $listModel,
         private StageModel $stageModel,
         private BuilderIntegrationsHelper $builderIntegrationsHelper
-    )
-    {
+    ) {
         $this->fieldChoices = $listModel->getChoiceFields();
 
         $this->filterFieldChoices();

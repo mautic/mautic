@@ -33,8 +33,7 @@ final class GeneratedColumnsProvider implements GeneratedColumnsProviderInterfac
     public function __construct(
         private VersionProviderInterface $versionProvider,
         private EventDispatcherInterface $dispatcher
-    )
-    {
+    ) {
     }
 
     public function getGeneratedColumns(): GeneratedColumns

@@ -61,8 +61,7 @@ class DashboardSubscriber extends MainDashboardSubscriber
         protected RouterInterface $router,
         protected TranslatorInterface $translator,
         protected DateHelper $dateHelper
-    )
-    {
+    ) {
     }
 
     /**

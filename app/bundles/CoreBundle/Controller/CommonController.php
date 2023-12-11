@@ -51,8 +51,7 @@ class CommonController extends AbstractController implements MauticController
         private FlashBag $flashBag,
         private ?RequestStack $requestStack,
         protected ?CorePermissions $security
-    )
-    {
+    ) {
         $this->user                 = $userHelper->getUser();
     }
 

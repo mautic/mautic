@@ -18,8 +18,7 @@ class ProcessMarketingMessagesQueueCommand extends ModeratedCommand
         private MessageQueueModel $messageQueueModel,
         PathsHelper $pathsHelper,
         CoreParametersHelper $coreParametersHelper
-    )
-    {
+    ) {
         parent::__construct($pathsHelper, $coreParametersHelper);
     }
 

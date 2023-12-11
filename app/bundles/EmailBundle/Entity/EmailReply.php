@@ -61,8 +61,7 @@ class EmailReply
         private Stat $stat,
         private $messageId,
         \DateTime $dateReplied = null
-    )
-    {
+    ) {
         $this->id          = Uuid::uuid4()->toString();
         $this->dateReplied = $dateReplied ?? new \DateTime();
     }

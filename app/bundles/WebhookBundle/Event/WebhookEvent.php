@@ -20,8 +20,7 @@ class WebhookEvent extends CommonEvent
         Webhook $webhook,
         protected $isNew = false,
         private $reason = ''
-    )
-    {
+    ) {
         $this->entity = $webhook;
     }
 

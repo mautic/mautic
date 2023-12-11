@@ -40,8 +40,7 @@ class ColumnSchemaHelper
     public function __construct(
         protected Connection $db,
         protected $prefix
-    )
-    {
+    ) {
         $this->sm     = $db->getSchemaManager();
     }
 

@@ -11,8 +11,7 @@ class InvalidEmailException extends InvalidValueException
         string $message = '',
         int $code = 0,
         \Throwable|null $previous = null
-    )
-    {
+    ) {
         parent::__construct($message, $code, $previous);
     }
 

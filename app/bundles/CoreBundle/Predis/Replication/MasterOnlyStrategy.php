@@ -10,8 +10,7 @@ class MasterOnlyStrategy extends ReplicationStrategy
 {
     public function __construct(
         private StrategyConfig $config
-    )
-    {
+    ) {
         parent::__construct();
     }
 

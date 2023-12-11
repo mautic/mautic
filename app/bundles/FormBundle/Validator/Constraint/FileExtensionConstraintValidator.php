@@ -10,8 +10,7 @@ class FileExtensionConstraintValidator extends ConstraintValidator
 {
     public function __construct(
         private CoreParametersHelper $coreParametersHelper
-    )
-    {
+    ) {
     }
 
     /**

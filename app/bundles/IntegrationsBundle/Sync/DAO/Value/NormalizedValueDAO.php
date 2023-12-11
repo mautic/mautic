@@ -39,8 +39,7 @@ class NormalizedValueDAO
         private $type,
         private $value,
         $normalizedValue = null
-    )
-    {
+    ) {
         $this->normalizedValue = $normalizedValue ?: $value;
     }
 

@@ -14,8 +14,7 @@ class NotificationSendEvent extends CommonEvent
         protected $message,
         protected $heading,
         protected Lead $lead
-    )
-    {
+    ) {
     }
 
     /**

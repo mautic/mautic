@@ -15,8 +15,7 @@ class Writer
         private NotificationModel $notificationModel,
         private AuditLogModel $auditLogModel,
         private EntityManagerInterface $em
-    )
-    {
+    ) {
     }
 
     /**

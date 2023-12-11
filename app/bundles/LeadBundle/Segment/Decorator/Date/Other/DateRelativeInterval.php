@@ -16,8 +16,7 @@ class DateRelativeInterval implements FilterDecoratorInterface
         private DateDecorator $dateDecorator,
         private $originalValue,
         private DateOptionParameters $dateOptionParameters
-    )
-    {
+    ) {
     }
 
     /**

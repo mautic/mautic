@@ -13,8 +13,7 @@ final class FormAdjustmentsProvider implements FormAdjustmentsProviderInterface
 {
     public function __construct(
         private EventDispatcherInterface $dispatcher
-    )
-    {
+    ) {
     }
 
     /**

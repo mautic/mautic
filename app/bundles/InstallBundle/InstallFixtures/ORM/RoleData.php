@@ -13,8 +13,7 @@ class RoleData extends AbstractFixture implements OrderedFixtureInterface, Fixtu
 {
     public function __construct(
         private TranslatorInterface $translator
-    )
-    {
+    ) {
     }
 
     public static function getGroups(): array

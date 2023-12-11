@@ -19,8 +19,7 @@ class DisplayCounter
 
     public function __construct(
         private Form $form
-    )
-    {
+    ) {
     }
 
     public function increaseDisplayedFields(): void

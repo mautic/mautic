@@ -38,8 +38,7 @@ class ResultsPaginator
     public function __construct(
         private LoggerInterface $logger,
         private $salesforceBaseUrl
-    )
-    {
+    ) {
     }
 
     /**

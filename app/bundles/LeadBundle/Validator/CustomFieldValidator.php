@@ -16,8 +16,7 @@ class CustomFieldValidator
     public function __construct(
         private FieldModel $fieldModel,
         private TranslatorInterface $translator
-    )
-    {
+    ) {
     }
 
     /**

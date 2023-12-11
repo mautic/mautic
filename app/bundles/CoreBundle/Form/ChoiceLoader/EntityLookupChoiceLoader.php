@@ -34,8 +34,7 @@ class EntityLookupChoiceLoader implements ChoiceLoaderInterface
         protected TranslatorInterface $translator,
         protected Connection $connection,
         protected $options = []
-    )
-    {
+    ) {
     }
 
     /**

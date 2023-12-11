@@ -19,8 +19,7 @@ class ValidateEventCommand extends Command
         private InactiveExecutioner $inactiveExecution,
         private TranslatorInterface $translator,
         private FormatterHelper $formatterHelper
-    )
-    {
+    ) {
         parent::__construct();
     }
 

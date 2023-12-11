@@ -20,8 +20,7 @@ class UntrackableUrlsEvent extends Event
      */
     public function __construct(
         private $content
-    )
-    {
+    ) {
     }
 
     /**

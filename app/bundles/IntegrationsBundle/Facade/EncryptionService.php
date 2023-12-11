@@ -10,8 +10,7 @@ class EncryptionService
 {
     public function __construct(
         private EncryptionHelper $encryptionHelper
-    )
-    {
+    ) {
     }
 
     /**

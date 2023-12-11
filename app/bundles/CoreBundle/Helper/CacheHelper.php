@@ -16,8 +16,7 @@ class CacheHelper
         private ?Session $session,
         private PathsHelper $pathsHelper,
         private KernelInterface $kernel
-    )
-    {
+    ) {
     }
 
     /**

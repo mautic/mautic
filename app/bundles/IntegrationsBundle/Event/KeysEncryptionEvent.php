@@ -12,8 +12,7 @@ class KeysEncryptionEvent extends Event
     public function __construct(
         private Integration $integrationConfiguration,
         private array $keys
-    )
-    {
+    ) {
     }
 
     public function getIntegrationConfiguration(): Integration

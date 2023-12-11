@@ -16,8 +16,7 @@ class CompanyNotificationHandler implements HandlerInterface
         private Writer $writer,
         private UserNotificationHelper $userNotificationHelper,
         private CompanyHelper $companyHelper
-    )
-    {
+    ) {
     }
 
     public function getIntegration(): string

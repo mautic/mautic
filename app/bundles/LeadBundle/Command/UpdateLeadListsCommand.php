@@ -22,8 +22,7 @@ class UpdateLeadListsCommand extends ModeratedCommand
         private TranslatorInterface $translator,
         PathsHelper $pathsHelper,
         CoreParametersHelper $coreParametersHelper
-    )
-    {
+    ) {
         parent::__construct($pathsHelper, $coreParametersHelper);
     }
 

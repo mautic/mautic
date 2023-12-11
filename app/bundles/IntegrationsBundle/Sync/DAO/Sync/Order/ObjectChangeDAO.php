@@ -43,8 +43,7 @@ class ObjectChangeDAO
         private $mappedObject,
         private $mappedId,
         private ?\DateTimeInterface $changeDateTime = null
-    )
-    {
+    ) {
     }
 
     public function getIntegration(): string

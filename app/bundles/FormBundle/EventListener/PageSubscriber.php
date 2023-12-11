@@ -21,8 +21,7 @@ class PageSubscriber implements EventSubscriberInterface
         private BuilderTokenHelperFactory $builderTokenHelperFactory,
         private TranslatorInterface $translator,
         private CorePermissions $security
-    )
-    {
+    ) {
     }
 
     public static function getSubscribedEvents(): array

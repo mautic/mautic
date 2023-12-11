@@ -25,8 +25,7 @@ class FocusType extends AbstractType
 {
     public function __construct(
         private CorePermissions $security
-    )
-    {
+    ) {
     }
 
     public function buildForm(FormBuilderInterface $builder, array $options): void

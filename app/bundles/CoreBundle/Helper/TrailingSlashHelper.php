@@ -8,8 +8,7 @@ class TrailingSlashHelper
 {
     public function __construct(
         private CoreParametersHelper $coreParametersHelper
-    )
-    {
+    ) {
     }
 
     public function getSafeRedirectUrl(Request $request): string

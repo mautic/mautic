@@ -32,8 +32,7 @@ class ContactSegmentQueryBuilder
         private EntityManager $entityManager,
         private RandomParameterName $randomParameterName,
         private EventDispatcherInterface $dispatcher
-    )
-    {
+    ) {
     }
 
     /**

@@ -16,8 +16,7 @@ final class ImportProcessEvent extends CommonEvent
         public Import $import,
         public LeadEventLog $eventLog,
         public array $rowData
-    )
-    {
+    ) {
     }
 
     public function setWasMerged(bool $wasMerged): void

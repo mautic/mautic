@@ -28,8 +28,7 @@ class FieldType extends AbstractType
         private ObjectCollectorInterface $objectCollector,
         private FieldCollectorInterface $fieldCollector,
         private AlreadyMappedFieldCollectorInterface $mappedFieldCollector
-    )
-    {
+    ) {
     }
 
     public function buildForm(FormBuilderInterface $builder, array $options): void

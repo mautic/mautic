@@ -112,8 +112,7 @@ final class ButtonHelper
         private Environment $twig,
         private TranslatorInterface $translator,
         private EventDispatcherInterface $dispatcher
-    )
-    {
+    ) {
     }
 
     /**

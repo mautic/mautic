@@ -31,8 +31,7 @@ class ContactNotificationHandler implements HandlerInterface
         private LeadEventLogRepository $leadEventRepository,
         private EntityManagerInterface $em,
         private UserSummaryNotificationHelper $userNotificationHelper
-    )
-    {
+    ) {
     }
 
     public function getIntegration(): string

@@ -15,8 +15,7 @@ class IntegrationsListType extends AbstractType
 {
     public function __construct(
         private IntegrationHelper $integrationHelper
-    )
-    {
+    ) {
     }
 
     public function buildForm(FormBuilderInterface $builder, array $options): void

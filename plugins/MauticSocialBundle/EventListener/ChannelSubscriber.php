@@ -13,8 +13,7 @@ class ChannelSubscriber implements EventSubscriberInterface
 {
     public function __construct(
         private IntegrationHelper $helper
-    )
-    {
+    ) {
     }
 
     public static function getSubscribedEvents(): array

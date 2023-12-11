@@ -26,8 +26,7 @@ class oAuthHelper
         UnifiedIntegrationInterface $integration,
         private ?Request $request = null,
         $settings = []
-    )
-    {
+    ) {
         $clientId                = $integration->getClientIdKey();
         $clientSecret            = $integration->getClientSecretKey();
         $keys                    = $integration->getDecryptedApiKeys();

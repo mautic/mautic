@@ -11,8 +11,7 @@ class CompanyReportData
     public function __construct(
         private FieldModel $fieldModel,
         private TranslatorInterface $translator
-    )
-    {
+    ) {
     }
 
     public function getCompanyData(): array

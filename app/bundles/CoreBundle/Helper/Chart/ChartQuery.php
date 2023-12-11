@@ -68,8 +68,7 @@ class ChartQuery extends AbstractChart
         \DateTime $dateFrom,
         \DateTime $dateTo,
         $unit = null
-    )
-    {
+    ) {
         $this->dateTimeHelper = new DateTimeHelper();
         $this->unit           = $unit ?? $this->getTimeUnitFromDateRange($dateFrom, $dateTo);
         $this->isTimeUnit     = in_array($this->unit, ['H', 'i', 's']);

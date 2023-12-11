@@ -29,8 +29,7 @@ class ConfigChangeLogger
     public function __construct(
         private IpLookupHelper $ipLookupHelper,
         private AuditLogModel $auditLogModel
-    )
-    {
+    ) {
     }
 
     /**

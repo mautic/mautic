@@ -22,8 +22,7 @@ class CampaignSubscriber implements EventSubscriberInterface
         private LeadModel $leadModel,
         private TrackingHelper $trackingHelper,
         private RealTimeExecutioner $realTimeExecutioner
-    )
-    {
+    ) {
     }
 
     public static function getSubscribedEvents(): array

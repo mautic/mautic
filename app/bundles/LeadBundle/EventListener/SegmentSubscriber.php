@@ -18,8 +18,7 @@ class SegmentSubscriber implements EventSubscriberInterface
         private AuditLogModel $auditLogModel,
         private ListModel $listModel,
         private TranslatorInterface $translator
-    )
-    {
+    ) {
     }
 
     public static function getSubscribedEvents(): array

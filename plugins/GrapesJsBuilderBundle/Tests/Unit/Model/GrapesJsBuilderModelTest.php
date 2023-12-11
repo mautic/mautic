@@ -73,8 +73,7 @@ class GrapesJsBuilderModelTest extends \PHPUnit\Framework\TestCase
         $entityManager = new class($grapesJsBuilderRepository) extends EntityManager {
             public function __construct(
                 private GrapesJsBuilderRepository $grapesJsBuilderRepository
-            )
-            {
+            ) {
             }
 
             public function getRepository($entityName)
@@ -176,8 +175,7 @@ class GrapesJsBuilderModelTest extends \PHPUnit\Framework\TestCase
         $entityManager = new class($grapesJsBuilderRepository) extends EntityManager {
             public function __construct(
                 private GrapesJsBuilderRepository $grapesJsBuilderRepository
-            )
-            {
+            ) {
             }
 
             public function getRepository($entityName)
@@ -215,8 +213,7 @@ class GrapesJsBuilderModelTest extends \PHPUnit\Framework\TestCase
         return new class($emailRepository) extends EmailModel {
             public function __construct(
                 private EmailRepository $emailRepository
-            )
-            {
+            ) {
             }
 
             public function getRepository()

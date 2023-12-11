@@ -25,8 +25,7 @@ class InactiveHelper
         private EventRepository $eventRepository,
         private LoggerInterface $logger,
         private DecisionHelper $decisionHelper
-    )
-    {
+    ) {
     }
 
     /**

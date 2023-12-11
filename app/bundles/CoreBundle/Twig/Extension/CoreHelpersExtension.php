@@ -17,8 +17,7 @@ class CoreHelpersExtension extends AbstractExtension
 {
     public function __construct(
         private TranslatorInterface $translate
-    )
-    {
+    ) {
     }
 
     public function getFunctions()

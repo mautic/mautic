@@ -22,8 +22,7 @@ class LeadSubscriber implements EventSubscriberInterface
         private PointsChangeLogRepository $pointsChangeLogRepository,
         private LeadPointLogRepository $leadPointLogRepository,
         private LeadTriggerLogRepository $leadTriggerLogRepository
-    )
-    {
+    ) {
     }
 
     public static function getSubscribedEvents(): array

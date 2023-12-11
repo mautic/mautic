@@ -40,8 +40,7 @@ final class FieldOperatorsEvent extends Event
         private string $field,
         private array $allOperators,
         private array $operators
-    )
-    {
+    ) {
     }
 
     /**

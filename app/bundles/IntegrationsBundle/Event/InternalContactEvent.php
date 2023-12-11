@@ -12,8 +12,7 @@ final class InternalContactEvent extends Event
     public function __construct(
         private string $integrationName,
         private Lead $contact
-    )
-    {
+    ) {
     }
 
     public function getIntegrationName(): string

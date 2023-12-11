@@ -20,8 +20,7 @@ class EmailSubscriber implements EventSubscriberInterface
         private EmailModel $emailModel,
         private TranslatorInterface $translator,
         private EntityManager $entityManager
-    )
-    {
+    ) {
     }
 
     public static function getSubscribedEvents(): array

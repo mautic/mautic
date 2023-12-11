@@ -25,8 +25,7 @@ class OrderExecutioner
         private ObjectProvider $objectProvider,
         private ReferenceResolverInterface $referenceResolver,
         private FieldValidatorInterface $fieldValidator
-    )
-    {
+    ) {
     }
 
     public function execute(OrderDAO $syncOrderDAO): ObjectMappingsDAO

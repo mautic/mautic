@@ -17,8 +17,7 @@ class InternalObjectRouteEvent extends Event
     public function __construct(
         private ObjectInterface $object,
         private int $id
-    )
-    {
+    ) {
     }
 
     public function getObject(): ObjectInterface

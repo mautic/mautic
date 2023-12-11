@@ -17,8 +17,7 @@ class BuilderIntegrationsHelper
 
     public function __construct(
         private IntegrationsHelper $integrationsHelper
-    )
-    {
+    ) {
     }
 
     /**

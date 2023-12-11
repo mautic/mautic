@@ -21,8 +21,7 @@ class NotificationHelper
         protected Router $router,
         protected RequestStack $requestStack,
         private \Mautic\LeadBundle\Model\DoNotContact $doNotContact
-    )
-    {
+    ) {
     }
 
     /**

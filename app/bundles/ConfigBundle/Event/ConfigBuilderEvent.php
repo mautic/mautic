@@ -27,8 +27,7 @@ class ConfigBuilderEvent extends Event
 
     public function __construct(
         private BundleHelper $bundleHelper
-    )
-    {
+    ) {
     }
 
     /**

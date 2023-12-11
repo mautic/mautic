@@ -15,8 +15,7 @@ class CustomFieldIndex
         private IndexSchemaHelper $indexSchemaHelper,
         private LoggerInterface $logger,
         private FieldsWithUniqueIdentifier $fieldsWithUniqueIdentifier
-    )
-    {
+    ) {
     }
 
     /**

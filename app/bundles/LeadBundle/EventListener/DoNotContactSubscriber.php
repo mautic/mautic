@@ -13,8 +13,7 @@ final class DoNotContactSubscriber implements EventSubscriberInterface
 {
     public function __construct(
         private DoNotContact $doNotContact
-    )
-    {
+    ) {
     }
 
     public static function getSubscribedEvents(): array

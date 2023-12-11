@@ -229,8 +229,7 @@ class MailHelper
         protected MauticFactory $factory,
         protected MailerInterface $mailer,
         $from = null
-    )
-    {
+    ) {
         $this->transport = $this->getTransport();
 
         $systemFromEmail    = $factory->getParameter('mailer_from_email');

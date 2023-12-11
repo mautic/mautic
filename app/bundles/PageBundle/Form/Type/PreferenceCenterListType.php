@@ -19,8 +19,7 @@ class PreferenceCenterListType extends AbstractType
     public function __construct(
         private PageModel $model,
         CorePermissions $corePermissions
-    )
-    {
+    ) {
         $this->canViewOther = $corePermissions->isGranted('page:pages:viewother');
     }
 

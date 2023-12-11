@@ -9,8 +9,7 @@ class FieldAliasHelper
 {
     public function __construct(
         private FieldModel $fieldModel
-    )
-    {
+    ) {
     }
 
     /**

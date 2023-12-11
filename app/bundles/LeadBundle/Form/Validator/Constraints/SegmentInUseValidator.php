@@ -15,8 +15,7 @@ class SegmentInUseValidator extends ConstraintValidator
 {
     public function __construct(
         private ListModel $listModel
-    )
-    {
+    ) {
     }
 
     /**

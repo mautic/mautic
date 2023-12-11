@@ -25,8 +25,7 @@ class CampaignLeadChangeEvent extends Event
         private Campaign $campaign,
         $leads,
         private $action
-    )
-    {
+    ) {
         if (is_array($leads)) {
             $this->leads = $leads;
         } else {

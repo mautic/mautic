@@ -11,8 +11,7 @@ class RedirectListType extends AbstractType
 {
     public function __construct(
         private CoreParametersHelper $coreParametersHelper
-    )
-    {
+    ) {
     }
 
     public function configureOptions(OptionsResolver $resolver): void

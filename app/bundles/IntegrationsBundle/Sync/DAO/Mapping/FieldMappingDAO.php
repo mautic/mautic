@@ -23,8 +23,7 @@ class FieldMappingDAO
         private $integrationField,
         private $syncDirection,
         $isRequired
-    )
-    {
+    ) {
         $this->isRequired        = (bool) $isRequired;
     }
 

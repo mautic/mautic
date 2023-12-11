@@ -11,8 +11,7 @@ class EmailToUserAccessor
 
     public function __construct(
         private array $config
-    )
-    {
+    ) {
         $this->transformer = new ArrayStringTransformer();
     }
 

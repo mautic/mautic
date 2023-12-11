@@ -16,8 +16,7 @@ class FindUpdatesCommand extends Command
     public function __construct(
         private TranslatorInterface $translator,
         private UpdateHelper $updateHelper
-    )
-    {
+    ) {
         parent::__construct();
     }
 

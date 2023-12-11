@@ -11,8 +11,7 @@ final class UserTokenService implements UserTokenServiceInterface
     public function __construct(
         private RandomHelperInterface $randomHelper,
         private UserTokenRepositoryInterface $userTokenRepository
-    )
-    {
+    ) {
     }
 
     /**

@@ -63,8 +63,7 @@ class ObjectChangeGenerator
         private SyncJudgeInterface $syncJudge,
         private ValueHelper $valueHelper,
         private FieldHelper $fieldHelper
-    )
-    {
+    ) {
     }
 
     /**

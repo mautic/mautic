@@ -16,8 +16,7 @@ class Adder
     public function __construct(
         private LeadRepository $leadRepository,
         private LeadEventLogRepository $leadEventLogRepository
-    )
-    {
+    ) {
     }
 
     public function createNewMembership(Lead $contact, Campaign $campaign, $isManualAction): CampaignMember

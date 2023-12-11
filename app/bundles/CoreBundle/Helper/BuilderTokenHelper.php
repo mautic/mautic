@@ -25,8 +25,7 @@ class BuilderTokenHelper
         private ModelFactory $modelFactory,
         private Connection $connection,
         private UserHelper $userHelper
-    )
-    {
+    ) {
     }
 
     /**

@@ -13,8 +13,7 @@ class EmailValidator
     public function __construct(
         protected TranslatorInterface $translator,
         protected EventDispatcherInterface $dispatcher
-    )
-    {
+    ) {
     }
 
     /**

@@ -15,8 +15,7 @@ class LoadFormResultData extends AbstractFixture implements OrderedFixtureInterf
     public function __construct(
         private PageModel $pageModel,
         private SubmissionModel $submissionModel
-    )
-    {
+    ) {
     }
 
     public function load(ObjectManager $manager): void

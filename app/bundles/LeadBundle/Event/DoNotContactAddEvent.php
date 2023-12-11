@@ -20,8 +20,7 @@ final class DoNotContactAddEvent extends Event
         private bool $persist = true,
         private bool $checkCurrentStatus = true,
         private bool $override = true
-    )
-    {
+    ) {
     }
 
     public function getLead(): Lead

@@ -13,8 +13,7 @@ class GatedVideoType extends SlotType
 {
     public function __construct(
         private FormRepository $formRepository
-    )
-    {
+    ) {
     }
 
     public function buildForm(FormBuilderInterface $builder, array $options): void

@@ -43,8 +43,7 @@ class DashboardSubscriber extends MainDashboardSubscriber
         private CorePermissions $security,
         private EventDispatcherInterface $dispatcher,
         protected ModelFactory $modelFactory
-    )
-    {
+    ) {
     }
 
     /**

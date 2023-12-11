@@ -18,8 +18,7 @@ class SegmentDependencies
         private ListModel $listModel,
         private TriggerEventModel $triggerEventModel,
         private ReportModel $reportModel
-    )
-    {
+    ) {
     }
 
     public function getChannelsIds($segmentId): array

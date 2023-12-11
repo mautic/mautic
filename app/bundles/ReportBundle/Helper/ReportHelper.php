@@ -10,8 +10,7 @@ final class ReportHelper
 {
     public function __construct(
         private EventDispatcherInterface $dispatcher
-    )
-    {
+    ) {
     }
 
     public function getName(): string

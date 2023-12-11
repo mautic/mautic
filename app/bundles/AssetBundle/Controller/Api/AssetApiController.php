@@ -44,8 +44,7 @@ class AssetApiController extends CommonApiController
         EventDispatcherInterface $dispatcher,
         CoreParametersHelper $coreParametersHelper,
         MauticFactory $factory
-    )
-    {
+    ) {
         $assetModel = $modelFactory->getModel('asset');
         \assert($assetModel instanceof AssetModel);
 

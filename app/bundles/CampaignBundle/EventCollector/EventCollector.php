@@ -26,8 +26,7 @@ class EventCollector
     public function __construct(
         private TranslatorInterface $translator,
         private EventDispatcherInterface $dispatcher
-    )
-    {
+    ) {
     }
 
     /**

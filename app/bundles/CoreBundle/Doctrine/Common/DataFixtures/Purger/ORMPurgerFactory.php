@@ -15,8 +15,7 @@ class ORMPurgerFactory implements PurgerFactory
 {
     public function __construct(
         private EventDispatcherInterface $eventDispatcher
-    )
-    {
+    ) {
     }
 
     public function createForEntityManager(

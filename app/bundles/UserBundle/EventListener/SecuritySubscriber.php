@@ -13,8 +13,7 @@ class SecuritySubscriber implements EventSubscriberInterface
     public function __construct(
         private IpLookupHelper $ipLookupHelper,
         private AuditLogModel $auditLogModel
-    )
-    {
+    ) {
     }
 
     public static function getSubscribedEvents(): array

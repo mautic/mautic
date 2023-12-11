@@ -12,8 +12,7 @@ class LeadCategoryType extends AbstractType
 {
     public function __construct(
         private CategoryModel $categoryModel
-    )
-    {
+    ) {
     }
 
     public function configureOptions(OptionsResolver $resolver): void

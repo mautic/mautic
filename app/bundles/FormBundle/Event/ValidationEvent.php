@@ -23,8 +23,7 @@ class ValidationEvent extends CommonEvent
     public function __construct(
         private Field $field,
         private $value
-    )
-    {
+    ) {
     }
 
     /**

@@ -31,8 +31,7 @@ final class SyncService implements SyncServiceInterface
         private Notifier $notifier,
         private IntegrationSyncProcess $integratinSyncProcess,
         private MauticSyncProcess $mauticSyncProcess
-    )
-    {
+    ) {
     }
 
     /**

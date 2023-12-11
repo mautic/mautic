@@ -15,8 +15,7 @@ class AssetsSubscriber implements EventSubscriberInterface
     public function __construct(
         private Config $config,
         private InstallService $installer
-    )
-    {
+    ) {
     }
 
     public static function getSubscribedEvents(): array

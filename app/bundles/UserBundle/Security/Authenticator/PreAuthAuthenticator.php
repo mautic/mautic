@@ -24,8 +24,7 @@ class PreAuthAuthenticator implements AuthenticationProviderInterface
         protected RequestStack $requestStack,
         protected UserProviderInterface $userProvider,
         protected $providerKey
-    )
-    {
+    ) {
     }
 
     /**

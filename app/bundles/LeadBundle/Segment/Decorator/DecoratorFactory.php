@@ -19,8 +19,7 @@ class DecoratorFactory
         private DateOptionFactory $dateOptionFactory,
         private CompanyDecorator $companyDecorator,
         private EventDispatcherInterface $eventDispatcher
-    )
-    {
+    ) {
     }
 
     /**

@@ -10,8 +10,7 @@ class LeadListAccessValidator extends ConstraintValidator
 {
     public function __construct(
         private ListModel $segmentModel
-    )
-    {
+    ) {
     }
 
     /**

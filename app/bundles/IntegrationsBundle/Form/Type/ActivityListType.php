@@ -13,8 +13,7 @@ class ActivityListType extends AbstractType
 {
     public function __construct(
         private LeadModel $leadModel
-    )
-    {
+    ) {
     }
 
     public function configureOptions(OptionsResolver $resolver): void

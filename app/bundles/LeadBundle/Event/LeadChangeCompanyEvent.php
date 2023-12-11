@@ -15,8 +15,7 @@ class LeadChangeCompanyEvent extends Event
         $leads,
         private Company $company,
         private $added = true
-    )
-    {
+    ) {
         if (is_array($leads)) {
             $this->leads = $leads;
         } else {

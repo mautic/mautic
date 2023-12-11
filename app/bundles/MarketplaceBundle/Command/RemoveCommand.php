@@ -16,8 +16,7 @@ class RemoveCommand extends Command
     public function __construct(
         private ComposerHelper $composer,
         private LoggerInterface $logger
-    )
-    {
+    ) {
         parent::__construct();
     }
 

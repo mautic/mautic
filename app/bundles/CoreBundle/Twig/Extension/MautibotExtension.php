@@ -12,8 +12,7 @@ class MautibotExtension extends AbstractExtension
 {
     public function __construct(
         protected MautibotHelper $mautibotHelper
-    )
-    {
+    ) {
     }
 
     public function getFunctions()

@@ -23,8 +23,7 @@ class InjectCustomContentSubscriber implements EventSubscriberInterface
         private Environment $twig,
         private RequestStack $requestStack,
         private RouterInterface $router
-    )
-    {
+    ) {
     }
 
     public static function getSubscribedEvents(): array

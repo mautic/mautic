@@ -15,8 +15,7 @@ class UIContactIntegrationsTabSubscriber implements EventSubscriberInterface
 {
     public function __construct(
         private ObjectMappingRepository $objectMappingRepository
-    )
-    {
+    ) {
     }
 
     public static function getSubscribedEvents(): array

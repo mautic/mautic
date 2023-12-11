@@ -17,8 +17,7 @@ class ConfigIntegrationsHelper
 
     public function __construct(
         private IntegrationsHelper $integrationsHelper
-    )
-    {
+    ) {
     }
 
     public function addIntegration(ConfigFormInterface $integration): void

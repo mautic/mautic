@@ -15,8 +15,7 @@ final class UpdateTranslationsStep implements StepInterface
         private TranslatorInterface $translator,
         private LanguageHelper $languageHelper,
         private LoggerInterface $logger
-    )
-    {
+    ) {
     }
 
     public function getOrder(): int

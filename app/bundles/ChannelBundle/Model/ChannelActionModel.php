@@ -14,8 +14,7 @@ class ChannelActionModel
         private LeadModel $contactModel,
         private DoNotContact $doNotContact,
         private TranslatorInterface $translator
-    )
-    {
+    ) {
     }
 
     /**

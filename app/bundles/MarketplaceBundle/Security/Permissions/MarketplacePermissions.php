@@ -20,8 +20,7 @@ class MarketplacePermissions extends AbstractPermissions
     public function __construct(
         CoreParametersHelper $coreParametersHelper,
         private Config $config
-    )
-    {
+    ) {
         parent::__construct($coreParametersHelper->all());
     }
 

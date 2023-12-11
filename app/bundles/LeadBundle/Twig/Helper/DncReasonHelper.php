@@ -13,8 +13,7 @@ final class DncReasonHelper
 {
     public function __construct(
         private TranslatorInterface $translator
-    )
-    {
+    ) {
     }
 
     /**

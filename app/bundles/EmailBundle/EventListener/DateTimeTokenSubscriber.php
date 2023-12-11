@@ -14,8 +14,7 @@ class DateTimeTokenSubscriber implements EventSubscriberInterface
     public function __construct(
         private TranslatorInterface $translator,
         private DateTimeToken $dateTokenHelper
-    )
-    {
+    ) {
     }
 
     public static function getSubscribedEvents(): array

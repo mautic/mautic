@@ -17,8 +17,7 @@ class SearchSubscriber implements EventSubscriberInterface
         private TriggerModel $pointTriggerModel,
         private CorePermissions $security,
         private Environment $twig
-    )
-    {
+    ) {
     }
 
     public static function getSubscribedEvents(): array

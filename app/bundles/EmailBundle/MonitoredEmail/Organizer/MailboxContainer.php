@@ -23,8 +23,7 @@ class MailboxContainer
 
     public function __construct(
         protected ConfigAccessor $config
-    )
-    {
+    ) {
     }
 
     public function addCriteria($criteria, $mailbox): void

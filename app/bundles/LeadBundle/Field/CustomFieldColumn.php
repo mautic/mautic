@@ -24,8 +24,7 @@ class CustomFieldColumn
         private CustomFieldIndex $customFieldIndex,
         private FieldColumnDispatcher $fieldColumnDispatcher,
         private TranslatorInterface $translator
-    )
-    {
+    ) {
     }
 
     /**

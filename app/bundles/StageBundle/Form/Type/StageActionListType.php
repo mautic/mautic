@@ -12,8 +12,7 @@ class StageActionListType extends AbstractType
 {
     public function __construct(
         private StageModel $model
-    )
-    {
+    ) {
     }
 
     public function configureOptions(OptionsResolver $resolver): void

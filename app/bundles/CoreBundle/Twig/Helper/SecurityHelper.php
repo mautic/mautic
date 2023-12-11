@@ -20,8 +20,7 @@ final class SecurityHelper
         private RequestStack $requestStack,
         private EventDispatcherInterface $dispatcher,
         private CsrfTokenManagerInterface $tokenManager
-    )
-    {
+    ) {
     }
 
     public function getName(): string

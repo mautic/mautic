@@ -11,8 +11,7 @@ final class VersionHelper
 {
     public function __construct(
         private AppVersion $appVersion
-    )
-    {
+    ) {
     }
 
     public function getName(): string

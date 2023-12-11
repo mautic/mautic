@@ -17,8 +17,7 @@ final class PackageDetail
         public int $monthlyDownloads,
         public int $dailyDownloads,
         public \DateTimeInterface $time
-    )
-    {
+    ) {
     }
 
     public static function fromArray(array $array): self

@@ -48,8 +48,7 @@ class PartialObjectReportBuilder
         private FieldBuilder $fieldBuilder,
         private ObjectProvider $objectProvider,
         private EventDispatcherInterface $dispatcher
-    )
-    {
+    ) {
     }
 
     public function buildReport(RequestDAO $requestDAO): ReportDAO

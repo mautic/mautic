@@ -25,8 +25,7 @@ final class FilterOperatorSubscriber implements EventSubscriberInterface
         private TypeOperatorProviderInterface $typeOperatorProvider,
         private FieldChoicesProviderInterface $fieldChoicesProvider,
         private TranslatorInterface $translator
-    )
-    {
+    ) {
     }
 
     public static function getSubscribedEvents(): array

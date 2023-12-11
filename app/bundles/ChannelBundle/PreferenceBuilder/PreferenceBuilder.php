@@ -20,8 +20,7 @@ class PreferenceBuilder
         private Event $event,
         array $channels,
         private LoggerInterface $logger
-    )
-    {
+    ) {
         $this->buildRules($logs, $channels);
     }
 

@@ -11,8 +11,7 @@ class EmailAddressValidator extends ConstraintValidator
 {
     public function __construct(
         private EmailValidator $emailValidator
-    )
-    {
+    ) {
     }
 
     /**

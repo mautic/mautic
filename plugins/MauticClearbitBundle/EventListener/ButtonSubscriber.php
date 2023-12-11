@@ -17,8 +17,7 @@ class ButtonSubscriber implements EventSubscriberInterface
         private IntegrationHelper $helper,
         private TranslatorInterface $translator,
         private RouterInterface $router
-    )
-    {
+    ) {
     }
 
     public static function getSubscribedEvents(): array

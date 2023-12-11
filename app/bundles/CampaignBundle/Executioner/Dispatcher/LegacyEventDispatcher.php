@@ -37,8 +37,7 @@ class LegacyEventDispatcher
         private NotificationHelper $notificationHelper,
         private MauticFactory $factory,
         private ContactTracker $contactTracker
-    )
-    {
+    ) {
     }
 
     public function dispatchCustomEvent(

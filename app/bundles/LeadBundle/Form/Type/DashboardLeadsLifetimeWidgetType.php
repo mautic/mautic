@@ -13,8 +13,7 @@ class DashboardLeadsLifetimeWidgetType extends AbstractType
     public function __construct(
         private ListModel $segmentModel,
         private TranslatorInterface $translator
-    )
-    {
+    ) {
     }
 
     public function buildForm(FormBuilderInterface $builder, array $options): void

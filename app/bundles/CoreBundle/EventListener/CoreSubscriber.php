@@ -40,8 +40,7 @@ class CoreSubscriber implements EventSubscriberInterface
         private EventDispatcherInterface $dispatcher,
         private RequestStack $requestStack,
         private FormRepository $formRepository
-    )
-    {
+    ) {
     }
 
     public static function getSubscribedEvents(): array

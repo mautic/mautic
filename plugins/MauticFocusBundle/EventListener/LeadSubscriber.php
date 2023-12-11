@@ -17,8 +17,7 @@ class LeadSubscriber implements EventSubscriberInterface
         private Translator $translator,
         private RouterInterface $router,
         private FocusModel $focusModel
-    )
-    {
+    ) {
     }
 
     public static function getSubscribedEvents(): array

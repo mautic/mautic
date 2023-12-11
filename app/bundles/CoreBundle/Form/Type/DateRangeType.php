@@ -14,8 +14,7 @@ class DateRangeType extends AbstractType
     public function __construct(
         private SessionInterface $session,
         private CoreParametersHelper $coreParametersHelper
-    )
-    {
+    ) {
     }
 
     public function buildForm(FormBuilderInterface $builder, array $options): void

@@ -19,8 +19,7 @@ class RequestDAO
         private string $syncToIntegration,
         int $syncIteration,
         private InputOptionsDAO $inputOptionsDAO
-    )
-    {
+    ) {
         $this->syncIteration     = (int) $syncIteration;
     }
 

@@ -33,8 +33,7 @@ class FocusSubscriber implements EventSubscriberInterface
         private AssetTokenHelper $assetTokenHelper,
         private FocusModel $focusModel,
         private RequestStack $requestStack
-    )
-    {
+    ) {
     }
 
     public static function getSubscribedEvents(): array

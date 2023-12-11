@@ -18,8 +18,7 @@ final class FieldCollector implements FieldCollectorInterface
 
     public function __construct(
         private EventDispatcherInterface $dispatcher
-    )
-    {
+    ) {
     }
 
     public function getFields(string $object): FieldCollection

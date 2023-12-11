@@ -12,8 +12,7 @@ class DisplayManager
     public function __construct(
         private Form $form,
         private array $viewOnlyFields = []
-    )
-    {
+    ) {
         $this->displayCounter = new DisplayCounter($form);
     }
 

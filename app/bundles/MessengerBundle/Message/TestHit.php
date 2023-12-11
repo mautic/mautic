@@ -8,7 +8,6 @@ class TestHit
 {
     public function __construct(
         public int $userId
-    )
-    {
+    ) {
     }
 }

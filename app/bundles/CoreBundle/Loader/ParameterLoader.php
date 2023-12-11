@@ -33,8 +33,7 @@ class ParameterLoader
 
     public function __construct(
         private string $rootPath = __DIR__.'/../../../'
-    )
-    {
+    ) {
         $this->configBaseDir = static::getLocalConfigBaseDir($this->rootPath);
 
         $this->loadDefaultParameters();

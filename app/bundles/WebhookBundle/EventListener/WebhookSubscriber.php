@@ -15,8 +15,7 @@ class WebhookSubscriber implements EventSubscriberInterface
         private IpLookupHelper $ipLookupHelper,
         private AuditLogModel $auditLogModel,
         private WebhookKillNotificator $webhookKillNotificator
-    )
-    {
+    ) {
     }
 
     public static function getSubscribedEvents(): array

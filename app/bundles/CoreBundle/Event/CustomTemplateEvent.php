@@ -18,8 +18,7 @@ class CustomTemplateEvent extends AbstractCustomRequestEvent
         Request $request = null,
         $template = null,
         protected array $vars = []
-    )
-    {
+    ) {
         parent::__construct($request);
 
         if (empty($template)) {

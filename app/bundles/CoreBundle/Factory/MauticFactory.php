@@ -36,8 +36,7 @@ class MauticFactory
         private RequestStack $requestStack,
         private ManagerRegistry $doctrine,
         private Translator $translator
-    )
-    {
+    ) {
     }
 
     /**

@@ -14,8 +14,7 @@ class TransportFactory
 {
     public function __construct(
         private SymfonyTransportFactory $transportFactory
-    )
-    {
+    ) {
     }
 
     /**

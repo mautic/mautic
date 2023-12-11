@@ -16,8 +16,7 @@ class CampaignActionChangeMembershipSubscriber implements EventSubscriberInterfa
     public function __construct(
         private MembershipManager $membershipManager,
         private CampaignModel $campaignModel
-    )
-    {
+    ) {
     }
 
     public static function getSubscribedEvents(): array

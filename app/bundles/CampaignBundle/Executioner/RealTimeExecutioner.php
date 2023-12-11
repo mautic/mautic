@@ -46,8 +46,7 @@ class RealTimeExecutioner
         private EventScheduler $scheduler,
         private ContactTracker $contactTracker,
         private DecisionHelper $decisionHelper
-    )
-    {
+    ) {
     }
 
     /**

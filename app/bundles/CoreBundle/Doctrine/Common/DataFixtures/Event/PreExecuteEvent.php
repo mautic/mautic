@@ -13,8 +13,7 @@ class PreExecuteEvent extends Event
     public function __construct(
         private EntityManagerInterface $entityManager,
         private int $purgeMode
-    )
-    {
+    ) {
     }
 
     public function getEntityManager(): EntityManagerInterface

@@ -27,8 +27,7 @@ class RouterSubscriber implements EventSubscriberInterface
         $httpsPort,
         $httpPort,
         private $baseUrl
-    )
-    {
+    ) {
         $this->httpsPort = $httpsPort ?? 443;
         $this->httpPort  = $httpPort ?? 80;
     }

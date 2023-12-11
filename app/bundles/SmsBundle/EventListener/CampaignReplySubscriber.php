@@ -20,8 +20,7 @@ class CampaignReplySubscriber implements EventSubscriberInterface
     public function __construct(
         private TransportChain $transportChain,
         private RealTimeExecutioner $realTimeExecutioner
-    )
-    {
+    ) {
     }
 
     public static function getSubscribedEvents(): array

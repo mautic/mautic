@@ -26,8 +26,7 @@ class DeviceTracker
         private DeviceDetectorFactoryInterface $deviceDetectorFactory,
         private DeviceTrackingServiceInterface $deviceTrackingService,
         private LoggerInterface $logger
-    )
-    {
+    ) {
     }
 
     /**

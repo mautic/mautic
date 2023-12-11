@@ -61,8 +61,7 @@ final class AssetsHelper
     public function __construct(
         private Packages $packages,
         private CoreParametersHelper $coreParametersHelper
-    )
-    {
+    ) {
     }
 
     /**

@@ -19,8 +19,7 @@ class Organizer
 
     public function __construct(
         private array $records
-    )
-    {
+    ) {
         $this->organize();
     }
 

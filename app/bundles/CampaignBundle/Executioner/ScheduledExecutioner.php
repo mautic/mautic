@@ -63,8 +63,7 @@ class ScheduledExecutioner implements ExecutionerInterface, ResetInterface
         private EventExecutioner $executioner,
         private EventScheduler $scheduler,
         private ScheduledContactFinder $scheduledContactFinder
-    )
-    {
+    ) {
     }
 
     /**

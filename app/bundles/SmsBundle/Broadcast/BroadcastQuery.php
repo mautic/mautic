@@ -21,8 +21,7 @@ class BroadcastQuery
     public function __construct(
         private EntityManager $entityManager,
         private SmsModel $smsModel
-    )
-    {
+    ) {
     }
 
     public function getPendingContacts(Sms $sms, ContactLimiter $contactLimiter): array

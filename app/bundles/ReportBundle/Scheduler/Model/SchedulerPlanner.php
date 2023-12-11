@@ -19,8 +19,7 @@ class SchedulerPlanner
     public function __construct(
         private DateBuilder $dateBuilder,
         private EntityManager $entityManager
-    )
-    {
+    ) {
         $this->schedulerRepository = $entityManager->getRepository(Scheduler::class);
     }
 

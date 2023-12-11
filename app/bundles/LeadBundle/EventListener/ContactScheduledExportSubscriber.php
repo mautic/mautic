@@ -13,8 +13,7 @@ class ContactScheduledExportSubscriber implements EventSubscriberInterface
 {
     public function __construct(
         private ContactExportSchedulerModel $contactExportSchedulerModel
-    )
-    {
+    ) {
     }
 
     public static function getSubscribedEvents(): array

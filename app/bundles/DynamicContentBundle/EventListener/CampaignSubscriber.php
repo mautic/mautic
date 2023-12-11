@@ -21,8 +21,7 @@ class CampaignSubscriber implements EventSubscriberInterface
         private DynamicContentModel $dynamicContentModel,
         private SessionInterface $session,
         private EventDispatcherInterface $dispatcher
-    )
-    {
+    ) {
     }
 
     public static function getSubscribedEvents(): array

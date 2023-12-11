@@ -11,8 +11,7 @@ class EnvironmentSubscriber implements EventSubscriberInterface
 {
     public function __construct(
         private CoreParametersHelper $coreParametersHelper
-    )
-    {
+    ) {
     }
 
     public static function getSubscribedEvents(): array

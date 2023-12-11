@@ -13,8 +13,7 @@ class UpdateDoNotSellListCommand extends Command
     public function __construct(
         private MaxMindDoNotSellDownloadHelper $maxMindDoNotSellDownloadHelper,
         private TranslatorInterface $translator
-    )
-    {
+    ) {
         parent::__construct();
     }
 

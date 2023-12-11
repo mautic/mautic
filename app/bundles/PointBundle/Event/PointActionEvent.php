@@ -11,8 +11,7 @@ class PointActionEvent extends CommonEvent
     public function __construct(
         protected Point $point,
         protected Lead $lead
-    )
-    {
+    ) {
     }
 
     /**

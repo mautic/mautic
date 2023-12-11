@@ -19,8 +19,7 @@ class RequestSubscriber implements EventSubscriberInterface
         private CsrfTokenManagerInterface $tokenManager,
         private TranslatorInterface $translator,
         private Environment $twig
-    )
-    {
+    ) {
     }
 
     public static function getSubscribedEvents(): array

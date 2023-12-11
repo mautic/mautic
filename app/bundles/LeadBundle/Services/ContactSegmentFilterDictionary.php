@@ -24,8 +24,7 @@ class ContactSegmentFilterDictionary
 
     public function __construct(
         private EventDispatcherInterface $dispatcher
-    )
-    {
+    ) {
     }
 
     /**

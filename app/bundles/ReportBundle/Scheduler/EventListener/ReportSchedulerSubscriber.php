@@ -11,8 +11,7 @@ class ReportSchedulerSubscriber implements EventSubscriberInterface
 {
     public function __construct(
         private SchedulerPlanner $schedulerPlanner
-    )
-    {
+    ) {
     }
 
     public static function getSubscribedEvents(): array

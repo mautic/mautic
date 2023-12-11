@@ -71,8 +71,7 @@ class SendEmailToContact
         private StatHelper $statHelper,
         private DoNotContact $dncModel,
         private TranslatorInterface $translator
-    )
-    {
+    ) {
     }
 
     /**

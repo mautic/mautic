@@ -17,8 +17,7 @@ class TrackingEvent extends Event
         private Lead $contact,
         private Request $request,
         array $mtcSessionResponses
-    )
-    {
+    ) {
         $this->response = new ParameterBag($mtcSessionResponses);
     }
 

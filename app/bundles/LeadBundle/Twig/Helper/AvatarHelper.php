@@ -21,8 +21,7 @@ final class AvatarHelper
         private PathsHelper $pathsHelper,
         private GravatarHelper $gravatarHelper,
         private DefaultAvatarHelper $defaultAvatarHelper
-    )
-    {
+    ) {
     }
 
     /**

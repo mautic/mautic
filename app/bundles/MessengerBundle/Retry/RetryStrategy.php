@@ -15,8 +15,7 @@ class RetryStrategy implements RetryStrategyInterface
 
     public function __construct(
         private CoreParametersHelper $parametersHelper
-    )
-    {
+    ) {
     }
 
     public function isRetryable(Envelope $message): bool

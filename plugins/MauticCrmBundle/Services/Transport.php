@@ -8,8 +8,7 @@ class Transport implements TransportInterface
 {
     public function __construct(
         private Client $client
-    )
-    {
+    ) {
     }
 
     public function post($uri, array $options = []): \Psr\Http\Message\ResponseInterface

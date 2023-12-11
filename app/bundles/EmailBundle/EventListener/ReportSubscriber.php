@@ -147,8 +147,7 @@ class ReportSubscriber implements EventSubscriberInterface
         private StatRepository $statRepository,
         private GeneratedColumnsProviderInterface $generatedColumnsProvider,
         private FieldsBuilder $fieldsBuilder
-    )
-    {
+    ) {
     }
 
     public static function getSubscribedEvents(): array

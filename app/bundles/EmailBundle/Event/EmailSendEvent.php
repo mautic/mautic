@@ -68,8 +68,7 @@ class EmailSendEvent extends CommonEvent
         private ?MailHelper $helper = null,
         $args = [],
         private $isDynamicContentParsing = false
-    )
-    {
+    ) {
         $this->content     = $args['content'] ?? '';
         $this->plainText   = $args['plainText'] ?? '';
         $this->subject     = $args['subject'] ?? '';

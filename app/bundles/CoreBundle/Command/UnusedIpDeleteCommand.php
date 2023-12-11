@@ -20,8 +20,7 @@ class UnusedIpDeleteCommand extends ModeratedCommand
         private IpAddressModel $ipAddressModel,
         PathsHelper $pathsHelper,
         CoreParametersHelper $coreParametersHelper
-    )
-    {
+    ) {
         parent::__construct($pathsHelper, $coreParametersHelper);
     }
 

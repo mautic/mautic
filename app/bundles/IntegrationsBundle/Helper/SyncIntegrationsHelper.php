@@ -27,8 +27,7 @@ class SyncIntegrationsHelper
     public function __construct(
         private IntegrationsHelper $integrationsHelper,
         private ObjectProvider $objectProvider
-    )
-    {
+    ) {
     }
 
     public function addIntegration(SyncInterface $integration): void

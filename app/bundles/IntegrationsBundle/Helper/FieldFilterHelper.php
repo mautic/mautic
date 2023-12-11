@@ -21,8 +21,7 @@ class FieldFilterHelper
 
     public function __construct(
         private ConfigFormSyncInterface $integrationObject
-    )
-    {
+    ) {
     }
 
     public function filterFieldsByPage(string $objectName, int $page, int $limit = 15): void

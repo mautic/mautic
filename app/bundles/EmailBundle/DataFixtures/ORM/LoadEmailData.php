@@ -14,8 +14,7 @@ class LoadEmailData extends AbstractFixture implements OrderedFixtureInterface
 {
     public function __construct(
         private EmailModel $emailModel
-    )
-    {
+    ) {
     }
 
     public function load(ObjectManager $manager): void

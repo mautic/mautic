@@ -20,8 +20,7 @@ class IntegrationConfigType extends AbstractType
 {
     public function __construct(
         private ConfigIntegrationsHelper $integrationsHelper
-    )
-    {
+    ) {
     }
 
     /**

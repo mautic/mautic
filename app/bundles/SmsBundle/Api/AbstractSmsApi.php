@@ -15,8 +15,7 @@ abstract class AbstractSmsApi implements TransportInterface
 {
     public function __construct(
         protected TrackableModel $pageTrackableModel
-    )
-    {
+    ) {
     }
 
     /**

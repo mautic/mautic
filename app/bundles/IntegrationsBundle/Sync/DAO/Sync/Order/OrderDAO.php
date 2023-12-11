@@ -72,8 +72,7 @@ class OrderDAO
         private $isFirstTimeSync,
         private $integration,
         private array $options = []
-    )
-    {
+    ) {
     }
 
     public function addObjectChange(ObjectChangeDAO $objectChangeDAO): self

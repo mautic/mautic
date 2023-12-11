@@ -29,8 +29,7 @@ class ReportDAO
      */
     public function __construct(
         private $integration
-    )
-    {
+    ) {
         $this->relationsDAO    = new RelationsDAO();
     }
 

@@ -13,8 +13,7 @@ final class ImportMappingEvent extends CommonEvent
 
     public function __construct(
         public string $routeObjectName
-    )
-    {
+    ) {
     }
 
     /**

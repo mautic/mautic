@@ -15,8 +15,7 @@ class TokenHelper
         protected FocusModel $model,
         protected RouterInterface $router,
         protected CorePermissions $security
-    )
-    {
+    ) {
     }
 
     public function findFocusTokens($content): array

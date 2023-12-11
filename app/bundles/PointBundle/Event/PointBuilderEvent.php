@@ -15,8 +15,7 @@ class PointBuilderEvent extends Event
 
     public function __construct(
         private TranslatorInterface $translator
-    )
-    {
+    ) {
     }
 
     /**

@@ -15,8 +15,7 @@ class CampaignEventFormFieldValueType extends AbstractType
 {
     public function __construct(
         private FormModel $model
-    )
-    {
+    ) {
     }
 
     public function buildForm(FormBuilderInterface $builder, array $options): void

@@ -35,8 +35,7 @@ class MauticSyncDataExchange implements SyncDataExchangeInterface
         private FullObjectReportBuilder $fullObjectReportBuilder,
         private PartialObjectReportBuilder $partialObjectReportBuilder,
         private OrderExecutioner $orderExecutioner
-    )
-    {
+    ) {
     }
 
     public function getSyncReport(RequestDAO $requestDAO): ReportDAO

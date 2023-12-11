@@ -23,8 +23,7 @@ class InactiveContactFinder
         private LeadRepository $leadRepository,
         private CampaignLeadRepository $campaignLeadRepository,
         private LoggerInterface $logger
-    )
-    {
+    ) {
     }
 
     /**

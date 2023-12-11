@@ -16,8 +16,7 @@ class CompletedSyncIterationEvent extends Event
         private int $iteration,
         private InputOptionsDAO $inputOptionsDAO,
         private MappingManualDAO $mappingManualDAO
-    )
-    {
+    ) {
     }
 
     public function getIntegration(): string

@@ -12,8 +12,7 @@ class SegmentCampaignShare
         private CampaignModel $campaignModel,
         private CacheStorageHelper $cacheStorageHelper,
         private EntityManager $entityManager
-    )
-    {
+    ) {
     }
 
     /**

@@ -24,8 +24,7 @@ class SmsHelper
         protected IntegrationHelper $integrationHelper,
         private DoNotContact $doNotContact,
         private CoreParametersHelper $coreParametersHelper
-    )
-    {
+    ) {
     }
 
     public function unsubscribe($number)

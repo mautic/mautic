@@ -13,8 +13,7 @@ class ConfigSubscriber implements EventSubscriberInterface
 {
     public function __construct(
         private LanguageHelper $languageHelper
-    )
-    {
+    ) {
     }
 
     public static function getSubscribedEvents(): array

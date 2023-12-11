@@ -21,8 +21,7 @@ class CampaignSubscriber implements EventSubscriberInterface
         private LeadModel $leadModel,
         private StageModel $stageModel,
         private TranslatorInterface $translator
-    )
-    {
+    ) {
     }
 
     public static function getSubscribedEvents(): array

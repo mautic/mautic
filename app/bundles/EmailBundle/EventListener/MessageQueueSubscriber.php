@@ -13,8 +13,7 @@ class MessageQueueSubscriber implements EventSubscriberInterface
 {
     public function __construct(
         private EmailModel $emailModel
-    )
-    {
+    ) {
     }
 
     public static function getSubscribedEvents(): array

@@ -11,8 +11,7 @@ class ContactColumnsType extends AbstractType
 {
     public function __construct(
         private ContactColumnsDictionary $columnsDictionary
-    )
-    {
+    ) {
     }
 
     public function configureOptions(OptionsResolver $resolver): void

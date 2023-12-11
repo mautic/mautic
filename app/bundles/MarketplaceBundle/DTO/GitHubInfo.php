@@ -11,7 +11,6 @@ final class GitHubInfo
         public int $watchers,
         public int $forks,
         public int $openIssues
-    )
-    {
+    ) {
     }
 }

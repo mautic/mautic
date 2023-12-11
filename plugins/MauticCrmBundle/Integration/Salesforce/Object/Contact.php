@@ -10,8 +10,7 @@ class Contact
         private $id,
         private $campaignId,
         private $isDeleted
-    )
-    {
+    ) {
     }
 
     /**

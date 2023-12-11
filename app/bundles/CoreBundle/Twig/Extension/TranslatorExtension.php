@@ -12,8 +12,7 @@ class TranslatorExtension extends AbstractExtension
 {
     public function __construct(
         private Translator $translator
-    )
-    {
+    ) {
     }
 
     public function getFunctions()

@@ -50,8 +50,7 @@ class CacheStorageHelper
         protected ?Connection $connection = null,
         $cacheDir = null,
         protected $defaultExpiration = 0
-    )
-    {
+    ) {
         $this->cacheDir          = $cacheDir.'/data';
 
         // @deprecated BC support for pre 2.6.0 to be removed in 3.0

@@ -18,8 +18,7 @@ class LoadUserData extends AbstractFixture implements OrderedFixtureInterface, F
 
     public function __construct(
         private UserPasswordHasher $hasher
-    )
-    {
+    ) {
     }
 
     public function load(ObjectManager $manager): void

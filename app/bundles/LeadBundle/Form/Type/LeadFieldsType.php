@@ -13,8 +13,7 @@ class LeadFieldsType extends AbstractType
 {
     public function __construct(
         protected FieldModel $fieldModel
-    )
-    {
+    ) {
     }
 
     public function configureOptions(OptionsResolver $resolver): void

@@ -15,8 +15,7 @@ final class AlreadyMappedFieldCollector implements AlreadyMappedFieldCollectorIn
 
     public function __construct(
         private CacheProviderInterface $cacheProvider
-    )
-    {
+    ) {
     }
 
     public function getFields(string $formId, string $object): array

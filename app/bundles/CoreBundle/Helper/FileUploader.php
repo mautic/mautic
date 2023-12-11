@@ -11,8 +11,7 @@ class FileUploader
 {
     public function __construct(
         private FilePathResolver $filePathResolver
-    )
-    {
+    ) {
     }
 
     /**

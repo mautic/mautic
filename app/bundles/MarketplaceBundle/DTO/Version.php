@@ -18,8 +18,7 @@ final class Version
         public ?string $type,
         public ?string $directoryName,
         public ?string $displayName
-    )
-    {
+    ) {
     }
 
     public static function fromArray(array $array): Version

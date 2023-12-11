@@ -15,8 +15,7 @@ class ContactSegmentService
         private ContactSegmentFilterFactory $contactSegmentFilterFactory,
         private ContactSegmentQueryBuilder $contactSegmentQueryBuilder,
         private \Psr\Log\LoggerInterface $logger
-    )
-    {
+    ) {
     }
 
     /**

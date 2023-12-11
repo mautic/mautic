@@ -25,8 +25,7 @@ class CompanyType extends AbstractType
         private EntityManager $em,
         protected RouterInterface $router,
         protected TranslatorInterface $translator
-    )
-    {
+    ) {
     }
 
     public function buildForm(FormBuilderInterface $builder, array $options): void

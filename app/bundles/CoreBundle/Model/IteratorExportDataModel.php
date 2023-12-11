@@ -23,8 +23,7 @@ class IteratorExportDataModel implements \Iterator
         private array $args,
         callable $callback,
         private bool $skipOrdering = false
-    )
-    {
+    ) {
         $this->callback     = $callback;
         $this->position     = 0;
         $this->total        = 0;

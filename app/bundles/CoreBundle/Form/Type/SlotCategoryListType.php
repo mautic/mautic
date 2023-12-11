@@ -10,8 +10,7 @@ class SlotCategoryListType extends SlotType
 {
     public function __construct(
         private TranslatorInterface $translator
-    )
-    {
+    ) {
     }
 
     public function buildForm(FormBuilderInterface $builder, array $options): void

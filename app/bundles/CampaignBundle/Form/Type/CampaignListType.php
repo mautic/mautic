@@ -21,8 +21,7 @@ class CampaignListType extends AbstractType
         private CampaignModel $model,
         protected TranslatorInterface $translator,
         CorePermissions $security
-    )
-    {
+    ) {
         $this->canViewOther = $security->isGranted('campaign:campaigns:viewother');
     }
 

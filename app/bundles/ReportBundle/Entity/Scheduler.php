@@ -35,8 +35,7 @@ class Scheduler
     public function __construct(
         private Report $report,
         private \DateTimeInterface $scheduleDate
-    )
-    {
+    ) {
     }
 
     /**

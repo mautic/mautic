@@ -10,8 +10,7 @@ class AssetLoadEvent extends CommonEvent
     public function __construct(
         Download $download,
         protected bool $unique
-    )
-    {
+    ) {
         $this->entity = $download;
     }
 

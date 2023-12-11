@@ -12,8 +12,7 @@ class MultipleEmailsValidValidator extends ConstraintValidator
 {
     public function __construct(
         private EmailValidator $emailValidator
-    )
-    {
+    ) {
     }
 
     /**

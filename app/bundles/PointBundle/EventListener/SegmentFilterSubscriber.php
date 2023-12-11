@@ -18,8 +18,7 @@ class SegmentFilterSubscriber implements EventSubscriberInterface
         private GroupRepository $groupRepository,
         private TypeOperatorProviderInterface $typeOperatorProvider,
         private TranslatorInterface $translator
-    )
-    {
+    ) {
     }
 
     public static function getSubscribedEvents(): array

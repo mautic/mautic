@@ -14,8 +14,7 @@ class DynamicContentFilterType extends AbstractType
 {
     public function __construct(
         private BuilderIntegrationsHelper $builderIntegrationsHelper
-    )
-    {
+    ) {
     }
 
     public function buildForm(FormBuilderInterface $builder, array $options): void

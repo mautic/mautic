@@ -73,8 +73,7 @@ class IpAddress
      */
     public function __construct(
         private $ipAddress = null
-    )
-    {
+    ) {
     }
 
     /**

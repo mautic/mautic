@@ -11,8 +11,7 @@ class MessageSubscriber implements EventSubscriberInterface
 {
     public function __construct(
         private AuditLogModel $auditLogModel
-    )
-    {
+    ) {
     }
 
     public static function getSubscribedEvents(): array

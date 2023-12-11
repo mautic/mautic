@@ -13,8 +13,7 @@ final class FormatterHelper
     public function __construct(
         private DateHelper $dateHelper,
         private TranslatorInterface $translator
-    )
-    {
+    ) {
     }
 
     /**

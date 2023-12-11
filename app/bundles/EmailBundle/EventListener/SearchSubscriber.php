@@ -17,8 +17,7 @@ class SearchSubscriber implements EventSubscriberInterface
         private EmailModel $emailModel,
         private CorePermissions $security,
         private Environment $twig
-    )
-    {
+    ) {
     }
 
     public static function getSubscribedEvents(): array

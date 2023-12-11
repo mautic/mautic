@@ -13,7 +13,6 @@ class CrmApi
 {
     public function __construct(
         protected CrmAbstractIntegration $integration
-    )
-    {
+    ) {
     }
 }

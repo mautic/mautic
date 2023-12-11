@@ -20,8 +20,7 @@ class FileManager
         private FileUploader $fileUploader,
         private CoreParametersHelper $coreParametersHelper,
         private PathsHelper $pathsHelper
-    )
-    {
+    ) {
     }
 
     /**

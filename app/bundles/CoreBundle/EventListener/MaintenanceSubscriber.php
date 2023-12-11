@@ -15,8 +15,7 @@ class MaintenanceSubscriber implements EventSubscriberInterface
         private Connection $db,
         private UserTokenRepositoryInterface $userTokenRepository,
         private TranslatorInterface $translator
-    )
-    {
+    ) {
     }
 
     public static function getSubscribedEvents(): array

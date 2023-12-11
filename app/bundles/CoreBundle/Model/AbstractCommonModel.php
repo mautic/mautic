@@ -29,8 +29,7 @@ abstract class AbstractCommonModel implements MauticModelInterface
         protected UserHelper $userHelper,
         protected LoggerInterface $logger,
         protected CoreParametersHelper $coreParametersHelper
-    )
-    {
+    ) {
     }
 
     /**

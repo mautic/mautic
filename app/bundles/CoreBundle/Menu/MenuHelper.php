@@ -21,8 +21,7 @@ class MenuHelper
         protected RequestStack $requestStack,
         private CoreParametersHelper $coreParametersHelper,
         protected IntegrationHelper $integrationHelper
-    )
-    {
+    ) {
     }
 
     /**

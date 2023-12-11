@@ -27,8 +27,7 @@ final class TypeOperatorProvider implements TypeOperatorProviderInterface
     public function __construct(
         private EventDispatcherInterface $dispatcher,
         private FilterOperatorProviderInterface $filterOperatorProvider
-    )
-    {
+    ) {
     }
 
     public function getOperatorsIncluding(array $operators): array

@@ -12,8 +12,7 @@ class AssetExtension extends AbstractExtension
 {
     public function __construct(
         protected AssetsHelper $assetsHelper
-    )
-    {
+    ) {
     }
 
     /**

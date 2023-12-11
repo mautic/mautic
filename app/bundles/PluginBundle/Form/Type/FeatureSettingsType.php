@@ -19,8 +19,7 @@ class FeatureSettingsType extends AbstractType
         protected SessionInterface $session,
         protected CoreParametersHelper $coreParametersHelper,
         protected LoggerInterface $logger
-    )
-    {
+    ) {
     }
 
     public function buildForm(FormBuilderInterface $builder, array $options): void

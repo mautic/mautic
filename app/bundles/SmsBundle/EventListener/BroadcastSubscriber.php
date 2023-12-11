@@ -11,8 +11,7 @@ class BroadcastSubscriber implements EventSubscriberInterface
 {
     public function __construct(
         private BroadcastExecutioner $broadcastExecutioner
-    )
-    {
+    ) {
     }
 
     public static function getSubscribedEvents(): array

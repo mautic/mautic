@@ -22,8 +22,7 @@ class TimelineEventLogCampaignSubscriber implements EventSubscriberInterface
         LeadEventLogRepository $eventLogRepository,
         private UserHelper $userHelper,
         Translator $translator
-    )
-    {
+    ) {
         $this->eventLogRepository = $eventLogRepository;
         $this->translator         = $translator;
     }

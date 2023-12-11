@@ -19,8 +19,7 @@ class SegmentDictionaryGenerationEvent extends CommonEvent
      */
     public function __construct(
         private array $translations = []
-    )
-    {
+    ) {
     }
 
     /**

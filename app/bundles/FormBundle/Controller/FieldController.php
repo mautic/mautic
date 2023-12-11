@@ -45,8 +45,7 @@ class FieldController extends CommonFormController
         FlashBag $flashBag,
         RequestStack $requestStack,
         CorePermissions $security
-    )
-    {
+    ) {
         $this->fieldHelper                 = $fieldHelper;
         $this->formFactory                 = $formFactory;
 

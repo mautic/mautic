@@ -11,8 +11,7 @@ class ConfigSubscriber implements EventSubscriberInterface
 {
     public function __construct(
         private ConfigChangeLogger $configChangeLogger
-    )
-    {
+    ) {
     }
 
     public static function getSubscribedEvents(): array

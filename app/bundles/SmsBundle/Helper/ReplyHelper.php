@@ -21,8 +21,7 @@ class ReplyHelper
         private EventDispatcherInterface $eventDispatcher,
         private LoggerInterface $logger,
         private ContactTracker $contactTracker
-    )
-    {
+    ) {
     }
 
     /**

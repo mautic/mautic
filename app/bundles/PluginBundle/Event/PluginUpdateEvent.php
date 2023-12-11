@@ -12,8 +12,7 @@ class PluginUpdateEvent extends Event
     public function __construct(
         private Plugin $plugin,
         private string $oldVersion
-    )
-    {
+    ) {
     }
 
     public function getPlugin(): Plugin

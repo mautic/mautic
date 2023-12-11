@@ -11,8 +11,7 @@ class DatetimeToStringTransformer implements DataTransformerInterface
      */
     public function __construct(
         private $format = 'Y-m-d H:i'
-    )
-    {
+    ) {
     }
 
     /**

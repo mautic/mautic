@@ -23,8 +23,7 @@ class DynamicContentHelper
         protected RealTimeExecutioner $realTimeExecutioner,
         protected EventDispatcherInterface $dispatcher,
         protected LeadModel $leadModel
-    )
-    {
+    ) {
     }
 
     /**

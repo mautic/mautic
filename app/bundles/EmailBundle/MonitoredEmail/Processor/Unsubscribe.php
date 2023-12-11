@@ -26,8 +26,7 @@ class Unsubscribe implements ProcessorInterface
         private TranslatorInterface $translator,
         private LoggerInterface $logger,
         private DoNotContactModel $doNotContact
-    )
-    {
+    ) {
     }
 
     public function process(Message $message): bool

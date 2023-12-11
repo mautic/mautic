@@ -11,8 +11,7 @@ class FulltextKeyword implements \Stringable
         private bool $booleanMode = true,
         private bool $wordSearch = true,
         private bool $wordInflecting = false
-    )
-    {
+    ) {
     }
 
     public function __toString(): string

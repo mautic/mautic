@@ -13,8 +13,7 @@ class WebhookSubscriber implements EventSubscriberInterface
 {
     public function __construct(
         private WebhookModel $webhookModel
-    )
-    {
+    ) {
     }
 
     public static function getSubscribedEvents(): array

@@ -11,8 +11,7 @@ class PluginInstallEvent extends Event
 {
     public function __construct(
         private Plugin $plugin
-    )
-    {
+    ) {
     }
 
     public function getPlugin(): Plugin

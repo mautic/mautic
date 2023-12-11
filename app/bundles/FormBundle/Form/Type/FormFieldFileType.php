@@ -23,8 +23,7 @@ class FormFieldFileType extends AbstractType
     public function __construct(
         private CoreParametersHelper $coreParametersHelper,
         private TranslatorInterface $translator
-    )
-    {
+    ) {
     }
 
     public function buildForm(FormBuilderInterface $builder, array $options): void

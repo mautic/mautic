@@ -70,8 +70,7 @@ class ChannelBroadcastEvent extends Event
         $channel,
         $channelId,
         protected OutputInterface $output
-    )
-    {
+    ) {
         $this->channel = $channel;
         $this->id      = $channelId;
     }

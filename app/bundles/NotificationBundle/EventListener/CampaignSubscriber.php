@@ -26,8 +26,7 @@ class CampaignSubscriber implements EventSubscriberInterface
         private AbstractNotificationApi $notificationApi,
         private EventDispatcherInterface $dispatcher,
         private DoNotContactModel $doNotContact
-    )
-    {
+    ) {
     }
 
     public static function getSubscribedEvents(): array

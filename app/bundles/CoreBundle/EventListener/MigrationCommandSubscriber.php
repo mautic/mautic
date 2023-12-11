@@ -19,8 +19,7 @@ class MigrationCommandSubscriber implements EventSubscriberInterface
         private VersionProviderInterface $versionProvider,
         private GeneratedColumnsProviderInterface $generatedColumnsProvider,
         private Connection $connection
-    )
-    {
+    ) {
     }
 
     public static function getSubscribedEvents(): array

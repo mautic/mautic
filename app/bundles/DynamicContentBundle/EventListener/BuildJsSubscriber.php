@@ -18,8 +18,7 @@ class BuildJsSubscriber implements EventSubscriberInterface
         private TranslatorInterface $translator,
         private RequestStack $requestStack,
         private RouterInterface $router
-    )
-    {
+    ) {
     }
 
     public static function getSubscribedEvents(): array

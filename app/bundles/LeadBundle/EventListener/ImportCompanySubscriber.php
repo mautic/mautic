@@ -26,8 +26,7 @@ final class ImportCompanySubscriber implements EventSubscriberInterface
         private CorePermissions $corePermissions,
         private CompanyModel $companyModel,
         private TranslatorInterface $translator
-    )
-    {
+    ) {
     }
 
     public static function getSubscribedEvents(): array

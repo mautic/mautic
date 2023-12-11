@@ -29,8 +29,7 @@ class MappingHelper
         private ObjectMappingRepository $objectMappingRepository,
         private ObjectProvider $objectProvider,
         private EventDispatcherInterface $dispatcher
-    )
-    {
+    ) {
     }
 
     /**

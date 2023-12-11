@@ -16,8 +16,7 @@ class BuildJsSubscriber implements EventSubscriberInterface
         private AssetsHelper $assetsHelper,
         private TrackingHelper $trackingHelper,
         private RouterInterface $router
-    )
-    {
+    ) {
     }
 
     public static function getSubscribedEvents(): array

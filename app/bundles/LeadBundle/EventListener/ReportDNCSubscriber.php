@@ -23,8 +23,7 @@ class ReportDNCSubscriber implements EventSubscriberInterface
         private TranslatorInterface $translator,
         private RouterInterface $router,
         private ChannelListHelper $channelListHelper
-    )
-    {
+    ) {
     }
 
     public static function getSubscribedEvents(): array

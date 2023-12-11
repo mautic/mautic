@@ -18,8 +18,7 @@ class TokenSubscriber implements EventSubscriberInterface
     public function __construct(
         private EventDispatcherInterface $dispatcher,
         private PrimaryCompanyHelper $primaryCompanyHelper
-    )
-    {
+    ) {
     }
 
     public static function getSubscribedEvents(): array

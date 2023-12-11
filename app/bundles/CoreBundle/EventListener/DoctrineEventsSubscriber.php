@@ -19,8 +19,7 @@ class DoctrineEventsSubscriber implements EventSubscriber
      */
     public function __construct(
         private $tablePrefix
-    )
-    {
+    ) {
     }
 
     public function getSubscribedEvents(): array

@@ -18,8 +18,7 @@ class OwnerProvider
     public function __construct(
         private EventDispatcherInterface $dispatcher,
         private ObjectProvider $objectProvider
-    )
-    {
+    ) {
     }
 
     /**

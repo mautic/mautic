@@ -11,8 +11,7 @@ class EventsToArrayTransformer implements DataTransformerInterface
 {
     public function __construct(
         private Webhook $webhook
-    )
-    {
+    ) {
     }
 
     /**

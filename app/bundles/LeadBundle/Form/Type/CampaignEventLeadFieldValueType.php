@@ -21,8 +21,7 @@ class CampaignEventLeadFieldValueType extends AbstractType
         protected Translator $translator,
         protected LeadModel $leadModel,
         protected FieldModel $fieldModel
-    )
-    {
+    ) {
     }
 
     public function buildForm(FormBuilderInterface $builder, array $options): void

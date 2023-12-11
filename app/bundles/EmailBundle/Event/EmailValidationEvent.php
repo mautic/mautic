@@ -21,8 +21,7 @@ class EmailValidationEvent extends Event
      */
     public function __construct(
         protected $address
-    )
-    {
+    ) {
     }
 
     /**

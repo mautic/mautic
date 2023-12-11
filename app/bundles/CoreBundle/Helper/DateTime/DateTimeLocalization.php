@@ -8,8 +8,7 @@ class DateTimeLocalization
 {
     public function __construct(
         private TranslatorInterface $translator
-    )
-    {
+    ) {
     }
 
     public function localize(string $format): string

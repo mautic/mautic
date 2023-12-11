@@ -22,8 +22,7 @@ class TwilioTransport implements TransportInterface
     public function __construct(
         private Configuration $configuration,
         private LoggerInterface $logger
-    )
-    {
+    ) {
     }
 
     /**

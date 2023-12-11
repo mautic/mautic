@@ -15,8 +15,7 @@ class ScheduledContactFinder
     public function __construct(
         private LeadRepository $leadRepository,
         private LoggerInterface $logger
-    )
-    {
+    ) {
     }
 
     /**

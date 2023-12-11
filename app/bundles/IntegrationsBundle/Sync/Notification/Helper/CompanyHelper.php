@@ -10,8 +10,7 @@ class CompanyHelper
 {
     public function __construct(
         private Connection $connection
-    )
-    {
+    ) {
     }
 
     /**

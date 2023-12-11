@@ -20,8 +20,7 @@ class UniqueCustomFieldValidator extends ConstraintValidator
         private LeadModel $leadModel,
         private CompanyModel $companyModel,
         private FieldsWithUniqueIdentifier $fieldsWithUniqueIdentifier
-    )
-    {
+    ) {
     }
 
     /**

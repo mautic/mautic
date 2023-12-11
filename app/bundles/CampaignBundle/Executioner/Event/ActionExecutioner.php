@@ -19,8 +19,7 @@ class ActionExecutioner implements EventInterface
     public function __construct(
         private ActionDispatcher $dispatcher,
         private EventLogger $eventLogger
-    )
-    {
+    ) {
     }
 
     /**

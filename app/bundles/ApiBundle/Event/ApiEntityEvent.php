@@ -14,8 +14,7 @@ class ApiEntityEvent extends CommonEvent
         protected $entity,
         protected array $entityRequestParameters,
         private Request $request
-    )
-    {
+    ) {
     }
 
     /**

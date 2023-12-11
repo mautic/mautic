@@ -15,8 +15,7 @@ class ChannelSubscriber implements EventSubscriberInterface
 {
     public function __construct(
         private TransportChain $transportChain
-    )
-    {
+    ) {
     }
 
     public static function getSubscribedEvents(): array

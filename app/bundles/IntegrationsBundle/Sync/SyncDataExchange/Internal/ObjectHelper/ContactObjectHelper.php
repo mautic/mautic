@@ -34,8 +34,7 @@ class ContactObjectHelper implements ObjectHelperInterface
         private Connection $connection,
         private FieldModel $fieldModel,
         private DoNotContactModel $dncModel
-    )
-    {
+    ) {
     }
 
     /**

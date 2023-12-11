@@ -29,8 +29,7 @@ class Progress
 
     public function __construct(
         protected ?OutputInterface $output = null
-    )
-    {
+    ) {
     }
 
     /**

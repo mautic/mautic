@@ -11,8 +11,7 @@ class GraphAggregateStatsSubscriber implements EventSubscriberInterface
 {
     public function __construct(
         private StatsCollectionHelper $statsCollectionHelper
-    )
-    {
+    ) {
     }
 
     public static function getSubscribedEvents(): array

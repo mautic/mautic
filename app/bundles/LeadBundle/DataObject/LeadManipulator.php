@@ -22,8 +22,7 @@ class LeadManipulator
         private $objectName = null,
         private $objectId = null,
         private $objectDescription = null
-    )
-    {
+    ) {
     }
 
     /**

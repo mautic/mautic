@@ -12,8 +12,7 @@ class LoadLeadListData extends AbstractFixture implements OrderedFixtureInterfac
 {
     public function __construct(
         private ListModel $segmentModel
-    )
-    {
+    ) {
     }
 
     public function load(ObjectManager $manager): void

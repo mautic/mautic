@@ -26,8 +26,7 @@ final class InstallNewFilesStep implements StepInterface
         private TranslatorInterface $translator,
         private UpdateHelper $updateHelper,
         private PathsHelper $pathsHelper
-    )
-    {
+    ) {
     }
 
     public function getOrder(): int

@@ -22,8 +22,7 @@ class SocialMonitorEvent extends CommonEvent
         protected array $leadIds,
         $newLeadCount,
         $updatedLeadCount
-    )
-    {
+    ) {
         $this->entity           = $monitoring;
         $this->newLeadCount     = (int) $newLeadCount;
         $this->updatedLeadCount = (int) $updatedLeadCount;

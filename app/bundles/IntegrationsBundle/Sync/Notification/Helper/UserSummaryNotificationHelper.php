@@ -41,8 +41,7 @@ class UserSummaryNotificationHelper
         private OwnerProvider $ownerProvider,
         private RouteHelper $routeHelper,
         private TranslatorInterface $translator
-    )
-    {
+    ) {
     }
 
     /**

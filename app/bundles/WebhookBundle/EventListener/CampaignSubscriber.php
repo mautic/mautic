@@ -14,8 +14,7 @@ class CampaignSubscriber implements EventSubscriberInterface
 {
     public function __construct(
         private CampaignHelper $campaignHelper
-    )
-    {
+    ) {
     }
 
     public static function getSubscribedEvents(): array

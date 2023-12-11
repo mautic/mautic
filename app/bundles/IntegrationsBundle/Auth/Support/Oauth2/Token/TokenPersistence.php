@@ -19,8 +19,7 @@ class TokenPersistence implements TokenPersistenceInterface
 
     public function __construct(
         private IntegrationsHelper $integrationsHelper
-    )
-    {
+    ) {
     }
 
     /**

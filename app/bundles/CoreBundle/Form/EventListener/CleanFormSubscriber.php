@@ -17,8 +17,7 @@ class CleanFormSubscriber implements EventSubscriberInterface
      */
     public function __construct(
         private $masks = 'clean'
-    )
-    {
+    ) {
     }
 
     public static function getSubscribedEvents(): array

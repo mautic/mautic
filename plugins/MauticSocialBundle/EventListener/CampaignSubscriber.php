@@ -18,8 +18,7 @@ class CampaignSubscriber implements EventSubscriberInterface
         private CampaignEventHelper $campaignEventHelper,
         private IntegrationHelper $integrationHelper,
         private TranslatorInterface $translator
-    )
-    {
+    ) {
     }
 
     public static function getSubscribedEvents(): array

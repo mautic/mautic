@@ -10,8 +10,7 @@ class LeadMergeEvent extends Event
     public function __construct(
         private Lead $victor,
         private Lead $loser
-    )
-    {
+    ) {
     }
 
     /**

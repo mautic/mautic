@@ -103,8 +103,7 @@ class AbstractIntegrationTest extends AbstractIntegrationTestCase
                 new class($assertRequest) extends Client {
                     public function __construct(
                         private object $assertRequest
-                    )
-                    {
+                    ) {
                     }
 
                     /**

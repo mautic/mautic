@@ -60,8 +60,7 @@ class BuilderSubscriber implements EventSubscriberInterface
         private TranslatorInterface $translator,
         private Connection $connection,
         private Environment $twig
-    )
-    {
+    ) {
     }
 
     public static function getSubscribedEvents(): array

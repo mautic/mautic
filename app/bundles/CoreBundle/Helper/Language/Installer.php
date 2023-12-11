@@ -26,8 +26,7 @@ class Installer
      */
     public function __construct(
         private $translationsDirectory
-    )
-    {
+    ) {
         $this->filesystem            = new Filesystem();
     }
 

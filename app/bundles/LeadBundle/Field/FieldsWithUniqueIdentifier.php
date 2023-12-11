@@ -13,8 +13,7 @@ class FieldsWithUniqueIdentifier
 
     public function __construct(
         private FieldList $fieldList
-    )
-    {
+    ) {
     }
 
     /**

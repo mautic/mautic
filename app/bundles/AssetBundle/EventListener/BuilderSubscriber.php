@@ -25,8 +25,7 @@ class BuilderSubscriber implements EventSubscriberInterface
         private TokenHelper $tokenHelper,
         private ContactTracker $contactTracker,
         private BuilderTokenHelperFactory $builderTokenHelperFactory
-    )
-    {
+    ) {
     }
 
     public static function getSubscribedEvents(): array

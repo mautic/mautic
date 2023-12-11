@@ -30,8 +30,7 @@ class UserType extends AbstractType
         private TranslatorInterface $translator,
         private UserModel $model,
         private LanguageHelper $languageHelper
-    )
-    {
+    ) {
     }
 
     public function buildForm(FormBuilderInterface $builder, array $options): void

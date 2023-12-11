@@ -8,8 +8,7 @@ class ContactSegmentFilterOperator
 {
     public function __construct(
         private FilterOperatorProviderInterface $filterOperatorProvider
-    )
-    {
+    ) {
     }
 
     /**

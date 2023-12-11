@@ -12,8 +12,7 @@ class SlotExtension extends AbstractExtension
 {
     public function __construct(
         protected SlotsHelper $helper
-    )
-    {
+    ) {
     }
 
     /**

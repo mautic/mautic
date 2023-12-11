@@ -10,8 +10,7 @@ class FieldToOrderTransformer implements DataTransformerInterface
 {
     public function __construct(
         private LeadFieldRepository $leadFieldRepository
-    )
-    {
+    ) {
     }
 
     /**

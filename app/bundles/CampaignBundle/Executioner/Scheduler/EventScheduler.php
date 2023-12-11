@@ -30,8 +30,7 @@ class EventScheduler
         private EventCollector $collector,
         private EventDispatcherInterface $dispatcher,
         private CoreParametersHelper $coreParametersHelper
-    )
-    {
+    ) {
     }
 
     public function scheduleForContact(Event $event, \DateTimeInterface $executionDate, Lead $contact): void

@@ -28,8 +28,7 @@ class LeadBuildSearchEvent extends CommonEvent
         protected $alias,
         protected bool $negate,
         protected QueryBuilder $queryBuilder
-    )
-    {
+    ) {
         $this->subQuery         = '';
         $this->isSearchDone     = false;
         $this->strict           = false;

@@ -16,8 +16,7 @@ class ClearCacheCommand extends Command
 {
     public function __construct(
         private CacheProviderInterface $cacheProvider
-    )
-    {
+    ) {
         parent::__construct();
     }
 

@@ -48,8 +48,7 @@ class SyncProcess
         private SyncDataExchangeInterface $integrationSyncDataExchange,
         private InputOptionsDAO $inputOptionsDAO,
         private SyncServiceInterface $syncService
-    )
-    {
+    ) {
     }
 
     /**

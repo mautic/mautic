@@ -15,8 +15,7 @@ class ReplyController extends AbstractController
     public function __construct(
         private HandlerContainer $callbackHandler,
         private ReplyHelper $replyHelper
-    )
-    {
+    ) {
     }
 
     /**

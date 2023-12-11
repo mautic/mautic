@@ -14,8 +14,7 @@ class PageDisplayEvent extends Event
         private $content,
         private Page $page,
         private array $params = []
-    )
-    {
+    ) {
     }
 
     /**

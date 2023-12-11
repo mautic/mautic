@@ -14,8 +14,7 @@ class ContactFinder
         private StatRepository $statRepository,
         private LeadRepository $leadRepository,
         private LoggerInterface $logger
-    )
-    {
+    ) {
     }
 
     /**

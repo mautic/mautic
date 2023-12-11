@@ -9,8 +9,7 @@ class DateTimeToken
     public function __construct(
         private CoreParametersHelper $coreParametersHelper,
         private DateTimeLocalization $dateTimeLocalization
-    )
-    {
+    ) {
     }
 
     /**

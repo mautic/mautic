@@ -15,8 +15,7 @@ class AssetsSubscriber implements EventSubscriberInterface
     public function __construct(
         private AssetsHelper $assetsHelper,
         private EventDispatcherInterface $dispatcher
-    )
-    {
+    ) {
     }
 
     public static function getSubscribedEvents(): array

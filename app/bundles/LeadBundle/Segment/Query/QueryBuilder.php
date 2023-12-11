@@ -23,8 +23,7 @@ class QueryBuilder extends BaseQueryBuilder
 
     public function __construct(
         private Connection $connection
-    )
-    {
+    ) {
         parent::__construct($connection);
     }
 

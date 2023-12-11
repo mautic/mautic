@@ -35,8 +35,7 @@ final class AuthenticationListener
         private $providerKey,
         private PermissionRepository $permissionRepository,
         private EntityManagerInterface $entityManager
-    )
-    {
+    ) {
     }
 
     public function __invoke(RequestEvent $event): void

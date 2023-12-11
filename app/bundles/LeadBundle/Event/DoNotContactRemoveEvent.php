@@ -15,8 +15,7 @@ final class DoNotContactRemoveEvent extends Event
         private Lead $lead,
         private string $channel,
         private bool $persist = true
-    )
-    {
+    ) {
     }
 
     public function getLead(): Lead

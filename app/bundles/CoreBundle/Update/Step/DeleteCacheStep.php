@@ -13,8 +13,7 @@ final class DeleteCacheStep implements StepInterface
     public function __construct(
         private CacheHelper $cacheHelper,
         private TranslatorInterface $translator
-    )
-    {
+    ) {
     }
 
     public function getOrder(): int

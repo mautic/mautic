@@ -19,8 +19,7 @@ class ReportSubscriber implements EventSubscriberInterface
     public function __construct(
         private CompanyReportData $companyReportData,
         private DownloadRepository $downloadRepository
-    )
-    {
+    ) {
     }
 
     public static function getSubscribedEvents(): array

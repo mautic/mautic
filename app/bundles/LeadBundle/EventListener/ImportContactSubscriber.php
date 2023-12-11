@@ -27,8 +27,7 @@ final class ImportContactSubscriber implements EventSubscriberInterface
         private CorePermissions $corePermissions,
         private LeadModel $contactModel,
         private TranslatorInterface $translator
-    )
-    {
+    ) {
     }
 
     public static function getSubscribedEvents(): array

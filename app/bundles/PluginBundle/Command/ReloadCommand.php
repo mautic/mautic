@@ -11,8 +11,7 @@ class ReloadCommand extends Command
 {
     public function __construct(
         private ReloadFacade $reloadFacade
-    )
-    {
+    ) {
         parent::__construct();
     }
 

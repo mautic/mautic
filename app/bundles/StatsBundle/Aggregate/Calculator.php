@@ -12,8 +12,7 @@ class Calculator
         private StatsDAO $statsDAO,
         private ?\DateTimeInterface $fromDateTime = null,
         private ?\DateTimeInterface $toDateTime = null
-    )
-    {
+    ) {
     }
 
     /**

@@ -17,8 +17,7 @@ final class RemoveDeletedFilesStep implements StepInterface
         private TranslatorInterface $translator,
         PathsHelper $pathsHelper,
         private LoggerInterface $logger
-    )
-    {
+    ) {
         $this->appRoot    = $pathsHelper->getRootPath();
     }
 

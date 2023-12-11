@@ -50,8 +50,7 @@ class ReportDataResult
         private array $totals = [],
         private int $preBatchSize = 0,
         private bool $isLastBatch = true
-    )
-    {
+    ) {
         if (
             !array_key_exists('data', $data) ||
             !array_key_exists('dataColumns', $data) ||

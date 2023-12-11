@@ -16,8 +16,7 @@ class TwilioCallback implements CallbackInterface
     public function __construct(
         private ContactHelper $contactHelper,
         private Configuration $configuration
-    )
-    {
+    ) {
     }
 
     public function getTransportName(): string

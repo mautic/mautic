@@ -12,8 +12,7 @@ class LeadSubscriber implements EventSubscriberInterface
 {
     public function __construct(
         private LookupHelper $lookupHelper
-    )
-    {
+    ) {
     }
 
     public static function getSubscribedEvents(): array

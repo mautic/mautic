@@ -15,8 +15,7 @@ final class VersionProvider implements VersionProviderInterface
 
     public function __construct(
         private Connection $connection
-    )
-    {
+    ) {
     }
 
     public function getVersion(): string

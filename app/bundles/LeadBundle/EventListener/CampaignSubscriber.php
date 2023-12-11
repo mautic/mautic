@@ -62,8 +62,7 @@ class CampaignSubscriber implements EventSubscriberInterface
         private DoNotContact $doNotContact,
         private PointGroupModel $groupModel,
         private FilterOperatorProvider $filterOperatorProvider
-    )
-    {
+    ) {
     }
 
     public static function getSubscribedEvents(): array

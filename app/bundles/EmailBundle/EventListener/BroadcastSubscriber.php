@@ -15,8 +15,7 @@ class BroadcastSubscriber implements EventSubscriberInterface
         private EmailModel $model,
         private EntityManager $em,
         private TranslatorInterface $translator
-    )
-    {
+    ) {
     }
 
     public static function getSubscribedEvents(): array

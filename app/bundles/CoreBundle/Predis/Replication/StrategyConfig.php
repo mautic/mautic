@@ -8,8 +8,7 @@ final class StrategyConfig
 {
     public function __construct(
         private bool $primaryOnly
-    )
-    {
+    ) {
     }
 
     /**

@@ -13,8 +13,7 @@ class TableSchemaColumnsCache
 
     public function __construct(
         private EntityManager $entityManager
-    )
-    {
+    ) {
         $this->cache         = [];
     }
 

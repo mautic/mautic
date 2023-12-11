@@ -60,8 +60,7 @@ class InactiveExecutioner implements ExecutionerInterface
         private EventScheduler $scheduler,
         private InactiveHelper $helper,
         private EventExecutioner $executioner
-    )
-    {
+    ) {
     }
 
     /**

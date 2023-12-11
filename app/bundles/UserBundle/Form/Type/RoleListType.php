@@ -11,8 +11,7 @@ class RoleListType extends AbstractType
 {
     public function __construct(
         private RoleModel $roleModel
-    )
-    {
+    ) {
     }
 
     public function configureOptions(OptionsResolver $resolver): void

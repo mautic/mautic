@@ -14,8 +14,7 @@ class CategoryBundlesType extends AbstractType
 {
     public function __construct(
         private EventDispatcherInterface $dispatcher
-    )
-    {
+    ) {
     }
 
     public function configureOptions(OptionsResolver $resolver): void

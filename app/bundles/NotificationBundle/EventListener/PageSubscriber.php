@@ -13,8 +13,7 @@ class PageSubscriber implements EventSubscriberInterface
     public function __construct(
         private AssetsHelper $assetsHelper,
         private IntegrationHelper $integrationHelper
-    )
-    {
+    ) {
     }
 
     public static function getSubscribedEvents(): array

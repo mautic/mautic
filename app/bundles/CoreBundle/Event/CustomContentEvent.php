@@ -24,8 +24,7 @@ class CustomContentEvent extends Event
         protected $viewName,
         protected $context = null,
         protected array $vars = []
-    )
-    {
+    ) {
     }
 
     /**

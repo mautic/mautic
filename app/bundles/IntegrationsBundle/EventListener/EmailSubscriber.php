@@ -30,8 +30,7 @@ class EmailSubscriber implements EventSubscriberInterface
         protected TokenParser $tokenParser,
         protected ObjectMappingRepository $objectMappingRepository,
         protected IntegrationHelper $integrationHelper
-    )
-    {
+    ) {
     }
 
     public static function getSubscribedEvents(): array

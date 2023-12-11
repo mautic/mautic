@@ -39,8 +39,7 @@ class DynamicContentSubscriber implements EventSubscriberInterface
         private DynamicContentModel $dynamicContentModel,
         private CorePermissions $security,
         private ContactTracker $contactTracker
-    )
-    {
+    ) {
     }
 
     public static function getSubscribedEvents(): array

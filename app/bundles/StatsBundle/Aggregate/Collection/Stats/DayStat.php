@@ -16,8 +16,7 @@ class DayStat implements StatInterface
      */
     public function __construct(
         private $day
-    )
-    {
+    ) {
     }
 
     /**

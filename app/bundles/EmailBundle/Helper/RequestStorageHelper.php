@@ -20,8 +20,7 @@ class RequestStorageHelper
 
     public function __construct(
         private CacheProviderInterface $cacheStorage
-    )
-    {
+    ) {
     }
 
     /**

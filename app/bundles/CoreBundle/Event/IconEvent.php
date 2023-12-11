@@ -14,8 +14,7 @@ class IconEvent extends Event
 
     public function __construct(
         protected CorePermissions $security
-    )
-    {
+    ) {
     }
 
     /**

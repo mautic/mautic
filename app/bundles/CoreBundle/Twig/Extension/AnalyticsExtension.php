@@ -12,8 +12,7 @@ class AnalyticsExtension extends AbstractExtension
 {
     public function __construct(
         protected AnalyticsHelper $helper
-    )
-    {
+    ) {
     }
 
     public function getFunctions()

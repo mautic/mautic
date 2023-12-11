@@ -11,8 +11,7 @@ class SchedulerSubscriber implements EventSubscriberInterface
 {
     public function __construct(
         private SendSchedule $sendSchedule
-    )
-    {
+    ) {
     }
 
     public static function getSubscribedEvents(): array

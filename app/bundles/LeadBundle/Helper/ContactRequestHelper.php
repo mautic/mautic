@@ -44,8 +44,7 @@ class ContactRequestHelper
         private Logger $logger,
         private EventDispatcherInterface $eventDispatcher,
         private ContactMerger $contactMerger
-    )
-    {
+    ) {
     }
 
     /**

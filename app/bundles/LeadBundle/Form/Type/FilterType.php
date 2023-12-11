@@ -21,8 +21,7 @@ class FilterType extends AbstractType
     public function __construct(
         private FormAdjustmentsProviderInterface $formAdjustmentsProvider,
         private ListModel $listModel
-    )
-    {
+    ) {
     }
 
     public function buildForm(FormBuilderInterface $builder, array $options): void

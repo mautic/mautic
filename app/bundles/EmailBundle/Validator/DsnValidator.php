@@ -18,8 +18,7 @@ class DsnValidator extends ConstraintValidator
 {
     public function __construct(
         private TransportFactory $transportFactory
-    )
-    {
+    ) {
     }
 
     public function validate($value, Constraint $constraint): void

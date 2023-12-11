@@ -15,8 +15,7 @@ final class ObjectCollector implements ObjectCollectorInterface
 
     public function __construct(
         private EventDispatcherInterface $dispatcher
-    )
-    {
+    ) {
     }
 
     public function getObjects(): ObjectCollection

@@ -31,8 +31,7 @@ class CustomFormEvent extends Event
         protected $formName,
         protected $formType,
         private FormBuilderInterface $formBuilder
-    )
-    {
+    ) {
     }
 
     /**

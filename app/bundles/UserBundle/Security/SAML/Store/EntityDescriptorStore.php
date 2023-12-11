@@ -15,8 +15,7 @@ class EntityDescriptorStore implements EntityDescriptorStoreInterface
 
     public function __construct(
         private CoreParametersHelper $coreParametersHelper
-    )
-    {
+    ) {
     }
 
     public function get($entityId): ?EntityDescriptor

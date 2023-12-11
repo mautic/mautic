@@ -17,8 +17,7 @@ class InstallCommand extends Command
     public function __construct(
         private ComposerHelper $composer,
         private PackageModel $packageModel
-    )
-    {
+    ) {
         parent::__construct();
     }
 

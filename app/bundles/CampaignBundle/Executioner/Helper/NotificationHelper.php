@@ -20,8 +20,7 @@ class NotificationHelper
         private TranslatorInterface $translator,
         private Router $router,
         private CoreParametersHelper $coreParametersHelper
-    )
-    {
+    ) {
     }
 
     public function notifyOfFailure(Lead $contact, Event $event): void

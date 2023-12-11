@@ -21,8 +21,7 @@ class FlashBag
         private TranslatorInterface $translator,
         private RequestStack $requestStack,
         private NotificationModel $notificationModel
-    )
-    {
+    ) {
     }
 
     /**

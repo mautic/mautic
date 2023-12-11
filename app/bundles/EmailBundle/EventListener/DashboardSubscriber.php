@@ -57,8 +57,7 @@ class DashboardSubscriber extends MainDashboardSubscriber
     public function __construct(
         protected EmailModel $emailModel,
         private RouterInterface $router
-    )
-    {
+    ) {
     }
 
     /**

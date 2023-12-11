@@ -18,8 +18,7 @@ class EmailSendType extends AbstractType
 {
     public function __construct(
         private RouterInterface $router
-    )
-    {
+    ) {
     }
 
     public function buildForm(FormBuilderInterface $builder, array $options): void

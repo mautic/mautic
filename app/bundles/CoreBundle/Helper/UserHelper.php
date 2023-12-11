@@ -9,8 +9,7 @@ class UserHelper
 {
     public function __construct(
         protected TokenStorageInterface $tokenStorage
-    )
-    {
+    ) {
     }
 
     /**

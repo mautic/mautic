@@ -20,8 +20,7 @@ class EntityMetadata
 
     public function __construct(
         private BundleMetadata $metadata
-    )
-    {
+    ) {
     }
 
     public function build(): void

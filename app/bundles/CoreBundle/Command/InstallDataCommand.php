@@ -17,8 +17,7 @@ class InstallDataCommand extends Command
 {
     public function __construct(
         private TranslatorInterface $translator
-    )
-    {
+    ) {
         parent::__construct();
     }
 

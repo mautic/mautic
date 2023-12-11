@@ -19,8 +19,7 @@ class ConfigMonitoredMailboxesType extends AbstractType
 {
     public function __construct(
         private Mailbox $imapHelper
-    )
-    {
+    ) {
     }
 
     public function buildForm(FormBuilderInterface $builder, array $options): void

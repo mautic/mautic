@@ -22,8 +22,7 @@ class Allowlist
         private Config $config,
         private CacheProvider $cache,
         private ClientInterface $httpClient
-    )
-    {
+    ) {
     }
 
     public function getAllowList(): ?DTOAllowlist

@@ -15,8 +15,7 @@ class TagType extends AbstractType
 {
     public function __construct(
         private EntityManager $em
-    )
-    {
+    ) {
     }
 
     public function buildForm(FormBuilderInterface $builder, array $options): void

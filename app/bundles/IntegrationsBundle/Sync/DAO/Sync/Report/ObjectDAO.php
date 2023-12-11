@@ -21,8 +21,7 @@ class ObjectDAO
         private $object,
         private $objectId,
         private ?\DateTimeInterface $changeDateTime = null
-    )
-    {
+    ) {
     }
 
     public function getChangeDateTime(): ?\DateTimeInterface

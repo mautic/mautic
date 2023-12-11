@@ -23,8 +23,7 @@ class CampaignHelper
         protected Client $client,
         protected CompanyModel $companyModel,
         private EventDispatcherInterface $dispatcher
-    )
-    {
+    ) {
     }
 
     /**

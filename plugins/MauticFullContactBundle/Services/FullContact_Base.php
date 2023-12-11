@@ -63,8 +63,7 @@ class FullContact_Base
      */
     public function __construct(
         protected $_apiKey
-    )
-    {
+    ) {
         $this->_next_req_time = new \DateTime('@0');
     }
 

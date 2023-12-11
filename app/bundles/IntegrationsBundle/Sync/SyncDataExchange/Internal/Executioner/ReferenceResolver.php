@@ -17,8 +17,7 @@ final class ReferenceResolver implements ReferenceResolverInterface
 {
     public function __construct(
         private Connection $connection
-    )
-    {
+    ) {
     }
 
     /**

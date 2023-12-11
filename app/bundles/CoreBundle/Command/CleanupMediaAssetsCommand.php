@@ -16,8 +16,7 @@ class CleanupMediaAssetsCommand extends Command
 {
     public function __construct(
         private PathsHelper $pathsHelper
-    )
-    {
+    ) {
         parent::__construct();
     }
 

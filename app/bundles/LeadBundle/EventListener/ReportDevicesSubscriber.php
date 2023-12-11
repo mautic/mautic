@@ -19,8 +19,7 @@ class ReportDevicesSubscriber implements EventSubscriberInterface
     public function __construct(
         private FieldsBuilder $fieldsBuilder,
         private CompanyReportData $companyReportData
-    )
-    {
+    ) {
     }
 
     public static function getSubscribedEvents(): array

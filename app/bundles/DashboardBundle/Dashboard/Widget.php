@@ -18,8 +18,7 @@ class Widget
         private DashboardModel $dashboardModel,
         private UserHelper $userHelper,
         private Session $session
-    )
-    {
+    ) {
     }
 
     /**

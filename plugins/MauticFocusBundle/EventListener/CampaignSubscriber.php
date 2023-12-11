@@ -17,8 +17,7 @@ class CampaignSubscriber implements EventSubscriberInterface
     public function __construct(
         private TrackingHelper $trackingHelper,
         private RouterInterface $router
-    )
-    {
+    ) {
     }
 
     public static function getSubscribedEvents(): array

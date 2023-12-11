@@ -29,8 +29,7 @@ class ImportValidateEvent extends Event
     public function __construct(
         private string $routeObjectName,
         private FormInterface $form
-    )
-    {
+    ) {
     }
 
     /**

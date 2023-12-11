@@ -9,8 +9,7 @@ class LoginEvent extends Event
 {
     public function __construct(
         private User $user
-    )
-    {
+    ) {
     }
 
     /**

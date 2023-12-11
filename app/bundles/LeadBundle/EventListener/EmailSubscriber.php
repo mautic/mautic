@@ -19,8 +19,7 @@ class EmailSubscriber implements EventSubscriberInterface
 
     public function __construct(
         private BuilderTokenHelperFactory $builderTokenHelperFactory
-    )
-    {
+    ) {
     }
 
     public static function getSubscribedEvents(): array

@@ -28,8 +28,7 @@ class DateOptionFactory
         private DateDecorator $dateDecorator,
         private RelativeDate $relativeDate,
         private TimezoneResolver $timezoneResolver
-    )
-    {
+    ) {
     }
 
     /**

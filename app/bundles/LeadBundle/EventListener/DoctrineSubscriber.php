@@ -13,8 +13,7 @@ class DoctrineSubscriber implements EventSubscriber
 {
     public function __construct(
         private Logger $logger
-    )
-    {
+    ) {
     }
 
     public function getSubscribedEvents(): array

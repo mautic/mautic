@@ -17,8 +17,7 @@ class RelationsHelper
 
     public function __construct(
         private MappingHelper $mappingHelper
-    )
-    {
+    ) {
     }
 
     public function processRelations(MappingManualDAO $mappingManualDao, ReportDAO $syncReport): void

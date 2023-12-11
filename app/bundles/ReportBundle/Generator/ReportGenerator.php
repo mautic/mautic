@@ -32,8 +32,7 @@ class ReportGenerator
         private Report $entity,
         private ChannelListHelper $channelListHelper,
         private ?FormFactoryInterface $formFactory = null
-    )
-    {
+    ) {
     }
 
     /**

@@ -20,8 +20,7 @@ class RestrictionHelper
         private TranslatorInterface $translator,
         array $restrictedFields,
         private string $displayMode
-    )
-    {
+    ) {
         $this->restrictedFields = FieldHelper::prepareRestrictions($restrictedFields);
     }
 

@@ -18,8 +18,7 @@ class DateTimeTokenSubscriber implements EventSubscriberInterface
         private DateTimeToken $dateTokenHelper,
         private CorePermissions $security,
         private ContactTracker $contactTracker
-    )
-    {
+    ) {
     }
 
     public static function getSubscribedEvents(): array

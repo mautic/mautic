@@ -18,8 +18,7 @@ class MenuEvent extends Event
     public function __construct(
         protected MenuHelper $helper,
         protected $type = 'main'
-    )
-    {
+    ) {
     }
 
     public function setMenuItems(array $menuItems): void

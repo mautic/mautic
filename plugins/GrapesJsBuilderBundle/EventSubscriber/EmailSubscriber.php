@@ -15,8 +15,7 @@ class EmailSubscriber implements EventSubscriberInterface
     public function __construct(
         private Config $config,
         private GrapesJsBuilderModel $grapesJsBuilderModel
-    )
-    {
+    ) {
     }
 
     public static function getSubscribedEvents(): array

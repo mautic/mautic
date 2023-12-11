@@ -16,8 +16,7 @@ class IframeAvailabilityChecker
 {
     public function __construct(
         private TranslatorInterface $translator
-    )
-    {
+    ) {
     }
 
     public function check(string $url, string $currentScheme): JsonResponse

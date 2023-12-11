@@ -14,8 +14,7 @@ class ContactHelper
         private LeadRepository $leadRepository,
         private Connection $connection,
         private PhoneNumberHelper $phoneNumberHelper
-    )
-    {
+    ) {
     }
 
     /**

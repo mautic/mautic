@@ -28,8 +28,7 @@ class Reply implements ProcessorInterface
         private LoggerInterface $logger,
         private ContactTracker $contactTracker,
         private EmailAddressHelper $addressHelper
-    )
-    {
+    ) {
     }
 
     public function process(Message $message): void

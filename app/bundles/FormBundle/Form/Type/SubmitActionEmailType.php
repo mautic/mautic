@@ -23,8 +23,7 @@ class SubmitActionEmailType extends AbstractType
     public function __construct(
         private TranslatorInterface $translator,
         protected CoreParametersHelper $coreParametersHelper
-    )
-    {
+    ) {
     }
 
     public function buildForm(FormBuilderInterface $builder, array $options): void

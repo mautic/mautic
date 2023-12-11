@@ -12,8 +12,7 @@ class UpdateCompanyActionType extends AbstractType
 
     public function __construct(
         protected FieldModel $fieldModel
-    )
-    {
+    ) {
     }
 
     public function buildForm(FormBuilderInterface $builder, array $options): void

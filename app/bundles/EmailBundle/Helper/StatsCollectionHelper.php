@@ -21,8 +21,7 @@ class StatsCollectionHelper
 
     public function __construct(
         private StatHelperContainer $helperContainer
-    )
-    {
+    ) {
     }
 
     /**

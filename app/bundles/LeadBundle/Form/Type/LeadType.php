@@ -29,8 +29,7 @@ class LeadType extends AbstractType
         private TranslatorInterface $translator,
         private CompanyModel $companyModel,
         private EntityManager $entityManager
-    )
-    {
+    ) {
     }
 
     public function buildForm(FormBuilderInterface $builder, array $options): void

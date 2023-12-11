@@ -17,8 +17,7 @@ final class FinalizeUpdateStep implements StepInterface
         private PathsHelper $pathsHelper,
         private Session $session,
         private AppVersion $appVersion
-    )
-    {
+    ) {
     }
 
     public function getOrder(): int

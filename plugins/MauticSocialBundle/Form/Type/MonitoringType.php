@@ -21,8 +21,7 @@ class MonitoringType extends AbstractType
 {
     public function __construct(
         private MonitoringModel $monitoringModel
-    )
-    {
+    ) {
     }
 
     public function buildForm(FormBuilderInterface $builder, array $options): void

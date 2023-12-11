@@ -15,8 +15,7 @@ class CompanyEvent extends CommonEvent
         Company $company,
         $isNew = false,
         protected $score = 0
-    )
-    {
+    ) {
         $this->entity = $company;
         $this->isNew  = $isNew;
     }

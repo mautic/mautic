@@ -76,8 +76,7 @@ class DynamicContentType extends AbstractType
         ListModel $listModel,
         private TranslatorInterface $translator,
         private LeadModel $leadModel
-    )
-    {
+    ) {
         $this->fieldChoices    = $listModel->getChoiceFields();
         $this->timezoneChoices = FormFieldHelper::getTimezonesChoices();
         $this->countryChoices  = FormFieldHelper::getCountryChoices();

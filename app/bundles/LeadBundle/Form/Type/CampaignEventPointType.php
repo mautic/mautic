@@ -17,8 +17,7 @@ class CampaignEventPointType extends AbstractType
 {
     public function __construct(
         private TypeOperatorProviderInterface $typeOperatorProvider
-    )
-    {
+    ) {
     }
 
     public function buildForm(FormBuilderInterface $builder, array $options): void

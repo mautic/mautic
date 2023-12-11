@@ -14,8 +14,7 @@ class ContactSegmentFilterFactory
         private TableSchemaColumnsCache $schemaCache,
         private Container $container,
         private DecoratorFactory $decoratorFactory
-    )
-    {
+    ) {
     }
 
     /**

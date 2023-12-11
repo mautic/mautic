@@ -14,8 +14,7 @@ class BaseDecorator implements FilterDecoratorInterface
 
     public function __construct(
         protected ContactSegmentFilterOperator $contactSegmentFilterOperator
-    )
-    {
+    ) {
     }
 
     /**

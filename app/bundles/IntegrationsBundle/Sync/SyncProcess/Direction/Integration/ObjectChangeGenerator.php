@@ -46,8 +46,7 @@ class ObjectChangeGenerator
 
     public function __construct(
         private ValueHelper $valueHelper
-    )
-    {
+    ) {
     }
 
     /**

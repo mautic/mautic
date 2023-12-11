@@ -15,8 +15,7 @@ class ReportFilterDataTransformer implements DataTransformerInterface
      */
     public function __construct(
         private $columns
-    )
-    {
+    ) {
     }
 
     /**

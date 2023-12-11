@@ -23,8 +23,7 @@ class CampaignActionJumpToEventSubscriber implements EventSubscriberInterface
         private EventExecutioner $eventExecutioner,
         private TranslatorInterface $translator,
         private LeadRepository $leadRepository
-    )
-    {
+    ) {
     }
 
     public static function getSubscribedEvents(): array

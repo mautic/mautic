@@ -10,8 +10,7 @@ class UserHelper
 {
     public function __construct(
         private Connection $connection
-    )
-    {
+    ) {
     }
 
     public function getAdminUsers(): array

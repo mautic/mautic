@@ -15,8 +15,7 @@ class UploadFieldValidator
 {
     public function __construct(
         private FileUploadValidator $fileUploadValidator
-    )
-    {
+    ) {
     }
 
     /**

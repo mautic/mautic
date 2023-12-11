@@ -30,8 +30,7 @@ class MembershipManager
         private EventDispatcher $eventDispatcher,
         private LeadRepository $leadRepository,
         private LoggerInterface $logger
-    )
-    {
+    ) {
     }
 
     /**

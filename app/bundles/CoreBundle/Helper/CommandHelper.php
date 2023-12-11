@@ -13,8 +13,7 @@ class CommandHelper
 {
     public function __construct(
         private KernelInterface $kernel
-    )
-    {
+    ) {
     }
 
     /**

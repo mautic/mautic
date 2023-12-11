@@ -61,8 +61,7 @@ class CampaignExecutionEvent extends Event
         array $args,
         protected $result,
         protected ?LeadEventLog $log = null
-    )
-    {
+    ) {
         $this->lead            = $args['lead'];
         $this->event           = $args['event'];
         $this->eventDetails    = $args['eventDetails'];

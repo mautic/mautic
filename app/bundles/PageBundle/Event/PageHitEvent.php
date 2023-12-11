@@ -20,8 +20,7 @@ class PageHitEvent extends CommonEvent
         protected $code,
         protected $clickthroughData = [],
         protected $unique = false
-    )
-    {
+    ) {
         $this->entity           = $hit;
         $this->page             = $hit->getPage();
     }

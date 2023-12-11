@@ -21,8 +21,7 @@ class ObjectProvider
 
     public function __construct(
         private EventDispatcherInterface $dispatcher
-    )
-    {
+    ) {
     }
 
     /**

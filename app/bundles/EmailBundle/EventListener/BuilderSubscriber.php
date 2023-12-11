@@ -33,8 +33,7 @@ class BuilderSubscriber implements EventSubscriberInterface
         private TrackableModel $pageTrackableModel,
         private RedirectModel $pageRedirectModel,
         private TranslatorInterface $translator
-    )
-    {
+    ) {
     }
 
     public static function getSubscribedEvents(): array

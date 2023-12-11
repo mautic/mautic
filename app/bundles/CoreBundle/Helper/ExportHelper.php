@@ -26,8 +26,7 @@ class ExportHelper
         private TranslatorInterface $translator,
         private CoreParametersHelper $coreParametersHelper,
         private FilePathResolver $filePathResolver
-    )
-    {
+    ) {
     }
 
     /**

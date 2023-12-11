@@ -25,8 +25,7 @@ final class DeviceTrackingService implements DeviceTrackingServiceInterface
         private RandomHelperInterface $randomHelper,
         private RequestStack $requestStack,
         private CorePermissions $security
-    )
-    {
+    ) {
     }
 
     public function isTracked(): bool

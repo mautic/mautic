@@ -13,8 +13,7 @@ class GroupScoreSubscriber implements EventSubscriberInterface
 {
     public function __construct(
         private TriggerModel $triggerModel
-    )
-    {
+    ) {
     }
 
     public static function getSubscribedEvents(): array

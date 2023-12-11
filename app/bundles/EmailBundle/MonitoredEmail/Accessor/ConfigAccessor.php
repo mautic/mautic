@@ -9,8 +9,7 @@ class ConfigAccessor
      */
     public function __construct(
         private array $config
-    )
-    {
+    ) {
     }
 
     /**

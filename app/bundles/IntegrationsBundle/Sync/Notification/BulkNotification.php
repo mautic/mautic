@@ -15,8 +15,7 @@ class BulkNotification
         private BulkNotificationInterface $bulkNotification,
         private UserNotificationBuilder $userNotificationBuilder,
         private EntityManagerInterface $entityManager
-    )
-    {
+    ) {
     }
 
     public function addNotification(

@@ -16,8 +16,7 @@ class HourStat
      */
     public function __construct(
         private $hour
-    )
-    {
+    ) {
     }
 
     /**

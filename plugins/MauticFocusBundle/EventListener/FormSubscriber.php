@@ -11,8 +11,7 @@ class FormSubscriber implements EventSubscriberInterface
 {
     public function __construct(
         private FocusModel $model
-    )
-    {
+    ) {
     }
 
     public static function getSubscribedEvents(): array

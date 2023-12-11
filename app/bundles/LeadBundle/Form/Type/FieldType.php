@@ -34,8 +34,7 @@ class FieldType extends AbstractType
         private EntityManagerInterface $em,
         private Translator $translator,
         private IdentifierFields $identifierFields
-    )
-    {
+    ) {
     }
 
     public function buildForm(FormBuilderInterface $builder, array $options): void

@@ -8,8 +8,7 @@ class RelativeDate
 {
     public function __construct(
         private TranslatorInterface $translator
-    )
-    {
+    ) {
     }
 
     public function getRelativeDateStrings(): array

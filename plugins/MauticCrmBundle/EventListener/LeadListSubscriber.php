@@ -19,8 +19,7 @@ class LeadListSubscriber implements EventSubscriberInterface
         private IntegrationHelper $helper,
         private ListModel $listModel,
         private TranslatorInterface $translator
-    )
-    {
+    ) {
     }
 
     public static function getSubscribedEvents(): array

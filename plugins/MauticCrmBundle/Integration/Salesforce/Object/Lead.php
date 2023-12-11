@@ -10,8 +10,7 @@ class Lead
         private $id,
         private $campaignId,
         private $isDeleted
-    )
-    {
+    ) {
     }
 
     /**

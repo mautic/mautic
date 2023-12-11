@@ -16,8 +16,7 @@ class BuilderTokenHelperFactory
         private ModelFactory $modelFactory,
         private Connection $connection,
         private UserHelper $userHelper
-    )
-    {
+    ) {
     }
 
     public function getBuilderTokenHelper(

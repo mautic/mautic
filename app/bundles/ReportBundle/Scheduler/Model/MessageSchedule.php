@@ -15,8 +15,7 @@ class MessageSchedule
         private FileProperties $fileProperties,
         private CoreParametersHelper $coreParametersHelper,
         private UrlGeneratorInterface $router
-    )
-    {
+    ) {
     }
 
     /**

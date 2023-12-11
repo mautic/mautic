@@ -21,8 +21,7 @@ class NotificationSubscriber implements EventSubscriberInterface
         private TrackableModel $trackableModel,
         private PageTokenHelper $pageTokenHelper,
         private AssetTokenHelper $assetTokenHelper
-    )
-    {
+    ) {
     }
 
     public static function getSubscribedEvents(): array

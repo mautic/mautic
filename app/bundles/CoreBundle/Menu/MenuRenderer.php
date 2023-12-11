@@ -15,8 +15,7 @@ class MenuRenderer implements RendererInterface
         private MatcherInterface $matcher,
         private Environment $twig,
         array $defaultOptions = []
-    )
-    {
+    ) {
         $this->defaultOptions = array_merge(
             [
                 'depth'             => null,

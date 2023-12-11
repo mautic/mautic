@@ -11,8 +11,7 @@ final class AddColumnBackgroundEvent extends Event
 {
     public function __construct(
         private LeadField $leadField
-    )
-    {
+    ) {
     }
 
     public function getLeadField(): LeadField

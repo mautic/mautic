@@ -18,8 +18,7 @@ class CampaignSubscriber implements EventSubscriberInterface
         private AuditLogModel $auditLogModel,
         private CampaignService $campaignService,
         private FlashBag $flashBag
-    )
-    {
+    ) {
     }
 
     public static function getSubscribedEvents(): array

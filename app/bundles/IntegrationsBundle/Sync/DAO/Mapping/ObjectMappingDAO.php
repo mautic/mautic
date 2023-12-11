@@ -28,8 +28,7 @@ class ObjectMappingDAO
     public function __construct(
         private string $internalObjectName,
         private string $integrationObjectName
-    )
-    {
+    ) {
     }
 
     /**

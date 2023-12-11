@@ -10,8 +10,7 @@ class SegmentCountCacheHelper
 {
     public function __construct(
         private CacheStorageHelper $cacheStorageHelper
-    )
-    {
+    ) {
     }
 
     /**

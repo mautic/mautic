@@ -13,8 +13,7 @@ class IpLookupFactory
         protected ?LoggerInterface $logger = null,
         protected ?Client $client = null,
         protected ?string $cacheDir = null
-    )
-    {
+    ) {
     }
 
     /**

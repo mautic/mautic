@@ -39,8 +39,7 @@ class IntegrationSyncProcess
         private SyncDateHelper $syncDateHelper,
         private MappingHelper $mappingHelper,
         private ObjectChangeGenerator $objectChangeGenerator
-    )
-    {
+    ) {
     }
 
     public function setupSync(InputOptionsDAO $inputOptionsDAO, MappingManualDAO $mappingManualDAO, SyncDataExchangeInterface $syncDataExchange): void

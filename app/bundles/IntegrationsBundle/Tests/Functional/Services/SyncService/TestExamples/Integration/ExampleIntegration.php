@@ -28,8 +28,7 @@ final class ExampleIntegration extends BasicIntegration implements IntegrationIn
 
     public function __construct(
         private ExampleSyncDataExchange $syncDataExchange
-    )
-    {
+    ) {
     }
 
     public function getName(): string

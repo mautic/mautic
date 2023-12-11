@@ -25,8 +25,7 @@ class SmsSubscriber implements EventSubscriberInterface
         private AssetTokenHelper $assetTokenHelper,
         private SmsHelper $smsHelper,
         private CoreParametersHelper $coreParametersHelper
-    )
-    {
+    ) {
     }
 
     public static function getSubscribedEvents(): array

@@ -28,8 +28,7 @@ class ProcessReplySubscriber implements EventSubscriberInterface
     public function __construct(
         private Reply $replier,
         private CacheStorageHelper $cache
-    )
-    {
+    ) {
     }
 
     public function onEmailConfig(MonitoredEmailEvent $event): void

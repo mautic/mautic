@@ -14,8 +14,7 @@ class ScheduleIsValidValidator extends ConstraintValidator
 {
     public function __construct(
         private SchedulerBuilder $schedulerBuilder
-    )
-    {
+    ) {
     }
 
     /**

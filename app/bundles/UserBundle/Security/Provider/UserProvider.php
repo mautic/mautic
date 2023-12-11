@@ -26,8 +26,7 @@ class UserProvider implements UserProviderInterface
         protected Session $session,
         protected EventDispatcherInterface $dispatcher,
         protected UserPasswordHasher $encoder
-    )
-    {
+    ) {
     }
 
     /**

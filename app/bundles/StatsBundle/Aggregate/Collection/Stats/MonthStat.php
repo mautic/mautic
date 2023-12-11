@@ -16,8 +16,7 @@ class MonthStat implements StatInterface
      */
     public function __construct(
         private $month
-    )
-    {
+    ) {
     }
 
     /**

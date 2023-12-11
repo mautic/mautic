@@ -13,8 +13,7 @@ final class PageHelper implements PageHelperInterface
         private CoreParametersHelper $coreParametersHelper,
         private string $sessionPrefix,
         private int $page
-    )
-    {
+    ) {
     }
 
     public function getLimit(): int

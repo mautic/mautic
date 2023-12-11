@@ -12,8 +12,7 @@ class ConditionDispatcher
 {
     public function __construct(
         private EventDispatcherInterface $dispatcher
-    )
-    {
+    ) {
     }
 
     public function dispatchEvent(ConditionAccessor $config, LeadEventLog $log): ConditionEvent

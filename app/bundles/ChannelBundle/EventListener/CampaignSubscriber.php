@@ -39,8 +39,7 @@ class CampaignSubscriber implements EventSubscriberInterface
         private EventCollector $eventCollector,
         private LoggerInterface $logger,
         private TranslatorInterface $translator
-    )
-    {
+    ) {
     }
 
     public static function getSubscribedEvents(): array

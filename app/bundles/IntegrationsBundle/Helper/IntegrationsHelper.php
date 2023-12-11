@@ -30,8 +30,7 @@ class IntegrationsHelper
         private IntegrationRepository $integrationRepository,
         private EncryptionService $encryptionService,
         private EventDispatcherInterface $eventDispatcher
-    )
-    {
+    ) {
     }
 
     public function addIntegration(IntegrationInterface $integration): void

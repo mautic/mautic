@@ -40,8 +40,7 @@ class TableSchemaHelper
         protected Connection $db,
         protected $prefix,
         protected ColumnSchemaHelper $columnHelper
-    )
-    {
+    ) {
         $this->sm           = $db->getSchemaManager();
     }
 

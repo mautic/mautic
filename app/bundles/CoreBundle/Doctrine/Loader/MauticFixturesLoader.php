@@ -11,8 +11,7 @@ final class MauticFixturesLoader implements FixturesLoaderInterface
 {
     public function __construct(
         private SymfonyFixturesLoader $fixturesLoader
-    )
-    {
+    ) {
     }
 
     public function getFixtures(array $groups = []): array

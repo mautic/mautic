@@ -26,8 +26,7 @@ class SendEmailToUser
         private EventDispatcherInterface $dispatcher,
         private CustomFieldValidator $customFieldValidator,
         private EmailValidator $emailValidator
-    )
-    {
+    ) {
     }
 
     /**

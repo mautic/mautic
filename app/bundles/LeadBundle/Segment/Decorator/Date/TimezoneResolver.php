@@ -9,8 +9,7 @@ class TimezoneResolver
 {
     public function __construct(
         private CoreParametersHelper $coreParametersHelper
-    )
-    {
+    ) {
     }
 
     /**

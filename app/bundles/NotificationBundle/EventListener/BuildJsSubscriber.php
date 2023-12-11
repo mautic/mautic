@@ -16,8 +16,7 @@ class BuildJsSubscriber implements EventSubscriberInterface
         private NotificationHelper $notificationHelper,
         private IntegrationHelper $integrationHelper,
         private RouterInterface $router
-    )
-    {
+    ) {
     }
 
     public static function getSubscribedEvents(): array

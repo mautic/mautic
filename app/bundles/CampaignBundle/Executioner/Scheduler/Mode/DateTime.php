@@ -9,8 +9,7 @@ class DateTime implements ScheduleModeInterface
 {
     public function __construct(
         private LoggerInterface $logger
-    )
-    {
+    ) {
     }
 
     public function getExecutionDateTime(Event $event, \DateTimeInterface $compareFromDateTime, \DateTimeInterface $comparedToDateTime): \DateTimeInterface

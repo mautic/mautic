@@ -19,8 +19,7 @@ class IdToEntityModelTransformer implements DataTransformerInterface
         private $repository = '',
         private $id = 'id',
         private $isArray = false
-    )
-    {
+    ) {
     }
 
     public function transform($entity)

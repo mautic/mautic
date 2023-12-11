@@ -21,8 +21,7 @@ class ReplyEvent extends Event
     public function __construct(
         private Lead $contact,
         private $message
-    )
-    {
+    ) {
     }
 
     /**

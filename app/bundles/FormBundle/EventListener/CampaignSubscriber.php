@@ -23,8 +23,7 @@ class CampaignSubscriber implements EventSubscriberInterface
         private SubmissionModel $formSubmissionModel,
         private RealTimeExecutioner $realTimeExecutioner,
         private FormFieldHelper $formFieldHelper
-    )
-    {
+    ) {
     }
 
     public static function getSubscribedEvents(): array

@@ -22,8 +22,7 @@ class DeleteWebhookLogsCommand extends Command
     public function __construct(
         WebhookModel $webhookModel,
         private CoreParametersHelper $coreParametersHelper
-    )
-    {
+    ) {
         $this->logRepository        = $webhookModel->getLogRepository();
 
         parent::__construct();

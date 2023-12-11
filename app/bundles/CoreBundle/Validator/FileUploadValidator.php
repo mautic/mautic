@@ -10,8 +10,7 @@ class FileUploadValidator
 {
     public function __construct(
         protected TranslatorInterface $translator
-    )
-    {
+    ) {
     }
 
     /**

@@ -14,8 +14,7 @@ class WebhookRequestEvent extends Event
         private string $url,
         private array $headers,
         private array $payload
-    )
-    {
+    ) {
     }
 
     public function getUrl(): string
