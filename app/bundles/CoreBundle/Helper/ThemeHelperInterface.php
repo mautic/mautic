@@ -18,8 +18,6 @@ interface ThemeHelperInterface
 
     /**
      * @param string $defaultTheme
-     *
-     * @return void
      */
     public function setDefaultTheme($defaultTheme);
 
@@ -45,8 +43,6 @@ interface ThemeHelperInterface
      * @param string      $newName
      * @param string|null $newDirName if not set then it will be generated from the $newName param
      *
-     * @return void
-     *
      * @throws FileExistsException
      * @throws FileNotFoundException
      */
@@ -56,8 +52,6 @@ interface ThemeHelperInterface
      * @param string $theme
      * @param string $newName
      *
-     * @return void
-     *
      * @throws FileNotFoundException
      * @throws FileExistsException
      */
@@ -65,8 +59,6 @@ interface ThemeHelperInterface
 
     /**
      * @param string $theme
-     *
-     * @return void
      *
      * @throws FileNotFoundException
      */

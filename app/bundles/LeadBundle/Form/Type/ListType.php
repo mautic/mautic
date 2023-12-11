@@ -155,9 +155,6 @@ class ListType extends AbstractType
         );
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function buildView(FormView $view, FormInterface $form, array $options): void
     {
         $view->vars['fields'] = $this->listModel->getChoiceFields();

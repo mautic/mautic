@@ -16,8 +16,6 @@ use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 class TagModel extends BaseTagModel
 {
     /**
-     * {@inheritdoc}
-     *
      * @return TagRepository
      */
     public function getRepository()
@@ -26,8 +24,6 @@ class TagModel extends BaseTagModel
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @param Tag         $entity
      * @param string|null $action
      * @param array       $options

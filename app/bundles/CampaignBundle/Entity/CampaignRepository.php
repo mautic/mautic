@@ -252,9 +252,6 @@ class CampaignRepository extends CommonRepository
         return $q->getQuery()->getResult();
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getTableAlias(): string
     {
         return 'c';

@@ -164,8 +164,6 @@ class ObjectChangeDAO
     }
 
     /**
-     * @param \DateTimeInterface $changeDateTime
-     *
      * @return ObjectChangeDAO
      */
     public function setChangeDateTime(?\DateTimeInterface $changeDateTime = null)

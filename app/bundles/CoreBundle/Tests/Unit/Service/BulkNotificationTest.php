@@ -71,7 +71,9 @@ class BulkNotificationTest extends TestCase
              */
             public $notifications = [];
 
-            /** @noinspection PhpMissingParentConstructorInspection */
+            /**
+             * @noinspection PhpMissingParentConstructorInspection
+             */
             public function __construct()
             {
             }

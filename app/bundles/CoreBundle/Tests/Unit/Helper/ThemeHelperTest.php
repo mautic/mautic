@@ -294,7 +294,9 @@ class ThemeHelperTest extends TestCase
                 }
             },
             new class() extends Finder {
-                /** @var \SplFileInfo[] */
+                /**
+                 * @var \SplFileInfo[]
+                 */
                 private array $dirs = [];
 
                 public function __construct()
@@ -310,9 +312,6 @@ class ThemeHelperTest extends TestCase
                     return $this;
                 }
 
-                /**
-                 * {@inheritDoc}
-                 */
                 public function getIterator()
                 {
                     return new \ArrayIterator($this->dirs);
@@ -409,9 +408,6 @@ class ThemeHelperTest extends TestCase
                     return $this;
                 }
 
-                /**
-                 * {@inheritDoc}
-                 */
                 public function getIterator()
                 {
                     return new \ArrayIterator($this->dirs);

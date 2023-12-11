@@ -25,9 +25,6 @@ class TagModel extends FormModel
         return $this->em->getRepository(Tag::class);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getPermissionBase(): string
     {
         return 'lead:leads';
@@ -48,8 +45,6 @@ class TagModel extends FormModel
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @param Tag   $entity
      * @param array $options
      *
@@ -69,8 +64,6 @@ class TagModel extends FormModel
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @throws \Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException
      */
     protected function dispatchEvent($action, &$entity, $isNew = false, Event $event = null): ?Event

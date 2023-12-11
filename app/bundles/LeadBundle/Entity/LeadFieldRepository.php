@@ -92,9 +92,6 @@ class LeadFieldRepository extends CommonRepository
         return array_column($results, null, 'alias');
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getTableAlias(): string
     {
         return 'f';

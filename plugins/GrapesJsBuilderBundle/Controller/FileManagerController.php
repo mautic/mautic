@@ -16,9 +16,6 @@ class FileManagerController extends AjaxController
         return $this->sendJsonResponse(['data'=> $fileManager->uploadFiles($request)]);
     }
 
-    /**
-     * @param string $fileName
-     */
     public function deleteAction(Request $request, FileManager $fileManager): JsonResponse
     {
         $fileName = $request->get('filename');

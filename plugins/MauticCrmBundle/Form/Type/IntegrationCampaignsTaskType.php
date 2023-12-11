@@ -70,9 +70,6 @@ class IntegrationCampaignsTaskType extends AbstractType
         );
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getBlockPrefix()
     {
         return 'integration_campaign_task';

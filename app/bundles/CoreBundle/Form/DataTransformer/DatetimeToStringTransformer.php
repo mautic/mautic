@@ -14,8 +14,6 @@ class DatetimeToStringTransformer implements DataTransformerInterface
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @return string
      */
     public function reverseTransform($value)
@@ -30,8 +28,6 @@ class DatetimeToStringTransformer implements DataTransformerInterface
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @return \DateTime
      */
     public function transform($value)

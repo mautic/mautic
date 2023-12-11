@@ -35,9 +35,6 @@ class StageListType extends AbstractType
         ksort($this->choices);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults([

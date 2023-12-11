@@ -15,8 +15,6 @@ use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 class TriggerEventModel extends CommonFormModel
 {
     /**
-     * {@inheritdoc}
-     *
      * @return TriggerEventRepository
      */
     public function getRepository()
@@ -24,9 +22,6 @@ class TriggerEventModel extends CommonFormModel
         return $this->em->getRepository(\Mautic\PointBundle\Entity\TriggerEvent::class);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getPermissionBase(): string
     {
         return 'point:triggers';
@@ -42,8 +37,6 @@ class TriggerEventModel extends CommonFormModel
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @throws MethodNotAllowedHttpException
      */
     public function createForm($entity, FormFactoryInterface $formFactory, $action = null, $options = []): \Symfony\Component\Form\FormInterface

@@ -24,9 +24,6 @@ class SubmitActionEmailType extends AbstractType
     {
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $data = $options['data']['subject'] ?? $this->translator->trans(
@@ -126,9 +123,6 @@ class SubmitActionEmailType extends AbstractType
         $this->addToBcBccFields($builder);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getBlockPrefix()
     {
         return 'form_submitaction_sendemail';

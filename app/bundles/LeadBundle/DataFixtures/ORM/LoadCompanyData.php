@@ -11,9 +11,6 @@ use Mautic\LeadBundle\Model\CompanyModel;
 
 class LoadCompanyData extends AbstractFixture implements OrderedFixtureInterface
 {
-    /**
-     * {@inheritdoc}
-     */
     public function __construct(private CompanyModel $companyModel)
     {
     }

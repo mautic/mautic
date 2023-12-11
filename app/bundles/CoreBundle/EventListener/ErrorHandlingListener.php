@@ -17,9 +17,6 @@ class ErrorHandlingListener implements EventSubscriberInterface
         ];
     }
 
-    /**
-     * ErrorHandlingListener constructor.
-     */
     public function __construct(LoggerInterface $logger, LoggerInterface $mainLogger, LoggerInterface $debugLogger = null)
     {
         ErrorHandler::getHandler()

@@ -15,9 +15,6 @@ class SubmitActionRepostType extends AbstractType
 {
     use FormFieldTrait;
 
-    /**
-     * {@inheritdoc}
-     */
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder->add(

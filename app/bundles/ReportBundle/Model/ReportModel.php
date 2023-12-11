@@ -79,8 +79,6 @@ class ReportModel extends FormModel
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @return \Mautic\ReportBundle\Entity\ReportRepository
      */
     public function getRepository()
@@ -88,9 +86,6 @@ class ReportModel extends FormModel
         return $this->em->getRepository(Report::class);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getPermissionBase(): string
     {
         return 'report:reports';
@@ -105,8 +100,6 @@ class ReportModel extends FormModel
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
      */
     public function createForm($entity, FormFactoryInterface $formFactory, $action = null, $options = []): \Symfony\Component\Form\FormInterface
@@ -143,8 +136,6 @@ class ReportModel extends FormModel
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @throws \Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException
      */
     protected function dispatchEvent($action, &$entity, $isNew = false, Event $event = null): ?Event

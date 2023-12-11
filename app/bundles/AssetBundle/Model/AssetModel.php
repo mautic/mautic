@@ -70,9 +70,6 @@ class AssetModel extends FormModel
         parent::__construct($em, $security, $dispatcher, $router, $translator, $userHelper, $logger, $coreParametersHelper);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function saveEntity($entity, $unlock = true): void
     {
         if (empty($this->inConversion)) {
@@ -325,8 +322,6 @@ class AssetModel extends FormModel
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @throws NotFoundHttpException
      */
     public function createForm($entity, FormFactoryInterface $formFactory, $action = null, $options = []): \Symfony\Component\Form\FormInterface
@@ -357,8 +352,6 @@ class AssetModel extends FormModel
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @throws \Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException
      */
     protected function dispatchEvent($action, &$entity, $isNew = false, Event $event = null): ?Event

@@ -16,9 +16,6 @@ class LeadFieldData extends AbstractFixture implements OrderedFixtureInterface, 
     {
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public static function getGroups(): array
     {
         return ['group_install', 'group_mautic_install_data'];
@@ -66,9 +63,6 @@ class LeadFieldData extends AbstractFixture implements OrderedFixtureInterface, 
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getOrder()
     {
         return 4;

@@ -63,8 +63,6 @@ class TrackableModel extends AbstractCommonModel
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @return \Mautic\PageBundle\Entity\TrackableRepository
      */
     public function getRepository()

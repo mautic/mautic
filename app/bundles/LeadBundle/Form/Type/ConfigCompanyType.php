@@ -30,9 +30,6 @@ class ConfigCompanyType extends AbstractType
         );
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getBlockPrefix()
     {
         return 'companyconfig';

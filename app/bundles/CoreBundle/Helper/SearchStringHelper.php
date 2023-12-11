@@ -33,9 +33,6 @@ class SearchStringHelper
         'parenthesis' => ')',
     ];
 
-    /**
-     * SearchStringHelper constructor.
-     */
     public function __construct(array $needsParsing = null, array $needsClosing = null, array $closingChars = null)
     {
         if (null !== $needsParsing) {

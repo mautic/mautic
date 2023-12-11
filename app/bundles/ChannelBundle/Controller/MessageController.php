@@ -202,25 +202,16 @@ class MessageController extends AbstractStandardFormController
         return $form->createView();
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function getJsLoadMethodPrefix(): string
     {
         return 'messages';
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function getModelName(): string
     {
         return 'channel.message';
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function getRouteBase(): string
     {
         return 'message';
@@ -236,9 +227,6 @@ class MessageController extends AbstractStandardFormController
         return 'message'.(($objectId) ? '.'.$objectId : '');
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function getTranslationBase(): string
     {
         return 'mautic.channel.message';

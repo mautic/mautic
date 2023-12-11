@@ -18,9 +18,6 @@ class IdToEntityModelTransformer implements DataTransformerInterface
     {
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function transform($entity)
     {
         $func = 'get'.ucfirst($this->id);
@@ -46,8 +43,6 @@ class IdToEntityModelTransformer implements DataTransformerInterface
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @throws TransformationFailedException if object is not found
      */
     public function reverseTransform($id)

@@ -19,9 +19,6 @@ class ProcessFetchEmailCommand extends Command
         parent::__construct();
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function configure()
     {
         $this

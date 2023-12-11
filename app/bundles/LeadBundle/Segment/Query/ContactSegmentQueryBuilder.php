@@ -23,7 +23,9 @@ class ContactSegmentQueryBuilder
 {
     use LeadBatchLimiterTrait;
 
-    /** @var array Contains segment edges mapping */
+    /**
+     * @var array Contains segment edges mapping
+     */
     private $dependencyMap = [];
 
     public function __construct(private EntityManager $entityManager, private RandomParameterName $randomParameterName, private EventDispatcherInterface $dispatcher)

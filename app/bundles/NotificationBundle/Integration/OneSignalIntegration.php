@@ -11,9 +11,6 @@ class OneSignalIntegration extends AbstractIntegration
 {
     protected bool $coreIntegration = true;
 
-    /**
-     * {@inheritdoc}
-     */
     public function getName(): string
     {
         return 'OneSignal';
@@ -55,9 +52,6 @@ class OneSignalIntegration extends AbstractIntegration
         ];
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getAuthenticationType(): string
     {
         return 'none';

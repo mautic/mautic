@@ -27,7 +27,9 @@ class Message
     public $fblMessage;
     public $xHeaders = [];
 
-    /** @var Attachment[] */
+    /**
+     * @var Attachment[]
+     */
     protected $attachments = [];
 
     public function addAttachment(Attachment $attachment): void

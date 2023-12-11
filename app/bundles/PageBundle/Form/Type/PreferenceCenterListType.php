@@ -21,9 +21,6 @@ class PreferenceCenterListType extends AbstractType
         $this->canViewOther = $corePermissions->isGranted('page:pages:viewother');
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function configureOptions(OptionsResolver $resolver): void
     {
         $model        = $this->model;
@@ -61,9 +58,6 @@ class PreferenceCenterListType extends AbstractType
         $resolver->setDefined(['top_level', 'ignore_ids']);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getParent()
     {
         return ChoiceType::class;

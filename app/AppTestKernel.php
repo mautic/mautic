@@ -11,9 +11,7 @@
 
 class AppTestKernel extends AppKernel
 {
-    /**
-     * {@inheritdoc}
-     */
+    
     protected function isInstalled(): bool
     {
         return true;

@@ -36,8 +36,6 @@ class ApiMetadataDriver extends BaseAnnotationDriver implements DriverInterface
     private $currentPropertyName;
 
     /**
-     * @return \Metadata\ClassMetadata
-     *
      * @throws \ReflectionException
      */
     public function loadMetadataForClass(\ReflectionClass $class): ?BaseClassMetadata

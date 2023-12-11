@@ -90,8 +90,6 @@ class ChannelEvent extends CommonEvent
     }
 
     /**
-     * @param $feature
-     *
      * @return array
      */
     public function getFeatureChannels()

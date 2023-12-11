@@ -13,8 +13,6 @@ use Symfony\Component\Form\FormFactoryInterface;
 class ActionModel extends CommonFormModel
 {
     /**
-     * {@inheritdoc}
-     *
      * @return \Mautic\FormBundle\Entity\ActionRepository
      */
     public function getRepository()
@@ -22,9 +20,6 @@ class ActionModel extends CommonFormModel
         return $this->em->getRepository(\Mautic\FormBundle\Entity\Action::class);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getPermissionBase(): string
     {
         return 'form:forms';

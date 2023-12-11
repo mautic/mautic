@@ -61,9 +61,6 @@ class MessageType extends AbstractFormStandardType
         );
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults(

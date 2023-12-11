@@ -15,9 +15,6 @@ class RoleData extends AbstractFixture implements OrderedFixtureInterface, Fixtu
     {
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public static function getGroups(): array
     {
         return ['group_install', 'group_mautic_install_data'];
@@ -39,9 +36,6 @@ class RoleData extends AbstractFixture implements OrderedFixtureInterface, Fixtu
         $this->addReference('admin-role', $role);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getOrder()
     {
         return 1;

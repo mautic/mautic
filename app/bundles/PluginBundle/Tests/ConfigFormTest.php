@@ -138,9 +138,6 @@ class ConfigFormTest extends KernelTestCase
         return $integrationHelper;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function tearDown(): void
     {
         parent::tearDown();

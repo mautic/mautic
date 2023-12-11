@@ -183,8 +183,6 @@ trait OperatorListTrait
      * Normalize type operator.
      *
      * @param string|null $type
-     *
-     * @return void
      */
     protected function normalizeType(&$type)
     {

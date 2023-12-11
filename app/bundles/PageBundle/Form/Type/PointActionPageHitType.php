@@ -7,9 +7,6 @@ use Symfony\Component\Form\FormBuilderInterface;
 
 class PointActionPageHitType extends AbstractType
 {
-    /**
-     * {@inheritdoc}
-     */
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder->add('pages', PageListType::class, [
@@ -22,9 +19,6 @@ class PointActionPageHitType extends AbstractType
         ]);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getBlockPrefix()
     {
         return 'pointaction_pagehit';

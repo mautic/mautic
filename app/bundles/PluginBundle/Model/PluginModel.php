@@ -27,8 +27,6 @@ class PluginModel extends FormModel
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @return \Mautic\PluginBundle\Entity\PluginRepository
      */
     public function getRepository()
@@ -41,9 +39,6 @@ class PluginModel extends FormModel
         return $this->em->getRepository(\Mautic\PluginBundle\Entity\IntegrationEntity::class);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getPermissionBase(): string
     {
         return 'plugin:plugins';

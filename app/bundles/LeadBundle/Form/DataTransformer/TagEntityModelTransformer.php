@@ -17,9 +17,6 @@ class TagEntityModelTransformer implements DataTransformerInterface
     {
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function reverseTransform($entity)
     {
         if (!$this->isArray) {
@@ -43,8 +40,6 @@ class TagEntityModelTransformer implements DataTransformerInterface
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @throws TransformationFailedException if object is not found
      */
     public function transform($id)

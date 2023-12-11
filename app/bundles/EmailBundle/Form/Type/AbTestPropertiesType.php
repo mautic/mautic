@@ -8,9 +8,6 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class AbTestPropertiesType extends AbstractType
 {
-    /**
-     * {@inheritdoc}
-     */
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $options = ['label' => false];
@@ -20,9 +17,6 @@ class AbTestPropertiesType extends AbstractType
         $builder->add('properties', $options['formType'], $options);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefined([
@@ -31,9 +25,6 @@ class AbTestPropertiesType extends AbstractType
         ]);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getBlockPrefix()
     {
         return 'email_abtest_settings';

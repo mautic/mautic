@@ -211,9 +211,6 @@ class EventRepository extends CommonRepository
             ->executeStatement();
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getTableAlias(): string
     {
         return 'e';

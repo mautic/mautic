@@ -4,7 +4,6 @@ namespace Mautic\FormBundle\Event;
 
 use Mautic\CoreBundle\Event\CommonEvent;
 use Mautic\FormBundle\Entity\Field;
-use Mautic\FormBundle\Entity\Form;
 
 class ValidationEvent extends CommonEvent
 {
@@ -19,8 +18,6 @@ class ValidationEvent extends CommonEvent
     private $invalidReason = '';
 
     /**
-     * @param Form  $form
-     * @param bool  $isNew
      * @param mixed $value
      */
     public function __construct(private Field $field, private $value)

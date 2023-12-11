@@ -135,17 +135,11 @@ class CompanyRepository extends CommonRepository implements CustomFieldRepositor
         return $q->executeQuery()->fetchAllAssociative();
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getTableAlias(): string
     {
         return 'comp';
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function addCatchAllWhereClause($q, $filter): array
     {
         return $this->addStandardCatchAllWhereClause(
@@ -158,9 +152,6 @@ class CompanyRepository extends CommonRepository implements CustomFieldRepositor
         );
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function addSearchCommandWhereClause($q, $filter): array
     {
         [$expr, $parameters]     = $this->addStandardSearchCommandWhereClause($q, $filter);

@@ -97,9 +97,6 @@ class DynamicsIntegration extends CrmAbstractIntegration
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function sortFieldsAlphabetically(): bool
     {
         return false;
@@ -129,25 +126,16 @@ class DynamicsIntegration extends CrmAbstractIntegration
         return $this->keys['resource'];
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getAccessTokenUrl(): string
     {
         return 'https://login.microsoftonline.com/common/oauth2/token';
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getAuthenticationUrl(): string
     {
         return 'https://login.microsoftonline.com/common/oauth2/authorize';
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getAuthLoginUrl(): string
     {
         $url = parent::getAuthLoginUrl();
@@ -156,8 +144,6 @@ class DynamicsIntegration extends CrmAbstractIntegration
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @param bool $inAuthorization
      */
     public function getBearerToken($inAuthorization = false)
@@ -175,8 +161,6 @@ class DynamicsIntegration extends CrmAbstractIntegration
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @return string|array
      */
     public function getFormNotes($section)

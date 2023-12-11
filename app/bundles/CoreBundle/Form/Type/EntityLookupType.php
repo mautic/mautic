@@ -52,9 +52,6 @@ class EntityLookupType extends AbstractType
         );
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setRequired(['model', 'ajax_lookup_action']);

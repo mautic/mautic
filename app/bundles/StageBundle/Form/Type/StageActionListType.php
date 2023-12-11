@@ -39,9 +39,6 @@ class StageActionListType extends AbstractType
         return ChoiceType::class;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getBlockPrefix()
     {
         return 'stageaction_list';

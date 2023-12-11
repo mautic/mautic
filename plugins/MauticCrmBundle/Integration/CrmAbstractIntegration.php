@@ -28,8 +28,6 @@ abstract class CrmAbstractIntegration extends AbstractIntegration
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @return string
      */
     public function getAuthenticationType()

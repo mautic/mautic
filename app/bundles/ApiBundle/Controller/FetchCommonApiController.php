@@ -720,8 +720,6 @@ class FetchCommonApiController extends AbstractFOSRestController implements Maut
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @param mixed|null                $data
      * @param array<string, string|int> $headers
      */

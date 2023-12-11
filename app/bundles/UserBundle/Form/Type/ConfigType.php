@@ -193,9 +193,6 @@ class ConfigType extends AbstractType
         $view->vars['entityId'] = $this->parameters->get('mautic.saml_idp_entity_id');
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getBlockPrefix()
     {
         return 'userconfig';

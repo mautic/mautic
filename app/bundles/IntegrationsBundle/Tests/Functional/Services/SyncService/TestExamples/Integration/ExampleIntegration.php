@@ -30,9 +30,6 @@ final class ExampleIntegration extends BasicIntegration implements IntegrationIn
     {
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getName(): string
     {
         return self::NAME;

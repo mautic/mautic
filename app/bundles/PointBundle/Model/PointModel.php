@@ -59,8 +59,6 @@ class PointModel extends CommonFormModel
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @return PointRepository
      */
     public function getRepository()
@@ -68,17 +66,12 @@ class PointModel extends CommonFormModel
         return $this->em->getRepository(\Mautic\PointBundle\Entity\Point::class);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getPermissionBase(): string
     {
         return 'point:points';
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @throws MethodNotAllowedHttpException
      */
     public function createForm($entity, FormFactoryInterface $formFactory, $action = null, $options = []): \Symfony\Component\Form\FormInterface
@@ -108,8 +101,6 @@ class PointModel extends CommonFormModel
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @throws MethodNotAllowedHttpException
      */
     protected function dispatchEvent($action, &$entity, $isNew = false, Event $event = null): ?Event

@@ -65,9 +65,6 @@ class FormFieldHelper extends AbstractFormFieldHelper
         'file' => [],
     ];
 
-    /**
-     * FormFieldHelper constructor.
-     */
     public function __construct(Translator $translator, ValidatorInterface $validator = null)
     {
         $this->translator = $translator;

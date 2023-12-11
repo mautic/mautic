@@ -6,9 +6,6 @@ use MauticPlugin\MauticSocialBundle\Form\Type\FacebookType;
 
 class FacebookIntegration extends SocialIntegration
 {
-    /**
-     * {@inheritdoc}
-     */
     public function getName(): string
     {
         return 'Facebook';
@@ -24,9 +21,6 @@ class FacebookIntegration extends SocialIntegration
         ];
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getSupportedFeatures(): array
     {
         return [
@@ -36,17 +30,11 @@ class FacebookIntegration extends SocialIntegration
         ];
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getAuthenticationUrl(): string
     {
         return 'https://www.facebook.com/dialog/oauth';
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getAccessTokenUrl(): string
     {
         return 'https://graph.facebook.com/oauth/access_token';
@@ -58,8 +46,6 @@ class FacebookIntegration extends SocialIntegration
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @param string $data
      * @param bool   $postAuthorization
      *
@@ -135,9 +121,6 @@ class FacebookIntegration extends SocialIntegration
         return null;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getAvailableLeadFields($settings = []): array
     {
         return [
@@ -159,9 +142,6 @@ class FacebookIntegration extends SocialIntegration
         ];
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getFormType(): string
     {
         return FacebookType::class;

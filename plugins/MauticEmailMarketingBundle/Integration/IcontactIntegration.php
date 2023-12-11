@@ -6,9 +6,6 @@ use MauticPlugin\MauticEmailMarketingBundle\Form\Type\IcontactType;
 
 class IcontactIntegration extends EmailAbstractIntegration
 {
-    /**
-     * {@inheritdoc}
-     */
     public function getName(): string
     {
         return 'Icontact';

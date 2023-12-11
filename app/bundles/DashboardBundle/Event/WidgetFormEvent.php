@@ -42,8 +42,6 @@ class WidgetFormEvent extends CommonEvent
 
     /**
      * Returns the widget edit form.
-     *
-     * @param string $form
      */
     public function getForm()
     {

@@ -51,9 +51,6 @@ class DashboardModel extends FormModel
         return $this->em->getRepository(Widget::class);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getPermissionBase(): string
     {
         return 'dashboard:widgets';
@@ -228,8 +225,6 @@ class DashboardModel extends FormModel
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @param Widget      $entity
      * @param string|null $action
      * @param array       $options

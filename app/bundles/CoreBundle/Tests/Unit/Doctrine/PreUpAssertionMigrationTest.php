@@ -20,7 +20,9 @@ class PreUpAssertionMigrationTest extends TestCase
              */
             public array $messages = [];
 
-            /** @noinspection PhpMissingParentConstructorInspection */
+            /**
+             * @noinspection PhpMissingParentConstructorInspection
+             */
             public function __construct()
             {
             }
@@ -48,7 +50,9 @@ class PreUpAssertionMigrationTest extends TestCase
              */
             public array $messages = [];
 
-            /** @noinspection PhpMissingParentConstructorInspection */
+            /**
+             * @noinspection PhpMissingParentConstructorInspection
+             */
             public function __construct()
             {
             }
@@ -102,7 +106,9 @@ class PreUpAssertionMigrationTest extends TestCase
              */
             public array $messages = [];
 
-            /** @noinspection PhpMissingParentConstructorInspection */
+            /**
+             * @noinspection PhpMissingParentConstructorInspection
+             */
             public function __construct()
             {
             }

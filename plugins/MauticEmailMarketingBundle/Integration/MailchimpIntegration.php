@@ -6,9 +6,6 @@ use MauticPlugin\MauticEmailMarketingBundle\Form\Type\MailchimpType;
 
 class MailchimpIntegration extends EmailAbstractIntegration
 {
-    /**
-     * {@inheritdoc}
-     */
     public function getName(): string
     {
         return 'Mailchimp';
@@ -19,9 +16,6 @@ class MailchimpIntegration extends EmailAbstractIntegration
         return 'MailChimp';
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getAuthenticationType(): string
     {
         return (empty($this->keys['client_id'])) ? 'basic' : 'oauth2';

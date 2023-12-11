@@ -7,9 +7,6 @@ use Symfony\Component\Form\FormBuilderInterface;
 
 class CampaignEventLeadSegmentsType extends AbstractType
 {
-    /**
-     * {@inheritdoc}
-     */
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder->add(
@@ -25,9 +22,6 @@ class CampaignEventLeadSegmentsType extends AbstractType
         );
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getBlockPrefix()
     {
         return 'campaignevent_lead_segments';

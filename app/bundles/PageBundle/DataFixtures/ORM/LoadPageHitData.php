@@ -41,9 +41,6 @@ class LoadPageHitData extends AbstractFixture implements OrderedFixtureInterface
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getOrder()
     {
         return 8;
