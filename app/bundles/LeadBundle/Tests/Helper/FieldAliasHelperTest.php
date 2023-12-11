@@ -10,7 +10,9 @@ use Mautic\LeadBundle\Model\FieldModel;
 class FieldAliasHelperTest extends \PHPUnit\Framework\TestCase
 {
     private \PHPUnit\Framework\MockObject\MockObject $fieldModel;
+
     private \PHPUnit\Framework\MockObject\MockObject $fieldRepository;
+
     private \Mautic\LeadBundle\Helper\FieldAliasHelper $helper;
 
     protected function setUp(): void

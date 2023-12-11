@@ -27,14 +27,21 @@ use Symfony\Component\Routing\Router;
 class InstallControllerTest extends \PHPUnit\Framework\TestCase
 {
     private \PHPUnit\Framework\MockObject\MockObject $translatorMock;
+
     private \PHPUnit\Framework\MockObject\MockObject $sessionMock;
+
     private \PHPUnit\Framework\MockObject\MockObject $containerMock;
+
     private \PHPUnit\Framework\MockObject\MockObject $routerMock;
+
     private \PHPUnit\Framework\MockObject\MockObject $flashBagMock;
+
     private \Mautic\InstallBundle\Controller\InstallController $controller;
+
     private \PHPUnit\Framework\MockObject\MockObject $pathsHelper;
 
     private \PHPUnit\Framework\MockObject\MockObject $configurator;
+
     private \PHPUnit\Framework\MockObject\MockObject $installer;
 
     protected function setUp(): void

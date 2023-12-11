@@ -13,7 +13,9 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 class ReportSubscriber implements EventSubscriberInterface
 {
     public const CONTEXT_GROUP_SCORE = 'group.score';
+
     public const GROUP_PREFIX        = 'pl';
+
     public const GROUP_SCORE_PREFIX  = 'ls';
 
     public const GROUP_COLUMNS = [

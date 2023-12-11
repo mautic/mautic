@@ -23,12 +23,19 @@ use Symfony\Component\HttpFoundation\RequestStack;
 class FormController extends AbstractStandardFormController
 {
     private $deprecatedModelName;
+
     private $deprecatedPermissionBase;
+
     private $deprecatedRouteBase;
+
     private $deprecatedSessionBase;
+
     private $deprecatedTranslationBase;
+
     private $deprecatedTemplateBase;
+
     private $deprecatedMauticContent;
+
     protected $activeLink;
 
     /**

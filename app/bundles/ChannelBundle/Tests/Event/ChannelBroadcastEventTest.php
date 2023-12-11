@@ -12,6 +12,7 @@ class ChannelBroadcastEventTest extends TestCase
     private string $channel;
 
     private int $channelId;
+
     private OutputInterface $output;
 
     protected function setUp(): void

@@ -14,9 +14,13 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 class LanguageHelper
 {
     private string $cacheFile;
+
     private Installer $installer;
+
     private array $supportedLanguages = [];
+
     private string $installedTranslationsDirectory;
+
     private string $defaultTranslationsDirectory;
 
     public function __construct(

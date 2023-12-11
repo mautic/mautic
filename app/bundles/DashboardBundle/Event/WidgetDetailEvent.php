@@ -11,15 +11,25 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 class WidgetDetailEvent extends CommonEvent
 {
     protected $widget;
+
     protected $type;
+
     protected $template;
+
     protected $templateData = [];
+
     protected $errorMessage;
+
     protected $uniqueId;
+
     protected $cacheDir;
+
     protected $uniqueCacheDir;
+
     protected $cacheTimeout;
+
     protected float $startTime;
+
     protected $loadTime  = 0;
 
     /**

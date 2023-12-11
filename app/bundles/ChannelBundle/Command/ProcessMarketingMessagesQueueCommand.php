@@ -73,5 +73,6 @@ class ProcessMarketingMessagesQueueCommand extends ModeratedCommand
 
         return \Symfony\Component\Console\Command\Command::SUCCESS;
     }
+
     protected static $defaultDescription = 'Process sending of messages queue.';
 }

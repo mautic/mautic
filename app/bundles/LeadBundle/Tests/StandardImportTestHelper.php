@@ -21,7 +21,9 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 abstract class StandardImportTestHelper extends CommonMocks
 {
     protected $eventEntities = [];
+
     protected static $csvPath;
+
     protected static $largeCsvPath;
 
     /**

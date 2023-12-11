@@ -9,6 +9,7 @@ use Symfony\Contracts\EventDispatcher\Event;
 class ListChangeEvent extends Event
 {
     private $lead;
+
     private $leads;
 
     /**

@@ -108,5 +108,6 @@ EOT
 
         return \Symfony\Component\Console\Command\Command::SUCCESS;
     }
+
     protected static $defaultDescription = 'Converts theme config to JSON from PHP';
 }

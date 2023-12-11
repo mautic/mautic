@@ -11,7 +11,9 @@ use Symfony\Component\HttpFoundation\Session\SessionInterface;
 class PageHelperTest extends \PHPUnit\Framework\TestCase
 {
     private \PHPUnit\Framework\MockObject\MockObject $session;
+
     private \PHPUnit\Framework\MockObject\MockObject $coreParametersHelper;
+
     private \Mautic\CoreBundle\Helper\PageHelper $pageHelper;
 
     protected function setUp(): void

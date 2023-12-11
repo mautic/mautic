@@ -44,6 +44,7 @@ class EmailController extends FormController
     use BuilderControllerTrait;
     use FormErrorMessagesTrait;
     use EntityContactsTrait;
+
     public const EXAMPLE_EMAIL_SUBJECT_PREFIX = '[TEST]';
 
     /**

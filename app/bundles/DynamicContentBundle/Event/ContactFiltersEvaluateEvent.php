@@ -10,6 +10,7 @@ use Symfony\Contracts\EventDispatcher\Event;
 final class ContactFiltersEvaluateEvent extends Event
 {
     private bool $isEvaluated = false;
+
     private bool $isMatched   = false;
 
     /**

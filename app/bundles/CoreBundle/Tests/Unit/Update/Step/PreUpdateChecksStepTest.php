@@ -23,6 +23,7 @@ class PreUpdateChecksStepTest extends AbstractStepTest
      * @var MockObject|UpdateHelper
      */
     private \PHPUnit\Framework\MockObject\MockObject $updateHelper;
+
     private PreUpdateChecksStep $step;
 
     protected function setUp(): void

@@ -9,8 +9,11 @@ use PHPUnit\Framework\TestCase;
 class DayStatTest extends TestCase
 {
     private $day  = '2019-11-07';
+
     private $hour = 11;
+
     private \Mautic\StatsBundle\Aggregate\Collection\Stats\DayStat $dayStat;
+
     private $hourStat;
 
     protected function setUp(): void

@@ -37,18 +37,29 @@ use Twig\Environment;
 class BuilderSubscriber implements EventSubscriberInterface
 {
     private $pageTokenRegex      = '{pagelink=(.*?)}';
+
     private $dwcTokenRegex       = '{dwc=(.*?)}';
+
     private $langBarRegex        = '{langbar}';
+
     private $shareButtonsRegex   = '{sharebuttons}';
+
     private $titleRegex          = '{pagetitle}';
+
     private $descriptionRegex    = '{pagemetadescription}';
 
     public const segmentListRegex  = '{segmentlist}';
+
     public const categoryListRegex = '{categorylist}';
+
     public const channelfrequency  = '{channelfrequency}';
+
     public const preferredchannel  = '{preferredchannel}';
+
     public const saveprefsRegex    = '{saveprefsbutton}';
+
     public const successmessage    = '{successmessage}';
+
     public const identifierToken   = '{leadidentifier}';
 
     public function __construct(

@@ -16,6 +16,7 @@ class FullContact_Name extends FullContact_Base
      * @var array
      */
     protected $_supportedMethods = ['normalizer', 'deducer', 'similarity', 'stats', 'parser'];
+
     protected $_resourceUri      = '';
 
     /**

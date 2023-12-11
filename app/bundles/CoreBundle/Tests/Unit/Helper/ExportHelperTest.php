@@ -23,11 +23,14 @@ class ExportHelperTest extends TestCase
      * @var MockObject|TranslatorInterface
      */
     private \PHPUnit\Framework\MockObject\MockObject $translatorInterfaceMock;
+
     /**
      * @var MockObject|CoreParametersHelper
      */
     private \PHPUnit\Framework\MockObject\MockObject $coreParametersHelperMock;
+
     private ExportHelper $exportHelper;
+
     /**
      * @var array<array<string, int|string>>
      */
@@ -45,10 +48,12 @@ class ExportHelperTest extends TestCase
             'email'     => 'demo@mautic.org',
         ],
     ];
+
     /**
      * @var array<string>
      */
     private array $filePaths = [];
+
     /**
      * @var FilePathResolver|MockObject
      */

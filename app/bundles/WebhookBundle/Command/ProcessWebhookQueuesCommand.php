@@ -87,5 +87,6 @@ class ProcessWebhookQueuesCommand extends Command
 
         return \Symfony\Component\Console\Command\Command::SUCCESS;
     }
+
     protected static $defaultDescription = 'Process queued webhook payloads';
 }

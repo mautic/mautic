@@ -77,5 +77,6 @@ class ValidateEventCommand extends Command
 
         return \Symfony\Component\Console\Command\Command::SUCCESS;
     }
+
     protected static $defaultDescription = 'Validate if a contact has been inactive for a decision and execute events if so.';
 }

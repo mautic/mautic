@@ -109,5 +109,6 @@ EOT
 
         return \Symfony\Component\Console\Command\Command::SUCCESS;
     }
+
     protected static $defaultDescription = 'Imports data to Mautic';
 }

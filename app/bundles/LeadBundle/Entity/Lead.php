@@ -24,10 +24,15 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
     use CustomFieldEntityTrait;
 
     public const FIELD_ALIAS     = '';
+
     public const POINTS_ADD      = 'plus';
+
     public const POINTS_SUBTRACT = 'minus';
+
     public const POINTS_MULTIPLY = 'times';
+
     public const POINTS_DIVIDE   = 'divide';
+
     public const DEFAULT_ALIAS   = 'l';
 
     /**

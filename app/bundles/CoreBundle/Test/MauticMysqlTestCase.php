@@ -14,6 +14,7 @@ use Symfony\Component\Process\Process;
 abstract class MauticMysqlTestCase extends AbstractMauticTestCase
 {
     private bool $databaseInstalled = false;
+
     private bool $setUpInvoked      = false;
 
     /**

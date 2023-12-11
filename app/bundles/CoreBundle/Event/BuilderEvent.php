@@ -9,14 +9,18 @@ use Symfony\Contracts\EventDispatcher\Event;
 class BuilderEvent extends Event
 {
     protected $slotTypes            = [];
+
     protected $sections             = [];
+
     protected $tokens               = [];
+
     protected $abTestWinnerCriteria = [];
 
     /**
      * @var string|string[]
      */
     protected string|array $tokenFilterText;
+
     protected string $tokenFilterTarget;
 
     public function __construct(

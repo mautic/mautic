@@ -46,5 +46,6 @@ EOT
 
         return \Symfony\Component\Console\Command\Command::SUCCESS;
     }
+
     protected static $defaultDescription = 'Fetches updates for Mautic';
 }

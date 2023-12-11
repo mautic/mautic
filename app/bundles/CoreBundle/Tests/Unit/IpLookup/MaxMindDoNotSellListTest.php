@@ -15,9 +15,11 @@ class MaxMindDoNotSellListTest extends \PHPUnit\Framework\TestCase
     private \PHPUnit\Framework\MockObject\MockObject $coreParamsHelperMock;
 
     private $badFilePath = 'bad_list.json';
+
     private $badData     = 'bad data';
 
     private $goodFilePath = 'good_list.json';
+
     private $goodData     = '{
                                 "exclusions": [
                                     {

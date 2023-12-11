@@ -63,5 +63,6 @@ class ListCommand extends Command
 
         return \Symfony\Component\Console\Command\Command::SUCCESS;
     }
+
     protected static $defaultDescription = 'Lists plugins that are available at Packagist.org';
 }
