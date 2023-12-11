@@ -194,9 +194,7 @@ class DBALMocker
             $mock->expects($this->testCase->any())
                 ->method('expr')
                 ->willReturnCallback(
-                    function () {
-                        return new ExpressionBuilder($this->getMockConnection());
-                    }
+                    fn () => new ExpressionBuilder($this->getMockConnection())
                 );
 
             $mock->expects($this->testCase->any())

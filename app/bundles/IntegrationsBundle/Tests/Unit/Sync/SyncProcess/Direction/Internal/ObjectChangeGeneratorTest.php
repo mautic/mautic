@@ -46,9 +46,7 @@ class ObjectChangeGeneratorTest extends TestCase
     {
         $this->valueHelper->method('getValueForMautic')
             ->willReturnCallback(
-                function (NormalizedValueDAO $normalizedValueDAO, string $fieldState, string $syncDirection) {
-                    return $normalizedValueDAO;
-                }
+                fn (NormalizedValueDAO $normalizedValueDAO, string $fieldState, string $syncDirection) => $normalizedValueDAO
             );
 
         $integration = 'Test';
@@ -64,9 +62,7 @@ class ObjectChangeGeneratorTest extends TestCase
         $this->syncJudge->expects($this->exactly(2))
             ->method('adjudicate')
             ->willReturnCallback(
-                function ($mode, InformationChangeRequestDAO $internalInformationChangeRequest, InformationChangeRequestDAO $integrationInformationChangeRequest) {
-                    return $integrationInformationChangeRequest;
-                }
+                fn ($mode, InformationChangeRequestDAO $internalInformationChangeRequest, InformationChangeRequestDAO $integrationInformationChangeRequest) => $integrationInformationChangeRequest
             );
 
         $objectChangeDAO       = $this->getObjectGenerator()->getSyncObjectChange(
@@ -107,9 +103,7 @@ class ObjectChangeGeneratorTest extends TestCase
     {
         $this->valueHelper->method('getValueForMautic')
             ->willReturnCallback(
-                function (NormalizedValueDAO $normalizedValueDAO, string $fieldState, string $syncDirection) {
-                    return $normalizedValueDAO;
-                }
+                fn (NormalizedValueDAO $normalizedValueDAO, string $fieldState, string $syncDirection) => $normalizedValueDAO
             );
 
         $integration = 'Test';
@@ -125,9 +119,7 @@ class ObjectChangeGeneratorTest extends TestCase
         $this->syncJudge->expects($this->exactly(2))
             ->method('adjudicate')
             ->willReturnCallback(
-                function ($mode, InformationChangeRequestDAO $internalInformationChangeRequest, InformationChangeRequestDAO $integrationInformationChangeRequest) {
-                    return $internalInformationChangeRequest;
-                }
+                fn ($mode, InformationChangeRequestDAO $internalInformationChangeRequest, InformationChangeRequestDAO $integrationInformationChangeRequest) => $internalInformationChangeRequest
             );
 
         $objectChangeDAO       = $this->getObjectGenerator()->getSyncObjectChange(

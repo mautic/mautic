@@ -670,9 +670,7 @@ class LeadControllerTest extends MauticMysqlTestCase
         $this->assertEquals($expectedCompanies, $collection->keys()->toArray());
         // Only one should be primary
         $primary = $collection->reject(
-            function (array $company) {
-                return empty($company['is_primary']);
-            }
+            fn (array $company) => empty($company['is_primary'])
         );
         $this->assertCount(1, $primary);
         // Primary company name should match

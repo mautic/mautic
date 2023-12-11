@@ -125,9 +125,7 @@ class UpdateTranslationsStepTest extends AbstractStepTest
 
         $this->translator->method('trans')
             ->willReturnCallback(
-                function (string $key) {
-                    return $key;
-                }
+                fn (string $key) => $key
             );
 
         $this->logger->expects($this->once())

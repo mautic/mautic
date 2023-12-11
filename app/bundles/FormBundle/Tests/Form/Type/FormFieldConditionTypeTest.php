@@ -77,7 +77,7 @@ final class FormFieldConditionTypeTest extends \PHPUnit\Framework\TestCase
                         'attr'  => [
                             'data-show-on' => '{"formfield_conditions_expr": "in"}',
                         ],
-                        'data' => isset($options['data']['any']) ? $options['data']['any'] : false,
+                        'data' => false,
                     ],
                 ],
                 [
