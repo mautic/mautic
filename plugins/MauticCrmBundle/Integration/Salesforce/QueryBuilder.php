@@ -7,11 +7,9 @@ use MauticPlugin\MauticCrmBundle\Integration\Salesforce\Exception\NoObjectsToFet
 class QueryBuilder
 {
     /**
-     * @return string
-     *
      * @throws NoObjectsToFetchException
      */
-    public static function getLeadQuery(array $fields, array $ids)
+    public static function getLeadQuery(array $fields, array $ids): string
     {
         if (empty($ids)) {
             throw new NoObjectsToFetchException();
@@ -24,11 +22,9 @@ class QueryBuilder
     }
 
     /**
-     * @return string
-     *
      * @throws NoObjectsToFetchException
      */
-    public static function getContactQuery(array $fields, array $ids)
+    public static function getContactQuery(array $fields, array $ids): string
     {
         if (empty($ids)) {
             throw new NoObjectsToFetchException();

@@ -156,9 +156,9 @@ trait LeadDetailsTrait
     }
 
     /**
-     * @return mixed
+     * @return mixed[]
      */
-    protected function getEngagementData(Lead $lead, \DateTime $fromDate = null, \DateTime $toDate = null)
+    protected function getEngagementData(Lead $lead, \DateTime $fromDate = null, \DateTime $toDate = null): array
     {
         $translator = $this->translator;
 
@@ -185,10 +185,9 @@ trait LeadDetailsTrait
     }
 
     /**
-     * @param int $page
-     * @param int $limit
+     * @return mixed[]
      */
-    protected function getAuditlogs(Lead $lead, array $filters = null, array $orderBy = null, $page = 1, $limit = 25): array
+    protected function getAuditlogs(Lead $lead, array $filters = null, array $orderBy = null, int $page = 1, int $limit = 25): array
     {
         $session = $this->requestStack->getCurrentRequest()->getSession();
 
@@ -255,10 +254,8 @@ trait LeadDetailsTrait
     /**
      * @param int $page
      * @param int $limit
-     *
-     * @return array
      */
-    protected function getEngagements(Lead $lead, array $filters = null, array $orderBy = null, $page = 1, $limit = 25)
+    protected function getEngagements(Lead $lead, array $filters = null, array $orderBy = null, $page = 1, $limit = 25): array
     {
         $session = $this->requestStack->getCurrentRequest()->getSession();
 
@@ -353,9 +350,9 @@ trait LeadDetailsTrait
     /**
      * Get company graph for points and engagements.
      *
-     * @return mixed
+     * @return array<string, mixed>
      */
-    protected function getCompanyEngagementsForGraph($contacts)
+    protected function getCompanyEngagementsForGraph($contacts): array
     {
         $graphData  = $this->getCompanyEngagementData($contacts);
         $translator = $this->translator;
@@ -374,10 +371,7 @@ trait LeadDetailsTrait
         return $lineChart->render();
     }
 
-    /**
-     * @return array
-     */
-    protected function getScheduledCampaignEvents(Lead $lead)
+    protected function getScheduledCampaignEvents(Lead $lead): array
     {
         // Upcoming events from Campaign Bundle
         /** @var \Mautic\CampaignBundle\Entity\LeadEventLogRepository $leadEventLogRepository */

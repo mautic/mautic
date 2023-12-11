@@ -51,16 +51,20 @@ class PluginModel extends FormModel
 
     /**
      * Get lead fields used in selects/matching.
+     *
+     * @return mixed[]
      */
-    public function getLeadFields()
+    public function getLeadFields(): array
     {
         return $this->leadFieldModel->getFieldList();
     }
 
     /**
      * Get Company fields.
+     *
+     * @return mixed[]
      */
-    public function getCompanyFields()
+    public function getCompanyFields(): array
     {
         return $this->leadFieldModel->getFieldList(true, true, ['isPublished' => true, 'object' => 'company']);
     }

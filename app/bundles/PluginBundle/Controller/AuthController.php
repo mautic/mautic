@@ -69,10 +69,7 @@ class AuthController extends FormController
         return new RedirectResponse($this->generateUrl('mautic_integration_auth_postauth', ['integration' => $integration]));
     }
 
-    /**
-     * @return \Symfony\Component\HttpFoundation\Response
-     */
-    public function authStatusAction(Request $request, $integration)
+    public function authStatusAction(Request $request, $integration): \Symfony\Component\HttpFoundation\Response
     {
         $postAuthTemplate = '@MauticPlugin/Auth/postauth.html.twig';
 

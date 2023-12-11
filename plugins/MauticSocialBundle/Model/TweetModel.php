@@ -213,10 +213,7 @@ class TweetModel extends FormModel implements AjaxLookupModelInterface
         return $this->em->getRepository(TweetStat::class);
     }
 
-    /**
-     * @return string
-     */
-    public function getPermissionBase()
+    public function getPermissionBase(): string
     {
         return 'mauticSocial:tweets';
     }

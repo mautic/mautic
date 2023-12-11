@@ -53,10 +53,7 @@ class DateCompanyDecorator implements FilterDecoratorInterface
         return $this->dateDecorator->getParameterValue($contactSegmentFilterCrate);
     }
 
-    /**
-     * @return string
-     */
-    public function getQueryType(ContactSegmentFilterCrate $contactSegmentFilterCrate)
+    public function getQueryType(ContactSegmentFilterCrate $contactSegmentFilterCrate): string
     {
         return ComplexRelationValueFilterQueryBuilder::getServiceId();
     }

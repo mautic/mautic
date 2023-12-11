@@ -192,9 +192,7 @@ class ConfigMapperTest extends \PHPUnit\Framework\TestCase
 
         $parameterHelper->method('get')
             ->willReturnCallback(
-                function ($param, $defaultValue) {
-                    return array_key_exists($param, $this->config) ? $this->config[$param] : $defaultValue;
-                }
+                fn ($param, $defaultValue) => array_key_exists($param, $this->config) ? $this->config[$param] : $defaultValue
             );
 
         $mapper = new ConfigMapper($parameterHelper, []);
@@ -261,9 +259,7 @@ class ConfigMapperTest extends \PHPUnit\Framework\TestCase
 
         $parameterHelper->method('get')
             ->willReturnCallback(
-                function ($param, $defaultValue) {
-                    return array_key_exists($param, $this->config) ? $this->config[$param] : $defaultValue;
-                }
+                fn ($param, $defaultValue) => array_key_exists($param, $this->config) ? $this->config[$param] : $defaultValue
             );
 
         $mapper = new ConfigMapper($parameterHelper, ['monitored_email']);

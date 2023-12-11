@@ -32,9 +32,7 @@ class ObjectChangeGeneratorTest extends TestCase
     {
         $this->valueHelper->method('getValueForIntegration')
             ->willReturnCallback(
-                function (NormalizedValueDAO $normalizedValueDAO, string $fieldState, string $syncDirection) {
-                    return $normalizedValueDAO;
-                }
+                fn (NormalizedValueDAO $normalizedValueDAO, string $fieldState, string $syncDirection) => $normalizedValueDAO
             );
 
         $integration = 'Test';
@@ -83,9 +81,7 @@ class ObjectChangeGeneratorTest extends TestCase
     {
         $this->valueHelper->method('getValueForIntegration')
             ->willReturnCallback(
-                function (NormalizedValueDAO $normalizedValueDAO, string $fieldState, string $syncDirection) {
-                    return $normalizedValueDAO;
-                }
+                fn (NormalizedValueDAO $normalizedValueDAO, string $fieldState, string $syncDirection) => $normalizedValueDAO
             );
 
         $integration = 'Test';

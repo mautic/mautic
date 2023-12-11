@@ -12,10 +12,7 @@ use Symfony\Component\HttpFoundation\Request;
 
 class AjaxController extends CommonAjaxController
 {
-    /**
-     * @return \Symfony\Component\HttpFoundation\JsonResponse
-     */
-    public function categoryListAction(Request $request)
+    public function categoryListAction(Request $request): \Symfony\Component\HttpFoundation\JsonResponse
     {
         $assetModel = $this->getModel('asset');
         \assert($assetModel instanceof AssetModel);
@@ -33,11 +30,9 @@ class AjaxController extends CommonAjaxController
     }
 
     /**
-     * @return \Symfony\Component\HttpFoundation\JsonResponse
-     *
      * @throws \Exception
      */
-    public function fetchRemoteFilesAction(Request $request)
+    public function fetchRemoteFilesAction(Request $request): \Symfony\Component\HttpFoundation\JsonResponse
     {
         $provider   = InputHelper::string($request->request->get('provider'));
         $path       = InputHelper::string($request->request->get('path', ''));

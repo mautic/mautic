@@ -486,10 +486,8 @@ class Import extends FormEntity
 
     /**
      * Counts current progress percentage.
-     *
-     * @return float
      */
-    public function getProgressPercentage()
+    public function getProgressPercentage(): float|int
     {
         $processed = $this->getProcessedRows();
 
@@ -544,10 +542,8 @@ class Import extends FormEntity
 
     /**
      * Returns Twitter Bootstrap label class based on current status.
-     *
-     * @return string
      */
-    public function getSatusLabelClass()
+    public function getSatusLabelClass(): string
     {
         return match ($this->status) {
             self::QUEUED => 'info',

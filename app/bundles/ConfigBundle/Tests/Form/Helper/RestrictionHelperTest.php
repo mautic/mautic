@@ -216,9 +216,7 @@ class RestrictionHelperTest extends TypeTestCase
             ->getMock();
         $translator->method('trans')
             ->willReturnCallback(
-                function ($key) {
-                    return $key;
-                }
+                fn ($key) => $key
             );
 
         $validator = $this->getMockBuilder(ValidatorInterface::class)

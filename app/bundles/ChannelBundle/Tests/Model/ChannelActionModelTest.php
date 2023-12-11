@@ -60,7 +60,7 @@ class ChannelActionModelTest extends \PHPUnit\Framework\TestCase
         $this->contactModelMock->expects($this->never())
             ->method('getContactChannels');
 
-        $this->actionModel->update($contacts, [], [], '');
+        $this->actionModel->update($contacts, []);
     }
 
     public function testSubscribeContactToEmailChannel(): void

@@ -22,7 +22,7 @@ class AmazonS3Integration extends CloudStorageIntegration
     /**
      * {@inheritdoc}
      */
-    public function getName()
+    public function getName(): string
     {
         return 'AmazonS3';
     }
@@ -30,27 +30,23 @@ class AmazonS3Integration extends CloudStorageIntegration
     /**
      * {@inheritdoc}
      */
-    public function getDisplayName()
+    public function getDisplayName(): string
     {
         return 'Amazon S3';
     }
 
     /**
      * Get the array key for clientId.
-     *
-     * @return string
      */
-    public function getClientIdKey()
+    public function getClientIdKey(): string
     {
         return 'client_id';
     }
 
     /**
      * Get the array key for client secret.
-     *
-     * @return string
      */
-    public function getClientSecretKey()
+    public function getClientSecretKey(): string
     {
         return 'client_secret';
     }

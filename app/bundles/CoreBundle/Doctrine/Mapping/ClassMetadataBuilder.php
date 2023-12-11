@@ -453,10 +453,8 @@ class ClassMetadataBuilder extends OrmClassMetadataBuilder
      *
      * @param string $name
      * @param string $where
-     *
-     * @return self
      */
-    public function addPartialIndex(array $columns, $name, $where)
+    public function addPartialIndex(array $columns, $name, $where): ClassMetadataBuilder
     {
         return $this->addIndex($columns, $name, null, ['where' => $where]);
     }

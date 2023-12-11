@@ -51,13 +51,9 @@ class ModeratedCommandTest extends TestCase
 
         $this->input->method('getOption')
             ->willReturnCallback(
-                function (string $name) {
-                    switch ($name) {
-                        case 'lock_mode':
-                            return 'file_lock';
-                        default:
-                            return null;
-                    }
+                fn (string $name) => match ($name) {
+                    'lock_mode' => 'file_lock',
+                    default     => null,
                 }
             );
 
@@ -71,15 +67,10 @@ class ModeratedCommandTest extends TestCase
 
         $this->input->method('getOption')
             ->willReturnCallback(
-                function (string $name) {
-                    switch ($name) {
-                        case 'lock_mode':
-                            return ModeratedCommand::MODE_FLOCK;
-                        case 'bypass-locking':
-                            return true;
-                        default:
-                            return null;
-                    }
+                fn (string $name) => match ($name) {
+                    'lock_mode'      => ModeratedCommand::MODE_FLOCK,
+                    'bypass-locking' => true,
+                    default          => null,
                 }
             );
 
@@ -93,17 +84,11 @@ class ModeratedCommandTest extends TestCase
 
         $this->input->method('getOption')
             ->willReturnCallback(
-                function (string $name) {
-                    switch ($name) {
-                        case 'lock_mode':
-                            return ModeratedCommand::MODE_FLOCK;
-                        case 'bypass-locking':
-                            return false;
-                        case 'force':
-                            return true;
-                        default:
-                            return null;
-                    }
+                fn (string $name) => match ($name) {
+                    'lock_mode'      => ModeratedCommand::MODE_FLOCK,
+                    'bypass-locking' => false,
+                    'force'          => true,
+                    default          => null,
                 }
             );
 
@@ -125,15 +110,10 @@ class ModeratedCommandTest extends TestCase
 
         $this->input->method('getOption')
             ->willReturnCallback(
-                function (string $name) {
-                    switch ($name) {
-                        case 'lock_mode':
-                            return ModeratedCommand::MODE_PID;
-                        case 'bypass-locking':
-                            return false;
-                        default:
-                            return null;
-                    }
+                fn (string $name) => match ($name) {
+                    'lock_mode'      => ModeratedCommand::MODE_PID,
+                    'bypass-locking' => false,
+                    default          => null,
                 }
             );
 
@@ -176,15 +156,10 @@ class ModeratedCommandTest extends TestCase
 
         $this->input->method('getOption')
             ->willReturnCallback(
-                function (string $name) {
-                    switch ($name) {
-                        case 'lock_mode':
-                            return ModeratedCommand::MODE_FLOCK;
-                        case 'bypass-locking':
-                            return false;
-                        default:
-                            return null;
-                    }
+                fn (string $name) => match ($name) {
+                    'lock_mode'      => ModeratedCommand::MODE_FLOCK,
+                    'bypass-locking' => false,
+                    default          => null,
                 }
             );
 
@@ -232,15 +207,10 @@ class ModeratedCommandTest extends TestCase
 
         $this->input->method('getOption')
             ->willReturnCallback(
-                function (string $name) {
-                    switch ($name) {
-                        case 'lock_mode':
-                            return ModeratedCommand::MODE_REDIS;
-                        case 'bypass-locking':
-                            return false;
-                        default:
-                            return null;
-                    }
+                fn (string $name) => match ($name) {
+                    'lock_mode'      => ModeratedCommand::MODE_REDIS,
+                    'bypass-locking' => false,
+                    default          => null,
                 }
             );
 

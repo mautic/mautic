@@ -73,11 +73,9 @@ class IntegrationsHelper
     }
 
     /**
-     * @return Integration
-     *
      * @throws IntegrationNotFoundException
      */
-    public function getIntegrationConfiguration(IntegrationInterface $integration)
+    public function getIntegrationConfiguration(IntegrationInterface $integration): Integration
     {
         if (!$integration->hasIntegrationConfiguration()) {
             /** @var Integration $configuration */

@@ -425,10 +425,7 @@ class CorePermissions
         return $this->pluginBundles;
     }
 
-    /**
-     * @return array
-     */
-    protected function getParams()
+    protected function getParams(): array
     {
         return $this->coreParametersHelper->all();
     }

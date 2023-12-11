@@ -58,9 +58,7 @@ class EventSchedulerTest extends \PHPUnit\Framework\TestCase
         $this->coreParamtersHelper = $this->createMock(CoreParametersHelper::class);
         $this->coreParamtersHelper->method('get')
             ->willReturnCallback(
-                function () {
-                    return 'America/New_York';
-                }
+                fn () => 'America/New_York'
             );
         $this->eventLogger       = $this->createMock(EventLogger::class);
         $this->intervalScheduler = new Interval($this->logger, $this->coreParamtersHelper);

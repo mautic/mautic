@@ -56,7 +56,7 @@ class StatHelperTest extends \PHPUnit\Framework\TestCase
                 $reference = $statHelper->getStat($emailAddress);
                 $this->assertEquals($reference->getLeadId(), $counter * 10);
                 $statHelper->markForDeletion($reference);
-            } catch (StatNotFoundException $exception) {
+            } catch (StatNotFoundException) {
                 $this->fail("Stat not found for $emailAddress");
             }
 

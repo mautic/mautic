@@ -294,7 +294,7 @@ class ReportSubscriberTest extends \PHPUnit\Framework\TestCase
                             'label'           => 'Send email',
                             'description'     => 'Send the selected email to the contact.',
                             'batchEventName'  => 'mautic.email.on_campaign_batch_action',
-                            'formType'        => "Mautic\EmailBundle\Form\Type\EmailSendType",
+                            'formType'        => \Mautic\EmailBundle\Form\Type\EmailSendType::class,
                             'formTypeOptions' => [
                               'update_select'    => 'campaignevent_properties_email',
                               'with_email_types' => true,
@@ -309,7 +309,7 @@ class ReportSubscriberTest extends \PHPUnit\Framework\TestCase
                               'label'                  => 'Clicks email',
                               'description'            => 'Trigger actions when an email is clicked. Connect a Send Email action to the top of this decision.',
                               'eventName'              => 'mautic.email.on_campaign_trigger_decision',
-                              'formType'               => "Mautic\EmailBundle\Form\Type\EmailClickDecisionType",
+                              'formType'               => \Mautic\EmailBundle\Form\Type\EmailClickDecisionType::class,
                               'connectionRestrictions' => [
                                 'source' => [
                                   'action' => [
@@ -807,7 +807,7 @@ class ReportSubscriberTest extends \PHPUnit\Framework\TestCase
                         'log.campaign_id' => [
                             'label' => '',
                             'type'  => 'select',
-                            'list'  => null,
+                            'list'  => [],
                             'alias' => 'campaign_id',
                         ],
                         'log.date_triggered' => [

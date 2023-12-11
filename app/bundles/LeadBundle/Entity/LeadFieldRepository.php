@@ -103,10 +103,8 @@ class LeadFieldRepository extends CommonRepository
     /**
      * @param \Doctrine\ORM\QueryBuilder|\Doctrine\DBAL\Query\QueryBuilder $q
      * @param object                                                       $filter
-     *
-     * @return array
      */
-    protected function addCatchAllWhereClause($q, $filter)
+    protected function addCatchAllWhereClause($q, $filter): array
     {
         return $this->addStandardCatchAllWhereClause(
             $q,
@@ -132,10 +130,8 @@ class LeadFieldRepository extends CommonRepository
      * Get field aliases for lead table columns.
      *
      * @param string $object name of object using the custom fields
-     *
-     * @return array
      */
-    public function getFieldAliases($object = 'lead')
+    public function getFieldAliases($object = 'lead'): array
     {
         $qb = $this->_em->getConnection()->createQueryBuilder();
 

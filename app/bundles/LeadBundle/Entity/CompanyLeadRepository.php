@@ -45,10 +45,8 @@ class CompanyLeadRepository extends CommonRepository
 
     /**
      * Get companies by leadId.
-     *
-     * @return array
      */
-    public function getCompaniesByLeadId($leadId, $companyId = null)
+    public function getCompaniesByLeadId($leadId, $companyId = null): array
     {
         $q = $this->_em->getConnection()->createQueryBuilder();
 
@@ -67,10 +65,7 @@ class CompanyLeadRepository extends CommonRepository
         return $q->executeQuery()->fetchAllAssociative();
     }
 
-    /**
-     * @return array
-     */
-    public function getCompanyLeads($companyId)
+    public function getCompanyLeads($companyId): array
     {
         $q = $this->_em->getConnection()->createQueryBuilder();
         $q->select('cl.lead_id')
@@ -101,7 +96,10 @@ class CompanyLeadRepository extends CommonRepository
         return !empty($result) ? $result[0] : [];
     }
 
-    public function getCompanyLeadEntity($leadId, $companyId)
+    /**
+     * @return mixed[]
+     */
+    public function getCompanyLeadEntity($leadId, $companyId): array
     {
         $qb = $this->getEntityManager()->getConnection()->createQueryBuilder();
         $qb->select('cl.is_primary, cl.lead_id, cl.company_id')

@@ -46,10 +46,7 @@ class BaseDecorator implements FilterDecoratorInterface
         };
     }
 
-    /**
-     * @return string
-     */
-    public function getQueryType(ContactSegmentFilterCrate $contactSegmentFilterCrate)
+    public function getQueryType(ContactSegmentFilterCrate $contactSegmentFilterCrate): string
     {
         return BaseFilterQueryBuilder::getServiceId();
     }

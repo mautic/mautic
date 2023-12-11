@@ -319,12 +319,10 @@ class SubmissionRepository extends CommonRepository
      * @param int              $limit
      * @param int              $offset
      *
-     * @return array
-     *
      * @throws \Doctrine\ORM\NoResultException
      * @throws \Doctrine\ORM\NonUniqueResultException
      */
-    public function getTopReferrers($query, $limit = 10, $offset = 0)
+    public function getTopReferrers($query, $limit = 10, $offset = 0): array
     {
         $query->select('fs.referer, count(fs.referer) as sessions')
             ->groupBy('fs.referer')
@@ -342,12 +340,10 @@ class SubmissionRepository extends CommonRepository
      * @param int              $limit
      * @param int              $offset
      *
-     * @return array
-     *
      * @throws \Doctrine\ORM\NoResultException
      * @throws \Doctrine\ORM\NonUniqueResultException
      */
-    public function getMostSubmitted($query, $limit = 10, $offset = 0, $column = 'fs.id', $as = 'submissions')
+    public function getMostSubmitted($query, $limit = 10, $offset = 0, $column = 'fs.id', $as = 'submissions'): array
     {
         $asSelect = ($as) ? ' as '.$as : '';
 
@@ -360,7 +356,10 @@ class SubmissionRepository extends CommonRepository
         return $query->executeQuery()->fetchAllAssociative();
     }
 
-    public function getSubmissionCountsByPage($pageId, \DateTime $fromDate = null)
+    /**
+     * @return mixed[]
+     */
+    public function getSubmissionCountsByPage($pageId, \DateTime $fromDate = null): array
     {
         $q = $this->_em->getConnection()->createQueryBuilder();
         $q->select('count(distinct(s.tracking_id)) as count, s.page_id as id, p.title as name, p.variant_hits as total')
@@ -388,9 +387,9 @@ class SubmissionRepository extends CommonRepository
      * Get submission count by email by linking emails that have been associated with a page hit that has the
      * same tracking ID as a form submission tracking ID and thus assumed happened in the same session.
      *
-     * @return mixed
+     * @return mixed[]
      */
-    public function getSubmissionCountsByEmail($emailId, \DateTime $fromDate = null)
+    public function getSubmissionCountsByEmail($emailId, \DateTime $fromDate = null): array
     {
         // link email to page hit tracking id to form submission tracking id
         $q = $this->_em->getConnection()->createQueryBuilder();

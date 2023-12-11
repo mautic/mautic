@@ -29,10 +29,8 @@ class AjaxController extends CommonAjaxController
 
     /**
      * @param string $name
-     *
-     * @return JsonResponse
      */
-    public function reorderFieldsAction(Request $request, $bundle, $name = 'fields')
+    public function reorderFieldsAction(Request $request, $bundle, $name = 'fields'): JsonResponse
     {
         if ('form' === $name) {
             $name = 'fields';
@@ -54,10 +52,7 @@ class AjaxController extends CommonAjaxController
         return $this->sendJsonResponse($dataArray);
     }
 
-    /**
-     * @return JsonResponse
-     */
-    public function getFieldsForObjectAction(Request $request)
+    public function getFieldsForObjectAction(Request $request): JsonResponse
     {
         $formId       = $request->get('formId');
         $mappedObject = $request->get('mappedObject');
@@ -80,18 +75,12 @@ class AjaxController extends CommonAjaxController
         );
     }
 
-    /**
-     * @return JsonResponse
-     */
-    public function reorderActionsAction(Request $request)
+    public function reorderActionsAction(Request $request): JsonResponse
     {
         return $this->reorderFieldsAction($request, 'actions');
     }
 
-    /**
-     * @return JsonResponse
-     */
-    public function updateFormFieldsAction(Request $request)
+    public function updateFormFieldsAction(Request $request): JsonResponse
     {
         $formId     = (int) $request->request->get('formId');
         $dataArray  = ['success' => 0];
@@ -145,10 +134,8 @@ class AjaxController extends CommonAjaxController
 
     /**
      * Ajax submit for forms.
-     *
-     * @return JsonResponse
      */
-    public function submitAction(Request $request)
+    public function submitAction(Request $request): JsonResponse
     {
         $response     = $this->forwardWithPost('Mautic\FormBundle\Controller\PublicController::submitAction', $request->request->all(), [], ['ajax' => true]);
         $responseData = json_decode($response->getContent(), true);
