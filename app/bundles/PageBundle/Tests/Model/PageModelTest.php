@@ -129,7 +129,8 @@ class PageModelTest extends PageTestAbstract
 
     public function testCleanQueryWhenCalledReturnsSafeAndValidData(): void
     {
-        $pageModel           = $this->getPageModel();
+        $pageModel = $this->getPageModel();
+        self::assertInstanceOf(PageModel::class, $pageModel);
         $pageModelReflection = new \ReflectionClass($pageModel::class);
         $cleanQueryMethod    = $pageModelReflection->getMethod('cleanQuery');
         $cleanQueryMethod->setAccessible(true);
