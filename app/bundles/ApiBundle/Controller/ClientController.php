@@ -121,10 +121,7 @@ class ClientController extends FormController
         );
     }
 
-    /**
-     * @return Response
-     */
-    public function authorizedClientsAction(TokenStorageInterface $tokenStorage)
+    public function authorizedClientsAction(TokenStorageInterface $tokenStorage): Response
     {
         $apiClientModel = $this->clientModel;
         \assert($apiClientModel instanceof ClientModel);

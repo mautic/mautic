@@ -30,7 +30,7 @@ class UserPermissions extends AbstractPermissions
     /**
      * {@inheritdoc}
      */
-    public function getName()
+    public function getName(): string
     {
         return 'user';
     }

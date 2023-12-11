@@ -668,10 +668,8 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
      * Adds the "catch all" where clause to the QueryBuilder.
      *
      * @param \Doctrine\ORM\QueryBuilder|\Doctrine\DBAL\Query\QueryBuilder $q
-     *
-     * @return array
      */
-    protected function addCatchAllWhereClause($q, $filter)
+    protected function addCatchAllWhereClause($q, $filter): array
     {
         $columns = array_merge(
             [
@@ -960,11 +958,9 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
     }
 
     /**
-     * Returns the array of search commands.
-     *
-     * @return array
+     * @return string[]
      */
-    public function getSearchCommands()
+    public function getSearchCommands(): array
     {
         $commands = [
             'mautic.lead.lead.searchcommand.isanonymous',

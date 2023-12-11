@@ -58,18 +58,12 @@ class FocusModel extends FormModel
         parent::__construct($em, $security, $dispatcher, $router, $translator, $userHelper, $mauticLogger, $coreParametersHelper);
     }
 
-    /**
-     * @return string
-     */
-    public function getActionRouteBase()
+    public function getActionRouteBase(): string
     {
         return 'focus';
     }
 
-    /**
-     * @return string
-     */
-    public function getPermissionBase()
+    public function getPermissionBase(): string
     {
         return 'focus:items';
     }
@@ -378,10 +372,8 @@ class FocusModel extends FormModel
 
     /**
      * @param bool $canViewOthers
-     *
-     * @return array
      */
-    public function getStats(Focus $focus, $unit, \DateTime $dateFrom = null, \DateTime $dateTo = null, $dateFormat = null, $canViewOthers = true)
+    public function getStats(Focus $focus, $unit, \DateTime $dateFrom = null, \DateTime $dateTo = null, $dateFormat = null, $canViewOthers = true): array
     {
         $chart = new LineChart($unit, $dateFrom, $dateTo, $dateFormat);
         $query = new ChartQuery($this->em->getConnection(), $dateFrom, $dateTo, $unit);

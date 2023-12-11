@@ -296,7 +296,7 @@ class MailHelperTest extends TestCase
         /** @var array<\Symfony\Component\Mime\Header\AbstractHeader> $headers */
         $headers = $mailer->message->getHeaders()->all();
         foreach ($headers as $header) {
-            if (false !== strpos($header->getName(), 'X-Mautic-Test')) {
+            if (str_contains($header->getName(), 'X-Mautic-Test')) {
                 $customHeadersFounds[] = $header->getName();
 
                 $this->assertEquals('test', $header->getBody());
@@ -329,7 +329,7 @@ class MailHelperTest extends TestCase
         $headers = $mailer->message->getHeaders()->all();
 
         foreach ($headers as $header) {
-            if (false !== strpos($header->getName(), 'X-Mautic-Test')) {
+            if (str_contains($header->getName(), 'X-Mautic-Test')) {
                 $this->assertEquals('test', $header->getBody());
             }
         }

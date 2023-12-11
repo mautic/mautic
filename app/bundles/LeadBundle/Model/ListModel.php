@@ -907,10 +907,8 @@ class ListModel extends FormModel
 
     /**
      * @param bool $canViewOthers
-     *
-     * @return array
      */
-    public function getLifeCycleSegmentChartData($unit, \DateTime $dateFrom, \DateTime $dateTo, $dateFormat, $filter, $canViewOthers, $listName)
+    public function getLifeCycleSegmentChartData($unit, \DateTime $dateFrom, \DateTime $dateTo, $dateFormat, $filter, $canViewOthers, $listName): array
     {
         $chart = new PieChart();
         $query = new ChartQuery($this->em->getConnection(), $dateFrom, $dateTo);
@@ -1071,10 +1069,8 @@ class ListModel extends FormModel
      * @param string $unit       {@link php.net/manual/en/function.date.php#refsect1-function.date-parameters}
      * @param string $dateFormat
      * @param array  $filter
-     *
-     * @return array
      */
-    public function getSegmentContactsLineChartData($unit, \DateTime $dateFrom, \DateTime $dateTo, $dateFormat = null, $filter = [])
+    public function getSegmentContactsLineChartData($unit, \DateTime $dateFrom, \DateTime $dateTo, $dateFormat = null, $filter = []): array
     {
         $chart    = new LineChart($unit, $dateFrom, $dateTo, $dateFormat);
         $query    = new SegmentContactsLineChartQuery($this->em->getConnection(), $dateFrom, $dateTo, $filter);

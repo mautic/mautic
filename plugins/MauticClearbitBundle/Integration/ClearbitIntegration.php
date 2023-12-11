@@ -10,17 +10,15 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 class ClearbitIntegration extends AbstractIntegration
 {
-    public function getName()
+    public function getName(): string
     {
         return 'Clearbit';
     }
 
     /**
      * Return's authentication method such as oauth2, oauth1a, key, etc.
-     *
-     * @return string
      */
-    public function getAuthenticationType()
+    public function getAuthenticationType(): string
     {
         return 'none';
     }

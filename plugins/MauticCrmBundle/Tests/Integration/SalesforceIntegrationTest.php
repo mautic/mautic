@@ -438,11 +438,11 @@ class SalesforceIntegrationTest extends AbstractIntegrationTestCase
                     $args = func_get_args();
 
                     // Checking for campaign members should return empty array for testing purposes
-                    if (false !== strpos($args[0], '/query') && false !== strpos($args[1]['q'], 'CampaignMember')) {
+                    if (str_contains($args[0], '/query') && str_contains($args[1]['q'], 'CampaignMember')) {
                         return [];
                     }
 
-                    if (false !== strpos($args[0], '/composite')) {
+                    if (str_contains($args[0], '/composite')) {
                         $this->assertSame(
                             '1-CampaignMemberNew-null-1',
                             $args[1]['compositeRequest'][0]['referenceId'],
@@ -474,11 +474,11 @@ class SalesforceIntegrationTest extends AbstractIntegrationTestCase
                     $args = func_get_args();
 
                     // Checking for campaign members should return empty array for testing purposes
-                    if (false !== strpos($args[0], '/query') && false !== strpos($args[1]['q'], 'Account')) {
+                    if (str_contains($args[0], '/query') && str_contains($args[1]['q'], 'Account')) {
                         return [];
                     }
 
-                    if (false !== strpos($args[0], '/composite')) {
+                    if (str_contains($args[0], '/composite')) {
                         $this->assertSame(
                             '1-Account-null-1',
                             $args[1]['compositeRequest'][0]['referenceId'],
@@ -507,12 +507,10 @@ class SalesforceIntegrationTest extends AbstractIntegrationTestCase
             ->method('getFetchQuery')
             ->with([])
             ->willReturnCallback(
-                function () {
-                    return [
-                        'start' => '-1 week',
-                        'end'   => 'now',
-                    ];
-                }
+                fn () => [
+                    'start' => '-1 week',
+                    'end'   => 'now',
+                ]
             );
 
         $this->setMaxInvocations('getIntegrationsEntityId', 1);
@@ -552,9 +550,7 @@ class SalesforceIntegrationTest extends AbstractIntegrationTestCase
             ->method('makeRequest')
             ->with('https://sftest.com/services/data/v38.0/composite/')
             ->willReturnCallback(
-                function () {
-                    return $this->getSalesforceCompositeResponse(func_get_arg(1));
-                }
+                fn () => $this->getSalesforceCompositeResponse(func_get_arg(1))
             );
 
         $sf->pushLeadActivity();
@@ -738,11 +734,7 @@ class SalesforceIntegrationTest extends AbstractIntegrationTestCase
      */
     protected function getMaxInvocations($name)
     {
-        if (isset($this->maxInvocations[$name])) {
-            return $this->maxInvocations[$name];
-        }
-
-        return 1;
+        return $this->maxInvocations[$name] ?? 1;
     }
 
     protected function setMocks()
@@ -770,7 +762,7 @@ class SalesforceIntegrationTest extends AbstractIntegrationTestCase
                     $invocations         = $spyParentProperties['invocations'];
 
                     if (count($invocations) > $this->getMaxInvocations('getIntegrationsEntityId')) {
-                        return null;
+                        return [];
                     }
 
                     // Just return some bogus entities for testing
@@ -1022,15 +1014,15 @@ class SalesforceIntegrationTest extends AbstractIntegrationTestCase
                         $args = func_get_args();
                         // Determine what to return by analyzing the URL and query parameters
                         switch (true) {
-                            case false !== strpos($args[0], '/query'):
-                                if (isset($args[1]['q']) && false !== strpos($args[0], 'from CampaignMember')) {
+                            case str_contains($args[0], '/query'):
+                                if (isset($args[1]['q']) && str_contains($args[0], 'from CampaignMember')) {
                                     return [];
-                                } elseif (isset($args[1]['q']) && false !== strpos($args[1]['q'], 'from Campaign')) {
+                                } elseif (isset($args[1]['q']) && str_contains($args[1]['q'], 'from Campaign')) {
                                     return [
                                         'totalSize' => 0,
                                         'records'   => [],
                                     ];
-                                } elseif (isset($args[1]['q']) && false !== strpos($args[1]['q'], 'from Account')) {
+                                } elseif (isset($args[1]['q']) && str_contains($args[1]['q'], 'from Account')) {
                                     return [
                                         'totalSize' => 0,
                                         'records'   => [],
@@ -1041,7 +1033,7 @@ class SalesforceIntegrationTest extends AbstractIntegrationTestCase
                                             ['CreatedDate' => '2012-10-30T17:56:50.000+0000'],
                                         ],
                                     ];
-                                } elseif (isset($args[1]['q']) && false !== strpos($args[1]['q'], 'from '.$updateObject.'History')) {
+                                } elseif (isset($args[1]['q']) && str_contains($args[1]['q'], 'from '.$updateObject.'History')) {
                                     return $this->getSalesforceDNCHistory($updateObject, 'Mautic');
                                 } else {
                                     // Extract emails
@@ -1055,7 +1047,7 @@ class SalesforceIntegrationTest extends AbstractIntegrationTestCase
                                     }
                                 }
                                 // no break
-                            case false !== strpos($args[0], '/composite'):
+                            case str_contains($args[0], '/composite'):
                                 return $this->getSalesforceCompositeResponse($args[1]);
                         }
                     }
@@ -1069,10 +1061,9 @@ class SalesforceIntegrationTest extends AbstractIntegrationTestCase
                     function () use ($sf, $integration) {
                         $args = func_get_args();
 
-                        switch ($args[0]) {
-                            default:
-                                return new PluginIntegrationKeyEvent($sf, $integration->getApiKeys());
-                        }
+                        return match ($args[0]) {
+                            default => new PluginIntegrationKeyEvent($sf, $integration->getApiKeys()),
+                        };
                     }
                 )
             );
@@ -1444,7 +1435,7 @@ class SalesforceIntegrationTest extends AbstractIntegrationTestCase
      */
     private static function getParentPrivateProperties($instance): array
     {
-        $reflectionClass       = new \ReflectionClass(get_class($instance));
+        $reflectionClass       = new \ReflectionClass($instance::class);
         $parentReflectionClass = $reflectionClass->getParentClass();
 
         $parentProperties = [];

@@ -31,10 +31,7 @@ class AjaxController extends CommonAjaxController
         );
     }
 
-    /**
-     * @return \Symfony\Component\HttpFoundation\JsonResponse
-     */
-    public function pageListAction(Request $request)
+    public function pageListAction(Request $request): \Symfony\Component\HttpFoundation\JsonResponse
     {
         $filter    = InputHelper::clean($request->query->get('filter'));
         $pageModel = $this->getModel('page.page');
@@ -52,10 +49,7 @@ class AjaxController extends CommonAjaxController
         return $this->sendJsonResponse($dataArray);
     }
 
-    /**
-     * @return \Symfony\Component\HttpFoundation\JsonResponse
-     */
-    public function setBuilderContentAction(Request $request)
+    public function setBuilderContentAction(Request $request): \Symfony\Component\HttpFoundation\JsonResponse
     {
         $dataArray = ['success' => 0];
         $entityId  = InputHelper::clean($request->request->get('entity'));

@@ -229,10 +229,7 @@ class LeadController extends FormController
         );
     }
 
-    /**
-     * @return JsonResponse|Response
-     */
-    public function quickAddAction(Request $request)
+    public function quickAddAction(Request $request): Response
     {
         /** @var \Mautic\LeadBundle\Model\LeadModel $model */
         $model = $this->getModel('lead.lead');
@@ -1211,10 +1208,8 @@ class LeadController extends FormController
 
     /**
      * Add/remove lead from a list.
-     *
-     * @return JsonResponse|\Symfony\Component\HttpFoundation\Response
      */
-    public function listAction($objectId)
+    public function listAction($objectId): Response
     {
         /** @var \Mautic\LeadBundle\Model\LeadModel $model */
         $model = $this->getModel('lead');
@@ -1251,10 +1246,8 @@ class LeadController extends FormController
 
     /**
      * Add/remove lead from a company.
-     *
-     * @return JsonResponse|\Symfony\Component\HttpFoundation\Response
      */
-    public function companyAction($objectId)
+    public function companyAction($objectId): Response
     {
         /** @var \Mautic\LeadBundle\Model\LeadModel $model */
         $model = $this->getModel('lead');
@@ -1294,10 +1287,8 @@ class LeadController extends FormController
 
     /**
      * Add/remove lead from a campaign.
-     *
-     * @return JsonResponse|\Symfony\Component\HttpFoundation\Response
      */
-    public function campaignAction($objectId)
+    public function campaignAction($objectId): Response
     {
         $model = $this->getModel('lead');
         $lead  = $model->getEntity($objectId);

@@ -7,7 +7,7 @@ class InstagramIntegration extends SocialIntegration
     /**
      * {@inheritdoc}
      */
-    public function getName()
+    public function getName(): string
     {
         return 'Instagram';
     }
@@ -26,7 +26,7 @@ class InstagramIntegration extends SocialIntegration
     /**
      * {@inheritdoc}
      */
-    public function getIdentifierFields()
+    public function getIdentifierFields(): string
     {
         return 'instagram';
     }
@@ -34,7 +34,7 @@ class InstagramIntegration extends SocialIntegration
     /**
      * {@inheritdoc}
      */
-    public function getAuthenticationUrl()
+    public function getAuthenticationUrl(): string
     {
         return 'https://api.instagram.com/oauth/authorize';
     }
@@ -42,15 +42,12 @@ class InstagramIntegration extends SocialIntegration
     /**
      * {@inheritdoc}
      */
-    public function getAccessTokenUrl()
+    public function getAccessTokenUrl(): string
     {
         return 'https://api.instagram.com/oauth/access_token';
     }
 
-    /**
-     * @return string
-     */
-    public function getApiUrl($endpoint)
+    public function getApiUrl($endpoint): string
     {
         return "https://api.instagram.com/v1/$endpoint";
     }

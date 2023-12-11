@@ -236,10 +236,8 @@ class PublicController extends CommonFormController
 
     /**
      * Displays a message.
-     *
-     * @return Response
      */
-    public function messageAction(Request $request)
+    public function messageAction(Request $request): Response
     {
         $session = $request->getSession();
         $message = $session->get('mautic.emailbundle.message', []);

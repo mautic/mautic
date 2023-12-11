@@ -451,12 +451,7 @@ class Mailbox
         return $this->folders[$this->imapFullPath];
     }
 
-    /**
-     * Fetch unread messages.
-     *
-     * @return array
-     */
-    public function fetchUnread($folder = null)
+    public function fetchUnread($folder = null): array
     {
         if (null !== $folder) {
             $this->switchFolder($folder);
@@ -553,60 +548,48 @@ class Mailbox
 
     /**
      * Add the flag \Seen to a mail.
-     *
-     * @return bool
      */
-    public function markMailAsRead($mailId)
+    public function markMailAsRead($mailId): bool
     {
         return $this->setFlag([$mailId], '\\Seen');
     }
 
     /**
      * Remove the flag \Seen from a mail.
-     *
-     * @return bool
      */
-    public function markMailAsUnread($mailId)
+    public function markMailAsUnread($mailId): bool
     {
         return $this->clearFlag([$mailId], '\\Seen');
     }
 
     /**
      * Add the flag \Flagged to a mail.
-     *
-     * @return bool
      */
-    public function markMailAsImportant($mailId)
+    public function markMailAsImportant($mailId): bool
     {
         return $this->setFlag([$mailId], '\\Flagged');
     }
 
     /**
      * Add the flag \Seen to a mails.
-     *
-     * @return bool
      */
-    public function markMailsAsRead(array $mailIds)
+    public function markMailsAsRead(array $mailIds): bool
     {
         return $this->setFlag($mailIds, '\\Seen');
     }
 
     /**
      * Remove the flag \Seen from some mails.
-     *
-     * @return bool
      */
-    public function markMailsAsUnread(array $mailIds)
+    public function markMailsAsUnread(array $mailIds): bool
     {
         return $this->clearFlag($mailIds, '\\Seen');
     }
 
     /**
      * Add the flag \Flagged to some mails.
-     *
-     * @return bool
      */
-    public function markMailsAsImportant(array $mailIds)
+    public function markMailsAsImportant(array $mailIds): bool
     {
         return $this->setFlag($mailIds, '\\Flagged');
     }

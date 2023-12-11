@@ -25,7 +25,7 @@ Diagnostic-Code: DNS; Host not found
 DSN;
 
         $parser = new Parser($message);
-        $bounce = $parser->parse($message);
+        $bounce = $parser->parse();
 
         $this->assertInstanceOf(BouncedEmail::class, $bounce);
     }
@@ -57,7 +57,7 @@ administrator.
 BODY;
 
         $parser = new Parser($message);
-        $bounce = $parser->parse($message);
+        $bounce = $parser->parse();
 
         $this->assertInstanceOf(BouncedEmail::class, $bounce);
     }

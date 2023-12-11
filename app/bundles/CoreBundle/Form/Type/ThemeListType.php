@@ -18,7 +18,7 @@ class ThemeListType extends AbstractType
     {
         $resolver->setDefaults(
             [
-                'choices'           => function (Options $options) {
+                'choices'           => function (Options $options): array {
                     $themes                     = $this->themeHelper->getInstalledThemes($options['feature']);
                     $themes['mautic_code_mode'] = 'Code Mode';
 

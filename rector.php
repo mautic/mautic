@@ -98,10 +98,15 @@ return static function (RectorConfig $rectorConfig): void {
     $rectorConfig->sets([
         SetList::DEAD_CODE,
         SetList::PHP_80,
+        // SetList::TYPE_DECLARATION,
     ]);
 
     // Define what single rules will be applied
     $rectorConfig->rules([
+        \Rector\TypeDeclaration\Rector\ClassMethod\ReturnTypeFromStrictTypedCallRector::class,
+        \Rector\TypeDeclaration\Rector\ClassMethod\ReturnTypeFromStrictScalarReturnExprRector::class,
+
+        \Rector\TypeDeclaration\Rector\Property\TypedPropertyFromAssignsRector::class,
         NumericReturnTypeFromStrictScalarReturnsRector::class,
         ReturnTypeFromReturnNewRector::class,
         ReturnTypeFromStrictNativeCallRector::class,

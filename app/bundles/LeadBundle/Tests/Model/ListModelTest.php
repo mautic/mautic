@@ -340,14 +340,8 @@ class ListModelTest extends TestCase
     private function mockLeadList(int $id): LeadList
     {
         return new class($id) extends LeadList {
-            /**
-             * @var int
-             */
-            private $id;
-
-            public function __construct(int $id)
+            public function __construct(private int $id)
             {
-                $this->id = $id;
                 parent::__construct();
             }
 
@@ -361,14 +355,8 @@ class ListModelTest extends TestCase
     private function mockLead(int $id): Lead
     {
         return new class($id) extends Lead {
-            /**
-             * @var int
-             */
-            private $id;
-
-            public function __construct(int $id)
+            public function __construct(private int $id)
             {
-                $this->id = $id;
                 parent::__construct();
             }
 

@@ -323,10 +323,7 @@ class LeadTimelineEvent extends Event
         ];
     }
 
-    /**
-     * @return array
-     */
-    public function getQueryOptions()
+    public function getQueryOptions(): array
     {
         return array_merge(
             [

@@ -37,9 +37,7 @@ class WebhookSubscriberTest extends \PHPUnit\Framework\TestCase
             ->method('queueWebhooksByType')
             ->with(
                 $this->callback(
-                    function ($type) {
-                        return LeadEvents::LEAD_POST_SAVE.'_new' === $type;
-                    }
+                    fn ($type) => LeadEvents::LEAD_POST_SAVE.'_new' === $type
                 )
             );
 
@@ -62,9 +60,7 @@ class WebhookSubscriberTest extends \PHPUnit\Framework\TestCase
             ->method('queueWebhooksByType')
             ->with(
                 $this->callback(
-                    function ($type) {
-                        return LeadEvents::LEAD_POST_SAVE.'_update' === $type;
-                    }
+                    fn ($type) => LeadEvents::LEAD_POST_SAVE.'_update' === $type
                 )
             );
 

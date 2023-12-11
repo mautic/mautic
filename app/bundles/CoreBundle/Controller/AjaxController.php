@@ -137,10 +137,7 @@ class AjaxController extends CommonController
         return $this->sendJsonResponse(['success' => 0]);
     }
 
-    /**
-     * @return JsonResponse
-     */
-    public function globalSearchAction(Request $request)
+    public function globalSearchAction(Request $request): JsonResponse
     {
         $dataArray = ['success' => 1];
         $searchStr = InputHelper::clean($request->query->get('global_search', ''));
@@ -157,10 +154,7 @@ class AjaxController extends CommonController
         return $this->sendJsonResponse($dataArray);
     }
 
-    /**
-     * @return JsonResponse
-     */
-    public function commandListAction(Request $request)
+    public function commandListAction(Request $request): JsonResponse
     {
         $model      = InputHelper::clean($request->query->get('model'));
         $commands   = $this->getModel($model)->getCommandList();
@@ -186,10 +180,7 @@ class AjaxController extends CommonController
         return $this->sendJsonResponse($dataArray);
     }
 
-    /**
-     * @return JsonResponse
-     */
-    public function globalCommandListAction(Request $request)
+    public function globalCommandListAction(Request $request): JsonResponse
     {
         $dispatcher = $this->dispatcher;
         $event      = new CommandListEvent();
@@ -232,10 +223,7 @@ class AjaxController extends CommonController
         return $this->sendJsonResponse($dataArray);
     }
 
-    /**
-     * @return JsonResponse
-     */
-    public function togglePublishStatusAction(Request $request)
+    public function togglePublishStatusAction(Request $request): JsonResponse
     {
         $dataArray      = ['success' => 0];
         $name           = InputHelper::clean($request->request->get('model'));
@@ -326,10 +314,8 @@ class AjaxController extends CommonController
 
     /**
      * Unlock an entity locked by the current user.
-     *
-     * @return JsonResponse
      */
-    public function unlockEntityAction(Request $request)
+    public function unlockEntityAction(Request $request): JsonResponse
     {
         $dataArray   = ['success' => 0];
         $name        = InputHelper::clean($request->request->get('model'));
@@ -354,10 +340,8 @@ class AjaxController extends CommonController
 
     /**
      * Sets the page layout to the update layout.
-     *
-     * @return JsonResponse
      */
-    public function updateSetUpdateLayoutAction(CookieHelper $cookieHelper)
+    public function updateSetUpdateLayoutAction(CookieHelper $cookieHelper): JsonResponse
     {
         $dataArray = [
             'success' => 1,
@@ -419,10 +403,8 @@ class AjaxController extends CommonController
 
     /**
      * Downloads the update package.
-     *
-     * @return JsonResponse
      */
-    public function updateDownloadPackageAction(UpdateHelper $updateHelper, CookieHelper $cookieHelper)
+    public function updateDownloadPackageAction(UpdateHelper $updateHelper, CookieHelper $cookieHelper): JsonResponse
     {
         $dataArray  = ['success' => 0];
         $translator = $this->translator;
@@ -454,10 +436,8 @@ class AjaxController extends CommonController
 
     /**
      * Extracts the update package.
-     *
-     * @return JsonResponse
      */
-    public function updateExtractPackageAction(UpdateHelper $updateHelper, CookieHelper $cookieHelper, PathsHelper $pathsHelper)
+    public function updateExtractPackageAction(UpdateHelper $updateHelper, CookieHelper $cookieHelper, PathsHelper $pathsHelper): JsonResponse
     {
         $dataArray  = ['success' => 0];
         $translator = $this->translator;
@@ -511,8 +491,6 @@ class AjaxController extends CommonController
 
     /**
      * Migrate the database to the latest version.
-     *
-     * @return JsonResponse
      */
     public function updateDatabaseMigrationAction(
         Request $request,
@@ -520,7 +498,7 @@ class AjaxController extends CommonController
         LanguageHelper $languageHelper,
         CookieHelper $cookieHelper,
         LoggerInterface $mauticLogger
-    ) {
+    ): JsonResponse {
         $dataArray  = ['success' => 0];
         $translator = $this->translator;
         $result     = 0;
@@ -643,10 +621,8 @@ class AjaxController extends CommonController
 
     /**
      * Finalize update.
-     *
-     * @return JsonResponse
      */
-    public function updateFinalizationAction(Request $request, CookieHelper $cookieHelper)
+    public function updateFinalizationAction(Request $request, CookieHelper $cookieHelper): JsonResponse
     {
         $dataArray  = ['success' => 0];
         $translator = $this->translator;
@@ -675,10 +651,7 @@ class AjaxController extends CommonController
         return $this->sendJsonResponse($dataArray);
     }
 
-    /**
-     * @return JsonResponse
-     */
-    public function clearNotificationAction(Request $request)
+    public function clearNotificationAction(Request $request): JsonResponse
     {
         $id = (int) $request->get('id', 0);
 
@@ -689,10 +662,7 @@ class AjaxController extends CommonController
         return $this->sendJsonResponse(['success' => 1]);
     }
 
-    /**
-     * @return JsonResponse
-     */
-    public function getBuilderTokensAction(Request $request)
+    public function getBuilderTokensAction(Request $request): JsonResponse
     {
         $tokens = [];
 
@@ -706,10 +676,8 @@ class AjaxController extends CommonController
 
     /**
      * Fetch remote data store.
-     *
-     * @return JsonResponse
      */
-    public function downloadIpLookupDataStoreAction(Request $request, IpLookupFactory $ipServiceFactory)
+    public function downloadIpLookupDataStoreAction(Request $request, IpLookupFactory $ipServiceFactory): JsonResponse
     {
         $dataArray = ['success' => 0];
 
@@ -749,10 +717,8 @@ class AjaxController extends CommonController
 
     /**
      * Fetch IP Lookup form.
-     *
-     * @return JsonResponse
      */
-    public function getIpLookupFormAction(Request $request, FormFactoryInterface $formFactory, IpLookupFactory $ipServiceFactory)
+    public function getIpLookupFormAction(Request $request, FormFactoryInterface $formFactory, IpLookupFactory $ipServiceFactory): JsonResponse
     {
         $dataArray = ['html' => '', 'attribution' => ''];
 

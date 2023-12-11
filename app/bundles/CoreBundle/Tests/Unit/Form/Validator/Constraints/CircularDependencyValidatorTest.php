@@ -143,9 +143,7 @@ class CircularDependencyValidatorTest extends \PHPUnit\Framework\TestCase
 
         $this->mockListModel->expects($this->any())
             ->method('getEntity')
-            ->willReturnCallback(function ($id) use ($entities) {
-                return $entities[$id];
-            });
+            ->willReturnCallback(fn ($id) => $entities[$id]);
 
         if (!empty($expectedMessage)) {
             $this->context->expects($this->once())

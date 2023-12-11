@@ -67,7 +67,7 @@ class CampaignSubscriberTest extends TestCase
         $ipAddress    = 'someIp';
 
         $dateTime = new \DateTime();
-        $dateTime->setTimestamp(1597752193);
+        $dateTime->setTimestamp(1_597_752_193);
 
         $campaign = new Campaign();
         $campaign->setPublishDown($dateTime);
@@ -105,7 +105,7 @@ class CampaignSubscriberTest extends TestCase
         $campaignName = 'campaignName';
 
         $dateTime = new \DateTime();
-        $dateTime->setTimestamp(1597752193);
+        $dateTime->setTimestamp(1_597_752_193);
 
         $campaign = new Campaign();
         $campaign->setPublishUp($dateTime);

@@ -48,7 +48,7 @@ class MonitorTwitterHashtagsCommand extends MonitorTwitterBaseCommand
         return $this->twitter->makeRequest($searchUrl, $requestQuery);
     }
 
-    public function getNetworkName()
+    public function getNetworkName(): string
     {
         return 'twitter';
     }

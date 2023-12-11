@@ -10,10 +10,7 @@ use Symfony\Component\Security\Core\Security;
 
 class SecurityController extends CommonController
 {
-    /**
-     * @return \Symfony\Component\HttpFoundation\Response
-     */
-    public function loginAction(Request $request)
+    public function loginAction(Request $request): Response
     {
         $session = $request->getSession();
 

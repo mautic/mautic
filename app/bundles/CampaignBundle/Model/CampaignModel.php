@@ -607,10 +607,7 @@ class CampaignModel extends CommonFormModel
         return $this->em->getRepository(\Mautic\CampaignBundle\Entity\Lead::class)->getLeads($campaignId, $eventId);
     }
 
-    /**
-     * @return array
-     */
-    public function getCampaignListIds($id)
+    public function getCampaignListIds($id): array
     {
         return $this->getRepository()->getCampaignListIds((int) $id);
     }
@@ -622,10 +619,8 @@ class CampaignModel extends CommonFormModel
      * @param string $dateFormat
      * @param array  $filter
      * @param bool   $canViewOthers
-     *
-     * @return array
      */
-    public function getLeadsAddedLineChartData($unit, \DateTime $dateFrom, \DateTime $dateTo, $dateFormat = null, $filter = [], $canViewOthers = true)
+    public function getLeadsAddedLineChartData($unit, \DateTime $dateFrom, \DateTime $dateTo, $dateFormat = null, $filter = [], $canViewOthers = true): array
     {
         $chart = new LineChart($unit, $dateFrom, $dateTo, $dateFormat);
         $query = new ChartQuery($this->em->getConnection(), $dateFrom, $dateTo);
@@ -649,10 +644,8 @@ class CampaignModel extends CommonFormModel
      * @param string|null $unit       {@link php.net/manual/en/function.date.php#refsect1-function.date-parameters}
      * @param string      $dateFormat
      * @param array       $filter
-     *
-     * @return array
      */
-    public function getCampaignMetricsLineChartData($unit, \DateTime $dateFrom, \DateTime $dateTo, $dateFormat = null, $filter = [])
+    public function getCampaignMetricsLineChartData($unit, \DateTime $dateFrom, \DateTime $dateTo, $dateFormat = null, $filter = []): array
     {
         $events = [];
         $chart  = new LineChart($unit, $dateFrom, $dateTo, $dateFormat);

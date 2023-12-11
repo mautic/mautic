@@ -34,7 +34,7 @@ class TransportChainTest extends MauticMysqlTestCase
      */
     public function invokeMethod(&$object, $methodName, array $parameters = [])
     {
-        $reflection = new \ReflectionClass(get_class($object));
+        $reflection = new \ReflectionClass($object::class);
         $method     = $reflection->getMethod($methodName);
         $method->setAccessible(true);
 

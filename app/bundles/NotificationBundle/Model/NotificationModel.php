@@ -216,10 +216,8 @@ class NotificationModel extends FormModel implements AjaxLookupModelInterface
      * @param string $dateFormat
      * @param array  $filter
      * @param bool   $canViewOthers
-     *
-     * @return array
      */
-    public function getHitsLineChartData($unit, \DateTime $dateFrom, \DateTime $dateTo, $dateFormat = null, $filter = [], $canViewOthers = true)
+    public function getHitsLineChartData($unit, \DateTime $dateFrom, \DateTime $dateTo, $dateFormat = null, $filter = [], $canViewOthers = true): array
     {
         $flag = null;
 
@@ -271,10 +269,8 @@ class NotificationModel extends FormModel implements AjaxLookupModelInterface
 
     /**
      * Get an array of tracked links.
-     *
-     * @return array
      */
-    public function getNotificationClickStats($notificationId)
+    public function getNotificationClickStats($notificationId): array
     {
         return $this->pageTrackableModel->getTrackableList('notification', $notificationId);
     }

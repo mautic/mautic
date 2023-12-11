@@ -43,10 +43,7 @@ class AjaxController extends CommonAjaxController
         );
     }
 
-    /**
-     * @return \Symfony\Component\HttpFoundation\JsonResponse
-     */
-    public function sendBatchAction(Request $request)
+    public function sendBatchAction(Request $request): JsonResponse
     {
         $dataArray = ['success' => 0];
 
@@ -101,10 +98,7 @@ class AjaxController extends CommonAjaxController
         return $model->getBuilderComponents(null, ['tokens'], (string) $query);
     }
 
-    /**
-     * @return \Symfony\Component\HttpFoundation\JsonResponse
-     */
-    public function generatePlaintTextAction(Request $request)
+    public function generatePlaintTextAction(Request $request): JsonResponse
     {
         $custom = $request->request->get('custom');
 
@@ -121,10 +115,7 @@ class AjaxController extends CommonAjaxController
         return $this->sendJsonResponse($dataArray);
     }
 
-    /**
-     * @return \Symfony\Component\HttpFoundation\JsonResponse
-     */
-    public function getAttachmentsSizeAction(Request $request)
+    public function getAttachmentsSizeAction(Request $request): JsonResponse
     {
         $assets = $request->query->get('assets') ?? [];
         $size   = 0;
@@ -139,10 +130,8 @@ class AjaxController extends CommonAjaxController
 
     /**
      * Tests monitored email connection settings.
-     *
-     * @return JsonResponse
      */
-    public function testMonitoredEmailServerConnectionAction(Request $request)
+    public function testMonitoredEmailServerConnectionAction(Request $request): JsonResponse
     {
         $dataArray = ['success' => 0, 'message' => ''];
 

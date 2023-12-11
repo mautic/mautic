@@ -32,10 +32,7 @@ class SmsRepository extends CommonRepository
         return parent::getEntities($args);
     }
 
-    /**
-     * @return \Doctrine\ORM\Internal\Hydration\IterableResult
-     */
-    public function getPublishedBroadcasts($id = null)
+    public function getPublishedBroadcasts($id = null): \Doctrine\ORM\Internal\Hydration\IterableResult
     {
         $qb   = $this->createQueryBuilder($this->getTableAlias());
         $expr = $this->getPublishedByDateExpression($qb, null, true, true, false);
@@ -141,9 +138,9 @@ class SmsRepository extends CommonRepository
     }
 
     /**
-     * @return array
+     * @return string[]
      */
-    public function getSearchCommands()
+    public function getSearchCommands(): array
     {
         $commands = [
             'mautic.core.searchcommand.ispublished',

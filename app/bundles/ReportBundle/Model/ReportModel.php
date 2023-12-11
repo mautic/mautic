@@ -655,9 +655,9 @@ class ReportModel extends FormModel
     }
 
     /**
-     * @return mixed
+     * @return mixed[]
      */
-    public function getReportsWithGraphs()
+    public function getReportsWithGraphs(): array
     {
         $ownedBy = $this->security->isGranted('report:reports:viewother') ? null : $this->userHelper->getUser()->getId();
 
