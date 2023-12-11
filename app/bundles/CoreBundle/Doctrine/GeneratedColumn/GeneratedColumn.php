@@ -13,20 +13,11 @@ final class GeneratedColumn implements GeneratedColumnInterface
 
     private string $columnName;
 
-    /**
-     * @var string|null
-     */
-    private $originalDateColumn;
+    private ?string $originalDateColumn = null;
 
-    /**
-     * @var string
-     */
-    private $timeUnit;
+    private ?string $timeUnit = null;
 
-    /**
-     * @var array
-     */
-    private $indexColumns = [];
+    private array $indexColumns = [];
 
     public function __construct(
         private string $tableName,

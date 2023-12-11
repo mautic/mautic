@@ -24,7 +24,7 @@ use Symfony\Component\HttpFoundation\RequestStack;
 
 class EventController extends CommonFormController
 {
-    private $supportedEventTypes = [
+    private array $supportedEventTypes = [
         Event::TYPE_DECISION,
         Event::TYPE_ACTION,
         Event::TYPE_CONDITION,

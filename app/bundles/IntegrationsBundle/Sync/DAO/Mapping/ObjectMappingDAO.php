@@ -12,20 +12,14 @@ class ObjectMappingDAO
 
     public const SYNC_BIDIRECTIONALLY = 'bidirectional';
 
-    /**
-     * @var array
-     */
-    private $internalIdMapping = [];
+    private array $internalIdMapping = [];
 
-    /**
-     * @var array
-     */
-    private $integrationIdMapping = [];
+    private array $integrationIdMapping = [];
 
     /**
      * @var FieldMappingDAO[]
      */
-    private $fieldMappings = [];
+    private array $fieldMappings = [];
 
     public function __construct(
         private string $internalObjectName,

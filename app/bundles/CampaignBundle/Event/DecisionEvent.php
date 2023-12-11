@@ -9,10 +9,7 @@ class DecisionEvent extends CampaignExecutionEvent
 {
     use ContextTrait;
 
-    /**
-     * @var bool
-     */
-    private $applicable = false;
+    private bool $applicable = false;
 
     /**
      * DecisionEvent constructor.

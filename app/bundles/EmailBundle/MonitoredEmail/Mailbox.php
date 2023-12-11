@@ -163,7 +163,7 @@ class Mailbox
 
     protected $mailboxes;
 
-    private $folders = [];
+    private array $folders = [];
 
     public function __construct(CoreParametersHelper $parametersHelper, PathsHelper $pathsHelper)
     {

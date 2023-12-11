@@ -13,7 +13,7 @@ use Symfony\Component\Routing\RouterInterface;
 
 class PageSubscriber implements EventSubscriberInterface
 {
-    private $regex = '{focus=(.*?)}';
+    private string $regex = '{focus=(.*?)}';
 
     public function __construct(
         private CorePermissions $security,

@@ -6,7 +6,7 @@ use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 
 class VtigerIntegration extends CrmAbstractIntegration
 {
-    private $authorzationError = '';
+    private string $authorzationError = '';
 
     /**
      * Returns the name of the social integration that must match the name of the file.

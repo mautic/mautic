@@ -8,10 +8,7 @@ class ApiErrorException extends \Exception
 {
     private $contactId;
 
-    /**
-     * @var Lead
-     */
-    private $contact;
+    private ?\Mautic\LeadBundle\Entity\Lead $contact = null;
 
     /**
      * @param string $message

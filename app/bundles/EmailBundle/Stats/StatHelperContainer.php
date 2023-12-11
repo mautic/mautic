@@ -7,7 +7,7 @@ use Mautic\EmailBundle\Stats\Helper\StatHelperInterface;
 
 class StatHelperContainer
 {
-    private $helpers = [];
+    private array $helpers = [];
 
     public function addHelper(StatHelperInterface $helper): void
     {

@@ -19,12 +19,9 @@ class IntegrationsHelper
     /**
      * @var IntegrationInterface[]
      */
-    private $integrations = [];
+    private array $integrations = [];
 
-    /**
-     * @var array
-     */
-    private $decryptedIntegrationConfigurations = [];
+    private array $decryptedIntegrationConfigurations = [];
 
     public function __construct(
         private IntegrationRepository $integrationRepository,

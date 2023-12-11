@@ -13,10 +13,8 @@ class ReportBuilderEvent extends AbstractReportEvent
 {
     /**
      * Container with registered tables and columns.
-     *
-     * @var array
      */
-    private $tableArray = [];
+    private array $tableArray = [];
 
     /**
      * @var string[]
@@ -38,7 +36,7 @@ class ReportBuilderEvent extends AbstractReportEvent
      *
      * @var mixed[]|Paginator|array
      */
-    private $leadFields = [];
+    private array $leadFields = [];
 
     /**
      * @param string                  $context

@@ -10,7 +10,7 @@ class ListChangeEvent extends Event
 {
     private $lead;
 
-    private $leads;
+    private ?array $leads = null;
 
     /**
      * @param bool $added

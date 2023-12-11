@@ -7,15 +7,12 @@ namespace Mautic\LeadBundle\Segment;
  */
 class ContactSegmentFilters implements \Iterator, \Countable
 {
-    /**
-     * @var int
-     */
-    private $position = 0;
+    private int $position = 0;
 
     /**
      * @var array|ContactSegmentFilter[]
      */
-    private $contactSegmentFilters = [];
+    private array $contactSegmentFilters = [];
 
     /**
      * @return $this

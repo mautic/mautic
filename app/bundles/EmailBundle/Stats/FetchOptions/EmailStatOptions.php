@@ -6,10 +6,7 @@ use Mautic\StatsBundle\Event\Options\FetchOptions;
 
 class EmailStatOptions extends FetchOptions
 {
-    /**
-     * @var array
-     */
-    private $ids = [];
+    private array $ids = [];
 
     /**
      * @var int|null
@@ -26,15 +23,9 @@ class EmailStatOptions extends FetchOptions
      */
     private $segmentId;
 
-    /**
-     * @var array
-     */
-    private $filters = [];
+    private array $filters = [];
 
-    /**
-     * @var bool
-     */
-    private $canViewOthers = false;
+    private bool $canViewOthers = false;
 
     /**
      * @var string

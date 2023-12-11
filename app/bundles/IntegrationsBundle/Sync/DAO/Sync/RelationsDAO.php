@@ -11,12 +11,9 @@ class RelationsDAO implements \Iterator, \Countable
     /**
      * @var RelationDAO[]
      */
-    private $relations = [];
+    private array $relations = [];
 
-    /**
-     * @var int
-     */
-    private $position = 0;
+    private int $position = 0;
 
     /**
      * @param RelationDAO[] $relations

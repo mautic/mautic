@@ -16,7 +16,7 @@ final class FieldValidator implements FieldValidatorInterface
     /**
      * @var mixed[]
      */
-    private $fieldSchemaData = [];
+    private array $fieldSchemaData = [];
 
     public function __construct(
         private LeadFieldRepository $leadFieldRepository,

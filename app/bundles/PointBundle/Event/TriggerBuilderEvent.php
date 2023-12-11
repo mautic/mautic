@@ -8,10 +8,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class TriggerBuilderEvent extends Event
 {
-    /**
-     * @var array
-     */
-    private $events = [];
+    private array $events = [];
 
     public function __construct(
         private TranslatorInterface $translator

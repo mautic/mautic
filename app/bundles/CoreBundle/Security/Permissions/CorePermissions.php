@@ -12,35 +12,17 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class CorePermissions
 {
-    /**
-     * @var array
-     */
-    private $permissionClasses = [];
+    private array $permissionClasses = [];
 
-    /**
-     * @var array
-     */
-    private $permissionObjectsByClass = [];
+    private array $permissionObjectsByClass = [];
 
-    /**
-     * @var array
-     */
-    private $permissionObjectsByName = [];
+    private array $permissionObjectsByName = [];
 
-    /**
-     * @var array
-     */
-    private $grantedPermissions = [];
+    private array $grantedPermissions = [];
 
-    /**
-     * @var array
-     */
-    private $checkedPermissions = [];
+    private array $checkedPermissions = [];
 
-    /**
-     * @var bool
-     */
-    private $permissionObjectsGenerated = false;
+    private bool $permissionObjectsGenerated = false;
 
     public function __construct(
         protected UserHelper $userHelper,

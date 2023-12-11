@@ -15,10 +15,7 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class BuilderSubscriber implements EventSubscriberInterface
 {
-    /**
-     * @var string
-     */
-    private $assetToken = '{assetlink=(.*?)}';
+    private string $assetToken = '{assetlink=(.*?)}';
 
     public function __construct(
         private CorePermissions $security,

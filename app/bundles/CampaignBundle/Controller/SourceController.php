@@ -11,7 +11,7 @@ use Symfony\Component\HttpFoundation\Response;
 
 class SourceController extends CommonFormController
 {
-    private $supportedSourceTypes = ['lists', 'forms'];
+    private array $supportedSourceTypes = ['lists', 'forms'];
 
     /**
      * @param int $objectId

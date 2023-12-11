@@ -9,10 +9,7 @@ class ConditionEvent extends CampaignExecutionEvent
 {
     use ContextTrait;
 
-    /**
-     * @var bool
-     */
-    private $passed = false;
+    private bool $passed = false;
 
     public function __construct(
         private AbstractEventAccessor $eventConfig,

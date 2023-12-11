@@ -14,10 +14,7 @@ class FieldDAO
 
     public const FIELD_UNCHANGED = 'unchanged';
 
-    /**
-     * @var \DateTimeInterface|null
-     */
-    private $changeDateTime;
+    private ?\DateTimeInterface $changeDateTime = null;
 
     public function __construct(
         private string $name,

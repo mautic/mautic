@@ -10,7 +10,7 @@ class CategoryChangeEvent extends Event
 {
     private $lead;
 
-    private $leads;
+    private ?array $leads = null;
 
     /**
      * CategoryChangeEvent constructor.

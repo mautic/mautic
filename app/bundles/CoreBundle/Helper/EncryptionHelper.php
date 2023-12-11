@@ -10,7 +10,7 @@ class EncryptionHelper
     /**
      * @var SymmetricCipherInterface[]
      */
-    private $availableCiphers;
+    private ?array $availableCiphers = null;
 
     /**
      * @var string

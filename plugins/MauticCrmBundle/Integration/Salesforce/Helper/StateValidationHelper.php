@@ -4,7 +4,7 @@ namespace MauticPlugin\MauticCrmBundle\Integration\Salesforce\Helper;
 
 class StateValidationHelper
 {
-    private static $supportedCountriesWithStates = [
+    private static array $supportedCountriesWithStates = [
         'United States',
         'Canada',
         'Australia',

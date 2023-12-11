@@ -32,13 +32,13 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class SugarcrmIntegration extends CrmAbstractIntegration
 {
-    private $objects = [
+    private array $objects = [
         'Leads',
         'Contacts',
         'Accounts',
     ];
 
-    private $sugarDncKeys = ['email_opt_out', 'invalid_email'];
+    private array $sugarDncKeys = ['email_opt_out', 'invalid_email'];
 
     private $authorizationError;
 

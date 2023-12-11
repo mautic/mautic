@@ -10,10 +10,7 @@ use Mautic\IntegrationsBundle\Migration\AbstractMigration;
 
 class Version_0_0_1 extends AbstractMigration
 {
-    /**
-     * @var string
-     */
-    private $table = 'sync_object_mapping';
+    private string $table = 'sync_object_mapping';
 
     protected function isApplicable(Schema $schema): bool
     {

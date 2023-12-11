@@ -9,7 +9,7 @@ use MauticPlugin\GrapesJsBuilderBundle\Integration\GrapesJsBuilderIntegration;
 
 class BuilderSupport extends GrapesJsBuilderIntegration implements BuilderInterface
 {
-    private $featuresSupported = ['email', 'page'];
+    private array $featuresSupported = ['email', 'page'];
 
     public function isSupported(string $featureName): bool
     {

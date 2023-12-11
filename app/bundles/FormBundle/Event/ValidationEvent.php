@@ -7,15 +7,9 @@ use Mautic\FormBundle\Entity\Field;
 
 class ValidationEvent extends CommonEvent
 {
-    /**
-     * @var bool
-     */
-    private $valid = true;
+    private bool $valid = true;
 
-    /**
-     * @var string
-     */
-    private $invalidReason = '';
+    private string $invalidReason = '';
 
     /**
      * @param mixed $value

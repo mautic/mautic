@@ -31,12 +31,12 @@ class HttpFactory implements AuthProviderInterface
      *
      * @var Client[]
      */
-    private $initializedClients = [];
+    private array $initializedClients = [];
 
     /**
      * @var HeaderCredentialsInterface|ParameterCredentialsInterface
      */
-    private $credentials;
+    private ?\Mautic\IntegrationsBundle\Auth\Provider\AuthCredentialsInterface $credentials = null;
 
     public function getAuthType(): string
     {

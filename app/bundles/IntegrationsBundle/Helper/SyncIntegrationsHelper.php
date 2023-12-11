@@ -17,7 +17,7 @@ class SyncIntegrationsHelper
     /**
      * @var SyncInterface[]
      */
-    private $integrations = [];
+    private array $integrations = [];
 
     /**
      * @var array<int,string>|null
