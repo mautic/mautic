@@ -16,7 +16,11 @@ class FileManager
 {
     public const GRAPESJS_IMAGES_DIRECTORY = '';
 
-    public function __construct(private FileUploader $fileUploader, private CoreParametersHelper $coreParametersHelper, private PathsHelper $pathsHelper)
+    public function __construct(
+        private FileUploader $fileUploader,
+        private CoreParametersHelper $coreParametersHelper,
+        private PathsHelper $pathsHelper
+    )
     {
     }
 

@@ -11,7 +11,11 @@ use Psr\Log\LoggerInterface;
 
 class CustomFieldIndex
 {
-    public function __construct(private IndexSchemaHelper $indexSchemaHelper, private LoggerInterface $logger, private FieldsWithUniqueIdentifier $fieldsWithUniqueIdentifier)
+    public function __construct(
+        private IndexSchemaHelper $indexSchemaHelper,
+        private LoggerInterface $logger,
+        private FieldsWithUniqueIdentifier $fieldsWithUniqueIdentifier
+    )
     {
     }
 

@@ -19,7 +19,9 @@ class FieldFilterHelper
      */
     private $filteredFields = [];
 
-    public function __construct(private ConfigFormSyncInterface $integrationObject)
+    public function __construct(
+        private ConfigFormSyncInterface $integrationObject
+    )
     {
     }
 

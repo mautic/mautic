@@ -38,7 +38,10 @@ class DashboardSubscriber extends MainDashboardSubscriber
         'report:reports:viewother',
     ];
 
-    public function __construct(protected ReportModel $reportModel, protected CorePermissions $security)
+    public function __construct(
+        protected ReportModel $reportModel,
+        protected CorePermissions $security
+    )
     {
     }
 

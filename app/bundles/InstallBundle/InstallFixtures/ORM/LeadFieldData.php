@@ -12,7 +12,9 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class LeadFieldData extends AbstractFixture implements OrderedFixtureInterface, FixtureGroupInterface
 {
-    public function __construct(private TranslatorInterface $translator)
+    public function __construct(
+        private TranslatorInterface $translator
+    )
     {
     }
 

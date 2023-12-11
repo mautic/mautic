@@ -17,7 +17,9 @@ class DoctrineEventsSubscriber implements EventSubscriber
     /**
      * @param string $tablePrefix
      */
-    public function __construct(private $tablePrefix)
+    public function __construct(
+        private $tablePrefix
+    )
     {
     }
 

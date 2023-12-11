@@ -23,7 +23,9 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class SmsType extends AbstractType
 {
-    public function __construct(private EntityManager $em)
+    public function __construct(
+        private EntityManager $em
+    )
     {
     }
 

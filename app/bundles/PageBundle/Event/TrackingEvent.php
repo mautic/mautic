@@ -13,7 +13,11 @@ class TrackingEvent extends Event
 {
     private \Symfony\Component\HttpFoundation\ParameterBag $response;
 
-    public function __construct(private Lead $contact, private Request $request, array $mtcSessionResponses)
+    public function __construct(
+        private Lead $contact,
+        private Request $request,
+        array $mtcSessionResponses
+    )
     {
         $this->response = new ParameterBag($mtcSessionResponses);
     }

@@ -33,7 +33,13 @@ class CampaignSubscriber implements EventSubscriberInterface
      */
     private array $messageChannels = [];
 
-    public function __construct(private MessageModel $messageModel, private ActionDispatcher $actionDispatcher, private EventCollector $eventCollector, private LoggerInterface $logger, private TranslatorInterface $translator)
+    public function __construct(
+        private MessageModel $messageModel,
+        private ActionDispatcher $actionDispatcher,
+        private EventCollector $eventCollector,
+        private LoggerInterface $logger,
+        private TranslatorInterface $translator
+    )
     {
     }
 

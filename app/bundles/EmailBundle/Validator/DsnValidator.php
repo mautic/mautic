@@ -16,7 +16,9 @@ use Symfony\Component\Validator\Exception\UnexpectedTypeException;
 
 class DsnValidator extends ConstraintValidator
 {
-    public function __construct(private TransportFactory $transportFactory)
+    public function __construct(
+        private TransportFactory $transportFactory
+    )
     {
     }
 

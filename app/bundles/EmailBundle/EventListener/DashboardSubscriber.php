@@ -54,7 +54,10 @@ class DashboardSubscriber extends MainDashboardSubscriber
         'email:emails:viewother',
     ];
 
-    public function __construct(protected EmailModel $emailModel, private RouterInterface $router)
+    public function __construct(
+        protected EmailModel $emailModel,
+        private RouterInterface $router
+    )
     {
     }
 

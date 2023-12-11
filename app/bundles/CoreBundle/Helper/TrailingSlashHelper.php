@@ -6,7 +6,9 @@ use Symfony\Component\HttpFoundation\Request;
 
 class TrailingSlashHelper
 {
-    public function __construct(private CoreParametersHelper $coreParametersHelper)
+    public function __construct(
+        private CoreParametersHelper $coreParametersHelper
+    )
     {
     }
 

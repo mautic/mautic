@@ -11,7 +11,10 @@ class CompanyDeduper
 {
     use DeduperTrait;
 
-    public function __construct(FieldModel $fieldModel, private CompanyRepository $companyRepository)
+    public function __construct(
+        FieldModel $fieldModel,
+        private CompanyRepository $companyRepository
+    )
     {
         $this->fieldModel        = $fieldModel;
         $this->object            = 'company';

@@ -23,7 +23,10 @@ final class CacheProvider implements CacheProviderInterface
      */
     private $psr16;
 
-    public function __construct(private CoreParametersHelper $coreParametersHelper, private ContainerInterface $container)
+    public function __construct(
+        private CoreParametersHelper $coreParametersHelper,
+        private ContainerInterface $container
+    )
     {
     }
 

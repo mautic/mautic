@@ -18,7 +18,9 @@ class DwcEntryFiltersType extends AbstractType
 {
     use FilterTrait;
 
-    public function __construct(private TranslatorInterface $translator)
+    public function __construct(
+        private TranslatorInterface $translator
+    )
     {
     }
 

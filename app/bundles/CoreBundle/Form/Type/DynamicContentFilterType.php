@@ -12,7 +12,9 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class DynamicContentFilterType extends AbstractType
 {
-    public function __construct(private BuilderIntegrationsHelper $builderIntegrationsHelper)
+    public function __construct(
+        private BuilderIntegrationsHelper $builderIntegrationsHelper
+    )
     {
     }
 

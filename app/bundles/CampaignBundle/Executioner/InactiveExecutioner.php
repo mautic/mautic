@@ -53,7 +53,14 @@ class InactiveExecutioner implements ExecutionerInterface
 
     protected ?\DateTime $now = null;
 
-    public function __construct(private InactiveContactFinder $inactiveContactFinder, private LoggerInterface $logger, private TranslatorInterface $translator, private EventScheduler $scheduler, private InactiveHelper $helper, private EventExecutioner $executioner)
+    public function __construct(
+        private InactiveContactFinder $inactiveContactFinder,
+        private LoggerInterface $logger,
+        private TranslatorInterface $translator,
+        private EventScheduler $scheduler,
+        private InactiveHelper $helper,
+        private EventExecutioner $executioner
+    )
     {
     }
 

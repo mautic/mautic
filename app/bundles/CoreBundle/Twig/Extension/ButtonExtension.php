@@ -13,7 +13,12 @@ use Twig\TwigFunction;
 
 class ButtonExtension extends AbstractExtension
 {
-    public function __construct(protected ButtonHelper $buttonHelper, protected RequestStack $requestStack, protected UrlGeneratorInterface $router, protected TranslatorInterface $translator)
+    public function __construct(
+        protected ButtonHelper $buttonHelper,
+        protected RequestStack $requestStack,
+        protected UrlGeneratorInterface $router,
+        protected TranslatorInterface $translator
+    )
     {
     }
 

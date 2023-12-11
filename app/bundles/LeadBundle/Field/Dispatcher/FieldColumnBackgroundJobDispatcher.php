@@ -13,7 +13,9 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class FieldColumnBackgroundJobDispatcher
 {
-    public function __construct(private EventDispatcherInterface $dispatcher)
+    public function __construct(
+        private EventDispatcherInterface $dispatcher
+    )
     {
     }
 

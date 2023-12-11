@@ -18,7 +18,10 @@ class FilterType extends AbstractType
 {
     use FilterTrait;
 
-    public function __construct(private FormAdjustmentsProviderInterface $formAdjustmentsProvider, private ListModel $listModel)
+    public function __construct(
+        private FormAdjustmentsProviderInterface $formAdjustmentsProvider,
+        private ListModel $listModel
+    )
     {
     }
 

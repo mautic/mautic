@@ -12,7 +12,9 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class PointSubscriber implements EventSubscriberInterface
 {
-    public function __construct(private PointModel $pointModel)
+    public function __construct(
+        private PointModel $pointModel
+    )
     {
     }
 

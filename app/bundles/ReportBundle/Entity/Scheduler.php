@@ -32,7 +32,10 @@ class Scheduler
             ->build();
     }
 
-    public function __construct(private Report $report, private \DateTimeInterface $scheduleDate)
+    public function __construct(
+        private Report $report,
+        private \DateTimeInterface $scheduleDate
+    )
     {
     }
 

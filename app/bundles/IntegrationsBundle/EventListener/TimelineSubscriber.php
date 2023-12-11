@@ -12,7 +12,10 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class TimelineSubscriber implements EventSubscriberInterface
 {
-    public function __construct(private LeadEventLogRepository $eventLogRepository, private TranslatorInterface $translator)
+    public function __construct(
+        private LeadEventLogRepository $eventLogRepository,
+        private TranslatorInterface $translator
+    )
     {
     }
 

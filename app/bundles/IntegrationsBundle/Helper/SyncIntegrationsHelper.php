@@ -24,7 +24,10 @@ class SyncIntegrationsHelper
      */
     private $enabled;
 
-    public function __construct(private IntegrationsHelper $integrationsHelper, private ObjectProvider $objectProvider)
+    public function __construct(
+        private IntegrationsHelper $integrationsHelper,
+        private ObjectProvider $objectProvider
+    )
     {
     }
 

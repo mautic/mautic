@@ -57,7 +57,18 @@ class TrackableModel extends AbstractCommonModel
      */
     private $contactFieldUrlTokens;
 
-    public function __construct(protected RedirectModel $redirectModel, private LeadFieldRepository $leadFieldRepository, EntityManagerInterface $em, CorePermissions $security, EventDispatcherInterface $dispatcher, UrlGeneratorInterface $router, Translator $translator, UserHelper $userHelper, LoggerInterface $mauticLogger, CoreParametersHelper $coreParametersHelper)
+    public function __construct(
+        protected RedirectModel $redirectModel,
+        private LeadFieldRepository $leadFieldRepository,
+        EntityManagerInterface $em,
+        CorePermissions $security,
+        EventDispatcherInterface $dispatcher,
+        UrlGeneratorInterface $router,
+        Translator $translator,
+        UserHelper $userHelper,
+        LoggerInterface $mauticLogger,
+        CoreParametersHelper $coreParametersHelper
+    )
     {
         parent::__construct($em, $security, $dispatcher, $router, $translator, $userHelper, $mauticLogger, $coreParametersHelper);
     }

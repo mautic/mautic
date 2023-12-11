@@ -17,7 +17,12 @@ class LeadManipulator
      * @param ?int    $objectId
      * @param ?string $objectDescription
      */
-    public function __construct(private $bundleName = null, private $objectName = null, private $objectId = null, private $objectDescription = null)
+    public function __construct(
+        private $bundleName = null,
+        private $objectName = null,
+        private $objectId = null,
+        private $objectDescription = null
+    )
     {
     }
 

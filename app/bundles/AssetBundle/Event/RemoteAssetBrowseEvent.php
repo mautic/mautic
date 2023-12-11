@@ -10,7 +10,9 @@ class RemoteAssetBrowseEvent extends CommonEvent
 {
     private ?Adapter $adapter = null;
 
-    public function __construct(private UnifiedIntegrationInterface $integration)
+    public function __construct(
+        private UnifiedIntegrationInterface $integration
+    )
     {
     }
 

@@ -9,7 +9,10 @@ class RepliedEmail
      *
      * @param string $fromAddress
      */
-    public function __construct(private $fromAddress, private $statHash = null)
+    public function __construct(
+        private $fromAddress,
+        private $statHash = null
+    )
     {
     }
 

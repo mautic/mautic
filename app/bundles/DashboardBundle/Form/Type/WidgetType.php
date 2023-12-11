@@ -24,7 +24,10 @@ class WidgetType extends AbstractType
      */
     protected $dispatcher;
 
-    public function __construct(EventDispatcherInterface $dispatcher, protected CorePermissions $security)
+    public function __construct(
+        EventDispatcherInterface $dispatcher,
+        protected CorePermissions $security
+    )
     {
         $this->dispatcher = $dispatcher;
     }

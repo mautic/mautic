@@ -66,7 +66,12 @@ class SendEmailToContact
      */
     private $contact = [];
 
-    public function __construct(private MailHelper $mailer, private StatHelper $statHelper, private DoNotContact $dncModel, private TranslatorInterface $translator)
+    public function __construct(
+        private MailHelper $mailer,
+        private StatHelper $statHelper,
+        private DoNotContact $dncModel,
+        private TranslatorInterface $translator
+    )
     {
     }
 

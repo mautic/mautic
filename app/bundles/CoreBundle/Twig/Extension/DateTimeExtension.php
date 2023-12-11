@@ -8,7 +8,9 @@ use Twig\TwigFunction;
 
 class DateTimeExtension extends AbstractExtension
 {
-    public function __construct(private DateTimeHelper $helper)
+    public function __construct(
+        private DateTimeHelper $helper
+    )
     {
     }
 

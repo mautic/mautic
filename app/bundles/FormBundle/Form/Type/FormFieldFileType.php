@@ -20,7 +20,10 @@ class FormFieldFileType extends AbstractType
     public const PROPERTY_ALLOWED_FILE_SIZE       = 'allowed_file_size';
     public const PROPERTY_PREFERED_PROFILE_IMAGE  = 'profile_image';
 
-    public function __construct(private CoreParametersHelper $coreParametersHelper, private TranslatorInterface $translator)
+    public function __construct(
+        private CoreParametersHelper $coreParametersHelper,
+        private TranslatorInterface $translator
+    )
     {
     }
 

@@ -27,7 +27,12 @@ class EntityLookupType extends AbstractType
     /**
      * @param ModelFactory<object> $modelFactory
      */
-    public function __construct(private ModelFactory $modelFactory, private TranslatorInterface $translator, private Connection $connection, private RouterInterface $router)
+    public function __construct(
+        private ModelFactory $modelFactory,
+        private TranslatorInterface $translator,
+        private Connection $connection,
+        private RouterInterface $router
+    )
     {
     }
 

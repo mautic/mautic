@@ -9,7 +9,9 @@ class EmailToUserAccessor
 {
     private \Mautic\CoreBundle\Form\DataTransformer\ArrayStringTransformer $transformer;
 
-    public function __construct(private array $config)
+    public function __construct(
+        private array $config
+    )
     {
         $this->transformer = new ArrayStringTransformer();
     }

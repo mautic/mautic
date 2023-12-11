@@ -21,7 +21,13 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class ActionDispatcher
 {
-    public function __construct(private EventDispatcherInterface $dispatcher, private LoggerInterface $logger, private EventScheduler $scheduler, private NotificationHelper $notificationHelper, private LegacyEventDispatcher $legacyDispatcher)
+    public function __construct(
+        private EventDispatcherInterface $dispatcher,
+        private LoggerInterface $logger,
+        private EventScheduler $scheduler,
+        private NotificationHelper $notificationHelper,
+        private LegacyEventDispatcher $legacyDispatcher
+    )
     {
     }
 

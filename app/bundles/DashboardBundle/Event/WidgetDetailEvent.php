@@ -27,7 +27,9 @@ class WidgetDetailEvent extends CommonEvent
      */
     protected $security;
 
-    public function __construct(protected TranslatorInterface $translator)
+    public function __construct(
+        protected TranslatorInterface $translator
+    )
     {
         $this->startTime  = microtime(true);
     }

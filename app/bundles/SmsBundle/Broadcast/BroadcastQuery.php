@@ -18,7 +18,10 @@ class BroadcastQuery
      */
     private $query;
 
-    public function __construct(private EntityManager $entityManager, private SmsModel $smsModel)
+    public function __construct(
+        private EntityManager $entityManager,
+        private SmsModel $smsModel
+    )
     {
     }
 

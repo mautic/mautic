@@ -11,7 +11,12 @@ class ErrorHandlerException extends \Exception
      * @param bool   $showMessage
      * @param int    $code
      */
-    public function __construct($message = '', protected $showMessage = false, $code = 0, \Exception $previous = null)
+    public function __construct(
+        $message = '',
+        protected $showMessage = false,
+        $code = 0,
+        \Exception $previous = null
+    )
     {
         parent::__construct($message, $code, $previous);
     }

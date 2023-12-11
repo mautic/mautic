@@ -20,7 +20,14 @@ class RouterSubscriber implements EventSubscriberInterface
      * @param string|null $httpPort
      * @param string|null $baseUrl
      */
-    public function __construct(private RouterInterface $router, private $scheme, private $host, $httpsPort, $httpPort, private $baseUrl)
+    public function __construct(
+        private RouterInterface $router,
+        private $scheme,
+        private $host,
+        $httpsPort,
+        $httpPort,
+        private $baseUrl
+    )
     {
         $this->httpsPort = $httpsPort ?? 443;
         $this->httpPort  = $httpPort ?? 80;

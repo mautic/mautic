@@ -13,7 +13,9 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class ContactExportSchedulerLoggerSubscriber implements EventSubscriberInterface
 {
-    public function __construct(private LoggerInterface $logger)
+    public function __construct(
+        private LoggerInterface $logger
+    )
     {
     }
 

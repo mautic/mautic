@@ -8,7 +8,10 @@ class UnsubscribedEmail
      * @param string $contactEmail
      * @param string $unsubscriptionAddress
      */
-    public function __construct(private $contactEmail, private $unsubscriptionAddress)
+    public function __construct(
+        private $contactEmail,
+        private $unsubscriptionAddress
+    )
     {
     }
 

@@ -17,6 +17,7 @@ return function (ECSConfig $ecsConfig): void {
     // this way you add a single rule
     $ecsConfig->rules([
         NoUnusedImportsFixer::class,
+        \Symplify\CodingStandard\Fixer\Spacing\StandaloneLinePromotedPropertyFixer::class,
     ]);
 
     // this way you can add sets - group of rules
@@ -25,8 +26,8 @@ return function (ECSConfig $ecsConfig): void {
         // SetList::SPACES,
         // SetList::ARRAY,
         SetList::DOCBLOCK,
-        // SetList::NAMESPACES,
-        // SetList::COMMENTS,
+        SetList::NAMESPACES,
+        SetList::COMMENTS,
         // SetList::PSR_12,
     ]);
 };

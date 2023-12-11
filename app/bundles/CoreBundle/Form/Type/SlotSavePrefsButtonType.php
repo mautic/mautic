@@ -9,7 +9,9 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class SlotSavePrefsButtonType extends SlotType
 {
-    public function __construct(private TranslatorInterface $translator)
+    public function __construct(
+        private TranslatorInterface $translator
+    )
     {
     }
 

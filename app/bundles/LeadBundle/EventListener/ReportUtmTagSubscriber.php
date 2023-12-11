@@ -13,7 +13,10 @@ class ReportUtmTagSubscriber implements EventSubscriberInterface
 {
     public const UTM_TAG = 'lead.utmTag';
 
-    public function __construct(private FieldsBuilder $fieldsBuilder, private CompanyReportData $companyReportData)
+    public function __construct(
+        private FieldsBuilder $fieldsBuilder,
+        private CompanyReportData $companyReportData
+    )
     {
     }
 

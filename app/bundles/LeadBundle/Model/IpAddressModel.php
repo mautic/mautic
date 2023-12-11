@@ -14,7 +14,10 @@ class IpAddressModel
 {
     private const DELETE_SIZE = 10000;
 
-    public function __construct(protected EntityManager $entityManager, protected LoggerInterface $logger)
+    public function __construct(
+        protected EntityManager $entityManager,
+        protected LoggerInterface $logger
+    )
     {
     }
 

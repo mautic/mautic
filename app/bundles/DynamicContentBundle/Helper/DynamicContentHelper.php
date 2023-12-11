@@ -18,7 +18,12 @@ class DynamicContentHelper
 {
     use MatchFilterForLeadTrait;
 
-    public function __construct(protected DynamicContentModel $dynamicContentModel, protected RealTimeExecutioner $realTimeExecutioner, protected EventDispatcherInterface $dispatcher, protected LeadModel $leadModel)
+    public function __construct(
+        protected DynamicContentModel $dynamicContentModel,
+        protected RealTimeExecutioner $realTimeExecutioner,
+        protected EventDispatcherInterface $dispatcher,
+        protected LeadModel $leadModel
+    )
     {
     }
 

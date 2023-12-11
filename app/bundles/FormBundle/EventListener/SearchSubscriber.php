@@ -12,7 +12,12 @@ use Twig\Environment;
 
 class SearchSubscriber implements EventSubscriberInterface
 {
-    public function __construct(private UserHelper $userHelper, private FormModel $formModel, private CorePermissions $security, private Environment $twig)
+    public function __construct(
+        private UserHelper $userHelper,
+        private FormModel $formModel,
+        private CorePermissions $security,
+        private Environment $twig
+    )
     {
     }
 

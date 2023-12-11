@@ -13,7 +13,10 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class ExportSchedulerCommand extends Command
 {
-    public function __construct(private ReportExporter $reportExporter, private TranslatorInterface $translator)
+    public function __construct(
+        private ReportExporter $reportExporter,
+        private TranslatorInterface $translator
+    )
     {
         parent::__construct();
     }

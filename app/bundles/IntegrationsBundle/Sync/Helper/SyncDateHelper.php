@@ -29,7 +29,9 @@ class SyncDateHelper
      */
     private $lastObjectSyncDates = [];
 
-    public function __construct(private Connection $connection)
+    public function __construct(
+        private Connection $connection
+    )
     {
     }
 

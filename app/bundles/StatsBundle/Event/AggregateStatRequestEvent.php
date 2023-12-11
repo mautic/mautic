@@ -15,7 +15,12 @@ class AggregateStatRequestEvent extends Event
      *
      * @param string $statName
      */
-    public function __construct(private $statName, private \DateTimeInterface $fromDateTime, private \DateTimeInterface $toDateTime, private FetchOptions $options)
+    public function __construct(
+        private $statName,
+        private \DateTimeInterface $fromDateTime,
+        private \DateTimeInterface $toDateTime,
+        private FetchOptions $options
+    )
     {
         $this->statCollection = new StatCollection();
     }

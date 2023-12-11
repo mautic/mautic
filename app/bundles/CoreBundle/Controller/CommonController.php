@@ -40,7 +40,18 @@ class CommonController extends AbstractController implements MauticController
     /**
      * @param ModelFactory<object> $modelFactory
      */
-    public function __construct(protected ManagerRegistry $doctrine, protected MauticFactory $factory, protected ModelFactory $modelFactory, UserHelper $userHelper, protected CoreParametersHelper $coreParametersHelper, protected EventDispatcherInterface $dispatcher, protected Translator $translator, private FlashBag $flashBag, private ?RequestStack $requestStack, protected ?CorePermissions $security)
+    public function __construct(
+        protected ManagerRegistry $doctrine,
+        protected MauticFactory $factory,
+        protected ModelFactory $modelFactory,
+        UserHelper $userHelper,
+        protected CoreParametersHelper $coreParametersHelper,
+        protected EventDispatcherInterface $dispatcher,
+        protected Translator $translator,
+        private FlashBag $flashBag,
+        private ?RequestStack $requestStack,
+        protected ?CorePermissions $security
+    )
     {
         $this->user                 = $userHelper->getUser();
     }

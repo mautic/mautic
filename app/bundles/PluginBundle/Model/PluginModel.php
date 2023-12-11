@@ -21,7 +21,18 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
  */
 class PluginModel extends FormModel
 {
-    public function __construct(protected FieldModel $leadFieldModel, CoreParametersHelper $coreParametersHelper, private BundleHelper $bundleHelper, EntityManager $em, CorePermissions $security, EventDispatcherInterface $dispatcher, UrlGeneratorInterface $router, Translator $translator, UserHelper $userHelper, LoggerInterface $mauticLogger)
+    public function __construct(
+        protected FieldModel $leadFieldModel,
+        CoreParametersHelper $coreParametersHelper,
+        private BundleHelper $bundleHelper,
+        EntityManager $em,
+        CorePermissions $security,
+        EventDispatcherInterface $dispatcher,
+        UrlGeneratorInterface $router,
+        Translator $translator,
+        UserHelper $userHelper,
+        LoggerInterface $mauticLogger
+    )
     {
         parent::__construct($em, $security, $dispatcher, $router, $translator, $userHelper, $mauticLogger, $coreParametersHelper);
     }

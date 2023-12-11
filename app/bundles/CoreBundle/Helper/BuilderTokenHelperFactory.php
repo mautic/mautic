@@ -11,7 +11,12 @@ class BuilderTokenHelperFactory
     /**
      * @param ModelFactory<object> $modelFactory
      */
-    public function __construct(private CorePermissions $security, private ModelFactory $modelFactory, private Connection $connection, private UserHelper $userHelper)
+    public function __construct(
+        private CorePermissions $security,
+        private ModelFactory $modelFactory,
+        private Connection $connection,
+        private UserHelper $userHelper
+    )
     {
     }
 

@@ -15,7 +15,11 @@ class RequestDAO
      */
     private $objects = [];
 
-    public function __construct(private string $syncToIntegration, int $syncIteration, private InputOptionsDAO $inputOptionsDAO)
+    public function __construct(
+        private string $syncToIntegration,
+        int $syncIteration,
+        private InputOptionsDAO $inputOptionsDAO
+    )
     {
         $this->syncIteration     = (int) $syncIteration;
     }

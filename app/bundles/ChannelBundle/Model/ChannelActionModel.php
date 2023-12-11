@@ -10,7 +10,11 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class ChannelActionModel
 {
-    public function __construct(private LeadModel $contactModel, private DoNotContact $doNotContact, private TranslatorInterface $translator)
+    public function __construct(
+        private LeadModel $contactModel,
+        private DoNotContact $doNotContact,
+        private TranslatorInterface $translator
+    )
     {
     }
 

@@ -13,7 +13,10 @@ class SendingNotificationEvent extends CommonEvent
      */
     protected $entity;
 
-    public function __construct(Notification $notification, protected Lead $lead)
+    public function __construct(
+        Notification $notification,
+        protected Lead $lead
+    )
     {
         $this->entity = $notification;
     }

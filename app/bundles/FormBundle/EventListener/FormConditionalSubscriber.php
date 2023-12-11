@@ -12,7 +12,10 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 final class FormConditionalSubscriber implements EventSubscriberInterface
 {
-    public function __construct(private FormModel $formModel, private FieldModel $fieldModel)
+    public function __construct(
+        private FormModel $formModel,
+        private FieldModel $fieldModel
+    )
     {
     }
 

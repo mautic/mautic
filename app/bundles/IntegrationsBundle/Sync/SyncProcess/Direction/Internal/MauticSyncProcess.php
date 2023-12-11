@@ -31,7 +31,10 @@ class MauticSyncProcess
 
     private ?MauticSyncDataExchange $syncDataExchange = null;
 
-    public function __construct(private SyncDateHelper $syncDateHelper, private ObjectChangeGenerator $objectChangeGenerator)
+    public function __construct(
+        private SyncDateHelper $syncDateHelper,
+        private ObjectChangeGenerator $objectChangeGenerator
+    )
     {
     }
 

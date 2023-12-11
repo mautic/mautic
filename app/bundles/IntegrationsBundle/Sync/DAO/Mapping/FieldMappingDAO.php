@@ -16,7 +16,14 @@ class FieldMappingDAO
      * @param string $syncDirection
      * @param bool   $isRequired
      */
-    public function __construct(private $internalObject, private $internalField, private $integrationObject, private $integrationField, private $syncDirection, $isRequired)
+    public function __construct(
+        private $internalObject,
+        private $internalField,
+        private $integrationObject,
+        private $integrationField,
+        private $syncDirection,
+        $isRequired
+    )
     {
         $this->isRequired        = (bool) $isRequired;
     }

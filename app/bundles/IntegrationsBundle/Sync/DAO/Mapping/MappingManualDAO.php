@@ -24,7 +24,9 @@ class MappingManualDAO
      */
     private $integrationObjectsMapping = [];
 
-    public function __construct(private string $integration)
+    public function __construct(
+        private string $integration
+    )
     {
     }
 

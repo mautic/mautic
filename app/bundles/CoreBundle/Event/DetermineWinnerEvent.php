@@ -23,7 +23,9 @@ class DetermineWinnerEvent extends Event
      *   email?: \Mautic\EmailBundle\Entity\Email
      * } $parameters
      */
-    public function __construct(private array $parameters)
+    public function __construct(
+        private array $parameters
+    )
     {
     }
 

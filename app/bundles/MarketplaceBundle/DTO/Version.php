@@ -6,7 +6,19 @@ namespace Mautic\MarketplaceBundle\DTO;
 
 final class Version
 {
-    public function __construct(public string $version, public array $license, public \DateTimeInterface $time, public string $homepage, public string $issues, public string $wiki, public array $require, public array $keywords, public ?string $type, public ?string $directoryName, public ?string $displayName)
+    public function __construct(
+        public string $version,
+        public array $license,
+        public \DateTimeInterface $time,
+        public string $homepage,
+        public string $issues,
+        public string $wiki,
+        public array $require,
+        public array $keywords,
+        public ?string $type,
+        public ?string $directoryName,
+        public ?string $displayName
+    )
     {
     }
 

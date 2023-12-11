@@ -8,7 +8,12 @@ use Symfony\Component\HttpFoundation\Session\SessionInterface;
 
 final class PageHelper implements PageHelperInterface
 {
-    public function __construct(private SessionInterface $session, private CoreParametersHelper $coreParametersHelper, private string $sessionPrefix, private int $page)
+    public function __construct(
+        private SessionInterface $session,
+        private CoreParametersHelper $coreParametersHelper,
+        private string $sessionPrefix,
+        private int $page
+    )
     {
     }
 

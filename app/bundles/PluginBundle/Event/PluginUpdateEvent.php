@@ -9,7 +9,10 @@ use Symfony\Contracts\EventDispatcher\Event;
 
 class PluginUpdateEvent extends Event
 {
-    public function __construct(private Plugin $plugin, private string $oldVersion)
+    public function __construct(
+        private Plugin $plugin,
+        private string $oldVersion
+    )
     {
     }
 

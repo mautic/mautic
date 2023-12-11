@@ -19,7 +19,11 @@ class CampaignHelper
      */
     private array $contactsValues = [];
 
-    public function __construct(protected Client $client, protected CompanyModel $companyModel, private EventDispatcherInterface $dispatcher)
+    public function __construct(
+        protected Client $client,
+        protected CompanyModel $companyModel,
+        private EventDispatcherInterface $dispatcher
+    )
     {
     }
 

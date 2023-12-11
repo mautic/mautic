@@ -12,7 +12,11 @@ final class ImportProcessEvent extends CommonEvent
 {
     private ?bool $wasMerged = null;
 
-    public function __construct(public Import $import, public LeadEventLog $eventLog, public array $rowData)
+    public function __construct(
+        public Import $import,
+        public LeadEventLog $eventLog,
+        public array $rowData
+    )
     {
     }
 

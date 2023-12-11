@@ -20,7 +20,10 @@ class SubmitActionEmailType extends AbstractType
     use FormFieldTrait;
     use ToBcBccFieldsTrait;
 
-    public function __construct(private TranslatorInterface $translator, protected CoreParametersHelper $coreParametersHelper)
+    public function __construct(
+        private TranslatorInterface $translator,
+        protected CoreParametersHelper $coreParametersHelper
+    )
     {
     }
 

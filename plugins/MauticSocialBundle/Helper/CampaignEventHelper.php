@@ -18,7 +18,13 @@ class CampaignEventHelper
      */
     protected $clickthrough = [];
 
-    public function __construct(protected IntegrationHelper $integrationHelper, protected TrackableModel $trackableModel, protected PageTokenHelper $pageTokenHelper, protected AssetTokenHelper $assetTokenHelper, protected TweetModel $tweetModel)
+    public function __construct(
+        protected IntegrationHelper $integrationHelper,
+        protected TrackableModel $trackableModel,
+        protected PageTokenHelper $pageTokenHelper,
+        protected AssetTokenHelper $assetTokenHelper,
+        protected TweetModel $tweetModel
+    )
     {
     }
 

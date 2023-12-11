@@ -733,7 +733,9 @@ class LeadModelTest extends \PHPUnit\Framework\TestCase
     private function getLead(int $id): Lead
     {
         return new class($id) extends Lead {
-            public function __construct(private int $id)
+            public function __construct(
+                private int $id
+            )
             {
                 parent::__construct();
             }

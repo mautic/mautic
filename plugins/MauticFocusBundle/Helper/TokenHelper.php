@@ -11,7 +11,11 @@ class TokenHelper
 {
     private $regex = '{focus=(.*?)}';
 
-    public function __construct(protected FocusModel $model, protected RouterInterface $router, protected CorePermissions $security)
+    public function __construct(
+        protected FocusModel $model,
+        protected RouterInterface $router,
+        protected CorePermissions $security
+    )
     {
     }
 

@@ -17,7 +17,9 @@ class SyncCommand extends Command
 {
     public const NAME = 'mautic:integrations:sync';
 
-    public function __construct(private SyncServiceInterface $syncService)
+    public function __construct(
+        private SyncServiceInterface $syncService
+    )
     {
         parent::__construct();
     }

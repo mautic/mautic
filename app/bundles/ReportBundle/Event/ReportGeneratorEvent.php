@@ -38,10 +38,14 @@ class ReportGeneratorEvent extends AbstractReportEvent
      */
     private $sortedFilters;
 
-    public function __construct(Report $report, private array $options, /**
+    public function __construct(
+        Report $report,
+        private array $options, /**
      * QueryBuilder object.
      */
-    private QueryBuilder $queryBuilder, private ChannelListHelper $channelListHelper)
+    private QueryBuilder $queryBuilder,
+        private ChannelListHelper $channelListHelper
+    )
     {
         $this->report            = $report;
         $this->context           = $report->getSource();

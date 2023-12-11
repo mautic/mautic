@@ -16,7 +16,12 @@ class PageSubscriber implements EventSubscriberInterface
 {
     private $formRegex = '{form=(.*?)}';
 
-    public function __construct(private FormModel $formModel, private BuilderTokenHelperFactory $builderTokenHelperFactory, private TranslatorInterface $translator, private CorePermissions $security)
+    public function __construct(
+        private FormModel $formModel,
+        private BuilderTokenHelperFactory $builderTokenHelperFactory,
+        private TranslatorInterface $translator,
+        private CorePermissions $security
+    )
     {
     }
 

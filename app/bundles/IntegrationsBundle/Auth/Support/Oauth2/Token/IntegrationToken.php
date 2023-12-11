@@ -15,7 +15,12 @@ class IntegrationToken implements TokenInterface
     /**
      * @param mixed[] $extraData
      */
-    public function __construct(?string $accessToken, ?string $refreshToken, $expiresAt = null, private array $extraData = [])
+    public function __construct(
+        ?string $accessToken,
+        ?string $refreshToken,
+        $expiresAt = null,
+        private array $extraData = []
+    )
     {
         $this->accessToken  = (string) $accessToken;
         $this->refreshToken = (string) $refreshToken;

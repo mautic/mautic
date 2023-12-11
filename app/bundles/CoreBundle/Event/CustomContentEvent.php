@@ -20,7 +20,11 @@ class CustomContentEvent extends Event
      * @param string      $viewName
      * @param string|null $context
      */
-    public function __construct(protected $viewName, protected $context = null, protected array $vars = [])
+    public function __construct(
+        protected $viewName,
+        protected $context = null,
+        protected array $vars = []
+    )
     {
     }
 

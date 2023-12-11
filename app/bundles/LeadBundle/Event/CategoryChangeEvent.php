@@ -16,7 +16,11 @@ class CategoryChangeEvent extends Event
      *
      * @param bool $added
      */
-    public function __construct($leads, private Category $category, private $added = true)
+    public function __construct(
+        $leads,
+        private Category $category,
+        private $added = true
+    )
     {
         if (is_array($leads)) {
             $this->leads = $leads;

@@ -16,7 +16,11 @@ use Mautic\LeadBundle\Model\CompanyModel;
 
 class CompanyObjectHelper implements ObjectHelperInterface
 {
-    public function __construct(private CompanyModel $model, private CompanyRepository $repository, private Connection $connection)
+    public function __construct(
+        private CompanyModel $model,
+        private CompanyRepository $repository,
+        private Connection $connection
+    )
     {
     }
 

@@ -13,7 +13,9 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 final class MenuSubscriber implements EventSubscriberInterface
 {
-    public function __construct(private Config $config)
+    public function __construct(
+        private Config $config
+    )
     {
     }
 

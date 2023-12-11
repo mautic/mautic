@@ -24,7 +24,9 @@ abstract class AbstractEventAccessor
      */
     private $extraProperties = [];
 
-    public function __construct(protected array $config)
+    public function __construct(
+        protected array $config
+    )
     {
         $this->filterExtraProperties();
     }

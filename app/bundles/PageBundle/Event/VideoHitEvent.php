@@ -7,7 +7,11 @@ use Mautic\PageBundle\Entity\VideoHit;
 
 class VideoHitEvent extends CommonEvent
 {
-    public function __construct(VideoHit $hit, protected $request, protected $code)
+    public function __construct(
+        VideoHit $hit,
+        protected $request,
+        protected $code
+    )
     {
         $this->entity  = $hit;
     }

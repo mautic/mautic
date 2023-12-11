@@ -9,7 +9,9 @@ use Symfony\Component\Form\FormBuilderInterface;
 
 class ConfigType extends AbstractType
 {
-    public function __construct(private FieldList $fieldList)
+    public function __construct(
+        private FieldList $fieldList
+    )
     {
     }
 

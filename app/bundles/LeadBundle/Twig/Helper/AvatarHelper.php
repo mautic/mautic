@@ -16,7 +16,12 @@ final class AvatarHelper
      */
     private $imageTypes = ['jpg', 'jpeg', 'png', 'gif'];
 
-    public function __construct(private AssetsHelper $assetsHelper, private PathsHelper $pathsHelper, private GravatarHelper $gravatarHelper, private DefaultAvatarHelper $defaultAvatarHelper)
+    public function __construct(
+        private AssetsHelper $assetsHelper,
+        private PathsHelper $pathsHelper,
+        private GravatarHelper $gravatarHelper,
+        private DefaultAvatarHelper $defaultAvatarHelper
+    )
     {
     }
 

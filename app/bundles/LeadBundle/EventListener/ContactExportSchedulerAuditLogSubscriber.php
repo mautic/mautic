@@ -12,7 +12,10 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class ContactExportSchedulerAuditLogSubscriber implements EventSubscriberInterface
 {
-    public function __construct(private AuditLogModel $auditLogModel, private IpLookupHelper $ipLookupHelper)
+    public function __construct(
+        private AuditLogModel $auditLogModel,
+        private IpLookupHelper $ipLookupHelper
+    )
     {
     }
 

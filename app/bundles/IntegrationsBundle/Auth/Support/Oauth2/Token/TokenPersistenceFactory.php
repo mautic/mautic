@@ -10,7 +10,9 @@ use Mautic\PluginBundle\Entity\Integration;
 
 class TokenPersistenceFactory
 {
-    public function __construct(private IntegrationsHelper $integrationsHelper)
+    public function __construct(
+        private IntegrationsHelper $integrationsHelper
+    )
     {
     }
 

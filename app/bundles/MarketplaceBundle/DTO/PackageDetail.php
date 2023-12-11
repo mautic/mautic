@@ -9,7 +9,15 @@ use Mautic\MarketplaceBundle\Collection\VersionCollection;
 
 final class PackageDetail
 {
-    public function __construct(public PackageBase $packageBase, public VersionCollection $versions, public MaintainerCollection $maintainers, public GitHubInfo $githubInfo, public int $monthlyDownloads, public int $dailyDownloads, public \DateTimeInterface $time)
+    public function __construct(
+        public PackageBase $packageBase,
+        public VersionCollection $versions,
+        public MaintainerCollection $maintainers,
+        public GitHubInfo $githubInfo,
+        public int $monthlyDownloads,
+        public int $dailyDownloads,
+        public \DateTimeInterface $time
+    )
     {
     }
 

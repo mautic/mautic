@@ -26,7 +26,16 @@ final class AuthenticationListener
     /**
      * @param string|mixed $providerKey
      */
-    public function __construct(private AuthenticationHandler $authenticationHandler, private TokenStorageInterface $tokenStorage, private AuthenticationManagerInterface $authenticationManager, private LoggerInterface $logger, private EventDispatcherInterface $dispatcher, private $providerKey, private PermissionRepository $permissionRepository, private EntityManagerInterface $entityManager)
+    public function __construct(
+        private AuthenticationHandler $authenticationHandler,
+        private TokenStorageInterface $tokenStorage,
+        private AuthenticationManagerInterface $authenticationManager,
+        private LoggerInterface $logger,
+        private EventDispatcherInterface $dispatcher,
+        private $providerKey,
+        private PermissionRepository $permissionRepository,
+        private EntityManagerInterface $entityManager
+    )
     {
     }
 

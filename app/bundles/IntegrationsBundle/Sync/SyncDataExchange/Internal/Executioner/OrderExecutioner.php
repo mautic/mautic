@@ -19,7 +19,13 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class OrderExecutioner
 {
-    public function __construct(private MappingHelper $mappingHelper, private EventDispatcherInterface $dispatcher, private ObjectProvider $objectProvider, private ReferenceResolverInterface $referenceResolver, private FieldValidatorInterface $fieldValidator)
+    public function __construct(
+        private MappingHelper $mappingHelper,
+        private EventDispatcherInterface $dispatcher,
+        private ObjectProvider $objectProvider,
+        private ReferenceResolverInterface $referenceResolver,
+        private FieldValidatorInterface $fieldValidator
+    )
     {
     }
 

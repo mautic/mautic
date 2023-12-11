@@ -12,7 +12,9 @@ class SegmentReportSubscriber implements EventSubscriberInterface
 {
     public const SEGMENT_MEMBERSHIP = 'segment.membership';
 
-    public function __construct(private FieldsBuilder $fieldsBuilder)
+    public function __construct(
+        private FieldsBuilder $fieldsBuilder
+    )
     {
     }
 

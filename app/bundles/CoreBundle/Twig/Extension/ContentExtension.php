@@ -10,7 +10,9 @@ use Twig\TwigFunction;
 
 class ContentExtension extends AbstractExtension
 {
-    public function __construct(protected ContentHelper $contentHelper)
+    public function __construct(
+        protected ContentHelper $contentHelper
+    )
     {
     }
 

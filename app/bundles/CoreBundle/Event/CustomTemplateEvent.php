@@ -14,7 +14,11 @@ class CustomTemplateEvent extends AbstractCustomRequestEvent
     /**
      * @param string|null $template
      */
-    public function __construct(Request $request = null, $template = null, protected array $vars = [])
+    public function __construct(
+        Request $request = null,
+        $template = null,
+        protected array $vars = []
+    )
     {
         parent::__construct($request);
 

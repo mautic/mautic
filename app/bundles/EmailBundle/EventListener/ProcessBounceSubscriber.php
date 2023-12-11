@@ -21,7 +21,9 @@ class ProcessBounceSubscriber implements EventSubscriberInterface
         ];
     }
 
-    public function __construct(private Bounce $bouncer)
+    public function __construct(
+        private Bounce $bouncer
+    )
     {
     }
 

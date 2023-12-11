@@ -18,7 +18,12 @@ class FeedbackLoop implements ProcessorInterface
      */
     private $message;
 
-    public function __construct(private ContactFinder $contactFinder, private TranslatorInterface $translator, private LoggerInterface $logger, private DoNotContactModel $doNotContact)
+    public function __construct(
+        private ContactFinder $contactFinder,
+        private TranslatorInterface $translator,
+        private LoggerInterface $logger,
+        private DoNotContactModel $doNotContact
+    )
     {
     }
 

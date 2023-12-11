@@ -7,7 +7,9 @@ use Symfony\Component\Console\Event\ConsoleTerminateEvent;
 
 class ConsoleTerminateListener
 {
-    public function __construct(private LoggerInterface $logger)
+    public function __construct(
+        private LoggerInterface $logger
+    )
     {
     }
 

@@ -11,7 +11,9 @@ use MauticPlugin\MauticCrmBundle\Integration\CrmAbstractIntegration;
  */
 class CrmApi
 {
-    public function __construct(protected CrmAbstractIntegration $integration)
+    public function __construct(
+        protected CrmAbstractIntegration $integration
+    )
     {
     }
 }

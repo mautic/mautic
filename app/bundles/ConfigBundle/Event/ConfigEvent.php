@@ -40,7 +40,10 @@ class ConfigEvent extends CommonEvent
     /**
      * @param mixed[]|null $config
      */
-    public function __construct(private ?array $config, private ParameterBag $post)
+    public function __construct(
+        private ?array $config,
+        private ParameterBag $post
+    )
     {
     }
 

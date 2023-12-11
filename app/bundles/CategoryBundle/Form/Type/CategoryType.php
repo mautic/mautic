@@ -16,7 +16,9 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class CategoryType extends AbstractType
 {
-    public function __construct(private SessionInterface $session)
+    public function __construct(
+        private SessionInterface $session
+    )
     {
     }
 

@@ -22,7 +22,20 @@ use Symfony\Component\HttpFoundation\RequestStack;
 
 class AjaxController extends CommonAjaxController
 {
-    public function __construct(private FieldCollectorInterface $fieldCollector, private AlreadyMappedFieldCollectorInterface $mappedFieldCollector, ManagerRegistry $doctrine, MauticFactory $factory, ModelFactory $modelFactory, UserHelper $userHelper, CoreParametersHelper $coreParametersHelper, EventDispatcherInterface $dispatcher, Translator $translator, FlashBag $flashBag, RequestStack $requestStack, CorePermissions $security)
+    public function __construct(
+        private FieldCollectorInterface $fieldCollector,
+        private AlreadyMappedFieldCollectorInterface $mappedFieldCollector,
+        ManagerRegistry $doctrine,
+        MauticFactory $factory,
+        ModelFactory $modelFactory,
+        UserHelper $userHelper,
+        CoreParametersHelper $coreParametersHelper,
+        EventDispatcherInterface $dispatcher,
+        Translator $translator,
+        FlashBag $flashBag,
+        RequestStack $requestStack,
+        CorePermissions $security
+    )
     {
         parent::__construct($doctrine, $factory, $modelFactory, $userHelper, $coreParametersHelper, $dispatcher, $translator, $flashBag, $requestStack, $security);
     }

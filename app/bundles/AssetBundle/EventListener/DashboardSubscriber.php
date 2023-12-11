@@ -38,7 +38,10 @@ class DashboardSubscriber extends MainDashboardSubscriber
         'asset:assets:viewother',
     ];
 
-    public function __construct(protected AssetModel $assetModel, protected RouterInterface $router)
+    public function __construct(
+        protected AssetModel $assetModel,
+        protected RouterInterface $router
+    )
     {
     }
 

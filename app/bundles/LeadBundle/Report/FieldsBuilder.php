@@ -10,7 +10,12 @@ use Mautic\UserBundle\Model\UserModel;
 
 class FieldsBuilder
 {
-    public function __construct(private FieldModel $fieldModel, private ListModel $listModel, private UserModel $userModel, private LeadModel $leadModel)
+    public function __construct(
+        private FieldModel $fieldModel,
+        private ListModel $listModel,
+        private UserModel $userModel,
+        private LeadModel $leadModel
+    )
     {
     }
 

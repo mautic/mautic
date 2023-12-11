@@ -10,7 +10,13 @@ class RemappedObjectDAO
      * @param mixed $oldObjectId
      * @param mixed $newObjectId
      */
-    public function __construct(private string $integration, private string $oldObjectName, private $oldObjectId, private string $newObjectName, private $newObjectId)
+    public function __construct(
+        private string $integration,
+        private string $oldObjectName,
+        private $oldObjectId,
+        private string $newObjectName,
+        private $newObjectId
+    )
     {
     }
 

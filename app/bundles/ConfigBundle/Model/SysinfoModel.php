@@ -22,7 +22,14 @@ class SysinfoModel
      */
     protected $folders;
 
-    public function __construct(protected PathsHelper $pathsHelper, protected CoreParametersHelper $coreParametersHelper, private TranslatorInterface $translator, protected Connection $connection, private InstallService $installService, private CheckStep $checkStep)
+    public function __construct(
+        protected PathsHelper $pathsHelper,
+        protected CoreParametersHelper $coreParametersHelper,
+        private TranslatorInterface $translator,
+        protected Connection $connection,
+        private InstallService $installService,
+        private CheckStep $checkStep
+    )
     {
     }
 

@@ -9,7 +9,9 @@ use Symfony\Contracts\EventDispatcher\Event;
 
 class PluginInstallEvent extends Event
 {
-    public function __construct(private Plugin $plugin)
+    public function __construct(
+        private Plugin $plugin
+    )
     {
     }
 

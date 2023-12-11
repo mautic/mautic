@@ -14,7 +14,9 @@ use Symfony\Component\Security\Http\Authentication\AuthenticationSuccessHandlerI
 
 class AuthenticationHandler implements AuthenticationSuccessHandlerInterface, AuthenticationFailureHandlerInterface
 {
-    public function __construct(private RouterInterface $router)
+    public function __construct(
+        private RouterInterface $router
+    )
     {
     }
 

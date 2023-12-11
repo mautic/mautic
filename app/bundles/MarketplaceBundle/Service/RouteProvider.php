@@ -18,7 +18,9 @@ class RouteProvider
 
     public const ROUTE_CLEAR_CACHE = 'mautic_marketplace_clear_cache';
 
-    public function __construct(private RouterInterface $router)
+    public function __construct(
+        private RouterInterface $router
+    )
     {
     }
 

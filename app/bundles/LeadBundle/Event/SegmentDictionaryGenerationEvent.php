@@ -17,7 +17,9 @@ class SegmentDictionaryGenerationEvent extends CommonEvent
     /**
      * @param array<string,mixed[]> $translations
      */
-    public function __construct(private array $translations = [])
+    public function __construct(
+        private array $translations = []
+    )
     {
     }
 

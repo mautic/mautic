@@ -22,7 +22,15 @@ use Twig\Environment;
 
 class FormSubscriber implements EventSubscriberInterface
 {
-    public function __construct(private AssetModel $assetModel, protected TranslatorInterface $translator, private AnalyticsHelper $analyticsHelper, private AssetsHelper $assetsHelper, private ThemeHelperInterface $themeHelper, private Environment $twig, private CoreParametersHelper $coreParametersHelper)
+    public function __construct(
+        private AssetModel $assetModel,
+        protected TranslatorInterface $translator,
+        private AnalyticsHelper $analyticsHelper,
+        private AssetsHelper $assetsHelper,
+        private ThemeHelperInterface $themeHelper,
+        private Environment $twig,
+        private CoreParametersHelper $coreParametersHelper
+    )
     {
     }
 

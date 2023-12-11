@@ -16,7 +16,10 @@ class ReportDevicesSubscriber implements EventSubscriberInterface
 {
     public const DEVICES = 'contact.devices';
 
-    public function __construct(private FieldsBuilder $fieldsBuilder, private CompanyReportData $companyReportData)
+    public function __construct(
+        private FieldsBuilder $fieldsBuilder,
+        private CompanyReportData $companyReportData
+    )
     {
     }
 

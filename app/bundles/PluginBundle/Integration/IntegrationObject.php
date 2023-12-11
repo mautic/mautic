@@ -8,7 +8,10 @@ class IntegrationObject
      * @param string $type
      * @param string $internalType
      */
-    public function __construct(private $type, private $internalType)
+    public function __construct(
+        private $type,
+        private $internalType
+    )
     {
     }
 

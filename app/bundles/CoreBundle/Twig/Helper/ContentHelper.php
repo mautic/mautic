@@ -9,7 +9,10 @@ use Twig\Environment;
 
 final class ContentHelper
 {
-    public function __construct(private Environment $twig, private EventDispatcherInterface $dispatcher)
+    public function __construct(
+        private Environment $twig,
+        private EventDispatcherInterface $dispatcher
+    )
     {
     }
 

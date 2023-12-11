@@ -13,7 +13,11 @@ class ContactDeduper
 {
     use DeduperTrait;
 
-    public function __construct(FieldModel $fieldModel, private ContactMerger $contactMerger, private LeadRepository $leadRepository)
+    public function __construct(
+        FieldModel $fieldModel,
+        private ContactMerger $contactMerger,
+        private LeadRepository $leadRepository
+    )
     {
         $this->fieldModel     = $fieldModel;
     }

@@ -13,7 +13,10 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class CampaignSendSubscriber implements EventSubscriberInterface
 {
-    public function __construct(private SmsModel $smsModel, private TransportChain $transportChain)
+    public function __construct(
+        private SmsModel $smsModel,
+        private TransportChain $transportChain
+    )
     {
     }
 

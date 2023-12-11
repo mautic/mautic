@@ -12,7 +12,11 @@ use Symfony\Component\Routing\RouterInterface;
 
 class BuildJsSubscriber implements EventSubscriberInterface
 {
-    public function __construct(private AssetsHelper $assetsHelper, private TrackingHelper $trackingHelper, private RouterInterface $router)
+    public function __construct(
+        private AssetsHelper $assetsHelper,
+        private TrackingHelper $trackingHelper,
+        private RouterInterface $router
+    )
     {
     }
 

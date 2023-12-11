@@ -9,7 +9,9 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class ConfigSubscriber implements EventSubscriberInterface
 {
-    public function __construct(private ConfigChangeLogger $configChangeLogger)
+    public function __construct(
+        private ConfigChangeLogger $configChangeLogger
+    )
     {
     }
 

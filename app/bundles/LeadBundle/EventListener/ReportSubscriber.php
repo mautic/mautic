@@ -55,7 +55,17 @@ class ReportSubscriber implements EventSubscriberInterface
      */
     private $channelActions;
 
-    public function __construct(private LeadModel $leadModel, private FieldModel $fieldModel, private StageModel $stageModel, private CampaignModel $campaignModel, private EventCollector $eventCollector, private CompanyModel $companyModel, private CompanyReportData $companyReportData, private FieldsBuilder $fieldsBuilder, private Translator $translator)
+    public function __construct(
+        private LeadModel $leadModel,
+        private FieldModel $fieldModel,
+        private StageModel $stageModel,
+        private CampaignModel $campaignModel,
+        private EventCollector $eventCollector,
+        private CompanyModel $companyModel,
+        private CompanyReportData $companyReportData,
+        private FieldsBuilder $fieldsBuilder,
+        private Translator $translator
+    )
     {
     }
 

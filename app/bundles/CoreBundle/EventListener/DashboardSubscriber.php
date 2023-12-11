@@ -36,7 +36,14 @@ class DashboardSubscriber extends MainDashboardSubscriber
     /**
      * @param ModelFactory<object> $modelFactory
      */
-    public function __construct(private AuditLogModel $auditLogModel, private TranslatorInterface $translator, private RouterInterface $router, private CorePermissions $security, private EventDispatcherInterface $dispatcher, protected ModelFactory $modelFactory)
+    public function __construct(
+        private AuditLogModel $auditLogModel,
+        private TranslatorInterface $translator,
+        private RouterInterface $router,
+        private CorePermissions $security,
+        private EventDispatcherInterface $dispatcher,
+        protected ModelFactory $modelFactory
+    )
     {
     }
 

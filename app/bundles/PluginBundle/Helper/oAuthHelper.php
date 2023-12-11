@@ -22,7 +22,11 @@ class oAuthHelper
 
     private $settings;
 
-    public function __construct(UnifiedIntegrationInterface $integration, private ?Request $request = null, $settings = [])
+    public function __construct(
+        UnifiedIntegrationInterface $integration,
+        private ?Request $request = null,
+        $settings = []
+    )
     {
         $clientId                = $integration->getClientIdKey();
         $clientSecret            = $integration->getClientSecretKey();

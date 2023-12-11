@@ -19,7 +19,11 @@ class InactiveContactFinder
      */
     private $campaignMemberDatesAdded;
 
-    public function __construct(private LeadRepository $leadRepository, private CampaignLeadRepository $campaignLeadRepository, private LoggerInterface $logger)
+    public function __construct(
+        private LeadRepository $leadRepository,
+        private CampaignLeadRepository $campaignLeadRepository,
+        private LoggerInterface $logger
+    )
     {
     }
 

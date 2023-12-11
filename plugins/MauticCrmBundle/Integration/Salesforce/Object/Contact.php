@@ -6,7 +6,11 @@ class Contact
 {
     public const OBJECT = 'Contact';
 
-    public function __construct(private $id, private $campaignId, private $isDeleted)
+    public function __construct(
+        private $id,
+        private $campaignId,
+        private $isDeleted
+    )
     {
     }
 

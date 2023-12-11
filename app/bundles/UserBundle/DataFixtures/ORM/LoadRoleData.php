@@ -16,7 +16,9 @@ class LoadRoleData extends AbstractFixture implements OrderedFixtureInterface, F
         return ['group_mautic_install_data'];
     }
 
-    public function __construct(private RoleModel $roleModel)
+    public function __construct(
+        private RoleModel $roleModel
+    )
     {
     }
 

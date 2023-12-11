@@ -6,7 +6,10 @@ namespace Mautic\FormBundle\Crate;
 
 final class ObjectCrate
 {
-    public function __construct(private string $key, private string $name)
+    public function __construct(
+        private string $key,
+        private string $name
+    )
     {
     }
 

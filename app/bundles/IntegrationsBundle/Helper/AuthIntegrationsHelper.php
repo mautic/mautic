@@ -15,7 +15,9 @@ class AuthIntegrationsHelper
      */
     private $integrations = [];
 
-    public function __construct(private IntegrationsHelper $integrationsHelper)
+    public function __construct(
+        private IntegrationsHelper $integrationsHelper
+    )
     {
     }
 

@@ -11,7 +11,9 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class ActivityListType extends AbstractType
 {
-    public function __construct(private LeadModel $leadModel)
+    public function __construct(
+        private LeadModel $leadModel
+    )
     {
     }
 

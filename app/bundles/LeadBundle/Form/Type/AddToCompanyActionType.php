@@ -10,7 +10,9 @@ use Symfony\Component\Validator\Constraints\NotBlank;
 
 class AddToCompanyActionType extends AbstractType
 {
-    public function __construct(protected RouterInterface $router)
+    public function __construct(
+        protected RouterInterface $router
+    )
     {
     }
 

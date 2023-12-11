@@ -23,7 +23,12 @@ class FieldType extends AbstractType
 {
     use FormFieldTrait;
 
-    public function __construct(private TranslatorInterface $translator, private ObjectCollectorInterface $objectCollector, private FieldCollectorInterface $fieldCollector, private AlreadyMappedFieldCollectorInterface $mappedFieldCollector)
+    public function __construct(
+        private TranslatorInterface $translator,
+        private ObjectCollectorInterface $objectCollector,
+        private FieldCollectorInterface $fieldCollector,
+        private AlreadyMappedFieldCollectorInterface $mappedFieldCollector
+    )
     {
     }
 

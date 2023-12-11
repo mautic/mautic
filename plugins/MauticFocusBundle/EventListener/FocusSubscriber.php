@@ -24,7 +24,16 @@ use Symfony\Component\Routing\RouterInterface;
 
 class FocusSubscriber implements EventSubscriberInterface
 {
-    public function __construct(private RouterInterface $router, private IpLookupHelper $ipHelper, private AuditLogModel $auditLogModel, private TrackableModel $trackableModel, private PageTokenHelper $pageTokenHelper, private AssetTokenHelper $assetTokenHelper, private FocusModel $focusModel, private RequestStack $requestStack)
+    public function __construct(
+        private RouterInterface $router,
+        private IpLookupHelper $ipHelper,
+        private AuditLogModel $auditLogModel,
+        private TrackableModel $trackableModel,
+        private PageTokenHelper $pageTokenHelper,
+        private AssetTokenHelper $assetTokenHelper,
+        private FocusModel $focusModel,
+        private RequestStack $requestStack
+    )
     {
     }
 

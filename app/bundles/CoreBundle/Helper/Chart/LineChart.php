@@ -35,7 +35,12 @@ class LineChart extends AbstractChart implements ChartInterface
      * @param \DateTime   $dateTo
      * @param string      $dateFormat
      */
-    public function __construct(?string $unit = null, $dateFrom = null, $dateTo = null, protected $dateFormat = null)
+    public function __construct(
+        ?string $unit = null,
+        $dateFrom = null,
+        $dateTo = null,
+        protected $dateFormat = null
+    )
     {
         $this->unit       = $unit ?? $this->getTimeUnitFromDateRange($dateFrom, $dateTo);
         $this->isTimeUnit = in_array($this->unit, ['H', 'i', 's']);

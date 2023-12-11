@@ -34,7 +34,9 @@ class DashboardSubscriber extends MainDashboardSubscriber
         'stage:stages:viewother',
     ];
 
-    public function __construct(protected StageModel $stageModel)
+    public function __construct(
+        protected StageModel $stageModel
+    )
     {
     }
 

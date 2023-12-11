@@ -10,7 +10,9 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class MessageQueueSubscriber implements EventSubscriberInterface
 {
-    public function __construct(private SmsModel $model)
+    public function __construct(
+        private SmsModel $model
+    )
     {
     }
 

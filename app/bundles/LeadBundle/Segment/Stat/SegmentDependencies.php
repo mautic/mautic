@@ -11,7 +11,14 @@ use Mautic\ReportBundle\Model\ReportModel;
 
 class SegmentDependencies
 {
-    public function __construct(private EmailModel $emailModel, private CampaignModel $campaignModel, private ActionModel $actionModel, private ListModel $listModel, private TriggerEventModel $triggerEventModel, private ReportModel $reportModel)
+    public function __construct(
+        private EmailModel $emailModel,
+        private CampaignModel $campaignModel,
+        private ActionModel $actionModel,
+        private ListModel $listModel,
+        private TriggerEventModel $triggerEventModel,
+        private ReportModel $reportModel
+    )
     {
     }
 

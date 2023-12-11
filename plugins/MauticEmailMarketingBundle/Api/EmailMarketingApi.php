@@ -12,7 +12,9 @@ class EmailMarketingApi
     /**
      * @param AbstractIntegration $integration
      */
-    public function __construct(protected UnifiedIntegrationInterface $integration)
+    public function __construct(
+        protected UnifiedIntegrationInterface $integration
+    )
     {
         $this->keys        = $integration->getKeys();
     }

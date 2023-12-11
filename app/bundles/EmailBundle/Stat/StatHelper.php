@@ -20,7 +20,9 @@ class StatHelper
      */
     private $deleteUs = [];
 
-    public function __construct(private StatRepository $repo)
+    public function __construct(
+        private StatRepository $repo
+    )
     {
     }
 

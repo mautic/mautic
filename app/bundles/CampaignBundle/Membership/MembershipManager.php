@@ -24,7 +24,13 @@ class MembershipManager
      */
     private $progressBar;
 
-    public function __construct(private Adder $adder, private Remover $remover, private EventDispatcher $eventDispatcher, private LeadRepository $leadRepository, private LoggerInterface $logger)
+    public function __construct(
+        private Adder $adder,
+        private Remover $remover,
+        private EventDispatcher $eventDispatcher,
+        private LeadRepository $leadRepository,
+        private LoggerInterface $logger
+    )
     {
     }
 

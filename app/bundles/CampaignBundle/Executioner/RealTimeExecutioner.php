@@ -36,7 +36,17 @@ class RealTimeExecutioner
      */
     private $responses;
 
-    public function __construct(private LoggerInterface $logger, private LeadModel $leadModel, private EventRepository $eventRepository, private EventExecutioner $executioner, private Executioner $decisionExecutioner, private EventCollector $collector, private EventScheduler $scheduler, private ContactTracker $contactTracker, private DecisionHelper $decisionHelper)
+    public function __construct(
+        private LoggerInterface $logger,
+        private LeadModel $leadModel,
+        private EventRepository $eventRepository,
+        private EventExecutioner $executioner,
+        private Executioner $decisionExecutioner,
+        private EventCollector $collector,
+        private EventScheduler $scheduler,
+        private ContactTracker $contactTracker,
+        private DecisionHelper $decisionHelper
+    )
     {
     }
 

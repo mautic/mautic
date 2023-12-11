@@ -11,7 +11,9 @@ use Symfony\Component\Form\FormInterface;
 
 final class FormAdjustmentsProvider implements FormAdjustmentsProviderInterface
 {
-    public function __construct(private EventDispatcherInterface $dispatcher)
+    public function __construct(
+        private EventDispatcherInterface $dispatcher
+    )
     {
     }
 

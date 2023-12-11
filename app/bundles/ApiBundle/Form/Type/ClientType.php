@@ -23,7 +23,13 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class ClientType extends AbstractType
 {
-    public function __construct(private RequestStack $requestStack, private TranslatorInterface $translator, private ValidatorInterface $validator, private SessionInterface $session, private RouterInterface $router)
+    public function __construct(
+        private RequestStack $requestStack,
+        private TranslatorInterface $translator,
+        private ValidatorInterface $validator,
+        private SessionInterface $session,
+        private RouterInterface $router
+    )
     {
     }
 

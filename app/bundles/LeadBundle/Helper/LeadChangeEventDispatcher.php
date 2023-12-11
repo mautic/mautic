@@ -20,7 +20,9 @@ class LeadChangeEventDispatcher
      */
     private $changes;
 
-    public function __construct(private EventDispatcherInterface $dispatcher)
+    public function __construct(
+        private EventDispatcherInterface $dispatcher
+    )
     {
     }
 

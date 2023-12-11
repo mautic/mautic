@@ -28,7 +28,11 @@ class FieldBuilder
      */
     private $requestObject;
 
-    public function __construct(private Router $router, private FieldHelper $fieldHelper, private ContactObjectHelper $contactObjectHelper)
+    public function __construct(
+        private Router $router,
+        private FieldHelper $fieldHelper,
+        private ContactObjectHelper $contactObjectHelper
+    )
     {
         $this->valueNormalizer = new ValueNormalizer();
     }

@@ -11,7 +11,10 @@ class FieldDAO
     /**
      * @param string $name
      */
-    public function __construct(private $name, private NormalizedValueDAO $value)
+    public function __construct(
+        private $name,
+        private NormalizedValueDAO $value
+    )
     {
     }
 

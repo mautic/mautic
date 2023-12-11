@@ -9,7 +9,12 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class UserNotificationBuilder
 {
-    public function __construct(private UserHelper $userHelper, private OwnerProvider $ownerProvider, private RouteHelper $routeHelper, private TranslatorInterface $translator)
+    public function __construct(
+        private UserHelper $userHelper,
+        private OwnerProvider $ownerProvider,
+        private RouteHelper $routeHelper,
+        private TranslatorInterface $translator
+    )
     {
     }
 

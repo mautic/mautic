@@ -14,7 +14,9 @@ use Symfony\Contracts\Translation\TranslatorInterface;
  */
 class IframeAvailabilityChecker
 {
-    public function __construct(private TranslatorInterface $translator)
+    public function __construct(
+        private TranslatorInterface $translator
+    )
     {
     }
 

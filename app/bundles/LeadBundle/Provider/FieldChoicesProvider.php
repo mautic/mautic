@@ -21,7 +21,9 @@ final class FieldChoicesProvider implements FieldChoicesProviderInterface
      */
     private array $cachedAliasChoices = [];
 
-    public function __construct(private EventDispatcherInterface $dispatcher)
+    public function __construct(
+        private EventDispatcherInterface $dispatcher
+    )
     {
     }
 

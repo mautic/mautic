@@ -26,7 +26,11 @@ class Fetcher
      */
     private $processedMessageCounter = 0;
 
-    public function __construct(private Mailbox $imapHelper, private EventDispatcherInterface $dispatcher, private TranslatorInterface $translator)
+    public function __construct(
+        private Mailbox $imapHelper,
+        private EventDispatcherInterface $dispatcher,
+        private TranslatorInterface $translator
+    )
     {
     }
 

@@ -13,7 +13,12 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class CampaignSubscriber implements EventSubscriberInterface
 {
-    public function __construct(private IpLookupHelper $ipLookupHelper, private AuditLogModel $auditLogModel, private CampaignService $campaignService, private FlashBag $flashBag)
+    public function __construct(
+        private IpLookupHelper $ipLookupHelper,
+        private AuditLogModel $auditLogModel,
+        private CampaignService $campaignService,
+        private FlashBag $flashBag
+    )
     {
     }
 

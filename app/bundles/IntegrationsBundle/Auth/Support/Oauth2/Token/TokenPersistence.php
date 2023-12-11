@@ -17,7 +17,9 @@ class TokenPersistence implements TokenPersistenceInterface
      */
     private $integration;
 
-    public function __construct(private IntegrationsHelper $integrationsHelper)
+    public function __construct(
+        private IntegrationsHelper $integrationsHelper
+    )
     {
     }
 

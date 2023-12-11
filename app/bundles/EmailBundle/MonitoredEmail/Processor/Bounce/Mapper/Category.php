@@ -9,7 +9,11 @@ class Category
      * @param string $type
      * @param bool   $isPermanent
      */
-    public function __construct(private $category, private $type, private $isPermanent)
+    public function __construct(
+        private $category,
+        private $type,
+        private $isPermanent
+    )
     {
         return $this;
     }

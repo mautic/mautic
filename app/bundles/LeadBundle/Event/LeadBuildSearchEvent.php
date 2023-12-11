@@ -22,7 +22,13 @@ class LeadBuildSearchEvent extends CommonEvent
      * @param string $command
      * @param string $alias
      */
-    public function __construct(protected $string, protected $command, protected $alias, protected bool $negate, protected QueryBuilder $queryBuilder)
+    public function __construct(
+        protected $string,
+        protected $command,
+        protected $alias,
+        protected bool $negate,
+        protected QueryBuilder $queryBuilder
+    )
     {
         $this->subQuery         = '';
         $this->isSearchDone     = false;

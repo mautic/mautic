@@ -26,7 +26,11 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class UserType extends AbstractType
 {
-    public function __construct(private TranslatorInterface $translator, private UserModel $model, private LanguageHelper $languageHelper)
+    public function __construct(
+        private TranslatorInterface $translator,
+        private UserModel $model,
+        private LanguageHelper $languageHelper
+    )
     {
     }
 

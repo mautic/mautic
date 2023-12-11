@@ -10,7 +10,10 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class MaintenanceSubscriber implements EventSubscriberInterface
 {
-    public function __construct(private Connection $db, private TranslatorInterface $translator)
+    public function __construct(
+        private Connection $db,
+        private TranslatorInterface $translator
+    )
     {
     }
 

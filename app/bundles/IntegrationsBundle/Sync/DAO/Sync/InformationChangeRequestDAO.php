@@ -24,7 +24,13 @@ class InformationChangeRequestDAO
      * @param mixed  $objectId
      * @param string $field
      */
-    public function __construct(private $integration, private $objectName, private $objectId, private $field, private NormalizedValueDAO $newValue)
+    public function __construct(
+        private $integration,
+        private $objectName,
+        private $objectId,
+        private $field,
+        private NormalizedValueDAO $newValue
+    )
     {
     }
 

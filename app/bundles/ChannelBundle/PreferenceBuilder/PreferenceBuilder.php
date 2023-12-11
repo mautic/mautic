@@ -15,7 +15,12 @@ class PreferenceBuilder
      */
     private $channels = [];
 
-    public function __construct(ArrayCollection $logs, private Event $event, array $channels, private LoggerInterface $logger)
+    public function __construct(
+        ArrayCollection $logs,
+        private Event $event,
+        array $channels,
+        private LoggerInterface $logger
+    )
     {
         $this->buildRules($logs, $channels);
     }

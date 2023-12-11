@@ -8,7 +8,9 @@ use Symfony\Component\Validator\ConstraintValidator;
 
 class LeadListAccessValidator extends ConstraintValidator
 {
-    public function __construct(private ListModel $segmentModel)
+    public function __construct(
+        private ListModel $segmentModel
+    )
     {
     }
 

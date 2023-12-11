@@ -12,7 +12,12 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 final class FinalizeUpdateStep implements StepInterface
 {
-    public function __construct(private TranslatorInterface $translator, private PathsHelper $pathsHelper, private Session $session, private AppVersion $appVersion)
+    public function __construct(
+        private TranslatorInterface $translator,
+        private PathsHelper $pathsHelper,
+        private Session $session,
+        private AppVersion $appVersion
+    )
     {
     }
 

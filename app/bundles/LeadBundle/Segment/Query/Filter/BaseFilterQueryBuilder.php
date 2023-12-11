@@ -11,7 +11,10 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class BaseFilterQueryBuilder implements FilterQueryBuilderInterface
 {
-    public function __construct(private RandomParameterName $parameterNameGenerator, private EventDispatcherInterface $dispatcher)
+    public function __construct(
+        private RandomParameterName $parameterNameGenerator,
+        private EventDispatcherInterface $dispatcher
+    )
     {
     }
 

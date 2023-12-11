@@ -21,7 +21,9 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class PointType extends AbstractType
 {
-    public function __construct(private CorePermissions $security)
+    public function __construct(
+        private CorePermissions $security
+    )
     {
     }
 

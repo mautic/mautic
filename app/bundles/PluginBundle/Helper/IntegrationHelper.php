@@ -26,7 +26,15 @@ class IntegrationHelper
 
     private $byPlugin = [];
 
-    public function __construct(private ContainerInterface $container, protected EntityManager $em, protected PathsHelper $pathsHelper, protected BundleHelper $bundleHelper, protected CoreParametersHelper $coreParametersHelper, protected Environment $twig, protected PluginModel $pluginModel)
+    public function __construct(
+        private ContainerInterface $container,
+        protected EntityManager $em,
+        protected PathsHelper $pathsHelper,
+        protected BundleHelper $bundleHelper,
+        protected CoreParametersHelper $coreParametersHelper,
+        protected Environment $twig,
+        protected PluginModel $pluginModel
+    )
     {
     }
 

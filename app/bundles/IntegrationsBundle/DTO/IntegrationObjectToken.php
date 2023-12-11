@@ -35,7 +35,9 @@ class IntegrationObjectToken
      */
     private $baseURL;
 
-    public function __construct(private string $token)
+    public function __construct(
+        private string $token
+    )
     {
     }
 

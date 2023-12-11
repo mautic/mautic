@@ -11,7 +11,9 @@ use Mautic\CoreBundle\Release\Metadata;
 
 class ReleaseParser
 {
-    public function __construct(private Client $client)
+    public function __construct(
+        private Client $client
+    )
     {
     }
 

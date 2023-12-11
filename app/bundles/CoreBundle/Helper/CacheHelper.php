@@ -11,7 +11,12 @@ use Symfony\Component\HttpKernel\KernelInterface;
 
 class CacheHelper
 {
-    public function __construct(private string $cacheDir, private ?Session $session, private PathsHelper $pathsHelper, private KernelInterface $kernel)
+    public function __construct(
+        private string $cacheDir,
+        private ?Session $session,
+        private PathsHelper $pathsHelper,
+        private KernelInterface $kernel
+    )
     {
     }
 

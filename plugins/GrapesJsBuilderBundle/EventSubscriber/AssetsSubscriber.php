@@ -12,7 +12,10 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class AssetsSubscriber implements EventSubscriberInterface
 {
-    public function __construct(private Config $config, private InstallService $installer)
+    public function __construct(
+        private Config $config,
+        private InstallService $installer
+    )
     {
     }
 

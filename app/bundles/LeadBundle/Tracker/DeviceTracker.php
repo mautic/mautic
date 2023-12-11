@@ -21,7 +21,12 @@ class DeviceTracker
      */
     private $trackedDevice = [];
 
-    public function __construct(private DeviceCreatorServiceInterface $deviceCreatorService, private DeviceDetectorFactoryInterface $deviceDetectorFactory, private DeviceTrackingServiceInterface $deviceTrackingService, private LoggerInterface $logger)
+    public function __construct(
+        private DeviceCreatorServiceInterface $deviceCreatorService,
+        private DeviceDetectorFactoryInterface $deviceDetectorFactory,
+        private DeviceTrackingServiceInterface $deviceTrackingService,
+        private LoggerInterface $logger
+    )
     {
     }
 

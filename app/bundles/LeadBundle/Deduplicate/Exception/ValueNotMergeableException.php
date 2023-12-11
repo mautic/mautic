@@ -10,7 +10,10 @@ class ValueNotMergeableException extends \Exception
      * @param mixed $newerValue
      * @param mixed $olderValue
      */
-    public function __construct(private $newerValue, private $olderValue)
+    public function __construct(
+        private $newerValue,
+        private $olderValue
+    )
     {
         parent::__construct();
     }

@@ -13,7 +13,9 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class ChannelSubscriber implements EventSubscriberInterface
 {
-    public function __construct(private TransportChain $transportChain)
+    public function __construct(
+        private TransportChain $transportChain
+    )
     {
     }
 

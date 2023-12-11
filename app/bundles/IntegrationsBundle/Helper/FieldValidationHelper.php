@@ -21,7 +21,10 @@ class FieldValidationHelper
      */
     private $integrationObject;
 
-    public function __construct(private FieldHelper $fieldHelper, private TranslatorInterface $translator)
+    public function __construct(
+        private FieldHelper $fieldHelper,
+        private TranslatorInterface $translator
+    )
     {
     }
 

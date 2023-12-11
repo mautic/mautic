@@ -11,7 +11,12 @@ use Symfony\Contracts\EventDispatcher\Event;
 
 class CompletedSyncIterationEvent extends Event
 {
-    public function __construct(private OrderResultsDAO $orderResultsDAO, private int $iteration, private InputOptionsDAO $inputOptionsDAO, private MappingManualDAO $mappingManualDAO)
+    public function __construct(
+        private OrderResultsDAO $orderResultsDAO,
+        private int $iteration,
+        private InputOptionsDAO $inputOptionsDAO,
+        private MappingManualDAO $mappingManualDAO
+    )
     {
     }
 

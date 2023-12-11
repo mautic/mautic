@@ -14,7 +14,10 @@ class ConfigMapper
      */
     private array $restrictedParameters;
 
-    public function __construct(private CoreParametersHelper $parametersHelper, array $restrictedParameters = [])
+    public function __construct(
+        private CoreParametersHelper $parametersHelper,
+        array $restrictedParameters = []
+    )
     {
         $this->restrictedParameters = RestrictionHelper::prepareRestrictions($restrictedParameters);
     }

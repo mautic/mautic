@@ -26,7 +26,10 @@ class ConfigChangeLogger
      */
     private ?array $originalNormData = null;
 
-    public function __construct(private IpLookupHelper $ipLookupHelper, private AuditLogModel $auditLogModel)
+    public function __construct(
+        private IpLookupHelper $ipLookupHelper,
+        private AuditLogModel $auditLogModel
+    )
     {
     }
 

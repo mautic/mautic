@@ -30,7 +30,14 @@ class LegacyEventDispatcher
 {
     use EventArrayTrait;
 
-    public function __construct(private EventDispatcherInterface $dispatcher, private EventScheduler $scheduler, private LoggerInterface $logger, private NotificationHelper $notificationHelper, private MauticFactory $factory, private ContactTracker $contactTracker)
+    public function __construct(
+        private EventDispatcherInterface $dispatcher,
+        private EventScheduler $scheduler,
+        private LoggerInterface $logger,
+        private NotificationHelper $notificationHelper,
+        private MauticFactory $factory,
+        private ContactTracker $contactTracker
+    )
     {
     }
 

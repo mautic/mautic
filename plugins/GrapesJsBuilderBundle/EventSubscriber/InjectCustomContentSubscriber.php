@@ -17,7 +17,13 @@ use Twig\Environment;
 
 class InjectCustomContentSubscriber implements EventSubscriberInterface
 {
-    public function __construct(private Config $config, private GrapesJsBuilderModel $grapesJsBuilderModel, private Environment $twig, private RequestStack $requestStack, private RouterInterface $router)
+    public function __construct(
+        private Config $config,
+        private GrapesJsBuilderModel $grapesJsBuilderModel,
+        private Environment $twig,
+        private RequestStack $requestStack,
+        private RouterInterface $router
+    )
     {
     }
 

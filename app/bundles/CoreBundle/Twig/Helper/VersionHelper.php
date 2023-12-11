@@ -9,7 +9,9 @@ use Mautic\CoreBundle\Helper\AppVersion;
  */
 final class VersionHelper
 {
-    public function __construct(private AppVersion $appVersion)
+    public function __construct(
+        private AppVersion $appVersion
+    )
     {
     }
 

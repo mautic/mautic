@@ -51,7 +51,9 @@ class Clearbit_Base
      *
      * @param string $api_key
      */
-    public function __construct(protected $api_key)
+    public function __construct(
+        protected $api_key
+    )
     {
         $this->_next_req_time = new \DateTime('@0');
     }

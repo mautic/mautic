@@ -18,7 +18,12 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class ConstantContactType extends AbstractType
 {
-    public function __construct(private IntegrationHelper $integrationHelper, private PluginModel $pluginModel, protected SessionInterface $session, protected CoreParametersHelper $coreParametersHelper)
+    public function __construct(
+        private IntegrationHelper $integrationHelper,
+        private PluginModel $pluginModel,
+        protected SessionInterface $session,
+        protected CoreParametersHelper $coreParametersHelper
+    )
     {
     }
 

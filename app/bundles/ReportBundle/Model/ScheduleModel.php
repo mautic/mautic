@@ -16,7 +16,10 @@ class ScheduleModel
      */
     private \Doctrine\ORM\EntityRepository $schedulerRepository;
 
-    public function __construct(private EntityManager $entityManager, private SchedulerPlanner $schedulerPlanner)
+    public function __construct(
+        private EntityManager $entityManager,
+        private SchedulerPlanner $schedulerPlanner
+    )
     {
         $this->schedulerRepository = $entityManager->getRepository(Scheduler::class);
     }

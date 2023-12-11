@@ -9,7 +9,9 @@ use Mautic\ReportBundle\Model\ReportModel;
 
 class ReportDataAdapter
 {
-    public function __construct(private ReportModel $reportModel)
+    public function __construct(
+        private ReportModel $reportModel
+    )
     {
     }
 

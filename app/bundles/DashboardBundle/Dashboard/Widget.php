@@ -14,7 +14,11 @@ class Widget
     public const FORMAT_HUMAN = 'M j, Y';
     public const FORMAT_MYSQL = 'Y-m-d';
 
-    public function __construct(private DashboardModel $dashboardModel, private UserHelper $userHelper, private Session $session)
+    public function __construct(
+        private DashboardModel $dashboardModel,
+        private UserHelper $userHelper,
+        private Session $session
+    )
     {
     }
 

@@ -16,7 +16,12 @@ class FlashBag
     public const LEVEL_WARNING   = 'warning';
     public const LEVEL_NOTICE    = 'notice';
 
-    public function __construct(private Session $session, private TranslatorInterface $translator, private RequestStack $requestStack, private NotificationModel $notificationModel)
+    public function __construct(
+        private Session $session,
+        private TranslatorInterface $translator,
+        private RequestStack $requestStack,
+        private NotificationModel $notificationModel
+    )
     {
     }
 

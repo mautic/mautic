@@ -10,7 +10,10 @@ use Mautic\MarketplaceBundle\Service\Allowlist;
 
 class PackageModel
 {
-    public function __construct(private Connection $connection, private Allowlist $allowlist)
+    public function __construct(
+        private Connection $connection,
+        private Allowlist $allowlist
+    )
     {
     }
 

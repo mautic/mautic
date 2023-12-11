@@ -17,7 +17,10 @@ class EncodedValueDAO
      * @param string $type
      * @param string $value
      */
-    public function __construct(private $type, private $value)
+    public function __construct(
+        private $type,
+        private $value
+    )
     {
     }
 

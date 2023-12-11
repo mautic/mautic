@@ -7,7 +7,9 @@ class ConfigAccessor
     /**
      * @param mixed[] $config
      */
-    public function __construct(private array $config)
+    public function __construct(
+        private array $config
+    )
     {
     }
 

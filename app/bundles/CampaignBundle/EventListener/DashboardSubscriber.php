@@ -36,7 +36,10 @@ class DashboardSubscriber extends MainDashboardSubscriber
         'campaign:campaigns:viewother',
     ];
 
-    public function __construct(protected CampaignModel $campaignModel, protected EventModel $campaignEventModel)
+    public function __construct(
+        protected CampaignModel $campaignModel,
+        protected EventModel $campaignEventModel
+    )
     {
     }
 

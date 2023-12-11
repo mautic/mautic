@@ -18,7 +18,10 @@ class GlobalSearchEvent extends Event
      * @param string     $searchString
      * @param Translator $translator
      */
-    public function __construct($searchString, protected $translator)
+    public function __construct(
+        $searchString,
+        protected $translator
+    )
     {
         $this->searchString = strtolower(trim(strip_tags($searchString)));
     }

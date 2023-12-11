@@ -12,7 +12,10 @@ use Symfony\Component\HttpKernel\KernelEvents;
 
 class AssetsSubscriber implements EventSubscriberInterface
 {
-    public function __construct(private AssetsHelper $assetsHelper, private EventDispatcherInterface $dispatcher)
+    public function __construct(
+        private AssetsHelper $assetsHelper,
+        private EventDispatcherInterface $dispatcher
+    )
     {
     }
 

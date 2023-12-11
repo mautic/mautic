@@ -18,7 +18,10 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class IntegrationSyncSettingsFieldMappingsType extends AbstractType
 {
-    public function __construct(private LoggerInterface $logger, private TranslatorInterface $translator)
+    public function __construct(
+        private LoggerInterface $logger,
+        private TranslatorInterface $translator
+    )
     {
     }
 

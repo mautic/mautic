@@ -71,7 +71,12 @@ class DynamicContentType extends AbstractType
     /**
      * @throws \InvalidArgumentException
      */
-    public function __construct(private EntityManager $em, ListModel $listModel, private TranslatorInterface $translator, private LeadModel $leadModel)
+    public function __construct(
+        private EntityManager $em,
+        ListModel $listModel,
+        private TranslatorInterface $translator,
+        private LeadModel $leadModel
+    )
     {
         $this->fieldChoices    = $listModel->getChoiceFields();
         $this->timezoneChoices = FormFieldHelper::getTimezonesChoices();

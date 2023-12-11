@@ -22,7 +22,11 @@ class ExceptionListener extends ErrorListener
     /**
      * @param LoggerInterface $controller
      */
-    public function __construct(protected Router $router, $controller, LoggerInterface $logger = null)
+    public function __construct(
+        protected Router $router,
+        $controller,
+        LoggerInterface $logger = null
+    )
     {
         parent::__construct($controller, $logger);
     }

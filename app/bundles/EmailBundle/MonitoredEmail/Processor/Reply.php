@@ -20,7 +20,15 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class Reply implements ProcessorInterface
 {
-    public function __construct(private StatRepository $statRepo, private ContactFinder $contactFinder, private LeadModel $leadModel, private EventDispatcherInterface $dispatcher, private LoggerInterface $logger, private ContactTracker $contactTracker, private EmailAddressHelper $addressHelper)
+    public function __construct(
+        private StatRepository $statRepo,
+        private ContactFinder $contactFinder,
+        private LeadModel $leadModel,
+        private EventDispatcherInterface $dispatcher,
+        private LoggerInterface $logger,
+        private ContactTracker $contactTracker,
+        private EmailAddressHelper $addressHelper
+    )
     {
     }
 

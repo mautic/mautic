@@ -42,7 +42,21 @@ use Symfony\Contracts\EventDispatcher\Event;
  */
 class SmsModel extends FormModel implements AjaxLookupModelInterface
 {
-    public function __construct(protected TrackableModel $pageTrackableModel, protected LeadModel $leadModel, protected MessageQueueModel $messageQueueModel, protected TransportChain $transport, private CacheStorageHelper $cacheStorageHelper, EntityManagerInterface $em, CorePermissions $security, EventDispatcherInterface $dispatcher, UrlGeneratorInterface $router, Translator $translator, UserHelper $userHelper, LoggerInterface $mauticLogger, CoreParametersHelper $coreParametersHelper)
+    public function __construct(
+        protected TrackableModel $pageTrackableModel,
+        protected LeadModel $leadModel,
+        protected MessageQueueModel $messageQueueModel,
+        protected TransportChain $transport,
+        private CacheStorageHelper $cacheStorageHelper,
+        EntityManagerInterface $em,
+        CorePermissions $security,
+        EventDispatcherInterface $dispatcher,
+        UrlGeneratorInterface $router,
+        Translator $translator,
+        UserHelper $userHelper,
+        LoggerInterface $mauticLogger,
+        CoreParametersHelper $coreParametersHelper
+    )
     {
         parent::__construct($em, $security, $dispatcher, $router, $translator, $userHelper, $mauticLogger, $coreParametersHelper);
     }

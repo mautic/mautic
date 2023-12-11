@@ -12,7 +12,10 @@ use Symfony\Component\Validator\Constraints\NotBlank;
 
 class MessageSendType extends AbstractType
 {
-    public function __construct(protected RouterInterface $router, protected MessageModel $messageModel)
+    public function __construct(
+        protected RouterInterface $router,
+        protected MessageModel $messageModel
+    )
     {
     }
 
