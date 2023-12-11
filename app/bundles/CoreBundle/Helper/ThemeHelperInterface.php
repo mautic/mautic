@@ -19,7 +19,7 @@ interface ThemeHelperInterface
     /**
      * @param string $defaultTheme
      */
-    public function setDefaultTheme($defaultTheme);
+    public function setDefaultTheme($defaultTheme): void;
 
     /**
      * @param string $themeName
@@ -46,7 +46,7 @@ interface ThemeHelperInterface
      * @throws FileExistsException
      * @throws FileNotFoundException
      */
-    public function copy($theme, $newName, $newDirName = null);
+    public function copy($theme, $newName, $newDirName = null): void;
 
     /**
      * @param string $theme
@@ -55,14 +55,14 @@ interface ThemeHelperInterface
      * @throws FileNotFoundException
      * @throws FileExistsException
      */
-    public function rename($theme, $newName);
+    public function rename($theme, $newName): void;
 
     /**
      * @param string $theme
      *
      * @throws FileNotFoundException
      */
-    public function delete($theme);
+    public function delete($theme): void;
 
     /**
      * Fetches the optional settings from the defined steps.
