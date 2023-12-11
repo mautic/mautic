@@ -12,6 +12,7 @@ use Mautic\FormBundle\Helper\TokenHelper as FormTokenHelper;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\LeadBundle\Tracker\ContactTracker;
+use Mautic\PageBundle\Entity\Page;
 use Mautic\PageBundle\Event\PageDisplayEvent;
 use Mautic\PageBundle\Helper\TokenHelper as PageTokenHelper;
 use Mautic\PageBundle\Model\TrackableModel;
@@ -185,5 +186,29 @@ HTML;
             ->with($expected);
 
         $this->subscriber->decodeTokens($event);
+    }
+
+    public function testDecodeTokensNotRunIfEventHasNoTrackingDisabled(): void
+    {
+        $this->security->expects($this->once())
+                       ->method('isAnonymous')
+                       ->willReturn(true);
+
+        $lead = $this->createMock(Lead::class);
+
+        $this->contactTracker->expects($this->once())
+                             ->method('getContact')
+                             ->willReturn($lead);
+
+        $eventMock = $this->getMockBuilder(PageDisplayEvent::class)
+                          ->disableOriginalConstructor()
+                          ->getMock();
+
+        $eventMock->expects($this->never())->method('getContent');
+
+        $page             = new Page();
+        $pageDisplayEvent = new PageDisplayEvent('', $page, [], false);
+
+        $this->subscriber->decodeTokens($pageDisplayEvent);
     }
 }

@@ -53,6 +53,14 @@ class PageTest extends \PHPUnit\Framework\TestCase
         yield ['string', true, ['noIndex' => [null, true]]];
     }
 
+    public function testSetTrackingDisabled(): void
+    {
+        $page = new Page();
+        $this->assertFalse($page->isTrackingDisabled());
+        $page->setTrackingDisabled(true);
+        $this->assertTrue($page->isTrackingDisabled());
+    }
+
     /**
      * Test setHeadScript and getHeadScript.
      */

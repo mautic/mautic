@@ -48,9 +48,9 @@ class PageTestAbstract extends TestCase
     }
 
     /**
-     * @return PageModel
+     * @return PageModel|array<mixed>
      */
-    protected function getPageModel($transliterationEnabled = true)
+    protected function getPageModel($transliterationEnabled = true, bool $constructorArgumentsOnly = false): PageModel|array
     {
         $cookieHelper = $this
             ->getMockBuilder(CookieHelper::class)
@@ -150,29 +150,33 @@ class PageTestAbstract extends TestCase
 
         $deviceTrackerMock = $this->createMock(DeviceTracker::class);
 
-        $pageModel = new PageModel(
-            $cookieHelper,
-            $ipLookupHelper,
-            $leadModel,
-            $leadFieldModel,
-            $redirectModel,
-            $trackableModel,
-            $messageBus,
-            $companyModel,
-            $deviceTrackerMock,
-            $contactTracker,
-            $coreParametersHelper,
-            $contactRequestHelper,
-            $entityManager,
-            $this->createMock(CorePermissions::class),
-            $dispatcher,
-            $this->router,
-            $translator,
-            $userHelper,
-            $this->createMock(LoggerInterface::class)
-        );
+        $corePermissionsMock = $this->createMock(CorePermissions::class);
+        $corePermissionsMock->expects($this->any())->method('isAnonymous')->willReturn(true);
 
-        return $pageModel;
+        $pageModelArguments = [$cookieHelper,
+                                $ipLookupHelper,
+                                $leadModel,
+                                $leadFieldModel,
+                                $redirectModel,
+                                $trackableModel,
+                                $messageBus,
+                                $companyModel,
+                                $deviceTrackerMock,
+                                $contactTracker,
+                                $coreParametersHelper,
+                                $contactRequestHelper,
+                                $entityManager,
+                                $corePermissionsMock,
+                                $dispatcher,
+                                $this->router,
+                                $translator,
+                                $userHelper,
+                                $this->createMock(LoggerInterface::class),
+        ];
+
+        return $constructorArgumentsOnly
+            ? $pageModelArguments
+            : new PageModel(...$pageModelArguments);
     }
 
     /**

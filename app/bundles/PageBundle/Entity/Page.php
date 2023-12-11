@@ -122,6 +122,8 @@ class Page extends FormEntity implements TranslationEntityInterface, VariantEnti
      */
     private $noIndex;
 
+    private bool $trackingDisabled = false;
+
     /**
      * Used to identify the page for the builder.
      */
@@ -221,6 +223,11 @@ class Page extends FormEntity implements TranslationEntityInterface, VariantEnti
         $builder->createField('noIndex', 'boolean')
             ->columnName('no_index')
             ->nullable()
+            ->build();
+
+        $builder->createField('trackingDisabled', 'boolean')
+            ->columnName('tracking_disabled')
+            ->option('default', false)
             ->build();
 
         self::addTranslationMetadata($builder, self::class);
@@ -812,5 +819,17 @@ class Page extends FormEntity implements TranslationEntityInterface, VariantEnti
     public function setCustomHtml($customHtml): void
     {
         $this->customHtml = $customHtml;
+    }
+
+    public function isTrackingDisabled(): bool
+    {
+        return $this->trackingDisabled;
+    }
+
+    public function setTrackingDisabled(bool $trackingDisabled): Page
+    {
+        $this->trackingDisabled = $trackingDisabled;
+
+        return $this;
     }
 }

@@ -10,6 +10,7 @@ use Mautic\LeadBundle\Entity\Lead;
 use Mautic\PageBundle\Entity\Hit;
 use Mautic\PageBundle\Entity\Page;
 use Mautic\PageBundle\Entity\Redirect;
+use Mautic\PageBundle\Model\PageModel;
 use Mautic\PageBundle\Tests\PageTestAbstract;
 use Symfony\Component\HttpFoundation\Request;
 
@@ -32,6 +33,37 @@ class PageModelTest extends PageTestAbstract
 
         $this->assertSame($expectedTitle, $hit->getUrlTitle());
         $this->assertSame(['page_title' => $expectedTitle], $hit->getQuery());
+    }
+
+    public function testHitPageDoesntProcessWhenTrackingIsDisabled(): void
+    {
+        $hit     = new Hit();
+        $page    = new Page();
+        $request = new Request();
+        $contact = new Lead();
+
+        $pageModelArguments = $this->getPageModel(true, true);
+
+        $pageModel = $this->getMockBuilder(PageModel::class)
+                          ->setConstructorArgs($pageModelArguments)
+                          ->onlyMethods(['getHitQuery'])
+                          ->enableOriginalClone()
+                          ->getMock();
+
+        $hit->setIpAddress(new IpAddress());
+        $hit->setQuery(['page_title' => 'Test Page']);
+
+        // Check if tracking is enabled and getHitQuery is called
+        $pageModel->expects($this->once())->method('getHitQuery')
+                  ->willReturn(['page_title' => 'Test Page']);
+
+        $pageModel->hitPage($page, $request, 200, $contact, []);
+
+        // Check if getHitQuery is not called when tracking is disabled
+        $page->setTrackingDisabled(true);
+
+        $pageModel->expects($this->never())->method('getHitQuery');
+        $pageModel->hitPage($page, $request, 200, $contact, []);
     }
 
     public function testUtf8CharsInTitleWithTransletirationDisabled(): void
@@ -97,7 +129,8 @@ class PageModelTest extends PageTestAbstract
 
     public function testCleanQueryWhenCalledReturnsSafeAndValidData(): void
     {
-        $pageModel           = $this->getPageModel();
+        $pageModel = $this->getPageModel();
+        self::assertInstanceOf(PageModel::class, $pageModel);
         $pageModelReflection = new \ReflectionClass($pageModel::class);
         $cleanQueryMethod    = $pageModelReflection->getMethod('cleanQuery');
         $cleanQueryMethod->setAccessible(true);
@@ -121,7 +154,7 @@ class PageModelTest extends PageTestAbstract
      */
     public function testGetHitQueryRequest(): void
     {
-        $pageModel         = $this->getPageModel();
+        $pageModel = $this->getPageModel();
 
         foreach ($this->getQueryParams() as $params) {
             $request = new Request($params);
@@ -136,9 +169,9 @@ class PageModelTest extends PageTestAbstract
      */
     public function testGetHitQueryRedirect(): void
     {
-        $pageModel         = $this->getPageModel();
-        $request           = new Request();
-        $redirect          = new Redirect();
+        $pageModel = $this->getPageModel();
+        $request   = new Request();
+        $redirect  = new Redirect();
 
         foreach ($this->getQueryParams() as $params) {
             $redirect->setUrl($params['page_url']);
@@ -163,11 +196,11 @@ class PageModelTest extends PageTestAbstract
 
     private function getQueryParams(): array
     {
-        $utm = [
-            'utm_source'  => 'test-utm_source',
-            'utm_medium'  => 'test-utm_medium',
-            'utm_campaign'=> 'test-utm_campaign',
-            'utm_content' => 'test-utm_content',
+        $utm         = [
+            'utm_source'   => 'test-utm_source',
+            'utm_medium'   => 'test-utm_medium',
+            'utm_campaign' => 'test-utm_campaign',
+            'utm_content'  => 'test-utm_content',
         ];
         $querystring = '';
         foreach ($utm as $key => $value) {
@@ -180,10 +213,10 @@ class PageModelTest extends PageTestAbstract
             'stat'    => '5f5dedc3b0dc0366144010',
             'lead'    => 2,
             'channel' => [
-                            'email' => 4,
-                        ],
-            ];
-        $ct      = ClickthroughHelper::encodeArrayForUrl($ctParams);
+                'email' => 4,
+            ],
+        ];
+        $ct       = ClickthroughHelper::encodeArrayForUrl($ctParams);
 
         $params = [[
             'page_title'      => 'Testpage',

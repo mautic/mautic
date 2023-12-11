@@ -7,11 +7,12 @@ use Symfony\Contracts\EventDispatcher\Event;
 
 class PageDisplayEvent extends Event
 {
-    /**
-     * @param string $content
-     */
-    public function __construct(private $content, private Page $page, private array $params = [])
-    {
+    public function __construct(
+        private mixed $content,
+        private Page $page,
+        private array $params = [],
+        private bool $trackingDisabled = false
+    ) {
     }
 
     /**
@@ -62,5 +63,19 @@ class PageDisplayEvent extends Event
     public function setParams($params): void
     {
         $this->params = $params;
+    }
+
+    /** If tracking is disabled no record for user should be created. */
+    public function isTrackingDisabled(): bool
+    {
+        return $this->trackingDisabled;
+    }
+
+    /** If tracking is disabled no record for user should be created. */
+    public function setTrackingDisabled(bool $trackingDisabled = true): PageDisplayEvent
+    {
+        $this->trackingDisabled = $trackingDisabled;
+
+        return $this;
     }
 }

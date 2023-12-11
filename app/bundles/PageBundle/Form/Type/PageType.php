@@ -121,6 +121,18 @@ class PageType extends AbstractType
             ]
         );
 
+        $builder->add(
+            'trackingDisabled',
+            YesNoButtonGroupType::class,
+            [
+                'label' => 'mautic.page.config.tracking_disabled',
+                'data'  => $options['data']->isTrackingDisabled() ?? false,
+                'attr'  => [
+                    'tooltip' => 'mautic.page.config.tracking_disabled.tooltip',
+                ],
+            ]
+        );
+
         $builder->add('publishUp', PublishUpDateType::class);
         $builder->add('publishDown', PublishDownDateType::class);
         $builder->add('sessionId', HiddenType::class);
