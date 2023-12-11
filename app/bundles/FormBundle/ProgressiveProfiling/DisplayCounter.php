@@ -17,8 +17,9 @@ class DisplayCounter
      */
     private $alreadyAlwaysDisplayed = 0;
 
-    public function __construct(private Form $form)
-    {
+    public function __construct(
+        private Form $form
+    ) {
     }
 
     public function increaseDisplayedFields(): void

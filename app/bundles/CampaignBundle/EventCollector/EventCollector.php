@@ -23,8 +23,10 @@ class EventCollector
      */
     private $events;
 
-    public function __construct(private TranslatorInterface $translator, private EventDispatcherInterface $dispatcher)
-    {
+    public function __construct(
+        private TranslatorInterface $translator,
+        private EventDispatcherInterface $dispatcher
+    ) {
     }
 
     /**

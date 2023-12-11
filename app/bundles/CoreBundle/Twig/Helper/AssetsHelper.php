@@ -58,8 +58,10 @@ final class AssetsHelper
     private BuilderIntegrationsHelper $builderIntegrationsHelper;
     private InstallService $installService;
 
-    public function __construct(private Packages $packages, private CoreParametersHelper $coreParametersHelper)
-    {
+    public function __construct(
+        private Packages $packages,
+        private CoreParametersHelper $coreParametersHelper
+    ) {
     }
 
     /**

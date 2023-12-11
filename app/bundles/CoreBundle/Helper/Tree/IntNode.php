@@ -21,8 +21,10 @@ class IntNode implements NodeInterface
      */
     private $position = 0;
 
-    public function __construct(private int $value, private ?NodeInterface $parent = null)
-    {
+    public function __construct(
+        private int $value,
+        private ?NodeInterface $parent = null
+    ) {
     }
 
     public function getValue(): int

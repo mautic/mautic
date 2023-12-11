@@ -20,8 +20,10 @@ class ValidationEvent extends CommonEvent
     /**
      * @param mixed $value
      */
-    public function __construct(private Field $field, private $value)
-    {
+    public function __construct(
+        private Field $field,
+        private $value
+    ) {
     }
 
     /**

@@ -16,8 +16,9 @@ class LoadUserData extends AbstractFixture implements OrderedFixtureInterface, F
         return ['group_mautic_install_data'];
     }
 
-    public function __construct(private UserPasswordHasher $hasher)
-    {
+    public function __construct(
+        private UserPasswordHasher $hasher
+    ) {
     }
 
     public function load(ObjectManager $manager): void

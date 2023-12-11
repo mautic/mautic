@@ -12,8 +12,12 @@ use Twig\Environment;
 
 class SearchSubscriber implements EventSubscriberInterface
 {
-    public function __construct(private PointModel $pointModel, private TriggerModel $pointTriggerModel, private CorePermissions $security, private Environment $twig)
-    {
+    public function __construct(
+        private PointModel $pointModel,
+        private TriggerModel $pointTriggerModel,
+        private CorePermissions $security,
+        private Environment $twig
+    ) {
     }
 
     public static function getSubscribedEvents(): array

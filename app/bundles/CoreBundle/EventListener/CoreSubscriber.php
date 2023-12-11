@@ -29,8 +29,18 @@ use Symfony\Component\Security\Http\SecurityEvents;
 
 class CoreSubscriber implements EventSubscriberInterface
 {
-    public function __construct(private BundleHelper $bundleHelper, private MenuHelper $menuHelper, private UserHelper $userHelper, private AssetsHelper $assetsHelper, private CoreParametersHelper $coreParametersHelper, private AuthorizationCheckerInterface $securityContext, private UserModel $userModel, private EventDispatcherInterface $dispatcher, private RequestStack $requestStack, private FormRepository $formRepository)
-    {
+    public function __construct(
+        private BundleHelper $bundleHelper,
+        private MenuHelper $menuHelper,
+        private UserHelper $userHelper,
+        private AssetsHelper $assetsHelper,
+        private CoreParametersHelper $coreParametersHelper,
+        private AuthorizationCheckerInterface $securityContext,
+        private UserModel $userModel,
+        private EventDispatcherInterface $dispatcher,
+        private RequestStack $requestStack,
+        private FormRepository $formRepository
+    ) {
     }
 
     public static function getSubscribedEvents(): array

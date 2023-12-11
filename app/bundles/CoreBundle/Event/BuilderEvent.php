@@ -19,8 +19,12 @@ class BuilderEvent extends Event
     protected string|array $tokenFilterText;
     protected string $tokenFilterTarget;
 
-    public function __construct(protected $translator, protected $entity = null, protected $requested = 'all', protected string $tokenFilter = '')
-    {
+    public function __construct(
+        protected $translator,
+        protected $entity = null,
+        protected $requested = 'all',
+        protected string $tokenFilter = ''
+    ) {
         $this->tokenFilterTarget = (str_starts_with($tokenFilter, '{@')) ? 'label' : 'token';
         $this->tokenFilterText   = str_replace(['{@', '{', '}'], '', $tokenFilter);
         $this->tokenFilter       = ('label' == $this->tokenFilterTarget) ? $this->tokenFilterText : str_replace('{@', '{', $tokenFilter);

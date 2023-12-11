@@ -41,8 +41,9 @@ class ReportSubscriber implements EventSubscriberInterface
         self::CONTEXT_GROUP_SCORE,
     ];
 
-    public function __construct(private FieldsBuilder $fieldsBuilder)
-    {
+    public function __construct(
+        private FieldsBuilder $fieldsBuilder
+    ) {
     }
 
     public static function getSubscribedEvents(): array

@@ -13,8 +13,11 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class SetContactAvatarFormSubscriber implements EventSubscriberInterface
 {
-    public function __construct(private AvatarHelper $avatarHelper, private FormUploader $uploader, private LeadModel $leadModel)
-    {
+    public function __construct(
+        private AvatarHelper $avatarHelper,
+        private FormUploader $uploader,
+        private LeadModel $leadModel
+    ) {
     }
 
     public static function getSubscribedEvents(): array

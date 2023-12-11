@@ -35,8 +35,16 @@ class ContactRequestHelper
      */
     private $publiclyUpdatableFieldValues = [];
 
-    public function __construct(private LeadModel $leadModel, private ContactTracker $contactTracker, private CoreParametersHelper $coreParametersHelper, private IpLookupHelper $ipLookupHelper, private RequestStack $requestStack, private Logger $logger, private EventDispatcherInterface $eventDispatcher, private ContactMerger $contactMerger)
-    {
+    public function __construct(
+        private LeadModel $leadModel,
+        private ContactTracker $contactTracker,
+        private CoreParametersHelper $coreParametersHelper,
+        private IpLookupHelper $ipLookupHelper,
+        private RequestStack $requestStack,
+        private Logger $logger,
+        private EventDispatcherInterface $eventDispatcher,
+        private ContactMerger $contactMerger
+    ) {
     }
 
     /**

@@ -13,8 +13,10 @@ class RemoveCommand extends Command
 {
     public const NAME = 'mautic:marketplace:remove';
 
-    public function __construct(private ComposerHelper $composer, private LoggerInterface $logger)
-    {
+    public function __construct(
+        private ComposerHelper $composer,
+        private LoggerInterface $logger
+    ) {
         parent::__construct();
     }
 

@@ -18,8 +18,12 @@ class IteratorExportDataModel implements \Iterator
      *
      * @template T of object
      */
-    public function __construct(private AbstractCommonModel $model, private array $args, callable $callback, private bool $skipOrdering = false)
-    {
+    public function __construct(
+        private AbstractCommonModel $model,
+        private array $args,
+        callable $callback,
+        private bool $skipOrdering = false
+    ) {
         $this->callback     = $callback;
         $this->position     = 0;
         $this->total        = 0;

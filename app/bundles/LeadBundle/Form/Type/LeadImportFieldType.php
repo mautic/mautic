@@ -16,8 +16,10 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class LeadImportFieldType extends AbstractType
 {
-    public function __construct(private TranslatorInterface $translator, private EntityManager $entityManager)
-    {
+    public function __construct(
+        private TranslatorInterface $translator,
+        private EntityManager $entityManager
+    ) {
     }
 
     public function buildForm(FormBuilderInterface $builder, array $options): void

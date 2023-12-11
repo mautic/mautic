@@ -43,8 +43,10 @@ class DashboardSubscriber extends MainDashboardSubscriber
         'page:pages:viewother',
     ];
 
-    public function __construct(protected PageModel $pageModel, protected RouterInterface $router)
-    {
+    public function __construct(
+        protected PageModel $pageModel,
+        protected RouterInterface $router
+    ) {
     }
 
     /**

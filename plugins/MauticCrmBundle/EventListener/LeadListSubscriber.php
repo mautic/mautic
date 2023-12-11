@@ -15,8 +15,11 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class LeadListSubscriber implements EventSubscriberInterface
 {
-    public function __construct(private IntegrationHelper $helper, private ListModel $listModel, private TranslatorInterface $translator)
-    {
+    public function __construct(
+        private IntegrationHelper $helper,
+        private ListModel $listModel,
+        private TranslatorInterface $translator
+    ) {
     }
 
     public static function getSubscribedEvents(): array

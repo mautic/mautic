@@ -26,8 +26,11 @@ class IntegrationsHelper
      */
     private $decryptedIntegrationConfigurations = [];
 
-    public function __construct(private IntegrationRepository $integrationRepository, private EncryptionService $encryptionService, private EventDispatcherInterface $eventDispatcher)
-    {
+    public function __construct(
+        private IntegrationRepository $integrationRepository,
+        private EncryptionService $encryptionService,
+        private EventDispatcherInterface $eventDispatcher
+    ) {
     }
 
     public function addIntegration(IntegrationInterface $integration): void

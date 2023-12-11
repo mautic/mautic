@@ -16,8 +16,10 @@ class CredentialsStore implements CredentialStoreInterface
      */
     private $credentials;
 
-    public function __construct(private CoreParametersHelper $coreParametersHelper, private string $entityId)
-    {
+    public function __construct(
+        private CoreParametersHelper $coreParametersHelper,
+        private string $entityId
+    ) {
     }
 
     public function getByEntityId($entityId): array

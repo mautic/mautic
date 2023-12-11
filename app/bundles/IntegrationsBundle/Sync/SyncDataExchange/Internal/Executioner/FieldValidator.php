@@ -18,8 +18,10 @@ final class FieldValidator implements FieldValidatorInterface
      */
     private $fieldSchemaData = [];
 
-    public function __construct(private LeadFieldRepository $leadFieldRepository, private BulkNotification $bulkNotification)
-    {
+    public function __construct(
+        private LeadFieldRepository $leadFieldRepository,
+        private BulkNotification $bulkNotification
+    ) {
     }
 
     /**

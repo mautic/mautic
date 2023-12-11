@@ -14,8 +14,12 @@ class ListChangeEvent extends Event
     /**
      * @param bool $added
      */
-    public function __construct($leads, private LeadList $list, private $added = true, private ?\DateTime $date = null)
-    {
+    public function __construct(
+        $leads,
+        private LeadList $list,
+        private $added = true,
+        private ?\DateTime $date = null
+    ) {
         if (is_array($leads)) {
             $this->leads = $leads;
         } else {

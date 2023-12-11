@@ -6,8 +6,9 @@ use Mautic\LeadBundle\Provider\FilterOperatorProviderInterface;
 
 class ContactSegmentFilterOperator
 {
-    public function __construct(private FilterOperatorProviderInterface $filterOperatorProvider)
-    {
+    public function __construct(
+        private FilterOperatorProviderInterface $filterOperatorProvider
+    ) {
     }
 
     /**

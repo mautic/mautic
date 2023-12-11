@@ -18,8 +18,12 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class CampaignSubscriber implements EventSubscriberInterface
 {
-    public function __construct(private FormModel $formModel, private SubmissionModel $formSubmissionModel, private RealTimeExecutioner $realTimeExecutioner, private FormFieldHelper $formFieldHelper)
-    {
+    public function __construct(
+        private FormModel $formModel,
+        private SubmissionModel $formSubmissionModel,
+        private RealTimeExecutioner $realTimeExecutioner,
+        private FormFieldHelper $formFieldHelper
+    ) {
     }
 
     public static function getSubscribedEvents(): array

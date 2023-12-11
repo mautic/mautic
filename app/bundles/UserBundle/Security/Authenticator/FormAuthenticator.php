@@ -42,8 +42,14 @@ class FormAuthenticator extends AbstractFormLoginAuthenticator implements Passwo
 
     private ?Response $authEventResponse = null;
 
-    public function __construct(private IntegrationHelper $integrationHelper, private UserPasswordHasher $hasher, private EventDispatcherInterface $dispatcher, private ?RequestStack $requestStack, private CsrfTokenManagerInterface $csrfTokenManager, private UrlGeneratorInterface $urlGenerator)
-    {
+    public function __construct(
+        private IntegrationHelper $integrationHelper,
+        private UserPasswordHasher $hasher,
+        private EventDispatcherInterface $dispatcher,
+        private ?RequestStack $requestStack,
+        private CsrfTokenManagerInterface $csrfTokenManager,
+        private UrlGeneratorInterface $urlGenerator
+    ) {
     }
 
     public function supports(Request $request): bool

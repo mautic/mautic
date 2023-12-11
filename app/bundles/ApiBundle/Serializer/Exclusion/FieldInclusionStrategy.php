@@ -21,8 +21,11 @@ class FieldInclusionStrategy implements ExclusionStrategyInterface
      *
      * @param int $level
      */
-    public function __construct(private array $fields, $level = 3, private $path = null)
-    {
+    public function __construct(
+        private array $fields,
+        $level = 3,
+        private $path = null
+    ) {
         $this->level  = (int) $level;
     }
 

@@ -12,8 +12,9 @@ final class FieldCollectEvent extends Event
 {
     private FieldCollection $fields;
 
-    public function __construct(private string $object)
-    {
+    public function __construct(
+        private string $object
+    ) {
         $this->fields = new FieldCollection();
     }
 

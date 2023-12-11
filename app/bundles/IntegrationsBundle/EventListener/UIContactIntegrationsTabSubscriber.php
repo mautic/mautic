@@ -13,8 +13,9 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class UIContactIntegrationsTabSubscriber implements EventSubscriberInterface
 {
-    public function __construct(private ObjectMappingRepository $objectMappingRepository)
-    {
+    public function __construct(
+        private ObjectMappingRepository $objectMappingRepository
+    ) {
     }
 
     public static function getSubscribedEvents(): array

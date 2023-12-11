@@ -18,8 +18,14 @@ class InactiveHelper
      */
     private $earliestInactiveDate;
 
-    public function __construct(private EventScheduler $scheduler, private InactiveContactFinder $inactiveContactFinder, private LeadEventLogRepository $eventLogRepository, private EventRepository $eventRepository, private LoggerInterface $logger, private DecisionHelper $decisionHelper)
-    {
+    public function __construct(
+        private EventScheduler $scheduler,
+        private InactiveContactFinder $inactiveContactFinder,
+        private LeadEventLogRepository $eventLogRepository,
+        private EventRepository $eventRepository,
+        private LoggerInterface $logger,
+        private DecisionHelper $decisionHelper
+    ) {
     }
 
     /**

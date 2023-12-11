@@ -18,8 +18,9 @@ class MiddlewareCacheWarmer implements CacheWarmerInterface
      */
     private \SplPriorityQueue $specs;
 
-    public function __construct(private string $env)
-    {
+    public function __construct(
+        private string $env
+    ) {
         $this->specs     = new \SplPriorityQueue();
     }
 

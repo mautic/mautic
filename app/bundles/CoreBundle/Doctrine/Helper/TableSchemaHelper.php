@@ -36,8 +36,11 @@ class TableSchemaHelper
     /**
      * @param string $prefix
      */
-    public function __construct(protected Connection $db, protected $prefix, protected ColumnSchemaHelper $columnHelper)
-    {
+    public function __construct(
+        protected Connection $db,
+        protected $prefix,
+        protected ColumnSchemaHelper $columnHelper
+    ) {
         $this->sm           = $db->getSchemaManager();
     }
 

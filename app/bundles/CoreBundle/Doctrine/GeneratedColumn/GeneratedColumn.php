@@ -28,8 +28,12 @@ final class GeneratedColumn implements GeneratedColumnInterface
      */
     private $indexColumns = [];
 
-    public function __construct(private string $tableName, string $columnName, private string $columnType, private string $as)
-    {
+    public function __construct(
+        private string $tableName,
+        string $columnName,
+        private string $columnType,
+        private string $as
+    ) {
         $this->indexColumns[] = $columnName;
         $this->tablePrefix    = MAUTIC_TABLE_PREFIX;
         $this->columnName     = $columnName;

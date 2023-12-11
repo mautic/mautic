@@ -28,8 +28,18 @@ class DynamicContentSubscriber implements EventSubscriberInterface
 {
     use MatchFilterForLeadTrait;
 
-    public function __construct(private TrackableModel $trackableModel, private PageTokenHelper $pageTokenHelper, private AssetTokenHelper $assetTokenHelper, private FormTokenHelper $formTokenHelper, private FocusTokenHelper $focusTokenHelper, private AuditLogModel $auditLogModel, private DynamicContentHelper $dynamicContentHelper, private DynamicContentModel $dynamicContentModel, private CorePermissions $security, private ContactTracker $contactTracker)
-    {
+    public function __construct(
+        private TrackableModel $trackableModel,
+        private PageTokenHelper $pageTokenHelper,
+        private AssetTokenHelper $assetTokenHelper,
+        private FormTokenHelper $formTokenHelper,
+        private FocusTokenHelper $focusTokenHelper,
+        private AuditLogModel $auditLogModel,
+        private DynamicContentHelper $dynamicContentHelper,
+        private DynamicContentModel $dynamicContentModel,
+        private CorePermissions $security,
+        private ContactTracker $contactTracker
+    ) {
     }
 
     public static function getSubscribedEvents(): array

@@ -19,8 +19,10 @@ class InternalObjectOwnerEvent extends Event
     /**
      * @param int[] $objectIds
      */
-    public function __construct(private ObjectInterface $object, private array $objectIds)
-    {
+    public function __construct(
+        private ObjectInterface $object,
+        private array $objectIds
+    ) {
     }
 
     public function getObject(): ObjectInterface

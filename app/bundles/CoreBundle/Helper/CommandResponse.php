@@ -6,8 +6,10 @@ namespace Mautic\CoreBundle\Helper;
 
 final class CommandResponse
 {
-    public function __construct(private int $statusCode, private string $message)
-    {
+    public function __construct(
+        private int $statusCode,
+        private string $message
+    ) {
     }
 
     public function getMessage(): string

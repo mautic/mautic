@@ -108,8 +108,11 @@ final class ButtonHelper
      */
     private $listMarker = 3;
 
-    public function __construct(private Environment $twig, private TranslatorInterface $translator, private EventDispatcherInterface $dispatcher)
-    {
+    public function __construct(
+        private Environment $twig,
+        private TranslatorInterface $translator,
+        private EventDispatcherInterface $dispatcher
+    ) {
     }
 
     /**

@@ -14,8 +14,10 @@ class ReportSubscriber implements EventSubscriberInterface
 {
     public const CONTEXT_MESSAGE_CHANNEL = 'message.channel';
 
-    public function __construct(private CompanyReportData $companyReportData, private RouterInterface $router)
-    {
+    public function __construct(
+        private CompanyReportData $companyReportData,
+        private RouterInterface $router
+    ) {
     }
 
     public static function getSubscribedEvents(): array

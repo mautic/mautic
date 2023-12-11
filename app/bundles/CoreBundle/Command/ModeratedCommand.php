@@ -43,8 +43,10 @@ abstract class ModeratedCommand extends Command
      */
     protected $output;
 
-    public function __construct(protected PathsHelper $pathsHelper, private CoreParametersHelper $coreParametersHelper)
-    {
+    public function __construct(
+        protected PathsHelper $pathsHelper,
+        private CoreParametersHelper $coreParametersHelper
+    ) {
         parent::__construct();
     }
 

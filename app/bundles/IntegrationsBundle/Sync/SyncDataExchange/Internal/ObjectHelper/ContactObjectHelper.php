@@ -28,8 +28,13 @@ class ContactObjectHelper implements ObjectHelperInterface
      */
     private $availableFields;
 
-    public function __construct(private LeadModel $model, private LeadRepository $repository, private Connection $connection, private FieldModel $fieldModel, private DoNotContactModel $dncModel)
-    {
+    public function __construct(
+        private LeadModel $model,
+        private LeadRepository $repository,
+        private Connection $connection,
+        private FieldModel $fieldModel,
+        private DoNotContactModel $dncModel
+    ) {
     }
 
     /**

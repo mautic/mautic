@@ -63,8 +63,12 @@ class ChartQuery extends AbstractChart
      *
      * @param string|null $unit
      */
-    public function __construct(protected Connection $connection, \DateTime $dateFrom, \DateTime $dateTo, $unit = null)
-    {
+    public function __construct(
+        protected Connection $connection,
+        \DateTime $dateFrom,
+        \DateTime $dateTo,
+        $unit = null
+    ) {
         $this->dateTimeHelper = new DateTimeHelper();
         $this->unit           = $unit ?? $this->getTimeUnitFromDateRange($dateFrom, $dateTo);
         $this->isTimeUnit     = in_array($this->unit, ['H', 'i', 's']);

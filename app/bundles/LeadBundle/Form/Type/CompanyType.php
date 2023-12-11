@@ -21,8 +21,11 @@ class CompanyType extends AbstractType
 {
     use EntityFieldsBuildFormTrait;
 
-    public function __construct(private EntityManager $em, protected RouterInterface $router, protected TranslatorInterface $translator)
-    {
+    public function __construct(
+        private EntityManager $em,
+        protected RouterInterface $router,
+        protected TranslatorInterface $translator
+    ) {
     }
 
     public function buildForm(FormBuilderInterface $builder, array $options): void

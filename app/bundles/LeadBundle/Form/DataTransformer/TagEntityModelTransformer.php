@@ -13,8 +13,11 @@ class TagEntityModelTransformer implements DataTransformerInterface
      * @param string $repository
      * @param bool   $isArray
      */
-    public function __construct(private EntityManager $em, private $repository = '', private $isArray = false)
-    {
+    public function __construct(
+        private EntityManager $em,
+        private $repository = '',
+        private $isArray = false
+    ) {
     }
 
     public function reverseTransform($entity)

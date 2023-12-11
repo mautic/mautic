@@ -42,8 +42,11 @@ class DynamicContentFilterEntryType extends AbstractType
      */
     private array $localeChoices;
 
-    public function __construct(ListModel $listModel, private StageModel $stageModel, private BuilderIntegrationsHelper $builderIntegrationsHelper)
-    {
+    public function __construct(
+        ListModel $listModel,
+        private StageModel $stageModel,
+        private BuilderIntegrationsHelper $builderIntegrationsHelper
+    ) {
         $this->fieldChoices = $listModel->getChoiceFields();
 
         $this->filterFieldChoices();

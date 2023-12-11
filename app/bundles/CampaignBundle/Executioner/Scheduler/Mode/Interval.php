@@ -21,8 +21,10 @@ class Interval implements ScheduleModeInterface
      */
     private $defaultTimezone;
 
-    public function __construct(private LoggerInterface $logger, private CoreParametersHelper $coreParametersHelper)
-    {
+    public function __construct(
+        private LoggerInterface $logger,
+        private CoreParametersHelper $coreParametersHelper
+    ) {
     }
 
     /**

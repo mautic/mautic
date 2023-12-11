@@ -29,8 +29,12 @@ class EntityLookupChoiceLoader implements ChoiceLoaderInterface
      * @param ModelFactory<object> $modelFactory
      * @param array                $options
      */
-    public function __construct(protected ModelFactory $modelFactory, protected TranslatorInterface $translator, protected Connection $connection, protected $options = [])
-    {
+    public function __construct(
+        protected ModelFactory $modelFactory,
+        protected TranslatorInterface $translator,
+        protected Connection $connection,
+        protected $options = []
+    ) {
     }
 
     /**

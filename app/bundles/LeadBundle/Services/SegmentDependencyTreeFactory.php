@@ -17,8 +17,10 @@ class SegmentDependencyTreeFactory
      */
     private $usedSegmentIds = [];
 
-    public function __construct(private ListModel $segmentModel, private RouterInterface $router)
-    {
+    public function __construct(
+        private ListModel $segmentModel,
+        private RouterInterface $router
+    ) {
     }
 
     public function buildTree(LeadList $segment, NodeInterface $rootNode = null): NodeInterface

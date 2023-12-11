@@ -48,8 +48,13 @@ class SegmentContactsLineChartQuery extends ChartQuery
      *
      * @throws SegmentNotFoundException
      */
-    public function __construct(Connection $connection, \DateTime $dateFrom, \DateTime $dateTo, private array $filters = [], $unit = null)
-    {
+    public function __construct(
+        Connection $connection,
+        \DateTime $dateFrom,
+        \DateTime $dateTo,
+        private array $filters = [],
+        $unit = null
+    ) {
         $this->connection = $connection;
         $this->dateFrom   = $dateFrom;
         $this->dateTo     = $dateTo;

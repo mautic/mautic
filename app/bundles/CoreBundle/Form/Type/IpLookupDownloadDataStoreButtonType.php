@@ -14,8 +14,10 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class IpLookupDownloadDataStoreButtonType extends AbstractType
 {
-    public function __construct(private DateHelper $dateHelper, private TranslatorInterface $translator)
-    {
+    public function __construct(
+        private DateHelper $dateHelper,
+        private TranslatorInterface $translator
+    ) {
     }
 
     public function buildForm(FormBuilderInterface $builder, array $options): void

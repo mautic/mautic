@@ -39,8 +39,12 @@ class MembershipBuilder
      */
     private $progressBar;
 
-    public function __construct(private MembershipManager $manager, private CampaignLeadRepository $campaignLeadRepository, private LeadRepository $leadRepository, private TranslatorInterface $translator)
-    {
+    public function __construct(
+        private MembershipManager $manager,
+        private CampaignLeadRepository $campaignLeadRepository,
+        private LeadRepository $leadRepository,
+        private TranslatorInterface $translator
+    ) {
     }
 
     /**

@@ -15,8 +15,9 @@ class Shortener
      */
     private array $services = [];
 
-    public function __construct(private CoreParametersHelper $coreParametersHelper)
-    {
+    public function __construct(
+        private CoreParametersHelper $coreParametersHelper
+    ) {
     }
 
     public function addService(ShortenerServiceInterface $shortener): void

@@ -33,8 +33,10 @@ class BundleMetadataBuilder
      */
     private $coreMetadata = [];
 
-    public function __construct(private array $symfonyBundles, private array $paths)
-    {
+    public function __construct(
+        private array $symfonyBundles,
+        private array $paths
+    ) {
         $this->buildMetadata();
     }
 

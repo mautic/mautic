@@ -13,8 +13,9 @@ use Symfony\Component\Validator\Constraints\NotBlank;
 
 class VariantType extends AbstractType
 {
-    public function __construct(private PageModel $pageModel)
-    {
+    public function __construct(
+        private PageModel $pageModel
+    ) {
     }
 
     public function buildForm(FormBuilderInterface $builder, array $options): void

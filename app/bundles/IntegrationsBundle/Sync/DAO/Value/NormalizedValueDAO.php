@@ -35,8 +35,11 @@ class NormalizedValueDAO
      * @param mixed  $value
      * @param mixed  $normalizedValue
      */
-    public function __construct(private $type, private $value, $normalizedValue = null)
-    {
+    public function __construct(
+        private $type,
+        private $value,
+        $normalizedValue = null
+    ) {
         $this->normalizedValue = $normalizedValue ?: $value;
     }
 

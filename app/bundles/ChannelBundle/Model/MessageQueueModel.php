@@ -31,8 +31,18 @@ class MessageQueueModel extends FormModel
      */
     public const DEFAULT_RESCHEDULE_INTERVAL = 'PT15M';
 
-    public function __construct(protected LeadModel $leadModel, protected CompanyModel $companyModel, CoreParametersHelper $coreParametersHelper, EntityManagerInterface $em, CorePermissions $security, EventDispatcherInterface $dispatcher, UrlGeneratorInterface $router, Translator $translator, UserHelper $userHelper, LoggerInterface $mauticLogger)
-    {
+    public function __construct(
+        protected LeadModel $leadModel,
+        protected CompanyModel $companyModel,
+        CoreParametersHelper $coreParametersHelper,
+        EntityManagerInterface $em,
+        CorePermissions $security,
+        EventDispatcherInterface $dispatcher,
+        UrlGeneratorInterface $router,
+        Translator $translator,
+        UserHelper $userHelper,
+        LoggerInterface $mauticLogger
+    ) {
         parent::__construct($em, $security, $dispatcher, $router, $translator, $userHelper, $mauticLogger, $coreParametersHelper);
     }
 

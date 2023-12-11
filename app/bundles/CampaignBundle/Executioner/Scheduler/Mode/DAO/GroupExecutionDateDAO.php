@@ -12,8 +12,9 @@ class GroupExecutionDateDAO
      */
     private $contacts;
 
-    public function __construct(private \DateTimeInterface $executionDate)
-    {
+    public function __construct(
+        private \DateTimeInterface $executionDate
+    ) {
         $this->contacts      = new ArrayCollection();
     }
 

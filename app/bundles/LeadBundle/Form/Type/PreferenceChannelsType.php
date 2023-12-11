@@ -10,8 +10,9 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class PreferenceChannelsType extends AbstractType
 {
-    public function __construct(private LeadModel $leadModel)
-    {
+    public function __construct(
+        private LeadModel $leadModel
+    ) {
     }
 
     public function configureOptions(OptionsResolver $resolver): void

@@ -11,8 +11,9 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class RoleData extends AbstractFixture implements OrderedFixtureInterface, FixtureGroupInterface
 {
-    public function __construct(private TranslatorInterface $translator)
-    {
+    public function __construct(
+        private TranslatorInterface $translator
+    ) {
     }
 
     public static function getGroups(): array

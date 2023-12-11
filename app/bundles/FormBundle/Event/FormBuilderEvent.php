@@ -28,8 +28,9 @@ class FormBuilderEvent extends Event
      */
     private $validators = [];
 
-    public function __construct(private TranslatorInterface $translator)
-    {
+    public function __construct(
+        private TranslatorInterface $translator
+    ) {
     }
 
     /**

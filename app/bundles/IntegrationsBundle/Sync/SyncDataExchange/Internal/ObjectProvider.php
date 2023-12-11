@@ -19,8 +19,9 @@ class ObjectProvider
      */
     private $objects = [];
 
-    public function __construct(private EventDispatcherInterface $dispatcher)
-    {
+    public function __construct(
+        private EventDispatcherInterface $dispatcher
+    ) {
     }
 
     /**

@@ -67,8 +67,12 @@ class OrderDAO
      * @param bool   $isFirstTimeSync
      * @param string $integration
      */
-    public function __construct(private \DateTimeInterface $syncDateTime, private $isFirstTimeSync, private $integration, private array $options = [])
-    {
+    public function __construct(
+        private \DateTimeInterface $syncDateTime,
+        private $isFirstTimeSync,
+        private $integration,
+        private array $options = []
+    ) {
     }
 
     public function addObjectChange(ObjectChangeDAO $objectChangeDAO): self

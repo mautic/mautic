@@ -21,8 +21,9 @@ class MailboxContainer
      */
     protected $messages = [];
 
-    public function __construct(protected ConfigAccessor $config)
-    {
+    public function __construct(
+        protected ConfigAccessor $config
+    ) {
     }
 
     public function addCriteria($criteria, $mailbox): void

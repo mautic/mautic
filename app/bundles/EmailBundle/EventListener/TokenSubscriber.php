@@ -15,8 +15,10 @@ class TokenSubscriber implements EventSubscriberInterface
 {
     use MatchFilterForLeadTrait;
 
-    public function __construct(private EventDispatcherInterface $dispatcher, private PrimaryCompanyHelper $primaryCompanyHelper)
-    {
+    public function __construct(
+        private EventDispatcherInterface $dispatcher,
+        private PrimaryCompanyHelper $primaryCompanyHelper
+    ) {
     }
 
     public static function getSubscribedEvents(): array

@@ -80,8 +80,14 @@ class StatsEvent extends Event
      * @param int $start
      * @param int $limit
      */
-    public function __construct($table, $start, $limit, protected array $order, array $where, protected User $user)
-    {
+    public function __construct(
+        $table,
+        $start,
+        $limit,
+        protected array $order,
+        array $where,
+        protected User $user
+    ) {
         $this->table = strtolower(trim(str_replace(MAUTIC_TABLE_PREFIX, '', strip_tags($table))));
         $this->start = (int) $start;
         $this->limit = (int) $limit;

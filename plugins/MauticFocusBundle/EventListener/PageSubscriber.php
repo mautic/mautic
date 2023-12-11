@@ -15,8 +15,12 @@ class PageSubscriber implements EventSubscriberInterface
 {
     private $regex = '{focus=(.*?)}';
 
-    public function __construct(private CorePermissions $security, private FocusModel $model, private RouterInterface $router, private BuilderTokenHelperFactory $builderTokenHelperFactory)
-    {
+    public function __construct(
+        private CorePermissions $security,
+        private FocusModel $model,
+        private RouterInterface $router,
+        private BuilderTokenHelperFactory $builderTokenHelperFactory
+    ) {
     }
 
     public static function getSubscribedEvents(): array

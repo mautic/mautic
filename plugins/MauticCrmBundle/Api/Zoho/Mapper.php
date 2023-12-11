@@ -37,8 +37,9 @@ class Mapper
      */
     private $contactMapper = [];
 
-    public function __construct(private array $fields)
-    {
+    public function __construct(
+        private array $fields
+    ) {
     }
 
     /**

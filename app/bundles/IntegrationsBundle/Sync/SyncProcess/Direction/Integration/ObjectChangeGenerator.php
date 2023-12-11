@@ -44,8 +44,9 @@ class ObjectChangeGenerator
      */
     private $objectChange;
 
-    public function __construct(private ValueHelper $valueHelper)
-    {
+    public function __construct(
+        private ValueHelper $valueHelper
+    ) {
     }
 
     /**

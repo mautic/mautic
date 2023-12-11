@@ -18,8 +18,10 @@ class ReplyEvent extends Event
      *
      * @param string $message
      */
-    public function __construct(private Lead $contact, private $message)
-    {
+    public function __construct(
+        private Lead $contact,
+        private $message
+    ) {
     }
 
     /**

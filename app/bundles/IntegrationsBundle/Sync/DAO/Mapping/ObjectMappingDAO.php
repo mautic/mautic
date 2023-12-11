@@ -25,8 +25,10 @@ class ObjectMappingDAO
      */
     private $fieldMappings = [];
 
-    public function __construct(private string $internalObjectName, private string $integrationObjectName)
-    {
+    public function __construct(
+        private string $internalObjectName,
+        private string $integrationObjectName
+    ) {
     }
 
     /**

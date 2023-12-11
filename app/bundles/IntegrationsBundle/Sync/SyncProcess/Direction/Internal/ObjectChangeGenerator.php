@@ -59,8 +59,11 @@ class ObjectChangeGenerator
         SyncJudgeInterface::FUZZY_EVIDENCE_MODE,
     ];
 
-    public function __construct(private SyncJudgeInterface $syncJudge, private ValueHelper $valueHelper, private FieldHelper $fieldHelper)
-    {
+    public function __construct(
+        private SyncJudgeInterface $syncJudge,
+        private ValueHelper $valueHelper,
+        private FieldHelper $fieldHelper
+    ) {
     }
 
     /**

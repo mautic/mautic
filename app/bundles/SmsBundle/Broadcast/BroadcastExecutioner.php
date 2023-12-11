@@ -21,8 +21,12 @@ class BroadcastExecutioner
      */
     private $result;
 
-    public function __construct(private SmsModel $smsModel, private BroadcastQuery $broadcastQuery, private TranslatorInterface $translator, private LeadRepository $leadRepository)
-    {
+    public function __construct(
+        private SmsModel $smsModel,
+        private BroadcastQuery $broadcastQuery,
+        private TranslatorInterface $translator,
+        private LeadRepository $leadRepository
+    ) {
     }
 
     public function execute(ChannelBroadcastEvent $event): void

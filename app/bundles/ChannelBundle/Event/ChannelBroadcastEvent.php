@@ -66,8 +66,11 @@ class ChannelBroadcastEvent extends Event
      */
     private $threadId;
 
-    public function __construct($channel, $channelId, protected OutputInterface $output)
-    {
+    public function __construct(
+        $channel,
+        $channelId,
+        protected OutputInterface $output
+    ) {
         $this->channel = $channel;
         $this->id      = $channelId;
     }

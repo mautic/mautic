@@ -108,8 +108,9 @@ class User extends FormEntity implements UserInterface, EquatableInterface, Pass
     /**
      * @param bool $guest
      */
-    public function __construct(private $guest = false)
-    {
+    public function __construct(
+        private $guest = false
+    ) {
     }
 
     public static function loadMetadata(ORM\ClassMetadata $metadata): void

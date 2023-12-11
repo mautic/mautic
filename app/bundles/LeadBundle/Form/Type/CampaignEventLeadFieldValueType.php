@@ -17,8 +17,11 @@ use Symfony\Component\Validator\Constraints\NotBlank;
 
 class CampaignEventLeadFieldValueType extends AbstractType
 {
-    public function __construct(protected Translator $translator, protected LeadModel $leadModel, protected FieldModel $fieldModel)
-    {
+    public function __construct(
+        protected Translator $translator,
+        protected LeadModel $leadModel,
+        protected FieldModel $fieldModel
+    ) {
     }
 
     public function buildForm(FormBuilderInterface $builder, array $options): void

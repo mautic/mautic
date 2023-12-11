@@ -9,8 +9,9 @@ use Symfony\Component\Form\DataTransformerInterface;
 
 class EventsToArrayTransformer implements DataTransformerInterface
 {
-    public function __construct(private Webhook $webhook)
-    {
+    public function __construct(
+        private Webhook $webhook
+    ) {
     }
 
     /**

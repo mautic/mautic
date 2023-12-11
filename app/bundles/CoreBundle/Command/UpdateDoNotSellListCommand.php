@@ -10,8 +10,10 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class UpdateDoNotSellListCommand extends Command
 {
-    public function __construct(private MaxMindDoNotSellDownloadHelper $maxMindDoNotSellDownloadHelper, private TranslatorInterface $translator)
-    {
+    public function __construct(
+        private MaxMindDoNotSellDownloadHelper $maxMindDoNotSellDownloadHelper,
+        private TranslatorInterface $translator
+    ) {
         parent::__construct();
     }
 

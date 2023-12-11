@@ -23,8 +23,10 @@ class MaxMindDoNotSellPurgeCommand extends Command
      */
     private \Doctrine\ORM\EntityRepository $leadRepository;
 
-    public function __construct(private EntityManager $em, private MaxMindDoNotSellList $doNotSellList)
-    {
+    public function __construct(
+        private EntityManager $em,
+        private MaxMindDoNotSellList $doNotSellList
+    ) {
         parent::__construct();
         $this->leadRepository = $this->em->getRepository(Lead::class);
     }

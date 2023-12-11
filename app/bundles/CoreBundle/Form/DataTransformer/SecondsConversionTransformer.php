@@ -6,8 +6,9 @@ use Symfony\Component\Form\DataTransformerInterface;
 
 class SecondsConversionTransformer implements DataTransformerInterface
 {
-    public function __construct(private $viewFormat = 'H')
-    {
+    public function __construct(
+        private $viewFormat = 'H'
+    ) {
     }
 
     /**

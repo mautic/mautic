@@ -23,8 +23,10 @@ class OwnerSubscriber implements EventSubscriberInterface
 
     public const onwerColumns = ['email', 'firstname', 'lastname', 'position', 'signature'];
 
-    public function __construct(private LeadModel $leadModel, private TranslatorInterface $translator)
-    {
+    public function __construct(
+        private LeadModel $leadModel,
+        private TranslatorInterface $translator
+    ) {
     }
 
     public static function getSubscribedEvents(): array

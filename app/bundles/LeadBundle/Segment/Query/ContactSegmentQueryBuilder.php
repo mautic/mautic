@@ -28,8 +28,11 @@ class ContactSegmentQueryBuilder
      */
     private $dependencyMap = [];
 
-    public function __construct(private EntityManager $entityManager, private RandomParameterName $randomParameterName, private EventDispatcherInterface $dispatcher)
-    {
+    public function __construct(
+        private EntityManager $entityManager,
+        private RandomParameterName $randomParameterName,
+        private EventDispatcherInterface $dispatcher
+    ) {
     }
 
     /**

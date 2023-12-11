@@ -57,8 +57,11 @@ class Fetcher
      *
      * @param string $campaignId
      */
-    public function __construct(private IntegrationEntityRepository $repo, private Organizer $organizer, private $campaignId)
-    {
+    public function __construct(
+        private IntegrationEntityRepository $repo,
+        private Organizer $organizer,
+        private $campaignId
+    ) {
         $this->fetchLeads();
         $this->fetchContacts();
     }

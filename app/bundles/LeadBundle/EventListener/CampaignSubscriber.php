@@ -51,8 +51,18 @@ class CampaignSubscriber implements EventSubscriberInterface
      */
     private $fields;
 
-    public function __construct(private IpLookupHelper $ipLookupHelper, private LeadModel $leadModel, private FieldModel $leadFieldModel, private ListModel $listModel, private CompanyModel $companyModel, private CampaignModel $campaignModel, private CoreParametersHelper $coreParametersHelper, private DoNotContact $doNotContact, private PointGroupModel $groupModel, private FilterOperatorProvider $filterOperatorProvider)
-    {
+    public function __construct(
+        private IpLookupHelper $ipLookupHelper,
+        private LeadModel $leadModel,
+        private FieldModel $leadFieldModel,
+        private ListModel $listModel,
+        private CompanyModel $companyModel,
+        private CampaignModel $campaignModel,
+        private CoreParametersHelper $coreParametersHelper,
+        private DoNotContact $doNotContact,
+        private PointGroupModel $groupModel,
+        private FilterOperatorProvider $filterOperatorProvider
+    ) {
     }
 
     public static function getSubscribedEvents(): array

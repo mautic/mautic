@@ -17,8 +17,9 @@ class ContactIdentificationEvent extends Event
      */
     private $identifiedByChannel;
 
-    public function __construct(private array $clickthrough)
-    {
+    public function __construct(
+        private array $clickthrough
+    ) {
     }
 
     /**

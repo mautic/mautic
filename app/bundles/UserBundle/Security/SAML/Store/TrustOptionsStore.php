@@ -13,8 +13,10 @@ class TrustOptionsStore implements TrustOptionsStoreInterface
      */
     private $trustOptions;
 
-    public function __construct(private CoreParametersHelper $coreParametersHelper, private string $entityId)
-    {
+    public function __construct(
+        private CoreParametersHelper $coreParametersHelper,
+        private string $entityId
+    ) {
     }
 
     public function get($entityId): TrustOptions

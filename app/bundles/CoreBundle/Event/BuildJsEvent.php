@@ -11,8 +11,10 @@ class BuildJsEvent extends Event
      * @param bool   $debugMode
      * @param string $js
      */
-    public function __construct(protected $js, protected $debugMode = false)
-    {
+    public function __construct(
+        protected $js,
+        protected $debugMode = false
+    ) {
     }
 
     /**

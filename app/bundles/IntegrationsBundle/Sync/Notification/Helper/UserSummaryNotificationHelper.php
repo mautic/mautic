@@ -35,8 +35,13 @@ class UserSummaryNotificationHelper
      */
     private $listTranslationKey;
 
-    public function __construct(private Writer $writer, private UserHelper $userHelper, private OwnerProvider $ownerProvider, private RouteHelper $routeHelper, private TranslatorInterface $translator)
-    {
+    public function __construct(
+        private Writer $writer,
+        private UserHelper $userHelper,
+        private OwnerProvider $ownerProvider,
+        private RouteHelper $routeHelper,
+        private TranslatorInterface $translator
+    ) {
     }
 
     /**

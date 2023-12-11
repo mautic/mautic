@@ -17,8 +17,11 @@ class FieldDAO
      */
     private $changeDateTime;
 
-    public function __construct(private string $name, private NormalizedValueDAO $value, private string $state = self::FIELD_CHANGED)
-    {
+    public function __construct(
+        private string $name,
+        private NormalizedValueDAO $value,
+        private string $state = self::FIELD_CHANGED
+    ) {
     }
 
     public function getName(): string

@@ -6,8 +6,12 @@ namespace Mautic\CoreBundle\Doctrine\Helper;
 
 class FulltextKeyword implements \Stringable
 {
-    public function __construct(private string $value, private bool $booleanMode = true, private bool $wordSearch = true, private bool $wordInflecting = false)
-    {
+    public function __construct(
+        private string $value,
+        private bool $booleanMode = true,
+        private bool $wordSearch = true,
+        private bool $wordInflecting = false
+    ) {
     }
 
     public function __toString(): string

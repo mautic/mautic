@@ -9,8 +9,9 @@ class DatetimeToStringTransformer implements DataTransformerInterface
     /**
      * @param string $format
      */
-    public function __construct(private $format = 'Y-m-d H:i')
-    {
+    public function __construct(
+        private $format = 'Y-m-d H:i'
+    ) {
     }
 
     /**

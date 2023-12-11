@@ -24,8 +24,10 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class ListType extends AbstractType
 {
-    public function __construct(private TranslatorInterface $translator, private ListModel $listModel)
-    {
+    public function __construct(
+        private TranslatorInterface $translator,
+        private ListModel $listModel
+    ) {
     }
 
     public function buildForm(FormBuilderInterface $builder, array $options): void

@@ -13,8 +13,10 @@ class LogoutEvent extends Event
      */
     private $session = [];
 
-    public function __construct(private User $user, private Request $request)
-    {
+    public function __construct(
+        private User $user,
+        private Request $request
+    ) {
     }
 
     /**

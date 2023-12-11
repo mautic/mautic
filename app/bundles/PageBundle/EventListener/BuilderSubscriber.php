@@ -51,8 +51,16 @@ class BuilderSubscriber implements EventSubscriberInterface
     public const successmessage    = '{successmessage}';
     public const identifierToken   = '{leadidentifier}';
 
-    public function __construct(private CorePermissions $security, private TokenHelper $tokenHelper, private IntegrationHelper $integrationHelper, private PageModel $pageModel, private BuilderTokenHelperFactory $builderTokenHelperFactory, private TranslatorInterface $translator, private Connection $connection, private Environment $twig)
-    {
+    public function __construct(
+        private CorePermissions $security,
+        private TokenHelper $tokenHelper,
+        private IntegrationHelper $integrationHelper,
+        private PageModel $pageModel,
+        private BuilderTokenHelperFactory $builderTokenHelperFactory,
+        private TranslatorInterface $translator,
+        private Connection $connection,
+        private Environment $twig
+    ) {
     }
 
     public static function getSubscribedEvents(): array
