@@ -43,7 +43,8 @@
     "symfony/maker-bundle": "^1.38",
     "symfony/var-dumper": "~5.4.0",
     "symfony/web-profiler-bundle": "~5.4.0",
-    "symplify/easy-coding-standard": "^12.0.13"
+    "symplify/easy-coding-standard": "^12.0.13",
+    "tomasvotruba/class-leak": "*"
   },
   "replace": {
     "mautic/grapes-js-builder-bundle": "self.version",

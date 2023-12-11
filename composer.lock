@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "e1ee4238613aa23770073e3070cff815",
+    "content-hash": "f84edcb03a33684dc8a98edbc8d05d9d",
     "packages": [
         {
             "name": "aws/aws-crt-php",
@@ -17685,6 +17685,54 @@
                 }
             ],
             "time": "2021-07-28T10:34:58+00:00"
+        },
+        {
+            "name": "tomasvotruba/class-leak",
+            "version": "0.2.6",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/TomasVotruba/class-leak.git",
+                "reference": "52a4b4cac9c8c88baaf17eac337803218e3e0a39"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/TomasVotruba/class-leak/zipball/52a4b4cac9c8c88baaf17eac337803218e3e0a39",
+                "reference": "52a4b4cac9c8c88baaf17eac337803218e3e0a39",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=7.2"
+            },
+            "bin": [
+                "bin/class-leak",
+                "bin/class-leak.php"
+            ],
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "TomasVotruba\\ClassLeak\\": "app"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "description": "Detect leaking classes",
+            "support": {
+                "issues": "https://github.com/TomasVotruba/class-leak/issues",
+                "source": "https://github.com/TomasVotruba/class-leak/tree/0.2.6"
+            },
+            "funding": [
+                {
+                    "url": "https://www.paypal.me/rectorphp",
+                    "type": "custom"
+                },
+                {
+                    "url": "https://github.com/tomasvotruba",
+                    "type": "github"
+                }
+            ],
+            "time": "2023-11-21T01:15:53+00:00"
         },
         {
             "name": "webmozart/assert",
