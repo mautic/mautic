@@ -807,7 +807,7 @@ class ReportSubscriberTest extends \PHPUnit\Framework\TestCase
                         'log.campaign_id' => [
                             'label' => '',
                             'type'  => 'select',
-                            'list'  => null,
+                            'list'  => [],
                             'alias' => 'campaign_id',
                         ],
                         'log.date_triggered' => [

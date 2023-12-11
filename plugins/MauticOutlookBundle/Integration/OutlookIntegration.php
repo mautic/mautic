@@ -7,17 +7,15 @@ use Mautic\PluginBundle\Integration\AbstractIntegration;
 
 class OutlookIntegration extends AbstractIntegration
 {
-    public function getName()
+    public function getName(): string
     {
         return 'Outlook';
     }
 
     /**
      * Return's authentication method such as oauth2, oauth1a, key, etc.
-     *
-     * @return string
      */
-    public function getAuthenticationType()
+    public function getAuthenticationType(): string
     {
         // Just use none for now and I'll build in "basic" later
         return 'none';

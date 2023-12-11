@@ -55,7 +55,7 @@ class UserModel extends FormModel
     /**
      * {@inheritdoc}
      */
-    public function getPermissionBase()
+    public function getPermissionBase(): string
     {
         return 'user:users';
     }
@@ -97,7 +97,7 @@ class UserModel extends FormModel
      *
      * @return string
      */
-    public function checkNewPassword(User $entity, UserPasswordHasherInterface $hasher, $submittedPassword, $validate = false)
+    public function checkNewPassword(User $entity, UserPasswordHasherInterface $hasher, $submittedPassword, $validate = false): string|null
     {
         if ($validate) {
             if (strlen($submittedPassword) < 6) {
@@ -368,10 +368,8 @@ class UserModel extends FormModel
 
     /**
      * Return list of Users for formType Choice.
-     *
-     * @return array
      */
-    public function getOwnerListChoices()
+    public function getOwnerListChoices(): array
     {
         return $this->getRepository()->getOwnerListChoices();
     }

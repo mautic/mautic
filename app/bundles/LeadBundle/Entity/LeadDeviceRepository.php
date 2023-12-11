@@ -146,10 +146,7 @@ class LeadDeviceRepository extends CommonRepository
         return !empty($devices);
     }
 
-    /**
-     * @return array
-     */
-    public function getLeadDevices(Lead $lead)
+    public function getLeadDevices(Lead $lead): array
     {
         $qb = $this->getEntityManager()->getConnection()->createQueryBuilder();
 

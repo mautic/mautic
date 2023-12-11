@@ -439,11 +439,9 @@ class ReportGeneratorEvent extends AbstractReportEvent
      *
      * @param string $column
      *
-     * @return array
-     *
      * @throws \UnexpectedValueException
      */
-    public function getFilterValues($column)
+    public function getFilterValues($column): array
     {
         return $this->getReport()->getFilterValues($column);
     }

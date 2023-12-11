@@ -394,10 +394,8 @@ final class AssetsHelper
 
     /**
      * Returns head scripts, stylesheets, and custom declarations.
-     *
-     * @return string
      */
-    public function getHeadDeclarations()
+    public function getHeadDeclarations(): string
     {
         $headOutput = $this->getStyles();
         if (!empty($this->assets[$this->context]['headDeclarations'])) {

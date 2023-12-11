@@ -104,10 +104,7 @@ abstract class DateOptionAbstract implements FilterDecoratorInterface
         return $dateTimeHelper->toLocalString($dateFormat);
     }
 
-    /**
-     * @return string
-     */
-    public function getQueryType(ContactSegmentFilterCrate $contactSegmentFilterCrate)
+    public function getQueryType(ContactSegmentFilterCrate $contactSegmentFilterCrate): string
     {
         return $this->dateDecorator->getQueryType($contactSegmentFilterCrate);
     }

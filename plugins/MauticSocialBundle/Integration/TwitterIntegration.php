@@ -10,7 +10,7 @@ class TwitterIntegration extends SocialIntegration
     /**
      * {@inheritdoc}
      */
-    public function getName()
+    public function getName(): string
     {
         return 'Twitter';
     }
@@ -26,7 +26,7 @@ class TwitterIntegration extends SocialIntegration
     /**
      * {@inheritdoc}
      */
-    public function getIdentifierFields()
+    public function getIdentifierFields(): string
     {
         return 'twitter';
     }
@@ -47,15 +47,12 @@ class TwitterIntegration extends SocialIntegration
     /**
      * {@inheritdoc}
      */
-    public function getAccessTokenUrl()
+    public function getAccessTokenUrl(): string
     {
         return 'https://api.twitter.com/oauth/access_token';
     }
 
-    /**
-     * @return string
-     */
-    public function getAuthLoginUrl()
+    public function getAuthLoginUrl(): string
     {
         $url = 'https://api.twitter.com/oauth/authorize';
 
@@ -69,10 +66,7 @@ class TwitterIntegration extends SocialIntegration
         return $url;
     }
 
-    /**
-     * @return string
-     */
-    public function getRequestTokenUrl()
+    public function getRequestTokenUrl(): string
     {
         return 'https://api.twitter.com/oauth/request_token';
     }
@@ -80,7 +74,7 @@ class TwitterIntegration extends SocialIntegration
     /**
      * {@inheritdoc}
      */
-    public function getAuthenticationType()
+    public function getAuthenticationType(): string
     {
         return 'oauth1a';
     }
@@ -106,10 +100,7 @@ class TwitterIntegration extends SocialIntegration
         return parent::prepareRequest($url, $parameters, $method, $settings, $authType);
     }
 
-    /**
-     * @return string
-     */
-    public function getApiUrl($endpoint)
+    public function getApiUrl($endpoint): string
     {
         return "https://api.twitter.com/1.1/$endpoint.json";
     }

@@ -205,10 +205,8 @@ class BuilderEvent extends Event
      * Pass in string or array of tokens to filter against if filterType == token.
      *
      * @param string|array|null $tokenKeys
-     *
-     * @return bool
      */
-    public function tokensRequested($tokenKeys = null)
+    public function tokensRequested($tokenKeys = null): bool
     {
         if ($requested = $this->getRequested('tokens')) {
             if (!empty($this->tokenFilter) && 'token' == $this->tokenFilterTarget) {
@@ -320,30 +318,24 @@ class BuilderEvent extends Event
 
     /**
      * Check if AB Test Winner Criteria has been requested.
-     *
-     * @return bool
      */
-    public function abTestWinnerCriteriaRequested()
+    public function abTestWinnerCriteriaRequested(): bool
     {
         return $this->getRequested('abTestWinnerCriteria');
     }
 
     /**
      * Check if Slot types has been requested.
-     *
-     * @return bool
      */
-    public function slotTypesRequested()
+    public function slotTypesRequested(): bool
     {
         return $this->getRequested('slotTypes');
     }
 
     /**
      * Check if Sections has been requested.
-     *
-     * @return bool
      */
-    public function sectionsRequested()
+    public function sectionsRequested(): bool
     {
         return $this->getRequested('sections');
     }

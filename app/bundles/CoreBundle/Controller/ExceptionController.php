@@ -115,10 +115,8 @@ class ExceptionController extends CommonController
 
     /**
      * @param int $startObLevel
-     *
-     * @return string
      */
-    protected function getAndCleanOutputBuffering($startObLevel)
+    protected function getAndCleanOutputBuffering($startObLevel): string|false
     {
         if (ob_get_level() <= $startObLevel) {
             return '';

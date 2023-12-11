@@ -11,20 +11,15 @@ use Symfony\Component\HttpFoundation\Request;
 
 class FileManagerController extends AjaxController
 {
-    /**
-     * @return JsonResponse
-     */
-    public function uploadAction(Request $request, FileManager $fileManager)
+    public function uploadAction(Request $request, FileManager $fileManager): JsonResponse
     {
         return $this->sendJsonResponse(['data'=> $fileManager->uploadFiles($request)]);
     }
 
     /**
      * @param string $fileName
-     *
-     * @return JsonResponse
      */
-    public function deleteAction(Request $request, FileManager $fileManager)
+    public function deleteAction(Request $request, FileManager $fileManager): JsonResponse
     {
         $fileName = $request->get('filename');
 

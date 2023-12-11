@@ -329,10 +329,7 @@ class ObjectChangeGenerator
         );
     }
 
-    /**
-     * @return string
-     */
-    private function getFieldState(string $object, string $field, string $integrationFieldState)
+    private function getFieldState(string $object, string $field, string $integrationFieldState): string
     {
         // If this is a Mautic required field, return required
         if (isset($this->fieldHelper->getRequiredFields($object)[$field])) {

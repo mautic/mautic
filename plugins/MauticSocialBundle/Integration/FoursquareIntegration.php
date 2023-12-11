@@ -7,7 +7,7 @@ class FoursquareIntegration extends SocialIntegration
     /**
      * {@inheritdoc}
      */
-    public function getName()
+    public function getName(): string
     {
         return 'Foursquare';
     }
@@ -34,7 +34,7 @@ class FoursquareIntegration extends SocialIntegration
     /**
      * {@inheritdoc}
      */
-    public function getAuthenticationUrl()
+    public function getAuthenticationUrl(): string
     {
         return 'https://foursquare.com/oauth2/authenticate';
     }
@@ -42,7 +42,7 @@ class FoursquareIntegration extends SocialIntegration
     /**
      * {@inheritdoc}
      */
-    public function getAccessTokenUrl()
+    public function getAccessTokenUrl(): string
     {
         return 'https://foursquare.com/oauth2/access_token';
     }
@@ -50,7 +50,7 @@ class FoursquareIntegration extends SocialIntegration
     /**
      * {@inheritdoc}
      */
-    public function getAuthenticationType()
+    public function getAuthenticationType(): string
     {
         return 'oauth2';
     }
@@ -58,10 +58,8 @@ class FoursquareIntegration extends SocialIntegration
     /**
      * @param string $endpoint
      * @param string $m
-     *
-     * @return string
      */
-    public function getApiUrl($endpoint, $m = 'foursquare')
+    public function getApiUrl($endpoint, $m = 'foursquare'): string
     {
         return "https://api.foursquare.com/v2/$endpoint?v=20140806&m={$m}";
     }
@@ -226,7 +224,7 @@ class FoursquareIntegration extends SocialIntegration
     /**
      * {@inheritdoc}
      */
-    public function getErrorsFromResponse($response)
+    public function getErrorsFromResponse($response): string
     {
         if (is_object($response) && isset($response->meta->errorDetail)) {
             return $response->meta->errorDetail.' ('.$response->meta->code.')';

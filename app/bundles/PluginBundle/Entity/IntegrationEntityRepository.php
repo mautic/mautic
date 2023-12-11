@@ -19,8 +19,6 @@ class IntegrationEntityRepository extends CommonRepository
      * @param int                 $start
      * @param int                 $limit
      * @param null                $integrationEntityIds
-     *
-     * @return array
      */
     public function getIntegrationsEntityId(
         $integration,
@@ -33,7 +31,7 @@ class IntegrationEntityRepository extends CommonRepository
         $start = 0,
         $limit = 0,
         $integrationEntityIds = null
-    ) {
+    ): array {
         $q = $this->_em->getConnection()->createQueryBuilder()
             ->select('DISTINCT(i.integration_entity_id), i.id, i.internal_entity_id, i.integration_entity, i.internal_entity')
             ->from(MAUTIC_TABLE_PREFIX.'integration_entity', 'i');

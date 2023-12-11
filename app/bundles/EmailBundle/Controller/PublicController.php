@@ -310,12 +310,10 @@ class PublicController extends CommonFormController
     }
 
     /**
-     * @return Response
-     *
      * @throws \Exception
      * @throws \Mautic\CoreBundle\Exception\FileNotFoundException
      */
-    public function resubscribeAction(ContactTracker $contactTracker, $idHash)
+    public function resubscribeAction(ContactTracker $contactTracker, $idHash): Response
     {
         // find the email
         $model = $this->getModel('email');

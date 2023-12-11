@@ -628,10 +628,8 @@ class CampaignSubscriber implements EventSubscriberInterface
 
     /**
      * Function to compare date value.
-     *
-     * @return bool
      */
-    private function compareDateValue(Lead $lead, CampaignExecutionEvent $event, \DateTime $triggerDate)
+    private function compareDateValue(Lead $lead, CampaignExecutionEvent $event, \DateTime $triggerDate): bool
     {
         return $this->leadFieldModel->getRepository()->compareDateValue(
             $lead->getId(),

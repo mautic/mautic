@@ -131,10 +131,8 @@ class LeadEventLogRepository extends CommonRepository
 
     /**
      * Get a lead's upcoming events.
-     *
-     * @return array
      */
-    public function getUpcomingEvents(array $options = null)
+    public function getUpcomingEvents(array $options = null): array
     {
         $leadIps = [];
 
@@ -351,10 +349,7 @@ class LeadEventLogRepository extends CommonRepository
         }
     }
 
-    /**
-     * @return array
-     */
-    public function getChartQuery($options)
+    public function getChartQuery($options): array
     {
         $chartQuery = new ChartQuery($this->getReplicaConnection(), $options['dateFrom'], $options['dateTo']);
 

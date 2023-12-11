@@ -8,18 +8,13 @@ class ConstantContactIntegration extends EmailAbstractIntegration
 {
     /**
      * {@inheritdoc}
-     *
-     * @return string
      */
-    public function getName()
+    public function getName(): string
     {
         return 'ConstantContact';
     }
 
-    /**
-     * @return string
-     */
-    public function getDisplayName()
+    public function getDisplayName(): string
     {
         return 'Constant Contact';
     }
@@ -27,27 +22,23 @@ class ConstantContactIntegration extends EmailAbstractIntegration
     /**
      * {@inheritdoc}
      */
-    public function getAuthenticationType()
+    public function getAuthenticationType(): string
     {
         return 'oauth2';
     }
 
     /**
      * Get the URL required to obtain an oauth2 access token.
-     *
-     * @return string
      */
-    public function getAccessTokenUrl()
+    public function getAccessTokenUrl(): string
     {
         return 'https://oauth2.constantcontact.com/oauth2/oauth/token';
     }
 
     /**
      * Get the authentication/login URL for oauth2 access.
-     *
-     * @return string
      */
-    public function getAuthenticationUrl()
+    public function getAuthenticationUrl(): string
     {
         return 'https://oauth2.constantcontact.com/oauth2/oauth/siteowner/authorize';
     }

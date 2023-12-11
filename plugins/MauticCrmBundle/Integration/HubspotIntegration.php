@@ -78,10 +78,8 @@ class HubspotIntegration extends CrmAbstractIntegration
 
     /**
      * {@inheritdoc}
-     *
-     * @return string
      */
-    public function getName()
+    public function getName(): string
     {
         return 'Hubspot';
     }
@@ -94,20 +92,15 @@ class HubspotIntegration extends CrmAbstractIntegration
         return [];
     }
 
-    /**
-     * @return string
-     */
-    public function getApiKey()
+    public function getApiKey(): string
     {
         return 'hapikey';
     }
 
     /**
      * Get the array key for the auth token.
-     *
-     * @return string
      */
-    public function getAuthTokenKey()
+    public function getAuthTokenKey(): string
     {
         return 'hapikey';
     }
@@ -148,10 +141,7 @@ class HubspotIntegration extends CrmAbstractIntegration
         return $this->getBearerToken() ? 'oauth2' : 'key';
     }
 
-    /**
-     * @return string
-     */
-    public function getApiUrl()
+    public function getApiUrl(): string
     {
         return 'https://api.hubapi.com';
     }
