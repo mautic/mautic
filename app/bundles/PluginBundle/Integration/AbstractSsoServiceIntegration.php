@@ -125,8 +125,6 @@ abstract class AbstractSsoServiceIntegration extends AbstractIntegration
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @param Form|\Symfony\Component\Form\FormBuilder $builder
      * @param array                                    $data
      * @param string                                   $formArea

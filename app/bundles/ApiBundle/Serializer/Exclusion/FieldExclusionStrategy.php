@@ -23,17 +23,11 @@ class FieldExclusionStrategy implements ExclusionStrategyInterface
         $this->level  = (int) $level;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function shouldSkipClass(ClassMetadata $metadata, Context $navigatorContext): bool
     {
         return false;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function shouldSkipProperty(PropertyMetadata $property, Context $navigatorContext): bool
     {
         if ($this->path) {

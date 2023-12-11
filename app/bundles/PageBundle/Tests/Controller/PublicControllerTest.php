@@ -52,36 +52,56 @@ class PublicControllerTest extends MauticMysqlTestCase
      */
     private \PHPUnit\Framework\MockObject\MockObject $internalContainer;
 
-    /** @var \Psr\Log\LoggerInterface */
+    /**
+     * @var \Psr\Log\LoggerInterface
+     */
     private \PHPUnit\Framework\MockObject\MockObject $logger;
 
-    /** @var ModelFactory<object>&MockObject */
+    /**
+     * @var ModelFactory<object>&MockObject
+     */
     private \PHPUnit\Framework\MockObject\MockObject $modelFactory;
 
-    /** @var RedirectModel */
+    /**
+     * @var RedirectModel
+     */
     private \PHPUnit\Framework\MockObject\MockObject $redirectModel;
 
-    /** @var Redirect */
+    /**
+     * @var Redirect
+     */
     private \PHPUnit\Framework\MockObject\MockObject $redirect;
 
     private \Symfony\Component\HttpFoundation\Request $request;
 
-    /** @var IpLookupHelper */
+    /**
+     * @var IpLookupHelper
+     */
     private \PHPUnit\Framework\MockObject\MockObject $ipLookupHelper;
 
-    /** @var IpAddress */
+    /**
+     * @var IpAddress
+     */
     private \PHPUnit\Framework\MockObject\MockObject $ipAddress;
 
-    /** @var LeadModel */
+    /**
+     * @var LeadModel
+     */
     private \PHPUnit\Framework\MockObject\MockObject $leadModel;
 
-    /** @var PageModel */
+    /**
+     * @var PageModel
+     */
     private \PHPUnit\Framework\MockObject\MockObject $pageModel;
 
-    /** @var PrimaryCompanyHelper */
+    /**
+     * @var PrimaryCompanyHelper
+     */
     private \PHPUnit\Framework\MockObject\MockObject $primaryCompanyHelper;
 
-    /** @var ContactRequestHelper&MockObject */
+    /**
+     * @var ContactRequestHelper&MockObject
+     */
     private \PHPUnit\Framework\MockObject\MockObject $contactRequestHelper;
 
     protected function setUp(): void

@@ -17,9 +17,6 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class DetailsType extends AbstractType
 {
-    /**
-     * {@inheritdoc}
-     */
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder->add('isPublished', YesNoButtonGroupType::class);
@@ -153,9 +150,6 @@ class DetailsType extends AbstractType
         $integrationObject->modifyForm($builder, $options);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults(
@@ -168,9 +162,6 @@ class DetailsType extends AbstractType
         $resolver->setAllowedTypes('integration_object', [AbstractIntegration::class]);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getBlockPrefix()
     {
         return 'integration_details';

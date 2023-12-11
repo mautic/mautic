@@ -59,8 +59,6 @@ class VtigerIntegration extends CrmAbstractIntegration
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @return bool
      */
     public function isAuthorized()
@@ -109,8 +107,6 @@ class VtigerIntegration extends CrmAbstractIntegration
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @return string
      */
     public function getAuthLoginUrl()
@@ -207,8 +203,6 @@ class VtigerIntegration extends CrmAbstractIntegration
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @return array<mixed>
      */
     public function getFormNotes($section)
@@ -220,9 +214,6 @@ class VtigerIntegration extends CrmAbstractIntegration
         return parent::getFormNotes($section);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function amendLeadDataBeforePush(&$mappedData): void
     {
         if (!empty($mappedData)) {

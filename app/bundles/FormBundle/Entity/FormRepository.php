@@ -10,9 +10,6 @@ use Mautic\CoreBundle\Entity\CommonRepository;
  */
 class FormRepository extends CommonRepository
 {
-    /**
-     * {@inheritdoc}
-     */
     public function getEntities(array $args = [])
     {
         // use a subquery to get a count of submissions otherwise doctrine will not pull all of the results
@@ -67,9 +64,6 @@ class FormRepository extends CommonRepository
         return $q->getQuery()->getArrayResult();
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function addCatchAllWhereClause($q, $filter): array
     {
         return $this->addStandardCatchAllWhereClause($q, $filter, [
@@ -78,9 +72,6 @@ class FormRepository extends CommonRepository
         ]);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function addSearchCommandWhereClause($q, $filter): array
     {
         [$expr, $standardSearchParameters] = $this->addStandardSearchCommandWhereClause($q, $filter);
@@ -224,9 +215,6 @@ class FormRepository extends CommonRepository
         return array_merge($commands, parent::getSearchCommands());
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function getDefaultOrder(): array
     {
         return [
@@ -234,9 +222,6 @@ class FormRepository extends CommonRepository
         ];
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getTableAlias(): string
     {
         return 'f';

@@ -606,9 +606,6 @@ class StatRepository extends CommonRepository
             ->executeStatement();
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getTableAlias(): string
     {
         return 's';

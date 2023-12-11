@@ -16,9 +16,6 @@ class TagRepository extends BaseTagRepository
         ];
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getTableAlias(): string
     {
         return 'lt';

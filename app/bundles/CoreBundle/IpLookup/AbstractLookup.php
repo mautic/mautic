@@ -35,9 +35,6 @@ abstract class AbstractLookup
      */
     abstract protected function lookup();
 
-    /**
-     * AbstractLookup constructor.
-     */
     public function __construct(
         protected ?string $auth = null,
         protected $config = null,

@@ -39,8 +39,6 @@ abstract class AbstractLocalDataLookup extends AbstractLookup implements IpLooku
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @return array
      */
     public function getConfigFormThemes()

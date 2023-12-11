@@ -22,14 +22,18 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class CampaignSubscriberTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var array */
+    /**
+     * @var array
+     */
     private $configFrom = [
         'id'          => 111,
         'companyname' => 'Mautic',
         'companemail' => 'mautic@mautic.com',
     ];
 
-    /** @var array<string, string> */
+    /**
+     * @var array<string, string>
+     */
     private $configTo = [
         'id'          => '112',
         'companyname' => 'Mautic2',
@@ -81,7 +85,9 @@ class CampaignSubscriberTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    /** @var array<string, string> */
+    /**
+     * @var array<string, string>
+     */
     private $configPageHit = [
         'startDate'         => '2022-06-08 12:45:22.0',
         'endDate'           => '2023-06-08 12:45:22.0',
@@ -90,7 +96,9 @@ class CampaignSubscriberTest extends \PHPUnit\Framework\TestCase
         'accumulative_time' => '5',
     ];
 
-    /** @var array<string, string> */
+    /**
+     * @var array<string, string>
+     */
     private $configUrlPageHit = [
         'startDate'         => '',
         'endDate'           => '',
@@ -99,7 +107,9 @@ class CampaignSubscriberTest extends \PHPUnit\Framework\TestCase
         'accumulative_time' => '5',
     ];
 
-    /** @var array<string, string> */
+    /**
+     * @var array<string, string>
+     */
     private $configUrlPageHitWithoutSpentTime = [
         'startDate'         => '',
         'endDate'           => '',

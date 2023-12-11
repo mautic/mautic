@@ -10,9 +10,6 @@ use Mautic\LeadBundle\Model\ListModel;
 
 class LoadLeadListData extends AbstractFixture implements OrderedFixtureInterface
 {
-    /**
-     * {@inheritdoc}
-     */
     public function __construct(private ListModel $segmentModel)
     {
     }

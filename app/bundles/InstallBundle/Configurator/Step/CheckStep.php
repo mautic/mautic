@@ -65,17 +65,11 @@ class CheckStep implements StepInterface
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getFormType(): string
     {
         return CheckStepType::class;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function checkRequirements(): array
     {
         $messages = [];
@@ -157,9 +151,6 @@ class CheckStep implements StepInterface
         return $messages;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function checkOptionalSettings(): array
     {
         $messages = [];
@@ -234,17 +225,12 @@ class CheckStep implements StepInterface
         return $messages;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getTemplate(): string
     {
         return '@MauticInstall/Install/check.html.twig';
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @return mixed[]
      */
     public function update(StepInterface $data): array

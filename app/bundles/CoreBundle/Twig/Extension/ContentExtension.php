@@ -14,9 +14,6 @@ class ContentExtension extends AbstractExtension
     {
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getFunctions()
     {
         return [

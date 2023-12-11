@@ -123,8 +123,6 @@ class TweetModel extends FormModel implements AjaxLookupModelInterface
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @param Tweet        $entity
      * @param array<mixed> $options
      *
@@ -158,8 +156,6 @@ class TweetModel extends FormModel implements AjaxLookupModelInterface
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @throws \Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException
      */
     protected function dispatchEvent($action, &$entity, $isNew = false, Event $event = null): ?Event

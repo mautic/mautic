@@ -26,7 +26,9 @@ final class EmailOrEmailTokenListValidatorTest extends TestCase
     public function testNoEmailsProvided($value, int $expectedViolationCount, callable $getFieldMocker, callable $violationResult): void
     {
         $context = new class() extends ExecutionContext {
-            /** @var callable */
+            /**
+             * @var callable
+             */
             public $violationResult;
             public int $violationCount = 0;
 
@@ -73,7 +75,9 @@ final class EmailOrEmailTokenListValidatorTest extends TestCase
         };
 
         $fieldModel = new class() extends FieldModel {
-            /** @var callable */
+            /**
+             * @var callable
+             */
             public $getFieldMocker;
 
             public function __construct()

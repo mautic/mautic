@@ -121,8 +121,6 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @return \Mautic\LeadBundle\Entity\CompanyLeadRepository
      */
     public function getCompanyLeadRepository()
@@ -130,26 +128,18 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
         return $this->em->getRepository(\Mautic\LeadBundle\Entity\CompanyLead::class);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getPermissionBase(): string
     {
         // We are using lead:leads in the CompanyController so this should match to prevent a BC break
         return 'lead:leads';
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getNameGetter(): string
     {
         return 'getPrimaryIdentifier';
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @throws MethodNotAllowedHttpException
      */
     public function createForm($entity, FormFactoryInterface $formFactory, $action = null, $options = []): \Symfony\Component\Form\FormInterface
@@ -567,8 +557,6 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @throws \Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException
      */
     protected function dispatchEvent($action, &$entity, $isNew = false, Event $event = null): ?Event

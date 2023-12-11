@@ -10,13 +10,17 @@ use PHPUnit\Framework\TestCase;
 
 class MatchFilterForLeadTraitTest extends TestCase
 {
-    /** @var mixed[] */
+    /**
+     * @var mixed[]
+     */
     private array $lead = [
         'id'     => 1,
         'custom' => 'my custom text',
     ];
 
-    /** @var mixed[] */
+    /**
+     * @var mixed[]
+     */
     private $filter = [
         0 => [
             'display' => null,
@@ -27,9 +31,6 @@ class MatchFilterForLeadTraitTest extends TestCase
         ],
     ];
 
-    /**
-     * @var MatchFilterForLeadTraitTestable
-     */
     private \Mautic\EmailBundle\Tests\EventListener\MatchFilterForLeadTraitTestable $matchFilterForLeadTrait;
 
     protected function setUp(): void

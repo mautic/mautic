@@ -11,17 +11,11 @@ final class Company implements ObjectInterface
     public const NAME   = 'company';
     public const ENTITY = CompanyEntity::class;
 
-    /**
-     * {@inheritdoc}
-     */
     public function getName(): string
     {
         return self::NAME;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getEntityName(): string
     {
         return self::ENTITY;

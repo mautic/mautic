@@ -42,7 +42,8 @@
     "symfony/dom-crawler": "~5.4.0",
     "symfony/maker-bundle": "^1.38",
     "symfony/var-dumper": "~5.4.0",
-    "symfony/web-profiler-bundle": "~5.4.0"
+    "symfony/web-profiler-bundle": "~5.4.0",
+    "symplify/easy-coding-standard": "^12.0.13"
   },
   "replace": {
     "mautic/grapes-js-builder-bundle": "self.version",

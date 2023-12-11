@@ -77,9 +77,6 @@ class ConfigType extends AbstractType
         );
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getBlockPrefix()
     {
         return 'apiconfig';

@@ -21,7 +21,6 @@ class FullContact_Location extends FullContact_Base
     /**
      * This takes a name and breaks it into its individual parts.
      *
-     * @param type $name
      * @param type $casing -> valid values are uppercase, lowercase, titlecase
      *
      * @return type

@@ -30,9 +30,6 @@ class UserType extends AbstractType
     {
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder->addEventSubscriber(new CleanFormSubscriber(['signature' => 'html', 'email' => 'email']));
@@ -232,9 +229,6 @@ class UserType extends AbstractType
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults(

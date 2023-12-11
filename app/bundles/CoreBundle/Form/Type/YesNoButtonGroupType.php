@@ -8,25 +8,16 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class YesNoButtonGroupType extends AbstractType
 {
-    /**
-     * {@inheritdoc}
-     */
     public function getParent()
     {
         return ButtonGroupType::class;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getBlockPrefix()
     {
         return 'yesno_button_group';
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults(

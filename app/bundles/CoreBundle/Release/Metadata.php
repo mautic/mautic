@@ -118,7 +118,9 @@ final class Metadata implements \JsonSerializable
         return $this->minSupportedMariaDbVersion;
     }
 
-    /** @return array<string, int|string> */
+    /**
+     * @return array<string, int|string>
+     */
     public function jsonSerialize(): array
     {
         return [

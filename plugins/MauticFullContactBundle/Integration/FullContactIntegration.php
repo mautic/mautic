@@ -98,8 +98,6 @@ class FullContactIntegration extends AbstractIntegration
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @return string|array
      */
     public function getFormNotes($section)

@@ -21,9 +21,6 @@ use Symfony\Component\Validator\Constraints\Choice;
  */
 class DoctrineStepType extends AbstractType
 {
-    /**
-     * {@inheritdoc}
-     */
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder->add(
@@ -171,9 +168,6 @@ class DoctrineStepType extends AbstractType
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getBlockPrefix()
     {
         return 'install_doctrine_step';

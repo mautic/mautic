@@ -13,9 +13,6 @@ class RedirectListType extends AbstractType
     {
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function configureOptions(OptionsResolver $resolver): void
     {
         $choices = $this->coreParametersHelper->get('redirect_list_types');

@@ -494,9 +494,6 @@ class LeadListRepository extends CommonRepository
         ];
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getTableAlias(): string
     {
         return 'l';

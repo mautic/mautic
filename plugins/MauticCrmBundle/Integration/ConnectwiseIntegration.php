@@ -19,9 +19,6 @@ class ConnectwiseIntegration extends CrmAbstractIntegration
 {
     public const PAGESIZE = 200;
 
-    /**
-     * {@inheritdoc}
-     */
     public function getName(): string
     {
         return 'Connectwise';
@@ -85,9 +82,6 @@ class ConnectwiseIntegration extends CrmAbstractIntegration
         return 'password';
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getSecretKeys(): array
     {
         return [
@@ -101,8 +95,6 @@ class ConnectwiseIntegration extends CrmAbstractIntegration
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @return string
      */
     public function getAuthLoginUrl()
@@ -142,9 +134,6 @@ class ConnectwiseIntegration extends CrmAbstractIntegration
         return $error;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getAuthenticationType(): string
     {
         return 'basic';

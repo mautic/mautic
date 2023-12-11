@@ -29,9 +29,6 @@ class MaxMindDoNotSellPurgeCommand extends Command
         $this->leadRepository = $this->em->getRepository(Lead::class);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function configure()
     {
         $this->setName('mautic:max-mind:purge')
@@ -55,9 +52,6 @@ EOT
             );
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         try {

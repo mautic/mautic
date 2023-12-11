@@ -273,25 +273,17 @@ class LeadModel extends FormModel
         return $this->em->getRepository(GroupContactScore::class);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getPermissionBase(): string
     {
         return 'lead:leads';
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getNameGetter(): string
     {
         return 'getPrimaryIdentifier';
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @param Lead        $entity
      * @param string|null $action
      * @param array       $options
@@ -336,8 +328,6 @@ class LeadModel extends FormModel
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @throws \Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException
      */
     protected function dispatchEvent($action, &$entity, $isNew = false, Event $event = null): ?Event
@@ -377,8 +367,6 @@ class LeadModel extends FormModel
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @param Lead $entity
      * @param bool $unlock
      */

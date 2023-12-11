@@ -12,7 +12,6 @@ class EmailOpenEvent extends CommonEvent
     private ?\Mautic\EmailBundle\Entity\Email $email;
 
     /**
-     * @param Email   $email
      * @param Request $request
      * @param bool    $firstTime
      */

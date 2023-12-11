@@ -8,9 +8,6 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class CompanyListType extends AbstractType
 {
-    /**
-     * {@inheritdoc}
-     */
     public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults(

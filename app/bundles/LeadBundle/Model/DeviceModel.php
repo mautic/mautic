@@ -40,8 +40,6 @@ class DeviceModel extends FormModel
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @return LeadDeviceRepository
      */
     public function getRepository()
@@ -49,9 +47,6 @@ class DeviceModel extends FormModel
         return $this->leadDeviceRepository;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getPermissionBase(): string
     {
         return 'lead:leads';
@@ -70,9 +65,6 @@ class DeviceModel extends FormModel
     }
 
     /**
-     * {@inheritdoc}
-     *
-
      * @param array $options
      *
      * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
@@ -91,8 +83,6 @@ class DeviceModel extends FormModel
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @throws \Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException
      */
     protected function dispatchEvent($action, &$entity, $isNew = false, Event $event = null): ?Event

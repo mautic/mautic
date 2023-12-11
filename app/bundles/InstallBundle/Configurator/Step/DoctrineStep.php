@@ -80,17 +80,11 @@ class DoctrineStep implements StepInterface
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getFormType(): string
     {
         return DoctrineStepType::class;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function checkRequirements(): array
     {
         $messages = [];
@@ -107,17 +101,12 @@ class DoctrineStep implements StepInterface
         return $messages;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function checkOptionalSettings(): array
     {
         return [];
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @return mixed[]
      */
     public function update(StepInterface $data): array
@@ -131,9 +120,6 @@ class DoctrineStep implements StepInterface
         return $parameters;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getTemplate(): string
     {
         return '@MauticInstall/Install/doctrine.html.twig';

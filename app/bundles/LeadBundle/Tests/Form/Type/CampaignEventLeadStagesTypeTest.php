@@ -13,7 +13,9 @@ use Symfony\Component\Form\FormBuilderInterface;
 final class CampaignEventLeadStagesTypeTest extends AbstractMauticTestCase
 {
     private CampaignEventLeadStagesType $campaignEventLeadStagesType;
-    /** @var FormBuilderInterface&MockObject */
+    /**
+     * @var FormBuilderInterface&MockObject
+     */
     private FormBuilderInterface $formBuilderInterface;
 
     protected function setUp(): void

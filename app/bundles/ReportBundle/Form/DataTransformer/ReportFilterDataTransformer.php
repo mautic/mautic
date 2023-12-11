@@ -18,8 +18,6 @@ class ReportFilterDataTransformer implements DataTransformerInterface
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @return array
      */
     public function transform($filters)
@@ -44,8 +42,6 @@ class ReportFilterDataTransformer implements DataTransformerInterface
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @return array
      */
     public function reverseTransform($filters)

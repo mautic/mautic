@@ -8,9 +8,6 @@ use Symfony\Component\Form\FormBuilderInterface;
 
 class FormFieldPlaceholderType extends AbstractType
 {
-    /**
-     * {@inheritdoc}
-     */
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder->add('placeholder', TextType::class, [
@@ -21,9 +18,6 @@ class FormFieldPlaceholderType extends AbstractType
         ]);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getBlockPrefix()
     {
         return 'formfield_placeholder';

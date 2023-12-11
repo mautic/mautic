@@ -21,9 +21,6 @@ class CampaignEventLeadFieldValueType extends AbstractType
     {
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder->add(
@@ -206,9 +203,6 @@ class CampaignEventLeadFieldValueType extends AbstractType
         $builder->addEventListener(FormEvents::PRE_SUBMIT, $func);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getBlockPrefix()
     {
         return 'campaignevent_lead_field_value';

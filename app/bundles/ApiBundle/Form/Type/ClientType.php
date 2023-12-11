@@ -38,9 +38,6 @@ class ClientType extends AbstractType
         );
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $apiMode = $this->getApiMode();
@@ -156,9 +153,6 @@ class ClientType extends AbstractType
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function configureOptions(OptionsResolver $resolver): void
     {
         $dataClass = \Mautic\ApiBundle\Entity\oAuth2\Client::class;

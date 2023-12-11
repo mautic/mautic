@@ -82,8 +82,6 @@ class ListModel extends FormModel
     private $leadChangeLists = [];
 
     /**
-     * {@inheritdoc}
-     *
      * @return LeadListRepository
      */
     public function getRepository()
@@ -107,17 +105,12 @@ class ListModel extends FormModel
         return $this->em->getRepository(ListLead::class);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getPermissionBase(): string
     {
         return 'lead:lists';
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @param bool $unlock
      *
      * @throws \Doctrine\DBAL\Exception
@@ -164,8 +157,6 @@ class ListModel extends FormModel
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @param string|null $action
      * @param array       $options
      *
@@ -197,8 +188,6 @@ class ListModel extends FormModel
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @throws \Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException
      */
     protected function dispatchEvent($action, &$entity, $isNew = false, Event $event = null): ?Event

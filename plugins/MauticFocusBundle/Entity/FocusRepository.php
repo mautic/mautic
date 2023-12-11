@@ -73,9 +73,6 @@ class FocusRepository extends CommonRepository
         ];
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getTableAlias(): string
     {
         return 'f';

@@ -38,7 +38,6 @@ class FullContact_Name extends FullContact_Base
      * This resolves a person's name from either their email address or a
      *   username. This is basically a wrapper for the Person lookup methods.
      *
-     * @param type $name
      * @param type $type   -> valid values are email and username
      * @param type $casing -> valid values are uppercase, lowercase, titlecase
      *

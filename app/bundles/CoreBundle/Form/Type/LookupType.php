@@ -8,9 +8,6 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class LookupType extends AbstractType
 {
-    /**
-     * {@inheritdoc}
-     */
     public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults([
@@ -19,9 +16,6 @@ class LookupType extends AbstractType
         ]);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getParent()
     {
         return TextType::class;

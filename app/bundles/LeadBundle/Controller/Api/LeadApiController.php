@@ -543,9 +543,6 @@ class LeadApiController extends CommonApiController
         return $this->model->checkForDuplicateContact($params);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function prepareParametersForBinding(Request $request, $parameters, $entity, $action)
     {
         // Unset the tags from params to avoid a validation error
@@ -571,8 +568,6 @@ class LeadApiController extends CommonApiController
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @param Lead   $entity
      * @param array  $parameters
      * @param string $action

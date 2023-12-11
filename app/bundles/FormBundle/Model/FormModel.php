@@ -70,8 +70,6 @@ class FormModel extends CommonFormModel
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @return FormRepository
      */
     public function getRepository()
@@ -79,25 +77,16 @@ class FormModel extends CommonFormModel
         return $this->em->getRepository(\Mautic\FormBundle\Entity\Form::class);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getPermissionBase(): string
     {
         return 'form:forms';
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getNameGetter(): string
     {
         return 'getName';
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function createForm($entity, FormFactoryInterface $formFactory, $action = null, $options = []): \Symfony\Component\Form\FormInterface
     {
         if (!$entity instanceof Form) {
@@ -331,9 +320,6 @@ class FormModel extends CommonFormModel
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function saveEntity($entity, $unlock = true): void
     {
         $isNew = ($entity->getId()) ? false : true;
@@ -563,9 +549,6 @@ class FormModel extends CommonFormModel
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function deleteEntity($entity): void
     {
         /* @var Form $entity */

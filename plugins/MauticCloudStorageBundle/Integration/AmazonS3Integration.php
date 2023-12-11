@@ -19,17 +19,11 @@ class AmazonS3Integration extends CloudStorageIntegration
      */
     private $fileSystem;
 
-    /**
-     * {@inheritdoc}
-     */
     public function getName(): string
     {
         return 'AmazonS3';
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getDisplayName(): string
     {
         return 'Amazon S3';
@@ -96,8 +90,6 @@ class AmazonS3Integration extends CloudStorageIntegration
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @return AwsS3
      */
     public function getAdapter()
@@ -135,9 +127,6 @@ class AmazonS3Integration extends CloudStorageIntegration
         throw new NoFormNeededException();
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getPublicUrl($key)
     {
         $this->getAdapter();

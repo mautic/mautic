@@ -57,9 +57,6 @@ class TriggerApiController extends CommonApiController
         parent::__construct($security, $translator, $entityResultHelper, $router, $formFactory, $appVersion, $requestStack, $doctrine, $modelFactory, $dispatcher, $coreParametersHelper, $factory);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function preSaveEntity(&$entity, $form, $parameters, $action = 'edit')
     {
         $method            = $this->requestStack->getCurrentRequest()->getMethod();

@@ -12,9 +12,6 @@ use Mautic\PageBundle\Model\PageModel;
 
 class LoadFormResultData extends AbstractFixture implements OrderedFixtureInterface
 {
-    /**
-     * {@inheritdoc}
-     */
     public function __construct(private PageModel $pageModel, private SubmissionModel $submissionModel)
     {
     }
@@ -62,9 +59,6 @@ class LoadFormResultData extends AbstractFixture implements OrderedFixtureInterf
         $importResults($results2);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getOrder()
     {
         return 9;

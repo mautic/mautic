@@ -17,13 +17,19 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 class MessageQueueModelTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var string */
+    /**
+     * @var string
+     */
     public const DATE = '2019-07-07 15:00:00';
 
-    /** @var MessageQueueModel */
+    /**
+     * @var MessageQueueModel
+     */
     protected $messageQueue;
 
-    /** @var MessageQueue */
+    /**
+     * @var MessageQueue
+     */
     protected $message;
 
     protected function setUp(): void

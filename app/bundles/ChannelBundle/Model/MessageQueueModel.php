@@ -26,7 +26,9 @@ use Symfony\Contracts\EventDispatcher\Event;
  */
 class MessageQueueModel extends FormModel
 {
-    /** @var string A default message reschedule interval */
+    /**
+     * @var string A default message reschedule interval
+     */
     public const DEFAULT_RESCHEDULE_INTERVAL = 'PT15M';
 
     public function __construct(protected LeadModel $leadModel, protected CompanyModel $companyModel, CoreParametersHelper $coreParametersHelper, EntityManagerInterface $em, CorePermissions $security, EventDispatcherInterface $dispatcher, UrlGeneratorInterface $router, Translator $translator, UserHelper $userHelper, LoggerInterface $mauticLogger)
@@ -325,8 +327,6 @@ class MessageQueueModel extends FormModel
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @throws \Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException
      */
     protected function dispatchEvent($action, &$entity, $isNew = false, Event $event = null): ?Event

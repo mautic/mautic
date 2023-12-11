@@ -8,9 +8,6 @@ use Symfony\Component\Form\FormBuilderInterface;
 
 class GenericStageActionType extends AbstractType
 {
-    /**
-     * {@inheritdoc}
-     */
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $default = (empty($options['data']['weight'])) ? 0 : (int) $options['data']['weight'];
@@ -26,9 +23,6 @@ class GenericStageActionType extends AbstractType
         ]);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getBlockPrefix()
     {
         return 'genericstage_settings';

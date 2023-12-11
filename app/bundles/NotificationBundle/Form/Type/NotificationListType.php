@@ -9,9 +9,6 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class NotificationListType extends AbstractType
 {
-    /**
-     * {@inheritdoc}
-     */
     public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults(

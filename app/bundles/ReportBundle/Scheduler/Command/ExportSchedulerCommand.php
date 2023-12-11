@@ -18,9 +18,6 @@ class ExportSchedulerCommand extends Command
         parent::__construct();
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function configure()
     {
         $this
@@ -28,9 +25,6 @@ class ExportSchedulerCommand extends Command
             ->addOption('--report', 'report', InputOption::VALUE_OPTIONAL, 'ID of report. Process all reports if not set.');
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $report = $input->getOption('report');

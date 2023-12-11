@@ -48,8 +48,6 @@ class SmsModel extends FormModel implements AjaxLookupModelInterface
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @return \Mautic\SmsBundle\Entity\SmsRepository
      */
     public function getRepository()
@@ -65,9 +63,6 @@ class SmsModel extends FormModel implements AjaxLookupModelInterface
         return $this->em->getRepository(\Mautic\SmsBundle\Entity\Stat::class);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getPermissionBase(): string
     {
         return 'sms:smses';
@@ -107,9 +102,6 @@ class SmsModel extends FormModel implements AjaxLookupModelInterface
     }
 
     /**
-     * {@inheritdoc}
-     *
-
      * @param array $options
      *
      * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
@@ -372,8 +364,6 @@ class SmsModel extends FormModel implements AjaxLookupModelInterface
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @throws \Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException
      */
     protected function dispatchEvent($action, &$entity, $isNew = false, Event $event = null): ?Event

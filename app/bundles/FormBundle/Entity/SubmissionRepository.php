@@ -40,9 +40,6 @@ class SubmissionRepository extends CommonRepository
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getEntities(array $args = [])
     {
         $form = $args['form'];
@@ -177,8 +174,6 @@ class SubmissionRepository extends CommonRepository
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @param int $id
      */
     public function getEntity($id = 0): ?Submission
@@ -267,9 +262,6 @@ class SubmissionRepository extends CommonRepository
         return parent::getFilterExpr($q, $filter);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function getDefaultOrder(): array
     {
         return [
@@ -529,9 +521,6 @@ class SubmissionRepository extends CommonRepository
         return MAUTIC_TABLE_PREFIX.'form_results_'.$formId.'_'.$formAlias;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getTableAlias(): string
     {
         return 'fs';

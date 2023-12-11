@@ -25,9 +25,6 @@ class CompanyType extends AbstractType
     {
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $cleaningRules                 = $this->getFormFields($builder, $options, 'company');
@@ -117,9 +114,6 @@ class CompanyType extends AbstractType
         $builder->addEventSubscriber(new CleanFormSubscriber($cleaningRules));
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults(

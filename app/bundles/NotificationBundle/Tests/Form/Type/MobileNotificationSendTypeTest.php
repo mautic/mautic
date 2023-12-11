@@ -22,7 +22,9 @@ final class MobileNotificationSendTypeTest extends TypeTestCase
     private TranslatorInterface $translator;
     private Connection $connection;
 
-    /** @var ModelFactory<object>&MockObject */
+    /**
+     * @var ModelFactory<object>&MockObject
+     */
     private ModelFactory $modelFactory;
 
     protected function setUp(): void

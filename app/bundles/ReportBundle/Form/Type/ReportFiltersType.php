@@ -10,9 +10,6 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class ReportFiltersType extends AbstractType
 {
-    /**
-     * {@inheritdoc}
-     */
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder->addModelTransformer(
@@ -28,9 +25,6 @@ class ReportFiltersType extends AbstractType
         return CollectionType::class;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults(

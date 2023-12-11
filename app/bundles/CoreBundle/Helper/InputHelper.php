@@ -472,8 +472,6 @@ class InputHelper
     /**
      * Allows tags 'b', 'i', 'u', 'em', 'strong', 'a', 'span'.
      *
-     * @param $data
-     *
      * @return mixed|string
      */
     public static function strict_html($value)

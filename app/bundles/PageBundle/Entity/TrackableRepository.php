@@ -190,9 +190,6 @@ class TrackableRepository extends CommonRepository
         return (isset($results[0])) ? $results[0]['click_count'] : 0;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getTableAlias(): string
     {
         return 't';

@@ -39,9 +39,6 @@ class SalesforceIntegration extends CrmAbstractIntegration
      */
     private $failureFetchingLeads = false;
 
-    /**
-     * {@inheritdoc}
-     */
     public function getName(): string
     {
         return 'Salesforce';
@@ -95,9 +92,6 @@ class SalesforceIntegration extends CrmAbstractIntegration
         return ['push_lead', 'get_leads', 'push_leads'];
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getAccessTokenUrl(): string
     {
         $config = $this->mergeConfigToFeatureSettings([]);
@@ -109,9 +103,6 @@ class SalesforceIntegration extends CrmAbstractIntegration
         return 'https://login.salesforce.com/services/oauth2/token';
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getAuthenticationUrl(): string
     {
         $config = $this->mergeConfigToFeatureSettings([]);
@@ -144,8 +135,6 @@ class SalesforceIntegration extends CrmAbstractIntegration
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @param bool $inAuthorization
      */
     public function getBearerToken($inAuthorization = false)
@@ -157,9 +146,6 @@ class SalesforceIntegration extends CrmAbstractIntegration
         return false;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getAuthenticationType(): string
     {
         return 'oauth2';
@@ -170,9 +156,6 @@ class SalesforceIntegration extends CrmAbstractIntegration
         return true;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function updateDncByDate(): bool
     {
         $featureSettings = $this->settings->getFeatureSettings();
@@ -321,8 +304,6 @@ class SalesforceIntegration extends CrmAbstractIntegration
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @return array
      */
     public function getFormNotes($section)

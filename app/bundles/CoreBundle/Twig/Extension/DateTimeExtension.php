@@ -12,9 +12,6 @@ class DateTimeExtension extends AbstractExtension
     {
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getFunctions()
     {
         return [

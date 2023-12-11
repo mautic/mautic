@@ -7,19 +7,25 @@ use Doctrine\DBAL\Types\Type;
 
 class ExampleClassWithPrivateProperty
 {
-    /** @phpstan-ignore-next-line */
+    /**
+     * @phpstan-ignore-next-line
+     */
     private $test = 'value';
 }
 
 class ExampleClassWithProtectedProperty
 {
-    /** @phpstan-ignore-next-line */
+    /**
+     * @phpstan-ignore-next-line
+     */
     protected $test = 'value';
 }
 
 class ExampleClassWithPublicProperty
 {
-    /** @phpstan-ignore-next-line */
+    /**
+     * @phpstan-ignore-next-line
+     */
     public $test = 'value';
 }
 
@@ -27,7 +33,9 @@ class ArrayTypeTest extends \PHPUnit\Framework\TestCase
 {
     public const MAUTIC_ARRAY_TYPE_NAME = 'mautic-array-type';
 
-    /** @var Type */
+    /**
+     * @var Type
+     */
     private $arrayType;
 
     private \Doctrine\DBAL\Platforms\MySQLPlatform $platform;

@@ -63,8 +63,6 @@ abstract class AbstractMauticMigration extends AbstractMigration implements Cont
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @throws \Doctrine\DBAL\Exception
      */
     public function setContainer(ContainerInterface $container = null): void

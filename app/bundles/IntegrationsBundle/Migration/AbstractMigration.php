@@ -18,17 +18,12 @@ abstract class AbstractMigration implements MigrationInterface
     {
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function shouldExecute(): bool
     {
         return $this->isApplicable($this->entityManager->getConnection()->getSchemaManager()->createSchema());
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @throws \Doctrine\DBAL\Exception
      */
     public function execute(): void

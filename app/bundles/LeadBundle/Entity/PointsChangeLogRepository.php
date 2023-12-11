@@ -84,9 +84,6 @@ class PointsChangeLogRepository extends CommonRepository
             ->executeStatement();
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getTableAlias(): string
     {
         return 'lp';

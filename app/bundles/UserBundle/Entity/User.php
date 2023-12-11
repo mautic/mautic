@@ -288,9 +288,6 @@ class User extends FormEntity implements UserInterface, EquatableInterface, Pass
             ->build();
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function isChanged($prop, $val)
     {
         $getter  = 'get'.ucfirst($prop);
@@ -311,26 +308,17 @@ class User extends FormEntity implements UserInterface, EquatableInterface, Pass
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getUsername()
     {
         return $this->username;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getSalt()
     {
         // bcrypt generates its own salt
         return null;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getPassword(): ?string
     {
         return $this->password;
@@ -356,9 +344,6 @@ class User extends FormEntity implements UserInterface, EquatableInterface, Pass
         return $this->currentPassword;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getRoles()
     {
         $roles = [];
@@ -376,9 +361,6 @@ class User extends FormEntity implements UserInterface, EquatableInterface, Pass
         return $roles;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function eraseCredentials(): void
     {
         $this->plainPassword   = null;

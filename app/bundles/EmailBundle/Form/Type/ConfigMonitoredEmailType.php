@@ -44,9 +44,6 @@ class ConfigMonitoredEmailType extends AbstractType
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getBlockPrefix()
     {
         return 'monitored_email';

@@ -62,9 +62,6 @@ class MonitoringRepository extends CommonRepository
         return $this->addStandardSearchCommandWhereClause($q, $filter);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getTableAlias(): string
     {
         return 'e';

@@ -52,7 +52,9 @@ class DoNotContactFilterQueryBuilderTest extends TestCase
     private function createConnection(): Connection
     {
         return new class() extends Connection {
-            /** @noinspection PhpMissingParentConstructorInspection */
+            /**
+             * @noinspection PhpMissingParentConstructorInspection
+             */
             public function __construct()
             {
             }
@@ -67,7 +69,9 @@ class DoNotContactFilterQueryBuilderTest extends TestCase
     private function createFilter(string $operator, string $parameterValue, array $batchLimiters = []): ContactSegmentFilter
     {
         return new class($operator, $parameterValue, $batchLimiters) extends ContactSegmentFilter {
-            /** @noinspection PhpMissingParentConstructorInspection */
+            /**
+             * @noinspection PhpMissingParentConstructorInspection
+             */
             public function __construct(
                 private string $operator,
                 private string $parameterValue,

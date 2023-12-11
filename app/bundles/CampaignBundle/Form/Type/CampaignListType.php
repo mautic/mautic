@@ -22,9 +22,6 @@ class CampaignListType extends AbstractType
         $this->canViewOther = $security->isGranted('campaign:campaigns:viewother');
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults(

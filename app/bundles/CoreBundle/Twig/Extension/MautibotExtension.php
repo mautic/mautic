@@ -14,9 +14,6 @@ class MautibotExtension extends AbstractExtension
     {
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getFunctions()
     {
         return [

@@ -29,9 +29,6 @@ class LoadPageCategoryData extends AbstractFixture implements OrderedFixtureInte
         $this->setReference('page-cat-1', $cat);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getOrder()
     {
         return 6;

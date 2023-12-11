@@ -143,9 +143,6 @@ class ContentType extends AbstractType
         return 'focus_content';
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults(

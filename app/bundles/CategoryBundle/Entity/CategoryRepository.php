@@ -161,9 +161,6 @@ class CategoryRepository extends CommonRepository
         return $results['aliascount'];
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getTableAlias(): string
     {
         return 'c';

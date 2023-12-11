@@ -4,17 +4,11 @@ namespace MauticPlugin\MauticSocialBundle\Integration;
 
 class FoursquareIntegration extends SocialIntegration
 {
-    /**
-     * {@inheritdoc}
-     */
     public function getName(): string
     {
         return 'Foursquare';
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getPriority(): int
     {
         return 2;
@@ -31,25 +25,16 @@ class FoursquareIntegration extends SocialIntegration
         ];
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getAuthenticationUrl(): string
     {
         return 'https://foursquare.com/oauth2/authenticate';
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getAccessTokenUrl(): string
     {
         return 'https://foursquare.com/oauth2/access_token';
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getAuthenticationType(): string
     {
         return 'oauth2';
@@ -221,9 +206,6 @@ class FoursquareIntegration extends SocialIntegration
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getErrorsFromResponse($response): string
     {
         if (is_object($response) && isset($response->meta->errorDetail)) {
@@ -233,9 +215,6 @@ class FoursquareIntegration extends SocialIntegration
         return '';
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function matchFieldName($field, $subfield = '')
     {
         if ('contact' == $field && in_array($subfield, ['facebook', 'twitter'])) {
@@ -245,9 +224,6 @@ class FoursquareIntegration extends SocialIntegration
         return parent::matchFieldName($field, $subfield);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getAvailableLeadFields($settings = []): array
     {
         return [
@@ -268,9 +244,6 @@ class FoursquareIntegration extends SocialIntegration
         ];
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getSupportedFeatures(): array
     {
         return [
@@ -310,9 +283,6 @@ class FoursquareIntegration extends SocialIntegration
         return false;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getFormType()
     {
         return null;

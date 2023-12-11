@@ -15,9 +15,6 @@ class FormatterExtension extends AbstractExtension
     {
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getFilters()
     {
         return [
@@ -25,9 +22,6 @@ class FormatterExtension extends AbstractExtension
         ];
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getFunctions()
     {
         return [

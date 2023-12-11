@@ -15,9 +15,6 @@ class Version_0_0_1 extends AbstractMigration
      */
     private $table = 'sync_object_mapping';
 
-    /**
-     * {@inheritdoc}
-     */
     protected function isApplicable(Schema $schema): bool
     {
         try {
@@ -27,9 +24,6 @@ class Version_0_0_1 extends AbstractMigration
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function up(): void
     {
         $this->addSql("

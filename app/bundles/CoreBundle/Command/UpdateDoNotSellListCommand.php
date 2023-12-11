@@ -15,9 +15,6 @@ class UpdateDoNotSellListCommand extends Command
         parent::__construct();
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function configure()
     {
         $this->setName('mautic:donotsell:download')
@@ -30,9 +27,6 @@ EOT
             );
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         if ($this->maxMindDoNotSellDownloadHelper->downloadRemoteDataStore()) {
