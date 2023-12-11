@@ -13,15 +13,12 @@ class SyncDateHelper
 
     private ?\DateTimeInterface $syncToDateTime = null;
 
-    /**
-     * @var \DateTimeInterface|null
-     */
     private ?\DateTimeImmutable $syncDateTime = null;
 
     /**
      * @var \DateTimeInterface[]
      */
-    private $lastObjectSyncDates = [];
+    private array $lastObjectSyncDates = [];
 
     public function __construct(
         private Connection $connection

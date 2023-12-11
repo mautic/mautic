@@ -119,17 +119,15 @@ class VtigerIntegration extends CrmAbstractIntegration
      *
      * @param array $settings
      * @param array $parameters
-     *
-     * @return array
      */
-    public function authCallback($settings = [], $parameters = [])
+    public function authCallback($settings = [], $parameters = []): string|bool
     {
         $success = $this->isAuthorized();
         if (!$success) {
             return $this->authorzationError;
-        } else {
-            return false;
         }
+
+        return false;
     }
 
     /**

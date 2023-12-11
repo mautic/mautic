@@ -10,6 +10,9 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class StageListType extends AbstractType
 {
+    /**
+     * @var Stage[]
+     */
     private array $choices = [];
 
     public function __construct(StageModel $model)

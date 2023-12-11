@@ -29,19 +29,24 @@ class SubmissionEvent extends CommonEvent
     /**
      * Callback for post form submit.
      *
-     * @var mixed
+     * @var array<string, mixed[]>
      */
     private array $callbacks = [];
 
     /**
-     * @var mixed
+     * @var mixed[]
      */
     private array $callbackResponses = [];
 
+    /**
+     * @var mixed[]
+     */
     private array $contactFieldMatches = [];
 
     /**
      * Array to hold information set by other actions that may be useful to subsequent actions.
+     *
+     * @var mixed[]
      */
     private array $feedback = [];
 

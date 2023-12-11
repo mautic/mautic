@@ -36,15 +36,9 @@ class HttpFactory implements AuthProviderInterface
 {
     public const NAME = 'oauth2_two_legged';
 
-    /**
-     * @var PasswordCredentialsGrantInterface|ClientCredentialsGrantInterface
-     */
-    private ?\Mautic\IntegrationsBundle\Auth\Provider\AuthCredentialsInterface $credentials = null;
+    private PasswordCredentialsGrantInterface|ClientCredentialsGrantInterface|null $credentials = null;
 
-    /**
-     * @var ConfigCredentialsSignerInterface|ConfigTokenPersistenceInterface|ConfigTokenSignerInterface
-     */
-    private ?\Mautic\IntegrationsBundle\Auth\Provider\AuthConfigInterface $config = null;
+    private ConfigCredentialsSignerInterface|ConfigTokenPersistenceInterface|ConfigTokenSignerInterface|AuthConfigInterface|ConfigTokenFactoryInterface|null $config = null;
 
     private ?\GuzzleHttp\Client $reAuthClient = null;
 
@@ -61,7 +55,7 @@ class HttpFactory implements AuthProviderInterface
     }
 
     /**
-     * @param PasswordCredentialsGrantInterface|ClientCredentialsGrantInterface|AuthCredentialsInterface                                                  $credentials
+     * @param PasswordCredentialsGrantInterface|ClientCredentialsGrantInterface                                                                           $credentials
      * @param ConfigCredentialsSignerInterface|ConfigTokenPersistenceInterface|ConfigTokenSignerInterface|AuthConfigInterface|ConfigTokenFactoryInterface $config
      *
      * @throws PluginNotConfiguredException

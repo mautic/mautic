@@ -44,7 +44,7 @@ class QueryBuilder extends BaseQueryBuilder
             return $this->_expr;
         }
 
-        $this->_expr = new ExpressionBuilder($this->getConnection());
+        $this->_expr = new ExpressionBuilder($this->connection);
 
         return $this->_expr;
     }

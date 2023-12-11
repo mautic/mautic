@@ -29,7 +29,7 @@ class OrderDAO
     private array $changedObjects = [];
 
     /**
-     * @var array|ObjectMapping
+     * @var ObjectMapping[]
      */
     private array $objectMappings = [];
 

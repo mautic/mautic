@@ -18,12 +18,24 @@ use Twig\Environment;
 
 class IntegrationHelper
 {
+    /**
+     * @var array<string, mixed>
+     */
     private array $integrations = [];
 
-    private $available = [];
+    /**
+     * @var mixed[]
+     */
+    private array $available = [];
 
+    /**
+     * @var array<string, mixed>
+     */
     private array $byFeatureList = [];
 
+    /**
+     * @var array<int, mixed>
+     */
     private array $byPlugin = [];
 
     public function __construct(
@@ -53,9 +65,7 @@ class IntegrationHelper
     public function getIntegrationObjects($specificIntegrations = null, $withFeatures = null, $alphabetical = false, $pluginFilter = null, $publishedOnly = false): array
     {
         // Build the service classes
-        if (empty($this->available)) {
-            $this->available = [];
-
+        if ([] === $this->available) {
             // Get currently installed integrations
             $integrationSettings = $this->getIntegrationSettings();
 

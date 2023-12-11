@@ -163,6 +163,9 @@ class Mailbox
 
     protected $mailboxes;
 
+    /**
+     * @var mixed[]
+     */
     private array $folders = [];
 
     public function __construct(CoreParametersHelper $parametersHelper, PathsHelper $pathsHelper)

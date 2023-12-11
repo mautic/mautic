@@ -33,10 +33,7 @@ class HttpFactory implements AuthProviderInterface
      */
     private array $initializedClients = [];
 
-    /**
-     * @var HeaderCredentialsInterface|ParameterCredentialsInterface
-     */
-    private ?\Mautic\IntegrationsBundle\Auth\Provider\AuthCredentialsInterface $credentials = null;
+    private HeaderCredentialsInterface|ParameterCredentialsInterface|null $credentials = null;
 
     public function getAuthType(): string
     {
@@ -44,7 +41,7 @@ class HttpFactory implements AuthProviderInterface
     }
 
     /**
-     * @param HeaderCredentialsInterface|ParameterCredentialsInterface|AuthCredentialsInterface $credentials
+     * @param HeaderCredentialsInterface|ParameterCredentialsInterface $credentials
      *
      * @throws PluginNotConfiguredException
      * @throws InvalidCredentialsException

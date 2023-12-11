@@ -157,6 +157,8 @@ class LeadRepository extends CommonRepository
      * @param int $campaignId
      * @param int $decisionId
      * @param int $parentDecisionId
+     *
+     * @return array<string, \DateTimeInterface>
      */
     public function getInactiveContacts($campaignId, $decisionId, $parentDecisionId, ContactLimiter $limiter): array
     {

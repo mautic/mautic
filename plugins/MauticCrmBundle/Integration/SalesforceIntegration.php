@@ -28,6 +28,9 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
  */
 class SalesforceIntegration extends CrmAbstractIntegration
 {
+    /**
+     * @var string []
+     */
     private array $objects = [
         'Lead',
         'Contact',

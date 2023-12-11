@@ -15,10 +15,13 @@ use Twig\Environment;
 class ThemeHelper implements ThemeHelperInterface
 {
     /**
-     * @var array|mixed
+     * @var array<string, mixed[]>
      */
     private array $themes = [];
 
+    /**
+     * @var array<string, mixed[]>
+     */
     private array $themesInfo = [];
 
     private array $steps = [];

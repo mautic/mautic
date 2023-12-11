@@ -4,6 +4,9 @@ namespace Mautic\FormBundle\Exception;
 
 class ValidationException extends \Exception
 {
+    /**
+     * @var mixed[]
+     */
     private array $violations = [];
 
     public function __construct($message = 'Validation failed', $code = 0, \Exception $previous = null)
@@ -12,19 +15,17 @@ class ValidationException extends \Exception
     }
 
     /**
-     * @return array
+     * @return mixed[]
      */
-    public function getViolations()
+    public function getViolations(): array
     {
         return $this->violations;
     }
 
     /**
-     * @param array $violations
-     *
-     * @return ValidationException
+     * @param mixed[] $violations
      */
-    public function setViolations($violations)
+    public function setViolations(array $violations): self
     {
         $this->violations = $violations;
 

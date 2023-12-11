@@ -35,10 +35,7 @@ class HttpFactory implements AuthProviderInterface
 
     private ?\Mautic\IntegrationsBundle\Auth\Provider\AuthCredentialsInterface $credentials = null;
 
-    /**
-     * @var ConfigCredentialsSignerInterface|ConfigTokenPersistenceInterface|ConfigTokenSignerInterface|ConfigTokenFactoryInterface
-     */
-    private ?\Mautic\IntegrationsBundle\Auth\Provider\AuthConfigInterface $config = null;
+    private ConfigCredentialsSignerInterface|ConfigTokenPersistenceInterface|ConfigTokenSignerInterface|AuthConfigInterface|null $config = null;
 
     private ?\GuzzleHttp\Client $reAuthClient = null;
 
@@ -67,7 +64,7 @@ class HttpFactory implements AuthProviderInterface
         }
 
         // Return cached initialized client if there is one.
-        if (!empty($this->initializedClients[$credentials->getClientId()])) {
+        if (isset($this->initializedClients[$credentials->getClientId()])) {
             return $this->initializedClients[$credentials->getClientId()];
         }
 
@@ -126,11 +123,9 @@ class HttpFactory implements AuthProviderInterface
             return $this->reAuthClient;
         }
 
-        $this->reAuthClient = new Client(
-            [
-                'base_uri' => $this->credentials->getTokenUrl(),
-            ]
-        );
+        $this->reAuthClient = new Client([
+            'base_uri' => $this->credentials->getTokenUrl(),
+        ]);
 
         return $this->reAuthClient;
     }

@@ -66,6 +66,9 @@ class DynamicContentType extends AbstractType
      */
     private array $deviceOsChoices;
 
+    /**
+     * @var array<string, string>
+     */
     private array $tagChoices = [];
 
     /**
