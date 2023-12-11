@@ -341,7 +341,7 @@ final class FormApiControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertSame(Response::HTTP_NOT_FOUND, $response['errors'][0]['code']);
     }
 
-    public function testFormWithChangeTagsAction()
+    public function testFormWithChangeTagsAction(): void
     {
         // Create tag:
         $tag1Payload = ['tag' => 'add this'];

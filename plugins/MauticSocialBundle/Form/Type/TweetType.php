@@ -19,14 +19,8 @@ use Symfony\Component\Validator\Constraints\NotBlank;
 
 class TweetType extends AbstractType
 {
-    /**
-     * @var EntityManager
-     */
-    protected $em;
-
-    public function __construct(EntityManager $em)
+    public function __construct(protected EntityManager $em)
     {
-        $this->em = $em;
     }
 
     public function buildForm(FormBuilderInterface $builder, array $options): void

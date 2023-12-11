@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\CoreBundle\Doctrine\Helper;
 
-class FulltextKeyword
+class FulltextKeyword implements \Stringable
 {
     public function __construct(private string $value, private bool $booleanMode = true, private bool $wordSearch = true, private bool $wordInflecting = false)
     {

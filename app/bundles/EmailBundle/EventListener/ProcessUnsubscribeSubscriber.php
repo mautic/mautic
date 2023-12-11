@@ -15,10 +15,7 @@ class ProcessUnsubscribeSubscriber implements EventSubscriberInterface
     public const BUNDLE     = 'EmailBundle';
     public const FOLDER_KEY = 'unsubscribes';
 
-    /**
-     * @return array
-     */
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             EmailEvents::MONITORED_EMAIL_CONFIG => ['onEmailConfig', 0],

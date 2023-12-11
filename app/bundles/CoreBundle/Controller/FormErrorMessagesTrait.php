@@ -2,7 +2,6 @@
 
 namespace Mautic\CoreBundle\Controller;
 
-use Symfony\Component\Form\Form;
 use Symfony\Component\Form\FormInterface;
 
 trait FormErrorMessagesTrait
@@ -60,7 +59,7 @@ trait FormErrorMessagesTrait
     /**
      * @return array<string|null>
      */
-    public function getFormErrorCodes(Form $form): array
+    public function getFormErrorCodes(FormInterface $form): array
     {
         $codes = [];
 

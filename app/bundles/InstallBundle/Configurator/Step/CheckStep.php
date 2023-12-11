@@ -76,7 +76,7 @@ class CheckStep implements StepInterface
     /**
      * {@inheritdoc}
      */
-    public function checkRequirements()
+    public function checkRequirements(): array
     {
         $messages = [];
 
@@ -160,7 +160,7 @@ class CheckStep implements StepInterface
     /**
      * {@inheritdoc}
      */
-    public function checkOptionalSettings()
+    public function checkOptionalSettings(): array
     {
         $messages = [];
 

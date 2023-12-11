@@ -4,6 +4,8 @@ namespace MauticPlugin\MauticSocialBundle\Controller;
 
 use Mautic\CoreBundle\Controller\FormController;
 use Symfony\Component\Form\Form;
+use Symfony\Component\Form\FormInterface;
+use Symfony\Component\Form\FormView;
 use Symfony\Component\HttpFoundation\Request;
 
 class TweetController extends FormController
@@ -95,10 +97,8 @@ class TweetController extends FormController
      * Set custom form themes, etc.
      *
      * @param string $action
-     *
-     * @return \Symfony\Component\Form\FormView
      */
-    protected function getFormView(Form $form, $action)
+    protected function getFormView(FormInterface $form, $action): FormView
     {
         return $form->createView();
     }

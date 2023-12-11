@@ -49,7 +49,7 @@ class UrlHelper
         $port   = $_SERVER['SERVER_PORT'];
         $port   = ((!$ssl && '80' == $port) || ($ssl && '443' == $port)) ? '' : ":$port";
         $host   = $_SERVER['HTTP_HOST'] ?? null;
-        $host   = $host ?? $_SERVER['SERVER_NAME'].$port;
+        $host ??= $_SERVER['SERVER_NAME'].$port;
         $base   = "$scheme://$host".$_SERVER['REQUEST_URI'];
 
         $base = str_replace('/index.php', '', $base);
@@ -104,10 +104,8 @@ class UrlHelper
      * With exception of URLs used as a token default values.
      *
      * @param string $text
-     *
-     * @return array
      */
-    public static function getUrlsFromPlaintext($text, array $contactUrlFields = [])
+    public static function getUrlsFromPlaintext($text, array $contactUrlFields = []): array
     {
         $urls = [];
         // Check if there are any tokens that URL based fields
@@ -245,7 +243,7 @@ class UrlHelper
     private static function removeTrailingNonAlphaNumeric($string)
     {
         // Special handling of closing bracket
-        if ('}' === substr($string, -1) && preg_match('/^[^{\r\n]*\}.*?$/', $string)) {
+        if (str_ends_with($string, '}') && preg_match('/^[^{\r\n]*\}.*?$/', $string)) {
             $string = substr($string, 0, -1);
 
             return self::removeTrailingNonAlphaNumeric($string);

@@ -548,13 +548,11 @@ class Form extends FormEntity
     {
         return array_filter(
             array_map(
-                function (Field $field): array {
-                    return [
-                        'formFieldId'  => $field->getId(),
-                        'mappedObject' => $field->getMappedObject(),
-                        'mappedField'  => $field->getMappedField(),
-                    ];
-                },
+                fn (Field $field): array => [
+                    'formFieldId'  => $field->getId(),
+                    'mappedObject' => $field->getMappedObject(),
+                    'mappedField'  => $field->getMappedField(),
+                ],
                 $this->getFields()->getValues()
             ),
             fn ($elem) => isset($elem['mappedObject']) && isset($elem['mappedField'])
@@ -573,9 +571,7 @@ class Form extends FormEntity
             array_filter(
                 array_unique(
                     $this->getFields()->map(
-                        function (Field $field) {
-                            return $field->getMappedObject();
-                        }
+                        fn (Field $field) => $field->getMappedObject()
                     )->toArray()
                 )
             )

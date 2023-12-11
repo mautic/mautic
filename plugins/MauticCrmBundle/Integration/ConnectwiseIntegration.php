@@ -426,7 +426,7 @@ class ConnectwiseIntegration extends CrmAbstractIntegration
      * @param array $params
      * @param null  $query
      */
-    public function getLeads($params = [], $query = null, &$executed = null, $result = [], $object = 'Contact')
+    public function getLeads($params = [], $query = null, &$executed = null, $result = [], $object = 'Contact'): int
     {
         return $this->getRecords($params, $object);
     }
@@ -434,12 +434,12 @@ class ConnectwiseIntegration extends CrmAbstractIntegration
     /**
      * Get Companies from connectwise.
      */
-    public function getCompanies(array $params = [])
+    public function getCompanies(array $params = []): int
     {
         return $this->getRecords($params, 'company');
     }
 
-    public function getRecords($params, $object)
+    public function getRecords($params, $object): int
     {
         if (!$this->isAuthorized()) {
             return 0;
@@ -498,8 +498,10 @@ class ConnectwiseIntegration extends CrmAbstractIntegration
 
     /**
      * Ammend mapped lead data before creating to Mautic.
+     *
+     * @return mixed[]
      */
-    public function amendLeadDataBeforeMauticPopulate($data, $object)
+    public function amendLeadDataBeforeMauticPopulate($data, $object): array
     {
         $fieldsValues = [];
 
@@ -670,10 +672,8 @@ class ConnectwiseIntegration extends CrmAbstractIntegration
 
     /**
      * Match lead data with integration fields.
-     *
-     * @return array
      */
-    public function populateLeadData($lead, $config = [])
+    public function populateLeadData($lead, $config = []): array
     {
         if ($lead instanceof Lead) {
             $fields = $lead->getFields(true);
@@ -865,9 +865,7 @@ class ConnectwiseIntegration extends CrmAbstractIntegration
 
                 $existingContactsIds = array_column(array_filter(
                     $contacts,
-                    function ($contact): bool {
-                        return 'lead' === $contact['internal_entity'];
-                    }
+                    fn ($contact): bool => 'lead' === $contact['internal_entity']
                 ), 'integration_entity_id');
 
                 $contactsToFetch = array_diff_key($recordList, array_flip($existingContactsIds));

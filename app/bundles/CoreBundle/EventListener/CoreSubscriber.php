@@ -33,10 +33,7 @@ class CoreSubscriber implements EventSubscriberInterface
     {
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             KernelEvents::CONTROLLER => [
@@ -128,7 +125,7 @@ class CoreSubscriber implements EventSubscriberInterface
         }
     }
 
-    public function onBuildRoute(RouteEvent $event)
+    public function onBuildRoute(RouteEvent $event): void
     {
         $type       = $event->getType();
         $bundles    = $this->bundleHelper->getMauticBundles(true);
@@ -244,7 +241,7 @@ class CoreSubscriber implements EventSubscriberInterface
                             $id = explode('_', $item['id']);
                             if (isset($id[1])) {
                                 // some bundle names are in plural, create also singular item
-                                if ('s' == substr($id[1], -1)) {
+                                if (str_ends_with($id[1], 's')) {
                                     $event->addIcon(rtrim($id[1], 's'), $item['iconClass']);
                                 }
                                 $event->addIcon($id[1], $item['iconClass']);

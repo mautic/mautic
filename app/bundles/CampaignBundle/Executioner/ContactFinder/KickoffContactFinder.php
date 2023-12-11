@@ -52,10 +52,8 @@ class KickoffContactFinder
 
     /**
      * @param int $campaignId
-     *
-     * @return int
      */
-    public function getContactCount($campaignId, array $eventIds, ContactLimiter $limiter)
+    public function getContactCount($campaignId, array $eventIds, ContactLimiter $limiter): int
     {
         $countResult = $this->campaignRepository->getCountsForPendingContacts($campaignId, $eventIds, $limiter);
 

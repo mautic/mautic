@@ -35,7 +35,7 @@ class CommonRepository extends ServiceEntityRepository
      */
     public function __construct(ManagerRegistry $registry, string $entityFQCN = null)
     {
-        parent::__construct($registry, $entityFQCN ?? str_replace('Repository', '', get_class($this)));
+        parent::__construct($registry, $entityFQCN ?? str_replace('Repository', '', static::class));
     }
 
     /**
@@ -645,11 +645,7 @@ class CommonRepository extends ServiceEntityRepository
 
         $result = $q->executeQuery()->fetchAssociative();
 
-        if (isset($result[$column])) {
-            return $result[$column];
-        }
-
-        return null;
+        return $result[$column] ?? null;
     }
 
     /**

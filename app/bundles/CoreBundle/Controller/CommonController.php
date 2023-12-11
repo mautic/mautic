@@ -67,10 +67,8 @@ class CommonController extends AbstractController implements MauticController
     /**
      * Override this method in your controller
      * for easy access to the permissions.
-     *
-     * @return array
      */
-    protected function getPermissions()
+    protected function getPermissions(): array
     {
         return [];
     }
@@ -482,10 +480,8 @@ class CommonController extends AbstractController implements MauticController
      * Returns a json encoded access denied error for modal windows.
      *
      * @param string $msg
-     *
-     * @return JsonResponse
      */
-    public function modalAccessDenied($msg = 'mautic.core.error.accessdenied')
+    public function modalAccessDenied($msg = 'mautic.core.error.accessdenied'): JsonResponse
     {
         return new JsonResponse([
             'error' => $this->translator->trans($msg, [], 'flashes'),
@@ -559,10 +555,8 @@ class CommonController extends AbstractController implements MauticController
 
     /**
      * Renders notification info for ajax.
-     *
-     * @return array
      */
-    protected function getNotificationContent(Request $request = null)
+    protected function getNotificationContent(Request $request = null): array
     {
         if (null === $request) {
             $request = $this->getCurrentRequest();

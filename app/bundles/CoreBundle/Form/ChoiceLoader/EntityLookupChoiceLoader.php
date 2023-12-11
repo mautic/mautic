@@ -106,9 +106,7 @@ class EntityLookupChoiceLoader implements ChoiceLoaderInterface
 
             if ($data) {
                 $data = array_map(
-                    function ($v): int {
-                        return (int) $v;
-                    },
+                    fn ($v): int => (int) $v,
                     (array) $data
                 );
             }
@@ -179,9 +177,7 @@ class EntityLookupChoiceLoader implements ChoiceLoaderInterface
             $counts     = array_count_values($prepped);
             $duplicates = array_filter(
                 $prepped,
-                function ($value) use ($counts): bool {
-                    return $counts[$value] > 1;
-                }
+                fn ($value): bool => $counts[$value] > 1
             );
 
             if (count($duplicates)) {
@@ -209,7 +205,7 @@ class EntityLookupChoiceLoader implements ChoiceLoaderInterface
         }
         $model = $this->modelFactory->getModel($modelName);
         if (!$model instanceof AjaxLookupModelInterface) {
-            throw new \InvalidArgumentException(get_class($model).' must implement '.AjaxLookupModelInterface::class);
+            throw new \InvalidArgumentException($model::class.' must implement '.AjaxLookupModelInterface::class);
         }
 
         $args = $this->options['lookup_arguments'] ?? [];
@@ -249,9 +245,7 @@ class EntityLookupChoiceLoader implements ChoiceLoaderInterface
 
     protected function formatChoices(array &$choices)
     {
-        // Get the first key
-        reset($choices);
-        $firstKey = key($choices);
+        $firstKey = array_key_first($choices);
 
         if (is_array($choices[$firstKey])) {
             $validChoices = [];

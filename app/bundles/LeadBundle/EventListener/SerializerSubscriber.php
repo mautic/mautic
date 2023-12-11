@@ -15,9 +15,9 @@ class SerializerSubscriber implements EventSubscriberInterface
     }
 
     /**
-     * @return mixed[]
+     * @return array<int, array<string, string>>
      */
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             [

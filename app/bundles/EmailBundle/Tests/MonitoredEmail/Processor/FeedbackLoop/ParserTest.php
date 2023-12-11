@@ -13,7 +13,7 @@ class ParserTest extends \PHPUnit\Framework\TestCase
      *
      * @covers  \Mautic\EmailBundle\MonitoredEmail\Processor\FeedbackLoop\Parser::parse()
      */
-    public function testEmailIsFoundInFeedbackLoopEmail()
+    public function testEmailIsFoundInFeedbackLoopEmail(): void
     {
         $message            = new Message();
         $message->fblReport = <<<'BODY'
@@ -44,7 +44,7 @@ BODY;
      *
      * @covers  \Mautic\EmailBundle\MonitoredEmail\Processor\FeedbackLoop\Parser::parse()
      */
-    public function testExceptionIsThrownWithFblNotFound()
+    public function testExceptionIsThrownWithFblNotFound(): void
     {
         $this->expectException(FeedbackLoopNotFound::class);
 

@@ -13,10 +13,7 @@ class SchedulerSubscriber implements EventSubscriberInterface
     {
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             ReportEvents::REPORT_SCHEDULE_SEND => ['onScheduleSend', 0],

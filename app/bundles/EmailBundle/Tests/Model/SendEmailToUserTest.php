@@ -24,27 +24,24 @@ class SendEmailToUserTest extends \PHPUnit\Framework\TestCase
     /**
      * @var MockObject|EmailModel
      */
-    private $emailModel;
+    private \PHPUnit\Framework\MockObject\MockObject $emailModel;
 
     /**
      * @var MockObject|EventDispatcherInterface
      */
-    private $dispatcher;
+    private \PHPUnit\Framework\MockObject\MockObject $dispatcher;
 
     /**
      * @var MockObject|CustomFieldValidator
      */
-    private $customFieldValidator;
+    private \PHPUnit\Framework\MockObject\MockObject $customFieldValidator;
 
     /**
      * @var MockObject|EmailValidator
      */
-    private $emailValidator;
+    private \PHPUnit\Framework\MockObject\MockObject $emailValidator;
 
-    /**
-     * @var SendEmailToUser
-     */
-    private $sendEmailToUser;
+    private \Mautic\EmailBundle\Model\SendEmailToUser $sendEmailToUser;
 
     protected function setUp(): void
     {
@@ -61,7 +58,7 @@ class SendEmailToUserTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testEmailNotFound()
+    public function testEmailNotFound(): void
     {
         $lead = new Lead();
 
@@ -78,7 +75,7 @@ class SendEmailToUserTest extends \PHPUnit\Framework\TestCase
         $this->sendEmailToUser->sendEmailToUsers($config, $lead);
     }
 
-    public function testEmailNotPublished()
+    public function testEmailNotPublished(): void
     {
         $lead  = new Lead();
         $email = new Email();
@@ -97,7 +94,7 @@ class SendEmailToUserTest extends \PHPUnit\Framework\TestCase
         $this->sendEmailToUser->sendEmailToUsers($config, $lead);
     }
 
-    public function testSendEmailWithNoError()
+    public function testSendEmailWithNoError(): void
     {
         $lead  = new Lead();
         $owner = new class() extends User {
@@ -193,7 +190,7 @@ class SendEmailToUserTest extends \PHPUnit\Framework\TestCase
         $this->emailModel
             ->expects($this->once())
             ->method('sendEmailToUser')
-            ->will($this->returnCallback(function ($email, $users, $leadCredentials, $tokens, $assetAttachments, $saveStat, $to, $cc, $bcc) {
+            ->will($this->returnCallback(function ($email, $users, $leadCredentials, $tokens, $assetAttachments, $saveStat, $to, $cc, $bcc): void {
                 $expectedUsers = [
                     ['id' => 6],
                     ['id' => 7],

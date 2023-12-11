@@ -243,7 +243,7 @@ trait VariantEntityTrait
      *
      * @return array<int,int|string>
      */
-    public function getRelatedEntityIds($publishedOnly = false)
+    public function getRelatedEntityIds($publishedOnly = false): array
     {
         [$parent, $children] = $this->getVariants();
 

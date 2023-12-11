@@ -18,10 +18,7 @@ class IntegrationSubscriber implements EventSubscriberInterface
     {
     }
 
-    /**
-     * @return array
-     */
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             PluginEvents::PLUGIN_ON_INTEGRATION_RESPONSE => ['onResponse', 0],

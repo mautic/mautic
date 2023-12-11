@@ -55,10 +55,7 @@ class BuilderSubscriber implements EventSubscriberInterface
     {
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             PageEvents::PAGE_ON_DISPLAY   => ['onPageDisplay', 0],
@@ -631,9 +628,7 @@ class BuilderSubscriber implements EventSubscriberInterface
             // sort by language
             uasort(
                 $related,
-                function ($a, $b): int {
-                    return strnatcasecmp($a['lang'], $b['lang']);
-                }
+                fn ($a, $b): int => strnatcasecmp($a['lang'], $b['lang'])
             );
 
             if (empty($related)) {

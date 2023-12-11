@@ -142,7 +142,7 @@ class LeadRepository extends CommonRepository
         $q->where(
             $q->expr()->and(
                 $q->expr()->eq('l.lead_id', ':leadId'),
-                $q->expr()->in('l.campaign_id', $options['campaigns'], \Doctrine\DBAL\Connection::PARAM_INT_ARRAY)
+                $q->expr()->in('l.campaign_id', $options['campaigns'])
             )
         );
 
@@ -388,7 +388,7 @@ class LeadRepository extends CommonRepository
      *
      * @return array<int|string, string>
      */
-    public function getCampaignContactsBySegments($campaignId, ContactLimiter $limiter, $campaignCanBeRestarted = false)
+    public function getCampaignContactsBySegments($campaignId, ContactLimiter $limiter, $campaignCanBeRestarted = false): array
     {
         if (!$segments = $this->getCampaignSegments($campaignId)) {
             return [];
@@ -499,10 +499,7 @@ class LeadRepository extends CommonRepository
             ->executeStatement();
     }
 
-    /**
-     * @return array
-     */
-    private function getCampaignSegments($campaignId)
+    private function getCampaignSegments($campaignId): array
     {
         // Get published segments for this campaign
         $segmentResults = $this->getEntityManager()->getConnection()->createQueryBuilder()

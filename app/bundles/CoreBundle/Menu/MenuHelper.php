@@ -187,11 +187,7 @@ class MenuHelper
                 $ap = (isset($a['priority']) ? (int) $a['priority'] : $defaultPriority);
                 $bp = (isset($b['priority']) ? (int) $b['priority'] : $defaultPriority);
 
-                if ($ap == $bp) {
-                    return 0;
-                }
-
-                return ($ap > $bp) ? -1 : 1;
+                return $bp <=> $ap;
             }
         );
     }

@@ -24,21 +24,8 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
  */
 class GrapesJsBuilderModel extends AbstractCommonModel
 {
-    /**
-     * @var RequestStack
-     */
-    private $requestStack;
-
-    /**
-     * @var EmailModel
-     */
-    private $emailModel;
-
-    public function __construct(RequestStack $requestStack, EmailModel $emailModel, EntityManager $em, CorePermissions $security, EventDispatcherInterface $dispatcher, UrlGeneratorInterface $router, Translator $translator, UserHelper $userHelper, LoggerInterface $mauticLogger, CoreParametersHelper $coreParametersHelper)
+    public function __construct(private RequestStack $requestStack, private EmailModel $emailModel, EntityManager $em, CorePermissions $security, EventDispatcherInterface $dispatcher, UrlGeneratorInterface $router, Translator $translator, UserHelper $userHelper, LoggerInterface $mauticLogger, CoreParametersHelper $coreParametersHelper)
     {
-        $this->requestStack = $requestStack;
-        $this->emailModel   = $emailModel;
-
         parent::__construct($em, $security, $dispatcher, $router, $translator, $userHelper, $mauticLogger, $coreParametersHelper);
     }
 

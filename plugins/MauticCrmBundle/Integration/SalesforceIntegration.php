@@ -247,12 +247,9 @@ class SalesforceIntegration extends CrmAbstractIntegration
             $salesForceObjects[] = 'Lead';
         }
 
-        $isRequired = function (array $field, $object): bool {
-            return
-                ('boolean' !== $field['type'] && empty($field['nillable']) && !in_array($field['name'], ['Status', 'Id', 'CreatedDate'])) ||
-                ('Lead' == $object && in_array($field['name'], ['Company'])) ||
-                (in_array($object, ['Lead', 'Contact']) && 'Email' === $field['name']);
-        };
+        $isRequired = fn (array $field, $object): bool => ('boolean' !== $field['type'] && empty($field['nillable']) && !in_array($field['name'], ['Status', 'Id', 'CreatedDate'])) ||
+        ('Lead' == $object && in_array($field['name'], ['Company'])) ||
+        (in_array($object, ['Lead', 'Contact']) && 'Email' === $field['name']);
 
         $salesFields = [];
         try {
@@ -1121,9 +1118,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
         if (count($supportedObjects) > 1) {
             $sfObject = 'Contact';
         } else {
-            // Only Lead or Contact is enabled so start with which ever that is
-            reset($supportedObjects);
-            $sfObject = key($supportedObjects);
+            $sfObject = array_key_first($supportedObjects);
         }
         $noMoreUpdates   = false;
         $trackedContacts = [
@@ -1316,7 +1311,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
     /**
      * @throws \Exception
      */
-    public function getCampaignMembers($campaignId)
+    public function getCampaignMembers($campaignId): void
     {
         $this->failureFetchingLeads = false;
 
@@ -1692,8 +1687,6 @@ class SalesforceIntegration extends CrmAbstractIntegration
     /**
      * @param null $objectId
      * @param null $sfRecord
-     *
-     * @return array
      */
     protected function buildCompositeBody(
         &$mauticData,
@@ -1702,7 +1695,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
         &$entity,
         $objectId = null,
         $sfRecord = null
-    ) {
+    ): array {
         $body         = [];
         $updateEntity = [];
         $company      = null;
@@ -2047,9 +2040,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
     {
         // Salesforce craps out with double quotes and unescaped single quotes
         $findEmailsInSF = array_map(
-            function ($lead): string {
-                return str_replace("'", "\'", $this->cleanPushData($lead['email']));
-            },
+            fn ($lead): string => str_replace("'", "\'", $this->cleanPushData($lead['email'])),
             $checkEmailsInSF
         );
 
@@ -2346,10 +2337,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
         return $this->prepareFieldsForSync($fields, $fieldsToUpdate, $objects);
     }
 
-    /**
-     * @return array
-     */
-    protected function mapContactDataForPush(Lead $lead, $config)
+    protected function mapContactDataForPush(Lead $lead, $config): array
     {
         $fields             = array_keys($config['leadFields']);
         $fieldsToUpdateInSf = $this->getPriorityFieldsForIntegration($config);
@@ -2396,10 +2384,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
         return $mappedData;
     }
 
-    /**
-     * @return array
-     */
-    protected function mapCompanyDataForPush(Company $company, $config)
+    protected function mapCompanyDataForPush(Company $company, $config): array
     {
         $object     = 'company';
         $entity     = [];

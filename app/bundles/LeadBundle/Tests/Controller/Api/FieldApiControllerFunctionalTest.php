@@ -24,7 +24,7 @@ final class FieldApiControllerFunctionalTest extends MauticMysqlTestCase
         parent::setUp();
     }
 
-    public function testCreatingMultiselectField()
+    public function testCreatingMultiselectField(): void
     {
         $payload = [
             'label'               => 'Shops (TB)',

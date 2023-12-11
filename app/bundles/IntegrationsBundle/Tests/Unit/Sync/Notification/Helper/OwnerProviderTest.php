@@ -19,17 +19,14 @@ class OwnerProviderTest extends TestCase
     /**
      * @var ObjectProvider|\PHPUnit\Framework\MockObject\MockObject
      */
-    private $objectProvider;
+    private \PHPUnit\Framework\MockObject\MockObject $objectProvider;
 
     /**
      * @var EventDispatcherInterface|\PHPUnit\Framework\MockObject\MockObject
      */
-    private $dispatcher;
+    private \PHPUnit\Framework\MockObject\MockObject $dispatcher;
 
-    /**
-     * @var OwnerProvider
-     */
-    private $ownerProvider;
+    private \Mautic\IntegrationsBundle\Sync\Notification\Helper\OwnerProvider $ownerProvider;
 
     protected function setUp(): void
     {

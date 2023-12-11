@@ -41,9 +41,9 @@ class ColorHelper
      */
     public function buildRandomColor()
     {
-        $this->red   = rand(20, 236);
-        $this->green = rand(20, 236);
-        $this->blue  = rand(20, 236);
+        $this->red   = random_int(20, 236);
+        $this->green = random_int(20, 236);
+        $this->blue  = random_int(20, 236);
 
         return $this;
     }

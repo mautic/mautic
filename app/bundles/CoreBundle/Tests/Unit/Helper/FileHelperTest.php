@@ -13,14 +13,14 @@ class FileHelperTest extends \PHPUnit\Framework\TestCase
      *
      * @dataProvider bytesToMegabytesProvider
      */
-    public function testConversionFromBytesToMegabytes(int $byte, float $megabyte)
+    public function testConversionFromBytesToMegabytes(int $byte, float $megabyte): void
     {
         $fileHelper = new FileHelper();
 
         $this->assertSame($megabyte, $fileHelper::convertBytesToMegabytes($byte));
     }
 
-    public function bytesToMegabytesProvider()
+    public static function bytesToMegabytesProvider()
     {
         return [
             [0, 0.0],
@@ -37,14 +37,14 @@ class FileHelperTest extends \PHPUnit\Framework\TestCase
      *
      * @dataProvider megabytesToBytesProvider
      */
-    public function testConversionFromMegabytesToBytes(int $megabyte, int $byte)
+    public function testConversionFromMegabytesToBytes(int $megabyte, int $byte): void
     {
         $fileHelper = new FileHelper();
 
         $this->assertSame($byte, $fileHelper::convertMegabytesToBytes($megabyte));
     }
 
-    public function megabytesToBytesProvider()
+    public static function megabytesToBytesProvider()
     {
         return [
             [0, 0],
@@ -60,14 +60,14 @@ class FileHelperTest extends \PHPUnit\Framework\TestCase
      *
      * @dataProvider phpSizeToBytesProvider
      */
-    public function testConvertPHPSizeToBytes(string $phpSize, int $bytes)
+    public function testConvertPHPSizeToBytes(string $phpSize, int $bytes): void
     {
         $fileHelper = new FileHelper();
 
         $this->assertSame($bytes, $fileHelper::convertPHPSizeToBytes($phpSize));
     }
 
-    public function phpSizeToBytesProvider()
+    public static function phpSizeToBytesProvider()
     {
         return [
             ['3048M', 3196059648],

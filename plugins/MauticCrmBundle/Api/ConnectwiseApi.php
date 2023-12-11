@@ -192,11 +192,9 @@ class ConnectwiseApi extends CrmApi
     }
 
     /**
-     * @return array
-     *
      * @throws ApiErrorException
      */
-    public function fetchAllRecords($endpoint)
+    public function fetchAllRecords($endpoint): array
     {
         $page        = 1;
         $pageSize    = ConnectwiseIntegration::PAGESIZE;

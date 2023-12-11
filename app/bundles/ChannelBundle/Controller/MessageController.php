@@ -20,6 +20,8 @@ use Mautic\LeadBundle\Controller\EntityContactsTrait;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\Form;
 use Symfony\Component\Form\FormFactoryInterface;
+use Symfony\Component\Form\FormInterface;
+use Symfony\Component\Form\FormView;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 
@@ -199,10 +201,7 @@ class MessageController extends AbstractStandardFormController
         return '@MauticChannel/Message';
     }
 
-    /**
-     * @return \Symfony\Component\Form\FormView
-     */
-    protected function getFormView(Form $form, $view)
+    protected function getFormView(FormInterface $form, $view): FormView
     {
         return $form->createView();
     }

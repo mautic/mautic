@@ -241,7 +241,7 @@ class TriggerCampaignCommand extends ModeratedCommand
     /**
      * @throws \Exception
      */
-    private function triggerCampaign(Campaign $campaign)
+    private function triggerCampaign(Campaign $campaign): void
     {
         if (!$campaign->isPublished()) {
             return;

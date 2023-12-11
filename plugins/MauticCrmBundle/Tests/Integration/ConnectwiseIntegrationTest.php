@@ -16,7 +16,7 @@ class ConnectwiseIntegrationTest extends AbstractIntegrationTestCase
      *
      * @covers  \MauticPlugin\MauticCrmBundle\Integration\ConnectwiseIntegration::getRecords()
      */
-    public function testMultiplePagesOfRecordsAreFetched()
+    public function testMultiplePagesOfRecordsAreFetched(): void
     {
         $this->reset();
 
@@ -53,7 +53,7 @@ class ConnectwiseIntegrationTest extends AbstractIntegrationTestCase
      *
      * @covers  \MauticPlugin\MauticCrmBundle\Integration\ConnectwiseIntegration::getCampaignMembers()
      */
-    public function testMultiplePagesOfCampaignMemberRecordsAreFetched()
+    public function testMultiplePagesOfCampaignMemberRecordsAreFetched(): void
     {
         $this->reset();
 

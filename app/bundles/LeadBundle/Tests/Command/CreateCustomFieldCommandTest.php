@@ -60,7 +60,7 @@ class CreateCustomFieldCommandTest extends TestCase
     /**
      * @return array<int, array<int, bool|int>>
      */
-    public function completeRunMethodProvider(): array
+    public static function completeRunMethodProvider(): array
     {
         return [
             [true, 1],  // `completeRun` should be called once

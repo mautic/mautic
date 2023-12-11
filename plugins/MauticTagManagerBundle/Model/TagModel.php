@@ -32,11 +32,9 @@ class TagModel extends BaseTagModel
      * @param string|null $action
      * @param array       $options
      *
-     * @return mixed
-     *
      * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
      */
-    public function createForm($entity, FormFactoryInterface $formFactory, $action = null, $options = [])
+    public function createForm($entity, FormFactoryInterface $formFactory, $action = null, $options = []): \Symfony\Component\Form\FormInterface
     {
         if (!$entity instanceof \Mautic\LeadBundle\Entity\Tag) {
             throw new MethodNotAllowedHttpException(['Tag']);

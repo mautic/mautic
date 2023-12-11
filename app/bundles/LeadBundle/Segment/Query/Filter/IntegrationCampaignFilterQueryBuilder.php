@@ -16,7 +16,7 @@ class IntegrationCampaignFilterQueryBuilder extends BaseFilterQueryBuilder
     /**
      * @throws QueryException
      */
-    public function applyQuery(QueryBuilder $queryBuilder, ContactSegmentFilter $filter)
+    public function applyQuery(QueryBuilder $queryBuilder, ContactSegmentFilter $filter): QueryBuilder
     {
         $leadsTableAlias          = $queryBuilder->getTableAlias(MAUTIC_TABLE_PREFIX.'leads');
         $integrationCampaignParts = $filter->getIntegrationCampaignParts();

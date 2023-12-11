@@ -72,7 +72,7 @@ class UserType extends AbstractType
             ]
         );
 
-        $positions = $this->model->getLookupResults('position', null, 0, true);
+        $positions = $this->model->getLookupResults('position', null, 0);
         $builder->add(
             'position',
             TextType::class,
@@ -206,11 +206,9 @@ class UserType extends AbstractType
                         ],
                         'class'         => Role::class,
                         'choice_label'  => 'name',
-                        'query_builder' => function (EntityRepository $er) {
-                            return $er->createQueryBuilder('r')
-                                ->where('r.isPublished = true')
-                                ->orderBy('r.name', \Doctrine\Common\Collections\Criteria::ASC);
-                        },
+                        'query_builder' => fn (EntityRepository $er) => $er->createQueryBuilder('r')
+                            ->where('r.isPublished = true')
+                            ->orderBy('r.name', \Doctrine\Common\Collections\Criteria::ASC),
                     ]
                 )
             );
@@ -252,10 +250,7 @@ class UserType extends AbstractType
         );
     }
 
-    /**
-     * @return array
-     */
-    private function getSupportedLanguageChoices()
+    private function getSupportedLanguageChoices(): array
     {
         // Get the list of available languages
         $languages = $this->languageHelper->fetchLanguages(false, false);

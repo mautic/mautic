@@ -66,10 +66,8 @@ class BatchIdToEntityHelper
      * The issue this solves is the response should match the format given by the request. If the request had associative keys, the response
      * will return with associative keys (json object). If the request was a sequential numeric array starting with 0, the response will
      * be a simple array (json array).
-     *
-     * @return array
      */
-    public function orderByOriginalKey(array $entities)
+    public function orderByOriginalKey(array $entities): array
     {
         if (!$this->isAssociative) {
             // The request was keyed by sequential numbers starting with 0
@@ -142,8 +140,7 @@ class BatchIdToEntityHelper
         $this->originalKeys  = array_keys($parameters);
 
         // [1,2,3]
-        reset($parameters);
-        $firstKey = key($parameters);
+        $firstKey            = array_key_first($parameters);
         if (!is_array($parameters[$firstKey])) {
             $this->ids = array_values($parameters);
 
@@ -168,9 +165,7 @@ class BatchIdToEntityHelper
         if (empty($array)) {
             return false;
         }
-
-        reset($array);
-        $firstKey = key($array);
+        $firstKey = array_key_first($array);
 
         return array_keys($array) !== range(0, count($array) - 1) && 0 !== $firstKey;
     }

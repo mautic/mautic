@@ -15,10 +15,7 @@ class BroadcastSubscriber implements EventSubscriberInterface
     {
     }
 
-    /**
-     * @return array
-     */
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             ChannelEvents::CHANNEL_BROADCAST => ['onBroadcast', 0],

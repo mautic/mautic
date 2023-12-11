@@ -28,7 +28,7 @@ abstract class AbstractFormStandardType extends AbstractType
     /**
      * @throws \Exception
      */
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         if (!isset($options['data'])) {
             throw new \Exception('$options[\'data\'] must be defined');

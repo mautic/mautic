@@ -8,10 +8,7 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class BuildJsSubscriber implements EventSubscriberInterface
 {
-    /**
-     * @return array
-     */
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             CoreEvents::BUILD_MAUTIC_JS => ['onBuildJs', 1000],
@@ -25,7 +22,7 @@ class BuildJsSubscriber implements EventSubscriberInterface
      */
     public function onBuildJs(BuildJsEvent $event): void
     {
-        $js = <<<'JS'
+        $js = <<<'JS_WRAP'
 // Polyfill for CustomEvent to support IE 9+
 (function () {
     if ( typeof window.CustomEvent === "function" ) return false;
@@ -388,7 +385,7 @@ MauticJS.ensureEventContext = function(event, context0, context1) {
         && event.detail[0] === context0
         && event.detail[1] === context1);
 };
-JS;
+JS_WRAP;
         $event->appendJs($js, 'Mautic Core');
     }
 }

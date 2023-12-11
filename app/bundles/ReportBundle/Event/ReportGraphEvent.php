@@ -47,11 +47,7 @@ class ReportGraphEvent extends AbstractReportEvent
      */
     public function getOptions($graph)
     {
-        if (isset($this->requestedGraphs[$graph]['options'])) {
-            return $this->requestedGraphs[$graph]['options'];
-        }
-
-        return [];
+        return $this->requestedGraphs[$graph]['options'] ?? [];
     }
 
     /**

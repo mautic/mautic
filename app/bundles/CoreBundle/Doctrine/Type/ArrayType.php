@@ -70,9 +70,7 @@ class ArrayType extends \Doctrine\DBAL\Types\ArrayType
             }
 
             return $value;
-        } catch (ConversionException) {
-            return [];
-        } catch (\ErrorException) {
+        } catch (ConversionException|\ErrorException) {
             return [];
         }
     }

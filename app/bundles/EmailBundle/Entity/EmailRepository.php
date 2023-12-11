@@ -540,7 +540,7 @@ class EmailRepository extends CommonRepository
      * @param int        $increaseBy
      * @param bool|false $variant
      */
-    public function upCount($id, $type = 'sent', $increaseBy = 1, $variant = false)
+    public function upCount($id, $type = 'sent', $increaseBy = 1, $variant = false): void
     {
         if (!$increaseBy) {
             return;

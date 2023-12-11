@@ -15,7 +15,7 @@ class FoursquareIntegration extends SocialIntegration
     /**
      * {@inheritdoc}
      */
-    public function getPriority()
+    public function getPriority(): int
     {
         return 2;
     }

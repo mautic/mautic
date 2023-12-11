@@ -1924,23 +1924,17 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
 
                         return ($a['frequency_number'] > $b['frequency_number']) ? -1 : 1;
                     } else {
-                        $convertToMonth = function ($number, $unit) {
-                            return match ($unit) {
-                                FrequencyRule::TIME_MONTH => (int) $number,
-                                FrequencyRule::TIME_WEEK  => $number * 4,
-                                FrequencyRule::TIME_DAY   => $number * 30,
-                                default                   => $number,
-                            };
+                        $convertToMonth = fn ($number, $unit) => match ($unit) {
+                            FrequencyRule::TIME_MONTH => (int) $number,
+                            FrequencyRule::TIME_WEEK  => $number * 4,
+                            FrequencyRule::TIME_DAY   => $number * 30,
+                            default                   => $number,
                         };
 
                         $aFrequency = $convertToMonth($a['frequency_number'], $a['frequency_time']);
                         $bFrequency = $convertToMonth($b['frequency_number'], $b['frequency_time']);
 
-                        if ($aFrequency === $bFrequency) {
-                            return 0;
-                        }
-
-                        return ($aFrequency > $bFrequency) ? -1 : 1;
+                        return $bFrequency <=> $aFrequency;
                     }
                 }
 

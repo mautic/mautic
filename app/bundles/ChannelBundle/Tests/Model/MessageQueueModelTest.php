@@ -52,25 +52,25 @@ class MessageQueueModelTest extends \PHPUnit\Framework\TestCase
         $this->message = $message;
     }
 
-    public function testRescheduleMessageIntervalDay()
+    public function testRescheduleMessageIntervalDay(): void
     {
         $interval = new \DateInterval('P2D');
         $this->prepareRescheduleMessageIntervalTest($interval);
     }
 
-    public function testRescheduleMessageIntervalWeek()
+    public function testRescheduleMessageIntervalWeek(): void
     {
         $interval = new \DateInterval('P4W');
         $this->prepareRescheduleMessageIntervalTest($interval);
     }
 
-    public function testRescheduleMessageIntervalMonth()
+    public function testRescheduleMessageIntervalMonth(): void
     {
         $interval = new \DateInterval('P8M');
         $this->prepareRescheduleMessageIntervalTest($interval);
     }
 
-    public function testRescheduleMessageNoInterval()
+    public function testRescheduleMessageNoInterval(): void
     {
         $interval = new \DateInterval('PT0S');
         $this->prepareRescheduleMessageIntervalTest($interval);

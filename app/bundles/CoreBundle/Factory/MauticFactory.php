@@ -216,7 +216,7 @@ class MauticFactory
         /** @var \AppKernel $kernel */
         $kernel = $this->container->get('kernel');
 
-        return $kernel->getLocalConfigFile($checkExists);
+        return $kernel->getLocalConfigFile();
     }
 
     /**

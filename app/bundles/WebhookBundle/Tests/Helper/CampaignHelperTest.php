@@ -15,30 +15,24 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class CampaignHelperTest extends \PHPUnit\Framework\TestCase
 {
-    private $contact;
+    private \PHPUnit\Framework\MockObject\MockObject $contact;
 
     /**
      * @var \PHPUnit\Framework\MockObject\MockObject|Client
      */
-    private $client;
+    private \PHPUnit\Framework\MockObject\MockObject $client;
 
-    private $companyModel;
-    private $companyRepository;
+    private \PHPUnit\Framework\MockObject\MockObject $companyModel;
+    private \PHPUnit\Framework\MockObject\MockObject $companyRepository;
 
-    /**
-     * @var ArrayCollection
-     */
-    private $ipCollection;
+    private \Doctrine\Common\Collections\ArrayCollection $ipCollection;
 
-    /**
-     * @var CampaignHelper
-     */
-    private $campaignHelper;
+    private \Mautic\WebhookBundle\Helper\CampaignHelper $campaignHelper;
 
     /**
      * @var \PHPUnit\Framework\MockObject\MockObject|EventDispatcherInterface
      */
-    private $dispatcher;
+    private \PHPUnit\Framework\MockObject\MockObject $dispatcher;
 
     protected function setUp(): void
     {
@@ -74,7 +68,7 @@ class CampaignHelperTest extends \PHPUnit\Framework\TestCase
             ->willReturn($this->ipCollection);
     }
 
-    public function testFireWebhookWithGet()
+    public function testFireWebhookWithGet(): void
     {
         $expectedUrl = 'https://mautic.org?test=tee&email=john%40doe.email&IP=127.0.0.1%2C127.0.0.2';
 
@@ -89,7 +83,7 @@ class CampaignHelperTest extends \PHPUnit\Framework\TestCase
         $this->campaignHelper->fireWebhook($this->provideSampleConfig(), $this->contact);
     }
 
-    public function testFireWebhookWithPost()
+    public function testFireWebhookWithPost(): void
     {
         $config      = $this->provideSampleConfig('post');
         $expectedUrl = 'https://mautic.org?test=tee&email=john%40doe.email&IP=127.0.0.1%2C127.0.0.2';
@@ -106,7 +100,7 @@ class CampaignHelperTest extends \PHPUnit\Framework\TestCase
         $this->campaignHelper->fireWebhook($config, $this->contact);
     }
 
-    public function testFireWebhookWithPostJson()
+    public function testFireWebhookWithPostJson(): void
     {
         $config      = $this->provideSampleConfig('post');
         $expectedUrl = 'https://mautic.org?test=tee&email=john%40doe.email&IP=127.0.0.1%2C127.0.0.2';
@@ -130,7 +124,7 @@ class CampaignHelperTest extends \PHPUnit\Framework\TestCase
         $this->campaignHelper->fireWebhook($config, $this->contact);
     }
 
-    public function testFireWebhookWhenReturningNotFound()
+    public function testFireWebhookWhenReturningNotFound(): void
     {
         $this->client->expects($this->once())
             ->method('get')

@@ -14,10 +14,7 @@ class StageSubscriber implements EventSubscriberInterface
     {
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             StageEvents::STAGE_POST_SAVE   => ['onStagePostSave', 0],

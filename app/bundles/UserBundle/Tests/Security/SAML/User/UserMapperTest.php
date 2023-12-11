@@ -12,15 +12,12 @@ use PHPUnit\Framework\TestCase;
 
 class UserMapperTest extends TestCase
 {
-    /**
-     * @var UserMapper
-     */
-    private $mapper;
+    private \Mautic\UserBundle\Security\SAML\User\UserMapper $mapper;
 
     /**
      * @var Response|MockObject
      */
-    private $response;
+    private \PHPUnit\Framework\MockObject\MockObject $response;
 
     protected function setUp(): void
     {
@@ -75,7 +72,7 @@ class UserMapperTest extends TestCase
             ->willReturn([$assertion]);
     }
 
-    public function testUserEntityIsPopulatedFromAssertions()
+    public function testUserEntityIsPopulatedFromAssertions(): void
     {
         $user = $this->mapper->getUser($this->response);
         $this->assertEquals('hello@there.com', $user->getEmail());
@@ -84,7 +81,7 @@ class UserMapperTest extends TestCase
         $this->assertEquals('Smith', $user->getLastName());
     }
 
-    public function testUsernameIsReturned()
+    public function testUsernameIsReturned(): void
     {
         $username = $this->mapper->getUsername($this->response);
         $this->assertEquals('hello@there.com', $username);

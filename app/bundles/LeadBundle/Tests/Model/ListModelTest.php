@@ -32,25 +32,22 @@ class ListModelTest extends TestCase
      */
     protected $fixture;
 
-    /**
-     * @var ListModel
-     */
-    private $model;
+    private \Mautic\LeadBundle\Model\ListModel $model;
 
     /**
      * @var LeadListRepository|MockObject
      */
-    private $leadListRepositoryMock;
+    private \PHPUnit\Framework\MockObject\MockObject $leadListRepositoryMock;
 
     /**
      * @var SegmentCountCacheHelper|MockObject
      */
-    private $segmentCountCacheHelper;
+    private \PHPUnit\Framework\MockObject\MockObject $segmentCountCacheHelper;
 
     /**
      * @var ContactSegmentService|MockObject
      */
-    private $contactSegmentServiceMock;
+    private \PHPUnit\Framework\MockObject\MockObject $contactSegmentServiceMock;
 
     protected function setUp(): void
     {
@@ -131,7 +128,7 @@ class ListModelTest extends TestCase
         $this->fixture = $mockListModel;
     }
 
-    public function sourceTypeTestDataProvider(): array
+    public static function sourceTypeTestDataProvider(): array
     {
         return [
             [

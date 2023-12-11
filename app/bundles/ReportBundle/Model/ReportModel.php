@@ -109,7 +109,7 @@ class ReportModel extends FormModel
      *
      * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
      */
-    public function createForm($entity, FormFactoryInterface $formFactory, $action = null, $options = [])
+    public function createForm($entity, FormFactoryInterface $formFactory, $action = null, $options = []): \Symfony\Component\Form\FormInterface
     {
         if (!$entity instanceof Report) {
             throw new MethodNotAllowedHttpException(['Report']);
@@ -714,10 +714,8 @@ class ReportModel extends FormModel
 
     /**
      * @param int $segmentId
-     *
-     * @return array
      */
-    public function getReportsIdsWithDependenciesOnSegment($segmentId)
+    public function getReportsIdsWithDependenciesOnSegment($segmentId): array
     {
         $search = 'lll.leadlist_id';
         $filter = [

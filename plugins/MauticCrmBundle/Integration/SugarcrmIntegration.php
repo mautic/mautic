@@ -40,12 +40,6 @@ class SugarcrmIntegration extends CrmAbstractIntegration
 
     private $sugarDncKeys = ['email_opt_out', 'invalid_email'];
     private $authorizationError;
-    private $userModel;
-
-    /**
-     * @var DoNotContact
-     */
-    protected $doNotContactModel;
 
     public function __construct(
         EventDispatcherInterface $eventDispatcher,
@@ -63,12 +57,9 @@ class SugarcrmIntegration extends CrmAbstractIntegration
         NotificationModel $notificationModel,
         FieldModel $fieldModel,
         IntegrationEntityModel $integrationEntityModel,
-        DoNotContact $doNotContactModel,
-        UserModel $userModel
+        protected DoNotContact $doNotContactModel,
+        private UserModel $userModel
     ) {
-        $this->doNotContactModel = $doNotContactModel;
-        $this->userModel         = $userModel;
-
         parent::__construct(
             $eventDispatcher,
             $cacheStorageHelper,
@@ -237,10 +228,8 @@ class SugarcrmIntegration extends CrmAbstractIntegration
      * Get available fields for choices in the config UI.
      *
      * @param array $settings
-     *
-     * @return array
      */
-    public function getFormLeadFields($settings = [])
+    public function getFormLeadFields($settings = []): array
     {
         if (!$this->isAuthorized()) {
             return [];
@@ -294,11 +283,9 @@ class SugarcrmIntegration extends CrmAbstractIntegration
             $settings['feature_settings']['objects'] = $sugarObjects;
         }
 
-        $isRequired = function (array $field, $object) {
-            return match (true) {
-                'Leads' === $object && ('webtolead_email1' === $field['name'] || 'email1' === $field['name']), 'Contacts' === $object && 'email1' === $field['name'], 'id' !== $field['name'] && !empty($field['required']) => true,
-                default => false,
-            };
+        $isRequired = fn (array $field, $object) => match (true) {
+            'Leads' === $object && ('webtolead_email1' === $field['name'] || 'email1' === $field['name']), 'Contacts' === $object && 'email1' === $field['name'], 'id' !== $field['name'] && !empty($field['required']) => true,
+            default => false,
         };
 
         try {
@@ -733,10 +720,8 @@ class SugarcrmIntegration extends CrmAbstractIntegration
      *
      * @param array  $data
      * @param string $object
-     *
-     * @return int
      */
-    public function amendLeadDataBeforeMauticPopulate($data, $object)
+    public function amendLeadDataBeforeMauticPopulate($data, $object): int
     {
         $settings['feature_settings']['objects'][] = $object;
         $fields                                    = array_keys($this->getAvailableLeadFields($settings));
@@ -1749,10 +1734,7 @@ class SugarcrmIntegration extends CrmAbstractIntegration
         return ($object && isset($fields[$object])) ? $fields[$object] : $fields;
     }
 
-    /**
-     * @return array
-     */
-    protected function prepareFieldsForPush($fields)
+    protected function prepareFieldsForPush($fields): array
     {
         $fieldMappings = [];
         $required      = [];

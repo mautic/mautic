@@ -36,10 +36,6 @@ class MailHelper
     public const QUEUE_RETURN_ERRORS      = 'RETURN_ERRORS';
     public const EMAIL_TYPE_TRANSACTIONAL = 'transactional';
     public const EMAIL_TYPE_MARKETING     = 'marketing';
-    /**
-     * @var MauticFactory
-     */
-    protected $factory;
 
     protected $transport;
 
@@ -229,9 +225,8 @@ class MailHelper
      */
     private $embedImagesReplaces = [];
 
-    public function __construct(MauticFactory $factory, protected MailerInterface $mailer, $from = null)
+    public function __construct(protected MauticFactory $factory, protected MailerInterface $mailer, $from = null)
     {
-        $this->factory   = $factory;
         $this->transport = $this->getTransport();
 
         $systemFromEmail    = $factory->getParameter('mailer_from_email');
@@ -1368,10 +1363,7 @@ class MailHelper
         $this->headers[$name] = $value;
     }
 
-    /**
-     * @return array
-     */
-    public function getCustomHeaders()
+    public function getCustomHeaders(): array
     {
         $headers = array_merge($this->headers, $this->getSystemHeaders());
 
@@ -1731,8 +1723,7 @@ class MailHelper
             $emailAddresses = $this->message->getTo();
 
             if (count($emailAddresses)) {
-                end($emailAddresses);
-                $emailAddress = key($emailAddresses);
+                $emailAddress = array_key_last($emailAddresses);
             }
         }
         $stat->setEmailAddress($emailAddress);
@@ -2010,7 +2001,7 @@ class MailHelper
      *
      * @throws InvalidEmailException
      */
-    public static function validateEmail($address)
+    public static function validateEmail($address): void
     {
         $invalidChar = strpbrk($address, '\'^&*%');
         if (false !== $invalidChar) {

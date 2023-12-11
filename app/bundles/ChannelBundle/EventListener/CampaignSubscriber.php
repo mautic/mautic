@@ -24,9 +24,9 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class CampaignSubscriber implements EventSubscriberInterface
 {
-    private ?Event $pseudoEvent;
+    private ?Event $pseudoEvent = null;
 
-    private ?ArrayCollection $mmLogs;
+    private ?ArrayCollection $mmLogs = null;
 
     /**
      * @var mixed[]
@@ -37,10 +37,7 @@ class CampaignSubscriber implements EventSubscriberInterface
     {
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             CampaignEvents::CAMPAIGN_ON_BUILD       => ['onCampaignBuild', 0],

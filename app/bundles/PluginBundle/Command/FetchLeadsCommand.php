@@ -82,9 +82,7 @@ class FetchLeadsCommand extends Command
         $integrationObject = $this->integrationHelper->getIntegrationObject($integration);
         if (!$integrationObject instanceof UnifiedIntegrationInterface) {
             $availableIntegrations = array_filter($this->integrationHelper->getIntegrationObjects(),
-                function (UnifiedIntegrationInterface $availableIntegration) {
-                    return $availableIntegration->isConfigured();
-                });
+                fn (UnifiedIntegrationInterface $availableIntegration) => $availableIntegration->isConfigured());
             throw new \RuntimeException(sprintf('The Integration "%s" is not one of the available integrations (%s)', $integration, implode(', ', array_keys($availableIntegrations))));
         }
 
@@ -142,9 +140,7 @@ class FetchLeadsCommand extends Command
                     $leadObjectName = 'Leads';
                 }
                 $contactObjectName = 'Contact';
-                if (in_array(strtolower('Contacts'), array_map(function ($i): string {
-                    return strtolower($i);
-                }, $config['objects']), true)) {
+                if (in_array(strtolower('Contacts'), array_map(fn ($i): string => strtolower($i), $config['objects']), true)) {
                     $contactObjectName = 'Contacts';
                 }
 
@@ -160,9 +156,7 @@ class FetchLeadsCommand extends Command
                         $processed += (int) $results;
                     }
                 }
-                if (in_array(strtolower($contactObjectName), array_map(function ($i): string {
-                    return strtolower($i);
-                }, $config['objects']), true)) {
+                if (in_array(strtolower($contactObjectName), array_map(fn ($i): string => strtolower($i), $config['objects']), true)) {
                     $output->writeln('');
                     $output->writeln('<comment>'.$this->translator->trans('mautic.plugin.command.fetch.contacts.starting').'</comment>');
                     $contactList = [];

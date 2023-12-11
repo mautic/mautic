@@ -30,7 +30,7 @@ class CategoryListType extends AbstractType
     public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults([
-            'choices' => function (Options $options) {
+            'choices' => function (Options $options): array {
                 $createNew  = $this->translator->trans('mautic.category.createnew');
                 $categories = $this->model->getLookupResults($options['bundle'], '', 0);
                 $choices    = [];

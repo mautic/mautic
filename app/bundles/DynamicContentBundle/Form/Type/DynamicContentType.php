@@ -36,13 +36,36 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 class DynamicContentType extends AbstractType
 {
     private $fieldChoices;
-    private $countryChoices;
-    private $regionChoices;
+
+    /**
+     * @var mixed[]
+     */
+    private array $countryChoices;
+
+    /**
+     * @var mixed[]
+     */
+    private array $regionChoices;
+
     private $timezoneChoices;
-    private $localeChoices;
-    private $deviceTypesChoices;
+
+    /**
+     * @var mixed[]
+     */
+    private array $localeChoices;
+
+    /**
+     * @var mixed[]
+     */
+    private array $deviceTypesChoices;
+
     private $deviceBrandsChoices;
-    private $deviceOsChoices;
+
+    /**
+     * @var mixed[]
+     */
+    private array $deviceOsChoices;
+
     private $tagChoices = [];
 
     /**
@@ -297,9 +320,7 @@ class DynamicContentType extends AbstractType
     {
         unset($this->fieldChoices['company']);
         $customFields               = $this->leadModel->getRepository()->getCustomFieldList('lead');
-        $this->fieldChoices['lead'] = array_filter($this->fieldChoices['lead'], function ($key) use ($customFields): bool {
-            return in_array($key, array_merge(array_keys($customFields[0]), ['date_added', 'date_modified', 'device_brand', 'device_model', 'device_os', 'device_type', 'tags']), true);
-        }, ARRAY_FILTER_USE_KEY);
+        $this->fieldChoices['lead'] = array_filter($this->fieldChoices['lead'], fn ($key): bool => in_array($key, array_merge(array_keys($customFields[0]), ['date_added', 'date_modified', 'device_brand', 'device_model', 'device_os', 'device_type', 'tags']), true), ARRAY_FILTER_USE_KEY);
     }
 
     /**

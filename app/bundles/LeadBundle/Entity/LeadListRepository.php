@@ -316,10 +316,7 @@ class LeadListRepository extends CommonRepository
         return $qb;
     }
 
-    /**
-     * @return array
-     */
-    public function arrangeFilters($filters)
+    public function arrangeFilters($filters): array
     {
         $objectFilters = [];
         if (empty($filters)) {

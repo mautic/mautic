@@ -38,37 +38,12 @@ use Twig\Environment;
  */
 class FocusModel extends FormModel
 {
-    /**
-     * @var \Mautic\FormBundle\Model\FormModel
-     */
-    protected $formModel;
-
-    /**
-     * @var TrackableModel
-     */
-    protected $trackableModel;
-
-    /**
-     * @var Environment
-     */
-    protected $twig;
-
-    /**
-     * @var FieldModel
-     */
-    protected $leadFieldModel;
-
-    /**
-     * @var ContactTracker
-     */
-    protected $contactTracker;
-
     public function __construct(
-        \Mautic\FormBundle\Model\FormModel $formModel,
-        TrackableModel $trackableModel,
-        Environment $twig,
-        FieldModel $leadFieldModel,
-        ContactTracker $contactTracker,
+        protected \Mautic\FormBundle\Model\FormModel $formModel,
+        protected TrackableModel $trackableModel,
+        protected Environment $twig,
+        protected FieldModel $leadFieldModel,
+        protected ContactTracker $contactTracker,
         EntityManagerInterface $em,
         CorePermissions $security,
         EventDispatcherInterface $dispatcher,
@@ -78,12 +53,7 @@ class FocusModel extends FormModel
         LoggerInterface $mauticLogger,
         CoreParametersHelper $coreParametersHelper
     ) {
-        $this->formModel      = $formModel;
-        $this->trackableModel = $trackableModel;
-        $this->twig           = $twig;
         $this->dispatcher     = $dispatcher;
-        $this->leadFieldModel = $leadFieldModel;
-        $this->contactTracker = $contactTracker;
 
         parent::__construct($em, $security, $dispatcher, $router, $translator, $userHelper, $mauticLogger, $coreParametersHelper);
     }
@@ -113,7 +83,7 @@ class FocusModel extends FormModel
      *
      * @throws NotFoundHttpException
      */
-    public function createForm($entity, FormFactoryInterface $formFactory, $action = null, $options = [])
+    public function createForm($entity, FormFactoryInterface $formFactory, $action = null, $options = []): \Symfony\Component\Form\FormInterface
     {
         if (!$entity instanceof Focus) {
             throw new MethodNotAllowedHttpException(['Focus']);

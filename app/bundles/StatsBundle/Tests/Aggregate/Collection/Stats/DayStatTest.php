@@ -10,7 +10,7 @@ class DayStatTest extends TestCase
 {
     private $day  = '2019-11-07';
     private $hour = 11;
-    private $dayStat;
+    private \Mautic\StatsBundle\Aggregate\Collection\Stats\DayStat $dayStat;
     private $hourStat;
 
     protected function setUp(): void
@@ -19,7 +19,7 @@ class DayStatTest extends TestCase
         $this->hourStat = $this->dayStat->getHour($this->hour);
     }
 
-    public function testGetHour()
+    public function testGetHour(): void
     {
         $this->assertInstanceOf(HourStat::class, $this->hourStat);
         $this->assertSame("$this->day $this->hour", $this->hourStat->getHour());
@@ -32,13 +32,13 @@ class DayStatTest extends TestCase
         $this->assertSame(0, $this->hourStat->getCount());
     }
 
-    public function testGetStats()
+    public function testGetStats(): void
     {
         $result = $this->dayStat->getStats();
         $this->assertSame(["$this->day $this->hour" => $this->hourStat], $result);
     }
 
-    public function testGetSum()
+    public function testGetSum(): void
     {
         $this->dayStat  = new DayStat($this->day);
         $this->dayStat->getHour($this->hour);
@@ -49,7 +49,7 @@ class DayStatTest extends TestCase
         $this->assertSame(2, $this->dayStat->getCount());
     }
 
-    public function testGetCount()
+    public function testGetCount(): void
     {
         $this->dayStat  = new DayStat($this->day);
         $this->dayStat->getHour($this->hour);

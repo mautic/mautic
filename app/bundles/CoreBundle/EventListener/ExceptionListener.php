@@ -27,7 +27,7 @@ class ExceptionListener extends ErrorListener
         parent::__construct($controller, $logger);
     }
 
-    public function onKernelException(ExceptionEvent $event, string $eventName = null, EventDispatcherInterface $eventDispatcher = null)
+    public function onKernelException(ExceptionEvent $event, string $eventName = null, EventDispatcherInterface $eventDispatcher = null): void
     {
         $exception = $event->getThrowable();
 
@@ -46,7 +46,7 @@ class ExceptionListener extends ErrorListener
         }
 
         if (!$exception instanceof AccessDeniedHttpException && !$exception instanceof NotFoundHttpException) {
-            $this->logException($exception, sprintf('Uncaught PHP Exception %s: "%s" at %s line %s', get_class($exception), $exception->getMessage(), $exception->getFile(), $exception->getLine()));
+            $this->logException($exception, sprintf('Uncaught PHP Exception %s: "%s" at %s line %s', $exception::class, $exception->getMessage(), $exception->getFile(), $exception->getLine()));
         }
 
         $exception = $event->getThrowable();
@@ -61,7 +61,7 @@ class ExceptionListener extends ErrorListener
                 $e,
                 sprintf(
                     'Exception thrown when handling an exception (%s: %s at %s line %s)',
-                    get_class($e),
+                    $e::class,
                     $e->getMessage(),
                     $e->getFile(),
                     $e->getLine()

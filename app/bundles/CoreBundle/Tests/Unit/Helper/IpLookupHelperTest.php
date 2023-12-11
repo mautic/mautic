@@ -26,7 +26,7 @@ class IpLookupHelperTest extends \PHPUnit\Framework\TestCase
      *
      * @covers  \Mautic\CoreBundle\Helper\IpLookupHelper::getIpAddress
      */
-    public function testLocalIpIsReturnedWhenNotInRequestScope()
+    public function testLocalIpIsReturnedWhenNotInRequestScope(): void
     {
         $ip = $this->getIpHelper()->getIpAddress();
 
@@ -38,7 +38,7 @@ class IpLookupHelperTest extends \PHPUnit\Framework\TestCase
      *
      * @covers  \Mautic\CoreBundle\Helper\IpLookupHelper::getIpAddress
      */
-    public function testClientIpIsReturnedFromProxy()
+    public function testClientIpIsReturnedFromProxy(): void
     {
         $request = new Request([], [], [], [], [], ['HTTP_X_FORWARDED_FOR' => '73.77.245.52,10.8.0.2,192.168.0.1']);
         $ip      = $this->getIpHelper($request)->getIpAddress();
@@ -51,7 +51,7 @@ class IpLookupHelperTest extends \PHPUnit\Framework\TestCase
      *
      * @covers  \Mautic\CoreBundle\Helper\IpLookupHelper::getIpAddress
      */
-    public function testClientIpIsReturnedFromRequest()
+    public function testClientIpIsReturnedFromRequest(): void
     {
         $request = new Request([], [], [], [], [], ['REMOTE_ADDR' => '73.77.245.53']);
         $ip      = $this->getIpHelper($request)->getIpAddress();
@@ -64,7 +64,7 @@ class IpLookupHelperTest extends \PHPUnit\Framework\TestCase
      *
      * @covers  \Mautic\CoreBundle\Helper\IpLookupHelper::getIpAddress
      */
-    public function testLocalIpIsReturnedForInternalNetworkIp()
+    public function testLocalIpIsReturnedForInternalNetworkIp(): void
     {
         $request = new Request([], [], [], [], [], ['REMOTE_ADDR' => '192.168.0.1']);
         $ip      = $this->getIpHelper($request)->getIpAddress();
@@ -77,7 +77,7 @@ class IpLookupHelperTest extends \PHPUnit\Framework\TestCase
      *
      * @covers  \Mautic\CoreBundle\Helper\IpLookupHelper::getIpAddress
      */
-    public function testInternalNetworkIpIsReturnedIfSetToTrack()
+    public function testInternalNetworkIpIsReturnedIfSetToTrack(): void
     {
         $request                  = new Request([], [], [], [], [], ['REMOTE_ADDR' => '192.168.0.1']);
         $mockCoreParametersHelper = $this

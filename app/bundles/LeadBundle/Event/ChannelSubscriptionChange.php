@@ -31,10 +31,7 @@ class ChannelSubscriptionChange extends Event
         return $this->channel;
     }
 
-    /**
-     * @return int
-     */
-    public function getOldStatus()
+    public function getOldStatus(): int
     {
         return $this->oldStatus;
     }
@@ -47,10 +44,7 @@ class ChannelSubscriptionChange extends Event
         return $this->getDncReasonVerb($this->oldStatus);
     }
 
-    /**
-     * @return int
-     */
-    public function getNewStatus()
+    public function getNewStatus(): int
     {
         return $this->newStatus;
     }

@@ -19,51 +19,38 @@ use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\LeadBundle\Entity\Lead;
 use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\MockObject\MockObject;
-use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class EventSchedulerTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var LoggerInterface|MockObject
-     */
-    private $logger;
+    private \Psr\Log\NullLogger $logger;
 
     /**
      * @var EventLogger|MockObject
      */
-    private $eventLogger;
+    private \PHPUnit\Framework\MockObject\MockObject $eventLogger;
 
-    /**
-     * @var Interval
-     */
-    private $intervalScheduler;
+    private \Mautic\CampaignBundle\Executioner\Scheduler\Mode\Interval $intervalScheduler;
 
-    /**
-     * @var DateTime
-     */
-    private $dateTimeScheduler;
+    private \Mautic\CampaignBundle\Executioner\Scheduler\Mode\DateTime $dateTimeScheduler;
 
     /**
      * @var EventCollector|MockObject
      */
-    private $eventCollector;
+    private \PHPUnit\Framework\MockObject\MockObject $eventCollector;
 
     /**
      * @var EventDispatcherInterface|MockObject
      */
-    private $dispatcher;
+    private \PHPUnit\Framework\MockObject\MockObject $dispatcher;
 
     /**
      * @var CoreParametersHelper|MockObject
      */
-    private $coreParamtersHelper;
+    private \PHPUnit\Framework\MockObject\MockObject $coreParamtersHelper;
 
-    /**
-     * @var EventScheduler
-     */
-    private $scheduler;
+    private \Mautic\CampaignBundle\Executioner\Scheduler\EventScheduler $scheduler;
 
     protected function setUp(): void
     {
@@ -91,7 +78,7 @@ class EventSchedulerTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testShouldScheduleIgnoresSeconds()
+    public function testShouldScheduleIgnoresSeconds(): void
     {
         $this->assertFalse(
             $this->scheduler->shouldSchedule(
@@ -101,7 +88,7 @@ class EventSchedulerTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testShouldSchedule()
+    public function testShouldSchedule(): void
     {
         $this->assertTrue(
             $this->scheduler->shouldSchedule(
@@ -111,7 +98,7 @@ class EventSchedulerTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testShouldScheduleForInactive()
+    public function testShouldScheduleForInactive(): void
     {
         $date  = new \DateTime();
         $now   = clone $date;
@@ -135,7 +122,7 @@ class EventSchedulerTest extends \PHPUnit\Framework\TestCase
         $this->assertTrue($this->scheduler->shouldScheduleEvent($event, $date, $now));
     }
 
-    public function testGetExecutionDateForInactivity()
+    public function testGetExecutionDateForInactivity(): void
     {
         $date = new \DateTime();
         $now  = clone $date;
@@ -152,7 +139,7 @@ class EventSchedulerTest extends \PHPUnit\Framework\TestCase
         $this->assertSame($date, $resultDate);
     }
 
-    public function testEventDoesNotGetRescheduledForRelativeTimeWhenValidated()
+    public function testEventDoesNotGetRescheduledForRelativeTimeWhenValidated(): void
     {
         $campaign = $this->createMock(Campaign::class);
         $campaign->method('getId')
@@ -205,7 +192,7 @@ class EventSchedulerTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals('America/New_York', $executionDate->getTimezone()->getName());
     }
 
-    public function testEventIsRescheduledForRelativeTimeIfAppropriate()
+    public function testEventIsRescheduledForRelativeTimeIfAppropriate(): void
     {
         $campaign = $this->createMock(Campaign::class);
         $campaign->method('getId')
@@ -258,7 +245,7 @@ class EventSchedulerTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals('America/New_York', $executionDate->getTimezone()->getName());
     }
 
-    public function testEventDoesNotGetRescheduledForRelativeTimeWithDowWhenValidated()
+    public function testEventDoesNotGetRescheduledForRelativeTimeWithDowWhenValidated(): void
     {
         $campaign = $this->createMock(Campaign::class);
         $campaign->method('getId')

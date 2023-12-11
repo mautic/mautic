@@ -9,10 +9,7 @@ use PHPUnit\Framework\TestCase;
 
 class BundleMetadataBuilderTest extends TestCase
 {
-    /**
-     * @var array
-     */
-    private $paths;
+    private array $paths;
 
     protected function setUp(): void
     {
@@ -26,7 +23,7 @@ class BundleMetadataBuilderTest extends TestCase
         $this->paths = $paths;
     }
 
-    public function testCoreBundleMetadataLoaded()
+    public function testCoreBundleMetadataLoaded(): void
     {
         $bundles = ['MauticCoreBundle' => 'Mautic\CoreBundle\MauticCoreBundle'];
 
@@ -52,7 +49,7 @@ class BundleMetadataBuilderTest extends TestCase
         $this->assertTrue(isset($bundleMetadata['config']['routes']));
     }
 
-    public function testPluginMetadataLoaded()
+    public function testPluginMetadataLoaded(): void
     {
         $bundles = ['MauticFocusBundle' => 'MauticPlugin\MauticFocusBundle\MauticFocusBundle'];
 
@@ -77,7 +74,7 @@ class BundleMetadataBuilderTest extends TestCase
         $this->assertTrue(isset($bundleMetadata['config']['routes']));
     }
 
-    public function testSymfonyBundleIgnored()
+    public function testSymfonyBundleIgnored(): void
     {
         $bundles = ['FooBarBundle' => 'Foo\Bar\BarBundle'];
 

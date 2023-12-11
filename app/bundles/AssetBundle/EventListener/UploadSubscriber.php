@@ -18,10 +18,7 @@ class UploadSubscriber implements EventSubscriberInterface
     {
     }
 
-    /**
-     * @return array
-     */
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             UploadEvents::POST_UPLOAD => ['onPostUpload', 0],
@@ -56,7 +53,7 @@ class UploadSubscriber implements EventSubscriberInterface
      *
      * @throws ValidationException
      */
-    public function onUploadValidation(ValidationEvent $event)
+    public function onUploadValidation(ValidationEvent $event): void
     {
         $file       = $event->getFile();
         $extensions = $this->coreParametersHelper->get('allowed_extensions');

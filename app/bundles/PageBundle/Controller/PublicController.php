@@ -192,9 +192,7 @@ class PublicController extends CommonFormController
                             );
 
                             // find the one with the most difference from weight
-
-                            reset($variants);
-                            $useId = key($variants);
+                            $useId = array_key_first($variants);
 
                             // set the cookie - 14 days
                             $cookieHelper->setCookie(
@@ -571,9 +569,7 @@ class PublicController extends CommonFormController
                 // Order slides
                 usort(
                     $options['slides'],
-                    function ($a, $b): int {
-                        return strcmp($a['order'], $b['order']);
-                    }
+                    fn ($a, $b): int => strcmp($a['order'], $b['order'])
                 );
 
                 $options['slot']   = $slot;

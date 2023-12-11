@@ -29,7 +29,7 @@ class CampaignListType extends AbstractType
     {
         $resolver->setDefaults(
             [
-                'choices'      => function (Options $options) {
+                'choices'      => function (Options $options): array {
                     $choices   = [];
                     $campaigns = $this->model->getRepository()->getPublishedCampaigns(null, null, true, $this->canViewOther);
                     foreach ($campaigns as $campaign) {

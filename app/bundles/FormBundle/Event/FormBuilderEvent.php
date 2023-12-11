@@ -51,7 +51,7 @@ class FormBuilderEvent extends Event
      *
      * @throws BadConfigurationException
      */
-    public function addSubmitAction(string $key, array $action)
+    public function addSubmitAction(string $key, array $action): void
     {
         if (array_key_exists($key, $this->actions)) {
             throw new \InvalidArgumentException("The key, '$key' is already used by another action. Please use a different key.");
@@ -64,7 +64,7 @@ class FormBuilderEvent extends Event
         );
 
         $action['label']       = $this->translator->trans($action['label']);
-        $action['description'] = $action['description'] ?? '';
+        $action['description'] ??= '';
 
         $this->actions[$key] = $action;
     }
@@ -78,12 +78,10 @@ class FormBuilderEvent extends Event
     {
         uasort(
             $this->actions,
-            function ($a, $b): int {
-                return strnatcasecmp(
-                    $a['label'],
-                    $b['label']
-                );
-            }
+            fn ($a, $b): int => strnatcasecmp(
+                $a['label'],
+                $b['label']
+            )
         );
 
         return $this->actions;
@@ -130,7 +128,7 @@ class FormBuilderEvent extends Event
      * @throws \InvalidArgumentException
      * @throws BadConfigurationException
      */
-    public function addFormField($key, array $field)
+    public function addFormField($key, array $field): void
     {
         if (array_key_exists($key, $this->fields)) {
             throw new \InvalidArgumentException("The key, '$key' is already used by another field. Please use a different key.");
@@ -172,7 +170,7 @@ class FormBuilderEvent extends Event
      *                         will be sent through the validation event
      *                         ]
      */
-    public function addValidator($key, array $validator)
+    public function addValidator($key, array $validator): void
     {
         if (array_key_exists($key, $this->fields)) {
             throw new \InvalidArgumentException("The key, '$key' is already used by another validator. Please use a different key.");
@@ -208,10 +206,8 @@ class FormBuilderEvent extends Event
 
     /**
      * Returns validators organized by ['form' => [], 'fieldType' => [], ...
-     *
-     * @return array
      */
-    public function getValidators()
+    public function getValidators(): array
     {
         // Organize by field
         $fieldValidators = [

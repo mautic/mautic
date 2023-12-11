@@ -30,7 +30,7 @@ class FrequencyRuleRepositoryTest extends MauticMysqlTestCase
      * @throws OptimisticLockException
      * @throws ORMException
      */
-    public function testCustomFrequencyRuleViolationsMethodReturnsCorrectData()
+    public function testCustomFrequencyRuleViolationsMethodReturnsCorrectData(): void
     {
         $lead = new Lead();
         $lead->setFirstname('Firstname');

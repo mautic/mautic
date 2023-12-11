@@ -43,7 +43,7 @@ class TwilioCallback implements CallbackInterface
         return trim($request->get('Body'));
     }
 
-    private function validateRequest(InputBag $request)
+    private function validateRequest(InputBag $request): void
     {
         try {
             $accountSid = $this->configuration->getAccountSid();

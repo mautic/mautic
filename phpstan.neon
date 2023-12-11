@@ -8,7 +8,7 @@ parameters:
 	reportUnmatchedIgnoredErrors: false
 	checkGenericClassInNonGenericObjectType: false
 	parallel:
-		maximumNumberOfProcesses: 4
+		# maximumNumberOfProcesses: 4
 		processTimeout: 1000.0
 	paths:
 		- app/bundles
@@ -38,6 +38,21 @@ parameters:
 		- '#Call to method PHPUnit\\Framework\\Assert::assertIsClosedResource\(\) with resource will always evaluate to true#'
 		# mocks
 		- '#Parameter (.*?) class (.*?) expects (.*?)PHPUnit\\Framework\\MockObject\\MockObject given#'
+		# handle later - ideally with custom interface
+		-
+			message: '#Call to an undefined method Mautic(.*?)Integration::getApiUrl\(\)#'
+			path: plugins/*/Api/*
+		- '#Parameter \$integration of method MauticPlugin\\MauticEmailMarketingBundle\\Api\\EmailMarketingApi::__construct\(\) has typehint with deprecated class Mautic\\PluginBundle\\Integration\\AbstractIntegration#'
+		# collection vs array
+		-
+			message: '#PHPDoc tag @return with type array|Doctrine\Common\Collections\ArrayCollection is not subtype of native type array#'
+			path: app/bundles/CoreBundle/Entity/TranslationEntityTrait.php
+		# mocks
+		- '#is not subtype of native type PHPUnit\\Framework\\MockObject\\MockObject#'
+		- '#Call to an undefined method PHPUnit\\Framework\\MockObject\\MockObject#'
+		- '#expects (.*?) PHPUnit\\Framework\\MockObject\\MockObject given#'
+		# on purpose
+		- '#Call to method PHPUnit\\Framework\\Assert::assertInstanceOf\(\) with (.*?) and (.*?) will always evaluate to#'
 	scanFiles:
 		# This is here because a few functions in the global namespace are defined in this file
 		- vendor/twig/twig/src/Extension/EscaperExtension.php

@@ -27,10 +27,7 @@ class OwnerSubscriber implements EventSubscriberInterface
     {
     }
 
-    /**
-     * @return array
-     */
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             EmailEvents::EMAIL_ON_BUILD   => ['onEmailBuild', 0],
@@ -62,10 +59,8 @@ class OwnerSubscriber implements EventSubscriberInterface
      * * If contact[owner_id] === 0, then we need fake data
      * * If contact[owner_id] === null, then we should blank out tokens
      * * If contact[owner_id] > 0 AND User exists, then we should fill in tokens
-     *
-     * @return array
      */
-    private function getGeneratedTokens(EmailSendEvent $event)
+    private function getGeneratedTokens(EmailSendEvent $event): array
     {
         $contact = $event->getLead();
 
@@ -97,10 +92,8 @@ class OwnerSubscriber implements EventSubscriberInterface
 
     /**
      * Used to replace all owner tokens with emptiness so not to email out tokens.
-     *
-     * @return array
      */
-    private function getEmptyTokens()
+    private function getEmptyTokens(): array
     {
         $tokens = [];
 
@@ -113,10 +106,8 @@ class OwnerSubscriber implements EventSubscriberInterface
 
     /**
      * Used to replace all owner tokens with emptiness so not to email out tokens.
-     *
-     * @return array
      */
-    private function getFakeTokens()
+    private function getFakeTokens(): array
     {
         $tokens = [];
 

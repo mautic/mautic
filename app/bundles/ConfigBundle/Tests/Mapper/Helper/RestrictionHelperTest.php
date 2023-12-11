@@ -25,7 +25,7 @@ class RestrictionHelperTest extends \PHPUnit\Framework\TestCase
      *
      * @covers  \Mautic\ConfigBundle\Mapper\Helper\RestrictionHelper::prepareRestrictions()
      */
-    public function testRestrictedConfigArrayIsFormattedCorrectly()
+    public function testRestrictedConfigArrayIsFormattedCorrectly(): void
     {
         $expected = [
             'db_host'         => 'db_host',
@@ -47,7 +47,7 @@ class RestrictionHelperTest extends \PHPUnit\Framework\TestCase
      * @covers  \Mautic\ConfigBundle\Mapper\Helper\RestrictionHelper::prepareRestrictions()
      * @covers  \Mautic\ConfigBundle\Mapper\Helper\RestrictionHelper::applyRestrictions()
      */
-    public function testApplyingRestrictionsToConfigArray()
+    public function testApplyingRestrictionsToConfigArray(): void
     {
         $config = [
             'db_host'         => 'dbhost',

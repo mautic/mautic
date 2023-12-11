@@ -110,9 +110,7 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
             return $results;
         }
 
-        return array_combine(array_map(function (Lead $lead) use ($field) {
-            return $lead->getFieldValue($field);
-        }, $results), $results);
+        return array_combine(array_map(fn (Lead $lead) => $lead->getFieldValue($field), $results), $results);
     }
 
     /**
@@ -199,9 +197,7 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
             ->getArrayResult();
 
         return array_map(
-            function ($row): int {
-                return (int) $row['id'];
-            },
+            fn ($row): int => (int) $row['id'],
             $result
         );
     }
@@ -1137,10 +1133,7 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
         return (bool) $q->executeQuery()->fetchOne();
     }
 
-    /**
-     * @return array
-     */
-    public function getContacts(array $contactIds)
+    public function getContacts(array $contactIds): array
     {
         $qb = $this->getEntityManager()->getConnection()->createQueryBuilder();
 

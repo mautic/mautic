@@ -134,10 +134,7 @@ class AmazonS3Integration extends CloudStorageIntegration
         return $this->adapter;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getForm()
+    public function getForm(): string
     {
         throw new NoFormNeededException();
     }

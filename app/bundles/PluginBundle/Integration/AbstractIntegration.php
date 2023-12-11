@@ -75,8 +75,8 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
      */
     protected ?\Doctrine\ORM\Tools\Pagination\Paginator $adminUsers = null;
 
-    protected array $notifications = [];
-    protected ?string $lastIntegrationError;
+    protected array $notifications              = [];
+    protected ?string $lastIntegrationError     = null;
     protected array $mauticDuplicates           = [];
     protected array $salesforceIdMapping        = [];
     protected array $deleteIntegrationEntities  = [];
