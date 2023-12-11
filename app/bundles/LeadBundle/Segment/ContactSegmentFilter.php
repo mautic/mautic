@@ -135,18 +135,12 @@ class ContactSegmentFilter implements \Stringable
         return $this->contactSegmentFilterCrate->getGlue();
     }
 
-    /**
-     * @return mixed
-     */
-    public function getAggregateFunction()
+    public function getAggregateFunction(): string|bool
     {
         return $this->filterDecorator->getAggregateFunc($this->contactSegmentFilterCrate);
     }
 
-    /**
-     * @return FilterQueryBuilderInterface
-     */
-    public function getFilterQueryBuilder()
+    public function getFilterQueryBuilder(): FilterQueryBuilderInterface
     {
         return $this->filterQueryBuilder;
     }
@@ -164,10 +158,7 @@ class ContactSegmentFilter implements \Stringable
         return 'leadlist' === $this->getField();
     }
 
-    /**
-     * @return bool
-     */
-    public function isColumnTypeBoolean()
+    public function isColumnTypeBoolean(): bool
     {
         return $this->contactSegmentFilterCrate->isBooleanType();
     }

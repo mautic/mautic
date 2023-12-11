@@ -104,10 +104,8 @@ class SegmentContactsLineChartQuery extends ChartQuery
      * Get data about add/remove from segment based on LeadEventLog.
      *
      * @param string $action
-     *
-     * @return array
      */
-    public function getDataFromLeadEventLog($action)
+    public function getDataFromLeadEventLog($action): array
     {
         $qb = $this->prepareTimeDataQuery(
             'lead_event_log',
@@ -126,10 +124,8 @@ class SegmentContactsLineChartQuery extends ChartQuery
 
     /**
      * Get data about add from segment based on LeadListLead before upgrade to 2.15.
-     *
-     * @return array
      */
-    public function getDataFromLeadListLeads()
+    public function getDataFromLeadListLeads(): array
     {
         $q = $this->prepareTimeDataQuery('lead_lists_leads', 'date_added', $this->filters);
         if ($this->firstEventLog) {

@@ -50,10 +50,7 @@ class CircularDependencyValidator extends ConstraintValidator
         return (int) $routeParams['objectId'];
     }
 
-    /**
-     * @return array
-     */
-    private function reduceToSegmentIds(array $filters)
+    private function reduceToSegmentIds(array $filters): array
     {
         $segmentFilters = array_filter($filters, fn (array $filter): bool => 'leadlist' === $filter['type']
             && in_array($filter['operator'], [OperatorOptions::IN, OperatorOptions::NOT_IN]));

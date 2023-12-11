@@ -35,7 +35,7 @@ trait PushToIntegrationTrait
         static::$integrationHelper = $integrationHelper;
     }
 
-    protected function pushToIntegration(array $config, Lead $lead, array &$errors = [])
+    protected function pushToIntegration(array $config, Lead $lead, array &$errors = []): bool
     {
         return static::pushIt($config, $lead, $errors);
     }

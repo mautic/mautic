@@ -118,7 +118,7 @@ class SysinfoModel
      *
      * @return string
      */
-    public function getLogTail($lines = 10)
+    public function getLogTail($lines = 10): ?string
     {
         $log = $this->coreParametersHelper->get('log_path').'/mautic_'.MAUTIC_ENV.'-'.date('Y-m-d').'.php';
 

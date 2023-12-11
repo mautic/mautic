@@ -29,7 +29,7 @@ class ReportRepository extends CommonRepository
     /**
      * {@inheritdoc}
      */
-    protected function addCatchAllWhereClause($q, $filter)
+    protected function addCatchAllWhereClause($q, $filter): array
     {
         return $this->addStandardCatchAllWhereClause(
             $q,
@@ -84,9 +84,9 @@ class ReportRepository extends CommonRepository
     }
 
     /**
-     * {@inheritdoc}
+     * @return string[]
      */
-    public function getSearchCommands()
+    public function getSearchCommands(): array
     {
         $commands = [
             'mautic.core.searchcommand.ispublished',
@@ -107,15 +107,15 @@ class ReportRepository extends CommonRepository
         ];
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getTableAlias(): string
     {
         return 'r';
     }
 
-    public function findReportsWithGraphs($ownedBy = null)
+    /**
+     * @return mixed[]
+     */
+    public function findReportsWithGraphs($ownedBy = null): array
     {
         $qb = $this->getEntityManager()->getConnection()->createQueryBuilder();
 

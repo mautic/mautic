@@ -9,7 +9,7 @@ class FacebookIntegration extends SocialIntegration
     /**
      * {@inheritdoc}
      */
-    public function getName()
+    public function getName(): string
     {
         return 'Facebook';
     }
@@ -39,7 +39,7 @@ class FacebookIntegration extends SocialIntegration
     /**
      * {@inheritdoc}
      */
-    public function getAuthenticationUrl()
+    public function getAuthenticationUrl(): string
     {
         return 'https://www.facebook.com/dialog/oauth';
     }
@@ -47,15 +47,12 @@ class FacebookIntegration extends SocialIntegration
     /**
      * {@inheritdoc}
      */
-    public function getAccessTokenUrl()
+    public function getAccessTokenUrl(): string
     {
         return 'https://graph.facebook.com/oauth/access_token';
     }
 
-    /**
-     * @return string
-     */
-    public function getAuthScope()
+    public function getAuthScope(): string
     {
         return 'email';
     }
@@ -82,10 +79,7 @@ class FacebookIntegration extends SocialIntegration
         return $values;
     }
 
-    /**
-     * @return string
-     */
-    public function getApiUrl($endpoint)
+    public function getApiUrl($endpoint): string
     {
         return "https://graph.facebook.com/$endpoint";
     }

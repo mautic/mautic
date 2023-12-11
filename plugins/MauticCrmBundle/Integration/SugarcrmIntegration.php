@@ -82,10 +82,8 @@ class SugarcrmIntegration extends CrmAbstractIntegration
 
     /**
      * Returns the name of the social integration that must match the name of the file.
-     *
-     * @return string
      */
-    public function getName()
+    public function getName(): string
     {
         return 'Sugarcrm';
     }
@@ -98,20 +96,16 @@ class SugarcrmIntegration extends CrmAbstractIntegration
 
     /**
      * Get the array key for clientId.
-     *
-     * @return string
      */
-    public function getClientIdKey()
+    public function getClientIdKey(): string
     {
         return 'client_id';
     }
 
     /**
      * Get the array key for client secret.
-     *
-     * @return string
      */
-    public function getClientSecretKey()
+    public function getClientSecretKey(): string
     {
         return 'client_secret';
     }
@@ -1198,9 +1192,9 @@ class SugarcrmIntegration extends CrmAbstractIntegration
     /**
      * @param array $params
      *
-     * @return mixed
+     * @return mixed[]
      */
-    public function pushLeads($params = [])
+    public function pushLeads($params = []): array
     {
         [$fromDate, $toDate]     = $this->getSyncTimeframeDates($params);
         $limit                   = $params['limit'];

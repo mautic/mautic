@@ -15,10 +15,8 @@ class Campaign
      * Has campaign at least one unpublished e-mail?
      *
      * @param int $id
-     *
-     * @return bool
      */
-    public function hasUnpublishedEmail($id)
+    public function hasUnpublishedEmail($id): bool
     {
         $emailIds = $this->campaignRepository->fetchEmailIdsById($id);
 

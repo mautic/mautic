@@ -252,10 +252,8 @@ class ChartQuery extends AbstractChart
      * @param string $table   without prefix
      * @param string $column  name. The column must be type of datetime
      * @param array  $filters will be added to where claues
-     *
-     * @return array
      */
-    public function fetchTimeData($table, $column, $filters = [])
+    public function fetchTimeData($table, $column, $filters = []): array
     {
         $query = $this->prepareTimeDataQuery($table, $column, $filters);
 
@@ -269,10 +267,8 @@ class ChartQuery extends AbstractChart
      * @param string $column    name. The column must be type of datetime
      * @param array  $filters   will be added to where claues
      * @param string $sumColumn name that will be summed
-     *
-     * @return array
      */
-    public function fetchSumTimeData($table, $column, $filters, $sumColumn)
+    public function fetchSumTimeData($table, $column, $filters, $sumColumn): array
     {
         $query = $this->prepareTimeDataQuery($table, $column, $filters, $sumColumn, 'sum');
 
@@ -283,10 +279,8 @@ class ChartQuery extends AbstractChart
      * Loads data from prepared query and builds the chart data.
      *
      * @param QueryBuilder $query
-     *
-     * @return array
      */
-    public function loadAndBuildTimeData($query)
+    public function loadAndBuildTimeData($query): array
     {
         $rawData =  $query->executeQuery()->fetchAllAssociative();
 

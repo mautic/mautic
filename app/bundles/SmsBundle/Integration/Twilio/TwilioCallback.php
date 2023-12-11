@@ -23,11 +23,9 @@ class TwilioCallback implements CallbackInterface
     }
 
     /**
-     * @return \Doctrine\Common\Collections\ArrayCollection
-     *
      * @throws NumberNotFoundException
      */
-    public function getContacts(Request $request)
+    public function getContacts(Request $request): \Doctrine\Common\Collections\ArrayCollection
     {
         $this->validateRequest($request->request);
 

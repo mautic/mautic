@@ -434,10 +434,8 @@ class SmsModel extends FormModel implements AjaxLookupModelInterface
      * @param string $dateFormat
      * @param array  $filter
      * @param bool   $canViewOthers
-     *
-     * @return array
      */
-    public function getHitsLineChartData($unit, \DateTime $dateFrom, \DateTime $dateTo, $dateFormat = null, $filter = [], $canViewOthers = true)
+    public function getHitsLineChartData($unit, \DateTime $dateFrom, \DateTime $dateTo, $dateFormat = null, $filter = [], $canViewOthers = true): array
     {
         $flag = null;
 
@@ -501,10 +499,8 @@ class SmsModel extends FormModel implements AjaxLookupModelInterface
 
     /**
      * Get an array of tracked links.
-     *
-     * @return array
      */
-    public function getSmsClickStats($smsId)
+    public function getSmsClickStats($smsId): array
     {
         return $this->pageTrackableModel->getTrackableList('sms', $smsId);
     }

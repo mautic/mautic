@@ -57,10 +57,8 @@ class BatchContactController extends AbstractFormController
 
     /**
      * View the modal form for adding contacts into categories in batches.
-     *
-     * @return JsonResponse|\Symfony\Component\HttpFoundation\Response
      */
-    public function indexAction()
+    public function indexAction(): \Symfony\Component\HttpFoundation\Response
     {
         $route = $this->generateUrl('mautic_category_batch_contact_set');
         $rows  = $this->categoryModel->getLookupResults('global', '', 300);

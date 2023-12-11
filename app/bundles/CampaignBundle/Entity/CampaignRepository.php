@@ -264,10 +264,8 @@ class CampaignRepository extends CommonRepository
 
     /**
      * @param \Doctrine\ORM\QueryBuilder|\Doctrine\DBAL\Query\QueryBuilder $q
-     *
-     * @return array
      */
-    protected function addCatchAllWhereClause($q, $filter)
+    protected function addCatchAllWhereClause($q, $filter): array
     {
         return $this->addStandardCatchAllWhereClause($q, $filter, [
             'c.name',
@@ -277,18 +275,16 @@ class CampaignRepository extends CommonRepository
 
     /**
      * @param \Doctrine\ORM\QueryBuilder|\Doctrine\DBAL\Query\QueryBuilder $q
-     *
-     * @return array
      */
-    protected function addSearchCommandWhereClause($q, $filter)
+    protected function addSearchCommandWhereClause($q, $filter): array
     {
         return $this->addStandardSearchCommandWhereClause($q, $filter);
     }
 
     /**
-     * @return array
+     * @return string[]
      */
-    public function getSearchCommands()
+    public function getSearchCommands(): array
     {
         return $this->getStandardSearchCommands();
     }
@@ -297,10 +293,8 @@ class CampaignRepository extends CommonRepository
      * Get a list of popular (by logs) campaigns.
      *
      * @param int $limit
-     *
-     * @return array
      */
-    public function getPopularCampaigns($limit = 10)
+    public function getPopularCampaigns($limit = 10): array
     {
         $q = $this->getEntityManager()->getConnection()->createQueryBuilder();
 
@@ -492,9 +486,9 @@ class CampaignRepository extends CommonRepository
      * @param bool|false $limit
      * @param array      $select
      *
-     * @return mixed
+     * @return mixed[]
      */
-    public function getCampaignLeads($campaignId, $start = 0, $limit = false, $select = ['cl.lead_id'])
+    public function getCampaignLeads($campaignId, $start = 0, $limit = false, $select = ['cl.lead_id']): array
     {
         $q = $this->getReplicaConnection()->createQueryBuilder();
 
@@ -538,10 +532,8 @@ class CampaignRepository extends CommonRepository
     /**
      * @param int   $segmentId
      * @param array $campaignIds
-     *
-     * @return array
      */
-    public function getCampaignsSegmentShare($segmentId, $campaignIds = [])
+    public function getCampaignsSegmentShare($segmentId, $campaignIds = []): array
     {
         $q = $this->getEntityManager()->getConnection()->createQueryBuilder();
         $q->select('c.id, c.name, ROUND(IFNULL(COUNT(DISTINCT t.lead_id)/COUNT(DISTINCT cl.lead_id)*100, 0),1) segmentCampaignShare');

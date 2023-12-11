@@ -89,10 +89,7 @@ class ConfigSubscriber implements EventSubscriberInterface
         $event->setConfig($data, 'userconfig');
     }
 
-    /**
-     * @return bool
-     */
-    private function validateXml($content)
+    private function validateXml($content): bool
     {
         $valid = true;
 

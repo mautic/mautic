@@ -48,7 +48,7 @@ class MonitorTwitterMentionsCommand extends MonitorTwitterBaseCommand
         return $this->twitter->makeRequest($mentionsUrl, $requestQuery);
     }
 
-    public function getNetworkName()
+    public function getNetworkName(): string
     {
         return 'twitter';
     }

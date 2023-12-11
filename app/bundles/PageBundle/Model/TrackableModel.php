@@ -188,9 +188,9 @@ class TrackableModel extends AbstractCommonModel
     /**
      * Get a list of URLs that are tracked by a specific channel.
      *
-     * @return mixed
+     * @return mixed[]
      */
-    public function getTrackableList($channel, $channelId)
+    public function getTrackableList($channel, $channelId): array
     {
         return $this->getRepository()->findByChannel($channel, $channelId);
     }
@@ -199,10 +199,8 @@ class TrackableModel extends AbstractCommonModel
      * Returns a list of tokens and/or URLs that should not be converted to trackables.
      *
      * @param mixed|null $content
-     *
-     * @return array
      */
-    public function getDoNotTrackList($content)
+    public function getDoNotTrackList($content): array
     {
         /** @var UntrackableUrlsEvent $event */
         $event = $this->dispatcher->dispatch(

@@ -414,10 +414,8 @@ class EmailRepository extends CommonRepository
     /**
      * @param \Doctrine\ORM\QueryBuilder|QueryBuilder $q
      * @param object                                  $filter
-     *
-     * @return array
      */
-    protected function addCatchAllWhereClause($q, $filter)
+    protected function addCatchAllWhereClause($q, $filter): array
     {
         return $this->addStandardCatchAllWhereClause($q, $filter, [
             'e.name',
@@ -471,9 +469,9 @@ class EmailRepository extends CommonRepository
     }
 
     /**
-     * @return array
+     * @return string[]
      */
-    public function getSearchCommands()
+    public function getSearchCommands(): array
     {
         $commands = [
             'mautic.core.searchcommand.ispublished',
@@ -652,10 +650,8 @@ class EmailRepository extends CommonRepository
 
     /**
      * @param int|null $id
-     *
-     * @return \Doctrine\ORM\Internal\Hydration\IterableResult
      */
-    public function getPublishedBroadcasts($id = null)
+    public function getPublishedBroadcasts($id = null): \Doctrine\ORM\Internal\Hydration\IterableResult
     {
         $qb   = $this->createQueryBuilder($this->getTableAlias());
         $expr = $this->getPublishedByDateExpression($qb, null, true, true, false);

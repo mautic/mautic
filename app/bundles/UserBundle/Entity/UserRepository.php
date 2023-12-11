@@ -207,7 +207,7 @@ class UserRepository extends CommonRepository
     /**
      * {@inheritdoc}
      */
-    protected function addCatchAllWhereClause($q, $filter)
+    protected function addCatchAllWhereClause($q, $filter): array
     {
         return $this->addStandardCatchAllWhereClause(
             $q,
@@ -300,9 +300,9 @@ class UserRepository extends CommonRepository
     }
 
     /**
-     * {@inheritdoc}
+     * @return string[]
      */
-    public function getSearchCommands()
+    public function getSearchCommands(): array
     {
         $commands = [
             'mautic.core.searchcommand.email',
@@ -333,7 +333,7 @@ class UserRepository extends CommonRepository
     /**
      * {@inheritdoc}
      */
-    public function getTableAlias()
+    public function getTableAlias(): string
     {
         return 'u';
     }
