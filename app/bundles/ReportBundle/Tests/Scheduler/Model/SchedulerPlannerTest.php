@@ -59,12 +59,9 @@ class SchedulerPlannerTest extends \PHPUnit\Framework\TestCase
 
         $entityManager->expects($this->once())
             ->method('persist')
-            ->with($this->callback(function ($scheduler) use ($report, $dateOfNextSchedule) {
-                return
-                    $scheduler instanceof Scheduler &&
-                    $scheduler->getReport() === $report &&
-                    $scheduler->getScheduleDate() === $dateOfNextSchedule;
-            }));
+            ->with($this->callback(fn ($scheduler) => $scheduler instanceof Scheduler &&
+            $scheduler->getReport() === $report &&
+            $scheduler->getScheduleDate() === $dateOfNextSchedule));
 
         $schedulerPlanner->computeScheduler($report);
     }

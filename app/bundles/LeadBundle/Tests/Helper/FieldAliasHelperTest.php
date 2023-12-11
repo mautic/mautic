@@ -29,9 +29,7 @@ class FieldAliasHelperTest extends \PHPUnit\Framework\TestCase
             'lastname',
         ]);
 
-        $this->fieldModel->method('cleanAlias')->will($this->returnCallback(function () {
-            return func_get_args()[0];
-        }));
+        $this->fieldModel->method('cleanAlias')->will($this->returnCallback(fn () => func_get_args()[0]));
 
         $this->fieldModel->method('getRepository')->willReturn($this->fieldRepository);
 

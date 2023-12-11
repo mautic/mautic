@@ -305,7 +305,7 @@ class ChartQueryTest extends \PHPUnit\Framework\TestCase
         $this->createChartQuery();
         self::assertSame(
             $expectedResult,
-            $this->chartQuery->completeTimeData($data, false, false)
+            $this->chartQuery->completeTimeData($data, false)
         );
     }
 

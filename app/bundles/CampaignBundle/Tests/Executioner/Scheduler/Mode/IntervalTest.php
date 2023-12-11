@@ -490,9 +490,7 @@ class IntervalTest extends \PHPUnit\Framework\TestCase
         $coreParametersHelper = $this->createMock(CoreParametersHelper::class);
         $coreParametersHelper->method('get')
             ->willReturnCallback(
-                function ($param, $default) {
-                    return 'America/New_York';
-                }
+                fn ($param, $default) => 'America/New_York'
             );
 
         return new Interval(new NullLogger(), $coreParametersHelper);

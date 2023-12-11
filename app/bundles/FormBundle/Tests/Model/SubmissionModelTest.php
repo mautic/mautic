@@ -438,7 +438,7 @@ class SubmissionModelTest extends \PHPUnit\Framework\TestCase
         $this->setUpExport();
         $response = $this->submissionModel->exportResults('csv', new Form(), []);
 
-        $this->assertSame(get_class($response), 'Symfony\Component\HttpFoundation\StreamedResponse');
+        $this->assertSame($response::class, \Symfony\Component\HttpFoundation\StreamedResponse::class);
         $this->assertStringContainsString('.csv', $response->headers->get('Content-Disposition'));
         $this->assertSame('0', $response->headers->get('Expires'));
     }
@@ -448,7 +448,7 @@ class SubmissionModelTest extends \PHPUnit\Framework\TestCase
         $this->setUpExport();
         $response = $this->submissionModel->exportResults('xlsx', new Form(), []);
 
-        $this->assertSame(get_class($response), 'Symfony\Component\HttpFoundation\StreamedResponse');
+        $this->assertSame($response::class, \Symfony\Component\HttpFoundation\StreamedResponse::class);
         $this->assertStringContainsString('.xlsx', $response->headers->get('Content-Disposition'));
         $this->assertSame('0', $response->headers->get('Expires'));
     }
@@ -460,16 +460,14 @@ class SubmissionModelTest extends \PHPUnit\Framework\TestCase
         $this->translator->expects($this->any())
             ->method('trans')
             ->with($this->anything())
-            ->will($this->returnCallback(function ($text) use ($values) {
-                return match ($text) {
-                    'mautic.form.report.submission.id'  => $values[0],
-                    'mautic.lead.report.contact_id'     => $values[1],
-                    'mautic.form.result.thead.date'     => $values[2],
-                    'mautic.core.ipaddress'             => $values[3],
-                    'mautic.form.result.thead.referrer' => $values[4],
-                    'mautic.form.report.form_id'        => $values[5],
-                    default                             => null,
-                };
+            ->will($this->returnCallback(fn ($text) => match ($text) {
+                'mautic.form.report.submission.id'  => $values[0],
+                'mautic.lead.report.contact_id'     => $values[1],
+                'mautic.form.result.thead.date'     => $values[2],
+                'mautic.core.ipaddress'             => $values[3],
+                'mautic.form.result.thead.referrer' => $values[4],
+                'mautic.form.report.form_id'        => $values[5],
+                default                             => null,
             }));
     }
 

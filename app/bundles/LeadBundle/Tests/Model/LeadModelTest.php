@@ -423,7 +423,7 @@ class LeadModelTest extends \PHPUnit\Framework\TestCase
 
         try {
             $mockLeadModel->import([], [], null, null, null, true, $leadEventLog);
-        } catch (\Exception $e) {
+        } catch (\Exception) {
             $this->assertNull($leadEventLog->getLead());
         }
     }
@@ -464,7 +464,7 @@ class LeadModelTest extends \PHPUnit\Framework\TestCase
 
         try {
             $mockLeadModel->import([], [], null, null, null, true, $leadEventLog);
-        } catch (\Exception $e) {
+        } catch (\Exception) {
             $this->assertEquals($lead, $leadEventLog->getLead());
         }
     }
@@ -733,11 +733,8 @@ class LeadModelTest extends \PHPUnit\Framework\TestCase
     private function getLead(int $id): Lead
     {
         return new class($id) extends Lead {
-            private int $id;
-
-            public function __construct(int $id)
+            public function __construct(private int $id)
             {
-                $this->id = $id;
                 parent::__construct();
             }
 

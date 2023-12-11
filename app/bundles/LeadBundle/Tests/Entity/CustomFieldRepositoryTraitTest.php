@@ -72,7 +72,7 @@ class CustomFieldRepositoryTraitTest extends StandardImportTestHelper
             ->will($this->returnValue($this->baseColumns));
 
         $mockTrait->method('getClassName')
-            ->will($this->returnValue('Mautic\LeadBundle\Entity\Lead'));
+            ->will($this->returnValue(\Mautic\LeadBundle\Entity\Lead::class));
 
         $mockTrait->method('getFieldGroups')
             ->will($this->returnValue($this->fieldGroups));
@@ -134,7 +134,7 @@ class CustomFieldRepositoryTraitTest extends StandardImportTestHelper
             ->will($this->returnValue($this->baseColumns));
 
         $mockTrait->method('getClassName')
-            ->will($this->returnValue('Mautic\LeadBundle\Entity\Lead'));
+            ->will($this->returnValue(\Mautic\LeadBundle\Entity\Lead::class));
 
         $mockTrait->method('getFieldGroups')
             ->will($this->returnValue($this->fieldGroups));

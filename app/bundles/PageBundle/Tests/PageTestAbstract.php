@@ -189,7 +189,7 @@ class PageTestAbstract extends TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $mockRedirectModel = $this->getMockBuilder('Mautic\PageBundle\Model\RedirectModel')
+        $mockRedirectModel = $this->getMockBuilder(\Mautic\PageBundle\Model\RedirectModel::class)
             ->setConstructorArgs([
                 $this->createMock(EntityManagerInterface::class),
                 $this->createMock(CorePermissions::class),
@@ -204,7 +204,7 @@ class PageTestAbstract extends TestCase
             ->setMethods(['createRedirectEntity', 'generateRedirectUrl'])
             ->getMock();
 
-        $mockRedirect = $this->getMockBuilder('Mautic\PageBundle\Entity\Redirect')
+        $mockRedirect = $this->getMockBuilder(\Mautic\PageBundle\Entity\Redirect::class)
             ->getMock();
 
         $mockRedirectModel->expects($this->any())
