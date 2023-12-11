@@ -42,8 +42,6 @@ class EntityLookupChoiceLoader implements ChoiceLoaderInterface
     }
 
     /**
-     * @param null $value
-     *
      * @return ArrayChoiceList
      */
     public function loadChoiceList($value = null)
@@ -56,8 +54,6 @@ class EntityLookupChoiceLoader implements ChoiceLoaderInterface
      *
      * Convert to other data types to strings - we're already working with IDs so just return $values
      *
-     * @param null $value
-     *
      * @return array
      */
     public function loadChoicesForValues(array $values, $value = null)
@@ -67,8 +63,6 @@ class EntityLookupChoiceLoader implements ChoiceLoaderInterface
 
     /**
      * Convert to other data types to strings - we're already working with IDs so just return $choices.
-     *
-     * @param null $value
      *
      * @return array
      */

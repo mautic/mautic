@@ -44,26 +44,20 @@ class LeadListRepository extends CommonRepository
     protected $companyTableSchema;
 
     /**
-     * {@inheritdoc}
-     *
      * @param int $id
-     *
-     * @return mixed|null
      */
-    public function getEntity($id = 0)
+    public function getEntity($id = 0): ?LeadList
     {
         try {
-            $entity = $this
+            return $this
                 ->createQueryBuilder('l')
                 ->where('l.id = :listId')
                 ->setParameter('listId', $id)
                 ->getQuery()
                 ->getSingleResult();
         } catch (\Exception) {
-            $entity = null;
+            return null;
         }
-
-        return $entity;
     }
 
     /**
@@ -343,8 +337,6 @@ class LeadListRepository extends CommonRepository
     }
 
     /**
-     * @param null $leadId
-     *
      * @return QueryBuilder
      */
     protected function createFilterExpressionSubQuery($table, $alias, $column, $value, array &$parameters, $leadId = null, array $subQueryFilters = [])

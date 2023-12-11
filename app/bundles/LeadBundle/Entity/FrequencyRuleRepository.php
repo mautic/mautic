@@ -50,10 +50,6 @@ class FrequencyRuleRepository extends CommonRepository
         return $violations;
     }
 
-    /**
-     * @param null $channel
-     * @param null $leadIds
-     */
     public function getFrequencyRules($channel = null, $leadIds = null): array
     {
         $q = $this->_em->getConnection()->createQueryBuilder();

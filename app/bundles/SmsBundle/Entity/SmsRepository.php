@@ -32,9 +32,6 @@ class SmsRepository extends CommonRepository
         return parent::getEntities($args);
     }
 
-    /**
-     * @param null $id
-     */
     public function getPublishedBroadcasts($id = null): \Doctrine\ORM\Internal\Hydration\IterableResult
     {
         $qb   = $this->createQueryBuilder($this->getTableAlias());

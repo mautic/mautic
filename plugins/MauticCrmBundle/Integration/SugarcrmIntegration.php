@@ -1511,9 +1511,6 @@ class SugarcrmIntegration extends CrmAbstractIntegration
         return null;
     }
 
-    /**
-     * @param null $objectId
-     */
     protected function buildCompositeBody(&$mauticData, $availableFields, $fieldsToUpdateInSugarUpdate, $object, $lead, $onwerAssignedUserIdByEmail = null, $objectId = null)
     {
         $body = [];
@@ -1716,7 +1713,6 @@ class SugarcrmIntegration extends CrmAbstractIntegration
     }
 
     /**
-     * @param null   $object
      * @param string $priorityObject
      *
      * @return mixed
@@ -1780,11 +1776,9 @@ class SugarcrmIntegration extends CrmAbstractIntegration
     /**
      * Checks if a string contains SuiteCRM / SugarCRM 6.x Multi-Select values.
      *
-     * @param  string
-     *
-     * @return bool
+     * @param string $stringToCheck
      */
-    public function checkIfSugarCrmMultiSelectString($stringToCheck)
+    public function checkIfSugarCrmMultiSelectString($stringToCheck): bool
     {
         // Regular Express to check SugarCRM/SuiteCRM Multi-Select format below
         // example format: '^choice1^,^choice2^,^choice_3^'

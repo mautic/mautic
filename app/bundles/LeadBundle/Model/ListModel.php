@@ -186,10 +186,8 @@ class ListModel extends FormModel
 
     /**
      * Get a specific entity or generate a new one if id is empty.
-     *
-     * @return object|null
      */
-    public function getEntity($id = null)
+    public function getEntity($id = null): ?LeadList
     {
         if (null === $id) {
             return new LeadList();
@@ -941,7 +939,6 @@ class ListModel extends FormModel
     }
 
     /**
-     * @param null  $dateFormat
      * @param array $filter
      * @param bool  $canViewOthers
      */
@@ -1003,7 +1000,6 @@ class ListModel extends FormModel
     }
 
     /**
-     * @param null  $dateFormat
      * @param array $filter
      * @param bool  $canViewOthers
      */
@@ -1115,8 +1111,7 @@ class ListModel extends FormModel
     }
 
     /**
-     * @param      $segmentId      *
-     * @param null $returnProperty property of entity in returned array, null return all entity
+     * @param $segmentId *
      *
      * @return array
      */

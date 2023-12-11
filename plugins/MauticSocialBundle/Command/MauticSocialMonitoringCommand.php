@@ -59,8 +59,6 @@ class MauticSocialMonitoringCommand extends Command
     }
 
     /**
-     * @param null $id
-     *
      * @return \Doctrine\ORM\Tools\Pagination\Paginator
      */
     protected function getMonitors($id = null)

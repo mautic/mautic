@@ -113,10 +113,8 @@ class FormModel extends CommonFormModel
 
     /**
      * @param string|int|null $id
-     *
-     * @return Form|object|null
      */
-    public function getEntity($id = null)
+    public function getEntity($id = null): ?Form
     {
         if (null === $id) {
             return new Form();
@@ -796,9 +794,6 @@ class FormModel extends CommonFormModel
         }
     }
 
-    /**
-     * @param null $operator
-     */
     public function getFilterExpressionFunctions($operator = null): array
     {
         $operatorOptions = [

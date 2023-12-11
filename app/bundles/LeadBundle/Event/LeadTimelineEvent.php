@@ -478,8 +478,6 @@ class LeadTimelineEvent extends Event
 
     /**
      * Calculate engagement counts only.
-     *
-     * @param null $groupUnit
      */
     public function setCountOnly(\DateTime $dateFrom, \DateTime $dateTo, $groupUnit = null, ChartQuery $chartQuery = null): void
     {

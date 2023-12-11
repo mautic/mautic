@@ -109,7 +109,7 @@ class SmsModel extends FormModel implements AjaxLookupModelInterface
     /**
      * {@inheritdoc}
      *
-     * @param null  $action
+
      * @param array $options
      *
      * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
@@ -129,10 +129,8 @@ class SmsModel extends FormModel implements AjaxLookupModelInterface
 
     /**
      * Get a specific entity or generate a new one if id is empty.
-     *
-     * @return Sms|null
      */
-    public function getEntity($id = null)
+    public function getEntity($id = null): ?Sms
     {
         if (null === $id) {
             $entity = new Sms();
@@ -346,9 +344,7 @@ class SmsModel extends FormModel implements AjaxLookupModelInterface
     }
 
     /**
-     * @param null $source
      * @param bool $persist
-     * @param null $listId
      *
      * @throws \Exception
      */

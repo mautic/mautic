@@ -293,7 +293,6 @@ class ClassMetadataBuilder extends OrmClassMetadataBuilder
      * @param bool|false $nullable
      * @param string     $onDelete
      * @param bool|false $isPrimaryKey
-     * @param null       $inversedBy
      *
      * @deprecated Use addContact instead; existing implementations will need a migration to rename lead_id to contact_id
      *

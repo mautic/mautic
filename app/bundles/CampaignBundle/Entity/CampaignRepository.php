@@ -64,14 +64,14 @@ class CampaignRepository extends CommonRepository
     /**
      * Returns a list of all published (and active) campaigns (optionally for a specific lead).
      *
-     * @param null $specificId
-     * @param null $leadId
-     * @param bool $forList    If true, returns ID and name only
-     * @param bool $viewOther  If true, returns all the campaigns
+
+
+     * @param bool $forList   If true, returns ID and name only
+     * @param bool $viewOther If true, returns all the campaigns
      *
      * @return array
      */
-    public function getPublishedCampaigns($specificId = null, $leadId = null, $forList = false, $viewOther = false)
+    public function getPublishedCampaigns($specificId = null, ?int $leadId = null, $forList = false, $viewOther = false)
     {
         $q = $this->getEntityManager()->createQueryBuilder()
             ->from(\Mautic\CampaignBundle\Entity\Campaign::class, 'c', 'c.id');
@@ -194,8 +194,6 @@ class CampaignRepository extends CommonRepository
 
     /**
      * Get array of list IDs => name assigned to this campaign.
-     *
-     * @param null $id
      */
     public function getCampaignListSources($id): array
     {

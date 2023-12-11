@@ -314,10 +314,8 @@ class LeadModel extends FormModel
 
     /**
      * Get a specific entity or generate a new one if id is empty.
-     *
-     * @return Lead|null
      */
-    public function getEntity($id = null)
+    public function getEntity($id = null): ?Lead
     {
         if (null === $id) {
             return new Lead();
@@ -1113,11 +1111,7 @@ class LeadModel extends FormModel
     /**
      * @param array $fields
      * @param array $data
-     * @param null  $owner
-     * @param null  $list
-     * @param null  $tags
      * @param bool  $persist
-     * @param null  $importId
      * @param bool  $skipIfExists
      *
      * @throws \Exception

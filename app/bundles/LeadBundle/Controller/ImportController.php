@@ -668,9 +668,6 @@ class ImportController extends FormController
         return 'lead.import';
     }
 
-    /***
-     * @param null $objectId
-     */
     protected function getSessionBase($objectId = null): string
     {
         $initEvent = $this->dispatchImportOnInit();

@@ -77,12 +77,7 @@ class StageModel extends CommonFormModel
         return $formFactory->create(StageType::class, $entity, $options);
     }
 
-    /**
-     * {@inheritdoc}
-     *
-     * @return Stage|null
-     */
-    public function getEntity($id = null)
+    public function getEntity($id = null): ?Stage
     {
         if (null === $id) {
             return new Stage();

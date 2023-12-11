@@ -13,12 +13,9 @@ class IntegrationEntityRepository extends CommonRepository
 {
     /**
      * @param array<int>|int|null $internalEntityIds
-     * @param null                $startDate
-     * @param null                $endDate
      * @param bool                $push
      * @param int                 $start
      * @param int                 $limit
-     * @param null                $integrationEntityIds
      */
     public function getIntegrationsEntityId(
         $integration,
@@ -103,8 +100,6 @@ class IntegrationEntityRepository extends CommonRepository
     }
 
     /**
-     * @param null $leadFields
-     *
      * @return array
      */
     public function getIntegrationEntity($integration, $integrationEntity, $internalEntity, $internalEntityId, $leadFields = null)
@@ -160,8 +155,6 @@ class IntegrationEntityRepository extends CommonRepository
 
     /**
      * @param int          $limit
-     * @param null         $fromDate
-     * @param null         $toDate
      * @param array|string $integrationEntity
      * @param array        $excludeIntegrationIds
      *
@@ -312,9 +305,7 @@ class IntegrationEntityRepository extends CommonRepository
     }
 
     /**
-     * @param int  $limit
-     * @param null $fromDate
-     * @param null $toDate
+     * @param int $limit
      *
      * @return array|int
      */

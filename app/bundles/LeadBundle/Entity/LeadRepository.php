@@ -358,10 +358,8 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
      * {@inheritdoc}
      *
      * @param int $id
-     *
-     * @return mixed|null
      */
-    public function getEntity($id = 0)
+    public function getEntity($id = 0): ?Lead
     {
         try {
             $q = $this->createQueryBuilder($this->getTableAlias());
@@ -1232,10 +1230,8 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
 
     /**
      * Get the next contact after an specific ID; mainly used in deduplication.
-     *
-     * @return Lead
      */
-    public function getNextIdentifiedContact($lastId)
+    public function getNextIdentifiedContact($lastId): ?Lead
     {
         $alias = $this->getTableAlias();
         $qb    = $this->getEntityManager()->getConnection()->createQueryBuilder()

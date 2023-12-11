@@ -562,7 +562,6 @@ class CampaignController extends AbstractStandardFormController
     }
 
     /**
-     * @param null $objectId
      * @param bool $isClone
      */
     protected function beforeFormProcessed($entity, FormInterface $form, $action, $isPost, $objectId = null, $isClone = false)
@@ -602,7 +601,6 @@ class CampaignController extends AbstractStandardFormController
 
     /**
      * @param Campaign $entity
-     * @param null     $objectId
      * @param bool     $isClone
      */
     protected function beforeEntitySave($entity, FormInterface $form, $action, $objectId = null, $isClone = false): bool
@@ -682,8 +680,6 @@ class CampaignController extends AbstractStandardFormController
     }
 
     /**
-     * @param null $objectId
-     *
      * @return int|string|null
      */
     protected function getCampaignSessionId(Campaign $campaign, $action, $objectId = null)

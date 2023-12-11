@@ -35,7 +35,6 @@ class FormRepository extends CommonRepository
      * @param int    $limit
      * @param int    $start
      * @param bool   $viewOther
-     * @param null   $formType
      */
     public function getFormList($search = '', $limit = 10, $start = 0, $viewOther = false, $formType = null): array
     {

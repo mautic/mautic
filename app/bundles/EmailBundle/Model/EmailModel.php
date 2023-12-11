@@ -282,10 +282,8 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
 
     /**
      * Get a specific entity or generate a new one if id is empty.
-     *
-     * @return Email|null
      */
-    public function getEntity($id = null)
+    public function getEntity($id = null): ?Email
     {
         if (null === $id) {
             $entity = new Email();
@@ -1714,7 +1712,6 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
      * @param int    $reason
      * @param string $comments
      * @param bool   $flush
-     * @param null   $leadId
      */
     public function setEmailDoNotContact($email, $reason = DoNotContact::BOUNCED, $comments = '', $flush = true, $leadId = null): array
     {

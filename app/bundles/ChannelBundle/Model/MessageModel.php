@@ -6,6 +6,7 @@ use Doctrine\ORM\EntityManager;
 use Mautic\CampaignBundle\Model\CampaignModel;
 use Mautic\ChannelBundle\ChannelEvents;
 use Mautic\ChannelBundle\Entity\Message;
+use Mautic\ChannelBundle\Entity\MessageRepository;
 use Mautic\ChannelBundle\Event\MessageEvent;
 use Mautic\ChannelBundle\Form\Type\MessageType;
 use Mautic\ChannelBundle\Helper\ChannelListHelper;
@@ -63,20 +64,12 @@ class MessageModel extends FormModel implements AjaxLookupModelInterface
         return 'channel:messages';
     }
 
-    /**
-     * @return \Mautic\ChannelBundle\Entity\MessageRepository
-     */
-    public function getRepository()
+    public function getRepository(): ?MessageRepository
     {
         return $this->em->getRepository(\Mautic\ChannelBundle\Entity\Message::class);
     }
 
-    /**
-     * @param null $id
-     *
-     * @return Form
-     */
-    public function getEntity($id = null)
+    public function getEntity($id = null): ?Message
     {
         if (null === $id) {
             return new Message();
@@ -87,7 +80,6 @@ class MessageModel extends FormModel implements AjaxLookupModelInterface
 
     /**
      * @param object $entity
-     * @param null   $action
      * @param array  $options
      */
     public function createForm($entity, FormFactoryInterface $formFactory, $action = null, $options = []): \Symfony\Component\Form\FormInterface
@@ -173,11 +165,6 @@ class MessageModel extends FormModel implements AjaxLookupModelInterface
         return $this->getRepository()->getChannelMessageByChannelId($channelId);
     }
 
-    /**
-     * @param null $dateFrom
-     * @param null $dateTo
-     * @param null $channel
-     */
     public function getLeadStatsPost($messageId, $dateFrom = null, $dateTo = null, $channel = null): array
     {
         $eventLog = $this->campaignModel->getCampaignLeadEventLogRepository();
@@ -195,9 +182,6 @@ class MessageModel extends FormModel implements AjaxLookupModelInterface
     }
 
     /**
-     * @param null $dateFrom
-     * @param null $dateTo
-     *
      * @return mixed
      */
     public function getMarketingMessagesEventLogs($messageId, $dateFrom = null, $dateTo = null)

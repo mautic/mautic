@@ -19,7 +19,6 @@ class RouteLoader extends Loader
      * Load each bundles routing.php file.
      *
      * @param mixed $resource
-     * @param null  $type
      *
      * @return RouteCollection
      *
@@ -89,7 +88,6 @@ class RouteLoader extends Loader
 
     /**
      * @param mixed $resource
-     * @param null  $type
      */
     public function supports($resource, $type = null): bool
     {

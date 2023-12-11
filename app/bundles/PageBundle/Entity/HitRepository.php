@@ -88,9 +88,6 @@ class HitRepository extends CommonRepository
     }
 
     /**
-     * @param null $sourceId
-     * @param null $fromDate
-     *
      * @return array
      */
     public function getHitCountForSource($source, $sourceId = null, $fromDate = null, $code = 200)

@@ -37,9 +37,6 @@ abstract class AbstractLookup
 
     /**
      * AbstractLookup constructor.
-     *
-     * @param null $config
-     * @param null $cacheDir
      */
     public function __construct(
         protected ?string $auth = null,

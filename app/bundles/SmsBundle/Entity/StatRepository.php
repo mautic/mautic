@@ -35,9 +35,6 @@ class StatRepository extends CommonRepository
         return (!empty($result)) ? $result[0] : null;
     }
 
-    /**
-     * @param null $listId
-     */
     public function getSentStats($smsId, $listId = null): array
     {
         $q = $this->_em->getConnection()->createQueryBuilder();

@@ -75,14 +75,7 @@ class DynamicContentModel extends FormModel implements AjaxLookupModelInterface
         $this->postTranslationEntitySave($entity);
     }
 
-    /**
-     * Here just so PHPStorm calms down about type hinting.
-     *
-     * @param null $id
-     *
-     * @return DynamicContent|null
-     */
-    public function getEntity($id = null)
+    public function getEntity($id = null): ?DynamicContent
     {
         if (null === $id) {
             return new DynamicContent();

@@ -214,8 +214,6 @@ class SubmissionEvent extends CommonEvent
     /**
      * Get feedback injected by another action.
      *
-     * @param null $key
-     *
      * @return array|bool|mixed
      */
     public function getActionFeedback($key = null)

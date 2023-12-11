@@ -656,13 +656,9 @@ class User extends FormEntity implements UserInterface, EquatableInterface, Pass
     }
 
     /**
-     * Set locale.
-     *
-     * @param string $locale
-     *
      * @return User
      */
-    public function setLocale($locale)
+    public function setLocale(?string $locale)
     {
         $this->isChanged('locale', $locale);
         $this->locale = $locale;

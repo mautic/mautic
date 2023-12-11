@@ -110,7 +110,6 @@ class AssetModel extends FormModel
     }
 
     /**
-     * @param null   $request
      * @param string $code
      * @param array  $systemEntry
      *
@@ -345,10 +344,8 @@ class AssetModel extends FormModel
 
     /**
      * Get a specific entity or generate a new one if id is empty.
-     *
-     * @return Asset|null
      */
-    public function getEntity($id = null)
+    public function getEntity($id = null): ?Asset
     {
         if (null === $id) {
             $entity = new Asset();

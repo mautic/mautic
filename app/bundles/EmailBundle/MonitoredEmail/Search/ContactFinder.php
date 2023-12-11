@@ -16,7 +16,6 @@ class ContactFinder
 
     /**
      * @param string $returnPathEmail
-     * @param null   $contactEmail
      *
      * @return Result
      */

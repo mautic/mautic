@@ -143,7 +143,6 @@ class WebhookModel extends FormModel
 
     /**
      * @param Webhook      $entity
-     * @param null         $action
      * @param array<mixed> $options
      *
      * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
@@ -163,10 +162,7 @@ class WebhookModel extends FormModel
         return $formFactory->create(WebhookType::class, $entity, $options);
     }
 
-    /**
-     * @return Webhook|null
-     */
-    public function getEntity($id = null)
+    public function getEntity($id = null): ?Webhook
     {
         if (null === $id) {
             return new Webhook();

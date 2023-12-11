@@ -914,11 +914,10 @@ class SalesforceIntegrationTest extends AbstractIntegrationTestCase
     }
 
     /**
-     * @param int  $maxUpdate
-     * @param int  $maxCreate
-     * @param int  $maxSfLeads
-     * @param int  $maxSfContacts
-     * @param null $updateObject
+     * @param int $maxUpdate
+     * @param int $maxCreate
+     * @param int $maxSfLeads
+     * @param int $maxSfContacts
      *
      * @return SalesforceIntegration|\PHPUnit\Framework\MockObject\MockObject
      */

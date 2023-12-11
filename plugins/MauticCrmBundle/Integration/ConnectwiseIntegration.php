@@ -13,7 +13,7 @@ use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\FormBuilder;
 
 /**
- * @method \MauticPlugin\MauticCrmBundle\Api\ConnectwiseApi getApiHelper
+ * @method \MauticPlugin\MauticCrmBundle\Api\ConnectwiseApi getApiHelper()
  */
 class ConnectwiseIntegration extends CrmAbstractIntegration
 {
@@ -410,7 +410,6 @@ class ConnectwiseIntegration extends CrmAbstractIntegration
      * Get Contacts from connectwise.
      *
      * @param array $params
-     * @param null  $query
      */
     public function getLeads($params = [], $query = null, &$executed = null, $result = [], $object = 'Contact'): int
     {
@@ -777,7 +776,6 @@ class ConnectwiseIntegration extends CrmAbstractIntegration
     }
 
     /**
-     * @param null   $object
      * @param string $priorityObject
      *
      * @return mixed

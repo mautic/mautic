@@ -30,10 +30,7 @@ class ActionModel extends CommonFormModel
         return 'form:forms';
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getEntity($id = null)
+    public function getEntity($id = null): ?Action
     {
         if (null === $id) {
             return new Action();
@@ -44,7 +41,6 @@ class ActionModel extends CommonFormModel
 
     /**
      * @param object $entity
-     * @param null   $action
      * @param array  $options
      */
     public function createForm($entity, FormFactoryInterface $formFactory, $action = null, $options = []): \Symfony\Component\Form\FormInterface

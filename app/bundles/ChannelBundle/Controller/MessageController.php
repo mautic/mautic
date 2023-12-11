@@ -227,7 +227,7 @@ class MessageController extends AbstractStandardFormController
     }
 
     /***
-     * @param null $objectId
+
      *
      * @return string
      */

@@ -130,10 +130,7 @@ class UserModel extends FormModel
         return $formFactory->create(UserType::class, $entity, $options);
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getEntity($id = null)
+    public function getEntity($id = null): ?User
     {
         if (null === $id) {
             return new User();
@@ -334,8 +331,6 @@ class UserModel extends FormModel
 
     /**
      * Set user preference.
-     *
-     * @param null $value
      */
     public function setPreference($key, $value = null, User $user = null): void
     {
@@ -353,8 +348,6 @@ class UserModel extends FormModel
 
     /**
      * Get user preference.
-     *
-     * @param null $default
      */
     public function getPreference($key, $default = null, User $user = null)
     {

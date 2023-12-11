@@ -37,10 +37,8 @@ class TagModel extends FormModel
      * Get a specific entity or generate a new one if id is empty.
      *
      * @param int $id
-     *
-     * @return object|null
      */
-    public function getEntity($id = null)
+    public function getEntity($id = null): ?Tag
     {
         if (is_null($id)) {
             return new Tag();
@@ -53,7 +51,6 @@ class TagModel extends FormModel
      * {@inheritdoc}
      *
      * @param Tag   $entity
-     * @param null  $action
      * @param array $options
      *
      * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException

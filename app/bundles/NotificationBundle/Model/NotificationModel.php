@@ -129,10 +129,8 @@ class NotificationModel extends FormModel implements AjaxLookupModelInterface
 
     /**
      * Get a specific entity or generate a new one if id is empty.
-     *
-     * @return Notification|null
      */
-    public function getEntity($id = null)
+    public function getEntity($id = null): ?Notification
     {
         if (null === $id) {
             $entity = new Notification();

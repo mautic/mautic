@@ -96,8 +96,6 @@ class EventLogApiController extends FetchCommonApiController
     /**
      * Get a list of events.
      *
-     * @param null $campaignId
-     *
      * @return Response
      */
     public function getContactEventsAction(Request $request, UserHelper $userHelper, $contactId, $campaignId = null)

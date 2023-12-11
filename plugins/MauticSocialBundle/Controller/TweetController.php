@@ -26,9 +26,6 @@ class TweetController extends FormController
         return 'mautic_tweet';
     }
 
-    /**
-     * @param null $objectId
-     */
     protected function getSessionBase($objectId = null): string
     {
         return 'mautic_tweet';

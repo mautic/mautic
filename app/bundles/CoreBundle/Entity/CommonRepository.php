@@ -237,9 +237,6 @@ class CommonRepository extends ServiceEntityRepository
     }
 
     /**
-     * @param null $catAlias
-     * @param null $lang
-     *
      * @return mixed|null
      */
     public function findOneBySlugs($alias, $catAlias = null, $lang = null)
@@ -390,10 +387,8 @@ class CommonRepository extends ServiceEntityRepository
      * Get a single entity.
      *
      * @param int $id
-     *
-     * @return object|null
      */
-    public function getEntity($id = 0)
+    public function getEntity($id = 0): ?object
     {
         try {
             if (is_array($id)) {

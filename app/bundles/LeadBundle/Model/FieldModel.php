@@ -468,10 +468,8 @@ class FieldModel extends FormModel
 
     /**
      * Get a specific entity or generate a new one if id is empty.
-     *
-     * @return LeadField|null
      */
-    public function getEntity($id = null)
+    public function getEntity($id = null): ?LeadField
     {
         if (null === $id) {
             return new LeadField();
@@ -729,7 +727,7 @@ class FieldModel extends FormModel
     /**
      * {@inheritdoc}
      *
-     * @param null  $action
+
      * @param array $options
      *
      * @throws MethodNotAllowedHttpException

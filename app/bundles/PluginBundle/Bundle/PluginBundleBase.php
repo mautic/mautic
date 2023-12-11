@@ -14,9 +14,6 @@ use Symfony\Component\HttpKernel\Bundle\Bundle;
 abstract class PluginBundleBase extends Bundle
 {
     /**
-     * @param null $metadata
-     * @param null $installedSchema
-     *
      * @throws \Exception
      *
      * @deprecated To be removed in 5.0. Listen to PluginEvents::ON_PLUGIN_INSTALL instead
@@ -30,8 +27,6 @@ abstract class PluginBundleBase extends Bundle
 
     /**
      * Install plugin schema based on Doctrine metadata.
-     *
-     * @param null $installedSchema
      *
      * @throws \Exception
      */
@@ -62,8 +57,6 @@ abstract class PluginBundleBase extends Bundle
 
     /**
      * Called by PluginController::reloadAction when the addon version does not match what's installed.
-     *
-     * @param null $metadata
      *
      * @throws \Exception
      *
@@ -108,8 +101,6 @@ abstract class PluginBundleBase extends Bundle
 
     /**
      * Not used yet :-).
-     *
-     * @param null $metadata
      */
     public static function onPluginUninstall(Plugin $plugin, MauticFactory $factory, $metadata = null): void
     {

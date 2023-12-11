@@ -109,8 +109,6 @@ class FormController extends AbstractStandardFormController
     }
 
     /**
-     * @param null $objectId
-     *
      * @return mixed
      */
     protected function getSessionBase($objectId = null)

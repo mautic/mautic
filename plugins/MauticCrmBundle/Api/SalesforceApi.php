@@ -34,8 +34,6 @@ class SalesforceApi extends CrmApi
      * @param array  $elementData
      * @param string $method
      * @param bool   $isRetry
-     * @param null   $object
-     * @param null   $queryUrl
      *
      * @return mixed|string
      *
@@ -71,8 +69,6 @@ class SalesforceApi extends CrmApi
     }
 
     /**
-     * @param null $object
-     *
      * @return mixed|string
      *
      * @throws ApiErrorException
@@ -377,9 +373,6 @@ class SalesforceApi extends CrmApi
     }
 
     /**
-     * @param null $modifiedSince
-     * @param null $queryUrl
-     *
      * @return mixed|string
      *
      * @throws ApiErrorException
@@ -455,8 +448,6 @@ class SalesforceApi extends CrmApi
     }
 
     /**
-     * @param null $requiredFieldString
-     *
      * @return mixed|string
      *
      * @throws ApiErrorException

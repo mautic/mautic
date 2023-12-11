@@ -114,10 +114,8 @@ class FocusModel extends FormModel
      * {@inheritdoc}
      *
      * @param int|null $id
-     *
-     * @return Focus|null
      */
-    public function getEntity($id = null)
+    public function getEntity($id = null): ?Focus
     {
         if (null === $id) {
             return new Focus();
@@ -373,7 +371,6 @@ class FocusModel extends FormModel
     }
 
     /**
-     * @param null $dateFormat
      * @param bool $canViewOthers
      */
     public function getStats(Focus $focus, $unit, \DateTime $dateFrom = null, \DateTime $dateTo = null, $dateFormat = null, $canViewOthers = true): array

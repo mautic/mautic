@@ -40,13 +40,9 @@ class CompanyRepository extends CommonRepository implements CustomFieldRepositor
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @param int $id
-     *
-     * @return mixed|null
      */
-    public function getEntity($id = 0)
+    public function getEntity($id = 0): ?Company
     {
         try {
             $q = $this->createQueryBuilder($this->getTableAlias());
@@ -63,7 +59,7 @@ class CompanyRepository extends CommonRepository implements CustomFieldRepositor
         }
 
         if (null === $entity) {
-            return $entity;
+            return null;
         }
 
         if ($entity->getFields()) {
@@ -298,8 +294,6 @@ class CompanyRepository extends CommonRepository implements CustomFieldRepositor
     /**
      * Get a list of lists.
      *
-     * @param null $state
-     *
      * @return array
      */
     public function identifyCompany($companyName, $city = null, $country = null, $state = null)
@@ -407,7 +401,6 @@ class CompanyRepository extends CommonRepository implements CustomFieldRepositor
     }
 
     /**
-     * @param null   $labelColumn
      * @param string $valueColumn
      */
     public function getAjaxSimpleList(CompositeExpression $expr = null, array $parameters = [], $labelColumn = null, $valueColumn = 'id'): array
