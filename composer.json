@@ -44,7 +44,7 @@
     "symfony/var-dumper": "~5.4.0",
     "symfony/web-profiler-bundle": "~5.4.0",
     "symplify/easy-coding-standard": "^12.0.13",
-    "tomasvotruba/class-leak": "*"
+    "tomasvotruba/class-leak": "^0.2.6"
   },
   "replace": {
     "mautic/grapes-js-builder-bundle": "self.version",
