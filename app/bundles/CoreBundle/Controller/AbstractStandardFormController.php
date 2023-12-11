@@ -48,7 +48,7 @@ abstract class AbstractStandardFormController extends AbstractFormController
     /**
      * Get this controller's model name.
      */
-    abstract protected function getModelName();
+    abstract protected function getModelName(): string;
 
     /**
      * Support non-index pages such as modal forms.

@@ -311,7 +311,7 @@ class ReportModel extends FormModel
      *
      * @param string $context
      *
-     * @return \stdClass [filterList => [], definitions => [], operatorChoices =>  [], operatorHtml => [], filterListHtml => '']
+     * @return \stdClass[filterList => [], definitions => [], operatorChoices =>  [], operatorHtml => [], filterListHtml => '']
      */
     public function getFilterList($context = 'all'): \stdClass
     {

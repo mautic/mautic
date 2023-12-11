@@ -57,14 +57,14 @@ class PageRepository extends CommonRepository
     }
 
     /**
-     * @param string $search
-     * @param int    $limit
-     * @param int    $start
-     * @param bool   $viewOther
-     * @param bool   $topLevel
-     * @param array  $ignoreIds
-     * @param array  $extraColumns
-     * @param bool   $publishedOnly
+     * @param string      $search
+     * @param int         $limit
+     * @param int         $start
+     * @param bool        $viewOther
+     * @param string|bool $topLevel
+     * @param array       $ignoreIds
+     * @param array       $extraColumns
+     * @param bool        $publishedOnly
      *
      * @return array
      */

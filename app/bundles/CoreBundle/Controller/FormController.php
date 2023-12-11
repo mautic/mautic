@@ -22,7 +22,7 @@ use Symfony\Component\HttpFoundation\RequestStack;
  */
 class FormController extends AbstractStandardFormController
 {
-    private $deprecatedModelName;
+    private string $deprecatedModelName = '';
 
     private $deprecatedPermissionBase;
 
@@ -51,14 +51,14 @@ class FormController extends AbstractStandardFormController
      * @param string $mauticContent   Mautic content string to return via ajax response for onLoad functions
      */
     protected function setStandardParameters(
-        $modelName,
-        $permissionBase,
-        $routeBase,
-        $sessionBase,
-        $translationBase,
-        $templateBase = null,
-        $activeLink = null,
-        $mauticContent = null
+        string $modelName,
+        string $permissionBase,
+        string $routeBase,
+        string $sessionBase,
+        string $translationBase,
+        string $templateBase,
+        string $activeLink,
+        string $mauticContent
     ) {
         $this->deprecatedModelName      = $modelName;
         $this->deprecatedPermissionBase = $permissionBase;
@@ -91,10 +91,7 @@ class FormController extends AbstractStandardFormController
         return $args;
     }
 
-    /**
-     * @return mixed
-     */
-    protected function getModelName()
+    protected function getModelName(): string
     {
         return $this->deprecatedModelName;
     }
