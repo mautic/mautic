@@ -7,11 +7,12 @@ use Symfony\Contracts\EventDispatcher\Event;
 
 class PageDisplayEvent extends Event
 {
-    /**
-     * @param string $content
-     */
-    public function __construct(private $content, private Page $page, private array $params = [], , private bool $trackingDisabled = false)
-    {
+    public function __construct(
+        private mixed $content,
+        private Page $page,
+        private array $params = [],
+        private bool $trackingDisabled = false
+    ) {
     }
 
     /**
