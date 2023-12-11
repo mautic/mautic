@@ -11,20 +11,11 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class WebhookSubscriber implements EventSubscriberInterface
 {
-    /**
-     * @var WebhookModel
-     */
-    private $webhookModel;
-
-    public function __construct(WebhookModel $webhookModel)
+    public function __construct(private WebhookModel $webhookModel)
     {
-        $this->webhookModel = $webhookModel;
     }
 
-    /**
-     * @return array
-     */
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             WebhookEvents::WEBHOOK_ON_BUILD => ['onWebhookBuild', 0],
@@ -35,7 +26,7 @@ class WebhookSubscriber implements EventSubscriberInterface
     /**
      * Add event triggers and actions.
      */
-    public function onWebhookBuild(WebhookBuilderEvent $event)
+    public function onWebhookBuild(WebhookBuilderEvent $event): void
     {
         // add checkbox to the webhook form for new leads
         $formSubmit = [
@@ -47,7 +38,7 @@ class WebhookSubscriber implements EventSubscriberInterface
         $event->addEvent(FormEvents::FORM_ON_SUBMIT, $formSubmit);
     }
 
-    public function onFormSubmit(SubmissionEvent $event)
+    public function onFormSubmit(SubmissionEvent $event): void
     {
         $this->webhookModel->queueWebhooksByType(
             FormEvents::FORM_ON_SUBMIT,

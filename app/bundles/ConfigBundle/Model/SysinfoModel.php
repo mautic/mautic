@@ -22,27 +22,8 @@ class SysinfoModel
      */
     protected $folders;
 
-    protected PathsHelper $pathsHelper;
-    protected CoreParametersHelper $coreParametersHelper;
-    protected Connection $connection;
-    private TranslatorInterface $translator;
-    private InstallService $installService;
-    private CheckStep $checkStep;
-
-    public function __construct(
-        PathsHelper $pathsHelper,
-        CoreParametersHelper $coreParametersHelper,
-        TranslatorInterface $translator,
-        Connection $connection,
-        InstallService $installService,
-        CheckStep $checkStep
-    ) {
-        $this->pathsHelper          = $pathsHelper;
-        $this->coreParametersHelper = $coreParametersHelper;
-        $this->translator           = $translator;
-        $this->connection           = $connection;
-        $this->installService       = $installService;
-        $this->checkStep            = $checkStep;
+    public function __construct(protected PathsHelper $pathsHelper, protected CoreParametersHelper $coreParametersHelper, private TranslatorInterface $translator, protected Connection $connection, private InstallService $installService, private CheckStep $checkStep)
+    {
     }
 
     /**
@@ -121,8 +102,8 @@ class SysinfoModel
 
         foreach ($importantFolders as $folder) {
             $folderPath = realpath($folder);
-            $folderKey  = ($folderPath) ? $folderPath : $folder;
-            $isWritable = ($folderPath) ? is_writable($folderPath) : false;
+            $folderKey  = $folderPath ?: $folder;
+            $isWritable = $folderPath && is_writable($folderPath);
 
             $this->folders[$folderKey] = $isWritable;
         }
@@ -153,7 +134,7 @@ class SysinfoModel
         return [
             'version'  => $this->connection->executeQuery('SELECT VERSION()')->fetchOne(),
             'driver'   => $this->connection->getParams()['driver'],
-            'platform' => get_class($this->connection->getDatabasePlatform()),
+            'platform' => $this->connection->getDatabasePlatform()::class,
         ];
     }
 
@@ -162,10 +143,8 @@ class SysinfoModel
      *
      * @param int $lines
      * @param int $buffer
-     *
-     * @return string
      */
-    public function tail($filename, $lines = 10, $buffer = 4096)
+    public function tail($filename, $lines = 10, $buffer = 4096): string
     {
         $f      = fopen($filename, 'rb');
         $output = '';

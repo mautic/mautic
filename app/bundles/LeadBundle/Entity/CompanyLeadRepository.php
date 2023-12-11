@@ -12,7 +12,7 @@ class CompanyLeadRepository extends CommonRepository
     /**
      * @param CompanyLead[] $entities
      */
-    public function saveEntities($entities, $new = true)
+    public function saveEntities($entities, $new = true): void
     {
         // Get a list of contacts and set primary to 0
         if ($new) {
@@ -40,7 +40,7 @@ class CompanyLeadRepository extends CommonRepository
             }
         }
 
-        return parent::saveEntities($entities);
+        parent::saveEntities($entities);
     }
 
     /**
@@ -133,7 +133,7 @@ class CompanyLeadRepository extends CommonRepository
     /**
      * Updates leads company name If company name changed and company is primary.
      */
-    public function updateLeadsPrimaryCompanyName(Company $company)
+    public function updateLeadsPrimaryCompanyName(Company $company): void
     {
         if ($company->isNew() || empty($company->getChanges()['fields']['companyname'])) {
             return;

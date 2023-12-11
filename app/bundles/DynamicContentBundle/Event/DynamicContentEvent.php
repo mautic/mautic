@@ -26,7 +26,7 @@ class DynamicContentEvent extends CommonEvent
         return $this->entity;
     }
 
-    public function setDynamicContent(DynamicContent $entity)
+    public function setDynamicContent(DynamicContent $entity): void
     {
         $this->entity = $entity;
     }

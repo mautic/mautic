@@ -23,7 +23,7 @@ trait TimelineEventLogTrait
      * @param null $object
      * @param null $action
      */
-    private function addEvents(LeadTimelineEvent $event, $eventType, $eventTypeName, $icon, $bundle = null, $object = null, $action = null, $contentTemplate = null)
+    private function addEvents(LeadTimelineEvent $event, $eventType, $eventTypeName, $icon, $bundle = null, $object = null, $action = null, $contentTemplate = null): void
     {
         $eventTypeName = $this->translator->trans($eventTypeName);
         $event->addEventType($eventType, $eventTypeName);
@@ -49,10 +49,7 @@ trait TimelineEventLogTrait
         }
     }
 
-    /**
-     * @return array
-     */
-    private function getEventEntry(array $log, $eventType, $eventTypeName, $icon, $contentTemplate)
+    private function getEventEntry(array $log, $eventType, $eventTypeName, $icon, $contentTemplate): array
     {
         $properties = json_decode($log['properties'], true);
 

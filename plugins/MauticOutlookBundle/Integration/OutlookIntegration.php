@@ -26,10 +26,8 @@ class OutlookIntegration extends AbstractIntegration
     /**
      * Return array of key => label elements that will be converted to inputs to
      * obtain from the user.
-     *
-     * @return array
      */
-    public function getRequiredKeyFields()
+    public function getRequiredKeyFields(): array
     {
         return [
             'secret' => 'mautic.integration.outlook.secret',

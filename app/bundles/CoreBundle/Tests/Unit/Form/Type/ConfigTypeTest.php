@@ -20,7 +20,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class ConfigTypeTest extends TypeTestCase
 {
-    private $formBuilder;
+    private \PHPUnit\Framework\MockObject\MockObject $formBuilder;
     private $formType;
 
     protected function setUp(): void
@@ -30,7 +30,7 @@ class ConfigTypeTest extends TypeTestCase
         parent::setUp();
     }
 
-    public function testSubmitValidData()
+    public function testSubmitValidData(): void
     {
         $formData = [
             'site_url'             => 'http://example.com',

@@ -128,10 +128,7 @@ class EventRepository extends CommonRepository
         return $q->getQuery()->getArrayResult();
     }
 
-    /**
-     * @return array
-     */
-    public function getCampaignEvents($campaignId)
+    public function getCampaignEvents($campaignId): array
     {
         $q = $this->getEntityManager()->createQueryBuilder();
         $q->select('e, IDENTITY(e.parent)')
@@ -193,7 +190,7 @@ class EventRepository extends CommonRepository
     /**
      * Null event parents in preparation for deleI'lting a campaign.
      */
-    public function nullEventParents($campaignId)
+    public function nullEventParents($campaignId): void
     {
         $this->getEntityManager()->getConnection()->update(
             MAUTIC_TABLE_PREFIX.'campaign_events',
@@ -205,7 +202,7 @@ class EventRepository extends CommonRepository
     /**
      * Null event parents in preparation for deleting events from a campaign.
      */
-    public function nullEventRelationships($events)
+    public function nullEventRelationships($events): void
     {
         $qb = $this->getEntityManager()->getConnection()->createQueryBuilder();
         $qb->update(MAUTIC_TABLE_PREFIX.'campaign_events')
@@ -220,7 +217,7 @@ class EventRepository extends CommonRepository
     /**
      * {@inheritdoc}
      */
-    public function getTableAlias()
+    public function getTableAlias(): string
     {
         return 'e';
     }
@@ -264,10 +261,8 @@ class EventRepository extends CommonRepository
 
     /**
      * Get an array of events that have been triggered by this lead.
-     *
-     * @return array
      */
-    public function getLeadTriggeredEvents($leadId)
+    public function getLeadTriggeredEvents($leadId): array
     {
         $q = $this->getEntityManager()->createQueryBuilder()
             ->select('e, c, l')

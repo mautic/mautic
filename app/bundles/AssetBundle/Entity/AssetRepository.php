@@ -77,12 +77,10 @@ class AssetRepository extends CommonRepository
 
     /**
      * @param \Doctrine\ORM\QueryBuilder|\Doctrine\DBAL\Query\QueryBuilder $q
-     *
-     * @return array
      */
-    protected function addSearchCommandWhereClause($q, $filter)
+    protected function addSearchCommandWhereClause($q, $filter): array
     {
-        list($expr, $parameters) = $this->addStandardSearchCommandWhereClause($q, $filter);
+        [$expr, $parameters] = $this->addStandardSearchCommandWhereClause($q, $filter);
         if ($expr) {
             return [$expr, $parameters];
         }
@@ -142,7 +140,7 @@ class AssetRepository extends CommonRepository
     /**
      * @return array<array<string>>
      */
-    protected function getDefaultOrder()
+    protected function getDefaultOrder(): array
     {
         return [
             ['a.title', 'ASC'],
@@ -152,17 +150,15 @@ class AssetRepository extends CommonRepository
     /**
      * {@inheritdoc}
      */
-    public function getTableAlias()
+    public function getTableAlias(): string
     {
         return 'a';
     }
 
     /**
      * Gets the sum size of assets.
-     *
-     * @return int
      */
-    public function getAssetSize(array $assets)
+    public function getAssetSize(array $assets): int
     {
         $q = $this->_em->getConnection()->createQueryBuilder();
         $q->select('sum(a.size) as total_size')
@@ -179,7 +175,7 @@ class AssetRepository extends CommonRepository
      * @param int        $increaseBy
      * @param bool|false $unique
      */
-    public function upDownloadCount($id, $increaseBy = 1, $unique = false)
+    public function upDownloadCount($id, $increaseBy = 1, $unique = false): void
     {
         $q = $this->_em->getConnection()->createQueryBuilder();
 

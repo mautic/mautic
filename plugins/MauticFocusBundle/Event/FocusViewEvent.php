@@ -5,19 +5,10 @@ namespace MauticPlugin\MauticFocusBundle\Event;
 use MauticPlugin\MauticFocusBundle\Entity\Stat;
 use Symfony\Contracts\EventDispatcher\Event;
 
-/**
- * Class FocusViewEvent.
- */
 class FocusViewEvent extends Event
 {
-    /**
-     * @var Stat
-     */
-    private $stat;
-
-    public function __construct(Stat $stat)
+    public function __construct(private Stat $stat)
     {
-        $this->stat  = $stat;
     }
 
     /**

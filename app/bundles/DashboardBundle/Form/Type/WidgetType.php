@@ -17,9 +17,6 @@ use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 
-/**
- * Class WidgetType.
- */
 class WidgetType extends AbstractType
 {
     /**
@@ -27,18 +24,12 @@ class WidgetType extends AbstractType
      */
     protected $dispatcher;
 
-    /**
-     * @var CorePermissions
-     */
-    protected $security;
-
-    public function __construct(EventDispatcherInterface $dispatcher, CorePermissions $security)
+    public function __construct(EventDispatcherInterface $dispatcher, protected CorePermissions $security)
     {
         $this->dispatcher = $dispatcher;
-        $this->security   = $security;
     }
 
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder->add(
             'name',
@@ -55,9 +46,7 @@ class WidgetType extends AbstractType
         $event->setSecurity($this->security);
         $this->dispatcher->dispatch($event, DashboardEvents::DASHBOARD_ON_MODULE_LIST_GENERATE);
 
-        $types = array_map(function ($category) {
-            return array_flip($category);
-        }, $event->getTypes());
+        $types = array_map(fn ($category): array => array_flip($category), $event->getTypes());
 
         $builder->add(
             'type',
@@ -112,7 +101,7 @@ class WidgetType extends AbstractType
         );
 
         // function to add a form for specific widget type dynamically
-        $func = function (FormEvent $e) {
+        $func = function (FormEvent $e): void {
             $data   = $e->getData();
             $form   = $e->getForm();
             $event  = new WidgetFormEvent();

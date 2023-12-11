@@ -11,32 +11,11 @@ use Symfony\Component\HttpFoundation\RequestStack;
 
 class PageSubscriber implements EventSubscriberInterface
 {
-    /**
-     * @var EmailModel
-     */
-    private $emailModel;
-
-    /**
-     * @var RealTimeExecutioner
-     */
-    private $realTimeExecutioner;
-
-    /**
-     * @var RequestStack
-     */
-    private $requestStack;
-
-    public function __construct(EmailModel $emailModel, RealTimeExecutioner $realTimeExecutioner, RequestStack $requestStack)
+    public function __construct(private EmailModel $emailModel, private RealTimeExecutioner $realTimeExecutioner, private RequestStack $requestStack)
     {
-        $this->emailModel          = $emailModel;
-        $this->realTimeExecutioner = $realTimeExecutioner;
-        $this->requestStack        = $requestStack;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             PageEvents::PAGE_ON_HIT => ['onPageHit', 0],
@@ -46,7 +25,7 @@ class PageSubscriber implements EventSubscriberInterface
     /**
      * Trigger point actions for page hits.
      */
-    public function onPageHit(Events\PageHitEvent $event)
+    public function onPageHit(Events\PageHitEvent $event): void
     {
         $hit      = $event->getHit();
         $redirect = $hit->getRedirect();

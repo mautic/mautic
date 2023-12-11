@@ -44,15 +44,7 @@ class CampaignScheduledEvent extends Event
      */
     protected $eventSettings;
 
-    /**
-     * @var LeadEventLog
-     */
-    protected $log;
-
-    /**
-     * CampaignScheduledEvent constructor.
-     */
-    public function __construct(array $args, LeadEventLog $log = null)
+    public function __construct(array $args, protected ?LeadEventLog $log = null)
     {
         $this->lead            = $args['lead'];
         $this->event           = $args['event'];
@@ -60,8 +52,6 @@ class CampaignScheduledEvent extends Event
         $this->systemTriggered = $args['systemTriggered'];
         $this->dateScheduled   = $args['dateScheduled'];
         $this->eventSettings   = $args['eventSettings'];
-
-        $this->log = $log;
     }
 
     /**

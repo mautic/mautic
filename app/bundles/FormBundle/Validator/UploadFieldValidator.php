@@ -13,14 +13,8 @@ use Symfony\Component\HttpFoundation\Request;
 
 class UploadFieldValidator
 {
-    /**
-     * @var FileUploadValidator
-     */
-    private $fileUploadValidator;
-
-    public function __construct(FileUploadValidator $fileUploadValidator)
+    public function __construct(private FileUploadValidator $fileUploadValidator)
     {
-        $this->fileUploadValidator = $fileUploadValidator;
     }
 
     /**

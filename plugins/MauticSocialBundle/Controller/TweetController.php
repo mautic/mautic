@@ -4,11 +4,10 @@ namespace MauticPlugin\MauticSocialBundle\Controller;
 
 use Mautic\CoreBundle\Controller\FormController;
 use Symfony\Component\Form\Form;
+use Symfony\Component\Form\FormInterface;
+use Symfony\Component\Form\FormView;
 use Symfony\Component\HttpFoundation\Request;
 
-/**
- * Class TweetController.
- */
 class TweetController extends FormController
 {
     /**
@@ -71,10 +70,8 @@ class TweetController extends FormController
 
     /**
      * Define options to pass to the form when it's being created.
-     *
-     * @return array
      */
-    protected function getEntityFormOptions()
+    protected function getEntityFormOptions(): array
     {
         return [
             'update_select'      => $this->getUpdateSelect(),
@@ -100,10 +97,8 @@ class TweetController extends FormController
      * Set custom form themes, etc.
      *
      * @param string $action
-     *
-     * @return \Symfony\Component\Form\FormView
      */
-    protected function getFormView(Form $form, $action)
+    protected function getFormView(FormInterface $form, $action): FormView
     {
         return $form->createView();
     }

@@ -33,38 +33,11 @@ class DashboardSubscriber extends MainDashboardSubscriber
         self::TYPE_RECENT_ACTIVITY => [],
     ];
 
-    private AuditLogModel $auditLogModel;
-
-    private TranslatorInterface $translator;
-
-    private RouterInterface $router;
-
-    private CorePermissions $security;
-
-    private EventDispatcherInterface $dispatcher;
-
-    /**
-     * @var ModelFactory<object>
-     */
-    protected ModelFactory $modelFactory;
-
     /**
      * @param ModelFactory<object> $modelFactory
      */
-    public function __construct(
-        AuditLogModel $auditLogModel,
-        TranslatorInterface $translator,
-        RouterInterface $router,
-        CorePermissions $security,
-        EventDispatcherInterface $dispatcher,
-        ModelFactory $modelFactory
-    ) {
-        $this->auditLogModel = $auditLogModel;
-        $this->translator    = $translator;
-        $this->router        = $router;
-        $this->security      = $security;
-        $this->dispatcher    = $dispatcher;
-        $this->modelFactory  = $modelFactory;
+    public function __construct(private AuditLogModel $auditLogModel, private TranslatorInterface $translator, private RouterInterface $router, private CorePermissions $security, private EventDispatcherInterface $dispatcher, protected ModelFactory $modelFactory)
+    {
     }
 
     /**
@@ -111,7 +84,7 @@ class DashboardSubscriber extends MainDashboardSubscriber
                     } else {
                         $log['route'] = false;
                     }
-                } catch (\Exception $e) {
+                } catch (\Exception) {
                     unset($logs[$key]);
                 }
             }

@@ -31,26 +31,10 @@ class MessageModel extends FormModel implements AjaxLookupModelInterface
 {
     public const CHANNEL_FEATURE = 'marketing_messages';
 
-    /**
-     * @var ChannelListHelper
-     */
-    protected $channelListHelper;
-
-    /**
-     * @var CampaignModel
-     */
-    protected $campaignModel;
-
     protected static $channels;
 
-    /**
-     * MessageModel constructor.
-     */
-    public function __construct(ChannelListHelper $channelListHelper, CampaignModel $campaignModel, EntityManager $em, CorePermissions $security, EventDispatcherInterface $dispatcher, UrlGeneratorInterface $router, Translator $translator, UserHelper $userHelper, LoggerInterface $mauticLogger, CoreParametersHelper $coreParametersHelper)
+    public function __construct(protected ChannelListHelper $channelListHelper, protected CampaignModel $campaignModel, EntityManager $em, CorePermissions $security, EventDispatcherInterface $dispatcher, UrlGeneratorInterface $router, Translator $translator, UserHelper $userHelper, LoggerInterface $mauticLogger, CoreParametersHelper $coreParametersHelper)
     {
-        $this->channelListHelper = $channelListHelper;
-        $this->campaignModel     = $campaignModel;
-
         parent::__construct($em, $security, $dispatcher, $router, $translator, $userHelper, $mauticLogger, $coreParametersHelper);
     }
 
@@ -58,7 +42,7 @@ class MessageModel extends FormModel implements AjaxLookupModelInterface
      * @param Message $entity
      * @param bool    $unlock
      */
-    public function saveEntity($entity, $unlock = true)
+    public function saveEntity($entity, $unlock = true): void
     {
         $isNew = $entity->isNew();
 
@@ -74,10 +58,7 @@ class MessageModel extends FormModel implements AjaxLookupModelInterface
         }
     }
 
-    /**
-     * @return string
-     */
-    public function getPermissionBase()
+    public function getPermissionBase(): string
     {
         return 'channel:messages';
     }
@@ -108,10 +89,8 @@ class MessageModel extends FormModel implements AjaxLookupModelInterface
      * @param object $entity
      * @param null   $action
      * @param array  $options
-     *
-     * @return \Symfony\Component\Form\FormInterface
      */
-    public function createForm($entity, FormFactoryInterface $formFactory, $action = null, $options = [])
+    public function createForm($entity, FormFactoryInterface $formFactory, $action = null, $options = []): \Symfony\Component\Form\FormInterface
     {
         if (!empty($action)) {
             $options['action'] = $action;
@@ -134,19 +113,12 @@ class MessageModel extends FormModel implements AjaxLookupModelInterface
                     throw new \InvalidArgumentException('lookupFormType and/or propertiesFormType are required for channel '.$channel);
                 }
 
-                switch (true) {
-                    case $this->translator->hasId('mautic.channel.'.$channel):
-                        $label = $this->translator->trans('mautic.channel.'.$channel);
-                        break;
-                    case $this->translator->hasId('mautic.'.$channel):
-                        $label = $this->translator->trans('mautic.'.$channel);
-                        break;
-                    case $this->translator->hasId('mautic.'.$channel.'.'.$channel):
-                        $label = $this->translator->trans('mautic.'.$channel.'.'.$channel);
-                        break;
-                    default:
-                        $label = ucfirst($channel);
-                }
+                $label = match (true) {
+                    $this->translator->hasId('mautic.channel.'.$channel)      => $this->translator->trans('mautic.channel.'.$channel),
+                    $this->translator->hasId('mautic.'.$channel)              => $this->translator->trans('mautic.'.$channel),
+                    $this->translator->hasId('mautic.'.$channel.'.'.$channel) => $this->translator->trans('mautic.'.$channel.'.'.$channel),
+                    default                                                   => ucfirst($channel),
+                };
                 $config['label'] = $label;
 
                 $channels[$channel] = $config;
@@ -163,10 +135,8 @@ class MessageModel extends FormModel implements AjaxLookupModelInterface
      * @param int    $limit
      * @param int    $start
      * @param array  $options
-     *
-     * @return array
      */
-    public function getLookupResults($type, $filter = '', $limit = 10, $start = 0, $options = [])
+    public function getLookupResults($type, $filter = '', $limit = 10, $start = 0, $options = []): array
     {
         $results = [];
         switch ($type) {
@@ -266,11 +236,7 @@ class MessageModel extends FormModel implements AjaxLookupModelInterface
             ->setParameter('id', (int) $id);
         $result = $qb->getQuery()->getOneOrNullResult();
 
-        if (isset($result[$nameColumn])) {
-            return $result[$nameColumn];
-        }
-
-        return null;
+        return $result[$nameColumn] ?? null;
     }
 
     /**
@@ -278,7 +244,7 @@ class MessageModel extends FormModel implements AjaxLookupModelInterface
      *
      * @throws MethodNotAllowedHttpException
      */
-    protected function dispatchEvent($action, &$entity, $isNew = false, Event $event = null)
+    protected function dispatchEvent($action, &$entity, $isNew = false, Event $event = null): ?Event
     {
         if (!$entity instanceof Message) {
             throw new MethodNotAllowedHttpException(['Message']);

@@ -30,29 +30,11 @@ use Symfony\Component\Validator\Context\ExecutionContextInterface;
 
 class FieldType extends AbstractType
 {
-    /**
-     * @var Translator
-     */
-    private $translator;
-
-    /**
-     * @var EntityManagerInterface
-     */
-    private $em;
-
-    /**
-     * @var IdentifierFields
-     */
-    private $identifierFields;
-
-    public function __construct(EntityManagerInterface $em, Translator $translator, IdentifierFields $identifierFields)
+    public function __construct(private EntityManagerInterface $em, private Translator $translator, private IdentifierFields $identifierFields)
     {
-        $this->em               = $em;
-        $this->translator       = $translator;
-        $this->identifierFields = $identifierFields;
     }
 
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder->addEventSubscriber(new FormExitSubscriber('lead.field', $options));
 
@@ -146,7 +128,7 @@ class FieldType extends AbstractType
                 'attr'        => ['class' => 'form-control'],
                 'required'    => false,
                 'mapped'      => false,
-                'data'        => isset($options['data']->getProperties()['allowHtml']) ? $options['data']->getProperties()['allowHtml'] : false,
+                'data'        => $options['data']->getProperties()['allowHtml'] ?? false,
             ]
         );
 
@@ -236,11 +218,11 @@ class FieldType extends AbstractType
             ]
         );
 
-        $formModifier = function (FormEvent $event) use ($listChoices, $type, $options, $disableDefaultValue) {
+        $formModifier = function (FormEvent $event) use ($listChoices, $type, $options, $disableDefaultValue): array {
             $cleaningRules = [];
             $form          = $event->getForm();
             $data          = $event->getData();
-            $type          = (is_array($data)) ? (isset($data['type']) ? $data['type'] : $type) : $data->getType();
+            $type          = (is_array($data)) ? ($data['type'] ?? $type) : $data->getType();
 
             switch ($type) {
                 case 'multiselect':
@@ -249,7 +231,7 @@ class FieldType extends AbstractType
                     $cleaningRules['defaultValue'] = 'raw';
 
                     if (is_array($data)) {
-                        $properties = isset($data['properties']) ? $data['properties'] : [];
+                        $properties = $data['properties'] ?? [];
                     } else {
                         $properties = $data->getProperties();
                     }
@@ -303,7 +285,7 @@ class FieldType extends AbstractType
                     break;
                 case 'boolean':
                     if (is_array($data)) {
-                        $value    = isset($data['defaultValue']) ? $data['defaultValue'] : false;
+                        $value    = $data['defaultValue'] ?? false;
                         $yesLabel = !empty($data['properties']['yes']) ? $data['properties']['yes'] : 'mautic.core.form.yes';
                         $noLabel  = !empty($data['properties']['no']) ? $data['properties']['no'] : 'mautic.core.form.no';
                     } else {
@@ -340,7 +322,7 @@ class FieldType extends AbstractType
                         case 'datetime':
                             $constraints = [
                                 new Assert\Callback(
-                                    function ($object, ExecutionContextInterface $context) {
+                                    function ($object, ExecutionContextInterface $context): void {
                                         if (!empty($object) && false === \DateTime::createFromFormat('Y-m-d H:i', $object)) {
                                             $context->buildViolation('mautic.lead.datetime.invalid')->addViolation();
                                         }
@@ -351,7 +333,7 @@ class FieldType extends AbstractType
                         case 'date':
                             $constraints = [
                                 new Assert\Callback(
-                                    function ($object, ExecutionContextInterface $context) {
+                                    function ($object, ExecutionContextInterface $context): void {
                                         if (!empty($object)) {
                                             $validator  = $context->getValidator();
                                             $violations = $validator->validate($object, new Assert\Date());
@@ -367,7 +349,7 @@ class FieldType extends AbstractType
                         case 'time':
                             $constraints = [
                                 new Assert\Callback(
-                                    function ($object, ExecutionContextInterface $context) {
+                                    function ($object, ExecutionContextInterface $context): void {
                                         if (!empty($object)) {
                                             $validator  = $context->getValidator();
                                             $violations = $validator->validate(
@@ -427,14 +409,14 @@ class FieldType extends AbstractType
 
         $builder->addEventListener(
             FormEvents::PRE_SET_DATA,
-            function (FormEvent $event) use ($formModifier) {
+            function (FormEvent $event) use ($formModifier): void {
                 $formModifier($event);
             }
         );
 
         $builder->addEventListener(
             FormEvents::PRE_SUBMIT,
-            function (FormEvent $event) use ($formModifier, $disableDefaultValue) {
+            function (FormEvent $event) use ($formModifier, $disableDefaultValue): void {
                 $data          = $event->getData();
                 $cleaningRules = $formModifier($event);
                 $masks         = !empty($cleaningRules) ? $cleaningRules : 'clean';
@@ -589,7 +571,7 @@ class FieldType extends AbstractType
         }
     }
 
-    public function configureOptions(OptionsResolver $resolver)
+    public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults(
             [

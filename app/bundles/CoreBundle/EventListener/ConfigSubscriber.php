@@ -11,20 +11,11 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class ConfigSubscriber implements EventSubscriberInterface
 {
-    /**
-     * @var LanguageHelper
-     */
-    private $languageHelper;
-
-    public function __construct(LanguageHelper $languageHelper)
+    public function __construct(private LanguageHelper $languageHelper)
     {
-        $this->languageHelper = $languageHelper;
     }
 
-    /**
-     * @return array
-     */
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             ConfigEvents::CONFIG_ON_GENERATE => ['onConfigGenerate', 0],
@@ -32,7 +23,7 @@ class ConfigSubscriber implements EventSubscriberInterface
         ];
     }
 
-    public function onConfigGenerate(ConfigBuilderEvent $event)
+    public function onConfigGenerate(ConfigBuilderEvent $event): void
     {
         $coreParams = $event->getParametersFromConfig('MauticCoreBundle');
         unset($coreParams['theme']);
@@ -46,7 +37,7 @@ class ConfigSubscriber implements EventSubscriberInterface
         ]);
     }
 
-    public function onConfigBeforeSave(ConfigEvent $event)
+    public function onConfigBeforeSave(ConfigEvent $event): void
     {
         $values = $event->getConfig();
 

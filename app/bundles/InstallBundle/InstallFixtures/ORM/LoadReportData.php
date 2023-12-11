@@ -9,19 +9,9 @@ use Doctrine\Persistence\ObjectManager;
 use Mautic\CoreBundle\Helper\CsvHelper;
 use Mautic\CoreBundle\Helper\Serializer;
 use Mautic\ReportBundle\Entity\Report;
-use Symfony\Component\DependencyInjection\ContainerAwareInterface;
-use Symfony\Component\DependencyInjection\ContainerInterface;
 
-/**
- * Class LoadReportData.
- */
-class LoadReportData extends AbstractFixture implements OrderedFixtureInterface, ContainerAwareInterface, FixtureGroupInterface
+class LoadReportData extends AbstractFixture implements OrderedFixtureInterface, FixtureGroupInterface
 {
-    /**
-     * @var ContainerInterface
-     */
-    private $container;
-
     /**
      * {@inheritdoc}
      */
@@ -30,15 +20,7 @@ class LoadReportData extends AbstractFixture implements OrderedFixtureInterface,
         return ['group_install', 'group_mautic_install_data'];
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function setContainer(ContainerInterface $container = null)
-    {
-        $this->container = $container;
-    }
-
-    public function load(ObjectManager $manager)
+    public function load(ObjectManager $manager): void
     {
         $reports = CsvHelper::csv_to_array(__DIR__.'/fakereportdata.csv');
         foreach ($reports as $count => $rows) {

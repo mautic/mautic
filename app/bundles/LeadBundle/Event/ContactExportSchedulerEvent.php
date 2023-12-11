@@ -9,12 +9,10 @@ use Symfony\Contracts\EventDispatcher\Event;
 
 class ContactExportSchedulerEvent extends Event
 {
-    private ContactExportScheduler $contactExportScheduler;
     private string $filePath;
 
-    public function __construct(ContactExportScheduler $contactExportScheduler)
+    public function __construct(private ContactExportScheduler $contactExportScheduler)
     {
-        $this->contactExportScheduler = $contactExportScheduler;
     }
 
     public function getContactExportScheduler(): ContactExportScheduler

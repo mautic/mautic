@@ -15,29 +15,11 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class CampaignActionDNCSubscriber implements EventSubscriberInterface
 {
-    /**
-     * @var DoNotContact
-     */
-    private $doNotContact;
-
-    /**
-     * @var LeadModel
-     */
-    private $leadModel;
-
-    /**
-     * CampaignActionDNCSubscriber constructor.
-     */
-    public function __construct(DoNotContact $doNotContact, LeadModel $leadModel)
+    public function __construct(private DoNotContact $doNotContact, private LeadModel $leadModel)
     {
-        $this->doNotContact = $doNotContact;
-        $this->leadModel    = $leadModel;
     }
 
-    /**
-     * @return array
-     */
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             CampaignEvents::CAMPAIGN_ON_BUILD                  => ['configureAction', 0],
@@ -46,7 +28,7 @@ class CampaignActionDNCSubscriber implements EventSubscriberInterface
         ];
     }
 
-    public function configureAction(CampaignBuilderEvent $event)
+    public function configureAction(CampaignBuilderEvent $event): void
     {
         $event->addAction(
             'lead.adddnc',
@@ -69,7 +51,7 @@ class CampaignActionDNCSubscriber implements EventSubscriberInterface
         );
     }
 
-    public function addDoNotContact(PendingEvent $event)
+    public function addDoNotContact(PendingEvent $event): void
     {
         $config          = $event->getEvent()->getProperties();
         $channels        = ArrayHelper::getValue('channels', $config, []);
@@ -94,7 +76,7 @@ class CampaignActionDNCSubscriber implements EventSubscriberInterface
         $event->passAll();
     }
 
-    public function removeDoNotContact(PendingEvent $event)
+    public function removeDoNotContact(PendingEvent $event): void
     {
         $config          = $event->getEvent()->getProperties();
         $channels        = ArrayHelper::getValue('channels', $config, []);

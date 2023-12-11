@@ -6,15 +6,8 @@ class Lead
 {
     public const OBJECT = 'Lead';
 
-    private $id;
-    private $campaignId;
-    private $isDeleted;
-
-    public function __construct($id, $campaignId, $isDeleted)
+    public function __construct(private $id, private $campaignId, private $isDeleted)
     {
-        $this->id         = $id;
-        $this->campaignId = $campaignId;
-        $this->isDeleted  = $isDeleted;
     }
 
     /**

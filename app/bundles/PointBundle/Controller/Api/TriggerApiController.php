@@ -15,8 +15,8 @@ use Mautic\PointBundle\Entity\Trigger;
 use Mautic\PointBundle\Model\TriggerEventModel;
 use Mautic\PointBundle\Model\TriggerModel;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
-use Symfony\Component\Form\Form;
 use Symfony\Component\Form\FormFactoryInterface;
+use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\RouterInterface;
@@ -29,9 +29,7 @@ class TriggerApiController extends CommonApiController
     /**
      * @var TriggerModel|null
      */
-    protected $model = null;
-
-    private ?RequestStack $requestStack = null;
+    protected $model;
 
     public function __construct(
         CorePermissions $security,
@@ -40,15 +38,13 @@ class TriggerApiController extends CommonApiController
         RouterInterface $router,
         FormFactoryInterface $formFactory,
         AppVersion $appVersion,
-        RequestStack $requestStack,
+        private ?RequestStack $requestStack,
         ManagerRegistry $doctrine,
         ModelFactory $modelFactory,
         EventDispatcherInterface $dispatcher,
         CoreParametersHelper $coreParametersHelper,
         MauticFactory $factory
     ) {
-        $this->requestStack = $requestStack;
-
         $triggerModel = $modelFactory->getModel('point.trigger');
         \assert($triggerModel instanceof TriggerModel);
 
@@ -120,12 +116,7 @@ class TriggerApiController extends CommonApiController
         }
     }
 
-    /**
-     * Creates the form instance.
-     *
-     * @return Form
-     */
-    protected function createTriggerEventEntityForm($entity)
+    protected function createTriggerEventEntityForm($entity): FormInterface
     {
         $triggerEventModel = $this->getModel('point.triggerevent');
         \assert($triggerEventModel instanceof TriggerEventModel);

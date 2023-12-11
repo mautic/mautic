@@ -36,10 +36,8 @@ class FormRepository extends CommonRepository
      * @param int    $start
      * @param bool   $viewOther
      * @param null   $formType
-     *
-     * @return array
      */
-    public function getFormList($search = '', $limit = 10, $start = 0, $viewOther = false, $formType = null)
+    public function getFormList($search = '', $limit = 10, $start = 0, $viewOther = false, $formType = null): array
     {
         $q = $this->createQueryBuilder('f');
         $q->select('partial f.{id, name, alias}');
@@ -84,9 +82,9 @@ class FormRepository extends CommonRepository
     /**
      * {@inheritdoc}
      */
-    protected function addSearchCommandWhereClause($q, $filter)
+    protected function addSearchCommandWhereClause($q, $filter): array
     {
-        list($expr, $standardSearchParameters) = $this->addStandardSearchCommandWhereClause($q, $filter);
+        [$expr, $standardSearchParameters] = $this->addStandardSearchCommandWhereClause($q, $filter);
         if ($expr) {
             return [$expr, $standardSearchParameters];
         }
@@ -195,10 +193,8 @@ class FormRepository extends CommonRepository
      *
      * @param int    $formId
      * @param string $formAlias
-     *
-     * @return string
      */
-    public function getResultsTableName($formId, $formAlias)
+    public function getResultsTableName($formId, $formAlias): string
     {
         return MAUTIC_TABLE_PREFIX.'form_results_'.$formId.'_'.$formAlias;
     }
@@ -234,7 +230,7 @@ class FormRepository extends CommonRepository
     /**
      * {@inheritdoc}
      */
-    protected function getDefaultOrder()
+    protected function getDefaultOrder(): array
     {
         return [
             ['f.name', 'ASC'],
@@ -244,7 +240,7 @@ class FormRepository extends CommonRepository
     /**
      * {@inheritdoc}
      */
-    public function getTableAlias()
+    public function getTableAlias(): string
     {
         return 'f';
     }

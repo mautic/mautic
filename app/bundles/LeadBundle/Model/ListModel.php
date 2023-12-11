@@ -52,42 +52,17 @@ class ListModel extends FormModel
     use OperatorListTrait;
 
     /**
-     * @var CategoryModel
-     */
-    protected $categoryModel;
-
-    /**
-     * @var ContactSegmentService
-     */
-    private $leadSegmentService;
-
-    /**
      * @var mixed[]
      */
     private $choiceFieldsCache = [];
 
-    /**
-     * @var SegmentChartQueryFactory
-     */
-    private $segmentChartQueryFactory;
-
-    /**
-     * @var RequestStack
-     */
-    private $requestStack;
-
-    /**
-     * @var SegmentCountCacheHelper
-     */
-    private $segmentCountCacheHelper;
-
     public function __construct(
-        CategoryModel $categoryModel,
+        protected CategoryModel $categoryModel,
         CoreParametersHelper $coreParametersHelper,
-        ContactSegmentService $leadSegment,
-        SegmentChartQueryFactory $segmentChartQueryFactory,
-        RequestStack $requestStack,
-        SegmentCountCacheHelper $segmentCountCacheHelper,
+        private ContactSegmentService $leadSegmentService,
+        private SegmentChartQueryFactory $segmentChartQueryFactory,
+        private RequestStack $requestStack,
+        private SegmentCountCacheHelper $segmentCountCacheHelper,
         EntityManagerInterface $em,
         CorePermissions $security,
         EventDispatcherInterface $dispatcher,
@@ -96,12 +71,6 @@ class ListModel extends FormModel
         UserHelper $userHelper,
         LoggerInterface $mauticLogger
     ) {
-        $this->categoryModel            = $categoryModel;
-        $this->leadSegmentService       = $leadSegment;
-        $this->segmentChartQueryFactory = $segmentChartQueryFactory;
-        $this->requestStack             = $requestStack;
-        $this->segmentCountCacheHelper  = $segmentCountCacheHelper;
-
         parent::__construct($em, $security, $dispatcher, $router, $translator, $userHelper, $mauticLogger, $coreParametersHelper);
     }
 
@@ -140,10 +109,8 @@ class ListModel extends FormModel
 
     /**
      * {@inheritdoc}
-     *
-     * @return string
      */
-    public function getPermissionBase()
+    public function getPermissionBase(): string
     {
         return 'lead:lists';
     }
@@ -153,11 +120,9 @@ class ListModel extends FormModel
      *
      * @param bool $unlock
      *
-     * @return mixed|void
-     *
      * @throws \Doctrine\DBAL\Exception
      */
-    public function saveEntity($entity, $unlock = true)
+    public function saveEntity($entity, $unlock = true): void
     {
         $isNew = ($entity->getId()) ? false : true;
 
@@ -204,11 +169,9 @@ class ListModel extends FormModel
      * @param string|null $action
      * @param array       $options
      *
-     * @return mixed
-     *
      * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
      */
-    public function createForm($entity, FormFactoryInterface $formFactory, $action = null, $options = [])
+    public function createForm($entity, FormFactoryInterface $formFactory, $action = null, $options = []): \Symfony\Component\Form\FormInterface
     {
         if (!$entity instanceof LeadList) {
             throw new MethodNotAllowedHttpException(['LeadList'], 'Entity must be of class LeadList()');
@@ -240,7 +203,7 @@ class ListModel extends FormModel
      *
      * @throws \Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException
      */
-    protected function dispatchEvent($action, &$entity, $isNew = false, Event $event = null)
+    protected function dispatchEvent($action, &$entity, $isNew = false, Event $event = null): ?Event
     {
         if (!$entity instanceof LeadList) {
             throw new MethodNotAllowedHttpException(['LeadList'], 'Entity must be of class LeadList()');
@@ -282,9 +245,9 @@ class ListModel extends FormModel
     /**
      * Get a list of field choices for filters.
      *
-     * @return array
+     * @return mixed[]
      */
-    public function getChoiceFields(string $search = '')
+    public function getChoiceFields(string $search = ''): array
     {
         if ($this->choiceFieldsCache) {
             return $this->choiceFieldsCache;
@@ -311,9 +274,7 @@ class ListModel extends FormModel
 
         // Order choices by label.
         foreach ($choices as $key => $choice) {
-            $cmp = function ($a, $b) {
-                return strcmp($a['label'], $b['label']);
-            };
+            $cmp = fn ($a, $b): int => strcmp($a['label'], $b['label']);
             uasort($choice, $cmp);
             $choices[$key] = $choice;
         }
@@ -359,11 +320,9 @@ class ListModel extends FormModel
      * @param int      $limit
      * @param bool|int $maxLeads
      *
-     * @return int
-     *
      * @throws \Exception
      */
-    public function rebuildListLeads(LeadList $leadList, $limit = 100, $maxLeads = false, OutputInterface $output = null)
+    public function rebuildListLeads(LeadList $leadList, $limit = 100, $maxLeads = false, OutputInterface $output = null): int
     {
         defined('MAUTIC_REBUILDING_LEAD_LISTS') or define('MAUTIC_REBUILDING_LEAD_LISTS', 1);
 
@@ -381,10 +340,10 @@ class ListModel extends FormModel
         try {
             // Get a count of leads to add
             $newLeadsCount = $this->leadSegmentService->getNewLeadListLeadsCount($leadList, $batchLimiters);
-        } catch (FieldNotFoundException $e) {
+        } catch (FieldNotFoundException) {
             // A field from filter does not exist anymore. Do not rebuild.
             return 0;
-        } catch (SegmentNotFoundException $e) {
+        } catch (SegmentNotFoundException) {
             // A segment from filter does not exist anymore. Do not rebuild.
             return 0;
         }
@@ -402,13 +361,13 @@ class ListModel extends FormModel
         }
 
         // Handle by batches
-        $start = $lastRoundPercentage = $leadsProcessed = 0;
+        $start = $leadsProcessed = 0;
 
         // Try to save some memory
         gc_enable();
 
         if ($leadCount) {
-            $maxCount = ($maxLeads) ? $maxLeads : $leadCount;
+            $maxCount = $maxLeads ?: $leadCount;
 
             if ($output) {
                 $progress = ProgressBarHelper::init($output, $maxCount);
@@ -486,7 +445,7 @@ class ListModel extends FormModel
         $batchLimiters['maxId'] = (int) $orphanLeadsCount[$segmentId]['maxId'];
 
         // Restart batching
-        $start     = $lastRoundPercentage     = 0;
+        $start     = 0;
         $leadCount = $orphanLeadsCount[$segmentId]['count'];
 
         if ($output) {
@@ -494,7 +453,7 @@ class ListModel extends FormModel
         }
 
         if ($leadCount) {
-            $maxCount = ($maxLeads) ? $maxLeads : $leadCount;
+            $maxCount = $maxLeads ?: $leadCount;
 
             if ($output) {
                 $progress = ProgressBarHelper::init($output, $maxCount);
@@ -576,7 +535,7 @@ class ListModel extends FormModel
      *
      * @throws \Exception
      */
-    public function addLead($lead, $lists, $manuallyAdded = false, $batchProcess = false, $searchListLead = 1, $dateManipulated = null)
+    public function addLead($lead, $lists, $manuallyAdded = false, $batchProcess = false, $searchListLead = 1, $dateManipulated = null): void
     {
         if (null == $dateManipulated) {
             $dateManipulated = new \DateTime();
@@ -713,7 +672,7 @@ class ListModel extends FormModel
      *
      * @throws \Exception
      */
-    public function removeLead($lead, $lists, $manuallyRemoved = false, $batchProcess = false, $skipFindOne = false)
+    public function removeLead($lead, $lists, $manuallyRemoved = false, $batchProcess = false, $skipFindOne = false): void
     {
         if (!$lead instanceof Lead) {
             $leadId = (is_array($lead) && isset($lead['id'])) ? $lead['id'] : $lead;
@@ -844,7 +803,7 @@ class ListModel extends FormModel
         }
 
         if ($leadSleepTime < 1) {
-            usleep($leadSleepTime * 1000000);
+            usleep($leadSleepTime * 1_000_000);
         } else {
             sleep($leadSleepTime);
         }
@@ -987,10 +946,8 @@ class ListModel extends FormModel
      * @param null  $dateFormat
      * @param array $filter
      * @param bool  $canViewOthers
-     *
-     * @return array
      */
-    public function getStagesBarChartData($unit, \DateTime $dateFrom, \DateTime $dateTo, $dateFormat = null, $filter = [], $canViewOthers = true)
+    public function getStagesBarChartData($unit, \DateTime $dateFrom, \DateTime $dateTo, $dateFormat = null, $filter = [], $canViewOthers = true): array
     {
         $data['values'] = [];
         $data['labels'] = [];
@@ -1051,10 +1008,8 @@ class ListModel extends FormModel
      * @param null  $dateFormat
      * @param array $filter
      * @param bool  $canViewOthers
-     *
-     * @return array
      */
-    public function getDeviceGranularityData($unit, \DateTime $dateFrom, \DateTime $dateTo, $dateFormat = null, $filter = [], $canViewOthers = true)
+    public function getDeviceGranularityData($unit, \DateTime $dateFrom, \DateTime $dateTo, $dateFormat = null, $filter = [], $canViewOthers = true): array
     {
         $data['values'] = [];
         $data['labels'] = [];
@@ -1143,10 +1098,8 @@ class ListModel extends FormModel
 
     /**
      * Is custom field used in at least one defined segment?
-     *
-     * @return bool
      */
-    public function isFieldUsed(LeadField $field)
+    public function isFieldUsed(LeadField $field): bool
     {
         return 0 < $this->getFieldSegments($field)->count();
     }
@@ -1209,10 +1162,8 @@ class ListModel extends FormModel
      * Get segments which are used as a dependent by other segments to prevent batch deletion of them.
      *
      * @param array $segmentIds
-     *
-     * @return array
      */
-    public function canNotBeDeleted($segmentIds)
+    public function canNotBeDeleted($segmentIds): array
     {
         $entities = $this->getEntities(
             [
@@ -1274,10 +1225,8 @@ class ListModel extends FormModel
             case null:
                 $choices['categories'] = [];
                 $categories            = $this->categoryModel->getLookupResults('segment');
-                if ($categories) {
-                    foreach ($categories as $category) {
-                        $choices['categories'][$category['id']] = $category['title'];
-                    }
+                foreach ($categories as $category) {
+                    $choices['categories'][$category['id']] = $category['title'];
                 }
         }
 

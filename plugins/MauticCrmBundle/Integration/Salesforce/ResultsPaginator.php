@@ -8,11 +8,6 @@ use Psr\Log\LoggerInterface;
 class ResultsPaginator
 {
     /**
-     * @var LoggerInterface
-     */
-    private $logger;
-
-    /**
      * @var array
      */
     private $results;
@@ -38,17 +33,10 @@ class ResultsPaginator
     private $nextRecordsUrl;
 
     /**
-     * @var string
-     */
-    private $salesforceBaseUrl;
-
-    /**
      * @param string $salesforceBaseUrl
      */
-    public function __construct(LoggerInterface $logger, $salesforceBaseUrl)
+    public function __construct(private LoggerInterface $logger, private $salesforceBaseUrl)
     {
-        $this->logger            = $logger;
-        $this->salesforceBaseUrl = $salesforceBaseUrl;
     }
 
     /**
@@ -80,7 +68,7 @@ class ResultsPaginator
             $this->retryCount     = 0;
             $this->nextRecordsUrl = $this->results['nextRecordsUrl'];
 
-            if (false === strpos($this->nextRecordsUrl, $this->salesforceBaseUrl)) {
+            if (!str_contains($this->nextRecordsUrl, $this->salesforceBaseUrl)) {
                 $this->nextRecordsUrl = $this->salesforceBaseUrl.$this->nextRecordsUrl;
             }
 
@@ -108,10 +96,7 @@ class ResultsPaginator
         return '';
     }
 
-    /**
-     * @return int
-     */
-    public function getTotal()
+    public function getTotal(): int
     {
         return (int) $this->totalRecords;
     }

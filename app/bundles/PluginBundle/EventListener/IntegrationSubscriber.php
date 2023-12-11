@@ -14,20 +14,11 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
  */
 class IntegrationSubscriber implements EventSubscriberInterface
 {
-    /**
-     * @var LoggerInterface
-     */
-    private $logger;
-
-    public function __construct(LoggerInterface $logger)
+    public function __construct(private LoggerInterface $logger)
     {
-        $this->logger = $logger;
     }
 
-    /**
-     * @return array
-     */
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             PluginEvents::PLUGIN_ON_INTEGRATION_RESPONSE => ['onResponse', 0],
@@ -38,7 +29,7 @@ class IntegrationSubscriber implements EventSubscriberInterface
     /*
      * Request event
      */
-    public function onRequest(PluginIntegrationRequestEvent $event)
+    public function onRequest(PluginIntegrationRequestEvent $event): void
     {
         $name     = strtoupper($event->getIntegrationName());
         $headers  = var_export($event->getHeaders(), true);
@@ -72,7 +63,7 @@ class IntegrationSubscriber implements EventSubscriberInterface
     /*
      * Response event
      */
-    public function onResponse(PluginIntegrationRequestEvent $event)
+    public function onResponse(PluginIntegrationRequestEvent $event): void
     {
         $response = $event->getResponse();
         $headers  = var_export($response->getHeaders(), true);

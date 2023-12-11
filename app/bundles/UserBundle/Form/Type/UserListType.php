@@ -9,20 +9,14 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class UserListType extends AbstractType
 {
-    /**
-     * @var UserModel
-     */
-    private $userModel;
-
-    public function __construct(UserModel $userModel)
+    public function __construct(private UserModel $userModel)
     {
-        $this->userModel = $userModel;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function configureOptions(OptionsResolver $resolver)
+    public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults(
             [
@@ -43,10 +37,7 @@ class UserListType extends AbstractType
         return ChoiceType::class;
     }
 
-    /**
-     * @return array
-     */
-    private function getUserChoices()
+    private function getUserChoices(): array
     {
         $choices = [];
         $users   = $this->userModel->getRepository()->getEntities(

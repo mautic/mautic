@@ -12,20 +12,11 @@ class SegmentLogReportSubscriber implements EventSubscriberInterface
 {
     public const SEGMENT_LOG = 'segment.log';
 
-    /**
-     * @var FieldsBuilder
-     */
-    private $fieldsBuilder;
-
-    public function __construct(FieldsBuilder $fieldsBuilder)
+    public function __construct(private FieldsBuilder $fieldsBuilder)
     {
-        $this->fieldsBuilder = $fieldsBuilder;
     }
 
-    /**
-     * @return array
-     */
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             ReportEvents::REPORT_ON_BUILD    => ['onReportBuilder', 0],
@@ -36,7 +27,7 @@ class SegmentLogReportSubscriber implements EventSubscriberInterface
     /**
      * Add available tables and columns to the report builder lookup.
      */
-    public function onReportBuilder(ReportBuilderEvent $event)
+    public function onReportBuilder(ReportBuilderEvent $event): void
     {
         if (!$event->checkContext([self::SEGMENT_LOG])) {
             return;
@@ -76,7 +67,7 @@ class SegmentLogReportSubscriber implements EventSubscriberInterface
     /**
      * Initialize the QueryBuilder object to generate reports from.
      */
-    public function onReportGenerate(ReportGeneratorEvent $event)
+    public function onReportGenerate(ReportGeneratorEvent $event): void
     {
         if (!$event->checkContext([self::SEGMENT_LOG])) {
             return;
@@ -113,10 +104,8 @@ class SegmentLogReportSubscriber implements EventSubscriberInterface
     /**
      * @param string $alias
      * @param string $action
-     *
-     * @return string
      */
-    private function generateLeftJoinCondition($alias, $action)
+    private function generateLeftJoinCondition($alias, $action): string
     {
         return 'l.id = '.$alias.'.lead_id  AND '.$alias.'.bundle = \'lead\' AND '.$alias.'.object = \'segment\'  AND '.$alias.'.`action` =\''.$action.'\' AND '.$alias.'.date_added BETWEEN :dateFrom AND :dateTo';
     }

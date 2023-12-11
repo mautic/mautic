@@ -27,7 +27,7 @@ class TriggerEventModel extends CommonFormModel
     /**
      * {@inheritdoc}
      */
-    public function getPermissionBase()
+    public function getPermissionBase(): string
     {
         return 'point:triggers';
     }
@@ -51,7 +51,7 @@ class TriggerEventModel extends CommonFormModel
      *
      * @throws MethodNotAllowedHttpException
      */
-    public function createForm($entity, FormFactoryInterface $formFactory, $action = null, $options = [])
+    public function createForm($entity, FormFactoryInterface $formFactory, $action = null, $options = []): \Symfony\Component\Form\FormInterface
     {
         if (!$entity instanceof TriggerEvent) {
             throw new MethodNotAllowedHttpException(['Trigger']);
@@ -68,10 +68,8 @@ class TriggerEventModel extends CommonFormModel
      * Get segments which are dependent on given segment.
      *
      * @param int $segmentId
-     *
-     * @return array
      */
-    public function getReportIdsWithDependenciesOnSegment($segmentId)
+    public function getReportIdsWithDependenciesOnSegment($segmentId): array
     {
         $filter = [
             'force'  => [

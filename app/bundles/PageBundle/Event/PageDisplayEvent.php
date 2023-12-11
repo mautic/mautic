@@ -5,34 +5,13 @@ namespace Mautic\PageBundle\Event;
 use Mautic\PageBundle\Entity\Page;
 use Symfony\Contracts\EventDispatcher\Event;
 
-/**
- * Class PageDisplayEvent.
- */
 class PageDisplayEvent extends Event
 {
     /**
-     * @var string
+     * @param string $content
      */
-    private $content;
-
-    /**
-     * @var Page
-     */
-    private $page;
-
-    /**
-     * @var array
-     */
-    private $params;
-
-    /**
-     * PageDisplayEvent constructor.
-     */
-    public function __construct($content, Page $page, array $params = [], private bool $trackingDisabled = false)
+    public function __construct(private $content, private Page $page, private array $params = [], , private bool $trackingDisabled = false)
     {
-        $this->page    = $page;
-        $this->content = $content;
-        $this->params  = $params;
     }
 
     /**
@@ -60,7 +39,7 @@ class PageDisplayEvent extends Event
      *
      * @param string $content
      */
-    public function setContent($content)
+    public function setContent($content): void
     {
         $this->content = $content;
     }
@@ -80,7 +59,7 @@ class PageDisplayEvent extends Event
      *
      * @param array $params
      */
-    public function setParams($params)
+    public function setParams($params): void
     {
         $this->params = $params;
     }

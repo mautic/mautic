@@ -12,26 +12,11 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class DetermineWinnerSubscriber implements EventSubscriberInterface
 {
-    /**
-     * @var EntityManagerInterface
-     */
-    private $em;
-
-    /**
-     * @var TranslatorInterface
-     */
-    private $translator;
-
-    public function __construct(EntityManagerInterface $em, TranslatorInterface $translator)
+    public function __construct(private EntityManagerInterface $em, private TranslatorInterface $translator)
     {
-        $this->em         = $em;
-        $this->translator = $translator;
     }
 
-    /**
-     * @return array
-     */
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             AssetEvents::ON_DETERMINE_DOWNLOAD_RATE_WINNER => ['onDetermineDownloadRateWinner', 0],
@@ -41,7 +26,7 @@ class DetermineWinnerSubscriber implements EventSubscriberInterface
     /**
      * Determines the winner of A/B test based on number of asset downloads.
      */
-    public function onDetermineDownloadRateWinner(DetermineWinnerEvent $event)
+    public function onDetermineDownloadRateWinner(DetermineWinnerEvent $event): void
     {
         $repo       = $this->em->getRepository(Download::class);
         $parameters = $event->getParameters();

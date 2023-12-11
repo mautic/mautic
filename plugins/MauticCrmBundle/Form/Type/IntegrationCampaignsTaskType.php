@@ -12,14 +12,11 @@ use Symfony\Component\Validator\Context\ExecutionContextInterface;
 
 class IntegrationCampaignsTaskType extends AbstractType
 {
-    private $connectwiseIntegration;
-
-    public function __construct(ConnectwiseIntegration $connectwiseIntegration)
+    public function __construct(private ConnectwiseIntegration $connectwiseIntegration)
     {
-        $this->connectwiseIntegration = $connectwiseIntegration;
     }
 
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder->add(
             'activity_name',
@@ -30,7 +27,7 @@ class IntegrationCampaignsTaskType extends AbstractType
                 'attr'        => ['class' => 'form-control'],
                 'constraints' => [
                     new Callback(
-                        function ($validateMe, ExecutionContextInterface $context) {
+                        function ($validateMe, ExecutionContextInterface $context): void {
                             $data = $context->getRoot()->getData();
                             if (!empty($data['properties']['config']['push_activities']) && empty($validateMe)) {
                                 $context->buildViolation('mautic.core.value.required')->addViolation();
@@ -61,7 +58,7 @@ class IntegrationCampaignsTaskType extends AbstractType
                 'label'             => 'mautic.plugin.integration.campaigns.connectwise.members',
                 'constraints'       => [
                     new Callback(
-                        function ($validateMe, ExecutionContextInterface $context) {
+                        function ($validateMe, ExecutionContextInterface $context): void {
                             $data = $context->getRoot()->getData();
                             if (!empty($data['properties']['config']['push_activities']) && empty($validateMe)) {
                                 $context->buildViolation('mautic.core.value.required')->addViolation();

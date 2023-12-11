@@ -12,15 +12,9 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class FetchLeadsCommand extends Command
 {
-    private TranslatorInterface $translator;
-    private IntegrationHelper $integrationHelper;
-
-    public function __construct(TranslatorInterface $translator, IntegrationHelper $integrationHelper)
+    public function __construct(private TranslatorInterface $translator, private IntegrationHelper $integrationHelper)
     {
         parent::__construct();
-
-        $this->translator        = $translator;
-        $this->integrationHelper = $integrationHelper;
     }
 
     protected function configure()
@@ -88,9 +82,7 @@ class FetchLeadsCommand extends Command
         $integrationObject = $this->integrationHelper->getIntegrationObject($integration);
         if (!$integrationObject instanceof UnifiedIntegrationInterface) {
             $availableIntegrations = array_filter($this->integrationHelper->getIntegrationObjects(),
-                function (UnifiedIntegrationInterface $availableIntegration) {
-                    return $availableIntegration->isConfigured();
-                });
+                fn (UnifiedIntegrationInterface $availableIntegration) => $availableIntegration->isConfigured());
             throw new \RuntimeException(sprintf('The Integration "%s" is not one of the available integrations (%s)', $integration, implode(', ', array_keys($availableIntegrations))));
         }
 
@@ -148,9 +140,7 @@ class FetchLeadsCommand extends Command
                     $leadObjectName = 'Leads';
                 }
                 $contactObjectName = 'Contact';
-                if (in_array(strtolower('Contacts'), array_map(function ($i) {
-                    return strtolower($i);
-                }, $config['objects']), true)) {
+                if (in_array(strtolower('Contacts'), array_map(fn ($i): string => strtolower($i), $config['objects']), true)) {
                     $contactObjectName = 'Contacts';
                 }
 
@@ -159,22 +149,20 @@ class FetchLeadsCommand extends Command
                     $leadList = [];
                     $results  = $integrationObject->getLeads($params, null, $leadsExecuted, $leadList, $leadObjectName);
                     if (is_array($results)) {
-                        list($justUpdated, $justCreated) = $results;
+                        [$justUpdated, $justCreated] = $results;
                         $updated += (int) $justUpdated;
                         $created += (int) $justCreated;
                     } else {
                         $processed += (int) $results;
                     }
                 }
-                if (in_array(strtolower($contactObjectName), array_map(function ($i) {
-                    return strtolower($i);
-                }, $config['objects']), true)) {
+                if (in_array(strtolower($contactObjectName), array_map(fn ($i): string => strtolower($i), $config['objects']), true)) {
                     $output->writeln('');
                     $output->writeln('<comment>'.$this->translator->trans('mautic.plugin.command.fetch.contacts.starting').'</comment>');
                     $contactList = [];
                     $results     = $integrationObject->getLeads($params, null, $contactsExecuted, $contactList, $contactObjectName);
                     if (is_array($results)) {
-                        list($justUpdated, $justCreated) = $results;
+                        [$justUpdated, $justCreated] = $results;
                         $updated += (int) $justUpdated;
                         $created += (int) $justCreated;
                     } else {
@@ -212,7 +200,7 @@ class FetchLeadsCommand extends Command
 
                 $results = $integrationObject->getCompanies($params);
                 if (is_array($results)) {
-                    list($justUpdated, $justCreated) = $results;
+                    [$justUpdated, $justCreated] = $results;
                     $updated += (int) $justUpdated;
                     $created += (int) $justCreated;
                 } else {
@@ -242,12 +230,12 @@ class FetchLeadsCommand extends Command
             $ignored = 0;
 
             if (4 === count($result)) {
-                list($updated, $created, $errored, $ignored) = $result;
+                [$updated, $created, $errored, $ignored] = $result;
             } elseif (3 === count($result)) {
-                list($updated, $created, $errored) = $result;
+                [$updated, $created, $errored] = $result;
             } else {
                 $errored                 = '?';
-                list($updated, $created) = $result;
+                [$updated, $created]     = $result;
             }
             $output->writeln(
                 '<comment>'.$this->translator->trans(
@@ -268,12 +256,12 @@ class FetchLeadsCommand extends Command
                 $ignored = 0;
 
                 if (4 === count($result)) {
-                    list($updated, $created, $errored, $ignored) = $result;
+                    [$updated, $created, $errored, $ignored] = $result;
                 } elseif (3 === count($result)) {
-                    list($updated, $created, $errored) = $result;
+                    [$updated, $created, $errored] = $result;
                 } else {
                     $errored                 = '?';
-                    list($updated, $created) = $result;
+                    [$updated, $created]     = $result;
                 }
                 $output->writeln(
                     '<comment>'.$this->translator->trans(

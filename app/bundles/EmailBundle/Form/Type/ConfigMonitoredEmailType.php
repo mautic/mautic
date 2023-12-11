@@ -10,17 +10,11 @@ use Symfony\Component\Form\FormBuilderInterface;
 
 class ConfigMonitoredEmailType extends AbstractType
 {
-    /**
-     * @var EventDispatcherInterface
-     */
-    private $dispatcher;
-
-    public function __construct(EventDispatcherInterface $dispatcher)
+    public function __construct(private EventDispatcherInterface $dispatcher)
     {
-        $this->dispatcher = $dispatcher;
     }
 
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         if (function_exists('imap_open')) {
             $data  = $options['data'];

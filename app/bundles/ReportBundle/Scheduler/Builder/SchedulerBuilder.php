@@ -12,12 +12,8 @@ use Recurr\Transformer\ArrayTransformer;
 
 class SchedulerBuilder
 {
-    /** @var SchedulerTemplateFactory */
-    private $schedulerTemplateFactory;
-
-    public function __construct(SchedulerTemplateFactory $schedulerTemplateFactory)
+    public function __construct(private SchedulerTemplateFactory $schedulerTemplateFactory)
     {
-        $this->schedulerTemplateFactory = $schedulerTemplateFactory;
     }
 
     /**
@@ -60,7 +56,7 @@ class SchedulerBuilder
             $transformer    = new ArrayTransformer();
 
             return $transformer->transform($finalScheduler);
-        } catch (InvalidWeekday $e) {
+        } catch (InvalidWeekday) {
             throw new InvalidSchedulerException();
         }
     }

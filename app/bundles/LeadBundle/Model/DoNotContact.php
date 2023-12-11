@@ -11,23 +11,8 @@ use Mautic\LeadBundle\Entity\Lead;
 
 class DoNotContact implements MauticModelInterface
 {
-    /**
-     * @var LeadModel
-     */
-    protected $leadModel;
-
-    /**
-     * @var DoNotContactRepository
-     */
-    protected $dncRepo;
-
-    /**
-     * DoNotContact constructor.
-     */
-    public function __construct(LeadModel $leadModel, DoNotContactRepository $dncRepo)
+    public function __construct(protected LeadModel $leadModel, protected DoNotContactRepository $dncRepo)
     {
-        $this->leadModel = $leadModel;
-        $this->dncRepo   = $dncRepo;
     }
 
     /**
@@ -37,10 +22,8 @@ class DoNotContact implements MauticModelInterface
      * @param string    $channel
      * @param bool|true $persist
      * @param int|null  $reason
-     *
-     * @return bool
      */
-    public function removeDncForContact($contactId, $channel, $persist = true, $reason = null)
+    public function removeDncForContact($contactId, $channel, $persist = true, $reason = null): bool
     {
         $contact = $this->leadModel->getEntity($contactId);
 
@@ -172,10 +155,8 @@ class DoNotContact implements MauticModelInterface
 
     /**
      * @param null $comments
-     *
-     * @return DNC
      */
-    public function createDncRecord(Lead $contact, $channel, $reason, $comments = null)
+    public function createDncRecord(Lead $contact, $channel, $reason, $comments = null): DNC
     {
         $dnc = new DNC();
 
@@ -200,7 +181,7 @@ class DoNotContact implements MauticModelInterface
     /**
      * @param null $comments
      */
-    public function updateDncRecord(DNC $dnc, Lead $contact, $channel, $reason, $comments = null)
+    public function updateDncRecord(DNC $dnc, Lead $contact, $channel, $reason, $comments = null): void
     {
         // Update the DNC entry
         $dnc->setChannel($channel);

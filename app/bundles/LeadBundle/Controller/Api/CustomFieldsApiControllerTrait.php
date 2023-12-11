@@ -161,7 +161,7 @@ trait CustomFieldsApiControllerTrait
             // we have to assume 0 was not meant to overwrite an existing value. Other empty values will be caught by LeadModel::setFieldValues
             $parameters = array_filter(
                 $parameters,
-                function ($value) {
+                function ($value): bool {
                     if (is_numeric($value)) {
                         return 0 !== (int) $value;
                     }

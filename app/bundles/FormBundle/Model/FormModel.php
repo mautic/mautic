@@ -43,80 +43,20 @@ use Twig\Environment;
  */
 class FormModel extends CommonFormModel
 {
-    /**
-     * @var RequestStack
-     */
-    protected $requestStack;
-
-    /**
-     * @var Environment
-     */
-    protected $twig;
-
-    /**
-     * @var ThemeHelperInterface
-     */
-    protected $themeHelper;
-
-    /**
-     * @var ActionModel
-     */
-    protected $formActionModel;
-
-    /**
-     * @var FieldModel
-     */
-    protected $formFieldModel;
-
-    /**
-     * @var FormFieldHelper
-     */
-    protected $fieldHelper;
-
-    /**
-     * @var LeadFieldModel
-     */
-    protected $leadFieldModel;
-
-    /**
-     * @var FormUploader
-     */
-    private $formUploader;
-
-    /**
-     * @var ContactTracker
-     */
-    private $contactTracker;
-
-    /**
-     * @var ColumnSchemaHelper
-     */
-    private $columnSchemaHelper;
-
-    /**
-     * @var TableSchemaHelper
-     */
-    private $tableSchemaHelper;
-
-    /**
-     * @var MappedObjectCollectorInterface
-     */
-    private $mappedObjectCollector;
-
     public function __construct(
-        RequestStack $requestStack,
-        Environment $twig,
-        ThemeHelperInterface $themeHelper,
-        ActionModel $formActionModel,
-        FieldModel $formFieldModel,
-        FormFieldHelper $fieldHelper,
+        protected RequestStack $requestStack,
+        protected Environment $twig,
+        protected ThemeHelperInterface $themeHelper,
+        protected ActionModel $formActionModel,
+        protected FieldModel $formFieldModel,
+        protected FormFieldHelper $fieldHelper,
         private PrimaryCompanyHelper $primaryCompanyHelper,
-        LeadFieldModel $leadFieldModel,
-        FormUploader $formUploader,
-        ContactTracker $contactTracker,
-        ColumnSchemaHelper $columnSchemaHelper,
-        TableSchemaHelper $tableSchemaHelper,
-        MappedObjectCollectorInterface $mappedObjectCollector,
+        protected LeadFieldModel $leadFieldModel,
+        private FormUploader $formUploader,
+        private ContactTracker $contactTracker,
+        private ColumnSchemaHelper $columnSchemaHelper,
+        private TableSchemaHelper $tableSchemaHelper,
+        private MappedObjectCollectorInterface $mappedObjectCollector,
         EntityManagerInterface $em,
         CorePermissions $security,
         EventDispatcherInterface $dispatcher,
@@ -126,19 +66,6 @@ class FormModel extends CommonFormModel
         LoggerInterface $mauticLogger,
         CoreParametersHelper $coreParametersHelper
     ) {
-        $this->requestStack           = $requestStack;
-        $this->twig                   = $twig;
-        $this->themeHelper            = $themeHelper;
-        $this->formActionModel        = $formActionModel;
-        $this->formFieldModel         = $formFieldModel;
-        $this->fieldHelper            = $fieldHelper;
-        $this->leadFieldModel         = $leadFieldModel;
-        $this->formUploader           = $formUploader;
-        $this->contactTracker         = $contactTracker;
-        $this->columnSchemaHelper     = $columnSchemaHelper;
-        $this->tableSchemaHelper      = $tableSchemaHelper;
-        $this->mappedObjectCollector  = $mappedObjectCollector;
-
         parent::__construct($em, $security, $dispatcher, $router, $translator, $userHelper, $mauticLogger, $coreParametersHelper);
     }
 
@@ -155,7 +82,7 @@ class FormModel extends CommonFormModel
     /**
      * {@inheritdoc}
      */
-    public function getPermissionBase()
+    public function getPermissionBase(): string
     {
         return 'form:forms';
     }
@@ -163,7 +90,7 @@ class FormModel extends CommonFormModel
     /**
      * {@inheritdoc}
      */
-    public function getNameGetter()
+    public function getNameGetter(): string
     {
         return 'getName';
     }
@@ -171,7 +98,7 @@ class FormModel extends CommonFormModel
     /**
      * {@inheritdoc}
      */
-    public function createForm($entity, FormFactoryInterface $formFactory, $action = null, $options = [])
+    public function createForm($entity, FormFactoryInterface $formFactory, $action = null, $options = []): \Symfony\Component\Form\FormInterface
     {
         if (!$entity instanceof Form) {
             throw new MethodNotAllowedHttpException(['Form']);
@@ -207,13 +134,9 @@ class FormModel extends CommonFormModel
     }
 
     /**
-     * {@inheritdoc}
-     *
-     * @return bool|FormEvent|Event|void|null
-     *
      * @throws \Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException
      */
-    protected function dispatchEvent($action, &$entity, $isNew = false, Event $event = null)
+    protected function dispatchEvent($action, &$entity, $isNew = false, Event $event = null): ?Event
     {
         if (!$entity instanceof Form) {
             throw new MethodNotAllowedHttpException(['Form']);
@@ -250,7 +173,7 @@ class FormModel extends CommonFormModel
         }
     }
 
-    public function setFields(Form $entity, $sessionFields)
+    public function setFields(Form $entity, $sessionFields): void
     {
         $order          = 1;
         $existingFields = $entity->getFields()->toArray();
@@ -304,7 +227,7 @@ class FormModel extends CommonFormModel
         }
     }
 
-    public function deleteFields(Form $entity, $sessionFields)
+    public function deleteFields(Form $entity, $sessionFields): void
     {
         if (empty($sessionFields)) {
             return;
@@ -327,7 +250,7 @@ class FormModel extends CommonFormModel
         }
     }
 
-    private function handleFilesDelete(Field $field)
+    private function handleFilesDelete(Field $field): void
     {
         if (!$field->isFileType()) {
             return;
@@ -336,7 +259,7 @@ class FormModel extends CommonFormModel
         $this->formUploader->deleteAllFilesOfFormField($field);
     }
 
-    public function setActions(Form $entity, $sessionActions)
+    public function setActions(Form $entity, $sessionActions): void
     {
         $order           = 1;
         $existingActions = $entity->getActions()->toArray();
@@ -362,7 +285,7 @@ class FormModel extends CommonFormModel
                 if ('properties' == $f) {
                     if (isset($v['mappedFields'])) {
                         foreach ($v['mappedFields'] as $pk => $pv) {
-                            if (false !== strpos($pv, 'new')) {
+                            if (str_contains($pv, 'new')) {
                                 $v['mappedFields'][$pk] = $fieldIds[$pv];
                             }
                         }
@@ -388,7 +311,7 @@ class FormModel extends CommonFormModel
     /**
      * @param array $actions
      */
-    public function deleteActions(Form $entity, $actions)
+    public function deleteActions(Form $entity, $actions): void
     {
         if (empty($actions)) {
             return;
@@ -413,7 +336,7 @@ class FormModel extends CommonFormModel
     /**
      * {@inheritdoc}
      */
-    public function saveEntity($entity, $unlock = true)
+    public function saveEntity($entity, $unlock = true): void
     {
         $isNew = ($entity->getId()) ? false : true;
 
@@ -503,10 +426,8 @@ class FormModel extends CommonFormModel
      * Generate the form's html.
      *
      * @param bool $persist
-     *
-     * @return string
      */
-    public function generateHtml(Form $entity, $persist = true)
+    public function generateHtml(Form $entity, $persist = true): string
     {
         $theme         = $entity->getTemplate();
         $submissions   = null;
@@ -537,13 +458,7 @@ class FormModel extends CommonFormModel
         $fields = $entity->getFields()->toArray();
 
         // Ensure the correct order in case this is generated right after a form save with new fields
-        uasort($fields, function ($a, $b) {
-            if ($a->getOrder() === $b->getOrder()) {
-                return 0;
-            }
-
-            return ($a->getOrder() < $b->getOrder()) ? -1 : 1;
-        });
+        uasort($fields, fn ($a, $b): int => $a->getOrder() <=> $b->getOrder());
 
         $viewOnlyFields     = $this->getCustomComponents()['viewOnlyFields'];
         $displayManager     = new DisplayManager($entity, !empty($viewOnlyFields) ? $viewOnlyFields : []);
@@ -627,7 +542,7 @@ class FormModel extends CommonFormModel
      * @param bool $isNew
      * @param bool $dropExisting
      */
-    public function createTableSchema(Form $entity, $isNew = false, $dropExisting = false)
+    public function createTableSchema(Form $entity, $isNew = false, $dropExisting = false): void
     {
         // create the field as its own column in the leads table
         $name         = 'form_results_'.$entity->getId().'_'.$entity->getAlias();
@@ -657,7 +572,7 @@ class FormModel extends CommonFormModel
     /**
      * {@inheritdoc}
      */
-    public function deleteEntity($entity)
+    public function deleteEntity($entity): void
     {
         /* @var Form $entity */
         $this->deleteFormFiles($entity);
@@ -671,9 +586,11 @@ class FormModel extends CommonFormModel
     }
 
     /**
-     * {@inheritdoc}
+     * @param mixed[] $ids
+     *
+     * @return mixed[]
      */
-    public function deleteEntities($ids)
+    public function deleteEntities($ids): array
     {
         $entities     = parent::deleteEntities($ids);
         foreach ($entities as $id => $entity) {
@@ -687,17 +604,15 @@ class FormModel extends CommonFormModel
         return $entities;
     }
 
-    private function deleteFormFiles(Form $form)
+    private function deleteFormFiles(Form $form): void
     {
         $this->formUploader->deleteFilesOfForm($form);
     }
 
     /**
      * Generate an array of columns from fields.
-     *
-     * @return array
      */
-    public function generateFieldColumns(Form $form)
+    public function generateFieldColumns(Form $form): array
     {
         $fields = $form->getFields()->toArray();
 
@@ -760,10 +675,8 @@ class FormModel extends CommonFormModel
 
     /**
      * Get the document write javascript for the form.
-     *
-     * @return string
      */
-    public function getAutomaticJavascript(Form $form)
+    public function getAutomaticJavascript(Form $form): string
     {
         $html       = $this->getContent($form, false);
         $formScript = $this->getFormScript($form);
@@ -791,10 +704,7 @@ class FormModel extends CommonFormModel
         return $script;
     }
 
-    /**
-     * @return string
-     */
-    public function getFormScript(Form $form)
+    public function getFormScript(Form $form): string
     {
         $theme          = $form->getTemplate();
         $scriptToRender = '@MauticForm/Builder/_script.html.twig';
@@ -826,7 +736,7 @@ class FormModel extends CommonFormModel
     /**
      * Writes in form values from get parameters.
      */
-    public function populateValuesWithGetParameters(Form $form, &$formHtml)
+    public function populateValuesWithGetParameters(Form $form, &$formHtml): void
     {
         $formName = $form->generateFormName();
         $request  = $this->requestStack->getCurrentRequest();
@@ -846,7 +756,7 @@ class FormModel extends CommonFormModel
     /**
      * @param string $formHtml
      */
-    public function populateValuesWithLead(Form $form, &$formHtml)
+    public function populateValuesWithLead(Form $form, &$formHtml): void
     {
         $formName          = $form->generateFormName();
         $fields            = $form->getFields();
@@ -892,10 +802,8 @@ class FormModel extends CommonFormModel
 
     /**
      * @param null $operator
-     *
-     * @return array
      */
-    public function getFilterExpressionFunctions($operator = null)
+    public function getFilterExpressionFunctions($operator = null): array
     {
         $operatorOptions = [
             '=' => [
@@ -961,11 +869,9 @@ class FormModel extends CommonFormModel
     /**
      * Get a list of assets in a date range.
      *
-     * @param int       $limit
-     * @param \DateTime $dateFrom
-     * @param \DateTime $dateTo
-     * @param array     $filters
-     * @param array     $options
+     * @param int   $limit
+     * @param array $filters
+     * @param array $options
      *
      * @return array
      */
@@ -991,7 +897,7 @@ class FormModel extends CommonFormModel
     /**
      * Load HTML consider Libxml < 2.7.8.
      */
-    private function loadHTML(&$dom, $html)
+    private function loadHTML(&$dom, $html): void
     {
         if (defined('LIBXML_HTML_NOIMPLIED') && defined('LIBXML_HTML_NODEFDTD')) {
             $dom->loadHTML(mb_convert_encoding($html, 'HTML-ENTITIES', 'UTF-8'), LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD);
@@ -1017,10 +923,8 @@ class FormModel extends CommonFormModel
 
     /**
      * Extract script from html.
-     *
-     * @return array
      */
-    private function extractScriptTag($html)
+    private function extractScriptTag($html): array
     {
         libxml_use_internal_errors(true);
         $dom = new \DOMDocument();
@@ -1037,10 +941,8 @@ class FormModel extends CommonFormModel
 
     /**
      * Remove script from html.
-     *
-     * @return string
      */
-    private function removeScriptTag($html)
+    private function removeScriptTag($html): string
     {
         libxml_use_internal_errors(true);
         $dom = new \DOMDocument();
@@ -1067,10 +969,8 @@ class FormModel extends CommonFormModel
 
     /**
      * Generate dom manipulation javascript to include all script.
-     *
-     * @return string
      */
-    private function generateJsScript($html)
+    private function generateJsScript($html): string
     {
         libxml_use_internal_errors(true);
         $dom = new \DOMDocument();
@@ -1188,7 +1088,7 @@ class FormModel extends CommonFormModel
             } elseif ($field->getLeadField() && !$field->getMappedField()) {
                 $field->setMappedField($field->getLeadField());
                 $field->setMappedObject(
-                    'company' === substr($field->getLeadField(), 0, 7) && 'company' !== $field->getLeadField() ? 'company' : 'contact'
+                    str_starts_with($field->getLeadField(), 'company') && 'company' !== $field->getLeadField() ? 'company' : 'contact'
                 );
             }
         }

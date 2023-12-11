@@ -13,18 +13,10 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class ContactExportSchedulerNotificationSubscriber implements EventSubscriberInterface
 {
-    private NotificationModel $notificationModel;
-    private TranslatorInterface $translator;
-
-    public function __construct(NotificationModel $notificationModel, TranslatorInterface $translator)
+    public function __construct(private NotificationModel $notificationModel, private TranslatorInterface $translator)
     {
-        $this->notificationModel = $notificationModel;
-        $this->translator        = $translator;
     }
 
-    /**
-     * @return array<string, string>
-     */
     public static function getSubscribedEvents(): array
     {
         return [

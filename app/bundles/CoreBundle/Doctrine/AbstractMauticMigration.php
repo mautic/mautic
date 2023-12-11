@@ -67,7 +67,7 @@ abstract class AbstractMauticMigration extends AbstractMigration implements Cont
      *
      * @throws \Doctrine\DBAL\Exception
      */
-    public function setContainer(ContainerInterface $container = null)
+    public function setContainer(ContainerInterface $container = null): void
     {
         $this->container     = $container;
         $this->prefix        = $container->getParameter('mautic.db_table_prefix');
@@ -157,9 +157,7 @@ abstract class AbstractMauticMigration extends AbstractMigration implements Cont
         $hash        = implode(
             '',
             array_map(
-                function ($column) {
-                    return dechex(crc32($column));
-                },
+                fn ($column): string => dechex(crc32($column)),
                 $columnNames
             )
         );

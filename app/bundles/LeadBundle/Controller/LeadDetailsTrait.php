@@ -16,10 +16,8 @@ trait LeadDetailsTrait
 
     /**
      * @param int $page
-     *
-     * @return array
      */
-    protected function getAllEngagements(array $leads, array $filters = null, array $orderBy = null, $page = 1, $limit = 25)
+    protected function getAllEngagements(array $leads, array $filters = null, array $orderBy = null, $page = 1, $limit = 25): array
     {
         $session = $this->requestStack->getCurrentRequest()->getSession();
 
@@ -72,7 +70,7 @@ trait LeadDetailsTrait
             foreach ($events as &$event) {
                 $event['leadId']    = $lead->getId();
                 $event['leadEmail'] = $lead->getEmail();
-                $event['leadName']  = $lead->getName() ? $lead->getName() : $lead->getEmail();
+                $event['leadName']  = $lead->getName() ?: $lead->getEmail();
             }
 
             $result['events'] = array_merge($result['events'], $events);
@@ -122,24 +120,15 @@ trait LeadDetailsTrait
         return $filters;
     }
 
-    /**
-     * @return int
-     */
-    private function cmp($a, $b)
+    private function cmp($a, $b): int
     {
-        if ($a['timestamp'] === $b['timestamp']) {
-            return 0;
-        }
-
-        return ($a['timestamp'] < $b['timestamp']) ? +1 : -1;
+        return $b['timestamp'] <=> $a['timestamp'];
     }
 
     /**
      * Get a list of places for the lead based on IP location.
-     *
-     * @return array
      */
-    protected function getPlaces(Lead $lead)
+    protected function getPlaces(Lead $lead): array
     {
         // Get Places from IP addresses
         $places = [];
@@ -198,10 +187,8 @@ trait LeadDetailsTrait
     /**
      * @param int $page
      * @param int $limit
-     *
-     * @return array
      */
-    protected function getAuditlogs(Lead $lead, array $filters = null, array $orderBy = null, $page = 1, $limit = 25)
+    protected function getAuditlogs(Lead $lead, array $filters = null, array $orderBy = null, $page = 1, $limit = 25): array
     {
         $session = $this->requestStack->getCurrentRequest()->getSession();
 
@@ -236,15 +223,13 @@ trait LeadDetailsTrait
         $logCount = $repo->getAuditLogsCount($lead, $filters);
         $logs     = $repo->getAuditLogs($lead, $filters, $orderBy, $page, $limit);
 
-        $logEvents = array_map(function ($l) {
-            return [
-                'eventType'       => $l['action'],
-                'eventLabel'      => $l['userName'],
-                'timestamp'       => $l['dateAdded'],
-                'details'         => $l['details'],
-                'contentTemplate' => '@MauticLead/Auditlog/details.html.twig',
-            ];
-        }, $logs);
+        $logEvents = array_map(fn ($l): array => [
+            'eventType'       => $l['action'],
+            'eventLabel'      => $l['userName'],
+            'timestamp'       => $l['dateAdded'],
+            'details'         => $l['details'],
+            'contentTemplate' => '@MauticLead/Auditlog/details.html.twig',
+        ], $logs);
 
         $types = [
             'delete'     => $this->translator->trans('mautic.lead.event.delete'),
@@ -307,10 +292,8 @@ trait LeadDetailsTrait
 
     /**
      * Get an array with engagements and points of a contact.
-     *
-     * @return array
      */
-    protected function getStatsCount(Lead $lead, \DateTime $fromDate = null, \DateTime $toDate = null)
+    protected function getStatsCount(Lead $lead, \DateTime $fromDate = null, \DateTime $toDate = null): array
     {
         if (null == $fromDate) {
             $fromDate = new \DateTime('first day of this month 00:00:00');
@@ -337,20 +320,19 @@ trait LeadDetailsTrait
      * Get an array to create company's engagements graph.
      *
      * @param array $contacts
-     *
-     * @return array
      */
-    protected function getCompanyEngagementData($contacts)
+    protected function getCompanyEngagementData($contacts): array
     {
         $engagements = [0, 0, 0, 0, 0, 0];
         $points      = [0, 0, 0, 0, 0, 0];
         foreach ($contacts as $contact) {
+            /** @var LeadModel $model */
             $model = $this->getModel('lead.lead');
 
-            /** @var \Mautic\LeadBundle\Entity\Lead $lead */
             if (!isset($contact['lead_id'])) {
                 continue;
             }
+
             $lead = $model->getEntity($contact['lead_id']);
             $model->getRepository()->refetchEntity($lead);
             if (!$lead instanceof Lead) {
@@ -358,12 +340,8 @@ trait LeadDetailsTrait
             }
             $engagementsData = $this->getStatsCount($lead);
 
-            $engagements = array_map(function ($a, $b) {
-                return $a + $b;
-            }, $engagementsData['engagements']['byUnit'], $engagements);
-            $points = array_map(function ($points_first_user, $points_second_user) {
-                return $points_first_user + $points_second_user;
-            }, $engagementsData['points'], $points);
+            $engagements = array_map(fn ($a, $b) => $a + $b, $engagementsData['engagements']['byUnit'], $engagements);
+            $points      = array_map(fn ($points_first_user, $points_second_user) => $points_first_user + $points_second_user, $engagementsData['points'], $points);
         }
 
         return [

@@ -21,21 +21,6 @@ use Mautic\IntegrationsBundle\Sync\SyncDataExchange\SyncDataExchangeInterface;
 class IntegrationSyncProcess
 {
     /**
-     * @var SyncDateHelper
-     */
-    private $syncDateHelper;
-
-    /**
-     * @var MappingHelper
-     */
-    private $mappingHelper;
-
-    /**
-     * @var ObjectChangeGenerator
-     */
-    private $objectChangeGenerator;
-
-    /**
      * @var InputOptionsDAO
      */
     private $inputOptionsDAO;
@@ -50,11 +35,8 @@ class IntegrationSyncProcess
      */
     private $syncDataExchange;
 
-    public function __construct(SyncDateHelper $syncDateHelper, MappingHelper $mappingHelper, ObjectChangeGenerator $objectChangeGenerator)
+    public function __construct(private SyncDateHelper $syncDateHelper, private MappingHelper $mappingHelper, private ObjectChangeGenerator $objectChangeGenerator)
     {
-        $this->syncDateHelper        = $syncDateHelper;
-        $this->mappingHelper         = $mappingHelper;
-        $this->objectChangeGenerator = $objectChangeGenerator;
     }
 
     public function setupSync(InputOptionsDAO $inputOptionsDAO, MappingManualDAO $mappingManualDAO, SyncDataExchangeInterface $syncDataExchange): void
@@ -65,11 +47,9 @@ class IntegrationSyncProcess
     }
 
     /**
-     * @return ReportDAO
-     *
      * @throws ObjectNotFoundException
      */
-    public function getSyncReport(int $syncIteration)
+    public function getSyncReport(int $syncIteration): ReportDAO
     {
         $integrationRequestDAO   = new RequestDAO(MauticSyncDataExchange::NAME, $syncIteration, $this->inputOptionsDAO);
         $integrationObjectsNames = $this->mappingManualDAO->getIntegrationObjectNames();
@@ -84,7 +64,7 @@ class IntegrationSyncProcess
                         'Integration to Mautic; there are no fields for the %s object',
                         $integrationObjectName
                     ),
-                    __CLASS__.':'.__FUNCTION__
+                    self::class.':'.__FUNCTION__
                 );
 
                 continue;
@@ -103,7 +83,7 @@ class IntegrationSyncProcess
                     $integrationObjectName,
                     count($integrationObjectFields)
                 ),
-                __CLASS__.':'.__FUNCTION__
+                self::class.':'.__FUNCTION__
             );
 
             $integrationRequestObject = new RequestObjectDAO(
@@ -129,11 +109,9 @@ class IntegrationSyncProcess
     }
 
     /**
-     * @return OrderDAO
-     *
      * @throws ObjectNotFoundException
      */
-    public function getSyncOrder(ReportDAO $syncReport)
+    public function getSyncOrder(ReportDAO $syncReport): OrderDAO
     {
         $syncOrder = new OrderDAO($this->syncDateHelper->getSyncDateTime(), $this->inputOptionsDAO->isFirstTimeSync(), $this->mappingManualDAO->getIntegration(), $this->inputOptionsDAO->getOptions());
 
@@ -152,7 +130,7 @@ class IntegrationSyncProcess
                         $internalObjectName,
                         $mappedIntegrationObjectName
                     ),
-                    __CLASS__.':'.__FUNCTION__
+                    self::class.':'.__FUNCTION__
                 );
 
                 foreach ($internalObjects as $internalObject) {
@@ -174,7 +152,7 @@ class IntegrationSyncProcess
                         if ($objectChange->shouldSync()) {
                             $syncOrder->addObjectChange($objectChange);
                         }
-                    } catch (ObjectDeletedException $exception) {
+                    } catch (ObjectDeletedException) {
                         DebugLogger::log(
                             $this->mappingManualDAO->getIntegration(),
                             sprintf(
@@ -182,7 +160,7 @@ class IntegrationSyncProcess
                                 $internalObject->getObject(),
                                 $internalObject->getObjectId()
                             ),
-                            __CLASS__.':'.__FUNCTION__
+                            self::class.':'.__FUNCTION__
                         );
 
                         continue;

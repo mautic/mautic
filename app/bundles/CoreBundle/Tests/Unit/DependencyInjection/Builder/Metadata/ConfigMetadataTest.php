@@ -12,7 +12,7 @@ class ConfigMetadataTest extends TestCase
     /**
      * @var BundleMetadata|MockObject
      */
-    private $metadata;
+    private \PHPUnit\Framework\MockObject\MockObject $metadata;
 
     protected function setUp(): void
     {
@@ -22,7 +22,7 @@ class ConfigMetadataTest extends TestCase
             ->getMock();
     }
 
-    public function testMissingConfigIsIgnored()
+    public function testMissingConfigIsIgnored(): void
     {
         $this->metadata->expects($this->once())
             ->method('getDirectory')
@@ -34,7 +34,7 @@ class ConfigMetadataTest extends TestCase
         $this->assertEquals([], $this->metadata->toArray()['config']);
     }
 
-    public function testBadConfigIsIgnored()
+    public function testBadConfigIsIgnored(): void
     {
         $this->metadata->expects($this->once())
             ->method('getDirectory')
@@ -46,7 +46,7 @@ class ConfigMetadataTest extends TestCase
         $this->assertEquals([], $this->metadata->toArray()['config']);
     }
 
-    public function testIpLookupServicesAreLoaded()
+    public function testIpLookupServicesAreLoaded(): void
     {
         $this->metadata->expects($this->once())
             ->method('getDirectory')
@@ -66,7 +66,7 @@ class ConfigMetadataTest extends TestCase
         );
     }
 
-    public function testConfigIsLoaded()
+    public function testConfigIsLoaded(): void
     {
         $this->metadata->expects($this->once())
             ->method('getDirectory')
@@ -80,7 +80,7 @@ class ConfigMetadataTest extends TestCase
         $this->assertTrue(isset($config['parameters']['log_path']));
     }
 
-    public function testOptionalMissingServicesAreIgnored()
+    public function testOptionalMissingServicesAreIgnored(): void
     {
         $this->metadata->expects($this->once())
             ->method('getDirectory')
@@ -93,7 +93,7 @@ class ConfigMetadataTest extends TestCase
         $this->assertFalse(isset($config['services']['fixtures']['mautic.test.fixture']));
     }
 
-    public function testParameterArgumentsAreEncoded()
+    public function testParameterArgumentsAreEncoded(): void
     {
         $this->metadata->expects($this->once())
             ->method('getDirectory')
@@ -108,7 +108,7 @@ class ConfigMetadataTest extends TestCase
         $this->assertEquals('%%mautic.bundles%%', $config['services']['helpers']['mautic.helper.bundle']['arguments'][0]);
     }
 
-    public function testParametersAreEncoded()
+    public function testParametersAreEncoded(): void
     {
         $this->metadata->expects($this->once())
             ->method('getDirectory')
@@ -123,7 +123,7 @@ class ConfigMetadataTest extends TestCase
         $this->assertEquals('%%kernel.project_dir%%/var/logs', $config['parameters']['log_path']);
     }
 
-    public function testParameterTypesArePreserved()
+    public function testParameterTypesArePreserved(): void
     {
         $this->metadata->expects($this->once())
             ->method('getDirectory')

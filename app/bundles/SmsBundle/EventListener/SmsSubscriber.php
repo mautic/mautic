@@ -18,50 +18,11 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class SmsSubscriber implements EventSubscriberInterface
 {
-    /**
-     * @var AuditLogModel
-     */
-    private $auditLogModel;
-
-    /**
-     * @var TrackableModel
-     */
-    private $trackableModel;
-
-    /**
-     * @var PageTokenHelper
-     */
-    private $pageTokenHelper;
-
-    /**
-     * @var AssetTokenHelper
-     */
-    private $assetTokenHelper;
-
-    /**
-     * @var SmsHelper
-     */
-    private $smsHelper;
-
-    public function __construct(
-        AuditLogModel $auditLogModel,
-        TrackableModel $trackableModel,
-        PageTokenHelper $pageTokenHelper,
-        AssetTokenHelper $assetTokenHelper,
-        SmsHelper $smsHelper,
-        private CoreParametersHelper $coreParametersHelper
-    ) {
-        $this->auditLogModel    = $auditLogModel;
-        $this->trackableModel   = $trackableModel;
-        $this->pageTokenHelper  = $pageTokenHelper;
-        $this->assetTokenHelper = $assetTokenHelper;
-        $this->smsHelper        = $smsHelper;
+    public function __construct(private AuditLogModel $auditLogModel, private TrackableModel $trackableModel, private PageTokenHelper $pageTokenHelper, private AssetTokenHelper $assetTokenHelper, private SmsHelper $smsHelper, private CoreParametersHelper $coreParametersHelper)
+    {
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             SmsEvents::SMS_POST_SAVE     => ['onPostSave', 0],
@@ -73,7 +34,7 @@ class SmsSubscriber implements EventSubscriberInterface
     /**
      * Add an entry to the audit log.
      */
-    public function onPostSave(SmsEvent $event)
+    public function onPostSave(SmsEvent $event): void
     {
         $entity = $event->getSms();
         if ($details = $event->getChanges()) {
@@ -91,7 +52,7 @@ class SmsSubscriber implements EventSubscriberInterface
     /**
      * Add a delete entry to the audit log.
      */
-    public function onDelete(SmsEvent $event)
+    public function onDelete(SmsEvent $event): void
     {
         $entity = $event->getSms();
         $log    = [
@@ -104,7 +65,7 @@ class SmsSubscriber implements EventSubscriberInterface
         $this->auditLogModel->writeToLog($log);
     }
 
-    public function onTokenReplacement(TokenReplacementEvent $event)
+    public function onTokenReplacement(TokenReplacementEvent $event): void
     {
         /** @var Lead $lead */
         $lead         = $event->getLead();
@@ -128,8 +89,9 @@ class SmsSubscriber implements EventSubscriberInterface
                 );
 
                 $shortenEnabled = $this->coreParametersHelper->get('shortener_sms_enable', false);
+
                 /**
-                 * @var string
+                 * @var string    $token
                  * @var Trackable $trackable
                  */
                 foreach ($trackables as $token => $trackable) {

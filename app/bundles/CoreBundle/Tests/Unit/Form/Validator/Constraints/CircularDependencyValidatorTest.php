@@ -15,27 +15,24 @@ class CircularDependencyValidatorTest extends \PHPUnit\Framework\TestCase
     /**
      * @var \PHPUnit\Framework\MockObject\MockObject|ListModel
      */
-    private $mockListModel;
+    private \PHPUnit\Framework\MockObject\MockObject $mockListModel;
 
     /**
      * @var \PHPUnit\Framework\MockObject\MockObject|ExecutionContext
      */
-    private $context;
+    private \PHPUnit\Framework\MockObject\MockObject $context;
 
     /**
      * @var \PHPUnit\Framework\MockObject\MockObject|RequestStack
      */
-    private $requestStack;
+    private \PHPUnit\Framework\MockObject\MockObject $requestStack;
 
     /**
      * @var \PHPUnit\Framework\MockObject\MockObject|Request
      */
-    private $request;
+    private \PHPUnit\Framework\MockObject\MockObject $request;
 
-    /**
-     * @var CircularDependencyValidator
-     */
-    private $validator;
+    private \Mautic\CoreBundle\Form\Validator\Constraints\CircularDependencyValidator $validator;
 
     protected function setUp(): void
     {
@@ -57,7 +54,7 @@ class CircularDependencyValidatorTest extends \PHPUnit\Framework\TestCase
     /**
      * Checks that the validator won't break if the segment ID is not present in the request.
      */
-    public function testIfSegmentIdIsNotInTheRequest()
+    public function testIfSegmentIdIsNotInTheRequest(): void
     {
         $this->context->expects($this->never())
             ->method('addViolation');
@@ -174,13 +171,13 @@ class CircularDependencyValidatorTest extends \PHPUnit\Framework\TestCase
      *
      * @dataProvider validateDataProvider
      */
-    public function testValidateOnInvalid($message, $currentSegmentId, $filters)
+    public function testValidateOnInvalid($message, $currentSegmentId, $filters): void
     {
         $this->configureValidator($message, $currentSegmentId)
             ->validate($filters, new CircularDependency(['message' => 'mautic.core.segment.circular_dependency_exists']));
     }
 
-    public function validateDataProvider()
+    public static function validateDataProvider()
     {
         $constraint = new CircularDependency(['message' => 'mautic.core.segment.circular_dependency_exists']);
 

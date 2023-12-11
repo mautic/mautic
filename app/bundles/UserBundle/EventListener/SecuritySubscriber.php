@@ -10,33 +10,18 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class SecuritySubscriber implements EventSubscriberInterface
 {
-    /**
-     * @var IpLookupHelper
-     */
-    private $ipLookupHelper;
-
-    /**
-     * @var AuditLogModel
-     */
-    private $auditLogModel;
-
-    public function __construct(IpLookupHelper $ipLookupHelper, AuditLogModel $auditLogModel)
+    public function __construct(private IpLookupHelper $ipLookupHelper, private AuditLogModel $auditLogModel)
     {
-        $this->ipLookupHelper = $ipLookupHelper;
-        $this->auditLogModel  = $auditLogModel;
     }
 
-    /**
-     * @return array
-     */
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             UserEvents::USER_LOGIN => ['onSecurityInteractiveLogin', 0],
         ];
     }
 
-    public function onSecurityInteractiveLogin(LoginEvent $event)
+    public function onSecurityInteractiveLogin(LoginEvent $event): void
     {
         $userId   = (int) $event->getUser()->getId();
         $useName  = $event->getUser()->getUsername();

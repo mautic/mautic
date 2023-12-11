@@ -16,7 +16,7 @@ return [
         ],
         'helpers' => [
             'mautic.helper.notification' => [
-                'class'     => 'Mautic\NotificationBundle\Helper\NotificationHelper',
+                'class'     => \Mautic\NotificationBundle\Helper\NotificationHelper::class,
                 'alias'     => 'notification_helper',
                 'arguments' => [
                     'doctrine.orm.entity_manager',
@@ -137,7 +137,7 @@ return [
                 'standard_entity' => true,
                 'name'            => 'notifications',
                 'path'            => '/notifications',
-                'controller'      => 'Mautic\NotificationBundle\Controller\Api\NotificationApiController',
+                'controller'      => \Mautic\NotificationBundle\Controller\Api\NotificationApiController::class,
             ],
         ],
     ],

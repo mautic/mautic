@@ -13,20 +13,14 @@ use Symfony\Component\Validator\Constraints\NotBlank;
 
 class IntegrationsListType extends AbstractType
 {
-    /**
-     * @var IntegrationHelper
-     */
-    private $integrationHelper;
-
-    public function __construct(IntegrationHelper $integrationHelper)
+    public function __construct(private IntegrationHelper $integrationHelper)
     {
-        $this->integrationHelper = $integrationHelper;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $integrationObjects = $this->integrationHelper->getIntegrationObjects(null, $options['supported_features'], true);
         $integrations       = ['' => ''];
@@ -66,7 +60,7 @@ class IntegrationsListType extends AbstractType
             ]
         );
 
-        $formModifier = function (FormEvent $event) use ($integrationObjects) {
+        $formModifier = function (FormEvent $event) use ($integrationObjects): void {
             $data            = $event->getData();
             $form            = $event->getForm();
             $statusChoices   = [];
@@ -103,7 +97,7 @@ class IntegrationsListType extends AbstractType
                     ],
                     'integration' => isset($data['integration'], $integrationObjects[$data['integration']]) ? $integrationObjects[$data['integration']] : null,
                     'campaigns'   => $campaignChoices,
-                    'data'        => (isset($data['config'])) ? $data['config'] : [],
+                    'data'        => $data['config'] ?? [],
                 ]
             );
 
@@ -117,7 +111,7 @@ class IntegrationsListType extends AbstractType
                         'class' => 'integration-campaigns-status'.$hideClass,
                     ],
                     'campaignContactStatus' => $statusChoices,
-                    'data'                  => (isset($data['campaign_member_status'])) ? $data['campaign_member_status'] : [],
+                    'data'                  => $data['campaign_member_status'] ?? [],
                 ]
             );
         };
@@ -130,7 +124,7 @@ class IntegrationsListType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function configureOptions(OptionsResolver $resolver)
+    public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefined(['supported_features']);
         $resolver->setDefaults(

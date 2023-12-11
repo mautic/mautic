@@ -9,23 +9,8 @@ use Twig\Environment;
 
 final class ContentHelper
 {
-    /**
-     * @var Environment
-     */
-    private $twig;
-
-    /**
-     * @var EventDispatcherInterface
-     */
-    private $dispatcher;
-
-    /**
-     * UIHelper constructor.
-     */
-    public function __construct(Environment $twig, EventDispatcherInterface $dispatcher)
+    public function __construct(private Environment $twig, private EventDispatcherInterface $dispatcher)
     {
-        $this->twig       = $twig;
-        $this->dispatcher = $dispatcher;
     }
 
     /**

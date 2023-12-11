@@ -9,17 +9,11 @@ use Mautic\ReportBundle\Model\ReportModel;
 
 class ReportDataAdapter
 {
-    /**
-     * @var ReportModel
-     */
-    private $reportModel;
-
-    public function __construct(ReportModel $reportModel)
+    public function __construct(private ReportModel $reportModel)
     {
-        $this->reportModel = $reportModel;
     }
 
-    public function getReportData(Report $report, ReportExportOptions $reportExportOptions)
+    public function getReportData(Report $report, ReportExportOptions $reportExportOptions): ReportDataResult
     {
         $options                    = [];
         $options['paginate']        = true;

@@ -6,9 +6,6 @@ use Mautic\CoreBundle\Security\Permissions\AbstractPermissions;
 use Mautic\UserBundle\Form\Type\PermissionListType;
 use Symfony\Component\Form\FormBuilderInterface;
 
-/**
- * Class UserPermissions.
- */
 class UserPermissions extends AbstractPermissions
 {
     /**
@@ -41,7 +38,7 @@ class UserPermissions extends AbstractPermissions
     /**
      * {@inheritdoc}
      */
-    public function buildForm(FormBuilderInterface &$builder, array $options, array $data)
+    public function buildForm(FormBuilderInterface &$builder, array $options, array $data): void
     {
         $this->addStandardFormFields('user', 'users', $builder, $data, false);
         $this->addStandardFormFields('user', 'roles', $builder, $data, false);

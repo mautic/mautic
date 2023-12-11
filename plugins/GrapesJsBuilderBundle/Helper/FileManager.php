@@ -16,32 +16,8 @@ class FileManager
 {
     public const GRAPESJS_IMAGES_DIRECTORY = '';
 
-    /**
-     * @var FileUploader
-     */
-    private $fileUploader;
-
-    /**
-     * @var CoreParametersHelper
-     */
-    private $coreParametersHelper;
-
-    /**
-     * @var PathsHelper
-     */
-    private $pathsHelper;
-
-    /**
-     * FileManager constructor.
-     */
-    public function __construct(
-        FileUploader $fileUploader,
-        CoreParametersHelper $coreParametersHelper,
-        PathsHelper $pathsHelper
-    ) {
-        $this->fileUploader         = $fileUploader;
-        $this->coreParametersHelper = $coreParametersHelper;
-        $this->pathsHelper          = $pathsHelper;
+    public function __construct(private FileUploader $fileUploader, private CoreParametersHelper $coreParametersHelper, private PathsHelper $pathsHelper)
+    {
     }
 
     /**
@@ -57,7 +33,7 @@ class FileManager
             foreach ($files as $file) {
                 try {
                     $uploadedFiles[] =  $this->getFullUrl($this->fileUploader->upload($uploadDir, $file));
-                } catch (FileUploadException $e) {
+                } catch (FileUploadException) {
                 }
             }
         }
@@ -68,7 +44,7 @@ class FileManager
     /**
      * @param string $fileName
      */
-    public function deleteFile($fileName)
+    public function deleteFile($fileName): void
     {
         $this->fileUploader->delete($this->getCompleteFilePath($fileName));
     }
@@ -120,10 +96,7 @@ class FileManager
             .self::GRAPESJS_IMAGES_DIRECTORY;
     }
 
-    /**
-     * @return array
-     */
-    public function getImages()
+    public function getImages(): array
     {
         $files      = [];
         $uploadDir  = $this->getUploadDir();
@@ -133,7 +106,7 @@ class FileManager
         if (!$fileSystem->exists($uploadDir)) {
             try {
                 $fileSystem->mkdir($uploadDir);
-            } catch (IOException $exception) {
+            } catch (IOException) {
                 return $files;
             }
         }

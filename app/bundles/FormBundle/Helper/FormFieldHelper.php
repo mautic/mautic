@@ -16,15 +16,9 @@ use Symfony\Component\Validator\ConstraintViolationList;
 use Symfony\Component\Validator\Validation;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 
-/**
- * Class FormFieldHelper.
- */
 class FormFieldHelper extends AbstractFormFieldHelper
 {
-    /**
-     * @var ValidatorInterface
-     */
-    private $validator;
+    private ?\Symfony\Component\Validator\Validator\ValidatorInterface $validator;
 
     /**
      * @var array
@@ -73,8 +67,6 @@ class FormFieldHelper extends AbstractFormFieldHelper
 
     /**
      * FormFieldHelper constructor.
-     *
-     * @param ValidatorInterface $validator
      */
     public function __construct(Translator $translator, ValidatorInterface $validator = null)
     {
@@ -91,7 +83,7 @@ class FormFieldHelper extends AbstractFormFieldHelper
     /**
      * Set the translation key prefix.
      */
-    public function setTranslationKeyPrefix()
+    public function setTranslationKeyPrefix(): void
     {
         $this->translationKeyPrefix = 'mautic.form.field.type.';
     }
@@ -124,11 +116,7 @@ class FormFieldHelper extends AbstractFormFieldHelper
     public function getFieldFilter($type)
     {
         if (array_key_exists($type, $this->types)) {
-            if (isset($this->types[$type]['filter'])) {
-                return $this->types[$type]['filter'];
-            }
-
-            return 'clean';
+            return $this->types[$type]['filter'] ?? 'clean';
         }
 
         return 'alphanum';
@@ -136,10 +124,8 @@ class FormFieldHelper extends AbstractFormFieldHelper
 
     /**
      * @param Field $f
-     *
-     * @return array
      */
-    public function validateFieldValue($type, $value, $f = null)
+    public function validateFieldValue($type, $value, $f = null): array
     {
         $errors = [];
         if (isset($this->types[$type]['constraints'])) {
@@ -184,7 +170,7 @@ class FormFieldHelper extends AbstractFormFieldHelper
         return $errors;
     }
 
-    public function populateField($field, $value, $formName, &$formHtml)
+    public function populateField($field, $value, $formName, &$formHtml): void
     {
         $alias = $field->getAlias();
 

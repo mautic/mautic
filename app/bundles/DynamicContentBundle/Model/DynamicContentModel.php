@@ -17,6 +17,7 @@ use Mautic\DynamicContentBundle\Event\DynamicContentEvent;
 use Mautic\DynamicContentBundle\Form\Type\DynamicContentType;
 use Mautic\LeadBundle\Entity\Lead;
 use Symfony\Component\Form\FormFactoryInterface;
+use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 use Symfony\Contracts\EventDispatcher\Event;
 
@@ -32,10 +33,8 @@ class DynamicContentModel extends FormModel implements AjaxLookupModelInterface
 
     /**
      * Retrieve the permissions base.
-     *
-     * @return string
      */
-    public function getPermissionBase()
+    public function getPermissionBase(): string
     {
         return 'dynamiccontent:dynamiccontents';
     }
@@ -69,7 +68,7 @@ class DynamicContentModel extends FormModel implements AjaxLookupModelInterface
      * @param object $entity
      * @param bool   $unlock
      */
-    public function saveEntity($entity, $unlock = true)
+    public function saveEntity($entity, $unlock = true): void
     {
         parent::saveEntity($entity, $unlock);
 
@@ -98,11 +97,9 @@ class DynamicContentModel extends FormModel implements AjaxLookupModelInterface
      * @param string|null $action
      * @param array       $options
      *
-     * @return mixed
-     *
      * @throws \InvalidArgumentException
      */
-    public function createForm($entity, FormFactoryInterface $formFactory, $action = null, $options = [])
+    public function createForm($entity, FormFactoryInterface $formFactory, $action = null, $options = []): FormInterface
     {
         if (!$entity instanceof DynamicContent) {
             throw new \InvalidArgumentException('Entity must be of class DynamicContent');
@@ -115,7 +112,7 @@ class DynamicContentModel extends FormModel implements AjaxLookupModelInterface
         return $formFactory->create(DynamicContentType::class, $entity, $options);
     }
 
-    public function setSlotContentForLead(DynamicContent $dwc, Lead $lead, $slot)
+    public function setSlotContentForLead(DynamicContent $dwc, Lead $lead, $slot): void
     {
         $qb = $this->em->getConnection()->createQueryBuilder();
 
@@ -164,7 +161,7 @@ class DynamicContentModel extends FormModel implements AjaxLookupModelInterface
      * @param Lead|array $lead
      * @param string     $source
      */
-    public function createStatEntry(DynamicContent $dynamicContent, $lead, $source = null)
+    public function createStatEntry(DynamicContent $dynamicContent, $lead, $source = null): void
     {
         if (empty($lead)) {
             return;
@@ -196,7 +193,7 @@ class DynamicContentModel extends FormModel implements AjaxLookupModelInterface
      *
      * @throws \Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException
      */
-    protected function dispatchEvent($action, &$entity, $isNew = false, Event $event = null)
+    protected function dispatchEvent($action, &$entity, $isNew = false, Event $event = null): ?Event
     {
         if (!$entity instanceof DynamicContent) {
             throw new MethodNotAllowedHttpException(['Dynamic Content']);
@@ -236,7 +233,7 @@ class DynamicContentModel extends FormModel implements AjaxLookupModelInterface
     /**
      * Joins the page table and limits created_by to currently logged in user.
      */
-    public function limitQueryToCreator(QueryBuilder &$q)
+    public function limitQueryToCreator(QueryBuilder &$q): void
     {
         $q->join('t', MAUTIC_TABLE_PREFIX.'dynamic_content', 'd', 'd.id = t.dynamic_content_id')
             ->andWhere('d.created_by = :userId')
@@ -296,8 +293,10 @@ class DynamicContentModel extends FormModel implements AjaxLookupModelInterface
      * @param int    $limit
      * @param int    $start
      * @param array  $options
+     *
+     * @return mixed[]
      */
-    public function getLookupResults($type, $filter = '', $limit = 10, $start = 0, $options = [])
+    public function getLookupResults($type, $filter = '', $limit = 10, $start = 0, $options = []): array
     {
         $results = [];
         switch ($type) {
@@ -307,9 +306,9 @@ class DynamicContentModel extends FormModel implements AjaxLookupModelInterface
                     $limit,
                     $start,
                     $this->security->isGranted($this->getPermissionBase().':viewother'),
-                    isset($options['top_level']) ? $options['top_level'] : false,
-                    isset($options['ignore_ids']) ? $options['ignore_ids'] : [],
-                    isset($options['where']) ? $options['where'] : ''
+                    $options['top_level'] ?? false,
+                    $options['ignore_ids'] ?? [],
+                    $options['where'] ?? ''
                 );
 
                 foreach ($entities as $entity) {

@@ -11,20 +11,11 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class MessageQueueSubscriber implements EventSubscriberInterface
 {
-    /**
-     * @var EmailModel
-     */
-    private $emailModel;
-
-    public function __construct(EmailModel $emailModel)
+    public function __construct(private EmailModel $emailModel)
     {
-        $this->emailModel = $emailModel;
     }
 
-    /**
-     * @return array
-     */
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             ChannelEvents::PROCESS_MESSAGE_QUEUE_BATCH => ['onProcessMessageQueueBatch', 0],
@@ -34,7 +25,7 @@ class MessageQueueSubscriber implements EventSubscriberInterface
     /**
      * Sends campaign emails.
      */
-    public function onProcessMessageQueueBatch(MessageQueueBatchProcessEvent $event)
+    public function onProcessMessageQueueBatch(MessageQueueBatchProcessEvent $event): void
     {
         if (!$event->checkContext('email')) {
             return;

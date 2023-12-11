@@ -5,9 +5,6 @@ namespace Mautic\PageBundle\Security\Permissions;
 use Mautic\CoreBundle\Security\Permissions\AbstractPermissions;
 use Symfony\Component\Form\FormBuilderInterface;
 
-/**
- * Class PagePermissions.
- */
 class PagePermissions extends AbstractPermissions
 {
     /**
@@ -24,7 +21,7 @@ class PagePermissions extends AbstractPermissions
     /**
      * {@inheritdoc}
      */
-    public function getName()
+    public function getName(): string
     {
         return 'page';
     }
@@ -32,7 +29,7 @@ class PagePermissions extends AbstractPermissions
     /**
      * {@inheritdoc}
      */
-    public function buildForm(FormBuilderInterface &$builder, array $options, array $data)
+    public function buildForm(FormBuilderInterface &$builder, array $options, array $data): void
     {
         $this->addStandardFormFields('page', 'categories', $builder, $data);
         $this->addExtendedFormFields('page', 'pages', $builder, $data);

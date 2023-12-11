@@ -16,7 +16,7 @@ use Symfony\Component\HttpFoundation\Request;
 
 class PageModelTest extends PageTestAbstract
 {
-    public function testUtf8CharsInTitleWithTransletirationEnabled()
+    public function testUtf8CharsInTitleWithTransletirationEnabled(): void
     {
         $providedTitle = '你好，世界';
         $expectedTitle = 'ni hao, shi jie';
@@ -66,7 +66,7 @@ class PageModelTest extends PageTestAbstract
         $pageModel->hitPage($page, $request, 200, $contact, []);
     }
 
-    public function testUtf8CharsInTitleWithTransletirationDisabled()
+    public function testUtf8CharsInTitleWithTransletirationDisabled(): void
     {
         $providedTitle = '你好，世界';
         $expectedTitle = '你好，世界';
@@ -85,23 +85,23 @@ class PageModelTest extends PageTestAbstract
         $this->assertSame(['page_title' => $expectedTitle], $hit->getQuery());
     }
 
-    public function testGenerateUrlWhenCalledReturnsValidUrl()
+    public function testGenerateUrlWhenCalledReturnsValidUrl(): void
     {
         $page = new Page();
         $page->setAlias('this-is-a-test');
         $pageModel = $this->getPageModel();
 
         $this->router->expects($this->once())
-                     ->method('generate')
-                     ->willReturnCallback(
-                         function (string $route, array $routeParams, int $referenceType) {
-                             $this->assertSame('mautic_page_public', $route);
-                             $this->assertSame(['slug' => 'this-is-a-test'], $routeParams);
-                             $this->assertSame(0, $referenceType);
+            ->method('generate')
+            ->willReturnCallback(
+                function (string $route, array $routeParams, int $referenceType) {
+                    $this->assertSame('mautic_page_public', $route);
+                    $this->assertSame(['slug' => 'this-is-a-test'], $routeParams);
+                    $this->assertSame(0, $referenceType);
 
-                             return '/'.$routeParams['slug'];
-                         }
-                     );
+                    return '/'.$routeParams['slug'];
+                }
+            );
 
         $url = $pageModel->generateUrl($page);
         $this->assertStringContainsString('/this-is-a-test', $url);
@@ -127,7 +127,7 @@ class PageModelTest extends PageTestAbstract
         $this->assertSame($expectedTitle, $hit->getUrlTitle());
     }
 
-    public function testCleanQueryWhenCalledReturnsSafeAndValidData()
+    public function testCleanQueryWhenCalledReturnsSafeAndValidData(): void
     {
         $pageModel           = $this->getPageModel();
         $pageModelReflection = new \ReflectionClass(get_class($pageModel));
@@ -179,7 +179,7 @@ class PageModelTest extends PageTestAbstract
         }
     }
 
-    private function assertUtmQuery(array $query)
+    private function assertUtmQuery(array $query): void
     {
         $this->assertArrayHasKey('utm_source', $query, 'utm_source not found');
         $this->assertArrayHasKey('utm_medium', $query, 'utm_medium not found');
@@ -218,45 +218,45 @@ class PageModelTest extends PageTestAbstract
         $ct       = ClickthroughHelper::encodeArrayForUrl($ctParams);
 
         $params = [[
-                       'page_title'       => 'Testpage',
-                       'page_language'    => 'en-GB',
-                       'page_referrer'    => '',
-                       'page_url'         => sprintf('https://www.domain.com/testpage/?%s', $querystring),
-                       'counter'          => 0,
-                       'mautic_device_id' => 'nowvkqdf6113236eokcg7qs',
-                       'resolution'       => '1792x1120',
-                       'timezone_offset'  => -120,
-                       'platform'         => 'MacIntel',
-                       'do_not_track'     => 1,
-                       'adblock'          => false,
-                       'fingerprint'      => 'fec25ab2d659c4153c7f1d5724841132',
-                   ], [
-                       'page_title'       => 'Testpage Special Chars',
-                       'page_language'    => 'en-GB',
-                       'page_referrer'    => '',
-                       'page_url'         => 'https://www.domain.com/testpage/?utm_source=t%C3%A9%C3%A0%C3%A8st-utm_source&utm_medium=t%C3%A4%C3%B6ust-utm_medium&utm_campaign=te+%20%C2%B0st-utm_campaign&utm_content=t%E4%BD%A0%E5%A5%BDt-utm_content',
-                       'counter'          => 0,
-                       'mautic_device_id' => 'nowvkqdf6113236eokcg7qs',
-                       'resolution'       => '1792x1120',
-                       'timezone_offset'  => -120,
-                       'platform'         => 'MacIntel',
-                       'do_not_track'     => 1,
-                       'adblock'          => false,
-                       'fingerprint'      => 'fec25ab2d659c4153c7f1d5724841132',
-                   ], [
-                       'page_title'       => 'Testpage With Encoded Params',
-                       'page_language'    => 'en-GB',
-                       'page_referrer'    => '',
-                       'page_url'         => sprintf('https://www.domain.com/testpage/?ct=%s&%s', $ct, $querystring),
-                       'counter'          => 0,
-                       'mautic_device_id' => 'nowvkqdf6113236eokcg7qs',
-                       'resolution'       => '1792x1120',
-                       'timezone_offset'  => -120,
-                       'platform'         => 'MacIntel',
-                       'do_not_track'     => 1,
-                       'adblock'          => false,
-                       'fingerprint'      => 'fec25ab2d659c4153c7f1d5724841132',
-                   ]];
+            'page_title'      => 'Testpage',
+            'page_language'   => 'en-GB',
+            'page_referrer'   => '',
+            'page_url'        => sprintf('https://www.domain.com/testpage/?%s', $querystring),
+            'counter'         => 0,
+            'mautic_device_id'=> 'nowvkqdf6113236eokcg7qs',
+            'resolution'      => '1792x1120',
+            'timezone_offset' => -120,
+            'platform'        => 'MacIntel',
+            'do_not_track'    => 1,
+            'adblock'         => false,
+            'fingerprint'     => 'fec25ab2d659c4153c7f1d5724841132',
+        ], [
+            'page_title'      => 'Testpage Special Chars',
+            'page_language'   => 'en-GB',
+            'page_referrer'   => '',
+            'page_url'        => 'https://www.domain.com/testpage/?utm_source=t%C3%A9%C3%A0%C3%A8st-utm_source&utm_medium=t%C3%A4%C3%B6ust-utm_medium&utm_campaign=te+%20%C2%B0st-utm_campaign&utm_content=t%E4%BD%A0%E5%A5%BDt-utm_content',
+            'counter'         => 0,
+            'mautic_device_id'=> 'nowvkqdf6113236eokcg7qs',
+            'resolution'      => '1792x1120',
+            'timezone_offset' => -120,
+            'platform'        => 'MacIntel',
+            'do_not_track'    => 1,
+            'adblock'         => false,
+            'fingerprint'     => 'fec25ab2d659c4153c7f1d5724841132',
+        ], [
+            'page_title'      => 'Testpage With Encoded Params',
+            'page_language'   => 'en-GB',
+            'page_referrer'   => '',
+            'page_url'        => sprintf('https://www.domain.com/testpage/?ct=%s&%s', $ct, $querystring),
+            'counter'         => 0,
+            'mautic_device_id'=> 'nowvkqdf6113236eokcg7qs',
+            'resolution'      => '1792x1120',
+            'timezone_offset' => -120,
+            'platform'        => 'MacIntel',
+            'do_not_track'    => 1,
+            'adblock'         => false,
+            'fingerprint'     => 'fec25ab2d659c4153c7f1d5724841132',
+        ]];
 
         return $params;
     }

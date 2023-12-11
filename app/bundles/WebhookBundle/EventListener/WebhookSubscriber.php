@@ -11,35 +11,11 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class WebhookSubscriber implements EventSubscriberInterface
 {
-    /**
-     * @var IpLookupHelper
-     */
-    private $ipLookupHelper;
-
-    /**
-     * @var AuditLogModel
-     */
-    private $auditLogModel;
-
-    /**
-     * @var WebhookKillNotificator
-     */
-    private $webhookKillNotificator;
-
-    public function __construct(
-        IpLookupHelper $ipLookupHelper,
-        AuditLogModel $auditLogModel,
-        WebhookKillNotificator $webhookKillNotificator
-    ) {
-        $this->ipLookupHelper         = $ipLookupHelper;
-        $this->auditLogModel          = $auditLogModel;
-        $this->webhookKillNotificator = $webhookKillNotificator;
+    public function __construct(private IpLookupHelper $ipLookupHelper, private AuditLogModel $auditLogModel, private WebhookKillNotificator $webhookKillNotificator)
+    {
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             WebhookEvents::WEBHOOK_POST_SAVE   => ['onWebhookSave', 0],
@@ -51,7 +27,7 @@ class WebhookSubscriber implements EventSubscriberInterface
     /**
      * Add an entry to the audit log.
      */
-    public function onWebhookSave(WebhookEvent $event)
+    public function onWebhookSave(WebhookEvent $event): void
     {
         $webhook = $event->getWebhook();
 
@@ -71,7 +47,7 @@ class WebhookSubscriber implements EventSubscriberInterface
     /**
      * Add a delete entry to the audit log.
      */
-    public function onWebhookDelete(WebhookEvent $event)
+    public function onWebhookDelete(WebhookEvent $event): void
     {
         $webhook = $event->getWebhook();
         $log     = [
@@ -88,7 +64,7 @@ class WebhookSubscriber implements EventSubscriberInterface
     /**
      * Send notification about killed webhook.
      */
-    public function onWebhookKill(WebhookEvent $event)
+    public function onWebhookKill(WebhookEvent $event): void
     {
         $this->webhookKillNotificator->send($event->getWebhook(), $event->getReason());
     }

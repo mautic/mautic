@@ -25,7 +25,7 @@ class ActionModel extends CommonFormModel
     /**
      * {@inheritdoc}
      */
-    public function getPermissionBase()
+    public function getPermissionBase(): string
     {
         return 'form:forms';
     }
@@ -47,7 +47,7 @@ class ActionModel extends CommonFormModel
      * @param null   $action
      * @param array  $options
      */
-    public function createForm($entity, FormFactoryInterface $formFactory, $action = null, $options = [])
+    public function createForm($entity, FormFactoryInterface $formFactory, $action = null, $options = []): \Symfony\Component\Form\FormInterface
     {
         if (!$entity instanceof Action) {
             throw new \InvalidArgumentException('Entity must be of class Action');
@@ -68,10 +68,8 @@ class ActionModel extends CommonFormModel
      * Get segments which are dependent on given segment.
      *
      * @param int $segmentId
-     *
-     * @return array
      */
-    public function getFormsIdsWithDependenciesOnSegment($segmentId)
+    public function getFormsIdsWithDependenciesOnSegment($segmentId): array
     {
         $filter = [
             'force'  => [

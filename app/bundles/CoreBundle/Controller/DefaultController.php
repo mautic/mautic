@@ -71,7 +71,7 @@ class DefaultController extends CommonController
         /** @var \Mautic\CoreBundle\Model\NotificationModel $model */
         $model = $this->getModel('core.notification');
 
-        list($notifications, $showNewIndicator, $updateMessage) = $model->getNotificationContent(null, false, 200);
+        [$notifications, $showNewIndicator, $updateMessage] = $model->getNotificationContent(null, false, 200);
 
         return $this->delegateView(
             [

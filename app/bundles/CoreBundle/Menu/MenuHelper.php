@@ -7,21 +7,8 @@ use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\PluginBundle\Helper\IntegrationHelper;
 use Symfony\Component\HttpFoundation\RequestStack;
 
-/**
- * Class MenuHelper.
- */
 class MenuHelper
 {
-    /**
-     * @var CorePermissions
-     */
-    protected $security;
-
-    /**
-     * @var RequestStack
-     */
-    protected $requestStack;
-
     /**
      * Stores items that are assigned to another parent outside it's bundle.
      *
@@ -29,25 +16,8 @@ class MenuHelper
      */
     private $orphans = [];
 
-    /**
-     * @var CoreParametersHelper
-     */
-    private $coreParametersHelper;
-
-    /**
-     * @var IntegrationHelper
-     */
-    protected $integrationHelper;
-
-    /**
-     * MenuHelper constructor.
-     */
-    public function __construct(CorePermissions $security, RequestStack $requestStack, CoreParametersHelper $coreParametersHelper, IntegrationHelper $integrationHelper)
+    public function __construct(protected CorePermissions $security, protected RequestStack $requestStack, private CoreParametersHelper $coreParametersHelper, protected IntegrationHelper $integrationHelper)
     {
-        $this->security              = $security;
-        $this->coreParametersHelper  = $coreParametersHelper;
-        $this->requestStack          = $requestStack;
-        $this->integrationHelper     = $integrationHelper;
     }
 
     /**
@@ -57,7 +27,7 @@ class MenuHelper
      * @param int    $defaultPriority
      * @param string $type
      */
-    public function createMenuStructure(&$items, $depth = 0, $defaultPriority = 9999, $type = 'main')
+    public function createMenuStructure(&$items, $depth = 0, $defaultPriority = 9999, $type = 'main'): void
     {
         foreach ($items as $k => &$i) {
             if (!is_array($i) || empty($i)) {
@@ -151,7 +121,7 @@ class MenuHelper
      */
     public function resetOrphans($type = 'main')
     {
-        $orphans              = (isset($this->orphans[$type])) ? $this->orphans[$type] : [];
+        $orphans              = $this->orphans[$type] ?? [];
         $this->orphans[$type] = [];
 
         return $orphans;
@@ -163,11 +133,11 @@ class MenuHelper
      * @param bool $appendOrphans
      * @param int  $depth
      */
-    public function placeOrphans(array &$menuItems, $appendOrphans = false, $depth = 1, $type = 'main')
+    public function placeOrphans(array &$menuItems, $appendOrphans = false, $depth = 1, $type = 'main'): void
     {
         foreach ($menuItems as $key => &$items) {
             if (isset($this->orphans[$type]) && isset($this->orphans[$type][$key])) {
-                $priority = (isset($items['priority'])) ? $items['priority'] : 9999;
+                $priority = $items['priority'] ?? 9999;
                 foreach ($this->orphans[$type][$key] as &$orphan) {
                     if (!isset($orphan['extras'])) {
                         $orphan['extras'] = [];
@@ -202,10 +172,10 @@ class MenuHelper
     /**
      * Sort menu items by priority.
      */
-    public function sortByPriority(&$menuItems, $defaultPriority = 9999)
+    public function sortByPriority(&$menuItems, $defaultPriority = 9999): void
     {
         foreach ($menuItems as &$items) {
-            $parentPriority = (isset($items['priority'])) ? $items['priority'] : $defaultPriority;
+            $parentPriority = $items['priority'] ?? $defaultPriority;
             if (isset($items['children'])) {
                 $this->sortByPriority($items['children'], $parentPriority);
             }
@@ -213,15 +183,11 @@ class MenuHelper
 
         uasort(
             $menuItems,
-            function ($a, $b) use ($defaultPriority) {
+            function ($a, $b) use ($defaultPriority): int {
                 $ap = (isset($a['priority']) ? (int) $a['priority'] : $defaultPriority);
                 $bp = (isset($b['priority']) ? (int) $b['priority'] : $defaultPriority);
 
-                if ($ap == $bp) {
-                    return 0;
-                }
-
-                return ($ap > $bp) ? -1 : 1;
+                return $bp <=> $ap;
             }
         );
     }
@@ -236,10 +202,8 @@ class MenuHelper
 
     /**
      * @param string $integrationName
-     *
-     * @return bool
      */
-    protected function handleIntegrationChecks($integrationName, array $config)
+    protected function handleIntegrationChecks($integrationName, array $config): bool
     {
         $integration = $this->integrationHelper->getIntegrationObject($integrationName);
 
@@ -275,10 +239,8 @@ class MenuHelper
     /**
      * @param string $name
      * @param mixed  $value
-     *
-     * @return bool
      */
-    protected function handleParametersChecks($name, $value)
+    protected function handleParametersChecks($name, $value): bool
     {
         return $this->getParameter($name) == $value;
     }
@@ -286,10 +248,8 @@ class MenuHelper
     /**
      * @param string $name
      * @param mixed  $value
-     *
-     * @return bool
      */
-    protected function handleRequestChecks($name, $value)
+    protected function handleRequestChecks($name, $value): bool
     {
         return $this->requestStack->getCurrentRequest()->get($name) == $value;
     }
@@ -299,12 +259,10 @@ class MenuHelper
      */
     protected function handleAccessCheck($accessLevel)
     {
-        switch ($accessLevel) {
-            case 'admin':
-                return $this->security->isAdmin();
-            default:
-                return $this->security->isGranted($accessLevel, 'MATCH_ONE');
-        }
+        return match ($accessLevel) {
+            'admin' => $this->security->isAdmin(),
+            default => $this->security->isGranted($accessLevel, 'MATCH_ONE'),
+        };
     }
 
     /**
@@ -312,7 +270,7 @@ class MenuHelper
      *
      * @return bool Returns false if the item fails the access check or any other checks
      */
-    protected function handleChecks(array $menuItem)
+    protected function handleChecks(array $menuItem): bool
     {
         if (isset($menuItem['access']) && false === $this->handleAccessCheck($menuItem['access'])) {
             return false;

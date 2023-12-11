@@ -20,27 +20,27 @@ class ContactMergerTest extends \PHPUnit\Framework\TestCase
     /**
      * @var \PHPUnit\Framework\MockObject\MockObject|LeadModel
      */
-    private $leadModel;
+    private \PHPUnit\Framework\MockObject\MockObject $leadModel;
 
     /**
      * @var \PHPUnit\Framework\MockObject\MockObject|MergeRecordRepository
      */
-    private $leadRepo;
+    private \PHPUnit\Framework\MockObject\MockObject $leadRepo;
 
     /**
      * @var \PHPUnit\Framework\MockObject\MockObject|MergeRecordRepository
      */
-    private $mergeRecordRepo;
+    private \PHPUnit\Framework\MockObject\MockObject $mergeRecordRepo;
 
     /**
      * @var \PHPUnit\Framework\MockObject\MockObject|EventDispatcher
      */
-    private $dispatcher;
+    private \PHPUnit\Framework\MockObject\MockObject $dispatcher;
 
     /**
      * @var \PHPUnit\Framework\MockObject\MockObject|Logger
      */
-    private $logger;
+    private \PHPUnit\Framework\MockObject\MockObject $logger;
 
     protected function setUp(): void
     {
@@ -53,7 +53,7 @@ class ContactMergerTest extends \PHPUnit\Framework\TestCase
         $this->leadModel->method('getRepository')->willReturn($this->leadRepo);
     }
 
-    public function testMergeTimestamps()
+    public function testMergeTimestamps(): void
     {
         $oldestDateTime = new \DateTime('-60 minutes');
         $latestDateTime = new \DateTime('-30 minutes');
@@ -88,7 +88,7 @@ class ContactMergerTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($latestDateTime, $winner->getDateIdentified());
     }
 
-    public function testMergeIpAddresses()
+    public function testMergeIpAddresses(): void
     {
         $winner = new Lead();
         $winner->addIpAddress((new IpAddress('1.2.3.4'))->setIpDetails(['extra' => 'from winner']));
@@ -119,7 +119,7 @@ class ContactMergerTest extends \PHPUnit\Framework\TestCase
         }
     }
 
-    public function testMergeFieldDataWithLoserAsNewlyUpdated()
+    public function testMergeFieldDataWithLoserAsNewlyUpdated(): void
     {
         $winner = $this->getMockBuilder(Lead::class)
             ->getMock();
@@ -149,10 +149,10 @@ class ContactMergerTest extends \PHPUnit\Framework\TestCase
 
         $winnerDateModified = new \DateTime('-30 minutes');
         $loserDateModified  = new \DateTime();
-        $winner->expects($this->exactly(2))
+        $winner->expects($this->exactly(1))
             ->method('getDateModified')
             ->willReturn($winnerDateModified);
-        $loser->expects($this->exactly(2))
+        $loser->expects($this->exactly(1))
             ->method('getDateModified')
             ->willReturn($loserDateModified);
         $winner->expects($this->once())
@@ -192,7 +192,7 @@ class ContactMergerTest extends \PHPUnit\Framework\TestCase
         $merger->mergeFieldData($winner, $loser);
     }
 
-    public function testMergeFieldDataWithWinnerAsNewlyUpdated()
+    public function testMergeFieldDataWithWinnerAsNewlyUpdated(): void
     {
         $winner = $this->getMockBuilder(Lead::class)
             ->getMock();
@@ -222,7 +222,7 @@ class ContactMergerTest extends \PHPUnit\Framework\TestCase
 
         $winnerDateModified = new \DateTime();
         $loserDateModified  = new \DateTime('-30 minutes');
-        $winner->expects($this->exactly(2))
+        $winner->expects($this->exactly(1))
             ->method('getDateModified')
             ->willReturn($winnerDateModified);
 
@@ -246,7 +246,7 @@ class ContactMergerTest extends \PHPUnit\Framework\TestCase
             ->with('email')
             ->willReturn('winner@test.com');
 
-        $loser->expects($this->exactly(2))
+        $loser->expects($this->exactly(1))
             ->method('getDateModified')
             ->willReturn($loserDateModified);
 
@@ -265,7 +265,7 @@ class ContactMergerTest extends \PHPUnit\Framework\TestCase
         $merger->mergeFieldData($winner, $loser);
     }
 
-    public function testMergeFieldDataWithLoserAsNewlyCreated()
+    public function testMergeFieldDataWithLoserAsNewlyCreated(): void
     {
         $winner = $this->getMockBuilder(Lead::class)
             ->getMock();
@@ -295,7 +295,7 @@ class ContactMergerTest extends \PHPUnit\Framework\TestCase
 
         $winnerDateModified = new \DateTime('-30 minutes');
         $loserDateModified  = new \DateTime();
-        $winner->expects($this->exactly(2))
+        $winner->expects($this->exactly(1))
             ->method('getDateModified')
             ->willReturn($winnerDateModified);
 
@@ -343,7 +343,7 @@ class ContactMergerTest extends \PHPUnit\Framework\TestCase
         $merger->mergeFieldData($winner, $loser);
     }
 
-    public function testMergeFieldDataWithWinnerAsNewlyCreated()
+    public function testMergeFieldDataWithWinnerAsNewlyCreated(): void
     {
         $winner = $this->getMockBuilder(Lead::class)
             ->getMock();
@@ -400,7 +400,7 @@ class ContactMergerTest extends \PHPUnit\Framework\TestCase
             ->with('email')
             ->willReturn('winner@test.com');
 
-        $loser->expects($this->exactly(2))
+        $loser->expects($this->exactly(1))
             ->method('getDateModified')
             ->willReturn($loserDateModified);
 
@@ -424,7 +424,7 @@ class ContactMergerTest extends \PHPUnit\Framework\TestCase
      * The browser must contain no Mautic cookies. A new contact is created with only default values.
      * If default values from the new contact overwrite the values of the original contact then data are lost.
      */
-    public function testMergeFieldDataWithDefaultValues()
+    public function testMergeFieldDataWithDefaultValues(): void
     {
         $winner = $this->createMock(Lead::class);
         $loser  = $this->createMock(Lead::class);
@@ -453,6 +453,7 @@ class ContactMergerTest extends \PHPUnit\Framework\TestCase
 
         $winner->method('getDateModified')->willReturn($winnerDateModified);
         $winner->method('getId')->willReturn(1);
+
         $loser->method('getDateModified')->willReturn($loserDateModified);
         $loser->method('getId')->willReturn(2);
         $loser->method('isAnonymous')->willReturn(true);
@@ -505,7 +506,7 @@ class ContactMergerTest extends \PHPUnit\Framework\TestCase
         $merger->mergeFieldData($winner, $loser);
     }
 
-    public function testMergeOwners()
+    public function testMergeOwners(): void
     {
         $winner = new Lead();
         $loser  = new Lead();
@@ -529,7 +530,7 @@ class ContactMergerTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($loserOwner->getUsername(), $winner->getOwner()->getUsername());
     }
 
-    public function testMergePoints()
+    public function testMergePoints(): void
     {
         $winner = new Lead();
         $loser  = new Lead();
@@ -542,7 +543,7 @@ class ContactMergerTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals(150, $winner->getPoints());
     }
 
-    public function testMergeTags()
+    public function testMergeTags(): void
     {
         $winner = new Lead();
         $loser  = new Lead();
@@ -556,7 +557,7 @@ class ContactMergerTest extends \PHPUnit\Framework\TestCase
         $this->getMerger()->mergeTags($winner, $loser);
     }
 
-    public function testFullMergeThrowsSameContactException()
+    public function testFullMergeThrowsSameContactException(): void
     {
         $winner = $this->getMockBuilder(Lead::class)
             ->getMock();
@@ -575,7 +576,7 @@ class ContactMergerTest extends \PHPUnit\Framework\TestCase
         $this->getMerger()->merge($winner, $loser);
     }
 
-    public function testFullMerge()
+    public function testFullMerge(): void
     {
         $winner = $this->getMockBuilder(Lead::class)
             ->getMock();
@@ -591,7 +592,7 @@ class ContactMergerTest extends \PHPUnit\Framework\TestCase
                     'email'  => 'winner@test.com',
                 ]
             );
-        $winner->expects($this->exactly(2))
+        $winner->expects($this->exactly(1))
             ->method('getDateModified')
             ->willReturn(new \DateTime('-30 minutes'));
 
@@ -609,7 +610,7 @@ class ContactMergerTest extends \PHPUnit\Framework\TestCase
                     'email'  => 'loser@test.com',
                 ]
             );
-        $loser->expects($this->exactly(2))
+        $loser->expects($this->exactly(1))
             ->method('getDateModified')
             ->willReturn(new \DateTime());
 
@@ -675,16 +676,16 @@ class ContactMergerTest extends \PHPUnit\Framework\TestCase
         $this->getMerger()->merge($winner, $loser);
     }
 
-    public function testMergeFieldWithEmptyFieldData()
+    public function testMergeFieldWithEmptyFieldData(): void
     {
         $loser  = $this->createMock(Lead::class);
         $winner = $this->createMock(Lead::class);
 
-        $loser->expects($this->exactly(2))
+        $loser->expects($this->exactly(1))
             ->method('getDateModified')
             ->willReturn(new \DateTime('-10 minutes'));
 
-        $winner->expects($this->exactly(2))
+        $winner->expects($this->exactly(1))
             ->method('getDateModified')
             ->willReturn(new \DateTime());
 

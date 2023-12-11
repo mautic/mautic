@@ -11,17 +11,11 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class GroupScoreSubscriber implements EventSubscriberInterface
 {
-    private TriggerModel $triggerModel;
-
-    public function __construct(TriggerModel $triggerModel)
+    public function __construct(private TriggerModel $triggerModel)
     {
-        $this->triggerModel = $triggerModel;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             PointGroupEvents::SCORE_CHANGE     => ['onGroupScoreChange', 0],

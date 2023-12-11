@@ -2,9 +2,6 @@
 
 namespace Mautic\FormBundle\Exception;
 
-/**
- * Class ValidationException.
- */
 class ValidationException extends \Exception
 {
     private $violations = [];

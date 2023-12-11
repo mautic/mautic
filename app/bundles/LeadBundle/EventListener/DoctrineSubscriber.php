@@ -9,35 +9,20 @@ use Doctrine\ORM\Tools\ToolEvents;
 use Mautic\LeadBundle\Model\FieldModel;
 use Monolog\Logger;
 
-/**
- * Class DoctrineSubscriber.
- */
 class DoctrineSubscriber implements EventSubscriber
 {
-    /**
-     * @var Logger
-     */
-    private $logger;
-
-    /**
-     * DoctrineSubscriber constructor.
-     */
-    public function __construct(Logger $logger)
+    public function __construct(private Logger $logger)
     {
-        $this->logger = $logger;
     }
 
-    /**
-     * @return array
-     */
-    public function getSubscribedEvents()
+    public function getSubscribedEvents(): array
     {
         return [
             ToolEvents::postGenerateSchema,
         ];
     }
 
-    public function postGenerateSchema(GenerateSchemaEventArgs $args)
+    public function postGenerateSchema(GenerateSchemaEventArgs $args): void
     {
         $schema = $args->getSchema();
 

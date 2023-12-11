@@ -13,14 +13,8 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 final class WebhookSubscriber implements EventSubscriberInterface
 {
-    /**
-     * @var WebhookModel
-     */
-    private $webhookModel;
-
-    public function __construct(WebhookModel $webhookModel)
+    public function __construct(private WebhookModel $webhookModel)
     {
-        $this->webhookModel = $webhookModel;
     }
 
     public static function getSubscribedEvents(): array

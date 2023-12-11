@@ -11,32 +11,11 @@ class TokenHelper
 {
     private $regex = '{focus=(.*?)}';
 
-    /**
-     * @var FocusModel
-     */
-    protected $model;
-
-    /**
-     * @var RouterInterface
-     */
-    protected $router;
-
-    /**
-     * @var CorePermissions
-     */
-    protected $security;
-
-    public function __construct(FocusModel $model, RouterInterface $router, CorePermissions $security)
+    public function __construct(protected FocusModel $model, protected RouterInterface $router, protected CorePermissions $security)
     {
-        $this->router   = $router;
-        $this->model    = $model;
-        $this->security = $security;
     }
 
-    /**
-     * @return array
-     */
-    public function findFocusTokens($content)
+    public function findFocusTokens($content): array
     {
         $regex = '/'.$this->regex.'/i';
 

@@ -20,30 +20,11 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class CampaignSubscriber implements EventSubscriberInterface
 {
-    private NotificationModel $notificationModel;
-    private AbstractNotificationApi $notificationApi;
-    private IntegrationHelper $integrationHelper;
-    private EventDispatcherInterface $dispatcher;
-    private DoNotContactModel $doNotContact;
-
-    public function __construct(
-        IntegrationHelper $integrationHelper,
-        NotificationModel $notificationModel,
-        AbstractNotificationApi $notificationApi,
-        EventDispatcherInterface $dispatcher,
-        DoNotContactModel $doNotContact
-    ) {
-        $this->integrationHelper = $integrationHelper;
-        $this->notificationModel = $notificationModel;
-        $this->notificationApi   = $notificationApi;
-        $this->dispatcher        = $dispatcher;
-        $this->doNotContact      = $doNotContact;
+    public function __construct(private IntegrationHelper $integrationHelper, private NotificationModel $notificationModel, private AbstractNotificationApi $notificationApi, private EventDispatcherInterface $dispatcher, private DoNotContactModel $doNotContact)
+    {
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             CampaignEvents::CAMPAIGN_ON_BUILD              => ['onCampaignBuild', 0],
@@ -51,7 +32,7 @@ class CampaignSubscriber implements EventSubscriberInterface
         ];
     }
 
-    public function onCampaignBuild(CampaignBuilderEvent $event)
+    public function onCampaignBuild(CampaignBuilderEvent $event): void
     {
         $integration = $this->integrationHelper->getIntegrationObject('OneSignal');
 

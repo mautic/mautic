@@ -19,18 +19,14 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class MonitoringType extends AbstractType
 {
-    /** @var MonitoringModel */
-    private $monitoringModel;
-
-    public function __construct(MonitoringModel $monitoringModel)
+    public function __construct(private MonitoringModel $monitoringModel)
     {
-        $this->monitoringModel = $monitoringModel;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder->addEventSubscriber(new CleanFormSubscriber(['description' => 'html']));
 
@@ -101,10 +97,10 @@ class MonitoringType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function configureOptions(OptionsResolver $resolver)
+    public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults([
-                'data_class' => 'MauticPlugin\MauticSocialBundle\Entity\Monitoring',
+                'data_class' => \MauticPlugin\MauticSocialBundle\Entity\Monitoring::class,
             ]);
 
         // allow network types to be sent through - list

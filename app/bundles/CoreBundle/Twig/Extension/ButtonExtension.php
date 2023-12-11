@@ -13,21 +13,8 @@ use Twig\TwigFunction;
 
 class ButtonExtension extends AbstractExtension
 {
-    protected ButtonHelper $buttonHelper;
-    protected RequestStack $requestStack;
-    protected UrlGeneratorInterface $router;
-    protected TranslatorInterface $translator;
-
-    public function __construct(
-        ButtonHelper $buttonHelper,
-        RequestStack $requestStack,
-        UrlGeneratorInterface $router,
-        TranslatorInterface $translator
-    ) {
-        $this->buttonHelper = $buttonHelper;
-        $this->requestStack = $requestStack;
-        $this->router       = $router;
-        $this->translator   = $translator;
+    public function __construct(protected ButtonHelper $buttonHelper, protected RequestStack $requestStack, protected UrlGeneratorInterface $router, protected TranslatorInterface $translator)
+    {
     }
 
     /**
@@ -145,7 +132,7 @@ class ButtonExtension extends AbstractExtension
                     $path = $this->router->generate($actionRoute, array_merge(['objectAction' => $action], $actionQuery, $query));
                     break;
                 case 'close':
-                    $closeParameters = isset($routeVars['close']) ? $routeVars['close'] : [];
+                    $closeParameters = $routeVars['close'] ?? [];
                     $icon            = 'remove';
                     $path            = $this->router->generate($indexRoute, $closeParameters);
                     $primary         = true;

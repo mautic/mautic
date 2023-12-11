@@ -13,29 +13,11 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class CampaignActionChangeMembershipSubscriber implements EventSubscriberInterface
 {
-    /**
-     * @var MembershipManager
-     */
-    private $membershipManager;
-
-    /**
-     * @var CampaignModel
-     */
-    private $campaignModel;
-
-    /**
-     * CampaignActionChangeMembershipSubscriber constructor.
-     */
-    public function __construct(MembershipManager $membershipManager, CampaignModel $campaignModel)
+    public function __construct(private MembershipManager $membershipManager, private CampaignModel $campaignModel)
     {
-        $this->membershipManager = $membershipManager;
-        $this->campaignModel     = $campaignModel;
     }
 
-    /**
-     * @return array
-     */
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             CampaignEvents::CAMPAIGN_ON_BUILD                    => ['addAction', 0],
@@ -46,7 +28,7 @@ class CampaignActionChangeMembershipSubscriber implements EventSubscriberInterfa
     /**
      * Add change membership action.
      */
-    public function addAction(CampaignBuilderEvent $event)
+    public function addAction(CampaignBuilderEvent $event): void
     {
         $event->addAction(
             'campaign.addremovelead',
@@ -62,7 +44,7 @@ class CampaignActionChangeMembershipSubscriber implements EventSubscriberInterfa
         );
     }
 
-    public function changeMembership(PendingEvent $event)
+    public function changeMembership(PendingEvent $event): void
     {
         $properties          = $event->getEvent()->getProperties();
         $contacts            = $event->getContactsKeyedById();

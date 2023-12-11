@@ -5,9 +5,6 @@ namespace Mautic\ChannelBundle\Security\Permissions;
 use Mautic\CoreBundle\Security\Permissions\AbstractPermissions;
 use Symfony\Component\Form\FormBuilderInterface;
 
-/**
- * Class ChannelPermissions.
- */
 class ChannelPermissions extends AbstractPermissions
 {
     /**
@@ -21,20 +18,12 @@ class ChannelPermissions extends AbstractPermissions
         $this->addExtendedPermissions('messages');
     }
 
-    /**
-     * {@inheritdoc}
-     *
-     * @return string|void
-     */
-    public function getName()
+    public function getName(): string
     {
         return 'channel';
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function buildForm(FormBuilderInterface &$builder, array $options, array $data)
+    public function buildForm(FormBuilderInterface &$builder, array $options, array $data): void
     {
         $this->addStandardFormFields($this->getName(), 'categories', $builder, $data);
         $this->addExtendedFormFields($this->getName(), 'messages', $builder, $data);

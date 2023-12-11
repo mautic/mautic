@@ -12,25 +12,10 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 final class FormConditionalSubscriber implements EventSubscriberInterface
 {
-    /**
-     * @var FormModel
-     */
-    private $formModel;
-
-    /**
-     * @var FieldModel
-     */
-    private $fieldModel;
-
-    public function __construct(FormModel $formModel, FieldModel $fieldModel)
+    public function __construct(private FormModel $formModel, private FieldModel $fieldModel)
     {
-        $this->formModel  = $formModel;
-        $this->fieldModel = $fieldModel;
     }
 
-    /**
-     * @return array<string,mixed[]>
-     */
     public static function getSubscribedEvents(): array
     {
         return [
@@ -49,7 +34,7 @@ final class FormConditionalSubscriber implements EventSubscriberInterface
         $actualFieldIds = [];
         foreach ($form->getFields() as $field) {
             $actualFieldIds[] = $field->getId();
-            if (false !== strpos((string) $field->getParent(), 'new')) {
+            if (str_contains((string) $field->getParent(), 'new')) {
                 foreach ($form->getFields() as $parentField) {
                     if ($field->getParent() === $parentField->getSessionId()) {
                         $field->setParent((string) $parentField->getId());

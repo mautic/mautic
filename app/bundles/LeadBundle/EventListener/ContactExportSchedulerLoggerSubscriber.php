@@ -13,16 +13,10 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class ContactExportSchedulerLoggerSubscriber implements EventSubscriberInterface
 {
-    private LoggerInterface $logger;
-
-    public function __construct(LoggerInterface $logger)
+    public function __construct(private LoggerInterface $logger)
     {
-        $this->logger = $logger;
     }
 
-    /**
-     * @return array<string, string>
-     */
     public static function getSubscribedEvents(): array
     {
         return [

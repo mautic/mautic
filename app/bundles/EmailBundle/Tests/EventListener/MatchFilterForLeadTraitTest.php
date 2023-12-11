@@ -30,7 +30,7 @@ class MatchFilterForLeadTraitTest extends TestCase
     /**
      * @var MatchFilterForLeadTraitTestable
      */
-    private $matchFilterForLeadTrait;
+    private \Mautic\EmailBundle\Tests\EventListener\MatchFilterForLeadTraitTestable $matchFilterForLeadTrait;
 
     protected function setUp(): void
     {
@@ -107,7 +107,7 @@ class MatchFilterForLeadTraitTest extends TestCase
         $this->assertEquals($expect, $this->matchFilterForLeadTrait->match($filters, $lead));
     }
 
-    public function dateMatchTestProvider(): iterable
+    public static function dateMatchTestProvider(): iterable
     {
         $date = '2021-05-01';
 

@@ -9,15 +9,7 @@ use Symfony\Component\HttpFoundation\ParameterBag;
 
 class ParameterLoader
 {
-    /**
-     * @var string
-     */
-    private $rootPath;
-
-    /**
-     * @var string
-     */
-    private $configBaseDir;
+    private string $configBaseDir;
 
     /**
      * @var ParameterBag
@@ -39,10 +31,9 @@ class ParameterLoader
      */
     private static $defaultParameters = [];
 
-    public function __construct(string $configRootPath = __DIR__.'/../../../')
+    public function __construct(private string $rootPath = __DIR__.'/../../../')
     {
-        $this->rootPath      = $configRootPath;
-        $this->configBaseDir = $this->getLocalConfigBaseDir($this->rootPath);
+        $this->configBaseDir = static::getLocalConfigBaseDir($this->rootPath);
 
         $this->loadDefaultParameters();
         $this->loadLocalParameters();
@@ -179,8 +170,8 @@ class ParameterLoader
         // Force local specific params
         $localParametersFile = $this->getLocalParametersFile();
         if (file_exists($localParametersFile)) {
-            /** @var array<string, mixed> $parameters */
             include $localParametersFile;
+            /** @var array<string, mixed> $parameters */
 
             // override default with forced
             $compiledParameters = array_merge($compiledParameters, $parameters);

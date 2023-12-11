@@ -9,20 +9,8 @@ use Symfony\Component\HttpFoundation\Session\SessionInterface;
 
 final class PageHelperFactory implements PageHelperFactoryInterface
 {
-    /**
-     * @var SessionInterface
-     */
-    private $session;
-
-    /**
-     * @var CoreParametersHelper
-     */
-    private $coreParametersHelper;
-
-    public function __construct(SessionInterface $session, CoreParametersHelper $coreParametersHelper)
+    public function __construct(private SessionInterface $session, private CoreParametersHelper $coreParametersHelper)
     {
-        $this->session              = $session;
-        $this->coreParametersHelper = $coreParametersHelper;
     }
 
     public function make(string $sessionPrefix, int $page): PageHelperInterface

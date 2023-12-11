@@ -10,26 +10,11 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class UserSubscriber implements EventSubscriberInterface
 {
-    /**
-     * @var IpLookupHelper
-     */
-    private $ipLookupHelper;
-
-    /**
-     * @var AuditLogModel
-     */
-    private $auditLogModel;
-
-    public function __construct(IpLookupHelper $ipLookupHelper, AuditLogModel $auditLogModel)
+    public function __construct(private IpLookupHelper $ipLookupHelper, private AuditLogModel $auditLogModel)
     {
-        $this->ipLookupHelper = $ipLookupHelper;
-        $this->auditLogModel  = $auditLogModel;
     }
 
-    /**
-     * @return array
-     */
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             UserEvents::USER_POST_SAVE   => ['onUserPostSave', 0],
@@ -42,7 +27,7 @@ class UserSubscriber implements EventSubscriberInterface
     /**
      * Add a user entry to the audit log.
      */
-    public function onUserPostSave(Events\UserEvent $event)
+    public function onUserPostSave(Events\UserEvent $event): void
     {
         $user = $event->getUser();
 
@@ -62,7 +47,7 @@ class UserSubscriber implements EventSubscriberInterface
     /**
      * Add a user delete entry to the audit log.
      */
-    public function onUserDelete(Events\UserEvent $event)
+    public function onUserDelete(Events\UserEvent $event): void
     {
         $user = $event->getUser();
         $log  = [
@@ -79,7 +64,7 @@ class UserSubscriber implements EventSubscriberInterface
     /**
      * Add a role entry to the audit log.
      */
-    public function onRolePostSave(Events\RoleEvent $event)
+    public function onRolePostSave(Events\RoleEvent $event): void
     {
         $role = $event->getRole();
         if ($details = $event->getChanges()) {
@@ -98,7 +83,7 @@ class UserSubscriber implements EventSubscriberInterface
     /**
      * Add a role delete entry to the audit log.
      */
-    public function onRoleDelete(Events\RoleEvent $event)
+    public function onRoleDelete(Events\RoleEvent $event): void
     {
         $role = $event->getRole();
         $log  = [

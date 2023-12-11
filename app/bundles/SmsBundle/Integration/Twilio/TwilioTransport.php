@@ -15,27 +15,12 @@ use Twilio\Rest\Client;
 class TwilioTransport implements TransportInterface
 {
     /**
-     * @var Configuration
-     */
-    private $configuration;
-
-    /**
-     * @var LoggerInterface
-     */
-    private $logger;
-
-    /**
      * @var Client
      */
     private $client;
 
-    /**
-     * TwilioTransport constructor.
-     */
-    public function __construct(Configuration $configuration, LoggerInterface $logger)
+    public function __construct(private Configuration $configuration, private LoggerInterface $logger)
     {
-        $this->logger        = $logger;
-        $this->configuration = $configuration;
     }
 
     /**
@@ -61,28 +46,28 @@ class TwilioTransport implements TransportInterface
             );
 
             return true;
-        } catch (NumberParseException $exception) {
+        } catch (NumberParseException $numberParseException) {
             $this->logger->warning(
-                $exception->getMessage(),
-                ['exception' => $exception]
+                $numberParseException->getMessage(),
+                ['exception' => $numberParseException]
             );
 
-            return $exception->getMessage();
-        } catch (ConfigurationException $exception) {
-            $message = ($exception->getMessage()) ? $exception->getMessage() : 'mautic.sms.transport.twilio.not_configured';
+            return $numberParseException->getMessage();
+        } catch (ConfigurationException $configurationException) {
+            $message = $configurationException->getMessage() ?: 'mautic.sms.transport.twilio.not_configured';
             $this->logger->warning(
                 $message,
-                ['exception' => $exception]
+                ['exception' => $configurationException]
             );
 
             return $message;
-        } catch (TwilioException $exception) {
+        } catch (TwilioException $twilioException) {
             $this->logger->warning(
-                $exception->getMessage(),
-                ['exception' => $exception]
+                $twilioException->getMessage(),
+                ['exception' => $twilioException]
             );
 
-            return $exception->getMessage();
+            return $twilioException->getMessage();
         }
     }
 
@@ -106,18 +91,16 @@ class TwilioTransport implements TransportInterface
      */
     private function createPayload(string $messagingServiceSid, string $content): array
     {
-        $payload = [
+        return [
             'messagingServiceSid' => $messagingServiceSid,
             'body'                => $content,
         ];
-
-        return $payload;
     }
 
     /**
      * @throws ConfigurationException
      */
-    private function configureClient()
+    private function configureClient(): void
     {
         if ($this->client) {
             // Already configured

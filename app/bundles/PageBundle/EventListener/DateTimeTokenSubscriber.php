@@ -13,20 +13,8 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class DateTimeTokenSubscriber implements EventSubscriberInterface
 {
-    private ContactTracker $contactTracker;
-
-    private DateTimeToken $dateTokenHelper;
-
-    private CorePermissions $security;
-
-    private TranslatorInterface $translator;
-
-    public function __construct(TranslatorInterface $translator, DateTimeToken $dateTokenHelper, CorePermissions $security, ContactTracker $contactTracker)
+    public function __construct(private TranslatorInterface $translator, private DateTimeToken $dateTokenHelper, private CorePermissions $security, private ContactTracker $contactTracker)
     {
-        $this->translator      = $translator;
-        $this->dateTokenHelper = $dateTokenHelper;
-        $this->security        = $security;
-        $this->contactTracker  = $contactTracker;
     }
 
     public static function getSubscribedEvents(): array

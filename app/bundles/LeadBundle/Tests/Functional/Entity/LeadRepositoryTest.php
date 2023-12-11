@@ -22,7 +22,7 @@ final class LeadRepositoryTest extends MauticMysqlTestCase
     /**
      * @return array<int, array<string, array<string, bool>>>
      */
-    public function joinIpAddressesProvider(): array
+    public static function joinIpAddressesProvider(): array
     {
         return [
             ['' => []],

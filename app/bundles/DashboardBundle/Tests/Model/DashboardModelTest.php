@@ -26,27 +26,24 @@ class DashboardModelTest extends TestCase
     /**
      * @var CoreParametersHelper|MockObject
      */
-    private $coreParametersHelper;
+    private \PHPUnit\Framework\MockObject\MockObject $coreParametersHelper;
 
     /**
      * @var PathsHelper|MockObject
      */
-    private $pathsHelper;
+    private \PHPUnit\Framework\MockObject\MockObject $pathsHelper;
 
     /**
      * @var MockObject|Filesystem
      */
-    private $filesystem;
+    private \PHPUnit\Framework\MockObject\MockObject $filesystem;
 
     /**
      * @var MockObject|Session
      */
-    private $session;
+    private \PHPUnit\Framework\MockObject\MockObject $session;
 
-    /**
-     * @var DashboardModel
-     */
-    private $model;
+    private \Mautic\DashboardBundle\Model\DashboardModel $model;
 
     protected function setUp(): void
     {

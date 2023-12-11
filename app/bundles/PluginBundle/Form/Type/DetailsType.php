@@ -15,15 +15,12 @@ use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
-/**
- * Class DetailsType.
- */
 class DetailsType extends AbstractType
 {
     /**
      * {@inheritdoc}
      */
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder->add('isPublished', YesNoButtonGroupType::class);
 
@@ -54,7 +51,7 @@ class DetailsType extends AbstractType
 
         $builder->addEventListener(
             FormEvents::PRE_SUBMIT,
-            function (FormEvent $event) use ($keys, $decryptedKeys, $options) {
+            function (FormEvent $event) use ($keys, $decryptedKeys, $options): void {
                 $data = $event->getData();
                 $form = $event->getForm();
 
@@ -114,7 +111,7 @@ class DetailsType extends AbstractType
                     'label'       => 'mautic.integration.form.features',
                     'required'    => false,
                     'data'        => $data,
-                    'choice_attr' => function ($val) use ($tooltips) {
+                    'choice_attr' => function ($val) use ($tooltips): array {
                         if (array_key_exists($val, $tooltips)) {
                             return [
                                 'data-toggle' => 'tooltip',
@@ -159,7 +156,7 @@ class DetailsType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function configureOptions(OptionsResolver $resolver)
+    public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults(
             [

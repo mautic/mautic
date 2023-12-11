@@ -73,7 +73,7 @@ class ConnectwiseApi extends CrmApi
             'page'     => $page,
             'pageSize' => ConnectwiseIntegration::PAGESIZE,
         ];
-        $conditions = isset($params['conditions']) ? $params['conditions'] : [];
+        $conditions = $params['conditions'] ?? [];
 
         if (isset($params['start'])) {
             $conditions[] = 'lastUpdated > ['.$params['start'].']';
@@ -192,11 +192,9 @@ class ConnectwiseApi extends CrmApi
     }
 
     /**
-     * @return array
-     *
      * @throws ApiErrorException
      */
-    public function fetchAllRecords($endpoint)
+    public function fetchAllRecords($endpoint): array
     {
         $page        = 1;
         $pageSize    = ConnectwiseIntegration::PAGESIZE;

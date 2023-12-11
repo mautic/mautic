@@ -23,6 +23,7 @@ use Mautic\PageBundle\Model\TrackableModel;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\FormFactoryInterface;
+use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Contracts\EventDispatcher\Event;
@@ -34,16 +35,8 @@ use Symfony\Contracts\EventDispatcher\Event;
  */
 class NotificationModel extends FormModel implements AjaxLookupModelInterface
 {
-    /**
-     * @var TrackableModel
-     */
-    protected $pageTrackableModel;
-
-    /**
-     * NotificationModel constructor.
-     */
     public function __construct(
-        TrackableModel $pageTrackableModel,
+        protected TrackableModel $pageTrackableModel,
         EntityManager $em,
         CorePermissions $security,
         EventDispatcherInterface $dispatcher,
@@ -53,8 +46,6 @@ class NotificationModel extends FormModel implements AjaxLookupModelInterface
         LoggerInterface $mauticLogger,
         CoreParametersHelper $coreParametersHelper
     ) {
-        $this->pageTrackableModel = $pageTrackableModel;
-
         parent::__construct($em, $security, $dispatcher, $router, $translator, $userHelper, $mauticLogger, $coreParametersHelper);
     }
 
@@ -79,17 +70,12 @@ class NotificationModel extends FormModel implements AjaxLookupModelInterface
     /**
      * {@inheritdoc}
      */
-    public function getPermissionBase()
+    public function getPermissionBase(): string
     {
         return 'notification:notifications';
     }
 
-    /**
-     * Save an array of entities.
-     *
-     * @return array
-     */
-    public function saveEntities($entities, $unlock = true)
+    public function saveEntities($entities, $unlock = true): void
     {
         // iterate over the results so the events are dispatched on each delete
         $batchSize = 20;
@@ -124,12 +110,10 @@ class NotificationModel extends FormModel implements AjaxLookupModelInterface
      * @param string|null       $action
      * @param array             $options
      *
-     * @return mixed
-     *
      * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
      * @throws MethodNotAllowedHttpException
      */
-    public function createForm($entity, FormFactoryInterface $formFactory, $action = null, $options = [])
+    public function createForm($entity, FormFactoryInterface $formFactory, $action = null, $options = []): FormInterface
     {
         if (!$entity instanceof Notification) {
             throw new MethodNotAllowedHttpException(['Notification']);
@@ -138,7 +122,7 @@ class NotificationModel extends FormModel implements AjaxLookupModelInterface
             $options['action'] = $action;
         }
 
-        $type = false !== strpos($action, 'mobile_') ? MobileNotificationType::class : NotificationType::class;
+        $type = str_contains($action, 'mobile_') ? MobileNotificationType::class : NotificationType::class;
 
         return $formFactory->create($type, $entity, $options);
     }
@@ -163,7 +147,7 @@ class NotificationModel extends FormModel implements AjaxLookupModelInterface
      * @param string $source
      * @param int    $sourceId
      */
-    public function createStatEntry(Notification $notification, Lead $lead, $source = null, $sourceId = null)
+    public function createStatEntry(Notification $notification, Lead $lead, $source = null, $sourceId = null): void
     {
         $stat = new Stat();
         $stat->setDateSent(new \DateTime());
@@ -180,7 +164,7 @@ class NotificationModel extends FormModel implements AjaxLookupModelInterface
      *
      * @throws \Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException
      */
-    protected function dispatchEvent($action, &$entity, $isNew = false, Event $event = null)
+    protected function dispatchEvent($action, &$entity, $isNew = false, Event $event = null): ?Event
     {
         if (!$entity instanceof Notification) {
             throw new MethodNotAllowedHttpException(['Notification']);
@@ -220,7 +204,7 @@ class NotificationModel extends FormModel implements AjaxLookupModelInterface
     /**
      * Joins the page table and limits created_by to currently logged in user.
      */
-    public function limitQueryToCreator(QueryBuilder &$q)
+    public function limitQueryToCreator(QueryBuilder &$q): void
     {
         $q->join('t', MAUTIC_TABLE_PREFIX.'push_notifications', 'p', 'p.id = t.notification_id')
             ->andWhere('p.created_by = :userId')
@@ -302,10 +286,8 @@ class NotificationModel extends FormModel implements AjaxLookupModelInterface
      * @param int    $limit
      * @param int    $start
      * @param array  $options
-     *
-     * @return array
      */
-    public function getLookupResults($type, $filter = '', $limit = 10, $start = 0, $options = [])
+    public function getLookupResults($type, $filter = '', $limit = 10, $start = 0, $options = []): array
     {
         $results = [];
         switch ($type) {
@@ -315,7 +297,7 @@ class NotificationModel extends FormModel implements AjaxLookupModelInterface
                     $limit,
                     $start,
                     $this->security->isGranted($this->getPermissionBase().':viewother'),
-                    isset($options['notification_type']) ? $options['notification_type'] : null
+                    $options['notification_type'] ?? null
                 );
 
                 foreach ($entities as $entity) {
@@ -332,7 +314,7 @@ class NotificationModel extends FormModel implements AjaxLookupModelInterface
                     $limit,
                     $start,
                     $this->security->isGranted($this->getPermissionBase().':viewother'),
-                    isset($options['notification_type']) ? $options['notification_type'] : null
+                    $options['notification_type'] ?? null
                 );
 
                 foreach ($entities as $entity) {

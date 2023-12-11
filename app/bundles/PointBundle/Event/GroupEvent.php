@@ -8,11 +8,8 @@ use Mautic\PointBundle\Entity\Group;
 
 final class GroupEvent
 {
-    private Group $entity;
-
-    public function __construct(Group $group)
+    public function __construct(private Group $entity)
     {
-        $this->entity = $group;
     }
 
     public function getGroup(): Group

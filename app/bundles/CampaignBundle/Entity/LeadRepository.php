@@ -19,10 +19,8 @@ class LeadRepository extends CommonRepository
      * Get the details of leads added to a campaign.
      *
      * @param null $leads
-     *
-     * @return array
      */
-    public function getLeadDetails($campaignId, $leads = null)
+    public function getLeadDetails($campaignId, $leads = null): array
     {
         $q = $this->getEntityManager()->createQueryBuilder()
             ->from(\Mautic\CampaignBundle\Entity\Lead::class, 'lc')
@@ -92,7 +90,7 @@ class LeadRepository extends CommonRepository
     /**
      * Updates lead ID (e.g. after a lead merge).
      */
-    public function updateLead($fromLeadId, $toLeadId)
+    public function updateLead($fromLeadId, $toLeadId): void
     {
         // First check to ensure the $toLead doesn't already exist
         $results = $this->getEntityManager()->getConnection()->createQueryBuilder()
@@ -132,10 +130,8 @@ class LeadRepository extends CommonRepository
      *
      * @param Lead  $lead
      * @param array $options
-     *
-     * @return bool
      */
-    public function checkLeadInCampaigns($lead, $options = [])
+    public function checkLeadInCampaigns($lead, $options = []): bool
     {
         if (empty($options['campaigns'])) {
             return false;
@@ -146,7 +142,7 @@ class LeadRepository extends CommonRepository
         $q->where(
             $q->expr()->and(
                 $q->expr()->eq('l.lead_id', ':leadId'),
-                $q->expr()->in('l.campaign_id', $options['campaigns'], \Doctrine\DBAL\Connection::PARAM_INT_ARRAY)
+                $q->expr()->in('l.campaign_id', $options['campaigns'])
             )
         );
 
@@ -165,10 +161,8 @@ class LeadRepository extends CommonRepository
      * @param int $campaignId
      * @param int $decisionId
      * @param int $parentDecisionId
-     *
-     * @return array
      */
-    public function getInactiveContacts($campaignId, $decisionId, $parentDecisionId, ContactLimiter $limiter)
+    public function getInactiveContacts($campaignId, $decisionId, $parentDecisionId, ContactLimiter $limiter): array
     {
         // Main query
         $q = $this->getReplicaConnection($limiter)->createQueryBuilder();
@@ -255,10 +249,8 @@ class LeadRepository extends CommonRepository
 
     /**
      * This is approximate because the query that fetches contacts per decision is based on if the grandparent has been executed or not.
-     *
-     * @return int
      */
-    public function getInactiveContactCount($campaignId, array $decisionIds, ContactLimiter $limiter)
+    public function getInactiveContactCount($campaignId, array $decisionIds, ContactLimiter $limiter): int
     {
         // We have to loop over each decision to get a count or else any contact that has executed any single one of the decision IDs
         // will not be included potentially resulting in not having the inactive path analyzed
@@ -304,10 +296,7 @@ class LeadRepository extends CommonRepository
         return $totalCount;
     }
 
-    /**
-     * @return array
-     */
-    public function getCampaignMembers(array $contactIds, Campaign $campaign)
+    public function getCampaignMembers(array $contactIds, Campaign $campaign): array
     {
         $qb = $this->createQueryBuilder('l');
 
@@ -332,10 +321,7 @@ class LeadRepository extends CommonRepository
         return $campaignMembers;
     }
 
-    /**
-     * @return array
-     */
-    public function getContactRotations(array $contactIds, $campaignId)
+    public function getContactRotations(array $contactIds, $campaignId): array
     {
         $qb = $this->getEntityManager()->getConnection()->createQueryBuilder();
         $qb->select('cl.lead_id, cl.rotation')
@@ -362,10 +348,8 @@ class LeadRepository extends CommonRepository
     /**
      * @param int  $campaignId
      * @param bool $campaignCanBeRestarted
-     *
-     * @return CountResult
      */
-    public function getCountsForCampaignContactsBySegment($campaignId, ContactLimiter $limiter, $campaignCanBeRestarted = false)
+    public function getCountsForCampaignContactsBySegment($campaignId, ContactLimiter $limiter, $campaignCanBeRestarted = false): CountResult
     {
         if (!$segments = $this->getCampaignSegments($campaignId)) {
             return new CountResult(0, 0, 0);
@@ -404,7 +388,7 @@ class LeadRepository extends CommonRepository
      *
      * @return array<int|string, string>
      */
-    public function getCampaignContactsBySegments($campaignId, ContactLimiter $limiter, $campaignCanBeRestarted = false)
+    public function getCampaignContactsBySegments($campaignId, ContactLimiter $limiter, $campaignCanBeRestarted = false): array
     {
         if (!$segments = $this->getCampaignSegments($campaignId)) {
             return [];
@@ -439,10 +423,8 @@ class LeadRepository extends CommonRepository
 
     /**
      * @param int $campaignId
-     *
-     * @return CountResult
      */
-    public function getCountsForOrphanedContactsBySegments($campaignId, ContactLimiter $limiter)
+    public function getCountsForOrphanedContactsBySegments($campaignId, ContactLimiter $limiter): CountResult
     {
         $segments = $this->getCampaignSegments($campaignId);
 
@@ -465,10 +447,7 @@ class LeadRepository extends CommonRepository
         return new CountResult($result['the_count'], $result['min_id'], $result['max_id']);
     }
 
-    /**
-     * @return array
-     */
-    public function getOrphanedContacts($campaignId, ContactLimiter $limiter)
+    public function getOrphanedContacts($campaignId, ContactLimiter $limiter): array
     {
         $segments = $this->getCampaignSegments($campaignId);
 
@@ -502,10 +481,8 @@ class LeadRepository extends CommonRepository
      *
      * @param int[] $contactIds
      * @param int   $campaignId
-     *
-     * @return bool
      */
-    public function incrementCampaignRotationForContacts(array $contactIds, $campaignId)
+    public function incrementCampaignRotationForContacts(array $contactIds, $campaignId): void
     {
         $q = $this->getEntityManager()->getConnection()->createQueryBuilder();
 
@@ -522,10 +499,7 @@ class LeadRepository extends CommonRepository
             ->executeStatement();
     }
 
-    /**
-     * @return array
-     */
-    private function getCampaignSegments($campaignId)
+    private function getCampaignSegments($campaignId): array
     {
         // Get published segments for this campaign
         $segmentResults = $this->getEntityManager()->getConnection()->createQueryBuilder()
@@ -549,7 +523,7 @@ class LeadRepository extends CommonRepository
         return $segments;
     }
 
-    private function updateQueryWithExistingMembershipExclusion(int $campaignId, QueryBuilder $qb, bool $campaignCanBeRestarted = false)
+    private function updateQueryWithExistingMembershipExclusion(int $campaignId, QueryBuilder $qb, bool $campaignCanBeRestarted = false): void
     {
         $membershipConditions = $qb->expr()->and(
             $qb->expr()->eq('cl.lead_id', 'll.lead_id'),
@@ -581,7 +555,7 @@ class LeadRepository extends CommonRepository
         );
     }
 
-    private function updateQueryWithSegmentMembershipExclusion(array $segments, QueryBuilder $qb)
+    private function updateQueryWithSegmentMembershipExclusion(array $segments, QueryBuilder $qb): void
     {
         if (0 === count($segments)) {
             // No segments so nothing to exclude
@@ -607,7 +581,7 @@ class LeadRepository extends CommonRepository
     /**
      * Exclude contacts with any previous campaign history; this is mainly BC for pre 2.14.0 where the membership entry was deleted.
      */
-    private function updateQueryWithHistoryExclusion($campaignId, QueryBuilder $qb)
+    private function updateQueryWithHistoryExclusion($campaignId, QueryBuilder $qb): void
     {
         $subq = $this->getEntityManager()->getConnection()->createQueryBuilder()
             ->select('null')

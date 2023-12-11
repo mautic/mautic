@@ -10,26 +10,11 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class CompanySubscriber implements EventSubscriberInterface
 {
-    /**
-     * @var AuditLogModel
-     */
-    private $auditLogModel;
-
-    /**
-     * @var IpLookupHelper
-     */
-    private $ipLookupHelper;
-
-    public function __construct(IpLookupHelper $ipLookupHelper, AuditLogModel $auditLogModel)
+    public function __construct(private IpLookupHelper $ipLookupHelper, private AuditLogModel $auditLogModel)
     {
-        $this->ipLookupHelper = $ipLookupHelper;
-        $this->auditLogModel  = $auditLogModel;
     }
 
-    /**
-     * @return array
-     */
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             LeadEvents::COMPANY_POST_SAVE   => ['onCompanyPostSave', 0],
@@ -40,7 +25,7 @@ class CompanySubscriber implements EventSubscriberInterface
     /**
      * Add a company entry to the audit log.
      */
-    public function onCompanyPostSave(Events\CompanyEvent $event)
+    public function onCompanyPostSave(Events\CompanyEvent $event): void
     {
         $company = $event->getCompany();
         if ($details = $event->getChanges()) {
@@ -59,7 +44,7 @@ class CompanySubscriber implements EventSubscriberInterface
     /**
      * Add a company delete entry to the audit log.
      */
-    public function onCompanyDelete(Events\CompanyEvent $event)
+    public function onCompanyDelete(Events\CompanyEvent $event): void
     {
         $company = $event->getCompany();
         $log     = [

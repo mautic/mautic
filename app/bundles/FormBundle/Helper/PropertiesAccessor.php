@@ -8,14 +8,8 @@ use Mautic\FormBundle\Model\FormModel;
 
 class PropertiesAccessor
 {
-    /**
-     * @var FormModel
-     */
-    private $formModel;
-
-    public function __construct(FormModel $formModel)
+    public function __construct(private FormModel $formModel)
     {
-        $this->formModel = $formModel;
     }
 
     /**
@@ -40,7 +34,7 @@ class PropertiesAccessor
      *
      * @return string[]
      */
-    public function getChoices($options)
+    public function getChoices($options): array
     {
         $choices = [];
 

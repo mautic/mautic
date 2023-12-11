@@ -10,13 +10,11 @@ class Clearbit_Base
     public const REQUEST_LATENCY = 0.2;
     public const USER_AGENT      = 'mautic/clearbit-php-0.1.0';
 
-    private $_next_req_time;
+    private \DateTime $_next_req_time;
 
     protected $_baseUri     = '';
     protected $_resourceUri = '';
     protected $_version     = 'v2';
-
-    protected $_apiKey;
     protected $_webhookId;
 
     public $response_obj;
@@ -26,10 +24,10 @@ class Clearbit_Base
     /**
      * Slow down calls to the Clearbit API if needed.
      */
-    private function _wait_for_rate_limit()
+    private function _wait_for_rate_limit(): void
     {
         $now = new \DateTime();
-        if ($this->_next_req_time && $this->_next_req_time->getTimestamp() > $now->getTimestamp()) {
+        if ($this->_next_req_time->getTimestamp() > $now->getTimestamp()) {
             $t = $this->_next_req_time->getTimestamp() - $now->getTimestamp();
             sleep($t);
         }
@@ -38,7 +36,7 @@ class Clearbit_Base
     /**
      * @param string $hdr
      */
-    private function _update_rate_limit($hdr)
+    private function _update_rate_limit($hdr): void
     {
         $remaining            = (float) $hdr['X-RateLimit-Remaining'];
         $reset                = (float) $hdr['X-RateLimit-Reset'];
@@ -53,9 +51,8 @@ class Clearbit_Base
      *
      * @param string $api_key
      */
-    public function __construct($api_key)
+    public function __construct(protected $api_key)
     {
-        $this->_apiKey        = $api_key;
         $this->_next_req_time = new \DateTime('@0');
     }
 
@@ -92,12 +89,12 @@ class Clearbit_Base
         curl_setopt($connection, CURLOPT_RETURNTRANSFER, 1);
         curl_setopt($connection, CURLOPT_USERAGENT, self::USER_AGENT);
         curl_setopt($connection, CURLOPT_HEADER, 1); // return HTTP headers with response
-        curl_setopt($connection, CURLOPT_HTTPHEADER, ['Authorization: Bearer '.$this->_apiKey]);
+        curl_setopt($connection, CURLOPT_HTTPHEADER, ['Authorization: Bearer '.$this->api_key]);
 
         // execute request
         $resp = curl_exec($connection);
 
-        list($response_headers, $this->response_json) = explode("\r\n\r\n", $resp, 2);
+        [$response_headers, $this->response_json] = explode("\r\n\r\n", $resp, 2);
         // $response_headers now has a string of the HTTP headers
         // $response_json is the body of the HTTP response
 
@@ -107,7 +104,7 @@ class Clearbit_Base
             if (0 === $i) {
                 $headers['http_code'] = $line;
             } else {
-                list($key, $value) = explode(': ', $line);
+                [$key, $value]     = explode(': ', $line);
                 $headers[$key]     = $value;
             }
         }

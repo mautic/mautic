@@ -21,19 +21,13 @@ class ConfigChangeLogger
         'mailer_is_owner',
     ];
 
-    private AuditLogModel $auditLogModel;
-
-    private IpLookupHelper $ipLookupHelper;
-
     /**
      * @var mixed[]|null
      */
     private ?array $originalNormData = null;
 
-    public function __construct(IpLookupHelper $ipLookupHelper, AuditLogModel $auditLogModel)
+    public function __construct(private IpLookupHelper $ipLookupHelper, private AuditLogModel $auditLogModel)
     {
-        $this->ipLookupHelper = $ipLookupHelper;
-        $this->auditLogModel  = $auditLogModel;
     }
 
     /**
@@ -52,7 +46,7 @@ class ConfigChangeLogger
      *
      * @see Form::getNormData()
      */
-    public function log(array $postNormData)
+    public function log(array $postNormData): void
     {
         if (null === $this->originalNormData) {
             throw new \RuntimeException('Set original normalized data at first');
@@ -91,10 +85,8 @@ class ConfigChangeLogger
     /**
      * Some form data (AssetBundle) has 'parameters' inside array too.
      * Normalize all.
-     *
-     * @return array
      */
-    private function normalizeData(array $data)
+    private function normalizeData(array $data): array
     {
         $key = 'parameters';
 
@@ -112,16 +104,12 @@ class ConfigChangeLogger
 
     /**
      * Filter unused keys from post data.
-     *
-     * @return array
      */
-    private function filterData(array $data)
+    private function filterData(array $data): array
     {
         $keys = $this->filterKeys;
 
-        return array_filter($data, function ($key) use ($keys) {
-            return !in_array($key, $keys);
-        },
+        return array_filter($data, fn ($key): bool => !in_array($key, $keys),
             ARRAY_FILTER_USE_KEY);
     }
 }

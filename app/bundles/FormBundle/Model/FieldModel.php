@@ -28,18 +28,8 @@ use Symfony\Contracts\EventDispatcher\Event;
  */
 class FieldModel extends CommonFormModel
 {
-    private RequestStack $requestStack;
-
-    /**
-     * @var LeadFieldModel
-     */
-    protected $leadFieldModel;
-
-    public function __construct(LeadFieldModel $leadFieldModel, EntityManager $em, CorePermissions $security, EventDispatcherInterface $dispatcher, UrlGeneratorInterface $router, Translator $translator, UserHelper $userHelper, LoggerInterface $mauticLogger, CoreParametersHelper $coreParametersHelper, RequestStack $requestStack)
+    public function __construct(protected LeadFieldModel $leadFieldModel, EntityManager $em, CorePermissions $security, EventDispatcherInterface $dispatcher, UrlGeneratorInterface $router, Translator $translator, UserHelper $userHelper, LoggerInterface $mauticLogger, CoreParametersHelper $coreParametersHelper, private RequestStack $requestStack)
     {
-        $this->leadFieldModel = $leadFieldModel;
-        $this->requestStack   = $requestStack;
-
         parent::__construct($em, $security, $dispatcher, $router, $translator, $userHelper, $mauticLogger, $coreParametersHelper);
     }
 
@@ -52,10 +42,8 @@ class FieldModel extends CommonFormModel
      * @param object|array<mixed> $entity
      * @param string|null         $action
      * @param array               $options
-     *
-     * @return \Symfony\Component\Form\FormInterface
      */
-    public function createForm($entity, FormFactoryInterface $formFactory, $action = null, $options = [])
+    public function createForm($entity, FormFactoryInterface $formFactory, $action = null, $options = []): \Symfony\Component\Form\FormInterface
     {
         if ($action) {
             $options['action'] = $action;
@@ -66,8 +54,10 @@ class FieldModel extends CommonFormModel
 
     /**
      * @deprecated to be removed in Mautic 4. This method is not used anymore.
+     *
+     * @return array{mixed[], mixed[]}
      */
-    public function getObjectFields($object = 'lead')
+    public function getObjectFields($object = 'lead'): array
     {
         $fields  = $this->leadFieldModel->getFieldListWithProperties($object);
         $choices = [];
@@ -93,7 +83,7 @@ class FieldModel extends CommonFormModel
         return $this->em->getRepository(\Mautic\FormBundle\Entity\Field::class);
     }
 
-    public function getPermissionBase()
+    public function getPermissionBase(): string
     {
         return 'form:forms';
     }
@@ -109,10 +99,8 @@ class FieldModel extends CommonFormModel
 
     /**
      * Get the fields saved in session.
-     *
-     * @return array
      */
-    public function getSessionFields($formId)
+    public function getSessionFields($formId): array
     {
         $fields = $this->getSession()->get('mautic.form.'.$formId.'.fields.modified', []);
         $remove = $this->getSession()->get('mautic.form.'.$formId.'.fields.deleted', []);
@@ -151,11 +139,9 @@ class FieldModel extends CommonFormModel
     }
 
     /**
-     * @return FormFieldEvent|Event|void|null
-     *
      * @throws MethodNotAllowedHttpException
      */
-    protected function dispatchEvent($action, &$entity, $isNew = false, Event $event = null)
+    protected function dispatchEvent($action, &$entity, $isNew = false, Event $event = null): ?Event
     {
         if (!$entity instanceof Field) {
             throw new MethodNotAllowedHttpException(['Form']);
@@ -186,8 +172,8 @@ class FieldModel extends CommonFormModel
             $this->dispatcher->dispatch($event, $name);
 
             return $event;
-        } else {
-            return null;
         }
+
+        return null;
     }
 }

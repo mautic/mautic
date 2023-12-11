@@ -25,22 +25,9 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
  */
 class VideoModel extends FormModel
 {
-    /**
-     * @var IpLookupHelper
-     */
-    protected $ipLookupHelper;
-
-    /**
-     * @var ContactTracker
-     */
-    protected $contactTracker;
-
-    /**
-     * VideoModel constructor.
-     */
     public function __construct(
-        IpLookupHelper $ipLookupHelper,
-        ContactTracker $contactTracker,
+        protected IpLookupHelper $ipLookupHelper,
+        protected ContactTracker $contactTracker,
         EntityManager $em,
         CorePermissions $security,
         EventDispatcherInterface $dispatcher,
@@ -50,23 +37,18 @@ class VideoModel extends FormModel
         LoggerInterface $mauticLogger,
         CoreParametersHelper $coreParametersHelper
     ) {
-        $this->ipLookupHelper = $ipLookupHelper;
-        $this->contactTracker = $contactTracker;
-
         parent::__construct($em, $security, $dispatcher, $router, $translator, $userHelper, $mauticLogger, $coreParametersHelper);
     }
 
     public function getHitRepository(): VideoHitRepository
     {
-        $result = $this->em->getRepository(VideoHit::class);
-
-        return $result;
+        return $this->em->getRepository(VideoHit::class);
     }
 
     /**
      * {@inheritdoc}
      */
-    public function getPermissionBase()
+    public function getPermissionBase(): string
     {
         return 'page:pages';
     }
@@ -74,7 +56,7 @@ class VideoModel extends FormModel
     /**
      * {@inheritdoc}
      */
-    public function getNameGetter()
+    public function getNameGetter(): string
     {
         return 'getTitle';
     }
@@ -96,7 +78,7 @@ class VideoModel extends FormModel
      * @throws \Doctrine\ORM\ORMException
      * @throws \Exception
      */
-    public function hitVideo($request, $code = '200')
+    public function hitVideo($request, $code = '200'): void
     {
         // don't skew results with in-house hits
         if (!$this->security->isAnonymous()) {

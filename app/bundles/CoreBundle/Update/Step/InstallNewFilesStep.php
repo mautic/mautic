@@ -13,21 +13,6 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 final class InstallNewFilesStep implements StepInterface
 {
     /**
-     * @var TranslatorInterface
-     */
-    private $translator;
-
-    /**
-     * @var UpdateHelper
-     */
-    private $updateHelper;
-
-    /**
-     * @var PathsHelper
-     */
-    private $pathsHelper;
-
-    /**
      * @var ProgressBar
      */
     private $progressBar;
@@ -37,14 +22,8 @@ final class InstallNewFilesStep implements StepInterface
      */
     private $input;
 
-    /**
-     * InstallNewFilesStep constructor.
-     */
-    public function __construct(TranslatorInterface $translator, UpdateHelper $updateHelper, PathsHelper $pathsHelper)
+    public function __construct(private TranslatorInterface $translator, private UpdateHelper $updateHelper, private PathsHelper $pathsHelper)
     {
-        $this->translator   = $translator;
-        $this->updateHelper = $updateHelper;
-        $this->pathsHelper  = $pathsHelper;
     }
 
     public function getOrder(): int

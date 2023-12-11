@@ -7,35 +7,17 @@ use Mautic\CoreBundle\Twig\Helper\FormatterHelper;
 use Mautic\ReportBundle\Crate\ReportDataResult;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-/**
- * Class CsvExporter.
- */
 class CsvExporter
 {
-    /**
-     * @var FormatterHelper
-     */
-    protected $formatterHelper;
-
-    /**
-     * @var CoreParametersHelper
-     */
-    private $coreParametersHelper;
-
-    private TranslatorInterface $translator;
-
-    public function __construct(FormatterHelper $formatterHelper, CoreParametersHelper $coreParametersHelper, TranslatorInterface $translator)
+    public function __construct(protected FormatterHelper $formatterHelper, private CoreParametersHelper $coreParametersHelper, private TranslatorInterface $translator)
     {
-        $this->formatterHelper      = $formatterHelper;
-        $this->coreParametersHelper = $coreParametersHelper;
-        $this->translator           = $translator;
     }
 
     /**
      * @param resource $handle
      * @param int      $page
      */
-    public function export(ReportDataResult $reportDataResult, $handle, $page = 1)
+    public function export(ReportDataResult $reportDataResult, $handle, $page = 1): void
     {
         if (1 === $page) {
             $this->putHeader($reportDataResult, $handle);
@@ -87,7 +69,7 @@ class CsvExporter
     /**
      * @param resource $handle
      */
-    private function putRow($handle, array $row)
+    private function putRow($handle, array $row): void
     {
         if ($this->coreParametersHelper->get('csv_always_enclose')) {
             fputs($handle, '"'.implode('","', $row).'"'."\n");

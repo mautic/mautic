@@ -17,32 +17,11 @@ class ReportSubscriber implements EventSubscriberInterface
     public const MOBILE_NOTIFICATIONS       = 'mobile_notifications';
     public const MOBILE_NOTIFICATIONS_STATS = 'mobile_notifications.stats';
 
-    /**
-     * @var Connection
-     */
-    private $db;
-
-    /**
-     * @var CompanyReportData
-     */
-    private $companyReportData;
-
-    /**
-     * @var StatRepository
-     */
-    private $statRepository;
-
-    public function __construct(Connection $db, CompanyReportData $companyReportData, StatRepository $statRepository)
+    public function __construct(private Connection $db, private CompanyReportData $companyReportData, private StatRepository $statRepository)
     {
-        $this->db                = $db;
-        $this->companyReportData = $companyReportData;
-        $this->statRepository    = $statRepository;
     }
 
-    /**
-     * @return array
-     */
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             ReportEvents::REPORT_ON_BUILD          => ['onReportBuilder', 0],
@@ -54,7 +33,7 @@ class ReportSubscriber implements EventSubscriberInterface
     /**
      * Add available tables and columns to the report builder lookup.
      */
-    public function onReportBuilder(ReportBuilderEvent $event)
+    public function onReportBuilder(ReportBuilderEvent $event): void
     {
         if (!$event->checkContext([self::MOBILE_NOTIFICATIONS, self::MOBILE_NOTIFICATIONS_STATS])) {
             return;
@@ -184,7 +163,7 @@ class ReportSubscriber implements EventSubscriberInterface
     /**
      * Initialize the QueryBuilder object to generate reports from.
      */
-    public function onReportGenerate(ReportGeneratorEvent $event)
+    public function onReportGenerate(ReportGeneratorEvent $event): void
     {
         if (!$event->checkContext([self::MOBILE_NOTIFICATIONS, self::MOBILE_NOTIFICATIONS_STATS])) {
             return;
@@ -252,7 +231,7 @@ class ReportSubscriber implements EventSubscriberInterface
     /**
      * Initialize the QueryBuilder object to generate reports from.
      */
-    public function onReportGraphGenerate(ReportGraphEvent $event)
+    public function onReportGraphGenerate(ReportGraphEvent $event): void
     {
         // Context check, we only want to fire for Mobile Notification reports
         if (!$event->checkContext(self::MOBILE_NOTIFICATIONS_STATS)) {

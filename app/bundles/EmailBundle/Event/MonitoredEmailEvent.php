@@ -2,36 +2,24 @@
 
 namespace Mautic\EmailBundle\Event;
 
-use Symfony\Component\Form\FormBuilder;
+use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Contracts\EventDispatcher\Event;
 
 class MonitoredEmailEvent extends Event
 {
     /**
-     * @var FormBuilder
-     */
-    private $formBuilder;
-
-    /**
-     * @var array
-     */
-    private $data;
-
-    /**
      * @var array
      */
     private $folders = [];
 
-    public function __construct(FormBuilder $builder, array $data)
+    public function __construct(private FormBuilderInterface $formBuilder, private array $data)
     {
-        $this->formBuilder = $builder;
-        $this->data        = $data;
     }
 
     /**
      * Get the FormBuilder for monitored_mailboxes FormType.
      *
-     * @return FormBuilder
+     * @return FormBuilderInterface
      */
     public function getFormBuilder()
     {
@@ -43,7 +31,7 @@ class MonitoredEmailEvent extends Event
      *
      * @param string $default
      */
-    public function addFolder($bundleKey, $folderKey, $label, $default = '')
+    public function addFolder($bundleKey, $folderKey, $label, $default = ''): void
     {
         $keyName = ($folderKey) ? $bundleKey.'_'.$folderKey : $bundleKey;
 
@@ -62,7 +50,7 @@ class MonitoredEmailEvent extends Event
     {
         $keyName = $bundleKey.'_'.$folderKey;
 
-        return (isset($this->data[$keyName])) ? $this->data[$keyName] : $default;
+        return $this->data[$keyName] ?? $default;
     }
 
     /**

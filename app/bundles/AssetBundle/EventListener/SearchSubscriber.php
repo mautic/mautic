@@ -12,38 +12,11 @@ use Twig\Environment;
 
 class SearchSubscriber implements EventSubscriberInterface
 {
-    /**
-     * @var AssetModel
-     */
-    private $assetModel;
-
-    /**
-     * @var CorePermissions
-     */
-    private $security;
-
-    /**
-     * @var UserHelper
-     */
-    private $userHelper;
-
-    /**
-     * @var Environment
-     */
-    private $twig;
-
-    public function __construct(AssetModel $assetModel, CorePermissions $security, UserHelper $userHelper, Environment $twig)
+    public function __construct(private AssetModel $assetModel, private CorePermissions $security, private UserHelper $userHelper, private Environment $twig)
     {
-        $this->assetModel = $assetModel;
-        $this->security   = $security;
-        $this->userHelper = $userHelper;
-        $this->twig       = $twig;
     }
 
-    /**
-     * @return array
-     */
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             CoreEvents::GLOBAL_SEARCH      => ['onGlobalSearch', 0],
@@ -51,7 +24,7 @@ class SearchSubscriber implements EventSubscriberInterface
         ];
     }
 
-    public function onGlobalSearch(MauticEvents\GlobalSearchEvent $event)
+    public function onGlobalSearch(MauticEvents\GlobalSearchEvent $event): void
     {
         $str = $event->getSearchString();
         if (empty($str)) {
@@ -104,7 +77,7 @@ class SearchSubscriber implements EventSubscriberInterface
         }
     }
 
-    public function onBuildCommandList(MauticEvents\CommandListEvent $event)
+    public function onBuildCommandList(MauticEvents\CommandListEvent $event): void
     {
         if ($this->security->isGranted(['asset:assets:viewown', 'asset:assets:viewother'], 'MATCH_ONE')) {
             $event->addCommands(

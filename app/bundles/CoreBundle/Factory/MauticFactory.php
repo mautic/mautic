@@ -24,46 +24,11 @@ use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
  */
 class MauticFactory
 {
-    private ContainerInterface $container;
-
-    /**
-     * @var ModelFactory<object>
-     */
-    private ModelFactory $modelFactory;
-
-    private CorePermissions $security;
-
-    private AuthorizationCheckerInterface $authorizationChecker;
-
-    private UserHelper $userHelper;
-
-    private RequestStack $requestStack;
-
-    private ManagerRegistry $doctrine;
-
-    private Translator $translator;
-
     /**
      * @param ModelFactory<object> $modelFactory
      */
-    public function __construct(
-        ContainerInterface $container,
-        ModelFactory $modelFactory,
-        CorePermissions $security,
-        AuthorizationCheckerInterface $authorizationChecker,
-        UserHelper $userHelper,
-        RequestStack $requestStack,
-        ManagerRegistry $doctrine,
-        Translator $translator
-    ) {
-        $this->container            = $container;
-        $this->modelFactory         = $modelFactory;
-        $this->security             = $security;
-        $this->authorizationChecker = $authorizationChecker;
-        $this->userHelper           = $userHelper;
-        $this->requestStack         = $requestStack;
-        $this->doctrine             = $doctrine;
-        $this->translator           = $translator;
+    public function __construct(private ContainerInterface $container, private ModelFactory $modelFactory, private CorePermissions $security, private AuthorizationCheckerInterface $authorizationChecker, private UserHelper $userHelper, private RequestStack $requestStack, private ManagerRegistry $doctrine, private Translator $translator)
+    {
     }
 
     /**
@@ -207,10 +172,8 @@ class MauticFactory
      * @param string $string
      * @param string $format
      * @param string $tz
-     *
-     * @return DateTimeHelper
      */
-    public function getDate($string = null, $format = null, $tz = 'local')
+    public function getDate($string = null, $format = null, $tz = 'local'): DateTimeHelper
     {
         return new DateTimeHelper($string, $format, $tz);
     }
@@ -253,7 +216,7 @@ class MauticFactory
         /** @var \AppKernel $kernel */
         $kernel = $this->container->get('kernel');
 
-        return $kernel->getLocalConfigFile($checkExists);
+        return $kernel->getLocalConfigFile();
     }
 
     /**
@@ -372,20 +335,14 @@ class MauticFactory
      */
     public function getHelper($helper)
     {
-        switch ($helper) {
-            case 'template.assets':
-                return $this->container->get('twig.helper.assets');
-            case 'template.slots':
-                return $this->container->get('twig.helper.slots');
-            case 'template.form':
-                return $this->container->get('twig.helper.form');
-            case 'template.translator':
-                return $this->container->get('twig.helper.translator');
-            case 'template.router':
-                return $this->container->get('twig.helper.router');
-            default:
-                return $this->container->get('mautic.helper.'.$helper);
-        }
+        return match ($helper) {
+            'template.assets'     => $this->container->get('twig.helper.assets'),
+            'template.slots'      => $this->container->get('twig.helper.slots'),
+            'template.form'       => $this->container->get('twig.helper.form'),
+            'template.translator' => $this->container->get('twig.helper.translator'),
+            'template.router'     => $this->container->get('twig.helper.router'),
+            default               => $this->container->get('mautic.helper.'.$helper),
+        };
     }
 
     /**

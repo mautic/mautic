@@ -17,32 +17,11 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class CampaignSubscriber implements EventSubscriberInterface
 {
-    /**
-     * @var LeadModel
-     */
-    private $leadModel;
-
-    /**
-     * @var StageModel
-     */
-    private $stageModel;
-
-    /**
-     * @var TranslatorInterface
-     */
-    private $translator;
-
-    public function __construct(LeadModel $leadModel, StageModel $stageModel, TranslatorInterface $translator)
+    public function __construct(private LeadModel $leadModel, private StageModel $stageModel, private TranslatorInterface $translator)
     {
-        $this->leadModel  = $leadModel;
-        $this->stageModel = $stageModel;
-        $this->translator = $translator;
     }
 
-    /**
-     * @return array
-     */
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             CampaignEvents::CAMPAIGN_ON_BUILD     => ['onCampaignBuild', 0],
@@ -50,7 +29,7 @@ class CampaignSubscriber implements EventSubscriberInterface
         ];
     }
 
-    public function onCampaignBuild(CampaignBuilderEvent $event)
+    public function onCampaignBuild(CampaignBuilderEvent $event): void
     {
         $action = [
             'label'            => 'mautic.stage.campaign.event.change',

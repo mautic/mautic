@@ -10,24 +10,12 @@ use Doctrine\ORM\EntityManager;
 abstract class AbstractMigration implements MigrationInterface
 {
     /**
-     * @var EntityManager
-     */
-    protected $entityManager;
-
-    /**
-     * @var string
-     */
-    protected $tablePrefix;
-
-    /**
      * @var string[]
      */
     private $queries = [];
 
-    public function __construct(EntityManager $entityManager, string $tablePrefix)
+    public function __construct(protected EntityManager $entityManager, protected string $tablePrefix)
     {
-        $this->entityManager = $entityManager;
-        $this->tablePrefix   = $tablePrefix;
     }
 
     /**
@@ -109,9 +97,7 @@ abstract class AbstractMigration implements MigrationInterface
         $hash        = implode(
             '',
             array_map(
-                function ($column) {
-                    return dechex(crc32($column));
-                },
+                fn ($column): string => dechex(crc32($column)),
                 $columnNames
             )
         );

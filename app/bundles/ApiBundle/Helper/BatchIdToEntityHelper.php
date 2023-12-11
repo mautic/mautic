@@ -15,11 +15,6 @@ class BatchIdToEntityHelper
     private $originalKeys = [];
 
     /**
-     * @var string
-     */
-    private $idKey;
-
-    /**
      * @var array
      */
     private $errors = [];
@@ -34,17 +29,12 @@ class BatchIdToEntityHelper
      *
      * @param string $idKey
      */
-    public function __construct(array $parameters, $idKey = 'id')
+    public function __construct(array $parameters, private $idKey = 'id')
     {
-        $this->idKey = $idKey;
-
         $this->extractIds($parameters);
     }
 
-    /**
-     * @return bool
-     */
-    public function hasIds()
+    public function hasIds(): bool
     {
         return !empty($this->ids);
     }
@@ -57,10 +47,7 @@ class BatchIdToEntityHelper
         return $this->ids;
     }
 
-    /**
-     * @return bool
-     */
-    public function hasErrors()
+    public function hasErrors(): bool
     {
         return !empty($this->errors);
     }
@@ -79,10 +66,8 @@ class BatchIdToEntityHelper
      * The issue this solves is the response should match the format given by the request. If the request had associative keys, the response
      * will return with associative keys (json object). If the request was a sequential numeric array starting with 0, the response will
      * be a simple array (json array).
-     *
-     * @return array
      */
-    public function orderByOriginalKey(array $entities)
+    public function orderByOriginalKey(array $entities): array
     {
         if (!$this->isAssociative) {
             // The request was keyed by sequential numbers starting with 0
@@ -108,7 +93,7 @@ class BatchIdToEntityHelper
         return $orderedEntities;
     }
 
-    private function extractIds(array $parameters)
+    private function extractIds(array $parameters): void
     {
         $this->ids = [];
 
@@ -124,7 +109,7 @@ class BatchIdToEntityHelper
     /**
      * @param mixed $ids
      */
-    private function extractIdsFromIdKey($ids)
+    private function extractIdsFromIdKey($ids): void
     {
         // ['ids' => [1,2,3]]
         if (is_array($ids)) {
@@ -136,7 +121,7 @@ class BatchIdToEntityHelper
         }
 
         // ['ids' => '1,2,3'] OR ['ids' => '1']
-        if (false !== strpos($ids, ',') || is_numeric($ids)) {
+        if (str_contains($ids, ',') || is_numeric($ids)) {
             $this->ids           = str_getcsv($ids);
             $this->originalKeys  = array_keys($this->ids);
             $this->isAssociative = false;
@@ -149,14 +134,13 @@ class BatchIdToEntityHelper
         $this->errors[] = 'mautic.api.call.id_missing';
     }
 
-    private function extractIdsFromParams(array $parameters)
+    private function extractIdsFromParams(array $parameters): void
     {
         $this->isAssociative = $this->isAssociativeArray($parameters);
         $this->originalKeys  = array_keys($parameters);
 
         // [1,2,3]
-        reset($parameters);
-        $firstKey = key($parameters);
+        $firstKey            = array_key_first($parameters);
         if (!is_array($parameters[$firstKey])) {
             $this->ids = array_values($parameters);
 
@@ -176,17 +160,12 @@ class BatchIdToEntityHelper
         }
     }
 
-    /**
-     * @return bool
-     */
-    private function isAssociativeArray(array $array)
+    private function isAssociativeArray(array $array): bool
     {
         if (empty($array)) {
             return false;
         }
-
-        reset($array);
-        $firstKey = key($array);
+        $firstKey = array_key_first($array);
 
         return array_keys($array) !== range(0, count($array) - 1) && 0 !== $firstKey;
     }

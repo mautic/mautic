@@ -11,39 +11,18 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class BroadcastSubscriber implements EventSubscriberInterface
 {
-    /**
-     * @var EmailModel
-     */
-    private $model;
-
-    /**
-     * @var EntityManager
-     */
-    private $em;
-
-    /**
-     * @var TranslatorInterface
-     */
-    private $translator;
-
-    public function __construct(EmailModel $emailModel, EntityManager $em, TranslatorInterface $translator)
+    public function __construct(private EmailModel $model, private EntityManager $em, private TranslatorInterface $translator)
     {
-        $this->model      = $emailModel;
-        $this->em         = $em;
-        $this->translator = $translator;
     }
 
-    /**
-     * @return array
-     */
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             ChannelEvents::CHANNEL_BROADCAST => ['onBroadcast', 0],
         ];
     }
 
-    public function onBroadcast(ChannelBroadcastEvent $event)
+    public function onBroadcast(ChannelBroadcastEvent $event): void
     {
         if (!$event->checkContext('email')) {
             return;
@@ -54,7 +33,7 @@ class BroadcastSubscriber implements EventSubscriberInterface
 
         while (false !== ($email = $emails->next())) {
             $emailEntity                                            = $email[0];
-            list($sentCount, $failedCount, $failedRecipientsByList) = $this->model->sendEmailToLists(
+            [$sentCount, $failedCount, $failedRecipientsByList]     = $this->model->sendEmailToLists(
                 $emailEntity,
                 null,
                 $event->getLimit(),

@@ -13,22 +13,19 @@ class UpdateTranslationsStepTest extends AbstractStepTest
     /**
      * @var MockObject|TranslatorInterface
      */
-    private $translator;
+    private \PHPUnit\Framework\MockObject\MockObject $translator;
 
     /**
      * @var MockObject|LanguageHelper
      */
-    private $languageHelper;
+    private \PHPUnit\Framework\MockObject\MockObject $languageHelper;
 
     /**
      * @var MockObject|LoggerInterface
      */
-    private $logger;
+    private \PHPUnit\Framework\MockObject\MockObject $logger;
 
-    /**
-     * @var UpdateTranslationsStep
-     */
-    private $step;
+    private \Mautic\CoreBundle\Update\Step\UpdateTranslationsStep $step;
 
     protected function setUp(): void
     {
@@ -41,7 +38,7 @@ class UpdateTranslationsStepTest extends AbstractStepTest
         $this->step = new UpdateTranslationsStep($this->translator, $this->languageHelper, $this->logger);
     }
 
-    public function testLanguageUnpackingSkippedIfJustOneLanguageIsEnabled()
+    public function testLanguageUnpackingSkippedIfJustOneLanguageIsEnabled(): void
     {
         $this->languageHelper->expects($this->once())
             ->method('getSupportedLanguages')
@@ -53,7 +50,7 @@ class UpdateTranslationsStepTest extends AbstractStepTest
         $this->step->execute($this->progressBar, $this->input, $this->output);
     }
 
-    public function testFetchingLanguagesLogError()
+    public function testFetchingLanguagesLogError(): void
     {
         $this->languageHelper->expects($this->once())
             ->method('getSupportedLanguages')
@@ -79,7 +76,7 @@ class UpdateTranslationsStepTest extends AbstractStepTest
         $this->step->execute($this->progressBar, $this->input, $this->output);
     }
 
-    public function testUsPackageSkipped()
+    public function testUsPackageSkipped(): void
     {
         $this->languageHelper->expects($this->once())
             ->method('getSupportedLanguages')
@@ -106,7 +103,7 @@ class UpdateTranslationsStepTest extends AbstractStepTest
         $this->step->execute($this->progressBar, $this->input, $this->output);
     }
 
-    public function testExtractionErrorIsLogged()
+    public function testExtractionErrorIsLogged(): void
     {
         $this->languageHelper->expects($this->once())
             ->method('getSupportedLanguages')

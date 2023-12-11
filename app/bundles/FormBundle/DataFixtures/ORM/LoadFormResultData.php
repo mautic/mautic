@@ -13,27 +13,15 @@ use Mautic\PageBundle\Model\PageModel;
 class LoadFormResultData extends AbstractFixture implements OrderedFixtureInterface
 {
     /**
-     * @var PageModel
-     */
-    private $pageModel;
-
-    /**
-     * @var SubmissionModel
-     */
-    private $submissionModel;
-
-    /**
      * {@inheritdoc}
      */
-    public function __construct(PageModel $pageModel, SubmissionModel $submissionModel)
+    public function __construct(private PageModel $pageModel, private SubmissionModel $submissionModel)
     {
-        $this->pageModel       = $pageModel;
-        $this->submissionModel = $submissionModel;
     }
 
-    public function load(ObjectManager $manager)
+    public function load(ObjectManager $manager): void
     {
-        $importResults = function ($results) {
+        $importResults = function ($results): void {
             foreach ($results as $rows) {
                 $submission = new Submission();
                 $submission->setDateSubmitted(new \DateTime());

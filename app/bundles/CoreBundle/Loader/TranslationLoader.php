@@ -9,28 +9,10 @@ use Symfony\Component\Translation\Loader\ArrayLoader;
 use Symfony\Component\Translation\Loader\LoaderInterface;
 use Symfony\Component\Translation\MessageCatalogue;
 
-/**
- * Class TranslationLoader.
- */
 class TranslationLoader extends ArrayLoader implements LoaderInterface
 {
-    /**
-     * @var BundleHelper
-     */
-    private $bundleHelper;
-
-    /**
-     * @var PathsHelper
-     */
-    private $pathsHelper;
-
-    /**
-     * TranslationLoader constructor.
-     */
-    public function __construct(BundleHelper $bundleHelper, PathsHelper $pathsHelper)
+    public function __construct(private BundleHelper $bundleHelper, private PathsHelper $pathsHelper)
     {
-        $this->bundleHelper = $bundleHelper;
-        $this->pathsHelper  = $pathsHelper;
     }
 
     /**
@@ -95,7 +77,7 @@ class TranslationLoader extends ArrayLoader implements LoaderInterface
      *
      * @throws \Exception
      */
-    private function loadTranslations($catalogue, $locale, $file)
+    private function loadTranslations($catalogue, $locale, $file): void
     {
         $iniFile  = $file->getRealpath();
         $content  = file_get_contents($iniFile);

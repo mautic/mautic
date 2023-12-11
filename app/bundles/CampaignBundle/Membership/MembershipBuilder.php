@@ -15,26 +15,6 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 class MembershipBuilder
 {
     /**
-     * @var MembershipManager
-     */
-    private $manager;
-
-    /**
-     * @var CampaignLeadRepository
-     */
-    private $campaignLeadRepository;
-
-    /**
-     * @var LeadRepository
-     */
-    private $leadRepository;
-
-    /**
-     * @var TranslatorInterface
-     */
-    private $translator;
-
-    /**
      * @var Campaign
      */
     private $campaign;
@@ -59,24 +39,14 @@ class MembershipBuilder
      */
     private $progressBar;
 
-    public function __construct(
-        MembershipManager $manager,
-        CampaignLeadRepository $campaignMemberRepository,
-        LeadRepository $leadRepository,
-        TranslatorInterface $translator
-    ) {
-        $this->manager                = $manager;
-        $this->campaignLeadRepository = $campaignMemberRepository;
-        $this->leadRepository         = $leadRepository;
-        $this->translator             = $translator;
+    public function __construct(private MembershipManager $manager, private CampaignLeadRepository $campaignLeadRepository, private LeadRepository $leadRepository, private TranslatorInterface $translator)
+    {
     }
 
     /**
      * @param int $runLimit
-     *
-     * @return int
      */
-    public function build(Campaign $campaign, ContactLimiter $contactLimiter, $runLimit, OutputInterface $output = null)
+    public function build(Campaign $campaign, ContactLimiter $contactLimiter, $runLimit, OutputInterface $output = null): int
     {
         defined('MAUTIC_REBUILDING_CAMPAIGNS') or define('MAUTIC_REBUILDING_CAMPAIGNS', 1);
 

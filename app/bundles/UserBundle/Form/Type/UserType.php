@@ -26,35 +26,14 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class UserType extends AbstractType
 {
-    /**
-     * @var TranslatorInterface
-     */
-    private $translator;
-
-    /**
-     * @var UserModel
-     */
-    private $model;
-
-    /**
-     * @var LanguageHelper
-     */
-    private $languageHelper;
-
-    public function __construct(
-        TranslatorInterface $translator,
-        UserModel $model,
-        LanguageHelper $languageHelper
-    ) {
-        $this->translator       = $translator;
-        $this->model            = $model;
-        $this->languageHelper   = $languageHelper;
+    public function __construct(private TranslatorInterface $translator, private UserModel $model, private LanguageHelper $languageHelper)
+    {
     }
 
     /**
      * {@inheritdoc}
      */
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder->addEventSubscriber(new CleanFormSubscriber(['signature' => 'html', 'email' => 'email']));
         $builder->addEventSubscriber(new FormExitSubscriber('user.user', $options));
@@ -93,7 +72,7 @@ class UserType extends AbstractType
             ]
         );
 
-        $positions = $this->model->getLookupResults('position', null, 0, true);
+        $positions = $this->model->getLookupResults('position', null, 0);
         $builder->add(
             'position',
             TextType::class,
@@ -227,11 +206,9 @@ class UserType extends AbstractType
                         ],
                         'class'         => Role::class,
                         'choice_label'  => 'name',
-                        'query_builder' => function (EntityRepository $er) {
-                            return $er->createQueryBuilder('r')
-                                ->where('r.isPublished = true')
-                                ->orderBy('r.name', \Doctrine\Common\Collections\Criteria::ASC);
-                        },
+                        'query_builder' => fn (EntityRepository $er) => $er->createQueryBuilder('r')
+                            ->where('r.isPublished = true')
+                            ->orderBy('r.name', \Doctrine\Common\Collections\Criteria::ASC),
                     ]
                 )
             );
@@ -258,7 +235,7 @@ class UserType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function configureOptions(OptionsResolver $resolver)
+    public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults(
             [
@@ -273,10 +250,7 @@ class UserType extends AbstractType
         );
     }
 
-    /**
-     * @return array
-     */
-    private function getSupportedLanguageChoices()
+    private function getSupportedLanguageChoices(): array
     {
         // Get the list of available languages
         $languages = $this->languageHelper->fetchLanguages(false, false);

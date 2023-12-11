@@ -19,17 +19,11 @@ use Symfony\Component\Validator\Constraints\NotBlank;
 
 class TweetType extends AbstractType
 {
-    /**
-     * @var EntityManager
-     */
-    protected $em;
-
-    public function __construct(EntityManager $em)
+    public function __construct(protected EntityManager $em)
     {
-        $this->em = $em;
     }
 
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder->add(
             'name',
@@ -167,7 +161,7 @@ class TweetType extends AbstractType
         }
     }
 
-    public function configureOptions(OptionsResolver $resolver)
+    public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefined(['update_select']);
     }

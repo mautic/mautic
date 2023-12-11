@@ -12,14 +12,12 @@ class RegionType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function configureOptions(OptionsResolver $resolver)
+    public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults(
             [
                 'choices'           => FormFieldHelper::getRegionChoices(),
-                'choice_value'      => function ($state) {
-                    return $state;
-                },
+                'choice_value'      => fn ($state) => $state,
                 'label_attr'        => ['class' => 'control-label'],
                 'attr'              => ['class' => 'form-control'],
                 'multiple'          => false,

@@ -10,26 +10,11 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class ImportSubscriber implements EventSubscriberInterface
 {
-    /**
-     * @var IpLookupHelper
-     */
-    private $ipLookupHelper;
-
-    /**
-     * @var AuditLogModel
-     */
-    private $auditLogModel;
-
-    public function __construct(IpLookupHelper $ipLookupHelper, AuditLogModel $auditLogModel)
+    public function __construct(private IpLookupHelper $ipLookupHelper, private AuditLogModel $auditLogModel)
     {
-        $this->ipLookupHelper = $ipLookupHelper;
-        $this->auditLogModel  = $auditLogModel;
     }
 
-    /**
-     * @return array
-     */
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             LeadEvents::IMPORT_POST_SAVE   => ['onImportPostSave', 0],
@@ -40,7 +25,7 @@ class ImportSubscriber implements EventSubscriberInterface
     /**
      * Add an entry to the audit log.
      */
-    public function onImportPostSave(ImportEvent $event)
+    public function onImportPostSave(ImportEvent $event): void
     {
         $entity = $event->getEntity();
         if ($details = $event->getChanges()) {
@@ -59,7 +44,7 @@ class ImportSubscriber implements EventSubscriberInterface
     /**
      * Add a delete entry to the audit log.
      */
-    public function onImportDelete(ImportEvent $event)
+    public function onImportDelete(ImportEvent $event): void
     {
         $entity = $event->getEntity();
         $log    = [

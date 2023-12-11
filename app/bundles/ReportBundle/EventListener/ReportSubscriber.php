@@ -10,26 +10,11 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class ReportSubscriber implements EventSubscriberInterface
 {
-    /**
-     * @var IpLookupHelper
-     */
-    private $ipLookupHelper;
-
-    /**
-     * @var AuditLogModel
-     */
-    private $auditLogModel;
-
-    public function __construct(IpLookupHelper $ipLookupHelper, AuditLogModel $auditLogModel)
+    public function __construct(private IpLookupHelper $ipLookupHelper, private AuditLogModel $auditLogModel)
     {
-        $this->ipLookupHelper = $ipLookupHelper;
-        $this->auditLogModel  = $auditLogModel;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             ReportEvents::REPORT_POST_SAVE   => ['onReportPostSave', 0],
@@ -40,7 +25,7 @@ class ReportSubscriber implements EventSubscriberInterface
     /**
      * Add an entry to the audit log.
      */
-    public function onReportPostSave(ReportEvent $event)
+    public function onReportPostSave(ReportEvent $event): void
     {
         $report = $event->getReport();
         if ($details = $event->getChanges()) {
@@ -59,7 +44,7 @@ class ReportSubscriber implements EventSubscriberInterface
     /**
      * Add a delete entry to the audit log.
      */
-    public function onReportDelete(ReportEvent $event)
+    public function onReportDelete(ReportEvent $event): void
     {
         $report = $event->getReport();
         $log    = [

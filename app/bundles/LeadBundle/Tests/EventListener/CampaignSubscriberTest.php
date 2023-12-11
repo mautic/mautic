@@ -108,7 +108,7 @@ class CampaignSubscriberTest extends \PHPUnit\Framework\TestCase
         'accumulative_time' => '',
     ];
 
-    public function testOnCampaignTriggerActiononUpdateCompany()
+    public function testOnCampaignTriggerActiononUpdateCompany(): void
     {
         $mockIpLookupHelper = $this->createMock(IpLookupHelper::class);
         $mockLeadModel      = $this->createMock(LeadModel::class);
@@ -178,7 +178,7 @@ class CampaignSubscriberTest extends \PHPUnit\Framework\TestCase
         $lead->setPrimaryCompany($this->configFrom);
 
         $mockLeadModel->expects($this->once())->method('setPrimaryCompany')->willReturnCallback(
-            function () use ($lead) {
+            function () use ($lead): void {
                 $lead->setPrimaryCompany($this->configTo);
             }
         );

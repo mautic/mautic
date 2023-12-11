@@ -15,26 +15,11 @@ class TokenSubscriber implements EventSubscriberInterface
 {
     use MatchFilterForLeadTrait;
 
-    /**
-     * @var EventDispatcherInterface
-     */
-    private $dispatcher;
-
-    /**
-     * @var PrimaryCompanyHelper
-     */
-    private $primaryCompanyHelper;
-
-    public function __construct(EventDispatcherInterface $dispatcher, PrimaryCompanyHelper $primaryCompanyHelper)
+    public function __construct(private EventDispatcherInterface $dispatcher, private PrimaryCompanyHelper $primaryCompanyHelper)
     {
-        $this->dispatcher           = $dispatcher;
-        $this->primaryCompanyHelper = $primaryCompanyHelper;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             EmailEvents::EMAIL_ON_SEND     => ['decodeTokens', 254],
@@ -43,7 +28,7 @@ class TokenSubscriber implements EventSubscriberInterface
         ];
     }
 
-    public function decodeTokens(EmailSendEvent $event)
+    public function decodeTokens(EmailSendEvent $event): void
     {
         if ($event->isDynamicContentParsing()) {
             // prevent a loop
@@ -81,7 +66,7 @@ class TokenSubscriber implements EventSubscriberInterface
         }
     }
 
-    public function onTokenReplacement(TokenReplacementEvent $event)
+    public function onTokenReplacement(TokenReplacementEvent $event): void
     {
         $clickthrough = $event->getClickthrough();
 

@@ -13,11 +13,6 @@ class IntegrationObjectToken
     /**
      * @var string
      */
-    private $token;
-
-    /**
-     * @var string
-     */
     private $objectName;
 
     /**
@@ -40,18 +35,11 @@ class IntegrationObjectToken
      */
     private $baseURL;
 
-    /**
-     * IntegrationObjectToken constructor.
-     */
-    public function __construct(string $token)
+    public function __construct(private string $token)
     {
-        $this->token = $token;
     }
 
-    /**
-     * @return string
-     */
-    public function getToken()
+    public function getToken(): string
     {
         return $this->token;
     }

@@ -91,7 +91,7 @@ class TrackableRepository extends CommonRepository
      * @param int  $increaseBy
      * @param bool $unique
      */
-    public function upHitCount($redirectId, $channel, $channelId, $increaseBy = 1, $unique = false)
+    public function upHitCount($redirectId, $channel, $channelId, $increaseBy = 1, $unique = false): void
     {
         $q = $this->getEntityManager()->getConnection()->createQueryBuilder();
 
@@ -193,7 +193,7 @@ class TrackableRepository extends CommonRepository
     /**
      * {@inheritdoc}
      */
-    public function getTableAlias()
+    public function getTableAlias(): string
     {
         return 't';
     }

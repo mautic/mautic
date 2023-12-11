@@ -7,15 +7,12 @@ use Symfony\Component\Form\AbstractType;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
-/**
- * Class SmsListType.
- */
 class SmsListType extends AbstractType
 {
     /**
      * {@inheritdoc}
      */
-    public function configureOptions(OptionsResolver $resolver)
+    public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults(
             [
@@ -23,18 +20,16 @@ class SmsListType extends AbstractType
                 'modal_header'        => 'mautic.sms.header.new',
                 'model'               => 'sms',
                 'model_lookup_method' => 'getLookupResults',
-                'lookup_arguments'    => function (Options $options) {
-                    return [
-                        'type'    => SmsType::class,
-                        'filter'  => '$data',
-                        'limit'   => 0,
-                        'start'   => 0,
-                        'options' => [
-                            'sms_type' => $options['sms_type'],
-                        ],
-                    ];
-                },
-                'ajax_lookup_action' => function (Options $options) {
+                'lookup_arguments'    => fn (Options $options): array => [
+                    'type'    => SmsType::class,
+                    'filter'  => '$data',
+                    'limit'   => 0,
+                    'start'   => 0,
+                    'options' => [
+                        'sms_type' => $options['sms_type'],
+                    ],
+                ],
+                'ajax_lookup_action' => function (Options $options): string {
                     $query = [
                         'sms_type' => $options['sms_type'],
                     ];

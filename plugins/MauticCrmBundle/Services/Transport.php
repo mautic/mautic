@@ -6,17 +6,8 @@ use GuzzleHttp\Client;
 
 class Transport implements TransportInterface
 {
-    /**
-     * @var Client
-     */
-    private $client;
-
-    /**
-     * TransportService constructor.
-     */
-    public function __construct(Client $client)
+    public function __construct(private Client $client)
     {
-        $this->client = $client;
     }
 
     public function post($uri, array $options = [])

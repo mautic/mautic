@@ -19,6 +19,7 @@ use Mautic\CoreBundle\Translation\Translator;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\Form;
 use Symfony\Component\Form\FormFactoryInterface;
+use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
@@ -42,7 +43,7 @@ class CommonApiController extends FetchCommonApiController
      *
      * @var FormModel<E>|null
      */
-    protected $model = null;
+    protected $model;
 
     /**
      * @var array
@@ -54,16 +55,9 @@ class CommonApiController extends FetchCommonApiController
      */
     protected $entityRequestParameters = [];
 
-    protected RouterInterface $router;
-
-    protected FormFactoryInterface $formFactory;
-
-    public function __construct(CorePermissions $security, Translator $translator, EntityResultHelper $entityResultHelper, RouterInterface $router, FormFactoryInterface $formFactory, AppVersion $appVersion, RequestStack $requestStack, ManagerRegistry $doctrine, ModelFactory $modelFactory, EventDispatcherInterface $dispatcher, CoreParametersHelper $coreParametersHelper, MauticFactory $factory)
+    public function __construct(CorePermissions $security, Translator $translator, EntityResultHelper $entityResultHelper, protected RouterInterface $router, protected FormFactoryInterface $formFactory, AppVersion $appVersion, RequestStack $requestStack, ManagerRegistry $doctrine, ModelFactory $modelFactory, EventDispatcherInterface $dispatcher, CoreParametersHelper $coreParametersHelper, MauticFactory $factory)
     {
         parent::__construct($security, $translator, $entityResultHelper, $appVersion, $requestStack, $doctrine, $modelFactory, $dispatcher, $coreParametersHelper, $factory);
-
-        $this->router      = $router;
-        $this->formFactory = $formFactory;
     }
 
     /**
@@ -161,7 +155,7 @@ class CommonApiController extends FetchCommonApiController
 
         foreach ($parameters as $key => $params) {
             $method = $request->getMethod();
-            $entity = (isset($entities[$key])) ? $entities[$key] : null;
+            $entity = $entities[$key] ?? null;
 
             $statusCode = Response::HTTP_OK;
             if (null === $entity || !$entity->getId()) {
@@ -327,10 +321,7 @@ class CommonApiController extends FetchCommonApiController
         return $this->processForm($request, $entity, $parameters, 'POST');
     }
 
-    /**
-     * Creates the form instance.
-     */
-    protected function createEntityForm($entity): Form
+    protected function createEntityForm($entity): FormInterface
     {
         return $this->model->createForm(
             $entity,
@@ -396,7 +387,7 @@ class CommonApiController extends FetchCommonApiController
                     $entity
                 );
             }
-        } elseif (is_object($formResponse) && get_class($formResponse) === get_class($entity)) {
+        } elseif (is_object($formResponse) && $formResponse::class === $entity::class) {
             // Success
             $entities[$key] = $formResponse;
         } elseif (is_array($formResponse) && isset($formResponse['code'], $formResponse['message'])) {

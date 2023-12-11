@@ -11,26 +11,11 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class DetermineWinnerSubscriber implements EventSubscriberInterface
 {
-    /**
-     * @var SubmissionRepository
-     */
-    private $submissionRepository;
-
-    /**
-     * @var TranslatorInterface
-     */
-    private $translator;
-
-    public function __construct(SubmissionRepository $submissionRepository, TranslatorInterface $translator)
+    public function __construct(private SubmissionRepository $submissionRepository, private TranslatorInterface $translator)
     {
-        $this->submissionRepository = $submissionRepository;
-        $this->translator           = $translator;
     }
 
-    /**
-     * @return array
-     */
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             FormEvents::ON_DETERMINE_SUBMISSION_RATE_WINNER => ['onDetermineSubmissionWinner', 0],
@@ -40,7 +25,7 @@ class DetermineWinnerSubscriber implements EventSubscriberInterface
     /**
      * Determines the winner of A/B test based on number of form submissions.
      */
-    public function onDetermineSubmissionWinner(DetermineWinnerEvent $event)
+    public function onDetermineSubmissionWinner(DetermineWinnerEvent $event): void
     {
         $parameters = $event->getParameters();
         $parent     = $parameters['parent'];

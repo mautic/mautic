@@ -16,23 +16,11 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class ConfigType extends AbstractType
 {
-    /**
-     * @var CoreParametersHelper
-     */
-    protected $parameters;
-
-    /**
-     * @var TranslatorInterface
-     */
-    protected $translator;
-
-    public function __construct(CoreParametersHelper $parametersHelper, TranslatorInterface $translator)
+    public function __construct(protected CoreParametersHelper $parameters, protected TranslatorInterface $translator)
     {
-        $this->parameters = $parametersHelper;
-        $this->translator = $translator;
     }
 
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $samlEntityIdChoices = ['', $this->parameters->get('mautic.site_url')];
         if (!empty($this->parameters->get('mautic.subdomain_url'))) {
@@ -200,7 +188,7 @@ class ConfigType extends AbstractType
         );
     }
 
-    public function buildView(FormView $view, FormInterface $form, array $options)
+    public function buildView(FormView $view, FormInterface $form, array $options): void
     {
         $view->vars['entityId'] = $this->parameters->get('mautic.saml_idp_entity_id');
     }

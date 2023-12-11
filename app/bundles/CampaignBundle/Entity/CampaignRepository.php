@@ -42,7 +42,7 @@ class CampaignRepository extends CommonRepository
      * @param object $entity
      * @param bool   $flush
      */
-    public function deleteEntity($entity, $flush = true)
+    public function deleteEntity($entity, $flush = true): void
     {
         // Null parents of associated events first
         $q = $this->getEntityManager()->getConnection()->createQueryBuilder();
@@ -120,10 +120,8 @@ class CampaignRepository extends CommonRepository
      * Returns a list of all published (and active) campaigns that specific lead lists are part of.
      *
      * @param int|array $leadLists
-     *
-     * @return array
      */
-    public function getPublishedCampaignsByLeadLists($leadLists)
+    public function getPublishedCampaignsByLeadLists($leadLists): array
     {
         if (!is_array($leadLists)) {
             $leadLists = [(int) $leadLists];
@@ -168,10 +166,8 @@ class CampaignRepository extends CommonRepository
      * Get array of list IDs assigned to this campaign.
      *
      * @param int|null $id
-     *
-     * @return array
      */
-    public function getCampaignListIds($id = null)
+    public function getCampaignListIds($id = null): array
     {
         $q = $this->getEntityManager()->getConnection()->createQueryBuilder()
             ->from(MAUTIC_TABLE_PREFIX.'campaign_leadlist_xref', 'cl');
@@ -200,10 +196,8 @@ class CampaignRepository extends CommonRepository
      * Get array of list IDs => name assigned to this campaign.
      *
      * @param null $id
-     *
-     * @return array
      */
-    public function getCampaignListSources($id)
+    public function getCampaignListSources($id): array
     {
         $q = $this->getEntityManager()->getConnection()->createQueryBuilder()
             ->select('cl.leadlist_id, l.name')
@@ -225,10 +219,8 @@ class CampaignRepository extends CommonRepository
 
     /**
      * Get array of form IDs => name assigned to this campaign.
-     *
-     * @return array
      */
-    public function getCampaignFormSources($id)
+    public function getCampaignFormSources($id): array
     {
         $q = $this->getEntityManager()->getConnection()->createQueryBuilder()
             ->select('cf.form_id, f.name')
@@ -265,7 +257,7 @@ class CampaignRepository extends CommonRepository
     /**
      * {@inheritdoc}
      */
-    public function getTableAlias()
+    public function getTableAlias(): string
     {
         return 'c';
     }
@@ -325,10 +317,7 @@ class CampaignRepository extends CommonRepository
         return $q->executeQuery()->fetchAllAssociative();
     }
 
-    /**
-     * @return CountResult
-     */
-    public function getCountsForPendingContacts($campaignId, array $pendingEvents, ContactLimiter $limiter)
+    public function getCountsForPendingContacts($campaignId, array $pendingEvents, ContactLimiter $limiter): CountResult
     {
         $q = $this->getReplicaConnection($limiter)->createQueryBuilder();
 
@@ -368,10 +357,8 @@ class CampaignRepository extends CommonRepository
 
     /**
      * Get pending contact IDs for a campaign.
-     *
-     * @return array
      */
-    public function getPendingContactIds($campaignId, ContactLimiter $limiter)
+    public function getPendingContactIds($campaignId, ContactLimiter $limiter): array
     {
         if ($limiter->hasCampaignLimit() && 0 === $limiter->getCampaignLimitRemaining()) {
             return [];
@@ -434,11 +421,9 @@ class CampaignRepository extends CommonRepository
      * @param int   $leadId        Optional lead ID to check if lead is part of campaign
      * @param array $pendingEvents List of specific events to rule out
      *
-     * @return int
-     *
      * @throws \Doctrine\DBAL\Cache\CacheException
      */
-    public function getCampaignLeadCount($campaignId, $leadId = null, $pendingEvents = [], \DateTimeInterface $dateFrom = null, \DateTimeInterface $dateTo = null)
+    public function getCampaignLeadCount($campaignId, $leadId = null, $pendingEvents = [], \DateTimeInterface $dateFrom = null, \DateTimeInterface $dateTo = null): int
     {
         $q = $this->getReplicaConnection()->createQueryBuilder();
 
@@ -588,10 +573,8 @@ class CampaignRepository extends CommonRepository
      * or empty array if nothing found.
      *
      * @param int $id
-     *
-     * @return array
      */
-    public function fetchEmailIdsById($id)
+    public function fetchEmailIdsById($id): array
     {
         $emails = $this->getEntityManager()
             ->createQueryBuilder()

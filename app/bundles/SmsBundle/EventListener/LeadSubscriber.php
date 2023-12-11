@@ -11,32 +11,11 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class LeadSubscriber implements EventSubscriberInterface
 {
-    /**
-     * @var TranslatorInterface
-     */
-    private $translator;
-
-    /**
-     * @var RouterInterface
-     */
-    private $router;
-
-    /**
-     * @var EntityManager
-     */
-    private $em;
-
-    public function __construct(TranslatorInterface $translator, RouterInterface $router, EntityManager $em)
+    public function __construct(private TranslatorInterface $translator, private RouterInterface $router, private EntityManager $em)
     {
-        $this->translator = $translator;
-        $this->router     = $router;
-        $this->em         = $em;
     }
 
-    /**
-     * @return array
-     */
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             LeadEvents::TIMELINE_ON_GENERATE => ['onTimelineGenerate', 0],
@@ -46,7 +25,7 @@ class LeadSubscriber implements EventSubscriberInterface
     /**
      * Compile events for the lead timeline.
      */
-    public function onTimelineGenerate(LeadTimelineEvent $event)
+    public function onTimelineGenerate(LeadTimelineEvent $event): void
     {
         $this->addSmsEvents($event, 'sent');
         $this->addSmsEvents($event, 'failed');

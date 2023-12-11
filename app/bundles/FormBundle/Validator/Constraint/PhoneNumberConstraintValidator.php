@@ -17,7 +17,7 @@ class PhoneNumberConstraintValidator extends ConstraintValidator
     /**
      * {@inheritdoc}
      */
-    public function validate($value, Constraint $constraint)
+    public function validate($value, Constraint $constraint): void
     {
         if (null === $value || '' === $value) {
             return;
@@ -33,7 +33,7 @@ class PhoneNumberConstraintValidator extends ConstraintValidator
             $value = (string) $value;
             try {
                 $phoneNumber = $phoneUtil->parse($value, PhoneNumberUtil::UNKNOWN_REGION);
-            } catch (NumberParseException $e) {
+            } catch (NumberParseException) {
                 $this->addViolation($value, $constraint);
 
                 return;
@@ -53,7 +53,7 @@ class PhoneNumberConstraintValidator extends ConstraintValidator
      * @param mixed      $value      the value that should be validated
      * @param Constraint $constraint the constraint for the validation
      */
-    private function addViolation($value, Constraint $constraint)
+    private function addViolation($value, Constraint $constraint): void
     {
         $this->context->addViolation(
             $constraint->getMessage(),
