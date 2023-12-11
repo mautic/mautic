@@ -24,6 +24,7 @@ use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Component\HttpFoundation\Response;
 
 class MessageController extends AbstractStandardFormController
 {
@@ -62,18 +63,13 @@ class MessageController extends AbstractStandardFormController
 
     /**
      * @param int $page
-     *
-     * @return \Mautic\CoreBundle\Controller\Response|\Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse
      */
-    public function indexAction(Request $request, $page = 1)
+    public function indexAction(Request $request, $page = 1): Response
     {
         return $this->indexStandard($request, $page);
     }
 
-    /**
-     * @return \Mautic\CoreBundle\Controller\Response|\Symfony\Component\HttpFoundation\JsonResponse
-     */
-    public function newAction(Request $request)
+    public function newAction(Request $request): Response
     {
         return $this->newStandard($request);
     }
@@ -231,7 +227,7 @@ class MessageController extends AbstractStandardFormController
     }
 
     /***
-     * @param null $objectId
+
      *
      * @return string
      */

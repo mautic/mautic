@@ -18,10 +18,7 @@ class UploadSubscriber implements EventSubscriberInterface
     {
     }
 
-    /**
-     * @return array
-     */
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             UploadEvents::POST_UPLOAD => ['onPostUpload', 0],

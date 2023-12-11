@@ -8,23 +8,18 @@ class IcontactIntegration extends EmailAbstractIntegration
 {
     /**
      * {@inheritdoc}
-     *
-     * @return string
      */
-    public function getName()
+    public function getName(): string
     {
         return 'Icontact';
     }
 
-    /**
-     * @return string
-     */
-    public function getDisplayName()
+    public function getDisplayName(): string
     {
         return 'iContact';
     }
 
-    public function getAuthenticationType()
+    public function getAuthenticationType(): string
     {
         return 'rest';
     }
@@ -50,7 +45,7 @@ class IcontactIntegration extends EmailAbstractIntegration
         ];
     }
 
-    public function getApiUrl()
+    public function getApiUrl(): string
     {
         return 'https://app.icontact.com/icp/a';
     }

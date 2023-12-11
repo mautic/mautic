@@ -7,7 +7,7 @@ use MauticPlugin\MauticCrmBundle\Integration\CrmAbstractIntegration;
 /**
  * Class CrmApi.
  *
- * @method createLead
+ * @method createLead()
  */
 class CrmApi
 {

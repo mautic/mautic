@@ -12,7 +12,7 @@ class ConfigMetadataTest extends TestCase
     /**
      * @var BundleMetadata|MockObject
      */
-    private $metadata;
+    private \PHPUnit\Framework\MockObject\MockObject $metadata;
 
     protected function setUp(): void
     {
@@ -59,7 +59,7 @@ class ConfigMetadataTest extends TestCase
             [
                 'extreme-ip' => [
                     'display_name' => 'Extreme-IP',
-                    'class'        => 'Mautic\CoreBundle\IpLookup\ExtremeIpLookup',
+                    'class'        => \Mautic\CoreBundle\IpLookup\ExtremeIpLookup::class,
                 ],
             ],
             $configMetadata->getIpLookupServices()

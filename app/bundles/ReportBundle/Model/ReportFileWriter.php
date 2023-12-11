@@ -31,11 +31,9 @@ class ReportFileWriter
     }
 
     /**
-     * @return string
-     *
      * @throws FileIOException
      */
-    public function getFilePath(Scheduler $scheduler)
+    public function getFilePath(Scheduler $scheduler): string
     {
         $fileName = $this->getFileName($scheduler);
 

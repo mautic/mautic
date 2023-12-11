@@ -34,57 +34,57 @@ class EventExecutionerTest extends \PHPUnit\Framework\TestCase
     /**
      * @var EventCollector|\PHPUnit\Framework\MockObject\MockObject
      */
-    private $eventCollector;
+    private \PHPUnit\Framework\MockObject\MockObject $eventCollector;
 
     /**
      * @var EventLogger|\PHPUnit\Framework\MockObject\MockObject
      */
-    private $eventLogger;
+    private \PHPUnit\Framework\MockObject\MockObject $eventLogger;
 
     /**
      * @var ActionExecutioner|\PHPUnit\Framework\MockObject\MockObject
      */
-    private $actionExecutioner;
+    private \PHPUnit\Framework\MockObject\MockObject $actionExecutioner;
 
     /**
      * @var ConditionExecutioner|\PHPUnit\Framework\MockObject\MockObject
      */
-    private $conditionExecutioner;
+    private \PHPUnit\Framework\MockObject\MockObject $conditionExecutioner;
 
     /**
      * @var DecisionExecutioner|\PHPUnit\Framework\MockObject\MockObject
      */
-    private $decisionExecutioner;
+    private \PHPUnit\Framework\MockObject\MockObject $decisionExecutioner;
 
     /**
      * @var LoggerInterface|\PHPUnit\Framework\MockObject\MockObject
      */
-    private $logger;
+    private \PHPUnit\Framework\MockObject\MockObject $logger;
 
     /**
      * @var EventScheduler|\PHPUnit\Framework\MockObject\MockObject
      */
-    private $eventScheduler;
+    private \PHPUnit\Framework\MockObject\MockObject $eventScheduler;
 
     /**
      * @var RemovedContactTracker|\PHPUnit\Framework\MockObject\MockObject
      */
-    private $removedContactTracker;
+    private \PHPUnit\Framework\MockObject\MockObject $removedContactTracker;
 
     /**
      * @var LeadRepository|\PHPUnit\Framework\MockObject\MockObject
      */
-    private $leadRepository;
+    private \PHPUnit\Framework\MockObject\MockObject $leadRepository;
 
     /**
      * @var EventRepository|MockBuilder
      */
-    private $eventRepository;
+    private \PHPUnit\Framework\MockObject\MockObject $eventRepository;
 
     /**
      * @var Translator|MockBuilder
      */
-    private $translator;
+    private \PHPUnit\Framework\MockObject\MockObject $translator;
 
     protected function setUp(): void
     {

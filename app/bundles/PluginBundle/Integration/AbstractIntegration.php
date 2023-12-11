@@ -2320,8 +2320,6 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
     }
 
     /**
-     * @param null $object
-     *
      * @return mixed
      */
     public function prepareFieldsForSync($fields, $keys, $object = null)

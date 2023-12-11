@@ -243,7 +243,6 @@ final class ButtonHelper
      *
      * @param string $buttonCount
      * @param string $groupType
-     * @param null   $item
      *
      * @return $this
      */

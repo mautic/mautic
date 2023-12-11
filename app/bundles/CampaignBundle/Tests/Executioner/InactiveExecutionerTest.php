@@ -21,27 +21,27 @@ class InactiveExecutionerTest extends \PHPUnit\Framework\TestCase
     /**
      * @var \PHPUnit\Framework\MockObject\MockObject|InactiveContactFinder
      */
-    private $inactiveContactFinder;
+    private \PHPUnit\Framework\MockObject\MockObject $inactiveContactFinder;
 
     /**
      * @var \PHPUnit\Framework\MockObject\MockObject|Translator
      */
-    private $translator;
+    private \PHPUnit\Framework\MockObject\MockObject $translator;
 
     /**
      * @var \PHPUnit\Framework\MockObject\MockObject|EventScheduler
      */
-    private $eventScheduler;
+    private \PHPUnit\Framework\MockObject\MockObject $eventScheduler;
 
     /**
      * @var \PHPUnit\Framework\MockObject\MockObject|InactiveHelper
      */
-    private $inactiveHelper;
+    private \PHPUnit\Framework\MockObject\MockObject $inactiveHelper;
 
     /**
      * @var \PHPUnit\Framework\MockObject\MockObject|EventExecutioner
      */
-    private $eventExecutioner;
+    private \PHPUnit\Framework\MockObject\MockObject $eventExecutioner;
 
     protected function setUp(): void
     {

@@ -11,7 +11,7 @@ class TrailingSlashHelperTest extends \PHPUnit\Framework\TestCase
     /**
      * @var CoreParametersHelper|\PHPUnit\Framework\MockObject\MockObject
      */
-    private $coreParametersHelper;
+    private \PHPUnit\Framework\MockObject\MockObject $coreParametersHelper;
 
     protected function setUp(): void
     {

@@ -14,17 +14,14 @@ class IdStoreTest extends TestCase
     /**
      * @var ObjectManager|MockObject
      */
-    private $manager;
+    private \PHPUnit\Framework\MockObject\MockObject $manager;
 
     /**
      * @var TimeProviderInterface|MockObject
      */
-    private $timeProvider;
+    private \PHPUnit\Framework\MockObject\MockObject $timeProvider;
 
-    /**
-     * @var IdStore
-     */
-    private $store;
+    private \Mautic\UserBundle\Security\SAML\Store\IdStore $store;
 
     protected function setUp(): void
     {

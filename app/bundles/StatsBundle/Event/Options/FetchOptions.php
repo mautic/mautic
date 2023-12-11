@@ -49,7 +49,6 @@ class FetchOptions
 
     /**
      * @param string $key
-     * @param null   $default
      *
      * @return mixed
      */

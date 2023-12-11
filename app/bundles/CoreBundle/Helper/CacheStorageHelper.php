@@ -68,8 +68,6 @@ class CacheStorageHelper
     }
 
     /**
-     * @param null $expiration
-     *
      * @return bool
      *
      * @throws \Psr\Cache\InvalidArgumentException
@@ -135,9 +133,6 @@ class CacheStorageHelper
     }
 
     /**
-     * @param null $namespace
-     * @param null $defaultExpiration
-     *
      * @return CacheStorageHelper;
      */
     public function getCache($namespace = null, $defaultExpiration = 0)

@@ -14,10 +14,7 @@ class LeadSubscriber implements EventSubscriberInterface
     {
     }
 
-    /**
-     * @return array
-     */
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             LeadEvents::LEAD_POST_SAVE    => ['leadPostSave', 0],

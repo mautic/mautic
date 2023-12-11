@@ -19,12 +19,12 @@ class TagRepository extends BaseTagRepository
     /**
      * {@inheritdoc}
      */
-    public function getTableAlias()
+    public function getTableAlias(): string
     {
         return 'lt';
     }
 
-    public function countOccurrences($tag)
+    public function countOccurrences($tag): int
     {
         $q = $this->getEntityManager()->getConnection()->createQueryBuilder();
 

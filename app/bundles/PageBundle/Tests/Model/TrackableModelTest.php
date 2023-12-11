@@ -71,7 +71,7 @@ class TrackableModelTest extends TestCase
             ->method('createTrackingTokens')
             ->willReturn([]);
 
-        list($content, $trackables) = $mockModel->parseContentForTrackables(
+        [$content, $trackables] = $mockModel->parseContentForTrackables(
             $this->generateContent('https://foo-bar.com', 'html'),
             [],
             'email',
@@ -130,7 +130,7 @@ class TrackableModelTest extends TestCase
             ->method('createTrackingTokens')
             ->willReturn([]);
 
-        list($content, $trackables) = $mockModel->parseContentForTrackables(
+        [$content, $trackables] = $mockModel->parseContentForTrackables(
             $this->generateContent('https://foo-bar.com', 'text'),
             [],
             'email',
@@ -317,7 +317,7 @@ class TrackableModelTest extends TestCase
         $url   = '{contactfield=foo}';
         $model = $this->getModel();
 
-        list($content, $trackables) = $model->parseContentForTrackables(
+        [$content, $trackables] = $model->parseContentForTrackables(
             $this->generateContent($url, 'html'),
             [
                 '{contactfield=foo}' => 'https://mautic.org',
@@ -347,7 +347,7 @@ class TrackableModelTest extends TestCase
         $url   = 'http://{contactfield=foo}.com?foo=bar';
         $model = $this->getModel();
 
-        list($content, $trackables) = $model->parseContentForTrackables(
+        [$content, $trackables] = $model->parseContentForTrackables(
             $this->generateContent($url, 'html'),
             [
                 '{contactfield=foo}' => '',
@@ -375,7 +375,7 @@ class TrackableModelTest extends TestCase
         $url   = 'http://{contactfield=foo}.com?foo={contactfield=bar}';
         $model = $this->getModel();
 
-        list($content, $trackables) = $model->parseContentForTrackables(
+        [$content, $trackables] = $model->parseContentForTrackables(
             $this->generateContent($url, 'html'),
             [
                 '{contactfield=foo}' => '',
@@ -406,7 +406,7 @@ class TrackableModelTest extends TestCase
         $url   = 'https://{unsubscribe_url}';
         $model = $this->getModel(['{unsubscribe_url}']);
 
-        list($content, $trackables) = $model->parseContentForTrackables(
+        [$content, $trackables] = $model->parseContentForTrackables(
             $this->generateContent($url, 'html'),
             [
                 '{unsubscribe_url}' => 'https://domain.com/email/unsubscribe/xxxxxxx',
@@ -431,7 +431,7 @@ class TrackableModelTest extends TestCase
         $url   = '{random_token}';
         $model = $this->getModel();
 
-        list($content, $trackables) = $model->parseContentForTrackables(
+        [$content, $trackables] = $model->parseContentForTrackables(
             $this->generateContent($url, 'text'),
             [
                 '{unsubscribe_url}' => 'https://domain.com/email/unsubscribe/xxxxxxx',
@@ -454,7 +454,7 @@ class TrackableModelTest extends TestCase
         $model        = $this->getModel();
         $inputContent = $this->generateContent($url, 'text');
 
-        list($content, $trackables) = $model->parseContentForTrackables(
+        [$content, $trackables] = $model->parseContentForTrackables(
             $inputContent,
             [
                 '{contactfield=website}' => 'https://mautic.org/about-us',
@@ -488,14 +488,14 @@ class TrackableModelTest extends TestCase
         $url   = 'https://domain.com';
         $model = $this->getModel([$url]);
 
-        list($content, $trackables) = $model->parseContentForTrackables(
+        [$content, $trackables] = $model->parseContentForTrackables(
             $this->generateContent($url, 'html'),
             [],
             'email',
             1
         );
 
-        $this->assertTrue(false !== strpos($content, $url), $content);
+        $this->assertTrue(str_contains($content, $url), $content);
     }
 
     /**
@@ -531,9 +531,7 @@ class TrackableModelTest extends TestCase
             'email',
             1
         );
-
-        reset($trackables);
-        $token = key($trackables);
+        $token = array_key_first($trackables);
         Assert::assertNotEmpty($trackables, $content);
         Assert::assertStringContainsString($token, $content);
 
@@ -582,7 +580,7 @@ class TrackableModelTest extends TestCase
 
         foreach ($trackables as $redirectId => $trackable) {
             // If the shared base was correctly parsed, all generated tokens will be in the content
-            Assert::assertNotFalse(strpos($content, $redirectId), $content);
+            Assert::assertNotFalse(strpos($content, (string) $redirectId), $content);
         }
     }
 
@@ -593,7 +591,7 @@ class TrackableModelTest extends TestCase
     {
         $model = $this->getModel();
 
-        list($content, $trackables) = $model->parseContentForTrackables(
+        [$content, $trackables] = $model->parseContentForTrackables(
             '<style> .mf-modal { background-image: url(\'https://www.mautic.org/wp-content/uploads/2014/08/iTunesArtwork.png\'); } </style>',
             [],
             'email',
@@ -623,7 +621,7 @@ TEXT;
         $plainText = strip_tags($html);
 
         $combined                   = [$html, $plainText];
-        list($content, $trackables) = $model->parseContentForTrackables(
+        [$content, $trackables]     = $model->parseContentForTrackables(
             $combined,
             [],
             'email',
@@ -634,10 +632,7 @@ TEXT;
 
         // No links so no trackables
         $this->assertEquals($html, $content[0]);
-
-        // Has a URL so has one trackable
-        reset($trackables);
-        $token = key($trackables);
+        $token = array_key_first($trackables);
         self::assertNotNull($token);
 
         $this->assertEquals(str_replace('https://plaintexttest.io', $token, $plainText), $content[1]);
@@ -663,7 +658,7 @@ TEXT;
         $plainText = strip_tags($html);
 
         $combined                   = [$html, $plainText];
-        list($content, $trackables) = $model->parseContentForTrackables(
+        [$content, $trackables]     = $model->parseContentForTrackables(
             $combined,
             [],
             'email',
@@ -674,10 +669,7 @@ TEXT;
 
         // No links so no trackables
         $this->assertEquals($html, $content[0]);
-
-        // Has a URL so has one trackable
-        reset($trackables);
-        $token = key($trackables);
+        $token = array_key_first($trackables);
         self::assertNotNull($token);
 
         $this->assertEquals(str_replace('{contactfield=website}', $token, $plainText), $content[1]);
@@ -757,8 +749,8 @@ TEXT;
         $trackable->setChannel('email')
             ->setChannelId(1)
             ->setRedirect($redirect)
-            ->setHits(rand(1, 10))
-            ->setUniqueHits(rand(1, 10));
+            ->setHits(random_int(1, 10))
+            ->setUniqueHits(random_int(1, 10));
 
         return $trackable;
     }
@@ -802,7 +794,7 @@ CONTENT;
     /**
      * @return array<array<bool|null>> Use null to include both <a> and <map> tags
      */
-    public function trackMapProvider(): array
+    public static function trackMapProvider(): array
     {
         return [
             [true],

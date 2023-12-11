@@ -17,10 +17,7 @@ class SegmentSubscriber implements EventSubscriberInterface
     {
     }
 
-    /**
-     * @return array
-     */
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             LeadEvents::LIST_PRE_UNPUBLISH => ['onSegmentPreUnpublish', 0],

@@ -113,10 +113,8 @@ class FormModel extends CommonFormModel
 
     /**
      * @param string|int|null $id
-     *
-     * @return Form|object|null
      */
-    public function getEntity($id = null)
+    public function getEntity($id = null): ?Form
     {
         if (null === $id) {
             return new Form();
@@ -363,10 +361,8 @@ class FormModel extends CommonFormModel
      *
      * @param bool|true $withScript
      * @param bool|true $useCache
-     *
-     * @return string
      */
-    public function getContent(Form $form, $withScript = true, $useCache = true)
+    public function getContent(Form $form, $withScript = true, $useCache = true): string
     {
         $html = $this->getFormHtml($form, $useCache);
 
@@ -408,10 +404,8 @@ class FormModel extends CommonFormModel
      *
      * @param int $leadId
      * @param int $limit
-     *
-     * @return array
      */
-    public function getLeadSubmissions(Form $form, $leadId, $limit = 200)
+    public function getLeadSubmissions(Form $form, $leadId, $limit = 200): array
     {
         return $this->getRepository()->getFormResults(
             $form,
@@ -800,9 +794,6 @@ class FormModel extends CommonFormModel
         }
     }
 
-    /**
-     * @param null $operator
-     */
     public function getFilterExpressionFunctions($operator = null): array
     {
         $operatorOptions = [

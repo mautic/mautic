@@ -109,7 +109,7 @@ class SmsModel extends FormModel implements AjaxLookupModelInterface
     /**
      * {@inheritdoc}
      *
-     * @param null  $action
+
      * @param array $options
      *
      * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
@@ -129,10 +129,8 @@ class SmsModel extends FormModel implements AjaxLookupModelInterface
 
     /**
      * Get a specific entity or generate a new one if id is empty.
-     *
-     * @return Sms|null
      */
-    public function getEntity($id = null)
+    public function getEntity($id = null): ?Sms
     {
         if (null === $id) {
             $entity = new Sms();
@@ -346,9 +344,7 @@ class SmsModel extends FormModel implements AjaxLookupModelInterface
     }
 
     /**
-     * @param null $source
      * @param bool $persist
-     * @param null $listId
      *
      * @throws \Exception
      */
@@ -434,10 +430,8 @@ class SmsModel extends FormModel implements AjaxLookupModelInterface
      * @param string $dateFormat
      * @param array  $filter
      * @param bool   $canViewOthers
-     *
-     * @return array
      */
-    public function getHitsLineChartData($unit, \DateTime $dateFrom, \DateTime $dateTo, $dateFormat = null, $filter = [], $canViewOthers = true)
+    public function getHitsLineChartData($unit, \DateTime $dateFrom, \DateTime $dateTo, $dateFormat = null, $filter = [], $canViewOthers = true): array
     {
         $flag = null;
 
@@ -501,10 +495,8 @@ class SmsModel extends FormModel implements AjaxLookupModelInterface
 
     /**
      * Get an array of tracked links.
-     *
-     * @return array
      */
-    public function getSmsClickStats($smsId)
+    public function getSmsClickStats($smsId): array
     {
         return $this->pageTrackableModel->getTrackableList('sms', $smsId);
     }

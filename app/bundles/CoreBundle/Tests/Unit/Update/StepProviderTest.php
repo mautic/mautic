@@ -9,10 +9,7 @@ use PHPUnit\Framework\TestCase;
 
 class StepProviderTest extends TestCase
 {
-    /**
-     * @var StepProvider
-     */
-    private $provider;
+    private \Mautic\CoreBundle\Update\StepProvider $provider;
 
     protected function setUp(): void
     {

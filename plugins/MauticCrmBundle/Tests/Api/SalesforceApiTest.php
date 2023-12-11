@@ -74,7 +74,7 @@ class SalesforceApiTest extends \PHPUnit\Framework\TestCase
 
         try {
             $api->request('/test');
-        } catch (ApiErrorException $exception) {
+        } catch (ApiErrorException) {
             $this->fail('ApiErrorException thrown');
         }
     }
@@ -107,7 +107,7 @@ class SalesforceApiTest extends \PHPUnit\Framework\TestCase
 
         try {
             $api->request('/test');
-        } catch (ApiErrorException $exception) {
+        } catch (ApiErrorException) {
             $this->fail('ApiErrorException should not have been thrown');
         }
     }
@@ -173,7 +173,7 @@ class SalesforceApiTest extends \PHPUnit\Framework\TestCase
 
         try {
             $api->request('/test');
-        } catch (ApiErrorException $exception) {
+        } catch (ApiErrorException) {
             $this->fail('ApiErrorException thrown');
         }
     }

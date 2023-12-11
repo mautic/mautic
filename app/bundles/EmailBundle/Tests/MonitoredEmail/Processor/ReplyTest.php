@@ -27,17 +27,14 @@ class ReplyTest extends \PHPUnit\Framework\TestCase
 {
     private EmailAddressHelper $emailAddressHelper;
 
-    private $statRepo;
-    private $contactFinder;
-    private $leadModel;
-    private $dispatcher;
-    private $logger;
-    private $contactTracker;
+    private \PHPUnit\Framework\MockObject\MockObject $statRepo;
+    private \PHPUnit\Framework\MockObject\MockObject $contactFinder;
+    private \PHPUnit\Framework\MockObject\MockObject $leadModel;
+    private \PHPUnit\Framework\MockObject\MockObject $dispatcher;
+    private \PHPUnit\Framework\MockObject\MockObject $logger;
+    private \PHPUnit\Framework\MockObject\MockObject $contactTracker;
 
-    /**
-     * @var Reply
-     */
-    private $processor;
+    private \Mautic\EmailBundle\MonitoredEmail\Processor\Reply $processor;
 
     /**
      * @var MockObject&LeadRepository

@@ -12,10 +12,7 @@ use PHPUnit\Framework\TestCase;
 
 class ReleaseParserTest extends TestCase
 {
-    /**
-     * @var ReleaseParser
-     */
-    private $releaseParser;
+    private \Mautic\CoreBundle\Helper\Update\Github\ReleaseParser $releaseParser;
 
     protected function setUp(): void
     {
@@ -111,9 +108,7 @@ class ReleaseParserTest extends TestCase
             [
                 'handler' => new MockHandler(
                     [
-                        function (Request $request, array $options) {
-                            return new Response(500);
-                        },
+                        fn (Request $request, array $options) => new Response(500),
                     ]
                 ),
             ]
@@ -133,9 +128,7 @@ class ReleaseParserTest extends TestCase
             [
                 'handler' => new MockHandler(
                     [
-                        function (Request $request, array $options) {
-                            return new Response(200, [], json_encode(['foo' => 'bar']));
-                        },
+                        fn (Request $request, array $options) => new Response(200, [], json_encode(['foo' => 'bar'])),
                     ]
                 ),
             ]

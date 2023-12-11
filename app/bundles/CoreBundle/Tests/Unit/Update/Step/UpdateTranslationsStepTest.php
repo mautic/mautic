@@ -13,22 +13,19 @@ class UpdateTranslationsStepTest extends AbstractStepTest
     /**
      * @var MockObject|TranslatorInterface
      */
-    private $translator;
+    private \PHPUnit\Framework\MockObject\MockObject $translator;
 
     /**
      * @var MockObject|LanguageHelper
      */
-    private $languageHelper;
+    private \PHPUnit\Framework\MockObject\MockObject $languageHelper;
 
     /**
      * @var MockObject|LoggerInterface
      */
-    private $logger;
+    private \PHPUnit\Framework\MockObject\MockObject $logger;
 
-    /**
-     * @var UpdateTranslationsStep
-     */
-    private $step;
+    private \Mautic\CoreBundle\Update\Step\UpdateTranslationsStep $step;
 
     protected function setUp(): void
     {
@@ -128,9 +125,7 @@ class UpdateTranslationsStepTest extends AbstractStepTest
 
         $this->translator->method('trans')
             ->willReturnCallback(
-                function (string $key) {
-                    return $key;
-                }
+                fn (string $key) => $key
             );
 
         $this->logger->expects($this->once())

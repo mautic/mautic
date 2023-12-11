@@ -16,15 +16,12 @@ use PHPUnit\Framework\TestCase;
 
 class CampaignSubscriberTest extends TestCase
 {
-    private $ipLookupHelper;
-    private $auditLogModel;
-    private $campaignService;
-    private $flashBag;
+    private \PHPUnit\Framework\MockObject\MockObject $ipLookupHelper;
+    private \PHPUnit\Framework\MockObject\MockObject $auditLogModel;
+    private \PHPUnit\Framework\MockObject\MockObject $campaignService;
+    private \PHPUnit\Framework\MockObject\MockObject $flashBag;
 
-    /**
-     * @var CampaignSubscriber
-     */
-    private $subscriber;
+    private \Mautic\CampaignBundle\EventListener\CampaignSubscriber $subscriber;
 
     public function setUp(): void
     {
@@ -70,7 +67,7 @@ class CampaignSubscriberTest extends TestCase
         $ipAddress    = 'someIp';
 
         $dateTime = new \DateTime();
-        $dateTime->setTimestamp(1597752193);
+        $dateTime->setTimestamp(1_597_752_193);
 
         $campaign = new Campaign();
         $campaign->setPublishDown($dateTime);
@@ -108,7 +105,7 @@ class CampaignSubscriberTest extends TestCase
         $campaignName = 'campaignName';
 
         $dateTime = new \DateTime();
-        $dateTime->setTimestamp(1597752193);
+        $dateTime->setTimestamp(1_597_752_193);
 
         $campaign = new Campaign();
         $campaign->setPublishUp($dateTime);

@@ -321,7 +321,7 @@ abstract class MauticMysqlTestCase extends AbstractMauticTestCase
             $table = 'company' === $data['object'] ? 'companies' : 'leads';
             try {
                 $this->connection->executeStatement(sprintf('ALTER TABLE %s%s DROP COLUMN %s', $prefix, $table, $data['alias']));
-            } catch (\Exception $e) {
+            } catch (\Exception) {
             }
         }
 

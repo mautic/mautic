@@ -18,27 +18,27 @@ class MembershipManagerTest extends \PHPUnit\Framework\TestCase
     /**
      * @var Adder|\PHPUnit\Framework\MockObject\MockObject
      */
-    private $adder;
+    private \PHPUnit\Framework\MockObject\MockObject $adder;
 
     /**
      * @var Remover|\PHPUnit\Framework\MockObject\MockObject
      */
-    private $remover;
+    private \PHPUnit\Framework\MockObject\MockObject $remover;
 
     /**
      * @var EventDispatcher|\PHPUnit\Framework\MockObject\MockObject
      */
-    private $eventDispatcher;
+    private \PHPUnit\Framework\MockObject\MockObject $eventDispatcher;
 
     /**
      * @var LeadRepository|\PHPUnit\Framework\MockObject\MockObject
      */
-    private $leadRepository;
+    private \PHPUnit\Framework\MockObject\MockObject $leadRepository;
 
     /**
      * @var NullLogger|\PHPUnit\Framework\MockObject\MockObject
      */
-    private $logger;
+    private \Psr\Log\NullLogger $logger;
 
     protected function setUp(): void
     {

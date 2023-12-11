@@ -9,15 +9,9 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 class ChannelBroadcastEventTest extends TestCase
 {
-    /**
-     * @var string
-     */
-    private $channel;
+    private string $channel;
 
-    /**
-     * @var int|string
-     */
-    private $channelId;
+    private int $channelId;
     private OutputInterface $output;
 
     protected function setUp(): void

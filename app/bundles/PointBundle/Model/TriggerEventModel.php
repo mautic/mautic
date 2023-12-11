@@ -32,12 +32,7 @@ class TriggerEventModel extends CommonFormModel
         return 'point:triggers';
     }
 
-    /**
-     * {@inheritdoc}
-     *
-     * @return TriggerEvent|null
-     */
-    public function getEntity($id = null)
+    public function getEntity($id = null): ?TriggerEvent
     {
         if (null === $id) {
             return new TriggerEvent();

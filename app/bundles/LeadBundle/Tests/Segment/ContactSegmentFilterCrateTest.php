@@ -279,7 +279,7 @@ class ContactSegmentFilterCrateTest extends \PHPUnit\Framework\TestCase
         $this->assertFalse($contactSegmentFilterCrate->hasTimeParts());
     }
 
-    public function specialFieldsToConvertToEmptyProvider()
+    public static function specialFieldsToConvertToEmptyProvider()
     {
         return [
             ['page_id'],

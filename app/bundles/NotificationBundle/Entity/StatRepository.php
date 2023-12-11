@@ -34,8 +34,6 @@ class StatRepository extends CommonRepository
 
     /**
      * Updates lead ID (e.g. after a lead merge).
-     *
-     * @param null $listId
      */
     public function getSentStats($notificationId, $listId = null): array
     {

@@ -126,7 +126,6 @@ class TweetModel extends FormModel implements AjaxLookupModelInterface
      * {@inheritdoc}
      *
      * @param Tweet        $entity
-     * @param null         $action
      * @param array<mixed> $options
      *
      * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
@@ -148,18 +147,14 @@ class TweetModel extends FormModel implements AjaxLookupModelInterface
      * Get a specific entity or generate a new one if id is empty.
      *
      * @param int $id
-     *
-     * @return Tweet|null
      */
-    public function getEntity($id = null)
+    public function getEntity($id = null): ?Tweet
     {
         if (null === $id) {
-            $entity = new Tweet();
-        } else {
-            $entity = parent::getEntity($id);
+            return new Tweet();
         }
 
-        return $entity;
+        return parent::getEntity($id);
     }
 
     /**
@@ -213,10 +208,7 @@ class TweetModel extends FormModel implements AjaxLookupModelInterface
         return $this->em->getRepository(TweetStat::class);
     }
 
-    /**
-     * @return string
-     */
-    public function getPermissionBase()
+    public function getPermissionBase(): string
     {
         return 'mauticSocial:tweets';
     }

@@ -54,9 +54,6 @@ class CampaignDecisionEvent extends Event
     }
 
     /**
-     * @param null $eventType
-     * @param null $type
-     *
      * @return bool
      */
     public function getEventSettings($eventType = null, $type = null)

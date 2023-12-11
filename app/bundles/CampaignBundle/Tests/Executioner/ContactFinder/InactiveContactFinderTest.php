@@ -17,12 +17,12 @@ class InactiveContactFinderTest extends \PHPUnit\Framework\TestCase
     /**
      * @var \PHPUnit\Framework\MockObject\MockObject|LeadRepository
      */
-    private $leadRepository;
+    private \PHPUnit\Framework\MockObject\MockObject $leadRepository;
 
     /**
      * @var \PHPUnit\Framework\MockObject\MockObject|CampaignLeadRepository
      */
-    private $campaignLeadRepository;
+    private \PHPUnit\Framework\MockObject\MockObject $campaignLeadRepository;
 
     protected function setUp(): void
     {

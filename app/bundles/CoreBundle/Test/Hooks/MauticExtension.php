@@ -32,9 +32,7 @@ class MauticExtension implements AfterTestHook, BeforeFirstTestHook
         $result = $testSuite->run();
 
         if (!$result->wasSuccessful()) {
-            $failures = array_map(function (TestFailure $testFailure) {
-                return $testFailure->getExceptionAsString();
-            }, array_merge($result->failures(), $result->errors()));
+            $failures = array_map(fn (TestFailure $testFailure) => $testFailure->getExceptionAsString(), array_merge($result->failures(), $result->errors()));
 
             exit(sprintf('The previous test was: "%s". Your test errored with: %s', $test, implode(PHP_EOL, $failures)));
         }

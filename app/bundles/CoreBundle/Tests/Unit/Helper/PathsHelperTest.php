@@ -17,17 +17,14 @@ class PathsHelperTest extends TestCase
     /**
      * @var MockObject|UserHelper
      */
-    private $userHelper;
+    private \PHPUnit\Framework\MockObject\MockObject $userHelper;
 
     /**
      * @var MockObject|CoreParametersHelper
      */
-    private $coreParametersHelper;
+    private \PHPUnit\Framework\MockObject\MockObject $coreParametersHelper;
 
-    /**
-     * @var PathsHelper
-     */
-    private $helper;
+    private \Mautic\CoreBundle\Helper\PathsHelper $helper;
 
     protected function setUp(): void
     {
@@ -35,15 +32,10 @@ class PathsHelperTest extends TestCase
         $this->coreParametersHelper = $this->createMock(CoreParametersHelper::class);
         $this->coreParametersHelper->method('get')
             ->willReturnCallback(
-                function (string $key) {
-                    switch ($key) {
-                        case 'image_path':
-                            return 'media/images';
-                        case 'tmp_path':
-                            return __DIR__.'/resource/paths/tmp';
-                        default:
-                            return '';
-                    }
+                fn (string $key) => match ($key) {
+                    'image_path' => 'media/images',
+                    'tmp_path'   => __DIR__.'/resource/paths/tmp',
+                    default      => '',
                 }
             );
         $this->helper = new PathsHelper(

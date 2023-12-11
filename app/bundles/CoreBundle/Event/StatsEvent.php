@@ -225,8 +225,6 @@ class StatsEvent extends Event
     }
 
     /**
-     * @param null $table
-     *
      * @return mixed
      */
     public function getTableColumns($table = null)

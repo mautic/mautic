@@ -189,7 +189,7 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
     {
         $result = $this->getEntityManager()
             ->createQuery("
-                SELECT c.id 
+                SELECT c.id
                 FROM Mautic\LeadBundle\Entity\Lead c
                 WHERE c.email IN (:emails)
             ")
@@ -358,10 +358,8 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
      * {@inheritdoc}
      *
      * @param int $id
-     *
-     * @return mixed|null
      */
-    public function getEntity($id = 0)
+    public function getEntity($id = 0): ?Lead
     {
         try {
             $q = $this->createQueryBuilder($this->getTableAlias());
@@ -670,10 +668,8 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
      * Adds the "catch all" where clause to the QueryBuilder.
      *
      * @param \Doctrine\ORM\QueryBuilder|\Doctrine\DBAL\Query\QueryBuilder $q
-     *
-     * @return array
      */
-    protected function addCatchAllWhereClause($q, $filter)
+    protected function addCatchAllWhereClause($q, $filter): array
     {
         $columns = array_merge(
             [
@@ -962,11 +958,9 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
     }
 
     /**
-     * Returns the array of search commands.
-     *
-     * @return array
+     * @return string[]
      */
-    public function getSearchCommands()
+    public function getSearchCommands(): array
     {
         $commands = [
             'mautic.lead.lead.searchcommand.isanonymous',
@@ -1236,10 +1230,8 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
 
     /**
      * Get the next contact after an specific ID; mainly used in deduplication.
-     *
-     * @return Lead
      */
-    public function getNextIdentifiedContact($lastId)
+    public function getNextIdentifiedContact($lastId): ?Lead
     {
         $alias = $this->getTableAlias();
         $qb    = $this->getEntityManager()->getConnection()->createQueryBuilder()

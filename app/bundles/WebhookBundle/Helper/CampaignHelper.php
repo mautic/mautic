@@ -46,10 +46,8 @@ class CampaignHelper
 
     /**
      * Gets the payload fields from the config and if there are tokens it translates them to contact values.
-     *
-     * @return array
      */
-    private function getPayload(array $config, Lead $contact)
+    private function getPayload(array $config, Lead $contact): array
     {
         $payload = !empty($config['additional_data']['list']) ? $config['additional_data']['list'] : '';
         $payload = array_flip(AbstractFormFieldHelper::parseList($payload));
@@ -59,10 +57,8 @@ class CampaignHelper
 
     /**
      * Gets the payload fields from the config and if there are tokens it translates them to contact values.
-     *
-     * @return array
      */
-    private function getHeaders(array $config, Lead $contact)
+    private function getHeaders(array $config, Lead $contact): array
     {
         $headers = !empty($config['headers']['list']) ? $config['headers']['list'] : '';
         $headers = array_flip(AbstractFormFieldHelper::parseList($headers));

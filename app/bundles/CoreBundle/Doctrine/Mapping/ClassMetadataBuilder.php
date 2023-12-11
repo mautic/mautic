@@ -293,7 +293,6 @@ class ClassMetadataBuilder extends OrmClassMetadataBuilder
      * @param bool|false $nullable
      * @param string     $onDelete
      * @param bool|false $isPrimaryKey
-     * @param null       $inversedBy
      *
      * @deprecated Use addContact instead; existing implementations will need a migration to rename lead_id to contact_id
      *
@@ -453,10 +452,8 @@ class ClassMetadataBuilder extends OrmClassMetadataBuilder
      *
      * @param string $name
      * @param string $where
-     *
-     * @return self
      */
-    public function addPartialIndex(array $columns, $name, $where)
+    public function addPartialIndex(array $columns, $name, $where): ClassMetadataBuilder
     {
         return $this->addIndex($columns, $name, null, ['where' => $where]);
     }

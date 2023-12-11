@@ -906,10 +906,8 @@ class FormController extends CommonFormController
      * Gives a preview of the form.
      *
      * @param int $objectId
-     *
-     * @return Response
      */
-    public function previewAction($objectId, ThemeHelper $themeHelper, AssetsHelper $assetsHelper, SlotsHelper $slotsHelper, AnalyticsHelper $analyticsHelper)
+    public function previewAction($objectId, ThemeHelper $themeHelper, AssetsHelper $assetsHelper, SlotsHelper $slotsHelper, AnalyticsHelper $analyticsHelper): Response
     {
         /** @var FormModel $model */
         $model = $this->getModel('form.form');

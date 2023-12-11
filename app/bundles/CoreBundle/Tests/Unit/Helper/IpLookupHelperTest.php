@@ -87,9 +87,7 @@ class IpLookupHelperTest extends \PHPUnit\Framework\TestCase
         $mockCoreParametersHelper->expects($this->any())
             ->method('get')
             ->willReturnCallback(
-                function ($param, $defaultValue) {
-                    return 'track_private_ip_ranges' === $param ? true : $defaultValue;
-                }
+                fn ($param, $defaultValue) => 'track_private_ip_ranges' === $param ? true : $defaultValue
             );
         $ip = $this->getIpHelper($request, $mockCoreParametersHelper)->getIpAddress();
 
@@ -97,9 +95,6 @@ class IpLookupHelperTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @param null $request
-     * @param null $mockCoreParametersHelper
-     *
      * @return IpLookupHelper
      */
     private function getIpHelper($request = null, $mockCoreParametersHelper = null)

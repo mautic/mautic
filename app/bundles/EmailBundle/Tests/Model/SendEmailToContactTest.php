@@ -101,7 +101,7 @@ class SendEmailToContactTest extends \PHPUnit\Framework\TestCase
             try {
                 $model->setContact($contact)
                     ->send();
-            } catch (FailedToSendToContactException $exception) {
+            } catch (FailedToSendToContactException) {
             }
         }
 
@@ -137,9 +137,7 @@ class SendEmailToContactTest extends \PHPUnit\Framework\TestCase
             ->willReturn(true);
         $mailHelper->method('addTo')
             ->willReturnCallback(
-                function ($email) {
-                    return '@bad.com' !== $email;
-                }
+                fn ($email) => '@bad.com' !== $email
             );
         $mailHelper->method('queue')
             ->willReturn([true, []]);
@@ -177,7 +175,7 @@ class SendEmailToContactTest extends \PHPUnit\Framework\TestCase
             try {
                 $model->setContact($contact)
                     ->send();
-            } catch (FailedToSendToContactException $exception) {
+            } catch (FailedToSendToContactException) {
                 $exceptionThrown = true;
             }
         }
@@ -221,11 +219,8 @@ class SendEmailToContactTest extends \PHPUnit\Framework\TestCase
             ->getMock();
         $factoryMock->method('getParameter')
             ->willReturnCallback(
-                function ($param) {
-                    switch ($param) {
-                        default:
-                            return '';
-                    }
+                fn ($param) => match ($param) {
+                    default => '',
                 }
             );
         $factoryMock->method('getLogger')
@@ -294,7 +289,7 @@ class SendEmailToContactTest extends \PHPUnit\Framework\TestCase
             try {
                 $model->setContact($contact)
                     ->send();
-            } catch (FailedToSendToContactException $exception) {
+            } catch (FailedToSendToContactException) {
                 // We're good here
             }
         }
@@ -339,11 +334,8 @@ class SendEmailToContactTest extends \PHPUnit\Framework\TestCase
             ->getMock();
         $factoryMock->method('getParameter')
             ->willReturnCallback(
-                function ($param) {
-                    switch ($param) {
-                        default:
-                            return '';
-                    }
+                fn ($param) => match ($param) {
+                    default => '',
                 }
             );
         $factoryMock->method('getLogger')
@@ -432,7 +424,7 @@ class SendEmailToContactTest extends \PHPUnit\Framework\TestCase
             try {
                 $model->setContact($contact)
                     ->send();
-            } catch (FailedToSendToContactException $exception) {
+            } catch (FailedToSendToContactException) {
                 // We're good here
             }
         }
@@ -471,11 +463,8 @@ class SendEmailToContactTest extends \PHPUnit\Framework\TestCase
             ->getMock();
         $factoryMock->method('getParameter')
             ->willReturnCallback(
-                function ($param) {
-                    switch ($param) {
-                        default:
-                            return '';
-                    }
+                fn ($param) => match ($param) {
+                    default => '',
                 }
             );
         $factoryMock->method('getLogger')
@@ -600,11 +589,8 @@ class SendEmailToContactTest extends \PHPUnit\Framework\TestCase
         $factoryMock = $this->createMock(MauticFactory::class);
         $factoryMock->method('getParameter')
             ->willReturnCallback(
-                function ($param) {
-                    switch ($param) {
-                        default:
-                            return '';
-                    }
+                fn ($param) => match ($param) {
+                    default => '',
                 }
             );
         $factoryMock->method('getLogger')->willReturn(new NullLogger());
@@ -649,7 +635,7 @@ class SendEmailToContactTest extends \PHPUnit\Framework\TestCase
         foreach ($this->contacts as $contact) {
             try {
                 $model->setContact($contact)->send();
-            } catch (FailedToSendToContactException $exception) {
+            } catch (FailedToSendToContactException) {
                 // We're good here
             }
         }

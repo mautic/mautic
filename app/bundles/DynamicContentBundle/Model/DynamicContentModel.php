@@ -75,14 +75,7 @@ class DynamicContentModel extends FormModel implements AjaxLookupModelInterface
         $this->postTranslationEntitySave($entity);
     }
 
-    /**
-     * Here just so PHPStorm calms down about type hinting.
-     *
-     * @param null $id
-     *
-     * @return DynamicContent|null
-     */
-    public function getEntity($id = null)
+    public function getEntity($id = null): ?DynamicContent
     {
         if (null === $id) {
             return new DynamicContent();
@@ -247,10 +240,8 @@ class DynamicContentModel extends FormModel implements AjaxLookupModelInterface
      * @param string $dateFormat
      * @param array  $filter
      * @param bool   $canViewOthers
-     *
-     * @return array
      */
-    public function getHitsLineChartData($unit, \DateTime $dateFrom, \DateTime $dateTo, $dateFormat = null, $filter = [], $canViewOthers = true)
+    public function getHitsLineChartData($unit, \DateTime $dateFrom, \DateTime $dateTo, $dateFormat = null, $filter = [], $canViewOthers = true): array
     {
         $flag = null;
 

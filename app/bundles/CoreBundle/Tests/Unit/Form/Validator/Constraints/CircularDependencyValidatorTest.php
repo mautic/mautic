@@ -15,27 +15,24 @@ class CircularDependencyValidatorTest extends \PHPUnit\Framework\TestCase
     /**
      * @var \PHPUnit\Framework\MockObject\MockObject|ListModel
      */
-    private $mockListModel;
+    private \PHPUnit\Framework\MockObject\MockObject $mockListModel;
 
     /**
      * @var \PHPUnit\Framework\MockObject\MockObject|ExecutionContext
      */
-    private $context;
+    private \PHPUnit\Framework\MockObject\MockObject $context;
 
     /**
      * @var \PHPUnit\Framework\MockObject\MockObject|RequestStack
      */
-    private $requestStack;
+    private \PHPUnit\Framework\MockObject\MockObject $requestStack;
 
     /**
      * @var \PHPUnit\Framework\MockObject\MockObject|Request
      */
-    private $request;
+    private \PHPUnit\Framework\MockObject\MockObject $request;
 
-    /**
-     * @var CircularDependencyValidator
-     */
-    private $validator;
+    private \Mautic\CoreBundle\Form\Validator\Constraints\CircularDependencyValidator $validator;
 
     protected function setUp(): void
     {
@@ -146,9 +143,7 @@ class CircularDependencyValidatorTest extends \PHPUnit\Framework\TestCase
 
         $this->mockListModel->expects($this->any())
             ->method('getEntity')
-            ->willReturnCallback(function ($id) use ($entities) {
-                return $entities[$id];
-            });
+            ->willReturnCallback(fn ($id) => $entities[$id]);
 
         if (!empty($expectedMessage)) {
             $this->context->expects($this->once())
@@ -180,7 +175,7 @@ class CircularDependencyValidatorTest extends \PHPUnit\Framework\TestCase
             ->validate($filters, new CircularDependency(['message' => 'mautic.core.segment.circular_dependency_exists']));
     }
 
-    public function validateDataProvider()
+    public static function validateDataProvider()
     {
         $constraint = new CircularDependency(['message' => 'mautic.core.segment.circular_dependency_exists']);
 

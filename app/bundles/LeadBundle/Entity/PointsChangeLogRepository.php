@@ -44,12 +44,10 @@ class PointsChangeLogRepository extends CommonRepository
     /**
      * Get table stat data from point log table.
      *
-     * @return array
-     *
      * @throws \Doctrine\ORM\NoResultException
      * @throws \Doctrine\ORM\NonUniqueResultException
      */
-    public function getMostPoints(QueryBuilder $query, $limit = 10, $offset = 0)
+    public function getMostPoints(QueryBuilder $query, $limit = 10, $offset = 0): array
     {
         $query->setMaxResults($limit)
                 ->setFirstResult($offset);
@@ -60,12 +58,10 @@ class PointsChangeLogRepository extends CommonRepository
     /**
      * Get table stat data from lead table.
      *
-     * @return array
-     *
      * @throws \Doctrine\ORM\NoResultException
      * @throws \Doctrine\ORM\NonUniqueResultException
      */
-    public function getMostLeads(QueryBuilder $query, $limit = 10, $offset = 0)
+    public function getMostLeads(QueryBuilder $query, $limit = 10, $offset = 0): array
     {
         $query->setMaxResults($limit)
                 ->setFirstResult($offset);

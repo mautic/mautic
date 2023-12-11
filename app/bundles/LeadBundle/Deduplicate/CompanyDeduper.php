@@ -2,6 +2,7 @@
 
 namespace Mautic\LeadBundle\Deduplicate;
 
+use Mautic\LeadBundle\Entity\Company;
 use Mautic\LeadBundle\Entity\CompanyRepository;
 use Mautic\LeadBundle\Exception\UniqueFieldNotFoundException;
 use Mautic\LeadBundle\Model\FieldModel;

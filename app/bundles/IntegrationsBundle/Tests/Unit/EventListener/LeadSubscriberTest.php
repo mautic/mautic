@@ -29,42 +29,39 @@ class LeadSubscriberTest extends TestCase
     /**
      * @var MockObject|FieldChangeRepository
      */
-    private $fieldChangeRepository;
+    private \PHPUnit\Framework\MockObject\MockObject $fieldChangeRepository;
 
     /**
      * @var MockObject|ObjectMappingRepository
      */
-    private $objectMappingRepository;
+    private \PHPUnit\Framework\MockObject\MockObject $objectMappingRepository;
 
     /**
      * @var MockObject|VariableExpresserHelperInterface
      */
-    private $variableExpresserHelper;
+    private \PHPUnit\Framework\MockObject\MockObject $variableExpresserHelper;
 
     /**
      * @var MockObject|SyncIntegrationsHelper
      */
-    private $syncIntegrationsHelper;
+    private \PHPUnit\Framework\MockObject\MockObject $syncIntegrationsHelper;
 
     /**
      * @var MockObject|LeadEvent
      */
-    private $leadEvent;
+    private \PHPUnit\Framework\MockObject\MockObject $leadEvent;
 
     /**
      * @var MockObject|CompanyEvent
      */
-    private $companyEvent;
+    private \PHPUnit\Framework\MockObject\MockObject $companyEvent;
 
-    /**
-     * @var LeadSubscriber
-     */
-    private $subscriber;
+    private \Mautic\IntegrationsBundle\EventListener\LeadSubscriber $subscriber;
 
     /**
      * @var MockObject|EventDispatcherInterface
      */
-    private $eventDispatcherInterfaceMock;
+    private \PHPUnit\Framework\MockObject\MockObject $eventDispatcherInterfaceMock;
 
     public function setUp(): void
     {
@@ -490,16 +487,10 @@ class LeadSubscriberTest extends TestCase
     private function createLeadMock(array $fieldChanges, int $objectId): Lead
     {
         return new class($fieldChanges, $objectId) extends Lead {
-            /** @var mixed[] */
-            private array $fieldChanges;
-            private int $objectId;
-
             /** @param mixed[] $fieldChanges */
-            public function __construct(array $fieldChanges, int $objectId)
+            public function __construct(private array $fieldChanges, private int $objectId)
             {
                 parent::__construct();
-                $this->fieldChanges = $fieldChanges;
-                $this->objectId     = $objectId;
             }
 
             public function isAnonymous(): bool
@@ -525,17 +516,11 @@ class LeadSubscriberTest extends TestCase
     private function createCompanyMock(array $fieldChanges, int $objectId): Company
     {
         return new class($fieldChanges, $objectId) extends Company {
-            /** @var mixed[] */
-            private array $fieldChanges;
-            private int $objectId;
-
             /**
              * @param mixed[] $fieldChanges
              */
-            public function __construct(array $fieldChanges, int $objectId)
+            public function __construct(private array $fieldChanges, private int $objectId)
             {
-                $this->fieldChanges = $fieldChanges;
-                $this->objectId     = $objectId;
             }
 
             public function getChanges($includePast = false): array

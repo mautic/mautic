@@ -186,10 +186,8 @@ class ListModel extends FormModel
 
     /**
      * Get a specific entity or generate a new one if id is empty.
-     *
-     * @return object|null
      */
-    public function getEntity($id = null)
+    public function getEntity($id = null): ?LeadList
     {
         if (null === $id) {
             return new LeadList();
@@ -909,10 +907,8 @@ class ListModel extends FormModel
 
     /**
      * @param bool $canViewOthers
-     *
-     * @return array
      */
-    public function getLifeCycleSegmentChartData($unit, \DateTime $dateFrom, \DateTime $dateTo, $dateFormat, $filter, $canViewOthers, $listName)
+    public function getLifeCycleSegmentChartData($unit, \DateTime $dateFrom, \DateTime $dateTo, $dateFormat, $filter, $canViewOthers, $listName): array
     {
         $chart = new PieChart();
         $query = new ChartQuery($this->em->getConnection(), $dateFrom, $dateTo);
@@ -943,7 +939,6 @@ class ListModel extends FormModel
     }
 
     /**
-     * @param null  $dateFormat
      * @param array $filter
      * @param bool  $canViewOthers
      */
@@ -1005,7 +1000,6 @@ class ListModel extends FormModel
     }
 
     /**
-     * @param null  $dateFormat
      * @param array $filter
      * @param bool  $canViewOthers
      */
@@ -1075,10 +1069,8 @@ class ListModel extends FormModel
      * @param string $unit       {@link php.net/manual/en/function.date.php#refsect1-function.date-parameters}
      * @param string $dateFormat
      * @param array  $filter
-     *
-     * @return array
      */
-    public function getSegmentContactsLineChartData($unit, \DateTime $dateFrom, \DateTime $dateTo, $dateFormat = null, $filter = [])
+    public function getSegmentContactsLineChartData($unit, \DateTime $dateFrom, \DateTime $dateTo, $dateFormat = null, $filter = []): array
     {
         $chart    = new LineChart($unit, $dateFrom, $dateTo, $dateFormat);
         $query    = new SegmentContactsLineChartQuery($this->em->getConnection(), $dateFrom, $dateTo, $filter);
@@ -1119,8 +1111,7 @@ class ListModel extends FormModel
     }
 
     /**
-     * @param      $segmentId      *
-     * @param null $returnProperty property of entity in returned array, null return all entity
+     * @param $segmentId *
      *
      * @return array
      */

@@ -88,9 +88,6 @@ class HitRepository extends CommonRepository
     }
 
     /**
-     * @param null $sourceId
-     * @param null $fromDate
-     *
      * @return array
      */
     public function getHitCountForSource($source, $sourceId = null, $fromDate = null, $code = 200)
@@ -253,6 +250,8 @@ class HitRepository extends CommonRepository
      *
      * @param array|string $pageIds
      * @param bool         $isVariantCheck
+     *
+     * @return mixed[]
      */
     public function getBounces($pageIds, \DateTime $fromDate = null, $isVariantCheck = false): array
     {
@@ -394,10 +393,8 @@ class HitRepository extends CommonRepository
      * Get the dwell times for bunch of URLs.
      *
      * @param string $url
-     *
-     * @return array
      */
-    public function getDwellTimesForUrl($url, array $options)
+    public function getDwellTimesForUrl($url, array $options): array
     {
         $q = $this->_em->getConnection()->createQueryBuilder();
         $q->from(MAUTIC_TABLE_PREFIX.'page_hits', 'ph')
@@ -465,12 +462,10 @@ class HitRepository extends CommonRepository
      * @param int                               $limit
      * @param int                               $offset
      *
-     * @return array
-     *
      * @throws \Doctrine\ORM\NoResultException
      * @throws \Doctrine\ORM\NonUniqueResultException
      */
-    public function getReferers($query, $limit = 10, $offset = 0)
+    public function getReferers($query, $limit = 10, $offset = 0): array
     {
         $query->select('ph.referer, count(ph.referer) as sessions')
             ->groupBy('ph.referer')
@@ -490,12 +485,10 @@ class HitRepository extends CommonRepository
      * @param string                            $column
      * @param string                            $as
      *
-     * @return array
-     *
      * @throws \Doctrine\ORM\NoResultException
      * @throws \Doctrine\ORM\NonUniqueResultException
      */
-    public function getMostVisited($query, $limit = 10, $offset = 0, $column = 'p.hits', $as = '')
+    public function getMostVisited($query, $limit = 10, $offset = 0, $column = 'p.hits', $as = ''): array
     {
         if ($as) {
             $as = ' as "'.$as.'"';

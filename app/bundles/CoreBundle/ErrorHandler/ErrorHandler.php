@@ -377,7 +377,6 @@ namespace Mautic\CoreBundle\ErrorHandler {
 
         /**
          * @param array $context
-         * @param null  $debugTrace
          */
         protected function log($logLevel, $message, $context = [], $debugTrace = null)
         {
@@ -524,10 +523,7 @@ namespace Mautic\CoreBundle\ErrorHandler {
             return $content;
         }
 
-        /**
-         * @return string
-         */
-        private function getErrorName($bit)
+        private function getErrorName($bit): string
         {
             return match ($bit) {
                 E_PARSE => 'Parse Error',

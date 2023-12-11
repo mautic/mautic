@@ -92,12 +92,8 @@ abstract class AbstractCommonModel implements MauticModelInterface
 
     /**
      * Get a specific entity.
-     *
-     * @param int|array id
-     *
-     * @return object|null
      */
-    public function getEntity($id = null)
+    public function getEntity($id = null): ?object
     {
         if (null !== $id) {
             $repo = $this->getRepository();

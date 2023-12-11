@@ -2,7 +2,6 @@
 
 namespace Mautic\CoreBundle\Tests\Unit\Doctrine;
 
-use Doctrine\DBAL\Platforms\AbstractPlatform;
 use Doctrine\DBAL\Platforms\MySQLPlatform;
 use Doctrine\DBAL\Types\Type;
 
@@ -31,15 +30,14 @@ class ArrayTypeTest extends \PHPUnit\Framework\TestCase
     /** @var Type */
     private $arrayType;
 
-    /** @var AbstractPlatform */
-    private $platform;
+    private \Doctrine\DBAL\Platforms\MySQLPlatform $platform;
 
     protected function setUp(): void
     {
         parent::setUp();
 
         if (!Type::hasType(self::MAUTIC_ARRAY_TYPE_NAME)) {
-            Type::addType(self::MAUTIC_ARRAY_TYPE_NAME, 'Mautic\CoreBundle\Doctrine\Type\ArrayType');
+            Type::addType(self::MAUTIC_ARRAY_TYPE_NAME, \Mautic\CoreBundle\Doctrine\Type\ArrayType::class);
         }
 
         $this->arrayType = Type::getType(self::MAUTIC_ARRAY_TYPE_NAME);
@@ -56,21 +54,21 @@ class ArrayTypeTest extends \PHPUnit\Framework\TestCase
 
     public function testGivenNullPoisonedStringWhenConvertsToDatabaseValueThenError(): void
     {
-        $this->expectException('Doctrine\DBAL\Types\ConversionException');
+        $this->expectException(\Doctrine\DBAL\Types\ConversionException::class);
 
         $this->arrayType->convertToDatabaseValue(["abcd\0efgh"], $this->platform);
     }
 
     public function testGivenObjectWithPrivatePropertyWhenConvertsToDatabaseValueThenError(): void
     {
-        $this->expectException('Doctrine\DBAL\Types\ConversionException');
+        $this->expectException(\Doctrine\DBAL\Types\ConversionException::class);
 
         $this->arrayType->convertToDatabaseValue([new ExampleClassWithPrivateProperty()], $this->platform);
     }
 
     public function testGivenObjectWithProtectedPropertyWhenConvertsToDatabaseValueThenError(): void
     {
-        $this->expectException('Doctrine\DBAL\Types\ConversionException');
+        $this->expectException(\Doctrine\DBAL\Types\ConversionException::class);
 
         $this->arrayType->convertToDatabaseValue([new ExampleClassWithProtectedProperty()], $this->platform);
     }

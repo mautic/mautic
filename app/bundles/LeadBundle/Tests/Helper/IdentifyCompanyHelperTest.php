@@ -89,7 +89,7 @@ class IdentifyCompanyHelperTest extends \PHPUnit\Framework\TestCase
         $reflection = new \ReflectionClass(IdentifyCompanyHelper::class);
         $method     = $reflection->getMethod('findCompany');
         $method->setAccessible(true);
-        list($resultCompany, $entities) = $method->invokeArgs($helper, [$company, $model]);
+        [$resultCompany, $entities] = $method->invokeArgs($helper, [$company, $model]);
 
         $this->assertEquals($expected, $resultCompany);
     }
@@ -124,7 +124,7 @@ class IdentifyCompanyHelperTest extends \PHPUnit\Framework\TestCase
         $reflection = new \ReflectionClass(IdentifyCompanyHelper::class);
         $method     = $reflection->getMethod('findCompany');
         $method->setAccessible(true);
-        list($resultCompany, $entities) = $method->invokeArgs($helper, [$company, $model]);
+        [$resultCompany, $entities] = $method->invokeArgs($helper, [$company, $model]);
 
         $this->assertEquals($expected, $resultCompany);
     }

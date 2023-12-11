@@ -193,6 +193,7 @@ class PublicController extends FormController
             if ($notify && (!isset($lead->imported) || !$lead->imported)) {
                 /** @var UserModel $userModel */
                 $userModel = $this->getModel('user');
+
                 if ($user = $userModel->getEntity($notify)) {
                     $this->addNewNotification(
                         sprintf($this->translator->trans('mautic.plugin.fullcontact.contact_retrieved'), $lead->getEmail()),

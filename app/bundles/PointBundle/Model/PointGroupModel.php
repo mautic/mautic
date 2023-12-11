@@ -59,10 +59,8 @@ class PointGroupModel extends CommonFormModel
      * Get a specific entity or generate a new one if id is empty.
      *
      * @param int $id
-     *
-     * @return object|null
      */
-    public function getEntity($id = null)
+    public function getEntity($id = null): ?Group
     {
         if (null === $id) {
             return new Group();

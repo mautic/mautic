@@ -133,12 +133,7 @@ class ReportModel extends FormModel
         return $reportGenerator->getForm($entity, $options);
     }
 
-    /**
-     * {@inheritdoc}
-     *
-     * @return Report|null
-     */
-    public function getEntity($id = null)
+    public function getEntity($id = null): ?Report
     {
         if (null === $id) {
             return new Report();
@@ -386,7 +381,6 @@ class ReportModel extends FormModel
      * Export report.
      *
      * @param string $format
-     * @param null   $handle
      * @param int    $page
      *
      * @return StreamedResponse|Response
@@ -661,9 +655,9 @@ class ReportModel extends FormModel
     }
 
     /**
-     * @return mixed
+     * @return mixed[]
      */
-    public function getReportsWithGraphs()
+    public function getReportsWithGraphs(): array
     {
         $ownedBy = $this->security->isGranted('report:reports:viewother') ? null : $this->userHelper->getUser()->getId();
 

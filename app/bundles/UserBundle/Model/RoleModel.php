@@ -26,7 +26,7 @@ class RoleModel extends FormModel
     /**
      * {@inheritdoc}
      */
-    public function getPermissionBase()
+    public function getPermissionBase(): string
     {
         return 'user:roles';
     }
@@ -112,10 +112,7 @@ class RoleModel extends FormModel
         return $formFactory->create(RoleType::class, $entity, $options);
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getEntity($id = null)
+    public function getEntity($id = null): ?Role
     {
         if (null === $id) {
             return new Role();

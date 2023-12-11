@@ -18,27 +18,27 @@ class NotificationHelperTest extends \PHPUnit\Framework\TestCase
     /**
      * @var \PHPUnit\Framework\MockObject\MockObject|UserModel
      */
-    private $userModel;
+    private \PHPUnit\Framework\MockObject\MockObject $userModel;
 
     /**
      * @var \PHPUnit\Framework\MockObject\MockObject|NotificationModel
      */
-    private $notificationModel;
+    private \PHPUnit\Framework\MockObject\MockObject $notificationModel;
 
     /**
      * @var \PHPUnit\Framework\MockObject\MockObject|Router
      */
-    private $router;
+    private \PHPUnit\Framework\MockObject\MockObject $router;
 
     /**
      * @var \PHPUnit\Framework\MockObject\MockObject|Translator
      */
-    private $translator;
+    private \PHPUnit\Framework\MockObject\MockObject $translator;
 
     /**
      * @var \PHPUnit\Framework\MockObject\MockObject|CoreParametersHelper
      */
-    private $coreParametersHelper;
+    private \PHPUnit\Framework\MockObject\MockObject $coreParametersHelper;
 
     protected function setUp(): void
     {

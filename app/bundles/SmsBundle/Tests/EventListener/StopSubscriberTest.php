@@ -13,7 +13,7 @@ class StopSubscriberTest extends \PHPUnit\Framework\TestCase
     /**
      * @var \PHPUnit\Framework\MockObject\MockObject|DoNotContact
      */
-    private $doNotContactModel;
+    private \PHPUnit\Framework\MockObject\MockObject $doNotContactModel;
 
     protected function setUp(): void
     {

@@ -45,8 +45,7 @@ class CopyRepository extends CommonRepository
     }
 
     /**
-     * @param string $string  md5 hash or content
-     * @param null   $subject If $string is the content, pass the subject to include it in the hash
+     * @param string $string md5 hash or content
      *
      * @return array
      */

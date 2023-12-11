@@ -51,10 +51,8 @@ class MonitoringModel extends FormModel
 
     /**
      * Get a specific entity or generate a new one if id is empty.
-     *
-     * @return Monitoring|null
      */
-    public function getEntity($id = null)
+    public function getEntity($id = null): ?Monitoring
     {
         return $id ? parent::getEntity($id) : new Monitoring();
     }
@@ -129,10 +127,7 @@ class MonitoringModel extends FormModel
         return $this->em->getRepository(Monitoring::class);
     }
 
-    /**
-     * @return string
-     */
-    public function getPermissionBase()
+    public function getPermissionBase(): string
     {
         return 'mauticSocial:monitoring';
     }

@@ -15,12 +15,12 @@ class RemoverTest extends \PHPUnit\Framework\TestCase
     /**
      * @var LeadRepository|\PHPUnit\Framework\MockObject\MockObject
      */
-    private $leadRepository;
+    private \PHPUnit\Framework\MockObject\MockObject $leadRepository;
 
     /**
      * @var LeadEventLogRepository|\PHPUnit\Framework\MockObject\MockObject
      */
-    private $leadEventLogRepository;
+    private \PHPUnit\Framework\MockObject\MockObject $leadEventLogRepository;
 
     protected function setUp(): void
     {

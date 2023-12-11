@@ -35,7 +35,6 @@ class FormRepository extends CommonRepository
      * @param int    $limit
      * @param int    $start
      * @param bool   $viewOther
-     * @param null   $formType
      */
     public function getFormList($search = '', $limit = 10, $start = 0, $viewOther = false, $formType = null): array
     {
@@ -71,7 +70,7 @@ class FormRepository extends CommonRepository
     /**
      * {@inheritdoc}
      */
-    protected function addCatchAllWhereClause($q, $filter)
+    protected function addCatchAllWhereClause($q, $filter): array
     {
         return $this->addStandardCatchAllWhereClause($q, $filter, [
             'f.name',
@@ -157,12 +156,10 @@ class FormRepository extends CommonRepository
     /**
      * Fetch the form results.
      *
-     * @return array
-     *
      * @throws \Doctrine\ORM\NoResultException
      * @throws \Doctrine\ORM\NonUniqueResultException
      */
-    public function getFormResults(Form $form, array $options = [])
+    public function getFormResults(Form $form, array $options = []): array
     {
         $query = $this->_em->getConnection()->createQueryBuilder();
 
@@ -208,9 +205,9 @@ class FormRepository extends CommonRepository
     }
 
     /**
-     * {@inheritdoc}
+     * @return string[]
      */
-    public function getSearchCommands()
+    public function getSearchCommands(): array
     {
         $commands = [
             'mautic.core.searchcommand.ispublished',

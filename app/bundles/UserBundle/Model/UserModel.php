@@ -55,7 +55,7 @@ class UserModel extends FormModel
     /**
      * {@inheritdoc}
      */
-    public function getPermissionBase()
+    public function getPermissionBase(): string
     {
         return 'user:users';
     }
@@ -97,7 +97,7 @@ class UserModel extends FormModel
      *
      * @return string
      */
-    public function checkNewPassword(User $entity, UserPasswordHasherInterface $hasher, $submittedPassword, $validate = false)
+    public function checkNewPassword(User $entity, UserPasswordHasherInterface $hasher, $submittedPassword, $validate = false): string|null
     {
         if ($validate) {
             if (strlen($submittedPassword) < 6) {
@@ -130,10 +130,7 @@ class UserModel extends FormModel
         return $formFactory->create(UserType::class, $entity, $options);
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getEntity($id = null)
+    public function getEntity($id = null): ?User
     {
         if (null === $id) {
             return new User();
@@ -334,8 +331,6 @@ class UserModel extends FormModel
 
     /**
      * Set user preference.
-     *
-     * @param null $value
      */
     public function setPreference($key, $value = null, User $user = null): void
     {
@@ -353,8 +348,6 @@ class UserModel extends FormModel
 
     /**
      * Get user preference.
-     *
-     * @param null $default
      */
     public function getPreference($key, $default = null, User $user = null)
     {
@@ -368,10 +361,8 @@ class UserModel extends FormModel
 
     /**
      * Return list of Users for formType Choice.
-     *
-     * @return array
      */
-    public function getOwnerListChoices()
+    public function getOwnerListChoices(): array
     {
         return $this->getRepository()->getOwnerListChoices();
     }

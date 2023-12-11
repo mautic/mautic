@@ -8,10 +8,7 @@ use Psr\Http\Message\ResponseInterface;
 
 class DynamicsApi extends CrmApi
 {
-    /**
-     * @return string
-     */
-    private function getUrl()
+    private function getUrl(): string
     {
         $keys = $this->integration->getKeys();
 
@@ -195,10 +192,8 @@ class DynamicsApi extends CrmApi
 
     /**
      * @param array $data
-     *
-     * @return array
      */
-    public function updateLeads($data, $object = 'contacts')
+    public function updateLeads($data, $object = 'contacts'): array
     {
         return $this->createLeads($data, $object, true);
     }

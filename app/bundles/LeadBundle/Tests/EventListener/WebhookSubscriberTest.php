@@ -15,14 +15,10 @@ use Mautic\LeadBundle\LeadEvents;
 use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\WebhookBundle\Model\WebhookModel;
 use Symfony\Component\EventDispatcher\EventDispatcher;
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class WebhookSubscriberTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var EventDispatcherInterface
-     */
-    private $dispatcher;
+    private \Symfony\Component\EventDispatcher\EventDispatcherInterface $dispatcher;
 
     private LeadModel|\PHPUnit\Framework\MockObject\MockObject $leadModel;
 
@@ -41,9 +37,7 @@ class WebhookSubscriberTest extends \PHPUnit\Framework\TestCase
             ->method('queueWebhooksByType')
             ->with(
                 $this->callback(
-                    function ($type) {
-                        return LeadEvents::LEAD_POST_SAVE.'_new' === $type;
-                    }
+                    fn ($type) => LeadEvents::LEAD_POST_SAVE.'_new' === $type
                 )
             );
 
@@ -66,9 +60,7 @@ class WebhookSubscriberTest extends \PHPUnit\Framework\TestCase
             ->method('queueWebhooksByType')
             ->with(
                 $this->callback(
-                    function ($type) {
-                        return LeadEvents::LEAD_POST_SAVE.'_update' === $type;
-                    }
+                    fn ($type) => LeadEvents::LEAD_POST_SAVE.'_update' === $type
                 )
             );
 

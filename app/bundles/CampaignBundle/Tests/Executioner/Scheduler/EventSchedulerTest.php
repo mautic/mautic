@@ -19,51 +19,38 @@ use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\LeadBundle\Entity\Lead;
 use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\MockObject\MockObject;
-use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class EventSchedulerTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var LoggerInterface|MockObject
-     */
-    private $logger;
+    private \Psr\Log\NullLogger $logger;
 
     /**
      * @var EventLogger|MockObject
      */
-    private $eventLogger;
+    private \PHPUnit\Framework\MockObject\MockObject $eventLogger;
 
-    /**
-     * @var Interval
-     */
-    private $intervalScheduler;
+    private \Mautic\CampaignBundle\Executioner\Scheduler\Mode\Interval $intervalScheduler;
 
-    /**
-     * @var DateTime
-     */
-    private $dateTimeScheduler;
+    private \Mautic\CampaignBundle\Executioner\Scheduler\Mode\DateTime $dateTimeScheduler;
 
     /**
      * @var EventCollector|MockObject
      */
-    private $eventCollector;
+    private \PHPUnit\Framework\MockObject\MockObject $eventCollector;
 
     /**
      * @var EventDispatcherInterface|MockObject
      */
-    private $dispatcher;
+    private \PHPUnit\Framework\MockObject\MockObject $dispatcher;
 
     /**
      * @var CoreParametersHelper|MockObject
      */
-    private $coreParamtersHelper;
+    private \PHPUnit\Framework\MockObject\MockObject $coreParamtersHelper;
 
-    /**
-     * @var EventScheduler
-     */
-    private $scheduler;
+    private \Mautic\CampaignBundle\Executioner\Scheduler\EventScheduler $scheduler;
 
     protected function setUp(): void
     {
@@ -71,9 +58,7 @@ class EventSchedulerTest extends \PHPUnit\Framework\TestCase
         $this->coreParamtersHelper = $this->createMock(CoreParametersHelper::class);
         $this->coreParamtersHelper->method('get')
             ->willReturnCallback(
-                function () {
-                    return 'America/New_York';
-                }
+                fn () => 'America/New_York'
             );
         $this->eventLogger       = $this->createMock(EventLogger::class);
         $this->intervalScheduler = new Interval($this->logger, $this->coreParamtersHelper);

@@ -68,7 +68,7 @@ class ImportController extends FormController
      *
      * @return JsonResponse|RedirectResponse
      */
-    public function indexAction(Request $request, $page = 1)
+    public function indexAction(Request $request, $page = 1): Response
     {
         $initEvent = $this->dispatchImportOnInit();
         $this->session->set('mautic.import.object', $initEvent->objectSingular);
@@ -127,9 +127,9 @@ class ImportController extends FormController
     /**
      * Cancel and unpublish the import during manual import.
      *
-     * @return array|JsonResponse|RedirectResponse|Response
+     * @return JsonResponse|RedirectResponse
      */
-    public function cancelAction(Request $request)
+    public function cancelAction(Request $request): Response
     {
         $initEvent   = $this->dispatchImportOnInit();
         $object      = $initEvent->objectSingular;
@@ -151,10 +151,8 @@ class ImportController extends FormController
 
     /**
      * Schedules manual import to background queue.
-     *
-     * @return array|JsonResponse|RedirectResponse|Response
      */
-    public function queueAction(Request $request)
+    public function queueAction(Request $request): Response
     {
         $initEvent   = $this->dispatchImportOnInit();
         $object      = $initEvent->objectSingular;
@@ -175,10 +173,8 @@ class ImportController extends FormController
     /**
      * @param int  $objectId
      * @param bool $ignorePost
-     *
-     * @return JsonResponse|Response
      */
-    public function newAction(Request $request, $objectId = 0, $ignorePost = false)
+    public function newAction(Request $request, $objectId = 0, $ignorePost = false): Response
     {
         $dispatcher = $this->dispatcher;
 
@@ -561,10 +557,8 @@ class ImportController extends FormController
 
     /**
      * Generates import directory path.
-     *
-     * @return string
      */
-    protected function getImportDirName()
+    protected function getImportDirName(): string
     {
         return $this->importModel->getImportDir();
     }
@@ -674,11 +668,6 @@ class ImportController extends FormController
         return 'lead.import';
     }
 
-    /***
-     * @param null $objectId
-     *
-     * @return string
-     */
     protected function getSessionBase($objectId = null): string
     {
         $initEvent = $this->dispatchImportOnInit();

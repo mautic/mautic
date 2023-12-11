@@ -9,7 +9,6 @@ use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\Filesystem;
 use Mautic\CoreBundle\Helper\PathsHelper;
 use Mautic\CoreBundle\Helper\ThemeHelper;
-use Mautic\CoreBundle\Helper\ThemeHelperInterface;
 use Mautic\IntegrationsBundle\Exception\IntegrationNotFoundException;
 use Mautic\IntegrationsBundle\Helper\BuilderIntegrationsHelper;
 use Mautic\IntegrationsBundle\Integration\Interfaces\BuilderInterface;
@@ -28,37 +27,34 @@ class ThemeHelperTest extends TestCase
     /**
      * @var PathsHelper|MockObject
      */
-    private $pathsHelper;
+    private \PHPUnit\Framework\MockObject\MockObject $pathsHelper;
 
     /**
      * @var Environment|MockObject
      */
-    private $twig;
+    private \PHPUnit\Framework\MockObject\MockObject $twig;
 
     /**
      * @var FilesystemLoader|MockObject
      */
-    private $loader;
+    private \PHPUnit\Framework\MockObject\MockObject $loader;
 
     /**
      * @var TranslatorInterface|MockObject
      */
-    private $translator;
+    private \PHPUnit\Framework\MockObject\MockObject $translator;
 
     /**
      * @var CoreParametersHelper|MockObject
      */
-    private $coreParameterHelper;
+    private \PHPUnit\Framework\MockObject\MockObject $coreParameterHelper;
 
     /**
      * @var BuilderIntegrationsHelper|MockObject
      */
-    private $builderIntegrationsHelper;
+    private \PHPUnit\Framework\MockObject\MockObject $builderIntegrationsHelper;
 
-    /**
-     * @var ThemeHelperInterface
-     */
-    private $themeHelper;
+    private \Mautic\CoreBundle\Helper\ThemeHelper $themeHelper;
 
     protected function setUp(): void
     {

@@ -82,10 +82,8 @@ class SugarcrmIntegration extends CrmAbstractIntegration
 
     /**
      * Returns the name of the social integration that must match the name of the file.
-     *
-     * @return string
      */
-    public function getName()
+    public function getName(): string
     {
         return 'Sugarcrm';
     }
@@ -98,20 +96,16 @@ class SugarcrmIntegration extends CrmAbstractIntegration
 
     /**
      * Get the array key for clientId.
-     *
-     * @return string
      */
-    public function getClientIdKey()
+    public function getClientIdKey(): string
     {
         return 'client_id';
     }
 
     /**
      * Get the array key for client secret.
-     *
-     * @return string
      */
-    public function getClientSecretKey()
+    public function getClientSecretKey(): string
     {
         return 'client_secret';
     }
@@ -1198,9 +1192,9 @@ class SugarcrmIntegration extends CrmAbstractIntegration
     /**
      * @param array $params
      *
-     * @return mixed
+     * @return mixed[]
      */
-    public function pushLeads($params = [])
+    public function pushLeads($params = []): array
     {
         [$fromDate, $toDate]     = $this->getSyncTimeframeDates($params);
         $limit                   = $params['limit'];
@@ -1517,9 +1511,6 @@ class SugarcrmIntegration extends CrmAbstractIntegration
         return null;
     }
 
-    /**
-     * @param null $objectId
-     */
     protected function buildCompositeBody(&$mauticData, $availableFields, $fieldsToUpdateInSugarUpdate, $object, $lead, $onwerAssignedUserIdByEmail = null, $objectId = null)
     {
         $body = [];
@@ -1722,7 +1713,6 @@ class SugarcrmIntegration extends CrmAbstractIntegration
     }
 
     /**
-     * @param null   $object
      * @param string $priorityObject
      *
      * @return mixed
@@ -1786,11 +1776,9 @@ class SugarcrmIntegration extends CrmAbstractIntegration
     /**
      * Checks if a string contains SuiteCRM / SugarCRM 6.x Multi-Select values.
      *
-     * @param  string
-     *
-     * @return bool
+     * @param string $stringToCheck
      */
-    public function checkIfSugarCrmMultiSelectString($stringToCheck)
+    public function checkIfSugarCrmMultiSelectString($stringToCheck): bool
     {
         // Regular Express to check SugarCRM/SuiteCRM Multi-Select format below
         // example format: '^choice1^,^choice2^,^choice_3^'

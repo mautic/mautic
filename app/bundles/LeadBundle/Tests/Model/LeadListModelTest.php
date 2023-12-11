@@ -94,7 +94,7 @@ class LeadListModelTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expected, $result, $message);
     }
 
-    public function segmentTestDataProvider()
+    public static function segmentTestDataProvider()
     {
         return [
             [

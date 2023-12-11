@@ -209,12 +209,10 @@ class ContactSegmentService
     }
 
     /**
-     * @return QueryBuilder
-     *
      * @throws Exception\SegmentQueryException
      * @throws \Exception
      */
-    private function getTotalSegmentContactsQuery(LeadList $segment)
+    private function getTotalSegmentContactsQuery(LeadList $segment): QueryBuilder
     {
         $segmentFilters = $this->contactSegmentFilterFactory->getSegmentFilters($segment);
 

@@ -21,6 +21,7 @@ use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 abstract class AbstractStandardFormController extends AbstractFormController
@@ -61,8 +62,6 @@ abstract class AbstractStandardFormController extends AbstractFormController
 
     /**
      * Called after the entity has been persisted allowing for custom preperation of $entity prior to viewAction.
-     *
-     * @param null $pass
      */
     protected function afterEntitySave($entity, Form $form, $action, $pass = null)
     {
@@ -164,9 +163,6 @@ abstract class AbstractStandardFormController extends AbstractFormController
     }
 
     /**
-     * @param null $entity
-     * @param null $objectId
-     *
      * @return bool|mixed
      */
     protected function checkActionPermission($action, $entity = null, $objectId = null)
@@ -637,8 +633,6 @@ abstract class AbstractStandardFormController extends AbstractFormController
     }
 
     /**
-     * @param null $objectId
-     *
      * @return mixed
      */
     protected function getSessionBase($objectId = null)
@@ -749,7 +743,6 @@ abstract class AbstractStandardFormController extends AbstractFormController
 
     /**
      * @param string $timezone
-     * @param null   $dateRangeForm
      *
      * @return array
      */
@@ -781,7 +774,7 @@ abstract class AbstractStandardFormController extends AbstractFormController
      *
      * @return \Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response
      */
-    protected function indexStandard(Request $request, $page = null)
+    protected function indexStandard(Request $request, $page = null): Response
     {
         // set some permissions
         $permissions = $this->security->isGranted(

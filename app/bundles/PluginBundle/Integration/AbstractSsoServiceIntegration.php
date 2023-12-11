@@ -80,8 +80,6 @@ abstract class AbstractSsoServiceIntegration extends AbstractIntegration
     /**
      * Don't save the keys as they are only used to validate user login.
      *
-     * @param null $tokenOverride
-     *
      * @return array
      */
     public function extractAuthKeys($data, $tokenOverride = null)

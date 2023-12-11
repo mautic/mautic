@@ -10,9 +10,9 @@ use Symfony\Component\HttpFoundation\Session\SessionInterface;
 
 class PageHelperTest extends \PHPUnit\Framework\TestCase
 {
-    private $session;
-    private $coreParametersHelper;
-    private $pageHelper;
+    private \PHPUnit\Framework\MockObject\MockObject $session;
+    private \PHPUnit\Framework\MockObject\MockObject $coreParametersHelper;
+    private \Mautic\CoreBundle\Helper\PageHelper $pageHelper;
 
     protected function setUp(): void
     {
@@ -35,7 +35,7 @@ class PageHelperTest extends \PHPUnit\Framework\TestCase
         $this->assertSame($page, $this->pageHelper->countPage($count));
     }
 
-    public function pageProvider()
+    public static function pageProvider()
     {
         return [
             [0, 10, 1],
@@ -63,7 +63,7 @@ class PageHelperTest extends \PHPUnit\Framework\TestCase
         $this->assertSame($start, $this->pageHelper->countPage($page));
     }
 
-    public function startProvider()
+    public static function startProvider()
     {
         return [
             [0, 10, 1],

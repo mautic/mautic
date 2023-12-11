@@ -81,20 +81,16 @@ class ExpressionBuilder extends BaseExpressionBuilder
 
     /**
      * Puts argument into EXISTS mysql function.
-     *
-     * @return string
      */
-    public function exists($input)
+    public function exists($input): string
     {
         return $this->func('EXISTS', $input);
     }
 
     /**
      * Puts argument into NOT EXISTS mysql function.
-     *
-     * @return string
      */
-    public function notExists($input)
+    public function notExists($input): string
     {
         return $this->func('NOT EXISTS', $input);
     }

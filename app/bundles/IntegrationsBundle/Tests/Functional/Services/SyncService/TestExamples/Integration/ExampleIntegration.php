@@ -26,14 +26,8 @@ final class ExampleIntegration extends BasicIntegration implements IntegrationIn
 {
     public const NAME = 'Example';
 
-    /**
-     * @var ExampleSyncDataExchange
-     */
-    private $syncDataExchange;
-
-    public function __construct(ExampleSyncDataExchange $syncDataExchange)
+    public function __construct(private ExampleSyncDataExchange $syncDataExchange)
     {
-        $this->syncDataExchange = $syncDataExchange;
     }
 
     /**

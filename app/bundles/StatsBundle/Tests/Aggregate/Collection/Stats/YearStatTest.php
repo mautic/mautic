@@ -10,7 +10,7 @@ class YearStatTest extends TestCase
 {
     private $year     = '2019';
     private $month    = 11;
-    private $yearStat;
+    private \Mautic\StatsBundle\Aggregate\Collection\Stats\YearStat $yearStat;
     private $monthStat;
 
     protected function setUp(): void

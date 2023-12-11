@@ -20,13 +20,13 @@ class FileHelperTest extends \PHPUnit\Framework\TestCase
         $this->assertSame($megabyte, $fileHelper::convertBytesToMegabytes($byte));
     }
 
-    public function bytesToMegabytesProvider()
+    public static function bytesToMegabytesProvider()
     {
         return [
             [0, 0.0],
-            [1048576, 1.0],
-            [10485760, 10.0],
-            [-10485760, -10.0],
+            [1_048_576, 1.0],
+            [10_485_760, 10.0],
+            [-10_485_760, -10.0],
         ];
     }
 
@@ -44,12 +44,12 @@ class FileHelperTest extends \PHPUnit\Framework\TestCase
         $this->assertSame($byte, $fileHelper::convertMegabytesToBytes($megabyte));
     }
 
-    public function megabytesToBytesProvider()
+    public static function megabytesToBytesProvider()
     {
         return [
             [0, 0],
-            [1, 1048576],
-            [5, 5242880],
+            [1, 1_048_576],
+            [5, 5_242_880],
         ];
     }
 
@@ -67,16 +67,16 @@ class FileHelperTest extends \PHPUnit\Framework\TestCase
         $this->assertSame($bytes, $fileHelper::convertPHPSizeToBytes($phpSize));
     }
 
-    public function phpSizeToBytesProvider()
+    public static function phpSizeToBytesProvider()
     {
         return [
-            ['3048M', 3196059648],
-            ['127M', 133169152],
+            ['3048M', 3_196_059_648],
+            ['127M', 133_169_152],
             ['1k', 1024],
             ['1K ', 1024],
-            ['1M', 1048576],
-            ['1G', 1073741824],
-            ['1P', 1125899906842624],
+            ['1M', 1_048_576],
+            ['1G', 1_073_741_824],
+            ['1P', 1_125_899_906_842_624],
             ['1024', 1024],
         ];
     }

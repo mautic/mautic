@@ -36,10 +36,7 @@ class ChannelSubscriptionChange extends Event
         return $this->oldStatus;
     }
 
-    /**
-     * @return string
-     */
-    public function getOldStatusVerb()
+    public function getOldStatusVerb(): string
     {
         return $this->getDncReasonVerb($this->oldStatus);
     }
@@ -49,18 +46,12 @@ class ChannelSubscriptionChange extends Event
         return $this->newStatus;
     }
 
-    /**
-     * @return string
-     */
-    public function getNewStatusVerb()
+    public function getNewStatusVerb(): string
     {
         return $this->getDncReasonVerb($this->newStatus);
     }
 
-    /**
-     * @return string
-     */
-    private function getDncReasonVerb($reason)
+    private function getDncReasonVerb($reason): string
     {
         return match (true) {
             DoNotContact::IS_CONTACTABLE === $reason => 'contactable',

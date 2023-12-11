@@ -16,10 +16,7 @@ class CacheClearSubscriberTest extends \PHPUnit\Framework\TestCase
      */
     private MockObject $adapter;
 
-    /**
-     * @var string
-     */
-    private $random;
+    private string $random;
 
     public function setUp(): void
     {

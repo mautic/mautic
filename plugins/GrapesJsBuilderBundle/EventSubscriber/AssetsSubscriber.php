@@ -16,7 +16,7 @@ class AssetsSubscriber implements EventSubscriberInterface
     {
     }
 
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             CoreEvents::VIEW_INJECT_CUSTOM_ASSETS => ['injectAssets', 0],

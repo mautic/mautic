@@ -39,10 +39,7 @@ class LeadSubscriber implements EventSubscriberInterface
         $this->setModelFactory($modelFactory);
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             LeadEvents::TIMELINE_ON_GENERATE => [

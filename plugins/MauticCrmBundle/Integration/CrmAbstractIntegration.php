@@ -263,8 +263,6 @@ abstract class CrmAbstractIntegration extends AbstractIntegration
     }
 
     /**
-     * @param null $object
-     *
      * @return Company|null
      */
     public function getMauticCompany($data, $object = null)
@@ -471,7 +469,6 @@ abstract class CrmAbstractIntegration extends AbstractIntegration
     }
 
     /**
-     * @param null   $entityObject   Possibly used by the CRM
      * @param string $priorityObject
      *
      * @return array
@@ -485,7 +482,6 @@ abstract class CrmAbstractIntegration extends AbstractIntegration
     }
 
     /**
-     * @param null   $entityObject   Possibly used by the CRM
      * @param string $priorityObject
      *
      * @return array

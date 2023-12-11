@@ -31,7 +31,7 @@ use Symfony\Component\Routing\Router;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
- * @method HubspotApi getApiHelper
+ * @method HubspotApi getApiHelper()
  */
 class HubspotIntegration extends CrmAbstractIntegration
 {
@@ -78,10 +78,8 @@ class HubspotIntegration extends CrmAbstractIntegration
 
     /**
      * {@inheritdoc}
-     *
-     * @return string
      */
-    public function getName()
+    public function getName(): string
     {
         return 'Hubspot';
     }
@@ -94,20 +92,15 @@ class HubspotIntegration extends CrmAbstractIntegration
         return [];
     }
 
-    /**
-     * @return string
-     */
-    public function getApiKey()
+    public function getApiKey(): string
     {
         return 'hapikey';
     }
 
     /**
      * Get the array key for the auth token.
-     *
-     * @return string
      */
-    public function getAuthTokenKey()
+    public function getAuthTokenKey(): string
     {
         return 'hapikey';
     }
@@ -148,10 +141,7 @@ class HubspotIntegration extends CrmAbstractIntegration
         return $this->getBearerToken() ? 'oauth2' : 'key';
     }
 
-    /**
-     * @return string
-     */
-    public function getApiUrl()
+    public function getApiUrl(): string
     {
         return 'https://api.hubapi.com';
     }
@@ -392,8 +382,6 @@ class HubspotIntegration extends CrmAbstractIntegration
 
     /**
      * @param array  $params
-     * @param null   $query
-     * @param null   $executed
      * @param array  $result
      * @param string $object
      *
@@ -451,7 +439,6 @@ class HubspotIntegration extends CrmAbstractIntegration
     /**
      * @param array $params
      * @param bool  $id
-     * @param null  $executed
      */
     public function getCompanies($params = [], $id = false, &$executed = null)
     {

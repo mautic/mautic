@@ -174,7 +174,7 @@ class InputHelperTest extends TestCase
         Assert::assertEquals($cleanedUrl, $outputUrl);
     }
 
-    public function urlProvider(): iterable
+    public static function urlProvider(): iterable
     {
         // valid URL is reconstructed as expected
         yield ['https://www.mautic.org/somewhere/something?foo=bar#abc123', 'https://www.mautic.org/somewhere/something?foo=bar#abc123'];
@@ -232,7 +232,7 @@ class InputHelperTest extends TestCase
     /**
      * @return iterable<array<string>>
      */
-    public function filenameProvider(): iterable
+    public static function filenameProvider(): iterable
     {
         yield [
             'dirname',
@@ -276,7 +276,7 @@ class InputHelperTest extends TestCase
     /**
      * @return array<array<string>>
      */
-    public function minifyHTMLProvider(): array
+    public static function minifyHTMLProvider(): array
     {
         return [
             // Test with a simple HTML string with no whitespace
@@ -310,7 +310,7 @@ class InputHelperTest extends TestCase
     /**
      * @return mixed[]
      */
-    public function underscoreProvider(): array
+    public static function underscoreProvider(): array
     {
         return [
             ['hello', 'hello'],

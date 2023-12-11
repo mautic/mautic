@@ -43,7 +43,6 @@ class MessageQueueModel extends FormModel
     }
 
     /**
-     * @param null   $campaignEventId
      * @param int    $attempts
      * @param int    $priority
      * @param mixed  $messageQueue
@@ -164,10 +163,6 @@ class MessageQueueModel extends FormModel
         return true;
     }
 
-    /**
-     * @param null $channel
-     * @param null $channelId
-     */
     public function sendMessages($channel = null, $channelId = null): int
     {
         // Note when the process started for batch purposes
@@ -312,9 +307,6 @@ class MessageQueueModel extends FormModel
      * @deprecated to be removed in 3.0; use reschedule method instead
      *
      * @param string $rescheduleInterval
-     * @param null   $leadId
-     * @param null   $channel
-     * @param null   $channelId
      * @param bool   $persist
      */
     public function rescheduleMessage($message, $rescheduleInterval = null, $leadId = null, $channel = null, $channelId = null, $persist = false): void
@@ -327,7 +319,7 @@ class MessageQueueModel extends FormModel
     /**
      * @param array $channelIds
      */
-    public function getQueuedChannelCount($channel, $channelIds = [])
+    public function getQueuedChannelCount($channel, $channelIds = []): int
     {
         return $this->getRepository()->getQueuedChannelCount($channel, $channelIds);
     }

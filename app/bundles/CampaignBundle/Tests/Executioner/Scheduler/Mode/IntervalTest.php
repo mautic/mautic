@@ -142,7 +142,7 @@ class IntervalTest extends \PHPUnit\Framework\TestCase
     }
 
     /** @return array<string, array<mixed>> */
-    public function provideReschedulingData(): array
+    public static function ProvidereschedulingData(): array
     {
         return [
             'test on specified hour'                     => [new \DateTime('2018-10-18 16:00'), new \DateTime('2018-10-18 16:00'), new \DateTime('2018-10-18 16:00')],
@@ -490,9 +490,7 @@ class IntervalTest extends \PHPUnit\Framework\TestCase
         $coreParametersHelper = $this->createMock(CoreParametersHelper::class);
         $coreParametersHelper->method('get')
             ->willReturnCallback(
-                function ($param, $default) {
-                    return 'America/New_York';
-                }
+                fn ($param, $default) => 'America/New_York'
             );
 
         return new Interval(new NullLogger(), $coreParametersHelper);
