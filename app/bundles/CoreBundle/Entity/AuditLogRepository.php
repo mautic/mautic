@@ -5,6 +5,7 @@ namespace Mautic\CoreBundle\Entity;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\TimelineTrait;
+use Mautic\UserBundle\Entity\User;
 
 /**
  * @extends CommonRepository<AuditLog>
@@ -14,8 +15,6 @@ class AuditLogRepository extends CommonRepository
     use TimelineTrait;
 
     /**
-     * @param array $filters
-     *
      * @return int
      */
     public function getAuditLogsCount(Lead $lead, array $filters = null)
@@ -45,9 +44,8 @@ class AuditLogRepository extends CommonRepository
     }
 
     /**
-     * @param array $filters
-     * @param int   $page
-     * @param int   $limit
+     * @param int $page
+     * @param int $limit
      *
      * @return array
      */
@@ -100,8 +98,6 @@ class AuditLogRepository extends CommonRepository
     }
 
     /**
-     * @param array $filters
-     *
      * @return array
      */
     public function getAuditLogsForLeads(array $listOfContacts, array $filters = null, array $orderBy = null, $dateAdded = null)
@@ -234,5 +230,22 @@ class AuditLogRepository extends CommonRepository
             ->from(sprintf('(%s)', $sqb->getSQL()), 'ip');
 
         return $this->getTimelineResults($qb, $options, 'ip.ip_address', 'ip.date_added', [], ['date_added']);
+    }
+
+    /**
+     * @return array
+     */
+    public function getLogsForUser(User $user, $limit = 15)
+    {
+        $query = $this->createQueryBuilder('al')
+            ->select('al.userName, al.userId, al.bundle, al.object,
+            al.objectId, al.action, al.details, al.dateAdded, al.ipAddress')
+            ->where('al.bundle = \'user\'')
+            ->andWhere('al.userId = :user_id')
+            ->setParameter('user_id', $user->getId())
+            ->orderBy('al.dateAdded', 'DESC')
+            ->setMaxResults($limit);
+
+        return $query->getQuery()->getArrayResult();
     }
 }

@@ -220,6 +220,11 @@ class UserController extends FormController
         \assert($model instanceof UserModel);
         $user = $model->getEntity($objectId);
 
+        /** @var \Mautic\CoreBundle\Model\AuditLogModel $auditLogModel */
+        $auditLogModel      = $this->getModel('core.auditlog');
+        $auditLogRepository = $auditLogModel->getRepository();
+        $userActivity       = $auditLogRepository->getLogsForUser($user);
+
         // set the page we came from
         $page = $request->getSession()->get('mautic.user.page', 1);
 
@@ -319,7 +324,10 @@ class UserController extends FormController
         }
 
         return $this->delegateView([
-            'viewParameters'  => ['form' => $form->createView()],
+            'viewParameters'  => [
+                'form'          => $form->createView(),
+                'logs'          => $userActivity,
+            ],
             'contentTemplate' => '@MauticUser/User/form.html.twig',
             'passthroughVars' => [
                 'activeLink'    => '#mautic_user_index',

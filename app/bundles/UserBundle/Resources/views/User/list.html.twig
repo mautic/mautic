@@ -43,7 +43,7 @@
                         'delete' : permissions['delete'],
                     },
             }) -}}
-            
+
             <th class="visible-md visible-lg col-user-avatar"></th>
             {{- include('@MauticCore/Helper/tableheader.html.twig', {
                     'sessionVar' : 'user',
@@ -74,11 +74,18 @@
 
                 {{- include('@MauticCore/Helper/tableheader.html.twig', {
                     'sessionVar' : 'user',
+                    'orderBy'    : 'r.name',
+                    'text'       : 'mautic.user.lastlogin',
+                    'class'      : 'visible-md visible-lg col-user-lastlogin',
+                }) -}}
+
+                {{- include('@MauticCore/Helper/tableheader.html.twig', {
+                    'sessionVar' : 'user',
                     'orderBy'    : 'u.id',
                     'text'       : 'mautic.core.id',
                     'class'      : 'visible-md visible-lg col-user-id',
                 }) -}}
-            
+
         </tr>
         </thead>
         <tbody>
@@ -101,6 +108,10 @@
                 </td>
                 <td>
                     <div>
+                        {{- include('@MauticUser/Helper/publishstatus_icon.html.twig', {
+                            'item'  : item,
+                            'model' : 'user',
+                        }) -}}
                         {% if permissions['edit'] %}
                             <a href="{{ path(
                                 'mautic_user_action',
@@ -119,6 +130,7 @@
                     <a href="mailto: {{ item.getEmail() }}">{{ item.getEmail() }}</a>
                 </td>
                 <td class="visible-md visible-lg">{{ item.getRole().getName() }}</td>
+                <td class="visible-md visible-lg">{{ dateToText(item.getLastLogin(), 'local', 'Y-m-d H:i:s', true) }}</td>
                 <td class="visible-md visible-lg">{{ item.getId() }}</td>
             </tr>
         {% endfor %}

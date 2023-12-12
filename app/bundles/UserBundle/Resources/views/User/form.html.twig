@@ -92,6 +92,89 @@
             {{ form_rest(form) }}
 		</div>
 	</div>
+
+	<!-- Recent activity block(audit_log table) -->
+	<div class="col-md-3 bg-white height-auto">
+        {{ customContent('right.section.top', mauticTemplateVars is defined ? mauticTemplateVars : {}) }}
+			<div class="panel bg-white shd-none bdr-rds-0 bdr-w-0 mb-0">
+		<div class="panel-heading">
+			<div class="panel-title">{% trans %}mautic.core.recent.activity{% endtrans %}</div>
+		</div>
+		<div class="panel-body pt-xs">
+			{% if logs is defined and logs is not empty %}
+			<ul class="media-list media-list-feed">
+				{% for log in logs %}
+				<li class="media">
+					<div class="media-object pull-left">
+					{% if log.action == 'login' %}
+						<span class="figure featured bg-success"><span class="fa fa-check"></span></span>
+					{% elseif log.action == 'update' %}
+						<span class="figure"></span>
+					{% else %}
+						<span class="figure"></span>
+					{% endif %}
+					</div>
+					<div class="media-body">
+
+						{% if log.object == 'user' %}
+							{% if log.action == 'update' %}
+								{{ 'mautic.user.user.form.update_user_status'|trans }}
+							{% endif %}
+
+						{% elseif log.object == 'security' %}
+							{% if log.action == 'login' %}
+								{{ 'mautic.user.user.form.login_by'|trans }}
+
+							{% elseif log.action == 'update' %}
+								{{ 'mautic.user.user.form.updated_by'|trans }}
+
+							{% elseif log.action == 'create' %}
+								{% set objects = {} %}
+								{% for key, value in log.details %}
+									{% set objects = objects|merge({(key): value}) %}
+								{% endfor %}
+								{% if objects|length > 0 %}
+									{% if log.object == 'role' %}
+										{{ 'mautic.user.role'|trans }}
+										{% for item in objects.name %}
+											{{ item }}
+										{% endfor %}
+										{{ 'mautic.user.user.form.was_created_by'|trans }}
+									{% elseif log.object == 'user' %}
+										{{ 'mautic.user.user.form.user'|trans }}
+										{% for item in objects.username %}
+											{{ item }}
+										{% endfor %}
+										{{ 'mautic.user.user.form.was_created_by'|trans }}
+									{% endif %}
+								{% endif %}
+							{% endif %}
+						{% endif %}
+
+
+
+
+						{% if log.userId is defined and log.userId is not empty %}
+							<a
+								href="{{ path('mautic_user_action', {objectAction: 'edit', objectId: log.userId}) }}"
+								data-toggle="ajax"
+							>{{ log.userName }}</a>
+						{% else %}
+							{{ log.userName }}
+						{% endif %}
+						<p class="fs-12 dark-sm"><small> {{ dateToFull(log.dateAdded) }}</small></p>
+					</div>
+				</li>
+				{% endfor %}
+			</ul>
+			{% endif %}
+		</div>
+		<!-- Recent activity block(audit_log table) -->
+
+	</div>
+			{{ customContent('right.section.bottom', mauticTemplateVars is defined ? mauticTemplateVars : {}) }}
+		</div>
+
     {{ form_end(form) }}
 </div>
 
