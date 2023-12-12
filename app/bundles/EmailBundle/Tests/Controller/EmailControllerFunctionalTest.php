@@ -153,7 +153,7 @@ final class EmailControllerFunctionalTest extends MauticMysqlTestCase
     {
         $segment = $this->createSegment();
         $this->em->persist($segment);
-        $email   = $this->createEmail();
+        $email = $this->createEmail();
         $email->setPublishUp(new \DateTime('now -1 hour'));
         $email->addList($segment);
         $this->em->persist($email);

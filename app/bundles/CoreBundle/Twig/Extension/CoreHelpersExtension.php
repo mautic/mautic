@@ -59,7 +59,7 @@ class CoreHelpersExtension extends AbstractExtension
      */
     public function getFilterAttributes(string $filterName, array $filter, string $target, string $tmpl): array
     {
-        $attr       = [
+        $attr = [
             'id="'.$filterName.'"',
             'name="'.$filterName.'"',
         ];

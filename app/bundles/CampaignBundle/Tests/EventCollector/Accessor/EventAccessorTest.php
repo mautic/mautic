@@ -17,7 +17,7 @@ class EventAccessorTest extends \PHPUnit\Framework\TestCase
      * @var array
      */
     private $events = [
-        Event::TYPE_ACTION    => [
+        Event::TYPE_ACTION => [
             'lead.scorecontactscompanies' => [
                 'label'          => 'Add to company\'s score',
                 'description'    => 'This action will add the specified value to the company\'s existing score',
@@ -34,7 +34,7 @@ class EventAccessorTest extends \PHPUnit\Framework\TestCase
                 'eventName'   => 'mautic.lead.on_campaign_trigger_condition',
             ],
         ],
-        Event::TYPE_DECISION  => [
+        Event::TYPE_DECISION => [
             'email.click' => [
                 'label'                  => 'Clicks email',
                 'description'            => 'Trigger actions when an email is clicked. Connect a Send Email action to the top of this decision.',

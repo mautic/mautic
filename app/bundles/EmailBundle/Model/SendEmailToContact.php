@@ -298,8 +298,8 @@ class SendEmailToContact
             }
 
             // Add lead ID to list of failures
-            $this->failedContacts[$stat->getLeadId()]  = $failedEmail;
-            $this->errorMessages[$stat->getLeadId()]   = $error;
+            $this->failedContacts[$stat->getLeadId()] = $failedEmail;
+            $this->errorMessages[$stat->getLeadId()]  = $error;
 
             $this->statHelper->markForDeletion($stat);
 

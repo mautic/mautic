@@ -283,7 +283,7 @@ class IntegrationEntityRepository extends CommonRepository
 
         $results = $q->executeQuery()->fetchAllAssociative();
 
-        $leads   = [];
+        $leads = [];
 
         if ($integrationEntity) {
             foreach ($integrationEntity as $entity) {

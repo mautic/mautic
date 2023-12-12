@@ -271,7 +271,7 @@ class UserModel extends FormModel
             $this->logger->error($exception->getMessage());
             throw new \RuntimeException();
         }
-        $resetLink  = $this->router->generate('mautic_user_passwordresetconfirm', ['token' => $resetToken->getSecret()], UrlGeneratorInterface::ABSOLUTE_URL);
+        $resetLink = $this->router->generate('mautic_user_passwordresetconfirm', ['token' => $resetToken->getSecret()], UrlGeneratorInterface::ABSOLUTE_URL);
 
         $mailer->setTo([$user->getEmail() => $user->getName()]);
         $mailer->setSubject($this->translator->trans('mautic.user.user.passwordreset.subject'));
@@ -291,7 +291,7 @@ class UserModel extends FormModel
 
     public function emailUser(User $user, string $subject, string $content): void
     {
-        $mailer  = $this->prepareEMail($subject, $content);
+        $mailer = $this->prepareEMail($subject, $content);
         $mailer->setTo([$user->getEmail() => $user->getName()]);
         $mailer->send();
     }
@@ -301,7 +301,7 @@ class UserModel extends FormModel
      */
     public function sendMailToEmailAddresses(array $emailAddresses, string $subject, string $content): void
     {
-        $mailer  = $this->prepareEMail($subject, $content);
+        $mailer = $this->prepareEMail($subject, $content);
         $mailer->setTo($emailAddresses);
         $mailer->send();
     }

@@ -17,10 +17,10 @@ class CampaignReplyType extends AbstractType
                 'label'      => 'mautic.sms.reply_pattern',
                 'label_attr' => ['class' => 'control-label'],
                 'attr'       => [
-                    'class'    => 'form-control',
-                    'tooltip'  => 'mautic.sms.reply_pattern.tooltip',
+                    'class'   => 'form-control',
+                    'tooltip' => 'mautic.sms.reply_pattern.tooltip',
                 ],
-                'required'    => false,
+                'required' => false,
             ]
         );
     }

@@ -21,7 +21,7 @@ class MiddlewareCacheWarmer implements CacheWarmerInterface
     public function __construct(
         private string $env
     ) {
-        $this->specs     = new \SplPriorityQueue();
+        $this->specs = new \SplPriorityQueue();
     }
 
     /**
@@ -60,7 +60,7 @@ class MiddlewareCacheWarmer implements CacheWarmerInterface
             mkdir($cacheDirectory, 0777, true);
         }
 
-        $data  = [];
+        $data = [];
         $this->specs->setExtractFlags(\SplPriorityQueue::EXTR_DATA);
 
         /** @var \ReflectionClass $middleware */

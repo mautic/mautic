@@ -464,9 +464,9 @@ namespace Mautic\CoreBundle\ErrorHandler {
             }
 
             if ('dev' == self::$environment || $this->displayErrors) {
-                $error['file']          = str_replace(self::$root, '', $error['file']);
-                $errorMessage           = $error['logMessage'] ?? $error['message'];
-                $error['message']       = "$errorMessage - in file {$error['file']} - at line {$error['line']}";
+                $error['file']    = str_replace(self::$root, '', $error['file']);
+                $errorMessage     = $error['logMessage'] ?? $error['message'];
+                $error['message'] = "$errorMessage - in file {$error['file']} - at line {$error['line']}";
             } else {
                 if (empty($error['showExceptionMessage'])) {
                     unset($error);
@@ -479,7 +479,7 @@ namespace Mautic\CoreBundle\ErrorHandler {
 
             try {
                 // Get the URLs base path
-                $base  = str_replace(['index.php'], '', $_SERVER['SCRIPT_NAME']);
+                $base = str_replace(['index.php'], '', $_SERVER['SCRIPT_NAME']);
 
                 // Determine if there is an asset prefix
                 $root = self::$root;
@@ -501,8 +501,8 @@ namespace Mautic\CoreBundle\ErrorHandler {
                 $error['assetBase'] = $assetBase;
 
                 // Allow a custom error page
-                $loader             = new \Twig\Loader\FilesystemLoader(['app/bundles/CoreBundle/Resources/views/Offline', 'app/bundles/CoreBundle/Resources/views/Exception']);
-                $twig               = new \Twig\Environment($loader);
+                $loader = new \Twig\Loader\FilesystemLoader(['app/bundles/CoreBundle/Resources/views/Offline', 'app/bundles/CoreBundle/Resources/views/Exception']);
+                $twig   = new \Twig\Environment($loader);
                 // This is the same filter Located at Mautic\CoreBundle\Twig\Extension\ExceptionExtension;
                 $twig->addFunction(new \Twig\TwigFunction('getRootPath', fn () => realpath(__DIR__.'/../../../../')));
 
@@ -565,7 +565,7 @@ namespace {
         {
             global $prof_timing, $prof_names;
             $size = count($prof_timing);
-            for ($i=0; $i < $size - 1; ++$i) {
+            for ($i = 0; $i < $size - 1; ++$i) {
                 echo "<b>{$prof_names[$i]}</b><br>";
                 echo sprintf('&nbsp;&nbsp;&nbsp;%f<br>', $prof_timing[$i + 1] - $prof_timing[$i]);
             }

@@ -24,7 +24,7 @@ class ContactColumnsDictionary
     {
         $columns = array_flip($this->coreParametersHelper->get('contact_columns', []));
         $fields  = $this->getFields();
-        foreach ($columns as $alias=>&$column) {
+        foreach ($columns as $alias => &$column) {
             if (isset($fields[$alias])) {
                 $column = $fields[$alias];
             }
@@ -36,7 +36,7 @@ class ContactColumnsDictionary
     public function getFields(): array
     {
         if ([] === $this->fieldList) {
-            $this->fieldList['name']        = sprintf(
+            $this->fieldList['name'] = sprintf(
                 '%s %s',
                 $this->translator->trans('mautic.core.firstname'),
                 $this->translator->trans('mautic.core.lastname')

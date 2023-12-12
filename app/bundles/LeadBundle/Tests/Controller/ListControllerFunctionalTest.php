@@ -153,7 +153,7 @@ class ListControllerFunctionalTest extends MauticMysqlTestCase
     public function testSegmentCount(): void
     {
         // Save segment.
-        $filters   = [
+        $filters = [
             [
                 'glue'     => 'and',
                 'field'    => 'email',
@@ -302,7 +302,7 @@ class ListControllerFunctionalTest extends MauticMysqlTestCase
         $crawler = $this->client->request(Request::METHOD_POST, '/s/segments/clone/'.$segment->getId());
         $this->assertTrue($this->client->getResponse()->isOk());
 
-        $form    = $crawler->selectButton('leadlist_buttons_apply')->form();
+        $form = $crawler->selectButton('leadlist_buttons_apply')->form();
         $form['leadlist[alias]']->setValue('clonesegment2');
         $this->client->submit($form);
 
@@ -320,7 +320,7 @@ class ListControllerFunctionalTest extends MauticMysqlTestCase
     public function testSegmentFilterIcon(): void
     {
         // Save segment.
-        $filters   = [
+        $filters = [
             [
                 'glue'     => 'and',
                 'field'    => 'email',
@@ -338,9 +338,9 @@ class ListControllerFunctionalTest extends MauticMysqlTestCase
         $crawler            = $this->client->request(Request::METHOD_GET, '/s/segments');
         $leadListsTableRows = $crawler->filterXPath("//table[@id='leadListTable']//tbody//tr");
         $this->assertEquals(2, $leadListsTableRows->count());
-        $secondColumnOfLine    = $leadListsTableRows->first()->filterXPath('//td[2]//div//i[@class="fa fa-fw fa-filter"]')->count();
+        $secondColumnOfLine = $leadListsTableRows->first()->filterXPath('//td[2]//div//i[@class="fa fa-fw fa-filter"]')->count();
         $this->assertEquals(1, $secondColumnOfLine);
-        $secondColumnOfLine    = $leadListsTableRows->eq(1)->filterXPath('//td[2]//div//i[@class="fa fa-fw fa-filter"]')->count();
+        $secondColumnOfLine = $leadListsTableRows->eq(1)->filterXPath('//td[2]//div//i[@class="fa fa-fw fa-filter"]')->count();
         $this->assertEquals(0, $secondColumnOfLine);
     }
 
@@ -364,11 +364,11 @@ class ListControllerFunctionalTest extends MauticMysqlTestCase
         $crawler            = $this->client->request(Request::METHOD_GET, '/s/segments');
         $leadListsTableRows = $crawler->filterXPath("//table[@id='leadListTable']//tbody//tr");
         $this->assertEquals(3, $leadListsTableRows->count());
-        $secondColumnOfLine    = $leadListsTableRows->first()->filterXPath('//td[2]//div//i[@class="fa text-danger fa-exclamation-circle"]')->count();
+        $secondColumnOfLine = $leadListsTableRows->first()->filterXPath('//td[2]//div//i[@class="fa text-danger fa-exclamation-circle"]')->count();
         $this->assertEquals(1, $secondColumnOfLine);
-        $secondColumnOfLine    = $leadListsTableRows->eq(1)->filterXPath('//td[2]//div//i[@class="fa text-danger fa-exclamation-circle"]')->count();
+        $secondColumnOfLine = $leadListsTableRows->eq(1)->filterXPath('//td[2]//div//i[@class="fa text-danger fa-exclamation-circle"]')->count();
         $this->assertEquals(0, $secondColumnOfLine);
-        $secondColumnOfLine    = $leadListsTableRows->eq(2)->filterXPath('//td[2]//div//i[@class="fa text-danger fa-exclamation-circle"]')->count();
+        $secondColumnOfLine = $leadListsTableRows->eq(2)->filterXPath('//td[2]//div//i[@class="fa text-danger fa-exclamation-circle"]')->count();
         $this->assertEquals(0, $secondColumnOfLine);
     }
 

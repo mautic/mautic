@@ -227,12 +227,12 @@ class ConnectwiseIntegration extends CrmAbstractIntegration
                     'choices' => [
                         'mautic.integrations.blanks' => 'updateBlanks',
                     ],
-                    'expanded'          => true,
-                    'multiple'          => true,
-                    'label'             => 'mautic.integrations.form.blanks',
-                    'label_attr'        => ['class' => 'control-label'],
-                    'placeholder'       => false,
-                    'required'          => false,
+                    'expanded'    => true,
+                    'multiple'    => true,
+                    'label'       => 'mautic.integrations.form.blanks',
+                    'label_attr'  => ['class' => 'control-label'],
+                    'placeholder' => false,
+                    'required'    => false,
                 ]
             );
             $builder->add(
@@ -243,12 +243,12 @@ class ConnectwiseIntegration extends CrmAbstractIntegration
                         'mautic.connectwise.object.contact' => 'Contact',
                         'mautic.connectwise.object.company' => 'company',
                     ],
-                    'expanded'          => true,
-                    'multiple'          => true,
-                    'label'             => 'mautic.connectwise.form.objects_to_pull_from',
-                    'label_attr'        => ['class' => ''],
-                    'placeholder'       => false,
-                    'required'          => false,
+                    'expanded'    => true,
+                    'multiple'    => true,
+                    'label'       => 'mautic.connectwise.form.objects_to_pull_from',
+                    'label_attr'  => ['class' => ''],
+                    'placeholder' => false,
+                    'required'    => false,
                 ]
             );
         }
@@ -388,10 +388,10 @@ class ConnectwiseIntegration extends CrmAbstractIntegration
                     'keys'  => ['Email', 'Direct', 'Fax', 'Cell'],
                 ],
             ],
-            'Direct'                 => ['type' => 'string', 'required' => false, 'configOnly' => true],
-            'Cell'                   => ['type' => 'string', 'required' => false, 'configOnly' => true],
-            'Email'                  => ['type' => 'string', 'required' => true, 'configOnly' => true],
-            'Fax'                    => ['type' => 'string', 'required' => false, 'configOnly' => true],
+            'Direct' => ['type' => 'string', 'required' => false, 'configOnly' => true],
+            'Cell'   => ['type' => 'string', 'required' => false, 'configOnly' => true],
+            'Email'  => ['type' => 'string', 'required' => true, 'configOnly' => true],
+            'Fax'    => ['type' => 'string', 'required' => false, 'configOnly' => true],
         ];
     }
 

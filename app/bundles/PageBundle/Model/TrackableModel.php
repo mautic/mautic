@@ -372,8 +372,8 @@ class TrackableModel extends AbstractCommonModel
 
         foreach ($allUrls as $url) {
             if ($preparedUrl = $this->prepareUrlForTracking($url)) {
-                [$urlKey, $urlValue]     = $preparedUrl;
-                $trackableUrls[$urlKey]  = $urlValue;
+                [$urlKey, $urlValue]    = $preparedUrl;
+                $trackableUrls[$urlKey] = $urlValue;
             }
         }
 
@@ -879,8 +879,8 @@ class TrackableModel extends AbstractCommonModel
             }
 
             if ($preparedUrl = $this->prepareUrlForTracking($url)) {
-                [$urlKey, $urlValue]     = $preparedUrl;
-                $trackableUrls[$urlKey]  = $urlValue;
+                [$urlKey, $urlValue]    = $preparedUrl;
+                $trackableUrls[$urlKey] = $urlValue;
             }
         }
 

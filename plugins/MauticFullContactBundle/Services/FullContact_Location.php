@@ -17,7 +17,7 @@ class FullContact_Location extends FullContact_Base
      */
     protected $_supportedMethods = ['normalizer', 'enrichment'];
 
-    protected $_resourceUri      = '';
+    protected $_resourceUri = '';
 
     /**
      * This takes a name and breaks it into its individual parts.

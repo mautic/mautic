@@ -159,11 +159,11 @@ class IpAddress
             if (str_contains($ip, '/')) {
                 // has a netmask range
                 // https://gist.github.com/tott/7684443
-                [$range, $netmask]     = explode('/', $ip, 2);
-                $range_decimal         = ip2long($range);
-                $ip_decimal            = ip2long($this->ipAddress);
-                $wildcard_decimal      = 2 ** (32 - $netmask) - 1;
-                $netmask_decimal       = ~$wildcard_decimal;
+                [$range, $netmask] = explode('/', $ip, 2);
+                $range_decimal     = ip2long($range);
+                $ip_decimal        = ip2long($this->ipAddress);
+                $wildcard_decimal  = 2 ** (32 - $netmask) - 1;
+                $netmask_decimal   = ~$wildcard_decimal;
 
                 if (($ip_decimal & $netmask_decimal) == ($range_decimal & $netmask_decimal)) {
                     return false;

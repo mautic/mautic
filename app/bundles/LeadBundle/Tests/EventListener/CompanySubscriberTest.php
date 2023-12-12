@@ -34,9 +34,9 @@ class CompanySubscriberTest extends \PHPUnit\Framework\TestCase
 
     public function testOnCompanyDelete(): void
     {
-        $companyId        = 1;
-        $companyName      = 'name';
-        $ip               = '127.0.0.2';
+        $companyId   = 1;
+        $companyName = 'name';
+        $ip          = '127.0.0.2';
 
         $log = [
             'bundle'    => 'lead',

@@ -36,31 +36,31 @@ use Twig\Environment;
 
 class BuilderSubscriber implements EventSubscriberInterface
 {
-    private $pageTokenRegex      = '{pagelink=(.*?)}';
+    private $pageTokenRegex = '{pagelink=(.*?)}';
 
-    private $dwcTokenRegex       = '{dwc=(.*?)}';
+    private $dwcTokenRegex = '{dwc=(.*?)}';
 
-    private $langBarRegex        = '{langbar}';
+    private $langBarRegex = '{langbar}';
 
-    private $shareButtonsRegex   = '{sharebuttons}';
+    private $shareButtonsRegex = '{sharebuttons}';
 
-    private $titleRegex          = '{pagetitle}';
+    private $titleRegex = '{pagetitle}';
 
-    private $descriptionRegex    = '{pagemetadescription}';
+    private $descriptionRegex = '{pagemetadescription}';
 
-    public const segmentListRegex  = '{segmentlist}';
+    public const segmentListRegex = '{segmentlist}';
 
     public const categoryListRegex = '{categorylist}';
 
-    public const channelfrequency  = '{channelfrequency}';
+    public const channelfrequency = '{channelfrequency}';
 
-    public const preferredchannel  = '{preferredchannel}';
+    public const preferredchannel = '{preferredchannel}';
 
-    public const saveprefsRegex    = '{saveprefsbutton}';
+    public const saveprefsRegex = '{saveprefsbutton}';
 
-    public const successmessage    = '{successmessage}';
+    public const successmessage = '{successmessage}';
 
-    public const identifierToken   = '{leadidentifier}';
+    public const identifierToken = '{leadidentifier}';
 
     public function __construct(
         private CorePermissions $security,
@@ -95,16 +95,16 @@ class BuilderSubscriber implements EventSubscriberInterface
         if ($event->abTestWinnerCriteriaRequested()) {
             // add AB Test Winner Criteria
             $bounceRate = [
-                'group'    => 'mautic.page.abtest.criteria',
-                'label'    => 'mautic.page.abtest.criteria.bounce',
-                'event'    => PageEvents::ON_DETERMINE_BOUNCE_RATE_WINNER,
+                'group' => 'mautic.page.abtest.criteria',
+                'label' => 'mautic.page.abtest.criteria.bounce',
+                'event' => PageEvents::ON_DETERMINE_BOUNCE_RATE_WINNER,
             ];
             $event->addAbTestWinnerCriteria('page.bouncerate', $bounceRate);
 
             $dwellTime = [
-                'group'    => 'mautic.page.abtest.criteria',
-                'label'    => 'mautic.page.abtest.criteria.dwelltime',
-                'event'    => PageEvents::ON_DETERMINE_DWELL_TIME_WINNER,
+                'group' => 'mautic.page.abtest.criteria',
+                'label' => 'mautic.page.abtest.criteria.dwelltime',
+                'event' => PageEvents::ON_DETERMINE_DWELL_TIME_WINNER,
             ];
             $event->addAbTestWinnerCriteria('page.dwelltime', $dwellTime);
         }
@@ -349,7 +349,7 @@ class BuilderSubscriber implements EventSubscriberInterface
                     $slot            = $divContent->item($i);
                     $slot->nodeValue = self::segmentListRegex;
                     $slot->setAttribute('data-prefs-center', '1');
-                    $content         = $dom->saveHTML();
+                    $content = $dom->saveHTML();
                 }
 
                 $divContent = $xpath->query('//*[@data-slot="categorylist"]');
@@ -357,7 +357,7 @@ class BuilderSubscriber implements EventSubscriberInterface
                     $slot            = $divContent->item($i);
                     $slot->nodeValue = self::categoryListRegex;
                     $slot->setAttribute('data-prefs-center', '1');
-                    $content         = $dom->saveHTML();
+                    $content = $dom->saveHTML();
                 }
 
                 $divContent = $xpath->query('//*[@data-slot="preferredchannel"]');
@@ -365,7 +365,7 @@ class BuilderSubscriber implements EventSubscriberInterface
                     $slot            = $divContent->item($i);
                     $slot->nodeValue = self::preferredchannel;
                     $slot->setAttribute('data-prefs-center', '1');
-                    $content         = $dom->saveHTML();
+                    $content = $dom->saveHTML();
                 }
 
                 $divContent = $xpath->query('//*[@data-slot="channelfrequency"]');
@@ -373,7 +373,7 @@ class BuilderSubscriber implements EventSubscriberInterface
                     $slot            = $divContent->item($i);
                     $slot->nodeValue = self::channelfrequency;
                     $slot->setAttribute('data-prefs-center', '1');
-                    $content         = $dom->saveHTML();
+                    $content = $dom->saveHTML();
                 }
 
                 $divContent = $xpath->query('//*[@data-slot="saveprefsbutton"]');
@@ -382,7 +382,7 @@ class BuilderSubscriber implements EventSubscriberInterface
                     $saveButton      = $xpath->query('//*[@data-slot="saveprefsbutton"]//a')->item(0);
                     $slot->nodeValue = self::saveprefsRegex;
                     $slot->setAttribute('data-prefs-center', '1');
-                    $content         = $dom->saveHTML();
+                    $content = $dom->saveHTML();
 
                     $params['saveprefsbutton'] = [
                         'style'      => $saveButton->getAttribute('style'),
@@ -421,7 +421,7 @@ class BuilderSubscriber implements EventSubscriberInterface
             if (isset($params['startform']) && str_contains($content, 'data-prefs-center')) {
                 $dom = new \DOMDocument('1.0', 'utf-8');
                 $dom->loadHTML(mb_convert_encoding($content, 'HTML-ENTITIES', 'UTF-8'), LIBXML_NOERROR);
-                $xpath      = new \DOMXPath($dom);
+                $xpath = new \DOMXPath($dom);
                 // If use slots
                 $divContent = $xpath->query('//*[@data-prefs-center="1"]');
                 if (!$divContent->length) {
@@ -628,7 +628,7 @@ class BuilderSubscriber implements EventSubscriberInterface
                 $related[$parent->getId()] = [
                     'lang' => $trans,
                     // Add ntrd to not auto redirect to another language
-                    'url'  => $this->pageModel->generateUrl($parent, false).'?ntrd=1',
+                    'url' => $this->pageModel->generateUrl($parent, false).'?ntrd=1',
                 ];
                 foreach ($children as $c) {
                     $lang  = $c->getLanguage();
@@ -639,7 +639,7 @@ class BuilderSubscriber implements EventSubscriberInterface
                     $related[$c->getId()] = [
                         'lang' => $trans,
                         // Add ntrd to not auto redirect to another language
-                        'url'  => $this->pageModel->generateUrl($c, false).'?ntrd=1',
+                        'url' => $this->pageModel->generateUrl($c, false).'?ntrd=1',
                     ];
                 }
             }

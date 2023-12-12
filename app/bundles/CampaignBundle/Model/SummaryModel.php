@@ -44,9 +44,9 @@ class SummaryModel extends AbstractCommonModel
             $dateFrom = $now->setTimestamp($timestamp);
             $dateTo   = (clone $dateFrom)->modify('+1 hour -1 second');
 
-            $campaign  = $log->getCampaign();
-            $event     = $log->getEvent();
-            $key       = $campaign->getId().'.'.$event->getId().'.'.$timestamp;
+            $campaign = $log->getCampaign();
+            $event    = $log->getEvent();
+            $key      = $campaign->getId().'.'.$event->getId().'.'.$timestamp;
 
             $this->logData[$key] = [
                 'campaignId' => $campaign->getId(),

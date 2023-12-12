@@ -352,15 +352,15 @@ class IntegrationHelper
         } else {
             // populate placeholder
             return [
-                'twitter'    => 'https://twitter.com/%handle%',
-                'facebook'   => 'https://facebook.com/%handle%',
-                'linkedin'   => 'https://linkedin.com/in/%handle%',
-                'instagram'  => 'https://instagram.com/%handle%',
-                'pinterest'  => 'https://pinterest.com/%handle%',
-                'klout'      => 'https://klout.com/%handle%',
-                'youtube'    => 'https://youtube.com/user/%handle%',
-                'flickr'     => 'https://flickr.com/photos/%handle%',
-                'skype'      => 'skype:%handle%?call',
+                'twitter'   => 'https://twitter.com/%handle%',
+                'facebook'  => 'https://facebook.com/%handle%',
+                'linkedin'  => 'https://linkedin.com/in/%handle%',
+                'instagram' => 'https://instagram.com/%handle%',
+                'pinterest' => 'https://pinterest.com/%handle%',
+                'klout'     => 'https://klout.com/%handle%',
+                'youtube'   => 'https://youtube.com/user/%handle%',
+                'flickr'    => 'https://flickr.com/photos/%handle%',
+                'skype'     => 'skype:%handle%?call',
             ];
         }
     }

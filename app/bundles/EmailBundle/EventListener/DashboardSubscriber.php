@@ -98,7 +98,7 @@ class DashboardSubscriber extends MainDashboardSubscriber
             $params = $widget->getParams();
 
             if (!$event->isCached()) {
-                $headItems  = [
+                $headItems = [
                     'mautic.dashboard.label.contact.id',
                     'mautic.dashboard.label.contact.email.address',
                     'mautic.dashboard.label.contact.open',

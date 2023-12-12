@@ -6,9 +6,9 @@ class UTF8Helper
 {
     public const ICONV_TRANSLIT = 'TRANSLIT';
 
-    public const ICONV_IGNORE   = 'IGNORE';
+    public const ICONV_IGNORE = 'IGNORE';
 
-    public const WITHOUT_ICONV  = '';
+    public const WITHOUT_ICONV = '';
 
     protected static $win1252ToUtf8 = [
         128 => "\xe2\x82\xac",

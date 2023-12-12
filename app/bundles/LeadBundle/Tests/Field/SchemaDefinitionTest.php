@@ -195,7 +195,7 @@ class SchemaDefinitionTest extends TestCase
 
         yield [
             [
-                'type'    => 'string',
+                'type' => 'string',
             ],
             ClassMetadataBuilder::MAX_VARCHAR_INDEXED_LENGTH,
         ];
@@ -213,7 +213,7 @@ class SchemaDefinitionTest extends TestCase
         foreach (['text', 'datetime', 'date', 'time', 'boolean', 'float'] as $type) {
             yield [
                 [
-                    'type'    => $type,
+                    'type' => $type,
                 ],
                 null,
             ];

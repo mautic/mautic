@@ -120,7 +120,7 @@ final class ReportHelper
         return array_map(
             function ($item) {
                 if (isset($item['type'])) {
-                    $item['type'] =  $this->getReportBuilderFieldType($item['type']);
+                    $item['type'] = $this->getReportBuilderFieldType($item['type']);
                 }
 
                 return $item;

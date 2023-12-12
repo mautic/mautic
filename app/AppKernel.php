@@ -66,7 +66,7 @@ class AppKernel extends Kernel
         if (defined('MAUTIC_INSTALLER')) {
             $uri = $request->getRequestUri();
             if (false === strpos($uri, 'installer')) {
-                $base   = $request->getBaseUrl();
+                $base = $request->getBaseUrl();
                 $prefix = '';
                 // check to see if the .htaccess file exists or if not running under apache
                 if (false === stripos($request->server->get('SERVER_SOFTWARE', ''), 'apache')
@@ -164,7 +164,7 @@ class AppKernel extends Kernel
 
         // dynamically register Mautic Plugin Bundles
         $searchPath = $this->getApplicationDir().'/plugins';
-        $finder     = new \Symfony\Component\Finder\Finder();
+        $finder = new \Symfony\Component\Finder\Finder();
         $finder->files()
             ->followLinks()
             ->depth('1')
@@ -172,7 +172,7 @@ class AppKernel extends Kernel
             ->name('*Bundle.php');
 
         foreach ($finder as $file) {
-            $dirname  = basename($file->getRelativePath());
+            $dirname = basename($file->getRelativePath());
             $filename = substr($file->getFilename(), 0, -4);
 
             $class = '\\MauticPlugin\\'.$dirname.'\\'.$filename;
@@ -281,8 +281,8 @@ class AppKernel extends Kernel
     {
         if (null === $this->installed) {
             $localParameters = $this->getParameterLoader()->getLocalParameterBag();
-            $dbDriver        = $localParameters->get('db_driver');
-            $siteUrl         = $localParameters->get('site_url');
+            $dbDriver = $localParameters->get('db_driver');
+            $siteUrl = $localParameters->get('site_url');
 
             $this->installed = !empty($dbDriver) && !empty($siteUrl);
         }

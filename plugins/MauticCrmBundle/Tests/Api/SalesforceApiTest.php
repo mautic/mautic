@@ -128,7 +128,7 @@ class SalesforceApiTest extends \PHPUnit\Framework\TestCase
             ->willReturn(
                 [
                     [
-                        'message'   => $message,
+                        'message' => $message,
                     ],
                 ]
             );

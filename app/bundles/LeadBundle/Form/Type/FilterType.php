@@ -50,9 +50,9 @@ class FilterType extends AbstractType
             $fieldAlias  = $data['field'] ?? null;
             $fieldObject = $data['object'] ?? 'behaviors';
             // Looking for behaviors for BC reasons as some filters were moved from 'lead' to 'behaviors'.
-            $field       = $fieldChoices[$fieldObject][$fieldAlias] ?? $fieldChoices['behaviors'][$fieldAlias] ?? null;
-            $operators   = $field['operators'] ?? [];
-            $operator    = $data['operator'] ?? null;
+            $field     = $fieldChoices[$fieldObject][$fieldAlias] ?? $fieldChoices['behaviors'][$fieldAlias] ?? null;
+            $operators = $field['operators'] ?? [];
+            $operator  = $data['operator'] ?? null;
 
             if ($operators && !$operator) {
                 $operator = array_key_first($operators);

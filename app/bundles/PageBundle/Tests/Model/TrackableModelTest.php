@@ -620,8 +620,8 @@ TEXT;
 
         $plainText = strip_tags($html);
 
-        $combined                   = [$html, $plainText];
-        [$content, $trackables]     = $model->parseContentForTrackables(
+        $combined               = [$html, $plainText];
+        [$content, $trackables] = $model->parseContentForTrackables(
             $combined,
             [],
             'email',
@@ -657,8 +657,8 @@ TEXT;
 
         $plainText = strip_tags($html);
 
-        $combined                   = [$html, $plainText];
-        [$content, $trackables]     = $model->parseContentForTrackables(
+        $combined               = [$html, $plainText];
+        [$content, $trackables] = $model->parseContentForTrackables(
             $combined,
             [],
             'email',

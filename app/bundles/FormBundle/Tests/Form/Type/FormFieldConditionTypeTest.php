@@ -84,7 +84,7 @@ final class FormFieldConditionTypeTest extends \PHPUnit\Framework\TestCase
                     'expr',
                     ChoiceType::class,
                     [
-                        'choices'  => [
+                        'choices' => [
                             'mautic.core.operator.in'    => 'in',
                             'mautic.core.operator.notin' => 'notIn',
                         ],

@@ -35,12 +35,12 @@ class EmailRepositoryTest extends TestCase
     {
         $this->mockExcludedListIds($excludedListIds);
 
-        $emailId         = 5;
-        $listIds         = [22, 33];
-        $countOnly       = true;
-        $limit           = null;
-        $minContactId    = null;
-        $maxContactId    = null;
+        $emailId      = 5;
+        $listIds      = [22, 33];
+        $countOnly    = true;
+        $limit        = null;
+        $minContactId = null;
+        $maxContactId = null;
 
         $query = $this->repo->getEmailPendingQuery(
             $emailId,

@@ -630,7 +630,7 @@ class PublicControllerTest extends MauticMysqlTestCase
     {
         $request = new Request();
 
-        $pageModel    = $this->createMock(PageModel::class);
+        $pageModel = $this->createMock(PageModel::class);
         $pageModel->expects($this->once())->method('hitPage')->willReturnCallback(
             function (): void {
                 throw new InvalidDecodedStringException();

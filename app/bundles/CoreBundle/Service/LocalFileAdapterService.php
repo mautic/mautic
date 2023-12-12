@@ -21,7 +21,7 @@ class LocalFileAdapterService extends LocalFilesystemAdapter
                         'public'  => 0666,
                         'private' => 0600,
                     ],
-                    'dir'  => [
+                    'dir' => [
                         'public'  => 0777,
                         'private' => 0700,
                     ],

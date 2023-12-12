@@ -41,7 +41,7 @@ class ConfigType extends AbstractType
                     'resubscribe_message'    => 'html',
                     'webview_text'           => 'html',
                     // Encode special chars to keep congruent with Email entity custom headers
-                    'mailer_custom_headers'  => 'clean',
+                    'mailer_custom_headers' => 'clean',
                 ]
             )
         );
@@ -56,8 +56,8 @@ class ConfigType extends AbstractType
                     'class'   => 'form-control',
                     'tooltip' => 'mautic.email.config.unsubscribe_text.tooltip',
                 ],
-                'required'   => false,
-                'data'       => (array_key_exists('unsubscribe_text', $options['data']) && !empty($options['data']['unsubscribe_text']))
+                'required' => false,
+                'data'     => (array_key_exists('unsubscribe_text', $options['data']) && !empty($options['data']['unsubscribe_text']))
                     ? $options['data']['unsubscribe_text']
                     : $this->translator->trans(
                         'mautic.email.unsubscribe.text',
@@ -76,8 +76,8 @@ class ConfigType extends AbstractType
                     'class'   => 'form-control',
                     'tooltip' => 'mautic.email.config.webview_text.tooltip',
                 ],
-                'required'   => false,
-                'data'       => (array_key_exists('webview_text', $options['data']) && !empty($options['data']['webview_text']))
+                'required' => false,
+                'data'     => (array_key_exists('webview_text', $options['data']) && !empty($options['data']['webview_text']))
                     ? $options['data']['webview_text']
                     : $this->translator->trans(
                         'mautic.email.webview.text',
@@ -96,8 +96,8 @@ class ConfigType extends AbstractType
                     'class'   => 'form-control',
                     'tooltip' => 'mautic.email.config.unsubscribe_message.tooltip',
                 ],
-                'required'   => false,
-                'data'       => (array_key_exists('unsubscribe_message', $options['data']) && !empty($options['data']['unsubscribe_message']))
+                'required' => false,
+                'data'     => (array_key_exists('unsubscribe_message', $options['data']) && !empty($options['data']['unsubscribe_message']))
                     ? $options['data']['unsubscribe_message']
                     : $this->translator->trans(
                         'mautic.email.unsubscribed.success',
@@ -119,8 +119,8 @@ class ConfigType extends AbstractType
                     'class'   => 'form-control',
                     'tooltip' => 'mautic.email.config.resubscribe_message.tooltip',
                 ],
-                'required'   => false,
-                'data'       => (array_key_exists('resubscribe_message', $options['data']) && !empty($options['data']['resubscribe_message']))
+                'required' => false,
+                'data'     => (array_key_exists('resubscribe_message', $options['data']) && !empty($options['data']['resubscribe_message']))
                     ? $options['data']['resubscribe_message']
                     : $this->translator->trans(
                         'mautic.email.resubscribed.success',
@@ -142,8 +142,8 @@ class ConfigType extends AbstractType
                     'class'   => 'form-control',
                     'tooltip' => 'mautic.email.config.default_signature_text.tooltip',
                 ],
-                'required'   => false,
-                'data'       => (!empty($options['data']['default_signature_text']))
+                'required' => false,
+                'data'     => (!empty($options['data']['default_signature_text']))
                     ? $options['data']['default_signature_text']
                     : $this->translator->trans(
                         'mautic.email.default.signature',
@@ -158,9 +158,9 @@ class ConfigType extends AbstractType
             'mailer_from_name',
             TextType::class,
             [
-                'label'       => 'mautic.email.config.mailer.from.name',
-                'label_attr'  => ['class' => 'control-label'],
-                'attr'        => [
+                'label'      => 'mautic.email.config.mailer.from.name',
+                'label_attr' => ['class' => 'control-label'],
+                'attr'       => [
                     'class'    => 'form-control',
                     'tooltip'  => 'mautic.email.config.mailer.from.name.tooltip',
                     'onchange' => 'Mautic.disableSendTestEmailButton(this)',
@@ -179,9 +179,9 @@ class ConfigType extends AbstractType
             'mailer_from_email',
             TextType::class,
             [
-                'label'       => 'mautic.email.config.mailer.from.email',
-                'label_attr'  => ['class' => 'control-label'],
-                'attr'        => [
+                'label'      => 'mautic.email.config.mailer.from.email',
+                'label_attr' => ['class' => 'control-label'],
+                'attr'       => [
                     'class'    => 'form-control',
                     'tooltip'  => 'mautic.email.config.mailer.from.email.tooltip',
                     'onchange' => 'Mautic.disableSendTestEmailButton(this)',
@@ -206,9 +206,9 @@ class ConfigType extends AbstractType
             'mailer_reply_to_email',
             TextType::class,
             [
-                'label'       => 'mautic.email.reply_to_email',
-                'label_attr'  => ['class' => 'control-label'],
-                'attr'        => [
+                'label'      => 'mautic.email.reply_to_email',
+                'label_attr' => ['class' => 'control-label'],
+                'attr'       => [
                     'class'    => 'form-control',
                     'tooltip'  => 'mautic.email.reply_to_email.tooltip',
                     'onchange' => 'Mautic.disableSendTestEmailButton(this)',
@@ -229,9 +229,9 @@ class ConfigType extends AbstractType
             'mailer_reply_to_email',
             TextType::class,
             [
-                'label'       => 'mautic.email.reply_to_email',
-                'label_attr'  => ['class' => 'control-label'],
-                'attr'        => [
+                'label'      => 'mautic.email.reply_to_email',
+                'label_attr' => ['class' => 'control-label'],
+                'attr'       => [
                     'class'    => 'form-control',
                     'tooltip'  => 'mautic.email.reply_to_email.tooltip',
                     'onchange' => 'Mautic.disableSendTestEmailButton(this)',
@@ -258,7 +258,7 @@ class ConfigType extends AbstractType
                     'tooltip'  => 'mautic.email.config.mailer.return.path.tooltip',
                     'onchange' => 'Mautic.disableSendTestEmailButton(this)',
                 ],
-                'required'   => false,
+                'required' => false,
             ]
         );
 
@@ -284,8 +284,8 @@ class ConfigType extends AbstractType
                     'class'   => 'form-control',
                     'tooltip' => 'mautic.email.config.mailer.convert.embed.images.tooltip',
                 ],
-                'data'       => empty($options['data']['mailer_convert_embed_images']) ? false : true,
-                'required'   => false,
+                'data'     => empty($options['data']['mailer_convert_embed_images']) ? false : true,
+                'required' => false,
             ]
         );
 
@@ -299,8 +299,8 @@ class ConfigType extends AbstractType
                     'class'   => 'form-control',
                     'tooltip' => 'mautic.email.config.mailer.append.tracking.pixel.tooltip',
                 ],
-                'data'       => empty($options['data']['mailer_append_tracking_pixel']) ? false : true,
-                'required'   => false,
+                'data'     => empty($options['data']['mailer_append_tracking_pixel']) ? false : true,
+                'required' => false,
             ]
         );
 
@@ -314,8 +314,8 @@ class ConfigType extends AbstractType
                     'class'   => 'form-control',
                     'tooltip' => 'mautic.email.config.mailer.disable.trackable.urls.tooltip',
                 ],
-                'data'       => empty($options['data']['disable_trackable_urls']) ? false : true,
-                'required'   => false,
+                'data'     => empty($options['data']['disable_trackable_urls']) ? false : true,
+                'required' => false,
             ]
         );
 
@@ -329,8 +329,8 @@ class ConfigType extends AbstractType
                     'class'   => 'form-control',
                     'tooltip' => 'mautic.email.config.mailer.minify.html.tooltip',
                 ],
-                'data'       => $options['data'][self::MINIFY_EMAIL_HTML] ?? false,
-                'required'   => false,
+                'data'     => $options['data'][self::MINIFY_EMAIL_HTML] ?? false,
+                'required' => false,
             ]
         );
 
@@ -338,9 +338,9 @@ class ConfigType extends AbstractType
             'mailer_custom_headers',
             SortableListType::class,
             [
-                'required'        => false,
-                'label'           => 'mautic.email.custom_headers',
-                'attr'            => [
+                'required' => false,
+                'label'    => 'mautic.email.custom_headers',
+                'attr'     => [
                     'tooltip'  => 'mautic.email.custom_headers.config.tooltip',
                     'onchange' => 'Mautic.disableSendTestEmailButton(this)',
                 ],
@@ -370,8 +370,8 @@ class ConfigType extends AbstractType
                     'class'   => 'form-control',
                     'tooltip' => 'mautic.email.config.mailer.is.owner.tooltip',
                 ],
-                'data'       => empty($options['data']['mailer_is_owner']) ? false : true,
-                'required'   => false,
+                'data'     => empty($options['data']['mailer_is_owner']) ? false : true,
+                'required' => false,
             ]
         );
         $builder->add(
@@ -391,7 +391,7 @@ class ConfigType extends AbstractType
             'email_frequency_time',
             ChoiceType::class,
             [
-                'choices'           => [
+                'choices' => [
                     'day'   => 'DAY',
                     'week'  => 'WEEK',
                     'month' => 'MONTH',
@@ -415,8 +415,8 @@ class ConfigType extends AbstractType
                     'class'   => 'form-control',
                     'tooltip' => 'mautic.email.config.show.contact.segments.tooltip',
                 ],
-                'data'       => empty($options['data']['show_contact_segments']) ? false : true,
-                'required'   => false,
+                'data'     => empty($options['data']['show_contact_segments']) ? false : true,
+                'required' => false,
             ]
         );
         $builder->add(
@@ -429,8 +429,8 @@ class ConfigType extends AbstractType
                     'class'   => 'form-control',
                     'tooltip' => 'mautic.email.config.show.preference.options.tooltip',
                 ],
-                'data'       => empty($options['data']['show_contact_preferences']) ? false : true,
-                'required'   => false,
+                'data'     => empty($options['data']['show_contact_preferences']) ? false : true,
+                'required' => false,
             ]
         );
         $builder->add(
@@ -443,8 +443,8 @@ class ConfigType extends AbstractType
                     'class'   => 'form-control',
                     'tooltip' => 'mautic.email.config.show.contact.frequency.tooltip',
                 ],
-                'data'       => empty($options['data']['show_contact_frequency']) ? false : true,
-                'required'   => false,
+                'data'     => empty($options['data']['show_contact_frequency']) ? false : true,
+                'required' => false,
             ]
         );
         $builder->add(
@@ -457,8 +457,8 @@ class ConfigType extends AbstractType
                     'class'   => 'form-control',
                     'tooltip' => 'mautic.email.config.show.contact.pause.dates.tooltip',
                 ],
-                'data'       => empty($options['data']['show_contact_pause_dates']) ? false : true,
-                'required'   => false,
+                'data'     => empty($options['data']['show_contact_pause_dates']) ? false : true,
+                'required' => false,
             ]
         );
         $builder->add(
@@ -471,8 +471,8 @@ class ConfigType extends AbstractType
                     'class'   => 'form-control',
                     'tooltip' => 'mautic.email.config.show.contact.categories.tooltip',
                 ],
-                'data'       => empty($options['data']['show_contact_categories']) ? false : true,
-                'required'   => false,
+                'data'     => empty($options['data']['show_contact_categories']) ? false : true,
+                'required' => false,
             ]
         );
         $builder->add(
@@ -485,8 +485,8 @@ class ConfigType extends AbstractType
                     'class'   => 'form-control',
                     'tooltip' => 'mautic.email.config.show.contact.preferred.channels',
                 ],
-                'data'       => empty($options['data']['show_contact_preferred_channels']) ? false : true,
-                'required'   => false,
+                'data'     => empty($options['data']['show_contact_preferred_channels']) ? false : true,
+                'required' => false,
             ]
         );
     }

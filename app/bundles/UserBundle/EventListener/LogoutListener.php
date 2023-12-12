@@ -17,7 +17,7 @@ class LogoutListener implements \Symfony\Component\EventDispatcher\EventSubscrib
         protected EventDispatcherInterface $dispatcher,
         UserHelper $userHelper
     ) {
-        $this->user       = $userHelper->getUser();
+        $this->user = $userHelper->getUser();
     }
 
     public function onLogout(\Symfony\Component\Security\Http\Event\LogoutEvent $logoutEvent): void

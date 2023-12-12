@@ -42,18 +42,18 @@ class SortableListType extends AbstractType
                 'list',
                 CollectionType::class,
                 [
-                    'label'          => false,
-                    'entry_type'     => ($options['with_labels']) ? SortableValueLabelListType::class : $options['entry_type'],
-                    'entry_options'  => [
-                        'label'          => false,
-                        'required'       => false,
-                        'attr'           => [
+                    'label'         => false,
+                    'entry_type'    => ($options['with_labels']) ? SortableValueLabelListType::class : $options['entry_type'],
+                    'entry_options' => [
+                        'label'    => false,
+                        'required' => false,
+                        'attr'     => [
                             'class'         => 'form-control',
                             'preaddon'      => $options['remove_icon'],
                             'preaddon_attr' => [
                                 'onclick' => $options['remove_onclick'],
                             ],
-                            'postaddon'     => $options['sortable'],
+                            'postaddon' => $options['sortable'],
                         ],
                         'constraints'    => $options['option_constraint'],
                         'error_bubbling' => true,
@@ -88,8 +88,8 @@ class SortableListType extends AbstractType
                 'entry_type'          => TextType::class,
                 'add_value_button'    => 'mautic.core.form.list.additem',
                 // Stores as [label => value] array instead of [list => [[label => the label, value => the value], ...]]
-                'key_value_pairs'     => false,
-                'option_constraint'   => [],
+                'key_value_pairs'   => false,
+                'option_constraint' => [],
             ]
         );
 

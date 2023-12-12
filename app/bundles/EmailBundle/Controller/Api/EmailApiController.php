@@ -147,10 +147,10 @@ class EmailApiController extends CommonApiController
                 return $lead;
             }
 
-            $post       = $request->request->all();
-            $tokens     = (!empty($post['tokens'])) ? $post['tokens'] : [];
-            $assetsIds  = (!empty($post['assetAttachments'])) ? $post['assetAttachments'] : [];
-            $response   = ['success' => false];
+            $post      = $request->request->all();
+            $tokens    = (!empty($post['tokens'])) ? $post['tokens'] : [];
+            $assetsIds = (!empty($post['assetAttachments'])) ? $post['assetAttachments'] : [];
+            $response  = ['success' => false];
 
             $cleanTokens = [];
 
@@ -173,12 +173,12 @@ class EmailApiController extends CommonApiController
                 $entity,
                 $leadFields,
                 [
-                    'source'            => ['api', 0],
-                    'tokens'            => $cleanTokens,
-                    'assetAttachments'  => $assetsIds,
-                    'return_errors'     => true,
-                    'ignoreDNC'         => true,
-                    'email_type'        => MailHelper::EMAIL_TYPE_TRANSACTIONAL,
+                    'source'           => ['api', 0],
+                    'tokens'           => $cleanTokens,
+                    'assetAttachments' => $assetsIds,
+                    'return_errors'    => true,
+                    'ignoreDNC'        => true,
+                    'email_type'       => MailHelper::EMAIL_TYPE_TRANSACTIONAL,
                 ]
             );
 

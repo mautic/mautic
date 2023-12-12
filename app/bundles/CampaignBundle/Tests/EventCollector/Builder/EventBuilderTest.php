@@ -12,7 +12,7 @@ class EventBuilderTest extends \PHPUnit\Framework\TestCase
     public function testActionsAreConvertedToAccessor(): void
     {
         $array = [
-            'some.action'  => [
+            'some.action' => [
                 'batchEventName' => 'some.action',
             ],
             'other.action' => [
@@ -32,7 +32,7 @@ class EventBuilderTest extends \PHPUnit\Framework\TestCase
     public function testConditionsAreConvertedToAccessor(): void
     {
         $array = [
-            'some.condition'  => [
+            'some.condition' => [
                 'eventName' => 'some.condition',
             ],
             'other.condition' => [
@@ -52,7 +52,7 @@ class EventBuilderTest extends \PHPUnit\Framework\TestCase
     public function testDecisionsAreConvertedToAccessor(): void
     {
         $array = [
-            'some.decision'  => [
+            'some.decision' => [
                 'eventName' => 'some.decision',
             ],
             'other.decision' => [

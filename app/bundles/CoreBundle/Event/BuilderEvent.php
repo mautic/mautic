@@ -8,11 +8,11 @@ use Symfony\Contracts\EventDispatcher\Event;
 
 class BuilderEvent extends Event
 {
-    protected $slotTypes            = [];
+    protected $slotTypes = [];
 
-    protected $sections             = [];
+    protected $sections = [];
 
-    protected $tokens               = [];
+    protected $tokens = [];
 
     protected $abTestWinnerCriteria = [];
 

@@ -63,8 +63,8 @@ class ListController extends CommonController
         }
 
         // set limits
-        $limit   = $session->get('mautic.marketplace.package.limit', $this->coreParametersHelper->get('default_pagelimit'));
-        $route   = $this->routeProvider->buildListRoute($page);
+        $limit = $session->get('mautic.marketplace.package.limit', $this->coreParametersHelper->get('default_pagelimit'));
+        $route = $this->routeProvider->buildListRoute($page);
 
         return $this->delegateView(
             [

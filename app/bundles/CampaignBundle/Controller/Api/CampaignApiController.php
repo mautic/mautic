@@ -54,12 +54,12 @@ class CampaignApiController extends CommonApiController
         $campaignModel = $modelFactory->getModel('campaign');
         \assert($campaignModel instanceof CampaignModel);
 
-        $this->model             = $campaignModel;
-        $this->entityClass       = Campaign::class;
-        $this->entityNameOne     = 'campaign';
-        $this->entityNameMulti   = 'campaigns';
-        $this->permissionBase    = 'campaign:campaigns';
-        $this->serializerGroups  = ['campaignDetails', 'campaignEventDetails', 'categoryList', 'publishDetails', 'leadListList', 'formList'];
+        $this->model            = $campaignModel;
+        $this->entityClass      = Campaign::class;
+        $this->entityNameOne    = 'campaign';
+        $this->entityNameMulti  = 'campaigns';
+        $this->permissionBase   = 'campaign:campaigns';
+        $this->serializerGroups = ['campaignDetails', 'campaignEventDetails', 'categoryList', 'publishDetails', 'leadListList', 'formList'];
 
         parent::__construct($security, $translator, $entityResultHelper, $router, $formFactory, $appVersion, $requestStack, $doctrine, $modelFactory, $dispatcher, $coreParametersHelper, $factory);
     }

@@ -35,11 +35,11 @@ class CampaignSubscriber implements EventSubscriberInterface
     public function onCampaignBuild(CampaignBuilderEvent $event): void
     {
         $action = [
-            'label'            => 'mautic.stage.campaign.event.change',
-            'description'      => 'mautic.stage.campaign.event.change_descr',
-            'batchEventName'   => StageEvents::ON_CAMPAIGN_BATCH_ACTION,
-            'formType'         => StageActionChangeType::class,
-            'formTheme'        => '@MauticStage/FormTheme/Action/_stageaction_properties_row.html.twig',
+            'label'          => 'mautic.stage.campaign.event.change',
+            'description'    => 'mautic.stage.campaign.event.change_descr',
+            'batchEventName' => StageEvents::ON_CAMPAIGN_BATCH_ACTION,
+            'formType'       => StageActionChangeType::class,
+            'formTheme'      => '@MauticStage/FormTheme/Action/_stageaction_properties_row.html.twig',
         ];
         $event->addAction('stage.change', $action);
     }

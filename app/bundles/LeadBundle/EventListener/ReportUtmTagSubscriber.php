@@ -36,9 +36,9 @@ class ReportUtmTagSubscriber implements EventSubscriberInterface
             return;
         }
 
-        $columns           = $this->fieldsBuilder->getLeadFieldsColumns('l.');
-        $companyColumns    = $this->companyReportData->getCompanyData();
-        $leadFilter        = $this->fieldsBuilder->getLeadFilter('l.', 's.');
+        $columns        = $this->fieldsBuilder->getLeadFieldsColumns('l.');
+        $companyColumns = $this->companyReportData->getCompanyData();
+        $leadFilter     = $this->fieldsBuilder->getLeadFilter('l.', 's.');
 
         $utmTagColumns = [
             'utm.utm_campaign' => [

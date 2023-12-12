@@ -96,7 +96,7 @@ class LeadController extends FormController
         $session->set('mautic.lead.filter', $search);
 
         // do some default filtering
-        $orderBy    = $session->get('mautic.lead.orderby', 'l.last_active');
+        $orderBy = $session->get('mautic.lead.orderby', 'l.last_active');
         // Add an id field to orderBy. Prevent Null-value ordering
         $orderById  = 'l.id' !== $orderBy ? ', l.id' : '';
         $orderBy    = $orderBy.$orderById;
@@ -1379,7 +1379,7 @@ class LeadController extends FormController
         }
 
         // Check if lead has a bounce status
-        $dnc    = $this->doctrine->getManager()->getRepository(\Mautic\LeadBundle\Entity\DoNotContact::class)->getEntriesByLeadAndChannel($lead, 'email');
+        $dnc = $this->doctrine->getManager()->getRepository(\Mautic\LeadBundle\Entity\DoNotContact::class)->getEntriesByLeadAndChannel($lead, 'email');
 
         $action = $this->generateUrl('mautic_contact_action', ['objectAction' => 'email', 'objectId' => $objectId]);
         $form   = $this->formFactory->create(EmailType::class, $email, ['action' => $action]);
@@ -1589,7 +1589,7 @@ class LeadController extends FormController
             $this->addFlashMessage(
                 'mautic.lead.batch_leads_affected',
                 [
-                    '%count%'     => $count,
+                    '%count%' => $count,
                 ]
             );
 
@@ -1682,7 +1682,7 @@ class LeadController extends FormController
             $this->addFlashMessage(
                 'mautic.lead.batch_leads_affected',
                 [
-                    '%count%'     => $count,
+                    '%count%' => $count,
                 ]
             );
 
@@ -1778,7 +1778,7 @@ class LeadController extends FormController
             $this->addFlashMessage(
                 'mautic.lead.batch_leads_affected',
                 [
-                    '%count%'     => $count,
+                    '%count%' => $count,
                 ]
             );
 
@@ -1877,7 +1877,7 @@ class LeadController extends FormController
             $this->addFlashMessage(
                 'mautic.lead.batch_leads_affected',
                 [
-                    '%count%'     => $count,
+                    '%count%' => $count,
                 ]
             );
 
@@ -1956,10 +1956,10 @@ class LeadController extends FormController
         }
 
         /** @var \Mautic\LeadBundle\Model\LeadModel $model */
-        $model      = $this->getModel('lead');
-        $session    = $request->getSession();
-        $search     = $session->get('mautic.lead.filter', '');
-        $orderBy    = $session->get('mautic.lead.orderby', 'l.last_active');
+        $model   = $this->getModel('lead');
+        $session = $request->getSession();
+        $search  = $session->get('mautic.lead.filter', '');
+        $orderBy = $session->get('mautic.lead.orderby', 'l.last_active');
         // Add an id field to orderBy. Prevent Null-value ordering
         $orderById  = 'l.id' !== $orderBy ? ', l.id' : '';
         $orderBy    = $orderBy.$orderById;

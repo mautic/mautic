@@ -40,8 +40,8 @@ class AjaxController extends CommonAjaxController
                     continue;
                 }
                 $data[] = [
-                    'id'          => $id,
-                    'pending'     => $this->translator->trans(
+                    'id'      => $id,
+                    'pending' => $this->translator->trans(
                         'mautic.sms.stat.leadcount',
                         ['%count%' => $pending]
                     ),

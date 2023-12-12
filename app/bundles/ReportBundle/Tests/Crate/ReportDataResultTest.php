@@ -67,7 +67,7 @@ class ReportDataResultTest extends \PHPUnit\Framework\TestCase
     {
         $fixture           = Fixtures::getValidReportResult();
         $reportDataResult  = new ReportDataResult($fixture);
-        $expectedDataCount =  count($fixture['data']);
+        $expectedDataCount = count($fixture['data']);
         $actualDataCount   = $reportDataResult->getDataCount();
 
         $fixture['data']       = [];

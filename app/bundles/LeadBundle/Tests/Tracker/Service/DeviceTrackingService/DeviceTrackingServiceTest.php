@@ -31,12 +31,12 @@ final class DeviceTrackingServiceTest extends \PHPUnit\Framework\TestCase
 
     protected function setUp(): void
     {
-        $this->cookieHelperMock            = $this->createMock(CookieHelper::class);
-        $this->entityManagerMock           = $this->createMock(EntityManagerInterface::class);
-        $this->randomHelperMock            = $this->createMock(RandomHelperInterface::class);
-        $this->leadDeviceRepositoryMock    = $this->createMock(LeadDeviceRepository::class);
-        $this->requestStackMock            = $this->createMock(RequestStack::class);
-        $this->security                    = $this->createMock(CorePermissions::class);
+        $this->cookieHelperMock         = $this->createMock(CookieHelper::class);
+        $this->entityManagerMock        = $this->createMock(EntityManagerInterface::class);
+        $this->randomHelperMock         = $this->createMock(RandomHelperInterface::class);
+        $this->leadDeviceRepositoryMock = $this->createMock(LeadDeviceRepository::class);
+        $this->requestStackMock         = $this->createMock(RequestStack::class);
+        $this->security                 = $this->createMock(CorePermissions::class);
     }
 
     public function testIsTrackedTrue(): void

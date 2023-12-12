@@ -31,7 +31,7 @@ class LookupHelper
         protected LeadModel $leadModel,
         protected CompanyModel $companyModel
     ) {
-        $this->integration  = $integrationHelper->getIntegrationObject('FullContact');
+        $this->integration = $integrationHelper->getIntegrationObject('FullContact');
     }
 
     /**
@@ -94,8 +94,8 @@ class LookupHelper
         if ($fullcontact = $this->getFullContact(false)) {
             if (!$checkAuto || ($checkAuto && $this->integration->shouldAutoUpdate())) {
                 try {
-                    $parse                             = parse_url($website);
-                    [$cacheId, $webhookId, $cache]     = $this->getCache($company, $notify);
+                    $parse                         = parse_url($website);
+                    [$cacheId, $webhookId, $cache] = $this->getCache($company, $notify);
 
                     if (isset($parse['host']) && !array_key_exists($cacheId, $cache['fullcontact'])) {
                         $fullcontact->setWebhookUrl(
@@ -129,9 +129,9 @@ class LookupHelper
     public function validateRequest($oid)
     {
         // prefix#entityId#hour#userId#nonce
-        [$w, $id, $hour, $uid, $nonce]     = explode('#', $oid, 5);
-        $notify                            = (str_contains($w, '_notify') && $uid) ? $uid : false;
-        $type                              = (str_starts_with($w, 'fullcontactcomp')) ? 'company' : 'person';
+        [$w, $id, $hour, $uid, $nonce] = explode('#', $oid, 5);
+        $notify                        = (str_contains($w, '_notify') && $uid) ? $uid : false;
+        $type                          = (str_starts_with($w, 'fullcontactcomp')) ? 'company' : 'person';
 
         switch ($type) {
             case 'person':

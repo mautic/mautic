@@ -36,7 +36,7 @@ final class DateHelper
             'time'     => $timeOnlyFormat,
         ];
 
-        $this->helper               = new DateTimeHelper('', 'Y-m-d H:i:s', 'local');
+        $this->helper = new DateTimeHelper('', 'Y-m-d H:i:s', 'local');
     }
 
     /**

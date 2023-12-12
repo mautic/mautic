@@ -490,7 +490,7 @@ JS;
     {
         $js = '';
 
-        $lead   = $this->trackingHelper->getLead();
+        $lead = $this->trackingHelper->getLead();
 
         if ($id = $this->trackingHelper->displayInitCode('google_analytics')) {
             $gtagSettings = [];

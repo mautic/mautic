@@ -112,7 +112,7 @@ class DateHelperTest extends \PHPUnit\Framework\TestCase
         $reflectedClass    = new \ReflectionClass($this->helper);
         $reflectedProperty = $reflectedClass->getProperty('helper');
         $reflectedProperty->setAccessible(true);
-        $dateTimeHelper     = $reflectedProperty->getValue($this->helper);
+        $dateTimeHelper = $reflectedProperty->getValue($this->helper);
 
         $reflectedClass     = new \ReflectionClass($dateTimeHelper);
         $reflectedProperty2 = $reflectedClass->getProperty('defaultLocalTimezone');

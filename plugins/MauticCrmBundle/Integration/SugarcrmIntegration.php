@@ -928,8 +928,8 @@ class SugarcrmIntegration extends CrmAbstractIntegration
                     '6.x/community' => '6',
                     '7.x'           => '7',
                 ],
-                'label'             => 'mautic.sugarcrm.form.version',
-                'constraints'       => [
+                'label'       => 'mautic.sugarcrm.form.version',
+                'constraints' => [
                     new NotBlank([
                         'message' => 'mautic.core.value.required',
                     ]),
@@ -945,13 +945,13 @@ class SugarcrmIntegration extends CrmAbstractIntegration
                     'choices' => [
                         'mautic.sugarcrm.updateOwner' => 'updateOwner',
                     ],
-                    'expanded'          => true,
-                    'multiple'          => true,
-                    'label'             => 'mautic.sugarcrm.form.updateOwner',
-                    'label_attr'        => ['class' => 'control-label'],
-                    'placeholder'       => false,
-                    'required'          => false,
-                    'attr'              => [
+                    'expanded'    => true,
+                    'multiple'    => true,
+                    'label'       => 'mautic.sugarcrm.form.updateOwner',
+                    'label_attr'  => ['class' => 'control-label'],
+                    'placeholder' => false,
+                    'required'    => false,
+                    'attr'        => [
                         'onclick' => 'Mautic.postForm(mQuery(\'form[name="integration_details"]\'),\'\');',
                     ],
                 ]
@@ -964,13 +964,13 @@ class SugarcrmIntegration extends CrmAbstractIntegration
                     'choices' => [
                         'mautic.sugarcrm.updateDnc' => 'updateDnc',
                     ],
-                    'expanded'          => true,
-                    'multiple'          => true,
-                    'label'             => 'mautic.sugarcrm.form.updateDnc',
-                    'label_attr'        => ['class' => 'control-label'],
-                    'placeholder'       => false,
-                    'required'          => false,
-                    'attr'              => [
+                    'expanded'    => true,
+                    'multiple'    => true,
+                    'label'       => 'mautic.sugarcrm.form.updateDnc',
+                    'label_attr'  => ['class' => 'control-label'],
+                    'placeholder' => false,
+                    'required'    => false,
+                    'attr'        => [
                         'onclick' => 'Mautic.postForm(mQuery(\'form[name="integration_details"]\'),\'\');',
                     ],
                 ]
@@ -983,12 +983,12 @@ class SugarcrmIntegration extends CrmAbstractIntegration
                     'choices' => [
                         'mautic.integrations.blanks' => 'updateBlanks',
                     ],
-                    'expanded'          => true,
-                    'multiple'          => true,
-                    'label'             => 'mautic.integrations.form.blanks',
-                    'label_attr'        => ['class' => 'control-label'],
-                    'placeholder'       => false,
-                    'required'          => false,
+                    'expanded'    => true,
+                    'multiple'    => true,
+                    'label'       => 'mautic.integrations.form.blanks',
+                    'label_attr'  => ['class' => 'control-label'],
+                    'placeholder' => false,
+                    'required'    => false,
                 ]
             );
 
@@ -1001,12 +1001,12 @@ class SugarcrmIntegration extends CrmAbstractIntegration
                         'mautic.sugarcrm.object.contact' => 'Contacts',
                         'mautic.sugarcrm.object.company' => 'company',
                     ],
-                    'expanded'          => true,
-                    'multiple'          => true,
-                    'label'             => 'mautic.sugarcrm.form.objects_to_pull_from',
-                    'label_attr'        => ['class' => ''],
-                    'placeholder'       => false,
-                    'required'          => false,
+                    'expanded'    => true,
+                    'multiple'    => true,
+                    'label'       => 'mautic.sugarcrm.form.objects_to_pull_from',
+                    'label_attr'  => ['class' => ''],
+                    'placeholder' => false,
+                    'required'    => false,
                 ]
             );
 
@@ -1014,9 +1014,9 @@ class SugarcrmIntegration extends CrmAbstractIntegration
                 'activityEvents',
                 ChoiceType::class,
                 [
-                    'choices'           => array_flip($this->leadModel->getEngagementTypes()), // Choice type expects labels as keys
-                    'label'             => 'mautic.salesforce.form.activity_included_events',
-                    'label_attr'        => [
+                    'choices'    => array_flip($this->leadModel->getEngagementTypes()), // Choice type expects labels as keys
+                    'label'      => 'mautic.salesforce.form.activity_included_events',
+                    'label_attr' => [
                         'class'       => 'control-label',
                         'data-toggle' => 'tooltip',
                         'title'       => $this->translator->trans('mautic.salesforce.form.activity.events.tooltip'),
@@ -1178,13 +1178,13 @@ class SugarcrmIntegration extends CrmAbstractIntegration
      */
     public function pushLeads($params = []): array
     {
-        [$fromDate, $toDate]     = $this->getSyncTimeframeDates($params);
-        $limit                   = $params['limit'];
-        $config                  = $this->mergeConfigToFeatureSettings();
-        $integrationEntityRepo   = $this->em->getRepository(\Mautic\PluginBundle\Entity\IntegrationEntity::class);
-        $mauticData              = $leadsToUpdate              = $fields              = [];
-        $fieldsToUpdateInSugar   = isset($config['update_mautic']) ? array_keys($config['update_mautic'], 0) : [];
-        $leadFields              = $config['leadFields'];
+        [$fromDate, $toDate]   = $this->getSyncTimeframeDates($params);
+        $limit                 = $params['limit'];
+        $config                = $this->mergeConfigToFeatureSettings();
+        $integrationEntityRepo = $this->em->getRepository(\Mautic\PluginBundle\Entity\IntegrationEntity::class);
+        $mauticData            = $leadsToUpdate = $fields = [];
+        $fieldsToUpdateInSugar = isset($config['update_mautic']) ? array_keys($config['update_mautic'], 0) : [];
+        $leadFields            = $config['leadFields'];
         if (!empty($leadFields)) {
             if ($keys = array_keys($leadFields, 'mauticContactTimelineLink')) {
                 foreach ($keys as $key) {
@@ -1264,8 +1264,8 @@ class SugarcrmIntegration extends CrmAbstractIntegration
 
         // Create any left over
         if ($checkEmailsInSugar && isset($checkEmailsInSugar['Leads'])) {
-            [$checkEmailsInSugar, $deletedSugarLeads]     = $this->getObjectDataToUpdate($checkEmailsInSugar['Leads'], $mauticData, $availableFields, $contactSugarFields, $leadSugarFields, 'Leads');
-            $ownerAssignedUserIdByEmail                   = null;
+            [$checkEmailsInSugar, $deletedSugarLeads] = $this->getObjectDataToUpdate($checkEmailsInSugar['Leads'], $mauticData, $availableFields, $contactSugarFields, $leadSugarFields, 'Leads');
+            $ownerAssignedUserIdByEmail               = null;
             foreach ($checkEmailsInSugar as $lead) {
                 if (isset($lead['email'])) {
                     $lead['owner_email'] = $this->getOwnerEmail($lead);
@@ -1508,7 +1508,7 @@ class SugarcrmIntegration extends CrmAbstractIntegration
                     } else {
                         $value = $lead[$mauticField];
                     }
-                    $body[] = ['name' => $sugarField, 'value' =>  $value];
+                    $body[] = ['name' => $sugarField, 'value' => $value];
                 } elseif ($required) {
                     $value  = $this->translator->trans('mautic.integration.form.lead.unknown');
                     $body[] = ['name' => $sugarField, 'value' => $value];
@@ -1778,11 +1778,11 @@ class SugarcrmIntegration extends CrmAbstractIntegration
     public function convertSuiteCrmToMauticMultiSelect($suiteCrmMultiSelectStringToConvert): string
     {
         // Mautic Multi Select format - 'choice1|choice2|choice_3'
-        $regexString            = '/(\^)(?:([A-Za-z0-9\-\_]+))(\^)/';
+        $regexString = '/(\^)(?:([A-Za-z0-9\-\_]+))(\^)/';
         preg_match_all($regexString, $suiteCrmMultiSelectStringToConvert, $matches, PREG_SET_ORDER, 0);
-        $convertedString        = '';
+        $convertedString = '';
         foreach ($matches as $innerArray) {
-            $convertedString     = $convertedString.$innerArray[2].'|';
+            $convertedString = $convertedString.$innerArray[2].'|';
         }
 
         return substr($convertedString, 0, -1);

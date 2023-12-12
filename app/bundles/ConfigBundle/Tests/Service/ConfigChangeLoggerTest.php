@@ -58,7 +58,7 @@ class ConfigChangeLoggerTest extends \PHPUnit\Framework\TestCase
             'mailer_is_owner'    => 'lksajhd',
         ];
 
-        $log     = [
+        $log = [
             'bundle'    => 'config',
             'object'    => 'config',
             'objectId'  => 0,

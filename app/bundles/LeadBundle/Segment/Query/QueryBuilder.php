@@ -227,7 +227,7 @@ class QueryBuilder extends BaseQueryBuilder
             return $leadTable.'.id';
         }
 
-        $joins     = $parts['join'][$leadTable];
+        $joins = $parts['join'][$leadTable];
 
         foreach ($joins as $join) {
             if ('right' == $join['joinType']) {
@@ -288,7 +288,7 @@ class QueryBuilder extends BaseQueryBuilder
     {
         $params = $this->getParameters();
         $sql    = $this->getSQL();
-        foreach ($params as $key=>$val) {
+        foreach ($params as $key => $val) {
             if (!is_int($val) && !is_float($val) && !is_array($val)) {
                 $val = "'$val'";
             } elseif (is_array($val)) {

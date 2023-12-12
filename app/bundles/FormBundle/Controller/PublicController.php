@@ -65,7 +65,7 @@ class PublicController extends CommonFormController
                 $postActionProperty = $form->getPostActionProperty();
 
                 // check to ensure the form is published
-                $status             = $form->getPublishStatus();
+                $status = $form->getPublishStatus();
                 if ('pending' == $status) {
                     $error = $translator->trans(
                         'mautic.form.submit.error.pending',
@@ -350,8 +350,8 @@ class PublicController extends CommonFormController
 
         $model = $this->getModel('form.form');
         \assert($model instanceof FormModel);
-        $form  = $model->getEntity($formId);
-        $js    = '';
+        $form = $model->getEntity($formId);
+        $js   = '';
 
         if (null !== $form) {
             $status = $form->getPublishStatus();

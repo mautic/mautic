@@ -68,8 +68,8 @@ class ArrayHelperTest extends \PHPUnit\Framework\TestCase
     public function testflipArray(): void
     {
         $array = [
-            'first' => 'Custom first',
-            'second'=> 'Custom second',
+            'first'  => 'Custom first',
+            'second' => 'Custom second',
         ];
 
         $this->assertSame(array_flip($array), ArrayHelper::flipArray($array));

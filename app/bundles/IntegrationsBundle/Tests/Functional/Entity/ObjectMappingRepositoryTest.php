@@ -12,15 +12,15 @@ use PHPUnit\Framework\Assert;
 
 final class ObjectMappingRepositoryTest extends MauticMysqlTestCase
 {
-    private const INTEGRATION             = 'integration';
+    private const INTEGRATION = 'integration';
 
     private const INTEGRATION_OBJECT_NAME = 'integrationObjectName';
 
-    private const INTEGRATION_OBJECT_ID   = '123';
+    private const INTEGRATION_OBJECT_ID = '123';
 
-    private const INTERNAL_OBJECT_NAME    = 'internalObjectName';
+    private const INTERNAL_OBJECT_NAME = 'internalObjectName';
 
-    private const INTERNAL_OBJECT_ID      = 569;
+    private const INTERNAL_OBJECT_ID = 569;
 
     private ObjectMappingRepository $repository;
 

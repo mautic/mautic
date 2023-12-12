@@ -44,7 +44,7 @@ class WebhookKillNotificatorTest extends \PHPUnit\Framework\TestCase
                 [$reason],
                 [
                     'mautic.webhook.stopped.details',
-                    ['%reason%'  => $reason, '%webhook%' => $htmlUrl],
+                    ['%reason%' => $reason, '%webhook%' => $htmlUrl],
                 ]
             )
             ->willReturnOnConsecutiveCalls($subject, $reason, $details);
@@ -148,7 +148,7 @@ class WebhookKillNotificatorTest extends \PHPUnit\Framework\TestCase
                 [$reason],
                 [
                     'mautic.webhook.stopped.details',
-                    ['%reason%'  => $reason, '%webhook%' => $htmlUrl],
+                    ['%reason%' => $reason, '%webhook%' => $htmlUrl],
                 ]
             )
             ->willReturnOnConsecutiveCalls($subject, $reason, $details);

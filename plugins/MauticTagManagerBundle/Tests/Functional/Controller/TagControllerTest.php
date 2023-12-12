@@ -46,8 +46,8 @@ class TagControllerTest extends MauticMysqlTestCase
     public function testIndexActionWhenNotFiltered(): void
     {
         $this->client->request('GET', '/s/tags');
-        $clientResponse         = $this->client->getResponse();
-        $clientResponseContent  = $clientResponse->getContent();
+        $clientResponse        = $this->client->getResponse();
+        $clientResponseContent = $clientResponse->getContent();
 
         $this->assertTrue($clientResponse->isOk(), 'Return code must be 200.');
         $this->assertStringContainsString('tag1', $clientResponseContent, 'The return must contain tag1');
@@ -60,8 +60,8 @@ class TagControllerTest extends MauticMysqlTestCase
     public function testIndexActionWhenFiltered(): void
     {
         $this->client->request('GET', '/s/tags?search=tag1');
-        $clientResponse         = $this->client->getResponse();
-        $clientResponseContent  = $clientResponse->getContent();
+        $clientResponse        = $this->client->getResponse();
+        $clientResponseContent = $clientResponse->getContent();
 
         $this->assertTrue($clientResponse->isOk(), 'Return code must be 200.');
         $this->assertStringContainsString('tag1', $clientResponseContent, 'The return must contain tag1');
@@ -86,8 +86,8 @@ class TagControllerTest extends MauticMysqlTestCase
         $tag = $this->tagRepository->findOneBy([]);
 
         $this->client->request('GET', '/s/tags/view/'.$tag->getId());
-        $clientResponse         = $this->client->getResponse();
-        $clientResponseContent  = $clientResponse->getContent();
+        $clientResponse        = $this->client->getResponse();
+        $clientResponseContent = $clientResponse->getContent();
         $this->assertTrue($clientResponse->isOk(), 'Return code must be 200.');
         $this->assertStringContainsString($tag->getTag(), $clientResponseContent, 'The return must contain tag');
     }
@@ -108,9 +108,9 @@ class TagControllerTest extends MauticMysqlTestCase
         $TagName = 'Test tag';
         $tag     = $this->tagRepository->findOneBy([]);
 
-        $crawler                = $this->client->request('GET', '/s/tags/edit/'.$tag->getId());
-        $clientResponse         = $this->client->getResponse();
-        $clientResponseContent  = $clientResponse->getContent();
+        $crawler               = $this->client->request('GET', '/s/tags/edit/'.$tag->getId());
+        $clientResponse        = $this->client->getResponse();
+        $clientResponseContent = $clientResponse->getContent();
         $this->assertTrue($clientResponse->isOk(), 'Return code must be 200.');
         $this->assertStringContainsString('Edit tag: '.$tag->getTag(), $clientResponseContent, 'The return must contain \'Edit tag\' text');
 
@@ -174,8 +174,8 @@ class TagControllerTest extends MauticMysqlTestCase
         $crawler = $this->client->request(Request::METHOD_GET, '/s/tags/new');
         Assert::assertTrue($this->client->getResponse()->isOk());
 
-        $buttonCrawler  = $crawler->selectButton('Save & Close');
-        $form           = $buttonCrawler->form();
+        $buttonCrawler = $crawler->selectButton('Save & Close');
+        $form          = $buttonCrawler->form();
         $form->setValues(['tag_entity[tag]' => '']);
         $this->client->submit($form);
         Assert::assertTrue($this->client->getResponse()->isOk());

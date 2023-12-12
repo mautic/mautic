@@ -50,7 +50,7 @@ class DisplayCounter
 
     public function getAlwaysDisplayFields(): int
     {
-        $i= 0;
+        $i = 0;
         /** @var Field $field */
         foreach ($this->form->getFields()->toArray() as $field) {
             if ($field->isAlwaysDisplay()) {

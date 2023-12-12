@@ -163,7 +163,7 @@ HTML;
             ->method('findDwcTokens')
             ->with($content, $contact)
             ->willReturn([
-                'test-token'  => [
+                'test-token' => [
                     'content' => $dwcContent,
                     'filters' => [
                         [

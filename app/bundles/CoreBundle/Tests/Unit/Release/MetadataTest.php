@@ -37,12 +37,12 @@ class MetadataTest extends TestCase
     public function testStableReleaseWithoutPhpVersionWarning(): void
     {
         $releaseMetadata = [
-            'version'                           => '3.2.1',
-            'stability'                         => 'stable',
-            'minimum_php_version'               => '7.2.21',
-            'maximum_php_version'               => '7.3.99',
-            'minimum_mautic_version'            => '3.0.0-alpha',
-            'announcement_url'                  => '',
+            'version'                => '3.2.1',
+            'stability'              => 'stable',
+            'minimum_php_version'    => '7.2.21',
+            'maximum_php_version'    => '7.3.99',
+            'minimum_mautic_version' => '3.0.0-alpha',
+            'announcement_url'       => '',
         ];
 
         $metadata = new Metadata($releaseMetadata);

@@ -15,12 +15,12 @@ class SegmentSubscriberTest extends \PHPUnit\Framework\TestCase
 {
     public function testGetSubscribedEvents(): void
     {
-        $ipLookupHelper   = $this->createMock(IpLookupHelper::class);
-        $auditLogModel    = $this->createMock(AuditLogModel::class);
-        $listModel        = $this->createMock(ListModel::class);
-        $translatorModel  = $this->createMock(TranslatorInterface::class);
+        $ipLookupHelper  = $this->createMock(IpLookupHelper::class);
+        $auditLogModel   = $this->createMock(AuditLogModel::class);
+        $listModel       = $this->createMock(ListModel::class);
+        $translatorModel = $this->createMock(TranslatorInterface::class);
 
-        $subscriber     = new SegmentSubscriber($ipLookupHelper, $auditLogModel, $listModel, $translatorModel);
+        $subscriber = new SegmentSubscriber($ipLookupHelper, $auditLogModel, $listModel, $translatorModel);
 
         $this->assertEquals(
             [
@@ -40,10 +40,10 @@ class SegmentSubscriberTest extends \PHPUnit\Framework\TestCase
 
     public function testOnSegmentDelete(): void
     {
-        $segmentId        = 1;
-        $segmentName      = 'name';
-        $ip               = '127.0.0.2';
-        $log              = [
+        $segmentId   = 1;
+        $segmentName = 'name';
+        $ip          = '127.0.0.2';
+        $log         = [
             'bundle'    => 'lead',
             'object'    => 'segment',
             'objectId'  => $segmentId,
@@ -62,10 +62,10 @@ class SegmentSubscriberTest extends \PHPUnit\Framework\TestCase
             ->method('writeToLog')
             ->with($log);
 
-        $listModel        = $this->createMock(ListModel::class);
-        $translatorModel  = $this->createMock(TranslatorInterface::class);
+        $listModel       = $this->createMock(ListModel::class);
+        $translatorModel = $this->createMock(TranslatorInterface::class);
 
-        $subscriber     = new SegmentSubscriber($ipLookupHelper, $auditLogModel, $listModel, $translatorModel);
+        $subscriber = new SegmentSubscriber($ipLookupHelper, $auditLogModel, $listModel, $translatorModel);
 
         $segment            = $this->createMock(LeadList::class);
         $segment->deletedId = $segmentId;
@@ -111,10 +111,10 @@ class SegmentSubscriberTest extends \PHPUnit\Framework\TestCase
             ->method('writeToLog')
             ->with($log);
 
-        $listModel        = $this->createMock(ListModel::class);
-        $translatorModel  = $this->createMock(TranslatorInterface::class);
+        $listModel       = $this->createMock(ListModel::class);
+        $translatorModel = $this->createMock(TranslatorInterface::class);
 
-        $subscriber     = new SegmentSubscriber($ipLookupHelper, $auditLogModel, $listModel, $translatorModel);
+        $subscriber = new SegmentSubscriber($ipLookupHelper, $auditLogModel, $listModel, $translatorModel);
 
         $segment = $this->createMock(LeadList::class);
         $segment->expects($this->once())

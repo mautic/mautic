@@ -30,10 +30,10 @@ final class CampaignEventLeadStagesTypeTest extends AbstractMauticTestCase
     public function testCampaignEventLeadStagesTypeFormIsProperlyBuilt(): void
     {
         $parameters = [
-            'label'       => 'mautic.lead.lead.field.stage',
-            'label_attr'  => ['class' => 'control-label'],
-            'multiple'    => true,
-            'required'    => false,
+            'label'      => 'mautic.lead.lead.field.stage',
+            'label_attr' => ['class' => 'control-label'],
+            'multiple'   => true,
+            'required'   => false,
         ];
 
         $this->formBuilderInterface->expects($this->once())

@@ -69,7 +69,7 @@ class ImportModelTest extends StandardImportTestHelper
 
     public function testCheckParallelImportLimitWhenMore(): void
     {
-        $model  = $this->getMockBuilder(ImportModel::class)
+        $model = $this->getMockBuilder(ImportModel::class)
             ->onlyMethods(['getParallelImportLimit', 'getRepository'])
             ->disableOriginalConstructor()
             ->getMock();
@@ -98,7 +98,7 @@ class ImportModelTest extends StandardImportTestHelper
 
     public function testCheckParallelImportLimitWhenEqual(): void
     {
-        $model  = $this->getMockBuilder(ImportModel::class)
+        $model = $this->getMockBuilder(ImportModel::class)
             ->onlyMethods(['getParallelImportLimit', 'getRepository'])
             ->disableOriginalConstructor()
             ->getMock();
@@ -127,7 +127,7 @@ class ImportModelTest extends StandardImportTestHelper
 
     public function testCheckParallelImportLimitWhenLess(): void
     {
-        $model  = $this->getMockBuilder(ImportModel::class)
+        $model = $this->getMockBuilder(ImportModel::class)
             ->onlyMethods(['getParallelImportLimit', 'getRepository'])
             ->disableOriginalConstructor()
             ->getMock();

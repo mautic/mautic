@@ -102,11 +102,11 @@ class LeadImportFieldType extends AbstractType
             'skip_if_exists',
             YesNoButtonGroupType::class,
             [
-                'label'       => 'mautic.lead.import.skip_if_exists',
-                'label_attr'  => ['class' => 'control-label'],
-                'attr'        => ['class' => 'form-control'],
-                'required'    => false,
-                'data'        => false,
+                'label'      => 'mautic.lead.import.skip_if_exists',
+                'label_attr' => ['class' => 'control-label'],
+                'attr'       => ['class' => 'form-control'],
+                'required'   => false,
+                'data'       => false,
             ]
         );
 

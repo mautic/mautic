@@ -62,7 +62,7 @@ class ContactMergerTest extends \PHPUnit\Framework\TestCase
         $winner->setLastActive($oldestDateTime);
         $winner->setDateIdentified($latestDateTime);
 
-        $loser  = new Lead();
+        $loser = new Lead();
         $loser->setLastActive($latestDateTime);
         $loser->setDateIdentified($oldestDateTime);
 
@@ -700,7 +700,7 @@ class ContactMergerTest extends \PHPUnit\Framework\TestCase
         $winner->expects($this->once())
             ->method('getProfileFields')
             ->willReturn([
-                'email'  => 'winner@test.com',
+                'email' => 'winner@test.com',
             ]);
 
         $winner->expects($this->once())

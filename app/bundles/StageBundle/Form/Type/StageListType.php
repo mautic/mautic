@@ -38,11 +38,11 @@ class StageListType extends AbstractType
     public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults([
-            'choices'           => $this->choices,
-            'expanded'          => false,
-            'multiple'          => true,
-            'required'          => false,
-            'placeholder'       => 'mautic.core.form.chooseone',
+            'choices'     => $this->choices,
+            'expanded'    => false,
+            'multiple'    => true,
+            'required'    => false,
+            'placeholder' => 'mautic.core.form.chooseone',
         ]);
     }
 

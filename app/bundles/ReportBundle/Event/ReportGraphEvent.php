@@ -15,8 +15,8 @@ class ReportGraphEvent extends AbstractReportEvent
         private array $requestedGraphs,
         private QueryBuilder $queryBuilder
     ) {
-        $this->report          = $report;
-        $this->context         = $report->getSource();
+        $this->report  = $report;
+        $this->context = $report->getSource();
     }
 
     /**

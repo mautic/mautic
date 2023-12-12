@@ -44,14 +44,14 @@ class DecisionHelper
         $parentEvent = $event->getParent();
 
         if (null !== $parentEvent && null !== $event->getDecisionPath()) {
-            $rotation    = $this->leadRepository->getContactRotations([$contact->getId()], $event->getCampaign()->getId());
-            $log         = $parentEvent->getLogByContactAndRotation($contact, $rotation);
+            $rotation = $this->leadRepository->getContactRotations([$contact->getId()], $event->getCampaign()->getId());
+            $log      = $parentEvent->getLogByContactAndRotation($contact, $rotation);
 
             if (null === $log) {
                 throw new DecisionNotApplicableException("Parent {$parentEvent->getId()} has not been fired, event {$event->getId()} should not be fired.");
             }
 
-            $pathTaken   = (int) $log->getNonActionPathTaken();
+            $pathTaken = (int) $log->getNonActionPathTaken();
 
             if (1 === $pathTaken && !$parentEvent->getNegativeChildren()->contains($event)) {
                 throw new DecisionNotApplicableException("Parent {$parentEvent->getId()} take negative path, event {$event->getId()} is on positive path.");

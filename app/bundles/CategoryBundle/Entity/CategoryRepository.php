@@ -85,9 +85,9 @@ class CategoryRepository extends CommonRepository
      */
     protected function addSearchCommandWhereClause($q, $filter): array
     {
-        $command                 = $field                 = $filter->command;
-        $unique                  = $this->generateRandomParameterName();
-        [$expr, $parameters]     = parent::addSearchCommandWhereClause($q, $filter);
+        $command             = $field = $filter->command;
+        $unique              = $this->generateRandomParameterName();
+        [$expr, $parameters] = parent::addSearchCommandWhereClause($q, $filter);
 
         switch ($command) {
             case $this->translator->trans('mautic.core.searchcommand.ispublished'):

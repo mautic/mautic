@@ -17,12 +17,12 @@ class MergeType extends AbstractType
             'lead_to_merge',
             ChoiceType::class,
             [
-                'choices'           => $options['leads'],
-                'label'             => 'mautic.lead.merge.select',
-                'label_attr'        => ['class' => 'control-label'],
-                'multiple'          => false,
-                'placeholder'       => '',
-                'attr'              => [
+                'choices'     => $options['leads'],
+                'label'       => 'mautic.lead.merge.select',
+                'label_attr'  => ['class' => 'control-label'],
+                'multiple'    => false,
+                'placeholder' => '',
+                'attr'        => [
                     'class'   => 'form-control',
                     'tooltip' => 'mautic.lead.merge.select.modal.tooltip',
                 ],

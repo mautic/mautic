@@ -83,15 +83,15 @@ EOT
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        $channel       = $input->getOption('channel');
-        $channelId     = $input->getOption('id');
-        $limit         = $input->getOption('limit');
-        $batch         = $input->getOption('batch');
-        $minContactId  = $input->getOption('min-contact-id');
-        $maxContactId  = $input->getOption('max-contact-id');
-        $threadId      = $input->getOption('thread-id');
-        $maxThreads    = $input->getOption('max-threads');
-        $key           = sprintf('%s-%s-%s-%s', $channel, $channelId, $threadId, $maxThreads);
+        $channel      = $input->getOption('channel');
+        $channelId    = $input->getOption('id');
+        $limit        = $input->getOption('limit');
+        $batch        = $input->getOption('batch');
+        $minContactId = $input->getOption('min-contact-id');
+        $maxContactId = $input->getOption('max-contact-id');
+        $threadId     = $input->getOption('thread-id');
+        $maxThreads   = $input->getOption('max-threads');
+        $key          = sprintf('%s-%s-%s-%s', $channel, $channelId, $threadId, $maxThreads);
 
         if ($threadId && $maxThreads) {
             if ((int) $threadId > (int) $maxThreads) {

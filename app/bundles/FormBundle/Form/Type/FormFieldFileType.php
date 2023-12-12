@@ -18,9 +18,9 @@ class FormFieldFileType extends AbstractType
 {
     public const PROPERTY_ALLOWED_FILE_EXTENSIONS = 'allowed_file_extensions';
 
-    public const PROPERTY_ALLOWED_FILE_SIZE       = 'allowed_file_size';
+    public const PROPERTY_ALLOWED_FILE_SIZE = 'allowed_file_size';
 
-    public const PROPERTY_PREFERED_PROFILE_IMAGE  = 'profile_image';
+    public const PROPERTY_PREFERED_PROFILE_IMAGE = 'profile_image';
 
     public function __construct(
         private CoreParametersHelper $coreParametersHelper,
@@ -85,8 +85,8 @@ class FormFieldFileType extends AbstractType
             self::PROPERTY_PREFERED_PROFILE_IMAGE,
             YesNoButtonGroupType::class,
             [
-                'label'       => 'mautic.form.field.file.set_as_profile_image',
-                'data'        => $options['data'][self::PROPERTY_PREFERED_PROFILE_IMAGE] ?? false,
+                'label' => 'mautic.form.field.file.set_as_profile_image',
+                'data'  => $options['data'][self::PROPERTY_PREFERED_PROFILE_IMAGE] ?? false,
             ]
         );
     }

@@ -67,9 +67,9 @@ abstract class AbstractMauticMigration extends AbstractMigration implements Cont
      */
     public function setContainer(ContainerInterface $container = null): void
     {
-        $this->container     = $container;
-        $this->prefix        = $container->getParameter('mautic.db_table_prefix');
-        $this->platform      = $this->connection->getDatabasePlatform()->getName();
+        $this->container = $container;
+        $this->prefix    = $container->getParameter('mautic.db_table_prefix');
+        $this->platform  = $this->connection->getDatabasePlatform()->getName();
     }
 
     /**

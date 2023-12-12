@@ -58,8 +58,8 @@ class SegmentFilterFunctionalTest extends MauticMysqlTestCase
         // Execute segment update command.
         $exitCode = $applicationTester->run(
             [
-                'command'       => 'mautic:segments:update',
-                '-i'            => $segmentA->getId(),
+                'command' => 'mautic:segments:update',
+                '-i'      => $segmentA->getId(),
             ]
         );
 

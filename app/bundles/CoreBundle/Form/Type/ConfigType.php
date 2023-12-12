@@ -40,7 +40,7 @@ class ConfigType extends AbstractType
         private Shortener $shortenerFactory,
         private CoreParametersHelper $coreParametersHelper,
     ) {
-        $this->supportedLanguages  = $langHelper->getSupportedLanguages();
+        $this->supportedLanguages = $langHelper->getSupportedLanguages();
     }
 
     public function buildForm(FormBuilderInterface $builder, array $options): void
@@ -89,11 +89,11 @@ class ConfigType extends AbstractType
             '404_page',
             PageListType::class,
             [
-                'label'         => 'mautic.core.config.form.404_page',
-                'label_attr'    => ['class' => 'control-label'],
-                'attr'          => [
-                    'class'            => 'form-control',
-                    'tooltip'          => 'mautic.core.config.form.404_page.tooltip',
+                'label'      => 'mautic.core.config.form.404_page',
+                'label_attr' => ['class' => 'control-label'],
+                'attr'       => [
+                    'class'   => 'form-control',
+                    'tooltip' => 'mautic.core.config.form.404_page.tooltip',
                 ],
                 'multiple'       => false,
                 'placeholder'    => '',
@@ -178,14 +178,14 @@ class ConfigType extends AbstractType
             'locale',
             ChoiceType::class,
             [
-                'choices'           => $this->getLanguageChoices(),
-                'label'             => 'mautic.core.config.form.locale',
-                'required'          => false,
-                'attr'              => [
+                'choices'  => $this->getLanguageChoices(),
+                'label'    => 'mautic.core.config.form.locale',
+                'required' => false,
+                'attr'     => [
                     'class'   => 'form-control',
                     'tooltip' => 'mautic.core.config.form.locale.tooltip',
                 ],
-                'placeholder'       => false,
+                'placeholder' => false,
             ]
         );
 
@@ -261,7 +261,7 @@ class ConfigType extends AbstractType
             'default_pagelimit',
             ChoiceType::class,
             [
-                'choices'           => [
+                'choices' => [
                     'mautic.core.pagination.5'   => 5,
                     'mautic.core.pagination.10'  => 10,
                     'mautic.core.pagination.15'  => 15,
@@ -271,16 +271,16 @@ class ConfigType extends AbstractType
                     'mautic.core.pagination.50'  => 50,
                     'mautic.core.pagination.100' => 100,
                 ],
-                'expanded'          => false,
-                'multiple'          => false,
-                'label'             => 'mautic.core.config.form.default.pagelimit',
-                'label_attr'        => ['class' => 'control-label'],
-                'attr'              => [
+                'expanded'   => false,
+                'multiple'   => false,
+                'label'      => 'mautic.core.config.form.default.pagelimit',
+                'label_attr' => ['class' => 'control-label'],
+                'attr'       => [
                     'class'   => 'form-control',
                     'tooltip' => 'mautic.core.config.form.default.pagelimit.tooltip',
                 ],
-                'required'          => false,
-                'placeholder'       => false,
+                'required'    => false,
+                'placeholder' => false,
             ]
         );
 
@@ -407,27 +407,27 @@ class ConfigType extends AbstractType
             ChoiceType::class,
             [
                 'choices' => [
-                    'mautic.core.daterange.0days'                                                                 => 'midnight',
-                    'mautic.core.daterange.1days'                                                                 => '-24 hours',
-                    $this->translator->trans('mautic.core.daterange.week', ['%count%' => 1])                      => '-1 week',
-                    $this->translator->trans('mautic.core.daterange.week', ['%count%' => 2])                      => '-2 weeks',
-                    $this->translator->trans('mautic.core.daterange.week', ['%count%' => 3])                      => '-3 weeks',
-                    $this->translator->trans('mautic.core.daterange.month', ['%count%' => 1])                     => '-1 month',
-                    $this->translator->trans('mautic.core.daterange.month', ['%count%' => 2])                     => '-2 months',
-                    $this->translator->trans('mautic.core.daterange.month', ['%count%' => 3])                     => '-3 months',
-                    $this->translator->trans('mautic.core.daterange.year', ['%count%' => 1])                      => '-1 year',
-                    $this->translator->trans('mautic.core.daterange.year', ['%count%' => 2])                      => '-2 years',
+                    'mautic.core.daterange.0days'                                             => 'midnight',
+                    'mautic.core.daterange.1days'                                             => '-24 hours',
+                    $this->translator->trans('mautic.core.daterange.week', ['%count%' => 1])  => '-1 week',
+                    $this->translator->trans('mautic.core.daterange.week', ['%count%' => 2])  => '-2 weeks',
+                    $this->translator->trans('mautic.core.daterange.week', ['%count%' => 3])  => '-3 weeks',
+                    $this->translator->trans('mautic.core.daterange.month', ['%count%' => 1]) => '-1 month',
+                    $this->translator->trans('mautic.core.daterange.month', ['%count%' => 2]) => '-2 months',
+                    $this->translator->trans('mautic.core.daterange.month', ['%count%' => 3]) => '-3 months',
+                    $this->translator->trans('mautic.core.daterange.year', ['%count%' => 1])  => '-1 year',
+                    $this->translator->trans('mautic.core.daterange.year', ['%count%' => 2])  => '-2 years',
                 ],
-                'expanded'          => false,
-                'multiple'          => false,
-                'label'             => 'mautic.core.config.form.default.daterange_default',
-                'label_attr'        => ['class' => 'control-label'],
-                'attr'              => [
+                'expanded'   => false,
+                'multiple'   => false,
+                'label'      => 'mautic.core.config.form.default.daterange_default',
+                'label_attr' => ['class' => 'control-label'],
+                'attr'       => [
                     'class'   => 'form-control',
                     'tooltip' => 'mautic.core.config.form.default.daterange_default.tooltip',
                 ],
-                'required'          => false,
-                'placeholder'       => false,
+                'required'    => false,
+                'placeholder' => false,
             ]
         );
 
@@ -435,13 +435,13 @@ class ConfigType extends AbstractType
             'ip_lookup_service',
             ChoiceType::class,
             [
-                'choices'           => $this->getIpServicesChoices(),
-                'label'             => 'mautic.core.config.form.ip.lookup.service',
-                'label_attr'        => [
+                'choices'    => $this->getIpServicesChoices(),
+                'label'      => 'mautic.core.config.form.ip.lookup.service',
+                'label_attr' => [
                     'class' => 'control-label',
                 ],
-                'required'          => false,
-                'attr'              => [
+                'required' => false,
+                'attr'     => [
                     'class'    => 'form-control',
                     'tooltip'  => 'mautic.core.config.form.ip.lookup.service.tooltip',
                     'onchange' => 'Mautic.getIpLookupFormConfig()',
@@ -516,19 +516,19 @@ class ConfigType extends AbstractType
             'update_stability',
             ChoiceType::class,
             [
-                'choices'           => [
+                'choices' => [
                     'mautic.core.config.update_stability.alpha'  => 'alpha',
                     'mautic.core.config.update_stability.beta'   => 'beta',
                     'mautic.core.config.update_stability.rc'     => 'rc',
                     'mautic.core.config.update_stability.stable' => 'stable',
                 ],
-                'label'             => 'mautic.core.config.form.update.stability',
-                'required'          => false,
-                'attr'              => [
+                'label'    => 'mautic.core.config.form.update.stability',
+                'required' => false,
+                'attr'     => [
                     'class'   => 'form-control',
                     'tooltip' => 'mautic.core.config.form.update.stability.tooltip',
                 ],
-                'placeholder'       => false,
+                'placeholder' => false,
             ]
         );
 
@@ -539,10 +539,10 @@ class ConfigType extends AbstractType
             Shortener::SHORTENER_SERVICE,
             ChoiceType::class,
             [
-                'choices'           => $choices,
-                'label'             => 'mautic.core.config.form.shortener',
-                'required'          => false,
-                'attr'              => [
+                'choices'  => $choices,
+                'label'    => 'mautic.core.config.form.shortener',
+                'required' => false,
+                'attr'     => [
                     'class'   => 'form-control',
                     'tooltip' => 'mautic.core.config.form.shortener.tooltip',
                 ],
@@ -553,11 +553,11 @@ class ConfigType extends AbstractType
             'shortener_email_enable',
             YesNoButtonGroupType::class,
             [
-                'label'      => 'mautic.core.config.form.shortener.enable_email',
-                'data'       => (array_key_exists('shortener_email_enable', $options['data']) && !empty($options['data']['shortener_email_enable'])),
-                'attr'       => [
-                    'class'        => 'form-control',
-                    'tooltip'      => 'mautic.core.config.form.shortener.enable_email.tooltip',
+                'label' => 'mautic.core.config.form.shortener.enable_email',
+                'data'  => (array_key_exists('shortener_email_enable', $options['data']) && !empty($options['data']['shortener_email_enable'])),
+                'attr'  => [
+                    'class'   => 'form-control',
+                    'tooltip' => 'mautic.core.config.form.shortener.enable_email.tooltip',
                 ],
             ]
         );
@@ -566,11 +566,11 @@ class ConfigType extends AbstractType
             'shortener_sms_enable',
             YesNoButtonGroupType::class,
             [
-                'label'      => 'mautic.core.config.form.shortener.enable_sms',
-                'data'       => (array_key_exists('shortener_sms_enable', $options['data']) && !empty($options['data']['shortener_sms_enable'])),
-                'attr'       => [
-                    'class'        => 'form-control',
-                    'tooltip'      => 'mautic.core.config.form.shortener.enable_sms.tooltip',
+                'label' => 'mautic.core.config.form.shortener.enable_sms',
+                'data'  => (array_key_exists('shortener_sms_enable', $options['data']) && !empty($options['data']['shortener_sms_enable'])),
+                'attr'  => [
+                    'class'   => 'form-control',
+                    'tooltip' => 'mautic.core.config.form.shortener.enable_sms.tooltip',
                 ],
             ]
         );
@@ -713,8 +713,8 @@ class ConfigType extends AbstractType
     private function getLanguageChoices(): array
     {
         // Get the list of available languages
-        $languages   = $this->langHelper->fetchLanguages(false, false);
-        $choices     = [];
+        $languages = $this->langHelper->fetchLanguages(false, false);
+        $choices   = [];
 
         foreach ($languages as $code => $langData) {
             $choices[$langData['name']] = $code;

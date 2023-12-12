@@ -479,10 +479,10 @@ class FormModel extends CommonFormModel
     {
         $pages = ['open' => [], 'close' => []];
 
-        $openFieldId  =
-        $previousId   =
-        $lastPage     = false;
-        $pageCount    = 1;
+        $openFieldId =
+        $previousId  =
+        $lastPage    = false;
+        $pageCount   = 1;
 
         foreach ($fields as $fieldId => $field) {
             if ('pagebreak' == $field->getType() && $openFieldId) {
@@ -525,8 +525,8 @@ class FormModel extends CommonFormModel
     public function createTableSchema(Form $entity, $isNew = false, $dropExisting = false): void
     {
         // create the field as its own column in the leads table
-        $name         = 'form_results_'.$entity->getId().'_'.$entity->getAlias();
-        $columns      = $this->generateFieldColumns($entity);
+        $name    = 'form_results_'.$entity->getId().'_'.$entity->getAlias();
+        $columns = $this->generateFieldColumns($entity);
         if ($isNew || (!$isNew && !$this->tableSchemaHelper->checkTableExists($name))) {
             $this->tableSchemaHelper->addTable([
                 'name'    => $name,
@@ -569,7 +569,7 @@ class FormModel extends CommonFormModel
      */
     public function deleteEntities($ids): array
     {
-        $entities     = parent::deleteEntities($ids);
+        $entities = parent::deleteEntities($ids);
         foreach ($entities as $id => $entity) {
             /* @var Form $entity */
             // delete the associated results table

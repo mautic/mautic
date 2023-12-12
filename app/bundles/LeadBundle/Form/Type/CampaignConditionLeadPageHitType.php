@@ -36,17 +36,17 @@ class CampaignConditionLeadPageHitType extends AbstractType
                 'class'   => 'form-control',
                 'tooltip' => 'mautic.page.campaign.condition.form.page.descr',
             ],
-            'multiple'     => false,
-            'required'     => false,
-            'placeholder'  => 'Choose Page',
+            'multiple'    => false,
+            'required'    => false,
+            'placeholder' => 'Choose Page',
         ]);
 
         $builder->add(
             'startDate',
             TextType::class,
             [
-                'label'  => 'mautic.page.campaign.condition.form.startdate',
-                'attr'   => [
+                'label' => 'mautic.page.campaign.condition.form.startdate',
+                'attr'  => [
                     'class'       => 'form-control',
                     'preaddon'    => 'fa fa-calendar',
                     'data-toggle' => 'datetime',
@@ -59,8 +59,8 @@ class CampaignConditionLeadPageHitType extends AbstractType
             'endDate',
             TextType::class,
             [
-                'label'  => 'mautic.page.campaign.condition.form.enddate',
-                'attr'   => [
+                'label' => 'mautic.page.campaign.condition.form.enddate',
+                'attr'  => [
                     'class'       => 'form-control',
                     'preaddon'    => 'fa fa-calendar',
                     'data-toggle' => 'datetime',
@@ -82,7 +82,7 @@ class CampaignConditionLeadPageHitType extends AbstractType
                     'required'   => false,
                     'label_attr' => ['class' => 'control-label'],
                     'attr'       => [
-                        'class'   => 'form-control',
+                        'class' => 'form-control',
                     ],
                     'auto_initialize' => false,
                 ])
@@ -90,7 +90,7 @@ class CampaignConditionLeadPageHitType extends AbstractType
                     ->getForm()
             );
 
-            $unit               =  's';
+            $unit               = 's';
             $secondsTransformer = new SecondsConversionTransformer($unit);
             $form->add('returns_within_unit', HiddenType::class, [
                 'data' => $unit,

@@ -19,7 +19,7 @@ class UrlHelperTest extends \PHPUnit\Framework\TestCase
             'https://mautic.org?#anchor'       => 'https://mautic.org?'.$appendQueryString.'#anchor',
             'https://mautic.org#anchor'        => 'https://mautic.org?'.$appendQueryString.'#anchor',
         ];
-        foreach ($urls as $url=>$expectedUrl) {
+        foreach ($urls as $url => $expectedUrl) {
             $this->assertEquals(UrlHelper::appendQueryToUrl($url, $appendQueryString), $expectedUrl);
         }
     }

@@ -71,8 +71,8 @@ return [
         ],
         'fixtures' => [
             'mautic.asset.fixture.asset' => [
-                'class'     => \Mautic\AssetBundle\DataFixtures\ORM\LoadAssetData::class,
-                'tag'       => \Doctrine\Bundle\FixturesBundle\DependencyInjection\CompilerPass\FixturesCompilerPass::FIXTURE_TAG,
+                'class' => \Mautic\AssetBundle\DataFixtures\ORM\LoadAssetData::class,
+                'tag'   => \Doctrine\Bundle\FixturesBundle\DependencyInjection\CompilerPass\FixturesCompilerPass::FIXTURE_TAG,
             ],
         ],
         'repositories' => [

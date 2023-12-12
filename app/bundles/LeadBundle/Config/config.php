@@ -375,7 +375,7 @@ return [
                 'arguments' => [
                     'mautic.validator.email',
                 ],
-                'tag'       => 'validator.constraint_validator',
+                'tag' => 'validator.constraint_validator',
             ],
             \Mautic\LeadBundle\Form\Validator\Constraints\FieldAliasKeywordValidator::class => [
                 'class'     => \Mautic\LeadBundle\Form\Validator\Constraints\FieldAliasKeywordValidator::class,
@@ -999,12 +999,12 @@ return [
                 'arguments' => ['mautic.lead.model.list'],
             ],
             'mautic.lead.fixture.category' => [
-                'class'     => \Mautic\LeadBundle\DataFixtures\ORM\LoadCategoryData::class,
-                'tag'       => \Doctrine\Bundle\FixturesBundle\DependencyInjection\CompilerPass\FixturesCompilerPass::FIXTURE_TAG,
+                'class' => \Mautic\LeadBundle\DataFixtures\ORM\LoadCategoryData::class,
+                'tag'   => \Doctrine\Bundle\FixturesBundle\DependencyInjection\CompilerPass\FixturesCompilerPass::FIXTURE_TAG,
             ],
             'mautic.lead.fixture.categorizedleadlists' => [
-                'class'     => \Mautic\LeadBundle\DataFixtures\ORM\LoadCategorizedLeadListData::class,
-                'tag'       => \Doctrine\Bundle\FixturesBundle\DependencyInjection\CompilerPass\FixturesCompilerPass::FIXTURE_TAG,
+                'class' => \Mautic\LeadBundle\DataFixtures\ORM\LoadCategorizedLeadListData::class,
+                'tag'   => \Doctrine\Bundle\FixturesBundle\DependencyInjection\CompilerPass\FixturesCompilerPass::FIXTURE_TAG,
             ],
             'mautic.lead.fixture.test.page_hit' => [
                 'class'    => \Mautic\LeadBundle\Tests\DataFixtures\ORM\LoadPageHitData::class,
@@ -1030,9 +1030,9 @@ return [
                 'optional'  => true,
             ],
             'mautic.lead.fixture.test.tag' => [
-                'class'     => \Mautic\LeadBundle\Tests\DataFixtures\ORM\LoadTagData::class,
-                'tag'       => \Doctrine\Bundle\FixturesBundle\DependencyInjection\CompilerPass\FixturesCompilerPass::FIXTURE_TAG,
-                'optional'  => true,
+                'class'    => \Mautic\LeadBundle\Tests\DataFixtures\ORM\LoadTagData::class,
+                'tag'      => \Doctrine\Bundle\FixturesBundle\DependencyInjection\CompilerPass\FixturesCompilerPass::FIXTURE_TAG,
+                'optional' => true,
             ],
         ],
     ],

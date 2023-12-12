@@ -213,8 +213,8 @@ class DynamicsApi extends CrmApi
         $a_blocks = preg_split("/-+$boundary/", $input);
         array_pop($a_blocks);
         // there is only one batchresponse
-        $input                = array_pop($a_blocks);
-        [$header, $input]     = explode("\r\n\r\n", $input, 2);
+        $input            = array_pop($a_blocks);
+        [$header, $input] = explode("\r\n\r\n", $input, 2);
         foreach (explode("\r\n", $header) as $r) {
             if (0 === stripos($r, 'Content-Type:')) {
                 [$headername, $contentType] = explode(':', $r, 2);

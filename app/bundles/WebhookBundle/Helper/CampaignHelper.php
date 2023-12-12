@@ -90,10 +90,10 @@ class CampaignHelper
             case 'post':
             case 'put':
             case 'patch':
-                $headers  = array_change_key_case($headers);
-                $options  = [
-                    \GuzzleHttp\RequestOptions::HEADERS     => $headers,
-                    \GuzzleHttp\RequestOptions::TIMEOUT     => $timeout,
+                $headers = array_change_key_case($headers);
+                $options = [
+                    \GuzzleHttp\RequestOptions::HEADERS => $headers,
+                    \GuzzleHttp\RequestOptions::TIMEOUT => $timeout,
                 ];
                 if (array_key_exists('content-type', $headers) && 'application/json' == strtolower($headers['content-type'])) {
                     $options[\GuzzleHttp\RequestOptions::BODY] = json_encode($payload);

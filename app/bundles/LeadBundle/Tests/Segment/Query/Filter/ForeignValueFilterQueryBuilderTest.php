@@ -41,10 +41,10 @@ class ForeignValueFilterQueryBuilderTest extends TestCase
     public function setUp(): void
     {
         parent::setUp();
-        $this->randomParameter     = new RandomParameterName();
-        $this->dispatcher          = $this->createMock(EventDispatcherInterface::class);
-        $this->connectionMock      = $this->createMock(Connection::class);
-        $this->queryBuilder        = new ForeignValueFilterQueryBuilder(
+        $this->randomParameter = new RandomParameterName();
+        $this->dispatcher      = $this->createMock(EventDispatcherInterface::class);
+        $this->connectionMock  = $this->createMock(Connection::class);
+        $this->queryBuilder    = new ForeignValueFilterQueryBuilder(
             $this->randomParameter,
             $this->dispatcher
         );

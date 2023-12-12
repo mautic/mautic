@@ -82,9 +82,9 @@ class DynamicContentTypeTest extends TestCase
                     'translationParent',
                     DynamicContentListType::class,
                     [
-                        'label'       => 'mautic.core.form.translation_parent',
-                        'label_attr'  => ['class' => 'control-label'],
-                        'attr'        => [
+                        'label'      => 'mautic.core.form.translation_parent',
+                        'label_attr' => ['class' => 'control-label'],
+                        'attr'       => [
                             'class'   => 'form-control',
                             'tooltip' => 'mautic.core.form.translation_parent.help',
                         ],
@@ -99,14 +99,14 @@ class DynamicContentTypeTest extends TestCase
                     'filters',
                     CollectionType::class,
                     [
-                        'entry_type'     => \Mautic\DynamicContentBundle\Form\Type\DwcEntryFiltersType::class,
-                        'entry_options'  => [
-                            'countries'    => FormFieldHelper::getCountryChoices(),
-                            'regions'      => FormFieldHelper::getRegionChoices(),
-                            'timezones'    => FormFieldHelper::getTimezonesChoices(),
-                            'locales'      => FormFieldHelper::getLocaleChoices(),
-                            'fields'       => $this->getMockChoiceFields(),
-                            'deviceTypes'  => array_combine(
+                        'entry_type'    => \Mautic\DynamicContentBundle\Form\Type\DwcEntryFiltersType::class,
+                        'entry_options' => [
+                            'countries'   => FormFieldHelper::getCountryChoices(),
+                            'regions'     => FormFieldHelper::getRegionChoices(),
+                            'timezones'   => FormFieldHelper::getTimezonesChoices(),
+                            'locales'     => FormFieldHelper::getLocaleChoices(),
+                            'fields'      => $this->getMockChoiceFields(),
+                            'deviceTypes' => array_combine(
                                 DeviceParser::getAvailableDeviceTypeNames(),
                                 DeviceParser::getAvailableDeviceTypeNames()
                             ),
@@ -115,7 +115,7 @@ class DynamicContentTypeTest extends TestCase
                                 array_keys(OperatingSystem::getAvailableOperatingSystemFamilies()),
                                 array_keys(OperatingSystem::getAvailableOperatingSystemFamilies())
                             ),
-                            'tags'         => $tagChoices,
+                            'tags' => $tagChoices,
                         ],
                         'error_bubbling' => false,
                         'mapped'         => true,
@@ -171,7 +171,7 @@ class DynamicContentTypeTest extends TestCase
                         'contains'    => 'contains',
                     ],
                 ],
-                'lastname'  => [
+                'lastname' => [
                     'label'      => 'Last Name',
                     'properties' => ['type' => 'text'],
                     'object'     => 'lead',
@@ -211,7 +211,7 @@ class DynamicContentTypeTest extends TestCase
                     'properties'    => 'a:0:{}',
                     'default_value' => null,
                 ],
-                'lastname'  => [
+                'lastname' => [
                     'id'            => '3',
                     'label'         => 'Last Name',
                     'alias'         => 'lastname',
@@ -222,7 +222,7 @@ class DynamicContentTypeTest extends TestCase
                     'properties'    => 'a:0:{}',
                     'default_value' => null,
                 ],
-                'email'     => [
+                'email' => [
                     'id'            => '6',
                     'label'         => 'Email',
                     'alias'         => 'email',

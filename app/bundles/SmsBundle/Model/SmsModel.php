@@ -183,11 +183,11 @@ class SmsModel extends FormModel implements AjaxLookupModelInterface
             $sendTo = [$sendTo];
         }
 
-        $sentCount       = 0;
-        $failedCount     = 0;
-        $results         = [];
-        $contacts        = [];
-        $fetchContacts   = [];
+        $sentCount     = 0;
+        $failedCount   = 0;
+        $results       = [];
+        $contacts      = [];
+        $fetchContacts = [];
         foreach ($sendTo as $lead) {
             if (!$lead instanceof Lead) {
                 $fetchContacts[] = $lead;
@@ -266,8 +266,8 @@ class SmsModel extends FormModel implements AjaxLookupModelInterface
             if (count($contacts)) {
                 /** @var Lead $lead */
                 foreach ($contacts as $lead) {
-                    $leadId          = $lead->getId();
-                    $stat            = $this->createStatEntry($sms, $lead, $channel, false, $listId);
+                    $leadId = $lead->getId();
+                    $stat   = $this->createStatEntry($sms, $lead, $channel, false, $listId);
 
                     $leadPhoneNumber = $lead->getLeadPhoneNumber();
 
@@ -294,7 +294,7 @@ class SmsModel extends FormModel implements AjaxLookupModelInterface
                                     $sms->getId(),  // Keep BC pre 2.14.1
                                     'sms' => $sms->getId(),
                                 ],
-                                'stat'    => $stat->getTrackingHash(),
+                                'stat' => $stat->getTrackingHash(),
                             ]
                         ),
                         SmsEvents::TOKEN_REPLACEMENT
@@ -322,7 +322,7 @@ class SmsModel extends FormModel implements AjaxLookupModelInterface
                         ++$sentCount;
                     }
 
-                    $stats[]            = $stat;
+                    $stats[] = $stat;
                     unset($stat);
                     $results[$leadId] = $sendResult;
 

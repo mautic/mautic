@@ -20,7 +20,7 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 class CampaignTestAbstract extends \PHPUnit\Framework\TestCase
 {
-    protected static $mockId   = 232;
+    protected static $mockId = 232;
 
     protected static $mockName = 'Mock name';
 

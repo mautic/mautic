@@ -50,7 +50,7 @@ use Twig\Environment;
 
 class FormTestAbstract extends TestCase
 {
-    protected static $mockId   = 123;
+    protected static $mockId = 123;
 
     protected static $mockName = 'Mock test name';
 
@@ -189,7 +189,7 @@ class FormTestAbstract extends TestCase
         $contactMerger            = $this->createMock(ContactMerger::class);
         $router->method('generate')->willReturn('absolute/path/somefile.jpg');
 
-        $lead                     = new Lead();
+        $lead = new Lead();
         $lead->setId(123);
 
         $leadFieldModel->expects($this->any())

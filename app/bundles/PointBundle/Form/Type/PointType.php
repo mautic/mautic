@@ -54,11 +54,11 @@ class PointType extends AbstractType
             'type',
             ChoiceType::class,
             [
-                'choices'           => $options['pointActions']['choices'],
-                'placeholder'       => '',
-                'label'             => 'mautic.point.form.type',
-                'label_attr'        => ['class' => 'control-label'],
-                'attr'              => [
+                'choices'     => $options['pointActions']['choices'],
+                'placeholder' => '',
+                'label'       => 'mautic.point.form.type',
+                'label_attr'  => ['class' => 'control-label'],
+                'attr'        => [
                     'class'    => 'form-control',
                     'onchange' => 'Mautic.getPointActionPropertiesForm(this.value);',
                 ],
@@ -98,7 +98,7 @@ class PointType extends AbstractType
             'group',
             GroupListType::class,
             [
-                'attr'       => [
+                'attr' => [
                     'class'   => 'form-control',
                     'tooltip' => 'mautic.point.group.form.group_descr',
                 ],

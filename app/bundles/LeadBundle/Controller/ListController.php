@@ -434,8 +434,8 @@ class ListController extends FormController
     {
         // set the return URL
         if ($objectId) {
-            $returnUrl       = $this->generateUrl('mautic_segment_action', ['objectAction' => 'view', 'objectId'=> $objectId]);
-            $viewParameters  = ['objectAction' => 'view', 'objectId'=> $objectId];
+            $returnUrl       = $this->generateUrl('mautic_segment_action', ['objectAction' => 'view', 'objectId' => $objectId]);
+            $viewParameters  = ['objectAction' => 'view', 'objectId' => $objectId];
             $contentTemplate = 'Mautic\LeadBundle\Controller\ListController::viewAction';
         } else {
             // set the page we came from
@@ -776,7 +776,7 @@ class ListController extends FormController
             new \DateTime($dateRangeForm->get('date_to')->getData()),
             null,
             [
-                'leadlist_id'   => [
+                'leadlist_id' => [
                     'value'            => $objectId,
                     'list_column_name' => 't.lead_id',
                 ],
@@ -787,12 +787,12 @@ class ListController extends FormController
         return $this->delegateView([
             'returnUrl'      => $this->generateUrl('mautic_segment_action', ['objectAction' => 'view', 'objectId' => $list->getId()]),
             'viewParameters' => [
-                'usageStats'     => $segmentDependencies->getChannelsIds($list->getId()),
-                'campaignStats'  => $segmentCampaignShare->getCampaignList($list->getId()),
-                'stats'          => $segmentContactsLineChartData,
-                'list'           => $list,
-                'segmentCount'   => $listModel->getRepository()->getLeadCount($list->getId()),
-                'permissions'    => $security->isGranted([
+                'usageStats'    => $segmentDependencies->getChannelsIds($list->getId()),
+                'campaignStats' => $segmentCampaignShare->getCampaignList($list->getId()),
+                'stats'         => $segmentContactsLineChartData,
+                'list'          => $list,
+                'segmentCount'  => $listModel->getRepository()->getLeadCount($list->getId()),
+                'permissions'   => $security->isGranted([
                     'lead:leads:editown',
                     'lead:lists:viewother',
                     'lead:lists:editother',

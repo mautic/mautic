@@ -390,17 +390,17 @@ class Fixtures
             'totalResults' => '2',
             'data'         => [
                 [
-                    'e_id'           => '1',
-                    'e_name'         => 'Test 123',
-                    'e_date_added'   => '2023-02-27 10:00:00',
+                    'e_id'         => '1',
+                    'e_name'       => 'Test 123',
+                    'e_date_added' => '2023-02-27 10:00:00',
                 ],
                 [
-                    'e_id'           => '2',
-                    'e_name'         => 'Test abc',
-                    'e_date_added'   => '2023-01-15 9:00:00',
+                    'e_id'         => '2',
+                    'e_name'       => 'Test abc',
+                    'e_date_added' => '2023-01-15 9:00:00',
                 ],
             ],
-            'dataColumns'  => [
+            'dataColumns' => [
                 'e_id'         => 'e.id',
                 'subject'      => 'vp.subject',
                 'bounced'      => 'bounced',

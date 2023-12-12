@@ -50,8 +50,8 @@ class StatRepositoryFunctionalTest extends MauticMysqlTestCase
         $focusPopupB = $this->createFocus('popup focus B');
         $focusPopupC = $this->createFocus('popup focus C');
 
-        $focusBarA   = $this->createFocus('bar focus A');
-        $focusBarB   = $this->createFocus('bar focus B');
+        $focusBarA = $this->createFocus('bar focus A');
+        $focusBarB = $this->createFocus('bar focus B');
 
         $this->focusModel->saveEntity($focusPopupA);
         $this->focusModel->saveEntity($focusPopupB);

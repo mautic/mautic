@@ -71,7 +71,7 @@ class IntegrationSyncProcessTest extends TestCase
             ->with(self::INTEGRATION_NAME, $objectName)
             ->willReturn($fromSyncDateTime);
 
-        $toSyncDateTime   = new \DateTimeImmutable();
+        $toSyncDateTime = new \DateTimeImmutable();
         $this->syncDateHelper->expects($this->once())
             ->method('getSyncToDateTime')
             ->willReturn($toSyncDateTime);

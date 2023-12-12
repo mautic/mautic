@@ -53,7 +53,7 @@ JS;
             $js,
             200,
             [
-                'Content-Type'           => 'application/javascript',
+                'Content-Type' => 'application/javascript',
             ]
         );
     }

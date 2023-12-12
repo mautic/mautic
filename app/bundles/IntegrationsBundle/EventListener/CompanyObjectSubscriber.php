@@ -28,10 +28,10 @@ class CompanyObjectSubscriber implements EventSubscriberInterface
     public static function getSubscribedEvents(): array
     {
         return [
-            IntegrationEvents::INTEGRATION_COLLECT_INTERNAL_OBJECTS    => ['collectInternalObjects', 0],
-            IntegrationEvents::INTEGRATION_UPDATE_INTERNAL_OBJECTS     => ['updateCompanies', 0],
-            IntegrationEvents::INTEGRATION_CREATE_INTERNAL_OBJECTS     => ['createCompanies', 0],
-            IntegrationEvents::INTEGRATION_FIND_INTERNAL_RECORDS       => [
+            IntegrationEvents::INTEGRATION_COLLECT_INTERNAL_OBJECTS => ['collectInternalObjects', 0],
+            IntegrationEvents::INTEGRATION_UPDATE_INTERNAL_OBJECTS  => ['updateCompanies', 0],
+            IntegrationEvents::INTEGRATION_CREATE_INTERNAL_OBJECTS  => ['createCompanies', 0],
+            IntegrationEvents::INTEGRATION_FIND_INTERNAL_RECORDS    => [
                 ['findCompaniesByIds', 0],
                 ['findCompaniesByDateRange', 0],
                 ['findCompaniesByFieldValues', 0],

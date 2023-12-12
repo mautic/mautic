@@ -44,9 +44,9 @@ class CampaignSubscriber implements EventSubscriberInterface
     public static function getSubscribedEvents(): array
     {
         return [
-            CampaignEvents::CAMPAIGN_ON_BUILD       => ['onCampaignBuild', 0],
-            EmailEvents::EMAIL_ON_OPEN              => ['onEmailOpen', 0],
-            EmailEvents::ON_CAMPAIGN_BATCH_ACTION   => [
+            CampaignEvents::CAMPAIGN_ON_BUILD     => ['onCampaignBuild', 0],
+            EmailEvents::EMAIL_ON_OPEN            => ['onEmailOpen', 0],
+            EmailEvents::ON_CAMPAIGN_BATCH_ACTION => [
                 ['onCampaignTriggerActionSendEmailToContact', 0],
                 ['onCampaignTriggerActionSendEmailToUser', 1],
             ],
@@ -93,14 +93,14 @@ class CampaignSubscriber implements EventSubscriberInterface
         $event->addAction(
             'email.send',
             [
-                'label'                => 'mautic.email.campaign.event.send',
-                'description'          => 'mautic.email.campaign.event.send_descr',
-                'batchEventName'       => EmailEvents::ON_CAMPAIGN_BATCH_ACTION,
-                'formType'             => EmailSendType::class,
-                'formTypeOptions'      => ['update_select' => 'campaignevent_properties_email', 'with_email_types' => true],
-                'formTheme'            => '@MauticEmail/FormTheme/EmailSendList/_emailsend_list_row.html.twig',
-                'channel'              => 'email',
-                'channelIdField'       => 'email',
+                'label'           => 'mautic.email.campaign.event.send',
+                'description'     => 'mautic.email.campaign.event.send_descr',
+                'batchEventName'  => EmailEvents::ON_CAMPAIGN_BATCH_ACTION,
+                'formType'        => EmailSendType::class,
+                'formTypeOptions' => ['update_select' => 'campaignevent_properties_email', 'with_email_types' => true],
+                'formTheme'       => '@MauticEmail/FormTheme/EmailSendList/_emailsend_list_row.html.twig',
+                'channel'         => 'email',
+                'channelIdField'  => 'email',
             ]
         );
 
@@ -123,14 +123,14 @@ class CampaignSubscriber implements EventSubscriberInterface
         $event->addAction(
             'email.send.to.user',
             [
-                'label'                => 'mautic.email.campaign.event.send.to.user',
-                'description'          => 'mautic.email.campaign.event.send.to.user_descr',
-                'batchEventName'       => EmailEvents::ON_CAMPAIGN_BATCH_ACTION,
-                'formType'             => EmailToUserType::class,
-                'formTypeOptions'      => ['update_select' => 'campaignevent_properties_useremail_email'],
-                'formTheme'            => '@MauticEmail/FormTheme/EmailSendList/_email_to_user_row.html.twig',
-                'channel'              => 'email',
-                'channelIdField'       => 'email',
+                'label'           => 'mautic.email.campaign.event.send.to.user',
+                'description'     => 'mautic.email.campaign.event.send.to.user_descr',
+                'batchEventName'  => EmailEvents::ON_CAMPAIGN_BATCH_ACTION,
+                'formType'        => EmailToUserType::class,
+                'formTypeOptions' => ['update_select' => 'campaignevent_properties_useremail_email'],
+                'formTheme'       => '@MauticEmail/FormTheme/EmailSendList/_email_to_user_row.html.twig',
+                'channel'         => 'email',
+                'channelIdField'  => 'email',
             ]
         );
     }
@@ -244,7 +244,7 @@ class CampaignSubscriber implements EventSubscriberInterface
             'customHeaders'  => [
                 'X-EMAIL-ID' => $emailId,
             ],
-            'ignoreDNC'      => MailHelper::EMAIL_TYPE_TRANSACTIONAL === $type,
+            'ignoreDNC' => MailHelper::EMAIL_TYPE_TRANSACTIONAL === $type,
         ];
 
         // Determine if this email is transactional/marketing

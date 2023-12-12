@@ -45,14 +45,14 @@ class SlotSocialFollowType extends SlotType
             'align',
             ButtonGroupType::class,
             [
-                'label'             => 'mautic.core.image.position',
-                'label_attr'        => ['class' => 'control-label'],
-                'required'          => false,
-                'attr'              => [
+                'label'      => 'mautic.core.image.position',
+                'label_attr' => ['class' => 'control-label'],
+                'required'   => false,
+                'attr'       => [
                     'class'           => 'form-control',
                     'data-slot-param' => 'align',
                 ],
-                'choices'           => [
+                'choices' => [
                     'mautic.core.left'   => 0,
                     'mautic.core.center' => 1,
                     'mautic.core.right'  => 2,

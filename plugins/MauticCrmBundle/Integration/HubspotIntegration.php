@@ -305,12 +305,12 @@ class HubspotIntegration extends CrmAbstractIntegration
                 self::ACCESS_KEY,
                 TextType::class,
                 [
-                    'label'       => 'mautic.hubspot.form.accessKey',
-                    'label_attr'  => ['class' => 'control-label'],
-                    'attr'        => [
-                        'class'    => 'form-control',
+                    'label'      => 'mautic.hubspot.form.accessKey',
+                    'label_attr' => ['class' => 'control-label'],
+                    'attr'       => [
+                        'class' => 'form-control',
                     ],
-                    'required'    => false,
+                    'required' => false,
                 ]
             );
 
@@ -318,13 +318,13 @@ class HubspotIntegration extends CrmAbstractIntegration
                 $this->getApiKey(),
                 TextType::class,
                 [
-                    'label'       => 'mautic.hubspot.form.apikey',
-                    'label_attr'  => ['class' => 'control-label'],
-                    'attr'        => [
+                    'label'      => 'mautic.hubspot.form.apikey',
+                    'label_attr' => ['class' => 'control-label'],
+                    'attr'       => [
                         'class'    => 'form-control',
                         'readonly' => true,
                     ],
-                    'required'    => false,
+                    'required' => false,
                 ]
             );
         }
@@ -337,12 +337,12 @@ class HubspotIntegration extends CrmAbstractIntegration
                         'mautic.hubspot.object.contact' => 'contacts',
                         'mautic.hubspot.object.company' => 'company',
                     ],
-                    'expanded'          => true,
-                    'multiple'          => true,
-                    'label'             => $this->getTranslator()->trans('mautic.crm.form.objects_to_pull_from', ['%crm%' => 'Hubspot']),
-                    'label_attr'        => ['class' => ''],
-                    'placeholder'       => false,
-                    'required'          => false,
+                    'expanded'    => true,
+                    'multiple'    => true,
+                    'label'       => $this->getTranslator()->trans('mautic.crm.form.objects_to_pull_from', ['%crm%' => 'Hubspot']),
+                    'label_attr'  => ['class' => ''],
+                    'placeholder' => false,
+                    'required'    => false,
                 ]
             );
         }
@@ -573,8 +573,8 @@ class HubspotIntegration extends CrmAbstractIntegration
             return [];
         }
 
-        $object         = 'contacts';
-        $createFields   = $config['leadFields'];
+        $object       = 'contacts';
+        $createFields = $config['leadFields'];
 
         $readOnlyFields = $this->getReadOnlyFields($object);
 

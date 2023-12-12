@@ -39,11 +39,11 @@ class LeadEventLogRepository extends CommonRepository
         return $this->getEntities(
             array_merge(
                 [
-                    'start'          => 0,
-                    'limit'          => 100,
-                    'orderBy'        => $this->getTableAlias().'.dateAdded',
-                    'orderByDir'     => 'ASC',
-                    'filter'         => [
+                    'start'      => 0,
+                    'limit'      => 100,
+                    'orderBy'    => $this->getTableAlias().'.dateAdded',
+                    'orderByDir' => 'ASC',
+                    'filter'     => [
                         'force' => [
                             [
                                 'column' => $this->getTableAlias().'.bundle',

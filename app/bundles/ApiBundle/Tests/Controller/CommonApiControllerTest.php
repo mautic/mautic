@@ -193,7 +193,7 @@ class CommonApiControllerTest extends CampaignTestAbstract
         $model->expects($this->once())
             ->method('getEntities')
             ->willReturn($users);
-        $entities   = $controller->testGetBatchEntities($parameters, $errors, $model);
+        $entities = $controller->testGetBatchEntities($parameters, $errors, $model);
         $this->assertSame(3, $entities[0]->getId());
         $this->assertSame(4, $entities[1]->getId());
         $this->assertSame(5, $entities[2]->getId());

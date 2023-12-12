@@ -187,7 +187,7 @@ class InstallController extends CommonController
 
                 return $this->postActionRedirect(
                     [
-                        'viewParameters'    => [
+                        'viewParameters' => [
                             'welcome_url' => $this->generateUrl('mautic_dashboard_index'),
                             'parameters'  => $this->configurator->render(),
                             'version'     => MAUTIC_VERSION,
@@ -209,7 +209,7 @@ class InstallController extends CommonController
 
         return $this->delegateView(
             [
-                'viewParameters'  => [
+                'viewParameters' => [
                     'form'           => $form->createView(),
                     'index'          => $index,
                     'count'          => $this->configurator->getStepCount(),

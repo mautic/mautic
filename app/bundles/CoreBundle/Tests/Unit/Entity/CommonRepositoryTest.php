@@ -233,9 +233,9 @@ class CommonRepositoryTest extends \PHPUnit\Framework\TestCase
         $qb   = new \Doctrine\DBAL\Query\QueryBuilder($this->connectionMock);
         $args = [
             [
-                'col'   => 'l.user_id',
-                'expr'  => 'in',
-                'val'   => '"1","2","3","4"',
+                'col'  => 'l.user_id',
+                'expr' => 'in',
+                'val'  => '"1","2","3","4"',
             ],
         ];
         $matchArgs = explode(',', $args[0]['val']);
@@ -250,9 +250,9 @@ class CommonRepositoryTest extends \PHPUnit\Framework\TestCase
         $qb   = new \Doctrine\DBAL\Query\QueryBuilder($this->connectionMock);
         $args = [
             [
-                'col'   => 'l.user_id',
-                'expr'  => 'notIn',
-                'val'   => '"1","2","3","4"',
+                'col'  => 'l.user_id',
+                'expr' => 'notIn',
+                'val'  => '"1","2","3","4"',
             ],
         ];
         $matchArgs = explode(',', $args[0]['val']);
@@ -270,9 +270,9 @@ class CommonRepositoryTest extends \PHPUnit\Framework\TestCase
         $qb   = new \Doctrine\DBAL\Query\QueryBuilder($this->connectionMock);
         $args = [
             [
-                'col'   => 'l.user_id',
-                'expr'  => 'in',
-                'val'   => '1,2,3,4',
+                'col'  => 'l.user_id',
+                'expr' => 'in',
+                'val'  => '1,2,3,4',
             ],
         ];
         $matchArgs = explode(',', $args[0]['val']);
@@ -288,9 +288,9 @@ class CommonRepositoryTest extends \PHPUnit\Framework\TestCase
         $qb   = new \Doctrine\DBAL\Query\QueryBuilder($this->connectionMock);
         $args = [
             [
-                'col'   => 'l.user_id',
-                'expr'  => 'notIn',
-                'val'   => '1,2,3,4',
+                'col'  => 'l.user_id',
+                'expr' => 'notIn',
+                'val'  => '1,2,3,4',
             ],
         ];
         $matchArgs = explode(',', $args[0]['val']);
@@ -309,9 +309,9 @@ class CommonRepositoryTest extends \PHPUnit\Framework\TestCase
         $qb   = new \Doctrine\DBAL\Query\QueryBuilder($this->connectionMock);
         $args = [
             [
-                'col'   => 'l.firstname',
-                'expr'  => 'in',
-                'val'   => 'jan,alan,don,john',
+                'col'  => 'l.firstname',
+                'expr' => 'in',
+                'val'  => 'jan,alan,don,john',
             ],
         ];
         $matchArgs = explode(',', $args[0]['val']);
@@ -327,9 +327,9 @@ class CommonRepositoryTest extends \PHPUnit\Framework\TestCase
         $qb   = new \Doctrine\DBAL\Query\QueryBuilder($this->connectionMock);
         $args = [
             [
-                'col'   => 'l.firstname',
-                'expr'  => 'notIn',
-                'val'   => 'jan,alan,don,john',
+                'col'  => 'l.firstname',
+                'expr' => 'notIn',
+                'val'  => 'jan,alan,don,john',
             ],
         ];
         $matchArgs = explode(',', $args[0]['val']);
@@ -348,9 +348,9 @@ class CommonRepositoryTest extends \PHPUnit\Framework\TestCase
         $qb   = new \Doctrine\DBAL\Query\QueryBuilder($this->connectionMock);
         $args = [
             [
-                'col'   => 'l.firstname',
-                'expr'  => 'in',
-                'val'   => '"jan,alan,don,john"',
+                'col'  => 'l.firstname',
+                'expr' => 'in',
+                'val'  => '"jan,alan,don,john"',
             ],
         ];
 
@@ -363,9 +363,9 @@ class CommonRepositoryTest extends \PHPUnit\Framework\TestCase
         $qb   = new \Doctrine\DBAL\Query\QueryBuilder($this->connectionMock);
         $args = [
             [
-                'col'   => 'l.firstname',
-                'expr'  => 'notIn',
-                'val'   => '"jan,alan,don,john"',
+                'col'  => 'l.firstname',
+                'expr' => 'notIn',
+                'val'  => '"jan,alan,don,john"',
             ],
         ];
 

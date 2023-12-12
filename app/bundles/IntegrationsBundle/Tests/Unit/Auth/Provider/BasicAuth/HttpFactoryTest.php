@@ -107,7 +107,7 @@ class HttpFactoryTest extends TestCase
 
         $factory = new HttpFactory();
 
-        $client  = $factory->getClient($credentials);
+        $client = $factory->getClient($credentials);
 
         try {
             // Triggering an exception so we can extract the request

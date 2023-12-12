@@ -15,17 +15,17 @@ class ConfigCompanyType extends AbstractType
             'company_unique_identifiers_operator',
             ChoiceType::class,
             [
-                'choices'           => [
-                    'mautic.core.config.contact_unique_identifiers_operator.or'    => CompositeExpression::TYPE_OR,
-                    'mautic.core.config.contact_unique_identifiers_operator.and'   => CompositeExpression::TYPE_AND,
+                'choices' => [
+                    'mautic.core.config.contact_unique_identifiers_operator.or'  => CompositeExpression::TYPE_OR,
+                    'mautic.core.config.contact_unique_identifiers_operator.and' => CompositeExpression::TYPE_AND,
                 ],
-                'label'             => 'mautic.core.config.unique_identifiers_operator',
-                'required'          => false,
-                'attr'              => [
+                'label'    => 'mautic.core.config.unique_identifiers_operator',
+                'required' => false,
+                'attr'     => [
                     'class'   => 'form-control',
                     'tooltip' => 'mautic.core.config.unique_identifiers_operator.tooltip',
                 ],
-                'placeholder'       => false,
+                'placeholder' => false,
             ]
         );
     }

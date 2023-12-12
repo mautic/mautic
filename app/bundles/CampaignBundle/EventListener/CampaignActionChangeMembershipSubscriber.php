@@ -41,16 +41,16 @@ class CampaignActionChangeMembershipSubscriber implements EventSubscriberInterfa
                 'formTypeOptions' => [
                     'include_this' => true,
                 ],
-                'batchEventName'  => CampaignEvents::ON_CAMPAIGN_ACTION_CHANGE_MEMBERSHIP,
+                'batchEventName' => CampaignEvents::ON_CAMPAIGN_ACTION_CHANGE_MEMBERSHIP,
             ]
         );
     }
 
     public function changeMembership(PendingEvent $event): void
     {
-        $properties          = $event->getEvent()->getProperties();
-        $contacts            = $event->getContactsKeyedById();
-        $executingCampaign   = $event->getEvent()->getCampaign();
+        $properties        = $event->getEvent()->getProperties();
+        $contacts          = $event->getContactsKeyedById();
+        $executingCampaign = $event->getEvent()->getCampaign();
 
         if (!empty($properties['addTo'])) {
             $campaigns = $this->getCampaigns($properties['addTo'], $executingCampaign);

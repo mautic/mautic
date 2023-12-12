@@ -222,10 +222,10 @@ class UserRepository extends CommonRepository
 
     protected function addSearchCommandWhereClause($q, $filter): array
     {
-        $command                 = $filter->command;
-        $unique                  = $this->generateRandomParameterName();
-        $returnParameter         = false; // returning a parameter that is not used will lead to a Doctrine error
-        [$expr, $parameters]     = parent::addSearchCommandWhereClause($q, $filter);
+        $command             = $filter->command;
+        $unique              = $this->generateRandomParameterName();
+        $returnParameter     = false; // returning a parameter that is not used will lead to a Doctrine error
+        [$expr, $parameters] = parent::addSearchCommandWhereClause($q, $filter);
 
         switch ($command) {
             case $this->translator->trans('mautic.core.searchcommand.ispublished'):

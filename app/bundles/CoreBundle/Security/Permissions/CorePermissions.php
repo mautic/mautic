@@ -54,8 +54,8 @@ class CorePermissions
 
     public function setPermissionObject(AbstractPermissions $permissionObject): void
     {
-        $this->permissionObjectsByClass[$permissionObject::class]     = $permissionObject;
-        $this->permissionObjectsByName[$permissionObject->getName()]  = $permissionObject;
+        $this->permissionObjectsByClass[$permissionObject::class]    = $permissionObject;
+        $this->permissionObjectsByName[$permissionObject->getName()] = $permissionObject;
     }
 
     /**

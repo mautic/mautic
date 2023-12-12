@@ -56,7 +56,7 @@ class AjaxControllerFunctionalTest extends MauticMysqlTestCase
         $contact2 = $this->createContact('paul@example.com');
 
         $this->em->flush();
-        $email   = $this->createEmailWithParams(
+        $email = $this->createEmailWithParams(
             'Email A',
             'Email A Subject',
             'list',
@@ -78,8 +78,8 @@ class AjaxControllerFunctionalTest extends MauticMysqlTestCase
         $response = $this->client->getResponse();
         $this->assertTrue($response->isOk());
         $this->assertSame([
-            'success'         => 1,
-            'delivered'       => 1,
+            'success'   => 1,
+            'delivered' => 1,
         ], json_decode($response->getContent(), true));
     }
 
@@ -91,7 +91,7 @@ class AjaxControllerFunctionalTest extends MauticMysqlTestCase
         $contactPl2 = $this->createContact('jadwiga@example.com');
         $this->em->flush();
 
-        $emailEn   = $this->createEmailWithParams(
+        $emailEn = $this->createEmailWithParams(
             'Email EN',
             'Email EN Subject',
             'list',
@@ -101,7 +101,7 @@ class AjaxControllerFunctionalTest extends MauticMysqlTestCase
         $emailEn->setLanguage('en');
         $this->em->flush();
 
-        $emailPl   = $this->createEmailWithParams(
+        $emailPl = $this->createEmailWithParams(
             'Email PL',
             'Email PL Subject',
             'list',
@@ -133,8 +133,8 @@ class AjaxControllerFunctionalTest extends MauticMysqlTestCase
         $response = $this->client->getResponse();
         $this->assertTrue($response->isOk());
         $this->assertSame([
-            'success'         => 1,
-            'delivered'       => 1,
+            'success'   => 1,
+            'delivered' => 1,
         ], json_decode($response->getContent(), true));
     }
 
@@ -146,7 +146,7 @@ class AjaxControllerFunctionalTest extends MauticMysqlTestCase
         ];
 
         $this->em->flush();
-        $email   = $this->createEmailWithParams(
+        $email = $this->createEmailWithParams(
             'Email A',
             'Email A Subject',
             'list',

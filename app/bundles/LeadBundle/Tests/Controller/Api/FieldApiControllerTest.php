@@ -80,7 +80,7 @@ class FieldApiControllerTest extends TestCase
         $modelFactory->method('getModel')
             ->with('lead.field')
             ->willReturn($fieldModel);
-        $controller   = new FieldApiController(
+        $controller = new FieldApiController(
             $this->createMock(CorePermissions::class),
             $this->createMock(Translator::class),
             $this->createMock(EntityResultHelper::class),

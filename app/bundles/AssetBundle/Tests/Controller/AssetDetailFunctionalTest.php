@@ -10,8 +10,8 @@ class AssetDetailFunctionalTest extends MauticMysqlTestCase
 {
     public function testLeadViewPreventsXSS(): void
     {
-        $title      = 'aaa" onerror=alert(1) a="';
-        $asset      = new Asset();
+        $title = 'aaa" onerror=alert(1) a="';
+        $asset = new Asset();
         $asset->setTitle($title);
         $asset->setAlias('dummy-alias');
         $asset->setStorageLocation('local');
@@ -21,11 +21,11 @@ class AssetDetailFunctionalTest extends MauticMysqlTestCase
         $this->em->flush();
         $this->em->detach($asset);
 
-        $crawler   = $this->client->request('GET', sprintf('/s/assets/view/%d', $asset->getId()));
-        $imageTag  = $crawler->filter('.tab-content.preview-detail img');
+        $crawler  = $this->client->request('GET', sprintf('/s/assets/view/%d', $asset->getId()));
+        $imageTag = $crawler->filter('.tab-content.preview-detail img');
 
-        $onError  = $imageTag->attr('onerror');
-        $altProp  = $imageTag->attr('alt');
+        $onError = $imageTag->attr('onerror');
+        $altProp = $imageTag->attr('alt');
 
         Assert::assertNull($onError);
         Assert::assertSame($title, $altProp);

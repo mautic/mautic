@@ -65,7 +65,7 @@ class DynamicFiltersType extends AbstractType
                         $args['attr']['class'] .= ' datetimepicker';
                         break;
                     case 'multiselect':
-                        $args['multiple']         = true;
+                        $args['multiple'] = true;
                         // no break
                     case 'select':
                         $type            = ChoiceType::class;

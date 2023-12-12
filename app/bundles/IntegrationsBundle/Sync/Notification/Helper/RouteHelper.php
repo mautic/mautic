@@ -23,7 +23,7 @@ class RouteHelper
         private ObjectProvider $objectProvider,
         EventDispatcherInterface $dispatcher
     ) {
-        $this->dispatcher     = $dispatcher;
+        $this->dispatcher = $dispatcher;
     }
 
     /**

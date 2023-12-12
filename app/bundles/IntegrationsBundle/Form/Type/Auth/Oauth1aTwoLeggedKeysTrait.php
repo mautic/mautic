@@ -21,7 +21,7 @@ trait Oauth1aTwoLeggedKeysTrait
                 'label'      => 'mautic.integration.oauth1a.consumer.key',
                 'label_attr' => ['class' => 'control-label'],
                 'attr'       => [
-                    'class'    => 'form-control',
+                    'class' => 'form-control',
                 ],
                 'required'    => true,
                 'constraints' => [$this->getNotBlankConstraint()],
@@ -35,7 +35,7 @@ trait Oauth1aTwoLeggedKeysTrait
                 'label'      => 'mautic.integration.oauth1a.consumer.secret',
                 'label_attr' => ['class' => 'control-label'],
                 'attr'       => [
-                    'class'    => 'form-control',
+                    'class' => 'form-control',
                 ],
                 'required'    => true,
                 'constraints' => [$this->getNotBlankConstraint()],
@@ -49,7 +49,7 @@ trait Oauth1aTwoLeggedKeysTrait
                 'label'      => 'mautic.integration.oauth1a.token',
                 'label_attr' => ['class' => 'control-label'],
                 'attr'       => [
-                    'class'    => 'form-control',
+                    'class' => 'form-control',
                 ],
                 'required'    => true,
                 'constraints' => [$this->getNotBlankConstraint()],
@@ -63,7 +63,7 @@ trait Oauth1aTwoLeggedKeysTrait
                 'label'      => 'mautic.integration.oauth1a.token.secret',
                 'label_attr' => ['class' => 'control-label'],
                 'attr'       => [
-                    'class'    => 'form-control',
+                    'class' => 'form-control',
                 ],
                 'required'    => true,
                 'constraints' => [$this->getNotBlankConstraint()],

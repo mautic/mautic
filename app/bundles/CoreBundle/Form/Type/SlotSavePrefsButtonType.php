@@ -27,7 +27,7 @@ class SlotSavePrefsButtonType extends SlotType
                     'class'           => 'form-control',
                     'data-slot-param' => 'link-text',
                 ],
-                'data'       => $this->translator->trans('mautic.page.form.saveprefs'),
+                'data' => $this->translator->trans('mautic.page.form.saveprefs'),
             ]
         );
 
@@ -52,14 +52,14 @@ class SlotSavePrefsButtonType extends SlotType
             'button-size',
             ButtonGroupType::class,
             [
-                'label'             => 'mautic.core.button.size',
-                'label_attr'        => ['class' => 'control-label'],
-                'required'          => false,
-                'attr'              => [
+                'label'      => 'mautic.core.button.size',
+                'label_attr' => ['class' => 'control-label'],
+                'required'   => false,
+                'attr'       => [
                     'class'           => 'form-control',
                     'data-slot-param' => 'button-size',
                 ],
-                'choices'           => [
+                'choices' => [
                     'S' => 0,
                     'M' => 1,
                     'L' => 2,
@@ -71,14 +71,14 @@ class SlotSavePrefsButtonType extends SlotType
             'float',
             ButtonGroupType::class,
             [
-                'label'             => 'mautic.core.button.position',
-                'label_attr'        => ['class' => 'control-label'],
-                'required'          => false,
-                'attr'              => [
+                'label'      => 'mautic.core.button.position',
+                'label_attr' => ['class' => 'control-label'],
+                'required'   => false,
+                'attr'       => [
                     'class'           => 'form-control',
                     'data-slot-param' => 'float',
                 ],
-                'choices'           => [
+                'choices' => [
                     'mautic.core.left'   => 0,
                     'mautic.core.center' => 1,
                     'mautic.core.right'  => 2,

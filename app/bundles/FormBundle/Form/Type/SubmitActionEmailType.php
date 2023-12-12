@@ -118,7 +118,7 @@ class SubmitActionEmailType extends AbstractType
                     'class'    => 'form-control',
                     'onchange' => 'Mautic.getLeadEmailContent(this)',
                 ],
-                'multiple'   => false,
+                'multiple' => false,
             ]
         );
 

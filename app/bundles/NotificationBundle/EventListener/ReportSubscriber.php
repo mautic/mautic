@@ -14,7 +14,7 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class ReportSubscriber implements EventSubscriberInterface
 {
-    public const MOBILE_NOTIFICATIONS       = 'mobile_notifications';
+    public const MOBILE_NOTIFICATIONS = 'mobile_notifications';
 
     public const MOBILE_NOTIFICATIONS_STATS = 'mobile_notifications.stats';
 

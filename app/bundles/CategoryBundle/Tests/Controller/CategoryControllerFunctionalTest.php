@@ -30,7 +30,7 @@ class CategoryControllerFunctionalTest extends MauticMysqlTestCase
             ],
         ];
         /** @var CategoryModel $model */
-        $model      = self::$container->get('mautic.category.model.category');
+        $model = self::$container->get('mautic.category.model.category');
 
         foreach ($categoriesData as $categoryData) {
             $category = new Category();
@@ -47,8 +47,8 @@ class CategoryControllerFunctionalTest extends MauticMysqlTestCase
     public function testIndexActionWhenNotFiltered(): void
     {
         $this->client->request('GET', '/s/categories?tmpl=list&bundle=category');
-        $clientResponse         = $this->client->getResponse();
-        $clientResponseContent  = $clientResponse->getContent();
+        $clientResponse        = $this->client->getResponse();
+        $clientResponseContent = $clientResponse->getContent();
 
         $this->assertSame(200, $clientResponse->getStatusCode(), 'Return code must be 200.');
         $this->assertStringContainsString('TestTitleCategoryController1', $clientResponseContent, 'The return must contain TestTitleCategoryController1');
@@ -61,8 +61,8 @@ class CategoryControllerFunctionalTest extends MauticMysqlTestCase
     public function testIndexActionWhenFiltered(): void
     {
         $this->client->request('GET', '/s/categories/page?tmpl=list&bundle=page');
-        $clientResponse         = $this->client->getResponse();
-        $clientResponseContent  = $clientResponse->getContent();
+        $clientResponse        = $this->client->getResponse();
+        $clientResponseContent = $clientResponse->getContent();
 
         $this->assertSame(200, $clientResponse->getStatusCode(), 'Return code must be 200.');
         $this->assertStringContainsString('TestTitleCategoryController1', $clientResponseContent, 'The return must contain TestTitleCategoryController1');
@@ -71,9 +71,9 @@ class CategoryControllerFunctionalTest extends MauticMysqlTestCase
 
     public function testNewActionWithInForm(): void
     {
-        $crawler                = $this->client->request(Request::METHOD_GET, 's/categories/category/new');
-        $clientResponse         = json_decode($this->client->getResponse()->getContent(), true);
-        $html                   = $clientResponse['newContent'];
+        $crawler        = $this->client->request(Request::METHOD_GET, 's/categories/category/new');
+        $clientResponse = json_decode($this->client->getResponse()->getContent(), true);
+        $html           = $clientResponse['newContent'];
         $crawler->addHtmlContent($html);
         $saveButton = $crawler->selectButton('category_form[buttons][save]');
         $form       = $saveButton->form();

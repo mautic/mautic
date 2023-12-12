@@ -85,7 +85,7 @@ class CategoryController extends AbstractFormController
         $session->set('mautic.category.filter', $search);
 
         // set some permissions
-        $categoryModel  = $this->getModel('category');
+        $categoryModel = $this->getModel('category');
         \assert($categoryModel instanceof CategoryModel);
         $permissionBase = $categoryModel->getPermissionBase($bundle);
         $permissions    = $this->security->isGranted(
@@ -216,7 +216,7 @@ class CategoryController extends AbstractFormController
         $session    = $request->getSession();
         $entity     = $model->getEntity();
         $success    = 0;
-        $cancelled  = $valid  = false;
+        $cancelled  = $valid = false;
         $method     = $request->getMethod();
         $inForm     = $this->getInFormValue($request, $method);
         $showSelect = $request->get('show_bundle_select', false);
@@ -313,7 +313,7 @@ class CategoryController extends AbstractFormController
         $model   = $this->getModel('category');
         \assert($model instanceof CategoryModel);
         $entity    = $model->getEntity($objectId);
-        $success   = $closeModal   = 0;
+        $success   = $closeModal = 0;
         $cancelled = $valid = false;
         $method    = $request->getMethod();
         $inForm    = $this->getInFormValue($request, $method);
@@ -460,7 +460,7 @@ class CategoryController extends AbstractFormController
         ];
 
         if (Request::METHOD_POST === $request->getMethod()) {
-            $model  = $this->getModel('category');
+            $model = $this->getModel('category');
             \assert($model instanceof CategoryModel);
             $entity = $model->getEntity($objectId);
 

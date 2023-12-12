@@ -58,7 +58,7 @@ class FormApiController extends CommonApiController
         $this->entityNameMulti  = 'forms';
         $this->serializerGroups = ['formDetails', 'categoryList', 'publishDetails'];
 
-        $this->dataInputMasks  = [
+        $this->dataInputMasks = [
             'text'    => 'html',
             'message' => 'html',
         ];
@@ -168,7 +168,7 @@ class FormApiController extends CommonApiController
                     // Create an unique ID if not set - the following code requires one
                     $fieldParams['id'] = 'new'.hash('sha1', uniqid(mt_rand()));
                     /** @var ?Field $fieldEntity */
-                    $fieldEntity       = $fieldModel->getEntity();
+                    $fieldEntity = $fieldModel->getEntity();
                 } else {
                     /** @var ?Field $fieldEntity */
                     $fieldEntity       = $fieldModel->getEntity($fieldParams['id']);

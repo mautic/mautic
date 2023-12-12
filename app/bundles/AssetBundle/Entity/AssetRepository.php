@@ -83,7 +83,7 @@ class AssetRepository extends CommonRepository
             return [$expr, $parameters];
         }
 
-        $command         = $field         = $filter->command;
+        $command         = $field = $filter->command;
         $unique          = $this->generateRandomParameterName();
         $returnParameter = false; // returning a parameter that is not used will lead to a Doctrine error
         switch ($command) {

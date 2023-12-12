@@ -478,13 +478,13 @@ class SalesforceIntegration extends CrmAbstractIntegration
                     'choices' => [
                         'mautic.salesforce.sandbox' => 'sandbox',
                     ],
-                    'expanded'          => true,
-                    'multiple'          => true,
-                    'label'             => 'mautic.salesforce.form.sandbox',
-                    'label_attr'        => ['class' => 'control-label'],
-                    'placeholder'       => false,
-                    'required'          => false,
-                    'attr'              => [
+                    'expanded'    => true,
+                    'multiple'    => true,
+                    'label'       => 'mautic.salesforce.form.sandbox',
+                    'label_attr'  => ['class' => 'control-label'],
+                    'placeholder' => false,
+                    'required'    => false,
+                    'attr'        => [
                         'onclick' => 'Mautic.postForm(mQuery(\'form[name="integration_details"]\'),\'\');',
                     ],
                 ]
@@ -497,13 +497,13 @@ class SalesforceIntegration extends CrmAbstractIntegration
                     'choices' => [
                         'mautic.salesforce.updateOwner' => 'updateOwner',
                     ],
-                    'expanded'          => true,
-                    'multiple'          => true,
-                    'label'             => 'mautic.salesforce.form.updateOwner',
-                    'label_attr'        => ['class' => 'control-label'],
-                    'placeholder'       => false,
-                    'required'          => false,
-                    'attr'              => [
+                    'expanded'    => true,
+                    'multiple'    => true,
+                    'label'       => 'mautic.salesforce.form.updateOwner',
+                    'label_attr'  => ['class' => 'control-label'],
+                    'placeholder' => false,
+                    'required'    => false,
+                    'attr'        => [
                         'onclick' => 'Mautic.postForm(mQuery(\'form[name="integration_details"]\'),\'\');',
                     ],
                 ]
@@ -515,12 +515,12 @@ class SalesforceIntegration extends CrmAbstractIntegration
                     'choices' => [
                         'mautic.integrations.blanks' => 'updateBlanks',
                     ],
-                    'expanded'          => true,
-                    'multiple'          => true,
-                    'label'             => 'mautic.integrations.form.blanks',
-                    'label_attr'        => ['class' => 'control-label'],
-                    'placeholder'       => false,
-                    'required'          => false,
+                    'expanded'    => true,
+                    'multiple'    => true,
+                    'label'       => 'mautic.integrations.form.blanks',
+                    'label_attr'  => ['class' => 'control-label'],
+                    'placeholder' => false,
+                    'required'    => false,
                 ]
             );
             $builder->add(
@@ -530,12 +530,12 @@ class SalesforceIntegration extends CrmAbstractIntegration
                     'choices' => [
                         'mautic.integrations.update.dnc.by.date' => 'updateDncByDate',
                     ],
-                    'expanded'          => true,
-                    'multiple'          => true,
-                    'label'             => 'mautic.integrations.form.update.dnc.by.date.label',
-                    'label_attr'        => ['class' => 'control-label'],
-                    'placeholder'       => false,
-                    'required'          => false,
+                    'expanded'    => true,
+                    'multiple'    => true,
+                    'label'       => 'mautic.integrations.form.update.dnc.by.date.label',
+                    'label_attr'  => ['class' => 'control-label'],
+                    'placeholder' => false,
+                    'required'    => false,
                 ]
             );
 
@@ -549,12 +549,12 @@ class SalesforceIntegration extends CrmAbstractIntegration
                         'mautic.salesforce.object.company'  => 'company',
                         'mautic.salesforce.object.activity' => 'Activity',
                     ],
-                    'expanded'          => true,
-                    'multiple'          => true,
-                    'label'             => 'mautic.salesforce.form.objects_to_pull_from',
-                    'label_attr'        => ['class' => ''],
-                    'placeholder'       => false,
-                    'required'          => false,
+                    'expanded'    => true,
+                    'multiple'    => true,
+                    'label'       => 'mautic.salesforce.form.objects_to_pull_from',
+                    'label_attr'  => ['class' => ''],
+                    'placeholder' => false,
+                    'required'    => false,
                 ]
             );
 
@@ -562,9 +562,9 @@ class SalesforceIntegration extends CrmAbstractIntegration
                 'activityEvents',
                 ChoiceType::class,
                 [
-                    'choices'           => array_flip($this->leadModel->getEngagementTypes()), // Choice type expects labels as keys
-                    'label'             => 'mautic.salesforce.form.activity_included_events',
-                    'label_attr'        => [
+                    'choices'    => array_flip($this->leadModel->getEngagementTypes()), // Choice type expects labels as keys
+                    'label'      => 'mautic.salesforce.form.activity_included_events',
+                    'label_attr' => [
                         'class'       => 'control-label',
                         'data-toggle' => 'tooltip',
                         'title'       => $this->translator->trans('mautic.salesforce.form.activity.events.tooltip'),
@@ -856,7 +856,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
                         break;
                     }
 
-                    $query['nextUrl']  = $nextUrl;
+                    $query['nextUrl'] = $nextUrl;
                 }
 
                 if ($progress) {
@@ -1023,10 +1023,10 @@ class SalesforceIntegration extends CrmAbstractIntegration
      */
     public function pushLeads($params = []): array
     {
-        $limit                   = $params['limit'] ?? 100;
-        [$fromDate, $toDate]     = $this->getSyncTimeframeDates($params);
-        $config                  = $this->mergeConfigToFeatureSettings($params);
-        $integrationEntityRepo   = $this->getIntegrationEntityRepository();
+        $limit                 = $params['limit'] ?? 100;
+        [$fromDate, $toDate]   = $this->getSyncTimeframeDates($params);
+        $config                = $this->mergeConfigToFeatureSettings($params);
+        $integrationEntityRepo = $this->getIntegrationEntityRepository();
 
         $totalUpdated = 0;
         $totalCreated = 0;
@@ -1843,7 +1843,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
     {
         if (is_array($response)) {
             foreach ($response as $item) {
-                $contactId      = $integrationEntityId      = $campaignId      = null;
+                $contactId      = $integrationEntityId = $campaignId = null;
                 $object         = 'Lead';
                 $internalObject = 'lead';
                 if (!empty($item['referenceId'])) {
@@ -2513,10 +2513,10 @@ class SalesforceIntegration extends CrmAbstractIntegration
      */
     public function pushCompanies($params = []): array
     {
-        $limit                   = $params['limit'] ?? 100;
-        [$fromDate, $toDate]     = $this->getSyncTimeframeDates($params);
-        $config                  = $this->mergeConfigToFeatureSettings($params);
-        $integrationEntityRepo   = $this->getIntegrationEntityRepository();
+        $limit                 = $params['limit'] ?? 100;
+        [$fromDate, $toDate]   = $this->getSyncTimeframeDates($params);
+        $config                = $this->mergeConfigToFeatureSettings($params);
+        $integrationEntityRepo = $this->getIntegrationEntityRepository();
 
         if (!isset($config['companyFields'])) {
             return [0, 0, 0, 0];

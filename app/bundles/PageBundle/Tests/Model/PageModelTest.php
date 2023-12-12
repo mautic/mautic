@@ -121,7 +121,7 @@ class PageModelTest extends PageTestAbstract
      */
     public function testGetHitQueryRequest(): void
     {
-        $pageModel         = $this->getPageModel();
+        $pageModel = $this->getPageModel();
 
         foreach ($this->getQueryParams() as $params) {
             $request = new Request($params);
@@ -136,9 +136,9 @@ class PageModelTest extends PageTestAbstract
      */
     public function testGetHitQueryRedirect(): void
     {
-        $pageModel         = $this->getPageModel();
-        $request           = new Request();
-        $redirect          = new Redirect();
+        $pageModel = $this->getPageModel();
+        $request   = new Request();
+        $redirect  = new Redirect();
 
         foreach ($this->getQueryParams() as $params) {
             $redirect->setUrl($params['page_url']);
@@ -164,10 +164,10 @@ class PageModelTest extends PageTestAbstract
     private function getQueryParams(): array
     {
         $utm = [
-            'utm_source'  => 'test-utm_source',
-            'utm_medium'  => 'test-utm_medium',
-            'utm_campaign'=> 'test-utm_campaign',
-            'utm_content' => 'test-utm_content',
+            'utm_source'   => 'test-utm_source',
+            'utm_medium'   => 'test-utm_medium',
+            'utm_campaign' => 'test-utm_campaign',
+            'utm_content'  => 'test-utm_content',
         ];
         $querystring = '';
         foreach ($utm as $key => $value) {
@@ -183,47 +183,47 @@ class PageModelTest extends PageTestAbstract
                             'email' => 4,
                         ],
             ];
-        $ct      = ClickthroughHelper::encodeArrayForUrl($ctParams);
+        $ct = ClickthroughHelper::encodeArrayForUrl($ctParams);
 
         $params = [[
-            'page_title'      => 'Testpage',
-            'page_language'   => 'en-GB',
-            'page_referrer'   => '',
-            'page_url'        => sprintf('https://www.domain.com/testpage/?%s', $querystring),
-            'counter'         => 0,
-            'mautic_device_id'=> 'nowvkqdf6113236eokcg7qs',
-            'resolution'      => '1792x1120',
-            'timezone_offset' => -120,
-            'platform'        => 'MacIntel',
-            'do_not_track'    => 1,
-            'adblock'         => false,
-            'fingerprint'     => 'fec25ab2d659c4153c7f1d5724841132',
+            'page_title'       => 'Testpage',
+            'page_language'    => 'en-GB',
+            'page_referrer'    => '',
+            'page_url'         => sprintf('https://www.domain.com/testpage/?%s', $querystring),
+            'counter'          => 0,
+            'mautic_device_id' => 'nowvkqdf6113236eokcg7qs',
+            'resolution'       => '1792x1120',
+            'timezone_offset'  => -120,
+            'platform'         => 'MacIntel',
+            'do_not_track'     => 1,
+            'adblock'          => false,
+            'fingerprint'      => 'fec25ab2d659c4153c7f1d5724841132',
         ], [
-            'page_title'      => 'Testpage Special Chars',
-            'page_language'   => 'en-GB',
-            'page_referrer'   => '',
-            'page_url'        => 'https://www.domain.com/testpage/?utm_source=t%C3%A9%C3%A0%C3%A8st-utm_source&utm_medium=t%C3%A4%C3%B6ust-utm_medium&utm_campaign=te+%20%C2%B0st-utm_campaign&utm_content=t%E4%BD%A0%E5%A5%BDt-utm_content',
-            'counter'         => 0,
-            'mautic_device_id'=> 'nowvkqdf6113236eokcg7qs',
-            'resolution'      => '1792x1120',
-            'timezone_offset' => -120,
-            'platform'        => 'MacIntel',
-            'do_not_track'    => 1,
-            'adblock'         => false,
-            'fingerprint'     => 'fec25ab2d659c4153c7f1d5724841132',
+            'page_title'       => 'Testpage Special Chars',
+            'page_language'    => 'en-GB',
+            'page_referrer'    => '',
+            'page_url'         => 'https://www.domain.com/testpage/?utm_source=t%C3%A9%C3%A0%C3%A8st-utm_source&utm_medium=t%C3%A4%C3%B6ust-utm_medium&utm_campaign=te+%20%C2%B0st-utm_campaign&utm_content=t%E4%BD%A0%E5%A5%BDt-utm_content',
+            'counter'          => 0,
+            'mautic_device_id' => 'nowvkqdf6113236eokcg7qs',
+            'resolution'       => '1792x1120',
+            'timezone_offset'  => -120,
+            'platform'         => 'MacIntel',
+            'do_not_track'     => 1,
+            'adblock'          => false,
+            'fingerprint'      => 'fec25ab2d659c4153c7f1d5724841132',
         ], [
-            'page_title'      => 'Testpage With Encoded Params',
-            'page_language'   => 'en-GB',
-            'page_referrer'   => '',
-            'page_url'        => sprintf('https://www.domain.com/testpage/?ct=%s&%s', $ct, $querystring),
-            'counter'         => 0,
-            'mautic_device_id'=> 'nowvkqdf6113236eokcg7qs',
-            'resolution'      => '1792x1120',
-            'timezone_offset' => -120,
-            'platform'        => 'MacIntel',
-            'do_not_track'    => 1,
-            'adblock'         => false,
-            'fingerprint'     => 'fec25ab2d659c4153c7f1d5724841132',
+            'page_title'       => 'Testpage With Encoded Params',
+            'page_language'    => 'en-GB',
+            'page_referrer'    => '',
+            'page_url'         => sprintf('https://www.domain.com/testpage/?ct=%s&%s', $ct, $querystring),
+            'counter'          => 0,
+            'mautic_device_id' => 'nowvkqdf6113236eokcg7qs',
+            'resolution'       => '1792x1120',
+            'timezone_offset'  => -120,
+            'platform'         => 'MacIntel',
+            'do_not_track'     => 1,
+            'adblock'          => false,
+            'fingerprint'      => 'fec25ab2d659c4153c7f1d5724841132',
         ]];
 
         return $params;

@@ -209,8 +209,8 @@ class AjaxController extends CommonAjaxController
                 $queued  = $model->getQueuedCounts($email);
 
                 $data[] = [
-                    'id'          => $email->getId(),
-                    'pending'     => 'list' === $email->getEmailType() && $pending ? $this->translator->trans(
+                    'id'      => $email->getId(),
+                    'pending' => 'list' === $email->getEmailType() && $pending ? $this->translator->trans(
                         'mautic.email.stat.leadcount',
                         ['%count%' => $pending]
                     ) : 0,
@@ -269,15 +269,15 @@ class AjaxController extends CommonAjaxController
         }
 
         return $this->sendJsonResponse([
-            'success'     => 1,
-            'delivered'   => $deliveredCount,
+            'success'   => 1,
+            'delivered' => $deliveredCount,
         ]);
     }
 
     public function heatmapAction(Request $request, EmailModel $model): JsonResponse
     {
-        $emailId     = (int) $request->query->get('id');
-        $email       = $model->getEntity($emailId);
+        $emailId = (int) $request->query->get('id');
+        $email   = $model->getEntity($emailId);
 
         if (null === $email) {
             return $this->sendJsonResponse([

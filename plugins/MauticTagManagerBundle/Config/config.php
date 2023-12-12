@@ -17,7 +17,7 @@ return [
             ],
         ],
     ],
-    'services'    => [
+    'services' => [
         'integrations' => [
             'mautic.integration.tagmanager' => [
                 'class'     => \MauticPlugin\MauticTagManagerBundle\Integration\TagManagerIntegration::class,

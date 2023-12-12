@@ -65,7 +65,7 @@ class ObjectChangeGeneratorTest extends TestCase
                 fn ($mode, InformationChangeRequestDAO $internalInformationChangeRequest, InformationChangeRequestDAO $integrationInformationChangeRequest) => $integrationInformationChangeRequest
             );
 
-        $objectChangeDAO       = $this->getObjectGenerator()->getSyncObjectChange(
+        $objectChangeDAO = $this->getObjectGenerator()->getSyncObjectChange(
             $syncReport,
             $mappingManual,
             $mappingManual->getObjectMapping(Contact::NAME, $objectName),
@@ -122,7 +122,7 @@ class ObjectChangeGeneratorTest extends TestCase
                 fn ($mode, InformationChangeRequestDAO $internalInformationChangeRequest, InformationChangeRequestDAO $integrationInformationChangeRequest) => $internalInformationChangeRequest
             );
 
-        $objectChangeDAO       = $this->getObjectGenerator()->getSyncObjectChange(
+        $objectChangeDAO = $this->getObjectGenerator()->getSyncObjectChange(
             $syncReport,
             $mappingManual,
             $mappingManual->getObjectMapping(Contact::NAME, $objectName),

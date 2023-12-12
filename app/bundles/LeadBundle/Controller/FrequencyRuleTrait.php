@@ -70,11 +70,11 @@ trait FrequencyRuleTrait
             ContactFrequencyType::class,
             $data,
             [
-                'action'                   => $action,
-                'channels'                 => $allChannels,
-                'public_view'              => $isPublic,
-                'preference_center_only'   => $isPreferenceCenter,
-                'allow_extra_fields'       => true,
+                'action'                 => $action,
+                'channels'               => $allChannels,
+                'public_view'            => $isPublic,
+                'preference_center_only' => $isPreferenceCenter,
+                'allow_extra_fields'     => true,
             ]
         );
 

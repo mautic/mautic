@@ -23,14 +23,14 @@ class FilterSelectorType extends AbstractType
             'column',
             ChoiceType::class,
             [
-                'choices'           => array_flip($options['filterList']),
-                'expanded'          => false,
-                'multiple'          => false,
-                'label'             => 'mautic.report.report.label.filtercolumn',
-                'label_attr'        => ['class' => 'control-label filter-column'],
-                'placeholder'       => false,
-                'required'          => false,
-                'attr'              => [
+                'choices'     => array_flip($options['filterList']),
+                'expanded'    => false,
+                'multiple'    => false,
+                'label'       => 'mautic.report.report.label.filtercolumn',
+                'label_attr'  => ['class' => 'control-label filter-column'],
+                'placeholder' => false,
+                'required'    => false,
+                'attr'        => [
                     'class' => 'form-control filter-columns',
                 ],
             ]
@@ -50,14 +50,14 @@ class FilterSelectorType extends AbstractType
                 'condition',
                 ChoiceType::class,
                 [
-                    'choices'           => array_flip($choices),
-                    'expanded'          => false,
-                    'multiple'          => false,
-                    'label'             => 'mautic.report.report.label.filtercondition',
-                    'label_attr'        => ['class' => 'control-label filter-condition'],
-                    'placeholder'       => false,
-                    'required'          => false,
-                    'attr'              => [
+                    'choices'     => array_flip($choices),
+                    'expanded'    => false,
+                    'multiple'    => false,
+                    'label'       => 'mautic.report.report.label.filtercondition',
+                    'label_attr'  => ['class' => 'control-label filter-condition'],
+                    'placeholder' => false,
+                    'required'    => false,
+                    'attr'        => [
                         'class' => 'form-control not-chosen',
                     ],
                 ]
@@ -65,13 +65,13 @@ class FilterSelectorType extends AbstractType
 
             if (array_key_exists('in', $choices) && isset($data['value']) && is_array($data['value'])) {
                 $form->add('value', CollectionType::class, [
-                    'entry_type'    => TextType::class,
-                    'allow_add'     => true,
-                    'allow_delete'  => true,
-                    'label'         => 'mautic.report.report.label.filtervalue',
-                    'label_attr'    => ['class' => 'control-label'],
-                    'attr'          => ['class' => 'form-control filter-value'],
-                    'required'      => false,
+                    'entry_type'   => TextType::class,
+                    'allow_add'    => true,
+                    'allow_delete' => true,
+                    'label'        => 'mautic.report.report.label.filtervalue',
+                    'label_attr'   => ['class' => 'control-label'],
+                    'attr'         => ['class' => 'form-control filter-value'],
+                    'required'     => false,
                 ]);
             } else {
                 $form->add(
@@ -101,11 +101,11 @@ class FilterSelectorType extends AbstractType
             'glue',
             ChoiceType::class,
             [
-                'label'             => false,
-                'label_attr'        => ['class' => 'control-label'],
-                'attr'              => ['class' => 'form-control filter-glue not-chosen'],
-                'required'          => false,
-                'choices'           => [
+                'label'      => false,
+                'label_attr' => ['class' => 'control-label'],
+                'attr'       => ['class' => 'form-control filter-glue not-chosen'],
+                'required'   => false,
+                'choices'    => [
                     'mautic.report.report.glue.choice.and' => 'and',
                     'mautic.report.report.glue.choice.or'  => 'or',
                 ],

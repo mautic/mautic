@@ -196,7 +196,7 @@ class DynamicContentType extends AbstractType
                     'class'   => 'form-control',
                     'tooltip' => 'mautic.email.utm_tags.tooltip',
                 ],
-                'required'   => false,
+                'required' => false,
             ]
         );
 

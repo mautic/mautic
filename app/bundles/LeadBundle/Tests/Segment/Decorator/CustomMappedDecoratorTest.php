@@ -18,7 +18,7 @@ class CustomMappedDecoratorTest extends \PHPUnit\Framework\TestCase
         $customMappedDecorator = $this->getDecorator();
 
         $contactSegmentFilterCrate = new ContactSegmentFilterCrate([
-            'field'    => 'lead_email_read_count',
+            'field' => 'lead_email_read_count',
         ]);
 
         $this->assertSame('open_count', $customMappedDecorator->getField($contactSegmentFilterCrate));
@@ -32,7 +32,7 @@ class CustomMappedDecoratorTest extends \PHPUnit\Framework\TestCase
         $customMappedDecorator = $this->getDecorator();
 
         $contactSegmentFilterCrate = new ContactSegmentFilterCrate([
-            'field'    => 'lead_email_read_count',
+            'field' => 'lead_email_read_count',
         ]);
 
         $this->assertSame(MAUTIC_TABLE_PREFIX.'email_stats', $customMappedDecorator->getTable($contactSegmentFilterCrate));
@@ -46,7 +46,7 @@ class CustomMappedDecoratorTest extends \PHPUnit\Framework\TestCase
         $customMappedDecorator = $this->getDecorator();
 
         $contactSegmentFilterCrate = new ContactSegmentFilterCrate([
-            'field'    => 'dnc_bounced',
+            'field' => 'dnc_bounced',
         ]);
 
         $this->assertSame('mautic.lead.query.builder.special.dnc', $customMappedDecorator->getQueryType($contactSegmentFilterCrate));
@@ -60,7 +60,7 @@ class CustomMappedDecoratorTest extends \PHPUnit\Framework\TestCase
         $customMappedDecorator = $this->getDecorator();
 
         $contactSegmentFilterCrate = new ContactSegmentFilterCrate([
-            'field'    => 'lead_email_read_count',
+            'field' => 'lead_email_read_count',
         ]);
 
         $this->assertSame('lead_id', $customMappedDecorator->getForeignContactColumn($contactSegmentFilterCrate));

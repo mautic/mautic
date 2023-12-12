@@ -21,8 +21,8 @@ final class GravatarHelper
         CoreParametersHelper $coreParametersHelper,
         private RequestStack $requestStack
     ) {
-        $this->devMode             = MAUTIC_ENV === 'dev';
-        $this->devHosts            = (array) $coreParametersHelper->get('dev_hosts');
+        $this->devMode  = MAUTIC_ENV === 'dev';
+        $this->devHosts = (array) $coreParametersHelper->get('dev_hosts');
     }
 
     /**

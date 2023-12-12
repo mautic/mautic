@@ -14,9 +14,9 @@ class ReportSubscriber implements EventSubscriberInterface
 {
     public const CONTEXT_GROUP_SCORE = 'group.score';
 
-    public const GROUP_PREFIX        = 'pl';
+    public const GROUP_PREFIX = 'pl';
 
-    public const GROUP_SCORE_PREFIX  = 'ls';
+    public const GROUP_SCORE_PREFIX = 'ls';
 
     public const GROUP_COLUMNS = [
         self::GROUP_PREFIX.'.id' => [
@@ -51,8 +51,8 @@ class ReportSubscriber implements EventSubscriberInterface
     public static function getSubscribedEvents(): array
     {
         return [
-            ReportEvents::REPORT_ON_BUILD          => ['onReportBuilder', -10],
-            ReportEvents::REPORT_ON_GENERATE       => ['onReportGenerate', -10],
+            ReportEvents::REPORT_ON_BUILD    => ['onReportBuilder', -10],
+            ReportEvents::REPORT_ON_GENERATE => ['onReportGenerate', -10],
         ];
     }
 

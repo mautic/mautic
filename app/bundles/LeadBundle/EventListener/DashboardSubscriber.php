@@ -35,9 +35,9 @@ class DashboardSubscriber extends MainDashboardSubscriber
         'lead.lifetime'                 => [
             'formAlias' => DashboardLeadsLifetimeWidgetType::class,
         ],
-        'map.of.leads'            => [],
-        'top.lists'               => [],
-        'segments.build.time'     => [
+        'map.of.leads'        => [],
+        'top.lists'           => [],
+        'segments.build.time' => [
             'formAlias' => DashboardSegmentsBuildTime::class,
         ],
         'top.creators'  => [],
@@ -460,7 +460,7 @@ class DashboardSubscriber extends MainDashboardSubscriber
                         new \DateInterval("PT{$buildTime[0]}H{$buildTime[1]}M{$buildTime[2]}S")
                     );
 
-                    $row        = [
+                    $row = [
                         [
                             'value' => $segment->getName(),
                             'type'  => 'link',

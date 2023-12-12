@@ -31,22 +31,22 @@ final class FormApiControllerFunctionalTest extends MauticMysqlTestCase
                 'isRequired'   => true,
             ],
             [
-                'label'        => 'Number',
-                'type'         => 'number',
-                'alias'        => 'number',
-                'leadField'    => 'points', // @deprecated Setting leadField, no mappedField or mappedObject (BC).
+                'label'     => 'Number',
+                'type'      => 'number',
+                'alias'     => 'number',
+                'leadField' => 'points', // @deprecated Setting leadField, no mappedField or mappedObject (BC).
             ],
             [
-                'label'        => 'Company',
-                'type'         => 'text',
-                'alias'        => 'company',
-                'leadField'    => 'company', // @deprecated Setting leadField, no mappedField or mappedObject (BC).
+                'label'     => 'Company',
+                'type'      => 'text',
+                'alias'     => 'company',
+                'leadField' => 'company', // @deprecated Setting leadField, no mappedField or mappedObject (BC).
             ],
             [
-                'label'        => 'Company Phone',
-                'type'         => 'tel',
-                'alias'        => 'phone',
-                'leadField'    => 'companyphone', // @deprecated Setting leadField, no mappedField or mappedObject (BC).
+                'label'     => 'Company Phone',
+                'type'      => 'tel',
+                'alias'     => 'phone',
+                'leadField' => 'companyphone', // @deprecated Setting leadField, no mappedField or mappedObject (BC).
             ],
             [
                 'label'        => 'Country',
@@ -56,10 +56,10 @@ final class FormApiControllerFunctionalTest extends MauticMysqlTestCase
                 'mappedField'  => 'country',
             ],
             [
-                'label'        => 'Multiselect',
-                'type'         => 'select',
-                'alias'        => 'multiselect',
-                'properties'   => [
+                'label'      => 'Multiselect',
+                'type'       => 'select',
+                'alias'      => 'multiselect',
+                'properties' => [
                     'syncList' => 0,
                     'multiple' => 1,
                     'list'     => [
@@ -77,8 +77,8 @@ final class FormApiControllerFunctionalTest extends MauticMysqlTestCase
                 ],
             ],
             [
-                'label'        => 'Submit',
-                'type'         => 'button',
+                'label' => 'Submit',
+                'type'  => 'button',
             ],
         ],
         'actions' => [
@@ -216,7 +216,7 @@ final class FormApiControllerFunctionalTest extends MauticMysqlTestCase
                         'any'    => 1,
                         'values' => [],
                     ],
-                    'properties'   => [
+                    'properties' => [
                         'syncList' => 1,
                         'multiple' => 0,
                     ],
@@ -238,8 +238,8 @@ final class FormApiControllerFunctionalTest extends MauticMysqlTestCase
 
         // Edit PUT:
         $payload['description'] .= ' renamed';
-        $payload['fields']      = []; // Set fields to an empty array as it would duplicate all fields.
-        $payload['postAction']  = 'return'; // Must be present for PUT as all empty values are being cleared.
+        $payload['fields']     = []; // Set fields to an empty array as it would duplicate all fields.
+        $payload['postAction'] = 'return'; // Must be present for PUT as all empty values are being cleared.
         $this->client->request(Request::METHOD_PUT, "/api/forms/{$formId}/edit", $payload);
         $clientResponse = $this->client->getResponse();
         $response       = json_decode($clientResponse->getContent(), true);

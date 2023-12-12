@@ -82,7 +82,7 @@ class CompanyModelTest extends \PHPUnit\Framework\TestCase
         $companyModel = $this->getCompanyModelForImport();
 
         $duplicatedCompany = $this->createMock(Company::class);
-        $duplicatedCompany->method('getProfileFields')->willReturn(['companyfield'=> 'xxx']);
+        $duplicatedCompany->method('getProfileFields')->willReturn(['companyfield' => 'xxx']);
         $companyDeduper = $this->getCompanyDeduperForImport($duplicatedCompany);
 
         $this->setProperty($companyModel, CompanyModel::class, 'companyDeduper', $companyDeduper);
@@ -95,7 +95,7 @@ class CompanyModelTest extends \PHPUnit\Framework\TestCase
         $companyModel = $this->getCompanyModelForImport();
 
         $duplicatedCompany = $this->createMock(Company::class);
-        $duplicatedCompany->method('getProfileFields')->willReturn(['companyfield'=> 'xxx']);
+        $duplicatedCompany->method('getProfileFields')->willReturn(['companyfield' => 'xxx']);
         $companyDeduper = $this->getCompanyDeduperForImport($duplicatedCompany);
 
         $this->setProperty($companyModel, CompanyModel::class, 'companyDeduper', $companyDeduper);
@@ -169,7 +169,7 @@ class CompanyModelTest extends \PHPUnit\Framework\TestCase
             'company'         => 'i_company_name',
             'companyindustry' => 'i_company_industry',
         ];
-        $data= [
+        $data = [
             'i_contact_email'    => 'PennyKMoore@dayrep.com',
             'i_company_email'    => 'turbochicken@dayrep.com',
             'i_company_name'     => 'Turbo chicken',

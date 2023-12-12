@@ -16,8 +16,8 @@ class WebhookQueueEvent extends CommonEvent
         protected Webhook $webhook,
         $isNew = false
     ) {
-        $this->entity  = $webhookQueue;
-        $this->isNew   = $isNew;
+        $this->entity = $webhookQueue;
+        $this->isNew  = $isNew;
     }
 
     /**

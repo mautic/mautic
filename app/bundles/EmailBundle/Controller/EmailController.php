@@ -313,10 +313,10 @@ class EmailController extends FormController
         }
 
         // get A/B test information
-        [$parent, $children]     = $email->getVariants();
-        $properties              = [];
-        $variantError            = false;
-        $weight                  = 0;
+        [$parent, $children] = $email->getVariants();
+        $properties          = [];
+        $variantError        = false;
+        $weight              = 0;
         if (count($children)) {
             foreach ($children as $c) {
                 $variantSettings = $c->getVariantSettings();
@@ -390,11 +390,11 @@ class EmailController extends FormController
                     ]
                 ),
                 'viewParameters' => [
-                    'email'        => $email,
-                    'trackables'   => $trackableLinks,
-                    'logs'         => $logs,
-                    'isEmbedded'   => $request->get('isEmbedded') ?: false,
-                    'variants'     => [
+                    'email'      => $email,
+                    'trackables' => $trackableLinks,
+                    'logs'       => $logs,
+                    'isEmbedded' => $request->get('isEmbedded') ?: false,
+                    'variants'   => [
                         'parent'     => $parent,
                         'children'   => $children,
                         'properties' => $properties,
@@ -1212,13 +1212,13 @@ class EmailController extends FormController
                 $stats = ['sent' => 0, 'failed' => 0, 'failedRecipients' => []];
                 $session->set('mautic.email.send.stats', $stats);
 
-                $status     = 'inprogress';
+                $status = 'inprogress';
 
                 $session->set('mautic.email.send.active', false);
             } else {
-                $stats      = $session->get('mautic.email.send.stats');
-                $progress   = $session->get('mautic.email.send.progress');
-                $status     = (!empty($stats['failed'])) ? 'with_errors' : 'success';
+                $stats    = $session->get('mautic.email.send.stats');
+                $progress = $session->get('mautic.email.send.progress');
+                $status   = (!empty($stats['failed'])) ? 'with_errors' : 'success';
             }
 
             $batchlimit      = $this->coreParametersHelper->get('mailer_memory_msg_limit');
@@ -1444,7 +1444,7 @@ class EmailController extends FormController
      */
     private function processSlots(SlotsHelper $slotsHelper, $slots, $entity): void
     {
-        $content     = $entity->getContent();
+        $content = $entity->getContent();
 
         // Set the slots
         foreach ($slots as $slot => $slotConfig) {

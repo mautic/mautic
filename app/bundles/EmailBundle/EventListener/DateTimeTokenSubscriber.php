@@ -20,9 +20,9 @@ class DateTimeTokenSubscriber implements EventSubscriberInterface
     public static function getSubscribedEvents(): array
     {
         return [
-            EmailEvents::EMAIL_ON_BUILD                     => ['onEmailBuild', 0],
-            EmailEvents::EMAIL_ON_SEND                      => ['onEmailGenerate', 0],
-            EmailEvents::EMAIL_ON_DISPLAY                   => ['onEmailDisplay', 0],
+            EmailEvents::EMAIL_ON_BUILD   => ['onEmailBuild', 0],
+            EmailEvents::EMAIL_ON_SEND    => ['onEmailGenerate', 0],
+            EmailEvents::EMAIL_ON_DISPLAY => ['onEmailDisplay', 0],
         ];
     }
 

@@ -55,8 +55,8 @@ class DashboardSubscriber extends MainDashboardSubscriber
             $widget = $event->getWidget();
             $params = $widget->getParams();
             if (!$event->isCached()) {
-                [$reportId, $graph]     = explode(':', $params['graph']);
-                $report                 = $this->reportModel->getEntity($reportId);
+                [$reportId, $graph] = explode(':', $params['graph']);
+                $report             = $this->reportModel->getEntity($reportId);
 
                 if ($report && $this->security->hasEntityAccess('report:reports:viewown', 'report:reports:viewother', $report->getCreatedBy())) {
                     $reportData = $this->reportModel->getReportData(

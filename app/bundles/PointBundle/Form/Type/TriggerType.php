@@ -97,7 +97,7 @@ class TriggerType extends AbstractType
             'group',
             GroupListType::class,
             [
-                'attr'       => [
+                'attr' => [
                     'class'   => 'form-control',
                     'tooltip' => 'mautic.point.group.form.group_descr',
                 ],
@@ -127,8 +127,8 @@ class TriggerType extends AbstractType
             'isPublished',
             YesNoButtonGroupType::class,
             [
-                'data'      => $data,
-                'attr'      => [
+                'data' => $data,
+                'attr' => [
                     'readonly' => $readonly,
                 ],
             ]

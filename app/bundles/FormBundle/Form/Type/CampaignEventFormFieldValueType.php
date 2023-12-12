@@ -53,7 +53,7 @@ class CampaignEventFormFieldValueType extends AbstractType
             'operator',
             ChoiceType::class,
             [
-                'choices'           => $choices,
+                'choices' => $choices,
                 ]
         );
 
@@ -110,8 +110,8 @@ class CampaignEventFormFieldValueType extends AbstractType
                 'field',
                 ChoiceType::class,
                 [
-                    'choices'           => $fields,
-                    'attr'              => [
+                    'choices' => $fields,
+                    'attr'    => [
                         'onchange'           => 'Mautic.updateFormFieldValues(this)',
                         'data-field-options' => json_encode($options),
                     ],

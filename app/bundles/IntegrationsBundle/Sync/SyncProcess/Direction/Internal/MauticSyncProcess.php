@@ -82,7 +82,7 @@ class MauticSyncProcess
                 self::class.':'.__FUNCTION__
             );
 
-            $internalRequestObject  = new RequestObjectDAO($internalObjectName, $objectSyncFromDateTime, $objectSyncToDateTime);
+            $internalRequestObject = new RequestObjectDAO($internalObjectName, $objectSyncFromDateTime, $objectSyncToDateTime);
             foreach ($internalObjectFields as $internalObjectField) {
                 $internalRequestObject->addField($internalObjectField);
             }
@@ -131,7 +131,7 @@ class MauticSyncProcess
                             $mappedInternalObjectName,
                             $integrationObject
                         );
-                        $objectChange   = $this->objectChangeGenerator->getSyncObjectChange(
+                        $objectChange = $this->objectChangeGenerator->getSyncObjectChange(
                             $syncReport,
                             $this->mappingManualDAO,
                             $objectMapping,

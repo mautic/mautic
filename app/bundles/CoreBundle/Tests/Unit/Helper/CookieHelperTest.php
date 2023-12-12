@@ -60,7 +60,7 @@ class CookieHelperTest extends TestCase
         $kernel            = new \AppKernel(MAUTIC_ENV, false);
         $request           = $this->createMock(Request::class);
 
-        $event   = new ResponseEvent($kernel, $request, HttpKernelInterface::MAIN_REQUEST, $response);
+        $event = new ResponseEvent($kernel, $request, HttpKernelInterface::MAIN_REQUEST, $response);
 
         $cookieHelper->onResponse($event);
     }
@@ -96,7 +96,7 @@ class CookieHelperTest extends TestCase
         $kernel            = new \AppKernel(MAUTIC_ENV, false);
         $request           = $this->createMock(Request::class);
 
-        $event             = new ResponseEvent($kernel, $request, HttpKernelInterface::MAIN_REQUEST, $response);
+        $event = new ResponseEvent($kernel, $request, HttpKernelInterface::MAIN_REQUEST, $response);
 
         $cookieHelper->onResponse($event);
     }

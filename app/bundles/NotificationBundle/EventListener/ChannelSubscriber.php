@@ -65,9 +65,9 @@ class ChannelSubscriber implements EventSubscriberInterface
                                 'asset.download',
                                 'form.submit',
                             ],
-                            'lookupFormType'             => NotificationListType::class,
-                            'repository'                 => \Mautic\NotificationBundle\Entity\Notification::class,
-                            'lookupOptions'              => [
+                            'lookupFormType' => NotificationListType::class,
+                            'repository'     => \Mautic\NotificationBundle\Entity\Notification::class,
+                            'lookupOptions'  => [
                                 'mobile'  => true,
                                 'desktop' => false,
                             ],

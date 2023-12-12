@@ -147,13 +147,13 @@ class CompanyController extends FormController
         );
 
         /** @var CompanyModel $model */
-        $model  = $this->getModel('lead.company');
+        $model = $this->getModel('lead.company');
 
         /** @var \Mautic\LeadBundle\Entity\Company $company */
         $company = $model->getEntity($objectId);
 
-        $companiesRepo  = $model->getCompanyLeadRepository();
-        $contacts       = $companiesRepo->getCompanyLeads($objectId);
+        $companiesRepo = $model->getCompanyLeadRepository();
+        $contacts      = $companiesRepo->getCompanyLeads($objectId);
 
         $leadIds = array_column($contacts, 'lead_id');
 
@@ -514,7 +514,7 @@ class CompanyController extends FormController
     public function viewAction(Request $request, $objectId)
     {
         /** @var CompanyModel $model */
-        $model  = $this->getModel('lead.company');
+        $model = $this->getModel('lead.company');
 
         /** @var \Mautic\LeadBundle\Entity\Company $company */
         $company = $model->getEntity($objectId);
@@ -572,9 +572,9 @@ class CompanyController extends FormController
             return $this->accessDenied();
         }
 
-        $fields         = $company->getFields();
-        $companiesRepo  = $model->getCompanyLeadRepository();
-        $contacts       = $companiesRepo->getCompanyLeads($objectId);
+        $fields        = $company->getFields();
+        $companiesRepo = $model->getCompanyLeadRepository();
+        $contacts      = $companiesRepo->getCompanyLeads($objectId);
 
         $leadIds = array_column($contacts, 'lead_id');
 
@@ -585,15 +585,15 @@ class CompanyController extends FormController
         return $this->delegateView(
             [
                 'viewParameters' => [
-                    'company'           => $company,
-                    'fields'            => $fields,
-                    'items'             => $contacts['items'],
-                    'permissions'       => $permissions,
-                    'engagementData'    => $engagementData,
-                    'security'          => $this->security,
-                    'page'              => $contacts['page'],
-                    'totalItems'        => $contacts['count'],
-                    'limit'             => $contacts['limit'],
+                    'company'        => $company,
+                    'fields'         => $fields,
+                    'items'          => $contacts['items'],
+                    'permissions'    => $permissions,
+                    'engagementData' => $engagementData,
+                    'security'       => $this->security,
+                    'page'           => $contacts['page'],
+                    'totalItems'     => $contacts['count'],
+                    'limit'          => $contacts['limit'],
                 ],
                 'contentTemplate' => '@MauticLead/Company/company.html.twig',
             ]
@@ -793,7 +793,7 @@ class CompanyController extends FormController
                 $this->addFlashMessage(
                     'mautic.company.notice.batch_deleted',
                     [
-                        '%count%'     => $deleted,
+                        '%count%' => $deleted,
                     ]
                 );
             }
@@ -980,9 +980,9 @@ class CompanyController extends FormController
         }
 
         /** @var companyModel $companyModel */
-        $companyModel  = $this->getModel('lead.company');
-        $company       = $companyModel->getEntity($companyId);
-        $dataType      = $request->get('filetype', 'csv');
+        $companyModel = $this->getModel('lead.company');
+        $company      = $companyModel->getEntity($companyId);
+        $dataType     = $request->get('filetype', 'csv');
 
         if (empty($company)) {
             return $this->notFound();
@@ -990,7 +990,7 @@ class CompanyController extends FormController
 
         $companyFields = $company->getProfileFields();
         $export        = [];
-        foreach ($companyFields as $alias=>$companyField) {
+        foreach ($companyFields as $alias => $companyField) {
             $export[] = [
                 'alias' => $alias,
                 'value' => $companyField,

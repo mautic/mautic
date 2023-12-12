@@ -144,7 +144,7 @@ class FieldModelTest extends MauticMysqlTestCase
      */
     private function getColumns($table, $column)
     {
-        $stmt       = $this->connection->executeQuery(
+        $stmt = $this->connection->executeQuery(
             "SELECT * FROM information_schema.COLUMNS WHERE TABLE_SCHEMA = '{$this->connection->getParams()['dbname']}' AND TABLE_NAME = '".MAUTIC_TABLE_PREFIX
             ."$table' AND COLUMN_NAME = '$column'"
         );

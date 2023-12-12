@@ -26,7 +26,7 @@ class SlotCategoryListType extends SlotType
                     'class'           => 'form-control',
                     'data-slot-param' => 'label-text',
                 ],
-                'data'       => $this->translator->trans('mautic.lead.form.categories'),
+                'data' => $this->translator->trans('mautic.lead.form.categories'),
             ]
         );
 

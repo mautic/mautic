@@ -23,7 +23,7 @@ abstract class AbstractHelper implements StatHelperInterface
         protected GeneratedColumnsProviderInterface $generatedColumnsProvider,
         private UserHelper $userHelper
     ) {
-        $this->connection               = $connection;
+        $this->connection = $connection;
     }
 
     /**

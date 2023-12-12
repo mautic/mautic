@@ -62,7 +62,7 @@ class ResponsesTest extends \PHPUnit\Framework\TestCase
         $responses->setFromLogs($logs);
 
         $actions = [
-            'actionEvent'  => [
+            'actionEvent' => [
                 1 => 'test',
             ],
             'action2Event' => [

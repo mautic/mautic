@@ -20,7 +20,7 @@ class ConfigType extends AbstractType
                     'class'   => 'form-control',
                     'tooltip' => 'mautic.config.tab.form.csv_always_enclose.tooltip',
                 ],
-                'data'       => isset($options['data']['csv_always_enclose']) && (bool) $options['data']['csv_always_enclose'],
+                'data' => isset($options['data']['csv_always_enclose']) && (bool) $options['data']['csv_always_enclose'],
             ]
         );
     }

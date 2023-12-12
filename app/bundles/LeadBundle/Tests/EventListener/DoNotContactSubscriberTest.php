@@ -16,8 +16,8 @@ class DoNotContactSubscriberTest extends \PHPUnit\Framework\TestCase
 
     protected function setUp(): void
     {
-        $this->doNotContact               = $this->createMock(DoNotContact::class);
-        $this->doNotContactSubscriber     = new DoNotContactSubscriber($this->doNotContact);
+        $this->doNotContact           = $this->createMock(DoNotContact::class);
+        $this->doNotContactSubscriber = new DoNotContactSubscriber($this->doNotContact);
     }
 
     public function testGetSubscribedEvents(): void

@@ -20,7 +20,7 @@ final class UpdateSchemaStep implements StepInterface
         private TranslatorInterface $translator,
         ContainerInterface $container
     ) {
-        $this->kernel     = $container->get('kernel');
+        $this->kernel = $container->get('kernel');
     }
 
     public function getOrder(): int

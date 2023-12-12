@@ -55,7 +55,7 @@ class BatchContactController extends AbstractFormController
             $this->actionModel->removeContactsFromCategories($contactIds, $categoriesToRemove);
 
             $this->addFlashMessage('mautic.lead.batch_leads_affected', [
-                '%count%'     => count($ids),
+                '%count%' => count($ids),
             ]);
         } else {
             $this->addFlashMessage('mautic.core.error.ids.missing');

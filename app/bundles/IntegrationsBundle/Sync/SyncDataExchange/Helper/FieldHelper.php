@@ -51,7 +51,7 @@ class FieldHelper
         EventDispatcherInterface $eventDispatcher,
         private ObjectProvider $objectProvider
     ) {
-        $this->eventDispatcher         = $eventDispatcher;
+        $this->eventDispatcher = $eventDispatcher;
     }
 
     public function getFieldList(string $object): array

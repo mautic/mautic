@@ -49,7 +49,7 @@ class LeadSubscriber implements EventSubscriberInterface
         ModelFactory $modelFactory,
         private $isTest = false
     ) {
-        $this->router              = $router;
+        $this->router = $router;
 
         $this->setModelFactory($modelFactory);
     }

@@ -38,7 +38,7 @@ class CompanyControllerTest extends MauticMysqlTestCase
         $model = self::getContainer()->get('mautic.lead.model.company');
 
         foreach ($companiesData as $i => $companyData) {
-            $company    = new Company();
+            $company = new Company();
             $company->setIsPublished(true)
               ->setName($companyData['name'])
               ->setState($companyData['state'])
@@ -57,10 +57,10 @@ class CompanyControllerTest extends MauticMysqlTestCase
     public function testViewActionCompany(): void
     {
         $this->client->request('GET', '/s/companies/view/'.$this->company1Id);
-        $clientResponse         = $this->client->getResponse();
-        $clientResponseContent  = $clientResponse->getContent();
-        $model                  = self::getContainer()->get('mautic.lead.model.company');
-        $company                = $model->getEntity($this->company1Id);
+        $clientResponse        = $this->client->getResponse();
+        $clientResponseContent = $clientResponse->getContent();
+        $model                 = self::getContainer()->get('mautic.lead.model.company');
+        $company               = $model->getEntity($this->company1Id);
         $this->assertEquals(Response::HTTP_OK, $clientResponse->getStatusCode());
         $this->assertStringContainsString($company->getName(), $clientResponseContent, 'The return must contain the name of company');
     }
@@ -71,10 +71,10 @@ class CompanyControllerTest extends MauticMysqlTestCase
     public function testEditActionCompany(): void
     {
         $this->client->request('GET', '/s/companies/edit/'.$this->company1Id);
-        $clientResponse         = $this->client->getResponse();
-        $clientResponseContent  = $clientResponse->getContent();
-        $model                  = self::getContainer()->get('mautic.lead.model.company');
-        $company                = $model->getEntity($this->company1Id);
+        $clientResponse        = $this->client->getResponse();
+        $clientResponseContent = $clientResponse->getContent();
+        $model                 = self::getContainer()->get('mautic.lead.model.company');
+        $company               = $model->getEntity($this->company1Id);
         $this->assertEquals(Response::HTTP_OK, $clientResponse->getStatusCode());
         $this->assertStringContainsString('Edit Company '.$company->getName(), $clientResponseContent, 'The return must contain \'Edit Company\' text');
     }
@@ -88,7 +88,7 @@ class CompanyControllerTest extends MauticMysqlTestCase
         $company1     = $companyModel->getEntity($this->company1Id);
 
         // Create a lead linked to the first company
-        $lead1    = new Lead();
+        $lead1 = new Lead();
         $lead1
           ->setFirstname('lead')
           ->setLastname('for '.$company1->getName());
@@ -97,14 +97,14 @@ class CompanyControllerTest extends MauticMysqlTestCase
         $companyModel->addLeadToCompany($company1, $lead1);
 
         // Create a lead not linked to a company
-        $lead2    = new Lead();
+        $lead2 = new Lead();
         $lead2
           ->setFirstname('lead')
           ->setLastname('without company');
         $leadModel->saveEntity($lead2);
 
         // Create a lead not linked to a company, but with `ids` in it's name (see https://github.com/mautic/mautic/issues/12415)
-        $lead3    = new Lead();
+        $lead3 = new Lead();
         $lead3
           ->setFirstname('lead')
           ->setLastname('without company')
@@ -117,8 +117,8 @@ class CompanyControllerTest extends MauticMysqlTestCase
         $this->assertEquals(Response::HTTP_OK, $this->client->getResponse()->getStatusCode());
         $this->assertEquals(1, $leadsTableRows->count(), $crawler->html());
 
-        $crawler         = $this->client->request('GET', '/s/company/'.$this->company2Id.'/contacts/');
-        $leadsTableRows  = $crawler->filterXPath("//table[@id='leadTable']//tbody//tr");
+        $crawler        = $this->client->request('GET', '/s/company/'.$this->company2Id.'/contacts/');
+        $leadsTableRows = $crawler->filterXPath("//table[@id='leadTable']//tbody//tr");
 
         $this->assertEquals(Response::HTTP_OK, $this->client->getResponse()->getStatusCode());
         $this->assertEquals(0, $leadsTableRows->count(), $crawler->html());
@@ -130,8 +130,8 @@ class CompanyControllerTest extends MauticMysqlTestCase
     public function testNewActionCompany(): void
     {
         $this->client->request('GET', '/s/companies/new/');
-        $clientResponse         = $this->client->getResponse();
-        $clientResponseContent  = $clientResponse->getContent();
+        $clientResponse        = $this->client->getResponse();
+        $clientResponseContent = $clientResponse->getContent();
         $this->assertEquals(Response::HTTP_OK, $clientResponse->getStatusCode());
     }
 }

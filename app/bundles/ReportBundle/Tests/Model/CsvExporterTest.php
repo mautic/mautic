@@ -15,7 +15,7 @@ class CsvExporterTest extends \PHPUnit\Framework\TestCase
 {
     public const DATEONLYFORMAT = 'F j, Y';
 
-    public const TIMEONLYFORMAT          = 'g:i a';
+    public const TIMEONLYFORMAT = 'g:i a';
 
     private CsvExporter $csvExporter;
 
@@ -40,9 +40,9 @@ class CsvExporterTest extends \PHPUnit\Framework\TestCase
             ->method('trans')
             ->with('mautic.report.report.groupby.totals')
             ->willReturn('Totals');
-        $coreParametersHelperMock  = $this->createMock(CoreParametersHelper::class);
+        $coreParametersHelperMock = $this->createMock(CoreParametersHelper::class);
 
-        $dateHelperMock =new DateHelper(
+        $dateHelperMock = new DateHelper(
             'F j, Y g:i a T',
             'D, M d',
             self::DATEONLYFORMAT,

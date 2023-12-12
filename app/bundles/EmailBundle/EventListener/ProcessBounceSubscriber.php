@@ -10,7 +10,7 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class ProcessBounceSubscriber implements EventSubscriberInterface
 {
-    public const BUNDLE     = 'EmailBundle';
+    public const BUNDLE = 'EmailBundle';
 
     public const FOLDER_KEY = 'bounces';
 

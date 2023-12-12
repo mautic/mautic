@@ -61,7 +61,7 @@ class DetermineWinnerSubscriber implements EventSubscriberInterface
                     $combined[$child->getId()] = $counts[$child->getId()];
 
                     if ($child->hasTranslations()) {
-                        $translations              = $child->getTranslationChildren()->getKeys();
+                        $translations = $child->getTranslationChildren()->getKeys();
                         foreach ($translations as $translation) {
                             $combined[$child->getId()]['bounces'] += $counts[$translation]['bounces'];
                             $combined[$child->getId()]['totalHits'] += $counts[$translation]['totalHits'];

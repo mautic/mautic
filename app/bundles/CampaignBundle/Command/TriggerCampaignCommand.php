@@ -29,7 +29,7 @@ class TriggerCampaignCommand extends ModeratedCommand
 {
     use WriteCountTrait;
 
-    private bool $kickoffOnly  = false;
+    private bool $kickoffOnly = false;
 
     private bool $inactiveOnly = false;
 

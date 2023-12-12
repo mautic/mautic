@@ -81,17 +81,17 @@ class CampaignSubscriberTest extends \PHPUnit\Framework\TestCase
                             'asset.download',
                             'form.submit',
                         ],
-                        'lookupFormType'             => EmailListType::class,
+                        'lookupFormType' => EmailListType::class,
                     ],
-                    'sms'   => [
+                    'sms' => [
                         'campaignAction'             => 'sms.send_text_sms',
                         'campaignDecisionsSupported' => [
                             'page.pagehit',
                             'asset.download',
                             'form.submit',
                         ],
-                        'lookupFormType'             => 'sms_list',
-                        'repository'                 => \Mautic\SmsBundle\Entity\Sms::class,
+                        'lookupFormType' => 'sms_list',
+                        'repository'     => \Mautic\SmsBundle\Entity\Sms::class,
                     ],
                 ]
             );
@@ -105,7 +105,7 @@ class CampaignSubscriberTest extends \PHPUnit\Framework\TestCase
                         'channel_id' => 2,
                         'properties' => [],
                     ],
-                    'sms'   => [
+                    'sms' => [
                         'id'         => 1,
                         'channel'    => 'sms',
                         'channel_id' => 1,
@@ -158,14 +158,14 @@ class CampaignSubscriberTest extends \PHPUnit\Framework\TestCase
                         case 'email.send':
                             return new ActionAccessor(
                                 [
-                                    'label'                => 'mautic.email.campaign.event.send',
-                                    'description'          => 'mautic.email.campaign.event.send_descr',
-                                    'batchEventName'       => EmailEvents::ON_CAMPAIGN_BATCH_ACTION,
-                                    'formType'             => EmailSendType::class,
-                                    'formTypeOptions'      => ['update_select' => 'campaignevent_properties_email', 'with_email_types' => true],
-                                    'formTheme'            => 'MauticEmailBundle:FormTheme\EmailSendList',
-                                    'channel'              => 'email',
-                                    'channelIdField'       => 'email',
+                                    'label'           => 'mautic.email.campaign.event.send',
+                                    'description'     => 'mautic.email.campaign.event.send_descr',
+                                    'batchEventName'  => EmailEvents::ON_CAMPAIGN_BATCH_ACTION,
+                                    'formType'        => EmailSendType::class,
+                                    'formTypeOptions' => ['update_select' => 'campaignevent_properties_email', 'with_email_types' => true],
+                                    'formTheme'       => 'MauticEmailBundle:FormTheme\EmailSendList',
+                                    'channel'         => 'email',
+                                    'channelIdField'  => 'email',
                                 ]
                             );
 
@@ -226,13 +226,13 @@ class CampaignSubscriberTest extends \PHPUnit\Framework\TestCase
                         ],
                     ],
                 ],
-                'timelineTemplate'       => '@MauticChannel/SubscribedEvents/Timeline/index.html.twig',
-                'timelineTemplateVars'   => [
+                'timelineTemplate'     => '@MauticChannel/SubscribedEvents/Timeline/index.html.twig',
+                'timelineTemplateVars' => [
                     'messageSettings' => [],
                 ],
             ]
         );
-        $logs   = $this->getLogs();
+        $logs = $this->getLogs();
 
         $pendingEvent = new PendingEvent($config, $event, $logs);
 
@@ -303,7 +303,7 @@ class CampaignSubscriberTest extends \PHPUnit\Framework\TestCase
         $event->setChannelId(1);
         $event->setProperties(
             [
-                'canvasSettings'      => [
+                'canvasSettings' => [
                         'droppedX' => '337',
                         'droppedY' => '155',
                     ],
@@ -316,15 +316,15 @@ class CampaignSubscriberTest extends \PHPUnit\Framework\TestCase
                 'properties'          => [
                         'marketingMessage' => '1',
                     ],
-                'type'                => 'message.send',
-                'eventType'           => 'action',
-                'anchorEventType'     => 'source',
-                'campaignId'          => '1',
-                '_token'              => 'q7FpcDX7iye6fBuBzsqMvQWKqW75lcD77jSmuNAEDXg',
-                'buttons'             => [
+                'type'            => 'message.send',
+                'eventType'       => 'action',
+                'anchorEventType' => 'source',
+                'campaignId'      => '1',
+                '_token'          => 'q7FpcDX7iye6fBuBzsqMvQWKqW75lcD77jSmuNAEDXg',
+                'buttons'         => [
                         'save' => '',
                     ],
-                'marketingMessage'    => '1',
+                'marketingMessage' => '1',
             ]
         );
         $campaign = $this->getMockBuilder(Campaign::class)

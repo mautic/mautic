@@ -30,7 +30,7 @@ trait DataGeneratorTrait
         $fakeData = [];
         $counter  = 0;
         while ($counter < $pageSize) {
-            $data                     = [
+            $data = [
                 'id' => $this->id,
             ];
             $fakeData[]               = $data;

@@ -88,8 +88,8 @@ class EventExecutionerTest extends \PHPUnit\Framework\TestCase
 
     protected function setUp(): void
     {
-        $this->eventCollector        = $this->createMock(EventCollector::class);
-        $this->eventLogger           = $this->createMock(EventLogger::class);
+        $this->eventCollector = $this->createMock(EventCollector::class);
+        $this->eventLogger    = $this->createMock(EventLogger::class);
         $this->eventLogger->method('persistCollection')
             ->willReturn($this->eventLogger);
         $this->actionExecutioner     = $this->createMock(ActionExecutioner::class);
@@ -118,14 +118,14 @@ class EventExecutionerTest extends \PHPUnit\Framework\TestCase
             ->setCampaign($campaign);
         $otherConfig = new ActionAccessor(
             [
-                 'label'                => 'mautic.email.campaign.event.send',
-                 'description'          => 'mautic.email.campaign.event.send_descr',
-                 'batchEventName'       => EmailEvents::ON_CAMPAIGN_BATCH_ACTION,
-                 'formType'             => EmailSendType::class,
-                 'formTypeOptions'      => ['update_select' => 'campaignevent_properties_email', 'with_email_types' => true],
-                 'formTheme'            => 'MauticEmailBundle:FormTheme\EmailSendList',
-                 'channel'              => 'email',
-                 'channelIdField'       => 'email',
+                 'label'           => 'mautic.email.campaign.event.send',
+                 'description'     => 'mautic.email.campaign.event.send_descr',
+                 'batchEventName'  => EmailEvents::ON_CAMPAIGN_BATCH_ACTION,
+                 'formType'        => EmailSendType::class,
+                 'formTypeOptions' => ['update_select' => 'campaignevent_properties_email', 'with_email_types' => true],
+                 'formTheme'       => 'MauticEmailBundle:FormTheme\EmailSendList',
+                 'channel'         => 'email',
+                 'channelIdField'  => 'email',
              ]
         );
 

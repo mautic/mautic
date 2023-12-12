@@ -29,19 +29,19 @@ use Twig\Environment;
 
 class MailHelper
 {
-    public const QUEUE_RESET_TO           = 'RESET_TO';
+    public const QUEUE_RESET_TO = 'RESET_TO';
 
-    public const QUEUE_FULL_RESET         = 'FULL_RESET';
+    public const QUEUE_FULL_RESET = 'FULL_RESET';
 
-    public const QUEUE_DO_NOTHING         = 'DO_NOTHING';
+    public const QUEUE_DO_NOTHING = 'DO_NOTHING';
 
-    public const QUEUE_NOTHING_IF_FAILED  = 'IF_FAILED';
+    public const QUEUE_NOTHING_IF_FAILED = 'IF_FAILED';
 
-    public const QUEUE_RETURN_ERRORS      = 'RETURN_ERRORS';
+    public const QUEUE_RETURN_ERRORS = 'RETURN_ERRORS';
 
     public const EMAIL_TYPE_TRANSACTIONAL = 'transactional';
 
-    public const EMAIL_TYPE_MARKETING     = 'marketing';
+    public const EMAIL_TYPE_MARKETING = 'marketing';
 
     protected $transport;
 
@@ -1296,7 +1296,7 @@ class MailHelper
         // Process emails created by Mautic v1
         if (empty($customHtml) && $template) {
             if (empty($slots)) {
-                $slots    = $this->factory->getTheme($template)->getSlots('email');
+                $slots = $this->factory->getTheme($template)->getSlots('email');
             }
 
             if (isset($slots[$template])) {

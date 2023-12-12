@@ -57,8 +57,8 @@ final class FieldControllerFunctionalTest extends MauticMysqlTestCase
 
         $this->assertSame(Response::HTTP_CREATED, $clientResponse->getStatusCode(), $clientResponse->getContent());
 
-        $crawler     = $this->client->request(Request::METHOD_GET, "/s/forms/field/new?type=captcha&tmpl=field&formId={$formId}&inBuilder=1", [], [], $this->createAjaxHeaders());
-        $content     = $this->client->getResponse()->getContent();
+        $crawler = $this->client->request(Request::METHOD_GET, "/s/forms/field/new?type=captcha&tmpl=field&formId={$formId}&inBuilder=1", [], [], $this->createAjaxHeaders());
+        $content = $this->client->getResponse()->getContent();
         Assert::assertTrue($this->client->getResponse()->isOk(), $content);
         $content     = json_decode($content)->newContent;
         $crawler     = new Crawler($content, $this->client->getInternalRequest()->getUri());

@@ -19,7 +19,7 @@ class ProfileController extends FormController
     public function indexAction(Request $request, LanguageHelper $languageHelper, UserPasswordHasherInterface $hasher)
     {
         // get current user
-        $me    = $this->get('security.token_storage')->getToken()->getUser();
+        $me = $this->get('security.token_storage')->getToken()->getUser();
         /** @var UserModel $model */
         $model = $this->getModel('user');
 

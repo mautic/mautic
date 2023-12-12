@@ -10,15 +10,15 @@ use Mautic\ReportBundle\Model\ReportModel;
 
 class ReportGeneratorEvent extends AbstractReportEvent
 {
-    public const CATEGORY_PREFIX         = 'c';
+    public const CATEGORY_PREFIX = 'c';
 
-    public const CONTACT_PREFIX          = 'l';
+    public const CONTACT_PREFIX = 'l';
 
-    public const COMPANY_PREFIX          = 'comp';
+    public const COMPANY_PREFIX = 'comp';
 
-    public const COMPANY_LEAD_PREFIX     = 'companies_lead';
+    public const COMPANY_LEAD_PREFIX = 'companies_lead';
 
-    public const IP_ADDRESS_PREFIX       = 'i';
+    public const IP_ADDRESS_PREFIX = 'i';
 
     /**
      * @var array
@@ -50,8 +50,8 @@ class ReportGeneratorEvent extends AbstractReportEvent
     private QueryBuilder $queryBuilder,
         private ChannelListHelper $channelListHelper
     ) {
-        $this->report            = $report;
-        $this->context           = $report->getSource();
+        $this->report  = $report;
+        $this->context = $report->getSource();
     }
 
     /**
@@ -489,7 +489,7 @@ class ReportGeneratorEvent extends AbstractReportEvent
     private function isJoined(QueryBuilder $query, string $table, string $fromAlias, string $alias): bool
     {
         $queryParts = $query->getQueryParts();
-        $joins      =   !empty($queryParts) && $queryParts['join'] ? $queryParts['join'] : null;
+        $joins      = !empty($queryParts) && $queryParts['join'] ? $queryParts['join'] : null;
         if (empty($joins) || (!empty($joins) && empty($joins[$fromAlias]))) { // @phpstan-ignore-line
             return false;
         }

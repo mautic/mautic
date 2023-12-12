@@ -57,7 +57,7 @@ class EventController extends CommonFormController
     public function newAction(Request $request)
     {
         $success = 0;
-        $valid   = $cancelled   = false;
+        $valid   = $cancelled = false;
         $method  = $request->getMethod();
         $session = $request->getSession();
         if ('POST' == $method) {
@@ -127,7 +127,7 @@ class EventController extends CommonFormController
                     $modifiedEvents = $session->get('mautic.campaign.'.$campaignId.'.events.modified');
                     $formData       = $form->getData();
                     $event          = array_merge($event, $formData);
-                    $event['id']    = $event['tempId']    = $keyId;
+                    $event['id']    = $event['tempId'] = $keyId;
                     if (empty($event['name'])) {
                         // set it to the event default
                         $event['name'] = $this->translator->trans($event['settings']['label']);

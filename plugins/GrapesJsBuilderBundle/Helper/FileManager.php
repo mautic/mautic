@@ -35,7 +35,7 @@ class FileManager
 
             foreach ($files as $file) {
                 try {
-                    $uploadedFiles[] =  $this->getFullUrl($this->fileUploader->upload($uploadDir, $file));
+                    $uploadedFiles[] = $this->getFullUrl($this->fileUploader->upload($uploadDir, $file));
                 } catch (FileUploadException) {
                 }
             }
@@ -91,8 +91,8 @@ class FileManager
 
     public function getImages(): array
     {
-        $files      = [];
-        $uploadDir  = $this->getUploadDir();
+        $files     = [];
+        $uploadDir = $this->getUploadDir();
 
         $fileSystem = new Filesystem();
 

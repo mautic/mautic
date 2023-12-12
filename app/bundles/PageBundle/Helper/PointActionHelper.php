@@ -16,8 +16,8 @@ class PointActionHelper
 
         if ($pageHit instanceof Page) {
             /** @var \Mautic\PageBundle\Model\PageModel $pageModel */
-            $pageModel               = $factory->getModel('page');
-            [$parent, $children]     = $pageHit->getVariants();
+            $pageModel           = $factory->getModel('page');
+            [$parent, $children] = $pageHit->getVariants();
             // use the parent (self or configured parent)
             $pageHitId = $parent->getId();
         } else {

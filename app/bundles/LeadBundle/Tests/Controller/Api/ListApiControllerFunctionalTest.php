@@ -140,7 +140,7 @@ class ListApiControllerFunctionalTest extends MauticMysqlTestCase
                     'type'       => 'email',
                     'operator'   => '!empty',
                     'properties' => [
-                        'filter'  => null,
+                        'filter' => null,
                     ],
                 ],
             ],
@@ -221,8 +221,8 @@ class ListApiControllerFunctionalTest extends MauticMysqlTestCase
         ];
 
         $this->client->request('POST', '/api/segments/batch/new', $payload);
-        $clientResponse  = $this->client->getResponse();
-        $response1       = json_decode($clientResponse->getContent(), true);
+        $clientResponse = $this->client->getResponse();
+        $response1      = json_decode($clientResponse->getContent(), true);
 
         if (!empty($response1['errors'][0])) {
             $this->fail($response1['errors'][0]['code'].': '.$response1['errors'][0]['message']);
@@ -247,8 +247,8 @@ class ListApiControllerFunctionalTest extends MauticMysqlTestCase
 
         // Lets try to create the same segment to see that the values are not re-setted
         $this->client->request('PATCH', '/api/segments/batch/edit', $response1['lists']);
-        $clientResponse  = $this->client->getResponse();
-        $response2       = json_decode($clientResponse->getContent(), true);
+        $clientResponse = $this->client->getResponse();
+        $response2      = json_decode($clientResponse->getContent(), true);
 
         if (!empty($response2['errors'][0])) {
             $this->fail($response2['errors'][0]['code'].': '.$response2['errors'][0]['message']);
@@ -378,9 +378,9 @@ class ListApiControllerFunctionalTest extends MauticMysqlTestCase
             'bundle' => 'segment',
         ];
         $this->client->request('POST', '/api/categories/new', $categoryPayload);
-        $clientResponse     = $this->client->getResponse();
-        $response           = json_decode($clientResponse->getContent(), true);
-        $categoryId         = $response['category']['id'];
+        $clientResponse = $this->client->getResponse();
+        $response       = json_decode($clientResponse->getContent(), true);
+        $categoryId     = $response['category']['id'];
 
         $segmentPayload = [
             'name'        => 'API segment',

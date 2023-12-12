@@ -23,9 +23,9 @@ class IntegrationConfigType extends AbstractType
                     'choices' => array_flip($options['campaigns']),
                     'attr'    => [
                         'class' => 'form-control', 'onchange' => 'Mautic.getIntegrationCampaignStatus(this);', ],
-                    'label'             => 'mautic.plugin.integration.campaigns',
-                    'placeholder'       => 'mautic.plugin.config.campaign.member.chooseone',
-                    'required'          => false,
+                    'label'       => 'mautic.plugin.integration.campaigns',
+                    'placeholder' => 'mautic.plugin.config.campaign.member.chooseone',
+                    'required'    => false,
                     ]
             );
         }

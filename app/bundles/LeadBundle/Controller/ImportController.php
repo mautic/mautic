@@ -43,11 +43,11 @@ use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 class ImportController extends FormController
 {
     // Steps of the import
-    public const STEP_UPLOAD_CSV      = 1;
+    public const STEP_UPLOAD_CSV = 1;
 
-    public const STEP_MATCH_FIELDS    = 2;
+    public const STEP_MATCH_FIELDS = 2;
 
-    public const STEP_PROGRESS_BAR    = 3;
+    public const STEP_PROGRESS_BAR = 3;
 
     public const STEP_IMPORT_FROM_CSV = 4;
 
@@ -147,10 +147,10 @@ class ImportController extends FormController
      */
     public function cancelAction(Request $request): Response
     {
-        $initEvent   = $this->dispatchImportOnInit();
-        $object      = $initEvent->objectSingular;
-        $fullPath    = $this->getFullCsvPath($object);
-        $import      = $this->importModel->getEntity($this->session->get('mautic.lead.import.id', null));
+        $initEvent = $this->dispatchImportOnInit();
+        $object    = $initEvent->objectSingular;
+        $fullPath  = $this->getFullCsvPath($object);
+        $import    = $this->importModel->getEntity($this->session->get('mautic.lead.import.id', null));
 
         if ($import && $import->getId()) {
             $import->setStatus($import::STOPPED)
@@ -170,10 +170,10 @@ class ImportController extends FormController
      */
     public function queueAction(Request $request): Response
     {
-        $initEvent   = $this->dispatchImportOnInit();
-        $object      = $initEvent->objectSingular;
-        $fullPath    = $this->getFullCsvPath($object);
-        $import      = $this->importModel->getEntity($this->session->get('mautic.lead.import.id', null));
+        $initEvent = $this->dispatchImportOnInit();
+        $object    = $initEvent->objectSingular;
+        $fullPath  = $this->getFullCsvPath($object);
+        $import    = $this->importModel->getEntity($this->session->get('mautic.lead.import.id', null));
 
         if ($import) {
             $import->setStatus($import::QUEUED);

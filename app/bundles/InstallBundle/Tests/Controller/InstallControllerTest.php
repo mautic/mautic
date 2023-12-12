@@ -48,11 +48,11 @@ class InstallControllerTest extends \PHPUnit\Framework\TestCase
     {
         parent::setUp();
 
-        $this->sessionMock          = $this->createMock(Session::class);
-        $this->containerMock        = $this->createMock(Container::class);
-        $this->routerMock           = $this->createMock(Router::class);
-        $this->flashBagMock         = $this->createMock(FlashBagInterface::class);
-        $this->pathsHelper          = $this->createMock(PathsHelper::class);
+        $this->sessionMock   = $this->createMock(Session::class);
+        $this->containerMock = $this->createMock(Container::class);
+        $this->routerMock    = $this->createMock(Router::class);
+        $this->flashBagMock  = $this->createMock(FlashBagInterface::class);
+        $this->pathsHelper   = $this->createMock(PathsHelper::class);
 
         $this->configurator   = $this->createMock(Configurator::class);
         $this->installer      = $this->createMock(InstallService::class);

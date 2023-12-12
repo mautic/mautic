@@ -21,7 +21,7 @@ class SourceController extends CommonFormController
     public function newAction(Request $request, $objectId = 0)
     {
         $success = 0;
-        $valid   = $cancelled   = false;
+        $valid   = $cancelled = false;
         $method  = $request->getMethod();
         $session = $request->getSession();
         if ('POST' == $method) {
@@ -139,7 +139,7 @@ class SourceController extends CommonFormController
         }
 
         $success = 0;
-        $valid   = $cancelled   = false;
+        $valid   = $cancelled = false;
 
         if (!in_array($sourceType, $this->supportedSourceTypes)) {
             return $this->modalAccessDenied();

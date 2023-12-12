@@ -28,11 +28,11 @@ class IteratorExportDataModel implements \Iterator
         callable $callback,
         private bool $skipOrdering = false
     ) {
-        $this->callback     = $callback;
-        $this->position     = 0;
-        $this->total        = 0;
-        $this->totalResult  = 0;
-        $this->data         = 0;
+        $this->callback    = $callback;
+        $this->position    = 0;
+        $this->total       = 0;
+        $this->totalResult = 0;
+        $this->data        = 0;
     }
 
     /**

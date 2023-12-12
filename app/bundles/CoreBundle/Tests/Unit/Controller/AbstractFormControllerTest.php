@@ -53,7 +53,7 @@ class AbstractFormControllerTest extends \PHPUnit\Framework\TestCase
                 return $this->isFormCancelled($form);
             }
         };
-        $this->formMock             = $this->createMock(Form::class);
+        $this->formMock = $this->createMock(Form::class);
     }
 
     /**

@@ -54,11 +54,11 @@ class WidgetType extends AbstractType
             'type',
             ChoiceType::class,
             [
-                'label'             => 'mautic.dashboard.widget.form.type',
-                'choices'           => $types,
-                'label_attr'        => ['class' => 'control-label'],
-                'placeholder'       => 'mautic.core.select',
-                'attr'              => [
+                'label'       => 'mautic.dashboard.widget.form.type',
+                'choices'     => $types,
+                'label_attr'  => ['class' => 'control-label'],
+                'placeholder' => 'mautic.core.select',
+                'attr'        => [
                     'class'    => 'form-control',
                     'onchange' => 'Mautic.updateWidgetForm(this)',
                 ],
@@ -76,10 +76,10 @@ class WidgetType extends AbstractType
                     '75%'  => '75',
                     '100%' => '100',
                 ],
-                'empty_data'        => '100',
-                'label_attr'        => ['class' => 'control-label'],
-                'attr'              => ['class' => 'form-control'],
-                'required'          => false,
+                'empty_data' => '100',
+                'label_attr' => ['class' => 'control-label'],
+                'attr'       => ['class' => 'form-control'],
+                'required'   => false,
             ]
         );
 
@@ -95,10 +95,10 @@ class WidgetType extends AbstractType
                     '560px' => '560',
                     '675px' => '675',
                 ],
-                'empty_data'        => '330',
-                'label_attr'        => ['class' => 'control-label'],
-                'attr'              => ['class' => 'form-control'],
-                'required'          => false,
+                'empty_data' => '330',
+                'label_attr' => ['class' => 'control-label'],
+                'attr'       => ['class' => 'form-control'],
+                'required'   => false,
             ]
         );
 

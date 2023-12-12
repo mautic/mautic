@@ -51,7 +51,7 @@ class CacheStorageHelper
         $cacheDir = null,
         protected $defaultExpiration = 0
     ) {
-        $this->cacheDir          = $cacheDir.'/data';
+        $this->cacheDir = $cacheDir.'/data';
 
         // @deprecated BC support for pre 2.6.0 to be removed in 3.0
         if (!in_array($adaptor, [self::ADAPTOR_DATABASE, self::ADAPTOR_FILESYSTEM])) {
@@ -164,7 +164,7 @@ class CacheStorageHelper
     {
         switch ($this->adaptor) {
             case self::ADAPTOR_DATABASE:
-                $namespace          = ($this->namespace) ? InputHelper::alphanum($this->namespace, false, '-', ['-', '+', '.']) : '';
+                $namespace = ($this->namespace) ? InputHelper::alphanum($this->namespace, false, '-', ['-', '+', '.']) : '';
 
                 $this->cacheAdaptor = new DoctrineDbalAdapter(
                     $this->connection, $namespace, $this->defaultExpiration, ['db_table' => MAUTIC_TABLE_PREFIX.'cache_items']

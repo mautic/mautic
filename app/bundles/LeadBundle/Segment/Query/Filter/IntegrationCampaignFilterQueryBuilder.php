@@ -21,8 +21,8 @@ class IntegrationCampaignFilterQueryBuilder extends BaseFilterQueryBuilder
         $leadsTableAlias          = $queryBuilder->getTableAlias(MAUTIC_TABLE_PREFIX.'leads');
         $integrationCampaignParts = $filter->getIntegrationCampaignParts();
 
-        $integrationNameParameter    = $this->generateRandomParameterName();
-        $campaignIdParameter         = $this->generateRandomParameterName();
+        $integrationNameParameter = $this->generateRandomParameterName();
+        $campaignIdParameter      = $this->generateRandomParameterName();
 
         $tableAlias = $this->generateRandomParameterName();
 

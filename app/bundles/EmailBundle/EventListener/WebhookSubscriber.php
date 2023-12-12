@@ -32,7 +32,7 @@ class WebhookSubscriber implements EventSubscriberInterface
     public function onWebhookBuild(WebhookBuilderEvent $event): void
     {
         // add checkbox to the webhook form for new leads
-        $mailSend= [
+        $mailSend = [
             'label'       => 'mautic.email.webhook.event.send',
             'description' => 'mautic.email.webhook.event.send_desc',
         ];

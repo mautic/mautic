@@ -56,7 +56,7 @@ class BatchContactController extends AbstractFormController
             $this->frequencyActionModel->update($ids, $params, $preferredChannel);
 
             $this->addFlashMessage('mautic.lead.batch_leads_affected', [
-                '%count%'     => count($ids),
+                '%count%' => count($ids),
             ]);
         } else {
             $this->addFlashMessage('mautic.core.error.ids.missing');
@@ -77,11 +77,11 @@ class BatchContactController extends AbstractFormController
 
         return $this->delegateView([
             'viewParameters' => [
-                'form'         => $this->createForm(ContactChannelsType::class, [], [
-                    'action'        => $route,
-                    'channels'      => $this->contactModel->getPreferenceChannels(),
-                    'public_view'   => false,
-                    'save_button'   => true,
+                'form' => $this->createForm(ContactChannelsType::class, [], [
+                    'action'      => $route,
+                    'channels'    => $this->contactModel->getPreferenceChannels(),
+                    'public_view' => false,
+                    'save_button' => true,
                 ])->createView(),
             ],
             'contentTemplate' => '@MauticLead/Batch/channel.html.twig',

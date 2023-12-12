@@ -12,7 +12,7 @@ class GrapesJsBuilderIntegration extends BasicIntegration implements BasicInterf
 {
     use ConfigurationTrait;
 
-    public const NAME         = 'grapesjsbuilder';
+    public const NAME = 'grapesjsbuilder';
 
     public const DISPLAY_NAME = 'GrapesJS';
 

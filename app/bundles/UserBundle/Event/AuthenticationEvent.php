@@ -60,7 +60,7 @@ class AuthenticationEvent extends Event
         protected $authenticatingService = null,
         protected $integrations = null
     ) {
-        $this->isFormLogin           = $token instanceof UsernamePasswordToken;
+        $this->isFormLogin = $token instanceof UsernamePasswordToken;
 
         if ($userProvider instanceof ChainUserProvider) {
             // Chain of user providers so let's find Mautic's

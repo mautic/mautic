@@ -78,9 +78,9 @@ class OrderDAO
     public function addObjectChange(ObjectChangeDAO $objectChangeDAO): self
     {
         if (!isset($this->identifiedObjects[$objectChangeDAO->getObject()])) {
-            $this->identifiedObjects[$objectChangeDAO->getObject()]    = [];
-            $this->unidentifiedObjects[$objectChangeDAO->getObject()]  = [];
-            $this->changedObjects[$objectChangeDAO->getObject()]       = [];
+            $this->identifiedObjects[$objectChangeDAO->getObject()]   = [];
+            $this->unidentifiedObjects[$objectChangeDAO->getObject()] = [];
+            $this->changedObjects[$objectChangeDAO->getObject()]      = [];
         }
 
         $this->changedObjects[$objectChangeDAO->getObject()][] = $objectChangeDAO;

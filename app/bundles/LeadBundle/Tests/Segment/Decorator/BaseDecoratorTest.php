@@ -36,7 +36,7 @@ class BaseDecoratorTest extends \PHPUnit\Framework\TestCase
         $baseDecorator = $this->getDecorator();
 
         $contactSegmentFilterCrate = new ContactSegmentFilterCrate([
-            'object'   => 'lead',
+            'object' => 'lead',
         ]);
 
         $this->assertSame(MAUTIC_TABLE_PREFIX.'leads', $baseDecorator->getTable($contactSegmentFilterCrate));
@@ -50,7 +50,7 @@ class BaseDecoratorTest extends \PHPUnit\Framework\TestCase
         $baseDecorator = $this->getDecorator();
 
         $contactSegmentFilterCrate = new ContactSegmentFilterCrate([
-            'object'   => 'company',
+            'object' => 'company',
         ]);
 
         $this->assertSame(MAUTIC_TABLE_PREFIX.'companies', $baseDecorator->getTable($contactSegmentFilterCrate));

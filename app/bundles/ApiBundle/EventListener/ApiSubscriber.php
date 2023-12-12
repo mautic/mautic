@@ -49,7 +49,7 @@ class ApiSubscriber implements EventSubscriberInterface
         // Prevent access to API if disabled
         $apiEnabled = $this->coreParametersHelper->get('api_enabled');
         if (!$apiEnabled) {
-            $response   = new JsonResponse(
+            $response = new JsonResponse(
                 [
                     'errors' => [
                         [
@@ -72,7 +72,7 @@ class ApiSubscriber implements EventSubscriberInterface
         $basicAuthEnabled = $this->coreParametersHelper->get('api_enable_basic_auth');
 
         if ($hasBasicAuth && !$basicAuthEnabled) {
-            $response   = new JsonResponse(
+            $response = new JsonResponse(
                 [
                     'errors' => [
                         [

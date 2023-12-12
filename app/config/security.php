@@ -63,8 +63,8 @@ $firewalls = [
             'username_mapper' => 'mautic.security.saml.username_mapper',
 
             // Environment variables will overwrite these with the standard login URLs if SAML is disabled
-            'login_path'      => '%env(MAUTIC_SAML_LOGIN_PATH)%', // '/s/saml/login',,
-            'check_path'      => '%env(MAUTIC_SAML_LOGIN_CHECK_PATH)%', // '/s/saml/login_check',
+            'login_path' => '%env(MAUTIC_SAML_LOGIN_PATH)%', // '/s/saml/login',,
+            'check_path' => '%env(MAUTIC_SAML_LOGIN_CHECK_PATH)%', // '/s/saml/login_check',
         ],
         'form_login' => [
             'csrf_token_generator' => 'security.csrf.token_manager',
@@ -89,8 +89,8 @@ $firewalls = [
                 'mautic.user.form_guard_authenticator',
             ],
         ],
-        'fos_oauth'     => true,
-        'context'       => 'mautic',
+        'fos_oauth' => true,
+        'context'   => 'mautic',
     ],
     'public' => [
         'pattern'   => '^/',

@@ -31,7 +31,7 @@ trait VariantAjaxControllerTrait
 
         if (!empty($type)) {
             // get the HTML for the form
-            $model  = $this->getModel($modelName);
+            $model = $this->getModel($modelName);
             if (!$model instanceof EmailModel && !$model instanceof PageModel) {
                 throw new \InvalidArgumentException('Model should be either email or page model.');
             }

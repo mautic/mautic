@@ -36,8 +36,8 @@ class DateOptionFactory
      */
     public function getDateOption(ContactSegmentFilterCrate $leadSegmentFilterCrate)
     {
-        $originalValue        = $leadSegmentFilterCrate->getFilter();
-        $relativeDateStrings  = $this->relativeDate->getRelativeDateStrings();
+        $originalValue       = $leadSegmentFilterCrate->getFilter();
+        $relativeDateStrings = $this->relativeDate->getRelativeDateStrings();
 
         $dateOptionParameters = new DateOptionParameters($leadSegmentFilterCrate, $relativeDateStrings, $this->timezoneResolver);
 

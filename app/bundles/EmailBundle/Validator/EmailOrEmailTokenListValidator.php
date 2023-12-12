@@ -24,7 +24,7 @@ final class EmailOrEmailTokenListValidator extends ConstraintValidator
         private EmailValidator $emailValidator,
         private CustomFieldValidator $customFieldValidator
     ) {
-        $this->transformer          = new ArrayStringTransformer();
+        $this->transformer = new ArrayStringTransformer();
     }
 
     public function validate($csv, Constraint $constraint): void

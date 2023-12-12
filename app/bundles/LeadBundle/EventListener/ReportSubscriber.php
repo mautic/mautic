@@ -24,21 +24,21 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class ReportSubscriber implements EventSubscriberInterface
 {
-    public const CONTEXT_LEADS                     = 'leads';
+    public const CONTEXT_LEADS = 'leads';
 
-    public const CONTEXT_LEAD_POINT_LOG            = 'lead.pointlog';
+    public const CONTEXT_LEAD_POINT_LOG = 'lead.pointlog';
 
     public const CONTEXT_CONTACT_ATTRIBUTION_MULTI = 'contact.attribution.multi';
 
     public const CONTEXT_CONTACT_ATTRIBUTION_FIRST = 'contact.attribution.first';
 
-    public const CONTEXT_CONTACT_ATTRIBUTION_LAST  = 'contact.attribution.last';
+    public const CONTEXT_CONTACT_ATTRIBUTION_LAST = 'contact.attribution.last';
 
-    public const CONTEXT_CONTACT_FREQUENCYRULES    = 'contact.frequencyrules';
+    public const CONTEXT_CONTACT_FREQUENCYRULES = 'contact.frequencyrules';
 
     public const CONTEXT_CONTACT_MESSAGE_FREQUENCY = 'contact.message.frequency';
 
-    public const CONTEXT_COMPANIES                 = 'companies';
+    public const CONTEXT_COMPANIES = 'companies';
 
     public const GROUP_CONTACTS = 'contacts';
 
@@ -141,11 +141,11 @@ class ReportSubscriber implements EventSubscriberInterface
 
             if ($event->checkContext([self::CONTEXT_LEADS])) {
                 $stageColumns = [
-                    'l.stage_id'           => [
+                    'l.stage_id' => [
                         'label' => 'mautic.lead.report.attribution.stage_id',
                         'type'  => 'int',
                     ],
-                    'ss.name'               => [
+                    'ss.name' => [
                         'alias' => 'stage_name',
                         'label' => 'mautic.lead.report.attribution.stage_name',
                         'type'  => 'string',
@@ -157,7 +157,7 @@ class ReportSubscriber implements EventSubscriberInterface
                         'formula' => '(SELECT MAX(stage_log.date_added) FROM '.MAUTIC_TABLE_PREFIX.'lead_stages_change_log stage_log WHERE stage_log.stage_id = l.stage_id AND stage_log.lead_id = l.id)',
                     ],
                 ];
-                $columns      = array_merge($columns, $stageColumns);
+                $columns = array_merge($columns, $stageColumns);
             }
 
             $data = [
@@ -711,14 +711,14 @@ class ReportSubscriber implements EventSubscriberInterface
                 'groupByFormula' => 'DATE(lp.date_added)',
             ],
             'pl.id' => [
-                'alias'          => 'group_id',
-                'label'          => 'mautic.lead.report.points.group_id',
-                'type'           => 'int',
+                'alias' => 'group_id',
+                'label' => 'mautic.lead.report.points.group_id',
+                'type'  => 'int',
             ],
             'pl.name' => [
-                'alias'          => 'group_name',
-                'label'          => 'mautic.lead.report.points.group_name',
-                'type'           => 'string',
+                'alias' => 'group_name',
+                'label' => 'mautic.lead.report.points.group_name',
+                'type'  => 'string',
             ],
         ];
         $data = [

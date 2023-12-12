@@ -59,7 +59,7 @@ class ReplyTest extends \PHPUnit\Framework\TestCase
         $this->emailAddressHelper = new EmailAddressHelper();
         $this->leadRepository     = $this->createMock(LeadRepository::class);
         $this->leadModel->method('getRepository')->willReturn($this->leadRepository);
-        $this->processor          = new Reply(
+        $this->processor = new Reply(
             $this->statRepo,
             $this->contactFinder,
             $this->leadModel,

@@ -64,14 +64,14 @@ class WebhookModelTest extends TestCase
 
     protected function setUp(): void
     {
-        $this->parametersHelperMock  = $this->createMock(CoreParametersHelper::class);
-        $this->serializerMock        = $this->createMock(SerializerInterface::class);
-        $this->entityManagerMock     = $this->createMock(EntityManager::class);
-        $this->userHelper            = $this->createMock(UserHelper::class);
-        $this->webhookRepository     = $this->createMock(WebhookRepository::class);
-        $this->httpClientMock        = $this->createMock(Client::class);
-        $this->eventDispatcherMock   = $this->createMock(EventDispatcher::class);
-        $this->model                 = $this->initModel();
+        $this->parametersHelperMock = $this->createMock(CoreParametersHelper::class);
+        $this->serializerMock       = $this->createMock(SerializerInterface::class);
+        $this->entityManagerMock    = $this->createMock(EntityManager::class);
+        $this->userHelper           = $this->createMock(UserHelper::class);
+        $this->webhookRepository    = $this->createMock(WebhookRepository::class);
+        $this->httpClientMock       = $this->createMock(Client::class);
+        $this->eventDispatcherMock  = $this->createMock(EventDispatcher::class);
+        $this->model                = $this->initModel();
     }
 
     public function testSaveEntity(): void

@@ -131,19 +131,19 @@ class MatchFilterForLeadTraitTest extends TestCase
     public function testCheckLeadValueIsInFilter(array $fieldDetails, array $filterDetails, bool $expected): void
     {
         $lead = [
-            'id'                    => 1,
-            $fieldDetails['name']   => $fieldDetails['value'],
+            'id'                  => 1,
+            $fieldDetails['name'] => $fieldDetails['value'],
         ];
 
         $filter = [
             0 => [
-                'display'   => null,
-                'field'     => $fieldDetails['name'],
-                'filter'    => $filterDetails['value'],
-                'glue'      => 'and',
-                'object'    => 'lead',
-                'operator'  => $filterDetails['operator'],
-                'type'      => $fieldDetails['type'],
+                'display'  => null,
+                'field'    => $fieldDetails['name'],
+                'filter'   => $filterDetails['value'],
+                'glue'     => 'and',
+                'object'   => 'lead',
+                'operator' => $filterDetails['operator'],
+                'type'     => $fieldDetails['type'],
             ],
         ];
 
@@ -165,8 +165,8 @@ class MatchFilterForLeadTraitTest extends TestCase
                 'value' => 'one',
             ],
             [
-                'operator'  => OperatorOptions::IN,
-                'value'     => 'one',
+                'operator' => OperatorOptions::IN,
+                'value'    => 'one',
             ],
             true,
         ];
@@ -177,8 +177,8 @@ class MatchFilterForLeadTraitTest extends TestCase
                 'value' => 'one|two',
             ],
             [
-                'operator'  => OperatorOptions::NOT_IN,
-                'value'     => 'three',
+                'operator' => OperatorOptions::NOT_IN,
+                'value'    => 'three',
             ],
             true,
         ];
@@ -189,8 +189,8 @@ class MatchFilterForLeadTraitTest extends TestCase
                 'value' => 'one|two|three',
             ],
             [
-                'operator'  => OperatorOptions::NOT_IN,
-                'value'     => 'one|four',
+                'operator' => OperatorOptions::NOT_IN,
+                'value'    => 'one|four',
             ],
             false,
         ];
@@ -201,8 +201,8 @@ class MatchFilterForLeadTraitTest extends TestCase
                 'value' => 'Some country',
             ],
             [
-                'operator'  => OperatorOptions::IN,
-                'value'     => 'Some country',
+                'operator' => OperatorOptions::IN,
+                'value'    => 'Some country',
             ],
             true,
         ];
@@ -213,8 +213,8 @@ class MatchFilterForLeadTraitTest extends TestCase
                 'value' => 'Some country',
             ],
             [
-                'operator'  => OperatorOptions::IN,
-                'value'     => 'Some other country',
+                'operator' => OperatorOptions::IN,
+                'value'    => 'Some other country',
             ],
             false,
         ];
@@ -230,13 +230,13 @@ class MatchFilterForLeadTraitTest extends TestCase
 
         $filters = [
             0 => [
-                'glue'      => 'and',
-                'field'     => 'companycity',
-                'object'    => 'company',
-                'type'      => 'text',
-                'filter'    => 'New York',
-                'display'   => null,
-                'operator'  => '=',
+                'glue'     => 'and',
+                'field'    => 'companycity',
+                'object'   => 'company',
+                'type'     => 'text',
+                'filter'   => 'New York',
+                'display'  => null,
+                'operator' => '=',
             ],
         ];
 

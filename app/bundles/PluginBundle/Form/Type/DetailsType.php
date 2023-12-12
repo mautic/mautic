@@ -73,7 +73,7 @@ class DetailsType extends AbstractType
                 'authButton',
                 StandAloneButtonType::class,
                 [
-                    'attr'     => [
+                    'attr' => [
                         'class'   => 'btn btn-success btn-lg',
                         'onclick' => 'Mautic.initiateIntegrationAuthorization()',
                         'icon'    => 'fa fa-key',

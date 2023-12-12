@@ -35,7 +35,7 @@ class IpRestrictMiddlewareTest extends \PHPUnit\Framework\TestCase
     {
         $inputRequest = new Request();
         $inputRequest->server->set('REMOTE_ADDR', 'unallowed.ip.address');
-        $httpKernel                 = new class() implements HttpKernelInterface {
+        $httpKernel = new class() implements HttpKernelInterface {
             public $handleWasCalled = false;
 
             public function __construct()

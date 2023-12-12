@@ -29,14 +29,14 @@ class FormUploader
 
         try {
             foreach ($filesToUpload as $fileFieldCrate) {
-                $field           = $fileFieldCrate->getField();
-                $alias           = $field->getAlias();
-                $uploadDir       = $this->getUploadDir($field);
-                $fileName        = $this->fileUploader->upload($uploadDir, $fileFieldCrate->getUploadedFile());
-                $result[$alias]  = $fileName;
-                $uploadedFile    = $uploadDir.DIRECTORY_SEPARATOR.$fileName;
+                $field          = $fileFieldCrate->getField();
+                $alias          = $field->getAlias();
+                $uploadDir      = $this->getUploadDir($field);
+                $fileName       = $this->fileUploader->upload($uploadDir, $fileFieldCrate->getUploadedFile());
+                $result[$alias] = $fileName;
+                $uploadedFile   = $uploadDir.DIRECTORY_SEPARATOR.$fileName;
                 $this->fixRotationJPG($uploadedFile);
-                $uploadedFiles[] =$uploadedFile;
+                $uploadedFiles[] = $uploadedFile;
             }
             $submission->setResults($result);
         } catch (FileUploadException) {

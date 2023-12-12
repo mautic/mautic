@@ -20,7 +20,7 @@ class TriggerEventController extends CommonFormController
     public function newAction(Request $request)
     {
         $success = 0;
-        $valid   = $cancelled   = false;
+        $valid   = $cancelled = false;
         $method  = $request->getMethod();
         $session = $request->getSession();
 

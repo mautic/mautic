@@ -78,9 +78,9 @@ class GrapesJsController extends CommonController
             }
         }
 
-        $slots        = [];
-        $type         = 'html';
-        $template     = InputHelper::clean($request->query->get('template'));
+        $slots    = [];
+        $type     = 'html';
+        $template = InputHelper::clean($request->query->get('template'));
         if (!$template) {
             $mauticLogger->warning('Grapesjs: no template in query');
 
@@ -92,7 +92,7 @@ class GrapesJsController extends CommonController
         // Check for MJML template
         // @deprecated - use mjml directly in email.html.twig
         if ($logicalName = $this->checkForMjmlTemplate($templateName.'.mjml.twig')) {
-            $type        = 'mjml';
+            $type = 'mjml';
         } else {
             $logicalName = $themeHelper->checkForTwigTemplate($templateName.'.html.twig');
             $slots       = $themeHelper->getTheme($template)->getSlots($objectType);
@@ -116,7 +116,7 @@ class GrapesJsController extends CommonController
         // Replace short codes to emoji
         $content = array_map(fn ($text) => EmojiHelper::toEmoji($text, 'short'), $content);
 
-        $renderedTemplate =  $this->renderView(
+        $renderedTemplate = $this->renderView(
             $logicalName,
             [
                 'isNew'     => $isNew,

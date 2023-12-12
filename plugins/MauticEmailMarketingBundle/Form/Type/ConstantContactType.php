@@ -57,10 +57,10 @@ class ConstantContactType extends AbstractType
         }
 
         $builder->add('list', ChoiceType::class, [
-            'choices'           => array_flip($choices), // Choice type expects labels as keys
-            'label'             => 'mautic.emailmarketing.list',
-            'required'          => false,
-            'attr'              => [
+            'choices'  => array_flip($choices), // Choice type expects labels as keys
+            'label'    => 'mautic.emailmarketing.list',
+            'required' => false,
+            'attr'     => [
                 'tooltip' => 'mautic.emailmarketing.list.tooltip',
             ],
         ]);

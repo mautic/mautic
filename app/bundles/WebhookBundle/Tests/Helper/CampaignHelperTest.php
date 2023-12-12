@@ -92,7 +92,7 @@ class CampaignHelperTest extends \PHPUnit\Framework\TestCase
         $this->client->expects($this->once())
             ->method('request')
             ->with('post', 'https://mautic.org', [
-                \GuzzleHttp\RequestOptions::FORM_PARAMS => ['test'  => 'tee', 'email' => 'john@doe.email', 'IP' => '127.0.0.1,127.0.0.2'],
+                \GuzzleHttp\RequestOptions::FORM_PARAMS => ['test' => 'tee', 'email' => 'john@doe.email', 'IP' => '127.0.0.1,127.0.0.2'],
                 \GuzzleHttp\RequestOptions::HEADERS     => ['test' => 'tee', 'company' => 'Mautic'],
                 \GuzzleHttp\RequestOptions::TIMEOUT     => 10,
             ])
@@ -106,7 +106,7 @@ class CampaignHelperTest extends \PHPUnit\Framework\TestCase
         $config      = $this->provideSampleConfig('post');
         $expectedUrl = 'https://mautic.org?test=tee&email=john%40doe.email&IP=127.0.0.1%2C127.0.0.2';
 
-        $config      = $this->provideSampleConfig('post', 'application/json');
+        $config = $this->provideSampleConfig('post', 'application/json');
         $this->client->expects($this->once())
             ->method('request')
             ->with('post', 'https://mautic.org', [

@@ -258,10 +258,10 @@ class CampaignSubscriber implements EventSubscriberInterface
         $somethingHappened = false;
 
         if (null !== $lead && !empty($points)) {
-            $pointsLogActionName      = "{$event->getEvent()['id']}: {$event->getEvent()['name']}";
-            $pointsLogEventName       = "{$event->getEvent()['campaign']['id']}: {$event->getEvent()['campaign']['name']}";
-            $pointGroupId             = $event->getConfig()['group'] ?? null;
-            $pointGroup               = $pointGroupId ? $this->groupModel->getEntity($pointGroupId) : null;
+            $pointsLogActionName = "{$event->getEvent()['id']}: {$event->getEvent()['name']}";
+            $pointsLogEventName  = "{$event->getEvent()['campaign']['id']}: {$event->getEvent()['campaign']['name']}";
+            $pointGroupId        = $event->getConfig()['group'] ?? null;
+            $pointGroup          = $pointGroupId ? $this->groupModel->getEntity($pointGroupId) : null;
 
             if (!empty($pointGroup)) {
                 $this->groupModel->adjustPoints($lead, $pointGroup, $points);
@@ -409,7 +409,7 @@ class CampaignSubscriber implements EventSubscriberInterface
             return;
         }
 
-        $primaryCompany =  $this->companyModel->getEntity($company['id']);
+        $primaryCompany = $this->companyModel->getEntity($company['id']);
 
         if (isset($config['companyname']) && $primaryCompany->getName() != $config['companyname']) {
             [$company, $leadAdded, $companyEntity] = IdentifyCompanyHelper::identifyLeadsCompany($config, $lead, $this->companyModel);
@@ -482,7 +482,7 @@ class CampaignSubscriber implements EventSubscriberInterface
             $listRepo = $this->listModel->getRepository();
             $result   = $listRepo->checkLeadSegmentsByIds($lead, $event->getConfig()['segments']);
         } elseif ($event->checkContext('lead.stages')) {
-            $result   = $this->leadModel->getRepository()->isContactInOneOfStages($lead, $event->getConfig()['stages']);
+            $result = $this->leadModel->getRepository()->isContactInOneOfStages($lead, $event->getConfig()['stages']);
         } elseif ($event->checkContext('lead.owner')) {
             $result = $this->leadModel->getRepository()->checkLeadOwner($lead, $event->getConfig()['owner']);
         } elseif ($event->checkContext('lead.campaigns')) {
@@ -523,8 +523,8 @@ class CampaignSubscriber implements EventSubscriberInterface
                 );
             }
         } elseif ($event->checkContext('lead.dnc')) {
-            $channels  = $event->getConfig()['channels'];
-            $reason    = $event->getConfig()['reason'] ?? null;
+            $channels = $event->getConfig()['channels'];
+            $reason   = $event->getConfig()['reason'] ?? null;
             foreach ($channels as $channel) {
                 $isLeadDNC = $this->doNotContact->isContactable($lead, $channel);
                 if (!empty($reason)) {

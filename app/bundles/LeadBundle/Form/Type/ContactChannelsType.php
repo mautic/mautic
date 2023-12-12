@@ -30,13 +30,13 @@ class ContactChannelsType extends AbstractType
             'subscribed_channels',
             ChoiceType::class,
             [
-                'choices'           => $options['channels'],
-                'expanded'          => true,
-                'label_attr'        => ['class' => 'control-label'],
-                'attr'              => ['onClick' => 'Mautic.togglePreferredChannel(this.value);'],
-                'multiple'          => true,
-                'label'             => false,
-                'required'          => false,
+                'choices'    => $options['channels'],
+                'expanded'   => true,
+                'label_attr' => ['class' => 'control-label'],
+                'attr'       => ['onClick' => 'Mautic.togglePreferredChannel(this.value);'],
+                'multiple'   => true,
+                'label'      => false,
+                'required'   => false,
             ]
         );
 
@@ -45,14 +45,14 @@ class ContactChannelsType extends AbstractType
                 'preferred_channel',
                 ChoiceType::class,
                 [
-                    'choices'           => $options['channels'],
-                    'expanded'          => false,
-                    'multiple'          => false,
-                    'label'             => 'mautic.lead.list.frequency.preferred.channel',
-                    'label_attr'        => ['class' => 'control-label'],
-                    'placeholder'       => false,
-                    'required'          => false,
-                    'attr'              => [
+                    'choices'     => $options['channels'],
+                    'expanded'    => false,
+                    'multiple'    => false,
+                    'label'       => 'mautic.lead.list.frequency.preferred.channel',
+                    'label_attr'  => ['class' => 'control-label'],
+                    'placeholder' => false,
+                    'required'    => false,
+                    'attr'        => [
                         'class'   => 'form-control',
                         'tooltip' => 'mautic.lead.list.frequency.preferred.channel',
                     ],
@@ -85,7 +85,7 @@ class ContactChannelsType extends AbstractType
                     'frequency_time_'.$channel,
                     ChoiceType::class,
                     [
-                        'choices'           => [
+                        'choices' => [
                             'mautic.core.time.days'   => FrequencyRule::TIME_DAY,
                             'mautic.core.time.weeks'  => FrequencyRule::TIME_WEEK,
                             'mautic.core.time.months' => FrequencyRule::TIME_MONTH,
@@ -177,8 +177,8 @@ class ContactChannelsType extends AbstractType
         $resolver->setRequired(['channels']);
         $resolver->setDefaults(
             [
-                'public_view'               => false,
-                'save_button'               => false,
+                'public_view' => false,
+                'save_button' => false,
             ]
         );
     }

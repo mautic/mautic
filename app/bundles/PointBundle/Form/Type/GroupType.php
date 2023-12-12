@@ -47,7 +47,7 @@ class GroupType extends AbstractType
             $data = $options['data']->isPublished(false);
         }
         $builder->add('isPublished', YesNoButtonGroupType::class, [
-            'data'      => $data,
+            'data' => $data,
         ]);
 
         $builder->add('buttons', FormButtonsType::class);

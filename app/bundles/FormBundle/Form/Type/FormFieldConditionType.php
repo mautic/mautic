@@ -70,7 +70,7 @@ class FormFieldConditionType extends AbstractType
             'expr',
             ChoiceType::class,
             [
-                'choices'  => [
+                'choices' => [
                     'mautic.core.operator.in'    => 'in',
                     'mautic.core.operator.notin' => 'notIn',
                 ],

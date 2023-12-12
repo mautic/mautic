@@ -68,8 +68,8 @@ class DecoratorFactoryTest extends \PHPUnit\Framework\TestCase
     public function testBaseDecorator(): void
     {
         $contactSegmentFilterCrate = new ContactSegmentFilterCrate([
-            'field'    => 'date_identified',
-            'type'     => 'number',
+            'field' => 'date_identified',
+            'type'  => 'number',
         ]);
 
         $this->assertInstanceOf(
@@ -81,8 +81,8 @@ class DecoratorFactoryTest extends \PHPUnit\Framework\TestCase
     public function testCustomMappedDecorator(): void
     {
         $contactSegmentFilterCrate = new ContactSegmentFilterCrate([
-            'field'    => 'hit_url_count',
-            'type'     => 'number',
+            'field' => 'hit_url_count',
+            'type'  => 'number',
         ]);
 
         $this->assertInstanceOf(

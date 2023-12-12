@@ -56,7 +56,7 @@ abstract class AbstractMaxmindLookup extends AbstractRemoteDataLookup
                     $this->country = $data->country->names->en;
                 }
                 if (isset($data->city)) {
-                    $this->city    = $data->city->names->en;
+                    $this->city = $data->city->names->en;
                 }
 
                 if (isset($data->subdivisions[0])) {

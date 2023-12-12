@@ -3,14 +3,14 @@
 declare(strict_types=1);
 
 return [
-    'routes'   => [
+    'routes' => [
         'main'   => [],
         'public' => [],
         'api'    => [],
     ],
     'menu'     => [],
     'services' => [
-        'events'    => [
+        'events' => [
             'mautic.cache.clear_cache_subscriber' => [
                 'class'     => \Mautic\CacheBundle\EventListener\CacheClearSubscriber::class,
                 'tags'      => ['kernel.cache_clearer'],
@@ -20,8 +20,8 @@ return [
                 ],
             ],
         ],
-        'other'     => [
-            'mautic.cache.provider'           => [
+        'other' => [
+            'mautic.cache.provider' => [
                 'class'     => \Mautic\CacheBundle\Cache\CacheProvider::class,
                 'arguments' => [
                     'mautic.helper.core_parameters',
@@ -35,18 +35,18 @@ return [
                     '%mautic.cache_lifetime%',
                     '%mautic.tmp_path%',
                 ],
-                'tag'       => 'mautic.cache.adapter',
+                'tag' => 'mautic.cache.adapter',
             ],
-            'mautic.cache.adapter.memcached'  => [
+            'mautic.cache.adapter.memcached' => [
                 'class'     => \Mautic\CacheBundle\Cache\Adapter\MemcachedTagAwareAdapter::class,
                 'arguments' => [
                     '%mautic.cache_adapter_memcached%',
                     '%mautic.cache_prefix%',
                     '%mautic.cache_lifetime%',
                 ],
-                'tag'       => 'mautic.cache.adapter',
+                'tag' => 'mautic.cache.adapter',
             ],
-            'mautic.cache.adapter.redis'      => [
+            'mautic.cache.adapter.redis' => [
                 'class'     => \Mautic\CacheBundle\Cache\Adapter\RedisTagAwareAdapter::class,
                 'arguments' => [
                     '%mautic.cache_adapter_redis%',
@@ -54,7 +54,7 @@ return [
                     '%mautic.cache_lifetime%',
                     '%mautic.redis_primary_only%',
                 ],
-                'tag'       => 'mautic.cache.adapter',
+                'tag' => 'mautic.cache.adapter',
             ],
         ],
         'models'    => [],
@@ -73,7 +73,7 @@ return [
                 'serializer'           => 'igbinary',
             ],
         ],
-        'cache_adapter_redis'     => [
+        'cache_adapter_redis' => [
             'dsn'     => 'redis://localhost',
             'options' => [
                 'lazy'           => false,

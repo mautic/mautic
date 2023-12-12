@@ -19,7 +19,7 @@ class DateDayTodayTest extends \PHPUnit\Framework\TestCase
         $dateDecorator    = $this->createMock(DateDecorator::class);
         $timezoneResolver = $this->createMock(TimezoneResolver::class);
 
-        $filter        = [
+        $filter = [
             'operator' => '=',
         ];
         $contactSegmentFilterCrate = new ContactSegmentFilterCrate($filter);
@@ -42,7 +42,7 @@ class DateDayTodayTest extends \PHPUnit\Framework\TestCase
             ->with()
             ->willReturn('=<');
 
-        $filter        = [
+        $filter = [
             'operator' => 'lte',
         ];
         $contactSegmentFilterCrate = new ContactSegmentFilterCrate($filter);
@@ -67,7 +67,7 @@ class DateDayTodayTest extends \PHPUnit\Framework\TestCase
             ->with()
             ->willReturn($date);
 
-        $filter        = [
+        $filter = [
             'operator' => '!=',
         ];
         $contactSegmentFilterCrate = new ContactSegmentFilterCrate($filter);
@@ -92,7 +92,7 @@ class DateDayTodayTest extends \PHPUnit\Framework\TestCase
             ->with()
             ->willReturn($date);
 
-        $filter        = [
+        $filter = [
             'operator' => 'lt',
         ];
         $contactSegmentFilterCrate = new ContactSegmentFilterCrate($filter);

@@ -40,7 +40,7 @@ class WebhookQueueFunctionalTest extends MauticMysqlTestCase
     {
         $webhookQueue = $this->createWebhookQueue();
 
-        $payload  = 'Compressed payload';
+        $payload = 'Compressed payload';
         $webhookQueue->setPayload($payload);
 
         Assert::assertSame($payload, $webhookQueue->getPayload());

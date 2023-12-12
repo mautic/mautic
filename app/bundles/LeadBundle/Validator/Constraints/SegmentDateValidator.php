@@ -43,7 +43,7 @@ final class SegmentDateValidator extends ConstraintValidator
                     return;
                 }
 
-                $formats  = ['Y-m-d', 'Y-m-d H:i', 'Y-m-d H:i:s'];
+                $formats = ['Y-m-d', 'Y-m-d H:i', 'Y-m-d H:i:s'];
 
                 foreach ($formats as $fmt) {
                     $dateTime = \DateTime::createFromFormat($fmt, $parameterValue);

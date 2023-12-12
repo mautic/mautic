@@ -14,7 +14,7 @@ trait UpsertTrait
      */
     private bool $hasBeenInserted = false;
 
-    private bool $hasBeenUpdated  = false;
+    private bool $hasBeenUpdated = false;
 
     public function hasBeenInserted(): bool
     {

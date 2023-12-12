@@ -229,8 +229,8 @@ class LeadFieldRepository extends CommonRepository
         } else {
             $property = $this->getPropertyByField($field, $q);
             if ('empty' === $operatorExpr || 'notEmpty' === $operatorExpr) {
-                $doesSupportEmptyValue            = !in_array($fieldType, ['date', 'datetime'], true);
-                $compositeExpression              = ('empty' === $operatorExpr) ?
+                $doesSupportEmptyValue = !in_array($fieldType, ['date', 'datetime'], true);
+                $compositeExpression   = ('empty' === $operatorExpr) ?
                     $q->expr()->or(
                         $q->expr()->isNull($property),
                         $doesSupportEmptyValue ? $q->expr()->eq($property, $q->expr()->literal('')) : null
@@ -316,16 +316,16 @@ class LeadFieldRepository extends CommonRepository
                 } else {
                     switch ($operatorExpr) {
                         case 'startsWith':
-                            $operatorExpr    = 'like';
-                            $value           = $value.'%';
+                            $operatorExpr = 'like';
+                            $value        = $value.'%';
                             break;
                         case 'endsWith':
-                            $operatorExpr   = 'like';
-                            $value          = '%'.$value;
+                            $operatorExpr = 'like';
+                            $value        = '%'.$value;
                             break;
                         case 'contains':
-                            $operatorExpr   = 'like';
-                            $value          = '%'.$value.'%';
+                            $operatorExpr = 'like';
+                            $value        = '%'.$value.'%';
                             break;
                     }
 

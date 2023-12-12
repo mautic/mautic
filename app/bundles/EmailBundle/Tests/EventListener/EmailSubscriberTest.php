@@ -53,13 +53,13 @@ final class EmailSubscriberTest extends \PHPUnit\Framework\TestCase
     {
         parent::setUp();
 
-        $this->ipLookupHelper   = $this->createMock(IpLookupHelper::class);
-        $this->auditLogModel    = $this->createMock(AuditLogModel::class);
-        $this->emailModel       = $this->createMock(EmailModel::class);
-        $this->translator       = $this->createMock(TranslatorInterface::class);
-        $this->em               = $this->createMock(EntityManager::class);
-        $this->mockMessage      = $this->createMock(MauticMessage::class);
-        $this->subscriber       = new EmailSubscriber($this->ipLookupHelper, $this->auditLogModel, $this->emailModel, $this->translator, $this->em);
+        $this->ipLookupHelper = $this->createMock(IpLookupHelper::class);
+        $this->auditLogModel  = $this->createMock(AuditLogModel::class);
+        $this->emailModel     = $this->createMock(EmailModel::class);
+        $this->translator     = $this->createMock(TranslatorInterface::class);
+        $this->em             = $this->createMock(EntityManager::class);
+        $this->mockMessage    = $this->createMock(MauticMessage::class);
+        $this->subscriber     = new EmailSubscriber($this->ipLookupHelper, $this->auditLogModel, $this->emailModel, $this->translator, $this->em);
     }
 
     public function testOnEmailResendWhenShouldTryAgain(): void

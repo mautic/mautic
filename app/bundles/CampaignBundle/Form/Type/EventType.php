@@ -68,18 +68,18 @@ class EventType extends AbstractType
                 'triggerMode',
                 ButtonGroupType::class,
                 [
-                    'choices'           => array_flip($choices),
-                    'expanded'          => true,
-                    'multiple'          => false,
-                    'label_attr'        => ['class' => 'control-label'],
-                    'label'             => $label,
-                    'placeholder'       => false,
-                    'required'          => false,
-                    'attr'              => [
+                    'choices'     => array_flip($choices),
+                    'expanded'    => true,
+                    'multiple'    => false,
+                    'label_attr'  => ['class' => 'control-label'],
+                    'label'       => $label,
+                    'placeholder' => false,
+                    'required'    => false,
+                    'attr'        => [
                         'onchange' => 'Mautic.campaignToggleTimeframes();',
                         'tooltip'  => 'mautic.campaign.form.type.help',
                     ],
-                    'data'        => $triggerMode,
+                    'data' => $triggerMode,
                 ]
             );
 
@@ -87,8 +87,8 @@ class EventType extends AbstractType
                 'triggerDate',
                 DateTimeType::class,
                 [
-                    'label'  => false,
-                    'attr'   => [
+                    'label' => false,
+                    'attr'  => [
                         'class'       => 'form-control',
                         'preaddon'    => 'fa fa-calendar',
                         'data-toggle' => 'datetime',
@@ -110,7 +110,7 @@ class EventType extends AbstractType
                         'class'    => 'form-control',
                         'preaddon' => 'symbol-hashtag',
                     ],
-                    'data'  => $data,
+                    'data' => $data,
                 ]
             );
 
@@ -119,17 +119,17 @@ class EventType extends AbstractType
                 'triggerIntervalUnit',
                 ChoiceType::class,
                 [
-                    'choices'     => [
+                    'choices' => [
                         'mautic.campaign.event.intervalunit.choice.i' => 'i',
                         'mautic.campaign.event.intervalunit.choice.h' => 'h',
                         'mautic.campaign.event.intervalunit.choice.d' => 'd',
                         'mautic.campaign.event.intervalunit.choice.m' => 'm',
                         'mautic.campaign.event.intervalunit.choice.y' => 'y',
                     ],
-                    'multiple'          => false,
-                    'label_attr'        => ['class' => 'control-label'],
-                    'label'             => false,
-                    'attr'              => [
+                    'multiple'   => false,
+                    'label_attr' => ['class' => 'control-label'],
+                    'label'      => false,
+                    'attr'       => [
                         'class' => 'form-control',
                     ],
                     'placeholder' => false,
@@ -151,7 +151,7 @@ class EventType extends AbstractType
                         'data-format'  => 'H:i',
                         'autocomplete' => 'off',
                     ],
-                    'data'  => ($data) ? $data->format('H:i') : $data,
+                    'data' => ($data) ? $data->format('H:i') : $data,
                 ]
             );
 
@@ -167,7 +167,7 @@ class EventType extends AbstractType
                         'data-format'  => 'H:i',
                         'autocomplete' => 'off',
                     ],
-                    'data'  => ($data) ? $data->format('H:i') : $data,
+                    'data' => ($data) ? $data->format('H:i') : $data,
                 ]
             );
 
@@ -183,7 +183,7 @@ class EventType extends AbstractType
                         'data-format'  => 'H:i',
                         'autocomplete' => 'off',
                     ],
-                    'data'  => ($data) ? $data->format('H:i') : $data,
+                    'data' => ($data) ? $data->format('H:i') : $data,
                 ]
             );
 
@@ -191,24 +191,24 @@ class EventType extends AbstractType
                 'triggerRestrictedDaysOfWeek',
                 ChoiceType::class,
                 [
-                    'label'    => true,
-                    'attr'     => [
+                    'label' => true,
+                    'attr'  => [
                         'data-toggle' => 'time',
                         'data-format' => 'H:i',
                     ],
-                    'choices'  => [
-                        'mautic.report.schedule.day.monday'     => 1,
-                        'mautic.report.schedule.day.tuesday'    => 2,
-                        'mautic.report.schedule.day.wednesday'  => 3,
-                        'mautic.report.schedule.day.thursday'   => 4,
-                        'mautic.report.schedule.day.friday'     => 5,
-                        'mautic.report.schedule.day.saturday'   => 6,
-                        'mautic.report.schedule.day.sunday'     => 0,
-                        'mautic.report.schedule.day.week_days'  => -1,
+                    'choices' => [
+                        'mautic.report.schedule.day.monday'    => 1,
+                        'mautic.report.schedule.day.tuesday'   => 2,
+                        'mautic.report.schedule.day.wednesday' => 3,
+                        'mautic.report.schedule.day.thursday'  => 4,
+                        'mautic.report.schedule.day.friday'    => 5,
+                        'mautic.report.schedule.day.saturday'  => 6,
+                        'mautic.report.schedule.day.sunday'    => 0,
+                        'mautic.report.schedule.day.week_days' => -1,
                     ],
-                    'expanded'          => true,
-                    'multiple'          => true,
-                    'required'          => false,
+                    'expanded' => true,
+                    'multiple' => true,
+                    'required' => false,
                 ]
             );
         }

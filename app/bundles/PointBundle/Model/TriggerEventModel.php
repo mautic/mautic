@@ -60,13 +60,13 @@ class TriggerEventModel extends CommonFormModel
     public function getReportIdsWithDependenciesOnSegment($segmentId): array
     {
         $filter = [
-            'force'  => [
-                ['column' => 'e.type', 'expr' => 'eq', 'value'=>'lead.changelists'],
+            'force' => [
+                ['column' => 'e.type', 'expr' => 'eq', 'value' => 'lead.changelists'],
             ],
         ];
         $entities = $this->getEntities(
             [
-                'filter'     => $filter,
+                'filter' => $filter,
             ]
         );
         $dependents = [];

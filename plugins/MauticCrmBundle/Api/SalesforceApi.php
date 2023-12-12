@@ -13,17 +13,17 @@ use MauticPlugin\MauticCrmBundle\Integration\SalesforceIntegration;
  */
 class SalesforceApi extends CrmApi
 {
-    protected $object          = 'Lead';
+    protected $object = 'Lead';
 
     protected $requestSettings = [
         'encode_parameters' => 'json',
     ];
 
-    protected $apiRequestCounter   = 0;
+    protected $apiRequestCounter = 0;
 
-    protected $requestCounter      = 1;
+    protected $requestCounter = 1;
 
-    protected $maxLockRetries      = 3;
+    protected $maxLockRetries = 3;
 
     public function __construct(CrmAbstractIntegration $integration)
     {
@@ -51,7 +51,7 @@ class SalesforceApi extends CrmApi
 
         $requestUrl = RequestUrl::get($this->integration->getApiUrl(), $queryUrl, $operation, $object);
 
-        $settings   = $this->requestSettings;
+        $settings = $this->requestSettings;
         if ('PATCH' == $method) {
             $settings['headers'] = ['Sforce-Auto-Assign' => 'FALSE'];
         }

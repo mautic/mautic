@@ -8,8 +8,8 @@ class CompanyTest extends \PHPUnit\Framework\TestCase
 {
     public function testChangingPropertiesHydratesFieldChanges(): void
     {
-        $email    = 'foo@bar.com';
-        $company  = new Company();
+        $email   = 'foo@bar.com';
+        $company = new Company();
         $company->addUpdatedField('email', $email);
         $changes = $company->getChanges();
 

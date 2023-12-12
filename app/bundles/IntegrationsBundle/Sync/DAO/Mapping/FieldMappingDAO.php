@@ -24,7 +24,7 @@ class FieldMappingDAO
         private $syncDirection,
         $isRequired
     ) {
-        $this->isRequired        = (bool) $isRequired;
+        $this->isRequired = (bool) $isRequired;
     }
 
     /**

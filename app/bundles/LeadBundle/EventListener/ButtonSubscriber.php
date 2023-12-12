@@ -34,11 +34,11 @@ class ButtonSubscriber implements EventSubscriberInterface
 
         $event->addButton(
             [
-                'attr'      => [
-                    'data-toggle'           => 'confirmation',
-                    'href'                  => $exportRoute.'?filetype=xlsx',
-                    'data-precheck'         => 'batchActionPrecheck',
-                    'data-message'          => $this->translator->trans(
+                'attr' => [
+                    'data-toggle'   => 'confirmation',
+                    'href'          => $exportRoute.'?filetype=xlsx',
+                    'data-precheck' => 'batchActionPrecheck',
+                    'data-message'  => $this->translator->trans(
                         'mautic.core.export.items',
                         ['%items%' => 'contacts']
                     ),
@@ -55,11 +55,11 @@ class ButtonSubscriber implements EventSubscriberInterface
 
         $event->addButton(
             [
-                'attr'      => [
-                    'data-toggle'           => 'confirmation',
-                    'href'                  => $exportRoute.'?filetype=csv',
-                    'data-precheck'         => 'batchActionPrecheck',
-                    'data-message'          => $this->translator->trans(
+                'attr' => [
+                    'data-toggle'   => 'confirmation',
+                    'href'          => $exportRoute.'?filetype=csv',
+                    'data-precheck' => 'batchActionPrecheck',
+                    'data-message'  => $this->translator->trans(
                         'mautic.core.export.items',
                         ['%items%' => 'contacts']
                     ),
@@ -76,7 +76,7 @@ class ButtonSubscriber implements EventSubscriberInterface
 
         $event->addButton(
             [
-                'attr'      => [
+                'attr' => [
                     'href'        => $exportRoute.'?filetype=xlsx',
                     'data-toggle' => null,
                 ],
@@ -88,7 +88,7 @@ class ButtonSubscriber implements EventSubscriberInterface
 
         $event->addButton(
             [
-                'attr'      => [
+                'attr' => [
                     'href'        => $exportRoute.'?filetype=csv',
                     'data-toggle' => null,
                 ],

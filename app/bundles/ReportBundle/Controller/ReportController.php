@@ -52,7 +52,7 @@ class ReportController extends FormController
 
         $this->setListFilters();
 
-        $pageHelper        = $pageHelperFactory->make('mautic.report', $page);
+        $pageHelper = $pageHelperFactory->make('mautic.report', $page);
 
         $limit  = $pageHelper->getLimit();
         $start  = $pageHelper->getStart();

@@ -248,8 +248,8 @@ class ListModel extends FormModel
                 'properties' => [
                     'type' => 'tags',
                 ],
-                'operators'  => $this->getOperatorsForFieldType('multiselect'),
-                'object'     => 'lead',
+                'operators' => $this->getOperatorsForFieldType('multiselect'),
+                'object'    => 'lead',
             ];
 
         // Add custom choices
@@ -1061,8 +1061,8 @@ class ListModel extends FormModel
      */
     public function getSegmentContactsLineChartData($unit, \DateTime $dateFrom, \DateTime $dateTo, $dateFormat = null, $filter = []): array
     {
-        $chart    = new LineChart($unit, $dateFrom, $dateTo, $dateFormat);
-        $query    = new SegmentContactsLineChartQuery($this->em->getConnection(), $dateFrom, $dateTo, $filter);
+        $chart = new LineChart($unit, $dateFrom, $dateTo, $dateFormat);
+        $query = new SegmentContactsLineChartQuery($this->em->getConnection(), $dateFrom, $dateTo, $filter);
 
         // added line everytime
         $chart->setDataset($this->translator->trans('mautic.lead.segments.contacts.added'), $this->segmentChartQueryFactory->getContactsAdded($query));
@@ -1091,8 +1091,8 @@ class ListModel extends FormModel
         $aliasLength = mb_strlen($alias);
         $likeContent = "%;s:5:\"field\";s:{$aliasLength}:\"{$alias}\";%";
         $filter      = [
-            'force'  => [
-                ['column' => 'l.filters', 'expr' => 'LIKE', 'value'=> $likeContent],
+            'force' => [
+                ['column' => 'l.filters', 'expr' => 'LIKE', 'value' => $likeContent],
             ],
         ];
 
@@ -1107,9 +1107,9 @@ class ListModel extends FormModel
     public function getSegmentsWithDependenciesOnSegment($segmentId, $returnProperty = 'name')
     {
         $filter = [
-            'force'  => [
-                ['column' => 'l.filters', 'expr' => 'LIKE', 'value'=>'%s:8:"leadlist"%'],
-                ['column' => 'l.id', 'expr' => 'neq', 'value'=>$segmentId],
+            'force' => [
+                ['column' => 'l.filters', 'expr' => 'LIKE', 'value' => '%s:8:"leadlist"%'],
+                ['column' => 'l.id', 'expr' => 'neq', 'value' => $segmentId],
             ],
         ];
         $entities = $this->getEntities(
@@ -1148,8 +1148,8 @@ class ListModel extends FormModel
         $entities = $this->getEntities(
             [
                 'filter' => [
-                    'force'  => [
-                        ['column' => 'l.filters', 'expr' => 'LIKE', 'value'=>'%s:8:"leadlist"%'],
+                    'force' => [
+                        ['column' => 'l.filters', 'expr' => 'LIKE', 'value' => '%s:8:"leadlist"%'],
                     ],
                 ],
             ]

@@ -180,8 +180,8 @@ class ReportDataResult
     private function buildHeader($data): void
     {
         foreach ($this->columnKeys as $k) {
-            $dataColumn      = $data['dataColumns'][$k];
-            $label           = $data['columns'][$dataColumn]['label'];
+            $dataColumn = $data['dataColumns'][$k];
+            $label      = $data['columns'][$dataColumn]['label'];
 
             // Aggregated column
             if (isset($data['aggregatorColumns'][$k])) {

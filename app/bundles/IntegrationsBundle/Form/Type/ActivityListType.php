@@ -23,11 +23,11 @@ class ActivityListType extends AbstractType
                 'choices'    => array_flip($this->leadModel->getEngagementTypes()),
                 'label'      => 'mautic.integration.feature.push_activity.included_events',
                 'label_attr' => [
-                    'class'       => 'control-label',
-                    'tooltip'     => 'mautic.integration.feature.push_activity.included_events.tooltip',
+                    'class'   => 'control-label',
+                    'tooltip' => 'mautic.integration.feature.push_activity.included_events.tooltip',
                 ],
-                'multiple'   => true,
-                'required'   => false,
+                'multiple' => true,
+                'required' => false,
             ]
         );
     }

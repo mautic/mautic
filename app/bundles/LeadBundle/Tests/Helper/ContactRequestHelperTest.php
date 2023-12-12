@@ -133,7 +133,7 @@ class ContactRequestHelperTest extends \PHPUnit\Framework\TestCase
                 'channel' => [
                     'email' => 1,
                 ],
-                'stat'    => 'abc123',
+                'stat' => 'abc123',
             ],
         ];
 
@@ -168,7 +168,7 @@ class ContactRequestHelperTest extends \PHPUnit\Framework\TestCase
                 'channel' => [
                     'email' => 1,
                 ],
-                'stat'    => 'abc123',
+                'stat' => 'abc123',
             ],
         ];
 
@@ -211,7 +211,7 @@ class ContactRequestHelperTest extends \PHPUnit\Framework\TestCase
                 'channel' => [
                     'email' => 1,
                 ],
-                'stat'    => 'abc123',
+                'stat' => 'abc123',
             ],
         ];
 

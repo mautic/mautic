@@ -70,7 +70,7 @@ class CampaignSubscriberFunctionalTest extends MauticMysqlTestCase
     {
         parent::setUp();
 
-        $this->contactRepository  = $this->em->getRepository(Lead::class);
+        $this->contactRepository = $this->em->getRepository(Lead::class);
     }
 
     protected function beforeBeginTransaction(): void
@@ -144,7 +144,7 @@ class CampaignSubscriberFunctionalTest extends MauticMysqlTestCase
         $contactIds = $this->createContacts();
         $stageIds   = $this->createStages();
         $this->addStageToContacts($contactIds, $stageIds[0]);
-        $campaign   = $this->createCampaignWithStageConditionEvent($contactIds);
+        $campaign = $this->createCampaignWithStageConditionEvent($contactIds);
 
         // Force Doctrine to re-fetch the entities otherwise the campaign won't know about any events.
         $this->em->clear();
@@ -182,7 +182,7 @@ class CampaignSubscriberFunctionalTest extends MauticMysqlTestCase
         foreach ($contactIds as $contactId) {
             $args['lead'] = $this->contactRepository->getEntity($contactId);
 
-            $event  = new CampaignExecutionEvent($args, true);
+            $event = new CampaignExecutionEvent($args, true);
 
             /** @var EventDispatcherInterface $dispatcher */
             $dispatcher = self::$container->get('event_dispatcher');
@@ -235,7 +235,7 @@ class CampaignSubscriberFunctionalTest extends MauticMysqlTestCase
         $application->setAutoExit(false);
         $applicationTester = new ApplicationTester($application);
 
-        $groupA    = $this->createGroup('A');
+        $groupA = $this->createGroup('A');
         $this->em->flush();
 
         $contactIds = $this->createContacts();
@@ -251,7 +251,7 @@ class CampaignSubscriberFunctionalTest extends MauticMysqlTestCase
         $this->em->persist($contactC);
         $this->em->flush();
 
-        $campaign   = $this->createCampaignWithPointEvents($contactIds, $groupA->getId());
+        $campaign = $this->createCampaignWithPointEvents($contactIds, $groupA->getId());
 
         // Force Doctrine to re-fetch the entities otherwise the campaign won't know about any events.
         $this->em->clear();
@@ -376,7 +376,7 @@ class CampaignSubscriberFunctionalTest extends MauticMysqlTestCase
         $event->setTriggerMode('immediate');
         $event->setProperties(
             [
-                'canvasSettings'             => [
+                'canvasSettings' => [
                     'droppedX' => '696',
                     'droppedY' => '155',
                 ],
@@ -390,73 +390,73 @@ class CampaignSubscriberFunctionalTest extends MauticMysqlTestCase
                 'triggerRestrictedStopHour'  => '',
                 'anchor'                     => 'leadsource',
                 'properties'                 => [
-                    'html'                 => '',
-                    'title'                => '',
-                    'html2'                => '',
-                    'firstname'            => '',
-                    'lastname'             => '',
-                    'company'              => '',
-                    'position'             => '',
-                    'email'                => '',
-                    'mobile'               => '',
-                    'phone'                => '',
-                    'points'               => 42,
-                    'fax'                  => '',
-                    'address1'             => '',
-                    'address2'             => '',
-                    'city'                 => '',
-                    'state'                => '',
-                    'zipcode'              => '',
-                    'country'              => '',
-                    'preferred_locale'     => '',
-                    'timezone'             => '',
-                    'last_active'          => '',
-                    'attribution_date'     => '',
-                    'attribution'          => '',
-                    'website'              => '',
-                    'facebook'             => '',
-                    'foursquare'           => '',
-                    'instagram'            => '',
-                    'linkedin'             => '',
-                    'skype'                => '',
-                    'twitter'              => '',
+                    'html'             => '',
+                    'title'            => '',
+                    'html2'            => '',
+                    'firstname'        => '',
+                    'lastname'         => '',
+                    'company'          => '',
+                    'position'         => '',
+                    'email'            => '',
+                    'mobile'           => '',
+                    'phone'            => '',
+                    'points'           => 42,
+                    'fax'              => '',
+                    'address1'         => '',
+                    'address2'         => '',
+                    'city'             => '',
+                    'state'            => '',
+                    'zipcode'          => '',
+                    'country'          => '',
+                    'preferred_locale' => '',
+                    'timezone'         => '',
+                    'last_active'      => '',
+                    'attribution_date' => '',
+                    'attribution'      => '',
+                    'website'          => '',
+                    'facebook'         => '',
+                    'foursquare'       => '',
+                    'instagram'        => '',
+                    'linkedin'         => '',
+                    'skype'            => '',
+                    'twitter'          => '',
                 ],
-                'type'                       => 'lead.updatelead',
-                'eventType'                  => 'action',
-                'anchorEventType'            => 'source',
-                'campaignId'                 => 'mautic_28ac4b8a4758b8597e8d189fa97b245996e338bb',
-                '_token'                     => 'HgysZwvH_n0uAp47CcAcsGddRnRk65t-3crOnuLx28Y',
-                'buttons'                    => ['save' => ''],
-                'html'                       => null,
-                'title'                      => null,
-                'html2'                      => null,
-                'firstname'                  => null,
-                'lastname'                   => null,
-                'company'                    => null,
-                'position'                   => null,
-                'email'                      => null,
-                'mobile'                     => null,
-                'phone'                      => null,
-                'points'                     => 42,
-                'fax'                        => null,
-                'address1'                   => null,
-                'address2'                   => null,
-                'city'                       => null,
-                'state'                      => null,
-                'zipcode'                    => null,
-                'country'                    => null,
-                'preferred_locale'           => null,
-                'timezone'                   => null,
-                'last_active'                => null,
-                'attribution_date'           => null,
-                'attribution'                => null,
-                'website'                    => null,
-                'facebook'                   => null,
-                'foursquare'                 => null,
-                'instagram'                  => null,
-                'linkedin'                   => null,
-                'skype'                      => null,
-                'twitter'                    => null,
+                'type'             => 'lead.updatelead',
+                'eventType'        => 'action',
+                'anchorEventType'  => 'source',
+                'campaignId'       => 'mautic_28ac4b8a4758b8597e8d189fa97b245996e338bb',
+                '_token'           => 'HgysZwvH_n0uAp47CcAcsGddRnRk65t-3crOnuLx28Y',
+                'buttons'          => ['save' => ''],
+                'html'             => null,
+                'title'            => null,
+                'html2'            => null,
+                'firstname'        => null,
+                'lastname'         => null,
+                'company'          => null,
+                'position'         => null,
+                'email'            => null,
+                'mobile'           => null,
+                'phone'            => null,
+                'points'           => 42,
+                'fax'              => null,
+                'address1'         => null,
+                'address2'         => null,
+                'city'             => null,
+                'state'            => null,
+                'zipcode'          => null,
+                'country'          => null,
+                'preferred_locale' => null,
+                'timezone'         => null,
+                'last_active'      => null,
+                'attribution_date' => null,
+                'attribution'      => null,
+                'website'          => null,
+                'facebook'         => null,
+                'foursquare'       => null,
+                'instagram'        => null,
+                'linkedin'         => null,
+                'skype'            => null,
+                'twitter'          => null,
             ]
         );
 
@@ -471,7 +471,7 @@ class CampaignSubscriberFunctionalTest extends MauticMysqlTestCase
         $event2->setTriggerMode('immediate');
         $event2->setProperties(
             [
-                'canvasSettings'             => [
+                'canvasSettings' => [
                     'droppedX' => '696',
                     'droppedY' => '155',
                 ],
@@ -489,15 +489,15 @@ class CampaignSubscriberFunctionalTest extends MauticMysqlTestCase
                     'operator' => '=',
                     'value'    => 'val',
                 ],
-                'type'                       => 'lead.field_value',
-                'eventType'                  => 'condition',
-                'anchorEventType'            => 'condition',
-                'campaignId'                 => 'mautic_28ac4b8a4758b8597e8d189fa97b245996e338bb',
-                '_token'                     => 'HgysZwvH_n0uAp47CcAcsGddRnRk65t-3crOnuLx28Y',
-                'buttons'                    => ['save' => ''],
-                'field'                      => 'utm_source',
-                'operator'                   => '=',
-                'value'                      => 'val',
+                'type'            => 'lead.field_value',
+                'eventType'       => 'condition',
+                'anchorEventType' => 'condition',
+                'campaignId'      => 'mautic_28ac4b8a4758b8597e8d189fa97b245996e338bb',
+                '_token'          => 'HgysZwvH_n0uAp47CcAcsGddRnRk65t-3crOnuLx28Y',
+                'buttons'         => ['save' => ''],
+                'field'           => 'utm_source',
+                'operator'        => '=',
+                'value'           => 'val',
             ]
         );
 
@@ -506,7 +506,7 @@ class CampaignSubscriberFunctionalTest extends MauticMysqlTestCase
 
         $campaign->setCanvasSettings(
             [
-                'nodes'       => [
+                'nodes' => [
                     [
                         'id'        => $event->getId(),
                         'positionX' => '696',
@@ -605,7 +605,7 @@ class CampaignSubscriberFunctionalTest extends MauticMysqlTestCase
         $event1->setTriggerMode('immediate');
         $event1->setProperties(
             [
-                'canvasSettings'             => [
+                'canvasSettings' => [
                     'droppedX' => '696',
                     'droppedY' => '155',
                 ],
@@ -641,7 +641,7 @@ class CampaignSubscriberFunctionalTest extends MauticMysqlTestCase
         $event2->setTriggerMode('immediate');
         $event2->setProperties(
             [
-                'canvasSettings'             => [
+                'canvasSettings' => [
                     'droppedX' => '696',
                     'droppedY' => '155',
                 ],
@@ -671,7 +671,7 @@ class CampaignSubscriberFunctionalTest extends MauticMysqlTestCase
 
         $campaign->setCanvasSettings(
             [
-                'nodes'       => [
+                'nodes' => [
                     [
                         'id'        => $event2->getId(),
                         'positionX' => '696',
@@ -761,7 +761,7 @@ class CampaignSubscriberFunctionalTest extends MauticMysqlTestCase
         $event1->setOrder(1);
         $event1->setProperties(
             [
-                'canvasSettings'             => [
+                'canvasSettings' => [
                     'droppedX' => '696',
                     'droppedY' => '155',
                 ],
@@ -776,19 +776,19 @@ class CampaignSubscriberFunctionalTest extends MauticMysqlTestCase
                 'order'                      => 1,
                 'anchor'                     => 'leadsource',
                 'properties'                 => [
-                    'operator'                   => 'gte',
-                    'score'                      => 1,
-                    'group'                      => $pointGroup,
+                    'operator' => 'gte',
+                    'score'    => 1,
+                    'group'    => $pointGroup,
                 ],
-                'type'                       => 'lead.points',
-                'eventType'                  => 'condition',
-                'anchorEventType'            => 'source',
-                'campaignId'                 => 'mautic_28ac4b8a4758b8597e8d189fa97b245996e338bb',
-                '_token'                     => 'HgysZwvH_n0uAp47CcAcsGddRnRk65t-3crOnuLx28Y',
-                'buttons'                    => ['save' => ''],
-                'operator'                   => 'gte',
-                'score'                      => 1,
-                'group'                      => $pointGroup,
+                'type'            => 'lead.points',
+                'eventType'       => 'condition',
+                'anchorEventType' => 'source',
+                'campaignId'      => 'mautic_28ac4b8a4758b8597e8d189fa97b245996e338bb',
+                '_token'          => 'HgysZwvH_n0uAp47CcAcsGddRnRk65t-3crOnuLx28Y',
+                'buttons'         => ['save' => ''],
+                'operator'        => 'gte',
+                'score'           => 1,
+                'group'           => $pointGroup,
             ]
         );
 
@@ -806,7 +806,7 @@ class CampaignSubscriberFunctionalTest extends MauticMysqlTestCase
         $event2->setParent($event1);
         $event2->setProperties(
             [
-                'canvasSettings'             => [
+                'canvasSettings' => [
                     'droppedX' => '696',
                     'droppedY' => '300',
                 ],
@@ -820,17 +820,17 @@ class CampaignSubscriberFunctionalTest extends MauticMysqlTestCase
                 'triggerRestrictedStopHour'  => '',
                 'anchor'                     => 'yes',
                 'properties'                 => [
-                    'points'                     => 1,
-                    'group'                      => $pointGroup,
+                    'points' => 1,
+                    'group'  => $pointGroup,
                 ],
-                'type'                       => 'lead.changepoints',
-                'eventType'                  => 'action',
-                'anchorEventType'            => 'condition',
-                'campaignId'                 => 'mautic_28ac4b8a4758b8597e8d189fa97b245996e338bb',
-                '_token'                     => 'HgysZwvH_n0uAp47CcAcsGddRnRk65t-3crOnuLx28Y',
-                'buttons'                    => ['save' => ''],
-                'points'                     => 1,
-                'group'                      => $pointGroup,
+                'type'            => 'lead.changepoints',
+                'eventType'       => 'action',
+                'anchorEventType' => 'condition',
+                'campaignId'      => 'mautic_28ac4b8a4758b8597e8d189fa97b245996e338bb',
+                '_token'          => 'HgysZwvH_n0uAp47CcAcsGddRnRk65t-3crOnuLx28Y',
+                'buttons'         => ['save' => ''],
+                'points'          => 1,
+                'group'           => $pointGroup,
             ]
         );
 
@@ -839,7 +839,7 @@ class CampaignSubscriberFunctionalTest extends MauticMysqlTestCase
 
         $campaign->setCanvasSettings(
             [
-                'nodes'       => [
+                'nodes' => [
                     [
                         'id'        => $event1->getId(),
                         'positionX' => '696',

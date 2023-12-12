@@ -10,7 +10,7 @@ final class SlotsHelper
     /**
      * @var array<string, mixed>
      */
-    private $slots     = [];
+    private $slots = [];
 
     /**
      * @var array<string, mixed>

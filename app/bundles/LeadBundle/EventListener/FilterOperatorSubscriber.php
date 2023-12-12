@@ -136,8 +136,8 @@ final class FilterOperatorSubscriber implements EventSubscriberInterface
                     'type' => 'leadlist',
                     'list' => $this->fieldChoicesProvider->getChoicesForField('multiselect', 'leadlist', $event->getSearch()),
                 ],
-                'operators'  => $this->typeOperatorProvider->getOperatorsForFieldType('multiselect'),
-                'object'     => 'lead',
+                'operators' => $this->typeOperatorProvider->getOperatorsForFieldType('multiselect'),
+                'object'    => 'lead',
             ],
             'campaign' => [
                 'label'      => $this->translator->trans('mautic.lead.list.filter.campaign'),
@@ -145,8 +145,8 @@ final class FilterOperatorSubscriber implements EventSubscriberInterface
                     'type' => 'campaign',
                     'list' => $this->fieldChoicesProvider->getChoicesForField('select', 'campaign'),
                 ],
-                'operators'  => $this->typeOperatorProvider->getOperatorsForFieldType('multiselect'),
-                'object'     => 'lead',
+                'operators' => $this->typeOperatorProvider->getOperatorsForFieldType('multiselect'),
+                'object'    => 'lead',
             ],
             'tags' => [
                 'label'      => $this->translator->trans('mautic.lead.list.filter.tags'),
@@ -218,8 +218,8 @@ final class FilterOperatorSubscriber implements EventSubscriberInterface
                     'type' => 'boolean',
                     'list' => $this->fieldChoicesProvider->getChoicesForField('boolean', 'dnc_manual_email'),
                 ],
-                'operators'  => $this->typeOperatorProvider->getOperatorsForFieldType('bool'),
-                'object'     => 'lead',
+                'operators' => $this->typeOperatorProvider->getOperatorsForFieldType('bool'),
+                'object'    => 'lead',
             ],
             'dnc_bounced_sms' => [
                 'label'      => $this->translator->trans('mautic.lead.list.filter.dnc_bounced_sms'),
@@ -245,8 +245,8 @@ final class FilterOperatorSubscriber implements EventSubscriberInterface
                     'type' => 'boolean',
                     'list' => $this->fieldChoicesProvider->getChoicesForField('boolean', 'dnc_manual_sms'),
                 ],
-                'operators'  => $this->typeOperatorProvider->getOperatorsForFieldType('bool'),
-                'object'     => 'lead',
+                'operators' => $this->typeOperatorProvider->getOperatorsForFieldType('bool'),
+                'object'    => 'lead',
             ],
             'stage' => [
                 'label'      => $this->translator->trans('mautic.lead.lead.field.stage'),
@@ -323,8 +323,8 @@ final class FilterOperatorSubscriber implements EventSubscriberInterface
                     'type' => 'assets',
                     'list' => $this->fieldChoicesProvider->getChoicesForField('select', 'lead_asset_download', $event->getSearch()),
                 ],
-                'operators'  => $this->typeOperatorProvider->getOperatorsForFieldType('multiselect'),
-                'object'     => 'lead',
+                'operators' => $this->typeOperatorProvider->getOperatorsForFieldType('multiselect'),
+                'object'    => 'lead',
             ],
             'lead_email_received' => [
                 'label'      => $this->translator->trans('mautic.lead.list.filter.lead_email_received'),
@@ -345,7 +345,7 @@ final class FilterOperatorSubscriber implements EventSubscriberInterface
                     'type' => 'lead_email_received',
                     'list' => $this->fieldChoicesProvider->getChoicesForField('select', 'lead_email_sent'),
                 ],
-                'operators'  => $this->typeOperatorProvider->getOperatorsIncluding([
+                'operators' => $this->typeOperatorProvider->getOperatorsIncluding([
                     OperatorOptions::IN,
                     OperatorOptions::NOT_IN,
                 ]),

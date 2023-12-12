@@ -26,7 +26,7 @@ class UpdatedObjectMappingDAO
         private $integrationObjectId,
         \DateTimeInterface $objectModifiedDate
     ) {
-        $this->objectModifiedDate    = $objectModifiedDate instanceof \DateTimeImmutable ? new \DateTime(
+        $this->objectModifiedDate = $objectModifiedDate instanceof \DateTimeImmutable ? new \DateTime(
             $objectModifiedDate->format('Y-m-d H:i:s'),
             $objectModifiedDate->getTimezone()
         ) : $objectModifiedDate;

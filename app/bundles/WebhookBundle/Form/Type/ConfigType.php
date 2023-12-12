@@ -42,7 +42,7 @@ class ConfigType extends AbstractType
                 'class'   => 'form-control',
                 'tooltip' => 'mautic.webhook.config.event.orderby.tooltip',
             ],
-            'required'          => false,
+            'required' => false,
             ]);
     }
 

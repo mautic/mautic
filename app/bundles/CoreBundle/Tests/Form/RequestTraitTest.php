@@ -227,8 +227,8 @@ class RequestTraitTest extends \PHPUnit\Framework\TestCase
                 $alias,
                 DateTimeType::class,
                 [
-                    'label'    => false,
-                    'attr'     => [
+                    'label' => false,
+                    'attr'  => [
                         'class' => 'form-control',
                     ],
                     'required' => false,

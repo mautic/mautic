@@ -37,7 +37,7 @@ class FormatterHelperTest extends \PHPUnit\Framework\TestCase
             $this->translator,
             $this->coreParametersHelper
         );
-        $this->formatterHelper               = new FormatterHelper($this->dateHelper, $this->translator);
+        $this->formatterHelper = new FormatterHelper($this->dateHelper, $this->translator);
     }
 
     public function testStrictHtmlFormatIsRemovingScriptTags(): void

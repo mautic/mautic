@@ -33,14 +33,14 @@ class CampaignSendSubscriber implements EventSubscriberInterface
             $event->addAction(
                 'sms.send_text_sms',
                 [
-                    'label'            => 'mautic.campaign.sms.send_text_sms',
-                    'description'      => 'mautic.campaign.sms.send_text_sms.tooltip',
-                    'eventName'        => SmsEvents::ON_CAMPAIGN_TRIGGER_ACTION,
-                    'formType'         => SmsSendType::class,
-                    'formTypeOptions'  => ['update_select' => 'campaignevent_properties_sms'],
-                    'formTheme'        => '@MauticSms/FormTheme/SmsSendList/smssend_list_row.html.twig',
-                    'channel'          => 'sms',
-                    'channelIdField'   => 'sms',
+                    'label'           => 'mautic.campaign.sms.send_text_sms',
+                    'description'     => 'mautic.campaign.sms.send_text_sms.tooltip',
+                    'eventName'       => SmsEvents::ON_CAMPAIGN_TRIGGER_ACTION,
+                    'formType'        => SmsSendType::class,
+                    'formTypeOptions' => ['update_select' => 'campaignevent_properties_sms'],
+                    'formTheme'       => '@MauticSms/FormTheme/SmsSendList/smssend_list_row.html.twig',
+                    'channel'         => 'sms',
+                    'channelIdField'  => 'sms',
                 ]
             );
         }

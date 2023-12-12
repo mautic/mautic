@@ -34,7 +34,7 @@ class ConfigType extends AbstractType
                     '1 week'            => 'PT14D',
                     '3 months'          => 'P3M',
                 ],
-                'attr'              => [
+                'attr' => [
                     'class'   => 'form-control',
                     'tooltip' => 'mautic.campaignconfig.campaign_time_wait_on_event_false_tooltip',
                 ],
@@ -50,7 +50,7 @@ class ConfigType extends AbstractType
                 'attr'  => [
                     'tooltip' => 'mautic.campaignconfig.campaign_by_range.tooltip',
                 ],
-                'data'  => (bool) ($options['data']['campaign_by_range'] ?? false),
+                'data' => (bool) ($options['data']['campaign_by_range'] ?? false),
             ]
         );
 
@@ -62,7 +62,7 @@ class ConfigType extends AbstractType
                 'attr'  => [
                     'tooltip' => 'mautic.campaignconfig.use_summary.tooltip',
                 ],
-                'data'  => (bool) ($options['data']['campaign_use_summary'] ?? false),
+                'data' => (bool) ($options['data']['campaign_use_summary'] ?? false),
             ]
         );
     }

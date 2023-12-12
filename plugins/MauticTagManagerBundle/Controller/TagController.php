@@ -400,8 +400,8 @@ class TagController extends FormController
     {
         // set the return URL
         if ($objectId) {
-            $returnUrl       = $this->generateUrl('mautic_tagmanager_action', ['objectAction' => 'view', 'objectId'=> $objectId]);
-            $viewParameters  = ['objectAction' => 'view', 'objectId'=> $objectId];
+            $returnUrl       = $this->generateUrl('mautic_tagmanager_action', ['objectAction' => 'view', 'objectId' => $objectId]);
+            $viewParameters  = ['objectAction' => 'view', 'objectId' => $objectId];
             $contentTemplate = 'MauticPlugin\MauticTagManagerBundle\Controller\TagController::viewAction';
         } else {
             // set the page we came from
@@ -517,8 +517,8 @@ class TagController extends FormController
 
             if ($overrideModel->getRepository()->countByLeads([$objectId])[$objectId] > 0) {
                 $flashes[] = [
-                    'type'    => 'error',
-                    'msg'     => 'mautic.tagmanager.tag.error.cannotbedeleted',
+                    'type' => 'error',
+                    'msg'  => 'mautic.tagmanager.tag.error.cannotbedeleted',
                 ];
 
                 return $this->postActionRedirect(
@@ -570,9 +570,9 @@ class TagController extends FormController
 
         if ('POST' === $request->getMethod()) {
             /** @var ListModel $model */
-            $model           = $this->getModel('lead.tag');
-            $ids             = json_decode($request->query->get('ids', '{}'));
-            $deleteIds       = [];
+            $model     = $this->getModel('lead.tag');
+            $ids       = json_decode($request->query->get('ids', '{}'));
+            $deleteIds = [];
 
             // Loop over the IDs to perform access checks pre-delete
             foreach ($ids as $objectId) {
@@ -597,8 +597,8 @@ class TagController extends FormController
                     $entities = $model->deleteEntities($deleteIds);
                 } catch (ForeignKeyConstraintViolationException) {
                     $flashes[] = [
-                        'type'    => 'notice',
-                        'msg'     => 'mautic.tagmanager.tag.error.cannotbedeleted',
+                        'type' => 'notice',
+                        'msg'  => 'mautic.tagmanager.tag.error.cannotbedeleted',
                     ];
 
                     return $this->postActionRedirect(

@@ -50,13 +50,13 @@ class CustomFieldHelperTest extends \PHPUnit\Framework\TestCase
         ];
 
         $fields = [
-            'customdate'         => [
+            'customdate' => [
                 'type' => 'date',
             ],
-            'customdatetime'     => [
+            'customdatetime' => [
                 'type' => 'datetime',
             ],
-            'customtime'         => [
+            'customtime' => [
                 'type' => 'time',
             ],
             'customnulldatetime' => [
@@ -77,13 +77,13 @@ class CustomFieldHelperTest extends \PHPUnit\Framework\TestCase
         ];
 
         $fields = [
-            'customdate'         => [
+            'customdate' => [
                 'type' => 'date',
             ],
-            'customdatetime'     => [
+            'customdatetime' => [
                 'type' => 'datetime',
             ],
-            'customtime'         => [
+            'customtime' => [
                 'type' => 'time',
             ],
             'customnulldatetime' => [
@@ -111,13 +111,13 @@ class CustomFieldHelperTest extends \PHPUnit\Framework\TestCase
         ];
 
         $fields = [
-            'customdate'        => [
+            'customdate' => [
                 'type' => 'date',
             ],
-            'customdatetime'    => [
+            'customdatetime' => [
                 'type' => 'datetime',
             ],
-            'customtime'        => [
+            'customtime' => [
                 'type' => 'time',
             ],
             'customemptystring' => [
@@ -138,19 +138,19 @@ class CustomFieldHelperTest extends \PHPUnit\Framework\TestCase
     public function testFieldsValuesTransformerForDifferingValueTypes(): void
     {
         $fields = [
-            'select'      => [
+            'select' => [
                 'type' => 'select',
             ],
             'multiselect' => [
                 'type' => 'multiselect',
             ],
-            'number'      => [
+            'number' => [
                 'type' => 'number',
             ],
-            'string'      => [
+            'string' => [
                 'type' => 'text',
             ],
-            'boolean'     => [
+            'boolean' => [
                 'type' => 'boolean',
             ],
         ];
@@ -160,9 +160,9 @@ class CustomFieldHelperTest extends \PHPUnit\Framework\TestCase
             'multiselect' => [
                 'array',
             ],
-            'number'      => 100,
-            'string'      => 'string',
-            'boolean'     => 0,
+            'number'  => 100,
+            'string'  => 'string',
+            'boolean' => 0,
         ];
 
         $this->assertSame($values, CustomFieldHelper::fieldsValuesTransformer($fields, $values));

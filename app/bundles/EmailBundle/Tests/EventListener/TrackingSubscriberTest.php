@@ -28,7 +28,7 @@ class TrackingSubscriberTest extends \PHPUnit\Framework\TestCase
                 'channel' => [
                     'sms' => 1,
                 ],
-                'stat'    => 'abc123',
+                'stat' => 'abc123',
         ];
 
         $sms = $this->createMock(Sms::class);
@@ -62,7 +62,7 @@ class TrackingSubscriberTest extends \PHPUnit\Framework\TestCase
             'channel' => [
                 'email' => 1,
             ],
-            'stat'    => 'abc123',
+            'stat' => 'abc123',
         ];
 
         $event = new ContactIdentificationEvent($ct);
@@ -79,7 +79,7 @@ class TrackingSubscriberTest extends \PHPUnit\Framework\TestCase
             'channel' => [
                 'sms' => 2,
             ],
-            'stat'    => 'abc123',
+            'stat' => 'abc123',
         ];
 
         $sms = $this->createMock(Sms::class);
@@ -113,7 +113,7 @@ class TrackingSubscriberTest extends \PHPUnit\Framework\TestCase
             'channel' => [
                 'sms' => 2,
             ],
-            'stat'    => 'abc123',
+            'stat' => 'abc123',
         ];
 
         $sms = $this->createMock(Sms::class);

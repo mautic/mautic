@@ -18,11 +18,11 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class ReportSubscriber implements EventSubscriberInterface
 {
-    public const CONTEXT_FORMS           = 'forms';
+    public const CONTEXT_FORMS = 'forms';
 
     public const CONTEXT_FORM_SUBMISSION = 'form.submissions';
 
-    public const CONTEXT_FORM_RESULT     = 'form.results';
+    public const CONTEXT_FORM_RESULT = 'form.results';
 
     public function __construct(
         private CompanyReportData $companyReportData,
@@ -142,14 +142,14 @@ class ReportSubscriber implements EventSubscriberInterface
 
             $forms = $formRepository->getEntities($args ?? []);
             foreach ($forms as $form) {
-                $formEntity         = $form[0];
+                $formEntity = $form[0];
 
                 $formResultsColumns = $this->getFormResultsColumns($formEntity);
                 $mappedFieldValues  = $formEntity->getMappedFieldValues();
                 $columnsMapped      = [];
                 foreach ($mappedFieldValues as $item) {
-                    $columns        = $this->reportHelper->getMappedObjectColumns($item['mappedObject'], $item);
-                    $columnsMapped  = array_merge($columnsMapped, $columns);
+                    $columns       = $this->reportHelper->getMappedObjectColumns($item['mappedObject'], $item);
+                    $columnsMapped = array_merge($columnsMapped, $columns);
                 }
 
                 $formResultsColumns = array_merge($formResultsColumns, $columnsMapped);
@@ -158,7 +158,7 @@ class ReportSubscriber implements EventSubscriberInterface
                     'columns'      => $formResultsColumns,
                 ];
 
-                $resultsTableName   = $formRepository->getResultsTableName($formEntity->getId(), $formEntity->getAlias());
+                $resultsTableName = $formRepository->getResultsTableName($formEntity->getId(), $formEntity->getAlias());
                 $event->addTable(self::CONTEXT_FORM_RESULT.'.'.$resultsTableName, $data, self::CONTEXT_FORM_RESULT);
             }
         }
@@ -307,7 +307,7 @@ class ReportSubscriber implements EventSubscriberInterface
             'type'  => 'int',
             'alias' => 'submissionId',
         ];
-        $formResultsColumns[$prefix.'form_id']       = [
+        $formResultsColumns[$prefix.'form_id'] = [
             'label' => $this->translator->trans('mautic.form.report.form_results.label', ['%field%' => $this->translator->trans('mautic.form.report.form_id')]),
             'type'  => 'int',
             'link'  => 'mautic_form_action',

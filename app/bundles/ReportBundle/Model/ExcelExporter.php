@@ -45,7 +45,7 @@ class ExcelExporter
             $this->putHeader($headersRow, $objPHPExcelSheet);
 
             // build the data rows
-            foreach ($reportData as $count=>$data) {
+            foreach ($reportData as $count => $data) {
                 $row = [];
                 foreach ($data as $k => $v) {
                     $type      = $reportDataResult->getType($k);

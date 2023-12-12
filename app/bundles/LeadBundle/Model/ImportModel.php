@@ -54,7 +54,7 @@ class ImportModel extends FormModel
         UserHelper $userHelper,
         LoggerInterface $mauticLogger
     ) {
-        $this->leadEventLogRepo  = $leadModel->getEventLogRepository();
+        $this->leadEventLogRepo = $leadModel->getEventLogRepository();
 
         parent::__construct($em, $security, $dispatcher, $router, $translator, $userHelper, $mauticLogger, $config);
     }

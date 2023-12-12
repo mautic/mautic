@@ -94,7 +94,7 @@ class IntegrationConfigType extends AbstractType
 
         $resolver->setDefined(
             [
-                'data_class'  => Integration::class,
+                'data_class' => Integration::class,
             ]
         );
     }

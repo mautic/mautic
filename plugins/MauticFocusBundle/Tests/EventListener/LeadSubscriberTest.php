@@ -177,7 +177,7 @@ class LeadSubscriberTest extends CommonMocks
     private function mockFocusModelGetStatsByLead(string $statType, string $focusName, string $method, \DateTime $date): void
     {
         $stats = [
-            'results'=> [
+            'results' => [
                 [
                     'id'         => 1,
                     'type'       => $statType,
@@ -186,7 +186,7 @@ class LeadSubscriberTest extends CommonMocks
                     'focus_name' => $focusName,
                 ],
             ],
-            'total'=> 1,
+            'total' => 1,
         ];
 
         $this->statRepository->method($method)->willReturn($stats);
@@ -204,7 +204,7 @@ class LeadSubscriberTest extends CommonMocks
     /**
      * @return array<string, mixed>
      */
-    private function getTimelineEvent(string $eventType, string $eventTypeName, string $focusName, \DateTime $date, ?Lead $lead=null): array
+    private function getTimelineEvent(string $eventType, string $eventTypeName, string $focusName, \DateTime $date, ?Lead $lead = null): array
     {
         $leadEventLogId = 1;
 
@@ -215,10 +215,10 @@ class LeadSubscriberTest extends CommonMocks
                 'label' => $focusName,
                 'href'  => null,
             ],
-            'eventType'       => $eventTypeName,
-            'timestamp'       => $date,
-            'icon'            => 'fa-search',
-            'contactId'       => $lead?->getId(),
+            'eventType' => $eventTypeName,
+            'timestamp' => $date,
+            'icon'      => 'fa-search',
+            'contactId' => $lead?->getId(),
         ];
     }
 }

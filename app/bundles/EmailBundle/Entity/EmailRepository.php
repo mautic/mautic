@@ -63,7 +63,7 @@ class EmailRepository extends CommonRepository
 
         $results = $q->executeQuery()->fetchAllAssociative();
 
-        $dnc     = count($results) ? $results[0] : null;
+        $dnc = count($results) ? $results[0] : null;
 
         if (null === $dnc) {
             return false;

@@ -22,27 +22,27 @@ class YesNoButtonGroupType extends AbstractType
     {
         $resolver->setDefaults(
             [
-                'choices'           => fn (Options $options): array => [
+                'choices' => fn (Options $options): array => [
                     $options['no_label']  => $options['no_value'],
                     $options['yes_label'] => $options['yes_value'],
                 ],
-                'choice_value'      => function ($choiceKey) {
+                'choice_value' => function ($choiceKey) {
                     if (null === $choiceKey || '' === $choiceKey) {
                         return null;
                     }
 
                     return (is_string($choiceKey) && !is_numeric($choiceKey)) ? $choiceKey : (int) $choiceKey;
                 },
-                'expanded'          => true,
-                'multiple'          => false,
-                'label_attr'        => ['class' => 'control-label'],
-                'label'             => 'mautic.core.form.published',
-                'placeholder'       => false,
-                'required'          => false,
-                'no_label'          => 'mautic.core.form.no',
-                'no_value'          => 0,
-                'yes_label'         => 'mautic.core.form.yes',
-                'yes_value'         => 1,
+                'expanded'    => true,
+                'multiple'    => false,
+                'label_attr'  => ['class' => 'control-label'],
+                'label'       => 'mautic.core.form.published',
+                'placeholder' => false,
+                'required'    => false,
+                'no_label'    => 'mautic.core.form.no',
+                'no_value'    => 0,
+                'yes_label'   => 'mautic.core.form.yes',
+                'yes_value'   => 1,
             ]
         );
     }

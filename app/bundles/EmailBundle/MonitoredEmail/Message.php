@@ -18,11 +18,11 @@ class Message
 
     public $toString;
 
-    public $cc         = [];
+    public $cc = [];
 
-    public $replyTo    = [];
+    public $replyTo = [];
 
-    public $inReplyTo  = false;
+    public $inReplyTo = false;
 
     public $returnPath = false;
 
@@ -32,7 +32,7 @@ class Message
 
     public $textHtml;
 
-    public string $dsnReport  = '';
+    public string $dsnReport = '';
 
     public string $dsnMessage = '';
 

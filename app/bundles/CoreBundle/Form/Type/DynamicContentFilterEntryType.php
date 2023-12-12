@@ -51,10 +51,10 @@ class DynamicContentFilterEntryType extends AbstractType
 
         $this->filterFieldChoices();
 
-        $this->countryChoices            = FormFieldHelper::getCountryChoices();
-        $this->regionChoices             = FormFieldHelper::getRegionChoices();
-        $this->timezoneChoices           = FormFieldHelper::getTimezonesChoices();
-        $this->localeChoices             = FormFieldHelper::getLocaleChoices();
+        $this->countryChoices  = FormFieldHelper::getCountryChoices();
+        $this->regionChoices   = FormFieldHelper::getRegionChoices();
+        $this->timezoneChoices = FormFieldHelper::getTimezonesChoices();
+        $this->localeChoices   = FormFieldHelper::getLocaleChoices();
     }
 
     public function buildForm(FormBuilderInterface $builder, array $options): void

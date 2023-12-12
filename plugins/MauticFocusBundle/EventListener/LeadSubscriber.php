@@ -23,7 +23,7 @@ class LeadSubscriber implements EventSubscriberInterface
     public static function getSubscribedEvents(): array
     {
         return [
-            LeadEvents::TIMELINE_ON_GENERATE      => ['onTimelineGenerate', 0],
+            LeadEvents::TIMELINE_ON_GENERATE => ['onTimelineGenerate', 0],
         ];
     }
 
@@ -48,7 +48,7 @@ class LeadSubscriber implements EventSubscriberInterface
         $statsClickByLead = $this->focusModel->getStatRepository()->getStatsClickByLead($leadId, $event->getQueryOptions());
 
         if (!$event->isEngagementCount()) {
-            $icon     = 'fa-search';
+            $icon = 'fa-search';
 
             // Add the view to the event array
             foreach (array_merge($statsViewsByLead['results'] ?? [], $statsClickByLead['results'] ?? []) as $statsView) {
@@ -63,13 +63,13 @@ class LeadSubscriber implements EventSubscriberInterface
 
                     $event->addEvent(
                         [
-                            'event'           => $eventType,
-                            'eventId'         => $eventType.'.'.$statsView['id'],
-                            'eventLabel'      => $eventLabel,
-                            'eventType'       => (Stat::TYPE_NOTIFICATION == $statsView['type']) ? $eventViewTypeName : $eventClickTypeName,
-                            'timestamp'       => $statsView['date_added'],
-                            'icon'            => $icon,
-                            'contactId'       => $leadId,
+                            'event'      => $eventType,
+                            'eventId'    => $eventType.'.'.$statsView['id'],
+                            'eventLabel' => $eventLabel,
+                            'eventType'  => (Stat::TYPE_NOTIFICATION == $statsView['type']) ? $eventViewTypeName : $eventClickTypeName,
+                            'timestamp'  => $statsView['date_added'],
+                            'icon'       => $icon,
+                            'contactId'  => $leadId,
                         ]
                     );
                 }

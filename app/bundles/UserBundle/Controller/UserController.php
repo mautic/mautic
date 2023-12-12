@@ -80,7 +80,7 @@ class UserController extends FormController
         $pageHelper->rememberPage($page);
 
         return $this->delegateView([
-            'viewParameters'  => [
+            'viewParameters' => [
                 'items'       => $users,
                 'searchValue' => $search,
                 'page'        => $page,
@@ -451,7 +451,7 @@ class UserController extends FormController
 
                     $reEntity = $form->get('entity')->getData();
                     if (empty($reEntity)) {
-                        $bundle   = $object   = 'user';
+                        $bundle   = $object = 'user';
                         $entityId = $user->getId();
                     } else {
                         $bundle = $object = $reEntity;

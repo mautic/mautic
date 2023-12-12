@@ -34,7 +34,7 @@ class EmailHitNotificationHandlerTest extends TestCase
 
         $message = new EmailHitNotification($hitId, $request);
 
-        $handler  = new EmailHitNotificationHandler($emailModelMock, $parametersHelper);
+        $handler = new EmailHitNotificationHandler($emailModelMock, $parametersHelper);
         $handler->__invoke($message);
     }
 
@@ -58,7 +58,7 @@ class EmailHitNotificationHandlerTest extends TestCase
 
         $message = new EmailHitNotification($hitId, $request);
 
-        $handler  = new EmailHitNotificationHandler($emailModelMock, $parametersHelper);
+        $handler = new EmailHitNotificationHandler($emailModelMock, $parametersHelper);
         $this->expectException(RecoverableMessageHandlingException::class);
         $handler->__invoke($message);
     }
@@ -81,8 +81,8 @@ class EmailHitNotificationHandlerTest extends TestCase
         $parametersHelper->method('get')
             ->willReturn('sync://');
 
-        $message  = new EmailHitNotification($hitId, $request);
-        $handler  = new EmailHitNotificationHandler($emailModelMock, $parametersHelper);
+        $message = new EmailHitNotification($hitId, $request);
+        $handler = new EmailHitNotificationHandler($emailModelMock, $parametersHelper);
         $this->expectException(\InvalidArgumentException::class);
         $this->expectErrorMessage('got my argument?');
         $handler->__invoke($message);

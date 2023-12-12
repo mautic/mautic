@@ -33,10 +33,10 @@ trait RequestTrait
     protected function prepareParametersFromRequest(FormInterface $form, array &$params, object $entity = null, array $masks = [], array $fields = []): void
     {
         // ungroup fields if need it
-        foreach ($fields as $key=>$field) {
+        foreach ($fields as $key => $field) {
             if (is_array($field)) {
-                foreach ($field as $k=>$f) {
-                    $fields[$k]=$f;
+                foreach ($field as $k => $f) {
+                    $fields[$k] = $f;
                 }
                 unset($fields[$key]);
                 continue;

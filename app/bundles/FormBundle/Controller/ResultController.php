@@ -92,7 +92,7 @@ class ResultController extends CommonFormController
             $this->setListFilters($request->query->get('name'));
         }
 
-        $pageHelper        = $pageHelperFacotry->make('mautic.formresult.'.$objectId, $page);
+        $pageHelper = $pageHelperFacotry->make('mautic.formresult.'.$objectId, $page);
 
         // set limits
         $limit = $pageHelper->getLimit();
@@ -248,7 +248,7 @@ class ResultController extends CommonFormController
 
         $file = $formUploader->getCompleteFilePath($fieldEntity, $fileName);
 
-        $fs   = new Filesystem();
+        $fs = new Filesystem();
         if (!$fs->exists($file)) {
             throw $this->createNotFoundException();
         }

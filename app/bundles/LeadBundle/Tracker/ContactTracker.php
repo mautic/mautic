@@ -49,7 +49,7 @@ class ContactTracker
         private EventDispatcherInterface $dispatcher,
         FieldModel $leadFieldModel
     ) {
-        $this->leadFieldModel         = $leadFieldModel;
+        $this->leadFieldModel = $leadFieldModel;
     }
 
     /**

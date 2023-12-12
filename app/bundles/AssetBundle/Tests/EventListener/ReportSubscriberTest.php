@@ -158,10 +158,10 @@ class ReportSubscriberTest extends \PHPUnit\Framework\TestCase
 
     public function testGroupByDefaultConfigured(): void
     {
-        $report             = new Report();
+        $report = new Report();
         $report->setSource(ReportSubscriber::CONTEXT_ASSET_DOWNLOAD);
-        $event              = new ReportGeneratorEvent($report, [], $this->queryBuilder, $this->channelListHelper);
-        $subscriber         = new ReportSubscriber($this->companyReportData, $this->downloadRepository);
+        $event      = new ReportGeneratorEvent($report, [], $this->queryBuilder, $this->channelListHelper);
+        $subscriber = new ReportSubscriber($this->companyReportData, $this->downloadRepository);
         $this->queryBuilder->method('from')->willReturn($this->queryBuilder);
 
         $this->queryBuilder->expects($this->once())
@@ -175,12 +175,12 @@ class ReportSubscriberTest extends \PHPUnit\Framework\TestCase
 
     public function testGroupByNotDefaultConfigured(): void
     {
-        $report             = new Report();
+        $report = new Report();
         $report->setSource(ReportSubscriber::CONTEXT_ASSET_DOWNLOAD);
         $this->queryBuilder->method('from')->willReturn($this->queryBuilder);
         $report->setGroupBy(['a.id' => 'desc']);
-        $event              = new ReportGeneratorEvent($report, [], $this->queryBuilder, $this->channelListHelper);
-        $subscriber         = new ReportSubscriber($this->companyReportData, $this->downloadRepository);
+        $event      = new ReportGeneratorEvent($report, [], $this->queryBuilder, $this->channelListHelper);
+        $subscriber = new ReportSubscriber($this->companyReportData, $this->downloadRepository);
         $subscriber->onReportGenerate($event);
         $this->assertTrue($event->hasGroupBy());
     }

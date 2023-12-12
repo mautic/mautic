@@ -144,7 +144,7 @@ class FetchCommonApiController extends AbstractFOSRestController implements Maut
         protected CoreParametersHelper $coreParametersHelper,
         protected MauticFactory $factory,
     ) {
-        $this->translator           = $translator;
+        $this->translator = $translator;
 
         if (null !== $this->model && !$this->permissionBase && method_exists($this->model, 'getPermissionBase')) {
             $this->permissionBase = $this->model->getPermissionBase();

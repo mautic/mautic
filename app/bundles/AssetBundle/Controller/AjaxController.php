@@ -16,9 +16,9 @@ class AjaxController extends CommonAjaxController
     {
         $assetModel = $this->getModel('asset');
         \assert($assetModel instanceof AssetModel);
-        $filter     = InputHelper::clean($request->query->get('filter'));
-        $results    = $assetModel->getLookupResults('category', $filter, 10);
-        $dataArray  = [];
+        $filter    = InputHelper::clean($request->query->get('filter'));
+        $results   = $assetModel->getLookupResults('category', $filter, 10);
+        $dataArray = [];
         foreach ($results as $r) {
             $dataArray[] = [
                 'label' => $r['title']." ({$r['id']})",

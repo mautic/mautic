@@ -58,14 +58,14 @@ class ContactLimiter
         $maxThreads = null,
         $campaignLimit = null
     ) {
-        $this->batchLimit    = ($batchLimit) ? (int) $batchLimit : 100;
-        $this->contactId     = ($contactId) ? (int) $contactId : null;
-        $this->minContactId  = ($minContactId) ? (int) $minContactId : null;
-        $this->maxContactId  = ($maxContactId) ? (int) $maxContactId : null;
+        $this->batchLimit   = ($batchLimit) ? (int) $batchLimit : 100;
+        $this->contactId    = ($contactId) ? (int) $contactId : null;
+        $this->minContactId = ($minContactId) ? (int) $minContactId : null;
+        $this->maxContactId = ($maxContactId) ? (int) $maxContactId : null;
 
         if ($threadId && $maxThreads) {
-            $this->threadId     = (int) $threadId;
-            $this->maxThreads   = (int) $maxThreads;
+            $this->threadId   = (int) $threadId;
+            $this->maxThreads = (int) $maxThreads;
 
             if ($threadId > $maxThreads) {
                 throw new \InvalidArgumentException('$threadId cannot be larger than $maxThreads');
@@ -149,7 +149,7 @@ class ContactLimiter
      */
     public function resetBatchMinContactId()
     {
-        $this->batchMinContactId =  null;
+        $this->batchMinContactId = null;
 
         return $this;
     }

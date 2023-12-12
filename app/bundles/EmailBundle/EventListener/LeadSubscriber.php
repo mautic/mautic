@@ -128,8 +128,8 @@ class LeadSubscriber implements EventSubscriberInterface
             return;
         }
 
-        $options          = $event->getQueryOptions();
-        $replies          = $this->emailReplyRepository->getByLeadIdForTimeline($event->getLeadId(), $options);
+        $options = $event->getQueryOptions();
+        $replies = $this->emailReplyRepository->getByLeadIdForTimeline($event->getLeadId(), $options);
         if (!$event->isEngagementCount()) {
             foreach ($replies['results'] as $reply) {
                 $label = $this->translator->trans('mautic.email.timeline.event.email_reply');

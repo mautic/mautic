@@ -79,8 +79,8 @@ class Interval implements ScheduleModeInterface
             return $this->getExecutionDateTime($event, $compareFromDateTime, $dateTriggered);
         }
 
-        $interval      = $event->getTriggerInterval();
-        $unit          = $event->getTriggerIntervalUnit();
+        $interval = $event->getTriggerInterval();
+        $unit     = $event->getTriggerIntervalUnit();
 
         if ($interval && $unit) {
             /** @var \DateTime $dateTriggered */
@@ -280,7 +280,7 @@ class Interval implements ScheduleModeInterface
         /* @var \DateTime $startTime */
         $startTime = clone $startTime;
         /* @var \DateTime $endTime */
-        $endTime   = clone $endTime;
+        $endTime = clone $endTime;
 
         if ($endTime < $startTime) {
             // End time is after start time so switch them

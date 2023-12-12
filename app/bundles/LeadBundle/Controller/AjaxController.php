@@ -429,9 +429,9 @@ class AjaxController extends CommonAjaxController
 
     public function removeBounceStatusAction(Request $request): JsonResponse
     {
-        $dataArray   = ['success' => 0];
-        $dncId       = $request->request->get('id');
-        $channel     = $request->request->get('channel', 'email');
+        $dataArray = ['success' => 0];
+        $dncId     = $request->request->get('id');
+        $channel   = $request->request->get('channel', 'email');
 
         if (!empty($dncId)) {
             /** @var \Mautic\LeadBundle\Model\LeadModel $model */
@@ -627,7 +627,7 @@ class AjaxController extends CommonAjaxController
         if (is_array($tags)) {
             $leadModel = $this->getModel('lead');
             \assert($leadModel instanceof LeadModel);
-            $newTags   = [];
+            $newTags = [];
 
             foreach ($tags as $tag) {
                 if (!is_numeric($tag)) {

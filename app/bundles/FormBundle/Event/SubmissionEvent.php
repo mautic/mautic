@@ -86,7 +86,7 @@ class SubmissionEvent extends CommonEvent
         private $server,
         private Request $request
     ) {
-        $this->entity  = $submission;
+        $this->entity = $submission;
     }
 
     public function getSubmission(): Submission

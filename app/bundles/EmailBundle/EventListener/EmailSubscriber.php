@@ -26,10 +26,10 @@ class EmailSubscriber implements EventSubscriberInterface
     public static function getSubscribedEvents(): array
     {
         return [
-            EmailEvents::EMAIL_POST_SAVE      => ['onEmailPostSave', 0],
-            EmailEvents::EMAIL_POST_DELETE    => ['onEmailDelete', 0],
-            EmailEvents::EMAIL_FAILED         => ['onEmailFailed', 0],
-            EmailEvents::EMAIL_RESEND         => ['onEmailResend', 0],
+            EmailEvents::EMAIL_POST_SAVE   => ['onEmailPostSave', 0],
+            EmailEvents::EMAIL_POST_DELETE => ['onEmailDelete', 0],
+            EmailEvents::EMAIL_FAILED      => ['onEmailFailed', 0],
+            EmailEvents::EMAIL_RESEND      => ['onEmailResend', 0],
         ];
     }
 

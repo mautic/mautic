@@ -74,7 +74,7 @@ class ReferenceResolverTest extends TestCase
         $this->connection->method('createQueryBuilder')
             ->willReturn($this->createQueryBuilder('Company name'));
 
-        $companyReference  = $this->createReference('company', 3);
+        $companyReference = $this->createReference('company', 3);
 
         $changedObject = (new ObjectChangeDAO('integration', 'company', '1', 'Lead', '00Q4H00000juXes'))
             ->addField(new FieldDAO('company', new NormalizedValueDAO('reference', $companyReference, $companyReference)));

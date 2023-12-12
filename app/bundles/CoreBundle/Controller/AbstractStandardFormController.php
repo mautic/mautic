@@ -1045,8 +1045,8 @@ abstract class AbstractStandardFormController extends AbstractFormController
      */
     protected function viewStandard(Request $request, $objectId, $logObject = null, $logBundle = null, $listPage = null, $itemName = 'item')
     {
-        $model    = $this->getModel($this->getModelName());
-        $entity   = $model->getEntity($objectId);
+        $model  = $this->getModel($this->getModelName());
+        $entity = $model->getEntity($objectId);
 
         if (null === $entity) {
             $page = $request->getSession()->get('mautic.'.$this->getSessionBase().'.page', 1);

@@ -217,7 +217,7 @@ class FormSubscriber implements EventSubscriberInterface
             $matchedFields[$key] = $field['alias'];
 
             // decode html chars and quotes before posting to next form
-            $payload[$key]       = htmlspecialchars_decode($value, ENT_QUOTES);
+            $payload[$key] = htmlspecialchars_decode($value, ENT_QUOTES);
         }
 
         $event->setPostSubmitPayload($payload);
@@ -275,7 +275,7 @@ class FormSubscriber implements EventSubscriberInterface
 
                 $results    = $this->postToHtml($post);
                 $submission = $event->getSubmission();
-                $emails     = $emails     = $this->getEmailsFromString($email);
+                $emails     = $emails = $this->getEmailsFromString($email);
                 $this->mailer->setTo($emails);
                 $this->mailer->setSubject(
                     $this->translator->trans('mautic.form.action.repost.failed_subject', ['%form%' => $submission->getForm()->getName()])

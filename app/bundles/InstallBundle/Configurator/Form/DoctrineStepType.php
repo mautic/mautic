@@ -27,17 +27,17 @@ class DoctrineStepType extends AbstractType
             'driver',
             ChoiceType::class,
             [
-                'choices'           => array_flip(DoctrineStep::getDrivers()),
-                'expanded'          => false,
-                'multiple'          => false,
-                'label'             => 'mautic.install.form.database.driver',
-                'label_attr'        => ['class' => 'control-label'],
-                'placeholder'       => false,
-                'required'          => true,
-                'attr'              => [
+                'choices'     => array_flip(DoctrineStep::getDrivers()),
+                'expanded'    => false,
+                'multiple'    => false,
+                'label'       => 'mautic.install.form.database.driver',
+                'label_attr'  => ['class' => 'control-label'],
+                'placeholder' => false,
+                'required'    => true,
+                'attr'        => [
                     'class' => 'form-control',
                 ],
-                'constraints'       => [
+                'constraints' => [
                     new Choice(
                         [
                             'callback' => '\Mautic\InstallBundle\Configurator\Step\DoctrineStep::getDriverKeys',

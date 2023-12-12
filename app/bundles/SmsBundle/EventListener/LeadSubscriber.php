@@ -66,8 +66,8 @@ class LeadSubscriber implements EventSubscriberInterface
                 }
 
                 $eventName = [
-                        'label'      => $label,
-                        'href'       => $this->router->generate('mautic_sms_action', ['objectAction'=>'view', 'objectId' => $stat['sms_id']]),
+                        'label' => $label,
+                        'href'  => $this->router->generate('mautic_sms_action', ['objectAction' => 'view', 'objectId' => $stat['sms_id']]),
                     ];
                 if ('failed' == $state or 'sent' == $state) { // this is to get the correct column for date dateSent
                     $dateSent = 'sent';
@@ -83,8 +83,8 @@ class LeadSubscriber implements EventSubscriberInterface
                         'eventType'  => $eventTypeName,
                         'timestamp'  => $stat['date'.ucfirst($dateSent)],
                         'extra'      => [
-                            'stat'   => $stat,
-                            'type'   => $state,
+                            'stat' => $stat,
+                            'type' => $state,
                         ],
                         'contentTemplate' => '@MauticSms/SubscribedEvents/Timeline/index.html.twig',
                         'icon'            => ('read' == $state) ? 'fa-message-o' : 'fa-commenting',

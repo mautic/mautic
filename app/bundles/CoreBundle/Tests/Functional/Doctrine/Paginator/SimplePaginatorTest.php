@@ -44,7 +44,7 @@ class SimplePaginatorTest extends MauticMysqlTestCase
 
         $repository = $this->em->getRepository(IpAddress::class);
 
-        $paginator  = $repository->getEntities([
+        $paginator = $repository->getEntities([
             'use_simple_paginator' => true,
             'start'                => 1,
             'limit'                => 5,

@@ -16,7 +16,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 
 ErrorHandler::register('prod');
 
-$kernel   = new AppKernel('prod', false);
+$kernel = new AppKernel('prod', false);
 $kernel->boot();
 
 /** @var ContainerInterface $container */

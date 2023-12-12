@@ -69,7 +69,7 @@ class ReportNormalizeSubscriberTest extends MauticMysqlTestCase
                     'yes' => 'True',
                     'no'  => 'False',
                 ],
-                'expected'   => 'True',
+                'expected' => 'True',
             ],
 
             // Test for select custom field
@@ -84,7 +84,7 @@ class ReportNormalizeSubscriberTest extends MauticMysqlTestCase
                         ],
                     ],
                 ],
-                'expected'   => 'Option 2',
+                'expected' => 'Option 2',
             ],
 
             // Test for multiselect custom field
@@ -100,7 +100,7 @@ class ReportNormalizeSubscriberTest extends MauticMysqlTestCase
                         ],
                     ],
                 ],
-                'expected'   => 'Option 1|Option 3',
+                'expected' => 'Option 1|Option 3',
             ],
         ];
     }

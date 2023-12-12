@@ -19,7 +19,7 @@ class GroupScoreSubscriber implements EventSubscriberInterface
     public static function getSubscribedEvents(): array
     {
         return [
-            PointGroupEvents::SCORE_CHANGE     => ['onGroupScoreChange', 0],
+            PointGroupEvents::SCORE_CHANGE => ['onGroupScoreChange', 0],
         ];
     }
 

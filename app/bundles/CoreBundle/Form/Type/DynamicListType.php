@@ -56,20 +56,20 @@ class DynamicListType extends AbstractType
                         'preaddon_attr' => fn (Options $options): array => [
                             'onclick' => $options['remove_onclick'],
                         ],
-                        'postaddon'     => fn (Options $options) => $options['sortable'],
+                        'postaddon' => fn (Options $options) => $options['sortable'],
                     ],
 
-                    'constraints'    => fn (Options $options): array => ($options['option_notblank']) ? [
+                    'constraints' => fn (Options $options): array => ($options['option_notblank']) ? [
                         new NotBlank(
                             ['message' => 'mautic.form.lists.notblank']
                         ),
                     ] : [],
                     'error_bubbling' => true,
                 ],
-                'allow_add'       => true,
-                'allow_delete'    => true,
-                'prototype'       => true,
-                'constraints'     => fn (Options $options): array => ($options['option_required']) ? [
+                'allow_add'    => true,
+                'allow_delete' => true,
+                'prototype'    => true,
+                'constraints'  => fn (Options $options): array => ($options['option_required']) ? [
                     new Count(
                         [
                             'minMessage' => 'mautic.form.lists.count',
@@ -77,7 +77,7 @@ class DynamicListType extends AbstractType
                         ]
                     ),
                 ] : [],
-                'error_bubbling'  => false,
+                'error_bubbling' => false,
             ]
         );
 

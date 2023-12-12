@@ -43,9 +43,9 @@ class UpdateSchemaStepTest extends AbstractStepTest
     {
         parent::setUp();
 
-        $this->translator     = $this->createMock(TranslatorInterface::class);
+        $this->translator = $this->createMock(TranslatorInterface::class);
 
-        $this->kernel         = $this->createMock(KernelInterface::class);
+        $this->kernel = $this->createMock(KernelInterface::class);
         $this->kernel
             ->method('getBundles')
             ->willReturn([]);

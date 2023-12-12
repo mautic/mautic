@@ -163,7 +163,7 @@ class ReportUtmTagSubscriberTest extends \PHPUnit\Framework\TestCase
                         'alias' => 'tag',
                     ],
                 ]),
-                'group'   => 'contacts',
+                'group' => 'contacts',
             ],
         ];
 

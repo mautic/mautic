@@ -47,8 +47,8 @@ class CampaignSubscriberTest extends TestCase
     {
         self::assertEquals(
             [
-                CampaignEvents::CAMPAIGN_POST_SAVE     => ['onCampaignPostSave', 0],
-                CampaignEvents::CAMPAIGN_POST_DELETE   => ['onCampaignDelete', 0],
+                CampaignEvents::CAMPAIGN_POST_SAVE   => ['onCampaignPostSave', 0],
+                CampaignEvents::CAMPAIGN_POST_DELETE => ['onCampaignDelete', 0],
             ],
             CampaignSubscriber::getSubscribedEvents()
         );
@@ -56,8 +56,8 @@ class CampaignSubscriberTest extends TestCase
 
     public function testOnCampaignPostSaveNothingHappened(): void
     {
-        $campaign            = new Campaign();
-        $event               = new CampaignEvent($campaign);
+        $campaign = new Campaign();
+        $event    = new CampaignEvent($campaign);
 
         $this->auditLogModel->expects($this->never())
             ->method('writeToLog');
@@ -67,7 +67,7 @@ class CampaignSubscriberTest extends TestCase
 
     public function testOnCampaignPostSaveUnpublished(): void
     {
-        $ipAddress    = 'someIp';
+        $ipAddress = 'someIp';
 
         $dateTime = new \DateTime();
         $dateTime->setTimestamp(1_597_752_193);
@@ -82,11 +82,11 @@ class CampaignSubscriberTest extends TestCase
             ->willReturn($ipAddress);
 
         $expectedLog = [
-            'bundle'    => 'campaign',
-            'object'    => 'campaign',
-            'objectId'  => $campaign->getId(),
-            'action'    => 'update',
-            'details'   => [
+            'bundle'   => 'campaign',
+            'object'   => 'campaign',
+            'objectId' => $campaign->getId(),
+            'action'   => 'update',
+            'details'  => [
                 'publishDown' => [
                     0 => null,
                     1 => '2020-08-18T12:03:13+00:00',
@@ -135,9 +135,9 @@ class CampaignSubscriberTest extends TestCase
             ->willReturn($ipAddress);
 
         $expectedLog = [
-            'action'    => 'update',
-            'bundle'    => 'campaign',
-            'details'   => [
+            'action'  => 'update',
+            'bundle'  => 'campaign',
+            'details' => [
                 'name' => [
                     0 => null,
                     1 => $campaignName,

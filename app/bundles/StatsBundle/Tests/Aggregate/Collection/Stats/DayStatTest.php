@@ -8,7 +8,7 @@ use PHPUnit\Framework\TestCase;
 
 class DayStatTest extends TestCase
 {
-    private $day  = '2019-11-07';
+    private $day = '2019-11-07';
 
     private $hour = 11;
 
@@ -43,7 +43,7 @@ class DayStatTest extends TestCase
 
     public function testGetSum(): void
     {
-        $this->dayStat  = new DayStat($this->day);
+        $this->dayStat = new DayStat($this->day);
         $this->dayStat->getHour($this->hour);
         $this->assertSame(1, $this->dayStat->getCount());
         $this->dayStat->getHour($this->hour);
@@ -54,7 +54,7 @@ class DayStatTest extends TestCase
 
     public function testGetCount(): void
     {
-        $this->dayStat  = new DayStat($this->day);
+        $this->dayStat = new DayStat($this->day);
         $this->dayStat->getHour($this->hour);
         $this->assertSame(1, $this->dayStat->getCount());
         $this->dayStat->getHour($this->hour);

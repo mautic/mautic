@@ -275,8 +275,8 @@ trait VariantEntityTrait
      */
     protected function getAccumulativeVariantCount($getter)
     {
-        [$parent, $children]     = $this->getVariants();
-        $count                   = $parent->$getter();
+        [$parent, $children] = $this->getVariants();
+        $count               = $parent->$getter();
 
         if ($checkTranslations = method_exists($parent, 'getAccumulativeTranslationCount')) {
             // Append translations for this variant if applicable

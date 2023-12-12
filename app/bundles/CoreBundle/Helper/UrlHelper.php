@@ -14,7 +14,7 @@ class UrlHelper
      */
     public static function appendQueryToUrl($url, $appendQueryString)
     {
-        $query     = parse_url($url, PHP_URL_QUERY);
+        $query = parse_url($url, PHP_URL_QUERY);
 
         if ($query) {
             $appendQueryString = '&'.$appendQueryString;
@@ -50,7 +50,7 @@ class UrlHelper
         $port   = ((!$ssl && '80' == $port) || ($ssl && '443' == $port)) ? '' : ":$port";
         $host   = $_SERVER['HTTP_HOST'] ?? null;
         $host ??= $_SERVER['SERVER_NAME'].$port;
-        $base   = "$scheme://$host".$_SERVER['REQUEST_URI'];
+        $base = "$scheme://$host".$_SERVER['REQUEST_URI'];
 
         $base = str_replace('/index.php', '', $base);
 
@@ -267,9 +267,9 @@ class UrlHelper
      */
     public static function isValidUrl($url): bool
     {
-        $path         = parse_url($url, PHP_URL_PATH);
-        $encodedPath  = array_map('urlencode', explode('/', $path));
-        $url          = str_replace($path, implode('/', $encodedPath), $url);
+        $path        = parse_url($url, PHP_URL_PATH);
+        $encodedPath = array_map('urlencode', explode('/', $path));
+        $url         = str_replace($path, implode('/', $encodedPath), $url);
 
         return (bool) filter_var($url, FILTER_VALIDATE_URL);
     }

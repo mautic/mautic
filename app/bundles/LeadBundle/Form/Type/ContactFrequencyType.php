@@ -97,8 +97,8 @@ class ContactFrequencyType extends AbstractType
         $resolver->setRequired(['channels']);
         $resolver->setDefaults(
             [
-                'public_view'               => false,
-                'preference_center_only'    => false,
+                'public_view'            => false,
+                'preference_center_only' => false,
             ]
         );
     }

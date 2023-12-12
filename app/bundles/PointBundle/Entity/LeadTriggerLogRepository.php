@@ -22,7 +22,7 @@ class LeadTriggerLogRepository extends CommonRepository
             ->executeQuery()
             ->fetchAllAssociative();
 
-        $events  = [];
+        $events = [];
         foreach ($results as $r) {
             $events[] = $r['event_id'];
         }

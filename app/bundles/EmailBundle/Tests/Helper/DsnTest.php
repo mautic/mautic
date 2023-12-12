@@ -128,7 +128,7 @@ class DsnTest extends TestCase
         ];
 
         yield 'With host, port, path and query.' => [
-            new Dsn('smtp', 'host', 'user', 'password', 25, 'test-path', ['encryption' => 'tls', 'auth_mode'=>'login']), 'smtp://user:password@host:25/test-path?encryption=tls&auth_mode=login',
+            new Dsn('smtp', 'host', 'user', 'password', 25, 'test-path', ['encryption' => 'tls', 'auth_mode' => 'login']), 'smtp://user:password@host:25/test-path?encryption=tls&auth_mode=login',
         ];
     }
 

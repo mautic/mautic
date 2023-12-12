@@ -547,7 +547,7 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
      *
      * @return \Doctrine\ORM\QueryBuilder
      */
-    public function getEntitiesOrmQueryBuilder($order, array $args=[])
+    public function getEntitiesOrmQueryBuilder($order, array $args = [])
     {
         $alias           = $this->getTableAlias();
         $select          = [$alias, 'u', $order];
@@ -1158,7 +1158,7 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
 
         $contacts = $this->getEntities(
             [
-                'filter'             => [
+                'filter' => [
                     'force' => [
                         [
                             'column' => 'l.id',

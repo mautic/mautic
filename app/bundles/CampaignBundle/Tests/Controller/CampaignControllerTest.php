@@ -34,8 +34,8 @@ class CampaignControllerTest extends MauticMysqlTestCase
     public function testNewActionCampaign(): void
     {
         $this->client->request('GET', '/s/campaigns/new/');
-        $clientResponse         = $this->client->getResponse();
-        $clientResponseContent  = $clientResponse->getContent();
+        $clientResponse        = $this->client->getResponse();
+        $clientResponseContent = $clientResponse->getContent();
         $this->assertEquals(Response::HTTP_OK, $clientResponse->getStatusCode());
     }
 
@@ -46,13 +46,13 @@ class CampaignControllerTest extends MauticMysqlTestCase
      */
     public function testNewActionCampaignCancel(): void
     {
-        $crawler                = $this->client->request('GET', '/s/campaigns/new/');
-        $clientResponse         = $this->client->getResponse();
+        $crawler        = $this->client->request('GET', '/s/campaigns/new/');
+        $clientResponse = $this->client->getResponse();
         Assert::assertSame(Response::HTTP_OK, $clientResponse->getStatusCode());
 
         $form = $crawler->filter('form[name="campaign"]')->selectButton('campaign_buttons_cancel')->form();
         $this->client->submit($form);
-        $clientResponse         = $this->client->getResponse();
+        $clientResponse = $this->client->getResponse();
         Assert::assertSame(Response::HTTP_OK, $clientResponse->getStatusCode());
     }
 }

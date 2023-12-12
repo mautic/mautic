@@ -12,7 +12,7 @@ class DoNotContactTest extends \PHPUnit\Framework\TestCase
         $doNotContact->setComments(null);
         $this->assertSame('', $doNotContact->getComments());
 
-        $comment      = '<script>alert(\'x\')</script>';
+        $comment = '<script>alert(\'x\')</script>';
         $doNotContact->setComments($comment);
         $this->assertNotSame($comment, $doNotContact->getComments());
         $this->assertSame('alert(\'x\')', $doNotContact->getComments());

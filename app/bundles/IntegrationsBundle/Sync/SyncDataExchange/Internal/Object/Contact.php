@@ -8,7 +8,7 @@ use Mautic\LeadBundle\Entity\Lead;
 
 final class Contact implements ObjectInterface
 {
-    public const NAME   = 'lead'; // kept as lead for BC
+    public const NAME = 'lead'; // kept as lead for BC
 
     public const ENTITY = Lead::class;
 

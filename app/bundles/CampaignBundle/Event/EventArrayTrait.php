@@ -50,8 +50,8 @@ trait EventArrayTrait
             /** @var Event $child */
             foreach ($children as $child) {
                 $childArray             = $child->convertToArray();
-                $childArray['parent']   =&$eventArray;
-                $childArray['campaign'] =&$eventArray['campaign'];
+                $childArray['parent']   = &$eventArray;
+                $childArray['campaign'] = &$eventArray['campaign'];
                 unset($childArray['children']);
 
                 $eventArray['children'] = $childArray;

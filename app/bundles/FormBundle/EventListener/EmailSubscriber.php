@@ -21,9 +21,9 @@ class EmailSubscriber implements EventSubscriberInterface
         if ($event->abTestWinnerCriteriaRequested()) {
             // add AB Test Winner Criteria
             $formSubmissions = [
-                'group'    => 'mautic.form.abtest.criteria',
-                'label'    => 'mautic.form.abtest.criteria.submissions',
-                'event'    => FormEvents::ON_DETERMINE_SUBMISSION_RATE_WINNER,
+                'group' => 'mautic.form.abtest.criteria',
+                'label' => 'mautic.form.abtest.criteria.submissions',
+                'event' => FormEvents::ON_DETERMINE_SUBMISSION_RATE_WINNER,
             ];
             $event->addAbTestWinnerCriteria('form.submissions', $formSubmissions);
         }

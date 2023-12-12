@@ -17,7 +17,7 @@ class AppCallbackController extends CommonController
         $requestBody = json_decode($request->getContent(), true);
         $contactRepo = $em->getRepository(Lead::class);
 
-        $matchData   = [
+        $matchData = [
             'email' => $requestBody['email'],
         ];
 
@@ -44,7 +44,7 @@ class AppCallbackController extends CommonController
             $stat             = $requestBody['stat'];
             $notificationRepo = $em->getRepository(Notification::class);
 
-            $notification     = $notificationRepo->getEntity($stat['notification_id']);
+            $notification = $notificationRepo->getEntity($stat['notification_id']);
 
             if (null !== $notification) {
                 $statCreated       = true;

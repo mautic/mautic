@@ -37,7 +37,7 @@ class IdentifyCompanyHelperTest extends \PHPUnit\Framework\TestCase
         ];
 
         $expected = [
-            'companyname'    => 'Mautic',
+            'companyname' => 'Mautic',
         ];
 
         $model = $this->getMockBuilder(CompanyModel::class)
@@ -69,8 +69,8 @@ class IdentifyCompanyHelperTest extends \PHPUnit\Framework\TestCase
         ];
 
         $expected = [
-            'companyname'    => 'Mautic',
-            'companyemail'   => 'hello@mautic.org',
+            'companyname'  => 'Mautic',
+            'companyemail' => 'hello@mautic.org',
         ];
 
         $model = $this->getMockBuilder(CompanyModel::class)

@@ -18,7 +18,7 @@ class ExportHandler
         CoreParametersHelper $coreParametersHelper,
         private FilePathResolver $filePathResolver
     ) {
-        $this->dir              = $coreParametersHelper->get('report_temp_dir');
+        $this->dir = $coreParametersHelper->get('report_temp_dir');
     }
 
     /**

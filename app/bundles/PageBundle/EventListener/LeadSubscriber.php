@@ -34,7 +34,7 @@ class LeadSubscriber implements EventSubscriberInterface
         RouterInterface $router,
         ModelFactory $modelFactory
     ) {
-        $this->router         = $router;
+        $this->router = $router;
 
         $this->setModelFactory($modelFactory);
     }

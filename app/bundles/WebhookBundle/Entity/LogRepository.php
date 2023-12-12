@@ -78,9 +78,9 @@ class LogRepository extends CommonRepository
      */
     public function removeLimitExceedLogs(int $webHookId, int $logMax): int
     {
-        $deletedLogs   = 0;
-        $table_name    = $this->getTableName();
-        $conn          = $this->getEntityManager()->getConnection();
+        $deletedLogs = 0;
+        $table_name  = $this->getTableName();
+        $conn        = $this->getEntityManager()->getConnection();
 
         $id = $conn->createQueryBuilder()
             ->select('id')

@@ -47,11 +47,11 @@ class ProcessMarketingMessagesQueueCommand extends ModeratedCommand
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        $processed  = 0;
-        $channel    = $input->getOption('channel');
-        $channelId  = $input->getOption('channel-id');
-        $messageId  = $input->getOption('message-id');
-        $key        = $channel.$channelId.$messageId;
+        $processed = 0;
+        $channel   = $input->getOption('channel');
+        $channelId = $input->getOption('channel-id');
+        $messageId = $input->getOption('message-id');
+        $key       = $channel.$channelId.$messageId;
 
         if (!$this->checkRunStatus($input, $output, $key)) {
             return \Symfony\Component\Console\Command\Command::SUCCESS;

@@ -22,13 +22,13 @@ class NoTablePrefixDefinitionInTestsFixer extends AbstractFixer
 
         if ($matches) {
             $begin_defined = $tokens->getPrevTokenOfKind(array_key_first($matches), [[T_STRING, 'defined']]);
-            $begin_if      = $tokens->getPrevTokenOfKind($begin_defined, [[T_IF, 'if']]);
+            $begin_if = $tokens->getPrevTokenOfKind($begin_defined, [[T_IF, 'if']]);
             if ($begin_defined) {
                 if ((int) $begin_if >= $begin_defined - 4) {
-                    $begin     = $begin_if;
+                    $begin = $begin_if;
                     $end_token = ['}'];
                 } else {
-                    $begin     = $begin_defined;
+                    $begin = $begin_defined;
                     $end_token = [';'];
                 }
 

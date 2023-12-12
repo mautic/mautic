@@ -29,10 +29,10 @@ class ContactObjectSubscriber implements EventSubscriberInterface
     public static function getSubscribedEvents(): array
     {
         return [
-            IntegrationEvents::INTEGRATION_COLLECT_INTERNAL_OBJECTS    => ['collectInternalObjects', 0],
-            IntegrationEvents::INTEGRATION_UPDATE_INTERNAL_OBJECTS     => ['updateContacts', 0],
-            IntegrationEvents::INTEGRATION_CREATE_INTERNAL_OBJECTS     => ['createContacts', 0],
-            IntegrationEvents::INTEGRATION_FIND_INTERNAL_RECORDS       => [
+            IntegrationEvents::INTEGRATION_COLLECT_INTERNAL_OBJECTS => ['collectInternalObjects', 0],
+            IntegrationEvents::INTEGRATION_UPDATE_INTERNAL_OBJECTS  => ['updateContacts', 0],
+            IntegrationEvents::INTEGRATION_CREATE_INTERNAL_OBJECTS  => ['createContacts', 0],
+            IntegrationEvents::INTEGRATION_FIND_INTERNAL_RECORDS    => [
                 ['findContactsByIds', 0],
                 ['findContactsByDateRange', 0],
                 ['findContactsByFieldValues', 0],

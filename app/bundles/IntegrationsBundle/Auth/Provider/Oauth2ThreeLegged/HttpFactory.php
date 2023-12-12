@@ -150,11 +150,11 @@ class HttpFactory implements AuthProviderInterface
         ];
 
         if ($this->credentials instanceof ScopeInterface) {
-            $config['scope']  = $this->credentials->getScope();
+            $config['scope'] = $this->credentials->getScope();
         }
 
         if ($this->credentials instanceof RedirectUriInterface) {
-            $config['redirect_uri']  = $this->credentials->getRedirectUri();
+            $config['redirect_uri'] = $this->credentials->getRedirectUri();
         }
 
         if ($this->credentials instanceof CodeInterface) {

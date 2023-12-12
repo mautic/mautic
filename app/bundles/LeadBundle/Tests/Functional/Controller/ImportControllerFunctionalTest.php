@@ -148,19 +148,19 @@ class ImportControllerFunctionalTest extends MauticMysqlTestCase
         $import->setStatus(1);
         $import->setObject('lead');
         $properties = [
-            'fields'   => [
+            'fields' => [
                 'file'      => 'file',
                 'email'     => 'email',
                 'firstname' => 'firstname',
                 'lastname'  => 'lastname',
             ],
-            'parser'   => [
+            'parser' => [
                 'escape'     => '\\',
                 'delimiter'  => ',',
                 'enclosure'  => '"',
                 'batchlimit' => 100,
             ],
-            'headers'  => [
+            'headers' => [
                 'file',
                 'email',
                 'firstname',

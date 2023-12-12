@@ -51,11 +51,11 @@ class Import extends FormEntity
     /**
      * ===== Priorities: =====.
      */
-    public const LOW    = 512;
+    public const LOW = 512;
 
     public const NORMAL = 64;
 
-    public const HIGH   = 1;
+    public const HIGH = 1;
 
     /**
      * @var int

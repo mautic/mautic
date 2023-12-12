@@ -15,8 +15,8 @@ class CompanyDeduper
         FieldModel $fieldModel,
         private CompanyRepository $companyRepository
     ) {
-        $this->fieldModel        = $fieldModel;
-        $this->object            = 'company';
+        $this->fieldModel = $fieldModel;
+        $this->object     = 'company';
     }
 
     /**

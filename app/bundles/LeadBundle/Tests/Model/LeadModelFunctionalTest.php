@@ -23,7 +23,7 @@ class LeadModelFunctionalTest extends MauticMysqlTestCase
         /** @var LeadModel $model */
         $model = self::$container->get('mautic.lead.model.lead');
         /** @var EntityManager $em */
-        $em   = self::$container->get('doctrine.orm.entity_manager');
+        $em = self::$container->get('doctrine.orm.entity_manager');
 
         // Set company to trigger setPrimaryCompany()
         $lead = new Lead();

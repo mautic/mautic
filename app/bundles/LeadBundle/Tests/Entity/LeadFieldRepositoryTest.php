@@ -30,14 +30,14 @@ final class LeadFieldRepositoryTest extends TestCase
 
     public function testCompareDateValueForContactField(): void
     {
-        $contactId                = 12;
-        $fieldAlias               = 'date_field';
-        $value                    = '2019-04-30';
-        $builderAlias             = $this->createMock(QueryBuilder::class);
-        $builderCompare           = $this->createMock(QueryBuilder::class);
-        $statementAliasResult     = $this->createMock(Result::class);
-        $statementCompareResult   = $this->createMock(Result::class);
-        $exprCompare              = $this->createMock(ExpressionBuilder::class);
+        $contactId              = 12;
+        $fieldAlias             = 'date_field';
+        $value                  = '2019-04-30';
+        $builderAlias           = $this->createMock(QueryBuilder::class);
+        $builderCompare         = $this->createMock(QueryBuilder::class);
+        $statementAliasResult   = $this->createMock(Result::class);
+        $statementCompareResult = $this->createMock(Result::class);
+        $exprCompare            = $this->createMock(ExpressionBuilder::class);
 
         // $this->entityManager->method('getConnection')->willReturn($this->connection);
         $builderAlias->method('expr')->willReturn(new ExpressionBuilder($this->connection));
@@ -123,14 +123,14 @@ final class LeadFieldRepositoryTest extends TestCase
 
     public function testCompareDateValueForCompanyField(): void
     {
-        $contactId                = 12;
-        $fieldAlias               = 'date_field';
-        $value                    = '2019-04-30';
-        $builderAlias             = $this->createMock(QueryBuilder::class);
-        $builderCompare           = $this->createMock(QueryBuilder::class);
-        $statementAliasResult     = $this->createMock(Result::class);
-        $statementCompareResult   = $this->createMock(Result::class);
-        $exprCompare              = $this->createMock(ExpressionBuilder::class);
+        $contactId              = 12;
+        $fieldAlias             = 'date_field';
+        $value                  = '2019-04-30';
+        $builderAlias           = $this->createMock(QueryBuilder::class);
+        $builderCompare         = $this->createMock(QueryBuilder::class);
+        $statementAliasResult   = $this->createMock(Result::class);
+        $statementCompareResult = $this->createMock(Result::class);
+        $exprCompare            = $this->createMock(ExpressionBuilder::class);
 
         $this->entityManager->method('getConnection')->willReturn($this->connection);
         $builderAlias->method('expr')->willReturn(new ExpressionBuilder($this->connection));

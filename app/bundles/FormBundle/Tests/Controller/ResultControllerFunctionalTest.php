@@ -21,7 +21,7 @@ final class ResultControllerFunctionalTest extends MauticMysqlTestCase
 
         $this->createFile($fileName);
 
-        $formPayload  = [
+        $formPayload = [
             'name'        => 'API form',
             'formType'    => 'standalone',
             'alias'       => 'apiform',
@@ -77,9 +77,9 @@ final class ResultControllerFunctionalTest extends MauticMysqlTestCase
     {
         $data = 'data:image/png;base64,AAAFBfj42Pj4';
 
-        [$type, $data]     = explode(';', $data);
-        [, $data]          = explode(',', $data);
-        $data              = base64_decode($data);
+        [$type, $data] = explode(';', $data);
+        [, $data]      = explode(',', $data);
+        $data          = base64_decode($data);
 
         file_put_contents($filename, $data);
     }

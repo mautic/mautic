@@ -34,7 +34,7 @@ class UserCreator implements UserCreatorInterface
         private UserPasswordHasher $hasher,
         $defaultRole
     ) {
-        $this->defaultRole   = (int) $defaultRole;
+        $this->defaultRole = (int) $defaultRole;
     }
 
     /**

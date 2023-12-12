@@ -512,7 +512,7 @@ class StatRepository extends CommonRepository
             $results['ignored'] = $results['sent'] - $results['read'] - $results['failed'];
             unset($results['sent']);
         } else {
-            $results['ignored'] = $results['sent'] = $results['read'] = $results['failed']  = 0;
+            $results['ignored'] = $results['sent'] = $results['read'] = $results['failed'] = 0;
         }
 
         return $results;
@@ -673,8 +673,8 @@ class StatRepository extends CommonRepository
      */
     public function getStatsSummaryForContacts(array $contacts): array
     {
-        $queryBuilder               = $this->getEntityManager()->getConnection()->createQueryBuilder();
-        $subQueryBuilder            = $this->getEntityManager()->getConnection()->createQueryBuilder();
+        $queryBuilder    = $this->getEntityManager()->getConnection()->createQueryBuilder();
+        $subQueryBuilder = $this->getEntityManager()->getConnection()->createQueryBuilder();
 
         $leadAlias     = 'l'; // leads
         $statsAlias    = 'es'; // email_stats

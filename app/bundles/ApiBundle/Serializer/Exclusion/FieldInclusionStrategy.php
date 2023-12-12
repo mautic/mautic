@@ -26,7 +26,7 @@ class FieldInclusionStrategy implements ExclusionStrategyInterface
         $level = 3,
         private $path = null
     ) {
-        $this->level  = (int) $level;
+        $this->level = (int) $level;
     }
 
     public function shouldSkipClass(ClassMetadata $metadata, Context $navigatorContext): bool

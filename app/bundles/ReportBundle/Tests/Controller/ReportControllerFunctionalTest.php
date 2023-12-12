@@ -92,24 +92,24 @@ class ReportControllerFunctionalTest extends MauticMysqlTestCase
         ]);
         $report->setAggregators([
             [
-                'column'    => 'l.points',
-                'function'  => 'MIN',
+                'column'   => 'l.points',
+                'function' => 'MIN',
             ],
             [
-                'column'    => 'l.points',
-                'function'  => 'MAX',
+                'column'   => 'l.points',
+                'function' => 'MAX',
             ],
             [
-                'column'    => 'l.points',
-                'function'  => 'SUM',
+                'column'   => 'l.points',
+                'function' => 'SUM',
             ],
             [
-                'column'    => 'l.points',
-                'function'  => 'COUNT',
+                'column'   => 'l.points',
+                'function' => 'COUNT',
             ],
             [
-                'column'    => 'l.points',
-                'function'  => 'AVG',
+                'column'   => 'l.points',
+                'function' => 'AVG',
             ],
         ]);
         self::$container->get('mautic.report.model.report')->saveEntity($report);

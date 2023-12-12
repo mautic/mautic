@@ -266,7 +266,7 @@ class LeadApiControllerFunctionalTest extends MauticMysqlTestCase
 
         Assert::assertSame(Response::HTTP_OK, $clientResponse->getStatusCode(), $clientResponse->getContent());
 
-        $response= json_decode($clientResponse->getContent(), true);
+        $response = json_decode($clientResponse->getContent(), true);
 
         $this->assertEquals(Response::HTTP_OK, $response['statusCodes'][0]);
         $this->assertEquals($contact->getId(), $response['contacts'][0]['id']);
@@ -534,10 +534,10 @@ class LeadApiControllerFunctionalTest extends MauticMysqlTestCase
                 'timezone'         => 'America/Chicago',
                 'owner'            => 1,
             ], [
-                'email'            => 'apiemail2@email.com',
-                'firstname'        => 'API2',
-                'lastname'         => 'Update2',
-                'points'           => 3,
+                'email'     => 'apiemail2@email.com',
+                'firstname' => 'API2',
+                'lastname'  => 'Update2',
+                'points'    => 3,
             ],
         ];
 
@@ -852,7 +852,7 @@ class LeadApiControllerFunctionalTest extends MauticMysqlTestCase
 
         // Remove DNC from the contact.
         $this->client->request('POST', "/api/contacts/$contactId/dnc/$dncChannel/remove");
-        $clientResponse    = $this->client->getResponse();
+        $clientResponse = $this->client->getResponse();
         self::assertSame(Response::HTTP_OK, $clientResponse->getStatusCode());
         $dncRemoveResponse = json_decode($clientResponse->getContent(), true);
 

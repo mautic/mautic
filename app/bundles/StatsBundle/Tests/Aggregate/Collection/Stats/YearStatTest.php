@@ -8,9 +8,9 @@ use PHPUnit\Framework\TestCase;
 
 class YearStatTest extends TestCase
 {
-    private $year     = '2019';
+    private $year = '2019';
 
-    private $month    = 11;
+    private $month = 11;
 
     private \Mautic\StatsBundle\Aggregate\Collection\Stats\YearStat $yearStat;
 
@@ -43,7 +43,7 @@ class YearStatTest extends TestCase
 
     public function testGetSum(): void
     {
-        $this->yearStat  = new YearStat($this->year);
+        $this->yearStat = new YearStat($this->year);
         $this->yearStat->getMonth($this->month);
         $this->assertSame(1, $this->yearStat->getCount());
         $this->yearStat->getMonth($this->month);
@@ -54,7 +54,7 @@ class YearStatTest extends TestCase
 
     public function testGetCount(): void
     {
-        $this->yearStat  = new YearStat($this->year);
+        $this->yearStat = new YearStat($this->year);
         $this->yearStat->getMonth($this->month);
         $this->assertSame(1, $this->yearStat->getCount());
         $this->yearStat->getMonth($this->month);

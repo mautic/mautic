@@ -62,11 +62,11 @@ class ClientType extends AbstractType
                         'onchange' => 'Mautic.refreshApiClientForm(\''.$this->router->generate('mautic_client_action', ['objectAction' => 'new']).'\', this)',
                     ],
                     'choices' => [
-                        'OAuth 2'    => 'oauth2',
+                        'OAuth 2' => 'oauth2',
                     ],
-                    'required'          => false,
-                    'placeholder'       => false,
-                    'data'              => $apiMode,
+                    'required'    => false,
+                    'placeholder' => false,
+                    'data'        => $apiMode,
                 ]
             );
         }

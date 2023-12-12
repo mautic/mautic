@@ -16,13 +16,13 @@ class CampaignEventLeadChangeType extends AbstractType
                 'mautic.campaign.form.trigger_leadchanged_added'   => 'added',
                 'mautic.campaign.form.trigger_leadchanged_removed' => 'removed',
             ],
-            'expanded'          => true,
-            'multiple'          => false,
-            'label_attr'        => ['class' => 'control-label'],
-            'label'             => 'mautic.campaign.form.trigger_leadchanged',
-            'placeholder'       => false,
-            'required'          => false,
-            'data'              => $data,
+            'expanded'    => true,
+            'multiple'    => false,
+            'label_attr'  => ['class' => 'control-label'],
+            'label'       => 'mautic.campaign.form.trigger_leadchanged',
+            'placeholder' => false,
+            'required'    => false,
+            'data'        => $data,
         ]);
 
         $builder->add('campaigns', CampaignListType::class, [

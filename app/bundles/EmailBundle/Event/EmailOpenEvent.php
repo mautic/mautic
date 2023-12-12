@@ -20,8 +20,8 @@ class EmailOpenEvent extends CommonEvent
         private $request,
         private $firstTime = false
     ) {
-        $this->entity    = $stat;
-        $this->email     = $stat->getEmail();
+        $this->entity = $stat;
+        $this->email  = $stat->getEmail();
     }
 
     /**

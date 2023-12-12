@@ -53,7 +53,7 @@ class SegmentReferenceFilterQueryBuilderTest extends MauticMysqlTestCase
         $this->dispatcherMock      = $this->createMock(EventDispatcherInterface::class);
         $this->connectionMock      = $this->createMock(Connection::class);
 
-        $this->queryBuilder        = new SegmentReferenceFilterQueryBuilder(
+        $this->queryBuilder = new SegmentReferenceFilterQueryBuilder(
             $this->randomParameterMock,
             new ContactSegmentQueryBuilder($this->em, $this->randomParameterMock, $this->dispatcherMock),
             $this->em,

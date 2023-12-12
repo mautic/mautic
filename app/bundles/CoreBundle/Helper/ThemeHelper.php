@@ -87,8 +87,8 @@ class ThemeHelper implements ThemeHelperInterface
         Finder $finder,
         private BuilderIntegrationsHelper $builderIntegrationsHelper
     ) {
-        $this->filesystem                = clone $filesystem;
-        $this->finder                    = clone $finder;
+        $this->filesystem = clone $filesystem;
+        $this->finder     = clone $finder;
     }
 
     public function getDefaultThemes()
@@ -467,9 +467,9 @@ class ThemeHelper implements ThemeHelperInterface
 
             $this->themes[$key][$theme->getBasename()] = $config['name'];
 
-            $this->themesInfo[$key][$theme->getBasename()]           = [];
-            $this->themesInfo[$key][$theme->getBasename()]['name']   = $config['name'];
-            $this->themesInfo[$key][$theme->getBasename()]['key']    = $theme->getBasename();
+            $this->themesInfo[$key][$theme->getBasename()]         = [];
+            $this->themesInfo[$key][$theme->getBasename()]['name'] = $config['name'];
+            $this->themesInfo[$key][$theme->getBasename()]['key']  = $theme->getBasename();
 
             // fix for legacy themes who do not have a builder configured
             if (empty($config['builder']) || !is_array($config['builder'])) {

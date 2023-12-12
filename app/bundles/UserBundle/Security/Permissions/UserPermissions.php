@@ -38,7 +38,7 @@ class UserPermissions extends AbstractPermissions
             'user:profile',
             PermissionListType::class,
             [
-                'choices'           => [
+                'choices' => [
                     'mautic.user.account.permissions.editname'     => 'editname',
                     'mautic.user.account.permissions.editusername' => 'editusername',
                     'mautic.user.account.permissions.editemail'    => 'editemail',

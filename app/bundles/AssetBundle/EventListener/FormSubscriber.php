@@ -36,8 +36,8 @@ class FormSubscriber implements EventSubscriberInterface
     public static function getSubscribedEvents(): array
     {
         return [
-            FormEvents::FORM_ON_BUILD                 => ['onFormBuilder', 0],
-            FormEvents::ON_EXECUTE_SUBMIT_ACTION      => [
+            FormEvents::FORM_ON_BUILD            => ['onFormBuilder', 0],
+            FormEvents::ON_EXECUTE_SUBMIT_ACTION => [
                 ['onFormSubmitActionAssetDownload', 0],
                 ['onFormSubmitActionDownloadFile', 0],
             ],
@@ -114,7 +114,7 @@ class FormSubscriber implements EventSubscriberInterface
             'asset'         => $asset,
             'message'       => $message,
             'messengerMode' => $messengerMode,
-        ]    = $event->getPostSubmitCallback('asset.download_file');
+        ] = $event->getPostSubmitCallback('asset.download_file');
 
         $url = $this->assetModel->generateUrl($asset, true, [
             'lead'    => $event->getLead() ? $event->getLead()->getId() : null,

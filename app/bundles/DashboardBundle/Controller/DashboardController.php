@@ -29,7 +29,7 @@ class DashboardController extends AbstractFormController
      */
     public function indexAction(Request $request, WidgetService $widget, FormFactoryInterface $formFactory, PathsHelper $pathsHelper): Response
     {
-        $model   = $this->getModel('dashboard');
+        $model = $this->getModel('dashboard');
         \assert($model instanceof DashboardModel);
         $widgets = $model->getWidgets();
 
@@ -96,7 +96,7 @@ class DashboardController extends AbstractFormController
         }
 
         $widgetService->setFilter($request);
-        $widget        = $widgetService->get((int) $widgetId);
+        $widget = $widgetService->get((int) $widgetId);
 
         if (!$widget) {
             throw new NotFoundHttpException('Not found.');
@@ -126,7 +126,7 @@ class DashboardController extends AbstractFormController
         // retrieve the entity
         $widget = new Widget();
 
-        $model  = $this->getModel('dashboard');
+        $model = $this->getModel('dashboard');
         \assert($model instanceof DashboardModel);
         $action = $this->generateUrl('mautic_dashboard_action', ['objectAction' => 'new']);
 
@@ -187,7 +187,7 @@ class DashboardController extends AbstractFormController
      */
     public function editAction(Request $request, FormFactoryInterface $formFactory, $objectId)
     {
-        $model  = $this->getModel('dashboard');
+        $model = $this->getModel('dashboard');
         \assert($model instanceof DashboardModel);
         $widget = $model->getEntity($objectId);
         $action = $this->generateUrl('mautic_dashboard_action', ['objectAction' => 'edit', 'objectId' => $objectId]);

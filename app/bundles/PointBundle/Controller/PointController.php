@@ -45,7 +45,7 @@ class PointController extends AbstractFormController
         $orderByDir = $request->getSession()->get('mautic.point.orderbydir', 'ASC');
         $pointModel = $this->getModel('point');
         \assert($pointModel instanceof PointModel);
-        $points     = $pointModel->getEntities([
+        $points = $pointModel->getEntities([
             'start'      => $start,
             'limit'      => $limit,
             'filter'     => $filter,

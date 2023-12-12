@@ -109,7 +109,7 @@ final class AuthenticationListener
     {
         $token = $this->tokenStorage->getToken();
         /** @var User|null $user */
-        $user  = $token->getUser();
+        $user = $token->getUser();
 
         // If no user associated with a token, it's a client credentials grant type. Handle accordingly.
         if (is_null($user)) {

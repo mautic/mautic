@@ -24,8 +24,8 @@ class ClientTest extends TestCase
 
         $response = new Response(); // here too
 
-        $parametersMock     = $this->createMock(CoreParametersHelper::class);
-        $httpClientMock     = $this->createMock(GuzzleClient::class);
+        $parametersMock = $this->createMock(CoreParametersHelper::class);
+        $httpClientMock = $this->createMock(GuzzleClient::class);
 
         $parametersMock->expects($this->once())
             ->method('get')

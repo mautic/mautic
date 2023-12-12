@@ -27,7 +27,7 @@ class SearchSubscriber implements EventSubscriberInterface
         private CorePermissions $security,
         private Environment $twig
     ) {
-        $this->leadRepo        = $leadModel->getRepository();
+        $this->leadRepo = $leadModel->getRepository();
     }
 
     public static function getSubscribedEvents(): array

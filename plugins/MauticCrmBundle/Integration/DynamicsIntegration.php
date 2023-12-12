@@ -69,12 +69,12 @@ class DynamicsIntegration extends CrmAbstractIntegration
                 'choices' => [
                     'mautic.integrations.blanks' => 'updateBlanks',
                 ],
-                'expanded'          => true,
-                'multiple'          => true,
-                'label'             => 'mautic.integrations.form.blanks',
-                'label_attr'        => ['class' => 'control-label'],
-                'placeholder'       => false,
-                'required'          => false,
+                'expanded'    => true,
+                'multiple'    => true,
+                'label'       => 'mautic.integrations.form.blanks',
+                'label_attr'  => ['class' => 'control-label'],
+                'placeholder' => false,
+                'required'    => false,
             ]
         );
         if ('features' === $formArea) {
@@ -83,15 +83,15 @@ class DynamicsIntegration extends CrmAbstractIntegration
                 ChoiceType::class,
                 [
                     'choices' => [
-                        'mautic.dynamics.object.contact'  => 'contacts',
-                        'mautic.dynamics.object.company'  => 'company',
+                        'mautic.dynamics.object.contact' => 'contacts',
+                        'mautic.dynamics.object.company' => 'company',
                     ],
-                    'expanded'          => true,
-                    'multiple'          => true,
-                    'label'             => 'mautic.dynamics.form.objects_to_pull_from',
-                    'label_attr'        => ['class' => ''],
-                    'placeholder'       => false,
-                    'required'          => false,
+                    'expanded'    => true,
+                    'multiple'    => true,
+                    'label'       => 'mautic.dynamics.form.objects_to_pull_from',
+                    'label_attr'  => ['class' => ''],
+                    'placeholder' => false,
+                    'required'    => false,
                 ]
             );
         }
@@ -702,7 +702,7 @@ class DynamicsIntegration extends CrmAbstractIntegration
         $integrationEntityRepo = $this->em->getRepository(\Mautic\PluginBundle\Entity\IntegrationEntity::class);
         $fieldsToUpdateInCrm   = isset($config['update_mautic']) ? array_keys($config['update_mautic'], 0) : [];
         $leadFields            = array_unique(array_values($config['leadFields']));
-        $totalUpdated          = $totalCreated          = $totalErrors          = 0;
+        $totalUpdated          = $totalCreated = $totalErrors = 0;
 
         if ($key = array_search('mauticContactTimelineLink', $leadFields)) {
             unset($leadFields[$key]);

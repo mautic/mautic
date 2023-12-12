@@ -21,8 +21,8 @@ final class RemoveOldLogTest extends MauticMysqlTestCase
 
     protected function setUp(): void
     {
-        $this->configParams['clean_webhook_logs_in_background']     = 'testRemoveLogUsingCleanUpJob' === $this->getName();
-        $this->configParams['webhook_log_max']                      = 5;
+        $this->configParams['clean_webhook_logs_in_background'] = 'testRemoveLogUsingCleanUpJob' === $this->getName();
+        $this->configParams['webhook_log_max']                  = 5;
         parent::setUp();
 
         $this->webhookModel = $this->getContainer()->get('mautic.webhook.model.webhook');
@@ -93,7 +93,7 @@ final class RemoveOldLogTest extends MauticMysqlTestCase
      */
     private function assertLogs(Webhook $webhook, int $expectedCount, array $expectedIds): void
     {
-        $logs   = $this->em->getRepository(Log::class)->findBy(['webhook'=>$webhook]);
+        $logs   = $this->em->getRepository(Log::class)->findBy(['webhook' => $webhook]);
         $logIds = array_map(fn (Log $log) => $log->getId(), $logs);
 
         Assert::assertCount($expectedCount, $logs);

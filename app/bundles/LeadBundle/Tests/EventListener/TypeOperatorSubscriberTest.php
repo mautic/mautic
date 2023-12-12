@@ -288,11 +288,11 @@ final class TypeOperatorSubscriberTest extends \PHPUnit\Framework\TestCase
                             $this->assertSame('', $options['data']);
                             $this->assertSame(
                                 [
-                                    'class'                 => 'form-control',
-                                    'data-field-callback'   => 'activateSegmentFilterTypeahead',
-                                    'data-target'           => 'owner',
-                                    'placeholder'           => 'mautic.lead.list.form.startTyping',
-                                    'data-no-record-message'=> 'mautic.core.form.nomatches',
+                                    'class'                  => 'form-control',
+                                    'data-field-callback'    => 'activateSegmentFilterTypeahead',
+                                    'data-target'            => 'owner',
+                                    'placeholder'            => 'mautic.lead.list.form.startTyping',
+                                    'data-no-record-message' => 'mautic.core.form.nomatches',
                                 ],
                                 $options['attr']
                             );
@@ -325,13 +325,13 @@ final class TypeOperatorSubscriberTest extends \PHPUnit\Framework\TestCase
         $operator = OperatorOptions::EQUAL_TO;
         $details  = [
             'properties' => [
-                'type'          => 'lookup_id',
-                'data-action'   => 'foo.bar',
-                'callback'      => 'fooBarCallback',
+                'type'        => 'lookup_id',
+                'data-action' => 'foo.bar',
+                'callback'    => 'fooBarCallback',
             ],
         ];
 
-        $event    = new FormAdjustmentEvent($this->form, $alias, $object, $operator, $details);
+        $event = new FormAdjustmentEvent($this->form, $alias, $object, $operator, $details);
 
         $this->form->expects($this->exactly(2))
             ->method('add')

@@ -33,15 +33,15 @@ class PointActionType extends AbstractType
         );
 
         $builder->add('group', GroupListType::class, [
-            'label'            => 'mautic.lead.campaign.event.point_group',
-            'label_attr'       => ['class' => 'control-label'],
-            'attr'             => [
-                'class'    => 'form-control',
-                'tooltip'  => 'mautic.lead.campaign.event.point_group.help',
+            'label'      => 'mautic.lead.campaign.event.point_group',
+            'label_attr' => ['class' => 'control-label'],
+            'attr'       => [
+                'class'   => 'form-control',
+                'tooltip' => 'mautic.lead.campaign.event.point_group.help',
             ],
-            'required'         => false,
-            'by_reference'     => false,
-            'return_entity'    => false,
+            'required'      => false,
+            'by_reference'  => false,
+            'return_entity' => false,
         ]);
     }
 

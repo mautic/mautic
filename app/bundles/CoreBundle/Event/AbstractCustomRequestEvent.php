@@ -68,9 +68,9 @@ abstract class AbstractCustomRequestEvent extends Event
         }
 
         if (null !== $route) {
-            [$currentRoute, $routeParams]     = $this->getRoute(true);
-            $givenRoute                       = $route;
-            $givenRouteParams                 = [];
+            [$currentRoute, $routeParams] = $this->getRoute(true);
+            $givenRoute                   = $route;
+            $givenRouteParams             = [];
             if (is_array($route)) {
                 [$givenRoute, $givenRouteParams] = $route;
             }

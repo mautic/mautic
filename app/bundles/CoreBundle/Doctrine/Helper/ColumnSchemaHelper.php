@@ -41,7 +41,7 @@ class ColumnSchemaHelper
         protected Connection $db,
         protected $prefix
     ) {
-        $this->sm     = $db->getSchemaManager();
+        $this->sm = $db->getSchemaManager();
     }
 
     /**

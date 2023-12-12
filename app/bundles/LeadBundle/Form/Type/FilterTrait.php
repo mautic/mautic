@@ -120,9 +120,9 @@ trait FilterTrait
                     $data['filter'] = [$data['filter']];
                 }
 
-                $customOptions['choices']           = $options['deviceTypes'];
-                $customOptions['multiple']          = true;
-                $type                               = ChoiceType::class;
+                $customOptions['choices']  = $options['deviceTypes'];
+                $customOptions['multiple'] = true;
+                $type                      = ChoiceType::class;
                 break;
             case 'device_brand':
                 if (!isset($data['filter'])) {
@@ -131,9 +131,9 @@ trait FilterTrait
                     $data['filter'] = [$data['filter']];
                 }
 
-                $customOptions['choices']           = $options['deviceBrands'];
-                $customOptions['multiple']          = true;
-                $type                               = ChoiceType::class;
+                $customOptions['choices']  = $options['deviceBrands'];
+                $customOptions['multiple'] = true;
+                $type                      = ChoiceType::class;
                 break;
             case 'device_os':
                 if (!isset($data['filter'])) {
@@ -142,9 +142,9 @@ trait FilterTrait
                     $data['filter'] = [$data['filter']];
                 }
 
-                $customOptions['choices']           = $options['deviceOs'];
-                $customOptions['multiple']          = true;
-                $type                               = ChoiceType::class;
+                $customOptions['choices']  = $options['deviceOs'];
+                $customOptions['multiple'] = true;
+                $type                      = ChoiceType::class;
                 break;
             case 'tags':
                 if (!isset($data['filter'])) {
@@ -177,9 +177,9 @@ trait FilterTrait
                 } elseif (!is_array($data['filter'])) {
                     $data['filter'] = [$data['filter']];
                 }
-                $customOptions['choices']           = $options['globalcategory'];
-                $customOptions['multiple']          = true;
-                $type                               = ChoiceType::class;
+                $customOptions['choices']  = $options['globalcategory'];
+                $customOptions['multiple'] = true;
+                $type                      = ChoiceType::class;
                 break;
             case 'timezone':
             case 'country':

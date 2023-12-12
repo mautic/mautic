@@ -20,7 +20,7 @@ class ActionController extends CommonFormController
     public function newAction(Request $request)
     {
         $success = 0;
-        $valid   = $cancelled   = false;
+        $valid   = $cancelled = false;
         $method  = $request->getMethod();
         $session = $request->getSession();
 
@@ -151,7 +151,7 @@ class ActionController extends CommonFormController
         $formId     = 'POST' === $method ? ($formaction['formId'] ?? '') : $request->query->get('formId');
         $actions    = $session->get('mautic.form.'.$formId.'.actions.modified', []);
         $success    = 0;
-        $valid      = $cancelled      = false;
+        $valid      = $cancelled = false;
         $formAction = array_key_exists($objectId, $actions) ? $actions[$objectId] : null;
 
         if (null !== $formAction) {

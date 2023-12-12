@@ -86,16 +86,16 @@ class DashboardControllerTest extends \PHPUnit\Framework\TestCase
         $this->sessionMock        = $this->createMock(Session::class);
         $this->containerMock      = $this->createMock(Container::class);
 
-        $doctrine                 = $this->createMock(ManagerRegistry::class);
-        $factory                  = $this->createMock(MauticFactory::class);
-        $this->modelFactoryMock   = $this->createMock(ModelFactory::class);
-        $userHelper               = $this->createMock(UserHelper::class);
-        $coreParametersHelper     = $this->createMock(CoreParametersHelper::class);
-        $dispatcher               = $this->createMock(EventDispatcherInterface::class);
-        $this->translatorMock     = $this->createMock(Translator::class);
-        $this->flashBagMock       = $this->createMock(FlashBag::class);
-        $requestStack             = new RequestStack();
-        $this->securityMock       = $this->createMock(CorePermissions::class);
+        $doctrine               = $this->createMock(ManagerRegistry::class);
+        $factory                = $this->createMock(MauticFactory::class);
+        $this->modelFactoryMock = $this->createMock(ModelFactory::class);
+        $userHelper             = $this->createMock(UserHelper::class);
+        $coreParametersHelper   = $this->createMock(CoreParametersHelper::class);
+        $dispatcher             = $this->createMock(EventDispatcherInterface::class);
+        $this->translatorMock   = $this->createMock(Translator::class);
+        $this->flashBagMock     = $this->createMock(FlashBag::class);
+        $requestStack           = new RequestStack();
+        $this->securityMock     = $this->createMock(CorePermissions::class);
 
         $requestStack->push($this->requestMock);
         $this->controller = new DashboardController(

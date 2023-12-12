@@ -10,7 +10,7 @@ class ConnectionBuilderTest extends \PHPUnit\Framework\TestCase
     public function testArrayIsBuiltAsItsUsedInJsPlumb(): void
     {
         $eventsArray = [
-            Event::TYPE_ACTION   => [
+            Event::TYPE_ACTION => [
                 'action1' => [
                     'connectionRestrictions' => [
                         'anchor' => ['decision1.inaction'],
@@ -50,15 +50,15 @@ class ConnectionBuilderTest extends \PHPUnit\Framework\TestCase
         $results = ConnectionBuilder::buildRestrictionsArray($eventsArray);
 
         $expected = [
-            'anchor'    => [
+            'anchor' => [
                 'decision1' => [
                     'action1' => ['inaction'],
                 ],
-                'action3'   => [
+                'action3' => [
                     'decision2' => ['top'],
                 ],
             ],
-            'action1'   => [
+            'action1' => [
                 'source' => [
                     'action'   => [],
                     'decision' => ['decision1'],
@@ -68,7 +68,7 @@ class ConnectionBuilderTest extends \PHPUnit\Framework\TestCase
                     'decision' => [],
                 ],
             ],
-            'action2'   => [
+            'action2' => [
                 'source' => [
                     'action'   => [],
                     'decision' => ['decision1'],
@@ -78,7 +78,7 @@ class ConnectionBuilderTest extends \PHPUnit\Framework\TestCase
                     'decision' => [],
                 ],
             ],
-            'action3'   => [
+            'action3' => [
                 'source' => [
                     'action'   => [],
                     'decision' => [],

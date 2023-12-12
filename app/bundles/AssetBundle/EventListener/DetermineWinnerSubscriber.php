@@ -54,7 +54,7 @@ class DetermineWinnerSubscriber implements EventSubscriberInterface
 
             $translator = $this->translator;
             if ($counts) {
-                $downloads  = $support  = $data  = [];
+                $downloads  = $support = $data = [];
                 $hasResults = [];
 
                 $downloadsLabel = $translator->trans('mautic.asset.abtest.label.downloads');

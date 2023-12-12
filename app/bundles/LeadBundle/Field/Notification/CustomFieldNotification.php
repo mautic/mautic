@@ -32,7 +32,7 @@ class CustomFieldNotification
             'mautic.lead.field.notification.created_message',
             ['%label%' => $leadField->getLabel()]
         );
-        $header  = $this->translator->trans('mautic.lead.field.notification.created_header');
+        $header = $this->translator->trans('mautic.lead.field.notification.created_header');
 
         $this->addToNotificationCenter($user, $message, $header);
     }
@@ -49,7 +49,7 @@ class CustomFieldNotification
             'mautic.lead.field.notification.custom_field_limit_hit_message',
             ['%label%' => $leadField->getLabel()]
         );
-        $header  = $this->translator->trans('mautic.lead.field.notification.custom_field_limit_hit_header');
+        $header = $this->translator->trans('mautic.lead.field.notification.custom_field_limit_hit_header');
 
         $this->addToNotificationCenter($user, $message, $header);
     }
@@ -66,7 +66,7 @@ class CustomFieldNotification
             'mautic.lead.field.notification.cannot_be_created_message',
             ['%label%' => $leadField->getLabel()]
         );
-        $header  = $this->translator->trans('mautic.lead.field.notification.cannot_be_created_header');
+        $header = $this->translator->trans('mautic.lead.field.notification.cannot_be_created_header');
 
         $this->addToNotificationCenter($user, $message, $header);
     }

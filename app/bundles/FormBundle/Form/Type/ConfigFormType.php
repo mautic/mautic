@@ -41,7 +41,7 @@ class ConfigFormType extends AbstractType
                     'class'   => 'form-control',
                     'tooltip' => 'mautic.form.config.form_results_data_sources.tooltip',
                 ],
-                'data'       => isset($options['data']['form_results_data_sources']) && (bool) $options['data']['form_results_data_sources'],
+                'data' => isset($options['data']['form_results_data_sources']) && (bool) $options['data']['form_results_data_sources'],
             ]
         );
 
@@ -49,13 +49,13 @@ class ConfigFormType extends AbstractType
             'successful_submit_action',
             ChoiceType::class,
             [
-                'choices'           => [
+                'choices' => [
                     'mautic.form.config.form.successful_submit_action_at_the_top'    => 'top',
                     'mautic.form.config.form.successful_submit_action_at_the_bottom' => 'bottom',
                 ],
-                'label'             => 'mautic.form.config.form.successful_submit_action',
-                'required'          => true,
-                'attr'              => [
+                'label'    => 'mautic.form.config.form.successful_submit_action',
+                'required' => true,
+                'attr'     => [
                     'class'   => 'form-control',
                     'tooltip' => 'mautic.form.config.form.successful_submit_action.tooltip',
                 ],

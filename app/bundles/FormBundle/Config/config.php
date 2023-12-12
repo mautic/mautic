@@ -137,8 +137,8 @@ return [
     'services' => [
         'forms' => [
             'mautic.form.type.field' => [
-                'class'       => FieldType::class,
-                'arguments'   => [
+                'class'     => FieldType::class,
+                'arguments' => [
                     'translator',
                     'mautic.form.collector.object',
                     'mautic.form.collector.field',
@@ -150,8 +150,8 @@ return [
                 ],
             ],
             'mautic.form.type.form_submitaction_sendemail' => [
-                'class'       => SubmitActionEmailType::class,
-                'arguments'   => [
+                'class'     => SubmitActionEmailType::class,
+                'arguments' => [
                     'translator',
                     'mautic.helper.core_parameters',
                 ],

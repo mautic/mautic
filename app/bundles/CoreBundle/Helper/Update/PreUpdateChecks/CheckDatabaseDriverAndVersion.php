@@ -20,7 +20,7 @@ class CheckDatabaseDriverAndVersion extends AbstractPreUpdateCheck
         $connection = $this->em->getConnection();
 
         // Version strings are in the format 10.3.30-MariaDB-1:10.3.30+maria~focal-log
-        $version  = $connection->executeQuery('SELECT VERSION()')->fetchOne();
+        $version = $connection->executeQuery('SELECT VERSION()')->fetchOne();
 
         // Platform class names are in the format Doctrine\DBAL\Platforms\MariaDb1027Platform
         $platform = strtolower($connection->getDatabasePlatform()::class);

@@ -7,7 +7,7 @@ use Mautic\LeadBundle\Segment\Exception\SegmentQueryException;
 
 class ExpressionBuilder extends BaseExpressionBuilder
 {
-    public const REGEXP  = 'REGEXP';
+    public const REGEXP = 'REGEXP';
 
     public const BETWEEN = 'BETWEEN';
 
@@ -108,7 +108,7 @@ class ExpressionBuilder extends BaseExpressionBuilder
         $functionArguments = func_get_args();
         $additionArguments = array_splice($functionArguments, 2);
 
-        foreach ($additionArguments as $k=> $v) {
+        foreach ($additionArguments as $k => $v) {
             $additionArguments[$k] = is_numeric($v) && intval($v) === $v ? $v : $this->literal($v);
         }
 

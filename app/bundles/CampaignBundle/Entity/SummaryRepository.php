@@ -91,9 +91,9 @@ class SummaryRepository extends CommonRepository
         int $campaignId = null,
         int $eventId = null
     ): void {
-        $dateFromTsActual = $dateFrom->getTimestamp();
-        $dateToTsActual   = $dateTo->getTimestamp();
-        $intervalInSeconds= 3600;
+        $dateFromTsActual  = $dateFrom->getTimestamp();
+        $dateToTsActual    = $dateTo->getTimestamp();
+        $intervalInSeconds = 3600;
 
         $dateFromStartWithZeroMinutes = $dateFromTsActual - ($dateFromTsActual % $intervalInSeconds);
         $numberOfIntervals            = ceil(($dateToTsActual - $dateFromStartWithZeroMinutes) / $intervalInSeconds);

@@ -32,10 +32,10 @@ class ConfigThemeType extends AbstractType
                     'label_attr' => [
                         'class' => 'control-label',
                     ],
-                    'attr'       => [
+                    'attr' => [
                         'class' => 'form-control',
                     ],
-                    'required'   => false,
+                    'required' => false,
                 ]
             )->addViewTransformer(new ArrayStringTransformer())
         );

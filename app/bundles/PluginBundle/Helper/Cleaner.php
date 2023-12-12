@@ -4,15 +4,15 @@ namespace Mautic\PluginBundle\Helper;
 
 class Cleaner
 {
-    public const FIELD_TYPE_STRING   = 'string';
+    public const FIELD_TYPE_STRING = 'string';
 
-    public const FIELD_TYPE_BOOL     = 'boolean';
+    public const FIELD_TYPE_BOOL = 'boolean';
 
-    public const FIELD_TYPE_NUMBER   = 'number';
+    public const FIELD_TYPE_NUMBER = 'number';
 
     public const FIELD_TYPE_DATETIME = 'datetime';
 
-    public const FIELD_TYPE_DATE     = 'date';
+    public const FIELD_TYPE_DATE = 'date';
 
     /**
      * @return bool|float|string

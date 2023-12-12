@@ -52,8 +52,8 @@ class ReportBuilderEvent extends AbstractReportEvent
         private ReportHelper $reportHelper,
         private ?string $reportSource = null
     ) {
-        $this->context           = $context;
-        $this->leadFields        = $leadFields;
+        $this->context    = $context;
+        $this->leadFields = $leadFields;
     }
 
     /**

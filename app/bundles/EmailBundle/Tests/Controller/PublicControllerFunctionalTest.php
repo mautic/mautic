@@ -174,7 +174,7 @@ class PublicControllerFunctionalTest extends MauticMysqlTestCase
 
     public function testPreviewDisabledByDefault(): void
     {
-        $emailName    = 'Test preview email';
+        $emailName = 'Test preview email';
 
         $email = new Email();
         $email->setName($emailName);
@@ -197,7 +197,7 @@ class PublicControllerFunctionalTest extends MauticMysqlTestCase
 
     public function testPreviewForExpiredEmail(): void
     {
-        $emailName    = 'Test preview email';
+        $emailName = 'Test preview email';
 
         $email = new Email();
         $email->setName($emailName);

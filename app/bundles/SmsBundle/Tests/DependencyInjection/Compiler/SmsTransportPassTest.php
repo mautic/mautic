@@ -18,7 +18,7 @@ class SmsTransportPassTest extends TestCase
             ->register('foo')
             ->setPublic(true)
             ->setAbstract(true)
-            ->addTag('mautic.sms_transport', ['alias'=>'fakeAliasDefault', 'integrationAlias' => 'fakeIntegrationDefault']);
+            ->addTag('mautic.sms_transport', ['alias' => 'fakeAliasDefault', 'integrationAlias' => 'fakeIntegrationDefault']);
 
         $container
             ->register('chocolate')

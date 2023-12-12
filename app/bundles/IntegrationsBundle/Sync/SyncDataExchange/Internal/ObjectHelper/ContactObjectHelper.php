@@ -287,7 +287,7 @@ class ContactObjectHelper implements ObjectHelperInterface
     {
         foreach ($fields as $name => $field) {
             if (str_starts_with($name, 'mautic_internal_dnc_')) {
-                $channel   = str_replace('mautic_internal_dnc_', '', $name);
+                $channel = str_replace('mautic_internal_dnc_', '', $name);
 
                 $dncReason = $this->getDoNotContactReason($field->getValue()->getNormalizedValue());
 

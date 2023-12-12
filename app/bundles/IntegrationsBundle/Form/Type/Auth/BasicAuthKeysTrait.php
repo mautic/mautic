@@ -23,10 +23,10 @@ trait BasicAuthKeysTrait
             'username',
             TextType::class,
             [
-                'label'       => $usernameLabel,
-                'label_attr'  => ['class' => 'control-label'],
-                'required'    => true,
-                'attr'        => [
+                'label'      => $usernameLabel,
+                'label_attr' => ['class' => 'control-label'],
+                'required'   => true,
+                'attr'       => [
                     'class' => 'form-control',
                 ],
                 'constraints' => [$this->getNotBlankConstraint()],
@@ -37,10 +37,10 @@ trait BasicAuthKeysTrait
             'password',
             PasswordType::class,
             [
-                'label'       => $passwordLabel,
-                'label_attr'  => ['class' => 'control-label'],
-                'required'    => true,
-                'attr'        => [
+                'label'      => $passwordLabel,
+                'label_attr' => ['class' => 'control-label'],
+                'required'   => true,
+                'attr'       => [
                     'class' => 'form-control',
                 ],
                 'constraints' => [$this->getNotBlankConstraint()],

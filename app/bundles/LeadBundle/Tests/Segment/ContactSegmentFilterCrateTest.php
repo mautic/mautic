@@ -295,7 +295,7 @@ class ContactSegmentFilterCrateTest extends \PHPUnit\Framework\TestCase
     public function testBehaviorsTypeFilter(): void
     {
         $filter = [
-            'object'     => 'behaviors',
+            'object' => 'behaviors',
         ];
 
         $contactSegmentFilterCrate = new ContactSegmentFilterCrate($filter);

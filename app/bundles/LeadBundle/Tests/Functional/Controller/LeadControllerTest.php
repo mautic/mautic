@@ -46,12 +46,12 @@ class LeadControllerTest extends MauticMysqlTestCase
         Assert::assertTrue($this->client->getResponse()->isOk());
         $contactExportSchedulerRows = $this->checkContactExportScheduler(1);
         /** @var ContactExportScheduler $contactExportScheduler */
-        $contactExportScheduler     = $contactExportSchedulerRows[0];
+        $contactExportScheduler = $contactExportSchedulerRows[0];
         $this->testSymfonyCommand(ContactScheduledExportCommand::COMMAND_NAME, ['--ids' => $contactExportScheduler->getId()]);
         $this->checkContactExportScheduler(0);
         /** @var CoreParametersHelper $coreParametersHelper */
-        $coreParametersHelper    = self::$container->get('mautic.helper.core_parameters');
-        $zipFileName             = 'contacts_export_'.$contactExportScheduler->getScheduledDateTime()
+        $coreParametersHelper = self::$container->get('mautic.helper.core_parameters');
+        $zipFileName          = 'contacts_export_'.$contactExportScheduler->getScheduledDateTime()
                 ->format('Y_m_d_H_i_s').'.zip';
         $this->filePaths[] = $filePath = $coreParametersHelper->get('contact_export_dir').'/'.$zipFileName;
         Assert::assertFileExists($filePath);

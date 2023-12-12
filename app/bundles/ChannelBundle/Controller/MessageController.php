@@ -129,8 +129,8 @@ class MessageController extends AbstractStandardFormController
                     ]
                 );
 
-                [$dateFrom, $dateTo]     = $this->getViewDateRange($this->requestStack->getCurrentRequest(), $message->getId(), $returnUrl, 'local', $dateRangeForm);
-                $chart                   = new LineChart(null, $dateFrom, $dateTo);
+                [$dateFrom, $dateTo] = $this->getViewDateRange($this->requestStack->getCurrentRequest(), $message->getId(), $returnUrl, 'local', $dateRangeForm);
+                $chart               = new LineChart(null, $dateFrom, $dateTo);
 
                 /** @var Channel[] $channels */
                 $channels        = $model->getChannels();

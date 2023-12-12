@@ -57,18 +57,18 @@ final class SubmissionFunctionalTest extends MauticMysqlTestCase
         $patchPayload = [
             'fields' => [
                 [
-                    'label'        => 'State',
-                    'type'         => 'select',
-                    'alias'        => 'state',
-                    'leadField'    => 'state',
-                    'parent'       => $response['form']['fields'][0]['id'],
-                    'isRequired'   => true,
-                    'conditions'   => [
+                    'label'      => 'State',
+                    'type'       => 'select',
+                    'alias'      => 'state',
+                    'leadField'  => 'state',
+                    'parent'     => $response['form']['fields'][0]['id'],
+                    'isRequired' => true,
+                    'conditions' => [
                         'expr'   => 'in',
                         'any'    => 0,
                         'values' => ['Australia'],
                     ],
-                    'properties'   => [
+                    'properties' => [
                         'syncList' => 1,
                         'multiple' => 0,
                     ],
@@ -159,18 +159,18 @@ final class SubmissionFunctionalTest extends MauticMysqlTestCase
         $patchPayload = [
             'fields' => [
                 [
-                    'label'        => 'State',
-                    'type'         => 'select',
-                    'alias'        => 'state',
-                    'leadField'    => 'state',
-                    'parent'       => $response['form']['fields'][0]['id'],
-                    'isRequired'   => true,
-                    'conditions'   => [
+                    'label'      => 'State',
+                    'type'       => 'select',
+                    'alias'      => 'state',
+                    'leadField'  => 'state',
+                    'parent'     => $response['form']['fields'][0]['id'],
+                    'isRequired' => true,
+                    'conditions' => [
                         'expr'   => 'in',
                         'any'    => 0,
                         'values' => ['Australia'],
                     ],
-                    'properties'   => [
+                    'properties' => [
                         'syncList' => 1,
                         'multiple' => 0,
                     ],
@@ -253,18 +253,18 @@ final class SubmissionFunctionalTest extends MauticMysqlTestCase
         $patchPayload = [
             'fields' => [
                 [
-                    'label'        => 'State',
-                    'type'         => 'select',
-                    'alias'        => 'state',
-                    'leadField'    => 'state',
-                    'parent'       => $response['form']['fields'][0]['id'],
-                    'isRequired'   => true,
-                    'conditions'   => [
+                    'label'      => 'State',
+                    'type'       => 'select',
+                    'alias'      => 'state',
+                    'leadField'  => 'state',
+                    'parent'     => $response['form']['fields'][0]['id'],
+                    'isRequired' => true,
+                    'conditions' => [
                         'expr'   => 'in',
                         'any'    => 0,
                         'values' => ['Australia'],
                     ],
-                    'properties'   => [
+                    'properties' => [
                         'syncList' => 1,
                         'multiple' => 0,
                     ],
@@ -397,7 +397,7 @@ final class SubmissionFunctionalTest extends MauticMysqlTestCase
         $publishedCampaign->setIsPublished(true);
         $campaignModel->setLeadSources($publishedCampaign, $campaignSources, []);
 
-        $unpublishedCampaign =  new Campaign();
+        $unpublishedCampaign = new Campaign();
         $unpublishedCampaign->setName('Unpublished');
         $unpublishedCampaign->setIsPublished(false);
         $campaignModel->setLeadSources($unpublishedCampaign, $campaignSources, []);

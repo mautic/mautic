@@ -23,7 +23,7 @@ class PRedisConnectionHelperTest extends TestCase
     public function testEndpointsStringInput(): void
     {
         // non domain string should be encapsulated into an array
-        Assert::assertSame([['scheme'=>'tcp', 'host'=>'1.1.1.1']], PRedisConnectionHelper::getRedisEndpoints('tcp://1.1.1.1'));
+        Assert::assertSame([['scheme' => 'tcp', 'host' => '1.1.1.1']], PRedisConnectionHelper::getRedisEndpoints('tcp://1.1.1.1'));
 
         // domain should be resolved and an array of ip addresses returned
         $connInfo = PRedisConnectionHelper::getRedisEndpoints('tcp://bing.com:8888?test=car');

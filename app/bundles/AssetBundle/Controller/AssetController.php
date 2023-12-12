@@ -131,7 +131,7 @@ class AssetController extends FormController
      */
     public function viewAction(Request $request, $objectId)
     {
-        $model       = $this->getModel('asset');
+        $model = $this->getModel('asset');
         \assert($model instanceof AssetModel);
         $activeAsset = $model->getEntity($objectId);
 
@@ -172,7 +172,7 @@ class AssetController extends FormController
         // Audit Log
         $auditLogModel = $this->getModel('core.auditlog');
         \assert($auditLogModel instanceof AuditLogModel);
-        $logs          = $auditLogModel->getLogForObject('asset', $activeAsset->getId(), $activeAsset->getDateAdded());
+        $logs = $auditLogModel->getLogForObject('asset', $activeAsset->getId(), $activeAsset->getDateAdded());
 
         return $this->delegateView([
             'returnUrl'      => $action,

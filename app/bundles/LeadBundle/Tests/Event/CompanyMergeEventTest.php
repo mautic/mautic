@@ -12,9 +12,9 @@ class CompanyMergeEventTest extends TestCase
 {
     public function testConstructGettersSetters(): void
     {
-        $victor  = new Company();
-        $loser   = new Company();
-        $event   = new CompanyMergeEvent($victor, $loser);
+        $victor = new Company();
+        $loser  = new Company();
+        $event  = new CompanyMergeEvent($victor, $loser);
 
         $this->assertEquals($victor, $event->getVictor());
         $this->assertEquals($loser, $event->getLoser());

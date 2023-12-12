@@ -35,8 +35,8 @@ class CampaignSendSubscriberTest extends \PHPUnit\Framework\TestCase
         $lead = new Lead();
         $lead->setId(1);
         $this->args = [
-            'lead'            => $lead,
-            'event'           => [
+            'lead'  => $lead,
+            'event' => [
                 'type'       => 'sms.send_text_sms',
                 'properties' => ['sms' => 1],
             ],

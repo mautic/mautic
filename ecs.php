@@ -19,6 +19,7 @@ return function (ECSConfig $ecsConfig): void {
         NoUnusedImportsFixer::class,
         \Symplify\CodingStandard\Fixer\Spacing\StandaloneLinePromotedPropertyFixer::class,
         \PhpCsFixer\Fixer\ClassNotation\ClassAttributesSeparationFixer::class,
+        \PhpCsFixer\Fixer\Operator\BinaryOperatorSpacesFixer::class,
     ]);
 
     // this way you can add sets - group of rules
@@ -27,8 +28,14 @@ return function (ECSConfig $ecsConfig): void {
         // SetList::SPACES,
         // SetList::ARRAY,
         SetList::DOCBLOCK,
+        // SetList::SPACES,
         SetList::NAMESPACES,
         SetList::COMMENTS,
         // SetList::PSR_12,
+    ]);
+
+    $ecsConfig->skip([
+        \PhpCsFixer\Fixer\Operator\NotOperatorWithSuccessorSpaceFixer::class,
+        \PhpCsFixer\Fixer\Operator\ConcatSpaceFixer::class,
     ]);
 };

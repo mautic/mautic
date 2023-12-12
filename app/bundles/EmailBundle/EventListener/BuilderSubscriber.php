@@ -60,16 +60,16 @@ class BuilderSubscriber implements EventSubscriberInterface
         if ($event->abTestWinnerCriteriaRequested()) {
             // add AB Test Winner Criteria
             $openRate = [
-                'group'    => 'mautic.email.stats',
-                'label'    => 'mautic.email.abtest.criteria.open',
-                'event'    => EmailEvents::ON_DETERMINE_OPEN_RATE_WINNER,
+                'group' => 'mautic.email.stats',
+                'label' => 'mautic.email.abtest.criteria.open',
+                'event' => EmailEvents::ON_DETERMINE_OPEN_RATE_WINNER,
             ];
             $event->addAbTestWinnerCriteria('email.openrate', $openRate);
 
             $clickThrough = [
-                'group'    => 'mautic.email.stats',
-                'label'    => 'mautic.email.abtest.criteria.clickthrough',
-                'event'    => EmailEvents::ON_DETERMINE_CLICKTHROUGH_RATE_WINNER,
+                'group' => 'mautic.email.stats',
+                'label' => 'mautic.email.abtest.criteria.clickthrough',
+                'event' => EmailEvents::ON_DETERMINE_CLICKTHROUGH_RATE_WINNER,
             ];
             $event->addAbTestWinnerCriteria('email.clickthrough', $clickThrough);
         }

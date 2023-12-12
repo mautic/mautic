@@ -396,7 +396,7 @@ class InputHelper
             if (!empty($matches[0])) {
                 $from = [];
                 $to   = [];
-                foreach ($matches[0] as $key=>$match) {
+                foreach ($matches[0] as $key => $match) {
                     $from[]   = $match;
                     $startTag = '<mcondition>';
                     $endTag   = '</mcondition>';

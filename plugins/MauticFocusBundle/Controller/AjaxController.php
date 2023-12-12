@@ -24,8 +24,8 @@ class AjaxController extends CommonAjaxController
 
     public function generatePreviewAction(Request $request): JsonResponse
     {
-        $responseContent  = ['html' => '', 'style' => ''];
-        $focus            = $request->request->all();
+        $responseContent = ['html' => '', 'style' => ''];
+        $focus           = $request->request->all();
 
         if (isset($focus['focus'])) {
             $focusArray = InputHelper::_($focus['focus']);
@@ -62,7 +62,7 @@ class AjaxController extends CommonAjaxController
             $uniqueViewsCount = $cacheItemValue['uniqueViews'];
         } else {
             /** @var FocusModel $model */
-            $model   = $this->getModel('focus');
+            $model = $this->getModel('focus');
 
             $focus = $model->getEntity($focusId);
             if (null === $focus) {
@@ -107,7 +107,7 @@ class AjaxController extends CommonAjaxController
             $clickThroughCount = $cacheItem->get();
         } else {
             /** @var FocusModel $model */
-            $model   = $this->getModel('focus');
+            $model = $this->getModel('focus');
 
             $focus = $model->getEntity($focusId);
             if (null === $focus) {
@@ -124,8 +124,8 @@ class AjaxController extends CommonAjaxController
         }
 
         return $this->sendJsonResponse([
-            'success'        => 1,
-            'clickThrough'   => $clickThroughCount,
+            'success'      => 1,
+            'clickThrough' => $clickThroughCount,
         ]);
     }
 }

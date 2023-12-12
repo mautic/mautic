@@ -571,8 +571,8 @@ class CampaignController extends AbstractStandardFormController
         [$this->modifiedEvents, $this->deletedEvents, $this->campaignEvents] = $this->getSessionEvents($sessionId);
 
         // set added/updated sources
-        [$this->addedSources, $this->deletedSources, $campaignSources]     = $this->getSessionSources($sessionId, $isClone);
-        $this->connections                                                 = $this->getSessionCanvasSettings($sessionId);
+        [$this->addedSources, $this->deletedSources, $campaignSources] = $this->getSessionSources($sessionId, $isClone);
+        $this->connections                                             = $this->getSessionCanvasSettings($sessionId);
 
         if ($isPost) {
             $this->getCampaignModel()->setCanvasSettings($entity, $this->connections, false, $this->modifiedEvents);
@@ -1142,10 +1142,10 @@ class CampaignController extends AbstractStandardFormController
                 !empty($event['parent_id']) &&
                 isset($events[$event['parent_id']]) &&
                 'condition' !== $event['eventType']) {
-                $parentEvent                 = $events[$event['parent_id']];
-                $event['percent']            = $parentEvent['percent'];
-                $event['yesPercent']         = $parentEvent['yesPercent'];
-                $event['noPercent']          = $parentEvent['noPercent'];
+                $parentEvent         = $events[$event['parent_id']];
+                $event['percent']    = $parentEvent['percent'];
+                $event['yesPercent'] = $parentEvent['yesPercent'];
+                $event['noPercent']  = $parentEvent['noPercent'];
                 if ('yes' === $event['decisionPath']) {
                     $event['noPercent'] = 0;
                 } else {

@@ -223,10 +223,10 @@ class PageController extends FormController
         }
 
         // get A/B test information
-        [$parent, $children]     = $activePage->getVariants();
-        $properties              = [];
-        $variantError            = false;
-        $weight                  = 0;
+        [$parent, $children] = $activePage->getVariants();
+        $properties          = [];
+        $variantError        = false;
+        $weight              = 0;
         if (count($children)) {
             foreach ($children as $c) {
                 $variantSettings = $c->getVariantSettings();
@@ -626,7 +626,7 @@ class PageController extends FormController
                     ],
                     'RETURN_ARRAY'
                 ),
-                'security'      => $security,
+                'security' => $security,
             ],
             'contentTemplate' => '@MauticPage/Page/form.html.twig',
             'passthroughVars' => [
@@ -844,7 +844,7 @@ class PageController extends FormController
         if (empty($template)) {
             throw new \InvalidArgumentException('No template found');
         }
-        $slots    = $this->factory->getTheme($template)->getSlots('page');
+        $slots = $this->factory->getTheme($template)->getSlots('page');
 
         // merge any existing changes
         $newContent = $request->getSession()->get('mautic.pagebuilder.'.$objectId.'.content', []);

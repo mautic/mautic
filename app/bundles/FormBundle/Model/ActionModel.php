@@ -63,13 +63,13 @@ class ActionModel extends CommonFormModel
     public function getFormsIdsWithDependenciesOnSegment($segmentId): array
     {
         $filter = [
-            'force'  => [
-                ['column' => 'e.type', 'expr' => 'LIKE', 'value'=>'lead.changelist'],
+            'force' => [
+                ['column' => 'e.type', 'expr' => 'LIKE', 'value' => 'lead.changelist'],
             ],
         ];
         $entities = $this->getEntities(
             [
-                'filter'     => $filter,
+                'filter' => $filter,
             ]
         );
         $dependents = [];

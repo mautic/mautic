@@ -236,8 +236,8 @@ class FetchLeadsCommand extends Command
             } elseif (3 === count($result)) {
                 [$updated, $created, $errored] = $result;
             } else {
-                $errored                 = '?';
-                [$updated, $created]     = $result;
+                $errored             = '?';
+                [$updated, $created] = $result;
             }
             $output->writeln(
                 '<comment>'.$this->translator->trans(
@@ -262,8 +262,8 @@ class FetchLeadsCommand extends Command
                 } elseif (3 === count($result)) {
                     [$updated, $created, $errored] = $result;
                 } else {
-                    $errored                 = '?';
-                    [$updated, $created]     = $result;
+                    $errored             = '?';
+                    [$updated, $created] = $result;
                 }
                 $output->writeln(
                     '<comment>'.$this->translator->trans(

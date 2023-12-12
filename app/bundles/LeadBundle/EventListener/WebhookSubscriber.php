@@ -229,9 +229,9 @@ class WebhookSubscriber implements EventSubscriberInterface
             $this->webhookModel->queueWebhooksByType(
                 LeadEvents::LEAD_COMPANY_CHANGE,
                 [
-                    'added'    => $event->wasAdded(),
-                    'contact'  => $lead,
-                    'company'  => $event->getCompany(),
+                    'added'   => $event->wasAdded(),
+                    'contact' => $lead,
+                    'company' => $event->getCompany(),
                 ],
                 [
                 ]
@@ -244,7 +244,7 @@ class WebhookSubscriber implements EventSubscriberInterface
         $this->webhookModel->queueWebhooksByType(
             LeadEvents::COMPANY_POST_SAVE,
             [
-                'company'    => $event->getCompany(),
+                'company' => $event->getCompany(),
             ]
         );
     }
@@ -271,9 +271,9 @@ class WebhookSubscriber implements EventSubscriberInterface
             $this->webhookModel->queueWebhooksByType(
                 LeadEvents::LEAD_LIST_CHANGE,
                 [
-                    'contact'  => $contact,
-                    'segment'  => $changeEvent->getList(),
-                    'action'   => $changeEvent->wasAdded() ? 'added' : 'removed',
+                    'contact' => $contact,
+                    'segment' => $changeEvent->getList(),
+                    'action'  => $changeEvent->wasAdded() ? 'added' : 'removed',
                 ]
             );
         }

@@ -161,29 +161,29 @@ class LeadModelTest extends \PHPUnit\Framework\TestCase
     {
         parent::setUp();
 
-        $this->requestStackMock                 = $this->createMock(RequestStack::class);
-        $this->ipLookupHelperMock               = $this->createMock(IpLookupHelper::class);
-        $this->pathsHelperMock                  = $this->createMock(PathsHelper::class);
-        $this->integrationHelperkMock           = $this->createMock(IntegrationHelper::class);
-        $this->fieldModelMock                   = $this->createMock(FieldModel::class);
-        $this->listModelMock                    = $this->createMock(ListModel::class);
-        $this->formFactoryMock                  = $this->createMock(FormFactory::class);
-        $this->companyModelMock                 = $this->createMock(CompanyModel::class);
-        $this->categoryModelMock                = $this->createMock(CategoryModel::class);
-        $this->channelListHelperMock            = new ChannelListHelper($this->createMock(EventDispatcherInterface::class), $this->createMock(Translator::class));
-        $this->coreParametersHelperMock         = $this->createMock(CoreParametersHelper::class);
-        $this->emailValidatorMock               = $this->createMock(EmailValidator::class);
-        $this->userProviderMock                 = $this->createMock(UserProvider::class);
-        $this->contactTrackerMock               = $this->createMock(ContactTracker::class);
-        $this->deviceTrackerMock                = $this->createMock(DeviceTracker::class);
-        $this->ipAddressModelMock               = $this->createMock(IpAddressModel::class);
-        $this->leadRepositoryMock               = $this->createMock(LeadRepository::class);
-        $this->companyLeadRepositoryMock        = $this->createMock(CompanyLeadRepository::class);
-        $this->userHelperMock                   = $this->createMock(UserHelper::class);
-        $this->dispatcherMock                   = $this->createMock(EventDispatcherInterface::class);
-        $this->entityManagerMock                = $this->createMock(EntityManager::class);
-        $this->translator                       = $this->createMock(Translator::class);
-        $this->leadModel                        = new LeadModel(
+        $this->requestStackMock          = $this->createMock(RequestStack::class);
+        $this->ipLookupHelperMock        = $this->createMock(IpLookupHelper::class);
+        $this->pathsHelperMock           = $this->createMock(PathsHelper::class);
+        $this->integrationHelperkMock    = $this->createMock(IntegrationHelper::class);
+        $this->fieldModelMock            = $this->createMock(FieldModel::class);
+        $this->listModelMock             = $this->createMock(ListModel::class);
+        $this->formFactoryMock           = $this->createMock(FormFactory::class);
+        $this->companyModelMock          = $this->createMock(CompanyModel::class);
+        $this->categoryModelMock         = $this->createMock(CategoryModel::class);
+        $this->channelListHelperMock     = new ChannelListHelper($this->createMock(EventDispatcherInterface::class), $this->createMock(Translator::class));
+        $this->coreParametersHelperMock  = $this->createMock(CoreParametersHelper::class);
+        $this->emailValidatorMock        = $this->createMock(EmailValidator::class);
+        $this->userProviderMock          = $this->createMock(UserProvider::class);
+        $this->contactTrackerMock        = $this->createMock(ContactTracker::class);
+        $this->deviceTrackerMock         = $this->createMock(DeviceTracker::class);
+        $this->ipAddressModelMock        = $this->createMock(IpAddressModel::class);
+        $this->leadRepositoryMock        = $this->createMock(LeadRepository::class);
+        $this->companyLeadRepositoryMock = $this->createMock(CompanyLeadRepository::class);
+        $this->userHelperMock            = $this->createMock(UserHelper::class);
+        $this->dispatcherMock            = $this->createMock(EventDispatcherInterface::class);
+        $this->entityManagerMock         = $this->createMock(EntityManager::class);
+        $this->translator                = $this->createMock(Translator::class);
+        $this->leadModel                 = new LeadModel(
             $this->requestStackMock,
             $this->ipLookupHelperMock,
             $this->pathsHelperMock,
@@ -433,8 +433,8 @@ class LeadModelTest extends \PHPUnit\Framework\TestCase
      */
     public function testImportWillSetLeadToLeadEventLogWhenLeadSaveSucceed(): void
     {
-        $leadEventLog  = new LeadEventLog();
-        $lead          = new Lead();
+        $leadEventLog = new LeadEventLog();
+        $lead         = new Lead();
 
         $mockUserModel = $this->getMockBuilder(UserHelper::class)
             ->disableOriginalConstructor()
@@ -509,8 +509,8 @@ class LeadModelTest extends \PHPUnit\Framework\TestCase
      */
     public function testImportMatchLeadById(): void
     {
-        $leadEventLog  = new LeadEventLog();
-        $lead          = new Lead();
+        $leadEventLog = new LeadEventLog();
+        $lead         = new Lead();
         $lead->setId(21);
 
         $mockUserModel = $this->getMockBuilder(UserHelper::class)

@@ -52,7 +52,7 @@ class CommonController extends AbstractController implements MauticController
         private ?RequestStack $requestStack,
         protected ?CorePermissions $security
     ) {
-        $this->user                 = $userHelper->getUser();
+        $this->user = $userHelper->getUser();
     }
 
     protected function getCurrentRequest(): Request

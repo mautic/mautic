@@ -12,7 +12,7 @@ class ImportValidateEvent extends Event
 {
     private ?int $ownerId = null;
 
-    private ?int $list    = null;
+    private ?int $list = null;
 
     /**
      * @var mixed[]

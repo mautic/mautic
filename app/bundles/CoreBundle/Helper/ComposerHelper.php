@@ -76,8 +76,8 @@ class ComposerHelper
              * as well.
              */
             $input = [
-                'command'     => 'update',
-                'packages'    => [$packageName],
+                'command'  => 'update',
+                'packages' => [$packageName],
             ];
 
             if (true === $dryRun) {
@@ -122,7 +122,7 @@ class ComposerHelper
     public function update(?string $packageName = null, bool $dryRun = false): ConsoleOutput
     {
         $input = [
-            'command'  => 'update',
+            'command' => 'update',
         ];
 
         if (!empty($packageName)) {

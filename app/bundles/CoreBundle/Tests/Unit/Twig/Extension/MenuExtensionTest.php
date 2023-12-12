@@ -38,9 +38,9 @@ class MenuExtensionTest extends AbstractMauticTestCase
         $menu->addChild('First item', ['uri' => '/']);
         $menu->addChild('Second item', ['uri' => '/', 'attributes' => ['class' => 'test-class']]);
 
-        $matcher        = null;
-        $options        = [];
-        $extraClasses   = '';
+        $matcher      = null;
+        $options      = [];
+        $extraClasses = '';
 
         $itemFirst  = $menu->getChild('First item');
         $itemSecond = $menu->getChild('Second item');

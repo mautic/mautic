@@ -18,7 +18,7 @@ class AjaxController extends CommonAjaxController
         $messageQueueId = (int) $request->request->get('channelId');
         $queueModel     = $this->getModel('channel.queue');
         \assert($queueModel instanceof MessageQueueModel);
-        $queuedMessage  = $queueModel->getEntity($messageQueueId);
+        $queuedMessage = $queueModel->getEntity($messageQueueId);
         if ($queuedMessage) {
             $queuedMessage->setStatus('cancelled');
             $queueModel->saveEntity($queuedMessage);

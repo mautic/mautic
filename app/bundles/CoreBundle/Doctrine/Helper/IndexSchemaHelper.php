@@ -52,7 +52,7 @@ class IndexSchemaHelper
         protected Connection $db,
         protected $prefix
     ) {
-        $this->sm     = $this->db->getSchemaManager();
+        $this->sm = $this->db->getSchemaManager();
     }
 
     /**

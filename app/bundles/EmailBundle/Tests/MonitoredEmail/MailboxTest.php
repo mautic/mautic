@@ -131,12 +131,12 @@ class MailboxTest extends \PHPUnit\Framework\TestCase
         // will not invoke undefined index error or mkdir error
         $config = [
             'general' => [
-                'address'         => 'foo@bar.com',
-                'host'            => 'imap.bar.com',
-                'port'            => '993',
-                'encryption'      => '/ssl',
-                'user'            => 'foo@bar.com',
-                'password'        => 'topsecret',
+                'address'    => 'foo@bar.com',
+                'host'       => 'imap.bar.com',
+                'port'       => '993',
+                'encryption' => '/ssl',
+                'user'       => 'foo@bar.com',
+                'password'   => 'topsecret',
             ],
         ];
 

@@ -31,7 +31,7 @@ class TokenPersistence implements TokenPersistenceInterface
      */
     public function restoreToken(TokenInterface $token): TokenInterface
     {
-        $apiKeys               = $this->getIntegration()->getApiKeys();
+        $apiKeys = $this->getIntegration()->getApiKeys();
         $apiKeys['expires_at'] ??= null;
 
         return new IntegrationToken(

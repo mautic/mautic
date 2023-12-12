@@ -1,7 +1,7 @@
 <?php
 
 return [
-    'routes'   => [
+    'routes' => [
         'main' => [
             'mautic_core_ajax' => [
                 'path'       => '/ajax',
@@ -9,7 +9,7 @@ return [
             ],
         ],
     ],
-    'menu'     => [
+    'menu' => [
         'main' => [
             'mautic.core.components' => [
                 'id'        => 'mautic_components_root',
@@ -19,7 +19,7 @@ return [
         ],
     ],
     'services' => [
-        'helpers'  => [
+        'helpers' => [
             'mautic.helper.bundle' => [
                 'class'     => \Mautic\CoreBundle\Helper\BundleHelper::class,
                 'arguments' => [
@@ -28,7 +28,7 @@ return [
                 ],
             ],
         ],
-        'other'    => [
+        'other' => [
             'mautic.http.client' => [
                 'class' => GuzzleHttp\Client::class,
             ],

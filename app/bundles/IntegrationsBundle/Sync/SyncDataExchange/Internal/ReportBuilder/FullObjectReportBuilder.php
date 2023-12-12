@@ -110,7 +110,7 @@ class FullObjectReportBuilder
                 !empty($object['date_modified']) ? $object['date_modified'] : $object['date_added'],
                 new \DateTimeZone('UTC')
             );
-            $reportObjectDAO  = new ReportObjectDAO($requestedObjectDAO->getObject(), $object['id'], $modifiedDateTime);
+            $reportObjectDAO = new ReportObjectDAO($requestedObjectDAO->getObject(), $object['id'], $modifiedDateTime);
             $syncReport->addObject($reportObjectDAO);
 
             if (isset($event)) {

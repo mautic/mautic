@@ -114,7 +114,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
         LoggerInterface $mauticLogger,
         CoreParametersHelper $coreParametersHelper
     ) {
-        $this->connection               = $connection;
+        $this->connection = $connection;
 
         parent::__construct($em, $security, $dispatcher, $router, $translator, $userHelper, $mauticLogger, $coreParametersHelper);
     }
@@ -1520,7 +1520,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
             return false;
         }
 
-        $mailer            = $this->mailHelper->getMailer();
+        $mailer = $this->mailHelper->getMailer();
         if (!isset($lead['companies'])) {
             $lead['companies'] = $this->companyModel->getRepository()->getCompaniesByLeadId($lead['id']);
         }
@@ -1783,7 +1783,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
             $format = '%h %p';
         }
 
-        $query      = new ChartQuery($this->em->getConnection(), $dateFrom, $dateTo);
+        $query = new ChartQuery($this->em->getConnection(), $dateFrom, $dateTo);
 
         $q                     = $query->prepareTimeDataQuery('email_stats', $column, $filter);
         $columnWithTimezone    = 't.'.$column;
@@ -1812,7 +1812,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
             $percentage = round(($percentage / $total) * 100, 1);
         });
 
-        $chart->setDataset($this->translator->trans('mautic.widget.emails.best.hours.reads_total', ['%reads%'=>$total]), $counts);
+        $chart->setDataset($this->translator->trans('mautic.widget.emails.best.hours.reads_total', ['%reads%' => $total]), $counts);
 
         return $chart->render();
     }
@@ -2216,9 +2216,9 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
 
     public function getEmailsIdsWithDependenciesOnSegment($segmentId): array
     {
-        $entities =  $this->getEntities(
+        $entities = $this->getEntities(
             [
-                'filter'         => [
+                'filter' => [
                     'force' => [
                         [
                             'column' => 'l.id',

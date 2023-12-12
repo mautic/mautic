@@ -482,8 +482,8 @@ class LeadControllerTest extends MauticMysqlTestCase
 
     public function testEmailSendToContactSync(): void
     {
-        $contact     = $this->createContact('contact@an.email');
-        $replyTo     = 'reply@mautic-community.test';
+        $contact = $this->createContact('contact@an.email');
+        $replyTo = 'reply@mautic-community.test';
 
         $this->client->request(Request::METHOD_GET, "/s/contacts/email/{$contact->getId()}");
 
@@ -807,7 +807,7 @@ class LeadControllerTest extends MauticMysqlTestCase
         $this->em->flush();
 
         // verify that all companies are attached to contact
-        $companies  = $this->getCompanyLeads($contact->getId());
+        $companies = $this->getCompanyLeads($contact->getId());
         Assert::assertCount($companyLimit, $companies);
 
         $crawler       = $this->client->request(Request::METHOD_GET, '/s/contacts/edit/'.$contact->getId());

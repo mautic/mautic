@@ -140,7 +140,7 @@ class ChartQuery extends AbstractChart
                 /** @var \DateTime $dateFrom */
                 $dateFrom = clone $this->dateFrom;
                 /** @var \DateTime $dateTo */
-                $dateTo   = clone $this->dateTo;
+                $dateTo = clone $this->dateTo;
                 if ($this->isTimeUnit) {
                     $dateFrom->setTimeZone(new \DateTimeZone('UTC'));
                 }
@@ -286,7 +286,7 @@ class ChartQuery extends AbstractChart
      */
     public function loadAndBuildTimeData($query): array
     {
-        $rawData =  $query->executeQuery()->fetchAllAssociative();
+        $rawData = $query->executeQuery()->fetchAllAssociative();
 
         return $this->completeTimeData($rawData);
     }
@@ -301,8 +301,8 @@ class ChartQuery extends AbstractChart
         $oneUnit       = $this->getUnitInterval();
         $limit         = $this->countAmountFromDateRange();
         /** @var \DateTime $previousDate */
-        $previousDate  = clone $this->dateFrom;
-        $utcTz         = new \DateTimeZone('UTC');
+        $previousDate = clone $this->dateFrom;
+        $utcTz        = new \DateTimeZone('UTC');
 
         // Do not let hours to mess with date comparisions.
         $previousDate->setTime(0, 0, 0);
@@ -335,8 +335,8 @@ class ChartQuery extends AbstractChart
                          * format, so we transform it into d-M-Y.
                          */
                         if ('W' === $this->unit && isset($item['date'])) {
-                            [$year, $week]     = explode(' ', $item['date']);
-                            $newDate           = new \DateTime();
+                            [$year, $week] = explode(' ', $item['date']);
+                            $newDate       = new \DateTime();
                             $newDate->setISODate($year, $week);
                             $item['date'] = $newDate->format('d-M-Y');
                             unset($newDate);

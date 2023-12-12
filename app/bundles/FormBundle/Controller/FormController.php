@@ -133,7 +133,7 @@ class FormController extends CommonFormController
 
         return $this->delegateView(
             [
-                'viewParameters'  => [
+                'viewParameters' => [
                     'searchValue' => $search,
                     'items'       => $forms,
                     'totalItems'  => $count,
@@ -733,9 +733,9 @@ class FormController extends CommonFormController
             $this->alreadyMappedFieldCollector->removeAllForForm($objectId);
 
             // load existing fields into session
-            $modifiedFields   = [];
-            $existingFields   = $entity->getFields()->toArray();
-            $submitButton     = false;
+            $modifiedFields = [];
+            $existingFields = $entity->getFields()->toArray();
+            $submitButton   = false;
 
             foreach ($existingFields as $formField) {
                 // Check to see if the field still exists
@@ -972,7 +972,7 @@ class FormController extends CommonFormController
         $viewParams['template'] = $template;
 
         if (!empty($template)) {
-            $logicalName     = $themeHelper->checkForTwigTemplate('@themes/'.$template.'/html/form.html.twig');
+            $logicalName = $themeHelper->checkForTwigTemplate('@themes/'.$template.'/html/form.html.twig');
 
             $slotsHelper->set('pageTitle', $form->getName());
 
@@ -1199,7 +1199,7 @@ class FormController extends CommonFormController
                 'type'    => 'notice',
                 'msg'     => 'mautic.form.notice.batch_html_generated',
                 'msgVars' => [
-                    '%count%'     => $count,
+                    '%count%' => $count,
                 ],
             ];
         } // else don't do anything

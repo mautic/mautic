@@ -39,8 +39,8 @@ class Allowlist
         }
 
         if (!empty($this->config->getAllowListUrl())) {
-            $response  = $this->httpClient->request('GET', $this->config->getAllowlistUrl());
-            $body      = (string) $response->getBody();
+            $response = $this->httpClient->request('GET', $this->config->getAllowlistUrl());
+            $body     = (string) $response->getBody();
 
             if ($response->getStatusCode() >= 300) {
                 throw new ApiException($body, $response->getStatusCode());

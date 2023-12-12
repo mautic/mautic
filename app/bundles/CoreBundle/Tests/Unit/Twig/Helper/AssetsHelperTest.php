@@ -134,8 +134,8 @@ class AssetsHelperTest extends TestCase
 
     public function testGetCKEditorScripts(): void
     {
-        $secretKey   = 'mautic';
-        $version     = 1;
+        $secretKey = 'mautic';
+        $version   = 1;
         $this->assetHelper->setVersion($secretKey, $version);
         $version = substr(hash('sha1', $secretKey.$version), 0, 8);
 

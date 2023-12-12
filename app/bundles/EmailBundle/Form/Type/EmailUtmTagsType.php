@@ -60,8 +60,8 @@ class EmailUtmTagsType extends AbstractType
             'attr'       => [
                 'class' => 'form-control',
             ],
-            'required'          => false,
-            'constraints'       => new Length(['max' => ClassMetadataBuilder::MAX_VARCHAR_INDEXED_LENGTH]),
+            'required'    => false,
+            'constraints' => new Length(['max' => ClassMetadataBuilder::MAX_VARCHAR_INDEXED_LENGTH]),
             ]
         );
     }

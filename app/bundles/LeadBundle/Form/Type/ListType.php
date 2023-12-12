@@ -97,8 +97,8 @@ class ListType extends AbstractType
             'isGlobal',
             YesNoButtonGroupType::class,
             [
-                'label'      => 'mautic.lead.list.form.isglobal',
-                'attr'       => [
+                'label' => 'mautic.lead.list.form.isglobal',
+                'attr'  => [
                     'tooltip' => 'mautic.lead.list.form.isglobal.tooltip',
                 ],
             ]
@@ -108,8 +108,8 @@ class ListType extends AbstractType
             'isPreferenceCenter',
             YesNoButtonGroupType::class,
             [
-                'label'      => 'mautic.lead.list.form.isPreferenceCenter',
-                'attr'       => [
+                'label' => 'mautic.lead.list.form.isPreferenceCenter',
+                'attr'  => [
                     'tooltip' => 'mautic.lead.list.form.isPreferenceCenter.tooltip',
                 ],
             ]

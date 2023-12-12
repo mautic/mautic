@@ -10,6 +10,6 @@ Learn more about Zapier integration in the <a href="https://mautic.org/docs/en/p
 Use these predefined Zap templates as a starting point:
 <div id="zaps"></div>
 <script src="https://zapier.com/apps/embed/widget.js?services=mautic&html_id=zaps"></script>',
-    'version'     => '1.0',
-    'author'      => 'Mautic',
+    'version' => '1.0',
+    'author'  => 'Mautic',
 ];

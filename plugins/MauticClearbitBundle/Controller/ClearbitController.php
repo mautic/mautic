@@ -88,7 +88,7 @@ class ClearbitController extends FormController
                     $this->addFlashMessage(
                         'mautic.lead.batch_leads_affected',
                         [
-                            '%count%'     => 1,
+                            '%count%' => 1,
                         ]
                     );
                 } catch (\Exception $ex) {
@@ -249,7 +249,7 @@ class ClearbitController extends FormController
                     $this->addFlashMessage(
                         'mautic.lead.batch_leads_affected',
                         [
-                            '%count%'     => $count,
+                            '%count%' => $count,
                         ]
                     );
                 }
@@ -341,7 +341,7 @@ class ClearbitController extends FormController
                     $this->addFlashMessage(
                         'mautic.company.batch_companies_affected',
                         [
-                            '%count%'     => 1,
+                            '%count%' => 1,
                         ]
                     );
                 } catch (\Exception $ex) {
@@ -501,7 +501,7 @@ class ClearbitController extends FormController
                     $this->addFlashMessage(
                         'mautic.company.batch_companies_affected',
                         [
-                            '%count%'     => $count,
+                            '%count%' => $count,
                         ]
                     );
                 }

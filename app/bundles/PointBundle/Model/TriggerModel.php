@@ -113,11 +113,11 @@ class TriggerModel extends CommonFormModel
 
         // should we trigger for existing leads?
         if ($entity->getTriggerExistingLeads() && $entity->isPublished()) {
-            $events      = $entity->getEvents();
-            $repo        = $this->getEventRepository();
-            $persist     = [];
-            $ipAddress   = $this->ipLookupHelper->getIpAddress();
-            $pointGroup  = $entity->getGroup();
+            $events     = $entity->getEvents();
+            $repo       = $this->getEventRepository();
+            $persist    = [];
+            $ipAddress  = $this->ipLookupHelper->getIpAddress();
+            $pointGroup = $entity->getGroup();
 
             /** @var LeadRepository $leadRepository */
             $leadRepository = $this->em->getRepository(Lead::class);
@@ -402,10 +402,10 @@ class TriggerModel extends CommonFormModel
 
         // find all published triggers that is applicable to this points
         /** @var \Mautic\PointBundle\Entity\TriggerEventRepository $repo */
-        $repo         = $this->getEventRepository();
-        $events       = $repo->getPublishedByPointTotal($points);
-        $groupEvents  = $repo->getPublishedByGroupScore($lead->getGroupScores());
-        $events       = array_merge($events, $groupEvents);
+        $repo        = $this->getEventRepository();
+        $events      = $repo->getPublishedByPointTotal($points);
+        $groupEvents = $repo->getPublishedByGroupScore($lead->getGroupScores());
+        $events      = array_merge($events, $groupEvents);
 
         if (!empty($events)) {
             // get a list of actions that has already been applied to this lead

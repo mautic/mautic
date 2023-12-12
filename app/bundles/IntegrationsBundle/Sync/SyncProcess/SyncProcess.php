@@ -247,7 +247,7 @@ class SyncProcess
             $mauticObjectIds->addObjectId($object->getObject(), $object->getObjectId());
         }
 
-        $integration  = $this->mappingManualDAO->getIntegration();
+        $integration = $this->mappingManualDAO->getIntegration();
 
         return new InputOptionsDAO([
             'integration'           => $integration,

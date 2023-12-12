@@ -82,7 +82,7 @@ class EventCollector
     private function buildEventList(): void
     {
         // build them
-        $event  = new CampaignBuilderEvent($this->translator);
+        $event = new CampaignBuilderEvent($this->translator);
         $this->dispatcher->dispatch($event, CampaignEvents::CAMPAIGN_ON_BUILD);
 
         $this->eventsArray[Event::TYPE_ACTION]    = $event->getActions();

@@ -26,9 +26,9 @@ class CampaignEventPointType extends AbstractType
             'operator',
             ChoiceType::class,
             [
-                'label'             => 'mautic.lead.campaign.event.point_operator',
-                'multiple'          => false,
-                'choices'           => $this->typeOperatorProvider->getOperatorsIncluding([
+                'label'    => 'mautic.lead.campaign.event.point_operator',
+                'multiple' => false,
+                'choices'  => $this->typeOperatorProvider->getOperatorsIncluding([
                     OperatorOptions::EQUAL_TO,
                     OperatorOptions::NOT_EQUAL_TO,
                     OperatorOptions::GREATER_THAN,
@@ -54,15 +54,15 @@ class CampaignEventPointType extends AbstractType
         );
 
         $builder->add('group', GroupListType::class, [
-            'label'            => 'mautic.lead.campaign.event.point_group',
-            'label_attr'       => ['class' => 'control-label'],
-            'attr'             => [
-                'class'    => 'form-control',
-                'tooltip'  => 'mautic.lead.campaign.event.point_group.help',
+            'label'      => 'mautic.lead.campaign.event.point_group',
+            'label_attr' => ['class' => 'control-label'],
+            'attr'       => [
+                'class'   => 'form-control',
+                'tooltip' => 'mautic.lead.campaign.event.point_group.help',
             ],
-            'required'         => false,
-            'by_reference'     => false,
-            'return_entity'    => false,
+            'required'      => false,
+            'by_reference'  => false,
+            'return_entity' => false,
         ]);
     }
 }

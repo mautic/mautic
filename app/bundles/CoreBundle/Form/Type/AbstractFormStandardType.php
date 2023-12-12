@@ -133,7 +133,7 @@ abstract class AbstractFormStandardType extends AbstractType
                     'attr'       => [
                         'class' => 'form-control',
                     ],
-                    'required'   => false,
+                    'required' => false,
                 ]
             );
         }

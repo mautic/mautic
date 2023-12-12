@@ -91,8 +91,8 @@ class DeviceTrackerTest extends \PHPUnit\Framework\TestCase
 
     public function testDeviceCreatedByUserAgent(): void
     {
-        $lead    = new Lead();
-        $device  = new LeadDevice();
+        $lead   = new Lead();
+        $device = new LeadDevice();
         $device->setDeviceBrand('apple');
 
         $this->deviceTrackingService->expects($this->once())

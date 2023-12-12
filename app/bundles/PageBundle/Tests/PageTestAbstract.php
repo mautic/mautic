@@ -33,7 +33,7 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 class PageTestAbstract extends TestCase
 {
-    protected static $mockId   = 123;
+    protected static $mockId = 123;
 
     protected static $mockName = 'Mock test name';
 

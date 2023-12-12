@@ -18,11 +18,11 @@ class TwitterType extends AbstractType
                 'mautic.integration.Twitter.share.layout.vertical'   => 'vertical',
                 'mautic.integration.Twitter.share.layout.none'       => 'none',
             ],
-            'label'             => 'mautic.integration.Twitter.share.layout',
-            'required'          => false,
-            'placeholder'       => false,
-            'label_attr'        => ['class' => 'control-label'],
-            'attr'              => ['class' => 'form-control'],
+            'label'       => 'mautic.integration.Twitter.share.layout',
+            'required'    => false,
+            'placeholder' => false,
+            'label_attr'  => ['class' => 'control-label'],
+            'attr'        => ['class' => 'form-control'],
         ]);
 
         $builder->add('text', TextType::class, [

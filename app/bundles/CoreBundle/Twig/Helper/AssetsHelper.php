@@ -526,7 +526,7 @@ final class AssetsHelper
      */
     private function getCKEditorScripts(): array
     {
-        $base    = 'media/libraries/ckeditor/';
+        $base = 'media/libraries/ckeditor/';
 
         return [
             $base.'ckeditor.js?v'.$this->version,
@@ -688,8 +688,8 @@ final class AssetsHelper
      */
     public function getCountryFlag($country, $urlOnly = true, $class = '')
     {
-        $country  = ucwords(str_replace(' ', '-', $country));
-        $flagImg  = $this->getOverridableUrl('images/flags/'.$country.'.png');
+        $country = ucwords(str_replace(' ', '-', $country));
+        $flagImg = $this->getOverridableUrl('images/flags/'.$country.'.png');
 
         if ($urlOnly) {
             return $flagImg;

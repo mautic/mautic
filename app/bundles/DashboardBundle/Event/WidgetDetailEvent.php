@@ -30,7 +30,7 @@ class WidgetDetailEvent extends CommonEvent
 
     protected float $startTime;
 
-    protected $loadTime  = 0;
+    protected $loadTime = 0;
 
     /**
      * @var CorePermissions
@@ -40,7 +40,7 @@ class WidgetDetailEvent extends CommonEvent
     public function __construct(
         protected TranslatorInterface $translator
     ) {
-        $this->startTime  = microtime(true);
+        $this->startTime = microtime(true);
     }
 
     /**

@@ -69,11 +69,11 @@ class FieldFunctionalTest extends MauticMysqlTestCase
         $inputLabel->setAttribute('type', 'text');
 
         $inputLabel->setAttribute('name', 'leadfield[properties][list][0][label]');
-        $inputValue  = $domDocument->createElement('input');
+        $inputValue = $domDocument->createElement('input');
         $inputValue->setAttribute('type', 'text');
         $inputValue->setAttribute('name', 'leadfield[properties][list][0][value]');
 
-        $form        = $crawler->selectButton('Save')->form();
+        $form = $crawler->selectButton('Save')->form();
         $form->set(new InputFormField($inputLabel));
         $form->set(new InputFormField($inputValue));
 

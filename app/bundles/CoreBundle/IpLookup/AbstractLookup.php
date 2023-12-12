@@ -7,25 +7,25 @@ use Psr\Log\LoggerInterface;
 
 abstract class AbstractLookup
 {
-    public $city         = '';
+    public $city = '';
 
-    public $region       = '';
+    public $region = '';
 
-    public $zipcode      = '';
+    public $zipcode = '';
 
-    public $country      = '';
+    public $country = '';
 
-    public $latitude     = '';
+    public $latitude = '';
 
-    public $longitude    = '';
+    public $longitude = '';
 
-    public $isp          = '';
+    public $isp = '';
 
     public $organization = '';
 
-    public $timezone     = '';
+    public $timezone = '';
 
-    public $extra        = '';
+    public $extra = '';
 
     /**
      * @var string IP Address

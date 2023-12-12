@@ -121,7 +121,7 @@ class GrapesJsBuilderModelTest extends \PHPUnit\Framework\TestCase
                         'grapesjsbuilder' => [
                             'customMjml' => '</mjml>',
                         ],
-                        'emailform'       => [
+                        'emailform' => [
                             'customHtml' => '</html>',
                         ],
                     ]
@@ -129,7 +129,7 @@ class GrapesJsBuilderModelTest extends \PHPUnit\Framework\TestCase
             }
         };
 
-        $emailRepository           = new class() extends EmailRepository {
+        $emailRepository = new class() extends EmailRepository {
             public int $saveEntityCallCount = 0;
 
             public function __construct()

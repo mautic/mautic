@@ -21,7 +21,7 @@ class ExportHelper
 {
     public const EXPORT_TYPE_EXCEL = 'xlsx';
 
-    public const EXPORT_TYPE_CSV   = 'csv';
+    public const EXPORT_TYPE_CSV = 'csv';
 
     public function __construct(
         private TranslatorInterface $translator,

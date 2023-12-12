@@ -20,7 +20,7 @@ class RequestDAO
         int $syncIteration,
         private InputOptionsDAO $inputOptionsDAO
     ) {
-        $this->syncIteration     = (int) $syncIteration;
+        $this->syncIteration = (int) $syncIteration;
     }
 
     /**

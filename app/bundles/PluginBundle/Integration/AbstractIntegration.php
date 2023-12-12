@@ -55,15 +55,15 @@ use Symfony\Contracts\Translation\TranslatorInterface;
  */
 abstract class AbstractIntegration implements UnifiedIntegrationInterface
 {
-    public const FIELD_TYPE_STRING   = 'string';
+    public const FIELD_TYPE_STRING = 'string';
 
-    public const FIELD_TYPE_BOOL     = 'boolean';
+    public const FIELD_TYPE_BOOL = 'boolean';
 
-    public const FIELD_TYPE_NUMBER   = 'number';
+    public const FIELD_TYPE_NUMBER = 'number';
 
     public const FIELD_TYPE_DATETIME = 'datetime';
 
-    public const FIELD_TYPE_DATE     = 'date';
+    public const FIELD_TYPE_DATE = 'date';
 
     protected bool $coreIntegration = false;
 
@@ -84,19 +84,19 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
      */
     protected ?\Doctrine\ORM\Tools\Pagination\Paginator $adminUsers = null;
 
-    protected array $notifications              = [];
+    protected array $notifications = [];
 
-    protected ?string $lastIntegrationError     = null;
+    protected ?string $lastIntegrationError = null;
 
-    protected array $mauticDuplicates           = [];
+    protected array $mauticDuplicates = [];
 
-    protected array $salesforceIdMapping        = [];
+    protected array $salesforceIdMapping = [];
 
-    protected array $deleteIntegrationEntities  = [];
+    protected array $deleteIntegrationEntities = [];
 
     protected array $persistIntegrationEntities = [];
 
-    protected array  $commandParameters         = [];
+    protected array  $commandParameters = [];
 
     public function __construct(
         protected EventDispatcherInterface $dispatcher,
@@ -116,9 +116,9 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
         protected IntegrationEntityModel $integrationEntityModel,
         protected DoNotContactModel $doNotContact
     ) {
-        $this->cache                  = $cacheStorageHelper->getCache($this->getName());
-        $this->session                = (!defined('IN_MAUTIC_CONSOLE')) ? $session : null;
-        $this->request                = (!defined('IN_MAUTIC_CONSOLE')) ? $requestStack->getCurrentRequest() : null;
+        $this->cache   = $cacheStorageHelper->getCache($this->getName());
+        $this->session = (!defined('IN_MAUTIC_CONSOLE')) ? $session : null;
+        $this->request = (!defined('IN_MAUTIC_CONSOLE')) ? $requestStack->getCurrentRequest() : null;
     }
 
     public function setCommandParameters(array $params): void
@@ -759,9 +759,9 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
             foreach ($parseHeaders as $key => $value) {
                 // Ignore string keys which assume it is already parsed and avoids splitting up a value that includes colons (such as a date/time)
                 if (!is_string($key) && str_contains($value, ':')) {
-                    [$key, $value]     = explode(':', $value);
-                    $key               = trim($key);
-                    $value             = trim($value);
+                    [$key, $value] = explode(':', $value);
+                    $key           = trim($key);
+                    $value         = trim($value);
                 }
 
                 $headers[$key] = $value;

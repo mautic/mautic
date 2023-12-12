@@ -61,12 +61,12 @@ class ListModelTest extends TestCase
         $entityManagerMock->method('getRepository')
             ->willReturn($this->leadListRepositoryMock);
 
-        $coreParametersHelperMock              = $this->createMock(CoreParametersHelper::class);
-        $this->contactSegmentServiceMock       = $this->createMock(ContactSegmentService::class);
-        $segmentChartQueryFactoryMock          = $this->createMock(SegmentChartQueryFactory::class);
-        $this->segmentCountCacheHelper         = $this->createMock(SegmentCountCacheHelper::class);
-        $requestStackMock                      = $this->createMock(RequestStack::class);
-        $categoryModelMock                     = $this->createMock(CategoryModel::class);
+        $coreParametersHelperMock        = $this->createMock(CoreParametersHelper::class);
+        $this->contactSegmentServiceMock = $this->createMock(ContactSegmentService::class);
+        $segmentChartQueryFactoryMock    = $this->createMock(SegmentChartQueryFactory::class);
+        $this->segmentCountCacheHelper   = $this->createMock(SegmentCountCacheHelper::class);
+        $requestStackMock                = $this->createMock(RequestStack::class);
+        $categoryModelMock               = $this->createMock(CategoryModel::class);
 
         $this->model = new ListModel(
             $categoryModelMock,

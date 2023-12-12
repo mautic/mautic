@@ -19,7 +19,7 @@ class DateRelativeIntervalTest extends \PHPUnit\Framework\TestCase
         $dateDecorator    = $this->createMock(DateDecorator::class);
         $timezoneResolver = $this->createMock(TimezoneResolver::class);
 
-        $filter        = [
+        $filter = [
             'operator' => '=',
         ];
         $contactSegmentFilterCrate = new ContactSegmentFilterCrate($filter);
@@ -38,7 +38,7 @@ class DateRelativeIntervalTest extends \PHPUnit\Framework\TestCase
         $dateDecorator    = $this->createMock(DateDecorator::class);
         $timezoneResolver = $this->createMock(TimezoneResolver::class);
 
-        $filter        = [
+        $filter = [
             'operator' => '!=',
         ];
         $contactSegmentFilterCrate = new ContactSegmentFilterCrate($filter);
@@ -61,7 +61,7 @@ class DateRelativeIntervalTest extends \PHPUnit\Framework\TestCase
             ->with()
             ->willReturn('==<<'); // Test that value is really returned from Decorator
 
-        $filter        = [
+        $filter = [
             'operator' => '=<',
         ];
         $contactSegmentFilterCrate = new ContactSegmentFilterCrate($filter);

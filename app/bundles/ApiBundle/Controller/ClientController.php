@@ -58,13 +58,13 @@ class ClientController extends FormController
             return $this->accessDenied();
         }
 
-        $pageHelper= $pageHelperFactory->make('mautic.client', $page);
-        $limit     = $pageHelper->getLimit();
-        $start     = $pageHelper->getStart();
-        $orderBy   = $request->getSession()->get('mautic.client.orderby', 'c.name');
-        $orderByDir= $request->getSession()->get('mautic.client.orderbydir', 'ASC');
-        $filter    = $request->get('search', $request->getSession()->get('mautic.client.filter', ''));
-        $apiMode   = $this->factory->getRequest()->get('api_mode', $request->getSession()->get('mautic.client.filter.api_mode', 'oauth2'));
+        $pageHelper = $pageHelperFactory->make('mautic.client', $page);
+        $limit      = $pageHelper->getLimit();
+        $start      = $pageHelper->getStart();
+        $orderBy    = $request->getSession()->get('mautic.client.orderby', 'c.name');
+        $orderByDir = $request->getSession()->get('mautic.client.orderbydir', 'ASC');
+        $filter     = $request->get('search', $request->getSession()->get('mautic.client.filter', ''));
+        $apiMode    = $this->factory->getRequest()->get('api_mode', $request->getSession()->get('mautic.client.filter.api_mode', 'oauth2'));
         $request->getSession()->set('mautic.client.filter.api_mode', $apiMode);
         $request->getSession()->set('mautic.client.filter', $filter);
 
@@ -112,7 +112,7 @@ class ClientController extends FormController
 
         return $this->delegateView(
             [
-                'viewParameters'  => [
+                'viewParameters' => [
                     'items'       => $clients,
                     'page'        => $page,
                     'limit'       => $limit,

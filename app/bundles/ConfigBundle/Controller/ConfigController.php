@@ -66,7 +66,7 @@ class ConfigController extends FormController
                 $isValid = false;
                 if ($isWritable && $isValid = $this->isFormValid($form)) {
                     // Bind request to the form
-                    $post     = $request->request;
+                    $post = $request->request;
 
                     /** @var mixed[] $formData */
                     $formData = $form->getData();

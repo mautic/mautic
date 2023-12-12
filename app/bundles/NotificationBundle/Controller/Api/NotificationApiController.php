@@ -41,7 +41,7 @@ class NotificationApiController extends CommonApiController
         CoreParametersHelper $coreParametersHelper,
         MauticFactory $factory
     ) {
-        $notificationModel    = $modelFactory->getModel('notification');
+        $notificationModel = $modelFactory->getModel('notification');
         \assert($notificationModel instanceof NotificationModel);
 
         $this->model           = $notificationModel;

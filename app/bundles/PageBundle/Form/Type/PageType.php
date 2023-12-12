@@ -220,7 +220,7 @@ class PageType extends AbstractType
                     'class' => 'form-control',
                     'rows'  => '8',
                 ],
-                'required'   => false,
+                'required' => false,
             ]
         );
 
@@ -234,7 +234,7 @@ class PageType extends AbstractType
                     'class' => 'form-control',
                     'rows'  => '8',
                 ],
-                'required'   => false,
+                'required' => false,
             ]
         );
 
@@ -305,7 +305,7 @@ class PageType extends AbstractType
                     'class'   => 'form-control',
                     'tooltip' => 'mautic.page.form.language.help',
                 ],
-                'required'   => true,
+                'required' => true,
             ]
         );
 

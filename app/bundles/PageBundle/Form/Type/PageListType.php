@@ -47,12 +47,12 @@ class PageListType extends AbstractType
 
                     return $choices;
                 },
-                'placeholder'       => false,
-                'expanded'          => false,
-                'multiple'          => true,
-                'required'          => false,
-                'top_level'         => 'variant',
-                'ignore_ids'        => [],
+                'placeholder' => false,
+                'expanded'    => false,
+                'multiple'    => true,
+                'required'    => false,
+                'top_level'   => 'variant',
+                'ignore_ids'  => [],
                 ]
         );
 

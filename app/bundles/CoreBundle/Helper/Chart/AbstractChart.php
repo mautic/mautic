@@ -134,7 +134,7 @@ abstract class AbstractChart
         /** @var \DateTime $dateFrom */
         $this->dateFrom = clone $dateFrom;
         /** @var \DateTime $dateTo */
-        $this->dateTo   = clone $dateTo;
+        $this->dateTo = clone $dateTo;
 
         // a diff of two identical dates returns 0, but we expect 24 hours
         if ($dateFrom == $dateTo) {

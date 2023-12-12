@@ -30,7 +30,7 @@ class SerializerSubscriber implements EventSubscriberInterface
 
     public function changeEmptyArraysToObject(ObjectEvent $event): void
     {
-        $request  = $this->requestStack->getCurrentRequest();
+        $request = $this->requestStack->getCurrentRequest();
 
         if (null === $request) {
             return;

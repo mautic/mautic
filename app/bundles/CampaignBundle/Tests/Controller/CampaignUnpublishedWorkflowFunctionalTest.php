@@ -73,7 +73,7 @@ final class CampaignUnpublishedWorkflowFunctionalTest extends AbstractCampaignTe
         $response = $this->client->getResponse();
         $this->assertTrue($response->isOk());
 
-        $attributes    = [
+        $attributes = [
             'onclick'               => 'Mautic.confirmationCampaignPublishStatus(mQuery(this));',
             'data-toggle'           => 'confirmation',
             'data-confirm-callback' => 'confirmCallbackCampaignPublishStatus',
@@ -99,7 +99,7 @@ final class CampaignUnpublishedWorkflowFunctionalTest extends AbstractCampaignTe
 
         $this->assertTrue($response->isOk());
 
-        $attributes    = [
+        $attributes = [
             'onclick'               => 'Mautic.confirmationCampaignPublishStatus(mQuery(this));',
             'data-toggle'           => 'confirmation',
             'data-confirm-callback' => 'confirmCallbackCampaignPublishStatus',

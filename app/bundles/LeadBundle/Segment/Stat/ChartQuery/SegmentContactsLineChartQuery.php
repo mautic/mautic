@@ -63,7 +63,7 @@ class SegmentContactsLineChartQuery extends ChartQuery
         if (!isset($this->filters['leadlist_id']['value'])) {
             throw new SegmentNotFoundException('Segment ID required');
         }
-        $this->segmentId  = $this->filters['leadlist_id']['value'];
+        $this->segmentId = $this->filters['leadlist_id']['value'];
         parent::__construct($connection, $dateFrom, $dateTo, $unit);
     }
 

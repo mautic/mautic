@@ -12,7 +12,7 @@ class MapperTest extends \PHPUnit\Framework\TestCase
      */
     protected $availableFields = [
         'Leads' => [
-            'Company'   => [
+            'Company' => [
                 'type'     => 'string',
                 'label'    => 'Company',
                 'api_name' => 'Company',
@@ -24,13 +24,13 @@ class MapperTest extends \PHPUnit\Framework\TestCase
                 'api_name' => 'First Name',
                 'required' => false,
             ],
-            'LastName'  => [
+            'LastName' => [
                 'type'     => 'string',
                 'label'    => 'Last Name',
                 'api_name' => 'Last Name',
                 'required' => true,
             ],
-            'Email'     => [
+            'Email' => [
                 'type'     => 'string',
                 'label'    => 'Email',
                 'api_name' => 'Email',
@@ -149,9 +149,9 @@ class MapperTest extends \PHPUnit\Framework\TestCase
                 'Last Name'  => 'LastName1',
             ],
             [
-                'id'         => 'def',
-                'Email'      => 'zoho2@email.com',
-                'Last Name'  => 'LastName2',
+                'id'        => 'def',
+                'Email'     => 'zoho2@email.com',
+                'Last Name' => 'LastName2',
             ],
             [
                 'id'         => 'ghi',

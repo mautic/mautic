@@ -57,8 +57,8 @@ final class FilterTypeTest extends \PHPUnit\Framework\TestCase
                             'properties' => [
                                 'type' => 'text',
                             ],
-                            'object'     => 'lead',
-                            'operators'  => [
+                            'object'    => 'lead',
+                            'operators' => [
                                 'equals' => 'eq',
                             ],
                         ],
@@ -151,8 +151,8 @@ final class FilterTypeTest extends \PHPUnit\Framework\TestCase
                             'properties' => [
                                 'type' => 'number',
                             ],
-                            'object'     => 'lead',
-                            'operators'  => [
+                            'object'    => 'lead',
+                            'operators' => [
                                 'equals' => 'eq',
                             ],
                         ],

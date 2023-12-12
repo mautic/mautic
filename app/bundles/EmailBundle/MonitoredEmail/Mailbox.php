@@ -145,13 +145,13 @@ class Mailbox
 
     protected $imapStream;
 
-    protected $imapFolder     = 'INBOX';
+    protected $imapFolder = 'INBOX';
 
-    protected $imapOptions    = 0;
+    protected $imapOptions = 0;
 
     protected $imapRetriesNum = 0;
 
-    protected $imapParams     = [];
+    protected $imapParams = [];
 
     protected $serverEncoding = 'UTF-8';
 

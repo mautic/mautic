@@ -41,7 +41,7 @@ class AssetType extends AbstractType
                 'mautic.asset.asset.form.storageLocation.local'  => 'local',
                 'mautic.asset.asset.form.storageLocation.remote' => 'remote',
             ],
-            'attr'              => [
+            'attr' => [
                 'onchange' => 'Mautic.changeAssetStorageLocation();',
             ],
         ]);
@@ -73,7 +73,7 @@ class AssetType extends AbstractType
                     'tooltip'      => 'mautic.asset.asset.form.disallow.crawlers.descr',
                     'data-show-on' => '{"asset_storageLocation_0":"checked"}',
                 ],
-                'data'=> empty($options['data']->getDisallow()) ? false : true,
+                'data' => empty($options['data']->getDisallow()) ? false : true,
             ]
         );
 

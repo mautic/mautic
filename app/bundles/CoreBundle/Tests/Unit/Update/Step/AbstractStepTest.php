@@ -32,8 +32,8 @@ abstract class AbstractStepTest extends TestCase
         $formatter->method('isDecorated')
           ->willReturn(false);
 
-        $this->input      = $this->createMock(InputInterface::class);
-        $this->output     = $this->createMock(OutputInterface::class);
+        $this->input  = $this->createMock(InputInterface::class);
+        $this->output = $this->createMock(OutputInterface::class);
 
         $this->output->method('getFormatter')
             ->willReturn($formatter);

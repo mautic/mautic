@@ -73,7 +73,7 @@ final class LeadListTest extends \PHPUnit\Framework\TestCase
                     'type'       => 'text',
                     'operator'   => '=',
                     'properties' => [
-                        'filter'  => 'Prague',
+                        'filter' => 'Prague',
                     ],
                 ],
             ]
@@ -101,7 +101,7 @@ final class LeadListTest extends \PHPUnit\Framework\TestCase
                     'type'       => 'text',
                     'operator'   => '=',
                     'properties' => [
-                        'filter'  => 'Prague',
+                        'filter' => 'Prague',
                     ],
                     'filter'  => 'Prague',
                     'display' => null,
@@ -219,7 +219,7 @@ final class LeadListTest extends \PHPUnit\Framework\TestCase
                 'type'       => 'text',
                 'operator'   => '=',
                 'properties' => [
-                    'filter'  => 'Prague',
+                    'filter' => 'Prague',
                 ],
             ],
         ]);
@@ -246,7 +246,7 @@ final class LeadListTest extends \PHPUnit\Framework\TestCase
                     'type'       => 'text',
                     'operator'   => '=',
                     'properties' => [
-                        'filter'  => 'Prague',
+                        'filter' => 'Prague',
                     ],
                     'filter'  => 'Prague',
                     'display' => null,

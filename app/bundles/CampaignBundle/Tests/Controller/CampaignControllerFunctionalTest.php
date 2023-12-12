@@ -15,7 +15,7 @@ class CampaignControllerFunctionalTest extends AbstractCampaignTest
 {
     private const CAMPAIGN_SUMMARY_PARAM = 'campaign_use_summary';
 
-    private const CAMPAIGN_RANGE_PARAM   = 'campaign_by_range';
+    private const CAMPAIGN_RANGE_PARAM = 'campaign_by_range';
 
     /**
      * @var CampaignModel
@@ -147,17 +147,17 @@ class CampaignControllerFunctionalTest extends AbstractCampaignTest
             null,
             ['campaign_id' => $campaignId]
         );
-        $datasets      = $stats['datasets'] ?? [];
+        $datasets = $stats['datasets'] ?? [];
 
         return $this->processTotalContactStats($datasets);
     }
 
     private function getCanvasTotalContacts(int $campaignId): int
     {
-        $crawler       = $this->getCrawlers($campaignId);
-        $canvasJson    = trim($crawler->filter('canvas')->html());
-        $canvasData    = json_decode($canvasJson, true);
-        $datasets      = $canvasData['datasets'] ?? [];
+        $crawler    = $this->getCrawlers($campaignId);
+        $canvasJson = trim($crawler->filter('canvas')->html());
+        $canvasData = json_decode($canvasJson, true);
+        $datasets   = $canvasData['datasets'] ?? [];
 
         return $this->processTotalContactStats($datasets);
     }

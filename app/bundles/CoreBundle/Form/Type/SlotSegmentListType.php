@@ -26,7 +26,7 @@ class SlotSegmentListType extends SlotType
                     'class'           => 'form-control',
                     'data-slot-param' => 'label-text',
                 ],
-                'data'       => $this->translator->trans('mautic.lead.form.list'),
+                'data' => $this->translator->trans('mautic.lead.form.list'),
             ]
         );
 

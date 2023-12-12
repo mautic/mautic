@@ -40,7 +40,7 @@ class ReportSubscriberFunctionalTest extends MauticMysqlTestCase
         $this->em->persist($report);
         $this->em->flush();
 
-        $crawler      = $this->client->request(Request::METHOD_GET, "/s/reports/view/{$report->getId()}");
+        $crawler = $this->client->request(Request::METHOD_GET, "/s/reports/view/{$report->getId()}");
         $this->assertTrue($this->client->getResponse()->isOk());
         $crawlerTable = $crawler->filterXPath('//*[contains(@href,"example.com")]')->closest('table');
 
@@ -97,7 +97,7 @@ class ReportSubscriberFunctionalTest extends MauticMysqlTestCase
         $this->em->persist($report);
         $this->em->flush();
 
-        $crawler            = $this->client->request(Request::METHOD_GET, "/s/reports/view/{$report->getId()}");
+        $crawler = $this->client->request(Request::METHOD_GET, "/s/reports/view/{$report->getId()}");
         $this->assertTrue($this->client->getResponse()->isOk());
         $crawlerReportTable = $crawler->filterXPath('//table[@id="reportTable"]')->first();
         $crawlerGraphTable  = $crawler->filterXPath('//*[contains(@href,"example.com")]')->closest('table');
@@ -166,7 +166,7 @@ class ReportSubscriberFunctionalTest extends MauticMysqlTestCase
         $this->em->flush();
 
         // -- test report table in mautic panel
-        $crawler            = $this->client->request(Request::METHOD_GET, "/s/reports/view/{$report->getId()}");
+        $crawler = $this->client->request(Request::METHOD_GET, "/s/reports/view/{$report->getId()}");
         $this->assertTrue($this->client->getResponse()->isOk());
         $crawlerReportTable = $crawler->filterXPath('//table[@id="reportTable"]')->first();
 

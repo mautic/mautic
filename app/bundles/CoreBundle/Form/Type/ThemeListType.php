@@ -19,22 +19,22 @@ class ThemeListType extends AbstractType
     {
         $resolver->setDefaults(
             [
-                'choices'           => function (Options $options): array {
+                'choices' => function (Options $options): array {
                     $themes                     = $this->themeHelper->getInstalledThemes($options['feature']);
                     $themes['mautic_code_mode'] = 'Code Mode';
 
                     return array_flip($themes);
                 },
-                'expanded'          => false,
-                'multiple'          => false,
-                'label'             => 'mautic.core.form.theme',
-                'label_attr'        => ['class' => 'control-label'],
-                'placeholder'       => false,
-                'required'          => false,
-                'attr'              => [
+                'expanded'    => false,
+                'multiple'    => false,
+                'label'       => 'mautic.core.form.theme',
+                'label_attr'  => ['class' => 'control-label'],
+                'placeholder' => false,
+                'required'    => false,
+                'attr'        => [
                     'class' => 'form-control',
                 ],
-                'feature'           => 'all',
+                'feature' => 'all',
             ]
         );
     }

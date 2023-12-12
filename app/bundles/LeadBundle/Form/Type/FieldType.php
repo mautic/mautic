@@ -126,21 +126,21 @@ class FieldType extends AbstractType
             'properties_textarea_template',
             YesNoButtonGroupType::class,
             [
-                'label'       => 'mautic.lead.field.form.properties.allowhtml',
-                'label_attr'  => ['class' => 'control-label'],
-                'attr'        => ['class' => 'form-control'],
-                'required'    => false,
-                'mapped'      => false,
-                'data'        => $options['data']->getProperties()['allowHtml'] ?? false,
+                'label'      => 'mautic.lead.field.form.properties.allowhtml',
+                'label_attr' => ['class' => 'control-label'],
+                'attr'       => ['class' => 'form-control'],
+                'required'   => false,
+                'mapped'     => false,
+                'data'       => $options['data']->getProperties()['allowHtml'] ?? false,
             ]
         );
 
         $listChoices = [
-            'country'       => FormFieldHelper::getCountryChoices(),
-            'region'        => FormFieldHelper::getRegionChoices(),
-            'timezone'      => FormFieldHelper::getTimezonesChoices(),
-            'locale'        => FormFieldHelper::getLocaleChoices(),
-            'select'        => [],
+            'country'  => FormFieldHelper::getCountryChoices(),
+            'region'   => FormFieldHelper::getRegionChoices(),
+            'timezone' => FormFieldHelper::getTimezonesChoices(),
+            'locale'   => FormFieldHelper::getLocaleChoices(),
+            'select'   => [],
         ];
         foreach ($listChoices as $listType => $choices) {
             $builder->add(
@@ -216,8 +216,8 @@ class FieldType extends AbstractType
                     'class'   => 'form-control',
                     'tooltip' => 'mautic.lead.field.help.defaultvalue',
                 ],
-                'required'   => false,
-                'disabled'   => $disableDefaultValue,
+                'required' => false,
+                'disabled' => $disableDefaultValue,
             ]
         );
 
@@ -374,9 +374,9 @@ class FieldType extends AbstractType
                         'defaultValue',
                         TextType::class,
                         [
-                            'label'       => 'mautic.core.defaultvalue',
-                            'label_attr'  => ['class' => 'control-label'],
-                            'attr'        => [
+                            'label'      => 'mautic.core.defaultvalue',
+                            'label_attr' => ['class' => 'control-label'],
+                            'attr'       => [
                                 'class'       => 'form-control',
                                 'data-toggle' => $type,
                             ],
@@ -399,8 +399,8 @@ class FieldType extends AbstractType
                                 'class' => 'form-control',
                                 'type'  => $type,
                             ],
-                            'required'   => false,
-                            'disabled'   => $disableDefaultValue,
+                            'required' => false,
+                            'disabled' => $disableDefaultValue,
                         ]
                     );
 
@@ -467,8 +467,8 @@ class FieldType extends AbstractType
                     'length'  => 25,
                     'tooltip' => 'mautic.lead.field.help.alias',
                 ],
-                'required'   => false,
-                'disabled'   => ($disabled || !$new),
+                'required' => false,
+                'disabled' => ($disabled || !$new),
             ]
         );
 

@@ -125,7 +125,7 @@ class BuilderSectionType extends AbstractType
             'wrapper-background-repeat',
             ChoiceType::class,
             [
-                'choices'    => [
+                'choices' => [
                     'no-repeat'    => 'no-repeat',
                     'repeat'       => 'repeat',
                     'repeat-x'     => 'repeat-x',
@@ -135,10 +135,10 @@ class BuilderSectionType extends AbstractType
                     'repeat-space' => 'repeat-space',
                     'space-round'  => 'space-round',
                 ],
-                'label'             => 'mautic.core.wrapper.background.repeat',
-                'label_attr'        => ['class' => 'control-label'],
-                'required'          => false,
-                'attr'              => ['class' => 'form-control'],
+                'label'      => 'mautic.core.wrapper.background.repeat',
+                'label_attr' => ['class' => 'control-label'],
+                'required'   => false,
+                'attr'       => ['class' => 'form-control'],
             ]
         );
 

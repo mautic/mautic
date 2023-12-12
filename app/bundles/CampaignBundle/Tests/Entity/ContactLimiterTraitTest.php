@@ -47,7 +47,7 @@ class ContactLimiterTraitTest extends \PHPUnit\Framework\TestCase
     {
         $contactLimiter = new ContactLimiter(50, 1);
 
-        $qb             = new DbalQueryBuilder($this->connection);
+        $qb = new DbalQueryBuilder($this->connection);
         $this->updateQueryFromContactLimiter('l', $qb, $contactLimiter);
         $this->assertEquals('SELECT  WHERE l.lead_id = :contactId LIMIT 50', $qb->getSQL());
         $this->assertEquals(['contactId' => 1], $qb->getParameters());
@@ -63,7 +63,7 @@ class ContactLimiterTraitTest extends \PHPUnit\Framework\TestCase
     {
         $contactLimiter = new ContactLimiter(50, null, null, null, [1, 2, 3]);
 
-        $qb             = new DbalQueryBuilder($this->connection);
+        $qb = new DbalQueryBuilder($this->connection);
         $this->updateQueryFromContactLimiter('l', $qb, $contactLimiter);
         $this->assertEquals('SELECT  WHERE l.lead_id IN (:contactIds) LIMIT 50', $qb->getSQL());
         $this->assertEquals(['contactIds' => [1, 2, 3]], $qb->getParameters());
@@ -79,7 +79,7 @@ class ContactLimiterTraitTest extends \PHPUnit\Framework\TestCase
     {
         $contactLimiter = new ContactLimiter(50, null, 4, null);
 
-        $qb             = new DbalQueryBuilder($this->connection);
+        $qb = new DbalQueryBuilder($this->connection);
         $this->updateQueryFromContactLimiter('l', $qb, $contactLimiter);
         $this->assertEquals('SELECT  WHERE l.lead_id >= :minContactId LIMIT 50', $qb->getSQL());
         $this->assertEquals(['minContactId' => 4], $qb->getParameters());
@@ -95,7 +95,7 @@ class ContactLimiterTraitTest extends \PHPUnit\Framework\TestCase
     {
         $contactLimiter = new ContactLimiter(50, null, 4, null);
 
-        $qb             = new DbalQueryBuilder($this->connection);
+        $qb = new DbalQueryBuilder($this->connection);
         $contactLimiter->setBatchMinContactId(10);
         $this->updateQueryFromContactLimiter('l', $qb, $contactLimiter);
         $this->assertEquals('SELECT  WHERE l.lead_id >= :minContactId LIMIT 50', $qb->getSQL());
@@ -112,7 +112,7 @@ class ContactLimiterTraitTest extends \PHPUnit\Framework\TestCase
     {
         $contactLimiter = new ContactLimiter(50, null, null, 10);
 
-        $qb             = new DbalQueryBuilder($this->connection);
+        $qb = new DbalQueryBuilder($this->connection);
         $this->updateQueryFromContactLimiter('l', $qb, $contactLimiter);
         $this->assertEquals('SELECT  WHERE l.lead_id <= :maxContactId LIMIT 50', $qb->getSQL());
         $this->assertEquals(['maxContactId' => 10], $qb->getParameters());
@@ -128,7 +128,7 @@ class ContactLimiterTraitTest extends \PHPUnit\Framework\TestCase
     {
         $contactLimiter = new ContactLimiter(50, null, 1, 10);
 
-        $qb             = new DbalQueryBuilder($this->connection);
+        $qb = new DbalQueryBuilder($this->connection);
         $this->updateQueryFromContactLimiter('l', $qb, $contactLimiter);
         $this->assertEquals('SELECT  WHERE l.lead_id BETWEEN :minContactId AND :maxContactId LIMIT 50', $qb->getSQL());
         $this->assertEquals(['minContactId' => 1, 'maxContactId' => 10], $qb->getParameters());
@@ -145,7 +145,7 @@ class ContactLimiterTraitTest extends \PHPUnit\Framework\TestCase
     {
         $contactLimiter = new ContactLimiter(50, null, null, null, [], 1, 5);
 
-        $qb             = new DbalQueryBuilder($this->connection);
+        $qb = new DbalQueryBuilder($this->connection);
         $this->updateQueryFromContactLimiter('l', $qb, $contactLimiter);
         $this->assertEquals('SELECT  WHERE MOD((l.lead_id + :threadShift), :maxThreads) = 0 LIMIT 50', $qb->getSQL());
         $this->assertEquals(['threadShift' => 0, 'maxThreads' => 5], $qb->getParameters());
@@ -162,7 +162,7 @@ class ContactLimiterTraitTest extends \PHPUnit\Framework\TestCase
     {
         $contactLimiter = new ContactLimiter(50, 1);
 
-        $qb             = new DbalQueryBuilder($this->connection);
+        $qb = new DbalQueryBuilder($this->connection);
         $this->updateQueryFromContactLimiter('l', $qb, $contactLimiter, true);
         $this->assertEquals('SELECT  WHERE l.lead_id = :contactId', $qb->getSQL());
         $this->assertEquals(['contactId' => 1], $qb->getParameters());

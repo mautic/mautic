@@ -452,7 +452,7 @@ class ZohoIntegration extends CrmAbstractIntegration
                     if (!isset($data['data'])) {
                         break; // no more data, exit loop
                     }
-                    $result   = $this->amendLeadDataBeforeMauticPopulate($data, $object);
+                    $result = $this->amendLeadDataBeforeMauticPopulate($data, $object);
                     $executed += count($result);
                     if (isset($params['output'])) {
                         if ($params['output']->getVerbosity() >= OutputInterface::VERBOSITY_VERBOSE) {
@@ -520,7 +520,7 @@ class ZohoIntegration extends CrmAbstractIntegration
                     if (!isset($data['data'])) {
                         break; // no more data, exit loop
                     }
-                    $result   = $this->amendLeadDataBeforeMauticPopulate($data, $object);
+                    $result = $this->amendLeadDataBeforeMauticPopulate($data, $object);
                     $executed += count($result);
                     if (isset($params['output'])) {
                         if ($params['output']->getVerbosity() >= OutputInterface::VERBOSITY_VERBOSE) {
@@ -902,7 +902,7 @@ class ZohoIntegration extends CrmAbstractIntegration
                 $lead['internal_entity_id']
             );
             if (count($integrationId)) { // lead exists, then update
-                $integrationEntity     = $this->em->getReference(\Mautic\PluginBundle\Entity\IntegrationEntity::class, $integrationId[0]['id']);
+                $integrationEntity = $this->em->getReference(\Mautic\PluginBundle\Entity\IntegrationEntity::class, $integrationId[0]['id']);
                 $integrationEntity->setLastSyncDate(new \DateTime());
                 $integrationEntity->setInternalEntity('lead-converted');
                 $integrationEntities[] = $integrationEntity;
@@ -1195,8 +1195,8 @@ class ZohoIntegration extends CrmAbstractIntegration
      */
     private function updateContactInZoho(Mapper $mapper, $object, &$counter, &$errorCounter): void
     {
-        $response     = $this->getApiHelper()->updateLead($mapper->getArray(), $object);
-        $failed       = $this->consumeResponse($response, $object, false, $mapper);
+        $response = $this->getApiHelper()->updateLead($mapper->getArray(), $object);
+        $failed   = $this->consumeResponse($response, $object, false, $mapper);
         $counter -= $failed;
         $errorCounter += $failed;
     }
@@ -1208,8 +1208,8 @@ class ZohoIntegration extends CrmAbstractIntegration
      */
     private function createContactInZoho(Mapper $mapper, $object, &$counter, &$errorCounter): void
     {
-        $response     = $this->getApiHelper()->createLead($mapper->getArray(), $object);
-        $failed       = $this->consumeResponse($response, $object, true, $mapper);
+        $response = $this->getApiHelper()->createLead($mapper->getArray(), $object);
+        $failed   = $this->consumeResponse($response, $object, true, $mapper);
         $counter -= $failed;
         $errorCounter += $failed;
     }

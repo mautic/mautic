@@ -12,9 +12,9 @@ class Group extends FormEntity
 {
     public const TABLE_NAME = 'point_groups';
 
-    private ?int $id             = null;
+    private ?int $id = null;
 
-    private ?string $name        = '';
+    private ?string $name = '';
 
     private ?string $description = '';
 

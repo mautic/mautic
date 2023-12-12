@@ -27,9 +27,9 @@ class VersionProviderTest extends \PHPUnit\Framework\TestCase
     {
         parent::setUp();
 
-        $this->connection           = $this->createMock(Connection::class);
-        $this->result               = $this->createMock(Result::class);
-        $this->provider             = new VersionProvider($this->connection);
+        $this->connection = $this->createMock(Connection::class);
+        $this->result     = $this->createMock(Result::class);
+        $this->provider   = new VersionProvider($this->connection);
     }
 
     public function testGetVersionForMySql(): void

@@ -83,8 +83,8 @@ class SubmissionRepository extends CommonRepository
         $this->buildWhereClause($dq, $args);
 
         // get a total count
-        $result  = $dq->executeQuery()->fetchAllAssociative();
-        $total   = $result[0]['count'];
+        $result = $dq->executeQuery()->fetchAllAssociative();
+        $total  = $result[0]['count'];
 
         // now get the actual paginated results
         $this->buildOrderByClause($dq, $args);
@@ -118,7 +118,7 @@ class SubmissionRepository extends CommonRepository
                     }
                 }
             }
-            $result['id']      =     $submissionId;
+            $result['id']      = $submissionId;
             $result['results'] = $values[$submissionId];
         }
 
@@ -224,7 +224,7 @@ class SubmissionRepository extends CommonRepository
         // get a total count
         $result = $dq->executeQuery()->fetchAllAssociative();
 
-        $total  = $result[0]['count'];
+        $total = $result[0]['count'];
 
         // now get the actual paginated results
         $this->buildOrderByClause($dq, $args);
@@ -458,16 +458,16 @@ class SubmissionRepository extends CommonRepository
         // Modify operator
         switch ($operatorExpr) {
             case 'startsWith':
-                $operatorExpr    = 'like';
-                $value           = $value.'%';
+                $operatorExpr = 'like';
+                $value        = $value.'%';
                 break;
             case 'endsWith':
-                $operatorExpr   = 'like';
-                $value          = '%'.$value;
+                $operatorExpr = 'like';
+                $value        = '%'.$value;
                 break;
             case 'contains':
-                $operatorExpr   = 'like';
-                $value          = '%'.$value.'%';
+                $operatorExpr = 'like';
+                $value        = '%'.$value.'%';
                 break;
         }
 

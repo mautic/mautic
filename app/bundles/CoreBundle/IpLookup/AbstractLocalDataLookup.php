@@ -55,7 +55,7 @@ abstract class AbstractLocalDataLookup extends AbstractLookup implements IpLooku
      */
     public function downloadRemoteDataStore()
     {
-        $package   = $this->getRemoteDateStoreDownloadUrl();
+        $package = $this->getRemoteDateStoreDownloadUrl();
 
         try {
             $data = $this->client->get($package);
@@ -63,10 +63,10 @@ abstract class AbstractLocalDataLookup extends AbstractLookup implements IpLooku
             $this->logger->error('Failed to fetch remote IP data: '.$exception->getMessage());
         }
 
-        $tempTarget        = $this->cacheDir.'/'.basename($package);
-        $tempExt           = strtolower(pathinfo($package, PATHINFO_EXTENSION));
-        $localTarget       = $this->getLocalDataStoreFilepath();
-        $localTargetExt    = strtolower(pathinfo($localTarget, PATHINFO_EXTENSION));
+        $tempTarget     = $this->cacheDir.'/'.basename($package);
+        $tempExt        = strtolower(pathinfo($package, PATHINFO_EXTENSION));
+        $localTarget    = $this->getLocalDataStoreFilepath();
+        $localTargetExt = strtolower(pathinfo($localTarget, PATHINFO_EXTENSION));
 
         try {
             $success = false;

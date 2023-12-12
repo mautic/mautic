@@ -301,8 +301,8 @@ trait LeadDetailsTrait
         }
 
         /** @var LeadModel $model */
-        $model       = $this->getModel('lead');
-        $chartQuery  = new ChartQuery($this->doctrine->getConnection(), $fromDate, $toDate);
+        $model      = $this->getModel('lead');
+        $chartQuery = new ChartQuery($this->doctrine->getConnection(), $fromDate, $toDate);
 
         $engagements = $model->getEngagementCount($lead, $fromDate, $toDate, 'm', $chartQuery);
         $pointStats  = $chartQuery->fetchSumTimeData('lead_points_change_log', 'date_added', ['lead_id' => $lead->getId()], 'delta');
@@ -362,7 +362,7 @@ trait LeadDetailsTrait
 
         $toDate = new \DateTime();
 
-        $lineChart  = new LineChart(null, $fromDate, $toDate);
+        $lineChart = new LineChart(null, $fromDate, $toDate);
 
         $lineChart->setDataset($translator->trans('mautic.lead.graph.line.all_engagements'), $graphData['engagements']);
 

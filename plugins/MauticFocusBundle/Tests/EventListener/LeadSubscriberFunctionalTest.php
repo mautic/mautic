@@ -45,8 +45,8 @@ class LeadSubscriberFunctionalTest extends MauticMysqlTestCase
      */
     private function searchPhrase(string $phrase, Lead $lead, FocusModel $focusModel): array
     {
-        $searchViewStats  = $focusModel->getStatRepository()->getStatsViewByLead((int) $lead->getId(), ['search'=>$phrase]);
-        $searchClickStats = $focusModel->getStatRepository()->getStatsClickByLead((int) $lead->getId(), ['search'=>$phrase]);
+        $searchViewStats  = $focusModel->getStatRepository()->getStatsViewByLead((int) $lead->getId(), ['search' => $phrase]);
+        $searchClickStats = $focusModel->getStatRepository()->getStatsClickByLead((int) $lead->getId(), ['search' => $phrase]);
 
         return array_merge($searchViewStats, $searchClickStats);
     }
@@ -57,8 +57,8 @@ class LeadSubscriberFunctionalTest extends MauticMysqlTestCase
         $focusPopupB = $this->createFocus('popup focus B');
         $focusPopupC = $this->createFocus('popup focus C');
 
-        $focusBarA   = $this->createFocus('bar focus A');
-        $focusBarB   = $this->createFocus('bar focus B');
+        $focusBarA = $this->createFocus('bar focus A');
+        $focusBarB = $this->createFocus('bar focus B');
 
         $this->focusModel->saveEntity($focusPopupA);
         $this->focusModel->saveEntity($focusPopupB);

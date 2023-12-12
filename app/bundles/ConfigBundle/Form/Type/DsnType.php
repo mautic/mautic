@@ -105,9 +105,9 @@ class DsnType extends AbstractType
             'options',
             SortableListType::class,
             [
-                'required'        => false,
-                'label'           => 'mautic.config.dsn.options',
-                'attr'            => [
+                'required' => false,
+                'label'    => 'mautic.config.dsn.options',
+                'attr'     => [
                     'onchange' => $onChange,
                 ],
                 'option_required' => false,
@@ -141,9 +141,9 @@ class DsnType extends AbstractType
             'error_mapping' => [
                 '.' => 'scheme',
             ],
-            'test_button'  => [
-                'action'   => null,
-                'label'    => null,
+            'test_button' => [
+                'action' => null,
+                'label'  => null,
             ],
         ]);
     }

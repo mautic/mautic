@@ -4,33 +4,33 @@ namespace Mautic\ReportBundle\Scheduler\Enum;
 
 class SchedulerEnum
 {
-    public const UNIT_NOW     = 'NOW';
+    public const UNIT_NOW = 'NOW';
 
-    public const UNIT_DAILY   = 'DAILY';
+    public const UNIT_DAILY = 'DAILY';
 
-    public const UNIT_WEEKLY  = 'WEEKLY'; // Defined in report.js too
+    public const UNIT_WEEKLY = 'WEEKLY'; // Defined in report.js too
 
     public const UNIT_MONTHLY = 'MONTHLY'; // Defined in report.js too
 
-    public const DAY_MO        = 'MO';
+    public const DAY_MO = 'MO';
 
-    public const DAY_TU        = 'TU';
+    public const DAY_TU = 'TU';
 
-    public const DAY_WE        = 'WE';
+    public const DAY_WE = 'WE';
 
-    public const DAY_TH        = 'TH';
+    public const DAY_TH = 'TH';
 
-    public const DAY_FR        = 'FR';
+    public const DAY_FR = 'FR';
 
-    public const DAY_SA        = 'SA';
+    public const DAY_SA = 'SA';
 
-    public const DAY_SU        = 'SU';
+    public const DAY_SU = 'SU';
 
     public const DAY_WEEK_DAYS = 'WEEK_DAYS';
 
     public const MONTH_FREQUENCY_FIRST = '1';
 
-    public const MONTH_FREQUENCY_LAST  = '-1';
+    public const MONTH_FREQUENCY_LAST = '-1';
 
     public static function getUnitEnumForSelect(): array
     {

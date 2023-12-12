@@ -15,7 +15,7 @@ abstract class MauticMysqlTestCase extends AbstractMauticTestCase
 {
     private bool $databaseInstalled = false;
 
-    private bool $setUpInvoked      = false;
+    private bool $setUpInvoked = false;
 
     /**
      * Use transaction rollback for cleanup. Sometimes it is not possible to use it because of the following:

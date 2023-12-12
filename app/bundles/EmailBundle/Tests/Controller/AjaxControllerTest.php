@@ -61,10 +61,10 @@ class AjaxControllerTest extends \PHPUnit\Framework\TestCase
     {
         parent::setUp();
 
-        $this->sessionMock      = $this->createMock(Session::class);
-        $this->containerMock    = $this->createMock(Container::class);
-        $this->modelMock        = $this->createMock(EmailModel::class);
-        $this->emailMock        = $this->createMock(Email::class);
+        $this->sessionMock   = $this->createMock(Session::class);
+        $this->containerMock = $this->createMock(Container::class);
+        $this->modelMock     = $this->createMock(EmailModel::class);
+        $this->emailMock     = $this->createMock(Email::class);
 
         $this->managerRegistry  = $this->createMock(ManagerRegistry::class);
         $doctrine               = $this->createMock(ManagerRegistry::class);

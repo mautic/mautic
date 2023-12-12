@@ -49,7 +49,7 @@ class DetermineWinnerSubscriber implements EventSubscriberInterface
             $translator = $this->translator;
 
             if ($counts) {
-                $rates      = $support      = $data      = [];
+                $rates      = $support = $data = [];
                 $hasResults = [];
 
                 $parentId = $parent->getId();
@@ -145,7 +145,7 @@ class DetermineWinnerSubscriber implements EventSubscriberInterface
 
             $translator = $this->translator;
             if ($clickthroughCounts) {
-                $rates      = $support      = $data      = [];
+                $rates      = $support = $data = [];
                 $hasResults = [];
 
                 $parentId = $parent->getId();
@@ -162,9 +162,9 @@ class DetermineWinnerSubscriber implements EventSubscriberInterface
                     $name                = ($parentId === $id) ? $parent->getName() : $children[$id]->getName();
                     $support['labels'][] = $name.' ('.$rates[$id].'%)';
 
-                    $data[$translator->trans('mautic.email.abtest.label.clickthrough')][]     = $count;
-                    $data[$translator->trans('mautic.email.abtest.label.opened')][]           = $sentCounts[$id];
-                    $hasResults[]                                                             = $id;
+                    $data[$translator->trans('mautic.email.abtest.label.clickthrough')][] = $count;
+                    $data[$translator->trans('mautic.email.abtest.label.opened')][]       = $sentCounts[$id];
+                    $hasResults[]                                                         = $id;
                 }
 
                 if (!in_array($parent->getId(), $hasResults)) {

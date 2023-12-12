@@ -178,7 +178,7 @@ class LeadSubscriberTest extends TestCase
                 ],
             ],
         ];
-        $objectId   = 1;
+        $objectId = 1;
 
         $lead = $this->createLeadMock($fieldChanges, $objectId);
 
@@ -214,7 +214,7 @@ class LeadSubscriberTest extends TestCase
                 $newOwnerId,
             ],
         ];
-        $objectId   = 1;
+        $objectId = 1;
 
         $lead = $this->createLeadMock($fieldChanges, $objectId);
 
@@ -245,14 +245,14 @@ class LeadSubscriberTest extends TestCase
      */
     public function testOnLeadPostSaveRecordChangesWithPointChange(): void
     {
-        $newPointCount   = 5;
-        $fieldChanges    = [
+        $newPointCount = 5;
+        $fieldChanges  = [
             'points' => [
                 2,
                 $newPointCount,
             ],
         ];
-        $objectId   = 1;
+        $objectId = 1;
 
         $lead = $this->createLeadMock($fieldChanges, $objectId);
 
@@ -364,7 +364,7 @@ class LeadSubscriberTest extends TestCase
                 ],
             ],
         ];
-        $objectId     = 1;
+        $objectId = 1;
 
         $company = $this->createCompanyMock($fieldChanges, $objectId);
 
@@ -400,7 +400,7 @@ class LeadSubscriberTest extends TestCase
                 $newOwnerId,
             ],
         ];
-        $objectId     = 1;
+        $objectId = 1;
 
         $company = $this->createCompanyMock($fieldChanges, $objectId);
 

@@ -120,7 +120,7 @@ class ModeratedCommandTest extends TestCase
         $this->fakeModeratedCommand->run($this->input, $this->output);
 
         // Assert that the file lock was created
-        $runDir   = $cacheDir.'/../run';
+        $runDir = $cacheDir.'/../run';
         $this->assertFileExists($runDir);
 
         $finder = new Finder();

@@ -53,7 +53,7 @@ class ContactRequestHelper
     public function getContactFromQuery(array $queryFields = [])
     {
         unset($queryFields['page_url']); // This is set now automatically by PageModel
-        $this->queryFields    = $queryFields;
+        $this->queryFields = $queryFields;
 
         try {
             $foundContact         = $this->getContactFromUrl();

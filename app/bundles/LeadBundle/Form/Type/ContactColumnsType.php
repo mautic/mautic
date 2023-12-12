@@ -25,7 +25,7 @@ class ContactColumnsType extends AbstractType
                 'multiple'   => true,
                 'expanded'   => false,
                 'attr'       => [
-                    'class'         => 'form-control',
+                    'class' => 'form-control',
                 ],
             ]
         );

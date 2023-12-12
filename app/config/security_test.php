@@ -11,7 +11,7 @@ $container->loadFromExtension('security',
                 'http_basic' => true,
             ],
         ],
-        'encoders'  => [
+        'encoders' => [
           'Symfony\Component\Security\Core\User\User' => [
             'algorithm'        => 'md5',
             'encode_as_base64' => false,

@@ -92,12 +92,12 @@ class ColorHelperTest extends \PHPUnit\Framework\TestCase
     public function testThatRgbColorsAreReturnedCorrectly(): void
     {
         $colors = [
-            '#ccc'    => [
+            '#ccc' => [
                 'red'   => 204,
                 'green' => 204,
                 'blue'  => 204,
             ],
-            '#369'    => [
+            '#369' => [
                 'red'   => 51,
                 'green' => 102,
                 'blue'  => 153,

@@ -93,7 +93,7 @@ trait CustomFieldsApiControllerTrait
                 }
                 $properties = is_string($fieldDefinition['properties']) ? unserialize($fieldDefinition['properties']) : $fieldDefinition['properties'];
 
-                $fields[$group][$field]['value']           = empty($properties['scale']) ? (int) $fields[$group][$field]['value']
+                $fields[$group][$field]['value'] = empty($properties['scale']) ? (int) $fields[$group][$field]['value']
                     : (float) $fields[$group][$field]['value'];
                 $fields[$group][$field]['normalizedValue'] = empty($properties['scale']) ? (int) $fields[$group][$field]['normalizedValue']
                     : (float) $fields[$group][$field]['normalizedValue'];
@@ -190,7 +190,7 @@ trait CustomFieldsApiControllerTrait
         $fields = $leadFieldModel->getFieldListWithProperties($object);
         foreach ($fields as $field) {
             if (!empty($field['properties']['allowHtml'])) {
-                $this->dataInputMasks[$field['alias']]  = 'html';
+                $this->dataInputMasks[$field['alias']] = 'html';
             }
         }
     }

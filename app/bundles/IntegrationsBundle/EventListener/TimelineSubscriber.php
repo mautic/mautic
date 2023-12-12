@@ -62,10 +62,10 @@ class TimelineSubscriber implements EventSubscriberInterface
         $properties = json_decode($log['properties'], true);
 
         return [
-            'event'           => $eventType,
-            'eventId'         => $eventType.$log['id'],
-            'eventType'       => $eventTypeName,
-            'eventLabel'      => $this->translator->trans(
+            'event'      => $eventType,
+            'eventId'    => $eventType.$log['id'],
+            'eventType'  => $eventTypeName,
+            'eventLabel' => $this->translator->trans(
                 'mautic.integration.sync.user_notification.header',
                 [
                     '%integration%' => $properties['integration'],

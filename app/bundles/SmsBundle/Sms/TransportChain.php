@@ -21,7 +21,7 @@ class TransportChain
         private $primaryTransport,
         private IntegrationHelper $integrationHelper
     ) {
-        $this->transports        = [];
+        $this->transports = [];
     }
 
     /**

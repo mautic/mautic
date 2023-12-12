@@ -12,7 +12,7 @@ class VideoHitEvent extends CommonEvent
         protected $request,
         protected $code
     ) {
-        $this->entity  = $hit;
+        $this->entity = $hit;
     }
 
     /**

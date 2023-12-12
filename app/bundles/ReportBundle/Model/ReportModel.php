@@ -73,7 +73,7 @@ class ReportModel extends FormModel
         LoggerInterface $mauticLogger,
         private RequestStack $requestStack
     ) {
-        $this->defaultPageLimit  = $coreParametersHelper->get('default_pagelimit');
+        $this->defaultPageLimit = $coreParametersHelper->get('default_pagelimit');
 
         parent::__construct($em, $security, $dispatcher, $router, $translator, $userHelper, $mauticLogger, $coreParametersHelper);
     }
@@ -471,11 +471,11 @@ class ReportModel extends FormModel
 
         $paginate        = !empty($options['paginate']);
         $reportPage      = $options['reportPage'] ?? 1;
-        $data            = $graphs            = [];
+        $data            = $graphs = [];
         $reportGenerator = new ReportGenerator($this->dispatcher, $this->getConnection(), $entity, $this->channelListHelper, $formFactory);
 
         $selectedColumns = $entity->getColumns();
-        $totalResults    = $limit    = 0;
+        $totalResults    = $limit = 0;
 
         // Prepare the query builder
         $tableDetails      = $this->getTableData($entity->getSource());
@@ -704,13 +704,13 @@ class ReportModel extends FormModel
     {
         $search = 'lll.leadlist_id';
         $filter = [
-            'force'  => [
-                ['column' => 'r.filters', 'expr' => 'LIKE', 'value'=>'%'.$search.'"%'],
+            'force' => [
+                ['column' => 'r.filters', 'expr' => 'LIKE', 'value' => '%'.$search.'"%'],
             ],
         ];
         $entities = $this->getEntities(
             [
-                'filter'     => $filter,
+                'filter' => $filter,
             ]
         );
         $dependents = [];

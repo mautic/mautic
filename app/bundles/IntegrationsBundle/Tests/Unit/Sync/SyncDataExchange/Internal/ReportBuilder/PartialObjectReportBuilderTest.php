@@ -64,10 +64,10 @@ class PartialObjectReportBuilderTest extends TestCase
             ->disableOriginalConstructor()
             ->setMethodsExcept(['getNormalizedFieldType'])
             ->getMock();
-        $this->dispatcher            = $this->createMock(EventDispatcherInterface::class);
-        $this->fieldBuilder          = $this->createMock(FieldBuilder::class);
-        $this->objectProvider        = $this->createMock(ObjectProvider::class);
-        $this->reportBuilder         = new PartialObjectReportBuilder(
+        $this->dispatcher     = $this->createMock(EventDispatcherInterface::class);
+        $this->fieldBuilder   = $this->createMock(FieldBuilder::class);
+        $this->objectProvider = $this->createMock(ObjectProvider::class);
+        $this->reportBuilder  = new PartialObjectReportBuilder(
             $this->fieldChangeRepository,
             $this->fieldHelper,
             $this->fieldBuilder,

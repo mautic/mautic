@@ -108,8 +108,8 @@ class ContactObjectHelperTest extends TestCase
         $companyValue->setValue($companyId);
         $companyValue->setType(MauticSyncDataExchange::OBJECT_COMPANY);
 
-        $emailField       = new FieldDAO('email', new NormalizedValueDAO('email', 'john@doe.com'));
-        $companyField     = new FieldDAO(
+        $emailField   = new FieldDAO('email', new NormalizedValueDAO('email', 'john@doe.com'));
+        $companyField = new FieldDAO(
             MauticSyncDataExchange::OBJECT_COMPANY,
             new NormalizedValueDAO('reference', $companyValue, 'Company A')
         );

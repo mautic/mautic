@@ -21,11 +21,11 @@ class AssetListType extends AbstractType
     public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults([
-            'choices'           => $this->getAssetChoices(),
-            'placeholder'       => false,
-            'expanded'          => false,
-            'multiple'          => true,
-            'required'          => false,
+            'choices'     => $this->getAssetChoices(),
+            'placeholder' => false,
+            'expanded'    => false,
+            'multiple'    => true,
+            'required'    => false,
         ]);
     }
 

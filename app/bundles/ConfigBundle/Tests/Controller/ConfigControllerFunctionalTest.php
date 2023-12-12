@@ -36,9 +36,9 @@ class ConfigControllerFunctionalTest extends MauticMysqlTestCase
 
     public function testValuesAreEscapedProperly(): void
     {
-        $url                         = 'https://test.us/create?key=2MLzQFXBSqd2nqwGero90CpB1jX1FbVhhRd51ojr&domain=https%3A%2F%2Ftest.us%2F&longUrl=';
-        $trackIps                    = "%ip1%\n%ip2%\n%kernel.project_dir%";
-        $googleAnalytics             = 'reveal pass: %mautic.db_password%';
+        $url             = 'https://test.us/create?key=2MLzQFXBSqd2nqwGero90CpB1jX1FbVhhRd51ojr&domain=https%3A%2F%2Ftest.us%2F&longUrl=';
+        $trackIps        = "%ip1%\n%ip2%\n%kernel.project_dir%";
+        $googleAnalytics = 'reveal pass: %mautic.db_password%';
 
         // request config edit page
         $crawler = $this->client->request(Request::METHOD_GET, '/s/config/edit');
@@ -49,10 +49,10 @@ class ConfigControllerFunctionalTest extends MauticMysqlTestCase
         $form          = $buttonCrawler->form();
         $form->setValues(
             [
-                'config[coreconfig][site_url]'                    => 'https://mautic-community.local', // required
-                'config[coreconfig][do_not_track_ips]'            => $trackIps,
-                'config[pageconfig][google_analytics]'            => $googleAnalytics,
-                'config[leadconfig][contact_columns]'             => ['name', 'email', 'id'],
+                'config[coreconfig][site_url]'         => 'https://mautic-community.local', // required
+                'config[coreconfig][do_not_track_ips]' => $trackIps,
+                'config[pageconfig][google_analytics]' => $googleAnalytics,
+                'config[leadconfig][contact_columns]'  => ['name', 'email', 'id'],
             ]
         );
 
@@ -163,8 +163,8 @@ class ConfigControllerFunctionalTest extends MauticMysqlTestCase
         $crawler = $this->client->request(Request::METHOD_GET, '/s/config/edit');
 
         // Find save & close button
-        $buttonCrawler  = $crawler->selectButton('config[buttons][save]');
-        $form           = $buttonCrawler->form();
+        $buttonCrawler = $crawler->selectButton('config[buttons][save]');
+        $form          = $buttonCrawler->form();
 
         // Fetch available option for 404_page field
         $availableOptions = $form['config[coreconfig][404_page]']->availableOptionValues();
@@ -200,8 +200,8 @@ class ConfigControllerFunctionalTest extends MauticMysqlTestCase
     {
         $crawler = $this->client->request(Request::METHOD_GET, '/s/config/edit');
 
-        $buttonCrawler  =  $crawler->selectButton('config[buttons][save]');
-        $form           = $buttonCrawler->form();
+        $buttonCrawler = $crawler->selectButton('config[buttons][save]');
+        $form          = $buttonCrawler->form();
 
         $send_notification_to_author           = '0';
         $campaign_notification_email_addresses = 'a@test.com, b@test.com';
@@ -302,8 +302,8 @@ class ConfigControllerFunctionalTest extends MauticMysqlTestCase
         Assert::assertCount(3, $availableOptions);
         $configForm->setValues(
             [
-                'config[userconfig][saml_idp_entity_id]'   => $availableOptions[1],
-                'config[coreconfig][site_url]'             => 'https://mautic-cloud.local', // required
+                'config[userconfig][saml_idp_entity_id]' => $availableOptions[1],
+                'config[coreconfig][site_url]'           => 'https://mautic-cloud.local', // required
             ]
         );
         $this->client->submit($configForm);

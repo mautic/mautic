@@ -14,7 +14,7 @@ class LeadUtmTagsEvent extends CommonEvent
         Lead $lead,
         protected array $utmtags
     ) {
-        $this->entity  = $lead;
+        $this->entity = $lead;
     }
 
     public function getLead(): Lead

@@ -99,8 +99,8 @@ class AjaxController extends CommonController
                             $namespace.'\\'.$bundle.'Bundle\\Controller\\AjaxController::executeAjaxAction',
                             $request->request->all(),
                             [
-                                'action'  => $action,
-                                'bundle'  => $bundleName,
+                                'action' => $action,
+                                'bundle' => $bundleName,
                             ],
                             $request->query->all()
                         );
@@ -127,8 +127,8 @@ class AjaxController extends CommonController
                 static::class.'::'.$action.'Action',
                 $request->request->all(),
                 [
-                    'action'  => $action,
-                    'bundle'  => $bundle,
+                    'action' => $action,
+                    'bundle' => $bundle,
                 ],
                 $request->query->all()
             );
@@ -225,12 +225,12 @@ class AjaxController extends CommonController
 
     public function togglePublishStatusAction(Request $request): JsonResponse
     {
-        $dataArray      = ['success' => 0];
-        $name           = InputHelper::clean($request->request->get('model'));
-        $id             = InputHelper::clean($request->request->get('id'));
-        $customToggle   = InputHelper::clean($request->request->get('customToggle'));
-        $model          = $this->getModel($name);
-        $status         = Response::HTTP_OK;
+        $dataArray    = ['success' => 0];
+        $name         = InputHelper::clean($request->request->get('model'));
+        $id           = InputHelper::clean($request->request->get('id'));
+        $customToggle = InputHelper::clean($request->request->get('customToggle'));
+        $model        = $this->getModel($name);
+        $status       = Response::HTTP_OK;
 
         $post = $request->request->all();
         unset($post['model'], $post['id'], $post['action']);
@@ -278,21 +278,21 @@ class AjaxController extends CommonController
                     if (!empty($refresh)) {
                         $dataArray['reload'] = 1;
                     } else {
-                        $onclickMethod  = (method_exists($entity, 'getOnclickMethod')) ? $entity->getOnclickMethod() : '';
-                        $dataAttr       = (method_exists($entity, 'getDataAttributes')) ? $entity->getDataAttributes() : [];
-                        $attrTransKeys  = (method_exists($entity, 'getTranslationKeysDataAttributes')) ? $entity->getTranslationKeysDataAttributes() : [];
+                        $onclickMethod = (method_exists($entity, 'getOnclickMethod')) ? $entity->getOnclickMethod() : '';
+                        $dataAttr      = (method_exists($entity, 'getDataAttributes')) ? $entity->getDataAttributes() : [];
+                        $attrTransKeys = (method_exists($entity, 'getTranslationKeysDataAttributes')) ? $entity->getTranslationKeysDataAttributes() : [];
 
                         // get updated icon HTML
                         $html = $this->renderView(
                             '@MauticCore/Helper/publishstatus_icon.html.twig',
                             [
-                                'item'          => $entity,
-                                'model'         => $name,
-                                'query'         => $extra,
-                                'size'          => $post['size'] ?? '',
-                                'onclick'       => $onclickMethod,
-                                'attributes'    => $dataAttr,
-                                'transKeys'     => $attrTransKeys,
+                                'item'       => $entity,
+                                'model'      => $name,
+                                'query'      => $extra,
+                                'size'       => $post['size'] ?? '',
+                                'onclick'    => $onclickMethod,
+                                'attributes' => $dataAttr,
+                                'transKeys'  => $attrTransKeys,
                             ]
                         );
                         $dataArray['statusHtml'] = $html;

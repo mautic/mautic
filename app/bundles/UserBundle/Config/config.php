@@ -181,10 +181,10 @@ return [
             'mautic.security.logout_handler' => [
                 'class'        => \Mautic\UserBundle\EventListener\LogoutListener::class,
                 'tagArguments' => [
-                    'event'      => \Symfony\Component\Security\Http\Event\LogoutEvent::class,
+                    'event' => \Symfony\Component\Security\Http\Event\LogoutEvent::class,
                 ],
-                'tag'          => 'kernel.event_listener',
-                'arguments'    => [
+                'tag'       => 'kernel.event_listener',
+                'arguments' => [
                     'mautic.user.model.user',
                     'event_dispatcher',
                     'mautic.helper.user',
@@ -198,7 +198,7 @@ return [
                     'mautic.helper.core_parameters',
                     '%mautic.saml_idp_entity_id%',
                 ],
-                'tag'       => 'lightsaml.own_credential_store',
+                'tag' => 'lightsaml.own_credential_store',
             ],
 
             'mautic.security.saml.trust_store' => [
@@ -207,7 +207,7 @@ return [
                     'mautic.helper.core_parameters',
                     '%mautic.saml_idp_entity_id%',
                 ],
-                'tag'       => 'lightsaml.trust_options_store',
+                'tag' => 'lightsaml.trust_options_store',
             ],
 
             'mautic.security.saml.entity_descriptor_store' => [
@@ -215,7 +215,7 @@ return [
                 'arguments' => [
                     'mautic.helper.core_parameters',
                 ],
-                'tag'       => 'lightsaml.idp_entity_store',
+                'tag' => 'lightsaml.idp_entity_store',
             ],
 
             'mautic.security.saml.id_store' => [

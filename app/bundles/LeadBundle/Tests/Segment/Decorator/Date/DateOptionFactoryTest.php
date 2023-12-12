@@ -280,7 +280,7 @@ class DateOptionFactoryTest extends \PHPUnit\Framework\TestCase
 
         $dateOptionFactory = new DateOptionFactory($dateDecorator, $relativeDate, $timezoneResolver);
 
-        $filter                    = [
+        $filter = [
             'glue'     => 'and',
             'type'     => 'datetime',
             'object'   => 'lead',

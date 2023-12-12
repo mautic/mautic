@@ -52,8 +52,8 @@ class EmailType extends AbstractType
                    'class'    => 'form-control',
                    'preaddon' => 'fa fa-user',
                ],
-               'required'   => false,
-               'data'       => $default,
+               'required' => false,
+               'data'     => $default,
             ]
         );
 
@@ -62,9 +62,9 @@ class EmailType extends AbstractType
             'from',
             TextType::class,
             [
-                'label'       => 'mautic.lead.email.from_email',
-                'label_attr'  => ['class' => 'control-label'],
-                'attr'        => [
+                'label'      => 'mautic.lead.email.from_email',
+                'label_attr' => ['class' => 'control-label'],
+                'attr'       => [
                     'class'    => 'form-control',
                     'preaddon' => 'fa fa-envelope',
                 ],

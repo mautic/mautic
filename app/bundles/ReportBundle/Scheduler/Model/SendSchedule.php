@@ -16,7 +16,7 @@ class SendSchedule
         private MessageSchedule $messageSchedule,
         private FileHandler $fileHandler
     ) {
-        $this->mailer          = $mailer->getMailer();
+        $this->mailer = $mailer->getMailer();
     }
 
     public function send(Scheduler $scheduler, $csvFilePath): void

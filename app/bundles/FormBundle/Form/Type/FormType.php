@@ -46,7 +46,7 @@ class FormType extends AbstractType
                 'class'   => 'form-control',
                 'tooltip' => 'mautic.form.field.form.form_attr.tooltip',
             ],
-            'required'   => false,
+            'required' => false,
         ]);
 
         $builder->add('description', TextareaType::class, [
@@ -124,7 +124,7 @@ class FormType extends AbstractType
                     'tooltip'     => 'mautic.form.form.progressive_profiling_limit.max_fields.tooltip',
                     'placeholder' => 'mautic.form.form.progressive_profiling_limit_unlimited',
                 ],
-                'data'  => $options['data']->getProgressiveProfilingLimit() ?: '',
+                'data' => $options['data']->getProgressiveProfilingLimit() ?: '',
             ]
         );
 
@@ -134,9 +134,9 @@ class FormType extends AbstractType
         }
 
         $builder->add('renderStyle', YesNoButtonGroupType::class, [
-            'label'      => 'mautic.form.form.renderstyle',
-            'data'       => $options['data']->getRenderStyle() ?? true,
-            'attr'       => [
+            'label' => 'mautic.form.form.renderstyle',
+            'data'  => $options['data']->getRenderStyle() ?? true,
+            'attr'  => [
                 'tooltip' => 'mautic.form.form.renderstyle.tooltip',
             ],
         ]);
@@ -150,9 +150,9 @@ class FormType extends AbstractType
                 'mautic.form.form.postaction.redirect' => 'redirect',
                 'mautic.form.form.postaction.message'  => 'message',
             ],
-            'label'             => 'mautic.form.form.postaction',
-            'label_attr'        => ['class' => 'control-label'],
-            'attr'              => [
+            'label'      => 'mautic.form.form.postaction',
+            'label_attr' => ['class' => 'control-label'],
+            'attr'       => [
                 'class'    => 'form-control',
                 'onchange' => 'Mautic.onPostSubmitActionChange(this.value);',
             ],

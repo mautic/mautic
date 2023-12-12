@@ -16,9 +16,9 @@ use Symfony\Component\HttpFoundation\File\UploadedFile;
 
 class FormUploaderTest extends \PHPUnit\Framework\TestCase
 {
-    private $formId1   = 1;
+    private $formId1 = 1;
 
-    private $formId2   = 2;
+    private $formId2 = 2;
 
     private $uploadDir = __DIR__.'/DummyFiles';
 

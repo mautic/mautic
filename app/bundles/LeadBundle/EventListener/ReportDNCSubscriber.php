@@ -44,9 +44,9 @@ class ReportDNCSubscriber implements EventSubscriberInterface
             return;
         }
 
-        $columns            = $this->fieldsBuilder->getLeadFieldsColumns('l.');
-        $companyColumns     = $this->companyReportData->getCompanyData();
-        $leadFilters        = $this->fieldsBuilder->getLeadFilter('l.', 's.');
+        $columns        = $this->fieldsBuilder->getLeadFieldsColumns('l.');
+        $companyColumns = $this->companyReportData->getCompanyData();
+        $leadFilters    = $this->fieldsBuilder->getLeadFilter('l.', 's.');
 
         $dncColumns = [
             'dnc.reason' => [

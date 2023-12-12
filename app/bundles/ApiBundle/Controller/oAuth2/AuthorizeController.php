@@ -82,7 +82,7 @@ class AuthorizeController extends \FOS\OAuthServerBundle\Controller\AuthorizeCon
             return $this->processSuccess($user, $this->authorizeFormHandler, $request);
         }
 
-        $contents =  $this->twig->render(
+        $contents = $this->twig->render(
             '@MauticApi/Authorize/oAuth2/authorize.html.twig',
             [
                 'form'   => $this->authorizeForm->createView(),

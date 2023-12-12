@@ -18,7 +18,7 @@ class AbstractCampaignCommand extends MauticMysqlTestCase
 {
     public const SEND_EMAIL_SECONDS = 3;
 
-    public const CONDITION_SECONDS  = 6;
+    public const CONDITION_SECONDS = 6;
 
     /**
      * @var array

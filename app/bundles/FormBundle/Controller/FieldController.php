@@ -46,8 +46,8 @@ class FieldController extends CommonFormController
         RequestStack $requestStack,
         CorePermissions $security
     ) {
-        $this->fieldHelper                 = $fieldHelper;
-        $this->formFactory                 = $formFactory;
+        $this->fieldHelper = $fieldHelper;
+        $this->formFactory = $formFactory;
 
         parent::__construct($formFactory, $fieldHelper, $doctrine, $factory, $modelFactory, $userHelper, $coreParametersHelper, $dispatcher, $translator, $flashBag, $requestStack, $security);
     }
@@ -60,7 +60,7 @@ class FieldController extends CommonFormController
     public function newAction(Request $request)
     {
         $success = 0;
-        $valid   = $cancelled   = false;
+        $valid   = $cancelled = false;
         $method  = $request->getMethod();
         $session = $request->getSession();
 
@@ -72,9 +72,9 @@ class FieldController extends CommonFormController
             $fieldType = $request->query->get('type');
             $formId    = $request->query->get('formId');
             $formField = [
-                'type'     => $fieldType,
-                'formId'   => $formId,
-                'parent'   => $request->query->get('parent'),
+                'type'   => $fieldType,
+                'formId' => $formId,
+                'parent' => $request->query->get('parent'),
             ];
         }
 
@@ -174,26 +174,26 @@ class FieldController extends CommonFormController
             $formField  = array_merge($blank, $formField);
             $formEntity = $this->formModel->getEntity($formId);
 
-            $passthroughVars['parent']    = $formField['parent'];
-            $passthroughVars['fieldId']   = $keyId;
-            $template                     = (!empty($customParams)) ? $customParams['template'] : '@MauticForm/Field/'.$fieldType.'.html.twig';
-            $leadFieldModel               = $this->getModel('lead.field');
+            $passthroughVars['parent']  = $formField['parent'];
+            $passthroughVars['fieldId'] = $keyId;
+            $template                   = (!empty($customParams)) ? $customParams['template'] : '@MauticForm/Field/'.$fieldType.'.html.twig';
+            $leadFieldModel             = $this->getModel('lead.field');
             \assert($leadFieldModel instanceof \Mautic\LeadBundle\Model\FieldModel);
             $passthroughVars['fieldHtml'] = $this->renderView(
                 '@MauticForm/Builder/_field_wrapper.html.twig',
                 [
-                    'isConditional'        => !empty($formField['parent']),
-                    'template'             => $template,
-                    'inForm'               => true,
-                    'field'                => $formField,
-                    'id'                   => $keyId,
-                    'formId'               => $formId,
-                    'formName'             => null === $formEntity ? 'newform' : $formEntity->generateFormName(),
-                    'mappedFields'         => $this->mappedObjectCollector->buildCollection((string) $formField['mappedObject']),
-                    'inBuilder'            => true,
-                    'fields'               => $this->fieldHelper->getChoiceList($customComponents['fields']),
-                    'viewOnlyFields'       => $customComponents['viewOnlyFields'],
-                    'formFields'           => $fields,
+                    'isConditional'  => !empty($formField['parent']),
+                    'template'       => $template,
+                    'inForm'         => true,
+                    'field'          => $formField,
+                    'id'             => $keyId,
+                    'formId'         => $formId,
+                    'formName'       => null === $formEntity ? 'newform' : $formEntity->generateFormName(),
+                    'mappedFields'   => $this->mappedObjectCollector->buildCollection((string) $formField['mappedObject']),
+                    'inBuilder'      => true,
+                    'fields'         => $this->fieldHelper->getChoiceList($customComponents['fields']),
+                    'viewOnlyFields' => $customComponents['viewOnlyFields'],
+                    'formFields'     => $fields,
                 ]
             );
         }
@@ -319,26 +319,26 @@ class FieldController extends CommonFormController
             $template                   = (!empty($customParams)) ? $customParams['template'] : '@MauticForm/Field/'.$fieldType.'.html.twig';
 
             // prevent undefined errors
-            $entity       = new Field();
-            $blank        = $entity->convertToArray();
-            $formField    = array_merge($blank, $formField);
+            $entity    = new Field();
+            $blank     = $entity->convertToArray();
+            $formField = array_merge($blank, $formField);
 
             $leadFieldModel = $this->getModel('lead.field');
             \assert($leadFieldModel instanceof \Mautic\LeadBundle\Model\FieldModel);
             $passthroughVars['fieldHtml'] = $this->renderView(
                 '@MauticForm/Builder/_field_wrapper.html.twig',
                 [
-                    'isConditional'        => !empty($formField['parent']),
-                    'template'             => $template,
-                    'inForm'               => true,
-                    'field'                => $formField,
-                    'id'                   => $objectId,
-                    'formId'               => $formId,
-                    'mappedFields'         => $this->mappedObjectCollector->buildCollection((string) $formField['mappedObject']),
-                    'inBuilder'            => true,
-                    'fields'               => $this->fieldHelper->getChoiceList($customComponents['fields']),
-                    'formFields'           => $fields,
-                    'viewOnlyFields'       => $customComponents['viewOnlyFields'],
+                    'isConditional'  => !empty($formField['parent']),
+                    'template'       => $template,
+                    'inForm'         => true,
+                    'field'          => $formField,
+                    'id'             => $objectId,
+                    'formId'         => $formId,
+                    'mappedFields'   => $this->mappedObjectCollector->buildCollection((string) $formField['mappedObject']),
+                    'inBuilder'      => true,
+                    'fields'         => $this->fieldHelper->getChoiceList($customComponents['fields']),
+                    'formFields'     => $fields,
+                    'viewOnlyFields' => $customComponents['viewOnlyFields'],
                 ]
             );
 
@@ -435,7 +435,7 @@ class FieldController extends CommonFormController
         );
         $form->get('formId')->setData($formId);
 
-        $event      = new FormBuilderEvent($this->translator);
+        $event = new FormBuilderEvent($this->translator);
         $this->dispatcher->dispatch($event, FormEvents::FORM_ON_BUILD);
         $event->addValidatorsToBuilder($form);
 

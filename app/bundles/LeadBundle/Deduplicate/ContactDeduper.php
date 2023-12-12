@@ -18,7 +18,7 @@ class ContactDeduper
         private ContactMerger $contactMerger,
         private LeadRepository $leadRepository
     ) {
-        $this->fieldModel     = $fieldModel;
+        $this->fieldModel = $fieldModel;
     }
 
     /**

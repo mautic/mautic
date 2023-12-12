@@ -85,7 +85,7 @@ class MenuBuilder
             $event = new MenuEvent($this->menuHelper, $name);
             $this->dispatcher->dispatch($event, CoreEvents::BUILD_MENU);
 
-            $menuItems    = $event->getMenuItems();
+            $menuItems = $event->getMenuItems();
 
             // KNP Menu explicitly requires a menu name since v3
             if (empty($menuItems['name'])) {

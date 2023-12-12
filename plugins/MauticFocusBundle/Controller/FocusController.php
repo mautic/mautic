@@ -192,9 +192,9 @@ class FocusController extends AbstractStandardFormController
                 }
             }
 
-            $args['viewParameters']['stats']                 = $stats;
-            $args['viewParameters']['dateRangeForm']         = $dateRangeForm->createView();
-            $args['viewParameters']['showConversionRate']    = true;
+            $args['viewParameters']['stats']              = $stats;
+            $args['viewParameters']['dateRangeForm']      = $dateRangeForm->createView();
+            $args['viewParameters']['showConversionRate'] = true;
             if (isset($trackables)) {
                 $args['viewParameters']['trackables'] = $trackables;
             }

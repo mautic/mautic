@@ -16,7 +16,7 @@ class MaxMindDoNotSellList implements DoNotSellListInterface
 
     public function __construct(CoreParametersHelper $coreParametersHelper)
     {
-        $this->listPath  = $coreParametersHelper->get('maxmind_do_not_sell_list_path', '');
+        $this->listPath = $coreParametersHelper->get('maxmind_do_not_sell_list_path', '');
     }
 
     public function loadList(): bool

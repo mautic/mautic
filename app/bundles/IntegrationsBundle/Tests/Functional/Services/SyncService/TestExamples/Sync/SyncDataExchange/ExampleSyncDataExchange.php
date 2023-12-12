@@ -23,19 +23,19 @@ class ExampleSyncDataExchange implements SyncDataExchangeInterface
      * @var array
      */
     public const FIELDS = [
-        'id'            => [
+        'id' => [
             'label' => 'ID',
             'type'  => NormalizedValueDAO::INT_TYPE,
         ],
-        'first_name'    => [
+        'first_name' => [
             'label' => 'First Name',
             'type'  => NormalizedValueDAO::STRING_TYPE,
         ],
-        'last_name'     => [
+        'last_name' => [
             'label' => 'Last Name',
             'type'  => NormalizedValueDAO::STRING_TYPE,
         ],
-        'email'         => [
+        'email' => [
             'label' => 'Email',
             'type'  => NormalizedValueDAO::STRING_TYPE,
         ],

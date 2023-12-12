@@ -97,7 +97,7 @@ class CompanyRepository extends CommonRepository implements CustomFieldRepositor
      *
      * @return \Doctrine\ORM\QueryBuilder
      */
-    public function getEntitiesOrmQueryBuilder($order, array $args=[])
+    public function getEntitiesOrmQueryBuilder($order, array $args = [])
     {
         $q = $this->getEntityManager()->createQueryBuilder();
         $q->select($this->getTableAlias().','.$order)
@@ -154,10 +154,10 @@ class CompanyRepository extends CommonRepository implements CustomFieldRepositor
 
     protected function addSearchCommandWhereClause($q, $filter): array
     {
-        [$expr, $parameters]     = $this->addStandardSearchCommandWhereClause($q, $filter);
-        $unique                  = $this->generateRandomParameterName();
-        $returnParameter         = true;
-        $command                 = $filter->command;
+        [$expr, $parameters] = $this->addStandardSearchCommandWhereClause($q, $filter);
+        $unique              = $this->generateRandomParameterName();
+        $returnParameter     = true;
+        $command             = $filter->command;
 
         if (in_array($command, $this->availableSearchFields)) {
             $expr = $q->expr()->like($this->getTableAlias().".$command", ":$unique");

@@ -14,8 +14,8 @@ class FormModelFunctionalTest extends MauticMysqlTestCase
 
     public function testPopulateValuesWithGetParameters(): void
     {
-        $formId     = $this->createForm();
-        $crawler    = $this->client->request(
+        $formId  = $this->createForm();
+        $crawler = $this->client->request(
             Request::METHOD_GET,
             "/s/forms/preview/{$formId}?email=testform@test.com&firstname=test&description=test-test&checkbox=val1|val3"
         );
@@ -50,9 +50,9 @@ class FormModelFunctionalTest extends MauticMysqlTestCase
             'description' => 'API test',
             'fields'      => [
                 [
-                    'label'     => 'firstname',
-                    'alias'     => 'firstname',
-                    'type'      => 'text',
+                    'label' => 'firstname',
+                    'alias' => 'firstname',
+                    'type'  => 'text',
                 ],
                 [
                     'label'     => 'email',
@@ -61,18 +61,18 @@ class FormModelFunctionalTest extends MauticMysqlTestCase
                     'leadField' => 'email',
                 ],
                 [
-                    'label'     => 'description',
-                    'alias'     => 'description',
-                    'type'      => 'textarea',
+                    'label' => 'description',
+                    'alias' => 'description',
+                    'type'  => 'textarea',
                 ],
                 [
-                    'label'          => 'checkbox',
-                    'alias'          => 'checkbox',
-                    'type'           => 'checkboxgrp',
-                    'properties'     => [
+                    'label'      => 'checkbox',
+                    'alias'      => 'checkbox',
+                    'type'       => 'checkboxgrp',
+                    'properties' => [
                         'syncList'   => 0,
                         'optionlist' => [
-                            'list'   => [
+                            'list' => [
                                 [
                                     'label' => 'val1',
                                     'value' => 'val1',
@@ -91,9 +91,9 @@ class FormModelFunctionalTest extends MauticMysqlTestCase
                     ],
                 ],
                 [
-                    'label'     => 'Submit',
-                    'alias'     => 'submit',
-                    'type'      => 'button',
+                    'label' => 'Submit',
+                    'alias' => 'submit',
+                    'type'  => 'button',
                 ],
             ],
         ];
@@ -109,11 +109,11 @@ class FormModelFunctionalTest extends MauticMysqlTestCase
     private function createPage(int $formId): void
     {
         $pagePayload = [
-            'title'        => 'Test Page',
-            'alias'        => 'test-page',
-            'description'  => 'This is my first page created via API.',
-            'isPublished'  => true,
-            'customHtml'   => '<!DOCTYPE html>
+            'title'       => 'Test Page',
+            'alias'       => 'test-page',
+            'description' => 'This is my first page created via API.',
+            'isPublished' => true,
+            'customHtml'  => '<!DOCTYPE html>
              <html>
                 <head>
                     <title>Test Page</title>

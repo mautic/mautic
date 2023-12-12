@@ -26,7 +26,7 @@ class SlotChannelFrequencyType extends SlotType
                     'class'           => 'form-control',
                     'data-slot-param' => 'label-text',
                 ],
-                'data'       => $this->translator->trans('mautic.lead.contact.me.label'),
+                'data' => $this->translator->trans('mautic.lead.contact.me.label'),
             ]
         );
 
@@ -41,7 +41,7 @@ class SlotChannelFrequencyType extends SlotType
                     'class'           => 'form-control',
                     'data-slot-param' => 'label-text1',
                 ],
-                'data'       => $this->translator->trans('mautic.lead.list.frequency.number'),
+                'data' => $this->translator->trans('mautic.lead.list.frequency.number'),
             ]
         );
 
@@ -56,7 +56,7 @@ class SlotChannelFrequencyType extends SlotType
                     'class'           => 'form-control',
                     'data-slot-param' => 'label-text2',
                 ],
-                'data'       => $this->translator->trans('mautic.lead.list.frequency.times'),
+                'data' => $this->translator->trans('mautic.lead.list.frequency.times'),
             ]
         );
 
@@ -71,7 +71,7 @@ class SlotChannelFrequencyType extends SlotType
                     'class'           => 'form-control',
                     'data-slot-param' => 'label-text3',
                 ],
-                'data'       => $this->translator->trans('mautic.lead.frequency.dates.label'),
+                'data' => $this->translator->trans('mautic.lead.frequency.dates.label'),
             ]
         );
 
@@ -86,7 +86,7 @@ class SlotChannelFrequencyType extends SlotType
                     'class'           => 'form-control',
                     'data-slot-param' => 'label-text4',
                 ],
-                'data'       => $this->translator->trans('mautic.lead.frequency.contact.end.date'),
+                'data' => $this->translator->trans('mautic.lead.frequency.contact.end.date'),
             ]
         );
 

@@ -24,11 +24,11 @@ interface SyncJudgeInterface
      */
     public const FUZZY_EVIDENCE_MODE = 'fuzzy';
 
-    public const LEFT_WINNER  = 'left';
+    public const LEFT_WINNER = 'left';
 
     public const RIGHT_WINNER = 'right';
 
-    public const NO_WINNER    = 'no';
+    public const NO_WINNER = 'no';
 
     /**
      * @param string $mode

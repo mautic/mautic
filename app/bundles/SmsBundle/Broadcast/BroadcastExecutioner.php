@@ -60,12 +60,12 @@ class BroadcastExecutioner
             $reduction = 0;
             $leads     = [];
             foreach ($contacts as $contact) {
-                $contactId  = $contact['id'];
-                $results    = $this->smsModel->sendSms($sms, $contactId, [
-                    'channel'=> [
+                $contactId = $contact['id'];
+                $results   = $this->smsModel->sendSms($sms, $contactId, [
+                    'channel' => [
                         'sms', $sms->getId(),
                     ],
-                    'listId'=> $contact['listId'],
+                    'listId' => $contact['listId'],
                 ], $leads);
                 $this->result->process($results);
                 $reduction += count($results);

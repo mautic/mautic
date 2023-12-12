@@ -69,10 +69,10 @@ final class FormConditionalSubscriberTest extends \PHPUnit\Framework\TestCase
      */
     public function testOnFormPostSaveForDeletedParent(): void
     {
-        $childField  = $this->createMock(Field::class);
-        $parentId    = 123;
-        $childId     = 456;
-        $form        = new Form();
+        $childField = $this->createMock(Field::class);
+        $parentId   = 123;
+        $childId    = 456;
+        $form       = new Form();
 
         $childField->method('getId')->willReturn($childId);
         $childField->method('getSessionId')->willReturn($childId);

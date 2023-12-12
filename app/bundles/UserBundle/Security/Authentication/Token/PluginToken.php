@@ -32,7 +32,7 @@ class PluginToken extends AbstractToken implements GuardTokenInterface
         if (null !== $user) {
             $this->setUser($user);
         }
-        $this->providerKey           = $providerKey;
+        $this->providerKey = $providerKey;
 
         $this->setAuthenticated(count($roles) > 0);
     }

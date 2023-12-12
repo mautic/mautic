@@ -24,13 +24,13 @@ class ExcelExporterTest extends TestCase
 
     public function setUp(): void
     {
-        $translator       = $this->createMock(TranslatorInterface::class);
+        $translator = $this->createMock(TranslatorInterface::class);
         $translator->expects($this->any())
             ->method('trans')
             ->with('mautic.report.report.groupby.totals')
             ->willReturn('Totals');
 
-        $dateHelperMock   =new DateHelper(
+        $dateHelperMock = new DateHelper(
             'F j, Y g:i a T',
             'D, M d',
             'F j, Y',
@@ -39,7 +39,7 @@ class ExcelExporterTest extends TestCase
             $this->createMock(CoreParametersHelper::class)
         );
 
-        $formatterHelper  = new FormatterHelper($dateHelperMock, $translator);
+        $formatterHelper = new FormatterHelper($dateHelperMock, $translator);
 
         $this->excelExporter = new ExcelExporter($formatterHelper, $translator);
         $this->tmpFile       = tempnam(sys_get_temp_dir(), 'mautic_xlsx_export_test_');

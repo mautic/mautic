@@ -390,7 +390,7 @@ class CampaignRepository extends CommonRepository
 
         $results = $q->executeQuery()->fetchAllAssociative();
 
-        $leads   = [];
+        $leads = [];
         foreach ($results as $r) {
             $leads[] = $r['lead_id'];
         }

@@ -79,7 +79,7 @@ class SmsType extends AbstractType
                     'label'      => 'mautic.email.form.list',
                     'label_attr' => ['class' => 'control-label'],
                     'attr'       => [
-                        'class'        => 'form-control',
+                        'class' => 'form-control',
                     ],
                     'multiple' => true,
                     'expanded' => false,

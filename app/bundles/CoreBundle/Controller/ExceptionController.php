@@ -37,7 +37,7 @@ class ExceptionController extends CommonController
                 str_contains($class, 'NotFoundHttpException') ||
                 str_contains($class, 'AccessDeniedHttpException');
 
-            $message   = $allowRealMessage
+            $message = $allowRealMessage
                 ? $exception->getMessage()
                 : $this->translator->trans(
                     'mautic.core.error.generic',
@@ -74,7 +74,7 @@ class ExceptionController extends CommonController
             }
         }
 
-        $template   = "@MauticCore/{$layout}/{$code}.html.twig";
+        $template = "@MauticCore/{$layout}/{$code}.html.twig";
         if (!$this->get('twig')->getLoader()->exists($template)) {
             $template = "@MauticCore/{$layout}/base.html.twig";
         }
@@ -86,7 +86,7 @@ class ExceptionController extends CommonController
 
         return $this->delegateView(
             [
-                'viewParameters'  => [
+                'viewParameters' => [
                     'baseTemplate'   => $baseTemplate,
                     'status_code'    => $code,
                     'status_text'    => $statusText,
@@ -105,7 +105,7 @@ class ExceptionController extends CommonController
                     ],
                     'route' => $urlParts['path'],
                 ],
-                'responseCode'    => $code,
+                'responseCode' => $code,
             ]
         );
     }

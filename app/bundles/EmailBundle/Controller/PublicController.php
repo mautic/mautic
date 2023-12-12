@@ -219,7 +219,7 @@ class PublicController extends CommonFormController
                     if (str_contains($html, 'data-slot="saveprefsbutton"') || str_contains($html, BuilderSubscriber::saveprefsRegex)) {
                         // set custom tag to inject end form
                         // update show pref center slots by looking for their presence in the html
-                        $params     = array_merge(
+                        $params = array_merge(
                             $viewParameters,
                             [
                                 'form'                         => $formView,
@@ -237,7 +237,7 @@ class PublicController extends CommonFormController
                             ->dispatch($event, PageEvents::PAGE_ON_DISPLAY);
                         $html = $event->getContent();
                         if (!$session->has($successSessionName)) {
-                            $successMessageDataSlots       = [
+                            $successMessageDataSlots = [
                                 'data-slot="successmessage"',
                                 'class="pref-successmessage"',
                             ];
@@ -362,7 +362,7 @@ class PublicController extends CommonFormController
                 $message
             );
         } else {
-            $email   = $lead   = false;
+            $email   = $lead = false;
             $message = $this->translator->trans('mautic.email.stat_record.not_found');
         }
 
@@ -681,7 +681,7 @@ class PublicController extends CommonFormController
     {
         $model = $this->getModel('lead.lead');
         \assert($model instanceof LeadModel);
-        $lead  = $model->getEntity();
+        $lead = $model->getEntity();
         // set custom field values
         $data = ['email' => $email];
         $model->setFieldValues($lead, $data, true);

@@ -35,7 +35,7 @@ class DateTimeLocalization
             'November',
             'December',
         ];
-        $days   = [
+        $days = [
             'Monday',
             'Tuesday',
             'Wednesday',

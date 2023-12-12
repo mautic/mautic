@@ -60,7 +60,7 @@ class CampaignActionDNCSubscriber implements EventSubscriberInterface
         $reason          = ArrayHelper::getValue('reason', $config, '');
         $persistEntities = [];
         $contacts        = $event->getContactsKeyedById();
-        foreach ($contacts as $contactId=>$contact) {
+        foreach ($contacts as $contactId => $contact) {
             foreach ($channels as $channel) {
                 $this->doNotContact->addDncForContact(
                     $contactId,
@@ -84,7 +84,7 @@ class CampaignActionDNCSubscriber implements EventSubscriberInterface
         $channels        = ArrayHelper::getValue('channels', $config, []);
         $persistEntities = [];
         $contacts        = $event->getContactsKeyedById();
-        foreach ($contacts as $contactId=>$contact) {
+        foreach ($contacts as $contactId => $contact) {
             foreach ($channels as $channel) {
                 $this->doNotContact->removeDncForContact(
                     $contactId,

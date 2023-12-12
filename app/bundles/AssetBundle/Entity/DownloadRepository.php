@@ -127,7 +127,7 @@ class DownloadRepository extends CommonRepository
 
         $results = $query->execute()->fetchAllAssociative();
 
-        $chart   = new PieChart();
+        $chart = new PieChart();
 
         foreach ($results as $result) {
             $chart->setDataset($result['status'], $result['count']);

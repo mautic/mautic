@@ -370,7 +370,7 @@ class DateTimeHelper
      */
     public static function validateMysqlDateTimeUnit($unit): void
     {
-        $possibleUnits   = ['s', 'i', 'H', 'd', 'W', 'm', 'Y'];
+        $possibleUnits = ['s', 'i', 'H', 'd', 'W', 'm', 'Y'];
 
         if (!in_array($unit, $possibleUnits, true)) {
             $possibleUnitsString = implode(', ', $possibleUnits);

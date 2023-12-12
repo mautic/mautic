@@ -16,10 +16,10 @@ class DateAnniversaryTest extends \PHPUnit\Framework\TestCase
      */
     public function testGetOperator(): void
     {
-        $dateDecorator             = $this->createMock(DateDecorator::class);
-        $timezoneResolver          = $this->createMock(TimezoneResolver::class);
+        $dateDecorator    = $this->createMock(DateDecorator::class);
+        $timezoneResolver = $this->createMock(TimezoneResolver::class);
 
-        $filter        = [
+        $filter = [
             'operator' => '=',
         ];
         $contactSegmentFilterCrate = new ContactSegmentFilterCrate($filter);
@@ -54,7 +54,7 @@ class DateAnniversaryTest extends \PHPUnit\Framework\TestCase
                     new \DateTime('midnight today', new \DateTimeZone('UTC')), null, 'UTC')
             );
 
-        $filter        = [
+        $filter = [
             'operator' => '=',
         ];
         $contactSegmentFilterCrate = new ContactSegmentFilterCrate($filter);
@@ -81,14 +81,14 @@ class DateAnniversaryTest extends \PHPUnit\Framework\TestCase
             ->with()
             ->willReturn($date);
 
-        $filter        = [
+        $filter = [
             'operator' => '=',
         ];
         $contactSegmentFilterCrate = new ContactSegmentFilterCrate($filter);
         $dateOptionParameters      = new DateOptionParameters($contactSegmentFilterCrate, [], $timezoneResolver);
 
-        $filter        = [
-            'filter'   => 'birthday +2days',
+        $filter = [
+            'filter' => 'birthday +2days',
         ];
         $contactSegmentFilterCrate = new ContactSegmentFilterCrate($filter);
 

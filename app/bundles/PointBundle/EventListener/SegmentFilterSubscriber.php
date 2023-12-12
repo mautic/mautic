@@ -24,10 +24,10 @@ class SegmentFilterSubscriber implements EventSubscriberInterface
     public static function getSubscribedEvents(): array
     {
         return [
-            LeadEvents::LIST_FILTERS_CHOICES_ON_GENERATE   => [
+            LeadEvents::LIST_FILTERS_CHOICES_ON_GENERATE => [
                 ['onGenerateSegmentFiltersAddPointGroups', -10],
             ],
-            LeadEvents::SEGMENT_DICTIONARY_ON_GENERATE   => [
+            LeadEvents::SEGMENT_DICTIONARY_ON_GENERATE => [
                 ['onSegmentDictionaryGenerate', 0],
             ],
         ];

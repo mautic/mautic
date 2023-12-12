@@ -37,13 +37,13 @@ class DetermineWinnerSubscriberTest extends \PHPUnit\Framework\TestCase
 
     public function testOnDetermineDownloadRateWinner(): void
     {
-        $parentMock    = $this->createMock(Page::class);
-        $childMock     = $this->createMock(Page::class);
-        $children      = [2 => $childMock];
-        $repoMock      = $this->createMock(DownloadRepository::class);
-        $parameters    = ['parent' => $parentMock, 'children' => $children];
-        $event         = new DetermineWinnerEvent($parameters);
-        $startDate     = new \DateTime();
+        $parentMock = $this->createMock(Page::class);
+        $childMock  = $this->createMock(Page::class);
+        $children   = [2 => $childMock];
+        $repoMock   = $this->createMock(DownloadRepository::class);
+        $parameters = ['parent' => $parentMock, 'children' => $children];
+        $event      = new DetermineWinnerEvent($parameters);
+        $startDate  = new \DateTime();
 
         $transDownloads = 'downloads';
         $transHits      = 'hits';

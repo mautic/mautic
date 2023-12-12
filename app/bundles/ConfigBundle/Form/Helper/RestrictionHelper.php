@@ -10,7 +10,7 @@ class RestrictionHelper
 {
     public const MODE_REMOVE = 'remove';
 
-    public const MODE_MASK   = 'mask';
+    public const MODE_MASK = 'mask';
 
     /**
      * @var string[]

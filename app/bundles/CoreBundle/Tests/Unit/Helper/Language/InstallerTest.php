@@ -13,7 +13,7 @@ class InstallerTest extends \PHPUnit\Framework\TestCase
 
         $installer = new Installer($translationsDirectory.'/translations');
 
-        $zipper  = new \ZipArchive();
+        $zipper = new \ZipArchive();
         $zipper->open($translationsDirectory.'/es.zip');
         $zipper->extractTo($translationsDirectory.'/tmp');
 

@@ -35,7 +35,7 @@ class DynamicsApiTest extends AbstractIntegrationTestCase
             $this->doNotContact
         );
 
-        $this->api         = new DynamicsApi($this->integration);
+        $this->api = new DynamicsApi($this->integration);
     }
 
     public function testIntegration(): void

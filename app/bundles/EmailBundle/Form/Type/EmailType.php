@@ -169,9 +169,9 @@ class EmailType extends AbstractType
             'headers',
             SortableListType::class,
             [
-                'required'        => false,
-                'label'           => 'mautic.email.custom_headers',
-                'attr'            => [
+                'required' => false,
+                'label'    => 'mautic.email.custom_headers',
+                'attr'     => [
                     'tooltip' => 'mautic.email.custom_headers.tooltip',
                 ],
                 'option_required' => false,

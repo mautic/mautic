@@ -32,11 +32,11 @@ class FormSubscriberTest extends TestCase
     {
         parent::setUp();
 
-        $ipLookupHelper       = $this->createMock(IpLookupHelper::class);
-        $auditLogModel        = $this->createMock(AuditLogModel::class);
-        $this->mailer         = $this->createMock(MailHelper::class);
-        $translator           = $this->createMock(TranslatorInterface::class);
-        $router               = $this->createMock(RouterInterface::class);
+        $ipLookupHelper = $this->createMock(IpLookupHelper::class);
+        $auditLogModel  = $this->createMock(AuditLogModel::class);
+        $this->mailer   = $this->createMock(MailHelper::class);
+        $translator     = $this->createMock(TranslatorInterface::class);
+        $router         = $this->createMock(RouterInterface::class);
 
         $this->mailer->expects($this->once())
             ->method('getMailer')
@@ -272,8 +272,8 @@ class FormSubscriberTest extends TestCase
             'notes'      => "A & B <br />\n < dy >",
         ];
 
-        $request         = new Request();
-        $submission      = $this->getFormSubmission();
+        $request    = new Request();
+        $submission = $this->getFormSubmission();
         $submission->getLead()->setEmail($leadEmail);
         $submissionEvent = new SubmissionEvent($submission, [], $request->server, $request);
         $action          = $this->getFormSubmitActionSendEmail();
@@ -331,9 +331,9 @@ class FormSubscriberTest extends TestCase
             'notes'      => "A & B <br />\n < dy >",
         ];
 
-        $request         = new Request();
-        $submission      = $this->getFormSubmission();
-        $owner           = new User();
+        $request    = new Request();
+        $submission = $this->getFormSubmission();
+        $owner      = new User();
         $owner->setEmail($ownerEmail);
         $submission->getLead()->setOwner($owner);
         $submissionEvent = new SubmissionEvent($submission, [], $request->server, $request);
@@ -397,9 +397,9 @@ class FormSubscriberTest extends TestCase
             'notes'      => "A & B <br />\n < dy >",
         ];
 
-        $request         = new Request();
-        $submission      = $this->getFormSubmission();
-        $owner           = new User();
+        $request    = new Request();
+        $submission = $this->getFormSubmission();
+        $owner      = new User();
         $owner->setEmail($ownerEmail);
         $submission->getLead()->setOwner($owner);
         $submission->getLead()->setEmail($leadEmail);

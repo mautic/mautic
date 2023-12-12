@@ -66,7 +66,7 @@ class IdentifyCompanyHelper
             return [[], []];
         }
 
-        $companyData     = $parameters;
+        $companyData = $parameters;
         if (!empty($companyEntities)) {
             $key               = array_key_last($companyEntities);
             $companyData['id'] = $companyEntities[$key]->getId();
@@ -101,7 +101,7 @@ class IdentifyCompanyHelper
             unset($parameters['company']);
         }
 
-        $fields= ['country', 'city', 'state'];
+        $fields = ['country', 'city', 'state'];
         foreach ($fields as $field) {
             if (isset($parameters[$field]) && !isset($parameters['company'.$field])) {
                 $parameters['company'.$field] = $parameters[$field];
@@ -125,8 +125,8 @@ class IdentifyCompanyHelper
             return false;
         }
 
-        [$user, $domain]     = explode('@', $email);
-        $arr                 = dns_get_record($domain, DNS_MX);
+        [$user, $domain] = explode('@', $email);
+        $arr             = dns_get_record($domain, DNS_MX);
 
         if (empty($arr)) {
             return false;

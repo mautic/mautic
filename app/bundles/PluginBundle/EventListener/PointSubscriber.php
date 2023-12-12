@@ -20,11 +20,11 @@ class PointSubscriber implements EventSubscriberInterface
     public function onTriggerBuild(TriggerBuilderEvent $event): void
     {
         $action = [
-            'group'     => 'mautic.plugin.point.action',
-            'label'     => 'mautic.plugin.actions.push_lead',
-            'formType'  => IntegrationsListType::class,
+            'group'    => 'mautic.plugin.point.action',
+            'label'    => 'mautic.plugin.actions.push_lead',
+            'formType' => IntegrationsListType::class,
             // 'formTheme' => 'MauticPluginBundle:FormTheme:Integration',
-            'callback'  => [EventHelper::class, 'pushLead'],
+            'callback' => [EventHelper::class, 'pushLead'],
         ];
 
         $event->addEvent('plugin.leadpush', $action);

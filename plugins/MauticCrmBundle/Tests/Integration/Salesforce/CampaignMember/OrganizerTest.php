@@ -115,7 +115,7 @@ class OrganizerTest extends \PHPUnit\Framework\TestCase
 
         $organizer = new Organizer($records);
 
-        $leads     = ['00Qf100000YjYv4EAF', '00Qf100000YjYv9EAF', '00Qf100000YjYvEEAV', '00Qf100000YjYvJEAV', '00Qf100000YjYvOEAV'];
+        $leads = ['00Qf100000YjYv4EAF', '00Qf100000YjYv9EAF', '00Qf100000YjYvEEAV', '00Qf100000YjYvJEAV', '00Qf100000YjYvOEAV'];
         $this->assertEquals($leads, $organizer->getLeadIds());
 
         /** @var Lead[] $organizedLeads */
@@ -126,7 +126,7 @@ class OrganizerTest extends \PHPUnit\Framework\TestCase
             $this->assertEquals($id, $organizedLeads[$id]->getId());
         }
 
-        $contacts  = ['00Qf100000YjYvTEAV', '00Qf100000X1NR5EAN', '00Qf100000YjYvYEAV', '00Qf100000YjYvdEAF', '00Qf100000YjYviEAF'];
+        $contacts = ['00Qf100000YjYvTEAV', '00Qf100000X1NR5EAN', '00Qf100000YjYvYEAV', '00Qf100000YjYvdEAF', '00Qf100000YjYviEAF'];
         $this->assertEquals($contacts, $organizer->getContactIds());
 
         /** @var Contact[] $organizedLeads */

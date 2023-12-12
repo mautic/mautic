@@ -44,7 +44,7 @@ class AjaxController extends CommonAjaxController
 
     public function installPackageAction(Request $request): JsonResponse
     {
-        $data   = json_decode($request->getContent(), true);
+        $data = json_decode($request->getContent(), true);
 
         if (empty($data['vendor']) || empty($data['package'])) {
             return $this->sendJsonResponse([
@@ -82,7 +82,7 @@ class AjaxController extends CommonAjaxController
 
     public function removePackageAction(Request $request): JsonResponse
     {
-        $data   = json_decode($request->getContent(), true);
+        $data = json_decode($request->getContent(), true);
 
         if (empty($data['vendor']) || empty($data['package'])) {
             return $this->sendJsonResponse([

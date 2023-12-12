@@ -34,9 +34,9 @@ class UserTokenServiceTest extends \PHPUnit\Framework\TestCase
      */
     public function testGenerateSecret(): void
     {
-        $secretLength    = 6;
-        $randomSecret    = 'secret';
-        $token           = new UserToken();
+        $secretLength = 6;
+        $randomSecret = 'secret';
+        $token        = new UserToken();
         $token->setAuthorizator('test-secret');
 
         $this->randomHelperMock->expects($this->exactly(2))

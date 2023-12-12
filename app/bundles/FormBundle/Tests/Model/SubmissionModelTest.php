@@ -177,19 +177,19 @@ class SubmissionModelTest extends \PHPUnit\Framework\TestCase
     {
         parent::setUp();
 
-        $this->ipLookupHelper           = $this->createMock(IpLookupHelper::class);
-        $this->twigMock                 = $this->createMock(Environment::class);
-        $this->formModel                = $this->createMock(FormModel::class);
-        $this->pageModel                = $this->createMock(PageModel::class);
-        $this->leadModel                = $this->createMock(LeadModel::class);
-        $this->campaignModel            = $this->createMock(CampaignModel::class);
-        $this->membershipManager        = $this->createMock(MembershipManager::class);
-        $this->leadFieldModel           = $this->createMock(LeadFieldModel::class);
-        $this->companyModel             = $this->createMock(CompanyModel::class);
-        $this->fieldHelper              = $this->createMock(FormFieldHelper::class);
-        $this->dispatcher               = $this->createMock(EventDispatcherInterface::class);
-        $this->translator               = $this->createMock(Translator::class);
-        $this->dateHelper               = new DateHelper(
+        $this->ipLookupHelper    = $this->createMock(IpLookupHelper::class);
+        $this->twigMock          = $this->createMock(Environment::class);
+        $this->formModel         = $this->createMock(FormModel::class);
+        $this->pageModel         = $this->createMock(PageModel::class);
+        $this->leadModel         = $this->createMock(LeadModel::class);
+        $this->campaignModel     = $this->createMock(CampaignModel::class);
+        $this->membershipManager = $this->createMock(MembershipManager::class);
+        $this->leadFieldModel    = $this->createMock(LeadFieldModel::class);
+        $this->companyModel      = $this->createMock(CompanyModel::class);
+        $this->fieldHelper       = $this->createMock(FormFieldHelper::class);
+        $this->dispatcher        = $this->createMock(EventDispatcherInterface::class);
+        $this->translator        = $this->createMock(Translator::class);
+        $this->dateHelper        = new DateHelper(
             'Y-m-d H:i:s',
             'Y-m-d H:i',
             'Y-m-d',

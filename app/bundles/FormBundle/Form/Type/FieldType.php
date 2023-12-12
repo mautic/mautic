@@ -94,7 +94,7 @@ class FieldType extends AbstractType
             $type = $options['data']['type'];
             switch ($type) {
                 case 'freetext':
-                    $addHelpMessage      = $addDefaultValue      = $addIsRequired      = $addMappedFieldList      = $addSaveResult      = $addBehaviorFields      = false;
+                    $addHelpMessage      = $addDefaultValue = $addIsRequired = $addMappedFieldList = $addSaveResult = $addBehaviorFields = false;
                     $labelText           = 'mautic.form.field.form.header';
                     $showLabelText       = 'mautic.form.field.form.showheader';
                     $inputAttributesText = 'mautic.form.field.form.freetext_attributes';
@@ -104,7 +104,7 @@ class FieldType extends AbstractType
                     $cleanMasks['properties'] = 'html';
                     break;
                 case 'freehtml':
-                    $addHelpMessage      = $addDefaultValue      = $addIsRequired      = $addMappedFieldList      = $addSaveResult      = $addBehaviorFields      = false;
+                    $addHelpMessage      = $addDefaultValue = $addIsRequired = $addMappedFieldList = $addSaveResult = $addBehaviorFields = false;
                     $labelText           = 'mautic.form.field.form.header';
                     $showLabelText       = 'mautic.form.field.form.showheader';
                     $inputAttributesText = 'mautic.form.field.form.freehtml_attributes';
@@ -144,10 +144,10 @@ class FieldType extends AbstractType
                 'conditions',
                 FormFieldConditionType::class,
                 [
-                    'label'      => false,
-                    'data'       => $options['data']['conditions'] ?? [],
-                    'formId'     => $options['data']['formId'],
-                    'parent'     => $options['data']['parent'] ?? null,
+                    'label'  => false,
+                    'data'   => $options['data']['conditions'] ?? [],
+                    'formId' => $options['data']['formId'],
+                    'parent' => $options['data']['parent'] ?? null,
                 ]
             );
         }
@@ -156,7 +156,7 @@ class FieldType extends AbstractType
             'parent',
             HiddenType::class,
             [
-                'label'=> false,
+                'label' => false,
             ]
         );
 
@@ -256,7 +256,7 @@ class FieldType extends AbstractType
                         'tooltip'      => $this->translator->trans('mautic.core.form.default').': '.$this->translator->trans('mautic.form.field.generic.required', [], 'validators'),
                         'data-show-on' => '{"formfield_isRequired_1": "checked"}',
                     ],
-                    'required'   => false,
+                    'required' => false,
                 ]
             );
         }
@@ -338,7 +338,7 @@ class FieldType extends AbstractType
                     'attr'  => [
                         'tooltip' => 'mautic.form.field.form.always_display.tooltip',
                     ],
-                    'data'  => $alwaysDisplay,
+                    'data' => $alwaysDisplay,
                 ]
             );
 

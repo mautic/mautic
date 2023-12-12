@@ -21,17 +21,17 @@ class ConfigType extends AbstractType
             'contact_unique_identifiers_operator',
             ChoiceType::class,
             [
-                'choices'           => [
-                    'mautic.core.config.contact_unique_identifiers_operator.or'    => CompositeExpression::TYPE_OR,
-                    'mautic.core.config.contact_unique_identifiers_operator.and'   => CompositeExpression::TYPE_AND,
+                'choices' => [
+                    'mautic.core.config.contact_unique_identifiers_operator.or'  => CompositeExpression::TYPE_OR,
+                    'mautic.core.config.contact_unique_identifiers_operator.and' => CompositeExpression::TYPE_AND,
                 ],
-                'label'             => 'mautic.core.config.unique_identifiers_operator',
-                'required'          => false,
-                'attr'              => [
+                'label'    => 'mautic.core.config.unique_identifiers_operator',
+                'required' => false,
+                'attr'     => [
                     'class'   => 'form-control',
                     'tooltip' => 'mautic.core.config.unique_identifiers_operator.tooltip',
                 ],
-                'placeholder'       => false,
+                'placeholder' => false,
             ]
         );
 
@@ -59,9 +59,9 @@ class ConfigType extends AbstractType
                 'contact_columns',
                 ContactColumnsType::class,
                 [
-                    'label'       => 'mautic.config.tab.columns',
-                    'label_attr'  => ['class' => 'control-label'],
-                    'attr'        => [
+                    'label'      => 'mautic.config.tab.columns',
+                    'label_attr' => ['class' => 'control-label'],
+                    'attr'       => [
                         'class'         => 'form-control multiselect',
                         'data-sortable' => 'true',
                         'data-order'    => $order,
@@ -74,7 +74,7 @@ class ConfigType extends AbstractType
                             ['message' => 'mautic.core.value.required']
                         ),
                     ],
-                    'data'=> array_flip($orderColumns),
+                    'data' => array_flip($orderColumns),
                 ]
             );
         };

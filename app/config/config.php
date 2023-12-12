@@ -66,20 +66,20 @@ $container->loadFromExtension('framework', [
         'enabled'  => true,
         'fallback' => 'en_US',
     ],
-    'session'         => [ // handler_id set to null will use default session handler from php.ini
-        'handler_id'           => null,
-        'name'                 => '%env(MAUTIC_SESSION_NAME)%',
-        'cookie_secure'        => $secureCookie,
-        'cookie_samesite'      => 'lax',
+    'session' => [ // handler_id set to null will use default session handler from php.ini
+        'handler_id'      => null,
+        'name'            => '%env(MAUTIC_SESSION_NAME)%',
+        'cookie_secure'   => $secureCookie,
+        'cookie_samesite' => 'lax',
     ],
     'fragments'            => null,
     'http_method_override' => true,
     'mailer'               => [
         'dsn' => '%env(mailer:MAUTIC_MAILER_DSN)%',
     ],
-    'messenger'            => [
-        'failure_transport'  => 'failed',
-        'transports'         => [
+    'messenger' => [
+        'failure_transport' => 'failed',
+        'transports'        => [
             'email' => [
                 'dsn'            => '%env(MAUTIC_MESSENGER_DSN_EMAIL)%',
                 'retry_strategy' => [
@@ -137,16 +137,16 @@ $connectionSettings = [
 ];
 
 if (!empty($localConfigParameterBag->get('db_host_ro'))) {
-    $dbalSettings['wrapper_class']   = \Mautic\CoreBundle\Doctrine\Connection\PrimaryReadReplicaConnectionWrapper::class;
-    $dbalSettings['keep_replica']    = true;
-    $dbalSettings['replicas']        = [
+    $dbalSettings['wrapper_class'] = \Mautic\CoreBundle\Doctrine\Connection\PrimaryReadReplicaConnectionWrapper::class;
+    $dbalSettings['keep_replica']  = true;
+    $dbalSettings['replicas']      = [
         'replica1' => [
-            'host'                  => '%mautic.db_host_ro%',
-            'port'                  => '%mautic.db_port%',
-            'dbname'                => '%mautic.db_name%',
-            'user'                  => '%mautic.db_user%',
-            'password'              => '%mautic.db_password%',
-            'charset'               => 'utf8mb4',
+            'host'     => '%mautic.db_host_ro%',
+            'port'     => '%mautic.db_port%',
+            'dbname'   => '%mautic.db_name%',
+            'user'     => '%mautic.db_user%',
+            'password' => '%mautic.db_password%',
+            'charset'  => 'utf8mb4',
         ],
     ];
 }
@@ -163,13 +163,13 @@ $container->loadFromExtension('doctrine', [
                 ],
             ]),
         ],
-        'types'    => [
+        'types' => [
             'array'     => \Mautic\CoreBundle\Doctrine\Type\ArrayType::class,
             'datetime'  => \Mautic\CoreBundle\Doctrine\Type\UTCDateTimeType::class,
             'generated' => \Mautic\CoreBundle\Doctrine\Type\GeneratedType::class,
         ],
     ],
-    'orm'  => [
+    'orm' => [
         'auto_generate_proxy_classes' => '%kernel.debug%',
         'auto_mapping'                => true,
         'mappings'                    => $bundleMetadataBuilder->getOrmConfig(),
@@ -346,14 +346,14 @@ $container->loadFromExtension('fm_elfinder', [
             'editor_template' => '@bundles/CoreBundle/Assets/js/libraries/filemanager/index.html.twig',
             'fullscreen'      => true,
             // 'include_assets'  => true,
-            'relative_path'   => false,
-            'connector'       => [
+            'relative_path' => false,
+            'connector'     => [
                 'debug' => '%kernel.debug%',
                 'binds' => [
                     'upload.pre mkdir.pre mkfile.pre rename.pre archive.pre ls.pre' => [
                         'Plugin.Sanitizer.cmdPreprocess',
                     ],
-                    'upload.presave paste.copyfrom'                                 => [
+                    'upload.presave paste.copyfrom' => [
                         'Plugin.Sanitizer.onUpLoadPreSave',
                     ],
                 ],
@@ -365,9 +365,9 @@ $container->loadFromExtension('fm_elfinder', [
                 ],
                 'roots' => [
                     'local' => [
-                        'driver'        => 'Flysystem',
-                        'path'          => '',
-                        'flysystem'     => [
+                        'driver'    => 'Flysystem',
+                        'path'      => '',
+                        'flysystem' => [
                             'type'            => 'custom',
                             'adapter_service' => 'mautic.core.service.local_file_adapter',
                             'options'         => [],

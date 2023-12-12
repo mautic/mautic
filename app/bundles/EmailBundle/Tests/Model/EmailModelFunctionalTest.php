@@ -26,7 +26,7 @@ class EmailModelFunctionalTest extends MauticMysqlTestCase
         $this->addContactsToSegment($contacts, $segment);
         $email = $this->createEmail($segment);
 
-        $emailModel                                             =  self::$container->get('mautic.email.model.email');
+        $emailModel = self::$container->get('mautic.email.model.email');
         \assert($emailModel instanceof EmailModel);
         [$sentCount] = $emailModel->sendEmailToLists($email, [$segment], null, null, null, null, null, 3, 1);
         $this->assertEquals($sentCount, 7);
@@ -107,8 +107,8 @@ class EmailModelFunctionalTest extends MauticMysqlTestCase
         $this->addContactsToSegment($contacts, $segment);
         $email = $this->createEmail($segment);
 
-        $emailModel                                             =  self::$container->get('mautic.email.model.email');
-        [$sentCount, $failedCount, $failedRecipientsByList]     = $emailModel->sendEmailToLists($email, [$segment], 4, 2);
+        $emailModel                                         = self::$container->get('mautic.email.model.email');
+        [$sentCount, $failedCount, $failedRecipientsByList] = $emailModel->sendEmailToLists($email, [$segment], 4, 2);
         $this->assertEquals($sentCount, 4);
         [$sentCount, $failedCount, $failedRecipientsByList] = $emailModel->sendEmailToLists($email, [$segment], 3, 2);
         $this->assertEquals($sentCount, 3);
@@ -117,19 +117,19 @@ class EmailModelFunctionalTest extends MauticMysqlTestCase
         [$sentCount, $failedCount, $failedRecipientsByList] = $emailModel->sendEmailToLists($email, [$segment], 4);
         $this->assertEquals($sentCount, 1);
 
-        $email                                                  = $this->createEmail($segment);
-        [$sentCount, $failedCount, $failedRecipientsByList]     = $emailModel->sendEmailToLists($email, [$segment]);
+        $email                                              = $this->createEmail($segment);
+        [$sentCount, $failedCount, $failedRecipientsByList] = $emailModel->sendEmailToLists($email, [$segment]);
         $this->assertEquals($sentCount, 10);
 
-        $email                                                  = $this->createEmail($segment);
-        [$sentCount, $failedCount, $failedRecipientsByList]     = $emailModel->sendEmailToLists($email, [$segment], null, 2);
+        $email                                              = $this->createEmail($segment);
+        [$sentCount, $failedCount, $failedRecipientsByList] = $emailModel->sendEmailToLists($email, [$segment], null, 2);
         $this->assertEquals($sentCount, 10);
     }
 
    public function testNotOverwriteChildrenTranslationEmailAfterSaveParent(): void
    {
-       $segment        = new LeadList();
-       $segmentName    = 'Test_segment';
+       $segment     = new LeadList();
+       $segmentName = 'Test_segment';
        $segment->setName($segmentName);
        $segment->setPublicName($segmentName);
        $segment->setAlias($segmentName);

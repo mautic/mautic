@@ -55,14 +55,14 @@ abstract class AbstractFormController extends CommonController
      */
     protected function isLocked($postActionVars, $entity, $model, $batch = false)
     {
-        $date                   = $entity->getCheckedOut();
-        $postActionVars         = $this->refererPostActionVars($postActionVars);
-        $returnUrl              = $postActionVars['returnUrl'];
-        $override               = '';
+        $date           = $entity->getCheckedOut();
+        $postActionVars = $this->refererPostActionVars($postActionVars);
+        $returnUrl      = $postActionVars['returnUrl'];
+        $override       = '';
 
-        $modelClass             = $this->getModel($model);
-        $nameFunction           = $modelClass->getNameGetter();
-        $this->permissionBase   = $modelClass->getPermissionBase();
+        $modelClass           = $this->getModel($model);
+        $nameFunction         = $modelClass->getNameGetter();
+        $this->permissionBase = $modelClass->getPermissionBase();
 
         if ($this->canEdit($entity)) {
             $override = $this->translator->trans(
@@ -238,7 +238,7 @@ abstract class AbstractFormController extends CommonController
         $objAction   = $actionRoute['objectAction'] ?? 'index';
         $routeCtrlr  = explode('\\', $actionRoute['_controller']);
 
-        $defaultContentTemplate  = $routeCtrlr[0].$routeCtrlr[1].':'.ucfirst(str_replace('Bundle', '', $routeCtrlr[1])).':'.$objAction;
+        $defaultContentTemplate = $routeCtrlr[0].$routeCtrlr[1].':'.ucfirst(str_replace('Bundle', '', $routeCtrlr[1])).':'.$objAction;
         $vars['contentTemplate'] ??= $defaultContentTemplate;
 
         $vars['passthroughVars']['activeLink'] = '#'.str_replace('_action', '_'.$objAction, $actionRoute['_route']);

@@ -159,7 +159,7 @@ class InputHelperTest extends TestCase
             'čusťom test' => 'custom test',
             null          => '',
         ];
-        foreach ($tests as $input=>$expected) {
+        foreach ($tests as $input => $expected) {
             $this->assertEquals(InputHelper::transliterate($input), $expected);
         }
     }

@@ -10,13 +10,13 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class DateTokenHelperTest extends \PHPUnit\Framework\TestCase
 {
-    public const DATE_FORMAT      = 'F j, Y';
+    public const DATE_FORMAT = 'F j, Y';
 
-    public const TIME_FORMAT      = 'g:i a';
+    public const TIME_FORMAT = 'g:i a';
 
     public const DATE_TIME_FORMAT = self::DATE_FORMAT.' '.self::TIME_FORMAT;
 
-    public const TIMEZONE        = 'Europe/Paris';
+    public const TIMEZONE = 'Europe/Paris';
 
     public const TIMEZONE_CUSTOM = 'America/Chicago';
 
@@ -49,7 +49,7 @@ class DateTokenHelperTest extends \PHPUnit\Framework\TestCase
             $expected        = $contents[1];
             $contactTimezone = $contents[2] ?? null;
 
-            $tokens          = $dateTokenHelper->getTokens($content, $contactTimezone);
+            $tokens = $dateTokenHelper->getTokens($content, $contactTimezone);
             $this->assertSame($expected, $tokens);
         }
     }
@@ -60,7 +60,7 @@ class DateTokenHelperTest extends \PHPUnit\Framework\TestCase
     public function getContents(): array
     {
         $now      = new \DateTime('now', new \DateTimeZone(self::TIMEZONE));
-        $contents =  [
+        $contents = [
             [
             '<html lang="en"><head><title></title></head><body>{today}</body></html>',
             [

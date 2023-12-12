@@ -28,7 +28,7 @@ class LookupHelper
         protected LeadModel $leadModel,
         protected CompanyModel $companyModel
     ) {
-        $this->integration  = $integrationHelper->getIntegrationObject('Clearbit');
+        $this->integration = $integrationHelper->getIntegrationObject('Clearbit');
     }
 
     /**
@@ -84,8 +84,8 @@ class LookupHelper
         if ($clearbit = $this->getClearbit(false)) {
             if (!$checkAuto || ($checkAuto && $this->integration->shouldAutoUpdate())) {
                 try {
-                    $parse                             = parse_url($company->getFieldValue('companywebsite'));
-                    [$cacheId, $webhookId, $cache]     = $this->getCache($company, $notify);
+                    $parse                         = parse_url($company->getFieldValue('companywebsite'));
+                    [$cacheId, $webhookId, $cache] = $this->getCache($company, $notify);
 
                     if (isset($parse['host']) && !array_key_exists($cacheId, $cache['clearbit'])) {
                         /* @var Router $router */
@@ -113,8 +113,8 @@ class LookupHelper
     public function validateRequest($oid, $type)
     {
         // prefix#entityId#hour#userId#nonce
-        [$w, $id, $hour, $uid, $nonce]     = explode('#', $oid, 5);
-        $notify                            = (str_contains($w, '_notify') && $uid) ? $uid : false;
+        [$w, $id, $hour, $uid, $nonce] = explode('#', $oid, 5);
+        $notify                        = (str_contains($w, '_notify') && $uid) ? $uid : false;
 
         switch ($type) {
             case 'person':

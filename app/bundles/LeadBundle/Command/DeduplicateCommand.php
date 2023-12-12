@@ -62,12 +62,12 @@ EOT
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        $newerIntoOlder  = (bool) $input->getOption('newer-into-older');
-        $batch           = (int) $input->getOption('batch');
-        $processes       = (int) $input->getOption('processes');
-        $uniqueFields    = $this->contactDeduper->getUniqueFields('lead');
-        $duplicateCount  = $this->contactDeduper->countDuplicatedContacts(array_keys($uniqueFields));
-        $stopwatch       = new Stopwatch();
+        $newerIntoOlder = (bool) $input->getOption('newer-into-older');
+        $batch          = (int) $input->getOption('batch');
+        $processes      = (int) $input->getOption('processes');
+        $uniqueFields   = $this->contactDeduper->getUniqueFields('lead');
+        $duplicateCount = $this->contactDeduper->countDuplicatedContacts(array_keys($uniqueFields));
+        $stopwatch      = new Stopwatch();
 
         if (!$duplicateCount) {
             $output->writeln('<error>No contacts to deduplicate.</error>');

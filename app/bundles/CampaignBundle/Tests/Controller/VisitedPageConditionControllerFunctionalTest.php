@@ -38,16 +38,16 @@ final class VisitedPageConditionControllerFunctionalTest extends MauticMysqlTest
         $form         = $crawler->filterXPath('//form[@name="campaignevent"]')->form();
         $form->setValues(
             [
-                'campaignevent[anchor]'                                  => 'leadsource',
-                'campaignevent[properties]['.$pageUrl[0].']'             => $pageUrl[1],
-                'campaignevent[properties]['.$startDate[0].']'           => $startDate[1],
-                'campaignevent[properties]['.$endDate[0].']'             => $endDate[1],
-                'campaignevent[properties]['.$accumulativeTime[0].']'    => $accumulativeTime[1],
-                'campaignevent[properties]['.$page[0].']'                => $page[1] ?? '',
-                'campaignevent[type]'                                    => 'lead.pageHit',
-                'campaignevent[eventType]'                               => 'condition',
-                'campaignevent[anchorEventType]'                         => 'source',
-                'campaignevent[campaignId]'                              => '3',
+                'campaignevent[anchor]'                               => 'leadsource',
+                'campaignevent[properties]['.$pageUrl[0].']'          => $pageUrl[1],
+                'campaignevent[properties]['.$startDate[0].']'        => $startDate[1],
+                'campaignevent[properties]['.$endDate[0].']'          => $endDate[1],
+                'campaignevent[properties]['.$accumulativeTime[0].']' => $accumulativeTime[1],
+                'campaignevent[properties]['.$page[0].']'             => $page[1] ?? '',
+                'campaignevent[type]'                                 => 'lead.pageHit',
+                'campaignevent[eventType]'                            => 'condition',
+                'campaignevent[anchorEventType]'                      => 'source',
+                'campaignevent[campaignId]'                           => '3',
             ]
         );
 
@@ -65,18 +65,18 @@ final class VisitedPageConditionControllerFunctionalTest extends MauticMysqlTest
     {
         return [
             [
-                'page_url'           => ['page_url', 'https://example.com'],
-                'startDate'          => ['startDate', (new \DateTime())->format('Y-m-d H:i:s')],
-                'endDate'            => ['endDate', (new \DateTime())->modify('+ 5 days')->format('Y-m-d H:i:s')],
-                'accumulative_time'  => ['accumulative_time', 5],
-                'page'               => ['page', null],
+                'page_url'          => ['page_url', 'https://example.com'],
+                'startDate'         => ['startDate', (new \DateTime())->format('Y-m-d H:i:s')],
+                'endDate'           => ['endDate', (new \DateTime())->modify('+ 5 days')->format('Y-m-d H:i:s')],
+                'accumulative_time' => ['accumulative_time', 5],
+                'page'              => ['page', null],
             ],
             [
-                'page_url'           => ['page_url', 'https://example.com'],
-                'startDate'          => ['startDate', (new \DateTime())->format('Y-m-d H:i:s')],
-                'endDate'            => ['endDate', (new \DateTime())->modify('+ 10 days')->format('Y-m-d H:i:s')],
-                'accumulative_time'  => ['accumulative_time', null],
-                'page'               => ['page', ''],
+                'page_url'          => ['page_url', 'https://example.com'],
+                'startDate'         => ['startDate', (new \DateTime())->format('Y-m-d H:i:s')],
+                'endDate'           => ['endDate', (new \DateTime())->modify('+ 10 days')->format('Y-m-d H:i:s')],
+                'accumulative_time' => ['accumulative_time', null],
+                'page'              => ['page', ''],
             ],
         ];
     }

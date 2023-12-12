@@ -17,7 +17,7 @@ class EventHelper
         $integrationHelper = $factory->getHelper('integration');
 
         static::setStaticIntegrationHelper($integrationHelper);
-        $errors  = [];
+        $errors = [];
 
         return static::pushIt($config, $contact, $errors);
     }

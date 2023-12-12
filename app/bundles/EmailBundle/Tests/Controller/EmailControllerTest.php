@@ -106,18 +106,18 @@ class EmailControllerTest extends \PHPUnit\Framework\TestCase
         $this->formMock      = $this->createMock(Form::class);
         $this->twigMock      = $this->createMock(Environment::class);
 
-        $this->formFactoryMock      = $this->createMock(FormFactory::class);
-        $formFieldHelper            = $this->createMock(FormFieldHelper::class);
-        $doctrine                   = $this->createMock(ManagerRegistry::class);
-        $factory                    = $this->createMock(MauticFactory::class);
-        $this->modelFactoryMock     = $this->createMock(ModelFactory::class);
-        $helperUserMock             = $this->createMock(UserHelper::class);
-        $coreParametersHelper       = $this->createMock(CoreParametersHelper::class);
-        $dispatcher                 = $this->createMock(EventDispatcherInterface::class);
-        $this->translatorMock       = $this->createMock(Translator::class);
-        $this->flashBagMock         = $this->createMock(FlashBag::class);
-        $this->requestStack         = new RequestStack();
-        $this->corePermissionsMock  = $this->createMock(CorePermissions::class);
+        $this->formFactoryMock     = $this->createMock(FormFactory::class);
+        $formFieldHelper           = $this->createMock(FormFieldHelper::class);
+        $doctrine                  = $this->createMock(ManagerRegistry::class);
+        $factory                   = $this->createMock(MauticFactory::class);
+        $this->modelFactoryMock    = $this->createMock(ModelFactory::class);
+        $helperUserMock            = $this->createMock(UserHelper::class);
+        $coreParametersHelper      = $this->createMock(CoreParametersHelper::class);
+        $dispatcher                = $this->createMock(EventDispatcherInterface::class);
+        $this->translatorMock      = $this->createMock(Translator::class);
+        $this->flashBagMock        = $this->createMock(FlashBag::class);
+        $this->requestStack        = new RequestStack();
+        $this->corePermissionsMock = $this->createMock(CorePermissions::class);
 
         $helperUserMock->method('getUser')
             ->willReturn(new User(false));

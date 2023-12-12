@@ -246,7 +246,7 @@ class MailHelperTest extends TestCase
      */
     public function testValidateEmails(string $email, bool $isValid): void
     {
-        $helper    = $this->mockEmptyMailHelper();
+        $helper = $this->mockEmptyMailHelper();
         if (!$isValid) {
             $this->expectException(InvalidEmailException::class);
         }

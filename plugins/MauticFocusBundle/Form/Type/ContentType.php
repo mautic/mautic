@@ -90,7 +90,7 @@ class ContentType extends AbstractType
             'font',
             ChoiceType::class,
             [
-                'choices'           => [
+                'choices' => [
                     'Arial'                    => 'Arial, Helvetica, sans-serif',
                     'Arial Black'              => '\'Arial Black\', Gadget, sans-serif',
                     'Arial Narrow'             => '\'Arial Narrow\', sans-serif',
@@ -107,9 +107,9 @@ class ContentType extends AbstractType
                     'Trebuchet MS'             => '\'Trebuchet MS\', Helvetica, sans-serif',
                     'Verdana'                  => 'Verdana, Geneva, sans-serif',
                 ],
-                'label'            => 'mautic.focus.form.font',
-                'label_attr'       => ['class' => 'control-label'],
-                'attr'             => [
+                'label'      => 'mautic.focus.form.font',
+                'label_attr' => ['class' => 'control-label'],
+                'attr'       => [
                     'class'        => 'form-control',
                     'onchange'     => 'Mautic.focusUpdatePreview()',
                     'data-show-on' => '{"focus_html_mode_0":"checked"}',
@@ -126,9 +126,9 @@ class ContentType extends AbstractType
                 'label'      => 'mautic.focus.form.custom.css',
                 'label_attr' => ['class' => 'control-label'],
                 'attr'       => [
-                    'class'        => 'form-control',
-                    'rows'         => 6,
-                    'onchange'     => 'Mautic.focusUpdatePreview()',
+                    'class'    => 'form-control',
+                    'rows'     => 6,
+                    'onchange' => 'Mautic.focusUpdatePreview()',
                 ],
                 'required' => false,
             ]

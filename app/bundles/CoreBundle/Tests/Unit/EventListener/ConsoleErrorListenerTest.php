@@ -32,9 +32,9 @@ class ConsoleErrorListenerTest extends \PHPUnit\Framework\TestCase
 
     protected function setUp(): void
     {
-        $this->logger   = $this->createMock(LoggerInterface::class);
-        $this->input    = $this->createMock(InputInterface::class);
-        $this->output   = $this->createMock(OutputInterface::class);
+        $this->logger = $this->createMock(LoggerInterface::class);
+        $this->input  = $this->createMock(InputInterface::class);
+        $this->output = $this->createMock(OutputInterface::class);
 
         $this->listener = new ConsoleErrorListener($this->logger);
     }

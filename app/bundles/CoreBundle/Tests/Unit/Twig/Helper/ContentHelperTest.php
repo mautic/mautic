@@ -48,7 +48,7 @@ class ContentHelperTest extends \PHPUnit\Framework\TestCase
 
     private function doShowTagsContext(string $tag): void
     {
-        $sample        = '<h1>Hello World</h1>
+        $sample = '<h1>Hello World</h1>
 
         <'.$tag.'>
             console.log("do not mind me");

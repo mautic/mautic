@@ -149,15 +149,15 @@ class Issue9488Test extends MauticMysqlTestCase
                     'operator' => '=',
                     'value'    => 'af',
                 ],
-                'type'                       => 'lead.field_value',
-                'eventType'                  => 'condition',
-                'anchorEventType'            => 'source',
-                'campaignId'                 => $campaign->getId(),
-                '_token'                     => 'HgysZwvH_n0uAp47CcAcsGddRnRk65t-3crOnuLx28Y',
-                'buttons'                    => ['save' => ''],
-                'field'                      => 'preferred_locale',
-                'operator'                   => '=',
-                'value'                      => 'af',
+                'type'            => 'lead.field_value',
+                'eventType'       => 'condition',
+                'anchorEventType' => 'source',
+                'campaignId'      => $campaign->getId(),
+                '_token'          => 'HgysZwvH_n0uAp47CcAcsGddRnRk65t-3crOnuLx28Y',
+                'buttons'         => ['save' => ''],
+                'field'           => 'preferred_locale',
+                'operator'        => '=',
+                'value'           => 'af',
             ]
         );
 
@@ -185,13 +185,13 @@ class Issue9488Test extends MauticMysqlTestCase
                 'properties'                 => [
                     'points' => '2',
                 ],
-                'type'                       => 'lead.changepoints',
-                'eventType'                  => 'action',
-                'anchorEventType'            => 'condition',
-                'campaignId'                 => $campaign->getId(),
-                '_token'                     => 'HgysZwvH_n0uAp47CcAcsGddRnRk65t-3crOnuLx28Y',
-                'buttons'                    => ['save' => ''],
-                'points'                     => '2',
+                'type'            => 'lead.changepoints',
+                'eventType'       => 'action',
+                'anchorEventType' => 'condition',
+                'campaignId'      => $campaign->getId(),
+                '_token'          => 'HgysZwvH_n0uAp47CcAcsGddRnRk65t-3crOnuLx28Y',
+                'buttons'         => ['save' => ''],
+                'points'          => '2',
             ]
         );
         $yesEvent->setParent($condition);
@@ -220,13 +220,13 @@ class Issue9488Test extends MauticMysqlTestCase
                 'properties'                 => [
                     'points' => '1',
                 ],
-                'type'                       => 'lead.changepoints',
-                'eventType'                  => 'action',
-                'anchorEventType'            => 'condition',
-                'campaignId'                 => $campaign->getId(),
-                '_token'                     => 'HgysZwvH_n0uAp47CcAcsGddRnRk65t-3crOnuLx28Y',
-                'buttons'                    => ['save' => ''],
-                'points'                     => '1',
+                'type'            => 'lead.changepoints',
+                'eventType'       => 'action',
+                'anchorEventType' => 'condition',
+                'campaignId'      => $campaign->getId(),
+                '_token'          => 'HgysZwvH_n0uAp47CcAcsGddRnRk65t-3crOnuLx28Y',
+                'buttons'         => ['save' => ''],
+                'points'          => '1',
             ]
         );
         $noEvent->setParent($condition);

@@ -57,7 +57,7 @@ class PluginController extends FormController
         /** @var \Mautic\PluginBundle\Helper\IntegrationHelper $integrationHelper */
         $integrationHelper  = $this->factory->getHelper('integration');
         $integrationObjects = $integrationHelper->getIntegrationObjects(null, null, true);
-        $integrations       = $foundPlugins       = [];
+        $integrations       = $foundPlugins = [];
 
         foreach ($integrationObjects as $name => $object) {
             $settings = $object->getIntegrationSettings();
@@ -140,7 +140,7 @@ class PluginController extends FormController
             $activeTab = $request->get('activeTab');
         }
 
-        $session   = $request->getSession();
+        $session = $request->getSession();
 
         $integrationDetailsPost = $request->request->get('integration_details') ?? [];
         $authorize              = empty($integrationDetailsPost['in_auth']) ? false : true;

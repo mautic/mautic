@@ -8,7 +8,7 @@ class StepProvider
 {
     private $initialSteps = [];
 
-    private $finalSteps   = [];
+    private $finalSteps = [];
 
     public function addStep(StepInterface $step): void
     {

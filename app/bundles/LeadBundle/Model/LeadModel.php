@@ -141,7 +141,7 @@ class LeadModel extends FormModel
         UserHelper $userHelper,
         LoggerInterface $mauticLogger
     ) {
-        $this->leadFieldModel       = $leadFieldModel;
+        $this->leadFieldModel = $leadFieldModel;
 
         parent::__construct($em, $security, $dispatcher, $router, $translator, $userHelper, $mauticLogger, $coreParametersHelper);
     }
@@ -413,8 +413,8 @@ class LeadModel extends FormModel
         $updatedFields   = $entity->getUpdatedFields();
         $changeLogEntity = null;
         if (isset($updatedFields['company'])) {
-            $companyFieldMatches['company']            = $updatedFields['company'];
-            [$company, $leadAdded, $companyEntity]     = IdentifyCompanyHelper::identifyLeadsCompany($companyFieldMatches, $entity, $this->companyModel);
+            $companyFieldMatches['company']        = $updatedFields['company'];
+            [$company, $leadAdded, $companyEntity] = IdentifyCompanyHelper::identifyLeadsCompany($companyFieldMatches, $entity, $this->companyModel);
             if ($leadAdded) {
                 $changeLogEntity = $entity->addCompanyChangeLogEntry('form', 'Identify Company', 'Lead added to the company, '.$company['companyname'], $company['id']);
             }
@@ -728,24 +728,24 @@ class LeadModel extends FormModel
             if ($field instanceof LeadField) {
                 $alias = $field->getAlias();
                 if ($field->isPublished() and 'Lead' === $field->getObject()) {
-                    $group                                = $field->getGroup();
-                    $array[$group][$alias]['id']          = $field->getId();
-                    $array[$group][$alias]['group']       = $group;
-                    $array[$group][$alias]['label']       = $field->getLabel();
-                    $array[$group][$alias]['alias']       = $alias;
-                    $array[$group][$alias]['type']        = $field->getType();
-                    $array[$group][$alias]['properties']  = $field->getProperties();
+                    $group                               = $field->getGroup();
+                    $array[$group][$alias]['id']         = $field->getId();
+                    $array[$group][$alias]['group']      = $group;
+                    $array[$group][$alias]['label']      = $field->getLabel();
+                    $array[$group][$alias]['alias']      = $alias;
+                    $array[$group][$alias]['type']       = $field->getType();
+                    $array[$group][$alias]['properties'] = $field->getProperties();
                 }
             } else {
                 $alias = $field['alias'];
                 if ($field['isPublished'] and 'lead' === $field['object']) {
-                    $group                                = $field['group'];
-                    $array[$group][$alias]['id']          = $field['id'];
-                    $array[$group][$alias]['group']       = $group;
-                    $array[$group][$alias]['label']       = $field['label'];
-                    $array[$group][$alias]['alias']       = $alias;
-                    $array[$group][$alias]['type']        = $field['type'];
-                    $array[$group][$alias]['properties']  = $field['properties'] ?? [];
+                    $group                               = $field['group'];
+                    $array[$group][$alias]['id']         = $field['id'];
+                    $array[$group][$alias]['group']      = $group;
+                    $array[$group][$alias]['label']      = $field['label'];
+                    $array[$group][$alias]['alias']      = $alias;
+                    $array[$group][$alias]['type']       = $field['type'];
+                    $array[$group][$alias]['properties'] = $field['properties'] ?? [];
                 }
             }
         }
@@ -1111,11 +1111,11 @@ class LeadModel extends FormModel
 
         // Extract company data and import separately
         // Modifies the data array
-        $company                           = null;
-        [$companyFields, $companyData]     = $this->companyModel->extractCompanyDataFromImport($fields, $data);
+        $company                       = null;
+        [$companyFields, $companyData] = $this->companyModel->extractCompanyDataFromImport($fields, $data);
 
         if (!empty($companyData)) {
-            $company       = $this->companyModel->importCompany(array_flip($companyFields), $companyData);
+            $company = $this->companyModel->importCompany(array_flip($companyFields), $companyData);
         }
 
         foreach ($fields as $leadField => $importField) {

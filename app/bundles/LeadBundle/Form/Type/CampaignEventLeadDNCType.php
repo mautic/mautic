@@ -31,7 +31,7 @@ class CampaignEventLeadDNCType extends AbstractType
             'reason',
             ChoiceType::class,
             [
-            'choices'  => [
+            'choices' => [
                 'mautic.lead.do.not.contact_bounced'      => DoNotContact::BOUNCED,
                 'mautic.lead.do.not.contact_unsubscribed' => DoNotContact::UNSUBSCRIBED,
                 'mautic.lead.do.not.contact_manual'       => DoNotContact::MANUAL,

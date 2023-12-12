@@ -152,8 +152,8 @@ class PageControllerTest extends MauticMysqlTestCase
      */
     public function testLandingPageWithUtmTracking(): void
     {
-        $timestamp  = \time();
-        $page       = $this->createTestPage();
+        $timestamp = \time();
+        $page      = $this->createTestPage();
 
         $this->client->request('GET', "{$page->getAlias()}?utm_source=linkedin&utm_medium=social&utm_campaign=mautic&utm_content=".$timestamp);
         $clientResponse = $this->client->getResponse();
@@ -199,10 +199,10 @@ class PageControllerTest extends MauticMysqlTestCase
     public function testViewActionPage(): void
     {
         $this->client->request('GET', '/s/pages/view/'.$this->id);
-        $clientResponse         = $this->client->getResponse();
-        $clientResponseContent  = $clientResponse->getContent();
-        $model                  = self::$container->get('mautic.page.model.page');
-        $page                   = $model->getEntity($this->id);
+        $clientResponse        = $this->client->getResponse();
+        $clientResponseContent = $clientResponse->getContent();
+        $model                 = self::$container->get('mautic.page.model.page');
+        $page                  = $model->getEntity($this->id);
         $this->assertEquals(Response::HTTP_OK, $clientResponse->getStatusCode());
         $this->assertStringContainsString($page->getTitle(), $clientResponseContent, 'The return must contain the title of page');
     }
@@ -213,8 +213,8 @@ class PageControllerTest extends MauticMysqlTestCase
     public function testNewActionPage(): void
     {
         $this->client->request('GET', '/s/pages/new/');
-        $clientResponse         = $this->client->getResponse();
-        $clientResponseContent  = $clientResponse->getContent();
+        $clientResponse        = $this->client->getResponse();
+        $clientResponseContent = $clientResponse->getContent();
         $this->assertEquals(Response::HTTP_OK, $clientResponse->getStatusCode());
     }
 
@@ -222,10 +222,10 @@ class PageControllerTest extends MauticMysqlTestCase
     public function testListLandingPageSubmissions(): void
     {
         $this->client->request('GET', 's/pages/results/'.$this->id);
-        $clientResponse         = $this->client->getResponse();
-        $clientResponseContent  = $clientResponse->getContent();
-        $model                  = self::$container->get('mautic.page.model.page');
-        $page                   = $model->getEntity($this->id);
+        $clientResponse        = $this->client->getResponse();
+        $clientResponseContent = $clientResponse->getContent();
+        $model                 = self::$container->get('mautic.page.model.page');
+        $page                  = $model->getEntity($this->id);
         $this->assertEquals(Response::HTTP_OK, $clientResponse->getStatusCode());
     }
 

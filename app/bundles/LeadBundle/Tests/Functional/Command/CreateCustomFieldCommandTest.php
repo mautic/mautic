@@ -44,7 +44,7 @@ class CreateCustomFieldCommandTest extends MauticMysqlTestCase
             ->with(self::isInstanceOf(LeadField::class), self::equalTo($expectedUserId));
         $kernel->getContainer()->set('mautic.lead.field.notification.custom_field', $customFieldNotification);
 
-        $application   = new Application($kernel);
+        $application = new Application($kernel);
         $application->setAutoExit(false);
         $command       = $application->find(CreateCustomFieldCommand::COMMAND_NAME);
         $commandTester = new CommandTester($command);
@@ -98,7 +98,7 @@ class CreateCustomFieldCommandTest extends MauticMysqlTestCase
             ->with(self::isInstanceOf(LeadField::class), self::equalTo($expectedUserId));
         $kernel->getContainer()->set('mautic.lead.field.notification.custom_field', $customFieldNotification);
 
-        $application   = new Application($kernel);
+        $application = new Application($kernel);
         $application->setAutoExit(false);
         $command       = $application->find(CreateCustomFieldCommand::COMMAND_NAME);
         $commandTester = new CommandTester($command);

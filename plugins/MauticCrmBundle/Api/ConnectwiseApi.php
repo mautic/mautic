@@ -190,9 +190,9 @@ class ConnectwiseApi extends CrmApi
      */
     public function fetchAllRecords($endpoint): array
     {
-        $page        = 1;
-        $pageSize    = ConnectwiseIntegration::PAGESIZE;
-        $allRecords  = [];
+        $page       = 1;
+        $pageSize   = ConnectwiseIntegration::PAGESIZE;
+        $allRecords = [];
         try {
             while ($pagedRecords = $this->request($endpoint, ['page' => $page, 'pageSize' => $pageSize])) {
                 $allRecords = array_merge($allRecords, $pagedRecords);

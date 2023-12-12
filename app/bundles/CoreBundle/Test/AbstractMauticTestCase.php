@@ -36,7 +36,7 @@ abstract class AbstractMauticTestCase extends WebTestCase
 
     protected array $clientOptions = [];
 
-    protected array $clientServer  = [
+    protected array $clientServer = [
         'PHP_AUTH_USER' => 'admin',
         'PHP_AUTH_PW'   => 'mautic',
     ];

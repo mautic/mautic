@@ -24,7 +24,7 @@ use Mautic\IntegrationsBundle\Sync\SyncDataExchange\Internal\ReportBuilder\Parti
 
 class MauticSyncDataExchange implements SyncDataExchangeInterface
 {
-    public const NAME           = 'mautic';
+    public const NAME = 'mautic';
 
     public const OBJECT_CONTACT = 'lead'; // kept as lead for BC
 

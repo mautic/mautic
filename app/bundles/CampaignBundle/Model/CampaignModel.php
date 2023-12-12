@@ -732,7 +732,7 @@ class CampaignModel extends CommonFormModel
     {
         $entities = $this->getRepository()->getEntities(
             [
-                'filter'    => [
+                'filter' => [
                     'force' => [
                         [
                             'column' => 'l.id',

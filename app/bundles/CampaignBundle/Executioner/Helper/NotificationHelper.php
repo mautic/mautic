@@ -112,7 +112,7 @@ class NotificationHelper
         if ($sendToAuthor) {
             $this->userModel->emailUser($user, $subject, $content);
         } else {
-            $emailAddresses =  array_map('trim', explode(',', $this->coreParametersHelper->get('campaign_notification_email_addresses')));
+            $emailAddresses = array_map('trim', explode(',', $this->coreParametersHelper->get('campaign_notification_email_addresses')));
             $this->userModel->sendMailToEmailAddresses($emailAddresses, $subject, $content);
         }
     }

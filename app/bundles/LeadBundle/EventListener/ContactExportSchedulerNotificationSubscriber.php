@@ -22,7 +22,7 @@ class ContactExportSchedulerNotificationSubscriber implements EventSubscriberInt
     public static function getSubscribedEvents(): array
     {
         return [
-            LeadEvents::POST_CONTACT_EXPORT_SCHEDULED  => 'onContactExportScheduled',
+            LeadEvents::POST_CONTACT_EXPORT_SCHEDULED => 'onContactExportScheduled',
         ];
     }
 

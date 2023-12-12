@@ -35,7 +35,7 @@ class EmailApiControllerFunctionalTest extends MauticMysqlTestCase
         $this->setPrivateProperty($mailHelper, 'mailer', $mailer);
         $this->setPrivateProperty($mailHelper, 'transport', $transport);
 
-        $this->transport  = $transport;
+        $this->transport = $transport;
     }
 
     protected function beforeTearDown(): void
@@ -329,7 +329,7 @@ class EmailApiControllerFunctionalTest extends MauticMysqlTestCase
 
         $this->assertSame(200, $clientResponse->getStatusCode(), $clientResponse->getContent());
 
-        $sendResponse   = json_decode($clientResponse->getContent(), true);
+        $sendResponse = json_decode($clientResponse->getContent(), true);
 
         $this->assertEquals($sendResponse, ['success' => true], $clientResponse->getContent());
         $testEmail();
@@ -368,7 +368,7 @@ class EmailApiControllerFunctionalTest extends MauticMysqlTestCase
 
         $this->assertSame(200, $clientResponse->getStatusCode(), $clientResponse->getContent());
 
-        $sendResponse   = json_decode($clientResponse->getContent(), true);
+        $sendResponse = json_decode($clientResponse->getContent(), true);
 
         $this->assertEquals($sendResponse, ['success' => true], $clientResponse->getContent());
         $testEmailOwnerAsMailer();
@@ -383,7 +383,7 @@ class EmailApiControllerFunctionalTest extends MauticMysqlTestCase
 
         $this->assertSame(200, $clientResponse->getStatusCode(), $clientResponse->getContent());
 
-        $sendResponse   = json_decode($clientResponse->getContent(), true);
+        $sendResponse = json_decode($clientResponse->getContent(), true);
 
         $this->assertEquals($sendResponse, ['success' => true], $clientResponse->getContent());
 
@@ -424,9 +424,9 @@ class EmailApiControllerFunctionalTest extends MauticMysqlTestCase
             $segment3->getId() => $segment3,
             $segment4->getId() => $segment4,
         ];
-        $email1   = $this->createEmail('Email A', 'Email A Subject', 'list', 'beefree-empty', 'Test html', $segments);
-        $email2   = $this->createEmail('Email B', 'Email B Subject', 'list', 'beefree-empty', 'Test html', $segments);
-        $email3   = $this->createEmail('Email C', 'Email C Subject', 'list', 'beefree-empty', 'Test html', $segments);
+        $email1 = $this->createEmail('Email A', 'Email A Subject', 'list', 'beefree-empty', 'Test html', $segments);
+        $email2 = $this->createEmail('Email B', 'Email B Subject', 'list', 'beefree-empty', 'Test html', $segments);
+        $email3 = $this->createEmail('Email C', 'Email C Subject', 'list', 'beefree-empty', 'Test html', $segments);
         $this->em->flush();
 
         $this->client->request('get', '/api/emails?limit=2');

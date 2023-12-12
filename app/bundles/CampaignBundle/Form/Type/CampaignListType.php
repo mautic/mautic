@@ -29,7 +29,7 @@ class CampaignListType extends AbstractType
     {
         $resolver->setDefaults(
             [
-                'choices'      => function (Options $options): array {
+                'choices' => function (Options $options): array {
                     $choices   = [];
                     $campaigns = $this->model->getRepository()->getPublishedCampaigns(null, null, true, $this->canViewOther);
                     foreach ($campaigns as $campaign) {
@@ -45,12 +45,12 @@ class CampaignListType extends AbstractType
 
                     return $choices;
                 },
-                'placeholder'       => false,
-                'expanded'          => false,
-                'multiple'          => true,
-                'required'          => false,
-                'include_this'      => false,
-                'this_translation'  => 'mautic.campaign.form.thiscampaign',
+                'placeholder'      => false,
+                'expanded'         => false,
+                'multiple'         => true,
+                'required'         => false,
+                'include_this'     => false,
+                'this_translation' => 'mautic.campaign.form.thiscampaign',
             ]
         );
     }

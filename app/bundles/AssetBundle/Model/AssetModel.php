@@ -65,7 +65,7 @@ class AssetModel extends FormModel
         LoggerInterface $logger,
         CoreParametersHelper $coreParametersHelper
     ) {
-        $this->maxAssetSize           = $coreParametersHelper->get('max_size');
+        $this->maxAssetSize = $coreParametersHelper->get('max_size');
 
         parent::__construct($em, $security, $dispatcher, $router, $translator, $userHelper, $logger, $coreParametersHelper);
     }
@@ -142,14 +142,14 @@ class AssetModel extends FormModel
                 if (!empty($clickthrough['lead'])) {
                     $lead = $this->leadModel->getEntity($clickthrough['lead']);
                     if (null !== $lead) {
-                        $wasTrackedAlready                    = $this->deviceTrackingService->isTracked();
-                        $deviceDetector                       = $this->deviceDetectorFactory->create($request->server->get('HTTP_USER_AGENT'));
+                        $wasTrackedAlready = $this->deviceTrackingService->isTracked();
+                        $deviceDetector    = $this->deviceDetectorFactory->create($request->server->get('HTTP_USER_AGENT'));
                         $deviceDetector->parse();
-                        $currentDevice                             = $this->deviceCreatorService->getCurrentFromDetector($deviceDetector, $lead);
-                        $trackedDevice                             = $this->deviceTrackingService->trackCurrentDevice($currentDevice, false);
-                        $trackingId                                = $trackedDevice->getTrackingId();
-                        $trackingNewlyGenerated                    = !$wasTrackedAlready;
-                        $leadClickthrough                          = true;
+                        $currentDevice          = $this->deviceCreatorService->getCurrentFromDetector($deviceDetector, $lead);
+                        $trackedDevice          = $this->deviceTrackingService->trackCurrentDevice($currentDevice, false);
+                        $trackingId             = $trackedDevice->getTrackingId();
+                        $trackingNewlyGenerated = !$wasTrackedAlready;
+                        $leadClickthrough       = true;
 
                         $this->contactTracker->setTrackedContact($lead);
                     }
@@ -178,11 +178,11 @@ class AssetModel extends FormModel
             }
 
             if (empty($leadClickthrough)) {
-                $wasTrackedAlready         = $this->deviceTrackingService->isTracked();
-                $lead                      = $this->contactTracker->getContact();
-                $trackedDevice             = $this->deviceTrackingService->getTrackedDevice();
-                $trackingId                = null;
-                $trackingNewlyGenerated    = false;
+                $wasTrackedAlready      = $this->deviceTrackingService->isTracked();
+                $lead                   = $this->contactTracker->getContact();
+                $trackedDevice          = $this->deviceTrackingService->getTrackedDevice();
+                $trackingId             = null;
+                $trackingNewlyGenerated = false;
                 if (null !== $trackedDevice) {
                     $trackingId             = $trackedDevice->getTrackingId();
                     $trackingNewlyGenerated = !$wasTrackedAlready;
@@ -224,8 +224,8 @@ class AssetModel extends FormModel
             } elseif ($this->security->isAnonymous() && !defined('IN_MAUTIC_CONSOLE')) {
                 // If the session is anonymous and not triggered via CLI, assume the lead did something to trigger the
                 // system forced download such as an email
-                $deviceWasTracked       = $this->deviceTrackingService->isTracked();
-                $deviceDetector         = $this->deviceDetectorFactory->create($request->server->get('HTTP_USER_AGENT'));
+                $deviceWasTracked = $this->deviceTrackingService->isTracked();
+                $deviceDetector   = $this->deviceDetectorFactory->create($request->server->get('HTTP_USER_AGENT'));
                 $deviceDetector->parse();
                 $currentDevice          = $this->deviceCreatorService->getCurrentFromDetector($deviceDetector, $lead);
                 $trackedDevice          = $this->deviceTrackingService->trackCurrentDevice($currentDevice, false);

@@ -46,14 +46,14 @@ return [
                 ],
             ],
             'mautic.sms.twilio.configuration' => [
-                'class'        => \Mautic\SmsBundle\Integration\Twilio\Configuration::class,
-                'arguments'    => [
+                'class'     => \Mautic\SmsBundle\Integration\Twilio\Configuration::class,
+                'arguments' => [
                     'mautic.helper.integration',
                 ],
             ],
             'mautic.sms.twilio.transport' => [
-                'class'        => \Mautic\SmsBundle\Integration\Twilio\TwilioTransport::class,
-                'arguments'    => [
+                'class'     => \Mautic\SmsBundle\Integration\Twilio\TwilioTransport::class,
+                'arguments' => [
                     'mautic.sms.twilio.configuration',
                     'monolog.logger.mautic',
                 ],
@@ -72,21 +72,21 @@ return [
                     'mautic.sms.helper.contact',
                     'mautic.sms.twilio.configuration',
                 ],
-                'tag'   => 'mautic.sms_callback_handler',
+                'tag' => 'mautic.sms_callback_handler',
             ],
 
             // @deprecated - this should not be used; use `mautic.sms.twilio.transport` instead.
             // Only kept as BC in case someone is passing the service by name in 3rd party
             'mautic.sms.transport.twilio' => [
-                'class'        => \Mautic\SmsBundle\Api\TwilioApi::class,
-                'arguments'    => [
+                'class'     => \Mautic\SmsBundle\Api\TwilioApi::class,
+                'arguments' => [
                     'mautic.sms.twilio.configuration',
                     'monolog.logger.mautic',
                 ],
             ],
             'mautic.sms.broadcast.executioner' => [
-                'class'        => \Mautic\SmsBundle\Broadcast\BroadcastExecutioner::class,
-                'arguments'    => [
+                'class'     => \Mautic\SmsBundle\Broadcast\BroadcastExecutioner::class,
+                'arguments' => [
                     'mautic.sms.model.sms',
                     'mautic.sms.broadcast.query',
                     'translator',
@@ -94,8 +94,8 @@ return [
                 ],
             ],
             'mautic.sms.broadcast.query' => [
-                'class'        => \Mautic\SmsBundle\Broadcast\BroadcastQuery::class,
-                'arguments'    => [
+                'class'     => \Mautic\SmsBundle\Broadcast\BroadcastQuery::class,
+                'arguments' => [
                     'doctrine.orm.entity_manager',
                     'mautic.sms.model.sms',
                 ],

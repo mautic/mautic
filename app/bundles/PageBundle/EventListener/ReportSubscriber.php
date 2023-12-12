@@ -16,9 +16,9 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class ReportSubscriber implements EventSubscriberInterface
 {
-    public const CONTEXT_PAGES      = 'pages';
+    public const CONTEXT_PAGES = 'pages';
 
-    public const CONTEXT_PAGE_HITS  = 'page.hits';
+    public const CONTEXT_PAGE_HITS = 'page.hits';
 
     public const CONTEXT_VIDEO_HITS = 'video.hits';
 
@@ -505,8 +505,8 @@ class ReportSubscriber implements EventSubscriberInterface
                 case 'mautic.page.graph.pie.devices':
                     $queryBuilder->select('ds.device, COUNT(distinct(ph.id)) as the_count')
                         ->groupBy('ds.device');
-                    $data     = $queryBuilder->execute()->fetchAllAssociative();
-                    $chart    = new PieChart();
+                    $data  = $queryBuilder->execute()->fetchAllAssociative();
+                    $chart = new PieChart();
 
                     foreach ($data as $device) {
                         $label = substr(empty($device['device']) ? $this->translator->trans('mautic.core.no.info') : $device['device'], 0, 12);

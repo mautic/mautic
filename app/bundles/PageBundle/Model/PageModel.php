@@ -86,7 +86,7 @@ class PageModel extends FormModel
         UserHelper $userHelper,
         LoggerInterface $mauticLogger
     ) {
-        $this->dateTimeHelper       = new DateTimeHelper();
+        $this->dateTimeHelper = new DateTimeHelper();
 
         parent::__construct($em, $security, $dispatcher, $router, $translator, $userHelper, $mauticLogger, $coreParametersHelper);
     }
@@ -817,7 +817,7 @@ class PageModel extends FormModel
         $filters['lead_id'] = [
             'expression' => 'isNull',
         ];
-        $returnQ            = $query->getCountQuery('page_hits', 'id', 'date_hit', $filters);
+        $returnQ = $query->getCountQuery('page_hits', 'id', 'date_hit', $filters);
 
         if (!$canViewOthers) {
             $this->limitQueryToCreator($allQ);
@@ -878,7 +878,7 @@ class PageModel extends FormModel
 
         $results = $q->executeQuery()->fetchAllAssociative();
 
-        $chart   = new PieChart();
+        $chart = new PieChart();
 
         if (empty($results)) {
             $results[] = [
@@ -960,8 +960,8 @@ class PageModel extends FormModel
      */
     private function getQueryFromUrl(string $pageUrl): array
     {
-        $query             = [];
-        $urlQuery          = parse_url($pageUrl, PHP_URL_QUERY);
+        $query    = [];
+        $urlQuery = parse_url($pageUrl, PHP_URL_QUERY);
 
         if (is_string($urlQuery)) {
             parse_str($urlQuery, $urlQueryArray);

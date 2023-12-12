@@ -51,8 +51,8 @@ class MonitoringType extends AbstractType
                 'class'    => 'form-control',
                 'onchange' => 'Mautic.getNetworkFormAction(this)',
             ],
-            'choices'           => array_flip((array) $options['networkTypes']), // passed from the controller
-            'placeholder'       => 'mautic.core.form.chooseone',
+            'choices'     => array_flip((array) $options['networkTypes']), // passed from the controller
+            'placeholder' => 'mautic.core.form.chooseone',
         ]);
 
         // if we have a network type value add in the form

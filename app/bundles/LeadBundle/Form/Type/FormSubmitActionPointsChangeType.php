@@ -16,10 +16,10 @@ class FormSubmitActionPointsChangeType extends AbstractType
             'operator',
             ChoiceType::class,
             [
-                'label'             => 'mautic.lead.lead.submitaction.operator',
-                'attr'              => ['class' => 'form-control'],
-                'label_attr'        => ['class' => 'control-label'],
-                'choices'           => [
+                'label'      => 'mautic.lead.lead.submitaction.operator',
+                'attr'       => ['class' => 'form-control'],
+                'label_attr' => ['class' => 'control-label'],
+                'choices'    => [
                     'mautic.lead.lead.submitaction.operator_plus'   => 'plus',
                     'mautic.lead.lead.submitaction.operator_minus'  => 'minus',
                     'mautic.lead.lead.submitaction.operator_times'  => 'times',
@@ -42,15 +42,15 @@ class FormSubmitActionPointsChangeType extends AbstractType
         );
 
         $builder->add('group', GroupListType::class, [
-            'label'            => 'mautic.lead.campaign.event.point_group',
-            'label_attr'       => ['class' => 'control-label'],
-            'attr'             => [
-                'class'    => 'form-control',
-                'tooltip'  => 'mautic.lead.campaign.event.point_group.help',
+            'label'      => 'mautic.lead.campaign.event.point_group',
+            'label_attr' => ['class' => 'control-label'],
+            'attr'       => [
+                'class'   => 'form-control',
+                'tooltip' => 'mautic.lead.campaign.event.point_group.help',
             ],
-            'required'         => false,
-            'by_reference'     => false,
-            'return_entity'    => false,
+            'required'      => false,
+            'by_reference'  => false,
+            'return_entity' => false,
         ]);
     }
 

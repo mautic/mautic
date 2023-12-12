@@ -83,9 +83,9 @@ class ReportSubscriberTest extends \PHPUnit\Framework\TestCase
             $this->fieldsBuilderMock
         );
 
-        $this->report             = $this->createMock(Report::class);
-        $this->channelListHelper  = new ChannelListHelper($this->createMock(EventDispatcherInterface::class), $this->createMock(Translator::class));
-        $this->queryBuilder       = new QueryBuilder($this->connectionMock);
+        $this->report            = $this->createMock(Report::class);
+        $this->channelListHelper = new ChannelListHelper($this->createMock(EventDispatcherInterface::class), $this->createMock(Translator::class));
+        $this->queryBuilder      = new QueryBuilder($this->connectionMock);
     }
 
     public function testOnReportGenerateForEmailStatsWhenDncIsUsed(): void
@@ -216,11 +216,11 @@ class ReportSubscriberTest extends \PHPUnit\Framework\TestCase
 
     public function testOnReportGraphGenerateForEmailContextWithEmailGraph(): void
     {
-        $eventMock         = $this->createMock(ReportGraphEvent::class);
-        $queryBuilderMock  = $this->createMock(QueryBuilder::class);
-        $chartQueryMock    = $this->createMock(ChartQuery::class);
-        $resultMock        = $this->createMock(Result::class);
-        $translatorMock    = $this->createMock(TranslatorInterface::class);
+        $eventMock        = $this->createMock(ReportGraphEvent::class);
+        $queryBuilderMock = $this->createMock(QueryBuilder::class);
+        $chartQueryMock   = $this->createMock(ChartQuery::class);
+        $resultMock       = $this->createMock(Result::class);
+        $translatorMock   = $this->createMock(TranslatorInterface::class);
 
         $queryBuilderMock->method('execute')->willReturn($resultMock);
         $resultMock->method('fetchOne')->willReturn([]);
@@ -271,8 +271,8 @@ class ReportSubscriberTest extends \PHPUnit\Framework\TestCase
 
     public function testOnReportBuilderWithEmailSentContext(): void
     {
-        $translatorMock     = $this->createMock(TranslatorInterface::class);
-        $reportHelper       = new ReportHelper($this->createMock(EventDispatcherInterface::class));
+        $translatorMock = $this->createMock(TranslatorInterface::class);
+        $reportHelper   = new ReportHelper($this->createMock(EventDispatcherInterface::class));
 
         $this->companyReportDataMock
             ->expects($this->any())

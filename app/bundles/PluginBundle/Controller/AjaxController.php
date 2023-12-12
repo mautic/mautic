@@ -121,7 +121,7 @@ class AjaxController extends CommonAjaxController
             $object = $helper->getIntegrationObject($integration);
 
             if ($object) {
-                $data           = $statusData           = [];
+                $data           = $statusData = [];
                 $objectSettings = $object->getIntegrationSettings();
                 $defaults       = $objectSettings->getFeatureSettings();
                 if (method_exists($object, 'getCampaigns')) {

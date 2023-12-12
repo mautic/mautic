@@ -43,7 +43,7 @@ class FlashBagTest extends TestCase
 
     protected function setUp(): void
     {
-        $this->symfonyFlashBag  = $this->createMock(SymfonyFlashBag::class);
+        $this->symfonyFlashBag = $this->createMock(SymfonyFlashBag::class);
 
         $this->session = $this->createMock(Session::class);
         $this->session
@@ -81,12 +81,12 @@ class FlashBagTest extends TestCase
 
     public function testAddWithChoices(): void
     {
-        $message                      = 'message';
-        $messageVars['%count%']       = 2;
-        $translatedMessage            = 'translatedMessage';
-        $level                        = FlashBag::LEVEL_NOTICE;
-        $domain                       = 'flashes';
-        $addNotification              = false;
+        $message                = 'message';
+        $messageVars['%count%'] = 2;
+        $translatedMessage      = 'translatedMessage';
+        $level                  = FlashBag::LEVEL_NOTICE;
+        $domain                 = 'flashes';
+        $addNotification        = false;
 
         $this->symfonyFlashBag
             ->expects($this->once())
@@ -109,12 +109,12 @@ class FlashBagTest extends TestCase
 
     public function testAddWithTranslation(): void
     {
-        $message            = 'message';
-        $messageVars        = [];
-        $translatedMessage  = 'translatedMessage';
-        $level              = FlashBag::LEVEL_NOTICE;
-        $domain             = 'flashes';
-        $addNotification    = false;
+        $message           = 'message';
+        $messageVars       = [];
+        $translatedMessage = 'translatedMessage';
+        $level             = FlashBag::LEVEL_NOTICE;
+        $domain            = 'flashes';
+        $addNotification   = false;
 
         $this->symfonyFlashBag
             ->expects($this->once())
@@ -162,12 +162,12 @@ class FlashBagTest extends TestCase
 
     private function assertReadStatus(int $mauticUserLastActive, bool $isRead): void
     {
-        $message            = 'message';
-        $messageVars        = [];
-        $level              = FlashBag::LEVEL_NOTICE;
-        $translatedMessage  = 'translatedMessage';
-        $domain             = 'flashes';
-        $addNotification    = true;
+        $message           = 'message';
+        $messageVars       = [];
+        $level             = FlashBag::LEVEL_NOTICE;
+        $translatedMessage = 'translatedMessage';
+        $domain            = 'flashes';
+        $addNotification   = true;
 
         $this->symfonyFlashBag
             ->expects($this->once())

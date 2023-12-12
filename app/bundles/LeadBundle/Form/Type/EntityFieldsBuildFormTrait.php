@@ -114,7 +114,7 @@ trait EntityFieldsBuildFormTrait
                 case DateType::class:
                 case DateTimeType::class:
                 case TimeType::class:
-                    $opts                = [
+                    $opts = [
                         'required'    => $required,
                         'label'       => $field['label'],
                         'label_attr'  => ['class' => 'control-label'],
@@ -152,7 +152,7 @@ trait EntityFieldsBuildFormTrait
                         } else {
                             $opts['attr']['data-toggle'] = 'time';
                             // $opts['with_seconds']   = true; // @todo figure out why this cause the contact form to fail.
-                            $opts['data']          = (!empty($value)) ? $dtHelper->toLocalString('H:i:s') : null;
+                            $opts['data'] = (!empty($value)) ? $dtHelper->toLocalString('H:i:s') : null;
                         }
 
                         $builder->addEventListener(
@@ -231,10 +231,10 @@ trait EntityFieldsBuildFormTrait
                         $alias,
                         $type,
                         [
-                            'required'          => $required,
-                            'label'             => $field['label'],
-                            'data'              => $value,
-                            'attr'              => [
+                            'required' => $required,
+                            'label'    => $field['label'],
+                            'data'     => $value,
+                            'attr'     => [
                                 'class'            => 'form-control',
                                 'data-placeholder' => $field['label'],
                             ],

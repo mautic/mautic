@@ -22,7 +22,7 @@ class PageHitNotificationHandlerTest extends TestCase
 {
     public function testInvoke(): void
     {
-        [$hitId, $pageId, $leadId, $redirectId]                 = [random_int(1, 1000), random_int(1, 1000), random_int(1, 1000), random_int(1, 1000)];
+        [$hitId, $pageId, $leadId, $redirectId] = [random_int(1, 1000), random_int(1, 1000), random_int(1, 1000), random_int(1, 1000)];
 
         $redirectObject = new Redirect();
         $redirectObject->setRedirectId((string) $redirectId);

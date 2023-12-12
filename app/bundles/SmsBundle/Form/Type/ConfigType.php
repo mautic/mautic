@@ -23,7 +23,7 @@ class ConfigType extends AbstractType
     {
         $choices    = [];
         $transports = $this->transportChain->getEnabledTransports();
-        foreach ($transports as $transportServiceId=>$transport) {
+        foreach ($transports as $transportServiceId => $transport) {
             $choices[$this->translator->trans($transportServiceId)] = $transportServiceId;
         }
 
@@ -34,7 +34,7 @@ class ConfigType extends AbstractType
                 'class'   => 'form-control',
                 'tooltip' => 'mautic.sms.config.select_default_transport',
             ],
-            'choices'           => $choices,
+            'choices' => $choices,
             ]);
 
         $builder->add(
@@ -45,7 +45,7 @@ class ConfigType extends AbstractType
                 'attr'  => [
                     'tooltip' => 'mautic.sms.config.form.sms.disable_trackable_urls.tooltip',
                 ],
-                'data'=> !empty($options['data'][self::SMS_DISABLE_TRACKABLE_URLS]) ? true : false,
+                'data' => !empty($options['data'][self::SMS_DISABLE_TRACKABLE_URLS]) ? true : false,
             ]
         );
     }

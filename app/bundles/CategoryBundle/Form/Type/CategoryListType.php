@@ -45,11 +45,11 @@ class CategoryListType extends AbstractType
 
                 return $choices;
             },
-            'label'             => 'mautic.core.category',
-            'label_attr'        => ['class' => 'control-label'],
-            'multiple'          => false,
-            'placeholder'       => 'mautic.core.form.uncategorized',
-            'attr'              => function (Options $options): array {
+            'label'       => 'mautic.core.category',
+            'label_attr'  => ['class' => 'control-label'],
+            'multiple'    => false,
+            'placeholder' => 'mautic.core.form.uncategorized',
+            'attr'        => function (Options $options): array {
                 $modalHeader = $this->translator->trans('mautic.category.header.new');
                 $newUrl      = $this->router->generate('mautic_category_action', [
                     'objectAction' => 'new',

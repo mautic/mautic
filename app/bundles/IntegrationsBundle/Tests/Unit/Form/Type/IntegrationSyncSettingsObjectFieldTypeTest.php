@@ -63,8 +63,8 @@ final class IntegrationSyncSettingsObjectFieldTypeTest extends \PHPUnit\Framewor
                     'mappedField',
                     ChoiceType::class,
                     [
-                        'label'          => false,
-                        'choices'        => [
+                        'label'   => false,
+                        'choices' => [
                             'Mautic Field A' => 'mautic_field_a',
                             'Mautic Field B' => 'mautic_field_b',
                         ],

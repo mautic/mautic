@@ -11,7 +11,7 @@ use PHPUnit\Framework\TestCase;
 
 class MappingManualDAOTest extends TestCase
 {
-    private $integrationName       = 'Test';
+    private $integrationName = 'Test';
 
     private $integrationObjectName = 'Contact';
 

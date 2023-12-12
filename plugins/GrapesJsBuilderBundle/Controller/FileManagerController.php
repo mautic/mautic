@@ -13,7 +13,7 @@ class FileManagerController extends AjaxController
 {
     public function uploadAction(Request $request, FileManager $fileManager): JsonResponse
     {
-        return $this->sendJsonResponse(['data'=> $fileManager->uploadFiles($request)]);
+        return $this->sendJsonResponse(['data' => $fileManager->uploadFiles($request)]);
     }
 
     public function deleteAction(Request $request, FileManager $fileManager): JsonResponse
@@ -22,7 +22,7 @@ class FileManagerController extends AjaxController
 
         $fileManager->deleteFile($fileName);
 
-        return $this->sendJsonResponse(['success'=> true]);
+        return $this->sendJsonResponse(['success' => true]);
     }
 
     public function assetsAction(FileManager $fileManager): JsonResponse

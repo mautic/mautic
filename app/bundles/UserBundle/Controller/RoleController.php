@@ -78,7 +78,7 @@ class RoleController extends FormController
         $pageHelper->rememberPage($page);
 
         return $this->delegateView([
-            'viewParameters'  => [
+            'viewParameters' => [
                 'items'       => $items,
                 'userCounts'  => (!empty($roleIds)) ? $model->getRepository()->getUserCount($roleIds) : [],
                 'searchValue' => $filter,
@@ -434,8 +434,8 @@ class RoleController extends FormController
             /** @var RoleModel $model */
             $model = $this->getModel('user.role');
             \assert($model instanceof RoleModel);
-            $ids         = json_decode($request->query->get('ids', ''));
-            $deleteIds   = [];
+            $ids       = json_decode($request->query->get('ids', ''));
+            $deleteIds = [];
 
             // Loop over the IDs to perform access checks pre-delete
             foreach ($ids as $objectId) {

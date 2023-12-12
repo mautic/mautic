@@ -39,9 +39,9 @@ final class MauticReportBuilderTest extends TestCase
     {
         parent::setUp();
 
-        $this->dispatcher          = $this->createMock(EventDispatcherInterface::class);
-        $this->connection          = $this->createMock(Connection::class);
-        $this->channelListHelper   = new ChannelListHelper($this->createMock(EventDispatcher::class), $this->createMock(Translator::class));
+        $this->dispatcher        = $this->createMock(EventDispatcherInterface::class);
+        $this->connection        = $this->createMock(Connection::class);
+        $this->channelListHelper = new ChannelListHelper($this->createMock(EventDispatcher::class), $this->createMock(Translator::class));
 
         $this->connection->method('createQueryBuilder')->willReturnOnConsecutiveCalls(
             new QueryBuilder($this->connection),
@@ -189,8 +189,8 @@ final class MauticReportBuilderTest extends TestCase
         $report->setGroupBy(['a.id']);
         $report->setAggregators([
             [
-                'column'    => 'a.bounced',
-                'function'  => 'AVG',
+                'column'   => 'a.bounced',
+                'function' => 'AVG',
             ],
         ]);
 
@@ -241,7 +241,7 @@ final class MauticReportBuilderTest extends TestCase
         ]);
         $builder = $this->buildBuilder($report);
 
-        $query   = $builder->getQuery([
+        $query = $builder->getQuery([
             'columns' => [
                 'l.id'    => [],
                 'l.email' => [],

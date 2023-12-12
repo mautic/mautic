@@ -43,7 +43,7 @@ final class TypeOperatorSubscriber implements EventSubscriberInterface
         private AssetModel $assetModel,
         TranslatorInterface $translator
     ) {
-        $this->translator    = $translator;
+        $this->translator = $translator;
     }
 
     public static function getSubscribedEvents(): array
@@ -160,7 +160,7 @@ final class TypeOperatorSubscriber implements EventSubscriberInterface
             'placeholder'         => $this->translator->trans(
                 'mautic.lead.list.form.startTyping'
             ),
-            'data-no-record-message'=> $this->translator->trans(
+            'data-no-record-message' => $this->translator->trans(
                 'mautic.core.form.nomatches'
             ),
         ];

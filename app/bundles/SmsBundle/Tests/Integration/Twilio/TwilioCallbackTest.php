@@ -33,8 +33,8 @@ class TwilioCallbackTest extends \PHPUnit\Framework\TestCase
     {
         $this->expectException(BadRequestHttpException::class);
 
-        $request          = $this->createMock(Request::class);
-        $inputBag         = new InputBag([
+        $request  = $this->createMock(Request::class);
+        $inputBag = new InputBag([
           'AccountSid' => '123',
           'From'       => '',
         ]);
@@ -48,8 +48,8 @@ class TwilioCallbackTest extends \PHPUnit\Framework\TestCase
     {
         $this->expectException(BadRequestHttpException::class);
 
-        $request          = $this->createMock(Request::class);
-        $inputBag         = new InputBag([
+        $request  = $this->createMock(Request::class);
+        $inputBag = new InputBag([
           'AccountSid' => '123',
           'From'       => '321',
           'Body'       => '',
@@ -64,8 +64,8 @@ class TwilioCallbackTest extends \PHPUnit\Framework\TestCase
     {
         $this->expectException(BadRequestHttpException::class);
 
-        $request          = $this->createMock(Request::class);
-        $inputBag         = new InputBag([
+        $request  = $this->createMock(Request::class);
+        $inputBag = new InputBag([
           'AccountSid' => '321',
         ]);
 
@@ -76,7 +76,7 @@ class TwilioCallbackTest extends \PHPUnit\Framework\TestCase
 
     public function testMessageIsReturned(): void
     {
-        $request      = $this->createMock(Request::class);
+        $request = $this->createMock(Request::class);
         $request->method('get')
             ->willReturn('Hello');
 

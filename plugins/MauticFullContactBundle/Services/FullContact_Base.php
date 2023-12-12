@@ -15,14 +15,14 @@ class FullContact_Base
 {
     public const REQUEST_LATENCY = 0.2;
 
-    public const USER_AGENT      = 'caseysoftware/fullcontact-php-0.9.0';
+    public const USER_AGENT = 'caseysoftware/fullcontact-php-0.9.0';
 
     private \DateTime $_next_req_time;
 
 //    protected $_baseUri = 'https://requestbin.fullcontact.com/1ailj6d1?';
-    protected $_baseUri     = 'https://api.fullcontact.com/';
+    protected $_baseUri = 'https://api.fullcontact.com/';
 
-    protected $_version     = 'v2';
+    protected $_version = 'v2';
 
     protected $_resourceUri = '';
 
@@ -30,7 +30,7 @@ class FullContact_Base
 
     protected $_webhookId;
 
-    protected $_webhookJson      = false;
+    protected $_webhookJson = false;
 
     protected $_supportedMethods = [];
 
@@ -166,8 +166,8 @@ class FullContact_Base
             if (0 === $i) {
                 $headers['http_code'] = $line;
             } else {
-                [$key, $value]     = explode(': ', $line);
-                $headers[$key]     = $value;
+                [$key, $value] = explode(': ', $line);
+                $headers[$key] = $value;
             }
         }
 

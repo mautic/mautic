@@ -38,7 +38,7 @@ class TokenReplacementEvent extends CommonEvent
             $this->entity = $content;
         }
 
-        $this->content      = $content;
+        $this->content = $content;
     }
 
     /**

@@ -402,7 +402,7 @@ class PublicController extends CommonFormController
         $trackedDevice = $deviceTrackingService->getTrackedDevice();
         $trackingId    = (null === $trackedDevice ? null : $trackedDevice->getTrackingId());
 
-        $sessionValue   = $trackingHelper->getSession(true);
+        $sessionValue = $trackingHelper->getSession(true);
 
         $event = new TrackingEvent($lead, $request, $sessionValue);
         $this->dispatcher->dispatch($event, PageEvents::ON_CONTACT_TRACKED);

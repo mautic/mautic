@@ -130,7 +130,7 @@ class ContactSegmentServiceFunctionalTest extends MauticMysqlTestCase
 
     public function testSegmentRebuildCommand(): void
     {
-        $segmentTest3Ref       = $this->getReference('segment-test-3');
+        $segmentTest3Ref = $this->getReference('segment-test-3');
 
         $this->runCommand(
             'mautic:segments:update',
@@ -167,7 +167,7 @@ class ContactSegmentServiceFunctionalTest extends MauticMysqlTestCase
             'There should be no contacts in the segment-test-3 segment after removing contact titles and rebuilding from the command line.'
         );
 
-        $segmentTest40Ref      = $this->getReference('segment-test-include-segment-with-or');
+        $segmentTest40Ref = $this->getReference('segment-test-include-segment-with-or');
         $this->runCommand('mautic:segments:update', [
             '-i'    => $segmentTest40Ref->getId(),
             '--env' => 'test',
@@ -181,7 +181,7 @@ class ContactSegmentServiceFunctionalTest extends MauticMysqlTestCase
             'There should be 11 contacts in the segment-test-include-segment-with-or segment after rebuilding from the command line.'
         );
 
-        $segmentTest51Ref      = $this->getReference('has-email-and-visited-url');
+        $segmentTest51Ref = $this->getReference('has-email-and-visited-url');
         $this->runCommand('mautic:segments:update', [
             '-i'    => $segmentTest51Ref->getId(),
             '--env' => 'test',

@@ -48,7 +48,7 @@ class SegmentCampaignShare
 
         foreach ($campaigns as &$campaign) {
             // just load from cache If exists
-            if ($share  = $this->cacheStorageHelper->get($this->getCachedKey($segmentId, $campaign['id']))) {
+            if ($share = $this->cacheStorageHelper->get($this->getCachedKey($segmentId, $campaign['id']))) {
                 $campaign['share'] = $share;
             }
         }

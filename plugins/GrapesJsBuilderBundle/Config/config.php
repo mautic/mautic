@@ -8,7 +8,7 @@ return [
     'version'     => '1.0.0',
     'author'      => 'Mautic Community',
     'routes'      => [
-        'main'   => [
+        'main' => [
             'grapesjsbuilder_upload' => [
                 'path'       => '/grapesjsbuilder/upload',
                 'controller' => 'MauticPlugin\GrapesJsBuilderBundle\Controller\FileManagerController::uploadAction',
@@ -29,9 +29,9 @@ return [
         'public' => [],
         'api'    => [],
     ],
-    'menu'        => [],
-    'services'    => [
-        'other'        => [
+    'menu'     => [],
+    'services' => [
+        'other' => [
             // Provides access to configured API keys, settings, field mapping, etc
             'grapesjsbuilder.config' => [
                 'class'     => \MauticPlugin\GrapesJsBuilderBundle\Integration\Config::class,
@@ -52,15 +52,15 @@ return [
             ],
             // Provides the form types to use for the configuration UI
             'grapesjsbuilder.integration.configuration' => [
-                'class'     => \MauticPlugin\GrapesJsBuilderBundle\Integration\Support\ConfigSupport::class,
-                'tags'      => [
+                'class' => \MauticPlugin\GrapesJsBuilderBundle\Integration\Support\ConfigSupport::class,
+                'tags'  => [
                     'mautic.config_integration',
                 ],
             ],
             // Tells Mautic what themes it should support when enabled
             'grapesjsbuilder.integration.builder' => [
-                'class'     => \MauticPlugin\GrapesJsBuilderBundle\Integration\Support\BuilderSupport::class,
-                'tags'      => [
+                'class' => \MauticPlugin\GrapesJsBuilderBundle\Integration\Support\BuilderSupport::class,
+                'tags'  => [
                     'mautic.builder_integration',
                 ],
             ],
@@ -77,7 +77,7 @@ return [
         ],
     ],
     'parameters' => [
-        'image_path_exclude'     => ['flags', 'mejs'], // exclude certain folders from showing in the image browser
-        'static_url'             => '', // optional base url for images
+        'image_path_exclude' => ['flags', 'mejs'], // exclude certain folders from showing in the image browser
+        'static_url'         => '', // optional base url for images
     ],
 ];

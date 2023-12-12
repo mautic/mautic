@@ -18,7 +18,7 @@ class ContactScheduledExportCommand extends Command
 {
     private const PICK_SCHEDULED_EXPORTS_LIMIT = 10;
 
-    public const COMMAND_NAME                  = 'mautic:contacts:scheduled_export';
+    public const COMMAND_NAME = 'mautic:contacts:scheduled_export';
 
     public function __construct(
         private ContactExportSchedulerModel $contactExportSchedulerModel,

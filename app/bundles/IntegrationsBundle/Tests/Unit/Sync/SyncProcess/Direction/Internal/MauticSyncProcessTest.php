@@ -63,7 +63,7 @@ class MauticSyncProcessTest extends TestCase
             ->with(MauticSyncDataExchange::NAME, Contact::NAME)
             ->willReturn($fromSyncDateTime);
 
-        $toSyncDateTime   = new \DateTimeImmutable();
+        $toSyncDateTime = new \DateTimeImmutable();
         $this->syncDateHelper->expects($this->once())
             ->method('getSyncToDateTime')
             ->willReturn($toSyncDateTime);

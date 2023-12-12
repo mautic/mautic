@@ -209,9 +209,9 @@ class ReportDevicesSubscriberTest extends \PHPUnit\Framework\TestCase
 
     public function testReportGenerate(): void
     {
-        $reportGeneratorEventMock  = $this->getReportGeneratorEventMock();
-        $reportDevicesSubscriber   = $this->getReportDevicesSubscriber();
-        $queryBuilderMock          = $this->getQueryBuilderMock();
+        $reportGeneratorEventMock = $this->getReportGeneratorEventMock();
+        $reportDevicesSubscriber  = $this->getReportDevicesSubscriber();
+        $queryBuilderMock         = $this->getQueryBuilderMock();
 
         $reportGeneratorEventMock->expects($this->once())
             ->method('getQueryBuilder')
@@ -222,8 +222,8 @@ class ReportDevicesSubscriberTest extends \PHPUnit\Framework\TestCase
 
     private function getReportDevicesSubscriber(): ReportDevicesSubscriber
     {
-        $fieldsBuilderMock      = $this->createMock(FieldsBuilder::class);
-        $companyReportDataMock  = $this->createMock(CompanyReportData::class);
+        $fieldsBuilderMock     = $this->createMock(FieldsBuilder::class);
+        $companyReportDataMock = $this->createMock(CompanyReportData::class);
 
         return new ReportDevicesSubscriber($fieldsBuilderMock, $companyReportDataMock);
     }

@@ -172,28 +172,28 @@ class ReportSubscriberTest extends \PHPUnit\Framework\TestCase
 
     protected function setUp(): void
     {
-        $this->leadModelMock                    = $this->createMock(LeadModel::class);
-        $this->leadFieldModelMock               = $this->createMock(FieldModel::class);
-        $this->stageModelMock                   = $this->createMock(StageModel::class);
-        $this->campaignModelMock                = $this->createMock(CampaignModel::class);
-        $this->eventCollectorMock               = $this->createMock(EventCollector::class);
-        $this->companyModelMock                 = $this->createMock(CompanyModel::class);
-        $this->companyReportDataMock            = $this->createMock(CompanyReportData::class);
-        $this->fieldsBuilderMock                = $this->createMock(FieldsBuilder::class);
-        $this->translatorMock                   = $this->createMock(Translator::class);
-        $this->reportGeneratorEventMock         = $this->createMock(ReportGeneratorEvent::class);
-        $this->reportDataEventMock              = $this->createMock(ReportDataEvent::class);
-        $this->channelListHelperMock            = new ChannelListHelper($this->createMock(EventDispatcherInterface::class), $this->createMock(Translator::class));
-        $this->reportHelperMock                 = new ReportHelper($this->createMock(EventDispatcherInterface::class));
-        $this->campaignRepositoryMock           = $this->createMock(CampaignRepository::class);
-        $this->reportBuilderEventMock           = $this->createMock(ReportBuilderEvent::class);
-        $this->queryBuilderMock                 = $this->createMock(QueryBuilder::class);
-        $this->expressionBuilderMock            = $this->createMock(ExpressionBuilder::class);
-        $this->reportGraphEventMock             = $this->createMock(ReportGraphEvent::class);
-        $this->companyRepositoryMock            = $this->createMock(CompanyRepository::class);
-        $this->pointsChangeLogRepositoryMock    = $this->createMock(PointsChangeLogRepository::class);
-        $this->reportMock                       = $this->createMock(Report::class);
-        $this->reportSubscriber                 = new ReportSubscriber(
+        $this->leadModelMock                 = $this->createMock(LeadModel::class);
+        $this->leadFieldModelMock            = $this->createMock(FieldModel::class);
+        $this->stageModelMock                = $this->createMock(StageModel::class);
+        $this->campaignModelMock             = $this->createMock(CampaignModel::class);
+        $this->eventCollectorMock            = $this->createMock(EventCollector::class);
+        $this->companyModelMock              = $this->createMock(CompanyModel::class);
+        $this->companyReportDataMock         = $this->createMock(CompanyReportData::class);
+        $this->fieldsBuilderMock             = $this->createMock(FieldsBuilder::class);
+        $this->translatorMock                = $this->createMock(Translator::class);
+        $this->reportGeneratorEventMock      = $this->createMock(ReportGeneratorEvent::class);
+        $this->reportDataEventMock           = $this->createMock(ReportDataEvent::class);
+        $this->channelListHelperMock         = new ChannelListHelper($this->createMock(EventDispatcherInterface::class), $this->createMock(Translator::class));
+        $this->reportHelperMock              = new ReportHelper($this->createMock(EventDispatcherInterface::class));
+        $this->campaignRepositoryMock        = $this->createMock(CampaignRepository::class);
+        $this->reportBuilderEventMock        = $this->createMock(ReportBuilderEvent::class);
+        $this->queryBuilderMock              = $this->createMock(QueryBuilder::class);
+        $this->expressionBuilderMock         = $this->createMock(ExpressionBuilder::class);
+        $this->reportGraphEventMock          = $this->createMock(ReportGraphEvent::class);
+        $this->companyRepositoryMock         = $this->createMock(CompanyRepository::class);
+        $this->pointsChangeLogRepositoryMock = $this->createMock(PointsChangeLogRepository::class);
+        $this->reportMock                    = $this->createMock(Report::class);
+        $this->reportSubscriber              = new ReportSubscriber(
             $this->leadModelMock,
             $this->leadFieldModelMock,
             $this->stageModelMock,
@@ -1064,8 +1064,8 @@ class ReportSubscriberTest extends \PHPUnit\Framework\TestCase
 
     public function testOnReportColumnCollectForCompany(): void
     {
-        $companyFields  = [
-            'comp.id'   => [
+        $companyFields = [
+            'comp.id' => [
                 'alias' => 'comp_id',
                 'label' => 'mautic.lead.report.company.company_id',
                 'type'  => 'int',
@@ -1081,8 +1081,8 @@ class ReportSubscriberTest extends \PHPUnit\Framework\TestCase
             ],
         ];
 
-        $columns        = [
-            'comp.id'   => [
+        $columns = [
+            'comp.id' => [
                 'alias' => 'comp_id',
                 'label' => 'mautic.lead.report.company.company_id',
                 'type'  => 'int',
@@ -1105,33 +1105,33 @@ class ReportSubscriberTest extends \PHPUnit\Framework\TestCase
     {
         $publishedFields = [
             [
-                'label'  => 'Email',
-                'type'   => 'string',
-                'alias'  => 'email',
+                'label' => 'Email',
+                'type'  => 'string',
+                'alias' => 'email',
             ],
             [
-                'label'  => 'Firstname',
-                'type'   => 'string',
-                'alias'  => 'firstname',
+                'label' => 'Firstname',
+                'type'  => 'string',
+                'alias' => 'firstname',
             ],
         ];
 
-        $columns          = [
-            'l.email'     => [
-                'label'   => '',
-                'type'    => 'string',
-                'alias'   => 'email',
+        $columns = [
+            'l.email' => [
+                'label' => '',
+                'type'  => 'string',
+                'alias' => 'email',
             ],
             'l.firstname' => [
-                'label'   => '',
-                'type'    => 'string',
-                'alias'   => 'firstname',
+                'label' => '',
+                'type'  => 'string',
+                'alias' => 'firstname',
             ],
-            'l.id'        => [
-                'label'   => 'mautic.lead.report.contact_id',
-                'type'    => 'int',
-                'link'    => 'mautic_contact_action',
-                'alias'   => 'contactId',
+            'l.id' => [
+                'label' => 'mautic.lead.report.contact_id',
+                'type'  => 'int',
+                'link'  => 'mautic_contact_action',
+                'alias' => 'contactId',
             ],
         ];
 

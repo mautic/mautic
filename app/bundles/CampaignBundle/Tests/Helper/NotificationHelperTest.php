@@ -208,8 +208,8 @@ class NotificationHelperTest extends \PHPUnit\Framework\TestCase
 
     public function testNotificationOfUnpublishToAuthor(): void
     {
-        $event    = new Event();
-        $user     = $this->getMockBuilder(User::class)
+        $event = new Event();
+        $user  = $this->getMockBuilder(User::class)
             ->getMock();
         $this->prepareCommonMocks($event, $user);
 
@@ -230,8 +230,8 @@ class NotificationHelperTest extends \PHPUnit\Framework\TestCase
 
     public function testNotificationOfUnpublishToEmailAddress(): void
     {
-        $event    = new Event();
-        $user     = $this->getMockBuilder(User::class)
+        $event = new Event();
+        $user  = $this->getMockBuilder(User::class)
             ->getMock();
         $this->prepareCommonMocks($event, $user);
 

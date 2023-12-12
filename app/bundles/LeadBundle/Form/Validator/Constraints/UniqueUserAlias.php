@@ -9,7 +9,7 @@ class UniqueUserAlias extends Constraint
 {
     public $message = 'This alias is already in use.';
 
-    public $field   = '';
+    public $field = '';
 
     public function validatedBy()
     {

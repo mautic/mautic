@@ -20,10 +20,10 @@ class SegmentActionModelTest extends \PHPUnit\Framework\TestCase
 
     protected function setUp(): void
     {
-        $this->contactMock5        = $this->createMock(Lead::class);
-        $this->contactMock6        = $this->createMock(Lead::class);
-        $this->contactModelMock    = $this->createMock(LeadModel::class);
-        $this->actionModel         = new SegmentActionModel($this->contactModelMock);
+        $this->contactMock5     = $this->createMock(Lead::class);
+        $this->contactMock6     = $this->createMock(Lead::class);
+        $this->contactModelMock = $this->createMock(LeadModel::class);
+        $this->actionModel      = new SegmentActionModel($this->contactModelMock);
     }
 
     public function testAddContactsToSegmentsEntityAccess(): void

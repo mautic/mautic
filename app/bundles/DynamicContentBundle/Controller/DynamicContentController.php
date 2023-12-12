@@ -82,7 +82,7 @@ class DynamicContentController extends FormController
         $tmpl = $request->isXmlHttpRequest() ? $request->get('tmpl', 'index') : 'index';
 
         // retrieve a list of categories
-        $pageModel  = $this->getModel('page');
+        $pageModel = $this->getModel('page');
         \assert($pageModel instanceof PageModel);
         $categories = $pageModel->getLookupResults('category', '', 0);
 
@@ -128,7 +128,7 @@ class DynamicContentController extends FormController
         $updateSelect = 'POST' === $method
             ? ($dwc['updateSelect'] ?? false)
             : $request->get('updateSelect', false);
-        $form         = $model->createForm($entity, $this->formFactory, $action, ['update_select' => $updateSelect]);
+        $form = $model->createForm($entity, $this->formFactory, $action, ['update_select' => $updateSelect]);
 
         if (Request::METHOD_POST === $method) {
             $valid = false;
@@ -380,7 +380,7 @@ class DynamicContentController extends FormController
         // Audit Log
         $auditLogModel = $this->getModel('core.auditlog');
         \assert($auditLogModel instanceof AuditLogModel);
-        $logs          = $auditLogModel->getLogForObject('dynamicContent', $entity->getId(), $entity->getDateAdded());
+        $logs = $auditLogModel->getLogForObject('dynamicContent', $entity->getId(), $entity->getDateAdded());
 
         // Init the date range filter form
         $dateRangeValues = $request->get('daterange', []);
@@ -472,7 +472,7 @@ class DynamicContentController extends FormController
         ];
 
         if (Request::METHOD_POST === $request->getMethod()) {
-            $model  = $this->getModel('dynamicContent');
+            $model = $this->getModel('dynamicContent');
             \assert($model instanceof DynamicContentModel);
             $entity = $model->getEntity($objectId);
 

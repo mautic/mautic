@@ -69,15 +69,15 @@ final class MauticReportBuilder implements ReportBuilderInterface
     /**
      * Standard Channel Columns.
      */
-    public const CHANNEL_COLUMN_CATEGORY_ID     = 'channel.category_id';
+    public const CHANNEL_COLUMN_CATEGORY_ID = 'channel.category_id';
 
-    public const CHANNEL_COLUMN_NAME            = 'channel.name';
+    public const CHANNEL_COLUMN_NAME = 'channel.name';
 
-    public const CHANNEL_COLUMN_DESCRIPTION     = 'channel.description';
+    public const CHANNEL_COLUMN_DESCRIPTION = 'channel.description';
 
-    public const CHANNEL_COLUMN_DATE_ADDED      = 'channel.date_added';
+    public const CHANNEL_COLUMN_DATE_ADDED = 'channel.date_added';
 
-    public const CHANNEL_COLUMN_CREATED_BY      = 'channel.created_by';
+    public const CHANNEL_COLUMN_CREATED_BY = 'channel.created_by';
 
     public const CHANNEL_COLUMN_CREATED_BY_USER = 'channel.created_by_user';
 
@@ -278,8 +278,8 @@ final class MauticReportBuilder implements ReportBuilderInterface
                     }
 
                     // support for prefix and suffix to value in query
-                    $prefix     = $fieldOptions['prefix'] ?? '';
-                    $suffix     = $fieldOptions['suffix'] ?? '';
+                    $prefix = $fieldOptions['prefix'] ?? '';
+                    $suffix = $fieldOptions['suffix'] ?? '';
                     if ($prefix || $suffix) {
                         $selectText = 'CONCAT(\''.$prefix.'\', '.$selectText.',\''.$suffix.'\')';
                     }

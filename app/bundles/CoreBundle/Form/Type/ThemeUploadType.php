@@ -27,7 +27,7 @@ class ThemeUploadType extends AbstractType
             'start',
             SubmitType::class,
             [
-                'attr'  => [
+                'attr' => [
                     'class'   => 'btn btn-primary',
                     'icon'    => 'fa fa-upload',
                     'onclick' => "mQuery(this).prop('disabled', true); mQuery('form[name=\'theme_upload\']').submit();",

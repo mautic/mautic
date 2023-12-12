@@ -55,7 +55,7 @@ class RemoveController extends CommonController
             [
                 'returnUrl'      => $this->routeProvider->buildListRoute(),
                 'viewParameters' => [
-                    'packageDetail'  => $this->packageModel->getPackageDetail("{$vendor}/{$package}"),
+                    'packageDetail' => $this->packageModel->getPackageDetail("{$vendor}/{$package}"),
                 ],
                 'contentTemplate' => '@Marketplace/Package/remove.html.twig',
                 'passthroughVars' => [

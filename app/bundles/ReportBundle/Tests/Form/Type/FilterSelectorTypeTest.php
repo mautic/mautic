@@ -25,8 +25,8 @@ final class FilterSelectorTypeTest extends \PHPUnit\Framework\TestCase
 
     protected function setUp(): void
     {
-        $this->formBuilder         = $this->createMock(FormBuilderInterface::class);
-        $this->FilterSelectorType  = new FilterSelectorType();
+        $this->formBuilder        = $this->createMock(FormBuilderInterface::class);
+        $this->FilterSelectorType = new FilterSelectorType();
     }
 
     public function testBuildFormWithTagFilter(): void
@@ -66,29 +66,29 @@ final class FilterSelectorTypeTest extends \PHPUnit\Framework\TestCase
                                     'condition',
                                     ChoiceType::class,
                                     [
-                                        'choices'           => [
+                                        'choices' => [
                                             'including' => 'in',
                                             'excluding' => 'notIn',
                                         ],
-                                        'expanded'          => false,
-                                        'multiple'          => false,
-                                        'label'             => 'mautic.report.report.label.filtercondition',
-                                        'label_attr'        => ['class' => 'control-label filter-condition'],
-                                        'placeholder'       => false,
-                                        'required'          => false,
-                                        'attr'              => [
+                                        'expanded'    => false,
+                                        'multiple'    => false,
+                                        'label'       => 'mautic.report.report.label.filtercondition',
+                                        'label_attr'  => ['class' => 'control-label filter-condition'],
+                                        'placeholder' => false,
+                                        'required'    => false,
+                                        'attr'        => [
                                             'class' => 'form-control not-chosen',
                                         ],
                                     ],
                                 ], [
                                     'value', CollectionType::class, [
-                                        'entry_type'    => TextType::class,
-                                        'allow_add'     => true,
-                                        'allow_delete'  => true,
-                                        'label'         => 'mautic.report.report.label.filtervalue',
-                                        'label_attr'    => ['class' => 'control-label'],
-                                        'attr'          => ['class' => 'form-control filter-value'],
-                                        'required'      => false,
+                                        'entry_type'   => TextType::class,
+                                        'allow_add'    => true,
+                                        'allow_delete' => true,
+                                        'label'        => 'mautic.report.report.label.filtervalue',
+                                        'label_attr'   => ['class' => 'control-label'],
+                                        'attr'         => ['class' => 'form-control filter-value'],
+                                        'required'     => false,
                                     ],
                                 ]);
 
