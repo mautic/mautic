@@ -16,25 +16,13 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 class TwitterCommandHelper
 {
-    /**
-     * @var OutputInterface
-     */
-    private $output;
+    private ?\Symfony\Component\Console\Output\OutputInterface $output = null;
 
-    /**
-     * @var int
-     */
-    private $updatedLeads = 0;
+    private int $updatedLeads = 0;
 
-    /**
-     * @var int
-     */
-    private $newLeads = 0;
+    private int $newLeads = 0;
 
-    /**
-     * @var array
-     */
-    private $manipulatedLeads = [];
+    private array $manipulatedLeads = [];
 
     /**
      * @var string
@@ -54,18 +42,12 @@ class TwitterCommandHelper
         $this->twitterHandleField = $coreParametersHelper->get('twitter_handle_field', 'twitter');
     }
 
-    /**
-     * @return int
-     */
-    public function getNewLeadsCount()
+    public function getNewLeadsCount(): int
     {
         return $this->newLeads;
     }
 
-    /**
-     * @return int
-     */
-    public function getUpdatedLeadsCount()
+    public function getUpdatedLeadsCount(): int
     {
         return $this->updatedLeads;
     }
@@ -89,12 +71,10 @@ class TwitterCommandHelper
      */
     private function output($message, $newLine = true): void
     {
-        if ($this->output instanceof OutputInterface) {
-            if ($newLine) {
-                $this->output->writeln($message);
-            } else {
-                $this->output->write($message);
-            }
+        if ($newLine) {
+            $this->output->writeln($message);
+        } else {
+            $this->output->write($message);
         }
     }
 

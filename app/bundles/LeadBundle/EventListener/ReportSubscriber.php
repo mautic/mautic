@@ -42,7 +42,10 @@ class ReportSubscriber implements EventSubscriberInterface
 
     public const GROUP_CONTACTS = 'contacts';
 
-    private $leadContexts = [
+    /**
+     * @var string[]
+     */
+    private array $leadContexts = [
         self::CONTEXT_LEADS,
         self::CONTEXT_LEAD_POINT_LOG,
         self::CONTEXT_CONTACT_ATTRIBUTION_MULTI,
@@ -51,17 +54,14 @@ class ReportSubscriber implements EventSubscriberInterface
         self::CONTEXT_CONTACT_FREQUENCYRULES,
     ];
 
-    private $companyContexts = [self::CONTEXT_COMPANIES];
-
     /**
-     * @var array
+     * @var string[]
      */
-    private $channels;
+    private array $companyContexts = [self::CONTEXT_COMPANIES];
 
-    /**
-     * @var array
-     */
-    private $channelActions;
+    private ?array $channels = null;
+
+    private ?array $channelActions = null;
 
     public function __construct(
         private LeadModel $leadModel,

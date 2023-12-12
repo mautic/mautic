@@ -6,10 +6,7 @@ use Mautic\CoreBundle\Security\Exception\Cryptography\Symmetric\InvalidDecryptio
 
 class OpenSSLCipher implements SymmetricCipherInterface
 {
-    /**
-     * @var string
-     */
-    private $cipher = 'AES-256-CBC';
+    private string $cipher = 'AES-256-CBC';
 
     /**
      * @param string $secretMessage

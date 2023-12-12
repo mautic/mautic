@@ -6,10 +6,8 @@ class LeadManipulator
 {
     /**
      * If true then the manipulator was logged and should not be logged for the second time.
-     *
-     * @var bool
      */
-    private $logged = false;
+    private bool $logged = false;
 
     /**
      * @param ?string $bundleName
@@ -59,10 +57,8 @@ class LeadManipulator
 
     /**
      * Check if the manipulator was logged already or not.
-     *
-     * @return bool
      */
-    public function wasLogged()
+    public function wasLogged(): bool
     {
         return $this->logged;
     }

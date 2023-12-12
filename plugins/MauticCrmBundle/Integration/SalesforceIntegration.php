@@ -28,16 +28,16 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
  */
 class SalesforceIntegration extends CrmAbstractIntegration
 {
-    private $objects = [
+    /**
+     * @var string []
+     */
+    private array $objects = [
         'Lead',
         'Contact',
         'Account',
     ];
 
-    /**
-     * @var bool
-     */
-    private $failureFetchingLeads = false;
+    private string|bool $failureFetchingLeads = false;
 
     public function getName(): string
     {

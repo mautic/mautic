@@ -14,10 +14,7 @@ use Symfony\Component\Form\FormBuilder;
 
 class AmazonS3Integration extends CloudStorageIntegration
 {
-    /**
-     * @var ResolvableFilesystem
-     */
-    private $fileSystem;
+    private ?\Gaufrette\Extras\Resolvable\ResolvableFilesystem $fileSystem = null;
 
     public function getName(): string
     {

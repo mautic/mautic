@@ -30,10 +30,7 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class SyncProcess
 {
-    /**
-     * @var int
-     */
-    private $syncIteration;
+    private ?int $syncIteration = null;
 
     public function __construct(
         private SyncDateHelper $syncDateHelper,

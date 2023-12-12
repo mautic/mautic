@@ -9,17 +9,12 @@ use Mautic\LeadBundle\Segment\Query\Expression\ExpressionBuilder;
 
 class QueryBuilder extends BaseQueryBuilder
 {
-    /**
-     * @var ExpressionBuilder
-     */
-    private $_expr;
+    private ?\Mautic\LeadBundle\Segment\Query\Expression\ExpressionBuilder $_expr = null;
 
     /**
      * Unprocessed logic for segment processing.
-     *
-     * @var array
      */
-    private $logicStack = [];
+    private array $logicStack = [];
 
     public function __construct(
         private Connection $connection
@@ -49,7 +44,7 @@ class QueryBuilder extends BaseQueryBuilder
             return $this->_expr;
         }
 
-        $this->_expr = new ExpressionBuilder($this->getConnection());
+        $this->_expr = new ExpressionBuilder($this->connection);
 
         return $this->_expr;
     }
@@ -316,10 +311,7 @@ class QueryBuilder extends BaseQueryBuilder
         return $this->logicStack;
     }
 
-    /**
-     * @return array
-     */
-    public function popLogicStack()
+    public function popLogicStack(): array
     {
         $stack            = $this->logicStack;
         $this->logicStack = [];

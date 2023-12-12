@@ -15,7 +15,7 @@ class SegmentDependencyTreeFactory
     /**
      * @var int[]
      */
-    private $usedSegmentIds = [];
+    private array $usedSegmentIds = [];
 
     public function __construct(
         private ListModel $segmentModel,

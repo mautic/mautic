@@ -11,20 +11,14 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class Fetcher
 {
-    /**
-     * @var array
-     */
-    private $mailboxes;
+    private ?array $mailboxes = null;
 
     /**
      * @var array
      */
     private $log = [];
 
-    /**
-     * @var int
-     */
-    private $processedMessageCounter = 0;
+    private int $processedMessageCounter = 0;
 
     public function __construct(
         private Mailbox $imapHelper,

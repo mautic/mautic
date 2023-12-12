@@ -23,15 +23,9 @@ final class AssetsHelper
      */
     public const CONTEXT_BUILDER = 'builder';
 
-    /**
-     * @var AssetGenerationHelper
-     */
-    private $assetHelper;
+    private ?\Mautic\CoreBundle\Helper\AssetGenerationHelper $assetHelper = null;
 
-    /**
-     * @var string
-     */
-    private $context = self::CONTEXT_APP;
+    private string $context = self::CONTEXT_APP;
 
     /**
      * @var array<mixed, mixed>
@@ -40,20 +34,14 @@ final class AssetsHelper
         self::CONTEXT_APP => [],
     ];
 
-    /**
-     * @var string|null
-     */
-    private $version;
+    private ?string $version = null;
 
     /**
      * @var string
      */
     private $siteUrl;
 
-    /**
-     * @var PathsHelper
-     */
-    private $pathsHelper;
+    private ?\Mautic\CoreBundle\Helper\PathsHelper $pathsHelper = null;
 
     private BuilderIntegrationsHelper $builderIntegrationsHelper;
 

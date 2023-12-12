@@ -8,25 +8,13 @@ use Mautic\CoreBundle\DependencyInjection\Builder\Metadata\PermissionClassMetada
 
 class BundleMetadataBuilder
 {
-    /**
-     * @var array
-     */
-    private $ipLookupServices = [];
+    private array $ipLookupServices = [];
 
-    /**
-     * @var array
-     */
-    private $ormConfig = [];
+    private array $ormConfig = [];
 
-    /**
-     * @var array
-     */
-    private $serializerConfig = [];
+    private array $serializerConfig = [];
 
-    /**
-     * @var array
-     */
-    private $pluginMetadata = [];
+    private array $pluginMetadata = [];
 
     /**
      * @var array

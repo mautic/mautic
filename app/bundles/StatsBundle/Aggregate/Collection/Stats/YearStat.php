@@ -7,7 +7,7 @@ class YearStat implements StatInterface
     /**
      * @var MonthStat[]
      */
-    private $stats = [];
+    private array $stats = [];
 
     private int $year;
 

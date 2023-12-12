@@ -7,10 +7,7 @@ use Symfony\Contracts\EventDispatcher\Event;
 
 class MonitoredEmailEvent extends Event
 {
-    /**
-     * @var array
-     */
-    private $folders = [];
+    private array $folders = [];
 
     public function __construct(
         private FormBuilderInterface $formBuilder,

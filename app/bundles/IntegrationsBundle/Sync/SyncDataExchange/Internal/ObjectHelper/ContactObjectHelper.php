@@ -23,10 +23,7 @@ use Mautic\LeadBundle\Model\LeadModel;
 
 class ContactObjectHelper implements ObjectHelperInterface
 {
-    /**
-     * @var array
-     */
-    private $availableFields;
+    private ?array $availableFields = null;
 
     public function __construct(
         private LeadModel $model,

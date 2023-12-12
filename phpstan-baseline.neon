@@ -18982,7 +18982,7 @@ parameters:
 
 		-
 			message: "#^Call to an undefined method Mautic\\\\IntegrationsBundle\\\\Auth\\\\Provider\\\\AuthCredentialsInterface\\:\\:getClientId\\(\\)\\.$#"
-			count: 4
+			count: 5
 			path: app/bundles/IntegrationsBundle/Auth/Provider/Oauth2ThreeLegged/HttpFactory.php
 
 		-

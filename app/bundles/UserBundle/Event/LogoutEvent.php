@@ -8,10 +8,7 @@ use Symfony\Contracts\EventDispatcher\Event;
 
 class LogoutEvent extends Event
 {
-    /**
-     * @var array
-     */
-    private $session = [];
+    private array $session = [];
 
     public function __construct(
         private User $user,

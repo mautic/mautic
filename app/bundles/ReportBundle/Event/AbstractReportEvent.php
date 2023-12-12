@@ -7,10 +7,7 @@ use Symfony\Contracts\EventDispatcher\Event;
 
 class AbstractReportEvent extends Event
 {
-    /**
-     * @var string
-     */
-    protected $context = '';
+    protected ?string $context = null;
 
     /**
      * Report entity.
@@ -27,12 +24,7 @@ class AbstractReportEvent extends Event
         return $this->report;
     }
 
-    /**
-     * Get the context.
-     *
-     * @return string
-     */
-    public function getContext()
+    public function getContext(): ?string
     {
         return $this->context;
     }

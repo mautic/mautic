@@ -65,10 +65,8 @@ class WebhookModel extends FormModel
 
     /**
      * How long the webhook processing can run in seconds.
-     *
-     * @var int
      */
-    private $webhookTimeLimit;
+    private int $webhookTimeLimit;
 
     /**
      * How many responses in 1 row can fail until the webhook disables itself.
@@ -108,10 +106,8 @@ class WebhookModel extends FormModel
 
     /**
      * Timestamp when the webhook processing starts.
-     *
-     * @var float
      */
-    private $startTime;
+    private string|float|null $startTime = null;
 
     public function __construct(
         CoreParametersHelper $coreParametersHelper,

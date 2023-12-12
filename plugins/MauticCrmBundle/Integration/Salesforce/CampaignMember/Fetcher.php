@@ -12,45 +12,21 @@ use MauticPlugin\MauticCrmBundle\Integration\Salesforce\QueryBuilder;
 
 class Fetcher
 {
-    /**
-     * @var array
-     */
-    private $leads = [];
+    private array $leads = [];
 
-    /**
-     * @var array
-     */
-    private $knownLeadIds = [];
+    private array $knownLeadIds = [];
 
-    /**
-     * @var array
-     */
-    private $unknownLeadIds = [];
+    private array $unknownLeadIds = [];
 
-    /**
-     * @var array
-     */
-    private $contacts = [];
+    private array $contacts = [];
 
-    /**
-     * @var array
-     */
-    private $knownContactIds = [];
+    private array $knownContactIds = [];
 
-    /**
-     * @var array
-     */
-    private $unknownContactIds = [];
+    private array $unknownContactIds = [];
 
-    /**
-     * @var array
-     */
-    private $mauticIds = [];
+    private array $mauticIds = [];
 
-    /**
-     * @var array
-     */
-    private $knownCampaignMembers = [];
+    private array $knownCampaignMembers = [];
 
     /**
      * Fetcher constructor.

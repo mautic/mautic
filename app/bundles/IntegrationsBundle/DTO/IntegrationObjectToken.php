@@ -20,10 +20,7 @@ class IntegrationObjectToken
      */
     private $integration;
 
-    /**
-     * @var string
-     */
-    private $defaultValue = '';
+    private string $defaultValue = '';
 
     /**
      * @var string
@@ -85,10 +82,7 @@ class IntegrationObjectToken
         $this->defaultValue = $defaultValue;
     }
 
-    /**
-     * @return string
-     */
-    public function getDefaultValue()
+    public function getDefaultValue(): string
     {
         return $this->defaultValue;
     }

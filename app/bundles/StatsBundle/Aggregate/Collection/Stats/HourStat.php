@@ -4,10 +4,7 @@ namespace Mautic\StatsBundle\Aggregate\Collection\Stats;
 
 class HourStat
 {
-    /**
-     * @var int
-     */
-    private $count = 0;
+    private int $count = 0;
 
     /**
      * HourStat constructor.
@@ -35,10 +32,7 @@ class HourStat
         $this->count = (int) $count;
     }
 
-    /**
-     * @return int
-     */
-    public function getCount()
+    public function getCount(): int
     {
         return $this->count;
     }

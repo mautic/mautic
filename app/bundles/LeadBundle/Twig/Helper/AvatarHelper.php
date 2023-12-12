@@ -14,7 +14,7 @@ final class AvatarHelper
     /**
      * @var array<string>
      */
-    private $imageTypes = ['jpg', 'jpeg', 'png', 'gif'];
+    private array $imageTypes = ['jpg', 'jpeg', 'png', 'gif'];
 
     public function __construct(
         private AssetsHelper $assetsHelper,

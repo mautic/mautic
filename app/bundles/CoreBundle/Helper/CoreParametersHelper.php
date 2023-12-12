@@ -9,10 +9,7 @@ class CoreParametersHelper
 {
     private \Symfony\Component\HttpFoundation\ParameterBag $parameters;
 
-    /**
-     * @var array
-     */
-    private $resolvedParameters;
+    private ?array $resolvedParameters = null;
 
     public function __construct(
         private ContainerInterface $container
