@@ -6,9 +6,6 @@ use Doctrine\ORM\Mapping as ORM;
 use FOS\OAuthServerBundle\Model\RefreshToken as BaseRefreshToken;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 
-/**
- * @deprecated since Mautic 5.0, to be removed in 6.0 with no replacement.
- */
 class RefreshToken extends BaseRefreshToken
 {
     public static function loadMetadata(ORM\ClassMetadata $metadata): void
