@@ -13,10 +13,7 @@ use Psr\Log\LoggerInterface;
 
 class InactiveHelper
 {
-    /**
-     * @var \DateTimeInterface
-     */
-    private $earliestInactiveDate;
+    private \DateTimeInterface|null $earliestInactiveDate = null;
 
     public function __construct(
         private EventScheduler $scheduler,
@@ -123,11 +120,9 @@ class InactiveHelper
     }
 
     /**
-     * @return \DateTimeInterface|null
-     *
      * @throws \Mautic\CampaignBundle\Executioner\Scheduler\Exception\NotSchedulableException
      */
-    public function getEarliestInactiveDate(ArrayCollection $negativeChildren, \DateTime $lastActiveDate)
+    public function getEarliestInactiveDate(ArrayCollection $negativeChildren, \DateTimeInterface $lastActiveDate): ?\DateTimeInterface
     {
         $earliestDate = null;
         foreach ($negativeChildren as $event) {

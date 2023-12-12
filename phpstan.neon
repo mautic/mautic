@@ -54,7 +54,7 @@ parameters:
 		- '#Call to method PHPUnit\\Framework\\Assert::assertInstanceOf\(\) with (.*?) and (.*?) will always evaluate to#'
 		# on purpose type check
 		-
-			message: '#Parameter \#1 \$credentials of method Mautic\\IntegrationsBundle\\Auth\\Provider\\ApiKey\\HttpFactory::getClient expect#'
+			message: '#Parameter \#1 \$credentials of method Mautic\\IntegrationsBundle\\Auth\\Provider\\(.*?)::getClient\(\) expect#'
 			paths:
 			     - app/bundles/IntegrationsBundle/Tests/Unit/Auth/Provider/ApiKey/HttpFactoryTest.php
 			     - app/bundles/IntegrationsBundle/Tests/Unit/Auth/Provider/Oauth2TwoLegged/HttpFactoryTest.php
