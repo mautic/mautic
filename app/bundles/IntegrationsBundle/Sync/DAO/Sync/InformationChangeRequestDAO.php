@@ -8,15 +8,9 @@ use Mautic\IntegrationsBundle\Sync\DAO\Value\NormalizedValueDAO;
 
 class InformationChangeRequestDAO
 {
-    /**
-     * @var \DateTimeInterface|null
-     */
-    private $possibleChangeDateTime;
+    private ?\DateTimeInterface $possibleChangeDateTime = null;
 
-    /**
-     * @var \DateTimeInterface|null
-     */
-    private $certainChangeDateTime;
+    private ?\DateTimeInterface $certainChangeDateTime = null;
 
     /**
      * @param string $integration

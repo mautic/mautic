@@ -36,17 +36,17 @@ use Twig\Environment;
 
 class BuilderSubscriber implements EventSubscriberInterface
 {
-    private $pageTokenRegex      = '{pagelink=(.*?)}';
+    private string $pageTokenRegex      = '{pagelink=(.*?)}';
 
-    private $dwcTokenRegex       = '{dwc=(.*?)}';
+    private string $dwcTokenRegex       = '{dwc=(.*?)}';
 
-    private $langBarRegex        = '{langbar}';
+    private string $langBarRegex        = '{langbar}';
 
-    private $shareButtonsRegex   = '{sharebuttons}';
+    private string $shareButtonsRegex   = '{sharebuttons}';
 
-    private $titleRegex          = '{pagetitle}';
+    private string $titleRegex          = '{pagetitle}';
 
-    private $descriptionRegex    = '{pagemetadescription}';
+    private string $descriptionRegex    = '{pagemetadescription}';
 
     public const segmentListRegex  = '{segmentlist}';
 

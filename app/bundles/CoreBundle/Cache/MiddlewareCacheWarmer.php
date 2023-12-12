@@ -8,10 +8,7 @@ use Symfony\Component\HttpKernel\CacheWarmer\CacheWarmerInterface;
 
 class MiddlewareCacheWarmer implements CacheWarmerInterface
 {
-    /**
-     * @var string
-     */
-    private $cacheFile;
+    private ?string $cacheFile = null;
 
     /**
      * @var \SplPriorityQueue|\ReflectionClass[]

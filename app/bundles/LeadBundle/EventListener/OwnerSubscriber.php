@@ -11,15 +11,9 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class OwnerSubscriber implements EventSubscriberInterface
 {
-    /**
-     * @var string
-     */
-    private $ownerFieldSprintf = '{ownerfield=%s}';
+    private string $ownerFieldSprintf = '{ownerfield=%s}';
 
-    /**
-     * @var array
-     */
-    private $owners;
+    private ?array $owners = null;
 
     public const onwerColumns = ['email', 'firstname', 'lastname', 'position', 'signature'];
 

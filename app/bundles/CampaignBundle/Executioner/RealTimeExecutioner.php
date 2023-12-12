@@ -31,10 +31,7 @@ class RealTimeExecutioner
      */
     private $events;
 
-    /**
-     * @var Responses
-     */
-    private $responses;
+    private ?\Mautic\CampaignBundle\Executioner\Result\Responses $responses = null;
 
     public function __construct(
         private LoggerInterface $logger,

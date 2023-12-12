@@ -23,25 +23,13 @@ class SegmentContactsLineChartQuery extends ChartQuery
      */
     private $firstEventLog;
 
-    /**
-     * @var array
-     */
-    private $addedEventLogStats;
+    private ?array $addedEventLogStats = null;
 
-    /**
-     * @var array
-     */
-    private $removedEventLogStats;
+    private ?array $removedEventLogStats = null;
 
-    /**
-     * @var array
-     */
-    private $addedLeadListStats;
+    private ?array $addedLeadListStats = null;
 
-    /**
-     * @var bool
-     */
-    private $statsFromEventLog;
+    private ?bool $statsFromEventLog = null;
 
     /**
      * @param string|null $unit

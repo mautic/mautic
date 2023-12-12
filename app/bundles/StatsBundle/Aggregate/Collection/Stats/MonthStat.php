@@ -7,7 +7,7 @@ class MonthStat implements StatInterface
     /**
      * @var DayStat[]
      */
-    private $stats = [];
+    private array $stats = [];
 
     /**
      * @param string $month "2019-01" format

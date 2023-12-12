@@ -8,14 +8,20 @@ use Symfony\Contracts\EventDispatcher\Event;
 
 class LeadChangeCompanyEvent extends Event
 {
-    private $lead;
+    private ?Lead $lead = null;
 
-    private $leads;
+    /**
+     * @var Lead[]|null
+     */
+    private ?array $leads = null;
 
+    /**
+     * @param Lead|Lead[] $leads
+     */
     public function __construct(
-        $leads,
+        Lead|array $leads,
         private Company $company,
-        private $added = true
+        private bool $added = true
     ) {
         if (is_array($leads)) {
             $this->leads = $leads;
@@ -52,10 +58,7 @@ class LeadChangeCompanyEvent extends Event
         return $this->company;
     }
 
-    /**
-     * @return bool
-     */
-    public function wasAdded()
+    public function wasAdded(): bool
     {
         return $this->added;
     }

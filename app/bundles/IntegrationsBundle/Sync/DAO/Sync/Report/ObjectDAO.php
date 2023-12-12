@@ -11,7 +11,7 @@ class ObjectDAO
     /**
      * @var FieldDAO[]
      */
-    private $fields = [];
+    private array $fields = [];
 
     /**
      * @param string $object

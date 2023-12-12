@@ -13,7 +13,7 @@ class PreferenceBuilder
     /**
      * @var ChannelPreferences[]
      */
-    private $channels = [];
+    private array $channels = [];
 
     public function __construct(
         ArrayCollection $logs,

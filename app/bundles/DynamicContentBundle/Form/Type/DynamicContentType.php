@@ -66,7 +66,10 @@ class DynamicContentType extends AbstractType
      */
     private array $deviceOsChoices;
 
-    private $tagChoices = [];
+    /**
+     * @var array<string, string>
+     */
+    private array $tagChoices = [];
 
     /**
      * @throws \InvalidArgumentException

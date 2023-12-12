@@ -77,9 +77,12 @@ return static function (RectorConfig $rectorConfig): void {
             __DIR__.'/app/bundles/CoreBundle/DependencyInjection/Builder/BundleMetadata.php',
         ],
 
+        \Rector\TypeDeclaration\Rector\Property\TypedPropertyFromAssignsRector::class => [
+            '*/Entity/*',
+        ],
+
         // handle later with full PHP 8.0 upgrade
         \Rector\Php80\Rector\FunctionLike\MixedTypeRector::class,
-        \Rector\TypeDeclaration\Rector\Property\TypedPropertyFromAssignsRector::class,
         \Rector\Php73\Rector\FuncCall\JsonThrowOnErrorRector::class,
         \Rector\CodeQuality\Rector\ClassMethod\OptionalParametersAfterRequiredRector::class,
 

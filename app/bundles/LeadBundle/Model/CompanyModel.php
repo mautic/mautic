@@ -59,10 +59,7 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
      */
     private $fields = [];
 
-    /**
-     * @var bool
-     */
-    private $repoSetup = false;
+    private bool $repoSetup = false;
 
     public function __construct(
         FieldModel $leadFieldModel,

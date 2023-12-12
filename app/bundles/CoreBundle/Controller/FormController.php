@@ -22,17 +22,17 @@ class FormController extends AbstractStandardFormController
 {
     private string $deprecatedModelName = '';
 
-    private $deprecatedPermissionBase;
+    private ?string $deprecatedPermissionBase = null;
 
-    private $deprecatedRouteBase;
+    private ?string $deprecatedRouteBase = null;
 
-    private $deprecatedSessionBase;
+    private ?string $deprecatedSessionBase = null;
 
-    private $deprecatedTranslationBase;
+    private ?string $deprecatedTranslationBase = null;
 
-    private $deprecatedTemplateBase;
+    private ?string $deprecatedTemplateBase = null;
 
-    private $deprecatedMauticContent;
+    private ?string $deprecatedMauticContent = null;
 
     protected $activeLink;
 

@@ -122,8 +122,6 @@ class Stage extends FormEntity
     }
 
     /**
-     * Get id.
-     *
      * @return int
      */
     public function getId()
@@ -131,12 +129,7 @@ class Stage extends FormEntity
         return $this->id;
     }
 
-    /**
-     * Set weight.
-     *
-     * @return int
-     */
-    public function setWeight($type)
+    public function setWeight($type): self
     {
         $this->weight = (int) $type;
 
@@ -144,8 +137,6 @@ class Stage extends FormEntity
     }
 
     /**
-     * Get weight.
-     *
      * @return int
      */
     public function getWeight()
@@ -159,13 +150,9 @@ class Stage extends FormEntity
     }
 
     /**
-     * Set description.
-     *
      * @param string $description
-     *
-     * @return string
      */
-    public function setDescription($description)
+    public function setDescription($description): self
     {
         $this->isChanged('description', $description);
         $this->description = $description;
@@ -184,13 +171,9 @@ class Stage extends FormEntity
     }
 
     /**
-     * Set name.
-     *
      * @param string $name
-     *
-     * @return string
      */
-    public function setName($name)
+    public function setName($name): self
     {
         $this->isChanged('name', $name);
         $this->name = $name;
@@ -208,29 +191,19 @@ class Stage extends FormEntity
         return $this->name;
     }
 
-    /**
-     * Add log.
-     *
-     * @return Log
-     */
-    public function addLog(LeadStageLog $log)
+    public function addLog(LeadStageLog $log): self
     {
         $this->log[] = $log;
 
         return $this;
     }
 
-    /**
-     * Remove log.
-     */
     public function removeLog(LeadStageLog $log): void
     {
         $this->log->removeElement($log);
     }
 
     /**
-     * Get log.
-     *
      * @return \Doctrine\Common\Collections\Collection
      */
     public function getLog()
@@ -239,13 +212,9 @@ class Stage extends FormEntity
     }
 
     /**
-     * Set publishUp.
-     *
      * @param \DateTime $publishUp
-     *
-     * @return Stage
      */
-    public function setPublishUp($publishUp)
+    public function setPublishUp($publishUp): self
     {
         $this->isChanged('publishUp', $publishUp);
         $this->publishUp = $publishUp;
@@ -254,8 +223,6 @@ class Stage extends FormEntity
     }
 
     /**
-     * Get publishUp.
-     *
      * @return \DateTimeInterface
      */
     public function getPublishUp()
@@ -264,13 +231,9 @@ class Stage extends FormEntity
     }
 
     /**
-     * Set publishDown.
-     *
      * @param \DateTime $publishDown
-     *
-     * @return Stage
      */
-    public function setPublishDown($publishDown)
+    public function setPublishDown($publishDown): Stage
     {
         $this->isChanged('publishDown', $publishDown);
         $this->publishDown = $publishDown;

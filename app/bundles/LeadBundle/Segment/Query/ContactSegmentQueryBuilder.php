@@ -26,7 +26,7 @@ class ContactSegmentQueryBuilder
     /**
      * @var array Contains segment edges mapping
      */
-    private $dependencyMap = [];
+    private array $dependencyMap = [];
 
     public function __construct(
         private EntityManager $entityManager,

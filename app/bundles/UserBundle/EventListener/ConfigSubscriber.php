@@ -11,7 +11,10 @@ use Symfony\Component\HttpFoundation\File\UploadedFile;
 
 class ConfigSubscriber implements EventSubscriberInterface
 {
-    private $fileFields = [
+    /**
+     * @var string[]
+     */
+    private array $fileFields = [
         'saml_idp_metadata',
         'saml_idp_own_certificate',
         'saml_idp_own_private_key',

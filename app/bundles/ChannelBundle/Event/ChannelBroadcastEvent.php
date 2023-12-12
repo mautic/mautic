@@ -44,27 +44,17 @@ class ChannelBroadcastEvent extends Event
 
     /**
      * How many contacts to load from the database.
-     *
-     * @var int
      */
-    private $limit = 100;
+    private int $limit = 100;
 
     /**
      * How big batches to use to actually send.
-     *
-     * @var int
      */
-    private $batch = 50;
+    private int $batch = 50;
 
-    /**
-     * @var int|null
-     */
-    private $maxThreads;
+    private ?int $maxThreads = null;
 
-    /**
-     * @var int|null
-     */
-    private $threadId;
+    private ?int $threadId = null;
 
     public function __construct(
         $channel,
@@ -170,10 +160,7 @@ class ChannelBroadcastEvent extends Event
         $this->limit = $limit;
     }
 
-    /**
-     * @return int
-     */
-    public function getLimit()
+    public function getLimit(): int
     {
         return $this->limit;
     }
@@ -186,10 +173,7 @@ class ChannelBroadcastEvent extends Event
         $this->batch = $batch;
     }
 
-    /**
-     * @return int
-     */
-    public function getBatch()
+    public function getBatch(): int
     {
         return $this->batch;
     }

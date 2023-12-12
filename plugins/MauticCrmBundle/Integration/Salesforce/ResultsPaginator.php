@@ -17,15 +17,9 @@ class ResultsPaginator
      */
     private $totalRecords = 0;
 
-    /**
-     * @var int
-     */
-    private $recordCount = 0;
+    private int $recordCount = 0;
 
-    /**
-     * @var int
-     */
-    private $retryCount = 0;
+    private int $retryCount = 0;
 
     /**
      * @var string|null

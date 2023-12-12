@@ -15,20 +15,11 @@ class EmailSendEvent extends CommonEvent
      */
     private $email;
 
-    /**
-     * @var string
-     */
-    private $content = '';
+    private string $content = '';
 
-    /**
-     * @var string
-     */
-    private $plainText = '';
+    private string $plainText = '';
 
-    /**
-     * @var string
-     */
-    private $subject = '';
+    private string $subject = '';
 
     /**
      * @var string|null
@@ -45,20 +36,14 @@ class EmailSendEvent extends CommonEvent
      */
     private $source;
 
-    /**
-     * @var array
-     */
-    private $tokens = [];
+    private array $tokens = [];
 
     /**
      * @var bool
      */
     private $internalSend = false;
 
-    /**
-     * @var array
-     */
-    private $textHeaders = [];
+    private array $textHeaders = [];
 
     /**
      * @param array $args
@@ -256,10 +241,8 @@ class EmailSendEvent extends CommonEvent
 
     /**
      * Get token array.
-     *
-     * @return array
      */
-    public function getTokens($includeGlobal = true)
+    public function getTokens($includeGlobal = true): array
     {
         $tokens = $this->tokens;
 
@@ -279,10 +262,7 @@ class EmailSendEvent extends CommonEvent
         }
     }
 
-    /**
-     * @return array
-     */
-    public function getTextHeaders()
+    public function getTextHeaders(): array
     {
         return (null !== $this->helper) ? $this->helper->getCustomHeaders() : $this->textHeaders;
     }

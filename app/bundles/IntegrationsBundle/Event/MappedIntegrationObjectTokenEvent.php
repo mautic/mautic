@@ -12,10 +12,7 @@ use Mautic\CoreBundle\Event\CommonEvent;
  */
 class MappedIntegrationObjectTokenEvent extends CommonEvent
 {
-    /**
-     * @var array
-     */
-    private $tokens = [];
+    private array $tokens = [];
 
     /**
      * Add a new mapped integration object token.

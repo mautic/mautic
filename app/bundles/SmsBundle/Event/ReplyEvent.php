@@ -8,10 +8,7 @@ use Symfony\Contracts\EventDispatcher\Event;
 
 class ReplyEvent extends Event
 {
-    /**
-     * @var Response|null
-     */
-    private $response;
+    private ?\Symfony\Component\HttpFoundation\Response $response = null;
 
     /**
      * @param string $message

@@ -11,15 +11,12 @@ use Psr\Log\LoggerInterface;
 
 class DeviceTracker
 {
-    /**
-     * @var bool
-     */
-    private $deviceWasChanged = false;
+    private bool $deviceWasChanged = false;
 
     /**
      * @var LeadDevice[]
      */
-    private $trackedDevice = [];
+    private array $trackedDevice = [];
 
     public function __construct(
         private DeviceCreatorServiceInterface $deviceCreatorService,
@@ -79,10 +76,7 @@ class DeviceTracker
         return $trackedDevice;
     }
 
-    /**
-     * @return bool
-     */
-    public function wasDeviceChanged()
+    public function wasDeviceChanged(): bool
     {
         return $this->deviceWasChanged;
     }

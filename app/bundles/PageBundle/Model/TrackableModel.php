@@ -52,10 +52,7 @@ class TrackableModel extends AbstractCommonModel
      */
     protected $usingClickthrough = true;
 
-    /**
-     * @var array|null
-     */
-    private $contactFieldUrlTokens;
+    private ?array $contactFieldUrlTokens = null;
 
     public function __construct(
         protected RedirectModel $redirectModel,

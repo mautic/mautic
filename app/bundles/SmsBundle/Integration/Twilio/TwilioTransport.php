@@ -14,10 +14,7 @@ use Twilio\Rest\Client;
 
 class TwilioTransport implements TransportInterface
 {
-    /**
-     * @var Client
-     */
-    private $client;
+    private ?\Twilio\Rest\Client $client = null;
 
     public function __construct(
         private Configuration $configuration,

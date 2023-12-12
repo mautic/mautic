@@ -25,15 +25,9 @@ class ContactRequestHelper
      */
     private $trackedContact;
 
-    /**
-     * @var array
-     */
-    private $queryFields = [];
+    private array $queryFields = [];
 
-    /**
-     * @var array
-     */
-    private $publiclyUpdatableFieldValues = [];
+    private array $publiclyUpdatableFieldValues = [];
 
     public function __construct(
         private LeadModel $leadModel,

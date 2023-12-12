@@ -6,10 +6,7 @@ namespace Mautic\IntegrationsBundle\Sync\DAO\Sync\Report;
 
 class RelationDAO
 {
-    /**
-     * @var int
-     */
-    private $relObjectInternalId;
+    private ?int $relObjectInternalId = null;
 
     public function __construct(
         private string $objectName,

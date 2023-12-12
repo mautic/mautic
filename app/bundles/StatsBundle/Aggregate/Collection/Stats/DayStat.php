@@ -7,7 +7,7 @@ class DayStat implements StatInterface
     /**
      * @var HourStat[]
      */
-    private $stats = [];
+    private array $stats = [];
 
     /**
      * @param string $day "2019-11-07" format

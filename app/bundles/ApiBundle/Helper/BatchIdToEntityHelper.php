@@ -9,20 +9,11 @@ class BatchIdToEntityHelper
      */
     private $ids = [];
 
-    /**
-     * @var array
-     */
-    private $originalKeys = [];
+    private array $originalKeys = [];
 
-    /**
-     * @var array
-     */
-    private $errors = [];
+    private array $errors = [];
 
-    /**
-     * @var bool
-     */
-    private $isAssociative = false;
+    private bool $isAssociative = false;
 
     /**
      * @param string $idKey
