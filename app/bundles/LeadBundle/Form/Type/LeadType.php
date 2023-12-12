@@ -142,7 +142,7 @@ class LeadType extends AbstractType
                     'multiple' => false,
                 ]
             )
-            ->addModelTransformer($transformer)
+                ->addModelTransformer($transformer)
         );
 
         $transformer = new IdToEntityModelTransformer($this->entityManager, Stage::class);

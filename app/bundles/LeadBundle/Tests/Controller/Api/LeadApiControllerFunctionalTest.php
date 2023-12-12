@@ -409,7 +409,9 @@ class LeadApiControllerFunctionalTest extends MauticMysqlTestCase
 
         // Test getting a contact
         $this->client->request(
-            'GET', '/api/contacts/'.$contactId);
+            'GET',
+            '/api/contacts/'.$contactId
+        );
         $clientResponse = $this->client->getResponse();
         $response       = json_decode($clientResponse->getContent(), true);
 
@@ -428,7 +430,9 @@ class LeadApiControllerFunctionalTest extends MauticMysqlTestCase
 
         // Test fetching the batch of contacts
         $this->client->request(
-            'GET', '/api/contacts');
+            'GET',
+            '/api/contacts'
+        );
         $clientResponse = $this->client->getResponse();
         $response       = json_decode($clientResponse->getContent(), true);
 
@@ -670,7 +674,9 @@ class LeadApiControllerFunctionalTest extends MauticMysqlTestCase
 
         // Test fetching the batch of contacts
         $this->client->request(
-            'GET', '/api/contacts');
+            'GET',
+            '/api/contacts'
+        );
         $clientResponse = $this->client->getResponse();
         $response       = json_decode($clientResponse->getContent(), true);
 

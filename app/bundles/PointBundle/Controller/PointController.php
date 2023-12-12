@@ -191,7 +191,9 @@ class PointController extends AbstractFormController
             'passthroughVars' => [
                 'activeLink'    => '#mautic_point_index',
                 'mauticContent' => 'point',
-                'route'         => $this->generateUrl('mautic_point_action', [
+                'route'         => $this->generateUrl(
+                    'mautic_point_action',
+                    [
                         'objectAction' => (!empty($valid) ? 'edit' : 'new'), // valid means a new form was applied
                         'objectId'     => $entity->getId(),
                     ]
@@ -325,7 +327,9 @@ class PointController extends AbstractFormController
             'passthroughVars' => [
                 'activeLink'    => '#mautic_point_index',
                 'mauticContent' => 'point',
-                'route'         => $this->generateUrl('mautic_point_action', [
+                'route'         => $this->generateUrl(
+                    'mautic_point_action',
+                    [
                         'objectAction' => 'edit',
                         'objectId'     => $entity->getId(),
                     ]

@@ -80,7 +80,11 @@ class LeadSubscriberTest extends CommonMocks
         $this->mockFocusModelGetStatsByLead(Stat::TYPE_NOTIFICATION, self::FOCUS_NAME, 'getStatsViewByLead', $date);
 
         $timelineEvent = $this->getTimelineEvent(
-            FocusEventTypes::FOCUS_ON_VIEW, self::EVENT_TYPE_VIEW_NAME, self::FOCUS_NAME, $date, $lead
+            FocusEventTypes::FOCUS_ON_VIEW,
+            self::EVENT_TYPE_VIEW_NAME,
+            self::FOCUS_NAME,
+            $date,
+            $lead
         );
 
         $leadEvent  = new LeadTimelineEvent($lead);
@@ -104,7 +108,10 @@ class LeadSubscriberTest extends CommonMocks
         $this->mockFocusModelGetStatsByLead(Stat::TYPE_NOTIFICATION, self::FOCUS_NAME, 'getStatsViewByLead', $date);
 
         $timelineEvent = $this->getTimelineEvent(
-            FocusEventTypes::FOCUS_ON_VIEW, self::EVENT_TYPE_VIEW_NAME, self::FOCUS_NAME, $date
+            FocusEventTypes::FOCUS_ON_VIEW,
+            self::EVENT_TYPE_VIEW_NAME,
+            self::FOCUS_NAME,
+            $date
         );
 
         $leadEvent  = new LeadTimelineEvent();
@@ -133,7 +140,11 @@ class LeadSubscriberTest extends CommonMocks
         $this->mockFocusModelGetStatsByLead(Stat::TYPE_CLICK, self::FOCUS_NAME, 'getStatsClickByLead', $date);
 
         $timelineEvent = $this->getTimelineEvent(
-            FocusEventTypes::FOCUS_ON_CLICK, self::EVENT_TYPE_CLICK_NAME, self::FOCUS_NAME, $date, $lead
+            FocusEventTypes::FOCUS_ON_CLICK,
+            self::EVENT_TYPE_CLICK_NAME,
+            self::FOCUS_NAME,
+            $date,
+            $lead
         );
 
         $leadEvent  = new LeadTimelineEvent($lead);
@@ -157,7 +168,10 @@ class LeadSubscriberTest extends CommonMocks
         $this->mockFocusModelGetStatsByLead(Stat::TYPE_CLICK, self::FOCUS_NAME, 'getStatsClickByLead', $date);
 
         $timelineEvent = $this->getTimelineEvent(
-            FocusEventTypes::FOCUS_ON_CLICK, self::EVENT_TYPE_CLICK_NAME, self::FOCUS_NAME, $date
+            FocusEventTypes::FOCUS_ON_CLICK,
+            self::EVENT_TYPE_CLICK_NAME,
+            self::FOCUS_NAME,
+            $date
         );
 
         $leadEvent  = new LeadTimelineEvent();

@@ -300,13 +300,19 @@ class SugarcrmIntegration extends CrmAbstractIntegration
                                     // 6.x/community
 
                                     foreach ($fields['module_fields'] as $fieldInfo) {
-                                        if (isset($fieldInfo['name']) && (!in_array($fieldInfo['type'], ['id', 'assigned_user_name', 'link', 'relate']) || ('id' == $fieldInfo['type'] && 'id' == $fieldInfo['name'])
+                                        if (isset($fieldInfo['name']) && (
+                                            !in_array($fieldInfo['type'], ['id', 'assigned_user_name', 'link', 'relate']) || ('id' == $fieldInfo['type'] && 'id' == $fieldInfo['name'])
                                         )
                                         ) {
                                             $type      = 'string';
-                                            $fieldName = (!str_contains($fieldInfo['name'],
-                                                'webtolead_email')) ? $fieldInfo['name'] : str_replace('webtolead_',
-                                                    '', $fieldInfo['name']);
+                                            $fieldName = (!str_contains(
+                                                $fieldInfo['name'],
+                                                'webtolead_email'
+                                            )) ? $fieldInfo['name'] : str_replace(
+                                                'webtolead_',
+                                                '',
+                                                $fieldInfo['name']
+                                            );
                                             // make these congruent as some come in with colons and some do not
                                             $label = str_replace(':', '', $fieldInfo['label']);
                                             if ('company' !== $sObject) {
@@ -330,10 +336,11 @@ class SugarcrmIntegration extends CrmAbstractIntegration
                                     // 7.x
                                     foreach ($fields['fields'] as $fieldInfo) {
                                         if (isset($fieldInfo['name']) && empty($fieldInfo['readonly'])
-                                            && (!in_array(
-                                                $fieldInfo['type'],
-                                                ['id', 'team_list', 'link', 'relate']
-                                            )
+                                            && (
+                                                !in_array(
+                                                    $fieldInfo['type'],
+                                                    ['id', 'team_list', 'link', 'relate']
+                                                )
                                                 ||
                                                 ('id' == $fieldInfo['type'] && 'id' == $fieldInfo['name'])
                                             )

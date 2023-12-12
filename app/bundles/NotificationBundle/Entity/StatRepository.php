@@ -148,7 +148,8 @@ class StatRepository extends CommonRepository
             ->where(
                 $query->expr()->andX(
                     $query->expr()->eq('IDENTITY(s.lead)', $leadId),
-                    $query->expr()->eq('s.isFailed', ':false'))
+                    $query->expr()->eq('s.isFailed', ':false')
+                )
             )->setParameter('false', false, 'boolean');
 
         if (isset($options['search']) && $options['search']) {

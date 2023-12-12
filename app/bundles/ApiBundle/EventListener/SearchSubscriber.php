@@ -38,7 +38,8 @@ class SearchSubscriber implements EventSubscriberInterface
                 [
                     'limit'  => 5,
                     'filter' => $str,
-                ]);
+                ]
+            );
 
             if (count($clients) > 0) {
                 $clientResults = [];

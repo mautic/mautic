@@ -106,23 +106,23 @@ class FrequencyRule extends CommonEntity
     public static function loadApiMetadata(ApiMetadataDriver $metadata): void
     {
         $metadata->setGroupPrefix('frequencyRules')
-                 ->addListProperties(
-                     [
-                         'channel',
-                         'frequencyNumber',
-                         'frequencyTime',
-                         'preferredChannel',
-                         'pauseFromDate',
-                         'pauseToDate',
-                     ]
-                 )
-                 ->addProperties(
-                     [
-                         'lead',
-                         'dateAdded',
-                     ]
-                 )
-                 ->build();
+            ->addListProperties(
+                [
+                    'channel',
+                    'frequencyNumber',
+                    'frequencyTime',
+                    'preferredChannel',
+                    'pauseFromDate',
+                    'pauseToDate',
+                ]
+            )
+            ->addProperties(
+                [
+                    'lead',
+                    'dateAdded',
+                ]
+            )
+            ->build();
     }
 
     /**

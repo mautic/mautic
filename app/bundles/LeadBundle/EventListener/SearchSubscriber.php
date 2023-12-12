@@ -71,7 +71,8 @@ class SearchSubscriber implements EventSubscriberInterface
                     'limit'          => 5,
                     'filter'         => $filter,
                     'withTotalCount' => true,
-                ]);
+                ]
+            );
 
             $count = $results['count'];
 
@@ -326,12 +327,14 @@ class SearchSubscriber implements EventSubscriberInterface
         $q     = $event->getQueryBuilder();
         $expr  = $q->expr()->and(sprintf('%s = :%s', $config['column'], $alias));
 
-        $expr = $expr->with(sprintf('%s = %s',
+        $expr = $expr->with(sprintf(
+            '%s = %s',
             'mq.channel',
             $q->createNamedParameter('email')
         ));
 
-        $expr = $expr->with(sprintf('%s IN (%s, %s)',
+        $expr = $expr->with(sprintf(
+            '%s IN (%s, %s)',
             'mq.status',
             $q->createNamedParameter(MessageQueue::STATUS_PENDING),
             $q->createNamedParameter(MessageQueue::STATUS_RESCHEDULED)

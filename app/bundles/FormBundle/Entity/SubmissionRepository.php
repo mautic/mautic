@@ -290,7 +290,7 @@ class SubmissionRepository extends CommonRepository
 
         if (!empty($options['id'])) {
             $query->andWhere($query->expr()->eq('fs.form_id', ':id'))
-            ->setParameter('id', $options['id']);
+                ->setParameter('id', $options['id']);
         }
 
         if (isset($options['search']) && $options['search']) {
@@ -505,7 +505,7 @@ class SubmissionRepository extends CommonRepository
         $query->select('COUNT(fs.id) AS `total`, COUNT(DISTINCT (fs.lead_id)) AS `unique`')
             ->from(MAUTIC_TABLE_PREFIX.'form_submissions', 'fs');
         $query->where($query->expr()->eq('fs.form_id', ':id'))
-                ->setParameter('id', $form->getId());
+            ->setParameter('id', $form->getId());
 
         return $query->executeQuery()->fetchAssociative();
     }

@@ -52,7 +52,7 @@ class CategoryRepository extends CommonRepository
         }
 
         $q->andWhere($expr)
-          ->setParameter('bundle', $bundle);
+            ->setParameter('bundle', $bundle);
 
         if (!empty($search)) {
             $q->andWhere($q->expr()->like('c.title', ':search'))

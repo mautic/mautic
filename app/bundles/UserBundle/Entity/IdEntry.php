@@ -30,9 +30,9 @@ class IdEntry
         $builder->setTable('saml_id_entry');
 
         $builder->createField('id', 'string')
-             ->makePrimaryKey()
-             ->generatedValue('NONE')
-             ->build();
+            ->makePrimaryKey()
+            ->generatedValue('NONE')
+            ->build();
 
         $builder->createField('entityId', 'string')
             ->columnName('entity_id')

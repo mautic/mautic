@@ -14,7 +14,8 @@ class DetailsTest extends MauticMysqlTestCase
     {
         $campaign = new Campaign();
         $campaign->setName('Campaign A');
-        $campaign->setCanvasSettings([
+        $campaign->setCanvasSettings(
+            [
                 'nodes' => [
                     0 => [
                         'id'        => '148',

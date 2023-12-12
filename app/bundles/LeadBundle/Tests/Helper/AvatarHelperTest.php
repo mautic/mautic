@@ -48,11 +48,11 @@ class AvatarHelperTest extends \PHPUnit\Framework\TestCase
         $this->assetsHelperMock = new AssetsHelper($packagesMock, $coreParametersHelper);
         $this->pathsHelperMock  = $this->createMock(PathsHelper::class);
         $this->pathsHelperMock->method('getSystemPath')
-        ->willReturn('http://localhost');
+            ->willReturn('http://localhost');
         $this->pathsHelperMock->method('getAssetsPath')
-          ->willReturn($root.'/app/assets');
+            ->willReturn($root.'/app/assets');
         $this->pathsHelperMock->method('getMediaPath')
-          ->willReturn($root.'/media');
+            ->willReturn($root.'/media');
 
         $this->assetsHelperMock->setPathsHelper($this->pathsHelperMock);
         $this->defaultAvatarHelperMock = new DefaultAvatarHelper($this->assetsHelperMock);

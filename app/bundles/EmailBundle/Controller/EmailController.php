@@ -617,14 +617,14 @@ class EmailController extends FormController
      * @return array|\Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|Response
      */
     public function editAction(
-            Request $request,
-            AssetsHelper $assetsHelper,
-            Translator $translator,
-            RouterInterface $routerHelper,
-            CoreParametersHelper $coreParametersHelper,
-            $objectId,
-            $ignorePost = false,
-            $forceTypeSelection = false
+        Request $request,
+        AssetsHelper $assetsHelper,
+        Translator $translator,
+        RouterInterface $routerHelper,
+        CoreParametersHelper $coreParametersHelper,
+        $objectId,
+        $ignorePost = false,
+        $forceTypeSelection = false
     ) {
         /** @var \Mautic\EmailBundle\Model\EmailModel $model */
         $model  = $this->getModel('email');

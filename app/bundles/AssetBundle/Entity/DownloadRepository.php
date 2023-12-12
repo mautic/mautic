@@ -33,7 +33,9 @@ class DownloadRepository extends CommonRepository
         );
 
         $q->select('u.is_unique')
-            ->from(sprintf('(SELECT (NOT EXISTS (%s)) is_unique)', $q2->getSQL()), 'u'
+            ->from(
+                sprintf('(SELECT (NOT EXISTS (%s)) is_unique)', $q2->getSQL()),
+                'u'
             )
             ->setParameter('id', $trackingId);
 

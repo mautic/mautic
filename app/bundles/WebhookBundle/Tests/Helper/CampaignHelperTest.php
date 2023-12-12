@@ -45,15 +45,15 @@ class CampaignHelperTest extends \PHPUnit\Framework\TestCase
         $this->dispatcher        = $this->createMock(EventDispatcherInterface::class);
         $this->ipCollection      = new ArrayCollection();
         $this->companyRepository = $this->getMockBuilder(CompanyRepository::class)
-        ->disableOriginalConstructor()
-        ->onlyMethods(['getCompaniesByLeadId'])
-        ->getMock();
+            ->disableOriginalConstructor()
+            ->onlyMethods(['getCompaniesByLeadId'])
+            ->getMock();
 
         $this->companyRepository->method('getCompaniesByLeadId')
-        ->willReturn([new Company()]);
+            ->willReturn([new Company()]);
 
         $this->companyModel->method('getRepository')
-        ->willReturn($this->companyRepository);
+            ->willReturn($this->companyRepository);
 
         $this->campaignHelper = new CampaignHelper($this->client, $this->companyModel, $this->dispatcher);
 
@@ -172,11 +172,13 @@ class CampaignHelperTest extends \PHPUnit\Framework\TestCase
             ],
         ];
         if ('application/json' == $type) {
-            array_push($sample['headers']['list'],
+            array_push(
+                $sample['headers']['list'],
                 [
                     'label' => 'content-type',
                     'value' => 'application/json',
-                ]);
+                ]
+            );
         }
 
         return $sample;

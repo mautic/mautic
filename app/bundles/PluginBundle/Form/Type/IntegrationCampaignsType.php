@@ -27,7 +27,8 @@ class IntegrationCampaignsType extends AbstractType
     public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults(
-            ['campaignContactStatus' => []]);
+            ['campaignContactStatus' => []]
+        );
     }
 
     public function getBlockPrefix()

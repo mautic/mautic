@@ -230,7 +230,9 @@ class ListApiController extends CommonApiController
             return $this->security->isGranted('lead:leads:viewown');
         } elseif ('delete' == $action) {
             return $this->factory->getSecurity()->hasEntityAccess(
-                true, 'lead:lists:deleteother', $entity->getCreatedBy()
+                true,
+                'lead:lists:deleteother',
+                $entity->getCreatedBy()
             );
         }
 

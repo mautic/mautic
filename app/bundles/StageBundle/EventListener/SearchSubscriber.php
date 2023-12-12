@@ -38,7 +38,8 @@ class SearchSubscriber implements EventSubscriberInterface
                 [
                     'limit'  => 5,
                     'filter' => $str,
-                ]);
+                ]
+            );
             $stageCount = count($items);
             if ($stageCount > 0) {
                 $stagesResults = [];

@@ -267,8 +267,7 @@ class LegacyEventDispatcher
 
     private function isFailed($result): bool
     {
-        return
-            false === $result
+        return false === $result
             || (is_array($result) && isset($result['result']) && false === $result['result']);
     }
 

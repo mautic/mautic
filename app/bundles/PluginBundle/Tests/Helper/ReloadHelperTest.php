@@ -44,7 +44,7 @@ class ReloadHelperTest extends \PHPUnit\Framework\TestCase
 
         $sampleSchema = $this->createMock(Schema::class);
         $sampleSchema->method('getTables')
-                ->willReturn([]);
+            ->willReturn([]);
 
         $this->sampleSchemas = [
             'MauticPlugin\MauticZapierBundle' => $sampleSchema,

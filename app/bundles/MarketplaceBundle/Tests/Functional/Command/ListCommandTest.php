@@ -103,7 +103,8 @@ final class ListCommandTest extends AbstractMauticTestCase
         $connection->method('getPlugins')
             ->withConsecutive(
                 [1, 1, 'koco/mautic-recaptcha-bundle'],
-                [1, 1, 'maatoo/mautic-referrals-bundle'])
+                [1, 1, 'maatoo/mautic-referrals-bundle']
+            )
             ->willReturnOnConsecutiveCalls(
                 json_decode($plugin1, true),
                 json_decode($plugin2, true)

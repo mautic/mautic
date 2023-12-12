@@ -129,8 +129,9 @@ class PageTestAbstract extends TestCase
         $contactTracker->expects($this
             ->any())
             ->method('getContact')
-            ->willReturn($this
-                ->returnValue(['id' => self::$mockId, 'name' => self::$mockName])
+            ->willReturn(
+                $this
+                    ->returnValue(['id' => self::$mockId, 'name' => self::$mockName])
             );
 
         $entityManager->expects($this
@@ -146,9 +147,9 @@ class PageTestAbstract extends TestCase
             );
 
         $coreParametersHelper->expects($this->any())
-                ->method('get')
-                ->with('transliterate_page_title')
-                ->willReturn($transliterationEnabled);
+            ->method('get')
+            ->with('transliterate_page_title')
+            ->willReturn($transliterationEnabled);
 
         $deviceTrackerMock = $this->createMock(DeviceTracker::class);
 

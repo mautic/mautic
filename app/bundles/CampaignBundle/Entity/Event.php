@@ -327,35 +327,35 @@ class Event implements ChannelInterface
 
             // Add standalone groups
             ->setGroupPrefix('campaignEventStandalone')
-             ->addListProperties(
-                 [
-                     'id',
-                     'name',
-                     'description',
-                     'type',
-                     'eventType',
-                     'channel',
-                     'channelId',
-                 ]
-             )
-             ->addProperties(
-                 [
-                     'campaign',
-                     'order',
-                     'properties',
-                     'triggerDate',
-                     'triggerInterval',
-                     'triggerIntervalUnit',
-                     'triggerHour',
-                    'triggerRestrictedStartHour',
-                    'triggerRestrictedStopHour',
-                    'triggerRestrictedDaysOfWeek',
-                     'triggerMode',
-                     'children',
-                     'parent',
-                     'decisionPath',
-                 ]
-             )
+            ->addListProperties(
+                [
+                    'id',
+                    'name',
+                    'description',
+                    'type',
+                    'eventType',
+                    'channel',
+                    'channelId',
+                ]
+            )
+            ->addProperties(
+                [
+                    'campaign',
+                    'order',
+                    'properties',
+                    'triggerDate',
+                    'triggerInterval',
+                    'triggerIntervalUnit',
+                    'triggerHour',
+                   'triggerRestrictedStartHour',
+                   'triggerRestrictedStopHour',
+                   'triggerRestrictedDaysOfWeek',
+                    'triggerMode',
+                    'children',
+                    'parent',
+                    'decisionPath',
+                ]
+            )
 
             // Include logs
             ->setGroupPrefix('campaignEventWithLogs')
@@ -387,7 +387,7 @@ class Event implements ChannelInterface
                     'campaign',
                 ]
             )
-             ->build();
+            ->build();
     }
 
     /**
@@ -932,9 +932,9 @@ class Event implements ChannelInterface
 
         return $this->log->matching(
             Criteria::create()
-                    ->where(
-                        Criteria::expr()->eq('lead', $contact)
-                    )
+                ->where(
+                    Criteria::expr()->eq('lead', $contact)
+                )
         );
     }
 

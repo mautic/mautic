@@ -1790,9 +1790,9 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
         $defaultTimezoneOffset = (new DateTimeHelper())->getLocalTimezoneOffset();
         $columnName            = "CONVERT_TZ($columnWithTimezone, '+00:00', '{$defaultTimezoneOffset}')";
         $q->select('CONCAT(TIME_FORMAT('.$columnName.', \''.$format.'\'),\'-\',TIME_FORMAT('.$columnName.' + INTERVAL 1 HOUR, \''.$format.'\'),\'\') as hour, COUNT(t.id) AS count')
-        ->groupBy('hour')
-        ->orderBy('count', 'DESC')
-        ->setMaxResults(24);
+            ->groupBy('hour')
+            ->orderBy('count', 'DESC')
+            ->setMaxResults(24);
 
         if (!$canViewOthers) {
             $this->limitQueryToCreator($q);

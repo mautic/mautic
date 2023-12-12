@@ -54,7 +54,8 @@ class SearchSubscriber implements EventSubscriberInterface
                 [
                     'limit'  => 5,
                     'filter' => $filter,
-                ]);
+                ]
+            );
 
             if (count($pages) > 0) {
                 $pageResults = [];

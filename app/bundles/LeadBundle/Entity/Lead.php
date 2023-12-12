@@ -1176,7 +1176,8 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
 
     public function isAnonymous(): bool
     {
-        return !($this->getName()
+        return !(
+            $this->getName()
             || $this->getFirstname()
             || $this->getLastname()
             || $this->getCompany()

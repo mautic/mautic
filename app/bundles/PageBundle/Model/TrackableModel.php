@@ -750,8 +750,7 @@ class TrackableModel extends AbstractCommonModel
             }
 
             // Combine the new elements into a string and return it
-            return
-                ((isset($url['scheme'])) ? 'mailto' == $url['scheme'] ? $url['scheme'].':' : $url['scheme'].'://' : '')
+            return ((isset($url['scheme'])) ? 'mailto' == $url['scheme'] ? $url['scheme'].':' : $url['scheme'].'://' : '')
                 .((isset($url['user'])) ? $url['user'].((isset($url['pass'])) ? ':'.$url['pass'] : '').'@' : '')
                 .($url['host'] ?? '')
                 .((isset($url['port'])) ? ':'.$url['port'] : '')

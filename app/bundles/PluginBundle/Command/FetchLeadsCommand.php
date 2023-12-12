@@ -83,8 +83,10 @@ class FetchLeadsCommand extends Command
 
         $integrationObject = $this->integrationHelper->getIntegrationObject($integration);
         if (!$integrationObject instanceof UnifiedIntegrationInterface) {
-            $availableIntegrations = array_filter($this->integrationHelper->getIntegrationObjects(),
-                fn (UnifiedIntegrationInterface $availableIntegration) => $availableIntegration->isConfigured());
+            $availableIntegrations = array_filter(
+                $this->integrationHelper->getIntegrationObjects(),
+                fn (UnifiedIntegrationInterface $availableIntegration) => $availableIntegration->isConfigured()
+            );
             throw new \RuntimeException(sprintf('The Integration "%s" is not one of the available integrations (%s)', $integration, implode(', ', array_keys($availableIntegrations))));
         }
 

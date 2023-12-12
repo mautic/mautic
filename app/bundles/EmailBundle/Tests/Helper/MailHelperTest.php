@@ -379,9 +379,11 @@ class MailHelperTest extends TestCase
         $emailSecret = hash_hmac('sha256', 'someemail@email.test', 'secret');
         $mockRouter->expects($this->once())
             ->method('generate')
-            ->with('mautic_email_unsubscribe',
+            ->with(
+                'mautic_email_unsubscribe',
                 ['idHash' => 'hash'],
-                UrlGeneratorInterface::ABSOLUTE_URL)
+                UrlGeneratorInterface::ABSOLUTE_URL
+            )
             ->willReturn('http://www.somedomain.cz/email/unsubscribe/hash/someemail@email.test/'.$emailSecret);
 
         $parameterMap = [

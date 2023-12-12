@@ -40,7 +40,8 @@ class SearchSubscriber implements EventSubscriberInterface
                 [
                     'limit'  => 5,
                     'filter' => $str,
-                ]);
+                ]
+            );
             $pointCount = count($items);
             if ($pointCount > 0) {
                 $pointsResults = [];
@@ -79,7 +80,8 @@ class SearchSubscriber implements EventSubscriberInterface
                 [
                     'limit'  => 5,
                     'filter' => $str,
-                ]);
+                ]
+            );
             $count = count($items);
             if ($count > 0) {
                 $results = [];

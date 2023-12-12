@@ -33,7 +33,8 @@ class PointType extends AbstractType
 
         $builder->add(
             'name',
-            TextType::class, [
+            TextType::class,
+            [
                 'label'      => 'mautic.core.name',
                 'label_attr' => ['class' => 'control-label'],
                 'attr'       => ['class' => 'form-control'],
@@ -42,7 +43,8 @@ class PointType extends AbstractType
 
         $builder->add(
             'description',
-            TextareaType::class, [
+            TextareaType::class,
+            [
                 'label'      => 'mautic.core.description',
                 'label_attr' => ['class' => 'control-label'],
                 'attr'       => ['class' => 'form-control editor'],

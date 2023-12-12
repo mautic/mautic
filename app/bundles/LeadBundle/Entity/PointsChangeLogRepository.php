@@ -50,7 +50,7 @@ class PointsChangeLogRepository extends CommonRepository
     public function getMostPoints(QueryBuilder $query, $limit = 10, $offset = 0): array
     {
         $query->setMaxResults($limit)
-                ->setFirstResult($offset);
+            ->setFirstResult($offset);
 
         return $query->executeQuery()->fetchAllAssociative();
     }
@@ -64,7 +64,7 @@ class PointsChangeLogRepository extends CommonRepository
     public function getMostLeads(QueryBuilder $query, $limit = 10, $offset = 0): array
     {
         $query->setMaxResults($limit)
-                ->setFirstResult($offset);
+            ->setFirstResult($offset);
 
         return $query->executeQuery()->fetchAllAssociative();
     }

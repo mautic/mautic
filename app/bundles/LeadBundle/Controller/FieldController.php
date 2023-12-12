@@ -309,7 +309,9 @@ class FieldController extends FormController
 
             if ($cancelled || ($valid && $this->getFormButton($form, ['buttons', 'save'])->isClicked())) {
                 return $this->postActionRedirect(
-                    array_merge($postActionVars, [
+                    array_merge(
+                        $postActionVars,
+                        [
                             'viewParameters'  => ['objectId' => $field->getId()],
                             'contentTemplate' => 'Mautic\LeadBundle\Controller\FieldController::indexAction',
                         ]

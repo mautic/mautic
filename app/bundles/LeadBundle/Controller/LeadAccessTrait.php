@@ -92,7 +92,8 @@ trait LeadAccessTrait
                 'orderByDir'     => 'DESC',
                 'limit'          => $limit,
                 'hydration_mode' => 'HYDRATE_ARRAY',
-            ]);
+            ]
+        );
 
         if (null === $leads) {
             return $this->accessDenied();

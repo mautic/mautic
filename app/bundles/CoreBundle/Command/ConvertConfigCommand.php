@@ -24,15 +24,20 @@ class ConvertConfigCommand extends Command
         $this->setName('mautic:theme:json-config')
             ->setDefinition([
                 new InputOption(
-                    'theme', null, InputOption::VALUE_REQUIRED,
+                    'theme',
+                    null,
+                    InputOption::VALUE_REQUIRED,
                     'The name of the theme whose config you are converting.'
                 ),
                 new InputOption(
-                    'save-php-config', null, InputOption::VALUE_NONE,
+                    'save-php-config',
+                    null,
+                    InputOption::VALUE_NONE,
                     'When used, the theme\'s PHP config file will be saved.'
                 ),
             ])
-            ->setHelp(<<<'EOT'
+            ->setHelp(
+                <<<'EOT'
 The <info>%command.name%</info> command converts a PHP theme config file to JSON.
 
 <info>php %command.full_name%</info>

@@ -50,9 +50,9 @@ class Channel extends CommonEntity
         $builder = new ClassMetadataBuilder($metadata);
 
         $builder->setTable('message_channels')
-                ->addIndex(['channel', 'channel_id'], 'channel_entity_index')
-                ->addIndex(['channel', 'is_enabled'], 'channel_enabled_index')
-                ->addUniqueConstraint(['message_id', 'channel'], 'channel_index');
+            ->addIndex(['channel', 'channel_id'], 'channel_entity_index')
+            ->addIndex(['channel', 'is_enabled'], 'channel_enabled_index')
+            ->addUniqueConstraint(['message_id', 'channel'], 'channel_index');
 
         $builder
             ->addId()
@@ -60,13 +60,13 @@ class Channel extends CommonEntity
             ->addNamedField('channelId', 'integer', 'channel_id', true)
             ->addField('properties', Types::JSON)
             ->createField('isEnabled', 'boolean')
-                ->columnName('is_enabled')
-                ->build();
+            ->columnName('is_enabled')
+            ->build();
 
         $builder->createManyToOne('message', Message::class)
-                ->addJoinColumn('message_id', 'id', false, false, 'CASCADE')
-                ->inversedBy('channels')
-                ->build();
+            ->addJoinColumn('message_id', 'id', false, false, 'CASCADE')
+            ->inversedBy('channels')
+            ->build();
     }
 
     /**

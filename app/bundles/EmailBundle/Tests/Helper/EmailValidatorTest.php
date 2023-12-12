@@ -89,13 +89,13 @@ class EmailValidatorTest extends \PHPUnit\Framework\TestCase
     public function testValidGmailEmailWithNonStandardTld(): void
     {
         $this->dispatcher->expects($this->once())
-        ->method('dispatch')
-        ->with($this->isInstanceOf(EmailValidationEvent::class), EmailEvents::ON_EMAIL_VALIDATION)
-        ->willReturn($this->event);
+            ->method('dispatch')
+            ->with($this->isInstanceOf(EmailValidationEvent::class), EmailEvents::ON_EMAIL_VALIDATION)
+            ->willReturn($this->event);
 
         $this->event->expects($this->once())
-        ->method('isValid')
-        ->willReturn(true);
+            ->method('isValid')
+            ->willReturn(true);
 
         // hopefully this domain remains intact
         $this->emailValidator->validate('john@mail.email');

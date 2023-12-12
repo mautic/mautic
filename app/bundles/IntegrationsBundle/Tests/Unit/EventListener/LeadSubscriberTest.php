@@ -467,8 +467,8 @@ class LeadSubscriberTest extends TestCase
         }
 
         $this->variableExpresserHelper->method('encodeVariable')
-                ->withConsecutive(...$values)
-                ->willReturn(...$valueDAOs);
+            ->withConsecutive(...$values)
+            ->willReturn(...$valueDAOs);
 
         $this->fieldChangeRepository->expects($this->once())
             ->method('deleteEntitiesForObjectByColumnName')

@@ -65,9 +65,9 @@ final class EmailSubscriberTest extends \PHPUnit\Framework\TestCase
     public function testOnEmailResendWhenShouldTryAgain(): void
     {
         $this->mockMessage
-        ->expects($this->once())
-        ->method('getLeadIdHash')
-        ->willReturn('idhash');
+            ->expects($this->once())
+            ->method('getLeadIdHash')
+            ->willReturn('idhash');
 
         $queueEmailEvent = new QueueEmailEvent($this->mockMessage);
 
@@ -85,9 +85,9 @@ final class EmailSubscriberTest extends \PHPUnit\Framework\TestCase
     public function testOnEmailResendWhenShouldNotTryAgain(): void
     {
         $this->mockMessage
-        ->expects($this->once())
-        ->method('getLeadIdHash')
-        ->willReturn('idhash');
+            ->expects($this->once())
+            ->method('getLeadIdHash')
+            ->willReturn('idhash');
 
         $this->mockMessage->expects($this->once())
             ->method('getSubject')

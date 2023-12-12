@@ -133,12 +133,12 @@ class LeadFieldRepository extends CommonRepository
         $qb = $this->_em->getConnection()->createQueryBuilder();
 
         return $qb->select('f.alias, f.is_unique_identifer as is_unique, f.type, f.object')
-                ->from(MAUTIC_TABLE_PREFIX.'lead_fields', 'f')
-                ->where($qb->expr()->eq('object', ':object'))
-                ->setParameter('object', $object)
-                ->orderBy('f.field_order', 'ASC')
-                ->executeQuery()
-                ->fetchAllAssociative();
+            ->from(MAUTIC_TABLE_PREFIX.'lead_fields', 'f')
+            ->where($qb->expr()->eq('object', ':object'))
+            ->setParameter('object', $object)
+            ->orderBy('f.field_order', 'ASC')
+            ->executeQuery()
+            ->fetchAllAssociative();
     }
 
     /**
@@ -246,7 +246,7 @@ class LeadFieldRepository extends CommonRepository
                         $compositeExpression
                     )
                 )
-                  ->setParameter('lead', (int) $lead);
+                    ->setParameter('lead', (int) $lead);
             } elseif ('regexp' === $operatorExpr || 'notRegexp' === $operatorExpr) {
                 if ('regexp' === $operatorExpr) {
                     $where = $property.' REGEXP  :value';
@@ -260,8 +260,8 @@ class LeadFieldRepository extends CommonRepository
                         $q->expr()->and($where)
                     )
                 )
-                  ->setParameter('lead', (int) $lead)
-                  ->setParameter('value', $value);
+                    ->setParameter('lead', (int) $lead)
+                    ->setParameter('value', $value);
             } elseif ('in' === $operatorExpr || 'notIn' === $operatorExpr) {
                 $property  = $this->getPropertyByField($field, $q);
                 $fieldType = $this->findOneBy(['alias' => $field])->getType();
@@ -335,8 +335,8 @@ class LeadFieldRepository extends CommonRepository
                 }
 
                 $q->where($expr)
-                  ->setParameter('lead', (int) $lead)
-                  ->setParameter('value', $value);
+                    ->setParameter('lead', (int) $lead)
+                    ->setParameter('value', $value);
             }
             if (str_starts_with($property, 'u.')) {
                 // Match only against the latest UTM properties.

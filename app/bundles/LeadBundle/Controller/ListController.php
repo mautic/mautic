@@ -139,7 +139,8 @@ class ListController extends FormController
         ];
 
         return $this->delegateView(
-            $this->getViewArguments([
+            $this->getViewArguments(
+                [
                 'viewParameters'  => $parameters,
                 'contentTemplate' => '@MauticLead/List/list.html.twig',
                 'passthroughVars' => [
@@ -417,7 +418,9 @@ class ListController extends FormController
         }
 
         if (!$this->security->hasEntityAccess(
-            true, 'lead:lists:editother', $segment->getCreatedBy()
+            true,
+            'lead:lists:editother',
+            $segment->getCreatedBy()
         )) {
             throw new AccessDeniedException(sprintf('User has not access on segment with id %d', $segmentId));
         }
@@ -507,7 +510,9 @@ class ListController extends FormController
                     'msgVars' => ['%id%' => $objectId],
                 ];
             } elseif (!$this->security->hasEntityAccess(
-                true, 'lead:lists:deleteother', $list->getCreatedBy()
+                true,
+                'lead:lists:deleteother',
+                $list->getCreatedBy()
             )
             ) {
                 return $this->accessDenied();
@@ -583,7 +588,9 @@ class ListController extends FormController
                         'msgVars' => ['%id%' => $objectId],
                     ];
                 } elseif (!$this->security->hasEntityAccess(
-                    true, 'lead:lists:deleteother', $entity->getCreatedBy()
+                    true,
+                    'lead:lists:deleteother',
+                    $entity->getCreatedBy()
                 )) {
                     $flashes[] = $this->accessDenied(true);
                 } elseif ($model->isLocked($entity)) {
@@ -666,7 +673,9 @@ class ListController extends FormController
                     'msgVars' => ['%id%' => $listId],
                 ];
             } elseif (!$this->security->hasEntityAccess(
-                'lead:leads:editown', 'lead:leads:editother', $lead->getPermissionUser()
+                'lead:leads:editown',
+                'lead:leads:editother',
+                $lead->getPermissionUser()
             )) {
                 return $this->accessDenied();
             } elseif (null === $list) {
@@ -676,7 +685,9 @@ class ListController extends FormController
                     'msgVars' => ['%id%' => $list->getId()],
                 ];
             } elseif (!$list->isGlobal() && !$this->security->hasEntityAccess(
-                true, 'lead:lists:viewother', $list->getCreatedBy()
+                true,
+                'lead:lists:viewother',
+                $list->getCreatedBy()
             )) {
                 return $this->accessDenied();
             } elseif ($model->isLocked($lead)) {

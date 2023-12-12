@@ -167,7 +167,10 @@ class CacheStorageHelper
                 $namespace          = ($this->namespace) ? InputHelper::alphanum($this->namespace, false, '-', ['-', '+', '.']) : '';
 
                 $this->cacheAdaptor = new DoctrineDbalAdapter(
-                    $this->connection, $namespace, $this->defaultExpiration, ['db_table' => MAUTIC_TABLE_PREFIX.'cache_items']
+                    $this->connection,
+                    $namespace,
+                    $this->defaultExpiration,
+                    ['db_table' => MAUTIC_TABLE_PREFIX.'cache_items']
                 );
                 break;
             case self::ADAPTOR_FILESYSTEM:

@@ -23,7 +23,8 @@ class FindUpdatesCommand extends Command
     protected function configure()
     {
         $this->setName('mautic:update:find')
-            ->setHelp(<<<'EOT'
+            ->setHelp(
+                <<<'EOT'
 The <info>%command.name%</info> command checks for updates for the Mautic application.
 
 <info>php %command.full_name%</info>

@@ -34,15 +34,21 @@ class ApplyUpdatesCommand extends Command
             ->setDefinition(
                 [
                     new InputOption(
-                        'force', null, InputOption::VALUE_NONE,
+                        'force',
+                        null,
+                        InputOption::VALUE_NONE,
                         'Bypasses the verification check.'
                     ),
                     new InputOption(
                         'update-package',
-                        'p', InputOption::VALUE_OPTIONAL, 'Optional full path to the update package to apply.'
+                        'p',
+                        InputOption::VALUE_OPTIONAL,
+                        'Optional full path to the update package to apply.'
                     ),
                     new InputOption(
-                        'finish', null, InputOption::VALUE_NONE,
+                        'finish',
+                        null,
+                        InputOption::VALUE_NONE,
                         'Finalize the upgrade.'
                     ),
                 ]

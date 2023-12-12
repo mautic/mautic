@@ -22,7 +22,10 @@ class TrackableRepository extends CommonRepository
 
         return $q->select('r.redirect_id, r.url, r.id, '.$tableAlias.'.hits, '.$tableAlias.'.unique_hits')
             ->from(MAUTIC_TABLE_PREFIX.'page_redirects', 'r')
-            ->innerJoin('r', MAUTIC_TABLE_PREFIX.'channel_url_trackables', $tableAlias,
+            ->innerJoin(
+                'r',
+                MAUTIC_TABLE_PREFIX.'channel_url_trackables',
+                $tableAlias,
                 $q->expr()->and(
                     $q->expr()->eq('r.id', 't.redirect_id'),
                     $q->expr()->eq('t.channel', ':channel'),

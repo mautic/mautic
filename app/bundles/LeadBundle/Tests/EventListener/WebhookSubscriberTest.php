@@ -133,7 +133,6 @@ class WebhookSubscriberTest extends \PHPUnit\Framework\TestCase
                     'old_status' => 'contactable',
                     'new_status' => 'unsubscribed',
                 ],
-
                 [
                     'leadDetails',
                     'userList',

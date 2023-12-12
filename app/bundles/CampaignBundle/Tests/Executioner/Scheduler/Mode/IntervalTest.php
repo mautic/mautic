@@ -504,29 +504,29 @@ class IntervalTest extends \PHPUnit\Framework\TestCase
     {
         $campaign = $this->createMock(Campaign::class);
         $campaign->method('getId')
-                 ->willReturn(1);
+            ->willReturn(1);
 
         $event = $this->createMock(Event::class);
         $event->method('getTriggerMode')
-              ->willReturn(Event::TRIGGER_MODE_INTERVAL);
+            ->willReturn(Event::TRIGGER_MODE_INTERVAL);
         $event->method('getTriggerInterval')
-              ->willReturn(15);
+            ->willReturn(15);
         $event->method('getTriggerIntervalUnit')
-              ->willReturn('D');
+            ->willReturn('D');
         $event->method('getTriggerRestrictedStartHour')
-              ->willReturn(new \DateTime('1970-01-01 08:00:00'));
+            ->willReturn(new \DateTime('1970-01-01 08:00:00'));
         $event->method('getTriggerRestrictedStopHour')
-              ->willReturn(new \DateTime('1970-01-01 20:00:00'));
+            ->willReturn(new \DateTime('1970-01-01 20:00:00'));
         $event->method('getTriggerRestrictedDaysOfWeek')
-              ->willReturn([]);
+            ->willReturn([]);
         $event->method('getCampaign')
-              ->willReturn($campaign);
+            ->willReturn($campaign);
 
         $contact1 = $this->createMock(Lead::class);
         $contact1->method('getId')
-                 ->willReturn(1);
+            ->willReturn(1);
         $contact1->method('getTimezone')
-                 ->willReturn('America/New_York');
+            ->willReturn('America/New_York');
 
         $log = new LeadEventLog();
         $log->setCampaign($campaign);

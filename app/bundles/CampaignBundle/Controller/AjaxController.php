@@ -127,13 +127,13 @@ class AjaxController extends CommonAjaxController
 
                 /** @var LeadEventLog $log */
                 $log = $logModel->getRepository()
-                                ->findOneBy(
-                                    [
-                                        'lead'  => $contactId,
-                                        'event' => $eventId,
-                                    ],
-                                    ['dateTriggered' => 'desc']
-                                );
+                    ->findOneBy(
+                        [
+                            'lead'  => $contactId,
+                            'event' => $eventId,
+                        ],
+                        ['dateTriggered' => 'desc']
+                    );
 
                 if ($log && ($log->getTriggerDate() > new \DateTime())) {
                     return $log;

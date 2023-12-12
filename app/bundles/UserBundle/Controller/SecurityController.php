@@ -51,14 +51,16 @@ class SecurityController extends CommonController implements EventSubscriberInte
                 // Run migrations
                 $request->query->set('finalize', 1);
 
-                return $this->forward('Mautic\CoreBundle\Controller\AjaxController::updateDatabaseMigrationAction',
+                return $this->forward(
+                    'Mautic\CoreBundle\Controller\AjaxController::updateDatabaseMigrationAction',
                     [
                         'request' => $request,
                     ]
                 );
             } elseif ('schemaMigration' === $step) {
                 // Done so finalize
-                return $this->forward('Mautic\CoreBundle\Controller\AjaxController::updateFinalizationAction',
+                return $this->forward(
+                    'Mautic\CoreBundle\Controller\AjaxController::updateFinalizationAction',
                     [
                         'request' => $request,
                     ]

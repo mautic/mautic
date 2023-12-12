@@ -236,11 +236,11 @@ class ReportGeneratorEventTest extends \PHPUnit\Framework\TestCase
     public function testAddCompanyLeftJoinWhenColumnIsNotUsed(): void
     {
         $this->report->expects($this->exactly(2))
-      ->method('getSelectAndAggregatorAndOrderAndGroupByColumns')
-      ->willReturn(['e.id', 'e.title']);
+            ->method('getSelectAndAggregatorAndOrderAndGroupByColumns')
+            ->willReturn(['e.id', 'e.title']);
 
         $this->queryBuilder->expects($this->never())
-      ->method('leftJoin');
+            ->method('leftJoin');
 
         $this->reportGeneratorEvent->addCompanyLeftJoin($this->queryBuilder, ReportGeneratorEvent::COMPANY_PREFIX);
     }
@@ -277,14 +277,14 @@ class ReportGeneratorEventTest extends \PHPUnit\Framework\TestCase
             ->willReturn(['e.id', 'e.title', 'comp.name']);
 
         $this->queryBuilder->expects($this->once())
-      ->method('getQueryParts')
-      ->willReturn([
-        'join' => [
-          'l' => [['joinTable' => MAUTIC_TABLE_PREFIX.'companies_leads', 'joinAlias' => ReportGeneratorEvent::COMPANY_LEAD_PREFIX]],
-        ],
-      ]);
+            ->method('getQueryParts')
+            ->willReturn([
+              'join' => [
+                'l' => [['joinTable' => MAUTIC_TABLE_PREFIX.'companies_leads', 'joinAlias' => ReportGeneratorEvent::COMPANY_LEAD_PREFIX]],
+              ],
+            ]);
         $this->queryBuilder->expects($this->never())
-      ->method('leftJoin');
+            ->method('leftJoin');
 
         $this->reportGeneratorEvent->addCompanyLeftJoin($this->queryBuilder, ReportGeneratorEvent::COMPANY_PREFIX);
     }

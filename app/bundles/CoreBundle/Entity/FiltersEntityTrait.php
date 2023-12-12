@@ -17,9 +17,9 @@ trait FiltersEntityTrait
     protected static function addFiltersMetadata(ClassMetadataBuilder $builder)
     {
         $builder->createField('filters', 'array')
-                ->columnName('filters')
-                ->nullable()
-                ->build();
+            ->columnName('filters')
+            ->nullable()
+            ->build();
     }
 
     /**

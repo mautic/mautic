@@ -44,7 +44,8 @@ class CampaignType extends AbstractType
             'required'   => false,
         ]);
 
-        $builder->add('allowRestart',
+        $builder->add(
+            'allowRestart',
             YesNoButtonGroupType::class,
             [
                 'label' => 'mautic.campaign.allow_restart',

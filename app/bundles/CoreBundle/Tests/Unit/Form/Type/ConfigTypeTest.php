@@ -67,8 +67,8 @@ class ConfigTypeTest extends TypeTestCase
         $coreParametersHelper       = $this->createMock(CoreParametersHelper::class);
 
         $languageHelper->expects($this->any())
-                       ->method('fetchLanguages')
-                       ->willReturn(['en' => ['name'=>'English']]);
+            ->method('fetchLanguages')
+            ->willReturn(['en' => ['name'=>'English']]);
 
         return new ConfigType($translator, $languageHelper, $ipLookupFactory, null, $shortener, $coreParametersHelper);
     }
@@ -85,13 +85,13 @@ class ConfigTypeTest extends TypeTestCase
 
         $repoMock = $this->createMock(PageRepository::class);
         $repoMock->expects($this->any())
-                 ->method('getPageList')
-                 ->willReturn([]);
+            ->method('getPageList')
+            ->willReturn([]);
 
         $pageModelMock = $this->createMock(PageModel::class);
         $pageModelMock->expects($this->any())
-                      ->method('getRepository')
-                      ->willReturn($repoMock);
+            ->method('getRepository')
+            ->willReturn($repoMock);
         $permsMock    = $this->createMock(CorePermissions::class);
         $pageListType = new PageListType($pageModelMock, $permsMock);
 

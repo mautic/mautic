@@ -385,7 +385,8 @@ class LegacyEventDispatcherTest extends TestCase
                         $event->setResult(true);
 
                         return $event;
-                    }),
+                    }
+                ),
                 $this->returnCallback(fn (CampaignExecutionEvent $event) => $event),
                 $this->returnCallback(fn (ExecutedEvent $event) => $event),
                 $this->returnCallback(fn (ExecutedBatchEvent $event) => $event),

@@ -40,7 +40,8 @@ class SearchSubscriber implements EventSubscriberInterface
                 [
                     'limit'  => 5,
                     'filter' => $str,
-                ]);
+                ]
+            );
 
             if (count($users) > 0) {
                 $userResults = [];
@@ -74,7 +75,8 @@ class SearchSubscriber implements EventSubscriberInterface
                 [
                     'limit'  => 5,
                     'filter' => $str,
-                ]);
+                ]
+            );
             if (count($roles)) {
                 $roleResults = [];
                 $canEdit     = $this->security->isGranted('user:roles:edit');

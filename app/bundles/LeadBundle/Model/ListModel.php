@@ -321,7 +321,8 @@ class ListModel extends FormModel
         $list          = ['id' => $segmentId, 'filters' => $leadList->getFilters()];
 
         $this->dispatcher->dispatch(
-            new ListPreProcessListEvent($list, false), LeadEvents::LIST_PRE_PROCESS_LIST
+            new ListPreProcessListEvent($list, false),
+            LeadEvents::LIST_PRE_PROCESS_LIST
         );
 
         try {
@@ -593,7 +594,8 @@ class ListModel extends FormModel
                     ]
                 );
             } else {
-                $listLead = $this->em->getReference(ListLead::class,
+                $listLead = $this->em->getReference(
+                    ListLead::class,
                     [
                         'lead' => $leadId,
                         'list' => $listId,

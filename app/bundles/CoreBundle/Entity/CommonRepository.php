@@ -78,8 +78,8 @@ class CommonRepository extends ServiceEntityRepository
     public function checkUniqueAlias($alias, $entity = null)
     {
         $q = $this->createQueryBuilder('e')
-                  ->select('count(e.id) as aliascount')
-                  ->where('e.alias = :alias');
+            ->select('count(e.id) as aliascount')
+            ->where('e.alias = :alias');
         $q->setParameter('alias', $alias);
 
         if (!empty($entity) && $entity->getId()) {
@@ -243,7 +243,7 @@ class CommonRepository extends ServiceEntityRepository
     {
         try {
             $q = $this->createQueryBuilder($this->getTableAlias())
-                      ->setParameter('alias', $alias);
+                ->setParameter('alias', $alias);
 
             $expr = $q->expr()->andX(
                 $q->expr()->eq($this->getTableAlias().'.alias', ':alias')
@@ -254,7 +254,7 @@ class CommonRepository extends ServiceEntityRepository
             if (null !== $catAlias) {
                 if (isset($metadata->associationMappings['category'])) {
                     $q->leftJoin($this->getTableAlias().'.category', 'category')
-                      ->setParameter('catAlias', $catAlias);
+                        ->setParameter('catAlias', $catAlias);
 
                     $expr->add(
                         $q->expr()->eq('category.alias', ':catAlias')
@@ -395,7 +395,7 @@ class CommonRepository extends ServiceEntityRepository
                 $q = $this->createQueryBuilder($this->getTableAlias());
                 $this->buildSelectClause($q, $id['select']);
                 $q->where($this->getTableAlias().'.id = :id')
-                ->setParameter('id', (int) $id['id']);
+                    ->setParameter('id', (int) $id['id']);
                 $entity = $q->getQuery()->getSingleResult();
             } else {
                 $entity = $this->find((int) $id);
@@ -604,9 +604,9 @@ class CommonRepository extends ServiceEntityRepository
         }
 
         $q->resetQueryPart('select')
-          ->select($selectString)
-          ->setFirstResult($start)
-          ->setMaxResults($limit);
+            ->select($selectString)
+            ->setFirstResult($start)
+            ->setMaxResults($limit);
 
         $this->buildOrderByClauseFromArray($q, $order);
 
@@ -680,8 +680,8 @@ class CommonRepository extends ServiceEntityRepository
         }
 
         $q->select($prefix.$valueColumn.' as value, '.$prefix.$labelColumn.' as label'.($extraColumns ? ", $extraColumns" : ''))
-          ->from($tableName, $alias)
-          ->orderBy($prefix.$labelColumn);
+            ->from($tableName, $alias)
+            ->orderBy($prefix.$labelColumn);
 
         if (null !== $expr && $expr->count()) {
             $q->where($expr);
@@ -696,7 +696,7 @@ class CommonRepository extends ServiceEntityRepository
             $q->andWhere(
                 $q->expr()->eq($prefix.'is_published', ':true')
             )
-              ->setParameter('true', true, 'boolean');
+                ->setParameter('true', true, 'boolean');
         }
 
         if ($limit) {
@@ -1282,7 +1282,7 @@ class CommonRepository extends ServiceEntityRepository
 
         if (!empty($limit)) {
             $q->setFirstResult($start)
-              ->setMaxResults($limit);
+                ->setMaxResults($limit);
         }
     }
 

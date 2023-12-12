@@ -52,7 +52,8 @@ class UserNotificationHelperTest extends TestCase
         $this->routeHelper   = $this->createMock(RouteHelper::class);
         $this->translator    = $this->createMock(TranslatorInterface::class);
 
-        $userNotificationBuilder = new UserNotificationBuilder($this->userHelper,
+        $userNotificationBuilder = new UserNotificationBuilder(
+            $this->userHelper,
             $this->ownerProvider,
             $this->routeHelper,
             $this->translator

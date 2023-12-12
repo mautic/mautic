@@ -53,7 +53,8 @@ class SearchSubscriber implements EventSubscriberInterface
                 [
                     'limit'  => 5,
                     'filter' => $filter,
-                ]);
+                ]
+            );
 
             if (count($emails) > 0) {
                 $emailResults = [];

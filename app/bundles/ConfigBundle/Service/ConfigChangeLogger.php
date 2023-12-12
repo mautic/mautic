@@ -111,7 +111,10 @@ class ConfigChangeLogger
     {
         $keys = $this->filterKeys;
 
-        return array_filter($data, fn ($key): bool => !in_array($key, $keys),
-            ARRAY_FILTER_USE_KEY);
+        return array_filter(
+            $data,
+            fn ($key): bool => !in_array($key, $keys),
+            ARRAY_FILTER_USE_KEY
+        );
     }
 }

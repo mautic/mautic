@@ -52,10 +52,10 @@ class MaintenanceSubscriber implements EventSubscriberInterface
                 ->fetchOne();
         } else {
             $qb->select('log.id')
-              ->from(MAUTIC_TABLE_PREFIX.$table, 'log')
-              ->where(
-                  $qb->expr()->lte('log.date_added', ':date')
-              );
+                ->from(MAUTIC_TABLE_PREFIX.$table, 'log')
+                ->where(
+                    $qb->expr()->lte('log.date_added', ':date')
+                );
 
             $rows = 0;
             $qb->setMaxResults(10000)->setFirstResult(0);
@@ -69,12 +69,13 @@ class MaintenanceSubscriber implements EventSubscriberInterface
                 }
 
                 $rows += $qb2->delete(MAUTIC_TABLE_PREFIX.$table)
-                  ->where(
-                      $qb2->expr()->in(
-                          'id', $ids
-                      )
-                  )
-                  ->executeStatement();
+                    ->where(
+                        $qb2->expr()->in(
+                            'id',
+                            $ids
+                        )
+                    )
+                    ->executeStatement();
             }
         }
 

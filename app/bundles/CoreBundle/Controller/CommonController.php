@@ -290,7 +290,8 @@ class CommonController extends AbstractController implements MauticController
                 $routeParams   = $this->get('router')->match($routePath);
                 $ajaxRouteName = $routeParams['_route'];
 
-                $request->attributes->set('ajaxRoute',
+                $request->attributes->set(
+                    'ajaxRoute',
                     [
                         '_route'        => $ajaxRouteName,
                         '_route_params' => $routeParams,
@@ -477,7 +478,8 @@ class CommonController extends AbstractController implements MauticController
 
         return $this->renderException(
             new NotFoundHttpException(
-                $this->translator->trans($msg,
+                $this->translator->trans(
+                    $msg,
                     [
                         '%url%' => $request->getRequestUri(),
                     ]

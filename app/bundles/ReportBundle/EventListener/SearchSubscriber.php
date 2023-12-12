@@ -54,7 +54,8 @@ class SearchSubscriber implements EventSubscriberInterface
                 [
                     'limit'  => 5,
                     'filter' => $filter,
-                ]);
+                ]
+            );
 
             $count = count($items);
             if ($count > 0) {

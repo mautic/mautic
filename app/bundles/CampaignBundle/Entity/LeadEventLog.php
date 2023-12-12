@@ -153,8 +153,8 @@ class LeadEventLog implements ChannelInterface
             ->build();
 
         $builder->createField('channel', 'string')
-                ->nullable()
-                ->build();
+            ->nullable()
+            ->build();
 
         $builder->addNamedField('channelId', 'integer', 'channel_id', true);
 

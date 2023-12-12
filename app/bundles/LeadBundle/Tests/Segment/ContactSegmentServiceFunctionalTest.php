@@ -196,11 +196,13 @@ class ContactSegmentServiceFunctionalTest extends MauticMysqlTestCase
         );
 
         // Change the url from page_hits with the right tracking_id, rebuild the list, and check that list is updated
-        $this->em->getConnection()->executeQuery(sprintf(
-            "UPDATE %spage_hits SET url = '%s' WHERE tracking_id = '%s';",
-            MAUTIC_TABLE_PREFIX,
-            'https://test/regex-segment-other.com',
-            'abcdr')
+        $this->em->getConnection()->executeQuery(
+            sprintf(
+                "UPDATE %spage_hits SET url = '%s' WHERE tracking_id = '%s';",
+                MAUTIC_TABLE_PREFIX,
+                'https://test/regex-segment-other.com',
+                'abcdr'
+            )
         );
 
         $this->runCommand(

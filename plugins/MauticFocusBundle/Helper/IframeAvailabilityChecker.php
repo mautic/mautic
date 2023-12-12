@@ -32,7 +32,8 @@ class IframeAvailabilityChecker
                 'mautic.focus.protocol.mismatch',
                 [
                     '%url%' => str_replace('http://', 'https://', $url),
-                ]);
+                ]
+            );
         } else {
             $client = HttpClient::create([
                 'headers' => [

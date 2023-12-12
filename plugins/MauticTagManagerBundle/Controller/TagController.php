@@ -83,7 +83,8 @@ class TagController extends FormController
                 'filter'     => $filter,
                 'orderBy'    => $orderBy,
                 'orderByDir' => $orderByDir,
-            ]);
+            ]
+        );
 
         $count = count($items);
 

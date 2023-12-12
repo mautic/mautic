@@ -36,7 +36,8 @@ class CheckDatabaseDriverAndVersion extends AbstractPreUpdateCheck
         } else {
             $supportedDrivers = implode(', ', DoctrineStep::getDriverKeys());
 
-            return new PreUpdateCheckResult(false, $this, [new PreUpdateCheckError('mautic.core.update.check.database_driver',
+            return new PreUpdateCheckResult(false, $this, [new PreUpdateCheckError(
+                'mautic.core.update.check.database_driver',
                 [
                     '%currentdriver%'    => $platform,
                     '%supporteddrviers%' => $supportedDrivers,
@@ -45,12 +46,14 @@ class CheckDatabaseDriverAndVersion extends AbstractPreUpdateCheck
         }
 
         if (true !== version_compare($version, $minSupported, 'gt')) {
-            return new PreUpdateCheckResult(false, $this, [new PreUpdateCheckError('mautic.core.update.check.database_version',
+            return new PreUpdateCheckResult(false, $this, [new PreUpdateCheckError(
+                'mautic.core.update.check.database_version',
                 [
                     '%currentversion%'    => $version,
                     '%mysqlminversion%'   => $metadata->getMinSupportedMySqlVersion(),
                     '%mariadbminversion%' => $metadata->getMinSupportedMariaDbVersion(),
-                ]),
+                ]
+            ),
             ]);
         }
 

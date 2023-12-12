@@ -58,8 +58,8 @@ class Message extends FormEntity
         $builder = new ClassMetadataBuilder($metadata);
 
         $builder->setTable('messages')
-                ->setCustomRepositoryClass(MessageRepository::class)
-                ->addIndex(['date_added'], 'date_message_added');
+            ->setCustomRepositoryClass(MessageRepository::class)
+            ->addIndex(['date_added'], 'date_message_added');
 
         $builder
             ->addIdColumns()

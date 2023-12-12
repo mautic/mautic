@@ -210,8 +210,8 @@ class ReportSubscriberTest extends \PHPUnit\Framework\TestCase
             ->willReturn($this->expressionBuilderMock);
 
         $this->queryBuilderMock->expects($this->any())
-                ->method('expr')
-                ->willReturn($this->expressionBuilderMock);
+            ->method('expr')
+            ->willReturn($this->expressionBuilderMock);
 
         $this->queryBuilderMock->expects($this->any())
             ->method('resetQueryParts')
@@ -319,7 +319,8 @@ class ReportSubscriberTest extends \PHPUnit\Framework\TestCase
                               ],
                             ],
                         ],
-                ]);
+                ]
+            );
 
         $this->translatorMock->expects($this->any())
             ->method('hasId')
@@ -1001,50 +1002,50 @@ class ReportSubscriberTest extends \PHPUnit\Framework\TestCase
     public function testOnReportDisplay(string $event): void
     {
         $this->reportBuilderEventMock->expects($this->any())
-        ->method('checkContext')
-        ->willReturn($event);
+            ->method('checkContext')
+            ->willReturn($event);
 
         $this->fieldsBuilderMock->expects($this->any())
-    ->method('getLeadFieldsColumns')
-    ->with('l.')
-    ->willReturn($this->leadColumns);
+            ->method('getLeadFieldsColumns')
+            ->with('l.')
+            ->willReturn($this->leadColumns);
 
         $this->fieldsBuilderMock->expects($this->any())
-        ->method('getLeadFilter')
-        ->with('l.', 's.')
-        ->willReturn($this->leadFilters);
+            ->method('getLeadFilter')
+            ->with('l.', 's.')
+            ->willReturn($this->leadFilters);
 
         $this->companyReportDataMock->expects($this->any())
-    ->method('getCompanyData')
-    ->willReturn($this->companyColumns);
+            ->method('getCompanyData')
+            ->willReturn($this->companyColumns);
 
         $this->reportBuilderEventMock->expects($this->any())
-        ->method('getCategoryColumns')
-        ->willReturn([
-            'c.id' => [
-                'label' => 'mautic.report.field.category_id',
-                'type'  => 'int',
-                'alias' => 'category_id',
-            ],
-            'c.title' => [
-                'label' => 'mautic.report.field.category_name',
-                'type'  => 'string',
-                'alias' => 'category_title',
-            ],
-        ]);
-        $this->reportBuilderEventMock->expects($this->any())
-        ->method('getIpColumn')
-        ->willReturn(
-            [
-                'i.ip_address' => [
-                    'label' => 'mautic.core.ipaddress',
-                    'type'  => 'string',
+            ->method('getCategoryColumns')
+            ->willReturn([
+                'c.id' => [
+                    'label' => 'mautic.report.field.category_id',
+                    'type'  => 'int',
+                    'alias' => 'category_id',
                 ],
-            ]
-        );
+                'c.title' => [
+                    'label' => 'mautic.report.field.category_name',
+                    'type'  => 'string',
+                    'alias' => 'category_title',
+                ],
+            ]);
         $this->reportBuilderEventMock->expects($this->any())
-        ->method('addGraph')
-        ->willReturn($this->reportBuilderEventMock);
+            ->method('getIpColumn')
+            ->willReturn(
+                [
+                    'i.ip_address' => [
+                        'label' => 'mautic.core.ipaddress',
+                        'type'  => 'string',
+                    ],
+                ]
+            );
+        $this->reportBuilderEventMock->expects($this->any())
+            ->method('addGraph')
+            ->willReturn($this->reportBuilderEventMock);
 
         $this->reportSubscriber->onReportBuilder($this->reportBuilderEventMock);
 

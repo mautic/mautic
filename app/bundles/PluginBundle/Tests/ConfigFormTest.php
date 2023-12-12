@@ -114,16 +114,16 @@ class ConfigFormTest extends KernelTestCase
 
         $entityManager->expects($this
             ->any())
-                ->method('getRepository')
-                ->will(
-                    $this->returnValueMap(
-                        [
-                            [\Mautic\PluginBundle\Entity\Plugin::class, $pluginRepository],
-                            [\Mautic\PluginBundle\Entity\Integration::class, $integrationRepository],
-                            [\Mautic\PluginBundle\Entity\IntegrationEntity::class, $integrationEntityRepository],
-                        ]
-                    )
-                );
+            ->method('getRepository')
+            ->will(
+                $this->returnValueMap(
+                    [
+                        [\Mautic\PluginBundle\Entity\Plugin::class, $pluginRepository],
+                        [\Mautic\PluginBundle\Entity\Integration::class, $integrationRepository],
+                        [\Mautic\PluginBundle\Entity\IntegrationEntity::class, $integrationEntityRepository],
+                    ]
+                )
+            );
 
         $integrationHelper = new IntegrationHelper(
             self::$kernel->getContainer(),

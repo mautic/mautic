@@ -41,7 +41,11 @@ class PathsHelperTest extends TestCase
                 }
             );
         $this->helper = new PathsHelper(
-            $this->userHelper, $this->coreParametersHelper, $this->cacheDir, $this->logsDir, $this->rootDir
+            $this->userHelper,
+            $this->coreParametersHelper,
+            $this->cacheDir,
+            $this->logsDir,
+            $this->rootDir
         );
     }
 

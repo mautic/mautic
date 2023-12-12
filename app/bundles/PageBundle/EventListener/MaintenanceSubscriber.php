@@ -36,9 +36,9 @@ class MaintenanceSubscriber implements EventSubscriberInterface
 
         if ($event->isDryRun()) {
             $qb->select('count(*) as records')
-              ->from(MAUTIC_TABLE_PREFIX.$table, 'h')
-              ->join('h', MAUTIC_TABLE_PREFIX.'leads', 'l', 'h.lead_id = l.id')
-              ->where($qb->expr()->lte('l.last_active', ':date'));
+                ->from(MAUTIC_TABLE_PREFIX.$table, 'h')
+                ->join('h', MAUTIC_TABLE_PREFIX.'leads', 'l', 'h.lead_id = l.id')
+                ->where($qb->expr()->lte('l.last_active', ':date'));
 
             if (false === $event->isGdpr()) {
                 $qb->andWhere($qb->expr()->isNull('l.date_identified'));
@@ -47,7 +47,8 @@ class MaintenanceSubscriber implements EventSubscriberInterface
                     $qb->expr()->and(
                         $qb->expr()->lte('l.date_added', ':date2'),
                         $qb->expr()->isNull('l.last_active')
-                    ));
+                    )
+                );
                 $qb->setParameter('date2', $event->getDate()->format('Y-m-d H:i:s'));
             }
 
@@ -55,7 +56,7 @@ class MaintenanceSubscriber implements EventSubscriberInterface
         } else {
             $subQb = $this->db->createQueryBuilder();
             $subQb->select('id')->from(MAUTIC_TABLE_PREFIX.'leads', 'l')
-              ->where($qb->expr()->lte('l.last_active', ':date'));
+                ->where($qb->expr()->lte('l.last_active', ':date'));
 
             if (false === $event->isGdpr()) {
                 $subQb->andWhere($qb->expr()->isNull('l.date_identified'));
@@ -64,7 +65,8 @@ class MaintenanceSubscriber implements EventSubscriberInterface
                     $subQb->expr()->and(
                         $subQb->expr()->lte('l.date_added', ':date2'),
                         $subQb->expr()->isNull('l.last_active')
-                    ));
+                    )
+                );
                 $subQb->setParameter('date2', $event->getDate()->format('Y-m-d H:i:s'));
             }
             $rows = 0;
@@ -80,12 +82,13 @@ class MaintenanceSubscriber implements EventSubscriberInterface
                 }
 
                 $rows += $qb->delete(MAUTIC_TABLE_PREFIX.$table)
-                  ->where(
-                      $qb->expr()->in(
-                          'lead_id', $leadsIds
-                      )
-                  )
-                  ->executeStatement();
+                    ->where(
+                        $qb->expr()->in(
+                            'lead_id',
+                            $leadsIds
+                        )
+                    )
+                    ->executeStatement();
                 ++$loop;
             }
         }

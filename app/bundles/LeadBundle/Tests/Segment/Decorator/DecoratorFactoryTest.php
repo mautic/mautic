@@ -62,7 +62,8 @@ class DecoratorFactoryTest extends \PHPUnit\Framework\TestCase
             $this->customMappedDecorator,
             $this->dateOptionFactory,
             $this->companyDecorator,
-            $this->eventDispatcherMock);
+            $this->eventDispatcherMock
+        );
     }
 
     public function testBaseDecorator(): void

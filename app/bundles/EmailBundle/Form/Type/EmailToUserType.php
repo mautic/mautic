@@ -14,8 +14,10 @@ class EmailToUserType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
-        $builder->add('useremail',
-            EmailSendType::class, [
+        $builder->add(
+            'useremail',
+            EmailSendType::class,
+            [
                 'label' => 'mautic.email.emails',
                 'attr'  => [
                     'class'   => 'form-control',

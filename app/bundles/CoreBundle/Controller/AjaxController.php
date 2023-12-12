@@ -506,7 +506,8 @@ class AjaxController extends CommonController
         // Also do the last bit of filesystem cleanup from the upgrade here
         if (is_dir(dirname($this->getParameter('mautic.application_dir')).'/app/upgrade')) {
             $iterator = new \FilesystemIterator(
-                dirname($this->getParameter('mautic.application_dir')).'/app/upgrade', \FilesystemIterator::SKIP_DOTS
+                dirname($this->getParameter('mautic.application_dir')).'/app/upgrade',
+                \FilesystemIterator::SKIP_DOTS
             );
 
             /** @var \FilesystemIterator $file */

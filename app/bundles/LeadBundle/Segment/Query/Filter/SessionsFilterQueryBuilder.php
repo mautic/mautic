@@ -20,8 +20,10 @@ class SessionsFilterQueryBuilder extends BaseFilterQueryBuilder
         $expressionValueAlias = $this->generateRandomParameterName();
 
         $expressionOperator = $filter->getOperator();
-        $expression         = $queryBuilder->expr()->$expressionOperator('count(id)',
-            $filter->getParameterHolder($expressionValueAlias));
+        $expression         = $queryBuilder->expr()->$expressionOperator(
+            'count(id)',
+            $filter->getParameterHolder($expressionValueAlias)
+        );
 
         $queryBuilder->setParameter($expressionValueAlias, (int) $filter->getParameterValue());
 

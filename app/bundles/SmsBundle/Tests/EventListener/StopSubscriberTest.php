@@ -27,8 +27,8 @@ class StopSubscriberTest extends \PHPUnit\Framework\TestCase
         $event = new ReplyEvent($lead, 'stop');
 
         $this->doNotContactModel->expects($this->once())
-        ->method('addDncForContact')
-        ->with(1, 'sms', DoNotContact::UNSUBSCRIBED);
+            ->method('addDncForContact')
+            ->with(1, 'sms', DoNotContact::UNSUBSCRIBED);
 
         $this->StopSubscriber()->onReply($event);
     }

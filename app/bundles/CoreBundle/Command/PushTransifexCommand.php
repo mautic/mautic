@@ -38,7 +38,8 @@ class PushTransifexCommand extends Command
     {
         $this->setName(self::NAME)
             ->addOption('bundle', null, InputOption::VALUE_OPTIONAL, 'Optional bundle to pull. Example value: WebhookBundle', null)
-            ->setHelp(<<<'EOT'
+            ->setHelp(
+                <<<'EOT'
 The <info>%command.name%</info> command is used to push translation resources to Transifex
 
 <info>php %command.full_name%</info>
@@ -58,8 +59,10 @@ EOT
         try {
             $transifex = $this->transifexFactory->getTransifex();
         } catch (InvalidConfigurationException) {
-            $output->writeln($this->translator->trans(
-                'mautic.core.command.transifex_no_credentials')
+            $output->writeln(
+                $this->translator->trans(
+                    'mautic.core.command.transifex_no_credentials'
+                )
             );
 
             return \Symfony\Component\Console\Command\Command::FAILURE;

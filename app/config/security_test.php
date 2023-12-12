@@ -3,7 +3,8 @@
 $this->import('security.php');
 
 // Support HTTP basic auth for test logins
-$container->loadFromExtension('security',
+$container->loadFromExtension(
+    'security',
     [
         'firewalls' => [
             'main' => [

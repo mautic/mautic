@@ -33,8 +33,8 @@ class CredentialsStoreTest extends TestCase
     public function testDefaultCredentialsAreUsedIfSamlIsDisabled(): void
     {
         $this->coreParametersHelper->method('get')
-          ->withConsecutive(['saml_idp_metadata'], ['cache_path'])
-          ->willReturnOnConsecutiveCalls('', $this->cacheDir);
+            ->withConsecutive(['saml_idp_metadata'], ['cache_path'])
+            ->willReturnOnConsecutiveCalls('', $this->cacheDir);
 
         $store = new CredentialsStore($this->coreParametersHelper, 'foobar');
 

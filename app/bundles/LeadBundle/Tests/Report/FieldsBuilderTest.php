@@ -113,7 +113,7 @@ class FieldsBuilderTest extends \PHPUnit\Framework\TestCase
             ->getMock();
 
         $fieldModel->expects($this->once())
-        ->method('getLeadFields')
+            ->method('getLeadFields')
             ->with()
             ->willReturn($this->getFields());
 
@@ -283,7 +283,7 @@ class FieldsBuilderTest extends \PHPUnit\Framework\TestCase
             ->getMock();
 
         $fieldModel->expects($this->exactly(2)) // We have 2 asserts
-        ->method('getCompanyFields')
+            ->method('getCompanyFields')
             ->with()
             ->willReturn($this->getFields());
 

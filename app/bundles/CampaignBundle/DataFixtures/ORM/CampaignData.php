@@ -14,7 +14,8 @@ class CampaignData extends AbstractFixture implements OrderedFixtureInterface
         $campaign = new Campaign();
 
         $campaign->setName('Campaign A');
-        $campaign->setCanvasSettings([
+        $campaign->setCanvasSettings(
+            [
             'nodes' => [
               0 => [
                 'id'        => '148',

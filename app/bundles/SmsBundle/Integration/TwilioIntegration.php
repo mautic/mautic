@@ -63,7 +63,9 @@ class TwilioIntegration extends AbstractIntegration
                     ],
                 ]
             );
-            $builder->add('frequency_number', NumberType::class,
+            $builder->add(
+                'frequency_number',
+                NumberType::class,
                 [
                     'scale'      => 0,
                     'label'      => 'mautic.sms.list.frequency.number',
@@ -72,8 +74,11 @@ class TwilioIntegration extends AbstractIntegration
                     'attr'       => [
                         'class' => 'form-control frequency',
                     ],
-                ]);
-            $builder->add('frequency_time', ChoiceType::class,
+                ]
+            );
+            $builder->add(
+                'frequency_time',
+                ChoiceType::class,
                 [
                     'choices' => [
                         'day'   => 'DAY',
@@ -87,7 +92,8 @@ class TwilioIntegration extends AbstractIntegration
                     'attr'              => [
                         'class' => 'form-control frequency',
                     ],
-                ]);
+                ]
+            );
         }
     }
 }

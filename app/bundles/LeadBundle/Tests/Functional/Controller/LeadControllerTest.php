@@ -52,7 +52,7 @@ class LeadControllerTest extends MauticMysqlTestCase
         /** @var CoreParametersHelper $coreParametersHelper */
         $coreParametersHelper    = self::$container->get('mautic.helper.core_parameters');
         $zipFileName             = 'contacts_export_'.$contactExportScheduler->getScheduledDateTime()
-                ->format('Y_m_d_H_i_s').'.zip';
+            ->format('Y_m_d_H_i_s').'.zip';
         $this->filePaths[] = $filePath = $coreParametersHelper->get('contact_export_dir').'/'.$zipFileName;
         Assert::assertFileExists($filePath);
 

@@ -246,10 +246,12 @@ class IntegrationEntityRepository extends CommonRepository
 
         if ('lead' == $internalEntity) {
             $q->andWhere(
-                $q->expr()->and($q->expr()->isNotNull('l.email')));
+                $q->expr()->and($q->expr()->isNotNull('l.email'))
+            );
         } else {
             $q->andWhere(
-                $q->expr()->and($q->expr()->isNotNull('l.companyname')));
+                $q->expr()->and($q->expr()->isNotNull('l.companyname'))
+            );
         }
 
         if ($fromDate) {

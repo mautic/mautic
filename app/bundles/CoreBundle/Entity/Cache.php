@@ -33,9 +33,9 @@ class Cache
         $builder->setTable('cache_items');
 
         $builder->createField('id', 'binary')
-                ->columnName('item_id')
-                ->makePrimaryKey()
-                ->build();
+            ->columnName('item_id')
+            ->makePrimaryKey()
+            ->build();
 
         $builder->addNamedField('data', 'blob', 'item_data');
 

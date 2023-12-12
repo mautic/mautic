@@ -52,30 +52,30 @@ class DeviceTrackerTest extends \PHPUnit\Framework\TestCase
 
         $cacheAdapter = $this->createMock(TagAwareAdapterInterface::class);
         $cacheAdapter->expects($this->atLeastOnce())
-          ->method('getItem')
-          ->withAnyParameters()
-          ->willReturn($createCacheItem('test'));
+            ->method('getItem')
+            ->withAnyParameters()
+            ->willReturn($createCacheItem('test'));
         $cacheAdapter->expects($this->atLeastOnce())
-          ->method('save')
-          ->willReturn(true);
+            ->method('save')
+            ->willReturn(true);
 
         $coreParametersHelper = $this->createMock(CoreParametersHelper::class);
         $coreParametersHelper->expects($this->once())
-          ->method('get')
-          ->with($this->equalTo('cache_adapter'))
-          ->willReturn('mautic.cache.adapter.filesystem');
+            ->method('get')
+            ->with($this->equalTo('cache_adapter'))
+            ->willReturn('mautic.cache.adapter.filesystem');
 
         $container = $this->createMock(ContainerInterface::class);
         $container
-          ->expects($this->once())
-          ->method('has')
-          ->with($this->equalTo('mautic.cache.adapter.filesystem'))
-          ->willReturn(true);
+            ->expects($this->once())
+            ->method('has')
+            ->with($this->equalTo('mautic.cache.adapter.filesystem'))
+            ->willReturn(true);
         $container
-          ->expects($this->once())
-          ->method('get')
-          ->with($this->equalTo('mautic.cache.adapter.filesystem'))
-          ->willReturn($cacheAdapter);
+            ->expects($this->once())
+            ->method('get')
+            ->with($this->equalTo('mautic.cache.adapter.filesystem'))
+            ->willReturn($cacheAdapter);
 
         $cacheProvider               = new CacheProvider($coreParametersHelper, $container);
         $this->deviceDetectorFactory = new DeviceDetectorFactory($cacheProvider);

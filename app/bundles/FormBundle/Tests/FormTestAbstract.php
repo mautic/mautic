@@ -107,8 +107,9 @@ class FormTestAbstract extends TestCase
         $contactTracker->expects($this
             ->any())
             ->method('getContact')
-            ->willReturn($this
-                ->returnValue(['id' => self::$mockId, 'name' => self::$mockName])
+            ->willReturn(
+                $this
+                    ->returnValue(['id' => self::$mockId, 'name' => self::$mockName])
             );
 
         $entityManager->expects($this

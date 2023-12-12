@@ -40,7 +40,8 @@ class MaxMindDoNotSellPurgeCommand extends Command
                 InputOption::VALUE_NONE,
                 'Get a list of data that will be purged.'
             )
-            ->setHelp(<<<'EOT'
+            ->setHelp(
+                <<<'EOT'
 The <info>%command.name%</info> command will purge all data from Mautic which is related to any IP found on the MaxMind Do Not Sell List.
 
 <info>php %command.full_name% --dry-run</info>

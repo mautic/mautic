@@ -41,27 +41,39 @@ EOT
             ->setDefinition(
                 [
                     new InputOption(
-                        'channel', 'c', InputOption::VALUE_OPTIONAL,
+                        'channel',
+                        'c',
+                        InputOption::VALUE_OPTIONAL,
                         'A specific channel to process broadcasts for pending contacts.'
                     ),
                     new InputOption(
-                        'id', 'i', InputOption::VALUE_OPTIONAL,
+                        'id',
+                        'i',
+                        InputOption::VALUE_OPTIONAL,
                         'The ID for a specifc channel to process broadcasts for pending contacts.'
                     ),
                     new InputOption(
-                        'min-contact-id', null, InputOption::VALUE_OPTIONAL,
+                        'min-contact-id',
+                        null,
+                        InputOption::VALUE_OPTIONAL,
                         'Min contact ID to filter recipients.'
                     ),
                     new InputOption(
-                        'max-contact-id', null, InputOption::VALUE_OPTIONAL,
+                        'max-contact-id',
+                        null,
+                        InputOption::VALUE_OPTIONAL,
                         'Max contact ID to filter recipients.'
                     ),
                     new InputOption(
-                        'limit', 'l', InputOption::VALUE_OPTIONAL,
+                        'limit',
+                        'l',
+                        InputOption::VALUE_OPTIONAL,
                         'Limit how many contacts to load from database to process.'
                     ),
                     new InputOption(
-                        'batch', 'b', InputOption::VALUE_OPTIONAL,
+                        'batch',
+                        'b',
+                        InputOption::VALUE_OPTIONAL,
                         'Limit how many messages to send at once.'
                     ),
                 ]

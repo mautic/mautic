@@ -21,10 +21,16 @@ return function (ECSConfig $ecsConfig): void {
         \PhpCsFixer\Fixer\ClassNotation\ClassAttributesSeparationFixer::class,
     ]);
 
+    $ecsConfig->skip([
+        \PhpCsFixer\Fixer\Operator\BinaryOperatorSpacesFixer::class,
+        \PhpCsFixer\Fixer\Operator\ConcatSpaceFixer::class,
+        \PhpCsFixer\Fixer\Operator\NotOperatorWithSuccessorSpaceFixer::class,
+    ]);
+
     // this way you can add sets - group of rules
     $ecsConfig->sets([
         // run and fix, one by one
-        // SetList::SPACES,
+        SetList::SPACES,
         // SetList::ARRAY,
         SetList::DOCBLOCK,
         SetList::NAMESPACES,

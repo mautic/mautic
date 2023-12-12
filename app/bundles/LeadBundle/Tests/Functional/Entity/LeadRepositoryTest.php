@@ -51,7 +51,7 @@ final class LeadRepositoryTest extends MauticMysqlTestCase
 
         $q       = $contactRepo->getEntitiesOrmQueryBuilder('(CASE WHEN u.id=1 THEN 1 ELSE 2 END) AS HIDDEN ORD', $args);
         $results = $q->getQuery()
-        ->getResult();
+            ->getResult();
 
         /** @var Lead $r */
         foreach ($results as $r) {

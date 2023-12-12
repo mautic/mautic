@@ -505,7 +505,10 @@ class CampaignSubscriber implements EventSubscriberInterface
                      * ( to integrate with: recursive campaign (future)).
                      */
                     $result = $this->leadFieldModel->getRepository()->compareDateMonthValue(
-                        $lead->getId(), $event->getConfig()['field'], $triggerDate);
+                        $lead->getId(),
+                        $event->getConfig()['field'],
+                        $triggerDate
+                    );
                 }
             } else {
                 $operators = $this->leadModel->getFilterExpressionFunctions();
@@ -619,11 +622,17 @@ class CampaignSubscriber implements EventSubscriberInterface
 
             if ($group) {
                 $result = $this->leadModel->getGroupContactScoreRepository()->compareScore(
-                    $lead->getId(), $group, $score, $operatorExpr,
+                    $lead->getId(),
+                    $group,
+                    $score,
+                    $operatorExpr,
                 );
             } else {
                 $result = $this->leadFieldModel->getRepository()->compareValue(
-                    $lead->getId(), 'points', $score, $operatorExpr
+                    $lead->getId(),
+                    'points',
+                    $score,
+                    $operatorExpr
                 );
             }
         }

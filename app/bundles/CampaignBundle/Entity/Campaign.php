@@ -592,10 +592,10 @@ class Campaign extends FormEntity implements PublishStatusIconAttributesInterfac
     {
         return $this->leads->matching(
             Criteria::create()
-                    ->where(
-                        Criteria::expr()->eq('lead', $contact)
-                    )
-                    ->orderBy(['dateAdded' => Criteria::DESC])
+                ->where(
+                    Criteria::expr()->eq('lead', $contact)
+                )
+                ->orderBy(['dateAdded' => Criteria::DESC])
         );
     }
 

@@ -119,7 +119,7 @@ class EventRepository extends CommonRepository
             $q->andWhere(
                 $q->expr()->eq('e.eventType', ':eventType')
             )
-              ->setParameter('eventType', $eventType);
+                ->setParameter('eventType', $eventType);
         }
 
         return $q->getQuery()->getArrayResult();
@@ -246,7 +246,7 @@ class EventRepository extends CommonRepository
 
         if ($eventType) {
             $q->andWhere('e.eventType', ':eventType')
-            ->setParameter('eventType', $eventType);
+                ->setParameter('eventType', $eventType);
         }
 
         return $q->getQuery()->getResult();

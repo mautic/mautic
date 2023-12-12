@@ -40,11 +40,11 @@ class CompanyControllerTest extends MauticMysqlTestCase
         foreach ($companiesData as $i => $companyData) {
             $company    = new Company();
             $company->setIsPublished(true)
-              ->setName($companyData['name'])
-              ->setState($companyData['state'])
-              ->setCity($companyData['city'])
-              ->setCountry($companyData['country'])
-              ->setIndustry($companyData['industry']);
+                ->setName($companyData['name'])
+                ->setState($companyData['state'])
+                ->setCity($companyData['city'])
+                ->setCountry($companyData['country'])
+                ->setIndustry($companyData['industry']);
             $model->saveEntity($company);
 
             $this->{'company'.$i.'Id'} = $company->getId();
@@ -90,8 +90,8 @@ class CompanyControllerTest extends MauticMysqlTestCase
         // Create a lead linked to the first company
         $lead1    = new Lead();
         $lead1
-          ->setFirstname('lead')
-          ->setLastname('for '.$company1->getName());
+            ->setFirstname('lead')
+            ->setLastname('for '.$company1->getName());
         $leadModel->saveEntity($lead1);
 
         $companyModel->addLeadToCompany($company1, $lead1);
@@ -99,16 +99,16 @@ class CompanyControllerTest extends MauticMysqlTestCase
         // Create a lead not linked to a company
         $lead2    = new Lead();
         $lead2
-          ->setFirstname('lead')
-          ->setLastname('without company');
+            ->setFirstname('lead')
+            ->setLastname('without company');
         $leadModel->saveEntity($lead2);
 
         // Create a lead not linked to a company, but with `ids` in it's name (see https://github.com/mautic/mautic/issues/12415)
         $lead3    = new Lead();
         $lead3
-          ->setFirstname('lead')
-          ->setLastname('without company')
-          ->setEmail('example@idstart.com');
+            ->setFirstname('lead')
+            ->setLastname('without company')
+            ->setEmail('example@idstart.com');
         $leadModel->saveEntity($lead3);
 
         $crawler        = $this->client->request('GET', '/s/company/'.$this->company1Id.'/contacts/');

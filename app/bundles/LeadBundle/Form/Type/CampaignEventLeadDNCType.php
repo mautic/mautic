@@ -40,6 +40,7 @@ class CampaignEventLeadDNCType extends AbstractType
             'required'   => false,
             'label_attr' => ['class' => 'control-label'],
             'attr'       => ['class' => 'form-control'],
-        ]);
+        ]
+        );
     }
 }

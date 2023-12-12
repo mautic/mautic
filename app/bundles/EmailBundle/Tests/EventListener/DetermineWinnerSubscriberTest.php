@@ -68,7 +68,8 @@ class DetermineWinnerSubscriberTest extends \PHPUnit\Framework\TestCase
                 ['mautic.email.abtest.label.opened'],
                 ['mautic.email.abtest.label.sent'],
                 ['mautic.email.abtest.label.opened'],
-                ['mautic.email.abtest.label.sent'])
+                ['mautic.email.abtest.label.sent']
+            )
             ->willReturnOnConsecutiveCalls(
                 'opened',
                 'sent',
@@ -140,7 +141,8 @@ class DetermineWinnerSubscriberTest extends \PHPUnit\Framework\TestCase
                 ['mautic.email.abtest.label.clickthrough'],
                 ['mautic.email.abtest.label.opened'],
                 ['mautic.email.abtest.label.clickthrough'],
-                ['mautic.email.abtest.label.opened'])
+                ['mautic.email.abtest.label.opened']
+            )
             ->willReturnOnConsecutiveCalls(
                 'clickthrough',
                 'opened',

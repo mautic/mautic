@@ -23,13 +23,13 @@ class CleanupMediaAssetsCommand extends Command
     protected function configure(): void
     {
         $this->setName('mautic:assets:cleanup')
-          ->setHelp(
-              <<<'EOT'
+            ->setHelp(
+                <<<'EOT'
                 The <info>%command.name%</info> command is used to clean up obsolete files in the media folder that are present in the app/assets folder.
 
 <info>php %command.full_name%</info>
 EOT
-          );
+            );
         parent::configure();
     }
 
@@ -68,7 +68,8 @@ EOT
             /** @var \Symfony\Component\Console\Helper\SymfonyQuestionHelper $helper */
             $helper   = $this->getHelperSet()->get('question');
             $question = new ConfirmationQuestion(
-                '<question>delete files?</question> ', false
+                '<question>delete files?</question> ',
+                false
             );
 
             if ($helper->ask($input, $output, $question)) {

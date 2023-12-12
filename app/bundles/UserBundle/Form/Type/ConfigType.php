@@ -28,7 +28,9 @@ class ConfigType extends AbstractType
         if (!empty($this->parameters->get('mautic.subdomain_url'))) {
             $samlEntityIdChoices[] = $this->parameters->get('mautic.subdomain_url');
         }
-        $builder->add('saml_idp_entity_id', ChoiceType::class,
+        $builder->add(
+            'saml_idp_entity_id',
+            ChoiceType::class,
             [
                 'choices'    => array_combine($samlEntityIdChoices, $samlEntityIdChoices),
                 'label'      => 'mautic.user.config.form.saml.idp_entity_id_label',
@@ -38,7 +40,8 @@ class ConfigType extends AbstractType
                 'attr'       => [
                     'class' => 'form-control',
                 ],
-            ]);
+            ]
+        );
 
         $builder->add(
             'saml_idp_metadata',

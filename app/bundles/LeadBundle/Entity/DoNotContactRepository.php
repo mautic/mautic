@@ -149,8 +149,8 @@ class DoNotContactRepository extends CommonRepository
             $q->select('dnc.channel, dnc.reason, l.id as lead_id');
         } else {
             $q->select('l.id, dnc.reason')
-              ->where('dnc.channel = :channel')
-              ->setParameter('channel', $channel);
+                ->where('dnc.channel = :channel')
+                ->setParameter('channel', $channel);
         }
 
         if ($contacts) {

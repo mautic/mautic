@@ -204,8 +204,7 @@ class Mailbox
             }
         }
 
-        return
-            !empty($this->settings['host']) && !empty($this->settings['port']) && !empty($this->settings['user'])
+        return !empty($this->settings['host']) && !empty($this->settings['port']) && !empty($this->settings['user'])
             && !empty($this->settings['password']);
     }
 

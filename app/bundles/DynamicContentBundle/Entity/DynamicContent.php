@@ -158,14 +158,14 @@ class DynamicContent extends FormEntity implements VariantEntityInterface, Trans
         self::addFiltersMetadata($builder);
 
         $builder->createField('isCampaignBased', 'boolean')
-                ->columnName('is_campaign_based')
-                ->option('default', 1)
-                ->build();
+            ->columnName('is_campaign_based')
+            ->option('default', 1)
+            ->build();
 
         $builder->createField('slotName', 'string')
-                ->columnName('slot_name')
-                ->nullable()
-                ->build();
+            ->columnName('slot_name')
+            ->nullable()
+            ->build();
     }
 
     /**
@@ -193,8 +193,8 @@ class DynamicContent extends FormEntity implements VariantEntityInterface, Trans
                     );
                     foreach ($violations as $violation) {
                         $context->buildViolation($violation->getMessage())
-                                ->atPath('slotName')
-                                ->addViolation();
+                            ->atPath('slotName')
+                            ->addViolation();
                     }
                     $violations = $validator->validate(
                         $dwc->getFilters(),
@@ -209,8 +209,8 @@ class DynamicContent extends FormEntity implements VariantEntityInterface, Trans
                     );
                     foreach ($violations as $violation) {
                         $context->buildViolation($violation->getMessage())
-                                ->atPath('filters')
-                                ->addViolation();
+                            ->atPath('filters')
+                            ->addViolation();
                     }
                 }
             },
