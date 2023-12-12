@@ -71,9 +71,9 @@ class InactiveContactFinder
     }
 
     /**
-     * @return ArrayCollection
+     * @return array<string, \DateTimeInterface>|null
      */
-    public function getDatesAdded()
+    public function getDatesAdded(): ?array
     {
         return $this->campaignMemberDatesAdded;
     }
