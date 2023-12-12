@@ -14,9 +14,6 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintValidator;
 
-/**
- * @deprecated since Mautic 5.0, to be removed in 6.0 with no replacement.
- */
 class UniqueCustomFieldValidator extends ConstraintValidator
 {
     public function __construct(
