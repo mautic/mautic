@@ -368,7 +368,8 @@ trait CustomFieldRepositoryTrait
     {
         if (empty($this->customFieldList)) {
             // Get the list of custom fields
-            $fq = $this->getEntityManager()->getConnection()->createQueryBuilder();
+            $connection = $this->getEntityManager()->getConnection();
+            $fq         = $connection->createQueryBuilder();
             $fq->select('f.id, f.label, f.alias, f.type, f.field_group as "group", f.object, f.is_fixed, f.properties, f.default_value')
                 ->from(MAUTIC_TABLE_PREFIX.'lead_fields', 'f')
                 ->where('f.is_published = :published')
@@ -376,7 +377,7 @@ trait CustomFieldRepositoryTrait
                 ->setParameter('published', true, 'boolean')
                 ->setParameter('object', $object)
                 ->addOrderBy('f.field_order', 'asc');
-            $result  = ResultCacheHelper::executeCachedDbalQuery($fq, new ResultCacheOptions(LeadField::CACHE_NAMESPACE));
+            $result  = ResultCacheHelper::executeCachedDbalQuery($connection, $fq, new ResultCacheOptions(LeadField::CACHE_NAMESPACE));
             $results = $result->fetchAllAssociative();
 
             $fields      = [];

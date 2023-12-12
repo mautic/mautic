@@ -4,11 +4,11 @@ declare(strict_types=1);
 
 namespace Mautic\CoreBundle\EventListener;
 
-use Doctrine\Common\Cache\CacheProvider;
 use Doctrine\Common\EventSubscriber;
 use Doctrine\ORM\Configuration;
 use Doctrine\ORM\Events;
 use Doctrine\Persistence\Event\LifecycleEventArgs;
+use Mautic\CoreBundle\Cache\ResultCacheHelper;
 use Mautic\CoreBundle\Entity\CacheInvalidateInterface;
 use Mautic\CoreBundle\Entity\FormEntity;
 
@@ -66,9 +66,9 @@ class CacheInvalidateSubscriber implements EventSubscriber
             return;
         }
 
-        $cache = $this->ormConfiguration->getResultCacheImpl();
+        $cache = ResultCacheHelper::getCache($this->ormConfiguration);
 
-        if (!$cache instanceof CacheProvider) {
+        if (!$cache) {
             return;
         }
 

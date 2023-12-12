@@ -5,9 +5,12 @@ declare(strict_types=1);
 namespace Mautic\CoreBundle\Cache;
 
 use Doctrine\Common\Cache\CacheProvider;
+use Doctrine\Common\Cache\Psr6\DoctrineProvider as DoctrineProviderAlias;
 use Doctrine\DBAL\Cache\QueryCacheProfile;
-use Doctrine\DBAL\ForwardCompatibility\DriverResultStatement;
+use Doctrine\DBAL\Configuration;
+use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Query\QueryBuilder;
+use Doctrine\DBAL\Result;
 use Doctrine\ORM\Query;
 
 class ResultCacheHelper
@@ -17,11 +20,9 @@ class ResultCacheHelper
      */
     public static function enableOrmQueryCache(Query $query, ResultCacheOptions $resultCacheOptions): bool
     {
-        $cache = $query->getEntityManager()
-            ->getConfiguration()
-            ->getResultCacheImpl();
+        $cache = self::getCache($query->getEntityManager()->getConfiguration());
 
-        if (!$cache instanceof CacheProvider) {
+        if (!$cache) {
             return false;
         }
 
@@ -32,18 +33,13 @@ class ResultCacheHelper
 
     /**
      * Executes the query using cache (if available) and returns its result.
-     *
-     * @return DriverResultStatement<mixed>|int|string
      */
-    public static function executeCachedDbalQuery(QueryBuilder $queryBuilder, ResultCacheOptions $resultCacheOptions)
+    public static function executeCachedDbalQuery(Connection $connection, QueryBuilder $queryBuilder, ResultCacheOptions $resultCacheOptions): Result
     {
-        $connection = $queryBuilder->getConnection();
-        $cache      = $connection
-            ->getConfiguration()
-            ->getResultCacheImpl();
+        $cache = self::getCache($connection->getConfiguration());
 
-        if (!$cache instanceof CacheProvider) {
-            return $queryBuilder->execute();
+        if (!$cache) {
+            return $queryBuilder->executeQuery();
         }
 
         return $connection->executeCacheQuery(
@@ -52,6 +48,23 @@ class ResultCacheHelper
             $queryBuilder->getParameterTypes(),
             self::createCacheProfile($resultCacheOptions, $cache)
         );
+    }
+
+    public static function getCache(Configuration $configuration): ?CacheProvider
+    {
+        $cache = $configuration->getResultCache();
+
+        if (!$cache) {
+            return null;
+        }
+
+        $cache = DoctrineProviderAlias::wrap($cache);
+
+        if (!$cache instanceof CacheProvider) {
+            return null;
+        }
+
+        return $cache;
     }
 
     private static function createCacheProfile(ResultCacheOptions $resultCacheOptions, CacheProvider $cache): QueryCacheProfile
