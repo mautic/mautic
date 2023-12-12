@@ -3,7 +3,7 @@
 namespace Mautic\LeadBundle\Segment;
 
 /**
- * Class ContactSegmentFilters is array object containing filters.
+ * Array object containing filters.
  */
 class ContactSegmentFilters implements \Iterator, \Countable
 {

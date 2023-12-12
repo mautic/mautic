@@ -16,8 +16,6 @@ class BatchIdToEntityHelper
     private bool $isAssociative = false;
 
     /**
-     * BatchIdToEntityHelper constructor.
-     *
      * @param string $idKey
      */
     public function __construct(

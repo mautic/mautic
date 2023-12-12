@@ -8,17 +8,13 @@ use JMS\Serializer\Metadata\ClassMetadata;
 use JMS\Serializer\Metadata\PropertyMetadata;
 
 /**
- * Class FieldInclusionStrategy.
- *
- * Include specific fields at a specific level
+ * Include specific fields at a specific level.
  */
 class FieldInclusionStrategy implements ExclusionStrategyInterface
 {
     private int $level;
 
     /**
-     * FieldInclusionStrategy constructor.
-     *
      * @param int $level
      */
     public function __construct(

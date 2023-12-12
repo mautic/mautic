@@ -6,8 +6,6 @@ use Mautic\CampaignBundle\Entity\LeadEventLog;
 use Symfony\Contracts\EventDispatcher\Event;
 
 /**
- * Class CampaignDecisionEvent.
- *
  * @deprecated 2.13.0; to be removed in 3.0
  */
 class CampaignDecisionEvent extends Event

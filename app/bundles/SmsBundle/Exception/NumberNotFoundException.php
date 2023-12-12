@@ -5,8 +5,6 @@ namespace Mautic\SmsBundle\Exception;
 class NumberNotFoundException extends \Exception
 {
     /**
-     * NumberNotFoundException constructor.
-     *
      * @param string $number
      * @param string $message
      * @param int    $code

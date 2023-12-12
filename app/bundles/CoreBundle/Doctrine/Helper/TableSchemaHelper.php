@@ -7,9 +7,7 @@ use Doctrine\DBAL\Schema\Schema;
 use Mautic\CoreBundle\Exception\SchemaException;
 
 /**
- * Class TableSchemaHelper.
- *
- * Used to manipulate creation/removal of tables
+ * Used to manipulate creation/removal of tables.
  */
 class TableSchemaHelper
 {

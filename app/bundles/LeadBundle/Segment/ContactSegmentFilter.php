@@ -12,7 +12,7 @@ use Mautic\LeadBundle\Segment\Query\Filter\FilterQueryBuilderInterface;
 use Mautic\LeadBundle\Segment\Query\QueryBuilder;
 
 /**
- * Class ContactSegmentFilter is used for accessing $filter as an object and to keep logic in an object.
+ * Used for accessing $filter as an object and to keep logic in an object.
  */
 class ContactSegmentFilter implements \Stringable
 {

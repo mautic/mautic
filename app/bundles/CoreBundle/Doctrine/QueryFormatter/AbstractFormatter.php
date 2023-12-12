@@ -6,8 +6,6 @@ use Doctrine\DBAL\Connection;
 
 /**
  * Help generate SQL statements to format column data.
- *
- * Class AbstractFormat
  */
 abstract class AbstractFormatter
 {

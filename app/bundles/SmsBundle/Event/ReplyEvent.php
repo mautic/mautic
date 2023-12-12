@@ -11,8 +11,6 @@ class ReplyEvent extends Event
     private ?\Symfony\Component\HttpFoundation\Response $response = null;
 
     /**
-     * ReplyEvent constructor.
-     *
      * @param string $message
      */
     public function __construct(

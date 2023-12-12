@@ -31,8 +31,6 @@ class CategoryChangeEvent extends Event
     }
 
     /**
-     * Returns the Lead entity.
-     *
      * @return Lead
      */
     public function getLead()

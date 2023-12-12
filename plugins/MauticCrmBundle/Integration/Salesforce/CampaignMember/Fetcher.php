@@ -29,8 +29,6 @@ class Fetcher
     private array $knownCampaignMembers = [];
 
     /**
-     * Fetcher constructor.
-     *
      * @param string $campaignId
      */
     public function __construct(
