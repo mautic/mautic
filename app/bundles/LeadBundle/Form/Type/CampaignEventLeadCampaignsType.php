@@ -12,13 +12,11 @@ use Symfony\Component\Form\FormBuilderInterface;
 
 class CampaignEventLeadCampaignsType extends AbstractType
 {
-    public function __construct(protected ListModel $listModel)
-    {
+    public function __construct(
+        protected ListModel $listModel
+    ) {
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder->add('campaigns',
@@ -77,9 +75,6 @@ class CampaignEventLeadCampaignsType extends AbstractType
         );
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getBlockPrefix()
     {
         return 'campaignevent_lead_campaigns';

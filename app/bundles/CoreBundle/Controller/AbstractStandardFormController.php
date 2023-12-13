@@ -17,23 +17,38 @@ use Mautic\FormBundle\Helper\FormFieldHelper;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\Form;
 use Symfony\Component\Form\FormFactoryInterface;
+use Symfony\Component\Form\FormInterface;
+use Symfony\Component\Form\FormView;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 abstract class AbstractStandardFormController extends AbstractFormController
 {
     use FormErrorMessagesTrait;
 
-    public function __construct(protected FormFactoryInterface $formFactory, protected FormFieldHelper $fieldHelper, ManagerRegistry $managerRegistry, MauticFactory $factory, ModelFactory $modelFactory, UserHelper $userHelper, CoreParametersHelper $coreParametersHelper, EventDispatcherInterface $dispatcher, Translator $translator, FlashBag $flashBag, RequestStack $requestStack, CorePermissions $security)
-    {
+    public function __construct(
+        protected FormFactoryInterface $formFactory,
+        protected FormFieldHelper $fieldHelper,
+        ManagerRegistry $managerRegistry,
+        MauticFactory $factory,
+        ModelFactory $modelFactory,
+        UserHelper $userHelper,
+        CoreParametersHelper $coreParametersHelper,
+        EventDispatcherInterface $dispatcher,
+        Translator $translator,
+        FlashBag $flashBag,
+        RequestStack $requestStack,
+        CorePermissions $security
+    ) {
         parent::__construct($managerRegistry, $factory, $modelFactory, $userHelper, $coreParametersHelper, $dispatcher, $translator, $flashBag, $requestStack, $security);
     }
 
     /**
      * Get this controller's model name.
      */
-    abstract protected function getModelName();
+    abstract protected function getModelName(): string;
 
     /**
      * Support non-index pages such as modal forms.
@@ -59,8 +74,6 @@ abstract class AbstractStandardFormController extends AbstractFormController
 
     /**
      * Called after the entity has been persisted allowing for custom preperation of $entity prior to viewAction.
-     *
-     * @param null $pass
      */
     protected function afterEntitySave($entity, Form $form, $action, $pass = null)
     {
@@ -162,9 +175,6 @@ abstract class AbstractStandardFormController extends AbstractFormController
     }
 
     /**
-     * @param null $entity
-     * @param null $objectId
-     *
      * @return bool|mixed
      */
     protected function checkActionPermission($action, $entity = null, $objectId = null)
@@ -317,7 +327,7 @@ abstract class AbstractStandardFormController extends AbstractFormController
         $isClone = false;
         $model   = $this->getModel($this->getModelName());
         if (!$model instanceof FormModel) {
-            throw new \Exception(get_class($model).' must extend '.FormModel::class);
+            throw new \Exception($model::class.' must extend '.FormModel::class);
         }
 
         $entity = $this->getFormEntity('edit', $objectId, $isClone);
@@ -529,10 +539,8 @@ abstract class AbstractStandardFormController extends AbstractFormController
 
     /**
      * Set custom form themes, etc.
-     *
-     * @return \Symfony\Component\Form\FormView
      */
-    protected function getFormView(Form $form, $action)
+    protected function getFormView(FormInterface $form, $action): FormView
     {
         return $form->createView();
     }
@@ -637,8 +645,6 @@ abstract class AbstractStandardFormController extends AbstractFormController
     }
 
     /**
-     * @param null $objectId
-     *
      * @return mixed
      */
     protected function getSessionBase($objectId = null)
@@ -749,7 +755,6 @@ abstract class AbstractStandardFormController extends AbstractFormController
 
     /**
      * @param string $timezone
-     * @param null   $dateRangeForm
      *
      * @return array
      */
@@ -781,7 +786,7 @@ abstract class AbstractStandardFormController extends AbstractFormController
      *
      * @return \Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response
      */
-    protected function indexStandard(Request $request, $page = null)
+    protected function indexStandard(Request $request, $page = null): Response
     {
         // set some permissions
         $permissions = $this->security->isGranted(
@@ -913,7 +918,7 @@ abstract class AbstractStandardFormController extends AbstractFormController
 
         $model = $this->getModel($this->getModelName());
         if (!$model instanceof FormModel) {
-            throw new \Exception(get_class($model).' must extend '.FormModel::class);
+            throw new \Exception($model::class.' must extend '.FormModel::class);
         }
 
         // set the page we came from

@@ -16,21 +16,18 @@ class Interval implements ScheduleModeInterface
 {
     public const LOG_DATE_FORMAT = 'Y-m-d H:i:s T';
 
-    /**
-     * @var \DateTimeZone
-     */
-    private $defaultTimezone;
+    private ?\DateTimeZone $defaultTimezone = null;
 
-    public function __construct(private LoggerInterface $logger, private CoreParametersHelper $coreParametersHelper)
-    {
+    public function __construct(
+        private LoggerInterface $logger,
+        private CoreParametersHelper $coreParametersHelper
+    ) {
     }
 
     /**
-     * @return \DateTimeInterface
-     *
      * @throws NotSchedulableException
      */
-    public function getExecutionDateTime(Event $event, \DateTimeInterface $compareFromDateTime, \DateTimeInterface $comparedToDateTime)
+    public function getExecutionDateTime(Event $event, \DateTimeInterface $compareFromDateTime, \DateTimeInterface $comparedToDateTime): \DateTimeInterface
     {
         $interval = $event->getTriggerInterval();
         $unit     = $event->getTriggerIntervalUnit();

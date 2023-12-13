@@ -6,13 +6,11 @@ namespace Mautic\LeadBundle\Field;
 
 class FieldsWithUniqueIdentifier
 {
-    /**
-     * @var array
-     */
-    private $uniqueIdentifierFields = [];
+    private array $uniqueIdentifierFields = [];
 
-    public function __construct(private FieldList $fieldList)
-    {
+    public function __construct(
+        private FieldList $fieldList
+    ) {
     }
 
     /**
@@ -22,9 +20,9 @@ class FieldsWithUniqueIdentifier
      */
     public function getFieldsWithUniqueIdentifier(array $filters = [])
     {
-        $filters['isPublished']       = $filters['isPublished'] ?? true;
-        $filters['isUniqueIdentifer'] = $filters['isUniqueIdentifer'] ?? true;
-        $filters['object']            = $filters['object'] ?? 'lead';
+        $filters['isPublished'] ??= true;
+        $filters['isUniqueIdentifer'] ??= true;
+        $filters['object'] ??= 'lead';
 
         $key = base64_encode(json_encode($filters));
         if (!isset($this->uniqueIdentifierFields[$key])) {

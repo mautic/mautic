@@ -192,9 +192,7 @@ class PublicController extends CommonFormController
                             );
 
                             // find the one with the most difference from weight
-
-                            reset($variants);
-                            $useId = key($variants);
+                            $useId = array_key_first($variants);
 
                             // set the cookie - 14 days
                             $cookieHelper->setCookie(
@@ -421,8 +419,6 @@ class PublicController extends CommonFormController
     }
 
     /**
-     * @return \Symfony\Component\HttpFoundation\RedirectResponse
-     *
      * @throws \Exception
      */
     public function redirectAction(
@@ -432,7 +428,7 @@ class PublicController extends CommonFormController
         IpLookupHelper $ipLookupHelper,
         LoggerInterface $logger,
         $redirectId
-    ) {
+    ): \Symfony\Component\HttpFoundation\RedirectResponse {
         $logger->debug('Attempting to load redirect with tracking_id of: '.$redirectId);
 
         /** @var \Mautic\PageBundle\Model\RedirectModel $redirectModel */
@@ -571,9 +567,7 @@ class PublicController extends CommonFormController
                 // Order slides
                 usort(
                     $options['slides'],
-                    function ($a, $b): int {
-                        return strcmp($a['order'], $b['order']);
-                    }
+                    fn ($a, $b): int => strcmp($a['order'], $b['order'])
                 );
 
                 $options['slot']   = $slot;

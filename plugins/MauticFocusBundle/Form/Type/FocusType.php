@@ -23,14 +23,9 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class FocusType extends AbstractType
 {
-    /**
-     * @var CorePermissions
-     */
-    private $security;
-
-    public function __construct(CorePermissions $security)
-    {
-        $this->security = $security;
+    public function __construct(
+        private CorePermissions $security
+    ) {
     }
 
     public function buildForm(FormBuilderInterface $builder, array $options): void
@@ -233,9 +228,6 @@ class FocusType extends AbstractType
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults(

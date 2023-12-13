@@ -11,8 +11,10 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class BaseFilterQueryBuilder implements FilterQueryBuilderInterface
 {
-    public function __construct(private RandomParameterName $parameterNameGenerator, private EventDispatcherInterface $dispatcher)
-    {
+    public function __construct(
+        private RandomParameterName $parameterNameGenerator,
+        private EventDispatcherInterface $dispatcher
+    ) {
     }
 
     public static function getServiceId(): string
@@ -20,7 +22,7 @@ class BaseFilterQueryBuilder implements FilterQueryBuilderInterface
         return 'mautic.lead.query.builder.basic';
     }
 
-    public function applyQuery(QueryBuilder $queryBuilder, ContactSegmentFilter $filter)
+    public function applyQuery(QueryBuilder $queryBuilder, ContactSegmentFilter $filter): QueryBuilder
     {
         // Check if the column exists in the table
         $filter->getColumn();

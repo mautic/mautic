@@ -67,12 +67,11 @@ class IpAddress
     }
 
     /**
-     * IpAddress constructor.
-     *
      * @param string|null $ipAddress
      */
-    public function __construct(private $ipAddress = null)
-    {
+    public function __construct(
+        private $ipAddress = null
+    ) {
     }
 
     /**

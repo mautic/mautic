@@ -13,14 +13,14 @@ class ContactColumnsDictionary
      */
     private array $fieldList = [];
 
-    public function __construct(protected FieldModel $fieldModel, private TranslatorInterface $translator, private CoreParametersHelper $coreParametersHelper)
-    {
+    public function __construct(
+        protected FieldModel $fieldModel,
+        private TranslatorInterface $translator,
+        private CoreParametersHelper $coreParametersHelper
+    ) {
     }
 
-    /**
-     * @return array
-     */
-    public function getColumns()
+    public function getColumns(): array
     {
         $columns = array_flip($this->coreParametersHelper->get('contact_columns', []));
         $fields  = $this->getFields();

@@ -25,7 +25,7 @@ class Copy
      */
     private $body;
 
-    private ?string $bodyText;
+    private ?string $bodyText = null;
 
     /**
      * @var string|null

@@ -8,10 +8,8 @@ class PlainTextHelper
 
     /**
      * Contains the HTML content to convert.
-     *
-     * @var string
      */
-    protected $html;
+    protected string $html = '';
 
     /**
      * Contains the converted, formatted text.
@@ -197,9 +195,9 @@ class PlainTextHelper
     /**
      * Various configuration options (able to be set in the constructor).
      *
-     * @var array
+     * @var array<string, mixed>
      */
-    protected $options = [
+    protected array $options = [
         'do_links' => 'inline', // 'none'
         // 'inline' (show links inline)
         // 'nextline' (show links on the next line)
@@ -213,18 +211,10 @@ class PlainTextHelper
     ];
 
     /**
-     * @param string $html    Source HTML
-     * @param array  $options Set configuration options
+     * @param array<string, mixed> $options Set configuration options
      */
-    public function __construct($html = '', $options = [])
+    public function __construct(array $options = [])
     {
-        if (is_array($html)) {
-            // Options were passed in without html
-            $options = $html;
-            $html    = '';
-        }
-
-        $this->html    = $html;
         $this->options = array_merge($this->options, $options);
     }
 
@@ -312,13 +302,12 @@ class PlainTextHelper
      * appeared. Also makes an effort at identifying and handling absolute
      * and relative links.
      *
-     * @param string $link         URL of the link
-     * @param string $display      Part of the text to associate number with
-     * @param null   $linkOverride
+     * @param string $link    URL of the link
+     * @param string $display Part of the text to associate number with
      *
      * @return string
      */
-    protected function buildlinkList($link, $display, $linkOverride = null)
+    protected function buildlinkList($link, $display, ?string $linkOverride = null)
     {
         $linkMethod = $linkOverride ?: $this->options['do_links'];
         if ('none' == $linkMethod) {
@@ -505,7 +494,7 @@ class PlainTextHelper
             }
         }
 
-        return implode($chunks);
+        return implode('', $chunks);
     }
 
     /**

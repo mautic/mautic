@@ -24,8 +24,10 @@ final class TypeOperatorProvider implements TypeOperatorProviderInterface
      */
     private array $cachedTypeOperatorsChoices = [];
 
-    public function __construct(private EventDispatcherInterface $dispatcher, private FilterOperatorProviderInterface $filterOperatorProvider)
-    {
+    public function __construct(
+        private EventDispatcherInterface $dispatcher,
+        private FilterOperatorProviderInterface $filterOperatorProvider
+    ) {
     }
 
     public function getOperatorsIncluding(array $operators): array

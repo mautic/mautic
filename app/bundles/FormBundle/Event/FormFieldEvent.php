@@ -9,8 +9,10 @@ use Symfony\Contracts\EventDispatcher\Event;
 
 final class FormFieldEvent extends Event
 {
-    public function __construct(private Field $entity, private bool $isNew = false)
-    {
+    public function __construct(
+        private Field $entity,
+        private bool $isNew = false
+    ) {
     }
 
     public function getField(): Field

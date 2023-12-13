@@ -68,8 +68,7 @@ class IdentifyCompanyHelper
 
         $companyData     = $parameters;
         if (!empty($companyEntities)) {
-            end($companyEntities);
-            $key               = key($companyEntities);
+            $key               = array_key_last($companyEntities);
             $companyData['id'] = $companyEntities[$key]->getId();
         }
 

@@ -7,26 +7,17 @@ use Symfony\Component\Form\FormBuilderInterface;
 
 class PluginPermissions extends AbstractPermissions
 {
-    /**
-     * {@inheritdoc}
-     */
     public function __construct($params)
     {
         parent::__construct($params);
         $this->addManagePermission('plugins');
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getName(): string
     {
         return 'plugin';
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function buildForm(FormBuilderInterface &$builder, array $options, array $data): void
     {
         $this->addManageFormFields('plugin', 'plugins', $builder, $data);

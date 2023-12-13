@@ -12,14 +12,12 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class CampaignConditionSubscriber implements EventSubscriberInterface
 {
-    public function __construct(private EmailValidator $validator)
-    {
+    public function __construct(
+        private EmailValidator $validator
+    ) {
     }
 
-    /**
-     * @return array
-     */
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             CampaignEvents::CAMPAIGN_ON_BUILD          => ['onCampaignBuild', 0],

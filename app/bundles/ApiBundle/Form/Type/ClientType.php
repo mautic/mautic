@@ -23,8 +23,13 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class ClientType extends AbstractType
 {
-    public function __construct(private RequestStack $requestStack, private TranslatorInterface $translator, private ValidatorInterface $validator, private SessionInterface $session, private RouterInterface $router)
-    {
+    public function __construct(
+        private RequestStack $requestStack,
+        private TranslatorInterface $translator,
+        private ValidatorInterface $validator,
+        private SessionInterface $session,
+        private RouterInterface $router
+    ) {
     }
 
     /**
@@ -38,9 +43,6 @@ class ClientType extends AbstractType
         );
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $apiMode = $this->getApiMode();
@@ -156,9 +158,6 @@ class ClientType extends AbstractType
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function configureOptions(OptionsResolver $resolver): void
     {
         $dataClass = \Mautic\ApiBundle\Entity\oAuth2\Client::class;

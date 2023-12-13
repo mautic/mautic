@@ -9,6 +9,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 class RestrictionHelper
 {
     public const MODE_REMOVE = 'remove';
+
     public const MODE_MASK   = 'mask';
 
     /**
@@ -16,8 +17,11 @@ class RestrictionHelper
      */
     private array $restrictedFields;
 
-    public function __construct(private TranslatorInterface $translator, array $restrictedFields, private string $displayMode)
-    {
+    public function __construct(
+        private TranslatorInterface $translator,
+        array $restrictedFields,
+        private string $displayMode
+    ) {
         $this->restrictedFields = FieldHelper::prepareRestrictions($restrictedFields);
     }
 
@@ -48,7 +52,7 @@ class RestrictionHelper
             case self::MODE_MASK:
                 $parentType->add(
                     $childType->getName(),
-                    get_class($childType->getConfig()->getType()->getInnerType()),
+                    $childType->getConfig()->getType()->getInnerType()::class,
                     array_merge(
                         $childType->getConfig()->getOptions(),
                         [

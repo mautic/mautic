@@ -19,10 +19,8 @@ class LeadFieldRepository extends CommonRepository
      * @param bool   $publishedOnly
      * @param bool   $includeEntityFields
      * @param string $object              name of object using the custom fields
-     *
-     * @return array
      */
-    public function getAliases($exludingId, $publishedOnly = false, $includeEntityFields = true, $object = 'lead')
+    public function getAliases($exludingId, $publishedOnly = false, $includeEntityFields = true, $object = 'lead'): array
     {
         $q = $this->_em->getConnection()->createQueryBuilder()
             ->select('l.alias')
@@ -94,9 +92,6 @@ class LeadFieldRepository extends CommonRepository
         return array_column($results, null, 'alias');
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getTableAlias(): string
     {
         return 'f';
@@ -105,10 +100,8 @@ class LeadFieldRepository extends CommonRepository
     /**
      * @param \Doctrine\ORM\QueryBuilder|\Doctrine\DBAL\Query\QueryBuilder $q
      * @param object                                                       $filter
-     *
-     * @return array
      */
-    protected function addCatchAllWhereClause($q, $filter)
+    protected function addCatchAllWhereClause($q, $filter): array
     {
         return $this->addStandardCatchAllWhereClause(
             $q,
@@ -134,10 +127,8 @@ class LeadFieldRepository extends CommonRepository
      * Get field aliases for lead table columns.
      *
      * @param string $object name of object using the custom fields
-     *
-     * @return array
      */
-    public function getFieldAliases($object = 'lead')
+    public function getFieldAliases($object = 'lead'): array
     {
         $qb = $this->_em->getConnection()->createQueryBuilder();
 

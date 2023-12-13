@@ -10,8 +10,10 @@ final class FormatterHelper
 {
     public const FLOAT_PRECISION = 4;
 
-    public function __construct(private DateHelper $dateHelper, private TranslatorInterface $translator)
-    {
+    public function __construct(
+        private DateHelper $dateHelper,
+        private TranslatorInterface $translator
+    ) {
     }
 
     /**
@@ -142,7 +144,7 @@ final class FormatterHelper
      *
      * @return array<string, string>|array<int, string>
      */
-    public function simpleCsvToArray($csv, $type = null)
+    public function simpleCsvToArray($csv, $type = null): array
     {
         if (!$csv) {
             return [];

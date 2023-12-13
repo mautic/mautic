@@ -6,12 +6,11 @@ use Doctrine\DBAL\Connection;
 
 /**
  * Help generate SQL statements to format column data.
- *
- * Class AbstractFormat
  */
 abstract class AbstractFormatter
 {
     protected \Doctrine\DBAL\Platforms\AbstractPlatform $platform;
+
     protected string $name;
 
     /**
@@ -25,8 +24,9 @@ abstract class AbstractFormatter
         return new $class($db);
     }
 
-    public function __construct(protected Connection $db)
-    {
+    public function __construct(
+        protected Connection $db
+    ) {
         $this->platform = $this->db->getDatabasePlatform();
         $this->name     = $this->platform->getName();
     }

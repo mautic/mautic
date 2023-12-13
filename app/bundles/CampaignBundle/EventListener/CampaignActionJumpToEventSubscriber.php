@@ -18,14 +18,15 @@ class CampaignActionJumpToEventSubscriber implements EventSubscriberInterface
 {
     public const EVENT_NAME = 'campaign.jump_to_event';
 
-    public function __construct(private EventRepository $eventRepository, private EventExecutioner $eventExecutioner, private TranslatorInterface $translator, private LeadRepository $leadRepository)
-    {
+    public function __construct(
+        private EventRepository $eventRepository,
+        private EventExecutioner $eventExecutioner,
+        private TranslatorInterface $translator,
+        private LeadRepository $leadRepository
+    ) {
     }
 
-    /**
-     * @return array
-     */
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             CampaignEvents::CAMPAIGN_POST_SAVE     => ['processCampaignEventsAfterSave', 1],

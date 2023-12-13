@@ -63,8 +63,6 @@ class TriggerModel extends CommonFormModel
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @return \Mautic\PointBundle\Entity\TriggerRepository
      */
     public function getRepository()
@@ -82,20 +80,15 @@ class TriggerModel extends CommonFormModel
         return $this->em->getRepository(TriggerEvent::class);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getPermissionBase(): string
     {
         return 'point:triggers';
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @throws MethodNotAllowedHttpException
      */
-    public function createForm($entity, FormFactoryInterface $formFactory, $action = null, $options = [])
+    public function createForm($entity, FormFactoryInterface $formFactory, $action = null, $options = []): \Symfony\Component\Form\FormInterface
     {
         if (!$entity instanceof Trigger) {
             throw new MethodNotAllowedHttpException(['Trigger']);
@@ -109,8 +102,6 @@ class TriggerModel extends CommonFormModel
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @param \Mautic\PointBundle\Entity\Trigger $entity
      * @param bool                               $unlock
      */
@@ -200,12 +191,7 @@ class TriggerModel extends CommonFormModel
         }
     }
 
-    /**
-     * {@inheritdoc}
-     *
-     * @return Trigger|null
-     */
-    public function getEntity($id = null)
+    public function getEntity($id = null): ?Trigger
     {
         if (null === $id) {
             return new Trigger();
@@ -215,8 +201,6 @@ class TriggerModel extends CommonFormModel
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @throws MethodNotAllowedHttpException
      */
     protected function dispatchEvent($action, &$entity, $isNew = false, Event $event = null): ?Event

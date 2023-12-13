@@ -6,8 +6,15 @@ use Mautic\CoreBundle\Update\Step\StepInterface;
 
 class StepProvider
 {
-    private $initialSteps = [];
-    private $finalSteps   = [];
+    /**
+     * @var StepInterface[]
+     */
+    private array $initialSteps = [];
+
+    /**
+     * @var StepInterface[]
+     */
+    private array $finalSteps = [];
 
     public function addStep(StepInterface $step): void
     {
@@ -41,13 +48,7 @@ class StepProvider
      */
     private function orderSteps(array $steps): array
     {
-        usort($steps, function (StepInterface $step1, StepInterface $step2): int {
-            if ($step1->getOrder() === $step2->getOrder()) {
-                return 0;
-            }
-
-            return ($step1->getOrder() < $step2->getOrder()) ? -1 : 1;
-        });
+        usort($steps, fn (StepInterface $step1, StepInterface $step2): int => $step1->getOrder() <=> $step2->getOrder());
 
         return $steps;
     }

@@ -48,7 +48,7 @@ class KeysType extends AbstractType
                     'label_attr' => ['class' => 'control-label'],
                     'attr'       => [
                         'class'        => 'form-control',
-                        'placeholder'  => ('password' == $type) ? '**************' : '',
+                        'placeholder'  => (PasswordType::class === $type) ? '**************' : '',
                         'autocomplete' => 'off',
                     ],
                     'required'       => $required,
@@ -60,9 +60,6 @@ class KeysType extends AbstractType
         $object->appendToForm($builder, $options['data'], 'keys');
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setRequired(['integration_object', 'integration_keys']);

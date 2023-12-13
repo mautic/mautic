@@ -9,9 +9,6 @@ use Symfony\Component\Form\FormBuilderInterface;
 
 class CheckStepType extends AbstractType
 {
-    /**
-     * {@inheritdoc}
-     */
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder->add(
@@ -45,9 +42,6 @@ class CheckStepType extends AbstractType
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getBlockPrefix()
     {
         return 'install_check_step';

@@ -9,9 +9,6 @@ use Mautic\CoreBundle\Entity\CommonRepository;
  */
 class DynamicContentLeadDataRepository extends CommonRepository
 {
-    /**
-     * {@inheritdoc}
-     */
     public function getTableAlias(): string
     {
         return 'dcld';

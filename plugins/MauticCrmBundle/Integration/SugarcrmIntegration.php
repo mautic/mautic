@@ -32,20 +32,21 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class SugarcrmIntegration extends CrmAbstractIntegration
 {
-    private $objects = [
+    /**
+     * @var string[]
+     */
+    private array $objects = [
         'Leads',
         'Contacts',
         'Accounts',
     ];
 
-    private $sugarDncKeys = ['email_opt_out', 'invalid_email'];
-    private $authorizationError;
-    private $userModel;
-
     /**
-     * @var DoNotContact
+     * @var string[]
      */
-    protected $doNotContactModel;
+    private array $sugarDncKeys = ['email_opt_out', 'invalid_email'];
+
+    private $authorizationError;
 
     public function __construct(
         EventDispatcherInterface $eventDispatcher,
@@ -63,12 +64,9 @@ class SugarcrmIntegration extends CrmAbstractIntegration
         NotificationModel $notificationModel,
         FieldModel $fieldModel,
         IntegrationEntityModel $integrationEntityModel,
-        DoNotContact $doNotContactModel,
-        UserModel $userModel
+        protected DoNotContact $doNotContactModel,
+        private UserModel $userModel
     ) {
-        $this->doNotContactModel = $doNotContactModel;
-        $this->userModel         = $userModel;
-
         parent::__construct(
             $eventDispatcher,
             $cacheStorageHelper,
@@ -91,10 +89,8 @@ class SugarcrmIntegration extends CrmAbstractIntegration
 
     /**
      * Returns the name of the social integration that must match the name of the file.
-     *
-     * @return string
      */
-    public function getName()
+    public function getName(): string
     {
         return 'Sugarcrm';
     }
@@ -107,27 +103,20 @@ class SugarcrmIntegration extends CrmAbstractIntegration
 
     /**
      * Get the array key for clientId.
-     *
-     * @return string
      */
-    public function getClientIdKey()
+    public function getClientIdKey(): string
     {
         return 'client_id';
     }
 
     /**
      * Get the array key for client secret.
-     *
-     * @return string
      */
-    public function getClientSecretKey()
+    public function getClientSecretKey(): string
     {
         return 'client_secret';
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getSecretKeys(): array
     {
         return [
@@ -155,9 +144,6 @@ class SugarcrmIntegration extends CrmAbstractIntegration
         ];
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getAccessTokenUrl(): string
     {
         $apiUrl = ('6' == $this->keys['version']) ? 'service/v4_1/rest.php' : 'rest/v10/oauth2/token';
@@ -166,8 +152,6 @@ class SugarcrmIntegration extends CrmAbstractIntegration
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @return string
      */
     public function getAuthLoginUrl()
@@ -237,10 +221,8 @@ class SugarcrmIntegration extends CrmAbstractIntegration
      * Get available fields for choices in the config UI.
      *
      * @param array $settings
-     *
-     * @return array
      */
-    public function getFormLeadFields($settings = [])
+    public function getFormLeadFields($settings = []): array
     {
         if (!$this->isAuthorized()) {
             return [];
@@ -294,11 +276,9 @@ class SugarcrmIntegration extends CrmAbstractIntegration
             $settings['feature_settings']['objects'] = $sugarObjects;
         }
 
-        $isRequired = function (array $field, $object) {
-            return match (true) {
-                'Leads' === $object && ('webtolead_email1' === $field['name'] || 'email1' === $field['name']), 'Contacts' === $object && 'email1' === $field['name'], 'id' !== $field['name'] && !empty($field['required']) => true,
-                default => false,
-            };
+        $isRequired = fn (array $field, $object) => match (true) {
+            'Leads' === $object && ('webtolead_email1' === $field['name'] || 'email1' === $field['name']), 'Contacts' === $object && 'email1' === $field['name'], 'id' !== $field['name'] && !empty($field['required']) => true,
+            default => false,
         };
 
         try {
@@ -628,17 +608,11 @@ class SugarcrmIntegration extends CrmAbstractIntegration
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getAuthenticationType(): string
     {
         return (isset($this->keys['version']) && '6' == $this->keys['version']) ? 'rest' : 'oauth2';
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getDataPriority(): bool
     {
         return true;
@@ -662,8 +636,6 @@ class SugarcrmIntegration extends CrmAbstractIntegration
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @return bool
      */
     public function isAuthorized()
@@ -715,9 +687,6 @@ class SugarcrmIntegration extends CrmAbstractIntegration
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function prepareResponseForExtraction($data)
     {
         // Extract expiry and set expires for 7.x
@@ -733,10 +702,8 @@ class SugarcrmIntegration extends CrmAbstractIntegration
      *
      * @param array  $data
      * @param string $object
-     *
-     * @return int
      */
-    public function amendLeadDataBeforeMauticPopulate($data, $object)
+    public function amendLeadDataBeforeMauticPopulate($data, $object): int
     {
         $settings['feature_settings']['objects'][] = $object;
         $fields                                    = array_keys($this->getAvailableLeadFields($settings));
@@ -1213,9 +1180,9 @@ class SugarcrmIntegration extends CrmAbstractIntegration
     /**
      * @param array $params
      *
-     * @return mixed
+     * @return mixed[]
      */
-    public function pushLeads($params = [])
+    public function pushLeads($params = []): array
     {
         [$fromDate, $toDate]     = $this->getSyncTimeframeDates($params);
         $limit                   = $params['limit'];
@@ -1532,9 +1499,6 @@ class SugarcrmIntegration extends CrmAbstractIntegration
         return null;
     }
 
-    /**
-     * @param null $objectId
-     */
     protected function buildCompositeBody(&$mauticData, $availableFields, $fieldsToUpdateInSugarUpdate, $object, $lead, $onwerAssignedUserIdByEmail = null, $objectId = null)
     {
         $body = [];
@@ -1737,7 +1701,6 @@ class SugarcrmIntegration extends CrmAbstractIntegration
     }
 
     /**
-     * @param null   $object
      * @param string $priorityObject
      *
      * @return mixed
@@ -1749,10 +1712,7 @@ class SugarcrmIntegration extends CrmAbstractIntegration
         return ($object && isset($fields[$object])) ? $fields[$object] : $fields;
     }
 
-    /**
-     * @return array
-     */
-    protected function prepareFieldsForPush($fields)
+    protected function prepareFieldsForPush($fields): array
     {
         $fieldMappings = [];
         $required      = [];
@@ -1804,11 +1764,9 @@ class SugarcrmIntegration extends CrmAbstractIntegration
     /**
      * Checks if a string contains SuiteCRM / SugarCRM 6.x Multi-Select values.
      *
-     * @param  string
-     *
-     * @return bool
+     * @param string $stringToCheck
      */
-    public function checkIfSugarCrmMultiSelectString($stringToCheck)
+    public function checkIfSugarCrmMultiSelectString($stringToCheck): bool
     {
         // Regular Express to check SugarCRM/SuiteCRM Multi-Select format below
         // example format: '^choice1^,^choice2^,^choice_3^'

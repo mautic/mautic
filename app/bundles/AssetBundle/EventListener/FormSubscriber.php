@@ -22,14 +22,18 @@ use Twig\Environment;
 
 class FormSubscriber implements EventSubscriberInterface
 {
-    public function __construct(private AssetModel $assetModel, protected TranslatorInterface $translator, private AnalyticsHelper $analyticsHelper, private AssetsHelper $assetsHelper, private ThemeHelperInterface $themeHelper, private Environment $twig, private CoreParametersHelper $coreParametersHelper)
-    {
+    public function __construct(
+        private AssetModel $assetModel,
+        protected TranslatorInterface $translator,
+        private AnalyticsHelper $analyticsHelper,
+        private AssetsHelper $assetsHelper,
+        private ThemeHelperInterface $themeHelper,
+        private Environment $twig,
+        private CoreParametersHelper $coreParametersHelper
+    ) {
     }
 
-    /**
-     * @return array
-     */
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             FormEvents::FORM_ON_BUILD                 => ['onFormBuilder', 0],

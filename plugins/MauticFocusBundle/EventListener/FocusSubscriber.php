@@ -24,70 +24,19 @@ use Symfony\Component\Routing\RouterInterface;
 
 class FocusSubscriber implements EventSubscriberInterface
 {
-    /**
-     * @var RouterInterface
-     */
-    private $router;
-
-    /**
-     * @var IpLookupHelper
-     */
-    private $ipHelper;
-
-    /**
-     * @var AuditLogModel
-     */
-    private $auditLogModel;
-
-    /**
-     * @var TrackableModel
-     */
-    private $trackableModel;
-
-    /**
-     * @var PageTokenHelper
-     */
-    private $pageTokenHelper;
-
-    /**
-     * @var AssetTokenHelper
-     */
-    private $assetTokenHelper;
-
-    /**
-     * @var FocusModel
-     */
-    private $focusModel;
-
-    /**
-     * @var RequestStack
-     */
-    private $requestStack;
-
     public function __construct(
-        RouterInterface $router,
-        IpLookupHelper $ipLookupHelper,
-        AuditLogModel $auditLogModel,
-        TrackableModel $trackableModel,
-        PageTokenHelper $pageTokenHelper,
-        AssetTokenHelper $assetTokenHelper,
-        FocusModel $focusModel,
-        RequestStack $requestStack
+        private RouterInterface $router,
+        private IpLookupHelper $ipHelper,
+        private AuditLogModel $auditLogModel,
+        private TrackableModel $trackableModel,
+        private PageTokenHelper $pageTokenHelper,
+        private AssetTokenHelper $assetTokenHelper,
+        private FocusModel $focusModel,
+        private RequestStack $requestStack
     ) {
-        $this->router           = $router;
-        $this->ipHelper         = $ipLookupHelper;
-        $this->auditLogModel    = $auditLogModel;
-        $this->trackableModel   = $trackableModel;
-        $this->pageTokenHelper  = $pageTokenHelper;
-        $this->assetTokenHelper = $assetTokenHelper;
-        $this->focusModel       = $focusModel;
-        $this->requestStack     = $requestStack;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             KernelEvents::REQUEST          => ['onKernelRequest', 0],

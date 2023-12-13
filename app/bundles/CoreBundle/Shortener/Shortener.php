@@ -15,13 +15,14 @@ class Shortener
      */
     private array $services = [];
 
-    public function __construct(private CoreParametersHelper $coreParametersHelper)
-    {
+    public function __construct(
+        private CoreParametersHelper $coreParametersHelper
+    ) {
     }
 
     public function addService(ShortenerServiceInterface $shortener): void
     {
-        $this->services[get_class($shortener)] = $shortener;
+        $this->services[$shortener::class] = $shortener;
     }
 
     public function getService(): ShortenerServiceInterface

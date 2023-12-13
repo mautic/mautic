@@ -17,17 +17,11 @@ class FormPermissions extends AbstractPermissions
         $this->addStandardPermissions('categories');
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getName(): string
     {
         return 'form';
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function buildForm(FormBuilderInterface &$builder, array $options, array $data): void
     {
         $this->addStandardFormFields('form', 'categories', $builder, $data);

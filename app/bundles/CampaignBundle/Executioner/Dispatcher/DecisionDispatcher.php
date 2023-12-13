@@ -13,8 +13,10 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class DecisionDispatcher
 {
-    public function __construct(private EventDispatcherInterface $dispatcher, private LegacyEventDispatcher $legacyDispatcher)
-    {
+    public function __construct(
+        private EventDispatcherInterface $dispatcher,
+        private LegacyEventDispatcher $legacyDispatcher
+    ) {
     }
 
     /**

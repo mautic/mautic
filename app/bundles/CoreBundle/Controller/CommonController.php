@@ -40,8 +40,18 @@ class CommonController extends AbstractController implements MauticController
     /**
      * @param ModelFactory<object> $modelFactory
      */
-    public function __construct(protected ManagerRegistry $doctrine, protected MauticFactory $factory, protected ModelFactory $modelFactory, UserHelper $userHelper, protected CoreParametersHelper $coreParametersHelper, protected EventDispatcherInterface $dispatcher, protected Translator $translator, private FlashBag $flashBag, private ?RequestStack $requestStack, protected ?CorePermissions $security)
-    {
+    public function __construct(
+        protected ManagerRegistry $doctrine,
+        protected MauticFactory $factory,
+        protected ModelFactory $modelFactory,
+        UserHelper $userHelper,
+        protected CoreParametersHelper $coreParametersHelper,
+        protected EventDispatcherInterface $dispatcher,
+        protected Translator $translator,
+        private FlashBag $flashBag,
+        private ?RequestStack $requestStack,
+        protected ?CorePermissions $security
+    ) {
         $this->user                 = $userHelper->getUser();
     }
 
@@ -67,10 +77,8 @@ class CommonController extends AbstractController implements MauticController
     /**
      * Override this method in your controller
      * for easy access to the permissions.
-     *
-     * @return array
      */
-    protected function getPermissions()
+    protected function getPermissions(): array
     {
         return [];
     }
@@ -482,10 +490,8 @@ class CommonController extends AbstractController implements MauticController
      * Returns a json encoded access denied error for modal windows.
      *
      * @param string $msg
-     *
-     * @return JsonResponse
      */
-    public function modalAccessDenied($msg = 'mautic.core.error.accessdenied')
+    public function modalAccessDenied($msg = 'mautic.core.error.accessdenied'): JsonResponse
     {
         return new JsonResponse([
             'error' => $this->translator->trans($msg, [], 'flashes'),
@@ -559,10 +565,8 @@ class CommonController extends AbstractController implements MauticController
 
     /**
      * Renders notification info for ajax.
-     *
-     * @return array
      */
-    protected function getNotificationContent(Request $request = null)
+    protected function getNotificationContent(Request $request = null): array
     {
         if (null === $request) {
             $request = $this->getCurrentRequest();
@@ -589,10 +593,7 @@ class CommonController extends AbstractController implements MauticController
     }
 
     /**
-     * @param null      $type
      * @param bool|true $isRead
-     * @param null      $header
-     * @param null      $iconClass
      *
      * @deprecated Will be removed in Mautic 3.0 as unused.
      */

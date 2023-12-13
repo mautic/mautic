@@ -22,7 +22,7 @@ class MailboxContainerTest extends \PHPUnit\Framework\TestCase
      * @covers \Mautic\EmailBundle\MonitoredEmail\Accessor\ConfigAccessor::getPath()
      * @covers \Mautic\EmailBundle\MonitoredEmail\Organizer\MailboxContainer::getPath()
      */
-    public function testPathMatches()
+    public function testPathMatches(): void
     {
         $configAccessor   = new ConfigAccessor($this->config);
         $mailboxContainer = new MailboxContainer($configAccessor);
@@ -36,7 +36,7 @@ class MailboxContainerTest extends \PHPUnit\Framework\TestCase
      * @covers \Mautic\EmailBundle\MonitoredEmail\Organizer\MailboxContainer::addCriteria()
      * @covers \Mautic\EmailBundle\MonitoredEmail\Organizer\MailboxContainer::getCriteria()
      */
-    public function testCriteriaIsSetAsExpected()
+    public function testCriteriaIsSetAsExpected(): void
     {
         $configAccessor   = new ConfigAccessor($this->config);
         $mailboxContainer = new MailboxContainer($configAccessor);
@@ -64,7 +64,7 @@ class MailboxContainerTest extends \PHPUnit\Framework\TestCase
      * @covers \Mautic\EmailBundle\MonitoredEmail\Organizer\MailboxContainer::keepAsUnseen()
      * @covers \Mautic\EmailBundle\MonitoredEmail\Organizer\MailboxContainer::shouldMarkAsSeen()
      */
-    public function testUnseenFlagIsReturnedAsExpected()
+    public function testUnseenFlagIsReturnedAsExpected(): void
     {
         $configAccessor   = new ConfigAccessor($this->config);
         $mailboxContainer = new MailboxContainer($configAccessor);

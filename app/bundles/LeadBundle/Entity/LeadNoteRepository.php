@@ -56,9 +56,6 @@ class LeadNoteRepository extends CommonRepository
         return $results[0]['note_count'];
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getTableAlias(): string
     {
         return 'n';
@@ -66,10 +63,8 @@ class LeadNoteRepository extends CommonRepository
 
     /**
      * @param \Doctrine\ORM\QueryBuilder|\Doctrine\DBAL\Query\QueryBuilder $q
-     *
-     * @return array
      */
-    protected function addCatchAllWhereClause($q, $filter)
+    protected function addCatchAllWhereClause($q, $filter): array
     {
         return $this->addStandardCatchAllWhereClause(
             $q,
@@ -137,9 +132,9 @@ class LeadNoteRepository extends CommonRepository
     }
 
     /**
-     * @return array
+     * @return array<string, string[]>
      */
-    public function getSearchCommands()
+    public function getSearchCommands(): array
     {
         $commands = [
             'mautic.lead.note.searchcommand.type' => [

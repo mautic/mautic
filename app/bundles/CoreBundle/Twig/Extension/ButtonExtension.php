@@ -13,13 +13,14 @@ use Twig\TwigFunction;
 
 class ButtonExtension extends AbstractExtension
 {
-    public function __construct(protected ButtonHelper $buttonHelper, protected RequestStack $requestStack, protected UrlGeneratorInterface $router, protected TranslatorInterface $translator)
-    {
+    public function __construct(
+        protected ButtonHelper $buttonHelper,
+        protected RequestStack $requestStack,
+        protected UrlGeneratorInterface $router,
+        protected TranslatorInterface $translator
+    ) {
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getFunctions()
     {
         return [
@@ -35,9 +36,6 @@ class ButtonExtension extends AbstractExtension
         ];
     }
 
-    /**
-     * @param null $item
-     */
     public function reset(string $location, string $groupType = ButtonHelper::TYPE_GROUP, $item = null): void
     {
         $this->buttonHelper->reset(

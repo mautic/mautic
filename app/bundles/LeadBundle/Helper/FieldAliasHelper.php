@@ -7,8 +7,9 @@ use Mautic\LeadBundle\Model\FieldModel;
 
 class FieldAliasHelper
 {
-    public function __construct(private FieldModel $fieldModel)
-    {
+    public function __construct(
+        private FieldModel $fieldModel
+    ) {
     }
 
     /**
@@ -22,7 +23,7 @@ class FieldAliasHelper
         }
 
         // set alias as name if alias is empty
-        $alias = $field->getAlias() ?: $field->getName() ?: '';
+        $alias = ($field->getAlias() ?: $field->getName()) ?: '';
 
         // clean the alias
         $alias = $this->fieldModel->cleanAlias($alias, 'f_', 25);

@@ -12,14 +12,12 @@ class SegmentLogReportSubscriber implements EventSubscriberInterface
 {
     public const SEGMENT_LOG = 'segment.log';
 
-    public function __construct(private FieldsBuilder $fieldsBuilder)
-    {
+    public function __construct(
+        private FieldsBuilder $fieldsBuilder
+    ) {
     }
 
-    /**
-     * @return array
-     */
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             ReportEvents::REPORT_ON_BUILD    => ['onReportBuilder', 0],

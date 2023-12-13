@@ -16,8 +16,9 @@ class ConditionExecutioner implements EventInterface
 {
     public const TYPE = 'condition';
 
-    public function __construct(private ConditionDispatcher $dispatcher)
-    {
+    public function __construct(
+        private ConditionDispatcher $dispatcher
+    ) {
     }
 
     /**
@@ -50,7 +51,7 @@ class ConditionExecutioner implements EventInterface
      * @throws CannotProcessEventException
      * @throws ConditionFailedException
      */
-    private function dispatchEvent(ConditionAccessor $config, LeadEventLog $log)
+    private function dispatchEvent(ConditionAccessor $config, LeadEventLog $log): void
     {
         if (Event::TYPE_CONDITION !== $log->getEvent()->getEventType()) {
             throw new CannotProcessEventException('Cannot process event ID '.$log->getEvent()->getId().' as a condition.');

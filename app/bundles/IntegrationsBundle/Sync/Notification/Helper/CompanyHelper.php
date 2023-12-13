@@ -8,8 +8,9 @@ use Doctrine\DBAL\Connection;
 
 class CompanyHelper
 {
-    public function __construct(private Connection $connection)
-    {
+    public function __construct(
+        private Connection $connection
+    ) {
     }
 
     /**

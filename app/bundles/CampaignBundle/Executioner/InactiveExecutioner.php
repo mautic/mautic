@@ -14,7 +14,6 @@ use Mautic\CampaignBundle\Executioner\Result\Counter;
 use Mautic\CampaignBundle\Executioner\Scheduler\EventScheduler;
 use Mautic\CoreBundle\Helper\ProgressBarHelper;
 use Psr\Log\LoggerInterface;
-use Symfony\Component\Console\Helper\ProgressBar;
 use Symfony\Component\Console\Output\NullOutput;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
@@ -26,35 +25,26 @@ class InactiveExecutioner implements ExecutionerInterface
      */
     private $campaign;
 
-    /**
-     * @var ContactLimiter
-     */
-    private $limiter;
+    private ?\Mautic\CampaignBundle\Executioner\ContactFinder\Limiter\ContactLimiter $limiter = null;
 
-    /**
-     * @var OutputInterface
-     */
-    private $output;
+    private ?\Symfony\Component\Console\Output\OutputInterface $output = null;
 
-    /**
-     * @var ProgressBar
-     */
-    private $progressBar;
+    private ?\Symfony\Component\Console\Helper\ProgressBar $progressBar = null;
 
-    /**
-     * @var Counter
-     */
-    private $counter;
+    private ?\Mautic\CampaignBundle\Executioner\Result\Counter $counter = null;
 
-    /**
-     * @var ArrayCollection
-     */
-    private $decisions;
+    private ?\Doctrine\Common\Collections\ArrayCollection $decisions = null;
 
     protected ?\DateTime $now = null;
 
-    public function __construct(private InactiveContactFinder $inactiveContactFinder, private LoggerInterface $logger, private TranslatorInterface $translator, private EventScheduler $scheduler, private InactiveHelper $helper, private EventExecutioner $executioner)
-    {
+    public function __construct(
+        private InactiveContactFinder $inactiveContactFinder,
+        private LoggerInterface $logger,
+        private TranslatorInterface $translator,
+        private EventScheduler $scheduler,
+        private InactiveHelper $helper,
+        private EventExecutioner $executioner
+    ) {
     }
 
     /**
@@ -128,7 +118,7 @@ class InactiveExecutioner implements ExecutionerInterface
     /**
      * @throws NoEventsFoundException
      */
-    private function checkCampaignIsPublished()
+    private function checkCampaignIsPublished(): void
     {
         if (!$this->decisions->count()) {
             throw new NoEventsFoundException();
@@ -144,7 +134,7 @@ class InactiveExecutioner implements ExecutionerInterface
      * @throws NoContactsFoundException
      * @throws NoEventsFoundException
      */
-    private function prepareForExecution()
+    private function prepareForExecution(): void
     {
         $this->logger->debug('CAMPAIGN: Triggering inaction events');
 

@@ -11,13 +11,13 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class AssetListType extends AbstractType
 {
-    public function __construct(private CorePermissions $corePermissions, private AssetModel $assetModel, private UserHelper $userHelper)
-    {
+    public function __construct(
+        private CorePermissions $corePermissions,
+        private AssetModel $assetModel,
+        private UserHelper $userHelper
+    ) {
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults([
@@ -29,9 +29,6 @@ class AssetListType extends AbstractType
         ]);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getParent()
     {
         return ChoiceType::class;

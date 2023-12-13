@@ -17,14 +17,13 @@ class CampaignReplySubscriber implements EventSubscriberInterface
 {
     public const TYPE = 'sms.reply';
 
-    public function __construct(private TransportChain $transportChain, private RealTimeExecutioner $realTimeExecutioner)
-    {
+    public function __construct(
+        private TransportChain $transportChain,
+        private RealTimeExecutioner $realTimeExecutioner
+    ) {
     }
 
-    /**
-     * @return array
-     */
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             CampaignEvents::CAMPAIGN_ON_BUILD => ['onCampaignBuild', 0],

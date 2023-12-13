@@ -268,7 +268,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
      *
      * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
      */
-    public function createForm($entity, FormFactoryInterface $formFactory, $action = null, $options = [])
+    public function createForm($entity, FormFactoryInterface $formFactory, $action = null, $options = []): FormInterface
     {
         if (!$entity instanceof Email) {
             throw new MethodNotAllowedHttpException(['Email']);
@@ -282,10 +282,8 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
 
     /**
      * Get a specific entity or generate a new one if id is empty.
-     *
-     * @return Email|null
      */
-    public function getEntity($id = null)
+    public function getEntity($id = null): ?Email
     {
         if (null === $id) {
             $entity = new Email();
@@ -626,10 +624,8 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
      * Get a stats for email by list.
      *
      * @param bool $includeVariants
-     *
-     * @return array
      */
-    public function getEmailListStats($email, $includeVariants = false, \DateTime $dateFrom = null, \DateTime $dateTo = null)
+    public function getEmailListStats($email, $includeVariants = false, \DateTime $dateFrom = null, \DateTime $dateTo = null): array
     {
         if (!$email instanceof Email) {
             $email = $this->getEntity($email);
@@ -727,10 +723,8 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
      *
      * @param Email|int $email
      * @param bool      $includeVariants
-     *
-     * @return array
      */
-    public function getEmailDeviceStats($email, $includeVariants = false, $dateFrom = null, $dateTo = null)
+    public function getEmailDeviceStats($email, $includeVariants = false, $dateFrom = null, $dateTo = null): array
     {
         if (!$email instanceof Email) {
             $email = $this->getEntity($email);
@@ -829,11 +823,9 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
     /**
      * @param bool $includeVariants
      *
-     * @return array
-     *
      * @throws \Mautic\EmailBundle\Stats\Exception\InvalidStatHelperException
      */
-    public function getEmailGeneralStats($email, $includeVariants, $unit, \DateTime $dateFrom, \DateTime $dateTo)
+    public function getEmailGeneralStats($email, $includeVariants, $unit, \DateTime $dateFrom, \DateTime $dateTo): array
     {
         if (!$email instanceof Email) {
             $email = $this->getEntity($email);
@@ -883,10 +875,8 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
 
     /**
      * Get an array of tracked links.
-     *
-     * @return array
      */
-    public function getEmailClickStats($emailId)
+    public function getEmailClickStats($emailId): array
     {
         return $this->pageTrackableModel->getTrackableList('email', $emailId);
     }
@@ -1722,7 +1712,6 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
      * @param int    $reason
      * @param string $comments
      * @param bool   $flush
-     * @param null   $leadId
      */
     public function setEmailDoNotContact($email, $reason = DoNotContact::BOUNCED, $comments = '', $flush = true, $leadId = null): array
     {
@@ -1776,8 +1765,6 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
     /**
      * @param string $column
      * @param bool   $canViewOthers
-     *
-     * @return array
      */
     public function getBestHours(
         $column,
@@ -1786,7 +1773,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
         array $filter = [],
         $canViewOthers = true,
         $timeFormat = 24
-    ) {
+    ): array {
         $companyId  = ArrayHelper::pickValue('companyId', $filter);
         $campaignId = ArrayHelper::pickValue('campaignId', $filter);
         $segmentId  = ArrayHelper::pickValue('segmentId', $filter);
@@ -1837,8 +1824,6 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
      * @param string|null $dateFormat
      * @param bool        $canViewOthers
      *
-     * @return array
-     *
      * @throws \Mautic\EmailBundle\Stats\Exception\InvalidStatHelperException
      */
     public function getEmailsLineChartData(
@@ -1848,7 +1833,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
         $dateFormat = null,
         array $filter = [],
         $canViewOthers = true
-    ) {
+    ): array {
         $fetchOptions = new EmailStatOptions();
         $fetchOptions->setCanViewOthers($canViewOthers);
 
@@ -1927,10 +1912,8 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
      * @param string $dateTo
      * @param array  $filters
      * @param bool   $canViewOthers
-     *
-     * @return array
      */
-    public function getIgnoredVsReadPieChartData($dateFrom, $dateTo, $filters = [], $canViewOthers = true)
+    public function getIgnoredVsReadPieChartData($dateFrom, $dateTo, $filters = [], $canViewOthers = true): array
     {
         $chart = new PieChart();
         $query = new ChartQuery($this->em->getConnection(), $dateFrom, $dateTo);
@@ -1963,10 +1946,8 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
 
     /**
      * Get pie chart data of ignored vs opened emails.
-     *
-     * @return array
      */
-    public function getDeviceGranularityPieChartData($dateFrom, $dateTo)
+    public function getDeviceGranularityPieChartData($dateFrom, $dateTo): array
     {
         $chart = new PieChart();
 
@@ -2067,10 +2048,8 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
      *
      * @param int  $limit
      * @param bool $canViewOthers
-     *
-     * @return array
      */
-    public function getUpcomingEmails($limit = 10, $canViewOthers = true)
+    public function getUpcomingEmails($limit = 10, $canViewOthers = true): array
     {
         /** @var \Mautic\CampaignBundle\Entity\LeadEventLogRepository $leadEventLogRepository */
         $leadEventLogRepository = $this->em->getRepository(\Mautic\CampaignBundle\Entity\LeadEventLog::class);

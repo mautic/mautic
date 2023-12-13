@@ -55,8 +55,13 @@ class DashboardSubscriber extends MainDashboardSubscriber
         'lead:leads:viewother',
     ];
 
-    public function __construct(protected LeadModel $leadModel, protected ListModel $leadListModel, protected RouterInterface $router, protected TranslatorInterface $translator, protected DateHelper $dateHelper)
-    {
+    public function __construct(
+        protected LeadModel $leadModel,
+        protected ListModel $leadListModel,
+        protected RouterInterface $router,
+        protected TranslatorInterface $translator,
+        protected DateHelper $dateHelper
+    ) {
     }
 
     /**
@@ -395,7 +400,7 @@ class DashboardSubscriber extends MainDashboardSubscriber
                     $limit = $params['limit'];
                 }
 
-                $leads = $this->leadModel->getLeadList($limit, $params['dateFrom'], $params['dateTo'], $canViewOthers, [], ['canViewOthers' => $canViewOthers]);
+                $leads = $this->leadModel->getLeadList($limit, $params['dateFrom'], $params['dateTo'], $canViewOthers, []);
                 $items = [];
 
                 if (empty($leads)) {

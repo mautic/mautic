@@ -21,14 +21,22 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
  */
 class PluginModel extends FormModel
 {
-    public function __construct(protected FieldModel $leadFieldModel, CoreParametersHelper $coreParametersHelper, private BundleHelper $bundleHelper, EntityManager $em, CorePermissions $security, EventDispatcherInterface $dispatcher, UrlGeneratorInterface $router, Translator $translator, UserHelper $userHelper, LoggerInterface $mauticLogger)
-    {
+    public function __construct(
+        protected FieldModel $leadFieldModel,
+        CoreParametersHelper $coreParametersHelper,
+        private BundleHelper $bundleHelper,
+        EntityManager $em,
+        CorePermissions $security,
+        EventDispatcherInterface $dispatcher,
+        UrlGeneratorInterface $router,
+        Translator $translator,
+        UserHelper $userHelper,
+        LoggerInterface $mauticLogger
+    ) {
         parent::__construct($em, $security, $dispatcher, $router, $translator, $userHelper, $mauticLogger, $coreParametersHelper);
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @return \Mautic\PluginBundle\Entity\PluginRepository
      */
     public function getRepository()
@@ -41,9 +49,6 @@ class PluginModel extends FormModel
         return $this->em->getRepository(\Mautic\PluginBundle\Entity\IntegrationEntity::class);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getPermissionBase(): string
     {
         return 'plugin:plugins';
@@ -51,16 +56,20 @@ class PluginModel extends FormModel
 
     /**
      * Get lead fields used in selects/matching.
+     *
+     * @return mixed[]
      */
-    public function getLeadFields()
+    public function getLeadFields(): array
     {
         return $this->leadFieldModel->getFieldList();
     }
 
     /**
      * Get Company fields.
+     *
+     * @return mixed[]
      */
-    public function getCompanyFields()
+    public function getCompanyFields(): array
     {
         return $this->leadFieldModel->getFieldList(true, true, ['isPublished' => true, 'object' => 'company']);
     }

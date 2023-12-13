@@ -19,8 +19,9 @@ class ContactFieldToken
     /**
      * @throws InvalidContactFieldTokenException
      */
-    public function __construct(private string $fullToken)
-    {
+    public function __construct(
+        private string $fullToken
+    ) {
         $this->parse(trim($fullToken));
     }
 

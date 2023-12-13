@@ -24,59 +24,46 @@ use Symfony\Component\Form\FormBuilder;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 /**
- * Class SalesforceIntegration.
- *
- * @method SalesforceApi getApiHelper
+ * @method SalesforceApi getApiHelper()
  */
 class SalesforceIntegration extends CrmAbstractIntegration
 {
-    private $objects = [
+    /**
+     * @var string []
+     */
+    private array $objects = [
         'Lead',
         'Contact',
         'Account',
     ];
 
-    /**
-     * @var bool
-     */
-    private $failureFetchingLeads = false;
+    private string|bool $failureFetchingLeads = false;
 
-    /**
-     * {@inheritdoc}
-     *
-     * @return string
-     */
-    public function getName()
+    public function getName(): string
     {
         return 'Salesforce';
     }
 
     /**
      * Get the array key for clientId.
-     *
-     * @return string
      */
-    public function getClientIdKey()
+    public function getClientIdKey(): string
     {
         return 'client_id';
     }
 
     /**
      * Get the array key for client secret.
-     *
-     * @return string
      */
-    public function getClientSecretKey()
+    public function getClientSecretKey(): string
     {
         return 'client_secret';
     }
 
     /**
      * Get the array key for the auth token.
-     *
-     * @return string
      */
-    public function getAuthTokenKey()
+    public function getAuthTokenKey(): string
     {
         return 'access_token';
     }
@@ -105,12 +92,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
         return ['push_lead', 'get_leads', 'push_leads'];
     }
 
-    /**
-     * {@inheritdoc}
-     *
-     * @return string
-     */
-    public function getAccessTokenUrl()
+    public function getAccessTokenUrl(): string
     {
         $config = $this->mergeConfigToFeatureSettings([]);
 
@@ -121,12 +103,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
         return 'https://login.salesforce.com/services/oauth2/token';
     }
 
-    /**
-     * {@inheritdoc}
-     *
-     * @return string
-     */
-    public function getAuthenticationUrl()
+    public function getAuthenticationUrl(): string
     {
         $config = $this->mergeConfigToFeatureSettings([]);
 
@@ -137,10 +114,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
         return 'https://login.salesforce.com/services/oauth2/authorize';
     }
 
-    /**
-     * @return string
-     */
-    public function getAuthScope()
+    public function getAuthScope(): string
     {
         return 'api refresh_token';
     }
@@ -161,8 +135,6 @@ class SalesforceIntegration extends CrmAbstractIntegration
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @param bool $inAuthorization
      */
     public function getBearerToken($inAuthorization = false)
@@ -174,12 +146,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
         return false;
     }
 
-    /**
-     * {@inheritdoc}
-     *
-     * @return string
-     */
-    public function getAuthenticationType()
+    public function getAuthenticationType(): string
     {
         return 'oauth2';
     }
@@ -189,9 +156,6 @@ class SalesforceIntegration extends CrmAbstractIntegration
         return true;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function updateDncByDate(): bool
     {
         $featureSettings = $this->settings->getFeatureSettings();
@@ -247,12 +211,9 @@ class SalesforceIntegration extends CrmAbstractIntegration
             $salesForceObjects[] = 'Lead';
         }
 
-        $isRequired = function (array $field, $object): bool {
-            return
-                ('boolean' !== $field['type'] && empty($field['nillable']) && !in_array($field['name'], ['Status', 'Id', 'CreatedDate'])) ||
-                ('Lead' == $object && in_array($field['name'], ['Company'])) ||
-                (in_array($object, ['Lead', 'Contact']) && 'Email' === $field['name']);
-        };
+        $isRequired = fn (array $field, $object): bool => ('boolean' !== $field['type'] && empty($field['nillable']) && !in_array($field['name'], ['Status', 'Id', 'CreatedDate'])) ||
+        ('Lead' == $object && in_array($field['name'], ['Company'])) ||
+        (in_array($object, ['Lead', 'Contact']) && 'Email' === $field['name']);
 
         $salesFields = [];
         try {
@@ -343,8 +304,6 @@ class SalesforceIntegration extends CrmAbstractIntegration
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @return array
      */
     public function getFormNotes($section)
@@ -853,8 +812,6 @@ class SalesforceIntegration extends CrmAbstractIntegration
 
     /**
      * @param array  $params
-     * @param null   $query
-     * @param null   $executed
      * @param array  $result
      * @param string $object
      *
@@ -919,8 +876,6 @@ class SalesforceIntegration extends CrmAbstractIntegration
 
     /**
      * @param array $params
-     * @param null  $query
-     * @param null  $executed
      *
      * @return array|null
      */
@@ -1121,9 +1076,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
         if (count($supportedObjects) > 1) {
             $sfObject = 'Contact';
         } else {
-            // Only Lead or Contact is enabled so start with which ever that is
-            reset($supportedObjects);
-            $sfObject = key($supportedObjects);
+            $sfObject = array_key_first($supportedObjects);
         }
         $noMoreUpdates   = false;
         $trackedContacts = [
@@ -1316,7 +1269,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
     /**
      * @throws \Exception
      */
-    public function getCampaignMembers($campaignId)
+    public function getCampaignMembers($campaignId): void
     {
         $this->failureFetchingLeads = false;
 
@@ -1449,10 +1402,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
         return $campaignMemberStatus;
     }
 
-    /**
-     * @return array
-     */
-    public function pushLeadToCampaign(Lead $lead, $campaignId, $status = '', $personIds = null)
+    public function pushLeadToCampaign(Lead $lead, $campaignId, $status = '', $personIds = null): bool
     {
         if (empty($personIds)) {
             // personIds should have been generated by pushLead()
@@ -1609,8 +1559,6 @@ class SalesforceIntegration extends CrmAbstractIntegration
     }
 
     /**
-     * @param null $progress
-     *
      * @return array
      *
      * @throws ApiErrorException
@@ -1689,12 +1637,6 @@ class SalesforceIntegration extends CrmAbstractIntegration
         return $sfEntityRecords;
     }
 
-    /**
-     * @param null $objectId
-     * @param null $sfRecord
-     *
-     * @return array
-     */
     protected function buildCompositeBody(
         &$mauticData,
         $objectFields,
@@ -1702,7 +1644,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
         &$entity,
         $objectId = null,
         $sfRecord = null
-    ) {
+    ): array {
         $body         = [];
         $updateEntity = [];
         $company      = null;
@@ -1868,7 +1810,6 @@ class SalesforceIntegration extends CrmAbstractIntegration
     }
 
     /**
-     * @param null   $object
      * @param string $priorityObject
      *
      * @return mixed
@@ -1881,7 +1822,6 @@ class SalesforceIntegration extends CrmAbstractIntegration
     }
 
     /**
-     * @param null   $object
      * @param string $priorityObject
      *
      * @return mixed
@@ -2047,9 +1987,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
     {
         // Salesforce craps out with double quotes and unescaped single quotes
         $findEmailsInSF = array_map(
-            function ($lead): string {
-                return str_replace("'", "\'", $this->cleanPushData($lead['email']));
-            },
+            fn ($lead): string => str_replace("'", "\'", $this->cleanPushData($lead['email'])),
             $checkEmailsInSF
         );
 
@@ -2064,9 +2002,6 @@ class SalesforceIntegration extends CrmAbstractIntegration
         return $this->getApiHelper()->request('query', ['q' => $findQuery], 'GET', false, null, $queryUrl);
     }
 
-    /**
-     * @param null $progress
-     */
     protected function prepareMauticContactsToUpdate(
         &$mauticData,
         &$checkEmailsInSF,
@@ -2346,10 +2281,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
         return $this->prepareFieldsForSync($fields, $fieldsToUpdate, $objects);
     }
 
-    /**
-     * @return array
-     */
-    protected function mapContactDataForPush(Lead $lead, $config)
+    protected function mapContactDataForPush(Lead $lead, $config): array
     {
         $fields             = array_keys($config['leadFields']);
         $fieldsToUpdateInSf = $this->getPriorityFieldsForIntegration($config);
@@ -2396,10 +2328,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
         return $mappedData;
     }
 
-    /**
-     * @return array
-     */
-    protected function mapCompanyDataForPush(Company $company, $config)
+    protected function mapCompanyDataForPush(Company $company, $config): array
     {
         $object     = 'company';
         $entity     = [];
@@ -2774,9 +2703,6 @@ class SalesforceIntegration extends CrmAbstractIntegration
         return [$totalUpdated, $totalCreated, $totalErrors, $totalIgnored];
     }
 
-    /**
-     * @param null $progress
-     */
     protected function prepareMauticCompaniesToUpdate(
         &$mauticData,
         &$checkCompaniesInSF,
@@ -2934,9 +2860,6 @@ class SalesforceIntegration extends CrmAbstractIntegration
         return 0 === $toUpdateCount;
     }
 
-    /**
-     * @param null $progress
-     */
     protected function getMauticEntitesToCreate(
         &$checkIdsInSF,
         $mauticCompanyFieldString,

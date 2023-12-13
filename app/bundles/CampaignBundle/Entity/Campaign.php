@@ -564,10 +564,7 @@ class Campaign extends FormEntity implements PublishStatusIconAttributesInterfac
         return (bool) $this->allowRestart;
     }
 
-    /**
-     * @return bool
-     */
-    public function allowRestart()
+    public function allowRestart(): bool
     {
         return $this->getAllowRestart();
     }

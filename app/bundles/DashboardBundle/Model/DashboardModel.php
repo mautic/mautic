@@ -51,9 +51,6 @@ class DashboardModel extends FormModel
         return $this->em->getRepository(Widget::class);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getPermissionBase(): string
     {
         return 'dashboard:widgets';
@@ -61,10 +58,8 @@ class DashboardModel extends FormModel
 
     /**
      * Get a specific entity or generate a new one if id is empty.
-     *
-     * @return object|null
      */
-    public function getEntity($id = null)
+    public function getEntity($id = null): ?Widget
     {
         if (null === $id) {
             return new Widget();
@@ -109,9 +104,7 @@ class DashboardModel extends FormModel
             'name'        => $name,
             'description' => $this->generateDescription(),
             'widgets'     => array_map(
-                function ($widget) {
-                    return $widget->toArray();
-                },
+                fn ($widget) => $widget->toArray(),
                 $this->getWidgets(true)
             ),
         ];
@@ -232,8 +225,6 @@ class DashboardModel extends FormModel
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @param Widget      $entity
      * @param string|null $action
      * @param array       $options
@@ -242,7 +233,7 @@ class DashboardModel extends FormModel
      *
      * @throws \Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException
      */
-    public function createForm($entity, FormFactoryInterface $formFactory, $action = null, $options = [])
+    public function createForm($entity, FormFactoryInterface $formFactory, $action = null, $options = []): \Symfony\Component\Form\FormInterface
     {
         if (!$entity instanceof Widget) {
             throw new MethodNotAllowedHttpException(['Widget'], 'Entity must be of class Widget()');

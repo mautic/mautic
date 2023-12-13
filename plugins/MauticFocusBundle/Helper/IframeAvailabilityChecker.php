@@ -14,14 +14,9 @@ use Symfony\Contracts\Translation\TranslatorInterface;
  */
 class IframeAvailabilityChecker
 {
-    /**
-     * @var TranslatorInterface
-     */
-    private $translator;
-
-    public function __construct(TranslatorInterface $translator)
-    {
-        $this->translator = $translator;
+    public function __construct(
+        private TranslatorInterface $translator
+    ) {
     }
 
     public function check(string $url, string $currentScheme): JsonResponse

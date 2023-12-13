@@ -12,11 +12,12 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class PointSubscriber implements EventSubscriberInterface
 {
-    public function __construct(private LeadModel $leadModel)
-    {
+    public function __construct(
+        private LeadModel $leadModel
+    ) {
     }
 
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             PointEvents::TRIGGER_ON_BUILD         => ['onTriggerBuild', 0],

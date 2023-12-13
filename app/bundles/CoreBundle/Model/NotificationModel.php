@@ -150,7 +150,7 @@ class NotificationModel extends FormModel
     /**
      * Get content for notifications.
      *
-     * @param null $afterId
+
      * @param bool $includeRead
      * @param int  $limit
      */

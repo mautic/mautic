@@ -11,20 +11,17 @@ use Symfony\Contracts\Translation\TranslatorInterface;
  */
 final class DncReasonHelper
 {
-    public function __construct(private TranslatorInterface $translator)
-    {
+    public function __construct(
+        private TranslatorInterface $translator
+    ) {
     }
 
     /**
      * Convert DNC reason ID to text.
      *
-     * @param int $reasonId
-     *
-     * @return string
-     *
      * @throws UnknownDncReasonException
      */
-    public function toText($reasonId)
+    public function toText(int $reasonId): string
     {
         $reasonKey = match ($reasonId) {
             DoNotContact::IS_CONTACTABLE => 'mautic.lead.event.donotcontact_contactable',

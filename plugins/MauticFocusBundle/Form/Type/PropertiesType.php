@@ -167,9 +167,6 @@ class PropertiesType extends AbstractType
         return 'focus_entity_properties';
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults(

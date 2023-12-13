@@ -9,13 +9,12 @@ class DatetimeToStringTransformer implements DataTransformerInterface
     /**
      * @param string $format
      */
-    public function __construct(private $format = 'Y-m-d H:i')
-    {
+    public function __construct(
+        private $format = 'Y-m-d H:i'
+    ) {
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @return string
      */
     public function reverseTransform($value)
@@ -30,8 +29,6 @@ class DatetimeToStringTransformer implements DataTransformerInterface
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @return \DateTime
      */
     public function transform($value)

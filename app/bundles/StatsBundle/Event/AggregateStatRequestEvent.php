@@ -11,12 +11,14 @@ class AggregateStatRequestEvent extends Event
     private \Mautic\StatsBundle\Aggregate\Collection\StatCollection $statCollection;
 
     /**
-     * AggregateStatRequestEvent constructor.
-     *
      * @param string $statName
      */
-    public function __construct(private $statName, private \DateTimeInterface $fromDateTime, private \DateTimeInterface $toDateTime, private FetchOptions $options)
-    {
+    public function __construct(
+        private $statName,
+        private \DateTimeInterface $fromDateTime,
+        private \DateTimeInterface $toDateTime,
+        private FetchOptions $options
+    ) {
         $this->statCollection = new StatCollection();
     }
 

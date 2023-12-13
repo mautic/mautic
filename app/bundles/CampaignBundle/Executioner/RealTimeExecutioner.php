@@ -31,13 +31,19 @@ class RealTimeExecutioner
      */
     private $events;
 
-    /**
-     * @var Responses
-     */
-    private $responses;
+    private ?\Mautic\CampaignBundle\Executioner\Result\Responses $responses = null;
 
-    public function __construct(private LoggerInterface $logger, private LeadModel $leadModel, private EventRepository $eventRepository, private EventExecutioner $executioner, private Executioner $decisionExecutioner, private EventCollector $collector, private EventScheduler $scheduler, private ContactTracker $contactTracker, private DecisionHelper $decisionHelper)
-    {
+    public function __construct(
+        private LoggerInterface $logger,
+        private LeadModel $leadModel,
+        private EventRepository $eventRepository,
+        private EventExecutioner $executioner,
+        private Executioner $decisionExecutioner,
+        private EventCollector $collector,
+        private EventScheduler $scheduler,
+        private ContactTracker $contactTracker,
+        private DecisionHelper $decisionHelper
+    ) {
     }
 
     /**
@@ -159,7 +165,7 @@ class RealTimeExecutioner
     /**
      * @throws CampaignNotExecutableException
      */
-    private function fetchCurrentContact()
+    private function fetchCurrentContact(): void
     {
         $this->contact = $this->contactTracker->getContact();
         if (!$this->contact instanceof Lead || !$this->contact->getId()) {
@@ -172,7 +178,7 @@ class RealTimeExecutioner
     /**
      * @throws CampaignNotExecutableException
      */
-    private function fetchCampaignData($type)
+    private function fetchCampaignData($type): void
     {
         if (!$this->events = $this->eventRepository->getContactPendingEvents($this->contact->getId(), $type)) {
             throw new CampaignNotExecutableException('Contact does not have any applicable '.$type.' associations.');

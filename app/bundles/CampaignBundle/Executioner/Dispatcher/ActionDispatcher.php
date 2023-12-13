@@ -21,8 +21,13 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class ActionDispatcher
 {
-    public function __construct(private EventDispatcherInterface $dispatcher, private LoggerInterface $logger, private EventScheduler $scheduler, private NotificationHelper $notificationHelper, private LegacyEventDispatcher $legacyDispatcher)
-    {
+    public function __construct(
+        private EventDispatcherInterface $dispatcher,
+        private LoggerInterface $logger,
+        private EventScheduler $scheduler,
+        private NotificationHelper $notificationHelper,
+        private LegacyEventDispatcher $legacyDispatcher
+    ) {
     }
 
     /**
@@ -111,7 +116,7 @@ class ActionDispatcher
      * @throws LogNotProcessedException
      * @throws LogPassedAndFailedException
      */
-    private function validateProcessedLogs(ArrayCollection $pending, ArrayCollection $success, ArrayCollection $failed)
+    private function validateProcessedLogs(ArrayCollection $pending, ArrayCollection $success, ArrayCollection $failed): void
     {
         foreach ($pending as $log) {
             if (!$success->contains($log) && !$failed->contains($log)) {

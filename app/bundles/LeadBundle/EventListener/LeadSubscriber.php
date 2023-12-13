@@ -54,10 +54,7 @@ class LeadSubscriber implements EventSubscriberInterface
         $this->setModelFactory($modelFactory);
     }
 
-    /**
-     * @return array
-     */
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             LeadEvents::LEAD_POST_SAVE       => ['onLeadPostSave', 0],
@@ -503,7 +500,7 @@ class LeadSubscriber implements EventSubscriberInterface
 
         if (!$event->isEngagementCount()) {
             foreach ($rows['results'] as $row) {
-                $row['reason'] = $this->dncReasonHelper->toText($row['reason']);
+                $row['reason'] = $this->dncReasonHelper->toText((int) $row['reason']);
 
                 $template = '@MauticLead/SubscribedEvents/Timeline/donotcontact.html.twig';
                 $icon     = 'fa-ban';

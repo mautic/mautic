@@ -13,8 +13,6 @@ use Symfony\Component\Form\FormFactoryInterface;
 class ActionModel extends CommonFormModel
 {
     /**
-     * {@inheritdoc}
-     *
      * @return \Mautic\FormBundle\Entity\ActionRepository
      */
     public function getRepository()
@@ -22,18 +20,12 @@ class ActionModel extends CommonFormModel
         return $this->em->getRepository(\Mautic\FormBundle\Entity\Action::class);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getPermissionBase(): string
     {
         return 'form:forms';
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getEntity($id = null)
+    public function getEntity($id = null): ?Action
     {
         if (null === $id) {
             return new Action();
@@ -44,10 +36,9 @@ class ActionModel extends CommonFormModel
 
     /**
      * @param object $entity
-     * @param null   $action
      * @param array  $options
      */
-    public function createForm($entity, FormFactoryInterface $formFactory, $action = null, $options = [])
+    public function createForm($entity, FormFactoryInterface $formFactory, $action = null, $options = []): \Symfony\Component\Form\FormInterface
     {
         if (!$entity instanceof Action) {
             throw new \InvalidArgumentException('Entity must be of class Action');
@@ -68,10 +59,8 @@ class ActionModel extends CommonFormModel
      * Get segments which are dependent on given segment.
      *
      * @param int $segmentId
-     *
-     * @return array
      */
-    public function getFormsIdsWithDependenciesOnSegment($segmentId)
+    public function getFormsIdsWithDependenciesOnSegment($segmentId): array
     {
         $filter = [
             'force'  => [

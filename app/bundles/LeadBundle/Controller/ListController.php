@@ -836,9 +836,6 @@ class ListController extends FormController
         return $model;
     }
 
-    /**
-     * Get Model Name.
-     */
     protected function getModelName(): string
     {
         return 'lead.list';

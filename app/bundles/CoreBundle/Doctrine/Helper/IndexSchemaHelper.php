@@ -48,8 +48,10 @@ class IndexSchemaHelper
     /**
      * @param string $prefix
      */
-    public function __construct(protected Connection $db, protected $prefix)
-    {
+    public function __construct(
+        protected Connection $db,
+        protected $prefix
+    ) {
         $this->sm     = $this->db->getSchemaManager();
     }
 
@@ -157,11 +159,9 @@ class IndexSchemaHelper
     }
 
     /**
-     * @return array
-     *
      * @throws \Doctrine\DBAL\Schema\SchemaException
      */
-    private function getTextColumns($columns)
+    private function getTextColumns($columns): array
     {
         if (!is_array($columns)) {
             $columns = [$columns];

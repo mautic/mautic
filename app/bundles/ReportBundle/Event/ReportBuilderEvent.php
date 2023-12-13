@@ -13,10 +13,8 @@ class ReportBuilderEvent extends AbstractReportEvent
 {
     /**
      * Container with registered tables and columns.
-     *
-     * @var array
      */
-    private $tableArray = [];
+    private array $tableArray = [];
 
     /**
      * @var string[]
@@ -34,26 +32,17 @@ class ReportBuilderEvent extends AbstractReportEvent
     private array $graphArray = [];
 
     /**
-     * List of published array of lead fields.
-     *
-     * @var mixed[]|Paginator|array
-     */
-    private $leadFields = [];
-
-    /**
-     * @param string                  $context
-     * @param mixed[]|Paginator|array $leadFields
+     * @param mixed[]|Paginator|array $leadFields list of published array of lead fields
      */
     public function __construct(
         private TranslatorInterface $translator,
         private ChannelListHelper $channelListHelper,
-        $context,
-        $leadFields,
+        string $context,
+        private array|Paginator $leadFields,
         private ReportHelper $reportHelper,
         private ?string $reportSource = null
     ) {
-        $this->context           = $context;
-        $this->leadFields        = $leadFields;
+        $this->context = $context;
     }
 
     /**
@@ -132,17 +121,15 @@ class ReportBuilderEvent extends AbstractReportEvent
      *
      * @return array<string,array<string,string>>
      */
-    public function getStandardColumns($prefix, $removeColumns = [], $idLink = null)
+    public function getStandardColumns($prefix, $removeColumns = [], $idLink = null): array
     {
         return $this->reportHelper->getStandardColumns($prefix, $removeColumns, (string) $idLink);
     }
 
     /**
      * Returns lead columns.
-     *
-     * @return array
      */
-    public function getLeadColumns($prefix = 'l.')
+    public function getLeadColumns($prefix = 'l.'): array
     {
         $fields = [];
 

@@ -114,8 +114,6 @@ class DoNotContactRepository extends CommonRepository
     }
 
     /**
-     * @param null $leadId
-     *
      * @return array
      */
     public function getTimelineStats($leadId = null, array $options = [])

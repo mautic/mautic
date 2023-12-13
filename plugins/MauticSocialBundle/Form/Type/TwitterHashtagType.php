@@ -8,9 +8,6 @@ use Symfony\Component\Form\FormBuilderInterface;
 
 class TwitterHashtagType extends TwitterAbstractType
 {
-    /**
-     * {@inheritdoc}
-     */
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder->add('hashtag', TextType::class, [

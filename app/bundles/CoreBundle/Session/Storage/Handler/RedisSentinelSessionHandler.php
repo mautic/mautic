@@ -17,8 +17,10 @@ class RedisSentinelSessionHandler extends AbstractSessionHandler
      */
     private \Predis\Client $redis;
 
-    public function __construct(private array $redisConfiguration, CoreParametersHelper $coreParametersHelper)
-    {
+    public function __construct(
+        private array $redisConfiguration,
+        CoreParametersHelper $coreParametersHelper
+    ) {
         $redisOptions = PRedisConnectionHelper::makeRedisOptions($redisConfiguration, 'session:'.$coreParametersHelper->get('db_name').':');
 
         $redisOptions['primaryOnly'] = $coreParametersHelper->get('redis_primary_only');
@@ -33,7 +35,7 @@ class RedisSentinelSessionHandler extends AbstractSessionHandler
 
     protected function doWrite(string $sessionId, string $data): bool
     {
-        $expireTime = isset($this->redisConfiguration['session_expire_time']) ? (int) $this->redisConfiguration['session_expire_time'] : 1209600;
+        $expireTime = isset($this->redisConfiguration['session_expire_time']) ? (int) $this->redisConfiguration['session_expire_time'] : 1_209_600;
         $result     = $this->redis->setEx($sessionId, $expireTime, $data);
 
         return $result && !$result instanceof ErrorInterface;
@@ -58,7 +60,7 @@ class RedisSentinelSessionHandler extends AbstractSessionHandler
 
     public function updateTimestamp($sessionId, $data): bool
     {
-        $expireTime = isset($this->redisConfiguration['session_expire_time']) ? (int) $this->redisConfiguration['session_expire_time'] : 1209600;
+        $expireTime = isset($this->redisConfiguration['session_expire_time']) ? (int) $this->redisConfiguration['session_expire_time'] : 1_209_600;
 
         return (bool) $this->redis->expire($sessionId, $expireTime);
     }

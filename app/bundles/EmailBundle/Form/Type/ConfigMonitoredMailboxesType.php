@@ -17,8 +17,9 @@ use Symfony\Component\Validator\Constraints\Email;
 
 class ConfigMonitoredMailboxesType extends AbstractType
 {
-    public function __construct(private Mailbox $imapHelper)
-    {
+    public function __construct(
+        private Mailbox $imapHelper
+    ) {
     }
 
     public function buildForm(FormBuilderInterface $builder, array $options): void
@@ -211,25 +212,16 @@ class ConfigMonitoredMailboxesType extends AbstractType
         );
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setRequired(['mailbox', 'default_folder', 'general_settings']);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function buildView(FormView $view, FormInterface $form, array $options): void
     {
         $view->vars['mailbox'] = $options['mailbox'];
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getBlockPrefix()
     {
         return 'monitored_mailboxes';

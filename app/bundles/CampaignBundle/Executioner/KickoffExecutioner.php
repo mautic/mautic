@@ -2,7 +2,6 @@
 
 namespace Mautic\CampaignBundle\Executioner;
 
-use Doctrine\Common\Collections\ArrayCollection;
 use Mautic\CampaignBundle\Entity\Campaign;
 use Mautic\CampaignBundle\Entity\Event;
 use Mautic\CampaignBundle\Executioner\ContactFinder\KickoffContactFinder;
@@ -14,45 +13,31 @@ use Mautic\CampaignBundle\Executioner\Scheduler\EventScheduler;
 use Mautic\CampaignBundle\Executioner\Scheduler\Exception\NotSchedulableException;
 use Mautic\CoreBundle\Helper\ProgressBarHelper;
 use Psr\Log\LoggerInterface;
-use Symfony\Component\Console\Helper\ProgressBar;
 use Symfony\Component\Console\Output\NullOutput;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 class KickoffExecutioner implements ExecutionerInterface
 {
-    /**
-     * @var ContactLimiter
-     */
-    private $limiter;
+    private ?\Mautic\CampaignBundle\Executioner\ContactFinder\Limiter\ContactLimiter $limiter = null;
 
-    /**
-     * @var Campaign
-     */
-    private $campaign;
+    private ?\Mautic\CampaignBundle\Entity\Campaign $campaign = null;
 
-    /**
-     * @var OutputInterface
-     */
-    private $output;
+    private ?\Symfony\Component\Console\Output\OutputInterface $output = null;
 
-    /**
-     * @var ProgressBar
-     */
-    private $progressBar;
+    private ?\Symfony\Component\Console\Helper\ProgressBar $progressBar = null;
 
-    /**
-     * @var ArrayCollection
-     */
-    private $rootEvents;
+    private ?\Doctrine\Common\Collections\ArrayCollection $rootEvents = null;
 
-    /**
-     * @var Counter
-     */
-    private $counter;
+    private ?\Mautic\CampaignBundle\Executioner\Result\Counter $counter = null;
 
-    public function __construct(private LoggerInterface $logger, private KickoffContactFinder $kickoffContactFinder, private TranslatorInterface $translator, private EventExecutioner $executioner, private EventScheduler $scheduler)
-    {
+    public function __construct(
+        private LoggerInterface $logger,
+        private KickoffContactFinder $kickoffContactFinder,
+        private TranslatorInterface $translator,
+        private EventExecutioner $executioner,
+        private EventScheduler $scheduler
+    ) {
     }
 
     /**
@@ -90,7 +75,7 @@ class KickoffExecutioner implements ExecutionerInterface
     /**
      * @throws NoEventsFoundException
      */
-    private function prepareForExecution()
+    private function prepareForExecution(): void
     {
         $this->logger->debug('CAMPAIGN: Triggering kickoff events');
 

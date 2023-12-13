@@ -8,45 +8,24 @@ class ContactLimiter
 {
     private int $batchLimit;
 
-    /**
-     * @var int|null
-     */
-    private $contactId;
+    private ?int $contactId;
 
-    /**
-     * @var int|null
-     */
-    private $minContactId;
+    private ?int $minContactId;
 
-    /**
-     * @var int|null
-     */
-    private $batchMinContactId;
+    private ?int $batchMinContactId = null;
 
-    /**
-     * @var int|null
-     */
-    private $maxContactId;
+    private ?int $maxContactId;
 
-    /**
-     * @var int|null
-     */
-    private $threadId;
+    private ?int $threadId = null;
 
-    /**
-     * @var int|null
-     */
-    private $maxThreads;
+    private ?int $maxThreads = null;
 
     /**
      * @var int|null
      */
     private $campaignLimit;
 
-    /**
-     * @var int|null
-     */
-    private $campaignLimitUsed;
+    private ?int $campaignLimitUsed = null;
 
     /**
      * @param int      $batchLimit
@@ -100,10 +79,7 @@ class ContactLimiter
         return $this->contactId;
     }
 
-    /**
-     * @return int|null
-     */
-    public function getMinContactId()
+    public function getMinContactId(): ?int
     {
         return $this->batchMinContactId ?: $this->minContactId;
     }

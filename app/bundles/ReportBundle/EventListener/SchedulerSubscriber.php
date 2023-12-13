@@ -9,14 +9,12 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class SchedulerSubscriber implements EventSubscriberInterface
 {
-    public function __construct(private SendSchedule $sendSchedule)
-    {
+    public function __construct(
+        private SendSchedule $sendSchedule
+    ) {
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             ReportEvents::REPORT_SCHEDULE_SEND => ['onScheduleSend', 0],

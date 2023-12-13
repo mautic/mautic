@@ -13,8 +13,10 @@ class Adder
 {
     public const NAME = 'added';
 
-    public function __construct(private LeadRepository $leadRepository, private LeadEventLogRepository $leadEventLogRepository)
-    {
+    public function __construct(
+        private LeadRepository $leadRepository,
+        private LeadEventLogRepository $leadEventLogRepository
+    ) {
     }
 
     public function createNewMembership(Lead $contact, Campaign $campaign, $isManualAction): CampaignMember
@@ -43,7 +45,7 @@ class Adder
      *
      * @throws ContactCannotBeAddedToCampaignException
      */
-    public function updateExistingMembership(CampaignMember $campaignMember, $isManualAction)
+    public function updateExistingMembership(CampaignMember $campaignMember, $isManualAction): void
     {
         $wasRemoved = $campaignMember->wasManuallyRemoved();
         if (!($wasRemoved && $isManualAction) && !$campaignMember->getCampaign()->allowRestart()) {

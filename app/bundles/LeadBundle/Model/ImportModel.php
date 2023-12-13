@@ -155,7 +155,7 @@ class ImportModel extends FormModel
      * @throws ImportFailedException
      * @throws ImportDelayedException
      */
-    public function beginImport(Import $import, Progress $progress, $limit = 0)
+    public function beginImport(Import $import, Progress $progress, $limit = 0): void
     {
         $this->setGhostImportsAsFailed();
 
@@ -489,10 +489,8 @@ class ImportModel extends FormModel
      * @param string $unit       {@link php.net/manual/en/function.date.php#refsect1-function.date-parameters}
      * @param string $dateFormat
      * @param array  $filter
-     *
-     * @return array
      */
-    public function getImportedRowsLineChartData($unit, \DateTimeInterface $dateFrom, \DateTimeInterface $dateTo, $dateFormat = null, $filter = [])
+    public function getImportedRowsLineChartData($unit, \DateTimeInterface $dateFrom, \DateTimeInterface $dateTo, $dateFormat = null, $filter = []): array
     {
         $filter['object'] = 'import';
         $filter['bundle'] = 'lead';
@@ -547,9 +545,6 @@ class ImportModel extends FormModel
         return $this->em->getRepository(\Mautic\LeadBundle\Entity\LeadEventLog::class);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getPermissionBase(): string
     {
         return 'lead:imports';
@@ -575,10 +570,8 @@ class ImportModel extends FormModel
 
     /**
      * Get a specific entity or generate a new one if id is empty.
-     *
-     * @return object|null
      */
-    public function getEntity($id = null)
+    public function getEntity($id = null): ?Import
     {
         if (null === $id) {
             return new Import();
@@ -588,8 +581,6 @@ class ImportModel extends FormModel
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @throws \Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException
      */
     protected function dispatchEvent($action, &$entity, $isNew = false, Event $event = null): ?Event

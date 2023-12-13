@@ -30,44 +30,41 @@ class ReportSubscriberTest extends \PHPUnit\Framework\TestCase
     /**
      * @var MockObject|Connection
      */
-    private $connectionMock;
+    private \PHPUnit\Framework\MockObject\MockObject $connectionMock;
 
     /**
      * @var MockObject|CompanyReportData
      */
-    private $companyReportDataMock;
+    private \PHPUnit\Framework\MockObject\MockObject $companyReportDataMock;
 
     /**
      * @var MockObject|StatRepository
      */
-    private $statRepository;
+    private \PHPUnit\Framework\MockObject\MockObject $statRepository;
 
     /**
      * @var MockObject&GeneratedColumnsProviderInterface
      */
-    private $generatedColumnsProvider;
+    private \PHPUnit\Framework\MockObject\MockObject $generatedColumnsProvider;
 
     /**
      * @var MockObject|Report
      */
-    private $report;
+    private \PHPUnit\Framework\MockObject\MockObject $report;
 
-    /**
-     * @var ChannelListHelper
-     */
-    private $channelListHelper;
+    private \Mautic\ChannelBundle\Helper\ChannelListHelper $channelListHelper;
 
     /**
      * @var MockObject|QueryBuilder
      */
-    private $queryBuilder;
+    private \Doctrine\DBAL\Query\QueryBuilder $queryBuilder;
 
     private ReportSubscriber $subscriber;
 
     /**
      * @var MockObject|FieldsBuilder
      */
-    private $fieldsBuilderMock;
+    private \PHPUnit\Framework\MockObject\MockObject $fieldsBuilderMock;
 
     protected function setUp(): void
     {

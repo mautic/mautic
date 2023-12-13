@@ -8,14 +8,23 @@ use Psr\Log\LoggerInterface;
 abstract class AbstractLookup
 {
     public $city         = '';
+
     public $region       = '';
+
     public $zipcode      = '';
+
     public $country      = '';
+
     public $latitude     = '';
+
     public $longitude    = '';
+
     public $isp          = '';
+
     public $organization = '';
+
     public $timezone     = '';
+
     public $extra        = '';
 
     /**
@@ -35,12 +44,6 @@ abstract class AbstractLookup
      */
     abstract protected function lookup();
 
-    /**
-     * AbstractLookup constructor.
-     *
-     * @param null $config
-     * @param null $cacheDir
-     */
     public function __construct(
         protected ?string $auth = null,
         protected $config = null,

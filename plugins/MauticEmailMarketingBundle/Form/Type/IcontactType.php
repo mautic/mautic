@@ -17,20 +17,12 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class IcontactType extends AbstractType
 {
-    private IntegrationHelper $integrationHelper;
-
-    private PluginModel $pluginModel;
-
-    protected SessionInterface $session;
-
-    protected CoreParametersHelper $coreParametersHelper;
-
-    public function __construct(IntegrationHelper $integrationHelper, PluginModel $pluginModel, SessionInterface $session, CoreParametersHelper $coreParametersHelper)
-    {
-        $this->integrationHelper    = $integrationHelper;
-        $this->pluginModel          = $pluginModel;
-        $this->session              = $session;
-        $this->coreParametersHelper = $coreParametersHelper;
+    public function __construct(
+        private IntegrationHelper $integrationHelper,
+        private PluginModel $pluginModel,
+        protected SessionInterface $session,
+        protected CoreParametersHelper $coreParametersHelper
+    ) {
     }
 
     public function buildForm(FormBuilderInterface $builder, array $options): void
@@ -105,9 +97,6 @@ class IcontactType extends AbstractType
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefined(['form_area']);

@@ -15,14 +15,13 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class CampaignActionDNCSubscriber implements EventSubscriberInterface
 {
-    public function __construct(private DoNotContact $doNotContact, private LeadModel $leadModel)
-    {
+    public function __construct(
+        private DoNotContact $doNotContact,
+        private LeadModel $leadModel
+    ) {
     }
 
-    /**
-     * @return array
-     */
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             CampaignEvents::CAMPAIGN_ON_BUILD                  => ['configureAction', 0],

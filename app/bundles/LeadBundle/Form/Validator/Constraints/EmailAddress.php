@@ -7,11 +7,8 @@ use Symfony\Component\Validator\Constraint;
 #[\Attribute]
 class EmailAddress extends Constraint
 {
-    /**
-     * {@inheritdoc}
-     */
     public function validatedBy()
     {
-        return \get_class($this).'Validator';
+        return static::class.'Validator';
     }
 }

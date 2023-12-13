@@ -9,13 +9,13 @@ use Twig\Environment;
 
 class MenuRenderer implements RendererInterface
 {
-    /**
-     * @var array
-     */
-    private $defaultOptions;
+    private array $defaultOptions;
 
-    public function __construct(private MatcherInterface $matcher, private Environment $twig, array $defaultOptions = [])
-    {
+    public function __construct(
+        private MatcherInterface $matcher,
+        private Environment $twig,
+        array $defaultOptions = []
+    ) {
         $this->defaultOptions = array_merge(
             [
                 'depth'             => null,
