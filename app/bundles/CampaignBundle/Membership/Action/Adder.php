@@ -13,29 +13,13 @@ class Adder
 {
     public const NAME = 'added';
 
-    /**
-     * @var LeadRepository
-     */
-    private $leadRepository;
-
-    /**
-     * @var LeadEventLogRepository
-     */
-    private $leadEventLogRepository;
-
-    /**
-     * Adder constructor.
-     */
-    public function __construct(LeadRepository $leadRepository, LeadEventLogRepository $leadEventLogRepository)
-    {
-        $this->leadRepository         = $leadRepository;
-        $this->leadEventLogRepository = $leadEventLogRepository;
+    public function __construct(
+        private LeadRepository $leadRepository,
+        private LeadEventLogRepository $leadEventLogRepository
+    ) {
     }
 
-    /**
-     * @return CampaignMember
-     */
-    public function createNewMembership(Lead $contact, Campaign $campaign, $isManualAction)
+    public function createNewMembership(Lead $contact, Campaign $campaign, $isManualAction): CampaignMember
     {
         // BC support for prior to 2.14.
         // If the contact was in the campaign to start with then removed, their logs remained but the original membership was removed
@@ -61,7 +45,7 @@ class Adder
      *
      * @throws ContactCannotBeAddedToCampaignException
      */
-    public function updateExistingMembership(CampaignMember $campaignMember, $isManualAction)
+    public function updateExistingMembership(CampaignMember $campaignMember, $isManualAction): void
     {
         $wasRemoved = $campaignMember->wasManuallyRemoved();
         if (!($wasRemoved && $isManualAction) && !$campaignMember->getCampaign()->allowRestart()) {
@@ -89,7 +73,7 @@ class Adder
         $this->saveCampaignMember($campaignMember);
     }
 
-    private function saveCampaignMember($campaignMember)
+    private function saveCampaignMember($campaignMember): void
     {
         $this->leadRepository->saveEntity($campaignMember);
         $this->leadRepository->detachEntity($campaignMember);

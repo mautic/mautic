@@ -11,20 +11,15 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class LeadFieldsType extends AbstractType
 {
-    /**
-     * @var FieldModel
-     */
-    protected $fieldModel;
-
-    public function __construct(FieldModel $fieldModel)
-    {
-        $this->fieldModel = $fieldModel;
+    public function __construct(
+        protected FieldModel $fieldModel
+    ) {
     }
 
-    public function configureOptions(OptionsResolver $resolver)
+    public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults([
-            'choices' => function (Options $options) {
+            'choices' => function (Options $options): array {
                 $fieldList = ArrayHelper::flipArray($this->fieldModel->getFieldList());
                 if ($options['with_tags']) {
                     $fieldList['Core']['mautic.lead.field.tags'] = 'tags';

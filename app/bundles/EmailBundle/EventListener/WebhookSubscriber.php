@@ -12,20 +12,12 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class WebhookSubscriber implements EventSubscriberInterface
 {
-    /**
-     * @var WebhookModel
-     */
-    private $webhookModel;
-
-    public function __construct(WebhookModel $webhookModel)
-    {
-        $this->webhookModel = $webhookModel;
+    public function __construct(
+        private WebhookModel $webhookModel
+    ) {
     }
 
-    /**
-     * @return array
-     */
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             EmailEvents::EMAIL_ON_SEND      => ['onEmailSend', 0],
@@ -37,7 +29,7 @@ class WebhookSubscriber implements EventSubscriberInterface
     /**
      * Add event triggers and actions.
      */
-    public function onWebhookBuild(WebhookBuilderEvent $event)
+    public function onWebhookBuild(WebhookBuilderEvent $event): void
     {
         // add checkbox to the webhook form for new leads
         $mailSend= [
@@ -77,7 +69,7 @@ class WebhookSubscriber implements EventSubscriberInterface
         );
     }
 
-    public function onEmailOpen(EmailOpenEvent $event)
+    public function onEmailOpen(EmailOpenEvent $event): void
     {
         $this->webhookModel->queueWebhooksByType(
             EmailEvents::EMAIL_ON_OPEN,

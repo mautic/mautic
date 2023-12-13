@@ -18,7 +18,7 @@ class FuzzyEvidence implements JudgementModeInterface
     ): InformationChangeRequestDAO {
         try {
             return BestEvidence::adjudicate($leftChangeRequest, $rightChangeRequest);
-        } catch (ConflictUnresolvedException $exception) {
+        } catch (ConflictUnresolvedException) {
         }
 
         if (

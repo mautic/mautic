@@ -44,7 +44,7 @@ class StagesChangeLogRepository extends CommonRepository
      * @param int $fromLeadId
      * @param int $toLeadId
      */
-    public function updateLead($fromLeadId, $toLeadId)
+    public function updateLead($fromLeadId, $toLeadId): void
     {
         $q = $this->_em->getConnection()->createQueryBuilder();
         $q->update(MAUTIC_TABLE_PREFIX.'lead_stages_change_log')
@@ -57,10 +57,8 @@ class StagesChangeLogRepository extends CommonRepository
      * Get the current stage assigned to a lead.
      *
      * @param int $leadId
-     *
-     * @return mixed
      */
-    public function getCurrentLeadStage($leadId)
+    public function getCurrentLeadStage($leadId): ?int
     {
         $query = $this->getEntityManager()->getConnection()->createQueryBuilder();
 

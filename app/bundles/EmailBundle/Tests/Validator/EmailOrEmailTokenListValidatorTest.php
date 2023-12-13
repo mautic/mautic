@@ -26,8 +26,11 @@ final class EmailOrEmailTokenListValidatorTest extends TestCase
     public function testNoEmailsProvided($value, int $expectedViolationCount, callable $getFieldMocker, callable $violationResult): void
     {
         $context = new class() extends ExecutionContext {
-            /** @var callable */
+            /**
+             * @var callable
+             */
             public $violationResult;
+
             public int $violationCount = 0;
 
             public function __construct()
@@ -36,10 +39,8 @@ final class EmailOrEmailTokenListValidatorTest extends TestCase
 
             /**
              * @param mixed[] $parameters
-             *
-             * @return void
              */
-            public function addViolation($message, array $parameters = [])
+            public function addViolation($message, array $parameters = []): void
             {
                 ++$this->violationCount;
                 ($this->violationResult)($message, $parameters);
@@ -75,7 +76,9 @@ final class EmailOrEmailTokenListValidatorTest extends TestCase
         };
 
         $fieldModel = new class() extends FieldModel {
-            /** @var callable */
+            /**
+             * @var callable
+             */
             public $getFieldMocker;
 
             public function __construct()
@@ -104,17 +107,17 @@ final class EmailOrEmailTokenListValidatorTest extends TestCase
     /**
      * @return \Generator<mixed[]>
      */
-    public function provider(): \Generator
+    public static function Provider(): \Generator
     {
         // Test null value.
         yield [
             null,
             0,
-            function () {
-                $this->fail('Field should not be fetched');
+            function (): void {
+                self::fail('Field should not be fetched');
             },
-            function () {
-                $this->fail('Null value should not be validated.');
+            function (): void {
+                self::fail('Null value should not be validated.');
             },
         ];
 
@@ -122,11 +125,11 @@ final class EmailOrEmailTokenListValidatorTest extends TestCase
         yield [
             '',
             0,
-            function () {
-                $this->fail('Field should not be fetched');
+            function (): void {
+                self::fail('Field should not be fetched');
             },
-            function () {
-                $this->fail('Empty string value should not be validated.');
+            function (): void {
+                self::fail('Empty string value should not be validated.');
             },
         ];
 
@@ -134,10 +137,10 @@ final class EmailOrEmailTokenListValidatorTest extends TestCase
         yield [
             'somestring',
             1,
-            function () {
-                $this->fail('Field should not be fetched');
+            function (): void {
+                self::fail('Field should not be fetched');
             },
-            function ($message, array $parameters = []) {
+            function ($message, array $parameters = []): void {
                 Assert::assertSame('mautic.email.email_or_token.not_valid', $message);
                 Assert::assertSame(
                     [
@@ -153,11 +156,11 @@ final class EmailOrEmailTokenListValidatorTest extends TestCase
         yield [
             'john@doe.com',
             0,
-            function () {
-                $this->fail('Field should not be fetched');
+            function (): void {
+                self::fail('Field should not be fetched');
             },
-            function () {
-                $this->fail('Valid email address value should not add violation.');
+            function (): void {
+                self::fail('Valid email address value should not add violation.');
             },
         ];
 
@@ -165,10 +168,10 @@ final class EmailOrEmailTokenListValidatorTest extends TestCase
         yield [
             'john@doe.com, somestring',
             1,
-            function () {
-                $this->fail('Field should not be fetched');
+            function (): void {
+                self::fail('Field should not be fetched');
             },
-            function ($message, array $parameters = []) {
+            function ($message, array $parameters = []): void {
                 Assert::assertSame('mautic.email.email_or_token.not_valid', $message);
                 Assert::assertSame(
                     [
@@ -183,10 +186,10 @@ final class EmailOrEmailTokenListValidatorTest extends TestCase
         yield [
             'john@doe.com, {contactfield=somefield | invalid-default-email-address}',
             1,
-            function () {
-                $this->fail('Field should not be fetched');
+            function (): void {
+                self::fail('Field should not be fetched');
             },
-            function ($message, array $parameters = []) {
+            function ($message, array $parameters = []): void {
                 Assert::assertSame('mautic.email.email_or_token.not_valid', $message);
                 Assert::assertSame(
                     [
@@ -207,7 +210,7 @@ final class EmailOrEmailTokenListValidatorTest extends TestCase
 
                 return null;
             },
-            function ($message, array $parameters = []) {
+            function ($message, array $parameters = []): void {
                 Assert::assertSame('mautic.email.email_or_token.not_valid', $message);
                 Assert::assertSame(
                     [
@@ -232,7 +235,7 @@ final class EmailOrEmailTokenListValidatorTest extends TestCase
 
                 return $field;
             },
-            function ($message, array $parameters = []) {
+            function ($message, array $parameters = []): void {
                 Assert::assertSame('mautic.email.email_or_token.not_valid', $message);
                 Assert::assertSame(
                     [
@@ -257,8 +260,8 @@ final class EmailOrEmailTokenListValidatorTest extends TestCase
 
                 return $field;
             },
-            function () {
-                $this->fail('There is no violation');
+            function (): void {
+                self::fail('There is no violation');
             },
         ];
 
@@ -275,7 +278,7 @@ final class EmailOrEmailTokenListValidatorTest extends TestCase
 
                 return $field;
             },
-            function ($message, array $parameters = []) {
+            function ($message, array $parameters = []): void {
                 Assert::assertSame('mautic.email.email_or_token.not_valid', $message);
                 Assert::assertSame(
                     [

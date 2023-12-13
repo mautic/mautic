@@ -9,9 +9,6 @@ use Symfony\Component\HttpKernel\Bundle\Bundle;
 
 class MauticCoreBundle extends Bundle
 {
-    /**
-     * {@inheritdoc}
-     */
     public function build(ContainerBuilder $container): void
     {
         $container->addCompilerPass(new Compiler\ConfiguratorPass(), PassConfig::TYPE_BEFORE_OPTIMIZATION, 0);

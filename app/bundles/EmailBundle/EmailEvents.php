@@ -3,7 +3,6 @@
 namespace Mautic\EmailBundle;
 
 /**
- * Class EmailEvents
  * Events available for EmailBundle.
  */
 final class EmailEvents

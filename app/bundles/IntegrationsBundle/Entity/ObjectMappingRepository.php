@@ -14,10 +14,7 @@ use Mautic\CoreBundle\Helper\DateTimeHelper;
  */
 class ObjectMappingRepository extends CommonRepository
 {
-    /**
-     * @return array|null
-     */
-    public function getInternalObject($integration, $integrationObjectName, $integrationObjectId, $internalObjectName)
+    public function getInternalObject($integration, $integrationObjectName, $integrationObjectId, $internalObjectName): ?array
     {
         return $this->doGetInternalObject($integration, $integrationObjectName, $integrationObjectId, $internalObjectName);
     }
@@ -62,10 +59,8 @@ class ObjectMappingRepository extends CommonRepository
      * @param mixed  $oldObjectId
      * @param string $newObjectName
      * @param mixed  $newObjectId
-     *
-     * @return int
      */
-    public function updateIntegrationObject($integration, $oldObjectName, $oldObjectId, $newObjectName, $newObjectId)
+    public function updateIntegrationObject($integration, $oldObjectName, $oldObjectId, $newObjectName, $newObjectId): int
     {
         $qb = $this->getEntityManager()->getConnection()->createQueryBuilder();
 

@@ -69,7 +69,7 @@ class CategoryControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertStringNotContainsString('TestTitleCategoryController2', $clientResponseContent, 'The return must not contain TestTitleCategoryController2');
     }
 
-    public function testNewActionWithInForm()
+    public function testNewActionWithInForm(): void
     {
         $crawler                = $this->client->request(Request::METHOD_GET, 's/categories/category/new');
         $clientResponse         = json_decode($this->client->getResponse()->getContent(), true);

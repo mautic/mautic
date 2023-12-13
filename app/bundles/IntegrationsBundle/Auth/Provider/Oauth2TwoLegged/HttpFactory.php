@@ -36,27 +36,18 @@ class HttpFactory implements AuthProviderInterface
 {
     public const NAME = 'oauth2_two_legged';
 
-    /**
-     * @var PasswordCredentialsGrantInterface|ClientCredentialsGrantInterface
-     */
-    private $credentials;
+    private PasswordCredentialsGrantInterface|ClientCredentialsGrantInterface|null $credentials = null;
 
-    /**
-     * @var ConfigCredentialsSignerInterface|ConfigTokenPersistenceInterface|ConfigTokenSignerInterface
-     */
-    private $config;
+    private ConfigCredentialsSignerInterface|ConfigTokenPersistenceInterface|ConfigTokenSignerInterface|AuthConfigInterface|ConfigTokenFactoryInterface|null $config = null;
 
-    /**
-     * @var Client
-     */
-    private $reAuthClient;
+    private ?\GuzzleHttp\Client $reAuthClient = null;
 
     /**
      * Cache of initialized clients.
      *
      * @var Client[]
      */
-    private $initializedClients = [];
+    private array $initializedClients = [];
 
     public function getAuthType(): string
     {
@@ -64,7 +55,7 @@ class HttpFactory implements AuthProviderInterface
     }
 
     /**
-     * @param PasswordCredentialsGrantInterface|ClientCredentialsGrantInterface|AuthCredentialsInterface                                                  $credentials
+     * @param PasswordCredentialsGrantInterface|ClientCredentialsGrantInterface                                                                           $credentials
      * @param ConfigCredentialsSignerInterface|ConfigTokenPersistenceInterface|ConfigTokenSignerInterface|AuthConfigInterface|ConfigTokenFactoryInterface $config
      *
      * @throws PluginNotConfiguredException

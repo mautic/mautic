@@ -13,7 +13,7 @@ class LeadTimelineEventTest extends \PHPUnit\Framework\TestCase
      * @covers \Mautic\LeadBundle\Event\LeadTimelineEvent::getEvents()
      * @covers \Mautic\LeadBundle\Event\LeadTimelineEvent::generateEventId()
      */
-    public function testEventIdIsGeneratedIfNotSetBySubscriber()
+    public function testEventIdIsGeneratedIfNotSetBySubscriber(): void
     {
         $payload = [
             [

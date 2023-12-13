@@ -17,43 +17,13 @@ use Mautic\LeadBundle\Model\FieldModel;
 
 class BackgroundService
 {
-    /**
-     * @var FieldModel
-     */
-    private $fieldModel;
-
-    /**
-     * @var CustomFieldColumn
-     */
-    private $customFieldColumn;
-
-    /**
-     * @var LeadFieldSaver
-     */
-    private $leadFieldSaver;
-
-    /**
-     * @var FieldColumnBackgroundJobDispatcher
-     */
-    private $fieldColumnBackgroundJobDispatcher;
-
-    /**
-     * @var CustomFieldNotification
-     */
-    private $customFieldNotification;
-
     public function __construct(
-        FieldModel $fieldModel,
-        CustomFieldColumn $customFieldColumn,
-        LeadFieldSaver $leadFieldSaver,
-        FieldColumnBackgroundJobDispatcher $fieldColumnBackgroundJobDispatcher,
-        CustomFieldNotification $customFieldNotification
+        private FieldModel $fieldModel,
+        private CustomFieldColumn $customFieldColumn,
+        private LeadFieldSaver $leadFieldSaver,
+        private FieldColumnBackgroundJobDispatcher $fieldColumnBackgroundJobDispatcher,
+        private CustomFieldNotification $customFieldNotification
     ) {
-        $this->fieldModel                         = $fieldModel;
-        $this->customFieldColumn                  = $customFieldColumn;
-        $this->leadFieldSaver                     = $leadFieldSaver;
-        $this->fieldColumnBackgroundJobDispatcher = $fieldColumnBackgroundJobDispatcher;
-        $this->customFieldNotification            = $customFieldNotification;
     }
 
     /**

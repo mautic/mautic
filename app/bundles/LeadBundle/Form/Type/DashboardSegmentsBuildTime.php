@@ -9,11 +9,9 @@ use Symfony\Component\Form\FormBuilderInterface;
 
 class DashboardSegmentsBuildTime extends AbstractType
 {
-    private ListModel $segmentModel;
-
-    public function __construct(ListModel $segmentModel)
-    {
-        $this->segmentModel = $segmentModel;
+    public function __construct(
+        private ListModel $segmentModel
+    ) {
     }
 
     public function buildForm(FormBuilderInterface $builder, array $options): void

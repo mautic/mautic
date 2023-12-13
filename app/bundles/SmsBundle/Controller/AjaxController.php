@@ -18,7 +18,7 @@ class AjaxController extends CommonAjaxController
 {
     use AjaxLookupControllerTrait;
 
-    public function getSmsCountStatsAction(Request $request, BroadcastQuery $broadcastQuery, CacheStorageHelper $cacheStorageHelper)
+    public function getSmsCountStatsAction(Request $request, BroadcastQuery $broadcastQuery, CacheStorageHelper $cacheStorageHelper): JsonResponse
     {
         /** @var SmsModel $model */
         $model = $this->getModel('sms');

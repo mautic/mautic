@@ -10,16 +10,11 @@ use Twig\TwigFunction;
 
 class ContentExtension extends AbstractExtension
 {
-    protected ContentHelper $contentHelper;
-
-    public function __construct(ContentHelper $contentHelper)
-    {
-        $this->contentHelper = $contentHelper;
+    public function __construct(
+        protected ContentHelper $contentHelper
+    ) {
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getFunctions()
     {
         return [

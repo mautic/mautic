@@ -10,16 +10,14 @@ final class SlotsHelper
     /**
      * @var array<string, mixed>
      */
-    private $slots     = [];
+    private array $slots     = [];
+
     /**
      * @var array<string, mixed>
      */
-    private $openSlots = [];
+    private array $openSlots = [];
 
-    /**
-     * @var bool
-     */
-    private $inBuilder = false;
+    private bool $inBuilder = false;
 
     /**
      * Starts a new slot.
@@ -64,10 +62,8 @@ final class SlotsHelper
      * Returns true if the slot exists.
      *
      * @param string $name The slot name
-     *
-     * @return bool
      */
-    public function has($name)
+    public function has($name): bool
     {
         return isset($this->slots[$name]);
     }
@@ -101,7 +97,7 @@ final class SlotsHelper
      *
      * @return string The canonical name
      */
-    public function getName()
+    public function getName(): string
     {
         return 'slots';
     }

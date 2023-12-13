@@ -17,12 +17,10 @@ class GeneratedType extends Type
      */
     public const GENERATED = 'generated';
 
-    /**
-     * @return string
-     */
-    public function getSQLDeclaration(array $fieldDeclaration, AbstractPlatform $platform)
+    public function getSQLDeclaration(array $fieldDeclaration, AbstractPlatform $platform): string
     {
         // Must be defined in `columnDefinition` option when adding the column in the subscriber
+        return '';
     }
 
     /**
