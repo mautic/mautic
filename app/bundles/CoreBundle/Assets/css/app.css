@@ -69,7 +69,7 @@
   --background-inverse: #161616;
   --background-inverse-hover: #8d8d8d29;
   --background-inverse-transparent: #000000e8;
-  --background-brand: #3358FF;
+  --background-brand: #4E5D9D;
   --background-blur: blur(8px);
   --layer: #f4f4f4;
   --layer-alternate: #ffffff;
@@ -85,7 +85,7 @@
   --field: #f4f4f4;
   --field-alternate: #ffffff;
   --field-hover: #e8e8e8;
-  --focus: #3358FF;
+  --focus: #4E5D9D;
   --border-interactive: #4E5D9D;
   --border-subtle: #e0e0e0;
   --border-subtle-alternate: #c6c6c6;
@@ -116,7 +116,7 @@
   --letter-spacing-h2: -1.5px;
   --letter-spacing-h3: -1px;
   --letter-spacing-h4: -0.5px;
-  --link-primary: #3358FF;
+  --link-primary: #4E5D9D;
   --link-primary-hover: #0026CF;
   --link-secondary: #0026CF;
   --link-inverse: #78a9ff;
@@ -125,18 +125,18 @@
   --icon-secondary: #525252;
   --icon-on-color: #ffffff;
   --icon-on-color-disabled: #8d8d8d;
-  --icon-interactive: #3358FF;
+  --icon-interactive: #4E5D9D;
   --icon-inverse: #ffffff;
   --icon-disabled: #16161640;
-  --button-primary: #3358FF;
-  --button-primary-hover: #2347E8;
-  --button-primary-active: #001D9C;
+  --button-primary: #4E5D9D;
+  --button-primary-hover: #394687;
+  --button-primary-active: #273271;
   --button-secondary: #393939;
   --button-secondary-hover: #4c4c4c;
   --button-secondary-active: #6f6f6f;
-  --button-tertiary: #3358FF;
-  --button-tertiary-hover: #2347E8;
-  --button-tertiary-active: #001D9C;
+  --button-tertiary: #4E5D9D;
+  --button-tertiary-hover: #394687;
+  --button-tertiary-active: #273271;
   --button-danger-primary: #da1e28;
   --button-danger-secondary: #da1e28;
   --button-danger-hover: #ba1b23;
@@ -514,7 +514,7 @@ body > #app-wrapper {
 .app-sidebar.sidebar-left {
   width: 230px;
   left: -230px;
-
+  background-color: #1d232b;
   box-shadow: inset -1px 0 0 0 rgba(0, 0, 0, 0.05);
   color: rgba(255, 255, 255, 0.55);
   -webkit-transition: all 0.3s ease;
@@ -548,28 +548,33 @@ body > #app-wrapper {
 .app-sidebar.sidebar-left .sidebar-content {
   padding-right: 1px;
 }
+.app-sidebar.sidebar-left .nav-sidebar > .nav > li.nav-group:after {
+  content: '';
+  position: absolute;
+  right: 0;
+  left: 50px;
+  bottom: 0;
+  border-bottom: 1px solid #202830;
+}
 .app-sidebar.sidebar-left .nav-sidebar > .nav > li > a {
-  color: var(--text-primary);
-  display: flex;
-  flex-grow: 1;
-  justify-content: space-between;
+  color: rgba(255, 255, 255, 0.5);
 }
 .app-sidebar.sidebar-left .nav-sidebar > .nav > li > a:hover,
 .app-sidebar.sidebar-left .nav-sidebar > .nav > li > a:focus {
-  background-color: var(--layer-hover);
+  background-color: #1d232b;
+  color: rgba(255, 255, 255, 0.75);
 }
 .app-sidebar.sidebar-left .nav-sidebar > .nav > li.active > a,
 .app-sidebar.sidebar-left .nav-sidebar > .nav > li.open > a {
-  background-color: var(--layer-selected);
-}
-.app-sidebar.sidebar-left .nav-sidebar > .nav > li.active > a:hover,
-.app-sidebar.sidebar-left .nav-sidebar > .nav > li.open > a:hover {
-  background-color: var(--layer-selected-hover);
+  background-color: #1d232b;
+  color: rgba(255, 255, 255, 0.75);
 }
 .app-sidebar.sidebar-left .nav-sidebar > .nav > li.active > .nav-submenu,
 .app-sidebar.sidebar-left .nav-sidebar > .nav > li.open > .nav-submenu {
+  background-color: #171c22;
 }
 .app-sidebar.sidebar-left .nav-sidebar > .nav > li > .nav-submenu {
+  background-color: #1a2026;
 }
 .app-sidebar.sidebar-left .nav-sidebar > .nav > li > .nav-submenu:after {
   background-color: #212831;
@@ -579,14 +584,16 @@ body > #app-wrapper {
   box-shadow: 0 0 0 2px #1a2026;
 }
 .app-sidebar.sidebar-left .nav-sidebar > .nav > li > .nav-submenu > li > a {
-  color: var(--text-primary);
+  color: rgba(255, 255, 255, 0.5);
   font-weight: normal;
 }
 .app-sidebar.sidebar-left .nav-sidebar > .nav > li > .nav-submenu > li > a:hover,
 .app-sidebar.sidebar-left .nav-sidebar > .nav > li > .nav-submenu > li > a:focus {
+  color: rgba(255, 255, 255, 0.8);
 }
 .app-sidebar.sidebar-left .nav-sidebar > .nav > li > .nav-submenu > li.active > a,
 .app-sidebar.sidebar-left .nav-sidebar > .nav > li > .nav-submenu > li.open > a {
+  color: rgba(255, 255, 255, 0.8);
 }
 .app-sidebar.sidebar-left .nav-sidebar > .nav .nav-heading {
   color: rgba(255, 255, 255, 0.25);
@@ -596,7 +603,7 @@ body > #app-wrapper {
 }
 .app-sidebar.sidebar-left .nav.sidebar-left-dark,
 .app-sidebar.sidebar-left .nav.sidebar-left-dark > li > a:hover {
-  background: var(--layer);
+  background: #0c0f12;
 }
 .app-sidebar.sidebar-right {
   width: 230px;
@@ -611,10 +618,19 @@ body > #app-wrapper {
 .app-sidebar.sidebar-right .sidebar-header,
 .app-sidebar.sidebar-right .sidebar-footer {
   width: 230px;
+  background-color: #232b34;
 }
 .app-sidebar.sidebar-right .sidebar-content {
   padding-left: 1px;
   top: 60px;
+}
+.app-sidebar.sidebar-right .nav-sidebar > .nav > li.nav-group:after {
+  content: '';
+  position: absolute;
+  right: 0;
+  left: 50px;
+  bottom: 0;
+  border-bottom: 1px solid #202830;
 }
 .app-sidebar.sidebar-right .nav-sidebar > .nav > li > a {
   color: rgba(255, 255, 255, 0.5);
@@ -735,8 +751,6 @@ body > #app-wrapper {
   -webkit-transition: all 0.15s ease;
   -o-transition: all 0.15s ease;
   transition: all 0.15s ease;
-  height: 48px;
-  justify-content: space-between;
 }
 .app-sidebar .nav-sidebar > .nav > li > a .text {
   -webkit-transition: opacity .3s ease .1s, margin-left 0s ease .2s;
@@ -753,9 +767,6 @@ body > #app-wrapper {
   font-size: 14px;
   min-width: 26px;
   display: block;
-  order: 2;
-  margin-left: 30px;
-
 }
 .app-sidebar .nav-sidebar > .nav > li > a .arrow {
   -webkit-transition: opacity .3s ease .1s, margin-left 0s ease .2s;
@@ -835,6 +846,7 @@ body > #app-wrapper {
     left: 0;
   }
   .app-sidebar.sidebar-left ~ #app-header.navbar {
+    left: 230px;
   }
   .app-sidebar.sidebar-left ~ #app-content {
     margin-left: 230px;
@@ -857,6 +869,7 @@ body > #app-wrapper {
   .sidebar-minimized .app-sidebar.sidebar-left .nav-sidebar > .nav > li > a {
     padding-top: 12px;
     padding-bottom: 12px;
+    text-align: center;
   }
   .sidebar-minimized .app-sidebar.sidebar-left .nav-sidebar > .nav > li.nav-heading,
   .sidebar-minimized .app-sidebar.sidebar-left .nav-sidebar > .nav > li > a .arrow,
@@ -1017,6 +1030,7 @@ body > #app-wrapper {
   -webkit-transition: all 0.3s ease;
   -o-transition: all 0.3s ease;
   transition: all 0.3s ease;
+  padding: 0 100px;
 }
 #app-footer ~ #app-content > .content-body {
   padding-bottom: 46px;

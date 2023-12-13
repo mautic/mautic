@@ -4138,7 +4138,12 @@ select[multiple].input-group-sm > .input-group-btn > .btn {
   display: flex;
   flex-direction: column;
 }
-.nav > li > a {
+.nav-sidebar .nav > li > a {
+  position: relative;
+  display: block;
+  padding: 10px 18px;
+}
+#app-header .nav > li > a {
   position: relative;
   display: flex;
   padding: 10px 18px;
