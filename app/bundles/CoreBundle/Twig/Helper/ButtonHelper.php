@@ -304,14 +304,9 @@ final class ButtonHelper
                 $attr .= " $k=".'"'.$v.'"';
             }
 
-            $buttonContent = '';
+            $buttonContent = (isset($button['iconClass'])) ? '<i class="'.$button['iconClass'].'"></i> ' : '';
             if (!empty($button['btnText'])) {
                 $buttonContent .= '<span'.$btnTextAttr.'>'.$this->translator->trans($button['btnText']).'</span>';
-            }
-            if (isset($button['svgIcon'])) {
-                $buttonContent .= ' '.$button['svgIcon'];
-            } elseif (isset($button['iconClass'])) {
-                $buttonContent .= ' <i class="'.$button['iconClass'].'"></i>';
             }
             $buttons .= "{$this->wrapOpeningTag}<a{$attr}><span{$tooltip}>{$buttonContent}</span></a>{$this->wrapClosingTag}\n";
         }
