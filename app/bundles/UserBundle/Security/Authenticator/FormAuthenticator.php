@@ -145,9 +145,7 @@ class FormAuthenticator extends AbstractFormLoginAuthenticator implements Passwo
         $newUser->setUsername($user->getUserName());
         $newUser->setPassword($user->getPassword());
 
-        $authenticated = $this->hasher->isPasswordValid($newUser, $this->getPassword($credentials));
-
-        return $authenticated;
+        return $this->hasher->isPasswordValid($newUser, $this->getPassword($credentials));
     }
 
     public function getPassword($credentials): ?string
