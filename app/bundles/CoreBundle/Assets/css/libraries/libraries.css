@@ -2702,9 +2702,12 @@ output {
   border: none;
   border-bottom: 1px solid var(--border-strong);
 }
-.form-control.search {
+.form-control.search, #daterange_date_from, #daterange_date_to {
   height: 48px;
   border-bottom: none;
+}
+.form-control.search {
+  background-color: transparent;
 }
 .form-control:hover {
 }
@@ -3712,6 +3715,9 @@ tbody.collapse.in {
 .dropdown-toggle:focus {
   outline: 0;
 }
+.dropdown-toggle:after {
+  color: var(--background-inverse);
+}
 .dropdown-menu {
   position: absolute;
   top: 100%;
@@ -3757,6 +3763,7 @@ tbody.collapse.in {
   background-color: transparent;
   transition: background var(--timing);
   border: none;
+  justify-content: space-between;
 }
 .dropdown-menu > li > a:hover,
 .dropdown-menu > li > a:focus {
@@ -4117,7 +4124,10 @@ select[multiple].input-group-sm > .input-group-btn > .btn {
   line-height: 1;
   color: #596776;
   text-align: center;
-  background-color: var(--field);
+  background-color: var(--layer);
+}
+.input-group-addon.preaddon {
+  height: auto;
 }
 .form-group .input-group-addon {
   border-bottom: 1px solid var(--border-strong);
@@ -9467,7 +9477,6 @@ button.close {
 }
 .chosen-container .chosen-drop {
   background: var(--layer);
-  border: 1px solid #d5d5d5;
   -webkit-box-shadow: 0 8px 35px rgba(0, 0, 0, .10);
   box-shadow: 0 8px 35px rgba(0, 0, 0, .10);
   position: absolute;
@@ -9628,21 +9637,18 @@ button.close {
   left: -9000px;
 }
 .chosen-container-multi .chosen-choices {
+  display: flex;
+  align-items: center;
   background-color: #fff;
-  border: 1px solid #d5d5d5;
-  border-top-left-radius: 3px;
-  border-top-right-radius: 3px;
-  border-bottom-right-radius: 3px;
-  border-bottom-left-radius: 3px;
-  -webkit-box-shadow: inset 0 1px 1px rgba(0, 0, 0, .075);
-  box-shadow: inset 0 1px 1px rgba(0, 0, 0, .075);
   cursor: text;
-  height: auto !important;
-  height: 1%;
+  height: 48px;
   margin: 0;
   overflow: hidden;
   padding: 0;
   position: relative;
+  outline: 2px solid transparent;
+  outline-offset: -2px;
+  transition: outline var(--timing);
 }
 .chosen-container-multi .chosen-choices li {
   float: left;
@@ -9661,7 +9667,7 @@ button.close {
   color: #596776;
   height: 30px;
   margin: 0;
-  padding: 4px;
+  padding: 4px 16px;
   outline: 0;
 }
 .chosen-container-multi .chosen-choices .search-choice {
@@ -9724,14 +9730,7 @@ button.close {
   background-position: -18px 10px;
 }
 .chosen-container-active .chosen-choices {
-  border: 1px solid #bcbcbc;
-  border-bottom-right-radius: 0;
-  border-bottom-left-radius: 0;
-  -webkit-box-shadow: 0 1px 1px rgba(0, 0, 0, .075) inset, 0 0 8px rgba(82, 168, 236, .6);
-  box-shadow: 0 1px 1px rgba(0, 0, 0, .075) inset, 0 0 8px rgba(82, 168, 236, .6);
-  -webkit-transition: border linear .2s, box-shadow linear .2s;
-  -o-transition: border linear .2s, box-shadow linear .2s;
-  transition: border linear .2s, box-shadow linear .2s;
+  outline: 2px solid var(--focus);
 }
 .chosen-container-active .chosen-choices .search-field input[type="text"] {
   color: #111 !important;
@@ -14478,6 +14477,14 @@ fieldset[disabled] .twitter-typeahead .tt-input {
 }
 .tt-dropdown-menu .tt-suggestion p {
   margin: 0;
+}
+.tt-menu {
+  min-width: 165px;
+  display: flex;
+  padding: 15px;
+  background-color: var(--background-inverse);
+  color: var(--text-on-color);
+  font-weight: normal;
 }
 .xdsoft_datetimepicker {
   box-shadow: 0 5px 15px -5px rgba(0, 0, 0, 0.506);

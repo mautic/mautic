@@ -451,7 +451,7 @@ body > #app-wrapper {
   bottom: -7px;
   margin-left: -8px;
   border-width: 0 8px 8px;
-  border-color: transparent transparent #fff;
+  border-color: transparent transparent var(--background-inverse);
   position: absolute;
   content: "";
   left: 50%;
@@ -1778,6 +1778,7 @@ label.list-group-item:focus {
 .dropdown-menu > li > a .fa {
   min-width: 15px;
   margin-left: 30px;
+  order: 2;
 }
 .dropdown-menu > .active > a,
 .dropdown-menu > .active > a:hover,
@@ -4877,6 +4878,7 @@ body.noscroll {
 .table .input-group-sm .dropdown-toggle {
   background-color: transparent;
   transition: background var(--timing);
+  justify-content: center;
 }
 .table .input-group-sm .dropdown-toggle:hover {
   background-color: var(--background-hover);
@@ -4884,6 +4886,9 @@ body.noscroll {
 .input-group .input-group-btn button {
   height: 48px;
   width: 48px;
+}
+#daterange_apply {
+  width: auto;
 }
 .theme-selected {
   border: 1px solid #4e5e9e;
