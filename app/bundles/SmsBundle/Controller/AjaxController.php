@@ -70,7 +70,7 @@ class AjaxController extends CommonAjaxController
     {
         $query  = $request->get('query', '');
         $tokens = $this->getBuilderTokens($query);
-        $event           = new TokensBuildEvent($tokens);
+        $event  = new TokensBuildEvent($tokens);
         $eventDispatcher->dispatch($event, SmsEvents::ON_SMS_TOKENS_BUILD);
 
         return $this->sendJsonResponse(['tokens'=>$event->getTokens()]);
