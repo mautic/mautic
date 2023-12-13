@@ -14,12 +14,9 @@ class CacheClearSubscriberTest extends \PHPUnit\Framework\TestCase
     /**
      * @var MockObject|FilesystemTagAwareAdapter
      */
-    private $adapter;
+    private MockObject $adapter;
 
-    /**
-     * @var string
-     */
-    private $random;
+    private string $random;
 
     public function setUp(): void
     {

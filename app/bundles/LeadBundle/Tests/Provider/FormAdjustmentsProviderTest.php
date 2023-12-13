@@ -17,17 +17,14 @@ final class FormAdjustmentsProviderTest extends \PHPUnit\Framework\TestCase
     /**
      * @var MockObject&EventDispatcherInterface
      */
-    private $dispatcher;
+    private \PHPUnit\Framework\MockObject\MockObject $dispatcher;
 
     /**
      * @var MockObject&FormInterface<FormInterface>
      */
-    private $form;
+    private \PHPUnit\Framework\MockObject\MockObject $form;
 
-    /**
-     * @var FormAdjustmentsProvider
-     */
-    private $provider;
+    private \Mautic\LeadBundle\Provider\FormAdjustmentsProvider $provider;
 
     protected function setUp(): void
     {

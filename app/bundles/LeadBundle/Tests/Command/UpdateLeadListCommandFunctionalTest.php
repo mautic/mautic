@@ -75,13 +75,11 @@ final class UpdateLeadListCommandFunctionalTest extends MauticMysqlTestCase
     /**
      * @return iterable<array<callable>>
      */
-    public function provider(): iterable
+    public static function Provider(): iterable
     {
         // Test that all segments will be rebuilt with no params set.
         yield [
-            function (): array {
-                return [];
-            },
+            fn (): array => [],
             function (LeadList $segment): void {
                 Assert::assertGreaterThan(
                     new \DateTime('2000-01-01 00:00:00'),
@@ -94,9 +92,7 @@ final class UpdateLeadListCommandFunctionalTest extends MauticMysqlTestCase
         // Test that it will work when we select a specific segment too.
         // Also testing the timing option = 0.
         yield [
-            function (LeadList $segment): array {
-                return ['--list-id' => $segment->getId()];
-            },
+            fn (LeadList $segment): array => ['--list-id' => $segment->getId()],
             function (LeadList $segment, string $output): void {
                 Assert::assertGreaterThan(
                     new \DateTime('2000-01-01 00:00:00'),
@@ -110,9 +106,7 @@ final class UpdateLeadListCommandFunctionalTest extends MauticMysqlTestCase
         // But the last built date will not update if we limit how many contacts to process.
         // Also testing the timing option = 1.
         yield [
-            function (): array {
-                return ['--max-contacts' => 1, '--timing' => 1];
-            },
+            fn (): array => ['--max-contacts' => 1, '--timing' => 1],
             function (LeadList $segment, string $output): void {
                 Assert::assertEquals(
                     new \DateTime('2000-01-01 00:00:00'),

@@ -23,15 +23,9 @@ final class AssetsHelper
      */
     public const CONTEXT_BUILDER = 'builder';
 
-    /**
-     * @var AssetGenerationHelper
-     */
-    private $assetHelper;
+    private ?\Mautic\CoreBundle\Helper\AssetGenerationHelper $assetHelper = null;
 
-    /**
-     * @var string
-     */
-    private $context = self::CONTEXT_APP;
+    private string $context = self::CONTEXT_APP;
 
     /**
      * @var array<mixed, mixed>
@@ -40,26 +34,23 @@ final class AssetsHelper
         self::CONTEXT_APP => [],
     ];
 
-    /**
-     * @var string|null
-     */
-    private $version;
+    private ?string $version = null;
 
     /**
      * @var string
      */
     private $siteUrl;
 
-    /**
-     * @var PathsHelper
-     */
-    private $pathsHelper;
+    private ?\Mautic\CoreBundle\Helper\PathsHelper $pathsHelper = null;
 
     private BuilderIntegrationsHelper $builderIntegrationsHelper;
+
     private InstallService $installService;
 
-    public function __construct(private Packages $packages, private CoreParametersHelper $coreParametersHelper)
-    {
+    public function __construct(
+        private Packages $packages,
+        private CoreParametersHelper $coreParametersHelper
+    ) {
     }
 
     /**
@@ -73,9 +64,9 @@ final class AssetsHelper
     {
         $prefix = $this->pathsHelper->getSystemPath('asset_prefix');
         if (!empty($prefix)) {
-            if ($includeEndingSlash && '/' != substr($prefix, -1)) {
+            if ($includeEndingSlash && !str_ends_with($prefix, '/')) {
                 $prefix .= '/';
-            } elseif (!$includeEndingSlash && '/' == substr($prefix, -1)) {
+            } elseif (!$includeEndingSlash && str_ends_with($prefix, '/')) {
                 $prefix = substr($prefix, 0, -1);
             }
         }
@@ -132,13 +123,13 @@ final class AssetsHelper
     public function getUrl($path, $packageName = null, $version = null, $absolute = false, $ignorePrefix = false)
     {
         // if we have http in the url it is absolute and we can just return it
-        if (0 === strpos($path, 'http')) {
+        if (str_starts_with($path, 'http')) {
             return $path;
         }
 
         // otherwise build the complete path
         if (!$ignorePrefix) {
-            $assetPrefix = $this->getAssetPrefix(0 !== strpos($path, '/'));
+            $assetPrefix = $this->getAssetPrefix(!str_starts_with($path, '/'));
             $path        = $assetPrefix.$path;
         }
 
@@ -195,7 +186,7 @@ final class AssetsHelper
     public function addScript($script, $location = 'head', $async = false, $name = null)
     {
         $assets     = &$this->assets[$this->context];
-        $addScripts = function ($s) use ($location, &$assets, $async, $name) {
+        $addScripts = function ($s) use ($location, &$assets, $async, $name): void {
             $name = $name ?: 'script_'.hash('sha1', uniqid((string) mt_rand()));
 
             if ('head' == $location) {
@@ -258,7 +249,7 @@ final class AssetsHelper
      */
     public function addStylesheet($stylesheet)
     {
-        $addSheet = function ($s) {
+        $addSheet = function ($s): void {
             if (!isset($this->assets[$this->context]['stylesheets'])) {
                 $this->assets[$this->context]['stylesheets'] = [];
             }
@@ -334,10 +325,8 @@ final class AssetsHelper
 
     /**
      * Outputs the stylesheets and style declarations.
-     *
-     * @return string
      */
-    public function getStyles()
+    public function getStyles(): string
     {
         $styles = '';
         if (isset($this->assets[$this->context]['stylesheets'])) {
@@ -366,7 +355,7 @@ final class AssetsHelper
     {
         if (isset($this->assets[$this->context]['scripts'][$location])) {
             foreach (array_reverse($this->assets[$this->context]['scripts'][$location]) as $s) {
-                list($script, $async) = $s;
+                [$script, $async] = $s;
                 echo '<script src="'.$this->getUrl($script).'"'.($async ? ' async' : '').' data-source="mautic"></script>'."\n";
             }
         }
@@ -396,10 +385,8 @@ final class AssetsHelper
 
     /**
      * Returns head scripts, stylesheets, and custom declarations.
-     *
-     * @return string
      */
-    public function getHeadDeclarations()
+    public function getHeadDeclarations(): string
     {
         $headOutput = $this->getStyles();
         if (!empty($this->assets[$this->context]['headDeclarations'])) {
@@ -415,7 +402,7 @@ final class AssetsHelper
                             $headOutput .= "\n</script>";
                             $scriptOpen = false;
                         }
-                        list($script, $async) = $output;
+                        [$script, $async] = $output;
 
                         $headOutput .= "\n".'<script src="'.$this->getUrl($script).'"'.($async ? ' async' : '').' data-source="mautic"></script>';
                         break;
@@ -481,7 +468,7 @@ final class AssetsHelper
             try {
                 $builder     = $this->builderIntegrationsHelper->getBuilder('email');
                 $builderName = $builder->getName();
-            } catch (IntegrationNotFoundException $exception) {
+            } catch (IntegrationNotFoundException) {
                 // Assume legacy builder
                 $builderName = 'legacy';
             }
@@ -584,10 +571,8 @@ final class AssetsHelper
      * @param string $assetFilePath         The path to the file location. Can use full path or relative to mautic web root
      * @param string $onLoadCallback        Mautic namespaced function to call for the script onload
      * @param string $alreadyLoadedCallback Mautic namespaced function to call if the script has already been loaded
-     *
-     * @return string
      */
-    public function includeScript($assetFilePath, $onLoadCallback = '', $alreadyLoadedCallback = '')
+    public function includeScript($assetFilePath, $onLoadCallback = '', $alreadyLoadedCallback = ''): string
     {
         return '<script async="async" type="text/javascript" data-source="mautic">Mautic.loadScript(\''.$this->getUrl($assetFilePath)."', '$onLoadCallback', '$alreadyLoadedCallback');</script>";
     }
@@ -596,10 +581,8 @@ final class AssetsHelper
      * Include stylesheet.
      *
      * @param string $assetFilePath the path to the file location. Can use full path or relative to mautic web root
-     *
-     * @return string
      */
-    public function includeStylesheet($assetFilePath)
+    public function includeStylesheet($assetFilePath): string
     {
         return '<script async="async" type="text/javascript" data-source="mautic">Mautic.loadStylesheet(\''.$this->getUrl($assetFilePath).'\');</script>';
     }
@@ -611,9 +594,9 @@ final class AssetsHelper
      * @param array<string>         $protocols  http/https, ftp, mail, twitter
      * @param array<string, string> $attributes
      *
-     * @return string
+     * @return string|string[]|null
      */
-    public function makeLinks($text, $protocols = ['http', 'mail'], array $attributes = [])
+    public function makeLinks($text, $protocols = ['http', 'mail'], array $attributes = []): string|array|null
     {
         // clear tags in text
         $text = InputHelper::url($text, false, $protocols);
@@ -627,51 +610,42 @@ final class AssetsHelper
         $links = [];
 
         // Extract existing links and tags
-        $text = preg_replace_callback('~(<a .*?>.*?</a>|<.*?>)~i', function ($match) use (&$links) {
+        $text = preg_replace_callback('~(<a .*?>.*?</a>|<.*?>)~i', function ($match) use (&$links): string {
             return '<'.array_push($links, $match[1]).'>';
         }, $text);
 
         // Extract text links for each protocol
         foreach ((array) $protocols as $protocol) {
-            switch ($protocol) {
-                case 'http':
-                case 'https':
-                    $text = preg_replace_callback('~(?:(https?)://([^\s<]+)|(www\.[^\s<]+?\.[^\s<]+))(?<![\.,:])~i', function ($match) use ($protocol, &$links, $attr) {
-                        if ($match[1]) {
-                            $protocol = $match[1];
-                        }
-                        $link = $this->escape($match[2] ?: $match[3]);
+            $text = match ($protocol) {
+                'http', 'https' => preg_replace_callback('~(?:(https?)://([^\s<]+)|(www\.[^\s<]+?\.[^\s<]+))(?<![\.,:])~i', function ($match) use ($protocol, &$links, $attr): string {
+                    if ($match[1]) {
+                        $protocol = $match[1];
+                    }
+                    $link = $this->escape($match[2] ?: $match[3]);
 
-                        return '<'.array_push($links, "<a $attr href=\"$protocol://$link\">$link</a>").'>';
-                    }, $text);
-                    break;
-                case 'mail':
-                    $text = preg_replace_callback('~([^\s<]+?@[^\s<]+?\.[^\s<]+)(?<![\.,:])~', function ($match) use (&$links, $attr) {
-                        $match[1] = $this->escape($match[1]);
+                    return '<'.array_push($links, "<a $attr href=\"$protocol://$link\">$link</a>").'>';
+                }, $text),
+                'mail' => preg_replace_callback('~([^\s<]+?@[^\s<]+?\.[^\s<]+)(?<![\.,:])~', function ($match) use (&$links, $attr): string {
+                    $match[1] = $this->escape($match[1]);
 
-                        return '<'.array_push($links, "<a $attr href=\"mailto:{$match[1]}\">{$match[1]}</a>").'>';
-                    }, $text);
-                    break;
-                case 'twitter':
-                    $text = preg_replace_callback('~(?<!\w)[@#](\w++)~', function ($match) use (&$links, $attr) {
-                        $match[0] = $this->escape($match[0]);
-                        $match[1] = $this->escape($match[1]);
+                    return '<'.array_push($links, "<a $attr href=\"mailto:{$match[1]}\">{$match[1]}</a>").'>';
+                }, $text),
+                'twitter' => preg_replace_callback('~(?<!\w)[@#](\w++)~', function ($match) use (&$links, $attr): string {
+                    $match[0] = $this->escape($match[0]);
+                    $match[1] = $this->escape($match[1]);
 
-                        return '<'.array_push($links, "<a $attr href=\"https://twitter.com/".('@' == $match[0][0] ? '' : 'search/%23').$match[1]."\">{$match[0]}</a>").'>';
-                    }, $text);
-                    break;
-                default:
-                    $text = preg_replace_callback('~'.preg_quote($protocol, '~').'://([^\s<]+?)(?<![\.,:])~i', function ($match) use ($protocol, &$links, $attr) {
-                        $match[1] = $this->escape($match[1]);
+                    return '<'.array_push($links, "<a $attr href=\"https://twitter.com/".('@' == $match[0][0] ? '' : 'search/%23').$match[1]."\">{$match[0]}</a>").'>';
+                }, $text),
+                default => preg_replace_callback('~'.preg_quote($protocol, '~').'://([^\s<]+?)(?<![\.,:])~i', function ($match) use ($protocol, &$links, $attr): string {
+                    $match[1] = $this->escape($match[1]);
 
-                        return '<'.array_push($links, "<a $attr href=\"$protocol://{$match[1]}\">{$match[1]}</a>").'>';
-                    }, $text);
-                    break;
-            }
+                    return '<'.array_push($links, "<a $attr href=\"$protocol://{$match[1]}\">{$match[1]}</a>").'>';
+                }, $text),
+            };
         }
 
         // Insert all link
-        return preg_replace_callback('/<(\d+)>/', function ($match) use (&$links) {
+        return preg_replace_callback('/<(\d+)>/', function ($match) use (&$links): string {
             return $links[(int) $match[1] - 1];
         }, $text);
     }
@@ -720,10 +694,7 @@ final class AssetsHelper
         $this->assets = [];
     }
 
-    /**
-     * @return string
-     */
-    public function getName()
+    public function getName(): string
     {
         return 'assets';
     }
@@ -734,11 +705,11 @@ final class AssetsHelper
     }
 
     /**
-     * @param string $siteUrl
+     * @param ?string $siteUrl can be null on installation
      */
     public function setSiteUrl($siteUrl): void
     {
-        if ('/' === substr($siteUrl, -1)) {
+        if ($siteUrl && str_ends_with($siteUrl, '/')) {
             $siteUrl = substr($siteUrl, 0, -1);
         }
 
@@ -769,10 +740,7 @@ final class AssetsHelper
         $this->installService = $installService;
     }
 
-    /**
-     * @return string
-     */
-    private function escape(string $string)
+    private function escape(string $string): string
     {
         return htmlspecialchars($string, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8', false);
     }

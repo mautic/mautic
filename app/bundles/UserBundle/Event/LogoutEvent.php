@@ -6,33 +6,14 @@ use Mautic\UserBundle\Entity\User;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Contracts\EventDispatcher\Event;
 
-/**
- * Class LogoutEvent.
- */
 class LogoutEvent extends Event
 {
-    /**
-     * @var User
-     */
-    private $user;
+    private array $session = [];
 
-    /**
-     * @var array
-     */
-    private $session = [];
-
-    /**
-     * @var Request
-     */
-    private $request;
-
-    /**
-     * LogoutEvent constructor.
-     */
-    public function __construct(User $user, Request $request)
-    {
-        $this->user    = $user;
-        $this->request = $request;
+    public function __construct(
+        private User $user,
+        private Request $request
+    ) {
     }
 
     /**
@@ -46,7 +27,7 @@ class LogoutEvent extends Event
     /**
      * Add value to session after it's been cleared.
      */
-    public function setPostSessionItem($key, $value)
+    public function setPostSessionItem($key, $value): void
     {
         $this->session[$key] = $value;
     }

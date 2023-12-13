@@ -14,33 +14,21 @@ use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Validator\Constraints\LessThanOrEqual;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-/**
- * Class FormFieldFileType.
- */
 class FormFieldFileType extends AbstractType
 {
     public const PROPERTY_ALLOWED_FILE_EXTENSIONS = 'allowed_file_extensions';
+
     public const PROPERTY_ALLOWED_FILE_SIZE       = 'allowed_file_size';
+
     public const PROPERTY_PREFERED_PROFILE_IMAGE  = 'profile_image';
 
-    /** @var CoreParametersHelper */
-    private $coreParametersHelper;
-
-    /**
-     * @var TranslatorInterface
-     */
-    private $translator;
-
-    public function __construct(CoreParametersHelper $coreParametersHelper, TranslatorInterface $translator)
-    {
-        $this->coreParametersHelper = $coreParametersHelper;
-        $this->translator           = $translator;
+    public function __construct(
+        private CoreParametersHelper $coreParametersHelper,
+        private TranslatorInterface $translator
+    ) {
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         if (empty($options['data'][self::PROPERTY_ALLOWED_FILE_EXTENSIONS])) {
             $options['data'][self::PROPERTY_ALLOWED_FILE_EXTENSIONS] = $this->coreParametersHelper->get('allowed_extensions');
@@ -98,7 +86,7 @@ class FormFieldFileType extends AbstractType
             YesNoButtonGroupType::class,
             [
                 'label'       => 'mautic.form.field.file.set_as_profile_image',
-                'data'        => isset($options['data'][self::PROPERTY_PREFERED_PROFILE_IMAGE]) ? $options['data'][self::PROPERTY_PREFERED_PROFILE_IMAGE] : false,
+                'data'        => $options['data'][self::PROPERTY_PREFERED_PROFILE_IMAGE] ?? false,
             ]
         );
     }

@@ -17,17 +17,14 @@ final class FormConditionalSubscriberTest extends \PHPUnit\Framework\TestCase
     /**
      * @var MockObject|FormModel
      */
-    private $formModel;
+    private \PHPUnit\Framework\MockObject\MockObject $formModel;
 
     /**
      * @var MockObject|FieldModel
      */
-    private $fieldModel;
+    private \PHPUnit\Framework\MockObject\MockObject $fieldModel;
 
-    /**
-     * @var FormConditionalSubscriber
-     */
-    private $subscriber;
+    private \Mautic\FormBundle\EventListener\FormConditionalSubscriber $subscriber;
 
     public function setUp(): void
     {

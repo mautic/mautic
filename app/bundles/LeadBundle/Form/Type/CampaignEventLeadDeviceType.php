@@ -10,10 +10,7 @@ use Symfony\Component\Form\FormBuilderInterface;
 
 class CampaignEventLeadDeviceType extends AbstractType
 {
-    /**
-     * {@inheritdoc}
-     */
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder->add(
             'device_type',
@@ -55,9 +52,6 @@ class CampaignEventLeadDeviceType extends AbstractType
         );
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getBlockPrefix()
     {
         return 'campaignevent_lead_device';

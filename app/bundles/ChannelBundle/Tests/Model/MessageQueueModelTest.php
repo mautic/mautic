@@ -17,13 +17,19 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 class MessageQueueModelTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var string */
+    /**
+     * @var string
+     */
     public const DATE = '2019-07-07 15:00:00';
 
-    /** @var MessageQueueModel */
+    /**
+     * @var MessageQueueModel
+     */
     protected $messageQueue;
 
-    /** @var MessageQueue */
+    /**
+     * @var MessageQueue
+     */
     protected $message;
 
     protected function setUp(): void
@@ -52,25 +58,25 @@ class MessageQueueModelTest extends \PHPUnit\Framework\TestCase
         $this->message = $message;
     }
 
-    public function testRescheduleMessageIntervalDay()
+    public function testRescheduleMessageIntervalDay(): void
     {
         $interval = new \DateInterval('P2D');
         $this->prepareRescheduleMessageIntervalTest($interval);
     }
 
-    public function testRescheduleMessageIntervalWeek()
+    public function testRescheduleMessageIntervalWeek(): void
     {
         $interval = new \DateInterval('P4W');
         $this->prepareRescheduleMessageIntervalTest($interval);
     }
 
-    public function testRescheduleMessageIntervalMonth()
+    public function testRescheduleMessageIntervalMonth(): void
     {
         $interval = new \DateInterval('P8M');
         $this->prepareRescheduleMessageIntervalTest($interval);
     }
 
-    public function testRescheduleMessageNoInterval()
+    public function testRescheduleMessageNoInterval(): void
     {
         $interval = new \DateInterval('PT0S');
         $this->prepareRescheduleMessageIntervalTest($interval);

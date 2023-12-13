@@ -14,56 +14,20 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class WebhookKillNotificator
 {
-    /**
-     * @var TranslatorInterface
-     */
-    private $translator;
-
-    /**
-     * @var Router
-     */
-    private $router;
-
-    /**
-     * @var NotificationModel
-     */
-    private $notificationModel;
-
-    /**
-     * @var EntityManager
-     */
-    private $entityManager;
-
-    /**
-     * @var MailHelper
-     */
-    private $mailer;
-
-    /**
-     * @var CoreParametersHelper
-     */
-    private $coreParametersHelper;
-
     public function __construct(
-        TranslatorInterface $translator,
-        Router $router,
-        NotificationModel $notificationModel,
-        EntityManager $entityManager,
-        MailHelper $mailer,
-        CoreParametersHelper $coreParametersHelper
+        private TranslatorInterface $translator,
+        private Router $router,
+        private NotificationModel $notificationModel,
+        private EntityManager $entityManager,
+        private MailHelper $mailer,
+        private CoreParametersHelper $coreParametersHelper
     ) {
-        $this->translator           = $translator;
-        $this->router               = $router;
-        $this->notificationModel    = $notificationModel;
-        $this->entityManager        = $entityManager;
-        $this->mailer               = $mailer;
-        $this->coreParametersHelper = $coreParametersHelper;
     }
 
     /**
      * @param string $reason Translatable key
      */
-    public function send(Webhook $webhook, $reason)
+    public function send(Webhook $webhook, $reason): void
     {
         $subject = $this->translator->trans('mautic.webhook.stopped');
         $reason  = $this->translator->trans($reason);

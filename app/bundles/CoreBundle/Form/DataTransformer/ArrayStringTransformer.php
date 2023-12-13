@@ -4,14 +4,9 @@ namespace Mautic\CoreBundle\Form\DataTransformer;
 
 use Symfony\Component\Form\DataTransformerInterface;
 
-/**
- * Class ArrayStringTransformer.
- */
 class ArrayStringTransformer implements DataTransformerInterface
 {
     /**
-     * {@inheritdoc}
-     *
      * @return string
      */
     public function transform($array)
@@ -27,8 +22,6 @@ class ArrayStringTransformer implements DataTransformerInterface
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @return array
      */
     public function reverseTransform($string)

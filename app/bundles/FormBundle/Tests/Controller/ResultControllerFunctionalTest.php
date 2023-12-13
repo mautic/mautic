@@ -77,8 +77,8 @@ final class ResultControllerFunctionalTest extends MauticMysqlTestCase
     {
         $data = 'data:image/png;base64,AAAFBfj42Pj4';
 
-        list($type, $data) = explode(';', $data);
-        list(, $data)      = explode(',', $data);
+        [$type, $data]     = explode(';', $data);
+        [, $data]          = explode(',', $data);
         $data              = base64_decode($data);
 
         file_put_contents($filename, $data);

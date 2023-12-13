@@ -16,10 +16,7 @@ use Mautic\InstallBundle\Exception\DatabaseVersionTooOldException;
 
 class SchemaHelper
 {
-    /**
-     * @var Connection
-     */
-    protected $db;
+    protected \Doctrine\DBAL\Connection $db;
 
     /**
      * @var EntityManager
@@ -31,10 +28,7 @@ class SchemaHelper
      */
     protected $platform;
 
-    /**
-     * @var array
-     */
-    protected $dbParams = [];
+    protected array $dbParams;
 
     /**
      * @throws \Doctrine\DBAL\Exception
@@ -62,7 +56,7 @@ class SchemaHelper
         $this->dbParams = $dbParams;
     }
 
-    public function setEntityManager(EntityManager $em)
+    public function setEntityManager(EntityManager $em): void
     {
         $this->em = $em;
     }
@@ -70,7 +64,7 @@ class SchemaHelper
     /**
      * Test db connection.
      */
-    public function testConnection()
+    public function testConnection(): void
     {
         if (isset($this->dbParams['dbname'])) {
             // Test connection credentials
@@ -87,15 +81,13 @@ class SchemaHelper
     }
 
     /**
-     * @return bool
-     *
      * @throws \Doctrine\DBAL\Exception
      */
-    public function createDatabase()
+    public function createDatabase(): bool
     {
         try {
             $this->db->connect();
-        } catch (\Exception $exception) {
+        } catch (\Exception) {
             // it failed to connect so remove the dbname and try to create it
             $dbName                   = $this->dbParams['dbname'];
             $this->dbParams['dbname'] = null;
@@ -110,7 +102,7 @@ class SchemaHelper
                 $this->dbParams['dbname'] = $dbName;
                 $this->db                 = DriverManager::getConnection($this->dbParams);
                 $this->db->close();
-            } catch (\Exception $e) {
+            } catch (\Exception) {
                 return false;
             }
         }
@@ -121,12 +113,10 @@ class SchemaHelper
     /**
      * Generates SQL for installation.
      *
-     * @return array|bool Array containing the flash message data on a failure, boolean true on success
-     *
      * @throws \Doctrine\DBAL\Exception
      * @throws ORMException
      */
-    public function installSchema()
+    public function installSchema(): bool
     {
         $sm = $this->db->getSchemaManager();
 
@@ -168,15 +158,13 @@ class SchemaHelper
         $sql = array_merge($sql, $installSchema->toSql($this->platform));
 
         // Execute drop queries
-        if (!empty($sql)) {
-            foreach ($sql as $q) {
-                try {
-                    $this->db->executeQuery($q);
-                } catch (\Exception $exception) {
-                    $this->db->close();
+        foreach ($sql as $q) {
+            try {
+                $this->db->executeQuery($q);
+            } catch (\Exception $exception) {
+                $this->db->close();
 
-                    throw $exception;
-                }
+                throw $exception;
             }
         }
 
@@ -191,16 +179,16 @@ class SchemaHelper
         $version  = $this->db->executeQuery('SELECT VERSION()')->fetchOne();
 
         // Platform class names are in the format Doctrine\DBAL\Platforms\MariaDb1027Platform
-        $platform = strtolower(get_class($this->db->getDatabasePlatform()));
+        $platform = strtolower($this->db->getDatabasePlatform()::class);
         $metadata = ThisRelease::getMetadata();
 
         /**
          * The second case is for MariaDB < 10.2, where Doctrine reports it as MySQLPlatform. Here we can use a little
          * help from the version string, which contains "MariaDB" in that case: 10.1.48-MariaDB-1~bionic.
          */
-        if (false !== strpos($platform, 'mariadb') || false !== strpos(strtolower($version), 'mariadb')) {
+        if (str_contains($platform, 'mariadb') || str_contains(strtolower($version), 'mariadb')) {
             $minSupported = $metadata->getMinSupportedMariaDbVersion();
-        } elseif (false !== strpos($platform, 'mysql')) {
+        } elseif (str_contains($platform, 'mysql')) {
             $minSupported = $metadata->getMinSupportedMySqlVersion();
         } else {
             throw new \Exception('Invalid database platform '.$platform.'. Mautic only supports MySQL and MariaDB!');
@@ -212,11 +200,9 @@ class SchemaHelper
     }
 
     /**
-     * @return array
-     *
      * @throws \Doctrine\DBAL\Exception
      */
-    protected function backupExistingSchema($tables, $mauticTables, $backupPrefix)
+    protected function backupExistingSchema($tables, $mauticTables, $backupPrefix): array
     {
         $sql = [];
         $sm  = $this->db->getSchemaManager();
@@ -312,10 +298,7 @@ class SchemaHelper
         return $sql;
     }
 
-    /**
-     * @return array
-     */
-    protected function dropExistingSchema($tables, $mauticTables)
+    protected function dropExistingSchema($tables, $mauticTables): array
     {
         $sql = [];
 
@@ -334,7 +317,7 @@ class SchemaHelper
      */
     protected function generateBackupName($prefix, $backupPrefix, $name)
     {
-        if (empty($prefix) || false === strpos($name, $prefix)) {
+        if (empty($prefix) || !str_contains($name, $prefix)) {
             return $backupPrefix.$name;
         } else {
             return str_replace($prefix, $backupPrefix, $name);

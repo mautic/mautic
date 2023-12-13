@@ -41,8 +41,6 @@ class DeviceApiController extends CommonApiController
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @param LeadDevice &$entity
      * @param string     $action
      */
@@ -68,9 +66,6 @@ class DeviceApiController extends CommonApiController
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function checkEntityAccess($entity, $action = 'view')
     {
         return parent::checkEntityAccess($entity->getLead(), $action);

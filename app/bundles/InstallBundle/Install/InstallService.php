@@ -41,44 +41,17 @@ class InstallService
 
     public const FINAL_STEP = 3;
 
-    private Configurator $configurator;
-
-    private CacheHelper $cacheHelper;
-
-    protected PathsHelper $pathsHelper;
-
-    private EntityManager $entityManager;
-
-    private TranslatorInterface $translator;
-
-    private KernelInterface $kernel;
-
-    private ValidatorInterface $validator;
-
-    private UserPasswordHasher $hasher;
-
-    private FixturesLoaderInterface $fixturesLoader;
-
     public function __construct(
-        Configurator $configurator,
-        CacheHelper $cacheHelper,
-        PathsHelper $pathsHelper,
-        EntityManager $entityManager,
-        TranslatorInterface $translator,
-        KernelInterface $kernel,
-        ValidatorInterface $validator,
-        UserPasswordHasher $hasher,
-        FixturesLoaderInterface $fixturesLoader
+        private Configurator $configurator,
+        private CacheHelper $cacheHelper,
+        protected PathsHelper $pathsHelper,
+        private EntityManager $entityManager,
+        private TranslatorInterface $translator,
+        private KernelInterface $kernel,
+        private ValidatorInterface $validator,
+        private UserPasswordHasher $hasher,
+        private FixturesLoaderInterface $fixturesLoader
     ) {
-        $this->configurator   = $configurator;
-        $this->cacheHelper    = $cacheHelper;
-        $this->pathsHelper    = $pathsHelper;
-        $this->entityManager  = $entityManager;
-        $this->translator     = $translator;
-        $this->kernel         = $kernel;
-        $this->validator      = $validator;
-        $this->hasher         = $hasher;
-        $this->fixturesLoader = $fixturesLoader;
     }
 
     /**
@@ -150,7 +123,6 @@ class InstallService
             return false;
         }
 
-        /** @var \Mautic\CoreBundle\Configurator\Configurator $configurator */
         $params = $this->configurator->getParameters();
 
         // if db_driver and site_url are present then it is assumed all the steps of the installation have been
@@ -210,7 +182,7 @@ class InstallService
         $messages = [];
         try {
             $this->configurator->write();
-        } catch (\RuntimeException $exception) {
+        } catch (\RuntimeException) {
             $messages = [
                 'error' => $this->translator->trans(
                     'mautic.installer.error.writing.configuration',
@@ -406,7 +378,7 @@ class InstallService
         try {
             /** @var User $existingUser */
             $existingUser = $entityManager->getRepository(User::class)->find(1);
-        } catch (\Exception $e) {
+        } catch (\Exception) {
             $existingUser = null;
         }
 

@@ -168,7 +168,7 @@ return [
                 'standard_entity' => true,
                 'name'            => 'smses',
                 'path'            => '/smses',
-                'controller'      => 'Mautic\SmsBundle\Controller\Api\SmsApiController',
+                'controller'      => \Mautic\SmsBundle\Controller\Api\SmsApiController::class,
             ],
             'mautic_api_smses_send' => [
                 'path'       => '/smses/{id}/contact/{contactId}/send',

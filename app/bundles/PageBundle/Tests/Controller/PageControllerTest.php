@@ -102,7 +102,7 @@ class PageControllerTest extends MauticMysqlTestCase
     /**
      * Skipped for now.
      */
-    public function LandingPageTrackingSecondVisit()
+    public function LandingPageTrackingSecondVisit(): void
     {
         $this->connection->insert($this->prefix.'pages', [
             'is_published' => true,
@@ -231,10 +231,8 @@ class PageControllerTest extends MauticMysqlTestCase
 
     /**
      * Only tests if an actual CSV file is returned.
-     *
-     * @return void
      */
-    public function testCsvIsExportedCorrectly()
+    public function testCsvIsExportedCorrectly(): void
     {
         $this->loadFixtures([LoadPageCategoryData::class, LoadPageData::class]);
 
@@ -251,10 +249,8 @@ class PageControllerTest extends MauticMysqlTestCase
 
     /**
      * Only tests if an actual Excel file is returned.
-     *
-     * @return void
      */
-    public function testExcelIsExportedCorrectly()
+    public function testExcelIsExportedCorrectly(): void
     {
         $this->loadFixtures([LoadPageCategoryData::class, LoadPageData::class]);
 
@@ -271,10 +267,8 @@ class PageControllerTest extends MauticMysqlTestCase
 
     /**
      * Only tests if an actual HTML file is returned.
-     *
-     * @return void
      */
-    public function testHTMLIsExportedCorrectly()
+    public function testHTMLIsExportedCorrectly(): void
     {
         $this->loadFixtures([LoadPageCategoryData::class, LoadPageData::class]);
 

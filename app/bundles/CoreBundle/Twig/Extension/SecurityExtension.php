@@ -11,11 +11,9 @@ use Twig\TwigFunction;
 
 class SecurityExtension extends AbstractExtension
 {
-    private SecurityHelper $securityHelper;
-
-    public function __construct(SecurityHelper $securityHelper)
-    {
-        $this->securityHelper = $securityHelper;
+    public function __construct(
+        private SecurityHelper $securityHelper
+    ) {
     }
 
     public function getFunctions()

@@ -4,9 +4,6 @@ namespace Mautic\CoreBundle\Doctrine;
 
 use Doctrine\DBAL\Schema\Schema;
 
-/**
- * Class VariantMigrationTrait.
- */
 trait VariantMigrationTrait
 {
     /**
