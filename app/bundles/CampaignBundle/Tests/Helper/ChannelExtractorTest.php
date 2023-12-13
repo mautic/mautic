@@ -9,7 +9,7 @@ use Mautic\CampaignBundle\Helper\ChannelExtractor;
 
 class ChannelExtractorTest extends \PHPUnit\Framework\TestCase
 {
-    public function testChannelIsSet()
+    public function testChannelIsSet(): void
     {
         $event  = new Event();
         $config = $this->createMock(AbstractEventAccessor::class);
@@ -23,7 +23,7 @@ class ChannelExtractorTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals('email', $log->getChannel());
     }
 
-    public function testChannelIsIgnoredIfSet()
+    public function testChannelIsIgnoredIfSet(): void
     {
         $event  = new Event();
         $config = $this->createMock(AbstractEventAccessor::class);
@@ -37,7 +37,7 @@ class ChannelExtractorTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals('page', $log->getChannel());
     }
 
-    public function testChannelIdIsSet()
+    public function testChannelIdIsSet(): void
     {
         $event = new Event();
         $event->setProperties(['email' => 1]);
@@ -57,7 +57,7 @@ class ChannelExtractorTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals(1, $log->getChannelId());
     }
 
-    public function testChannelIdIsIgnoredIfPropertiesAreEmpty()
+    public function testChannelIdIsIgnoredIfPropertiesAreEmpty(): void
     {
         $event = new Event();
         $event->setProperties(null);
@@ -77,7 +77,7 @@ class ChannelExtractorTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals(null, $log->getChannelId());
     }
 
-    public function testChannelIdIsIgnoredIfChannelIdFieldIsNotSet()
+    public function testChannelIdIsIgnoredIfChannelIdFieldIsNotSet(): void
     {
         $event = new Event();
         $event->setProperties(['email' => 1]);

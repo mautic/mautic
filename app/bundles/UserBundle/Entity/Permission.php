@@ -6,9 +6,6 @@ use Doctrine\ORM\Mapping as ORM;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\CoreBundle\Entity\CacheInvalidateInterface;
 
-/**
- * Class Permission.
- */
 class Permission implements CacheInvalidateInterface
 {
     public const CACHE_NAMESPACE = 'Permission';
@@ -38,12 +35,12 @@ class Permission implements CacheInvalidateInterface
      */
     protected $bitwise;
 
-    public static function loadMetadata(ORM\ClassMetadata $metadata)
+    public static function loadMetadata(ORM\ClassMetadata $metadata): void
     {
         $builder = new ClassMetadataBuilder($metadata);
 
         $builder->setTable('permissions')
-            ->setCustomRepositoryClass('Mautic\UserBundle\Entity\PermissionRepository')
+            ->setCustomRepositoryClass(\Mautic\UserBundle\Entity\PermissionRepository::class)
             ->addUniqueConstraint(['bundle', 'name', 'role_id'], 'unique_perm');
 
         $builder->addId();
@@ -124,8 +121,6 @@ class Permission implements CacheInvalidateInterface
 
     /**
      * Set role.
-     *
-     * @param Role $role
      *
      * @return Permission
      */

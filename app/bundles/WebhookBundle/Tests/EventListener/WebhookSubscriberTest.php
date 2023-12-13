@@ -12,9 +12,11 @@ use Mautic\WebhookBundle\WebhookEvents;
 
 class WebhookSubscriberTest extends \PHPUnit\Framework\TestCase
 {
-    private $ipLookupHelper;
-    private $auditLogModel;
-    private $webhookKillNotificator;
+    private \PHPUnit\Framework\MockObject\MockObject $ipLookupHelper;
+
+    private \PHPUnit\Framework\MockObject\MockObject $auditLogModel;
+
+    private \PHPUnit\Framework\MockObject\MockObject $webhookKillNotificator;
 
     protected function setUp(): void
     {
@@ -23,7 +25,7 @@ class WebhookSubscriberTest extends \PHPUnit\Framework\TestCase
         $this->webhookKillNotificator = $this->createMock(WebhookKillNotificator::class);
     }
 
-    public function testGetSubscribedEvents()
+    public function testGetSubscribedEvents(): void
     {
         $this->assertSame(
             [
@@ -35,7 +37,7 @@ class WebhookSubscriberTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testOnWebhookKill()
+    public function testOnWebhookKill(): void
     {
         $webhookMock = $this->createMock(Webhook::class);
         $reason      = 'reason';

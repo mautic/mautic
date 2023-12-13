@@ -7,9 +7,6 @@ use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\CoreBundle\Entity\CacheInvalidateInterface;
 use Mautic\CoreBundle\Entity\CommonEntity;
 
-/**
- * Class Integration.
- */
 class Integration extends CommonEntity implements CacheInvalidateInterface
 {
     public const CACHE_NAMESPACE = 'IntegrationSettings';
@@ -49,12 +46,12 @@ class Integration extends CommonEntity implements CacheInvalidateInterface
      */
     private $featureSettings = [];
 
-    public static function loadMetadata(ORM\ClassMetadata $metadata)
+    public static function loadMetadata(ORM\ClassMetadata $metadata): void
     {
         $builder = new ClassMetadataBuilder($metadata);
 
         $builder->setTable('plugin_integration_settings')
-            ->setCustomRepositoryClass('Mautic\PluginBundle\Entity\IntegrationRepository');
+            ->setCustomRepositoryClass(\Mautic\PluginBundle\Entity\IntegrationRepository::class);
 
         $builder->createField('id', 'integer')
             ->makePrimaryKey()

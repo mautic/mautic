@@ -9,27 +9,19 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class RateLimitGenerateKeySubscriber implements EventSubscriberInterface
 {
-    /**
-     * @var CoreParametersHelper
-     */
-    private $coreParametersHelper;
-
-    public function __construct(CoreParametersHelper $coreParametersHelper)
-    {
-        $this->coreParametersHelper = $coreParametersHelper;
+    public function __construct(
+        private CoreParametersHelper $coreParametersHelper
+    ) {
     }
 
-    /**
-     * @return array
-     */
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
           RateLimitEvents::GENERATE_KEY => ['onGenerateKey', 0],
         ];
     }
 
-    public function onGenerateKey(GenerateKeyEvent $event)
+    public function onGenerateKey(GenerateKeyEvent $event): void
     {
         $suffix = rawurlencode($this->coreParametersHelper->get('site_url'));
         $event->addToKey($suffix);

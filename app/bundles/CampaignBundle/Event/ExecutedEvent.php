@@ -7,23 +7,10 @@ use Mautic\CampaignBundle\EventCollector\Accessor\Event\AbstractEventAccessor;
 
 class ExecutedEvent extends \Symfony\Contracts\EventDispatcher\Event
 {
-    /**
-     * @var AbstractEventAccessor
-     */
-    private $config;
-
-    /**
-     * @var LeadEventLog
-     */
-    private $log;
-
-    /**
-     * ExecutedEvent constructor.
-     */
-    public function __construct(AbstractEventAccessor $config, LeadEventLog $log)
-    {
-        $this->config = $config;
-        $this->log    = $log;
+    public function __construct(
+        private AbstractEventAccessor $config,
+        private LeadEventLog $log
+    ) {
     }
 
     /**

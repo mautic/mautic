@@ -11,9 +11,6 @@ use Mautic\CoreBundle\Entity\FormEntity;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
 
-/**
- * Class Role.
- */
 class Role extends FormEntity implements CacheInvalidateInterface
 {
     public const CACHE_NAMESPACE = 'Role';
@@ -53,21 +50,18 @@ class Role extends FormEntity implements CacheInvalidateInterface
      */
     private $users;
 
-    /**
-     * Constructor.
-     */
     public function __construct()
     {
         $this->permissions = new ArrayCollection();
         $this->users       = new ArrayCollection();
     }
 
-    public static function loadMetadata(ORM\ClassMetadata $metadata)
+    public static function loadMetadata(ORM\ClassMetadata $metadata): void
     {
         $builder = new ClassMetadataBuilder($metadata);
 
         $builder->setTable('roles')
-            ->setCustomRepositoryClass('Mautic\UserBundle\Entity\RoleRepository');
+            ->setCustomRepositoryClass(\Mautic\UserBundle\Entity\RoleRepository::class);
 
         $builder->addIdColumns();
 
@@ -93,7 +87,7 @@ class Role extends FormEntity implements CacheInvalidateInterface
             ->build();
     }
 
-    public static function loadValidatorMetadata(ClassMetadata $metadata)
+    public static function loadValidatorMetadata(ClassMetadata $metadata): void
     {
         $metadata->addPropertyConstraint('name', new Assert\NotBlank(
             ['message' => 'mautic.core.name.required']
@@ -103,7 +97,7 @@ class Role extends FormEntity implements CacheInvalidateInterface
     /**
      * Prepares the metadata for API usage.
      */
-    public static function loadApiMetadata(ApiMetadataDriver $metadata)
+    public static function loadApiMetadata(ApiMetadataDriver $metadata): void
     {
         $metadata->setGroupPrefix('role')
             ->addListProperties(
@@ -170,7 +164,7 @@ class Role extends FormEntity implements CacheInvalidateInterface
     /**
      * Remove permissions.
      */
-    public function removePermission(Permission $permissions)
+    public function removePermission(Permission $permissions): void
     {
         $this->permissions->removeElement($permissions);
     }
@@ -248,7 +242,7 @@ class Role extends FormEntity implements CacheInvalidateInterface
     /**
      * Simply used to store a readable format of permissions for the changelog.
      */
-    public function setRawPermissions(array $permissions)
+    public function setRawPermissions(array $permissions): void
     {
         $this->isChanged('rawPermissions', $permissions);
         $this->rawPermissions = $permissions;
@@ -279,7 +273,7 @@ class Role extends FormEntity implements CacheInvalidateInterface
     /**
      * Remove users.
      */
-    public function removeUser(User $users)
+    public function removeUser(User $users): void
     {
         $this->users->removeElement($users);
     }

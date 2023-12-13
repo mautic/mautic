@@ -18,7 +18,7 @@ class AjaxController extends CommonAjaxController
 {
     use AjaxLookupControllerTrait;
 
-    public function getSmsCountStatsAction(Request $request, BroadcastQuery $broadcastQuery, CacheStorageHelper $cacheStorageHelper)
+    public function getSmsCountStatsAction(Request $request, BroadcastQuery $broadcastQuery, CacheStorageHelper $cacheStorageHelper): JsonResponse
     {
         /** @var SmsModel $model */
         $model = $this->getModel('sms');
@@ -66,15 +66,11 @@ class AjaxController extends CommonAjaxController
         return new JsonResponse($data);
     }
 
-    /**
-     * @return JsonResponse
-     */
-    public function getBuilderTokensAction(Request $request, EventDispatcherInterface $eventDispatcher = null)
+    public function getBuilderTokensAction(Request $request, EventDispatcherInterface $eventDispatcher = null): JsonResponse
     {
         $query  = $request->get('query', '');
         $tokens = $this->getBuilderTokens($query);
-        /** @var EventDispatcherInterface $eventDispatcher */
-        $event           = new TokensBuildEvent($tokens);
+        $event  = new TokensBuildEvent($tokens);
         $eventDispatcher->dispatch($event, SmsEvents::ON_SMS_TOKENS_BUILD);
 
         return $this->sendJsonResponse(['tokens'=>$event->getTokens()]);
@@ -97,9 +93,9 @@ class AjaxController extends CommonAjaxController
         $tokens       = $components['tokens'];
 
         array_map(
-            function ($token, $value) use ($findTokens, &$returnTokens) {
+            function ($token, $value) use ($findTokens, &$returnTokens): void {
                 foreach ($findTokens as $findToken) {
-                    if (substr($token, 0, strlen($findToken)) === $findToken) {
+                    if (str_starts_with($token, $findToken)) {
                         $returnTokens[$token] = $value;
                     }
                 }

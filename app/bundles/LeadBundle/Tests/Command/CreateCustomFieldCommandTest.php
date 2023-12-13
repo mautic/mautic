@@ -17,9 +17,13 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 class CreateCustomFieldCommandTest extends TestCase
 {
     private BackgroundService $backgroundServiceMock;
+
     private TranslatorInterface $translatorMock;
+
     private LeadFieldRepository $leadFieldRepositoryMock;
+
     private PathsHelper $pathsHelperMock;
+
     private CoreParametersHelper $coreParametersHelper;
 
     protected function setUp(): void
@@ -60,7 +64,7 @@ class CreateCustomFieldCommandTest extends TestCase
     /**
      * @return array<int, array<int, bool|int>>
      */
-    public function completeRunMethodProvider(): array
+    public static function completeRunMethodProvider(): array
     {
         return [
             [true, 1],  // `completeRun` should be called once

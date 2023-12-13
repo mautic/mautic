@@ -6,25 +6,18 @@ namespace Mautic\CoreBundle\Doctrine\GeneratedColumn;
 
 final class GeneratedColumns implements GeneratedColumnsInterface
 {
-    /**
-     * @var int
-     */
-    private $position = 0;
+    private int $position = 0;
 
     /**
      * Simple array of generated columns.
-     *
-     * @var array
      */
-    private $generatedColumns = [];
+    private array $generatedColumns = [];
 
     /**
      * Array structure holding the generated columns that allows to
      * search by date column and unit without need for a loop.
-     *
-     * @var array
      */
-    private $dateColumnIndex = [];
+    private array $dateColumnIndex = [];
 
     public function add(GeneratedColumn $generatedColumn): void
     {

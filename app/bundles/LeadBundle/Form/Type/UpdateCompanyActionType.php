@@ -12,17 +12,12 @@ class UpdateCompanyActionType extends AbstractType
 {
     use EntityFieldsBuildFormTrait;
 
-    /**
-     * @var FieldModel
-     */
-    protected $fieldModel;
-
-    public function __construct(FieldModel $fieldModel)
-    {
-        $this->fieldModel = $fieldModel;
+    public function __construct(
+        protected FieldModel $fieldModel
+    ) {
     }
 
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $leadFields = $this->fieldModel->getEntities(
             [

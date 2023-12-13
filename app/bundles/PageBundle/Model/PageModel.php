@@ -63,72 +63,21 @@ class PageModel extends FormModel
      */
     protected $catInUrl;
 
-    /**
-     * @var CookieHelper
-     */
-    protected $cookieHelper;
-
-    /**
-     * @var IpLookupHelper
-     */
-    protected $ipLookupHelper;
-
-    /**
-     * @var LeadModel
-     */
-    protected $leadModel;
-
-    /**
-     * @var FieldModel
-     */
-    protected $leadFieldModel;
-
-    /**
-     * @var RedirectModel
-     */
-    protected $pageRedirectModel;
-
-    /**
-     * @var TrackableModel
-     */
-    protected $pageTrackableModel;
-
-    /**
-     * @var DateTimeHelper
-     */
-    protected $dateTimeHelper;
-
-    /**
-     * @var DeviceTracker
-     */
-    private $deviceTracker;
-
-    /**
-     * @var CompanyModel
-     */
-    private $companyModel;
-
-    /**
-     * @var ContactTracker
-     */
-    private $contactTracker;
-    private MessageBusInterface $messageBus;
-
-    private ContactRequestHelper $contactRequestHelper;
+    protected \Mautic\CoreBundle\Helper\DateTimeHelper $dateTimeHelper;
 
     public function __construct(
-        CookieHelper $cookieHelper,
-        IpLookupHelper $ipLookupHelper,
-        LeadModel $leadModel,
-        FieldModel $leadFieldModel,
-        RedirectModel $pageRedirectModel,
-        TrackableModel $pageTrackableModel,
-        MessageBusInterface $messageBus,
-        CompanyModel $companyModel,
-        DeviceTracker $deviceTracker,
-        ContactTracker $contactTracker,
+        protected CookieHelper $cookieHelper,
+        protected IpLookupHelper $ipLookupHelper,
+        protected LeadModel $leadModel,
+        protected FieldModel $leadFieldModel,
+        protected RedirectModel $pageRedirectModel,
+        protected TrackableModel $pageTrackableModel,
+        private MessageBusInterface $messageBus,
+        private CompanyModel $companyModel,
+        private DeviceTracker $deviceTracker,
+        private ContactTracker $contactTracker,
         CoreParametersHelper $coreParametersHelper,
-        ContactRequestHelper $contactRequestHelper,
+        private ContactRequestHelper $contactRequestHelper,
         EntityManager $em,
         CorePermissions $security,
         EventDispatcherInterface $dispatcher,
@@ -137,23 +86,12 @@ class PageModel extends FormModel
         UserHelper $userHelper,
         LoggerInterface $mauticLogger
     ) {
-        $this->cookieHelper         = $cookieHelper;
-        $this->ipLookupHelper       = $ipLookupHelper;
-        $this->leadModel            = $leadModel;
-        $this->leadFieldModel       = $leadFieldModel;
-        $this->pageRedirectModel    = $pageRedirectModel;
-        $this->pageTrackableModel   = $pageTrackableModel;
         $this->dateTimeHelper       = new DateTimeHelper();
-        $this->companyModel         = $companyModel;
-        $this->deviceTracker        = $deviceTracker;
-        $this->contactTracker       = $contactTracker;
-        $this->contactRequestHelper = $contactRequestHelper;
-        $this->messageBus           = $messageBus;
 
         parent::__construct($em, $security, $dispatcher, $router, $translator, $userHelper, $mauticLogger, $coreParametersHelper);
     }
 
-    public function setCatInUrl($catInUrl)
+    public function setCatInUrl($catInUrl): void
     {
         $this->catInUrl = $catInUrl;
     }
@@ -177,12 +115,12 @@ class PageModel extends FormModel
         return $this->em->getRepository(\Mautic\PageBundle\Entity\Hit::class);
     }
 
-    public function getPermissionBase()
+    public function getPermissionBase(): string
     {
         return 'page:pages';
     }
 
-    public function getNameGetter()
+    public function getNameGetter(): string
     {
         return 'getTitle';
     }
@@ -191,7 +129,7 @@ class PageModel extends FormModel
      * @param Page $entity
      * @param bool $unlock
      */
-    public function saveEntity($entity, $unlock = true)
+    public function saveEntity($entity, $unlock = true): void
     {
         $pageIds = $entity->getRelatedEntityIds();
 
@@ -241,7 +179,7 @@ class PageModel extends FormModel
     /**
      * @param Page $entity
      */
-    public function deleteEntity($entity)
+    public function deleteEntity($entity): void
     {
         if ($entity->isVariant() && $entity->getIsPublished()) {
             $this->resetVariants($entity);
@@ -253,7 +191,7 @@ class PageModel extends FormModel
     /**
      * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
      */
-    public function createForm($entity, FormFactoryInterface $formFactory, $action = null, $options = [])
+    public function createForm($entity, FormFactoryInterface $formFactory, $action = null, $options = []): \Symfony\Component\Form\FormInterface
     {
         if (!$entity instanceof Page) {
             throw new MethodNotAllowedHttpException(['Page']);
@@ -272,10 +210,7 @@ class PageModel extends FormModel
         return $formFactory->create($formClass, $entity, $options);
     }
 
-    /**
-     * @return Page|null
-     */
-    public function getEntity($id = null)
+    public function getEntity($id = null): ?Page
     {
         if (null === $id) {
             $entity = new Page();
@@ -293,7 +228,7 @@ class PageModel extends FormModel
     /**
      * @throws \Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException
      */
-    protected function dispatchEvent($action, &$entity, $isNew = false, Event $event = null)
+    protected function dispatchEvent($action, &$entity, $isNew = false, Event $event = null): ?Event
     {
         if (!$entity instanceof Page) {
             throw new MethodNotAllowedHttpException(['Page']);
@@ -378,10 +313,8 @@ class PageModel extends FormModel
 
     /**
      * Generates slug string.
-     *
-     * @return string
      */
-    public function generateSlug($entity)
+    public function generateSlug($entity): string
     {
         $pageSlug = $entity->getAlias();
 
@@ -438,7 +371,7 @@ class PageModel extends FormModel
      *
      * @throws \Exception
      */
-    public function hitPage(Redirect|Page|null $page, Request $request, $code = '200', Lead $lead = null, $query = [])
+    public function hitPage(Redirect|Page|null $page, Request $request, $code = '200', Lead $lead = null, $query = []): void
     {
         // Don't skew results with user hits
         if (!$this->security->isAnonymous()) {
@@ -615,7 +548,7 @@ class PageModel extends FormModel
         }
 
         $hit->setQuery($query);
-        $hit->setUrl((isset($query['page_url'])) ? $query['page_url'] : $request->getRequestUri());
+        $hit->setUrl($query['page_url'] ?? $request->getRequestUri());
 
         // Add entry to contact log table
         $this->setLeadManipulator($page, $hit, $lead);
@@ -755,10 +688,8 @@ class PageModel extends FormModel
 
     /**
      * @param Redirect|Page|null $page
-     *
-     * @return array
      */
-    public function getHitQuery(Request $request, $page = null)
+    public function getHitQuery(Request $request, $page = null): array
     {
         $get  = $request->query->all();
         $post = $request->request->all();
@@ -800,9 +731,9 @@ class PageModel extends FormModel
     /**
      * Get number of page bounces.
      *
-     * @return int
+     * @return mixed[]
      */
-    public function getBounces(Page $page, \DateTime $fromDate = null)
+    public function getBounces(Page $page, \DateTime $fromDate = null): array
     {
         return $this->getHitRepository()->getBounces($page->getId(), $fromDate);
     }
@@ -810,7 +741,7 @@ class PageModel extends FormModel
     /**
      * Joins the page table and limits created_by to currently logged in user.
      */
-    public function limitQueryToCreator(QueryBuilder &$q)
+    public function limitQueryToCreator(QueryBuilder &$q): void
     {
         $q->join('t', MAUTIC_TABLE_PREFIX.'pages', 'p', 'p.id = t.page_id')
             ->andWhere('p.created_by = :userId')
@@ -824,10 +755,8 @@ class PageModel extends FormModel
      * @param string $dateFormat
      * @param array  $filter
      * @param bool   $canViewOthers
-     *
-     * @return array
      */
-    public function getHitsLineChartData($unit, \DateTime $dateFrom, \DateTime $dateTo, $dateFormat = null, $filter = [], $canViewOthers = true)
+    public function getHitsLineChartData($unit, \DateTime $dateFrom, \DateTime $dateTo, $dateFormat = null, $filter = [], $canViewOthers = true): array
     {
         $flag = null;
 
@@ -879,10 +808,8 @@ class PageModel extends FormModel
      * @param \DateTime $dateTo
      * @param array     $filters
      * @param bool      $canViewOthers
-     *
-     * @return array
      */
-    public function getNewVsReturningPieChartData($dateFrom, $dateTo, $filters = [], $canViewOthers = true)
+    public function getNewVsReturningPieChartData($dateFrom, $dateTo, $filters = [], $canViewOthers = true): array
     {
         $chart              = new PieChart();
         $query              = new ChartQuery($this->em->getConnection(), $dateFrom, $dateTo);
@@ -911,10 +838,8 @@ class PageModel extends FormModel
      *
      * @param array $filters
      * @param bool  $canViewOthers
-     *
-     * @return array
      */
-    public function getDwellTimesPieChartData(\DateTime $dateFrom, \DateTime $dateTo, $filters = [], $canViewOthers = true)
+    public function getDwellTimesPieChartData(\DateTime $dateFrom, \DateTime $dateTo, $filters = [], $canViewOthers = true): array
     {
         $timesOnSite = $this->getHitRepository()->getDwellTimeLabels();
         $chart       = new PieChart();
@@ -936,13 +861,8 @@ class PageModel extends FormModel
 
     /**
      * Get bar chart data of hits.
-     *
-     * @param DateTime $dateFrom
-     * @param DateTime $dateTo
-     *
-     * @return array
      */
-    public function getDeviceGranularityData(\DateTime $dateFrom, \DateTime $dateTo, $filters = [], $canViewOthers = true)
+    public function getDeviceGranularityData(\DateTime $dateFrom, \DateTime $dateTo, $filters = [], $canViewOthers = true): array
     {
         $q = $this->em->getConnection()->createQueryBuilder();
 
@@ -1010,11 +930,9 @@ class PageModel extends FormModel
     /**
      * Get a list of pages created in a date range.
      *
-     * @param int       $limit
-     * @param \DateTime $dateFrom
-     * @param \DateTime $dateTo
-     * @param array     $filters
-     * @param bool      $canViewOthers
+     * @param int   $limit
+     * @param array $filters
+     * @param bool  $canViewOthers
      *
      * @return array
      */
@@ -1068,7 +986,7 @@ class PageModel extends FormModel
         $queryHasUtmTags = false;
         $query           = $hit->getQuery();
         foreach ($query as $key => $value) {
-            if (false !== strpos($key, 'utm_')) {
+            if (str_contains($key, 'utm_')) {
                 $queryHasUtmTags = true;
                 break;
             }
@@ -1107,7 +1025,7 @@ class PageModel extends FormModel
         }
     }
 
-    private function setLeadManipulator($page, Hit $hit, Lead $lead)
+    private function setLeadManipulator($page, Hit $hit, Lead $lead): void
     {
         // Only save the lead and dispatch events if needed
         $source   = 'hit';
@@ -1146,13 +1064,13 @@ class PageModel extends FormModel
 
         // Use the current URL
         $isPageEvent = false;
-        if (false !== strpos($request->server->get('REQUEST_URI'), $this->router->generate('mautic_page_tracker'))) {
+        if (str_contains($request->server->get('REQUEST_URI'), $this->router->generate('mautic_page_tracker'))) {
             // Tracking pixel is used
             if ($request->server->get('QUERY_STRING')) {
                 parse_str($request->server->get('QUERY_STRING'), $query);
                 $isPageEvent = true;
             }
-        } elseif (false !== strpos($request->server->get('REQUEST_URI'), $this->router->generate('mautic_page_tracker_cors'))) {
+        } elseif (str_contains($request->server->get('REQUEST_URI'), $this->router->generate('mautic_page_tracker_cors'))) {
             $query       = $request->request->all();
             $isPageEvent = true;
         }

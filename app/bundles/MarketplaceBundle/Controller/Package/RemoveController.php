@@ -23,16 +23,10 @@ use Symfony\Component\HttpFoundation\Response;
 
 class RemoveController extends CommonController
 {
-    private PackageModel $packageModel;
-
-    private RouteProvider $routeProvider;
-
-    private Config $config;
-
     public function __construct(
-        PackageModel $packageModel,
-        RouteProvider $routeProvider,
-        Config $config,
+        private PackageModel $packageModel,
+        private RouteProvider $routeProvider,
+        private Config $config,
         ManagerRegistry $doctrine,
         MauticFactory $factory,
         ModelFactory $modelFactory,
@@ -44,10 +38,6 @@ class RemoveController extends CommonController
         RequestStack $requestStack,
         CorePermissions $security
     ) {
-        $this->packageModel    = $packageModel;
-        $this->routeProvider   = $routeProvider;
-        $this->config          = $config;
-
         parent::__construct($doctrine, $factory, $modelFactory, $userHelper, $coreParametersHelper, $dispatcher, $translator, $flashBag, $requestStack, $security);
     }
 

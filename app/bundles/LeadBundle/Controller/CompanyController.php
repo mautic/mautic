@@ -606,10 +606,8 @@ class CompanyController extends FormController
      * @param int        $companyId
      * @param int        $page
      * @param array<int> $leadIds   filter to get only company's contacts
-     *
-     * @return array
      */
-    public function getCompanyContacts(Request $request, $companyId, $page = 0, $leadIds = [])
+    public function getCompanyContacts(Request $request, $companyId, $page = 0, $leadIds = []): array
     {
         $this->setListFilters();
 
@@ -908,7 +906,7 @@ class CompanyController extends FormController
                     }
 
                     // Both leads are good so now we merge them
-                    $model->companyMerge($primaryCompany, $secondaryCompany, false);
+                    $model->companyMerge($primaryCompany, $secondaryCompany);
                 }
 
                 if ($valid) {
