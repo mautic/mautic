@@ -36,7 +36,7 @@ class SearchSubscriberTest extends TestCase
 
         $contactRepository->method('applySearchQueryRelationship')
             ->willReturnCallback(
-                function (QueryBuilder $q, array $tables, $innerJoinTables, $whereExpression = null, $having = null) {
+                function (QueryBuilder $q, array $tables, $innerJoinTables, $whereExpression = null, $having = null): void {
                     // the following code is taken from LeadRepository class
                     $primaryTable = $tables[0];
                     unset($tables[0]);

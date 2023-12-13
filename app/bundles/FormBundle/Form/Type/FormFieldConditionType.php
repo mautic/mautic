@@ -15,20 +15,10 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class FormFieldConditionType extends AbstractType
 {
-    /**
-     * @var FieldModel
-     */
-    private $fieldModel;
-
-    /**
-     * @var PropertiesAccessor
-     */
-    private $propertiesAccessor;
-
-    public function __construct(FieldModel $fieldModel, PropertiesAccessor $propertiesAccessor)
-    {
-        $this->fieldModel          = $fieldModel;
-        $this->propertiesAccessor  = $propertiesAccessor;
+    public function __construct(
+        private FieldModel $fieldModel,
+        private PropertiesAccessor $propertiesAccessor
+    ) {
     }
 
     /**

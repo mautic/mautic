@@ -7,16 +7,10 @@ use Symfony\Contracts\EventDispatcher\Event;
 class TokensBuildEvent extends Event
 {
     /**
-     * @var array<string,array<int|string>>
-     */
-    private array $tokens;
-
-    /**
      * @param array<string,array<int|string>> $tokens
      */
-    public function __construct(array $tokens)
+    public function __construct(private array $tokens)
     {
-        $this->tokens = $tokens;
     }
 
     /**

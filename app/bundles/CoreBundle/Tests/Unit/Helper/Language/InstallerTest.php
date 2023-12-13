@@ -7,7 +7,7 @@ use Symfony\Component\Filesystem\Filesystem;
 
 class InstallerTest extends \PHPUnit\Framework\TestCase
 {
-    public function testInstaller()
+    public function testInstaller(): void
     {
         $translationsDirectory = __DIR__.'/../resource/language';
 

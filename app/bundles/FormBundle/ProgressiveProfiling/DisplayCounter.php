@@ -7,59 +7,36 @@ use Mautic\FormBundle\Entity\Form;
 
 class DisplayCounter
 {
-    /**
-     * @var int
-     */
-    private $displayedFields = 0;
+    private int $displayedFields = 0;
 
-    /**
-     * @var int
-     */
-    private $alreadyAlwaysDisplayed = 0;
+    private int $alreadyAlwaysDisplayed = 0;
 
-    /**
-     * @var Form
-     */
-    private $form;
-
-    /**
-     * DisplayCounter constructor.
-     */
-    public function __construct(Form $form)
-    {
-        $this->form = $form;
+    public function __construct(
+        private Form $form
+    ) {
     }
 
-    public function increaseDisplayedFields()
+    public function increaseDisplayedFields(): void
     {
         ++$this->displayedFields;
     }
 
-    /**
-     * @return int
-     */
-    public function getDisplayFields()
+    public function getDisplayFields(): int
     {
         return $this->displayedFields;
     }
 
-    public function increaseAlreadyAlwaysDisplayed()
+    public function increaseAlreadyAlwaysDisplayed(): void
     {
         ++$this->alreadyAlwaysDisplayed;
     }
 
-    /**
-     * @return int
-     */
-    public function getAlreadyAlwaysDisplayed()
+    public function getAlreadyAlwaysDisplayed(): int
     {
         return $this->alreadyAlwaysDisplayed;
     }
 
-    /**
-     * @return int
-     */
-    public function getAlwaysDisplayFields()
+    public function getAlwaysDisplayFields(): int
     {
         $i= 0;
         /** @var Field $field */

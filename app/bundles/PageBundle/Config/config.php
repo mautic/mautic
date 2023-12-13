@@ -58,7 +58,7 @@ return [
                 'standard_entity' => true,
                 'name'            => 'pages',
                 'path'            => '/pages',
-                'controller'      => 'Mautic\PageBundle\Controller\Api\PageApiController',
+                'controller'      => \Mautic\PageBundle\Controller\Api\PageApiController::class,
             ],
         ],
         'catchall' => [
@@ -132,11 +132,11 @@ return [
         ],
         'other' => [
             'mautic.page.helper.token' => [
-                'class'     => 'Mautic\PageBundle\Helper\TokenHelper',
+                'class'     => \Mautic\PageBundle\Helper\TokenHelper::class,
                 'arguments' => 'mautic.page.model.page',
             ],
             'mautic.page.helper.tracking' => [
-                'class'     => 'Mautic\PageBundle\Helper\TrackingHelper',
+                'class'     => \Mautic\PageBundle\Helper\TrackingHelper::class,
                 'arguments' => [
                     'session',
                     'mautic.helper.core_parameters',

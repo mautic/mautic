@@ -19,17 +19,17 @@ class FieldBuilderTest extends TestCase
     /**
      * @var Router|\PHPUnit\Framework\MockObject\MockObject
      */
-    private $router;
+    private \PHPUnit\Framework\MockObject\MockObject $router;
 
     /**
      * @var FieldHelper|\PHPUnit\Framework\MockObject\MockObject
      */
-    private $fieldHelper;
+    private \PHPUnit\Framework\MockObject\MockObject $fieldHelper;
 
     /**
      * @var ContactObjectHelper|\PHPUnit\Framework\MockObject\MockObject
      */
-    private $contactObjectHelper;
+    private \PHPUnit\Framework\MockObject\MockObject $contactObjectHelper;
 
     protected function setUp(): void
     {

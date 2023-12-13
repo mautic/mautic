@@ -790,7 +790,7 @@ class ReportController extends FormController
 
         if ('csv' === $format) {
             $response = new HttpFoundation\StreamedResponse(
-                function () use ($model, $entity, $format, $options) {
+                function () use ($model, $entity, $format, $options): void {
                     $options['paginate']        = true;
                     $options['ignoreGraphData'] = true;
                     $options['limit']           = (int) $this->coreParametersHelper->getParameter('report_export_batch_size', 1000);

@@ -7,8 +7,6 @@ use Symfony\Component\Cache\Adapter\DoctrineDbalAdapter;
 use Symfony\Component\Cache\Adapter\FilesystemAdapter;
 
 /**
- * Class CacheStorageHelper.
- *
  * @deprecated This helper is deprecated in favor of CacheBundle
  */
 class CacheStorageHelper
@@ -27,30 +25,7 @@ class CacheStorageHelper
      */
     protected $cacheAdaptor;
 
-    /**
-     * @var string
-     */
-    protected $adaptor;
-
-    /**
-     * @var Connection
-     */
-    protected $connection;
-
-    /**
-     * @var string
-     */
-    protected $cacheDir;
-
-    /**
-     * @var string
-     */
-    protected $namespace;
-
-    /**
-     * @var int
-     */
-    protected $defaultExpiration;
+    protected string $cacheDir;
 
     /**
      * Semi BC support for pre 2.6.0.
@@ -62,17 +37,19 @@ class CacheStorageHelper
     protected $expirations = [];
 
     /**
-     * @param null $namespace
-     * @param null $cacheDir
-     * @param int  $defaultExpiration
+     * @param mixed  $cacheDir
+     * @param mixed  $namespace
+     * @param int    $defaultExpiration
+     * @param string $adaptor
      */
-    public function __construct($adaptor, $namespace = null, Connection $connection = null, $cacheDir = null, $defaultExpiration = 0)
-    {
+    public function __construct(
+        protected $adaptor,
+        protected $namespace = null,
+        protected ?Connection $connection = null,
+        $cacheDir = null,
+        protected $defaultExpiration = 0
+    ) {
         $this->cacheDir          = $cacheDir.'/data';
-        $this->adaptor           = $adaptor;
-        $this->namespace         = $namespace;
-        $this->connection        = $connection;
-        $this->defaultExpiration = $defaultExpiration;
 
         // @deprecated BC support for pre 2.6.0 to be removed in 3.0
         if (!in_array($adaptor, [self::ADAPTOR_DATABASE, self::ADAPTOR_FILESYSTEM])) {
@@ -88,17 +65,12 @@ class CacheStorageHelper
         $this->setCacheAdaptor();
     }
 
-    /**
-     * @return string|false
-     */
-    public function getAdaptorClassName()
+    public function getAdaptorClassName(): string
     {
-        return get_class($this->cacheAdaptor);
+        return $this->cacheAdaptor::class;
     }
 
     /**
-     * @param null $expiration
-     *
      * @return bool
      *
      * @throws \Psr\Cache\InvalidArgumentException
@@ -142,7 +114,7 @@ class CacheStorageHelper
         return false;
     }
 
-    public function delete($name)
+    public function delete($name): void
     {
         $this->cacheAdaptor->deleteItem($name);
     }
@@ -158,15 +130,12 @@ class CacheStorageHelper
     /**
      * Wipes out the cache directory.
      */
-    public function clear()
+    public function clear(): void
     {
         $this->cacheAdaptor->clear();
     }
 
     /**
-     * @param null $namespace
-     * @param null $defaultExpiration
-     *
      * @return CacheStorageHelper;
      */
     public function getCache($namespace = null, $defaultExpiration = 0)
@@ -214,7 +183,7 @@ class CacheStorageHelper
      *
      * @deprecated 2.6.0 to be removed in 3.0
      */
-    public function touchDir()
+    public function touchDir(): void
     {
     }
 }
