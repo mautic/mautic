@@ -4733,6 +4733,7 @@ label.required:after {
   -webkit-transition: all 0.5s ease;
   -o-transition: all 0.5s ease;
   transition: all 0.5s ease;
+  background-color: transparent;
 }
 .search-container a.search-button {
   color: var(--text-inverse);

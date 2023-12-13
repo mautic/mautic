@@ -2659,6 +2659,10 @@ output {
   border: none;
   border-bottom: 1px solid var(--border-strong);
 }
+.form-control.search {
+  height: 48px;
+  border-bottom: none;
+}
 .form-control:hover {
 }
 .form-control:focus, .chosen-container-active .chosen-single {
@@ -3973,7 +3977,6 @@ tbody.collapse.in {
   position: relative;
   display: table;
   border-collapse: separate;
-  border-bottom: 1px solid var(--border-strong);
 }
 .input-group[class*="col-"] {
   float: none;
@@ -3986,7 +3989,6 @@ tbody.collapse.in {
   float: left;
   width: 100%;
   margin-bottom: 0;
-  border-bottom: none;
 }
 .input-group .form-control:focus {
   z-index: 3;
@@ -4062,6 +4064,9 @@ select[multiple].input-group-sm > .input-group-btn > .btn {
   color: #596776;
   text-align: center;
   background-color: var(--field);
+}
+.form-group .input-group-addon {
+  border-bottom: 1px solid var(--border-strong);
 }
 .input-group-addon.input-sm {
   padding: 5px 10px;
