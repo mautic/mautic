@@ -8,49 +8,24 @@ use Symfony\Contracts\EventDispatcher\Event;
 
 class AggregateStatRequestEvent extends Event
 {
-    /**
-     * @var string
-     */
-    private $statName;
+    private \Mautic\StatsBundle\Aggregate\Collection\StatCollection $statCollection;
 
     /**
-     * @var \DateTimeInterface
-     */
-    private $fromDateTime;
-
-    /**
-     * @var \DateTimeInterface
-     */
-    private $toDateTime;
-
-    /**
-     * @var StatCollection
-     */
-    private $statCollection;
-
-    /**
-     * @var FetchOptions
-     */
-    private $options;
-
-    /**
-     * AggregateStatRequestEvent constructor.
-     *
      * @param string $statName
      */
-    public function __construct($statName, \DateTimeInterface $fromDateTime, \DateTimeInterface $toDateTime, FetchOptions $eventOptions)
-    {
-        $this->statName       = $statName;
-        $this->fromDateTime   = $fromDateTime;
-        $this->toDateTime     = $toDateTime;
-        $this->options        = $eventOptions;
+    public function __construct(
+        private $statName,
+        private \DateTimeInterface $fromDateTime,
+        private \DateTimeInterface $toDateTime,
+        private FetchOptions $options
+    ) {
         $this->statCollection = new StatCollection();
     }
 
     /**
      * Note if the listener handled collecting these stats.
      */
-    public function statsCollected()
+    public function statsCollected(): void
     {
         $this->stopPropagation();
     }
@@ -103,10 +78,7 @@ class AggregateStatRequestEvent extends Event
         return $this->statName === $context;
     }
 
-    /**
-     * @return bool
-     */
-    public function checkContexts(array $contexts)
+    public function checkContexts(array $contexts): bool
     {
         return in_array($this->statName, $contexts, true);
     }
@@ -116,13 +88,13 @@ class AggregateStatRequestEvent extends Event
      */
     public function checkContextPrefix($prefix): bool
     {
-        return 0 === strpos($this->statName, $prefix);
+        return str_starts_with($this->statName, $prefix);
     }
 
     public function checkContextPrefixes(array $prefixes): bool
     {
         foreach ($prefixes as $string) {
-            if (0 === strpos($this->statName, $string)) {
+            if (str_starts_with($this->statName, $string)) {
                 return true;
             }
         }

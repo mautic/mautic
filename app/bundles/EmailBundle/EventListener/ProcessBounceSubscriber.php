@@ -11,17 +11,10 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 class ProcessBounceSubscriber implements EventSubscriberInterface
 {
     public const BUNDLE     = 'EmailBundle';
+
     public const FOLDER_KEY = 'bounces';
 
-    /**
-     * @var Bounce
-     */
-    private $bouncer;
-
-    /**
-     * @return array
-     */
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             EmailEvents::MONITORED_EMAIL_CONFIG => ['onEmailConfig', 0],
@@ -29,17 +22,17 @@ class ProcessBounceSubscriber implements EventSubscriberInterface
         ];
     }
 
-    public function __construct(Bounce $bouncer)
-    {
-        $this->bouncer = $bouncer;
+    public function __construct(
+        private Bounce $bouncer
+    ) {
     }
 
-    public function onEmailConfig(MonitoredEmailEvent $event)
+    public function onEmailConfig(MonitoredEmailEvent $event): void
     {
         $event->addFolder(self::BUNDLE, self::FOLDER_KEY, 'mautic.email.config.monitored_email.bounce_folder');
     }
 
-    public function onEmailParse(ParseEmailEvent $event)
+    public function onEmailParse(ParseEmailEvent $event): void
     {
         if ($event->isApplicable(self::BUNDLE, self::FOLDER_KEY)) {
             // Process the messages

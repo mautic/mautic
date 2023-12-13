@@ -85,7 +85,7 @@ class EmailRepository extends CommonRepository
      *
      * @param int $id
      */
-    public function deleteDoNotEmailEntry($id)
+    public function deleteDoNotEmailEntry($id): void
     {
         $this->getEntityManager()->getConnection()->delete(MAUTIC_TABLE_PREFIX.'lead_donotcontact', ['id' => (int) $id]);
     }
@@ -414,10 +414,8 @@ class EmailRepository extends CommonRepository
     /**
      * @param \Doctrine\ORM\QueryBuilder|QueryBuilder $q
      * @param object                                  $filter
-     *
-     * @return array
      */
-    protected function addCatchAllWhereClause($q, $filter)
+    protected function addCatchAllWhereClause($q, $filter): array
     {
         return $this->addStandardCatchAllWhereClause($q, $filter, [
             'e.name',
@@ -428,12 +426,10 @@ class EmailRepository extends CommonRepository
     /**
      * @param \Doctrine\ORM\QueryBuilder|QueryBuilder $q
      * @param object                                  $filter
-     *
-     * @return array
      */
-    protected function addSearchCommandWhereClause($q, $filter)
+    protected function addSearchCommandWhereClause($q, $filter): array
     {
-        list($expr, $parameters) = $this->addStandardSearchCommandWhereClause($q, $filter);
+        [$expr, $parameters] = $this->addStandardSearchCommandWhereClause($q, $filter);
         if ($expr) {
             return [$expr, $parameters];
         }
@@ -473,9 +469,9 @@ class EmailRepository extends CommonRepository
     }
 
     /**
-     * @return array
+     * @return string[]
      */
-    public function getSearchCommands()
+    public function getSearchCommands(): array
     {
         $commands = [
             'mautic.core.searchcommand.ispublished',
@@ -492,17 +488,14 @@ class EmailRepository extends CommonRepository
     /**
      * @return array<array<string>>
      */
-    protected function getDefaultOrder()
+    protected function getDefaultOrder(): array
     {
         return [
             ['e.name', 'ASC'],
         ];
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getTableAlias()
+    public function getTableAlias(): string
     {
         return 'e';
     }
@@ -513,7 +506,7 @@ class EmailRepository extends CommonRepository
      * @param string[]|string|int $relatedIds
      * @param string              $date
      */
-    public function resetVariants($relatedIds, $date)
+    public function resetVariants($relatedIds, $date): void
     {
         if (!is_array($relatedIds)) {
             $relatedIds = [(string) $relatedIds];
@@ -542,7 +535,7 @@ class EmailRepository extends CommonRepository
      * @param int        $increaseBy
      * @param bool|false $variant
      */
-    public function upCount($id, $type = 'sent', $increaseBy = 1, $variant = false)
+    public function upCount($id, $type = 'sent', $increaseBy = 1, $variant = false): void
     {
         if (!$increaseBy) {
             return;
@@ -654,10 +647,8 @@ class EmailRepository extends CommonRepository
 
     /**
      * @param int|null $id
-     *
-     * @return \Doctrine\ORM\Internal\Hydration\IterableResult
      */
-    public function getPublishedBroadcasts($id = null)
+    public function getPublishedBroadcasts($id = null): \Doctrine\ORM\Internal\Hydration\IterableResult
     {
         $qb   = $this->createQueryBuilder($this->getTableAlias());
         $expr = $this->getPublishedByDateExpression($qb, null, true, true, false);
@@ -682,10 +673,8 @@ class EmailRepository extends CommonRepository
      * @param string $column
      * @param int    $minContactId
      * @param int    $maxContactId
-     *
-     * @return QueryBuilder
      */
-    private function setMinMaxIds(QueryBuilder $q, $column, $minContactId, $maxContactId)
+    private function setMinMaxIds(QueryBuilder $q, $column, $minContactId, $maxContactId): QueryBuilder
     {
         if ($minContactId && is_numeric($minContactId)) {
             $q->andWhere($column.' >= :minContactId');
@@ -702,10 +691,8 @@ class EmailRepository extends CommonRepository
 
     /**
      * Is one of emails unpublished?
-     *
-     * @return bool
      */
-    public function isOneUnpublished(array $ids)
+    public function isOneUnpublished(array $ids): bool
     {
         $result = $this->getEntityManager()
             ->createQueryBuilder()

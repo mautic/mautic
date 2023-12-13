@@ -38,20 +38,16 @@ class DashboardSubscriber extends MainDashboardSubscriber
         'asset:assets:viewother',
     ];
 
-    protected \Mautic\AssetBundle\Model\AssetModel $assetModel;
-
-    protected \Symfony\Component\Routing\RouterInterface $router;
-
-    public function __construct(AssetModel $assetModel, RouterInterface $router)
-    {
-        $this->assetModel = $assetModel;
-        $this->router     = $router;
+    public function __construct(
+        protected AssetModel $assetModel,
+        protected RouterInterface $router
+    ) {
     }
 
     /**
      * Set a widget detail when needed.
      */
-    public function onWidgetDetailGenerate(WidgetDetailEvent $event)
+    public function onWidgetDetailGenerate(WidgetDetailEvent $event): void
     {
         $this->checkPermissions($event);
         $canViewOthers = $event->hasPermission('asset:assets:viewother');

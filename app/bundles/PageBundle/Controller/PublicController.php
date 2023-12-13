@@ -176,7 +176,7 @@ class PublicController extends CommonFormController
                             // Reorder according to send_weight so that campaigns which currently send one at a time alternate
                             uasort(
                                 $variants,
-                                function ($a, $b) {
+                                function ($a, $b): int {
                                     if ($a['weight_deficit'] === $b['weight_deficit']) {
                                         if ($a['hits'] === $b['hits']) {
                                             return 0;
@@ -192,9 +192,7 @@ class PublicController extends CommonFormController
                             );
 
                             // find the one with the most difference from weight
-
-                            reset($variants);
-                            $useId = key($variants);
+                            $useId = array_key_first($variants);
 
                             // set the cookie - 14 days
                             $cookieHelper->setCookie(
@@ -395,7 +393,7 @@ class PublicController extends CommonFormController
 
         try {
             $model->hitPage(null, $request);
-        } catch (InvalidDecodedStringException $invalidDecodedStringException) {
+        } catch (InvalidDecodedStringException) {
             // do not track invalid ct
             return $notSuccessResponse;
         }
@@ -421,8 +419,6 @@ class PublicController extends CommonFormController
     }
 
     /**
-     * @return \Symfony\Component\HttpFoundation\RedirectResponse
-     *
      * @throws \Exception
      */
     public function redirectAction(
@@ -432,7 +428,7 @@ class PublicController extends CommonFormController
         IpLookupHelper $ipLookupHelper,
         LoggerInterface $logger,
         $redirectId
-    ) {
+    ): \Symfony\Component\HttpFoundation\RedirectResponse {
         $logger->debug('Attempting to load redirect with tracking_id of: '.$redirectId);
 
         /** @var \Mautic\PageBundle\Model\RedirectModel $redirectModel */
@@ -493,7 +489,7 @@ class PublicController extends CommonFormController
                 $url = TokenHelper::findLeadTokens($url, $leadArray, true);
             }
 
-            if (false !== strpos($url, $this->generateUrl('mautic_asset_download'))) {
+            if (str_contains($url, $this->generateUrl('mautic_asset_download'))) {
                 if (strpos($url, '&')) {
                     $url .= '&ct='.$ct;
                 } else {
@@ -519,7 +515,7 @@ class PublicController extends CommonFormController
      * @param array $slots
      * @param Page  $entity
      */
-    private function processSlots($slots, $entity)
+    private function processSlots($slots, $entity): void
     {
         /** @var \Mautic\CoreBundle\Twig\Helper\AssetsHelper $assetsHelper */
         $assetsHelper = $this->factory->getHelper('template.assets');
@@ -571,9 +567,7 @@ class PublicController extends CommonFormController
                 // Order slides
                 usort(
                     $options['slides'],
-                    function ($a, $b) {
-                        return strcmp($a['order'], $b['order']);
-                    }
+                    fn ($a, $b): int => strcmp($a['order'], $b['order'])
                 );
 
                 $options['slot']   = $slot;
@@ -583,7 +577,7 @@ class PublicController extends CommonFormController
                 $slotsHelper->set($slot, $value);
             } else {
                 // Fallback for other types like html, text, textarea and all unknown
-                $value = isset($content[$slot]) ? $content[$slot] : '';
+                $value = $content[$slot] ?? '';
                 $slotsHelper->set($slot, $value);
             }
         }
@@ -605,7 +599,7 @@ class PublicController extends CommonFormController
 
             try {
                 $model->hitVideo($request);
-            } catch (\Exception $e) {
+            } catch (\Exception) {
                 return new JsonResponse(['success' => false]);
             }
 

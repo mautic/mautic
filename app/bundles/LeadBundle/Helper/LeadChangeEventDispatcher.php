@@ -11,26 +11,18 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 class LeadChangeEventDispatcher
 {
     /**
-     * @var EventDispatcherInterface
-     */
-    private $dispatcher;
-
-    /**
      * @var Lead
      */
     private $lead;
 
-    /**
-     * @var array
-     */
-    private $changes;
+    private ?array $changes = null;
 
-    public function __construct(EventDispatcherInterface $dispatcher)
-    {
-        $this->dispatcher = $dispatcher;
+    public function __construct(
+        private EventDispatcherInterface $dispatcher
+    ) {
     }
 
-    public function dispatchEvents(Events\LeadEvent $event, array $changes)
+    public function dispatchEvents(Events\LeadEvent $event, array $changes): void
     {
         $this->lead    = $event->getLead();
         $this->changes = $changes;
@@ -41,7 +33,7 @@ class LeadChangeEventDispatcher
         $this->dispatchDncChangeEvent();
     }
 
-    private function dispatchDateIdentifiedEvent(Events\LeadEvent $event)
+    private function dispatchDateIdentifiedEvent(Events\LeadEvent $event): void
     {
         if (!isset($this->changes['dateIdentified'])) {
             return;
@@ -50,7 +42,7 @@ class LeadChangeEventDispatcher
         $this->dispatcher->dispatch($event, LeadEvents::LEAD_IDENTIFIED);
     }
 
-    private function dispatchPointChangeEvent(Events\LeadEvent $event)
+    private function dispatchPointChangeEvent(Events\LeadEvent $event): void
     {
         if (!isset($this->changes['points'])) {
             return;
@@ -72,7 +64,7 @@ class LeadChangeEventDispatcher
         $this->dispatcher->dispatch($pointsEvent, LeadEvents::LEAD_POINTS_CHANGE);
     }
 
-    private function dispatchUtmTagsChangeEvent()
+    private function dispatchUtmTagsChangeEvent(): void
     {
         if (!isset($this->changes['utmtags'])) {
             return;
@@ -82,14 +74,14 @@ class LeadChangeEventDispatcher
         $this->dispatcher->dispatch($utmTagsEvent, LeadEvents::LEAD_UTMTAGS_ADD);
     }
 
-    private function dispatchDncChangeEvent()
+    private function dispatchDncChangeEvent(): void
     {
         if (!isset($this->changes['dnc_channel_status'])) {
             return;
         }
 
         foreach ($this->changes['dnc_channel_status'] as $channel => $status) {
-            $oldStatus = isset($status['old_reason']) ? $status['old_reason'] : DoNotContact::IS_CONTACTABLE;
+            $oldStatus = $status['old_reason'] ?? DoNotContact::IS_CONTACTABLE;
             $newStatus = $status['reason'];
 
             $event = new Events\ChannelSubscriptionChange($this->lead, $channel, $oldStatus, $newStatus);

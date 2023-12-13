@@ -30,77 +30,31 @@ class LeadSubscriber implements EventSubscriberInterface
     use ChannelTrait;
 
     /**
-     * @var AuditLogModel
-     */
-    private $auditLogModel;
-
-    /**
-     * @var IpLookupHelper
-     */
-    private $ipLookupHelper;
-
-    /**
-     * @var LeadChangeEventDispatcher
-     */
-    private $leadEventDispatcher;
-
-    /**
-     * @var DncReasonHelper
-     */
-    private $dncReasonHelper;
-
-    /**
-     * @var EntityManager
-     */
-    private $entityManager;
-
-    /**
-     * @var TranslatorInterface
-     */
-    private $translator;
-
-    /**
      * @var RouterInterface
      */
     private $router;
 
     /**
-     * Whether or not we're running in a test environment.
-     *
-     * @var bool
-     */
-    private $isTest;
-
-    /**
      * @param ModelFactory<object> $modelFactory
+     * @param bool                 $isTest       whether or not we're running in a test environment
      */
     public function __construct(
-        IpLookupHelper $ipLookupHelper,
-        AuditLogModel $auditLogModel,
-        LeadChangeEventDispatcher $eventDispatcher,
-        DncReasonHelper $dncReasonHelper,
-        EntityManager $entityManager,
-        TranslatorInterface $translator,
+        private IpLookupHelper $ipLookupHelper,
+        private AuditLogModel $auditLogModel,
+        private LeadChangeEventDispatcher $leadEventDispatcher,
+        private DncReasonHelper $dncReasonHelper,
+        private EntityManager $entityManager,
+        private TranslatorInterface $translator,
         RouterInterface $router,
         ModelFactory $modelFactory,
-        $isTest = false
+        private $isTest = false
     ) {
-        $this->ipLookupHelper      = $ipLookupHelper;
-        $this->auditLogModel       = $auditLogModel;
-        $this->leadEventDispatcher = $eventDispatcher;
-        $this->dncReasonHelper     = $dncReasonHelper;
-        $this->entityManager       = $entityManager;
-        $this->translator          = $translator;
         $this->router              = $router;
-        $this->isTest              = $isTest;
 
         $this->setModelFactory($modelFactory);
     }
 
-    /**
-     * @return array
-     */
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             LeadEvents::LEAD_POST_SAVE       => ['onLeadPostSave', 0],
@@ -118,7 +72,7 @@ class LeadSubscriber implements EventSubscriberInterface
     /**
      * Add a lead entry to the audit log.
      */
-    public function onLeadPostSave(Events\LeadEvent $event)
+    public function onLeadPostSave(Events\LeadEvent $event): void
     {
         // Because there is an event within an event, there is a risk that something will trigger a loop which
         // needs to be prevented
@@ -183,7 +137,7 @@ class LeadSubscriber implements EventSubscriberInterface
     /**
      * Add a lead delete entry to the audit log.
      */
-    public function onLeadDelete(Events\LeadEvent $event)
+    public function onLeadDelete(Events\LeadEvent $event): void
     {
         $lead = $event->getLead();
         $log  = [
@@ -200,7 +154,7 @@ class LeadSubscriber implements EventSubscriberInterface
     /**
      * Add a field entry to the audit log.
      */
-    public function onFieldPostSave(Events\LeadFieldEvent $event)
+    public function onFieldPostSave(Events\LeadFieldEvent $event): void
     {
         $field = $event->getField();
         if ($details = $event->getChanges()) {
@@ -219,7 +173,7 @@ class LeadSubscriber implements EventSubscriberInterface
     /**
      * Add a field delete entry to the audit log.
      */
-    public function onFieldDelete(Events\LeadFieldEvent $event)
+    public function onFieldDelete(Events\LeadFieldEvent $event): void
     {
         $field = $event->getField();
         $log   = [
@@ -236,7 +190,7 @@ class LeadSubscriber implements EventSubscriberInterface
     /**
      * Add a note entry to the audit log.
      */
-    public function onNotePostSave(Events\LeadNoteEvent $event)
+    public function onNotePostSave(Events\LeadNoteEvent $event): void
     {
         $note = $event->getNote();
         if ($details = $event->getChanges()) {
@@ -255,7 +209,7 @@ class LeadSubscriber implements EventSubscriberInterface
     /**
      * Add a note delete entry to the audit log.
      */
-    public function onNoteDelete(Events\LeadNoteEvent $event)
+    public function onNoteDelete(Events\LeadNoteEvent $event): void
     {
         $note = $event->getNote();
         $log  = [
@@ -269,7 +223,7 @@ class LeadSubscriber implements EventSubscriberInterface
         $this->auditLogModel->writeToLog($log);
     }
 
-    public function preLeadMerge(Events\LeadMergeEvent $event)
+    public function preLeadMerge(Events\LeadMergeEvent $event): void
     {
         $this->entityManager->getRepository(LeadEventLog::class)->updateLead(
             $event->getLoser()->getId(),
@@ -277,7 +231,7 @@ class LeadSubscriber implements EventSubscriberInterface
         );
     }
 
-    public function onLeadMerge(Events\LeadMergeEvent $event)
+    public function onLeadMerge(Events\LeadMergeEvent $event): void
     {
         $this->entityManager->getRepository(PointsChangeLog::class)->updateLead(
             $event->getLoser()->getId(),
@@ -313,7 +267,7 @@ class LeadSubscriber implements EventSubscriberInterface
     /**
      * Compile events for the lead timeline.
      */
-    public function onTimelineGenerate(Events\LeadTimelineEvent $event)
+    public function onTimelineGenerate(Events\LeadTimelineEvent $event): void
     {
         $eventTypes = [
             'lead.utmtagsadded' => 'mautic.lead.event.utmtagsadded',
@@ -379,7 +333,7 @@ class LeadSubscriber implements EventSubscriberInterface
         }
     }
 
-    private function addTimelineIpAddressEntries(Events\LeadTimelineEvent $event, $eventTypeKey, $eventTypeName)
+    private function addTimelineIpAddressEntries(Events\LeadTimelineEvent $event, $eventTypeKey, $eventTypeName): void
     {
         $lead = $event->getLead();
         $rows = $this->auditLogModel->getRepository()->getLeadIpLogs($lead, $event->getQueryOptions());
@@ -417,7 +371,7 @@ class LeadSubscriber implements EventSubscriberInterface
         }
     }
 
-    private function addTimelineDateCreatedEntry(Events\LeadTimelineEvent $event, $eventTypeKey, $eventTypeName)
+    private function addTimelineDateCreatedEntry(Events\LeadTimelineEvent $event, $eventTypeKey, $eventTypeName): void
     {
         // Do nothing if the lead is not set
         if (!$event->getLead() instanceof Lead) {
@@ -446,7 +400,7 @@ class LeadSubscriber implements EventSubscriberInterface
         }
     }
 
-    private function addTimelineDateIdentifiedEntry(Events\LeadTimelineEvent $event, $eventTypeKey, $eventTypeName)
+    private function addTimelineDateIdentifiedEntry(Events\LeadTimelineEvent $event, $eventTypeKey, $eventTypeName): void
     {
         // Do nothing if the lead is not set
         if (!$event->getLead() instanceof Lead) {
@@ -477,7 +431,7 @@ class LeadSubscriber implements EventSubscriberInterface
         }
     }
 
-    private function addTimelineUtmEntries(Events\LeadTimelineEvent $event, $eventTypeKey, $eventTypeName)
+    private function addTimelineUtmEntries(Events\LeadTimelineEvent $event, $eventTypeKey, $eventTypeName): void
     {
         $utmRepo = $this->entityManager->getRepository(UtmTag::class);
         $utmTags = $utmRepo->getUtmTagsByLead($event->getLead(), $event->getQueryOptions());
@@ -534,7 +488,7 @@ class LeadSubscriber implements EventSubscriberInterface
         }
     }
 
-    private function addTimelineDoNotContactEntries(Events\LeadTimelineEvent $event, $eventTypeKey, $eventTypeName)
+    private function addTimelineDoNotContactEntries(Events\LeadTimelineEvent $event, $eventTypeKey, $eventTypeName): void
     {
         /** @var \Mautic\LeadBundle\Entity\DoNotContactRepository $dncRepo */
         $dncRepo = $this->entityManager->getRepository(DoNotContact::class);
@@ -546,7 +500,7 @@ class LeadSubscriber implements EventSubscriberInterface
 
         if (!$event->isEngagementCount()) {
             foreach ($rows['results'] as $row) {
-                $row['reason'] = $this->dncReasonHelper->toText($row['reason']);
+                $row['reason'] = $this->dncReasonHelper->toText((int) $row['reason']);
 
                 $template = '@MauticLead/SubscribedEvents/Timeline/donotcontact.html.twig';
                 $icon     = 'fa-ban';
@@ -600,7 +554,7 @@ class LeadSubscriber implements EventSubscriberInterface
         }
     }
 
-    private function addTimelineImportedEntries(Events\LeadTimelineEvent $event, $eventTypeKey, $eventTypeName)
+    private function addTimelineImportedEntries(Events\LeadTimelineEvent $event, $eventTypeKey, $eventTypeName): void
     {
         /** @var LeadEventLogRepository $eventLogRepo */
         $eventLogRepo = $this->entityManager->getRepository(LeadEventLog::class);
@@ -657,7 +611,7 @@ class LeadSubscriber implements EventSubscriberInterface
         }
     }
 
-    private function addTimelineApiCreatedEntries(Events\LeadTimelineEvent $event, $eventTypeKey, $eventTypeName)
+    private function addTimelineApiCreatedEntries(Events\LeadTimelineEvent $event, $eventTypeKey, $eventTypeName): void
     {
         /** @var LeadEventLogRepository $eventLogRepo */
         $eventLogRepo    = $this->entityManager->getRepository(LeadEventLog::class);

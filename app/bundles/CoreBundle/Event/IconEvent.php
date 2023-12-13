@@ -12,14 +12,9 @@ class IconEvent extends Event
      */
     protected $icons = [];
 
-    /**
-     * @var CorePermissions
-     */
-    protected $security;
-
-    public function __construct(CorePermissions $security)
-    {
-        $this->security = $security;
+    public function __construct(
+        protected CorePermissions $security
+    ) {
     }
 
     /**
@@ -34,7 +29,7 @@ class IconEvent extends Event
      * @param string $type
      * @param string $icon
      */
-    public function addIcon($type, $icon)
+    public function addIcon($type, $icon): void
     {
         $this->icons[$type] = $icon;
     }
@@ -49,7 +44,7 @@ class IconEvent extends Event
         return $this->icons;
     }
 
-    public function setIcons(array $icons)
+    public function setIcons(array $icons): void
     {
         $this->icons = $icons;
     }

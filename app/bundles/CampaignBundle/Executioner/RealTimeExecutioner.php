@@ -22,16 +22,6 @@ use Psr\Log\LoggerInterface;
 class RealTimeExecutioner
 {
     /**
-     * @var LoggerInterface
-     */
-    private $logger;
-
-    /**
-     * @var LeadModel
-     */
-    private $leadModel;
-
-    /**
      * @var Lead
      */
     private $contact;
@@ -41,66 +31,19 @@ class RealTimeExecutioner
      */
     private $events;
 
-    /**
-     * @var EventRepository
-     */
-    private $eventRepository;
-
-    /**
-     * @var EventExecutioner
-     */
-    private $executioner;
-
-    /**
-     * @var Executioner
-     */
-    private $decisionExecutioner;
-
-    /**
-     * @var EventCollector
-     */
-    private $collector;
-
-    /**
-     * @var EventScheduler
-     */
-    private $scheduler;
-
-    /**
-     * @var ContactTracker
-     */
-    private $contactTracker;
-
-    /**
-     * @var Responses
-     */
-    private $responses;
-
-    /**
-     * @var DecisionHelper
-     */
-    private $decisionHelper;
+    private ?\Mautic\CampaignBundle\Executioner\Result\Responses $responses = null;
 
     public function __construct(
-        LoggerInterface $logger,
-        LeadModel $leadModel,
-        EventRepository $eventRepository,
-        EventExecutioner $executioner,
-        Executioner $decisionExecutioner,
-        EventCollector $collector,
-        EventScheduler $scheduler,
-        ContactTracker $contactTracker,
-        DecisionHelper $decisionHelper
+        private LoggerInterface $logger,
+        private LeadModel $leadModel,
+        private EventRepository $eventRepository,
+        private EventExecutioner $executioner,
+        private Executioner $decisionExecutioner,
+        private EventCollector $collector,
+        private EventScheduler $scheduler,
+        private ContactTracker $contactTracker,
+        private DecisionHelper $decisionHelper
     ) {
-        $this->logger              = $logger;
-        $this->leadModel           = $leadModel;
-        $this->eventRepository     = $eventRepository;
-        $this->executioner         = $executioner;
-        $this->decisionExecutioner = $decisionExecutioner;
-        $this->collector           = $collector;
-        $this->scheduler           = $scheduler;
-        $this->contactTracker      = $contactTracker;
-        $this->decisionHelper      = $decisionHelper;
     }
 
     /**
@@ -176,7 +119,7 @@ class RealTimeExecutioner
      * @throws Exception\CannotProcessEventException
      * @throws Scheduler\Exception\NotSchedulableException
      */
-    private function executeAssociatedEvents(ArrayCollection $children, \DateTime $now)
+    private function executeAssociatedEvents(ArrayCollection $children, \DateTime $now): void
     {
         $children = clone $children;
 
@@ -208,7 +151,7 @@ class RealTimeExecutioner
      * @throws DecisionNotApplicableException
      * @throws Exception\CannotProcessEventException
      */
-    private function evaluateDecisionForContact(Event $event, $passthrough = null, $channel = null, $channelId = null)
+    private function evaluateDecisionForContact(Event $event, $passthrough = null, $channel = null, $channelId = null): void
     {
         $this->logger->debug('CAMPAIGN: Executing '.$event->getType().' ID '.$event->getId().' for contact ID '.$this->contact->getId());
 
@@ -222,7 +165,7 @@ class RealTimeExecutioner
     /**
      * @throws CampaignNotExecutableException
      */
-    private function fetchCurrentContact()
+    private function fetchCurrentContact(): void
     {
         $this->contact = $this->contactTracker->getContact();
         if (!$this->contact instanceof Lead || !$this->contact->getId()) {
@@ -235,7 +178,7 @@ class RealTimeExecutioner
     /**
      * @throws CampaignNotExecutableException
      */
-    private function fetchCampaignData($type)
+    private function fetchCampaignData($type): void
     {
         if (!$this->events = $this->eventRepository->getContactPendingEvents($this->contact->getId(), $type)) {
             throw new CampaignNotExecutableException('Contact does not have any applicable '.$type.' associations.');

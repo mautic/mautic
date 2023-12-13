@@ -12,17 +12,13 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class ConfigType extends AbstractType
 {
-    private RestrictionHelper $restrictionHelper;
-
-    private EscapeTransformer $escapeTransformer;
-
-    public function __construct(RestrictionHelper $restrictionHelper, EscapeTransformer $escapeTransformer)
-    {
-        $this->restrictionHelper = $restrictionHelper;
-        $this->escapeTransformer = $escapeTransformer;
+    public function __construct(
+        private RestrictionHelper $restrictionHelper,
+        private EscapeTransformer $escapeTransformer
+    ) {
     }
 
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         // TODO very dirty quick fix for https://github.com/mautic/mautic/issues/8854
         if (isset($options['data']['apiconfig']['parameters']['api_oauth2_access_token_lifetime'])
@@ -32,7 +28,7 @@ class ConfigType extends AbstractType
         }
 
         if (isset($options['data']['apiconfig']['parameters']['api_oauth2_refresh_token_lifetime'])
-            && 1209600 === $options['data']['apiconfig']['parameters']['api_oauth2_refresh_token_lifetime']
+            && 1_209_600 === $options['data']['apiconfig']['parameters']['api_oauth2_refresh_token_lifetime']
         ) {
             $options['data']['apiconfig']['parameters']['api_oauth2_refresh_token_lifetime'] = 14;
         }
@@ -58,7 +54,7 @@ class ConfigType extends AbstractType
 
         $builder->addEventListener(
             FormEvents::PRE_SET_DATA,
-            function (FormEvent $event) {
+            function (FormEvent $event): void {
                 $form = $event->getForm();
 
                 foreach ($form as $configForm) {
@@ -83,7 +79,7 @@ class ConfigType extends AbstractType
         }
     }
 
-    public function configureOptions(OptionsResolver $resolver)
+    public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults(
             [

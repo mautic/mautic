@@ -60,7 +60,9 @@ class ContactSegmentQueryBuilderTest extends TestCase
     private function createConnection(): Connection
     {
         return new class() extends Connection {
-            /** @noinspection PhpMissingParentConstructorInspection */
+            /**
+             * @noinspection PhpMissingParentConstructorInspection
+             */
             public function __construct()
             {
             }

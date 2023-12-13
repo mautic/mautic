@@ -10,29 +10,11 @@ use Symfony\Component\HttpFoundation\Request;
 
 class Tracking404Model
 {
-    /**
-     * @var ContactTracker
-     */
-    private $contactTracker;
-
-    /**
-     * @var PageModel
-     */
-    private $pageModel;
-
-    /**
-     * @var CoreParametersHelper
-     */
-    private $coreParametersHelper;
-
     public function __construct(
-        CoreParametersHelper $coreParametersHelper,
-        ContactTracker $contactTracker,
-        PageModel $pageModel
+        private CoreParametersHelper $coreParametersHelper,
+        private ContactTracker $contactTracker,
+        private PageModel $pageModel
     ) {
-        $this->coreParametersHelper = $coreParametersHelper;
-        $this->contactTracker       = $contactTracker;
-        $this->pageModel            = $pageModel;
     }
 
     /**

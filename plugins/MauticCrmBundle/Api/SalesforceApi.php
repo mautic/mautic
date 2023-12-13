@@ -14,11 +14,15 @@ use MauticPlugin\MauticCrmBundle\Integration\SalesforceIntegration;
 class SalesforceApi extends CrmApi
 {
     protected $object          = 'Lead';
+
     protected $requestSettings = [
         'encode_parameters' => 'json',
     ];
+
     protected $apiRequestCounter   = 0;
+
     protected $requestCounter      = 1;
+
     protected $maxLockRetries      = 3;
 
     public function __construct(CrmAbstractIntegration $integration)
@@ -34,8 +38,6 @@ class SalesforceApi extends CrmApi
      * @param array  $elementData
      * @param string $method
      * @param bool   $isRetry
-     * @param null   $object
-     * @param null   $queryUrl
      *
      * @return mixed|string
      *
@@ -63,7 +65,7 @@ class SalesforceApi extends CrmApi
 
         try {
             $this->analyzeResponse($response, $isRetry);
-        } catch (RetryRequestException $exception) {
+        } catch (RetryRequestException) {
             return $this->request($operation, $elementData, $method, true, $object, $queryUrl);
         }
 
@@ -71,8 +73,6 @@ class SalesforceApi extends CrmApi
     }
 
     /**
-     * @param null $object
-     *
      * @return mixed|string
      *
      * @throws ApiErrorException
@@ -377,8 +377,7 @@ class SalesforceApi extends CrmApi
     }
 
     /**
-     * @param null $modifiedSince
-     * @param null $queryUrl
+     * @param mixed $modifiedSince
      *
      * @return mixed|string
      *
@@ -455,8 +454,6 @@ class SalesforceApi extends CrmApi
     }
 
     /**
-     * @param null $requiredFieldString
-     *
      * @return mixed|string
      *
      * @throws ApiErrorException
@@ -490,7 +487,7 @@ class SalesforceApi extends CrmApi
      * @throws ApiErrorException
      * @throws RetryRequestException
      */
-    private function analyzeResponse($response, $isRetry)
+    private function analyzeResponse($response, $isRetry): void
     {
         if (is_array($response)) {
             if (!empty($response['errors'])) {
@@ -503,7 +500,7 @@ class SalesforceApi extends CrmApi
                 }
                 $lineItemForInvalidSession              = $lineItem;
                 $lineItemForInvalidSession['errorCode'] = 'INVALID_SESSION_ID';
-                if (!empty($lineItemForInvalidSession['message']) && false !== strpos($lineItemForInvalidSession['message'], '"errorCode":"INVALID_SESSION_ID"') && $error = $this->processError($lineItemForInvalidSession, $isRetry)) {
+                if (!empty($lineItemForInvalidSession['message']) && str_contains($lineItemForInvalidSession['message'], '"errorCode":"INVALID_SESSION_ID"') && $error = $this->processError($lineItemForInvalidSession, $isRetry)) {
                     $errors[] = $error;
                     continue;
                 }
@@ -547,7 +544,7 @@ class SalesforceApi extends CrmApi
      * @throws ApiErrorException
      * @throws RetryRequestException
      */
-    private function revalidateSession($isRetry)
+    private function revalidateSession($isRetry): void
     {
         if ($refreshError = $this->integration->authCallback(['use_refresh_token' => true])) {
             throw new ApiErrorException($refreshError);

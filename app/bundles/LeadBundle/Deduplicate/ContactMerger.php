@@ -27,40 +27,18 @@ class ContactMerger
      */
     protected $loser;
 
-    /**
-     * @var LeadModel
-     */
-    protected $leadModel;
-
-    /**
-     * @var MergeRecordRepository
-     */
-    protected $repo;
-
-    /**
-     * @var LoggerInterface
-     */
-    protected $logger;
-
-    /**
-     * @var EventDispatcherInterface
-     */
-    protected $dispatcher;
-
-    public function __construct(LeadModel $leadModel, MergeRecordRepository $repo, EventDispatcherInterface $dispatcher, LoggerInterface $logger)
-    {
-        $this->leadModel  = $leadModel;
-        $this->repo       = $repo;
-        $this->logger     = $logger;
-        $this->dispatcher = $dispatcher;
+    public function __construct(
+        protected LeadModel $leadModel,
+        protected MergeRecordRepository $repo,
+        protected EventDispatcherInterface $dispatcher,
+        protected LoggerInterface $logger
+    ) {
     }
 
     /**
-     * @return Lead
-     *
      * @throws SameContactException
      */
-    public function merge(Lead $winner, Lead $loser)
+    public function merge(Lead $winner, Lead $loser): Lead
     {
         if ($winner->getId() === $loser->getId()) {
             throw new SameContactException();
@@ -144,8 +122,8 @@ class ContactMerger
     public function mergeFieldData(Lead $winner, Lead $loser)
     {
         // Use the modified date if applicable or date added if the contact has never been edited
-        $loserDate  = ($loser->getDateModified()) ? $loser->getDateModified() : $loser->getDateAdded();
-        $winnerDate = ($winner->getDateModified()) ? $winner->getDateModified() : $winner->getDateAdded();
+        $loserDate  = $loser->getDateModified() ?: $loser->getDateAdded();
+        $winnerDate = $winner->getDateModified() ?: $winner->getDateAdded();
 
         // When it comes to data, keep the newest value regardless of the winner/loser
         $newest = ($loserDate > $winnerDate) ? $loser : $winner;

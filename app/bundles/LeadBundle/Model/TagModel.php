@@ -25,12 +25,7 @@ class TagModel extends FormModel
         return $this->em->getRepository(Tag::class);
     }
 
-    /**
-     * {@inheritdoc}
-     *
-     * @return string
-     */
-    public function getPermissionBase()
+    public function getPermissionBase(): string
     {
         return 'lead:leads';
     }
@@ -39,10 +34,8 @@ class TagModel extends FormModel
      * Get a specific entity or generate a new one if id is empty.
      *
      * @param int $id
-     *
-     * @return object|null
      */
-    public function getEntity($id = null)
+    public function getEntity($id = null): ?Tag
     {
         if (is_null($id)) {
             return new Tag();
@@ -52,17 +45,12 @@ class TagModel extends FormModel
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @param Tag   $entity
-     * @param null  $action
      * @param array $options
-     *
-     * @return mixed
      *
      * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
      */
-    public function createForm($entity, FormFactoryInterface $formFactory, $action = null, $options = [])
+    public function createForm($entity, FormFactoryInterface $formFactory, $action = null, $options = []): \Symfony\Component\Form\FormInterface
     {
         if (!$entity instanceof Tag) {
             throw new MethodNotAllowedHttpException(['Tag']);
@@ -76,11 +64,9 @@ class TagModel extends FormModel
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @throws \Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException
      */
-    protected function dispatchEvent($action, &$entity, $isNew = false, Event $event = null)
+    protected function dispatchEvent($action, &$entity, $isNew = false, Event $event = null): ?Event
     {
         if (!$entity instanceof Tag) {
             throw new MethodNotAllowedHttpException(['Tag']);

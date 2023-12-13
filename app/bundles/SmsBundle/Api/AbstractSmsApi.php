@@ -7,20 +7,13 @@ use Mautic\PageBundle\Model\TrackableModel;
 use Mautic\SmsBundle\Sms\TransportInterface;
 
 /**
- * Class AbstractSmsApi.
- *
  * @deprecated use TransportInterface instead
  */
 abstract class AbstractSmsApi implements TransportInterface
 {
-    /**
-     * @var TrackableModel
-     */
-    protected $pageTrackableModel;
-
-    public function __construct(TrackableModel $pageTrackableModel)
-    {
-        $this->pageTrackableModel = $pageTrackableModel;
+    public function __construct(
+        protected TrackableModel $pageTrackableModel
+    ) {
     }
 
     /**

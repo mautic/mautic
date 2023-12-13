@@ -8,11 +8,6 @@ use Twilio\Exceptions\ConfigurationException;
 class Configuration
 {
     /**
-     * @var IntegrationHelper
-     */
-    private $integrationHelper;
-
-    /**
      * @var string
      */
     private $messagingServiceSid;
@@ -27,9 +22,9 @@ class Configuration
      */
     private $authToken;
 
-    public function __construct(IntegrationHelper $integrationHelper)
-    {
-        $this->integrationHelper = $integrationHelper;
+    public function __construct(
+        private IntegrationHelper $integrationHelper
+    ) {
     }
 
     /**
@@ -71,7 +66,7 @@ class Configuration
     /**
      * @throws ConfigurationException
      */
-    private function setConfiguration()
+    private function setConfiguration(): void
     {
         if ($this->accountSid) {
             return;

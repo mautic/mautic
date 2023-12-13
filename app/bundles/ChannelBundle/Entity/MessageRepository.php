@@ -25,10 +25,7 @@ class MessageRepository extends CommonRepository
         return parent::getEntities($args);
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getTableAlias()
+    public function getTableAlias(): string
     {
         return 'm';
     }
@@ -73,7 +70,7 @@ class MessageRepository extends CommonRepository
             ->select('id, channel, channel_id, properties')
             ->where($q->expr()->eq('message_id', ':messageId'))
             ->setParameter('messageId', $messageId)
-            ->andWhere($q->expr()->eq('is_enabled', true, 'boolean'));
+            ->andWhere($q->expr()->eq('is_enabled', true));
 
         $results = $q->executeQuery()->fetchAllAssociative();
 
@@ -96,7 +93,7 @@ class MessageRepository extends CommonRepository
             ->select('id, channel, channel_id, properties, message_id')
             ->where($q->expr()->eq('id', ':channelId'))
             ->setParameter('channelId', $channelId)
-            ->andWhere($q->expr()->eq('is_enabled', true, 'boolean'));
+            ->andWhere($q->expr()->eq('is_enabled', true));
 
         return $q->executeQuery()->fetchAssociative();
     }

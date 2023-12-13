@@ -26,10 +26,7 @@ class Hit
      */
     private $dateLeft;
 
-    /**
-     * @var Page|null
-     */
-    private $page;
+    private ?Page $page = null;
 
     /**
      * @var Redirect|null
@@ -135,12 +132,12 @@ class Hit
      */
     private $device;
 
-    public static function loadMetadata(ORM\ClassMetadata $metadata)
+    public static function loadMetadata(ORM\ClassMetadata $metadata): void
     {
         $builder = new ClassMetadataBuilder($metadata);
 
         $builder->setTable('page_hits')
-            ->setCustomRepositoryClass('Mautic\PageBundle\Entity\HitRepository')
+            ->setCustomRepositoryClass(\Mautic\PageBundle\Entity\HitRepository::class)
             ->addIndex(['tracking_id'], 'page_hit_tracking_search')
             ->addIndex(['code'], 'page_hit_code_search')
             ->addIndex(['source', 'source_id'], 'page_hit_source_search')
@@ -166,7 +163,7 @@ class Hit
             ->addJoinColumn('redirect_id', 'id', true, false, 'SET NULL')
             ->build();
 
-        $builder->createManyToOne('email', 'Mautic\EmailBundle\Entity\Email')
+        $builder->createManyToOne('email', \Mautic\EmailBundle\Entity\Email::class)
             ->addJoinColumn('email_id', 'id', true, false, 'SET NULL')
             ->build();
 
@@ -244,7 +241,7 @@ class Hit
 
         $builder->addNullableField('query', 'array');
 
-        $builder->createManyToOne('device', 'Mautic\LeadBundle\Entity\LeadDevice')
+        $builder->createManyToOne('device', \Mautic\LeadBundle\Entity\LeadDevice::class)
             ->addJoinColumn('device_id', 'id', true, false, 'SET NULL')
             ->cascadePersist()
             ->build();
@@ -253,7 +250,7 @@ class Hit
     /**
      * Prepares the metadata for API usage.
      */
-    public static function loadApiMetadata(ApiMetadataDriver $metadata)
+    public static function loadApiMetadata(ApiMetadataDriver $metadata): void
     {
         $metadata->setGroupPrefix('hit')
             ->addProperties(
@@ -290,10 +287,8 @@ class Hit
 
     /**
      * Get id.
-     *
-     * @return int
      */
-    public function getId()
+    public function getId(): int
     {
         return (int) $this->id;
     }
@@ -620,9 +615,7 @@ class Hit
     }
 
     /**
-     * Get page.
-     *
-     * @return Page
+     * @return ?Page
      */
     public function getPage()
     {
@@ -806,7 +799,7 @@ class Hit
     /**
      * @param mixed $email
      */
-    public function setEmail(Email $email)
+    public function setEmail(Email $email): void
     {
         $this->email = $email;
     }

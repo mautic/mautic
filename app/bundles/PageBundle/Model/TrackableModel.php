@@ -52,32 +52,24 @@ class TrackableModel extends AbstractCommonModel
      */
     protected $usingClickthrough = true;
 
-    /**
-     * @var RedirectModel
-     */
-    protected $redirectModel;
+    private ?array $contactFieldUrlTokens = null;
 
-    /**
-     * @var LeadFieldRepository
-     */
-    private $leadFieldRepository;
-
-    /**
-     * @var array|null
-     */
-    private $contactFieldUrlTokens;
-
-    public function __construct(RedirectModel $redirectModel, LeadFieldRepository $leadFieldRepository, EntityManagerInterface $em, CorePermissions $security, EventDispatcherInterface $dispatcher, UrlGeneratorInterface $router, Translator $translator, UserHelper $userHelper, LoggerInterface $mauticLogger, CoreParametersHelper $coreParametersHelper)
-    {
-        $this->redirectModel       = $redirectModel;
-        $this->leadFieldRepository = $leadFieldRepository;
-
+    public function __construct(
+        protected RedirectModel $redirectModel,
+        private LeadFieldRepository $leadFieldRepository,
+        EntityManagerInterface $em,
+        CorePermissions $security,
+        EventDispatcherInterface $dispatcher,
+        UrlGeneratorInterface $router,
+        Translator $translator,
+        UserHelper $userHelper,
+        LoggerInterface $mauticLogger,
+        CoreParametersHelper $coreParametersHelper
+    ) {
         parent::__construct($em, $security, $dispatcher, $router, $translator, $userHelper, $mauticLogger, $coreParametersHelper);
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @return \Mautic\PageBundle\Entity\TrackableRepository
      */
     public function getRepository()
@@ -201,9 +193,9 @@ class TrackableModel extends AbstractCommonModel
     /**
      * Get a list of URLs that are tracked by a specific channel.
      *
-     * @return mixed
+     * @return mixed[]
      */
-    public function getTrackableList($channel, $channelId)
+    public function getTrackableList($channel, $channelId): array
     {
         return $this->getRepository()->findByChannel($channel, $channelId);
     }
@@ -211,12 +203,11 @@ class TrackableModel extends AbstractCommonModel
     /**
      * Returns a list of tokens and/or URLs that should not be converted to trackables.
      *
-     * @param null $content
-     *
-     * @return array
+     * @param mixed|null $content
      */
-    public function getDoNotTrackList($content = null)
+    public function getDoNotTrackList($content): array
     {
+        /** @var UntrackableUrlsEvent $event */
         $event = $this->dispatcher->dispatch(
             new UntrackableUrlsEvent($content),
             PageEvents::REDIRECT_DO_NOT_TRACK
@@ -229,14 +220,12 @@ class TrackableModel extends AbstractCommonModel
      * Extract URLs from content and return as trackables.
      *
      * @param mixed      $content
-     * @param null       $channel
-     * @param null       $channelId
      * @param bool|false $usingClickthrough Set to false if not using a clickthrough parameter. This is to ensure that URLs are built correctly with ?
      *                                      or & for URLs tracked that include query parameters
      *
      * @return array{0: mixed, 1: array<int|string, Redirect|Trackable>}
      */
-    public function parseContentForTrackables($content, array $contentTokens = [], $channel = null, $channelId = null, $usingClickthrough = true)
+    public function parseContentForTrackables($content, array $contentTokens = [], $channel = null, $channelId = null, $usingClickthrough = true): array
     {
         $this->usingClickthrough = $usingClickthrough;
 
@@ -305,9 +294,7 @@ class TrackableModel extends AbstractCommonModel
         $content          = str_ireplace($firstPassSearch, $firstPassReplace, $content);
 
         // Sort longer to shorter strings to ensure that URLs that share the same base are appropriately replaced
-        uksort($this->contentReplacements['second_pass'], function ($a, $b) {
-            return strlen($b) - strlen($a);
-        });
+        uksort($this->contentReplacements['second_pass'], fn ($a, $b): int => strlen($b) - strlen($a));
 
         if ('html' == $type) {
             // For HTML, replace only the links; leaving the link text (if a URL) intact
@@ -348,10 +335,8 @@ class TrackableModel extends AbstractCommonModel
      * Find URLs in HTML and parse into trackables.
      *
      * @param string $html HTML content
-     *
-     * @return array
      */
-    protected function extractTrackablesFromHtml($html)
+    protected function extractTrackablesFromHtml($html): array
     {
         // Find links using DOM to only find <a> tags
         $libxmlPreviousState = libxml_use_internal_errors(true);
@@ -384,7 +369,7 @@ class TrackableModel extends AbstractCommonModel
 
         foreach ($allUrls as $url) {
             if ($preparedUrl = $this->prepareUrlForTracking($url)) {
-                list($urlKey, $urlValue) = $preparedUrl;
+                [$urlKey, $urlValue]     = $preparedUrl;
                 $trackableUrls[$urlKey]  = $urlValue;
             }
         }
@@ -494,12 +479,8 @@ class TrackableModel extends AbstractCommonModel
 
     /**
      * Validates that a token is trackable as a URL.
-     *
-     * @param null $tokenizedHost
-     *
-     * @return bool
      */
-    protected function validateTokenIsTrackable($token, $tokenizedHost = null)
+    protected function validateTokenIsTrackable($token, $tokenizedHost = null): bool
     {
         // Validate if this token is listed as not to be tracked
         if ($this->isInDoNotTrack($token)) {
@@ -580,7 +561,7 @@ class TrackableModel extends AbstractCommonModel
 
         // Check for tokens in the query
         if (!empty($urlParts['query'])) {
-            list($tokenizedParams, $untokenizedParams) = $this->parseTokenizedQuery($urlParts['query']);
+            [$tokenizedParams, $untokenizedParams] = $this->parseTokenizedQuery($urlParts['query']);
             if ($tokenizedParams) {
                 // Rebuild the query without the tokenized query params for now
                 $urlParts['query'] = $this->httpBuildQuery($untokenizedParams);
@@ -595,7 +576,7 @@ class TrackableModel extends AbstractCommonModel
      *
      * @return array<array<string, mixed>> [$tokenizedParams[], $untokenizedParams[]]
      */
-    protected function parseTokenizedQuery($query)
+    protected function parseTokenizedQuery($query): array
     {
         $tokenizedParams   =
         $untokenizedParams = [];
@@ -721,7 +702,7 @@ class TrackableModel extends AbstractCommonModel
                             unset($sBasePath);
                         }
 
-                        if (false !== strpos($url['path'], './')) {
+                        if (str_contains($url['path'], './')) {
                             // Remove any '../' and their directories
                             while (preg_match('/\w+\/\.\.\//', $url['path'])) {
                                 $url['path'] = preg_replace('/\w+\/\.\.\//', '', $url['path']);
@@ -769,9 +750,9 @@ class TrackableModel extends AbstractCommonModel
             return
                 ((isset($url['scheme'])) ? 'mailto' == $url['scheme'] ? $url['scheme'].':' : $url['scheme'].'://' : '')
                 .((isset($url['user'])) ? $url['user'].((isset($url['pass'])) ? ':'.$url['pass'] : '').'@' : '')
-                .((isset($url['host'])) ? $url['host'] : '')
+                .($url['host'] ?? '')
                 .((isset($url['port'])) ? ':'.$url['port'] : '')
-                .((isset($url['path'])) ? $url['path'] : '')
+                .($url['path'] ?? '')
                 .((!empty($url['query'])) ? '?'.$url['query'] : '')
                 .((!empty($url['fragment'])) ? '#'.$url['fragment'] : '');
         }
@@ -789,9 +770,7 @@ class TrackableModel extends AbstractCommonModel
         // http_build_query likely encoded tokens so that has to be fixed so they get replaced
         $query = preg_replace_callback(
             '/%7B(\S+?)%7D/i',
-            function ($matches) {
-                return urldecode($matches[0]);
-            },
+            fn ($matches): string => urldecode($matches[0]),
             $query
         );
 
@@ -800,7 +779,7 @@ class TrackableModel extends AbstractCommonModel
 
     private function isContactFieldToken($token): bool
     {
-        return false !== strpos($token, '{contactfield') || false !== strpos($token, '{leadfield');
+        return str_contains($token, '{contactfield') || str_contains($token, '{leadfield');
     }
 
     /**

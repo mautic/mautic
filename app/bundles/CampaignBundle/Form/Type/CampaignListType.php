@@ -13,35 +13,23 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 class CampaignListType extends AbstractType
 {
     /**
-     * @var CampaignModel
-     */
-    private $model;
-
-    /**
-     * @var TranslatorInterface
-     */
-    protected $translator;
-
-    /**
      * @var bool
      */
     private $canViewOther = false;
 
-    public function __construct(CampaignModel $campaignModel, TranslatorInterface $translator, CorePermissions $security)
-    {
-        $this->model        = $campaignModel;
-        $this->translator   = $translator;
+    public function __construct(
+        private CampaignModel $model,
+        protected TranslatorInterface $translator,
+        CorePermissions $security
+    ) {
         $this->canViewOther = $security->isGranted('campaign:campaigns:viewother');
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function configureOptions(OptionsResolver $resolver)
+    public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults(
             [
-                'choices'      => function (Options $options) {
+                'choices'      => function (Options $options): array {
                     $choices   = [];
                     $campaigns = $this->model->getRepository()->getPublishedCampaigns(null, null, true, $this->canViewOther);
                     foreach ($campaigns as $campaign) {

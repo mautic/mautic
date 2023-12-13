@@ -21,14 +21,23 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 class ReportSubscriber implements EventSubscriberInterface
 {
     public const CONTEXT_EMAILS       = 'emails';
+
     public const CONTEXT_EMAIL_STATS  = 'email.stats';
+
     public const EMAILS_PREFIX        = 'e';
+
     public const EMAIL_STATS_PREFIX   = 'es';
+
     public const EMAIL_VARIANT_PREFIX = 'vp';
+
     public const DNC_PREFIX           = 'dnc';
+
     public const CLICK_PREFIX         = 'cut';
+
     public const TRACKABLE_PREFIX     = 'tr';
+
     public const REDIRECT_PREFIX      = 'pr';
+
     public const CLICK_THROUGH_PREFIX = 'ct';
 
     public const DNC_COLUMNS = [
@@ -141,49 +150,16 @@ class ReportSubscriber implements EventSubscriberInterface
         ],
     ];
 
-    /**
-     * @var Connection
-     */
-    private $db;
-
-    /**
-     * @var CompanyReportData
-     */
-    private $companyReportData;
-
-    /**
-     * @var GeneratedColumnsProviderInterface
-     */
-    private $generatedColumnsProvider;
-
-    /**
-     * @var StatRepository
-     */
-    private $statRepository;
-
-    /**
-     * @var FieldsBuilder
-     */
-    private $fieldsBuilder;
-
     public function __construct(
-        Connection $db,
-        CompanyReportData $companyReportData,
-        StatRepository $statRepository,
-        GeneratedColumnsProviderInterface $generatedColumnsProvider,
-        FieldsBuilder $fieldsBuilder
+        private Connection $db,
+        private CompanyReportData $companyReportData,
+        private StatRepository $statRepository,
+        private GeneratedColumnsProviderInterface $generatedColumnsProvider,
+        private FieldsBuilder $fieldsBuilder
     ) {
-        $this->db                       = $db;
-        $this->companyReportData        = $companyReportData;
-        $this->statRepository           = $statRepository;
-        $this->generatedColumnsProvider = $generatedColumnsProvider;
-        $this->fieldsBuilder            = $fieldsBuilder;
     }
 
-    /**
-     * @return array
-     */
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             ReportEvents::REPORT_ON_BUILD          => ['onReportBuilder', 0],
@@ -195,7 +171,7 @@ class ReportSubscriber implements EventSubscriberInterface
     /**
      * Add available tables and columns to the report builder lookup.
      */
-    public function onReportBuilder(ReportBuilderEvent $event)
+    public function onReportBuilder(ReportBuilderEvent $event): void
     {
         if (!$event->checkContext([self::CONTEXT_EMAILS, self::CONTEXT_EMAIL_STATS])) {
             return;
@@ -353,7 +329,7 @@ class ReportSubscriber implements EventSubscriberInterface
     /**
      * Initialize the QueryBuilder object to generate reports from.
      */
-    public function onReportGenerate(ReportGeneratorEvent $event)
+    public function onReportGenerate(ReportGeneratorEvent $event): void
     {
         $context    = $event->getContext();
         $qb         = $event->getQueryBuilder();
@@ -488,7 +464,7 @@ class ReportSubscriber implements EventSubscriberInterface
     /**
      * Initialize the QueryBuilder object to generate reports from.
      */
-    public function onReportGraphGenerate(ReportGraphEvent $event)
+    public function onReportGraphGenerate(ReportGraphEvent $event): void
     {
         $graphs = $event->getRequestedGraphs();
 
@@ -779,7 +755,7 @@ class ReportSubscriber implements EventSubscriberInterface
     /**
      * Add the Do Not Contact table to the query builder.
      */
-    private function addDNCTableForEmailStats(QueryBuilder $qb)
+    private function addDNCTableForEmailStats(QueryBuilder $qb): void
     {
         $table = MAUTIC_TABLE_PREFIX.'lead_donotcontact';
 

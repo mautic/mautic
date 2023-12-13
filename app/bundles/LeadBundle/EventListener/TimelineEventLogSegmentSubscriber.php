@@ -18,32 +18,17 @@ class TimelineEventLogSegmentSubscriber implements EventSubscriberInterface
 {
     use TimelineEventLogTrait;
 
-    /**
-     * @var UserHelper
-     */
-    private $userHelper;
-
-    /**
-     * @var EntityManagerInterface
-     */
-    private $em;
-
     public function __construct(
         LeadEventLogRepository $eventLogRepository,
-        UserHelper $userHelper,
+        private UserHelper $userHelper,
         Translator $translator,
-        EntityManagerInterface $em
+        private EntityManagerInterface $em
     ) {
         $this->eventLogRepository = $eventLogRepository;
-        $this->userHelper         = $userHelper;
         $this->translator         = $translator;
-        $this->em                 = $em;
     }
 
-    /**
-     * @return array
-     */
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             LeadEvents::LEAD_LIST_CHANGE       => 'onChange',
@@ -52,7 +37,7 @@ class TimelineEventLogSegmentSubscriber implements EventSubscriberInterface
         ];
     }
 
-    public function onChange(ListChangeEvent $event)
+    public function onChange(ListChangeEvent $event): void
     {
         if (!$contact = $event->getLead()) {
             return;
@@ -66,7 +51,7 @@ class TimelineEventLogSegmentSubscriber implements EventSubscriberInterface
         );
     }
 
-    public function onTimelineGenerate(LeadTimelineEvent $event)
+    public function onTimelineGenerate(LeadTimelineEvent $event): void
     {
         $this->addEvents(
             $event,
@@ -78,7 +63,7 @@ class TimelineEventLogSegmentSubscriber implements EventSubscriberInterface
         );
     }
 
-    public function onBatchChange(ListChangeEvent $event)
+    public function onBatchChange(ListChangeEvent $event): void
     {
         if (!$contacts = $event->getLeads()) {
             return;
@@ -92,7 +77,7 @@ class TimelineEventLogSegmentSubscriber implements EventSubscriberInterface
         );
     }
 
-    private function writeEntries(array $contacts, LeadList $segment, $action, \DateTime $date = null)
+    private function writeEntries(array $contacts, LeadList $segment, $action, \DateTime $date = null): void
     {
         $user                    = $this->userHelper->getUser();
         $logs                    = [];

@@ -21,43 +21,13 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class ActionDispatcher
 {
-    /**
-     * @var EventDispatcherInterface
-     */
-    private $dispatcher;
-
-    /**
-     * @var LoggerInterface
-     */
-    private $logger;
-
-    /**
-     * @var EventScheduler
-     */
-    private $scheduler;
-
-    /**
-     * @var NotificationHelper
-     */
-    private $notificationHelper;
-
-    /**
-     * @var LegacyEventDispatcher
-     */
-    private $legacyDispatcher;
-
     public function __construct(
-        EventDispatcherInterface $dispatcher,
-        LoggerInterface $logger,
-        EventScheduler $scheduler,
-        NotificationHelper $notificationHelper,
-        LegacyEventDispatcher $legacyDispatcher
+        private EventDispatcherInterface $dispatcher,
+        private LoggerInterface $logger,
+        private EventScheduler $scheduler,
+        private NotificationHelper $notificationHelper,
+        private LegacyEventDispatcher $legacyDispatcher
     ) {
-        $this->dispatcher         = $dispatcher;
-        $this->logger             = $logger;
-        $this->scheduler          = $scheduler;
-        $this->notificationHelper = $notificationHelper;
-        $this->legacyDispatcher   = $legacyDispatcher;
     }
 
     /**
@@ -100,7 +70,7 @@ class ActionDispatcher
         return $pendingEvent;
     }
 
-    private function dispatchExecutedEvent(AbstractEventAccessor $config, Event $event, ArrayCollection $logs)
+    private function dispatchExecutedEvent(AbstractEventAccessor $config, Event $event, ArrayCollection $logs): void
     {
         if (!$logs->count()) {
             return;
@@ -119,7 +89,7 @@ class ActionDispatcher
         );
     }
 
-    private function dispatchedFailedEvent(AbstractEventAccessor $config, ArrayCollection $logs)
+    private function dispatchedFailedEvent(AbstractEventAccessor $config, ArrayCollection $logs): void
     {
         if (!$logs->count()) {
             return;
@@ -146,7 +116,7 @@ class ActionDispatcher
      * @throws LogNotProcessedException
      * @throws LogPassedAndFailedException
      */
-    private function validateProcessedLogs(ArrayCollection $pending, ArrayCollection $success, ArrayCollection $failed)
+    private function validateProcessedLogs(ArrayCollection $pending, ArrayCollection $success, ArrayCollection $failed): void
     {
         foreach ($pending as $log) {
             if (!$success->contains($log) && !$failed->contains($log)) {

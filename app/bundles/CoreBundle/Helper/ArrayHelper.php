@@ -40,30 +40,29 @@ class ArrayHelper
 
     /**
      * Selects keys defined in the $keys array and returns array that contains only those.
-     *
-     * @return array
      */
-    public static function select(array $keys, array $origin)
+    public static function select(array $keys, array $origin): array
     {
-        return array_filter($origin, function ($value, $key) use ($keys) {
-            return in_array($key, $keys, true);
-        }, ARRAY_FILTER_USE_BOTH);
+        return array_filter($origin, fn ($value, $key): bool => in_array($key, $keys, true), ARRAY_FILTER_USE_BOTH);
     }
 
     /**
      * Sum between two array.
+     *
+     * @param mixed[] $a1
+     * @param mixed[] $b2
+     *
+     * @return mixed[]
      */
-    public static function sum(array $a1, array $b2)
+    public static function sum(array $a1, array $b2): array
     {
         return self::sumOrSub($a1, $b2);
     }
 
     /**
      * SUBSTRACT between two array.
-     *
-     * @return array
      */
-    public static function sub(array $a1, array $b2)
+    public static function sub(array $a1, array $b2): array
     {
         return self::sumOrSub($a1, $b2, true);
     }
@@ -79,9 +78,7 @@ class ArrayHelper
     {
         return array_filter(
             $array,
-            function ($value): bool {
-                return !is_null($value) && '' !== $value;
-            }
+            fn ($value): bool => !is_null($value) && '' !== $value
         );
     }
 
@@ -115,7 +112,7 @@ class ArrayHelper
 
         array_walk_recursive(
             $multidimensionalArray,
-            function ($value, $key) use (&$flattenedArray) {
+            function ($value, $key) use (&$flattenedArray): void {
                 $flattenedArray[$key] = $value;
             }
         );
@@ -127,10 +124,8 @@ class ArrayHelper
      *  SUM/SUBSTRACT between two arrays.
      *
      * @param bool $subtracted
-     *
-     * @return array
      */
-    private static function sumOrSub(array $a1, array $b2, $subtracted = false)
+    private static function sumOrSub(array $a1, array $b2, $subtracted = false): array
     {
         return array_map(function ($x, $y) use ($subtracted) {
             if ($subtracted) {

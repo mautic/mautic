@@ -48,9 +48,13 @@ class Import extends FormEntity
      */
     public const DELAYED = 7;
 
-    /** ===== Priorities: ===== */
+    /**
+     * ===== Priorities: =====.
+     */
     public const LOW    = 512;
+
     public const NORMAL = 64;
+
     public const HIGH   = 1;
 
     /**
@@ -150,7 +154,7 @@ class Import extends FormEntity
         $this->priority = self::LOW;
     }
 
-    public static function loadMetadata(ORM\ClassMetadata $metadata)
+    public static function loadMetadata(ORM\ClassMetadata $metadata): void
     {
         $builder = new ClassMetadataBuilder($metadata);
         $builder->setTable('imports')
@@ -174,7 +178,7 @@ class Import extends FormEntity
             ->addNullableField('properties', Types::JSON);
     }
 
-    public static function loadValidatorMetadata(ClassMetadata $metadata)
+    public static function loadValidatorMetadata(ClassMetadata $metadata): void
     {
         $metadata->addPropertyConstraint('dir', new Assert\NotBlank(
             ['message' => 'mautic.lead.import.dir.notblank']
@@ -188,7 +192,7 @@ class Import extends FormEntity
     /**
      * Prepares the metadata for API usage.
      */
-    public static function loadApiMetadata(ApiMetadataDriver $metadata)
+    public static function loadApiMetadata(ApiMetadataDriver $metadata): void
     {
         $metadata->setGroupPrefix('import')
             ->addListProperties(
@@ -246,10 +250,8 @@ class Import extends FormEntity
     /**
      * Decides if this import entity is triggered as the background
      * job or as UI process.
-     *
-     * @return bool
      */
-    public function isBackgroundProcess()
+    public function isBackgroundProcess(): bool
     {
         return !(self::MANUAL === $this->getStatus());
     }
@@ -298,10 +300,8 @@ class Import extends FormEntity
 
     /**
      * Get import file path.
-     *
-     * @return string
      */
-    public function getFilePath()
+    public function getFilePath(): string
     {
         return $this->getDir().'/'.$this->getFile();
     }
@@ -330,7 +330,7 @@ class Import extends FormEntity
      * Not removing the CSV file is not considered a big trouble.
      * It will be removed on the next cache:clear.
      */
-    public function removeFile()
+    public function removeFile(): void
     {
         $file = $this->getFilePath();
 
@@ -367,7 +367,7 @@ class Import extends FormEntity
      */
     public function getName()
     {
-        return $this->getOriginalFile() ? $this->getOriginalFile() : $this->getId();
+        return $this->getOriginalFile() ?: $this->getId();
     }
 
     /**
@@ -490,10 +490,8 @@ class Import extends FormEntity
 
     /**
      * Counts current progress percentage.
-     *
-     * @return float
      */
-    public function getProgressPercentage()
+    public function getProgressPercentage(): float|int
     {
         $processed = $this->getProcessedRows();
 
@@ -548,27 +546,17 @@ class Import extends FormEntity
 
     /**
      * Returns Twitter Bootstrap label class based on current status.
-     *
-     * @return string
      */
-    public function getSatusLabelClass()
+    public function getSatusLabelClass(): string
     {
-        switch ($this->status) {
-            case self::QUEUED:
-                return 'info';
-            case self::IN_PROGRESS:
-            case self::MANUAL:
-                return 'primary';
-            case self::IMPORTED:
-                return 'success';
-            case self::FAILED:
-                return 'danger';
-            case self::STOPPED:
-            case self::DELAYED:
-                return 'warning';
-            default:
-                return 'default';
-        }
+        return match ($this->status) {
+            self::QUEUED => 'info',
+            self::IN_PROGRESS, self::MANUAL => 'primary',
+            self::IMPORTED => 'success',
+            self::FAILED   => 'danger',
+            self::STOPPED, self::DELAYED => 'warning',
+            default => 'default',
+        };
     }
 
     /**
@@ -740,10 +728,7 @@ class Import extends FormEntity
         return $this->setProperties($properties);
     }
 
-    /**
-     * @return Import
-     */
-    public function setLastLineImported($line)
+    public function setLastLineImported($line): void
     {
         $this->properties['line'] = (int) $line;
     }
@@ -753,7 +738,7 @@ class Import extends FormEntity
      */
     public function getLastLineImported()
     {
-        return isset($this->properties['line']) ? $this->properties['line'] : 0;
+        return $this->properties['line'] ?? 0;
     }
 
     /**
@@ -794,11 +779,7 @@ class Import extends FormEntity
      */
     public function getDefaults()
     {
-        if (isset($this->properties['defaults'])) {
-            return $this->properties['defaults'];
-        }
-
-        return [];
+        return $this->properties['defaults'] ?? [];
     }
 
     /**

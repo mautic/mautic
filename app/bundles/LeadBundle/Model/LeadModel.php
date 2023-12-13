@@ -80,26 +80,6 @@ class LeadModel extends FormModel
     public const CHANNEL_FEATURE = 'contact_preference';
 
     /**
-     * @var RequestStack
-     */
-    protected $requestStack;
-
-    /**
-     * @var IpLookupHelper
-     */
-    protected $ipLookupHelper;
-
-    /**
-     * @var PathsHelper
-     */
-    protected $pathsHelper;
-
-    /**
-     * @var IntegrationHelper
-     */
-    protected $integrationHelper;
-
-    /**
      * @var FieldModel
      */
     protected $leadFieldModel;
@@ -108,36 +88,6 @@ class LeadModel extends FormModel
      * @var array
      */
     protected $leadFields = [];
-
-    /**
-     * @var ListModel
-     */
-    protected $leadListModel;
-
-    /**
-     * @var CompanyModel
-     */
-    protected $companyModel;
-
-    /**
-     * @var CategoryModel
-     */
-    protected $categoryModel;
-
-    /**
-     * @var FormFactoryInterface
-     */
-    protected $formFactory;
-
-    /**
-     * @var ChannelListHelper
-     */
-    protected $channelListHelper;
-
-    /**
-     * @var UserProvider
-     */
-    protected $userProvider;
 
     protected $leadTrackingId;
 
@@ -151,58 +101,32 @@ class LeadModel extends FormModel
      */
     protected $availableLeadFields = [];
 
-    /**
-     * @var EmailValidator
-     */
-    protected $emailValidator;
-
-    /**
-     * @var ContactTracker
-     */
-    private $contactTracker;
-
-    /**
-     * @var DeviceTracker
-     */
-    private $deviceTracker;
-
-    /**
-     * @var IpAddressModel
-     */
-    private $ipAddressModel;
-
-    /**
-     * @var bool
-     */
-    private $repoSetup = false;
+    private bool $repoSetup = false;
 
     /**
      * @var array
      */
     private $flattenedFields = [];
 
-    /**
-     * @var array
-     */
-    private $fieldsByGroup = [];
+    private array $fieldsByGroup = [];
 
     public function __construct(
-        RequestStack $requestStack,
-        IpLookupHelper $ipLookupHelper,
-        PathsHelper $pathsHelper,
-        IntegrationHelper $integrationHelper,
+        protected RequestStack $requestStack,
+        protected IpLookupHelper $ipLookupHelper,
+        protected PathsHelper $pathsHelper,
+        protected IntegrationHelper $integrationHelper,
         FieldModel $leadFieldModel,
-        ListModel $leadListModel,
-        FormFactoryInterface $formFactory,
-        CompanyModel $companyModel,
-        CategoryModel $categoryModel,
-        ChannelListHelper $channelListHelper,
+        protected ListModel $leadListModel,
+        protected FormFactoryInterface $formFactory,
+        protected CompanyModel $companyModel,
+        protected CategoryModel $categoryModel,
+        protected ChannelListHelper $channelListHelper,
         CoreParametersHelper $coreParametersHelper,
-        EmailValidator $emailValidator,
-        UserProvider $userProvider,
-        ContactTracker $contactTracker,
-        DeviceTracker $deviceTracker,
-        IpAddressModel $ipAddressModel,
+        protected EmailValidator $emailValidator,
+        protected UserProvider $userProvider,
+        private ContactTracker $contactTracker,
+        private DeviceTracker $deviceTracker,
+        private IpAddressModel $ipAddressModel,
         EntityManager $em,
         CorePermissions $security,
         EventDispatcherInterface $dispatcher,
@@ -211,21 +135,7 @@ class LeadModel extends FormModel
         UserHelper $userHelper,
         LoggerInterface $mauticLogger
     ) {
-        $this->requestStack         = $requestStack;
-        $this->ipLookupHelper       = $ipLookupHelper;
-        $this->pathsHelper          = $pathsHelper;
-        $this->integrationHelper    = $integrationHelper;
         $this->leadFieldModel       = $leadFieldModel;
-        $this->leadListModel        = $leadListModel;
-        $this->companyModel         = $companyModel;
-        $this->formFactory          = $formFactory;
-        $this->categoryModel        = $categoryModel;
-        $this->channelListHelper    = $channelListHelper;
-        $this->emailValidator       = $emailValidator;
-        $this->userProvider         = $userProvider;
-        $this->contactTracker       = $contactTracker;
-        $this->deviceTracker        = $deviceTracker;
-        $this->ipAddressModel       = $ipAddressModel;
 
         parent::__construct($em, $security, $dispatcher, $router, $translator, $userHelper, $mauticLogger, $coreParametersHelper);
     }
@@ -357,29 +267,17 @@ class LeadModel extends FormModel
         return $this->em->getRepository(GroupContactScore::class);
     }
 
-    /**
-     * {@inheritdoc}
-     *
-     * @return string
-     */
-    public function getPermissionBase()
+    public function getPermissionBase(): string
     {
         return 'lead:leads';
     }
 
-    /**
-     * {@inheritdoc}
-     *
-     * @return string
-     */
-    public function getNameGetter()
+    public function getNameGetter(): string
     {
         return 'getPrimaryIdentifier';
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @param Lead        $entity
      * @param string|null $action
      * @param array       $options
@@ -388,7 +286,7 @@ class LeadModel extends FormModel
      *
      * @throws \Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException
      */
-    public function createForm($entity, FormFactoryInterface $formFactory, $action = null, $options = [])
+    public function createForm($entity, FormFactoryInterface $formFactory, $action = null, $options = []): \Symfony\Component\Form\FormInterface
     {
         if (!$entity instanceof Lead) {
             throw new MethodNotAllowedHttpException(['Lead'], 'Entity must be of class Lead()');
@@ -402,10 +300,8 @@ class LeadModel extends FormModel
 
     /**
      * Get a specific entity or generate a new one if id is empty.
-     *
-     * @return Lead|null
      */
-    public function getEntity($id = null)
+    public function getEntity($id = null): ?Lead
     {
         if (null === $id) {
             return new Lead();
@@ -426,11 +322,9 @@ class LeadModel extends FormModel
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @throws \Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException
      */
-    protected function dispatchEvent($action, &$entity, $isNew = false, Event $event = null)
+    protected function dispatchEvent($action, &$entity, $isNew = false, Event $event = null): ?Event
     {
         if (!$entity instanceof Lead) {
             throw new MethodNotAllowedHttpException(['Lead'], 'Entity must be of class Lead()');
@@ -467,12 +361,10 @@ class LeadModel extends FormModel
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @param Lead $entity
      * @param bool $unlock
      */
-    public function saveEntity($entity, $unlock = true)
+    public function saveEntity($entity, $unlock = true): void
     {
         $companyFieldMatches = [];
         $fields              = $entity->getFields();
@@ -546,7 +438,7 @@ class LeadModel extends FormModel
     /**
      * @param object $entity
      */
-    public function deleteEntity($entity)
+    public function deleteEntity($entity): void
     {
         // Delete custom avatar if one exists
         $imageDir = $this->pathsHelper->getSystemPath('images', true);
@@ -566,11 +458,9 @@ class LeadModel extends FormModel
      * @param bool|true  $fetchSocialProfiles
      * @param bool|false $bindWithForm        Send $data through the Lead form and only use valid data (should be used with request data)
      *
-     * @return array
-     *
      * @throws ImportFailedException
      */
-    public function setFieldValues(Lead $lead, array $data, $overwriteWithBlank = false, $fetchSocialProfiles = true, $bindWithForm = false)
+    public function setFieldValues(Lead $lead, array $data, $overwriteWithBlank = false, $fetchSocialProfiles = true, $bindWithForm = false): void
     {
         if ($fetchSocialProfiles) {
             // @todo - add a catch to NOT do social gleaning if a lead is created via a form, etc as we do not want the user to experience the wait
@@ -687,7 +577,7 @@ class LeadModel extends FormModel
                         $this->cleanFields($data, $field);
                     }
                     $curValue = $field['value'];
-                    $newValue = isset($data[$alias]) ? $data[$alias] : '';
+                    $newValue = $data[$alias] ?? '';
 
                     if (is_array($newValue)) {
                         $newValue = implode('|', $newValue);
@@ -728,7 +618,7 @@ class LeadModel extends FormModel
     /**
      * Disassociates a user from leads.
      */
-    public function disassociateOwner($userId)
+    public function disassociateOwner($userId): void
     {
         $leads = $this->getRepository()->findByOwner($userId);
         foreach ($leads as $lead) {
@@ -969,7 +859,7 @@ class LeadModel extends FormModel
      * @param array|LeadList $lists
      * @param bool           $manuallyAdded
      */
-    public function addToLists($lead, $lists, $manuallyAdded = true)
+    public function addToLists($lead, $lists, $manuallyAdded = true): void
     {
         $this->leadListModel->addLead($lead, $lists, $manuallyAdded);
     }
@@ -979,7 +869,7 @@ class LeadModel extends FormModel
      *
      * @param bool $manuallyRemoved
      */
-    public function removeFromLists($lead, $lists, $manuallyRemoved = true)
+    public function removeFromLists($lead, $lists, $manuallyRemoved = true): void
     {
         $this->leadListModel->removeLead($lead, $lists, $manuallyRemoved);
     }
@@ -1070,7 +960,7 @@ class LeadModel extends FormModel
                 $data['lead_channels']['preferred_channel'] = $ch;
             }
 
-            $frequencyRule = (isset($frequencyRules[$ch])) ? $frequencyRules[$ch] : new FrequencyRule();
+            $frequencyRule = $frequencyRules[$ch] ?? new FrequencyRule();
             $frequencyRule->setChannel($ch);
             $frequencyRule->setLead($lead);
             $frequencyRule->setDateAdded(new \DateTime());
@@ -1163,7 +1053,7 @@ class LeadModel extends FormModel
         return $results;
     }
 
-    public function removeFromCategories($categories)
+    public function removeFromCategories($categories): void
     {
         $deleteCats = [];
         if (is_array($categories)) {
@@ -1203,18 +1093,12 @@ class LeadModel extends FormModel
     /**
      * @param array $fields
      * @param array $data
-     * @param null  $owner
-     * @param null  $list
-     * @param null  $tags
      * @param bool  $persist
-     * @param null  $importId
      * @param bool  $skipIfExists
-     *
-     * @return bool|null
      *
      * @throws \Exception
      */
-    public function import($fields, $data, $owner = null, $list = null, $tags = null, $persist = true, LeadEventLog $eventLog = null, $importId = null, $skipIfExists = false)
+    public function import($fields, $data, $owner = null, $list = null, $tags = null, $persist = true, LeadEventLog $eventLog = null, $importId = null, $skipIfExists = false): bool
     {
         $fields    = array_flip($fields);
         $fieldData = [];
@@ -1239,7 +1123,7 @@ class LeadModel extends FormModel
             $lead = $this->getEntity($fieldData['id']);
         }
 
-        $lead   = $lead ?? $this->checkForDuplicateContact($fieldData);
+        $lead ??= $this->checkForDuplicateContact($fieldData);
         $merged = (bool) $lead->getId();
 
         if (!empty($fields['dateAdded']) && !empty($data[$fields['dateAdded']])) {
@@ -1379,7 +1263,7 @@ class LeadModel extends FormModel
                 $lead->setOwner($newOwner);
                 // reset default import owner if exists owner for contact
                 $owner = null;
-            } catch (NonUniqueResultException $exception) {
+            } catch (NonUniqueResultException) {
                 // user not found
             }
         }
@@ -1508,7 +1392,7 @@ class LeadModel extends FormModel
      *
      * @param bool|false $removeOrphans
      */
-    public function setTags(Lead $lead, array $tags, $removeOrphans = false)
+    public function setTags(Lead $lead, array $tags, $removeOrphans = false): void
     {
         /** @var Tag[] $currentTags */
         $currentTags  = $lead->getTags();
@@ -1555,7 +1439,7 @@ class LeadModel extends FormModel
     /**
      * Update a leads UTM tags.
      */
-    public function setUtmTags(Lead $lead, UtmTag $utmTags)
+    public function setUtmTags(Lead $lead, UtmTag $utmTags): void
     {
         $lead->setUtmTags($utmTags);
 
@@ -1567,7 +1451,7 @@ class LeadModel extends FormModel
      *
      * @param array $params
      */
-    public function addUTMTags(Lead $lead, $params)
+    public function addUTMTags(Lead $lead, $params): void
     {
         // known "synonym" fields expected
         $synonyms = ['useragent'  => 'user_agent',
@@ -1654,10 +1538,8 @@ class LeadModel extends FormModel
      * Modify tags with support to remove via a prefixed minus sign.
      *
      * @param bool $persist True if tags modified
-     *
-     * @return bool
      */
-    public function modifyTags(Lead $lead, $tags, array $removeTags = null, $persist = true)
+    public function modifyTags(Lead $lead, $tags, array $removeTags = null, $persist = true): bool
     {
         $tagsModified = false;
         $leadTags     = $lead->getTags();
@@ -1678,7 +1560,7 @@ class LeadModel extends FormModel
 
         $this->logger->debug('CONTACT: Adding '.implode(', ', $tags).' to contact ID# '.$lead->getId());
 
-        array_walk($tags, function (&$val) {
+        array_walk($tags, function (&$val): void {
             $val = html_entity_decode(trim($val), ENT_QUOTES);
             $val = InputHelper::clean($val);
         });
@@ -1686,7 +1568,7 @@ class LeadModel extends FormModel
         // See which tags already exist
         $foundTags = $this->getTagRepository()->getTagsByName($tags);
         foreach ($tags as $tag) {
-            if (0 === strpos($tag, '-')) {
+            if (str_starts_with($tag, '-')) {
                 // Tag to be removed
                 $tag = substr($tag, 1);
 
@@ -1716,7 +1598,7 @@ class LeadModel extends FormModel
         if (!empty($removeTags)) {
             $this->logger->debug('CONTACT: Removing '.implode(', ', $removeTags).' for contact ID# '.$lead->getId());
 
-            array_walk($removeTags, function (&$val) {
+            array_walk($removeTags, function (&$val): void {
                 $val = html_entity_decode(trim($val), ENT_QUOTES);
                 $val = InputHelper::clean($val);
             });
@@ -1747,7 +1629,7 @@ class LeadModel extends FormModel
      *
      * @param int[] $companies
      */
-    public function modifyCompanies(Lead $lead, array $companies)
+    public function modifyCompanies(Lead $lead, array $companies): void
     {
         // See which companies belong to the lead already
         $leadCompanies = $this->companyModel->getCompanyLeadRepository()->getCompaniesByLeadId($lead->getId());
@@ -1766,10 +1648,9 @@ class LeadModel extends FormModel
 
         // Remove companies that are not in the array of given companies
         $removeCompanies = $currentCompanies->reject(
-            function (array $company) use ($requestedCompanies) {
+            fn (array $company) =>
                 // Reject if the found company is still in the list of companies given
-                return $requestedCompanies->contains($company['company_id']);
-            }
+                $requestedCompanies->contains($company['company_id'])
         );
         if ($removeCompanies->count()) {
             $this->companyModel->removeLeadFromCompany($removeCompanies->keys()->toArray(), $lead);
@@ -1778,8 +1659,10 @@ class LeadModel extends FormModel
 
     /**
      * Get array of available lead tags.
+     *
+     * @return mixed[]
      */
-    public function getTagList()
+    public function getTagList(): array
     {
         return $this->getTagRepository()->getSimpleList(null, [], 'tag', 'id');
     }
@@ -1793,10 +1676,8 @@ class LeadModel extends FormModel
      * @param string    $dateFormat
      * @param array     $filter
      * @param bool      $canViewOthers
-     *
-     * @return array
      */
-    public function getLeadsLineChartData($unit, $dateFrom, $dateTo, $dateFormat = null, $filter = [], $canViewOthers = true)
+    public function getLeadsLineChartData($unit, $dateFrom, $dateTo, $dateFormat = null, $filter = [], $canViewOthers = true): array
     {
         $flag        = null;
         $topLists    = null;
@@ -1876,10 +1757,8 @@ class LeadModel extends FormModel
      * @param string $dateTo
      * @param array  $filters
      * @param bool   $canViewOthers
-     *
-     * @return array
      */
-    public function getAnonymousVsIdentifiedPieChartData($dateFrom, $dateTo, $filters = [], $canViewOthers = true)
+    public function getAnonymousVsIdentifiedPieChartData($dateFrom, $dateTo, $filters = [], $canViewOthers = true): array
     {
         $chart = new PieChart();
         $query = new ChartQuery($this->em->getConnection(), $dateFrom, $dateTo);
@@ -2082,10 +1961,8 @@ class LeadModel extends FormModel
      * Get engagement counts by time unit.
      *
      * @param string $unit
-     *
-     * @return array
      */
-    public function getEngagementCount(Lead $lead, \DateTime $dateFrom = null, \DateTime $dateTo = null, $unit = 'm', ChartQuery $chartQuery = null)
+    public function getEngagementCount(Lead $lead, \DateTime $dateFrom = null, \DateTime $dateTo = null, $unit = 'm', ChartQuery $chartQuery = null): array
     {
         $event = new LeadTimelineEvent($lead);
         $event->setCountOnly($dateFrom, $dateTo, $unit, $chartQuery);
@@ -2152,10 +2029,7 @@ class LeadModel extends FormModel
         return $channels;
     }
 
-    /**
-     * @return array
-     */
-    public function getPreferenceChannels()
+    public function getPreferenceChannels(): array
     {
         return $this->channelListHelper->getFeatureChannels(self::CHANNEL_FEATURE, true);
     }
@@ -2174,7 +2048,7 @@ class LeadModel extends FormModel
     }
 
     /**
-     * @return array
+     * @return mixed[]
      */
     public function setPrimaryCompany($companyId, $leadId)
     {
@@ -2223,10 +2097,7 @@ class LeadModel extends FormModel
         return ['oldPrimary' => $oldPrimaryCompany, 'newPrimary' => $companyId];
     }
 
-    /**
-     * @return bool
-     */
-    public function scoreContactsCompany(Lead $lead, $score)
+    public function scoreContactsCompany(Lead $lead, $score): bool
     {
         $success          = false;
         $entities         = [];
@@ -2248,7 +2119,7 @@ class LeadModel extends FormModel
         return $success;
     }
 
-    public function updateLeadOwner(Lead $lead, $ownerId)
+    public function updateLeadOwner(Lead $lead, $ownerId): void
     {
         $owner = $this->em->getReference(User::class, $ownerId);
         $lead->setOwner($owner);
@@ -2256,7 +2127,7 @@ class LeadModel extends FormModel
         parent::saveEntity($lead);
     }
 
-    private function processManipulator(Lead $lead)
+    private function processManipulator(Lead $lead): void
     {
         if ($lead->isNewlyCreated() || $lead->wasAnonymous()) {
             // Only store an entry once for created and once for identified, not every time the lead is saved

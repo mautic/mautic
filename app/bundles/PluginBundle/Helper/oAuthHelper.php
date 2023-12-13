@@ -6,9 +6,7 @@ use Mautic\PluginBundle\Integration\UnifiedIntegrationInterface;
 use Symfony\Component\HttpFoundation\Request;
 
 /**
- * Class oAuthHelper.
- *
- * Portions modified from https://code.google.com/p/simple-php-oauth/
+ * Portions modified from https://code.google.com/p/simple-php-oauth/.
  */
 class oAuthHelper
 {
@@ -24,27 +22,24 @@ class oAuthHelper
 
     private $settings;
 
-    private $request;
-
-    public function __construct(UnifiedIntegrationInterface $integration, Request $request = null, $settings = [])
-    {
+    public function __construct(
+        UnifiedIntegrationInterface $integration,
+        private ?Request $request = null,
+        $settings = []
+    ) {
         $clientId                = $integration->getClientIdKey();
         $clientSecret            = $integration->getClientSecretKey();
         $keys                    = $integration->getDecryptedApiKeys();
-        $this->clientId          = isset($keys[$clientId]) ? $keys[$clientId] : null;
-        $this->clientSecret      = isset($keys[$clientSecret]) ? $keys[$clientSecret] : null;
+        $this->clientId          = $keys[$clientId] ?? null;
+        $this->clientSecret      = $keys[$clientSecret] ?? null;
         $authToken               = $integration->getAuthTokenKey();
-        $this->accessToken       = (isset($keys[$authToken])) ? $keys[$authToken] : '';
-        $this->accessTokenSecret = (isset($settings['token_secret'])) ? $settings['token_secret'] : '';
+        $this->accessToken       = $keys[$authToken] ?? '';
+        $this->accessTokenSecret = $settings['token_secret'] ?? '';
         $this->callback          = $integration->getAuthCallbackUrl();
         $this->settings          = $settings;
-        $this->request           = $request;
     }
 
-    /**
-     * @return array
-     */
-    public function getAuthorizationHeader($url, $parameters, $method)
+    public function getAuthorizationHeader($url, $parameters, $method): array
     {
         // Get standard OAuth headers
         $headers = $this->getOauthHeaders();
@@ -60,7 +55,7 @@ class oAuthHelper
 
         if (!empty($this->settings['double_encode_basestring_parameters'])) {
             // Parameters must be encoded before going through buildBaseString
-            array_walk($parameters, function (&$val, $key, $oauth) {
+            array_walk($parameters, function (&$val, $key, $oauth): void {
                 $val = $oauth->encode($val);
             }, $this);
         }
@@ -76,10 +71,8 @@ class oAuthHelper
 
     /**
      * Get composite key for OAuth 1 signature signing.
-     *
-     * @return string
      */
-    private function getCompositeKey()
+    private function getCompositeKey(): string
     {
         if (strlen($this->accessTokenSecret) > 0) {
             $composite_key = $this->encode($this->clientSecret).'&'.$this->encode($this->accessTokenSecret);
@@ -119,10 +112,8 @@ class oAuthHelper
 
     /**
      * Build base string for OAuth 1 signature signing.
-     *
-     * @return string
      */
-    private function buildBaseString($baseURI, $method, $params)
+    private function buildBaseString($baseURI, $method, $params): string
     {
         $r = $this->normalizeParameters($params);
 
@@ -131,10 +122,8 @@ class oAuthHelper
 
     /**
      * Build header for OAuth 1 authorization.
-     *
-     * @return string
      */
-    private function buildAuthorizationHeader($oauth)
+    private function buildAuthorizationHeader($oauth): string
     {
         $r      = 'Authorization: OAuth ';
         $values = $this->normalizeParameters($oauth, true, true);
@@ -177,10 +166,8 @@ class oAuthHelper
 
     /**
      * Returns an encoded string according to the RFC3986.
-     *
-     * @return string
      */
-    public function encode($string)
+    public function encode($string): string
     {
         return str_replace('%7E', '~', rawurlencode($string));
     }
@@ -189,10 +176,8 @@ class oAuthHelper
      * OAuth1.0 nonce generator.
      *
      * @param int $bits
-     *
-     * @return string
      */
-    private function generateNonce($bits = 64)
+    private function generateNonce($bits = 64): string
     {
         $result          = '';
         $accumulatedBits = 0;

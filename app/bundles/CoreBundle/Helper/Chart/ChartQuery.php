@@ -12,19 +12,9 @@ use Mautic\CoreBundle\Helper\DateTimeHelper;
  */
 class ChartQuery extends AbstractChart
 {
-    /**
-     * Doctrine's Connetion object.
-     *
-     * @var Connection
-     */
-    protected $connection;
-
     private DateTimeHelper $dateTimeHelper;
 
-    /**
-     * @var GeneratedColumnsProviderInterface
-     */
-    private $generatedColumnProvider;
+    private ?\Mautic\CoreBundle\Doctrine\Provider\GeneratedColumnsProviderInterface $generatedColumnProvider = null;
 
     /**
      * Match date/time unit to a SQL datetime format
@@ -70,16 +60,19 @@ class ChartQuery extends AbstractChart
      *
      * @param string|null $unit
      */
-    public function __construct(Connection $connection, \DateTime $dateFrom, \DateTime $dateTo, $unit = null)
-    {
+    public function __construct(
+        protected Connection $connection,
+        \DateTime $dateFrom,
+        \DateTime $dateTo,
+        $unit = null
+    ) {
         $this->dateTimeHelper = new DateTimeHelper();
-        $this->unit           = (null === $unit) ? $this->getTimeUnitFromDateRange($dateFrom, $dateTo) : $unit;
+        $this->unit           = $unit ?? $this->getTimeUnitFromDateRange($dateFrom, $dateTo);
         $this->isTimeUnit     = in_array($this->unit, ['H', 'i', 's']);
-        $this->connection     = $connection;
         $this->setDateRange($dateFrom, $dateTo);
     }
 
-    public function setGeneratedColumnProvider(GeneratedColumnsProviderInterface $generatedColumnProvider)
+    public function setGeneratedColumnProvider(GeneratedColumnsProviderInterface $generatedColumnProvider): void
     {
         $this->generatedColumnProvider = $generatedColumnProvider;
     }
@@ -90,7 +83,7 @@ class ChartQuery extends AbstractChart
      * @param QueryBuilder $query
      * @param array        $filters
      */
-    public function applyFilters(&$query, $filters)
+    public function applyFilters(&$query, $filters): void
     {
         if ($filters && is_array($filters)) {
             foreach ($filters as $column => $value) {
@@ -129,7 +122,7 @@ class ChartQuery extends AbstractChart
      * @param string       $dateColumn
      * @param string       $tablePrefix
      */
-    public function applyDateFilters(&$query, $dateColumn, $tablePrefix = 't')
+    public function applyDateFilters(&$query, $dateColumn, $tablePrefix = 't'): void
     {
         // Check if the date filters have already been applied
         if ($parameters = $query->getParameters()) {
@@ -231,7 +224,7 @@ class ChartQuery extends AbstractChart
      * @param string       $countColumn
      * @param bool|string  $isEnumerable true = COUNT, string sum = SUM
      */
-    public function modifyTimeDataQuery($query, $column, $tablePrefix = 't', $countColumn = '*', $isEnumerable = true, bool $useSqlOrder = true)
+    public function modifyTimeDataQuery($query, $column, $tablePrefix = 't', $countColumn = '*', $isEnumerable = true, bool $useSqlOrder = true): void
     {
         // Convert time units to the right form for current database platform
         $limit         = $this->countAmountFromDateRange();
@@ -260,10 +253,8 @@ class ChartQuery extends AbstractChart
      * @param string $table   without prefix
      * @param string $column  name. The column must be type of datetime
      * @param array  $filters will be added to where claues
-     *
-     * @return array
      */
-    public function fetchTimeData($table, $column, $filters = [])
+    public function fetchTimeData($table, $column, $filters = []): array
     {
         $query = $this->prepareTimeDataQuery($table, $column, $filters);
 
@@ -277,10 +268,8 @@ class ChartQuery extends AbstractChart
      * @param string $column    name. The column must be type of datetime
      * @param array  $filters   will be added to where claues
      * @param string $sumColumn name that will be summed
-     *
-     * @return array
      */
-    public function fetchSumTimeData($table, $column, $filters, $sumColumn)
+    public function fetchSumTimeData($table, $column, $filters, $sumColumn): array
     {
         $query = $this->prepareTimeDataQuery($table, $column, $filters, $sumColumn, 'sum');
 
@@ -291,10 +280,8 @@ class ChartQuery extends AbstractChart
      * Loads data from prepared query and builds the chart data.
      *
      * @param QueryBuilder $query
-     *
-     * @return array
      */
-    public function loadAndBuildTimeData($query)
+    public function loadAndBuildTimeData($query): array
     {
         $rawData =  $query->executeQuery()->fetchAllAssociative();
 
@@ -486,10 +473,8 @@ class ChartQuery extends AbstractChart
      * @param string $dateColumn   name
      * @param array  $filters      will be added to where claues
      * @param array  $options      for special behavior
-     *
-     * @return int
      */
-    public function count($table, $uniqueColumn, $dateColumn = null, $filters = [], $options = [])
+    public function count($table, $uniqueColumn, $dateColumn = null, $filters = [], $options = []): int
     {
         $query = $this->getCountQuery($table, $uniqueColumn, $dateColumn, $filters);
 
@@ -498,10 +483,8 @@ class ChartQuery extends AbstractChart
 
     /**
      * Fetch the count integet from a query.
-     *
-     * @return int
      */
-    public function fetchCount(QueryBuilder $query)
+    public function fetchCount(QueryBuilder $query): int
     {
         $data = $query->executeQuery()->fetchAssociative();
 
@@ -541,7 +524,7 @@ class ChartQuery extends AbstractChart
      * @param int    $endSecond
      * @param string $tablePrefix
      */
-    public function modifyCountDateDiffQuery(QueryBuilder &$query, $dateColumn1, $dateColumn2, $startSecond = 0, $endSecond = 60, $tablePrefix = 't')
+    public function modifyCountDateDiffQuery(QueryBuilder &$query, $dateColumn1, $dateColumn2, $startSecond = 0, $endSecond = 60, $tablePrefix = 't'): void
     {
         $query->select('COUNT('.$tablePrefix.'.'.$dateColumn1.') AS count');
         $query->where('TIMESTAMPDIFF(SECOND, '.$tablePrefix.'.'.$dateColumn1.', '.$tablePrefix.'.'.$dateColumn2.') >= :startSecond');
@@ -555,10 +538,8 @@ class ChartQuery extends AbstractChart
      * Count how many rows is between a range of date diff in seconds.
      *
      * @param string $query
-     *
-     * @return int
      */
-    public function fetchCountDateDiff($query)
+    public function fetchCountDateDiff($query): int
     {
         $data = $query->execute()->fetchAssociative();
 
@@ -570,11 +551,11 @@ class ChartQuery extends AbstractChart
      */
     protected function prepareTable($table)
     {
-        if (MAUTIC_TABLE_PREFIX && 0 === strpos($table, MAUTIC_TABLE_PREFIX)) {
+        if (MAUTIC_TABLE_PREFIX && str_starts_with($table, MAUTIC_TABLE_PREFIX)) {
             return $table;
         }
 
-        if (0 === strpos($table, '(')) {
+        if (str_starts_with($table, '(')) {
             return $table;
         }
 
@@ -585,7 +566,7 @@ class ChartQuery extends AbstractChart
      * @param string $tablePrefix
      * @param string $column
      */
-    private function getDateConstruct($tablePrefix, $column)
+    private function getDateConstruct($tablePrefix, $column): string
     {
         if ($this->generatedColumnProvider) {
             $generatedColumns = $this->generatedColumnProvider->getGeneratedColumns();
@@ -594,7 +575,7 @@ class ChartQuery extends AbstractChart
                 $generatedColumn = $generatedColumns->getForOriginalDateColumnAndUnit($column, $this->unit);
 
                 return $tablePrefix.'.'.$generatedColumn->getColumnName();
-            } catch (\UnexpectedValueException $e) {
+            } catch (\UnexpectedValueException) {
                 // Alright. Use the original column then.
             }
         }

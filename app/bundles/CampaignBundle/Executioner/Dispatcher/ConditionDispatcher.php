@@ -10,14 +10,9 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class ConditionDispatcher
 {
-    /**
-     * @var EventDispatcherInterface
-     */
-    private $dispatcher;
-
-    public function __construct(EventDispatcherInterface $dispatcher)
-    {
-        $this->dispatcher = $dispatcher;
+    public function __construct(
+        private EventDispatcherInterface $dispatcher
+    ) {
     }
 
     public function dispatchEvent(ConditionAccessor $config, LeadEventLog $log): ConditionEvent

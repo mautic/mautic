@@ -22,16 +22,6 @@ class AuthenticationEvent extends Event
     protected $response;
 
     /**
-     * @var mixed
-     */
-    protected $user;
-
-    /**
-     * @var TokenInterface
-     */
-    protected $token;
-
-    /**
      * @var bool
      */
     protected $isAuthenticated = false;
@@ -44,29 +34,9 @@ class AuthenticationEvent extends Event
     /**
      * @var UserProvider
      */
-    protected $userProvider;
+    protected \Symfony\Component\Security\Core\User\UserProviderInterface $userProvider;
 
-    /**
-     * @var bool
-     */
-    protected $isFormLogin;
-
-    /**
-     * @var bool
-     */
-    protected $isLoginCheck;
-
-    /**
-     * @var string Service that authenticated the user
-     */
-    protected $authenticatingService;
-
-    protected $integrations;
-
-    /**
-     * @var Request
-     */
-    protected $request;
+    protected bool $isFormLogin;
 
     /**
      * Message to display to user if there is a failed authentication.
@@ -77,27 +47,20 @@ class AuthenticationEvent extends Event
 
     /**
      * @param string|User|null                $user
-     * @param bool                            $loginCheck            Event executed from the mautic_sso_login_check route typically used as the SSO callback
+     * @param bool                            $isLoginCheck          Event executed from the mautic_sso_login_check route typically used as the SSO callback
      * @param string                          $authenticatingService Service Service requesting authentication
      * @param array<AbstractIntegration>|null $integrations
      */
     public function __construct(
-        $user,
-        TokenInterface $token,
+        protected $user,
+        protected TokenInterface $token,
         UserProviderInterface $userProvider,
-        Request $request,
-        $loginCheck = false,
-        $authenticatingService = null,
-        $integrations = null
+        protected Request $request,
+        protected $isLoginCheck = false,
+        protected $authenticatingService = null,
+        protected $integrations = null
     ) {
-        $this->token = $token;
-        $this->user  = $user;
-
         $this->isFormLogin           = $token instanceof UsernamePasswordToken;
-        $this->integrations          = $integrations;
-        $this->request               = $request;
-        $this->isLoginCheck          = $loginCheck;
-        $this->authenticatingService = $authenticatingService;
 
         if ($userProvider instanceof ChainUserProvider) {
             // Chain of user providers so let's find Mautic's
@@ -130,7 +93,7 @@ class AuthenticationEvent extends Event
      * @param bool|true $saveUser
      * @param bool|true $createIfNotExists If true, the user will be created if it does not exist
      */
-    public function setUser(User $user, $saveUser = true, $createIfNotExists = true)
+    public function setUser(User $user, $saveUser = true, $createIfNotExists = true): void
     {
         if ($saveUser) {
             $user = $this->userProvider->saveUser($user, $createIfNotExists);
@@ -149,7 +112,7 @@ class AuthenticationEvent extends Event
         return $this->token;
     }
 
-    public function setToken($service, TokenInterface $token)
+    public function setToken($service, TokenInterface $token): void
     {
         $this->token                 = $token;
         $this->authenticatingService = $service;
@@ -184,7 +147,7 @@ class AuthenticationEvent extends Event
      * @param string    $service           Service that authenticated the user; if using a Integration, it should match that of AbstractIntegration::getName();
      * @param bool|true $createIfNotExists
      */
-    public function setIsAuthenticated($service, User $user = null, $createIfNotExists = true)
+    public function setIsAuthenticated($service, User $user = null, $createIfNotExists = true): void
     {
         $this->authenticatingService = $service;
         $this->isAuthenticated       = true;
@@ -211,7 +174,7 @@ class AuthenticationEvent extends Event
      * Prevent any other authentication method from authorizing the user.
      * Mainly used to prevent a form login from trying to auth with the given password for a local user (think two-factor requirements).
      */
-    public function setIsFailedAuthentication()
+    public function setIsFailedAuthentication(): void
     {
         $this->forceFailedAuthentication = true;
 
@@ -222,7 +185,7 @@ class AuthenticationEvent extends Event
     /**
      * Set the message to display to the user for failing auth.
      */
-    public function setFailedAuthenticationMessage($message)
+    public function setFailedAuthenticationMessage($message): void
     {
         $this->failedAuthMessage = $message;
     }
@@ -260,7 +223,7 @@ class AuthenticationEvent extends Event
     /**
      * Set a response such as a redirect.
      */
-    public function setResponse(Response $response)
+    public function setResponse(Response $response): void
     {
         $this->response = $response;
 
@@ -290,10 +253,8 @@ class AuthenticationEvent extends Event
 
     /**
      * Check if this is a form login authentication request or pre-auth.
-     *
-     * @return bool
      */
-    public function isFormLogin()
+    public function isFormLogin(): bool
     {
         return $this->isFormLogin;
     }
@@ -313,6 +274,6 @@ class AuthenticationEvent extends Event
      */
     public function getIntegration($integrationName)
     {
-        return (isset($this->integrations[$integrationName])) ? $this->integrations[$integrationName] : false;
+        return $this->integrations[$integrationName] ?? false;
     }
 }

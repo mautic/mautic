@@ -9,10 +9,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class NotificationListType extends AbstractType
 {
-    /**
-     * {@inheritdoc}
-     */
-    public function configureOptions(OptionsResolver $resolver)
+    public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults(
             [
@@ -20,18 +17,16 @@ class NotificationListType extends AbstractType
                 'modal_header'        => 'mautic.notification.header.new',
                 'model'               => 'notification',
                 'model_lookup_method' => 'getLookupResults',
-                'lookup_arguments'    => function (Options $options) {
-                    return [
-                        'type'    => 'notification',
-                        'filter'  => '$data',
-                        'limit'   => 0,
-                        'start'   => 0,
-                        'options' => [
-                            'notification_type' => $options['notification_type'],
-                        ],
-                    ];
-                },
-                'ajax_lookup_action' => function (Options $options) {
+                'lookup_arguments'    => fn (Options $options): array => [
+                    'type'    => 'notification',
+                    'filter'  => '$data',
+                    'limit'   => 0,
+                    'start'   => 0,
+                    'options' => [
+                        'notification_type' => $options['notification_type'],
+                    ],
+                ],
+                'ajax_lookup_action' => function (Options $options): string {
                     $query = [
                         'notification_type' => $options['notification_type'],
                     ];

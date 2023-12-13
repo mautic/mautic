@@ -11,10 +11,8 @@ class IdentifyCompanyHelper
     /**
      * @param array $data
      * @param mixed $lead
-     *
-     * @return array
      */
-    public static function identifyLeadsCompany($data, $lead, CompanyModel $companyModel)
+    public static function identifyLeadsCompany($data, $lead, CompanyModel $companyModel): array
     {
         $addContactToCompany = true;
 
@@ -26,7 +24,7 @@ class IdentifyCompanyHelper
 
         try {
             $companies = $companyModel->checkForDuplicateCompanies($parameters);
-        } catch (UniqueFieldNotFoundException $uniqueFieldNotFoundException) {
+        } catch (UniqueFieldNotFoundException) {
             return [null, false, null];
         }
 
@@ -54,10 +52,7 @@ class IdentifyCompanyHelper
         return [$companyData, $addContactToCompany, $companyEntity];
     }
 
-    /**
-     * @return array
-     */
-    public static function findCompany(array $data, CompanyModel $companyModel)
+    public static function findCompany(array $data, CompanyModel $companyModel): array
     {
         $parameters = self::normalizeParameters($data);
 
@@ -67,14 +62,13 @@ class IdentifyCompanyHelper
 
         try {
             $companyEntities = $companyModel->checkForDuplicateCompanies($parameters);
-        } catch (UniqueFieldNotFoundException $uniqueFieldNotFoundException) {
+        } catch (UniqueFieldNotFoundException) {
             return [[], []];
         }
 
         $companyData     = $parameters;
         if (!empty($companyEntities)) {
-            end($companyEntities);
-            $key               = key($companyEntities);
+            $key               = array_key_last($companyEntities);
             $companyData['id'] = $companyEntities[$key]->getId();
         }
 
@@ -95,11 +89,13 @@ class IdentifyCompanyHelper
         return false;
     }
 
-    private static function normalizeParameters(array $parameters)
+    /**
+     * @param mixed[] $parameters
+     *
+     * @return mixed[]
+     */
+    private static function normalizeParameters(array $parameters): array
     {
-        $companyName   = null;
-        $companyDomain = null;
-
         if (isset($parameters['company'])) {
             $parameters['companyname'] = filter_var($parameters['company']);
             unset($parameters['company']);

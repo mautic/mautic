@@ -19,6 +19,7 @@ class ImportControllerFunctionalTest extends MauticMysqlTestCase
     protected $useCleanupRollback = false;
 
     private string $csvFile;
+
     /**
      * @var array|string[][]
      */

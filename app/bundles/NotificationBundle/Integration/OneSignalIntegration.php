@@ -11,22 +11,17 @@ class OneSignalIntegration extends AbstractIntegration
 {
     protected bool $coreIntegration = true;
 
-    /**
-     * {@inheritdoc}
-     *
-     * @return string
-     */
-    public function getName()
+    public function getName(): string
     {
         return 'OneSignal';
     }
 
-    public function getIcon()
+    public function getIcon(): string
     {
         return 'app/bundles/NotificationBundle/Assets/img/OneSignal.png';
     }
 
-    public function getSupportedFeatures()
+    public function getSupportedFeatures(): array
     {
         return [
             'mobile',
@@ -36,7 +31,7 @@ class OneSignalIntegration extends AbstractIntegration
         ];
     }
 
-    public function getSupportedFeatureTooltips()
+    public function getSupportedFeatureTooltips(): array
     {
         return [
             'landing_page_enabled'  => 'mautic.integration.form.features.landing_page_enabled.tooltip',
@@ -45,11 +40,9 @@ class OneSignalIntegration extends AbstractIntegration
     }
 
     /**
-     * {@inheritdoc}
-     *
-     * @return array
+     * @return array<string, string>
      */
-    public function getRequiredKeyFields()
+    public function getRequiredKeyFields(): array
     {
         return [
             'app_id'        => 'mautic.notification.config.form.notification.app_id',
@@ -59,12 +52,7 @@ class OneSignalIntegration extends AbstractIntegration
         ];
     }
 
-    /**
-     * {@inheritdoc}
-     *
-     * @return string
-     */
-    public function getAuthenticationType()
+    public function getAuthenticationType(): string
     {
         return 'none';
     }
@@ -74,7 +62,7 @@ class OneSignalIntegration extends AbstractIntegration
      * @param array                                             $data
      * @param string                                            $formArea
      */
-    public function appendToForm(&$builder, $data, $formArea)
+    public function appendToForm(&$builder, $data, $formArea): void
     {
         if ('features' == $formArea) {
             /* @var FormBuilder $builder */

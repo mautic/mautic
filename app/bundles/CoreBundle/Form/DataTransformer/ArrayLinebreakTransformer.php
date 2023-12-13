@@ -7,8 +7,6 @@ use Symfony\Component\Form\DataTransformerInterface;
 class ArrayLinebreakTransformer implements DataTransformerInterface
 {
     /**
-     * {@inheritdoc}
-     *
      * @return string
      */
     public function transform($array)
@@ -21,8 +19,6 @@ class ArrayLinebreakTransformer implements DataTransformerInterface
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @return array
      */
     public function reverseTransform($string)

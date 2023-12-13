@@ -16,48 +16,21 @@ use Symfony\Component\Routing\Router;
 
 class FieldBuilder
 {
-    /**
-     * @var ValueNormalizer
-     */
-    private $valueNormalizer;
+    private \Mautic\IntegrationsBundle\Sync\ValueNormalizer\ValueNormalizer $valueNormalizer;
 
-    /**
-     * @var Router
-     */
-    private $router;
+    private ?array $mauticObject = null;
 
-    /**
-     * @var FieldHelper
-     */
-    private $fieldHelper;
+    private ?\Mautic\IntegrationsBundle\Sync\DAO\Sync\Request\ObjectDAO $requestObject = null;
 
-    /**
-     * @var ContactObjectHelper
-     */
-    private $contactObjectHelper;
-
-    /**
-     * @var array
-     */
-    private $mauticObject;
-
-    /**
-     * @var RequestObjectDAO
-     */
-    private $requestObject;
-
-    public function __construct(Router $router, FieldHelper $fieldHelper, ContactObjectHelper $contactObjectHelper)
-    {
+    public function __construct(
+        private Router $router,
+        private FieldHelper $fieldHelper,
+        private ContactObjectHelper $contactObjectHelper
+    ) {
         $this->valueNormalizer = new ValueNormalizer();
-
-        $this->router              = $router;
-        $this->fieldHelper         = $fieldHelper;
-        $this->contactObjectHelper = $contactObjectHelper;
     }
 
     /**
-     * @return ReportFieldDAO
-     *
      * @throws FieldNotFoundException
      */
     public function buildObjectField(
@@ -66,7 +39,7 @@ class FieldBuilder
         RequestObjectDAO $requestObject,
         string $integration,
         string $defaultState = ReportFieldDAO::FIELD_CHANGED
-    ) {
+    ): ReportFieldDAO {
         $this->mauticObject  = $mauticObject;
         $this->requestObject = $requestObject;
 
@@ -81,7 +54,7 @@ class FieldBuilder
         }
 
         // Special handling of DNC fields
-        if (0 === strpos($field, 'mautic_internal_dnc_')) {
+        if (str_starts_with($field, 'mautic_internal_dnc_')) {
             return $this->addDoNotContactField($field);
         }
 

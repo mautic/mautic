@@ -7,29 +7,22 @@ use Symfony\Contracts\EventDispatcher\Event;
 class ParseEmailEvent extends Event
 {
     /**
-     * @var array
+     * @var mixed[]
      */
-    private $messages;
+    private array $criteriaRequests = [];
 
     /**
-     * @var array
+     * @var mixed[]
      */
-    private $keys;
+    private array $markAsSeen = [];
 
     /**
-     * @var array
+     * @param mixed[] $keys
      */
-    private $criteriaRequests = [];
-
-    /**
-     * @var array
-     */
-    private $markAsSeen = [];
-
-    public function __construct(array $messages = [], array $applicableKeys = [])
-    {
-        $this->messages = $messages;
-        $this->keys     = $applicableKeys;
+    public function __construct(
+        private array $messages = [],
+        private array $keys = []
+    ) {
     }
 
     /**
@@ -100,7 +93,7 @@ class ParseEmailEvent extends Event
      * @param string $criteria   Should be a string using combinations of Mautic\EmailBundle\MonitoredEmail\Mailbox::CRITERIA_* constants
      * @param bool   $markAsSeen Mark the message as read after being processed
      */
-    public function setCriteriaRequest($bundleKey, $folderKeys, $criteria, $markAsSeen = true)
+    public function setCriteriaRequest($bundleKey, $folderKeys, $criteria, $markAsSeen = true): void
     {
         if (!is_array($folderKeys)) {
             $folderKeys = [$folderKeys];

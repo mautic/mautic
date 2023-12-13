@@ -15,35 +15,17 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class BuilderSubscriber implements EventSubscriberInterface
 {
-    /**
-     * @var string
-     */
-    private $assetToken = '{assetlink=(.*?)}';
-
-    private \Mautic\CoreBundle\Security\Permissions\CorePermissions $security;
-
-    private \Mautic\AssetBundle\Helper\TokenHelper $tokenHelper;
-
-    private \Mautic\LeadBundle\Tracker\ContactTracker $contactTracker;
-
-    private \Mautic\CoreBundle\Helper\BuilderTokenHelperFactory $builderTokenHelperFactory;
+    private string $assetToken = '{assetlink=(.*?)}';
 
     public function __construct(
-        CorePermissions $security,
-        TokenHelper $tokenHelper,
-        ContactTracker $contactTracker,
-        BuilderTokenHelperFactory $builderTokenHelperFactory
+        private CorePermissions $security,
+        private TokenHelper $tokenHelper,
+        private ContactTracker $contactTracker,
+        private BuilderTokenHelperFactory $builderTokenHelperFactory
     ) {
-        $this->security                  = $security;
-        $this->tokenHelper               = $tokenHelper;
-        $this->contactTracker            = $contactTracker;
-        $this->builderTokenHelperFactory = $builderTokenHelperFactory;
     }
 
-    /**
-     * @return array
-     */
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             EmailEvents::EMAIL_ON_BUILD   => ['onBuilderBuild', 0],
@@ -54,7 +36,7 @@ class BuilderSubscriber implements EventSubscriberInterface
         ];
     }
 
-    public function onBuilderBuild(BuilderEvent $event)
+    public function onBuilderBuild(BuilderEvent $event): void
     {
         if ($event->tokensRequested($this->assetToken)) {
             $tokenHelper = $this->builderTokenHelperFactory->getBuilderTokenHelper('asset');
@@ -62,7 +44,7 @@ class BuilderSubscriber implements EventSubscriberInterface
         }
     }
 
-    public function onEmailGenerate(EmailSendEvent $event)
+    public function onEmailGenerate(EmailSendEvent $event): void
     {
         $lead   = $event->getLead();
         $leadId = (int) (null !== $lead ? $lead['id'] : null);
@@ -71,7 +53,7 @@ class BuilderSubscriber implements EventSubscriberInterface
         $event->addTokens($tokens);
     }
 
-    public function onPageDisplay(PageDisplayEvent $event)
+    public function onPageDisplay(PageDisplayEvent $event): void
     {
         $page    = $event->getPage();
         $lead    = $this->security->isAnonymous() ? $this->contactTracker->getContact() : null;
@@ -79,7 +61,7 @@ class BuilderSubscriber implements EventSubscriberInterface
         $tokens  = $this->generateTokensFromContent($event, $leadId, ['page', $page->getId()]);
         $content = $event->getContent();
 
-        if (!empty($tokens)) {
+        if ([] !== $tokens) {
             $content = str_ireplace(array_keys($tokens), $tokens, $content);
         }
         $event->setContent($content);
@@ -87,13 +69,12 @@ class BuilderSubscriber implements EventSubscriberInterface
 
     /**
      * @param PageDisplayEvent|EmailSendEvent $event
-     * @param int                             $leadId
      * @param array                           $source
-     * @param null                            $emailId
+     * @param int|null                        $emailId
      *
-     * @return array
+     * @return mixed[]
      */
-    private function generateTokensFromContent($event, $leadId, $source = [], $emailId = null)
+    private function generateTokensFromContent($event, ?int $leadId, $source = [], $emailId = null): array
     {
         if ($event instanceof PageDisplayEvent || ($event instanceof EmailSendEvent && $event->shouldAppendClickthrough())) {
             $clickthrough = [

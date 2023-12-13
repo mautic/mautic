@@ -13,9 +13,9 @@ class BarChart extends AbstractChart implements ChartInterface
     }
 
     /**
-     * Render chart data.
+     * @return array{labels: mixed[], datasets: mixed[]}
      */
-    public function render()
+    public function render(): array
     {
         ksort($this->datasets);
 
@@ -55,10 +55,8 @@ class BarChart extends AbstractChart implements ChartInterface
      * Generate unique color for the dataset.
      *
      * @param int $datasetId
-     *
-     * @return array
      */
-    public function generateColors($datasetId)
+    public function generateColors($datasetId): array
     {
         $color = $this->configureColorHelper($datasetId);
 

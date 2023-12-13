@@ -11,7 +11,7 @@ use PHPUnit\Framework\TestCase;
 
 class ClientTest extends TestCase
 {
-    public function testPost()
+    public function testPost(): void
     {
         $method  = 'POST';
         $url     = 'url';

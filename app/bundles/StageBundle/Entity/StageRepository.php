@@ -9,9 +9,6 @@ use Mautic\CoreBundle\Entity\CommonRepository;
  */
 class StageRepository extends CommonRepository
 {
-    /**
-     * {@inheritdoc}
-     */
     public function getEntities(array $args = [])
     {
         $q = $this
@@ -23,10 +20,7 @@ class StageRepository extends CommonRepository
         return parent::getEntities($args);
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getTableAlias()
+    public function getTableAlias(): string
     {
         return 's';
     }
@@ -81,10 +75,7 @@ class StageRepository extends CommonRepository
         return $return;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    protected function addCatchAllWhereClause($q, $filter)
+    protected function addCatchAllWhereClause($q, $filter): array
     {
         return $this->addStandardCatchAllWhereClause($q, $filter, [
             's.name',
@@ -92,18 +83,15 @@ class StageRepository extends CommonRepository
         ]);
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    protected function addSearchCommandWhereClause($q, $filter)
+    protected function addSearchCommandWhereClause($q, $filter): array
     {
         return $this->addStandardSearchCommandWhereClause($q, $filter);
     }
 
     /**
-     * {@inheritdoc}
+     * @return string[]
      */
-    public function getSearchCommands()
+    public function getSearchCommands(): array
     {
         return $this->getStandardSearchCommands();
     }
@@ -112,7 +100,6 @@ class StageRepository extends CommonRepository
      * Get a list of lists.
      *
      * @param bool   $user
-     * @param string $alias
      * @param string $id
      *
      * @return array
@@ -159,8 +146,6 @@ class StageRepository extends CommonRepository
 
     /**
      * Get a list of stages.
-     *
-     * @param string $name
      *
      * @return array
      */

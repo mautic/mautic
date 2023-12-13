@@ -11,26 +11,16 @@ use Symfony\Component\Routing\RouteCollection;
 
 class RouteLoader extends Loader
 {
-    /**
-     * @var EventDispatcherInterface
-     */
-    private $dispatcher;
-    /**
-     * @var CoreParametersHelper
-     */
-    private $coreParameters;
-
-    public function __construct(EventDispatcherInterface $dispatcher, CoreParametersHelper $parametersHelper)
-    {
-        $this->dispatcher     = $dispatcher;
-        $this->coreParameters = $parametersHelper;
+    public function __construct(
+        private EventDispatcherInterface $dispatcher,
+        private CoreParametersHelper $coreParameters
+    ) {
     }
 
     /**
      * Load each bundles routing.php file.
      *
      * @param mixed $resource
-     * @param null  $type
      *
      * @return RouteCollection
      *
@@ -100,11 +90,8 @@ class RouteLoader extends Loader
 
     /**
      * @param mixed $resource
-     * @param null  $type
-     *
-     * @return bool
      */
-    public function supports($resource, $type = null)
+    public function supports($resource, $type = null): bool
     {
         return 'mautic' === $type;
     }

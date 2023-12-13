@@ -39,32 +39,17 @@ class DashboardSubscriber extends MainDashboardSubscriber
         'form:forms:viewother',
     ];
 
-    /**
-     * @var SubmissionModel
-     */
-    protected $formSubmissionModel;
-
-    /**
-     * @var FormModel
-     */
-    protected $formModel;
-
-    /**
-     * @var RouterInterface
-     */
-    private $router;
-
-    public function __construct(SubmissionModel $formSubmissionModel, FormModel $formModel, RouterInterface $router)
-    {
-        $this->formModel           = $formModel;
-        $this->formSubmissionModel = $formSubmissionModel;
-        $this->router              = $router;
+    public function __construct(
+        protected SubmissionModel $formSubmissionModel,
+        protected FormModel $formModel,
+        private RouterInterface $router
+    ) {
     }
 
     /**
      * Set a widget detail when needed.
      */
-    public function onWidgetDetailGenerate(WidgetDetailEvent $event)
+    public function onWidgetDetailGenerate(WidgetDetailEvent $event): void
     {
         $this->checkPermissions($event);
         $canViewOthers = $event->hasPermission('form:forms:viewother');

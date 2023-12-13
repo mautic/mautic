@@ -19,36 +19,15 @@ class IntegrationsHelper
     /**
      * @var IntegrationInterface[]
      */
-    private $integrations = [];
+    private array $integrations = [];
 
-    /**
-     * @var IntegrationRepository
-     */
-    private $integrationRepository;
-
-    /**
-     * @var EncryptionService
-     */
-    private $encryptionService;
-
-    /**
-     * @var EventDispatcherInterface
-     */
-    private $eventDispatcher;
-
-    /**
-     * @var array
-     */
-    private $decryptedIntegrationConfigurations = [];
+    private array $decryptedIntegrationConfigurations = [];
 
     public function __construct(
-        IntegrationRepository $integrationRepository,
-        EncryptionService $encryptionService,
-        EventDispatcherInterface $eventDispatcher
+        private IntegrationRepository $integrationRepository,
+        private EncryptionService $encryptionService,
+        private EventDispatcherInterface $eventDispatcher
     ) {
-        $this->integrationRepository = $integrationRepository;
-        $this->encryptionService     = $encryptionService;
-        $this->eventDispatcher       = $eventDispatcher;
     }
 
     public function addIntegration(IntegrationInterface $integration): void
@@ -94,11 +73,9 @@ class IntegrationsHelper
     }
 
     /**
-     * @return Integration
-     *
      * @throws IntegrationNotFoundException
      */
-    public function getIntegrationConfiguration(IntegrationInterface $integration)
+    public function getIntegrationConfiguration(IntegrationInterface $integration): Integration
     {
         if (!$integration->hasIntegrationConfiguration()) {
             /** @var Integration $configuration */

@@ -7,10 +7,7 @@ use Symfony\Component\Form\FormBuilderInterface;
 
 class PointActionFormSubmitType extends AbstractType
 {
-    /**
-     * {@inheritdoc}
-     */
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder->add('forms', FormListType::class, [
             'label'      => 'mautic.form.point.action.forms',
@@ -23,9 +20,6 @@ class PointActionFormSubmitType extends AbstractType
         ]);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getBlockPrefix()
     {
         return 'pointaction_formsubmit';

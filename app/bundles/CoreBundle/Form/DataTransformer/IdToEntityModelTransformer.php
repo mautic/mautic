@@ -10,41 +10,18 @@ use Symfony\Component\Form\Exception\TransformationFailedException;
 class IdToEntityModelTransformer implements DataTransformerInterface
 {
     /**
-     * @var EntityManager
-     */
-    private $em;
-
-    /**
-     * @var string
-     */
-    private $repository;
-
-    /**
-     * @var string
-     */
-    private $id;
-
-    /**
-     * @var bool
-     */
-    private $isArray;
-
-    /**
-     * @param string $repo
-     * @param string $identifier
+     * @param string $repository
+     * @param string $id
      * @param bool   $isArray
      */
-    public function __construct(EntityManager $em, $repo = '', $identifier = 'id', $isArray = false)
-    {
-        $this->em         = $em;
-        $this->repository = $repo;
-        $this->id         = $identifier;
-        $this->isArray    = $isArray;
+    public function __construct(
+        private EntityManager $em,
+        private $repository = '',
+        private $id = 'id',
+        private $isArray = false
+    ) {
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function transform($entity)
     {
         $func = 'get'.ucfirst($this->id);
@@ -70,8 +47,6 @@ class IdToEntityModelTransformer implements DataTransformerInterface
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @throws TransformationFailedException if object is not found
      */
     public function reverseTransform($id)
@@ -124,7 +99,7 @@ class IdToEntityModelTransformer implements DataTransformerInterface
      *
      * @param string $repo
      */
-    public function setRepository($repo)
+    public function setRepository($repo): void
     {
         $this->repository = $repo;
     }
@@ -134,7 +109,7 @@ class IdToEntityModelTransformer implements DataTransformerInterface
      *
      * @param string $id
      */
-    public function setIdentifier($id)
+    public function setIdentifier($id): void
     {
         $this->id = $id;
     }

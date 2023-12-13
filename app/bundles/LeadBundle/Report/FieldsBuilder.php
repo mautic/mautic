@@ -10,40 +10,18 @@ use Mautic\UserBundle\Model\UserModel;
 
 class FieldsBuilder
 {
-    /**
-     * @var FieldModel
-     */
-    private $fieldModel;
-
-    /**
-     * @var ListModel
-     */
-    private $listModel;
-
-    /**
-     * @var UserModel
-     */
-    private $userModel;
-
-    /**
-     * @var LeadModel
-     */
-    private $leadModel;
-
-    public function __construct(FieldModel $fieldModel, ListModel $listModel, UserModel $userModel, LeadModel $leadModel)
-    {
-        $this->fieldModel = $fieldModel;
-        $this->listModel  = $listModel;
-        $this->userModel  = $userModel;
-        $this->leadModel  = $leadModel;
+    public function __construct(
+        private FieldModel $fieldModel,
+        private ListModel $listModel,
+        private UserModel $userModel,
+        private LeadModel $leadModel
+    ) {
     }
 
     /**
      * @param string $prefix
-     *
-     * @return array
      */
-    public function getLeadFieldsColumns($prefix)
+    public function getLeadFieldsColumns($prefix): array
     {
         $baseColumns  = $this->getBaseLeadColumns();
         $leadFields   = $this->fieldModel->getLeadFields();
@@ -55,10 +33,8 @@ class FieldsBuilder
     /**
      * @param string $prefix
      * @param string $segmentPrefix
-     *
-     * @return array
      */
-    public function getLeadFilter($prefix, $segmentPrefix)
+    public function getLeadFilter($prefix, $segmentPrefix): array
     {
         $filters = $this->getLeadFieldsColumns($prefix);
 
@@ -119,10 +95,8 @@ class FieldsBuilder
 
     /**
      * @param string $prefix
-     *
-     * @return array
      */
-    public function getCompanyFieldsColumns($prefix)
+    public function getCompanyFieldsColumns($prefix): array
     {
         $baseColumns   = $this->getBaseCompanyColumns();
         $companyFields = $this->fieldModel->getCompanyFields();
@@ -131,10 +105,7 @@ class FieldsBuilder
         return array_merge($baseColumns, $fieldColumns);
     }
 
-    /**
-     * @return array
-     */
-    private function getBaseLeadColumns()
+    private function getBaseLeadColumns(): array
     {
         return [
             'l.id' => [
@@ -170,10 +141,7 @@ class FieldsBuilder
         ];
     }
 
-    /**
-     * @return array
-     */
-    private function getBaseCompanyColumns()
+    private function getBaseCompanyColumns(): array
     {
         return [
             'comp.id' => [
@@ -219,32 +187,16 @@ class FieldsBuilder
 
         $columns = [];
         foreach ($fields as $field) {
-            switch ($field->getType()) {
-                case 'boolean':
-                    $type = 'bool';
-                    break;
-                case 'date':
-                    $type = 'date';
-                    break;
-                case 'datetime':
-                    $type = 'datetime';
-                    break;
-                case 'time':
-                    $type = 'time';
-                    break;
-                case 'url':
-                    $type = 'url';
-                    break;
-                case 'email':
-                    $type = 'email';
-                    break;
-                case 'number':
-                    $type = 'float';
-                    break;
-                default:
-                    $type = 'string';
-                    break;
-            }
+            $type = match ($field->getType()) {
+                'boolean'  => 'bool',
+                'date'     => 'date',
+                'datetime' => 'datetime',
+                'time'     => 'time',
+                'url'      => 'url',
+                'email'    => 'email',
+                'number'   => 'float',
+                default    => 'string',
+            };
             $columns[$prefix.$field->getAlias()] = [
                 'label' => $field->getLabel(),
                 'type'  => $type,
@@ -256,12 +208,10 @@ class FieldsBuilder
 
     /**
      * @param string $prefix
-     *
-     * @return string
      */
-    private function sanitizePrefix($prefix)
+    private function sanitizePrefix($prefix): string
     {
-        if (false === strpos($prefix, '.')) {
+        if (!str_contains($prefix, '.')) {
             $prefix .= '.';
         }
 

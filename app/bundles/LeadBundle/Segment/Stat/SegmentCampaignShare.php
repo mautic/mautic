@@ -8,26 +8,11 @@ use Mautic\CoreBundle\Helper\CacheStorageHelper;
 
 class SegmentCampaignShare
 {
-    /**
-     * @var CampaignModel
-     */
-    private $campaignModel;
-
-    /**
-     * @var CacheStorageHelper
-     */
-    private $cacheStorageHelper;
-
-    /**
-     * @var EntityManager
-     */
-    private $entityManager;
-
-    public function __construct(CampaignModel $campaignModel, CacheStorageHelper $cacheStorageHelper, EntityManager $entityManager)
-    {
-        $this->campaignModel      = $campaignModel;
-        $this->cacheStorageHelper = $cacheStorageHelper;
-        $this->entityManager      = $entityManager;
+    public function __construct(
+        private CampaignModel $campaignModel,
+        private CacheStorageHelper $cacheStorageHelper,
+        private EntityManager $entityManager
+    ) {
     }
 
     /**
@@ -74,10 +59,8 @@ class SegmentCampaignShare
     /**
      * @param int $segmentId
      * @param int $campaignId
-     *
-     * @return string
      */
-    private function getCachedKey($segmentId, $campaignId)
+    private function getCachedKey($segmentId, $campaignId): string
     {
         return sprintf('%s|%s|%s|%s|%s', 'campaign', $campaignId, 'segment', $segmentId, 'share');
     }

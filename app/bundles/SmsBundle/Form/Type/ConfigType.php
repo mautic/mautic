@@ -13,23 +13,13 @@ class ConfigType extends AbstractType
 {
     public const SMS_DISABLE_TRACKABLE_URLS = 'sms_disable_trackable_urls';
 
-    /**
-     * @var TransportChain
-     */
-    private $transportChain;
-
-    /**
-     * @var TranslatorInterface
-     */
-    private $translator;
-
-    public function __construct(TransportChain $transportChain, TranslatorInterface $translator)
-    {
-        $this->transportChain = $transportChain;
-        $this->translator     = $translator;
+    public function __construct(
+        private TransportChain $transportChain,
+        private TranslatorInterface $translator
+    ) {
     }
 
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $choices    = [];
         $transports = $this->transportChain->getEnabledTransports();
@@ -60,9 +50,6 @@ class ConfigType extends AbstractType
         );
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getBlockPrefix()
     {
         return 'smsconfig';

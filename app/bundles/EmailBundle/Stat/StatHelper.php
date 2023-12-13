@@ -9,11 +9,6 @@ use Mautic\EmailBundle\Stat\Exception\StatNotFoundException;
 class StatHelper
 {
     /**
-     * @var StatRepository
-     */
-    private $repo;
-
-    /**
      * Just store email ID and lead ID to avoid doctrine RAM issues with entities.
      *
      * @var Reference[]
@@ -25,12 +20,12 @@ class StatHelper
      */
     private $deleteUs = [];
 
-    public function __construct(StatRepository $statRepository)
-    {
-        $this->repo = $statRepository;
+    public function __construct(
+        private StatRepository $repo
+    ) {
     }
 
-    public function storeStat(Stat $stat, $emailAddress)
+    public function storeStat(Stat $stat, $emailAddress): void
     {
         $this->repo->saveEntity($stat);
 
@@ -41,14 +36,14 @@ class StatHelper
         $this->repo->detachEntity($stat);
     }
 
-    public function deletePending()
+    public function deletePending(): void
     {
         if (count($this->deleteUs)) {
             $this->repo->deleteStats($this->deleteUs);
         }
     }
 
-    public function markForDeletion(Reference $stat)
+    public function markForDeletion(Reference $stat): void
     {
         $this->deleteUs[] = $stat->getStatId();
     }
@@ -67,7 +62,7 @@ class StatHelper
         return $this->stats[$emailAddress];
     }
 
-    public function reset()
+    public function reset(): void
     {
         $this->deleteUs = [];
         $this->stats    = [];

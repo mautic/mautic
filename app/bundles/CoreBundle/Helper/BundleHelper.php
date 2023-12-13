@@ -4,23 +4,28 @@ namespace Mautic\CoreBundle\Helper;
 
 class BundleHelper
 {
-    private $coreBundles   = [];
-    private $pluginBundles = [];
-    private $allBundles    = [];
+    /**
+     * @var mixed[]
+     */
+    private array $allBundles;
 
-    public function __construct(array $coreBundles, array $pluginBundles)
-    {
-        $this->coreBundles   = $coreBundles;
-        $this->pluginBundles = $pluginBundles;
+    /**
+     * @param mixed[] $coreBundles
+     * @param mixed[] $pluginBundles
+     */
+    public function __construct(
+        private array $coreBundles,
+        private array $pluginBundles
+    ) {
         $this->allBundles    = array_merge($coreBundles, $pluginBundles);
     }
 
     /**
      * @param bool $includePlugins
      *
-     * @return mixed
+     * @return mixed[]
      */
-    public function getMauticBundles($includePlugins = true)
+    public function getMauticBundles($includePlugins = true): array
     {
         return $includePlugins ? $this->allBundles : $this->coreBundles;
     }

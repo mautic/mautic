@@ -17,7 +17,7 @@ class PointActionHelper
         if ($pageHit instanceof Page) {
             /** @var \Mautic\PageBundle\Model\PageModel $pageModel */
             $pageModel               = $factory->getModel('page');
-            list($parent, $children) = $pageHit->getVariants();
+            [$parent, $children]     = $pageHit->getVariants();
             // use the parent (self or configured parent)
             $pageHitId = $parent->getId();
         } else {
@@ -39,10 +39,8 @@ class PointActionHelper
 
     /**
      * @param MauticFactory $factory
-     *
-     * @return bool
      */
-    public static function validateUrlHit($factory, $eventDetails, $action)
+    public static function validateUrlHit($factory, $eventDetails, $action): bool
     {
         $changePoints = [];
         $url          = $eventDetails->getUrl();

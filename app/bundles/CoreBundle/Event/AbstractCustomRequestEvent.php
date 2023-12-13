@@ -22,9 +22,6 @@ abstract class AbstractCustomRequestEvent extends Event
      */
     protected $routeParams = [];
 
-    /**
-     * AbstractCustomRequestEvent constructor.
-     */
     public function __construct(Request $request = null)
     {
         if ($request) {
@@ -64,21 +61,18 @@ abstract class AbstractCustomRequestEvent extends Event
         return ($withParams) ? [$this->route, $this->routeParams] : $this->route;
     }
 
-    /**
-     * @return bool
-     */
-    public function checkRouteContext($route)
+    public function checkRouteContext($route): bool
     {
         if (null == $this->request) {
             return false;
         }
 
         if (null !== $route) {
-            list($currentRoute, $routeParams) = $this->getRoute(true);
+            [$currentRoute, $routeParams]     = $this->getRoute(true);
             $givenRoute                       = $route;
             $givenRouteParams                 = [];
             if (is_array($route)) {
-                list($givenRoute, $givenRouteParams) = $route;
+                [$givenRoute, $givenRouteParams] = $route;
             }
 
             if ($givenRoute !== $currentRoute) {

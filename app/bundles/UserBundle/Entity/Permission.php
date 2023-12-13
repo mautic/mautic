@@ -32,12 +32,12 @@ class Permission
      */
     protected $bitwise;
 
-    public static function loadMetadata(ORM\ClassMetadata $metadata)
+    public static function loadMetadata(ORM\ClassMetadata $metadata): void
     {
         $builder = new ClassMetadataBuilder($metadata);
 
         $builder->setTable('permissions')
-            ->setCustomRepositoryClass('Mautic\UserBundle\Entity\PermissionRepository')
+            ->setCustomRepositoryClass(\Mautic\UserBundle\Entity\PermissionRepository::class)
             ->addUniqueConstraint(['bundle', 'name', 'role_id'], 'unique_perm');
 
         $builder->addId();

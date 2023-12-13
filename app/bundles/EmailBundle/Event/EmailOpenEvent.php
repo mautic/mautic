@@ -9,30 +9,19 @@ use Symfony\Component\HttpFoundation\Request;
 
 class EmailOpenEvent extends CommonEvent
 {
-    /**
-     * @var Request
-     */
-    private $request;
+    private ?\Mautic\EmailBundle\Entity\Email $email;
 
     /**
-     * @var Email
+     * @param Request $request
+     * @param bool    $firstTime
      */
-    private $email;
-
-    /**
-     * @var bool
-     */
-    private $firstTime;
-
-    /**
-     * @param Email $email
-     */
-    public function __construct(Stat $stat, $request, $firstTime = false)
-    {
+    public function __construct(
+        Stat $stat,
+        private $request,
+        private $firstTime = false
+    ) {
         $this->entity    = $stat;
         $this->email     = $stat->getEmail();
-        $this->request   = $request;
-        $this->firstTime = $firstTime;
     }
 
     /**

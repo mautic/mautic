@@ -7,9 +7,6 @@ use Symfony\Component\Form\FormBuilderInterface;
 
 class NotificationPermissions extends AbstractPermissions
 {
-    /**
-     * {@inheritdoc}
-     */
     public function __construct($params)
     {
         parent::__construct($params);
@@ -18,20 +15,12 @@ class NotificationPermissions extends AbstractPermissions
         $this->addExtendedPermissions('mobile_notifications');
     }
 
-    /**
-     * {@inheritdoc}
-     *
-     * @return string|void
-     */
-    public function getName()
+    public function getName(): string
     {
         return 'notification';
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function buildForm(FormBuilderInterface &$builder, array $options, array $data)
+    public function buildForm(FormBuilderInterface &$builder, array $options, array $data): void
     {
         $this->addStandardFormFields('notification', 'categories', $builder, $data);
         $this->addExtendedFormFields('notification', 'notifications', $builder, $data);

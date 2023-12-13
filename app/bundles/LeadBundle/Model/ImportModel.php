@@ -38,42 +38,14 @@ use Symfony\Contracts\EventDispatcher\Event;
  */
 class ImportModel extends FormModel
 {
-    /**
-     * @var PathsHelper
-     */
-    protected $pathsHelper;
-
-    /**
-     * @var LeadModel
-     */
-    protected $leadModel;
-
-    /**
-     * @var CompanyModel
-     */
-    protected $companyModel;
-
-    /**
-     * @var NotificationModel
-     */
-    protected $notificationModel;
-
-    /**
-     * @var CoreParametersHelper
-     */
-    protected $config;
-
-    /**
-     * @var LeadEventLogRepository
-     */
-    protected $leadEventLogRepo;
+    protected \Mautic\LeadBundle\Entity\LeadEventLogRepository $leadEventLogRepo;
 
     public function __construct(
-        PathsHelper $pathsHelper,
-        LeadModel $leadModel,
-        NotificationModel $notificationModel,
-        CoreParametersHelper $config,
-        CompanyModel $companyModel,
+        protected PathsHelper $pathsHelper,
+        protected LeadModel $leadModel,
+        protected NotificationModel $notificationModel,
+        protected CoreParametersHelper $config,
+        protected CompanyModel $companyModel,
         EntityManagerInterface $em,
         CorePermissions $security,
         EventDispatcherInterface $dispatcher,
@@ -82,12 +54,7 @@ class ImportModel extends FormModel
         UserHelper $userHelper,
         LoggerInterface $mauticLogger
     ) {
-        $this->pathsHelper       = $pathsHelper;
-        $this->leadModel         = $leadModel;
-        $this->notificationModel = $notificationModel;
-        $this->config            = $config;
         $this->leadEventLogRepo  = $leadModel->getEventLogRepository();
-        $this->companyModel      = $companyModel;
 
         parent::__construct($em, $security, $dispatcher, $router, $translator, $userHelper, $mauticLogger, $config);
     }
@@ -110,10 +77,8 @@ class ImportModel extends FormModel
 
     /**
      * Compares current number of imports in progress with the limit from the configuration.
-     *
-     * @return bool
      */
-    public function checkParallelImportLimit()
+    public function checkParallelImportLimit(): bool
     {
         $parallelImportLimit = $this->getParallelImportLimit();
         $importsInProgress   = $this->getRepository()->countImportsInProgress();
@@ -135,10 +100,8 @@ class ImportModel extends FormModel
 
     /**
      * Generates a HTML link to the import detail.
-     *
-     * @return string
      */
-    public function generateLink(Import $import)
+    public function generateLink(Import $import): string
     {
         return '<a href="'.$this->router->generate(
             'mautic_import_action',
@@ -192,7 +155,7 @@ class ImportModel extends FormModel
      * @throws ImportFailedException
      * @throws ImportDelayedException
      */
-    public function beginImport(Import $import, Progress $progress, $limit = 0)
+    public function beginImport(Import $import, Progress $progress, $limit = 0): void
     {
         $this->setGhostImportsAsFailed();
 
@@ -308,7 +271,7 @@ class ImportModel extends FormModel
         $batchSize = $config['batchlimit'];
 
         // Convert to field names
-        array_walk($headers, function (&$val) {
+        array_walk($headers, function (&$val): void {
             $val = strtolower(InputHelper::alphanum($val, false, '_'));
         });
 
@@ -460,10 +423,8 @@ class ImportModel extends FormModel
 
     /**
      * Trim all values in a one dymensional array.
-     *
-     * @return array
      */
-    public function trimArrayValues(array $data)
+    public function trimArrayValues(array $data): array
     {
         return array_map('trim', $data);
     }
@@ -472,10 +433,8 @@ class ImportModel extends FormModel
      * Decide whether the CSV row is empty.
      *
      * @param mixed $row
-     *
-     * @return bool
      */
-    public function isEmptyCsvRow($row)
+    public function isEmptyCsvRow($row): bool
     {
         if (!is_array($row) || empty($row)) {
             return true;
@@ -493,7 +452,7 @@ class ImportModel extends FormModel
      *
      * @param string $errorMessage
      */
-    public function logImportRowError(LeadEventLog $eventLog, $errorMessage)
+    public function logImportRowError(LeadEventLog $eventLog, $errorMessage): void
     {
         $eventLog->addProperty('error', $this->translator->trans($errorMessage))
             ->setAction('failed');
@@ -530,10 +489,8 @@ class ImportModel extends FormModel
      * @param string $unit       {@link php.net/manual/en/function.date.php#refsect1-function.date-parameters}
      * @param string $dateFormat
      * @param array  $filter
-     *
-     * @return array
      */
-    public function getImportedRowsLineChartData($unit, \DateTimeInterface $dateFrom, \DateTimeInterface $dateTo, $dateFormat = null, $filter = [])
+    public function getImportedRowsLineChartData($unit, \DateTimeInterface $dateFrom, \DateTimeInterface $dateTo, $dateFormat = null, $filter = []): array
     {
         $filter['object'] = 'import';
         $filter['bundle'] = 'lead';
@@ -588,32 +545,23 @@ class ImportModel extends FormModel
         return $this->em->getRepository(\Mautic\LeadBundle\Entity\LeadEventLog::class);
     }
 
-    /**
-     * {@inheritdoc}
-     *
-     * @return string
-     */
-    public function getPermissionBase()
+    public function getPermissionBase(): string
     {
         return 'lead:imports';
     }
 
     /**
      * Returns a unique name of a CSV file based on time.
-     *
-     * @return string
      */
-    public function getUniqueFileName()
+    public function getUniqueFileName(): string
     {
         return (new DateTimeHelper())->toUtcString('YmdHis').'.csv';
     }
 
     /**
      * Returns a full path to the import dir.
-     *
-     * @return string
      */
-    public function getImportDir()
+    public function getImportDir(): string
     {
         $tmpDir = $this->pathsHelper->getSystemPath('tmp', true);
 
@@ -622,10 +570,8 @@ class ImportModel extends FormModel
 
     /**
      * Get a specific entity or generate a new one if id is empty.
-     *
-     * @return object|null
      */
-    public function getEntity($id = null)
+    public function getEntity($id = null): ?Import
     {
         if (null === $id) {
             return new Import();
@@ -635,11 +581,9 @@ class ImportModel extends FormModel
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @throws \Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException
      */
-    protected function dispatchEvent($action, &$entity, $isNew = false, Event $event = null)
+    protected function dispatchEvent($action, &$entity, $isNew = false, Event $event = null): ?Event
     {
         if (!$entity instanceof Import) {
             throw new MethodNotAllowedHttpException(['Import']);

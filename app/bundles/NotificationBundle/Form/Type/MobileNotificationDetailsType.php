@@ -14,17 +14,12 @@ use Symfony\Component\Form\FormBuilderInterface;
 
 class MobileNotificationDetailsType extends AbstractType
 {
-    /**
-     * @var IntegrationHelper
-     */
-    protected $integrationHelper;
-
-    public function __construct(IntegrationHelper $integrationHelper)
-    {
-        $this->integrationHelper = $integrationHelper;
+    public function __construct(
+        protected IntegrationHelper $integrationHelper
+    ) {
     }
 
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $integration = $this->integrationHelper->getIntegrationObject('OneSignal');
         $settings    = $integration->getIntegrationSettings()->getFeatureSettings();

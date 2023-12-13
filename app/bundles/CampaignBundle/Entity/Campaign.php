@@ -96,7 +96,7 @@ class Campaign extends FormEntity implements PublishStatusIconAttributesInterfac
         parent::__clone();
     }
 
-    public static function loadMetadata(ORM\ClassMetadata $metadata)
+    public static function loadMetadata(ORM\ClassMetadata $metadata): void
     {
         $builder = new ClassMetadataBuilder($metadata);
 
@@ -144,7 +144,7 @@ class Campaign extends FormEntity implements PublishStatusIconAttributesInterfac
         $builder->addNamedField('allowRestart', 'integer', 'allow_restart');
     }
 
-    public static function loadValidatorMetadata(ClassMetadata $metadata)
+    public static function loadValidatorMetadata(ClassMetadata $metadata): void
     {
         $metadata->addPropertyConstraint(
             'name',
@@ -159,7 +159,7 @@ class Campaign extends FormEntity implements PublishStatusIconAttributesInterfac
     /**
      * Prepares the metadata for API usage.
      */
-    public static function loadApiMetadata(ApiMetadataDriver $metadata)
+    public static function loadApiMetadata(ApiMetadataDriver $metadata): void
     {
         $metadata->setGroupPrefix('campaign')
             ->addListProperties(
@@ -196,10 +196,7 @@ class Campaign extends FormEntity implements PublishStatusIconAttributesInterfac
             ->build();
     }
 
-    /**
-     * @return array
-     */
-    public function convertToArray()
+    public function convertToArray(): array
     {
         return get_object_vars($this);
     }
@@ -224,8 +221,6 @@ class Campaign extends FormEntity implements PublishStatusIconAttributesInterfac
     }
 
     /**
-     * Get id.
-     *
      * @return int
      */
     public function getId()
@@ -315,7 +310,7 @@ class Campaign extends FormEntity implements PublishStatusIconAttributesInterfac
     /**
      * Remove events.
      */
-    public function removeEvent(Event $event)
+    public function removeEvent(Event $event): void
     {
         $this->changes['events']['removed'][$event->getId()] = $event->getName();
 
@@ -447,7 +442,7 @@ class Campaign extends FormEntity implements PublishStatusIconAttributesInterfac
     /**
      * @param mixed $category
      */
-    public function setCategory($category)
+    public function setCategory($category): void
     {
         $this->isChanged('category', $category);
         $this->category = $category;
@@ -472,7 +467,7 @@ class Campaign extends FormEntity implements PublishStatusIconAttributesInterfac
     /**
      * Remove lead.
      */
-    public function removeLead(Lead $lead)
+    public function removeLead(Lead $lead): void
     {
         $leadEntity                                              = $lead->getLead();
         $this->changes['leads']['removed'][$leadEntity->getId()] = $leadEntity->getPrimaryIdentifier();
@@ -514,7 +509,7 @@ class Campaign extends FormEntity implements PublishStatusIconAttributesInterfac
     /**
      * Remove list.
      */
-    public function removeList(LeadList $list)
+    public function removeList(LeadList $list): void
     {
         $this->changes['lists']['removed'][$list->getId()] = $list->getName();
         $this->lists->removeElement($list);
@@ -545,7 +540,7 @@ class Campaign extends FormEntity implements PublishStatusIconAttributesInterfac
     /**
      * Remove form.
      */
-    public function removeForm(Form $form)
+    public function removeForm(Form $form): void
     {
         $this->changes['forms']['removed'][$form->getId()] = $form->getName();
         $this->forms->removeElement($form);
@@ -559,23 +554,17 @@ class Campaign extends FormEntity implements PublishStatusIconAttributesInterfac
         return $this->canvasSettings;
     }
 
-    public function setCanvasSettings(array $canvasSettings)
+    public function setCanvasSettings(array $canvasSettings): void
     {
         $this->canvasSettings = $canvasSettings;
     }
 
-    /**
-     * @return bool
-     */
-    public function getAllowRestart()
+    public function getAllowRestart(): bool
     {
         return (bool) $this->allowRestart;
     }
 
-    /**
-     * @return bool
-     */
-    public function allowRestart()
+    public function allowRestart(): bool
     {
         return $this->getAllowRestart();
     }

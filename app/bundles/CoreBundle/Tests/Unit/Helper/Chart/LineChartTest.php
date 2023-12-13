@@ -11,7 +11,7 @@ class LineChartTest extends \PHPUnit\Framework\TestCase
      *
      * @covers \Mautic\CoreBundle\Helper\Chart\LineChart::getUnitInterval
      */
-    public function testGetUnitInterval()
+    public function testGetUnitInterval(): void
     {
         $units = [
             'Y' => new \DateInterval('P1Y'),

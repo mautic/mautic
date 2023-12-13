@@ -12,26 +12,16 @@ class TransportChain
     /**
      * @var TransportInterface[]
      */
-    private $transports;
-
-    /**
-     * @var string
-     */
-    private $primaryTransport;
-
-    /**
-     * @var IntegrationHelper
-     */
-    private $integrationHelper;
+    private array $transports;
 
     /**
      * @param string $primaryTransport
      */
-    public function __construct($primaryTransport, IntegrationHelper $integrationHelper)
-    {
-        $this->primaryTransport  = $primaryTransport;
+    public function __construct(
+        private $primaryTransport,
+        private IntegrationHelper $integrationHelper
+    ) {
         $this->transports        = [];
-        $this->integrationHelper = $integrationHelper;
     }
 
     /**

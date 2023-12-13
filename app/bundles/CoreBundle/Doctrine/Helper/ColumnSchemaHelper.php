@@ -13,19 +13,9 @@ use Mautic\CoreBundle\Exception\SchemaException;
 class ColumnSchemaHelper
 {
     /**
-     * @var Connection
-     */
-    protected $db;
-
-    /**
      * @var \Doctrine\DBAL\Schema\AbstractSchemaManager<\Doctrine\DBAL\Platforms\AbstractMySQLPlatform>
      */
-    protected $sm;
-
-    /**
-     * @var string
-     */
-    protected $prefix;
+    protected \Doctrine\DBAL\Schema\AbstractSchemaManager $sm;
 
     /**
      * @var string
@@ -47,11 +37,11 @@ class ColumnSchemaHelper
     /**
      * @param string $prefix
      */
-    public function __construct(Connection $db, $prefix)
-    {
-        $this->db     = $db;
+    public function __construct(
+        protected Connection $db,
+        protected $prefix
+    ) {
         $this->sm     = $db->getSchemaManager();
-        $this->prefix = $prefix;
     }
 
     /**
@@ -116,7 +106,7 @@ class ColumnSchemaHelper
      *
      * @throws SchemaException
      */
-    public function addColumns(array $columns)
+    public function addColumns(array $columns): void
     {
         // ensure none of the columns exist before manipulating the schema
         foreach ($columns as $column) {
@@ -156,8 +146,8 @@ class ColumnSchemaHelper
             $this->checkColumnExists($column['name'], true);
         }
 
-        $type    = (isset($column['type'])) ? $column['type'] : 'text';
-        $options = (isset($column['options'])) ? $column['options'] : [];
+        $type    = $column['type'] ?? 'text';
+        $options = $column['options'] ?? [];
 
         $this->toTable->addColumn($column['name'], $type, $options);
 
@@ -181,7 +171,7 @@ class ColumnSchemaHelper
     /**
      * Computes and executes the changes.
      */
-    public function executeChanges()
+    public function executeChanges(): void
     {
         // create a table diff
         $comparator = new Comparator();

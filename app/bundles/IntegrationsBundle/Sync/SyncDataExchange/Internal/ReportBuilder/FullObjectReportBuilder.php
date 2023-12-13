@@ -26,29 +26,11 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class FullObjectReportBuilder
 {
-    /**
-     * @var FieldBuilder
-     */
-    private $fieldBuilder;
-
-    /**
-     * @var ObjectProvider
-     */
-    private $objectProvider;
-
-    /**
-     * @var EventDispatcherInterface
-     */
-    private $dispatcher;
-
     public function __construct(
-        FieldBuilder $fieldBuilder,
-        ObjectProvider $objectProvider,
-        EventDispatcherInterface $dispatcher
+        private FieldBuilder $fieldBuilder,
+        private ObjectProvider $objectProvider,
+        private EventDispatcherInterface $dispatcher
     ) {
-        $this->fieldBuilder   = $fieldBuilder;
-        $this->objectProvider = $objectProvider;
-        $this->dispatcher     = $dispatcher;
     }
 
     public function buildReport(RequestDAO $requestDAO): ReportDAO
@@ -70,7 +52,7 @@ class FullObjectReportBuilder
                         $start,
                         $limit
                     ),
-                    __CLASS__.':'.__FUNCTION__
+                    self::class.':'.__FUNCTION__
                 );
 
                 $event = new InternalObjectFindEvent(
@@ -104,7 +86,7 @@ class FullObjectReportBuilder
                 DebugLogger::log(
                     MauticSyncDataExchange::NAME,
                     $exception->getMessage(),
-                    __CLASS__.':'.__FUNCTION__
+                    self::class.':'.__FUNCTION__
                 );
             }
         }
@@ -143,7 +125,7 @@ class FullObjectReportBuilder
 
                 try {
                     $this->dispatchBeforeFieldChangesEvent($syncReport->getIntegration(), $event->getEntity());
-                } catch (InvalidValueException $e) {
+                } catch (InvalidValueException) {
                     // Object is not eligible, continue.
                     continue;
                 }
@@ -158,7 +140,7 @@ class FullObjectReportBuilder
                     DebugLogger::log(
                         MauticSyncDataExchange::NAME,
                         $exception->getMessage(),
-                        __CLASS__.':'.__FUNCTION__
+                        self::class.':'.__FUNCTION__
                     );
                 }
             }

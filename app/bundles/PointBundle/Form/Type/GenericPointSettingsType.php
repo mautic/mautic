@@ -9,10 +9,7 @@ use Symfony\Component\Validator\Constraints\NotEqualTo;
 
 class GenericPointSettingsType extends AbstractType
 {
-    /**
-     * {@inheritdoc}
-     */
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $default = (empty($options['data']['delta'])) ? 0 : (int) $options['data']['delta'];
         $builder->add(
@@ -39,9 +36,6 @@ class GenericPointSettingsType extends AbstractType
         );
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getBlockPrefix()
     {
         return 'genericpoint_settings';

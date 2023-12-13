@@ -177,7 +177,7 @@ class AssetGenerationHelper
                         "$assetsFullPath/css",
                         "$assetsFullPath/js",
                     ];
-                    array_walk($checkPaths, function ($path) {
+                    array_walk($checkPaths, function ($path): void {
                         if (!file_exists($path)) {
                             mkdir($path);
                         }
@@ -262,15 +262,13 @@ class AssetGenerationHelper
                 $thisDirectory = str_replace('\\', '/', $directory->getRealPath());
                 $files->files()->depth('0')->name('*.'.$ext)->in($thisDirectory);
 
-                $sort = function (\SplFileInfo $a, \SplFileInfo $b) {
-                    return strnatcmp($a->getRealpath(), $b->getRealpath());
-                };
+                $sort = fn (\SplFileInfo $a, \SplFileInfo $b): int => strnatcmp($a->getRealpath(), $b->getRealpath());
                 $files->sort($sort);
 
                 foreach ($files as $file) {
                     $fullPath = $file->getPathname();
                     $relPath  = str_replace($rootPath, '', $file->getPathname());
-                    if (0 === strpos($relPath, '/')) {
+                    if (str_starts_with($relPath, '/')) {
                         $relPath = substr($relPath, 1);
                     }
 
@@ -297,9 +295,7 @@ class AssetGenerationHelper
         $files = new Finder();
         $files->files()->depth('0')->ignoreDotFiles(true)->name('*.'.$ext)->in($dir);
 
-        $sort = function (\SplFileInfo $a, \SplFileInfo $b) {
-            return strnatcmp($a->getRealpath(), $b->getRealpath());
-        };
+        $sort = fn (\SplFileInfo $a, \SplFileInfo $b): int => strnatcmp($a->getRealpath(), $b->getRealpath());
         $files->sort($sort);
 
         foreach ($files as $file) {

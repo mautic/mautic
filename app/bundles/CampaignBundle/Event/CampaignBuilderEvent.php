@@ -11,36 +11,20 @@ class CampaignBuilderEvent extends Event
 {
     use ComponentValidationTrait;
 
-    /**
-     * @var array
-     */
-    private $decisions = [];
+    private array $decisions = [];
 
-    /**
-     * @var array
-     */
-    private $conditions = [];
+    private array $conditions = [];
 
-    /**
-     * @var array
-     */
-    private $actions = [];
-
-    /**
-     * @var TranslatorInterface
-     */
-    private $translator;
+    private array $actions = [];
 
     /**
      * Holds info if some property has been already sorted or not.
-     *
-     * @var array
      */
-    private $sortCache = [];
+    private array $sortCache = [];
 
-    public function __construct(TranslatorInterface $translator)
-    {
-        $this->translator = $translator;
+    public function __construct(
+        private TranslatorInterface $translator
+    ) {
     }
 
     /**
@@ -63,7 +47,7 @@ class CampaignBuilderEvent extends Event
      *                         ]
      *                         ]
      */
-    public function addDecision($key, array $decision)
+    public function addDecision($key, array $decision): void
     {
         if (array_key_exists($key, $this->decisions)) {
             throw new KeyAlreadyRegisteredException("The key, '$key' is already used by another contact action. Please use a different key.");
@@ -110,7 +94,7 @@ class CampaignBuilderEvent extends Event
      *                      ]
      *                      ]
      */
-    public function addCondition($key, array $event)
+    public function addCondition($key, array $event): void
     {
         if (array_key_exists($key, $this->conditions)) {
             throw new KeyAlreadyRegisteredException("The key, '$key' is already used by another contact action. Please use a different key.");
@@ -160,7 +144,7 @@ class CampaignBuilderEvent extends Event
      *                       ]
      *                       ]
      */
-    public function addAction($key, array $action)
+    public function addAction($key, array $action): void
     {
         if (array_key_exists($key, $this->actions)) {
             throw new KeyAlreadyRegisteredException("The key, '$key' is already used by another action. Please use a different key.");
@@ -202,12 +186,10 @@ class CampaignBuilderEvent extends Event
         if (empty($this->sortCache[$property])) {
             uasort(
                 $this->{$property},
-                function ($a, $b) {
-                    return strnatcasecmp(
-                        $a['label'],
-                        $b['label']
-                    );
-                }
+                fn ($a, $b): int => strnatcasecmp(
+                    $a['label'],
+                    $b['label']
+                )
             );
             $this->sortCache[$property] = true;
         }

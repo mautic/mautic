@@ -37,7 +37,7 @@ class ListLead
      */
     private $manuallyAdded = false;
 
-    public static function loadMetadata(ORM\ClassMetadata $metadata)
+    public static function loadMetadata(ORM\ClassMetadata $metadata): void
     {
         $builder = new ClassMetadataBuilder($metadata);
 
@@ -76,7 +76,7 @@ class ListLead
     /**
      * @param \DateTime $date
      */
-    public function setDateAdded($date)
+    public function setDateAdded($date): void
     {
         $this->dateAdded = $date;
     }
@@ -92,7 +92,7 @@ class ListLead
     /**
      * @param mixed $lead
      */
-    public function setLead($lead)
+    public function setLead($lead): void
     {
         $this->lead = $lead;
     }
@@ -108,7 +108,7 @@ class ListLead
     /**
      * @param LeadList $leadList
      */
-    public function setList($leadList)
+    public function setList($leadList): void
     {
         $this->list = $leadList;
     }
@@ -124,7 +124,7 @@ class ListLead
     /**
      * @param bool $manuallyRemoved
      */
-    public function setManuallyRemoved($manuallyRemoved)
+    public function setManuallyRemoved($manuallyRemoved): void
     {
         $this->manuallyRemoved = $manuallyRemoved;
     }
@@ -148,7 +148,7 @@ class ListLead
     /**
      * @param bool $manuallyAdded
      */
-    public function setManuallyAdded($manuallyAdded)
+    public function setManuallyAdded($manuallyAdded): void
     {
         $this->manuallyAdded = $manuallyAdded;
     }

@@ -33,15 +33,15 @@ class Trackable
      */
     private $uniqueHits = 0;
 
-    public static function loadMetadata(ORM\ClassMetadata $metadata)
+    public static function loadMetadata(ORM\ClassMetadata $metadata): void
     {
         $builder = new ClassMetadataBuilder($metadata);
 
         $builder->setTable('channel_url_trackables')
-            ->setCustomRepositoryClass('Mautic\PageBundle\Entity\TrackableRepository')
+            ->setCustomRepositoryClass(\Mautic\PageBundle\Entity\TrackableRepository::class)
             ->addIndex(['channel', 'channel_id'], 'channel_url_trackable_search');
 
-        $builder->createManyToOne('redirect', 'Mautic\PageBundle\Entity\Redirect')
+        $builder->createManyToOne('redirect', \Mautic\PageBundle\Entity\Redirect::class)
             ->addJoinColumn('redirect_id', 'id', true, false, 'CASCADE')
             ->cascadePersist()
             ->inversedBy('trackables')
@@ -63,7 +63,7 @@ class Trackable
     /**
      * Prepares the metadata for API usage.
      */
-    public static function loadApiMetadata(ApiMetadataDriver $metadata)
+    public static function loadApiMetadata(ApiMetadataDriver $metadata): void
     {
         $metadata->setGroupPrefix('trackable')
             ->addListProperties(

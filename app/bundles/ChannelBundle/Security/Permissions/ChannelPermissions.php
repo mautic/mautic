@@ -7,9 +7,6 @@ use Symfony\Component\Form\FormBuilderInterface;
 
 class ChannelPermissions extends AbstractPermissions
 {
-    /**
-     * {@inheritdoc}
-     */
     public function __construct($params)
     {
         parent::__construct($params);
@@ -18,20 +15,12 @@ class ChannelPermissions extends AbstractPermissions
         $this->addExtendedPermissions('messages');
     }
 
-    /**
-     * {@inheritdoc}
-     *
-     * @return string|void
-     */
-    public function getName()
+    public function getName(): string
     {
         return 'channel';
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function buildForm(FormBuilderInterface &$builder, array $options, array $data)
+    public function buildForm(FormBuilderInterface &$builder, array $options, array $data): void
     {
         $this->addStandardFormFields($this->getName(), 'categories', $builder, $data);
         $this->addExtendedFormFields($this->getName(), 'messages', $builder, $data);

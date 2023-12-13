@@ -10,10 +10,7 @@ class FormFieldGroupType extends AbstractType
 {
     use SortableListTrait;
 
-    /**
-     * {@inheritdoc}
-     */
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder->add(
             'labelAttributes',
@@ -42,9 +39,6 @@ class FormFieldGroupType extends AbstractType
         $this->addSortableList($builder, $options, 'optionlist', $data);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getBlockPrefix()
     {
         return 'formfield_group';

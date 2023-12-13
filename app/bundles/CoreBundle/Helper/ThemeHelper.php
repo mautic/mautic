@@ -15,34 +15,16 @@ use Twig\Environment;
 class ThemeHelper implements ThemeHelperInterface
 {
     /**
-     * @var PathsHelper
+     * @var array<string, mixed[]>
      */
-    private $pathsHelper;
+    private array $themes = [];
 
     /**
-     * @var Environment
+     * @var array<string, mixed[]>
      */
-    private $twig;
+    private array $themesInfo = [];
 
-    /**
-     * @var TranslatorInterface
-     */
-    private $translator;
-
-    /**
-     * @var array|mixed
-     */
-    private $themes = [];
-
-    /**
-     * @var array
-     */
-    private $themesInfo = [];
-
-    /**
-     * @var array
-     */
-    private $steps = [];
+    private array $steps = [];
 
     /**
      * @var string
@@ -52,32 +34,13 @@ class ThemeHelper implements ThemeHelperInterface
     /**
      * @var twigThemeHelper[]
      */
-    private $themeHelpers = [];
+    private array $themeHelpers = [];
 
-    /**
-     * @var CoreParametersHelper
-     */
-    private $coreParametersHelper;
+    private \Mautic\CoreBundle\Helper\Filesystem $filesystem;
 
-    /**
-     * @var BuilderIntegrationsHelper
-     */
-    private $builderIntegrationsHelper;
+    private \Symfony\Component\Finder\Finder $finder;
 
-    /**
-     * @var Filesystem
-     */
-    private $filesystem;
-
-    /**
-     * @var Finder
-     */
-    private $finder;
-
-    /**
-     * @var bool
-     */
-    private $themesLoadedFromFilesystem = false;
+    private bool $themesLoadedFromFilesystem = false;
 
     /**
      * Default themes which cannot be deleted.
@@ -110,19 +73,14 @@ class ThemeHelper implements ThemeHelperInterface
     ];
 
     public function __construct(
-        PathsHelper $pathsHelper,
-        Environment $twig,
-        TranslatorInterface $translator,
-        CoreParametersHelper $coreParametersHelper,
+        private PathsHelper $pathsHelper,
+        private Environment $twig,
+        private TranslatorInterface $translator,
+        private CoreParametersHelper $coreParametersHelper,
         Filesystem $filesystem,
         Finder $finder,
-        BuilderIntegrationsHelper $builderIntegrationsHelper
+        private BuilderIntegrationsHelper $builderIntegrationsHelper
     ) {
-        $this->pathsHelper               = $pathsHelper;
-        $this->twig                      = $twig;
-        $this->translator                = $translator;
-        $this->coreParametersHelper      = $coreParametersHelper;
-        $this->builderIntegrationsHelper = $builderIntegrationsHelper;
         $this->filesystem                = clone $filesystem;
         $this->finder                    = clone $finder;
     }
@@ -132,7 +90,7 @@ class ThemeHelper implements ThemeHelperInterface
         return $this->defaultThemes;
     }
 
-    public function setDefaultTheme($defaultTheme)
+    public function setDefaultTheme($defaultTheme): void
     {
         $this->defaultTheme = $defaultTheme;
     }
@@ -164,7 +122,7 @@ class ThemeHelper implements ThemeHelperInterface
         return $this->filesystem->exists($root.$dirName);
     }
 
-    public function copy($theme, $newName, $newDirName = null)
+    public function copy($theme, $newName, $newDirName = null): void
     {
         $root   = $this->pathsHelper->getSystemPath('themes', true).'/';
         $themes = $this->getInstalledThemes();
@@ -185,7 +143,7 @@ class ThemeHelper implements ThemeHelperInterface
         $this->updateConfig($root.$dirName, $newName);
     }
 
-    public function rename($theme, $newName)
+    public function rename($theme, $newName): void
     {
         $root   = $this->pathsHelper->getSystemPath('themes', true).'/';
         $themes = $this->getInstalledThemes();
@@ -206,7 +164,7 @@ class ThemeHelper implements ThemeHelperInterface
         $this->updateConfig($root.$theme, $dirName);
     }
 
-    public function delete($theme)
+    public function delete($theme): void
     {
         $root   = $this->pathsHelper->getSystemPath('themes', true).'/';
         $themes = $this->getInstalledThemes();
@@ -301,7 +259,7 @@ class ThemeHelper implements ThemeHelperInterface
                                 $found = true;
                                 break;
                             }
-                        } catch (FileNotFoundException $e) {
+                        } catch (FileNotFoundException) {
                             continue;
                         }
                     }
@@ -349,7 +307,7 @@ class ThemeHelper implements ThemeHelperInterface
         $config = [];
         for ($i = 0; $i < $zipper->numFiles; ++$i) {
             $entry = $zipper->getNameIndex($i);
-            if (0 === strpos($entry, '/')) {
+            if (str_starts_with($entry, '/')) {
                 $entry = substr($entry, 1);
             }
 
@@ -396,32 +354,18 @@ class ThemeHelper implements ThemeHelperInterface
         }
     }
 
-    public function getExtractError($archive)
+    /**
+     * @param \ZipArchive::ER_* $archive
+     */
+    public function getExtractError(int $archive): string
     {
-        switch ($archive) {
-            case \ZipArchive::ER_EXISTS:
-                $error = 'mautic.core.update.archive_file_exists';
-                break;
-            case \ZipArchive::ER_INCONS:
-            case \ZipArchive::ER_INVAL:
-            case \ZipArchive::ER_MEMORY:
-                $error = 'mautic.core.update.archive_zip_corrupt';
-                break;
-            case \ZipArchive::ER_NOENT:
-                $error = 'mautic.core.update.archive_no_such_file';
-                break;
-            case \ZipArchive::ER_NOZIP:
-                $error = 'mautic.core.update.archive_not_valid_zip';
-                break;
-            case \ZipArchive::ER_READ:
-            case \ZipArchive::ER_SEEK:
-            case \ZipArchive::ER_OPEN:
-            default:
-                $error = 'mautic.core.update.archive_could_not_open';
-                break;
-        }
-
-        return $error;
+        return match ($archive) {
+            \ZipArchive::ER_EXISTS => 'mautic.core.update.archive_file_exists',
+            \ZipArchive::ER_INCONS, \ZipArchive::ER_INVAL, \ZipArchive::ER_MEMORY => 'mautic.core.update.archive_zip_corrupt',
+            \ZipArchive::ER_NOENT => 'mautic.core.update.archive_no_such_file',
+            \ZipArchive::ER_NOZIP => 'mautic.core.update.archive_not_valid_zip',
+            default               => 'mautic.core.update.archive_could_not_open',
+        };
     }
 
     public function zip($themeName)
@@ -553,7 +497,7 @@ class ThemeHelper implements ThemeHelperInterface
         try {
             $builder     = $this->builderIntegrationsHelper->getBuilder($featureRequested);
             $builderName = $builder->getName();
-        } catch (IntegrationNotFoundException $exception) {
+        } catch (IntegrationNotFoundException) {
             // Assume legacy builder
             $builderName = 'legacy';
         }

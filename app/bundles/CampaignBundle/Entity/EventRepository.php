@@ -96,9 +96,6 @@ class EventRepository extends CommonRepository
     /**
      * Get array of events by parent.
      *
-     * @param null $decisionPath
-     * @param null $eventType
-     *
      * @return array
      */
     public function getEventsByParent($parentId, $decisionPath = null, $eventType = null)
@@ -190,7 +187,7 @@ class EventRepository extends CommonRepository
     /**
      * Null event parents in preparation for deleI'lting a campaign.
      */
-    public function nullEventParents($campaignId)
+    public function nullEventParents($campaignId): void
     {
         $this->getEntityManager()->getConnection()->update(
             MAUTIC_TABLE_PREFIX.'campaign_events',
@@ -202,7 +199,7 @@ class EventRepository extends CommonRepository
     /**
      * Null event parents in preparation for deleting events from a campaign.
      */
-    public function nullEventRelationships($events)
+    public function nullEventRelationships($events): void
     {
         $qb = $this->getEntityManager()->getConnection()->createQueryBuilder();
         $qb->update(MAUTIC_TABLE_PREFIX.'campaign_events')
@@ -214,26 +211,22 @@ class EventRepository extends CommonRepository
             ->executeStatement();
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getTableAlias()
+    public function getTableAlias(): string
     {
         return 'e';
     }
 
     /**
-     * {@inheritdoc}
+     * For the API.
      *
-     * For the API
+     * @return string[]
      */
-    public function getSearchCommands()
+    public function getSearchCommands(): array
     {
         return $this->getStandardSearchCommands();
     }
 
     /**
-     * @param null   $campaignId
      * @param string $eventType
      */
     public function getEventsByChannel($channel, $campaignId = null, $eventType = 'action')
@@ -288,7 +281,7 @@ class EventRepository extends CommonRepository
      *
      * For the API
      */
-    protected function addCatchAllWhereClause($q, $filter)
+    protected function addCatchAllWhereClause($q, $filter): array
     {
         return $this->addStandardCatchAllWhereClause(
             $q,
@@ -304,7 +297,7 @@ class EventRepository extends CommonRepository
      *
      * For the API
      */
-    protected function addSearchCommandWhereClause($q, $filter)
+    protected function addSearchCommandWhereClause($q, $filter): array
     {
         return $this->addStandardSearchCommandWhereClause($q, $filter);
     }

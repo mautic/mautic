@@ -44,26 +44,20 @@ class LeadListRepository extends CommonRepository
     protected $companyTableSchema;
 
     /**
-     * {@inheritdoc}
-     *
      * @param int $id
-     *
-     * @return mixed|null
      */
-    public function getEntity($id = 0)
+    public function getEntity($id = 0): ?LeadList
     {
         try {
-            $entity = $this
+            return $this
                 ->createQueryBuilder('l')
                 ->where('l.id = :listId')
                 ->setParameter('listId', $id)
                 ->getQuery()
                 ->getSingleResult();
-        } catch (\Exception $e) {
-            $entity = null;
+        } catch (\Exception) {
+            return null;
         }
-
-        return $entity;
     }
 
     /**
@@ -193,10 +187,8 @@ class LeadListRepository extends CommonRepository
 
     /**
      * Check Lead segments by ids.
-     *
-     * @return bool
      */
-    public function checkLeadSegmentsByIds(Lead $lead, $ids)
+    public function checkLeadSegmentsByIds(Lead $lead, $ids): bool
     {
         if (empty($ids)) {
             return false;
@@ -318,17 +310,14 @@ class LeadListRepository extends CommonRepository
         return $qb;
     }
 
-    /**
-     * @return array
-     */
-    public function arrangeFilters($filters)
+    public function arrangeFilters($filters): array
     {
         $objectFilters = [];
         if (empty($filters)) {
             $objectFilters['lead'][] = $filters;
         }
         foreach ($filters as $filter) {
-            $object = (isset($filter['object'])) ? $filter['object'] : 'lead';
+            $object = $filter['object'] ?? 'lead';
             switch ($object) {
                 case 'company':
                     $objectFilters['company'][] = $filter;
@@ -342,14 +331,12 @@ class LeadListRepository extends CommonRepository
         return $objectFilters;
     }
 
-    public function setDispatcher(EventDispatcherInterface $dispatcher)
+    public function setDispatcher(EventDispatcherInterface $dispatcher): void
     {
         $this->dispatcher = $dispatcher;
     }
 
     /**
-     * @param null $leadId
-     *
      * @return QueryBuilder
      */
     protected function createFilterExpressionSubQuery($table, $alias, $column, $value, array &$parameters, $leadId = null, array $subQueryFilters = [])
@@ -396,10 +383,8 @@ class LeadListRepository extends CommonRepository
 
     /**
      * @param \Doctrine\ORM\QueryBuilder|\Doctrine\DBAL\Query\QueryBuilder $q
-     *
-     * @return array
      */
-    protected function addCatchAllWhereClause($q, $filter)
+    protected function addCatchAllWhereClause($q, $filter): array
     {
         return $this->addStandardCatchAllWhereClause(
             $q,
@@ -413,10 +398,8 @@ class LeadListRepository extends CommonRepository
 
     /**
      * @param \Doctrine\ORM\QueryBuilder|\Doctrine\DBAL\Query\QueryBuilder $q
-     *
-     * @return array
      */
-    protected function addSearchCommandWhereClause($q, $filter)
+    protected function addSearchCommandWhereClause($q, $filter): array
     {
         [$expr, $parameters] = parent::addStandardSearchCommandWhereClause($q, $filter);
         if ($expr) {
@@ -454,9 +437,9 @@ class LeadListRepository extends CommonRepository
     }
 
     /**
-     * @return array
+     * @return string[]
      */
-    public function getSearchCommands()
+    public function getSearchCommands(): array
     {
         $commands = [
             'mautic.lead.list.searchcommand.isglobal',
@@ -482,10 +465,7 @@ class LeadListRepository extends CommonRepository
         return $strings;
     }
 
-    /**
-     * @return array
-     */
-    public static function getRelativeDateTranslationKeys()
+    public static function getRelativeDateTranslationKeys(): array
     {
         return [
             'mautic.lead.list.month_last',
@@ -507,17 +487,14 @@ class LeadListRepository extends CommonRepository
     /**
      * @return array<array<string>>
      */
-    protected function getDefaultOrder()
+    protected function getDefaultOrder(): array
     {
         return [
             ['l.name', 'ASC'],
         ];
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getTableAlias()
+    public function getTableAlias(): string
     {
         return 'l';
     }

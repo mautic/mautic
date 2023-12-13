@@ -14,22 +14,16 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 class ReportSubscriber implements EventSubscriberInterface
 {
     public const CONTEXT_ASSET          = 'assets';
+
     public const CONTEXT_ASSET_DOWNLOAD = 'asset.downloads';
 
-    private \Mautic\LeadBundle\Model\CompanyReportData $companyReportData;
-
-    private \Mautic\AssetBundle\Entity\DownloadRepository $downloadRepository;
-
-    public function __construct(CompanyReportData $companyReportData, DownloadRepository $downloadRepository)
-    {
-        $this->companyReportData  = $companyReportData;
-        $this->downloadRepository = $downloadRepository;
+    public function __construct(
+        private CompanyReportData $companyReportData,
+        private DownloadRepository $downloadRepository
+    ) {
     }
 
-    /**
-     * @return array
-     */
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             ReportEvents::REPORT_ON_BUILD          => ['onReportBuilder', 0],
@@ -41,7 +35,7 @@ class ReportSubscriber implements EventSubscriberInterface
     /**
      * Add available tables and columns to the report builder lookup.
      */
-    public function onReportBuilder(ReportBuilderEvent $event)
+    public function onReportBuilder(ReportBuilderEvent $event): void
     {
         if (!$event->checkContext([self::CONTEXT_ASSET, self::CONTEXT_ASSET_DOWNLOAD])) {
             return;
@@ -169,7 +163,7 @@ class ReportSubscriber implements EventSubscriberInterface
     /**
      * Initialize the QueryBuilder object to generate reports from.
      */
-    public function onReportGenerate(ReportGeneratorEvent $event)
+    public function onReportGenerate(ReportGeneratorEvent $event): void
     {
         if (!$event->checkContext([self::CONTEXT_ASSET, self::CONTEXT_ASSET_DOWNLOAD])) {
             return;
@@ -205,7 +199,7 @@ class ReportSubscriber implements EventSubscriberInterface
     /**
      * Initialize the QueryBuilder object to generate reports from.
      */
-    public function onReportGraphGenerate(ReportGraphEvent $event)
+    public function onReportGraphGenerate(ReportGraphEvent $event): void
     {
         // Context check, we only want to fire for Lead reports
         if (!$event->checkContext(self::CONTEXT_ASSET_DOWNLOAD)) {

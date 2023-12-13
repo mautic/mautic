@@ -13,22 +13,10 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class DecisionDispatcher
 {
-    /**
-     * @var EventDispatcherInterface
-     */
-    private $dispatcher;
-
-    /**
-     * @var LegacyEventDispatcher
-     */
-    private $legacyDispatcher;
-
     public function __construct(
-        EventDispatcherInterface $dispatcher,
-        LegacyEventDispatcher $legacyDispatcher
+        private EventDispatcherInterface $dispatcher,
+        private LegacyEventDispatcher $legacyDispatcher
     ) {
-        $this->dispatcher       = $dispatcher;
-        $this->legacyDispatcher = $legacyDispatcher;
     }
 
     /**
@@ -52,7 +40,7 @@ class DecisionDispatcher
         return $event;
     }
 
-    public function dispatchDecisionResultsEvent(DecisionAccessor $config, ArrayCollection $logs, EvaluatedContacts $evaluatedContacts)
+    public function dispatchDecisionResultsEvent(DecisionAccessor $config, ArrayCollection $logs, EvaluatedContacts $evaluatedContacts): void
     {
         if (!$logs->count()) {
             return;

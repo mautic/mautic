@@ -150,7 +150,7 @@ return [
                 'standard_entity' => true,
                 'name'            => 'contacts',
                 'path'            => '/contacts',
-                'controller'      => 'Mautic\LeadBundle\Controller\Api\LeadApiController',
+                'controller'      => \Mautic\LeadBundle\Controller\Api\LeadApiController::class,
             ],
             'mautic_api_dncaddcontact' => [
                 'path'       => '/contacts/{id}/dnc/{channel}/add',
@@ -219,7 +219,7 @@ return [
                 'standard_entity' => true,
                 'name'            => 'lists',
                 'path'            => '/segments',
-                'controller'      => 'Mautic\LeadBundle\Controller\Api\ListApiController',
+                'controller'      => \Mautic\LeadBundle\Controller\Api\ListApiController::class,
             ],
             'mautic_api_segmentaddcontact' => [
                 'path'       => '/segments/{id}/contact/{leadId}/add',
@@ -240,7 +240,7 @@ return [
                 'standard_entity' => true,
                 'name'            => 'companies',
                 'path'            => '/companies',
-                'controller'      => 'Mautic\LeadBundle\Controller\Api\CompanyApiController',
+                'controller'      => \Mautic\LeadBundle\Controller\Api\CompanyApiController::class,
             ],
             'mautic_api_companyaddcontact' => [
                 'path'       => '/companies/{companyId}/contact/{contactId}/add',
@@ -256,7 +256,7 @@ return [
                 'standard_entity' => true,
                 'name'            => 'fields',
                 'path'            => '/fields/{object}',
-                'controller'      => 'Mautic\LeadBundle\Controller\Api\FieldApiController',
+                'controller'      => \Mautic\LeadBundle\Controller\Api\FieldApiController::class,
                 'defaults'        => [
                     'object' => 'contact',
                 ],
@@ -265,19 +265,19 @@ return [
                 'standard_entity' => true,
                 'name'            => 'notes',
                 'path'            => '/notes',
-                'controller'      => 'Mautic\LeadBundle\Controller\Api\NoteApiController',
+                'controller'      => \Mautic\LeadBundle\Controller\Api\NoteApiController::class,
             ],
             'mautic_api_devicesstandard' => [
                 'standard_entity' => true,
                 'name'            => 'devices',
                 'path'            => '/devices',
-                'controller'      => 'Mautic\LeadBundle\Controller\Api\DeviceApiController',
+                'controller'      => \Mautic\LeadBundle\Controller\Api\DeviceApiController::class,
             ],
             'mautic_api_tagsstandard' => [
                 'standard_entity' => true,
                 'name'            => 'tags',
                 'path'            => '/tags',
-                'controller'      => 'Mautic\LeadBundle\Controller\Api\TagApiController',
+                'controller'      => \Mautic\LeadBundle\Controller\Api\TagApiController::class,
             ],
         ],
     ],
@@ -360,7 +360,7 @@ return [
         ],
         'other' => [
             'mautic.lead.doctrine.subscriber' => [
-                'class'     => 'Mautic\LeadBundle\EventListener\DoctrineSubscriber',
+                'class'     => \Mautic\LeadBundle\EventListener\DoctrineSubscriber::class,
                 'tag'       => 'doctrine.event_subscriber',
                 'arguments' => ['monolog.logger.mautic'],
             ],

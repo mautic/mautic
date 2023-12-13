@@ -6,12 +6,9 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class RelativeDate
 {
-    /** @var TranslatorInterface */
-    private $translator;
-
-    public function __construct(TranslatorInterface $translator)
-    {
-        $this->translator = $translator;
+    public function __construct(
+        private TranslatorInterface $translator
+    ) {
     }
 
     public function getRelativeDateStrings(): array
@@ -26,10 +23,7 @@ class RelativeDate
         return $strings;
     }
 
-    /**
-     * @return array
-     */
-    private function getRelativeDateTranslationKeys()
+    private function getRelativeDateTranslationKeys(): array
     {
         return [
             'mautic.lead.list.month_last',

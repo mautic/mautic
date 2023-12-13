@@ -9,22 +9,19 @@ class TagRepository extends BaseTagRepository
     /**
      * @return string[][]
      */
-    protected function getDefaultOrder()
+    protected function getDefaultOrder(): array
     {
         return [
             ['lt.tag', 'ASC'],
         ];
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getTableAlias()
+    public function getTableAlias(): string
     {
         return 'lt';
     }
 
-    public function countOccurrences($tag)
+    public function countOccurrences($tag): int
     {
         $q = $this->getEntityManager()->getConnection()->createQueryBuilder();
 

@@ -7,24 +7,15 @@ use Mautic\UserBundle\Entity\User;
 
 class EmailToUserAccessor
 {
-    /** @var array */
-    private $config;
+    private \Mautic\CoreBundle\Form\DataTransformer\ArrayStringTransformer $transformer;
 
-    /**
-     * @var ArrayStringTransformer
-     */
-    private $transformer;
-
-    public function __construct(array $config)
-    {
-        $this->config      = $config;
+    public function __construct(
+        private array $config
+    ) {
         $this->transformer = new ArrayStringTransformer();
     }
 
-    /**
-     * @return int
-     */
-    public function getEmailID()
+    public function getEmailID(): int
     {
         return (int) $this->config['useremail']['email'];
     }

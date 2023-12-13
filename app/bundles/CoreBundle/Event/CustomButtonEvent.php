@@ -8,33 +8,17 @@ use Symfony\Component\HttpFoundation\Request;
 class CustomButtonEvent extends AbstractCustomRequestEvent
 {
     /**
-     * Button location requested.
-     */
-    protected $location;
-
-    /**
      * @var array
      */
     protected $buttons = [];
 
-    /**
-     * Entity for list/view actions.
-     *
-     * @var mixed
-     */
-    protected $item;
-
-    /**
-     * CustomButtonEvent constructor.
-     *
-     * @param null $item
-     */
-    public function __construct($location, Request $request, array $buttons = [], $item = null)
-    {
+    public function __construct(
+        protected $location,
+        Request $request,
+        array $buttons = [],
+        protected $item = null
+    ) {
         parent::__construct($request);
-
-        $this->location = $location;
-        $this->item     = $item;
 
         foreach ($buttons as $button) {
             $this->buttons[$this->generateButtonKey($button)] = $button;
@@ -59,9 +43,6 @@ class CustomButtonEvent extends AbstractCustomRequestEvent
 
     /**
      * Add an array of buttons.
-     *
-     * @param null $location
-     * @param null $route
      *
      * @return $this
      */
@@ -105,7 +86,7 @@ class CustomButtonEvent extends AbstractCustomRequestEvent
         return $this;
     }
 
-    public function removeButton($button)
+    public function removeButton($button): void
     {
         $buttonKey = $this->generateButtonKey($button);
         if (isset($this->buttons[$buttonKey])) {
@@ -134,10 +115,8 @@ class CustomButtonEvent extends AbstractCustomRequestEvent
 
     /**
      * Generate a button ID that can be overridden by other plugins.
-     *
-     * @return string
      */
-    protected function generateButtonKey($button)
+    protected function generateButtonKey($button): string
     {
         $buttonKey = '';
         if (!empty($button['btnText'])) {
@@ -167,7 +146,7 @@ class CustomButtonEvent extends AbstractCustomRequestEvent
 
         if (ButtonHelper::LOCATION_NAVBAR !== $this->location) {
             // Include the request
-            list($currentRoute, $routeParams) = $this->getRoute(true);
+            [$currentRoute, $routeParams] = $this->getRoute(true);
 
             $buttonKey .= $currentRoute;
 

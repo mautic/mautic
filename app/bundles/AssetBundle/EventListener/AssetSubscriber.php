@@ -10,20 +10,13 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class AssetSubscriber implements EventSubscriberInterface
 {
-    private \Mautic\CoreBundle\Helper\IpLookupHelper $ipLookupHelper;
-
-    private \Mautic\CoreBundle\Model\AuditLogModel $auditLogModel;
-
-    public function __construct(IpLookupHelper $ipLookupHelper, AuditLogModel $auditLogModel)
-    {
-        $this->ipLookupHelper = $ipLookupHelper;
-        $this->auditLogModel  = $auditLogModel;
+    public function __construct(
+        private IpLookupHelper $ipLookupHelper,
+        private AuditLogModel $auditLogModel
+    ) {
     }
 
-    /**
-     * @return array
-     */
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             AssetEvents::ASSET_POST_SAVE   => ['onAssetPostSave', 0],
@@ -34,7 +27,7 @@ class AssetSubscriber implements EventSubscriberInterface
     /**
      * Add an entry to the audit log.
      */
-    public function onAssetPostSave(Events\AssetEvent $event)
+    public function onAssetPostSave(Events\AssetEvent $event): void
     {
         $asset = $event->getAsset();
         if ($details = $event->getChanges()) {
@@ -53,7 +46,7 @@ class AssetSubscriber implements EventSubscriberInterface
     /**
      * Add a delete entry to the audit log.
      */
-    public function onAssetDelete(Events\AssetEvent $event)
+    public function onAssetDelete(Events\AssetEvent $event): void
     {
         $asset = $event->getAsset();
         $log   = [

@@ -10,7 +10,7 @@ use Symfony\Component\Form\FormBuilderInterface;
 
 class TwitterType extends AbstractType
 {
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder->add('count', ChoiceType::class, [
             'choices' => [

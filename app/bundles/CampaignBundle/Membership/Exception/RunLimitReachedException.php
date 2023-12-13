@@ -4,10 +4,7 @@ namespace Mautic\CampaignBundle\Membership\Exception;
 
 class RunLimitReachedException extends \Exception
 {
-    /**
-     * @var int
-     */
-    private $contactsProcessed;
+    private int $contactsProcessed;
 
     public function __construct($contactsProcessed)
     {
@@ -16,10 +13,7 @@ class RunLimitReachedException extends \Exception
         parent::__construct();
     }
 
-    /**
-     * @return int
-     */
-    public function getContactsProcessed()
+    public function getContactsProcessed(): int
     {
         return $this->contactsProcessed;
     }

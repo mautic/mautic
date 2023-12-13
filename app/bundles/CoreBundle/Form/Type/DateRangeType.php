@@ -11,23 +11,13 @@ use Symfony\Component\HttpFoundation\Session\SessionInterface;
 
 class DateRangeType extends AbstractType
 {
-    /**
-     * @var SessionInterface
-     */
-    private $session;
-
-    /**
-     * @var CoreParametersHelper
-     */
-    private $coreParametersHelper;
-
-    public function __construct(SessionInterface $session, CoreParametersHelper $coreParametersHelper)
-    {
-        $this->session              = $session;
-        $this->coreParametersHelper = $coreParametersHelper;
+    public function __construct(
+        private SessionInterface $session,
+        private CoreParametersHelper $coreParametersHelper
+    ) {
     }
 
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $humanFormat     = 'M j, Y';
         $sessionDateFrom = $this->session->get('mautic.daterange.form.from');

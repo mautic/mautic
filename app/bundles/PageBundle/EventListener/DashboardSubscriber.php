@@ -43,26 +43,16 @@ class DashboardSubscriber extends MainDashboardSubscriber
         'page:pages:viewother',
     ];
 
-    /**
-     * @var PageModel
-     */
-    protected $pageModel;
-
-    /**
-     * @var RouterInterface
-     */
-    protected $router;
-
-    public function __construct(PageModel $pageModel, RouterInterface $router)
-    {
-        $this->pageModel = $pageModel;
-        $this->router    = $router;
+    public function __construct(
+        protected PageModel $pageModel,
+        protected RouterInterface $router
+    ) {
     }
 
     /**
      * Set a widget detail when needed.
      */
-    public function onWidgetDetailGenerate(WidgetDetailEvent $event)
+    public function onWidgetDetailGenerate(WidgetDetailEvent $event): void
     {
         $this->checkPermissions($event);
         $canViewOthers = $event->hasPermission('page:pages:viewother');

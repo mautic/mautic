@@ -27,10 +27,7 @@ class PointEventHelper
         return true;
     }
 
-    /**
-     * @return bool
-     */
-    public static function sendEmail($event, Lead $lead, MauticFactory $factory)
+    public static function sendEmail($event, Lead $lead, MauticFactory $factory): bool
     {
         $properties = $event['properties'];
         $emailId    = (int) $properties['email'];

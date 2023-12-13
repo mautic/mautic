@@ -51,9 +51,13 @@ use Twig\Environment;
 class FormTestAbstract extends TestCase
 {
     protected static $mockId   = 123;
+
     protected static $mockName = 'Mock test name';
+
     protected $mockTrackingId;
+
     protected $formRepository;
+
     protected $leadFieldModel;
 
     /**

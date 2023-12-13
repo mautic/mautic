@@ -31,6 +31,7 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\Form;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\Form\FormFactoryInterface;
+use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -84,17 +85,11 @@ class CampaignController extends AbstractStandardFormController
 
     protected $sessionId;
 
-    private RequestStack $requestStack;
-
-    private EventCollector $eventCollector;
-
-    private DateHelper $dateHelper;
-
     public function __construct(
         FormFactoryInterface $formFactory,
         FormFieldHelper $fieldHelper,
-        EventCollector $eventCollector,
-        DateHelper $dateHelper,
+        private EventCollector $eventCollector,
+        private DateHelper $dateHelper,
         ManagerRegistry $managerRegistry,
         MauticFactory $factory,
         ModelFactory $modelFactory,
@@ -103,20 +98,13 @@ class CampaignController extends AbstractStandardFormController
         EventDispatcherInterface $dispatcher,
         Translator $translator,
         FlashBag $flashBag,
-        RequestStack $requestStack,
+        private RequestStack $requestStack,
         CorePermissions $security
     ) {
-        $this->requestStack   = $requestStack;
-        $this->eventCollector = $eventCollector;
-        $this->dateHelper     = $dateHelper;
-
         parent::__construct($formFactory, $fieldHelper, $managerRegistry, $factory, $modelFactory, $userHelper, $coreParametersHelper, $dispatcher, $translator, $flashBag, $requestStack, $security);
     }
 
-    /**
-     * @return array
-     */
-    protected function getPermissions()
+    protected function getPermissions(): array
     {
         // set some permissions
         return (array) $this->security->isGranted(
@@ -548,7 +536,7 @@ class CampaignController extends AbstractStandardFormController
      * @param string    $action
      * @param bool|null $persistConnections
      */
-    protected function afterEntitySave($entity, Form $form, $action, $persistConnections = null)
+    protected function afterEntitySave($entity, FormInterface $form, $action, $persistConnections = null)
     {
         if ($persistConnections) {
             // Update canvas settings with new event IDs then save
@@ -562,7 +550,7 @@ class CampaignController extends AbstractStandardFormController
     /**
      * @param bool $isClone
      */
-    protected function afterFormProcessed($isValid, $entity, Form $form, $action, $isClone = false)
+    protected function afterFormProcessed($isValid, $entity, FormInterface $form, $action, $isClone = false)
     {
         if (!$isValid) {
             // Add the canvas settings to the entity to be able to rebuild it
@@ -574,10 +562,9 @@ class CampaignController extends AbstractStandardFormController
     }
 
     /**
-     * @param null $objectId
      * @param bool $isClone
      */
-    protected function beforeFormProcessed($entity, Form $form, $action, $isPost, $objectId = null, $isClone = false)
+    protected function beforeFormProcessed($entity, FormInterface $form, $action, $isPost, $objectId = null, $isClone = false)
     {
         $sessionId = $this->getCampaignSessionId($entity, $action, $objectId);
         // set added/updated events
@@ -614,10 +601,9 @@ class CampaignController extends AbstractStandardFormController
 
     /**
      * @param Campaign $entity
-     * @param null     $objectId
      * @param bool     $isClone
      */
-    protected function beforeEntitySave($entity, Form $form, $action, $objectId = null, $isClone = false): bool
+    protected function beforeEntitySave($entity, FormInterface $form, $action, $objectId = null, $isClone = false): bool
     {
         if (empty($this->campaignEvents)) {
             // set the error
@@ -694,8 +680,6 @@ class CampaignController extends AbstractStandardFormController
     }
 
     /**
-     * @param null $objectId
-     *
      * @return int|string|null
      */
     protected function getCampaignSessionId(Campaign $campaign, $action, $objectId = null)
@@ -813,18 +797,15 @@ class CampaignController extends AbstractStandardFormController
         );
     }
 
-    /**
-     * @return string
-     */
-    protected function getModelName()
+    protected function getModelName(): string
     {
         return 'campaign';
     }
 
     /**
-     * @return array
+     * @return mixed[]
      */
-    protected function getPostActionRedirectArguments(array $args, $action)
+    protected function getPostActionRedirectArguments(array $args, $action): array
     {
         switch ($action) {
             case 'new':
@@ -841,10 +822,8 @@ class CampaignController extends AbstractStandardFormController
 
     /**
      * Get events from session.
-     *
-     * @return array
      */
-    protected function getSessionEvents($id)
+    protected function getSessionEvents($id): array
     {
         $session = $this->getCurrentRequest()->getSession();
 
@@ -858,10 +837,8 @@ class CampaignController extends AbstractStandardFormController
 
     /**
      * Get events from session.
-     *
-     * @return array
      */
-    protected function getSessionSources($id, $isClone = false)
+    protected function getSessionSources($id, $isClone = false): array
     {
         $session = $this->getCurrentRequest()->getSession();
 

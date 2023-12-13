@@ -12,25 +12,18 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 class PreferenceCenterListType extends AbstractType
 {
     /**
-     * @var PageModel
-     */
-    private $model;
-
-    /**
      * @var bool
      */
     private $canViewOther = false;
 
-    public function __construct(PageModel $pageModel, CorePermissions $corePermissions)
-    {
-        $this->model        = $pageModel;
+    public function __construct(
+        private PageModel $model,
+        CorePermissions $corePermissions
+    ) {
         $this->canViewOther = $corePermissions->isGranted('page:pages:viewother');
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function configureOptions(OptionsResolver $resolver)
+    public function configureOptions(OptionsResolver $resolver): void
     {
         $model        = $this->model;
         $canViewOther = $this->canViewOther;
@@ -67,9 +60,6 @@ class PreferenceCenterListType extends AbstractType
         $resolver->setDefined(['top_level', 'ignore_ids']);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getParent()
     {
         return ChoiceType::class;

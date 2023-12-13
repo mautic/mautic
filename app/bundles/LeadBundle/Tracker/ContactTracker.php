@@ -21,30 +21,8 @@ use Symfony\Component\HttpFoundation\RequestStack;
 class ContactTracker
 {
     use DefaultValueTrait;
-    /**
-     * @var LeadRepository
-     */
-    private $leadRepository;
 
-    /**
-     * @var ContactTrackingServiceInterface
-     */
-    private $contactTrackingService;
-
-    /**
-     * @var DeviceTracker
-     */
-    private $deviceTracker;
-
-    /**
-     * @var CorePermissions
-     */
-    private $security;
-
-    /**
-     * @var Lead|null
-     */
-    private $systemContact;
+    private ?\Mautic\LeadBundle\Entity\Lead $systemContact = null;
 
     /**
      * @var Lead|null
@@ -52,56 +30,22 @@ class ContactTracker
     private $trackedContact;
 
     /**
-     * @var LoggerInterface
-     */
-    private $logger;
-
-    /**
-     * @var IpLookupHelper
-     */
-    private $ipLookupHelper;
-
-    /**
-     * @var RequestStack
-     */
-    private $requestStack;
-
-    /**
-     * @var CoreParametersHelper
-     */
-    private $coreParametersHelper;
-
-    /**
-     * @var EventDispatcherInterface
-     */
-    private $dispatcher;
-
-    /**
      * @var FieldModel
      */
     private $leadFieldModel;
 
     public function __construct(
-        LeadRepository $leadRepository,
-        ContactTrackingServiceInterface $contactTrackingService,
-        DeviceTracker $deviceTracker,
-        CorePermissions $security,
-        LoggerInterface $mauticLogger,
-        IpLookupHelper $ipLookupHelper,
-        RequestStack $requestStack,
-        CoreParametersHelper $coreParametersHelper,
-        EventDispatcherInterface $dispatcher,
+        private LeadRepository $leadRepository,
+        private ContactTrackingServiceInterface $contactTrackingService,
+        private DeviceTracker $deviceTracker,
+        private CorePermissions $security,
+        private LoggerInterface $logger,
+        private IpLookupHelper $ipLookupHelper,
+        private RequestStack $requestStack,
+        private CoreParametersHelper $coreParametersHelper,
+        private EventDispatcherInterface $dispatcher,
         FieldModel $leadFieldModel
     ) {
-        $this->leadRepository         = $leadRepository;
-        $this->contactTrackingService = $contactTrackingService;
-        $this->deviceTracker          = $deviceTracker;
-        $this->security               = $security;
-        $this->logger                 = $mauticLogger;
-        $this->ipLookupHelper         = $ipLookupHelper;
-        $this->requestStack           = $requestStack;
-        $this->coreParametersHelper   = $coreParametersHelper;
-        $this->dispatcher             = $dispatcher;
         $this->leadFieldModel         = $leadFieldModel;
     }
 
@@ -139,7 +83,7 @@ class ContactTracker
     /**
      * Set the contact and generate cookies for future tracking.
      */
-    public function setTrackedContact(Lead $trackedContact)
+    public function setTrackedContact(Lead $trackedContact): void
     {
         $this->logger->debug("CONTACT: {$trackedContact->getId()} set as current lead.");
 
@@ -185,7 +129,7 @@ class ContactTracker
     /**
      * System contact bypasses cookie tracking.
      */
-    public function setSystemContact(Lead $lead = null)
+    public function setSystemContact(Lead $lead = null): void
     {
         if (null !== $lead) {
             $this->logger->debug("LEAD: {$lead->getId()} set as system lead.");
@@ -333,7 +277,7 @@ class ContactTracker
         return $lead;
     }
 
-    private function hydrateCustomFieldData(Lead $lead = null)
+    private function hydrateCustomFieldData(Lead $lead = null): void
     {
         if (null === $lead) {
             return;
@@ -349,15 +293,12 @@ class ContactTracker
         return $this->isUserSession() || $this->systemContact || defined('IN_MAUTIC_CONSOLE') || null === $this->requestStack->getCurrentRequest();
     }
 
-    /**
-     * @return bool
-     */
-    private function isUserSession()
+    private function isUserSession(): bool
     {
         return !$this->security->isAnonymous();
     }
 
-    private function dispatchContactChangeEvent(Lead $previouslyTrackedContact, $previouslyTrackedId)
+    private function dispatchContactChangeEvent(Lead $previouslyTrackedContact, $previouslyTrackedId): void
     {
         $newTrackingId = $this->getTrackingId();
         $this->logger->debug(
@@ -372,7 +313,7 @@ class ContactTracker
         }
     }
 
-    private function generateTrackingCookies()
+    private function generateTrackingCookies(): void
     {
         $request = $this->requestStack->getCurrentRequest();
         if ($leadId = $this->trackedContact->getId() && null !== $request) {

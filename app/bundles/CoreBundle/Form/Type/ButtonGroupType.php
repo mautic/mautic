@@ -10,18 +10,12 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class ButtonGroupType extends AbstractType
 {
-    /**
-     * {@inheritdoc}
-     */
     public function getParent()
     {
         return ChoiceType::class;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function configureOptions(OptionsResolver $resolver)
+    public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults([
             'expanded'           => true,
@@ -33,7 +27,7 @@ class ButtonGroupType extends AbstractType
         ]);
     }
 
-    public function buildView(FormView $view, FormInterface $form, array $options)
+    public function buildView(FormView $view, FormInterface $form, array $options): void
     {
         $view->vars['buttonBlockClass'] = $options['button_group_class'];
     }

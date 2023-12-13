@@ -56,12 +56,12 @@ class Submission
      */
     private $results = [];
 
-    public static function loadMetadata(ORM\ClassMetadata $metadata)
+    public static function loadMetadata(ORM\ClassMetadata $metadata): void
     {
         $builder = new ClassMetadataBuilder($metadata);
 
         $builder->setTable('form_submissions')
-            ->setCustomRepositoryClass('Mautic\FormBundle\Entity\SubmissionRepository')
+            ->setCustomRepositoryClass(\Mautic\FormBundle\Entity\SubmissionRepository::class)
             ->addIndex(['tracking_id'], 'form_submission_tracking_search')
             ->addIndex(['date_submitted'], 'form_date_submitted');
 
@@ -87,7 +87,7 @@ class Submission
 
         $builder->addField('referer', 'text');
 
-        $builder->createManyToOne('page', 'Mautic\PageBundle\Entity\Page')
+        $builder->createManyToOne('page', \Mautic\PageBundle\Entity\Page::class)
             ->addJoinColumn('page_id', 'id', true, false, 'SET NULL')
             ->fetchExtraLazy()
             ->build();
@@ -96,7 +96,7 @@ class Submission
     /**
      * Prepares the metadata for API usage.
      */
-    public static function loadApiMetadata(ApiMetadataDriver $metadata)
+    public static function loadApiMetadata(ApiMetadataDriver $metadata): void
     {
         $metadata->setGroupPrefix('submission')
             ->addProperties(
@@ -130,10 +130,8 @@ class Submission
 
     /**
      * Get id.
-     *
-     * @return int
      */
-    public function getId()
+    public function getId(): int
     {
         return (int) $this->id;
     }

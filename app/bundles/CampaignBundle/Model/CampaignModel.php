@@ -38,37 +38,12 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
  */
 class CampaignModel extends CommonFormModel
 {
-    /**
-     * @var ListModel
-     */
-    protected $leadListModel;
-
-    /**
-     * @var FormModel
-     */
-    protected $formModel;
-
-    /**
-     * @var EventCollector
-     */
-    private $eventCollector;
-
-    /**
-     * @var MembershipBuilder
-     */
-    private $membershipBuilder;
-
-    /**
-     * @var ContactTracker
-     */
-    private $contactTracker;
-
     public function __construct(
-        ListModel $leadListModel,
-        FormModel $formModel,
-        EventCollector $eventCollector,
-        MembershipBuilder $membershipBuilder,
-        ContactTracker $contactTracker,
+        protected ListModel $leadListModel,
+        protected FormModel $formModel,
+        private EventCollector $eventCollector,
+        private MembershipBuilder $membershipBuilder,
+        private ContactTracker $contactTracker,
         EntityManager $em,
         CorePermissions $security,
         EventDispatcherInterface $dispatcher,
@@ -78,18 +53,10 @@ class CampaignModel extends CommonFormModel
         LoggerInterface $mauticLogger,
         CoreParametersHelper $coreParametersHelper
     ) {
-        $this->leadListModel     = $leadListModel;
-        $this->formModel         = $formModel;
-        $this->eventCollector    = $eventCollector;
-        $this->membershipBuilder = $membershipBuilder;
-        $this->contactTracker    = $contactTracker;
-
         parent::__construct($em, $security, $dispatcher, $router, $translator, $userHelper, $mauticLogger, $coreParametersHelper);
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @return \Mautic\CampaignBundle\Entity\CampaignRepository
      */
     public function getRepository()
@@ -124,28 +91,19 @@ class CampaignModel extends CommonFormModel
         return $this->em->getRepository(\Mautic\CampaignBundle\Entity\LeadEventLog::class);
     }
 
-    /**
-     * {@inheritdoc}
-     *
-     * @return string
-     */
-    public function getPermissionBase()
+    public function getPermissionBase(): string
     {
         return 'campaign:campaigns';
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @param object      $entity
      * @param string|null $action
      * @param array       $options
      *
-     * @return mixed
-     *
      * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
      */
-    public function createForm($entity, FormFactoryInterface $formFactory, $action = null, $options = [])
+    public function createForm($entity, FormFactoryInterface $formFactory, $action = null, $options = []): \Symfony\Component\Form\FormInterface
     {
         if (!$entity instanceof Campaign) {
             throw new MethodNotAllowedHttpException(['Campaign']);
@@ -160,10 +118,8 @@ class CampaignModel extends CommonFormModel
 
     /**
      * Get a specific entity or generate a new one if id is empty.
-     *
-     * @return Campaign|null
      */
-    public function getEntity($id = null)
+    public function getEntity($id = null): ?Campaign
     {
         if (null === $id) {
             return new Campaign();
@@ -175,7 +131,7 @@ class CampaignModel extends CommonFormModel
     /**
      * @param object $entity
      */
-    public function deleteEntity($entity)
+    public function deleteEntity($entity): void
     {
         // Null all the event parents for this campaign to avoid database constraints
         $this->getEventRepository()->nullEventParents($entity->getId());
@@ -184,11 +140,9 @@ class CampaignModel extends CommonFormModel
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @throws \Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException
      */
-    protected function dispatchEvent($action, &$entity, $isNew = false, \Symfony\Contracts\EventDispatcher\Event $event = null)
+    protected function dispatchEvent($action, &$entity, $isNew = false, \Symfony\Contracts\EventDispatcher\Event $event = null): ?\Symfony\Contracts\EventDispatcher\Event
     {
         if ($entity instanceof \Mautic\CampaignBundle\Entity\Lead) {
             return null;
@@ -242,7 +196,7 @@ class CampaignModel extends CommonFormModel
             $event = !$isNew ? $existingEvents[$properties['id']] : new Event();
 
             foreach ($properties as $f => $v) {
-                if ('id' == $f && 0 === strpos($v, 'new')) {
+                if ('id' == $f && str_starts_with($v, 'new')) {
                     // set the temp ID used to be able to match up connections
                     $event->setTempId($v);
                 }
@@ -348,14 +302,11 @@ class CampaignModel extends CommonFormModel
 
         uasort(
             $events,
-            function ($a, $b) {
+            function ($a, $b): int {
                 $aOrder = $a->getOrder();
                 $bOrder = $b->getOrder();
-                if ($aOrder == $bOrder) {
-                    return 0;
-                }
 
-                return ($aOrder < $bOrder) ? -1 : 1;
+                return $aOrder <=> $bOrder;
             }
         );
 
@@ -369,7 +320,6 @@ class CampaignModel extends CommonFormModel
 
     /**
      * @param bool $persist
-     * @param null $events
      *
      * @return array
      */
@@ -394,7 +344,7 @@ class CampaignModel extends CommonFormModel
         }
 
         foreach ($settings['nodes'] as &$node) {
-            if (false !== strpos($node['id'], 'new')) {
+            if (str_contains($node['id'], 'new')) {
                 // Find the real one and update the node
                 $node['id'] = str_replace($node['id'], $tempIds[$node['id']], $node['id']);
             }
@@ -406,13 +356,13 @@ class CampaignModel extends CommonFormModel
 
         foreach ($settings['connections'] as &$connection) {
             // Check source
-            if (false !== strpos($connection['sourceId'], 'new')) {
+            if (str_contains($connection['sourceId'], 'new')) {
                 // Find the real one and update the node
                 $connection['sourceId'] = str_replace($connection['sourceId'], $tempIds[$connection['sourceId']], $connection['sourceId']);
             }
 
             // Check target
-            if (false !== strpos($connection['targetId'], 'new')) {
+            if (str_contains($connection['targetId'], 'new')) {
                 // Find the real one and update the node
                 $connection['targetId'] = str_replace($connection['targetId'], $tempIds[$connection['targetId']], $connection['targetId']);
             }
@@ -459,7 +409,7 @@ class CampaignModel extends CommonFormModel
     /**
      * Add and/or delete lead sources from a campaign.
      */
-    public function setLeadSources(Campaign $entity, $addedSources, $deletedSources)
+    public function setLeadSources(Campaign $entity, $addedSources, $deletedSources): void
     {
         foreach ($addedSources as $type => $sources) {
             foreach ($sources as $id => $label) {
@@ -497,10 +447,8 @@ class CampaignModel extends CommonFormModel
      *
      * @param string $sourceType
      * @param bool   $globalOnly
-     *
-     * @return array
      */
-    public function getSourceLists($sourceType = null, $globalOnly = false)
+    public function getSourceLists($sourceType = null, $globalOnly = false): array
     {
         $choices = [];
         switch ($sourceType) {
@@ -582,11 +530,9 @@ class CampaignModel extends CommonFormModel
     /**
      * Gets a list of published campaigns.
      *
-     * @param bool $forList
-     *
      * @return array
      */
-    public function getPublishedCampaigns($forList = false)
+    public function getPublishedCampaigns(bool $forList = false)
     {
         static $campaigns = [];
 
@@ -623,8 +569,6 @@ class CampaignModel extends CommonFormModel
     /**
      * Get details of leads in a campaign.
      *
-     * @param null $leads
-     *
      * @return mixed
      */
     public function getLeadDetails($campaign, $leads = null)
@@ -654,10 +598,7 @@ class CampaignModel extends CommonFormModel
         return $this->em->getRepository(\Mautic\CampaignBundle\Entity\Lead::class)->getLeads($campaignId, $eventId);
     }
 
-    /**
-     * @return array
-     */
-    public function getCampaignListIds($id)
+    public function getCampaignListIds($id): array
     {
         return $this->getRepository()->getCampaignListIds((int) $id);
     }
@@ -669,10 +610,8 @@ class CampaignModel extends CommonFormModel
      * @param string $dateFormat
      * @param array  $filter
      * @param bool   $canViewOthers
-     *
-     * @return array
      */
-    public function getLeadsAddedLineChartData($unit, \DateTime $dateFrom, \DateTime $dateTo, $dateFormat = null, $filter = [], $canViewOthers = true)
+    public function getLeadsAddedLineChartData($unit, \DateTime $dateFrom, \DateTime $dateTo, $dateFormat = null, $filter = [], $canViewOthers = true): array
     {
         $chart = new LineChart($unit, $dateFrom, $dateTo, $dateFormat);
         $query = new ChartQuery($this->em->getConnection(), $dateFrom, $dateTo);
@@ -696,10 +635,8 @@ class CampaignModel extends CommonFormModel
      * @param string|null $unit       {@link php.net/manual/en/function.date.php#refsect1-function.date-parameters}
      * @param string      $dateFormat
      * @param array       $filter
-     *
-     * @return array
      */
-    public function getCampaignMetricsLineChartData($unit, \DateTime $dateFrom, \DateTime $dateTo, $dateFormat = null, $filter = [])
+    public function getCampaignMetricsLineChartData($unit, \DateTime $dateFrom, \DateTime $dateTo, $dateFormat = null, $filter = []): array
     {
         $events = [];
         $chart  = new LineChart($unit, $dateFrom, $dateTo, $dateFormat);
@@ -783,10 +720,8 @@ class CampaignModel extends CommonFormModel
     /**
      * @param int  $limit
      * @param bool $maxLeads
-     *
-     * @return int
      */
-    public function rebuildCampaignLeads(Campaign $campaign, $limit = 1000, $maxLeads = false, OutputInterface $output = null)
+    public function rebuildCampaignLeads(Campaign $campaign, $limit = 1000, $maxLeads = false, OutputInterface $output = null): int
     {
         $contactLimiter = new ContactLimiter($limit);
 

@@ -35,10 +35,8 @@ class BodyParser
      * @todo - refactor to get rid of the if/else statements
      *
      * @param string $knownEmail
-     *
-     * @return array
      */
-    public function parse($body, $knownEmail = '')
+    public function parse($body, $knownEmail = ''): array
     {
         // initialize the result array
         $result = [

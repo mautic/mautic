@@ -34,8 +34,6 @@ class StatRepository extends CommonRepository
 
     /**
      * Updates lead ID (e.g. after a lead merge).
-     *
-     * @param null $listId
      */
     public function getSentStats($notificationId, $listId = null): array
     {
@@ -160,17 +158,12 @@ class StatRepository extends CommonRepository
         }
 
         if (isset($options['order'])) {
-            list($orderBy, $orderByDir) = $options['order'];
+            [$orderBy, $orderByDir] = $options['order'];
 
-            switch ($orderBy) {
-                case 'eventLabel':
-                    $orderBy = 'e.title';
-                    break;
-                case 'timestamp':
-                default:
-                    $orderBy = 'e.dateRead, e.dateSent';
-                    break;
-            }
+            $orderBy = match ($orderBy) {
+                'eventLabel' => 'e.title',
+                default      => 'e.dateRead, e.dateSent',
+            };
 
             $query->orderBy($orderBy, $orderByDir);
         }
@@ -254,7 +247,7 @@ class StatRepository extends CommonRepository
     /**
      * Updates lead ID (e.g. after a lead merge).
      */
-    public function updateLead($fromLeadId, $toLeadId)
+    public function updateLead($fromLeadId, $toLeadId): void
     {
         $q = $this->_em->getConnection()->createQueryBuilder();
         $q->update(MAUTIC_TABLE_PREFIX.'push_notification_stats')
@@ -266,15 +259,12 @@ class StatRepository extends CommonRepository
     /**
      * Delete a stat.
      */
-    public function deleteStat($id)
+    public function deleteStat($id): void
     {
         $this->_em->getConnection()->delete(MAUTIC_TABLE_PREFIX.'push_notification_stats', ['id' => (int) $id]);
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getTableAlias()
+    public function getTableAlias(): string
     {
         return 's';
     }

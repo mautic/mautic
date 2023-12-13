@@ -13,20 +13,10 @@ class Adder
 {
     public const NAME = 'added';
 
-    /**
-     * @var LeadRepository
-     */
-    private $leadRepository;
-
-    /**
-     * @var LeadEventLogRepository
-     */
-    private $leadEventLogRepository;
-
-    public function __construct(LeadRepository $leadRepository, LeadEventLogRepository $leadEventLogRepository)
-    {
-        $this->leadRepository         = $leadRepository;
-        $this->leadEventLogRepository = $leadEventLogRepository;
+    public function __construct(
+        private LeadRepository $leadRepository,
+        private LeadEventLogRepository $leadEventLogRepository
+    ) {
     }
 
     public function createNewMembership(Lead $contact, Campaign $campaign, $isManualAction): CampaignMember
@@ -55,7 +45,7 @@ class Adder
      *
      * @throws ContactCannotBeAddedToCampaignException
      */
-    public function updateExistingMembership(CampaignMember $campaignMember, $isManualAction)
+    public function updateExistingMembership(CampaignMember $campaignMember, $isManualAction): void
     {
         $wasRemoved = $campaignMember->wasManuallyRemoved();
         if (!($wasRemoved && $isManualAction) && !$campaignMember->getCampaign()->allowRestart()) {
@@ -83,7 +73,7 @@ class Adder
         $this->saveCampaignMember($campaignMember);
     }
 
-    private function saveCampaignMember($campaignMember)
+    private function saveCampaignMember($campaignMember): void
     {
         $this->leadRepository->saveEntity($campaignMember);
         $this->leadRepository->detachEntity($campaignMember);

@@ -7,8 +7,9 @@ use Mautic\LeadBundle\Entity\Lead;
 
 class PointsChangeEvent extends CommonEvent
 {
-    protected $old;
-    protected $new;
+    protected int $old;
+
+    protected int $new;
 
     public function __construct(Lead &$lead, $old, $new)
     {
@@ -29,20 +30,16 @@ class PointsChangeEvent extends CommonEvent
 
     /**
      * Returns the new points.
-     *
-     * @return int
      */
-    public function getNewPoints()
+    public function getNewPoints(): int
     {
         return $this->new;
     }
 
     /**
      * Returns the old points.
-     *
-     * @return int
      */
-    public function getOldPoints()
+    public function getOldPoints(): int
     {
         return $this->old;
     }

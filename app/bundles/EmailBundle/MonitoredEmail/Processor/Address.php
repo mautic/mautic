@@ -20,7 +20,7 @@ class Address
                 'default.domain.name' != $parsedAddress->host
             ) {
                 $email           = $parsedAddress->mailbox.'@'.$parsedAddress->host;
-                $name            = isset($parsedAddress->personal) ? $parsedAddress->personal : null;
+                $name            = $parsedAddress->personal ?? null;
                 $results[$email] = $name;
             }
         }
@@ -28,15 +28,12 @@ class Address
         return $results;
     }
 
-    /**
-     * @return string|null
-     */
-    public static function parseAddressForStatHash($address)
+    public static function parseAddressForStatHash($address): ?string
     {
         if (preg_match('#^(.*?)\+(.*?)@(.*?)$#', $address, $parts)) {
             if (strstr($parts[2], '_')) {
                 // Has an ID hash so use it to find the lead
-                list($ignore, $hashId) = explode('_', $parts[2]);
+                [$ignore, $hashId] = explode('_', $parts[2]);
 
                 return $hashId;
             }

@@ -18,14 +18,9 @@ class EmailType extends AbstractType
 {
     public const REPLY_TO_ADDRESS = 'replyToAddress';
 
-    /**
-     * @var UserHelper
-     */
-    private $userHelper;
-
-    public function __construct(UserHelper $userHelper)
-    {
-        $this->userHelper = $userHelper;
+    public function __construct(
+        private UserHelper $userHelper
+    ) {
     }
 
     public function buildForm(FormBuilderInterface $builder, array $options): void

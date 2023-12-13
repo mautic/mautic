@@ -26,10 +26,8 @@ class JsController extends CommonController
 
     /**
      * Build a JS header for the Mautic embedded JS.
-     *
-     * @return string
      */
-    protected function getJsHeader()
+    protected function getJsHeader(): string
     {
         $year = date('Y');
 
