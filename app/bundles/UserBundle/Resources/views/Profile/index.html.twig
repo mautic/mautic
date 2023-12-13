@@ -9,21 +9,21 @@
 <div class="box-layout">
     <!-- step container -->
     <div class="col-md-3 bg-white height-auto">
-        <div class="pr-lg pl-lg pt-md pb-md">
+        <div class="pr-lg pt-md pb-md">
             {% if me.getId() %}
-            <div class="media">
-                <div class="pull-left">
+            <div class="media row center">
+                <div class="pull-left gradient-background img-rounded" style="padding: 2px;">
                     <img class="img-rounded img-bordered media-object" src="{{ gravatarGetImage(me.getEmail()) }}" alt="" width="65px">
                 </div>
-                <div class="media-body">
+                <div class="center">
                     <h4>{{ me.getName() }}</h4>
-                    <h5>{{ me.getPosition() }}</h5>
+                    <div>{{ me.getPosition() }}</div>
                 </div>
             </div>
             <hr />
             {% endif %}
 
-            <ul class="list-group list-group-tabs">
+            <ul class="list-group list-group-tabs hidden">
                 <li class="list-group-item active">
                     <a href="#profile" class="steps" data-toggle="tab">
                         {% trans %}mautic.user.account.header.details{% endtrans %}
@@ -47,23 +47,40 @@
         <div class="tab-content">
             <div class="tab-pane fade in active bdr-rds-0 bdr-w-0" id="profile">
                 {{ form_start(userForm) }}
-                <div class="pa-md bg-auto bg-light-xs bdr-b">
-                    <h4 class="fw-sb">{% trans %}mautic.user.account.header.details{% endtrans %}</h4>
+                <div class="pl-xxxl pa-md bg-auto bg-light-xs">
+                    <h2 class="fw-sb">{% trans %}mautic.user.account.header.details{% endtrans %}</h2>
                 </div>
-                <div class="pa-md">
-                    <div class="col-md-6">
-                        {{ permissions.editUsername ? form_row(userForm.username) : form_row(userForm.username_unbound) }}
-                        {{ permissions.editName ? form_row(userForm.firstName) : form_row(userForm.firstName_unbound) }}
-                        {{ permissions.editName ? form_row(userForm.lastName) : form_row(userForm.lastName_unbound) }}
-                        {{ permissions.editPosition ? form_row(userForm.position) : form_row(userForm.position_unbound) }}
-                        {{ permissions.editEmail ? form_row(userForm.email) : form_row(userForm.email_unbound) }}
-                    </div>
-                    <div class="col-md-6">
-                        {{ form_row(userForm.timezone) }}
-                        {{ form_row(userForm.locale) }}
-                        {{ form_row(userForm.plainPassword.password) }}
-                        {{ form_row(userForm.plainPassword.confirm) }}
-                        {{ form_row(userForm.signature) }}
+                <div>
+                    <div class="pl-xxxl pt-xxl pb-xxl">
+                        <h3 id="personal-info">{% trans %}mautic.user.config.title.get_to_know_you{% endtrans %}</h3>
+                        <div class="text-muted small description">{% trans %}mautic.user.config.personalize.interface.helper{% endtrans %}</div>
+                        <div class="column-wrapper-s">
+                            {{ permissions.editName ? form_row(userForm.firstName) : form_row(userForm.firstName_unbound) }}
+                            {{ permissions.editName ? form_row(userForm.lastName) : form_row(userForm.lastName_unbound) }}
+                            {{ permissions.editPosition ? form_row(userForm.position) : form_row(userForm.position_unbound) }}
+                        </div>
+                        <div>
+                            {{ form_row(userForm.signature) }}
+                        </div>
+
+                        <h3 id="security">{% trans %}mautic.user.config.title.account_data_security{% endtrans %}</h3>
+                        <div class="text-muted small description">{% trans %}mautic.user.config.account.security.helper{% endtrans %}</div>
+                        <div class="column-wrapper-s">
+                            {{ permissions.editUsername ? form_row(userForm.username) : form_row(userForm.username_unbound) }}
+                            {{ permissions.editEmail ? form_row(userForm.email) : form_row(userForm.email_unbound) }}
+                        </div>
+                        <div class="column-wrapper-s">
+                            {{ form_row(userForm.plainPassword.password) }}
+                            {{ form_row(userForm.plainPassword.confirm) }}
+                        </div>
+                        <div>
+                            <h3 id="locale">{% trans %}mautic.user.config.title.locale{% endtrans %}</h3>
+                            <div class="text-muted small description">{% trans %}mautic.user.config.region.preferences.helper{% endtrans %}</div>
+                            <div class="column-wrapper-s">
+                                {{ form_row(userForm.timezone) }}
+                                {{ form_row(userForm.locale) }}
+                            </div>
+                        </div>
                     </div>
                 </div>
                 {{ form_end(userForm) }}
