@@ -6,15 +6,8 @@ namespace Mautic\CoreBundle\Cache;
 
 class ResultCacheOptions
 {
-    private string $namespace;
-    private ?int $ttl;
-    private ?string $id;
-
-    public function __construct(string $namespace, int $ttl = null, string $id = null)
+    public function __construct(private string $namespace, private ?int $ttl = null, private ?string $id = null)
     {
-        $this->namespace = $namespace;
-        $this->ttl       = $ttl;
-        $this->id        = $id;
     }
 
     public function getNamespace(): string

@@ -17,11 +17,9 @@ class CacheInvalidateSubscriber implements EventSubscriber
     private const ACTION_PERSIST = 'persist';
     private const ACTION_UPDATE  = 'update';
     private const ACTION_REMOVE  = 'remove';
-    private Configuration $ormConfiguration;
 
-    public function __construct(Configuration $ormConfiguration)
+    public function __construct(private Configuration $ormConfiguration)
     {
-        $this->ormConfiguration = $ormConfiguration;
     }
 
     public function getSubscribedEvents(): array
