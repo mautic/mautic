@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Mautic\CoreBundle\Cache;
 
 use Doctrine\Common\Cache\CacheProvider;
-use Doctrine\Common\Cache\Psr6\DoctrineProvider as DoctrineProviderAlias;
+use Doctrine\Common\Cache\Psr6\DoctrineProvider;
 use Doctrine\DBAL\Cache\QueryCacheProfile;
 use Doctrine\DBAL\Configuration;
 use Doctrine\DBAL\Connection;
@@ -58,7 +58,7 @@ class ResultCacheHelper
             return null;
         }
 
-        $cache = DoctrineProviderAlias::wrap($cache);
+        $cache = DoctrineProvider::wrap($cache);
 
         if (!$cache instanceof CacheProvider) {
             return null;
