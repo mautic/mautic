@@ -7,10 +7,7 @@ use Symfony\Component\Form\FormBuilderInterface;
 
 class TwitterCustomType extends TwitterAbstractType
 {
-    /**
-     * {@inheritdoc}
-     */
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder->add('custom', TextType::class, [
             'label'      => 'mautic.social.monitoring.twitter.custom',

@@ -15,9 +15,13 @@ class HSTSMiddleware implements HttpKernelInterface, PrioritizedMiddlewareInterf
     public const PRIORITY = 900;
 
     protected bool $enableHSTS;
+
     protected bool $includeDubDomains;
+
     protected bool $preload;
+
     protected int $expireTime;
+
     protected HttpKernelInterface $app;
 
     public function __construct(HttpKernelInterface $app)

@@ -13,64 +13,25 @@ use Psr\Log\LoggerInterface;
 
 class InactiveHelper
 {
-    /**
-     * @var EventScheduler
-     */
-    private $scheduler;
+    private \DateTimeInterface|null $earliestInactiveDate = null;
 
-    /**
-     * @var InactiveContactFinder
-     */
-    private $inactiveContactFinder;
-
-    /**
-     * @var LeadEventLogRepository
-     */
-    private $eventLogRepository;
-
-    /**
-     * @var EventRepository
-     */
-    private $eventRepository;
-
-    /**
-     * @var LoggerInterface
-     */
-    private $logger;
-
-    private DecisionHelper $decisionHelper;
-
-    /**
-     * @var \DateTimeInterface
-     */
-    private $earliestInactiveDate;
-
-    /**
-     * InactiveHelper constructor.
-     */
     public function __construct(
-        EventScheduler $scheduler,
-        InactiveContactFinder $inactiveContactFinder,
-        LeadEventLogRepository $eventLogRepository,
-        EventRepository $eventRepository,
-        LoggerInterface $logger,
-        DecisionHelper $decisionHelper
+        private EventScheduler $scheduler,
+        private InactiveContactFinder $inactiveContactFinder,
+        private LeadEventLogRepository $eventLogRepository,
+        private EventRepository $eventRepository,
+        private LoggerInterface $logger,
+        private DecisionHelper $decisionHelper
     ) {
-        $this->scheduler               = $scheduler;
-        $this->inactiveContactFinder   = $inactiveContactFinder;
-        $this->eventLogRepository      = $eventLogRepository;
-        $this->eventRepository         = $eventRepository;
-        $this->logger                  = $logger;
-        $this->decisionHelper          = $decisionHelper;
     }
 
     /**
-     * @param ArrayCollection|Event[] $decisions
+     * @param ArrayCollection<int, Event> $decisions
      */
-    public function removeDecisionsWithoutNegativeChildren(ArrayCollection $decisions)
+    public function removeDecisionsWithoutNegativeChildren(ArrayCollection $decisions): void
     {
         /**
-         * @var int
+         * @var int   $key
          * @var Event $decision
          */
         foreach ($decisions as $key => $decision) {
@@ -92,7 +53,7 @@ class InactiveHelper
         $lastActiveEventId,
         ArrayCollection $negativeChildren,
         Event $event
-    ) {
+    ): void {
         $contactIds                 = $contacts->getKeys();
         $lastActiveDates            = $this->getLastActiveDates($lastActiveEventId, $contactIds);
         $this->earliestInactiveDate = $now;
@@ -146,10 +107,7 @@ class InactiveHelper
         return $this->earliestInactiveDate;
     }
 
-    /**
-     * @return ArrayCollection
-     */
-    public function getCollectionByDecisionId($decisionId)
+    public function getCollectionByDecisionId($decisionId): ArrayCollection
     {
         $collection = new ArrayCollection();
 
@@ -162,11 +120,9 @@ class InactiveHelper
     }
 
     /**
-     * @return \DateTimeInterface|null
-     *
      * @throws \Mautic\CampaignBundle\Executioner\Scheduler\Exception\NotSchedulableException
      */
-    public function getEarliestInactiveDate(ArrayCollection $negativeChildren, \DateTime $lastActiveDate)
+    public function getEarliestInactiveDate(ArrayCollection $negativeChildren, \DateTimeInterface $lastActiveDate): ?\DateTimeInterface
     {
         $earliestDate = null;
         foreach ($negativeChildren as $event) {
@@ -180,9 +136,9 @@ class InactiveHelper
     }
 
     /**
-     * @return array|ArrayCollection
+     * @return array<string, \DateTimeInterface>|null
      */
-    private function getLastActiveDates($lastActiveEventId, array $contactIds)
+    private function getLastActiveDates($lastActiveEventId, array $contactIds): ?array
     {
         // If there is a parent ID, get last active dates based on when that event was executed for the given contact
         // Otherwise, use when the contact was added to the campaign for comparison

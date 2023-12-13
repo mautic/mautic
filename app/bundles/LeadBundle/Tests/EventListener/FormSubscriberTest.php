@@ -30,32 +30,29 @@ class FormSubscriberTest extends \PHPUnit\Framework\TestCase
     /**
      * @var LeadModel|\PHPUnit\Framework\MockObject\MockObject
      */
-    private $leadModel;
+    private \PHPUnit\Framework\MockObject\MockObject $leadModel;
 
     /**
      * @var PointGroupModel|(PointGroupModel&object&MockObject)|(PointGroupModel&MockObject)|(object&MockObject)|MockObject
      */
     private MockObject|PointGroupModel $pointGroupModel;
 
-    /**
-     * @var FormSubscriber
-     */
-    private $subscriber;
+    private \Mautic\LeadBundle\EventListener\FormSubscriber $subscriber;
 
     /**
      * @var MockObject|ContactTracker
      */
-    private $contactTracker;
+    private \PHPUnit\Framework\MockObject\MockObject $contactTracker;
 
     /**
      * @var MockObject|LeadFieldRepository
      */
-    private $leadFieldRepostory;
+    private \PHPUnit\Framework\MockObject\MockObject $leadFieldRepostory;
 
     /**
      * @var MockObject|IpLookupHelper
      */
-    private $ipLookupHelper;
+    private \PHPUnit\Framework\MockObject\MockObject $ipLookupHelper;
 
     protected function setUp(): void
     {

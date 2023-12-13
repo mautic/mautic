@@ -4,27 +4,17 @@ namespace Mautic\CoreBundle\Form\DataTransformer;
 
 use Symfony\Component\Form\DataTransformerInterface;
 
-/**
- * Class DatetimeToStringTransformer.
- */
 class DatetimeToStringTransformer implements DataTransformerInterface
 {
     /**
-     * @var string
-     */
-    private $format;
-
-    /**
      * @param string $format
      */
-    public function __construct($format = 'Y-m-d H:i')
-    {
-        $this->format = $format;
+    public function __construct(
+        private $format = 'Y-m-d H:i'
+    ) {
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @return string
      */
     public function reverseTransform($value)
@@ -39,8 +29,6 @@ class DatetimeToStringTransformer implements DataTransformerInterface
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @return \DateTime
      */
     public function transform($value)

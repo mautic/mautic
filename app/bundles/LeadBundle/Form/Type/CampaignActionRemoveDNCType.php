@@ -8,7 +8,7 @@ use Symfony\Component\Validator\Constraints\NotBlank;
 
 class CampaignActionRemoveDNCType extends AbstractType
 {
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder->add(
             'channels',

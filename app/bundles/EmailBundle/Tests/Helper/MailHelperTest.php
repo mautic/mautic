@@ -62,7 +62,7 @@ class MailHelperTest extends TestCase
         defined('MAUTIC_ENV') or define('MAUTIC_ENV', 'test');
     }
 
-    public function testBatchIsEnabledWithBcTokenInterface()
+    public function testBatchIsEnabledWithBcTokenInterface(): void
     {
         $mockFactory = $this->getMockFactory();
 
@@ -94,7 +94,7 @@ class MailHelperTest extends TestCase
         $this->assertEquals(4, count($metadatas));
     }
 
-    public function testGlobalFromThatAllFromAddressesAreTheSame()
+    public function testGlobalFromThatAllFromAddressesAreTheSame(): void
     {
         $mockFactory = $this->getMockFactory();
 
@@ -120,7 +120,7 @@ class MailHelperTest extends TestCase
         $this->assertEquals(['override@owner.com'], array_unique($fromAddresses));
     }
 
-    public function testStandardEmailFrom()
+    public function testStandardEmailFrom(): void
     {
         $mockFactory   = $this->getMockFactory(true);
         $transport     = new SmtpTransport();
@@ -145,7 +145,7 @@ class MailHelperTest extends TestCase
         }
     }
 
-    public function testStandardEmailReplyTo()
+    public function testStandardEmailReplyTo(): void
     {
         $mockFactory   = $this->getMockFactory(true);
         $transport     = new SmtpTransport();
@@ -206,7 +206,7 @@ class MailHelperTest extends TestCase
         $this->assertEquals('admin@mautic.com', $replyTo);
     }
 
-    public function testStandardOwnerAsMailer()
+    public function testStandardOwnerAsMailer(): void
     {
         $mockFactory = $this->getMockFactory();
 
@@ -276,7 +276,7 @@ class MailHelperTest extends TestCase
         ];
     }
 
-    public function testGlobalHeadersAreSet()
+    public function testGlobalHeadersAreSet(): void
     {
         $parameterMap = [
             ['mailer_custom_headers', [], ['X-Mautic-Test' => 'test', 'X-Mautic-Test2' => 'test']],
@@ -296,7 +296,7 @@ class MailHelperTest extends TestCase
         /** @var array<\Symfony\Component\Mime\Header\AbstractHeader> $headers */
         $headers = $mailer->message->getHeaders()->all();
         foreach ($headers as $header) {
-            if (false !== strpos($header->getName(), 'X-Mautic-Test')) {
+            if (str_contains($header->getName(), 'X-Mautic-Test')) {
                 $customHeadersFounds[] = $header->getName();
 
                 $this->assertEquals('test', $header->getBody());
@@ -329,13 +329,13 @@ class MailHelperTest extends TestCase
         $headers = $mailer->message->getHeaders()->all();
 
         foreach ($headers as $header) {
-            if (false !== strpos($header->getName(), 'X-Mautic-Test')) {
+            if (str_contains($header->getName(), 'X-Mautic-Test')) {
                 $this->assertEquals('test', $header->getBody());
             }
         }
     }
 
-    public function testEmailHeadersAreSet()
+    public function testEmailHeadersAreSet(): void
     {
         $parameterMap = [
             ['mailer_custom_headers', [], ['X-Mautic-Test' => 'test', 'X-Mautic-Test2' => 'test']],
@@ -505,7 +505,7 @@ class MailHelperTest extends TestCase
         return $mockFactory;
     }
 
-    public function testArrayOfAddressesAreRemappedIntoEmailToNameKeyValuePair()
+    public function testArrayOfAddressesAreRemappedIntoEmailToNameKeyValuePair(): void
     {
         $mockFactory = $this->getMockBuilder(MauticFactory::class)
             ->disableOriginalConstructor()
@@ -572,7 +572,7 @@ class MailHelperTest extends TestCase
     /**
      * @return array<array<bool|int|string>>
      */
-    public function minifyHtmlDataProvider(): array
+    public static function minifyHtmlDataProvider(): array
     {
         $html = '<!doctype html>
 <html lang=3D"en" xmlns=3D"http://www.w3.org/1999/xhtml" xmlns:v=3D"urn:schemas-microsoft-com:vml" xmlns:o=3D"urn:schemas-microsoft-com:office:office">
@@ -587,5 +587,37 @@ class MailHelperTest extends TestCase
             [false, $html, $html],
             [true, $html, InputHelper::minifyHTML($html)],
         ];
+    }
+
+    public function testHeadersAreTokenized(): void
+    {
+        $parameterMap = [
+          ['mailer_custom_headers', [], ['X-Mautic-Test-1' => '{tracking_pixel}']],
+        ];
+        $mockFactory = $this->getMockFactory(true, $parameterMap);
+
+        $transport     = new SmtpTransport();
+        $symfonyMailer = new Mailer($transport);
+
+        $mailer = new MailHelper($mockFactory, $symfonyMailer, ['nobody@nowhere.com' => '{tracking_pixel}']);
+        $mailer->addTo($this->contacts[0]['email']);
+
+        $email = new Email();
+        $email->setSubject('Test');
+        $email->setCustomHtml('content');
+        $email->setHeaders(['X-Mautic-Test-2' => '{tracking_pixel}']);
+        $mailer->setEmail($email);
+        $mailer->send();
+
+        /** @var array<\Symfony\Component\Mime\Header\AbstractHeader> $headers */
+        $headers = $mailer->message->getHeaders()->all();
+
+        foreach ($headers as $header) {
+            if ('X-Mautic-Test-1' === $header->getName() || 'X-Mautic-Test-2' === $header->getName()) {
+                $this->assertEquals(MailHelper::getBlankPixel(), $header->getBody());
+            } elseif ('from' === $header->getName()) {
+                $this->assertEquals('{tracking_pixel}', $header->getBody()->getName());
+            }
+        }
     }
 }

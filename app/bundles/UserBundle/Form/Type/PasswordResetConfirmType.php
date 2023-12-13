@@ -14,10 +14,7 @@ use Symfony\Component\Validator\Constraints as Assert;
 
 class PasswordResetConfirmType extends AbstractType
 {
-    /**
-     * {@inheritdoc}
-     */
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder->addEventSubscriber(new CleanFormSubscriber([]));
 
@@ -107,9 +104,6 @@ class PasswordResetConfirmType extends AbstractType
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getBlockPrefix()
     {
         return 'passwordresetconfirm';

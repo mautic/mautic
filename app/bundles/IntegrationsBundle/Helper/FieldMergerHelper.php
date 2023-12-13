@@ -12,24 +12,14 @@ use Mautic\IntegrationsBundle\Sync\DAO\Mapping\ObjectMappingDAO;
 class FieldMergerHelper
 {
     /**
-     * @var ConfigFormSyncInterface
-     */
-    private $integrationObject;
-
-    /**
-     * @var array
-     */
-    private $currentFieldMappings;
-
-    /**
      * @var MappedFieldInfoInterface[]
      */
-    private $allFields;
+    private ?array $allFields = null;
 
-    public function __construct(ConfigFormSyncInterface $integrationObject, array $currentFieldMappings)
-    {
-        $this->integrationObject    = $integrationObject;
-        $this->currentFieldMappings = $currentFieldMappings;
+    public function __construct(
+        private ConfigFormSyncInterface $integrationObject,
+        private array $currentFieldMappings
+    ) {
     }
 
     /**

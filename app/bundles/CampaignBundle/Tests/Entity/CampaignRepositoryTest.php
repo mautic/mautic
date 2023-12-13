@@ -20,7 +20,7 @@ class CampaignRepositoryTest extends TestCase
     /**
      * @var MockObject&QueryBuilder
      */
-    private $queryBuilder;
+    private \PHPUnit\Framework\MockObject\MockObject $queryBuilder;
 
     private CampaignRepository $repository;
 
