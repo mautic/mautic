@@ -1,5 +1,7 @@
 <?php
 
+use Doctrine\DBAL\Types\Types;
+use Mautic\CoreBundle\Doctrine\Type;
 use Mautic\CoreBundle\EventListener\ConsoleErrorListener;
 use Mautic\CoreBundle\EventListener\ConsoleTerminateListener;
 use Symfony\Component\DependencyInjection\Definition;
@@ -164,9 +166,10 @@ $container->loadFromExtension('doctrine', [
             ]),
         ],
         'types'    => [
-            'array'     => \Mautic\CoreBundle\Doctrine\Type\ArrayType::class,
-            'datetime'  => \Mautic\CoreBundle\Doctrine\Type\UTCDateTimeType::class,
-            'generated' => \Mautic\CoreBundle\Doctrine\Type\GeneratedType::class,
+            Types::ARRAY                  => Type\ArrayType::class,
+            Types::DATETIME_MUTABLE       => Type\UTCDateTimeType::class,
+            Types::DATETIME_IMMUTABLE     => Type\UTCDateTimeImmutableType::class,
+            Type\GeneratedType::GENERATED => Type\GeneratedType::class,
         ],
     ],
     'orm'  => [
