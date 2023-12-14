@@ -9,6 +9,7 @@ use Mautic\FormBundle\Model\ActionModel;
 use Mautic\LeadBundle\Model\ListModel;
 use Mautic\PointBundle\Model\PointModel;
 use Mautic\PointBundle\Model\TriggerEventModel;
+use Mautic\ReportBundle\Model\ReportModel;
 
 class EmailDependencies
 {
@@ -17,7 +18,8 @@ class EmailDependencies
         private ListModel $listModel,
         private ActionModel $actionModel,
         private PointModel $pointModel,
-        private TriggerEventModel $triggerEventModel
+        private TriggerEventModel $triggerEventModel,
+        private ReportModel $reportModel
     ) {
     }
 
@@ -51,6 +53,11 @@ class EmailDependencies
                 'label' => 'mautic.point.trigger.header.index',
                 'route' => 'mautic_pointtrigger_index',
                 'ids'   => $this->triggerEventModel->getPointTriggerIdsWithDependenciesOnEmail($emailId),
+            ],
+            [
+                'label' => 'mautic.report.reports',
+                'route' => 'mautic_report_index',
+                'ids'   => $this->reportModel->getReportsIdsWithDependenciesOnEmail($emailId),
             ],
         ];
     }
