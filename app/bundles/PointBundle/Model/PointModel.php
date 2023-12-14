@@ -354,6 +354,6 @@ class PointModel extends CommonFormModel
             }
         }
 
-        return $pointActionIds;
+        return array_unique($pointActionIds);
     }
 }

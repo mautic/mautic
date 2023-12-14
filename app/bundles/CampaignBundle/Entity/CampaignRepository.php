@@ -609,6 +609,6 @@ class CampaignRepository extends CommonRepository
             ->setParameter('emailId', $emailId)
             ->getQuery();
 
-        return array_map(fn ($val): int => (int) $val, $query->getSingleColumnResult());
+        return array_unique(array_map(fn ($val): int => (int) $val, $query->getSingleColumnResult()));
     }
 }

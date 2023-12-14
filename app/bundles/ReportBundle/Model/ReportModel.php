@@ -753,7 +753,7 @@ class ReportModel extends FormModel
             }
         }
 
-        return $dependents;
+        return array_unique($dependents);
     }
 
     /**

@@ -108,6 +108,6 @@ class TriggerEventModel extends CommonFormModel
             }
         }
 
-        return $triggerIds;
+        return array_unique($triggerIds);
     }
 }

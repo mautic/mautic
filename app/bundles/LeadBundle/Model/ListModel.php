@@ -1169,7 +1169,7 @@ class ListModel extends FormModel
             }
         }
 
-        return $dependents;
+        return array_unique($dependents);
     }
 
     /**

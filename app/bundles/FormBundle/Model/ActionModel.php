@@ -111,6 +111,6 @@ class ActionModel extends CommonFormModel
             }
         }
 
-        return $formIds;
+        return array_unique($formIds);
     }
 }
