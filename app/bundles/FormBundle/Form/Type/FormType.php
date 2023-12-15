@@ -10,6 +10,7 @@ use Mautic\CoreBundle\Form\Type\PublishDownDateType;
 use Mautic\CoreBundle\Form\Type\PublishUpDateType;
 use Mautic\CoreBundle\Form\Type\ThemeListType;
 use Mautic\CoreBundle\Form\Type\YesNoButtonGroupType;
+use Mautic\CoreBundle\Helper\LanguageHelper;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\FormBundle\Entity\Form;
 use Symfony\Component\Form\AbstractType;
@@ -23,7 +24,8 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 class FormType extends AbstractType
 {
     public function __construct(
-        private CorePermissions $security
+        private CorePermissions $security,
+        private LanguageHelper $langHelper,
     ) {
     }
 
