@@ -77,7 +77,6 @@ class FormControllerFunctionalTest extends MauticMysqlTestCase
 
         // copy all from $translationsPath to $languagePath
         $filesystem->mirror($translationsPath, $languagePath);
-        // check If copy was ok
 
         /** @var LanguageHelper $languageHelper */
         $languageHelper = $this->getContainer()->get('mautic.helper.language');
