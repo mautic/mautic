@@ -435,6 +435,10 @@ final class MauticReportBuilder implements ReportBuilderInterface
                             case 'email':
                             case 'url':
                                 switch ($exprFunction) {
+                                    case 'like':
+                                    case 'notLike':
+                                        $filter['value'] = !str_contains($filter['value'], '%') ? '%'.$filter['value'].'%' : $filter['value'];
+                                        break;
                                     case 'startsWith':
                                         $exprFunction    = 'like';
                                         $filter['value'] = $filter['value'].'%';
