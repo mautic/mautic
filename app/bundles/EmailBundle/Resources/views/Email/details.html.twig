@@ -315,11 +315,6 @@
 
       <!-- right section -->
       <div class="col-md-3 bg-white bdr-l height-auto">
-          {{ include('@MauticCore/Helper/usage.html.twig', {
-              'title': 'mautic.email.usages'|trans,
-              'stats': usageStats,
-              'noUsages': 'mautic.email.no_usages'|trans,
-          }) }}
 
           <!-- preview URL -->
           <div class="panel bg-transparent shd-none bdr-rds-0 bdr-w-0 mt-sm mb-0">
@@ -345,8 +340,17 @@
               </div>
           </div>
 
+          <!-- email usages -->
+          {{ include('@MauticCore/Helper/usage.html.twig', {
+              'title': 'mautic.email.usages'|trans,
+              'stats': usageStats,
+              'noUsages': 'mautic.email.no_usages'|trans,
+          }) }}
+
           <!-- activity feed -->
           {{- include('@MauticCore/Helper/recentactivity.html.twig', {'logs': logs}) -}}
+
+
       </div>
       <!--/ right section -->
       <input name="entityId" id="entityId" type="hidden" value="{{ email.id|escape }}"/>
