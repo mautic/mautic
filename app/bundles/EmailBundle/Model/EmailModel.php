@@ -2,6 +2,7 @@
 
 namespace Mautic\EmailBundle\Model;
 
+use Cassandra\Table;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Query\QueryBuilder;
 use Doctrine\ORM\EntityManagerInterface;
@@ -23,6 +24,7 @@ use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Model\AjaxLookupModelInterface;
 use Mautic\CoreBundle\Model\BuilderModelTrait;
 use Mautic\CoreBundle\Model\FormModel;
+use Mautic\CoreBundle\Model\TableModelInterface;
 use Mautic\CoreBundle\Model\TranslationModelTrait;
 use Mautic\CoreBundle\Model\VariantModelTrait;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
@@ -31,6 +33,7 @@ use Mautic\EmailBundle\EmailEvents;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Entity\Stat;
 use Mautic\EmailBundle\Entity\StatDevice;
+use Mautic\EmailBundle\Entity\StatRepository;
 use Mautic\EmailBundle\Event\EmailBuilderEvent;
 use Mautic\EmailBundle\Event\EmailEvent;
 use Mautic\EmailBundle\Event\EmailOpenEvent;
@@ -52,6 +55,8 @@ use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\LeadBundle\Tracker\ContactTracker;
 use Mautic\LeadBundle\Tracker\DeviceTracker;
 use Mautic\PageBundle\Entity\RedirectRepository;
+use Mautic\PageBundle\Entity\Trackable;
+use Mautic\PageBundle\Entity\TrackableRepository;
 use Mautic\PageBundle\Model\TrackableModel;
 use Mautic\UserBundle\Model\UserModel;
 use Psr\Log\LoggerInterface;
@@ -69,8 +74,9 @@ use Symfony\Contracts\EventDispatcher\Event;
  * @extends FormModel<Email>
  *
  * @implements AjaxLookupModelInterface<Email>
+ * @implements TableModelInterface<Email>
  */
-class EmailModel extends FormModel implements AjaxLookupModelInterface
+class EmailModel extends FormModel implements AjaxLookupModelInterface, TableModelInterface
 {
     use VariantModelTrait;
     use TranslationModelTrait;
@@ -224,11 +230,11 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
     }
 
     /**
-     * @return \Mautic\EmailBundle\Entity\StatRepository
+     * @return StatRepository
      */
     public function getStatRepository()
     {
-        return $this->em->getRepository(\Mautic\EmailBundle\Entity\Stat::class);
+        return $this->em->getRepository(Stat::class);
     }
 
     /**
@@ -725,6 +731,23 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
     }
 
     /**
+     * @param Email $entity
+     *
+     * @return array<string, array<int, array<string, int|string>>>
+     *
+     * @throws \Doctrine\DBAL\Exception
+     */
+    public function getCountryStats($entity, \DateTime $dateFrom = null, \DateTime $dateTo = null, bool $includeVariants = false): array
+    {
+        $emailIds = ($includeVariants && ($entity->isVariant() || $entity->isTranslation())) ? $entity->getRelatedEntityIds() : [$entity->getId()];
+
+        /** @var StatRepository $statRepo */
+        $statRepo      = $this->em->getRepository(Stat::class);
+
+        return $statRepo->getStatsSummaryByCountry($emailIds);
+    }
+
+    /**
      * Get a stats for email by list.
      *
      * @param bool $includeVariants
@@ -752,14 +775,14 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
             ]
         );
 
-        /** @var \Mautic\EmailBundle\Entity\StatRepository $statRepo */
-        $statRepo = $this->em->getRepository(\Mautic\EmailBundle\Entity\Stat::class);
+        /** @var StatRepository $statRepo */
+        $statRepo = $this->em->getRepository(Stat::class);
 
         /** @var \Mautic\LeadBundle\Entity\DoNotContactRepository $dncRepo */
         $dncRepo = $this->em->getRepository(\Mautic\LeadBundle\Entity\DoNotContact::class);
 
-        /** @var \Mautic\PageBundle\Entity\TrackableRepository $trackableRepo */
-        $trackableRepo = $this->em->getRepository(\Mautic\PageBundle\Entity\Trackable::class);
+        /** @var TrackableRepository $trackableRepo */
+        $trackableRepo = $this->em->getRepository(Trackable::class);
         $query         = new ChartQuery($this->em->getConnection(), $dateFrom, $dateTo);
         $key           = ($listCount > 1) ? 1 : 0;
 

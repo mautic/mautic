@@ -1,0 +1,34 @@
+{% set mauticTemplateVars = mauticTemplateVars is defined ? mauticTemplateVars : [] %}
+{% if trackables is not empty %}
+    <div class="table-responsive">
+        <table class="table table-hover table-striped table-bordered click-list">
+            <thead>
+            <tr>
+                <td>{{ 'mautic.lead.lead.thead.country'|trans }}</td>
+                <td>{{ 'mautic.email.graph.line.stats.sent'|trans }}</td>
+                <td>{{ 'mautic.email.graph.line.stats.read'|trans }}</td>
+                <td>{{ 'mautic.email.report.is_hit'|trans }}</td>
+            </tr>
+            </thead>
+            <tbody>
+            {% for item in geoStats %}
+                <tr>
+                    <td class="long-text">
+                        {% set flag = item.country is not empty ? assetGetCountryFlag(item.country) : '' %}
+                        {% if flag is not empty %}
+                            <img src="{{ flag }}" style="max-height: 24px;" class="mr-sm"  alt="{{ item.country }}"/>
+                        {% endif %}
+                        {{ item.country }}
+                    </td>
+                    <td class="text-center">{{ item.sent_count }}</td>
+                    <td class="text-center">{{ item.read_count }}</td>
+                    <td class="text-center">{{ item.clicked_through_count }}</td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+{% else %}
+    {{- include('@MauticCore/Helper/noresults.html.twig', {'header' : 'mautic.trackable.click_counts.header_none', 'message' : 'mautic.trackable.click_counts.none'}) -}}
+    <div class="clearfix"></div>
+{% endif %}

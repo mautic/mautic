@@ -276,6 +276,11 @@
                           </a>
                       </li>
                   {% endif %}
+                  <li>
+                      <a href="#geo-stats-container" role="tab" data-toggle="tab">
+                          {{ 'mautic.email.geographic.stats'|trans }}
+                      </a>
+                  </li>
               </ul>
               <!--/ tabs controls -->
           </div>
@@ -308,6 +313,15 @@
                       {{ translationContent|raw }}
                   </div>
               {% endif %}
+              <!--/ #translation-container -->
+
+              <!-- #geo-stats-container -->
+              <div class="tab-pane bdr-w-0" id="geo-stats-container">
+                  Test
+                  {{- include('@MauticCore/Helper/geotable.html.twig', {
+                      'test'  : 'test',
+                  }) -}}
+              </div>
               <!--/ #translation-container -->
           </div>
       </div>
