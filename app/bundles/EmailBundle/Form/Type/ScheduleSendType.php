@@ -77,7 +77,7 @@ class ScheduleSendType extends AbstractType
                 'html5'       => false,
                 'required'    => false,
                 'constraints' => [
-                    new Callback(function ($value, ExecutionContextInterface $context) {
+                    new Callback(function ($value, ExecutionContextInterface $context): void {
                         $data            = $context->getRoot()->getData() ?? [];
                         $continueSending = $data['continueSending'] ?? false;
                         $publishUp       = $data['publishUp'] ?? null;
@@ -113,7 +113,7 @@ class ScheduleSendType extends AbstractType
             );
         }
 
-        $builder->addEventListener(FormEvents::PRE_SUBMIT, function (FormEvent $event) {
+        $builder->addEventListener(FormEvents::PRE_SUBMIT, function (FormEvent $event): void {
             $form = $event->getForm();
             $data = $event->getData();
 
