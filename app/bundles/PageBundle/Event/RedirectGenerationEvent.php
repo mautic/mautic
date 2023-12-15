@@ -7,20 +7,10 @@ use Mautic\PageBundle\Entity\Redirect;
 
 class RedirectGenerationEvent extends CommonEvent
 {
-    /**
-     * @var array
-     */
-    private $clickthrough;
-
-    /**
-     * @var Redirect
-     */
-    private $redirect;
-
-    public function __construct(Redirect $redirect, array $clickthrough)
-    {
-        $this->redirect     = $redirect;
-        $this->clickthrough = $clickthrough;
+    public function __construct(
+        private Redirect $redirect,
+        private array $clickthrough
+    ) {
     }
 
     /**
@@ -29,7 +19,7 @@ class RedirectGenerationEvent extends CommonEvent
      * @param string $key
      * @param mixed  $value
      */
-    public function setInClickthrough($key, $value)
+    public function setInClickthrough($key, $value): void
     {
         $this->clickthrough[$key] = $value;
     }

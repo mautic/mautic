@@ -10,9 +10,6 @@ use Symfony\Component\Form\FormBuilderInterface;
 
 class CampaignEventLeadStagesType extends AbstractType
 {
-    /**
-     * {@inheritdoc}
-     */
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder->add(
@@ -27,9 +24,6 @@ class CampaignEventLeadStagesType extends AbstractType
         );
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getBlockPrefix()
     {
         return 'campaignevent_lead_stages';

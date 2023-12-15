@@ -8,12 +8,12 @@ use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
-/**
- * Class UserListType.
- */
 class StageListType extends AbstractType
 {
-    private $choices = [];
+    /**
+     * @var Stage[]
+     */
+    private array $choices = [];
 
     public function __construct(StageModel $model)
     {
@@ -38,10 +38,7 @@ class StageListType extends AbstractType
         ksort($this->choices);
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function configureOptions(OptionsResolver $resolver)
+    public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults([
             'choices'           => $this->choices,

@@ -8,7 +8,7 @@ use Symfony\Component\Form\FormBuilderInterface;
 
 class CampaignReplyType extends AbstractType
 {
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder->add(
             'pattern',

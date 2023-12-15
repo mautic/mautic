@@ -16,17 +16,14 @@ class DetermineWinnerSubscriberTest extends \PHPUnit\Framework\TestCase
     /**
      * @var MockObject|SubmissionRepository
      */
-    private $submissionRepository;
+    private \PHPUnit\Framework\MockObject\MockObject $submissionRepository;
 
     /**
      * @var MockObject|TranslatorInterface
      */
-    private $translator;
+    private \PHPUnit\Framework\MockObject\MockObject $translator;
 
-    /**
-     * @var DetermineWinnerSubscriber
-     */
-    private $subscriber;
+    private \Mautic\FormBundle\EventListener\DetermineWinnerSubscriber $subscriber;
 
     protected function setUp(): void
     {
@@ -37,7 +34,7 @@ class DetermineWinnerSubscriberTest extends \PHPUnit\Framework\TestCase
         $this->subscriber           = new DetermineWinnerSubscriber($this->submissionRepository, $this->translator);
     }
 
-    public function testOnDetermineSubmissionWinner()
+    public function testOnDetermineSubmissionWinner(): void
     {
         $parentMock       = $this->createMock(Page::class);
         $childMock        = $this->createMock(Page::class);

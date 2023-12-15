@@ -7,16 +7,11 @@ use Mautic\WebhookBundle\Entity\Event;
 use Mautic\WebhookBundle\Entity\Webhook;
 use Symfony\Component\Form\DataTransformerInterface;
 
-/**
- * Class EventsToArrayTransformer.
- */
 class EventsToArrayTransformer implements DataTransformerInterface
 {
-    private $webhook;
-
-    public function __construct(Webhook $webhook)
-    {
-        $this->webhook = $webhook;
+    public function __construct(
+        private Webhook $webhook
+    ) {
     }
 
     /**
@@ -49,21 +44,17 @@ class EventsToArrayTransformer implements DataTransformerInterface
 
         // Check to see what events have been removed
         $removed = array_diff($eventTypes, $submittedArray);
-        if ($removed) {
-            foreach ($removed as $type) {
-                $this->webhook->removeEvent($events[$type]);
-            }
+        foreach ($removed as $type) {
+            $this->webhook->removeEvent($events[$type]);
         }
 
         // Now check to see what events have been added
         $added = array_diff($submittedArray, $eventTypes);
-        if ($added) {
-            foreach ($added as $type) {
-                // Create a new entity
-                $event = new Event();
-                $event->setWebhook($this->webhook)->setEventType($type);
-                $events[] = $event;
-            }
+        foreach ($added as $type) {
+            // Create a new entity
+            $event = new Event();
+            $event->setWebhook($this->webhook)->setEventType($type);
+            $events[] = $event;
         }
 
         $this->webhook->setEvents($events);

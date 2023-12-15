@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\EmailBundle\Controller;
 
 use Mautic\AssetBundle\Model\AssetModel;
@@ -46,6 +37,7 @@ class EmailController extends FormController
     use BuilderControllerTrait;
     use FormErrorMessagesTrait;
     use EntityContactsTrait;
+
     public const EXAMPLE_EMAIL_SUBJECT_PREFIX = '[TEST]';
 
     /**
@@ -390,12 +382,12 @@ class EmailController extends FormController
                     ]
                 ),
                 'viewParameters' => [
-                    'email'          => $email,
-                    'trackables'     => $trackableLinks,
-                    'logs'           => $logs,
-                    'isEmbedded'     => $request->get('isEmbedded') ? $request->get('isEmbedded') : false,
+                    'email'        => $email,
+                    'trackables'   => $trackableLinks,
+                    'logs'         => $logs,
+                    'isEmbedded'   => $request->get('isEmbedded') ?: false,
                     'publishStatus'  => $model->getPublishStatus($email),
-                    'variants'       => [
+                    'variants'     => [
                         'parent'     => $parent,
                         'children'   => $children,
                         'properties' => $properties,
@@ -948,7 +940,7 @@ class EmailController extends FormController
         $model = $this->getModel('email');
 
         // permission check
-        if (false !== strpos($objectId, 'new')) {
+        if (str_contains($objectId, 'new')) {
             $isNew = true;
             if (!$this->security->isGranted('email:emails:create')) {
                 return $this->accessDenied();
@@ -1466,7 +1458,7 @@ class EmailController extends FormController
                 $fields     = $fieldModel->getFieldList(false, false);
                 array_walk(
                     $fields,
-                    function (&$field) {
+                    function (&$field): void {
                         $field = "[$field]";
                     }
                 );
@@ -1528,7 +1520,7 @@ class EmailController extends FormController
      * @param array $slots
      * @param Email $entity
      */
-    private function processSlots(SlotsHelper $slotsHelper, $slots, $entity)
+    private function processSlots(SlotsHelper $slotsHelper, $slots, $entity): void
     {
         $content     = $entity->getContent();
 
@@ -1540,7 +1532,7 @@ class EmailController extends FormController
                 $slotConfig = [];
             }
 
-            $value = isset($content[$slot]) ? $content[$slot] : '';
+            $value = $content[$slot] ?? '';
             $slotsHelper->set($slot, "<div data-slot=\"text\" id=\"slot-{$slot}\">{$value}</div>");
         }
 

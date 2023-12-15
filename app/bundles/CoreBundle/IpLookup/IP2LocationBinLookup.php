@@ -4,15 +4,9 @@ namespace Mautic\CoreBundle\IpLookup;
 
 use IP2Location\Database;
 
-/**
- * Class IP2LocationBinLookup.
- */
 class IP2LocationBinLookup extends AbstractLocalDataLookup
 {
-    /**
-     * @return string
-     */
-    public function getAttribution()
+    public function getAttribution(): string
     {
         return 'IP2Location Local Bin File DB9BIN only';
     }

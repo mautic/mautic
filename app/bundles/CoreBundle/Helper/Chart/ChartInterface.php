@@ -2,9 +2,6 @@
 
 namespace Mautic\CoreBundle\Helper\Chart;
 
-/**
- * Class ChartInterface.
- */
 interface ChartInterface
 {
     /**

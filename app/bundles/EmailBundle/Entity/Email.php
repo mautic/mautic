@@ -26,9 +26,6 @@ use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
 
-/**
- * Class Email.
- */
 class Email extends FormEntity implements VariantEntityInterface, TranslationEntityInterface
 {
     use VariantEntityTrait;
@@ -232,9 +229,6 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
         parent::__clone();
     }
 
-    /**
-     * Email constructor.
-     */
     public function __construct()
     {
         $this->lists               = new ArrayCollection();
@@ -249,12 +243,12 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
     /**
      * Clear stats.
      */
-    public function clearStats()
+    public function clearStats(): void
     {
         $this->stats = new ArrayCollection();
     }
 
-    public static function loadMetadata(ORM\ClassMetadata $metadata)
+    public static function loadMetadata(ORM\ClassMetadata $metadata): void
     {
         $builder = new ClassMetadataBuilder($metadata);
 
@@ -324,7 +318,7 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
         $builder->addNullableField('publicPreview', Types::BOOLEAN, 'public_preview');
     }
 
-    public static function loadValidatorMetadata(ClassMetadata $metadata)
+    public static function loadValidatorMetadata(ClassMetadata $metadata): void
     {
         $metadata->addPropertyConstraint(
             'name',
@@ -372,7 +366,7 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
         );
 
         $metadata->addConstraint(new Callback([
-            'callback' => function (Email $email, ExecutionContextInterface $context) {
+            'callback' => function (Email $email, ExecutionContextInterface $context): void {
                 $type              = $email->getEmailType();
                 $translationParent = $email->getTranslationParent();
 
@@ -389,12 +383,10 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
                             ),
                         ]
                     );
-                    if (count($violations) > 0) {
-                        foreach ($violations as $violation) {
-                            $context->buildViolation($violation->getMessage())
-                                ->atPath('lists')
-                                ->addViolation();
-                        }
+                    foreach ($violations as $violation) {
+                        $context->buildViolation($violation->getMessage())
+                            ->atPath('lists')
+                            ->addViolation();
                     }
                 }
 
@@ -422,7 +414,7 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
     /**
      * Prepares the metadata for API usage.
      */
-    public static function loadApiMetadata(ApiMetadataDriver $metadata)
+    public static function loadApiMetadata(ApiMetadataDriver $metadata): void
     {
         $metadata->setGroupPrefix('email')
             ->addListProperties(
@@ -523,9 +515,7 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
     }
 
     /**
-     * Get id.
-     *
-     * @return int
+     * @return int|null
      */
     public function getId()
     {
@@ -901,7 +891,7 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
     /**
      * Remove list.
      */
-    public function removeList(LeadList $list)
+    public function removeList(LeadList $list): void
     {
         $this->lists->removeElement($list);
     }
@@ -995,8 +985,6 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
     }
 
     /**
-     * @param Form $unsubscribeForm
-     *
      * @return $this
      */
     public function setUnsubscribeForm(Form $unsubscribeForm = null)
@@ -1015,8 +1003,6 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
     }
 
     /**
-     * @param Page $preferenceCenter
-     *
      * @return $this
      */
     public function setPreferenceCenter(Page $preferenceCenter = null)
@@ -1061,7 +1047,7 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
     /**
      * Remove asset.
      */
-    public function removeAssetAttachment(Asset $asset)
+    public function removeAssetAttachment(Asset $asset): void
     {
         $this->assetAttachments->removeElement($asset);
     }
@@ -1099,7 +1085,7 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
     /**
      * Lifecycle callback to clean URLs in the content.
      */
-    public function cleanUrlsInContent()
+    public function cleanUrlsInContent(): void
     {
         if (is_string($this->plainText)) {
             $this->decodeAmpersands($this->plainText);

@@ -23,43 +23,13 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class ClientType extends AbstractType
 {
-    /**
-     * @var TranslatorInterface
-     */
-    private $translator;
-
-    /**
-     * @var ValidatorInterface
-     */
-    private $validator;
-
-    /**
-     * @var RouterInterface
-     */
-    private $router;
-
-    /**
-     * @var RequestStack
-     */
-    private $requestStack;
-
-    /**
-     * @var SessionInterface
-     */
-    private $session;
-
     public function __construct(
-        RequestStack $requestStack,
-        TranslatorInterface $translator,
-        ValidatorInterface $validator,
-        SessionInterface $session,
-        RouterInterface $router
+        private RequestStack $requestStack,
+        private TranslatorInterface $translator,
+        private ValidatorInterface $validator,
+        private SessionInterface $session,
+        private RouterInterface $router
     ) {
-        $this->translator   = $translator;
-        $this->validator    = $validator;
-        $this->requestStack = $requestStack;
-        $this->session      = $session;
-        $this->router       = $router;
     }
 
     /**
@@ -73,10 +43,7 @@ class ClientType extends AbstractType
         );
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $apiMode = $this->getApiMode();
         $builder->addEventSubscriber(new CleanFormSubscriber([]));
@@ -159,7 +126,7 @@ class ClientType extends AbstractType
 
         $builder->addEventListener(
             FormEvents::POST_SUBMIT,
-            function (FormEvent $event) {
+            function (FormEvent $event): void {
                 $form = $event->getForm();
                 $data = $event->getData();
 
@@ -191,12 +158,9 @@ class ClientType extends AbstractType
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function configureOptions(OptionsResolver $resolver)
+    public function configureOptions(OptionsResolver $resolver): void
     {
-        $dataClass = 'Mautic\ApiBundle\Entity\oAuth2\Client';
+        $dataClass = \Mautic\ApiBundle\Entity\oAuth2\Client::class;
         $resolver->setDefaults(
             [
                 'data_class' => $dataClass,
