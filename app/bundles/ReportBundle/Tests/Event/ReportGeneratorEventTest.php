@@ -17,22 +17,19 @@ class ReportGeneratorEventTest extends \PHPUnit\Framework\TestCase
     /**
      * @var MockObject|Report
      */
-    private $report;
+    private \PHPUnit\Framework\MockObject\MockObject $report;
 
     /**
      * @var MockObject|QueryBuilder
      */
-    private $queryBuilder;
+    private \PHPUnit\Framework\MockObject\MockObject $queryBuilder;
 
     /**
      * @var MockObject|ChannelListHelper
      */
-    private $channelListHelper;
+    private \Mautic\ChannelBundle\Helper\ChannelListHelper $channelListHelper;
 
-    /**
-     * @var ReportGeneratorEvent
-     */
-    private $reportGeneratorEvent;
+    private \Mautic\ReportBundle\Event\ReportGeneratorEvent $reportGeneratorEvent;
 
     protected function setUp(): void
     {

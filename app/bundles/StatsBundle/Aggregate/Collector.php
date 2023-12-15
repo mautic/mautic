@@ -8,22 +8,11 @@ use Mautic\StatsBundle\Event\Options\FetchOptions;
 use Mautic\StatsBundle\StatEvents;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
-/**
- * Class Collector.
- */
 class Collector
 {
-    /**
-     * @var EventDispatcherInterface
-     */
-    private $eventDispatcher;
-
-    /**
-     * Collector constructor.
-     */
-    public function __construct(EventDispatcherInterface $eventDispatcher)
-    {
-        $this->eventDispatcher = $eventDispatcher;
+    public function __construct(
+        private EventDispatcherInterface $eventDispatcher
+    ) {
     }
 
     /**

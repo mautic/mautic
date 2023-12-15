@@ -9,13 +9,10 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 class ReloadCommand extends Command
 {
-    private ReloadFacade $reloadFacade;
-
-    public function __construct(ReloadFacade $reloadFacade)
-    {
+    public function __construct(
+        private ReloadFacade $reloadFacade
+    ) {
         parent::__construct();
-
-        $this->reloadFacade = $reloadFacade;
     }
 
     protected function configure()
@@ -38,5 +35,6 @@ class ReloadCommand extends Command
 
         return \Symfony\Component\Console\Command\Command::SUCCESS;
     }
+
     protected static $defaultDescription = 'Installs, updates, enable and/or disable plugins.';
 }

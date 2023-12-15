@@ -37,7 +37,7 @@ class EmailAddressValidatorTest extends AbstractMauticTestCase
     /**
      * @return iterable<mixed[]>
      */
-    public function provider(): iterable
+    public static function Provider(): iterable
     {
         yield [null, 0];
         yield ['', 0];

@@ -15,12 +15,12 @@ class AdderTest extends \PHPUnit\Framework\TestCase
     /**
      * @var LeadRepository|\PHPUnit\Framework\MockObject\MockObject
      */
-    private $leadRepository;
+    private \PHPUnit\Framework\MockObject\MockObject $leadRepository;
 
     /**
      * @var LeadEventLogRepository|\PHPUnit\Framework\MockObject\MockObject
      */
-    private $leadEventLogRepository;
+    private \PHPUnit\Framework\MockObject\MockObject $leadEventLogRepository;
 
     protected function setUp(): void
     {
@@ -28,7 +28,7 @@ class AdderTest extends \PHPUnit\Framework\TestCase
         $this->leadEventLogRepository = $this->createMock(LeadEventLogRepository::class);
     }
 
-    public function testNewMemberAdded()
+    public function testNewMemberAdded(): void
     {
         $campaign = $this->createMock(Campaign::class);
         $campaign->method('getId')
@@ -55,7 +55,7 @@ class AdderTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals(2, $campaignMember->getRotation());
     }
 
-    public function testManuallyRemovedAddedBackWhenManualActionAddsTheMember()
+    public function testManuallyRemovedAddedBackWhenManualActionAddsTheMember(): void
     {
         $campaignMember = new CampaignMember();
         $campaignMember->setManuallyRemoved(true);
@@ -70,7 +70,7 @@ class AdderTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals(2, $campaignMember->getRotation());
     }
 
-    public function testFilterRemovedAddedBackWhenManualActionAddsTheMember()
+    public function testFilterRemovedAddedBackWhenManualActionAddsTheMember(): void
     {
         $campaignMember = new CampaignMember();
         $campaignMember->setManuallyRemoved(true);
@@ -86,7 +86,7 @@ class AdderTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals(2, $campaignMember->getRotation());
     }
 
-    public function testManuallyRemovedIsNotAddedBackWhenFilterActionAddsTheMember()
+    public function testManuallyRemovedIsNotAddedBackWhenFilterActionAddsTheMember(): void
     {
         $this->expectException(ContactCannotBeAddedToCampaignException::class);
 

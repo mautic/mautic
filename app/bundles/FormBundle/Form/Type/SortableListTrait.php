@@ -12,7 +12,7 @@ use Symfony\Component\Validator\Context\ExecutionContextInterface;
 
 trait SortableListTrait
 {
-    public function addSortableList(FormBuilderInterface $builder, $options, $listName = 'list', $listData = null, $formName = 'formfield')
+    public function addSortableList(FormBuilderInterface $builder, $options, $listName = 'list', $listData = null, $formName = 'formfield'): void
     {
         $listOptions = [
             'with_labels' => true,
@@ -21,7 +21,7 @@ trait SortableListTrait
             ],
             'option_required'     => false,
             'constraint_callback' => new Callback(
-                function ($validateMe, ExecutionContextInterface $context) use ($listName) {
+                function ($validateMe, ExecutionContextInterface $context) use ($listName): void {
                     $data = $context->getRoot()->getData();
                     if ((empty($data['properties']['syncList']) || empty($data['mappedField'])) && !count($data['properties'][$listName]['list'])) {
                         $context->buildViolation('mautic.form.lists.count')->addViolation();
@@ -47,7 +47,7 @@ trait SortableListTrait
             ]
         );
 
-        $builder->addEventListener(FormEvents::PRE_SUBMIT, function (FormEvent $event) {
+        $builder->addEventListener(FormEvents::PRE_SUBMIT, function (FormEvent $event): void {
             $formData = $event->getForm()->getParent()->getData();
             $form     = $event->getForm();
             if (empty($formData['mappedField'])) {

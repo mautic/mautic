@@ -9,7 +9,7 @@ use Symfony\Component\Form\FormBuilderInterface;
 
 class BatchLookupType extends AbstractType
 {
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder->add('ids', \Symfony\Component\Form\Extension\Core\Type\HiddenType::class);
 

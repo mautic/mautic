@@ -22,10 +22,8 @@ class GroupController extends AbstractStandardFormController
 
     /**
      * @param int $page
-     *
-     * @return JsonResponse|RedirectResponse|Response
      */
-    public function indexAction(Request $request, $page = 1)
+    public function indexAction(Request $request, $page = 1): Response
     {
         return parent::indexStandard($request, $page);
     }

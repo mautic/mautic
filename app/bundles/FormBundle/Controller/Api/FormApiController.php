@@ -33,7 +33,7 @@ class FormApiController extends CommonApiController
     /**
      * @var FormModel|null
      */
-    protected $model = null;
+    protected $model;
 
     public function __construct(
         CorePermissions $security,
@@ -126,9 +126,6 @@ class FormApiController extends CommonApiController
         return $this->handleView($view);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function preSaveEntity(&$entity, $form, $parameters, $action = 'edit')
     {
         $fieldModel = $this->getModel('form.field');

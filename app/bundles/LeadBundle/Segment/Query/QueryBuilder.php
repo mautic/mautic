@@ -9,24 +9,16 @@ use Mautic\LeadBundle\Segment\Query\Expression\ExpressionBuilder;
 
 class QueryBuilder extends BaseQueryBuilder
 {
-    /**
-     * @var ExpressionBuilder
-     */
-    private $_expr;
+    private ?\Mautic\LeadBundle\Segment\Query\Expression\ExpressionBuilder $_expr = null;
 
     /**
      * Unprocessed logic for segment processing.
-     *
-     * @var array
      */
-    private $logicStack = [];
+    private array $logicStack = [];
 
-    private Connection $connection;
-
-    public function __construct(Connection $connection)
-    {
-        $this->connection = $connection;
-
+    public function __construct(
+        private Connection $connection
+    ) {
         parent::__construct($connection);
     }
 
@@ -52,7 +44,7 @@ class QueryBuilder extends BaseQueryBuilder
             return $this->_expr;
         }
 
-        $this->_expr = new ExpressionBuilder($this->getConnection());
+        $this->_expr = new ExpressionBuilder($this->connection);
 
         return $this->_expr;
     }
@@ -174,17 +166,14 @@ class QueryBuilder extends BaseQueryBuilder
     }
 
     /**
-     * @param string $table
-     * @param null   $joinType allowed values: inner, left, right
-     *
      * @return array|bool|string
      */
-    public function getTableAlias($table, $joinType = null)
+    public function getTableAlias(string $table, $joinType = null)
     {
         if (is_null($joinType)) {
             $tables = $this->getTableAliases();
 
-            return isset($tables[$table]) ? $tables[$table] : false;
+            return $tables[$table] ?? false;
         }
 
         $tableJoins = $this->getTableJoins($table);
@@ -198,7 +187,10 @@ class QueryBuilder extends BaseQueryBuilder
         return false;
     }
 
-    public function getTableJoins($tableName)
+    /**
+     * @return mixed[]
+     */
+    public function getTableJoins(string $tableName): array
     {
         $found = [];
         foreach ($this->getQueryParts()['join'] as $join) {
@@ -267,10 +259,7 @@ class QueryBuilder extends BaseQueryBuilder
         return $tables;
     }
 
-    /**
-     * @return bool
-     */
-    public function isJoinTable($table)
+    public function isJoinTable($table): bool
     {
         $queryParts = $this->getQueryParts();
 
@@ -309,10 +298,7 @@ class QueryBuilder extends BaseQueryBuilder
         return $sql;
     }
 
-    /**
-     * @return bool
-     */
-    public function hasLogicStack()
+    public function hasLogicStack(): bool
     {
         return count($this->logicStack) > 0;
     }
@@ -325,10 +311,7 @@ class QueryBuilder extends BaseQueryBuilder
         return $this->logicStack;
     }
 
-    /**
-     * @return array
-     */
-    public function popLogicStack()
+    public function popLogicStack(): array
     {
         $stack            = $this->logicStack;
         $this->logicStack = [];
@@ -350,7 +333,7 @@ class QueryBuilder extends BaseQueryBuilder
      * This function assembles correct logic for segment processing, this is to replace andWhere and orWhere (virtualy
      *  as they need to be kept). You may not use andWhere in filters!!!
      */
-    public function addLogic($expression, $glue)
+    public function addLogic($expression, $glue): void
     {
         // little setup
         $glue = strtolower($glue);

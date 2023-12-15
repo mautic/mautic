@@ -10,17 +10,14 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class PointSubscriber implements EventSubscriberInterface
 {
-    /**
-     * {@inheritdoc}
-     */
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             PointEvents::TRIGGER_ON_BUILD => ['onTriggerBuild', 0],
         ];
     }
 
-    public function onTriggerBuild(TriggerBuilderEvent $event)
+    public function onTriggerBuild(TriggerBuilderEvent $event): void
     {
         $action = [
             'group'     => 'mautic.plugin.point.action',

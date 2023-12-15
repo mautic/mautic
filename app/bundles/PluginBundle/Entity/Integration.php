@@ -6,9 +6,6 @@ use Doctrine\ORM\Mapping as ORM;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\CoreBundle\Entity\CommonEntity;
 
-/**
- * Class Integration.
- */
 class Integration extends CommonEntity
 {
     /**
@@ -46,12 +43,12 @@ class Integration extends CommonEntity
      */
     private $featureSettings = [];
 
-    public static function loadMetadata(ORM\ClassMetadata $metadata)
+    public static function loadMetadata(ORM\ClassMetadata $metadata): void
     {
         $builder = new ClassMetadataBuilder($metadata);
 
         $builder->setTable('plugin_integration_settings')
-            ->setCustomRepositoryClass('Mautic\PluginBundle\Entity\IntegrationRepository');
+            ->setCustomRepositoryClass(\Mautic\PluginBundle\Entity\IntegrationRepository::class);
 
         $builder->createField('id', 'integer')
             ->makePrimaryKey()

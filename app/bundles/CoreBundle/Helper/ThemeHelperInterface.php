@@ -18,10 +18,8 @@ interface ThemeHelperInterface
 
     /**
      * @param string $defaultTheme
-     *
-     * @return void
      */
-    public function setDefaultTheme($defaultTheme);
+    public function setDefaultTheme($defaultTheme): void;
 
     /**
      * @param string $themeName
@@ -45,32 +43,26 @@ interface ThemeHelperInterface
      * @param string      $newName
      * @param string|null $newDirName if not set then it will be generated from the $newName param
      *
-     * @return void
-     *
      * @throws FileExistsException
      * @throws FileNotFoundException
      */
-    public function copy($theme, $newName, $newDirName = null);
+    public function copy($theme, $newName, $newDirName = null): void;
 
     /**
      * @param string $theme
      * @param string $newName
      *
-     * @return void
-     *
      * @throws FileNotFoundException
      * @throws FileExistsException
      */
-    public function rename($theme, $newName);
+    public function rename($theme, $newName): void;
 
     /**
      * @param string $theme
      *
-     * @return void
-     *
      * @throws FileNotFoundException
      */
-    public function delete($theme);
+    public function delete($theme): void;
 
     /**
      * Fetches the optional settings from the defined steps.
@@ -122,11 +114,11 @@ interface ThemeHelperInterface
     /**
      * Get the error message from the zip archive.
      *
-     * @param \ZipArchive $archive
+     * @param \ZipArchive::ER_* $archive
      *
      * @return string
      */
-    public function getExtractError($archive);
+    public function getExtractError(int $archive);
 
     /**
      * Creates a zip file from a theme and returns the path where it's stored.

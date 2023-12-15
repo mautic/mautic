@@ -22,7 +22,7 @@ class DoNotContactPartsTest extends \PHPUnit\Framework\TestCase
     /**
      * @return iterable<array<string,string|int>>
      */
-    public function dataProvider(): iterable
+    public static function dataProvider(): iterable
     {
         yield [
             'field'   => 'dnc_bounced',
