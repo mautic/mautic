@@ -45,7 +45,7 @@ class ClickthroughHelper
             if ((false !== $data || 'b:0;' === $string) && $unserialized = Serializer::decode($decoded)) {
                 return $this->shortKeyConverter->unpack($unserialized);
             }
-        } catch (\Exception $exception) {
+        } catch (\Exception) {
         }
 
         if ($this->isIgBinaryEnabled()) {
@@ -53,7 +53,7 @@ class ClickthroughHelper
                 if ($unserialized = igbinary_unserialize($decoded)) {
                     return $this->shortKeyConverter->unpack($unserialized);
                 }
-            } catch (\Exception $e) {
+            } catch (\Exception) {
             }
         }
 
