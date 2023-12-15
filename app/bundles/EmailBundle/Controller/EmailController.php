@@ -382,12 +382,12 @@ class EmailController extends FormController
                     ]
                 ),
                 'viewParameters' => [
-                    'email'        => $email,
-                    'trackables'   => $trackableLinks,
-                    'logs'         => $logs,
-                    'isEmbedded'   => $request->get('isEmbedded') ?: false,
+                    'email'          => $email,
+                    'trackables'     => $trackableLinks,
+                    'logs'           => $logs,
+                    'isEmbedded'     => $request->get('isEmbedded') ?: false,
                     'publishStatus'  => $model->getPublishStatus($email),
-                    'variants'     => [
+                    'variants'       => [
                         'parent'     => $parent,
                         'children'   => $children,
                         'properties' => $properties,
