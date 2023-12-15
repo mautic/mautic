@@ -6,7 +6,7 @@ use Doctrine\DBAL\Schema\Schema;
 use Doctrine\Migrations\Exception\SkipMigration;
 use Mautic\CoreBundle\Doctrine\AbstractMauticMigration;
 
-class Version20200505235400 extends AbstractMauticMigration
+class Version20231207235400 extends AbstractMauticMigration
 {
     public function up(Schema $schema): void
     {
@@ -15,7 +15,7 @@ class Version20200505235400 extends AbstractMauticMigration
             throw new SkipMigration('Schema includes this migration');
         }
 
-        $this->addSql('ALTER TABLE '.$this->prefix.'forms ADD lang VARCHAR(255)  DEFAULT NULL');
+        $this->addSql('ALTER TABLE '.$this->prefix.'forms ADD lang VARCHAR(191)  DEFAULT NULL');
     }
 
     public function down(Schema $schema): void
