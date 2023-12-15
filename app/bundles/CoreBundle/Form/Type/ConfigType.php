@@ -30,8 +30,6 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class ConfigType extends AbstractType
 {
-    private array $supportedLanguages;
-
     public function __construct(
         private TranslatorInterface $translator,
         private LanguageHelper $langHelper,
@@ -40,7 +38,6 @@ class ConfigType extends AbstractType
         private Shortener $shortenerFactory,
         private CoreParametersHelper $coreParametersHelper,
     ) {
-        $this->supportedLanguages  = $langHelper->getSupportedLanguages();
     }
 
     public function buildForm(FormBuilderInterface $builder, array $options): void
