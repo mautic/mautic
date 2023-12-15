@@ -424,7 +424,7 @@ class EmailController extends FormController
                             'ignoreAjax' => true,
                         ]
                     )->getContent(),
-                    'dateRangeForm'  => $dateRangeForm->createView(),
+                    'dateRangeForm' => $dateRangeForm->createView(),
                 ],
                 'contentTemplate' => '@MauticEmail/Email/details.html.twig',
                 'passthroughVars' => [
