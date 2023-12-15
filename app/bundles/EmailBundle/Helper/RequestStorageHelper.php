@@ -18,21 +18,17 @@ class RequestStorageHelper
      */
     public const KEY_SEPARATOR = ';webhook_request;';
 
-    private CacheProviderInterface $cacheStorage;
-
-    public function __construct(CacheProviderInterface $cacheStorage)
-    {
-        $this->cacheStorage = $cacheStorage;
+    public function __construct(
+        private CacheProviderInterface $cacheStorage
+    ) {
     }
 
     /**
      * Stores the request content into cache and returns the unique key under which it's stored.
      *
      * @param string $transportName
-     *
-     * @return string
      */
-    public function storeRequest($transportName, Request $request)
+    public function storeRequest($transportName, Request $request): string
     {
         $key  = $this->getUniqueCacheHash($transportName);
         $item = $this->cacheStorage->getItem($key);
@@ -47,18 +43,16 @@ class RequestStorageHelper
      *
      * @param string $key
      *
-     * @return Request
-     *
      * @throws \UnexpectedValueException
      */
-    public function getRequest($key)
+    public function getRequest($key): Request
     {
         $error = "Request with key '{$key}' was not found.";
         $key   = $this->removeCachePrefix($key);
 
         try {
             $item = $this->cacheStorage->getItem($key);
-        } catch (InvalidArgumentException $e) {
+        } catch (InvalidArgumentException) {
             throw new \UnexpectedValueException($error);
         }
 
@@ -71,10 +65,8 @@ class RequestStorageHelper
 
     /**
      * @param string $key
-     *
-     * @return void
      */
-    public function deleteCachedRequest($key)
+    public function deleteCachedRequest($key): void
     {
         $this->cacheStorage->deleteItem($this->removeCachePrefix($key));
     }
@@ -91,7 +83,7 @@ class RequestStorageHelper
         $key = $this->removeCachePrefix($key);
 
         // Take the part before the key separator as the serialized transpot name.
-        list($serializedTransportName) = explode(self::KEY_SEPARATOR, $key);
+        [$serializedTransportName] = explode(self::KEY_SEPARATOR, $key);
 
         // Unserialize transport name to the standard full class name.
         $transportName = str_replace('|', '\\', $serializedTransportName);
@@ -104,7 +96,7 @@ class RequestStorageHelper
      */
     private function removeCachePrefix(string $key): string
     {
-        if (0 === strpos($key, 'mautic:')) {
+        if (str_starts_with($key, 'mautic:')) {
             $key = ltrim($key, 'mautic:');
         }
 

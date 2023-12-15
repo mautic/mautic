@@ -21,12 +21,12 @@ class LeadListRepositoryTest extends TestCase
     /**
      * @var QueryBuilder&MockObject
      */
-    private $queryBuilderMock;
+    private \PHPUnit\Framework\MockObject\MockObject $queryBuilderMock;
 
     /**
      * @var Expr&MockObject
      */
-    private $expressionMock;
+    private \PHPUnit\Framework\MockObject\MockObject $expressionMock;
 
     protected function setUp(): void
     {

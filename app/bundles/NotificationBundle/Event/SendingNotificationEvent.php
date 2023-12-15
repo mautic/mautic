@@ -6,28 +6,18 @@ use Mautic\CoreBundle\Event\CommonEvent;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\NotificationBundle\Entity\Notification;
 
-/**
- * Class SendingNotificationEvent.
- */
 class SendingNotificationEvent extends CommonEvent
 {
-    /**
-     * @var Lead
-     */
-    protected $lead;
-
     /**
      * @var Notification
      */
     protected $entity;
 
-    /**
-     * SendingNotificationEvent constructor.
-     */
-    public function __construct(Notification $notification, Lead $lead)
-    {
+    public function __construct(
+        Notification $notification,
+        protected Lead $lead
+    ) {
         $this->entity = $notification;
-        $this->lead   = $lead;
     }
 
     /**

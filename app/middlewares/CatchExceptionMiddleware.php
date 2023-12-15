@@ -16,17 +16,11 @@ class CatchExceptionMiddleware implements HttpKernelInterface, PrioritizedMiddle
      */
     protected $app;
 
-    /**
-     * CatchExceptionMiddleware constructor.
-     */
     public function __construct(HttpKernelInterface $app)
     {
         $this->app = $app;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function handle(Request $request, $type = self::MASTER_REQUEST, $catch = true)
     {
         $content = 'The site is currently offline due to encountering an error. If the problem persists, please contact the system administrator. System administrators, check server logs for errors.';
@@ -43,9 +37,6 @@ class CatchExceptionMiddleware implements HttpKernelInterface, PrioritizedMiddle
         return new Response($content, 500);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getPriority()
     {
         return self::PRIORITY;

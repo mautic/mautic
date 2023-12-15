@@ -128,7 +128,7 @@ class LeadEventLogRepository extends CommonRepository
      * @param int $fromLeadId
      * @param int $toLeadId
      */
-    public function updateLead($fromLeadId, $toLeadId)
+    public function updateLead($fromLeadId, $toLeadId): void
     {
         $q = $this->_em->getConnection()->createQueryBuilder();
         $q->update(MAUTIC_TABLE_PREFIX.'lead_event_log')
@@ -139,10 +139,8 @@ class LeadEventLogRepository extends CommonRepository
 
     /**
      * Defines default table alias for lead_event_log table.
-     *
-     * @return string
      */
-    public function getTableAlias()
+    public function getTableAlias(): string
     {
         return 'lel';
     }

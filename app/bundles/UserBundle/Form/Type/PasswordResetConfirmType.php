@@ -3,6 +3,7 @@
 namespace Mautic\UserBundle\Form\Type;
 
 use Mautic\CoreBundle\Form\EventListener\CleanFormSubscriber;
+use Mautic\UserBundle\Form\Validator\Constraints\NotWeak;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\PasswordType;
 use Symfony\Component\Form\Extension\Core\Type\RepeatedType;
@@ -13,10 +14,7 @@ use Symfony\Component\Validator\Constraints as Assert;
 
 class PasswordResetConfirmType extends AbstractType
 {
-    /**
-     * {@inheritdoc}
-     */
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder->addEventSubscriber(new CleanFormSubscriber([]));
 
@@ -61,6 +59,9 @@ class PasswordResetConfirmType extends AbstractType
                             'min'        => 6,
                             'minMessage' => 'mautic.user.user.password.minlength',
                         ]),
+                        new NotWeak([
+                            'message' => 'mautic.user.user.password.weak',
+                        ]),
                     ],
                 ],
                 'second_name'    => 'confirm',
@@ -103,9 +104,6 @@ class PasswordResetConfirmType extends AbstractType
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getBlockPrefix()
     {
         return 'passwordresetconfirm';

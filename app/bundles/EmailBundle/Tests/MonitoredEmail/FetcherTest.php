@@ -54,16 +54,14 @@ class FetcherTest extends \PHPUnit\Framework\TestCase
      * @covers  \Mautic\EmailBundle\MonitoredEmail\Fetcher::getMessages()
      * @covers  \Mautic\EmailBundle\MonitoredEmail\Fetcher::getConfigs()
      */
-    public function testMessagesAreFetchedAndEventDispatched()
+    public function testMessagesAreFetchedAndEventDispatched(): void
     {
         $mailbox = $this->getMockBuilder(Mailbox::class)
             ->disableOriginalConstructor()
             ->getMock();
         $mailbox->method('getMailboxSettings')
             ->willReturnCallback(
-                function ($mailbox) {
-                    return $this->mailboxes[$mailbox];
-                }
+                fn ($mailbox) => $this->mailboxes[$mailbox]
             );
         $mailbox->method('searchMailBox')
             ->willReturn([1]);

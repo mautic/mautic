@@ -17,7 +17,7 @@ class DsnParserTest extends \PHPUnit\Framework\TestCase
      * @covers  \Mautic\EmailBundle\MonitoredEmail\Processor\Bounce\DsnParser::getBounce()
      * @covers  \Mautic\EmailBundle\MonitoredEmail\Processor\Bounce\DsnParser::parse()
      */
-    public function testBouncedEmailIsReturnedFromParsedDsnReport()
+    public function testBouncedEmailIsReturnedFromParsedDsnReport(): void
     {
         $message            = new Message();
         $message->dsnReport = <<<'DSN'
@@ -43,7 +43,7 @@ DSN;
      * @covers  \Mautic\EmailBundle\MonitoredEmail\Processor\Bounce\DsnParser::getBounce()
      * @covers  \Mautic\EmailBundle\MonitoredEmail\Processor\Bounce\DsnParser::parse()
      */
-    public function testPostfixBouncedEmailIsReturnedFromParsedDsnReport()
+    public function testPostfixBouncedEmailIsReturnedFromParsedDsnReport(): void
     {
         $message            = new Message();
         $message->dsnReport = <<<'DSN'
@@ -71,7 +71,7 @@ DSN;
      *
      * @covers  \Mautic\EmailBundle\MonitoredEmail\Processor\Bounce\DsnParser::getBounce()
      */
-    public function testBounceNotFoundFromBadDsnReport()
+    public function testBounceNotFoundFromBadDsnReport(): void
     {
         $this->expectException(BounceNotFound::class);
 

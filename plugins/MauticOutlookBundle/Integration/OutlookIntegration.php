@@ -7,17 +7,15 @@ use Mautic\PluginBundle\Integration\AbstractIntegration;
 
 class OutlookIntegration extends AbstractIntegration
 {
-    public function getName()
+    public function getName(): string
     {
         return 'Outlook';
     }
 
     /**
      * Return's authentication method such as oauth2, oauth1a, key, etc.
-     *
-     * @return string
      */
-    public function getAuthenticationType()
+    public function getAuthenticationType(): string
     {
         // Just use none for now and I'll build in "basic" later
         return 'none';
@@ -26,10 +24,8 @@ class OutlookIntegration extends AbstractIntegration
     /**
      * Return array of key => label elements that will be converted to inputs to
      * obtain from the user.
-     *
-     * @return array
      */
-    public function getRequiredKeyFields()
+    public function getRequiredKeyFields(): array
     {
         return [
             'secret' => 'mautic.integration.outlook.secret',
@@ -37,8 +33,6 @@ class OutlookIntegration extends AbstractIntegration
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @return array<mixed>
      */
     public function getFormNotes($section)

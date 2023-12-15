@@ -2,6 +2,7 @@
 
 namespace Mautic\LeadBundle\Command;
 
+use Mautic\CoreBundle\ProcessSignal\ProcessSignalService;
 use Mautic\LeadBundle\Exception\ImportDelayedException;
 use Mautic\LeadBundle\Exception\ImportFailedException;
 use Mautic\LeadBundle\Helper\Progress;
@@ -18,15 +19,13 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 class ImportCommand extends Command
 {
     public const COMMAND_NAME = 'mautic:import';
-    private TranslatorInterface $translator;
-    private ImportModel $importModel;
 
-    public function __construct(TranslatorInterface $translator, ImportModel $importModel)
-    {
+    public function __construct(
+        private TranslatorInterface $translator,
+        private ImportModel $importModel,
+        private ProcessSignalService $processSignalService
+    ) {
         parent::__construct();
-
-        $this->translator  = $translator;
-        $this->importModel = $importModel;
     }
 
     protected function configure()
@@ -49,6 +48,8 @@ EOT
         $progress = new Progress($output);
         $id       = (int) $input->getOption('id');
         $limit    = (int) $input->getOption('limit');
+
+        $this->processSignalService->registerSignalHandler(fn (int $signal) => $output->writeln(sprintf('Signal %d caught.', $signal)));
 
         if ($id) {
             $import = $this->importModel->getEntity($id);
@@ -78,7 +79,7 @@ EOT
 
         try {
             $this->importModel->beginImport($import, $progress, $limit);
-        } catch (ImportFailedException $e) {
+        } catch (ImportFailedException) {
             $output->writeln('<error>'.$this->translator->trans(
                 'mautic.lead.import.failed',
                 [
@@ -87,7 +88,7 @@ EOT
             ).'</error>');
 
             return \Symfony\Component\Console\Command\Command::FAILURE;
-        } catch (ImportDelayedException $e) {
+        } catch (ImportDelayedException) {
             $output->writeln('<info>'.$this->translator->trans(
                 'mautic.lead.import.delayed',
                 [
@@ -112,5 +113,6 @@ EOT
 
         return \Symfony\Component\Console\Command\Command::SUCCESS;
     }
+
     protected static $defaultDescription = 'Imports data to Mautic';
 }

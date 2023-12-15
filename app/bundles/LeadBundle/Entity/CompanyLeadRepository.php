@@ -12,7 +12,7 @@ class CompanyLeadRepository extends CommonRepository
     /**
      * @param CompanyLead[] $entities
      */
-    public function saveEntities($entities, $new = true)
+    public function saveEntities($entities, $new = true): void
     {
         // Get a list of contacts and set primary to 0
         if ($new) {
@@ -40,15 +40,13 @@ class CompanyLeadRepository extends CommonRepository
             }
         }
 
-        return parent::saveEntities($entities);
+        parent::saveEntities($entities);
     }
 
     /**
      * Get companies by leadId.
-     *
-     * @return array
      */
-    public function getCompaniesByLeadId($leadId, $companyId = null)
+    public function getCompaniesByLeadId($leadId, $companyId = null): array
     {
         $q = $this->_em->getConnection()->createQueryBuilder();
 
@@ -67,10 +65,7 @@ class CompanyLeadRepository extends CommonRepository
         return $q->executeQuery()->fetchAllAssociative();
     }
 
-    /**
-     * @return array
-     */
-    public function getCompanyLeads($companyId)
+    public function getCompanyLeads($companyId): array
     {
         $q = $this->_em->getConnection()->createQueryBuilder();
         $q->select('cl.lead_id')
@@ -101,7 +96,10 @@ class CompanyLeadRepository extends CommonRepository
         return !empty($result) ? $result[0] : [];
     }
 
-    public function getCompanyLeadEntity($leadId, $companyId)
+    /**
+     * @return mixed[]
+     */
+    public function getCompanyLeadEntity($leadId, $companyId): array
     {
         $qb = $this->getEntityManager()->getConnection()->createQueryBuilder();
         $qb->select('cl.is_primary, cl.lead_id, cl.company_id')
@@ -133,7 +131,7 @@ class CompanyLeadRepository extends CommonRepository
     /**
      * Updates leads company name If company name changed and company is primary.
      */
-    public function updateLeadsPrimaryCompanyName(Company $company)
+    public function updateLeadsPrimaryCompanyName(Company $company): void
     {
         if ($company->isNew() || empty($company->getChanges()['fields']['companyname'])) {
             return;

@@ -8,36 +8,12 @@ use Symfony\Component\HttpFoundation\Session\SessionInterface;
 
 final class PageHelper implements PageHelperInterface
 {
-    /**
-     * @var SessionInterface
-     */
-    private $session;
-
-    /**
-     * @var CoreParametersHelper
-     */
-    private $coreParametersHelper;
-
-    /**
-     * @var string
-     */
-    private $sessionPrefix;
-
-    /**
-     * @var int
-     */
-    private $page;
-
     public function __construct(
-        SessionInterface $session,
-        CoreParametersHelper $coreParametersHelper,
-        string $sessionPrefix,
-        int $page
+        private SessionInterface $session,
+        private CoreParametersHelper $coreParametersHelper,
+        private string $sessionPrefix,
+        private int $page
     ) {
-        $this->session              = $session;
-        $this->coreParametersHelper = $coreParametersHelper;
-        $this->sessionPrefix        = $sessionPrefix;
-        $this->page                 = $page;
     }
 
     public function getLimit(): int

@@ -17,7 +17,7 @@ class ClickthroughHelperTest extends \PHPUnit\Framework\TestCase
         $this->clickthroughHelper = new ClickthroughHelper($shortKeyConverter);
     }
 
-    public function testEncodingCanBeDecoded()
+    public function testEncodingCanBeDecoded(): void
     {
         $array = ['foo' => 'bar'];
 
@@ -27,7 +27,7 @@ class ClickthroughHelperTest extends \PHPUnit\Framework\TestCase
     /**
      * @covers \Mautic\CoreBundle\Helper\Serializer::decode
      */
-    public function testObjectInArrayIsDetectedOrIgnored()
+    public function testObjectInArrayIsDetectedOrIgnored(): void
     {
         $this->expectException(\InvalidArgumentException::class);
 
@@ -36,14 +36,14 @@ class ClickthroughHelperTest extends \PHPUnit\Framework\TestCase
         $this->clickthroughHelper->decode(ClickthroughHelper::encodeArrayForUrl($array));
     }
 
-    public function testOnlyArraysCanBeDecodedToPreventObjectWakeupVulnerability()
+    public function testOnlyArraysCanBeDecodedToPreventObjectWakeupVulnerability(): void
     {
         $this->expectException(\InvalidArgumentException::class);
 
         $this->clickthroughHelper->decode(urlencode(base64_encode(serialize(new \stdClass()))));
     }
 
-    public function testEmptyStringDoesNotThrowException()
+    public function testEmptyStringDoesNotThrowException(): void
     {
         $array = [];
 

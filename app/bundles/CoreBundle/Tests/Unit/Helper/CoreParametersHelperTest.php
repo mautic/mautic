@@ -15,20 +15,18 @@ class CoreParametersHelperTest extends TestCase
     /**
      * @var MockObject|ContainerInterface
      */
-    private $container;
+    private \PHPUnit\Framework\MockObject\MockObject $container;
 
     protected function setUp(): void
     {
         $this->container = $this->createMock(ContainerInterface::class);
     }
 
-    public function testAllReturnsResolvedParameters()
+    public function testAllReturnsResolvedParameters(): void
     {
         $this->container->method('hasParameter')
             ->willReturnCallback(
-                function (string $key) {
-                    return 'mautic.cache_path' === $key;
-                }
+                fn (string $key) => 'mautic.cache_path' === $key
             );
 
         $this->container->expects($this->once())

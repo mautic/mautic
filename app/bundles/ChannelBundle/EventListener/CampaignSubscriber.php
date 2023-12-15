@@ -24,19 +24,9 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class CampaignSubscriber implements EventSubscriberInterface
 {
-    private MessageModel $messageModel;
+    private ?Event $pseudoEvent = null;
 
-    private ActionDispatcher $actionDispatcher;
-
-    private EventCollector $eventCollector;
-
-    private LoggerInterface $logger;
-
-    private TranslatorInterface $translator;
-
-    private ?Event $pseudoEvent;
-
-    private ?ArrayCollection $mmLogs;
+    private ?ArrayCollection $mmLogs = null;
 
     /**
      * @var mixed[]
@@ -44,23 +34,15 @@ class CampaignSubscriber implements EventSubscriberInterface
     private array $messageChannels = [];
 
     public function __construct(
-        MessageModel $messageModel,
-        ActionDispatcher $actionDispatcher,
-        EventCollector $collector,
-        LoggerInterface $logger,
-        TranslatorInterface $translator
+        private MessageModel $messageModel,
+        private ActionDispatcher $actionDispatcher,
+        private EventCollector $eventCollector,
+        private LoggerInterface $logger,
+        private TranslatorInterface $translator
     ) {
-        $this->messageModel     = $messageModel;
-        $this->actionDispatcher = $actionDispatcher;
-        $this->eventCollector   = $collector;
-        $this->logger           = $logger;
-        $this->translator       = $translator;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             CampaignEvents::CAMPAIGN_ON_BUILD       => ['onCampaignBuild', 0],
@@ -103,7 +85,7 @@ class CampaignSubscriber implements EventSubscriberInterface
      * @throws \Mautic\CampaignBundle\Executioner\Dispatcher\Exception\LogPassedAndFailedException
      * @throws \ReflectionException
      */
-    public function onCampaignTriggerAction(PendingEvent $pendingEvent)
+    public function onCampaignTriggerAction(PendingEvent $pendingEvent): void
     {
         $this->pseudoEvent = clone $pendingEvent->getEvent();
         $this->pseudoEvent->setCampaign($pendingEvent->getEvent()->getCampaign());
@@ -234,7 +216,7 @@ class CampaignSubscriber implements EventSubscriberInterface
                 if ($metadata = $channelLog->getMetadata()) {
                     $log->appendToMetadata([$channel => $metadata]);
                 }
-            } catch (NoContactsFoundException $exception) {
+            } catch (NoContactsFoundException) {
                 continue;
             }
         }

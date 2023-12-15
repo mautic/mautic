@@ -15,12 +15,9 @@ class ShortenerTest extends TestCase
     /**
      * @var CoreParametersHelper|MockObject
      */
-    private $coreParametersHelper;
+    private \PHPUnit\Framework\MockObject\MockObject $coreParametersHelper;
 
-    /**
-     * @var Shortener
-     */
-    private $shortener;
+    private \Mautic\CoreBundle\Shortener\Shortener $shortener;
 
     protected function setUp(): void
     {
@@ -38,7 +35,7 @@ class ShortenerTest extends TestCase
 
         $this->shortener->addService($service);
 
-        $this->assertSame([get_class($service) => $service], $this->shortener->getServices());
+        $this->assertSame([$service::class => $service], $this->shortener->getServices());
     }
 
     public function testGetService(): void
@@ -49,7 +46,7 @@ class ShortenerTest extends TestCase
         $this->coreParametersHelper
             ->expects($this->once())
             ->method('get')
-            ->willReturn(get_class($service));
+            ->willReturn($service::class);
 
         $this->shortener->addService($service);
 
@@ -79,7 +76,7 @@ class ShortenerTest extends TestCase
         $this->coreParametersHelper
             ->expects($this->once())
             ->method('get')
-            ->willReturn(get_class($service));
+            ->willReturn($service::class);
 
         $this->shortener->addService($service);
 
@@ -125,6 +122,6 @@ class ShortenerTest extends TestCase
         $this->shortener->addService($enabledService);
         $this->shortener->addService($disabledService);
 
-        $this->assertSame([get_class($enabledService) => $enabledService], $this->shortener->getEnabledServices());
+        $this->assertSame([$enabledService::class => $enabledService], $this->shortener->getEnabledServices());
     }
 }

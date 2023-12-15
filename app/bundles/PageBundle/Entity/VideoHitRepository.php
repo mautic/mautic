@@ -80,10 +80,8 @@ class VideoHitRepository extends CommonRepository
      * Count stats from hit times.
      *
      * @param array $times
-     *
-     * @return array
      */
-    public function countStats($times)
+    public function countStats($times): array
     {
         return [
             'sum'     => array_sum($times),
@@ -101,12 +99,10 @@ class VideoHitRepository extends CommonRepository
      * @param int                               $limit
      * @param int                               $offset
      *
-     * @return array
-     *
      * @throws \Doctrine\ORM\NoResultException
      * @throws \Doctrine\ORM\NonUniqueResultException
      */
-    public function getReferers($query, $limit = 10, $offset = 0)
+    public function getReferers($query, $limit = 10, $offset = 0): array
     {
         $query->select('h.referer, count(h.referer) as sessions')
             ->groupBy('h.referer')
@@ -120,7 +116,7 @@ class VideoHitRepository extends CommonRepository
     /**
      * Updates lead ID (e.g. after a lead merge).
      */
-    public function updateLead($fromLeadId, $toLeadId)
+    public function updateLead($fromLeadId, $toLeadId): void
     {
         $q = $this->_em->getConnection()->createQueryBuilder();
         $q->update(MAUTIC_TABLE_PREFIX.'video_hits')

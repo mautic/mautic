@@ -107,6 +107,36 @@ class UserApiControllerFunctionalTest extends MauticMysqlTestCase
         Assert::assertStringContainsString('"username":"'.$user->getUsername().'"', $clientResponse->getContent());
     }
 
+    /**
+     * @dataProvider passwordProvider
+     */
+    public function testUserPasswordPolicy(int $responseCode, string $password): void
+    {
+        $userPayload = [
+            'username'      => 'lorem_ipsum',
+            'firstName'     => 'lorem',
+            'lastName'      => 'ipsum',
+            'email'         => 'loremipsum@example.com',
+            'plainPassword' => ['password' => $password, 'confirm' => $password],
+            'role'          => 1,
+        ];
+
+        $this->client->request(Request::METHOD_POST, '/api/users/new', $userPayload);
+        $clientResponse = $this->client->getResponse();
+        Assert::assertSame($responseCode, $clientResponse->getStatusCode());
+    }
+
+    /**
+     * @return iterable<array<int, mixed>>
+     */
+    public function passwordProvider(): iterable
+    {
+        yield [Response::HTTP_BAD_REQUEST, 'aaa'];
+        yield [Response::HTTP_BAD_REQUEST, 'qwerty'];
+        yield [Response::HTTP_BAD_REQUEST, 'qwerty123'];
+        yield [Response::HTTP_CREATED, 'Qwertee@123'];
+    }
+
     private function createRole(bool $isAdmin = false): Role
     {
         $role = new Role();

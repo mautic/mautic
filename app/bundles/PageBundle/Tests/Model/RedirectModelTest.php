@@ -19,7 +19,7 @@ use Symfony\Component\EventDispatcher\EventDispatcher;
 
 class RedirectModelTest extends PageTestAbstract
 {
-    public function testCreateRedirectEntityWhenCalledReturnsRedirect()
+    public function testCreateRedirectEntityWhenCalledReturnsRedirect(): void
     {
         $redirectModel = $this->getRedirectModel();
         $entity        = $redirectModel->createRedirectEntity('http://some-url.com');
@@ -27,7 +27,7 @@ class RedirectModelTest extends PageTestAbstract
         $this->assertInstanceOf(Redirect::class, $entity);
     }
 
-    public function testGenerateRedirectUrlWhenCalledReturnsValidUrl()
+    public function testGenerateRedirectUrlWhenCalledReturnsValidUrl(): void
     {
         $redirect = new Redirect();
         $redirect->setUrl('http://some-url.com');
@@ -39,7 +39,7 @@ class RedirectModelTest extends PageTestAbstract
         $this->assertStringContainsString($url, 'http://some-url.com');
     }
 
-    public function testRedirectGenerationEvent()
+    public function testRedirectGenerationEvent(): void
     {
         $shortener = $this
             ->getMockBuilder(Shortener::class)
@@ -74,7 +74,7 @@ class RedirectModelTest extends PageTestAbstract
         // Add the listener to append something else to the CT
         $dispatcher->addListener(
             PageEvents::ON_REDIRECT_GENERATE,
-            function (RedirectGenerationEvent $event) {
+            function (RedirectGenerationEvent $event): void {
                 $event->setInClickthrough('bar', 'foo');
             }
         );

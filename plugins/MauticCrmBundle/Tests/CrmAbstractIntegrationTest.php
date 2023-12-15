@@ -10,7 +10,7 @@ use MauticPlugin\MauticCrmBundle\Tests\Stubs\StubIntegration;
 
 class CrmAbstractIntegrationTest extends AbstractIntegrationTestCase
 {
-    public function testFieldMatchingPriority()
+    public function testFieldMatchingPriority(): void
     {
         $config = [
             'update_mautic' => [
@@ -52,7 +52,7 @@ class CrmAbstractIntegrationTest extends AbstractIntegrationTestCase
         );
     }
 
-    public function testCompanyDataIsMappedForNewCompanies()
+    public function testCompanyDataIsMappedForNewCompanies(): void
     {
         $data = [
             'custom_company_name' => 'Some Business',
@@ -128,7 +128,7 @@ class CrmAbstractIntegrationTest extends AbstractIntegrationTestCase
         $this->assertEquals('some value', $company->getFieldValue('some_custom_field'));
     }
 
-    public function testLimitString()
+    public function testLimitString(): void
     {
         $integration = $this->getMockBuilder(StubIntegration::class)
             ->disableOriginalConstructor()
