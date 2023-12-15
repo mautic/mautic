@@ -64,10 +64,8 @@ class PublicController extends CommonFormController
                 $subject = EmojiHelper::toEmoji($subject, 'short');
 
                 // Replace tokens
-                if (!empty($tokens)) {
-                    $content = str_ireplace(array_keys($tokens), $tokens, $content);
-                    $subject = str_ireplace(array_keys($tokens), $tokens, $subject);
-                }
+                $content = str_ireplace(array_keys($tokens), $tokens, $content);
+                $subject = str_ireplace(array_keys($tokens), $tokens, $subject);
             } else {
                 $subject = '';
                 $content = '';
@@ -77,9 +75,9 @@ class PublicController extends CommonFormController
 
             // Add subject as title
             if (!empty($subject)) {
-                if (false !== strpos($content, '<title></title>')) {
+                if (str_contains($content, '<title></title>')) {
                     $content = str_replace('<title></title>', "<title>$subject</title>", $content);
-                } elseif (false === strpos($content, '<title>')) {
+                } elseif (!str_contains($content, '<title>')) {
                     $content = str_replace('<head>', "<head>\n<title>$subject</title>", $content);
                 }
             }
@@ -130,9 +128,6 @@ class PublicController extends CommonFormController
         $lead       = null;
         $template   = null;
         $session    = $request->getSession();
-
-        /** @var \Mautic\LeadBundle\Model\LeadModel $leadModel */
-        $leadModel = $this->getModel('lead');
 
         if (!empty($stat)) {
             if ($email = $stat->getEmail()) {
@@ -230,10 +225,10 @@ class PublicController extends CommonFormController
                                 'form'                         => $formView,
                                 'startform'                    => $this->render('@MauticCore/Default/form.html.twig', ['form' => $formView]),
                                 'custom_tag'                   => '<a name="end-'.$formView->vars['id'].'"></a>',
-                                'showContactFrequency'         => false !== strpos($html, 'data-slot="channelfrequency"') || false !== strpos($html, BuilderSubscriber::channelfrequency),
-                                'showContactSegments'          => false !== strpos($html, 'data-slot="segmentlist"') || false !== strpos($html, BuilderSubscriber::segmentListRegex),
-                                'showContactCategories'        => false !== strpos($html, 'data-slot="categorylist"') || false !== strpos($html, BuilderSubscriber::categoryListRegex),
-                                'showContactPreferredChannels' => false !== strpos($html, 'data-slot="preferredchannel"') || false !== strpos($html, BuilderSubscriber::preferredchannel),
+                                'showContactFrequency'         => str_contains($html, 'data-slot="channelfrequency"') || str_contains($html, BuilderSubscriber::channelfrequency),
+                                'showContactSegments'          => str_contains($html, 'data-slot="segmentlist"') || str_contains($html, BuilderSubscriber::segmentListRegex),
+                                'showContactCategories'        => str_contains($html, 'data-slot="categorylist"') || str_contains($html, BuilderSubscriber::categoryListRegex),
+                                'showContactPreferredChannels' => str_contains($html, 'data-slot="preferredchannel"') || str_contains($html, BuilderSubscriber::preferredchannel),
                             ]
                         );
                         // Replace tokens in preference center page
@@ -284,7 +279,7 @@ class PublicController extends CommonFormController
                                 ),
                             ]
                         )
-                    );
+                    )->getContent();
                 }
                 $message = $html;
             }
@@ -315,12 +310,10 @@ class PublicController extends CommonFormController
     }
 
     /**
-     * @return Response
-     *
      * @throws \Exception
      * @throws \Mautic\CoreBundle\Exception\FileNotFoundException
      */
-    public function resubscribeAction(ContactTracker $contactTracker, $idHash)
+    public function resubscribeAction(ContactTracker $contactTracker, $idHash): Response
     {
         // find the email
         $model = $this->getModel('email');
@@ -490,7 +483,7 @@ class PublicController extends CommonFormController
         $fields     = $fieldModel->getFieldList(false, false);
         array_walk(
             $fields,
-            function (&$field) {
+            function (&$field): void {
                 $field = "[$field]";
             }
         );
@@ -522,7 +515,7 @@ class PublicController extends CommonFormController
     /**
      * @param Email $entity
      */
-    public function processSlots($slots, $entity)
+    public function processSlots($slots, $entity): void
     {
         /** @var \Mautic\CoreBundle\Twig\Helper\SlotsHelper $slotsHelper */
         $slotsHelper = $this->factory->getHelper('template.slots');
@@ -535,7 +528,7 @@ class PublicController extends CommonFormController
                 $slotConfig = [];
             }
 
-            $value = isset($content[$slot]) ? $content[$slot] : '';
+            $value = $content[$slot] ?? '';
             $slotsHelper->set($slot, $value);
         }
     }
@@ -543,7 +536,7 @@ class PublicController extends CommonFormController
     /**
      * @throws \Exception
      */
-    private function doTracking(Request $request, IntegrationHelper $integrationHelper, MailHelper $mailer, LoggerInterface $mauticLogger, $integration)
+    private function doTracking(Request $request, IntegrationHelper $integrationHelper, MailHelper $mailer, LoggerInterface $mauticLogger, $integration): void
     {
         $logger = $mauticLogger;
 
@@ -555,7 +548,7 @@ class PublicController extends CommonFormController
             return;
         }
 
-        if (0 === strpos($query_string, 'r=')) {
+        if (str_starts_with($query_string, 'r=')) {
             $query_string = substr($query_string, strpos($query_string, '?') + 1);
         } // remove route variable
 
@@ -580,7 +573,7 @@ class PublicController extends CommonFormController
 
         // generate signature
         $salt = $keys['secret'];
-        if (false === strpos($salt, '$1$')) {
+        if (!str_contains($salt, '$1$')) {
             $salt = '$1$'.$salt;
         } // add MD5 prefix
         $cr    = crypt(urlencode($query['d']), $salt);

@@ -10,32 +10,11 @@ use Symfony\Component\HttpFoundation\Request;
 
 class Tracking404Model
 {
-    /**
-     * @var ContactTracker
-     */
-    private $contactTracker;
-
-    /**
-     * @var PageModel
-     */
-    private $pageModel;
-
-    /**
-     * @var CoreParametersHelper
-     */
-    private $coreParametersHelper;
-
-    /**
-     * Tracking404Model constructor.
-     */
     public function __construct(
-        CoreParametersHelper $coreParametersHelper,
-        ContactTracker $contactTracker,
-        PageModel $pageModel
+        private CoreParametersHelper $coreParametersHelper,
+        private ContactTracker $contactTracker,
+        private PageModel $pageModel
     ) {
-        $this->coreParametersHelper = $coreParametersHelper;
-        $this->contactTracker       = $contactTracker;
-        $this->pageModel            = $pageModel;
     }
 
     /**
@@ -48,10 +27,7 @@ class Tracking404Model
         $this->pageModel->hitPage($entity, $request, 404);
     }
 
-    /**
-     * @return bool
-     */
-    public function isTrackable()
+    public function isTrackable(): bool
     {
         if (!$this->coreParametersHelper->get('do_not_track_404_anonymous')) {
             return true;

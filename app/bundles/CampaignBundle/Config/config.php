@@ -33,7 +33,7 @@ return [
                 'standard_entity' => true,
                 'name'            => 'campaigns',
                 'path'            => '/campaigns',
-                'controller'      => 'Mautic\CampaignBundle\Controller\Api\CampaignApiController',
+                'controller'      => \Mautic\CampaignBundle\Controller\Api\CampaignApiController::class,
             ],
             'mautic_api_campaigneventsstandard'       => [
                 'standard_entity'     => true,
@@ -43,7 +43,7 @@ return [
                 ],
                 'name'                => 'events',
                 'path'                => '/campaigns/events',
-                'controller'          => 'Mautic\CampaignBundle\Controller\Api\EventApiController',
+                'controller'          => \Mautic\CampaignBundle\Controller\Api\EventApiController::class,
             ],
             'mautic_api_campaigns_events_contact'     => [
                 'path'       => '/campaigns/events/contact/{contactId}',

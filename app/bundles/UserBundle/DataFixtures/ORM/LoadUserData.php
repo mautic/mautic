@@ -11,28 +11,17 @@ use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasher;
 
 class LoadUserData extends AbstractFixture implements OrderedFixtureInterface, FixtureGroupInterface
 {
-    /**
-     * {@inheritdoc}
-     */
     public static function getGroups(): array
     {
         return ['group_mautic_install_data'];
     }
 
-    /**
-     * @var UserPasswordHasher
-     */
-    private $hasher;
-
-    /**
-     * {@inheritdoc}
-     */
-    public function __construct(UserPasswordHasher $hasher)
-    {
-        $this->hasher = $hasher;
+    public function __construct(
+        private UserPasswordHasher $hasher
+    ) {
     }
 
-    public function load(ObjectManager $manager)
+    public function load(ObjectManager $manager): void
     {
         $user = new User();
         $user->setFirstName('Admin');
@@ -59,9 +48,6 @@ class LoadUserData extends AbstractFixture implements OrderedFixtureInterface, F
         $this->addReference('sales-user', $user);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getOrder()
     {
         return 2;

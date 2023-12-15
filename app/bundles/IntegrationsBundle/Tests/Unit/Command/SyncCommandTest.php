@@ -23,12 +23,9 @@ class SyncCommandTest extends TestCase
     /**
      * @var SyncServiceInterface|\PHPUnit\Framework\MockObject\MockObject
      */
-    private $syncService;
+    private \PHPUnit\Framework\MockObject\MockObject $syncService;
 
-    /**
-     * @var CommandTester
-     */
-    private $commandTester;
+    private \Symfony\Component\Console\Tester\CommandTester $commandTester;
 
     public function setUp(): void
     {

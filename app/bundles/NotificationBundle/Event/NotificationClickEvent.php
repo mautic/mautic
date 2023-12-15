@@ -6,20 +6,16 @@ use Mautic\CoreBundle\Event\CommonEvent;
 use Mautic\NotificationBundle\Entity\Notification;
 use Mautic\NotificationBundle\Entity\Stat;
 
-/**
- * Class NotificationClickEvent.
- */
 class NotificationClickEvent extends CommonEvent
 {
-    private $request;
+    private \Mautic\NotificationBundle\Entity\Notification $notification;
 
-    private $notification;
-
-    public function __construct(Stat $stat, $request)
-    {
+    public function __construct(
+        Stat $stat,
+        private $request
+    ) {
         $this->entity       = $stat;
         $this->notification = $stat->getNotification();
-        $this->request      = $request;
     }
 
     /**

@@ -11,10 +11,8 @@ class IpAddressRepository extends CommonRepository
 {
     /**
      * Count how many unique IP addresses is there.
-     *
-     * @return int
      */
-    public function countIpAddresses()
+    public function countIpAddresses(): int
     {
         $q = $this->createQueryBuilder('i');
         $q->select('COUNT(DISTINCT i.id) as unique');

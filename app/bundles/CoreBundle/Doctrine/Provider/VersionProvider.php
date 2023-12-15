@@ -8,16 +8,11 @@ use Doctrine\DBAL\Connection;
 
 final class VersionProvider implements VersionProviderInterface
 {
-    private Connection $connection;
+    private ?string $version = null;
 
-    /**
-     * @var string
-     */
-    private $version;
-
-    public function __construct(Connection $connection)
-    {
-        $this->connection = $connection;
+    public function __construct(
+        private Connection $connection
+    ) {
     }
 
     public function getVersion(): string
@@ -31,7 +26,7 @@ final class VersionProvider implements VersionProviderInterface
 
     public function isMariaDb(): bool
     {
-        return false !== strpos($this->getVersion(), 'MariaDB');
+        return str_contains($this->getVersion(), 'MariaDB');
     }
 
     public function isMySql(): bool
