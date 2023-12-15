@@ -431,7 +431,6 @@ class PublicController extends CommonFormController
         $redirectId,
         ?string $ct = null
     ): \Symfony\Component\HttpFoundation\RedirectResponse {
-    ) {
         $logger->debug('Attempting to load redirect with tracking_id of: '.$redirectId);
 
         /** @var \Mautic\PageBundle\Model\RedirectModel $redirectModel */
