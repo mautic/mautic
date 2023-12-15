@@ -9,11 +9,8 @@ class ClickthroughHelper
 {
     use ClickthroughHelperBCTrait;
 
-    private ClickthroughKeyConverter $shortKeyConverter;
-
-    public function __construct(ClickthroughKeyConverter $shortKeyConverter)
+    public function __construct(private ClickthroughKeyConverter $shortKeyConverter)
     {
-        $this->shortKeyConverter = $shortKeyConverter;
     }
 
     /**
