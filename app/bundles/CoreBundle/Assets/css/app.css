@@ -167,7 +167,7 @@
   background-size: cover;
   color: white;
 }
-.card-gradient .link, card-gradient a {
+.card-gradient .link, .card-gradient a, .card-gradient a:hover {
   color: var(--text-on-color);
 }
 .link-group {
