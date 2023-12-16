@@ -3864,6 +3864,7 @@ tbody.collapse.in {
   float: left;
   padding: 14px;
   height: 48px;
+  margin-right: 1px;
 }
 .btn-group > .btn > span > span, .btn-group-vertical > .btn > span > span {
   margin-right: 32px;
