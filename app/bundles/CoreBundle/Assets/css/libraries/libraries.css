@@ -3334,6 +3334,7 @@ fieldset[disabled] .btn-primary.focus {
   color: var(--icon-primary);
   background-color: transparent;
   min-width: 48px;
+  justify-content: center;
 }
 .btn-icon-only:hover {
   background-color: var(--background-hover);
@@ -4916,6 +4917,14 @@ fieldset[disabled] .navbar-inverse .btn-link:hover,
 .navbar-inverse .btn-link[disabled]:focus,
 fieldset[disabled] .navbar-inverse .btn-link:focus {
   color: #444;
+}
+.notifications-panel-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.notifications-panel-header > *, .notifications-panel-header > *:hover {
+  color: white;
 }
 .breadcrumb {
   padding: 8px 15px;

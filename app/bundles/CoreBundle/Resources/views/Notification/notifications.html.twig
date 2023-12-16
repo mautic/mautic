@@ -8,22 +8,18 @@
     </a>
     <div class="dropdown-menu notifications-panel">
         <div class="panel panel-default content-widget">
-            <div style="display: flex; align-items: center; justify-content: space-between; padding: 0 0 0 16px; background-color: var(--layer);">
+            <div class="notifications-panel-header pl-lg">
                     <h5 class="fw-sb">{% trans %}mautic.core.notifications{% endtrans %}</h5>
-                        <a href="javascript:void(0);" class="btn btn-icon-only btn-xs btn-nospin pull-right text-danger" data-toggle="tooltip" title="{% trans %}mautic.core.notifications.clearall{% endtrans %}" onclick="Mautic.clearNotification(0);"><i class="fa fa-times"></i></a>
-
-
+                        <a href="javascript:void(0);" class="btn btn-ghost btn-nospin pull-right" aria-label="{% trans %}mautic.core.notifications.clearall{% endtrans %}" tabindex="0" onclick="Mautic.clearNotification(0);"><span>{% trans %}mautic.core.notifications.clearall{% endtrans %}</span></a>
             </div>
             <div class="pt-0 pb-xs pl-0 pr-0">
-                <div class="scroll-content slimscroll" style="height:250px;" id="notifications">
+                <div class="scroll-content slimscroll" style="height: 60vh;" id="notifications">
                     {{ include('@MauticCore/Notification/notification_messages.html.twig', {
                         notifications: notifications,
                         updateMessage: updateMessage
                     }) }}
                     {% set class = notifications is not empty ? ' hide' : '' %}
-                    <div style="width: 100px; margin: 75px auto 0 auto;" class="{{ class }} mautibot-image" id="notificationMautibot">
-                        <img class="img img-responsive" src="{{ mautibotGetImage('wave') }}" />
-                    </div>
+                    <div class="pr-lg pl-lg pt-lg" style="color: white;">{% trans %}mautic.core.notifications.nothing{% endtrans %}</div>
                 </div>
             </div>
             {% set lastNotification = notifications|first %}

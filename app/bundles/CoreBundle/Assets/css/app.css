@@ -76,6 +76,7 @@
   --layer-hover: #e8e8e8;
   --layer-active: #c6c6c6;
   --layer-selected: #e0e0e0;
+  --layer-inverse: #262626;
   --layer-selected-hover: #cacaca;
   --layer-selected-inverse: #161616;
   --layer-selected-disabled: #8d8d8d;
@@ -369,7 +370,7 @@ body > #app-wrapper {
 #app-header.navbar .navbar-nocollapse .navbar-nav .open .dropdown-menu {
   position: absolute;
   top: 100%;
-  margin-top: 5px;
+  margin-top: 3px;
   left: 15px;
   float: left;
   -webkit-box-shadow: 0 3px 6px rgba(0, 0, 0, 0.06);
