@@ -37,7 +37,7 @@ class EventAccessorTest extends \PHPUnit\Framework\TestCase
         Event::TYPE_DECISION  => [
             'email.click' => [
                 'label'                  => 'Clicks email',
-                'description'            => 'Trigger actions when an email is clicked. Connect a &quot;Send Email&quot; action to the top of this decision.',
+                'description'            => 'Trigger actions when an email is clicked. Connect a Send Email action to the top of this decision.',
                 'eventName'              => 'mautic.email.on_campaign_trigger_decision',
                 'formType'               => EmailClickDecisionType::class,
                 'connectionRestrictions' => [
@@ -51,7 +51,7 @@ class EventAccessorTest extends \PHPUnit\Framework\TestCase
         ],
     ];
 
-    public function testEventsArrayIsBuiltWithAccessors()
+    public function testEventsArrayIsBuiltWithAccessors(): void
     {
         $eventAccessor = new EventAccessor($this->events);
 

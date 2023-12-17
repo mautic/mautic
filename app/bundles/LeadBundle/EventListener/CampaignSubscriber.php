@@ -22,6 +22,7 @@ use Mautic\LeadBundle\Form\Type\CampaignEventLeadOwnerType;
 use Mautic\LeadBundle\Form\Type\CampaignEventLeadSegmentsType;
 use Mautic\LeadBundle\Form\Type\CampaignEventLeadStagesType;
 use Mautic\LeadBundle\Form\Type\CampaignEventLeadTagsType;
+use Mautic\LeadBundle\Form\Type\CampaignEventPointType;
 use Mautic\LeadBundle\Form\Type\ChangeOwnerType;
 use Mautic\LeadBundle\Form\Type\CompanyChangeScoreActionType;
 use Mautic\LeadBundle\Form\Type\ListActionType;
@@ -37,78 +38,31 @@ use Mautic\LeadBundle\Model\DoNotContact;
 use Mautic\LeadBundle\Model\FieldModel;
 use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\LeadBundle\Model\ListModel;
+use Mautic\LeadBundle\Provider\FilterOperatorProvider;
+use Mautic\PointBundle\Model\PointGroupModel;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class CampaignSubscriber implements EventSubscriberInterface
 {
     public const ACTION_LEAD_CHANGE_OWNER = 'lead.changeowner';
 
-    /**
-     * @var IpLookupHelper
-     */
-    private $ipLookupHelper;
-
-    /**
-     * @var LeadModel
-     */
-    private $leadModel;
-
-    /**
-     * @var FieldModel
-     */
-    private $leadFieldModel;
-
-    /**
-     * @var ListModel
-     */
-    private $listModel;
-
-    /**
-     * @var CompanyModel
-     */
-    private $companyModel;
-
-    /**
-     * @var CampaignModel
-     */
-    private $campaignModel;
-
-    /**
-     * @var CoreParametersHelper
-     */
-    private $coreParametersHelper;
-
-    /**
-     * @var array
-     */
-    private $fields;
-
-    private DoNotContact $doNotContact;
+    private ?array $fields = null;
 
     public function __construct(
-        IpLookupHelper $ipLookupHelper,
-        LeadModel $leadModel,
-        FieldModel $leadFieldModel,
-        ListModel $listModel,
-        CompanyModel $companyModel,
-        CampaignModel $campaignModel,
-        CoreParametersHelper $coreParametersHelper,
-        DoNotContact $doNotContact
+        private IpLookupHelper $ipLookupHelper,
+        private LeadModel $leadModel,
+        private FieldModel $leadFieldModel,
+        private ListModel $listModel,
+        private CompanyModel $companyModel,
+        private CampaignModel $campaignModel,
+        private CoreParametersHelper $coreParametersHelper,
+        private DoNotContact $doNotContact,
+        private PointGroupModel $groupModel,
+        private FilterOperatorProvider $filterOperatorProvider
     ) {
-        $this->ipLookupHelper       = $ipLookupHelper;
-        $this->leadModel            = $leadModel;
-        $this->leadFieldModel       = $leadFieldModel;
-        $this->listModel            = $listModel;
-        $this->companyModel         = $companyModel;
-        $this->campaignModel        = $campaignModel;
-        $this->coreParametersHelper = $coreParametersHelper;
-        $this->doNotContact         = $doNotContact;
     }
 
-    /**
-     * @return array
-     */
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             CampaignEvents::CAMPAIGN_ON_BUILD      => ['onCampaignBuild', 0],
@@ -130,7 +84,7 @@ class CampaignSubscriber implements EventSubscriberInterface
     /**
      * Add event triggers and actions.
      */
-    public function onCampaignBuild(CampaignBuilderEvent $event)
+    public function onCampaignBuild(CampaignBuilderEvent $event): void
     {
         // Add actions
         $action = [
@@ -279,6 +233,15 @@ class CampaignSubscriber implements EventSubscriberInterface
         ];
 
         $event->addCondition('lead.dnc', $trigger);
+
+        $trigger = [
+            'label'       => 'mautic.lead.lead.events.points',
+            'description' => 'mautic.lead.lead.events.points_descr',
+            'formType'    => CampaignEventPointType::class,
+            'eventName'   => LeadEvents::ON_CAMPAIGN_TRIGGER_CONDITION,
+        ];
+
+        $event->addCondition('lead.points', $trigger);
     }
 
     public function onCampaignTriggerActionChangePoints(CampaignExecutionEvent $event)
@@ -287,23 +250,34 @@ class CampaignSubscriber implements EventSubscriberInterface
             return;
         }
 
-        $lead   = $event->getLead();
-        $points = $event->getConfig()['points'];
-
+        $lead              = $event->getLead();
+        $points            = $event->getConfig()['points'];
         $somethingHappened = false;
 
         if (null !== $lead && !empty($points)) {
-            $lead->adjustPoints($points);
+            $pointsLogActionName      = "{$event->getEvent()['id']}: {$event->getEvent()['name']}";
+            $pointsLogEventName       = "{$event->getEvent()['campaign']['id']}: {$event->getEvent()['campaign']['name']}";
+            $pointGroupId             = $event->getConfig()['group'] ?? null;
+            $pointGroup               = $pointGroupId ? $this->groupModel->getEntity($pointGroupId) : null;
+
+            if (!empty($pointGroup)) {
+                $this->groupModel->adjustPoints($lead, $pointGroup, $points);
+            } else {
+                $lead->adjustPoints($points);
+            }
 
             // add a lead point change log
             $log = new PointsChangeLog();
             $log->setDelta($points);
             $log->setLead($lead);
             $log->setType('campaign');
-            $log->setEventName("{$event->getEvent()['campaign']['id']}: {$event->getEvent()['campaign']['name']}");
-            $log->setActionName("{$event->getEvent()['id']}: {$event->getEvent()['name']}");
+            $log->setEventName($pointsLogEventName);
+            $log->setActionName($pointsLogActionName);
             $log->setIpAddress($this->ipLookupHelper->getIpAddress());
             $log->setDateAdded(new \DateTime());
+            if ($pointGroup) {
+                $log->setGroup($pointGroup);
+            }
             $lead->addPointsChangeLog($log);
 
             $this->leadModel->saveEntity($lead);
@@ -388,7 +362,7 @@ class CampaignSubscriber implements EventSubscriberInterface
         return $event->setResult(true);
     }
 
-    public function onCampaignTriggerActionAddToCompany(CampaignExecutionEvent $event)
+    public function onCampaignTriggerActionAddToCompany(CampaignExecutionEvent $event): void
     {
         if (!$event->checkContext('lead.addtocompany')) {
             return;
@@ -516,10 +490,10 @@ class CampaignSubscriber implements EventSubscriberInterface
                 $triggerDate = new \DateTime('now', new \DateTimeZone($this->coreParametersHelper->get('default_timezone')));
                 $interval    = substr($event->getConfig()['value'], 1); // remove 1st character + or -
 
-                if (false !== strpos($event->getConfig()['value'], '+P')) { // add date
+                if (str_contains($event->getConfig()['value'], '+P')) { // add date
                     $triggerDate->add(new \DateInterval($interval)); // add the today date with interval
                     $result = $this->compareDateValue($lead, $event, $triggerDate);
-                } elseif (false !== strpos($event->getConfig()['value'], '-P')) { // subtract date
+                } elseif (str_contains($event->getConfig()['value'], '-P')) { // subtract date
                     $triggerDate->sub(new \DateInterval($interval)); // subtract the today date with interval
                     $result = $this->compareDateValue($lead, $event, $triggerDate);
                 } elseif ('anniversary' === $event->getConfig()['value']) {
@@ -634,6 +608,21 @@ class CampaignSubscriber implements EventSubscriberInterface
                     }
                 }
             }
+        } elseif ($event->checkContext('lead.points')) {
+            $operators    = $this->filterOperatorProvider->getAllOperators();
+            $group        = $event->getConfig()['group'] ?? null;
+            $score        = $event->getConfig()['score'];
+            $operatorExpr = $operators[$event->getConfig()['operator']]['expr'];
+
+            if ($group) {
+                $result = $this->leadModel->getGroupContactScoreRepository()->compareScore(
+                    $lead->getId(), $group, $score, $operatorExpr,
+                );
+            } else {
+                $result = $this->leadFieldModel->getRepository()->compareValue(
+                    $lead->getId(), 'points', $score, $operatorExpr
+                );
+            }
         }
 
         return $event->setResult($result);
@@ -646,10 +635,8 @@ class CampaignSubscriber implements EventSubscriberInterface
 
     /**
      * Function to compare date value.
-     *
-     * @return bool
      */
-    private function compareDateValue(Lead $lead, CampaignExecutionEvent $event, \DateTime $triggerDate)
+    private function compareDateValue(Lead $lead, CampaignExecutionEvent $event, \DateTime $triggerDate): bool
     {
         return $this->leadFieldModel->getRepository()->compareDateValue(
             $lead->getId(),

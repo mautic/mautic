@@ -27,10 +27,15 @@ use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
 abstract class AbstractMauticTestCase extends WebTestCase
 {
     protected EntityManager $em;
+
     protected Connection $connection;
+
     protected KernelBrowser $client;
+
     protected Router $router;
+
     protected array $clientOptions = [];
+
     protected array $clientServer  = [
         'PHP_AUTH_USER' => 'admin',
         'PHP_AUTH_PW'   => 'mautic',
@@ -43,6 +48,7 @@ abstract class AbstractMauticTestCase extends WebTestCase
         'site_url'                          => 'https://localhost',
         'mailer_dsn'                        => 'null://null',
         'messenger_dsn_email'               => 'in-memory://default',
+        'messenger_dsn_hit'                 => 'sync://',
         'messenger_dsn_failed'              => 'in-memory://default',
     ];
 

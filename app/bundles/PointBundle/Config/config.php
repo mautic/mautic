@@ -15,6 +15,14 @@ return [
                 'path'       => '/points/triggers/{objectAction}/{objectId}',
                 'controller' => 'Mautic\PointBundle\Controller\TriggerController::executeAction',
             ],
+            'mautic_point.group_index' => [
+                'path'       => '/points/groups/{page}',
+                'controller' => 'Mautic\PointBundle\Controller\GroupController::indexAction',
+            ],
+            'mautic_point.group_action' => [
+                'path'       => '/points/groups/{objectAction}/{objectId}',
+                'controller' => 'Mautic\PointBundle\Controller\GroupController::executeAction',
+            ],
             'mautic_point_index' => [
                 'path'       => '/points/{page}',
                 'controller' => 'Mautic\PointBundle\Controller\PointController::indexAction',
@@ -29,7 +37,7 @@ return [
                 'standard_entity' => true,
                 'name'            => 'points',
                 'path'            => '/points',
-                'controller'      => 'Mautic\PointBundle\Controller\Api\PointApiController',
+                'controller'      => \Mautic\PointBundle\Controller\Api\PointApiController::class,
             ],
             'mautic_api_getpointactiontypes' => [
                 'path'       => '/points/actions/types',
@@ -39,7 +47,7 @@ return [
                 'standard_entity' => true,
                 'name'            => 'triggers',
                 'path'            => '/points/triggers',
-                'controller'      => 'Mautic\PointBundle\Controller\Api\TriggerApiController',
+                'controller'      => \Mautic\PointBundle\Controller\Api\TriggerApiController::class,
             ],
             'mautic_api_getpointtriggereventtypes' => [
                 'path'       => '/points/triggers/events/types',
@@ -63,7 +71,7 @@ return [
             'mautic.points.menu.root' => [
                 'id'        => 'mautic_points_root',
                 'iconClass' => 'fa-calculator',
-                'access'    => ['point:points:view', 'point:triggers:view'],
+                'access'    => ['point:points:view', 'point:triggers:view', 'point:groups:view'],
                 'priority'  => 30,
                 'children'  => [
                     'mautic.point.menu.index' => [
@@ -73,6 +81,10 @@ return [
                     'mautic.point.trigger.menu.index' => [
                         'route'  => 'mautic_pointtrigger_index',
                         'access' => 'point:triggers:view',
+                    ],
+                    'mautic.point.group.menu.index' => [
+                        'route'  => 'mautic_point.group_index',
+                        'access' => 'point:groups:view',
                     ],
                 ],
             ],

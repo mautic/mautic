@@ -14,12 +14,9 @@ final class FieldFilterTransformerTest extends \PHPUnit\Framework\TestCase
     /**
      * @var MockObject|TranslatorInterface
      */
-    private $translator;
+    private \PHPUnit\Framework\MockObject\MockObject $translator;
 
-    /**
-     * @var FieldFilterTransformer
-     */
-    private $transformer;
+    private \Mautic\LeadBundle\Form\DataTransformer\FieldFilterTransformer $transformer;
 
     /**
      * @var MockObject|RelativeDate

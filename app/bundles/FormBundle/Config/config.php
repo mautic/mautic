@@ -53,7 +53,7 @@ return [
                 'standard_entity' => true,
                 'name'            => 'forms',
                 'path'            => '/forms',
-                'controller'      => 'Mautic\FormBundle\Controller\Api\FormApiController',
+                'controller'      => \Mautic\FormBundle\Controller\Api\FormApiController::class,
             ],
             'mautic_api_formresults' => [
                 'path'       => '/forms/{formId}/submissions',
@@ -82,6 +82,10 @@ return [
             'mautic_form_file_download' => [
                 'path'       => '/forms/results/file/{submissionId}/{field}',
                 'controller' => 'Mautic\FormBundle\Controller\ResultController::downloadFileAction',
+            ],
+            'mautic_form_file_download_by_name' => [
+                'path'       => '/forms/results/file/{fieldId}/filename/{fileName}',
+                'controller' => 'Mautic\FormBundle\Controller\ResultController::downloadFileByFileNameAction',
             ],
             'mautic_form_postresults' => [
                 'path'       => '/form/submit',
@@ -260,7 +264,7 @@ return [
     ],
 
     'parameters' => [
-        'form_upload_dir'           => '%kernel.project_dir%/media/files/form',
+        'form_upload_dir'           => '%mautic.application_dir%/media/files/form',
         'blacklisted_extensions'    => ['php', 'sh'],
         'do_not_submit_emails'      => [],
         'form_results_data_sources' => false,

@@ -58,12 +58,12 @@ class FileApiController extends CommonApiController
         $response = [$this->entityNameOne => []];
         if ($request->files) {
             foreach ($request->files as $file) {
-                $extension = $file->guessExtension() ? $file->guessExtension() : $file->getClientOriginalExtension();
+                $extension = $file->guessExtension() ?: $file->getClientOriginalExtension();
                 if (in_array($extension, $this->allowedExtensions)) {
                     $fileName = md5(uniqid()).'.'.$extension;
                     $moved    = $file->move($path, $fileName);
 
-                    if ('images' === substr($dir, 0, 6)) {
+                    if (str_starts_with($dir, 'images')) {
                         $response[$this->entityNameOne]['link'] = $this->getMediaUrl($request).'/'.$fileName;
                     }
 
@@ -99,7 +99,7 @@ class FileApiController extends CommonApiController
         if (is_array($fnames)) {
             foreach ($fnames as $key => $name) {
                 // remove hidden files
-                if ('.' === substr($name, 0, 1)) {
+                if (str_starts_with($name, '.')) {
                     unset($fnames[$key]);
                 }
             }
@@ -152,12 +152,12 @@ class FileApiController extends CommonApiController
     protected function getAbsolutePath(Request $request, PathsHelper $pathsHelper, LoggerInterface $mauticLogger, $dir, $createDir = false)
     {
         try {
-            $possibleDirs = ['assets', 'images'];
+            $possibleDirs = ['media', 'images'];
             $dir          = InputHelper::alphanum($dir, true, null, ['_', '.']);
             $subdir       = trim(InputHelper::alphanum($request->get('subdir', ''), true, null, ['/']));
 
             // Dots in the dir name are slashes
-            if (false !== strpos($dir, '.') && !$subdir) {
+            if (str_contains($dir, '.') && !$subdir) {
                 $dirs = explode('.', $dir);
                 $dir  = $dirs[0];
                 unset($dirs[0]);
@@ -170,7 +170,7 @@ class FileApiController extends CommonApiController
 
             if ('images' === $dir) {
                 $absoluteDir = realpath($pathsHelper->getSystemPath($dir, true));
-            } elseif ('assets' === $dir) {
+            } elseif ('media' === $dir) {
                 $absoluteDir = realpath($this->coreParametersHelper->get('upload_dir'));
             }
 
@@ -204,10 +204,8 @@ class FileApiController extends CommonApiController
 
     /**
      * Get the Media directory full file system path.
-     *
-     * @return string
      */
-    protected function getMediaUrl(Request $request)
+    protected function getMediaUrl(Request $request): string
     {
         return $request->getScheme().'://'
             .$request->getHttpHost()

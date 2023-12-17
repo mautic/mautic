@@ -16,17 +16,17 @@ class EncryptionHelperTest extends \PHPUnit\Framework\TestCase
     /**
      * @var MockObject|CoreParametersHelper
      */
-    private $coreParametersHelperMock;
+    private \PHPUnit\Framework\MockObject\MockObject $coreParametersHelperMock;
 
     /**
      * @var MockObject|OpenSSLCipher
      */
-    private $mainCipherMock;
+    private \PHPUnit\Framework\MockObject\MockObject $mainCipherMock;
 
     /**
      * @var MockObject|SymmetricCipherInterface
      */
-    private $secondaryCipherMock;
+    private \PHPUnit\Framework\MockObject\MockObject $secondaryCipherMock;
 
     /**
      * @var string

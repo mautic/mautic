@@ -8,7 +8,7 @@ use Mautic\LeadBundle\Segment\Query\QueryException;
 
 class IntegrationCampaignFilterQueryBuilder extends BaseFilterQueryBuilder
 {
-    public static function getServiceId()
+    public static function getServiceId(): string
     {
         return 'mautic.lead.query.builder.special.integration';
     }
@@ -16,7 +16,7 @@ class IntegrationCampaignFilterQueryBuilder extends BaseFilterQueryBuilder
     /**
      * @throws QueryException
      */
-    public function applyQuery(QueryBuilder $queryBuilder, ContactSegmentFilter $filter)
+    public function applyQuery(QueryBuilder $queryBuilder, ContactSegmentFilter $filter): QueryBuilder
     {
         $leadsTableAlias          = $queryBuilder->getTableAlias(MAUTIC_TABLE_PREFIX.'leads');
         $integrationCampaignParts = $filter->getIntegrationCampaignParts();
@@ -35,7 +35,7 @@ class IntegrationCampaignFilterQueryBuilder extends BaseFilterQueryBuilder
             $tableAlias.'.internal_entity_id = '.$leadsTableAlias.'.id'
         );
 
-        $expression = $queryBuilder->expr()->andX(
+        $expression = $queryBuilder->expr()->and(
             $queryBuilder->expr()->eq($tableAlias.'.integration', ":$integrationNameParameter"),
             $queryBuilder->expr()->eq($tableAlias.'.integration_entity_id', ":$campaignIdParameter")
         );

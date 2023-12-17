@@ -9,7 +9,7 @@ use Mautic\LeadBundle\Segment\Query\QueryException;
 
 class ForeignFuncFilterQueryBuilder extends BaseFilterQueryBuilder
 {
-    public static function getServiceId()
+    public static function getServiceId(): string
     {
         return 'mautic.lead.query.builder.foreign.func';
     }
@@ -18,11 +18,10 @@ class ForeignFuncFilterQueryBuilder extends BaseFilterQueryBuilder
      * @throws FieldNotFoundException
      * @throws QueryException
      */
-    public function applyQuery(QueryBuilder $queryBuilder, ContactSegmentFilter $filter)
+    public function applyQuery(QueryBuilder $queryBuilder, ContactSegmentFilter $filter): QueryBuilder
     {
         $leadsTableAlias = $queryBuilder->getTableAlias(MAUTIC_TABLE_PREFIX.'leads');
         $filterOperator  = $filter->getOperator();
-        $filterGlue      = $filter->getGlue();
         $filterAggr      = $filter->getAggregateFunction();
 
         $filterParameters = $filter->getParameterValue();
@@ -40,8 +39,6 @@ class ForeignFuncFilterQueryBuilder extends BaseFilterQueryBuilder
         $filter->getColumn();
 
         $filterParametersHolder = $filter->getParameterHolder($parameters);
-
-        $filterGlueFunc = $filterGlue.'Where';
 
         $tableAlias = $queryBuilder->getTableAlias($filter->getTable());
 
@@ -72,14 +69,14 @@ class ForeignFuncFilterQueryBuilder extends BaseFilterQueryBuilder
 
         switch ($filterOperator) {
             case 'empty':
-                $expression = $queryBuilder->expr()->orX(
+                $expression = $queryBuilder->expr()->or(
                     $queryBuilder->expr()->isNull($tableAlias.'.'.$filter->getField()),
                     $queryBuilder->expr()->eq($tableAlias.'.'.$filter->getField(), ':'.$emptyParameter = $this->generateRandomParameterName())
                 );
                 $queryBuilder->setParameter($emptyParameter, '');
                 break;
             case 'notEmpty':
-                $expression = $queryBuilder->expr()->andX(
+                $expression = $queryBuilder->expr()->and(
                     $queryBuilder->expr()->isNotNull($tableAlias.'.'.$filter->getField()),
                     $queryBuilder->expr()->neq($tableAlias.'.'.$filter->getField(), ':'.$emptyParameter = $this->generateRandomParameterName())
                 );

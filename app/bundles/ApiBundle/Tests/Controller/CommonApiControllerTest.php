@@ -24,42 +24,42 @@ use Symfony\Component\HttpFoundation\RequestStack;
 
 class CommonApiControllerTest extends CampaignTestAbstract
 {
-    public function testAddAliasIfNotPresentWithOneColumnWithoutAlias()
+    public function testAddAliasIfNotPresentWithOneColumnWithoutAlias(): void
     {
         $result = $this->getResultFromProtectedMethod('addAliasIfNotPresent', ['dateAdded', 'f']);
 
         $this->assertEquals('f.dateAdded', $result);
     }
 
-    public function testAddAliasIfNotPresentWithOneColumnWithDifferentAlias()
+    public function testAddAliasIfNotPresentWithOneColumnWithDifferentAlias(): void
     {
         $result = $this->getResultFromProtectedMethod('addAliasIfNotPresent', ['s.date_submitted', 'fs']);
 
         $this->assertEquals('s.date_submitted', $result);
     }
 
-    public function testAddAliasIfNotPresentWithOneColumnWithAlias()
+    public function testAddAliasIfNotPresentWithOneColumnWithAlias(): void
     {
         $result = $this->getResultFromProtectedMethod('addAliasIfNotPresent', ['f.dateAdded', 'f']);
 
         $this->assertEquals('f.dateAdded', $result);
     }
 
-    public function testAddAliasIfNotPresentWithTwoColumnsWithAlias()
+    public function testAddAliasIfNotPresentWithTwoColumnsWithAlias(): void
     {
         $result = $this->getResultFromProtectedMethod('addAliasIfNotPresent', ['f.dateAdded, f.dateModified', 'f']);
 
         $this->assertEquals('f.dateAdded,f.dateModified', $result);
     }
 
-    public function testAddAliasIfNotPresentWithTwoColumnsWithoutAlias()
+    public function testAddAliasIfNotPresentWithTwoColumnsWithoutAlias(): void
     {
         $result = $this->getResultFromProtectedMethod('addAliasIfNotPresent', ['dateAdded, dateModified', 'f']);
 
         $this->assertEquals('f.dateAdded,f.dateModified', $result);
     }
 
-    public function testgetWhereFromRequestWithNoWhere()
+    public function testgetWhereFromRequestWithNoWhere(): void
     {
         $request = $this->getMockBuilder(Request::class)
             ->disableOriginalConstructor()
@@ -70,7 +70,7 @@ class CommonApiControllerTest extends CampaignTestAbstract
         $this->assertEquals([], $result);
     }
 
-    public function testgetWhereFromRequestWithSomeWhere()
+    public function testgetWhereFromRequestWithSomeWhere(): void
     {
         $where = [
             [

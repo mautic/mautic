@@ -11,29 +11,11 @@ class ContactSegmentService
 {
     use LeadBatchLimiterTrait;
 
-    /**
-     * @var ContactSegmentFilterFactory
-     */
-    private $contactSegmentFilterFactory;
-
-    /**
-     * @var ContactSegmentQueryBuilder
-     */
-    private $contactSegmentQueryBuilder;
-
-    /**
-     * @var \Psr\Log\LoggerInterface
-     */
-    private $logger;
-
     public function __construct(
-        ContactSegmentFilterFactory $contactSegmentFilterFactory,
-        ContactSegmentQueryBuilder $queryBuilder,
-        \Psr\Log\LoggerInterface $logger
+        private ContactSegmentFilterFactory $contactSegmentFilterFactory,
+        private ContactSegmentQueryBuilder $contactSegmentQueryBuilder,
+        private \Psr\Log\LoggerInterface $logger
     ) {
-        $this->contactSegmentFilterFactory = $contactSegmentFilterFactory;
-        $this->contactSegmentQueryBuilder  = $queryBuilder;
-        $this->logger                      = $logger;
     }
 
     /**
@@ -77,11 +59,9 @@ class ContactSegmentService
     /**
      * @param array|null $batchLimiters for debug purpose only
      *
-     * @return array
-     *
      * @throws \Exception
      */
-    public function getTotalLeadListLeadsCount(LeadList $segment, array $batchLimiters = null)
+    public function getTotalLeadListLeadsCount(LeadList $segment, array $batchLimiters = null): array
     {
         $segmentFilters = $this->contactSegmentFilterFactory->getSegmentFilters($segment);
 
@@ -132,9 +112,9 @@ class ContactSegmentService
     /**
      * @param mixed[] $batchLimiters
      */
-    public function getNewLeadListLeadsQueryBuilder(LeadList $segment, array $batchLimiters): QueryBuilder
+    public function getNewLeadListLeadsQueryBuilder(LeadList $segment, array $batchLimiters, bool $addNewContactsRestrictions = true): QueryBuilder
     {
-        $queryBuilder    = $this->getNewSegmentContactsQuery($segment, $batchLimiters);
+        $queryBuilder    = $this->getNewSegmentContactsQuery($segment, $batchLimiters, $addNewContactsRestrictions);
         $leadsTableAlias = $queryBuilder->getTableAlias(MAUTIC_TABLE_PREFIX.'leads');
 
         // Prepend the DISTINCT to the beginning of the select array
@@ -152,7 +132,8 @@ class ContactSegmentService
         $distinct = is_array($join) && (0 < count($join)) ? 'DISTINCT ' : '';
         // Make sure that leads.id is the first column
         array_unshift($select, $distinct.$leadsTableAlias.'.id');
-        $queryBuilder->setQueryPart('select', $select);
+        $queryBuilder->resetQueryPart('select');
+        $queryBuilder->select($select);
 
         $this->logger->debug('Segment QB: Create Leads SQL: '.$queryBuilder->getDebugOutput(), ['segmentId' => $segment->getId()]);
 
@@ -161,7 +142,7 @@ class ContactSegmentService
         if (!empty($batchLimiters['dateTime'])) {
             // Only leads in the list at the time of count
             $queryBuilder->andWhere(
-                $queryBuilder->expr()->orX(
+                $queryBuilder->expr()->or(
                     $queryBuilder->expr()->lte($leadsTableAlias.'.date_added', $queryBuilder->expr()->literal($batchLimiters['dateTime'])),
                     $queryBuilder->expr()->isNull($leadsTableAlias.'.date_added')
                 )
@@ -176,12 +157,10 @@ class ContactSegmentService
     }
 
     /**
-     * @return array
-     *
      * @throws Exception\SegmentQueryException
      * @throws \Doctrine\DBAL\Exception
      */
-    public function getOrphanedLeadListLeadsCount(LeadList $segment, array $batchLimiters = [])
+    public function getOrphanedLeadListLeadsCount(LeadList $segment, array $batchLimiters = []): array
     {
         $queryBuilder = $this->getOrphanedLeadListLeadsQueryBuilder($segment, $batchLimiters);
         $queryBuilder = $this->contactSegmentQueryBuilder->wrapInCount($queryBuilder);
@@ -196,12 +175,10 @@ class ContactSegmentService
     /**
      * @param int|null $limit
      *
-     * @return array
-     *
      * @throws Exception\SegmentQueryException
      * @throws \Doctrine\DBAL\Exception
      */
-    public function getOrphanedLeadListLeads(LeadList $segment, array $batchLimiters = [], $limit = null)
+    public function getOrphanedLeadListLeads(LeadList $segment, array $batchLimiters = [], $limit = null): array
     {
         $queryBuilder = $this->getOrphanedLeadListLeadsQueryBuilder($segment, $batchLimiters, $limit);
 
@@ -218,14 +195,16 @@ class ContactSegmentService
      * @throws Exception\SegmentQueryException
      * @throws \Exception
      */
-    private function getNewSegmentContactsQuery(LeadList $segment, array $batchLimiters = []): QueryBuilder
+    private function getNewSegmentContactsQuery(LeadList $segment, array $batchLimiters = [], bool $addNewContactsRestrictions = true): QueryBuilder
     {
         $queryBuilder = $this->contactSegmentQueryBuilder->assembleContactsSegmentQueryBuilder(
             $segment->getId(),
             $this->contactSegmentFilterFactory->getSegmentFilters($segment, $batchLimiters)
         );
 
-        $queryBuilder = $this->contactSegmentQueryBuilder->addNewContactsRestrictions($queryBuilder, (int) $segment->getId(), $batchLimiters);
+        if ($addNewContactsRestrictions) {
+            $queryBuilder = $this->contactSegmentQueryBuilder->addNewContactsRestrictions($queryBuilder, (int) $segment->getId(), $batchLimiters);
+        }
 
         $this->contactSegmentQueryBuilder->queryBuilderGenerated($segment, $queryBuilder);
 
@@ -233,12 +212,10 @@ class ContactSegmentService
     }
 
     /**
-     * @return QueryBuilder
-     *
      * @throws Exception\SegmentQueryException
      * @throws \Exception
      */
-    private function getTotalSegmentContactsQuery(LeadList $segment)
+    private function getTotalSegmentContactsQuery(LeadList $segment): QueryBuilder
     {
         $segmentFilters = $this->contactSegmentFilterFactory->getSegmentFilters($segment);
 
@@ -316,7 +293,7 @@ class ContactSegmentService
         try {
             $start = microtime(true);
 
-            $result = $qb->execute()->fetchAssociative();
+            $result = $qb->executeQuery()->fetchAssociative();
 
             $end = microtime(true) - $start;
 
@@ -346,7 +323,7 @@ class ContactSegmentService
     {
         try {
             $start  = microtime(true);
-            $result = $qb->execute()->fetchAllAssociative();
+            $result = $qb->executeQuery()->fetchAllAssociative();
 
             $end = microtime(true) - $start;
 

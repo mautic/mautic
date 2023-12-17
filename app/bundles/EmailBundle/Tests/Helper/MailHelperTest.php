@@ -10,12 +10,16 @@ use Mautic\EmailBundle\Helper\MailHelper;
 use Mautic\EmailBundle\MonitoredEmail\Mailbox;
 use Mautic\EmailBundle\Tests\Helper\Transport\BcInterfaceTokenTransport;
 use Mautic\EmailBundle\Tests\Helper\Transport\SmtpTransport;
+use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadRepository;
 use Mautic\LeadBundle\Model\LeadModel;
 use Monolog\Logger;
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
+use Symfony\Bundle\FrameworkBundle\Routing\Router;
 use Symfony\Component\Mailer\Mailer;
 use Symfony\Component\Mime\Header\HeaderInterface;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 class MailHelperTest extends TestCase
 {
@@ -58,7 +62,7 @@ class MailHelperTest extends TestCase
         defined('MAUTIC_ENV') or define('MAUTIC_ENV', 'test');
     }
 
-    public function testBatchIsEnabledWithBcTokenInterface()
+    public function testBatchIsEnabledWithBcTokenInterface(): void
     {
         $mockFactory = $this->getMockFactory();
 
@@ -90,7 +94,7 @@ class MailHelperTest extends TestCase
         $this->assertEquals(4, count($metadatas));
     }
 
-    public function testGlobalFromThatAllFromAddressesAreTheSame()
+    public function testGlobalFromThatAllFromAddressesAreTheSame(): void
     {
         $mockFactory = $this->getMockFactory();
 
@@ -116,7 +120,7 @@ class MailHelperTest extends TestCase
         $this->assertEquals(['override@owner.com'], array_unique($fromAddresses));
     }
 
-    public function testStandardEmailFrom()
+    public function testStandardEmailFrom(): void
     {
         $mockFactory   = $this->getMockFactory(true);
         $transport     = new SmtpTransport();
@@ -141,7 +145,7 @@ class MailHelperTest extends TestCase
         }
     }
 
-    public function testStandardEmailReplyTo()
+    public function testStandardEmailReplyTo(): void
     {
         $mockFactory   = $this->getMockFactory(true);
         $transport     = new SmtpTransport();
@@ -202,7 +206,7 @@ class MailHelperTest extends TestCase
         $this->assertEquals('admin@mautic.com', $replyTo);
     }
 
-    public function testStandardOwnerAsMailer()
+    public function testStandardOwnerAsMailer(): void
     {
         $mockFactory = $this->getMockFactory();
 
@@ -237,80 +241,42 @@ class MailHelperTest extends TestCase
         }
     }
 
-    public function testValidateValidEmails()
+    /**
+     * @dataProvider provideEmails
+     */
+    public function testValidateEmails(string $email, bool $isValid): void
     {
         $helper    = $this->mockEmptyMailHelper();
-        $addresses = [
-            'john@doe.com',
-            'john@doe.email',
-            'john.doe@email.com',
-            'john+doe@email.com',
-            'john@doe.whatevertldtheycomewithinthefuture',
-        ];
-
-        foreach ($addresses as $address) {
-            // will throw InvalidEmailException if it will find the address invalid
-            $this->assertNull($helper::validateEmail($address));
+        if (!$isValid) {
+            $this->expectException(InvalidEmailException::class);
         }
+        /** @phpstan-ignore-next-line */
+        $this->assertNull($helper::validateEmail($email));
     }
 
-    public function testValidateEmailWithoutTld()
+    /**
+     * @return mixed[]
+     */
+    public function provideEmails(): array
     {
-        $helper = $this->mockEmptyMailHelper();
-        $this->expectException(InvalidEmailException::class);
-        $helper::validateEmail('john@doe');
+        return [
+            ['john@doe.com', true],
+            ['john@doe.email', true],
+            ['john@doe.whatevertldtheycomewithinthefuture', true],
+            ['john.doe@email.com', true],
+            ['john+doe@email.com', true],
+            ['john@doe', false],
+            ['jo hn@doe.email', false],
+            ['jo^hn@doe.email', false],
+            ['jo\'hn@doe.email', false],
+            ['jo;hn@doe.email', false],
+            ['jo&hn@doe.email', false],
+            ['jo*hn@doe.email', false],
+            ['jo%hn@doe.email', false],
+        ];
     }
 
-    public function testValidateEmailWithSpaceInIt()
-    {
-        $helper = $this->mockEmptyMailHelper();
-        $this->expectException(InvalidEmailException::class);
-        $helper::validateEmail('jo hn@doe.email');
-    }
-
-    public function testValidateEmailWithCaretInIt()
-    {
-        $helper = $this->mockEmptyMailHelper();
-        $this->expectException(InvalidEmailException::class);
-        $helper::validateEmail('jo^hn@doe.email');
-    }
-
-    public function testValidateEmailWithApostropheInIt()
-    {
-        $helper = $this->mockEmptyMailHelper();
-        $this->expectException(InvalidEmailException::class);
-        $helper::validateEmail('jo\'hn@doe.email');
-    }
-
-    public function testValidateEmailWithSemicolonInIt()
-    {
-        $helper = $this->mockEmptyMailHelper();
-        $this->expectException(InvalidEmailException::class);
-        $helper::validateEmail('jo;hn@doe.email');
-    }
-
-    public function testValidateEmailWithAmpersandInIt()
-    {
-        $helper = $this->mockEmptyMailHelper();
-        $this->expectException(InvalidEmailException::class);
-        $helper::validateEmail('jo&hn@doe.email');
-    }
-
-    public function testValidateEmailWithStarInIt()
-    {
-        $helper = $this->mockEmptyMailHelper();
-        $this->expectException(InvalidEmailException::class);
-        $helper::validateEmail('jo*hn@doe.email');
-    }
-
-    public function testValidateEmailWithPercentInIt()
-    {
-        $helper = $this->mockEmptyMailHelper();
-        $this->expectException(InvalidEmailException::class);
-        $helper::validateEmail('jo%hn@doe.email');
-    }
-
-    public function testGlobalHeadersAreSet()
+    public function testGlobalHeadersAreSet(): void
     {
         $parameterMap = [
             ['mailer_custom_headers', [], ['X-Mautic-Test' => 'test', 'X-Mautic-Test2' => 'test']],
@@ -330,7 +296,7 @@ class MailHelperTest extends TestCase
         /** @var array<\Symfony\Component\Mime\Header\AbstractHeader> $headers */
         $headers = $mailer->message->getHeaders()->all();
         foreach ($headers as $header) {
-            if (false !== strpos($header->getName(), 'X-Mautic-Test')) {
+            if (str_contains($header->getName(), 'X-Mautic-Test')) {
                 $customHeadersFounds[] = $header->getName();
 
                 $this->assertEquals('test', $header->getBody());
@@ -363,13 +329,13 @@ class MailHelperTest extends TestCase
         $headers = $mailer->message->getHeaders()->all();
 
         foreach ($headers as $header) {
-            if (false !== strpos($header->getName(), 'X-Mautic-Test')) {
+            if (str_contains($header->getName(), 'X-Mautic-Test')) {
                 $this->assertEquals('test', $header->getBody());
             }
         }
     }
 
-    public function testEmailHeadersAreSet()
+    public function testEmailHeadersAreSet(): void
     {
         $parameterMap = [
             ['mailer_custom_headers', [], ['X-Mautic-Test' => 'test', 'X-Mautic-Test2' => 'test']],
@@ -407,7 +373,52 @@ class MailHelperTest extends TestCase
         $this->assertCount(4, $customHeadersFounds);
     }
 
-    protected function mockEmptyMailHelper()
+    public function testUnsubscribeHeader(): void
+    {
+        $mockRouter  = $this->createMock(Router::class);
+        $emailSecret = hash_hmac('sha256', 'someemail@email.test', 'secret');
+        $mockRouter->expects($this->once())
+            ->method('generate')
+            ->with('mautic_email_unsubscribe',
+                ['idHash' => 'hash'],
+                UrlGeneratorInterface::ABSOLUTE_URL)
+            ->willReturn('http://www.somedomain.cz/email/unsubscribe/hash/someemail@email.test/'.$emailSecret);
+
+        $parameterMap = [
+            ['mailer_custom_headers', [], ['X-Mautic-Test' => 'test', 'X-Mautic-Test2' => 'test']],
+        ];
+
+        /** @var MockObject|MauticFactory $mockFactory */
+        $mockFactory = $this->getMockFactory(true, $parameterMap);
+
+        $mockFactory->method('getRouter')
+            ->willReturnOnConsecutiveCalls($mockRouter);
+
+        $transport     = new SmtpTransport();
+        $symfonyMailer = new Mailer($transport);
+
+        $email = new Email();
+        $email->setSubject('Test');
+        $email->setCustomHtml('<html></html>');
+
+        $mailer = new MailHelper($mockFactory, $symfonyMailer, ['nobody@nowhere.com' => 'No Body']);
+        $mailer->setIdHash('hash');
+        $mailer->setEmail($email);
+        $lead = new Lead();
+        $lead->setEmail('someemail@email.test');
+        $mailer->setLead($lead);
+
+        $mailer->setEmailType(MailHelper::EMAIL_TYPE_MARKETING);
+        $headers = $mailer->getCustomHeaders();
+        $this->assertSame('<http://www.somedomain.cz/email/unsubscribe/hash/someemail@email.test/'.$emailSecret.'>', $headers['List-Unsubscribe']);
+
+        // There are no unsubscribe headers in transactional emails.
+        $mailer->setEmailType(MailHelper::EMAIL_TYPE_TRANSACTIONAL);
+        $headers = $mailer->getCustomHeaders();
+        $this->assertNull($headers['List-Unsubscribe'] ?? null);
+    }
+
+    protected function mockEmptyMailHelper(): MailHelper
     {
         $mockFactory   = $this->getMockFactory();
         $transport     = new SmtpTransport();
@@ -416,7 +427,12 @@ class MailHelperTest extends TestCase
         return new MailHelper($mockFactory, $symfonyMailer);
     }
 
-    protected function getMockFactory($mailIsOwner = true, $parameterMap = [])
+    /**
+     * @param mixed[] $parameterMap
+     *
+     * @phpstan-ignore-next-line
+     */
+    protected function getMockFactory(bool $mailIsOwner = true, array $parameterMap = []): MauticFactory
     {
         $mockLeadRepository = $this->getMockBuilder(LeadRepository::class)
             ->disableOriginalConstructor()
@@ -489,7 +505,7 @@ class MailHelperTest extends TestCase
         return $mockFactory;
     }
 
-    public function testArrayOfAddressesAreRemappedIntoEmailToNameKeyValuePair()
+    public function testArrayOfAddressesAreRemappedIntoEmailToNameKeyValuePair(): void
     {
         $mockFactory = $this->getMockBuilder(MauticFactory::class)
             ->disableOriginalConstructor()
@@ -556,7 +572,7 @@ class MailHelperTest extends TestCase
     /**
      * @return array<array<bool|int|string>>
      */
-    public function minifyHtmlDataProvider(): array
+    public static function minifyHtmlDataProvider(): array
     {
         $html = '<!doctype html>
 <html lang=3D"en" xmlns=3D"http://www.w3.org/1999/xhtml" xmlns:v=3D"urn:schemas-microsoft-com:vml" xmlns:o=3D"urn:schemas-microsoft-com:office:office">
@@ -571,5 +587,37 @@ class MailHelperTest extends TestCase
             [false, $html, $html],
             [true, $html, InputHelper::minifyHTML($html)],
         ];
+    }
+
+    public function testHeadersAreTokenized(): void
+    {
+        $parameterMap = [
+          ['mailer_custom_headers', [], ['X-Mautic-Test-1' => '{tracking_pixel}']],
+        ];
+        $mockFactory = $this->getMockFactory(true, $parameterMap);
+
+        $transport     = new SmtpTransport();
+        $symfonyMailer = new Mailer($transport);
+
+        $mailer = new MailHelper($mockFactory, $symfonyMailer, ['nobody@nowhere.com' => '{tracking_pixel}']);
+        $mailer->addTo($this->contacts[0]['email']);
+
+        $email = new Email();
+        $email->setSubject('Test');
+        $email->setCustomHtml('content');
+        $email->setHeaders(['X-Mautic-Test-2' => '{tracking_pixel}']);
+        $mailer->setEmail($email);
+        $mailer->send();
+
+        /** @var array<\Symfony\Component\Mime\Header\AbstractHeader> $headers */
+        $headers = $mailer->message->getHeaders()->all();
+
+        foreach ($headers as $header) {
+            if ('X-Mautic-Test-1' === $header->getName() || 'X-Mautic-Test-2' === $header->getName()) {
+                $this->assertEquals(MailHelper::getBlankPixel(), $header->getBody());
+            } elseif ('from' === $header->getName()) {
+                $this->assertEquals('{tracking_pixel}', $header->getBody()->getName());
+            }
+        }
     }
 }

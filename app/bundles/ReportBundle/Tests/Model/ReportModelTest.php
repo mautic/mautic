@@ -24,10 +24,7 @@ use Twig\Environment;
 
 class ReportModelTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var ReportModel
-     */
-    private $reportModel;
+    private \Mautic\ReportBundle\Model\ReportModel $reportModel;
 
     protected function setUp(): void
     {
@@ -54,7 +51,7 @@ class ReportModelTest extends \PHPUnit\Framework\TestCase
             $this->createMock(Environment::class),
             new ChannelListHelper($this->createMock(EventDispatcherInterface::class), $this->createMock(Translator::class)),
             $fieldModelMock,
-            new ReportHelper(),
+            new ReportHelper($this->createMock(EventDispatcherInterface::class)),
             $this->createMock(CsvExporter::class),
             $this->createMock(ExcelExporter::class),
             $this->createMock(EntityManagerInterface::class),

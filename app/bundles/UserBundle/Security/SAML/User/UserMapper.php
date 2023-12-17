@@ -10,16 +10,11 @@ use Mautic\UserBundle\Entity\User;
 class UserMapper implements UsernameMapperInterface
 {
     /**
-     * @var string[]
+     * @param array<string, mixed> $attributes
      */
-    private $attributes;
-
-    /**
-     * UserMapper constructor.
-     */
-    public function __construct(array $attributes)
-    {
-        $this->attributes = $attributes;
+    public function __construct(
+        private array $attributes
+    ) {
     }
 
     public function getUser(Response $response): User
@@ -40,9 +35,6 @@ class UserMapper implements UsernameMapperInterface
         return $user->getUsername();
     }
 
-    /**
-     * @return string|null
-     */
     private function setValuesFromAssertion(Assertion $assertion, User $user): void
     {
         $attributes = $this->extractAttributes($assertion);
@@ -71,6 +63,10 @@ class UserMapper implements UsernameMapperInterface
         $attributes = [];
 
         foreach ($this->attributes as $key => $attributeName) {
+            if (!$attributeName) {
+                continue;
+            }
+
             foreach ($assertion->getAllAttributeStatements() as $attributeStatement) {
                 $attribute = $attributeStatement->getFirstAttributeByName($attributeName);
                 if ($attribute && $attribute->getFirstAttributeValue()) {

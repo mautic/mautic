@@ -4,10 +4,8 @@ namespace Mautic\LeadBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
+use Mautic\PointBundle\Entity\Group;
 
-/**
- * Class PointsChangeLog.
- */
 class PointsChangeLog
 {
     /**
@@ -50,12 +48,14 @@ class PointsChangeLog
      */
     private $dateAdded;
 
-    public static function loadMetadata(ORM\ClassMetadata $metadata)
+    private ?Group $group = null;
+
+    public static function loadMetadata(ORM\ClassMetadata $metadata): void
     {
         $builder = new ClassMetadataBuilder($metadata);
 
         $builder->setTable('lead_points_change_log')
-            ->setCustomRepositoryClass('Mautic\LeadBundle\Entity\PointsChangeLogRepository')
+            ->setCustomRepositoryClass(\Mautic\LeadBundle\Entity\PointsChangeLogRepository::class)
             ->addIndex(['date_added'], 'point_date_added');
 
         $builder->addBigIntIdField();
@@ -78,15 +78,17 @@ class PointsChangeLog
 
         $builder->addField('delta', 'integer');
 
+        $builder->createManyToOne('group', Group::class)
+            ->addJoinColumn('group_id', 'id', true, false, 'CASCADE')
+            ->build();
+
         $builder->addDateAdded();
     }
 
     /**
      * Get id.
-     *
-     * @return int
      */
-    public function getId()
+    public function getId(): int
     {
         return (int) $this->id;
     }
@@ -253,5 +255,15 @@ class PointsChangeLog
     public function getIpAddress()
     {
         return $this->ipAddress;
+    }
+
+    public function getGroup(): ?Group
+    {
+        return $this->group;
+    }
+
+    public function setGroup(Group $group): void
+    {
+        $this->group = $group;
     }
 }

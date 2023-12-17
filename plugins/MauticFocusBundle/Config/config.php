@@ -32,7 +32,7 @@ return [
                 'standard_entity' => true,
                 'name'            => 'focus',
                 'path'            => '/focus',
-                'controller'      => 'MauticPlugin\MauticFocusBundle\Controller\Api\FocusApiController',
+                'controller'      => \MauticPlugin\MauticFocusBundle\Controller\Api\FocusApiController::class,
             ],
             'mautic_api_focusjs' => [
                 'path'       => '/focus/{id}/js',

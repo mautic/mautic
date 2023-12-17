@@ -8,13 +8,13 @@ use Mautic\InstallBundle\InstallFixtures\ORM\RoleData;
 use Mautic\UserBundle\DataFixtures\ORM\LoadRoleData;
 use Mautic\UserBundle\DataFixtures\ORM\LoadUserData;
 use Psr\Cache\CacheItemPoolInterface;
-use Symfony\Bundle\FrameworkBundle\Client;
 use Symfony\Bundle\FrameworkBundle\KernelBrowser;
 use Symfony\Component\Process\Process;
 
 abstract class MauticMysqlTestCase extends AbstractMauticTestCase
 {
     private bool $databaseInstalled = false;
+
     private bool $setUpInvoked      = false;
 
     /**
@@ -168,7 +168,7 @@ abstract class MauticMysqlTestCase extends AbstractMauticTestCase
     /**
      * @throws \Exception
      */
-    private function applySqlFromFile($file)
+    private function applySqlFromFile($file): void
     {
         $connection = $this->connection;
         $command    = 'mysql -h"${:db_host}" -P"${:db_port}" -u"${:db_user}" "${:db_name}" < "${:db_backup_file}"';
@@ -195,7 +195,7 @@ abstract class MauticMysqlTestCase extends AbstractMauticTestCase
      *
      * @throws \Exception
      */
-    private function prepareDatabase()
+    private function prepareDatabase(): void
     {
         if (!function_exists('proc_open')) {
             $this->installDatabase();
@@ -224,7 +224,7 @@ abstract class MauticMysqlTestCase extends AbstractMauticTestCase
     /**
      * @throws \Exception
      */
-    private function installDatabase()
+    private function installDatabase(): void
     {
         $this->createDatabase();
         $this->applyMigrations();
@@ -235,7 +235,7 @@ abstract class MauticMysqlTestCase extends AbstractMauticTestCase
     /**
      * @throws \Exception
      */
-    private function createDatabase()
+    private function createDatabase(): void
     {
         $this->runCommand('doctrine:database:drop', ['--if-exists' => true, '--force' => true]);
         $this->runCommand('doctrine:database:create');
@@ -322,7 +322,7 @@ abstract class MauticMysqlTestCase extends AbstractMauticTestCase
             $table = 'company' === $data['object'] ? 'companies' : 'leads';
             try {
                 $this->connection->executeStatement(sprintf('ALTER TABLE %s%s DROP COLUMN %s', $prefix, $table, $data['alias']));
-            } catch (\Exception $e) {
+            } catch (\Exception) {
             }
         }
 
@@ -400,7 +400,7 @@ abstract class MauticMysqlTestCase extends AbstractMauticTestCase
      */
     protected function generateTypeSafePayload(mixed $payload): mixed
     {
-        array_walk_recursive($payload, function (&$value) {
+        array_walk_recursive($payload, function (&$value): void {
             $value = is_bool($value) ? ($value ? '1' : '0') : $value;
         });
 

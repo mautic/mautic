@@ -3,7 +3,6 @@
 namespace Mautic\LeadBundle\EventListener;
 
 use Mautic\CoreBundle\Helper\IpLookupHelper;
-use Mautic\EmailBundle\Model\EmailModel;
 use Mautic\FormBundle\Crate\FieldCrate;
 use Mautic\FormBundle\Crate\ObjectCrate;
 use Mautic\FormBundle\Event\FieldCollectEvent;
@@ -20,55 +19,25 @@ use Mautic\LeadBundle\Form\Type\CompanyChangeScoreActionType;
 use Mautic\LeadBundle\Form\Type\FormSubmitActionPointsChangeType;
 use Mautic\LeadBundle\Form\Type\ListActionType;
 use Mautic\LeadBundle\Form\Type\ModifyLeadTagsType;
+use Mautic\LeadBundle\Model\DoNotContact;
 use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\LeadBundle\Tracker\ContactTracker;
+use Mautic\PointBundle\Model\PointGroupModel;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class FormSubscriber implements EventSubscriberInterface
 {
-    /**
-     * @var EmailModel
-     */
-    private $emailModel;
-
-    /**
-     * @param LeadModel
-     */
-    protected $leadModel;
-
-    /**
-     * @var ContactTracker
-     */
-    protected $contactTracker;
-
-    /**
-     * @var IpLookupHelper
-     */
-    protected $ipLookupHelper;
-
-    /**
-     * @var LeadFieldRepository
-     */
-    protected $leadFieldRepository;
-
     public function __construct(
-        EmailModel $emailModel,
-        LeadModel $leadModel,
-        ContactTracker $contactTracker,
-        IpLookupHelper $ipLookupHelper,
-        LeadFieldRepository $leadFieldRepository
+        protected LeadModel $leadModel,
+        protected ContactTracker $contactTracker,
+        protected IpLookupHelper $ipLookupHelper,
+        protected LeadFieldRepository $leadFieldRepository,
+        private PointGroupModel $groupModel,
+        private DoNotContact $doNotContact
     ) {
-        $this->emailModel          = $emailModel;
-        $this->leadModel           = $leadModel;
-        $this->contactTracker      = $contactTracker;
-        $this->ipLookupHelper      = $ipLookupHelper;
-        $this->leadFieldRepository = $leadFieldRepository;
     }
 
-    /**
-     * @return array
-     */
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             FormEvents::FORM_ON_BUILD            => ['onFormBuilder', 0],
@@ -88,7 +57,7 @@ class FormSubscriber implements EventSubscriberInterface
     /**
      * Add a lead generation action to available form submit actions.
      */
-    public function onFormBuilder(FormBuilderEvent $event)
+    public function onFormBuilder(FormBuilderEvent $event): void
     {
         $event->addSubmitAction('lead.pointschange', [
             'group'       => 'mautic.lead.lead.submitaction',
@@ -190,7 +159,16 @@ class FormSubscriber implements EventSubscriberInterface
         $oldPoints  = $contact->getPoints();
         $properties = $event->getActionConfig();
 
-        $contact->adjustPoints($properties['points'], $properties['operator']);
+        $operator     = $properties['operator'];
+        $pointGroupId = $properties['group'] ?? null;
+        $pointGroup   = $pointGroupId ? $this->groupModel->getEntity($pointGroupId) : null;
+        $points       = $properties['points'];
+
+        if (!empty($pointGroup)) {
+            $this->groupModel->adjustPoints($contact, $pointGroup, $points, $operator);
+        } else {
+            $contact->adjustPoints($points, $operator);
+        }
 
         $newPoints = $contact->getPoints();
 
@@ -276,8 +254,10 @@ class FormSubscriber implements EventSubscriberInterface
         $utmValues->setUtmSource($queryArray['utm_source'] ?? $queryReferer['utm_source'] ?? null);
         $utmValues->setUtmTerm($queryArray['utm_term'] ?? $queryReferer['utm_term'] ?? null);
 
-        $this->leadModel->getUtmTagRepository()->saveEntity($utmValues);
-        $this->leadModel->setUtmTags($utmValues->getLead(), $utmValues);
+        if ($utmValues->hasUtmTags()) {
+            $this->leadModel->getUtmTagRepository()->saveEntity($utmValues);
+            $this->leadModel->setUtmTags($utmValues->getLead(), $utmValues);
+        }
     }
 
     public function onFormSubmitActionScoreContactsCompanies(SubmissionEvent $event): void
@@ -303,10 +283,8 @@ class FormSubscriber implements EventSubscriberInterface
             return;
         }
 
-        $formResults = $event->getResults();
-
-        if (isset($formResults['email']) && !empty($formResults['email'])) {
-            $this->emailModel->removeDoNotContact($formResults['email']);
+        if ($event->getLead()) {
+            $this->doNotContact->removeDncForContact($event->getLead()->getId(), 'email');
         }
     }
 }

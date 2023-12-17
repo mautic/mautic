@@ -6,6 +6,7 @@ use Mautic\CoreBundle\Form\RequestTrait;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\DataMapperInterface;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
+use Symfony\Component\Form\Extension\Core\Type\DateTimeType;
 use Symfony\Component\Form\Form;
 use Symfony\Component\Form\FormConfigBuilder;
 use Symfony\Component\Form\FormFactoryBuilder;
@@ -14,10 +15,7 @@ class RequestTraitTest extends \PHPUnit\Framework\TestCase
 {
     use RequestTrait;
 
-    /**
-     * @var Form
-     */
-    private $form;
+    private \Symfony\Component\Form\Form $form;
 
     protected function setUp(): void
     {
@@ -33,7 +31,7 @@ class RequestTraitTest extends \PHPUnit\Framework\TestCase
         $this->form = new Form($fooConfig);
     }
 
-    public function testMultiSelectPrepareParametersFromRequest()
+    public function testMultiSelectPrepareParametersFromRequest(): void
     {
         $params = [
             'multiselect'  => '',
@@ -93,7 +91,7 @@ class RequestTraitTest extends \PHPUnit\Framework\TestCase
     /**
      * @return iterable<array<?int,int|bool|string|null>>
      */
-    public function boolProvider(): iterable
+    public static function boolProvider(): iterable
     {
         yield [true, '1'];
         yield [true, 1];
@@ -210,5 +208,36 @@ class RequestTraitTest extends \PHPUnit\Framework\TestCase
         $expectedValues = ['fieldEmail' => 'email@domain.com'];
         $this->cleanFields($fieldData, $leadField);
         $this->assertSame($expectedValues, $fieldData);
+    }
+
+    public function testDatTimePrepareParametersFromRequest(): void
+    {
+        $params = [
+            'datetime'  => '',
+            'datetime2' => '2023-01-01 21:00:00',
+        ];
+
+        $expectedValues =
+            [
+                'datetime2' => '2023-01-01 21:00',
+            ];
+
+        foreach ($params as $alias => $value) {
+            $this->form->add(
+                $alias,
+                DateTimeType::class,
+                [
+                    'label'    => false,
+                    'attr'     => [
+                        'class' => 'form-control',
+                    ],
+                    'required' => false,
+                ]
+            );
+        }
+
+        $this->prepareParametersFromRequest($this->form, $params);
+
+        $this->assertSame($expectedValues, $params);
     }
 }

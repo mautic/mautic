@@ -28,42 +28,39 @@ class WebhookModelTest extends TestCase
     /**
      * @var MockObject|CoreParametersHelper
      */
-    private $parametersHelperMock;
+    private \PHPUnit\Framework\MockObject\MockObject $parametersHelperMock;
 
     /**
      * @var MockObject|SerializerInterface
      */
-    private $serializerMock;
+    private \PHPUnit\Framework\MockObject\MockObject $serializerMock;
 
     /**
      * @var MockObject|EntityManager
      */
-    private $entityManagerMock;
+    private \PHPUnit\Framework\MockObject\MockObject $entityManagerMock;
 
     /**
      * @var MockObject|WebhookRepository
      */
-    private $webhookRepository;
+    private \PHPUnit\Framework\MockObject\MockObject $webhookRepository;
 
     /**
      * @var MockObject|UserHelper
      */
-    private $userHelper;
+    private \PHPUnit\Framework\MockObject\MockObject $userHelper;
 
     /**
      * @var MockObject|EventDispatcherInterface
      */
-    private $eventDispatcherMock;
+    private \PHPUnit\Framework\MockObject\MockObject $eventDispatcherMock;
 
-    /**
-     * @var WebhookModel
-     */
-    private $model;
+    private \Mautic\WebhookBundle\Model\WebhookModel $model;
 
     /**
      * @var MockObject|Client
      */
-    private $httpClientMock;
+    private \PHPUnit\Framework\MockObject\MockObject $httpClientMock;
 
     protected function setUp(): void
     {
@@ -233,8 +230,7 @@ class WebhookModelTest extends TestCase
 
         $webhookQueueRepoMock
             ->method('deleteQueuesById')
-            ->with([1])
-            ->willReturn(null);
+            ->with([1]);
 
         $responsePayload = [
             'mautic.email_on_send' => [

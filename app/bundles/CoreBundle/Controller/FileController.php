@@ -2,17 +2,18 @@
 
 namespace Mautic\CoreBundle\Controller;
 
+use Mautic\CoreBundle\Exception\FileUploadException;
+use Mautic\CoreBundle\Helper\FileUploader;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\CoreBundle\Helper\PathsHelper;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
-/**
- * Class FileController.
- */
 class FileController extends AjaxController
 {
     public const EDITOR_FROALA   = 'froala';
+
     public const EDITOR_CKEDITOR = 'ckeditor';
 
     protected $imageMimes = [
@@ -32,17 +33,16 @@ class FileController extends AjaxController
     /**
      * Uploads a file.
      *
-     * @return \Symfony\Component\HttpFoundation\JsonResponse
+     * @throws FileUploadException
      */
-    public function uploadAction(Request $request, PathsHelper $pathsHelper)
+    public function uploadAction(Request $request, PathsHelper $pathsHelper, FileUploader $fileUploader): JsonResponse
     {
         $editor   = $request->get('editor', 'froala');
         $mediaDir = $this->getMediaAbsolutePath($pathsHelper);
         if (!isset($this->response['error'])) {
             foreach ($request->files as $file) {
                 if (in_array($file->getMimeType(), $this->imageMimes)) {
-                    $fileName = md5(uniqid()).'.'.$file->guessExtension();
-                    $file->move($mediaDir, $fileName);
+                    $fileName = $fileUploader->upload($mediaDir, $file);
                     $this->successfulResponse($request, $fileName, $editor);
                 } else {
                     $this->failureResponse($editor);
@@ -55,10 +55,8 @@ class FileController extends AjaxController
 
     /**
      * List the files in /media directory.
-     *
-     * @return \Symfony\Component\HttpFoundation\JsonResponse
      */
-    public function listAction(Request $request, PathsHelper $pathsHelper)
+    public function listAction(Request $request, PathsHelper $pathsHelper): JsonResponse
     {
         $fnames = scandir($this->getMediaAbsolutePath($pathsHelper));
 
@@ -83,13 +81,10 @@ class FileController extends AjaxController
 
     /**
      * Delete a file from /media directory.
-     *
-     * @return \Symfony\Component\HttpFoundation\JsonResponse
      */
-    public function deleteAction(Request $request, PathsHelper $pathsHelper)
+    public function deleteAction(Request $request, PathsHelper $pathsHelper): JsonResponse
     {
         $src       = InputHelper::clean($request->request->get('src'));
-        $response  = ['deleted' => false];
         $imagePath = $this->getMediaAbsolutePath($pathsHelper).'/'.basename($src);
 
         if (!file_exists($imagePath)) {
@@ -130,10 +125,8 @@ class FileController extends AjaxController
 
     /**
      * Get the Media directory full file system path.
-     *
-     * @return string
      */
-    public function getMediaUrl(Request $request)
+    public function getMediaUrl(Request $request): string
     {
         return $request->getScheme().'://'
             .$request->getHttpHost()

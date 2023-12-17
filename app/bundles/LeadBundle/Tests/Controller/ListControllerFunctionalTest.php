@@ -140,7 +140,7 @@ class ListControllerFunctionalTest extends MauticMysqlTestCase
 
     private function saveSegment(string $name, string $alias, array $filters = [], LeadList $segment = null): LeadList
     {
-        $segment = $segment ?? new LeadList();
+        $segment ??= new LeadList();
         $segment->setName($name)->setAlias($alias)->setFilters($filters);
         $this->listModel->saveEntity($segment);
 
@@ -342,5 +342,85 @@ class ListControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertEquals(1, $secondColumnOfLine);
         $secondColumnOfLine    = $leadListsTableRows->eq(1)->filterXPath('//td[2]//div//i[@class="fa fa-fw fa-filter"]')->count();
         $this->assertEquals(0, $secondColumnOfLine);
+    }
+
+    public function testSegmentWarningIcon(): void
+    {
+        $segmentWithOldLastRebuildDate            = $this->saveSegment('Lead List 1', 'lead-list-1');
+        $segmentWithFreshLastRebuildDate          = $this->saveSegment('Lead List 2', 'lead-list-2');
+        $segmentWithOldLastRebuildDateUnpublished = $this->saveSegment('Lead List 3', 'lead-list-3');
+
+        $segmentWithOldLastRebuildDate->setLastBuiltDate(new \DateTime('-1 year'));
+        $segmentWithFreshLastRebuildDate->setLastBuiltDate(new \DateTime('now'));
+        $segmentWithOldLastRebuildDateUnpublished->isPublished(false);
+
+        $this->em->persist($segmentWithOldLastRebuildDate);
+        $this->em->persist($segmentWithFreshLastRebuildDate);
+        $this->em->persist($segmentWithOldLastRebuildDateUnpublished);
+
+        $this->em->flush();
+
+        // Check segment count UI for no contacts.
+        $crawler            = $this->client->request(Request::METHOD_GET, '/s/segments');
+        $leadListsTableRows = $crawler->filterXPath("//table[@id='leadListTable']//tbody//tr");
+        $this->assertEquals(3, $leadListsTableRows->count());
+        $secondColumnOfLine    = $leadListsTableRows->first()->filterXPath('//td[2]//div//i[@class="fa text-danger fa-exclamation-circle"]')->count();
+        $this->assertEquals(1, $secondColumnOfLine);
+        $secondColumnOfLine    = $leadListsTableRows->eq(1)->filterXPath('//td[2]//div//i[@class="fa text-danger fa-exclamation-circle"]')->count();
+        $this->assertEquals(0, $secondColumnOfLine);
+        $secondColumnOfLine    = $leadListsTableRows->eq(2)->filterXPath('//td[2]//div//i[@class="fa text-danger fa-exclamation-circle"]')->count();
+        $this->assertEquals(0, $secondColumnOfLine);
+    }
+
+    /**
+     * @dataProvider dateFieldProvider
+     */
+    public function testWarningOnInvalidDateField(?string $filter, bool $shouldContainError, string $operator = '='): void
+    {
+        $segment = $this->saveSegment(
+            'Date Segment',
+            'ds',
+            [
+                [
+                    'glue'     => 'and',
+                    'field'    => 'date_added',
+                    'object'   => 'lead',
+                    'type'     => 'date',
+                    'filter'   => $filter,
+                    'display'  => null,
+                    'operator' => $operator,
+                ],
+            ]
+        );
+
+        $this->em->clear();
+
+        $crawler = $this->client->request(Request::METHOD_GET, '/s/segments/edit/'.$segment->getId());
+        $form    = $crawler->selectButton('leadlist_buttons_apply')->form();
+        $this->client->submit($form);
+        $this->assertTrue($this->client->getResponse()->isOk());
+
+        if ($shouldContainError) {
+            $this->assertStringContainsString('Date field filter value &quot;'.$filter.'&quot; is invalid', $this->client->getResponse()->getContent());
+        } else {
+            $this->assertStringNotContainsString('Date field filter value', $this->client->getResponse()->getContent());
+        }
+    }
+
+    /**
+     * @return array<int, array<int, bool|string|null>>
+     */
+    public static function dateFieldProvider(): array
+    {
+        return [
+            ['Today', true],
+            ['birthday', false],
+            ['2023-01-01 11:00', false],
+            ['2023-01-01 11:00:00', false],
+            ['2023-01-01', false],
+            ['next week', false],
+            [null, false],
+            ['\b\d{4}-(10|11|12)-\d{2}\b', false, 'regexp'],
+        ];
     }
 }

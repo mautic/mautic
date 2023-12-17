@@ -36,32 +36,56 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class DynamicContentType extends AbstractType
 {
-    private $em;
-    private $translator;
     private $fieldChoices;
-    private $countryChoices;
-    private $regionChoices;
-    private $timezoneChoices;
-    private $localeChoices;
-    private $deviceTypesChoices;
-    private $deviceBrandsChoices;
-    private $deviceOsChoices;
-    private $tagChoices = [];
+
     /**
-     * @var LeadModel
+     * @var mixed[]
      */
+    private array $countryChoices;
+
+    /**
+     * @var mixed[]
+     */
+    private array $regionChoices;
+
+    private $timezoneChoices;
+
+    /**
+     * @var mixed[]
+     */
+    private array $localeChoices;
+
+    /**
+     * @var mixed[]
+     */
+    private array $deviceTypesChoices;
+
+    private $deviceBrandsChoices;
+
+    /**
+     * @var mixed[]
+     */
+    private array $deviceOsChoices;
+
+    /**
+     * @var array<string, string>
+     */
+    private array $tagChoices = [];
+
     private $leadModel;
+  
     private RelativeDate $relativeDate;
 
     /**
      * @throws \InvalidArgumentException
      */
-    public function __construct(EntityManager $entityManager, ListModel $listModel, TranslatorInterface $translator, LeadModel $leadModel, RelativeDate $relativeDate)
-    {
-        $this->em              = $entityManager;
-        $this->translator      = $translator;
-        $this->leadModel       = $leadModel;
-        $this->relativeDate    = $relativeDate;
+    public function __construct(
+        private EntityManager $em,
+        ListModel $listModel,
+        private TranslatorInterface $translator,
+        private LeadModel $leadModel,
+        private RelativeDate $relativeDate
+    ) {
         $this->fieldChoices    = $listModel->getChoiceFields();
         $this->timezoneChoices = FormFieldHelper::getTimezonesChoices();
         $this->countryChoices  = FormFieldHelper::getCountryChoices();
@@ -83,7 +107,7 @@ class DynamicContentType extends AbstractType
         );
     }
 
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder->addEventSubscriber(new CleanFormSubscriber(['content' => 'html']));
         $builder->addEventSubscriber(new FormExitSubscriber('dynamicContent.dynamicContent', $options));
@@ -266,7 +290,7 @@ class DynamicContentType extends AbstractType
 
         $builder->addEventListener(
             FormEvents::PRE_SUBMIT,
-            function (FormEvent $event) {
+            function (FormEvent $event): void {
                 // delete default prototype values
                 $data = $event->getData();
                 unset($data['filters']['__name__']);
@@ -278,7 +302,7 @@ class DynamicContentType extends AbstractType
     /**
      * @throws \Symfony\Component\OptionsResolver\Exception\AccessException
      */
-    public function configureOptions(OptionsResolver $resolver)
+    public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults([
             'data_class'     => DynamicContent::class,
@@ -289,10 +313,7 @@ class DynamicContentType extends AbstractType
         $resolver->setDefined(['update_select']);
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function buildView(FormView $view, FormInterface $form, array $options)
+    public function buildView(FormView $view, FormInterface $form, array $options): void
     {
         $view->vars['fields']       = $this->fieldChoices;
         $view->vars['countries']    = $this->countryChoices;
@@ -305,13 +326,11 @@ class DynamicContentType extends AbstractType
         $view->vars['locales']      = $this->localeChoices;
     }
 
-    private function filterFieldChoices()
+    private function filterFieldChoices(): void
     {
         unset($this->fieldChoices['company']);
         $customFields               = $this->leadModel->getRepository()->getCustomFieldList('lead');
-        $this->fieldChoices['lead'] = array_filter($this->fieldChoices['lead'], function ($key) use ($customFields) {
-            return in_array($key, array_merge(array_keys($customFields[0]), ['date_added', 'date_modified', 'device_brand', 'device_model', 'device_os', 'device_type', 'tags']), true);
-        }, ARRAY_FILTER_USE_KEY);
+        $this->fieldChoices['lead'] = array_filter($this->fieldChoices['lead'], fn ($key): bool => in_array($key, array_merge(array_keys($customFields[0]), ['date_added', 'date_modified', 'device_brand', 'device_model', 'device_os', 'device_type', 'tags']), true), ARRAY_FILTER_USE_KEY);
     }
 
     /**

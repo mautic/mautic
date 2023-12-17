@@ -36,11 +36,9 @@ class CategoryMapper
     ];
 
     /**
-     * @return CategoryObject
-     *
      * @throws CategoryNotFound
      */
-    public static function map($category)
+    public static function map($category): CategoryObject
     {
         if (!isset(static::$mappings[$category])) {
             throw new CategoryNotFound();

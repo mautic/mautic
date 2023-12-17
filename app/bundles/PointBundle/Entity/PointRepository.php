@@ -9,26 +9,21 @@ use Mautic\CoreBundle\Entity\CommonRepository;
  */
 class PointRepository extends CommonRepository
 {
-    /**
-     * {@inheritdoc}
-     */
     public function getEntities(array $args = [])
     {
         $q = $this->_em
             ->createQueryBuilder()
             ->select($this->getTableAlias().', cat')
             ->from(\Mautic\PointBundle\Entity\Point::class, $this->getTableAlias())
-            ->leftJoin($this->getTableAlias().'.category', 'cat');
+            ->leftJoin($this->getTableAlias().'.category', 'cat')
+            ->leftJoin($this->getTableAlias().'.group', 'pl');
 
         $args['qb'] = $q;
 
         return parent::getEntities($args);
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getTableAlias()
+    public function getTableAlias(): string
     {
         return 'p';
     }
@@ -58,10 +53,8 @@ class PointRepository extends CommonRepository
     /**
      * @param string $type
      * @param int    $leadId
-     *
-     * @return array
      */
-    public function getCompletedLeadActions($type, $leadId)
+    public function getCompletedLeadActions($type, $leadId): array
     {
         $q = $this->_em->getConnection()->createQueryBuilder()
             ->select('p.*')
@@ -77,7 +70,7 @@ class PointRepository extends CommonRepository
         )
             ->setParameter('type', $type);
 
-        $results = $q->execute()->fetchAllAssociative();
+        $results = $q->executeQuery()->fetchAllAssociative();
 
         $return = [];
 
@@ -90,10 +83,8 @@ class PointRepository extends CommonRepository
 
     /**
      * @param int $leadId
-     *
-     * @return array
      */
-    public function getCompletedLeadActionsByLeadId($leadId)
+    public function getCompletedLeadActionsByLeadId($leadId): array
     {
         $q = $this->_em->getConnection()->createQueryBuilder()
             ->select('p.*')
@@ -107,7 +98,7 @@ class PointRepository extends CommonRepository
             )
         );
 
-        $results = $q->execute()->fetchAllAssociative();
+        $results = $q->executeQuery()->fetchAllAssociative();
 
         $return = [];
 
@@ -118,10 +109,7 @@ class PointRepository extends CommonRepository
         return $return;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    protected function addCatchAllWhereClause($q, $filter)
+    protected function addCatchAllWhereClause($q, $filter): array
     {
         return $this->addStandardCatchAllWhereClause($q, $filter, [
             'p.name',
@@ -129,18 +117,15 @@ class PointRepository extends CommonRepository
         ]);
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    protected function addSearchCommandWhereClause($q, $filter)
+    protected function addSearchCommandWhereClause($q, $filter): array
     {
         return $this->addStandardSearchCommandWhereClause($q, $filter);
     }
 
     /**
-     * {@inheritdoc}
+     * @return string[]
      */
-    public function getSearchCommands()
+    public function getSearchCommands(): array
     {
         return $this->getStandardSearchCommands();
     }

@@ -7,12 +7,12 @@ use Mautic\LeadBundle\Segment\Query\QueryBuilder;
 
 class SessionsFilterQueryBuilder extends BaseFilterQueryBuilder
 {
-    public static function getServiceId()
+    public static function getServiceId(): string
     {
         return 'mautic.lead.query.builder.special.sessions';
     }
 
-    public function applyQuery(QueryBuilder $queryBuilder, ContactSegmentFilter $filter)
+    public function applyQuery(QueryBuilder $queryBuilder, ContactSegmentFilter $filter): QueryBuilder
     {
         $leadsTableAlias      = $queryBuilder->getTableAlias(MAUTIC_TABLE_PREFIX.'leads');
         $pageHitsAlias        = $this->generateRandomParameterName();
@@ -25,12 +25,12 @@ class SessionsFilterQueryBuilder extends BaseFilterQueryBuilder
 
         $queryBuilder->setParameter($expressionValueAlias, (int) $filter->getParameterValue());
 
-        $exclusionQueryBuilder = $queryBuilder->getConnection()->createQueryBuilder();
+        $exclusionQueryBuilder = $queryBuilder->createQueryBuilder();
         $exclusionQueryBuilder
             ->select($exclusionAlias.'.id')
             ->from(MAUTIC_TABLE_PREFIX.'page_hits', $exclusionAlias)
             ->where(
-                $queryBuilder->expr()->andX(
+                $queryBuilder->expr()->and(
                     $queryBuilder->expr()->eq($leadsTableAlias.'.id', $exclusionAlias.'.lead_id'),
                     $queryBuilder->expr()->gt(
                         $exclusionAlias.'.date_hit',
@@ -40,12 +40,12 @@ class SessionsFilterQueryBuilder extends BaseFilterQueryBuilder
                 )
             );
 
-        $sessionQueryBuilder = $queryBuilder->getConnection()->createQueryBuilder();
+        $sessionQueryBuilder = $queryBuilder->createQueryBuilder();
         $sessionQueryBuilder
             ->select('count(id)')
             ->from(MAUTIC_TABLE_PREFIX.'page_hits', $pageHitsAlias)
             ->where(
-                $queryBuilder->expr()->andX(
+                $queryBuilder->expr()->and(
                     $queryBuilder->expr()->eq($leadsTableAlias.'.id', $pageHitsAlias.'.lead_id'),
                     $queryBuilder->expr()->isNull($pageHitsAlias.'.email_id'),
                     $queryBuilder->expr()->isNull($pageHitsAlias.'.redirect_id'),

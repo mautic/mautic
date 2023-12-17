@@ -11,23 +11,22 @@ use PHPUnit\Framework\TestCase;
 class PathsHelperTest extends TestCase
 {
     private $cacheDir = __DIR__.'/resource/paths/cache';
+
     private $logsDir  = __DIR__.'/resource/paths/logs';
+
     private $rootDir  = __DIR__.'/resource/paths';
 
     /**
      * @var MockObject|UserHelper
      */
-    private $userHelper;
+    private \PHPUnit\Framework\MockObject\MockObject $userHelper;
 
     /**
      * @var MockObject|CoreParametersHelper
      */
-    private $coreParametersHelper;
+    private \PHPUnit\Framework\MockObject\MockObject $coreParametersHelper;
 
-    /**
-     * @var PathsHelper
-     */
-    private $helper;
+    private \Mautic\CoreBundle\Helper\PathsHelper $helper;
 
     protected function setUp(): void
     {
@@ -35,15 +34,10 @@ class PathsHelperTest extends TestCase
         $this->coreParametersHelper = $this->createMock(CoreParametersHelper::class);
         $this->coreParametersHelper->method('get')
             ->willReturnCallback(
-                function (string $key) {
-                    switch ($key) {
-                        case 'image_path':
-                            return 'media/images';
-                        case 'tmp_path':
-                            return __DIR__.'/resource/paths/tmp';
-                        default:
-                            return '';
-                    }
+                fn (string $key) => match ($key) {
+                    'image_path' => 'media/images',
+                    'tmp_path'   => __DIR__.'/resource/paths/tmp',
+                    default      => '',
                 }
             );
         $this->helper = new PathsHelper(
@@ -51,57 +45,57 @@ class PathsHelperTest extends TestCase
         );
     }
 
-    public function testGetLocalConfigFile()
+    public function testGetLocalConfigFile(): void
     {
-        $this->assertEquals(__DIR__.'/resource/paths/app/config/local.php', $this->helper->getLocalConfigurationFile());
+        $this->assertEquals(__DIR__.'/resource/paths/config/local.php', realpath($this->helper->getLocalConfigurationFile()));
     }
 
-    public function testGetCachePath()
+    public function testGetCachePath(): void
     {
         $this->assertEquals($this->cacheDir, $this->helper->getCachePath());
     }
 
-    public function testGetRootPath()
+    public function testGetRootPath(): void
     {
         $this->assertEquals(__DIR__.'/resource/paths', $this->helper->getRootPath());
     }
 
-    public function testGetTemporaryPath()
+    public function testGetTemporaryPath(): void
     {
         $this->assertEquals(__DIR__.'/resource/paths/tmp', $this->helper->getTemporaryPath());
     }
 
-    public function testGetLogsPath()
+    public function testGetLogsPath(): void
     {
         $this->assertEquals($this->logsDir, $this->helper->getLogsPath());
     }
 
-    public function testGetImagesPath()
+    public function testGetImagesPath(): void
     {
         $this->assertEquals(__DIR__.'/resource/paths/media/images', $this->helper->getImagePath());
     }
 
-    public function testGetTranslationsPath()
+    public function testGetTranslationsPath(): void
     {
         $this->assertEquals(__DIR__.'/resource/paths/translations', $this->helper->getTranslationsPath());
     }
 
-    public function testGetThemesPath()
+    public function testGetThemesPath(): void
     {
         $this->assertEquals(__DIR__.'/resource/paths/themes', $this->helper->getThemesPath());
     }
 
-    public function testGetAssetsPath()
+    public function testGetAssetsPath(): void
     {
         $this->assertEquals(__DIR__.'/resource/paths/media', $this->helper->getAssetsPath());
     }
 
-    public function testGetCoreBundlesPath()
+    public function testGetCoreBundlesPath(): void
     {
         $this->assertEquals(__DIR__.'/resource/paths/app/bundles', $this->helper->getCoreBundlesPath());
     }
 
-    public function testGetPluginsPath()
+    public function testGetPluginsPath(): void
     {
         $this->assertEquals(__DIR__.'/resource/paths/plugins', $this->helper->getPluginsPath());
     }

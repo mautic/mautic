@@ -28,9 +28,6 @@ class MessageQueueRepository extends CommonRepository
     }
 
     /**
-     * @param null $channel
-     * @param null $channelId
-     *
      * @return array<int, MessageQueue>
      */
     public function getQueuedMessages($limit, $processStarted, $channel = null, $channelId = null)
@@ -63,10 +60,7 @@ class MessageQueueRepository extends CommonRepository
         return $q->getQuery()->getResult();
     }
 
-    /**
-     * @return bool|string
-     */
-    public function getQueuedChannelCount($channel, array $ids = null)
+    public function getQueuedChannelCount($channel, array $ids = null): int
     {
         $q = $this->getEntityManager()->getConnection()->createQueryBuilder();
 
@@ -90,7 +84,7 @@ class MessageQueueRepository extends CommonRepository
                     'status'  => MessageQueue::STATUS_SENT,
                 ]
             )
-            ->execute()
+            ->executeQuery()
             ->fetchOne();
     }
 
@@ -105,8 +99,8 @@ class MessageQueueRepository extends CommonRepository
     {
         $query = $this->getEntityManager()->getConnection()->createQueryBuilder()
             ->from(MAUTIC_TABLE_PREFIX.'message_queue', 'mq')
-            ->select('mq.id, mq.lead_id, mq.channel as channelName, mq.channel_id as channelId, 
-            mq.priority as priority, mq.attempts, mq.success, mq.status, mq.date_published as dateAdded, 
+            ->select('mq.id, mq.lead_id, mq.channel as channelName, mq.channel_id as channelId,
+            mq.priority as priority, mq.attempts, mq.success, mq.status, mq.date_published as dateAdded,
             mq.scheduled_date as scheduledDate, mq.last_attempt as lastAttempt, mq.date_sent as dateSent');
 
         if ($leadId) {

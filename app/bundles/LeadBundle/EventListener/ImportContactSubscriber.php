@@ -22,21 +22,12 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 final class ImportContactSubscriber implements EventSubscriberInterface
 {
-    private FieldList $fieldList;
-    private CorePermissions $corePermissions;
-    private LeadModel $contactModel;
-    private TranslatorInterface $translator;
-
     public function __construct(
-        FieldList $fieldList,
-        CorePermissions $corePermissions,
-        LeadModel $contactModel,
-        TranslatorInterface $translator
+        private FieldList $fieldList,
+        private CorePermissions $corePermissions,
+        private LeadModel $contactModel,
+        private TranslatorInterface $translator
     ) {
-        $this->fieldList       = $fieldList;
-        $this->corePermissions = $corePermissions;
-        $this->contactModel    = $contactModel;
-        $this->translator      = $translator;
     }
 
     public static function getSubscribedEvents(): array
@@ -81,6 +72,7 @@ final class ImportContactSubscriber implements EventSubscriberInterface
                 'stage'          => 'mautic.lead.import.label.stage',
                 'doNotEmail'     => 'mautic.lead.import.label.doNotEmail',
                 'ownerusername'  => 'mautic.lead.import.label.ownerusername',
+                'tags'           => 'mautic.lead.import.label.tags',
             ];
 
             // Add ID to lead fields to allow matching import contacts by identifier
@@ -196,7 +188,7 @@ final class ImportContactSubscriber implements EventSubscriberInterface
         $missingRequiredFields = array_diff_key($requiredFields, array_flip($matchedFields));
 
         // Check for the presense of company mapped fields
-        $companyFields = array_filter($matchedFields, fn ($fieldname) => is_string($fieldname) && 0 === strpos($fieldname, 'company'));
+        $companyFields = array_filter($matchedFields, fn ($fieldname) => is_string($fieldname) && str_starts_with($fieldname, 'company'));
 
         // If we have any, ensure all required company fields are mapped.
         if (count($companyFields)) {

@@ -2,39 +2,34 @@
 
 namespace Mautic\CoreBundle\Controller;
 
-use Symfony\Component\Form\Form;
 use Symfony\Component\Form\FormInterface;
 
 trait FormErrorMessagesTrait
 {
     /**
      * @param array<mixed> $formErrors
-     *
-     * @return string
      */
-    public function getFormErrorMessage(array $formErrors)
+    public function getFormErrorMessage(array $formErrors): string
     {
         $msg = '';
 
-        if ($formErrors) {
-            foreach ($formErrors as $key => $error) {
-                if (!$error) {
-                    continue;
-                }
+        foreach ($formErrors as $key => $error) {
+            if (!$error) {
+                continue;
+            }
 
-                if ($msg) {
-                    $msg .= ', ';
-                }
+            if ($msg) {
+                $msg .= ', ';
+            }
 
-                if (is_string($key)) {
-                    $msg .= $key.': ';
-                }
+            if (is_string($key)) {
+                $msg .= $key.': ';
+            }
 
-                if (is_array($error)) {
-                    $msg .= $this->getFormErrorMessage($error);
-                } else {
-                    $msg .= $error;
-                }
+            if (is_array($error)) {
+                $msg .= $this->getFormErrorMessage($error);
+            } else {
+                $msg .= $error;
             }
         }
 
@@ -64,7 +59,7 @@ trait FormErrorMessagesTrait
     /**
      * @return array<string|null>
      */
-    public function getFormErrorCodes(Form $form): array
+    public function getFormErrorCodes(FormInterface $form): array
     {
         $codes = [];
 
@@ -76,7 +71,10 @@ trait FormErrorMessagesTrait
         return $codes;
     }
 
-    public function getFormErrorForBuilder(Form $form): ?string
+    /**
+     * @param FormInterface<object> $form
+     */
+    public function getFormErrorForBuilder(FormInterface $form): ?string
     {
         if (!$form->isSubmitted() || $form->isValid()) {
             return null;

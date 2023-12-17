@@ -1,0 +1,21 @@
+<div class="heatmap-legend">
+    <p>{{ 'mautic.email.heatmap.clicks_recorded'|trans }}<br />
+        <small><a href="#" data-toggle="heatmap-total" class="active">{{ 'mautic.email.heatmap.total'|trans }}</a> | <a href="#" data-toggle="heatmap-unique">{{ 'mautic.email.heatmap.unique'|trans }}</a></small></p>
+    <p data-heatmap-clicks>{{ totalClicks }}</p>
+    <p>{{ 'mautic.email.heatmap.heat_scale'|trans }}</p>
+    <div class="heatmap-scale-header">
+        <div>{{ 'mautic.email.heatmap.cold'|trans }}</div>
+        <div>{{ 'mautic.email.heatmap.hot'|trans }}</div>
+    </div>
+    <div class="heatmap-scale">
+        <div class="heatmap-scale-bar"></div>
+        <div class="heatmap-scale-bar"></div>
+        <div class="heatmap-scale-bar"></div>
+        <div class="heatmap-scale-bar"></div>
+        <div class="heatmap-scale-bar"></div>
+    </div>
+    <div class="heatmap-scale-footer">
+        <div>0%</div>
+        <div>100%</div>
+    </div>
+</div>

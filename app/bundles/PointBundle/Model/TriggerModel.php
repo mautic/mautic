@@ -12,8 +12,10 @@ use Mautic\CoreBundle\Model\FormModel as CommonFormModel;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\CoreBundle\Translation\Translator;
 use Mautic\LeadBundle\Entity\Lead;
+use Mautic\LeadBundle\Entity\LeadRepository;
 use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\LeadBundle\Tracker\ContactTracker;
+use Mautic\PointBundle\Entity\GroupContactScore;
 use Mautic\PointBundle\Entity\LeadTriggerLog;
 use Mautic\PointBundle\Entity\Trigger;
 use Mautic\PointBundle\Entity\TriggerEvent;
@@ -35,38 +37,19 @@ class TriggerModel extends CommonFormModel
     protected $triggers = [];
 
     /**
-     * @var IpLookupHelper
+     * @var array<string,array<string,mixed>>
      */
-    protected $ipLookupHelper;
-
-    /**
-     * @var LeadModel
-     */
-    protected $leadModel;
-
-    /**
-     * @var TriggerEventModel
-     */
-    protected $pointTriggerEventModel;
-
-    /**
-     * @deprecated https://github.com/mautic/mautic/issues/8229
-     *
-     * @var MauticFactory
-     */
-    protected $mauticFactory;
-
-    /**
-     * @var ContactTracker
-     */
-    private $contactTracker;
+    private static array $events;
 
     public function __construct(
-        IpLookupHelper $ipLookupHelper,
-        LeadModel $leadModel,
-        TriggerEventModel $pointTriggerEventModel,
-        MauticFactory $mauticFactory,
-        ContactTracker $contactTracker,
+        protected IpLookupHelper $ipLookupHelper,
+        protected LeadModel $leadModel,
+        protected TriggerEventModel $pointTriggerEventModel,
+        /**
+         * @deprecated https://github.com/mautic/mautic/issues/8229
+         */
+        protected MauticFactory $mauticFactory,
+        private ContactTracker $contactTracker,
         EntityManagerInterface $em,
         CorePermissions $security,
         EventDispatcherInterface $dispatcher,
@@ -76,18 +59,10 @@ class TriggerModel extends CommonFormModel
         LoggerInterface $mauticLogger,
         CoreParametersHelper $coreParametersHelper
     ) {
-        $this->ipLookupHelper         = $ipLookupHelper;
-        $this->leadModel              = $leadModel;
-        $this->pointTriggerEventModel = $pointTriggerEventModel;
-        $this->mauticFactory          = $mauticFactory;
-        $this->contactTracker         = $contactTracker;
-
         parent::__construct($em, $security, $dispatcher, $router, $translator, $userHelper, $mauticLogger, $coreParametersHelper);
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @return \Mautic\PointBundle\Entity\TriggerRepository
      */
     public function getRepository()
@@ -105,20 +80,15 @@ class TriggerModel extends CommonFormModel
         return $this->em->getRepository(TriggerEvent::class);
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getPermissionBase()
+    public function getPermissionBase(): string
     {
         return 'point:triggers';
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @throws MethodNotAllowedHttpException
      */
-    public function createForm($entity, FormFactoryInterface $formFactory, $action = null, $options = [])
+    public function createForm($entity, FormFactoryInterface $formFactory, $action = null, $options = []): \Symfony\Component\Form\FormInterface
     {
         if (!$entity instanceof Trigger) {
             throw new MethodNotAllowedHttpException(['Trigger']);
@@ -132,12 +102,10 @@ class TriggerModel extends CommonFormModel
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @param \Mautic\PointBundle\Entity\Trigger $entity
      * @param bool                               $unlock
      */
-    public function saveEntity($entity, $unlock = true)
+    public function saveEntity($entity, $unlock = true): void
     {
         $isNew = ($entity->getId()) ? false : true;
 
@@ -145,30 +113,54 @@ class TriggerModel extends CommonFormModel
 
         // should we trigger for existing leads?
         if ($entity->getTriggerExistingLeads() && $entity->isPublished()) {
-            $events    = $entity->getEvents();
-            $repo      = $this->getEventRepository();
-            $persist   = [];
-            $ipAddress = $this->ipLookupHelper->getIpAddress();
+            $events      = $entity->getEvents();
+            $repo        = $this->getEventRepository();
+            $persist     = [];
+            $ipAddress   = $this->ipLookupHelper->getIpAddress();
+            $pointGroup  = $entity->getGroup();
+
+            /** @var LeadRepository $leadRepository */
+            $leadRepository = $this->em->getRepository(Lead::class);
 
             foreach ($events as $event) {
-                $filter = ['force' => [
-                    [
-                        'column' => 'l.date_added',
-                        'expr'   => 'lte',
-                        'value'  => (new DateTimeHelper($entity->getDateAdded()))->toUtcString(),
+                $args = [
+                    'filter' => [
+                        'force' => [
+                            [
+                                'column' => 'l.date_added',
+                                'expr'   => 'lte',
+                                'value'  => (new DateTimeHelper($entity->getDateAdded()))->toUtcString(),
+                            ],
+                        ],
                     ],
-                    [
+                ];
+
+                if (!$pointGroup) {
+                    $args['filter']['force'][] = [
                         'column' => 'l.points',
                         'expr'   => 'gte',
                         'value'  => $entity->getPoints(),
-                    ],
-                ]];
+                    ];
+                } else {
+                    $args['qb'] = $leadRepository->getEntitiesDbalQueryBuilder()
+                        ->leftJoin('l', MAUTIC_TABLE_PREFIX.GroupContactScore::TABLE_NAME, 'pls', 'l.id = pls.contact_id');
+                    $args['filter']['force'][] = [
+                        'column' => 'pls.score',
+                        'expr'   => 'gte',
+                        'value'  => $entity->getPoints(),
+                    ];
+                    $args['filter']['force'][] = [
+                        'column' => 'pls.group_id',
+                        'expr'   => 'eq',
+                        'value'  => $entity->getGroup()->getId(),
+                    ];
+                }
 
                 if (!$isNew) {
                     // get a list of leads that has already had this event applied
                     $leadIds = $repo->getLeadsForEvent($event->getId());
                     if (!empty($leadIds)) {
-                        $filter['force'][] = [
+                        $args['filter']['force'][] = [
                             'column' => 'l.id',
                             'expr'   => 'notIn',
                             'value'  => $leadIds,
@@ -177,10 +169,9 @@ class TriggerModel extends CommonFormModel
                 }
 
                 // get a list of leads that are before the trigger's date_added and trigger if not already done so
-                $leads = $this->leadModel->getEntities([
-                    'filter' => $filter,
-                ]);
+                $leads = $this->leadModel->getEntities($args);
 
+                /** @var Lead $l */
                 foreach ($leads as $l) {
                     if ($this->triggerEvent($event->convertToArray(), $l, true)) {
                         $log = new LeadTriggerLog();
@@ -200,12 +191,7 @@ class TriggerModel extends CommonFormModel
         }
     }
 
-    /**
-     * {@inheritdoc}
-     *
-     * @return Trigger|null
-     */
-    public function getEntity($id = null)
+    public function getEntity($id = null): ?Trigger
     {
         if (null === $id) {
             return new Trigger();
@@ -215,11 +201,9 @@ class TriggerModel extends CommonFormModel
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @throws MethodNotAllowedHttpException
      */
-    protected function dispatchEvent($action, &$entity, $isNew = false, Event $event = null)
+    protected function dispatchEvent($action, &$entity, $isNew = false, Event $event = null): ?Event
     {
         if (!$entity instanceof Trigger) {
             throw new MethodNotAllowedHttpException(['Trigger']);
@@ -258,7 +242,7 @@ class TriggerModel extends CommonFormModel
     /**
      * @param array $sessionEvents
      */
-    public function setEvents(Trigger $entity, $sessionEvents)
+    public function setEvents(Trigger $entity, $sessionEvents): void
     {
         $order           = 1;
         $existingActions = $entity->getEvents();
@@ -296,25 +280,23 @@ class TriggerModel extends CommonFormModel
      */
     public function getEvents()
     {
-        static $events;
-
-        if (empty($events)) {
+        if (empty(self::$events)) {
             // build them
-            $events = [];
-            $event  = new Events\TriggerBuilderEvent($this->translator);
+            self::$events = [];
+            $event        = new Events\TriggerBuilderEvent($this->translator);
             $this->dispatcher->dispatch($event, PointEvents::TRIGGER_ON_BUILD);
-            $events = $event->getEvents();
+            self::$events = $event->getEvents();
         }
 
-        return $events;
+        return self::$events;
     }
 
     /**
      * Gets array of custom events from bundles inside groups.
      *
-     * @return mixed
+     * @return mixed[]
      */
-    public function getEventGroups()
+    public function getEventGroups(): array
     {
         $events = $this->getEvents();
         $groups = [];
@@ -392,7 +374,7 @@ class TriggerModel extends CommonFormModel
 
         if (is_array($settings['callback'])) {
             $reflection = new \ReflectionMethod($settings['callback'][0], $settings['callback'][1]);
-        } elseif (false !== strpos($settings['callback'], '::')) {
+        } elseif (str_contains($settings['callback'], '::')) {
             $parts      = explode('::', $settings['callback']);
             $reflection = new \ReflectionMethod($parts[0], $parts[1]);
         } else {
@@ -414,20 +396,23 @@ class TriggerModel extends CommonFormModel
     /**
      * Trigger events for the current lead.
      */
-    public function triggerEvents(Lead $lead)
+    public function triggerEvents(Lead $lead): void
     {
         $points = $lead->getPoints();
 
         // find all published triggers that is applicable to this points
         /** @var \Mautic\PointBundle\Entity\TriggerEventRepository $repo */
-        $repo   = $this->getEventRepository();
-        $events = $repo->getPublishedByPointTotal($points);
+        $repo         = $this->getEventRepository();
+        $events       = $repo->getPublishedByPointTotal($points);
+        $groupEvents  = $repo->getPublishedByGroupScore($lead->getGroupScores());
+        $events       = array_merge($events, $groupEvents);
 
         if (!empty($events)) {
             // get a list of actions that has already been applied to this lead
             $appliedEvents = $repo->getLeadTriggeredEvents($lead->getId());
             $ipAddress     = $this->ipLookupHelper->getIpAddress();
             $persist       = [];
+
             foreach ($events as $event) {
                 if (isset($appliedEvents[$event['id']])) {
                     // don't apply the event to the lead if it's already been done

@@ -16,7 +16,7 @@
     - mauticContent
 #}
 {% set isIndex = 'index' == tmpl ? true : false %}
-{% extends isIndex ? '@MauticLead/Lead/index.html.twig' : '@MauticCore/Default/raw_output.html.twig' %}
+{% extends isIndex ? '@MauticLead/Lead/list.html.twig' : '@MauticCore/Default/raw_output.html.twig' %}
 
 {% block content %}
 <div class="pa-md bg-auto">

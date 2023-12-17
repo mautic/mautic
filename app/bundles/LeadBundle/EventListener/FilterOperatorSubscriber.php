@@ -19,28 +19,13 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 final class FilterOperatorSubscriber implements EventSubscriberInterface
 {
-    private OperatorOptions $operatorOptions;
-
-    private LeadFieldRepository $leadFieldRepository;
-
-    private TypeOperatorProviderInterface $typeOperatorProvider;
-
-    private FieldChoicesProviderInterface $fieldChoicesProvider;
-
-    private TranslatorInterface $translator;
-
     public function __construct(
-        OperatorOptions $operatorOptions,
-        LeadFieldRepository $leadFieldRepository,
-        TypeOperatorProviderInterface $typeOperatorProvider,
-        FieldChoicesProviderInterface $fieldChoicesProvider,
-        TranslatorInterface $translator
+        private OperatorOptions $operatorOptions,
+        private LeadFieldRepository $leadFieldRepository,
+        private TypeOperatorProviderInterface $typeOperatorProvider,
+        private FieldChoicesProviderInterface $fieldChoicesProvider,
+        private TranslatorInterface $translator
     ) {
-        $this->operatorOptions      = $operatorOptions;
-        $this->leadFieldRepository  = $leadFieldRepository;
-        $this->typeOperatorProvider = $typeOperatorProvider;
-        $this->fieldChoicesProvider = $fieldChoicesProvider;
-        $this->translator           = $translator;
     }
 
     public static function getSubscribedEvents(): array
@@ -64,7 +49,7 @@ final class FilterOperatorSubscriber implements EventSubscriberInterface
 
     public function onGenerateSegmentFiltersAddCustomFields(LeadListFiltersChoicesEvent $event): void
     {
-        $this->leadFieldRepository->getListablePublishedFields()->map(function (LeadField $field) use ($event) {
+        $this->leadFieldRepository->getListablePublishedFields()->map(function (LeadField $field) use ($event): void {
             $type               = $field->getType();
             $properties         = $field->getProperties();
             $properties['type'] = $type;
@@ -79,7 +64,7 @@ final class FilterOperatorSubscriber implements EventSubscriberInterface
             } else {
                 try {
                     $properties['list'] = $this->fieldChoicesProvider->getChoicesForField($type, $field->getAlias());
-                } catch (ChoicesNotFoundException $e) {
+                } catch (ChoicesNotFoundException) {
                     // That's fine. Not all fields should have choices.
                 }
             }
@@ -100,7 +85,7 @@ final class FilterOperatorSubscriber implements EventSubscriberInterface
     public function onGenerateSegmentFiltersAddStaticFields(LeadListFiltersChoicesEvent $event): void
     {
         // Only show for segments and not dynamic content addressed by https://github.com/mautic/mautic/pull/9260
-        if (!$this->isForSegmentation($event)) {
+        if (!$event->isForSegmentation()) {
             return;
         }
 
@@ -326,7 +311,7 @@ final class FilterOperatorSubscriber implements EventSubscriberInterface
     public function onGenerateSegmentFiltersAddBehaviors(LeadListFiltersChoicesEvent $event): void
     {
         // Only show for segments and not dynamic content addressed by https://github.com/mautic/mautic/pull/9260
-        if (!$this->isForSegmentation($event)) {
+        if (!$event->isForSegmentation()) {
             return;
         }
 
@@ -590,30 +575,6 @@ final class FilterOperatorSubscriber implements EventSubscriberInterface
         foreach ($choices as $alias => $fieldOptions) {
             $event->addChoice('behaviors', $alias, $fieldOptions);
         }
-    }
-
-    private function isForSegmentation(LeadListFiltersChoicesEvent $event): bool
-    {
-        $route = (string) $event->getRoute();
-
-        // segment form
-        if ('mautic_segment_action' === $route) {
-            return true;
-        }
-
-        // segment API
-        if (0 === strpos($route, 'mautic_api_lists')) {
-            return true;
-        }
-
-        // ajax request to load the filter's value fields
-        $request = $event->getRequest();
-        if ('loadSegmentFilterForm' === $request->attributes->get('action')) {
-            return true;
-        }
-
-        // something else such as dynanmic content
-        return false;
     }
 
     private function setIncludeExcludeOperatorsToTextFilters(LeadListFiltersChoicesEvent $event): void

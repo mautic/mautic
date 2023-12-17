@@ -21,7 +21,7 @@ class DynamicContentRepository extends CommonRepository
         $q = $this->_em
             ->createQueryBuilder()
             ->select('e')
-            ->from(\Mautic\DynamicContentBundle\Entity\DynamicContent::class, 'e', 'e.id');
+            ->from(DynamicContent::class, 'e', 'e.id');
 
         if (empty($args['iterator_mode'])) {
             $q->leftJoin('e.category', 'c');
@@ -34,17 +34,15 @@ class DynamicContentRepository extends CommonRepository
 
     /**
      * @param \Doctrine\ORM\QueryBuilder|\Doctrine\DBAL\Query\QueryBuilder $q
-     *
-     * @return array
      */
-    protected function addSearchCommandWhereClause($q, $filter)
+    protected function addSearchCommandWhereClause($q, $filter): array
     {
-        list($expr, $parameters) = $this->addStandardSearchCommandWhereClause($q, $filter);
+        [$expr, $parameters] = $this->addStandardSearchCommandWhereClause($q, $filter);
         if ($expr) {
             return [$expr, $parameters];
         }
 
-        list($expr, $parameters) = parent::addSearchCommandWhereClause($q, $filter);
+        [$expr, $parameters] = parent::addSearchCommandWhereClause($q, $filter);
         if ($expr) {
             return [$expr, $parameters];
         }
@@ -83,9 +81,9 @@ class DynamicContentRepository extends CommonRepository
     }
 
     /**
-     * @return array
+     * @return string[]
      */
-    public function getSearchCommands()
+    public function getSearchCommands(): array
     {
         $commands = [
             'mautic.core.searchcommand.ispublished',
@@ -102,17 +100,14 @@ class DynamicContentRepository extends CommonRepository
     /**
      * @return array<array<string>>
      */
-    protected function getDefaultOrder()
+    protected function getDefaultOrder(): array
     {
         return [
             ['e.name', 'ASC'],
         ];
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getTableAlias()
+    public function getTableAlias(): string
     {
         return 'e';
     }
@@ -122,7 +117,7 @@ class DynamicContentRepository extends CommonRepository
      *
      * @param int $increaseBy
      */
-    public function upSentCount($id, $increaseBy = 1)
+    public function upSentCount($id, $increaseBy = 1): void
     {
         $q = $this->_em->getConnection()->createQueryBuilder();
 
@@ -130,7 +125,7 @@ class DynamicContentRepository extends CommonRepository
             ->set('sent_count', 'sent_count + '.(int) $increaseBy)
             ->where('id = '.(int) $id);
 
-        $q->execute();
+        $q->executeStatement();
     }
 
     /**
@@ -206,7 +201,7 @@ class DynamicContentRepository extends CommonRepository
             ->setParameter('slot', '%'.$slot.'%')
             ->orderBy('c.is_published');
 
-        $result = $qb->execute()->fetchAllAssociative();
+        $result = $qb->executeQuery()->fetchAllAssociative();
 
         foreach ($result as $item) {
             $properties = Serializer::decode($item['properties']);

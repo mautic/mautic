@@ -31,8 +31,8 @@ class TimelineController extends CommonController
         if ('POST' == $request->getMethod() && $request->request->has('search')) {
             $filters = [
                 'search'        => InputHelper::clean($request->request->get('search')),
-                'includeEvents' => InputHelper::clean($request->request->get('includeEvents')) ?? [],
-                'excludeEvents' => InputHelper::clean($request->request->get('excludeEvents')) ?? [],
+                'includeEvents' => InputHelper::clean($request->request->get('includeEvents') ?? []),
+                'excludeEvents' => InputHelper::clean($request->request->get('excludeEvents') ?? []),
             ];
             $session->set('mautic.lead.'.$leadId.'.timeline.filters', $filters);
         } else {
@@ -78,8 +78,8 @@ class TimelineController extends CommonController
         if ('POST' === $request->getMethod() && $request->request->has('search')) {
             $filters = [
                 'search'        => InputHelper::clean($request->request->get('search')),
-                'includeEvents' => InputHelper::clean($request->request->get('includeEvents')) ?? [],
-                'excludeEvents' => InputHelper::clean($request->request->get('excludeEvents')) ?? [],
+                'includeEvents' => InputHelper::clean($request->request->get('includeEvents') ?? []),
+                'excludeEvents' => InputHelper::clean($request->request->get('excludeEvents') ?? []),
             ];
             $session->set('mautic.plugin.timeline.filters', $filters);
         } else {
@@ -142,8 +142,8 @@ class TimelineController extends CommonController
         if ('POST' === $request->getMethod() && $request->request->has('search')) {
             $filters = [
                 'search'        => InputHelper::clean($request->request->get('search')),
-                'includeEvents' => InputHelper::clean($request->request->get('includeEvents')) ?? [],
-                'excludeEvents' => InputHelper::clean($request->request->get('excludeEvents')) ?? [],
+                'includeEvents' => InputHelper::clean($request->request->get('includeEvents') ?? []),
+                'excludeEvents' => InputHelper::clean($request->request->get('excludeEvents') ?? []),
             ];
             $session->set('mautic.plugin.timeline.'.$leadId.'.filters', $filters);
         } else {
@@ -207,8 +207,8 @@ class TimelineController extends CommonController
         if ('POST' == $request->getMethod() && $request->request->has('search')) {
             $filters = [
                 'search'        => InputHelper::clean($request->request->get('search')),
-                'includeEvents' => InputHelper::clean($request->request->get('includeEvents')) ?? [],
-                'excludeEvents' => InputHelper::clean($request->request->get('excludeEvents')) ?? [],
+                'includeEvents' => InputHelper::clean($request->request->get('includeEvents') ?? []),
+                'excludeEvents' => InputHelper::clean($request->request->get('excludeEvents') ?? []),
             ];
             $session->set('mautic.lead.'.$leadId.'.timeline.filters', $filters);
         } else {
@@ -222,15 +222,15 @@ class TimelineController extends CommonController
 
         $dataType = $request->get('filetype', 'csv');
 
-        $resultsCallback = function ($event) use ($dateHelper) {
-            $eventLabel = (isset($event['eventLabel'])) ? $event['eventLabel'] : $event['eventType'];
+        $resultsCallback = function ($event) use ($dateHelper): array {
+            $eventLabel = $event['eventLabel'] ?? $event['eventType'];
             if (is_array($eventLabel)) {
                 $eventLabel = $eventLabel['label'];
             }
 
             return [
                 'eventName'      => $eventLabel,
-                'eventType'      => isset($event['eventType']) ? $event['eventType'] : '',
+                'eventType'      => $event['eventType'] ?? '',
                 'eventTimestamp' => $dateHelper->toText($event['timestamp'], 'local', 'Y-m-d H:i:s', true),
             ];
         };

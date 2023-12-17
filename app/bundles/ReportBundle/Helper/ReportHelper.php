@@ -2,12 +2,18 @@
 
 namespace Mautic\ReportBundle\Helper;
 
+use Mautic\ReportBundle\Event\ColumnCollectEvent;
+use Mautic\ReportBundle\ReportEvents;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+
 final class ReportHelper
 {
-    /**
-     * @return string
-     */
-    public function getName()
+    public function __construct(
+        private EventDispatcherInterface $dispatcher
+    ) {
+    }
+
+    public function getName(): string
     {
         return 'report';
     }
@@ -17,23 +23,11 @@ final class ReportHelper
      */
     public function getReportBuilderFieldType($type)
     {
-        switch ($type) {
-            case 'number':
-                $type = 'int';
-                break;
-            case 'lookup':
-            case 'text':
-            case 'url':
-            case 'email':
-            case 'tel':
-            case 'region':
-            case 'country':
-            case 'locale':
-                $type = 'string';
-                break;
-        }
-
-        return $type;
+        return match ($type) {
+            'number' => 'int',
+            'lookup', 'text', 'url', 'email', 'tel', 'region', 'country', 'locale' => 'string',
+            default => $type,
+        };
     }
 
     /**
@@ -104,14 +98,34 @@ final class ReportHelper
             unset($columns[$prefix.'id']['link']);
         }
 
-        if (!empty($removeColumns)) {
-            foreach ($removeColumns as $c) {
-                if (isset($columns[$prefix.$c])) {
-                    unset($columns[$prefix.$c]);
-                }
+        foreach ($removeColumns as $c) {
+            if (isset($columns[$prefix.$c])) {
+                unset($columns[$prefix.$c]);
             }
         }
 
         return $columns;
+    }
+
+    /**
+     * @param array<string, mixed> $properties
+     *
+     * @return array<string, array<string, mixed>>
+     */
+    public function getMappedObjectColumns(string $object, array $properties = []): array
+    {
+        $event = new ColumnCollectEvent($object, $properties);
+        $this->dispatcher->dispatch($event, ReportEvents::REPORT_ON_COLUMN_COLLECT);
+
+        return array_map(
+            function ($item) {
+                if (isset($item['type'])) {
+                    $item['type'] =  $this->getReportBuilderFieldType($item['type']);
+                }
+
+                return $item;
+            },
+            $event->getColumns()
+        );
     }
 }

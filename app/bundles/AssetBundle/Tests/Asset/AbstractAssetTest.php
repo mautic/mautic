@@ -12,9 +12,13 @@ use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 abstract class AbstractAssetTest extends MauticMysqlTestCase
 {
     protected Asset $asset;
+
     protected string $expectedMimeType;
+
     protected string $expectedContentDisposition;
+
     protected string $expectedPngContent;
+
     protected string $csvPath;
 
     protected function setUp(): void

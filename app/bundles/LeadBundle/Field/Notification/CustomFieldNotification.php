@@ -13,36 +13,18 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class CustomFieldNotification
 {
-    /**
-     * @var NotificationModel
-     */
-    private $notificationModel;
-
-    /**
-     * @var UserModel
-     */
-    private $userModel;
-
-    /**
-     * @var TranslatorInterface
-     */
-    private $translator;
-
     public function __construct(
-        NotificationModel $notificationModel,
-        UserModel $userModel,
-        TranslatorInterface $translator
+        private NotificationModel $notificationModel,
+        private UserModel $userModel,
+        private TranslatorInterface $translator
     ) {
-        $this->notificationModel = $notificationModel;
-        $this->userModel         = $userModel;
-        $this->translator        = $translator;
     }
 
-    public function customFieldWasCreated(LeadField $leadField, int $userId): void
+    public function customFieldWasCreated(LeadField $leadField, ?int $userId): void
     {
         try {
             $user = $this->getUser($userId);
-        } catch (NoUserException $e) {
+        } catch (NoUserException) {
             return;
         }
 
@@ -55,11 +37,11 @@ class CustomFieldNotification
         $this->addToNotificationCenter($user, $message, $header);
     }
 
-    public function customFieldLimitWasHit(LeadField $leadField, int $userId): void
+    public function customFieldLimitWasHit(LeadField $leadField, ?int $userId): void
     {
         try {
             $user = $this->getUser($userId);
-        } catch (NoUserException $e) {
+        } catch (NoUserException) {
             return;
         }
 
@@ -72,11 +54,11 @@ class CustomFieldNotification
         $this->addToNotificationCenter($user, $message, $header);
     }
 
-    public function customFieldCannotBeCreated(LeadField $leadField, int $userId): void
+    public function customFieldCannotBeCreated(LeadField $leadField, ?int $userId): void
     {
         try {
             $user = $this->getUser($userId);
-        } catch (NoUserException $e) {
+        } catch (NoUserException) {
             return;
         }
 
@@ -105,7 +87,7 @@ class CustomFieldNotification
     /**
      * @throws NoUserException
      */
-    private function getUser(int $userId): User
+    private function getUser(?int $userId): User
     {
         if (!$userId || !$user = $this->userModel->getEntity($userId)) {
             throw new NoUserException();

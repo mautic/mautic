@@ -2,45 +2,34 @@
 
 namespace Mautic\SmsBundle\Integration;
 
-use Mautic\CoreBundle\Form\Type\YesNoButtonGroupType;
 use Mautic\PluginBundle\Integration\AbstractIntegration;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\NumberType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 
-/**
- * Class TwilioIntegration.
- */
 class TwilioIntegration extends AbstractIntegration
 {
     protected bool $coreIntegration = true;
 
-    /**
-     * {@inheritdoc}
-     *
-     * @return string
-     */
-    public function getName()
+    public function getName(): string
     {
         return 'Twilio';
     }
 
-    public function getIcon()
+    public function getIcon(): string
     {
         return 'app/bundles/SmsBundle/Assets/img/Twilio.png';
     }
 
-    public function getSecretKeys()
+    public function getSecretKeys(): array
     {
         return ['password'];
     }
 
     /**
-     * {@inheritdoc}
-     *
-     * @return array
+     * @return array<string, string>
      */
-    public function getRequiredKeyFields()
+    public function getRequiredKeyFields(): array
     {
         return [
             'username' => 'mautic.sms.config.form.sms.username',
@@ -48,12 +37,7 @@ class TwilioIntegration extends AbstractIntegration
         ];
     }
 
-    /**
-     * {@inheritdoc}
-     *
-     * @return string
-     */
-    public function getAuthenticationType()
+    public function getAuthenticationType(): string
     {
         return 'none';
     }
@@ -63,31 +47,20 @@ class TwilioIntegration extends AbstractIntegration
      * @param array                                             $data
      * @param string                                            $formArea
      */
-    public function appendToForm(&$builder, $data, $formArea)
+    public function appendToForm(&$builder, $data, $formArea): void
     {
         if ('features' == $formArea) {
             $builder->add(
-                'sending_phone_number',
+                'messaging_service_sid',
                 TextType::class,
                 [
-                    'label'      => 'mautic.sms.config.form.sms.sending_phone_number',
+                    'label'      => 'mautic.sms.config.form.sms.messaging_service_sid',
                     'label_attr' => ['class' => 'control-label'],
                     'required'   => false,
                     'attr'       => [
                         'class'   => 'form-control',
-                        'tooltip' => 'mautic.sms.config.form.sms.sending_phone_number.tooltip',
+                        'tooltip' => 'mautic.sms.config.form.sms.messaging_service_sid.tooltip',
                     ],
-                ]
-            );
-            $builder->add(
-                'disable_trackable_urls',
-                YesNoButtonGroupType::class,
-                [
-                    'label' => 'mautic.sms.config.form.sms.disable_trackable_urls',
-                    'attr'  => [
-                        'tooltip' => 'mautic.sms.config.form.sms.disable_trackable_urls.tooltip',
-                    ],
-                    'data'=> !empty($data['disable_trackable_urls']) ? true : false,
                 ]
             );
             $builder->add('frequency_number', NumberType::class,
