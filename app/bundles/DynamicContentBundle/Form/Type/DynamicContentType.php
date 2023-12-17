@@ -72,10 +72,6 @@ class DynamicContentType extends AbstractType
      */
     private array $tagChoices = [];
 
-    private $leadModel;
-  
-    private RelativeDate $relativeDate;
-
     /**
      * @throws \InvalidArgumentException
      */
