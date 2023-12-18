@@ -16,6 +16,8 @@ use Doctrine\ORM\Query;
 use Doctrine\ORM\QueryBuilder;
 use Doctrine\ORM\Tools\Pagination\Paginator;
 use Doctrine\Persistence\ManagerRegistry;
+use Mautic\CoreBundle\Cache\ResultCacheHelper;
+use Mautic\CoreBundle\Cache\ResultCacheOptions;
 use Mautic\CoreBundle\Doctrine\Paginator\SimplePaginator;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\CoreBundle\Helper\InputHelper;
@@ -358,6 +360,14 @@ class CommonRepository extends ServiceEntityRepository
 
         $this->buildClauses($q, $args);
         $query = $q->getQuery();
+
+        if (isset($args['result_cache'])) {
+            if (!$args['result_cache'] instanceof ResultCacheOptions) {
+                throw new \InvalidArgumentException(sprintf('The value of the key "result_cache" must be an instance of "%s"', ResultCacheOptions::class));
+            }
+
+            ResultCacheHelper::enableOrmQueryCache($query, $args['result_cache']);
+        }
 
         if (isset($args['hydration_mode'])) {
             $hydrationMode = constant('\\Doctrine\\ORM\\Query::'.strtoupper($args['hydration_mode']));

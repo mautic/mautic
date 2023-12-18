@@ -2,6 +2,8 @@
 
 namespace Mautic\UserBundle\Security\Provider;
 
+use Mautic\CoreBundle\Cache\ResultCacheHelper;
+use Mautic\CoreBundle\Cache\ResultCacheOptions;
 use Mautic\CoreBundle\Helper\EncryptionHelper;
 use Mautic\UserBundle\Entity\PermissionRepository;
 use Mautic\UserBundle\Entity\User;
@@ -36,7 +38,7 @@ class UserProvider implements UserProviderInterface
      */
     public function loadUserByUsername($username)
     {
-        $q = $this->userRepository
+        $qb = $this->userRepository
             ->createQueryBuilder('u')
             ->select('u, r')
             ->leftJoin('u.role', 'r')
@@ -44,8 +46,9 @@ class UserProvider implements UserProviderInterface
             ->andWhere('u.isPublished = :true')
             ->setParameter('true', true, 'boolean')
             ->setParameter('username', $username);
-
-        $user = $q->getQuery()->getOneOrNullResult();
+        $query = $qb->getQuery();
+        ResultCacheHelper::enableOrmQueryCache($query, new ResultCacheOptions(User::CACHE_NAMESPACE, 5 * 60));
+        $user = $query->getOneOrNullResult();
 
         if (empty($user)) {
             $message = sprintf(

@@ -8,6 +8,7 @@ use Doctrine\ORM\Tools\Pagination\Paginator;
 use Mautic\CategoryBundle\Entity\Category;
 use Mautic\CategoryBundle\Model\CategoryModel;
 use Mautic\ChannelBundle\Helper\ChannelListHelper;
+use Mautic\CoreBundle\Cache\ResultCacheOptions;
 use Mautic\CoreBundle\Entity\IpAddress;
 use Mautic\CoreBundle\Form\RequestTrait;
 use Mautic\CoreBundle\Helper\Chart\ChartQuery;
@@ -518,6 +519,7 @@ class LeadModel extends FormModel
                     [
                         'filter'         => ['isPublished' => true, 'object' => 'lead'],
                         'hydration_mode' => 'HYDRATE_ARRAY',
+                        'result_cache'   => new ResultCacheOptions(LeadField::CACHE_NAMESPACE),
                     ]
                 );
                 $this->fieldsByGroup = $this->organizeFieldsByGroup($this->flattenedFields);
@@ -1301,6 +1303,7 @@ class LeadModel extends FormModel
                         ],
                     ],
                     'hydration_mode' => 'HYDRATE_ARRAY',
+                    'result_cache'   => new ResultCacheOptions(LeadField::CACHE_NAMESPACE),
                 ]
             );
         }
