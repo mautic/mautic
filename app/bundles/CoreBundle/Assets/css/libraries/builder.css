@@ -20,7 +20,6 @@
   border: 0;
 }
 :focus {
-  outline: 0;
 }
 .fr-element,
 .fr-element:focus {

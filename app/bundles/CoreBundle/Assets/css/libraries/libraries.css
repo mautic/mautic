@@ -42,7 +42,6 @@ a {
 }
 a:active,
 a:hover {
-  outline: 0;
 }
 abbr[title] {
   border-bottom: none;
@@ -1092,9 +1091,7 @@ a {
 a:not(.btn):hover, a:not(.btn):focus {
   color: var(--link-primary-hover);
 }
-a:focus {
-  border-color: var(--button-primary);
-}
+
 figure {
   margin: 0;
 }
@@ -3149,13 +3146,14 @@ select[multiple].input-lg {
   height: 48px;
   font-size: 13px;
   line-height: 1.3856;
-  border: 2px solid transparent;
-  outline: none;
+  border: 1px solid transparent;
+  outline: 2px solid transparent;
+  outline-offset: -2px;
   -webkit-user-select: none;
   -moz-user-select: none;
   -ms-user-select: none;
   user-select: none;
-  transition: background var(--timing), border var(--timing);
+  transition: background var(--timing), outline var(--timing);
 }
 .btn-primary, .btn-secondary, .btn-tertiary, .btn-ghost, .btn-danger-primary, .btn-danger-tertiary {
   min-width: 175px;
@@ -3167,7 +3165,7 @@ select[multiple].input-lg {
 .btn.focus,
 .btn:active.focus,
 .btn.active.focus {
-  border-color: var(--button-primary);
+  outline-color: var(--focus);
 }
 .btn:hover,
 .btn:focus,
@@ -3177,7 +3175,7 @@ select[multiple].input-lg {
 .btn:active,
 .btn.active {
   background-image: none;
-  outline: 0;
+  outline-color: var(--focus)
   background-color: var(--button-primary-active);
 }
 .btn.disabled,
@@ -3343,7 +3341,7 @@ fieldset[disabled] .btn-primary.focus {
   background-color: var(--background-active);
 }
 .btn-icon-only:focus {
-  border-color: var(--focus);
+  outline: 2px solid var(--focus);
 }
 .btn-icon-only:selected {
   background-color: var(--background-selected);
@@ -3713,9 +3711,6 @@ tbody.collapse.in {
 .dropdown {
   position: relative;
 }
-.dropdown-toggle:focus {
-  outline: 0;
-}
 .dropdown-toggle:after {
   color: var(--background-inverse);
 }
@@ -3799,7 +3794,6 @@ tbody.collapse.in {
   display: block;
 }
 .open > a {
-  outline: 0;
 }
 .dropdown-menu-right {
   right: 0;
@@ -3936,7 +3930,6 @@ tbody.collapse.in {
 }
 .btn-group .dropdown-toggle:active,
 .btn-group.open .dropdown-toggle {
-  outline: 0;
 }
 .btn-group > .btn + .dropdown-toggle {
   padding-right: 8px;
@@ -15650,7 +15643,6 @@ span.CodeMirror-selectedtext {
   border: 0;
 }
 :focus {
-  outline: 0;
 }
 .fr-element,
 .fr-element:focus {

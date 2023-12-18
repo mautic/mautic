@@ -351,7 +351,7 @@ body > #app-wrapper {
 #app-header.navbar .navbar-nocollapse .navbar-nav > li > a:active,
 #app-header.navbar .navbar-nocollapse .navbar-nav > li > a:focus,
 #app-header.navbar .navbar-nocollapse .navbar-nav > li > a.active {
-  outline: 0;
+  outline-color: var(--focus);
 }
 #app-header.navbar .navbar-nocollapse .navbar-nav .dropdown-custom {
   position: static;
@@ -377,9 +377,6 @@ body > #app-wrapper {
   box-shadow: 0 3px 6px rgba(0, 0, 0, 0.06);
 }
 #app-header.navbar .navbar-nocollapse .navbar-nav .open > a {
-}
-#app-header.navbar .navbar-nocollapse .navbar-nav .open > a:hover,
-#app-header.navbar .navbar-nocollapse .navbar-nav .open > a:focus {
 }
 #app-header.navbar .navbar-nocollapse .navbar-nav .open > a > .badge,
 #app-header.navbar .navbar-nocollapse .navbar-nav .open > a > .bullet,
@@ -1437,10 +1434,9 @@ blockquote > p:after {
   background-color: gray !important;
   right: 3px !important;
 }
-.btn,
 .btn:active,
 .btn.active {
-  outline: 0;
+  outline-color: var(--focus);
 }
 .btn .fa {
   min-width: 13px;
