@@ -1507,7 +1507,6 @@ blockquote > p:after {
 .btn-group .btn ~ .btn-group,
 .btn-group .btn-group ~ .btn,
 .btn-group .btn-group ~ .btn-group {
-  margin-left: -1px;
 }
 .alert-dismissible .close,
 .alert-dismissible .close {

@@ -3285,7 +3285,7 @@ fieldset[disabled] .btn-primary.focus {
   background-color: transparent;
   color: var(--button-tertiary);
   border-color: var(--button-tertiary);
-  margin-right: 10px;
+  margin-left: 10px;
 }
 .btn-tertiary:hover, .btn-primary + .btn-primary:hover, .btn-primary + .btn-primary + .btn-secondary:hover {
   color: var(--text-inverse);
@@ -3303,6 +3303,9 @@ fieldset[disabled] .btn-primary.focus {
   color: var(--text-disabled);
   background-color: transparent;
   border-color: var(--button-disabled);
+}
+.btn-primary, .btn-secondary, .btn-secondary {
+  flex-grow: 1;
 }
 .btn-ghost {
   background-color: transparent;
@@ -3856,9 +3859,6 @@ tbody.collapse.in {
   display: inline-block;
   vertical-align: middle;
 }
-.btn-primary, .btn-secondary, .btn-secondary {
-  flex-grow: 1;
-}
 .toolbar-standard {
   display: flex;
   min-width: 400px;
@@ -3869,7 +3869,6 @@ tbody.collapse.in {
   float: left;
   padding: 14px;
   height: 48px;
-  margin-right: 16px;
 }
 .btn-group > .btn > span > span, .btn-group-vertical > .btn > span > span {
   margin-right: 32px;
@@ -3891,7 +3890,6 @@ tbody.collapse.in {
 .btn-group .btn + .btn-group,
 .btn-group .btn-group + .btn,
 .btn-group .btn-group + .btn-group {
-  margin-left: -1px;
 }
 .btn-toolbar {
   margin-left: -5px;
