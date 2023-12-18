@@ -98,7 +98,7 @@ class FormButtonsType extends AbstractType
         $resolver->setDefaults(
             [
                 'apply_text'         => 'mautic.core.form.apply',
-                'apply_icon'         => 'fa fa-check text-success',
+                'apply_icon'         => 'fa fa-check',
                 'apply_class'        => 'btn btn-primary btn-apply',
                 'apply_onclick'      => false,
                 'apply_attr'         => [],

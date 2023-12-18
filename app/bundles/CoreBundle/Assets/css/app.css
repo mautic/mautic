@@ -142,6 +142,9 @@
   --button-danger-secondary: #da1e28;
   --button-danger-hover: #ba1b23;
   --button-danger-active: #750e13;
+  --button-success-primary: #008170;
+  --button-success-hover: #005d51;
+  --button-success-active: #00352e;
   --button-separator: #e0e0e0;
   --button-disabled: #c6c6c6;
   --support-error: #da1e28;
@@ -1441,6 +1444,9 @@ blockquote > p:after {
 .btn .fa {
   min-width: 13px;
   order: 2;
+}
+.btn:not(.btn-icon-only) .fa {
+  padding-left: 30px;
 }
 .btn span, .dropdown-menu > li > a > span {
   display: flex;
