@@ -429,23 +429,17 @@ class ImportController extends FormController
                         ->setDefault('owner', $validateEvent->getOwnerId())
                         ->setDefault('list', $validateEvent->getList())
                         ->setDefault('tags', $validateEvent->getTags())
-                        ->setDefault('skip_if_exists', $matchedFields['skip_if_exists'] ?? false)
+                        ->setDefault('skip_if_exists', $validateEvent->getSkipIfExists())
                         ->setHeaders($this->session->get('mautic.'.$object.'.import.headers'))
                         ->setParserConfig($this->session->get('mautic.'.$object.'.import.config'));
-
-                    unset($matchedFields['skip_if_exists']);
 
                     // In case the user chose to import in browser
                     if ($this->importInBrowser($form, $object)) {
                         $import->setStatus($import::MANUAL);
-
                         $this->session->set('mautic.'.$object.'.import.step', self::STEP_PROGRESS_BAR);
                     }
-
                     $this->importModel->saveEntity($import);
-
                     $this->session->set('mautic.'.$object.'.import.id', $import->getId());
-
                     // In case the user decided to queue the import
                     if ($this->importInCli($form, $object)) {
                         $this->addFlashMessage('mautic.lead.batch.import.created');
