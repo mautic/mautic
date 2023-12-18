@@ -18,8 +18,12 @@ class DynamicContentHelper
 {
     use MatchFilterForLeadTrait;
 
-    public function __construct(protected DynamicContentModel $dynamicContentModel, protected RealTimeExecutioner $realTimeExecutioner, protected EventDispatcherInterface $dispatcher, protected LeadModel $leadModel)
-    {
+    public function __construct(
+        protected DynamicContentModel $dynamicContentModel,
+        protected RealTimeExecutioner $realTimeExecutioner,
+        protected EventDispatcherInterface $dispatcher,
+        protected LeadModel $leadModel
+    ) {
     }
 
     /**
@@ -152,7 +156,7 @@ class DynamicContentHelper
         $content = $dwc->getContent();
         // Determine a translation based on contact's preferred locale
         /** @var DynamicContent $translation */
-        list($ignore, $translation) = $this->dynamicContentModel->getTranslatedEntity($dwc, $lead);
+        [$ignore, $translation] = $this->dynamicContentModel->getTranslatedEntity($dwc, $lead);
         if ($translation !== $dwc) {
             // Use translated version of content
             $dwc     = $translation;
@@ -202,18 +206,14 @@ class DynamicContentHelper
 
     /**
      * @param Lead $lead
-     *
-     * @return array
      */
-    public function convertLeadToArray($lead)
+    public function convertLeadToArray($lead): array
     {
         return array_merge(
             $lead->getProfileFields(),
             [
                 'tags' => array_map(
-                    function (Tag $v) {
-                        return $v->getId();
-                    },
+                    fn (Tag $v) => $v->getId(),
                     $lead->getTags()->toArray()
                 ),
             ]

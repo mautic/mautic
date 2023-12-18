@@ -6,48 +6,33 @@ use MauticPlugin\MauticEmailMarketingBundle\Form\Type\MailchimpType;
 
 class MailchimpIntegration extends EmailAbstractIntegration
 {
-    /**
-     * {@inheritdoc}
-     *
-     * @return string
-     */
-    public function getName()
+    public function getName(): string
     {
         return 'Mailchimp';
     }
 
-    /**
-     * @return string
-     */
-    public function getDisplayName()
+    public function getDisplayName(): string
     {
         return 'MailChimp';
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getAuthenticationType()
+    public function getAuthenticationType(): string
     {
         return (empty($this->keys['client_id'])) ? 'basic' : 'oauth2';
     }
 
     /**
      * Get the URL required to obtain an oauth2 access token.
-     *
-     * @return string
      */
-    public function getAccessTokenUrl()
+    public function getAccessTokenUrl(): string
     {
         return 'https://login.mailchimp.com/oauth2/token';
     }
 
     /**
      * Get the authentication/login URL for oauth2 access.
-     *
-     * @return string
      */
-    public function getAuthenticationUrl()
+    public function getAuthenticationUrl(): string
     {
         return 'https://login.mailchimp.com/oauth2/authorize';
     }
@@ -91,9 +76,9 @@ class MailchimpIntegration extends EmailAbstractIntegration
     /**
      * @param array $settings
      *
-     * @return mixed
+     * @return mixed[]
      */
-    public function getAvailableLeadFields($settings = [])
+    public function getAvailableLeadFields($settings = []): array
     {
         if (isset($settings['list'])) {
             // Ajax update

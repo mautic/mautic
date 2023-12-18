@@ -16,8 +16,9 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class CategoryType extends AbstractType
 {
-    public function __construct(private SessionInterface $session)
-    {
+    public function __construct(
+        private SessionInterface $session
+    ) {
     }
 
     public function buildForm(FormBuilderInterface $builder, array $options): void
@@ -123,7 +124,7 @@ class CategoryType extends AbstractType
     {
         $resolver->setDefaults(
             [
-                'data_class'         => 'Mautic\CategoryBundle\Entity\Category',
+                'data_class'         => \Mautic\CategoryBundle\Entity\Category::class,
                 'show_bundle_select' => false,
                 'bundle'             => function (Options $options) {
                     if (!$bundle = $options['data']->getBundle()) {

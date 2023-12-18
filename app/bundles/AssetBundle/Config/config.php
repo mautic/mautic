@@ -21,7 +21,7 @@ return [
                 'standard_entity' => true,
                 'name'            => 'assets',
                 'path'            => '/assets',
-                'controller'      => 'Mautic\AssetBundle\Controller\Api\AssetApiController',
+                'controller'      => \Mautic\AssetBundle\Controller\Api\AssetApiController::class,
             ],
         ],
         'public' => [

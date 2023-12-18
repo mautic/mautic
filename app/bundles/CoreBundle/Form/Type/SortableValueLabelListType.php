@@ -10,9 +10,6 @@ use Symfony\Component\Form\FormView;
 
 class SortableValueLabelListType extends AbstractType
 {
-    /**
-     * {@inheritdoc}
-     */
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder->add(
@@ -40,9 +37,9 @@ class SortableValueLabelListType extends AbstractType
     {
         parent::buildView($view, $form, $options);
 
-        $view->vars['preaddonAttr']  = (isset($options['attr']['preaddon_attr'])) ? $options['attr']['preaddon_attr'] : [];
-        $view->vars['postaddonAttr'] = (isset($options['attr']['postaddon_attr'])) ? $options['attr']['postaddon_attr'] : [];
-        $view->vars['preaddon']      = (isset($options['attr']['preaddon'])) ? $options['attr']['preaddon'] : [];
-        $view->vars['postaddon']     = (isset($options['attr']['postaddon'])) ? $options['attr']['postaddon'] : [];
+        $view->vars['preaddonAttr']  = $options['attr']['preaddon_attr'] ?? [];
+        $view->vars['postaddonAttr'] = $options['attr']['postaddon_attr'] ?? [];
+        $view->vars['preaddon']      = $options['attr']['preaddon'] ?? [];
+        $view->vars['postaddon']     = $options['attr']['postaddon'] ?? [];
     }
 }

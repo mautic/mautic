@@ -27,10 +27,7 @@ final class EmailOrEmailTokenListValidator extends ConstraintValidator
         $this->transformer          = new ArrayStringTransformer();
     }
 
-    /**
-     * @return void
-     */
-    public function validate($csv, Constraint $constraint)
+    public function validate($csv, Constraint $constraint): void
     {
         if (!$constraint instanceof EmailOrEmailTokenList) {
             throw new UnexpectedTypeException($constraint, EmailOrEmailTokenList::class);
@@ -56,7 +53,7 @@ final class EmailOrEmailTokenListValidator extends ConstraintValidator
             try {
                 // Try to validate if the value is an email address.
                 $this->emailValidator->validate($emailOrToken);
-            } catch (InvalidEmailException $emailException) {
+            } catch (InvalidEmailException) {
                 try {
                     // The token syntax is validated during creation of new ContactFieldToken object.
                     $contactFieldToken = new ContactFieldToken($emailOrToken);

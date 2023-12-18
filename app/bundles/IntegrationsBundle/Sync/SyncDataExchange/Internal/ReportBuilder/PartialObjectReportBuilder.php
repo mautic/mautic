@@ -37,13 +37,15 @@ class PartialObjectReportBuilder
      */
     private $objectsWithMissingFields = [];
 
-    /**
-     * @var ReportDAO
-     */
-    private $syncReport;
+    private ?\Mautic\IntegrationsBundle\Sync\DAO\Sync\Report\ReportDAO $syncReport = null;
 
-    public function __construct(private FieldChangeRepository $fieldChangeRepository, private FieldHelper $fieldHelper, private FieldBuilder $fieldBuilder, private ObjectProvider $objectProvider, private EventDispatcherInterface $dispatcher)
-    {
+    public function __construct(
+        private FieldChangeRepository $fieldChangeRepository,
+        private FieldHelper $fieldHelper,
+        private FieldBuilder $fieldBuilder,
+        private ObjectProvider $objectProvider,
+        private EventDispatcherInterface $dispatcher
+    ) {
     }
 
     public function buildReport(RequestDAO $requestDAO): ReportDAO
@@ -77,14 +79,14 @@ class PartialObjectReportBuilder
                     DebugLogger::log(
                         MauticSyncDataExchange::NAME,
                         $exception->getMessage(),
-                        __CLASS__.':'.__FUNCTION__
+                        self::class.':'.__FUNCTION__
                     );
                 }
             } catch (ObjectNotFoundException $exception) {
                 DebugLogger::log(
                     MauticSyncDataExchange::NAME,
                     $exception->getMessage(),
-                    __CLASS__.':'.__FUNCTION__
+                    self::class.':'.__FUNCTION__
                 );
             }
         }
@@ -147,7 +149,7 @@ class PartialObjectReportBuilder
             foreach ($fields as $field) {
                 try {
                     $syncObject->getField($field);
-                } catch (FieldNotFoundException $exception) {
+                } catch (FieldNotFoundException) {
                     $missingFields[] = $field;
                 }
             }
@@ -189,7 +191,7 @@ class PartialObjectReportBuilder
                     DebugLogger::log(
                         MauticSyncDataExchange::NAME,
                         $exception->getMessage(),
-                        __CLASS__.':'.__FUNCTION__
+                        self::class.':'.__FUNCTION__
                     );
                 }
             }

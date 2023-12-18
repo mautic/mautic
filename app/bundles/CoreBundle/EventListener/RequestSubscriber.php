@@ -15,14 +15,14 @@ use Twig\Environment;
 
 class RequestSubscriber implements EventSubscriberInterface
 {
-    public function __construct(private CsrfTokenManagerInterface $tokenManager, private TranslatorInterface $translator, private Environment $twig)
-    {
+    public function __construct(
+        private CsrfTokenManagerInterface $tokenManager,
+        private TranslatorInterface $translator,
+        private Environment $twig
+    ) {
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             KernelEvents::REQUEST => ['validateCsrfTokenForAjaxPost', 0],

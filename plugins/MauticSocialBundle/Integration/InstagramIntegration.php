@@ -4,17 +4,11 @@ namespace MauticPlugin\MauticSocialBundle\Integration;
 
 class InstagramIntegration extends SocialIntegration
 {
-    /**
-     * {@inheritdoc}
-     */
-    public function getName()
+    public function getName(): string
     {
         return 'Instagram';
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getSupportedFeatures(): array
     {
         return [
@@ -23,34 +17,22 @@ class InstagramIntegration extends SocialIntegration
         ];
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getIdentifierFields()
+    public function getIdentifierFields(): string
     {
         return 'instagram';
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getAuthenticationUrl()
+    public function getAuthenticationUrl(): string
     {
         return 'https://api.instagram.com/oauth/authorize';
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getAccessTokenUrl()
+    public function getAccessTokenUrl(): string
     {
         return 'https://api.instagram.com/oauth/access_token';
     }
 
-    /**
-     * @return string
-     */
-    public function getApiUrl($endpoint)
+    public function getApiUrl($endpoint): string
     {
         return "https://api.instagram.com/v1/$endpoint";
     }
@@ -71,9 +53,6 @@ class InstagramIntegration extends SocialIntegration
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getPublicActivity($identifier, &$socialCache): void
     {
         $socialCache['has']['activity'] = false;
@@ -121,9 +100,6 @@ class InstagramIntegration extends SocialIntegration
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getAvailableLeadFields($settings = []): array
     {
         return [
@@ -133,9 +109,6 @@ class InstagramIntegration extends SocialIntegration
         ];
     }
 
-    /**
-     * {@inheritdoc}
-     */
     private function getContactUserId(&$identifier, &$socialCache)
     {
         if (!empty($socialCache['id'])) {
@@ -162,9 +135,6 @@ class InstagramIntegration extends SocialIntegration
         return false;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getFormType()
     {
         return null;

@@ -42,8 +42,11 @@ class DynamicContentFilterEntryType extends AbstractType
      */
     private array $localeChoices;
 
-    public function __construct(ListModel $listModel, private StageModel $stageModel, private BuilderIntegrationsHelper $builderIntegrationsHelper)
-    {
+    public function __construct(
+        ListModel $listModel,
+        private StageModel $stageModel,
+        private BuilderIntegrationsHelper $builderIntegrationsHelper
+    ) {
         $this->fieldChoices = $listModel->getChoiceFields();
 
         $this->filterFieldChoices();
@@ -61,7 +64,7 @@ class DynamicContentFilterEntryType extends AbstractType
         try {
             $mauticBuilder = $this->builderIntegrationsHelper->getBuilder('email');
             $mauticBuilder->getName();
-        } catch (IntegrationNotFoundException $exception) {
+        } catch (IntegrationNotFoundException) {
             // Assume legacy builder
             $extraClasses = ' legacy-builder';
         }
@@ -105,9 +108,6 @@ class DynamicContentFilterEntryType extends AbstractType
         );
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function buildView(FormView $view, FormInterface $form, array $options): void
     {
         $view->vars['fields'] = $this->fieldChoices;
@@ -127,26 +127,24 @@ class DynamicContentFilterEntryType extends AbstractType
     {
         $this->fieldChoices['lead'] = array_filter(
             $this->fieldChoices['lead'],
-            function ($key): bool {
-                return !in_array(
-                    $key,
-                    [
-                        'company',
-                        'leadlist',
-                        'campaign',
-                        'device_type',
-                        'device_brand',
-                        'device_os',
-                        'lead_email_received',
-                        'tags',
-                        'dnc_bounced',
-                        'dnc_unsubscribed',
-                        'dnc_bounced_sms',
-                        'dnc_unsubscribed_sms',
-                        'hit_url',
-                    ]
-                );
-            },
+            fn ($key): bool => !in_array(
+                $key,
+                [
+                    'company',
+                    'leadlist',
+                    'campaign',
+                    'device_type',
+                    'device_brand',
+                    'device_os',
+                    'lead_email_received',
+                    'tags',
+                    'dnc_bounced',
+                    'dnc_unsubscribed',
+                    'dnc_bounced_sms',
+                    'dnc_unsubscribed_sms',
+                    'hit_url',
+                ]
+            ),
             ARRAY_FILTER_USE_KEY
         );
     }

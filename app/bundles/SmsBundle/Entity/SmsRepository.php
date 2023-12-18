@@ -32,12 +32,7 @@ class SmsRepository extends CommonRepository
         return parent::getEntities($args);
     }
 
-    /**
-     * @param null $id
-     *
-     * @return \Doctrine\ORM\Internal\Hydration\IterableResult
-     */
-    public function getPublishedBroadcasts($id = null)
+    public function getPublishedBroadcasts($id = null): \Doctrine\ORM\Internal\Hydration\IterableResult
     {
         $qb   = $this->createQueryBuilder($this->getTableAlias());
         $expr = $this->getPublishedByDateExpression($qb, null, true, true, false);
@@ -103,7 +98,7 @@ class SmsRepository extends CommonRepository
      */
     protected function addSearchCommandWhereClause($q, $filter): array
     {
-        list($expr, $parameters) = $this->addStandardSearchCommandWhereClause($q, $filter);
+        [$expr, $parameters] = $this->addStandardSearchCommandWhereClause($q, $filter);
         if ($expr) {
             return [$expr, $parameters];
         }
@@ -143,9 +138,9 @@ class SmsRepository extends CommonRepository
     }
 
     /**
-     * @return array
+     * @return string[]
      */
-    public function getSearchCommands()
+    public function getSearchCommands(): array
     {
         $commands = [
             'mautic.core.searchcommand.ispublished',
@@ -169,9 +164,6 @@ class SmsRepository extends CommonRepository
         ];
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getTableAlias(): string
     {
         return 'e';
@@ -193,7 +185,7 @@ class SmsRepository extends CommonRepository
                 ->where('id = '.(int) $id);
 
             $q->executeStatement();
-        } catch (\Exception $exception) {
+        } catch (\Exception) {
             // not important
         }
     }

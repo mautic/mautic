@@ -11,14 +11,9 @@ use Symfony\Component\Validator\Constraints\NotBlank;
 
 class FocusShowType extends AbstractType
 {
-    /**
-     * @var RouterInterface
-     */
-    protected $router;
-
-    public function __construct(RouterInterface $router)
-    {
-        $this->router = $router;
+    public function __construct(
+        protected RouterInterface $router
+    ) {
     }
 
     public function buildForm(FormBuilderInterface $builder, array $options): void
@@ -41,7 +36,7 @@ class FocusShowType extends AbstractType
                         ['message' => 'mautic.focus.choosefocus.notblank']
                     ),
                 ],
-                'data' => isset($options['data']['focus']) ? $options['data']['focus'] : null,
+                'data' => $options['data']['focus'] ?? null,
             ]
         );
 

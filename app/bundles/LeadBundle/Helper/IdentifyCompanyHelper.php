@@ -24,7 +24,7 @@ class IdentifyCompanyHelper
 
         try {
             $companies = $companyModel->checkForDuplicateCompanies($parameters);
-        } catch (UniqueFieldNotFoundException $uniqueFieldNotFoundException) {
+        } catch (UniqueFieldNotFoundException) {
             return [null, false, null];
         }
 
@@ -62,14 +62,13 @@ class IdentifyCompanyHelper
 
         try {
             $companyEntities = $companyModel->checkForDuplicateCompanies($parameters);
-        } catch (UniqueFieldNotFoundException $uniqueFieldNotFoundException) {
+        } catch (UniqueFieldNotFoundException) {
             return [[], []];
         }
 
         $companyData     = $parameters;
         if (!empty($companyEntities)) {
-            end($companyEntities);
-            $key               = key($companyEntities);
+            $key               = array_key_last($companyEntities);
             $companyData['id'] = $companyEntities[$key]->getId();
         }
 
@@ -90,7 +89,12 @@ class IdentifyCompanyHelper
         return false;
     }
 
-    private static function normalizeParameters(array $parameters)
+    /**
+     * @param mixed[] $parameters
+     *
+     * @return mixed[]
+     */
+    private static function normalizeParameters(array $parameters): array
     {
         if (isset($parameters['company'])) {
             $parameters['companyname'] = filter_var($parameters['company']);

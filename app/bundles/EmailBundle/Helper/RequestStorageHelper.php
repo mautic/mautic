@@ -18,8 +18,9 @@ class RequestStorageHelper
      */
     public const KEY_SEPARATOR = ';webhook_request;';
 
-    public function __construct(private CacheProviderInterface $cacheStorage)
-    {
+    public function __construct(
+        private CacheProviderInterface $cacheStorage
+    ) {
     }
 
     /**
@@ -51,7 +52,7 @@ class RequestStorageHelper
 
         try {
             $item = $this->cacheStorage->getItem($key);
-        } catch (InvalidArgumentException $e) {
+        } catch (InvalidArgumentException) {
             throw new \UnexpectedValueException($error);
         }
 
@@ -82,7 +83,7 @@ class RequestStorageHelper
         $key = $this->removeCachePrefix($key);
 
         // Take the part before the key separator as the serialized transpot name.
-        list($serializedTransportName) = explode(self::KEY_SEPARATOR, $key);
+        [$serializedTransportName] = explode(self::KEY_SEPARATOR, $key);
 
         // Unserialize transport name to the standard full class name.
         $transportName = str_replace('|', '\\', $serializedTransportName);

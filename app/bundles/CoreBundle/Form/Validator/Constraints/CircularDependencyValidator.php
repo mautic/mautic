@@ -14,8 +14,10 @@ use Symfony\Component\Validator\ConstraintValidator;
  */
 class CircularDependencyValidator extends ConstraintValidator
 {
-    public function __construct(private ListModel $model, private RequestStack $requestStack)
-    {
+    public function __construct(
+        private ListModel $model,
+        private RequestStack $requestStack
+    ) {
     }
 
     /**
@@ -23,16 +25,14 @@ class CircularDependencyValidator extends ConstraintValidator
      */
     public function validate($filters, Constraint $constraint): void
     {
-        $dependentSegmentIds = $this->flatten(array_map(function ($id) {
-            return $this->reduceToSegmentIds($this->model->getEntity($id)->getFilters());
-        }, $this->reduceToSegmentIds($filters)));
+        $dependentSegmentIds = $this->flatten(array_map(fn ($id) => $this->reduceToSegmentIds($this->model->getEntity($id)->getFilters()), $this->reduceToSegmentIds($filters)));
 
         try {
             $segmentId = $this->getSegmentIdFromRequest();
             if (in_array($segmentId, $dependentSegmentIds)) {
                 $this->context->addViolation($constraint->message);
             }
-        } catch (\UnexpectedValueException $e) {
+        } catch (\UnexpectedValueException) {
             // Segment ID is not in the request. May be new segment.
         }
     }
@@ -52,15 +52,10 @@ class CircularDependencyValidator extends ConstraintValidator
         return (int) $routeParams['objectId'];
     }
 
-    /**
-     * @return array
-     */
-    private function reduceToSegmentIds(array $filters)
+    private function reduceToSegmentIds(array $filters): array
     {
-        $segmentFilters = array_filter($filters, function (array $filter): bool {
-            return 'leadlist' === $filter['type']
-                && in_array($filter['operator'], [OperatorOptions::IN, OperatorOptions::NOT_IN]);
-        });
+        $segmentFilters = array_filter($filters, fn (array $filter): bool => 'leadlist' === $filter['type']
+            && in_array($filter['operator'], [OperatorOptions::IN, OperatorOptions::NOT_IN]));
 
         $segentIdsInFilter = array_map(function (array $filter) {
             $bcValue = $filter['filter'] ?? [];

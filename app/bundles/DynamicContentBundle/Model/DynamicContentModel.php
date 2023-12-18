@@ -17,6 +17,7 @@ use Mautic\DynamicContentBundle\Event\DynamicContentEvent;
 use Mautic\DynamicContentBundle\Form\Type\DynamicContentType;
 use Mautic\LeadBundle\Entity\Lead;
 use Symfony\Component\Form\FormFactoryInterface;
+use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 use Symfony\Contracts\EventDispatcher\Event;
 
@@ -39,8 +40,6 @@ class DynamicContentModel extends FormModel implements AjaxLookupModelInterface
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @return DynamicContentRepository
      */
     public function getRepository()
@@ -62,8 +61,6 @@ class DynamicContentModel extends FormModel implements AjaxLookupModelInterface
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @param object $entity
      * @param bool   $unlock
      */
@@ -74,14 +71,7 @@ class DynamicContentModel extends FormModel implements AjaxLookupModelInterface
         $this->postTranslationEntitySave($entity);
     }
 
-    /**
-     * Here just so PHPStorm calms down about type hinting.
-     *
-     * @param null $id
-     *
-     * @return DynamicContent|null
-     */
-    public function getEntity($id = null)
+    public function getEntity($id = null): ?DynamicContent
     {
         if (null === $id) {
             return new DynamicContent();
@@ -91,16 +81,12 @@ class DynamicContentModel extends FormModel implements AjaxLookupModelInterface
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @param string|null $action
      * @param array       $options
      *
-     * @return mixed
-     *
      * @throws \InvalidArgumentException
      */
-    public function createForm($entity, FormFactoryInterface $formFactory, $action = null, $options = [])
+    public function createForm($entity, FormFactoryInterface $formFactory, $action = null, $options = []): FormInterface
     {
         if (!$entity instanceof DynamicContent) {
             throw new \InvalidArgumentException('Entity must be of class DynamicContent');
@@ -190,11 +176,9 @@ class DynamicContentModel extends FormModel implements AjaxLookupModelInterface
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @throws \Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException
      */
-    protected function dispatchEvent($action, &$entity, $isNew = false, Event $event = null)
+    protected function dispatchEvent($action, &$entity, $isNew = false, Event $event = null): ?Event
     {
         if (!$entity instanceof DynamicContent) {
             throw new MethodNotAllowedHttpException(['Dynamic Content']);
@@ -248,10 +232,8 @@ class DynamicContentModel extends FormModel implements AjaxLookupModelInterface
      * @param string $dateFormat
      * @param array  $filter
      * @param bool   $canViewOthers
-     *
-     * @return array
      */
-    public function getHitsLineChartData($unit, \DateTime $dateFrom, \DateTime $dateTo, $dateFormat = null, $filter = [], $canViewOthers = true)
+    public function getHitsLineChartData($unit, \DateTime $dateFrom, \DateTime $dateTo, $dateFormat = null, $filter = [], $canViewOthers = true): array
     {
         $flag = null;
 
@@ -307,9 +289,9 @@ class DynamicContentModel extends FormModel implements AjaxLookupModelInterface
                     $limit,
                     $start,
                     $this->security->isGranted($this->getPermissionBase().':viewother'),
-                    isset($options['top_level']) ? $options['top_level'] : false,
-                    isset($options['ignore_ids']) ? $options['ignore_ids'] : [],
-                    isset($options['where']) ? $options['where'] : ''
+                    $options['top_level'] ?? false,
+                    $options['ignore_ids'] ?? [],
+                    $options['where'] ?? ''
                 );
 
                 foreach ($entities as $entity) {

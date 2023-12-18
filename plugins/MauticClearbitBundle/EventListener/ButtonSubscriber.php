@@ -13,29 +13,14 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class ButtonSubscriber implements EventSubscriberInterface
 {
-    /**
-     * @var IntegrationHelper
-     */
-    private $helper;
-
-    /**
-     * @var TranslatorInterface
-     */
-    private $translator;
-
-    /**
-     * @var RouterInterface
-     */
-    private $router;
-
-    public function __construct(IntegrationHelper $helper, TranslatorInterface $translator, RouterInterface $router)
-    {
-        $this->helper     = $helper;
-        $this->translator = $translator;
-        $this->router     = $router;
+    public function __construct(
+        private IntegrationHelper $helper,
+        private TranslatorInterface $translator,
+        private RouterInterface $router
+    ) {
     }
 
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             CoreEvents::VIEW_INJECT_CUSTOM_BUTTONS => ['injectViewButtons', 0],

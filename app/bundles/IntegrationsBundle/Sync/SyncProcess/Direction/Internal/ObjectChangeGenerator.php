@@ -25,42 +25,27 @@ use Mautic\IntegrationsBundle\Sync\SyncProcess\Direction\Helper\ValueHelper;
 
 class ObjectChangeGenerator
 {
-    /**
-     * @var ReportDAO
-     */
-    private $syncReport;
+    private ?\Mautic\IntegrationsBundle\Sync\DAO\Sync\Report\ReportDAO $syncReport = null;
 
-    /**
-     * @var MappingManualDAO
-     */
-    private $mappingManual;
+    private ?\Mautic\IntegrationsBundle\Sync\DAO\Mapping\MappingManualDAO $mappingManual = null;
 
-    /**
-     * @var ReportObjectDAO
-     */
-    private $internalObject;
+    private ?\Mautic\IntegrationsBundle\Sync\DAO\Sync\Report\ObjectDAO $internalObject = null;
 
-    /**
-     * @var ReportObjectDAO
-     */
-    private $integrationObject;
+    private ?\Mautic\IntegrationsBundle\Sync\DAO\Sync\Report\ObjectDAO $integrationObject = null;
 
-    /**
-     * @var ObjectChangeDAO
-     */
-    private $objectChange;
+    private ?\Mautic\IntegrationsBundle\Sync\DAO\Sync\Order\ObjectChangeDAO $objectChange = null;
 
-    /**
-     * @var array
-     */
-    private $judgementModes = [
+    private array $judgementModes = [
         SyncJudgeInterface::HARD_EVIDENCE_MODE,
         SyncJudgeInterface::BEST_EVIDENCE_MODE,
         SyncJudgeInterface::FUZZY_EVIDENCE_MODE,
     ];
 
-    public function __construct(private SyncJudgeInterface $syncJudge, private ValueHelper $valueHelper, private FieldHelper $fieldHelper)
-    {
+    public function __construct(
+        private SyncJudgeInterface $syncJudge,
+        private ValueHelper $valueHelper,
+        private FieldHelper $fieldHelper
+    ) {
     }
 
     /**
@@ -98,7 +83,7 @@ class ObjectChangeGenerator
                     $integrationObject->getObject(),
                     (string) $integrationObject->getObjectId()
                 ),
-                __CLASS__.':'.__FUNCTION__
+                self::class.':'.__FUNCTION__
             );
         } else {
             DebugLogger::log(
@@ -108,7 +93,7 @@ class ObjectChangeGenerator
                     $integrationObject->getObject(),
                     (string) $integrationObject->getObjectId()
                 ),
-                __CLASS__.':'.__FUNCTION__
+                self::class.':'.__FUNCTION__
             );
         }
 
@@ -142,7 +127,7 @@ class ObjectChangeGenerator
                 $this->integrationObject->getObjectId(),
                 $fieldMappingDAO->getIntegrationField()
             );
-        } catch (FieldNotFoundException $e) {
+        } catch (FieldNotFoundException) {
             return;
         }
 
@@ -159,7 +144,7 @@ class ObjectChangeGenerator
                 $internalFieldState,
                 $fieldMappingDAO->getSyncDirection()
             );
-        } catch (InvalidValueException $e) {
+        } catch (InvalidValueException) {
             return; // Field has to be skipped
         }
 
@@ -183,7 +168,7 @@ class ObjectChangeGenerator
                     $fieldMappingDAO->getInternalField(),
                     var_export($newValue->getNormalizedValue(), true)
                 ),
-                __CLASS__.':'.__FUNCTION__
+                self::class.':'.__FUNCTION__
             );
 
             return;
@@ -198,7 +183,7 @@ class ObjectChangeGenerator
                 $internalFieldState,
                 $fieldMappingDAO->getInternalField()
             ),
-            __CLASS__.':'.__FUNCTION__
+            self::class.':'.__FUNCTION__
         );
     }
 
@@ -209,7 +194,7 @@ class ObjectChangeGenerator
     ): void {
         try {
             $internalField = $this->internalObject->getField($fieldMappingDAO->getInternalField());
-        } catch (FieldNotFoundException $exception) {
+        } catch (FieldNotFoundException) {
             $internalField = null;
         }
 
@@ -234,7 +219,7 @@ class ObjectChangeGenerator
                     $fieldMappingDAO->getInternalField(),
                     var_export($newValue->getNormalizedValue(), true)
                 ),
-                __CLASS__.':'.__FUNCTION__
+                self::class.':'.__FUNCTION__
             );
 
             return;
@@ -272,7 +257,7 @@ class ObjectChangeGenerator
                 );
 
                 break;
-            } catch (ConflictUnresolvedException $exception) {
+            } catch (ConflictUnresolvedException) {
                 DebugLogger::log(
                     $this->mappingManual->getIntegration(),
                     sprintf(
@@ -281,7 +266,7 @@ class ObjectChangeGenerator
                         $this->internalObject->getObject(),
                         $fieldMappingDAO->getInternalField()
                     ),
-                    __CLASS__.':'.__FUNCTION__
+                    self::class.':'.__FUNCTION__
                 );
             }
         }
@@ -325,14 +310,11 @@ class ObjectChangeGenerator
                 var_export($newValue->getNormalizedValue(), true),
                 $judgeMode
             ),
-            __CLASS__.':'.__FUNCTION__
+            self::class.':'.__FUNCTION__
         );
     }
 
-    /**
-     * @return string
-     */
-    private function getFieldState(string $object, string $field, string $integrationFieldState)
+    private function getFieldState(string $object, string $field, string $integrationFieldState): string
     {
         // If this is a Mautic required field, return required
         if (isset($this->fieldHelper->getRequiredFields($object)[$field])) {

@@ -9,13 +9,11 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class RedirectListType extends AbstractType
 {
-    public function __construct(private CoreParametersHelper $coreParametersHelper)
-    {
+    public function __construct(
+        private CoreParametersHelper $coreParametersHelper
+    ) {
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function configureOptions(OptionsResolver $resolver): void
     {
         $choices = $this->coreParametersHelper->get('redirect_list_types');

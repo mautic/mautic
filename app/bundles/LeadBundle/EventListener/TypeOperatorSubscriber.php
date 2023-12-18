@@ -155,7 +155,7 @@ final class TypeOperatorSubscriber implements EventSubscriberInterface
         $properties  = $event->getFieldDetails()['properties'] ?? [];
         $displayAttr = [
             'class'               => 'form-control',
-            'data-field-callback' => isset($properties['callback']) ? $properties['callback'] : 'activateSegmentFilterTypeahead',
+            'data-field-callback' => $properties['callback'] ?? 'activateSegmentFilterTypeahead',
             'data-target'         => $event->getFieldAlias(),
             'placeholder'         => $this->translator->trans(
                 'mautic.lead.list.form.startTyping'

@@ -10,8 +10,9 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class StageActionListType extends AbstractType
 {
-    public function __construct(private StageModel $model)
-    {
+    public function __construct(
+        private StageModel $model
+    ) {
     }
 
     public function configureOptions(OptionsResolver $resolver): void
@@ -39,9 +40,6 @@ class StageActionListType extends AbstractType
         return ChoiceType::class;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getBlockPrefix()
     {
         return 'stageaction_list';

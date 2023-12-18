@@ -21,13 +21,11 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class TriggerType extends AbstractType
 {
-    public function __construct(private CorePermissions $security)
-    {
+    public function __construct(
+        private CorePermissions $security
+    ) {
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder->addEventSubscriber(new CleanFormSubscriber(['description' => 'html']));
@@ -154,9 +152,6 @@ class TriggerType extends AbstractType
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults(
@@ -166,9 +161,6 @@ class TriggerType extends AbstractType
         );
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getBlockPrefix()
     {
         return 'pointtrigger';

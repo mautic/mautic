@@ -13,14 +13,11 @@ class IntegrationEntityRepository extends CommonRepository
 {
     /**
      * @param array<int>|int|null $internalEntityIds
-     * @param null                $startDate
-     * @param null                $endDate
+     * @param mixed               $startDate
+     * @param mixed               $endDate
      * @param bool                $push
      * @param int                 $start
      * @param int                 $limit
-     * @param null                $integrationEntityIds
-     *
-     * @return array
      */
     public function getIntegrationsEntityId(
         $integration,
@@ -33,7 +30,7 @@ class IntegrationEntityRepository extends CommonRepository
         $start = 0,
         $limit = 0,
         $integrationEntityIds = null
-    ) {
+    ): array {
         $q = $this->_em->getConnection()->createQueryBuilder()
             ->select('DISTINCT(i.integration_entity_id), i.id, i.internal_entity_id, i.integration_entity, i.internal_entity')
             ->from(MAUTIC_TABLE_PREFIX.'integration_entity', 'i');
@@ -105,8 +102,6 @@ class IntegrationEntityRepository extends CommonRepository
     }
 
     /**
-     * @param null $leadFields
-     *
      * @return array
      */
     public function getIntegrationEntity($integration, $integrationEntity, $internalEntity, $internalEntityId, $leadFields = null)
@@ -162,8 +157,6 @@ class IntegrationEntityRepository extends CommonRepository
 
     /**
      * @param int          $limit
-     * @param null         $fromDate
-     * @param null         $toDate
      * @param array|string $integrationEntity
      * @param array        $excludeIntegrationIds
      *
@@ -227,9 +220,7 @@ class IntegrationEntityRepository extends CommonRepository
                 $q->expr()->notIn(
                     'i.integration_entity_id',
                     array_map(
-                        function ($x): string {
-                            return "'".$x."'";
-                        },
+                        fn ($x): string => "'".$x."'",
                         $excludeIntegrationIds
                     )
                 )
@@ -316,9 +307,7 @@ class IntegrationEntityRepository extends CommonRepository
     }
 
     /**
-     * @param int  $limit
-     * @param null $fromDate
-     * @param null $toDate
+     * @param int $limit
      *
      * @return array|int
      */
@@ -454,9 +443,7 @@ class IntegrationEntityRepository extends CommonRepository
                 ->from(MAUTIC_TABLE_PREFIX.'plugin_integration_settings', 'p')
                 ->where('p.is_published = 1');
             $rows    = $pq->executeQuery()->fetchAllAssociative();
-            $plugins = array_map(static function ($i): string {
-                return "'{$i['name']}'";
-            }, $rows);
+            $plugins = array_map(static fn ($i): string => "'{$i['name']}'", $rows);
             if (count($plugins) > 0) {
                 $q->andWhere($q->expr()->in('i.integration', $plugins));
             } else {

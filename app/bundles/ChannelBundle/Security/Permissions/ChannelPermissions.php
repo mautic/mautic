@@ -7,9 +7,6 @@ use Symfony\Component\Form\FormBuilderInterface;
 
 class ChannelPermissions extends AbstractPermissions
 {
-    /**
-     * {@inheritdoc}
-     */
     public function __construct($params)
     {
         parent::__construct($params);

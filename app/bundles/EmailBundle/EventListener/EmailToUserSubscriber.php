@@ -10,19 +10,17 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class EmailToUserSubscriber implements EventSubscriberInterface
 {
-    public function __construct(private SendEmailToUser $sendEmailToUser)
-    {
+    public function __construct(
+        private SendEmailToUser $sendEmailToUser
+    ) {
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [EmailEvents::ON_SENT_EMAIL_TO_USER => ['onEmailToUser', 0]];
     }
 
-    public function onEmailToUser(TriggerExecutedEvent $event)
+    public function onEmailToUser(TriggerExecutedEvent $event): TriggerExecutedEvent
     {
         $triggerEvent = $event->getTriggerEvent();
         $config       = $triggerEvent->getProperties();
@@ -31,7 +29,7 @@ class EmailToUserSubscriber implements EventSubscriberInterface
         try {
             $this->sendEmailToUser->sendEmailToUsers($config, $lead);
             $event->setSucceded();
-        } catch (EmailCouldNotBeSentException $e) {
+        } catch (EmailCouldNotBeSentException) {
             $event->setFailed();
         }
 

@@ -108,8 +108,9 @@ class User extends FormEntity implements UserInterface, EquatableInterface, Pass
     /**
      * @param bool $guest
      */
-    public function __construct(private $guest = false)
-    {
+    public function __construct(
+        private $guest = false
+    ) {
     }
 
     public static function loadMetadata(ORM\ClassMetadata $metadata): void
@@ -288,9 +289,6 @@ class User extends FormEntity implements UserInterface, EquatableInterface, Pass
             ->build();
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function isChanged($prop, $val)
     {
         $getter  = 'get'.ucfirst($prop);
@@ -311,26 +309,17 @@ class User extends FormEntity implements UserInterface, EquatableInterface, Pass
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getUsername()
     {
         return $this->username;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getSalt()
     {
         // bcrypt generates its own salt
         return null;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getPassword(): ?string
     {
         return $this->password;
@@ -356,9 +345,6 @@ class User extends FormEntity implements UserInterface, EquatableInterface, Pass
         return $this->currentPassword;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getRoles()
     {
         $roles = [];
@@ -376,9 +362,6 @@ class User extends FormEntity implements UserInterface, EquatableInterface, Pass
         return $roles;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function eraseCredentials(): void
     {
         $this->plainPassword   = null;
@@ -529,10 +512,8 @@ class User extends FormEntity implements UserInterface, EquatableInterface, Pass
      * Get full name.
      *
      * @param bool $lastFirst
-     *
-     * @return string
      */
-    public function getName($lastFirst = false)
+    public function getName($lastFirst = false): string
     {
         return ($lastFirst) ? $this->lastName.', '.$this->firstName : $this->firstName.' '.$this->lastName;
     }
@@ -658,13 +639,9 @@ class User extends FormEntity implements UserInterface, EquatableInterface, Pass
     }
 
     /**
-     * Set locale.
-     *
-     * @param string $locale
-     *
      * @return User
      */
-    public function setLocale($locale)
+    public function setLocale(?string $locale)
     {
         $this->isChanged('locale', $locale);
         $this->locale = $locale;

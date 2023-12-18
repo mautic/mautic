@@ -9,8 +9,9 @@ use Symfony\Component\HttpFoundation\File\UploadedFile;
 
 class FileUploader
 {
-    public function __construct(private FilePathResolver $filePathResolver)
-    {
+    public function __construct(
+        private FilePathResolver $filePathResolver
+    ) {
     }
 
     /**
@@ -30,7 +31,7 @@ class FileUploader
                 $file->move($uploadDir, $fileName);
 
                 return $fileName;
-            } catch (FileException $e) {
+            } catch (FileException) {
                 throw new FileUploadException('Could not upload file');
             }
         } catch (FilePathException $e) {

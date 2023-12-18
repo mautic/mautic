@@ -11,11 +11,18 @@ use Symfony\Component\HttpFoundation\Session\Session;
 
 class TrackingHelper
 {
-    public function __construct(protected Session $session, protected CoreParametersHelper $coreParametersHelper, protected RequestStack $requestStack, protected ContactTracker $contactTracker)
-    {
+    public function __construct(
+        protected Session $session,
+        protected CoreParametersHelper $coreParametersHelper,
+        protected RequestStack $requestStack,
+        protected ContactTracker $contactTracker
+    ) {
     }
 
-    public function getEnabledServices()
+    /**
+     * @return array<string, 'facebook_pixel'|'google_analytics'>
+     */
+    public function getEnabledServices(): array
     {
         $keys = [
             'google_analytics' => 'Google Analytics',

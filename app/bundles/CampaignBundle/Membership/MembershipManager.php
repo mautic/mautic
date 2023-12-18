@@ -17,15 +17,18 @@ use Symfony\Component\Console\Helper\ProgressBar;
 class MembershipManager
 {
     public const ACTION_ADDED   = 'added';
+
     public const ACTION_REMOVED = 'removed';
 
-    /**
-     * @var ProgressBar
-     */
-    private $progressBar;
+    private ?\Symfony\Component\Console\Helper\ProgressBar $progressBar = null;
 
-    public function __construct(private Adder $adder, private Remover $remover, private EventDispatcher $eventDispatcher, private LeadRepository $leadRepository, private LoggerInterface $logger)
-    {
+    public function __construct(
+        private Adder $adder,
+        private Remover $remover,
+        private EventDispatcher $eventDispatcher,
+        private LeadRepository $leadRepository,
+        private LoggerInterface $logger
+    ) {
     }
 
     /**

@@ -20,23 +20,17 @@ use Mautic\IntegrationsBundle\Sync\SyncDataExchange\SyncDataExchangeInterface;
 
 class IntegrationSyncProcess
 {
-    /**
-     * @var InputOptionsDAO
-     */
-    private $inputOptionsDAO;
+    private ?\Mautic\IntegrationsBundle\Sync\DAO\Sync\InputOptionsDAO $inputOptionsDAO = null;
 
-    /**
-     * @var MappingManualDAO
-     */
-    private $mappingManualDAO;
+    private ?\Mautic\IntegrationsBundle\Sync\DAO\Mapping\MappingManualDAO $mappingManualDAO = null;
 
-    /**
-     * @var SyncDataExchangeInterface
-     */
-    private $syncDataExchange;
+    private ?\Mautic\IntegrationsBundle\Sync\SyncDataExchange\SyncDataExchangeInterface $syncDataExchange = null;
 
-    public function __construct(private SyncDateHelper $syncDateHelper, private MappingHelper $mappingHelper, private ObjectChangeGenerator $objectChangeGenerator)
-    {
+    public function __construct(
+        private SyncDateHelper $syncDateHelper,
+        private MappingHelper $mappingHelper,
+        private ObjectChangeGenerator $objectChangeGenerator
+    ) {
     }
 
     public function setupSync(InputOptionsDAO $inputOptionsDAO, MappingManualDAO $mappingManualDAO, SyncDataExchangeInterface $syncDataExchange): void
@@ -47,11 +41,9 @@ class IntegrationSyncProcess
     }
 
     /**
-     * @return ReportDAO
-     *
      * @throws ObjectNotFoundException
      */
-    public function getSyncReport(int $syncIteration)
+    public function getSyncReport(int $syncIteration): ReportDAO
     {
         $integrationRequestDAO   = new RequestDAO(MauticSyncDataExchange::NAME, $syncIteration, $this->inputOptionsDAO);
         $integrationObjectsNames = $this->mappingManualDAO->getIntegrationObjectNames();
@@ -66,7 +58,7 @@ class IntegrationSyncProcess
                         'Integration to Mautic; there are no fields for the %s object',
                         $integrationObjectName
                     ),
-                    __CLASS__.':'.__FUNCTION__
+                    self::class.':'.__FUNCTION__
                 );
 
                 continue;
@@ -85,7 +77,7 @@ class IntegrationSyncProcess
                     $integrationObjectName,
                     count($integrationObjectFields)
                 ),
-                __CLASS__.':'.__FUNCTION__
+                self::class.':'.__FUNCTION__
             );
 
             $integrationRequestObject = new RequestObjectDAO(
@@ -132,7 +124,7 @@ class IntegrationSyncProcess
                         $internalObjectName,
                         $mappedIntegrationObjectName
                     ),
-                    __CLASS__.':'.__FUNCTION__
+                    self::class.':'.__FUNCTION__
                 );
 
                 foreach ($internalObjects as $internalObject) {
@@ -154,7 +146,7 @@ class IntegrationSyncProcess
                         if ($objectChange->shouldSync()) {
                             $syncOrder->addObjectChange($objectChange);
                         }
-                    } catch (ObjectDeletedException $exception) {
+                    } catch (ObjectDeletedException) {
                         DebugLogger::log(
                             $this->mappingManualDAO->getIntegration(),
                             sprintf(
@@ -162,7 +154,7 @@ class IntegrationSyncProcess
                                 $internalObject->getObject(),
                                 $internalObject->getObjectId()
                             ),
-                            __CLASS__.':'.__FUNCTION__
+                            self::class.':'.__FUNCTION__
                         );
 
                         continue;

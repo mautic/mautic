@@ -15,13 +15,11 @@ class LeadChangeEventDispatcher
      */
     private $lead;
 
-    /**
-     * @var array
-     */
-    private $changes;
+    private ?array $changes = null;
 
-    public function __construct(private EventDispatcherInterface $dispatcher)
-    {
+    public function __construct(
+        private EventDispatcherInterface $dispatcher
+    ) {
     }
 
     public function dispatchEvents(Events\LeadEvent $event, array $changes): void
@@ -83,7 +81,7 @@ class LeadChangeEventDispatcher
         }
 
         foreach ($this->changes['dnc_channel_status'] as $channel => $status) {
-            $oldStatus = isset($status['old_reason']) ? $status['old_reason'] : DoNotContact::IS_CONTACTABLE;
+            $oldStatus = $status['old_reason'] ?? DoNotContact::IS_CONTACTABLE;
             $newStatus = $status['reason'];
 
             $event = new Events\ChannelSubscriptionChange($this->lead, $channel, $oldStatus, $newStatus);

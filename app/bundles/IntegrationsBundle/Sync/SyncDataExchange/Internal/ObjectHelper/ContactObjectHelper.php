@@ -23,13 +23,15 @@ use Mautic\LeadBundle\Model\LeadModel;
 
 class ContactObjectHelper implements ObjectHelperInterface
 {
-    /**
-     * @var array
-     */
-    private $availableFields;
+    private ?array $availableFields = null;
 
-    public function __construct(private LeadModel $model, private LeadRepository $repository, private Connection $connection, private FieldModel $fieldModel, private DoNotContactModel $dncModel)
-    {
+    public function __construct(
+        private LeadModel $model,
+        private LeadRepository $repository,
+        private Connection $connection,
+        private FieldModel $fieldModel,
+        private DoNotContactModel $dncModel
+    ) {
     }
 
     /**
@@ -72,7 +74,7 @@ class ContactObjectHelper implements ObjectHelperInterface
                     'Created lead ID %d',
                     $contact->getId()
                 ),
-                __CLASS__.':'.__FUNCTION__
+                self::class.':'.__FUNCTION__
             );
 
             $objectMapping = new ObjectMapping();
@@ -104,7 +106,7 @@ class ContactObjectHelper implements ObjectHelperInterface
                 count($contacts),
                 implode(', ', $ids)
             ),
-            __CLASS__.':'.__FUNCTION__
+            self::class.':'.__FUNCTION__
         );
 
         $availableFields      = $this->getAvailableFields();
@@ -141,7 +143,7 @@ class ContactObjectHelper implements ObjectHelperInterface
                     'Updated lead ID %d',
                     $contact->getId()
                 ),
-                __CLASS__.':'.__FUNCTION__
+                self::class.':'.__FUNCTION__
             );
 
             // Integration name and ID are stored in the change's mappedObject/mappedObjectId

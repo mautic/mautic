@@ -12,8 +12,9 @@ abstract class AbstractPermissions
      */
     protected $permissions = [];
 
-    public function __construct(protected array $params)
-    {
+    public function __construct(
+        protected array $params
+    ) {
     }
 
     /**
@@ -45,7 +46,7 @@ abstract class AbstractPermissions
      */
     public function isSupported($name, $level = '')
     {
-        list($name, $level) = $this->getSynonym($name, $level);
+        [$name, $level] = $this->getSynonym($name, $level);
 
         if (empty($level)) {
             // verify permission name only
@@ -190,7 +191,7 @@ abstract class AbstractPermissions
      */
     public function isGranted($userPermissions, $name, $level)
     {
-        list($name, $level) = $this->getSynonym($name, $level);
+        [$name, $level] = $this->getSynonym($name, $level);
 
         if (!isset($userPermissions[$name])) {
             // the user doesn't have implicit access
@@ -238,7 +239,7 @@ abstract class AbstractPermissions
                         break;
                 }
                 foreach ($required as $r) {
-                    list($ignore, $r) = $this->getSynonym($level, $r);
+                    [$ignore, $r] = $this->getSynonym($level, $r);
                     if ($this->isSupported($level, $r) && !in_array($r, $perms)) {
                         $perms[] = $r;
                     }

@@ -14,14 +14,16 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class EmailSubscriber implements EventSubscriberInterface
 {
-    public function __construct(private IpLookupHelper $ipLookupHelper, private AuditLogModel $auditLogModel, private EmailModel $emailModel, private TranslatorInterface $translator, private EntityManager $entityManager)
-    {
+    public function __construct(
+        private IpLookupHelper $ipLookupHelper,
+        private AuditLogModel $auditLogModel,
+        private EmailModel $emailModel,
+        private TranslatorInterface $translator,
+        private EntityManager $entityManager
+    ) {
     }
 
-    /**
-     * @return array
-     */
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             EmailEvents::EMAIL_POST_SAVE      => ['onEmailPostSave', 0],

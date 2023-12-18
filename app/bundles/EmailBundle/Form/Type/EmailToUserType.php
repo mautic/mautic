@@ -45,7 +45,7 @@ class EmailToUserType extends AbstractType
             YesNoButtonGroupType::class,
             [
                 'label' => 'mautic.form.action.send.email.to.owner',
-                'data'  => isset($options['data']['to_owner']) ? $options['data']['to_owner'] : false,
+                'data'  => $options['data']['to_owner'] ?? false,
             ]
         );
 

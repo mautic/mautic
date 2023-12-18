@@ -17,7 +17,9 @@ use Symfony\Component\Lock\Store\RedisStore;
 abstract class ModeratedCommand extends Command
 {
     public const MODE_PID   = 'pid';
+
     public const MODE_FLOCK = 'flock';
+
     public const MODE_REDIS = 'redis';
 
     /**
@@ -26,25 +28,30 @@ abstract class ModeratedCommand extends Command
     public const MODE_LOCK = 'file_lock';
 
     protected $checkFile;
+
     protected $moderationKey;
+
     protected $moderationTable = [];
+
     protected $moderationMode;
+
     protected $runDirectory;
+
     protected $lockExpiration;
+
     protected $lockFile;
 
-    /**
-     * @var Lock
-     */
-    private $lock;
+    private ?\Symfony\Component\Lock\LockInterface $lock = null;
 
     /**
      * @var OutputInterface
      */
     protected $output;
 
-    public function __construct(protected PathsHelper $pathsHelper, private CoreParametersHelper $coreParametersHelper)
-    {
+    public function __construct(
+        protected PathsHelper $pathsHelper,
+        private CoreParametersHelper $coreParametersHelper
+    ) {
         parent::__construct();
     }
 

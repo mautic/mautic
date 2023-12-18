@@ -17,8 +17,12 @@ class UpdateLeadListsCommand extends ModeratedCommand
 {
     public const NAME = 'mautic:segments:update';
 
-    public function __construct(private ListModel $listModel, private TranslatorInterface $translator, PathsHelper $pathsHelper, CoreParametersHelper $coreParametersHelper)
-    {
+    public function __construct(
+        private ListModel $listModel,
+        private TranslatorInterface $translator,
+        PathsHelper $pathsHelper,
+        CoreParametersHelper $coreParametersHelper
+    ) {
         parent::__construct($pathsHelper, $coreParametersHelper);
     }
 
@@ -136,5 +140,6 @@ class UpdateLeadListsCommand extends ModeratedCommand
             );
         }
     }
+
     protected static $defaultDescription = 'Update contacts in smart segments based on new contact data.';
 }

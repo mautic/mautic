@@ -11,24 +11,22 @@ class ConfigEvent extends CommonEvent
     /**
      * @var mixed[]
      */
-    private $preserve = [];
+    private array $preserve = [];
 
     /**
      * @var mixed[]
      */
-    private $errors = [];
+    private array $errors = [];
 
     /**
      * @var mixed[]
      */
-    private $fieldErrors = [];
+    private array $fieldErrors = [];
 
     /**
      * Data got from build form before update.
-     *
-     * @var array
      */
-    private $originalNormData;
+    private ?array $originalNormData = null;
 
     /**
      * Data got from build form after update.
@@ -38,10 +36,12 @@ class ConfigEvent extends CommonEvent
     private $normData;
 
     /**
-     * @param mixed[] $config
+     * @param mixed[]|null $config
      */
-    public function __construct(private array $config, private ParameterBag $post)
-    {
+    public function __construct(
+        private ?array $config,
+        private ParameterBag $post
+    ) {
     }
 
     /**
@@ -54,7 +54,7 @@ class ConfigEvent extends CommonEvent
     public function getConfig($key = null)
     {
         if ($key) {
-            return (isset($this->config[$key])) ? $this->config[$key] : [];
+            return $this->config[$key] ?? [];
         }
 
         return $this->config;

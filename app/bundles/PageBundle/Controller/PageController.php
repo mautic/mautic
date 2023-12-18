@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\PageBundle\Controller;
 
 use Mautic\CoreBundle\Controller\BuilderControllerTrait;
@@ -1007,7 +998,7 @@ class PageController extends FormController
                 $slotConfig['placeholder'] = 'mautic.page.builder.addcontent';
             }
 
-            $value = isset($content[$slot]) ? $content[$slot] : '';
+            $value = $content[$slot] ?? '';
 
             $slotsHelper->set($slot, "<div data-slot=\"text\" id=\"slot-{$slot}\">{$value}</div>");
         }

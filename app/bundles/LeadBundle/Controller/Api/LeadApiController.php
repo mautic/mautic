@@ -52,8 +52,24 @@ class LeadApiController extends CommonApiController
 
     private DoNotContactModel $doNotContactModel;
 
-    public function __construct(CorePermissions $security, Translator $translator, EntityResultHelper $entityResultHelper, RouterInterface $router, FormFactoryInterface $formFactory, DoNotContactModel $doNotContactModel, AppVersion $appVersion, private ContactMerger $contactMerger, private UserHelper $userHelper, private IpLookupHelper $ipLookupHelper, RequestStack $requestStack, ManagerRegistry $doctrine, ModelFactory $modelFactory, EventDispatcherInterface $dispatcher, CoreParametersHelper $coreParametersHelper, MauticFactory $factory)
-    {
+    public function __construct(
+        CorePermissions $security,
+        Translator $translator,
+        EntityResultHelper $entityResultHelper,
+        RouterInterface $router,
+        FormFactoryInterface $formFactory,
+        DoNotContactModel $doNotContactModel,
+        AppVersion $appVersion,
+        private ContactMerger $contactMerger,
+        private UserHelper $userHelper,
+        private IpLookupHelper $ipLookupHelper,
+        RequestStack $requestStack,
+        ManagerRegistry $doctrine,
+        ModelFactory $modelFactory,
+        EventDispatcherInterface $dispatcher,
+        CoreParametersHelper $coreParametersHelper,
+        MauticFactory $factory
+    ) {
         $this->doNotContactModel = $doNotContactModel;
 
         $leadModel = $modelFactory->getModel(self::MODEL_ID);
@@ -543,9 +559,6 @@ class LeadApiController extends CommonApiController
         return $this->model->checkForDuplicateContact($params);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function prepareParametersForBinding(Request $request, $parameters, $entity, $action)
     {
         // Unset the tags from params to avoid a validation error
@@ -571,8 +584,6 @@ class LeadApiController extends CommonApiController
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @param Lead   $entity
      * @param array  $parameters
      * @param string $action
@@ -588,7 +599,7 @@ class LeadApiController extends CommonApiController
             if ($entity->getId() && $existingEntity->getId()) {
                 try {
                     $entity = $contactMerger->merge($entity, $existingEntity);
-                } catch (SameContactException $exception) {
+                } catch (SameContactException) {
                 }
             } elseif ($existingEntity->getId()) {
                 $entity = $existingEntity;

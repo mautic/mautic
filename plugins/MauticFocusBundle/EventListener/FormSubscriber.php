@@ -9,20 +9,12 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class FormSubscriber implements EventSubscriberInterface
 {
-    /**
-     * @var FocusModel
-     */
-    private $model;
-
-    public function __construct(FocusModel $model)
-    {
-        $this->model = $model;
+    public function __construct(
+        private FocusModel $model
+    ) {
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             FormEvents::FORM_POST_SAVE   => ['onFormPostSave', 0],

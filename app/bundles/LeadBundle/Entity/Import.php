@@ -48,9 +48,13 @@ class Import extends FormEntity
      */
     public const DELAYED = 7;
 
-    /** ===== Priorities: ===== */
+    /**
+     * ===== Priorities: =====.
+     */
     public const LOW    = 512;
+
     public const NORMAL = 64;
+
     public const HIGH   = 1;
 
     /**
@@ -363,7 +367,7 @@ class Import extends FormEntity
      */
     public function getName()
     {
-        return $this->getOriginalFile() ? $this->getOriginalFile() : $this->getId();
+        return $this->getOriginalFile() ?: $this->getId();
     }
 
     /**
@@ -486,10 +490,8 @@ class Import extends FormEntity
 
     /**
      * Counts current progress percentage.
-     *
-     * @return float
      */
-    public function getProgressPercentage()
+    public function getProgressPercentage(): float|int
     {
         $processed = $this->getProcessedRows();
 
@@ -544,27 +546,17 @@ class Import extends FormEntity
 
     /**
      * Returns Twitter Bootstrap label class based on current status.
-     *
-     * @return string
      */
-    public function getSatusLabelClass()
+    public function getSatusLabelClass(): string
     {
-        switch ($this->status) {
-            case self::QUEUED:
-                return 'info';
-            case self::IN_PROGRESS:
-            case self::MANUAL:
-                return 'primary';
-            case self::IMPORTED:
-                return 'success';
-            case self::FAILED:
-                return 'danger';
-            case self::STOPPED:
-            case self::DELAYED:
-                return 'warning';
-            default:
-                return 'default';
-        }
+        return match ($this->status) {
+            self::QUEUED => 'info',
+            self::IN_PROGRESS, self::MANUAL => 'primary',
+            self::IMPORTED => 'success',
+            self::FAILED   => 'danger',
+            self::STOPPED, self::DELAYED => 'warning',
+            default => 'default',
+        };
     }
 
     /**
@@ -746,7 +738,7 @@ class Import extends FormEntity
      */
     public function getLastLineImported()
     {
-        return isset($this->properties['line']) ? $this->properties['line'] : 0;
+        return $this->properties['line'] ?? 0;
     }
 
     /**
@@ -787,11 +779,7 @@ class Import extends FormEntity
      */
     public function getDefaults()
     {
-        if (isset($this->properties['defaults'])) {
-            return $this->properties['defaults'];
-        }
-
-        return [];
+        return $this->properties['defaults'] ?? [];
     }
 
     /**

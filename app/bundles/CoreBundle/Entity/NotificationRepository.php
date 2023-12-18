@@ -7,17 +7,11 @@ namespace Mautic\CoreBundle\Entity;
  */
 class NotificationRepository extends CommonRepository
 {
-    /**
-     * {@inheritdoc}
-     */
     public function getTableAlias(): string
     {
         return 'n';
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getDefaultOrder(): array
     {
         return [
@@ -35,9 +29,6 @@ class NotificationRepository extends CommonRepository
 
     /**
      * Clear notifications for a user.
-     *
-     * @param null $id    Clears all if empty
-     * @param null $limit Clears a set number
      *
      * @throws \Doctrine\DBAL\Exception\InvalidArgumentException
      */
@@ -93,10 +84,8 @@ class NotificationRepository extends CommonRepository
     /**
      * Fetch notifications for this user.
      *
-     * @param null $afterId
+
      * @param bool $includeRead
-     * @param null $type
-     * @param null $limit
      *
      * @return array
      */

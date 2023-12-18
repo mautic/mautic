@@ -28,8 +28,18 @@ use Symfony\Contracts\EventDispatcher\Event;
  */
 class FieldModel extends CommonFormModel
 {
-    public function __construct(protected LeadFieldModel $leadFieldModel, EntityManager $em, CorePermissions $security, EventDispatcherInterface $dispatcher, UrlGeneratorInterface $router, Translator $translator, UserHelper $userHelper, LoggerInterface $mauticLogger, CoreParametersHelper $coreParametersHelper, private RequestStack $requestStack)
-    {
+    public function __construct(
+        protected LeadFieldModel $leadFieldModel,
+        EntityManager $em,
+        CorePermissions $security,
+        EventDispatcherInterface $dispatcher,
+        UrlGeneratorInterface $router,
+        Translator $translator,
+        UserHelper $userHelper,
+        LoggerInterface $mauticLogger,
+        CoreParametersHelper $coreParametersHelper,
+        private RequestStack $requestStack
+    ) {
         parent::__construct($em, $security, $dispatcher, $router, $translator, $userHelper, $mauticLogger, $coreParametersHelper);
     }
 
@@ -42,10 +52,8 @@ class FieldModel extends CommonFormModel
      * @param object|array<mixed> $entity
      * @param string|null         $action
      * @param array               $options
-     *
-     * @return \Symfony\Component\Form\FormInterface
      */
-    public function createForm($entity, FormFactoryInterface $formFactory, $action = null, $options = [])
+    public function createForm($entity, FormFactoryInterface $formFactory, $action = null, $options = []): \Symfony\Component\Form\FormInterface
     {
         if ($action) {
             $options['action'] = $action;
@@ -141,11 +149,9 @@ class FieldModel extends CommonFormModel
     }
 
     /**
-     * @return FormFieldEvent|Event|null
-     *
      * @throws MethodNotAllowedHttpException
      */
-    protected function dispatchEvent($action, &$entity, $isNew = false, Event $event = null)
+    protected function dispatchEvent($action, &$entity, $isNew = false, Event $event = null): ?Event
     {
         if (!$entity instanceof Field) {
             throw new MethodNotAllowedHttpException(['Form']);

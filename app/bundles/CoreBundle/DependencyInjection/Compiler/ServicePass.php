@@ -76,13 +76,13 @@ final class ServicePass implements CompilerPassInterface
                         if ('menus' == $type) {
                             $details = array_merge(
                                 [
-                                    'class'   => 'Knp\Menu\MenuItem',
+                                    'class'   => \Knp\Menu\MenuItem::class,
                                     'factory' => ['@mautic.menu.builder', $details['alias'].'Menu'],
                                 ],
                                 $details
                             );
 
-                            $menus[$details['alias']] = (isset($details['options'])) ? $details['options'] : [];
+                            $menus[$details['alias']] = $details['options'] ?? [];
                         }
 
                         // Set service alias

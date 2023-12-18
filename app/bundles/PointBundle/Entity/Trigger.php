@@ -71,9 +71,6 @@ class Trigger extends FormEntity
         parent::__clone();
     }
 
-    /**
-     * Constructor.
-     */
     public function __construct()
     {
         $this->events = new ArrayCollection();
@@ -84,7 +81,7 @@ class Trigger extends FormEntity
         $builder = new ClassMetadataBuilder($metadata);
 
         $builder->setTable('point_triggers')
-            ->setCustomRepositoryClass('Mautic\PointBundle\Entity\TriggerRepository');
+            ->setCustomRepositoryClass(\Mautic\PointBundle\Entity\TriggerRepository::class);
 
         $builder->addIdColumns();
 

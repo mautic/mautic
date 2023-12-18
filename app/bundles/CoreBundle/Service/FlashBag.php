@@ -13,11 +13,17 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 class FlashBag
 {
     public const LEVEL_ERROR     = 'error';
+
     public const LEVEL_WARNING   = 'warning';
+
     public const LEVEL_NOTICE    = 'notice';
 
-    public function __construct(private Session $session, private TranslatorInterface $translator, private RequestStack $requestStack, private NotificationModel $notificationModel)
-    {
+    public function __construct(
+        private Session $session,
+        private TranslatorInterface $translator,
+        private RequestStack $requestStack,
+        private NotificationModel $notificationModel
+    ) {
     }
 
     /**
@@ -43,17 +49,11 @@ class FlashBag
         $this->session->getFlashBag()->add($level, $translatedMessage);
 
         if (!defined('MAUTIC_INSTALLER') && $addNotification) {
-            switch ($level) {
-                case self::LEVEL_WARNING:
-                    $iconClass = 'text-warning fa-exclamation-triangle';
-                    break;
-                case self::LEVEL_ERROR:
-                    $iconClass = 'text-danger fa-exclamation-circle';
-                    break;
-                default:
-                    $iconClass = 'fa-info-circle';
-                    break;
-            }
+            $iconClass = match ($level) {
+                self::LEVEL_WARNING => 'text-warning fa-exclamation-triangle',
+                self::LEVEL_ERROR   => 'text-danger fa-exclamation-circle',
+                default             => 'fa-info-circle',
+            };
 
             // If the user has not interacted with the browser for the last 30 seconds, consider the message unread
             $lastActive = $this->requestStack->getCurrentRequest()->get('mauticUserLastActive', 0);

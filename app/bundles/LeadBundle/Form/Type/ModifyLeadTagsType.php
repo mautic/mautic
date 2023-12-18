@@ -8,8 +8,9 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class ModifyLeadTagsType extends AbstractType
 {
-    public function __construct(private TranslatorInterface $translator)
-    {
+    public function __construct(
+        private TranslatorInterface $translator
+    ) {
     }
 
     public function buildForm(FormBuilderInterface $builder, array $options): void
@@ -25,7 +26,7 @@ class ModifyLeadTagsType extends AbstractType
                     'data-allow-add'       => 'true',
                     'onchange'             => 'Mautic.createLeadTag(this)',
                 ],
-                'data'            => (isset($options['data']['add_tags'])) ? $options['data']['add_tags'] : null,
+                'data'            => $options['data']['add_tags'] ?? null,
                 'add_transformer' => true,
             ]
         );
@@ -41,7 +42,7 @@ class ModifyLeadTagsType extends AbstractType
                     'data-allow-add'       => 'true',
                     'onchange'             => 'Mautic.createLeadTag(this)',
                 ],
-                'data'            => (isset($options['data']['remove_tags'])) ? $options['data']['remove_tags'] : null,
+                'data'            => $options['data']['remove_tags'] ?? null,
                 'add_transformer' => true,
             ]
         );

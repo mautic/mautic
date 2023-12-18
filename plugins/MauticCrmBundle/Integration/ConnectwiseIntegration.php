@@ -13,18 +13,13 @@ use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\FormBuilder;
 
 /**
- * @method \MauticPlugin\MauticCrmBundle\Api\ConnectwiseApi getApiHelper
+ * @method \MauticPlugin\MauticCrmBundle\Api\ConnectwiseApi getApiHelper()
  */
 class ConnectwiseIntegration extends CrmAbstractIntegration
 {
     public const PAGESIZE = 200;
 
-    /**
-     * {@inheritdoc}
-     *
-     * @return string
-     */
-    public function getName()
+    public function getName(): string
     {
         return 'Connectwise';
     }
@@ -49,57 +44,44 @@ class ConnectwiseIntegration extends CrmAbstractIntegration
 
     /**
      * Get the array key for application cookie.
-     *
-     * @return string
      */
-    public function getCompanyCookieKey()
+    public function getCompanyCookieKey(): string
     {
         return 'appcookie';
     }
 
     /**
      * Get the array key for companyid.
-     *
-     * @return string
      */
-    public function getCompanyIdKey()
+    public function getCompanyIdKey(): string
     {
         return 'companyid';
     }
 
     /**
      * Get the array key for client id.
-     *
-     * @return string
      */
-    public function getIntegrator()
+    public function getIntegrator(): string
     {
         return 'username';
     }
 
     /**
      * Get the array key for client id.
-     *
-     * @return string
      */
-    public function getConnectwiseUrl()
+    public function getConnectwiseUrl(): string
     {
         return 'site';
     }
 
     /**
      * Get the array key for client secret.
-     *
-     * @return string
      */
-    public function getClientSecretKey()
+    public function getClientSecretKey(): string
     {
         return 'password';
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getSecretKeys(): array
     {
         return [
@@ -107,17 +89,12 @@ class ConnectwiseIntegration extends CrmAbstractIntegration
         ];
     }
 
-    /**
-     * @return string
-     */
-    public function getApiUrl()
+    public function getApiUrl(): string
     {
         return sprintf('%s/v4_6_release/apis/3.0', $this->keys['site']);
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @return string
      */
     public function getAuthLoginUrl()
@@ -157,12 +134,7 @@ class ConnectwiseIntegration extends CrmAbstractIntegration
         return $error;
     }
 
-    /**
-     * {@inheritdoc}
-     *
-     * @return string
-     */
-    public function getAuthenticationType()
+    public function getAuthenticationType(): string
     {
         return 'basic';
     }
@@ -195,9 +167,9 @@ class ConnectwiseIntegration extends CrmAbstractIntegration
     }
 
     /**
-     * @return array|mixed
+     * @return mixed[]
      */
-    public function getAvailableLeadFields($settings = [])
+    public function getAvailableLeadFields($settings = []): array
     {
         $cwFields = [];
         if (isset($settings['feature_settings']['objects'])) {
@@ -305,7 +277,7 @@ class ConnectwiseIntegration extends CrmAbstractIntegration
                         'attr'  => [
                             'data-hide-on' => '{"campaignevent_properties_config_push_activities_0":"checked"}',
                         ],
-                        'data' => (isset($data['campaign_task'])) ? $data['campaign_task'] : [],
+                        'data' => $data['campaign_task'] ?? [],
                     ]);
             }
         }
@@ -427,9 +399,8 @@ class ConnectwiseIntegration extends CrmAbstractIntegration
      * Get Contacts from connectwise.
      *
      * @param array $params
-     * @param null  $query
      */
-    public function getLeads($params = [], $query = null, &$executed = null, $result = [], $object = 'Contact')
+    public function getLeads($params = [], $query = null, &$executed = null, $result = [], $object = 'Contact'): int
     {
         return $this->getRecords($params, $object);
     }
@@ -437,12 +408,12 @@ class ConnectwiseIntegration extends CrmAbstractIntegration
     /**
      * Get Companies from connectwise.
      */
-    public function getCompanies(array $params = [])
+    public function getCompanies(array $params = []): int
     {
         return $this->getRecords($params, 'company');
     }
 
-    public function getRecords($params, $object)
+    public function getRecords($params, $object): int
     {
         if (!$this->isAuthorized()) {
             return 0;
@@ -501,8 +472,10 @@ class ConnectwiseIntegration extends CrmAbstractIntegration
 
     /**
      * Ammend mapped lead data before creating to Mautic.
+     *
+     * @return mixed[]
      */
-    public function amendLeadDataBeforeMauticPopulate($data, $object)
+    public function amendLeadDataBeforeMauticPopulate($data, $object): array
     {
         $fieldsValues = [];
 
@@ -575,11 +548,9 @@ class ConnectwiseIntegration extends CrmAbstractIntegration
      * @param array|Lead $lead
      * @param array      $config
      *
-     * @return array|bool
-     *
      * @throws ApiErrorException
      */
-    public function pushLead($lead, $config = [])
+    public function pushLead($lead, $config = []): bool
     {
         $config      = $this->mergeConfigToFeatureSettings($config);
         $personFound = false;
@@ -641,10 +612,7 @@ class ConnectwiseIntegration extends CrmAbstractIntegration
         return $leadPushed;
     }
 
-    /**
-     * @return array
-     */
-    public function getMappedFields($object, $lead, $personFound, $config, $cwContactData = [])
+    public function getMappedFields($object, $lead, $personFound, $config, $cwContactData = []): array
     {
         $fieldsToUpdateInCW = isset($config['update_mautic']) && $personFound ? array_keys($config['update_mautic'], 1) : [];
         $objectFields       = $this->prepareFieldsForPush($this->getContactFields());
@@ -652,7 +620,7 @@ class ConnectwiseIntegration extends CrmAbstractIntegration
 
         $cwContactExists = $this->amendLeadDataBeforeMauticPopulate($cwContactData, $object);
 
-        $communicationItems = isset($cwContactData['communicationItems']) ? $cwContactData['communicationItems'] : [];
+        $communicationItems = $cwContactData['communicationItems'] ?? [];
 
         $leadFields = array_diff_key($leadFields, array_flip($fieldsToUpdateInCW));
         $leadFields = $this->getBlankFieldsToUpdate($leadFields, $cwContactExists, $objectFields, $config);
@@ -673,10 +641,8 @@ class ConnectwiseIntegration extends CrmAbstractIntegration
 
     /**
      * Match lead data with integration fields.
-     *
-     * @return array
      */
-    public function populateLeadData($lead, $config = [])
+    public function populateLeadData($lead, $config = []): array
     {
         if ($lead instanceof Lead) {
             $fields = $lead->getFields(true);
@@ -744,7 +710,7 @@ class ConnectwiseIntegration extends CrmAbstractIntegration
                     ]);
 
                     $matched['company'] = ['identifier' => $foundCompanies[0]['identifier']];
-                } catch (ApiErrorException $e) {
+                } catch (ApiErrorException) {
                     // No matching companies were found
                 }
 
@@ -799,7 +765,6 @@ class ConnectwiseIntegration extends CrmAbstractIntegration
     }
 
     /**
-     * @param null   $object
      * @param string $priorityObject
      *
      * @return mixed
@@ -868,9 +833,7 @@ class ConnectwiseIntegration extends CrmAbstractIntegration
 
                 $existingContactsIds = array_column(array_filter(
                     $contacts,
-                    function ($contact): bool {
-                        return 'lead' === $contact['internal_entity'];
-                    }
+                    fn ($contact): bool => 'lead' === $contact['internal_entity']
                 ), 'integration_entity_id');
 
                 $contactsToFetch = array_diff_key($recordList, array_flip($existingContactsIds));

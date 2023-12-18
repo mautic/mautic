@@ -4,15 +4,9 @@ namespace Mautic\SmsBundle\Broadcast;
 
 class BroadcastResult
 {
-    /**
-     * @var int
-     */
-    private $sentCount = 0;
+    private int $sentCount = 0;
 
-    /**
-     * @var int
-     */
-    private $failedCount = 0;
+    private int $failedCount = 0;
 
     public function process(array $results): void
     {
@@ -35,18 +29,12 @@ class BroadcastResult
         ++$this->failedCount;
     }
 
-    /**
-     * @return int
-     */
-    public function getSentCount()
+    public function getSentCount(): int
     {
         return $this->sentCount;
     }
 
-    /**
-     * @return int
-     */
-    public function getFailedCount()
+    public function getFailedCount(): int
     {
         return $this->failedCount;
     }

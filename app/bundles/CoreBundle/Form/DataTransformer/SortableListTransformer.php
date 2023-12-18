@@ -9,11 +9,12 @@ class SortableListTransformer implements DataTransformerInterface
 {
     /**
      * @param bool $withLabels
-     * @param bool $atRootLevel
      * @param bool $useKeyValuePairs
      */
-    public function __construct(private $withLabels = true, private $useKeyValuePairs = false)
-    {
+    public function __construct(
+        private $withLabels = true,
+        private $useKeyValuePairs = false
+    ) {
     }
 
     /**
@@ -76,10 +77,7 @@ class SortableListTransformer implements DataTransformerInterface
         return ['list' => $formattedArray];
     }
 
-    /**
-     * @return array
-     */
-    private function reverseTransformKeyValuePair($array)
+    private function reverseTransformKeyValuePair($array): array
     {
         if (null === $array || !isset($array['list'])) {
             return [];

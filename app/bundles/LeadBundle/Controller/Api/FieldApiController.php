@@ -71,7 +71,7 @@ class FieldApiController extends CommonApiController
     {
         try {
             return parent::saveEntity($entity, $statusCode);
-        } catch (AbortColumnCreateException $exception) {
+        } catch (AbortColumnCreateException) {
             // Field has been queued
             return Response::HTTP_ACCEPTED;
         }
@@ -110,8 +110,6 @@ class FieldApiController extends CommonApiController
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @param LeadField &$entity
      * @param string    $action
      */

@@ -27,10 +27,7 @@ class Company extends FormEntity implements CustomFieldEntityInterface, Identifi
      */
     private $score = 0;
 
-    /**
-     * @var User|null
-     */
-    private $owner;
+    private ?User $owner = null;
 
     /**
      * @var mixed[]
@@ -100,7 +97,7 @@ class Company extends FormEntity implements CustomFieldEntityInterface, Identifi
             ->nullable()
             ->build();
 
-        $builder->createManyToOne('owner', 'Mautic\UserBundle\Entity\User')
+        $builder->createManyToOne('owner', \Mautic\UserBundle\Entity\User::class)
             ->cascadeMerge()
             ->addJoinColumn('owner_id', 'id', true, false, 'SET NULL')
             ->build();
@@ -214,10 +211,7 @@ class Company extends FormEntity implements CustomFieldEntityInterface, Identifi
         return $this;
     }
 
-    /**
-     * @return User
-     */
-    public function getOwner()
+    public function getOwner(): ?User
     {
         return $this->owner;
     }
@@ -229,7 +223,7 @@ class Company extends FormEntity implements CustomFieldEntityInterface, Identifi
      */
     public function getPermissionUser()
     {
-        return (null === $this->getOwner()) ? $this->getCreatedBy() : $this->getOwner();
+        return $this->getOwner() ?? $this->getCreatedBy();
     }
 
     /**

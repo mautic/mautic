@@ -9,18 +9,16 @@ use Mautic\IntegrationsBundle\Mapping\MappedFieldInfoInterface;
 
 class FieldFilterHelper
 {
-    /**
-     * @var int
-     */
-    private $totalFieldCount = 0;
+    private int $totalFieldCount = 0;
 
     /**
      * @var MappedFieldInfoInterface[]
      */
-    private $filteredFields = [];
+    private array $filteredFields = [];
 
-    public function __construct(private ConfigFormSyncInterface $integrationObject)
-    {
+    public function __construct(
+        private ConfigFormSyncInterface $integrationObject
+    ) {
     }
 
     public function filterFieldsByPage(string $objectName, int $page, int $limit = 15): void

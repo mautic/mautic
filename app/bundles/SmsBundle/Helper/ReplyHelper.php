@@ -17,8 +17,11 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 class ReplyHelper
 {
-    public function __construct(private EventDispatcherInterface $eventDispatcher, private LoggerInterface $logger, private ContactTracker $contactTracker)
-    {
+    public function __construct(
+        private EventDispatcherInterface $eventDispatcher,
+        private LoggerInterface $logger,
+        private ContactTracker $contactTracker
+    ) {
     }
 
     /**
@@ -58,9 +61,9 @@ class ReplyHelper
                     $response = $eventResponse;
                 }
             }
-        } catch (BadRequestHttpException $exception) {
+        } catch (BadRequestHttpException) {
             return new Response('invalid request', 400);
-        } catch (NotFoundHttpException $exception) {
+        } catch (NotFoundHttpException) {
             return new Response('', 404);
         } catch (NumberNotFoundException $exception) {
             $this->logger->debug(

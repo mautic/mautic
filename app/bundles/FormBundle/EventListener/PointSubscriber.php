@@ -12,14 +12,12 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class PointSubscriber implements EventSubscriberInterface
 {
-    public function __construct(private PointModel $pointModel)
-    {
+    public function __construct(
+        private PointModel $pointModel
+    ) {
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             PointEvents::POINT_ON_BUILD => ['onPointBuild', 0],
@@ -33,7 +31,7 @@ class PointSubscriber implements EventSubscriberInterface
             'group'       => 'mautic.form.point.action',
             'label'       => 'mautic.form.point.action.submit',
             'description' => 'mautic.form.point.action.submit_descr',
-            'callback'    => ['\\Mautic\\FormBundle\\Helper\\PointActionHelper', 'validateFormSubmit'],
+            'callback'    => [\Mautic\FormBundle\Helper\PointActionHelper::class, 'validateFormSubmit'],
             'formType'    => PointActionFormSubmitType::class,
         ];
 

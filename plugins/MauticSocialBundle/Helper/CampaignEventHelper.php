@@ -14,47 +14,17 @@ use MauticPlugin\MauticSocialBundle\Model\TweetModel;
 class CampaignEventHelper
 {
     /**
-     * @var IntegrationHelper
-     */
-    protected $integrationHelper;
-
-    /**
-     * @var TrackableModel
-     */
-    protected $trackableModel;
-
-    /**
-     * @var PageTokenHelper
-     */
-    protected $pageTokenHelper;
-
-    /**
-     * @var AssetTokenHelper
-     */
-    protected $assetTokenHelper;
-
-    /**
-     * @var TweetModel
-     */
-    protected $tweetModel;
-
-    /**
      * @var array
      */
     protected $clickthrough = [];
 
     public function __construct(
-        IntegrationHelper $integrationHelper,
-        TrackableModel $trackableModel,
-        PageTokenHelper $pageTokenHelper,
-        AssetTokenHelper $assetTokenHelper,
-        TweetModel $tweetModel
+        protected IntegrationHelper $integrationHelper,
+        protected TrackableModel $trackableModel,
+        protected PageTokenHelper $pageTokenHelper,
+        protected AssetTokenHelper $assetTokenHelper,
+        protected TweetModel $tweetModel
     ) {
-        $this->integrationHelper = $integrationHelper;
-        $this->trackableModel    = $trackableModel;
-        $this->pageTokenHelper   = $pageTokenHelper;
-        $this->assetTokenHelper  = $assetTokenHelper;
-        $this->tweetModel        = $tweetModel;
     }
 
     /**
@@ -116,9 +86,9 @@ class CampaignEventHelper
      * @param array  $lead
      * @param int    $channelId
      *
-     * @return string
+     * @return string|string[]
      */
-    protected function parseTweetText($text, $lead, $channelId = -1)
+    protected function parseTweetText($text, $lead, $channelId = -1): array|string
     {
         $tweetHandle = $lead['twitter'];
         $tokens      = [
@@ -132,7 +102,7 @@ class CampaignEventHelper
             $this->assetTokenHelper->findAssetTokens($text, $this->clickthrough)
         );
 
-        list($text, $trackables) = $this->trackableModel->parseContentForTrackables(
+        [$text, $trackables] = $this->trackableModel->parseContentForTrackables(
             $text,
             $tokens,
             'social_twitter',

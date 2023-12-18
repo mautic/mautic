@@ -31,6 +31,7 @@ use Mautic\LeadBundle\LeadEvents;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\FormFactoryInterface;
+use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Contracts\EventDispatcher\Event;
@@ -457,9 +458,6 @@ class FieldModel extends FormModel
         return $this->leadFieldRepository;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getPermissionBase(): string
     {
         return 'lead:fields';
@@ -467,10 +465,8 @@ class FieldModel extends FormModel
 
     /**
      * Get a specific entity or generate a new one if id is empty.
-     *
-     * @return LeadField|null
      */
-    public function getEntity($id = null)
+    public function getEntity($id = null): ?LeadField
     {
         if (null === $id) {
             return new LeadField();
@@ -605,13 +601,13 @@ class FieldModel extends FormModel
     /**
      * Delete an array of entities.
      *
-     * @param array $ids
+     * @param mixed[] $ids
      *
-     * @return array
+     * @return mixed[]
      *
      * @throws \Mautic\CoreBundle\Exception\SchemaException
      */
-    public function deleteEntities($ids)
+    public function deleteEntities($ids): array
     {
         $entities = parent::deleteEntities($ids);
 
@@ -632,10 +628,8 @@ class FieldModel extends FormModel
 
     /**
      * Is field used in segment filter?
-     *
-     * @return bool
      */
-    public function isUsedField(LeadField $field)
+    public function isUsedField(LeadField $field): bool
     {
         return $this->leadListModel->isFieldUsed($field);
     }
@@ -655,15 +649,13 @@ class FieldModel extends FormModel
      */
     public function filterUsedFieldIds(array $ids): array
     {
-        return array_filter($ids, function ($id): bool {
-            return false === $this->isUsedField($this->getEntity($id));
-        });
+        return array_filter($ids, fn ($id): bool => false === $this->isUsedField($this->getEntity($id)));
     }
 
     /**
      * Reorder fields based on passed entity position.
      */
-    public function reorderFieldsByEntity($entity)
+    public function reorderFieldsByEntity($entity): void
     {
         if (!$entity instanceof LeadField) {
             throw new MethodNotAllowedHttpException(['LeadEntity']);
@@ -730,16 +722,11 @@ class FieldModel extends FormModel
     }
 
     /**
-     * {@inheritdoc}
-     *
-     * @param null  $action
      * @param array $options
-     *
-     * @return mixed
      *
      * @throws MethodNotAllowedHttpException
      */
-    public function createForm($entity, FormFactoryInterface $formFactory, $action = null, $options = [])
+    public function createForm($entity, FormFactoryInterface $formFactory, $action = null, $options = []): FormInterface
     {
         if (!$entity instanceof LeadField) {
             throw new MethodNotAllowedHttpException(['LeadField']);
@@ -776,11 +763,9 @@ class FieldModel extends FormModel
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @throws \Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException
      */
-    protected function dispatchEvent($action, &$entity, $isNew = false, Event $event = null)
+    protected function dispatchEvent($action, &$entity, $isNew = false, Event $event = null): ?Event
     {
         switch ($action) {
             case 'pre_save':
@@ -807,7 +792,7 @@ class FieldModel extends FormModel
 
         try {
             return $this->fieldSaveDispatcher->dispatchEvent($action, $entity, $isNew, $event);
-        } catch (NoListenerException $exception) {
+        } catch (NoListenerException) {
             return $event;
         }
     }
@@ -819,9 +804,9 @@ class FieldModel extends FormModel
      * @param bool|true $alphabetical
      * @param array     $filters
      *
-     * @return array
+     * @return mixed[]
      */
-    public function getFieldList($byGroup = true, $alphabetical = true, $filters = ['isPublished' => true, 'object' => 'lead'])
+    public function getFieldList($byGroup = true, $alphabetical = true, $filters = ['isPublished' => true, 'object' => 'lead']): array
     {
         return $this->fieldList->getFieldList($byGroup, $alphabetical, $filters);
     }
@@ -895,10 +880,8 @@ class FieldModel extends FormModel
      * Get the fields for a specific group.
      *
      * @param array $filters
-     *
-     * @return array
      */
-    public function getGroupFields($group, $filters = ['isPublished' => true])
+    public function getGroupFields($group, $filters = ['isPublished' => true]): array
     {
         $forceFilters = [
             [
@@ -966,10 +949,8 @@ class FieldModel extends FormModel
      * @deprecated Use SchemaDefinition::getSchemaDefinition method instead
      *
      * @param bool $isUnique
-     *
-     * @return array
      */
-    public static function getSchemaDefinition($alias, $type, $isUnique = false)
+    public static function getSchemaDefinition($alias, $type, $isUnique = false): array
     {
         return SchemaDefinition::getSchemaDefinition($alias, $type, $isUnique);
     }

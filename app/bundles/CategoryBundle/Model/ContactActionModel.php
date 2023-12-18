@@ -6,8 +6,9 @@ use Mautic\LeadBundle\Model\LeadModel;
 
 class ContactActionModel
 {
-    public function __construct(private LeadModel $contactModel)
-    {
+    public function __construct(
+        private LeadModel $contactModel
+    ) {
     }
 
     public function addContactsToCategories(array $contactIds, array $categoryIds): void

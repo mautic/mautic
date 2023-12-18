@@ -64,7 +64,7 @@ class Stat
         $builder = new ClassMetadataBuilder($metadata);
 
         $builder->setTable('dynamic_content_stats')
-            ->setCustomRepositoryClass('Mautic\DynamicContentBundle\Entity\StatRepository')
+            ->setCustomRepositoryClass(\Mautic\DynamicContentBundle\Entity\StatRepository::class)
             ->addIndex(['dynamic_content_id', 'lead_id'], 'stat_dynamic_content_search')
             ->addIndex(['source', 'source_id'], 'stat_dynamic_content_source_search');
 

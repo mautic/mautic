@@ -9,13 +9,11 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class UserListType extends AbstractType
 {
-    public function __construct(private UserModel $userModel)
-    {
+    public function __construct(
+        private UserModel $userModel
+    ) {
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults(

@@ -12,13 +12,12 @@ class CustomButtonEvent extends AbstractCustomRequestEvent
      */
     protected $buttons = [];
 
-    /**
-     * CustomButtonEvent constructor.
-     *
-     * @param null $item
-     */
-    public function __construct(protected $location, Request $request, array $buttons = [], protected $item = null)
-    {
+    public function __construct(
+        protected $location,
+        Request $request,
+        array $buttons = [],
+        protected $item = null
+    ) {
         parent::__construct($request);
 
         foreach ($buttons as $button) {
@@ -44,9 +43,6 @@ class CustomButtonEvent extends AbstractCustomRequestEvent
 
     /**
      * Add an array of buttons.
-     *
-     * @param null $location
-     * @param null $route
      *
      * @return $this
      */
@@ -150,7 +146,7 @@ class CustomButtonEvent extends AbstractCustomRequestEvent
 
         if (ButtonHelper::LOCATION_NAVBAR !== $this->location) {
             // Include the request
-            list($currentRoute, $routeParams) = $this->getRoute(true);
+            [$currentRoute, $routeParams] = $this->getRoute(true);
 
             $buttonKey .= $currentRoute;
 

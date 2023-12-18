@@ -243,9 +243,9 @@ trait VariantEntityTrait
      *
      * @return array<int,int|string>
      */
-    public function getRelatedEntityIds($publishedOnly = false)
+    public function getRelatedEntityIds($publishedOnly = false): array
     {
-        list($parent, $children) = $this->getVariants();
+        [$parent, $children] = $this->getVariants();
 
         // If parent is not published and only published has been requested, no need to proceed
         if ($parent && $publishedOnly && !$parent->isPublished()) {
@@ -275,7 +275,7 @@ trait VariantEntityTrait
      */
     protected function getAccumulativeVariantCount($getter)
     {
-        list($parent, $children) = $this->getVariants();
+        [$parent, $children]     = $this->getVariants();
         $count                   = $parent->$getter();
 
         if ($checkTranslations = method_exists($parent, 'getAccumulativeTranslationCount')) {
@@ -306,7 +306,7 @@ trait VariantEntityTrait
 
         /** @var TranslationEntityInterface $parentTranslation */
         /** @var ArrayCollection $childrenTranslations */
-        list($parentTranslation, $childrenTranslations) = $entity->getTranslations();
+        [$parentTranslation, $childrenTranslations] = $entity->getTranslations();
         if ($entity->getId() && $parentTranslation != $entity) {
             if (!$publishedOnly || $parentTranslation->isPublished()) {
                 $ids[] = $parentTranslation->getId();

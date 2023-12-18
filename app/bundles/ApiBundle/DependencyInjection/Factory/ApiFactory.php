@@ -10,9 +10,6 @@ use Symfony\Component\DependencyInjection\Reference;
 
 class ApiFactory implements SecurityFactoryInterface
 {
-    /**
-     * {@inheritdoc}
-     */
     public function create(ContainerBuilder $container, string $id, array $config, string $userProvider, ?string $defaultEntryPoint): array
     {
         $providerId = 'security.authentication.provider.mautic_api.'.$id;
@@ -26,25 +23,16 @@ class ApiFactory implements SecurityFactoryInterface
         return [$providerId, $listenerId, $defaultEntryPoint];
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getPosition()
     {
         return 'pre_auth';
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getKey()
     {
         return 'mautic_api_auth';
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function addConfiguration(NodeDefinition $node): void
     {
     }

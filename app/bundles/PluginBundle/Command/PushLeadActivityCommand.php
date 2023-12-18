@@ -11,8 +11,10 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class PushLeadActivityCommand extends Command
 {
-    public function __construct(private TranslatorInterface $translator, private IntegrationHelper $integrationHelper)
-    {
+    public function __construct(
+        private TranslatorInterface $translator,
+        private IntegrationHelper $integrationHelper
+    ) {
         parent::__construct();
     }
 
@@ -85,5 +87,6 @@ class PushLeadActivityCommand extends Command
 
         return \Symfony\Component\Console\Command\Command::SUCCESS;
     }
+
     protected static $defaultDescription = 'Push lead activity to integration.';
 }

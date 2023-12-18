@@ -9,9 +9,6 @@ use Twig\TwigFunction;
 
 final class HtmlExtension extends AbstractExtension
 {
-    /**
-     * {@inheritdoc}
-     */
     public function getFunctions()
     {
         return [
@@ -44,7 +41,7 @@ final class HtmlExtension extends AbstractExtension
 
         try {
             $attributes = current((array) new \SimpleXMLElement("<element $attributes />"));
-        } catch (\Exception $e) {
+        } catch (\Exception) {
             return [];
         }
 

@@ -22,7 +22,7 @@ class AuthController extends CommonController
         } catch (UnauthorizedException $exception) {
             $message             = $exception->getMessage();
             $authenticationError = true;
-        } catch (IntegrationNotFoundException $exception) {
+        } catch (IntegrationNotFoundException) {
             return $this->notFound();
         }
 

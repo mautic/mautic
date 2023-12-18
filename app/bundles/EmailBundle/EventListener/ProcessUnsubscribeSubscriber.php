@@ -13,12 +13,10 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 class ProcessUnsubscribeSubscriber implements EventSubscriberInterface
 {
     public const BUNDLE     = 'EmailBundle';
+
     public const FOLDER_KEY = 'unsubscribes';
 
-    /**
-     * @return array
-     */
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             EmailEvents::MONITORED_EMAIL_CONFIG => ['onEmailConfig', 0],
@@ -27,8 +25,10 @@ class ProcessUnsubscribeSubscriber implements EventSubscriberInterface
         ];
     }
 
-    public function __construct(private Unsubscribe $unsubscriber, private FeedbackLoop $looper)
-    {
+    public function __construct(
+        private Unsubscribe $unsubscriber,
+        private FeedbackLoop $looper
+    ) {
     }
 
     public function onEmailConfig(MonitoredEmailEvent $event): void
@@ -57,7 +57,7 @@ class ProcessUnsubscribeSubscriber implements EventSubscriberInterface
         $helper = $event->getHelper();
         if ($helper && $unsubscribeEmail = $helper->generateUnsubscribeEmail()) {
             $headers          = $event->getTextHeaders();
-            $existing         = (isset($headers['List-Unsubscribe'])) ? $headers['List-Unsubscribe'] : '';
+            $existing         = $headers['List-Unsubscribe'] ?? '';
             $unsubscribeEmail = "<mailto:$unsubscribeEmail>";
             if ($existing) {
                 if (!str_contains($existing, $unsubscribeEmail)) {

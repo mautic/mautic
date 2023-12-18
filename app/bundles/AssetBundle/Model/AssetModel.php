@@ -70,9 +70,6 @@ class AssetModel extends FormModel
         parent::__construct($em, $security, $dispatcher, $router, $translator, $userHelper, $logger, $coreParametersHelper);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function saveEntity($entity, $unlock = true): void
     {
         if (empty($this->inConversion)) {
@@ -110,14 +107,13 @@ class AssetModel extends FormModel
     }
 
     /**
-     * @param null   $request
      * @param string $code
      * @param array  $systemEntry
      *
      * @throws \Doctrine\ORM\ORMException
      * @throws \Exception
      */
-    public function trackDownload($asset, $request = null, $code = '200', $systemEntry = [])
+    public function trackDownload($asset, $request = null, $code = '200', $systemEntry = []): void
     {
         // Don't skew results with in-house downloads
         if (empty($systemEntry) && !$this->security->isAnonymous()) {
@@ -326,11 +322,9 @@ class AssetModel extends FormModel
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @throws NotFoundHttpException
      */
-    public function createForm($entity, FormFactoryInterface $formFactory, $action = null, $options = [])
+    public function createForm($entity, FormFactoryInterface $formFactory, $action = null, $options = []): \Symfony\Component\Form\FormInterface
     {
         if (!$entity instanceof Asset) {
             throw new MethodNotAllowedHttpException(['Asset']);
@@ -345,10 +339,8 @@ class AssetModel extends FormModel
 
     /**
      * Get a specific entity or generate a new one if id is empty.
-     *
-     * @return Asset|null
      */
-    public function getEntity($id = null)
+    public function getEntity($id = null): ?Asset
     {
         if (null === $id) {
             $entity = new Asset();
@@ -360,11 +352,9 @@ class AssetModel extends FormModel
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @throws \Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException
      */
-    protected function dispatchEvent($action, &$entity, $isNew = false, Event $event = null)
+    protected function dispatchEvent($action, &$entity, $isNew = false, Event $event = null): ?Event
     {
         if (!$entity instanceof Asset) {
             throw new MethodNotAllowedHttpException(['Asset']);
@@ -471,7 +461,7 @@ class AssetModel extends FormModel
         if ($humanReadable) {
             $number = Asset::convertBytesToHumanReadable($maxAllowed);
         } else {
-            list($number, $unit) = Asset::convertBytesToUnit($maxAllowed, $unit);
+            [$number, $unit] = Asset::convertBytesToUnit($maxAllowed, $unit);
         }
 
         return $number;
@@ -516,10 +506,8 @@ class AssetModel extends FormModel
      * @param string      $dateFormat
      * @param array       $filter
      * @param bool        $canViewOthers
-     *
-     * @return array
      */
-    public function getDownloadsLineChartData($unit, \DateTime $dateFrom, \DateTime $dateTo, $dateFormat = null, $filter = [], $canViewOthers = true)
+    public function getDownloadsLineChartData($unit, \DateTime $dateFrom, \DateTime $dateTo, $dateFormat = null, $filter = [], $canViewOthers = true): array
     {
         $chart = new LineChart($unit, $dateFrom, $dateTo, $dateFormat);
         $query = new ChartQuery($this->em->getConnection(), $dateFrom, $dateTo);
@@ -546,10 +534,8 @@ class AssetModel extends FormModel
      * @param string $dateTo
      * @param array  $filters
      * @param bool   $canViewOthers
-     *
-     * @return array
      */
-    public function getUniqueVsRepetitivePieChartData($dateFrom, $dateTo, $filters = [], $canViewOthers = true)
+    public function getUniqueVsRepetitivePieChartData($dateFrom, $dateTo, $filters = [], $canViewOthers = true): array
     {
         $chart   = new PieChart();
         $query   = new ChartQuery($this->em->getConnection(), $dateFrom, $dateTo);

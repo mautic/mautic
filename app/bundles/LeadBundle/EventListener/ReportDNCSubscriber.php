@@ -17,14 +17,16 @@ class ReportDNCSubscriber implements EventSubscriberInterface
 {
     public const DNC = 'contact.dnc';
 
-    public function __construct(private FieldsBuilder $fieldsBuilder, private CompanyReportData $companyReportData, private TranslatorInterface $translator, private RouterInterface $router, private ChannelListHelper $channelListHelper)
-    {
+    public function __construct(
+        private FieldsBuilder $fieldsBuilder,
+        private CompanyReportData $companyReportData,
+        private TranslatorInterface $translator,
+        private RouterInterface $router,
+        private ChannelListHelper $channelListHelper
+    ) {
     }
 
-    /**
-     * @return array
-     */
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             ReportEvents::REPORT_ON_BUILD    => ['onReportBuilder', 0],

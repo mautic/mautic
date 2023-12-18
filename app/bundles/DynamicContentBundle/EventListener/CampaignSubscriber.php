@@ -17,14 +17,14 @@ use Symfony\Component\HttpFoundation\Session\SessionInterface;
 
 class CampaignSubscriber implements EventSubscriberInterface
 {
-    public function __construct(private DynamicContentModel $dynamicContentModel, private SessionInterface $session, private EventDispatcherInterface $dispatcher)
-    {
+    public function __construct(
+        private DynamicContentModel $dynamicContentModel,
+        private SessionInterface $session,
+        private EventDispatcherInterface $dispatcher
+    ) {
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             CampaignEvents::CAMPAIGN_ON_BUILD                  => ['onCampaignBuild', 0],
@@ -116,7 +116,7 @@ class CampaignSubscriber implements EventSubscriberInterface
 
         if ($dwc instanceof DynamicContent) {
             // Use translation if available
-            list($ignore, $dwc) = $this->dynamicContentModel->getTranslatedEntity($dwc, $lead);
+            [$ignore, $dwc] = $this->dynamicContentModel->getTranslatedEntity($dwc, $lead);
 
             if ($slot) {
                 $this->dynamicContentModel->setSlotContentForLead($dwc, $lead, $slot);

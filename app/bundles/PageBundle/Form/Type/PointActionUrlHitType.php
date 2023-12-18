@@ -14,9 +14,6 @@ use Symfony\Component\Form\FormInterface;
 
 class PointActionUrlHitType extends AbstractType
 {
-    /**
-     * {@inheritdoc}
-     */
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder->add('page_url', TextType::class, [
@@ -40,7 +37,7 @@ class PointActionUrlHitType extends AbstractType
         ]);
 
         $formModifier = function (FormInterface $form, $data) use ($builder): void {
-            $unit = (isset($data['accumulative_time_unit'])) ? $data['accumulative_time_unit'] : 'H';
+            $unit = $data['accumulative_time_unit'] ?? 'H';
             $form->add('accumulative_time_unit', HiddenType::class, [
                 'data' => $unit,
             ]);
@@ -61,7 +58,7 @@ class PointActionUrlHitType extends AbstractType
                     ->getForm()
             );
 
-            $unit               = (isset($data['returns_within_unit'])) ? $data['returns_within_unit'] : 'H';
+            $unit               = $data['returns_within_unit'] ?? 'H';
             $secondsTransformer = new SecondsConversionTransformer($unit);
             $form->add('returns_within_unit', HiddenType::class, [
                 'data' => $unit,
@@ -83,7 +80,7 @@ class PointActionUrlHitType extends AbstractType
                     ->getForm()
             );
 
-            $unit               = (isset($data['returns_after_unit'])) ? $data['returns_after_unit'] : 'H';
+            $unit               = $data['returns_after_unit'] ?? 'H';
             $secondsTransformer = new SecondsConversionTransformer($unit);
             $form->add('returns_after_unit', HiddenType::class, [
                 'data' => $unit,
@@ -120,9 +117,6 @@ class PointActionUrlHitType extends AbstractType
         );
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getBlockPrefix()
     {
         return 'pointaction_urlhit';

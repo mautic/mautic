@@ -14,9 +14,6 @@ use Symfony\Component\HttpKernel\Bundle\Bundle;
 abstract class PluginBundleBase extends Bundle
 {
     /**
-     * @param null $metadata
-     * @param null $installedSchema
-     *
      * @throws \Exception
      *
      * @deprecated To be removed in 5.0. Listen to PluginEvents::ON_PLUGIN_INSTALL instead
@@ -31,11 +28,9 @@ abstract class PluginBundleBase extends Bundle
     /**
      * Install plugin schema based on Doctrine metadata.
      *
-     * @param null $installedSchema
-     *
      * @throws \Exception
      */
-    public static function installPluginSchema(array $metadata, MauticFactory $factory, $installedSchema = null)
+    public static function installPluginSchema(array $metadata, MauticFactory $factory, $installedSchema = null): void
     {
         if (null !== $installedSchema) {
             // Schema exists so bail
@@ -63,8 +58,6 @@ abstract class PluginBundleBase extends Bundle
     /**
      * Called by PluginController::reloadAction when the addon version does not match what's installed.
      *
-     * @param null $metadata
-     *
      * @throws \Exception
      *
      * @deprecated To be removed in 5.0. Listen to PluginEvents::ON_PLUGIN_UPDATE instead
@@ -85,7 +78,7 @@ abstract class PluginBundleBase extends Bundle
      * @throws \Doctrine\DBAL\ConnectionException
      * @throws \Exception
      */
-    public static function updatePluginSchema(array $metadata, Schema $installedSchema, MauticFactory $factory)
+    public static function updatePluginSchema(array $metadata, Schema $installedSchema, MauticFactory $factory): void
     {
         $db         = $factory->getDatabase();
         $schemaTool = new SchemaTool($factory->getEntityManager());
@@ -108,8 +101,6 @@ abstract class PluginBundleBase extends Bundle
 
     /**
      * Not used yet :-).
-     *
-     * @param null $metadata
      */
     public static function onPluginUninstall(Plugin $plugin, MauticFactory $factory, $metadata = null): void
     {
@@ -121,7 +112,7 @@ abstract class PluginBundleBase extends Bundle
      * @throws \Doctrine\DBAL\ConnectionException
      * @throws \Exception
      */
-    public static function dropPluginSchema(array $metadata, MauticFactory $factory)
+    public static function dropPluginSchema(array $metadata, MauticFactory $factory): void
     {
         $db          = $factory->getDatabase();
         $schemaTool  = new SchemaTool($factory->getEntityManager());

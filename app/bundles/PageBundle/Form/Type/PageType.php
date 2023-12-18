@@ -49,9 +49,6 @@ class PageType extends AbstractType
         $this->user         = $userHelper->getUser();
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder->addEventSubscriber(new CleanFormSubscriber(['content' => 'html', 'customHtml' => 'html', 'redirectUrl' => 'url', 'headScript' => 'html', 'footerScript' => 'html']));
@@ -108,7 +105,7 @@ class PageType extends AbstractType
             YesNoButtonGroupType::class,
             [
                 'label' => 'mautic.page.form.preference_center',
-                'data'  => $options['data']->isPreferenceCenter() ? $options['data']->isPreferenceCenter() : false,
+                'data'  => $options['data']->isPreferenceCenter() ?: false,
                 'attr'  => [
                     'tooltip' => 'mautic.page.form.preference_center.tooltip',
                 ],
@@ -120,7 +117,7 @@ class PageType extends AbstractType
             YesNoButtonGroupType::class,
             [
                 'label' => 'mautic.page.config.no_index',
-                'data'  => $options['data']->getNoIndex() ? $options['data']->getNoIndex() : false,
+                'data'  => $options['data']->getNoIndex() ?: false,
             ]
         );
 
@@ -331,9 +328,6 @@ class PageType extends AbstractType
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults([

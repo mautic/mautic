@@ -8,11 +8,12 @@ use Symfony\Contracts\EventDispatcher\Event;
 
 class TriggerExecutedEvent extends Event
 {
-    /** @var bool */
-    private $result;
+    private ?bool $result = null;
 
-    public function __construct(private TriggerEventEntity $triggerEvent, private Lead $lead)
-    {
+    public function __construct(
+        private TriggerEventEntity $triggerEvent,
+        private Lead $lead
+    ) {
     }
 
     /**

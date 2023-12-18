@@ -16,15 +16,19 @@ class MaxMindDoNotSellDownloadHelper
     /**
      * @var array<string>
      */
-    private $auth;
+    private array $auth;
 
     /**
      * @var string
      */
     private $listPath;
 
-    public function __construct($auth, private LoggerInterface $logger, private HttpClientInterface $httpClient, CoreParametersHelper $coreParametersHelper)
-    {
+    public function __construct(
+        $auth,
+        private LoggerInterface $logger,
+        private HttpClientInterface $httpClient,
+        CoreParametersHelper $coreParametersHelper
+    ) {
         $this->auth       = explode(':', (string) $auth, 2);
         $this->listPath   = $coreParametersHelper->get('maxmind_do_not_sell_list_path') ?? '';
     }
@@ -91,18 +95,12 @@ class MaxMindDoNotSellDownloadHelper
         return $this->listPath;
     }
 
-    /**
-     * @return string
-     */
-    private function getUser()
+    private function getUser(): string
     {
         return $this->getAuthPart(0);
     }
 
-    /**
-     * @return string
-     */
-    protected function getPassword()
+    protected function getPassword(): string
     {
         return $this->getAuthPart(1);
     }

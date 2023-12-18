@@ -53,7 +53,7 @@ trait RequestTrait
             if ($type instanceof ResolvedFormTypeInterface) {
                 $type = $type->getInnerType();
             }
-            switch (get_class($type)) {
+            switch ($type::class) {
                 case YesNoButtonGroupType::class:
                 case BooleanType::class:
                     if (!is_object($entity)) {
@@ -89,7 +89,7 @@ trait RequestTrait
                         // Manually handled so remove from form processing
                         unset($form[$name], $params[$name]);
                         break;
-                    } catch (\InvalidArgumentException $exception) {
+                    } catch (\InvalidArgumentException) {
                     }
 
                     // If not manually handled cast to int because Symfony form processing take false as empty
@@ -134,7 +134,7 @@ trait RequestTrait
                         break;
                     }
 
-                    switch (get_class($type)) {
+                    switch ($type::class) {
                         case DateTimeType::class:
                             $params[$name] = (new \DateTime(date('Y-m-d H:i:s', $timestamp)))->format('Y-m-d H:i');
                             break;

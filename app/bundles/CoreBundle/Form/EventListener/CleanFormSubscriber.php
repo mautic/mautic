@@ -15,14 +15,12 @@ class CleanFormSubscriber implements EventSubscriberInterface
     /**
      * @param string|mixed[] $masks
      */
-    public function __construct(private $masks = 'clean')
-    {
+    public function __construct(
+        private $masks = 'clean'
+    ) {
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             FormEvents::PRE_SUBMIT => 'preSubmitData',

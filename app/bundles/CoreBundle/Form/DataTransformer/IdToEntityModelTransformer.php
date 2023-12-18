@@ -14,13 +14,14 @@ class IdToEntityModelTransformer implements DataTransformerInterface
      * @param string $id
      * @param bool   $isArray
      */
-    public function __construct(private EntityManager $em, private $repository = '', private $id = 'id', private $isArray = false)
-    {
+    public function __construct(
+        private EntityManager $em,
+        private $repository = '',
+        private $id = 'id',
+        private $isArray = false
+    ) {
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function transform($entity)
     {
         $func = 'get'.ucfirst($this->id);
@@ -46,8 +47,6 @@ class IdToEntityModelTransformer implements DataTransformerInterface
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @throws TransformationFailedException if object is not found
      */
     public function reverseTransform($id)

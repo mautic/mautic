@@ -33,14 +33,15 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class CampaignSubscriber implements EventSubscriberInterface
 {
-    public function __construct(private EmailModel $emailModel, private RealTimeExecutioner $realTimeExecutioner, private SendEmailToUser $sendEmailToUser, private TranslatorInterface $translator)
-    {
+    public function __construct(
+        private EmailModel $emailModel,
+        private RealTimeExecutioner $realTimeExecutioner,
+        private SendEmailToUser $sendEmailToUser,
+        private TranslatorInterface $translator
+    ) {
     }
 
-    /**
-     * @return array
-     */
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             CampaignEvents::CAMPAIGN_ON_BUILD       => ['onCampaignBuild', 0],
@@ -232,11 +233,11 @@ class CampaignSubscriber implements EventSubscriberInterface
 
         $event->setChannel('email', $emailId);
 
-        $type    = (isset($config['email_type'])) ? $config['email_type'] : MailHelper::EMAIL_TYPE_TRANSACTIONAL;
+        $type    = $config['email_type'] ?? MailHelper::EMAIL_TYPE_TRANSACTIONAL;
         $options = [
             'source'         => ['campaign.event', $event->getEvent()->getId()],
-            'email_attempts' => (isset($config['attempts'])) ? $config['attempts'] : 3,
-            'email_priority' => (isset($config['priority'])) ? $config['priority'] : 2,
+            'email_attempts' => $config['attempts'] ?? 3,
+            'email_priority' => $config['priority'] ?? 2,
             'email_type'     => $type,
             'return_errors'  => true,
             'dnc_as_error'   => true,

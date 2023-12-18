@@ -40,13 +40,9 @@ class CompanyRepository extends CommonRepository implements CustomFieldRepositor
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @param int $id
-     *
-     * @return mixed|null
      */
-    public function getEntity($id = 0)
+    public function getEntity($id = 0): ?Company
     {
         try {
             $q = $this->createQueryBuilder($this->getTableAlias());
@@ -58,12 +54,12 @@ class CompanyRepository extends CommonRepository implements CustomFieldRepositor
             }
             $q->andWhere($this->getTableAlias().'.id = '.(int) $companyId);
             $entity = $q->getQuery()->getSingleResult();
-        } catch (\Exception $e) {
+        } catch (\Exception) {
             $entity = null;
         }
 
         if (null === $entity) {
-            return $entity;
+            return null;
         }
 
         if ($entity->getFields()) {
@@ -120,10 +116,8 @@ class CompanyRepository extends CommonRepository implements CustomFieldRepositor
 
     /**
      * Get companies by lead.
-     *
-     * @return array
      */
-    public function getCompaniesByLeadId($leadId, $companyId = null)
+    public function getCompaniesByLeadId($leadId, $companyId = null): array
     {
         $q = $this->getEntityManager()->getConnection()->createQueryBuilder();
 
@@ -141,18 +135,12 @@ class CompanyRepository extends CommonRepository implements CustomFieldRepositor
         return $q->executeQuery()->fetchAllAssociative();
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getTableAlias(): string
     {
         return 'comp';
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    protected function addCatchAllWhereClause($q, $filter)
+    protected function addCatchAllWhereClause($q, $filter): array
     {
         return $this->addStandardCatchAllWhereClause(
             $q,
@@ -164,12 +152,9 @@ class CompanyRepository extends CommonRepository implements CustomFieldRepositor
         );
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function addSearchCommandWhereClause($q, $filter): array
     {
-        list($expr, $parameters) = $this->addStandardSearchCommandWhereClause($q, $filter);
+        [$expr, $parameters]     = $this->addStandardSearchCommandWhereClause($q, $filter);
         $unique                  = $this->generateRandomParameterName();
         $returnParameter         = true;
         $command                 = $filter->command;
@@ -201,9 +186,9 @@ class CompanyRepository extends CommonRepository implements CustomFieldRepositor
     }
 
     /**
-     * {@inheritdoc}
+     * @return string[]
      */
-    public function getSearchCommands()
+    public function getSearchCommands(): array
     {
         $commands = $this->getStandardSearchCommands();
         if (!empty($this->availableSearchFields)) {
@@ -300,8 +285,6 @@ class CompanyRepository extends CommonRepository implements CustomFieldRepositor
     /**
      * Get a list of lists.
      *
-     * @param null $state
-     *
      * @return array
      */
     public function identifyCompany($companyName, $city = null, $country = null, $state = null)
@@ -338,10 +321,7 @@ class CompanyRepository extends CommonRepository implements CustomFieldRepositor
         return ($results) ? $results[0] : null;
     }
 
-    /**
-     * @return array
-     */
-    public function getCompaniesForContacts(array $contacts)
+    public function getCompaniesForContacts(array $contacts): array
     {
         if (!$contacts) {
             return [];
@@ -412,12 +392,9 @@ class CompanyRepository extends CommonRepository implements CustomFieldRepositor
     }
 
     /**
-     * @param null   $labelColumn
      * @param string $valueColumn
-     *
-     * @return array
      */
-    public function getAjaxSimpleList(CompositeExpression $expr = null, array $parameters = [], $labelColumn = null, $valueColumn = 'id')
+    public function getAjaxSimpleList(CompositeExpression $expr = null, array $parameters = [], $labelColumn = null, $valueColumn = 'id'): array
     {
         $q = $this->_em->getConnection()->createQueryBuilder();
 
@@ -519,7 +496,10 @@ class CompanyRepository extends CommonRepository implements CustomFieldRepositor
         return $q->executeQuery()->fetchAllAssociative();
     }
 
-    public function getCompaniesByUniqueFields(array $uniqueFieldsWithData, int $companyId = null, int $limit = null)
+    /**
+     * @return Company[]
+     */
+    public function getCompaniesByUniqueFields(array $uniqueFieldsWithData, int $companyId = null, int $limit = null): array
     {
         $results = $this->getCompanyFieldsByUniqueFields($uniqueFieldsWithData, 'c.*', $companyId, $limit);
 

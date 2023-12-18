@@ -66,6 +66,7 @@ EOT
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
+        /** @var array<string, mixed> $options */
         $options = $input->getOptions();
 
         // Start a progress bar, don't give a max number of steps because it is conditional
@@ -73,7 +74,9 @@ EOT
         $progressBar->setFormat('Step %current% [%bar%] <info>%message%</info>');
 
         // Define this just in case
-        defined('MAUTIC_ENV') or define('MAUTIC_ENV', (isset($options['env'])) ? $options['env'] : 'prod');
+        if (!defined('MAUTIC_ENV')) {
+            define('MAUTIC_ENV', $options['env'] ?? 'prod');
+        }
 
         if (true === $this->coreParametersHelper->get('composer_updates', false)) {
             $output->writeln('<error>'.$this->translator->trans('mautic.core.command.update.composer').'</error>');
@@ -136,5 +139,6 @@ EOT
 
         return 0;
     }
+
     protected static $defaultDescription = 'Updates the Mautic application';
 }

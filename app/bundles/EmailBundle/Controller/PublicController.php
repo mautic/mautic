@@ -310,12 +310,10 @@ class PublicController extends CommonFormController
     }
 
     /**
-     * @return Response
-     *
      * @throws \Exception
      * @throws \Mautic\CoreBundle\Exception\FileNotFoundException
      */
-    public function resubscribeAction(ContactTracker $contactTracker, $idHash)
+    public function resubscribeAction(ContactTracker $contactTracker, $idHash): Response
     {
         // find the email
         $model = $this->getModel('email');
@@ -530,7 +528,7 @@ class PublicController extends CommonFormController
                 $slotConfig = [];
             }
 
-            $value = isset($content[$slot]) ? $content[$slot] : '';
+            $value = $content[$slot] ?? '';
             $slotsHelper->set($slot, $value);
         }
     }

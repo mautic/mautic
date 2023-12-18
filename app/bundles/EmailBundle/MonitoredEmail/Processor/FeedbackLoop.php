@@ -13,13 +13,14 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class FeedbackLoop implements ProcessorInterface
 {
-    /**
-     * @var Message
-     */
-    private $message;
+    private ?\Mautic\EmailBundle\MonitoredEmail\Message $message = null;
 
-    public function __construct(private ContactFinder $contactFinder, private TranslatorInterface $translator, private LoggerInterface $logger, private DoNotContactModel $doNotContact)
-    {
+    public function __construct(
+        private ContactFinder $contactFinder,
+        private TranslatorInterface $translator,
+        private LoggerInterface $logger,
+        private DoNotContactModel $doNotContact
+    ) {
     }
 
     public function process(Message $message): bool
@@ -37,7 +38,7 @@ class FeedbackLoop implements ProcessorInterface
                 // A contact email was not found in the FBL report
                 return false;
             }
-        } catch (FeedbackLoopNotFound $exception) {
+        } catch (FeedbackLoopNotFound) {
             return false;
         }
 
@@ -56,9 +57,6 @@ class FeedbackLoop implements ProcessorInterface
         return true;
     }
 
-    /**
-     * @return int
-     */
     protected function isApplicable(): int|bool
     {
         return preg_match('/.*feedback-type: abuse.*/is', $this->message->fblReport);

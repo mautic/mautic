@@ -204,10 +204,7 @@ class UserRepository extends CommonRepository
         return $q->getQuery()->getArrayResult();
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    protected function addCatchAllWhereClause($q, $filter)
+    protected function addCatchAllWhereClause($q, $filter): array
     {
         return $this->addStandardCatchAllWhereClause(
             $q,
@@ -223,15 +220,12 @@ class UserRepository extends CommonRepository
         );
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function addSearchCommandWhereClause($q, $filter): array
     {
         $command                 = $filter->command;
         $unique                  = $this->generateRandomParameterName();
         $returnParameter         = false; // returning a parameter that is not used will lead to a Doctrine error
-        list($expr, $parameters) = parent::addSearchCommandWhereClause($q, $filter);
+        [$expr, $parameters]     = parent::addSearchCommandWhereClause($q, $filter);
 
         switch ($command) {
             case $this->translator->trans('mautic.core.searchcommand.ispublished'):
@@ -300,9 +294,9 @@ class UserRepository extends CommonRepository
     }
 
     /**
-     * {@inheritdoc}
+     * @return string[]
      */
-    public function getSearchCommands()
+    public function getSearchCommands(): array
     {
         $commands = [
             'mautic.core.searchcommand.email',
@@ -318,9 +312,6 @@ class UserRepository extends CommonRepository
         return array_merge($commands, parent::getSearchCommands());
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function getDefaultOrder(): array
     {
         return [
@@ -330,10 +321,7 @@ class UserRepository extends CommonRepository
         ];
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getTableAlias()
+    public function getTableAlias(): string
     {
         return 'u';
     }

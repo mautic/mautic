@@ -56,7 +56,7 @@ class FileControllerTest extends MauticMysqlTestCase
 
     private function getFixurePath(): string
     {
-        return realpath(dirname(__FILE__).'/../../Fixtures/').'/';
+        return realpath(__DIR__.'/../../Fixtures/').'/';
     }
 
     protected function beforeTearDown(): void

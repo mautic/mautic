@@ -6,7 +6,7 @@ use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 
-class CommonEntity
+class CommonEntity implements \Stringable
 {
     /**
      * @var array
@@ -43,12 +43,9 @@ class CommonEntity
         throw new \InvalidArgumentException('Method '.$name.' not exists');
     }
 
-    /**
-     * @return string
-     */
-    public function __toString()
+    public function __toString(): string
     {
-        $string = get_called_class();
+        $string = static::class;
         if (method_exists($this, 'getId')) {
             $string .= ' with ID #'.$this->getId();
         }

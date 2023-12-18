@@ -24,10 +24,15 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
     use CustomFieldEntityTrait;
 
     public const FIELD_ALIAS     = '';
+
     public const POINTS_ADD      = 'plus';
+
     public const POINTS_SUBTRACT = 'minus';
+
     public const POINTS_MULTIPLY = 'times';
+
     public const POINTS_DIVIDE   = 'divide';
+
     public const DEFAULT_ALIAS   = 'l';
 
     /**
@@ -240,7 +245,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
         $builder = new ClassMetadataBuilder($metadata);
 
         $builder->setTable('leads')
-            ->setCustomRepositoryClass('Mautic\LeadBundle\Entity\LeadRepository')
+            ->setCustomRepositoryClass(\Mautic\LeadBundle\Entity\LeadRepository::class)
             ->addLifecycleEvent('checkDateIdentified', 'preUpdate')
             ->addLifecycleEvent('checkDateIdentified', 'prePersist')
             ->addLifecycleEvent('checkAttributionDate', 'preUpdate')
@@ -251,7 +256,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
 
         $builder->addBigIntIdField();
 
-        $builder->createManyToOne('owner', 'Mautic\UserBundle\Entity\User')
+        $builder->createManyToOne('owner', \Mautic\UserBundle\Entity\User::class)
             ->fetchLazy()
             ->addJoinColumn('owner_id', 'id', true, false, 'SET NULL')
             ->build();
@@ -275,7 +280,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
             ->fetchExtraLazy()
             ->build();
 
-        $builder->createOneToMany('doNotContact', 'Mautic\LeadBundle\Entity\DoNotContact')
+        $builder->createOneToMany('doNotContact', \Mautic\LeadBundle\Entity\DoNotContact::class)
             ->orphanRemoval()
             ->mappedBy('lead')
             ->cascadePersist()
@@ -284,7 +289,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
             ->fetchExtraLazy()
             ->build();
 
-        $builder->createManyToMany('ipAddresses', 'Mautic\CoreBundle\Entity\IpAddress')
+        $builder->createManyToMany('ipAddresses', \Mautic\CoreBundle\Entity\IpAddress::class)
             ->setJoinTable('lead_ips_xref')
             ->addInverseJoinColumn('ip_id', 'id', false)
             ->addJoinColumn('lead_id', 'id', false, false, 'CASCADE')
@@ -294,7 +299,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
             ->cascadePersist()
             ->build();
 
-        $builder->createOneToMany('pushIds', 'Mautic\NotificationBundle\Entity\PushID')
+        $builder->createOneToMany('pushIds', \Mautic\NotificationBundle\Entity\PushID::class)
             ->orphanRemoval()
             ->mappedBy('lead')
             ->cascadeAll()
@@ -342,7 +347,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
             ->nullable()
             ->build();
 
-        $builder->createManyToMany('tags', 'Mautic\LeadBundle\Entity\Tag')
+        $builder->createManyToMany('tags', \Mautic\LeadBundle\Entity\Tag::class)
             ->setJoinTable('lead_tags_xref')
             ->addInverseJoinColumn('tag_id', 'id', false)
             ->addJoinColumn('lead_id', 'id', false, false, 'CASCADE')
@@ -354,7 +359,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
             ->cascadeDetach()
             ->build();
 
-        $builder->createManyToOne('stage', 'Mautic\StageBundle\Entity\Stage')
+        $builder->createManyToOne('stage', \Mautic\StageBundle\Entity\Stage::class)
             ->cascadePersist()
             ->cascadeMerge()
             ->cascadeDetach()
@@ -369,14 +374,14 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
             ->fetchExtraLazy()
             ->build();
 
-        $builder->createOneToMany('utmtags', 'Mautic\LeadBundle\Entity\UtmTag')
+        $builder->createOneToMany('utmtags', \Mautic\LeadBundle\Entity\UtmTag::class)
             ->orphanRemoval()
             ->mappedBy('lead')
             ->cascadeAll()
             ->fetchExtraLazy()
             ->build();
 
-        $builder->createOneToMany('frequencyRules', 'Mautic\LeadBundle\Entity\FrequencyRule')
+        $builder->createOneToMany('frequencyRules', \Mautic\LeadBundle\Entity\FrequencyRule::class)
             ->orphanRemoval()
             ->setIndexBy('channel')
             ->setOrderBy(['dateAdded' => 'DESC'])
@@ -485,14 +490,14 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
     }
 
     /**
-     * @param string $prop
-     * @param mixed  $val
-     * @param null   $oldValue
+     * @param string     $prop
+     * @param mixed      $val
+     * @param mixed|null $oldValue
      */
     protected function isChanged($prop, $val, $oldValue = null)
     {
         $getter  = 'get'.ucfirst($prop);
-        $current = null !== $oldValue ? $oldValue : $this->$getter();
+        $current = $oldValue ?? $this->$getter();
         if ('owner' == $prop) {
             if ($current && !$val) {
                 $this->changes['owner'] = [$current->getId(), $val];
@@ -615,7 +620,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
      */
     public function getPermissionUser()
     {
-        return (null === $this->getOwner()) ? $this->getCreatedBy() : $this->getOwner();
+        return $this->getOwner() ?? $this->getCreatedBy();
     }
 
     /**
@@ -970,9 +975,6 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
         return $this->pointsChangeLog;
     }
 
-    /**
-     * @param null $company
-     */
     public function addCompanyChangeLogEntry($type, $name, $action, $company = null): ?CompanyChangeLog
     {
         if (!$company) {
@@ -1924,30 +1926,17 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
 
                         return ($a['frequency_number'] > $b['frequency_number']) ? -1 : 1;
                     } else {
-                        $convertToMonth = function ($number, $unit) {
-                            switch ($unit) {
-                                case FrequencyRule::TIME_MONTH:
-                                    $number = (int) $number;
-                                    break;
-                                case FrequencyRule::TIME_WEEK:
-                                    $number = $number * 4;
-                                    break;
-                                case FrequencyRule::TIME_DAY:
-                                    $number = $number * 30;
-                                    break;
-                            }
-
-                            return $number;
+                        $convertToMonth = fn ($number, $unit) => match ($unit) {
+                            FrequencyRule::TIME_MONTH => (int) $number,
+                            FrequencyRule::TIME_WEEK  => $number * 4,
+                            FrequencyRule::TIME_DAY   => $number * 30,
+                            default                   => $number,
                         };
 
                         $aFrequency = $convertToMonth($a['frequency_number'], $a['frequency_time']);
                         $bFrequency = $convertToMonth($b['frequency_number'], $b['frequency_time']);
 
-                        if ($aFrequency === $bFrequency) {
-                            return 0;
-                        }
-
-                        return ($aFrequency > $bFrequency) ? -1 : 1;
+                        return $bFrequency <=> $aFrequency;
                     }
                 }
 
@@ -1967,7 +1956,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
         if (count($dncRules)) {
             foreach ($dncRules as $channel => $reason) {
                 $rules[$channel] = [
-                    'frequency' => (isset($dncFrequencyRules[$channel])) ? $dncFrequencyRules[$channel] : null,
+                    'frequency' => $dncFrequencyRules[$channel] ?? null,
                     'dnc'       => $reason,
                 ];
             }

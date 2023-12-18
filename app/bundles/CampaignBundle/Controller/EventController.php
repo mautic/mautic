@@ -24,7 +24,10 @@ use Symfony\Component\HttpFoundation\RequestStack;
 
 class EventController extends CommonFormController
 {
-    private $supportedEventTypes = [
+    /**
+     * @var string[]
+     */
+    private array $supportedEventTypes = [
         Event::TYPE_DECISION,
         Event::TYPE_ACTION,
         Event::TYPE_CONDITION,
@@ -372,9 +375,7 @@ class EventController extends CommonFormController
         if (!$cancelled && $valid) {
             // Prevent undefined errors
             $event    = array_merge((new Event())->convertToArray(), $event);
-            $template = isset($event['settings']['template'])
-                ? $event['settings']['template']
-                : '@MauticCampaign/Event/_generic.html.twig';
+            $template = $event['settings']['template'] ?? '@MauticCampaign/Event/_generic.html.twig';
 
             $passthroughVars = array_merge($passthroughVars, [
                 'event'      => $event,

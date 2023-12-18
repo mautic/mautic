@@ -35,9 +35,6 @@ class StatRepository extends CommonRepository
         return (!empty($result)) ? $result[0] : null;
     }
 
-    /**
-     * @param null $listId
-     */
     public function getSentStats($smsId, $listId = null): array
     {
         $q = $this->_em->getConnection()->createQueryBuilder();
@@ -184,9 +181,6 @@ class StatRepository extends CommonRepository
         $this->_em->getConnection()->delete(MAUTIC_TABLE_PREFIX.'sms_message_stats', ['id' => (int) $id]);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getTableAlias(): string
     {
         return 's';

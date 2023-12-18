@@ -16,8 +16,10 @@ final class FilterOperatorProvider implements FilterOperatorProviderInterface
      */
     private array $cachedOperators = [];
 
-    public function __construct(private EventDispatcherInterface $dispatcher, private TranslatorInterface $translator)
-    {
+    public function __construct(
+        private EventDispatcherInterface $dispatcher,
+        private TranslatorInterface $translator
+    ) {
     }
 
     /**

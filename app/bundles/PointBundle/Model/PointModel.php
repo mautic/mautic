@@ -59,8 +59,6 @@ class PointModel extends CommonFormModel
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @return PointRepository
      */
     public function getRepository()
@@ -68,20 +66,15 @@ class PointModel extends CommonFormModel
         return $this->em->getRepository(\Mautic\PointBundle\Entity\Point::class);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getPermissionBase(): string
     {
         return 'point:points';
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @throws MethodNotAllowedHttpException
      */
-    public function createForm($entity, FormFactoryInterface $formFactory, $action = null, $options = [])
+    public function createForm($entity, FormFactoryInterface $formFactory, $action = null, $options = []): \Symfony\Component\Form\FormInterface
     {
         if (!$entity instanceof Point) {
             throw new MethodNotAllowedHttpException(['Point']);
@@ -98,12 +91,7 @@ class PointModel extends CommonFormModel
         return $formFactory->create(PointType::class, $entity, $options);
     }
 
-    /**
-     * {@inheritdoc}
-     *
-     * @return Point|null
-     */
-    public function getEntity($id = null)
+    public function getEntity($id = null): ?Point
     {
         if (null === $id) {
             return new Point();
@@ -113,11 +101,9 @@ class PointModel extends CommonFormModel
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @throws MethodNotAllowedHttpException
      */
-    protected function dispatchEvent($action, &$entity, $isNew = false, Event $event = null)
+    protected function dispatchEvent($action, &$entity, $isNew = false, Event $event = null): ?Event
     {
         if (!$entity instanceof Point) {
             throw new MethodNotAllowedHttpException(['Point']);
@@ -250,8 +236,7 @@ class PointModel extends CommonFormModel
                 'eventDetails' => $eventDetails,
             ];
 
-            $callback = (isset($settings['callback'])) ? $settings['callback'] :
-                ['\\Mautic\\PointBundle\\Helper\\EventHelper', 'engagePointAction'];
+            $callback = $settings['callback'] ?? [\Mautic\PointBundle\Helper\EventHelper::class, 'engagePointAction'];
 
             if (is_callable($callback)) {
                 if (is_array($callback)) {
@@ -327,10 +312,8 @@ class PointModel extends CommonFormModel
      * @param string $dateFormat
      * @param array  $filter
      * @param bool   $canViewOthers
-     *
-     * @return array
      */
-    public function getPointLineChartData($unit, \DateTime $dateFrom, \DateTime $dateTo, $dateFormat = null, $filter = [], $canViewOthers = true)
+    public function getPointLineChartData($unit, \DateTime $dateFrom, \DateTime $dateTo, $dateFormat = null, $filter = [], $canViewOthers = true): array
     {
         $chart = new LineChart($unit, $dateFrom, $dateTo, $dateFormat);
         $query = new ChartQuery($this->em->getConnection(), $dateFrom, $dateTo);

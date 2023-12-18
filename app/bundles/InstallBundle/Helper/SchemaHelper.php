@@ -28,10 +28,7 @@ class SchemaHelper
      */
     protected $platform;
 
-    /**
-     * @var array
-     */
-    protected $dbParams = [];
+    protected array $dbParams;
 
     /**
      * @throws \Doctrine\DBAL\Exception
@@ -90,7 +87,7 @@ class SchemaHelper
     {
         try {
             $this->db->connect();
-        } catch (\Exception $exception) {
+        } catch (\Exception) {
             // it failed to connect so remove the dbname and try to create it
             $dbName                   = $this->dbParams['dbname'];
             $this->dbParams['dbname'] = null;
@@ -105,7 +102,7 @@ class SchemaHelper
                 $this->dbParams['dbname'] = $dbName;
                 $this->db                 = DriverManager::getConnection($this->dbParams);
                 $this->db->close();
-            } catch (\Exception $e) {
+            } catch (\Exception) {
                 return false;
             }
         }
@@ -182,7 +179,7 @@ class SchemaHelper
         $version  = $this->db->executeQuery('SELECT VERSION()')->fetchOne();
 
         // Platform class names are in the format Doctrine\DBAL\Platforms\MariaDb1027Platform
-        $platform = strtolower(get_class($this->db->getDatabasePlatform()));
+        $platform = strtolower($this->db->getDatabasePlatform()::class);
         $metadata = ThisRelease::getMetadata();
 
         /**
@@ -203,11 +200,9 @@ class SchemaHelper
     }
 
     /**
-     * @return array
-     *
      * @throws \Doctrine\DBAL\Exception
      */
-    protected function backupExistingSchema($tables, $mauticTables, $backupPrefix)
+    protected function backupExistingSchema($tables, $mauticTables, $backupPrefix): array
     {
         $sql = [];
         $sm  = $this->db->getSchemaManager();

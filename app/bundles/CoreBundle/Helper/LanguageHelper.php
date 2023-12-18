@@ -14,9 +14,13 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 class LanguageHelper
 {
     private string $cacheFile;
+
     private Installer $installer;
+
     private array $supportedLanguages = [];
+
     private string $installedTranslationsDirectory;
+
     private string $defaultTranslationsDirectory;
 
     public function __construct(
@@ -69,29 +73,13 @@ class LanguageHelper
         $archive = $zipper->open($packagePath);
 
         if (true !== $archive) {
-            // Get the exact error
-            switch ($archive) {
-                case \ZipArchive::ER_EXISTS:
-                    $error = 'mautic.core.update.archive_file_exists';
-                    break;
-                case \ZipArchive::ER_INCONS:
-                case \ZipArchive::ER_INVAL:
-                case \ZipArchive::ER_MEMORY:
-                    $error = 'mautic.core.update.archive_zip_corrupt';
-                    break;
-                case \ZipArchive::ER_NOENT:
-                    $error = 'mautic.core.update.archive_no_such_file';
-                    break;
-                case \ZipArchive::ER_NOZIP:
-                    $error = 'mautic.core.update.archive_not_valid_zip';
-                    break;
-                case \ZipArchive::ER_READ:
-                case \ZipArchive::ER_SEEK:
-                case \ZipArchive::ER_OPEN:
-                default:
-                    $error = 'mautic.core.update.archive_could_not_open';
-                    break;
-            }
+            $error = match ($archive) {
+                \ZipArchive::ER_EXISTS => 'mautic.core.update.archive_file_exists',
+                \ZipArchive::ER_INCONS, \ZipArchive::ER_INVAL, \ZipArchive::ER_MEMORY => 'mautic.core.update.archive_zip_corrupt',
+                \ZipArchive::ER_NOENT => 'mautic.core.update.archive_no_such_file',
+                \ZipArchive::ER_NOZIP => 'mautic.core.update.archive_not_valid_zip',
+                default               => 'mautic.core.update.archive_could_not_open',
+            };
 
             return [
                 'error'   => true,

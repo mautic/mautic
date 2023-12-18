@@ -14,8 +14,13 @@ use Symfony\Component\HttpFoundation\RequestStack;
  */
 final class ContactTrackingService implements ContactTrackingServiceInterface
 {
-    public function __construct(private CookieHelper $cookieHelper, private LeadDeviceRepository $leadDeviceRepository, private LeadRepository $leadRepository, private MergeRecordRepository $mergeRecordRepository, private RequestStack $requestStack)
-    {
+    public function __construct(
+        private CookieHelper $cookieHelper,
+        private LeadDeviceRepository $leadDeviceRepository,
+        private LeadRepository $leadRepository,
+        private MergeRecordRepository $mergeRecordRepository,
+        private RequestStack $requestStack
+    ) {
     }
 
     /**

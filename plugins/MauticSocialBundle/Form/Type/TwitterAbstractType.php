@@ -7,9 +7,6 @@ use Symfony\Component\Form\FormBuilderInterface;
 
 class TwitterAbstractType extends AbstractType
 {
-    /**
-     * {@inheritdoc}
-     */
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
     }

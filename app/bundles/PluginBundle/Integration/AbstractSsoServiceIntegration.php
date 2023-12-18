@@ -33,7 +33,7 @@ abstract class AbstractSsoServiceIntegration extends AbstractIntegration
     {
         $featureSettings = $this->settings->getFeatureSettings();
 
-        $role = (isset($featureSettings['new_user_role'])) ? $featureSettings['new_user_role'] : false;
+        $role = $featureSettings['new_user_role'] ?? false;
 
         if ($role) {
             return $this->em->getReference(Role::class, $role);
@@ -80,8 +80,6 @@ abstract class AbstractSsoServiceIntegration extends AbstractIntegration
     /**
      * Don't save the keys as they are only used to validate user login.
      *
-     * @param null $tokenOverride
-     *
      * @return array
      */
     public function extractAuthKeys($data, $tokenOverride = null)
@@ -90,7 +88,7 @@ abstract class AbstractSsoServiceIntegration extends AbstractIntegration
         $data = $this->prepareResponseForExtraction($data);
 
         // parse the response
-        $authTokenKey = ($tokenOverride) ? $tokenOverride : $this->getAuthTokenKey();
+        $authTokenKey = $tokenOverride ?: $this->getAuthTokenKey();
         if (is_array($data) && isset($data[$authTokenKey])) {
             return $data;
         }
@@ -127,8 +125,6 @@ abstract class AbstractSsoServiceIntegration extends AbstractIntegration
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @param Form|\Symfony\Component\Form\FormBuilder $builder
      * @param array                                    $data
      * @param string                                   $formArea

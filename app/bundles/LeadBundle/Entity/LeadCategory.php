@@ -43,11 +43,11 @@ class LeadCategory
         $builder = new ClassMetadataBuilder($metadata);
 
         $builder->setTable('lead_categories')
-            ->setCustomRepositoryClass('Mautic\LeadBundle\Entity\LeadCategoryRepository');
+            ->setCustomRepositoryClass(\Mautic\LeadBundle\Entity\LeadCategoryRepository::class);
 
         $builder->addId();
 
-        $builder->createManyToOne('category', 'Mautic\CategoryBundle\Entity\Category')
+        $builder->createManyToOne('category', \Mautic\CategoryBundle\Entity\Category::class)
             ->addJoinColumn('category_id', 'id', false, false, 'CASCADE')
             ->build();
 

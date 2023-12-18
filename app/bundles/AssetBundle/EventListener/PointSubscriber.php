@@ -12,14 +12,12 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class PointSubscriber implements EventSubscriberInterface
 {
-    public function __construct(private PointModel $pointModel)
-    {
+    public function __construct(
+        private PointModel $pointModel
+    ) {
     }
 
-    /**
-     * @return array
-     */
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             PointEvents::POINT_ON_BUILD => ['onPointBuild', 0],
@@ -33,7 +31,7 @@ class PointSubscriber implements EventSubscriberInterface
             'group'       => 'mautic.asset.actions',
             'label'       => 'mautic.asset.point.action.download',
             'description' => 'mautic.asset.point.action.download_descr',
-            'callback'    => ['\\Mautic\\AssetBundle\\Helper\\PointActionHelper', 'validateAssetDownload'],
+            'callback'    => [\Mautic\AssetBundle\Helper\PointActionHelper::class, 'validateAssetDownload'],
             'formType'    => PointActionAssetDownloadType::class,
         ];
 

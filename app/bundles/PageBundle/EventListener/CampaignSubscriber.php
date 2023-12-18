@@ -18,14 +18,14 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class CampaignSubscriber implements EventSubscriberInterface
 {
-    public function __construct(private LeadModel $leadModel, private TrackingHelper $trackingHelper, private RealTimeExecutioner $realTimeExecutioner)
-    {
+    public function __construct(
+        private LeadModel $leadModel,
+        private TrackingHelper $trackingHelper,
+        private RealTimeExecutioner $realTimeExecutioner
+    ) {
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             CampaignEvents::CAMPAIGN_ON_BUILD        => ['onCampaignBuild', 0],
@@ -163,14 +163,14 @@ class CampaignSubscriber implements EventSubscriberInterface
 
         // Check Landing Pages
         if ($pageHit instanceof Page) {
-            list($parent, $children) = $pageHit->getVariants();
+            [$parent, $children] = $pageHit->getVariants();
             // use the parent (self or configured parent)
             $pageHitId = $parent->getId();
         } else {
             $pageHitId = 0;
         }
 
-        $limitToPages = (isset($config['pages'])) ? $config['pages'] : [];
+        $limitToPages = $config['pages'] ?? [];
 
         $urlMatches = [];
 

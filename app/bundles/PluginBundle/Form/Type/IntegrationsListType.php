@@ -13,13 +13,11 @@ use Symfony\Component\Validator\Constraints\NotBlank;
 
 class IntegrationsListType extends AbstractType
 {
-    public function __construct(private IntegrationHelper $integrationHelper)
-    {
+    public function __construct(
+        private IntegrationHelper $integrationHelper
+    ) {
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $integrationObjects = $this->integrationHelper->getIntegrationObjects(null, $options['supported_features'], true);
@@ -97,7 +95,7 @@ class IntegrationsListType extends AbstractType
                     ],
                     'integration' => isset($data['integration'], $integrationObjects[$data['integration']]) ? $integrationObjects[$data['integration']] : null,
                     'campaigns'   => $campaignChoices,
-                    'data'        => (isset($data['config'])) ? $data['config'] : [],
+                    'data'        => $data['config'] ?? [],
                 ]
             );
 
@@ -111,7 +109,7 @@ class IntegrationsListType extends AbstractType
                         'class' => 'integration-campaigns-status'.$hideClass,
                     ],
                     'campaignContactStatus' => $statusChoices,
-                    'data'                  => (isset($data['campaign_member_status'])) ? $data['campaign_member_status'] : [],
+                    'data'                  => $data['campaign_member_status'] ?? [],
                 ]
             );
         };
@@ -121,9 +119,6 @@ class IntegrationsListType extends AbstractType
         $builder->addEventListener(FormEvents::PRE_SUBMIT, $formModifier);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefined(['supported_features']);
@@ -134,9 +129,6 @@ class IntegrationsListType extends AbstractType
         );
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getBlockPrefix()
     {
         return 'integration_list';

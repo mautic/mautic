@@ -40,9 +40,6 @@ class SubmissionRepository extends CommonRepository
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getEntities(array $args = [])
     {
         $form = $args['form'];
@@ -52,9 +49,7 @@ class SubmissionRepository extends CommonRepository
             $args['viewOnlyFields'] = ['button', 'freetext', 'freehtml', 'pagebreak', 'captcha'];
         }
         $viewOnlyFields = array_map(
-            function ($value): string {
-                return '"'.$value.'"';
-            },
+            fn ($value): string => '"'.$value.'"',
             $args['viewOnlyFields']
         );
 
@@ -179,13 +174,9 @@ class SubmissionRepository extends CommonRepository
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @param int $id
-     *
-     * @return Submission|null
      */
-    public function getEntity($id = 0)
+    public function getEntity($id = 0): ?Submission
     {
         $entity = parent::getEntity($id);
 
@@ -271,9 +262,6 @@ class SubmissionRepository extends CommonRepository
         return parent::getFilterExpr($q, $filter);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function getDefaultOrder(): array
     {
         return [
@@ -321,12 +309,10 @@ class SubmissionRepository extends CommonRepository
      * @param int              $limit
      * @param int              $offset
      *
-     * @return array
-     *
      * @throws \Doctrine\ORM\NoResultException
      * @throws \Doctrine\ORM\NonUniqueResultException
      */
-    public function getTopReferrers($query, $limit = 10, $offset = 0)
+    public function getTopReferrers($query, $limit = 10, $offset = 0): array
     {
         $query->select('fs.referer, count(fs.referer) as sessions')
             ->groupBy('fs.referer')
@@ -344,12 +330,10 @@ class SubmissionRepository extends CommonRepository
      * @param int              $limit
      * @param int              $offset
      *
-     * @return array
-     *
      * @throws \Doctrine\ORM\NoResultException
      * @throws \Doctrine\ORM\NonUniqueResultException
      */
-    public function getMostSubmitted($query, $limit = 10, $offset = 0, $column = 'fs.id', $as = 'submissions')
+    public function getMostSubmitted($query, $limit = 10, $offset = 0, $column = 'fs.id', $as = 'submissions'): array
     {
         $asSelect = ($as) ? ' as '.$as : '';
 
@@ -362,7 +346,10 @@ class SubmissionRepository extends CommonRepository
         return $query->executeQuery()->fetchAllAssociative();
     }
 
-    public function getSubmissionCountsByPage($pageId, \DateTime $fromDate = null)
+    /**
+     * @return mixed[]
+     */
+    public function getSubmissionCountsByPage($pageId, \DateTime $fromDate = null): array
     {
         $q = $this->_em->getConnection()->createQueryBuilder();
         $q->select('count(distinct(s.tracking_id)) as count, s.page_id as id, p.title as name, p.variant_hits as total')
@@ -390,9 +377,9 @@ class SubmissionRepository extends CommonRepository
      * Get submission count by email by linking emails that have been associated with a page hit that has the
      * same tracking ID as a form submission tracking ID and thus assumed happened in the same session.
      *
-     * @return mixed
+     * @return mixed[]
      */
-    public function getSubmissionCountsByEmail($emailId, \DateTime $fromDate = null)
+    public function getSubmissionCountsByEmail($emailId, \DateTime $fromDate = null): array
     {
         // link email to page hit tracking id to form submission tracking id
         $q = $this->_em->getConnection()->createQueryBuilder();
@@ -498,16 +485,11 @@ class SubmissionRepository extends CommonRepository
             ->setParameter('lead', (int) $lead)
             ->setParameter('form', (int) $form);
 
-        switch ($type) {
-            case 'boolean':
-            case 'number':
-                $q->andWhere($q->expr()->$operatorExpr('r.'.$field, $value));
-                break;
-            default:
-                $q->andWhere($q->expr()->$operatorExpr('r.'.$field, ':value'))
-                    ->setParameter('value', $value);
-                break;
-        }
+        match ($type) {
+            'boolean', 'number' => $q->andWhere($q->expr()->$operatorExpr('r.'.$field, $value)),
+            default => $q->andWhere($q->expr()->$operatorExpr('r.'.$field, ':value'))
+                ->setParameter('value', $value),
+        };
 
         $result = $q->executeQuery()->fetchAssociative();
 
@@ -539,9 +521,6 @@ class SubmissionRepository extends CommonRepository
         return MAUTIC_TABLE_PREFIX.'form_results_'.$formId.'_'.$formAlias;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getTableAlias(): string
     {
         return 'fs';

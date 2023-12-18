@@ -13,8 +13,9 @@ use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 
 class ORMPurgerFactory implements PurgerFactory
 {
-    public function __construct(private EventDispatcherInterface $eventDispatcher)
-    {
+    public function __construct(
+        private EventDispatcherInterface $eventDispatcher
+    ) {
     }
 
     public function createForEntityManager(

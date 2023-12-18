@@ -12,8 +12,15 @@ final class DoNotContactAddEvent extends Event
 {
     public const ADD_DONOT_CONTACT = 'mautic.lead.add_donot_contact';
 
-    public function __construct(private Lead $lead, private string $channel, private string $comments = '', private int $reason = DNC::BOUNCED, private bool $persist = true, private bool $checkCurrentStatus = true, private bool $override = true)
-    {
+    public function __construct(
+        private Lead $lead,
+        private string $channel,
+        private string $comments = '',
+        private int $reason = DNC::BOUNCED,
+        private bool $persist = true,
+        private bool $checkCurrentStatus = true,
+        private bool $override = true
+    ) {
     }
 
     public function getLead(): Lead

@@ -16,8 +16,10 @@ class SchedulerPlanner
      */
     private \Doctrine\ORM\EntityRepository $schedulerRepository;
 
-    public function __construct(private DateBuilder $dateBuilder, private EntityManager $entityManager)
-    {
+    public function __construct(
+        private DateBuilder $dateBuilder,
+        private EntityManager $entityManager
+    ) {
         $this->schedulerRepository = $entityManager->getRepository(Scheduler::class);
     }
 
@@ -31,7 +33,7 @@ class SchedulerPlanner
     {
         try {
             $date = $this->dateBuilder->getNextEvent($report);
-        } catch (NoScheduleException $e) {
+        } catch (NoScheduleException) {
             return;
         }
 

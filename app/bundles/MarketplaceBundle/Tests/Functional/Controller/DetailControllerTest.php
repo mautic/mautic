@@ -42,7 +42,7 @@ final class DetailControllerTest extends MauticMysqlTestCase
     /**
      * @return iterable<array<string|int>>
      */
-    public function dataProvider(): iterable
+    public static function dataProvider(): iterable
     {
         // Package that do not exist in the allowlist.
         yield [

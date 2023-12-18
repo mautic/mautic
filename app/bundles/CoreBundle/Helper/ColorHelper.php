@@ -23,9 +23,7 @@ class ColorHelper
     protected $blue = 0;
 
     /**
-     * Constructor.
-     *
-     * @param  string in format #xxxxxx or #xxx
+     * @param string $hex in format #xxxxxx or #xxx
      */
     public function __construct($hex = null)
     {
@@ -41,9 +39,9 @@ class ColorHelper
      */
     public function buildRandomColor()
     {
-        $this->red   = rand(20, 236);
-        $this->green = rand(20, 236);
-        $this->blue  = rand(20, 236);
+        $this->red   = random_int(20, 236);
+        $this->green = random_int(20, 236);
+        $this->blue  = random_int(20, 236);
 
         return $this;
     }
@@ -59,13 +57,13 @@ class ColorHelper
     {
         if (4 === strlen($hex)) {
             $format          = '#%1s%1s%1s';
-            list($r, $g, $b) = sscanf($hex, $format);
+            [$r, $g, $b]     = sscanf($hex, $format);
             $this->red       = hexdec("$r$r");
             $this->green     = hexdec("$g$g");
             $this->blue      = hexdec("$b$b");
         } else {
             $format                                     = '#%2x%2x%2x';
-            list($this->red, $this->green, $this->blue) = sscanf($hex, $format);
+            [$this->red, $this->green, $this->blue]     = sscanf($hex, $format);
         }
 
         return $this;

@@ -9,14 +9,12 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class MessageSubscriber implements EventSubscriberInterface
 {
-    public function __construct(private AuditLogModel $auditLogModel)
-    {
+    public function __construct(
+        private AuditLogModel $auditLogModel
+    ) {
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             ChannelEvents::MESSAGE_POST_SAVE   => ['onPostSave', 0],

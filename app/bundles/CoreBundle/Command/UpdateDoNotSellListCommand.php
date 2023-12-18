@@ -10,14 +10,13 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class UpdateDoNotSellListCommand extends Command
 {
-    public function __construct(private MaxMindDoNotSellDownloadHelper $maxMindDoNotSellDownloadHelper, private TranslatorInterface $translator)
-    {
+    public function __construct(
+        private MaxMindDoNotSellDownloadHelper $maxMindDoNotSellDownloadHelper,
+        private TranslatorInterface $translator
+    ) {
         parent::__construct();
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function configure()
     {
         $this->setName('mautic:donotsell:download')
@@ -30,9 +29,6 @@ EOT
             );
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         if ($this->maxMindDoNotSellDownloadHelper->downloadRemoteDataStore()) {
@@ -58,5 +54,6 @@ EOT
 
         return \Symfony\Component\Console\Command\Command::SUCCESS;
     }
+
     protected static $defaultDescription = 'Fetch remote do not sell list from MaxMind';
 }

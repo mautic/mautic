@@ -10,14 +10,17 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class PreAuthorizationEventListener
 {
-    public function __construct(private EntityManager $em, private CorePermissions $mauticSecurity, private TranslatorInterface $translator)
-    {
+    public function __construct(
+        private EntityManager $em,
+        private CorePermissions $mauticSecurity,
+        private TranslatorInterface $translator
+    ) {
     }
 
     /**
      * @throws AccessDeniedException
      */
-    public function onPreAuthorizationProcess(PreAuthorizationEvent $event)
+    public function onPreAuthorizationProcess(PreAuthorizationEvent $event): void
     {
         if ($user = $this->getUser($event)) {
             // check to see if user has api access

@@ -10,13 +10,11 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class ReportNormalizeSubscriber implements EventSubscriberInterface
 {
-    public function __construct(private FieldModel $fieldModel)
-    {
+    public function __construct(
+        private FieldModel $fieldModel
+    ) {
     }
 
-    /**
-     * @return array<string, array<int, int|string>>
-     */
     public static function getSubscribedEvents(): array
     {
         return [

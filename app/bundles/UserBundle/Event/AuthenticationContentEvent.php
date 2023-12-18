@@ -17,8 +17,9 @@ class AuthenticationContentEvent extends Event
      */
     protected $postLogout = false;
 
-    public function __construct(protected Request $request)
-    {
+    public function __construct(
+        protected Request $request
+    ) {
         $this->postLogout = $request->getSession()->get('post_logout', false);
     }
 
@@ -43,10 +44,7 @@ class AuthenticationContentEvent extends Event
         $this->content[] = $content;
     }
 
-    /**
-     * @return string
-     */
-    public function getContent()
+    public function getContent(): string
     {
         return implode("\n\n", $this->content);
     }

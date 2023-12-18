@@ -37,8 +37,10 @@ class ColumnSchemaHelper
     /**
      * @param string $prefix
      */
-    public function __construct(protected Connection $db, protected $prefix)
-    {
+    public function __construct(
+        protected Connection $db,
+        protected $prefix
+    ) {
         $this->sm     = $db->getSchemaManager();
     }
 
@@ -104,7 +106,7 @@ class ColumnSchemaHelper
      *
      * @throws SchemaException
      */
-    public function addColumns(array $columns)
+    public function addColumns(array $columns): void
     {
         // ensure none of the columns exist before manipulating the schema
         foreach ($columns as $column) {
@@ -144,8 +146,8 @@ class ColumnSchemaHelper
             $this->checkColumnExists($column['name'], true);
         }
 
-        $type    = (isset($column['type'])) ? $column['type'] : 'text';
-        $options = (isset($column['options'])) ? $column['options'] : [];
+        $type    = $column['type'] ?? 'text';
+        $options = $column['options'] ?? [];
 
         $this->toTable->addColumn($column['name'], $type, $options);
 

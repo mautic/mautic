@@ -27,9 +27,7 @@ trait FrequencyRuleTrait
 
     /**
      * @param array $viewParameters
-     * @param null  $data
      * @param bool  $isPublic
-     * @param null  $action
      * @param bool  $isPreferenceCenter
      *
      * @return true|Form
@@ -97,9 +95,7 @@ trait FrequencyRuleTrait
     }
 
     /**
-     * @param null $leadChannels
      * @param bool $isPublic
-     * @param null $frequencyRules
      */
     protected function getFrequencyRuleFormData(Lead $lead, array $allChannels = null, $leadChannels = null, $isPublic = false, $frequencyRules = null, $isPreferenceCenter = false): array
     {
@@ -138,11 +134,9 @@ trait FrequencyRuleTrait
             }
         }
 
-        $data['global_categories'] = (isset($frequencyRules['global_categories']))
-            ? $frequencyRules['global_categories']
-            : $model->getLeadCategories(
-                $lead
-            );
+        $data['global_categories'] = $frequencyRules['global_categories'] ?? $model->getLeadCategories(
+            $lead
+        );
         $this->leadLists    = $model->getLists($lead, false, false, $isPublic, $isPreferenceCenter);
         $data['lead_lists'] = [];
         foreach ($this->leadLists as $leadList) {

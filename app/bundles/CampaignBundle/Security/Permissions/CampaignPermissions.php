@@ -7,9 +7,6 @@ use Symfony\Component\Form\FormBuilderInterface;
 
 class CampaignPermissions extends AbstractPermissions
 {
-    /**
-     * {@inheritdoc}
-     */
     public function __construct($params)
     {
         parent::__construct($params);
@@ -17,9 +14,6 @@ class CampaignPermissions extends AbstractPermissions
         $this->addStandardPermissions('categories');
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getName(): string
     {
         return 'campaign';

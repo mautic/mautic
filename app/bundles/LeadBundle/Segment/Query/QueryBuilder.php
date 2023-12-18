@@ -9,20 +9,16 @@ use Mautic\LeadBundle\Segment\Query\Expression\ExpressionBuilder;
 
 class QueryBuilder extends BaseQueryBuilder
 {
-    /**
-     * @var ExpressionBuilder
-     */
-    private $_expr;
+    private ?\Mautic\LeadBundle\Segment\Query\Expression\ExpressionBuilder $_expr = null;
 
     /**
      * Unprocessed logic for segment processing.
-     *
-     * @var array
      */
-    private $logicStack = [];
+    private array $logicStack = [];
 
-    public function __construct(private Connection $connection)
-    {
+    public function __construct(
+        private Connection $connection
+    ) {
         parent::__construct($connection);
     }
 
@@ -48,7 +44,7 @@ class QueryBuilder extends BaseQueryBuilder
             return $this->_expr;
         }
 
-        $this->_expr = new ExpressionBuilder($this->getConnection());
+        $this->_expr = new ExpressionBuilder($this->connection);
 
         return $this->_expr;
     }
@@ -170,17 +166,14 @@ class QueryBuilder extends BaseQueryBuilder
     }
 
     /**
-     * @param string $table
-     * @param null   $joinType allowed values: inner, left, right
-     *
      * @return array|bool|string
      */
-    public function getTableAlias($table, $joinType = null)
+    public function getTableAlias(string $table, $joinType = null)
     {
         if (is_null($joinType)) {
             $tables = $this->getTableAliases();
 
-            return isset($tables[$table]) ? $tables[$table] : false;
+            return $tables[$table] ?? false;
         }
 
         $tableJoins = $this->getTableJoins($table);
@@ -194,7 +187,10 @@ class QueryBuilder extends BaseQueryBuilder
         return false;
     }
 
-    public function getTableJoins($tableName)
+    /**
+     * @return mixed[]
+     */
+    public function getTableJoins(string $tableName): array
     {
         $found = [];
         foreach ($this->getQueryParts()['join'] as $join) {
@@ -315,10 +311,7 @@ class QueryBuilder extends BaseQueryBuilder
         return $this->logicStack;
     }
 
-    /**
-     * @return array
-     */
-    public function popLogicStack()
+    public function popLogicStack(): array
     {
         $stack            = $this->logicStack;
         $this->logicStack = [];

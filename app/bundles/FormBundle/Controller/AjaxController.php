@@ -22,17 +22,27 @@ use Symfony\Component\HttpFoundation\RequestStack;
 
 class AjaxController extends CommonAjaxController
 {
-    public function __construct(private FieldCollectorInterface $fieldCollector, private AlreadyMappedFieldCollectorInterface $mappedFieldCollector, ManagerRegistry $doctrine, MauticFactory $factory, ModelFactory $modelFactory, UserHelper $userHelper, CoreParametersHelper $coreParametersHelper, EventDispatcherInterface $dispatcher, Translator $translator, FlashBag $flashBag, RequestStack $requestStack, CorePermissions $security)
-    {
+    public function __construct(
+        private FieldCollectorInterface $fieldCollector,
+        private AlreadyMappedFieldCollectorInterface $mappedFieldCollector,
+        ManagerRegistry $doctrine,
+        MauticFactory $factory,
+        ModelFactory $modelFactory,
+        UserHelper $userHelper,
+        CoreParametersHelper $coreParametersHelper,
+        EventDispatcherInterface $dispatcher,
+        Translator $translator,
+        FlashBag $flashBag,
+        RequestStack $requestStack,
+        CorePermissions $security
+    ) {
         parent::__construct($doctrine, $factory, $modelFactory, $userHelper, $coreParametersHelper, $dispatcher, $translator, $flashBag, $requestStack, $security);
     }
 
     /**
      * @param string $name
-     *
-     * @return JsonResponse
      */
-    public function reorderFieldsAction(Request $request, $bundle, $name = 'fields')
+    public function reorderFieldsAction(Request $request, $bundle, $name = 'fields'): JsonResponse
     {
         if ('form' === $name) {
             $name = 'fields';
@@ -54,10 +64,7 @@ class AjaxController extends CommonAjaxController
         return $this->sendJsonResponse($dataArray);
     }
 
-    /**
-     * @return JsonResponse
-     */
-    public function getFieldsForObjectAction(Request $request)
+    public function getFieldsForObjectAction(Request $request): JsonResponse
     {
         $formId       = $request->get('formId');
         $mappedObject = $request->get('mappedObject');
@@ -69,31 +76,23 @@ class AjaxController extends CommonAjaxController
         return $this->sendJsonResponse(
             [
                 'fields' => array_map(
-                    function (FieldCrate $field): array {
-                        return [
-                            'label'      => $field->getName(),
-                            'value'      => $field->getKey(),
-                            'isListType' => $field->isListType(),
-                        ];
-                    },
+                    fn (FieldCrate $field): array => [
+                        'label'      => $field->getName(),
+                        'value'      => $field->getKey(),
+                        'isListType' => $field->isListType(),
+                    ],
                     $fields->getArrayCopy()
                 ),
             ]
         );
     }
 
-    /**
-     * @return JsonResponse
-     */
-    public function reorderActionsAction(Request $request)
+    public function reorderActionsAction(Request $request): JsonResponse
     {
         return $this->reorderFieldsAction($request, 'actions');
     }
 
-    /**
-     * @return JsonResponse
-     */
-    public function updateFormFieldsAction(Request $request)
+    public function updateFormFieldsAction(Request $request): JsonResponse
     {
         $formId     = (int) $request->request->get('formId');
         $dataArray  = ['success' => 0];
@@ -147,10 +146,8 @@ class AjaxController extends CommonAjaxController
 
     /**
      * Ajax submit for forms.
-     *
-     * @return JsonResponse
      */
-    public function submitAction(Request $request)
+    public function submitAction(Request $request): JsonResponse
     {
         $response     = $this->forwardWithPost('Mautic\FormBundle\Controller\PublicController::submitAction', $request->request->all(), [], ['ajax' => true]);
         $responseData = json_decode($response->getContent(), true);

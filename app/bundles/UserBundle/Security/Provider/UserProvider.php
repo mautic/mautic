@@ -20,8 +20,13 @@ use Symfony\Component\Security\Core\User\UserProviderInterface;
 
 class UserProvider implements UserProviderInterface
 {
-    public function __construct(protected UserRepository $userRepository, protected PermissionRepository $permissionRepository, protected Session $session, protected EventDispatcherInterface $dispatcher, protected UserPasswordHasher $encoder)
-    {
+    public function __construct(
+        protected UserRepository $userRepository,
+        protected PermissionRepository $permissionRepository,
+        protected Session $session,
+        protected EventDispatcherInterface $dispatcher,
+        protected UserPasswordHasher $encoder
+    ) {
     }
 
     /**
@@ -59,12 +64,9 @@ class UserProvider implements UserProviderInterface
         return $user;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function refreshUser(UserInterface $user)
     {
-        $class = get_class($user);
+        $class = $user::class;
         if (!$this->supportsClass($class)) {
             throw new UnsupportedUserException(sprintf('Instances of "%s" are not supported.', $class));
         }
@@ -72,9 +74,6 @@ class UserProvider implements UserProviderInterface
         return $this->loadUserByUsername($user->getUsername());
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function supportsClass(string $class): bool
     {
         return User::class === $class || is_subclass_of($class, User::class);
@@ -156,11 +155,11 @@ class UserProvider implements UserProviderInterface
             $user = $this->loadUserByUsername($user->getUsername());
 
             return $user;
-        } catch (UserNotFoundException $exception) {
+        } catch (UserNotFoundException) {
             // Try by email
             try {
                 return $this->loadUserByUsername($user->getEmail());
-            } catch (UserNotFoundException $exception) {
+            } catch (UserNotFoundException) {
             }
         }
 

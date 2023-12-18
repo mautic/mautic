@@ -19,7 +19,7 @@ class CompanyChangeScoreActionType extends AbstractType
                 'attr'        => ['class' => 'form-control'],
                 'label_attr'  => ['class' => 'control-label'],
                 'scale'       => 0,
-                'data'        => (isset($options['data']['score'])) ? $options['data']['score'] : 0,
+                'data'        => $options['data']['score'] ?? 0,
                 'constraints' => [
                     new NotEqualTo(
                         [

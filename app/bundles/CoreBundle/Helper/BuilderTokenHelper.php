@@ -9,19 +9,27 @@ use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 
 class BuilderTokenHelper
 {
-    private $isConfigured = false;
+    private bool $isConfigured = false;
 
     protected $permissionSet;
+
     protected $modelName;
+
     protected $viewPermissionBase;
+
     protected $langVar;
+
     protected $bundleName;
 
     /**
      * @param ModelFactory<object> $modelFactory
      */
-    public function __construct(private CorePermissions $security, private ModelFactory $modelFactory, private Connection $connection, private UserHelper $userHelper)
-    {
+    public function __construct(
+        private CorePermissions $security,
+        private ModelFactory $modelFactory,
+        private Connection $connection,
+        private UserHelper $userHelper
+    ) {
     }
 
     /**
@@ -66,7 +74,7 @@ class BuilderTokenHelper
         CompositeExpression $expr = null
     ) {
         if (!$this->isConfigured) {
-            throw new \BadMethodCallException('You must call the "'.get_class($this).'::configure()" method first.');
+            throw new \BadMethodCallException('You must call the "'.static::class.'::configure()" method first.');
         }
 
         // set some permissions

@@ -252,7 +252,7 @@ trait CustomFieldEntityTrait
 
     public function getEventData($key)
     {
-        return (isset($this->eventData[$key])) ? $this->eventData[$key] : null;
+        return $this->eventData[$key] ?? null;
     }
 
     /**

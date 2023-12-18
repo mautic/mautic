@@ -8,9 +8,6 @@ use Symfony\Component\Form\FormBuilderInterface;
 
 class FormFieldCaptchaType extends AbstractType
 {
-    /**
-     * {@inheritdoc}
-     */
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder->add(
@@ -51,9 +48,6 @@ class FormFieldCaptchaType extends AbstractType
         );
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getBlockPrefix()
     {
         return 'formfield_captcha';

@@ -10,14 +10,13 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class DetermineWinnerSubscriber implements EventSubscriberInterface
 {
-    public function __construct(private HitRepository $hitRepository, private TranslatorInterface $translator)
-    {
+    public function __construct(
+        private HitRepository $hitRepository,
+        private TranslatorInterface $translator
+    ) {
     }
 
-    /**
-     * @return array
-     */
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             PageEvents::ON_DETERMINE_BOUNCE_RATE_WINNER => ['onDetermineBounceRateWinner', 0],

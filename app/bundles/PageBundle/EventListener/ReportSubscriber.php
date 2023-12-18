@@ -17,17 +17,19 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 class ReportSubscriber implements EventSubscriberInterface
 {
     public const CONTEXT_PAGES      = 'pages';
+
     public const CONTEXT_PAGE_HITS  = 'page.hits';
+
     public const CONTEXT_VIDEO_HITS = 'video.hits';
 
-    public function __construct(private CompanyReportData $companyReportData, private HitRepository $hitRepository, private TranslatorInterface $translator)
-    {
+    public function __construct(
+        private CompanyReportData $companyReportData,
+        private HitRepository $hitRepository,
+        private TranslatorInterface $translator
+    ) {
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             ReportEvents::REPORT_ON_BUILD          => ['onReportBuilder', 0],

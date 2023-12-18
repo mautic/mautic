@@ -19,8 +19,12 @@ use Symfony\Contracts\Translation\TranslatorInterface;
  */
 class CleanupMaintenanceCommand extends ModeratedCommand
 {
-    public function __construct(private TranslatorInterface $translator, private EventDispatcherInterface $dispatcher, PathsHelper $pathsHelper, CoreParametersHelper $coreParametersHelper)
-    {
+    public function __construct(
+        private TranslatorInterface $translator,
+        private EventDispatcherInterface $dispatcher,
+        PathsHelper $pathsHelper,
+        CoreParametersHelper $coreParametersHelper
+    ) {
         parent::__construct($pathsHelper, $coreParametersHelper);
     }
 
@@ -121,5 +125,6 @@ EOT
 
         return \Symfony\Component\Console\Command\Command::SUCCESS;
     }
+
     protected static $defaultDescription = 'Updates the Mautic application';
 }

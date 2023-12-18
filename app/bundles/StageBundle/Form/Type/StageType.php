@@ -20,13 +20,11 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class StageType extends AbstractType
 {
-    public function __construct(private CorePermissions $security)
-    {
+    public function __construct(
+        private CorePermissions $security
+    ) {
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder->addEventSubscriber(new CleanFormSubscriber(['description' => 'html']));
@@ -98,13 +96,10 @@ class StageType extends AbstractType
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults([
-            'data_class' => 'Mautic\StageBundle\Entity\Stage',
+            'data_class' => \Mautic\StageBundle\Entity\Stage::class,
         ]);
 
         $resolver->setDefined(['stageActions', 'actionType']);

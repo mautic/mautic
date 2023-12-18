@@ -22,16 +22,20 @@ use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 /**
- * Class LegacyEventDispatcher.
- *
  * @deprecated 2.13.0 to be removed in 3.0; BC support for old listeners
  */
 class LegacyEventDispatcher
 {
     use EventArrayTrait;
 
-    public function __construct(private EventDispatcherInterface $dispatcher, private EventScheduler $scheduler, private LoggerInterface $logger, private NotificationHelper $notificationHelper, private MauticFactory $factory, private ContactTracker $contactTracker)
-    {
+    public function __construct(
+        private EventDispatcherInterface $dispatcher,
+        private EventScheduler $scheduler,
+        private LoggerInterface $logger,
+        private NotificationHelper $notificationHelper,
+        private MauticFactory $factory,
+        private ContactTracker $contactTracker
+    ) {
     }
 
     public function dispatchCustomEvent(
@@ -208,7 +212,7 @@ class LegacyEventDispatcher
             }
 
             return $reflection->invokeArgs($this, $pass);
-        } catch (\ReflectionException $exception) {
+        } catch (\ReflectionException) {
             return false;
         }
     }

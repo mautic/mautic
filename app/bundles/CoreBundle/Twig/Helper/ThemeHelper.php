@@ -26,8 +26,10 @@ final class ThemeHelper
      * @throws BadConfigurationException
      * @throws FileNotFoundException
      */
-    public function __construct(PathsHelper $pathsHelper, private $theme)
-    {
+    public function __construct(
+        PathsHelper $pathsHelper,
+        private $theme
+    ) {
         $this->themeDir  = $pathsHelper->getSystemPath('themes').'/'.$this->theme;
         $this->themePath = $pathsHelper->getSystemPath('themes_root').'/'.$this->themeDir;
 
@@ -87,7 +89,7 @@ final class ThemeHelper
      */
     public function getSlots($type)
     {
-        return (isset($this->config['slots'][$type])) ? $this->config['slots'][$type] : [];
+        return $this->config['slots'][$type] ?? [];
     }
 
     /**

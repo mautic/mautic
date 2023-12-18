@@ -70,8 +70,6 @@ class FormModel extends CommonFormModel
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @return FormRepository
      */
     public function getRepository()
@@ -79,26 +77,17 @@ class FormModel extends CommonFormModel
         return $this->em->getRepository(\Mautic\FormBundle\Entity\Form::class);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getPermissionBase(): string
     {
         return 'form:forms';
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getNameGetter(): string
     {
         return 'getName';
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function createForm($entity, FormFactoryInterface $formFactory, $action = null, $options = [])
+    public function createForm($entity, FormFactoryInterface $formFactory, $action = null, $options = []): \Symfony\Component\Form\FormInterface
     {
         if (!$entity instanceof Form) {
             throw new MethodNotAllowedHttpException(['Form']);
@@ -113,10 +102,8 @@ class FormModel extends CommonFormModel
 
     /**
      * @param string|int|null $id
-     *
-     * @return Form|object|null
      */
-    public function getEntity($id = null)
+    public function getEntity($id = null): ?Form
     {
         if (null === $id) {
             return new Form();
@@ -134,13 +121,9 @@ class FormModel extends CommonFormModel
     }
 
     /**
-     * {@inheritdoc}
-     *
-     * @return bool|FormEvent|Event|void|null
-     *
      * @throws \Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException
      */
-    protected function dispatchEvent($action, &$entity, $isNew = false, Event $event = null)
+    protected function dispatchEvent($action, &$entity, $isNew = false, Event $event = null): ?Event
     {
         if (!$entity instanceof Form) {
             throw new MethodNotAllowedHttpException(['Form']);
@@ -337,9 +320,6 @@ class FormModel extends CommonFormModel
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function saveEntity($entity, $unlock = true): void
     {
         $isNew = ($entity->getId()) ? false : true;
@@ -367,10 +347,8 @@ class FormModel extends CommonFormModel
      *
      * @param bool|true $withScript
      * @param bool|true $useCache
-     *
-     * @return string
      */
-    public function getContent(Form $form, $withScript = true, $useCache = true)
+    public function getContent(Form $form, $withScript = true, $useCache = true): string
     {
         $html = $this->getFormHtml($form, $useCache);
 
@@ -412,10 +390,8 @@ class FormModel extends CommonFormModel
      *
      * @param int $leadId
      * @param int $limit
-     *
-     * @return array
      */
-    public function getLeadSubmissions(Form $form, $leadId, $limit = 200)
+    public function getLeadSubmissions(Form $form, $leadId, $limit = 200): array
     {
         return $this->getRepository()->getFormResults(
             $form,
@@ -462,13 +438,7 @@ class FormModel extends CommonFormModel
         $fields = $entity->getFields()->toArray();
 
         // Ensure the correct order in case this is generated right after a form save with new fields
-        uasort($fields, function ($a, $b): int {
-            if ($a->getOrder() === $b->getOrder()) {
-                return 0;
-            }
-
-            return ($a->getOrder() < $b->getOrder()) ? -1 : 1;
-        });
+        uasort($fields, fn ($a, $b): int => $a->getOrder() <=> $b->getOrder());
 
         $viewOnlyFields     = $this->getCustomComponents()['viewOnlyFields'];
         $displayManager     = new DisplayManager($entity, !empty($viewOnlyFields) ? $viewOnlyFields : []);
@@ -579,9 +549,6 @@ class FormModel extends CommonFormModel
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function deleteEntity($entity): void
     {
         /* @var Form $entity */
@@ -596,9 +563,11 @@ class FormModel extends CommonFormModel
     }
 
     /**
-     * {@inheritdoc}
+     * @param mixed[] $ids
+     *
+     * @return mixed[]
      */
-    public function deleteEntities($ids)
+    public function deleteEntities($ids): array
     {
         $entities     = parent::deleteEntities($ids);
         foreach ($entities as $id => $entity) {
@@ -619,10 +588,8 @@ class FormModel extends CommonFormModel
 
     /**
      * Generate an array of columns from fields.
-     *
-     * @return array
      */
-    public function generateFieldColumns(Form $form)
+    public function generateFieldColumns(Form $form): array
     {
         $fields = $form->getFields()->toArray();
 
@@ -810,12 +777,7 @@ class FormModel extends CommonFormModel
         }
     }
 
-    /**
-     * @param null $operator
-     *
-     * @return array
-     */
-    public function getFilterExpressionFunctions($operator = null)
+    public function getFilterExpressionFunctions($operator = null): array
     {
         $operatorOptions = [
             '=' => [

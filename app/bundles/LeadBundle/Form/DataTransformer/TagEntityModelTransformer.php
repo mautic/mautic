@@ -13,13 +13,13 @@ class TagEntityModelTransformer implements DataTransformerInterface
      * @param string $repository
      * @param bool   $isArray
      */
-    public function __construct(private EntityManager $em, private $repository = '', private $isArray = false)
-    {
+    public function __construct(
+        private EntityManager $em,
+        private $repository = '',
+        private $isArray = false
+    ) {
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function reverseTransform($entity)
     {
         if (!$this->isArray) {
@@ -43,8 +43,6 @@ class TagEntityModelTransformer implements DataTransformerInterface
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @throws TransformationFailedException if object is not found
      */
     public function transform($id)

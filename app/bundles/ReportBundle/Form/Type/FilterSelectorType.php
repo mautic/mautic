@@ -16,9 +16,6 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class FilterSelectorType extends AbstractType
 {
-    /**
-     * {@inheritdoc}
-     */
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         // Build a list of columns
@@ -44,10 +41,9 @@ class FilterSelectorType extends AbstractType
             $column = $data['column'] ?? null;
             $form   = $formEvent->getForm();
             if (null === $column) {
-                reset($options['filterList']);
-                $column = key($options['filterList']);
+                $column = array_key_first($options['filterList']);
             }
-            $choices = (isset($options['operatorList'][$column])) ? $options['operatorList'][$column] : [];
+            $choices = $options['operatorList'][$column] ?? [];
 
             // Build a list of condition values
             $form->add(
@@ -132,9 +128,6 @@ class FilterSelectorType extends AbstractType
         );
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function buildView(FormView $view, FormInterface $form, array $options): void
     {
         $view->vars = array_replace(
@@ -145,9 +138,6 @@ class FilterSelectorType extends AbstractType
         );
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults(

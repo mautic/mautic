@@ -16,21 +16,18 @@ class Interval implements ScheduleModeInterface
 {
     public const LOG_DATE_FORMAT = 'Y-m-d H:i:s T';
 
-    /**
-     * @var \DateTimeZone
-     */
-    private $defaultTimezone;
+    private ?\DateTimeZone $defaultTimezone = null;
 
-    public function __construct(private LoggerInterface $logger, private CoreParametersHelper $coreParametersHelper)
-    {
+    public function __construct(
+        private LoggerInterface $logger,
+        private CoreParametersHelper $coreParametersHelper
+    ) {
     }
 
     /**
-     * @return \DateTimeInterface
-     *
      * @throws NotSchedulableException
      */
-    public function getExecutionDateTime(Event $event, \DateTimeInterface $compareFromDateTime, \DateTimeInterface $comparedToDateTime)
+    public function getExecutionDateTime(Event $event, \DateTimeInterface $compareFromDateTime, \DateTimeInterface $comparedToDateTime): \DateTimeInterface
     {
         $interval = $event->getTriggerInterval();
         $unit     = $event->getTriggerIntervalUnit();
@@ -250,7 +247,7 @@ class Interval implements ScheduleModeInterface
                 $groupExecutionDate->setTime($groupHour->format('H'), $groupHour->format('i'));
 
                 return $groupExecutionDate;
-            } catch (\Exception $exception) {
+            } catch (\Exception) {
                 // Timezone is not recognized so use the default
                 $this->logger->debug(
                     'CAMPAIGN: ('.$eventId.') '.$timezone.' for contact '.$contact->getId().' is not recognized'
@@ -304,7 +301,7 @@ class Interval implements ScheduleModeInterface
                 /** @var \DateTime $groupExecutionDate */
                 $groupExecutionDate = clone $compareFromDateTime;
                 $groupExecutionDate->setTimezone($contactTimezone);
-            } catch (\Exception $exception) {
+            } catch (\Exception) {
                 // Timezone is not recognized so use the default
                 $this->logger->debug(
                     'CAMPAIGN: ('.$eventId.') '.$timezone.' for contact '.$contact->getId().' is not recognized'

@@ -96,8 +96,6 @@ class EventLogApiController extends FetchCommonApiController
     /**
      * Get a list of events.
      *
-     * @param null $campaignId
-     *
      * @return Response
      */
     public function getContactEventsAction(Request $request, UserHelper $userHelper, $contactId, $campaignId = null)
@@ -179,7 +177,7 @@ class EventLogApiController extends FetchCommonApiController
         if (is_string($result)) {
             return $this->returnError($result, Response::HTTP_CONFLICT);
         } else {
-            list($log, $created) = $result;
+            [$log, $created] = $result;
         }
 
         $event->addContactLog($log);
@@ -245,7 +243,7 @@ class EventLogApiController extends FetchCommonApiController
             if (is_string($result)) {
                 $errors[$key] = $this->returnError($result, Response::HTTP_CONFLICT);
             } else {
-                list($log, $created) = $result;
+                [$log, $created] = $result;
                 $event->addContactLog($log);
             }
         }
@@ -265,17 +263,13 @@ class EventLogApiController extends FetchCommonApiController
         return $this->handleView($view);
     }
 
-    /**
-     * @param null $data
-     * @param null $statusCode
-     */
     protected function view($data = null, ?int $statusCode = null, array $headers = []): View
     {
         if ($this->campaign) {
             $data['campaign'] = $this->campaign;
 
             if ($this->contact) {
-                list($data['membership'], $ignore) = $this->prepareEntitiesForView($this->campaign->getContactMembership($this->contact));
+                [$data['membership'], $ignore] = $this->prepareEntitiesForView($this->campaign->getContactMembership($this->contact));
             }
         }
 

@@ -8,8 +8,12 @@ class ReportDataEvent extends AbstractReportEvent
 {
     private int $totalResults;
 
-    public function __construct(Report $report, private array $data, $totalResults, private array $options)
-    {
+    public function __construct(
+        Report $report,
+        private array $data,
+        $totalResults,
+        private array $options
+    ) {
         $this->context      = $report->getSource();
         $this->report       = $report;
         $this->totalResults = (int) $totalResults;

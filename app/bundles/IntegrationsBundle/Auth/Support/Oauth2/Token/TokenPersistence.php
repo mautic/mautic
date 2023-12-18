@@ -12,13 +12,11 @@ use Mautic\PluginBundle\Entity\Integration;
 
 class TokenPersistence implements TokenPersistenceInterface
 {
-    /**
-     * @var Integration|null
-     */
-    private $integration;
+    private ?\Mautic\PluginBundle\Entity\Integration $integration = null;
 
-    public function __construct(private IntegrationsHelper $integrationsHelper)
-    {
+    public function __construct(
+        private IntegrationsHelper $integrationsHelper
+    ) {
     }
 
     /**
@@ -31,7 +29,7 @@ class TokenPersistence implements TokenPersistenceInterface
     public function restoreToken(TokenInterface $token): TokenInterface
     {
         $apiKeys               = $this->getIntegration()->getApiKeys();
-        $apiKeys['expires_at'] = $apiKeys['expires_at'] ?? null;
+        $apiKeys['expires_at'] ??= null;
 
         return new IntegrationToken(
             empty($apiKeys['access_token']) ? null : $apiKeys['access_token'],

@@ -12,8 +12,9 @@ use Symfony\Component\Validator\ConstraintValidator;
 
 class ScheduleIsValidValidator extends ConstraintValidator
 {
-    public function __construct(private SchedulerBuilder $schedulerBuilder)
-    {
+    public function __construct(
+        private SchedulerBuilder $schedulerBuilder
+    ) {
     }
 
     /**
@@ -45,7 +46,7 @@ class ScheduleIsValidValidator extends ConstraintValidator
                 $this->buildScheduler($report);
 
                 return;
-            } catch (ScheduleNotValidException $e) {
+            } catch (ScheduleNotValidException) {
                 $this->addReportScheduleNotValidViolation();
             }
         }
@@ -55,7 +56,7 @@ class ScheduleIsValidValidator extends ConstraintValidator
                 $this->buildScheduler($report);
 
                 return;
-            } catch (ScheduleNotValidException $e) {
+            } catch (ScheduleNotValidException) {
                 $this->addReportScheduleNotValidViolation();
             }
         }
@@ -74,9 +75,9 @@ class ScheduleIsValidValidator extends ConstraintValidator
             $this->schedulerBuilder->getNextEvent($report);
 
             return;
-        } catch (InvalidSchedulerException $e) {
+        } catch (InvalidSchedulerException) {
             $message = 'mautic.report.schedule.notValid';
-        } catch (NotSupportedScheduleTypeException $e) {
+        } catch (NotSupportedScheduleTypeException) {
             $message = 'mautic.report.schedule.notSupportedType';
         }
 

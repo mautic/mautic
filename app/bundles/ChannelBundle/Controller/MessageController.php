@@ -20,15 +20,30 @@ use Mautic\LeadBundle\Controller\EntityContactsTrait;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\Form;
 use Symfony\Component\Form\FormFactoryInterface;
+use Symfony\Component\Form\FormInterface;
+use Symfony\Component\Form\FormView;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Component\HttpFoundation\Response;
 
 class MessageController extends AbstractStandardFormController
 {
     use EntityContactsTrait;
 
-    public function __construct(FormFactoryInterface $formFactory, FormFieldHelper $fieldHelper, ManagerRegistry $doctrine, MauticFactory $factory, ModelFactory $modelFactory, UserHelper $userHelper, CoreParametersHelper $coreParametersHelper, EventDispatcherInterface $dispatcher, Translator $translator, FlashBag $flashBag, private RequestStack $requestStack, CorePermissions $security)
-    {
+    public function __construct(
+        FormFactoryInterface $formFactory,
+        FormFieldHelper $fieldHelper,
+        ManagerRegistry $doctrine,
+        MauticFactory $factory,
+        ModelFactory $modelFactory,
+        UserHelper $userHelper,
+        CoreParametersHelper $coreParametersHelper,
+        EventDispatcherInterface $dispatcher,
+        Translator $translator,
+        FlashBag $flashBag,
+        private RequestStack $requestStack,
+        CorePermissions $security
+    ) {
         parent::__construct($formFactory, $fieldHelper, $doctrine, $factory, $modelFactory, $userHelper, $coreParametersHelper, $dispatcher, $translator, $flashBag, $requestStack, $security);
     }
 
@@ -60,18 +75,13 @@ class MessageController extends AbstractStandardFormController
 
     /**
      * @param int $page
-     *
-     * @return \Mautic\CoreBundle\Controller\Response|\Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse
      */
-    public function indexAction(Request $request, $page = 1)
+    public function indexAction(Request $request, $page = 1): Response
     {
         return $this->indexStandard($request, $page);
     }
 
-    /**
-     * @return \Mautic\CoreBundle\Controller\Response|\Symfony\Component\HttpFoundation\JsonResponse
-     */
-    public function newAction(Request $request)
+    public function newAction(Request $request): Response
     {
         return $this->newStandard($request);
     }
@@ -85,9 +95,9 @@ class MessageController extends AbstractStandardFormController
     }
 
     /**
-     * @return mixed
+     * @return mixed[]
      */
-    protected function getViewArguments(array $args, $action)
+    protected function getViewArguments(array $args, $action): array
     {
         /** @var MessageModel $model */
         $model          = $this->getModel($this->getModelName());
@@ -119,7 +129,7 @@ class MessageController extends AbstractStandardFormController
                     ]
                 );
 
-                list($dateFrom, $dateTo) = $this->getViewDateRange($this->requestStack->getCurrentRequest(), $message->getId(), $returnUrl, 'local', $dateRangeForm);
+                [$dateFrom, $dateTo]     = $this->getViewDateRange($this->requestStack->getCurrentRequest(), $message->getId(), $returnUrl, 'local', $dateRangeForm);
                 $chart                   = new LineChart(null, $dateFrom, $dateTo);
 
                 /** @var Channel[] $channels */
@@ -199,40 +209,28 @@ class MessageController extends AbstractStandardFormController
         return '@MauticChannel/Message';
     }
 
-    /**
-     * @return \Symfony\Component\Form\FormView
-     */
-    protected function getFormView(Form $form, $view)
+    protected function getFormView(FormInterface $form, $view): FormView
     {
         return $form->createView();
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function getJsLoadMethodPrefix(): string
     {
         return 'messages';
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function getModelName(): string
     {
         return 'channel.message';
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function getRouteBase(): string
     {
         return 'message';
     }
 
     /***
-     * @param null $objectId
+
      *
      * @return string
      */
@@ -241,9 +239,6 @@ class MessageController extends AbstractStandardFormController
         return 'message'.(($objectId) ? '.'.$objectId : '');
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function getTranslationBase(): string
     {
         return 'mautic.channel.message';
@@ -270,7 +265,7 @@ class MessageController extends AbstractStandardFormController
                     'objectId'     => $objectId,
                 ]
             );
-            list($dateFrom, $dateTo) = $this->getViewDateRange($request, $objectId, $returnUrl, 'UTC');
+            [$dateFrom, $dateTo] = $this->getViewDateRange($request, $objectId, $returnUrl, 'UTC');
 
             $filter = [
                 'channel' => $channel,
@@ -307,7 +302,7 @@ class MessageController extends AbstractStandardFormController
             ],
             null,
             [
-                'channel' => ($channel) ? $channel : 'all',
+                'channel' => $channel ?: 'all',
             ],
             '.message-'.$channel
         );

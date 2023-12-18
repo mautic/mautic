@@ -44,26 +44,20 @@ class LeadListRepository extends CommonRepository
     protected $companyTableSchema;
 
     /**
-     * {@inheritdoc}
-     *
      * @param int $id
-     *
-     * @return mixed|null
      */
-    public function getEntity($id = 0)
+    public function getEntity($id = 0): ?LeadList
     {
         try {
-            $entity = $this
+            return $this
                 ->createQueryBuilder('l')
                 ->where('l.id = :listId')
                 ->setParameter('listId', $id)
                 ->getQuery()
                 ->getSingleResult();
-        } catch (\Exception $e) {
-            $entity = null;
+        } catch (\Exception) {
+            return null;
         }
-
-        return $entity;
     }
 
     /**
@@ -316,17 +310,14 @@ class LeadListRepository extends CommonRepository
         return $qb;
     }
 
-    /**
-     * @return array
-     */
-    public function arrangeFilters($filters)
+    public function arrangeFilters($filters): array
     {
         $objectFilters = [];
         if (empty($filters)) {
             $objectFilters['lead'][] = $filters;
         }
         foreach ($filters as $filter) {
-            $object = (isset($filter['object'])) ? $filter['object'] : 'lead';
+            $object = $filter['object'] ?? 'lead';
             switch ($object) {
                 case 'company':
                     $objectFilters['company'][] = $filter;
@@ -346,8 +337,6 @@ class LeadListRepository extends CommonRepository
     }
 
     /**
-     * @param null $leadId
-     *
      * @return QueryBuilder
      */
     protected function createFilterExpressionSubQuery($table, $alias, $column, $value, array &$parameters, $leadId = null, array $subQueryFilters = [])
@@ -394,10 +383,8 @@ class LeadListRepository extends CommonRepository
 
     /**
      * @param \Doctrine\ORM\QueryBuilder|\Doctrine\DBAL\Query\QueryBuilder $q
-     *
-     * @return array
      */
-    protected function addCatchAllWhereClause($q, $filter)
+    protected function addCatchAllWhereClause($q, $filter): array
     {
         return $this->addStandardCatchAllWhereClause(
             $q,
@@ -450,9 +437,9 @@ class LeadListRepository extends CommonRepository
     }
 
     /**
-     * @return array
+     * @return string[]
      */
-    public function getSearchCommands()
+    public function getSearchCommands(): array
     {
         $commands = [
             'mautic.lead.list.searchcommand.isglobal',
@@ -507,9 +494,6 @@ class LeadListRepository extends CommonRepository
         ];
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getTableAlias(): string
     {
         return 'l';

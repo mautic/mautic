@@ -42,6 +42,7 @@ class WebhookModel extends FormModel
      *  2 possible types of the processing of the webhooks.
      */
     public const COMMAND_PROCESS   = 'command_process';
+
     public const IMMEDIATE_PROCESS = 'immediate_process';
 
     private const DELETE_BATCH_LIMIT = 5000;
@@ -64,10 +65,8 @@ class WebhookModel extends FormModel
 
     /**
      * How long the webhook processing can run in seconds.
-     *
-     * @var int
      */
-    private $webhookTimeLimit;
+    private int $webhookTimeLimit;
 
     /**
      * How many responses in 1 row can fail until the webhook disables itself.
@@ -107,10 +106,8 @@ class WebhookModel extends FormModel
 
     /**
      * Timestamp when the webhook processing starts.
-     *
-     * @var float
      */
-    private $startTime;
+    private string|float|null $startTime = null;
 
     public function __construct(
         CoreParametersHelper $coreParametersHelper,
@@ -143,14 +140,11 @@ class WebhookModel extends FormModel
 
     /**
      * @param Webhook      $entity
-     * @param null         $action
      * @param array<mixed> $options
-     *
-     * @return mixed
      *
      * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
      */
-    public function createForm($entity, FormFactoryInterface $formFactory, $action = null, $options = [])
+    public function createForm($entity, FormFactoryInterface $formFactory, $action = null, $options = []): \Symfony\Component\Form\FormInterface
     {
         if (!$entity instanceof Webhook) {
             throw new MethodNotAllowedHttpException(['Webhook']);
@@ -165,10 +159,7 @@ class WebhookModel extends FormModel
         return $formFactory->create(WebhookType::class, $entity, $options);
     }
 
-    /**
-     * @return Webhook|null
-     */
-    public function getEntity($id = null)
+    public function getEntity($id = null): ?Webhook
     {
         if (null === $id) {
             return new Webhook();
@@ -548,11 +539,9 @@ class WebhookModel extends FormModel
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @throws \Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException
      */
-    protected function dispatchEvent($action, &$entity, $isNew = false, SymfonyEvent $event = null)
+    protected function dispatchEvent($action, &$entity, $isNew = false, SymfonyEvent $event = null): ?SymfonyEvent
     {
         if (!$entity instanceof Webhook) {
             throw new MethodNotAllowedHttpException(['Webhook'], 'Entity must be of class Webhook()');

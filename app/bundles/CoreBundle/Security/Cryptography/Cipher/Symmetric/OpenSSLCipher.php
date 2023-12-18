@@ -6,15 +6,12 @@ use Mautic\CoreBundle\Security\Exception\Cryptography\Symmetric\InvalidDecryptio
 
 class OpenSSLCipher implements SymmetricCipherInterface
 {
-    /** @var string */
-    private $cipher = 'AES-256-CBC';
+    private string $cipher = 'AES-256-CBC';
 
     /**
      * @param string $secretMessage
      * @param string $key
      * @param string $randomInitVector
-     *
-     * @return string
      */
     public function encrypt($secretMessage, $key, $randomInitVector): string|bool
     {
@@ -64,9 +61,6 @@ class OpenSSLCipher implements SymmetricCipherInterface
         return false !== $testForRandom;
     }
 
-    /**
-     * @return int
-     */
     private function getInitVectorSize(): int|bool
     {
         return openssl_cipher_iv_length($this->cipher);

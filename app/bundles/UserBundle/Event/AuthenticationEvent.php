@@ -253,10 +253,8 @@ class AuthenticationEvent extends Event
 
     /**
      * Check if this is a form login authentication request or pre-auth.
-     *
-     * @return bool
      */
-    public function isFormLogin()
+    public function isFormLogin(): bool
     {
         return $this->isFormLogin;
     }
@@ -276,6 +274,6 @@ class AuthenticationEvent extends Event
      */
     public function getIntegration($integrationName)
     {
-        return (isset($this->integrations[$integrationName])) ? $this->integrations[$integrationName] : false;
+        return $this->integrations[$integrationName] ?? false;
     }
 }

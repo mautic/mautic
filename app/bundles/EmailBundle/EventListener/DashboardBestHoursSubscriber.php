@@ -38,8 +38,9 @@ class DashboardBestHoursSubscriber extends MainDashboardSubscriber
         'email:emails:viewother',
     ];
 
-    public function __construct(protected EmailModel $emailModel)
-    {
+    public function __construct(
+        protected EmailModel $emailModel
+    ) {
     }
 
     /**
