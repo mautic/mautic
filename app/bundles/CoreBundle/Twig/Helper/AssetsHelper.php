@@ -677,7 +677,7 @@ final class AssetsHelper
     public function getCountryFlag($country, $urlOnly = true, $class = '')
     {
         $country  = ucwords(str_replace(' ', '-', $country));
-        $flagImg  = $this->getOverridableUrl('images/flags/'.$country.'.png');
+        $flagImg  = (string) $this->getOverridableUrl('images/flags/'.$country.'.png');
 
         if ($urlOnly) {
             return $flagImg;
