@@ -1137,6 +1137,42 @@ class ListModel extends FormModel
     }
 
     /**
+     * @return array<int, int>
+     */
+    public function getSegmentIdsWithDependenciesOnEmail(int $emailId): array
+    {
+        $entities = $this->getEntities(
+            [
+                'filter' => [
+                    'force'  => [
+                        [
+                            'column' => 'l.filters',
+                            'expr'   => 'LIKE',
+                            'value'  => '%"lead_email_%',
+                        ],
+                    ],
+                ],
+            ]
+        );
+
+        $emailFilterTypes = ['lead_email_received', 'lead_email_sent'];
+
+        $dependents = [];
+        foreach ($entities as $entity) {
+            foreach ($entity->getFilters() as $entityFilter) {
+                // BC support for old filters where the field existed outside of properties.
+                $filter = $entityFilter['properties']['filter'] ?? $entityFilter['filter'];
+                if ($filter && in_array($entityFilter['type'], $emailFilterTypes) && in_array($emailId, $filter)) {
+                    $dependents[] = $entity->getId();
+                    break;
+                }
+            }
+        }
+
+        return array_unique($dependents);
+    }
+
+    /**
      * Get segments which are used as a dependent by other segments to prevent batch deletion of them.
      *
      * @param array $segmentIds
