@@ -25,7 +25,7 @@ class ImportValidateEvent extends Event
     private array $tags = [];
 
     /**
-     * @param FormInterface<FormInterface> $form
+     * @param FormInterface<mixed> $form
      */
     public function __construct(
         private string $routeObjectName,
@@ -34,7 +34,7 @@ class ImportValidateEvent extends Event
     }
 
     /**
-     * @return FormInterface<FormInterface>
+     * @return FormInterface<mixed>
      */
     public function getForm(): FormInterface
     {

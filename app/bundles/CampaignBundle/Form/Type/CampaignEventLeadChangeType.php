@@ -6,6 +6,9 @@ use Mautic\CoreBundle\Form\Type\ButtonGroupType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 
+/**
+ * @extends AbstractType<mixed>
+ */
 class CampaignEventLeadChangeType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options): void

@@ -8,6 +8,9 @@ use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\NumberType;
 use Symfony\Component\Form\FormBuilderInterface;
 
+/**
+ * @extends AbstractType<mixed>
+ */
 class FormSubmitActionPointsChangeType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options): void

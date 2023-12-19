@@ -15,6 +15,9 @@ use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
+/**
+ * @extends AbstractType<mixed>
+ */
 class SubmitActionEmailType extends AbstractType
 {
     use FormFieldTrait;

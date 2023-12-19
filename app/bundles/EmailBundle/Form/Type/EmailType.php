@@ -36,6 +36,9 @@ use Symfony\Component\Form\FormView;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
+/**
+ * @extends AbstractType<Email>
+ */
 class EmailType extends AbstractType
 {
     use DynamicContentTrait;

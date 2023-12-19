@@ -11,6 +11,9 @@ use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
+/**
+ * @extends AbstractType<mixed>
+ */
 class CampaignEventFormFieldValueType extends AbstractType
 {
     public function __construct(
