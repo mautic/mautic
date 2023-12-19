@@ -325,7 +325,6 @@ class AjaxController extends CommonAjaxController
 
         if (0 === $emailId) {
             return $this->sendJsonResponse([
-                'success' => 0,
                 'message' => $this->translator->trans('mautic.core.error.badrequest'),
             ], 400);
         }
@@ -337,7 +336,6 @@ class AjaxController extends CommonAjaxController
         ]);
 
         return $this->sendJsonResponse([
-            'success'     => 1,
             'usagesHtml'  => $usagesHtml,
         ]);
     }

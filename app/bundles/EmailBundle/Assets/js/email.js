@@ -818,9 +818,7 @@ Mautic.loadEmailDeliveredStat = function($el) {
 Mautic.loadEmailUsages = function($el) {
     var emailId = $el.data('fetch-email-usages');
     Mautic.ajaxActionRequest('email:getEmailUsages', {id: emailId}, function(response){
-        if (response.success) {
-            var usagesHtml = response.usagesHtml;
-            $el.html(usagesHtml);
-        }
+        var usagesHtml = response.usagesHtml;
+        $el.html(usagesHtml);
     }, false, true, "GET");
 };
