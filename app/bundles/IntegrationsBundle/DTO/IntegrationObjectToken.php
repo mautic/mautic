@@ -20,10 +20,7 @@ class IntegrationObjectToken
      */
     private $integration;
 
-    /**
-     * @var string
-     */
-    private $defaultValue = '';
+    private string $defaultValue = '';
 
     /**
      * @var string
@@ -35,8 +32,9 @@ class IntegrationObjectToken
      */
     private $baseURL;
 
-    public function __construct(private string $token)
-    {
+    public function __construct(
+        private string $token
+    ) {
     }
 
     public function getToken(): string
@@ -84,10 +82,7 @@ class IntegrationObjectToken
         $this->defaultValue = $defaultValue;
     }
 
-    /**
-     * @return string
-     */
-    public function getDefaultValue()
+    public function getDefaultValue(): string
     {
         return $this->defaultValue;
     }

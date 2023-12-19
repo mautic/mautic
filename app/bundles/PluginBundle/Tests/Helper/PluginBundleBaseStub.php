@@ -13,9 +13,6 @@ use Symfony\Component\HttpKernel\Bundle\Bundle;
 abstract class PluginBundleBaseStub extends Bundle
 {
     /**
-     * @param null $metadata
-     * @param null $installedSchema
-     *
      * @throws \Exception
      */
     public static function onPluginInstall(Plugin $plugin, MauticFactory $factory, $metadata = null, $installedSchema = null): void
@@ -24,9 +21,6 @@ abstract class PluginBundleBaseStub extends Bundle
 
     /**
      * Called by PluginController::reloadAction when the addon version does not match what's installed.
-     *
-     * @param null   $metadata
-     * @param Schema $installedSchema
      *
      * @throws \Exception
      */

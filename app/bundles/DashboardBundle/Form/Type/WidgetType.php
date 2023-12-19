@@ -24,8 +24,10 @@ class WidgetType extends AbstractType
      */
     protected $dispatcher;
 
-    public function __construct(EventDispatcherInterface $dispatcher, protected CorePermissions $security)
-    {
+    public function __construct(
+        EventDispatcherInterface $dispatcher,
+        protected CorePermissions $security
+    ) {
         $this->dispatcher = $dispatcher;
     }
 
@@ -46,9 +48,7 @@ class WidgetType extends AbstractType
         $event->setSecurity($this->security);
         $this->dispatcher->dispatch($event, DashboardEvents::DASHBOARD_ON_MODULE_LIST_GENERATE);
 
-        $types = array_map(function ($category): array {
-            return array_flip($category);
-        }, $event->getTypes());
+        $types = array_map(fn ($category): array => array_flip($category), $event->getTypes());
 
         $builder->add(
             'type',

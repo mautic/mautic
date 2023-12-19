@@ -15,14 +15,13 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class FormSubscriber implements EventSubscriberInterface
 {
-    public function __construct(private EmailModel $emailModel, private ContactTracker $contactTracker)
-    {
+    public function __construct(
+        private EmailModel $emailModel,
+        private ContactTracker $contactTracker
+    ) {
     }
 
-    /**
-     * @return array
-     */
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             FormEvents::FORM_ON_BUILD            => ['onFormBuilder', 0],

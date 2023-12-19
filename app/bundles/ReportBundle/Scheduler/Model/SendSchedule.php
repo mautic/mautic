@@ -19,9 +19,6 @@ class SendSchedule
         $this->mailer          = $mailer->getMailer();
     }
 
-    /**
-     * @param string $filePath
-     */
     public function send(Scheduler $scheduler, $csvFilePath): void
     {
         $this->mailer->reset(true);

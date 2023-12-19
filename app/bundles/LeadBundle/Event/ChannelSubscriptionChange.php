@@ -11,8 +11,12 @@ class ChannelSubscriptionChange extends Event
     /**
      * @param string $channel
      */
-    public function __construct(private Lead $lead, private $channel, private int $oldStatus, private int $newStatus)
-    {
+    public function __construct(
+        private Lead $lead,
+        private $channel,
+        private int $oldStatus,
+        private int $newStatus
+    ) {
     }
 
     /**
@@ -31,42 +35,27 @@ class ChannelSubscriptionChange extends Event
         return $this->channel;
     }
 
-    /**
-     * @return int
-     */
-    public function getOldStatus()
+    public function getOldStatus(): int
     {
         return $this->oldStatus;
     }
 
-    /**
-     * @return string
-     */
-    public function getOldStatusVerb()
+    public function getOldStatusVerb(): string
     {
         return $this->getDncReasonVerb($this->oldStatus);
     }
 
-    /**
-     * @return int
-     */
-    public function getNewStatus()
+    public function getNewStatus(): int
     {
         return $this->newStatus;
     }
 
-    /**
-     * @return string
-     */
-    public function getNewStatusVerb()
+    public function getNewStatusVerb(): string
     {
         return $this->getDncReasonVerb($this->newStatus);
     }
 
-    /**
-     * @return string
-     */
-    private function getDncReasonVerb($reason)
+    private function getDncReasonVerb($reason): string
     {
         return match (true) {
             DoNotContact::IS_CONTACTABLE === $reason => 'contactable',

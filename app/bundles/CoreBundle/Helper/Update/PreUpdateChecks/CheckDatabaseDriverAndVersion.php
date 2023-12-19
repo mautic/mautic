@@ -9,8 +9,9 @@ use Mautic\InstallBundle\Configurator\Step\DoctrineStep;
 
 class CheckDatabaseDriverAndVersion extends AbstractPreUpdateCheck
 {
-    public function __construct(private EntityManager $em)
-    {
+    public function __construct(
+        private EntityManager $em
+    ) {
     }
 
     public function runCheck(): PreUpdateCheckResult
@@ -22,7 +23,7 @@ class CheckDatabaseDriverAndVersion extends AbstractPreUpdateCheck
         $version  = $connection->executeQuery('SELECT VERSION()')->fetchOne();
 
         // Platform class names are in the format Doctrine\DBAL\Platforms\MariaDb1027Platform
-        $platform = strtolower(get_class($connection->getDatabasePlatform()));
+        $platform = strtolower($connection->getDatabasePlatform()::class);
 
         /**
          * The second case is for MariaDB < 10.2, where Doctrine reports it as MySQLPlatform. Here we can use a little

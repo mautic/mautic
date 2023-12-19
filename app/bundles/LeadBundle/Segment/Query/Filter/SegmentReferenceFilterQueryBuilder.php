@@ -38,7 +38,7 @@ class SegmentReferenceFilterQueryBuilder extends BaseFilterQueryBuilder
      * @throws \Doctrine\DBAL\Exception
      * @throws QueryException
      */
-    public function applyQuery(QueryBuilder $queryBuilder, ContactSegmentFilter $filter)
+    public function applyQuery(QueryBuilder $queryBuilder, ContactSegmentFilter $filter): QueryBuilder
     {
         $leadsTableAlias = $queryBuilder->getTableAlias(MAUTIC_TABLE_PREFIX.'leads');
         $segmentIds      = $filter->getParameterValue();

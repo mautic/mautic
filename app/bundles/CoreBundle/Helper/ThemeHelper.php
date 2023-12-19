@@ -15,19 +15,16 @@ use Twig\Environment;
 class ThemeHelper implements ThemeHelperInterface
 {
     /**
-     * @var array|mixed
+     * @var array<string, mixed[]>
      */
-    private $themes = [];
+    private array $themes = [];
 
     /**
-     * @var array
+     * @var array<string, mixed[]>
      */
-    private $themesInfo = [];
+    private array $themesInfo = [];
 
-    /**
-     * @var array
-     */
-    private $steps = [];
+    private array $steps = [];
 
     /**
      * @var string
@@ -37,16 +34,13 @@ class ThemeHelper implements ThemeHelperInterface
     /**
      * @var twigThemeHelper[]
      */
-    private $themeHelpers = [];
+    private array $themeHelpers = [];
 
     private \Mautic\CoreBundle\Helper\Filesystem $filesystem;
 
     private \Symfony\Component\Finder\Finder $finder;
 
-    /**
-     * @var bool
-     */
-    private $themesLoadedFromFilesystem = false;
+    private bool $themesLoadedFromFilesystem = false;
 
     /**
      * Default themes which cannot be deleted.
@@ -128,7 +122,7 @@ class ThemeHelper implements ThemeHelperInterface
         return $this->filesystem->exists($root.$dirName);
     }
 
-    public function copy($theme, $newName, $newDirName = null)
+    public function copy($theme, $newName, $newDirName = null): void
     {
         $root   = $this->pathsHelper->getSystemPath('themes', true).'/';
         $themes = $this->getInstalledThemes();
@@ -149,7 +143,7 @@ class ThemeHelper implements ThemeHelperInterface
         $this->updateConfig($root.$dirName, $newName);
     }
 
-    public function rename($theme, $newName)
+    public function rename($theme, $newName): void
     {
         $root   = $this->pathsHelper->getSystemPath('themes', true).'/';
         $themes = $this->getInstalledThemes();
@@ -170,7 +164,7 @@ class ThemeHelper implements ThemeHelperInterface
         $this->updateConfig($root.$theme, $dirName);
     }
 
-    public function delete($theme)
+    public function delete($theme): void
     {
         $root   = $this->pathsHelper->getSystemPath('themes', true).'/';
         $themes = $this->getInstalledThemes();

@@ -151,8 +151,6 @@ class AuditLogRepository extends CommonRepository
      * @param string|null $object
      * @param string|null $id
      * @param int         $limit
-     * @param null        $afterDate
-     * @param null        $bundle
      *
      * @return array
      */

@@ -41,9 +41,6 @@ class ConfigThemeType extends AbstractType
         );
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getBlockPrefix()
     {
         return 'themeconfig';

@@ -13,8 +13,10 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class CustomFieldValidator
 {
-    public function __construct(private FieldModel $fieldModel, private TranslatorInterface $translator)
-    {
+    public function __construct(
+        private FieldModel $fieldModel,
+        private TranslatorInterface $translator
+    ) {
     }
 
     /**

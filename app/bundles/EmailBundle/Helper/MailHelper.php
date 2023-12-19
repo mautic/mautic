@@ -30,16 +30,18 @@ use Twig\Environment;
 class MailHelper
 {
     public const QUEUE_RESET_TO           = 'RESET_TO';
+
     public const QUEUE_FULL_RESET         = 'FULL_RESET';
+
     public const QUEUE_DO_NOTHING         = 'DO_NOTHING';
+
     public const QUEUE_NOTHING_IF_FAILED  = 'IF_FAILED';
+
     public const QUEUE_RETURN_ERRORS      = 'RETURN_ERRORS';
+
     public const EMAIL_TYPE_TRANSACTIONAL = 'transactional';
+
     public const EMAIL_TYPE_MARKETING     = 'marketing';
-    /**
-     * @var MauticFactory
-     */
-    protected $factory;
 
     protected $transport;
 
@@ -214,24 +216,18 @@ class MailHelper
 
     /**
      * Simply a md5 of the content so that event listeners can easily determine if the content has been changed.
-     *
-     * @var string
      */
-    private $contentHash;
+    private ?string $contentHash = null;
 
-    /**
-     * @var array
-     */
-    private $copies = [];
+    private array $copies = [];
 
-    /**
-     * @var array
-     */
-    private $embedImagesReplaces = [];
+    private array $embedImagesReplaces = [];
 
-    public function __construct(MauticFactory $factory, protected MailerInterface $mailer, $from = null)
-    {
-        $this->factory   = $factory;
+    public function __construct(
+        protected MauticFactory $factory,
+        protected MailerInterface $mailer,
+        $from = null
+    ) {
         $this->transport = $this->getTransport();
 
         $systemFromEmail    = $factory->getParameter('mailer_from_email');
@@ -737,7 +733,6 @@ class MailHelper
      * @param string $template
      * @param array  $vars
      * @param bool   $returnContent
-     * @param null   $charset
      *
      * @return void|string
      */
@@ -807,7 +802,6 @@ class MailHelper
 
     /**
      * @param string $contentType
-     * @param null   $charset
      * @param bool   $ignoreTrackingPixel
      */
     public function setBody($content, $contentType = 'text/html', $charset = null, $ignoreTrackingPixel = false): void
@@ -976,7 +970,6 @@ class MailHelper
      * Add cc address.
      *
      * @param mixed $address
-     * @param null  $name
      *
      * @return bool
      */
@@ -1033,7 +1026,6 @@ class MailHelper
      * Add bcc address.
      *
      * @param string $address
-     * @param null   $name
      *
      * @return bool
      */
@@ -1368,10 +1360,7 @@ class MailHelper
         $this->headers[$name] = $value;
     }
 
-    /**
-     * @return array
-     */
-    public function getCustomHeaders()
+    public function getCustomHeaders(): array
     {
         $headers = array_merge($this->headers, $this->getSystemHeaders());
 
@@ -1511,8 +1500,6 @@ class MailHelper
 
     /**
      * Log exception.
-     *
-     * @param null $context
      */
     protected function logError($error, $context = null)
     {
@@ -1633,9 +1620,6 @@ class MailHelper
 
     /**
      * Queues the details to note if a lead received an asset if no errors are generated.
-     *
-     * @param null $contactEmail
-     * @param null $metadata
      */
     protected function queueAssetDownloadEntry($contactEmail = null, array $metadata = null)
     {
@@ -1706,7 +1690,6 @@ class MailHelper
      *
      * @param bool|true   $persist
      * @param string|null $emailAddress
-     * @param null        $listId
      */
     public function createEmailStat($persist = true, $emailAddress = null, $listId = null): Stat
     {
@@ -1731,8 +1714,7 @@ class MailHelper
             $emailAddresses = $this->message->getTo();
 
             if (count($emailAddresses)) {
-                end($emailAddresses);
-                $emailAddress = key($emailAddresses);
+                $emailAddress = array_key_last($emailAddresses);
             }
         }
         $stat->setEmailAddress($emailAddress);
@@ -1814,8 +1796,6 @@ class MailHelper
     /**
      * Generate bounce email for the lead.
      *
-     * @param null $idHash
-     *
      * @return bool|string
      */
     public function generateBounceEmail($idHash = null)
@@ -1837,8 +1817,6 @@ class MailHelper
 
     /**
      * Generate an unsubscribe email for the lead.
-     *
-     * @param null $idHash
      *
      * @return bool|string
      */
@@ -2010,7 +1988,7 @@ class MailHelper
      *
      * @throws InvalidEmailException
      */
-    public static function validateEmail($address)
+    public static function validateEmail($address): void
     {
         $invalidChar = strpbrk($address, '\'^&*%');
         if (false !== $invalidChar) {

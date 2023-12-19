@@ -74,10 +74,8 @@ class ReportApiController extends CommonApiController
     /**
      * This method is careful to add new options from the request to keep BC.
      * It originally loaded all rows without any filter or pagination applied.
-     *
-     * @return array
      */
-    private function getOptionsFromRequest(Request $request)
+    private function getOptionsFromRequest(Request $request): array
     {
         $options = ['paginate'=> false, 'ignoreGraphData' => true];
 

@@ -11,18 +11,16 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class BroadcastExecutioner
 {
-    /**
-     * @var ContactLimiter
-     */
-    private $contactLimiter;
+    private ?\Mautic\CampaignBundle\Executioner\ContactFinder\Limiter\ContactLimiter $contactLimiter = null;
 
-    /**
-     * @var BroadcastResult
-     */
-    private $result;
+    private ?\Mautic\SmsBundle\Broadcast\BroadcastResult $result = null;
 
-    public function __construct(private SmsModel $smsModel, private BroadcastQuery $broadcastQuery, private TranslatorInterface $translator, private LeadRepository $leadRepository)
-    {
+    public function __construct(
+        private SmsModel $smsModel,
+        private BroadcastQuery $broadcastQuery,
+        private TranslatorInterface $translator,
+        private LeadRepository $leadRepository
+    ) {
     }
 
     public function execute(ChannelBroadcastEvent $event): void

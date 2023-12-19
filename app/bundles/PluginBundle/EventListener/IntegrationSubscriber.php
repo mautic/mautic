@@ -14,14 +14,12 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
  */
 class IntegrationSubscriber implements EventSubscriberInterface
 {
-    public function __construct(private LoggerInterface $logger)
-    {
+    public function __construct(
+        private LoggerInterface $logger
+    ) {
     }
 
-    /**
-     * @return array
-     */
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             PluginEvents::PLUGIN_ON_INTEGRATION_RESPONSE => ['onResponse', 0],

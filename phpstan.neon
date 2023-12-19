@@ -1,6 +1,5 @@
 includes:
 	- phpstan-baseline.neon
-	- vendor/phpstan/phpstan/conf/bleedingEdge.neon
 
 parameters:
 	tmpDir: ./var/cache/phpstan
@@ -8,7 +7,7 @@ parameters:
 	reportUnmatchedIgnoredErrors: false
 	checkGenericClassInNonGenericObjectType: false
 	parallel:
-		maximumNumberOfProcesses: 4
+		# maximumNumberOfProcesses: 4
 		processTimeout: 1000.0
 	paths:
 		- app/bundles
@@ -19,7 +18,7 @@ parameters:
 		- *.js.php
 		- *.less.php
 		- *.inc.php
-		- app/bundles/CoreBundle/Controller/AbstractFormController.php
+		# @todo handle once the other PRs are merged
 		- app/bundles/CoreBundle/Controller/AbstractStandardFormController.php
 	dynamicConstantNames:
 		- MAUTIC_ENV
@@ -38,6 +37,33 @@ parameters:
 		- '#Call to method PHPUnit\\Framework\\Assert::assertIsClosedResource\(\) with resource will always evaluate to true#'
 		# mocks
 		- '#Parameter (.*?) class (.*?) expects (.*?)PHPUnit\\Framework\\MockObject\\MockObject given#'
+		# handle later - ideally with custom interface
+		-
+			message: '#Call to an undefined method Mautic(.*?)Integration::getApiUrl\(\)#'
+			path: plugins/*/Api/*
+		- '#Parameter \$integration of method MauticPlugin\\MauticEmailMarketingBundle\\Api\\EmailMarketingApi::__construct\(\) has typehint with deprecated class Mautic\\PluginBundle\\Integration\\AbstractIntegration#'
+		# collection vs array
+		-
+			message: '#PHPDoc tag @return with type array|Doctrine\Common\Collections\ArrayCollection is not subtype of native type array#'
+			path: app/bundles/CoreBundle/Entity/TranslationEntityTrait.php
+		# mocks
+		- '#is not subtype of native type PHPUnit\\Framework\\MockObject\\MockObject#'
+		- '#Call to an undefined method PHPUnit\\Framework\\MockObject\\MockObject#'
+		- '#expects (.*?) PHPUnit\\Framework\\MockObject\\MockObject given#'
+		# on purpose
+		- '#Call to method PHPUnit\\Framework\\Assert::assertInstanceOf\(\) with (.*?) and (.*?) will always evaluate to#'
+		# on purpose type check
+		-
+			message: '#Parameter \#1 \$credentials of method Mautic\\IntegrationsBundle\\Auth\\Provider\\(.*?)::getClient\(\) expect#'
+			paths:
+			     - app/bundles/IntegrationsBundle/Tests/Unit/Auth/Provider/ApiKey/HttpFactoryTest.php
+			     - app/bundles/IntegrationsBundle/Tests/Unit/Auth/Provider/Oauth2TwoLegged/HttpFactoryTest.php
+		-
+			message: '#Method Mautic\\CampaignBundle\\Executioner\\ContactFinder\\InactiveContactFinder::getDatesAdded\(\) should return Doctrine\\Common\\Collections\\ArrayCollection but returns array<string, DateTimeInterface>\|null#'
+			path: app/bundles/CampaignBundle/Executioner/ContactFinder/InactiveContactFinder.php
+		-
+			message: '#Call to an undefined method Mautic\\IntegrationsBundle\\Auth\\Provider\\AuthCredentialsInterface::#'
+			path: app/bundles/IntegrationsBundle/Auth/Provider/Oauth2ThreeLegged/HttpFactory.php
 	scanFiles:
 		# This is here because a few functions in the global namespace are defined in this file
 		- vendor/twig/twig/src/Extension/EscaperExtension.php

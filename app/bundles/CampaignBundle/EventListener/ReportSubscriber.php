@@ -14,14 +14,12 @@ class ReportSubscriber implements EventSubscriberInterface
 {
     public const CONTEXT_CAMPAIGN_LEAD_EVENT_LOG = 'campaign_lead_event_log';
 
-    public function __construct(private CompanyReportData $companyReportData)
-    {
+    public function __construct(
+        private CompanyReportData $companyReportData
+    ) {
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             ReportEvents::REPORT_ON_BUILD          => ['onReportBuilder', 0],

@@ -34,22 +34,19 @@ class FullObjectReportBuilderTest extends TestCase
     /**
      * @var ObjectProvider|\PHPUnit\Framework\MockObject\MockObject
      */
-    private $objectProvider;
+    private \PHPUnit\Framework\MockObject\MockObject $objectProvider;
 
     /**
      * @var EventDispatcherInterface|\PHPUnit\Framework\MockObject\MockObject
      */
-    private $dispatcher;
+    private \PHPUnit\Framework\MockObject\MockObject $dispatcher;
 
     /**
      * @var FieldBuilder|\PHPUnit\Framework\MockObject\MockObject
      */
-    private $fieldBuilder;
+    private \PHPUnit\Framework\MockObject\MockObject $fieldBuilder;
 
-    /**
-     * @var FullObjectReportBuilder
-     */
-    private $reportBuilder;
+    private \Mautic\IntegrationsBundle\Sync\SyncDataExchange\Internal\ReportBuilder\FullObjectReportBuilder $reportBuilder;
 
     protected function setUp(): void
     {

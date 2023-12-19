@@ -191,7 +191,7 @@ class PageModel extends FormModel
     /**
      * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
      */
-    public function createForm($entity, FormFactoryInterface $formFactory, $action = null, $options = [])
+    public function createForm($entity, FormFactoryInterface $formFactory, $action = null, $options = []): \Symfony\Component\Form\FormInterface
     {
         if (!$entity instanceof Page) {
             throw new MethodNotAllowedHttpException(['Page']);
@@ -210,10 +210,7 @@ class PageModel extends FormModel
         return $formFactory->create($formClass, $entity, $options);
     }
 
-    /**
-     * @return Page|null
-     */
-    public function getEntity($id = null)
+    public function getEntity($id = null): ?Page
     {
         if (null === $id) {
             $entity = new Page();
@@ -374,7 +371,7 @@ class PageModel extends FormModel
      *
      * @throws \Exception
      */
-    public function hitPage(Redirect|Page|null $page, Request $request, $code = '200', Lead $lead = null, $query = [])
+    public function hitPage(Redirect|Page|null $page, Request $request, $code = '200', Lead $lead = null, $query = []): void
     {
         // Don't skew results with user hits
         if (!$this->security->isAnonymous()) {
@@ -691,10 +688,8 @@ class PageModel extends FormModel
 
     /**
      * @param Redirect|Page|null $page
-     *
-     * @return array
      */
-    public function getHitQuery(Request $request, $page = null)
+    public function getHitQuery(Request $request, $page = null): array
     {
         $get  = $request->query->all();
         $post = $request->request->all();
@@ -736,9 +731,9 @@ class PageModel extends FormModel
     /**
      * Get number of page bounces.
      *
-     * @return int
+     * @return mixed[]
      */
-    public function getBounces(Page $page, \DateTime $fromDate = null)
+    public function getBounces(Page $page, \DateTime $fromDate = null): array
     {
         return $this->getHitRepository()->getBounces($page->getId(), $fromDate);
     }
@@ -760,10 +755,8 @@ class PageModel extends FormModel
      * @param string $dateFormat
      * @param array  $filter
      * @param bool   $canViewOthers
-     *
-     * @return array
      */
-    public function getHitsLineChartData($unit, \DateTime $dateFrom, \DateTime $dateTo, $dateFormat = null, $filter = [], $canViewOthers = true)
+    public function getHitsLineChartData($unit, \DateTime $dateFrom, \DateTime $dateTo, $dateFormat = null, $filter = [], $canViewOthers = true): array
     {
         $flag = null;
 
@@ -815,10 +808,8 @@ class PageModel extends FormModel
      * @param \DateTime $dateTo
      * @param array     $filters
      * @param bool      $canViewOthers
-     *
-     * @return array
      */
-    public function getNewVsReturningPieChartData($dateFrom, $dateTo, $filters = [], $canViewOthers = true)
+    public function getNewVsReturningPieChartData($dateFrom, $dateTo, $filters = [], $canViewOthers = true): array
     {
         $chart              = new PieChart();
         $query              = new ChartQuery($this->em->getConnection(), $dateFrom, $dateTo);
@@ -847,10 +838,8 @@ class PageModel extends FormModel
      *
      * @param array $filters
      * @param bool  $canViewOthers
-     *
-     * @return array
      */
-    public function getDwellTimesPieChartData(\DateTime $dateFrom, \DateTime $dateTo, $filters = [], $canViewOthers = true)
+    public function getDwellTimesPieChartData(\DateTime $dateFrom, \DateTime $dateTo, $filters = [], $canViewOthers = true): array
     {
         $timesOnSite = $this->getHitRepository()->getDwellTimeLabels();
         $chart       = new PieChart();
@@ -872,10 +861,8 @@ class PageModel extends FormModel
 
     /**
      * Get bar chart data of hits.
-     *
-     * @return array
      */
-    public function getDeviceGranularityData(\DateTime $dateFrom, \DateTime $dateTo, $filters = [], $canViewOthers = true)
+    public function getDeviceGranularityData(\DateTime $dateFrom, \DateTime $dateTo, $filters = [], $canViewOthers = true): array
     {
         $q = $this->em->getConnection()->createQueryBuilder();
 

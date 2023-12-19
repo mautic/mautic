@@ -15,14 +15,13 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class FormValidationSubscriber implements EventSubscriberInterface
 {
-    public function __construct(private TranslatorInterface $translator, private CoreParametersHelper $coreParametersHelper)
-    {
+    public function __construct(
+        private TranslatorInterface $translator,
+        private CoreParametersHelper $coreParametersHelper
+    ) {
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             FormEvents::FORM_ON_BUILD    => ['onFormBuilder', 0],
@@ -75,9 +74,7 @@ class FormValidationSubscriber implements EventSubscriberInterface
         $value = $event->getValue();
         if ('email' === $field->getType() && !empty($field->getValidation()['donotsubmit'])) {
             // Check the domains using shell wildcard patterns
-            $donotSubmitFilter = function ($doNotSubmitArray) use ($value): bool {
-                return fnmatch($doNotSubmitArray, $value, FNM_CASEFOLD);
-            };
+            $donotSubmitFilter  = fn ($doNotSubmitArray): bool => fnmatch($doNotSubmitArray, $value, FNM_CASEFOLD);
             $notNotSubmitEmails = $this->coreParametersHelper->get('do_not_submit_emails');
             if (array_filter($notNotSubmitEmails, $donotSubmitFilter)) {
                 $event->failedValidation(ArrayHelper::getValue('donotsubmit_validationmsg', $field->getValidation()));

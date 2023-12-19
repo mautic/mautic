@@ -9,13 +9,11 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class ContactColumnsType extends AbstractType
 {
-    public function __construct(private ContactColumnsDictionary $columnsDictionary)
-    {
+    public function __construct(
+        private ContactColumnsDictionary $columnsDictionary
+    ) {
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults(

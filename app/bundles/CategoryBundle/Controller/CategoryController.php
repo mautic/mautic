@@ -16,6 +16,7 @@ use Mautic\CoreBundle\Service\FlashBag;
 use Mautic\CoreBundle\Translation\Translator;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\FormFactoryInterface;
+use Symfony\Component\Form\SubmitButton;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
@@ -23,8 +24,19 @@ use Symfony\Component\HttpFoundation\Response;
 
 class CategoryController extends AbstractFormController
 {
-    public function __construct(private FormFactoryInterface $formFactory, ManagerRegistry $doctrine, MauticFactory $factory, ModelFactory $modelFactory, UserHelper $userHelper, CoreParametersHelper $coreParametersHelper, EventDispatcherInterface $dispatcher, Translator $translator, FlashBag $flashBag, RequestStack $requestStack, CorePermissions $security)
-    {
+    public function __construct(
+        private FormFactoryInterface $formFactory,
+        ManagerRegistry $doctrine,
+        MauticFactory $factory,
+        ModelFactory $modelFactory,
+        UserHelper $userHelper,
+        CoreParametersHelper $coreParametersHelper,
+        EventDispatcherInterface $dispatcher,
+        Translator $translator,
+        FlashBag $flashBag,
+        RequestStack $requestStack,
+        CorePermissions $security
+    ) {
         parent::__construct($doctrine, $factory, $modelFactory, $userHelper, $coreParametersHelper, $dispatcher, $translator, $flashBag, $requestStack, $security);
     }
 
@@ -358,7 +370,9 @@ class CategoryController extends AbstractFormController
                         ]
                     );
 
-                    if ($form->get('buttons')->get('apply')->isClicked()) {
+                    /** @var SubmitButton $applySubmitButton */
+                    $applySubmitButton = $form->get('buttons')->get('apply');
+                    if ($applySubmitButton->isClicked()) {
                         // Rebuild the form with new action so that apply doesn't keep creating a clone
                         $action = $this->generateUrl(
                             'mautic_category_action',

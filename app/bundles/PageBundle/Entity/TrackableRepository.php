@@ -13,9 +13,9 @@ class TrackableRepository extends CommonRepository
     /**
      * Find redirects that are trackable.
      *
-     * @return mixed
+     * @return mixed[]
      */
-    public function findByChannel($channel, $channelId)
+    public function findByChannel($channel, $channelId): array
     {
         $q          = $this->getEntityManager()->getConnection()->createQueryBuilder();
         $tableAlias = $this->getTableAlias();
@@ -190,9 +190,6 @@ class TrackableRepository extends CommonRepository
         return (isset($results[0])) ? $results[0]['click_count'] : 0;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getTableAlias(): string
     {
         return 't';

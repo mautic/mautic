@@ -14,9 +14,6 @@ use Symfony\Component\Form\FormInterface;
 
 class PointActionUrlHitType extends AbstractType
 {
-    /**
-     * {@inheritdoc}
-     */
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder->add('page_url', TextType::class, [
@@ -120,9 +117,6 @@ class PointActionUrlHitType extends AbstractType
         );
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getBlockPrefix()
     {
         return 'pointaction_urlhit';

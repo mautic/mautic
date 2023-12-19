@@ -17,8 +17,6 @@ class LeadRepository extends CommonRepository
 
     /**
      * Get the details of leads added to a campaign.
-     *
-     * @param null $leads
      */
     public function getLeadDetails($campaignId, $leads = null): array
     {
@@ -49,8 +47,6 @@ class LeadRepository extends CommonRepository
 
     /**
      * Get leads for a specific campaign.
-     *
-     * @param null $eventId
      *
      * @return array
      */
@@ -142,7 +138,7 @@ class LeadRepository extends CommonRepository
         $q->where(
             $q->expr()->and(
                 $q->expr()->eq('l.lead_id', ':leadId'),
-                $q->expr()->in('l.campaign_id', $options['campaigns'], \Doctrine\DBAL\Connection::PARAM_INT_ARRAY)
+                $q->expr()->in('l.campaign_id', $options['campaigns'])
             )
         );
 
@@ -161,6 +157,8 @@ class LeadRepository extends CommonRepository
      * @param int $campaignId
      * @param int $decisionId
      * @param int $parentDecisionId
+     *
+     * @return array<string, \DateTimeInterface>
      */
     public function getInactiveContacts($campaignId, $decisionId, $parentDecisionId, ContactLimiter $limiter): array
     {
@@ -388,7 +386,7 @@ class LeadRepository extends CommonRepository
      *
      * @return array<int|string, string>
      */
-    public function getCampaignContactsBySegments($campaignId, ContactLimiter $limiter, $campaignCanBeRestarted = false)
+    public function getCampaignContactsBySegments($campaignId, ContactLimiter $limiter, $campaignCanBeRestarted = false): array
     {
         if (!$segments = $this->getCampaignSegments($campaignId)) {
             return [];
@@ -499,10 +497,7 @@ class LeadRepository extends CommonRepository
             ->executeStatement();
     }
 
-    /**
-     * @return array
-     */
-    private function getCampaignSegments($campaignId)
+    private function getCampaignSegments($campaignId): array
     {
         // Get published segments for this campaign
         $segmentResults = $this->getEntityManager()->getConnection()->createQueryBuilder()

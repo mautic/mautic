@@ -19,8 +19,10 @@ class ChannelListHelper
      */
     private array $featureChannels = [];
 
-    public function __construct(private EventDispatcherInterface $dispatcher, private Translator $translator)
-    {
+    public function __construct(
+        private EventDispatcherInterface $dispatcher,
+        private Translator $translator
+    ) {
     }
 
     /**
@@ -39,10 +41,8 @@ class ChannelListHelper
 
     /**
      * @param bool $listOnly
-     *
-     * @return array
      */
-    public function getFeatureChannels($features, $listOnly = false)
+    public function getFeatureChannels($features, $listOnly = false): array
     {
         $this->setupChannels();
 
@@ -85,10 +85,7 @@ class ChannelListHelper
         return $this->channels;
     }
 
-    /**
-     * @return string
-     */
-    public function getChannelLabel($channel)
+    public function getChannelLabel($channel): string
     {
         return match (true) {
             $this->translator->hasId('mautic.channel.'.$channel)      => $this->translator->trans('mautic.channel.'.$channel),

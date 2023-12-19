@@ -15,8 +15,11 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class FeatureSettingsType extends AbstractType
 {
-    public function __construct(protected SessionInterface $session, protected CoreParametersHelper $coreParametersHelper, protected LoggerInterface $logger)
-    {
+    public function __construct(
+        protected SessionInterface $session,
+        protected CoreParametersHelper $coreParametersHelper,
+        protected LoggerInterface $logger
+    ) {
     }
 
     public function buildForm(FormBuilderInterface $builder, array $options): void
@@ -135,17 +138,11 @@ class FeatureSettingsType extends AbstractType
         );
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setRequired(['integration', 'integration_object', 'lead_fields', 'company_fields']);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getBlockPrefix()
     {
         return 'integration_featuresettings';

@@ -10,8 +10,11 @@ class NotificationSendEvent extends CommonEvent
     /**
      * @param string $message
      */
-    public function __construct(protected $message, protected $heading, protected Lead $lead)
-    {
+    public function __construct(
+        protected $message,
+        protected $heading,
+        protected Lead $lead
+    ) {
     }
 
     /**

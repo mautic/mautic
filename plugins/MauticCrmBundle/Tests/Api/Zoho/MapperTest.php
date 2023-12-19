@@ -89,7 +89,7 @@ class MapperTest extends \PHPUnit\Framework\TestCase
      * @covers  \MauticPlugin\MauticCrmBundle\Api\Zoho\Mapper::map()
      * @covers  \MauticPlugin\MauticCrmBundle\Api\Zoho\Mapper::getArray()
      */
-    public function testArrayIsGeneratedBasedOnMapping()
+    public function testArrayIsGeneratedBasedOnMapping(): void
     {
         $mapper = new Mapper($this->availableFields);
         $mapper->setObject('Leads');
@@ -127,7 +127,7 @@ class MapperTest extends \PHPUnit\Framework\TestCase
      * @covers  \MauticPlugin\MauticCrmBundle\Api\Zoho\Mapper::map()
      * @covers  \MauticPlugin\MauticCrmBundle\Api\Zoho\Mapper::getArray()
      */
-    public function testContactDoesNotInheritPreviousContactData()
+    public function testContactDoesNotInheritPreviousContactData(): void
     {
         $mapper = new Mapper($this->availableFields);
         $mapper->setObject('Leads');
@@ -170,7 +170,7 @@ class MapperTest extends \PHPUnit\Framework\TestCase
      * @covers  \MauticPlugin\MauticCrmBundle\Api\Zoho\Mapper::map()
      * @covers  \MauticPlugin\MauticCrmBundle\Api\Zoho\Mapper::getArray()
      */
-    public function testArrayIsGeneratedBasedOnMappingWithId()
+    public function testArrayIsGeneratedBasedOnMappingWithId(): void
     {
         $mapper = new Mapper($this->availableFields);
         $mapper->setObject('Leads');
@@ -210,7 +210,7 @@ class MapperTest extends \PHPUnit\Framework\TestCase
      *
      * @covers  \MauticPlugin\MauticCrmBundle\Api\Zoho\Mapper::getContactIdByKey()
      */
-    public function testThatContactIdMatchesGivenKey()
+    public function testThatContactIdMatchesGivenKey(): void
     {
         $mapper = new Mapper($this->availableFields);
         $mapper->setObject('Leads');
@@ -231,7 +231,7 @@ class MapperTest extends \PHPUnit\Framework\TestCase
      *
      * @covers  \MauticPlugin\MauticCrmBundle\Api\Zoho\Mapper::getContactIdByKey()
      */
-    public function testThatExceptionIsThrownIfKeyNotFound()
+    public function testThatExceptionIsThrownIfKeyNotFound(): void
     {
         $this->expectException(MatchingKeyNotFoundException::class);
 

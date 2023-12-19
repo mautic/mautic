@@ -30,8 +30,15 @@ class Bounce implements ProcessorInterface
      */
     protected $message;
 
-    public function __construct(protected TransportInterface $transport, protected ContactFinder $contactFinder, protected StatRepository $statRepository, protected LeadModel $leadModel, protected TranslatorInterface $translator, protected LoggerInterface $logger, protected DoNotContact $doNotContact)
-    {
+    public function __construct(
+        protected TransportInterface $transport,
+        protected ContactFinder $contactFinder,
+        protected StatRepository $statRepository,
+        protected LeadModel $leadModel,
+        protected TranslatorInterface $translator,
+        protected LoggerInterface $logger,
+        protected DoNotContact $doNotContact
+    ) {
     }
 
     public function process(Message $message): bool

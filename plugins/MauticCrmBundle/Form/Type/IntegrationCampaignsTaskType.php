@@ -12,11 +12,9 @@ use Symfony\Component\Validator\Context\ExecutionContextInterface;
 
 class IntegrationCampaignsTaskType extends AbstractType
 {
-    private $connectwiseIntegration;
-
-    public function __construct(ConnectwiseIntegration $connectwiseIntegration)
-    {
-        $this->connectwiseIntegration = $connectwiseIntegration;
+    public function __construct(
+        private ConnectwiseIntegration $connectwiseIntegration
+    ) {
     }
 
     public function buildForm(FormBuilderInterface $builder, array $options): void
@@ -73,9 +71,6 @@ class IntegrationCampaignsTaskType extends AbstractType
         );
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getBlockPrefix()
     {
         return 'integration_campaign_task';

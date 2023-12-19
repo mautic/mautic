@@ -10,8 +10,9 @@ use Symfony\Component\Form\FormBuilderInterface;
 
 class ConfigMonitoredEmailType extends AbstractType
 {
-    public function __construct(private EventDispatcherInterface $dispatcher)
-    {
+    public function __construct(
+        private EventDispatcherInterface $dispatcher
+    ) {
     }
 
     public function buildForm(FormBuilderInterface $builder, array $options): void
@@ -44,9 +45,6 @@ class ConfigMonitoredEmailType extends AbstractType
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getBlockPrefix()
     {
         return 'monitored_email';

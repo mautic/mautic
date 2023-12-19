@@ -11,11 +11,13 @@ use Symfony\Component\Routing\RouterInterface;
 
 class SAMLSubscriber implements EventSubscriberInterface
 {
-    public function __construct(private CoreParametersHelper $coreParametersHelper, private RouterInterface $router)
-    {
+    public function __construct(
+        private CoreParametersHelper $coreParametersHelper,
+        private RouterInterface $router
+    ) {
     }
 
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             KernelEvents::REQUEST => ['onKernelRequest', 256],

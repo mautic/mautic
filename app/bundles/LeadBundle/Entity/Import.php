@@ -48,9 +48,13 @@ class Import extends FormEntity
      */
     public const DELAYED = 7;
 
-    /** ===== Priorities: ===== */
+    /**
+     * ===== Priorities: =====.
+     */
     public const LOW    = 512;
+
     public const NORMAL = 64;
+
     public const HIGH   = 1;
 
     /**
@@ -486,10 +490,8 @@ class Import extends FormEntity
 
     /**
      * Counts current progress percentage.
-     *
-     * @return float
      */
-    public function getProgressPercentage()
+    public function getProgressPercentage(): float|int
     {
         $processed = $this->getProcessedRows();
 
@@ -544,10 +546,8 @@ class Import extends FormEntity
 
     /**
      * Returns Twitter Bootstrap label class based on current status.
-     *
-     * @return string
      */
-    public function getSatusLabelClass()
+    public function getSatusLabelClass(): string
     {
         return match ($this->status) {
             self::QUEUED => 'info',
@@ -779,11 +779,7 @@ class Import extends FormEntity
      */
     public function getDefaults()
     {
-        if (isset($this->properties['defaults'])) {
-            return $this->properties['defaults'];
-        }
-
-        return [];
+        return $this->properties['defaults'] ?? [];
     }
 
     /**

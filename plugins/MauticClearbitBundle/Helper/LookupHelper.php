@@ -17,42 +17,18 @@ use Monolog\Logger;
 class LookupHelper
 {
     /**
-     * @var UserHelper
-     */
-    protected $userHelper;
-
-    /**
      * @var bool|ClearbitIntegration
      */
     protected $integration;
 
-    /**
-     * @var Logger
-     */
-    protected $logger;
-
-    /**
-     * @var LeadModel
-     */
-    protected $leadModel;
-
-    /**
-     * @var CompanyModel
-     */
-    protected $companyModel;
-
     public function __construct(
         IntegrationHelper $integrationHelper,
-        UserHelper $userHelper,
-        Logger $logger,
-        LeadModel $leadModel,
-        CompanyModel $companyModel
+        protected UserHelper $userHelper,
+        protected Logger $logger,
+        protected LeadModel $leadModel,
+        protected CompanyModel $companyModel
     ) {
         $this->integration  = $integrationHelper->getIntegrationObject('Clearbit');
-        $this->userHelper   = $userHelper;
-        $this->logger       = $logger;
-        $this->leadModel    = $leadModel;
-        $this->companyModel = $companyModel;
     }
 
     /**

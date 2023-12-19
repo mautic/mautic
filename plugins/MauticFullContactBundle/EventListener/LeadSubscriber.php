@@ -10,20 +10,12 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class LeadSubscriber implements EventSubscriberInterface
 {
-    /**
-     * @var LookupHelper
-     */
-    private $lookupHelper;
-
-    public function __construct(LookupHelper $lookupHelper)
-    {
-        $this->lookupHelper = $lookupHelper;
+    public function __construct(
+        private LookupHelper $lookupHelper
+    ) {
     }
 
-    /**
-     * @return array
-     */
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             LeadEvents::LEAD_POST_SAVE    => ['leadPostSave', 0],

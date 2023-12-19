@@ -26,8 +26,20 @@ use Symfony\Component\HttpFoundation\Response;
 
 class InstallController extends CommonController
 {
-    public function __construct(private Configurator $configurator, private InstallService $installer, ManagerRegistry $doctrine, MauticFactory $factory, ModelFactory $modelFactory, UserHelper $userHelper, CoreParametersHelper $coreParametersHelper, EventDispatcherInterface $dispatcher, Translator $translator, FlashBag $flashBag, RequestStack $requestStack, CorePermissions $security)
-    {
+    public function __construct(
+        private Configurator $configurator,
+        private InstallService $installer,
+        ManagerRegistry $doctrine,
+        MauticFactory $factory,
+        ModelFactory $modelFactory,
+        UserHelper $userHelper,
+        CoreParametersHelper $coreParametersHelper,
+        EventDispatcherInterface $dispatcher,
+        Translator $translator,
+        FlashBag $flashBag,
+        RequestStack $requestStack,
+        CorePermissions $security
+    ) {
         parent::__construct($doctrine, $factory, $modelFactory, $userHelper, $coreParametersHelper, $dispatcher, $translator, $flashBag, $requestStack, $security);
     }
 
@@ -226,7 +238,7 @@ class InstallController extends CommonController
      *
      * @throws \Exception
      */
-    public function finalAction(Request $request, PathsHelper $pathsHelper)
+    public function finalAction(Request $request, PathsHelper $pathsHelper): \Symfony\Component\HttpFoundation\RedirectResponse|Response
     {
         $session = $request->getSession();
 

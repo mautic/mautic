@@ -12,9 +12,6 @@ use Symfony\Component\HttpKernel\Log\DebugLoggerInterface;
 
 class ExceptionController extends CommonController
 {
-    /**
-     * {@inheritdoc}
-     */
     public function showAction(Request $request, \Throwable $exception, ThemeHelper $themeHelper, DebugLoggerInterface $logger = null)
     {
         $exception      = FlattenException::createFromThrowable($exception, $exception->getCode(), $request->headers->all());
@@ -115,10 +112,8 @@ class ExceptionController extends CommonController
 
     /**
      * @param int $startObLevel
-     *
-     * @return string
      */
-    protected function getAndCleanOutputBuffering($startObLevel)
+    protected function getAndCleanOutputBuffering($startObLevel): string|false
     {
         if (ob_get_level() <= $startObLevel) {
             return '';

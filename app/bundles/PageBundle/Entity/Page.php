@@ -136,9 +136,6 @@ class Page extends FormEntity implements TranslationEntityInterface, VariantEnti
         parent::__clone();
     }
 
-    /**
-     * Constructor.
-     */
     public function __construct()
     {
         $this->translationChildren = new \Doctrine\Common\Collections\ArrayCollection();

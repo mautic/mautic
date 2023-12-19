@@ -35,7 +35,7 @@ trait PushToIntegrationTrait
         static::$integrationHelper = $integrationHelper;
     }
 
-    protected function pushToIntegration(array $config, Lead $lead, array &$errors = [])
+    protected function pushToIntegration(array $config, Lead $lead, array &$errors = []): bool
     {
         return static::pushIt($config, $lead, $errors);
     }
@@ -70,7 +70,7 @@ trait PushToIntegrationTrait
             }
 
             if ($success && $integrationCampaign && method_exists($s, 'pushLeadToCampaign')) {
-                if (!$s->resetLastIntegrationError()->pushLeadToCampaign($lead, $integrationCampaign, $integrationMemberStatus, $personIds)) {
+                if (!$s->resetLastIntegrationError()->pushLeadToCampaign($lead, $integrationCampaign, $integrationMemberStatus)) {
                     $success = false;
                     if ($error = $s->getLastIntegrationError()) {
                         $errors[] = $error;

@@ -7,15 +7,14 @@ class MonthStat implements StatInterface
     /**
      * @var DayStat[]
      */
-    private $stats = [];
+    private array $stats = [];
 
     /**
-     * MonthStat constructor.
-     *
      * @param string $month "2019-01" format
      */
-    public function __construct(private $month)
-    {
+    public function __construct(
+        private $month
+    ) {
     }
 
     /**

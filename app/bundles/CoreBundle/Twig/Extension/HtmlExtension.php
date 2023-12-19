@@ -9,9 +9,6 @@ use Twig\TwigFunction;
 
 final class HtmlExtension extends AbstractExtension
 {
-    /**
-     * {@inheritdoc}
-     */
     public function getFunctions()
     {
         return [

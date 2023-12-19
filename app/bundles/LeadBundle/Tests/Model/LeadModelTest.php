@@ -48,112 +48,109 @@ class LeadModelTest extends \PHPUnit\Framework\TestCase
     /**
      * @var MockObject|RequestStack
      */
-    private $requestStackMock;
+    private \PHPUnit\Framework\MockObject\MockObject $requestStackMock;
 
     /**
      * @var MockObject|IpLookupHelper
      */
-    private $ipLookupHelperMock;
+    private \PHPUnit\Framework\MockObject\MockObject $ipLookupHelperMock;
 
     /**
      * @var MockObject|PathsHelper
      */
-    private $pathsHelperMock;
+    private \PHPUnit\Framework\MockObject\MockObject $pathsHelperMock;
 
     /**
      * @var MockObject|IntegrationHelper
      */
-    private $integrationHelperkMock;
+    private \PHPUnit\Framework\MockObject\MockObject $integrationHelperkMock;
 
     /**
      * @var MockObject|FieldModel
      */
-    private $fieldModelMock;
+    private \PHPUnit\Framework\MockObject\MockObject $fieldModelMock;
 
     /**
      * @var MockObject|ListModel
      */
-    private $listModelMock;
+    private \PHPUnit\Framework\MockObject\MockObject $listModelMock;
 
     /**
      * @var MockObject|FormFactory
      */
-    private $formFactoryMock;
+    private \PHPUnit\Framework\MockObject\MockObject $formFactoryMock;
 
     /**
      * @var MockObject|CompanyModel
      */
-    private $companyModelMock;
+    private \PHPUnit\Framework\MockObject\MockObject $companyModelMock;
 
     /**
      * @var MockObject|CategoryModel
      */
-    private $categoryModelMock;
+    private \PHPUnit\Framework\MockObject\MockObject $categoryModelMock;
 
     /**
      * @var MockObject|ChannelListHelper
      */
-    private $channelListHelperMock;
+    private \Mautic\ChannelBundle\Helper\ChannelListHelper $channelListHelperMock;
 
     /**
      * @var MockObject|CoreParametersHelper
      */
-    private $coreParametersHelperMock;
+    private \PHPUnit\Framework\MockObject\MockObject $coreParametersHelperMock;
 
     /**
      * @var MockObject|EmailValidator
      */
-    private $emailValidatorMock;
+    private \PHPUnit\Framework\MockObject\MockObject $emailValidatorMock;
 
     /**
      * @var MockObject|UserProvider
      */
-    private $userProviderMock;
+    private \PHPUnit\Framework\MockObject\MockObject $userProviderMock;
 
     /**
      * @var MockObject|ContactTracker
      */
-    private $contactTrackerMock;
+    private \PHPUnit\Framework\MockObject\MockObject $contactTrackerMock;
 
     /**
      * @var MockObject|DeviceTracker
      */
-    private $deviceTrackerMock;
+    private \PHPUnit\Framework\MockObject\MockObject $deviceTrackerMock;
 
     /**
      * @var MockObject|IpAddressModel
      */
-    private $ipAddressModelMock;
+    private \PHPUnit\Framework\MockObject\MockObject $ipAddressModelMock;
 
     /**
      * @var MockObject|LeadRepository
      */
-    private $leadRepositoryMock;
+    private \PHPUnit\Framework\MockObject\MockObject $leadRepositoryMock;
 
     /**
      * @var MockObject|CompanyLeadRepository
      */
-    private $companyLeadRepositoryMock;
+    private \PHPUnit\Framework\MockObject\MockObject $companyLeadRepositoryMock;
 
     /**
      * @var MockObject|UserHelper
      */
-    private $userHelperMock;
+    private \PHPUnit\Framework\MockObject\MockObject $userHelperMock;
 
     /**
      * @var MockObject|EventDispatcherInterface
      */
-    private $dispatcherMock;
+    private \PHPUnit\Framework\MockObject\MockObject $dispatcherMock;
 
     /**
      * @var MockObject|EntityManager
      */
-    private $entityManagerMock;
+    private \PHPUnit\Framework\MockObject\MockObject $entityManagerMock;
 
-    /**
-     * @var LeadModel
-     */
-    private $leadModel;
+    private \Mautic\LeadBundle\Model\LeadModel $leadModel;
 
     /**
      * @var MockObject&Translator
@@ -426,7 +423,7 @@ class LeadModelTest extends \PHPUnit\Framework\TestCase
 
         try {
             $mockLeadModel->import([], [], null, null, null, true, $leadEventLog);
-        } catch (\Exception $e) {
+        } catch (\Exception) {
             $this->assertNull($leadEventLog->getLead());
         }
     }
@@ -434,7 +431,7 @@ class LeadModelTest extends \PHPUnit\Framework\TestCase
     /**
      * Test that the Lead will be set to the LeadEventLog if the Lead save succeed.
      */
-    public function testImportWillSetLeadToLeadEventLogWhenLeadSaveSucceed()
+    public function testImportWillSetLeadToLeadEventLogWhenLeadSaveSucceed(): void
     {
         $leadEventLog  = new LeadEventLog();
         $lead          = new Lead();
@@ -467,7 +464,7 @@ class LeadModelTest extends \PHPUnit\Framework\TestCase
 
         try {
             $mockLeadModel->import([], [], null, null, null, true, $leadEventLog);
-        } catch (\Exception $e) {
+        } catch (\Exception) {
             $this->assertEquals($lead, $leadEventLog->getLead());
         }
     }
@@ -688,7 +685,7 @@ class LeadModelTest extends \PHPUnit\Framework\TestCase
         $reflectedProp->setValue($object, $value);
     }
 
-    private function mockGetLeadRepository()
+    private function mockGetLeadRepository(): void
     {
         $this->entityManagerMock->expects($this->any())
             ->method('getRepository')
@@ -736,11 +733,9 @@ class LeadModelTest extends \PHPUnit\Framework\TestCase
     private function getLead(int $id): Lead
     {
         return new class($id) extends Lead {
-            private int $id;
-
-            public function __construct(int $id)
-            {
-                $this->id = $id;
+            public function __construct(
+                private int $id
+            ) {
                 parent::__construct();
             }
 

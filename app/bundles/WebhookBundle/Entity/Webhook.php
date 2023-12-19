@@ -18,6 +18,7 @@ use Symfony\Component\Validator\Mapping\ClassMetadata;
 class Webhook extends FormEntity
 {
     public const LOGS_DISPLAY_LIMIT = 100;
+
     /**
      * @var int
      */

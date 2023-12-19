@@ -27,8 +27,11 @@ class CustomFormEvent extends Event
      * @param string $formName
      * @param string $formType
      */
-    public function __construct(protected $formName, protected $formType, private FormBuilderInterface $formBuilder)
-    {
+    public function __construct(
+        protected $formName,
+        protected $formType,
+        private FormBuilderInterface $formBuilder
+    ) {
     }
 
     /**
@@ -71,7 +74,7 @@ class CustomFormEvent extends Event
         return $this->subscribers;
     }
 
-    public function addListener($eventName, $listener)
+    public function addListener($eventName, $listener): void
     {
         if (!is_callable($listener)) {
             throw new \InvalidArgumentException('$listener must be callable');

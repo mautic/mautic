@@ -23,10 +23,7 @@ class ReplySubscriber implements EventSubscriberInterface
         $this->eventLogRepository = $eventLogRepository;
     }
 
-    /**
-     * @return array
-     */
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             SmsEvents::ON_REPLY              => ['onReply', 0],

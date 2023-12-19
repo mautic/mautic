@@ -16,12 +16,12 @@ class KickoffContactFinderTest extends \PHPUnit\Framework\TestCase
     /**
      * @var \PHPUnit\Framework\MockObject\MockObject|LeadRepository
      */
-    private $leadRepository;
+    private \PHPUnit\Framework\MockObject\MockObject $leadRepository;
 
     /**
      * @var \PHPUnit\Framework\MockObject\MockObject|CampaignRepository
      */
-    private $campaignRepository;
+    private \PHPUnit\Framework\MockObject\MockObject $campaignRepository;
 
     protected function setUp(): void
     {
@@ -34,7 +34,7 @@ class KickoffContactFinderTest extends \PHPUnit\Framework\TestCase
             ->getMock();
     }
 
-    public function testNoContactsFoundExceptionIsThrown()
+    public function testNoContactsFoundExceptionIsThrown(): void
     {
         $this->campaignRepository->expects($this->once())
             ->method('getPendingContactIds')
@@ -46,7 +46,7 @@ class KickoffContactFinderTest extends \PHPUnit\Framework\TestCase
         $this->getContactFinder()->getContacts(1, $limiter);
     }
 
-    public function testNoContactsFoundExceptionIsThrownIfEntitiesAreNotFound()
+    public function testNoContactsFoundExceptionIsThrownIfEntitiesAreNotFound(): void
     {
         $contactIds = [1, 2];
 
@@ -64,7 +64,7 @@ class KickoffContactFinderTest extends \PHPUnit\Framework\TestCase
         $this->getContactFinder()->getContacts(1, $limiter);
     }
 
-    public function testArrayCollectionIsReturnedForFoundContacts()
+    public function testArrayCollectionIsReturnedForFoundContacts(): void
     {
         $contactIds = [1, 2];
 

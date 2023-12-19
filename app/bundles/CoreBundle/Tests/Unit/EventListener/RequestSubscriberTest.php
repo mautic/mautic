@@ -14,20 +14,14 @@ use Twig\Environment;
 
 class RequestSubscriberTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var RequestSubscriber
-     */
-    private $subscriber;
+    private \Mautic\CoreBundle\EventListener\RequestSubscriber $subscriber;
 
-    /**
-     * @var Request
-     */
-    private $request;
+    private \Symfony\Component\HttpFoundation\Request $request;
 
     /**
      * @var MockObject&RequestEvent
      */
-    private $event;
+    private \PHPUnit\Framework\MockObject\MockObject $event;
 
     protected function setUp(): void
     {
@@ -42,9 +36,7 @@ class RequestSubscriberTest extends \PHPUnit\Framework\TestCase
 
         $csrfTokenManagerMock
           ->method('isTokenValid')
-          ->will($this->returnCallback(function (CsrfToken $token) use ($aCsrfTokenValue) {
-              return $token->getValue() === $aCsrfTokenValue;
-          }));
+          ->will($this->returnCallback(fn (CsrfToken $token) => $token->getValue() === $aCsrfTokenValue));
 
         $this->request = new Request();
 

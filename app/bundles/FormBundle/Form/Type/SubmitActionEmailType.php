@@ -20,13 +20,12 @@ class SubmitActionEmailType extends AbstractType
     use FormFieldTrait;
     use ToBcBccFieldsTrait;
 
-    public function __construct(private TranslatorInterface $translator, protected CoreParametersHelper $coreParametersHelper)
-    {
+    public function __construct(
+        private TranslatorInterface $translator,
+        protected CoreParametersHelper $coreParametersHelper
+    ) {
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $data = $options['data']['subject'] ?? $this->translator->trans(
@@ -126,9 +125,6 @@ class SubmitActionEmailType extends AbstractType
         $this->addToBcBccFields($builder);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getBlockPrefix()
     {
         return 'form_submitaction_sendemail';

@@ -67,8 +67,6 @@ class StatRepository extends CommonRepository
      * @param int|null $companyId
      * @param int|null $campaignId
      * @param int|null $segmentId
-     *
-     * @return array
      */
     public function getSentEmailToContactData(
         $limit,
@@ -78,7 +76,7 @@ class StatRepository extends CommonRepository
         $companyId = null,
         $campaignId = null,
         $segmentId = null
-    ) {
+    ): array {
         $q = $this->getEntityManager()->getConnection()->createQueryBuilder();
         $q->select('s.id, s.lead_id, s.email_address, s.is_read, s.email_id, s.date_sent, s.date_read')
             ->from(MAUTIC_TABLE_PREFIX.'email_stats', 's')
@@ -384,7 +382,7 @@ class StatRepository extends CommonRepository
      *
      * @return array<int, array<string, mixed>>
      */
-    public function getOpenedStatIds($emailIds = null, $listId = null)
+    public function getOpenedStatIds($emailIds = null, $listId = null): array
     {
         $q = $this->_em->getConnection()->createQueryBuilder();
 
@@ -608,9 +606,6 @@ class StatRepository extends CommonRepository
             ->executeStatement();
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getTableAlias(): string
     {
         return 's';

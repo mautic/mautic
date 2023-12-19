@@ -27,8 +27,12 @@ class ContactMerger
      */
     protected $loser;
 
-    public function __construct(protected LeadModel $leadModel, protected MergeRecordRepository $repo, protected EventDispatcherInterface $dispatcher, protected LoggerInterface $logger)
-    {
+    public function __construct(
+        protected LeadModel $leadModel,
+        protected MergeRecordRepository $repo,
+        protected EventDispatcherInterface $dispatcher,
+        protected LoggerInterface $logger
+    ) {
     }
 
     /**

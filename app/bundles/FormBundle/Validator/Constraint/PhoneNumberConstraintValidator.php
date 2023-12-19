@@ -14,10 +14,7 @@ use Symfony\Component\Validator\Exception\UnexpectedTypeException;
  */
 class PhoneNumberConstraintValidator extends ConstraintValidator
 {
-    /**
-     * {@inheritdoc}
-     */
-    public function validate($value, Constraint $constraint)
+    public function validate($value, Constraint $constraint): void
     {
         if (null === $value || '' === $value) {
             return;

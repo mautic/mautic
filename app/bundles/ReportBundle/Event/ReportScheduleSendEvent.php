@@ -10,8 +10,10 @@ class ReportScheduleSendEvent extends Event
     /**
      * @param string $file
      */
-    public function __construct(private Scheduler $scheduler, private $file)
-    {
+    public function __construct(
+        private Scheduler $scheduler,
+        private $file
+    ) {
     }
 
     /**

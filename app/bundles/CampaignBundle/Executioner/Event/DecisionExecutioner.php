@@ -18,8 +18,10 @@ class DecisionExecutioner implements EventInterface
 {
     public const TYPE = 'decision';
 
-    public function __construct(private EventLogger $eventLogger, private DecisionDispatcher $dispatcher)
-    {
+    public function __construct(
+        private EventLogger $eventLogger,
+        private DecisionDispatcher $dispatcher
+    ) {
     }
 
     /**
@@ -30,7 +32,7 @@ class DecisionExecutioner implements EventInterface
      * @throws CannotProcessEventException
      * @throws DecisionNotApplicableException
      */
-    public function evaluateForContact(DecisionAccessor $config, Event $event, Lead $contact, $passthrough = null, $channel = null, $channelId = null)
+    public function evaluateForContact(DecisionAccessor $config, Event $event, Lead $contact, $passthrough = null, $channel = null, $channelId = null): void
     {
         if (Event::TYPE_DECISION !== $event->getEventType()) {
             throw new CannotProcessEventException('Cannot process event ID '.$event->getId().' as a decision.');
@@ -92,7 +94,7 @@ class DecisionExecutioner implements EventInterface
     /**
      * @throws DecisionNotApplicableException
      */
-    private function dispatchEvent(DecisionAccessor $config, LeadEventLog $log)
+    private function dispatchEvent(DecisionAccessor $config, LeadEventLog $log): void
     {
         $decisionEvent = $this->dispatcher->dispatchEvaluationEvent($config, $log);
 

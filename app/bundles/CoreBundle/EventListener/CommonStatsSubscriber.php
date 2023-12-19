@@ -27,21 +27,20 @@ abstract class CommonStatsSubscriber implements EventSubscriberInterface
      */
     protected $permissions = [];
 
-    public function __construct(protected CorePermissions $security, protected EntityManager $entityManager)
-    {
+    public function __construct(
+        protected CorePermissions $security,
+        protected EntityManager $entityManager
+    ) {
     }
 
-    /**
-     * @return array
-     */
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             CoreEvents::LIST_STATS => ['onStatsFetch', 0],
         ];
     }
 
-    public function onStatsFetch(StatsEvent $event)
+    public function onStatsFetch(StatsEvent $event): void
     {
         /** @var CommonRepository<object> $repository */
         foreach ($this->repositories as $repository) {

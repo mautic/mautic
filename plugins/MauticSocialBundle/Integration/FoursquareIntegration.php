@@ -4,18 +4,12 @@ namespace MauticPlugin\MauticSocialBundle\Integration;
 
 class FoursquareIntegration extends SocialIntegration
 {
-    /**
-     * {@inheritdoc}
-     */
-    public function getName()
+    public function getName(): string
     {
         return 'Foursquare';
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getPriority()
+    public function getPriority(): int
     {
         return 2;
     }
@@ -31,26 +25,17 @@ class FoursquareIntegration extends SocialIntegration
         ];
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getAuthenticationUrl()
+    public function getAuthenticationUrl(): string
     {
         return 'https://foursquare.com/oauth2/authenticate';
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getAccessTokenUrl()
+    public function getAccessTokenUrl(): string
     {
         return 'https://foursquare.com/oauth2/access_token';
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getAuthenticationType()
+    public function getAuthenticationType(): string
     {
         return 'oauth2';
     }
@@ -58,10 +43,8 @@ class FoursquareIntegration extends SocialIntegration
     /**
      * @param string $endpoint
      * @param string $m
-     *
-     * @return string
      */
-    public function getApiUrl($endpoint, $m = 'foursquare')
+    public function getApiUrl($endpoint, $m = 'foursquare'): string
     {
         return "https://api.foursquare.com/v2/$endpoint?v=20140806&m={$m}";
     }
@@ -223,10 +206,7 @@ class FoursquareIntegration extends SocialIntegration
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getErrorsFromResponse($response)
+    public function getErrorsFromResponse($response): string
     {
         if (is_object($response) && isset($response->meta->errorDetail)) {
             return $response->meta->errorDetail.' ('.$response->meta->code.')';
@@ -235,9 +215,6 @@ class FoursquareIntegration extends SocialIntegration
         return '';
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function matchFieldName($field, $subfield = '')
     {
         if ('contact' == $field && in_array($subfield, ['facebook', 'twitter'])) {
@@ -247,9 +224,6 @@ class FoursquareIntegration extends SocialIntegration
         return parent::matchFieldName($field, $subfield);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getAvailableLeadFields($settings = []): array
     {
         return [
@@ -270,9 +244,6 @@ class FoursquareIntegration extends SocialIntegration
         ];
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getSupportedFeatures(): array
     {
         return [
@@ -312,9 +283,6 @@ class FoursquareIntegration extends SocialIntegration
         return false;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getFormType()
     {
         return null;

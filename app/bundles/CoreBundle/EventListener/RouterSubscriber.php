@@ -20,16 +20,19 @@ class RouterSubscriber implements EventSubscriberInterface
      * @param string|null $httpPort
      * @param string|null $baseUrl
      */
-    public function __construct(private RouterInterface $router, private $scheme, private $host, $httpsPort, $httpPort, private $baseUrl)
-    {
+    public function __construct(
+        private RouterInterface $router,
+        private $scheme,
+        private $host,
+        $httpsPort,
+        $httpPort,
+        private $baseUrl
+    ) {
         $this->httpsPort = $httpsPort ?? 443;
         $this->httpPort  = $httpPort ?? 80;
     }
 
-    /**
-     * @return array
-     */
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             KernelEvents::REQUEST => ['setRouterRequestContext', 1],
@@ -55,7 +58,7 @@ class RouterSubscriber implements EventSubscriberInterface
 
         // Remove index.php, and ending forward slash from the URL to match what is configured in SiteUrlEnvVars
         $originalBaseUrl = str_replace(['index.php'], '', $originalContext->getBaseUrl());
-        if ('/' == substr($originalBaseUrl, -1)) {
+        if (str_ends_with($originalBaseUrl, '/')) {
             $originalBaseUrl = substr($originalBaseUrl, 0, -1);
         }
 

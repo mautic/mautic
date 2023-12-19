@@ -427,9 +427,9 @@ class FetchCommonApiController extends AbstractFOSRestController implements Maut
      * @param MauticModelInterface|null $model
      * @param bool                      $returnWithOriginalKeys
      *
-     * @return array|mixed
+     * @return mixed[]
      */
-    protected function getBatchEntities($parameters, &$errors, $prepareForSerialization = false, $requestIdColumn = 'id', $model = null, $returnWithOriginalKeys = true)
+    protected function getBatchEntities($parameters, &$errors, $prepareForSerialization = false, $requestIdColumn = 'id', $model = null, $returnWithOriginalKeys = true): array
     {
         $idHelper = new BatchIdToEntityHelper($parameters, $requestIdColumn);
 
@@ -496,7 +496,7 @@ class FetchCommonApiController extends AbstractFOSRestController implements Maut
      */
     protected function getEntityDefaultProperties(object $entity): array
     {
-        $class         = get_class($entity);
+        $class         = $entity::class;
         $chain         = array_reverse(class_parents($entity), true) + [$class => $class];
         $defaultValues = [];
 
@@ -720,8 +720,6 @@ class FetchCommonApiController extends AbstractFOSRestController implements Maut
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @param mixed|null                $data
      * @param array<string, string|int> $headers
      */

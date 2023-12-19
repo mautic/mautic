@@ -13,13 +13,11 @@ use Symfony\Component\Validator\Constraints\NotBlank;
 
 class VariantType extends AbstractType
 {
-    public function __construct(private PageModel $pageModel)
-    {
+    public function __construct(
+        private PageModel $pageModel
+    ) {
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder->add(
@@ -85,9 +83,6 @@ class VariantType extends AbstractType
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getBlockPrefix()
     {
         return 'pagevariant';

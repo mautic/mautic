@@ -11,8 +11,9 @@ use Symfony\Component\Validator\Constraints\NotBlank;
 
 class NotificationSendType extends AbstractType
 {
-    public function __construct(protected RouterInterface $router)
-    {
+    public function __construct(
+        protected RouterInterface $router
+    ) {
     }
 
     public function buildForm(FormBuilderInterface $builder, array $options): void

@@ -30,13 +30,22 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class SyncProcess
 {
-    /**
-     * @var int
-     */
-    private $syncIteration;
+    private ?int $syncIteration = null;
 
-    public function __construct(private SyncDateHelper $syncDateHelper, private MappingHelper $mappingHelper, private RelationsHelper $relationsHelper, private IntegrationSyncProcess $integrationSyncProcess, private MauticSyncProcess $mauticSyncProcess, private EventDispatcherInterface $eventDispatcher, private Notifier $notifier, private MappingManualDAO $mappingManualDAO, private MauticSyncDataExchange $internalSyncDataExchange, private SyncDataExchangeInterface $integrationSyncDataExchange, private InputOptionsDAO $inputOptionsDAO, private SyncServiceInterface $syncService)
-    {
+    public function __construct(
+        private SyncDateHelper $syncDateHelper,
+        private MappingHelper $mappingHelper,
+        private RelationsHelper $relationsHelper,
+        private IntegrationSyncProcess $integrationSyncProcess,
+        private MauticSyncProcess $mauticSyncProcess,
+        private EventDispatcherInterface $eventDispatcher,
+        private Notifier $notifier,
+        private MappingManualDAO $mappingManualDAO,
+        private MauticSyncDataExchange $internalSyncDataExchange,
+        private SyncDataExchangeInterface $integrationSyncDataExchange,
+        private InputOptionsDAO $inputOptionsDAO,
+        private SyncServiceInterface $syncService
+    ) {
     }
 
     /**

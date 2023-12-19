@@ -11,14 +11,14 @@ use Twig\Environment;
 
 class SearchSubscriber implements EventSubscriberInterface
 {
-    public function __construct(private ClientModel $apiClientModel, private CorePermissions $security, private Environment $twig)
-    {
+    public function __construct(
+        private ClientModel $apiClientModel,
+        private CorePermissions $security,
+        private Environment $twig
+    ) {
     }
 
-    /**
-     * @return array
-     */
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             CoreEvents::GLOBAL_SEARCH      => ['onGlobalSearch', 0],

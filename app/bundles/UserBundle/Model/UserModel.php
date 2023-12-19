@@ -52,17 +52,12 @@ class UserModel extends FormModel
         return $this->em->getRepository(User::class);
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getPermissionBase()
+    public function getPermissionBase(): string
     {
         return 'user:users';
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @throws \Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException
      */
     public function saveEntity($entity, $unlock = true): void
@@ -94,10 +89,8 @@ class UserModel extends FormModel
      *
      * @param string     $submittedPassword
      * @param bool|false $validate
-     *
-     * @return string
      */
-    public function checkNewPassword(User $entity, UserPasswordHasherInterface $hasher, $submittedPassword, $validate = false)
+    public function checkNewPassword(User $entity, UserPasswordHasherInterface $hasher, $submittedPassword, $validate = false): string|null
     {
         if ($validate) {
             if (strlen($submittedPassword) < 6) {
@@ -114,11 +107,9 @@ class UserModel extends FormModel
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
      */
-    public function createForm($entity, FormFactoryInterface $formFactory, $action = null, $options = [])
+    public function createForm($entity, FormFactoryInterface $formFactory, $action = null, $options = []): \Symfony\Component\Form\FormInterface
     {
         if (!$entity instanceof User) {
             throw new MethodNotAllowedHttpException(['User'], 'Entity must be of class User()');
@@ -130,10 +121,7 @@ class UserModel extends FormModel
         return $formFactory->create(UserType::class, $entity, $options);
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getEntity($id = null)
+    public function getEntity($id = null): ?User
     {
         if (null === $id) {
             return new User();
@@ -167,8 +155,6 @@ class UserModel extends FormModel
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @throws \Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException
      */
     protected function dispatchEvent($action, &$entity, $isNew = false, Event $event = null): ?Event
@@ -273,7 +259,7 @@ class UserModel extends FormModel
     /**
      * @throws \RuntimeException
      */
-    public function sendResetEmail(User $user)
+    public function sendResetEmail(User $user): void
     {
         $mailer = $this->mailHelper->getMailer();
 
@@ -334,8 +320,6 @@ class UserModel extends FormModel
 
     /**
      * Set user preference.
-     *
-     * @param null $value
      */
     public function setPreference($key, $value = null, User $user = null): void
     {
@@ -353,8 +337,6 @@ class UserModel extends FormModel
 
     /**
      * Get user preference.
-     *
-     * @param null $default
      */
     public function getPreference($key, $default = null, User $user = null)
     {
@@ -368,10 +350,8 @@ class UserModel extends FormModel
 
     /**
      * Return list of Users for formType Choice.
-     *
-     * @return array
      */
-    public function getOwnerListChoices()
+    public function getOwnerListChoices(): array
     {
         return $this->getRepository()->getOwnerListChoices();
     }

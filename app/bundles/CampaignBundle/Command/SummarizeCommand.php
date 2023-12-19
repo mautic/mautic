@@ -77,5 +77,6 @@ class SummarizeCommand extends ModeratedCommand
 
         return \Symfony\Component\Console\Command\Command::SUCCESS;
     }
+
     protected static $defaultDescription = 'Builds historical campaign summary statistics if they do not already exist.';
 }

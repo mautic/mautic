@@ -46,9 +46,6 @@ class LeadEventLogRepository extends CommonRepository
         return parent::getEntities($args);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getTableAlias(): string
     {
         return 'll';
@@ -103,7 +100,7 @@ class LeadEventLogRepository extends CommonRepository
                         $query->expr()->eq('ll.is_scheduled', ':scheduled'),
                         $query->expr()->and(
                             $query->expr()->eq('ll.is_scheduled', 0),
-                            $query->expr()->isNull('ll.date_triggered', 0)
+                            $query->expr()->isNull('ll.date_triggered')
                         )
                     )
                 );
@@ -131,10 +128,8 @@ class LeadEventLogRepository extends CommonRepository
 
     /**
      * Get a lead's upcoming events.
-     *
-     * @return array
      */
-    public function getUpcomingEvents(array $options = null)
+    public function getUpcomingEvents(array $options = null): array
     {
         $leadIps = [];
 
@@ -351,10 +346,7 @@ class LeadEventLogRepository extends CommonRepository
         }
     }
 
-    /**
-     * @return array
-     */
-    public function getChartQuery($options)
+    public function getChartQuery($options): array
     {
         $chartQuery = new ChartQuery($this->getReplicaConnection(), $options['dateFrom'], $options['dateTo']);
 

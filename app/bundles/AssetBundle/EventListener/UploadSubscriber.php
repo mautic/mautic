@@ -14,14 +14,14 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class UploadSubscriber implements EventSubscriberInterface
 {
-    public function __construct(private CoreParametersHelper $coreParametersHelper, private AssetModel $assetModel, private FileUploadValidator $fileUploadValidator)
-    {
+    public function __construct(
+        private CoreParametersHelper $coreParametersHelper,
+        private AssetModel $assetModel,
+        private FileUploadValidator $fileUploadValidator
+    ) {
     }
 
-    /**
-     * @return array
-     */
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             UploadEvents::POST_UPLOAD => ['onPostUpload', 0],
@@ -56,7 +56,7 @@ class UploadSubscriber implements EventSubscriberInterface
      *
      * @throws ValidationException
      */
-    public function onUploadValidation(ValidationEvent $event)
+    public function onUploadValidation(ValidationEvent $event): void
     {
         $file       = $event->getFile();
         $extensions = $this->coreParametersHelper->get('allowed_extensions');

@@ -12,8 +12,9 @@ use Recurr\Transformer\ArrayTransformer;
 
 class SchedulerBuilder
 {
-    public function __construct(private SchedulerTemplateFactory $schedulerTemplateFactory)
-    {
+    public function __construct(
+        private SchedulerTemplateFactory $schedulerTemplateFactory
+    ) {
     }
 
     /**

@@ -717,10 +717,7 @@ class NotificationController extends AbstractFormController
         );
     }
 
-    /**
-     * @return JsonResponse|Response
-     */
-    public function previewAction($objectId)
+    public function previewAction($objectId): Response
     {
         /** @var \Mautic\NotificationBundle\Model\NotificationModel $model */
         $model        = $this->getModel('notification');

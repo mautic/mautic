@@ -28,8 +28,11 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 class TriggerCampaignCommand extends ModeratedCommand
 {
     use WriteCountTrait;
+
     private bool $kickoffOnly  = false;
+
     private bool $inactiveOnly = false;
+
     private bool $scheduleOnly = false;
 
     /**
@@ -37,15 +40,9 @@ class TriggerCampaignCommand extends ModeratedCommand
      */
     protected $output;
 
-    /**
-     * @var ContactLimiter
-     */
-    private $limiter;
+    private ?\Mautic\CampaignBundle\Executioner\ContactFinder\Limiter\ContactLimiter $limiter = null;
 
-    /**
-     * @var Campaign
-     */
-    private $campaign;
+    private ?\Mautic\CampaignBundle\Entity\Campaign $campaign = null;
 
     public function __construct(
         private CampaignRepository $campaignRepository,
@@ -241,7 +238,7 @@ class TriggerCampaignCommand extends ModeratedCommand
     /**
      * @throws \Exception
      */
-    private function triggerCampaign(Campaign $campaign)
+    private function triggerCampaign(Campaign $campaign): void
     {
         if (!$campaign->isPublished()) {
             return;
@@ -356,5 +353,6 @@ class TriggerCampaignCommand extends ModeratedCommand
             $this->segmentCountCacheHelper->setSegmentContactCount($segmentId, (int) $totalLeadCount);
         }
     }
+
     protected static $defaultDescription = 'Trigger timed events for published campaigns.';
 }

@@ -78,10 +78,8 @@ class UpdateHelper
      * Retrieves the update data from our home server.
      *
      * @param bool $overrideCache
-     *
-     * @return array
      */
-    public function fetchData($overrideCache = false)
+    public function fetchData($overrideCache = false): array
     {
         $cacheFile       = $this->pathsHelper->getSystemPath('cache').'/lastUpdateCheck.txt';
         $updateStability = $this->coreParametersHelper->get('update_stability');
@@ -190,7 +188,7 @@ class UpdateHelper
                 $checkResults[] = $check->runCheck();
             } catch (\Exception $e) {
                 // Checks are supposed to catch errors themselves and return them in their PreUpdateCheckResult, but we catch here just in case.
-                $checkResults[] = new PreUpdateCheckResult(false, $check, [new PreUpdateCheckError('Unknown error while running '.get_class($check).': '.$e->getMessage())]);
+                $checkResults[] = new PreUpdateCheckResult(false, $check, [new PreUpdateCheckError('Unknown error while running '.$check::class.': '.$e->getMessage())]);
             }
         }
 

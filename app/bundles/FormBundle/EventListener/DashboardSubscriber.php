@@ -39,8 +39,11 @@ class DashboardSubscriber extends MainDashboardSubscriber
         'form:forms:viewother',
     ];
 
-    public function __construct(protected SubmissionModel $formSubmissionModel, protected FormModel $formModel, private RouterInterface $router)
-    {
+    public function __construct(
+        protected SubmissionModel $formSubmissionModel,
+        protected FormModel $formModel,
+        private RouterInterface $router
+    ) {
     }
 
     /**

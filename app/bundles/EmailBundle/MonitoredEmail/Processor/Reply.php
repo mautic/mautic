@@ -20,8 +20,15 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class Reply implements ProcessorInterface
 {
-    public function __construct(private StatRepository $statRepo, private ContactFinder $contactFinder, private LeadModel $leadModel, private EventDispatcherInterface $dispatcher, private LoggerInterface $logger, private ContactTracker $contactTracker, private EmailAddressHelper $addressHelper)
-    {
+    public function __construct(
+        private StatRepository $statRepo,
+        private ContactFinder $contactFinder,
+        private LeadModel $leadModel,
+        private EventDispatcherInterface $dispatcher,
+        private LoggerInterface $logger,
+        private ContactTracker $contactTracker,
+        private EmailAddressHelper $addressHelper
+    ) {
     }
 
     public function process(Message $message): void
@@ -71,7 +78,7 @@ class Reply implements ProcessorInterface
      * @param string $trackingHash
      * @param string $messageId
      */
-    public function createReplyByHash($trackingHash, $messageId)
+    public function createReplyByHash($trackingHash, $messageId): void
     {
         /** @var Stat|null $stat */
         $stat = $this->statRepo->findOneBy(['trackingHash' => $trackingHash]);
@@ -101,9 +108,7 @@ class Reply implements ProcessorInterface
     protected function createReply(Stat $stat, $messageId)
     {
         $replies = $stat->getReplies()->filter(
-            function (EmailReply $reply) use ($messageId): bool {
-                return $reply->getMessageId() === $messageId;
-            }
+            fn (EmailReply $reply): bool => $reply->getMessageId() === $messageId
         );
 
         if (!$replies->count()) {

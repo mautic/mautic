@@ -395,9 +395,6 @@ class SubmissionModel extends CommonFormModel
         parent::deleteEntity($submission);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getEntities(array $args = [])
     {
         return $this->getRepository()->getEntities($args);
@@ -408,7 +405,7 @@ class SubmissionModel extends CommonFormModel
      *
      * @return array<mixed>
      */
-    public function getEntitiesByPage(array $args = [])
+    public function getEntitiesByPage(array $args = []): array
     {
         return $this->getRepository()->getEntitiesByPage($args);
     }
@@ -748,8 +745,6 @@ class SubmissionModel extends CommonFormModel
      * @param string      $dateFormat
      * @param array       $filter
      * @param bool        $canViewOthers
-     *
-     * @return array
      */
     public function getSubmissionsLineChartData(
         ?string $unit,
@@ -758,7 +753,7 @@ class SubmissionModel extends CommonFormModel
         $dateFormat = null,
         $filter = [],
         $canViewOthers = true
-    ) {
+    ): array {
         $chart = new LineChart($unit, $dateFrom, $dateTo, $dateFormat);
         $query = new ChartQuery($this->em->getConnection(), $dateFrom, $dateTo);
         $q     = $query->prepareTimeDataQuery('form_submissions', 'date_submitted', $filter);
@@ -853,9 +848,7 @@ class SubmissionModel extends CommonFormModel
         $customComponents = $this->formModel->getCustomComponents();
         $availableActions = $customComponents['actions'] ?? [];
 
-        $actions->filter(function (Action $action) use ($availableActions): bool {
-            return array_key_exists($action->getType(), $availableActions);
-        })->map(function (Action $action) use ($event, $availableActions): void {
+        $actions->filter(fn (Action $action): bool => array_key_exists($action->getType(), $availableActions))->map(function (Action $action) use ($event, $availableActions): void {
             $event->setAction($action);
             $this->dispatcher->dispatch($event, $availableActions[$action->getType()]['eventName']);
         });

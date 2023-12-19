@@ -12,9 +12,9 @@ use Mautic\LeadBundle\Segment\Query\Filter\FilterQueryBuilderInterface;
 use Mautic\LeadBundle\Segment\Query\QueryBuilder;
 
 /**
- * Class ContactSegmentFilter is used for accessing $filter as an object and to keep logic in an object.
+ * Used for accessing $filter as an object and to keep logic in an object.
  */
-class ContactSegmentFilter
+class ContactSegmentFilter implements \Stringable
 {
     /**
      * @var ContactSegmentFilterCrate
@@ -135,18 +135,12 @@ class ContactSegmentFilter
         return $this->contactSegmentFilterCrate->getGlue();
     }
 
-    /**
-     * @return mixed
-     */
-    public function getAggregateFunction()
+    public function getAggregateFunction(): string|bool
     {
         return $this->filterDecorator->getAggregateFunc($this->contactSegmentFilterCrate);
     }
 
-    /**
-     * @return FilterQueryBuilderInterface
-     */
-    public function getFilterQueryBuilder()
+    public function getFilterQueryBuilder(): FilterQueryBuilderInterface
     {
         return $this->filterQueryBuilder;
     }
@@ -164,10 +158,7 @@ class ContactSegmentFilter
         return 'leadlist' === $this->getField();
     }
 
-    /**
-     * @return bool
-     */
-    public function isColumnTypeBoolean()
+    public function isColumnTypeBoolean(): bool
     {
         return $this->contactSegmentFilterCrate->isBooleanType();
     }
@@ -190,7 +181,7 @@ class ContactSegmentFilter
         return new IntegrationCampaignParts($this->getParameterValue());
     }
 
-    public function __toString()
+    public function __toString(): string
     {
         return sprintf(
             'table: %s,  %s on %s %s %s',

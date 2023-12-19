@@ -21,15 +21,19 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class SendEmailToUser
 {
-    public function __construct(private EmailModel $emailModel, private EventDispatcherInterface $dispatcher, private CustomFieldValidator $customFieldValidator, private EmailValidator $emailValidator)
-    {
+    public function __construct(
+        private EmailModel $emailModel,
+        private EventDispatcherInterface $dispatcher,
+        private CustomFieldValidator $customFieldValidator,
+        private EmailValidator $emailValidator
+    ) {
     }
 
     /**
      * @throws EmailCouldNotBeSentException
      * @throws ORMException
      */
-    public function sendEmailToUsers(array $config, Lead $lead)
+    public function sendEmailToUsers(array $config, Lead $lead): void
     {
         $emailToUserAccessor = new EmailToUserAccessor($config);
 

@@ -44,16 +44,32 @@ class ImportController extends FormController
 {
     // Steps of the import
     public const STEP_UPLOAD_CSV      = 1;
+
     public const STEP_MATCH_FIELDS    = 2;
+
     public const STEP_PROGRESS_BAR    = 3;
+
     public const STEP_IMPORT_FROM_CSV = 4;
 
     private \Symfony\Component\HttpFoundation\Session\SessionInterface $session;
 
     private \Mautic\LeadBundle\Model\ImportModel $importModel;
 
-    public function __construct(FormFactoryInterface $formFactory, FormFieldHelper $fieldHelper, private LoggerInterface $logger, ManagerRegistry $doctrine, MauticFactory $factory, ModelFactory $modelFactory, UserHelper $userHelper, CoreParametersHelper $coreParametersHelper, EventDispatcherInterface $dispatcher, Translator $translator, FlashBag $flashBag, RequestStack $requestStack, CorePermissions $security)
-    {
+    public function __construct(
+        FormFactoryInterface $formFactory,
+        FormFieldHelper $fieldHelper,
+        private LoggerInterface $logger,
+        ManagerRegistry $doctrine,
+        MauticFactory $factory,
+        ModelFactory $modelFactory,
+        UserHelper $userHelper,
+        CoreParametersHelper $coreParametersHelper,
+        EventDispatcherInterface $dispatcher,
+        Translator $translator,
+        FlashBag $flashBag,
+        RequestStack $requestStack,
+        CorePermissions $security
+    ) {
         /** @var ImportModel $model */
         $model = $modelFactory->getModel($this->getModelName());
 
@@ -68,7 +84,7 @@ class ImportController extends FormController
      *
      * @return JsonResponse|RedirectResponse
      */
-    public function indexAction(Request $request, $page = 1)
+    public function indexAction(Request $request, $page = 1): Response
     {
         $initEvent = $this->dispatchImportOnInit();
         $this->session->set('mautic.import.object', $initEvent->objectSingular);
@@ -127,9 +143,9 @@ class ImportController extends FormController
     /**
      * Cancel and unpublish the import during manual import.
      *
-     * @return array|JsonResponse|RedirectResponse|Response
+     * @return JsonResponse|RedirectResponse
      */
-    public function cancelAction(Request $request)
+    public function cancelAction(Request $request): Response
     {
         $initEvent   = $this->dispatchImportOnInit();
         $object      = $initEvent->objectSingular;
@@ -151,10 +167,8 @@ class ImportController extends FormController
 
     /**
      * Schedules manual import to background queue.
-     *
-     * @return array|JsonResponse|RedirectResponse|Response
      */
-    public function queueAction(Request $request)
+    public function queueAction(Request $request): Response
     {
         $initEvent   = $this->dispatchImportOnInit();
         $object      = $initEvent->objectSingular;
@@ -175,10 +189,8 @@ class ImportController extends FormController
     /**
      * @param int  $objectId
      * @param bool $ignorePost
-     *
-     * @return JsonResponse|Response
      */
-    public function newAction(Request $request, $objectId = 0, $ignorePost = false)
+    public function newAction(Request $request, $objectId = 0, $ignorePost = false): Response
     {
         $dispatcher = $this->dispatcher;
 
@@ -417,23 +429,17 @@ class ImportController extends FormController
                         ->setDefault('owner', $validateEvent->getOwnerId())
                         ->setDefault('list', $validateEvent->getList())
                         ->setDefault('tags', $validateEvent->getTags())
-                        ->setDefault('skip_if_exists', $matchedFields['skip_if_exists'] ?? false)
+                        ->setDefault('skip_if_exists', $validateEvent->getSkipIfExists())
                         ->setHeaders($this->session->get('mautic.'.$object.'.import.headers'))
                         ->setParserConfig($this->session->get('mautic.'.$object.'.import.config'));
-
-                    unset($matchedFields['skip_if_exists']);
 
                     // In case the user chose to import in browser
                     if ($this->importInBrowser($form, $object)) {
                         $import->setStatus($import::MANUAL);
-
                         $this->session->set('mautic.'.$object.'.import.step', self::STEP_PROGRESS_BAR);
                     }
-
                     $this->importModel->saveEntity($import);
-
                     $this->session->set('mautic.'.$object.'.import.id', $import->getId());
-
                     // In case the user decided to queue the import
                     if ($this->importInCli($form, $object)) {
                         $this->addFlashMessage('mautic.lead.batch.import.created');
@@ -561,10 +567,8 @@ class ImportController extends FormController
 
     /**
      * Generates import directory path.
-     *
-     * @return string
      */
-    protected function getImportDirName()
+    protected function getImportDirName(): string
     {
         return $this->importModel->getImportDir();
     }
@@ -674,11 +678,6 @@ class ImportController extends FormController
         return 'lead.import';
     }
 
-    /***
-     * @param null $objectId
-     *
-     * @return string
-     */
     protected function getSessionBase($objectId = null): string
     {
         $initEvent = $this->dispatchImportOnInit();

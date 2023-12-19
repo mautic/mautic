@@ -8,6 +8,7 @@ use Symfony\Component\Validator\Constraint;
 class UniqueUserAlias extends Constraint
 {
     public $message = 'This alias is already in use.';
+
     public $field   = '';
 
     public function validatedBy()

@@ -31,13 +31,10 @@ class FormSubscriber implements EventSubscriberInterface
         private TranslatorInterface $translator,
         private RouterInterface $router
     ) {
-        $this->mailer               = $mailer->getMailer();
+        $this->mailer = $mailer->getMailer();
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             FormEvents::FORM_POST_SAVE           => ['onFormPostSave', 0],
@@ -186,7 +183,7 @@ class FormSubscriber implements EventSubscriberInterface
         }
     }
 
-    public function onFormSubmitActionRepost(Events\SubmissionEvent $event)
+    public function onFormSubmitActionRepost(Events\SubmissionEvent $event): void
     {
         if (!$event->checkContext('form.repost')) {
             return;
@@ -333,7 +330,6 @@ class FormSubscriber implements EventSubscriberInterface
                 $formViolations = $body['violations'];
 
                 // Ensure the violations match up to Mautic's
-                $violations = [];
                 foreach ($formViolations as $field => $violation) {
                     if (isset($matchedFields[$field])) {
                         $violations[$matchedFields[$field]] = $violation;

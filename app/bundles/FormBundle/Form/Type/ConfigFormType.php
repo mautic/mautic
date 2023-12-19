@@ -63,9 +63,6 @@ class ConfigFormType extends AbstractType
         );
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getBlockPrefix()
     {
         return 'formconfig';

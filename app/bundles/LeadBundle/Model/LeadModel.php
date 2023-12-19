@@ -101,20 +101,14 @@ class LeadModel extends FormModel
      */
     protected $availableLeadFields = [];
 
-    /**
-     * @var bool
-     */
-    private $repoSetup = false;
+    private bool $repoSetup = false;
 
     /**
      * @var array
      */
     private $flattenedFields = [];
 
-    /**
-     * @var array
-     */
-    private $fieldsByGroup = [];
+    private array $fieldsByGroup = [];
 
     public function __construct(
         protected RequestStack $requestStack,
@@ -273,25 +267,17 @@ class LeadModel extends FormModel
         return $this->em->getRepository(GroupContactScore::class);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getPermissionBase(): string
     {
         return 'lead:leads';
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getNameGetter(): string
     {
         return 'getPrimaryIdentifier';
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @param Lead        $entity
      * @param string|null $action
      * @param array       $options
@@ -300,7 +286,7 @@ class LeadModel extends FormModel
      *
      * @throws \Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException
      */
-    public function createForm($entity, FormFactoryInterface $formFactory, $action = null, $options = [])
+    public function createForm($entity, FormFactoryInterface $formFactory, $action = null, $options = []): \Symfony\Component\Form\FormInterface
     {
         if (!$entity instanceof Lead) {
             throw new MethodNotAllowedHttpException(['Lead'], 'Entity must be of class Lead()');
@@ -314,10 +300,8 @@ class LeadModel extends FormModel
 
     /**
      * Get a specific entity or generate a new one if id is empty.
-     *
-     * @return Lead|null
      */
-    public function getEntity($id = null)
+    public function getEntity($id = null): ?Lead
     {
         if (null === $id) {
             return new Lead();
@@ -338,8 +322,6 @@ class LeadModel extends FormModel
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @throws \Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException
      */
     protected function dispatchEvent($action, &$entity, $isNew = false, Event $event = null): ?Event
@@ -379,8 +361,6 @@ class LeadModel extends FormModel
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @param Lead $entity
      * @param bool $unlock
      */
@@ -478,11 +458,9 @@ class LeadModel extends FormModel
      * @param bool|true  $fetchSocialProfiles
      * @param bool|false $bindWithForm        Send $data through the Lead form and only use valid data (should be used with request data)
      *
-     * @return array
-     *
      * @throws ImportFailedException
      */
-    public function setFieldValues(Lead $lead, array $data, $overwriteWithBlank = false, $fetchSocialProfiles = true, $bindWithForm = false)
+    public function setFieldValues(Lead $lead, array $data, $overwriteWithBlank = false, $fetchSocialProfiles = true, $bindWithForm = false): void
     {
         if ($fetchSocialProfiles) {
             // @todo - add a catch to NOT do social gleaning if a lead is created via a form, etc as we do not want the user to experience the wait
@@ -1115,11 +1093,7 @@ class LeadModel extends FormModel
     /**
      * @param array $fields
      * @param array $data
-     * @param null  $owner
-     * @param null  $list
-     * @param null  $tags
      * @param bool  $persist
-     * @param null  $importId
      * @param bool  $skipIfExists
      *
      * @throws \Exception
@@ -1149,7 +1123,7 @@ class LeadModel extends FormModel
             $lead = $this->getEntity($fieldData['id']);
         }
 
-        $lead   = $lead ?? $this->checkForDuplicateContact($fieldData);
+        $lead ??= $this->checkForDuplicateContact($fieldData);
         $merged = (bool) $lead->getId();
 
         if (!empty($fields['dateAdded']) && !empty($data[$fields['dateAdded']])) {
@@ -1674,10 +1648,9 @@ class LeadModel extends FormModel
 
         // Remove companies that are not in the array of given companies
         $removeCompanies = $currentCompanies->reject(
-            function (array $company) use ($requestedCompanies) {
+            fn (array $company) =>
                 // Reject if the found company is still in the list of companies given
-                return $requestedCompanies->contains($company['company_id']);
-            }
+                $requestedCompanies->contains($company['company_id'])
         );
         if ($removeCompanies->count()) {
             $this->companyModel->removeLeadFromCompany($removeCompanies->keys()->toArray(), $lead);
@@ -1686,8 +1659,10 @@ class LeadModel extends FormModel
 
     /**
      * Get array of available lead tags.
+     *
+     * @return mixed[]
      */
-    public function getTagList()
+    public function getTagList(): array
     {
         return $this->getTagRepository()->getSimpleList(null, [], 'tag', 'id');
     }
@@ -1701,10 +1676,8 @@ class LeadModel extends FormModel
      * @param string    $dateFormat
      * @param array     $filter
      * @param bool      $canViewOthers
-     *
-     * @return array
      */
-    public function getLeadsLineChartData($unit, $dateFrom, $dateTo, $dateFormat = null, $filter = [], $canViewOthers = true)
+    public function getLeadsLineChartData($unit, $dateFrom, $dateTo, $dateFormat = null, $filter = [], $canViewOthers = true): array
     {
         $flag        = null;
         $topLists    = null;
@@ -1784,10 +1757,8 @@ class LeadModel extends FormModel
      * @param string $dateTo
      * @param array  $filters
      * @param bool   $canViewOthers
-     *
-     * @return array
      */
-    public function getAnonymousVsIdentifiedPieChartData($dateFrom, $dateTo, $filters = [], $canViewOthers = true)
+    public function getAnonymousVsIdentifiedPieChartData($dateFrom, $dateTo, $filters = [], $canViewOthers = true): array
     {
         $chart = new PieChart();
         $query = new ChartQuery($this->em->getConnection(), $dateFrom, $dateTo);
@@ -1990,10 +1961,8 @@ class LeadModel extends FormModel
      * Get engagement counts by time unit.
      *
      * @param string $unit
-     *
-     * @return array
      */
-    public function getEngagementCount(Lead $lead, \DateTime $dateFrom = null, \DateTime $dateTo = null, $unit = 'm', ChartQuery $chartQuery = null)
+    public function getEngagementCount(Lead $lead, \DateTime $dateFrom = null, \DateTime $dateTo = null, $unit = 'm', ChartQuery $chartQuery = null): array
     {
         $event = new LeadTimelineEvent($lead);
         $event->setCountOnly($dateFrom, $dateTo, $unit, $chartQuery);
@@ -2060,10 +2029,7 @@ class LeadModel extends FormModel
         return $channels;
     }
 
-    /**
-     * @return array
-     */
-    public function getPreferenceChannels()
+    public function getPreferenceChannels(): array
     {
         return $this->channelListHelper->getFeatureChannels(self::CHANNEL_FEATURE, true);
     }

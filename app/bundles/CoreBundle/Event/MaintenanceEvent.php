@@ -25,8 +25,6 @@ class MaintenanceEvent extends Event
     protected $debug = [];
 
     /**
-     * MaintenanceEvent constructor.
-     *
      * @param int  $daysOld
      * @param bool $dryRun
      */

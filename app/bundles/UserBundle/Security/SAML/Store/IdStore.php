@@ -9,8 +9,10 @@ use Mautic\UserBundle\Entity\IdEntry;
 
 class IdStore implements IdStoreInterface
 {
-    public function __construct(private ObjectManager $manager, private TimeProviderInterface $timeProvider)
-    {
+    public function __construct(
+        private ObjectManager $manager,
+        private TimeProviderInterface $timeProvider
+    ) {
     }
 
     /**

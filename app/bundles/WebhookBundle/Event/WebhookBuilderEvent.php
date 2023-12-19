@@ -8,13 +8,11 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class WebhookBuilderEvent extends Event
 {
-    /**
-     * @var array
-     */
-    private $events = [];
+    private array $events = [];
 
-    public function __construct(private TranslatorInterface $translator)
-    {
+    public function __construct(
+        private TranslatorInterface $translator
+    ) {
     }
 
     /**
@@ -25,7 +23,7 @@ class WebhookBuilderEvent extends Event
      *                      'label'       => (required) what to display in the list
      *                      'description' => (optional) short description of event
      */
-    public function addEvent($key, array $event)
+    public function addEvent($key, array $event): void
     {
         if (array_key_exists($key, $this->events)) {
             throw new InvalidArgumentException("The key, '$key' is already used by another webhook event. Please use a different key.");
@@ -47,10 +45,8 @@ class WebhookBuilderEvent extends Event
         static $sorted = false;
 
         if (empty($sorted)) {
-            uasort($this->events, function ($a, $b): int {
-                return strnatcasecmp(
-                    $a['label'], $b['label']);
-            });
+            uasort($this->events, fn ($a, $b): int => strnatcasecmp(
+                $a['label'], $b['label']));
             $sorted = true;
         }
 

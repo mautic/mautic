@@ -21,14 +21,23 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 class ReportSubscriber implements EventSubscriberInterface
 {
     public const CONTEXT_EMAILS       = 'emails';
+
     public const CONTEXT_EMAIL_STATS  = 'email.stats';
+
     public const EMAILS_PREFIX        = 'e';
+
     public const EMAIL_STATS_PREFIX   = 'es';
+
     public const EMAIL_VARIANT_PREFIX = 'vp';
+
     public const DNC_PREFIX           = 'dnc';
+
     public const CLICK_PREFIX         = 'cut';
+
     public const TRACKABLE_PREFIX     = 'tr';
+
     public const REDIRECT_PREFIX      = 'pr';
+
     public const CLICK_THROUGH_PREFIX = 'ct';
 
     public const DNC_COLUMNS = [
@@ -141,14 +150,16 @@ class ReportSubscriber implements EventSubscriberInterface
         ],
     ];
 
-    public function __construct(private Connection $db, private CompanyReportData $companyReportData, private StatRepository $statRepository, private GeneratedColumnsProviderInterface $generatedColumnsProvider, private FieldsBuilder $fieldsBuilder)
-    {
+    public function __construct(
+        private Connection $db,
+        private CompanyReportData $companyReportData,
+        private StatRepository $statRepository,
+        private GeneratedColumnsProviderInterface $generatedColumnsProvider,
+        private FieldsBuilder $fieldsBuilder
+    ) {
     }
 
-    /**
-     * @return array
-     */
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             ReportEvents::REPORT_ON_BUILD          => ['onReportBuilder', 0],

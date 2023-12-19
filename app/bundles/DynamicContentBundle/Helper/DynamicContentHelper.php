@@ -18,8 +18,12 @@ class DynamicContentHelper
 {
     use MatchFilterForLeadTrait;
 
-    public function __construct(protected DynamicContentModel $dynamicContentModel, protected RealTimeExecutioner $realTimeExecutioner, protected EventDispatcherInterface $dispatcher, protected LeadModel $leadModel)
-    {
+    public function __construct(
+        protected DynamicContentModel $dynamicContentModel,
+        protected RealTimeExecutioner $realTimeExecutioner,
+        protected EventDispatcherInterface $dispatcher,
+        protected LeadModel $leadModel
+    ) {
     }
 
     /**
@@ -202,18 +206,14 @@ class DynamicContentHelper
 
     /**
      * @param Lead $lead
-     *
-     * @return array
      */
-    public function convertLeadToArray($lead)
+    public function convertLeadToArray($lead): array
     {
         return array_merge(
             $lead->getProfileFields(),
             [
                 'tags' => array_map(
-                    function (Tag $v) {
-                        return $v->getId();
-                    },
+                    fn (Tag $v) => $v->getId(),
                     $lead->getTags()->toArray()
                 ),
             ]

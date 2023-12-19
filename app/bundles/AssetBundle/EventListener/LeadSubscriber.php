@@ -14,14 +14,15 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class LeadSubscriber implements EventSubscriberInterface
 {
-    public function __construct(private AssetModel $assetModel, private TranslatorInterface $translator, private RouterInterface $router, private DownloadRepository $downloadRepository)
-    {
+    public function __construct(
+        private AssetModel $assetModel,
+        private TranslatorInterface $translator,
+        private RouterInterface $router,
+        private DownloadRepository $downloadRepository
+    ) {
     }
 
-    /**
-     * @return array
-     */
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             LeadEvents::TIMELINE_ON_GENERATE => ['onTimelineGenerate', 0],

@@ -26,8 +26,13 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class LeadSubscriber implements EventSubscriberInterface
 {
-    public function __construct(private FieldChangeRepository $fieldChangeRepo, private ObjectMappingRepository $objectMappingRepository, private VariableExpresserHelperInterface $variableExpressor, private SyncIntegrationsHelper $syncIntegrationsHelper, private EventDispatcherInterface $dispatcher)
-    {
+    public function __construct(
+        private FieldChangeRepository $fieldChangeRepo,
+        private ObjectMappingRepository $objectMappingRepository,
+        private VariableExpresserHelperInterface $variableExpressor,
+        private SyncIntegrationsHelper $syncIntegrationsHelper,
+        private EventDispatcherInterface $dispatcher
+    ) {
     }
 
     public static function getSubscribedEvents(): array

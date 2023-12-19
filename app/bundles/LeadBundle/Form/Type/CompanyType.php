@@ -21,13 +21,13 @@ class CompanyType extends AbstractType
 {
     use EntityFieldsBuildFormTrait;
 
-    public function __construct(private EntityManager $em, protected RouterInterface $router, protected TranslatorInterface $translator)
-    {
+    public function __construct(
+        private EntityManager $em,
+        protected RouterInterface $router,
+        protected TranslatorInterface $translator
+    ) {
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $cleaningRules                 = $this->getFormFields($builder, $options, 'company');
@@ -117,9 +117,6 @@ class CompanyType extends AbstractType
         $builder->addEventSubscriber(new CleanFormSubscriber($cleaningRules));
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults(

@@ -8,8 +8,6 @@ use Symfony\Component\HttpFoundation\Request;
 
 /**
  * Provides helper methods for determine the requested language from contact's profile and/or request.
- *
- * Class TranslationModelTrait
  */
 trait TranslationModelTrait
 {

@@ -122,11 +122,7 @@ trait LeadDetailsTrait
 
     private function cmp($a, $b): int
     {
-        if ($a['timestamp'] === $b['timestamp']) {
-            return 0;
-        }
-
-        return ($a['timestamp'] < $b['timestamp']) ? +1 : -1;
+        return $b['timestamp'] <=> $a['timestamp'];
     }
 
     /**
@@ -160,9 +156,9 @@ trait LeadDetailsTrait
     }
 
     /**
-     * @return mixed
+     * @return mixed[]
      */
-    protected function getEngagementData(Lead $lead, \DateTime $fromDate = null, \DateTime $toDate = null)
+    protected function getEngagementData(Lead $lead, \DateTime $fromDate = null, \DateTime $toDate = null): array
     {
         $translator = $this->translator;
 
@@ -189,10 +185,9 @@ trait LeadDetailsTrait
     }
 
     /**
-     * @param int $page
-     * @param int $limit
+     * @return mixed[]
      */
-    protected function getAuditlogs(Lead $lead, array $filters = null, array $orderBy = null, $page = 1, $limit = 25): array
+    protected function getAuditlogs(Lead $lead, array $filters = null, array $orderBy = null, int $page = 1, int $limit = 25): array
     {
         $session = $this->requestStack->getCurrentRequest()->getSession();
 
@@ -227,15 +222,13 @@ trait LeadDetailsTrait
         $logCount = $repo->getAuditLogsCount($lead, $filters);
         $logs     = $repo->getAuditLogs($lead, $filters, $orderBy, $page, $limit);
 
-        $logEvents = array_map(function ($l): array {
-            return [
-                'eventType'       => $l['action'],
-                'eventLabel'      => $l['userName'],
-                'timestamp'       => $l['dateAdded'],
-                'details'         => $l['details'],
-                'contentTemplate' => '@MauticLead/Auditlog/details.html.twig',
-            ];
-        }, $logs);
+        $logEvents = array_map(fn ($l): array => [
+            'eventType'       => $l['action'],
+            'eventLabel'      => $l['userName'],
+            'timestamp'       => $l['dateAdded'],
+            'details'         => $l['details'],
+            'contentTemplate' => '@MauticLead/Auditlog/details.html.twig',
+        ], $logs);
 
         $types = [
             'delete'     => $this->translator->trans('mautic.lead.event.delete'),
@@ -261,10 +254,8 @@ trait LeadDetailsTrait
     /**
      * @param int $page
      * @param int $limit
-     *
-     * @return array
      */
-    protected function getEngagements(Lead $lead, array $filters = null, array $orderBy = null, $page = 1, $limit = 25)
+    protected function getEngagements(Lead $lead, array $filters = null, array $orderBy = null, $page = 1, $limit = 25): array
     {
         $session = $this->requestStack->getCurrentRequest()->getSession();
 
@@ -346,12 +337,8 @@ trait LeadDetailsTrait
             }
             $engagementsData = $this->getStatsCount($lead);
 
-            $engagements = array_map(function ($a, $b) {
-                return $a + $b;
-            }, $engagementsData['engagements']['byUnit'], $engagements);
-            $points = array_map(function ($points_first_user, $points_second_user) {
-                return $points_first_user + $points_second_user;
-            }, $engagementsData['points'], $points);
+            $engagements = array_map(fn ($a, $b) => $a + $b, $engagementsData['engagements']['byUnit'], $engagements);
+            $points      = array_map(fn ($points_first_user, $points_second_user) => $points_first_user + $points_second_user, $engagementsData['points'], $points);
         }
 
         return [
@@ -363,9 +350,9 @@ trait LeadDetailsTrait
     /**
      * Get company graph for points and engagements.
      *
-     * @return mixed
+     * @return array<string, mixed>
      */
-    protected function getCompanyEngagementsForGraph($contacts)
+    protected function getCompanyEngagementsForGraph($contacts): array
     {
         $graphData  = $this->getCompanyEngagementData($contacts);
         $translator = $this->translator;
@@ -384,10 +371,7 @@ trait LeadDetailsTrait
         return $lineChart->render();
     }
 
-    /**
-     * @return array
-     */
-    protected function getScheduledCampaignEvents(Lead $lead)
+    protected function getScheduledCampaignEvents(Lead $lead): array
     {
         // Upcoming events from Campaign Bundle
         /** @var \Mautic\CampaignBundle\Entity\LeadEventLogRepository $leadEventLogRepository */

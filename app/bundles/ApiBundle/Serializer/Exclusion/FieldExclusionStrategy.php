@@ -18,22 +18,19 @@ class FieldExclusionStrategy implements ExclusionStrategyInterface
      * @param int         $level
      * @param string|null $path
      */
-    public function __construct(private array $fields, $level = 3, private $path = null)
-    {
+    public function __construct(
+        private array $fields,
+        $level = 3,
+        private $path = null
+    ) {
         $this->level  = (int) $level;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function shouldSkipClass(ClassMetadata $metadata, Context $navigatorContext): bool
     {
         return false;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function shouldSkipProperty(PropertyMetadata $property, Context $navigatorContext): bool
     {
         if ($this->path) {

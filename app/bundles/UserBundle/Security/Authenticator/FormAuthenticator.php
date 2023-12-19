@@ -33,6 +33,7 @@ class FormAuthenticator extends AbstractFormLoginAuthenticator implements Passwo
     use TargetPathTrait;
 
     public const LOGIN_ROUTE       = 'login';
+
     public const LOGIN_CHECK_ROUTE = 'mautic_user_logincheck';
 
     /**
@@ -40,10 +41,16 @@ class FormAuthenticator extends AbstractFormLoginAuthenticator implements Passwo
      */
     private ?string $authenticatingService = null;
 
-    private ?Response $authEventResponse;
+    private ?Response $authEventResponse = null;
 
-    public function __construct(private IntegrationHelper $integrationHelper, private UserPasswordHasher $hasher, private EventDispatcherInterface $dispatcher, private ?RequestStack $requestStack, private CsrfTokenManagerInterface $csrfTokenManager, private UrlGeneratorInterface $urlGenerator)
-    {
+    public function __construct(
+        private IntegrationHelper $integrationHelper,
+        private UserPasswordHasher $hasher,
+        private EventDispatcherInterface $dispatcher,
+        private ?RequestStack $requestStack,
+        private CsrfTokenManagerInterface $csrfTokenManager,
+        private UrlGeneratorInterface $urlGenerator
+    ) {
     }
 
     public function supports(Request $request): bool

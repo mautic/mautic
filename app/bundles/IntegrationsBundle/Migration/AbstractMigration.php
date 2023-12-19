@@ -12,23 +12,20 @@ abstract class AbstractMigration implements MigrationInterface
     /**
      * @var string[]
      */
-    private $queries = [];
+    private array $queries = [];
 
-    public function __construct(protected EntityManager $entityManager, protected string $tablePrefix)
-    {
+    public function __construct(
+        protected EntityManager $entityManager,
+        protected string $tablePrefix
+    ) {
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function shouldExecute(): bool
     {
         return $this->isApplicable($this->entityManager->getConnection()->getSchemaManager()->createSchema());
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @throws \Doctrine\DBAL\Exception
      */
     public function execute(): void
@@ -97,9 +94,7 @@ abstract class AbstractMigration implements MigrationInterface
         $hash        = implode(
             '',
             array_map(
-                function ($column): string {
-                    return dechex(crc32($column));
-                },
+                fn ($column): string => dechex(crc32($column)),
                 $columnNames
             )
         );

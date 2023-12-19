@@ -16,8 +16,10 @@ final class UpdateSchemaStep implements StepInterface
 {
     private ?object $kernel;
 
-    public function __construct(private TranslatorInterface $translator, ContainerInterface $container)
-    {
+    public function __construct(
+        private TranslatorInterface $translator,
+        ContainerInterface $container
+    ) {
         $this->kernel     = $container->get('kernel');
     }
 

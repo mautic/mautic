@@ -15,10 +15,7 @@ use Symfony\Component\HttpFoundation\Response;
 
 class DynamicContentController extends FormController
 {
-    /**
-     * @return array
-     */
-    protected function getPermissions()
+    protected function getPermissions(): array
     {
         return (array) $this->security->isGranted(
             [
@@ -36,9 +33,6 @@ class DynamicContentController extends FormController
         );
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function indexAction(Request $request, $page = 1)
     {
         $model = $this->getModel('dynamicContent');
@@ -114,9 +108,6 @@ class DynamicContentController extends FormController
         );
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function newAction(Request $request, $entity = null)
     {
         if (!$this->security->isGranted('dynamiccontent:dynamiccontents:create')) {

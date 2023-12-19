@@ -11,25 +11,19 @@ use Symfony\Contracts\EventDispatcher\Event;
 
 class InternalObjectUpdateEvent extends Event
 {
-    private \Mautic\IntegrationsBundle\Sync\SyncDataExchange\Internal\Object\ObjectInterface $object;
-
-    private array $identifiedObjectIds;
-
-    /**
-     * @var ObjectChangeDAO[]
-     */
-    private array $updateObjects;
-
     /**
      * @var UpdatedObjectMappingDAO[]
      */
-    private $updatedObjectMappings = [];
+    private array $updatedObjectMappings = [];
 
-    public function __construct(ObjectInterface $object, array $identifiedObjectIds, array $updateObjects)
-    {
-        $this->object              = $object;
-        $this->identifiedObjectIds = $identifiedObjectIds;
-        $this->updateObjects       = $updateObjects;
+    public function __construct(
+        private ObjectInterface $object,
+        private array $identifiedObjectIds,
+        /**
+         * @var ObjectChangeDAO[]
+         */
+        private array $updateObjects
+    ) {
     }
 
     public function getObject(): ObjectInterface
@@ -42,6 +36,9 @@ class InternalObjectUpdateEvent extends Event
         return $this->identifiedObjectIds;
     }
 
+    /**
+     * @return ObjectChangeDAO[]
+     */
     public function getUpdateObjects(): array
     {
         return $this->updateObjects;

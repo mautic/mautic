@@ -8,14 +8,22 @@ use Symfony\Contracts\EventDispatcher\Event;
 
 class ListChangeEvent extends Event
 {
-    private $lead;
-    private $leads;
+    private ?Lead $lead;
 
     /**
-     * @param bool $added
+     * @var Lead[]|null
      */
-    public function __construct($leads, private LeadList $list, private $added = true, private ?\DateTime $date = null)
-    {
+    private ?array $leads = null;
+
+    /**
+     * @param Lead[]|Lead $leads
+     */
+    public function __construct(
+        Lead|array $leads,
+        private LeadList $list,
+        private bool $added = true,
+        private ?\DateTime $date = null
+    ) {
         if (is_array($leads)) {
             $this->leads = $leads;
         } else {
@@ -51,10 +59,7 @@ class ListChangeEvent extends Event
         return $this->leads;
     }
 
-    /**
-     * @return bool
-     */
-    public function wasAdded()
+    public function wasAdded(): bool
     {
         return $this->added;
     }

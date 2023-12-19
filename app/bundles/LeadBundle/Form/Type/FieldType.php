@@ -30,8 +30,11 @@ use Symfony\Component\Validator\Context\ExecutionContextInterface;
 
 class FieldType extends AbstractType
 {
-    public function __construct(private EntityManagerInterface $em, private Translator $translator, private IdentifierFields $identifierFields)
-    {
+    public function __construct(
+        private EntityManagerInterface $em,
+        private Translator $translator,
+        private IdentifierFields $identifierFields
+    ) {
     }
 
     public function buildForm(FormBuilderInterface $builder, array $options): void
@@ -218,7 +221,7 @@ class FieldType extends AbstractType
             ]
         );
 
-        $formModifier = function (FormEvent $event) use ($listChoices, $type, $options, $disableDefaultValue) {
+        $formModifier = function (FormEvent $event) use ($listChoices, $type, $options, $disableDefaultValue): array {
             $cleaningRules = [];
             $form          = $event->getForm();
             $data          = $event->getData();

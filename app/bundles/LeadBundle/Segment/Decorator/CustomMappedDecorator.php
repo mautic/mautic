@@ -41,10 +41,7 @@ class CustomMappedDecorator extends BaseDecorator implements ContactDecoratorFor
         }
     }
 
-    /**
-     * @return string
-     */
-    public function getQueryType(ContactSegmentFilterCrate $contactSegmentFilterCrate)
+    public function getQueryType(ContactSegmentFilterCrate $contactSegmentFilterCrate): string
     {
         $originalField = $contactSegmentFilterCrate->getField();
 

@@ -19,8 +19,10 @@ class ImportCommand extends Command
 {
     public const COMMAND_NAME = 'mautic:import';
 
-    public function __construct(private TranslatorInterface $translator, private ImportModel $importModel)
-    {
+    public function __construct(
+        private TranslatorInterface $translator,
+        private ImportModel $importModel
+    ) {
         parent::__construct();
     }
 
@@ -107,5 +109,6 @@ EOT
 
         return \Symfony\Component\Console\Command\Command::SUCCESS;
     }
+
     protected static $defaultDescription = 'Imports data to Mautic';
 }

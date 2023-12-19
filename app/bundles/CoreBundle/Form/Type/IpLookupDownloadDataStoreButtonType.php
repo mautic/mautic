@@ -14,13 +14,12 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class IpLookupDownloadDataStoreButtonType extends AbstractType
 {
-    public function __construct(private DateHelper $dateHelper, private TranslatorInterface $translator)
-    {
+    public function __construct(
+        private DateHelper $dateHelper,
+        private TranslatorInterface $translator
+    ) {
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $localDataExists = file_exists($options['ip_lookup_service']->getLocalDataStoreFilepath());
@@ -38,17 +37,11 @@ class IpLookupDownloadDataStoreButtonType extends AbstractType
         );
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults(['ip_lookup_service' => null]);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function buildView(FormView $view, FormInterface $form, array $options): void
     {
         if (null !== $options['ip_lookup_service'] && $options['ip_lookup_service'] instanceof AbstractLocalDataLookup) {
@@ -64,9 +57,6 @@ class IpLookupDownloadDataStoreButtonType extends AbstractType
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getBlockPrefix()
     {
         return 'iplookup_download_data_store_button';

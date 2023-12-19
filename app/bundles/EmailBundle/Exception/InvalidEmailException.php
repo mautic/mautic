@@ -6,8 +6,12 @@ use Mautic\CoreBundle\Exception\InvalidValueException;
 
 class InvalidEmailException extends InvalidValueException
 {
-    public function __construct(protected string $emailAddress, string $message = '', int $code = 0, \Throwable|null $previous = null)
-    {
+    public function __construct(
+        protected string $emailAddress,
+        string $message = '',
+        int $code = 0,
+        \Throwable|null $previous = null
+    ) {
         parent::__construct($message, $code, $previous);
     }
 

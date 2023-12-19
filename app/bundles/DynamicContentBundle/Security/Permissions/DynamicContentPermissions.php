@@ -7,9 +7,6 @@ use Symfony\Component\Form\FormBuilderInterface;
 
 class DynamicContentPermissions extends AbstractPermissions
 {
-    /**
-     * {@inheritdoc}
-     */
     public function __construct($params)
     {
         parent::__construct($params);
@@ -23,9 +20,6 @@ class DynamicContentPermissions extends AbstractPermissions
         return 'dynamiccontent';
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function buildForm(FormBuilderInterface &$builder, array $options, array $data): void
     {
         $this->addStandardFormFields('dynamiccontent', 'categories', $builder, $data);

@@ -22,8 +22,13 @@ class LeadBuildSearchEvent extends CommonEvent
      * @param string $command
      * @param string $alias
      */
-    public function __construct(protected $string, protected $command, protected $alias, protected bool $negate, protected QueryBuilder $queryBuilder)
-    {
+    public function __construct(
+        protected $string,
+        protected $command,
+        protected $alias,
+        protected bool $negate,
+        protected QueryBuilder $queryBuilder
+    ) {
         $this->subQuery         = '';
         $this->isSearchDone     = false;
         $this->strict           = false;
@@ -55,10 +60,7 @@ class LeadBuildSearchEvent extends CommonEvent
         return $this->alias;
     }
 
-    /**
-     * @return bool
-     */
-    public function isNegation()
+    public function isNegation(): bool
     {
         return $this->negate;
     }

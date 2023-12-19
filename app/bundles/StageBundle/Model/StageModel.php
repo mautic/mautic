@@ -43,8 +43,6 @@ class StageModel extends CommonFormModel
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @return \Mautic\StageBundle\Entity\StageRepository
      */
     public function getRepository()
@@ -52,20 +50,15 @@ class StageModel extends CommonFormModel
         return $this->em->getRepository(\Mautic\StageBundle\Entity\Stage::class);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getPermissionBase(): string
     {
         return 'stage:stages';
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @throws MethodNotAllowedHttpException
      */
-    public function createForm($entity, FormFactoryInterface $formFactory, $action = null, $options = [])
+    public function createForm($entity, FormFactoryInterface $formFactory, $action = null, $options = []): \Symfony\Component\Form\FormInterface
     {
         if (!$entity instanceof Stage) {
             throw new MethodNotAllowedHttpException(['Stage']);
@@ -77,12 +70,7 @@ class StageModel extends CommonFormModel
         return $formFactory->create(StageType::class, $entity, $options);
     }
 
-    /**
-     * {@inheritdoc}
-     *
-     * @return Stage|null
-     */
-    public function getEntity($id = null)
+    public function getEntity($id = null): ?Stage
     {
         if (null === $id) {
             return new Stage();
@@ -92,8 +80,6 @@ class StageModel extends CommonFormModel
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @throws MethodNotAllowedHttpException
      */
     protected function dispatchEvent($action, &$entity, $isNew = false, Event $event = null): ?Event
@@ -162,10 +148,8 @@ class StageModel extends CommonFormModel
      * @param string $dateFormat
      * @param array  $filter
      * @param bool   $canViewOthers
-     *
-     * @return array
      */
-    public function getStageLineChartData($unit, \DateTime $dateFrom, \DateTime $dateTo, $dateFormat = null, $filter = [], $canViewOthers = true)
+    public function getStageLineChartData($unit, \DateTime $dateFrom, \DateTime $dateTo, $dateFormat = null, $filter = [], $canViewOthers = true): array
     {
         $chart = new LineChart($unit, $dateFrom, $dateTo, $dateFormat);
         $query = new ChartQuery($this->em->getConnection(), $dateFrom, $dateTo);

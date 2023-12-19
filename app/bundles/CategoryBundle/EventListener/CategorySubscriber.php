@@ -12,14 +12,14 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class CategorySubscriber implements EventSubscriberInterface
 {
-    public function __construct(private BundleHelper $bundleHelper, private IpLookupHelper $ipLookupHelper, private AuditLogModel $auditLogModel)
-    {
+    public function __construct(
+        private BundleHelper $bundleHelper,
+        private IpLookupHelper $ipLookupHelper,
+        private AuditLogModel $auditLogModel
+    ) {
     }
 
-    /**
-     * @return array
-     */
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             CategoryEvents::CATEGORY_ON_BUNDLE_LIST_BUILD => ['onCategoryBundleListBuild', 0],

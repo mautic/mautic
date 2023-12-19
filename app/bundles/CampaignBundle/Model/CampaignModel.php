@@ -57,8 +57,6 @@ class CampaignModel extends CommonFormModel
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @return \Mautic\CampaignBundle\Entity\CampaignRepository
      */
     public function getRepository()
@@ -93,26 +91,19 @@ class CampaignModel extends CommonFormModel
         return $this->em->getRepository(\Mautic\CampaignBundle\Entity\LeadEventLog::class);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getPermissionBase(): string
     {
         return 'campaign:campaigns';
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @param object      $entity
      * @param string|null $action
      * @param array       $options
      *
-     * @return mixed
-     *
      * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
      */
-    public function createForm($entity, FormFactoryInterface $formFactory, $action = null, $options = [])
+    public function createForm($entity, FormFactoryInterface $formFactory, $action = null, $options = []): \Symfony\Component\Form\FormInterface
     {
         if (!$entity instanceof Campaign) {
             throw new MethodNotAllowedHttpException(['Campaign']);
@@ -127,10 +118,8 @@ class CampaignModel extends CommonFormModel
 
     /**
      * Get a specific entity or generate a new one if id is empty.
-     *
-     * @return Campaign|null
      */
-    public function getEntity($id = null)
+    public function getEntity($id = null): ?Campaign
     {
         if (null === $id) {
             return new Campaign();
@@ -151,8 +140,6 @@ class CampaignModel extends CommonFormModel
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @throws \Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException
      */
     protected function dispatchEvent($action, &$entity, $isNew = false, \Symfony\Contracts\EventDispatcher\Event $event = null): ?\Symfony\Contracts\EventDispatcher\Event
@@ -318,11 +305,8 @@ class CampaignModel extends CommonFormModel
             function ($a, $b): int {
                 $aOrder = $a->getOrder();
                 $bOrder = $b->getOrder();
-                if ($aOrder == $bOrder) {
-                    return 0;
-                }
 
-                return ($aOrder < $bOrder) ? -1 : 1;
+                return $aOrder <=> $bOrder;
             }
         );
 
@@ -336,7 +320,6 @@ class CampaignModel extends CommonFormModel
 
     /**
      * @param bool $persist
-     * @param null $events
      *
      * @return array
      */
@@ -547,11 +530,9 @@ class CampaignModel extends CommonFormModel
     /**
      * Gets a list of published campaigns.
      *
-     * @param bool $forList
-     *
      * @return array
      */
-    public function getPublishedCampaigns($forList = false)
+    public function getPublishedCampaigns(bool $forList = false)
     {
         static $campaigns = [];
 
@@ -588,8 +569,6 @@ class CampaignModel extends CommonFormModel
     /**
      * Get details of leads in a campaign.
      *
-     * @param null $leads
-     *
      * @return mixed
      */
     public function getLeadDetails($campaign, $leads = null)
@@ -619,10 +598,7 @@ class CampaignModel extends CommonFormModel
         return $this->em->getRepository(\Mautic\CampaignBundle\Entity\Lead::class)->getLeads($campaignId, $eventId);
     }
 
-    /**
-     * @return array
-     */
-    public function getCampaignListIds($id)
+    public function getCampaignListIds($id): array
     {
         return $this->getRepository()->getCampaignListIds((int) $id);
     }
@@ -634,10 +610,8 @@ class CampaignModel extends CommonFormModel
      * @param string $dateFormat
      * @param array  $filter
      * @param bool   $canViewOthers
-     *
-     * @return array
      */
-    public function getLeadsAddedLineChartData($unit, \DateTime $dateFrom, \DateTime $dateTo, $dateFormat = null, $filter = [], $canViewOthers = true)
+    public function getLeadsAddedLineChartData($unit, \DateTime $dateFrom, \DateTime $dateTo, $dateFormat = null, $filter = [], $canViewOthers = true): array
     {
         $chart = new LineChart($unit, $dateFrom, $dateTo, $dateFormat);
         $query = new ChartQuery($this->em->getConnection(), $dateFrom, $dateTo);
@@ -661,10 +635,8 @@ class CampaignModel extends CommonFormModel
      * @param string|null $unit       {@link php.net/manual/en/function.date.php#refsect1-function.date-parameters}
      * @param string      $dateFormat
      * @param array       $filter
-     *
-     * @return array
      */
-    public function getCampaignMetricsLineChartData($unit, \DateTime $dateFrom, \DateTime $dateTo, $dateFormat = null, $filter = [])
+    public function getCampaignMetricsLineChartData($unit, \DateTime $dateFrom, \DateTime $dateTo, $dateFormat = null, $filter = []): array
     {
         $events = [];
         $chart  = new LineChart($unit, $dateFrom, $dateTo, $dateFormat);
@@ -748,10 +720,8 @@ class CampaignModel extends CommonFormModel
     /**
      * @param int  $limit
      * @param bool $maxLeads
-     *
-     * @return int
      */
-    public function rebuildCampaignLeads(Campaign $campaign, $limit = 1000, $maxLeads = false, OutputInterface $output = null)
+    public function rebuildCampaignLeads(Campaign $campaign, $limit = 1000, $maxLeads = false, OutputInterface $output = null): int
     {
         $contactLimiter = new ContactLimiter($limit);
 

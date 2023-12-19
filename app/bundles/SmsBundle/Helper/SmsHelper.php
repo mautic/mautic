@@ -16,8 +16,15 @@ use Mautic\SmsBundle\Model\SmsModel;
 
 class SmsHelper
 {
-    public function __construct(protected EntityManager $em, protected LeadModel $leadModel, protected PhoneNumberHelper $phoneNumberHelper, protected SmsModel $smsModel, protected IntegrationHelper $integrationHelper, private DoNotContact $doNotContact, private CoreParametersHelper $coreParametersHelper)
-    {
+    public function __construct(
+        protected EntityManager $em,
+        protected LeadModel $leadModel,
+        protected PhoneNumberHelper $phoneNumberHelper,
+        protected SmsModel $smsModel,
+        protected IntegrationHelper $integrationHelper,
+        private DoNotContact $doNotContact,
+        private CoreParametersHelper $coreParametersHelper
+    ) {
     }
 
     public function unsubscribe($number)
