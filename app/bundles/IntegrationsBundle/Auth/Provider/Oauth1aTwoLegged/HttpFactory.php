@@ -25,7 +25,7 @@ class HttpFactory implements AuthProviderInterface
      *
      * @var Client[]
      */
-    private $initializedClients = [];
+    private array $initializedClients = [];
 
     public function getAuthType(): string
     {
@@ -34,7 +34,6 @@ class HttpFactory implements AuthProviderInterface
 
     /**
      * @param CredentialsInterface|AuthCredentialsInterface $credentials
-     * @param AuthConfigInterface                           $config
      *
      * @throws PluginNotConfiguredException
      */
@@ -54,10 +53,7 @@ class HttpFactory implements AuthProviderInterface
         return $this->initializedClients[$credentials->getConsumerKey()];
     }
 
-    /**
-     * @return Client
-     */
-    private function buildClient(CredentialsInterface $credentials)
+    private function buildClient(CredentialsInterface $credentials): Client
     {
         $stack = HandlerStack::create();
         $stack->push($this->createOauth1($credentials));
@@ -71,10 +67,7 @@ class HttpFactory implements AuthProviderInterface
         );
     }
 
-    /**
-     * @return Oauth1
-     */
-    private function createOauth1(CredentialsInterface $credentials)
+    private function createOauth1(CredentialsInterface $credentials): Oauth1
     {
         $config = [
             'consumer_key'    => $credentials->getConsumerKey(),
@@ -89,10 +82,7 @@ class HttpFactory implements AuthProviderInterface
         return new Oauth1($config);
     }
 
-    /**
-     * @return bool
-     */
-    private function credentialsAreConfigured(CredentialsInterface $credentials)
+    private function credentialsAreConfigured(CredentialsInterface $credentials): bool
     {
         return !empty($credentials->getAuthUrl()) && !empty($credentials->getConsumerKey()) && !empty($credentials->getConsumerSecret());
     }

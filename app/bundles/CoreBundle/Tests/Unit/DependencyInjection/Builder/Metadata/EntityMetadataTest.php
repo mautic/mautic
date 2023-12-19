@@ -8,10 +8,7 @@ use PHPUnit\Framework\TestCase;
 
 class EntityMetadataTest extends TestCase
 {
-    /**
-     * @var BundleMetadata
-     */
-    private $metadata;
+    private \Mautic\CoreBundle\DependencyInjection\Builder\BundleMetadata $metadata;
 
     protected function setUp(): void
     {
@@ -29,7 +26,7 @@ class EntityMetadataTest extends TestCase
         $this->metadata = new BundleMetadata($metadataArray);
     }
 
-    public function testOrmAndSerializerConfigsFound()
+    public function testOrmAndSerializerConfigsFound(): void
     {
         $entityMetadata = new EntityMetadata($this->metadata);
         $entityMetadata->build();

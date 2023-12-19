@@ -11,41 +11,19 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class OwnerSubscriber implements EventSubscriberInterface
 {
-    /**
-     * @var string
-     */
-    private $ownerFieldSprintf = '{ownerfield=%s}';
+    private string $ownerFieldSprintf = '{ownerfield=%s}';
 
-    /**
-     * @var TranslatorInterface
-     */
-    private $translator;
-
-    /**
-     * @var LeadModel
-     */
-    private $leadModel;
-
-    /**
-     * @var array
-     */
-    private $owners;
+    private ?array $owners = null;
 
     public const onwerColumns = ['email', 'firstname', 'lastname', 'position', 'signature'];
 
-    /**
-     * OwnerSubscriber constructor.
-     */
-    public function __construct(LeadModel $leadModel, TranslatorInterface $translator)
-    {
-        $this->translator = $translator;
-        $this->leadModel  = $leadModel;
+    public function __construct(
+        private LeadModel $leadModel,
+        private TranslatorInterface $translator
+    ) {
     }
 
-    /**
-     * @return array
-     */
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             EmailEvents::EMAIL_ON_BUILD   => ['onEmailBuild', 0],
@@ -54,19 +32,19 @@ class OwnerSubscriber implements EventSubscriberInterface
         ];
     }
 
-    public function onEmailBuild(EmailBuilderEvent $event)
+    public function onEmailBuild(EmailBuilderEvent $event): void
     {
         foreach (self::onwerColumns as $ownerAlias) {
             $event->addToken($this->buildToken($ownerAlias), $this->buildLabel($ownerAlias));
         }
     }
 
-    public function onEmailDisplay(EmailSendEvent $event)
+    public function onEmailDisplay(EmailSendEvent $event): void
     {
         $this->onEmailGenerate($event);
     }
 
-    public function onEmailGenerate(EmailSendEvent $event)
+    public function onEmailGenerate(EmailSendEvent $event): void
     {
         $event->addTokens($this->getGeneratedTokens($event));
     }
@@ -77,10 +55,8 @@ class OwnerSubscriber implements EventSubscriberInterface
      * * If contact[owner_id] === 0, then we need fake data
      * * If contact[owner_id] === null, then we should blank out tokens
      * * If contact[owner_id] > 0 AND User exists, then we should fill in tokens
-     *
-     * @return array
      */
-    private function getGeneratedTokens(EmailSendEvent $event)
+    private function getGeneratedTokens(EmailSendEvent $event): array
     {
         $contact = $event->getLead();
 
@@ -101,7 +77,7 @@ class OwnerSubscriber implements EventSubscriberInterface
         $combinedContent = $event->getCombinedContent();
         foreach (self::onwerColumns as $ownerColumn) {
             $token = $this->buildToken($ownerColumn);
-            if (false !== strpos($combinedContent, $token)) {
+            if (str_contains($combinedContent, $token)) {
                 $ownerColumnNormalized = str_replace(['firstname', 'lastname'], ['first_name', 'last_name'], $ownerColumn);
                 $tokens[$token]        = $owner[$ownerColumnNormalized] ?? null;
             }
@@ -112,10 +88,8 @@ class OwnerSubscriber implements EventSubscriberInterface
 
     /**
      * Used to replace all owner tokens with emptiness so not to email out tokens.
-     *
-     * @return array
      */
-    private function getEmptyTokens()
+    private function getEmptyTokens(): array
     {
         $tokens = [];
 
@@ -128,10 +102,8 @@ class OwnerSubscriber implements EventSubscriberInterface
 
     /**
      * Used to replace all owner tokens with emptiness so not to email out tokens.
-     *
-     * @return array
      */
-    private function getFakeTokens()
+    private function getFakeTokens(): array
     {
         $tokens = [];
 
@@ -146,10 +118,8 @@ class OwnerSubscriber implements EventSubscriberInterface
      * Creates a token using defined pattern.
      *
      * @param string $field
-     *
-     * @return string
      */
-    private function buildToken($field)
+    private function buildToken($field): string
     {
         return sprintf($this->ownerFieldSprintf, $field);
     }
@@ -158,10 +128,8 @@ class OwnerSubscriber implements EventSubscriberInterface
      * Creates translation ready label Owner Firstname etc.
      *
      * @param string $field
-     *
-     * @return string
      */
-    private function buildLabel($field)
+    private function buildLabel($field): string
     {
         return sprintf(
             '%s %s',

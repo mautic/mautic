@@ -8,7 +8,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class EmailOpenType extends AbstractType
 {
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $defaultOptions = [
             'label'      => 'mautic.email.open.limittoemails',
@@ -33,7 +33,7 @@ class EmailOpenType extends AbstractType
         $builder->add('emails', EmailListType::class, $defaultOptions);
     }
 
-    public function configureOptions(OptionsResolver $resolver)
+    public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefined(['list_options']);
     }

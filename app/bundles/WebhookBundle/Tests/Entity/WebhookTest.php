@@ -7,21 +7,21 @@ use PHPUnit\Framework\Assert;
 
 class WebhookTest extends \PHPUnit\Framework\TestCase
 {
-    public function testWasModifiedRecentlyWithNotModifiedWebhook()
+    public function testWasModifiedRecentlyWithNotModifiedWebhook(): void
     {
         $webhook = new Webhook();
         $this->assertNull($webhook->getDateModified());
         $this->assertFalse($webhook->wasModifiedRecently());
     }
 
-    public function testWasModifiedRecentlyWithWebhookModifiedAWhileBack()
+    public function testWasModifiedRecentlyWithWebhookModifiedAWhileBack(): void
     {
         $webhook = new Webhook();
         $webhook->setDateModified((new \DateTime())->modify('-20 days'));
         $this->assertFalse($webhook->wasModifiedRecently());
     }
 
-    public function testWasModifiedRecentlyWithWebhookModifiedRecently()
+    public function testWasModifiedRecentlyWithWebhookModifiedRecently(): void
     {
         $webhook = new Webhook();
         $webhook->setDateModified((new \DateTime())->modify('-2 hours'));

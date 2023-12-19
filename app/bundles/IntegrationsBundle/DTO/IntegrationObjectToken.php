@@ -13,11 +13,6 @@ class IntegrationObjectToken
     /**
      * @var string
      */
-    private $token;
-
-    /**
-     * @var string
-     */
     private $objectName;
 
     /**
@@ -25,10 +20,7 @@ class IntegrationObjectToken
      */
     private $integration;
 
-    /**
-     * @var string
-     */
-    private $defaultValue = '';
+    private string $defaultValue = '';
 
     /**
      * @var string
@@ -40,18 +32,12 @@ class IntegrationObjectToken
      */
     private $baseURL;
 
-    /**
-     * IntegrationObjectToken constructor.
-     */
-    public function __construct(string $token)
-    {
-        $this->token = $token;
+    public function __construct(
+        private string $token
+    ) {
     }
 
-    /**
-     * @return string
-     */
-    public function getToken()
+    public function getToken(): string
     {
         return $this->token;
     }
@@ -96,10 +82,7 @@ class IntegrationObjectToken
         $this->defaultValue = $defaultValue;
     }
 
-    /**
-     * @return string
-     */
-    public function getDefaultValue()
+    public function getDefaultValue(): string
     {
         return $this->defaultValue;
     }

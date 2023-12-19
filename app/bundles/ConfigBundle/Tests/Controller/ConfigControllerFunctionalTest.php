@@ -12,6 +12,7 @@ use Symfony\Component\HttpFoundation\Request;
 class ConfigControllerFunctionalTest extends MauticMysqlTestCase
 {
     private const SUBDOMAIN_URL = 'subdomain_url.com';
+
     /**
      * @var string
      */

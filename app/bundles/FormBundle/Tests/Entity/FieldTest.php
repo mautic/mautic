@@ -319,7 +319,7 @@ final class FieldTest extends \PHPUnit\Framework\TestCase
     /**
      * @return array<int, mixed>
      */
-    public function dataProvider(): iterable
+    public static function dataProvider(): iterable
     {
         yield ['string', [], false];
         yield ['string', ['multiple' => 0], false];

@@ -10,9 +10,6 @@ use Twig\TwigFunction;
 
 final class BarChartExtension extends AbstractExtension
 {
-    /**
-     * {@inheritdoc}
-     */
     public function getFunctions()
     {
         return [

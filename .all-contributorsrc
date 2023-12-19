@@ -1180,6 +1180,36 @@
         "bug",
         "code"
       ]
+    },
+    {
+      "login": "notz",
+      "name": "Gernot Pansy",
+      "avatar_url": "https://avatars.githubusercontent.com/u/697251?v=4",
+      "profile": "https://github.com/notz",
+      "contributions": [
+        "bug",
+        "code"
+      ]
+    },
+    {
+      "login": "andersonjeccel",
+      "name": "andersonjeccel",
+      "avatar_url": "https://avatars.githubusercontent.com/u/116097999?v=4",
+      "profile": "https://github.com/andersonjeccel",
+      "contributions": [
+        "code",
+        "a11y"
+      ]
+    },
+    {
+      "login": "pasxel",
+      "name": "Alexei Pl",
+      "avatar_url": "https://avatars.githubusercontent.com/u/1814849?v=4",
+      "profile": "https://github.com/pasxel",
+      "contributions": [
+        "bug",
+        "code"
+      ]
     }
   ],
   "contributorsPerLine": 7,

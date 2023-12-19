@@ -10,25 +10,18 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class PreferenceChannelsType extends AbstractType
 {
-    /**
-     * @var LeadModel
-     */
-    private $leadModel;
-
-    public function __construct(LeadModel $leadModel)
-    {
-        $this->leadModel = $leadModel;
+    public function __construct(
+        private LeadModel $leadModel
+    ) {
     }
 
-    public function configureOptions(OptionsResolver $resolver)
+    public function configureOptions(OptionsResolver $resolver): void
     {
         $model = $this->leadModel;
 
         $resolver->setDefaults(
             [
-                'choices'     => function (Options $options) use ($model) {
-                    return $model->getPreferenceChannels();
-                },
+                'choices'     => fn (Options $options) => $model->getPreferenceChannels(),
                 'placeholder' => '',
                 'attr'        => ['class' => 'form-control'],
                 'label_attr'  => ['class' => 'control-label'],
