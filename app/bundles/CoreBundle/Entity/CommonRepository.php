@@ -989,10 +989,8 @@ class CommonRepository extends ServiceEntityRepository
 
     /**
      * @param \Doctrine\ORM\QueryBuilder|\Doctrine\DBAL\Query\QueryBuilder $qb
-     *
-     * @return array
      */
-    protected function addCatchAllWhereClause($qb, $filter)
+    protected function addCatchAllWhereClause($qb, $filter): array
     {
         foreach (['name', 'title'] as $column) {
             if ($this->getClassMetadata()->hasField($column)) {
