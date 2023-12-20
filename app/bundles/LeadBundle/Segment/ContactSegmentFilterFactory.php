@@ -44,7 +44,6 @@ class ContactSegmentFilterFactory
         $event = new LeadListMergeFiltersEvent($filters);
         $this->eventDispatcher->dispatch(LeadEvents::LIST_FILTERS_MERGE, $event);
         $filters = $event->getFilters();
-
         foreach ($filters as $filter) {
             if (self::CUSTOM_OPERATOR === $filter['operator']) {
                 $mergedProperty      = $filter['merged_property'];
@@ -55,6 +54,7 @@ class ContactSegmentFilterFactory
                     }
                     $factorSegmentFilter                    = $this->factorSegmentFilter($nestedFilter, $batchLimiters);
                     $mergedProperty[$index]['filter_value'] = $factorSegmentFilter->getParameterValue();
+                    $mergedProperty[$index]['operator']     = $factorSegmentFilter->getOperator();
                 }
                 if ($factorSegmentFilter) {
                     $factorSegmentFilter->contactSegmentFilterCrate->setMergedProperty($mergedProperty);
