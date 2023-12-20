@@ -10,20 +10,12 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class LeadSubscriber implements EventSubscriberInterface
 {
-    /**
-     * @var PluginModel
-     */
-    private $pluginModel;
-
-    public function __construct(PluginModel $pluginModel)
-    {
-        $this->pluginModel = $pluginModel;
+    public function __construct(
+        private PluginModel $pluginModel
+    ) {
     }
 
-    /**
-     * @return array
-     */
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             LeadEvents::LEAD_PRE_DELETE    => ['onLeadDelete', 0],
@@ -35,7 +27,7 @@ class LeadSubscriber implements EventSubscriberInterface
     /*
      * Delete lead event
      */
-    public function onLeadDelete(LeadEvent $event)
+    public function onLeadDelete(LeadEvent $event): bool
     {
         /** @var \Mautic\LeadBundle\Entity\Lead $lead */
         $lead                  = $event->getLead();
@@ -48,7 +40,7 @@ class LeadSubscriber implements EventSubscriberInterface
     /*
      * Delete company event
      */
-    public function onCompanyDelete(CompanyEvent $event)
+    public function onCompanyDelete(CompanyEvent $event): bool
     {
         /** @var \Mautic\LeadBundle\Entity\Company $company */
         $company               = $event->getCompany();
@@ -61,7 +53,7 @@ class LeadSubscriber implements EventSubscriberInterface
     /*
     * Change lead event
     */
-    public function onLeadSave(LeadEvent $event)
+    public function onLeadSave(LeadEvent $event): void
     {
         /** @var \Mautic\LeadBundle\Entity\Lead $lead */
         $lead                  = $event->getLead();

@@ -9,23 +9,12 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class TimeFormatType extends AbstractType
 {
-    /**
-     * @var TranslatorInterface
-     */
-    private $translator;
-
-    /**
-     * TimeFormat constructor.
-     */
-    public function __construct(TranslatorInterface $translator)
-    {
-        $this->translator = $translator;
+    public function __construct(
+        private TranslatorInterface $translator
+    ) {
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function configureOptions(OptionsResolver $resolver)
+    public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults([
             'choices' => [
@@ -41,9 +30,6 @@ class TimeFormatType extends AbstractType
         ]);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getParent()
     {
         return ChoiceType::class;

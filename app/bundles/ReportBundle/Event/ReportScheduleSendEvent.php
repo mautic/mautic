@@ -5,28 +5,15 @@ namespace Mautic\ReportBundle\Event;
 use Mautic\ReportBundle\Entity\Scheduler;
 use Symfony\Contracts\EventDispatcher\Event;
 
-/**
- * Class ReportScheduleSendEvent.
- */
 class ReportScheduleSendEvent extends Event
 {
     /**
-     * @var Scheduler
-     */
-    private $scheduler;
-
-    /**
-     * @var string
-     */
-    private $file;
-
-    /**
      * @param string $file
      */
-    public function __construct(Scheduler $scheduler, $file)
-    {
-        $this->scheduler = $scheduler;
-        $this->file      = $file;
+    public function __construct(
+        private Scheduler $scheduler,
+        private $file
+    ) {
     }
 
     /**

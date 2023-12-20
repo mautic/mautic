@@ -32,42 +32,27 @@ class UserStep implements StepInterface
      */
     public $password;
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getFormType()
+    public function getFormType(): string
     {
         return UserStepType::class;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function checkRequirements()
+    public function checkRequirements(): array
     {
         return [];
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function checkOptionalSettings()
+    public function checkOptionalSettings(): array
     {
         return [];
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getTemplate()
+    public function getTemplate(): string
     {
         return '@MauticInstall/Install/user.html.twig';
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function update(StepInterface $data)
+    public function update(StepInterface $data): array
     {
         return [];
     }

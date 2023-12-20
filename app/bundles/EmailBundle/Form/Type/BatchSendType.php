@@ -7,7 +7,7 @@ use Symfony\Component\Form\FormBuilderInterface;
 
 class BatchSendType extends AbstractType
 {
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         if (!empty($options['action'])) {
             $builder->setAction($options['action']);

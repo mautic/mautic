@@ -75,7 +75,7 @@ class FormEntity extends CommonEntity
      */
     public $deletedId;
 
-    public static function loadMetadata(ORM\ClassMetadata $metadata)
+    public static function loadMetadata(ORM\ClassMetadata $metadata): void
     {
         $builder = new ClassMetadataBuilder($metadata);
 
@@ -131,7 +131,7 @@ class FormEntity extends CommonEntity
     /**
      * Prepares the metadata for API usage.
      */
-    public static function loadApiMetadata(ApiMetadataDriver $metadata)
+    public static function loadApiMetadata(ApiMetadataDriver $metadata): void
     {
         $metadata->setGroupPrefix('publish')
             ->addListProperties(
@@ -437,7 +437,7 @@ class FormEntity extends CommonEntity
     /**
      * Set this entity as new in case it has to be saved prior to the events.
      */
-    public function setNew()
+    public function setNew(): void
     {
         $this->new = true;
     }

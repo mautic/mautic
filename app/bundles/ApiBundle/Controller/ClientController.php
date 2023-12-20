@@ -27,12 +27,21 @@ use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInt
 
 class ClientController extends FormController
 {
-    private ClientModel $clientModel;
-
-    public function __construct(ClientModel $clientModel, FormFactoryInterface $formFactory, FormFieldHelper $fieldHelper, ManagerRegistry $doctrine, MauticFactory $factory, ModelFactory $modelFactory, UserHelper $userHelper, CoreParametersHelper $coreParametersHelper, EventDispatcherInterface $dispatcher, Translator $translator, FlashBag $flashBag, RequestStack $requestStack, CorePermissions $security)
-    {
-        $this->clientModel     = $clientModel;
-
+    public function __construct(
+        private ClientModel $clientModel,
+        FormFactoryInterface $formFactory,
+        FormFieldHelper $fieldHelper,
+        ManagerRegistry $doctrine,
+        MauticFactory $factory,
+        ModelFactory $modelFactory,
+        UserHelper $userHelper,
+        CoreParametersHelper $coreParametersHelper,
+        EventDispatcherInterface $dispatcher,
+        Translator $translator,
+        FlashBag $flashBag,
+        RequestStack $requestStack,
+        CorePermissions $security
+    ) {
         parent::__construct($formFactory, $fieldHelper, $doctrine, $factory, $modelFactory, $userHelper, $coreParametersHelper, $dispatcher, $translator, $flashBag, $requestStack, $security);
     }
 
@@ -125,10 +134,7 @@ class ClientController extends FormController
         );
     }
 
-    /**
-     * @return Response
-     */
-    public function authorizedClientsAction(TokenStorageInterface $tokenStorage)
+    public function authorizedClientsAction(TokenStorageInterface $tokenStorage): Response
     {
         $apiClientModel = $this->clientModel;
         \assert($apiClientModel instanceof ClientModel);

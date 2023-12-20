@@ -37,7 +37,7 @@ return [
                 'standard_entity' => true,
                 'name'            => 'points',
                 'path'            => '/points',
-                'controller'      => 'Mautic\PointBundle\Controller\Api\PointApiController',
+                'controller'      => \Mautic\PointBundle\Controller\Api\PointApiController::class,
             ],
             'mautic_api_getpointactiontypes' => [
                 'path'       => '/points/actions/types',
@@ -47,7 +47,7 @@ return [
                 'standard_entity' => true,
                 'name'            => 'triggers',
                 'path'            => '/points/triggers',
-                'controller'      => 'Mautic\PointBundle\Controller\Api\TriggerApiController',
+                'controller'      => \Mautic\PointBundle\Controller\Api\TriggerApiController::class,
             ],
             'mautic_api_getpointtriggereventtypes' => [
                 'path'       => '/points/triggers/events/types',

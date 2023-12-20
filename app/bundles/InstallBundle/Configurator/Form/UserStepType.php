@@ -13,17 +13,12 @@ use Symfony\Component\Validator\Constraints as Assert;
 
 class UserStepType extends AbstractType
 {
-    private SessionInterface $session;
-
-    public function __construct(SessionInterface $session)
-    {
-        $this->session = $session;
+    public function __construct(
+        private SessionInterface $session
+    ) {
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $storedData = $this->session->get('mautic.installer.user', new \stdClass());
 
@@ -168,9 +163,6 @@ class UserStepType extends AbstractType
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getBlockPrefix()
     {
         return 'install_user_step';

@@ -7,15 +7,9 @@ use Symfony\Component\Form\AbstractType;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
-/**
- * Class MessageListType.
- */
 class MessageListType extends AbstractType
 {
-    /**
-     * {@inheritdoc}
-     */
-    public function configureOptions(OptionsResolver $resolver)
+    public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults(
             [
@@ -23,7 +17,7 @@ class MessageListType extends AbstractType
                 'modal_route'        => 'mautic_message_action',
                 'model'              => 'channel.message',
                 'multiple'           => true,
-                'ajax_lookup_action' => function (Options $options) {
+                'ajax_lookup_action' => function (Options $options): string {
                     $query = [
                         'is_published' => $options['is_published'],
                     ];
@@ -31,17 +25,15 @@ class MessageListType extends AbstractType
                     return 'channel:getLookupChoiceList&'.http_build_query($query);
                 },
                 'model_lookup_method' => 'getLookupResults',
-                'lookup_arguments'    => function (Options $options) {
-                    return [
-                        'type'    => 'channel.message',
-                        'filter'  => '$data',
-                        'limit'   => 0,
-                        'start'   => 0,
-                        'options' => [
-                            'is_published' => $options['is_published'],
-                        ],
-                    ];
-                },
+                'lookup_arguments'    => fn (Options $options): array => [
+                    'type'    => 'channel.message',
+                    'filter'  => '$data',
+                    'limit'   => 0,
+                    'start'   => 0,
+                    'options' => [
+                        'is_published' => $options['is_published'],
+                    ],
+                ],
                 'is_published' => true,
             ]
         );

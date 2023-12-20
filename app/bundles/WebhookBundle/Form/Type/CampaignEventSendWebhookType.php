@@ -11,25 +11,14 @@ use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-/**
- * Class CampaignEventRemoteUrlType.
- */
 class CampaignEventSendWebhookType extends AbstractType
 {
-    /**
-     * @var TranslatorInterface
-     */
-    private $translator;
-
-    /**
-     * ConfigType constructor.
-     */
-    public function __construct(TranslatorInterface $translator)
-    {
-        $this->translator = $translator;
+    public function __construct(
+        private TranslatorInterface $translator
+    ) {
     }
 
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder->add(
             'url',

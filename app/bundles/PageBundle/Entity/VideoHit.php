@@ -123,12 +123,12 @@ class VideoHit
      */
     private $query = [];
 
-    public static function loadMetadata(ORM\ClassMetadata $metadata)
+    public static function loadMetadata(ORM\ClassMetadata $metadata): void
     {
         $builder = new ClassMetadataBuilder($metadata);
 
         $builder->setTable('video_hits')
-            ->setCustomRepositoryClass('Mautic\PageBundle\Entity\VideoHitRepository')
+            ->setCustomRepositoryClass(\Mautic\PageBundle\Entity\VideoHitRepository::class)
             ->addIndex(['date_hit'], 'video_date_hit')
             ->addIndex(['channel', 'channel_id'], 'video_channel_search')
             ->addIndex(['guid', 'lead_id'], 'video_guid_lead_search');
@@ -227,7 +227,7 @@ class VideoHit
     /**
      * Prepares the metadata for API usage.
      */
-    public static function loadApiMetadata(ApiMetadataDriver $metadata)
+    public static function loadApiMetadata(ApiMetadataDriver $metadata): void
     {
         $metadata->setGroupPrefix('hit')
             ->addProperties(

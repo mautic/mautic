@@ -23,7 +23,7 @@ class ContactFinderTest extends \PHPUnit\Framework\TestCase
      * @covers  \Mautic\EmailBundle\MonitoredEmail\Search\Result::setContacts()
      * @covers  \Mautic\EmailBundle\MonitoredEmail\Search\Result::getContacts()
      */
-    public function testContactFoundByDelegationForAddress()
+    public function testContactFoundByDelegationForAddress(): void
     {
         $lead = new Lead();
         $lead->setEmail('contact@email.com');
@@ -64,7 +64,7 @@ class ContactFinderTest extends \PHPUnit\Framework\TestCase
      * @covers  \Mautic\EmailBundle\MonitoredEmail\Search\Result::addContact()
      * @covers  \Mautic\EmailBundle\MonitoredEmail\Search\Result::getContacts()
      */
-    public function testContactFoundByDelegationForHash()
+    public function testContactFoundByDelegationForHash(): void
     {
         $lead = new Lead();
         $lead->setEmail('contact@email.com');

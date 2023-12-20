@@ -11,25 +11,14 @@ use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
-/**
- * Class CampaignEventFormSubmitType.
- */
 class CampaignEventFormFieldValueType extends AbstractType
 {
-    /**
-     * @var FormModel
-     */
-    private $model;
-
-    public function __construct(FormModel $model)
-    {
-        $this->model = $model;
+    public function __construct(
+        private FormModel $model
+    ) {
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder->add(
             'form',
@@ -69,7 +58,7 @@ class CampaignEventFormFieldValueType extends AbstractType
         );
 
         // function to add 'template' choice field dynamically
-        $func = function (FormEvent $e) {
+        $func = function (FormEvent $e): void {
             $data    = $e->getData();
             $form    = $e->getForm();
             $fields  = [];
@@ -181,9 +170,6 @@ class CampaignEventFormFieldValueType extends AbstractType
         $builder->addEventListener(FormEvents::PRE_SUBMIT, $func);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getBlockPrefix()
     {
         return 'campaignevent_form_field_value';

@@ -94,9 +94,7 @@ final class RemoveOldLogTest extends MauticMysqlTestCase
     private function assertLogs(Webhook $webhook, int $expectedCount, array $expectedIds): void
     {
         $logs   = $this->em->getRepository(Log::class)->findBy(['webhook'=>$webhook]);
-        $logIds = array_map(function (Log $log) {
-            return $log->getId();
-        }, $logs);
+        $logIds = array_map(fn (Log $log) => $log->getId(), $logs);
 
         Assert::assertCount($expectedCount, $logs);
         Assert::assertSame($expectedIds, $logIds);

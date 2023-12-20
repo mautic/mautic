@@ -13,7 +13,7 @@ use PHPUnit\Framework\Assert;
 
 class ListModelFunctionalTest extends MauticMysqlTestCase
 {
-    public function testPublicSegmentsInContactPreferences()
+    public function testPublicSegmentsInContactPreferences(): void
     {
         $user           = $this->em->getRepository(User::class)->findBy([], [], 1)[0];
         $firstLeadList  = $this->createLeadList($user, 'First', true);

@@ -133,10 +133,6 @@ class DashboardControllerFunctionalTest extends MauticMysqlTestCase
         $crawler      = new Crawler($doc);
         $crawlerTable = $crawler->filter('table')->first();
 
-        return array_slice($crawlerTable->filter('tr')->each(function ($tr) {
-            return $tr->filter('td')->each(function ($td) {
-                return trim($td->text());
-            });
-        }), 1);
+        return array_slice($crawlerTable->filter('tr')->each(fn ($tr) => $tr->filter('td')->each(fn ($td) => trim($td->text()))), 1);
     }
 }
