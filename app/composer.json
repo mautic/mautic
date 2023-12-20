@@ -22,6 +22,7 @@
     "ext-zip": "*",
     "ext-imap": "*",
     "ext-pdo": "*",
+    "ext-iconv": "*",
     "symfony/amqp-messenger": "~5.4",
     "symfony/console": "~5.4.0",
     "symfony/form": "~5.4.0",
