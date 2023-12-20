@@ -10,6 +10,7 @@ use Mautic\LeadBundle\Segment\Decorator\FilterDecoratorInterface;
 use Mautic\LeadBundle\Segment\Query\Filter\FilterQueryBuilderInterface;
 use Mautic\LeadBundle\Segment\TableSchemaColumnsCache;
 use Symfony\Component\DependencyInjection\Container;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class ContactSegmentFilterFactoryTest extends \PHPUnit\Framework\TestCase
 {
@@ -37,7 +38,7 @@ class ContactSegmentFilterFactoryTest extends \PHPUnit\Framework\TestCase
             ->with('MyQueryTypeId')
             ->willReturn($filterQueryBuilder);
 
-        $contactSegmentFilterFactory = new ContactSegmentFilterFactory($tableSchemaColumnsCache, $container, $decoratorFactory);
+        $contactSegmentFilterFactory = new ContactSegmentFilterFactory($tableSchemaColumnsCache, $container, $decoratorFactory, $this->createMock(EventDispatcherInterface::class));
 
         $leadList = new LeadList();
         $leadList->setFilters([
