@@ -25,7 +25,7 @@ class ListApiControllerFunctionalTest extends MauticMysqlTestCase
         $this->listModel = self::$container->get('mautic.lead.model.list');
     }
 
-    public function testSingleSegmentWorkflow()
+    public function testSingleSegmentWorkflow(): void
     {
         $payload = [
             'name'        => 'API segment',
@@ -190,7 +190,7 @@ class ListApiControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertSame(404, $response['errors'][0]['code']);
     }
 
-    public function testBatchSegmentWorkflow()
+    public function testBatchSegmentWorkflow(): void
     {
         $payload = [
             [
@@ -474,7 +474,7 @@ class ListApiControllerFunctionalTest extends MauticMysqlTestCase
 
     private function saveSegment(string $name, string $alias, array $filters = [], LeadList $segment = null): LeadList
     {
-        $segment = $segment ?? new LeadList();
+        $segment ??= new LeadList();
         $segment->setName($name)->setAlias($alias)->setFilters($filters);
         $this->listModel->saveEntity($segment);
 

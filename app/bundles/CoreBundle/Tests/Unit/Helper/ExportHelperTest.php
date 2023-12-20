@@ -19,12 +19,21 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class ExportHelperTest extends TestCase
 {
-    /** @var MockObject|TranslatorInterface */
-    private $translatorInterfaceMock;
-    /** @var MockObject|CoreParametersHelper */
-    private $coreParametersHelperMock;
+    /**
+     * @var MockObject|TranslatorInterface
+     */
+    private \PHPUnit\Framework\MockObject\MockObject $translatorInterfaceMock;
+
+    /**
+     * @var MockObject|CoreParametersHelper
+     */
+    private \PHPUnit\Framework\MockObject\MockObject $coreParametersHelperMock;
+
     private ExportHelper $exportHelper;
-    /** @var array<array<string, int|string>> */
+
+    /**
+     * @var array<array<string, int|string>>
+     */
     private array $dummyData = [
         [
             'id'        => 1,
@@ -39,10 +48,16 @@ class ExportHelperTest extends TestCase
             'email'     => 'demo@mautic.org',
         ],
     ];
-    /** @var array<string> */
+
+    /**
+     * @var array<string>
+     */
     private array $filePaths = [];
-    /** @var FilePathResolver|MockObject */
-    private $filePathResolver;
+
+    /**
+     * @var FilePathResolver|MockObject
+     */
+    private \PHPUnit\Framework\MockObject\MockObject $filePathResolver;
 
     protected function setUp(): void
     {
@@ -282,37 +297,31 @@ class ExportHelperTest extends TestCase
 
         $iteratorExportDataModelMock->method('rewind')
             ->willReturnCallback(
-                function () use ($iteratorData) {
+                function () use ($iteratorData): void {
                     $iteratorData->position = 0;
                 }
             );
 
         $iteratorExportDataModelMock->method('current')
             ->willReturnCallback(
-                function () use ($iteratorData) {
-                    return $iteratorData->array[$iteratorData->position];
-                }
+                fn () => $iteratorData->array[$iteratorData->position]
             );
 
         $iteratorExportDataModelMock->method('key')
             ->willReturnCallback(
-                function () use ($iteratorData) {
-                    return $iteratorData->position;
-                }
+                fn () => $iteratorData->position
             );
 
         $iteratorExportDataModelMock->method('next')
             ->willReturnCallback(
-                function () use ($iteratorData) {
+                function () use ($iteratorData): void {
                     ++$iteratorData->position;
                 }
             );
 
         $iteratorExportDataModelMock->method('valid')
             ->willReturnCallback(
-                function () use ($iteratorData) {
-                    return isset($iteratorData->array[$iteratorData->position]);
-                }
+                fn () => isset($iteratorData->array[$iteratorData->position])
             );
 
         return $iteratorExportDataModelMock;

@@ -30,7 +30,7 @@ class TwigEnvVarsTest extends TestCase
         $this->envVars       = new ParameterBag();
     }
 
-    public function testTwigCachDirectoryToTmpPath()
+    public function testTwigCachDirectoryToTmpPath(): void
     {
         $this->config->set('tmp_path', '/foo/bar');
         TwigEnvVars::load($this->config, $this->defaultConfig, $this->envVars);

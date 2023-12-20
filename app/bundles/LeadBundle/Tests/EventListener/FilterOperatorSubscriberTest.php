@@ -23,40 +23,34 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 final class FilterOperatorSubscriberTest extends TestCase
 {
-    /**
-     * @var OperatorOptions
-     */
-    private $operatorOptions;
+    private \Mautic\LeadBundle\Segment\OperatorOptions $operatorOptions;
 
     /**
      * @var MockObject|LeadFieldRepository
      */
-    private $leadFieldRepository;
+    private MockObject $leadFieldRepository;
 
     /**
      * @var MockObject|TypeOperatorProviderInterface
      */
-    private $typeOperatorProvider;
+    private MockObject $typeOperatorProvider;
 
     /**
      * @var MockObject|FieldChoicesProviderInterface
      */
-    private $fieldChoicesProvider;
+    private MockObject $fieldChoicesProvider;
 
     /**
      * @var MockObject|TranslatorInterface
      */
-    private $translator;
+    private MockObject $translator;
 
     /**
      * @var MockObject&CoreParametersHelper
      */
-    private $coreParametersHelper;
+    private MockObject $coreParametersHelper;
 
-    /**
-     * @var FilterOperatorSubscriber
-     */
-    private $subscriber;
+    private FilterOperatorSubscriber $subscriber;
 
     protected function setUp(): void
     {

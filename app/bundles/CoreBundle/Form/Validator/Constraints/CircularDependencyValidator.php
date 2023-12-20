@@ -16,12 +16,7 @@ use Symfony\Component\Validator\Exception\UnexpectedTypeException;
  */
 class CircularDependencyValidator extends ConstraintValidator
 {
-    /**
-     * @var SegmentDependencyTreeFactory
-     */
-    private $segmentDependencyTreeFactory;
-
-    public function __construct(SegmentDependencyTreeFactory $segmentDependencyTreeFactory)
+    public function __construct(private SegmentDependencyTreeFactory $segmentDependencyTreeFactory)
     {
         $this->segmentDependencyTreeFactory = $segmentDependencyTreeFactory;
     }

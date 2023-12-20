@@ -13,6 +13,7 @@ trait UpsertTrait
      * 2. Remove it from the list of excluded files in phpstan.neon
      */
     private bool $hasBeenInserted = false;
+
     private bool $hasBeenUpdated  = false;
 
     public function hasBeenInserted(): bool

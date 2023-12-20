@@ -21,22 +21,18 @@ use Symfony\Component\Form\FormView;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
+/**
+ * @extends AbstractType<LeadList>
+ */
 class ListType extends AbstractType
 {
-    private $translator;
-
-    /**
-     * @var ListModel
-     */
-    private $listModel;
-
-    public function __construct(TranslatorInterface $translator, ListModel $listModel)
-    {
-        $this->translator = $translator;
-        $this->listModel  = $listModel;
+    public function __construct(
+        private TranslatorInterface $translator,
+        private ListModel $listModel
+    ) {
     }
 
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder->addEventSubscriber(new CleanFormSubscriber(['description' => 'html', 'name' => 'clean', 'publicName' => 'clean', 'filter' => 'raw']));
         $builder->addEventSubscriber(new FormExitSubscriber('lead.list', $options));
@@ -151,7 +147,7 @@ class ListType extends AbstractType
         }
     }
 
-    public function configureOptions(OptionsResolver $resolver)
+    public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults(
             [
@@ -160,10 +156,7 @@ class ListType extends AbstractType
         );
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function buildView(FormView $view, FormInterface $form, array $options)
+    public function buildView(FormView $view, FormInterface $form, array $options): void
     {
         $view->vars['fields'] = $this->listModel->getChoiceFields();
     }

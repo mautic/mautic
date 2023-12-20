@@ -394,26 +394,17 @@ class ResultController extends CommonFormController
         return $this->batchDeleteStandard($request);
     }
 
-    /**
-     * @return string
-     */
-    protected function getModelName()
+    protected function getModelName(): string
     {
         return 'form.submission';
     }
 
-    /**
-     * @return string
-     */
-    protected function getIndexRoute()
+    protected function getIndexRoute(): string
     {
         return 'mautic_form_results';
     }
 
-    /**
-     * @return string
-     */
-    protected function getActionRoute()
+    protected function getActionRoute(): string
     {
         return 'mautic_form_results_action';
     }
@@ -436,7 +427,7 @@ class ResultController extends CommonFormController
         return parent::generateUrl($route, $parameters, $referenceType);
     }
 
-    public function getPostActionRedirectArguments(array $args, $action)
+    public function getPostActionRedirectArguments(array $args, $action): array
     {
         switch ($action) {
             case 'batchDelete':
@@ -461,8 +452,8 @@ class ResultController extends CommonFormController
         } elseif ($request->request->has('formId')) {
             $formId = $request->request->get('formId');
         } else {
-            $objectId = isset($parameters['objectId']) ? $parameters['objectId'] : 0;
-            $formId   = (isset($parameters['formId'])) ? $parameters['formId'] : $request->query->get('formId', $objectId);
+            $objectId = $parameters['objectId'] ?? 0;
+            $formId   = $parameters['formId'] ?? $request->query->get('formId', $objectId);
         }
 
         return $formId;

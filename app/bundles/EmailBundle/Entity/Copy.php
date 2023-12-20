@@ -25,14 +25,14 @@ class Copy
      */
     private $body;
 
-    private ?string $bodyText;
+    private ?string $bodyText = null;
 
     /**
      * @var string|null
      */
     private $subject;
 
-    public static function loadMetadata(ORM\ClassMetadata $metadata)
+    public static function loadMetadata(ORM\ClassMetadata $metadata): void
     {
         $builder = new ClassMetadataBuilder($metadata);
 

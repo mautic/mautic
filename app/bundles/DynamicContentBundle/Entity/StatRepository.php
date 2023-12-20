@@ -13,10 +13,7 @@ class StatRepository extends CommonRepository
 {
     use TimelineTrait;
 
-    /**
-     * @return array
-     */
-    public function getSentStats($dynamicContentId)
+    public function getSentStats($dynamicContentId): array
     {
         $q = $this->_em->getConnection()->createQueryBuilder();
         $q->select('s.lead_id')
@@ -67,12 +64,9 @@ class StatRepository extends CommonRepository
     /**
      * Get sent counts based grouped by dynamic content Id.
      *
-     * @param array     $dynamicContentIds
-     * @param \DateTime $fromDate
-     *
-     * @return array
+     * @param array $dynamicContentIds
      */
-    public function getSentCounts($dynamicContentIds = [], \DateTime $fromDate = null)
+    public function getSentCounts($dynamicContentIds = [], \DateTime $fromDate = null): array
     {
         $q = $this->_em->getConnection()->createQueryBuilder();
         $q->select('s.dynamic_content_id, count(s.id) as sent_count')
@@ -136,7 +130,7 @@ class StatRepository extends CommonRepository
     /**
      * Updates lead ID (e.g. after a lead merge).
      */
-    public function updateLead($fromLeadId, $toLeadId)
+    public function updateLead($fromLeadId, $toLeadId): void
     {
         $q = $this->_em->getConnection()->createQueryBuilder();
         $q->update(MAUTIC_TABLE_PREFIX.'dynamic_content_stats')
@@ -148,15 +142,12 @@ class StatRepository extends CommonRepository
     /**
      * Delete a stat.
      */
-    public function deleteStat($id)
+    public function deleteStat($id): void
     {
         $this->_em->getConnection()->delete(MAUTIC_TABLE_PREFIX.'dynamic_content_stats', ['id' => (int) $id]);
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getTableAlias()
+    public function getTableAlias(): string
     {
         return 's';
     }

@@ -23,42 +23,36 @@ class InactiveHelperTest extends TestCase
     /**
      * @var EventScheduler|MockObject
      */
-    private $scheduler;
+    private \PHPUnit\Framework\MockObject\MockObject $scheduler;
 
     /**
      * @var InactiveContactFinder|MockObject
      */
-    private $inactiveContactFinder;
+    private \PHPUnit\Framework\MockObject\MockObject $inactiveContactFinder;
 
     /**
      * @var LeadEventLogRepository|MockObject
      */
-    private $eventLogRepository;
+    private \PHPUnit\Framework\MockObject\MockObject $eventLogRepository;
 
     /**
      * @var EventRepository|MockObject
      */
-    private $eventRepository;
+    private \PHPUnit\Framework\MockObject\MockObject $eventRepository;
 
     /**
      * @var LeadRepository|MockObject
      */
-    private $leadRepository;
+    private \PHPUnit\Framework\MockObject\MockObject $leadRepository;
 
     /**
      * @var LoggerInterface|MockObject
      */
-    private $logger;
+    private \PHPUnit\Framework\MockObject\MockObject $logger;
 
-    /**
-     * @var InactiveHelper
-     */
-    private $inactiveHelper;
+    private \Mautic\CampaignBundle\Executioner\Helper\InactiveHelper $inactiveHelper;
 
-    /**
-     * @var DecisionHelper
-     */
-    private $decisionHelper;
+    private \Mautic\CampaignBundle\Executioner\Helper\DecisionHelper $decisionHelper;
 
     protected function setUp(): void
     {
@@ -101,12 +95,12 @@ class InactiveHelperTest extends TestCase
 
         $this->eventLogRepository->expects($this->once())
             ->method('getDatesExecuted')
-            ->willReturn(new ArrayCollection([
+            ->willReturn([
                 $leadNegative->getId()  => \DateTime::createFromFormat('Y-m-d H:i:s', '2022-05-28 21:37:00'),
                 $leadNegative2->getId() => \DateTime::createFromFormat('Y-m-d H:i:s', '2022-05-28 21:37:00'),
                 $leadPositive->getId()  => \DateTime::createFromFormat('Y-m-d H:i:s', '2022-05-28 21:37:00'),
                 $leadNegative3->getId() => \DateTime::createFromFormat('Y-m-d H:i:s', '2022-05-28 21:37:00'),
-            ]));
+            ]);
 
         /** @var LeadEventLog&MockObject */
         $log = $this->createMock(LeadEventLog::class);

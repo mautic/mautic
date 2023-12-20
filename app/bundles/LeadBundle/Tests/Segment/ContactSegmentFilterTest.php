@@ -18,25 +18,22 @@ use PHPUnit\Framework\TestCase;
 
 class ContactSegmentFilterTest extends TestCase
 {
-    /**
-     * @var ContactSegmentFilterCrate
-     */
-    private $contactSegmentFilterCrate;
+    private \Mautic\LeadBundle\Segment\ContactSegmentFilterCrate $contactSegmentFilterCrate;
 
     /**
      * @var BaseDecorator|MockObject
      */
-    private $filterDecorator;
+    private \PHPUnit\Framework\MockObject\MockObject $filterDecorator;
 
     /**
      * @var TableSchemaColumnsCache|MockObject
      */
-    private $tableSchemaColumnCache;
+    private \PHPUnit\Framework\MockObject\MockObject $tableSchemaColumnCache;
 
     /**
      * @var FilterQueryBuilderInterface&MockObject
      */
-    private $filterQueryBuilder;
+    private \PHPUnit\Framework\MockObject\MockObject $filterQueryBuilder;
 
     protected function setUp(): void
     {

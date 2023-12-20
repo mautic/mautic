@@ -2,6 +2,8 @@
 
 namespace Mautic\UserBundle\Security\Provider;
 
+use Mautic\CoreBundle\Cache\ResultCacheHelper;
+use Mautic\CoreBundle\Cache\ResultCacheOptions;
 use Mautic\CoreBundle\Helper\EncryptionHelper;
 use Mautic\UserBundle\Entity\PermissionRepository;
 use Mautic\UserBundle\Entity\User;
@@ -20,43 +22,13 @@ use Symfony\Component\Security\Core\User\UserProviderInterface;
 
 class UserProvider implements UserProviderInterface
 {
-    /**
-     * @var UserRepository
-     */
-    protected $userRepository;
-
-    /**
-     * @var PermissionRepository
-     */
-    protected $permissionRepository;
-
-    /**
-     * @var Session
-     */
-    protected $session;
-
-    /**
-     * @var EventDispatcherInterface
-     */
-    protected $dispatcher;
-
-    /**
-     * @var UserPasswordHasher
-     */
-    protected $encoder;
-
     public function __construct(
-        UserRepository $userRepository,
-        PermissionRepository $permissionRepository,
-        Session $session,
-        EventDispatcherInterface $dispatcher,
-        UserPasswordHasher $encoder
+        protected UserRepository $userRepository,
+        protected PermissionRepository $permissionRepository,
+        protected Session $session,
+        protected EventDispatcherInterface $dispatcher,
+        protected UserPasswordHasher $encoder
     ) {
-        $this->userRepository       = $userRepository;
-        $this->permissionRepository = $permissionRepository;
-        $this->session              = $session;
-        $this->dispatcher           = $dispatcher;
-        $this->encoder              = $encoder;
     }
 
     /**
@@ -66,7 +38,7 @@ class UserProvider implements UserProviderInterface
      */
     public function loadUserByUsername($username)
     {
-        $q = $this->userRepository
+        $qb = $this->userRepository
             ->createQueryBuilder('u')
             ->select('u, r')
             ->leftJoin('u.role', 'r')
@@ -74,8 +46,9 @@ class UserProvider implements UserProviderInterface
             ->andWhere('u.isPublished = :true')
             ->setParameter('true', true, 'boolean')
             ->setParameter('username', $username);
-
-        $user = $q->getQuery()->getOneOrNullResult();
+        $query = $qb->getQuery();
+        ResultCacheHelper::enableOrmQueryCache($query, new ResultCacheOptions(User::CACHE_NAMESPACE, 5 * 60));
+        $user = $query->getOneOrNullResult();
 
         if (empty($user)) {
             $message = sprintf(
@@ -94,12 +67,9 @@ class UserProvider implements UserProviderInterface
         return $user;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function refreshUser(UserInterface $user)
     {
-        $class = get_class($user);
+        $class = $user::class;
         if (!$this->supportsClass($class)) {
             throw new UnsupportedUserException(sprintf('Instances of "%s" are not supported.', $class));
         }
@@ -107,10 +77,7 @@ class UserProvider implements UserProviderInterface
         return $this->loadUserByUsername($user->getUsername());
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function supportsClass(string $class)
+    public function supportsClass(string $class): bool
     {
         return User::class === $class || is_subclass_of($class, User::class);
     }
@@ -191,11 +158,11 @@ class UserProvider implements UserProviderInterface
             $user = $this->loadUserByUsername($user->getUsername());
 
             return $user;
-        } catch (UserNotFoundException $exception) {
+        } catch (UserNotFoundException) {
             // Try by email
             try {
                 return $this->loadUserByUsername($user->getEmail());
-            } catch (UserNotFoundException $exception) {
+            } catch (UserNotFoundException) {
             }
         }
 
