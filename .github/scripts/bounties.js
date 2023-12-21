@@ -36,7 +36,8 @@ async function run() {
           const comment =
             "This issue has a bounty associated with it. Check the total available " +
             "<a href='https://opencollective.com/mautic/projects/bounties/transactions'> " +
-            "here</a>.";
+            "here</a>. Read the docs about how to work on the issue and claim the funds "
+            "<a href='https://contribute.mautic.org/product-team/mautic-bounty-programme'>here.</a>";
       
           await octokit.request('POST /repos/{owner}/{repo}/issues/{issue_number}/comments', {
             owner: repoOwner,
