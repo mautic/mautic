@@ -35,7 +35,7 @@ async function run() {
         if (labelName === 'bounty') {
           const comment =
             "This issue has a bounty associated with it. Check the total available " +
-            "<a href'https://opencollective.com/mautic/projects/bounties/transactions'> " +
+            "<a href='https://opencollective.com/mautic/projects/bounties/transactions'> " +
             "here</a>.";
       
           await octokit.request('POST /repos/{owner}/{repo}/issues/{issue_number}/comments', {
