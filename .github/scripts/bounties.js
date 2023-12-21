@@ -18,8 +18,8 @@ async function run() {
           "of Mautic</a>, you can add some funds to the " +
           "<a href='https://opencollective.com/mautic/projects/bounties'>Bounties Project</a> " +
           "so that the person who completes this task can claim those funds once it is " +
-          "merged by a member of the core team! Read the docs here: " +
-          "<a href='https://contribute.mautic.org/product-team/mautic-bounty-programme'>";
+          "merged by a member of the core team! Read the docs " +
+          "<a href='https://contribute.mautic.org/product-team/mautic-bounty-programme'>here.</a>";
         
         await octokit.request('PATCH /repos/{owner}/{repo}/issues/{issue_number}', {
           owner: repoOwner,
