@@ -22,7 +22,7 @@ class CampaignSubscriberFunctionalTest extends MauticMysqlTestCase
     /**
      * @dataProvider valueProvider
      */
-    public function testComparingFormSubmissionValues(string $valueToCompare, string $submittedValue, bool $result, string $operator = "="): void
+    public function testComparingFormSubmissionValues(string $valueToCompare, string $submittedValue, bool $result, string $operator = '='): void
     {
         $formPayload = [
             'name'     => 'Test Form',
@@ -54,7 +54,7 @@ class CampaignSubscriberFunctionalTest extends MauticMysqlTestCase
                     'leadField' => 'email',
                 ], [
                     'label' => 'Submit',
-                    'alias' => 'submit',
+                    'alias' => 'su bmit',
                     'type'  => 'button',
                 ],
             ],
@@ -143,14 +143,14 @@ class CampaignSubscriberFunctionalTest extends MauticMysqlTestCase
             'test',
             'tester',
             false,
-            '!like'
+            '!like',
         ];
 
         yield [
             'test',
             'tst',
             true,
-            '!like'
+            '!like',
         ];
     }
 
