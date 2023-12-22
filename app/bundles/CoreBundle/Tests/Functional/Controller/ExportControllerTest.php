@@ -87,6 +87,9 @@ final class ExportControllerTest extends MauticMysqlTestCase
         Assert::assertSame(Response::HTTP_OK, $this->client->getResponse()->getStatusCode());
     }
 
+    /**
+     * @param array<string|int> $permissions
+     */
     private function createAndLoginUser(array $permissions): User
     {
         // Create non-admin role
@@ -100,8 +103,9 @@ final class ExportControllerTest extends MauticMysqlTestCase
 
         $this->em->flush();
         $this->em->detach($role);
-
+        /** @phpstan-ignore-next-line  */
         $this->loginUser($user->getUsername());
+        /** @phpstan-ignore-next-line  */
         $this->client->setServerParameter('PHP_AUTH_USER', $user->getUsername());
         $this->client->setServerParameter('PHP_AUTH_PW', 'mautic');
 
