@@ -108,25 +108,6 @@ class PublicController extends CommonFormController
     }
 
     /**
-     * One-Click unsubscribe - RFC 8058.
-     */
-    public function oneClickUnsubscribeAction(EmailModel $emailModel, string $idHash): Response
-    {
-        $stat = $emailModel->getEmailStatus($idHash);
-        if (!empty($stat)) {
-            $unsubscribeComment = $this->translator->trans('mautic.email.dnc.unsubscribed');
-            $emailModel->setDoNotContact($stat, $unsubscribeComment, DoNotContact::UNSUBSCRIBED);
-        } else {
-            $content = $this->translator->trans('mautic.email.stat_record.not_found');
-
-            return new Response($content, Response::HTTP_NOT_FOUND);
-        }
-        $content = $this->translator->trans('mautic.lead.do.not.contact_unsubscribed');
-
-        return new Response($content);
-    }
-
-    /**
      * @return Response
      *
      * @throws \Exception
@@ -139,16 +120,25 @@ class PublicController extends CommonFormController
     ) {
         // Find the email
         /** @var \Mautic\EmailBundle\Model\EmailModel $model */
-        $model      = $this->getModel('email');
-        $translator = $this->translator;
-        $stat       = $model->getEmailStatus($idHash);
-        $message    = '';
-        $email      = null;
-        $lead       = null;
-        $template   = null;
-        $session    = $request->getSession();
+        $model                 = $this->getModel('email');
+        $translator            = $this->translator;
+        $stat                  = $model->getEmailStatus($idHash);
+        $message               = '';
+        $email                 = null;
+        $lead                  = null;
+        $template              = null;
+        $session               = $request->getSession();
+        $isOneClickUnsubscribe = $request->isMethod(Request::METHOD_POST) && 'One-Click' === $request->get('List-Unsubscribe');
 
         if (!empty($stat)) {
+            if ($isOneClickUnsubscribe) {
+                // RFC 8058 One-Click unsubscribe
+                $unsubscribeComment = $this->translator->trans('mautic.email.dnc.unsubscribed');
+                $model->setDoNotContact($stat, $unsubscribeComment, DoNotContact::UNSUBSCRIBED);
+
+                return new Response($this->translator->trans('mautic.lead.do.not.contact_unsubscribed'));
+            }
+
             if ($email = $stat->getEmail()) {
                 $template = $email->getTemplate();
                 if ('mautic_code_mode' === $template) {
@@ -164,6 +154,10 @@ class PublicController extends CommonFormController
                     \assert($formModel instanceof FormModel);
                     $formContent = '<div class="mautic-unsubscribeform">'.$formModel->getContent($unsubscribeForm).'</div>';
                 }
+            }
+        } else {
+            if ($isOneClickUnsubscribe) {
+                return new Response($this->translator->trans('mautic.email.stat_record.not_found'), Response::HTTP_NOT_FOUND);
             }
         }
 

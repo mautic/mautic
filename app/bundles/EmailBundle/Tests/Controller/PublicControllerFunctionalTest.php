@@ -126,7 +126,9 @@ class PublicControllerFunctionalTest extends MauticMysqlTestCase
         $lead = $this->createLead();
         $stat = $this->getStat(null, $lead);
         $this->em->flush();
-        $this->client->request('POST', '/email/unsubscribe/'.$stat->getTrackingHash());
+        $this->client->request('POST', '/email/unsubscribe/'.$stat->getTrackingHash(), [
+            'List-Unsubscribe' => 'One-Click',
+        ]);
         $this->assertTrue($this->client->getResponse()->isOk());
         $dncCollection = $stat->getLead()->getDoNotContact();
         $this->assertEquals(1, $dncCollection->count());

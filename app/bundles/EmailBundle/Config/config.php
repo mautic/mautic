@@ -59,11 +59,6 @@ return [
                 'path'       => '/email/view/{idHash}',
                 'controller' => 'Mautic\EmailBundle\Controller\PublicController::indexAction',
             ],
-            'mautic_email_oneclick_unsubscribe' => [
-                'path'       => '/email/unsubscribe/{idHash}',
-                'controller' => 'Mautic\EmailBundle\Controller\PublicController::oneClickUnsubscribeAction',
-                'method'     => 'POST',
-            ],
             'mautic_email_unsubscribe' => [
                 'path'       => '/email/unsubscribe/{idHash}',
                 'controller' => 'Mautic\EmailBundle\Controller\PublicController::unsubscribeAction',
