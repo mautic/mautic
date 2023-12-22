@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\CoreBundle\Controller;
 
-use Mautic\CoreBundle\Model\MapModelInterface;
+use Mautic\CoreBundle\Model\TableModelInterface;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
@@ -15,14 +15,10 @@ use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
  */
 abstract class AbstractCountryTableController extends AbstractController
 {
-    public const MAP_OPTIONS = [];
-
-    public const LEGEND_TEXT = 'Total: %total (%withCountry with country)';
-
     /**
-     * @var MapModelInterface<S>
+     * @var TableModelInterface<S>
      */
-    protected MapModelInterface $model;
+    protected TableModelInterface $model;
 
     /**
      * @template T
@@ -31,7 +27,7 @@ abstract class AbstractCountryTableController extends AbstractController
      *
      * @return array<string, array<int, array<string, int|string>>>
      */
-    abstract public function getData($entity, \DateTime $dateFromObject, \DateTime $dateToObject): array;
+    abstract public function getData($entity, \DateTimeInterface $dateFromObject = null, \DateTimeInterface $dateToObject = null): array;
 
     /**
      * @template T
@@ -39,17 +35,6 @@ abstract class AbstractCountryTableController extends AbstractController
      * @param T $entity
      */
     abstract public function hasAccess(CorePermissions $security, $entity): bool;
-
-    abstract public function getMapOptionsTitle(): string;
-
-    /**
-     * @template T
-     *
-     * @param T $entity
-     *
-     * @return array<string,array<string, string>>
-     */
-    abstract public function getMapOptions($entity): array;
 
     /**
      * @throws \Exception
@@ -66,17 +51,34 @@ abstract class AbstractCountryTableController extends AbstractController
             throw new AccessDeniedHttpException();
         }
 
-        $statsCountries = $this->getData($entity, new \DateTime($dateFrom), new \DateTime($dateTo));
-        // $mapData        = TableHelper::buildMapData($statsCountries, $this->getMapOptions($entity), self::LEGEND_TEXT);
+        $statsCountries = $this->getData($entity);
 
         return $this->render(
             '@MauticCore/Helper/geotable.html.twig',
             [
-                'data'           => 'test',
-                'optionsEnabled' => true,
-                'optionsTitle'   => $this->getMapOptionsTitle(),
-                'legendEnabled'  => true,
+                'data'           => $statsCountries,
+                'object'         => $entity,
             ]
         );
+    }
+
+    public function exportAction(int $objectId, string $format = 'csv')
+    {
+        $campaign = $this->model->getEntity($objectId);
+
+        if (null === $campaign) {
+            return 'test';
+        }
+
+        /*  if (!$this->hasAccess(
+              'form:forms:viewown',
+              'form:forms:viewother',
+              $campaign->getCreatedBy()
+          )
+          ) {
+              return $this->accessDenied();
+          }*/
+
+        return $this->model->exportResults($campaign, $format);
     }
 }

@@ -27,6 +27,17 @@ return [
                 'path'       => '/campaign/preview/{objectId}',
                 'controller' => 'Mautic\EmailBundle\Controller\PublicController::previewAction',
             ],
+            'mautic_campaign_geo_stats'      => [
+                'path'       => '/campaign-geo-stats/preview/{objectId}',
+                'controller' => 'Mautic\CampaignBundle\Controller\CampaignTableStatsController::viewAction',
+            ],
+            'mautic_campaign_geo_stats_export' => [
+                'path'         => '/campaign-geo-stats/export/{objectId}/{format}',
+                'controller'   => 'Mautic\CampaignBundle\Controller\CampaignTableStatsController::exportAction',
+                'defaults'     => [
+                    'format' => 'csv',
+                ],
+            ],
         ],
         'api'  => [
             'mautic_api_campaignsstandard'            => [

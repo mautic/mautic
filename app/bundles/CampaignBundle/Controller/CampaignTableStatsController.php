@@ -15,21 +15,6 @@ use Mautic\CoreBundle\Security\Permissions\CorePermissions;
  */
 class CampaignTableStatsController extends AbstractCountryTableController
 {
-    public const MAP_OPTIONS = [
-        'contacts' => [
-            'label' => 'mautic.lead.leads',
-            'unit'  => 'Contact',
-        ],
-        'read_count' => [
-            'label' => 'mautic.email.read',
-            'unit'  => 'Read',
-        ],
-        'clicked_through_count'=> [
-            'label' => 'mautic.email.click',
-            'unit'  => 'Click',
-        ],
-    ];
-
     public function __construct(CampaignModel $model)
     {
         $this->model = $model;
@@ -42,9 +27,9 @@ class CampaignTableStatsController extends AbstractCountryTableController
      *
      * @throws Exception
      */
-    public function getData($entity, \DateTime $dateFromObject, \DateTime $dateToObject): array
+    public function getData($entity, \DateTimeInterface $dateFromObject = null, \DateTimeInterface $dateToObject = null): array
     {
-        return $this->model->getCountryStats($entity, $dateFromObject, $dateToObject);
+        return $this->model->getCountryStats($entity);
     }
 
     /**
@@ -57,26 +42,5 @@ class CampaignTableStatsController extends AbstractCountryTableController
             'email:emails:viewother',
             $entity->getCreatedBy()
         );
-    }
-
-    /**
-     * @param Campaign $entity
-     *
-     * @return array<string,array<string, string>>
-     */
-    public function getMapOptions($entity): array
-    {
-        if ($entity->getEmailSendEvents()->count() > 0) {
-            return self::MAP_OPTIONS;
-        }
-
-        $key = array_key_first(self::MAP_OPTIONS);
-
-        return [$key => self::MAP_OPTIONS[$key]];
-    }
-
-    public function getMapOptionsTitle(): string
-    {
-        return '';
     }
 }

@@ -20,7 +20,7 @@ interface TableModelInterface
      *
      * @throws Exception
      */
-    public function getCountryStats($entity, \DateTime $dateFrom, \DateTime $dateTo, bool $includeVariants = false): array;
+    public function getCountryStats($entity, bool $includeVariants = false): array;
 
     /**
      * @param int|array id
@@ -30,4 +30,6 @@ interface TableModelInterface
      * @phpstan-ignore-next-line
      */
     public function getEntity($id = null);
+
+    public function exportResults($object, string $format);
 }

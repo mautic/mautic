@@ -154,8 +154,8 @@
                     </a>
                 </li>
                 <li class="">
-                    <a href="#geographic-stats-container" role="tab" data-toggle="tab">
-                        {{ 'mautic.lead.leads'|trans }}
+                    <a href="#geo-stats-container" role="tab" data-toggle="tab">
+                        {{ 'mautic.email.geographic.stats'|trans }}
                     </a>
                 </li>
                 {{ customContent('tabs', mauticTemplateVars is defined ? mauticTemplateVars : {}) }}
@@ -198,6 +198,12 @@
                 <div class="spinner"><i class="fa fa-spin fa-spinner"></i></div>
                 <div class="clearfix"></div>
             </div>
+            <!-- #geo-stats-container -->
+            <div class="tab-pane bdr-w-0" id="geo-stats-container"
+                data-target-url="{{ path('mautic_campaign_geo_stats', {'objectId': campaign.id }) }}">
+                <div class="spinner"><i class="fa fa-spin fa-spinner"></i></div>
+            </div>
+            <!--/ #translation-container -->
             {{ customContent('tabs.content', mauticTemplateVars is defined ? mauticTemplateVars : {}) }}
         </div>
         <!--/ end: tab-content -->

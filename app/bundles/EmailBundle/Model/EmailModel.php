@@ -2,7 +2,6 @@
 
 namespace Mautic\EmailBundle\Model;
 
-use Cassandra\Table;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Query\QueryBuilder;
 use Doctrine\ORM\EntityManagerInterface;
@@ -737,7 +736,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, TableMod
      *
      * @throws \Doctrine\DBAL\Exception
      */
-    public function getCountryStats($entity, \DateTime $dateFrom = null, \DateTime $dateTo = null, bool $includeVariants = false): array
+    public function getCountryStats($entity, bool $includeVariants = false): array
     {
         $emailIds = ($includeVariants && ($entity->isVariant() || $entity->isTranslation())) ? $entity->getRelatedEntityIds() : [$entity->getId()];
 
@@ -2437,5 +2436,64 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, TableMod
         $context->setScheme($original_scheme);
 
         return $url;
+    }
+
+    public function exportResults($object, string $format)
+    {
+        $date = (new DateTimeHelper())->toLocalString();
+        $name = str_replace(' ', '_', $date).'_'.InputHelper::alphanum($object->getName(), false, '-');
+
+        switch ($format) {
+            case 'csv':
+                if (!is_null($handle)) {
+                    $this->csvExporter->export($reportDataResult, $handle, $page);
+
+                    return;
+                }
+
+                $response = new StreamedResponse(
+                    function () use ($reportDataResult) {
+                        $handle = fopen('php://output', 'r+');
+                        $this->csvExporter->export($reportDataResult, $handle);
+                        fclose($handle);
+                    }
+                );
+
+                $fileName = $name.'.csv';
+                ExportResponse::setResponseHeaders($response, $fileName);
+
+                return $response;
+
+            case 'html':
+                $content = $this->twig->render(
+                    '@MauticReport/Report/export.html.twig',
+                    [
+                        'pageTitle'        => $name,
+                        'report'           => $report,
+                        'reportDataResult' => $reportDataResult,
+                    ]
+                );
+
+                return new Response($content);
+
+            case 'xlsx':
+                if (!class_exists(Spreadsheet::class)) {
+                    throw new \Exception('PHPSpreadsheet is required to export to Excel spreadsheets');
+                }
+
+                $response = new StreamedResponse(
+                    function () use ($reportDataResult, $name) {
+                        $this->excelExporter->export($reportDataResult, $name);
+                    }
+                );
+
+                $fileName = $name.'.xlsx';
+                ExportResponse::setResponseHeaders($response, $fileName);
+
+                return $response;
+
+            default:
+                return new Response();
+        }
     }
 }

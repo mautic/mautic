@@ -15,17 +15,6 @@ use Mautic\EmailBundle\Model\EmailModel;
  */
 class EmailTableStatsController extends AbstractCountryTableController
 {
-    public const MAP_OPTIONS = [
-        'read_count' => [
-            'label' => 'mautic.email.stat.read',
-            'unit'  => 'Read',
-        ],
-        'clicked_through_count'=> [
-            'label' => 'mautic.email.clicked',
-            'unit'  => 'Click',
-        ],
-    ];
-
     public function __construct(EmailModel $model)
     {
         $this->model = $model;
@@ -38,7 +27,7 @@ class EmailTableStatsController extends AbstractCountryTableController
      *
      * @throws Exception
      */
-    public function getData($entity, \DateTime $dateFromObject, \DateTime $dateToObject): array
+    public function getData($entity, \DateTimeInterface $dateFromObject = null, \DateTimeInterface $dateToObject = null): array
     {
         // get A/B test information
         $parent = $entity->getVariantParent();
@@ -50,8 +39,6 @@ class EmailTableStatsController extends AbstractCountryTableController
 
         return $this->model->getCountryStats(
             $entity,
-            $dateFromObject,
-            $dateToObject,
             $includeVariants,
         );
     }
@@ -66,20 +53,5 @@ class EmailTableStatsController extends AbstractCountryTableController
             'email:emails:viewother',
             $entity->getCreatedBy()
         );
-    }
-
-    /**
-     * @param Email $entity
-     *
-     * @return array<string, array<string, string>>
-     */
-    public function getMapOptions($entity): array
-    {
-        return self::MAP_OPTIONS;
-    }
-
-    public function getMapOptionsTitle(): string
-    {
-        return 'mautic.email.stats.options.title';
     }
 }

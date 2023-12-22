@@ -6,6 +6,7 @@
  */
 Mautic.campaignOnLoad = function (container, response) {
     Mautic.lazyLoadContactListOnCampaignDetail();
+    Mautic.lazyLoadGeoTable();
 
     if (mQuery(container + ' #list-search').length) {
         Mautic.activateSearchAutocomplete('list-search', 'campaign');

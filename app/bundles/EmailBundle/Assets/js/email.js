@@ -1,5 +1,6 @@
 /** EmailBundle **/
 Mautic.emailOnLoad = function (container, response) {
+    Mautic.lazyLoadGeoTable();
     Mautic.internalDynamicContentItemCreateListeners = [];
     Mautic.internalDynamicContentFilterCreateListeners = [];
 

@@ -19,6 +19,7 @@ use Mautic\CampaignBundle\Membership\MembershipBuilder;
 use Mautic\CoreBundle\Helper\Chart\ChartQuery;
 use Mautic\CoreBundle\Helper\Chart\LineChart;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
+use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Model\FormModel as CommonFormModel;
 use Mautic\CoreBundle\Model\TableModelInterface;
@@ -843,7 +844,7 @@ class CampaignModel extends CommonFormModel implements TableModelInterface
      *
      * @throws Exception
      */
-    public function getCountryStats($entity, \DateTime $dateFrom, \DateTime $dateTo, bool $includeVariants = false): array
+    public function getCountryStats($entity, bool $includeVariants = false): array
     {
         $eventsEmailsSend     = $entity->getEmailSendEvents();
         $eventsIds            = $eventsEmailsSend->getKeys();
@@ -851,15 +852,20 @@ class CampaignModel extends CommonFormModel implements TableModelInterface
         /** @var StatRepository $statRepo */
         $statRepo            = $this->em->getRepository(Stat::class);
         // $query               = new ChartQuery($this->em->getConnection(), $dateFrom, $dateTo);
-        $results['contacts'] =  $this->getCampaignMembersGroupByCountry($entity);
+        $contacts =  $this->getCampaignMembersGroupByCountry($entity);
+
+        foreach ($contacts as $e) {
+            $results[$e['country']]['contacts'] = $e['contacts'];
+            $results[$e['country']]['country']  = $e['country'];
+        }
 
         if ($eventsEmailsSend->count() > 0) {
             $emailStats            = $statRepo->getStatsSummaryByCountry($eventsIds, 'campaign');
-            $results['read_count'] = $results['clicked_through_count'] = [];
 
             foreach ($emailStats as $e) {
-                $results['read_count'][]            = array_intersect_key($e, array_flip(['country', 'read_count']));
-                $results['clicked_through_count'][] = array_intersect_key($e, array_flip(['country', 'clicked_through_count']));
+                $results[$e['country']]['sent_count']            = $e['sent_count'];
+                $results[$e['country']]['read_count']            = $e['read_count'];
+                $results[$e['country']]['clicked_through_count'] = $e['clicked_through_count'];
             }
         }
 
@@ -873,6 +879,65 @@ class CampaignModel extends CommonFormModel implements TableModelInterface
      */
     public function getCampaignMembersGroupByCountry(Campaign $campaign): array
     {
-        return $this->em->getRepository(CampaignLead::class)->getCampaignMembersGroupByCountry($campaign, $dateFromObject, $dateToObject);
+        return $this->em->getRepository(CampaignLead::class)->getCampaignMembersGroupByCountry($campaign);
+    }
+
+    public function exportResults($object, string $format)
+    {
+        $date = (new DateTimeHelper())->toLocalString();
+        $name = str_replace(' ', '_', $date).'_'.InputHelper::alphanum($object->getName(), false, '-');
+
+        switch ($format) {
+            case 'csv':
+                if (!is_null($handle)) {
+                    $this->csvExporter->export($reportDataResult, $handle, $page);
+
+                    return;
+                }
+
+                $response = new StreamedResponse(
+                    function () use ($reportDataResult) {
+                        $handle = fopen('php://output', 'r+');
+                        $this->csvExporter->export($reportDataResult, $handle);
+                        fclose($handle);
+                    }
+                );
+
+                $fileName = $name.'.csv';
+                ExportResponse::setResponseHeaders($response, $fileName);
+
+                return $response;
+
+            case 'html':
+                $content = $this->twig->render(
+                    '@MauticReport/Report/export.html.twig',
+                    [
+                        'pageTitle'        => $name,
+                        'report'           => $report,
+                        'reportDataResult' => $reportDataResult,
+                    ]
+                );
+
+                return new Response($content);
+
+            case 'xlsx':
+                if (!class_exists(Spreadsheet::class)) {
+                    throw new \Exception('PHPSpreadsheet is required to export to Excel spreadsheets');
+                }
+
+                $response = new StreamedResponse(
+                    function () use ($reportDataResult, $name) {
+                        $this->excelExporter->export($reportDataResult, $name);
+                    }
+                );
+
+                $fileName = $name.'.xlsx';
+                ExportResponse::setResponseHeaders($response, $fileName);
+
+                return $response;
+
+            default:
+                return new Response();
+        }
     }
 }

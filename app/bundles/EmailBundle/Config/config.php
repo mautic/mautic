@@ -19,6 +19,17 @@ return [
                 'path'       => '/emails/view/{objectId}/contact/{page}',
                 'controller' => 'Mautic\EmailBundle\Controller\EmailController::contactsAction',
             ],
+            'mautic_email_geo_stats'      => [
+                'path'       => '/email-geo-stats/preview/{objectId}',
+                'controller' => 'Mautic\EmailBundle\Controller\EmailTableStatsController::viewAction',
+            ],
+            'mautic_email_geo_stats_export' => [
+                'path'         => '/email-geo-stats/export/{objectId}/{format}',
+                'controller'   => 'Mautic\EmailBundle\Controller\EmailTableStatsController::exportAction',
+                'defaults'     => [
+                    'format' => 'csv',
+                ],
+            ],
         ],
         'api' => [
             'mautic_api_emailstandard' => [

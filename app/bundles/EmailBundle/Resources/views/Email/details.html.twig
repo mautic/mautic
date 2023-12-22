@@ -316,11 +316,9 @@
               <!--/ #translation-container -->
 
               <!-- #geo-stats-container -->
-              <div class="tab-pane bdr-w-0" id="geo-stats-container">
-                  Test
-                  {{- include('@MauticCore/Helper/geotable.html.twig', {
-                      'test'  : 'test',
-                  }) -}}
+              <div class="tab-pane bdr-w-0" id="geo-stats-container"
+                   data-target-url="{{ path('mautic_email_geo_stats', {'objectId': email.id }) }}">
+                  <div class="spinner"><i class="fa fa-spin fa-spinner"></i></div>
               </div>
               <!--/ #translation-container -->
           </div>

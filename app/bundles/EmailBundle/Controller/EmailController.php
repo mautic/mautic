@@ -379,16 +379,6 @@ class EmailController extends FormController
         // Get click through stats
         $trackableLinks = $model->getEmailClickStats($email->getId());
 
-        // get A/B test information
-        $parent = $email->getVariantParent();
-
-        // get translation parent
-        $translationParent = $email->getTranslationParent();
-
-        $includeVariants = (($email->isVariant() && empty($parent)) || ($email->isTranslation() && empty($translationParent)));
-
-        $countryStats = $model->getCountryStats($email, null, null, $includeVariants);
-
         return $this->delegateView(
             [
                 'returnUrl' => $this->generateUrl(
@@ -401,7 +391,6 @@ class EmailController extends FormController
                 'viewParameters' => [
                     'email'        => $email,
                     'trackables'   => $trackableLinks,
-                    'geoStats'     => $countryStats,
                     'logs'         => $logs,
                     'isEmbedded'   => $request->get('isEmbedded') ? $request->get('isEmbedded') : false,
                     'variants'     => [
