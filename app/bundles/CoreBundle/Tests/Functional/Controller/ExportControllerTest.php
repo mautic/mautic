@@ -22,7 +22,7 @@ final class ExportControllerTest extends MauticMysqlTestCase
     public const PERMISSION_FORM_EXPORT     = 'form:export:enable';
     public const PERMISSION_REPORT_EXPORT   = 'report:export:enable';
 
-    public function testContactExportAction()
+    public function testContactExportAction(): void
     {
         $permissions = [
             1024  => 'lead:export:enable',
@@ -36,7 +36,7 @@ final class ExportControllerTest extends MauticMysqlTestCase
         Assert::assertSame(Response::HTTP_OK, $this->client->getResponse()->getStatusCode(), $this->client->getResponse()->getContent());
     }
 
-    public function testFormExportAction()
+    public function testFormExportAction(): void
     {
         $permissions = [
             1024 => 'form:export:enable',
@@ -52,7 +52,7 @@ final class ExportControllerTest extends MauticMysqlTestCase
         Assert::assertSame(Response::HTTP_OK, $this->client->getResponse()->getStatusCode());
     }
 
-    public function testReportExportAction()
+    public function testReportExportAction(): void
     {
         $permissions = [
             1024 => 'report:export:enable',
@@ -85,17 +85,6 @@ final class ExportControllerTest extends MauticMysqlTestCase
         $this->assertStringContainsString('Export to CSV', $this->client->getResponse()->getContent());
         $this->client->request(Request::METHOD_GET, '/s/reports/view/'.$report->getId().'/export');
         Assert::assertSame(Response::HTTP_OK, $this->client->getResponse()->getStatusCode());
-    }
-
-    private function createContact(string $email): Lead
-    {
-        $lead = new Lead();
-        $lead->setEmail($email);
-
-        $this->em->persist($lead);
-        $this->em->flush();
-
-        return $lead;
     }
 
     private function createAndLoginUser(array $permissions): User
