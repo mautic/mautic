@@ -108,6 +108,25 @@ class PublicController extends CommonFormController
     }
 
     /**
+     * One-Click unsubscribe - RFC 8058.
+     */
+    public function oneClickUnsubscribeAction(EmailModel $emailModel, string $idHash): Response
+    {
+        $stat = $emailModel->getEmailStatus($idHash);
+        if (!empty($stat)) {
+            $unsubscribeComment = $this->translator->trans('mautic.email.dnc.unsubscribed');
+            $emailModel->setDoNotContact($stat, $unsubscribeComment, DoNotContact::UNSUBSCRIBED);
+        } else {
+            $content = $this->translator->trans('mautic.email.stat_record.not_found');
+
+            return new Response($content, Response::HTTP_NOT_FOUND);
+        }
+        $content = $this->translator->trans('mautic.lead.do.not.contact_unsubscribed');
+
+        return new Response($content);
+    }
+
+    /**
      * @return Response
      *
      * @throws \Exception
