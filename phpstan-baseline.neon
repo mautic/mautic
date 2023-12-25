@@ -10536,6 +10536,41 @@ parameters:
 			path: app/bundles/CoreBundle/IpLookup/IP2LocationAPILookup.php
 
 		-
+			message: "#^Access to an undefined property object\\:\\:\\$city_name\\.$#"
+			count: 1
+			path: app/bundles/CoreBundle/IpLookup/IP2LocationIoLookup.php
+
+		-
+			message: "#^Access to an undefined property object\\:\\:\\$latitude\\.$#"
+			count: 1
+			path: app/bundles/CoreBundle/IpLookup/IP2LocationIoLookup.php
+
+		-
+			message: "#^Access to an undefined property object\\:\\:\\$longitude\\.$#"
+			count: 1
+			path: app/bundles/CoreBundle/IpLookup/IP2LocationIoLookup.php
+
+		-
+			message: "#^Access to an undefined property object\\:\\:\\$region_name\\.$#"
+			count: 1
+			path: app/bundles/CoreBundle/IpLookup/IP2LocationIoLookup.php
+
+		-
+			message: "#^Access to an undefined property object\\:\\:\\$zip_code\\.$#"
+			count: 1
+			path: app/bundles/CoreBundle/IpLookup/IP2LocationIoLookup.php
+
+		-
+			message: "#^Dead catch \\- Exception is never thrown in the try block\\.$#"
+			count: 1
+			path: app/bundles/CoreBundle/IpLookup/IP2LocationIoLookup.php
+
+		-
+			message: "#^Method Mautic\\\\CoreBundle\\\\IpLookup\\\\IP2LocationIoLookup\\:\\:parseResponse\\(\\) has parameter \\$response with no type specified\\.$#"
+			count: 1
+			path: app/bundles/CoreBundle/IpLookup/IP2LocationIoLookup.php
+
+		-
 			message: "#^Call to an undefined method Psr\\\\Log\\\\LoggerInterface\\:\\:warn\\(\\)\\.$#"
 			count: 2
 			path: app/bundles/CoreBundle/IpLookup/IP2LocationBinLookup.php
