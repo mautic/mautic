@@ -4,6 +4,9 @@ namespace Mautic\CoreBundle\Form\DataTransformer;
 
 use Symfony\Component\Form\DataTransformerInterface;
 
+/**
+ * @implements DataTransformerInterface<string|null, string>
+ */
 class NullToEmptyTransformer implements DataTransformerInterface
 {
     /**
@@ -11,7 +14,7 @@ class NullToEmptyTransformer implements DataTransformerInterface
      *
      * @param string|null $value
      *
-     * @return string
+     * @return string|null
      */
     public function transform($value)
     {
@@ -21,7 +24,7 @@ class NullToEmptyTransformer implements DataTransformerInterface
     /**
      * Transforms a null to an empty string.
      *
-     * @param string $value
+     * @param string|null $value
      *
      * @return string
      */

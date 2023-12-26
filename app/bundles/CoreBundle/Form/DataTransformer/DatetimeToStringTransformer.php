@@ -4,6 +4,9 @@ namespace Mautic\CoreBundle\Form\DataTransformer;
 
 use Symfony\Component\Form\DataTransformerInterface;
 
+/**
+ * @implements DataTransformerInterface<string|null, \DateTime>
+ */
 class DatetimeToStringTransformer implements DataTransformerInterface
 {
     /**
@@ -15,6 +18,8 @@ class DatetimeToStringTransformer implements DataTransformerInterface
     }
 
     /**
+     * @param \DateTime|null $value
+     *
      * @return string
      */
     public function reverseTransform($value)
@@ -29,6 +34,8 @@ class DatetimeToStringTransformer implements DataTransformerInterface
     }
 
     /**
+     * @param string|null $value
+     *
      * @return \DateTime
      */
     public function transform($value)
