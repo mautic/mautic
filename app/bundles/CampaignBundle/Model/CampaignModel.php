@@ -843,7 +843,7 @@ class CampaignModel extends CommonFormModel implements TableModelInterface
     /**
      * @param Campaign $entity
      *
-     * @return array<string, array<int, array<string, int|string>>>
+     * @return array<int|string, array<string, int|string|null>>
      *
      * @throws Exception
      */
@@ -851,7 +851,6 @@ class CampaignModel extends CommonFormModel implements TableModelInterface
     {
         $eventsEmailsSend     = $entity->getEmailSendEvents();
         $eventsIds            = $eventsEmailsSend->getKeys();
-        $results              = [];
 
         /** @var StatRepository $statRepo */
         $statRepo            = $this->em->getRepository(Stat::class);
@@ -872,7 +871,7 @@ class CampaignModel extends CommonFormModel implements TableModelInterface
             }
         }
 
-        return $results;
+        return $results ?? [];
     }
 
     /**

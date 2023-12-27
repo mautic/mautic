@@ -26,9 +26,9 @@ abstract class AbstractCountryTableController extends AbstractController
      *
      * @param T $entity
      *
-     * @return array<string, array<int, array<string, int|string>>>
+     * @return array<int|string, array<int|string, int|string>>
      */
-    abstract public function getData($entity, \DateTimeInterface $dateFromObject = null, \DateTimeInterface $dateToObject = null): array;
+    abstract public function getData($entity): array;
 
     /**
      * @template T
@@ -42,9 +42,7 @@ abstract class AbstractCountryTableController extends AbstractController
      */
     public function viewAction(
         CorePermissions $security,
-        int $objectId,
-        string $dateFrom = '',
-        string $dateTo = ''
+        int $objectId
     ): Response {
         $entity = $this->model->getEntity($objectId);
 

@@ -23,11 +23,11 @@ class CampaignTableStatsController extends AbstractCountryTableController
     /**
      * @param Campaign $entity
      *
-     * @return array<string, array<int, array<string, int|string>>>
+     * @return array<int|string, array<int|string, int|string>>
      *
      * @throws Exception
      */
-    public function getData($entity, \DateTimeInterface $dateFromObject = null, \DateTimeInterface $dateToObject = null): array
+    public function getData($entity): array
     {
         return $this->model->getCountryStats($entity);
     }

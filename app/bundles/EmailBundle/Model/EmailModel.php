@@ -736,7 +736,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, TableMod
     /**
      * @param Email $entity
      *
-     * @return array<string, array<int, array<string, int|string>>>
+     * @return array<int|string, array<string, int|string|null>>
      *
      * @throws \Doctrine\DBAL\Exception
      */

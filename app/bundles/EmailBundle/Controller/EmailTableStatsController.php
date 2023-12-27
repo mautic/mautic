@@ -23,11 +23,11 @@ class EmailTableStatsController extends AbstractCountryTableController
     /**
      * @param Email $entity
      *
-     * @return array<string, array<int, array<string, int|string>>>
+     * @return array<int|string, array<int|string, int|string>>
      *
      * @throws Exception
      */
-    public function getData($entity, \DateTimeInterface $dateFromObject = null, \DateTimeInterface $dateToObject = null): array
+    public function getData($entity): array
     {
         // get A/B test information
         $parent = $entity->getVariantParent();
