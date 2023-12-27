@@ -19,6 +19,7 @@ use Mautic\PageBundle\Event\PageDisplayEvent;
 use Mautic\PageBundle\EventListener\BuilderSubscriber;
 use Mautic\PageBundle\PageEvents;
 use Mautic\QueueBundle\Queue\QueueName;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
 class PublicController extends CommonFormController
@@ -125,11 +126,20 @@ class PublicController extends CommonFormController
         $lead       = null;
         $template   = null;
         $session    = $this->get('session');
+        $isOneClickUnsubscribe = $this->request->isMethod(Request::METHOD_POST) && 'One-Click' === $this->request->get('List-Unsubscribe');
 
         /** @var \Mautic\LeadBundle\Model\LeadModel $leadModel */
         $leadModel = $this->getModel('lead');
 
         if (!empty($stat)) {
+            if ($isOneClickUnsubscribe) {
+                // RFC 8058 One-Click unsubscribe
+                $unsubscribeComment = $this->translator->trans('mautic.email.dnc.unsubscribed');
+                $model->setDoNotContact($stat, $unsubscribeComment, DoNotContact::UNSUBSCRIBED);
+
+                return new Response($unsubscribeComment);
+            }
+
             if ($email = $stat->getEmail()) {
                 $template = $email->getTemplate();
                 if ('mautic_code_mode' === $template) {
@@ -144,6 +154,10 @@ class PublicController extends CommonFormController
                     $formModel    = $this->getModel('form');
                     $formContent  = '<div class="mautic-unsubscribeform">'.$formModel->getContent($unsubscribeForm).'</div>';
                 }
+            }
+        } else {
+            if ($isOneClickUnsubscribe) {
+                return new Response($this->translator->trans('mautic.email.stat_record.not_found'), Response::HTTP_NOT_FOUND);
             }
         }
 
