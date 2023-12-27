@@ -826,7 +826,7 @@ class CampaignModel extends CommonFormModel implements TableModelInterface
         switch ($format) {
             case 'csv':
                 $response = new StreamedResponse(
-                    function () use ($entity, $dataResult) {
+                    function () use ($entity, $dataResult): void {
                         $handle    = fopen('php://output', 'r+');
                         $headerRow = $this->getExportHeader($entity);
 
@@ -853,7 +853,7 @@ class CampaignModel extends CommonFormModel implements TableModelInterface
                     throw new \Exception('PHPSpreadsheet is required to export to Excel spreadsheets');
                 }
                 $response = new StreamedResponse(
-                    function () use ($entity, $dataResult, $name) {
+                    function () use ($entity, $dataResult, $name): void {
                         $objPHPExcel = new Spreadsheet();
                         $objPHPExcel->getProperties()->setTitle($name);
                         $objPHPExcel->createSheet();
@@ -864,7 +864,7 @@ class CampaignModel extends CommonFormModel implements TableModelInterface
 
                         // build the data rows
                         $count = 2;
-                        foreach ($dataResult as $k => $s) {
+                        foreach ($dataResult as $s) {
                             $row = $this->getExportRow($entity, $s);
                             $objPHPExcel->getActiveSheet()->fromArray($row, null, "A{$count}");
 

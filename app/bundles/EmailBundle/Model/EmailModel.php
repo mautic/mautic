@@ -2310,7 +2310,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, TableMod
         switch ($format) {
             case 'csv':
                 $response = new StreamedResponse(
-                    function () use ($dataResult) {
+                    function () use ($dataResult): void {
                         $handle    = fopen('php://output', 'r+');
                         $headerRow = $this->getExportHeader();
 
@@ -2337,7 +2337,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, TableMod
                     throw new \Exception('PHPSpreadsheet is required to export to Excel spreadsheets');
                 }
                 $response = new StreamedResponse(
-                    function () use ($dataResult, $name) {
+                    function () use ($dataResult, $name): void {
                         $objPHPExcel = new Spreadsheet();
                         $objPHPExcel->getProperties()->setTitle($name);
                         $objPHPExcel->createSheet();
