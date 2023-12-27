@@ -416,6 +416,13 @@ class Campaign extends FormEntity implements PublishStatusIconAttributesInterfac
         return $keyedArrayCollection;
     }
 
+    public function isEmailCampaign(): bool
+    {
+        $emailEvents = $this->getEmailSendEvents();
+
+        return $emailEvents->count() > 0;
+    }
+
     /**
      * Set publishUp.
      *
