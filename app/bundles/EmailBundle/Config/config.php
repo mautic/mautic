@@ -19,12 +19,12 @@ return [
                 'path'       => '/emails/view/{objectId}/contact/{page}',
                 'controller' => 'Mautic\EmailBundle\Controller\EmailController::contactsAction',
             ],
-            'mautic_email_geo_stats'      => [
-                'path'       => '/email-geo-stats/preview/{objectId}',
+            'mautic_email_countries_stats'      => [
+                'path'       => '/email-countries-stats/preview/{objectId}',
                 'controller' => 'Mautic\EmailBundle\Controller\EmailTableStatsController::viewAction',
             ],
-            'mautic_email_geo_stats_export' => [
-                'path'         => '/email-geo-stats/{objectId}/export/{format}',
+            'mautic_email_countries_stats_export' => [
+                'path'         => '/email-countries-stats/{objectId}/export/{format}',
                 'controller'   => 'Mautic\EmailBundle\Controller\EmailTableStatsController::exportAction',
             ],
         ],

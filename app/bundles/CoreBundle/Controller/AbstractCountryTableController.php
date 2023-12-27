@@ -53,7 +53,7 @@ abstract class AbstractCountryTableController extends AbstractController
         $statsCountries = $this->getData($entity);
 
         return $this->render(
-            '@MauticCore/Helper/geotable.html.twig',
+            '@MauticCore/Helper/countries_table.html.twig',
             [
                 'data'           => $statsCountries,
                 'object'         => $entity,

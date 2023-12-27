@@ -154,7 +154,7 @@
                     </a>
                 </li>
                 <li class="">
-                    <a href="#geo-stats-container" role="tab" data-toggle="tab">
+                    <a href="#countries-stats-container" role="tab" data-toggle="tab">
                         {{ 'mautic.core.countries.stats'|trans }}
                     </a>
                 </li>
@@ -198,18 +198,18 @@
                 <div class="spinner"><i class="fa fa-spin fa-spinner"></i></div>
                 <div class="clearfix"></div>
             </div>
-            <!-- #geo-stats-container -->
-            <div class="tab-pane bdr-w-0" id="geo-stats-container"
-                data-target-url="{{ path('mautic_campaign_geo_stats', {'objectId': campaign.id }) }}">
+            <!-- #countries-stats-container -->
+            <div class="tab-pane bdr-w-0" id="countries-stats-container"
+                data-target-url="{{ path('mautic_campaign_countries_stats', {'objectId': campaign.id }) }}">
                 <div class="std-toolbar btn-group download-toolbar">
-                    <a class="btn btn-default" href="{{ path('mautic_campaign_geo_stats_export', {'objectId': campaign.id, 'format': 'csv'}) }}">
+                    <a class="btn btn-default" href="{{ path('mautic_campaign_countries_stats_export', {'objectId': campaign.id, 'format': 'csv'}) }}">
                         <span><i class="fa fa-file-text-o"></i><span class="hidden-xs hidden-sm">{{ 'mautic.core.export.csv'|trans }}</span></span>
                     </a>
-                    <a class="btn btn-default" href="{{ path('mautic_campaign_geo_stats_export', {'objectId': campaign.id, 'format': 'xlsx'}) }}">
+                    <a class="btn btn-default" href="{{ path('mautic_campaign_countries_stats_export', {'objectId': campaign.id, 'format': 'xlsx'}) }}">
                         <span><i class="fa fa-file-excel-o"></i><span class="hidden-xs hidden-sm">{{ 'mautic.core.export.xlsx'|trans }}</span></span>
                     </a>
                 </div>
-                <div id="geo-stats">
+                <div id="countries-stats">
                     <div class="spinner"><i class="fa fa-spin fa-spinner"></i></div>
                 </div>
             </div>

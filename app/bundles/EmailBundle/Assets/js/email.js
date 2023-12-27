@@ -1,8 +1,8 @@
 /** EmailBundle **/
 Mautic.emailOnLoad = function (container, response) {
-    Mautic.lazyLoadGeoTable();
     Mautic.internalDynamicContentItemCreateListeners = [];
     Mautic.internalDynamicContentFilterCreateListeners = [];
+    Mautic.lazyLoadCountriesStats();
 
     if (mQuery('#emailform_plainText').length) {
         // @todo initiate the token dropdown
