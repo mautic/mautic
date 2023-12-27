@@ -10,20 +10,12 @@ use Mautic\LeadBundle\Model\ListModel;
 
 class LoadLeadListData extends AbstractFixture implements OrderedFixtureInterface
 {
-    /**
-     * @var ListModel
-     */
-    private $segmentModel;
-
-    /**
-     * {@inheritdoc}
-     */
-    public function __construct(ListModel $segmentModel)
-    {
-        $this->segmentModel = $segmentModel;
+    public function __construct(
+        private ListModel $segmentModel
+    ) {
     }
 
-    public function load(ObjectManager $manager)
+    public function load(ObjectManager $manager): void
     {
         $adminUser = $this->getReference('admin-user');
 

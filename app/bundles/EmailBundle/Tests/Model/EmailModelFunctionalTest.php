@@ -108,21 +108,21 @@ class EmailModelFunctionalTest extends MauticMysqlTestCase
         $email = $this->createEmail($segment);
 
         $emailModel                                             =  self::$container->get('mautic.email.model.email');
-        list($sentCount, $failedCount, $failedRecipientsByList) = $emailModel->sendEmailToLists($email, [$segment], 4, 2);
+        [$sentCount, $failedCount, $failedRecipientsByList]     = $emailModel->sendEmailToLists($email, [$segment], 4, 2);
         $this->assertEquals($sentCount, 4);
-        list($sentCount, $failedCount, $failedRecipientsByList) = $emailModel->sendEmailToLists($email, [$segment], 3, 2);
+        [$sentCount, $failedCount, $failedRecipientsByList] = $emailModel->sendEmailToLists($email, [$segment], 3, 2);
         $this->assertEquals($sentCount, 3);
-        list($sentCount, $failedCount, $failedRecipientsByList) = $emailModel->sendEmailToLists($email, [$segment], 2);
+        [$sentCount, $failedCount, $failedRecipientsByList] = $emailModel->sendEmailToLists($email, [$segment], 2);
         $this->assertEquals($sentCount, 2);
-        list($sentCount, $failedCount, $failedRecipientsByList) = $emailModel->sendEmailToLists($email, [$segment], 4);
+        [$sentCount, $failedCount, $failedRecipientsByList] = $emailModel->sendEmailToLists($email, [$segment], 4);
         $this->assertEquals($sentCount, 1);
 
         $email                                                  = $this->createEmail($segment);
-        list($sentCount, $failedCount, $failedRecipientsByList) = $emailModel->sendEmailToLists($email, [$segment]);
+        [$sentCount, $failedCount, $failedRecipientsByList]     = $emailModel->sendEmailToLists($email, [$segment]);
         $this->assertEquals($sentCount, 10);
 
         $email                                                  = $this->createEmail($segment);
-        list($sentCount, $failedCount, $failedRecipientsByList) = $emailModel->sendEmailToLists($email, [$segment], null, 2);
+        [$sentCount, $failedCount, $failedRecipientsByList]     = $emailModel->sendEmailToLists($email, [$segment], null, 2);
         $this->assertEquals($sentCount, 10);
     }
 

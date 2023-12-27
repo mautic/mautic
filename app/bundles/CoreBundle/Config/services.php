@@ -5,7 +5,9 @@ declare(strict_types=1);
 use Mautic\CoreBundle\DependencyInjection\MauticCoreExtension;
 use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
 
-return function (ContainerConfigurator $configurator) {
+use function Symfony\Component\DependencyInjection\Loader\Configurator\service;
+
+return function (ContainerConfigurator $configurator): void {
     $services = $configurator->services()
         ->defaults()
         ->autowire()
@@ -30,6 +32,7 @@ return function (ContainerConfigurator $configurator) {
         'Twig/Helper/ThemeHelper.php',
         'Translation/TranslatorLoader.php',
         'Helper/Dsn/Dsn.php',
+        'Cache/ResultCacheOptions.php',
     ];
 
     $services->load('Mautic\\CoreBundle\\', '../')
@@ -59,4 +62,7 @@ return function (ContainerConfigurator $configurator) {
     $services->alias('mautic.core.model.auditlog', \Mautic\CoreBundle\Model\AuditLogModel::class);
     $services->alias('mautic.core.model.notification', \Mautic\CoreBundle\Model\NotificationModel::class);
     $services->alias('mautic.core.model.form', \Mautic\CoreBundle\Model\FormModel::class);
+    $services->get(\Mautic\CoreBundle\EventListener\CacheInvalidateSubscriber::class)
+        ->arg('$ormConfiguration', service('doctrine.orm.default_configuration'))
+        ->tag('doctrine.event_subscriber');
 };

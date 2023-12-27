@@ -11,7 +11,7 @@ use Mautic\CoreBundle\Entity\CommonRepository;
  */
 class GroupRepository extends CommonRepository
 {
-    public function getTableAlias()
+    public function getTableAlias(): string
     {
         return 'pl';
     }

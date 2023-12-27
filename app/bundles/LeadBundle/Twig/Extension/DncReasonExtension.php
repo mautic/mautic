@@ -11,14 +11,9 @@ use Twig\TwigFunction;
 
 class DncReasonExtension extends AbstractExtension
 {
-    /**
-     * @var DncReasonHelper
-     */
-    protected $helper;
-
-    public function __construct(DncReasonHelper $helper)
-    {
-        $this->helper = $helper;
+    public function __construct(
+        protected DncReasonHelper $helper
+    ) {
     }
 
     /**

@@ -8,8 +8,6 @@ use Symfony\Component\Process\Process;
 
 final class ProcessQueue
 {
-    private int $processLimit;
-
     /**
      * @var \SplQueue<Process>
      */
@@ -25,12 +23,12 @@ final class ProcessQueue
      */
     private \SplObjectStorage $processed;
 
-    public function __construct(int $processLimit = 10)
-    {
+    public function __construct(
+        private int $processLimit = 10
+    ) {
         $this->pending      = new \SplQueue();
         $this->processing   = new \SplObjectStorage();
         $this->processed    = new \SplObjectStorage();
-        $this->processLimit = $processLimit;
     }
 
     /**

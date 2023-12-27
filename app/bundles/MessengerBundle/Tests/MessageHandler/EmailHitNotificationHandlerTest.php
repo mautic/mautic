@@ -16,7 +16,7 @@ class EmailHitNotificationHandlerTest extends TestCase
 {
     public function testInvoke(): void
     {
-        $hitId   = sha1((string) rand(0, 1000000));
+        $hitId   = sha1((string) random_int(0, 1_000_000));
         $request = new Request();
         $request->query->set('testMe', 'I am here');
 
@@ -40,7 +40,7 @@ class EmailHitNotificationHandlerTest extends TestCase
 
     public function testInvokeThrowsRecoverableExceptionOnDBLock(): void
     {
-        $hitId   = sha1((string) rand(0, 1000000));
+        $hitId   = sha1((string) random_int(0, 1_000_000));
         $request = new Request();
         $request->query->set('testMe', 'I am here');
 
@@ -65,7 +65,7 @@ class EmailHitNotificationHandlerTest extends TestCase
 
     public function testInvokeLogsUnrecoverableException(): void
     {
-        $hitId   = sha1((string) rand(0, 1000000));
+        $hitId   = sha1((string) random_int(0, 1_000_000));
         $request = new Request();
         $request->query->set('testMe', 'I am here');
 

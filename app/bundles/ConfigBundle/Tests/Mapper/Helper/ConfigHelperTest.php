@@ -11,7 +11,7 @@ class ConfigHelperTest extends \PHPUnit\Framework\TestCase
      *
      * @covers \Mautic\ConfigBundle\Mapper\Helper\ConfigHelper::bindNestedConfigValues
      */
-    public function testNestedLocalParametersAreBoundCorrectly()
+    public function testNestedLocalParametersAreBoundCorrectly(): void
     {
         $defaults = [
             'db_host'         => null,

@@ -62,7 +62,7 @@ class PublicController extends CommonFormController
                     $entity->setUploadDir($parametersHelper->get('upload_dir'));
                     $contents = $entity->getFileContents();
                     $model->trackDownload($entity, $request, 200);
-                } catch (\Exception $e) {
+                } catch (\Exception) {
                     $model->trackDownload($entity, $request, 404);
 
                     return $this->notFound();

@@ -21,21 +21,12 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 final class ImportCompanySubscriber implements EventSubscriberInterface
 {
-    private FieldList $fieldList;
-    private CorePermissions $corePermissions;
-    private CompanyModel $companyModel;
-    private TranslatorInterface $translator;
-
     public function __construct(
-        FieldList $fieldList,
-        CorePermissions $corePermissions,
-        CompanyModel $companyModel,
-        TranslatorInterface $translator
+        private FieldList $fieldList,
+        private CorePermissions $corePermissions,
+        private CompanyModel $companyModel,
+        private TranslatorInterface $translator
     ) {
-        $this->fieldList       = $fieldList;
-        $this->corePermissions = $corePermissions;
-        $this->companyModel    = $companyModel;
-        $this->translator      = $translator;
     }
 
     public static function getSubscribedEvents(): array

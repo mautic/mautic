@@ -87,51 +87,6 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, TableMod
     use FilterTrait;
 
     /**
-     * @var IpLookupHelper
-     */
-    protected $ipLookupHelper;
-
-    /**
-     * @var ThemeHelperInterface
-     */
-    protected $themeHelper;
-
-    /**
-     * @var Mailbox
-     */
-    protected $mailboxHelper;
-
-    /**
-     * @var MailHelper
-     */
-    protected $mailHelper;
-
-    /**
-     * @var LeadModel
-     */
-    protected $leadModel;
-
-    /**
-     * @var CompanyModel
-     */
-    protected $companyModel;
-
-    /**
-     * @var TrackableModel
-     */
-    protected $pageTrackableModel;
-
-    /**
-     * @var UserModel
-     */
-    protected $userModel;
-
-    /**
-     * @var MessageQueueModel
-     */
-    protected $messageQueueModel;
-
-    /**
      * @var bool
      */
     protected $updatingTranslationChildren = false;
@@ -141,58 +96,23 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, TableMod
      */
     protected $emailSettings = [];
 
-    /**
-     * @var SendEmailToContact
-     */
-    protected $sendModel;
-
-    /**
-     * @var DeviceTracker
-     */
-    private $deviceTracker;
-
-    /**
-     * @var RedirectRepository
-     */
-    private $redirectRepository;
-
-    /**
-     * @var CacheStorageHelper
-     */
-    private $cacheStorageHelper;
-
-    /**
-     * @var ContactTracker
-     */
-    private $contactTracker;
-
-    /**
-     * @var DNC
-     */
-    private $doNotContact;
-
-    /**
-     * @var StatsCollectionHelper
-     */
-    private $statsCollectionHelper;
-
     public function __construct(
-        IpLookupHelper $ipLookupHelper,
-        ThemeHelperInterface $themeHelper,
-        Mailbox $mailboxHelper,
-        MailHelper $mailHelper,
-        LeadModel $leadModel,
-        CompanyModel $companyModel,
-        TrackableModel $pageTrackableModel,
-        UserModel $userModel,
-        MessageQueueModel $messageQueueModel,
-        SendEmailToContact $sendModel,
-        DeviceTracker $deviceTracker,
-        RedirectRepository $redirectRepository,
-        CacheStorageHelper $cacheStorageHelper,
-        ContactTracker $contactTracker,
-        DNC $doNotContact,
-        StatsCollectionHelper $statsCollectionHelper,
+        protected IpLookupHelper $ipLookupHelper,
+        protected ThemeHelperInterface $themeHelper,
+        protected Mailbox $mailboxHelper,
+        protected MailHelper $mailHelper,
+        protected LeadModel $leadModel,
+        protected CompanyModel $companyModel,
+        protected TrackableModel $pageTrackableModel,
+        protected UserModel $userModel,
+        protected MessageQueueModel $messageQueueModel,
+        protected SendEmailToContact $sendModel,
+        private DeviceTracker $deviceTracker,
+        private RedirectRepository $redirectRepository,
+        private CacheStorageHelper $cacheStorageHelper,
+        private ContactTracker $contactTracker,
+        private DNC $doNotContact,
+        private StatsCollectionHelper $statsCollectionHelper,
         CorePermissions $security,
         Connection $connection,
         EntityManagerInterface $em,
@@ -203,22 +123,6 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, TableMod
         LoggerInterface $mauticLogger,
         CoreParametersHelper $coreParametersHelper
     ) {
-        $this->ipLookupHelper           = $ipLookupHelper;
-        $this->themeHelper              = $themeHelper;
-        $this->mailboxHelper            = $mailboxHelper;
-        $this->mailHelper               = $mailHelper;
-        $this->leadModel                = $leadModel;
-        $this->companyModel             = $companyModel;
-        $this->pageTrackableModel       = $pageTrackableModel;
-        $this->userModel                = $userModel;
-        $this->messageQueueModel        = $messageQueueModel;
-        $this->sendModel                = $sendModel;
-        $this->deviceTracker            = $deviceTracker;
-        $this->redirectRepository       = $redirectRepository;
-        $this->cacheStorageHelper       = $cacheStorageHelper;
-        $this->contactTracker           = $contactTracker;
-        $this->doNotContact             = $doNotContact;
-        $this->statsCollectionHelper    = $statsCollectionHelper;
         $this->connection               = $connection;
 
         parent::__construct($em, $security, $dispatcher, $router, $translator, $userHelper, $mauticLogger, $coreParametersHelper);
@@ -256,7 +160,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, TableMod
         return $this->em->getRepository(\Mautic\EmailBundle\Entity\StatDevice::class);
     }
 
-    public function getPermissionBase()
+    public function getPermissionBase(): string
     {
         return 'email:emails';
     }
@@ -324,10 +228,8 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, TableMod
 
     /**
      * Save an array of entities.
-     *
-     * @return array
      */
-    public function saveEntities($entities, $unlock = true)
+    public function saveEntities($entities, $unlock = true): void
     {
         // iterate over the results so the events are dispatched on each delete
         $batchSize = 20;
@@ -358,7 +260,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, TableMod
     /**
      * @param Email $entity
      */
-    public function deleteEntity($entity)
+    public function deleteEntity($entity): void
     {
         if ($entity->isVariant() && $entity->getIsPublished()) {
             $this->resetVariants($entity);
@@ -371,11 +273,11 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, TableMod
      * @param string|null $action
      * @param array       $options
      *
-     * @return FormInterface<object>
+     * @return FormInterface<Email>
      *
      * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
      */
-    public function createForm($entity, FormFactoryInterface $formFactory, $action = null, $options = [])
+    public function createForm($entity, FormFactoryInterface $formFactory, $action = null, $options = []): FormInterface
     {
         if (!$entity instanceof Email) {
             throw new MethodNotAllowedHttpException(['Email']);
@@ -389,10 +291,8 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, TableMod
 
     /**
      * Get a specific entity or generate a new one if id is empty.
-     *
-     * @return Email|null
      */
-    public function getEntity($id = null)
+    public function getEntity($id = null): ?Email
     {
         if (null === $id) {
             $entity = new Email();
@@ -437,7 +337,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, TableMod
     /**
      * @throws \Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException
      */
-    protected function dispatchEvent($action, &$entity, $isNew = false, Event $event = null)
+    protected function dispatchEvent($action, &$entity, $isNew = false, Event $event = null): ?Event
     {
         if (!$entity instanceof Email) {
             throw new MethodNotAllowedHttpException(['Email']);
@@ -619,10 +519,8 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, TableMod
      * @param int|null $companyId
      * @param int|null $campaignId
      * @param int|null $segmentId
-     *
-     * @return array
      */
-    public function getSentEmailToContactData($limit, \DateTime $dateFrom, \DateTime $dateTo, $options = [], $companyId = null, $campaignId = null, $segmentId = null)
+    public function getSentEmailToContactData($limit, \DateTime $dateFrom, \DateTime $dateTo, $options = [], $companyId = null, $campaignId = null, $segmentId = null): array
     {
         $createdByUserId = null;
         $canViewOthers   = empty($options['canViewOthers']) ? false : $options['canViewOthers'];
@@ -652,7 +550,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, TableMod
                 'contact_id'    => $stat['lead_id'],
                 'contact_email' => $stat['email_address'],
                 'open'          => $stat['is_read'],
-                'click'         => (null !== $stat['link_hits']) ? $stat['link_hits'] : 0,
+                'click'         => $stat['link_hits'] ?? 0,
                 'links_clicked' => [],
                 'email_id'      => (string) $stat['email_id'],
                 'email_name'    => (string) $stat['email_name'],
@@ -682,10 +580,8 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, TableMod
      * @param int|null $companyId
      * @param int|null $campaignId
      * @param int|null $segmentId
-     *
-     * @return array
      */
-    public function getMostHitEmailRedirects($limit, \DateTime $dateFrom, \DateTime $dateTo, $options = [], $companyId = null, $campaignId = null, $segmentId = null)
+    public function getMostHitEmailRedirects($limit, \DateTime $dateFrom, \DateTime $dateTo, $options = [], $companyId = null, $campaignId = null, $segmentId = null): array
     {
         $createdByUserId = null;
         $canViewOthers   = empty($options['canViewOthers']) ? false : $options['canViewOthers'];
@@ -754,10 +650,8 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, TableMod
      * Get a stats for email by list.
      *
      * @param bool $includeVariants
-     *
-     * @return array
      */
-    public function getEmailListStats($email, $includeVariants = false, \DateTime $dateFrom = null, \DateTime $dateTo = null)
+    public function getEmailListStats($email, $includeVariants = false, \DateTime $dateFrom = null, \DateTime $dateTo = null): array
     {
         if (!$email instanceof Email) {
             $email = $this->getEntity($email);
@@ -798,12 +692,12 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, TableMod
             $bouncedCounts      = $dncRepo->getCount('email', $emailIds, DoNotContact::BOUNCED, $lists->getKeys(), $query);
 
             foreach ($lists as $l) {
-                $sentCount         = isset($sentCounts[$l->getId()]) ? $sentCounts[$l->getId()] : 0;
-                $readCount         = isset($readCounts[$l->getId()]) ? $readCounts[$l->getId()] : 0;
-                $failedCount       = isset($failedCounts[$l->getId()]) ? $failedCounts[$l->getId()] : 0;
-                $clickCount        = isset($clickCounts[$l->getId()]) ? $clickCounts[$l->getId()] : 0;
-                $unsubscribedCount = isset($unsubscribedCounts[$l->getId()]) ? $unsubscribedCounts[$l->getId()] : 0;
-                $bouncedCount      = isset($bouncedCounts[$l->getId()]) ? $bouncedCounts[$l->getId()] : 0;
+                $sentCount         = $sentCounts[$l->getId()] ?? 0;
+                $readCount         = $readCounts[$l->getId()] ?? 0;
+                $failedCount       = $failedCounts[$l->getId()] ?? 0;
+                $clickCount        = $clickCounts[$l->getId()] ?? 0;
+                $unsubscribedCount = $unsubscribedCounts[$l->getId()] ?? 0;
+                $bouncedCount      = $bouncedCounts[$l->getId()] ?? 0;
 
                 $chart->setDataset(
                     $l->getName(),
@@ -855,10 +749,8 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, TableMod
      *
      * @param Email|int $email
      * @param bool      $includeVariants
-     *
-     * @return array
      */
-    public function getEmailDeviceStats($email, $includeVariants = false, $dateFrom = null, $dateTo = null)
+    public function getEmailDeviceStats($email, $includeVariants = false, $dateFrom = null, $dateTo = null): array
     {
         if (!$email instanceof Email) {
             $email = $this->getEntity($email);
@@ -957,11 +849,9 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, TableMod
     /**
      * @param bool $includeVariants
      *
-     * @return array
-     *
      * @throws \Mautic\EmailBundle\Stats\Exception\InvalidStatHelperException
      */
-    public function getEmailGeneralStats($email, $includeVariants, $unit, \DateTime $dateFrom, \DateTime $dateTo)
+    public function getEmailGeneralStats($email, $includeVariants, $unit, \DateTime $dateFrom, \DateTime $dateTo): array
     {
         if (!$email instanceof Email) {
             $email = $this->getEntity($email);
@@ -1011,10 +901,8 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, TableMod
 
     /**
      * Get an array of tracked links.
-     *
-     * @return array
      */
-    public function getEmailClickStats($emailId)
+    public function getEmailClickStats($emailId): array
     {
         return $this->pageTrackableModel->getTrackableList('email', $emailId);
     }
@@ -1077,10 +965,8 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, TableMod
 
     /**
      * @param bool $includeVariants
-     *
-     * @return array|int
      */
-    public function getQueuedCounts(Email $email, $includeVariants = true)
+    public function getQueuedCounts(Email $email, $includeVariants = true): int
     {
         $ids = ($includeVariants) ? $email->getRelatedEntityIds() : null;
         if (!in_array($email->getId(), $ids)) {
@@ -1114,12 +1000,11 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, TableMod
     /**
      * Send an email to lead lists.
      *
-     * @param array           $lists
-     * @param int|null        $limit
-     * @param int|null        $batch        True to process and batch all pending leads
-     * @param OutputInterface $output
-     * @param int             $minContactId
-     * @param int             $maxContactId
+     * @param array    $lists
+     * @param int|null $limit
+     * @param int|null $batch        True to process and batch all pending leads
+     * @param int      $minContactId
+     * @param int      $maxContactId
      *
      * @return array array(int $sentCount, int $failedCount, array $failedRecipientsByList)
      */
@@ -1133,7 +1018,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, TableMod
         $maxContactId = null,
         int $maxThreads = null,
         int $threadId = null
-    ) {
+    ): array {
         // get the leads
         if (empty($lists)) {
             $lists = $email->getLists();
@@ -1381,7 +1266,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, TableMod
             }
 
             // Reorder according to send_weight so that campaigns which currently send one at a time alternate
-            uasort($this->emailSettings[$email->getId()], function ($a, $b) {
+            uasort($this->emailSettings[$email->getId()], function ($a, $b): int {
                 if ($a['weight_deficit'] === $b['weight_deficit']) {
                     if ($a['variantCount'] === $b['variantCount']) {
                         return 0;
@@ -1430,7 +1315,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, TableMod
         $errors              = [];
 
         if (empty($channel)) {
-            $channel = (isset($options['source'])) ? $options['source'] : [];
+            $channel = $options['source'] ?? [];
         }
 
         if (!$email->getId()) {
@@ -1462,14 +1347,12 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, TableMod
         if (!$ignoreDNC) {
             $dnc = $emailRepo->getDoNotEmailList($leadIds);
 
-            if (!empty($dnc)) {
-                foreach ($dnc as $removeMeId => $removeMeEmail) {
-                    if ($dncAsError) {
-                        $errors[$removeMeId] = $this->translator->trans('mautic.email.dnc');
-                    }
-                    unset($sendTo[$removeMeId]);
-                    unset($leadIds[$removeMeId]);
+            foreach ($dnc as $removeMeId => $removeMeEmail) {
+                if ($dncAsError) {
+                    $errors[$removeMeId] = $this->translator->trans('mautic.email.dnc');
                 }
+                unset($sendTo[$removeMeId]);
+                unset($leadIds[$removeMeId]);
             }
         }
 
@@ -1578,7 +1461,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, TableMod
                         if (!empty($emailSettings[$parentId]['isVariant'])) {
                             ++$emailSettings[$parentId]['variantCount'];
                         }
-                    } catch (FailedToSendToContactException $exception) {
+                    } catch (FailedToSendToContactException) {
                         // move along to the next contact
                     }
                 }
@@ -1629,7 +1512,6 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, TableMod
      * Send an email to lead(s).
      *
      * @param array|int $users
-     * @param array     $lead
      * @param bool      $saveStat
      *
      * @return bool|string[]
@@ -1789,10 +1671,8 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, TableMod
      * Dispatches EmailSendEvent so you could get tokens form it or tokenized content.
      *
      * @param string $idHash
-     *
-     * @return EmailSendEvent
      */
-    public function dispatchEmailSendEvent(Email $email, array $leadFields = [], $idHash = null, array $tokens = [])
+    public function dispatchEmailSendEvent(Email $email, array $leadFields = [], $idHash = null, array $tokens = []): EmailSendEvent
     {
         $event = new EmailSendEvent(
             null,
@@ -1836,7 +1716,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, TableMod
      *
      * @param string $email
      */
-    public function removeDoNotContact($email)
+    public function removeDoNotContact($email): void
     {
         /** @var \Mautic\LeadBundle\Entity\LeadRepository $leadRepo */
         $leadRepo = $this->em->getRepository(\Mautic\LeadBundle\Entity\Lead::class);
@@ -1858,11 +1738,8 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, TableMod
      * @param int    $reason
      * @param string $comments
      * @param bool   $flush
-     * @param null   $leadId
-     *
-     * @return array
      */
-    public function setEmailDoNotContact($email, $reason = DoNotContact::BOUNCED, $comments = '', $flush = true, $leadId = null)
+    public function setEmailDoNotContact($email, $reason = DoNotContact::BOUNCED, $comments = '', $flush = true, $leadId = null): array
     {
         /** @var \Mautic\LeadBundle\Entity\LeadRepository $leadRepo */
         $leadRepo = $this->em->getRepository(\Mautic\LeadBundle\Entity\Lead::class);
@@ -1904,7 +1781,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, TableMod
     /**
      * Joins the email table and limits created_by to currently logged in user.
      */
-    public function limitQueryToCreator(QueryBuilder &$q)
+    public function limitQueryToCreator(QueryBuilder &$q): void
     {
         $q->join('t', MAUTIC_TABLE_PREFIX.'emails', 'e', 'e.id = t.email_id')
             ->andWhere('e.created_by = :userId')
@@ -1914,8 +1791,6 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, TableMod
     /**
      * @param string $column
      * @param bool   $canViewOthers
-     *
-     * @return array
      */
     public function getBestHours(
         $column,
@@ -1924,7 +1799,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, TableMod
         array $filter = [],
         $canViewOthers = true,
         $timeFormat = 24
-    ) {
+    ): array {
         $companyId  = ArrayHelper::pickValue('companyId', $filter);
         $campaignId = ArrayHelper::pickValue('campaignId', $filter);
         $segmentId  = ArrayHelper::pickValue('segmentId', $filter);
@@ -1959,7 +1834,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, TableMod
         $counts = array_column($result, 'count');
         $total  = array_sum($counts);
 
-        array_walk($counts, function (&$percentage) use ($total) {
+        array_walk($counts, function (&$percentage) use ($total): void {
             $percentage = round(($percentage / $total) * 100, 1);
         });
 
@@ -1975,8 +1850,6 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, TableMod
      * @param string|null $dateFormat
      * @param bool        $canViewOthers
      *
-     * @return array
-     *
      * @throws \Mautic\EmailBundle\Stats\Exception\InvalidStatHelperException
      */
     public function getEmailsLineChartData(
@@ -1986,7 +1859,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, TableMod
         $dateFormat = null,
         array $filter = [],
         $canViewOthers = true
-    ) {
+    ): array {
         $fetchOptions = new EmailStatOptions();
         $fetchOptions->setCanViewOthers($canViewOthers);
 
@@ -2065,10 +1938,8 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, TableMod
      * @param string $dateTo
      * @param array  $filters
      * @param bool   $canViewOthers
-     *
-     * @return array
      */
-    public function getIgnoredVsReadPieChartData($dateFrom, $dateTo, $filters = [], $canViewOthers = true)
+    public function getIgnoredVsReadPieChartData($dateFrom, $dateTo, $filters = [], $canViewOthers = true): array
     {
         $chart = new PieChart();
         $query = new ChartQuery($this->em->getConnection(), $dateFrom, $dateTo);
@@ -2101,10 +1972,8 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, TableMod
 
     /**
      * Get pie chart data of ignored vs opened emails.
-     *
-     * @return array
      */
-    public function getDeviceGranularityPieChartData($dateFrom, $dateTo)
+    public function getDeviceGranularityPieChartData($dateFrom, $dateTo): array
     {
         $chart = new PieChart();
 
@@ -2124,7 +1993,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, TableMod
 
         foreach ($deviceStats as $device) {
             $chart->setDataset(
-                ($device['device']) ? $device['device'] : $this->translator->trans('mautic.core.unknown'),
+                $device['device'] ?: $this->translator->trans('mautic.core.unknown'),
                 $device['count']
             );
         }
@@ -2135,11 +2004,9 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, TableMod
     /**
      * Get a list of emails in a date range, grouped by a stat date count.
      *
-     * @param int       $limit
-     * @param \DateTime $dateFrom
-     * @param \DateTime $dateTo
-     * @param array     $filters
-     * @param array     $options
+     * @param int   $limit
+     * @param array $filters
+     * @param array $options
      *
      * @return array
      */
@@ -2176,11 +2043,9 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, TableMod
     /**
      * Get a list of emails in a date range.
      *
-     * @param int       $limit
-     * @param \DateTime $dateFrom
-     * @param \DateTime $dateTo
-     * @param array     $filters
-     * @param array     $options
+     * @param int   $limit
+     * @param array $filters
+     * @param array $options
      *
      * @return array
      */
@@ -2209,10 +2074,8 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, TableMod
      *
      * @param int  $limit
      * @param bool $canViewOthers
-     *
-     * @return array
      */
-    public function getUpcomingEmails($limit = 10, $canViewOthers = true)
+    public function getUpcomingEmails($limit = 10, $canViewOthers = true): array
     {
         /** @var \Mautic\CampaignBundle\Entity\LeadEventLogRepository $leadEventLogRepository */
         $leadEventLogRepository = $this->em->getRepository(\Mautic\CampaignBundle\Entity\LeadEventLog::class);
@@ -2233,10 +2096,8 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, TableMod
      * @param int    $limit
      * @param int    $start
      * @param array  $options
-     *
-     * @return array
      */
-    public function getLookupResults($type, $filter = '', $limit = 10, $start = 0, $options = [])
+    public function getLookupResults($type, $filter = '', $limit = 10, $start = 0, $options = []): array
     {
         $results = [];
         switch ($type) {
@@ -2271,7 +2132,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, TableMod
         return $results;
     }
 
-    private function getContactCompanies(array &$sendTo)
+    private function getContactCompanies(array &$sendTo): void
     {
         $fetchCompanies = [];
         foreach ($sendTo as $key => $contact) {
@@ -2379,10 +2240,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, TableMod
         return $errors;
     }
 
-    /**
-     * @return array
-     */
-    public function getEmailsIdsWithDependenciesOnSegment($segmentId)
+    public function getEmailsIdsWithDependenciesOnSegment($segmentId): array
     {
         $entities =  $this->getEntities(
             [

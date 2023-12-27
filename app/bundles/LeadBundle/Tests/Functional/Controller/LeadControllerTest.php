@@ -15,7 +15,9 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 class LeadControllerTest extends MauticMysqlTestCase
 {
-    /** @var array<string> */
+    /**
+     * @var array<string>
+     */
     private array $filePaths = [];
 
     protected function setUp(): void

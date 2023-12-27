@@ -12,17 +12,14 @@ class DeleteCacheStepTest extends AbstractStepTest
     /**
      * @var MockObject|CacheHelper
      */
-    private $cacheHelper;
+    private \PHPUnit\Framework\MockObject\MockObject $cacheHelper;
 
     /**
      * @var MockObject|TranslatorInterface
      */
-    private $translator;
+    private \PHPUnit\Framework\MockObject\MockObject $translator;
 
-    /**
-     * @var DeleteCacheStep
-     */
-    private $step;
+    private \Mautic\CoreBundle\Update\Step\DeleteCacheStep $step;
 
     protected function setUp(): void
     {
@@ -33,7 +30,7 @@ class DeleteCacheStepTest extends AbstractStepTest
         $this->step        = new DeleteCacheStep($this->cacheHelper, $this->translator);
     }
 
-    public function testCacheIsNukedAndProgressNoted()
+    public function testCacheIsNukedAndProgressNoted(): void
     {
         $stepOutput = 'mautic.core.update.clear.cache';
         $this->translator->expects($this->once())

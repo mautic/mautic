@@ -18,10 +18,7 @@ trait DeduperTrait
      */
     private $availableFields;
 
-    /**
-     * @return array
-     */
-    public function getUniqueData(array $queryFields)
+    public function getUniqueData(array $queryFields): array
     {
         $uniqueLeadFields    = $this->fieldModel->getUniqueIdentifierFields(['object' => $this->object]);
         $uniqueLeadFieldData = [];

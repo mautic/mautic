@@ -17,32 +17,29 @@ class FlashBagTest extends TestCase
     /**
      * @var MockObject|SymfonyFlashBag
      */
-    private $symfonyFlashBag;
+    private \PHPUnit\Framework\MockObject\MockObject $symfonyFlashBag;
 
     /**
      * @var MockObject|Session
      */
-    private $session;
+    private \PHPUnit\Framework\MockObject\MockObject $session;
 
     /**
      * @var MockObject|TranslatorInterface
      */
-    private $translator;
+    private \PHPUnit\Framework\MockObject\MockObject $translator;
 
     /**
      * @var MockObject|RequestStack
      */
-    private $requestStack;
+    private \PHPUnit\Framework\MockObject\MockObject $requestStack;
 
     /**
      * @var NotificationModel|MockObject
      */
-    private $notificationModel;
+    private \PHPUnit\Framework\MockObject\MockObject $notificationModel;
 
-    /**
-     * @var FlashBag
-     */
-    private $flashBag;
+    private \Mautic\CoreBundle\Service\FlashBag $flashBag;
 
     protected function setUp(): void
     {

@@ -63,106 +63,24 @@ use Twig\Environment;
  */
 class SubmissionModel extends CommonFormModel
 {
-    /**
-     * @var IpLookupHelper
-     */
-    protected $ipLookupHelper;
-
-    /**
-     * @var Environment
-     */
-    protected $twig;
-
-    /**
-     * @var FormModel
-     */
-    protected $formModel;
-
-    /**
-     * @var PageModel
-     */
-    protected $pageModel;
-
-    /**
-     * @var LeadModel
-     */
-    protected $leadModel;
-
-    /**
-     * @var CampaignModel
-     */
-    protected $campaignModel;
-
-    /**
-     * @var MembershipManager
-     */
-    protected $membershipManager;
-
-    /**
-     * @var LeadFieldModel
-     */
-    protected $leadFieldModel;
-
-    /**
-     * @var CompanyModel
-     */
-    protected $companyModel;
-
-    /**
-     * @var FormFieldHelper
-     */
-    protected $fieldHelper;
-
-    /**
-     * @var UploadFieldValidator
-     */
-    private $uploadFieldValidator;
-
-    /**
-     * @var FormUploader
-     */
-    private $formUploader;
-
-    /**
-     * @var DeviceTrackingServiceInterface
-     */
-    private $deviceTrackingService;
-
-    /**
-     * @var FieldValueTransformer
-     */
-    private $fieldValueTransformer;
-
-    /**
-     * @var DateHelper
-     */
-    private $dateHelper;
-
-    /**
-     * @var ContactTracker
-     */
-    private $contactTracker;
-
-    private ContactMerger $contactMerger;
-
     public function __construct(
-        IpLookupHelper $ipLookupHelper,
-        Environment $twig,
-        FormModel $formModel,
-        PageModel $pageModel,
-        LeadModel $leadModel,
-        CampaignModel $campaignModel,
-        MembershipManager $membershipManager,
-        LeadFieldModel $leadFieldModel,
-        CompanyModel $companyModel,
-        FormFieldHelper $fieldHelper,
-        UploadFieldValidator $uploadFieldValidator,
-        FormUploader $formUploader,
-        DeviceTrackingServiceInterface $deviceTrackingService,
-        FieldValueTransformer $fieldValueTransformer,
-        DateHelper $dateHelper,
-        ContactTracker $contactTracker,
-        ContactMerger $contactMerger,
+        protected IpLookupHelper $ipLookupHelper,
+        protected Environment $twig,
+        protected FormModel $formModel,
+        protected PageModel $pageModel,
+        protected LeadModel $leadModel,
+        protected CampaignModel $campaignModel,
+        protected MembershipManager $membershipManager,
+        protected LeadFieldModel $leadFieldModel,
+        protected CompanyModel $companyModel,
+        protected FormFieldHelper $fieldHelper,
+        private UploadFieldValidator $uploadFieldValidator,
+        private FormUploader $formUploader,
+        private DeviceTrackingServiceInterface $deviceTrackingService,
+        private FieldValueTransformer $fieldValueTransformer,
+        private DateHelper $dateHelper,
+        private ContactTracker $contactTracker,
+        private ContactMerger $contactMerger,
         EntityManager $em,
         CorePermissions $security,
         EventDispatcherInterface $dispatcher,
@@ -172,32 +90,12 @@ class SubmissionModel extends CommonFormModel
         LoggerInterface $mauticLogger,
         CoreParametersHelper $coreParametersHelper
     ) {
-        $this->ipLookupHelper         = $ipLookupHelper;
-        $this->twig                   = $twig;
-        $this->formModel              = $formModel;
-        $this->pageModel              = $pageModel;
-        $this->leadModel              = $leadModel;
-        $this->campaignModel          = $campaignModel;
-        $this->membershipManager      = $membershipManager;
-        $this->leadFieldModel         = $leadFieldModel;
-        $this->companyModel           = $companyModel;
-        $this->fieldHelper            = $fieldHelper;
-        $this->uploadFieldValidator   = $uploadFieldValidator;
-        $this->formUploader           = $formUploader;
-        $this->deviceTrackingService  = $deviceTrackingService;
-        $this->fieldValueTransformer  = $fieldValueTransformer;
-        $this->dateHelper             = $dateHelper;
-        $this->contactTracker         = $contactTracker;
-        $this->contactMerger          = $contactMerger;
-
         parent::__construct($em, $security, $dispatcher, $router, $translator, $userHelper, $mauticLogger, $coreParametersHelper);
     }
 
     public function getRepository(): SubmissionRepository
     {
-        $result = $this->em->getRepository(Submission::class);
-
-        return $result;
+        return $this->em->getRepository(Submission::class);
     }
 
     /**
@@ -258,7 +156,7 @@ class SubmissionModel extends CommonFormModel
             $id    = $f->getId();
             $type  = $f->getType();
             $alias = $f->getAlias();
-            $value = (isset($post[$alias])) ? $post[$alias] : '';
+            $value = $post[$alias] ?? '';
 
             $fieldArray[$id] = [
                 'id'    => $id,
@@ -279,7 +177,7 @@ class SubmissionModel extends CommonFormModel
                     $file  = $this->uploadFieldValidator->processFileValidation($f, $request);
                     $value = $file->getClientOriginalName();
                     $filesToUpload->addFile($file, $f);
-                } catch (NoFileGivenException $e) { // No error here, we just move to another validation, eg. if a field is required
+                } catch (NoFileGivenException) { // No error here, we just move to another validation, eg. if a field is required
                 } catch (FileValidationException $e) {
                     $validationErrors[$alias] = $e->getMessage();
                 }
@@ -326,7 +224,7 @@ class SubmissionModel extends CommonFormModel
                 $params = $components['fields'][$f->getType()];
                 if (!empty($value)) {
                     if (isset($params['valueFilter'])) {
-                        if (is_string($params['valueFilter']) && is_callable(['\Mautic\CoreBundle\Helper\InputHelper', $params['valueFilter']])) {
+                        if (is_string($params['valueFilter']) && is_callable([\Mautic\CoreBundle\Helper\InputHelper::class, $params['valueFilter']])) {
                             $value = InputHelper::_($value, $params['valueFilter']);
                         } elseif (is_callable($params['valueFilter'])) {
                             $value = call_user_func_array($params['valueFilter'], [$f, $value]);
@@ -460,12 +358,10 @@ class SubmissionModel extends CommonFormModel
         if (!$form->isStandalone()) {
             // Find and add the lead to the associated campaigns
             $campaigns = $this->campaignModel->getCampaignsByForm($form);
-            if (!empty($campaigns)) {
-                /** @var Campaign $campaign */
-                foreach ($campaigns as $campaign) {
-                    if ($campaign->isPublished()) {
-                        $this->membershipManager->addContact($lead, $campaign);
-                    }
+            /** @var Campaign $campaign */
+            foreach ($campaigns as $campaign) {
+                if ($campaign->isPublished()) {
+                    $this->membershipManager->addContact($lead, $campaign);
                 }
             }
         }
@@ -491,16 +387,13 @@ class SubmissionModel extends CommonFormModel
     /**
      * @param Submission $submission
      */
-    public function deleteEntity($submission)
+    public function deleteEntity($submission): void
     {
         $this->formUploader->deleteUploadedFiles($submission);
 
         parent::deleteEntity($submission);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getEntities(array $args = [])
     {
         return $this->getRepository()->getEntities($args);
@@ -511,7 +404,7 @@ class SubmissionModel extends CommonFormModel
      *
      * @return array<mixed>
      */
-    public function getEntitiesByPage(array $args = [])
+    public function getEntitiesByPage(array $args = []): array
     {
         return $this->getRepository()->getEntitiesByPage($args);
     }
@@ -532,7 +425,7 @@ class SubmissionModel extends CommonFormModel
         switch ($format) {
             case 'csv':
                 $response = new StreamedResponse(
-                    function () use ($results, $form, $viewOnlyFields) {
+                    function () use ($results, $form, $viewOnlyFields): void {
                         $handle = fopen('php://output', 'r+');
 
                         // build the header row
@@ -575,7 +468,7 @@ class SubmissionModel extends CommonFormModel
             case 'xlsx':
                 if (class_exists(Spreadsheet::class)) {
                     $response = new StreamedResponse(
-                        function () use ($results, $form, $name, $viewOnlyFields) {
+                        function () use ($results, $form, $name, $viewOnlyFields): void {
                             $objPHPExcel = new Spreadsheet();
                             $objPHPExcel->getProperties()->setTitle($name);
 
@@ -639,7 +532,7 @@ class SubmissionModel extends CommonFormModel
         switch ($format) {
             case 'csv':
                 $response = new StreamedResponse(
-                    function () use ($results) {
+                    function () use ($results): void {
                         $handle = fopen('php://output', 'r+');
 
                         // build the header row
@@ -679,7 +572,7 @@ class SubmissionModel extends CommonFormModel
                     throw new \Exception('PHPSpreadsheet is required to export to Excel spreadsheets');
                 }
                 $response = new StreamedResponse(
-                    function () use ($results, $name) {
+                    function () use ($results, $name): void {
                         $objPHPExcel = new Spreadsheet();
                         $objPHPExcel->getProperties()->setTitle($name);
 
@@ -823,8 +716,6 @@ class SubmissionModel extends CommonFormModel
      * @param string      $dateFormat
      * @param array       $filter
      * @param bool        $canViewOthers
-     *
-     * @return array
      */
     public function getSubmissionsLineChartData(
         ?string $unit,
@@ -833,7 +724,7 @@ class SubmissionModel extends CommonFormModel
         $dateFormat = null,
         $filter = [],
         $canViewOthers = true
-    ) {
+    ): array {
         $chart = new LineChart($unit, $dateFrom, $dateTo, $dateFormat);
         $query = new ChartQuery($this->em->getConnection(), $dateFrom, $dateTo);
         $q     = $query->prepareTimeDataQuery('form_submissions', 'date_submitted', $filter);
@@ -928,9 +819,7 @@ class SubmissionModel extends CommonFormModel
         $customComponents = $this->formModel->getCustomComponents();
         $availableActions = $customComponents['actions'] ?? [];
 
-        $actions->filter(function (Action $action) use ($availableActions) {
-            return array_key_exists($action->getType(), $availableActions);
-        })->map(function (Action $action) use ($event, $availableActions) {
+        $actions->filter(fn (Action $action): bool => array_key_exists($action->getType(), $availableActions))->map(function (Action $action) use ($event, $availableActions): void {
             $event->setAction($action);
             $this->dispatcher->dispatch($event, $availableActions[$action->getType()]['eventName']);
         });
@@ -939,11 +828,9 @@ class SubmissionModel extends CommonFormModel
     /**
      * Create/update lead from form submit.
      *
-     * @return Lead
-     *
      * @throws ORMException
      */
-    protected function createLeadFromSubmit(Form $form, array $leadFieldMatches, $leadFields)
+    protected function createLeadFromSubmit(Form $form, array $leadFieldMatches, $leadFields): Lead
     {
         // set the mapped data
         $inKioskMode   = $form->isInKioskMode();
@@ -971,7 +858,7 @@ class SubmissionModel extends CommonFormModel
         $uniqueLeadFields = $this->leadFieldModel->getUniqueIdentifierFields();
 
         // Closure to get data and unique fields
-        $getData = function ($currentFields, $uniqueOnly = false) use ($leadFields, $uniqueLeadFields) {
+        $getData = function ($currentFields, $uniqueOnly = false) use ($leadFields, $uniqueLeadFields): array {
             $uniqueFieldsWithData = $data = [];
             foreach ($leadFields as $alias => $properties) {
                 if (isset($currentFields[$alias])) {
@@ -989,7 +876,7 @@ class SubmissionModel extends CommonFormModel
         };
 
         // Closure to get data and unique fields
-        $getCompanyData = function ($currentFields) use ($companyFields) {
+        $getCompanyData = function ($currentFields) use ($companyFields): array {
             $companyData = [];
             // force add company contact field to company fields check
             $companyFields = array_merge($companyFields, ['company'=> 'company']);
@@ -1004,7 +891,7 @@ class SubmissionModel extends CommonFormModel
         };
 
         // Closure to help search for a conflict
-        $checkForIdentifierConflict = function ($fieldSet1, $fieldSet2) {
+        $checkForIdentifierConflict = function ($fieldSet1, $fieldSet2): array {
             // Find fields in both sets
             $potentialConflicts = array_keys(
                 array_intersect_key($fieldSet1, $fieldSet2)
@@ -1068,7 +955,7 @@ class SubmissionModel extends CommonFormModel
                 // Merge the found lead with currently tracked lead
                 try {
                     $lead = $this->contactMerger->merge($lead, $foundLead);
-                } catch (SameContactException $exception) {
+                } catch (SameContactException) {
                 }
             }
 

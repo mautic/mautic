@@ -40,8 +40,6 @@ interface CustomFieldEntityInterface
     /**
      * Get a field value (should include those in updated fields).
      *
-     * @param null $group
-     *
      * @return mixed
      */
     public function getFieldValue($field, $group = null);

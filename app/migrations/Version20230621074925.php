@@ -12,15 +12,25 @@ use Mautic\PointBundle\Entity\GroupContactScore;
 final class Version20230621074925 extends PreUpAssertionMigration
 {
     private string $groupTableName;
+
     private string $contactScoreTableName;
+
     private string $contactTableName;
+
     private string $pointsTableName;
+
     private string $pointTriggersTableName;
+
     private string $leadPointsChangeLogTableName;
+
     private string $contactScoreContactFk;
+
     private string $contactScoreGroupFk;
+
     private string $pointsGroupFk;
+
     private string $pointTriggersGroupFk;
+
     private string $leadPointsChangeLogGroupFk;
 
     private function initTableNames(): void

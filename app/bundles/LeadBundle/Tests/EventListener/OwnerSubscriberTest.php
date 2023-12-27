@@ -64,7 +64,7 @@ class OwnerSubscriberTest extends \PHPUnit\Framework\TestCase
         defined('MAUTIC_ENV') or define('MAUTIC_ENV', 'test');
     }
 
-    public function testOnEmailBuild()
+    public function testOnEmailBuild(): void
     {
         $leadModel = $this->getMockFactory()->getModel('lead');
         if (!$leadModel instanceof LeadModel) {
@@ -80,7 +80,7 @@ class OwnerSubscriberTest extends \PHPUnit\Framework\TestCase
         $this->assertArrayHasKey('{ownerfield=lastname}', $tokens);
     }
 
-    public function testOnEmailGenerate()
+    public function testOnEmailGenerate(): void
     {
         $leadModel = $this->getMockFactory()->getModel('lead');
         if (!$leadModel instanceof LeadModel) {
@@ -102,7 +102,7 @@ class OwnerSubscriberTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals('S&#39;mith', $tokens['{ownerfield=lastname}']);
     }
 
-    public function testOnEmailGenerateWithFakeOwner()
+    public function testOnEmailGenerateWithFakeOwner(): void
     {
         $leadModel = $this->getMockFactory()->getModel('lead');
         if (!$leadModel instanceof LeadModel) {
@@ -120,7 +120,7 @@ class OwnerSubscriberTest extends \PHPUnit\Framework\TestCase
         $this->assertArrayHasKey('{ownerfield=lastname}', $tokens);
     }
 
-    public function testOnEmailGenerateWithNoOwner()
+    public function testOnEmailGenerateWithNoOwner(): void
     {
         $leadModel = $this->getMockFactory()->getModel('lead');
         if (!$leadModel instanceof LeadModel) {
@@ -142,7 +142,7 @@ class OwnerSubscriberTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals('', $tokens['{ownerfield=lastname}']);
     }
 
-    public function testOnEmailDisplay()
+    public function testOnEmailDisplay(): void
     {
         $leadModel = $this->getMockFactory()->getModel('lead');
         if (!$leadModel instanceof LeadModel) {
@@ -160,7 +160,7 @@ class OwnerSubscriberTest extends \PHPUnit\Framework\TestCase
         $this->assertArrayHasKey('{ownerfield=lastname}', $tokens);
     }
 
-    public function testOnEmailDisplayWithFakeOwner()
+    public function testOnEmailDisplayWithFakeOwner(): void
     {
         $leadModel = $this->getMockFactory()->getModel('lead');
         if (!$leadModel instanceof LeadModel) {
@@ -178,7 +178,7 @@ class OwnerSubscriberTest extends \PHPUnit\Framework\TestCase
         $this->assertArrayHasKey('{ownerfield=lastname}', $tokens);
     }
 
-    public function testOnEmailDisplayWithNoOwner()
+    public function testOnEmailDisplayWithNoOwner(): void
     {
         $leadModel = $this->getMockFactory()->getModel('lead');
         if (!$leadModel instanceof LeadModel) {

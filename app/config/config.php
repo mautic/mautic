@@ -178,6 +178,10 @@ $container->loadFromExtension('doctrine', [
                 'match' => \DoctrineExtensions\Query\Mysql\MatchAgainst::class,
             ],
         ],
+        'result_cache_driver' => [
+            'type' => 'pool',
+            'pool' => 'doctrine_result_cache',
+        ],
     ],
 ]);
 
@@ -264,6 +268,9 @@ $container->loadFromExtension('framework', [
     'cache' => [
         'pools' => [
             'api_rate_limiter_cache' => $configParameterBag->get('api_rate_limiter_cache'),
+            'doctrine_result_cache'  => [
+                'adapter' => 'cache.adapter.array',
+            ],
         ],
     ],
 ]);
