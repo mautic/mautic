@@ -9,7 +9,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 
 /**
- * Interface MapModelInterface.
+ * Interface TableModelInterface.
  *
  * @template T of object
  */
@@ -18,7 +18,7 @@ interface TableModelInterface
     /**
      * @param T $entity
      *
-     * @return array<string, array<int, array<string, int|string>>>
+     * @return array<int|string, array<string, int|string|null>>
      *
      * @throws Exception
      */
