@@ -118,14 +118,14 @@ class PublicController extends CommonFormController
     {
         // Find the email
         /** @var \Mautic\EmailBundle\Model\EmailModel $model */
-        $model      = $this->getModel('email');
-        $translator = $this->get('translator');
-        $stat       = $model->getEmailStatus($idHash);
-        $message    = '';
-        $email      = null;
-        $lead       = null;
-        $template   = null;
-        $session    = $this->get('session');
+        $model                 = $this->getModel('email');
+        $translator            = $this->get('translator');
+        $stat                  = $model->getEmailStatus($idHash);
+        $message               = '';
+        $email                 = null;
+        $lead                  = null;
+        $template              = null;
+        $session               = $this->get('session');
         $isOneClickUnsubscribe = $this->request->isMethod(Request::METHOD_POST) && 'One-Click' === $this->request->get('List-Unsubscribe');
 
         /** @var \Mautic\LeadBundle\Model\LeadModel $leadModel */
