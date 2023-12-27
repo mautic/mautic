@@ -2,6 +2,7 @@
 
 namespace Mautic\LeadBundle\Entity;
 
+use Doctrine\DBAL\Driver\Exception;
 use Doctrine\DBAL\Query\Expression\CompositeExpression;
 use Doctrine\ORM\QueryBuilder;
 use Mautic\CoreBundle\Entity\CommonRepository;
@@ -126,12 +127,14 @@ class CompanyRepository extends CommonRepository implements CustomFieldRepositor
      * @param $leadId
      *
      * @return array
+     *
+     * @throws Exception
      */
     public function getCompaniesByLeadId($leadId, $companyId = null)
     {
         $q = $this->getEntityManager()->getConnection()->createQueryBuilder();
 
-        $q->select('comp.id, comp.companyname, comp.companycity, comp.companycountry, cl.is_primary')
+        $q->select('*')
             ->from(MAUTIC_TABLE_PREFIX.'companies', 'comp')
             ->leftJoin('comp', MAUTIC_TABLE_PREFIX.'companies_leads', 'cl', 'cl.company_id = comp.id')
             ->where('cl.lead_id = :leadId')
@@ -142,7 +145,7 @@ class CompanyRepository extends CommonRepository implements CustomFieldRepositor
             $q->andWhere('comp.id = :companyId')->setParameter('companyId', $companyId);
         }
 
-        return $q->execute()->fetchAll();
+        return $q->execute()->fetchAllAssociative();
     }
 
     /**

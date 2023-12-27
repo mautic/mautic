@@ -75,6 +75,7 @@ return [
                     'mautic.dynamicContent.model.dynamicContent',
                     'mautic.security',
                     'mautic.tracker.contact',
+                    'mautic.lead.model.company',
                 ],
             ],
             'mautic.dynamicContent.subscriber.channel' => [

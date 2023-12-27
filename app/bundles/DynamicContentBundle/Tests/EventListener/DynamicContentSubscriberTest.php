@@ -10,6 +10,7 @@ use Mautic\DynamicContentBundle\Helper\DynamicContentHelper;
 use Mautic\DynamicContentBundle\Model\DynamicContentModel;
 use Mautic\FormBundle\Helper\TokenHelper as FormTokenHelper;
 use Mautic\LeadBundle\Entity\Lead;
+use Mautic\LeadBundle\Model\CompanyModel;
 use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\LeadBundle\Tracker\ContactTracker;
 use Mautic\PageBundle\Event\PageDisplayEvent;
@@ -79,6 +80,10 @@ class DynamicContentSubscriberTest extends \PHPUnit\Framework\TestCase
      * @var DynamicContentSubscriber
      */
     private $subscriber;
+    /**
+     * @var CompanyModel|MockObject
+     */
+    private $companyModel;
 
     protected function setUp(): void
     {
@@ -95,6 +100,7 @@ class DynamicContentSubscriberTest extends \PHPUnit\Framework\TestCase
         $this->dynamicContentModel  = $this->createMock(DynamicContentModel::class);
         $this->security             = $this->createMock(CorePermissions::class);
         $this->contactTracker       = $this->createMock(ContactTracker::class);
+        $this->companyModel         = $this->createMock(CompanyModel::class);
         $this->subscriber           = new DynamicContentSubscriber(
             $this->trackableModel,
             $this->pageTokenHelper,
@@ -105,7 +111,8 @@ class DynamicContentSubscriberTest extends \PHPUnit\Framework\TestCase
             $this->dynamicContentHelper,
             $this->dynamicContentModel,
             $this->security,
-            $this->contactTracker
+            $this->contactTracker,
+            $this->companyModel
         );
     }
 

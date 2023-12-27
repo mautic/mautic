@@ -17,6 +17,7 @@ use Mautic\EmailBundle\EventListener\MatchFilterForLeadTrait;
 use Mautic\FormBundle\Helper\TokenHelper as FormTokenHelper;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Helper\TokenHelper;
+use Mautic\LeadBundle\Model\CompanyModel;
 use Mautic\LeadBundle\Tracker\ContactTracker;
 use Mautic\PageBundle\Entity\Trackable;
 use Mautic\PageBundle\Event\PageDisplayEvent;
@@ -79,6 +80,7 @@ class DynamicContentSubscriber implements EventSubscriberInterface
      * @var ContactTracker
      */
     private $contactTracker;
+    private CompanyModel $companyModel;
 
     public function __construct(
         TrackableModel $trackableModel,
@@ -90,7 +92,8 @@ class DynamicContentSubscriber implements EventSubscriberInterface
         DynamicContentHelper $dynamicContentHelper,
         DynamicContentModel $dynamicContentModel,
         CorePermissions $security,
-        ContactTracker $contactTracker
+        ContactTracker $contactTracker,
+        CompanyModel $companyModel
     ) {
         $this->trackableModel       = $trackableModel;
         $this->pageTokenHelper      = $pageTokenHelper;
@@ -102,6 +105,7 @@ class DynamicContentSubscriber implements EventSubscriberInterface
         $this->dynamicContentModel  = $dynamicContentModel;
         $this->security             = $security;
         $this->contactTracker       = $contactTracker;
+        $this->companyModel         = $companyModel;
     }
 
     /**
@@ -153,14 +157,21 @@ class DynamicContentSubscriber implements EventSubscriberInterface
 
     public function onTokenReplacement(MauticEvents\TokenReplacementEvent $event)
     {
-        /** @var Lead $lead */
         $lead         = $event->getLead();
         $content      = $event->getContent();
         $clickthrough = $event->getClickthrough();
 
+        if ($lead instanceof Lead) {
+            $leadArray              = $this->dynamicContentHelper->convertLeadToArray($lead);
+            $leadArray['companies'] = $this->companyModel->getRepository()->getCompaniesByLeadId($leadArray['id']);
+        } else {
+            /** @var Lead $lead */
+            $leadArray = $lead->getProfileFields();
+        }
+
         if ($content) {
             $tokens = array_merge(
-                TokenHelper::findLeadTokens($content, $lead->getProfileFields()),
+                TokenHelper::findLeadTokens($content, $leadArray),
                 $this->pageTokenHelper->findPageTokens($content, $clickthrough),
                 $this->assetTokenHelper->findAssetTokens($content, $clickthrough),
                 $this->formTokenHelper->findFormTokens($content),
