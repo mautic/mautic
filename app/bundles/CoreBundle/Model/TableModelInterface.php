@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace Mautic\CoreBundle\Model;
 
 use Doctrine\DBAL\Exception;
+use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\StreamedResponse;
 
 /**
  * Interface MapModelInterface.
@@ -31,5 +33,10 @@ interface TableModelInterface
      */
     public function getEntity($id = null);
 
-    public function exportResults($object, string $format);
+    /**
+     * @param T                                        $entity
+     * @param array<int|string, array<string, string>> $dataResult
+     *
+     **/
+    public function exportStats(string $format, $entity, array $dataResult): StreamedResponse|Response;
 }

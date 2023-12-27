@@ -318,7 +318,17 @@
               <!-- #geo-stats-container -->
               <div class="tab-pane bdr-w-0" id="geo-stats-container"
                    data-target-url="{{ path('mautic_email_geo_stats', {'objectId': email.id }) }}">
-                  <div class="spinner"><i class="fa fa-spin fa-spinner"></i></div>
+                  <div class="std-toolbar btn-group download-toolbar">
+                      <a class="btn btn-default" href="{{ path('mautic_email_geo_stats_export', {'objectId': email.id, 'format': 'csv'}) }}">
+                          <span><i class="fa fa-file-text-o"></i><span class="hidden-xs hidden-sm">{{ 'mautic.core.export.csv'|trans }}</span></span>
+                      </a>
+                      <a class="btn btn-default" href="{{ path('mautic_email_geo_stats_export', {'objectId': email.id, 'format': 'xlsx'}) }}">
+                          <span><i class="fa fa-file-excel-o"></i><span class="hidden-xs hidden-sm">{{ 'mautic.core.export.xlsx'|trans }}</span></span>
+                      </a>
+                  </div>
+                  <div id="geo-stats">
+                    <div class="spinner"><i class="fa fa-spin fa-spinner"></i></div>
+                  </div>
               </div>
               <!--/ #translation-container -->
           </div>

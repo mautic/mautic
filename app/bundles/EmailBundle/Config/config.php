@@ -24,11 +24,8 @@ return [
                 'controller' => 'Mautic\EmailBundle\Controller\EmailTableStatsController::viewAction',
             ],
             'mautic_email_geo_stats_export' => [
-                'path'         => '/email-geo-stats/export/{objectId}/{format}',
+                'path'         => '/email-geo-stats/{objectId}/export/{format}',
                 'controller'   => 'Mautic\EmailBundle\Controller\EmailTableStatsController::exportAction',
-                'defaults'     => [
-                    'format' => 'csv',
-                ],
             ],
         ],
         'api' => [

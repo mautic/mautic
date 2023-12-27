@@ -8,6 +8,7 @@ use Mautic\CoreBundle\Model\TableModelInterface;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\StreamedResponse;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 
 /**
@@ -62,23 +63,16 @@ abstract class AbstractCountryTableController extends AbstractController
         );
     }
 
-    public function exportAction(int $objectId, string $format = 'csv')
+    public function exportAction(int $objectId, string $format = 'csv'): StreamedResponse|Response
     {
-        $campaign = $this->model->getEntity($objectId);
+        $entity = $this->model->getEntity($objectId);
 
-        if (null === $campaign) {
-            return 'test';
+        if (null === $entity) {
+            return new Response();
         }
 
-        /*  if (!$this->hasAccess(
-              'form:forms:viewown',
-              'form:forms:viewother',
-              $campaign->getCreatedBy()
-          )
-          ) {
-              return $this->accessDenied();
-          }*/
+        $statsCountries = $this->getData($entity);
 
-        return $this->model->exportResults($campaign, $format);
+        return $this->model->exportStats($format, $entity, $statsCountries);
     }
 }

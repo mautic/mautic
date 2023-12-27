@@ -1,12 +1,4 @@
 {% if data is not empty %}
-    <div class="std-toolbar btn-group download-toolbar">
-        <a class="btn btn-default" href="{{ path('mautic_form_export', {'objectId': object.id, 'format': 'csv'}) }}" data-toggle="ajax">
-            <span><i class="fa fa-file-text-o"></i><span class="hidden-xs hidden-sm">{{ 'mautic.core.export.csv'|trans }}</span></span>
-        </a>
-        <a class="btn btn-default" href="{{ path('mautic_form_export', {'objectId': object.id, 'format': 'xlsx'}) }}" data-toggle="ajax">
-            <span><i class="fa fa-file-excel-o"></i><span class="hidden-xs hidden-sm">{{ 'mautic.form.result.export.xlsx'|trans }}</span></span>
-        </a>
-    </div>
     <div class="table-responsive">
         <table class="table table-hover table-striped table-bordered click-list">
             <thead>
@@ -18,7 +10,7 @@
                 {% if data|first.sent_count is defined and data|first.read_count is defined and data|first.clicked_through_count is defined %}
                     <td>{{ 'mautic.email.graph.line.stats.sent'|trans }}</td>
                     <td>{{ 'mautic.email.graph.line.stats.read'|trans }}</td>
-                    <td>{{ 'mautic.email.report.is_hit'|trans }}</td>
+                    <td>{{ 'mautic.email.clicked'|trans }}</td>
                 {% endif %}
             </tr>
             </thead>

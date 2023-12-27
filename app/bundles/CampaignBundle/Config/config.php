@@ -32,11 +32,8 @@ return [
                 'controller' => 'Mautic\CampaignBundle\Controller\CampaignTableStatsController::viewAction',
             ],
             'mautic_campaign_geo_stats_export' => [
-                'path'         => '/campaign-geo-stats/export/{objectId}/{format}',
+                'path'         => '/campaign-geo-stats/{objectId}/export/{format}',
                 'controller'   => 'Mautic\CampaignBundle\Controller\CampaignTableStatsController::exportAction',
-                'defaults'     => [
-                    'format' => 'csv',
-                ],
             ],
         ],
         'api'  => [

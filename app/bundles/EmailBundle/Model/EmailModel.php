@@ -17,6 +17,7 @@ use Mautic\CoreBundle\Helper\Chart\LineChart;
 use Mautic\CoreBundle\Helper\Chart\PieChart;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
+use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\CoreBundle\Helper\ThemeHelperInterface;
 use Mautic\CoreBundle\Helper\UserHelper;
@@ -58,6 +59,8 @@ use Mautic\PageBundle\Entity\Trackable;
 use Mautic\PageBundle\Entity\TrackableRepository;
 use Mautic\PageBundle\Model\TrackableModel;
 use Mautic\UserBundle\Model\UserModel;
+use PhpOffice\PhpSpreadsheet\IOFactory;
+use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Console\Helper\ProgressBar;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -65,6 +68,8 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\StreamedResponse;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Contracts\EventDispatcher\Event;
@@ -2438,60 +2443,105 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, TableMod
         return $url;
     }
 
-    public function exportResults($object, string $format)
+    public function exportStats(string $format, $entity, $dataResult): StreamedResponse|Response
     {
         $date = (new DateTimeHelper())->toLocalString();
-        $name = str_replace(' ', '_', $date).'_'.InputHelper::alphanum($object->getName(), false, '-');
+        $name = str_replace(' ', '_', $date).'_'.InputHelper::alphanum($entity->getName(), false, '-');
 
         switch ($format) {
             case 'csv':
-                if (!is_null($handle)) {
-                    $this->csvExporter->export($reportDataResult, $handle, $page);
-
-                    return;
-                }
-
                 $response = new StreamedResponse(
-                    function () use ($reportDataResult) {
+                    function () use ($dataResult) {
                         $handle = fopen('php://output', 'r+');
-                        $this->csvExporter->export($reportDataResult, $handle);
+
+                        $headerRow = [
+                            $this->translator->trans('mautic.lead.lead.thead.country'),
+                            $this->translator->trans('mautic.email.graph.line.stats.sent'),
+                            $this->translator->trans('mautic.email.graph.line.stats.read'),
+                            $this->translator->trans('mautic.email.clicked'),
+                        ];
+
+                        // write the header row
+                        fputcsv($handle, $headerRow);
+
+                        // build the data rows
+                        foreach ($dataResult as $k => $s) {
+                            fputcsv($handle, [
+                                    $s['country'],
+                                    $s['sent_count'],
+                                    $s['read_count'],
+                                    $s['clicked_through_count'],
+                                ]
+                            );
+                        }
                         fclose($handle);
                     }
                 );
 
-                $fileName = $name.'.csv';
-                ExportResponse::setResponseHeaders($response, $fileName);
+                $response->headers->set('Content-Type', [
+                    'text/csv; charset=UTF-8',
+                ]);
+
+                $response->headers->set('Content-Disposition', 'attachment; filename="'.$name.'.csv"');
+                $response->headers->set('Expires', '0');
+                $response->headers->set('Cache-Control', 'must-revalidate');
+                $response->headers->set('Pragma', 'public');
 
                 return $response;
-
-            case 'html':
-                $content = $this->twig->render(
-                    '@MauticReport/Report/export.html.twig',
-                    [
-                        'pageTitle'        => $name,
-                        'report'           => $report,
-                        'reportDataResult' => $reportDataResult,
-                    ]
-                );
-
-                return new Response($content);
 
             case 'xlsx':
                 if (!class_exists(Spreadsheet::class)) {
                     throw new \Exception('PHPSpreadsheet is required to export to Excel spreadsheets');
                 }
-
                 $response = new StreamedResponse(
-                    function () use ($reportDataResult, $name) {
-                        $this->excelExporter->export($reportDataResult, $name);
+                    function () use ($dataResult, $name) {
+                        $objPHPExcel = new Spreadsheet();
+                        $objPHPExcel->getProperties()->setTitle($name);
+
+                        $objPHPExcel->createSheet();
+
+                        $headerRow = [
+                            $this->translator->trans('mautic.lead.lead.thead.country'),
+                            $this->translator->trans('mautic.email.graph.line.stats.sent'),
+                            $this->translator->trans('mautic.email.graph.line.stats.read'),
+                            $this->translator->trans('mautic.email.clicked'),
+                        ];
+
+                        // write the row
+                        $objPHPExcel->getActiveSheet()->fromArray($headerRow, null, 'A1');
+
+                        // build the data rows
+                        $count = 2;
+                        foreach ($dataResult as $k => $s) {
+                            $row = [
+                                $s['country'],
+                                $s['sent_count'],
+                                $s['read_count'],
+                                $s['clicked_through_count'],
+                            ];
+                            $objPHPExcel->getActiveSheet()->fromArray($row, null, "A{$count}");
+
+                            // increment letter
+                            ++$count;
+                        }
+
+                        $objWriter = IOFactory::createWriter($objPHPExcel, 'Xlsx');
+                        $objWriter->setPreCalculateFormulas(false);
+
+                        $objWriter->save('php://output');
                     }
                 );
 
-                $fileName = $name.'.xlsx';
-                ExportResponse::setResponseHeaders($response, $fileName);
+                $response->headers->set('Content-Type', [
+                    'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+                ]);
+
+                $response->headers->set('Content-Disposition', 'attachment; filename="'.$name.'.xlsx"');
+                $response->headers->set('Expires', '0');
+                $response->headers->set('Cache-Control', 'must-revalidate');
+                $response->headers->set('Pragma', 'public');
 
                 return $response;
-
             default:
                 return new Response();
         }

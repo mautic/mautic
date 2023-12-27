@@ -446,17 +446,19 @@ Mautic.emulateNoDataForPieChart = function (data) {
 
 Mautic.lazyLoadGeoTable = () => {
     let containerId = '#geo-stats-container';
+    let geoStatsId = '#geo-stats';
     let container = mQuery(containerId);
+    let geoStats = mQuery(geoStatsId);
 
     // Load the table only if the container exists.
-    if (!container.length) {
+    if (!container.length && !geoStats.length) {
         return;
     }
 
     let tableUrl = container.data('target-url');
     mQuery.get(tableUrl, (response) => {
-        response.target = containerId;
-        mQuery(containerId).html(response);
+        response.target = geoStatsId;
+        mQuery(geoStatsId).html(response);
     });
 };
 
