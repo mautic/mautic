@@ -19,8 +19,6 @@ use Mautic\CampaignBundle\Membership\MembershipBuilder;
 use Mautic\CoreBundle\Helper\Chart\ChartQuery;
 use Mautic\CoreBundle\Helper\Chart\LineChart;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
-use Mautic\CoreBundle\Helper\DateTimeHelper;
-use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Model\FormModel as CommonFormModel;
 use Mautic\CoreBundle\Model\TableModelInterface;
@@ -864,7 +862,7 @@ class CampaignModel extends CommonFormModel implements TableModelInterface
             $results[$e['country']]['country']  = $e['country'];
         }
 
-        if ($eventsEmailsSend->count() > 0) {
+        if ($entity->isEmailCampaign()) {
             $emailStats            = $statRepo->getStatsSummaryByCountry($eventsIds, 'campaign');
 
             foreach ($emailStats as $e) {
@@ -887,51 +885,35 @@ class CampaignModel extends CommonFormModel implements TableModelInterface
         return $this->em->getRepository(CampaignLead::class)->getCampaignMembersGroupByCountry($campaign);
     }
 
+    /**
+     * @throws \Exception
+     */
     public function exportStats(string $format, $entity, array $dataResult): StreamedResponse|Response
     {
-        $date = (new DateTimeHelper())->toLocalString();
-        $name = str_replace(' ', '_', $date).'_'.InputHelper::alphanum($entity->getName(), false, '-');
+        $name = $this->getExportFilename($entity->getName());
 
         switch ($format) {
             case 'csv':
                 $response = new StreamedResponse(
-                    function () use ($dataResult) {
-                        $handle = fopen('php://output', 'r+');
-
-                        $headerRow = [
-                            $this->translator->trans('mautic.lead.lead.thead.country'),
-                            $this->translator->trans('mautic.lead.leads'),
-                            $this->translator->trans('mautic.email.graph.line.stats.sent'),
-                            $this->translator->trans('mautic.email.graph.line.stats.read'),
-                            $this->translator->trans('mautic.email.clicked'),
-                        ];
+                    function () use ($entity, $dataResult) {
+                        $handle    = fopen('php://output', 'r+');
+                        $headerRow = $this->getExportHeader($entity);
 
                         // write the header row
                         fputcsv($handle, $headerRow);
 
                         // build the data rows
-                        foreach ($dataResult as $k => $s) {
-                            fputcsv($handle, [
-                                    $s['country'],
-                                    $s['contacts'],
-                                    $s['sent_count'],
-                                    $s['read_count'],
-                                    $s['clicked_through_count'],
-                                ]
-                            );
+                        foreach ($dataResult as $s) {
+                            $row = $this->getExportRow($entity, $s);
+                            fputcsv($handle, $row);
                         }
                         fclose($handle);
                     }
                 );
 
-                $response->headers->set('Content-Type', [
+                $this->setExportResponseHeaders($response, $name.'.csv', [
                     'text/csv; charset=UTF-8',
                 ]);
-
-                $response->headers->set('Content-Disposition', 'attachment; filename="'.$name.'.csv"');
-                $response->headers->set('Expires', '0');
-                $response->headers->set('Cache-Control', 'must-revalidate');
-                $response->headers->set('Pragma', 'public');
 
                 return $response;
 
@@ -940,19 +922,11 @@ class CampaignModel extends CommonFormModel implements TableModelInterface
                     throw new \Exception('PHPSpreadsheet is required to export to Excel spreadsheets');
                 }
                 $response = new StreamedResponse(
-                    function () use ($dataResult, $name) {
+                    function () use ($entity, $dataResult, $name) {
                         $objPHPExcel = new Spreadsheet();
                         $objPHPExcel->getProperties()->setTitle($name);
-
                         $objPHPExcel->createSheet();
-
-                        $headerRow = [
-                            $this->translator->trans('mautic.lead.lead.thead.country'),
-                            $this->translator->trans('mautic.lead.leads'),
-                            $this->translator->trans('mautic.email.graph.line.stats.sent'),
-                            $this->translator->trans('mautic.email.graph.line.stats.read'),
-                            $this->translator->trans('mautic.email.clicked'),
-                        ];
+                        $headerRow = $this->getExportHeader($entity);
 
                         // write the row
                         $objPHPExcel->getActiveSheet()->fromArray($headerRow, null, 'A1');
@@ -960,13 +934,7 @@ class CampaignModel extends CommonFormModel implements TableModelInterface
                         // build the data rows
                         $count = 2;
                         foreach ($dataResult as $k => $s) {
-                            $row = [
-                                $s['country'],
-                                $s['contacts'],
-                                $s['sent_count'],
-                                $s['read_count'],
-                                $s['clicked_through_count'],
-                            ];
+                            $row = $this->getExportRow($entity, $s);
                             $objPHPExcel->getActiveSheet()->fromArray($row, null, "A{$count}");
 
                             // increment letter
@@ -980,18 +948,57 @@ class CampaignModel extends CommonFormModel implements TableModelInterface
                     }
                 );
 
-                $response->headers->set('Content-Type', [
+                $this->setExportResponseHeaders($response, $name.'.xlsx', [
                     'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
                 ]);
-
-                $response->headers->set('Content-Disposition', 'attachment; filename="'.$name.'.xlsx"');
-                $response->headers->set('Expires', '0');
-                $response->headers->set('Cache-Control', 'must-revalidate');
-                $response->headers->set('Pragma', 'public');
 
                 return $response;
             default:
                 return new Response();
         }
+    }
+
+    /**
+     * @return array<int, string>
+     */
+    public function getExportHeader(Campaign $entity): array
+    {
+        $headers = [
+            $this->translator->trans('mautic.lead.lead.thead.country'),
+            $this->translator->trans('mautic.lead.leads'),
+        ];
+
+        if ($entity->isEmailCampaign()) {
+            array_push($headers,
+                $this->translator->trans('mautic.email.graph.line.stats.sent'),
+                $this->translator->trans('mautic.email.graph.line.stats.read'),
+                $this->translator->trans('mautic.email.clicked')
+            );
+        }
+
+        return $headers;
+    }
+
+    /**
+     * @param array<int|string, string> $values
+     *
+     * @return array<int, string>
+     */
+    public function getExportRow(Campaign $entity, array $values): array
+    {
+        $row = [
+            $values['country'],
+            $values['contacts'],
+        ];
+
+        if ($entity->isEmailCampaign()) {
+            array_push($row,
+                $values['sent_count'],
+                $values['read_count'],
+                $values['clicked_through_count'],
+            );
+        }
+
+        return $row;
     }
 }

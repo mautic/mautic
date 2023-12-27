@@ -2,9 +2,11 @@
 
 namespace Mautic\CoreBundle\Model;
 
+use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\UserBundle\Entity\User;
 use Symfony\Component\Form\FormFactoryInterface;
+use Symfony\Component\HttpFoundation\StreamedResponse;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Contracts\EventDispatcher\Event;
 
@@ -455,5 +457,38 @@ class FormModel extends AbstractCommonModel
                 ['exception' => $ex]
             );
         }
+    }
+
+    /**
+     * @param resource                 $handle
+     * @param array<int|string,string> $row
+     *
+     * @return false|int
+     */
+    protected function putCsvExportRow($handle, array $row): bool|int
+    {
+        return fputcsv($handle, $row);
+    }
+
+    /**
+     * @param array<string> $contentType
+     */
+    protected function setExportResponseHeaders(StreamedResponse $response, string $filename, array $contentType): void
+    {
+        foreach ($contentType as $ct) {
+            $response->headers->set('Content-Type', $ct);
+        }
+
+        $response->headers->set('Content-Disposition', 'attachment; filename="'.$filename.'"');
+        $response->headers->set('Expires', '0');
+        $response->headers->set('Cache-Control', 'must-revalidate');
+        $response->headers->set('Pragma', 'public');
+    }
+
+    protected function getExportFilename(string $objectName): string
+    {
+        $date = (new DateTimeHelper())->toLocalString();
+
+        return str_replace(' ', '_', $date).'_'.InputHelper::alphanum($objectName, false, '-');
     }
 }

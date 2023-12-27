@@ -17,7 +17,6 @@ use Mautic\CoreBundle\Helper\Chart\LineChart;
 use Mautic\CoreBundle\Helper\Chart\PieChart;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
-use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\CoreBundle\Helper\ThemeHelperInterface;
 use Mautic\CoreBundle\Helper\UserHelper;
@@ -2443,49 +2442,35 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, TableMod
         return $url;
     }
 
+    /**
+     * @throws \Exception
+     */
     public function exportStats(string $format, $entity, $dataResult): StreamedResponse|Response
     {
-        $date = (new DateTimeHelper())->toLocalString();
-        $name = str_replace(' ', '_', $date).'_'.InputHelper::alphanum($entity->getName(), false, '-');
+        $name = $this->getExportFilename($entity->getName());
 
         switch ($format) {
             case 'csv':
                 $response = new StreamedResponse(
                     function () use ($dataResult) {
-                        $handle = fopen('php://output', 'r+');
-
-                        $headerRow = [
-                            $this->translator->trans('mautic.lead.lead.thead.country'),
-                            $this->translator->trans('mautic.email.graph.line.stats.sent'),
-                            $this->translator->trans('mautic.email.graph.line.stats.read'),
-                            $this->translator->trans('mautic.email.clicked'),
-                        ];
+                        $handle    = fopen('php://output', 'r+');
+                        $headerRow = $this->getExportHeader();
 
                         // write the header row
-                        fputcsv($handle, $headerRow);
+                        $this->putCsvExportRow($handle, $headerRow);
 
                         // build the data rows
-                        foreach ($dataResult as $k => $s) {
-                            fputcsv($handle, [
-                                    $s['country'],
-                                    $s['sent_count'],
-                                    $s['read_count'],
-                                    $s['clicked_through_count'],
-                                ]
-                            );
+                        foreach ($dataResult as $s) {
+                            $row = $this->getExportRow($s);
+                            $this->putCsvExportRow($handle, $row);
                         }
                         fclose($handle);
                     }
                 );
 
-                $response->headers->set('Content-Type', [
+                $this->setExportResponseHeaders($response, $name.'.csv', [
                     'text/csv; charset=UTF-8',
                 ]);
-
-                $response->headers->set('Content-Disposition', 'attachment; filename="'.$name.'.csv"');
-                $response->headers->set('Expires', '0');
-                $response->headers->set('Cache-Control', 'must-revalidate');
-                $response->headers->set('Pragma', 'public');
 
                 return $response;
 
@@ -2497,28 +2482,16 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, TableMod
                     function () use ($dataResult, $name) {
                         $objPHPExcel = new Spreadsheet();
                         $objPHPExcel->getProperties()->setTitle($name);
-
                         $objPHPExcel->createSheet();
-
-                        $headerRow = [
-                            $this->translator->trans('mautic.lead.lead.thead.country'),
-                            $this->translator->trans('mautic.email.graph.line.stats.sent'),
-                            $this->translator->trans('mautic.email.graph.line.stats.read'),
-                            $this->translator->trans('mautic.email.clicked'),
-                        ];
+                        $headerRow = $this->getExportHeader();
 
                         // write the row
                         $objPHPExcel->getActiveSheet()->fromArray($headerRow, null, 'A1');
 
                         // build the data rows
                         $count = 2;
-                        foreach ($dataResult as $k => $s) {
-                            $row = [
-                                $s['country'],
-                                $s['sent_count'],
-                                $s['read_count'],
-                                $s['clicked_through_count'],
-                            ];
+                        foreach ($dataResult as $s) {
+                            $row = $this->getExportRow($s);
                             $objPHPExcel->getActiveSheet()->fromArray($row, null, "A{$count}");
 
                             // increment letter
@@ -2532,18 +2505,41 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, TableMod
                     }
                 );
 
-                $response->headers->set('Content-Type', [
+                $this->setExportResponseHeaders($response, $name.'.xlsx', [
                     'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
                 ]);
-
-                $response->headers->set('Content-Disposition', 'attachment; filename="'.$name.'.xlsx"');
-                $response->headers->set('Expires', '0');
-                $response->headers->set('Cache-Control', 'must-revalidate');
-                $response->headers->set('Pragma', 'public');
 
                 return $response;
             default:
                 return new Response();
         }
+    }
+
+    /**
+     * @return array<int, string>
+     */
+    public function getExportHeader(): array
+    {
+        return [
+            $this->translator->trans('mautic.lead.lead.thead.country'),
+            $this->translator->trans('mautic.email.graph.line.stats.sent'),
+            $this->translator->trans('mautic.email.graph.line.stats.read'),
+            $this->translator->trans('mautic.email.clicked'),
+        ];
+    }
+
+    /**
+     * @param array<int|string, string> $values
+     *
+     * @return array<int, string>
+     */
+    public function getExportRow(array $values): array
+    {
+        return [
+            $values['country'],
+            $values['sent_count'],
+            $values['read_count'],
+            $values['clicked_through_count'],
+        ];
     }
 }

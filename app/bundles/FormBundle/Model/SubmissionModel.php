@@ -11,7 +11,6 @@ use Mautic\CoreBundle\Exception\FileUploadException;
 use Mautic\CoreBundle\Helper\Chart\ChartQuery;
 use Mautic\CoreBundle\Helper\Chart\LineChart;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
-use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\CoreBundle\Helper\UserHelper;
@@ -528,9 +527,7 @@ class SubmissionModel extends CommonFormModel
         $queryArgs['viewOnlyFields'] = $viewOnlyFields;
         $queryArgs['simpleResults']  = true;
         $results                     = $this->getEntities($queryArgs);
-
-        $date = (new DateTimeHelper())->toLocalString();
-        $name = str_replace(' ', '_', $date).'_'.$form->getAlias();
+        $name                        = $this->getExportFilename($form->getAlias());
 
         switch ($format) {
             case 'csv':
@@ -557,7 +554,7 @@ class SubmissionModel extends CommonFormModel
                     }
                 );
 
-                $this->setResponseHeaders($response, $name.'.csv', [
+                $this->setExportResponseHeaders($response, $name.'.csv', [
                     'application/force-download',
                     'application/octet-stream',
                 ]);
@@ -611,7 +608,7 @@ class SubmissionModel extends CommonFormModel
                         }
                     );
 
-                    $this->setResponseHeaders($response, $name.'.xlsx', [
+                    $this->setExportResponseHeaders($response, $name.'.xlsx', [
                         'application/force-download',
                         'application/octet-stream',
                     ]);
@@ -637,9 +634,7 @@ class SubmissionModel extends CommonFormModel
     {
         $results    = $this->getEntitiesByPage($queryArgs);
         $results    = $results['results'];
-
-        $date = (new DateTimeHelper())->toLocalString();
-        $name = str_replace(' ', '_', $date).'_'.$page->getAlias();
+        $name       = $this->getExportFilename($page->getAlias());
 
         switch ($format) {
             case 'csv':
@@ -663,7 +658,7 @@ class SubmissionModel extends CommonFormModel
                         fclose($handle);
                     }
                 );
-                $this->setResponseHeaders($response, $name.'.csv', [
+                $this->setExportResponseHeaders($response, $name.'.csv', [
                     'text/csv; charset=UTF-8',
                 ]);
 
@@ -713,7 +708,7 @@ class SubmissionModel extends CommonFormModel
                         $objWriter->save('php://output');
                     }
                 );
-                $this->setResponseHeaders($response, $name.'.xlsx', [
+                $this->setExportResponseHeaders($response, $name.'.xlsx', [
                     'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
                 ]);
 
@@ -721,32 +716,6 @@ class SubmissionModel extends CommonFormModel
             default:
                 return new Response();
         }
-    }
-
-    /**
-     * @param array<string> $contentType
-     */
-    private function setResponseHeaders(StreamedResponse $response, string $filename, array $contentType): void
-    {
-        foreach ($contentType as $ct) {
-            $response->headers->set('Content-Type', $ct);
-        }
-
-        $response->headers->set('Content-Disposition', 'attachment; filename="'.$filename.'"');
-        $response->headers->set('Expires', '0');
-        $response->headers->set('Cache-Control', 'must-revalidate');
-        $response->headers->set('Pragma', 'public');
-    }
-
-    /**
-     * @param resource     $handle
-     * @param array<mixed> $row
-     *
-     * @return false|int
-     */
-    private function putCsvExportRow($handle, array $row): bool|int
-    {
-        return fputcsv($handle, $row);
     }
 
     /**
