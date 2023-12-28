@@ -11,8 +11,10 @@ use Mautic\CampaignBundle\Controller\CampaignTableStatsController;
 use Mautic\CampaignBundle\Entity\Campaign;
 use Mautic\CampaignBundle\Entity\Event;
 use Mautic\CampaignBundle\Model\CampaignModel;
+use Mautic\CoreBundle\Helper\ExportHelper;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
+use Mautic\CoreBundle\Translation\Translator;
 use Mautic\EmailBundle\Entity\Email;
 use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\HttpFoundation\StreamedResponse;
@@ -31,7 +33,13 @@ class CampaignTableStatsControllerTest extends MauticMysqlTestCase
             ->willReturn(true);
 
         $this->campaignModelMock       = $this->createMock(CampaignModel::class);
-        $this->controller              = new CampaignTableStatsController($this->campaignModelMock);
+        $this->exportHelper            = $this->createMock(ExportHelper::class);
+        $this->translator              = $this->createMock(Translator::class);
+        $this->controller              = new CampaignTableStatsController(
+            $this->campaignModelMock,
+            $this->exportHelper,
+            $this->translator
+        );
     }
 
     /**
@@ -169,22 +177,24 @@ class CampaignTableStatsControllerTest extends MauticMysqlTestCase
      */
     public function testGetExportHeader(): void
     {
-        $translator      = $this->getContainer()->get('translator');
         $campaign        = $this->createCampaignWithEmail();
         $campaignNoEmail = $this->createCampaignNoEmail();
-        $headers         = [
-            $translator->trans('mautic.lead.lead.thead.country'),
-            $translator->trans('mautic.lead.leads'),
-        ];
 
-        $this->assertSame($headers, $this->controller->getExportHeader($campaignNoEmail));
+        $this->translator->expects($this->exactly(7))
+            ->method('trans')
+            ->withConsecutive(
+                ['mautic.lead.lead.thead.country'],
+                ['mautic.lead.leads'],
+                ['mautic.lead.lead.thead.country'],
+                ['mautic.lead.leads'],
+                ['mautic.email.graph.line.stats.sent'],
+                ['mautic.email.graph.line.stats.read'],
+                ['mautic.email.clicked']
+            )
+            ->willReturnOnConsecutiveCalls('Country', 'Contacts', 'Country', 'Contacts', 'Sent', 'Read', 'Clicked');
 
-        array_push($headers,
-            $translator->trans('mautic.email.graph.line.stats.sent'),
-            $translator->trans('mautic.email.graph.line.stats.read'),
-            $translator->trans('mautic.email.clicked')
-        );
-        $this->assertSame($headers, $this->controller->getExportHeader($campaign));
+        $this->assertSame(['Country', 'Contacts'], $this->controller->getExportHeader($campaignNoEmail));
+        $this->assertSame(['Country', 'Contacts', 'Sent', 'Read', 'Clicked'], $this->controller->getExportHeader($campaign));
     }
 
     /**
@@ -206,8 +216,8 @@ class CampaignTableStatsControllerTest extends MauticMysqlTestCase
             ->with($campaign->getId())
             ->willReturn($campaign);
 
-        $this->campaignModelMock->expects($this->once())
-            ->method('exportStats')
+        $this->exportHelper->expects($this->once())
+            ->method('exportDataAs')
             ->willReturn(new StreamedResponse());
 
         $this->controller->exportAction($campaign->getId(), 'csv');

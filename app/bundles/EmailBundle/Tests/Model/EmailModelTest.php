@@ -967,17 +967,4 @@ class EmailModelTest extends \PHPUnit\Framework\TestCase
         $this->emailModel->saveEntity($email);
         $this->assertFalse($this->emailModel->isUpdatingTranslationChildren());
     }
-
-    public function testGetExportRow(): void
-    {
-        $values = [
-            'country'               => 'Finland',
-            'read_count'            => '6',
-            'sent_count'            => '8',
-            'clicked_through_count' => '3',
-            'test'                  => '123',
-        ];
-
-        $this->assertSame(['Finland', '8', '6', '3'], $this->emailModel->getExportRow($values));
-    }
 }

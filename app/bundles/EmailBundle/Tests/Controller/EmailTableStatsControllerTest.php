@@ -6,8 +6,10 @@ namespace Mautic\EmailBundle\Tests\Controller;
 
 use Doctrine\DBAL\Exception;
 use Doctrine\ORM\Exception\ORMException;
+use Mautic\CoreBundle\Helper\ExportHelper;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
+use Mautic\CoreBundle\Translation\Translator;
 use Mautic\EmailBundle\Controller\EmailTableStatsController;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Model\EmailModel;
@@ -25,8 +27,14 @@ class EmailTableStatsControllerTest extends MauticMysqlTestCase
     protected function setUp(): void
     {
         parent::setUp();
-        $this->emailModelMock = $this->createMock(EmailModel::class);
-        $this->controller     = new EmailTableStatsController($this->emailModelMock);
+        $this->emailModelMock     = $this->createMock(EmailModel::class);
+        $this->exportHelper       = $this->createMock(ExportHelper::class);
+        $this->translator         = $this->createMock(Translator::class);
+        $this->controller         = new EmailTableStatsController(
+            $this->emailModelMock,
+            $this->exportHelper,
+            $this->translator
+        );
     }
 
     /**
@@ -119,16 +127,18 @@ class EmailTableStatsControllerTest extends MauticMysqlTestCase
 
     public function testGetExportHeader(): void
     {
-        $translator = $this->getContainer()->get('translator');
         $email      = new Email();
 
-        $headerRow = [
-            $translator->trans('mautic.lead.lead.thead.country'),
-            $translator->trans('mautic.email.graph.line.stats.sent'),
-            $translator->trans('mautic.email.graph.line.stats.read'),
-            $translator->trans('mautic.email.clicked'),
-        ];
+        $this->translator->expects($this->exactly(4))
+            ->method('trans')
+            ->withConsecutive(
+                ['mautic.lead.lead.thead.country'],
+                ['mautic.email.graph.line.stats.sent'],
+                ['mautic.email.graph.line.stats.read'],
+                ['mautic.email.clicked']
+            )
+            ->willReturnOnConsecutiveCalls('Country', 'Sent', 'Read', 'Clicked');
 
-        $this->assertSame($headerRow, $this->getExportHeader($email));
+        $this->assertSame(['Country', 'Sent', 'Read', 'Clicked'], $this->controller->getExportHeader($email));
     }
 }
