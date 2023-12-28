@@ -161,15 +161,11 @@ class DynamicContentSubscriber implements EventSubscriberInterface
         $content      = $event->getContent();
         $clickthrough = $event->getClickthrough();
 
-        if ($lead instanceof Lead) {
+        if ($lead instanceof Lead && $content) {
+            /** @var Lead $lead */
             $leadArray              = $this->dynamicContentHelper->convertLeadToArray($lead);
             $leadArray['companies'] = $this->companyModel->getRepository()->getCompaniesByLeadId($leadArray['id']);
-        } else {
-            /** @var Lead $lead */
-            $leadArray = $lead->getProfileFields();
-        }
 
-        if ($content) {
             $tokens = array_merge(
                 TokenHelper::findLeadTokens($content, $leadArray),
                 $this->pageTokenHelper->findPageTokens($content, $clickthrough),
