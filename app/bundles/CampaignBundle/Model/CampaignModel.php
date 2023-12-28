@@ -25,7 +25,6 @@ use Mautic\CoreBundle\Model\TableModelInterface;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\CoreBundle\Translation\Translator;
 use Mautic\EmailBundle\Entity\Stat;
-use Mautic\EmailBundle\Entity\StatRepository;
 use Mautic\FormBundle\Entity\Form;
 use Mautic\FormBundle\Model\FormModel;
 use Mautic\LeadBundle\Entity\Lead;
@@ -784,7 +783,6 @@ class CampaignModel extends CommonFormModel implements TableModelInterface
         $eventsEmailsSend     = $entity->getEmailSendEvents();
         $eventsIds            = $eventsEmailsSend->getKeys();
 
-        /** @var StatRepository $statRepo */
         $statRepo            = $this->em->getRepository(Stat::class);
         $contacts            =  $this->getCampaignMembersGroupByCountry($entity);
 

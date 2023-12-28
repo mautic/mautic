@@ -10,7 +10,6 @@ use Doctrine\ORM\OptimisticLockException;
 use Mautic\CampaignBundle\Entity\Campaign;
 use Mautic\CampaignBundle\Entity\Event;
 use Mautic\CampaignBundle\Entity\Lead as CampaignLead;
-use Mautic\CampaignBundle\Model\CampaignModel;
 use Mautic\CoreBundle\Entity\IpAddress;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\EmailBundle\Entity\Email;
@@ -29,7 +28,6 @@ class CampaignModelFunctionalTest extends MauticMysqlTestCase
      */
     public function testGetCountryStats(): void
     {
-        /** @var CampaignModel $model */
         $model = $this->getContainer()->get('mautic.campaign.model.campaign');
 
         $leadsPayload = [
@@ -152,26 +150,6 @@ class CampaignModelFunctionalTest extends MauticMysqlTestCase
      * @throws OptimisticLockException
      * @throws ORMException
      */
-    public function testGetContextEntity(): void
-    {
-        /** @var CampaignModel $model */
-        $model = $this->getContainer()->get('mautic.campaign.model.campaign');
-
-        $campaign = new Campaign();
-        $campaign->setName('Test email');
-        $this->em->persist($campaign);
-        $this->em->flush();
-
-        $id     = $campaign->getId();
-        $result = $model->getEntity($id);
-
-        $this->assertSame($campaign, $result);
-    }
-
-    /**
-     * @throws OptimisticLockException
-     * @throws ORMException
-     */
     private function emulateEmailStat(Lead $lead, Email $email, bool $isRead, int $sourceId): void
     {
         $stat = new Stat();
@@ -225,5 +203,11 @@ class CampaignModelFunctionalTest extends MauticMysqlTestCase
         $pageHit->setSourceId($email->getId());
         $this->em->persist($pageHit);
         $this->em->flush();
+    }
+
+    public function testGetCampaignLeadRepository(): void
+    {
+        $model = $this->getContainer()->get('mautic.campaign.model.campaign');
+        $this->assertInstanceOf(\Mautic\CampaignBundle\Entity\LeadRepository::class, $model->getCampaignLeadRepository());
     }
 }

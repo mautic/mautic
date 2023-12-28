@@ -161,4 +161,51 @@ class CampaignTableStatsControllerTest extends MauticMysqlTestCase
 
         return $campaign;
     }
+
+    /**
+     * @throws OptimisticLockException
+     * @throws ORMException
+     */
+    public function testGetExportRow(): void
+    {
+        $model           = $this->getContainer()->get('mautic.campaign.model.campaign');
+        $campaign        = $this->createCampaignWithEmail();
+        $campaignNoEmail = $this->createCampaignNoEmail();
+        $values          = [
+            'country'               => 'Finland',
+            'read_count'            => '6',
+            'sent_count'            => '8',
+            'contacts'              => '10',
+            'clicked_through_count' => '3',
+            'test'                  => '123',
+        ];
+
+        $this->assertSame(['Finland', '10', '8', '6', '3'], $model->getExportRow($campaign, $values));
+        $this->assertSame(['Finland', '10'], $model->getExportRow($campaignNoEmail, $values));
+    }
+
+    /**
+     * @throws OptimisticLockException
+     * @throws ORMException
+     */
+    public function testGetExportHeader(): void
+    {
+        $model           = $this->getContainer()->get('mautic.campaign.model.campaign');
+        $translator      = $this->getContainer()->get('translator');
+        $campaign        = $this->createCampaignWithEmail();
+        $campaignNoEmail = $this->createCampaignNoEmail();
+        $headers         = [
+            $translator->trans('mautic.lead.lead.thead.country'),
+            $translator->trans('mautic.lead.leads'),
+        ];
+
+        $this->assertSame($headers, $model->getExportHeader($campaignNoEmail));
+
+        array_push($headers,
+            $translator->trans('mautic.email.graph.line.stats.sent'),
+            $translator->trans('mautic.email.graph.line.stats.read'),
+            $translator->trans('mautic.email.clicked')
+        );
+        $this->assertSame($headers, $model->getExportHeader($campaign));
+    }
 }
