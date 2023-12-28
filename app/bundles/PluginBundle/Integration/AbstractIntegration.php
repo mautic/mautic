@@ -795,12 +795,16 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
                     break;
             }
         } catch (\GuzzleHttp\Exception\RequestException $exception) {
-            return [
-                'error' => [
-                    'message' => $exception->getResponse()->getBody()->getContents(),
-                    'code'    => $exception->getCode(),
-                ],
-            ];
+            if (!empty($settings['return_raw'])) {
+                return $exception->getResponse();
+            } else {
+                return [
+                    'error' => [
+                        'message' => $this->parseCallbackResponse($exception->getResponse()->getBody()),
+                        'code'    => $exception->getCode(),
+                    ],
+                ];
+            }
         }
         if (empty($settings['ignore_event_dispatch'])) {
             $event->setResponse($result);
