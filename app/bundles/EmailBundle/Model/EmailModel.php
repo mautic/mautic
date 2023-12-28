@@ -58,8 +58,6 @@ use Mautic\PageBundle\Entity\Trackable;
 use Mautic\PageBundle\Entity\TrackableRepository;
 use Mautic\PageBundle\Model\TrackableModel;
 use Mautic\UserBundle\Model\UserModel;
-use PhpOffice\PhpSpreadsheet\IOFactory;
-use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Console\Helper\ProgressBar;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -67,8 +65,6 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpFoundation\StreamedResponse;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Contracts\EventDispatcher\Event;
@@ -638,9 +634,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, TableMod
      */
     public function getCountryStats($entity, bool $includeVariants = false): array
     {
-        $emailIds = ($includeVariants && ($entity->isVariant() || $entity->isTranslation())) ? $entity->getRelatedEntityIds() : [$entity->getId()];
-
-        /** @var StatRepository $statRepo */
+        $emailIds      = ($includeVariants && ($entity->isVariant() || $entity->isTranslation())) ? $entity->getRelatedEntityIds() : [$entity->getId()];
         $statRepo      = $this->em->getRepository(Stat::class);
 
         return $statRepo->getStatsSummaryByCountry($emailIds);
@@ -2298,106 +2292,5 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, TableMod
         $context->setScheme($original_scheme);
 
         return $url;
-    }
-
-    /**
-     * @throws \Exception
-     */
-    public function exportStats(string $format, $entity, $dataResult): StreamedResponse|Response
-    {
-        $name = $this->getExportFilename($entity->getName());
-
-        switch ($format) {
-            case 'csv':
-                $response = new StreamedResponse(
-                    function () use ($dataResult): void {
-                        $handle    = fopen('php://output', 'r+');
-                        $headerRow = $this->getExportHeader();
-
-                        // write the header row
-                        $this->putCsvExportRow($handle, $headerRow);
-
-                        // build the data rows
-                        foreach ($dataResult as $s) {
-                            $row = $this->getExportRow($s);
-                            $this->putCsvExportRow($handle, $row);
-                        }
-                        fclose($handle);
-                    }
-                );
-
-                $this->setExportResponseHeaders($response, $name.'.csv', [
-                    'text/csv; charset=UTF-8',
-                ]);
-
-                return $response;
-
-            case 'xlsx':
-                if (!class_exists(Spreadsheet::class)) {
-                    throw new \Exception('PHPSpreadsheet is required to export to Excel spreadsheets');
-                }
-                $response = new StreamedResponse(
-                    function () use ($dataResult, $name): void {
-                        $objPHPExcel = new Spreadsheet();
-                        $objPHPExcel->getProperties()->setTitle($name);
-                        $objPHPExcel->createSheet();
-                        $headerRow = $this->getExportHeader();
-
-                        // write the row
-                        $objPHPExcel->getActiveSheet()->fromArray($headerRow, null, 'A1');
-
-                        // build the data rows
-                        $count = 2;
-                        foreach ($dataResult as $s) {
-                            $row = $this->getExportRow($s);
-                            $objPHPExcel->getActiveSheet()->fromArray($row, null, "A{$count}");
-
-                            // increment letter
-                            ++$count;
-                        }
-
-                        $objWriter = IOFactory::createWriter($objPHPExcel, 'Xlsx');
-                        $objWriter->setPreCalculateFormulas(false);
-
-                        $objWriter->save('php://output');
-                    }
-                );
-
-                $this->setExportResponseHeaders($response, $name.'.xlsx', [
-                    'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-                ]);
-
-                return $response;
-            default:
-                return new Response();
-        }
-    }
-
-    /**
-     * @return array<int, string>
-     */
-    public function getExportHeader(): array
-    {
-        return [
-            $this->translator->trans('mautic.lead.lead.thead.country'),
-            $this->translator->trans('mautic.email.graph.line.stats.sent'),
-            $this->translator->trans('mautic.email.graph.line.stats.read'),
-            $this->translator->trans('mautic.email.clicked'),
-        ];
-    }
-
-    /**
-     * @param array<int|string, string> $values
-     *
-     * @return array<int, string>
-     */
-    public function getExportRow(array $values): array
-    {
-        return [
-            $values['country'],
-            $values['sent_count'],
-            $values['read_count'],
-            $values['clicked_through_count'],
-        ];
     }
 }

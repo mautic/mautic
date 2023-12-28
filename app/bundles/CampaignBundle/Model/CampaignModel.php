@@ -30,14 +30,10 @@ use Mautic\FormBundle\Model\FormModel;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Model\ListModel;
 use Mautic\LeadBundle\Tracker\ContactTracker;
-use PhpOffice\PhpSpreadsheet\IOFactory;
-use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\FormFactoryInterface;
-use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpFoundation\StreamedResponse;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
@@ -787,8 +783,8 @@ class CampaignModel extends CommonFormModel implements TableModelInterface
         $contacts            =  $this->getCampaignMembersGroupByCountry($entity);
 
         foreach ($contacts as $e) {
-            $results[$e['country']]['contacts'] = $e['contacts'];
             $results[$e['country']]['country']  = $e['country'];
+            $results[$e['country']]['contacts'] = $e['contacts'];
         }
 
         if ($entity->isEmailCampaign()) {
@@ -812,122 +808,5 @@ class CampaignModel extends CommonFormModel implements TableModelInterface
     public function getCampaignMembersGroupByCountry(Campaign $campaign): array
     {
         return $this->em->getRepository(CampaignLead::class)->getCampaignMembersGroupByCountry($campaign);
-    }
-
-    /**
-     * @throws \Exception
-     */
-    public function exportStats(string $format, $entity, array $dataResult): StreamedResponse|Response
-    {
-        $name = $this->getExportFilename($entity->getName());
-
-        switch ($format) {
-            case 'csv':
-                $response = new StreamedResponse(
-                    function () use ($entity, $dataResult): void {
-                        $handle    = fopen('php://output', 'r+');
-                        $headerRow = $this->getExportHeader($entity);
-
-                        // write the header row
-                        fputcsv($handle, $headerRow);
-
-                        // build the data rows
-                        foreach ($dataResult as $s) {
-                            $row = $this->getExportRow($entity, $s);
-                            fputcsv($handle, $row);
-                        }
-                        fclose($handle);
-                    }
-                );
-
-                $this->setExportResponseHeaders($response, $name.'.csv', [
-                    'text/csv; charset=UTF-8',
-                ]);
-
-                return $response;
-
-            case 'xlsx':
-                if (!class_exists(Spreadsheet::class)) {
-                    throw new \Exception('PHPSpreadsheet is required to export to Excel spreadsheets');
-                }
-                $response = new StreamedResponse(
-                    function () use ($entity, $dataResult, $name): void {
-                        $objPHPExcel = new Spreadsheet();
-                        $objPHPExcel->getProperties()->setTitle($name);
-                        $objPHPExcel->createSheet();
-                        $headerRow = $this->getExportHeader($entity);
-
-                        // write the row
-                        $objPHPExcel->getActiveSheet()->fromArray($headerRow, null, 'A1');
-
-                        // build the data rows
-                        $count = 2;
-                        foreach ($dataResult as $s) {
-                            $row = $this->getExportRow($entity, $s);
-                            $objPHPExcel->getActiveSheet()->fromArray($row, null, "A{$count}");
-
-                            // increment letter
-                            ++$count;
-                        }
-
-                        $objWriter = IOFactory::createWriter($objPHPExcel, 'Xlsx');
-                        $objWriter->setPreCalculateFormulas(false);
-
-                        $objWriter->save('php://output');
-                    }
-                );
-
-                $this->setExportResponseHeaders($response, $name.'.xlsx', [
-                    'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-                ]);
-
-                return $response;
-            default:
-                return new Response();
-        }
-    }
-
-    /**
-     * @return array<int, string>
-     */
-    public function getExportHeader(Campaign $entity): array
-    {
-        $headers = [
-            $this->translator->trans('mautic.lead.lead.thead.country'),
-            $this->translator->trans('mautic.lead.leads'),
-        ];
-
-        if ($entity->isEmailCampaign()) {
-            array_push($headers,
-                $this->translator->trans('mautic.email.graph.line.stats.sent'),
-                $this->translator->trans('mautic.email.graph.line.stats.read'),
-                $this->translator->trans('mautic.email.clicked')
-            );
-        }
-
-        return $headers;
-    }
-
-    /**
-     * @param array<int|string, string> $values
-     *
-     * @return array<int, string>
-     */
-    public function getExportRow(Campaign $entity, array $values): array
-    {
-        $row = [
-            $values['country'],
-            $values['contacts'],
-        ];
-
-        if ($entity->isEmailCampaign()) {
-            array_push($row,
-                $values['sent_count'],
-                $values['read_count'],
-                $values['clicked_through_count'],
-            );
-        }
-
-        return $row;
     }
 }

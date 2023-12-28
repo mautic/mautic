@@ -28,8 +28,24 @@ class CampaignModelFunctionalTest extends MauticMysqlTestCase
      */
     public function testGetCountryStats(): void
     {
-        $model = $this->getContainer()->get('mautic.campaign.model.campaign');
+        $model    = $this->getContainer()->get('mautic.campaign.model.campaign');
+        $campaign = $this->createCampaignWithEmail();
 
+        $results = $model->getCountryStats($campaign);
+
+        $this->assertCount(4, $campaign->getEmailSendEvents());
+        $this->assertCount(3, $results);
+        $this->assertSame([
+            'contacts'              => '3',
+            'country'               => 'Spain',
+            'sent_count'            => '12',
+            'read_count'            => '8',
+            'clicked_through_count' => '4',
+        ], $results['Spain']);
+    }
+
+    private function createCampaignWithEmail(): Campaign
+    {
         $leadsPayload = [
             [
                 'email'   => 'example1@test.com',
@@ -133,17 +149,7 @@ class CampaignModelFunctionalTest extends MauticMysqlTestCase
             }
         }
 
-        $results = $model->getCountryStats($campaign);
-
-        $this->assertCount(4, $campaign->getEmailSendEvents());
-        $this->assertCount(3, $results);
-        $this->assertSame([
-            'contacts'              => '3',
-            'country'               => 'Spain',
-            'sent_count'            => '12',
-            'read_count'            => '8',
-            'clicked_through_count' => '4',
-        ], $results['Spain']);
+        return $campaign;
     }
 
     /**

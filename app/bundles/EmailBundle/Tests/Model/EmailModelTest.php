@@ -980,16 +980,4 @@ class EmailModelTest extends \PHPUnit\Framework\TestCase
 
         $this->assertSame(['Finland', '8', '6', '3'], $this->emailModel->getExportRow($values));
     }
-
-    public function testGetExportHeader(): void
-    {
-        $headerRow = [
-            $this->translator->trans('mautic.lead.lead.thead.country'),
-            $this->translator->trans('mautic.email.graph.line.stats.sent'),
-            $this->translator->trans('mautic.email.graph.line.stats.read'),
-            $this->translator->trans('mautic.email.clicked'),
-        ];
-
-        $this->assertSame($headerRow, $this->emailModel->getExportHeader());
-    }
 }

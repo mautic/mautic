@@ -15,6 +15,7 @@ use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\EmailBundle\Entity\Email;
 use PHPUnit\Framework\MockObject\MockObject;
+use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class CampaignTableStatsControllerTest extends MauticMysqlTestCase
 {
@@ -166,31 +167,8 @@ class CampaignTableStatsControllerTest extends MauticMysqlTestCase
      * @throws OptimisticLockException
      * @throws ORMException
      */
-    public function testGetExportRow(): void
-    {
-        $model           = $this->getContainer()->get('mautic.campaign.model.campaign');
-        $campaign        = $this->createCampaignWithEmail();
-        $campaignNoEmail = $this->createCampaignNoEmail();
-        $values          = [
-            'country'               => 'Finland',
-            'read_count'            => '6',
-            'sent_count'            => '8',
-            'contacts'              => '10',
-            'clicked_through_count' => '3',
-            'test'                  => '123',
-        ];
-
-        $this->assertSame(['Finland', '10', '8', '6', '3'], $model->getExportRow($campaign, $values));
-        $this->assertSame(['Finland', '10'], $model->getExportRow($campaignNoEmail, $values));
-    }
-
-    /**
-     * @throws OptimisticLockException
-     * @throws ORMException
-     */
     public function testGetExportHeader(): void
     {
-        $model           = $this->getContainer()->get('mautic.campaign.model.campaign');
         $translator      = $this->getContainer()->get('translator');
         $campaign        = $this->createCampaignWithEmail();
         $campaignNoEmail = $this->createCampaignNoEmail();
@@ -199,13 +177,39 @@ class CampaignTableStatsControllerTest extends MauticMysqlTestCase
             $translator->trans('mautic.lead.leads'),
         ];
 
-        $this->assertSame($headers, $model->getExportHeader($campaignNoEmail));
+        $this->assertSame($headers, $this->controller->getExportHeader($campaignNoEmail));
 
         array_push($headers,
             $translator->trans('mautic.email.graph.line.stats.sent'),
             $translator->trans('mautic.email.graph.line.stats.read'),
             $translator->trans('mautic.email.clicked')
         );
-        $this->assertSame($headers, $model->getExportHeader($campaign));
+        $this->assertSame($headers, $this->controller->getExportHeader($campaign));
+    }
+
+    /**
+     * @throws OptimisticLockException
+     * @throws ORMException
+     * @throws Exception
+     */
+    /**
+     * @throws OptimisticLockException
+     * @throws ORMException
+     * @throws \Exception
+     */
+    public function testExportAction(): void
+    {
+        $campaign = $this->createCampaignWithEmail();
+
+        $this->campaignModelMock->expects($this->once())
+            ->method('getEntity')
+            ->with($campaign->getId())
+            ->willReturn($campaign);
+
+        $this->campaignModelMock->expects($this->once())
+            ->method('exportStats')
+            ->willReturn(new StreamedResponse());
+
+        $this->controller->exportAction($campaign->getId(), 'csv');
     }
 }

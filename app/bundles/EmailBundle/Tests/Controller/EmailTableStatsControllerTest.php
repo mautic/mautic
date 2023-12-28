@@ -116,4 +116,19 @@ class EmailTableStatsControllerTest extends MauticMysqlTestCase
         $this->assertCount(2, $results);
         $this->assertSame($this->getStats(), $results);
     }
+
+    public function testGetExportHeader(): void
+    {
+        $translator = $this->getContainer()->get('translator');
+        $email      = new Email();
+
+        $headerRow = [
+            $translator->trans('mautic.lead.lead.thead.country'),
+            $translator->trans('mautic.email.graph.line.stats.sent'),
+            $translator->trans('mautic.email.graph.line.stats.read'),
+            $translator->trans('mautic.email.clicked'),
+        ];
+
+        $this->assertSame($headerRow, $this->getExportHeader($email));
+    }
 }

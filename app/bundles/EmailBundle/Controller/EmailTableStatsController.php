@@ -6,7 +6,9 @@ namespace Mautic\EmailBundle\Controller;
 
 use Doctrine\DBAL\Exception;
 use Mautic\CoreBundle\Controller\AbstractCountryTableController;
+use Mautic\CoreBundle\Helper\ExportHelper;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
+use Mautic\CoreBundle\Translation\Translator;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Model\EmailModel;
 
@@ -15,8 +17,11 @@ use Mautic\EmailBundle\Model\EmailModel;
  */
 class EmailTableStatsController extends AbstractCountryTableController
 {
-    public function __construct(EmailModel $model)
-    {
+    public function __construct(
+        EmailModel $model,
+        protected ExportHelper $exportHelper,
+        protected Translator $translator
+    ) {
         $this->model = $model;
     }
 
@@ -53,5 +58,20 @@ class EmailTableStatsController extends AbstractCountryTableController
             'email:emails:viewother',
             $entity->getCreatedBy()
         );
+    }
+
+    /**
+     * @param Email $entity
+     *
+     * @return array<int, string>
+     */
+    public function getExportHeader($entity): array
+    {
+        return [
+            $this->translator->trans('mautic.lead.lead.thead.country'),
+            $this->translator->trans('mautic.email.graph.line.stats.sent'),
+            $this->translator->trans('mautic.email.graph.line.stats.read'),
+            $this->translator->trans('mautic.email.clicked'),
+        ];
     }
 }

@@ -23,6 +23,8 @@ class ExportHelper
 
     public const EXPORT_TYPE_CSV   = 'csv';
 
+    private array $headerRow = [];
+
     public function __construct(
         private TranslatorInterface $translator,
         private CoreParametersHelper $coreParametersHelper,
@@ -118,6 +120,11 @@ class ExportHelper
         return $response;
     }
 
+    public function setHeaderRow(array $headerRow)
+    {
+        $this->headerRow = $headerRow;
+    }
+
     private function getSpreadsheetGeneric(\Iterator $data, string $filename): Spreadsheet
     {
         $spreadsheet = new Spreadsheet();
@@ -126,8 +133,10 @@ class ExportHelper
 
         $rowCount = 2;
         foreach ($data as $key => $row) {
-            if (0 === $key) {
-                // Build the header row from keys in the current row.
+            // Build the header row from keys in the current row.
+            if (!empty($this->headerRow)) {
+                $spreadsheet->getActiveSheet()->fromArray($this->headerRow, null, 'A1');
+            } elseif (0 === $key) {
                 $spreadsheet->getActiveSheet()->fromArray(array_keys($row), null, 'A1');
             }
 
