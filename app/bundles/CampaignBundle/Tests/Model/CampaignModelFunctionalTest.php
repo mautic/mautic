@@ -36,8 +36,8 @@ class CampaignModelFunctionalTest extends MauticMysqlTestCase
         $this->assertCount(4, $campaign->getEmailSendEvents());
         $this->assertCount(3, $results);
         $this->assertSame([
-            'contacts'              => '3',
             'country'               => 'Spain',
+            'contacts'              => '3',
             'sent_count'            => '12',
             'read_count'            => '8',
             'clicked_through_count' => '4',
