@@ -800,7 +800,7 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
             } else {
                 return [
                     'error' => [
-                        'message' => $this->parseCallbackResponse($exception->getResponse()->getBody()),
+                        'message' => $exception->getResponse()->getBody()->getContents(),
                         'code'    => $exception->getCode(),
                     ],
                 ];
