@@ -3,12 +3,15 @@
 namespace Mautic\DynamicContentBundle\Tests\EventListener;
 
 use Mautic\AssetBundle\Helper\TokenHelper as AssetTokenHelper;
+use Mautic\CoreBundle\Event\TokenReplacementEvent;
 use Mautic\CoreBundle\Model\AuditLogModel;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
+use Mautic\DynamicContentBundle\Entity\DynamicContent;
 use Mautic\DynamicContentBundle\EventListener\DynamicContentSubscriber;
 use Mautic\DynamicContentBundle\Helper\DynamicContentHelper;
 use Mautic\DynamicContentBundle\Model\DynamicContentModel;
 use Mautic\FormBundle\Helper\TokenHelper as FormTokenHelper;
+use Mautic\LeadBundle\Entity\CompanyRepository;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Model\CompanyModel;
 use Mautic\LeadBundle\Model\LeadModel;
@@ -195,5 +198,119 @@ HTML;
             ->with($expected);
 
         $this->subscriber->decodeTokens($event);
+    }
+
+    public function testOnTokenReplacement(): void
+    {
+        $content = <<< HTML
+<!DOCTYPE html>
+<html>
+    <head></head>
+    <body>
+        <h2>Hello there!</h2>
+        Company name    : {contactfield=companyname}
+        Company Country : {contactfield=companycountry}
+        Company website : {contactfield=companywebsite}
+    </body>
+</html>
+
+HTML;
+        $expected = <<< HTML
+<!DOCTYPE html>
+<html>
+    <head></head>
+    <body>
+        <h2>Hello there!</h2>
+        Company name    : Doe Corp
+        Company Country : India
+        Company website : https://www.doe.corp
+    </body>
+</html>
+
+HTML;
+        $contact = new Lead();
+        $event   = $this->createMock(TokenReplacementEvent::class);
+
+        $event
+            ->expects($this->once())
+            ->method('getContent')
+            ->willReturn($content);
+
+        $event
+            ->expects($this->once())
+            ->method('getLead')
+            ->willReturn($contact);
+
+        $event
+            ->expects($this->once())
+            ->method('getClickthrough')
+            ->willReturn([
+                'slot'               => 'slotOne',
+                'dynamic_content_id' => 1,
+                'lead'               => 1,
+            ]);
+
+        $this->dynamicContentHelper
+            ->expects($this->once())
+            ->method('convertLeadToArray')
+            ->willReturn([
+                'id'        => 1,
+                'firstname' => 'John',
+                'lastname'  => 'Doe',
+                'company'   => 'Doe Corp',
+                'email'     => 'john@doe.com',
+            ]);
+
+        $repo = $this->createMock(CompanyRepository::class);
+        $repo->expects($this->once())
+            ->method('getCompaniesByLeadId')
+            ->willReturn([
+                [
+                  'id'             => 1,
+                  'companyname'    => 'Doe Corp',
+                  'companycountry' => 'India',
+                  'companywebsite' => 'https://www.doe.corp',
+                  'is_primary'     => true,
+                ],
+            ]);
+
+        $this->companyModel
+            ->expects($this->once())
+            ->method('getRepository')
+            ->willReturn($repo);
+
+        $this->pageTokenHelper
+            ->method('findPageTokens')
+            ->willReturn([]);
+        $this->assetTokenHelper
+            ->method('findAssetTokens')
+            ->willReturn([]);
+        $this->formTokenHelper
+            ->method('findFormTokens')
+            ->willReturn([]);
+        $this->focusTokenHelper
+            ->method('findFocusTokens')
+            ->willReturn([]);
+
+        $this->trackableModel
+            ->method('parseContentForTrackables')
+            ->willReturn([
+               $content,
+               [],
+            ]);
+
+        $dwc = new DynamicContent();
+        $dwc->setContent($content);
+
+        $this->dynamicContentModel
+            ->expects($this->once())
+            ->method('getEntity')
+            ->willReturn($dwc);
+
+        $event->expects($this->once())
+            ->method('setContent')
+            ->with($expected);
+
+        $this->subscriber->onTokenReplacement($event);
     }
 }
