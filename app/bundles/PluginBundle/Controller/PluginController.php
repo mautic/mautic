@@ -197,12 +197,30 @@ class PluginController extends FormController
                         $keys = $form['apiKeys']->getData();
 
                         // Prevent merged keys
-                        $secretKeys = $integrationObject->getSecretKeys();
+                        $resetTokens = false;
+                        $keysToStore = [];
+                        $secretKeys  = $integrationObject->getSecretKeys();
                         foreach ($secretKeys as $secretKey) {
                             if (empty($keys[$secretKey]) && !empty($currentKeys[$secretKey])) {
                                 $keys[$secretKey] = $currentKeys[$secretKey];
                             }
+                            if ($keys[$secretKey] !== $currentKeys[$secretKey]) {
+                                $resetTokens   = true;
+                                $keysToStore[] = $secretKey;
+                            }
                         }
+
+                        $clientIdKey = $integrationObject->getClientIdKey();
+                        if ($keys[$clientIdKey] !== $currentKeys[$clientIdKey]) {
+                            $resetTokens   = true;
+                            $keysToStore[] = $clientIdKey;
+                        }
+                        if ($resetTokens) {
+                            $keys = array_filter($keys, function ($key) use ($keysToStore) {
+                                return in_array($key, $keysToStore);
+                            }, ARRAY_FILTER_USE_KEY);
+                        }
+
                         $integrationObject->encryptAndSetApiKeys($keys, $entity);
                     }
 
