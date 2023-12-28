@@ -470,10 +470,10 @@ class FormModel extends AbstractCommonModel
         $response->headers->set('Pragma', 'public');
     }
 
-    protected function getExportFilename(string $objectName): string
+    public function getExportFilename(string $objectName): string
     {
         $date = (new DateTimeHelper())->toLocalString();
 
-        return str_replace(' ', '_', $date).'_'.InputHelper::alphanum($objectName, false, '-');
+        return str_replace(' ', '_', $date).'_'.InputHelper::alphanum($objectName, false, '_');
     }
 }

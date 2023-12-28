@@ -7,6 +7,7 @@ use Mautic\CampaignBundle\Membership\MembershipManager;
 use Mautic\CampaignBundle\Model\CampaignModel;
 use Mautic\CoreBundle\Entity\IpAddress;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
+use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
@@ -629,5 +630,16 @@ class SubmissionModelTest extends \PHPUnit\Framework\TestCase
         $this->assertSame([1, 123, $this->dateHelper->toFull($dateSubmitted, 'UTC'), '127.0.0.1', 'https://test.com'], $row2);
         $this->assertNotContains($formId, $row2);
         $this->assertNotContains($email, $row1);
+    }
+
+    public function testExportFilename(): void
+    {
+        $form = new Form();
+        $form->setAlias('Test form results');
+        $date = (new DateTimeHelper())->toLocalString('Y-m-d H');
+        $name =$this->submissionModel->getExportFilename($form->getAlias());
+
+        $this->assertStringContainsString('Test_form_results', $name);
+        $this->assertStringContainsString(str_replace(' ', '_', $date), $name);
     }
 }
