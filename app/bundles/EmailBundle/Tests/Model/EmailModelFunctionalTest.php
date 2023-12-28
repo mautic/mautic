@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Mautic\EmailBundle\Tests\Model;
 
+use Doctrine\ORM\Exception\ORMException;
+use Doctrine\ORM\OptimisticLockException;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Model\EmailModel;
@@ -11,6 +13,7 @@ use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\LeadBundle\Entity\ListLead;
 use Mautic\LeadBundle\Model\LeadModel;
+use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class EmailModelFunctionalTest extends MauticMysqlTestCase
 {
@@ -164,4 +167,45 @@ class EmailModelFunctionalTest extends MauticMysqlTestCase
        self::assertSame($customHtmlParent, $parentEmail->getCustomHtml());
        self::assertSame($customHtmlChildren, $childrenEmail->getCustomHtml());
    }
+
+    /**
+     * @throws OptimisticLockException
+     * @throws ORMException
+     * @throws \Exception
+     */
+    public function testExportStats(): void
+    {
+        $email = new Email();
+        $email->setName('Test email');
+        $this->em->persist($email);
+        $this->em->flush();
+
+        $data = [
+            'Finland' => [
+                'contacts'              => '14',
+                'country'               => 'Finland',
+                'sent_count'            => '14',
+                'read_count'            => '4',
+                'clicked_through_count' => '0',
+            ],
+        ];
+
+        /** @var EmailModel $emailModel */
+        $emailModel = self::getContainer()->get('mautic.email.model.email');
+
+        $exportCsv  = $emailModel->exportStats('csv', $email, $data);
+        $exportXlsx = $emailModel->exportStats('xlsx', $email, $data);
+
+        $this->assertInstanceOf(StreamedResponse::class, $exportCsv);
+        $this->assertStringContainsString('Test_email', $emailModel->getExportFilename($email->getName()));
+        $this->assertSame('text/csv; charset=UTF-8', $exportCsv->headers->get('content-type'));
+        $this->assertSame('application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', $exportXlsx->headers->get('content-type'));
+        $this->assertSame('0', $exportCsv->headers->get('expires'));
+        $this->assertStringContainsString('must-revalidate', $exportCsv->headers->get('cache-control'));
+        $this->assertSame('public', $exportCsv->headers->get('pragma'));
+
+        $this->assertStringContainsString('attachment; filename=', $exportCsv->headers->get('content-disposition'));
+        $this->assertStringContainsString('.csv', $exportCsv->headers->get('content-disposition'));
+        $this->assertStringContainsString('.xlsx', $exportXlsx->headers->get('content-disposition'));
+    }
 }
