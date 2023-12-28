@@ -169,9 +169,9 @@ class PluginController extends FormController
         $leadFields    = $pluginModel->getLeadFields();
         $companyFields = $pluginModel->getCompanyFields();
         /** @var AbstractIntegration $integrationObject */
-        $entity = $integrationObject->getIntegrationSettings();
-
-        $form = $this->createForm(
+        $entity                 = $integrationObject->getIntegrationSettings();
+        $existingPublishedState = $entity->getIsPublished();
+        $form                   = $this->createForm(
             DetailsType::class,
             $entity,
             [
@@ -277,6 +277,9 @@ class PluginController extends FormController
                             $dispatcher->dispatch($event, PluginEvents::PLUGIN_ON_INTEGRATION_CONFIG_SAVE);
 
                             $entity = $event->getEntity();
+                            if (!$valid && !$existingPublishedState) {
+                                $entity->setIsPublished(false);
+                            }
                         }
 
                         $em->persist($entity);
