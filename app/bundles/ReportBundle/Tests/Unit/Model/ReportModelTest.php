@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Mautic\ReportBundle\Tests\Unit\Model;
 
 use Mautic\CoreBundle\Entity\IpAddress;
+use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\FormBundle\Entity\Form;
 use Mautic\FormBundle\Entity\Submission;
@@ -76,5 +77,17 @@ final class ReportModelTest extends MauticMysqlTestCase
         $submission->setReferer('');
 
         return $submission;
+    }
+
+    public function testExportFilename(): void
+    {
+        $report = new Report();
+        $report->setName('Test report');
+        $date        = (new DateTimeHelper())->toLocalString('Y-m-d H');
+        $reportModel = self::getContainer()->get('mautic.report.model.report');
+        $name        =$reportModel->getExportFilename($report->getName());
+
+        $this->assertStringContainsString('Test_report', $name);
+        $this->assertStringContainsString(str_replace(' ', '_', $date), $name);
     }
 }
