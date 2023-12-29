@@ -381,10 +381,10 @@ class FormModel extends AbstractCommonModel
      * Cleans a string to be used as an alias. The returned string will be alphanumeric or underscore, less than 25 characters
      * and if it is a reserved SQL keyword, it will be prefixed with f_.
      *
-     * @param string       $prefix            Used when the alias is a reserved keyword by the database platform
-     * @param int          $maxLength         Maximum number of characters used; 0 to disable
-     * @param string       $spaceCharacter    Character to replace spaces with
-     * @param array<mixed> $allowedCharacters
+     * @param string   $prefix            Used when the alias is a reserved keyword by the database platform
+     * @param int      $maxLength         Maximum number of characters used; 0 to disable
+     * @param string   $spaceCharacter    Character to replace spaces with
+     * @param string[] $allowedCharacters Allowed characters in alias
      *
      * @throws \Doctrine\DBAL\Exception
      */
