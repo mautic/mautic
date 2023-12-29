@@ -146,13 +146,9 @@ class ExportHelper
         $spreadsheet->createSheet();
 
         // Build the header row if defined
-        if (!empty($this->headerRow) || (!empty($data->key()) && 0 === $data->key())) {
-            $this->addHeaderToSheet($spreadsheet, !empty($this->headerRow) ? $this->headerRow : array_keys($data->current()));
-            $rowCount = 2;
-        } else {
-            $rowCount = 1;
-        }
+        $this->addHeaderToSheet($spreadsheet, $this->headerRow ?? array_keys($data->current()));
 
+        $rowCount = 2;
         foreach ($data as $row) {
             $spreadsheet->getActiveSheet()->fromArray($row, null, "A{$rowCount}");
 
