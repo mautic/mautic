@@ -26,16 +26,18 @@ class EmailTableStatsControllerTest extends MauticMysqlTestCase
 
     private MockObject $translator;
 
+    private MockObject $corePermissionsMock;
+
     protected function setUp(): void
     {
         parent::setUp();
-        $corePermissionsMock      = $this->createMock(CorePermissions::class);
-        $this->emailModelMock     = $this->createMock(EmailModel::class);
-        $exportHelper             = $this->createMock(ExportHelper::class);
-        $this->translator         = $this->createMock(Translator::class);
-        $this->controller         = new EmailTableStatsController(
+        $this->corePermissionsMock      = $this->createMock(CorePermissions::class);
+        $this->emailModelMock           = $this->createMock(EmailModel::class);
+        $exportHelper                   = $this->createMock(ExportHelper::class);
+        $this->translator               = $this->createMock(Translator::class);
+        $this->controller               = new EmailTableStatsController(
             $this->emailModelMock,
-            $corePermissionsMock,
+            $this->corePermissionsMock,
             $exportHelper,
             $this->translator
         );
@@ -46,8 +48,6 @@ class EmailTableStatsControllerTest extends MauticMysqlTestCase
      */
     public function testHasAccess(): void
     {
-        $corePermissionsMock = $this->createMock(CorePermissions::class);
-
         $role = new Role();
         $role->setName('Example admin');
         $this->em->persist($role);
@@ -69,7 +69,7 @@ class EmailTableStatsControllerTest extends MauticMysqlTestCase
         $this->em->persist($email);
         $this->em->flush();
 
-        $corePermissionsMock->method('hasEntityAccess')
+        $this->corePermissionsMock->method('hasEntityAccess')
             ->with(
                 'email:emails:viewown',
                 'email:emails:viewother',

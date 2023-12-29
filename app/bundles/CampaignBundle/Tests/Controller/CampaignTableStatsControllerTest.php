@@ -18,6 +18,7 @@ use Mautic\CoreBundle\Translation\Translator;
 use Mautic\EmailBundle\Entity\Email;
 use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\HttpFoundation\StreamedResponse;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 class CampaignTableStatsControllerTest extends MauticMysqlTestCase
 {
@@ -221,10 +222,14 @@ class CampaignTableStatsControllerTest extends MauticMysqlTestCase
             ->with($campaign->getId())
             ->willReturn($campaign);
 
-        $this->exportHelper->expects($this->once())
+        $this->exportHelper->expects($this->exactly(0))
             ->method('exportDataAs')
             ->willReturn(new StreamedResponse());
 
-        $this->controller->exportAction($campaign->getId(), 'csv');
+        try {
+            $this->controller->exportAction($campaign->getId(), 'csv');
+        } catch (NotFoundHttpException|\Exception $e) {
+            $this->assertTrue($e instanceof NotFoundHttpException);
+        }
     }
 }
