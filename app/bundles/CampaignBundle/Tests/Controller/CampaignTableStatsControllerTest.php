@@ -41,6 +41,7 @@ class CampaignTableStatsControllerTest extends MauticMysqlTestCase
         $this->translator              = $this->createMock(Translator::class);
         $this->controller              = new CampaignTableStatsController(
             $this->campaignModelMock,
+            $corePermissionsMock,
             $this->exportHelper,
             $this->translator
         );

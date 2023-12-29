@@ -29,11 +29,13 @@ class EmailTableStatsControllerTest extends MauticMysqlTestCase
     protected function setUp(): void
     {
         parent::setUp();
+        $corePermissionsMock      = $this->createMock(CorePermissions::class);
         $this->emailModelMock     = $this->createMock(EmailModel::class);
         $exportHelper             = $this->createMock(ExportHelper::class);
         $this->translator         = $this->createMock(Translator::class);
         $this->controller         = new EmailTableStatsController(
             $this->emailModelMock,
+            $corePermissionsMock,
             $exportHelper,
             $this->translator
         );
@@ -75,10 +77,10 @@ class EmailTableStatsControllerTest extends MauticMysqlTestCase
             )
             ->willReturn(false);
 
-        $result = $this->controller->hasAccess($corePermissionsMock, $email);
+        $result = $this->controller->hasAccess($email);
 
         try {
-            $this->controller->viewAction($corePermissionsMock, $email->getId());
+            $this->controller->viewAction($email->getId());
         } catch (AccessDeniedHttpException|\Exception $e) {
             $this->assertTrue($e instanceof AccessDeniedHttpException);
         }
