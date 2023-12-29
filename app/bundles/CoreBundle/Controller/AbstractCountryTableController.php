@@ -12,6 +12,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 /**
  * @template S of object
@@ -22,6 +23,8 @@ abstract class AbstractCountryTableController extends AbstractController
      * @var TableModelInterface<S>
      */
     protected TableModelInterface $model;
+
+    protected CorePermissions $security;
 
     protected ExportHelper $exportHelper;
 
@@ -41,7 +44,7 @@ abstract class AbstractCountryTableController extends AbstractController
      *
      * @param T $entity
      */
-    abstract public function hasAccess(CorePermissions $security, $entity): bool;
+    abstract public function hasAccess($entity): bool;
 
     /**
      * @template T
@@ -56,12 +59,11 @@ abstract class AbstractCountryTableController extends AbstractController
      * @throws \Exception
      */
     public function viewAction(
-        CorePermissions $security,
         int $objectId
     ): Response {
         $entity = $this->model->getEntity($objectId);
 
-        if (empty($entity) || !$this->hasAccess($security, $entity)) {
+        if (empty($entity) || !$this->hasAccess($entity)) {
             throw new AccessDeniedHttpException();
         }
 
@@ -83,13 +85,17 @@ abstract class AbstractCountryTableController extends AbstractController
     {
         $entity = $this->model->getEntity($objectId);
 
-        if (null === $entity) {
-            return new Response();
+        if (empty($entity) || !$this->hasAccess($entity)) {
+            throw new AccessDeniedHttpException();
         }
 
         $filename       = $this->model->getExportFilename($entity->getName()).'.'.$format;
         $headerRow      = $this->getExportHeader($entity);
         $statsCountries = $this->getData($entity);
+
+        if (empty($statsCountries)) {
+            throw new NotFoundHttpException();
+        }
 
         $this->exportHelper->setHeaderRow($headerRow);
 

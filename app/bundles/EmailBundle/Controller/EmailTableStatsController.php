@@ -19,6 +19,7 @@ class EmailTableStatsController extends AbstractCountryTableController
 {
     public function __construct(
         EmailModel $model,
+        protected CorePermissions $security,
         protected ExportHelper $exportHelper,
         protected Translator $translator
     ) {
@@ -51,9 +52,9 @@ class EmailTableStatsController extends AbstractCountryTableController
     /**
      * @param Email $entity
      */
-    public function hasAccess(CorePermissions $security, $entity): bool
+    public function hasAccess($entity): bool
     {
-        return $security->hasEntityAccess(
+        return $this->security->hasEntityAccess(
             'email:emails:viewown',
             'email:emails:viewother',
             $entity->getCreatedBy()

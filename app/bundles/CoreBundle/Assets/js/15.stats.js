@@ -10,6 +10,12 @@ Mautic.lazyLoadCountriesStats = () => {
     let tableUrl = container.data('target-url');
     mQuery.get(tableUrl, (response) => {
         response.target = containerId;
+        const downloadButtons = mQuery('#countries-stats-container').contents().find("[data-button='download']");
+
+        if (!response.includes('alert') && downloadButtons.length) {
+            downloadButtons.removeClass('disabled');
+        }
+
         mQuery(containerId).html(response);
     });
 };

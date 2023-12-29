@@ -37,4 +37,6 @@
             </tbody>
         </table>
     </div>
+{% else %}
+    {{ include('@MauticCore/Helper/noresults.html.twig', {'header': 'mautic.core.countries.noresults.header', 'message': 'mautic.core.countries.noresults.message'}) }}
 {% endif %}

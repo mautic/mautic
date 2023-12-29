@@ -19,6 +19,7 @@ class CampaignTableStatsController extends AbstractCountryTableController
 {
     public function __construct(
         CampaignModel $model,
+        protected CorePermissions $security,
         protected ExportHelper $exportHelper,
         protected Translator $translator
     ) {
@@ -40,11 +41,11 @@ class CampaignTableStatsController extends AbstractCountryTableController
     /**
      * @param Campaign $entity
      */
-    public function hasAccess(CorePermissions $security, $entity): bool
+    public function hasAccess($entity): bool
     {
-        return $security->hasEntityAccess(
-            'email:emails:viewown',
-            'email:emails:viewother',
+        return $this->security->hasEntityAccess(
+            'campaign:campaigns:viewown',
+            'campaign:campaigns:viewother',
             $entity->getCreatedBy()
         );
     }
