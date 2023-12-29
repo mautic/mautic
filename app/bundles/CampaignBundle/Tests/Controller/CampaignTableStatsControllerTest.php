@@ -25,6 +25,10 @@ class CampaignTableStatsControllerTest extends MauticMysqlTestCase
 
     private CampaignTableStatsController $controller;
 
+    private MockObject $exportHelper;
+
+    private MockObject $translator;
+
     protected function setUp(): void
     {
         parent::setUp();
@@ -43,7 +47,7 @@ class CampaignTableStatsControllerTest extends MauticMysqlTestCase
     }
 
     /**
-     * @return array<string, array<int, array<string, string>>>
+     * @return array<string, array<string, string>>
      */
     private function getStats(bool $addEmail = true): array
     {

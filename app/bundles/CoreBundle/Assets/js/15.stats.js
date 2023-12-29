@@ -1,17 +1,15 @@
 Mautic.lazyLoadCountriesStats = () => {
-    let containerId = '#countries-stats-container';
-    let geoStatsId = '#countries-stats';
+    let containerId = '#countries-stats';
     let container = mQuery(containerId);
-    let geoStats = mQuery(geoStatsId);
 
     // Load the table only if the container exists.
-    if (!container.length && !geoStats.length) {
+    if (!container.length) {
         return;
     }
 
     let tableUrl = container.data('target-url');
     mQuery.get(tableUrl, (response) => {
-        response.target = geoStatsId;
-        mQuery(geoStatsId).html(response);
+        response.target = containerId;
+        mQuery(containerId).html(response);
     });
 };

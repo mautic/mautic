@@ -24,15 +24,17 @@ class EmailTableStatsControllerTest extends MauticMysqlTestCase
 
     private EmailTableStatsController $controller;
 
+    private MockObject $translator;
+
     protected function setUp(): void
     {
         parent::setUp();
         $this->emailModelMock     = $this->createMock(EmailModel::class);
-        $this->exportHelper       = $this->createMock(ExportHelper::class);
+        $exportHelper             = $this->createMock(ExportHelper::class);
         $this->translator         = $this->createMock(Translator::class);
         $this->controller         = new EmailTableStatsController(
             $this->emailModelMock,
-            $this->exportHelper,
+            $exportHelper,
             $this->translator
         );
     }
@@ -85,7 +87,7 @@ class EmailTableStatsControllerTest extends MauticMysqlTestCase
     }
 
     /**
-     * @return array<string, array<int, array<string, string>>>
+     * @return array<string, array<string, string>>
      */
     private function getStats(): array
     {

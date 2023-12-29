@@ -23,6 +23,9 @@ class ExportHelper
 
     public const EXPORT_TYPE_CSV   = 'csv';
 
+    /**
+     * @var array<int, string>
+     */
     private array $headerRow = [];
 
     public function __construct(
@@ -120,9 +123,20 @@ class ExportHelper
         return $response;
     }
 
-    public function setHeaderRow(array $headerRow)
+    /**
+     * @param array<int, string> $headerRow
+     */
+    public function setHeaderRow(array $headerRow): void
     {
         $this->headerRow = $headerRow;
+    }
+
+    /**
+     * @param array<int|string, mixed> $headerRow
+     */
+    private function addHeaderToSheet(Spreadsheet $spreadsheet, array $headerRow): void
+    {
+        $spreadsheet->getActiveSheet()->fromArray($headerRow);
     }
 
     private function getSpreadsheetGeneric(\Iterator $data, string $filename): Spreadsheet
@@ -131,15 +145,15 @@ class ExportHelper
         $spreadsheet->getProperties()->setTitle($filename);
         $spreadsheet->createSheet();
 
-        $rowCount = 2;
-        foreach ($data as $key => $row) {
-            // Build the header row from keys in the current row.
-            if (!empty($this->headerRow)) {
-                $spreadsheet->getActiveSheet()->fromArray($this->headerRow, null, 'A1');
-            } elseif (0 === $key) {
-                $spreadsheet->getActiveSheet()->fromArray(array_keys($row), null, 'A1');
-            }
+        // Build the header row if defined
+        if (!empty($this->headerRow) || !empty($data[0])) {
+            $this->addHeaderToSheet($spreadsheet, !empty($this->headerRow) ? $this->headerRow : array_keys($data[0]));
+            $rowCount = 2;
+        } else {
+            $rowCount = 1;
+        }
 
+        foreach ($data as $row) {
             $spreadsheet->getActiveSheet()->fromArray($row, null, "A{$rowCount}");
 
             // Increment row

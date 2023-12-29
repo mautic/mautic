@@ -30,4 +30,6 @@ interface TableModelInterface
      * @phpstan-ignore-next-line
      */
     public function getEntity($id = null);
+
+    public function getExportFilename(string $objectName): string;
 }
