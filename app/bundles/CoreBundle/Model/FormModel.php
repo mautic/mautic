@@ -391,7 +391,7 @@ class FormModel extends AbstractCommonModel
     public function cleanAlias(
         string $alias,
         string $prefix = '',
-        int $maxLength = false,
+        int $maxLength = 0,
         string $spaceCharacter = '_',
         array $allowedCharacters = []
     ): string {
