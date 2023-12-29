@@ -612,6 +612,32 @@ class SubmissionModel extends CommonFormModel
     }
 
     /**
+     * @param resource                 $handle
+     * @param array<int|string,string> $row
+     *
+     * @return false|int
+     */
+    protected function putCsvExportRow($handle, array $row): bool|int
+    {
+        return fputcsv($handle, $row);
+    }
+
+    /**
+     * @param array<string> $contentType
+     */
+    protected function setExportResponseHeaders(StreamedResponse $response, string $filename, array $contentType): void
+    {
+        foreach ($contentType as $ct) {
+            $response->headers->set('Content-Type', $ct);
+        }
+
+        $response->headers->set('Content-Disposition', 'attachment; filename="'.$filename.'"');
+        $response->headers->set('Expires', '0');
+        $response->headers->set('Cache-Control', 'must-revalidate');
+        $response->headers->set('Pragma', 'public');
+    }
+
+    /**
      * @param array<mixed> $values
      *
      * @return array<mixed>
