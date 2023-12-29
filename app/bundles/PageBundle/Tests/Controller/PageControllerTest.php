@@ -282,4 +282,21 @@ class PageControllerTest extends MauticMysqlTestCase
         $this->assertEquals(Response::HTTP_OK, $clientResponse->getStatusCode());
         $this->assertEquals($this->client->getInternalResponse()->getHeader('content-type'), 'text/html; charset=UTF-8');
     }
+
+    public function testSavePageAliasWithUnderscores(): void
+    {
+        /** @var PageModel $pageModel */
+        $pageModel = self::$container->get('mautic.page.model.page');
+
+        $parentPage = new Page();
+        $parentPage->setTitle('This is My Page');
+        $parentPage->setAlias('This_Is_My_Page');
+        $parentPage->setTemplate('blank');
+        $parentPage->setCustomHtml('This is My Page');
+        $pageModel->saveEntity($parentPage);
+
+        $this->client->request(Request::METHOD_GET, '/this_is_my_page');
+        $response = $this->client->getResponse();
+        Assert::assertTrue($response->isOk());
+    }
 }
