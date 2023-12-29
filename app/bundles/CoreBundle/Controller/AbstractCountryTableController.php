@@ -93,6 +93,6 @@ abstract class AbstractCountryTableController extends AbstractController
 
         $this->exportHelper->setHeaderRow($headerRow);
 
-        return $this->exportHelper->exportDataAs($statsCountries, $format, $filename);
+        return $this->exportHelper->exportDataAs(array_values($statsCountries), $format, $filename);
     }
 }

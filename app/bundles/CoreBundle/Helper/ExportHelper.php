@@ -131,12 +131,9 @@ class ExportHelper
         $this->headerRow = $headerRow;
     }
 
-    /**
-     * @param array<int|string, mixed> $headerRow
-     */
-    private function addHeaderToSheet(Spreadsheet $spreadsheet, array $headerRow): void
+    private function addHeaderToSheet(Spreadsheet $spreadsheet): void
     {
-        $spreadsheet->getActiveSheet()->fromArray($headerRow);
+        $spreadsheet->getActiveSheet()->fromArray($this->headerRow);
     }
 
     private function getSpreadsheetGeneric(\Iterator $data, string $filename): Spreadsheet
@@ -145,14 +142,16 @@ class ExportHelper
         $spreadsheet->getProperties()->setTitle($filename);
         $spreadsheet->createSheet();
 
-        // Build the header row if defined
-        if (empty($this->headerRow)) {
-            $this->setHeaderRow(array_keys($data->current()));
-        }
-        $this->addHeaderToSheet($spreadsheet, $this->headerRow);
-
         $rowCount = 2;
-        foreach ($data as $row) {
+        foreach ($data as $key => $row) {
+            // Build the header row if defined
+            if (0 === $key) {
+                if (empty($this->headerRow)) {
+                    $this->setHeaderRow(array_keys($row));
+                }
+                $this->addHeaderToSheet($spreadsheet);
+            }
+
             $spreadsheet->getActiveSheet()->fromArray($row, null, "A{$rowCount}");
 
             // Increment row
