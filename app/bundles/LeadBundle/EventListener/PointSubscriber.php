@@ -9,7 +9,7 @@ use Mautic\PointBundle\Event\TriggerBuilderEvent;
 use Mautic\PointBundle\Event\TriggerExecutedEvent;
 use Mautic\PointBundle\PointEvents;
 use Mautic\StageBundle\Form\Type\StageActionChangeType;
-use Mautic\StageBundle\Helper\StageHelper;
+use Mautic\StageBundle\Model\StageModel;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
@@ -18,7 +18,7 @@ class PointSubscriber implements EventSubscriberInterface
 {
     public function __construct(
         private LeadModel $leadModel,
-        private StageHelper $stageHelper,
+        private StageModel $stageModel,
         private TranslatorInterface $translator,
         private LoggerInterface $logger
     ) {
@@ -94,13 +94,13 @@ class PointSubscriber implements EventSubscriberInterface
     private function handelChangeStage(TriggerExecutedEvent $event): void
     {
         $stageId  = (int) $event->getTriggerEvent()->getProperties()['stage'];
-        $stage    = $this->stageHelper->getStage($stageId);
+        $stage    = $this->stageModel->getEntity($stageId);
 
         if (null === $stage) {
             throw new \InvalidArgumentException("Stage for ID $stageId not found");
         }
         try {
-            $this->stageHelper->changeStage(
+            $this->leadModel->changeStage(
                 $event->getLead(),
                 $stage,
                 $this->translator->trans('mautic.lead.point.trigger')

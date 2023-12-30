@@ -891,6 +891,36 @@ class LeadModel extends FormModel
         return $this;
     }
 
+    public function changeStage(Lead $lead, Stage $stage, string $origin): void
+    {
+        // Get the current stage and validate it vs the new one
+        $currentStage = $lead->getStage();
+        if ($currentStage) {
+            if ($currentStage->getId() === $stage->getId()) {
+                throw new \UnexpectedValueException($this->translator->trans('mautic.stage.campaign.event.already_in_stage'));
+            }
+
+            if ($currentStage->getWeight() > $stage->getWeight()) {
+                throw new \UnexpectedValueException($this->translator->trans('mautic.stage.campaign.event.stage_invalid'));
+            }
+        }
+
+        $this->addToStage($lead, $stage, $origin);
+        $this->saveEntity($lead);
+
+        $this->logger->info(
+            sprintf(
+                'StageBundle: Lead %s changed stage from %s (%s) to %s (%s) by %s',
+                $lead->getId(),
+                $currentStage?->getName(),
+                $currentStage?->getId(),
+                $stage->getName(),
+                $stage->getId(),
+                $origin
+            )
+        );
+    }
+
     /**
      * Remove a lead from all Stages.
      */
