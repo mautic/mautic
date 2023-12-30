@@ -902,20 +902,20 @@ class LeadModel extends FormModel
     }
 
     /**
-     * Remove a lead from all Stage.
+     * Remove lead from Stage.
+     *
+     * @param bool $manuallyRemoved
+     *
+     * @return $this
      */
-    public function removeFromStages(Lead $lead, ?Stage $stage, string $origin): LeadModel
+    public function removeFromStages($lead, $stage, $manuallyRemoved = true)
     {
-        $stage = $stage ?? $lead->getStage();
         $lead->setStage(null);
-
-        if (isset($stage)) {
-            $lead->stageChangeLogEntry(
-                $stage,
-                $stage ? $stage->getId().': '.$stage->getName() : 'there was no stage',
-                $origin
-            );
-        }
+        $lead->stageChangeLogEntry(
+            $stage,
+            $stage->getId().': '.$stage->getName(),
+            $this->translator->trans('mautic.stage.event.removed.batch')
+        );
 
         return $this;
     }
@@ -968,7 +968,17 @@ class LeadModel extends FormModel
     public function removeFromStage(Lead $lead, ?Stage $stage, string $origin): void
     {
         // Get the current stage and validate it vs the new one
-        $this->removeFromStages($lead, $stage, $origin);
+        $stage = $stage ?? $lead->getStage();
+        $lead->setStage(null);
+
+        if (isset($stage)) {
+            $lead->stageChangeLogEntry(
+                $stage,
+                $stage->getId().': '.$stage->getName(),
+                $origin
+            );
+        }
+
         $this->saveEntity($lead);
 
         $this->logger->info(
