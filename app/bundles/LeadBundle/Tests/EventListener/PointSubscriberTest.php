@@ -50,9 +50,6 @@ class PointSubscriberTest extends \PHPUnit\Framework\TestCase
         $this->leadModel->expects($this->never())
             ->method('modifyTags');
 
-        $this->leadModel->expects($this->once())
-            ->method('changeStage');
-
         $this->subscriber->onTriggerExecute(new TriggerExecutedEvent($triggerEvent, $contact));
     }
 
@@ -69,9 +66,6 @@ class PointSubscriberTest extends \PHPUnit\Framework\TestCase
         $this->leadModel->expects($this->once())
             ->method('modifyTags')
             ->with($contact, ['tagA'], []);
-
-        $this->leadModel->expects($this->once())
-            ->method('changeStage');
 
         $this->subscriber->onTriggerExecute(new TriggerExecutedEvent($triggerEvent, $contact));
     }

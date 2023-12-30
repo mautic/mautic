@@ -879,9 +879,9 @@ class LeadModel extends FormModel
     /**
      * Add lead to Stage.
      *
-     * @param array|Lead $lead
+     * @param array|Lead  $lead
      * @param array|Stage $stage
-     * @param bool $manuallyAdded
+     * @param bool        $manuallyAdded
      *
      * @return $this
      */
@@ -909,7 +909,7 @@ class LeadModel extends FormModel
         $stage = $stage ?? $lead->getStage();
         $lead->setStage(null);
 
-        if(isset($stage)) {
+        if (isset($stage)) {
             $lead->stageChangeLogEntry(
                 $stage,
                 $stage ? $stage->getId().': '.$stage->getName() : 'there was no stage',

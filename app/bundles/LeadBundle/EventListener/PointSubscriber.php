@@ -64,11 +64,11 @@ class PointSubscriber implements EventSubscriberInterface
         $event->addEvent(
             'lead.changestage',
             [
-                'group'     => 'mautic.lead.point.trigger',
-                'label'     => 'mautic.lead.lead.events.changestage',
-                'formType'  => StageType::class,
+                'group'           => 'mautic.lead.point.trigger',
+                'label'           => 'mautic.lead.lead.events.changestage',
+                'formType'        => StageType::class,
                 'formTypeOptions' => ['items' => $choices],
-                'eventName' => PointEvents::TRIGGER_ON_EVENT_EXECUTE,
+                'eventName'       => PointEvents::TRIGGER_ON_EVENT_EXECUTE,
             ]
         );
     }
@@ -101,7 +101,7 @@ class PointSubscriber implements EventSubscriberInterface
     {
         $stageId = (int) $event->getTriggerEvent()->getProperties()['stage'];
 
-        if ($stageId === 0) {
+        if (0 === $stageId) {
             $this->leadModel->removeFromStage(
                 $event->getLead(),
                 null,
