@@ -904,14 +904,18 @@ class LeadModel extends FormModel
     /**
      * Remove a lead from all Stage.
      */
-    public function removeFromStages(Lead $lead, Stage $stage, string $origin): LeadModel
+    public function removeFromStages(Lead $lead, ?Stage $stage, string $origin): LeadModel
     {
+        $stage = $stage ?? $lead->getStage();
         $lead->setStage(null);
-        $lead->stageChangeLogEntry(
-            $stage,
-            $stage->getId().': '.$stage->getName(),
-            $origin
-        );
+
+        if(isset($stage)) {
+            $lead->stageChangeLogEntry(
+                $stage,
+                $stage ? $stage->getId().': '.$stage->getName() : 'there was no stage',
+                $origin
+            );
+        }
 
         return $this;
     }
@@ -950,13 +954,27 @@ class LeadModel extends FormModel
 
         $this->logger->info(
             sprintf(
-                'StageBundle: Lead %s changed stage from %s (%s) to %s (%s) by %s',
+                'LeadBundle: Lead %s changed stage from %s (%s) to %s (%s) by %s',
                 $lead->getId(),
                 $currentStage?->getName(),
                 $currentStage?->getId(),
                 $stage->getName(),
                 $stage->getId(),
                 $origin
+            )
+        );
+    }
+
+    public function removeFromStage(Lead $lead, ?Stage $stage, string $origin): void
+    {
+        // Get the current stage and validate it vs the new one
+        $this->removeFromStages($lead, $stage, $origin);
+        $this->saveEntity($lead);
+
+        $this->logger->info(
+            sprintf(
+                'LeadBundle: Lead %s removed from stage',
+                $lead->getId(),
             )
         );
     }
