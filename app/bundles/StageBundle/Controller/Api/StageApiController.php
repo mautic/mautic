@@ -113,7 +113,7 @@ class StageApiController extends CommonApiController
         $leadModel = $this->getModel('lead');
         \assert($leadModel instanceof LeadModel);
 
-        $leadModel->removeFromStages(
+        $leadModel->removeFromStage(
             $contact,
             $stage,
             'API: '.$this->translator->trans('mautic.stage.event.removed.batch')

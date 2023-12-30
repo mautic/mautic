@@ -105,7 +105,7 @@ class PointSubscriber implements EventSubscriberInterface
             $this->leadModel->removeFromStage(
                 $event->getLead(),
                 null,
-                $this->translator->trans('mautic.lead.point.trigger')
+                $this->translator->trans('mautic.stage.event.removed.batch')
             );
 
             return;

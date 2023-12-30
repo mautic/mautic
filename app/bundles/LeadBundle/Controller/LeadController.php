@@ -1776,7 +1776,7 @@ class LeadController extends FormController
 
                     if (!empty($data['removestage'])) {
                         $stage = $stageModel->getEntity($data['removestage']);
-                        $model->removeFromStages(
+                        $model->removeFromStage(
                             $lead,
                             $stage,
                             $this->translator->trans('mautic.stage.event.removed.batch')
