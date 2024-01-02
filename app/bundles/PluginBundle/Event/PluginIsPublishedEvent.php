@@ -5,14 +5,16 @@ namespace Mautic\PluginBundle\Event;
 class PluginIsPublishedEvent extends AbstractPluginIntegrationEvent
 {
     private int $value;
+    private string $integrationName;
     private string $message;
     private bool $canPublish;
 
-    public function __construct(int $value)
+    public function __construct(int $value, string $integrationName)
     {
-        $this->value      = $value;
-        $this->canPublish = true;
-        $this->message    = '';
+        $this->value           = $value;
+        $this->canPublish      = true;
+        $this->message         = '';
+        $this->integrationName = $integrationName;
     }
 
     public function getValue(): int
@@ -38,5 +40,10 @@ class PluginIsPublishedEvent extends AbstractPluginIntegrationEvent
     public function setCanPublish(bool $canPublish): void
     {
         $this->canPublish = $canPublish;
+    }
+
+    public function getIntegrationName(): string
+    {
+        return $this->integrationName;
     }
 }

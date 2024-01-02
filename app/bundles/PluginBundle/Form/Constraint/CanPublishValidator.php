@@ -22,7 +22,10 @@ class CanPublishValidator extends ConstraintValidator
         if (1 !== $value) {
             return;
         }
-        $event = new PluginIsPublishedEvent($value);
+        /**
+         * @phpstan-ignore-next-line
+         */
+        $event = new PluginIsPublishedEvent($value, $constraint->integrationName);
         $this->eventDispatcher->dispatch(PluginEvents::PLUGIN_IS_PUBLISHED_STATE_CHANGING, $event);
 
         if (!$event->isCanPublish()) {
