@@ -198,7 +198,6 @@ class PluginController extends FormController
 
                         // Prevent merged keys
                         $resetTokens = false;
-                        $keysToStore = [];
                         $secretKeys  = $integrationObject->getSecretKeys();
                         foreach ($secretKeys as $secretKey) {
                             if (empty($keys[$secretKey]) && !empty($currentKeys[$secretKey])) {
@@ -206,18 +205,22 @@ class PluginController extends FormController
                             }
                             if ($keys[$secretKey] !== $currentKeys[$secretKey]) {
                                 $resetTokens   = true;
-                                $keysToStore[] = $secretKey;
                             }
                         }
 
                         $clientIdKey = $integrationObject->getClientIdKey();
-                        if ($keys[$clientIdKey] !== $currentKeys[$clientIdKey]) {
+                        if (!empty($clientIdKey) && $keys[$clientIdKey] !== $currentKeys[$clientIdKey]) {
                             $resetTokens   = true;
-                            $keysToStore[] = $clientIdKey;
                         }
                         if ($resetTokens) {
-                            $keys = array_filter($keys, function ($key) use ($keysToStore) {
-                                return in_array($key, $keysToStore);
+                            $keysToIgnore[]   = $integrationObject->getAuthTokenKey();
+                            $keysToIgnore[]   = 'refresh_token';
+                            $refreshTokenKeys = $integrationObject->getRefreshTokenKeys();
+                            foreach ($refreshTokenKeys as $refreshTokenKey) {
+                                $keysToIgnore[] = $refreshTokenKey;
+                            }
+                            $keys = array_filter($keys, function ($key) use ($keysToIgnore) {
+                                return !in_array($key, $keysToIgnore);
                             }, ARRAY_FILTER_USE_KEY);
                         }
 
