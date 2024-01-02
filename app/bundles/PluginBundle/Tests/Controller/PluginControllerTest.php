@@ -17,7 +17,7 @@ class PluginControllerTest extends MauticMysqlTestCase
 
         $form->setValues([
             'integration_details' => [
-                'isPublished' => 1,
+                'isPublished' => 0,
                 'apiKeys'     => [
                     'username' => 'valid_username',
                     'password' => 'valid_password',
