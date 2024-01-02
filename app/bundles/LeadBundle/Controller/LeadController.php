@@ -21,6 +21,7 @@ use Mautic\LeadBundle\Entity\LeadField;
 use Mautic\LeadBundle\Entity\LeadRepository;
 use Mautic\LeadBundle\Event\ContactExportSchedulerEvent;
 use Mautic\LeadBundle\Form\Type\BatchType;
+use Mautic\LeadBundle\Form\Type\ContactGroupPointsType;
 use Mautic\LeadBundle\Form\Type\DncType;
 use Mautic\LeadBundle\Form\Type\EmailType;
 use Mautic\LeadBundle\Form\Type\MergeType;
@@ -37,6 +38,7 @@ use Mautic\LeadBundle\Services\ContactColumnsDictionary;
 use Mautic\LeadBundle\Twig\Helper\AvatarHelper;
 use Mautic\PluginBundle\Entity\IntegrationEntity;
 use Mautic\PluginBundle\Helper\IntegrationHelper;
+use Mautic\PointBundle\Model\PointGroupModel;
 use Mautic\UserBundle\Model\UserModel;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\FormError;
@@ -2116,6 +2118,85 @@ class LeadController extends FormController
                     'emailStats' => $model->getLeadEmailStats($lead),
                 ],
                 'contentTemplate' => '@MauticLead/Lead/lead_stats.html.twig',
+            ]
+        );
+    }
+
+    public function contactGroupPointsAction(Request $request, LeadModel $model, PointGroupModel $pointGroupModel, $objectId)
+    {
+        $lead  = $model->getEntity($objectId);
+
+        if (null === $lead
+            || !$this->security->hasEntityAccess(
+                'lead:leads:editown',
+                'lead:leads:editother',
+                $lead->getPermissionUser()
+            )
+        ) {
+            return $this->accessDenied();
+        }
+
+        $pointGroups = $pointGroupModel->getEntities();
+        $fields      = [];
+        foreach ($pointGroups as $group) {
+            $fields[] = 'score_group_'.$group->getId();
+        }
+
+        $initData = [];
+        foreach ($lead->getGroupScores() as $score) {
+            $initData['score_group_'.$score->getGroup()->getId()] = $score->getScore();
+        }
+
+        $form = $this->formFactory->create(ContactGroupPointsType::class, $initData, [
+            'action' => $this->generateUrl('mautic_contact_action', ['objectAction' => 'contactGroupPoints', 'objectId' => $objectId]),
+        ]);
+
+        if (Request::METHOD_POST === $request->getMethod()) {
+            if (!$this->isFormCancelled($form)) {
+                if ($this->isFormValid($form)) {
+                    $postData = $form->getData();
+                    foreach ($pointGroups as $group) {
+                        $scoreKey = 'score_group_'.$group->getId();
+                        $oldScore = $initData[$scoreKey] ?? null;
+                        $newScore = $postData[$scoreKey];
+                        if (!is_null($newScore)) {
+                            $pointGroupModel->adjustPoints($lead, $group, $newScore, Lead::POINTS_SET);
+                        } elseif (!is_null($oldScore)) {
+                            // set 0 when the new score is not present, but the record exists
+                            $pointGroupModel->adjustPoints($lead, $group, 0, Lead::POINTS_SET);
+                        }
+                    }
+
+                    return $this->postActionRedirect(
+                        [
+                            'returnUrl' => $this->generateUrl('mautic_contact_action', [
+                                'objectId'     => $lead->getId(),
+                                'objectAction' => 'view',
+                            ]),
+                            'viewParameters'  => [
+                                'objectId'     => $lead->getId(),
+                                'objectAction' => 'view',
+                            ],
+                            'contentTemplate' => 'Mautic\LeadBundle\Controller\LeadController::viewAction',
+                            'passthroughVars' => [
+                                'closeModal' => 1,
+                            ],
+                        ]
+                    );
+                }
+            }
+        }
+
+        return $this->delegateView(
+            [
+                'viewParameters' => array_merge(
+                    [
+                        'fields' => $fields,
+                        'form'   => $form->createView(),
+                        'lead'   => $lead,
+                    ],
+                ),
+                'contentTemplate' => '@MauticLead/Lead/group_points.html.twig',
             ]
         );
     }

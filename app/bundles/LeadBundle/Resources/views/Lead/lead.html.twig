@@ -55,6 +55,17 @@
           'btnText': 'mautic.lead.contact.frequency'|trans,
           'iconClass': 'fa fa-signal',
       }]) %}
+      {% set buttons = buttons|merge([{
+          'attr': {
+              'data-toggle': 'ajaxmodal',
+              'data-target': '#MauticSharedModal',
+              'data-header': 'mautic.lead.groups.panel.title'|trans,
+              'href': path('mautic_contact_action', {'objectId': lead.id, 'objectAction': 'contactGroupPoints'}),
+          },
+          'btnText': 'mautic.lead.groups.panel.title'|trans,
+          'iconClass': 'fa fa-calculator',
+      }]) %}
+
     {% endif %}
 
     {# View Campaigns List button #}
