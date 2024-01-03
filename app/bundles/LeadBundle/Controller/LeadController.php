@@ -8,6 +8,7 @@ use Mautic\CoreBundle\Cache\ResultCacheOptions;
 use Mautic\CoreBundle\Controller\FormController;
 use Mautic\CoreBundle\Helper\EmojiHelper;
 use Mautic\CoreBundle\Helper\ExportHelper;
+use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Model\IteratorExportDataModel;
 use Mautic\EmailBundle\Helper\MailHelper;
@@ -19,6 +20,7 @@ use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadDevice;
 use Mautic\LeadBundle\Entity\LeadField;
 use Mautic\LeadBundle\Entity\LeadRepository;
+use Mautic\LeadBundle\Entity\PointsChangeLog;
 use Mautic\LeadBundle\Event\ContactExportSchedulerEvent;
 use Mautic\LeadBundle\Form\Type\BatchType;
 use Mautic\LeadBundle\Form\Type\ContactGroupPointsType;
@@ -2122,10 +2124,14 @@ class LeadController extends FormController
         );
     }
 
-    public function contactGroupPointsAction(Request $request, LeadModel $model, PointGroupModel $pointGroupModel, $objectId)
+    public function contactGroupPointsAction(
+        Request $request,
+        LeadModel $model,
+        PointGroupModel $pointGroupModel,
+        IpLookupHelper $ipLookupHelper,
+        int $objectId): Response
     {
         $lead  = $model->getEntity($objectId);
-
         if (null === $lead
             || !$this->security->hasEntityAccess(
                 'lead:leads:editown',
@@ -2139,32 +2145,57 @@ class LeadController extends FormController
         $pointGroups = $pointGroupModel->getEntities();
         $fields      = [];
         foreach ($pointGroups as $group) {
-            $fields[] = 'score_group_'.$group->getId();
+            $fields[] = ContactGroupPointsType::getFieldKey($group->getId());
         }
 
         $initData = [];
         foreach ($lead->getGroupScores() as $score) {
-            $initData['score_group_'.$score->getGroup()->getId()] = $score->getScore();
+            $initData[ContactGroupPointsType::getFieldKey($score->getGroup()->getId())] = $score->getScore();
         }
 
         $form = $this->formFactory->create(ContactGroupPointsType::class, $initData, [
-            'action' => $this->generateUrl('mautic_contact_action', ['objectAction' => 'contactGroupPoints', 'objectId' => $objectId]),
+            'action' => $this->generateUrl('mautic_contact_action', [
+                'objectAction' => 'contactGroupPoints',
+                'objectId'     => $objectId,
+            ]),
+            'point_groups' => $pointGroups,
         ]);
 
         if (Request::METHOD_POST === $request->getMethod()) {
             if (!$this->isFormCancelled($form)) {
                 if ($this->isFormValid($form)) {
-                    $postData = $form->getData();
+                    $leadUpdated = false;
+                    $postData    = $form->getData();
                     foreach ($pointGroups as $group) {
-                        $scoreKey = 'score_group_'.$group->getId();
+                        $scoreKey = ContactGroupPointsType::getFieldKey($group->getId());
                         $oldScore = $initData[$scoreKey] ?? null;
                         $newScore = $postData[$scoreKey];
-                        if (!is_null($newScore)) {
-                            $pointGroupModel->adjustPoints($lead, $group, $newScore, Lead::POINTS_SET);
-                        } elseif (!is_null($oldScore)) {
+                        if (!is_null($oldScore) && is_null($newScore)) {
                             // set 0 when the new score is not present, but the record exists
-                            $pointGroupModel->adjustPoints($lead, $group, 0, Lead::POINTS_SET);
+                            $newScore = 0;
                         }
+
+                        if (!is_null($newScore) && $newScore !== $oldScore) {
+                            $pointGroupModel->adjustPoints($lead, $group, $newScore, Lead::POINTS_SET);
+                            $delta = $newScore - ($oldScore ?? 0);
+
+                            // add a lead point change log
+                            $log = new PointsChangeLog();
+                            $log->setDelta($delta);
+                            $log->setLead($lead);
+                            $log->setType('manual');
+                            $log->setEventName($this->translator->trans('mautic.point.event.manual_change'));
+                            $log->setActionName('');
+                            $log->setIpAddress($ipLookupHelper->getIpAddress());
+                            $log->setDateAdded(new \DateTime());
+                            $log->setGroup($group);
+                            $lead->addPointsChangeLog($log);
+                            $leadUpdated = true;
+                        }
+                    }
+
+                    if ($leadUpdated) {
+                        $model->saveEntity($lead);
                     }
 
                     return $this->postActionRedirect(

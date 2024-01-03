@@ -15,9 +15,12 @@ use Mautic\LeadBundle\Entity\Company;
 use Mautic\LeadBundle\Entity\CompanyLead;
 use Mautic\LeadBundle\Entity\ContactExportScheduler;
 use Mautic\LeadBundle\Entity\Lead;
+use Mautic\LeadBundle\Entity\PointsChangeLog;
+use Mautic\LeadBundle\Form\Type\ContactGroupPointsType;
 use Mautic\LeadBundle\Model\CompanyModel;
 use Mautic\LeadBundle\Model\FieldModel;
 use Mautic\LeadBundle\Model\LeadModel;
+use Mautic\PointBundle\Entity\Group;
 use PHPUnit\Framework\Assert;
 use Symfony\Component\DomCrawler\Crawler;
 use Symfony\Component\DomCrawler\Field\ChoiceFormField;
@@ -816,5 +819,60 @@ class LeadControllerTest extends MauticMysqlTestCase
         $leadCompanies = $form['lead[companies]']->getValue();
 
         Assert::assertCount($companyLimit, $leadCompanies);
+    }
+
+    public function testContactGroupPointsEdit(): void
+    {
+        $contact = $this->createContact('test-contact@example.com');
+
+        $groupA = new Group();
+        $groupA->setName('Group A');
+        $groupB = new Group();
+        $groupB->setName('Group B');
+        $groupC = new Group();
+        $groupC->setName('Group C');
+        $this->em->persist($groupA);
+        $this->em->persist($groupB);
+        $this->em->persist($groupC);
+        $this->em->flush();
+
+        $scoresMap = [
+            $groupA->getId() => 1,
+            $groupB->getId() => 5,
+        ];
+
+        $uri = "/s/contacts/contactGroupPoints/{$contact->getId()}";
+        $this->client->request('GET', $uri, [], [], $this->createAjaxHeaders());
+        $response = $this->client->getResponse();
+        $this->assertTrue($response->isOk(), $response->getContent());
+
+        // Get the form HTML element out of the response, fill it in and submit.
+        $responseData = json_decode($response->getContent(), true);
+        $crawler      = new Crawler($responseData['newContent'], $this->client->getInternalRequest()->getUri());
+        $form         = $crawler->filterXPath('//form[@name="contact_group_points"]')->form();
+        $groupAKey    = ContactGroupPointsType::getFieldKey($groupA->getId());
+        $groupBKey    = ContactGroupPointsType::getFieldKey($groupB->getId());
+        $form->setValues(
+            [
+                "contact_group_points[{$groupAKey}]" => $scoresMap[$groupA->getId()],
+                "contact_group_points[{$groupBKey}]" => $scoresMap[$groupB->getId()],
+            ]
+        );
+
+        $this->client->request($form->getMethod(), $form->getUri(), $form->getPhpValues(), [], $this->createAjaxHeaders());
+        $response = $this->client->getResponse();
+        $this->assertTrue($response->isOk(), $response->getContent());
+
+        $scores = $contact->getGroupScores();
+        $this->assertCount(2, $scores);
+        foreach ($scores as $score) {
+            $this->assertEquals($scoresMap[$score->getGroup()->getId()], $score->getScore());
+        }
+
+        $logs = $this->em->getRepository(PointsChangeLog::class)->findBy(['lead' => $contact->getId()]);
+        $this->assertCount(2, $logs);
+        foreach ($logs as $log) {
+            $this->assertEquals($scoresMap[$log->getGroup()->getId()], $log->getDelta());
+        }
     }
 }
