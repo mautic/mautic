@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace Mautic\CoreBundle\Tests\Unit\Type;
 
-use DateTimeImmutable;
-use DateTimeZone;
 use Doctrine\DBAL\Platforms\MySQL80Platform;
 use Mautic\CoreBundle\Doctrine\Type\UTCDateTimeImmutableType;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
@@ -42,7 +40,7 @@ class UTCDateTimeImmutableTypeTest extends TestCase
     {
         date_default_timezone_set($timezone);
 
-        $databaseValue = $this->type->convertToDatabaseValue(new DateTimeImmutable($date), $this->platform);
+        $databaseValue = $this->type->convertToDatabaseValue(new \DateTimeImmutable($date), $this->platform);
 
         Assert::assertIsString($databaseValue);
         Assert::assertSame($this->convertDateTimezone($date, $timezone, 'UTC'), $databaseValue, 'Database value should be converted to UTC.');
@@ -62,7 +60,7 @@ class UTCDateTimeImmutableTypeTest extends TestCase
 
         $phpValue = $this->type->convertToPHPValue($date, $this->platform);
 
-        Assert::assertInstanceOf(DateTimeImmutable::class, $phpValue);
+        Assert::assertInstanceOf(\DateTimeImmutable::class, $phpValue);
         Assert::assertSame($this->convertDateTimezone($date, 'UTC', $timezone), $phpValue->format(DateTimeHelper::FORMAT_DB), sprintf('PHP value should be converted to %s.', $timezone));
     }
 
@@ -79,8 +77,8 @@ class UTCDateTimeImmutableTypeTest extends TestCase
 
     private function convertDateTimezone(string $date, string $timezoneFrom, string $timezoneTo): string
     {
-        return (new DateTimeImmutable($date, new DateTimeZone($timezoneFrom)))
-            ->setTimezone(new DateTimeZone($timezoneTo))
+        return (new \DateTimeImmutable($date, new \DateTimeZone($timezoneFrom)))
+            ->setTimezone(new \DateTimeZone($timezoneTo))
             ->format(DateTimeHelper::FORMAT_DB);
     }
 }
