@@ -1460,7 +1460,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
 
     public function getMixedLeadFields($fields, $object): array
     {
-        $mixedFields = array_filter($fields['leadFields']);
+        $mixedFields = array_filter($fields['leadFields'] ?? []);
         $fields      = [];
         foreach ($mixedFields as $sfField => $mField) {
             if (str_contains($sfField, '__'.$object)) {
@@ -1831,7 +1831,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
         $requiredFields = $this->getRequiredFields($availableFields[$object]);
 
         if ('company' != $object) {
-            $requiredFields = $this->prepareFieldsForSync($config['leadFields'], array_keys($requiredFields), $object);
+            $requiredFields = $this->prepareFieldsForSync($config['leadFields'] ?? [], array_keys($requiredFields), $object);
         }
 
         $requiredString = implode(',', array_keys($requiredFields));
@@ -1854,7 +1854,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
         // Important to have contacts first!!
         if (false !== array_search('Contact', $config['objects'])) {
             $supportedObjects['Contact'] = 'Contact';
-            $fieldsToCreate              = $this->prepareFieldsForSync($config['leadFields'], $fieldKeys, 'Contact');
+            $fieldsToCreate              = $this->prepareFieldsForSync($config['leadFields'] ?? [], $fieldKeys, 'Contact');
             $objectFields['Contact']     = [
                 'update' => isset($fieldsToUpdateInSf['Contact']) ? array_intersect_key($fieldsToCreate, $fieldsToUpdateInSf['Contact']) : [],
                 'create' => $fieldsToCreate,
@@ -1862,7 +1862,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
         }
         if (false !== array_search('Lead', $config['objects'])) {
             $supportedObjects['Lead'] = 'Lead';
-            $fieldsToCreate           = $this->prepareFieldsForSync($config['leadFields'], $fieldKeys, 'Lead');
+            $fieldsToCreate           = $this->prepareFieldsForSync($config['leadFields'] ?? [], $fieldKeys, 'Lead');
             $objectFields['Lead']     = [
                 'update' => isset($fieldsToUpdateInSf['Lead']) ? array_intersect_key($fieldsToCreate, $fieldsToUpdateInSf['Lead']) : [],
                 'create' => $fieldsToCreate,
@@ -2372,7 +2372,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
 
     protected function mapContactDataForPush(Lead $lead, $config): array
     {
-        $fields             = array_keys($config['leadFields']);
+        $fields             = array_keys($config['leadFields'] ?? []);
         $fieldsToUpdateInSf = $this->getPriorityFieldsForIntegration($config);
         $fieldMapping       = [
             'Lead'    => [],
@@ -2385,7 +2385,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
 
         foreach (['Lead', 'Contact'] as $object) {
             if (isset($config['objects']) && false !== array_search($object, $config['objects'])) {
-                $fieldMapping[$object]['create'] = $this->prepareFieldsForSync($config['leadFields'], $fields, $object);
+                $fieldMapping[$object]['create'] = $this->prepareFieldsForSync($config['leadFields'] ?? [], $fields, $object);
                 $fieldMapping[$object]['update'] = isset($fieldsToUpdateInSf[$object]) ? array_intersect_key(
                     $fieldMapping[$object]['create'],
                     $fieldsToUpdateInSf[$object]
@@ -2487,7 +2487,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
                 $fields = array_keys(array_filter($fields['companyFields']));
                 break;
             default:
-                $mixedFields = array_filter($fields['leadFields']);
+                $mixedFields = array_filter($fields['leadFields'] ?? []);
                 $fields      = [];
                 foreach ($mixedFields as $sfField => $mField) {
                     if (str_contains($sfField, '__'.$object)) {
