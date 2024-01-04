@@ -275,14 +275,14 @@ class PluginController extends FormController
                         $mauticLogger->info('Dispatching integration config save event.');
                         if ($dispatcher->hasListeners(PluginEvents::PLUGIN_ON_INTEGRATION_CONFIG_SAVE)) {
                             $mauticLogger->info('Event dispatcher has integration config save listeners.');
+                            if (!$valid && !$existingPublishedState) {
+                                $integrationObject->getIntegrationSettings()->setIsPublished(false);
+                            }
                             $event = new PluginIntegrationEvent($integrationObject);
 
                             $dispatcher->dispatch($event, PluginEvents::PLUGIN_ON_INTEGRATION_CONFIG_SAVE);
 
                             $entity = $event->getEntity();
-                            if (!$valid && !$existingPublishedState) {
-                                $entity->setIsPublished(false);
-                            }
                         }
 
                         $em->persist($entity);
