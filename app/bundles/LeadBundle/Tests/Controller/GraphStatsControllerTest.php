@@ -87,7 +87,7 @@ class GraphStatsControllerTest extends MauticMysqlTestCase
                 ['lead.lead', $this->leadModelMock],
             ]);
         $userHelperMock->method('getUser')
-            ->willReturn(0);
+            ->willReturn(null);
 
         $this->graphStatsController = new GraphStatsController(
             $this->createMock(ManagerRegistry::class),
