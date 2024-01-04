@@ -51,6 +51,7 @@ final class CampaignSubscriberTest extends TestCase
             {
             }
 
+            /** @phpstan-ignore-next-line */
             public function getEntity($id = null): ?Stage
             {
                 Assert::assertSame(123, $id);
@@ -104,6 +105,7 @@ final class CampaignSubscriberTest extends TestCase
             {
             }
 
+            /** @phpstan-ignore-next-line */
             public function getEntity($id = null): ?Stage
             {
                 Assert::assertSame(123, $id);
@@ -178,6 +180,7 @@ final class CampaignSubscriberTest extends TestCase
             {
             }
 
+            /** @phpstan-ignore-next-line */
             public function getEntity($id = null): ?Stage
             {
                 Assert::assertSame(123, $id);
@@ -257,6 +260,7 @@ final class CampaignSubscriberTest extends TestCase
             {
             }
 
+            /** @phpstan-ignore-next-line */
             public function getEntity($id = null): ?Stage
             {
                 Assert::assertSame(123, $id);
@@ -344,6 +348,7 @@ final class CampaignSubscriberTest extends TestCase
             {
             }
 
+            /** @phpstan-ignore-next-line */
             public function getEntity($id = null): ?Stage
             {
                 Assert::assertSame(123, $id);
@@ -435,6 +440,7 @@ final class CampaignSubscriberTest extends TestCase
             {
             }
 
+            /** @phpstan-ignore-next-line */
             public function getEntity($id = null): ?Stage
             {
                 Assert::assertSame(123, $id);
@@ -468,7 +474,10 @@ final class CampaignSubscriberTest extends TestCase
     private function createTranslatorMock(): TranslatorInterface
     {
         return new class() implements TranslatorInterface {
-            public function trans($id, array $parameters = [], string $domain = null, string $locale = null): string
+            /**
+             * @param array<int|string> $parameters
+             */
+            public function trans(string $id, array $parameters = [], string $domain = null, string $locale = null): string
             {
                 return '[trans]'.$id.'[/trans]';
             }
