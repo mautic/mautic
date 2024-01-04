@@ -61,16 +61,11 @@ class GraphStatsController extends CommonController
     {
         $stats = [];
 
-        switch ($timeUnit) {
-            case 'd':
-                $stats  = $this->getEmailDaysData($lead);
-                break;
-            case 'h':
-                $stats = $this->getEmailHoursData($lead);
-                break;
-        }
-
-        return $stats;
+        return match ($timeUnit) {
+            'd'     => $this->getEmailDaysData($lead),
+            'h'     => $this->getEmailHoursData($lead),
+            default => $stats,
+        };
     }
 
     /**
