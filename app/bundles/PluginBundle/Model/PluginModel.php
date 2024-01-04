@@ -21,27 +21,22 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
  */
 class PluginModel extends FormModel
 {
-    /**
-     * @var FieldModel
-     */
-    protected $leadFieldModel;
-
-    /**
-     * @var BundleHelper
-     */
-    private $bundleHelper;
-
-    public function __construct(FieldModel $leadFieldModel, CoreParametersHelper $coreParametersHelper, BundleHelper $bundleHelper, EntityManager $em, CorePermissions $security, EventDispatcherInterface $dispatcher, UrlGeneratorInterface $router, Translator $translator, UserHelper $userHelper, LoggerInterface $mauticLogger)
-    {
-        $this->leadFieldModel       = $leadFieldModel;
-        $this->bundleHelper         = $bundleHelper;
-
+    public function __construct(
+        protected FieldModel $leadFieldModel,
+        CoreParametersHelper $coreParametersHelper,
+        private BundleHelper $bundleHelper,
+        EntityManager $em,
+        CorePermissions $security,
+        EventDispatcherInterface $dispatcher,
+        UrlGeneratorInterface $router,
+        Translator $translator,
+        UserHelper $userHelper,
+        LoggerInterface $mauticLogger
+    ) {
         parent::__construct($em, $security, $dispatcher, $router, $translator, $userHelper, $mauticLogger, $coreParametersHelper);
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @return \Mautic\PluginBundle\Entity\PluginRepository
      */
     public function getRepository()
@@ -54,31 +49,32 @@ class PluginModel extends FormModel
         return $this->em->getRepository(\Mautic\PluginBundle\Entity\IntegrationEntity::class);
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getPermissionBase()
+    public function getPermissionBase(): string
     {
         return 'plugin:plugins';
     }
 
     /**
      * Get lead fields used in selects/matching.
+     *
+     * @return mixed[]
      */
-    public function getLeadFields()
+    public function getLeadFields(): array
     {
         return $this->leadFieldModel->getFieldList();
     }
 
     /**
      * Get Company fields.
+     *
+     * @return mixed[]
      */
-    public function getCompanyFields()
+    public function getCompanyFields(): array
     {
         return $this->leadFieldModel->getFieldList(true, true, ['isPublished' => true, 'object' => 'company']);
     }
 
-    public function saveFeatureSettings($entity)
+    public function saveFeatureSettings($entity): void
     {
         $this->em->persist($entity);
         $this->em->flush();
@@ -110,10 +106,8 @@ class PluginModel extends FormModel
 
     /**
      * Returns metadata for all plugins.
-     *
-     * @return array
      */
-    public function getPluginsMetadata()
+    public function getPluginsMetadata(): array
     {
         $allMetadata     = $this->em->getMetadataFactory()->getAllMetadata();
         $pluginsMetadata = [];
@@ -121,7 +115,7 @@ class PluginModel extends FormModel
         foreach ($allMetadata as $meta) {
             $namespace = $meta->namespace;
 
-            if (false !== strpos($namespace, 'MauticPlugin')) {
+            if (str_contains($namespace, 'MauticPlugin')) {
                 $bundleName = preg_replace('/\\\Entity$/', '', $namespace);
                 if (!isset($pluginsMetadata[$bundleName])) {
                     $pluginsMetadata[$bundleName] = [];
@@ -135,10 +129,8 @@ class PluginModel extends FormModel
 
     /**
      * Returns all tables of installed plugins.
-     *
-     * @return array
      */
-    public function getInstalledPluginTables(array $pluginsMetadata)
+    public function getInstalledPluginTables(array $pluginsMetadata): array
     {
         $currentSchema          = $this->em->getConnection()->getSchemaManager()->createSchema();
         $installedPluginsTables = [];
@@ -162,10 +154,8 @@ class PluginModel extends FormModel
 
     /**
      * Generates new Schema objects for all installed plugins.
-     *
-     * @return array
      */
-    public function createPluginSchemas(array $installedPluginsTables)
+    public function createPluginSchemas(array $installedPluginsTables): array
     {
         $installedPluginsSchemas = [];
         foreach ($installedPluginsTables as $bundleName => $tables) {

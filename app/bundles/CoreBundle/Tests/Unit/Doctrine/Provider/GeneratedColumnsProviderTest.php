@@ -18,17 +18,14 @@ final class GeneratedColumnsProviderTest extends \PHPUnit\Framework\TestCase
     /**
      * @var MockObject|VersionProviderInterface
      */
-    private $versionProvider;
+    private \PHPUnit\Framework\MockObject\MockObject $versionProvider;
 
     /**
      * @var MockObject|EventDispatcherInterface
      */
-    private $dispatcher;
+    private \PHPUnit\Framework\MockObject\MockObject $dispatcher;
 
-    /**
-     * @var GeneratedColumnsProvider
-     */
-    private $provider;
+    private \Mautic\CoreBundle\Doctrine\Provider\GeneratedColumnsProvider $provider;
 
     protected function setUp(): void
     {

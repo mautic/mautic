@@ -17,6 +17,7 @@ use Mautic\LeadBundle\Entity\ListLead;
 class AbstractCampaignCommand extends MauticMysqlTestCase
 {
     public const SEND_EMAIL_SECONDS = 3;
+
     public const CONDITION_SECONDS  = 6;
 
     /**

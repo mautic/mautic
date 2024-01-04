@@ -74,7 +74,7 @@ class SalesforceApiTest extends \PHPUnit\Framework\TestCase
 
         try {
             $api->request('/test');
-        } catch (ApiErrorException $exception) {
+        } catch (ApiErrorException) {
             $this->fail('ApiErrorException thrown');
         }
     }
@@ -107,7 +107,7 @@ class SalesforceApiTest extends \PHPUnit\Framework\TestCase
 
         try {
             $api->request('/test');
-        } catch (ApiErrorException $exception) {
+        } catch (ApiErrorException) {
             $this->fail('ApiErrorException should not have been thrown');
         }
     }
@@ -173,7 +173,7 @@ class SalesforceApiTest extends \PHPUnit\Framework\TestCase
 
         try {
             $api->request('/test');
-        } catch (ApiErrorException $exception) {
+        } catch (ApiErrorException) {
             $this->fail('ApiErrorException thrown');
         }
     }
@@ -231,7 +231,7 @@ class SalesforceApiTest extends \PHPUnit\Framework\TestCase
         $integration->expects($this->exactly(1))
             ->method('makeRequest')
             ->willReturnCallback(
-                function ($url, $parameters = [], $method = 'GET', $settings = []) {
+                function ($url, $parameters = [], $method = 'GET', $settings = []): void {
                     $this->assertEquals(
                         $parameters,
                         [
@@ -260,7 +260,7 @@ class SalesforceApiTest extends \PHPUnit\Framework\TestCase
      *
      * @covers \MauticPlugin\MauticCrmBundle\Api\SalesforceApi::escapeQueryValue()
      */
-    public function testCompanyQueryWithHtmlEntitiesIsEscapedCorrectly()
+    public function testCompanyQueryWithHtmlEntitiesIsEscapedCorrectly(): void
     {
         $integration = $this->getMockBuilder(SalesforceIntegration::class)
             ->disableOriginalConstructor()
@@ -280,7 +280,7 @@ class SalesforceApiTest extends \PHPUnit\Framework\TestCase
         $integration->expects($this->exactly(1))
             ->method('makeRequest')
             ->willReturnCallback(
-                function ($url, $parameters = [], $method = 'GET', $settings = []) {
+                function ($url, $parameters = [], $method = 'GET', $settings = []): void {
                     $this->assertEquals(
                         $parameters,
                         [
@@ -327,7 +327,7 @@ class SalesforceApiTest extends \PHPUnit\Framework\TestCase
         $integration->expects($this->exactly(1))
             ->method('makeRequest')
             ->willReturnCallback(
-                function ($url, $parameters = [], $method = 'GET', $settings = []) {
+                function ($url, $parameters = [], $method = 'GET', $settings = []): void {
                     $this->assertEquals(
                         $parameters,
                         [
@@ -369,7 +369,7 @@ class SalesforceApiTest extends \PHPUnit\Framework\TestCase
         $integration->expects($this->exactly(1))
             ->method('makeRequest')
             ->willReturnCallback(
-                function ($url, $parameters = [], $method = 'GET', $settings = []) {
+                function ($url, $parameters = [], $method = 'GET', $settings = []): void {
                     $this->assertEquals(
                         $parameters,
                         [

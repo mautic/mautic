@@ -20,7 +20,7 @@ class ObjectIdsDAO
      *
      * @var array[]
      */
-    private $objects = [];
+    private array $objects = [];
 
     /**
      * Expected $cliOptions structure:
@@ -39,7 +39,7 @@ class ObjectIdsDAO
         $objectsIdDAO = new self();
 
         foreach ($cliOptions as $cliOption) {
-            if (is_string($cliOption) && false !== strpos($cliOption, ':')) {
+            if (is_string($cliOption) && str_contains($cliOption, ':')) {
                 $objectsIdDAO->addObjectId(...explode(':', $cliOption));
             }
         }

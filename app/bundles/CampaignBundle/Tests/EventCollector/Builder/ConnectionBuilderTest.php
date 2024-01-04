@@ -7,7 +7,7 @@ use Mautic\CampaignBundle\EventCollector\Builder\ConnectionBuilder;
 
 class ConnectionBuilderTest extends \PHPUnit\Framework\TestCase
 {
-    public function testArrayIsBuiltAsItsUsedInJsPlumb()
+    public function testArrayIsBuiltAsItsUsedInJsPlumb(): void
     {
         $eventsArray = [
             Event::TYPE_ACTION   => [

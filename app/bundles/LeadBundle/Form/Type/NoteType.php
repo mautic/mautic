@@ -16,17 +16,14 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class NoteType extends AbstractType
 {
-    /**
-     * @var DateTimeHelper
-     */
-    private $dateHelper;
+    private \Mautic\CoreBundle\Helper\DateTimeHelper $dateHelper;
 
     public function __construct()
     {
         $this->dateHelper = new DateTimeHelper();
     }
 
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder->addEventSubscriber(new CleanFormSubscriber(['text' => 'html']));
         $builder->addEventSubscriber(new FormExitSubscriber('lead.note', $options));
@@ -88,7 +85,7 @@ class NoteType extends AbstractType
         }
     }
 
-    public function configureOptions(OptionsResolver $resolver)
+    public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults([
             'data_class' => LeadNote::class,

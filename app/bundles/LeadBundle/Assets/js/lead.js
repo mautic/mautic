@@ -1278,7 +1278,7 @@ Mautic.getLeadEmailContent = function (el) {
         if (mauticFroalaEnabled && Mautic.getActiveBuilderName() === 'legacy') {
             mQuery(bodyEl).froalaEditor('html.set', response.body);
         } else {
-            mQuery(bodyEl).ckeditorGet().setData(response.body);
+            ckEditors.get( mQuery(bodyEl)[0] ).setData(response.body);
         }
 
         mQuery(bodyEl).val(response.body);

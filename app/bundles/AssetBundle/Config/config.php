@@ -21,7 +21,7 @@ return [
                 'standard_entity' => true,
                 'name'            => 'assets',
                 'path'            => '/assets',
-                'controller'      => 'Mautic\AssetBundle\Controller\Api\AssetApiController',
+                'controller'      => \Mautic\AssetBundle\Controller\Api\AssetApiController::class,
             ],
         ],
         'public' => [
@@ -85,7 +85,7 @@ return [
     ],
 
     'parameters' => [
-        'upload_dir'          => '%kernel.project_dir%/media/files',
+        'upload_dir'          => '%mautic.application_dir%/media/files',
         'max_size'            => '6',
         'allowed_extensions'  => ['csv', 'doc', 'docx', 'epub', 'gif', 'jpg', 'jpeg', 'mpg', 'mpeg', 'mp3', 'odt', 'odp', 'ods', 'pdf', 'png', 'ppt', 'pptx', 'tif', 'tiff', 'txt', 'xls', 'xlsx', 'wav'],
         'streamed_extensions' => ['gif', 'jpg', 'jpeg', 'mpg', 'mpeg', 'mp3', 'pdf', 'png', 'wav'],

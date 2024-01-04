@@ -9,10 +9,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class PointActionType extends AbstractType
 {
-    /**
-     * {@inheritdoc}
-     */
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $masks           = [];
         $formTypeOptions = [
@@ -30,10 +27,7 @@ class PointActionType extends AbstractType
         $builder->addEventSubscriber(new CleanFormSubscriber($masks));
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function configureOptions(OptionsResolver $resolver)
+    public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults([
             'formType'        => GenericPointSettingsType::class,
@@ -41,9 +35,6 @@ class PointActionType extends AbstractType
         ]);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getBlockPrefix()
     {
         return 'pointaction';

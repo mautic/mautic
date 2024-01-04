@@ -17,6 +17,7 @@ class SimplePaginatorTest extends MauticMysqlTestCase
      * @var array<string,mixed>
      */
     protected array $clientOptions = ['debug' => true];
+
     private DebugDataHolder $debugDataHolder;
 
     protected function setUp(): void

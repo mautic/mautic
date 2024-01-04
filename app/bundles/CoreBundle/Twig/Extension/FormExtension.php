@@ -11,9 +11,6 @@ use Twig\TwigFunction;
 
 class FormExtension extends AbstractExtension
 {
-    /**
-     * {@inheritdoc}
-     */
     public function getFunctions()
     {
         return [

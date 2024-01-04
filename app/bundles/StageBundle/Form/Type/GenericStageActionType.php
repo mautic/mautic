@@ -6,15 +6,9 @@ use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\NumberType;
 use Symfony\Component\Form\FormBuilderInterface;
 
-/**
- * Class GenericStageSettingsType.
- */
 class GenericStageActionType extends AbstractType
 {
-    /**
-     * {@inheritdoc}
-     */
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $default = (empty($options['data']['weight'])) ? 0 : (int) $options['data']['weight'];
         $builder->add('weight', NumberType::class, [
@@ -29,9 +23,6 @@ class GenericStageActionType extends AbstractType
         ]);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getBlockPrefix()
     {
         return 'genericstage_settings';

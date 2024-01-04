@@ -9,47 +9,20 @@ use Mautic\LeadBundle\Tracker\ContactTracker;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Session\Session;
 
-/**
- * Class TrackinHelper.
- */
 class TrackingHelper
 {
-    /**
-     * @var Session
-     */
-    protected $session;
-
-    /**
-     * @var CoreParametersHelper
-     */
-    protected $coreParametersHelper;
-
-    /**
-     * @var RequestStack
-     */
-    protected $requestStack;
-
-    /**
-     * @var ContactTracker
-     */
-    protected $contactTracker;
-
-    /**
-     * BuildJsSubscriber constructor.
-     */
     public function __construct(
-        Session $session,
-        CoreParametersHelper $coreParametersHelper,
-        RequestStack $requestStack,
-        ContactTracker $contactTracker
+        protected Session $session,
+        protected CoreParametersHelper $coreParametersHelper,
+        protected RequestStack $requestStack,
+        protected ContactTracker $contactTracker
     ) {
-        $this->session              = $session;
-        $this->coreParametersHelper = $coreParametersHelper;
-        $this->requestStack         = $requestStack;
-        $this->contactTracker       = $contactTracker;
     }
 
-    public function getEnabledServices()
+    /**
+     * @return array<string, 'facebook_pixel'|'google_analytics'>
+     */
+    public function getEnabledServices(): array
     {
         $keys = [
             'google_analytics' => 'Google Analytics',
@@ -130,13 +103,10 @@ class TrackingHelper
         return $this->coreParametersHelper->get('google_analytics_anonymize_ip');
     }
 
-    /**
-     * @return bool
-     */
-    protected function isLandingPage()
+    protected function isLandingPage(): bool
     {
         $server = $this->requestStack->getCurrentRequest()->server;
-        if (false === strpos((string) $server->get('HTTP_REFERER'), $this->coreParametersHelper->get('site_url'))) {
+        if (!str_contains((string) $server->get('HTTP_REFERER'), $this->coreParametersHelper->get('site_url'))) {
             return false;
         }
 
