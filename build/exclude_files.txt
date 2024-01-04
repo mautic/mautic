@@ -28,8 +28,6 @@ bin/simple-phpunit
 build/*
 modified_files.txt
 node_modules/*
-package-lock.json
-package.json
 phpstan*.neon
 rector.php
 tests/*

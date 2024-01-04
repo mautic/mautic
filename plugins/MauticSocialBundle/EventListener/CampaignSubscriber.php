@@ -14,35 +14,14 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class CampaignSubscriber implements EventSubscriberInterface
 {
-    /**
-     * @var CampaignEventHelper
-     */
-    private $campaignEventHelper;
-
-    /**
-     * @var IntegrationHelper
-     */
-    private $integrationHelper;
-
-    /**
-     * @var TranslatorInterface
-     */
-    private $translator;
-
     public function __construct(
-        CampaignEventHelper $campaignEventHelper,
-        IntegrationHelper $integrationHelper,
-        TranslatorInterface $translator
+        private CampaignEventHelper $campaignEventHelper,
+        private IntegrationHelper $integrationHelper,
+        private TranslatorInterface $translator
     ) {
-        $this->campaignEventHelper = $campaignEventHelper;
-        $this->integrationHelper   = $integrationHelper;
-        $this->translator          = $translator;
     }
 
-    /**
-     * @return array
-     */
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             CampaignEvents::CAMPAIGN_ON_BUILD        => ['onCampaignBuild', 0],
@@ -50,7 +29,7 @@ class CampaignSubscriber implements EventSubscriberInterface
         ];
     }
 
-    public function onCampaignBuild(CampaignBuilderEvent $event)
+    public function onCampaignBuild(CampaignBuilderEvent $event): void
     {
         $integration = $this->integrationHelper->getIntegrationObject('Twitter');
         if ($integration && $integration->getIntegrationSettings()->isPublished()) {

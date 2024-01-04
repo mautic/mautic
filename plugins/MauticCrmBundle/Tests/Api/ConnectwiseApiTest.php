@@ -17,7 +17,7 @@ class ConnectwiseApiTest extends \PHPUnit\Framework\TestCase
      *
      * @throws \Mautic\PluginBundle\Exception\ApiErrorException
      */
-    public function testResultPagination()
+    public function testResultPagination(): void
     {
         $integration = $this->getMockBuilder(ConnectwiseIntegration::class)
             ->disableOriginalConstructor()

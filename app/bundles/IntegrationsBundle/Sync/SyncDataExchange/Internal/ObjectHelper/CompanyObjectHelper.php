@@ -16,26 +16,11 @@ use Mautic\LeadBundle\Model\CompanyModel;
 
 class CompanyObjectHelper implements ObjectHelperInterface
 {
-    /**
-     * @var CompanyModel
-     */
-    private $model;
-
-    /**
-     * @var CompanyRepository
-     */
-    private $repository;
-
-    /**
-     * @var Connection
-     */
-    private $connection;
-
-    public function __construct(CompanyModel $model, CompanyRepository $repository, Connection $connection)
-    {
-        $this->model      = $model;
-        $this->repository = $repository;
-        $this->connection = $connection;
+    public function __construct(
+        private CompanyModel $model,
+        private CompanyRepository $repository,
+        private Connection $connection
+    ) {
     }
 
     /**
@@ -63,7 +48,7 @@ class CompanyObjectHelper implements ObjectHelperInterface
                     'Created company ID %d',
                     $company->getId()
                 ),
-                __CLASS__.':'.__FUNCTION__
+                self::class.':'.__FUNCTION__
             );
 
             $objectMapping = new ObjectMapping();
@@ -101,7 +86,7 @@ class CompanyObjectHelper implements ObjectHelperInterface
                 count($companies),
                 implode(', ', $ids)
             ),
-            __CLASS__.':'.__FUNCTION__
+            self::class.':'.__FUNCTION__
         );
 
         foreach ($companies as $company) {
@@ -122,7 +107,7 @@ class CompanyObjectHelper implements ObjectHelperInterface
                     'Updated company ID %d',
                     $company->getId()
                 ),
-                __CLASS__.':'.__FUNCTION__
+                self::class.':'.__FUNCTION__
             );
 
             // Integration name and ID are stored in the change's mappedObject/mappedObjectId

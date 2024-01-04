@@ -10,13 +10,9 @@ use Symfony\Contracts\EventDispatcher\Event;
 
 class ImportValidateEvent extends Event
 {
-    private string $routeObjectName;
-
-    /**
-     * @var FormInterface<FormInterface>
-     */
-    private FormInterface $form;
+    private bool $skipIfExists;
     private ?int $ownerId = null;
+
     private ?int $list    = null;
 
     /**
@@ -32,10 +28,10 @@ class ImportValidateEvent extends Event
     /**
      * @param FormInterface<FormInterface> $form
      */
-    public function __construct(string $routeObjectName, FormInterface $form)
-    {
-        $this->routeObjectName = $routeObjectName;
-        $this->form            = $form;
+    public function __construct(
+        private string $routeObjectName,
+        private FormInterface $form
+    ) {
     }
 
     /**
@@ -75,6 +71,16 @@ class ImportValidateEvent extends Event
     public function setMatchedFields(array $matchedFields): void
     {
         $this->matchedFields = $matchedFields;
+    }
+
+    public function getSkipIfExists(): bool
+    {
+        return $this->skipIfExists;
+    }
+
+    public function setSkipIfExists(bool $skipIfExists): void
+    {
+        $this->skipIfExists = $skipIfExists;
     }
 
     /**

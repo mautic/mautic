@@ -25,7 +25,7 @@ return [
                 'standard_entity' => true,
                 'name'            => 'emails',
                 'path'            => '/emails',
-                'controller'      => 'Mautic\EmailBundle\Controller\Api\EmailApiController',
+                'controller'      => \Mautic\EmailBundle\Controller\Api\EmailApiController::class,
             ],
             'mautic_api_sendemail' => [
                 'path'       => '/emails/{id}/send',
@@ -99,7 +99,7 @@ return [
                 'tag'   => 'container.env_var_processor',
             ],
             'mautic.helper.mailbox' => [
-                'class'     => 'Mautic\EmailBundle\MonitoredEmail\Mailbox',
+                'class'     => \Mautic\EmailBundle\MonitoredEmail\Mailbox::class,
                 'arguments' => [
                     'mautic.helper.core_parameters',
                     'mautic.helper.paths',
@@ -182,12 +182,6 @@ return [
                 'class'     => \Mautic\EmailBundle\Stat\StatHelper::class,
                 'arguments' => [
                     'mautic.email.repository.stat',
-                ],
-            ],
-            'mautic.email.helper.request.storage' => [
-                'class'     => \Mautic\EmailBundle\Helper\RequestStorageHelper::class,
-                'arguments' => [
-                    'mautic.helper.cache_storage',
                 ],
             ],
             'mautic.email.helper.stats_collection' => [

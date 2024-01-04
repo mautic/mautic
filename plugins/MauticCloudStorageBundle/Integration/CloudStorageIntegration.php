@@ -13,10 +13,7 @@ abstract class CloudStorageIntegration extends AbstractIntegration
      */
     protected $adapter;
 
-    /**
-     * {@inheritdoc}
-     */
-    public function appendToForm(&$builder, $data, $formArea)
+    public function appendToForm(&$builder, $data, $formArea): void
     {
         if ('features' !== $formArea) {
             return;
@@ -29,16 +26,13 @@ abstract class CloudStorageIntegration extends AbstractIntegration
                 [
                     'label'    => 'mautic.integration.form.provider.settings',
                     'required' => false,
-                    'data'     => (isset($data['provider'])) ? $data['provider'] : [],
+                    'data'     => $data['provider'] ?? [],
                 ]
             );
-        } catch (NoFormNeededException $e) {
+        } catch (NoFormNeededException) {
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getAuthenticationType()
     {
         return 'api';
@@ -54,11 +48,9 @@ abstract class CloudStorageIntegration extends AbstractIntegration
     /**
      * Retrieves FQCN form type class name.
      *
-     * @return string
-     *
      * @throws NoFormNeededException
      */
-    abstract public function getForm();
+    abstract public function getForm(): string;
 
     /**
      * Retrieves the public URL for a given key.
@@ -69,9 +61,6 @@ abstract class CloudStorageIntegration extends AbstractIntegration
      */
     abstract public function getPublicUrl($key);
 
-    /**
-     * {@inheritdoc}
-     */
     public function getSupportedFeatures()
     {
         return ['cloud_storage'];

@@ -8,7 +8,7 @@ use Mautic\EmailBundle\Entity\EmailRepository;
 
 class CampaignTest extends \PHPUnit\Framework\TestCase
 {
-    public function testHasUnpublishedEmail()
+    public function testHasUnpublishedEmail(): void
     {
         $campaignId         = 1;
         $campaignRepository = $this->createMock(CampaignRepository::class);

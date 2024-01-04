@@ -16,15 +16,14 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 class UpdateLeadListsCommand extends ModeratedCommand
 {
     public const NAME = 'mautic:segments:update';
-    private TranslatorInterface $translator;
-    private ListModel $listModel;
 
-    public function __construct(ListModel $listModel, TranslatorInterface $translator, PathsHelper $pathsHelper, CoreParametersHelper $coreParametersHelper)
-    {
+    public function __construct(
+        private ListModel $listModel,
+        private TranslatorInterface $translator,
+        PathsHelper $pathsHelper,
+        CoreParametersHelper $coreParametersHelper
+    ) {
         parent::__construct($pathsHelper, $coreParametersHelper);
-
-        $this->listModel  = $listModel;
-        $this->translator = $translator;
     }
 
     protected function configure()
@@ -141,5 +140,6 @@ class UpdateLeadListsCommand extends ModeratedCommand
             );
         }
     }
+
     protected static $defaultDescription = 'Update contacts in smart segments based on new contact data.';
 }

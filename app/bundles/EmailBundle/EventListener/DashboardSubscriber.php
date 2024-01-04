@@ -54,26 +54,16 @@ class DashboardSubscriber extends MainDashboardSubscriber
         'email:emails:viewother',
     ];
 
-    /**
-     * @var EmailModel
-     */
-    protected $emailModel;
-
-    /**
-     * @var RouterInterface
-     */
-    private $router;
-
-    public function __construct(EmailModel $emailModel, RouterInterface $router)
-    {
-        $this->emailModel = $emailModel;
-        $this->router     = $router;
+    public function __construct(
+        protected EmailModel $emailModel,
+        private RouterInterface $router
+    ) {
     }
 
     /**
      * Set a widget detail when needed.
      */
-    public function onWidgetDetailGenerate(WidgetDetailEvent $event)
+    public function onWidgetDetailGenerate(WidgetDetailEvent $event): void
     {
         $this->checkPermissions($event);
         $canViewOthers = $event->hasPermission('email:emails:viewother');
@@ -217,21 +207,19 @@ class DashboardSubscriber extends MainDashboardSubscriber
                 $items = [];
 
                 // Build table rows with links
-                if ($emails) {
-                    foreach ($emails as &$email) {
-                        $emailUrl = $this->router->generate('mautic_email_action', ['objectAction' => 'view', 'objectId' => $email['id']]);
-                        $row      = [
-                            [
-                                'value' => $email['name'],
-                                'type'  => 'link',
-                                'link'  => $emailUrl,
-                            ],
-                            [
-                                'value' => $email['count'],
-                            ],
-                        ];
-                        $items[] = $row;
-                    }
+                foreach ($emails as &$email) {
+                    $emailUrl = $this->router->generate('mautic_email_action', ['objectAction' => 'view', 'objectId' => $email['id']]);
+                    $row      = [
+                        [
+                            'value' => $email['name'],
+                            'type'  => 'link',
+                            'link'  => $emailUrl,
+                        ],
+                        [
+                            'value' => $email['count'],
+                        ],
+                    ];
+                    $items[] = $row;
                 }
 
                 $event->setTemplateData([
@@ -261,21 +249,19 @@ class DashboardSubscriber extends MainDashboardSubscriber
                 $items = [];
 
                 // Build table rows with links
-                if ($emails) {
-                    foreach ($emails as &$email) {
-                        $emailUrl = $this->router->generate('mautic_email_action', ['objectAction' => 'view', 'objectId' => $email['id']]);
-                        $row      = [
-                            [
-                                'value' => $email['name'],
-                                'type'  => 'link',
-                                'link'  => $emailUrl,
-                            ],
-                            [
-                                'value' => $email['count'],
-                            ],
-                        ];
-                        $items[] = $row;
-                    }
+                foreach ($emails as &$email) {
+                    $emailUrl = $this->router->generate('mautic_email_action', ['objectAction' => 'view', 'objectId' => $email['id']]);
+                    $row      = [
+                        [
+                            'value' => $email['name'],
+                            'type'  => 'link',
+                            'link'  => $emailUrl,
+                        ],
+                        [
+                            'value' => $email['count'],
+                        ],
+                    ];
+                    $items[] = $row;
                 }
 
                 $event->setTemplateData([
@@ -305,24 +291,22 @@ class DashboardSubscriber extends MainDashboardSubscriber
                 $items = [];
 
                 // Build table rows with links
-                if ($emails) {
-                    foreach ($emails as &$email) {
-                        $emailUrl = $this->router->generate(
-                            'mautic_email_action',
-                            [
-                                'objectAction' => 'view',
-                                'objectId'     => $email['id'],
-                            ]
-                        );
-                        $row = [
-                            [
-                                'value' => $email['name'],
-                                'type'  => 'link',
-                                'link'  => $emailUrl,
-                            ],
-                        ];
-                        $items[] = $row;
-                    }
+                foreach ($emails as &$email) {
+                    $emailUrl = $this->router->generate(
+                        'mautic_email_action',
+                        [
+                            'objectAction' => 'view',
+                            'objectId'     => $email['id'],
+                        ]
+                    );
+                    $row = [
+                        [
+                            'value' => $email['name'],
+                            'type'  => 'link',
+                            'link'  => $emailUrl,
+                        ],
+                    ];
+                    $items[] = $row;
                 }
 
                 $event->setTemplateData([
@@ -347,8 +331,7 @@ class DashboardSubscriber extends MainDashboardSubscriber
                     'chartHeight' => $widget->getHeight() - 80,
                     'chartData'   => $this->emailModel->getDeviceGranularityPieChartData(
                         $params['dateFrom'],
-                        $params['dateTo'],
-                        $canViewOthers
+                        $params['dateTo']
                     ),
                 ]);
             }
@@ -360,10 +343,8 @@ class DashboardSubscriber extends MainDashboardSubscriber
 
     /**
      * Count the row limit from the widget height.
-     *
-     * @return int
      */
-    private function getDefaultLimit(Widget $widget)
+    private function getDefaultLimit(Widget $widget): float
     {
         return round((($widget->getHeight() - 80) / 35) - 1);
     }

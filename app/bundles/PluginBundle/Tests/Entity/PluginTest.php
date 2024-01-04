@@ -6,7 +6,7 @@ use Mautic\PluginBundle\Entity\Plugin;
 
 class PluginTest extends \PHPUnit\Framework\TestCase
 {
-    public function testEmptyDescription()
+    public function testEmptyDescription(): void
     {
         $plugin = new Plugin();
         $this->assertNull($plugin->getDescription());
@@ -15,7 +15,7 @@ class PluginTest extends \PHPUnit\Framework\TestCase
         $this->assertFalse($plugin->hasSecondaryDescription());
     }
 
-    public function testSimpleDescription()
+    public function testSimpleDescription(): void
     {
         $description = 'This is the best plugin in the whole galaxy';
         $plugin      = new Plugin();
@@ -26,7 +26,7 @@ class PluginTest extends \PHPUnit\Framework\TestCase
         $this->assertFalse($plugin->hasSecondaryDescription());
     }
 
-    public function testSecondaryDescriptionWithUnixLineEnding()
+    public function testSecondaryDescriptionWithUnixLineEnding(): void
     {
         $description = "This is the best plugin in the whole galaxy\n---\nLearn more about it <a href=\"#\">here</a>";
         $plugin      = new Plugin();
@@ -37,7 +37,7 @@ class PluginTest extends \PHPUnit\Framework\TestCase
         $this->assertTrue($plugin->hasSecondaryDescription());
     }
 
-    public function testSecondaryDescriptionWithWinLineEnding()
+    public function testSecondaryDescriptionWithWinLineEnding(): void
     {
         $description = "This is the best plugin in the whole galaxy\n\r---\n\rLearn more about it <a href=\"#\">here</a>";
         $plugin      = new Plugin();

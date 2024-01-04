@@ -2,6 +2,7 @@
 
 namespace Mautic\CoreBundle\Helper;
 
+use MatthiasMullie\Minify;
 use Symfony\Component\Finder\Finder;
 
 class AssetGenerationHelper
@@ -176,7 +177,7 @@ class AssetGenerationHelper
                         "$assetsFullPath/css",
                         "$assetsFullPath/js",
                     ];
-                    array_walk($checkPaths, function ($path) {
+                    array_walk($checkPaths, function ($path): void {
                         if (!file_exists($path)) {
                             mkdir($path);
                         }
@@ -196,25 +197,11 @@ class AssetGenerationHelper
                                 }
 
                                 if ('css' == $type) {
-                                    $out = fopen($assetFile, 'w');
-
-                                    foreach ($files as $relPath => $details) {
-                                        $content = (new \Minify(new \Minify_Cache_Null()))->combine([$details['fullPath']], [
-                                            'rewriteCssUris'  => false,
-                                            'minifierOptions' => [
-                                                'text/css' => [
-                                                    'currentDir'          => '',
-                                                    'prependRelativePath' => '../../'.dirname($relPath).'/',
-                                                ],
-                                            ],
-                                        ]);
-
-                                        fwrite($out, $content);
-                                    }
-
-                                    fclose($out);
+                                    $minifier = new Minify\CSS(...array_column($files, 'fullPath'));
+                                    $minifier->minify($assetFile);
                                 } else {
-                                    file_put_contents($assetFile, (new \Minify(new \Minify_Cache_Null()))->combine(array_column($files, 'fullPath')));
+                                    $minifier = new Minify\JS(...array_column($files, 'fullPath'));
+                                    $minifier->minify($assetFile);
                                 }
                             }
                         }
@@ -253,10 +240,8 @@ class AssetGenerationHelper
      * @param string $ext
      * @param string $env
      * @param array  $assets
-     *
-     * @return array
      */
-    protected function findAssets($dir, $ext, $env, &$assets)
+    protected function findAssets($dir, $ext, $env, &$assets): array
     {
         $rootPath    = str_replace('\\', '/', $this->pathsHelper->getSystemPath('assets_root').'/');
         $directories = new Finder();
@@ -277,15 +262,13 @@ class AssetGenerationHelper
                 $thisDirectory = str_replace('\\', '/', $directory->getRealPath());
                 $files->files()->depth('0')->name('*.'.$ext)->in($thisDirectory);
 
-                $sort = function (\SplFileInfo $a, \SplFileInfo $b) {
-                    return strnatcmp($a->getRealpath(), $b->getRealpath());
-                };
+                $sort = fn (\SplFileInfo $a, \SplFileInfo $b): int => strnatcmp($a->getRealpath(), $b->getRealpath());
                 $files->sort($sort);
 
                 foreach ($files as $file) {
                     $fullPath = $file->getPathname();
                     $relPath  = str_replace($rootPath, '', $file->getPathname());
-                    if (0 === strpos($relPath, '/')) {
+                    if (str_starts_with($relPath, '/')) {
                         $relPath = substr($relPath, 1);
                     }
 
@@ -312,9 +295,7 @@ class AssetGenerationHelper
         $files = new Finder();
         $files->files()->depth('0')->ignoreDotFiles(true)->name('*.'.$ext)->in($dir);
 
-        $sort = function (\SplFileInfo $a, \SplFileInfo $b) {
-            return strnatcmp($a->getRealpath(), $b->getRealpath());
-        };
+        $sort = fn (\SplFileInfo $a, \SplFileInfo $b): int => strnatcmp($a->getRealpath(), $b->getRealpath());
         $files->sort($sort);
 
         foreach ($files as $file) {
@@ -343,10 +324,8 @@ class AssetGenerationHelper
 
     /**
      * Find asset overrides in the template.
-     *
-     * @return array
      */
-    protected function findOverrides($env, &$assets)
+    protected function findOverrides($env, &$assets): array
     {
         $rootPath      = $this->pathsHelper->getSystemPath('assets_root');
         $currentTheme  = $this->pathsHelper->getSystemPath('current_theme');

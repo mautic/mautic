@@ -16,6 +16,7 @@ use Mautic\CoreBundle\Service\FlashBag;
 use Mautic\CoreBundle\Translation\Translator;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\FormFactoryInterface;
+use Symfony\Component\Form\SubmitButton;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
@@ -23,12 +24,19 @@ use Symfony\Component\HttpFoundation\Response;
 
 class CategoryController extends AbstractFormController
 {
-    private FormFactoryInterface $formFactory;
-
-    public function __construct(FormFactoryInterface $formFactory, ManagerRegistry $doctrine, MauticFactory $factory, ModelFactory $modelFactory, UserHelper $userHelper, CoreParametersHelper $coreParametersHelper, EventDispatcherInterface $dispatcher, Translator $translator, FlashBag $flashBag, RequestStack $requestStack, CorePermissions $security)
-    {
-        $this->formFactory = $formFactory;
-
+    public function __construct(
+        private FormFactoryInterface $formFactory,
+        ManagerRegistry $doctrine,
+        MauticFactory $factory,
+        ModelFactory $modelFactory,
+        UserHelper $userHelper,
+        CoreParametersHelper $coreParametersHelper,
+        EventDispatcherInterface $dispatcher,
+        Translator $translator,
+        FlashBag $flashBag,
+        RequestStack $requestStack,
+        CorePermissions $security
+    ) {
         parent::__construct($doctrine, $factory, $modelFactory, $userHelper, $coreParametersHelper, $dispatcher, $translator, $flashBag, $requestStack, $security);
     }
 
@@ -315,7 +323,22 @@ class CategoryController extends AbstractFormController
         } elseif (!$this->security->isGranted($model->getPermissionBase($bundle).':view')) {
             return $this->modalAccessDenied();
         } elseif ($model->isLocked($entity)) {
-            return $this->modalAccessDenied();
+            $viewParams = [
+                'page'   => $session->get('mautic.category.page', 1),
+                'bundle' => $bundle,
+            ];
+            $postActionVars = [
+                'returnUrl'       => $this->generateUrl('mautic_category_index', $viewParams),
+                'viewParameters'  => $viewParams,
+                'contentTemplate' => 'Mautic\CategoryBundle\Controller\CategoryController::indexAction',
+                'passthroughVars' => [
+                    'activeLink'    => 'mautic_'.$bundle.'category_index',
+                    'mauticContent' => 'category',
+                    'closeModal'    => 1,
+                ],
+            ];
+
+            return $this->isLocked($postActionVars, $entity, 'category.category');
         }
 
         // Create the form
@@ -347,7 +370,9 @@ class CategoryController extends AbstractFormController
                         ]
                     );
 
-                    if ($form->get('buttons')->get('apply')->isClicked()) {
+                    /** @var SubmitButton $applySubmitButton */
+                    $applySubmitButton = $form->get('buttons')->get('apply');
+                    if ($applySubmitButton->isClicked()) {
                         // Rebuild the form with new action so that apply doesn't keep creating a clone
                         $action = $this->generateUrl(
                             'mautic_category_action',

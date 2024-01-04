@@ -9,32 +9,18 @@ use Symfony\Component\Routing\RouterInterface;
 
 class FieldValueTransformer
 {
-    /**
-     * @var RouterInterface
-     */
-    private $router;
+    private array $contactFieldsToUpdate = [];
 
-    /**
-     * @var array
-     */
-    private $contactFieldsToUpdate = [];
+    private array $tokensToUpdate = [];
 
-    /**
-     * @var array
-     */
-    private $tokensToUpdate = [];
+    private bool $isTransformed = false;
 
-    /**
-     * @var bool
-     */
-    private $isTransformed = false;
-
-    public function __construct(RouterInterface $router)
-    {
-        $this->router = $router;
+    public function __construct(
+        private RouterInterface $router
+    ) {
     }
 
-    public function transformValuesAfterSubmit(SubmissionEvent $submissionEvent)
+    public function transformValuesAfterSubmit(SubmissionEvent $submissionEvent): void
     {
         if (true === $this->isTransformed) {
             return;
@@ -95,10 +81,8 @@ class FieldValueTransformer
 
     /**
      * @deprecated will be removed in Mautic 4. This should have been a private method. Not actually needed.
-     *
-     * @return bool
      */
-    public function isIsTransformed()
+    public function isIsTransformed(): bool
     {
         return $this->isTransformed;
     }

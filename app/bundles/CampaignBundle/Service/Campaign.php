@@ -7,30 +7,18 @@ use Mautic\EmailBundle\Entity\EmailRepository;
 
 class Campaign
 {
-    /**
-     * @var CampaignRepository
-     */
-    private $campaignRepository;
-
-    /**
-     * @var EmailRepository
-     */
-    private $emailRepository;
-
-    public function __construct(CampaignRepository $campaignRepository, EmailRepository $emailRepository)
-    {
-        $this->campaignRepository = $campaignRepository;
-        $this->emailRepository    = $emailRepository;
+    public function __construct(
+        private CampaignRepository $campaignRepository,
+        private EmailRepository $emailRepository
+    ) {
     }
 
     /**
      * Has campaign at least one unpublished e-mail?
      *
      * @param int $id
-     *
-     * @return bool
      */
-    public function hasUnpublishedEmail($id)
+    public function hasUnpublishedEmail($id): bool
     {
         $emailIds = $this->campaignRepository->fetchEmailIdsById($id);
 

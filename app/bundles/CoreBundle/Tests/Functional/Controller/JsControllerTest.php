@@ -38,6 +38,6 @@ final class JsControllerTest extends MauticMysqlTestCase
         $this->client->request('GET', '/mtc.js');
         Assert::assertSame(Response::HTTP_OK, $this->client->getResponse()->getStatusCode());
         Assert::assertStringContainsString('https://www.googletagmanager.com/gtag/js?id=G-F3825DS9CD', $this->client->getResponse()->getContent());
-        Assert::assertStringContainsString('gtag(\'config\',\'G-F3825DS9CD\',{"anonymize_ip":true})', $this->client->getResponse()->getContent());
+        Assert::assertStringContainsString('gtag(\'config\',\'G-F3825DS9CD\',{"anonymize_ip":!0})', $this->client->getResponse()->getContent());
     }
 }

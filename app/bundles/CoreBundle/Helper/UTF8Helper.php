@@ -5,7 +5,9 @@ namespace Mautic\CoreBundle\Helper;
 class UTF8Helper
 {
     public const ICONV_TRANSLIT = 'TRANSLIT';
+
     public const ICONV_IGNORE   = 'IGNORE';
+
     public const WITHOUT_ICONV  = '';
 
     protected static $win1252ToUtf8 = [
@@ -240,7 +242,7 @@ class UTF8Helper
         return self::toUTF8(static::utf8_decode($text, $option));
     }
 
-    public static function UTF8FixWin1252Chars($text)
+    public static function UTF8FixWin1252Chars($text): string
     {
         // If you received an UTF-8 string that was converted from Windows-1252 as it was ISO8859-1
         // (ignoring Windows-1252 chars from 80 to 9F) use this function to fix it.
@@ -258,13 +260,13 @@ class UTF8Helper
         return $str;
     }
 
-    protected static function strlen($text)
+    protected static function strlen($text): int
     {
         return (function_exists('mb_strlen') && ((int) ini_get('mbstring.func_overload')) & 2) ?
             mb_strlen($text, '8bit') : strlen($text);
     }
 
-    public static function normalizeEncoding($encodingLabel)
+    public static function normalizeEncoding($encodingLabel): string
     {
         $encoding     = strtoupper($encodingLabel);
         $encoding     = preg_replace('/[^a-zA-Z0-9\s]/', '', $encoding);

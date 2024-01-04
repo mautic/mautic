@@ -29,7 +29,7 @@ return [
                 'standard_entity' => true,
                 'name'            => 'messages',
                 'path'            => '/messages',
-                'controller'      => 'Mautic\ChannelBundle\Controller\Api\MessageApiController',
+                'controller'      => \Mautic\ChannelBundle\Controller\Api\MessageApiController::class,
             ],
         ],
         'public' => [

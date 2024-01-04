@@ -4,16 +4,11 @@ namespace Mautic\CoreBundle\Form\DataTransformer;
 
 use Symfony\Component\Form\DataTransformerInterface;
 
-/**
- * Class SecondsConversionTransformer.
- */
 class SecondsConversionTransformer implements DataTransformerInterface
 {
-    private $viewFormat;
-
-    public function __construct($viewFormat = 'H')
-    {
-        $this->viewFormat = $viewFormat;
+    public function __construct(
+        private $viewFormat = 'H'
+    ) {
     }
 
     /**
@@ -27,20 +22,13 @@ class SecondsConversionTransformer implements DataTransformerInterface
     {
         $value = (int) $value;
 
-        switch ($this->viewFormat) {
-            case 'i':
-                $value *= 60;
-                break;
-            case 'H':
-                $value *= 3600;
-                break;
-            case 'd':
-                $value *= 86400;
-                break;
-            case 'm':
-                $value *= 2592000;
-                break;
-        }
+        match ($this->viewFormat) {
+            'i'     => $value *= 60,
+            'H'     => $value *= 3600,
+            'd'     => $value *= 86400,
+            'm'     => $value *= 2_592_000,
+            default => $value,
+        };
 
         return $value;
     }
@@ -56,20 +44,13 @@ class SecondsConversionTransformer implements DataTransformerInterface
     {
         $value = (int) $value;
 
-        switch ($this->viewFormat) {
-            case 'i':
-                $value /= 60;
-                break;
-            case 'H':
-                $value /= 3600;
-                break;
-            case 'd':
-                $value /= 86400;
-                break;
-            case 'm':
-                $value /= 2592000;
-                break;
-        }
+        match ($this->viewFormat) {
+            'i'     => $value /= 60,
+            'H'     => $value /= 3600,
+            'd'     => $value /= 86400,
+            'm'     => $value /= 2_592_000,
+            default => $value,
+        };
 
         return $value;
     }

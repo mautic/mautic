@@ -5,6 +5,7 @@ namespace Mautic\CategoryBundle\Tests\Controller;
 use Mautic\CategoryBundle\Entity\Category;
 use Mautic\CategoryBundle\Model\CategoryModel;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
+use Mautic\UserBundle\Model\UserModel;
 use PHPUnit\Framework\Assert;
 use Symfony\Component\HttpFoundation\Request;
 
@@ -69,7 +70,7 @@ class CategoryControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertStringNotContainsString('TestTitleCategoryController2', $clientResponseContent, 'The return must not contain TestTitleCategoryController2');
     }
 
-    public function testNewActionWithInForm()
+    public function testNewActionWithInForm(): void
     {
         $crawler                = $this->client->request(Request::METHOD_GET, 's/categories/category/new');
         $clientResponse         = json_decode($this->client->getResponse()->getContent(), true);
@@ -88,5 +89,25 @@ class CategoryControllerFunctionalTest extends MauticMysqlTestCase
         $body           = json_decode($clientResponse->getContent(), true);
         $this->assertArrayHasKey('categoryId', $body);
         $this->assertArrayHasKey('categoryName', $body);
+    }
+
+    public function testEditLockCategory(): void
+    {
+        /** @var CategoryModel $categoryModel */
+        $categoryModel      = self::$container->get('mautic.category.model.category');
+        /** @var UserModel $userModel */
+        $userModel      = self::$container->get('mautic.user.model.user');
+        $user           = $userModel->getEntity(2);
+
+        $category = new Category();
+        $category->setTitle('New Category');
+        $category->setAlias('category');
+        $category->setBundle('global');
+        $category->setCheckedOutBy($user);
+        $category->setCheckedOut(new \DateTime('now'));
+        $categoryModel->saveEntity($category, false);
+
+        $this->client->request(Request::METHOD_GET, 's/categories/category/edit/'.$category->getId());
+        $this->assertStringContainsString('is currently checked out by', $this->client->getResponse()->getContent());
     }
 }

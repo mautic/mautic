@@ -10,17 +10,15 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class LeadCategoryType extends AbstractType
 {
-    private $categoryModel;
-
-    public function __construct(CategoryModel $categoryModel)
-    {
-        $this->categoryModel = $categoryModel;
+    public function __construct(
+        private CategoryModel $categoryModel
+    ) {
     }
 
-    public function configureOptions(OptionsResolver $resolver)
+    public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults([
-            'choices'           => function (Options $options) {
+            'choices'           => function (Options $options): array {
                 $categories = $this->categoryModel->getLookupResults('global');
                 $choices    = [];
 
