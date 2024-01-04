@@ -791,7 +791,7 @@ class StatRepository extends CommonRepository
                 '('.
                     $this->getEntityManager()->getConnection()->createQueryBuilder()
                     ->select(
-                        'WEEKDAY('."CONVERT_TZ(date_hit, '+00:00', '$timezoneOffset')".') AS hit_day',
+                        'WEEKDAY(TIMESTAMPADD(SECOND, :timezoneOffset, date_hit)) AS hit_day',
                         'count(id) AS hit_count'
                     )
                     ->from(MAUTIC_TABLE_PREFIX.'channel_url_trackables', $cutAlias)
@@ -815,7 +815,7 @@ class StatRepository extends CommonRepository
                 '('.
                     $this->getEntityManager()->getConnection()->createQueryBuilder()
                     ->select(
-                        'WEEKDAY('."CONVERT_TZ(date_sent, '+00:00', '$timezoneOffset')".') AS sent_day',
+                        'WEEKDAY(TIMESTAMPADD(SECOND, :timezoneOffset, date_sent)) AS sent_day',
                         'count(id) AS sent_count',
                     )
                     ->from(MAUTIC_TABLE_PREFIX.'email_stats', $statsAlias)
@@ -833,7 +833,7 @@ class StatRepository extends CommonRepository
                 '('.
                     $this->getEntityManager()->getConnection()->createQueryBuilder()
                     ->select(
-                        'WEEKDAY('."CONVERT_TZ(date_read, '+00:00', '$timezoneOffset')".') AS read_day',
+                        'WEEKDAY(TIMESTAMPADD(SECOND, :timezoneOffset, date_read)) AS read_day',
                         'count(id) AS read_count',
                     )
                     ->from(MAUTIC_TABLE_PREFIX.'email_stats', $statsAlias)
@@ -848,6 +848,7 @@ class StatRepository extends CommonRepository
                 "$readAlias.read_day = $daysAlias.day "
             )
             ->orderBy('day')
+            ->setParameter('timezoneOffset', $timezoneOffset)
             ->setParameter('lead', $lead->getId());
 
         return $queryBuilder->executeQuery()->fetchAllAssociative();
@@ -890,7 +891,7 @@ class StatRepository extends CommonRepository
                 '('.
                     $this->getEntityManager()->getConnection()->createQueryBuilder()
                     ->select(
-                        "TIME_FORMAT(CONVERT_TZ(date_hit, '+00:00', '$timezoneOffset'), '$format') AS hit_hour",
+                        'TIME_FORMAT(TIMESTAMPADD(SECOND, :timezoneOffset, date_hit), :format) AS hit_hour',
                         'count(id) AS hit_count'
                     )
                     ->from(MAUTIC_TABLE_PREFIX.'channel_url_trackables', $cutAlias)
@@ -915,7 +916,7 @@ class StatRepository extends CommonRepository
                 '('.
                     $this->getEntityManager()->getConnection()->createQueryBuilder()
                     ->select(
-                        "TIME_FORMAT(CONVERT_TZ(date_sent, '+00:00', '$timezoneOffset'), '$format') AS sent_hour",
+                        'TIME_FORMAT(TIMESTAMPADD(SECOND, :timezoneOffset, date_sent), :format) AS sent_hour',
                         "COUNT($statsAlias.id) AS sent_count"
                     )
                     ->from(MAUTIC_TABLE_PREFIX.'email_stats', $statsAlias)
@@ -934,7 +935,7 @@ class StatRepository extends CommonRepository
                 '('.
                     $this->getEntityManager()->getConnection()->createQueryBuilder()
                     ->select(
-                        "TIME_FORMAT(CONVERT_TZ(date_read, '+00:00', '$timezoneOffset'), '$format') AS read_hour",
+                        'TIME_FORMAT(TIMESTAMPADD(SECOND, :timezoneOffset, date_read), :format) AS read_hour',
                         "COUNT($statsAlias.id) AS read_count"
                     )
                     ->from(MAUTIC_TABLE_PREFIX.'email_stats', $statsAlias)
@@ -949,6 +950,8 @@ class StatRepository extends CommonRepository
                 "$readAlias.read_hour = $hoursAlias.hour"
             )
             ->orderBy('hour')
+            ->setParameter('timezoneOffset', $timezoneOffset)
+            ->setParameter('format', $format)
             ->setParameter('lead', $lead->getId());
 
         return $queryBuilder->executeQuery()->fetchAllAssociative();

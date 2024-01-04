@@ -84,7 +84,7 @@ class GraphStatsController extends CommonController
         $model                 = $this->getModel('email');
         $statRepository        = $model->getStatRepository();
         $dateTimeHelper        = new DateTimeHelper();
-        $defaultTimezoneOffset = $dateTimeHelper->getLocalTimezoneOffset();
+        $defaultTimezoneOffset = $dateTimeHelper->getLocalTimezoneOffset('Z');
 
         $stats       = $statRepository->getEmailDayStats($lead, $defaultTimezoneOffset);
 
@@ -116,7 +116,7 @@ class GraphStatsController extends CommonController
         $model                 = $this->getModel('email');
         $statRepository        = $model->getStatRepository();
         $dateTimeHelper        = new DateTimeHelper();
-        $defaultTimezoneOffset = $dateTimeHelper->getLocalTimezoneOffset();
+        $defaultTimezoneOffset = $dateTimeHelper->getLocalTimezoneOffset('Z');
 
         $stats = $statRepository->getEmailTimeStats($lead, $defaultTimezoneOffset);
 
