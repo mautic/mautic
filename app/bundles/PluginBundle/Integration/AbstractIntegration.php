@@ -2,6 +2,7 @@
 
 namespace Mautic\PluginBundle\Integration;
 
+use Closure;
 use Doctrine\ORM\EntityManager;
 use GuzzleHttp\Client;
 use GuzzleHttp\Handler\CurlHandler;
@@ -96,8 +97,8 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
 
     protected array $persistIntegrationEntities = [];
 
-    protected array $commandParameters         = [];
-
+    protected array  $commandParameters = [];
+    private Closure $clientFactory;
     public function __construct(
         protected EventDispatcherInterface $dispatcher,
         CacheStorageHelper $cacheStorageHelper,
@@ -119,6 +120,12 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
         $this->cache                  = $cacheStorageHelper->getCache($this->getName());
         $this->session                = (!defined('IN_MAUTIC_CONSOLE')) ? $session : null;
         $this->request                = (!defined('IN_MAUTIC_CONSOLE')) ? $requestStack->getCurrentRequest() : null;
+
+        $this->setClientFactory(fn (array $options) => new Client([
+            'handler' => HandlerStack::create(new CurlHandler([
+                'options' => $options,
+            ])),
+        ]));
     }
 
     public function setCommandParameters(array $params): void
@@ -2440,6 +2447,14 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
     }
 
     /**
+     * @param callable(mixed[]): Client $clientFactory
+     */
+    public function setClientFactory(callable $clientFactory): void
+    {
+        $this->clientFactory = Closure::fromCallable($clientFactory);
+    }
+
+    /**
      * Because so many integrations extend this class and mautic.http.client is not in the
      * constructor at the time of writing, let's just create a new client here. In addition,
      * we add some custom cURL options.
@@ -2448,8 +2463,6 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
      */
     protected function makeHttpClient(array $options): Client
     {
-        return new Client(['handler' => HandlerStack::create(new CurlHandler([
-            'options' => $options,
-        ]))]);
+        return ($this->clientFactory)($options);
     }
 }
