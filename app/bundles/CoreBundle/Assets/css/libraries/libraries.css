@@ -1068,7 +1068,7 @@ html {
 }
 body {
   font-family: "Source Sans 3", Helvetica, Arial, sans-serif;
-  font-size: 13px;
+  font-size: 14px;
   line-height: 1.3856;
   color: var(--text-primary);
   background-color: var(--background);
@@ -14498,21 +14498,16 @@ fieldset[disabled] .twitter-typeahead .tt-input {
 }
 .xdsoft_datetimepicker {
   box-shadow: 0 5px 15px -5px rgba(0, 0, 0, 0.506);
-  background: #fff;
-  border-bottom: 1px solid #bbb;
-  border-left: 1px solid #ccc;
-  border-right: 1px solid #ccc;
-  border-top: 1px solid #ccc;
+  background: var(--layer);
+  border: 1px solid var(--border-subtle);
   color: #333;
-  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
-  padding: 8px;
-  padding-left: 0;
-  padding-top: 2px;
+  padding: 16px;
   position: absolute;
   z-index: 9999;
   -moz-box-sizing: border-box;
   box-sizing: border-box;
   display: none;
+  margin-top: 1px;
 }
 .xdsoft_datetimepicker.xdsoft_rtl {
   padding: 8px 0 8px 8px;
@@ -14565,9 +14560,7 @@ fieldset[disabled] .twitter-typeahead .tt-input {
   display: block;
 }
 .xdsoft_datetimepicker .xdsoft_datepicker {
-  width: 224px;
   float: left;
-  margin-left: 8px;
 }
 .xdsoft_datetimepicker.xdsoft_rtl .xdsoft_datepicker {
   float: right;
@@ -14700,7 +14693,6 @@ fieldset[disabled] .twitter-typeahead .tt-input {
   font-size: 14px;
   line-height: 20px;
   font-weight: bold;
-  background-color: #fff;
   float: left;
   width: 182px;
   text-align: center;
@@ -14766,17 +14758,17 @@ fieldset[disabled] .twitter-typeahead .tt-input {
 }
 .xdsoft_datetimepicker .xdsoft_calendar td,
 .xdsoft_datetimepicker .xdsoft_calendar th {
-  width: 14.2857142%;
+  width: 40px;
   background: #f5f5f5;
-  border: 1px solid #ddd;
   color: #666;
   font-size: 12px;
   text-align: right;
-  vertical-align: middle;
-  padding: 0;
+  vertical-align: bottom;
+  padding: 4px;
   border-collapse: collapse;
   cursor: pointer;
-  height: 25px;
+  height: 40px;
+  transition: background var(--timing), color var(--timing);
 }
 .xdsoft_datetimepicker.xdsoft_showweeks .xdsoft_calendar td,
 .xdsoft_datetimepicker.xdsoft_showweeks .xdsoft_calendar th {
