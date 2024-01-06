@@ -1445,7 +1445,7 @@ blockquote > p:after {
   min-width: 13px;
   order: 2;
 }
-.btn:not(.btn-icon-only) .fa {
+.btn-primary .fa, .btn-secondary .fa, .btn-tertiary .fa {
   padding-left: 30px;
 }
 .btn span, .dropdown-menu > li > a > span {
