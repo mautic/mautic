@@ -2,9 +2,7 @@
     <a href="javascript: void(0);" onclick="Mautic.showNotifications();" class="dropdown-toggle dropdown-notification btn btn-icon-only btn-nospin" data-toggle="dropdown">
         {% set hideClass = updateMessage.isNew or showNewIndicator ? '' : ' hide' %}
         <span class="label label-danger{{ hideClass }}" id="newNotificationIndicator"><i class="fa fa-asterisk"></i></span>
-        <svg width="20" height="20" fill="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-            <path d="M20 17h2v2H2v-2h2v-7a8 8 0 1 1 16 0v7Zm-2 0v-7a6 6 0 1 0-12 0v7h12Zm-9 4h6v2H9v-2Z"></path>
-        </svg>
+        <i class="ri-notification-3-line ri-lg"></i>
     </a>
     <div class="dropdown-menu notifications-panel">
         <div class="panel panel-default content-widget">
@@ -19,7 +17,7 @@
                         updateMessage: updateMessage
                     }) }}
                     {% set class = notifications is not empty ? ' hide' : '' %}
-                    <div class="pr-lg pl-lg pt-lg" style="color: white;">{% trans %}mautic.core.notifications.nothing{% endtrans %}</div>
+                    <div class="pr-lg pl-lg pt-lg" style="color: white;">{% trans %}mautic.core.notifications.nothing{% endtrans %} <i class="ri-focus-2-line"></i></div>
                 </div>
             </div>
             {% set lastNotification = notifications|first %}
