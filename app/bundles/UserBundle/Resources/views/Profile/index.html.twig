@@ -11,11 +11,11 @@
     <div class="col-md-3 bg-white height-auto">
         <div class="pr-lg pt-md pb-md">
             {% if me.getId() %}
-            <div class="media row center">
+            <div class="media flex-row">
                 <div class="pull-left">
                     <img class="img-rounded img-bordered media-object" src="{{ gravatarGetImage(me.getEmail()) }}" alt="" width="65px">
                 </div>
-                <div class="center">
+                <div class="row-wrapper">
                     <h4>{{ me.getName() }}</h4>
                     <div>{{ me.getPosition() }}</div>
                 </div>
