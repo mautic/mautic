@@ -180,7 +180,7 @@
 }
 
 .marketplace-card-container {
-  width: calc(33% - 30px);
+  width: calc(33% - 14px);
   height: 300px;
   padding: 30px;
   background: #F8F8F8;
@@ -193,7 +193,7 @@
 
 @media (max-width: 1390px) {
   .marketplace-card-container {
-    width: calc(50% - 30px);
+    width: calc(50% - 13px);
   }
 }
 
