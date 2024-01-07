@@ -1085,7 +1085,7 @@ textarea {
 a {
   color: var(--link-primary);
   text-decoration: none;
-  font-weight: bold;
+  font-weight: 600;
   transition: color var(--timing);
 }
 a:not(.btn):hover, a:not(.btn):focus {
