@@ -112,7 +112,7 @@
   --heading-04: 16px;
   --heading-05: 14px;
   --heading-06: 12px;
-  --letter-spacing-p: 0;
+  --letter-spacing-p: -0.1px;
   --letter-spacing-h1: -2px;
   --letter-spacing-h2: -1.5px;
   --letter-spacing-h3: -1px;
@@ -4936,7 +4936,7 @@ label.required:after {
   padding: 0 16px 0 64px;
 }
 .search-container.active i {
-  color: #4E5D9D;
+  color: var(--icon-on-color);
 }
 .col-actions {
   width: 100px;
