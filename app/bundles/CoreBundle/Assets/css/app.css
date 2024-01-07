@@ -1599,6 +1599,9 @@ blockquote > p:after {
   justify-content: space-between;
   flex-grow: 1;
 }
+.timeline-icon a span {
+  justify-content: center;
+}
 .btn > .caret {
   margin-top: -1px;
 }
@@ -1973,6 +1976,7 @@ ul.dropdown-menu-form {
 }
 .nav-tabs > li > a {
   line-height: 20px;
+  padding: 10px 18px;
 }
 .nav-tabs > li.active > a {
   overflow: hidden;

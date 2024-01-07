@@ -1593,8 +1593,8 @@ pre code {
 
 
 .row {
-  display: flex;
-  flex-grow: 1;
+  margin-left: -15px;
+  margin-right: -15px;
 }
 .row-no-gutters {
   margin-right: 0;
@@ -1709,6 +1709,8 @@ pre code {
 .col-lg-12 {
   position: relative;
   min-height: 1px;
+  padding-left: 15px;
+  padding-right: 15px;
 }
 .col-xs-1,
 .col-xs-2,
@@ -3481,6 +3483,7 @@ fieldset[disabled] .btn-success.focus {
   background-color: #2a8d91;
   background-image: none;
   border-color: #278689;
+  outline-color: #195456;
 }
 .btn-info:active:hover,
 .btn-info.active:hover,
@@ -3494,6 +3497,7 @@ fieldset[disabled] .btn-success.focus {
   color: #fff;
   background-color: #227276;
   border-color: #195456;
+  outline-color: #195456;
 }
 .btn-info.disabled:hover,
 .btn-info[disabled]:hover,
@@ -4177,6 +4181,9 @@ select[multiple].input-group-sm > .input-group-btn > .btn {
   color: #596776;
   text-align: center;
   background-color: var(--layer);
+}
+.page-list .input-group-addon {
+  background-color: transparent;
 }
 .input-group-addon.preaddon {
   height: auto;
@@ -5728,6 +5735,8 @@ button.list-group-item-danger.active:focus {
 }
 .panel {
   margin-bottom: 40px;
+  flex-direction: column;
+  display: flex;
 }
 @media (min-width: 1000px) {
   .panel {
@@ -5755,7 +5764,7 @@ button.list-group-item-danger.active:focus {
   color: inherit;
 }
 .panel-footer {
-  padding: 32px 0;
+  padding: 10px 15px;
 }
 .panel > .list-group,
 .panel > .panel-collapse > .list-group {
@@ -14480,7 +14489,7 @@ select[multiple].input-group.input-group-lg .twitter-typeahead .tt-hint {
   border-bottom-right-radius: 4px;
 }
 .twitter-typeahead {
-  width: 100%;
+  width: 95%;
   display: table-cell !important;
   float: left;
 }
