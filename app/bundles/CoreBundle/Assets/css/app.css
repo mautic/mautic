@@ -190,10 +190,25 @@
   gap: 16px;
   display: inline-flex;
 }
+.marketplace .form-inline .input-group {
+  width: calc(50% - 18px);
+  display: flex;
+}
+
+.marketplace-card-container .btn {
+  margin: 0;
+}
+
+.marketplace .form-inline .input-group > .form-control {
+  width: 100%;
+}
 
 @media (max-width: 1390px) {
   .marketplace-card-container {
     width: calc(50% - 13px);
+  }
+  .marketplace .form-inline .input-group {
+    width: 73%;
   }
 }
 
@@ -203,9 +218,7 @@
   }
 }
 
-.marketplace-card-container .btn {
-  margin: 0;
-}
+
 
 .card-content {
   align-self: stretch;
