@@ -14,12 +14,12 @@ class FileLogHandlerTest extends TestCase
     /**
      * @var CoreParametersHelper|MockObject
      */
-    private $coreParametersHelper;
+    private \PHPUnit\Framework\MockObject\MockObject $coreParametersHelper;
 
     /**
      * @var FormatterInterface|MockObject
      */
-    private $formatter;
+    private \PHPUnit\Framework\MockObject\MockObject $formatter;
 
     protected function setUp(): void
     {

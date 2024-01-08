@@ -9,14 +9,9 @@ use Symfony\Contracts\EventDispatcher\Event;
 
 class SyncEvent extends Event
 {
-    /**
-     * @var InputOptionsDAO
-     */
-    private $inputOptionsDAO;
-
-    public function __construct(InputOptionsDAO $inputOptionsDAO)
-    {
-        $this->inputOptionsDAO = $inputOptionsDAO;
+    public function __construct(
+        private InputOptionsDAO $inputOptionsDAO
+    ) {
     }
 
     public function getIntegrationName(): string

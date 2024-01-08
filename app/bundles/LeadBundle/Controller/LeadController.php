@@ -112,10 +112,10 @@ class LeadController extends FormController
         $session->set('mautic.lead.indexmode', $indexMode);
 
         $anonymousShowing = false;
-        if ('list' != $indexMode || ('list' == $indexMode && false === strpos($search, $anonymous))) {
+        if ('list' != $indexMode || ('list' == $indexMode && !str_contains($search, $anonymous))) {
             // remove anonymous leads unless requested to prevent clutter
             $filter['force'] .= " !$anonymous";
-        } elseif (false !== strpos($search, $anonymous) && false === strpos($search, '!'.$anonymous)) {
+        } elseif (str_contains($search, $anonymous) && !str_contains($search, '!'.$anonymous)) {
             $anonymousShowing = true;
         }
 
@@ -229,10 +229,7 @@ class LeadController extends FormController
         );
     }
 
-    /**
-     * @return JsonResponse|Response
-     */
-    public function quickAddAction(Request $request)
+    public function quickAddAction(Request $request): Response
     {
         /** @var \Mautic\LeadBundle\Model\LeadModel $model */
         $model = $this->getModel('lead.lead');
@@ -314,7 +311,6 @@ class LeadController extends FormController
                 'lead:leads:editother',
                 'lead:leads:deleteown',
                 'lead:leads:deleteother',
-                'lead:exports:create',
             ],
             'RETURN_ARRAY'
         );
@@ -364,18 +360,16 @@ class LeadController extends FormController
         $companiesRepo = $companyModel->getRepository();
         $companies     = $companiesRepo->getCompaniesByLeadId($objectId);
         // Set the social profile templates
-        if ($socialProfiles) {
-            foreach ($socialProfiles as $integration => &$details) {
-                if ($integrationObject = $integrationHelper->getIntegrationObject($integration)) {
-                    if ($template = $integrationObject->getSocialProfileTemplate()) {
-                        $details['social_profile_template'] = $template;
-                    }
+        foreach ($socialProfiles as $integration => &$details) {
+            if ($integrationObject = $integrationHelper->getIntegrationObject($integration)) {
+                if ($template = $integrationObject->getSocialProfileTemplate()) {
+                    $details['social_profile_template'] = $template;
                 }
+            }
 
-                if (!isset($details['social_profile_template'])) {
-                    // No profile template found
-                    unset($socialProfiles[$integration]);
-                }
+            if (!isset($details['social_profile_template'])) {
+                // No profile template found
+                unset($socialProfiles[$integration]);
             }
         }
 
@@ -795,7 +789,7 @@ class LeadController extends FormController
     /**
      * Upload an asset.
      */
-    private function uploadAvatar(Request $request, AvatarHelper $avatarHelper, Lead $lead)
+    private function uploadAvatar(Request $request, AvatarHelper $avatarHelper, Lead $lead): void
     {
         $leadInformation = $request->files->get('lead', []);
         $file            = $leadInformation['custom_avatar'] ?? null;
@@ -942,7 +936,7 @@ class LeadController extends FormController
                     // Both leads are good so now we merge them
                     try {
                         $mainLead = $contactMerger->merge($mainLead, $secLead);
-                    } catch (SameContactException $exception) {
+                    } catch (SameContactException) {
                     }
                 }
             }
@@ -1214,10 +1208,8 @@ class LeadController extends FormController
 
     /**
      * Add/remove lead from a list.
-     *
-     * @return JsonResponse|\Symfony\Component\HttpFoundation\Response
      */
-    public function listAction($objectId)
+    public function listAction($objectId): Response
     {
         /** @var \Mautic\LeadBundle\Model\LeadModel $model */
         $model = $this->getModel('lead');
@@ -1254,10 +1246,8 @@ class LeadController extends FormController
 
     /**
      * Add/remove lead from a company.
-     *
-     * @return JsonResponse|\Symfony\Component\HttpFoundation\Response
      */
-    public function companyAction($objectId)
+    public function companyAction($objectId): Response
     {
         /** @var \Mautic\LeadBundle\Model\LeadModel $model */
         $model = $this->getModel('lead');
@@ -1297,10 +1287,8 @@ class LeadController extends FormController
 
     /**
      * Add/remove lead from a campaign.
-     *
-     * @return JsonResponse|\Symfony\Component\HttpFoundation\Response
      */
-    public function campaignAction($objectId)
+    public function campaignAction($objectId): Response
     {
         $model = $this->getModel('lead');
         $lead  = $model->getEntity($objectId);
@@ -1408,6 +1396,12 @@ class LeadController extends FormController
 
                         // To lead
                         $mailer->addTo($leadEmail, $leadName);
+
+                        if (!empty($email[EmailType::REPLY_TO_ADDRESS])) {
+                            $addresses = explode(',', $email[EmailType::REPLY_TO_ADDRESS]);
+
+                            $mailer->setReplyTo($addresses);
+                        }
 
                         // From user
                         $user = $userHelper->getUser();
@@ -1678,17 +1672,11 @@ class LeadController extends FormController
             }
 
             if ($count = count($entities)) {
-                $persistEntities = [];
                 foreach ($entities as $lead) {
                     if ($this->security->hasEntityAccess('lead:leads:editown', 'lead:leads:editother', $lead->getPermissionUser())) {
-                        if ($doNotContact->addDncForContact($lead->getId(), 'email', DoNotContact::MANUAL, $data['reason'])) {
-                            $persistEntities[] = $lead;
-                        }
+                        $doNotContact->addDncForContact($lead->getId(), 'email', DoNotContact::MANUAL, $data['reason']);
                     }
                 }
-
-                // Save entities
-                $model->saveEntities($persistEntities);
             }
 
             $this->addFlashMessage(
@@ -1996,7 +1984,7 @@ class LeadController extends FormController
                 ],
             ];
         } else {
-            if ('list' != $indexMode || ('list' == $indexMode && false === strpos($search, $anonymous))) {
+            if ('list' != $indexMode || ('list' == $indexMode && !str_contains($search, $anonymous))) {
                 // remove anonymous leads unless requested to prevent clutter
                 $filter['force'] .= " !$anonymous";
             }
@@ -2015,9 +2003,7 @@ class LeadController extends FormController
             'withTotalCount' => true,
         ];
 
-        $iterator = new IteratorExportDataModel($model, $args, function ($contact) use ($notAnonymize, $exportHelper) {
-            return $exportHelper->parseLeadToExport($contact, $notAnonymize);
-        });
+        $iterator = new IteratorExportDataModel($model, $args, fn ($contact) => $exportHelper->parseLeadToExport($contact, $notAnonymize));
 
         return $this->exportResultsAs($iterator, $fileType, 'contacts', $exportHelper);
     }
@@ -2078,7 +2064,7 @@ class LeadController extends FormController
 
         try {
             return $model->getExportFileToDownload($fileName);
-        } catch (FileNotFoundException $exception) {
+        } catch (FileNotFoundException) {
             return $this->notFound();
         }
     }

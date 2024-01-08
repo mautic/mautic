@@ -15,7 +15,6 @@ final class Version20230809094201 extends AbstractMauticMigration
 {
     private EntityManagerInterface $entityManager;
 
-
     public function postUp(Schema $schema): void
     {
         $this->entityManager = $this->container->get('doctrine.orm.entity_manager');

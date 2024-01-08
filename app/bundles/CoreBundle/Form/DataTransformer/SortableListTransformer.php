@@ -8,23 +8,13 @@ use Symfony\Component\Form\DataTransformerInterface;
 class SortableListTransformer implements DataTransformerInterface
 {
     /**
-     * @var bool
-     */
-    private $withLabels = true;
-
-    /**
-     * @var bool
-     */
-    private $useKeyValuePairs = false;
-
-    /**
      * @param bool $withLabels
-     * @param bool $atRootLevel
+     * @param bool $useKeyValuePairs
      */
-    public function __construct($withLabels = true, $useKeyValuePairs = false)
-    {
-        $this->withLabels       = $withLabels;
-        $this->useKeyValuePairs = $useKeyValuePairs;
+    public function __construct(
+        private $withLabels = true,
+        private $useKeyValuePairs = false
+    ) {
     }
 
     /**
@@ -69,10 +59,7 @@ class SortableListTransformer implements DataTransformerInterface
         return $array;
     }
 
-    /**
-     * @return array
-     */
-    private function transformKeyValuePair($array)
+    private function transformKeyValuePair($array): array
     {
         if (null === $array) {
             return ['list' => []];
@@ -90,10 +77,7 @@ class SortableListTransformer implements DataTransformerInterface
         return ['list' => $formattedArray];
     }
 
-    /**
-     * @return array
-     */
-    private function reverseTransformKeyValuePair($array)
+    private function reverseTransformKeyValuePair($array): array
     {
         if (null === $array || !isset($array['list'])) {
             return [];

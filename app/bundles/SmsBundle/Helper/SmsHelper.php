@@ -4,60 +4,27 @@ namespace Mautic\SmsBundle\Helper;
 
 use Doctrine\ORM\EntityManager;
 use libphonenumber\PhoneNumberFormat;
+use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\PhoneNumberHelper;
 use Mautic\LeadBundle\Entity\DoNotContact as DoNotContactEntity;
 use Mautic\LeadBundle\Entity\LeadRepository;
 use Mautic\LeadBundle\Model\DoNotContact;
 use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\PluginBundle\Helper\IntegrationHelper;
+use Mautic\SmsBundle\Form\Type\ConfigType;
 use Mautic\SmsBundle\Model\SmsModel;
 
 class SmsHelper
 {
-    /**
-     * @var EntityManager
-     */
-    protected $em;
-
-    /**
-     * @var LeadModel
-     */
-    protected $leadModel;
-
-    /**
-     * @var PhoneNumberHelper
-     */
-    protected $phoneNumberHelper;
-
-    /**
-     * @var SmsModel
-     */
-    protected $smsModel;
-
-    /**
-     * @var IntegrationHelper
-     */
-    protected $integrationHelper;
-
-    /**
-     * @var DoNotContact
-     */
-    private $doNotContact;
-
     public function __construct(
-        EntityManager $em,
-        LeadModel $leadModel,
-        PhoneNumberHelper $phoneNumberHelper,
-        SmsModel $smsModel,
-        IntegrationHelper $integrationHelper,
-        DoNotContact $doNotContact
+        protected EntityManager $em,
+        protected LeadModel $leadModel,
+        protected PhoneNumberHelper $phoneNumberHelper,
+        protected SmsModel $smsModel,
+        protected IntegrationHelper $integrationHelper,
+        private DoNotContact $doNotContact,
+        private CoreParametersHelper $coreParametersHelper
     ) {
-        $this->em                   = $em;
-        $this->leadModel            = $leadModel;
-        $this->phoneNumberHelper    = $phoneNumberHelper;
-        $this->smsModel             = $smsModel;
-        $this->integrationHelper    = $integrationHelper;
-        $this->doNotContact         = $doNotContact;
     }
 
     public function unsubscribe($number)
@@ -99,14 +66,8 @@ class SmsHelper
         return $this->doNotContact->addDncForContact($lead->getId(), 'sms', DoNotContactEntity::UNSUBSCRIBED);
     }
 
-    /**
-     * @return bool
-     */
-    public function getDisableTrackableUrls()
+    public function getDisableTrackableUrls(): bool
     {
-        $integration = $this->integrationHelper->getIntegrationObject('Twilio');
-        $settings    = $integration->getIntegrationSettings()->getFeatureSettings();
-
-        return !empty($settings['disable_trackable_urls']) ? true : false;
+        return $this->coreParametersHelper->get(ConfigType::SMS_DISABLE_TRACKABLE_URLS);
     }
 }

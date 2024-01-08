@@ -7,7 +7,7 @@ use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigura
 
 use function Symfony\Component\DependencyInjection\Loader\Configurator\ref;
 
-return function (ContainerConfigurator $configurator) {
+return function (ContainerConfigurator $configurator): void {
     $services = $configurator->services()
         ->defaults()
         ->autowire()
@@ -29,8 +29,7 @@ return function (ContainerConfigurator $configurator) {
         ->arg('$authorizeForm', ref('fos_oauth_server.authorize.form'))
         ->arg('$authorizeFormHandler', ref('fos_oauth_server.authorize.form.handler.default'))
         ->arg('$oAuth2Server', ref('fos_oauth_server.server'))
-        ->arg('$clientManager', ref('fos_oauth_server.client_manager.default'))
-    ;
+        ->arg('$clientManager', ref('fos_oauth_server.client_manager.default'));
 
     $services->alias('mautic.api.model.client', \Mautic\ApiBundle\Model\ClientModel::class);
 };

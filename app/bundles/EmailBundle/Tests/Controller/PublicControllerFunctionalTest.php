@@ -10,6 +10,7 @@ use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Entity\Stat;
 use Mautic\EmailBundle\Event\TransportWebhookEvent;
 use Mautic\FormBundle\Entity\Form;
+use Mautic\LeadBundle\Entity\DoNotContact;
 use Mautic\LeadBundle\Entity\Lead;
 use PHPUnit\Framework\Assert;
 use Symfony\Component\HttpFoundation\Response;
@@ -118,6 +119,20 @@ class PublicControllerFunctionalTest extends MauticMysqlTestCase
 
         self::assertStringNotContainsString('form/submit?formId=', $crawler->html());
         $this->assertTrue($this->client->getResponse()->isOk());
+    }
+
+    public function testOneClickUnsubscribeAction(): void
+    {
+        $lead = $this->createLead();
+        $stat = $this->getStat(null, $lead);
+        $this->em->flush();
+        $this->client->request('POST', '/email/unsubscribe/'.$stat->getTrackingHash(), [
+            'List-Unsubscribe' => 'One-Click',
+        ]);
+        $this->assertTrue($this->client->getResponse()->isOk());
+        $dncCollection = $stat->getLead()->getDoNotContact();
+        $this->assertEquals(1, $dncCollection->count());
+        $this->assertEquals(DoNotContact::UNSUBSCRIBED, $dncCollection->first()->getReason());
     }
 
     /**

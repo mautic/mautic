@@ -55,7 +55,7 @@ class SchemaDefinition
                 $options['length'] = $length;
                 break;
             case 'text':
-                $schemaType        = (false !== strpos($alias, 'description')) ? 'text' : 'string';
+                $schemaType        = (str_contains($alias, 'description')) ? 'text' : 'string';
                 $options['length'] = $length;
                 break;
             case 'multiselect':
@@ -86,15 +86,11 @@ class SchemaDefinition
         $length = $schemaDefinition['options']['length'] ?? null;
         $type   = $schemaDefinition['type'] ?? null;
 
-        switch ($type) {
-            case 'string':
-                return $length ?? ClassMetadataBuilder::MAX_VARCHAR_INDEXED_LENGTH;
-
-            case 'text':
-                return $length;
-        }
-
-        return null;
+        return match ($type) {
+            'string' => $length ?? ClassMetadataBuilder::MAX_VARCHAR_INDEXED_LENGTH,
+            'text'   => $length,
+            default  => null,
+        };
     }
 
     /**

@@ -45,6 +45,22 @@
                           <table class="table table-bordered table-striped mb-0">
                               <tbody>
                               {{ include('@MauticCore/Helper/details.html.twig', {'entity': item}) }}
+                              <tr>
+                                  <td width="20%">
+                                      <span class="fw-b">{{ 'mautic.focus.details.views'|trans }}</span>
+                                  </td>
+                                  <td data-focus-total-views-cell>
+                                      <div class="spinner"><i class="fa fa-spin fa-spinner"></i></div>
+                                  </td>
+                              </tr>
+                              <tr>
+                                  <td width="20%">
+                                      <span class="fw-b">{{ 'mautic.focus.details.unique_views'|trans }}</span>
+                                  </td>
+                                  <td data-focus-total-unique-views-cell>
+                                      <div class="spinner"><i class="fa fa-spin fa-spinner"></i></div>
+                                  </td>
+                              </tr>
                               </tbody>
                           </table>
                       </div>

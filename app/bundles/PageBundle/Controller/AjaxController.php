@@ -10,9 +10,6 @@ use Mautic\PageBundle\Model\PageModel;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\HttpFoundation\Request;
 
-/**
- * Class AjaxController.
- */
 class AjaxController extends CommonAjaxController
 {
     use VariantAjaxControllerTrait;
@@ -34,10 +31,7 @@ class AjaxController extends CommonAjaxController
         );
     }
 
-    /**
-     * @return \Symfony\Component\HttpFoundation\JsonResponse
-     */
-    public function pageListAction(Request $request)
+    public function pageListAction(Request $request): \Symfony\Component\HttpFoundation\JsonResponse
     {
         $filter    = InputHelper::clean($request->query->get('filter'));
         $pageModel = $this->getModel('page.page');
@@ -55,10 +49,7 @@ class AjaxController extends CommonAjaxController
         return $this->sendJsonResponse($dataArray);
     }
 
-    /**
-     * @return \Symfony\Component\HttpFoundation\JsonResponse
-     */
-    public function setBuilderContentAction(Request $request)
+    public function setBuilderContentAction(Request $request): \Symfony\Component\HttpFoundation\JsonResponse
     {
         $dataArray = ['success' => 0];
         $entityId  = InputHelper::clean($request->request->get('entity'));
@@ -109,6 +100,6 @@ class AjaxController extends CommonAjaxController
         /** @var \Mautic\PageBundle\Model\PageModel $model */
         $model = $this->getModel('page');
 
-        return $model->getBuilderComponents(null, ['tokens'], $query);
+        return $model->getBuilderComponents(null, ['tokens'], $query ?? '');
     }
 }

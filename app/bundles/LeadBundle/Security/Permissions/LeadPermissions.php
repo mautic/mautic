@@ -33,15 +33,12 @@ class LeadPermissions extends AbstractPermissions
         $this->addStandardPermissions('imports');
     }
 
-    /**
-     * @return string
-     */
-    public function getName()
+    public function getName(): string
     {
         return 'lead';
     }
 
-    public function buildForm(FormBuilderInterface &$builder, array $options, array $data)
+    public function buildForm(FormBuilderInterface &$builder, array $options, array $data): void
     {
         $this->addExtendedFormFields('lead', 'leads', $builder, $data, false);
 
@@ -95,7 +92,7 @@ class LeadPermissions extends AbstractPermissions
         $this->addStandardFormFields($this->getName(), 'imports', $builder, $data);
     }
 
-    public function analyzePermissions(array &$permissions, $allPermissions, $isSecondRound = false)
+    public function analyzePermissions(array &$permissions, $allPermissions, $isSecondRound = false): bool
     {
         parent::analyzePermissions($permissions, $allPermissions, $isSecondRound);
 

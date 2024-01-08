@@ -2,51 +2,8 @@
 
 namespace Mautic\CoreBundle\Helper;
 
-use GuzzleHttp\Client;
-use Monolog\Logger;
-
 class UrlHelper
 {
-    protected ?Client $client;
-    protected ?string $shortnerServiceUrl;
-    protected ?Logger $logger;
-
-    public function __construct(?Client $client = null, ?string $shortnerServiceUrl = null, ?Logger $logger = null)
-    {
-        $this->client             = $client;
-        $this->shortnerServiceUrl = $shortnerServiceUrl;
-        $this->logger             = $logger;
-    }
-
-    /**
-     * Shorten a URL.
-     *
-     * @return mixed
-     */
-    public function buildShortUrl($url)
-    {
-        if (!$this->shortnerServiceUrl) {
-            return $url;
-        }
-
-        try {
-            $response = $this->client->get($this->shortnerServiceUrl.urlencode($url));
-
-            if (200 === $response->getStatusCode()) {
-                return rtrim($response->getBody());
-            } else {
-                $this->logger->warning("Url shortner failed with code {$response->getStatusCode()}: {$response->getBody()}");
-            }
-        } catch (\Exception $exception) {
-            $this->logger->error(
-                $exception->getMessage(),
-                ['exception' => $exception]
-            );
-        }
-
-        return $url;
-    }
-
     /**
      * Append query string to URL.
      *
@@ -91,8 +48,8 @@ class UrlHelper
         $scheme = substr($scheme, 0, strpos($scheme, '/')).($ssl ? 's' : '');
         $port   = $_SERVER['SERVER_PORT'];
         $port   = ((!$ssl && '80' == $port) || ($ssl && '443' == $port)) ? '' : ":$port";
-        $host   = isset($_SERVER['HTTP_HOST']) ? $_SERVER['HTTP_HOST'] : null;
-        $host   = isset($host) ? $host : $_SERVER['SERVER_NAME'].$port;
+        $host   = $_SERVER['HTTP_HOST'] ?? null;
+        $host ??= $_SERVER['SERVER_NAME'].$port;
         $base   = "$scheme://$host".$_SERVER['REQUEST_URI'];
 
         $base = str_replace('/index.php', '', $base);
@@ -147,15 +104,13 @@ class UrlHelper
      * With exception of URLs used as a token default values.
      *
      * @param string $text
-     *
-     * @return array
      */
-    public static function getUrlsFromPlaintext($text, array $contactUrlFields = [])
+    public static function getUrlsFromPlaintext($text, array $contactUrlFields = []): array
     {
         $urls = [];
         // Check if there are any tokens that URL based fields
         foreach ($contactUrlFields as $field) {
-            if (false !== strpos($text, "{contactfield=$field}")) {
+            if (str_contains($text, "{contactfield=$field}")) {
                 $urls[] = "{contactfield=$field}";
             }
         }
@@ -214,19 +169,19 @@ class UrlHelper
      */
     private static function sanitizeUrlScheme($url)
     {
-        $isRelative = 0 === strpos($url, '//');
+        $isRelative = str_starts_with($url, '//');
 
         if ($isRelative) {
             return $url;
         }
 
-        $isMailto = 0 === strpos($url, 'mailto:');
+        $isMailto = str_starts_with($url, 'mailto:');
 
         if ($isMailto) {
             return $url;
         }
 
-        $containSlashes = false !== strpos($url, '://');
+        $containSlashes = str_contains($url, '://');
 
         if (!$containSlashes) {
             $url = sprintf('://%s', $url);
@@ -288,7 +243,7 @@ class UrlHelper
     private static function removeTrailingNonAlphaNumeric($string)
     {
         // Special handling of closing bracket
-        if ('}' === substr($string, -1) && preg_match('/^[^{\r\n]*\}.*?$/', $string)) {
+        if (str_ends_with($string, '}') && preg_match('/^[^{\r\n]*\}.*?$/', $string)) {
             $string = substr($string, 0, -1);
 
             return self::removeTrailingNonAlphaNumeric($string);
@@ -309,10 +264,8 @@ class UrlHelper
      * filter_var($url, FILTER_VALIDATE_URL) allow only alphanumerics [0-9a-zA-Z], the special characters "$-_.+!*'()," [not including the quotes - ed].
      *
      * @param string $url
-     *
-     * @return bool
      */
-    public static function isValidUrl($url)
+    public static function isValidUrl($url): bool
     {
         $path         = parse_url($url, PHP_URL_PATH);
         $encodedPath  = array_map('urlencode', explode('/', $path));
@@ -331,7 +284,7 @@ class UrlHelper
      */
     public static function decodeAmpersands($url)
     {
-        while (false !== strpos($url, '&amp;') || false !== strpos($url, '&#38;') || false !== strpos($url, '&#x26;')) {
+        while (str_contains($url, '&amp;') || str_contains($url, '&#38;') || str_contains($url, '&#x26;')) {
             $url = str_replace(['&amp;', '&#38;', '&#x26;'], '&', $url);
         }
 

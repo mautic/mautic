@@ -19,10 +19,14 @@ class BatchTransport extends AbstractTransport implements TokenTransportInterfac
      * @var array<string, mixed>
      */
     private $transports = []; // @phpstan-ignore-line
+
     private $metadatas  = [];
 
-    public function __construct(private bool $validate = false, private int $maxRecipients = 4, private int $numberToFail = 1)
-    {
+    public function __construct(
+        private bool $validate = false,
+        private int $maxRecipients = 4,
+        private int $numberToFail = 1
+    ) {
         $this->transports['main'] = $this;
     }
 

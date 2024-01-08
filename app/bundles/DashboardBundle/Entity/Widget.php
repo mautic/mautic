@@ -10,9 +10,6 @@ use Mautic\CoreBundle\Helper\InputHelper;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
 
-/**
- * Class Widget.
- */
 class Widget extends FormEntity
 {
     /**
@@ -87,7 +84,7 @@ class Widget extends FormEntity
         parent::__clone();
     }
 
-    public static function loadMetadata(ORM\ClassMetadata $metadata)
+    public static function loadMetadata(ORM\ClassMetadata $metadata): void
     {
         $builder = new ClassMetadataBuilder($metadata);
         $builder->setTable('widgets');
@@ -101,7 +98,7 @@ class Widget extends FormEntity
         $builder->addNullableField('params', Types::ARRAY);
     }
 
-    public static function loadValidatorMetadata(ClassMetadata $metadata)
+    public static function loadValidatorMetadata(ClassMetadata $metadata): void
     {
         $metadata->addPropertyConstraint('type', new NotBlank([
             'message' => 'mautic.core.type.required',
@@ -411,10 +408,7 @@ class Widget extends FormEntity
         return $this->loadTime;
     }
 
-    /**
-     * @return array
-     */
-    public function toArray()
+    public function toArray(): array
     {
         return [
             'name'     => $this->getName(),

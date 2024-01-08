@@ -13,9 +13,9 @@ class TrackableRepository extends CommonRepository
     /**
      * Find redirects that are trackable.
      *
-     * @return mixed
+     * @return mixed[]
      */
-    public function findByChannel($channel, $channelId)
+    public function findByChannel($channel, $channelId): array
     {
         $q          = $this->getEntityManager()->getConnection()->createQueryBuilder();
         $tableAlias = $this->getTableAlias();
@@ -31,7 +31,7 @@ class TrackableRepository extends CommonRepository
             )
             ->setParameter('channel', $channel)
             ->orderBy('r.url')
-            ->execute()
+            ->executeQuery()
             ->fetchAllAssociative();
     }
 
@@ -91,7 +91,7 @@ class TrackableRepository extends CommonRepository
      * @param int  $increaseBy
      * @param bool $unique
      */
-    public function upHitCount($redirectId, $channel, $channelId, $increaseBy = 1, $unique = false)
+    public function upHitCount($redirectId, $channel, $channelId, $increaseBy = 1, $unique = false): void
     {
         $q = $this->getEntityManager()->getConnection()->createQueryBuilder();
 
@@ -110,7 +110,7 @@ class TrackableRepository extends CommonRepository
             $q->set('unique_hits', 'unique_hits + '.(int) $increaseBy);
         }
 
-        $q->execute();
+        $q->executeStatement();
     }
 
     /**
@@ -190,10 +190,7 @@ class TrackableRepository extends CommonRepository
         return (isset($results[0])) ? $results[0]['click_count'] : 0;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getTableAlias()
+    public function getTableAlias(): string
     {
         return 't';
     }

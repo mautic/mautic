@@ -19,12 +19,12 @@ final class InstallCommandTest extends AbstractMauticTestCase
     /**
      * @var MockObject&ComposerHelper
      */
-    private $composerHelper;
+    private \PHPUnit\Framework\MockObject\MockObject $composerHelper;
 
     /**
      * @var MockObject&PackageModel
      */
-    private $packageModel;
+    private \PHPUnit\Framework\MockObject\MockObject $packageModel;
 
     private string $packageName;
 

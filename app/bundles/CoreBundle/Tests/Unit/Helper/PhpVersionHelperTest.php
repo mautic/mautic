@@ -8,7 +8,7 @@ use Mautic\CoreBundle\Helper\PhpVersionHelper;
 
 class PhpVersionHelperTest extends \PHPUnit\Framework\TestCase
 {
-    public function testGetCurrentSemver()
+    public function testGetCurrentSemver(): void
     {
         $helper = new PhpVersionHelper();
 

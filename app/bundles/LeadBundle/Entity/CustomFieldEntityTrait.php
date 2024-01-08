@@ -48,8 +48,8 @@ trait CustomFieldEntityTrait
      */
     public function __call($name, $arguments)
     {
-        $isSetter = 0 === strpos($name, 'set');
-        $isGetter = 0 === strpos($name, 'get');
+        $isSetter = str_starts_with($name, 'set');
+        $isGetter = str_starts_with($name, 'get');
 
         if (($isSetter && array_key_exists(0, $arguments)) || $isGetter) {
             $fieldRequested = mb_strtolower(mb_substr($name, 3));
@@ -63,7 +63,7 @@ trait CustomFieldEntityTrait
         return parent::__call($name, $arguments);
     }
 
-    public function setFields($fields)
+    public function setFields($fields): void
     {
         $this->fields = CustomFieldValueHelper::normalizeValues($fields);
     }
@@ -256,17 +256,14 @@ trait CustomFieldEntityTrait
         }
     }
 
-    /**
-     * @return bool
-     */
-    public function hasFields()
+    public function hasFields(): bool
     {
         return !empty($this->fields);
     }
 
     public function getEventData($key)
     {
-        return (isset($this->eventData[$key])) ? $this->eventData[$key] : null;
+        return $this->eventData[$key] ?? null;
     }
 
     /**

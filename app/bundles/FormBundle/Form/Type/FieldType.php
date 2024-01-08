@@ -23,39 +23,15 @@ class FieldType extends AbstractType
 {
     use FormFieldTrait;
 
-    /**
-     * @var TranslatorInterface
-     */
-    private $translator;
-
-    /**
-     * @var ObjectCollectorInterface
-     */
-    private $objectCollector;
-
-    /**
-     * @var FieldCollectorInterface
-     */
-    private $fieldCollector;
-
-    /**
-     * @var AlreadyMappedFieldCollectorInterface
-     */
-    private $mappedFieldCollector;
-
     public function __construct(
-        TranslatorInterface $translator,
-        ObjectCollectorInterface $objectCollector,
-        FieldCollectorInterface $fieldCollector,
-        AlreadyMappedFieldCollectorInterface $mappedFieldCollector
+        private TranslatorInterface $translator,
+        private ObjectCollectorInterface $objectCollector,
+        private FieldCollectorInterface $fieldCollector,
+        private AlreadyMappedFieldCollectorInterface $mappedFieldCollector
     ) {
-        $this->translator           = $translator;
-        $this->objectCollector      = $objectCollector;
-        $this->fieldCollector       = $fieldCollector;
-        $this->mappedFieldCollector = $mappedFieldCollector;
     }
 
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         // Populate settings
         $cleanMasks = [
@@ -108,9 +84,10 @@ class FieldType extends AbstractType
                 'addIsRequired',
                 'addHtml',
             ];
+
             foreach ($addFields as $f) {
                 if (isset($customParams['builderOptions'][$f])) {
-                    $$f = (bool) $customParams['builderOptions'][$f];
+                    ${$f} = (bool) $customParams['builderOptions'][$f];
                 }
             }
         } else {
@@ -168,9 +145,9 @@ class FieldType extends AbstractType
                 FormFieldConditionType::class,
                 [
                     'label'      => false,
-                    'data'       => isset($options['data']['conditions']) ? $options['data']['conditions'] : [],
+                    'data'       => $options['data']['conditions'] ?? [],
                     'formId'     => $options['data']['formId'],
-                    'parent'     => isset($options['data']['parent']) ? $options['data']['parent'] : null,
+                    'parent'     => $options['data']['parent'] ?? null,
                 ]
             );
         }
@@ -210,7 +187,7 @@ class FieldType extends AbstractType
                         'class'   => 'form-control',
                         'tooltip' => 'mautic.form.field.form.alias.tooltip',
                     ],
-                    'disabled' => (!empty($options['data']['id']) && false === strpos($options['data']['id'], 'new')) ? true : false,
+                    'disabled' => (!empty($options['data']['id']) && !str_contains($options['data']['id'], 'new')) ? true : false,
                     'required' => false,
                 ]
             );
@@ -352,7 +329,7 @@ class FieldType extends AbstractType
         }
 
         if ($addBehaviorFields) {
-            $alwaysDisplay = isset($options['data']['alwaysDisplay']) ? $options['data']['alwaysDisplay'] : false;
+            $alwaysDisplay = $options['data']['alwaysDisplay'] ?? false;
             $builder->add(
                 'alwaysDisplay',
                 YesNoButtonGroupType::class,
@@ -439,13 +416,13 @@ class FieldType extends AbstractType
                 ChoiceType::class,
                 [
                     'choices'     => $fields->toChoices(),
-                    'choice_attr' => function ($val) use ($fields) {
+                    'choice_attr' => function ($val) use ($fields): array {
                         try {
                             $field = $fields->getFieldByKey($val);
                             if ($field->isListType()) {
                                 return ['data-list-type' => 1];
                             }
-                        } catch (FieldNotFoundException $e) {
+                        } catch (FieldNotFoundException) {
                         }
 
                         return [];
@@ -503,7 +480,7 @@ class FieldType extends AbstractType
         );
 
         // Put properties last so that the other values are available to form events
-        $propertiesData = (isset($options['data']['properties'])) ? $options['data']['properties'] : [];
+        $propertiesData = $options['data']['properties'] ?? [];
         if (!empty($options['customParameters'])) {
             $formTypeOptions = array_merge($formTypeOptions, ['data' => $propertiesData]);
             $builder->add('properties', $customParams['formType'], $formTypeOptions);
@@ -615,7 +592,7 @@ class FieldType extends AbstractType
         }
     }
 
-    public function configureOptions(OptionsResolver $resolver)
+    public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults(
             [
@@ -633,21 +610,11 @@ class FieldType extends AbstractType
 
     private function getDefaultMappedField(string $type): string
     {
-        switch ($type) {
-            case 'email':
-                $default = 'email';
-                break;
-            case 'country':
-                $default = 'country';
-                break;
-            case 'tel':
-                $default = 'phone';
-                break;
-            default:
-                $default = '';
-                break;
-        }
-
-        return $default;
+        return match ($type) {
+            'email'   => 'email',
+            'country' => 'country',
+            'tel'     => 'phone',
+            default   => '',
+        };
     }
 }

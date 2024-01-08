@@ -14,12 +14,12 @@ class TransportChainTest extends MauticMysqlTestCase
     /**
      * @var TransportChain|MockObject
      */
-    private $transportChain;
+    private \Mautic\SmsBundle\Sms\TransportChain $transportChain;
 
     /**
      * @var TransportInterface|MockObject
      */
-    private $twilioTransport;
+    private \PHPUnit\Framework\MockObject\MockObject $twilioTransport;
 
     /**
      * Call protected/private method of a class.
@@ -34,7 +34,7 @@ class TransportChainTest extends MauticMysqlTestCase
      */
     public function invokeMethod(&$object, $methodName, array $parameters = [])
     {
-        $reflection = new \ReflectionClass(get_class($object));
+        $reflection = new \ReflectionClass($object::class);
         $method     = $reflection->getMethod($methodName);
         $method->setAccessible(true);
 
@@ -57,7 +57,7 @@ class TransportChainTest extends MauticMysqlTestCase
             ->will($this->returnValue('lol'));
     }
 
-    public function testAddTransport()
+    public function testAddTransport(): void
     {
         $count = count($this->transportChain->getTransports());
 
@@ -66,7 +66,7 @@ class TransportChainTest extends MauticMysqlTestCase
         $this->assertCount($count + 1, $this->transportChain->getTransports());
     }
 
-    public function testSendSms()
+    public function testSendSms(): void
     {
         $this->testAddTransport();
 

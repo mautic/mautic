@@ -4,6 +4,7 @@ namespace Mautic\EmailBundle\Form\Type;
 
 use Mautic\ChannelBundle\Entity\MessageQueue;
 use Mautic\CoreBundle\Form\Type\ButtonGroupType;
+use Mautic\EmailBundle\Helper\MailHelper;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ButtonType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
@@ -15,17 +16,12 @@ use Symfony\Component\Validator\Constraints\NotBlank;
 
 class EmailSendType extends AbstractType
 {
-    /**
-     * @var RouterInterface
-     */
-    private $router;
-
-    public function __construct(RouterInterface $router)
-    {
-        $this->router = $router;
+    public function __construct(
+        private RouterInterface $router
+    ) {
     }
 
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder->add(
             'email',
@@ -54,8 +50,8 @@ class EmailSendType extends AbstractType
                 ButtonGroupType::class,
                 [
                     'choices' => [
-                        'mautic.email.send.emailtype.transactional' => 'transactional',
-                        'mautic.email.send.emailtype.marketing'     => 'marketing',
+                        'mautic.email.send.emailtype.transactional' => MailHelper::EMAIL_TYPE_TRANSACTIONAL,
+                        'mautic.email.send.emailtype.marketing'     => MailHelper::EMAIL_TYPE_MARKETING,
                     ],
                     'label'      => 'mautic.email.send.emailtype',
                     'label_attr' => ['class' => 'control-label'],
@@ -63,7 +59,7 @@ class EmailSendType extends AbstractType
                         'class'   => 'form-control email-type',
                         'tooltip' => 'mautic.email.send.emailtype.tooltip',
                     ],
-                    'data' => (!isset($options['data']['email_type'])) ? 'transactional' : $options['data']['email_type'],
+                    'data' => (!isset($options['data']['email_type'])) ? MailHelper::EMAIL_TYPE_TRANSACTIONAL : $options['data']['email_type'],
                 ]
             );
         }
@@ -176,7 +172,7 @@ class EmailSendType extends AbstractType
         }
     }
 
-    public function configureOptions(OptionsResolver $resolver)
+    public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults(
             [

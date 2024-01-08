@@ -5,9 +5,11 @@ namespace Mautic\CoreBundle\Form\Type;
 use Mautic\CoreBundle\Factory\IpLookupFactory;
 use Mautic\CoreBundle\Form\DataTransformer\ArrayLinebreakTransformer;
 use Mautic\CoreBundle\Form\DataTransformer\ArrayStringTransformer;
+use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\LanguageHelper;
 use Mautic\CoreBundle\IpLookup\AbstractLookup;
 use Mautic\CoreBundle\IpLookup\IpLookupFormInterface;
+use Mautic\CoreBundle\Shortener\Shortener;
 use Mautic\PageBundle\Form\Type\PageListType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
@@ -17,6 +19,7 @@ use Symfony\Component\Form\Extension\Core\Type\NumberType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\Extension\Core\Type\TimezoneType;
+use Symfony\Component\Form\Extension\Core\Type\UrlType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
@@ -27,58 +30,26 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class ConfigType extends AbstractType
 {
-    /**
-     * @var TranslatorInterface
-     */
-    private $translator;
-
-    /**
-     * @var LanguageHelper
-     */
-    private $langHelper;
-
-    /**
-     * @var array
-     */
-    private $supportedLanguages;
-
-    /**
-     * @var IpLookupFactory
-     */
-    private $ipLookupFactory;
-
-    /**
-     * @var AbstractLookup
-     */
-    private $ipLookup;
-
-    /**
-     * @var array
-     */
-    private $ipLookupServices;
+    private array $supportedLanguages;
 
     public function __construct(
-        TranslatorInterface $translator,
-        LanguageHelper $langHelper,
-        IpLookupFactory $ipLookupFactory,
-        array $ipLookupServices,
-        AbstractLookup $ipLookup = null
+        private TranslatorInterface $translator,
+        private LanguageHelper $langHelper,
+        private IpLookupFactory $ipLookupFactory,
+        private ?AbstractLookup $ipLookup,
+        private Shortener $shortenerFactory,
+        private CoreParametersHelper $coreParametersHelper,
     ) {
-        $this->translator          = $translator;
-        $this->langHelper          = $langHelper;
-        $this->ipLookupFactory     = $ipLookupFactory;
-        $this->ipLookup            = $ipLookup;
         $this->supportedLanguages  = $langHelper->getSupportedLanguages();
-        $this->ipLookupServices    = $ipLookupServices;
     }
 
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder->add('last_shown_tab', HiddenType::class);
 
         $builder->add(
             'site_url',
-            TextType::class,
+            UrlType::class,
             [
                 'label'      => 'mautic.core.config.form.site.url',
                 'label_attr' => ['class' => 'control-label'],
@@ -86,7 +57,8 @@ class ConfigType extends AbstractType
                     'class'   => 'form-control',
                     'tooltip' => 'mautic.core.config.form.site.url.tooltip',
                 ],
-                'constraints' => [
+                'default_protocol' => 'https',
+                'constraints'      => [
                     new NotBlank(
                         [
                             'message' => 'mautic.core.value.required',
@@ -501,17 +473,17 @@ class ConfigType extends AbstractType
                     'class'   => 'form-control',
                     'tooltip' => 'mautic.core.config.create.organization.from.ip.lookup.tooltip',
                 ],
-                'data'     => isset($options['data']['ip_lookup_create_organization']) ? (bool) $options['data']['ip_lookup_create_organization'] : false,
+                'data'     => isset($options['data']['ip_lookup_create_organization']) && (bool) $options['data']['ip_lookup_create_organization'],
                 'required' => false,
             ]
         );
 
         $ipLookupFactory = $this->ipLookupFactory;
-        $formModifier    = function (FormEvent $event) use ($ipLookupFactory) {
+        $formModifier    = function (FormEvent $event) use ($ipLookupFactory): void {
             $data = $event->getData();
             $form = $event->getForm();
 
-            $ipServiceName = (isset($data['ip_lookup_service'])) ? $data['ip_lookup_service'] : null;
+            $ipServiceName = $data['ip_lookup_service'] ?? null;
             if ($ipServiceName && $lookupService = $ipLookupFactory->getService($ipServiceName)) {
                 if ($lookupService instanceof IpLookupFormInterface && $formType = $lookupService->getConfigFormService()) {
                     $form->add(
@@ -528,14 +500,14 @@ class ConfigType extends AbstractType
 
         $builder->addEventListener(
             FormEvents::PRE_SET_DATA,
-            function (FormEvent $event) use ($formModifier) {
+            function (FormEvent $event) use ($formModifier): void {
                 $formModifier($event);
             }
         );
 
         $builder->addEventListener(
             FormEvents::PRE_SUBMIT,
-            function (FormEvent $event) use ($formModifier) {
+            function (FormEvent $event) use ($formModifier): void {
                 $formModifier($event);
             }
         );
@@ -560,33 +532,48 @@ class ConfigType extends AbstractType
             ]
         );
 
+        $enabledServices = $this->shortenerFactory->getEnabledServices();
+        $choices         = array_flip(array_map(fn ($enabledService) => $enabledService->getPublicName(), $enabledServices));
+
         $builder->add(
-            'link_shortener_url',
-            TextType::class,
+            Shortener::SHORTENER_SERVICE,
+            ChoiceType::class,
             [
-                'label'      => 'mautic.core.config.form.link.shortener',
-                'label_attr' => ['class' => 'control-label'],
-                'attr'       => [
+                'choices'           => $choices,
+                'label'             => 'mautic.core.config.form.shortener',
+                'required'          => false,
+                'attr'              => [
                     'class'   => 'form-control',
-                    'tooltip' => 'mautic.core.config.form.link.shortener.tooltip',
+                    'tooltip' => 'mautic.core.config.form.shortener.tooltip',
                 ],
-                'required' => false,
             ]
         );
 
         $builder->add(
-            'link_shortener_enable_email',
+            'shortener_email_enable',
             YesNoButtonGroupType::class,
             [
-                'label'      => 'mautic.core.config.form.link.shortener.enable_email',
-                'data'       => (array_key_exists('link_shortener_enable_email', $options['data']) && !empty($options['data']['link_shortener_enable_email'])),
+                'label'      => 'mautic.core.config.form.shortener.enable_email',
+                'data'       => (array_key_exists('shortener_email_enable', $options['data']) && !empty($options['data']['shortener_email_enable'])),
                 'attr'       => [
                     'class'        => 'form-control',
-                    'tooltip'      => 'mautic.core.config.form.link.shortener.enable_email.tooltip',
+                    'tooltip'      => 'mautic.core.config.form.shortener.enable_email.tooltip',
                 ],
             ]
         );
 
+        $builder->add(
+            'shortener_sms_enable',
+            YesNoButtonGroupType::class,
+            [
+                'label'      => 'mautic.core.config.form.shortener.enable_sms',
+                'data'       => (array_key_exists('shortener_sms_enable', $options['data']) && !empty($options['data']['shortener_sms_enable'])),
+                'attr'       => [
+                    'class'        => 'form-control',
+                    'tooltip'      => 'mautic.core.config.form.shortener.enable_sms.tooltip',
+                ],
+            ]
+        );
         $builder->add(
             'max_entity_lock_time',
             NumberType::class,
@@ -713,17 +700,11 @@ class ConfigType extends AbstractType
         );
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function buildView(FormView $view, FormInterface $form, array $options)
+    public function buildView(FormView $view, FormInterface $form, array $options): void
     {
         $view->vars['ipLookupAttribution'] = (null !== $this->ipLookup) ? $this->ipLookup->getAttribution() : '';
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getBlockPrefix()
     {
         return 'coreconfig';
@@ -749,8 +730,9 @@ class ConfigType extends AbstractType
 
     private function getIpServicesChoices(): array
     {
-        $choices = [];
-        foreach ($this->ipLookupServices as $name => $service) {
+        $choices          = [];
+        $ipLookupServices = $this->coreParametersHelper->get('ip_lookup_services') ?? [];
+        foreach ($ipLookupServices as $name => $service) {
             $choices[$service['display_name']] = $name;
         }
 

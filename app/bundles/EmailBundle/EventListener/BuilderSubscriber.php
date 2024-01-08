@@ -27,49 +27,16 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class BuilderSubscriber implements EventSubscriberInterface
 {
-    /**
-     * @var CoreParametersHelper
-     */
-    private $coreParametersHelper;
-
-    /**
-     * @var EmailModel
-     */
-    private $emailModel;
-
-    /**
-     * @var TrackableModel
-     */
-    private $pageTrackableModel;
-
-    /**
-     * @var RedirectModel
-     */
-    private $pageRedirectModel;
-
-    /**
-     * @var TranslatorInterface
-     */
-    private $translator;
-
     public function __construct(
-        CoreParametersHelper $coreParametersHelper,
-        EmailModel $emailModel,
-        TrackableModel $trackableModel,
-        RedirectModel $redirectModel,
-        TranslatorInterface $translator
+        private CoreParametersHelper $coreParametersHelper,
+        private EmailModel $emailModel,
+        private TrackableModel $pageTrackableModel,
+        private RedirectModel $pageRedirectModel,
+        private TranslatorInterface $translator
     ) {
-        $this->coreParametersHelper = $coreParametersHelper;
-        $this->emailModel           = $emailModel;
-        $this->pageTrackableModel   = $trackableModel;
-        $this->pageRedirectModel    = $redirectModel;
-        $this->translator           = $translator;
     }
 
-    /**
-     * @return array
-     */
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             EmailEvents::EMAIL_ON_BUILD => ['onEmailBuild', 0],
@@ -88,7 +55,7 @@ class BuilderSubscriber implements EventSubscriberInterface
         ];
     }
 
-    public function onEmailBuild(EmailBuilderEvent $event)
+    public function onEmailBuild(EmailBuilderEvent $event): void
     {
         if ($event->abTestWinnerCriteriaRequested()) {
             // add AB Test Winner Criteria
@@ -273,7 +240,7 @@ class BuilderSubscriber implements EventSubscriberInterface
         $event->setContent($content);
     }
 
-    public function onEmailGenerate(EmailSendEvent $event)
+    public function onEmailGenerate(EmailSendEvent $event): void
     {
         $idHash = $event->getIdHash();
         $lead   = $event->getLead();
@@ -322,18 +289,11 @@ class BuilderSubscriber implements EventSubscriberInterface
             return;
         }
 
-        // If a link shortener URL is provided, and shortening is enabled for e-mail, use it for shortening URLs in e-mails
-        $shorten_url     = (null != $this->coreParametersHelper->get('link_shortener_url', null) ? true : false);
-        $shorten_enabled = $this->coreParametersHelper->get('link_shortener_enable_email', false);
-        $shorten         = $shorten_url && $shorten_enabled;
+        $shortenEnabled = $this->coreParametersHelper->get('shortener_email_enable', false);
+        $email          = $event->getEmail();
+        $emailId        = $email instanceof Email ? $email->getId() : null;
+        $utmTags        = $email instanceof Email ? $email->getUtmTags() : [];
 
-        $email   = $event->getEmail();
-        $emailId = ($email) ? $email->getId() : null;
-        if (!$email instanceof Email) {
-            $email = $this->emailModel->getEntity($emailId);
-        }
-
-        $utmTags      = $email->getUtmTags();
         $clickthrough = $event->generateClickthrough();
         $trackables   = $this->parseContentForUrls($event, $emailId);
 
@@ -343,9 +303,9 @@ class BuilderSubscriber implements EventSubscriberInterface
         foreach ($trackables as $token => $trackable) {
             $url = ($trackable instanceof Trackable)
                 ?
-                $this->pageTrackableModel->generateTrackableUrl($trackable, $clickthrough, $shorten, $utmTags)
+                $this->pageTrackableModel->generateTrackableUrl($trackable, $clickthrough, $shortenEnabled, $utmTags)
                 :
-                $this->pageRedirectModel->generateRedirectUrl($trackable, $clickthrough, $shorten, $utmTags);
+                $this->pageRedirectModel->generateRedirectUrl($trackable, $clickthrough, $shortenEnabled, $utmTags);
 
             $event->addToken($token, $url);
         }

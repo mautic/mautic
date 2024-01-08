@@ -24,29 +24,11 @@ use Mautic\LeadBundle\Segment\RelativeDate;
 
 class DateOptionFactory
 {
-    /**
-     * @var DateDecorator
-     */
-    private $dateDecorator;
-
-    /**
-     * @var RelativeDate
-     */
-    private $relativeDate;
-
-    /**
-     * @var TimezoneResolver
-     */
-    private $timezoneResolver;
-
     public function __construct(
-        DateDecorator $dateDecorator,
-        RelativeDate $relativeDate,
-        TimezoneResolver $timezoneResolver
+        private DateDecorator $dateDecorator,
+        private RelativeDate $relativeDate,
+        private TimezoneResolver $timezoneResolver
     ) {
-        $this->dateDecorator    = $dateDecorator;
-        $this->relativeDate     = $relativeDate;
-        $this->timezoneResolver = $timezoneResolver;
     }
 
     /**
@@ -69,8 +51,8 @@ class DateOptionFactory
             case 'birthday':
             case 'anniversary':
             case $timeframe && (
-                false !== strpos($timeframe, 'anniversary') ||
-                false !== strpos($timeframe, 'birthday')
+                str_contains($timeframe, 'anniversary') ||
+                str_contains($timeframe, 'birthday')
             ):
                 return new DateAnniversary($this->dateDecorator, $dateOptionParameters);
             case 'today':
@@ -98,9 +80,9 @@ class DateOptionFactory
             case 'year_this':
                 return new DateYearThis($this->dateDecorator, $dateOptionParameters);
             case $timeframe && (
-                false !== strpos($timeframe[0], '-') || // -5 days
-                false !== strpos($timeframe[0], '+') || // +5 days
-                false !== strpos($timeframe, ' ago')    // 5 days ago
+                str_contains($timeframe[0], '-') || // -5 days
+                str_contains($timeframe[0], '+') || // +5 days
+                str_contains($timeframe, ' ago')    // 5 days ago
             ):
                 return new DateRelativeInterval($this->dateDecorator, $originalValue, $dateOptionParameters);
             default:

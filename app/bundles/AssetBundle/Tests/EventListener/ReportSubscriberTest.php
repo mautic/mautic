@@ -20,36 +20,30 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class ReportSubscriberTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var ChannelListHelper
-     */
-    private $channelListHelper;
+    private \Mautic\ChannelBundle\Helper\ChannelListHelper $channelListHelper;
 
     /**
      * @var CompanyReportData|\PHPUnit\Framework\MockObject\MockObject
      */
-    private $companyReportData;
+    private \PHPUnit\Framework\MockObject\MockObject $companyReportData;
 
     /**
      * @var DownloadRepository|\PHPUnit\Framework\MockObject\MockObject
      */
-    private $downloadRepository;
+    private \PHPUnit\Framework\MockObject\MockObject $downloadRepository;
 
     /**
      * @var QueryBuilder|\PHPUnit\Framework\MockObject\MockObject
      */
-    private $queryBuilder;
+    private \PHPUnit\Framework\MockObject\MockObject $queryBuilder;
 
-    /**
-     * @var ReportHelper
-     */
-    private $reportHelper;
+    private \Mautic\ReportBundle\Helper\ReportHelper $reportHelper;
 
     public function setUp(): void
     {
         $this->queryBuilder       = $this->createMock(QueryBuilder::class);
         $this->channelListHelper  = new ChannelListHelper($this->createMock(EventDispatcherInterface::class), $this->createMock(Translator::class));
-        $this->reportHelper       = new ReportHelper();
+        $this->reportHelper       = new ReportHelper($this->createMock(EventDispatcherInterface::class));
         $this->companyReportData  = $this->createMock(CompanyReportData::class);
         $this->downloadRepository = $this->createMock(DownloadRepository::class);
     }

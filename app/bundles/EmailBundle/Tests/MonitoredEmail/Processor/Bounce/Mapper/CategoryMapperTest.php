@@ -15,7 +15,7 @@ class CategoryMapperTest extends \PHPUnit\Framework\TestCase
      * @covers  \Mautic\EmailBundle\MonitoredEmail\Processor\Bounce\Mapper\CategoryMapper::map()
      * @covers  \Mautic\EmailBundle\MonitoredEmail\Processor\Bounce\Definition\Category
      */
-    public function testCategoryIsMapped()
+    public function testCategoryIsMapped(): void
     {
         $category = CategoryMapper::map(Definition::ANTISPAM);
 
@@ -27,7 +27,7 @@ class CategoryMapperTest extends \PHPUnit\Framework\TestCase
      *
      * @covers  \Mautic\EmailBundle\MonitoredEmail\Processor\Bounce\Mapper\CategoryMapper::map()
      */
-    public function testExceptionIsThrownWithUnrecognizedCategory()
+    public function testExceptionIsThrownWithUnrecognizedCategory(): void
     {
         $this->expectException(CategoryNotFound::class);
 

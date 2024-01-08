@@ -15,14 +15,10 @@ use Mautic\LeadBundle\LeadEvents;
 use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\WebhookBundle\Model\WebhookModel;
 use Symfony\Component\EventDispatcher\EventDispatcher;
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class WebhookSubscriberTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var EventDispatcherInterface
-     */
-    private $dispatcher;
+    private \Symfony\Component\EventDispatcher\EventDispatcherInterface $dispatcher;
 
     private LeadModel|\PHPUnit\Framework\MockObject\MockObject $leadModel;
 
@@ -35,15 +31,13 @@ class WebhookSubscriberTest extends \PHPUnit\Framework\TestCase
         $this->leadModel  = $this->createMock(LeadModel::class);
     }
 
-    public function testNewContactEventIsFiredWhenIdentified()
+    public function testNewContactEventIsFiredWhenIdentified(): void
     {
         $this->mockModel->expects($this->once())
             ->method('queueWebhooksByType')
             ->with(
                 $this->callback(
-                    function ($type) {
-                        return LeadEvents::LEAD_POST_SAVE.'_new' === $type;
-                    }
+                    fn ($type) => LeadEvents::LEAD_POST_SAVE.'_new' === $type
                 )
             );
 
@@ -58,7 +52,7 @@ class WebhookSubscriberTest extends \PHPUnit\Framework\TestCase
         $this->dispatcher->dispatch($event, LeadEvents::LEAD_POST_SAVE);
     }
 
-    public function testUpdateContactEventIsFiredWhenUpdatedButWithoutDateIdentified()
+    public function testUpdateContactEventIsFiredWhenUpdatedButWithoutDateIdentified(): void
     {
         $this->mockModel  = $this->createMock(WebhookModel::class);
 
@@ -66,9 +60,7 @@ class WebhookSubscriberTest extends \PHPUnit\Framework\TestCase
             ->method('queueWebhooksByType')
             ->with(
                 $this->callback(
-                    function ($type) {
-                        return LeadEvents::LEAD_POST_SAVE.'_update' === $type;
-                    }
+                    fn ($type) => LeadEvents::LEAD_POST_SAVE.'_update' === $type
                 )
             );
 
@@ -84,7 +76,7 @@ class WebhookSubscriberTest extends \PHPUnit\Framework\TestCase
         $this->dispatcher->dispatch($event, LeadEvents::LEAD_POST_SAVE);
     }
 
-    public function testWebhookIsNotDeliveredIfContactIsAVisitor()
+    public function testWebhookIsNotDeliveredIfContactIsAVisitor(): void
     {
         $this->mockModel  = $this->createMock(WebhookModel::class);
 
@@ -100,10 +92,29 @@ class WebhookSubscriberTest extends \PHPUnit\Framework\TestCase
         $this->dispatcher->dispatch($event, LeadEvents::LEAD_POST_SAVE);
     }
 
+    public function testWebhookIsNotDeliveredIfContactIsWithoutChanges(): void
+    {
+        $mockModel  = $this->createMock(WebhookModel::class);
+        $leadModel  = $this->createMock(LeadModel::class);
+
+        $mockModel->expects($this->exactly(0))
+            ->method('queueWebhooksByType');
+
+        $webhookSubscriber = new WebhookSubscriber($mockModel, $leadModel);
+
+        $this->dispatcher->addSubscriber($webhookSubscriber);
+
+        $lead  = new Lead();
+        $lead->setEmail('test@test.com');
+        $lead->setChanges([]);
+        $event = new LeadEvent($lead, false);
+        $this->dispatcher->dispatch($event, LeadEvents::LEAD_POST_SAVE);
+    }
+
     /**
      * @testdox Test that webhook is queued for channel subscription changes
      */
-    public function testChannelChangeIsPickedUpByWebhook()
+    public function testChannelChangeIsPickedUpByWebhook(): void
     {
         $this->mockModel = $this->getMockBuilder(WebhookModel::class)
             ->disableOriginalConstructor()
@@ -144,7 +155,7 @@ class WebhookSubscriberTest extends \PHPUnit\Framework\TestCase
     /**
      * @testdox Test that webhook is queued for lead company changes
      */
-    public function testLeadCompanyChangeIsPickedUpByWebhook()
+    public function testLeadCompanyChangeIsPickedUpByWebhook(): void
     {
         $this->mockModel = $this->getMockBuilder(WebhookModel::class)
             ->disableOriginalConstructor()
@@ -174,7 +185,7 @@ class WebhookSubscriberTest extends \PHPUnit\Framework\TestCase
         $this->dispatcher->dispatch($event, LeadEvents::LEAD_COMPANY_CHANGE);
     }
 
-    public function testOnCompanySaveAndDelete()
+    public function testOnCompanySaveAndDelete(): void
     {
         $dispatcher       = new EventDispatcher();
         $this->mockModel  = $this->createMock(WebhookModel::class);

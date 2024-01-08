@@ -16,8 +16,9 @@ use Symfony\Component\Validator\Exception\UnexpectedTypeException;
 
 class DsnValidator extends ConstraintValidator
 {
-    public function __construct(private TransportFactory $transportFactory)
-    {
+    public function __construct(
+        private TransportFactory $transportFactory
+    ) {
     }
 
     public function validate($value, Constraint $constraint): void
@@ -36,18 +37,18 @@ class DsnValidator extends ConstraintValidator
 
         try {
             $dsn = MailerDsn::fromString($value);
-        } catch (InvalidArgumentException) {
-            $this->context->addViolation('mautic.email.dsn.invalid_dsn');
+        } catch (InvalidArgumentException $e) {
+            $this->context->addViolation($e->getMessage() ?: 'mautic.email.dsn.invalid_dsn');
 
             return;
         }
 
         try {
             $this->transportFactory->fromDsnObject($dsn);
-        } catch (UnsupportedSchemeException) {
-            $this->context->addViolation('mautic.email.dsn.unsupported_scheme');
-        } catch (ExceptionInterface) {
-            $this->context->addViolation('mautic.email.dsn.invalid_dsn');
+        } catch (UnsupportedSchemeException $e) {
+            $this->context->addViolation($e->getMessage() ?: 'mautic.email.dsn.unsupported_scheme');
+        } catch (ExceptionInterface $e) {
+            $this->context->addViolation($e->getMessage() ?: 'mautic.email.dsn.invalid_dsn');
         }
     }
 }

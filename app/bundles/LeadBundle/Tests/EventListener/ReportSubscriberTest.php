@@ -18,15 +18,18 @@ use Mautic\LeadBundle\Entity\PointsChangeLogRepository;
 use Mautic\LeadBundle\EventListener\ReportSubscriber;
 use Mautic\LeadBundle\Model\CompanyModel;
 use Mautic\LeadBundle\Model\CompanyReportData;
+use Mautic\LeadBundle\Model\FieldModel;
 use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\LeadBundle\Report\FieldsBuilder;
 use Mautic\ReportBundle\Entity\Report;
+use Mautic\ReportBundle\Event\ColumnCollectEvent;
 use Mautic\ReportBundle\Event\ReportBuilderEvent;
 use Mautic\ReportBundle\Event\ReportDataEvent;
 use Mautic\ReportBundle\Event\ReportGeneratorEvent;
 use Mautic\ReportBundle\Event\ReportGraphEvent;
 use Mautic\ReportBundle\Helper\ReportHelper;
 use Mautic\StageBundle\Model\StageModel;
+use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
@@ -35,107 +38,106 @@ class ReportSubscriberTest extends \PHPUnit\Framework\TestCase
     /**
      * @var MockObject|LeadModel
      */
-    private $leadModelMock;
+    private \PHPUnit\Framework\MockObject\MockObject $leadModelMock;
+
+    /**
+     * @var MockObject|FieldModel
+     */
+    private \PHPUnit\Framework\MockObject\MockObject $leadFieldModelMock;
 
     /**
      * @var MockObject|StageModel
      */
-    private $stageModelMock;
+    private \PHPUnit\Framework\MockObject\MockObject $stageModelMock;
 
     /**
      * @var MockObject|CampaignModel
      */
-    private $campaignModelMock;
+    private \PHPUnit\Framework\MockObject\MockObject $campaignModelMock;
 
     /**
      * @var MockObject|EventCollector
      */
-    private $eventCollectorMock;
+    private \PHPUnit\Framework\MockObject\MockObject $eventCollectorMock;
 
     /**
      * @var MockObject|CompanyModel
      */
-    private $companyModelMock;
+    private \PHPUnit\Framework\MockObject\MockObject $companyModelMock;
 
     /**
      * @var MockObject|CompanyReportData
      */
-    private $companyReportDataMock;
+    private \PHPUnit\Framework\MockObject\MockObject $companyReportDataMock;
 
     /**
      * @var MockObject|FieldsBuilder
      */
-    private $fieldsBuilderMock;
+    private \PHPUnit\Framework\MockObject\MockObject $fieldsBuilderMock;
 
     /**
      * @var MockObject|Translator
      */
-    private $translatorMock;
+    private \PHPUnit\Framework\MockObject\MockObject $translatorMock;
 
     /**
      * @var MockObject|ReportGeneratorEvent
      */
-    private $reportGeneratorEventMock;
+    private \PHPUnit\Framework\MockObject\MockObject $reportGeneratorEventMock;
 
     /**
      * @var MockObject|ChannelListHelper
      */
-    private $channelListHelperMock;
+    private \Mautic\ChannelBundle\Helper\ChannelListHelper $channelListHelperMock;
 
-    /**
-     * @var MockObject|ReportHelper
-     */
-    private $reportHelperMock;
+    private \Mautic\ReportBundle\Helper\ReportHelper $reportHelperMock;
 
     /**
      * @var MockObject|CampaignRepository
      */
-    private $campaignRepositoryMock;
+    private \PHPUnit\Framework\MockObject\MockObject $campaignRepositoryMock;
 
     /**
      * @var MockObject|ReportBuilderEvent
      */
-    private $reportBuilderEventMock;
+    private \PHPUnit\Framework\MockObject\MockObject $reportBuilderEventMock;
 
     /**
      * @var MockObject|QueryBuilder
      */
-    private $queryBuilderMock;
+    private \PHPUnit\Framework\MockObject\MockObject $queryBuilderMock;
 
     /**
      * @var MockObject|ExpressionBuilder
      */
-    private $expressionBuilderMock;
+    private \PHPUnit\Framework\MockObject\MockObject $expressionBuilderMock;
 
     /**
      * @var MockObject|ReportGraphEvent
      */
-    private $reportGraphEventMock;
+    private \PHPUnit\Framework\MockObject\MockObject $reportGraphEventMock;
 
     /**
      * @var MockObject|CompanyRepository
      */
-    private $companyRepositoryMock;
+    private \PHPUnit\Framework\MockObject\MockObject $companyRepositoryMock;
 
     /**
      * @var MockObject|PointsChangeLogRepository
      */
-    private $pointsChangeLogRepositoryMock;
+    private \PHPUnit\Framework\MockObject\MockObject $pointsChangeLogRepositoryMock;
 
     /**
      * @var MockObject|ReportMock
      */
-    private $reportMock;
+    private \PHPUnit\Framework\MockObject\MockObject $reportMock;
 
     /**
      * @var MockObject|ReportDataEventMock
      */
-    private $reportDataEventMock;
+    private \PHPUnit\Framework\MockObject\MockObject $reportDataEventMock;
 
-    /**
-     * @var ReportSubscriber
-     */
-    private $reportSubscriber;
+    private \Mautic\LeadBundle\EventListener\ReportSubscriber $reportSubscriber;
 
     /**
      * @var array
@@ -171,6 +173,7 @@ class ReportSubscriberTest extends \PHPUnit\Framework\TestCase
     protected function setUp(): void
     {
         $this->leadModelMock                    = $this->createMock(LeadModel::class);
+        $this->leadFieldModelMock               = $this->createMock(FieldModel::class);
         $this->stageModelMock                   = $this->createMock(StageModel::class);
         $this->campaignModelMock                = $this->createMock(CampaignModel::class);
         $this->eventCollectorMock               = $this->createMock(EventCollector::class);
@@ -181,7 +184,7 @@ class ReportSubscriberTest extends \PHPUnit\Framework\TestCase
         $this->reportGeneratorEventMock         = $this->createMock(ReportGeneratorEvent::class);
         $this->reportDataEventMock              = $this->createMock(ReportDataEvent::class);
         $this->channelListHelperMock            = new ChannelListHelper($this->createMock(EventDispatcherInterface::class), $this->createMock(Translator::class));
-        $this->reportHelperMock                 = new ReportHelper();
+        $this->reportHelperMock                 = new ReportHelper($this->createMock(EventDispatcherInterface::class));
         $this->campaignRepositoryMock           = $this->createMock(CampaignRepository::class);
         $this->reportBuilderEventMock           = $this->createMock(ReportBuilderEvent::class);
         $this->queryBuilderMock                 = $this->createMock(QueryBuilder::class);
@@ -192,6 +195,7 @@ class ReportSubscriberTest extends \PHPUnit\Framework\TestCase
         $this->reportMock                       = $this->createMock(Report::class);
         $this->reportSubscriber                 = new ReportSubscriber(
             $this->leadModelMock,
+            $this->leadFieldModelMock,
             $this->stageModelMock,
             $this->campaignModelMock,
             $this->eventCollectorMock,
@@ -215,7 +219,30 @@ class ReportSubscriberTest extends \PHPUnit\Framework\TestCase
 
         $this->queryBuilderMock->expects($this->any())
             ->method('getQueryPart')
-            ->willReturn([['alias' => 'lp']]);
+            ->willReturnCallback(function ($input) {
+                if ('join' === $input) {
+                    return [
+                        'lp' => [[
+                            'joinType'      => 'left',
+                            'joinTable'     => 'leads',
+                            'joinAlias'     => 'l',
+                            'joinCondition' => 'l.id = lp.lead_id',
+                        ]],
+                        'l' => [[
+                            'joinType'      => 'inner',
+                            'joinTable'     => 'lead_list_leads',
+                            'joinAlias'     => 's',
+                            'joinCondition' => 's.lead_id = l.id',
+                        ]],
+                    ];
+                }
+
+                if ('where' === $input) {
+                    return '(lp.date_added IS NULL OR (lp.date_added BETWEEN :dateFrom AND :dateTo)) AND (s.leadlist_id = :i3csleadlistid))';
+                }
+
+                return [['alias' => 'lp']];
+            });
 
         $this->queryBuilderMock->expects($this->any())
             ->method('from')
@@ -267,7 +294,7 @@ class ReportSubscriberTest extends \PHPUnit\Framework\TestCase
                             'label'           => 'Send email',
                             'description'     => 'Send the selected email to the contact.',
                             'batchEventName'  => 'mautic.email.on_campaign_batch_action',
-                            'formType'        => "Mautic\EmailBundle\Form\Type\EmailSendType",
+                            'formType'        => \Mautic\EmailBundle\Form\Type\EmailSendType::class,
                             'formTypeOptions' => [
                               'update_select'    => 'campaignevent_properties_email',
                               'with_email_types' => true,
@@ -282,7 +309,7 @@ class ReportSubscriberTest extends \PHPUnit\Framework\TestCase
                               'label'                  => 'Clicks email',
                               'description'            => 'Trigger actions when an email is clicked. Connect a Send Email action to the top of this decision.',
                               'eventName'              => 'mautic.email.on_campaign_trigger_decision',
-                              'formType'               => "Mautic\EmailBundle\Form\Type\EmailClickDecisionType",
+                              'formType'               => \Mautic\EmailBundle\Form\Type\EmailClickDecisionType::class,
                               'connectionRestrictions' => [
                                 'source' => [
                                   'action' => [
@@ -313,7 +340,7 @@ class ReportSubscriberTest extends \PHPUnit\Framework\TestCase
     /**
      * @return array<int, array<int, string>>
      */
-    public function eventDataProvider(): array
+    public static function eventDataProvider(): array
     {
         return [
             ['leads'],
@@ -329,7 +356,7 @@ class ReportSubscriberTest extends \PHPUnit\Framework\TestCase
     /**
      * @return array<int, array<int, string>>
      */
-    public function reportGraphEventDataProvider(): array
+    public static function reportGraphEventDataProvider(): array
     {
         return [
             ['leads'],
@@ -780,7 +807,7 @@ class ReportSubscriberTest extends \PHPUnit\Framework\TestCase
                         'log.campaign_id' => [
                             'label' => '',
                             'type'  => 'select',
-                            'list'  => null,
+                            'list'  => [],
                             'alias' => 'campaign_id',
                         ],
                         'log.date_triggered' => [
@@ -1033,5 +1060,89 @@ class ReportSubscriberTest extends \PHPUnit\Framework\TestCase
             ]]);
         $this->reportSubscriber->onReportBuilder($this->reportBuilderEventMock);
         $this->reportSubscriber->onReportDisplay($this->reportDataEventMock);
+    }
+
+    public function testOnReportColumnCollectForCompany(): void
+    {
+        $companyFields  = [
+            'comp.id'   => [
+                'alias' => 'comp_id',
+                'label' => 'mautic.lead.report.company.company_id',
+                'type'  => 'int',
+                'link'  => 'mautic_company_action',
+            ],
+            'companies_lead.is_primary' => [
+                'label' => 'mautic.lead.report.company.is_primary',
+                'type'  => 'bool',
+            ],
+            'companies_lead.date_added' => [
+                'label' => 'mautic.lead.report.company.date_added',
+                'type'  => 'datetime',
+            ],
+        ];
+
+        $columns        = [
+            'comp.id'   => [
+                'alias' => 'comp_id',
+                'label' => 'mautic.lead.report.company.company_id',
+                'type'  => 'int',
+                'link'  => 'mautic_company_action',
+            ],
+        ];
+
+        $columnCollectEvent = new ColumnCollectEvent('company');
+
+        $this->companyReportDataMock->expects($this->once())
+            ->method('getCompanyData')
+            ->willReturn($companyFields);
+
+        $this->reportSubscriber->onReportColumnCollect($columnCollectEvent);
+
+        Assert::assertSame($columns, $columnCollectEvent->getColumns());
+    }
+
+    public function testOnReportColumnCollectForContact(): void
+    {
+        $publishedFields = [
+            [
+                'label'  => 'Email',
+                'type'   => 'string',
+                'alias'  => 'email',
+            ],
+            [
+                'label'  => 'Firstname',
+                'type'   => 'string',
+                'alias'  => 'firstname',
+            ],
+        ];
+
+        $columns          = [
+            'l.email'     => [
+                'label'   => '',
+                'type'    => 'string',
+                'alias'   => 'email',
+            ],
+            'l.firstname' => [
+                'label'   => '',
+                'type'    => 'string',
+                'alias'   => 'firstname',
+            ],
+            'l.id'        => [
+                'label'   => 'mautic.lead.report.contact_id',
+                'type'    => 'int',
+                'link'    => 'mautic_contact_action',
+                'alias'   => 'contactId',
+            ],
+        ];
+
+        $columnCollectEvent = new ColumnCollectEvent('contact');
+
+        $this->leadFieldModelMock->expects($this->once())
+            ->method('getPublishedFieldArrays')
+            ->willReturn($publishedFields);
+
+        $this->reportSubscriber->onReportColumnCollect($columnCollectEvent);
+
+        Assert::assertSame($columns, $columnCollectEvent->getColumns());
     }
 }

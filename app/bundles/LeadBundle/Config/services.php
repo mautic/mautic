@@ -5,7 +5,7 @@ declare(strict_types=1);
 use Mautic\CoreBundle\DependencyInjection\MauticCoreExtension;
 use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
 
-return function (ContainerConfigurator $configurator) {
+return function (ContainerConfigurator $configurator): void {
     $services = $configurator->services()
         ->defaults()
         ->autowire()
@@ -43,4 +43,5 @@ return function (ContainerConfigurator $configurator) {
     $services->alias('mautic.lead.model.segment.action', \Mautic\LeadBundle\Model\SegmentActionModel::class);
     $services->alias('mautic.lead.model.ipaddress', \Mautic\LeadBundle\Model\IpAddressModel::class);
     $services->alias('mautic.lead.model.export_scheduler', \Mautic\LeadBundle\Model\ContactExportSchedulerModel::class);
+    $services->get(\Mautic\LeadBundle\Validator\Constraints\SegmentDateValidator::class)->tag('validator.constraint_validator');
 };

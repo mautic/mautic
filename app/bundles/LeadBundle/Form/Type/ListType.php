@@ -11,6 +11,7 @@ use Mautic\CoreBundle\Form\Validator\Constraints\CircularDependency;
 use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\LeadBundle\Form\DataTransformer\FieldFilterTransformer;
 use Mautic\LeadBundle\Model\ListModel;
+use Mautic\LeadBundle\Validator\Constraints\SegmentDate;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\CollectionType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
@@ -23,20 +24,13 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class ListType extends AbstractType
 {
-    private $translator;
-
-    /**
-     * @var ListModel
-     */
-    private $listModel;
-
-    public function __construct(TranslatorInterface $translator, ListModel $listModel)
-    {
-        $this->translator = $translator;
-        $this->listModel  = $listModel;
+    public function __construct(
+        private TranslatorInterface $translator,
+        private ListModel $listModel
+    ) {
     }
 
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder->addEventSubscriber(new CleanFormSubscriber(['description' => 'html', 'name' => 'clean', 'publicName' => 'clean', 'filter' => 'raw']));
         $builder->addEventSubscriber(new FormExitSubscriber('lead.list', $options));
@@ -139,6 +133,9 @@ class ListType extends AbstractType
                         new CircularDependency([
                             'message' => 'mautic.core.segment.circular_dependency_exists',
                         ]),
+                        new SegmentDate([
+                            'message' => 'mautic.lead.segment.date_invalid',
+                        ]),
                     ],
                 ]
             )->addModelTransformer($filterModalTransformer)
@@ -151,7 +148,7 @@ class ListType extends AbstractType
         }
     }
 
-    public function configureOptions(OptionsResolver $resolver)
+    public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults(
             [
@@ -160,10 +157,7 @@ class ListType extends AbstractType
         );
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function buildView(FormView $view, FormInterface $form, array $options)
+    public function buildView(FormView $view, FormInterface $form, array $options): void
     {
         $view->vars['fields'] = $this->listModel->getChoiceFields();
     }

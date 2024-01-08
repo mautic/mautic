@@ -13,13 +13,14 @@ use MauticPlugin\MauticCrmBundle\Api\CrmApi;
 abstract class CrmAbstractIntegration extends AbstractIntegration
 {
     protected $auth;
+
     protected $helper;
 
-    public function setIntegrationSettings(Integration $settings)
+    public function setIntegrationSettings(Integration $settings): void
     {
         // make sure URL does not have ending /
         $keys = $this->getDecryptedApiKeys($settings);
-        if (isset($keys['url']) && '/' == substr($keys['url'], -1)) {
+        if (isset($keys['url']) && str_ends_with($keys['url'], '/')) {
             $keys['url'] = substr($keys['url'], 0, -1);
             $this->encryptAndSetApiKeys($keys, $settings);
         }
@@ -28,8 +29,6 @@ abstract class CrmAbstractIntegration extends AbstractIntegration
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @return string
      */
     public function getAuthenticationType()
@@ -105,7 +104,7 @@ abstract class CrmAbstractIntegration extends AbstractIntegration
     /**
      * Amend mapped lead data before pushing to CRM.
      */
-    public function amendLeadDataBeforePush(&$mappedData)
+    public function amendLeadDataBeforePush(&$mappedData): void
     {
     }
 
@@ -114,6 +113,7 @@ abstract class CrmAbstractIntegration extends AbstractIntegration
      */
     public function getFetchQuery($config)
     {
+        return null;
     }
 
     /**
@@ -140,10 +140,7 @@ abstract class CrmAbstractIntegration extends AbstractIntegration
         return 'client_secret';
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function sortFieldsAlphabetically()
+    public function sortFieldsAlphabetically(): bool
     {
         return false;
     }
@@ -168,6 +165,7 @@ abstract class CrmAbstractIntegration extends AbstractIntegration
      */
     public function pushLeadActivity($params = [])
     {
+        return null;
     }
 
     /**
@@ -215,7 +213,7 @@ abstract class CrmAbstractIntegration extends AbstractIntegration
                 // inject lead into events
                 foreach ($events as $event) {
                     $link  = '';
-                    $label = (isset($event['eventLabel'])) ? $event['eventLabel'] : $event['eventType'];
+                    $label = $event['eventLabel'] ?? $event['eventType'];
                     if (is_array($label)) {
                         $link  = $label['href'];
                         $label = $label['label'];
@@ -226,21 +224,12 @@ abstract class CrmAbstractIntegration extends AbstractIntegration
                     $activity[$i]['description'] = $link;
                     $activity[$i]['dateAdded']   = $event['timestamp'];
 
-                    // We must keep BC with pre 2.11.0 formatting in order to prevent duplicates
-                    switch ($event['eventType']) {
-                        case 'point.gained':
-                            $id = str_replace($event['eventType'], 'pointChange', $event['eventId']);
-                            break;
-                        case 'form.submitted':
-                            $id = str_replace($event['eventType'], 'formSubmission', $event['eventId']);
-                            break;
-                        case 'email.read':
-                            $id = str_replace($event['eventType'], 'emailStat', $event['eventId']);
-                            break;
-                        default:
-                            // Just to keep congruent formatting with the three above
-                            $id = str_replace(' ', '', ucwords(str_replace('.', ' ', $event['eventId'])));
-                    }
+                    $id = match ($event['eventType']) {
+                        'point.gained'   => str_replace($event['eventType'], 'pointChange', $event['eventId']),
+                        'form.submitted' => str_replace($event['eventType'], 'formSubmission', $event['eventId']),
+                        'email.read'     => str_replace($event['eventType'], 'emailStat', $event['eventId']),
+                        default          => str_replace(' ', '', ucwords(str_replace('.', ' ', $event['eventId']))),
+                    };
 
                     $activity[$i]['id'] = $id;
                     ++$i;
@@ -249,7 +238,7 @@ abstract class CrmAbstractIntegration extends AbstractIntegration
                 ++$page;
 
                 // Lots of entities will be loaded into memory while compiling these events so let's prevent memory overload by clearing the EM
-                $entityToNotDetach = ['Mautic\PluginBundle\Entity\Integration', 'Mautic\PluginBundle\Entity\Plugin'];
+                $entityToNotDetach = [\Mautic\PluginBundle\Entity\Integration::class, \Mautic\PluginBundle\Entity\Plugin::class];
                 $loadedEntities    = $this->em->getUnitOfWork()->getIdentityMap();
                 foreach ($loadedEntities as $name => $loadedEntitySet) {
                     if (!in_array($name, $entityToNotDetach, true)) {
@@ -273,8 +262,6 @@ abstract class CrmAbstractIntegration extends AbstractIntegration
     }
 
     /**
-     * @param null $object
-     *
      * @return Company|null
      */
     public function getMauticCompany($data, $object = null)
@@ -374,12 +361,17 @@ abstract class CrmAbstractIntegration extends AbstractIntegration
                 $uniqueLeadFieldData[$leadField] = $value;
             }
 
-            $fieldType                 = isset($leadFieldTypes[$leadField]['type']) ? $leadFieldTypes[$leadField]['type'] : '';
+            $fieldType                 = $leadFieldTypes[$leadField]['type'] ?? '';
             $matchedFields[$leadField] = $this->limitString($value, $fieldType);
         }
 
         if (count(array_diff_key($uniqueLeadFields, $matchedFields)) == count($uniqueLeadFields)) {
             // return if uniqueIdentifiers have no data set to avoid duplicating leads.
+            $this->logger->debug('getMauticLead: No unique identifiers', [
+                'uniqueLeadFields' => $uniqueLeadFields,
+                'matchedFields'    => $matchedFields,
+            ]);
+
             return;
         }
 
@@ -404,6 +396,8 @@ abstract class CrmAbstractIntegration extends AbstractIntegration
             // Use only prioirty fields if updating
             $fieldsToUpdateInMautic = $this->getPriorityFieldsForMautic($config, $object, 'mautic');
             if (empty($fieldsToUpdateInMautic)) {
+                $this->logger->debug('getMauticLead: No fields to update in Mautic', ['config' => $config, 'object' => $object]);
+
                 return;
             }
 
@@ -470,11 +464,10 @@ abstract class CrmAbstractIntegration extends AbstractIntegration
 
         $fields = ($this->isAuthorized()) ? $this->getAvailableLeadFields($settings) : [];
 
-        return (isset($fields[$object])) ? $fields[$object] : [];
+        return $fields[$object] ?? [];
     }
 
     /**
-     * @param null   $entityObject   Possibly used by the CRM
      * @param string $priorityObject
      *
      * @return array
@@ -488,7 +481,6 @@ abstract class CrmAbstractIntegration extends AbstractIntegration
     }
 
     /**
-     * @param null   $entityObject   Possibly used by the CRM
      * @param string $priorityObject
      *
      * @return array
@@ -526,11 +518,7 @@ abstract class CrmAbstractIntegration extends AbstractIntegration
             return $fieldsToUpdate['leadFields'];
         }
 
-        if (isset($fieldsToUpdate['leadFields'][$objects])) {
-            return $fieldsToUpdate['leadFields'][$objects];
-        }
-
-        return $fieldsToUpdate;
+        return $fieldsToUpdate['leadFields'][$objects] ?? $fieldsToUpdate;
     }
 
     /**

@@ -5,9 +5,6 @@ namespace Mautic\UserBundle\Entity;
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 
-/**
- * Class Permission.
- */
 class Permission
 {
     /**
@@ -35,12 +32,12 @@ class Permission
      */
     protected $bitwise;
 
-    public static function loadMetadata(ORM\ClassMetadata $metadata)
+    public static function loadMetadata(ORM\ClassMetadata $metadata): void
     {
         $builder = new ClassMetadataBuilder($metadata);
 
         $builder->setTable('permissions')
-            ->setCustomRepositoryClass('Mautic\UserBundle\Entity\PermissionRepository')
+            ->setCustomRepositoryClass(\Mautic\UserBundle\Entity\PermissionRepository::class)
             ->addUniqueConstraint(['bundle', 'name', 'role_id'], 'unique_perm');
 
         $builder->addId();
@@ -121,8 +118,6 @@ class Permission
 
     /**
      * Set role.
-     *
-     * @param Role $role
      *
      * @return Permission
      */

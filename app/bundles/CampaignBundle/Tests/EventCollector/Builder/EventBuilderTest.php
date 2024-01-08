@@ -9,7 +9,7 @@ use Mautic\CampaignBundle\EventCollector\Builder\EventBuilder;
 
 class EventBuilderTest extends \PHPUnit\Framework\TestCase
 {
-    public function testActionsAreConvertedToAccessor()
+    public function testActionsAreConvertedToAccessor(): void
     {
         $array = [
             'some.action'  => [
@@ -29,7 +29,7 @@ class EventBuilderTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals('other.action', $converted['other.action']->getBatchEventName());
     }
 
-    public function testConditionsAreConvertedToAccessor()
+    public function testConditionsAreConvertedToAccessor(): void
     {
         $array = [
             'some.condition'  => [
@@ -49,7 +49,7 @@ class EventBuilderTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals('other.condition', $converted['other.condition']->getEventName());
     }
 
-    public function testDecisionsAreConvertedToAccessor()
+    public function testDecisionsAreConvertedToAccessor(): void
     {
         $array = [
             'some.decision'  => [

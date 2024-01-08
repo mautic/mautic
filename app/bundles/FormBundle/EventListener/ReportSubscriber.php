@@ -5,12 +5,13 @@ namespace Mautic\FormBundle\EventListener;
 use Mautic\CoreBundle\Helper\Chart\LineChart;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\FormBundle\Entity\Form;
-use Mautic\FormBundle\Entity\FormRepository;
 use Mautic\FormBundle\Entity\SubmissionRepository;
+use Mautic\FormBundle\Model\FormModel;
 use Mautic\LeadBundle\Model\CompanyReportData;
 use Mautic\ReportBundle\Event\ReportBuilderEvent;
 use Mautic\ReportBundle\Event\ReportGeneratorEvent;
 use Mautic\ReportBundle\Event\ReportGraphEvent;
+use Mautic\ReportBundle\Helper\ReportHelper;
 use Mautic\ReportBundle\ReportEvents;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
@@ -18,37 +19,22 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 class ReportSubscriber implements EventSubscriberInterface
 {
     public const CONTEXT_FORMS           = 'forms';
+
     public const CONTEXT_FORM_SUBMISSION = 'form.submissions';
+
     public const CONTEXT_FORM_RESULT     = 'form.results';
 
-    private CompanyReportData $companyReportData;
-
-    private SubmissionRepository $submissionRepository;
-
-    private FormRepository $formRepository;
-
-    private CoreParametersHelper $coreParametersHelper;
-
-    private TranslatorInterface $translator;
-
     public function __construct(
-        CompanyReportData $companyReportData,
-        SubmissionRepository $submissionRepository,
-        FormRepository $formRepository,
-        CoreParametersHelper $coreParametersHelper,
-        TranslatorInterface $translator
+        private CompanyReportData $companyReportData,
+        private SubmissionRepository $submissionRepository,
+        private FormModel $formModel,
+        private ReportHelper $reportHelper,
+        private CoreParametersHelper $coreParametersHelper,
+        private TranslatorInterface $translator
     ) {
-        $this->companyReportData    = $companyReportData;
-        $this->submissionRepository = $submissionRepository;
-        $this->formRepository       = $formRepository;
-        $this->coreParametersHelper = $coreParametersHelper;
-        $this->translator           = $translator;
     }
 
-    /**
-     * @return array
-     */
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             ReportEvents::REPORT_ON_BUILD          => ['onReportBuilder', 0],
@@ -60,7 +46,7 @@ class ReportSubscriber implements EventSubscriberInterface
     /**
      * Add available tables and columns to the report builder lookup.
      */
-    public function onReportBuilder(ReportBuilderEvent $event)
+    public function onReportBuilder(ReportBuilderEvent $event): void
     {
         if (!$event->checkContext([self::CONTEXT_FORMS, self::CONTEXT_FORM_SUBMISSION, self::CONTEXT_FORM_RESULT])) {
             return;
@@ -135,11 +121,12 @@ class ReportSubscriber implements EventSubscriberInterface
         }
 
         if ($event->checkContext(self::CONTEXT_FORM_RESULT)) {
+            $formRepository = $this->formModel->getRepository();
             // select only the table for an existing report, if the setting is disabled
             if (false === $this->coreParametersHelper->get('form_results_data_sources')) {
                 $reportSource = empty($event->getContext()) ? ($event->getReportSource() ?? '') : $event->getContext();
 
-                $id   = $this->formRepository->getFormTableIdViaResults($reportSource);
+                $id   = $formRepository->getFormTableIdViaResults($reportSource);
                 $args = [
                     'filter' => [
                         'force' => [
@@ -153,22 +140,25 @@ class ReportSubscriber implements EventSubscriberInterface
                 ];
             }
 
-            $forms = $this->formRepository->getEntities($args ?? []);
+            $forms = $formRepository->getEntities($args ?? []);
             foreach ($forms as $form) {
-                $formEntity          = $form[0];
+                $formEntity         = $form[0];
 
                 $formResultsColumns = $this->getFormResultsColumns($formEntity);
-                $leadColumns        = $event->getLeadColumns();
-                $companyColumns     = $this->companyReportData->getCompanyData();
+                $mappedFieldValues  = $formEntity->getMappedFieldValues();
+                $columnsMapped      = [];
+                foreach ($mappedFieldValues as $item) {
+                    $columns        = $this->reportHelper->getMappedObjectColumns($item['mappedObject'], $item);
+                    $columnsMapped  = array_merge($columnsMapped, $columns);
+                }
 
-                $formResultsColumns = array_merge($formResultsColumns, $leadColumns, $companyColumns);
-
-                $data = [
+                $formResultsColumns = array_merge($formResultsColumns, $columnsMapped);
+                $data               = [
                     'display_name' => $formEntity->getId().' '.$formEntity->getName(),
                     'columns'      => $formResultsColumns,
                 ];
 
-                $resultsTableName = $this->formRepository->getResultsTableName($formEntity->getId(), $formEntity->getAlias());
+                $resultsTableName   = $formRepository->getResultsTableName($formEntity->getId(), $formEntity->getAlias());
                 $event->addTable(self::CONTEXT_FORM_RESULT.'.'.$resultsTableName, $data, self::CONTEXT_FORM_RESULT);
             }
         }
@@ -177,7 +167,7 @@ class ReportSubscriber implements EventSubscriberInterface
     /**
      * Initialize the QueryBuilder object to generate reports from.
      */
-    public function onReportGenerate(ReportGeneratorEvent $event)
+    public function onReportGenerate(ReportGeneratorEvent $event): void
     {
         if (!$event->checkContext([self::CONTEXT_FORMS, self::CONTEXT_FORM_SUBMISSION, self::CONTEXT_FORM_RESULT])) {
             return;
@@ -226,7 +216,7 @@ class ReportSubscriber implements EventSubscriberInterface
     /**
      * Initialize the QueryBuilder object to generate reports from.
      */
-    public function onReportGraphGenerate(ReportGraphEvent $event)
+    public function onReportGraphGenerate(ReportGraphEvent $event): void
     {
         // Context check, we only want to fire for Lead reports
         if (!$event->checkContext(self::CONTEXT_FORM_SUBMISSION)) {
@@ -289,11 +279,12 @@ class ReportSubscriber implements EventSubscriberInterface
      */
     private function getFormResultsColumns(Form $form): array
     {
-        $prefix = 'fr.';
-        $fields = $form->getFields();
+        $prefix         = 'fr.';
+        $fields         = $form->getFields();
+        $viewOnlyFields = $this->formModel->getCustomComponents()['viewOnlyFields'];
 
         foreach ($fields as $field) {
-            if ('button' !== $field->getType()) {
+            if (!in_array($field->getType(), $viewOnlyFields)) {
                 $index                      = $prefix.$field->getAlias();
                 $formResultsColumns[$index] = [
                     'label' => $this->translator->trans('mautic.form.report.form_results.label', ['%field%' => $field->getLabel()]),

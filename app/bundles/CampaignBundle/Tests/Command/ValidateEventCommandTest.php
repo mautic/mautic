@@ -7,7 +7,7 @@ use Mautic\CampaignBundle\Executioner\ScheduledExecutioner;
 
 class ValidateEventCommandTest extends AbstractCampaignCommand
 {
-    public function testEventsAreExecutedForInactiveEventWithSingleContact()
+    public function testEventsAreExecutedForInactiveEventWithSingleContact(): void
     {
         $this->runCommand('mautic:campaigns:trigger', ['-i' => 1, '--contact-id' => 1]);
 
@@ -31,7 +31,7 @@ class ValidateEventCommandTest extends AbstractCampaignCommand
         $this->assertCount(0, $byEvent[10]); // the positive path should be 0
     }
 
-    public function testEventsAreExecutedForInactiveEventWithMultipleContact()
+    public function testEventsAreExecutedForInactiveEventWithMultipleContact(): void
     {
         $this->runCommand('mautic:campaigns:trigger', ['-i' => 1, '--contact-ids' => '1,2,3']);
 
@@ -55,7 +55,7 @@ class ValidateEventCommandTest extends AbstractCampaignCommand
         $this->assertCount(0, $byEvent[10]); // the positive path should be 0
     }
 
-    public function testContactsRemovedFromTheCampaignAreNotExecutedForInactiveEvents()
+    public function testContactsRemovedFromTheCampaignAreNotExecutedForInactiveEvents(): void
     {
         $this->runCommand('mautic:campaigns:trigger', ['-i' => 1, '--contact-ids' => '1,2,3']);
 
@@ -74,7 +74,7 @@ class ValidateEventCommandTest extends AbstractCampaignCommand
         $this->db->createQueryBuilder()->update(MAUTIC_TABLE_PREFIX.'campaign_leads')
             ->set('manually_removed', 1)
             ->where('lead_id = 1')
-            ->execute();
+            ->executeStatement();
 
         // Now they should be inactive
         $this->runCommand('mautic:campaigns:validate', ['--decision-id' => 3, '--contact-ids' => '1,2,3']);

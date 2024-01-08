@@ -118,6 +118,93 @@ class ReportSubscriberFunctionalTest extends MauticMysqlTestCase
         ], $graphTableArray);
     }
 
+    public function testEmailReportWithClickThroughColumns(): void
+    {
+        $emails = [
+            $this->createEmail('Email 1'),
+            $this->createEmail('Email 2'),
+        ];
+        $this->em->flush();
+
+        $contacts = [
+            $this->createContact('test1@example.com'),
+            $this->createContact('test2@example.com'),
+            $this->createContact('test3@example.com'),
+        ];
+        $this->em->flush();
+
+        $trackables = [
+            [   // email 1
+                $this->createTrackable('https://example.com/1', $emails[0]->getId()),
+                $this->createTrackable('https://example.com/2', $emails[0]->getId()),
+            ],
+            [   // email 2
+                $this->createTrackable('https://example.com/3', $emails[1]->getId()),
+            ],
+        ];
+        $this->em->flush();
+
+        $statsEmail = [
+            $this->emulateEmailSend($emails[0], $contacts), // email 1
+            $this->emulateEmailSend($emails[1], $contacts), // email 2
+        ];
+
+        $this->emulateEmailRead($statsEmail[0][0]); // email 1
+        $this->emulateEmailRead($statsEmail[0][1]); // email 1
+        $this->emulateEmailRead($statsEmail[1][2]); // email 2
+
+        $this->emulateLinkClick($emails[0], $trackables[0][0], $contacts[0], 3); // email 1
+        $this->emulateLinkClick($emails[0], $trackables[0][1], $contacts[0]);          // email 1
+        $this->emulateLinkClick($emails[1], $trackables[1][0], $contacts[2]);          // email 2
+        $this->em->flush();
+
+        $report = new Report();
+        $report->setName('Email with click through');
+        $report->setSource('emails');
+        $report->setColumns(['e.id', 'e.name', 'e.read_count', 'hits', 'click_through_count', 'click_through_rate', 'click_to_open_rate']);
+        $this->em->persist($report);
+        $this->em->flush();
+
+        // -- test report table in mautic panel
+        $crawler            = $this->client->request(Request::METHOD_GET, "/s/reports/view/{$report->getId()}");
+        $this->assertTrue($this->client->getResponse()->isOk());
+        $crawlerReportTable = $crawler->filterXPath('//table[@id="reportTable"]')->first();
+
+        // convert html table to php array
+        $crawlerReportTable = array_slice($this->domTableToArray($crawlerReportTable), 1, 2);
+
+        $this->assertSame([
+            // no., id, name, read_count, hits, click_through_count, click_through_rate, click_to_open_rate
+            ['1', (string) $emails[0]->getId(), 'Email 1', '2', '4', '1', '33.3%', '50.0%'],
+            ['2', (string) $emails[1]->getId(), 'Email 2', '1', '1', '1', '33.3%', '100.0%'],
+        ], $crawlerReportTable);
+
+        // -- test API report data
+        $this->client->request(Request::METHOD_GET, "/api/reports/{$report->getId()}");
+        $clientResponse = $this->client->getResponse();
+        $result         = json_decode($clientResponse->getContent(), true);
+        $this->assertSame([
+            [
+                'e_id'                => (string) $emails[0]->getId(),
+                'e_name'              => 'Email 1',
+                'read_count'          => '2',
+                'hits'                => '4',
+                'click_through_count' => '1',
+                'click_through_rate'  => '33.3%',
+                'click_to_open_rate'  => '50.0%',
+            ],
+            [
+                'e_id'                => (string) $emails[1]->getId(),
+                'e_name'              => 'Email 2',
+                'read_count'          => '1',
+                'hits'                => '1',
+                'click_through_count' => '1',
+                'click_through_rate'  => '33.3%',
+                'click_to_open_rate'  => '100.0%',
+            ],
+        ], $result['data']);
+    }
+
     private function createContact(string $email): Lead
     {
         $contact = new Lead();
@@ -198,6 +285,7 @@ class ReportSubscriberFunctionalTest extends MauticMysqlTestCase
         $email = $emailStat->getEmail();
         $email->setReadCount($email->getReadCount() + 1);
         $this->em->persist($emailStat);
+        $this->em->persist($email);
     }
 
     private function emulateLinkClick(Email $email, Trackable $trackable, Lead $lead, int $count = 1): void
@@ -233,10 +321,6 @@ class ReportSubscriberFunctionalTest extends MauticMysqlTestCase
      */
     private function domTableToArray(Crawler $crawler): array
     {
-        return $crawler->filter('tr')->each(function ($tr) {
-            return $tr->filter('td')->each(function ($td) {
-                return trim($td->text());
-            });
-        });
+        return $crawler->filter('tr')->each(fn ($tr) => $tr->filter('td')->each(fn ($td) => trim($td->text())));
     }
 }

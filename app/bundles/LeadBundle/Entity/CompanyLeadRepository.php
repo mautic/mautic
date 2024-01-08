@@ -12,7 +12,7 @@ class CompanyLeadRepository extends CommonRepository
     /**
      * @param CompanyLead[] $entities
      */
-    public function saveEntities($entities, $new = true)
+    public function saveEntities($entities, $new = true): void
     {
         // Get a list of contacts and set primary to 0
         if ($new) {
@@ -36,19 +36,17 @@ class CompanyLeadRepository extends CommonRepository
 
                 $qb->where(
                     $qb->expr()->in('lead_id', $contacts)
-                )->execute();
+                )->executeStatement();
             }
         }
 
-        return parent::saveEntities($entities);
+        parent::saveEntities($entities);
     }
 
     /**
      * Get companies by leadId.
-     *
-     * @return array
      */
-    public function getCompaniesByLeadId($leadId, $companyId = null)
+    public function getCompaniesByLeadId($leadId, $companyId = null): array
     {
         $q = $this->_em->getConnection()->createQueryBuilder();
 
@@ -64,13 +62,10 @@ class CompanyLeadRepository extends CommonRepository
             )->setParameter('companyId', $companyId);
         }
 
-        return $q->execute()->fetchAllAssociative();
+        return $q->executeQuery()->fetchAllAssociative();
     }
 
-    /**
-     * @return array
-     */
-    public function getCompanyLeads($companyId)
+    public function getCompanyLeads($companyId): array
     {
         $q = $this->_em->getConnection()->createQueryBuilder();
         $q->select('cl.lead_id')
@@ -79,7 +74,7 @@ class CompanyLeadRepository extends CommonRepository
         $q->where($q->expr()->eq('cl.company_id', ':company'))
             ->setParameter('company', $companyId);
 
-        return $q->execute()->fetchAllAssociative();
+        return $q->executeQuery()->fetchAllAssociative();
     }
 
     /**
@@ -96,12 +91,15 @@ class CompanyLeadRepository extends CommonRepository
             ->setParameter('leadId', $leadId);
         $q->orderBy('cl.date_added', 'DESC');
 
-        $result = $q->execute()->fetchAllAssociative();
+        $result = $q->executeQuery()->fetchAllAssociative();
 
         return !empty($result) ? $result[0] : [];
     }
 
-    public function getCompanyLeadEntity($leadId, $companyId)
+    /**
+     * @return mixed[]
+     */
+    public function getCompanyLeadEntity($leadId, $companyId): array
     {
         $qb = $this->getEntityManager()->getConnection()->createQueryBuilder();
         $qb->select('cl.is_primary, cl.lead_id, cl.company_id')
@@ -112,7 +110,7 @@ class CompanyLeadRepository extends CommonRepository
             )->setParameter('leadId', $leadId)
             ->setParameter('companyId', $companyId);
 
-        return $qb->execute()->fetchAllAssociative();
+        return $qb->executeQuery()->fetchAllAssociative();
     }
 
     /**
@@ -133,7 +131,7 @@ class CompanyLeadRepository extends CommonRepository
     /**
      * Updates leads company name If company name changed and company is primary.
      */
-    public function updateLeadsPrimaryCompanyName(Company $company)
+    public function updateLeadsPrimaryCompanyName(Company $company): void
     {
         if ($company->isNew() || empty($company->getChanges()['fields']['companyname'])) {
             return;
@@ -144,7 +142,7 @@ class CompanyLeadRepository extends CommonRepository
         $q->where($q->expr()->eq('cl.company_id', ':companyId'))
             ->setParameter('companyId', $company->getId())
             ->andWhere('cl.is_primary = 1');
-        $leadIds = $q->execute()->fetchOne();
+        $leadIds = $q->executeQuery()->fetchOne();
         if (!empty($leadIds)) {
             $this->getEntityManager()->getConnection()->createQueryBuilder()
             ->update(MAUTIC_TABLE_PREFIX.'leads')
@@ -152,7 +150,7 @@ class CompanyLeadRepository extends CommonRepository
             ->setParameter('company', $company->getName())
             ->where(
                 $q->expr()->in('id', $leadIds)
-            )->execute();
+            )->executeStatement();
         }
     }
 
@@ -164,6 +162,6 @@ class CompanyLeadRepository extends CommonRepository
             $qb->expr()->eq('lead_id', $leadId)
         )->andWhere(
             $qb->expr()->eq('is_primary', 1)
-        )->execute();
+        )->executeStatement();
     }
 }
