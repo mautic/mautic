@@ -15,26 +15,13 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class FormValidationSubscriber implements EventSubscriberInterface
 {
-    /**
-     * @var TranslatorInterface
-     */
-    private $translator;
-
-    /**
-     * @var CoreParametersHelper
-     */
-    private $coreParametersHelper;
-
-    public function __construct(TranslatorInterface $translator, CoreParametersHelper $coreParametersHelper)
-    {
-        $this->translator           = $translator;
-        $this->coreParametersHelper = $coreParametersHelper;
+    public function __construct(
+        private TranslatorInterface $translator,
+        private CoreParametersHelper $coreParametersHelper
+    ) {
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             FormEvents::FORM_ON_BUILD    => ['onFormBuilder', 0],
@@ -45,7 +32,7 @@ class FormValidationSubscriber implements EventSubscriberInterface
     /**
      * Add a simple email form.
      */
-    public function onFormBuilder(Events\FormBuilderEvent $event)
+    public function onFormBuilder(Events\FormBuilderEvent $event): void
     {
         $event->addValidator(
             'phone.validation',
@@ -71,7 +58,7 @@ class FormValidationSubscriber implements EventSubscriberInterface
     /**
      * Custom validation.
      */
-    public function onFormValidate(Events\ValidationEvent $event)
+    public function onFormValidate(Events\ValidationEvent $event): void
     {
         $value = $event->getValue();
 
@@ -81,15 +68,13 @@ class FormValidationSubscriber implements EventSubscriberInterface
         }
     }
 
-    private function fieldEmailValidation(Events\ValidationEvent $event)
+    private function fieldEmailValidation(Events\ValidationEvent $event): void
     {
         $field = $event->getField();
         $value = $event->getValue();
         if ('email' === $field->getType() && !empty($field->getValidation()['donotsubmit'])) {
             // Check the domains using shell wildcard patterns
-            $donotSubmitFilter = function ($doNotSubmitArray) use ($value) {
-                return fnmatch($doNotSubmitArray, $value, FNM_CASEFOLD);
-            };
+            $donotSubmitFilter  = fn ($doNotSubmitArray): bool => fnmatch($doNotSubmitArray, $value, FNM_CASEFOLD);
             $notNotSubmitEmails = $this->coreParametersHelper->get('do_not_submit_emails');
             if (array_filter($notNotSubmitEmails, $donotSubmitFilter)) {
                 $event->failedValidation(ArrayHelper::getValue('donotsubmit_validationmsg', $field->getValidation()));
@@ -97,7 +82,7 @@ class FormValidationSubscriber implements EventSubscriberInterface
         }
     }
 
-    private function fieldTelValidation(Events\ValidationEvent $event)
+    private function fieldTelValidation(Events\ValidationEvent $event): void
     {
         $field = $event->getField();
         $value = $event->getValue();
@@ -106,7 +91,7 @@ class FormValidationSubscriber implements EventSubscriberInterface
             $phoneUtil = PhoneNumberUtil::getInstance();
             try {
                 $phoneUtil->parse($value, PhoneNumberUtil::UNKNOWN_REGION);
-            } catch (NumberParseException $e) {
+            } catch (NumberParseException) {
                 if (!empty($field->getValidation()['international_validationmsg'])) {
                     $event->failedValidation($field->getValidation()['international_validationmsg']);
                 } else {

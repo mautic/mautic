@@ -4,12 +4,9 @@ namespace Mautic\CoreBundle\Form\Type;
 
 use Symfony\Component\Form\FormBuilderInterface;
 
-/**
- * Class SlotImageType.
- */
 class SlotImageType extends SlotType
 {
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder->add(
             'align',

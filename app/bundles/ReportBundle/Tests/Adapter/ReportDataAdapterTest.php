@@ -11,7 +11,7 @@ use Mautic\ReportBundle\Tests\Fixtures;
 
 class ReportDataAdapterTest extends \PHPUnit\Framework\TestCase
 {
-    public function testNoEmailsProvided()
+    public function testNoEmailsProvided(): void
     {
         $reportModelMock = $this->getMockBuilder(ReportModel::class)
             ->disableOriginalConstructor()

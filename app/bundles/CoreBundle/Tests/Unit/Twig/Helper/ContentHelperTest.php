@@ -26,17 +26,17 @@ class ContentHelperTest extends \PHPUnit\Framework\TestCase
         $this->contentHelper = new contenthelper($delegationMock, $dispatcherMock);
     }
 
-    public function testShowScriptTagsContext()
+    public function testShowScriptTagsContext(): void
     {
         $this->doShowTagsContext('script');
     }
 
-    public function testShowStyleTagsContext()
+    public function testShowStyleTagsContext(): void
     {
         $this->doShowTagsContext('style');
     }
 
-    public function testShowScriptTagsInlineContext()
+    public function testShowScriptTagsInlineContext(): void
     {
         $sample   = 'Hi <script>console.log("do not mind me");</script> <script type="text/javascript">console.log("do not mind me");</script>';
         $expected = 'Hi [script]console.log("do not mind me");[/script] [script type="text/javascript"]console.log("do not mind me");[/script]';
@@ -46,7 +46,7 @@ class ContentHelperTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expected, $result);
     }
 
-    private function doShowTagsContext($tag)
+    private function doShowTagsContext(string $tag): void
     {
         $sample        = '<h1>Hello World</h1>
 

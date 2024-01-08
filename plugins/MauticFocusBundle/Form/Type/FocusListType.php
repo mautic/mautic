@@ -10,24 +10,19 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class FocusListType extends AbstractType
 {
-    /**
-     * @var FocusModel
-     */
-    protected $focusModel;
-
     private $repo;
 
-    public function __construct(FocusModel $focusModel)
-    {
-        $this->focusModel = $focusModel;
+    public function __construct(
+        protected FocusModel $focusModel
+    ) {
         $this->repo       = $this->focusModel->getRepository();
     }
 
-    public function configureOptions(OptionsResolver $resolver)
+    public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults(
             [
-                'choices' => function (Options $options) {
+                'choices' => function (Options $options): array {
                     $choices = [];
 
                     $list = $this->repo->getFocusList($options['data']);
@@ -40,15 +35,11 @@ class FocusListType extends AbstractType
 
                     return $choices;
                 },
-                'expanded'    => false,
-                'multiple'    => true,
-                'required'    => false,
-                'placeholder' => function (Options $options) {
-                    return (empty($options['choices'])) ? 'mautic.focus.no.focusitem.note' : 'mautic.core.form.chooseone';
-                },
-                'disabled' => function (Options $options) {
-                    return empty($options['choices']);
-                },
+                'expanded'       => false,
+                'multiple'       => true,
+                'required'       => false,
+                'placeholder'    => fn (Options $options): string => (empty($options['choices'])) ? 'mautic.focus.no.focusitem.note' : 'mautic.core.form.chooseone',
+                'disabled'       => fn (Options $options): bool => empty($options['choices']),
                 'top_level'      => 'variant',
                 'variant_parent' => null,
                 'ignore_ids'     => [],

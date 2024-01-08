@@ -11,7 +11,7 @@ use Mautic\LeadBundle\Entity\Lead;
 
 class StatHelperTest extends \PHPUnit\Framework\TestCase
 {
-    public function testStatsAreCreatedAndDeleted()
+    public function testStatsAreCreatedAndDeleted(): void
     {
         $mockStatRepository = $this->getMockBuilder(StatRepository::class)
             ->disableOriginalConstructor()
@@ -56,7 +56,7 @@ class StatHelperTest extends \PHPUnit\Framework\TestCase
                 $reference = $statHelper->getStat($emailAddress);
                 $this->assertEquals($reference->getLeadId(), $counter * 10);
                 $statHelper->markForDeletion($reference);
-            } catch (StatNotFoundException $exception) {
+            } catch (StatNotFoundException) {
                 $this->fail("Stat not found for $emailAddress");
             }
 
@@ -66,7 +66,7 @@ class StatHelperTest extends \PHPUnit\Framework\TestCase
         $statHelper->deletePending();
     }
 
-    public function testExceptionIsThrownIfEmailAddressIsNotFound()
+    public function testExceptionIsThrownIfEmailAddressIsNotFound(): void
     {
         $this->expectException(StatNotFoundException::class);
         $mockStatRepository = $this->getMockBuilder(StatRepository::class)

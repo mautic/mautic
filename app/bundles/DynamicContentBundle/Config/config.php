@@ -39,14 +39,14 @@ return [
                 'standard_entity' => true,
                 'name'            => 'dynamicContents',
                 'path'            => '/dynamiccontents',
-                'controller'      => 'Mautic\DynamicContentBundle\Controller\Api\DynamicContentApiController',
+                'controller'      => \Mautic\DynamicContentBundle\Controller\Api\DynamicContentApiController::class,
             ],
         ],
     ],
     'services' => [
         'forms' => [
             'mautic.form.type.dwc_entry_filters' => [
-                'class'     => 'Mautic\DynamicContentBundle\Form\Type\DwcEntryFiltersType',
+                'class'     => \Mautic\DynamicContentBundle\Form\Type\DwcEntryFiltersType::class,
                 'arguments' => [
                     'translator',
                 ],

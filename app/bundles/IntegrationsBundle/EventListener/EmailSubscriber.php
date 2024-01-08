@@ -21,54 +21,19 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 /**
  * This class subscribes to events related to building and providing
  * tokens for emails, particularly the IntegrationObjectToken.
- *
- * Class EmailSubscriber
  */
 class EmailSubscriber implements EventSubscriberInterface
 {
-    /**
-     * @var TranslatorInterface
-     */
-    protected $translator;
-
-    /**
-     * @var EventDispatcherInterface
-     */
-    protected $eventDispatcher;
-
-    /**
-     * @var TokenParser
-     */
-    protected $tokenParser;
-
-    /**
-     * @var ObjectMappingRepository
-     */
-    protected $objectMappingRepository;
-
-    /**
-     * @var IntegrationHelper
-     */
-    protected $integrationHelper;
-
     public function __construct(
-        TranslatorInterface $translator,
-        EventDispatcherInterface $eventDispatcher,
-        TokenParser $tokenParser,
-        ObjectMappingRepository $objectMappingRepository,
-        IntegrationHelper $integrationHelper
+        protected TranslatorInterface $translator,
+        protected EventDispatcherInterface $eventDispatcher,
+        protected TokenParser $tokenParser,
+        protected ObjectMappingRepository $objectMappingRepository,
+        protected IntegrationHelper $integrationHelper
     ) {
-        $this->translator              = $translator;
-        $this->eventDispatcher         = $eventDispatcher;
-        $this->tokenParser             = $tokenParser;
-        $this->objectMappingRepository = $objectMappingRepository;
-        $this->integrationHelper       = $integrationHelper;
     }
 
-    /**
-     * @return array
-     */
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             EmailEvents::EMAIL_ON_BUILD   => ['onEmailBuild', 0],
@@ -128,7 +93,7 @@ class EmailSubscriber implements EventSubscriberInterface
                 $url  = $token->getBaseURL().'/'.$integrationObject['integration_object_id'];
                 $link = "<a href=\"{$url}\" >".$token->getLinkText().'</a>';
                 $event->addToken($token->getToken(), $link);
-            } catch (EntityNotFoundException $e) {
+            } catch (EntityNotFoundException) {
                 return;
             }
         });

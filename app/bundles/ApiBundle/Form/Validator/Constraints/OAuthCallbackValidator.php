@@ -13,7 +13,7 @@ class OAuthCallbackValidator extends ConstraintValidator
     /**
      * @param mixed $value
      */
-    public function validate($value, Constraint $constraint)
+    public function validate($value, Constraint $constraint): void
     {
         if (!$constraint instanceof OAuthCallback) {
             throw new UnexpectedTypeException($constraint, __NAMESPACE__.'\OAuthCallback');

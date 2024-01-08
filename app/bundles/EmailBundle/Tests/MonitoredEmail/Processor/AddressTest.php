@@ -11,7 +11,7 @@ class AddressTest extends \PHPUnit\Framework\TestCase
      *
      * @covers  \Mautic\EmailBundle\MonitoredEmail\Processor\Address::parseList()
      */
-    public function testArrayOfAddressesAreReturnedFromEmailHeader()
+    public function testArrayOfAddressesAreReturnedFromEmailHeader(): void
     {
         $results = Address::parseList('<user@test.com>,<user2@test.com>');
 
@@ -29,7 +29,7 @@ class AddressTest extends \PHPUnit\Framework\TestCase
      *
      * @covers  \Mautic\EmailBundle\MonitoredEmail\Processor\Address::parseList()
      */
-    public function testStatHashIsParsedFromEmail()
+    public function testStatHashIsParsedFromEmail(): void
     {
         $hash = Address::parseAddressForStatHash('hello+bounce_123abc@test.com');
 

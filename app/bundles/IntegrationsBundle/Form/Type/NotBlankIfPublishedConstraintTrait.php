@@ -15,7 +15,7 @@ trait NotBlankIfPublishedConstraintTrait
      *
      * @return callable
      */
-    private function getNotBlankConstraint()
+    private function getNotBlankConstraint(): Callback
     {
         return new Callback(
             function ($validateMe, ExecutionContextInterface $context): void {

@@ -30,20 +30,11 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
  */
 class DashboardModel extends FormModel
 {
-    private RequestStack $requestStack;
-
-    private PathsHelper $pathsHelper;
-
-    private Filesystem $filesystem;
-
-    /**
-     * DashboardModel constructor.
-     */
     public function __construct(
         CoreParametersHelper $coreParametersHelper,
-        PathsHelper $pathsHelper,
-        Filesystem $filesystem,
-        RequestStack $requestStack,
+        private PathsHelper $pathsHelper,
+        private Filesystem $filesystem,
+        private RequestStack $requestStack,
         EntityManagerInterface $em,
         CorePermissions $security,
         EventDispatcherInterface $dispatcher,
@@ -52,36 +43,23 @@ class DashboardModel extends FormModel
         UserHelper $userHelper,
         LoggerInterface $mauticLogger
     ) {
-        $this->pathsHelper  = $pathsHelper;
-        $this->filesystem   = $filesystem;
-        $this->requestStack = $requestStack;
-
         parent::__construct($em, $security, $dispatcher, $router, $translator, $userHelper, $mauticLogger, $coreParametersHelper);
     }
 
     public function getRepository(): WidgetRepository
     {
-        $result = $this->em->getRepository(Widget::class);
-
-        return $result;
+        return $this->em->getRepository(Widget::class);
     }
 
-    /**
-     * {@inheritdoc}
-     *
-     * @return string
-     */
-    public function getPermissionBase()
+    public function getPermissionBase(): string
     {
         return 'dashboard:widgets';
     }
 
     /**
      * Get a specific entity or generate a new one if id is empty.
-     *
-     * @return object|null
      */
-    public function getEntity($id = null)
+    public function getEntity($id = null): ?Widget
     {
         if (null === $id) {
             return new Widget();
@@ -119,18 +97,14 @@ class DashboardModel extends FormModel
      * Useful for dashboard exports.
      *
      * @param string $name
-     *
-     * @return array
      */
-    public function toArray($name)
+    public function toArray($name): array
     {
         return [
             'name'        => $name,
             'description' => $this->generateDescription(),
             'widgets'     => array_map(
-                function ($widget) {
-                    return $widget->toArray();
-                },
+                fn ($widget) => $widget->toArray(),
                 $this->getWidgets(true)
             ),
         ];
@@ -143,7 +117,7 @@ class DashboardModel extends FormModel
      *
      * @throws IOException
      */
-    public function saveSnapshot($name)
+    public function saveSnapshot($name): void
     {
         $dir      = $this->pathsHelper->getSystemPath('dashboard.user');
         $filename = InputHelper::filename($name, 'json');
@@ -153,10 +127,8 @@ class DashboardModel extends FormModel
 
     /**
      * Generates a translatable description for a dashboard.
-     *
-     * @return string
      */
-    public function generateDescription()
+    public function generateDescription(): string
     {
         return $this->translator->trans(
             'mautic.dashboard.generated_by',
@@ -173,7 +145,7 @@ class DashboardModel extends FormModel
      * @param array $widgets
      * @param array $filter
      */
-    public function populateWidgetsContent(&$widgets, $filter = [])
+    public function populateWidgetsContent(&$widgets, $filter = []): void
     {
         if (count($widgets)) {
             foreach ($widgets as &$widget) {
@@ -187,10 +159,8 @@ class DashboardModel extends FormModel
 
     /**
      * Creates a new Widget object from an array data.
-     *
-     * @return Widget
      */
-    public function populateWidgetEntity(array $data)
+    public function populateWidgetEntity(array $data): Widget
     {
         $entity = new Widget();
 
@@ -210,7 +180,7 @@ class DashboardModel extends FormModel
      *
      * @param array $filter
      */
-    public function populateWidgetContent(Widget $widget, $filter = [])
+    public function populateWidgetContent(Widget $widget, $filter = []): void
     {
         $cacheDir = $this->coreParametersHelper->get('cached_data_dir', $this->pathsHelper->getSystemPath('cache', true));
 
@@ -246,7 +216,7 @@ class DashboardModel extends FormModel
     /**
      * Clears the temporary widget cache.
      */
-    public function clearDashboardCache()
+    public function clearDashboardCache(): void
     {
         $cacheDir     = $this->coreParametersHelper->get('cached_data_dir', $this->pathsHelper->getSystemPath('cache', true));
         $cacheStorage = new CacheStorageHelper(CacheStorageHelper::ADAPTOR_FILESYSTEM, $this->userHelper->getUser()->getId(), null, $cacheDir);
@@ -255,8 +225,6 @@ class DashboardModel extends FormModel
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @param Widget      $entity
      * @param string|null $action
      * @param array       $options
@@ -265,7 +233,7 @@ class DashboardModel extends FormModel
      *
      * @throws \Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException
      */
-    public function createForm($entity, FormFactoryInterface $formFactory, $action = null, $options = [])
+    public function createForm($entity, FormFactoryInterface $formFactory, $action = null, $options = []): \Symfony\Component\Form\FormInterface
     {
         if (!$entity instanceof Widget) {
             throw new MethodNotAllowedHttpException(['Widget'], 'Entity must be of class Widget()');
@@ -284,7 +252,7 @@ class DashboardModel extends FormModel
      * @param object $entity
      * @param bool   $unlock
      */
-    public function saveEntity($entity, $unlock = true)
+    public function saveEntity($entity, $unlock = true): void
     {
         // Set widget name from widget type if empty
         if (!$entity->getName()) {

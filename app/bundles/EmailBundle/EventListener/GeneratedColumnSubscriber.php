@@ -11,10 +11,7 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class GeneratedColumnSubscriber implements EventSubscriberInterface
 {
-    /**
-     * @return array
-     */
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             CoreEvents::ON_GENERATED_COLUMNS_BUILD => ['onGeneratedColumnsBuild', 0],

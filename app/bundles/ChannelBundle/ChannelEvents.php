@@ -2,9 +2,6 @@
 
 namespace Mautic\ChannelBundle;
 
-/**
- * Class ChannelEvents.
- */
 final class ChannelEvents
 {
     /**
