@@ -1,8 +1,10 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\PluginBundle\Event;
 
-class PluginIsPublishedEvent extends AbstractPluginIntegrationEvent
+class PluginIsPublishedEvent extends \Symfony\Contracts\EventDispatcher\Event
 {
     private int $value;
     private string $integrationName;

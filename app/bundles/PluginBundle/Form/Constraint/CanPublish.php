@@ -6,7 +6,7 @@ use Symfony\Component\Validator\Constraint;
 
 class CanPublish extends Constraint
 {
-    public string $message = 'You are not allowed to publish plugin due to insufficient configurations.';
+    public string $message =  'You are not allowed to publish plugin due to insufficient configurations.';
 
     public string $integrationName;
 

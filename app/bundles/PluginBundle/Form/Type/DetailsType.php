@@ -25,9 +25,7 @@ class DetailsType extends AbstractType
     {
         $builder->add('isPublished', YesNoButtonGroupType::class, [
             'constraints' => [
-                new CanPublish([
-                    'integrationName' => $options['integration'] ?? '',
-                ]),
+                new CanPublish($options['integration'] ?? ''),
             ],
         ]);
 

@@ -10,7 +10,7 @@ class ApiErrorException extends \Exception
 
     private ?Lead $contact = null;
 
-    private string $shortMessage;
+    private string $shortMessage = '';
 
     /**
      * @param string $message

@@ -197,32 +197,14 @@ class PluginController extends FormController
                         $keys = $form['apiKeys']->getData();
 
                         // Prevent merged keys
-                        $resetTokens = false;
-                        $secretKeys  = $integrationObject->getSecretKeys();
+                        $secretKeys = $integrationObject->getSecretKeys();
                         foreach ($secretKeys as $secretKey) {
                             if (empty($keys[$secretKey]) && !empty($currentKeys[$secretKey])) {
                                 $keys[$secretKey] = $currentKeys[$secretKey];
                             }
-                            if ($keys[$secretKey] !== $currentKeys[$secretKey]) {
-                                $resetTokens   = true;
-                            }
                         }
-
-                        $clientIdKey = $integrationObject->getClientIdKey();
-                        if (!empty($clientIdKey) && $keys[$clientIdKey] !== $currentKeys[$clientIdKey]) {
-                            $resetTokens   = true;
-                        }
-                        if ($resetTokens) {
-                            $keysToIgnore[]   = $integrationObject->getAuthTokenKey();
-                            $keysToIgnore[]   = 'refresh_token';
-                            $refreshTokenKeys = $integrationObject->getRefreshTokenKeys();
-                            foreach ($refreshTokenKeys as $refreshTokenKey) {
-                                $keysToIgnore[] = $refreshTokenKey;
-                            }
-                            $keys = array_filter($keys, function ($key) use ($keysToIgnore) {
-                                return !in_array($key, $keysToIgnore);
-                            }, ARRAY_FILTER_USE_KEY);
-                        }
+                        $keys = $this->removeAuthData($keys, $currentKeys, $integrationObject);
+                        $integrationObject->encryptAndSetApiKeys($keys, $entity);
 
                         $integrationObject->encryptAndSetApiKeys($keys, $entity);
                     }
@@ -455,5 +437,32 @@ class PluginController extends FormController
                 ],
             ]
         );
+    }
+
+    /**
+     * @param array <string,mixed> $keys
+     * @param array <string,mixed> $currentKeys
+     *
+     * @return array <string,mixed>
+     */
+    private function removeAuthData(array $keys, array $currentKeys, AbstractIntegration $integrationObject): array
+    {
+        $resetTokens = false;
+        $secretKeys  = array_unique(array_merge($integrationObject->getSecretKeys(), [$integrationObject->getClientIdKey()]));
+
+        foreach ($secretKeys as $secretKey) {
+            if (($keys[$secretKey] ?? null) !== ($currentKeys[$secretKey] ?? null)) {
+                $resetTokens = true;
+                break;
+            }
+        }
+
+        if (!$resetTokens) {
+            return $keys;
+        }
+
+        $keysToRemove = array_unique(array_merge($integrationObject->getRefreshTokenKeys(), [$integrationObject->getAuthTokenKey()]));
+
+        return array_diff_key($keys, array_flip($keysToRemove));
     }
 }

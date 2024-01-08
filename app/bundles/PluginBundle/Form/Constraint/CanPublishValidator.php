@@ -22,9 +22,9 @@ class CanPublishValidator extends ConstraintValidator
         if (1 !== $value) {
             return;
         }
-        /**
-         * @phpstan-ignore-next-line
-         */
+        if (!$constraint instanceof CanPublish) {
+            throw new \Symfony\Component\Validator\Exception\UnexpectedTypeException($constraint, CanPublish::class);
+        }
         $event = new PluginIsPublishedEvent($value, $constraint->integrationName);
         $this->eventDispatcher->dispatch(PluginEvents::PLUGIN_IS_PUBLISHED_STATE_CHANGING, $event);
 
