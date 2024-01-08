@@ -27,6 +27,10 @@ return [
                 'path'       => '/campaign/preview/{objectId}',
                 'controller' => 'Mautic\EmailBundle\Controller\PublicController::previewAction',
             ],
+            'mautic_campaign_map_stats' => [
+                'path'       => '/campaign-map-stats/{objectId}/{dateFrom}/{dateTo}',
+                'controller' => 'Mautic\CampaignBundle\Controller\CampaignMapStatsController::viewAction',
+            ],
         ],
         'api'  => [
             'mautic_api_campaignsstandard'            => [

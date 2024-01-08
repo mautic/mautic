@@ -227,7 +227,7 @@ Mautic.renderHorizontalBarChart = function(canvas) {
 
 /**
  * Render vector maps
- *
+ * @deprecated please use MauticMap class
  * @param mQuery element scope
  */
 Mautic.renderMaps = function(scope) {
@@ -249,7 +249,7 @@ Mautic.renderMaps = function(scope) {
 };
 
 /**
- *
+ * @deprecated please use MauticMap class
  * @param wrapper
  * @returns {*}
  */
@@ -333,6 +333,7 @@ Mautic.renderMap = function(wrapper) {
 
 /**
  * Destroy a jVector map
+ * @deprecated please use MauticMap class
  */
 Mautic.destroyMap = function(wrapper) {
     if (wrapper.hasClass('map-rendered')) {

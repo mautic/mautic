@@ -2,12 +2,14 @@
 
 namespace Mautic\CampaignBundle\Model;
 
+use Doctrine\DBAL\Exception;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\PersistentCollection;
 use Mautic\CampaignBundle\CampaignEvents;
 use Mautic\CampaignBundle\Entity\Campaign;
 use Mautic\CampaignBundle\Entity\Event;
 use Mautic\CampaignBundle\Entity\Lead as CampaignLead;
+use Mautic\CampaignBundle\Entity\LeadEventLogRepository;
 use Mautic\CampaignBundle\Event as Events;
 use Mautic\CampaignBundle\EventCollector\EventCollector;
 use Mautic\CampaignBundle\Executioner\ContactFinder\Limiter\ContactLimiter;
@@ -19,8 +21,11 @@ use Mautic\CoreBundle\Helper\Chart\LineChart;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Model\FormModel as CommonFormModel;
+use Mautic\CoreBundle\Model\MapModelInterface;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\CoreBundle\Translation\Translator;
+use Mautic\EmailBundle\Entity\Stat;
+use Mautic\EmailBundle\Entity\StatRepository;
 use Mautic\FormBundle\Entity\Form;
 use Mautic\FormBundle\Model\FormModel;
 use Mautic\LeadBundle\Entity\Lead;
@@ -35,8 +40,10 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 /**
  * @extends CommonFormModel<Campaign>
+ *
+ * @implements MapModelInterface<Campaign>
  */
-class CampaignModel extends CommonFormModel
+class CampaignModel extends CommonFormModel implements MapModelInterface
 {
     public function __construct(
         protected ListModel $leadListModel,
@@ -80,11 +87,11 @@ class CampaignModel extends CommonFormModel
      */
     public function getCampaignLeadRepository()
     {
-        return $this->em->getRepository(\Mautic\CampaignBundle\Entity\Lead::class);
+        return $this->em->getRepository(CampaignLead::class);
     }
 
     /**
-     * @return \Mautic\CampaignBundle\Entity\LeadEventLogRepository
+     * @return LeadEventLogRepository
      */
     public function getCampaignLeadEventLogRepository()
     {
@@ -144,7 +151,7 @@ class CampaignModel extends CommonFormModel
      */
     protected function dispatchEvent($action, &$entity, $isNew = false, \Symfony\Contracts\EventDispatcher\Event $event = null): ?\Symfony\Contracts\EventDispatcher\Event
     {
-        if ($entity instanceof \Mautic\CampaignBundle\Entity\Lead) {
+        if ($entity instanceof CampaignLead) {
             return null;
         }
 
@@ -579,7 +586,7 @@ class CampaignModel extends CommonFormModel
             $leads = array_keys($leads->toArray());
         }
 
-        return $this->em->getRepository(\Mautic\CampaignBundle\Entity\Lead::class)->getLeadDetails($campaignId, $leads);
+        return $this->em->getRepository(CampaignLead::class)->getLeadDetails($campaignId, $leads);
     }
 
     /**
@@ -595,7 +602,7 @@ class CampaignModel extends CommonFormModel
         $campaignId = ($campaign instanceof Campaign) ? $campaign->getId() : $campaign;
         $eventId    = (is_array($event) && isset($event['id'])) ? $event['id'] : $event;
 
-        return $this->em->getRepository(\Mautic\CampaignBundle\Entity\Lead::class)->getLeads($campaignId, $eventId);
+        return $this->em->getRepository(CampaignLead::class)->getLeads($campaignId, $eventId);
     }
 
     public function getCampaignListIds($id): array
@@ -751,5 +758,45 @@ class CampaignModel extends CommonFormModel
         }
 
         return $ids;
+    }
+
+    /**
+     * @param Campaign $entity
+     *
+     * @return array<string, array<int, array<string, int|string>>>
+     *
+     * @throws Exception
+     */
+    public function getCountryStats($entity, \DateTime $dateFrom, \DateTime $dateTo, bool $includeVariants = false): array
+    {
+        $eventsEmailsSend     = $entity->getEmailSendEvents();
+        $eventsIds            = $eventsEmailsSend->getKeys();
+
+        /** @var StatRepository $statRepo */
+        $statRepo            = $this->em->getRepository(Stat::class);
+        $query               = new ChartQuery($this->em->getConnection(), $dateFrom, $dateTo);
+        $results['contacts'] =  $this->getCampaignMembersGroupByCountry($entity, $dateFrom, $dateTo);
+
+        if ($eventsEmailsSend->count() > 0) {
+            $emailStats            = $statRepo->getStatsSummaryByCountry($query, $eventsIds, 'campaign');
+            $results['read_count'] = $results['clicked_through_count'] = [];
+
+            foreach ($emailStats as $e) {
+                $results['read_count'][]            = array_intersect_key($e, array_flip(['country', 'read_count']));
+                $results['clicked_through_count'][] = array_intersect_key($e, array_flip(['country', 'clicked_through_count']));
+            }
+        }
+
+        return $results;
+    }
+
+    /**
+     * Get leads in a campaign grouped by country.
+     *
+     * @return array{}|array<int, array<string, string|null>>
+     */
+    public function getCampaignMembersGroupByCountry(Campaign $campaign, \DateTime $dateFromObject, \DateTime $dateToObject): array
+    {
+        return $this->em->getRepository(CampaignLead::class)->getCampaignMembersGroupByCountry($campaign, $dateFromObject, $dateToObject);
     }
 }
