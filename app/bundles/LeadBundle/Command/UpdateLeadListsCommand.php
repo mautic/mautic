@@ -71,6 +71,10 @@ class UpdateLeadListsCommand extends ModeratedCommand
         $enableTimeMeasurement = (bool) $input->getOption('timing');
         $output                = ($input->getOption('quiet')) ? new NullOutput() : $output;
 
+        if (is_numeric($max)) {
+            $max = (int) $max;
+        }
+
         if (!$this->checkRunStatus($input, $output, $id)) {
             return \Symfony\Component\Console\Command\Command::SUCCESS;
         }

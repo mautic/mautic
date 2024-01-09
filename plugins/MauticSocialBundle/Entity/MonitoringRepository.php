@@ -3,6 +3,7 @@
 namespace MauticPlugin\MauticSocialBundle\Entity;
 
 use Doctrine\ORM\Tools\Pagination\Paginator;
+use Mautic\CoreBundle\Doctrine\Paginator\SimplePaginator;
 use Mautic\CoreBundle\Entity\CommonRepository;
 
 /**

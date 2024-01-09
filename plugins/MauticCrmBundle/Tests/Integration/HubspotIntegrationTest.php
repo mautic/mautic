@@ -46,6 +46,7 @@ class HubspotIntegrationTest extends AbstractIntegrationTestCase
             $this->fieldModel,
             $this->integrationEntityModel,
             $this->doNotContact,
+            $this->fieldsWithUniqueIdentifier,
             $this->userHelper
         );
     }

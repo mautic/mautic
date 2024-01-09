@@ -31,8 +31,14 @@ class ExportSchedulerCommand extends Command
     {
         $report = $input->getOption('report');
 
+        if (!is_null($report) && !is_numeric($report)) {
+            $output->writeln('<error>'.$this->translator->trans('mautic.report.schedule.command.invalid_parameter').'</error>');
+
+            return \Symfony\Component\Console\Command\Command::INVALID;
+        }
+
         try {
-            $exportOption = new ExportOption($report);
+            $exportOption = new ExportOption((int) $report);
         } catch (\InvalidArgumentException $e) {
             $output->writeln('<error>'.$this->translator->trans('mautic.report.schedule.command.invalid_parameter').'</error>');
 

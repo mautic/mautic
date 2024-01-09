@@ -563,9 +563,9 @@ class PageModel extends FormModel
         $trackingId = $hit->getTrackingId();
         if (!$trackingNewlyGenerated) {
             $lastHit = $request->cookies->get('mautic_referer_id');
-            if (!empty($lastHit)) {
+            if (!empty($lastHit) && is_numeric($lastHit)) {
                 // this is not a new session so update the last hit if applicable with the date/time the user left
-                $this->getHitRepository()->updateHitDateLeft($lastHit);
+                $this->getHitRepository()->updateHitDateLeft((int) $lastHit);
             }
         }
 

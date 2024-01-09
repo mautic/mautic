@@ -30,7 +30,6 @@ DSN;
         $parser = new DsnParser();
         $bounce = $parser->getBounce($message);
 
-        $this->assertInstanceOf(BouncedEmail::class, $bounce);
         $this->assertEquals('sdfgsdfg@seznan.cz', $bounce->getContactEmail());
         $this->assertEquals(Category::DNS_UNKNOWN, $bounce->getRuleCategory());
         $this->assertEquals(Type::HARD, $bounce->getType());
@@ -59,7 +58,6 @@ DSN;
         $parser = new DsnParser();
         $bounce = $parser->getBounce($message);
 
-        $this->assertInstanceOf(BouncedEmail::class, $bounce);
         $this->assertEquals('aaaaaaaaaaaaa@yoursite.com', $bounce->getContactEmail());
         $this->assertEquals(Category::UNKNOWN, $bounce->getRuleCategory());
         $this->assertEquals(Type::HARD, $bounce->getType());

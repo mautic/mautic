@@ -31,7 +31,7 @@ class EmailAddressValidatorTest extends AbstractMauticTestCase
         $emailAddressValidator->initialize($context);
         $emailAddressValidator->validate($value, new EmailAddress());
 
-        Assert::assertSame($expectedViolationCount, $context->getViolations()->count());
+        Assert::assertCount($expectedViolationCount, $context->getViolations());
     }
 
     /**

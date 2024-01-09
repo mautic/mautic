@@ -499,7 +499,7 @@ class Import extends FormEntity
             return round(($processed / $total) * 100, 2);
         }
 
-        return 0;
+        return 0.0;
     }
 
     /**
@@ -560,11 +560,9 @@ class Import extends FormEntity
     }
 
     /**
-     * @param int $dateStarted
-     *
      * @return Import
      */
-    public function setDateStarted(\DateTime $dateStarted)
+    public function setDateStarted(\DateTimeInterface $dateStarted)
     {
         $this->isChanged('dateStarted', $dateStarted);
         $this->dateStarted = $dateStarted;
@@ -572,10 +570,7 @@ class Import extends FormEntity
         return $this;
     }
 
-    /**
-     * @return \DateTimeInterface
-     */
-    public function getDateStarted()
+    public function getDateStarted(): ?\DateTimeInterface
     {
         return $this->dateStarted;
     }
@@ -681,10 +676,8 @@ class Import extends FormEntity
 
     /**
      * Counts speed in items per second.
-     *
-     * @return float
      */
-    public function getSpeed()
+    public function getSpeed(): float
     {
         $runtime       = $this->getRunTimeSeconds();
         $processedRows = $this->getProcessedRows();
@@ -693,7 +686,7 @@ class Import extends FormEntity
             return round($processedRows / $runtime, 2);
         }
 
-        return $processedRows;
+        return (float) $processedRows;
     }
 
     /**

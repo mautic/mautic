@@ -20,7 +20,7 @@ use PHPUnit\Framework\TestCase;
 class EventLoggerTest extends TestCase
 {
     /**
-     * @var LeadRepository|MockObject
+     * @var IpLookupHelper&MockObject
      */
     private \PHPUnit\Framework\MockObject\MockObject $ipLookupHelper;
 

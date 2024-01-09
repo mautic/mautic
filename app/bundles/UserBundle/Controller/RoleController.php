@@ -297,7 +297,7 @@ class RoleController extends FormController
         $translator        = $this->translator;
 
         $permissionsArray = ($role->getId()) ?
-            $this->get('doctrine')->getRepository(\Mautic\UserBundle\Entity\Permission::class)->getPermissionsByRole($role, true) :
+            $this->doctrine->getRepository(\Mautic\UserBundle\Entity\Permission::class)->getPermissionsByRole($role, true) :
             [];
 
         $permissions     = [];
@@ -440,7 +440,7 @@ class RoleController extends FormController
             // Loop over the IDs to perform access checks pre-delete
             foreach ($ids as $objectId) {
                 $entity = $model->getEntity($objectId);
-                $users  = $this->get('doctrine')->getRepository(\Mautic\UserBundle\Entity\User::class)->findByRole($entity);
+                $users  = $this->doctrine->getRepository(\Mautic\UserBundle\Entity\User::class)->findByRole($entity);
 
                 if (null === $entity) {
                     $flashes[] = [

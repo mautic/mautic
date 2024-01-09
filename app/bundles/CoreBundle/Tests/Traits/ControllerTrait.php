@@ -3,6 +3,8 @@
 namespace Mautic\CoreBundle\Tests\Traits;
 
 use Mautic\PageBundle\Tests\Controller\PageControllerTest;
+use PHPUnit\Framework\Assert;
+use Symfony\Component\HttpFoundation\Response;
 
 trait ControllerTrait
 {
@@ -41,6 +43,7 @@ trait ControllerTrait
             'GET',
             '/s/'.$urlAlias.'?tmpl=list&name='.$routeAlias.'&orderby='.$tableAlias.$column
         );
+        Assert::assertSame(Response::HTTP_OK, $this->client->getResponse()->getStatusCode());
         PageControllerTest::assertEquals(
             1,
             $crawler->filterXPath(

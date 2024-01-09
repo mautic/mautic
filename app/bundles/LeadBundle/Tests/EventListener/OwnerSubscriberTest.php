@@ -213,6 +213,8 @@ class OwnerSubscriberTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @param mixed[] $parameterMap
+     *
+     * @return MauticFactory&MockObject
      */
     protected function getMockFactory(bool $mailIsOwner = true, array $parameterMap = []): MauticFactory|MockObject
     {
@@ -238,7 +240,7 @@ class OwnerSubscriberTest extends \PHPUnit\Framework\TestCase
         $mockLeadModel->method('getRepository')
             ->willReturn($mockLeadRepository);
 
-        /** @var MauticFactory|MockObject $mockFactory */
+        /** @var MauticFactory&MockObject $mockFactory */
         $mockFactory = $this->getMockBuilder(MauticFactory::class)
             ->disableOriginalConstructor()
             ->getMock();
@@ -293,7 +295,6 @@ class OwnerSubscriberTest extends \PHPUnit\Framework\TestCase
         $parameterMap = [
             ['mailer_custom_headers', [], ['X-Mautic-Test' => 'test', 'X-Mautic-Test2' => 'test']],
         ];
-        /** @var MauticFactory|MockObject $mockFactory */
         $mockFactory = $this->getMockFactory(true, $parameterMap);
 
         /** @var FromEmailHelper|MockObject $fromEmaiHelper */
@@ -317,11 +318,11 @@ class OwnerSubscriberTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @return Translator|MockObject
+     * @return Translator&MockObject
      */
     protected function getMockTranslator()
     {
-        /** @var Translator|MockObject $translator */
+        /** @var Translator&MockObject $translator */
         $translator = $this->createMock(Translator::class);
         $translator->expects($this->any())
             ->method('hasId')

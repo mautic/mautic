@@ -19,16 +19,14 @@ class FullContact_API extends FullContact_Person
      *
      * @deprecated
      *
-     * @param string $search - Search Term (Could be an email address or a phone number,
-     *                       depending on the specified search type)
-     * @param string $type   - Search Type (Specify the API search method to use.
-     *                        E.g. email -- tested with email and phone)
-
-     * @param int $timeout
+     * @param string|null $search - Search Term (Could be an email address or a phone number,
+     *                            depending on the specified search type)
+     * @param string|null $type   - Search Type (Specify the API search method to use.
+     *                            E.g. email -- tested with email and phone)
      *
-     * @return array - All information associated with this email address
+     * @return array<mixed> - All information associated with this email address
      */
-    public function doLookup($search = null, $type = 'email', $timeout = 30)
+    public function doLookup(?string $search = null, ?string $type = 'email')
     {
         if (is_null($search)) {
             throw new BaseException('To search, you must supply a search term.');

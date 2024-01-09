@@ -121,7 +121,7 @@ class ConfigEventTest extends \PHPUnit\Framework\TestCase
 
         $origNormData = ['orig'];
 
-        $this->assertInstanceOf(ConfigEvent::class, $event->setOriginalNormData($origNormData));
+        $event->setOriginalNormData($origNormData);
         $this->assertEquals($origNormData, $event->getOriginalNormData());
 
         $normData = ['norm'];

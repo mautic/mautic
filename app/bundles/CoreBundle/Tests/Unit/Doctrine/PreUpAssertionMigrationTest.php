@@ -60,20 +60,14 @@ class PreUpAssertionMigrationTest extends TestCase
             protected function preUpAssertions(): void
             {
                 $this->skipAssertion(function (Schema $schema) {
-                    Assert::assertInstanceOf(Schema::class, $schema);
-
                     return true;
                 }, 'First exists');
 
                 $this->skipAssertion(function (Schema $schema) {
-                    Assert::assertInstanceOf(Schema::class, $schema);
-
                     return true;
                 }, 'Second exists');
 
                 $this->skipAssertion(function (Schema $schema) {
-                    Assert::assertInstanceOf(Schema::class, $schema);
-
                     return true;
                 }, 'Third exists');
             }
@@ -116,20 +110,14 @@ class PreUpAssertionMigrationTest extends TestCase
             protected function preUpAssertions(): void
             {
                 $this->skipAssertion(function (Schema $schema) {
-                    Assert::assertInstanceOf(Schema::class, $schema);
-
                     return true;
                 }, 'First exists');
 
                 $this->skipAssertion(function (Schema $schema) {
-                    Assert::assertInstanceOf(Schema::class, $schema);
-
                     return true;
                 }, 'Second exists');
 
                 $this->skipAssertion(function (Schema $schema) {
-                    Assert::assertInstanceOf(Schema::class, $schema);
-
                     return false;
                 }, 'Third does not exist');
             }
