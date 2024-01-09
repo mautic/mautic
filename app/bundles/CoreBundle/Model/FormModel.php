@@ -327,6 +327,8 @@ class FormModel extends AbstractCommonModel
      * @param string|null $action
      * @param array       $options
      *
+     * @return \Symfony\Component\Form\FormInterface<mixed>
+     *
      * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
      */
     public function createForm($entity, FormFactoryInterface $formFactory, $action = null, $options = []): FormInterface

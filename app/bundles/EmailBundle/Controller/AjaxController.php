@@ -12,6 +12,7 @@ use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\EmailBundle\Helper\PlainTextHelper;
 use Mautic\EmailBundle\Mailer\Message\MauticMessage;
 use Mautic\EmailBundle\Model\EmailModel;
+use Mautic\EmailBundle\Stats\EmailDependencies;
 use Mautic\PageBundle\Form\Type\AbTestPropertiesType;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -315,6 +316,27 @@ class AjaxController extends CommonAjaxController
             'totalUniqueClicks' => $totalUniqueClicks,
             'totalClicks'       => $totalClicks,
             'legendTemplate'    => $legendTemplate,
+        ]);
+    }
+
+    public function getEmailUsagesAction(Request $request, EmailDependencies $emailDependencies): JsonResponse
+    {
+        $emailId = (int) $request->query->get('id');
+
+        if (0 === $emailId) {
+            return $this->sendJsonResponse([
+                'message' => $this->translator->trans('mautic.core.error.badrequest'),
+            ], 400);
+        }
+
+        $usagesHtml = $this->renderView('@MauticCore/Helper/usage.html.twig', [
+            'title'    => $this->translator->trans('mautic.email.usages'),
+            'stats'    => $emailDependencies->getChannelsIds($emailId),
+            'noUsages' => $this->translator->trans('mautic.email.no_usages'),
+        ]);
+
+        return $this->sendJsonResponse([
+            'usagesHtml'  => $usagesHtml,
         ]);
     }
 }
