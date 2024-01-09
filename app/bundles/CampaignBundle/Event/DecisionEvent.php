@@ -12,8 +12,6 @@ class DecisionEvent extends CampaignExecutionEvent
     private bool $applicable = false;
 
     /**
-     * DecisionEvent constructor.
-     *
      * @param mixed $passthrough
      */
     public function __construct(

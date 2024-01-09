@@ -9,10 +9,6 @@ use MauticPlugin\MauticTagManagerBundle\Form\Type\TagEntityType;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 
-/**
- * Class TagModel
- * {@inheritdoc}
- */
 class TagModel extends BaseTagModel
 {
     /**

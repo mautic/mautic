@@ -10,8 +10,6 @@ class DayStat implements StatInterface
     private array $stats = [];
 
     /**
-     * DayStat constructor.
-     *
      * @param string $day "2019-11-07" format
      */
     public function __construct(

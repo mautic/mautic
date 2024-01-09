@@ -17,7 +17,7 @@ use Mautic\LeadBundle\Segment\RandomParameterName;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 /**
- * Class ContactSegmentQueryBuilder is responsible for building queries for segments.
+ * Responsible for building queries for segments.
  */
 class ContactSegmentQueryBuilder
 {

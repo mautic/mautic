@@ -7,8 +7,6 @@ class HourStat
     private int $count = 0;
 
     /**
-     * HourStat constructor.
-     *
      * @param string $hour "2018-12-07 12" format
      */
     public function __construct(

@@ -47,9 +47,6 @@ class Role extends FormEntity
      */
     private $users;
 
-    /**
-     * Constructor.
-     */
     public function __construct()
     {
         $this->permissions = new ArrayCollection();

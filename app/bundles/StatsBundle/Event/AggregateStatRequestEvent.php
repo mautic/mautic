@@ -11,8 +11,6 @@ class AggregateStatRequestEvent extends Event
     private \Mautic\StatsBundle\Aggregate\Collection\StatCollection $statCollection;
 
     /**
-     * AggregateStatRequestEvent constructor.
-     *
      * @param string $statName
      */
     public function __construct(

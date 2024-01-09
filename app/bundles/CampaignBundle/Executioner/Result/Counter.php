@@ -5,8 +5,6 @@ namespace Mautic\CampaignBundle\Executioner\Result;
 class Counter
 {
     /**
-     * Counter constructor.
-     *
      * @param int $eventCount
      * @param int $evaluated
      * @param int $executed

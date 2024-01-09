@@ -6,8 +6,6 @@ use Mautic\PluginBundle\Exception\ApiErrorException;
 use MauticPlugin\MauticCrmBundle\Integration\ConnectwiseIntegration;
 
 /**
- * Class ConnectwiseApi.
- *
  * @property ConnectwiseIntegration $integration
  */
 class ConnectwiseApi extends CrmApi

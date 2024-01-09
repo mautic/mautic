@@ -22,8 +22,6 @@ use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 /**
- * Class LegacyEventDispatcher.
- *
  * @deprecated 2.13.0 to be removed in 3.0; BC support for old listeners
  */
 class LegacyEventDispatcher
