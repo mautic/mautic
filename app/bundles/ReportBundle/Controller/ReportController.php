@@ -470,7 +470,7 @@ class ReportController extends FormController
                         return $this->editAction($request, $entity->getId(), true);
                     }
 
-                    $viewParameters = ['objectId' => $entity->getId(),];
+                    $viewParameters = ['objectId' => $entity->getId()];
                     $returnUrl      = $this->generateUrl('mautic_report_view', $viewParameters);
                     $template       = 'Mautic\ReportBundle\Controller\ReportController::viewAction';
                 }
