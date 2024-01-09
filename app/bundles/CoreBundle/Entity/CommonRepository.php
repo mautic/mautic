@@ -338,7 +338,7 @@ class CommonRepository extends ServiceEntityRepository
      *
      * @param array<string,mixed> $args
      *
-     * @return object[]|array<int,mixed>|\Doctrine\ORM\Internal\Hydration\IterableResult<object>|Paginator<object>|SimplePaginator<mixed>
+     * @return object[]|array<int,mixed>|iterable<object>|\Doctrine\ORM\Internal\Hydration\IterableResult<object>|Paginator<object>|SimplePaginator<mixed>
      */
     public function getEntities(array $args = [])
     {
@@ -375,8 +375,15 @@ class CommonRepository extends ServiceEntityRepository
             $hydrationMode = Query::HYDRATE_OBJECT;
         }
 
-        if (!empty($args['iterator_mode'])) {
+        if (array_key_exists('iterable_mode', $args) && true === $args['iterable_mode']) {
             // Hydrate one by one
+            return $query->toIterable([], $hydrationMode);
+        }
+
+        if (!empty($args['iterator_mode'])) {
+            // When you remove the following, please search for the "iterator_mode" in the project.
+            @\trigger_error('Using "iterator_mode" is deprecated. Use "iterable_mode" instead. Usage of "iterator_mode" will be removed in 6.0.', \E_USER_DEPRECATED);
+
             return $query->iterate(null, $hydrationMode);
         } elseif (empty($args['ignore_paginator'])) {
             if (!empty($args['use_simple_paginator'])) {
