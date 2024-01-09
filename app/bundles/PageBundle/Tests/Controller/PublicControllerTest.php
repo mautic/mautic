@@ -266,8 +266,10 @@ class PublicControllerTest extends MauticMysqlTestCase
             );
 
         $container = $this->createMock(Container::class);
-        $container->method('has')
-            ->will($this->returnValue(true));
+        $container->expects(self::never())
+            ->method('has'); // THIS CAN FAIL!!!!!!!!!!!!!!
+        $container->expects(self::never())
+            ->method('get');
 
         $this->request->attributes->set('ignore_mismatch', true);
 
@@ -399,7 +401,7 @@ class PublicControllerTest extends MauticMysqlTestCase
             $this->logger,
             $redirectId
         );
-        self::assertInstanceOf(RedirectResponse::class, $response);
+        self::assertSame('https://someurl.test/?ct=someClickTroughValue', $response->getTargetUrl());
     }
 
     /**
@@ -498,7 +500,6 @@ class PublicControllerTest extends MauticMysqlTestCase
             $this->logger,
             $redirectId
         );
-        self::assertInstanceOf(RedirectResponse::class, $response);
         self::assertSame($targetUrl, $response->getTargetUrl());
         self::assertSame(Response::HTTP_FOUND, $response->getStatusCode());
     }

@@ -5,7 +5,6 @@ namespace Mautic\EmailBundle\Tests\MonitoredEmail\Processor\Unsubscription;
 use Mautic\EmailBundle\MonitoredEmail\Exception\UnsubscriptionNotFound;
 use Mautic\EmailBundle\MonitoredEmail\Message;
 use Mautic\EmailBundle\MonitoredEmail\Processor\Unsubscription\Parser;
-use Mautic\EmailBundle\MonitoredEmail\Processor\Unsubscription\UnsubscribedEmail;
 
 class ParserTest extends \PHPUnit\Framework\TestCase
 {
@@ -27,7 +26,6 @@ class ParserTest extends \PHPUnit\Framework\TestCase
         $parser = new Parser($message);
 
         $unsubscribedEmail = $parser->parse();
-        $this->assertInstanceOf(UnsubscribedEmail::class, $unsubscribedEmail);
 
         $this->assertEquals('hello@hello.com', $unsubscribedEmail->getContactEmail());
         $this->assertEquals('test+unsubscribe@test.com', $unsubscribedEmail->getUnsubscriptionAddress());

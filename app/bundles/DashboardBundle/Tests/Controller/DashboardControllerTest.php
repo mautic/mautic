@@ -241,12 +241,13 @@ class DashboardControllerTest extends \PHPUnit\Framework\TestCase
             ->willReturn(false);
 
         $this->expectException(NotFoundHttpException::class);
-        $this->controller->widgetAction($this->requestMock, $this->createMock(Widget::class), 1);
+        $this->controller->widgetAction($this->requestMock, $this->createMock(Widget::class), $this->createMock(Environment::class), 1);
     }
 
     public function testWidgetNotFound(): void
     {
         $widgetId = '1';
+        $twig     = $this->createMock(Environment::class);
 
         $this->requestMock->method('isXmlHttpRequest')
             ->willReturn(true);
@@ -264,7 +265,7 @@ class DashboardControllerTest extends \PHPUnit\Framework\TestCase
             ->method('get');
 
         $this->expectException(NotFoundHttpException::class);
-        $this->controller->widgetAction($this->requestMock, $widgetService, $widgetId);
+        $this->controller->widgetAction($this->requestMock, $widgetService, $twig, $widgetId);
     }
 
     public function testWidget(): void
@@ -290,12 +291,7 @@ class DashboardControllerTest extends \PHPUnit\Framework\TestCase
             ->with((int) $widgetId)
             ->willReturn($widget);
 
-        $this->containerMock->expects(self::once())
-            ->method('get')
-            ->with('twig')
-            ->willReturn($twig);
-
-        $response = $this->controller->widgetAction($this->requestMock, $widgetService, $widgetId);
+        $response = $this->controller->widgetAction($this->requestMock, $widgetService, $twig, $widgetId);
 
         self::assertSame('{"success":1,"widgetId":"1","widgetHtml":"lfsadkdhf\u016fasfjds","widgetWidth":null,"widgetHeight":null}', $response->getContent());
     }

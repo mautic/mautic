@@ -297,7 +297,7 @@ class PluginController extends FormController
                         'enabled'       => $entity->getIsPublished(),
                         'name'          => $integrationObject->getName(),
                         'mauticContent' => 'integrationConfig',
-                        'sidebar'       => $this->get('twig')->render('@MauticCore/LeftPanel/index.html.twig'),
+                        'sidebar'       => $this->renderView('@MauticCore/LeftPanel/index.html.twig'),
                     ]
                 );
             }
@@ -351,7 +351,7 @@ class PluginController extends FormController
                     'activeLink'    => '#mautic_plugin_index',
                     'mauticContent' => 'integrationConfig',
                     'route'         => false,
-                    'sidebar'       => $this->get('twig')->render('@MauticCore/LeftPanel/index.html.twig'),
+                    'sidebar'       => $this->renderView('@MauticCore/LeftPanel/index.html.twig'),
                 ],
             ]
         );

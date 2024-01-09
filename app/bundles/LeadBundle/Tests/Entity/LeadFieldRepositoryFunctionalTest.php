@@ -154,13 +154,13 @@ class LeadFieldRepositoryFunctionalTest extends MauticMysqlTestCase
         );
 
         $fieldModel = self::getContainer()->get(FieldModel::class);
-        \assert($fieldModel instanceof FieldModel);
+        \assert($fieldModel instanceof FieldModel); // @phpstan-ignore-line
         $fieldModel->saveEntity($field);
 
         $lead = new Lead();
         $lead->addUpdatedField('colors', 'green|blue');
         $contactModel = self::getContainer()->get(LeadModel::class);
-        \assert($contactModel instanceof LeadModel);
+        \assert($contactModel instanceof LeadModel); // @phpstan-ignore-line
 
         $contactModel->saveEntity($lead);
         $repository = $fieldModel->getRepository();

@@ -40,7 +40,6 @@ BODY;
         $parser = new BodyParser();
         $bounce = $parser->getBounce($message);
 
-        $this->assertInstanceOf(BouncedEmail::class, $bounce);
         $this->assertEquals('recipient@example.net', $bounce->getContactEmail());
         $this->assertEquals(Category::UNKNOWN, $bounce->getRuleCategory());
         $this->assertEquals(Type::HARD, $bounce->getType());

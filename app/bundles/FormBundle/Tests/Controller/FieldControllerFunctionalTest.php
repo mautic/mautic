@@ -65,7 +65,7 @@ final class FieldControllerFunctionalTest extends MauticMysqlTestCase
         $content     = json_decode($content)->newContent;
         $crawler     = new Crawler($content, $this->client->getInternalRequest()->getUri());
         $formCrawler = $crawler->filter('form[name=formfield]');
-        $this::assertSame(1, $formCrawler->count(), $this->client->getResponse()->getContent());
+        Assert::assertCount(1, $formCrawler, $this->client->getResponse()->getContent());
         $form = $formCrawler->form();
         $form->setValues(
             [

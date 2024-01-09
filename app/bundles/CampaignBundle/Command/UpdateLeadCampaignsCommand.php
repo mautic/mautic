@@ -122,6 +122,30 @@ class UpdateLeadCampaignsCommand extends ModeratedCommand
         $this->output     = ($this->quiet) ? new NullOutput() : $output;
         $excludeCampaigns = $input->getOption('exclude');
 
+        if (is_numeric($id)) {
+            $id = (int) $id;
+        }
+
+        if (is_numeric($maxThreads)) {
+            $maxThreads = (int) $maxThreads;
+        }
+
+        if (is_numeric($threadId)) {
+            $threadId = (int) $threadId;
+        }
+
+        if (is_numeric($contactMaxId)) {
+            $contactMaxId = (int) $contactMaxId;
+        }
+
+        if (is_numeric($contactMinId)) {
+            $contactMinId = (int) $contactMinId;
+        }
+
+        if (is_numeric($contactId)) {
+            $contactId = (int) $contactId;
+        }
+
         if ($threadId && $maxThreads && (int) $threadId > (int) $maxThreads) {
             $this->output->writeln('--thread-id cannot be larger than --max-thread');
 

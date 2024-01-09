@@ -87,6 +87,7 @@ class ConnectwiseIntegrationTest extends AbstractIntegrationTestCase
                 $this->fieldModel,
                 $integrationEntityModel,
                 $this->doNotContact,
+                $this->fieldsWithUniqueIdentifier,
             ])
             ->onlyMethods(['isAuthorized', 'getApiHelper', 'getRecords', 'saveCampaignMembers'])
             ->getMock();

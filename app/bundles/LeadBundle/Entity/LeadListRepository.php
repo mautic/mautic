@@ -289,7 +289,7 @@ class LeadListRepository extends CommonRepository
 
         $return = [];
         foreach ($result as $r) {
-            $return[$r['leadlist_id']] = $r['thecount'];
+            $return[$r['leadlist_id']] = (int) $r['thecount'];
         }
 
         // Ensure lists without leads have a value

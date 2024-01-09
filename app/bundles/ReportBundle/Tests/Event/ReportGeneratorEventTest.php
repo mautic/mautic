@@ -24,10 +24,7 @@ class ReportGeneratorEventTest extends \PHPUnit\Framework\TestCase
      */
     private MockObject $queryBuilder;
 
-    /**
-     * @var MockObject|ChannelListHelper
-     */
-    private ChannelListHelper $channelListHelper;
+    private \Mautic\ChannelBundle\Helper\ChannelListHelper $channelListHelper;
 
     private ReportGeneratorEvent $reportGeneratorEvent;
 

@@ -40,7 +40,7 @@ class PublicController extends FormController
             return new Response('ERROR');
         }
 
-        $result           = json_decode($request->request->get('result') ?? [], true);
+        $result           = json_decode($request->request->get('result', null) ?? [], true);
         $oid              = $request->request->get('webhookId', '');
         $validatedRequest = $lookupHelper->validateRequest($oid);
 

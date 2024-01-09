@@ -152,7 +152,7 @@ class PublicController extends AbstractFormController
                         if (!empty($variantCookie)) {
                             if (isset($variants[$variantCookie])) {
                                 // if not the parent, show the specific variant already displayed to the visitor
-                                if ($variantCookie !== $entity->getId()) {
+                                if ((int) $variantCookie !== $entity->getId()) {
                                     $entity = $childrenVariants[$variantCookie];
                                 } // otherwise proceed with displaying parent
                             }
@@ -277,7 +277,8 @@ class PublicController extends AbstractFormController
                 }
             }
 
-            $assetsHelper->addScript($router->generate('mautic_js', [], UrlGeneratorInterface::ABSOLUTE_URL),
+            $assetsHelper->addScript(
+                $router->generate('mautic_js', [], UrlGeneratorInterface::ABSOLUTE_URL),
                 'onPageDisplay_headClose',
                 true,
                 'mautic_js'

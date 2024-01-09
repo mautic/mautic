@@ -693,7 +693,7 @@ class CampaignController extends AbstractStandardFormController
         } elseif ('new' === $action && empty($sessionId)) {
             $sessionId = 'mautic_'.sha1(uniqid(mt_rand(), true));
             if ($this->requestStack->getCurrentRequest()->request->has('campaign')) {
-                $campaign  = $this->requestStack->getCurrentRequest()->request->get('campaign') ?? [];
+                $campaign  = $this->requestStack->getCurrentRequest()->request->all()['campaign'] ?? [];
                 $sessionId = $campaign['sessionId'] ?? $sessionId;
             }
         } elseif ('edit' === $action) {
