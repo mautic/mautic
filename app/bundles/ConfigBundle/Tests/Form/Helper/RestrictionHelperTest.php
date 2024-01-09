@@ -189,7 +189,7 @@ class RestrictionHelperTest extends TypeTestCase
             ->getFormFactory();
 
         $form = $this->factory->create(ConfigType::class, $this->forms);
-        /** @var FormInterface $address */
+        /** @var FormInterface<mixed> $address */
         $address = $form['emailconfig']['monitored_email']['EmailBundle_unsubscribes']['address'];
 
         $this->assertTrue($address->getConfig()->getOption('attr')['readonly']);

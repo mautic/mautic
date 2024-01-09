@@ -280,7 +280,7 @@ class TagController extends FormController
         /** @var TagModel $tagModel */
         $tagModel = $this->getModel('tagmanager.tag');
 
-        /** @var FormInterface<FormInterface> $form */
+        /** @var FormInterface<FormInterface<Tag>> $form */
         $form = $tagModel->createForm($tag, $this->formFactory, $action);
 
         // /Check for a submitted form and process it

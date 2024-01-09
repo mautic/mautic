@@ -73,7 +73,7 @@ final class TypeOperatorSubscriberTest extends \PHPUnit\Framework\TestCase
     private \PHPUnit\Framework\MockObject\MockObject $translator;
 
     /**
-     * @var MockObject&FormInterface<FormInterface>
+     * @var MockObject&FormInterface<FormInterface<mixed>>
      */
     private \PHPUnit\Framework\MockObject\MockObject $form;
 
