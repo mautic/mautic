@@ -21,7 +21,7 @@ The underlying library used for sending emails (Swift Mailer) was discontinued a
 *   Configuration
     * Replace all occurances of `%kernel.root_dir%` to `%kernel.project_dir%/app` as the "root_dir" was deprecated in Symfony 4 and removed in Symfony 5. The "project_dir" variable is path to the Mautic root directory. The "root_dir" variable was path to the app directory.
     * The index_dev.php was removed. Use env variables to set the environment.
-    * We are following symfony env naming convention. [Symfomy 4.4](https://symfony.com/doc/4.4/configuration.html#selecting-the-active-environment)
+    * We are following symfony env naming convention. [Symfony 4.4](https://symfony.com/doc/4.4/configuration.html#selecting-the-active-environment)
       * `.env`                contains default values for the environment variables needed by the app
       * `.env.local`          uncommitted file with local overrides
       * `.env.$APP_ENV`       committed environment-specific defaults
