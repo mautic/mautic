@@ -4,8 +4,15 @@ ROOT=$(git rev-parse --show-toplevel)
 
 echo "php-cs-fixer pre commit hook start"
 
+which php
+if [ $? -eq 1 ]; then
+  echo "php is not installed"
+  exit 0
+fi
+
 PHP_CS_FIXER="bin/php-cs-fixer"
 HAS_PHP_CS_FIXER=false
+RETURN_CODE=0
 
 if [ -x $PHP_CS_FIXER ]; then
     HAS_PHP_CS_FIXER=true
@@ -13,11 +20,9 @@ fi
 
 if $HAS_PHP_CS_FIXER; then
 
-    # Fix changed (indexed) files
-    $PHP_CS_FIXER fix --config=$ROOT/.php-cs-fixer.php --verbose --using-cache=no $(git diff --cached --name-only)
-
-    # Add the changes from CS Fixer back to the git index:
-    git add $(git diff --cached --name-only)
+    # Check changed (indexed) files
+    $PHP_CS_FIXER fix --config=$ROOT/.php-cs-fixer.php --dry-run --verbose --using-cache=no $(git diff --cached --name-only)
+    RETURN_CODE=$?
 
 else
     echo ""
@@ -28,3 +33,4 @@ else
 fi
 
 echo "php-cs-fixer pre commit hook finish"
+exit $RETURN_CODE
