@@ -2,7 +2,6 @@
 
 namespace Mautic\LeadBundle\Tests\Entity;
 
-use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\DBAL\Query\Expression\ExpressionBuilder;
 use Doctrine\DBAL\Query\QueryBuilder;
 use Doctrine\DBAL\Result;
@@ -231,7 +230,7 @@ final class LeadFieldRepositoryTest extends TestCase
 
         $query->method('execute')->willReturn([]);
 
-        $this->assertInstanceOf(ArrayCollection::class, $this->repository->getListablePublishedFields());
+        $this->repository->getListablePublishedFields();
     }
 
     public function testGetFieldSchemaData(): void

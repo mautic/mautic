@@ -233,10 +233,10 @@ class SalesforceApiTest extends \PHPUnit\Framework\TestCase
             ->willReturnCallback(
                 function ($url, $parameters = [], $method = 'GET', $settings = []): void {
                     $this->assertEquals(
-                        $parameters,
                         [
                             'q' => 'select Id from Account where Name = \'Some\\\\thing E\\\'lse\' and BillingCountry =  \'Some\\\\Where E\\\'lse\' and BillingCity =  \'Some\\\\Where E\\\'lse\' and BillingState =  \'Some\\\\Where E\\\'lse\'',
-                        ]
+                        ],
+                        $parameters
                     );
                 }
             );
@@ -282,10 +282,10 @@ class SalesforceApiTest extends \PHPUnit\Framework\TestCase
             ->willReturnCallback(
                 function ($url, $parameters = [], $method = 'GET', $settings = []): void {
                     $this->assertEquals(
-                        $parameters,
                         [
                             'q' => 'select Id from Account where Name = \'Some\\\\thing\\\' E\\\'lse\' and BillingCountry =  \'Some\\\\Where\\\' E\\\'lse\' and BillingCity =  \'Some\\\\Where\\\' E\\\'lse\' and BillingState =  \'Some\\\\Where\\\' E\\\'lse\'',
-                        ]
+                        ],
+                        $parameters
                     );
                 }
             );
@@ -329,10 +329,10 @@ class SalesforceApiTest extends \PHPUnit\Framework\TestCase
             ->willReturnCallback(
                 function ($url, $parameters = [], $method = 'GET', $settings = []): void {
                     $this->assertEquals(
-                        $parameters,
                         [
                             'q' => 'select Id from Contact where email = \'con\\\\tact\\\'email@email.com\'',
-                        ]
+                        ],
+                        $parameters
                     );
                 }
             );
@@ -371,10 +371,10 @@ class SalesforceApiTest extends \PHPUnit\Framework\TestCase
             ->willReturnCallback(
                 function ($url, $parameters = [], $method = 'GET', $settings = []): void {
                     $this->assertEquals(
-                        $parameters,
                         [
                             'q' => 'select Id from Lead where email = \'con\\\\tact\\\'email@email.com\' and ConvertedContactId = NULL',
-                        ]
+                        ],
+                        $parameters
                     );
                 }
             );

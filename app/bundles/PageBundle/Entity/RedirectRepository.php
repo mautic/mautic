@@ -73,7 +73,7 @@ class RedirectRepository extends CommonRepository
             $q->set('unique_hits', 'unique_hits + '.(int) $increaseBy);
         }
 
-        $q->executeQuery();
+        $q->executeStatement();
     }
 
     /**
