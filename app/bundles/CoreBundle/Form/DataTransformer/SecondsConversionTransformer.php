@@ -4,10 +4,14 @@ namespace Mautic\CoreBundle\Form\DataTransformer;
 
 use Symfony\Component\Form\DataTransformerInterface;
 
+/**
+ * @implements DataTransformerInterface<string, string>
+ */
 class SecondsConversionTransformer implements DataTransformerInterface
 {
-    public function __construct(private $viewFormat = 'H')
-    {
+    public function __construct(
+        private $viewFormat = 'H'
+    ) {
     }
 
     /**

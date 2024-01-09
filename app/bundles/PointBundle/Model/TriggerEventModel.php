@@ -15,8 +15,6 @@ use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 class TriggerEventModel extends CommonFormModel
 {
     /**
-     * {@inheritdoc}
-     *
      * @return TriggerEventRepository
      */
     public function getRepository()
@@ -24,9 +22,6 @@ class TriggerEventModel extends CommonFormModel
         return $this->em->getRepository(\Mautic\PointBundle\Entity\TriggerEvent::class);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getPermissionBase(): string
     {
         return 'point:triggers';
@@ -42,8 +37,6 @@ class TriggerEventModel extends CommonFormModel
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @throws MethodNotAllowedHttpException
      */
     public function createForm($entity, FormFactoryInterface $formFactory, $action = null, $options = []): \Symfony\Component\Form\FormInterface
@@ -87,5 +80,34 @@ class TriggerEventModel extends CommonFormModel
         }
 
         return $dependents;
+    }
+
+    /**
+     * @return array<int, int>
+     */
+    public function getPointTriggerIdsWithDependenciesOnEmail(int $emailId): array
+    {
+        $filter = [
+            'force'  => [
+                ['column' => 'e.type', 'expr' => 'in', 'value' => ['email.send', 'email.send_to_user']],
+            ],
+        ];
+        $entities = $this->getEntities(
+            [
+                'filter'     => $filter,
+            ]
+        );
+        $triggerIds = [];
+        foreach ($entities as $entity) {
+            $properties = $entity->getProperties();
+            if (isset($properties['email']) && (int) $properties['email'] === $emailId) {
+                $triggerIds[] = $entity->getTrigger()->getId();
+            }
+            if (isset($properties['useremail']['email']) && (int) $properties['useremail']['email'] === $emailId) {
+                $triggerIds[] = $entity->getTrigger()->getId();
+            }
+        }
+
+        return array_unique($triggerIds);
     }
 }

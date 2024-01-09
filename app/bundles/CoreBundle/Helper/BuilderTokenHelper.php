@@ -9,19 +9,27 @@ use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 
 class BuilderTokenHelper
 {
-    private $isConfigured = false;
+    private bool $isConfigured = false;
 
     protected $permissionSet;
+
     protected $modelName;
+
     protected $viewPermissionBase;
+
     protected $langVar;
+
     protected $bundleName;
 
     /**
      * @param ModelFactory<object> $modelFactory
      */
-    public function __construct(private CorePermissions $security, private ModelFactory $modelFactory, private Connection $connection, private UserHelper $userHelper)
-    {
+    public function __construct(
+        private CorePermissions $security,
+        private ModelFactory $modelFactory,
+        private Connection $connection,
+        private UserHelper $userHelper
+    ) {
     }
 
     /**

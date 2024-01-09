@@ -23,33 +23,26 @@ class SegmentContactsLineChartQuery extends ChartQuery
      */
     private $firstEventLog;
 
-    /**
-     * @var array
-     */
-    private $addedEventLogStats;
+    private ?array $addedEventLogStats = null;
 
-    /**
-     * @var array
-     */
-    private $removedEventLogStats;
+    private ?array $removedEventLogStats = null;
 
-    /**
-     * @var array
-     */
-    private $addedLeadListStats;
+    private ?array $addedLeadListStats = null;
 
-    /**
-     * @var bool
-     */
-    private $statsFromEventLog;
+    private ?bool $statsFromEventLog = null;
 
     /**
      * @param string|null $unit
      *
      * @throws SegmentNotFoundException
      */
-    public function __construct(Connection $connection, \DateTime $dateFrom, \DateTime $dateTo, private array $filters = [], $unit = null)
-    {
+    public function __construct(
+        Connection $connection,
+        \DateTime $dateFrom,
+        \DateTime $dateTo,
+        private array $filters = [],
+        $unit = null
+    ) {
         $this->connection = $connection;
         $this->dateFrom   = $dateFrom;
         $this->dateTo     = $dateTo;

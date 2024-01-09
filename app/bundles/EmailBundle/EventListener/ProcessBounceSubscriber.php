@@ -11,6 +11,7 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 class ProcessBounceSubscriber implements EventSubscriberInterface
 {
     public const BUNDLE     = 'EmailBundle';
+
     public const FOLDER_KEY = 'bounces';
 
     public static function getSubscribedEvents(): array
@@ -21,8 +22,9 @@ class ProcessBounceSubscriber implements EventSubscriberInterface
         ];
     }
 
-    public function __construct(private Bounce $bouncer)
-    {
+    public function __construct(
+        private Bounce $bouncer
+    ) {
     }
 
     public function onEmailConfig(MonitoredEmailEvent $event): void

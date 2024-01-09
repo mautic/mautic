@@ -30,8 +30,20 @@ class MessageController extends AbstractStandardFormController
 {
     use EntityContactsTrait;
 
-    public function __construct(FormFactoryInterface $formFactory, FormFieldHelper $fieldHelper, ManagerRegistry $doctrine, MauticFactory $factory, ModelFactory $modelFactory, UserHelper $userHelper, CoreParametersHelper $coreParametersHelper, EventDispatcherInterface $dispatcher, Translator $translator, FlashBag $flashBag, private RequestStack $requestStack, CorePermissions $security)
-    {
+    public function __construct(
+        FormFactoryInterface $formFactory,
+        FormFieldHelper $fieldHelper,
+        ManagerRegistry $doctrine,
+        MauticFactory $factory,
+        ModelFactory $modelFactory,
+        UserHelper $userHelper,
+        CoreParametersHelper $coreParametersHelper,
+        EventDispatcherInterface $dispatcher,
+        Translator $translator,
+        FlashBag $flashBag,
+        private RequestStack $requestStack,
+        CorePermissions $security
+    ) {
         parent::__construct($formFactory, $fieldHelper, $doctrine, $factory, $modelFactory, $userHelper, $coreParametersHelper, $dispatcher, $translator, $flashBag, $requestStack, $security);
     }
 
@@ -202,25 +214,16 @@ class MessageController extends AbstractStandardFormController
         return $form->createView();
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function getJsLoadMethodPrefix(): string
     {
         return 'messages';
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function getModelName(): string
     {
         return 'channel.message';
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function getRouteBase(): string
     {
         return 'message';
@@ -236,9 +239,6 @@ class MessageController extends AbstractStandardFormController
         return 'message'.(($objectId) ? '.'.$objectId : '');
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function getTranslationBase(): string
     {
         return 'mautic.channel.message';

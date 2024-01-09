@@ -5,19 +5,23 @@ namespace Mautic\CoreBundle\Form\DataTransformer;
 use Mautic\CoreBundle\Helper\AbstractFormFieldHelper;
 use Symfony\Component\Form\DataTransformerInterface;
 
+/**
+ * @implements DataTransformerInterface<array<mixed>, array<mixed>>
+ */
 class SortableListTransformer implements DataTransformerInterface
 {
     /**
      * @param bool $withLabels
-     * @param bool $atRootLevel
      * @param bool $useKeyValuePairs
      */
-    public function __construct(private $withLabels = true, private $useKeyValuePairs = false)
-    {
+    public function __construct(
+        private $withLabels = true,
+        private $useKeyValuePairs = false
+    ) {
     }
 
     /**
-     * @return array
+     * @return array<mixed>
      */
     public function transform($array)
     {
@@ -29,7 +33,7 @@ class SortableListTransformer implements DataTransformerInterface
     }
 
     /**
-     * @return array
+     * @return array<mixed>
      */
     public function reverseTransform($array)
     {
@@ -40,7 +44,12 @@ class SortableListTransformer implements DataTransformerInterface
         return $this->formatList($array);
     }
 
-    private function formatList($array)
+    /**
+     * @param array<mixed>|null $array
+     *
+     * @return array<mixed>
+     */
+    private function formatList(?array $array): array
     {
         if (null === $array || !isset($array['list'])) {
             return ['list' => []];
@@ -58,6 +67,9 @@ class SortableListTransformer implements DataTransformerInterface
         return $array;
     }
 
+    /**
+     * @return array<mixed>
+     */
     private function transformKeyValuePair($array): array
     {
         if (null === $array) {
@@ -76,7 +88,12 @@ class SortableListTransformer implements DataTransformerInterface
         return ['list' => $formattedArray];
     }
 
-    private function reverseTransformKeyValuePair($array): array
+    /**
+     * @param array<mixed> $array
+     *
+     * @return array<mixed>
+     */
+    private function reverseTransformKeyValuePair(?array $array): array
     {
         if (null === $array || !isset($array['list'])) {
             return [];

@@ -11,8 +11,11 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class WebhookSubscriber implements EventSubscriberInterface
 {
-    public function __construct(private IpLookupHelper $ipLookupHelper, private AuditLogModel $auditLogModel, private WebhookKillNotificator $webhookKillNotificator)
-    {
+    public function __construct(
+        private IpLookupHelper $ipLookupHelper,
+        private AuditLogModel $auditLogModel,
+        private WebhookKillNotificator $webhookKillNotificator
+    ) {
     }
 
     public static function getSubscribedEvents(): array

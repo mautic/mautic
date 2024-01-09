@@ -41,8 +41,9 @@ final class CampaignActionJumpToEventSubscriberTest extends TestCase
         $leadLog->setLead($contact);
 
         $eventRepository = new class($campaign) extends EventRepository {
-            public function __construct(private Campaign $campaign)
-            {
+            public function __construct(
+                private Campaign $campaign
+            ) {
             }
 
             public function getEntities(array $args = [])
@@ -147,8 +148,9 @@ final class CampaignActionJumpToEventSubscriberTest extends TestCase
         $leadLog->setLead($contact);
 
         $eventRepository = new class($campaign) extends EventRepository {
-            public function __construct(private Campaign $campaign)
-            {
+            public function __construct(
+                private Campaign $campaign
+            ) {
             }
 
             public function getEntities(array $args = [])

@@ -83,9 +83,6 @@ class ImportRepository extends CommonRepository
         return $q->where($q->expr()->in($this->getTableAlias().'.status', $statuses));
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getTableAlias(): string
     {
         return 'i';

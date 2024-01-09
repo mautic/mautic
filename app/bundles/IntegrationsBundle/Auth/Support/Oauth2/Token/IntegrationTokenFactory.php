@@ -11,8 +11,9 @@ class IntegrationTokenFactory implements TokenFactoryInterface
     /**
      * @param mixed[] $extraKeysToStore
      */
-    public function __construct(private array $extraKeysToStore = [])
-    {
+    public function __construct(
+        private array $extraKeysToStore = []
+    ) {
     }
 
     public function __invoke(array $data, ?TokenInterface $previousToken = null): IntegrationToken

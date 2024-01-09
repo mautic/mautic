@@ -8,18 +8,16 @@ use Symfony\Component\HttpKernel\CacheWarmer\CacheWarmerInterface;
 
 class MiddlewareCacheWarmer implements CacheWarmerInterface
 {
-    /**
-     * @var string
-     */
-    private $cacheFile;
+    private ?string $cacheFile = null;
 
     /**
      * @var \SplPriorityQueue|\ReflectionClass[]
      */
     private \SplPriorityQueue $specs;
 
-    public function __construct(private string $env)
-    {
+    public function __construct(
+        private string $env
+    ) {
         $this->specs     = new \SplPriorityQueue();
     }
 

@@ -51,17 +51,7 @@ class ReportSubscriberTest extends TestCase
 
     public function testOnReportBuilderAddsPageAndPageHitReports(): void
     {
-        $mockEvent = $this->getMockBuilder(ReportBuilderEvent::class)
-            ->disableOriginalConstructor()
-            ->onlyMethods([
-                'checkContext',
-                'addGraph',
-                'getStandardColumns',
-                'getCategoryColumns',
-                'getCampaignByChannelColumns',
-                'addTable',
-            ])
-            ->getMock();
+        $mockEvent = $this->createMock(ReportBuilderEvent::class);
 
         $mockEvent->expects($this->once())
             ->method('getStandardColumns')

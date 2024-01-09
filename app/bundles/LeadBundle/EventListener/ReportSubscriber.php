@@ -25,17 +25,27 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 class ReportSubscriber implements EventSubscriberInterface
 {
     public const CONTEXT_LEADS                     = 'leads';
+
     public const CONTEXT_LEAD_POINT_LOG            = 'lead.pointlog';
+
     public const CONTEXT_CONTACT_ATTRIBUTION_MULTI = 'contact.attribution.multi';
+
     public const CONTEXT_CONTACT_ATTRIBUTION_FIRST = 'contact.attribution.first';
+
     public const CONTEXT_CONTACT_ATTRIBUTION_LAST  = 'contact.attribution.last';
+
     public const CONTEXT_CONTACT_FREQUENCYRULES    = 'contact.frequencyrules';
+
     public const CONTEXT_CONTACT_MESSAGE_FREQUENCY = 'contact.message.frequency';
+
     public const CONTEXT_COMPANIES                 = 'companies';
 
     public const GROUP_CONTACTS = 'contacts';
 
-    private $leadContexts = [
+    /**
+     * @var string[]
+     */
+    private array $leadContexts = [
         self::CONTEXT_LEADS,
         self::CONTEXT_LEAD_POINT_LOG,
         self::CONTEXT_CONTACT_ATTRIBUTION_MULTI,
@@ -43,20 +53,27 @@ class ReportSubscriber implements EventSubscriberInterface
         self::CONTEXT_CONTACT_ATTRIBUTION_LAST,
         self::CONTEXT_CONTACT_FREQUENCYRULES,
     ];
-    private $companyContexts = [self::CONTEXT_COMPANIES];
 
     /**
-     * @var array
+     * @var string[]
      */
-    private $channels;
+    private array $companyContexts = [self::CONTEXT_COMPANIES];
 
-    /**
-     * @var array
-     */
-    private $channelActions;
+    private ?array $channels = null;
 
-    public function __construct(private LeadModel $leadModel, private FieldModel $fieldModel, private StageModel $stageModel, private CampaignModel $campaignModel, private EventCollector $eventCollector, private CompanyModel $companyModel, private CompanyReportData $companyReportData, private FieldsBuilder $fieldsBuilder, private Translator $translator)
-    {
+    private ?array $channelActions = null;
+
+    public function __construct(
+        private LeadModel $leadModel,
+        private FieldModel $fieldModel,
+        private StageModel $stageModel,
+        private CampaignModel $campaignModel,
+        private EventCollector $eventCollector,
+        private CompanyModel $companyModel,
+        private CompanyReportData $companyReportData,
+        private FieldsBuilder $fieldsBuilder,
+        private Translator $translator
+    ) {
     }
 
     public static function getSubscribedEvents(): array

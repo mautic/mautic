@@ -7,24 +7,27 @@ use Doctrine\ORM\PersistentCollection;
 use Symfony\Component\Form\DataTransformerInterface;
 use Symfony\Component\Form\Exception\TransformationFailedException;
 
+/**
+ * @implements DataTransformerInterface<array<mixed>|int|null, array<mixed>|object|null>
+ */
 class TagEntityModelTransformer implements DataTransformerInterface
 {
     /**
      * @param string $repository
      * @param bool   $isArray
      */
-    public function __construct(private EntityManager $em, private $repository = '', private $isArray = false)
-    {
+    public function __construct(
+        private EntityManager $em,
+        private $repository = '',
+        private $isArray = false
+    ) {
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function reverseTransform($entity)
     {
         if (!$this->isArray) {
             if (is_null($entity) || !is_object($entity)) {
-                return '';
+                return null;
             }
 
             return $entity->getTag();
@@ -43,8 +46,6 @@ class TagEntityModelTransformer implements DataTransformerInterface
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @throws TransformationFailedException if object is not found
      */
     public function transform($id)

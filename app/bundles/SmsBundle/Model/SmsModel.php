@@ -42,14 +42,25 @@ use Symfony\Contracts\EventDispatcher\Event;
  */
 class SmsModel extends FormModel implements AjaxLookupModelInterface
 {
-    public function __construct(protected TrackableModel $pageTrackableModel, protected LeadModel $leadModel, protected MessageQueueModel $messageQueueModel, protected TransportChain $transport, private CacheStorageHelper $cacheStorageHelper, EntityManagerInterface $em, CorePermissions $security, EventDispatcherInterface $dispatcher, UrlGeneratorInterface $router, Translator $translator, UserHelper $userHelper, LoggerInterface $mauticLogger, CoreParametersHelper $coreParametersHelper)
-    {
+    public function __construct(
+        protected TrackableModel $pageTrackableModel,
+        protected LeadModel $leadModel,
+        protected MessageQueueModel $messageQueueModel,
+        protected TransportChain $transport,
+        private CacheStorageHelper $cacheStorageHelper,
+        EntityManagerInterface $em,
+        CorePermissions $security,
+        EventDispatcherInterface $dispatcher,
+        UrlGeneratorInterface $router,
+        Translator $translator,
+        UserHelper $userHelper,
+        LoggerInterface $mauticLogger,
+        CoreParametersHelper $coreParametersHelper
+    ) {
         parent::__construct($em, $security, $dispatcher, $router, $translator, $userHelper, $mauticLogger, $coreParametersHelper);
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @return \Mautic\SmsBundle\Entity\SmsRepository
      */
     public function getRepository()
@@ -65,9 +76,6 @@ class SmsModel extends FormModel implements AjaxLookupModelInterface
         return $this->em->getRepository(\Mautic\SmsBundle\Entity\Stat::class);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getPermissionBase(): string
     {
         return 'sms:smses';
@@ -107,9 +115,6 @@ class SmsModel extends FormModel implements AjaxLookupModelInterface
     }
 
     /**
-     * {@inheritdoc}
-     *
-
      * @param array $options
      *
      * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
@@ -372,8 +377,6 @@ class SmsModel extends FormModel implements AjaxLookupModelInterface
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @throws \Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException
      */
     protected function dispatchEvent($action, &$entity, $isNew = false, Event $event = null): ?Event

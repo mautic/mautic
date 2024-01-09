@@ -18,12 +18,11 @@ use Symfony\Component\Validator\Constraints\Choice;
  * @author Fabien Potencier <fabien@symfony.com>
  *
  * @note   This class is based on Sensio\Bundle\DistributionBundle\Configurator\Form\DoctrineStepType
+ *
+ * @extends AbstractType<mixed>
  */
 class DoctrineStepType extends AbstractType
 {
-    /**
-     * {@inheritdoc}
-     */
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder->add(
@@ -171,9 +170,6 @@ class DoctrineStepType extends AbstractType
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getBlockPrefix()
     {
         return 'install_doctrine_step';

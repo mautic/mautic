@@ -14,10 +14,12 @@ class FieldMergerHelper
     /**
      * @var MappedFieldInfoInterface[]
      */
-    private $allFields;
+    private ?array $allFields = null;
 
-    public function __construct(private ConfigFormSyncInterface $integrationObject, private array $currentFieldMappings)
-    {
+    public function __construct(
+        private ConfigFormSyncInterface $integrationObject,
+        private array $currentFieldMappings
+    ) {
     }
 
     /**

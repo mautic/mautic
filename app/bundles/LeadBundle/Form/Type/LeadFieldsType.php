@@ -9,10 +9,14 @@ use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
+/**
+ * @extends AbstractType<mixed>
+ */
 class LeadFieldsType extends AbstractType
 {
-    public function __construct(protected FieldModel $fieldModel)
-    {
+    public function __construct(
+        protected FieldModel $fieldModel
+    ) {
     }
 
     public function configureOptions(OptionsResolver $resolver): void
@@ -45,7 +49,7 @@ class LeadFieldsType extends AbstractType
     }
 
     /**
-     * @return string|\Symfony\Component\Form\FormTypeInterface|null
+     * @return string
      */
     public function getParent()
     {

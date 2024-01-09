@@ -6,8 +6,10 @@ namespace Mautic\MarketplaceBundle\DTO;
 
 final class Maintainer
 {
-    public function __construct(public string $name, public string $avatar)
-    {
+    public function __construct(
+        public string $name,
+        public string $avatar
+    ) {
     }
 
     public static function fromArray(array $array): Maintainer

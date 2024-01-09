@@ -9,8 +9,11 @@ use Mautic\PointBundle\Entity\GroupContactScore;
 
 final class GroupScoreChangeEvent
 {
-    public function __construct(private GroupContactScore $groupContactScore, private int $oldScore, private int $newScore)
-    {
+    public function __construct(
+        private GroupContactScore $groupContactScore,
+        private int $oldScore,
+        private int $newScore
+    ) {
     }
 
     public function getGroupContactScore(): GroupContactScore

@@ -127,8 +127,6 @@ class CampaignApiController extends CommonApiController
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @param Campaign &$entity
      * @param string   $action
      */

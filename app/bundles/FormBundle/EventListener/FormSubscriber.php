@@ -330,7 +330,6 @@ class FormSubscriber implements EventSubscriberInterface
                 $formViolations = $body['violations'];
 
                 // Ensure the violations match up to Mautic's
-                $violations = [];
                 foreach ($formViolations as $field => $violation) {
                     if (isset($matchedFields[$field])) {
                         $violations[$matchedFields[$field]] = $violation;

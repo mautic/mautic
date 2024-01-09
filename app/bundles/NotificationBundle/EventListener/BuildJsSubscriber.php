@@ -12,8 +12,11 @@ use Symfony\Component\Routing\RouterInterface;
 
 class BuildJsSubscriber implements EventSubscriberInterface
 {
-    public function __construct(private NotificationHelper $notificationHelper, private IntegrationHelper $integrationHelper, private RouterInterface $router)
-    {
+    public function __construct(
+        private NotificationHelper $notificationHelper,
+        private IntegrationHelper $integrationHelper,
+        private RouterInterface $router
+    ) {
     }
 
     public static function getSubscribedEvents(): array

@@ -13,58 +13,46 @@ class SubmissionEvent extends CommonEvent
 {
     /**
      * Cleaned post results.
-     *
-     * @var array
      */
-    private $results = [];
+    private array $results = [];
 
     /**
      * Form fields.
-     *
-     * @var array
      */
-    private $fields = [];
+    private array $fields = [];
 
     /**
      * Results converted to tokens.
-     *
-     * @var array
      */
-    private $tokens = [];
+    private array $tokens = [];
 
     /**
      * Callback for post form submit.
      *
-     * @var mixed
+     * @var array<string, mixed[]>
      */
-    private $callbacks = [];
+    private array $callbacks = [];
 
     /**
-     * @var mixed
+     * @var mixed[]
      */
-    private $callbackResponses = [];
+    private array $callbackResponses = [];
 
     /**
-     * @var array
+     * @var mixed[]
      */
-    private $contactFieldMatches = [];
+    private array $contactFieldMatches = [];
 
     /**
      * Array to hold information set by other actions that may be useful to subsequent actions.
      *
-     * @var array
+     * @var mixed[]
      */
-    private $feedback = [];
+    private array $feedback = [];
 
-    /**
-     * @var Action
-     */
-    private $action;
+    private ?\Mautic\FormBundle\Entity\Action $action = null;
 
-    /**
-     * @var string
-     */
-    private $context;
+    private ?string $context = null;
 
     /**
      * @var array|Response|null
@@ -74,7 +62,7 @@ class SubmissionEvent extends CommonEvent
     /**
      * @var array<mixed>
      */
-    private $postSubmitPayload;
+    private ?array $postSubmitPayload = null;
 
     /**
      * @param mixed[]                 $post   raw POST results

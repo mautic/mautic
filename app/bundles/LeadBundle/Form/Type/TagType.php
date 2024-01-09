@@ -11,10 +11,14 @@ use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
+/**
+ * @extends AbstractType<Tag>
+ */
 class TagType extends AbstractType
 {
-    public function __construct(private EntityManager $em)
-    {
+    public function __construct(
+        private EntityManager $em
+    ) {
     }
 
     public function buildForm(FormBuilderInterface $builder, array $options): void

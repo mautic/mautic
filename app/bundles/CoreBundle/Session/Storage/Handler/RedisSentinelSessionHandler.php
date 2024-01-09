@@ -10,6 +10,9 @@ use Predis\Client;
 use Predis\Response\ErrorInterface;
 use Symfony\Component\HttpFoundation\Session\Storage\Handler\AbstractSessionHandler;
 
+/**
+ * @deprecated since Mautic 5.0, to be removed in 6.0 with no replacement.
+ */
 class RedisSentinelSessionHandler extends AbstractSessionHandler
 {
     /**
@@ -17,8 +20,10 @@ class RedisSentinelSessionHandler extends AbstractSessionHandler
      */
     private \Predis\Client $redis;
 
-    public function __construct(private array $redisConfiguration, CoreParametersHelper $coreParametersHelper)
-    {
+    public function __construct(
+        private array $redisConfiguration,
+        CoreParametersHelper $coreParametersHelper
+    ) {
         $redisOptions = PRedisConnectionHelper::makeRedisOptions($redisConfiguration, 'session:'.$coreParametersHelper->get('db_name').':');
 
         $redisOptions['primaryOnly'] = $coreParametersHelper->get('redis_primary_only');

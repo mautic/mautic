@@ -10,10 +10,14 @@ use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
+/**
+ * @extends AbstractType<mixed>
+ */
 class DynamicContentFilterType extends AbstractType
 {
-    public function __construct(private BuilderIntegrationsHelper $builderIntegrationsHelper)
-    {
+    public function __construct(
+        private BuilderIntegrationsHelper $builderIntegrationsHelper
+    ) {
     }
 
     public function buildForm(FormBuilderInterface $builder, array $options): void

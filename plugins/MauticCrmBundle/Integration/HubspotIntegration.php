@@ -76,9 +76,6 @@ class HubspotIntegration extends CrmAbstractIntegration
         );
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getName(): string
     {
         return 'Hubspot';
@@ -133,9 +130,6 @@ class HubspotIntegration extends CrmAbstractIntegration
         ];
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getAuthenticationType(): string
     {
         return $this->getBearerToken() ? 'oauth2' : 'key';
@@ -282,9 +276,6 @@ class HubspotIntegration extends CrmAbstractIntegration
         return $formattedLeadData;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function isAuthorized(): bool
     {
         $keys = $this->getKeys();
@@ -650,8 +641,6 @@ class HubspotIntegration extends CrmAbstractIntegration
     }
 
     /**
-     * @return array
-     *
      * @throws \Exception
      */
     private function getReadOnlyFields($object): ?array

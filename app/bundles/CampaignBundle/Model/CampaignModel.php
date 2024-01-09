@@ -57,8 +57,6 @@ class CampaignModel extends CommonFormModel
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @return \Mautic\CampaignBundle\Entity\CampaignRepository
      */
     public function getRepository()
@@ -93,17 +91,12 @@ class CampaignModel extends CommonFormModel
         return $this->em->getRepository(\Mautic\CampaignBundle\Entity\LeadEventLog::class);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getPermissionBase(): string
     {
         return 'campaign:campaigns';
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @param object      $entity
      * @param string|null $action
      * @param array       $options
@@ -147,8 +140,6 @@ class CampaignModel extends CommonFormModel
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @throws \Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException
      */
     protected function dispatchEvent($action, &$entity, $isNew = false, \Symfony\Contracts\EventDispatcher\Event $event = null): ?\Symfony\Contracts\EventDispatcher\Event
@@ -760,5 +751,13 @@ class CampaignModel extends CommonFormModel
         }
 
         return $ids;
+    }
+
+    /**
+     * @return array<int, int>
+     */
+    public function getCampaignIdsWithDependenciesOnEmail(int $emailId): array
+    {
+        return $this->getRepository()->getCampaignIdsWithDependenciesOnEmail($emailId);
     }
 }

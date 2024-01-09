@@ -12,11 +12,12 @@ class CustomButtonEvent extends AbstractCustomRequestEvent
      */
     protected $buttons = [];
 
-    /**
-     * CustomButtonEvent constructor.
-     */
-    public function __construct(protected $location, Request $request, array $buttons = [], protected $item = null)
-    {
+    public function __construct(
+        protected $location,
+        Request $request,
+        array $buttons = [],
+        protected $item = null
+    ) {
         parent::__construct($request);
 
         foreach ($buttons as $button) {

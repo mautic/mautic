@@ -44,16 +44,32 @@ class ImportController extends FormController
 {
     // Steps of the import
     public const STEP_UPLOAD_CSV      = 1;
+
     public const STEP_MATCH_FIELDS    = 2;
+
     public const STEP_PROGRESS_BAR    = 3;
+
     public const STEP_IMPORT_FROM_CSV = 4;
 
     private \Symfony\Component\HttpFoundation\Session\SessionInterface $session;
 
     private \Mautic\LeadBundle\Model\ImportModel $importModel;
 
-    public function __construct(FormFactoryInterface $formFactory, FormFieldHelper $fieldHelper, private LoggerInterface $logger, ManagerRegistry $doctrine, MauticFactory $factory, ModelFactory $modelFactory, UserHelper $userHelper, CoreParametersHelper $coreParametersHelper, EventDispatcherInterface $dispatcher, Translator $translator, FlashBag $flashBag, RequestStack $requestStack, CorePermissions $security)
-    {
+    public function __construct(
+        FormFactoryInterface $formFactory,
+        FormFieldHelper $fieldHelper,
+        private LoggerInterface $logger,
+        ManagerRegistry $doctrine,
+        MauticFactory $factory,
+        ModelFactory $modelFactory,
+        UserHelper $userHelper,
+        CoreParametersHelper $coreParametersHelper,
+        EventDispatcherInterface $dispatcher,
+        Translator $translator,
+        FlashBag $flashBag,
+        RequestStack $requestStack,
+        CorePermissions $security
+    ) {
         /** @var ImportModel $model */
         $model = $modelFactory->getModel($this->getModelName());
 
@@ -413,23 +429,17 @@ class ImportController extends FormController
                         ->setDefault('owner', $validateEvent->getOwnerId())
                         ->setDefault('list', $validateEvent->getList())
                         ->setDefault('tags', $validateEvent->getTags())
-                        ->setDefault('skip_if_exists', $matchedFields['skip_if_exists'] ?? false)
+                        ->setDefault('skip_if_exists', $validateEvent->getSkipIfExists())
                         ->setHeaders($this->session->get('mautic.'.$object.'.import.headers'))
                         ->setParserConfig($this->session->get('mautic.'.$object.'.import.config'));
-
-                    unset($matchedFields['skip_if_exists']);
 
                     // In case the user chose to import in browser
                     if ($this->importInBrowser($form, $object)) {
                         $import->setStatus($import::MANUAL);
-
                         $this->session->set('mautic.'.$object.'.import.step', self::STEP_PROGRESS_BAR);
                     }
-
                     $this->importModel->saveEntity($import);
-
                     $this->session->set('mautic.'.$object.'.import.id', $import->getId());
-
                     // In case the user decided to queue the import
                     if ($this->importInCli($form, $object)) {
                         $this->addFlashMessage('mautic.lead.batch.import.created');
@@ -515,8 +525,8 @@ class ImportController extends FormController
     /**
      * Decide whether the import will be processed in client's browser.
      *
-     * @param FormInterface<FormInterface> $form
-     * @param string                       $object
+     * @param FormInterface<mixed> $form
+     * @param string               $object
      */
     protected function importInBrowser(FormInterface $form, $object): bool
     {
@@ -539,8 +549,8 @@ class ImportController extends FormController
     /**
      * Decide whether the import will be queued to be processed by the CLI command in the background.
      *
-     * @param FormInterface<FormInterface> $form
-     * @param string                       $object
+     * @param FormInterface<mixed> $form
+     * @param string               $object
      */
     protected function importInCli(FormInterface $form, $object): bool
     {

@@ -45,17 +45,11 @@ class VideoModel extends FormModel
         return $this->em->getRepository(VideoHit::class);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getPermissionBase(): string
     {
         return 'page:pages';
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getNameGetter(): string
     {
         return 'getTitle';

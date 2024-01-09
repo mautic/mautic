@@ -18,8 +18,10 @@ class PluginCollector
 
     private int $total = 0;
 
-    public function __construct(private Connection $connection, private Allowlist $allowlist)
-    {
+    public function __construct(
+        private Connection $connection,
+        private Allowlist $allowlist
+    ) {
     }
 
     public function collectPackages(int $page, int $limit, string $query = ''): PackageCollection

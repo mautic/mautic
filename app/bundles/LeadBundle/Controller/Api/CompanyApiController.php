@@ -76,8 +76,6 @@ class CompanyApiController extends CommonApiController
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @param Lead   &$entity
      * @param string $action
      */

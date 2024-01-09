@@ -18,7 +18,10 @@ use Symfony\Contracts\EventDispatcher\Event;
  */
 class MonitoringModel extends FormModel
 {
-    private $networkTypes = [
+    /**
+     * @var array<string, mixed>
+     */
+    private array $networkTypes = [
         'twitter_handle' => [
             'label' => 'mautic.social.monitoring.type.list.twitter.handle',
             'form'  => TwitterMentionType::class,
@@ -58,8 +61,6 @@ class MonitoringModel extends FormModel
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @throws \Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException
      */
     protected function dispatchEvent($action, &$entity, $isNew = false, Event $event = null): ?Event

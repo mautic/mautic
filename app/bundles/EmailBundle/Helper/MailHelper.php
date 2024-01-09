@@ -30,11 +30,17 @@ use Twig\Environment;
 class MailHelper
 {
     public const QUEUE_RESET_TO           = 'RESET_TO';
+
     public const QUEUE_FULL_RESET         = 'FULL_RESET';
+
     public const QUEUE_DO_NOTHING         = 'DO_NOTHING';
+
     public const QUEUE_NOTHING_IF_FAILED  = 'IF_FAILED';
+
     public const QUEUE_RETURN_ERRORS      = 'RETURN_ERRORS';
+
     public const EMAIL_TYPE_TRANSACTIONAL = 'transactional';
+
     public const EMAIL_TYPE_MARKETING     = 'marketing';
 
     protected $transport;
@@ -210,23 +216,18 @@ class MailHelper
 
     /**
      * Simply a md5 of the content so that event listeners can easily determine if the content has been changed.
-     *
-     * @var string
      */
-    private $contentHash;
+    private ?string $contentHash = null;
 
-    /**
-     * @var array
-     */
-    private $copies = [];
+    private array $copies = [];
 
-    /**
-     * @var array
-     */
-    private $embedImagesReplaces = [];
+    private array $embedImagesReplaces = [];
 
-    public function __construct(protected MauticFactory $factory, protected MailerInterface $mailer, $from = null)
-    {
+    public function __construct(
+        protected MauticFactory $factory,
+        protected MailerInterface $mailer,
+        $from = null
+    ) {
         $this->transport = $this->getTransport();
 
         $systemFromEmail    = $factory->getParameter('mailer_from_email');
@@ -1379,6 +1380,7 @@ class MailHelper
             } else {
                 $headers['List-Unsubscribe'] = $listUnsubscribeHeader;
             }
+            $headers['List-Unsubscribe-Post'] = 'List-Unsubscribe=One-Click';
         }
 
         return $headers;

@@ -99,7 +99,6 @@ class PointApiController extends CommonApiController
     /**
      * Log the lead points change.
      *
-     * @param int $leadId
      * @param int $delta
      */
     protected function logApiPointChange(Request $request, IpLookupHelper $ipLookupHelper, $lead, $delta, $operator)

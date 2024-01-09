@@ -8,18 +8,15 @@ use Symfony\Contracts\EventDispatcher\Event;
 
 class ReplyEvent extends Event
 {
-    /**
-     * @var Response|null
-     */
-    private $response;
+    private ?\Symfony\Component\HttpFoundation\Response $response = null;
 
     /**
-     * ReplyEvent constructor.
-     *
      * @param string $message
      */
-    public function __construct(private Lead $contact, private $message)
-    {
+    public function __construct(
+        private Lead $contact,
+        private $message
+    ) {
     }
 
     /**

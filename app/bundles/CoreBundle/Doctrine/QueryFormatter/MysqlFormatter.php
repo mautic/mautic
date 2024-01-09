@@ -4,8 +4,6 @@ namespace Mautic\CoreBundle\Doctrine\QueryFormatter;
 
 /**
  * Help generate SQL statements to format column data.
- *
- * Class AbstractFormat
  */
 class MysqlFormatter extends AbstractFormatter
 {

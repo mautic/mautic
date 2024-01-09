@@ -6,7 +6,7 @@ use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 
 class VtigerIntegration extends CrmAbstractIntegration
 {
-    private $authorzationError = '';
+    private string $authorzationError = '';
 
     /**
      * Returns the name of the social integration that must match the name of the file.
@@ -59,8 +59,6 @@ class VtigerIntegration extends CrmAbstractIntegration
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @return bool
      */
     public function isAuthorized()
@@ -109,8 +107,6 @@ class VtigerIntegration extends CrmAbstractIntegration
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @return string
      */
     public function getAuthLoginUrl()
@@ -123,17 +119,15 @@ class VtigerIntegration extends CrmAbstractIntegration
      *
      * @param array $settings
      * @param array $parameters
-     *
-     * @return array
      */
-    public function authCallback($settings = [], $parameters = [])
+    public function authCallback($settings = [], $parameters = []): string|bool
     {
         $success = $this->isAuthorized();
         if (!$success) {
             return $this->authorzationError;
-        } else {
-            return false;
         }
+
+        return false;
     }
 
     /**
@@ -207,8 +201,6 @@ class VtigerIntegration extends CrmAbstractIntegration
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @return array<mixed>
      */
     public function getFormNotes($section)
@@ -220,9 +212,6 @@ class VtigerIntegration extends CrmAbstractIntegration
         return parent::getFormNotes($section);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function amendLeadDataBeforePush(&$mappedData): void
     {
         if (!empty($mappedData)) {

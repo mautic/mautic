@@ -5,7 +5,9 @@ namespace Mautic\LeadBundle\Segment;
 class ContactSegmentFilterCrate
 {
     public const CONTACT_OBJECT   = 'lead';
+
     public const COMPANY_OBJECT   = 'company';
+
     public const BEHAVIORS_OBJECT = 'behaviors';
 
     /**

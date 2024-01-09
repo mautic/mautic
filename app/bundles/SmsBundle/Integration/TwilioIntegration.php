@@ -11,9 +11,6 @@ class TwilioIntegration extends AbstractIntegration
 {
     protected bool $coreIntegration = true;
 
-    /**
-     * {@inheritdoc}
-     */
     public function getName(): string
     {
         return 'Twilio';
@@ -40,9 +37,6 @@ class TwilioIntegration extends AbstractIntegration
         ];
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getAuthenticationType(): string
     {
         return 'none';

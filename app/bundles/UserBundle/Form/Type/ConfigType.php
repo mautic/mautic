@@ -14,10 +14,15 @@ use Symfony\Component\Form\FormView;
 use Symfony\Component\Validator\Constraints\File;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
+/**
+ * @extends AbstractType<array<mixed>>
+ */
 class ConfigType extends AbstractType
 {
-    public function __construct(protected CoreParametersHelper $parameters, protected TranslatorInterface $translator)
-    {
+    public function __construct(
+        protected CoreParametersHelper $parameters,
+        protected TranslatorInterface $translator
+    ) {
     }
 
     public function buildForm(FormBuilderInterface $builder, array $options): void
@@ -193,9 +198,6 @@ class ConfigType extends AbstractType
         $view->vars['entityId'] = $this->parameters->get('mautic.saml_idp_entity_id');
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getBlockPrefix()
     {
         return 'userconfig';

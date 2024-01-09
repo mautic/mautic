@@ -30,9 +30,6 @@ class ZohoIntegration extends CrmAbstractIntegration
         return 'Zoho';
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getAuthenticationType(): string
     {
         return 'oauth2';
@@ -84,17 +81,11 @@ class ZohoIntegration extends CrmAbstractIntegration
         return sprintf('https://accounts.%s', $this->getDatacenter());
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getAccessTokenUrl(): string
     {
         return $this->getApiUrl().'/oauth/v2/token';
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getAuthenticationUrl(): string
     {
         return $this->getApiUrl().'/oauth/v2/auth';
@@ -116,9 +107,6 @@ class ZohoIntegration extends CrmAbstractIntegration
         ];
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function prepareResponseForExtraction($data)
     {
         // Extract expiry and set expires for zoho
@@ -558,8 +546,6 @@ class ZohoIntegration extends CrmAbstractIntegration
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @param array $data
      * @param array $config
      */

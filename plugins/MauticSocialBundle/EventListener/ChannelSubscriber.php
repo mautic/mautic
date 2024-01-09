@@ -11,8 +11,9 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class ChannelSubscriber implements EventSubscriberInterface
 {
-    public function __construct(private IntegrationHelper $helper)
-    {
+    public function __construct(
+        private IntegrationHelper $helper
+    ) {
     }
 
     public static function getSubscribedEvents(): array

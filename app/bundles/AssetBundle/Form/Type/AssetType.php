@@ -22,10 +22,15 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
+/**
+ * @extends AbstractType<Asset>
+ */
 class AssetType extends AbstractType
 {
-    public function __construct(private TranslatorInterface $translator, private AssetModel $assetModel)
-    {
+    public function __construct(
+        private TranslatorInterface $translator,
+        private AssetModel $assetModel
+    ) {
     }
 
     public function buildForm(FormBuilderInterface $builder, array $options): void

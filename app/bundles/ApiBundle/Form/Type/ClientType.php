@@ -2,6 +2,7 @@
 
 namespace Mautic\ApiBundle\Form\Type;
 
+use Mautic\ApiBundle\Entity\oAuth2\Client;
 use Mautic\ApiBundle\Form\Validator\Constraints\OAuthCallback;
 use Mautic\CoreBundle\Form\DataTransformer as Transformers;
 use Mautic\CoreBundle\Form\EventListener\CleanFormSubscriber;
@@ -21,10 +22,18 @@ use Symfony\Component\Routing\RouterInterface;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
+/**
+ * @extends AbstractType<Client>
+ */
 class ClientType extends AbstractType
 {
-    public function __construct(private RequestStack $requestStack, private TranslatorInterface $translator, private ValidatorInterface $validator, private SessionInterface $session, private RouterInterface $router)
-    {
+    public function __construct(
+        private RequestStack $requestStack,
+        private TranslatorInterface $translator,
+        private ValidatorInterface $validator,
+        private SessionInterface $session,
+        private RouterInterface $router
+    ) {
     }
 
     /**
@@ -38,9 +47,6 @@ class ClientType extends AbstractType
         );
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $apiMode = $this->getApiMode();
@@ -156,12 +162,9 @@ class ClientType extends AbstractType
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function configureOptions(OptionsResolver $resolver): void
     {
-        $dataClass = \Mautic\ApiBundle\Entity\oAuth2\Client::class;
+        $dataClass = Client::class;
         $resolver->setDefaults(
             [
                 'data_class' => $dataClass,

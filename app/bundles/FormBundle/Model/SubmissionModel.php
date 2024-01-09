@@ -395,9 +395,6 @@ class SubmissionModel extends CommonFormModel
         parent::deleteEntity($submission);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getEntities(array $args = [])
     {
         return $this->getRepository()->getEntities($args);

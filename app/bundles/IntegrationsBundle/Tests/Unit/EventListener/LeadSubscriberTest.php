@@ -487,9 +487,13 @@ class LeadSubscriberTest extends TestCase
     private function createLeadMock(array $fieldChanges, int $objectId): Lead
     {
         return new class($fieldChanges, $objectId) extends Lead {
-            /** @param mixed[] $fieldChanges */
-            public function __construct(private array $fieldChanges, private int $objectId)
-            {
+            /**
+             * @param mixed[] $fieldChanges
+             */
+            public function __construct(
+                private array $fieldChanges,
+                private int $objectId
+            ) {
                 parent::__construct();
             }
 
@@ -519,8 +523,10 @@ class LeadSubscriberTest extends TestCase
             /**
              * @param mixed[] $fieldChanges
              */
-            public function __construct(private array $fieldChanges, private int $objectId)
-            {
+            public function __construct(
+                private array $fieldChanges,
+                private int $objectId
+            ) {
             }
 
             public function getChanges($includePast = false): array

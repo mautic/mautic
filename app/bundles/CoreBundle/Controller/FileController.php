@@ -13,6 +13,7 @@ use Symfony\Component\HttpFoundation\Response;
 class FileController extends AjaxController
 {
     public const EDITOR_FROALA   = 'froala';
+
     public const EDITOR_CKEDITOR = 'ckeditor';
 
     protected $imageMimes = [

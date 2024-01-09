@@ -9,9 +9,6 @@ use Mautic\CoreBundle\Entity\CommonRepository;
  */
 class PageRepository extends CommonRepository
 {
-    /**
-     * {@inheritdoc}
-     */
     public function getEntities(array $args = [])
     {
         $select = ['p'];
@@ -37,7 +34,6 @@ class PageRepository extends CommonRepository
 
     /**
      * @param string $alias
-     * @param Page   $entity
      *
      * @return mixed
      */
@@ -61,14 +57,14 @@ class PageRepository extends CommonRepository
     }
 
     /**
-     * @param string $search
-     * @param int    $limit
-     * @param int    $start
-     * @param bool   $viewOther
-     * @param bool   $topLevel
-     * @param array  $ignoreIds
-     * @param array  $extraColumns
-     * @param bool   $publishedOnly
+     * @param string      $search
+     * @param int         $limit
+     * @param int         $start
+     * @param bool        $viewOther
+     * @param string|bool $topLevel
+     * @param array       $ignoreIds
+     * @param array       $extraColumns
+     * @param bool        $publishedOnly
      *
      * @return array
      */
@@ -113,9 +109,6 @@ class PageRepository extends CommonRepository
         return $q->getQuery()->getArrayResult();
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function addCatchAllWhereClause($q, $filter): array
     {
         return $this->addStandardCatchAllWhereClause(
@@ -128,9 +121,6 @@ class PageRepository extends CommonRepository
         );
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function addSearchCommandWhereClause($q, $filter): array
     {
         [$expr, $parameters] = $this->addStandardSearchCommandWhereClause($q, $filter);
@@ -196,9 +186,6 @@ class PageRepository extends CommonRepository
         return array_merge($commands, parent::getSearchCommands());
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function getDefaultOrder(): array
     {
         return [
@@ -206,9 +193,6 @@ class PageRepository extends CommonRepository
         ];
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getTableAlias(): string
     {
         return 'p';

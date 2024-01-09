@@ -2,24 +2,27 @@
 
 namespace Mautic\CoreBundle\Form\DataTransformer;
 
-use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\PersistentCollection;
 use Symfony\Component\Form\DataTransformerInterface;
 use Symfony\Component\Form\Exception\TransformationFailedException;
 
+/**
+ * @implements DataTransformerInterface<array<mixed>|int|string, array<mixed>|int|string>
+ */
 class IdToEntityModelTransformer implements DataTransformerInterface
 {
     /**
-     * @param string $repository
-     * @param string $id
-     * @param bool   $isArray
+     * @param class-string $repository
      */
-    public function __construct(private EntityManager $em, private $repository = '', private $id = 'id', private $isArray = false)
+    public function __construct(private EntityManagerInterface $em, private string $repository, private string $id = 'id', private bool $isArray = false)
     {
     }
 
     /**
-     * {@inheritdoc}
+     * @param array<mixed>|object|null $entity
+     *
+     * @return array<mixed>|int|string
      */
     public function transform($entity)
     {
@@ -46,9 +49,9 @@ class IdToEntityModelTransformer implements DataTransformerInterface
     }
 
     /**
-     * {@inheritdoc}
+     * @param array<mixed>|int|string $id
      *
-     * @throws TransformationFailedException if object is not found
+     * @return array<mixed>|object|null
      */
     public function reverseTransform($id)
     {

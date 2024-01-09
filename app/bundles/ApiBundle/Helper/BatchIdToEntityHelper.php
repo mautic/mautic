@@ -9,28 +9,19 @@ class BatchIdToEntityHelper
      */
     private $ids = [];
 
-    /**
-     * @var array
-     */
-    private $originalKeys = [];
+    private array $originalKeys = [];
+
+    private array $errors = [];
+
+    private bool $isAssociative = false;
 
     /**
-     * @var array
-     */
-    private $errors = [];
-
-    /**
-     * @var bool
-     */
-    private $isAssociative = false;
-
-    /**
-     * BatchIdToEntityHelper constructor.
-     *
      * @param string $idKey
      */
-    public function __construct(array $parameters, private $idKey = 'id')
-    {
+    public function __construct(
+        array $parameters,
+        private $idKey = 'id'
+    ) {
         $this->extractIds($parameters);
     }
 

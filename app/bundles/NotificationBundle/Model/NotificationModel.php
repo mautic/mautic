@@ -50,8 +50,6 @@ class NotificationModel extends FormModel implements AjaxLookupModelInterface
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @return \Mautic\NotificationBundle\Entity\NotificationRepository
      */
     public function getRepository()
@@ -67,9 +65,6 @@ class NotificationModel extends FormModel implements AjaxLookupModelInterface
         return $this->em->getRepository(\Mautic\NotificationBundle\Entity\Stat::class);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getPermissionBase(): string
     {
         return 'notification:notifications';
@@ -104,8 +99,6 @@ class NotificationModel extends FormModel implements AjaxLookupModelInterface
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @param Notification|null $entity
      * @param string|null       $action
      * @param array             $options
@@ -158,8 +151,6 @@ class NotificationModel extends FormModel implements AjaxLookupModelInterface
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @throws \Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException
      */
     protected function dispatchEvent($action, &$entity, $isNew = false, Event $event = null): ?Event

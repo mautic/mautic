@@ -9,16 +9,14 @@ use Mautic\CoreBundle\Entity\DeprecatedInterface;
 
 class DoctrineEventsSubscriber implements EventSubscriber
 {
-    /**
-     * @var array
-     */
-    private $deprecatedEntityTables = [];
+    private array $deprecatedEntityTables = [];
 
     /**
      * @param string $tablePrefix
      */
-    public function __construct(private $tablePrefix)
-    {
+    public function __construct(
+        private $tablePrefix
+    ) {
     }
 
     public function getSubscribedEvents(): array

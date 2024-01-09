@@ -15,6 +15,9 @@ use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
+/**
+ * @extends AbstractType<mixed>
+ */
 class DynamicContentFilterEntryType extends AbstractType
 {
     /**
@@ -42,8 +45,11 @@ class DynamicContentFilterEntryType extends AbstractType
      */
     private array $localeChoices;
 
-    public function __construct(ListModel $listModel, private StageModel $stageModel, private BuilderIntegrationsHelper $builderIntegrationsHelper)
-    {
+    public function __construct(
+        ListModel $listModel,
+        private StageModel $stageModel,
+        private BuilderIntegrationsHelper $builderIntegrationsHelper
+    ) {
         $this->fieldChoices = $listModel->getChoiceFields();
 
         $this->filterFieldChoices();
@@ -105,9 +111,6 @@ class DynamicContentFilterEntryType extends AbstractType
         );
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function buildView(FormView $view, FormInterface $form, array $options): void
     {
         $view->vars['fields'] = $this->fieldChoices;

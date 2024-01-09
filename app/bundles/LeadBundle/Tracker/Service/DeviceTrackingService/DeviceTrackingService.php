@@ -18,8 +18,14 @@ final class DeviceTrackingService implements DeviceTrackingServiceInterface
      */
     private $trackedDevice;
 
-    public function __construct(private CookieHelper $cookieHelper, private EntityManagerInterface $entityManager, private LeadDeviceRepository $leadDeviceRepository, private RandomHelperInterface $randomHelper, private RequestStack $requestStack, private CorePermissions $security)
-    {
+    public function __construct(
+        private CookieHelper $cookieHelper,
+        private EntityManagerInterface $entityManager,
+        private LeadDeviceRepository $leadDeviceRepository,
+        private RandomHelperInterface $randomHelper,
+        private RequestStack $requestStack,
+        private CorePermissions $security
+    ) {
     }
 
     public function isTracked(): bool

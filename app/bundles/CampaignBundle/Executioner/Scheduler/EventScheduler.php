@@ -22,8 +22,15 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class EventScheduler
 {
-    public function __construct(private LoggerInterface $logger, private EventLogger $eventLogger, private Interval $intervalScheduler, private DateTime $dateTimeScheduler, private EventCollector $collector, private EventDispatcherInterface $dispatcher, private CoreParametersHelper $coreParametersHelper)
-    {
+    public function __construct(
+        private LoggerInterface $logger,
+        private EventLogger $eventLogger,
+        private Interval $intervalScheduler,
+        private DateTime $dateTimeScheduler,
+        private EventCollector $collector,
+        private EventDispatcherInterface $dispatcher,
+        private CoreParametersHelper $coreParametersHelper
+    ) {
     }
 
     public function scheduleForContact(Event $event, \DateTimeInterface $executionDate, Lead $contact): void

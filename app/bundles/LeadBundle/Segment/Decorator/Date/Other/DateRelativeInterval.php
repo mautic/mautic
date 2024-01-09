@@ -12,8 +12,11 @@ class DateRelativeInterval implements FilterDecoratorInterface
     /**
      * @param string $originalValue
      */
-    public function __construct(private DateDecorator $dateDecorator, private $originalValue, private DateOptionParameters $dateOptionParameters)
-    {
+    public function __construct(
+        private DateDecorator $dateDecorator,
+        private $originalValue,
+        private DateOptionParameters $dateOptionParameters
+    ) {
     }
 
     /**

@@ -38,9 +38,6 @@ class ClientRepository extends CommonRepository
         return new Paginator($query);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function addCatchAllWhereClause($q, $filter): array
     {
         return $this->addStandardCatchAllWhereClause($q, $filter, [
@@ -49,9 +46,6 @@ class ClientRepository extends CommonRepository
         ]);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function getDefaultOrder(): array
     {
         return [
@@ -59,9 +53,6 @@ class ClientRepository extends CommonRepository
         ];
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getTableAlias(): string
     {
         return 'c';

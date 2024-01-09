@@ -12,8 +12,10 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class FetchLeadsCommand extends Command
 {
-    public function __construct(private TranslatorInterface $translator, private IntegrationHelper $integrationHelper)
-    {
+    public function __construct(
+        private TranslatorInterface $translator,
+        private IntegrationHelper $integrationHelper
+    ) {
         parent::__construct();
     }
 
@@ -280,5 +282,6 @@ class FetchLeadsCommand extends Command
 
         return \Symfony\Component\Console\Command\Command::SUCCESS;
     }
+
     protected static $defaultDescription = 'Fetch leads from integration.';
 }

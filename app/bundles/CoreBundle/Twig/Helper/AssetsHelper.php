@@ -23,15 +23,9 @@ final class AssetsHelper
      */
     public const CONTEXT_BUILDER = 'builder';
 
-    /**
-     * @var AssetGenerationHelper
-     */
-    private $assetHelper;
+    private ?\Mautic\CoreBundle\Helper\AssetGenerationHelper $assetHelper = null;
 
-    /**
-     * @var string
-     */
-    private $context = self::CONTEXT_APP;
+    private string $context = self::CONTEXT_APP;
 
     /**
      * @var array<mixed, mixed>
@@ -40,26 +34,23 @@ final class AssetsHelper
         self::CONTEXT_APP => [],
     ];
 
-    /**
-     * @var string|null
-     */
-    private $version;
+    private ?string $version = null;
 
     /**
      * @var string
      */
     private $siteUrl;
 
-    /**
-     * @var PathsHelper
-     */
-    private $pathsHelper;
+    private ?\Mautic\CoreBundle\Helper\PathsHelper $pathsHelper = null;
 
     private BuilderIntegrationsHelper $builderIntegrationsHelper;
+
     private InstallService $installService;
 
-    public function __construct(private Packages $packages, private CoreParametersHelper $coreParametersHelper)
-    {
+    public function __construct(
+        private Packages $packages,
+        private CoreParametersHelper $coreParametersHelper
+    ) {
     }
 
     /**
@@ -686,7 +677,7 @@ final class AssetsHelper
     public function getCountryFlag($country, $urlOnly = true, $class = '')
     {
         $country  = ucwords(str_replace(' ', '-', $country));
-        $flagImg  = $this->getOverridableUrl('images/flags/'.$country.'.png');
+        $flagImg  = (string) $this->getOverridableUrl('images/flags/'.$country.'.png');
 
         if ($urlOnly) {
             return $flagImg;

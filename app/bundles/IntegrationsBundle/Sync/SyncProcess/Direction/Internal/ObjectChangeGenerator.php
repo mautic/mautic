@@ -25,42 +25,27 @@ use Mautic\IntegrationsBundle\Sync\SyncProcess\Direction\Helper\ValueHelper;
 
 class ObjectChangeGenerator
 {
-    /**
-     * @var ReportDAO
-     */
-    private $syncReport;
+    private ?\Mautic\IntegrationsBundle\Sync\DAO\Sync\Report\ReportDAO $syncReport = null;
 
-    /**
-     * @var MappingManualDAO
-     */
-    private $mappingManual;
+    private ?\Mautic\IntegrationsBundle\Sync\DAO\Mapping\MappingManualDAO $mappingManual = null;
 
-    /**
-     * @var ReportObjectDAO
-     */
-    private $internalObject;
+    private ?\Mautic\IntegrationsBundle\Sync\DAO\Sync\Report\ObjectDAO $internalObject = null;
 
-    /**
-     * @var ReportObjectDAO
-     */
-    private $integrationObject;
+    private ?\Mautic\IntegrationsBundle\Sync\DAO\Sync\Report\ObjectDAO $integrationObject = null;
 
-    /**
-     * @var ObjectChangeDAO
-     */
-    private $objectChange;
+    private ?\Mautic\IntegrationsBundle\Sync\DAO\Sync\Order\ObjectChangeDAO $objectChange = null;
 
-    /**
-     * @var array
-     */
-    private $judgementModes = [
+    private array $judgementModes = [
         SyncJudgeInterface::HARD_EVIDENCE_MODE,
         SyncJudgeInterface::BEST_EVIDENCE_MODE,
         SyncJudgeInterface::FUZZY_EVIDENCE_MODE,
     ];
 
-    public function __construct(private SyncJudgeInterface $syncJudge, private ValueHelper $valueHelper, private FieldHelper $fieldHelper)
-    {
+    public function __construct(
+        private SyncJudgeInterface $syncJudge,
+        private ValueHelper $valueHelper,
+        private FieldHelper $fieldHelper
+    ) {
     }
 
     /**

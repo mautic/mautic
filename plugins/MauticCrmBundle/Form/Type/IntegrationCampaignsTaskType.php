@@ -10,10 +10,14 @@ use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Validator\Constraints\Callback;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
 
+/**
+ * @extends AbstractType<array<mixed>>
+ */
 class IntegrationCampaignsTaskType extends AbstractType
 {
-    public function __construct(private ConnectwiseIntegration $connectwiseIntegration)
-    {
+    public function __construct(
+        private ConnectwiseIntegration $connectwiseIntegration
+    ) {
     }
 
     public function buildForm(FormBuilderInterface $builder, array $options): void
@@ -70,9 +74,6 @@ class IntegrationCampaignsTaskType extends AbstractType
         );
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getBlockPrefix()
     {
         return 'integration_campaign_task';

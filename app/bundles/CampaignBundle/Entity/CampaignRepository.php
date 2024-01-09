@@ -252,9 +252,6 @@ class CampaignRepository extends CommonRepository
         return $q->getQuery()->getResult();
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getTableAlias(): string
     {
         return 'c';
@@ -590,5 +587,28 @@ class CampaignRepository extends CommonRepository
         }
 
         return $return;
+    }
+
+    /**
+     * @return array<int, int>
+     */
+    public function getCampaignIdsWithDependenciesOnEmail(int $emailId): array
+    {
+        $query = $this->getEntityManager()
+            ->createQueryBuilder()
+            ->select($this->getTableAlias().'.id')
+            ->distinct()
+            ->from(Campaign::class, $this->getTableAlias(), $this->getTableAlias().'.id')
+            ->leftJoin(
+                $this->getTableAlias().'.events',
+                'e',
+                Expr\Join::WITH,
+                "e.channel = '".Event::CHANNEL_EMAIL."'"
+            )
+            ->where('e.channelId = :emailId')
+            ->setParameter('emailId', $emailId)
+            ->getQuery();
+
+        return array_unique(array_map(fn ($val): int => (int) $val, $query->getSingleColumnResult()));
     }
 }

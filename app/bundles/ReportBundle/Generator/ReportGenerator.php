@@ -16,18 +16,20 @@ use Symfony\Component\Form\FormFactoryInterface;
  */
 class ReportGenerator
 {
-    /**
-     * @var string
-     */
-    private $validInterface = \Mautic\ReportBundle\Builder\ReportBuilderInterface::class;
+    private string $validInterface = \Mautic\ReportBundle\Builder\ReportBuilderInterface::class;
 
     /**
      * @var string
      */
     private $contentTemplate;
 
-    public function __construct(private EventDispatcherInterface $dispatcher, private Connection $db, private Report $entity, private ChannelListHelper $channelListHelper, private ?FormFactoryInterface $formFactory = null)
-    {
+    public function __construct(
+        private EventDispatcherInterface $dispatcher,
+        private Connection $db,
+        private Report $entity,
+        private ChannelListHelper $channelListHelper,
+        private ?FormFactoryInterface $formFactory = null
+    ) {
     }
 
     /**
@@ -54,7 +56,7 @@ class ReportGenerator
      * @param Report $entity  Report Entity
      * @param array  $options Parameters set by the caller
      *
-     * @return \Symfony\Component\Form\FormInterface
+     * @return \Symfony\Component\Form\FormInterface<Report>
      */
     public function getForm(Report $entity, $options)
     {

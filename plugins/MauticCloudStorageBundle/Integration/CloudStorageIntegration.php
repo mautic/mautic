@@ -13,9 +13,6 @@ abstract class CloudStorageIntegration extends AbstractIntegration
      */
     protected $adapter;
 
-    /**
-     * {@inheritdoc}
-     */
     public function appendToForm(&$builder, $data, $formArea): void
     {
         if ('features' !== $formArea) {
@@ -36,9 +33,6 @@ abstract class CloudStorageIntegration extends AbstractIntegration
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getAuthenticationType()
     {
         return 'api';
@@ -67,9 +61,6 @@ abstract class CloudStorageIntegration extends AbstractIntegration
      */
     abstract public function getPublicUrl($key);
 
-    /**
-     * {@inheritdoc}
-     */
     public function getSupportedFeatures()
     {
         return ['cloud_storage'];

@@ -11,14 +11,17 @@ class ObjectDAO
     /**
      * @var FieldDAO[]
      */
-    private $fields = [];
+    private array $fields = [];
 
     /**
      * @param string $object
      * @param mixed  $objectId
      */
-    public function __construct(private $object, private $objectId, private ?\DateTimeInterface $changeDateTime = null)
-    {
+    public function __construct(
+        private $object,
+        private $objectId,
+        private ?\DateTimeInterface $changeDateTime = null
+    ) {
     }
 
     public function getChangeDateTime(): ?\DateTimeInterface

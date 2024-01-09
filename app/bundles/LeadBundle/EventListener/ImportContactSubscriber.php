@@ -22,8 +22,12 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 final class ImportContactSubscriber implements EventSubscriberInterface
 {
-    public function __construct(private FieldList $fieldList, private CorePermissions $corePermissions, private LeadModel $contactModel, private TranslatorInterface $translator)
-    {
+    public function __construct(
+        private FieldList $fieldList,
+        private CorePermissions $corePermissions,
+        private LeadModel $contactModel,
+        private TranslatorInterface $translator
+    ) {
     }
 
     public static function getSubscribedEvents(): array
@@ -109,6 +113,8 @@ final class ImportContactSubscriber implements EventSubscriberInterface
 
         $matchedFields = $event->getForm()->getData();
 
+        $skipIfExists = ArrayHelper::pickValue('skip_if_exists', $matchedFields, false);
+        $event->setSkipIfExists((bool) $skipIfExists);
         $event->setOwnerId($this->handleValidateOwner($matchedFields));
         $event->setList($this->handleValidateList($matchedFields));
         $event->setTags($this->handleValidateTags($matchedFields));

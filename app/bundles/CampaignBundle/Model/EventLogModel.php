@@ -46,9 +46,6 @@ class EventLogModel extends AbstractCommonModel
         return $this->em->getRepository(LeadEventLog::class);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getPermissionBase(): string
     {
         return 'campaign:campaigns';

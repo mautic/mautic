@@ -33,8 +33,6 @@ class PointGroupModel extends CommonFormModel
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @param object               $entity
      * @param FormFactory          $formFactory
      * @param string|null          $action
@@ -70,8 +68,6 @@ class PointGroupModel extends CommonFormModel
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @throws MethodNotAllowedHttpException
      */
     protected function dispatchEvent($action, &$entity, $isNew = false, Event $event = null): ?Event

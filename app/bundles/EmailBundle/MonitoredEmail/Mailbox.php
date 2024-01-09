@@ -140,19 +140,33 @@ class Mailbox
     public const CRITERIA_UNREAD = 'UNSEEN';
 
     protected $imapPath;
+
     protected $imapFullPath;
+
     protected $imapStream;
+
     protected $imapFolder     = 'INBOX';
+
     protected $imapOptions    = 0;
+
     protected $imapRetriesNum = 0;
+
     protected $imapParams     = [];
+
     protected $serverEncoding = 'UTF-8';
+
     protected $attachmentsDir;
+
     protected $settings;
+
     protected $isGmail = false;
+
     protected $mailboxes;
 
-    private $folders = [];
+    /**
+     * @var mixed[]
+     */
+    private array $folders = [];
 
     public function __construct(CoreParametersHelper $parametersHelper, PathsHelper $pathsHelper)
     {

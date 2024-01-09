@@ -16,6 +16,7 @@ use PHPUnit\Framework\TestCase;
 class TwilioTransportTest extends TestCase
 {
     private TwilioTransport $twilioTransport;
+
     /**
      * @var MockObject&\Monolog\Logger
      */

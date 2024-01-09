@@ -48,9 +48,13 @@ class Import extends FormEntity
      */
     public const DELAYED = 7;
 
-    /** ===== Priorities: ===== */
+    /**
+     * ===== Priorities: =====.
+     */
     public const LOW    = 512;
+
     public const NORMAL = 64;
+
     public const HIGH   = 1;
 
     /**

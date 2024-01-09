@@ -16,20 +16,11 @@ use Mautic\LeadBundle\Tracker\ContactTracker;
 
 class EventLogger
 {
-    /**
-     * @var ArrayCollection
-     */
-    private $persistQueue;
+    private \Doctrine\Common\Collections\ArrayCollection $persistQueue;
 
-    /**
-     * @var ArrayCollection
-     */
-    private $logs;
+    private \Doctrine\Common\Collections\ArrayCollection $logs;
 
-    /**
-     * @var array
-     */
-    private $contactRotations = [];
+    private array $contactRotations = [];
 
     /**
      * @var int

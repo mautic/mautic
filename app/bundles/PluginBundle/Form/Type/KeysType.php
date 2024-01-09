@@ -10,6 +10,9 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Validator\Constraints\Callback;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
 
+/**
+ * @extends AbstractType<array<mixed>>
+ */
 class KeysType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options): void
@@ -48,7 +51,7 @@ class KeysType extends AbstractType
                     'label_attr' => ['class' => 'control-label'],
                     'attr'       => [
                         'class'        => 'form-control',
-                        'placeholder'  => ('password' == $type) ? '**************' : '',
+                        'placeholder'  => (PasswordType::class === $type) ? '**************' : '',
                         'autocomplete' => 'off',
                     ],
                     'required'       => $required,
@@ -60,9 +63,6 @@ class KeysType extends AbstractType
         $object->appendToForm($builder, $options['data'], 'keys');
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setRequired(['integration_object', 'integration_keys']);

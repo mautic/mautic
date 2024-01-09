@@ -69,8 +69,6 @@ class FocusModel extends FormModel
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @param object      $entity
      * @param string|null $action
      * @param array       $options
@@ -91,8 +89,6 @@ class FocusModel extends FormModel
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @return \MauticPlugin\MauticFocusBundle\Entity\FocusRepository
      */
     public function getRepository()
@@ -101,8 +97,6 @@ class FocusModel extends FormModel
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @return \MauticPlugin\MauticFocusBundle\Entity\StatRepository
      */
     public function getStatRepository()
@@ -111,8 +105,6 @@ class FocusModel extends FormModel
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @param int|null $id
      */
     public function getEntity($id = null): ?Focus
@@ -125,8 +117,6 @@ class FocusModel extends FormModel
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @param Focus      $entity
      * @param bool|false $unlock
      */

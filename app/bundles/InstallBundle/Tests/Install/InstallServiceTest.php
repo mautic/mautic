@@ -24,14 +24,20 @@ class InstallServiceTest extends \PHPUnit\Framework\TestCase
     private \PHPUnit\Framework\MockObject\MockObject $configurator;
 
     private \PHPUnit\Framework\MockObject\MockObject $cacheHelper;
+
     private \PHPUnit\Framework\MockObject\MockObject $pathsHelper;
 
-    /** @var EntityManager&MockObject */
+    /**
+     * @var EntityManager&MockObject
+     */
     private \PHPUnit\Framework\MockObject\MockObject $entityManager;
 
     private \PHPUnit\Framework\MockObject\MockObject $translator;
+
     private \PHPUnit\Framework\MockObject\MockObject $kernel;
+
     private \PHPUnit\Framework\MockObject\MockObject $validator;
+
     private UserPasswordHasher $hasher;
 
     /**

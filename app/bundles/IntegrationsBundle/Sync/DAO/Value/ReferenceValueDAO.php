@@ -6,15 +6,9 @@ namespace Mautic\IntegrationsBundle\Sync\DAO\Value;
 
 class ReferenceValueDAO implements \Stringable
 {
-    /**
-     * @var int
-     */
-    private $value;
+    private ?int $value = null;
 
-    /**
-     * @var string|null
-     */
-    private $type;
+    private ?string $type = null;
 
     public function getValue(): ?int
     {

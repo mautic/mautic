@@ -18,8 +18,11 @@ class TimelineEventLogCampaignSubscriber implements EventSubscriberInterface
 {
     use TimelineEventLogTrait;
 
-    public function __construct(LeadEventLogRepository $eventLogRepository, private UserHelper $userHelper, Translator $translator)
-    {
+    public function __construct(
+        LeadEventLogRepository $eventLogRepository,
+        private UserHelper $userHelper,
+        Translator $translator
+    ) {
         $this->eventLogRepository = $eventLogRepository;
         $this->translator         = $translator;
     }

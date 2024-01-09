@@ -48,8 +48,10 @@ class IndexSchemaHelper
     /**
      * @param string $prefix
      */
-    public function __construct(protected Connection $db, protected $prefix)
-    {
+    public function __construct(
+        protected Connection $db,
+        protected $prefix
+    ) {
         $this->sm     = $this->db->getSchemaManager();
     }
 

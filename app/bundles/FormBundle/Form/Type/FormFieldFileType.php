@@ -14,19 +14,23 @@ use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Validator\Constraints\LessThanOrEqual;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
+/**
+ * @extends AbstractType<mixed>
+ */
 class FormFieldFileType extends AbstractType
 {
     public const PROPERTY_ALLOWED_FILE_EXTENSIONS = 'allowed_file_extensions';
+
     public const PROPERTY_ALLOWED_FILE_SIZE       = 'allowed_file_size';
+
     public const PROPERTY_PREFERED_PROFILE_IMAGE  = 'profile_image';
 
-    public function __construct(private CoreParametersHelper $coreParametersHelper, private TranslatorInterface $translator)
-    {
+    public function __construct(
+        private CoreParametersHelper $coreParametersHelper,
+        private TranslatorInterface $translator
+    ) {
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         if (empty($options['data'][self::PROPERTY_ALLOWED_FILE_EXTENSIONS])) {

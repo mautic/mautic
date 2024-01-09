@@ -15,25 +15,16 @@ class DateTimeHelper
      */
     private $string;
 
-    /**
-     * @var string
-     */
-    private $format;
+    private string $format;
 
     /**
      * @var string
      */
     private $timezone;
 
-    /**
-     * @var \DateTimeZone
-     */
-    private $utc;
+    private \DateTimeZone $utc;
 
-    /**
-     * @var \DateTimeZone
-     */
-    private $local;
+    private \DateTimeZone $local;
 
     /**
      * @var \DateTimeInterface

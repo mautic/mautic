@@ -12,53 +12,30 @@ use MauticPlugin\MauticCrmBundle\Integration\Salesforce\QueryBuilder;
 
 class Fetcher
 {
-    /**
-     * @var array
-     */
-    private $leads = [];
+    private array $leads = [];
+
+    private array $knownLeadIds = [];
+
+    private array $unknownLeadIds = [];
+
+    private array $contacts = [];
+
+    private array $knownContactIds = [];
+
+    private array $unknownContactIds = [];
+
+    private array $mauticIds = [];
+
+    private array $knownCampaignMembers = [];
 
     /**
-     * @var array
-     */
-    private $knownLeadIds = [];
-
-    /**
-     * @var array
-     */
-    private $unknownLeadIds = [];
-
-    /**
-     * @var array
-     */
-    private $contacts = [];
-
-    /**
-     * @var array
-     */
-    private $knownContactIds = [];
-
-    /**
-     * @var array
-     */
-    private $unknownContactIds = [];
-
-    /**
-     * @var array
-     */
-    private $mauticIds = [];
-
-    /**
-     * @var array
-     */
-    private $knownCampaignMembers = [];
-
-    /**
-     * Fetcher constructor.
-     *
      * @param string $campaignId
      */
-    public function __construct(private IntegrationEntityRepository $repo, private Organizer $organizer, private $campaignId)
-    {
+    public function __construct(
+        private IntegrationEntityRepository $repo,
+        private Organizer $organizer,
+        private $campaignId
+    ) {
         $this->fetchLeads();
         $this->fetchContacts();
     }

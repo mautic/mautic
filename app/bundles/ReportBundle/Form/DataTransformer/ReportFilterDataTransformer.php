@@ -8,18 +8,20 @@ use Symfony\Component\Form\Extension\Core\Type\DateTimeType;
 use Symfony\Component\Form\Extension\Core\Type\DateType;
 use Symfony\Component\Form\Extension\Core\Type\TimeType;
 
+/**
+ * @implements DataTransformerInterface<array<mixed>, array<mixed>>
+ */
 class ReportFilterDataTransformer implements DataTransformerInterface
 {
     /**
      * @param array $columns
      */
-    public function __construct(private $columns)
-    {
+    public function __construct(
+        private $columns
+    ) {
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @return array
      */
     public function transform($filters)
@@ -44,8 +46,6 @@ class ReportFilterDataTransformer implements DataTransformerInterface
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @return array
      */
     public function reverseTransform($filters)

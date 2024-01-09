@@ -15,13 +15,14 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class BuilderSubscriber implements EventSubscriberInterface
 {
-    /**
-     * @var string
-     */
-    private $assetToken = '{assetlink=(.*?)}';
+    private string $assetToken = '{assetlink=(.*?)}';
 
-    public function __construct(private CorePermissions $security, private TokenHelper $tokenHelper, private ContactTracker $contactTracker, private BuilderTokenHelperFactory $builderTokenHelperFactory)
-    {
+    public function __construct(
+        private CorePermissions $security,
+        private TokenHelper $tokenHelper,
+        private ContactTracker $contactTracker,
+        private BuilderTokenHelperFactory $builderTokenHelperFactory
+    ) {
     }
 
     public static function getSubscribedEvents(): array

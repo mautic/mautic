@@ -11,8 +11,12 @@ class Engine
 {
     private string $migrationsPath;
 
-    public function __construct(private EntityManager $entityManager, private string $tablePrefix, string $pluginPath, private string $bundleName)
-    {
+    public function __construct(
+        private EntityManager $entityManager,
+        private string $tablePrefix,
+        string $pluginPath,
+        private string $bundleName
+    ) {
         $this->migrationsPath = $pluginPath.'/Migrations/';
     }
 

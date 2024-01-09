@@ -11,15 +11,16 @@ use Mautic\ReportBundle\Model\ReportModel;
 class ReportGeneratorEvent extends AbstractReportEvent
 {
     public const CATEGORY_PREFIX         = 'c';
+
     public const CONTACT_PREFIX          = 'l';
+
     public const COMPANY_PREFIX          = 'comp';
+
     public const COMPANY_LEAD_PREFIX     = 'companies_lead';
+
     public const IP_ADDRESS_PREFIX       = 'i';
 
-    /**
-     * @var array
-     */
-    private $selectColumns = [];
+    private array $selectColumns = [];
 
     /**
      * contentTemplate.
@@ -28,21 +29,18 @@ class ReportGeneratorEvent extends AbstractReportEvent
      */
     private $contentTemplate;
 
-    /**
-     * @var ExpressionBuilder|null
-     */
-    private $filterExpression;
+    private ?\Doctrine\DBAL\Query\Expression\ExpressionBuilder $filterExpression = null;
 
-    /**
-     * @var array|null
-     */
-    private $sortedFilters;
+    private ?array $sortedFilters = null;
 
-    public function __construct(Report $report, private array $options, /**
+    public function __construct(
+        Report $report,
+        private array $options, /**
      * QueryBuilder object.
      */
-    private QueryBuilder $queryBuilder, private ChannelListHelper $channelListHelper)
-    {
+    private QueryBuilder $queryBuilder,
+        private ChannelListHelper $channelListHelper
+    ) {
         $this->report            = $report;
         $this->context           = $report->getSource();
     }

@@ -21,12 +21,18 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Validator\Constraints\File;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
+/**
+ * @extends AbstractType<Lead>
+ */
 class LeadType extends AbstractType
 {
     use EntityFieldsBuildFormTrait;
 
-    public function __construct(private TranslatorInterface $translator, private CompanyModel $companyModel, private EntityManager $entityManager)
-    {
+    public function __construct(
+        private TranslatorInterface $translator,
+        private CompanyModel $companyModel,
+        private EntityManager $entityManager
+    ) {
     }
 
     public function buildForm(FormBuilderInterface $builder, array $options): void

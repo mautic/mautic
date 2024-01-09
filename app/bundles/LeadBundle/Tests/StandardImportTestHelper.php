@@ -5,6 +5,7 @@ namespace Mautic\LeadBundle\Tests;
 use Doctrine\ORM\EntityManagerInterface;
 use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Model\NotificationModel;
+use Mautic\CoreBundle\ProcessSignal\ProcessSignalService;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\CoreBundle\Tests\CommonMocks;
 use Mautic\LeadBundle\Entity\Import;
@@ -21,7 +22,9 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 abstract class StandardImportTestHelper extends CommonMocks
 {
     protected $eventEntities = [];
+
     protected static $csvPath;
+
     protected static $largeCsvPath;
 
     /**
@@ -200,7 +203,8 @@ abstract class StandardImportTestHelper extends CommonMocks
             $this->createMock(UrlGeneratorInterface::class),
             $translator,
             $userHelper,
-            $this->createMock(LoggerInterface::class)
+            $this->createMock(LoggerInterface::class),
+            new ProcessSignalService()
         );
 
         return $importModel;

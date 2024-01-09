@@ -17,8 +17,11 @@ use Symfony\Component\HttpFoundation\Session\SessionInterface;
 
 class CampaignSubscriber implements EventSubscriberInterface
 {
-    public function __construct(private DynamicContentModel $dynamicContentModel, private SessionInterface $session, private EventDispatcherInterface $dispatcher)
-    {
+    public function __construct(
+        private DynamicContentModel $dynamicContentModel,
+        private SessionInterface $session,
+        private EventDispatcherInterface $dispatcher
+    ) {
     }
 
     public static function getSubscribedEvents(): array

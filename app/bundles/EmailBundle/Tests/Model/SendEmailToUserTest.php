@@ -126,7 +126,7 @@ class SendEmailToUserTest extends \PHPUnit\Framework\TestCase
              *
              * @return string[]
              */
-            public function getTokens($includeGlobal = true)
+            public function getTokens($includeGlobal = true): array
             {
                 ++$this->getTokenMethodCallCounter;
 

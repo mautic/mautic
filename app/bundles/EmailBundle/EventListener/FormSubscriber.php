@@ -15,8 +15,10 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class FormSubscriber implements EventSubscriberInterface
 {
-    public function __construct(private EmailModel $emailModel, private ContactTracker $contactTracker)
-    {
+    public function __construct(
+        private EmailModel $emailModel,
+        private ContactTracker $contactTracker
+    ) {
     }
 
     public static function getSubscribedEvents(): array
@@ -50,7 +52,7 @@ class FormSubscriber implements EventSubscriberInterface
             'description'     => 'mautic.email.form.action.sendemail.lead.descr',
             'formType'        => EmailSendType::class,
             'formTypeOptions' => ['update_select' => 'formaction_properties_email'],
-            'formTheme'       => '@MauticEmail/FormTheme/EmailSendList/_emailsend_list_row.html.twig',
+            'formTheme'       => '@MauticEmail/FormTheme/EmailSendList/emailsend_list_row.html.twig',
             'eventName'       => FormEvents::ON_EXECUTE_SUBMIT_ACTION,
         ]);
     }

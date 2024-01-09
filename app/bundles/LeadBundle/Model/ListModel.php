@@ -38,6 +38,7 @@ use Psr\Log\LoggerInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\FormFactoryInterface;
+use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 use Symfony\Component\PropertyAccess\PropertyAccess;
@@ -54,7 +55,7 @@ class ListModel extends FormModel
     /**
      * @var mixed[]
      */
-    private $choiceFieldsCache = [];
+    private array $choiceFieldsCache = [];
 
     public function __construct(
         protected CategoryModel $categoryModel,
@@ -76,14 +77,10 @@ class ListModel extends FormModel
 
     /**
      * Used by addLead and removeLead functions.
-     *
-     * @var array
      */
-    private $leadChangeLists = [];
+    private array $leadChangeLists = [];
 
     /**
-     * {@inheritdoc}
-     *
      * @return LeadListRepository
      */
     public function getRepository()
@@ -107,17 +104,12 @@ class ListModel extends FormModel
         return $this->em->getRepository(ListLead::class);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getPermissionBase(): string
     {
         return 'lead:lists';
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @param bool $unlock
      *
      * @throws \Doctrine\DBAL\Exception
@@ -164,14 +156,14 @@ class ListModel extends FormModel
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @param string|null $action
      * @param array       $options
      *
+     * @return FormInterface<LeadList>
+     *
      * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
      */
-    public function createForm($entity, FormFactoryInterface $formFactory, $action = null, $options = []): \Symfony\Component\Form\FormInterface
+    public function createForm($entity, FormFactoryInterface $formFactory, $action = null, $options = []): FormInterface
     {
         if (!$entity instanceof LeadList) {
             throw new MethodNotAllowedHttpException(['LeadList'], 'Entity must be of class LeadList()');
@@ -197,8 +189,6 @@ class ListModel extends FormModel
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @throws \Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException
      */
     protected function dispatchEvent($action, &$entity, $isNew = false, Event $event = null): ?Event
@@ -1147,6 +1137,42 @@ class ListModel extends FormModel
         }
 
         return $dependents;
+    }
+
+    /**
+     * @return array<int, int>
+     */
+    public function getSegmentIdsWithDependenciesOnEmail(int $emailId): array
+    {
+        $entities = $this->getEntities(
+            [
+                'filter' => [
+                    'force'  => [
+                        [
+                            'column' => 'l.filters',
+                            'expr'   => 'LIKE',
+                            'value'  => '%"lead_email_%',
+                        ],
+                    ],
+                ],
+            ]
+        );
+
+        $emailFilterTypes = ['lead_email_received', 'lead_email_sent'];
+
+        $dependents = [];
+        foreach ($entities as $entity) {
+            foreach ($entity->getFilters() as $entityFilter) {
+                // BC support for old filters where the field existed outside of properties.
+                $filter = $entityFilter['properties']['filter'] ?? $entityFilter['filter'];
+                if ($filter && in_array($entityFilter['type'], $emailFilterTypes) && in_array($emailId, $filter)) {
+                    $dependents[] = $entity->getId();
+                    break;
+                }
+            }
+        }
+
+        return array_unique($dependents);
     }
 
     /**

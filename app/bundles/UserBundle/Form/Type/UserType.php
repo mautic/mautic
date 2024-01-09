@@ -24,15 +24,18 @@ use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
+/**
+ * @extends AbstractType<User>
+ */
 class UserType extends AbstractType
 {
-    public function __construct(private TranslatorInterface $translator, private UserModel $model, private LanguageHelper $languageHelper)
-    {
+    public function __construct(
+        private TranslatorInterface $translator,
+        private UserModel $model,
+        private LanguageHelper $languageHelper
+    ) {
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder->addEventSubscriber(new CleanFormSubscriber(['signature' => 'html', 'email' => 'email']));
@@ -232,9 +235,6 @@ class UserType extends AbstractType
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults(

@@ -59,8 +59,6 @@ class PointModel extends CommonFormModel
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @return PointRepository
      */
     public function getRepository()
@@ -68,17 +66,12 @@ class PointModel extends CommonFormModel
         return $this->em->getRepository(\Mautic\PointBundle\Entity\Point::class);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getPermissionBase(): string
     {
         return 'point:points';
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @throws MethodNotAllowedHttpException
      */
     public function createForm($entity, FormFactoryInterface $formFactory, $action = null, $options = []): \Symfony\Component\Form\FormInterface
@@ -108,8 +101,6 @@ class PointModel extends CommonFormModel
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @throws MethodNotAllowedHttpException
      */
     protected function dispatchEvent($action, &$entity, $isNew = false, Event $event = null): ?Event
@@ -338,5 +329,31 @@ class PointModel extends CommonFormModel
         $chart->setDataset($this->translator->trans('mautic.point.changes'), $data);
 
         return $chart->render();
+    }
+
+    /**
+     * @return array<int, int>
+     */
+    public function getPointActionIdsWithDependenciesOnEmail(int $emailId): array
+    {
+        $filter = [
+            'force'  => [
+                ['column' => 'p.type', 'expr' => 'in', 'value' => ['email.send', 'email.open']],
+            ],
+        ];
+        $entities = $this->getEntities(
+            [
+                'filter'     => $filter,
+            ]
+        );
+        $pointActionIds = [];
+        foreach ($entities as $entity) {
+            $properties = $entity->getProperties();
+            if (in_array($emailId, $properties['emails'] ?? [])) {
+                $pointActionIds[] = $entity->getId();
+            }
+        }
+
+        return array_unique($pointActionIds);
     }
 }

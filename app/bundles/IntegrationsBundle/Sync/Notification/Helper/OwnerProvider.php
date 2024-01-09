@@ -15,8 +15,10 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class OwnerProvider
 {
-    public function __construct(private EventDispatcherInterface $dispatcher, private ObjectProvider $objectProvider)
-    {
+    public function __construct(
+        private EventDispatcherInterface $dispatcher,
+        private ObjectProvider $objectProvider
+    ) {
     }
 
     /**

@@ -26,5 +26,10 @@ return function (ContainerConfigurator $configurator): void {
     $services->load('Mautic\\IntegrationsBundle\\', '../')
         ->exclude('../{'.implode(',', array_merge(MauticCoreExtension::DEFAULT_EXCLUDES, $excludes)).'}');
 
-    $services->load('Mautic\\IntegrationsBundle\\Entity\\', '../Entity/*Repository.php');
+    $services->load('Mautic\\IntegrationsBundle\\Entity\\', '../Entity/*Repository.php')
+        ->tag(\Doctrine\Bundle\DoctrineBundle\DependencyInjection\Compiler\ServiceRepositoryCompilerPass::REPOSITORY_SERVICE_TAG);
+
+    $services->alias('mautic.integrations.repository.field_change', \Mautic\IntegrationsBundle\Entity\FieldChangeRepository::class);
+    $services->alias('mautic.integrations.repository.object_mapping', \Mautic\IntegrationsBundle\Entity\ObjectMappingRepository::class);
+    $services->alias('mautic.plugin.integrations.repository.integration', \Mautic\PluginBundle\Entity\IntegrationRepository::class);
 };

@@ -27,8 +27,11 @@ class CustomFormEvent extends Event
      * @param string $formName
      * @param string $formType
      */
-    public function __construct(protected $formName, protected $formType, private FormBuilderInterface $formBuilder)
-    {
+    public function __construct(
+        protected $formName,
+        protected $formType,
+        private FormBuilderInterface $formBuilder
+    ) {
     }
 
     /**

@@ -15,15 +15,18 @@ use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
+/**
+ * @extends AbstractType<mixed>
+ */
 class CampaignEventLeadFieldValueType extends AbstractType
 {
-    public function __construct(protected Translator $translator, protected LeadModel $leadModel, protected FieldModel $fieldModel)
-    {
+    public function __construct(
+        protected Translator $translator,
+        protected LeadModel $leadModel,
+        protected FieldModel $fieldModel
+    ) {
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder->add(
@@ -206,9 +209,6 @@ class CampaignEventLeadFieldValueType extends AbstractType
         $builder->addEventListener(FormEvents::PRE_SUBMIT, $func);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getBlockPrefix()
     {
         return 'campaignevent_lead_field_value';

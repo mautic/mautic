@@ -13,9 +13,6 @@ use Mautic\CoreBundle\Helper\UTF8Helper;
  */
 class ArrayType extends \Doctrine\DBAL\Types\ArrayType
 {
-    /**
-     * {@inheritdoc}
-     */
     public function convertToDatabaseValue($value, AbstractPlatform $platform)
     {
         if (!is_array($value)) {

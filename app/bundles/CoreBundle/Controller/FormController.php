@@ -16,19 +16,24 @@ use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 
 /**
- * Class FormController.
- *
  * @deprecated 2.3 - to be removed in 3.0; use AbstractFormController instead
  */
 class FormController extends AbstractStandardFormController
 {
-    private $deprecatedModelName;
-    private $deprecatedPermissionBase;
-    private $deprecatedRouteBase;
-    private $deprecatedSessionBase;
-    private $deprecatedTranslationBase;
-    private $deprecatedTemplateBase;
-    private $deprecatedMauticContent;
+    private string $deprecatedModelName = '';
+
+    private ?string $deprecatedPermissionBase = null;
+
+    private ?string $deprecatedRouteBase = null;
+
+    private ?string $deprecatedSessionBase = null;
+
+    private ?string $deprecatedTranslationBase = null;
+
+    private ?string $deprecatedTemplateBase = null;
+
+    private ?string $deprecatedMauticContent = null;
+
     protected $activeLink;
 
     /**
@@ -44,14 +49,14 @@ class FormController extends AbstractStandardFormController
      * @param string $mauticContent   Mautic content string to return via ajax response for onLoad functions
      */
     protected function setStandardParameters(
-        $modelName,
-        $permissionBase,
-        $routeBase,
-        $sessionBase,
-        $translationBase,
-        $templateBase = null,
-        $activeLink = null,
-        $mauticContent = null
+        string $modelName,
+        string $permissionBase,
+        string $routeBase,
+        string $sessionBase,
+        string $translationBase,
+        string $templateBase,
+        string $activeLink,
+        string $mauticContent
     ) {
         $this->deprecatedModelName      = $modelName;
         $this->deprecatedPermissionBase = $permissionBase;
@@ -84,10 +89,7 @@ class FormController extends AbstractStandardFormController
         return $args;
     }
 
-    /**
-     * @return mixed
-     */
-    protected function getModelName()
+    protected function getModelName(): string
     {
         return $this->deprecatedModelName;
     }

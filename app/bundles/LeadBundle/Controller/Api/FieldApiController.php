@@ -110,8 +110,6 @@ class FieldApiController extends CommonApiController
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @param LeadField &$entity
      * @param string    $action
      */

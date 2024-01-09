@@ -27,8 +27,16 @@ class MauticFactory
     /**
      * @param ModelFactory<object> $modelFactory
      */
-    public function __construct(private ContainerInterface $container, private ModelFactory $modelFactory, private CorePermissions $security, private AuthorizationCheckerInterface $authorizationChecker, private UserHelper $userHelper, private RequestStack $requestStack, private ManagerRegistry $doctrine, private Translator $translator)
-    {
+    public function __construct(
+        private ContainerInterface $container,
+        private ModelFactory $modelFactory,
+        private CorePermissions $security,
+        private AuthorizationCheckerInterface $authorizationChecker,
+        private UserHelper $userHelper,
+        private RequestStack $requestStack,
+        private ManagerRegistry $doctrine,
+        private Translator $translator
+    ) {
     }
 
     /**

@@ -55,8 +55,13 @@ class DashboardSubscriber extends MainDashboardSubscriber
         'lead:leads:viewother',
     ];
 
-    public function __construct(protected LeadModel $leadModel, protected ListModel $leadListModel, protected RouterInterface $router, protected TranslatorInterface $translator, protected DateHelper $dateHelper)
-    {
+    public function __construct(
+        protected LeadModel $leadModel,
+        protected ListModel $leadListModel,
+        protected RouterInterface $router,
+        protected TranslatorInterface $translator,
+        protected DateHelper $dateHelper
+    ) {
     }
 
     /**

@@ -10,8 +10,11 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class PreAuthorizationEventListener
 {
-    public function __construct(private EntityManager $em, private CorePermissions $mauticSecurity, private TranslatorInterface $translator)
-    {
+    public function __construct(
+        private EntityManager $em,
+        private CorePermissions $mauticSecurity,
+        private TranslatorInterface $translator
+    ) {
     }
 
     /**
@@ -48,6 +51,6 @@ class PreAuthorizationEventListener
      */
     protected function getUser(PreAuthorizationEvent $event)
     {
-        return $this->em->getRepository(\Mautic\UserBundle\Entity\User::class)->findOneByUsername($event->getUser()->getUsername());
+        return $this->em->getRepository(\Mautic\UserBundle\Entity\User::class)->findOneByUsername($event->getUser()->getUserIdentifier());
     }
 }

@@ -15,8 +15,10 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class FormValidationSubscriber implements EventSubscriberInterface
 {
-    public function __construct(private TranslatorInterface $translator, private CoreParametersHelper $coreParametersHelper)
-    {
+    public function __construct(
+        private TranslatorInterface $translator,
+        private CoreParametersHelper $coreParametersHelper
+    ) {
     }
 
     public static function getSubscribedEvents(): array

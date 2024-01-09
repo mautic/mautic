@@ -24,7 +24,6 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
     use CustomFieldRepositoryTrait {
         prepareDbalFieldsForSave as defaultPrepareDbalFieldsForSave;
     }
-
     use ExpressionHelperTrait;
     use OperatorListTrait;
 
@@ -355,8 +354,6 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @param int $id
      */
     public function getEntity($id = 0): ?Lead
@@ -1180,9 +1177,6 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
         return new ArrayCollection($contacts);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getTableAlias(): string
     {
         return 'l';

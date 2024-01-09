@@ -10,20 +10,14 @@ use Metadata\Driver\DriverInterface;
 
 class ApiMetadataDriver extends BaseAnnotationDriver implements DriverInterface
 {
-    /**
-     * @var ClassMetadata
-     */
-    private $metadata;
+    private ?\JMS\Serializer\Metadata\ClassMetadata $metadata = null;
 
     /**
      * @var PropertyMetadata[]
      */
     private $properties = [];
 
-    /**
-     * @var string
-     */
-    private $groupPrefix = '';
+    private string $groupPrefix = '';
 
     /**
      * @var null
@@ -36,8 +30,6 @@ class ApiMetadataDriver extends BaseAnnotationDriver implements DriverInterface
     private $currentPropertyName;
 
     /**
-     * @return \Metadata\ClassMetadata
-     *
      * @throws \ReflectionException
      */
     public function loadMetadataForClass(\ReflectionClass $class): ?BaseClassMetadata
@@ -143,10 +135,7 @@ class ApiMetadataDriver extends BaseAnnotationDriver implements DriverInterface
             $this->setSinceVersion($this->defaultVersion);
         }
 
-        if (null !== $this->groupPrefix) {
-            // Auto add to the Details group
-            $this->addGroup($this->groupPrefix.'Details');
-        }
+        $this->addGroup($this->groupPrefix.'Details');
 
         return $this;
     }

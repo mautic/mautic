@@ -19,12 +19,21 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class ExportHelperTest extends TestCase
 {
-    /** @var MockObject|TranslatorInterface */
+    /**
+     * @var MockObject|TranslatorInterface
+     */
     private \PHPUnit\Framework\MockObject\MockObject $translatorInterfaceMock;
-    /** @var MockObject|CoreParametersHelper */
+
+    /**
+     * @var MockObject|CoreParametersHelper
+     */
     private \PHPUnit\Framework\MockObject\MockObject $coreParametersHelperMock;
+
     private ExportHelper $exportHelper;
-    /** @var array<array<string, int|string>> */
+
+    /**
+     * @var array<array<string, int|string>>
+     */
     private array $dummyData = [
         [
             'id'        => 1,
@@ -39,9 +48,15 @@ class ExportHelperTest extends TestCase
             'email'     => 'demo@mautic.org',
         ],
     ];
-    /** @var array<string> */
+
+    /**
+     * @var array<string>
+     */
     private array $filePaths = [];
-    /** @var FilePathResolver|MockObject */
+
+    /**
+     * @var FilePathResolver|MockObject
+     */
     private \PHPUnit\Framework\MockObject\MockObject $filePathResolver;
 
     protected function setUp(): void

@@ -22,9 +22,6 @@ abstract class PluginBundleBaseStub extends Bundle
     /**
      * Called by PluginController::reloadAction when the addon version does not match what's installed.
      *
-
-     * @param Schema $installedSchema
-     *
      * @throws \Exception
      */
     public static function onPluginUpdate(Plugin $plugin, MauticFactory $factory, $metadata = null, Schema $installedSchema = null)

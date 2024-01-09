@@ -6,9 +6,6 @@ use MauticPlugin\MauticEmailMarketingBundle\Form\Type\ConstantContactType;
 
 class ConstantContactIntegration extends EmailAbstractIntegration
 {
-    /**
-     * {@inheritdoc}
-     */
     public function getName(): string
     {
         return 'ConstantContact';
@@ -19,9 +16,6 @@ class ConstantContactIntegration extends EmailAbstractIntegration
         return 'Constant Contact';
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getAuthenticationType(): string
     {
         return 'oauth2';

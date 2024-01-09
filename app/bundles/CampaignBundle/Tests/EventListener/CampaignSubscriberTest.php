@@ -17,8 +17,11 @@ use PHPUnit\Framework\TestCase;
 class CampaignSubscriberTest extends TestCase
 {
     private \PHPUnit\Framework\MockObject\MockObject $ipLookupHelper;
+
     private \PHPUnit\Framework\MockObject\MockObject $auditLogModel;
+
     private \PHPUnit\Framework\MockObject\MockObject $campaignService;
+
     private \PHPUnit\Framework\MockObject\MockObject $flashBag;
 
     private \Mautic\CampaignBundle\EventListener\CampaignSubscriber $subscriber;

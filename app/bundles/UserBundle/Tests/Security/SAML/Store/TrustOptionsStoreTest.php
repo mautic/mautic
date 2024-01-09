@@ -9,9 +9,10 @@ use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
 class TrustOptionsStoreTest extends TestCase
-{  /**
- * @var CoreParametersHelper|MockObject
- */
+{
+    /**
+     * @var CoreParametersHelper|MockObject
+     */
     private \PHPUnit\Framework\MockObject\MockObject $coreParametersHelper;
 
     private \Mautic\UserBundle\Security\SAML\Store\TrustOptionsStore $store;

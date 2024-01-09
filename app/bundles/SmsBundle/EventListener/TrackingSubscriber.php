@@ -10,8 +10,9 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class TrackingSubscriber implements EventSubscriberInterface
 {
-    public function __construct(private StatRepository $statRepository)
-    {
+    public function __construct(
+        private StatRepository $statRepository
+    ) {
     }
 
     public static function getSubscribedEvents(): array

@@ -7,10 +7,14 @@ use Mautic\CoreBundle\Security\Exception\Cryptography\Symmetric\InvalidDecryptio
 
 class EncryptionHelper
 {
-    /** @var SymmetricCipherInterface[] */
-    private $availableCiphers;
+    /**
+     * @var SymmetricCipherInterface[]
+     */
+    private ?array $availableCiphers = null;
 
-    /** @var string */
+    /**
+     * @var string
+     */
     private $key;
 
     public function __construct(

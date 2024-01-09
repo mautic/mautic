@@ -10,8 +10,11 @@ use Psr\Log\LoggerInterface;
 
 class ContactFinder
 {
-    public function __construct(private StatRepository $statRepository, private LeadRepository $leadRepository, private LoggerInterface $logger)
-    {
+    public function __construct(
+        private StatRepository $statRepository,
+        private LeadRepository $leadRepository,
+        private LoggerInterface $logger
+    ) {
     }
 
     /**

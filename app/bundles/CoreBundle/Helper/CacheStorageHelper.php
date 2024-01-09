@@ -7,8 +7,6 @@ use Symfony\Component\Cache\Adapter\DoctrineDbalAdapter;
 use Symfony\Component\Cache\Adapter\FilesystemAdapter;
 
 /**
- * Class CacheStorageHelper.
- *
  * @deprecated This helper is deprecated in favor of CacheBundle
  */
 class CacheStorageHelper
@@ -44,8 +42,13 @@ class CacheStorageHelper
      * @param int    $defaultExpiration
      * @param string $adaptor
      */
-    public function __construct(protected $adaptor, protected $namespace = null, protected ?Connection $connection = null, $cacheDir = null, protected $defaultExpiration = 0)
-    {
+    public function __construct(
+        protected $adaptor,
+        protected $namespace = null,
+        protected ?Connection $connection = null,
+        $cacheDir = null,
+        protected $defaultExpiration = 0
+    ) {
         $this->cacheDir          = $cacheDir.'/data';
 
         // @deprecated BC support for pre 2.6.0 to be removed in 3.0

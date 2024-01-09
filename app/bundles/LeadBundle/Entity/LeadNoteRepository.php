@@ -56,9 +56,6 @@ class LeadNoteRepository extends CommonRepository
         return $results[0]['note_count'];
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getTableAlias(): string
     {
         return 'n';

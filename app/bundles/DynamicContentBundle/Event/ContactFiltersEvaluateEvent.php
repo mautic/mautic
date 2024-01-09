@@ -10,13 +10,16 @@ use Symfony\Contracts\EventDispatcher\Event;
 final class ContactFiltersEvaluateEvent extends Event
 {
     private bool $isEvaluated = false;
+
     private bool $isMatched   = false;
 
     /**
      * @param mixed[] $filters
      */
-    public function __construct(private array $filters, private Lead $contact)
-    {
+    public function __construct(
+        private array $filters,
+        private Lead $contact
+    ) {
     }
 
     public function isMatch(): bool

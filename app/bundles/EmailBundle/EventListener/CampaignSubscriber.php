@@ -33,8 +33,12 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class CampaignSubscriber implements EventSubscriberInterface
 {
-    public function __construct(private EmailModel $emailModel, private RealTimeExecutioner $realTimeExecutioner, private SendEmailToUser $sendEmailToUser, private TranslatorInterface $translator)
-    {
+    public function __construct(
+        private EmailModel $emailModel,
+        private RealTimeExecutioner $realTimeExecutioner,
+        private SendEmailToUser $sendEmailToUser,
+        private TranslatorInterface $translator
+    ) {
     }
 
     public static function getSubscribedEvents(): array
@@ -94,7 +98,7 @@ class CampaignSubscriber implements EventSubscriberInterface
                 'batchEventName'       => EmailEvents::ON_CAMPAIGN_BATCH_ACTION,
                 'formType'             => EmailSendType::class,
                 'formTypeOptions'      => ['update_select' => 'campaignevent_properties_email', 'with_email_types' => true],
-                'formTheme'            => '@MauticEmail/FormTheme/EmailSendList/_emailsend_list_row.html.twig',
+                'formTheme'            => '@MauticEmail/FormTheme/EmailSendList/emailsend_list_row.html.twig',
                 'channel'              => 'email',
                 'channelIdField'       => 'email',
             ]
@@ -124,7 +128,7 @@ class CampaignSubscriber implements EventSubscriberInterface
                 'batchEventName'       => EmailEvents::ON_CAMPAIGN_BATCH_ACTION,
                 'formType'             => EmailToUserType::class,
                 'formTypeOptions'      => ['update_select' => 'campaignevent_properties_useremail_email'],
-                'formTheme'            => '@MauticEmail/FormTheme/EmailSendList/_email_to_user_row.html.twig',
+                'formTheme'            => '@MauticEmail/FormTheme/EmailSendList/email_to_user_row.html.twig',
                 'channel'              => 'email',
                 'channelIdField'       => 'email',
             ]

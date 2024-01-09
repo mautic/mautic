@@ -13,6 +13,7 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 class ProcessUnsubscribeSubscriber implements EventSubscriberInterface
 {
     public const BUNDLE     = 'EmailBundle';
+
     public const FOLDER_KEY = 'unsubscribes';
 
     public static function getSubscribedEvents(): array
@@ -24,8 +25,10 @@ class ProcessUnsubscribeSubscriber implements EventSubscriberInterface
         ];
     }
 
-    public function __construct(private Unsubscribe $unsubscriber, private FeedbackLoop $looper)
-    {
+    public function __construct(
+        private Unsubscribe $unsubscriber,
+        private FeedbackLoop $looper
+    ) {
     }
 
     public function onEmailConfig(MonitoredEmailEvent $event): void

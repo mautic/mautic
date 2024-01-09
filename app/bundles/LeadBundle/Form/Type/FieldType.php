@@ -28,10 +28,16 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
 
+/**
+ * @extends AbstractType<LeadField>
+ */
 class FieldType extends AbstractType
 {
-    public function __construct(private EntityManagerInterface $em, private Translator $translator, private IdentifierFields $identifierFields)
-    {
+    public function __construct(
+        private EntityManagerInterface $em,
+        private Translator $translator,
+        private IdentifierFields $identifierFields
+    ) {
     }
 
     public function buildForm(FormBuilderInterface $builder, array $options): void

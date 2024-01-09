@@ -19,11 +19,19 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 class ReportSubscriber implements EventSubscriberInterface
 {
     public const CONTEXT_FORMS           = 'forms';
+
     public const CONTEXT_FORM_SUBMISSION = 'form.submissions';
+
     public const CONTEXT_FORM_RESULT     = 'form.results';
 
-    public function __construct(private CompanyReportData $companyReportData, private SubmissionRepository $submissionRepository, private FormModel $formModel, private ReportHelper $reportHelper, private CoreParametersHelper $coreParametersHelper, private TranslatorInterface $translator)
-    {
+    public function __construct(
+        private CompanyReportData $companyReportData,
+        private SubmissionRepository $submissionRepository,
+        private FormModel $formModel,
+        private ReportHelper $reportHelper,
+        private CoreParametersHelper $coreParametersHelper,
+        private TranslatorInterface $translator
+    ) {
     }
 
     public static function getSubscribedEvents(): array

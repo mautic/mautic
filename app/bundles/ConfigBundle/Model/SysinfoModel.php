@@ -22,8 +22,14 @@ class SysinfoModel
      */
     protected $folders;
 
-    public function __construct(protected PathsHelper $pathsHelper, protected CoreParametersHelper $coreParametersHelper, private TranslatorInterface $translator, protected Connection $connection, private InstallService $installService, private CheckStep $checkStep)
-    {
+    public function __construct(
+        protected PathsHelper $pathsHelper,
+        protected CoreParametersHelper $coreParametersHelper,
+        private TranslatorInterface $translator,
+        protected Connection $connection,
+        private InstallService $installService,
+        private CheckStep $checkStep
+    ) {
     }
 
     /**
@@ -115,8 +121,6 @@ class SysinfoModel
      * Method to tail (a few last rows) of a file.
      *
      * @param int $lines
-     *
-     * @return string
      */
     public function getLogTail($lines = 10): ?string
     {

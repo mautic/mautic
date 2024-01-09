@@ -9,18 +9,20 @@ class ParseEmailEvent extends Event
     /**
      * @var mixed[]
      */
-    private $criteriaRequests = [];
+    private array $criteriaRequests = [];
 
     /**
      * @var mixed[]
      */
-    private $markAsSeen = [];
+    private array $markAsSeen = [];
 
     /**
      * @param mixed[] $keys
      */
-    public function __construct(private array $messages = [], private array $keys = [])
-    {
+    public function __construct(
+        private array $messages = [],
+        private array $keys = []
+    ) {
     }
 
     /**

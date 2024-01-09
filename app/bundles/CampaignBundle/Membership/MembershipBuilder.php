@@ -8,39 +8,27 @@ use Mautic\CampaignBundle\Executioner\ContactFinder\Limiter\ContactLimiter;
 use Mautic\CampaignBundle\Membership\Exception\RunLimitReachedException;
 use Mautic\CoreBundle\Helper\ProgressBarHelper;
 use Mautic\LeadBundle\Entity\LeadRepository;
-use Symfony\Component\Console\Helper\ProgressBar;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 class MembershipBuilder
 {
-    /**
-     * @var Campaign
-     */
-    private $campaign;
+    private ?\Mautic\CampaignBundle\Entity\Campaign $campaign = null;
 
-    /**
-     * @var ContactLimiter
-     */
-    private $contactLimiter;
+    private ?\Mautic\CampaignBundle\Executioner\ContactFinder\Limiter\ContactLimiter $contactLimiter = null;
 
-    /**
-     * @var int
-     */
-    private $runLimit;
+    private ?int $runLimit = null;
 
-    /**
-     * @var OutputInterface|null
-     */
-    private $output;
+    private ?\Symfony\Component\Console\Output\OutputInterface $output = null;
 
-    /**
-     * @var ProgressBar|null
-     */
-    private $progressBar;
+    private ?\Symfony\Component\Console\Helper\ProgressBar $progressBar = null;
 
-    public function __construct(private MembershipManager $manager, private CampaignLeadRepository $campaignLeadRepository, private LeadRepository $leadRepository, private TranslatorInterface $translator)
-    {
+    public function __construct(
+        private MembershipManager $manager,
+        private CampaignLeadRepository $campaignLeadRepository,
+        private LeadRepository $leadRepository,
+        private TranslatorInterface $translator
+    ) {
     }
 
     /**

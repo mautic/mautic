@@ -7,17 +7,11 @@ namespace Mautic\CoreBundle\Entity;
  */
 class NotificationRepository extends CommonRepository
 {
-    /**
-     * {@inheritdoc}
-     */
     public function getTableAlias(): string
     {
         return 'n';
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getDefaultOrder(): array
     {
         return [

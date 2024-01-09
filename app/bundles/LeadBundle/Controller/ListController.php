@@ -12,7 +12,6 @@ use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\LeadBundle\Model\ListModel;
 use Mautic\LeadBundle\Segment\Stat\SegmentCampaignShare;
 use Mautic\LeadBundle\Segment\Stat\SegmentDependencies;
-use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -328,7 +327,6 @@ class ListController extends FormController
             return $this->isLocked($postActionVars, $segment, 'lead.list');
         }
 
-        /** @var FormInterface $form */
         $form = $segmentModel->createForm($segment, $this->formFactory, $action);
 
         // /Check for a submitted form and process it
@@ -836,9 +834,6 @@ class ListController extends FormController
         return $model;
     }
 
-    /**
-     * Get Model Name.
-     */
     protected function getModelName(): string
     {
         return 'lead.list';

@@ -13,7 +13,9 @@ use Mautic\WebhookBundle\WebhookEvents;
 class WebhookSubscriberTest extends \PHPUnit\Framework\TestCase
 {
     private \PHPUnit\Framework\MockObject\MockObject $ipLookupHelper;
+
     private \PHPUnit\Framework\MockObject\MockObject $auditLogModel;
+
     private \PHPUnit\Framework\MockObject\MockObject $webhookKillNotificator;
 
     protected function setUp(): void

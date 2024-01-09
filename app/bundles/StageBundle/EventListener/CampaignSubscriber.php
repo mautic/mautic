@@ -17,8 +17,11 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class CampaignSubscriber implements EventSubscriberInterface
 {
-    public function __construct(private LeadModel $leadModel, private StageModel $stageModel, private TranslatorInterface $translator)
-    {
+    public function __construct(
+        private LeadModel $leadModel,
+        private StageModel $stageModel,
+        private TranslatorInterface $translator
+    ) {
     }
 
     public static function getSubscribedEvents(): array

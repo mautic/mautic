@@ -19,15 +19,15 @@ class IntegrationsHelper
     /**
      * @var IntegrationInterface[]
      */
-    private $integrations = [];
+    private array $integrations = [];
 
-    /**
-     * @var array
-     */
-    private $decryptedIntegrationConfigurations = [];
+    private array $decryptedIntegrationConfigurations = [];
 
-    public function __construct(private IntegrationRepository $integrationRepository, private EncryptionService $encryptionService, private EventDispatcherInterface $eventDispatcher)
-    {
+    public function __construct(
+        private IntegrationRepository $integrationRepository,
+        private EncryptionService $encryptionService,
+        private EventDispatcherInterface $eventDispatcher
+    ) {
     }
 
     public function addIntegration(IntegrationInterface $integration): void
@@ -79,7 +79,7 @@ class IntegrationsHelper
     {
         if (!$integration->hasIntegrationConfiguration()) {
             /** @var Integration $configuration */
-            $configuration = $this->integrationRepository->findOneBy(['name' => $integration->getName()]);
+            $configuration = $this->integrationRepository->findOneByName($integration->getName());
 
             if (!$configuration) {
                 throw new IntegrationNotFoundException("{$integration->getName()} doesn't exist in the database");

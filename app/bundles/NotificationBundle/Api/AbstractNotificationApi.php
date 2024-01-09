@@ -10,8 +10,11 @@ use Psr\Http\Message\ResponseInterface;
 
 abstract class AbstractNotificationApi
 {
-    public function __construct(protected Client $http, protected TrackableModel $trackableModel, protected IntegrationHelper $integrationHelper)
-    {
+    public function __construct(
+        protected Client $http,
+        protected TrackableModel $trackableModel,
+        protected IntegrationHelper $integrationHelper
+    ) {
     }
 
     /**

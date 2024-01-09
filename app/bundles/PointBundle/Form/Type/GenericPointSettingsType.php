@@ -7,11 +7,11 @@ use Symfony\Component\Form\Extension\Core\Type\NumberType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Validator\Constraints\NotEqualTo;
 
+/**
+ * @extends AbstractType<array<mixed>>
+ */
 class GenericPointSettingsType extends AbstractType
 {
-    /**
-     * {@inheritdoc}
-     */
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $default = (empty($options['data']['delta'])) ? 0 : (int) $options['data']['delta'];
@@ -39,9 +39,6 @@ class GenericPointSettingsType extends AbstractType
         );
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getBlockPrefix()
     {
         return 'genericpoint_settings';

@@ -27,8 +27,10 @@ abstract class CommonStatsSubscriber implements EventSubscriberInterface
      */
     protected $permissions = [];
 
-    public function __construct(protected CorePermissions $security, protected EntityManager $entityManager)
-    {
+    public function __construct(
+        protected CorePermissions $security,
+        protected EntityManager $entityManager
+    ) {
     }
 
     public static function getSubscribedEvents(): array
