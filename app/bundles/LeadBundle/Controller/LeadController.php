@@ -297,23 +297,7 @@ class LeadController extends FormController
         /** @var \Mautic\LeadBundle\Model\LeadModel $model */
         $model = $this->getModel('lead.lead');
 
-        /** @var \Mautic\LeadBundle\Entity\Lead $lead */
         $lead = $model->getEntity($objectId);
-        $model->getRepository()->refetchEntity($lead);
-
-        // set some permissions
-        $permissions = $this->security->isGranted(
-            [
-                'lead:leads:viewown',
-                'lead:leads:viewother',
-                'lead:leads:create',
-                'lead:leads:editown',
-                'lead:leads:editother',
-                'lead:leads:deleteown',
-                'lead:leads:deleteother',
-            ],
-            'RETURN_ARRAY'
-        );
 
         if (null === $lead) {
             // get the page we came from
@@ -341,6 +325,23 @@ class LeadController extends FormController
                 ]
             );
         }
+
+        /** @var \Mautic\LeadBundle\Entity\Lead $lead */
+        $model->getRepository()->refetchEntity($lead);
+
+        // set some permissions
+        $permissions = $this->security->isGranted(
+            [
+              'lead:leads:viewown',
+              'lead:leads:viewother',
+              'lead:leads:create',
+              'lead:leads:editown',
+              'lead:leads:editother',
+              'lead:leads:deleteown',
+              'lead:leads:deleteother',
+            ],
+            'RETURN_ARRAY'
+        );
 
         if (!$this->security->hasEntityAccess(
             'lead:leads:viewown',
