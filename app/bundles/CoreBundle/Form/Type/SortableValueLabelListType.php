@@ -8,6 +8,9 @@ use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
 
+/**
+ * @extends AbstractType<mixed>
+ */
 class SortableValueLabelListType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options): void

@@ -65,8 +65,9 @@ class ReportController extends FormController
             $filter['force'][] = ['column' => 'r.createdBy', 'expr' => 'eq', 'value' => $this->user->getId()];
         }
 
-        $orderBy    = $request->getSession()->get('mautic.report.orderby', 'r.name');
-        $orderByDir = $request->getSession()->get('mautic.report.orderbydir', 'DESC');
+        $orderBy    = $request->getSession()->get('mautic.report.orderby', 'r.dateModified');
+        $orderByDir = $request->getSession()->get('mautic.report.orderbydir', $this->getDefaultOrderDirection());
+
         $reports    = $model->getEntities(
             [
                 'start'      => $start,
@@ -867,5 +868,10 @@ class ReportController extends FormController
         $response->setContentDisposition(ResponseHeaderBag::DISPOSITION_ATTACHMENT, "report-{$report->getId()}.zip");
 
         return $response;
+    }
+
+    protected function getDefaultOrderDirection(): string
+    {
+        return 'DESC';
     }
 }
