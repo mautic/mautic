@@ -48,8 +48,12 @@ final class ImportControllerTest extends MauticMysqlTestCase
         Assert::assertStringContainsString('Some required fields are missing. You must map the field "Phone."', $crawler->html());
     }
 
-    public function testImportMappingAndImport(): void
+    /**
+     *  @dataProvider validateDataProvider
+     */
+    public function testImportMappingAndImport(string $skipIfExist, string $expectedName): void
     {
+        $this->createLead('john@doe.email', 'Johny');
         $crawler    = $this->client->request(Request::METHOD_GET, '/s/contacts/import/new');
         $uploadForm = $crawler->selectButton('Upload')->form();
         $file       = new UploadedFile(__DIR__.'/../Fixtures/contacts.csv', 'contacs.csv', 'itext/csv');
@@ -58,6 +62,7 @@ final class ImportControllerTest extends MauticMysqlTestCase
 
         $crawler     = $this->client->submit($uploadForm);
         $mappingForm = $crawler->selectButton('Import')->form();
+        $mappingForm['lead_field_import[skip_if_exists]']->setValue($skipIfExist);
         $crawler     = $this->client->submit($mappingForm);
 
         Assert::assertStringContainsString('Import process was successfully created. You will be notified when finished.', $crawler->html());
@@ -86,15 +91,16 @@ final class ImportControllerTest extends MauticMysqlTestCase
 
         Assert::assertNotNull($importEntity);
         Assert::assertSame(2, $importEntity->getLineCount());
-        Assert::assertSame(2, $importEntity->getInsertedCount());
+        Assert::assertSame(1, $importEntity->getInsertedCount());
+        Assert::assertSame(1, $importEntity->getUpdatedCount());
         Assert::assertSame(Import::IMPORTED, $importEntity->getStatus());
 
         /** @var LeadRepository $importRepository */
         $leadRepository = $this->em->getRepository(Lead::class);
 
         /** @var Lead[] $contacts */
-        $contacts = $leadRepository->findBy(['email' => ['john@doe.email', 'ferda@mravenec.email']]);
-
+        $contacts = $leadRepository->findBy(['email' => ['john@doe.email', 'ferda@mravenec.email']], ['email' => 'desc']);
+        Assert::assertSame($expectedName, $contacts[0]->getFirstname());
         Assert::assertCount(2, $contacts);
     }
 
@@ -108,5 +114,26 @@ final class ImportControllerTest extends MauticMysqlTestCase
 
         $phoneField->setIsRequired($required);
         $fieldRepository->saveEntity($phoneField);
+    }
+
+    private function createLead(string $email = null, string $firstName = ''): Lead
+    {
+        $lead = new Lead();
+        if (!empty($email)) {
+            $lead->setEmail($email);
+        }
+        $lead->setFirstname($firstName);
+        $this->em->persist($lead);
+
+        return $lead;
+    }
+
+    /**
+     * @return mixed[]
+     */
+    public function validateDataProvider(): iterable
+    {
+        yield ['0', 'John'];
+        yield ['1', 'Johny'];
     }
 }

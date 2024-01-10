@@ -821,6 +821,16 @@ class LeadControllerTest extends MauticMysqlTestCase
         Assert::assertCount($companyLimit, $leadCompanies);
     }
 
+    public function testNonExitingContactIsRedirected(): void
+    {
+        $this->client->followRedirects(false);
+        $this->client->request(
+            Request::METHOD_GET,
+            's/contacts/view/1000',
+        );
+        $this->assertEquals(true, $this->client->getResponse()->isRedirect('/s/contacts/1'));
+    }
+  
     public function testContactGroupPointsEdit(): void
     {
         $contact = $this->createContact('test-contact@example.com');

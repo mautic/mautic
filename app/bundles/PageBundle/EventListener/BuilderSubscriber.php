@@ -22,6 +22,7 @@ use Mautic\CoreBundle\Form\Type\SlotSuccessMessageType;
 use Mautic\CoreBundle\Form\Type\SlotTextType;
 use Mautic\CoreBundle\Helper\BuilderTokenHelperFactory;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
+use Mautic\CoreBundle\Twig\Helper\AssetsHelper;
 use Mautic\EmailBundle\EmailEvents;
 use Mautic\EmailBundle\Event\EmailBuilderEvent;
 use Mautic\EmailBundle\Event\EmailSendEvent;
@@ -70,7 +71,8 @@ class BuilderSubscriber implements EventSubscriberInterface
         private BuilderTokenHelperFactory $builderTokenHelperFactory,
         private TranslatorInterface $translator,
         private Connection $connection,
-        private Environment $twig
+        private Environment $twig,
+        private AssetsHelper $assetsHelper
     ) {
     }
 
@@ -415,7 +417,7 @@ class BuilderSubscriber implements EventSubscriberInterface
 
             if (str_contains($content, self::saveprefsRegex)) {
                 $savePrefs = $this->renderSavePrefs($params);
-                $content   = str_ireplace(self::saveprefsRegex, $savePrefs, $content);
+                $content   = str_ireplace(self::saveprefsRegex, $savePrefs.($params['custom_tag'] ?? ''), $content);
             }
             // add form before first block of prefs center
             if (isset($params['startform']) && str_contains($content, 'data-prefs-center')) {
@@ -435,6 +437,20 @@ class BuilderSubscriber implements EventSubscriberInterface
                     $slot->parentNode->insertBefore($newnode, $slot);
                     $content = $dom->saveHTML();
                     $content = str_replace('<startform></startform>', $params['startform'], $content);
+                }
+
+                /* Add close form tag before the custom tag to prevent cascading forms
+                 * in case there is already an unsubscribe form on the page
+                 * that's why we can't use the bodyclose customdeclaration
+                 */
+                if (!empty($params['form'])) {
+                    $formEnd = $this->twig->render('@MauticCore/Default/form_end.html.twig', $params);
+
+                    if (!empty($params['custom_tag'])) {
+                        $this->assetsHelper->addCustomDeclaration($formEnd, 'customTag');
+                    } else {
+                        $this->assetsHelper->addCustomDeclaration($formEnd, 'bodyClose');
+                    }
                 }
             }
 

@@ -44,6 +44,6 @@ class PublicControllerTest extends MauticMysqlTestCase
         $this->assertTrue($clientResponse->isOk(), $clientResponse->getContent());
 
         $responseData = $clientResponse->getContent();
-        $this->assertStringContainsString('A new password has been generated and will be emailed to you, if this user exist. If you do not receive it within a few minutes, check your spam box and/or contact the system administrator.', $responseData);
+        $this->assertStringContainsString('A new password has been generated and will be emailed to you, if this user exists. If you do not receive it within a few minutes, check your spam box and/or contact the system administrator.', $responseData);
     }
 }
