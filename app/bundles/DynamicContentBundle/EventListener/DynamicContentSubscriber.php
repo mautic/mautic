@@ -80,7 +80,6 @@ class DynamicContentSubscriber implements EventSubscriberInterface
      * @var ContactTracker
      */
     private $contactTracker;
-    private CompanyModel $companyModel;
 
     public function __construct(
         TrackableModel $trackableModel,
@@ -93,7 +92,7 @@ class DynamicContentSubscriber implements EventSubscriberInterface
         DynamicContentModel $dynamicContentModel,
         CorePermissions $security,
         ContactTracker $contactTracker,
-        CompanyModel $companyModel
+        private CompanyModel $companyModel
     ) {
         $this->trackableModel       = $trackableModel;
         $this->pageTokenHelper      = $pageTokenHelper;
@@ -105,7 +104,6 @@ class DynamicContentSubscriber implements EventSubscriberInterface
         $this->dynamicContentModel  = $dynamicContentModel;
         $this->security             = $security;
         $this->contactTracker       = $contactTracker;
-        $this->companyModel         = $companyModel;
     }
 
     /**
@@ -162,7 +160,6 @@ class DynamicContentSubscriber implements EventSubscriberInterface
         $clickthrough = $event->getClickthrough();
 
         if ($lead instanceof Lead && $content) {
-            /** @var Lead $lead */
             $leadArray              = $this->dynamicContentHelper->convertLeadToArray($lead);
             $leadArray['companies'] = $this->companyModel->getRepository()->getCompaniesByLeadId($leadArray['id']);
 
