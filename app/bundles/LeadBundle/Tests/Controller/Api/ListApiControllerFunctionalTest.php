@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\LeadBundle\Tests\Controller\Api;
 
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
@@ -16,6 +18,8 @@ class ListApiControllerFunctionalTest extends MauticMysqlTestCase
 
     protected function setUp(): void
     {
+        $this->configParams['show_leadlist_static_filter'] = 'testCircularDepencencySegment' === $this->getName(false);
+
         parent::setUp();
         /* @var ListModel $listModel */
         $this->listModel = self::$container->get('mautic.lead.model.list');
@@ -296,7 +300,57 @@ class ListApiControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertSame([], $response2['lists'][1]['filters']);
     }
 
-    public function testUnpublishUsedSingleSegment(): void
+    /**
+     * @dataProvider segmentMembershipFilterProvider
+     */
+    public function testCircularDepencencySegment(string $filterName): void
+    {
+        $segmentA = $this->saveSegment('SA', 's1');
+        $segmentB = $this->saveSegment('SB', 's2', [[
+            'object'     => 'lead',
+            'glue'       => 'and',
+            'field'      => $filterName,
+            'type'       => 'leadlist',
+            'operator'   => 'in',
+            'properties' => [
+                'filter' => [$segmentA->getId()],
+            ],
+            'display' => '',
+        ]]);
+        $this->em->clear();
+
+        $this->client->request('PATCH', "/api/segments/{$segmentA->getId()}/edit", ['name' => 'API segment changed', 'filters' => [[
+            'object'     => 'lead',
+            'glue'       => 'and',
+            'field'      => $filterName,
+            'type'       => 'leadlist',
+            'operator'   => 'in',
+            'properties' => [
+                'filter' => [$segmentB->getId()],
+            ],
+            'display' => '',
+        ]]]);
+        $expectedErrorMessage = 'filters: Circular dependency detected in the segment membership filter. API segment changed > SB > API segment changed. This operation would create an infinite loop. Please double check what you are intending to do.';
+
+        $clientResponse = $this->client->getResponse();
+        $response       = json_decode($clientResponse->getContent(), true);
+        $this->assertSame(Response::HTTP_UNPROCESSABLE_ENTITY, $clientResponse->getStatusCode());
+        $this->assertSame($expectedErrorMessage, $response['errors'][0]['message']);
+    }
+
+    /**
+     * @return iterable<string, string[]>
+     */
+    public function segmentMembershipFilterProvider(): iterable
+    {
+        yield 'Classic Segment Membership Filter' => ['leadlist'];
+        yield 'Static Segment Membership Filter' => ['leadlist_static'];
+    }
+
+    /**
+     * @dataProvider segmentMembershipFilterProvider
+     */
+    public function testUnpublishUsedSingleSegment(string $filterName): void
     {
         $filter = [[
             'glue'     => 'and',
@@ -310,7 +364,7 @@ class ListApiControllerFunctionalTest extends MauticMysqlTestCase
         $filter = [[
             'object'     => 'lead',
             'glue'       => 'and',
-            'field'      => 'leadlist',
+            'field'      => $filterName,
             'type'       => 'leadlist',
             'operator'   => 'in',
             'properties' => [
@@ -329,7 +383,10 @@ class ListApiControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertSame($response['errors'][0]['message'], $expectedErrorMessage);
     }
 
-    public function testUnpublishUsedBatchSegment(): void
+    /**
+     * @dataProvider segmentMembershipFilterProvider
+     */
+    public function testUnpublishUsedBatchSegment(string $filterName): void
     {
         $filter = [[
             'glue'     => 'and',
@@ -343,7 +400,7 @@ class ListApiControllerFunctionalTest extends MauticMysqlTestCase
         $filter = [[
             'object'     => 'lead',
             'glue'       => 'and',
-            'field'      => 'leadlist',
+            'field'      => $filterName,
             'type'       => 'leadlist',
             'operator'   => 'in',
             'properties' => [

@@ -1,105 +1,33 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\CoreBundle\Tests\Unit\Form\Validator\Constraints;
 
-use Mautic\CoreBundle\Form\Validator\Constraints\CircularDependency;
-use Mautic\CoreBundle\Form\Validator\Constraints\CircularDependencyValidator;
+use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\LeadBundle\Entity\LeadList;
-use Mautic\LeadBundle\Model\ListModel;
-use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\RequestStack;
-use Symfony\Component\Validator\Context\ExecutionContext;
 
-class CircularDependencyValidatorTest extends \PHPUnit\Framework\TestCase
+final class CircularDependencyValidatorTest extends MauticMysqlTestCase
 {
-    /**
-     * @var \PHPUnit\Framework\MockObject\MockObject|ListModel
-     */
-    private \PHPUnit\Framework\MockObject\MockObject $mockListModel;
-
-    /**
-     * @var \PHPUnit\Framework\MockObject\MockObject|ExecutionContext
-     */
-    private \PHPUnit\Framework\MockObject\MockObject $context;
-
-    /**
-     * @var \PHPUnit\Framework\MockObject\MockObject|RequestStack
-     */
-    private \PHPUnit\Framework\MockObject\MockObject $requestStack;
-
-    /**
-     * @var \PHPUnit\Framework\MockObject\MockObject|Request
-     */
-    private \PHPUnit\Framework\MockObject\MockObject $request;
-
-    private \Mautic\CoreBundle\Form\Validator\Constraints\CircularDependencyValidator $validator;
-
     protected function setUp(): void
     {
+        $this->configParams['show_leadlist_static_filter'] = true;
+
         parent::setUp();
-
-        $this->mockListModel = $this->createMock(ListModel::class);
-        $this->context       = $this->createMock(ExecutionContext::class);
-        $this->requestStack  = $this->createMock(RequestStack::class);
-        $this->request       = $this->createMock(Request::class);
-
-        $this->requestStack->expects($this->once())
-            ->method('getCurrentRequest')
-            ->willReturn($this->request);
-
-        $this->validator = new CircularDependencyValidator($this->mockListModel, $this->requestStack);
-        $this->validator->initialize($this->context);
     }
 
     /**
-     * Checks that the validator won't break if the segment ID is not present in the request.
-     */
-    public function testIfSegmentIdIsNotInTheRequest(): void
-    {
-        $this->context->expects($this->never())
-            ->method('addViolation');
-
-        $this->mockListModel->expects($this->never())
-            ->method('getEntity');
-
-        $this->validator->validate([], new CircularDependency([]));
-    }
-
-    /**
-     * Configure a CircularDependencyValidator.
+     * Verify a constraint message.
      *
-     * @param string $expectedMessage  the expected message on a validation violation, if any
-     * @param int    $currentSegmentId
-     *
-     * @return Mautic\CoreBundle\Form\Validator\Constraints\CircularDependencyValidator
+     * @dataProvider validateDataProvider
      */
-    private function configureValidator($expectedMessage, $currentSegmentId)
+    public function testValidateOnInvalid(string $expectedMessage, int $expectedCode, string $segmentKeyToUpdate, callable $newSegmentFiltersBuilder): void
     {
-        $filters = [
-            [
-                'glue'     => 'and',
-                'field'    => 'leadlist',
-                'object'   => 'lead',
-                'type'     => 'leadlist',
-                'filter'   => [2], // Keeping filter in the root to test also for BC segments.
-                'display'  => null,
-                'operator' => 'in',
-            ],
-        ];
-
-        $filters2 = [
-            [
-                'glue'       => 'and',
-                'field'      => 'leadlist',
-                'object'     => 'lead',
-                'type'       => 'leadlist',
-                'properties' => ['filter' => [1]],
-                'display'    => null,
-                'operator'   => 'in',
-            ],
-        ];
-
-        $filters3 = [
+        $segment3 = new LeadList();
+        $segment3->setName('Segment 3');
+        $segment3->setPublicName('Segment 3');
+        $segment3->setAlias('segment-3');
+        $segment3->setFilters([
             [
                 'glue'       => 'and',
                 'field'      => 'first_name',
@@ -109,154 +37,138 @@ class CircularDependencyValidatorTest extends \PHPUnit\Framework\TestCase
                 'display'    => null,
                 'operator'   => '=',
             ],
+        ]);
+
+        $this->em->persist($segment3);
+        $this->em->flush();
+
+        $segment2 = new LeadList();
+        $segment2->setName('Segment 2');
+        $segment2->setPublicName('Segment 2');
+        $segment2->setAlias('segment-2');
+
+        $this->em->persist($segment2);
+        $this->em->flush();
+
+        $segment1 = new LeadList();
+        $segment1->setName('Segment 1');
+        $segment1->setPublicName('Segment 1');
+        $segment1->setAlias('segment-1');
+        $segment1->setFilters([
+            [
+                'glue'     => 'and',
+                'field'    => 'leadlist_static',
+                'object'   => 'lead',
+                'type'     => 'leadlist',
+                'filter'   => [$segment2->getId()], // Keeping filter in the root to test also for BC segments.
+                'display'  => null,
+                'operator' => 'in',
+            ],
+        ]);
+
+        $this->em->persist($segment1);
+        $this->em->flush();
+
+        $segment2->setFilters([
+            [
+                'glue'       => 'and',
+                'field'      => 'leadlist',
+                'object'     => 'lead',
+                'type'       => 'leadlist',
+                'properties' => ['filter' => [$segment1->getId()]],
+                'display'    => null,
+                'operator'   => 'in',
+            ],
+        ]);
+        $this->em->persist($segment2);
+        $this->em->flush();
+        $this->em->clear();
+
+        $existingSegments = [
+            $segment1->getAlias() => $segment1,
+            $segment2->getAlias() => $segment2,
+            $segment3->getAlias() => $segment3,
         ];
 
-        $mockEntity1 = $this->createMock(LeadList::class);
-        $mockEntity1->expects($this->any())
-            ->method('getId')
-            ->willReturn(1);
-        $mockEntity1->expects($this->any())
-            ->method('getFilters')
-            ->willReturn($filters);
-
-        $mockEntity2 = $this->createMock(LeadList::class);
-        $mockEntity2->expects($this->any())
-            ->method('getId')
-            ->willReturn(2);
-        $mockEntity2->expects($this->any())
-            ->method('getFilters')
-            ->willReturn($filters2);
-
-        $mockEntity3 = $this->createMock(LeadList::class);
-        $mockEntity3->expects($this->any())
-            ->method('getId')
-            ->willReturn(3);
-        $mockEntity3->expects($this->any())
-            ->method('getFilters')
-            ->willReturn($filters3);
-
-        $entities = [
-            1 => $mockEntity1,
-            2 => $mockEntity2,
-            3 => $mockEntity3,
-        ];
-
-        $this->mockListModel->expects($this->any())
-            ->method('getEntity')
-            ->willReturnCallback(fn ($id) => $entities[$id]);
-
-        if (!empty($expectedMessage)) {
-            $this->context->expects($this->once())
-                ->method('addViolation')
-                ->with($this->equalTo($expectedMessage));
-        } else {
-            $this->context->expects($this->never())
-                ->method('addViolation');
-        }
-
-        $this->request->expects($this->once())
-            ->method('get')
-            ->with('_route_params')
-            ->willReturn([
-                'objectId' => $currentSegmentId,
-            ]);
-
-        return $this->validator;
+        $segmentIdToUpdate = $existingSegments[$segmentKeyToUpdate]->getId();
+        $this->client->request(
+            'PATCH',
+            "/api/segments/{$segmentIdToUpdate}/edit",
+            [
+                'name'        => "API changed ({$segmentKeyToUpdate})",
+                'description' => 'Segment created via API test',
+                'filters'     => $newSegmentFiltersBuilder($existingSegments),
+            ]
+        );
+        $clientResponse = $this->client->getResponse();
+        $response       = json_decode($clientResponse->getContent(), true);
+        $this->assertSame($expectedCode, $clientResponse->getStatusCode(), $clientResponse->getContent());
+        $this->assertEquals($expectedMessage, $response['errors'][0]['message'] ?? '');
     }
 
     /**
-     * Verify a constraint message.
-     *
-     * @dataProvider validateDataProvider
+     * @return mixed[]
      */
-    public function testValidateOnInvalid($message, $currentSegmentId, $filters): void
+    public function validateDataProvider(): array
     {
-        $this->configureValidator($message, $currentSegmentId)
-            ->validate($filters, new CircularDependency(['message' => 'mautic.core.segment.circular_dependency_exists']));
-    }
-
-    public static function validateDataProvider()
-    {
-        $constraint = new CircularDependency(['message' => 'mautic.core.segment.circular_dependency_exists']);
-
         return [
-            // Segment 1 is dependent on Segment 2 which is dependent on segment 1 - circular
-            [
-                $constraint->message,
-                2, // current segment id
-                [
+            'Segment 1 is dependent on Segment 2 which is dependent on segment 1 - circular' => [
+                'filters: Circular dependency detected in the segment membership filter. API changed (segment-2) > Segment 1 > API changed (segment-2). This operation would create an infinite loop. Please double check what you are intending to do.',
+                422,
+                'segment-2',
+                fn (array $existingSegments) => [
                     [
                         'glue'     => 'and',
                         'field'    => 'leadlist',
                         'object'   => 'lead',
                         'type'     => 'leadlist',
-                        'filter'   => [1], // Keeping filter in the root to test also for BC segments.
-                        'display'  => null,
+                        'filter'   => [$existingSegments['segment-1']->getId()], // Keeping filter in the root to test also for BC segments.
                         'operator' => 'in',
                     ],
                 ],
             ],
-            // Segment 2 is dependent on Segment 1 which is dependent on segment 2 - circular
-            [
-                $constraint->message,
-                1, // current segment id
-                [
+            'Segment 2 is dependent on Segment 1 which is dependent on segment 2 - circular' => [
+                'filters: Circular dependency detected in the segment membership filter. API changed (segment-1) > Segment 2 > API changed (segment-1). This operation would create an infinite loop. Please double check what you are intending to do.',
+                422,
+                'segment-1',
+                fn (array $existingSegments) => [
                     [
                         'glue'       => 'and',
-                        'field'      => 'leadlist',
+                        'field'      => 'leadlist_static',
                         'object'     => 'lead',
                         'type'       => 'leadlist',
-                        'properties' => ['filter' => [2]],
-                        'display'    => null,
+                        'properties' => ['filter' => [$existingSegments['segment-3']->getId(), $existingSegments['segment-2']->getId()]],
                         'operator'   => 'in',
                     ],
                 ],
             ],
             // Test when there are no validation errors
-            // The segment in the filter (3) is NOT dependent on any
-            [
-                null,
-                1, // current segment id
-                [
+            'The segment in the filter (3) is NOT dependent on any' => [
+                '',
+                200,
+                'segment-1',
+                fn (array $existingSegments) => [
                     [
                         'glue'       => 'and',
                         'field'      => 'leadlist',
                         'object'     => 'lead',
                         'type'       => 'leadlist',
-                        'properties' => ['filter' => [3]],
-                        'display'    => null,
+                        'properties' => ['filter' => [$existingSegments['segment-3']->getId()]],
                         'operator'   => 'in',
                     ],
                 ],
             ],
-            // Test when no lead list filters
-            [
-                null,
-                1, // current segment id
-                [
-                    [
-                        'glue'     => 'and',
-                        'field'    => 'first_name',
-                        'object'   => 'lead',
-                        'type'     => 'text',
-                        'filter'   => 'Doe', // Keeping filter in the root to test also for BC segments.
-                        'display'  => null,
-                        'operator' => '=',
-                    ],
-                ],
-            ],
-            // Test multiple lead list filters. Fails because 2 is dependent on 1
-            [
-                $constraint->message,
-                2, // current segment id
-                [
+            'Test multiple lead list filters. Fails because 2 is dependent on 1' => [
+                'filters: Circular dependency detected in the segment membership filter. API changed (segment-2) > Segment 1 > API changed (segment-2). This operation would create an infinite loop. Please double check what you are intending to do.',
+                422,
+                'segment-2',
+                fn (array $existingSegments) => [
                     [
                         'glue'       => 'and',
                         'field'      => 'leadlist',
                         'object'     => 'lead',
                         'type'       => 'leadlist',
-                        'properties' => ['filter' => [1]],
-                        'display'    => null,
+                        'properties' => ['filter' => [$existingSegments['segment-1']->getId()]],
                         'operator'   => 'in',
                     ],
                     [
@@ -264,8 +176,7 @@ class CircularDependencyValidatorTest extends \PHPUnit\Framework\TestCase
                         'field'      => 'leadlist',
                         'object'     => 'lead',
                         'type'       => 'leadlist',
-                        'properties' => ['filter' => [3]],
-                        'display'    => null,
+                        'properties' => ['filter' => [$existingSegments['segment-3']->getId()]],
                         'operator'   => 'in',
                     ],
                 ],

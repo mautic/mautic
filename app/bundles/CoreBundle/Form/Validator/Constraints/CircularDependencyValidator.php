@@ -2,11 +2,13 @@
 
 namespace Mautic\CoreBundle\Form\Validator\Constraints;
 
-use Mautic\LeadBundle\Model\ListModel;
-use Mautic\LeadBundle\Segment\OperatorOptions;
-use Symfony\Component\HttpFoundation\RequestStack;
+use Mautic\CoreBundle\Helper\Tree\IntNode;
+use Mautic\LeadBundle\Entity\LeadList;
+use Mautic\LeadBundle\Services\SegmentDependencyTreeFactory;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintValidator;
+use Symfony\Component\Validator\Exception\UnexpectedTypeException;
 
 /**
  * Throws an exception if the field alias is equal some segment filter keyword.
@@ -14,60 +16,65 @@ use Symfony\Component\Validator\ConstraintValidator;
  */
 class CircularDependencyValidator extends ConstraintValidator
 {
-    public function __construct(
-        private ListModel $model,
-        private RequestStack $requestStack
-    ) {
+    public function __construct(private SegmentDependencyTreeFactory $segmentDependencyTreeFactory)
+    {
+        $this->segmentDependencyTreeFactory = $segmentDependencyTreeFactory;
     }
 
     /**
-     * @param array $filters
+     * @param LeadList|mixed $segment
      */
-    public function validate($filters, Constraint $constraint): void
+    public function validate($segment, Constraint $constraint)
     {
-        $dependentSegmentIds = $this->flatten(array_map(fn ($id) => $this->reduceToSegmentIds($this->model->getEntity($id)->getFilters()), $this->reduceToSegmentIds($filters)));
+        if (!$constraint instanceof CircularDependency) {
+            throw new UnexpectedTypeException($constraint, CircularDependency::class);
+        }
 
-        try {
-            $segmentId = $this->getSegmentIdFromRequest();
-            if (in_array($segmentId, $dependentSegmentIds)) {
-                $this->context->addViolation($constraint->message);
+        if (!$segment instanceof LeadList) {
+            return;
+        }
+
+        $parentNode     = $this->segmentDependencyTreeFactory->buildTree($segment);
+        $directChildren = $parentNode->getChildrenArray();
+
+        $segmentIdsToCheck = array_map(fn ($child) => $child->getValue(), $directChildren);
+
+        foreach ($directChildren as $directChildNode) {
+            /** @var \RecursiveIteratorIterator<IntNode> $iterator */
+            $iterator = new \RecursiveIteratorIterator($directChildNode, \RecursiveIteratorIterator::LEAVES_ONLY);
+            foreach ($iterator as $childNode) {
+                if (in_array($childNode->getValue(), $segmentIdsToCheck)) {
+                    $this->context->buildViolation($constraint->message)
+                        ->atPath('filters')
+                        ->setCode((string) Response::HTTP_UNPROCESSABLE_ENTITY)
+                        ->setParameter('%segments%', "{$segment->getName()} > {$this->getSegmentCiclePath($childNode)}")
+                        ->addViolation();
+
+                    return;
+                }
+
+                if ($segment->getId() && $childNode->getValue() === $segment->getId()) {
+                    $this->context->buildViolation($constraint->message)
+                        ->atPath('filters')
+                        ->setCode((string) Response::HTTP_UNPROCESSABLE_ENTITY)
+                        ->setParameter('%segments%', "{$this->getSegmentCiclePath($childNode)} > {$segment->getName()}")
+                        ->addViolation();
+
+                    return;
+                }
             }
-        } catch (\UnexpectedValueException) {
-            // Segment ID is not in the request. May be new segment.
         }
     }
 
-    /**
-     * @throws \UnexpectedValueException
-     */
-    private function getSegmentIdFromRequest(): int
+    private function getSegmentCiclePath(IntNode $node): string
     {
-        $request     = $this->requestStack->getCurrentRequest();
-        $routeParams = $request->get('_route_params');
+        $path = [];
 
-        if (empty($routeParams['objectId'])) {
-            throw new \UnexpectedValueException('Segment ID is missing in the request');
+        while ($node->getParent()) {
+            $path[] = $node->getParam('name');
+            $node   = $node->getParent();
         }
 
-        return (int) $routeParams['objectId'];
-    }
-
-    private function reduceToSegmentIds(array $filters): array
-    {
-        $segmentFilters = array_filter($filters, fn (array $filter): bool => 'leadlist' === $filter['type']
-            && in_array($filter['operator'], [OperatorOptions::IN, OperatorOptions::NOT_IN]));
-
-        $segentIdsInFilter = array_map(function (array $filter) {
-            $bcValue = $filter['filter'] ?? [];
-
-            return $filter['properties']['filter'] ?? $bcValue;
-        }, $segmentFilters);
-
-        return $this->flatten($segentIdsInFilter);
-    }
-
-    private function flatten(array $array): array
-    {
-        return array_unique(array_reduce($array, 'array_merge', []));
+        return implode(' > ', $path);
     }
 }

@@ -717,8 +717,7 @@ return [
             'mautic.form.list.validator.circular' => [
                 'class'     => Mautic\CoreBundle\Form\Validator\Constraints\CircularDependencyValidator::class,
                 'arguments' => [
-                    'mautic.lead.model.list',
-                    'request_stack',
+                    'mautic.lead.service.segment_dependency_tree_factory',
                 ],
                 'tag' => 'validator.constraint_validator',
             ],

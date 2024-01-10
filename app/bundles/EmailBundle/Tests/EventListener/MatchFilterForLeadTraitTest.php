@@ -122,6 +122,79 @@ class MatchFilterForLeadTraitTest extends TestCase
         yield [null, '!empty', false];
     }
 
+    public function testDWCContactCountryIn(): void
+    {
+        $country = 'Czech Republic';
+        $lead    = [
+            'id'      => 1,
+            'country' => $country,
+        ];
+        $operator = OperatorOptions::IN;
+
+        $filter = [
+            0 => [
+                'display' => null,
+                'field'   => 'country',
+                'filter'  => [
+                    0 => $country,
+                ],
+                'glue'     => 'and',
+                'object'   => 'lead',
+                'operator' => $operator,
+                'type'     => 'country',
+            ],
+        ];
+
+        $trait = new MatchFilterForLeadTraitTestable();
+
+        self::assertTrue($trait->match($filter, $lead));
+
+        $lead['country'] = 'someOtherCountry';
+
+        self::assertFalse($trait->match($filter, $lead));
+    }
+
+    public function testDWCContactCountryNotIn(): void
+    {
+        $country = 'Czech Republic';
+        $lead    = [
+            'id'      => 1,
+            'country' => 'someOtherCountry',
+        ];
+        $operator = OperatorOptions::NOT_IN;
+
+        $filter = [
+            0 => [
+                'display' => null,
+                'field'   => 'country',
+                'filter'  => [
+                    0 => $country,
+                ],
+                'glue'     => 'and',
+                'object'   => 'lead',
+                'operator' => $operator,
+                'type'     => 'country',
+            ],
+        ];
+
+        $trait = new MatchFilterForLeadTraitTestable();
+
+        self::assertTrue($trait->match($filter, $lead));
+
+        $lead['country'] = $country;
+
+        self::assertFalse($trait->match($filter, $lead));
+    }
+
+    /**
+     * @return iterable<string, string[]>
+     */
+    public function segmentMembershipFilterProvider(): iterable
+    {
+        yield 'Classic Segment Membership Filter' => ['leadlist'];
+        yield 'Static Segment Membership Filter' => ['leadlist_static'];
+    }
+
     /**
      * @dataProvider dataForInNotInOperatorFilter
      *

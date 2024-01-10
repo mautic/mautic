@@ -951,5 +951,6 @@ return [
         'contact_export_in_background'                                                          => true,
         'contact_export_dir'                                                                    => '%mautic.application_dir%/media/files/temp',
         'contact_export_batch_size'                                                             => 20000,
+        'show_leadlist_static_filter'                                                           => false,
     ],
 ];

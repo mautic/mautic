@@ -35,6 +35,8 @@ class ListControllerFunctionalTest extends MauticMysqlTestCase
 
     protected function setUp(): void
     {
+        $this->configParams['update_segment_contact_count_in_background'] = 'testSegmentCountInBackground' === $this->getName();
+        $this->configParams['show_leadlist_static_filter']                = 'testLeadlistStaticFilterIsShownWhenFeatureFlagIsOn' === $this->getName();
         parent::setUp();
         $this->listModel = self::$container->get('mautic.lead.model.list');
         \assert($this->listModel instanceof ListModel);
@@ -46,7 +48,19 @@ class ListControllerFunctionalTest extends MauticMysqlTestCase
         $this->leadRepo = $leadModel->getRepository();
     }
 
-    public function testUnpublishUsedSegment(): void
+    /**
+     * @return iterable<string, string[]>
+     */
+    public function segmentMembershipFilterProvider(): iterable
+    {
+        yield 'Classic Segment Membership Filter' => ['leadlist'];
+        yield 'Static Segment Membership Filter' => ['leadlist_static'];
+    }
+
+    /**
+     * @dataProvider segmentMembershipFilterProvider
+     */
+    public function testUnpublishUsedSegment(string $filterField): void
     {
         $filter = [[
             'glue'     => 'and',
@@ -60,7 +74,7 @@ class ListControllerFunctionalTest extends MauticMysqlTestCase
         $filter = [[
             'object'     => 'lead',
             'glue'       => 'and',
-            'field'      => 'leadlist',
+            'field'      => $filterField,
             'type'       => 'leadlist',
             'operator'   => 'in',
             'properties' => [
@@ -82,6 +96,13 @@ class ListControllerFunctionalTest extends MauticMysqlTestCase
         $crawler = $this->client->submit($form);
         $this->assertTrue($this->client->getResponse()->isOk());
         $this->assertStringContainsString($expectedErrorMessage, $this->client->getResponse()->getContent());
+    }
+
+    public function testLeadlistStaticFilterIsShownWhenFeatureFlagIsOn(): void
+    {
+        $this->client->request(Request::METHOD_GET, '/s/segments/new');
+        $this->assertTrue($this->client->getResponse()->isOk());
+        $this->assertStringContainsString('<option value="leadlist_static"', $this->client->getResponse()->getContent());
     }
 
     public function testUnpublishUnUsedSegment(): void
@@ -106,6 +127,9 @@ class ListControllerFunctionalTest extends MauticMysqlTestCase
         $form['leadlist[isPublished]']->setValue('0');
         $crawler = $this->client->submit($form);
         $this->assertTrue($this->client->getResponse()->isOk());
+
+        // Reusing this test to assert the opposit of the test testLeadlistStaticFilterIsShownWhenFeatureFlagIsOn
+        $this->assertStringNotContainsString('<option value="leadlist_static"', $this->client->getResponse()->getContent());
 
         $rows = $this->listRepo->findAll();
         $this->assertCount(2, $rows);

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Mautic\LeadBundle\Tests\EventListener;
 
 use Doctrine\Common\Collections\ArrayCollection;
+use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\LeadBundle\Entity\LeadField;
 use Mautic\LeadBundle\Entity\LeadFieldRepository;
 use Mautic\LeadBundle\Event\LeadListFiltersChoicesEvent;
@@ -27,24 +28,29 @@ final class FilterOperatorSubscriberTest extends TestCase
     /**
      * @var MockObject|LeadFieldRepository
      */
-    private \PHPUnit\Framework\MockObject\MockObject $leadFieldRepository;
+    private MockObject $leadFieldRepository;
 
     /**
      * @var MockObject|TypeOperatorProviderInterface
      */
-    private \PHPUnit\Framework\MockObject\MockObject $typeOperatorProvider;
+    private MockObject $typeOperatorProvider;
 
     /**
      * @var MockObject|FieldChoicesProviderInterface
      */
-    private \PHPUnit\Framework\MockObject\MockObject $fieldChoicesProvider;
+    private MockObject $fieldChoicesProvider;
 
     /**
      * @var MockObject|TranslatorInterface
      */
-    private \PHPUnit\Framework\MockObject\MockObject $translator;
+    private MockObject $translator;
 
-    private \Mautic\LeadBundle\EventListener\FilterOperatorSubscriber $subscriber;
+    /**
+     * @var MockObject&CoreParametersHelper
+     */
+    private MockObject $coreParametersHelper;
+
+    private FilterOperatorSubscriber $subscriber;
 
     protected function setUp(): void
     {
@@ -55,13 +61,15 @@ final class FilterOperatorSubscriberTest extends TestCase
         $this->typeOperatorProvider = $this->createMock(TypeOperatorProviderInterface::class);
         $this->fieldChoicesProvider = $this->createMock(FieldChoicesProviderInterface::class);
         $this->translator           = $this->createMock(TranslatorInterface::class);
+        $this->coreParametersHelper = $this->createMock(CoreParametersHelper::class);
 
         $this->subscriber = new FilterOperatorSubscriber(
             $this->operatorOptions,
             $this->leadFieldRepository,
             $this->typeOperatorProvider,
             $this->fieldChoicesProvider,
-            $this->translator
+            $this->translator,
+            $this->coreParametersHelper
         );
     }
 
