@@ -830,7 +830,7 @@ class LeadControllerTest extends MauticMysqlTestCase
         );
         $this->assertEquals(true, $this->client->getResponse()->isRedirect('/s/contacts/1'));
     }
-  
+
     public function testContactGroupPointsEdit(): void
     {
         $contact = $this->createContact('test-contact@example.com');
