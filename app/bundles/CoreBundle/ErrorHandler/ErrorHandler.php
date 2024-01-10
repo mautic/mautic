@@ -3,6 +3,7 @@
 namespace Mautic\CoreBundle\ErrorHandler {
     use Mautic\CoreBundle\Exception\DatabaseConnectionException;
     use Mautic\CoreBundle\Exception\ErrorHandlerException;
+    use Mautic\CoreBundle\Loader\ParameterLoader;
     use Psr\Log\LoggerInterface;
     use Psr\Log\LogLevel;
     use Symfony\Component\ErrorHandler\Debug;
@@ -482,7 +483,8 @@ namespace Mautic\CoreBundle\ErrorHandler {
                 $base  = str_replace(['index.php'], '', $_SERVER['SCRIPT_NAME']);
 
                 // Determine if there is an asset prefix
-                $root = self::$root;
+                $root          = self::$root;
+                $projectRoot   = ParameterLoader::getProjectDirByRoot($root.'/app');
 
                 /** @var array<string, mixed> $paths */
                 $paths = [];
