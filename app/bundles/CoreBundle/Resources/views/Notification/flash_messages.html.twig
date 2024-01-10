@@ -1,7 +1,7 @@
 {% set dismissable = dismissable|default('') %}
 {% set alertType = alertType|default('growl') %}
 {% set alertClasses = alertType == 'growl' ? 
-    {notice: 'alert-growl', warning: 'alert-growl', error: 'alert-growl'} :
+    {notice: 'alert-growl', warning: 'alert-growl alert-growl--warning', error: 'alert-growl alert-growl--error'} :
     {notice: 'alert-success', warning: 'alert-warning', error: 'alert-danger'}
 %}
 {% set flashes = flashes|default(app.flashes) %}
