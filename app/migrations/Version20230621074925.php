@@ -60,11 +60,11 @@ final class Version20230621074925 extends PreUpAssertionMigration
         $this->assertColumnDoesNotExist($this->pointTriggersTableName, 'group_id');
         $this->assertColumnDoesNotExist($this->leadPointsChangeLogTableName, 'group_id');
 
-        $this->assertIndexDoesNotExist($this->contactScoreTableName, $this->contactScoreContactFk);
-        $this->assertIndexDoesNotExist($this->contactScoreTableName, $this->contactScoreGroupFk);
-        $this->assertIndexDoesNotExist($this->pointsTableName, $this->pointsGroupFk);
-        $this->assertIndexDoesNotExist($this->pointTriggersTableName, $this->pointTriggersGroupFk);
-        $this->assertIndexDoesNotExist($this->leadPointsChangeLogTableName, $this->leadPointsChangeLogGroupFk);
+        $this->assertForeignKeyDoesNotExist($this->contactScoreTableName, $this->contactScoreContactFk);
+        $this->assertForeignKeyDoesNotExist($this->contactScoreTableName, $this->contactScoreGroupFk);
+        $this->assertForeignKeyDoesNotExist($this->pointsTableName, $this->pointsGroupFk);
+        $this->assertForeignKeyDoesNotExist($this->pointTriggersTableName, $this->pointTriggersGroupFk);
+        $this->assertForeignKeyDoesNotExist($this->leadPointsChangeLogTableName, $this->leadPointsChangeLogGroupFk);
     }
 
     public function up(Schema $schema): void
@@ -155,11 +155,11 @@ final class Version20230621074925 extends PreUpAssertionMigration
         );
     }
 
-    private function assertIndexDoesNotExist(string $tableName, string $indexName): void
+    private function assertForeignKeyDoesNotExist(string $tableName, string $fkName): void
     {
         $this->skipAssertion(
-            fn (Schema $schema) => $schema->getTable("{$tableName}")->hasIndex($indexName),
-            "Index {$indexName} already exists in {$tableName} table"
+            fn (Schema $schema) => $schema->getTable("{$tableName}")->hasForeignKey($fkName),
+            "Foreign key {$fkName} already exists in {$tableName} table"
         );
     }
 }
