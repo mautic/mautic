@@ -134,7 +134,7 @@ class CompanyRepository extends CommonRepository implements CustomFieldRepositor
     {
         $q = $this->getEntityManager()->getConnection()->createQueryBuilder();
 
-        $q->select('*')
+        $q->select('comp.*, cl.is_primary')
             ->from(MAUTIC_TABLE_PREFIX.'companies', 'comp')
             ->leftJoin('comp', MAUTIC_TABLE_PREFIX.'companies_leads', 'cl', 'cl.company_id = comp.id')
             ->where('cl.lead_id = :leadId')
