@@ -5,8 +5,8 @@ namespace Mautic\InstallBundle\Configurator\Step;
 use Mautic\CoreBundle\Configurator\Configurator;
 use Mautic\CoreBundle\Configurator\Step\StepInterface;
 use Mautic\CoreBundle\Helper\FileHelper;
-use Mautic\CoreBundle\Security\Cryptography\Cipher\Symmetric\OpenSSLCipher;
 use Mautic\CoreBundle\Loader\ParameterLoader;
+use Mautic\CoreBundle\Security\Cryptography\Cipher\Symmetric\OpenSSLCipher;
 use Mautic\InstallBundle\Configurator\Form\CheckStepType;
 use Symfony\Component\HttpFoundation\RequestStack;
 
