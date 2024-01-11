@@ -13,12 +13,12 @@ class ConfigurationTest extends \PHPUnit\Framework\TestCase
     /**
      * @var IntegrationHelper|\PHPUnit\Framework\MockObject\MockObject
      */
-    private $integrationHelper;
+    private \PHPUnit\Framework\MockObject\MockObject $integrationHelper;
 
     /**
      * @var AbstractIntegration|\PHPUnit\Framework\MockObject\MockObject
      */
-    private $integrationObject;
+    private \PHPUnit\Framework\MockObject\MockObject $integrationObject;
 
     protected function setUp(): void
     {
@@ -48,7 +48,7 @@ class ConfigurationTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals('123', $this->getConfiguration()->getMessagingServiceSid());
     }
 
-    public function testGetAccountSid()
+    public function testGetAccountSid(): void
     {
         $this->integrationObject->method('getDecryptedApiKeys')
             ->willReturn(
@@ -60,7 +60,7 @@ class ConfigurationTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals('username', $this->getConfiguration()->getAccountSid());
     }
 
-    public function testGetAuthToken()
+    public function testGetAuthToken(): void
     {
         $this->integrationObject->method('getDecryptedApiKeys')
             ->willReturn(
@@ -95,7 +95,7 @@ class ConfigurationTest extends \PHPUnit\Framework\TestCase
         $this->getConfiguration()->getMessagingServiceSid();
     }
 
-    public function testConfigurationExceptionThrownWithoutUsername()
+    public function testConfigurationExceptionThrownWithoutUsername(): void
     {
         $this->expectException(ConfigurationException::class);
         $this->integrationObject->method('getDecryptedApiKeys')
@@ -108,7 +108,7 @@ class ConfigurationTest extends \PHPUnit\Framework\TestCase
         $this->getConfiguration()->getMessagingServiceSid();
     }
 
-    public function testConfigurationExceptionThrownWithoutPassword()
+    public function testConfigurationExceptionThrownWithoutPassword(): void
     {
         $this->expectException(ConfigurationException::class);
         $this->integrationObject->method('getDecryptedApiKeys')

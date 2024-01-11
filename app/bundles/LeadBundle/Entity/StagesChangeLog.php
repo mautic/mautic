@@ -6,9 +6,6 @@ use Doctrine\ORM\Mapping as ORM;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\StageBundle\Entity\Stage;
 
-/**
- * Class StagesChangeLog.
- */
 class StagesChangeLog
 {
     /**
@@ -41,12 +38,12 @@ class StagesChangeLog
      */
     private $dateAdded;
 
-    public static function loadMetadata(ORM\ClassMetadata $metadata)
+    public static function loadMetadata(ORM\ClassMetadata $metadata): void
     {
         $builder = new ClassMetadataBuilder($metadata);
 
         $builder->setTable('lead_stages_change_log')
-            ->setCustomRepositoryClass('Mautic\LeadBundle\Entity\StagesChangeLogRepository');
+            ->setCustomRepositoryClass(\Mautic\LeadBundle\Entity\StagesChangeLogRepository::class);
 
         $builder->addId();
 
@@ -60,7 +57,7 @@ class StagesChangeLog
             ->columnName('action_name')
             ->build();
 
-        $builder->createManyToOne('stage', 'Mautic\StageBundle\Entity\Stage')
+        $builder->createManyToOne('stage', \Mautic\StageBundle\Entity\Stage::class)
             ->inversedBy('log')
             ->addJoinColumn('stage_id', 'id', true, false, 'CASCADE')
             ->build();

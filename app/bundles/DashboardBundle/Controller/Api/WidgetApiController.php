@@ -32,7 +32,7 @@ class WidgetApiController extends CommonApiController
     /**
      * @var DashboardModel|null
      */
-    protected $model = null;
+    protected $model;
 
     public function __construct(CorePermissions $security, Translator $translator, EntityResultHelper $entityResultHelper, RouterInterface $router, FormFactoryInterface $formFactory, AppVersion $appVersion, RequestStack $requestStack, ManagerRegistry $doctrine, ModelFactory $modelFactory, EventDispatcherInterface $dispatcher, CoreParametersHelper $coreParametersHelper, MauticFactory $factory)
     {
@@ -116,10 +116,7 @@ class WidgetApiController extends CommonApiController
         $widget->setParams($params);
         $widget->setType($type);
         $widget->setHeight($widgetHeight);
-
-        if (null !== $cacheTimeout) {
-            $widget->setCacheTimeout($cacheTimeout);
-        }
+        $widget->setCacheTimeout($cacheTimeout);
 
         $this->model->populateWidgetContent($widget);
         $data = $widget->getTemplateData();

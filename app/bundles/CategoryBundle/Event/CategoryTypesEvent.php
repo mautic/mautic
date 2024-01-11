@@ -5,9 +5,6 @@ namespace Mautic\CategoryBundle\Event;
 use Mautic\CategoryBundle\Entity\Category;
 use Mautic\CoreBundle\Event\CommonEvent;
 
-/**
- * Class CategoryTypesEvent.
- */
 class CategoryTypesEvent extends CommonEvent
 {
     /**
@@ -41,7 +38,7 @@ class CategoryTypesEvent extends CommonEvent
      * @param string $type
      * @param string $label
      */
-    public function addCategoryType($type, $label = null)
+    public function addCategoryType($type, $label = null): void
     {
         if (is_int($type)) {
             $type = $label;

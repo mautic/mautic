@@ -27,10 +27,7 @@ class Company extends FormEntity implements CustomFieldEntityInterface, Identifi
      */
     private $score = 0;
 
-    /**
-     * @var User|null
-     */
-    private $owner;
+    private ?User $owner = null;
 
     /**
      * @var mixed[]
@@ -79,12 +76,12 @@ class Company extends FormEntity implements CustomFieldEntityInterface, Identifi
     /**
      * @param mixed[] $cache
      */
-    public function setSocialCache($cache)
+    public function setSocialCache($cache): void
     {
         $this->socialCache = $cache;
     }
 
-    public static function loadMetadata(ORM\ClassMetadata $metadata)
+    public static function loadMetadata(ORM\ClassMetadata $metadata): void
     {
         $builder = new ClassMetadataBuilder($metadata);
         $builder->setTable('companies')
@@ -100,7 +97,7 @@ class Company extends FormEntity implements CustomFieldEntityInterface, Identifi
             ->nullable()
             ->build();
 
-        $builder->createManyToOne('owner', 'Mautic\UserBundle\Entity\User')
+        $builder->createManyToOne('owner', \Mautic\UserBundle\Entity\User::class)
             ->cascadeMerge()
             ->addJoinColumn('owner_id', 'id', true, false, 'SET NULL')
             ->build();
@@ -132,7 +129,7 @@ class Company extends FormEntity implements CustomFieldEntityInterface, Identifi
     /**
      * Prepares the metadata for API usage.
      */
-    public static function loadApiMetadata(ApiMetadataDriver $metadata)
+    public static function loadApiMetadata(ApiMetadataDriver $metadata): void
     {
         $metadata->setGroupPrefix('companyBasic')
             ->addListProperties(
@@ -182,30 +179,6 @@ class Company extends FormEntity implements CustomFieldEntityInterface, Identifi
     }
 
     /**
-     * @param string $prop
-     * @param mixed  $val
-     */
-    protected function isChanged($prop, $val)
-    {
-        $getter  = 'get'.ucfirst($prop);
-        $current = $this->$getter();
-        if ('owner' == $prop) {
-            if ($current && !$val) {
-                $this->changes['owner'] = [$current->getName().' ('.$current->getId().')', $val];
-            } elseif (!$current && $val) {
-                $this->changes['owner'] = [$current, $val->getName().' ('.$val->getId().')'];
-            } elseif ($current && $val && $current->getId() != $val->getId()) {
-                $this->changes['owner'] = [
-                    $current->getName().'('.$current->getId().')',
-                    $val->getName().'('.$val->getId().')',
-                ];
-            }
-        } else {
-            parent::isChanged($prop, $val);
-        }
-    }
-
-    /**
      * @return int
      */
     public function getId()
@@ -228,8 +201,6 @@ class Company extends FormEntity implements CustomFieldEntityInterface, Identifi
     }
 
     /**
-     * @param User $owner
-     *
      * @return Company
      */
     public function setOwner(User $owner = null)
@@ -240,10 +211,7 @@ class Company extends FormEntity implements CustomFieldEntityInterface, Identifi
         return $this;
     }
 
-    /**
-     * @return User
-     */
-    public function getOwner()
+    public function getOwner(): ?User
     {
         return $this->owner;
     }
@@ -255,7 +223,7 @@ class Company extends FormEntity implements CustomFieldEntityInterface, Identifi
      */
     public function getPermissionUser()
     {
-        return (null === $this->getOwner()) ? $this->getCreatedBy() : $this->getOwner();
+        return $this->getOwner() ?? $this->getCreatedBy();
     }
 
     /**

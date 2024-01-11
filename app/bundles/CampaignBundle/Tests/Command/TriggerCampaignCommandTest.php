@@ -37,7 +37,7 @@ class TriggerCampaignCommandTest extends AbstractCampaignCommand
     /**
      * @throws \Exception
      */
-    public function testCampaignExecutionForAll()
+    public function testCampaignExecutionForAll(): void
     {
         // Process in batches of 10 to ensure batching is working as expected
         $this->runCommand('mautic:campaigns:trigger', ['-i' => 1, '-l' => 10]);
@@ -81,7 +81,7 @@ class TriggerCampaignCommandTest extends AbstractCampaignCommand
             ->select('*')
             ->from($this->prefix.'email_stats', 'stat')
             ->where('stat.lead_id <= 25')
-            ->execute()
+            ->executeQuery()
             ->fetchAllAssociative();
         $this->assertCount(0, $stats);
 
@@ -106,7 +106,7 @@ class TriggerCampaignCommandTest extends AbstractCampaignCommand
             ->select('*')
             ->from($this->prefix.'email_stats', 'stat')
             ->where('stat.lead_id <= 25')
-            ->execute()
+            ->executeQuery()
             ->fetchAllAssociative();
 
         $this->assertCount(25, $stats);
@@ -204,7 +204,7 @@ class TriggerCampaignCommandTest extends AbstractCampaignCommand
     /**
      * @throws \Exception
      */
-    public function testCampaignExecutionForOne()
+    public function testCampaignExecutionForOne(): void
     {
         $this->runCommand('mautic:campaigns:trigger', ['-i' => 1, '--contact-id' => 1]);
 
@@ -247,7 +247,7 @@ class TriggerCampaignCommandTest extends AbstractCampaignCommand
             ->select('*')
             ->from($this->prefix.'email_stats', 'stat')
             ->where('stat.lead_id = 1')
-            ->execute()
+            ->executeQuery()
             ->fetchAllAssociative();
 
         $this->assertCount(0, $stats);
@@ -273,7 +273,7 @@ class TriggerCampaignCommandTest extends AbstractCampaignCommand
             ->select('*')
             ->from($this->prefix.'email_stats', 'stat')
             ->where('stat.lead_id = 1')
-            ->execute()
+            ->executeQuery()
             ->fetchAllAssociative();
 
         $this->assertCount(1, $stats);
@@ -365,7 +365,7 @@ class TriggerCampaignCommandTest extends AbstractCampaignCommand
         $this->assertTrue(empty($tags['EmailNotOpen']));
     }
 
-    public function testCampaignExecutionForSome()
+    public function testCampaignExecutionForSome(): void
     {
         $this->runCommand('mautic:campaigns:trigger', ['-i' => 1, '--contact-ids' => '1,2,3,4,19']);
 
@@ -408,7 +408,7 @@ class TriggerCampaignCommandTest extends AbstractCampaignCommand
             ->select('*')
             ->from($this->prefix.'email_stats', 'stat')
             ->where('stat.lead_id <= 2')
-            ->execute()
+            ->executeQuery()
             ->fetchAllAssociative();
 
         $this->assertCount(0, $stats);
@@ -434,7 +434,7 @@ class TriggerCampaignCommandTest extends AbstractCampaignCommand
             ->select('*')
             ->from($this->prefix.'email_stats', 'stat')
             ->where('stat.lead_id <= 2')
-            ->execute()
+            ->executeQuery()
             ->fetchAllAssociative();
         $this->assertCount(2, $stats);
 
@@ -597,6 +597,29 @@ class TriggerCampaignCommandTest extends AbstractCampaignCommand
         $this->assertLessThan(10, $tDiff, 'The campaign rebuild takes more than 10 seconds, probably an infinite loop.');
     }
 
+    public function testCampaignExecuteOrderByDateCreatedDesc(): void
+    {
+        $oldCampaign = $this->createCampaign('Some old campaign');
+        $oldCampaign->setDateAdded(new \DateTime('2019-01-03 03:54:25'));
+        $newCampaign = $this->createCampaign('New campaign');
+        $newCampaign->setDateAdded(new \DateTime());
+        $this->em->flush();
+
+        $commandTester = $this->testSymfonyCommand('mautic:campaigns:trigger');
+        $commandTester->assertCommandIsSuccessful();
+        $lines = preg_split('/\r\n|\r|\n/', $commandTester->getDisplay());
+
+        $campaignStartLines = [];
+        foreach ($lines as $line) {
+            if (str_starts_with($line, 'Triggering events for campaign')) {
+                $campaignStartLines[] = $line;
+            }
+        }
+
+        // check if the new campaign processed first
+        $this->assertEquals("Triggering events for campaign {$newCampaign->getId()}", $campaignStartLines[0]);
+    }
+
     /**
      * @throws \Exception
      */
@@ -619,7 +642,7 @@ class TriggerCampaignCommandTest extends AbstractCampaignCommand
             ->from($this->prefix.'lead_tags', 't')
             ->join('t', $this->prefix.'lead_tags_xref', 'l', 't.id = l.tag_id')
             ->groupBy('t.tag')
-            ->execute()
+            ->executeQuery()
             ->fetchAllAssociative();
 
         $tagCounts = [];

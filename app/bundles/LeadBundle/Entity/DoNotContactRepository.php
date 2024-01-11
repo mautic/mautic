@@ -98,7 +98,7 @@ class DoNotContactRepository extends CommonRepository
             $chartQuery->applyDateFilters($q, 'date_added', 'dnc');
         }
 
-        $results = $q->execute()->fetchAllAssociative();
+        $results = $q->executeQuery()->fetchAllAssociative();
 
         if ((true === $listId || is_array($listId)) && !$combined) {
             // Return list group of counts
@@ -114,8 +114,6 @@ class DoNotContactRepository extends CommonRepository
     }
 
     /**
-     * @param null $leadId
-     *
      * @return array
      */
     public function getTimelineStats($leadId = null, array $options = [])
@@ -140,10 +138,8 @@ class DoNotContactRepository extends CommonRepository
 
     /**
      * @param array $contacts Array of contacts to filter by
-     *
-     * @return array
      */
-    public function getChannelList($channel, array $contacts = null)
+    public function getChannelList($channel, array $contacts = null): array
     {
         $q = $this->getEntityManager()->getConnection()->createQueryBuilder()
             ->from(MAUTIC_TABLE_PREFIX.'lead_donotcontact', 'dnc')
@@ -163,7 +159,7 @@ class DoNotContactRepository extends CommonRepository
             );
         }
 
-        $results = $q->execute()->fetchAllAssociative();
+        $results = $q->executeQuery()->fetchAllAssociative();
 
         $dnc = [];
         foreach ($results as $r) {

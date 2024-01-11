@@ -13,8 +13,9 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class ConfigType extends AbstractType
 {
-    public function __construct(private TranslatorInterface $translator)
-    {
+    public function __construct(
+        private TranslatorInterface $translator
+    ) {
     }
 
     public function buildForm(FormBuilderInterface $builder, array $options): void
@@ -26,6 +27,15 @@ class ConfigType extends AbstractType
 
         $builder->add(
             'messenger_dsn_email',
+            DsnType::class,
+            [
+                'constraints' => [new Dsn()],
+                'test_button' => $testButton,
+            ]
+        );
+
+        $builder->add(
+            'messenger_dsn_hit',
             DsnType::class,
             [
                 'constraints' => [new Dsn()],

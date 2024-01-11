@@ -12,6 +12,7 @@ use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\EmailBundle\Helper\PlainTextHelper;
 use Mautic\EmailBundle\Mailer\Message\MauticMessage;
 use Mautic\EmailBundle\Model\EmailModel;
+use Mautic\EmailBundle\Stats\EmailDependencies;
 use Mautic\PageBundle\Form\Type\AbTestPropertiesType;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -43,10 +44,7 @@ class AjaxController extends CommonAjaxController
         );
     }
 
-    /**
-     * @return \Symfony\Component\HttpFoundation\JsonResponse
-     */
-    public function sendBatchAction(Request $request)
+    public function sendBatchAction(Request $request): JsonResponse
     {
         $dataArray = ['success' => 0];
 
@@ -101,13 +99,9 @@ class AjaxController extends CommonAjaxController
         return $model->getBuilderComponents(null, ['tokens'], (string) $query);
     }
 
-    /**
-     * @return \Symfony\Component\HttpFoundation\JsonResponse
-     */
-    public function generatePlaintTextAction(Request $request)
+    public function generatePlaintTextAction(Request $request): JsonResponse
     {
         $custom = $request->request->get('custom');
-        $id     = $request->request->get('id');
 
         $parser = new PlainTextHelper(
             [
@@ -122,10 +116,7 @@ class AjaxController extends CommonAjaxController
         return $this->sendJsonResponse($dataArray);
     }
 
-    /**
-     * @return \Symfony\Component\HttpFoundation\JsonResponse
-     */
-    public function getAttachmentsSizeAction(Request $request)
+    public function getAttachmentsSizeAction(Request $request): JsonResponse
     {
         $assets = $request->query->get('assets') ?? [];
         $size   = 0;
@@ -140,10 +131,8 @@ class AjaxController extends CommonAjaxController
 
     /**
      * Tests monitored email connection settings.
-     *
-     * @return JsonResponse
      */
-    public function testMonitoredEmailServerConnectionAction(Request $request)
+    public function testMonitoredEmailServerConnectionAction(Request $request): JsonResponse
     {
         $dataArray = ['success' => 0, 'message' => ''];
 
@@ -161,8 +150,8 @@ class AjaxController extends CommonAjaxController
             $helper = $this->factory->getHelper('mailbox');
 
             try {
-                $helper->setMailboxSettings($settings, false);
-                $folders = $helper->getListingFolders('');
+                $helper->setMailboxSettings($settings);
+                $folders = $helper->getListingFolders();
                 if (!empty($folders)) {
                     $dataArray['folders'] = '';
                     foreach ($folders as $folder) {
@@ -201,7 +190,7 @@ class AjaxController extends CommonAjaxController
         return $this->sendJsonResponse(['success' => $success, 'message' => $message]);
     }
 
-    public function getEmailCountStatsAction(Request $request)
+    public function getEmailCountStatsAction(Request $request): JsonResponse
     {
         /** @var EmailModel $model */
         $model = $this->getModel('email');
@@ -283,6 +272,71 @@ class AjaxController extends CommonAjaxController
         return $this->sendJsonResponse([
             'success'     => 1,
             'delivered'   => $deliveredCount,
+        ]);
+    }
+
+    public function heatmapAction(Request $request, EmailModel $model): JsonResponse
+    {
+        $emailId     = (int) $request->query->get('id');
+        $email       = $model->getEntity($emailId);
+
+        if (null === $email) {
+            return $this->sendJsonResponse([
+                'message' => $this->translator->trans('mautic.api.call.notfound'),
+            ], 404);
+        }
+
+        if (!$this->security->hasEntityAccess(
+            'email:emails:viewown',
+            'email:emails:viewother',
+            $email->getCreatedBy()
+        )
+        ) {
+            return $this->accessDenied();
+        }
+
+        $content           = $email->getCustomHtml();
+        $clickStats        = $model->getEmailClickStats($emailId);
+        $totalUniqueClicks = array_sum(array_column($clickStats, 'unique_hits'));
+        $totalClicks       = array_sum(array_column($clickStats, 'hits'));
+        foreach ($clickStats as &$stat) {
+            $stat['unique_hits_rate'] = round($totalUniqueClicks > 0 ? ($stat['unique_hits'] / $totalUniqueClicks) : 0, 4);
+            $stat['unique_hits_text'] = $this->translator->trans('mautic.email.heatmap.clicks', ['%count%' => $stat['unique_hits']]);
+            $stat['hits_rate']        = round($totalClicks > 0 ? ($stat['hits'] / $totalClicks) : 0, 4);
+            $stat['hits_text']        = $this->translator->trans('mautic.email.heatmap.clicks', ['%count%' => $stat['hits']]);
+        }
+        $legendTemplate = $this->renderView('@MauticEmail/Heatmap/heatmap_legend.html.twig', [
+            'totalClicks'       => $totalClicks,
+            'totalUniqueClicks' => $totalUniqueClicks,
+        ]);
+
+        return $this->sendJsonResponse([
+            'content'           => $content,
+            'clickStats'        => $clickStats,
+            'totalUniqueClicks' => $totalUniqueClicks,
+            'totalClicks'       => $totalClicks,
+            'legendTemplate'    => $legendTemplate,
+        ]);
+    }
+
+    public function getEmailUsagesAction(Request $request, EmailDependencies $emailDependencies): JsonResponse
+    {
+        $emailId = (int) $request->query->get('id');
+
+        if (0 === $emailId) {
+            return $this->sendJsonResponse([
+                'message' => $this->translator->trans('mautic.core.error.badrequest'),
+            ], 400);
+        }
+
+        $usagesHtml = $this->renderView('@MauticCore/Helper/usage.html.twig', [
+            'title'    => $this->translator->trans('mautic.email.usages'),
+            'stats'    => $emailDependencies->getChannelsIds($emailId),
+            'noUsages' => $this->translator->trans('mautic.email.no_usages'),
+        ]);
+
+        return $this->sendJsonResponse([
+            'usagesHtml'  => $usagesHtml,
         ]);
     }
 }

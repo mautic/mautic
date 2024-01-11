@@ -17,39 +17,17 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class SegmentReferenceFilterQueryBuilder extends BaseFilterQueryBuilder
 {
-    /**
-     * @var ContactSegmentQueryBuilder
-     */
-    private $leadSegmentQueryBuilder;
-
-    /**
-     * @var ContactSegmentFilterFactory
-     */
-    private $leadSegmentFilterFactory;
-
-    /**
-     * @var EntityManager
-     */
-    private $entityManager;
-
     public function __construct(
         RandomParameterName $randomParameterNameService,
-        ContactSegmentQueryBuilder $leadSegmentQueryBuilder,
-        EntityManager $entityManager,
-        ContactSegmentFilterFactory $leadSegmentFilterFactory,
+        private ContactSegmentQueryBuilder $leadSegmentQueryBuilder,
+        private EntityManager $entityManager,
+        private ContactSegmentFilterFactory $leadSegmentFilterFactory,
         EventDispatcherInterface $dispatcher
     ) {
         parent::__construct($randomParameterNameService, $dispatcher);
-
-        $this->leadSegmentQueryBuilder  = $leadSegmentQueryBuilder;
-        $this->leadSegmentFilterFactory = $leadSegmentFilterFactory;
-        $this->entityManager            = $entityManager;
     }
 
-    /**
-     * @return string
-     */
-    public static function getServiceId()
+    public static function getServiceId(): string
     {
         return 'mautic.lead.query.builder.special.leadlist';
     }
@@ -60,7 +38,7 @@ class SegmentReferenceFilterQueryBuilder extends BaseFilterQueryBuilder
      * @throws \Doctrine\DBAL\Exception
      * @throws QueryException
      */
-    public function applyQuery(QueryBuilder $queryBuilder, ContactSegmentFilter $filter)
+    public function applyQuery(QueryBuilder $queryBuilder, ContactSegmentFilter $filter): QueryBuilder
     {
         $leadsTableAlias = $queryBuilder->getTableAlias(MAUTIC_TABLE_PREFIX.'leads');
         $segmentIds      = $filter->getParameterValue();

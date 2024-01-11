@@ -23,62 +23,59 @@ class DynamicContentSubscriberTest extends \PHPUnit\Framework\TestCase
     /**
      * @var MockObject|TrackableModel
      */
-    private $trackableModel;
+    private \PHPUnit\Framework\MockObject\MockObject $trackableModel;
 
     /**
      * @var MockObject|PageTokenHelper
      */
-    private $pageTokenHelper;
+    private \PHPUnit\Framework\MockObject\MockObject $pageTokenHelper;
 
     /**
      * @var MockObject|AssetTokenHelper
      */
-    private $assetTokenHelper;
+    private \PHPUnit\Framework\MockObject\MockObject $assetTokenHelper;
 
     /**
      * @var MockObject|FormTokenHelper
      */
-    private $formTokenHelper;
+    private \PHPUnit\Framework\MockObject\MockObject $formTokenHelper;
 
     /**
      * @var MockObject|FocusTokenHelper
      */
-    private $focusTokenHelper;
+    private \PHPUnit\Framework\MockObject\MockObject $focusTokenHelper;
 
     /**
      * @var MockObject|AuditLogModel
      */
-    private $auditLogModel;
+    private \PHPUnit\Framework\MockObject\MockObject $auditLogModel;
 
     /**
      * @var MockObject|LeadModel
      */
-    private $leadModel;
+    private \PHPUnit\Framework\MockObject\MockObject $leadModel;
 
     /**
      * @var MockObject|DynamicContentHelper
      */
-    private $dynamicContentHelper;
+    private \PHPUnit\Framework\MockObject\MockObject $dynamicContentHelper;
 
     /**
      * @var MockObject|DynamicContentModel
      */
-    private $dynamicContentModel;
+    private \PHPUnit\Framework\MockObject\MockObject $dynamicContentModel;
 
     /**
      * @var MockObject|CorePermissions
      */
-    private $security;
+    private \PHPUnit\Framework\MockObject\MockObject $security;
 
     /**
      * @var MockObject|ContactTracker
      */
-    private $contactTracker;
+    private \PHPUnit\Framework\MockObject\MockObject $contactTracker;
 
-    /**
-     * @var DynamicContentSubscriber
-     */
-    private $subscriber;
+    private \Mautic\DynamicContentBundle\EventListener\DynamicContentSubscriber $subscriber;
 
     protected function setUp(): void
     {
@@ -116,7 +113,7 @@ class DynamicContentSubscriberTest extends \PHPUnit\Framework\TestCase
      *
      * It happens when there is an ampersand in the DWC content.
      */
-    public function testDecodeTokensWithAmpersand()
+    public function testDecodeTokensWithAmpersand(): void
     {
         $content = <<< HTML
 <!DOCTYPE html>

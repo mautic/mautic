@@ -12,14 +12,14 @@ class ListLeadRepository extends CommonRepository
     /**
      * Updates lead ID (e.g. after a lead merge).
      */
-    public function updateLead($fromLeadId, $toLeadId)
+    public function updateLead($fromLeadId, $toLeadId): void
     {
         // First check to ensure the $toLead doesn't already exist
         $results = $this->_em->getConnection()->createQueryBuilder()
             ->select('l.leadlist_id')
             ->from(MAUTIC_TABLE_PREFIX.'lead_lists_leads', 'l')
             ->where('l.lead_id = '.$toLeadId)
-            ->execute()
+            ->executeQuery()
             ->fetchAllAssociative();
 
         $lists = [];
@@ -35,15 +35,15 @@ class ListLeadRepository extends CommonRepository
         if (!empty($lists)) {
             $q->andWhere(
                 $q->expr()->notIn('leadlist_id', $lists)
-            )->execute();
+            )->executeStatement();
 
             // Delete remaining leads as the new lead already belongs
             $this->_em->getConnection()->createQueryBuilder()
                 ->delete(MAUTIC_TABLE_PREFIX.'lead_lists_leads')
                 ->where('lead_id = '.(int) $fromLeadId)
-                ->execute();
+                ->executeStatement();
         } else {
-            $q->execute();
+            $q->executeStatement();
         }
     }
 
@@ -57,12 +57,10 @@ class ListLeadRepository extends CommonRepository
             ->where('ll.list = :segmentId')
             ->setParameter('segmentId', $segmentId);
 
-        if (!empty($filters)) {
-            foreach ($filters as $colName => $val) {
-                $entityFieldName = lcfirst(str_replace(' ', '', ucwords(str_replace('_', ' ', $colName))));
-                $qb->andWhere(sprintf('ll.%s=:%s', $entityFieldName, $entityFieldName));
-                $qb->setParameter($entityFieldName, $val);
-            }
+        foreach ($filters as $colName => $val) {
+            $entityFieldName = lcfirst(str_replace(' ', '', ucwords(str_replace('_', ' ', $colName))));
+            $qb->andWhere(sprintf('ll.%s=:%s', $entityFieldName, $entityFieldName));
+            $qb->setParameter($entityFieldName, $val);
         }
 
         return (int) $qb->getQuery()->getSingleScalarResult();

@@ -13,14 +13,9 @@ use Symfony\Component\HttpFoundation\Request;
 
 class UploadFieldValidator
 {
-    /**
-     * @var FileUploadValidator
-     */
-    private $fileUploadValidator;
-
-    public function __construct(FileUploadValidator $fileUploadValidator)
-    {
-        $this->fileUploadValidator = $fileUploadValidator;
+    public function __construct(
+        private FileUploadValidator $fileUploadValidator
+    ) {
     }
 
     /**
@@ -33,12 +28,11 @@ class UploadFieldValidator
     {
         $files = $request->files->get('mauticform');
 
-        if (!$files || !array_key_exists($field->getAlias(), $files)) {
+        if (!$files || !array_key_exists($field->getAlias(), $files) || !$files[$field->getAlias()] instanceof UploadedFile) {
             throw new NoFileGivenException();
         }
 
         $file = $files[$field->getAlias()];
-        \assert($file instanceof UploadedFile);
 
         $properties = $field->getProperties();
 
