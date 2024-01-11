@@ -119,19 +119,46 @@ final class Version20230621074925 extends PreUpAssertionMigration
     {
         $this->initTableNames();
 
-        $this->addSql("ALTER TABLE `{$this->contactScoreTableName}` DROP FOREIGN KEY `{$this->contactScoreContactFk}`");
-        $this->addSql("ALTER TABLE `{$this->contactScoreTableName}` DROP FOREIGN KEY `{$this->contactScoreGroupFk}`");
+        if ($schema->hasTable($this->contactScoreTableName)) {
+            $contactScoreTable = $schema->getTable($this->contactScoreTableName);
+            if ($contactScoreTable->hasForeignKey($this->contactScoreContactFk)) {
+                $this->addSql("ALTER TABLE `{$this->contactScoreTableName}` DROP FOREIGN KEY `{$this->contactScoreContactFk}`");
+            }
+            if ($contactScoreTable->hasForeignKey($this->contactScoreGroupFk)) {
+                $this->addSql("ALTER TABLE `{$this->contactScoreTableName}` DROP FOREIGN KEY `{$this->contactScoreGroupFk}`");
+            }
+        }
 
-        $this->addSql("ALTER TABLE `{$this->pointsTableName}` DROP FOREIGN KEY `{$this->pointsGroupFk}`");
-        $this->addSql("ALTER TABLE `{$this->pointTriggersTableName}` DROP FOREIGN KEY `{$this->pointTriggersGroupFk}`");
-        $this->addSql("ALTER TABLE `{$this->leadPointsChangeLogTableName}` DROP FOREIGN KEY `{$this->leadPointsChangeLogGroupFk}`");
+        $pointsTable              = $schema->getTable($this->pointsTableName);
+        $pointTriggersTable       = $schema->getTable($this->pointTriggersTableName);
+        $leadPointsChangeLogTable = $schema->getTable($this->leadPointsChangeLogTableName);
 
-        $this->addSql("ALTER TABLE `{$this->pointsTableName}` DROP group_id");
-        $this->addSql("ALTER TABLE `{$this->pointTriggersTableName}` DROP group_id");
-        $this->addSql("ALTER TABLE `{$this->leadPointsChangeLogTableName}` DROP group_id");
+        if ($pointsTable->hasForeignKey($this->pointsGroupFk)) {
+            $this->addSql("ALTER TABLE `{$this->pointsTableName}` DROP FOREIGN KEY `{$this->pointsGroupFk}`");
+        }
+        if ($pointTriggersTable->hasForeignKey($this->pointTriggersGroupFk)) {
+            $this->addSql("ALTER TABLE `{$this->pointTriggersTableName}` DROP FOREIGN KEY `{$this->pointTriggersGroupFk}`");
+        }
+        if ($leadPointsChangeLogTable->hasForeignKey($this->leadPointsChangeLogGroupFk)) {
+            $this->addSql("ALTER TABLE `{$this->leadPointsChangeLogTableName}` DROP FOREIGN KEY `{$this->leadPointsChangeLogGroupFk}`");
+        }
 
-        $this->addSql("DROP TABLE {$this->contactScoreTableName}");
-        $this->addSql("DROP TABLE {$this->groupTableName}");
+        if ($pointsTable->hasColumn('group_id')) {
+            $this->addSql("ALTER TABLE `{$this->pointsTableName}` DROP group_id");
+        }
+        if ($pointTriggersTable->hasColumn('group_id')) {
+            $this->addSql("ALTER TABLE `{$this->pointTriggersTableName}` DROP group_id");
+        }
+        if ($leadPointsChangeLogTable->hasColumn('group_id')) {
+            $this->addSql("ALTER TABLE `{$this->leadPointsChangeLogTableName}` DROP group_id");
+        }
+
+        if ($schema->hasTable($this->contactScoreTableName)) {
+            $this->addSql("DROP TABLE {$this->contactScoreTableName}");
+        }
+        if ($schema->hasTable($this->groupTableName)) {
+            $this->addSql("DROP TABLE {$this->groupTableName}");
+        }
     }
 
     private function generateTableName(string $tableName): string
