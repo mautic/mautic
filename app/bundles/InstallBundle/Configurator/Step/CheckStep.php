@@ -6,6 +6,7 @@ use Mautic\CoreBundle\Configurator\Configurator;
 use Mautic\CoreBundle\Configurator\Step\StepInterface;
 use Mautic\CoreBundle\Helper\FileHelper;
 use Mautic\CoreBundle\Security\Cryptography\Cipher\Symmetric\OpenSSLCipher;
+use Mautic\CoreBundle\Loader\ParameterLoader;
 use Mautic\InstallBundle\Configurator\Form\CheckStepType;
 use Symfony\Component\HttpFoundation\RequestStack;
 
@@ -17,7 +18,13 @@ class CheckStep implements StepInterface
     private bool $configIsWritable;
 
     /**
-     * Absolute path to cache directory.
+     * @var ParameterLoader|null
+     **/
+    private $parameterLoader;
+
+    /**
+     * Default absolute path to cache directory.
+     * Used when no cache path is defined in configuration.
      * Required in step.
      *
      * @var string
@@ -25,7 +32,8 @@ class CheckStep implements StepInterface
     public $cache_path = '%kernel.project_dir%/var/cache';
 
     /**
-     * Absolute path to log directory.
+     * Default absolute path to log directory.
+     * Used when no log path is defined in configuration.
      * Required in step.
      *
      * @var string
@@ -82,12 +90,12 @@ class CheckStep implements StepInterface
             $messages[] = 'mautic.install.config.unwritable';
         }
 
-        if (!is_writable(str_replace('%kernel.project_dir%', $this->projectDir, $this->cache_path))) {
-            $messages[] = 'mautic.install.cache.unwritable';
+        if (!is_writable($this->getCacheDir())) {
+          $messages[] = 'mautic.install.cache.unwritable';
         }
 
-        if (!is_writable(str_replace('%kernel.project_dir%', $this->projectDir, $this->log_path))) {
-            $messages[] = 'mautic.install.logs.unwritable';
+        if (!is_writable($this->getLogDir())) {
+          $messages[] = 'mautic.install.logs.unwritable';
         }
 
         $timezones = [];
@@ -246,4 +254,26 @@ class CheckStep implements StepInterface
 
         return $parameters;
     }
+
+  private function getParameterLoader(): ParameterLoader
+    {
+        if (!$this->parameterLoader) {
+            $this->parameterLoader = new ParameterLoader();
+        }
+
+        return $this->parameterLoader;
+    }
+
+    public function getCacheDir(): string
+    {
+          $cachePath = $this->getParameterLoader()->getLocalParameterBag()->get('cache_path') ?? $this->cache_path;
+          return str_replace('%kernel.project_dir%', $this->projectDir, $cachePath);
+    }
+
+    public function getLogDir(): string
+    {
+          $logPath = $this->getParameterLoader()->getLocalParameterBag()->get('log_path') ?? $this->log_path;
+          return str_replace('%kernel.project_dir%', $this->projectDir, $logPath);
+    }
+
 }
