@@ -343,7 +343,7 @@ class BuilderSubscriber implements EventSubscriberInterface
             // replace slots
             if (count($params)) {
                 $dom = new \DOMDocument('1.0', 'utf-8');
-                $dom->loadHTML(mb_encode_numericentity($content, [0x80, 0x10ffff, 0, 0xfffff], 'UTF-8'), LIBXML_NOERROR);
+                $dom->loadHTML(mb_encode_numericentity($content, [0x80, 0x10FFFF, 0, 0xFFFFF], 'UTF-8'), LIBXML_NOERROR);
                 $xpath = new \DOMXPath($dom);
 
                 $divContent = $xpath->query('//*[@data-slot="segmentlist"]');
@@ -422,7 +422,7 @@ class BuilderSubscriber implements EventSubscriberInterface
             // add form before first block of prefs center
             if (isset($params['startform']) && str_contains($content, 'data-prefs-center')) {
                 $dom = new \DOMDocument('1.0', 'utf-8');
-                $dom->loadHTML(mb_encode_numericentity($content, [0x80, 0x10ffff, 0, 0xfffff], 'UTF-8'), LIBXML_NOERROR);
+                $dom->loadHTML(mb_encode_numericentity($content, [0x80, 0x10FFFF, 0, 0xFFFFF], 'UTF-8'), LIBXML_NOERROR);
                 $xpath      = new \DOMXPath($dom);
                 // If use slots
                 $divContent = $xpath->query('//*[@data-prefs-center="1"]');

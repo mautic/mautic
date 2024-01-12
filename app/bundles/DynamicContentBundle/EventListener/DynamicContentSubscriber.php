@@ -159,7 +159,7 @@ class DynamicContentSubscriber implements EventSubscriberInterface
 
         // replace slots
         $dom = new \DOMDocument('1.0', 'utf-8');
-        $dom->loadHTML(mb_encode_numericentity($content, [0x80, 0x10ffff, 0, 0xfffff], 'UTF-8'), LIBXML_NOERROR);
+        $dom->loadHTML(mb_encode_numericentity($content, [0x80, 0x10FFFF, 0, 0xFFFFF], 'UTF-8'), LIBXML_NOERROR);
         $xpath = new \DOMXPath($dom);
 
         $divContent = $xpath->query('//*[@data-slot="dwc"]');
@@ -174,7 +174,7 @@ class DynamicContentSubscriber implements EventSubscriberInterface
             }
 
             $newnode = $dom->createDocumentFragment();
-            $newnode->appendXML('<![CDATA['.mb_encode_numericentity($slotContent, [0x80, 0x10ffff, 0, 0xfffff], 'UTF-8').']]>');
+            $newnode->appendXML('<![CDATA['.mb_encode_numericentity($slotContent, [0x80, 0x10FFFF, 0, 0xFFFFF], 'UTF-8').']]>');
             $slot->parentNode->replaceChild($newnode, $slot);
         }
 
