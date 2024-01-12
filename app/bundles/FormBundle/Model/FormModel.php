@@ -874,9 +874,9 @@ class FormModel extends CommonFormModel
     private function loadHTML(&$dom, $html): void
     {
         if (defined('LIBXML_HTML_NOIMPLIED') && defined('LIBXML_HTML_NODEFDTD')) {
-            $dom->loadHTML(mb_encode_numericentity($html, [0x80, 0x10ffff, 0, 0xfffff], 'UTF-8'), LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD);
+            $dom->loadHTML(mb_encode_numericentity($html, [0x80, 0x10FFFF, 0, 0xFFFFF], 'UTF-8'), LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD);
         } else {
-            $dom->loadHTML(mb_encode_numericentity($html, [0x80, 0x10ffff, 0, 0xfffff], 'UTF-8'));
+            $dom->loadHTML(mb_encode_numericentity($html, [0x80, 0x10FFFF, 0, 0xFFFFF], 'UTF-8'));
         }
     }
 
