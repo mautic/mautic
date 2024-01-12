@@ -178,7 +178,7 @@ class ParameterLoader
             $compiledParameters = array_merge($compiledParameters, json_decode($envParameters, true));
         }
 
-        // Hardcode the dv_driver to pdo_mysql, as it is currently the only supported driver.
+        // Hardcode the db_driver to pdo_mysql, as it is currently the only supported driver.
         // We set in here, to ensure it is always set to this value.
         $compiledParameters['db_driver'] = 'pdo_mysql';
 
