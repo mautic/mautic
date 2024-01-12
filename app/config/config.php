@@ -11,7 +11,6 @@ use Symfony\Component\DependencyInjection\Reference;
 $root        = $container->getParameter('mautic.application_dir').'/app';
 $projectRoot = $container->getParameter('kernel.project_dir');
 
-/** @var array $paths */
 include __DIR__.'/paths_helper.php';
 
 // Load extra annotations
@@ -24,7 +23,7 @@ $container->loadFromExtension('sensio_framework_extra', [
 
 // Build and store Mautic bundle metadata
 $symfonyBundles        = $container->getParameter('kernel.bundles');
-$bundleMetadataBuilder = new \Mautic\CoreBundle\DependencyInjection\Builder\BundleMetadataBuilder($symfonyBundles, $paths, $root);
+$bundleMetadataBuilder = new \Mautic\CoreBundle\DependencyInjection\Builder\BundleMetadataBuilder($symfonyBundles, $paths);
 
 $container->setParameter('mautic.bundles', $bundleMetadataBuilder->getCoreBundleMetadata());
 $container->setParameter('mautic.plugin.bundles', $bundleMetadataBuilder->getPluginMetadata());
@@ -47,7 +46,7 @@ if (defined('MAUTIC_INSTALLER')) {
     $secureCookie = $request->isSecure();
 } else {
     $siteUrl      = $configParameterBag->get('site_url');
-    $secureCookie = ($siteUrl && 0 === strpos($siteUrl, 'https'));
+    $secureCookie = ($siteUrl && str_starts_with($siteUrl, 'https'));
 }
 
 $container->loadFromExtension('framework', [
