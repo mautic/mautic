@@ -114,6 +114,13 @@ Mautic.campaignOnLoad = function (container, response) {
             }
         });
 
+        const $flashes = mQuery('#flashes');
+        $flashes.on('flashes.update', function() {
+            if (mQuery('#app-content .campaign-builder').hasClass('builder-active')) {
+                $flashes.find('.alert').first().css('margin-top', '30px');
+            }
+        });
+
         Mautic.prepareCampaignCanvas();
 
         // Open the builder directly when saved from the builder
