@@ -3,6 +3,7 @@
 namespace Mautic\CoreBundle\ErrorHandler {
     use Mautic\CoreBundle\Exception\DatabaseConnectionException;
     use Mautic\CoreBundle\Exception\ErrorHandlerException;
+    use Mautic\CoreBundle\Exception\MessageOnlyErrorHandlerException;
     use Psr\Log\LoggerInterface;
     use Psr\Log\LogLevel;
     use Symfony\Component\ErrorHandler\Debug;
@@ -238,8 +239,9 @@ namespace Mautic\CoreBundle\ErrorHandler {
          */
         public static function prepareExceptionForOutput($exception)
         {
-            $inline     = null;
-            $logMessage = null;
+            $inline             = null;
+            $logMessage         = null;
+            $originalException  = $exception;
 
             if (!$exception instanceof \Exception && !$exception instanceof FlattenException) {
                 if ($exception instanceof \Throwable) {
@@ -289,6 +291,10 @@ namespace Mautic\CoreBundle\ErrorHandler {
             $file              = $exception->getFile();
             $trace             = $exception->getTrace();
             $context           = (method_exists($exception, 'getContext')) ? $exception->getContext() : [];
+
+            if ($originalException instanceof MessageOnlyErrorHandlerException) {
+                $file = $trace = $context = $line = '';
+            }
 
             return compact(['inline', 'type', 'message', 'logMessage', 'line', 'file', 'trace', 'context', 'showExceptionMessage', 'previous']);
         }

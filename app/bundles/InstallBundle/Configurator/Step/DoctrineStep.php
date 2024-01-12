@@ -143,7 +143,6 @@ class DoctrineStep implements StepInterface
     {
         $mauticSupported = [
             'pdo_mysql' => 'MySQL PDO (Recommended)',
-            'mysqli'    => 'MySQLi',
         ];
 
         $supported = [];
@@ -157,11 +156,6 @@ class DoctrineStep implements StepInterface
                     $supported['pdo_'.$driver] = $mauticSupported['pdo_'.$driver];
                 }
             }
-        }
-
-        // Add MySQLi if available
-        if (function_exists('mysqli_connect')) {
-            $supported['mysqli'] = $mauticSupported['mysqli'];
         }
 
         return $supported;
