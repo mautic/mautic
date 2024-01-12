@@ -51,7 +51,7 @@ class Integration extends CommonEntity implements CacheInvalidateInterface
         $builder = new ClassMetadataBuilder($metadata);
 
         $builder->setTable('plugin_integration_settings')
-            ->setCustomRepositoryClass(\Mautic\PluginBundle\Entity\IntegrationRepository::class);
+            ->setCustomRepositoryClass(IntegrationRepository::class);
 
         $builder->createField('id', 'integer')
             ->makePrimaryKey()
@@ -84,9 +84,6 @@ class Integration extends CommonEntity implements CacheInvalidateInterface
             ->build();
     }
 
-    /**
-     * @return mixed
-     */
     public function getId()
     {
         return $this->id;
@@ -101,8 +98,6 @@ class Integration extends CommonEntity implements CacheInvalidateInterface
     }
 
     /**
-     * @param mixed $plugin
-     *
      * @return Integration
      */
     public function setPlugin($plugin)
@@ -112,17 +107,12 @@ class Integration extends CommonEntity implements CacheInvalidateInterface
         return $this;
     }
 
-    /**
-     * @return mixed
-     */
     public function getName()
     {
         return $this->name;
     }
 
     /**
-     * @param mixed $name
-     *
      * @return Integration
      */
     public function setName($name)
@@ -134,17 +124,12 @@ class Integration extends CommonEntity implements CacheInvalidateInterface
         return $this;
     }
 
-    /**
-     * @return mixed
-     */
     public function getIsPublished()
     {
         return $this->isPublished;
     }
 
     /**
-     * @param mixed $isPublished
-     *
      * @return Integration
      */
     public function setIsPublished($isPublished)
@@ -161,17 +146,12 @@ class Integration extends CommonEntity implements CacheInvalidateInterface
         return $this->isPublished;
     }
 
-    /**
-     * @return mixed
-     */
     public function getSupportedFeatures()
     {
         return $this->supportedFeatures;
     }
 
     /**
-     * @param mixed $supportedFeatures
-     *
      * @return Integration
      */
     public function setSupportedFeatures($supportedFeatures)
@@ -183,17 +163,12 @@ class Integration extends CommonEntity implements CacheInvalidateInterface
         return $this;
     }
 
-    /**
-     * @return mixed
-     */
     public function getApiKeys()
     {
         return $this->apiKeys;
     }
 
     /**
-     * @param mixed $apiKeys
-     *
      * @return Integration
      */
     public function setApiKeys($apiKeys)
@@ -203,17 +178,12 @@ class Integration extends CommonEntity implements CacheInvalidateInterface
         return $this;
     }
 
-    /**
-     * @return mixed
-     */
     public function getFeatureSettings()
     {
         return $this->featureSettings;
     }
 
     /**
-     * @param mixed $featureSettings
-     *
      * @return Integration
      */
     public function setFeatureSettings($featureSettings)

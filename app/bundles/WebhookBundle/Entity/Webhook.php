@@ -296,9 +296,6 @@ class Webhook extends FormEntity
         return $this->category;
     }
 
-    /**
-     * @return mixed
-     */
     public function getEvents()
     {
         return $this->events;
@@ -312,7 +309,7 @@ class Webhook extends FormEntity
         $this->isChanged('events', $events);
 
         $this->events = $events;
-        /** @var \Mautic\WebhookBundle\Entity\Event $event */
+        /** @var Event $event */
         foreach ($events as $event) {
             $event->setWebhook($this);
         }
@@ -446,7 +443,7 @@ class Webhook extends FormEntity
     {
         $this->logs = $logs;
 
-        /** @var \Mautic\WebhookBundle\Entity\Log $log */
+        /** @var Log $log */
         foreach ($logs as $log) {
             $log->setWebhook($this);
         }

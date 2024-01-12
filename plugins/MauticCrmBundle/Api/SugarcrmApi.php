@@ -108,7 +108,7 @@ class SugarcrmApi extends CrmApi
     /**
      * @return array
      *
-     * @throws \Mautic\PluginBundle\Exception\ApiErrorException
+     * @throws ApiErrorException
      */
     public function createLead(array $fields, $lead)
     {
@@ -196,7 +196,7 @@ class SugarcrmApi extends CrmApi
     /**
      * @return array
      *
-     * @throws \Mautic\PluginBundle\Exception\ApiErrorException
+     * @throws ApiErrorException
      */
     public function syncLeadsToSugar(array $data)
     {
@@ -303,9 +303,6 @@ class SugarcrmApi extends CrmApi
     }
 
     /**
-     * @param $object
-     *                 TODO 7.x
-     *
      * @return array|mixed|string
      */
     public function createLeadActivity(array $activity, $object)
@@ -554,8 +551,6 @@ class SugarcrmApi extends CrmApi
      *
      * @param array  $query
      * @param string $object
-     *
-     * @return mixed
      */
     public function getLeads($query, $object)
     {

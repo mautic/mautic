@@ -92,7 +92,6 @@ class ButtonExtension extends AbstractExtension
      * @param array<string,string> $query
      * @param array<string,string> $editAttr
      * @param array<string,string> $routeVars
-     * @param mixed                $item
      */
     public function addButtonsFromTemplate(
         array $templateButtons,
@@ -104,7 +103,7 @@ class ButtonExtension extends AbstractExtension
         array $editAttr = [],
         array $routeVars = [],
         $item = null,
-        ?string $tooltip = null
+        string $tooltip = null
     ): void {
         foreach ($templateButtons as $action => $enabled) {
             if (!$enabled) {

@@ -102,8 +102,8 @@ class TriggerModel extends CommonFormModel
     }
 
     /**
-     * @param \Mautic\PointBundle\Entity\Trigger $entity
-     * @param bool                               $unlock
+     * @param Trigger $entity
+     * @param bool    $unlock
      */
     public function saveEntity($entity, $unlock = true): void
     {

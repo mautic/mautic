@@ -257,7 +257,7 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
      *
      * @return array<array{id: string}>
      */
-    public function getLeadIdsByUniqueFields($uniqueFieldsWithData, ?int $leadId = null, ?int $limit = null): array
+    public function getLeadIdsByUniqueFields($uniqueFieldsWithData, int $leadId = null, int $limit = null): array
     {
         return $this->getLeadFieldsByUniqueFields($uniqueFieldsWithData, 'l.id', $leadId, $limit);
     }
@@ -267,7 +267,7 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
      *
      * @return array<array<mixed>>
      */
-    private function getLeadFieldsByUniqueFields($uniqueFieldsWithData, string $select, ?int $leadId = null, ?int $limit = null): array
+    private function getLeadFieldsByUniqueFields($uniqueFieldsWithData, string $select, int $leadId = null, int $limit = null): array
     {
         $q = $this->getEntityManager()->getConnection()->createQueryBuilder()
             ->select($select)
@@ -403,8 +403,6 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
      * The primary company data will be a flat array on the entity
      * with a key of `primaryCompany`
      *
-     * @param mixed $entity
-     *
      * @return mixed|null
      */
     public function getEntityWithPrimaryCompany($entity)
@@ -531,7 +529,7 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
     }
 
     /**
-     * @return \Doctrine\DBAL\Query\QueryBuilder
+     * @return QueryBuilder
      */
     public function getEntitiesDbalQueryBuilder()
     {
@@ -559,7 +557,7 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
         }
 
         $q->select($select)
-            ->from(\Mautic\LeadBundle\Entity\Lead::class, $alias, $alias.'.id')
+            ->from(Lead::class, $alias, $alias.'.id')
             ->leftJoin($alias.'.owner', 'u')
             ->indexBy($alias, $alias.'.id');
 
@@ -1009,7 +1007,7 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
      *
      * @param int $leadId
      */
-    public function updateLastActive($leadId, ?\DateTimeInterface $lastActiveDate = null): void
+    public function updateLastActive($leadId, \DateTimeInterface $lastActiveDate = null): void
     {
         if (!$leadId) {
             // Prevent unnecessary queries like:
@@ -1091,7 +1089,7 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
                     $q->expr()->eq('l.id', ':leadId')
                 )
             )
-            ->setParameter('stageIds', $stages, \Doctrine\DBAL\Connection::PARAM_INT_ARRAY)
+            ->setParameter('stageIds', $stages, Connection::PARAM_INT_ARRAY)
             ->setParameter('leadId', $lead->getId());
 
         return (bool) $q->executeQuery()->fetchOne();
@@ -1249,8 +1247,6 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
     /**
      * @param array $tables          $tables[0] should be primary table
      * @param bool  $innerJoinTables
-     * @param mixed $whereExpression
-     * @param mixed $having
      */
     public function applySearchQueryRelationship(QueryBuilder $q, array $tables, $innerJoinTables, $whereExpression = null, $having = null): void
     {

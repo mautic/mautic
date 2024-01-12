@@ -17,7 +17,7 @@ return [
                 'standard_entity' => true,
                 'name'            => 'stages',
                 'path'            => '/stages',
-                'controller'      => \Mautic\StageBundle\Controller\Api\StageApiController::class,
+                'controller'      => Mautic\StageBundle\Controller\Api\StageApiController::class,
             ],
             'mautic_api_stageddcontact' => [
                 'path'       => '/stages/{id}/contact/{contactId}/add',

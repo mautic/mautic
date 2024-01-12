@@ -105,7 +105,7 @@ class DashboardControllerFunctionalTest extends MauticMysqlTestCase
         ], $tableArray);
     }
 
-    private function createSegment(string $name, string $alias, float $lastBuildTime = 0, ?User $user = null): LeadList
+    private function createSegment(string $name, string $alias, float $lastBuildTime = 0, User $user = null): LeadList
     {
         $segment = new LeadList();
         $segment->setName($name);

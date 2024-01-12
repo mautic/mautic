@@ -28,7 +28,7 @@ class CustomFieldIndex
     public function addIndexOnColumn(LeadField $leadField): void
     {
         try {
-            /** @var \Mautic\CoreBundle\Doctrine\Helper\IndexSchemaHelper $modifySchema */
+            /** @var IndexSchemaHelper $modifySchema */
             $modifySchema = $this->indexSchemaHelper->setName($leadField->getCustomFieldObject());
 
             $alias = $leadField->getAlias();

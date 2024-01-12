@@ -10,14 +10,8 @@ use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
  */
 class Cache
 {
-    /**
-     * @var mixed
-     */
     private $id;
 
-    /**
-     * @var mixed
-     */
     private $data;
 
     /**

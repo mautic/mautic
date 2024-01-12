@@ -19,7 +19,7 @@ class DecisionHelper
     /**
      * @throws DecisionNotApplicableException
      */
-    public function checkIsDecisionApplicableForContact(Event $event, Lead $contact, ?string $channel = null, ?int $channelId = null): void
+    public function checkIsDecisionApplicableForContact(Event $event, Lead $contact, string $channel = null, int $channelId = null): void
     {
         if (Event::TYPE_DECISION !== $event->getEventType()) {
             @trigger_error(

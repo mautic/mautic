@@ -18,8 +18,6 @@ abstract class AbstractSmsApi implements TransportInterface
 
     /**
      * @param string $content
-     *
-     * @return mixed
      */
     abstract public function sendSms(Lead $lead, $content);
 

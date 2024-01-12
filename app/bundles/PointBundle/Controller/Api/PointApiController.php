@@ -78,7 +78,7 @@ class PointApiController extends CommonApiController
      * @param string $operator
      * @param int    $delta
      *
-     * @return \Symfony\Component\HttpFoundation\Response
+     * @return Response
      */
     public function adjustPointsAction(Request $request, IpLookupHelper $ipLookupHelper, $leadId, $operator, $delta)
     {

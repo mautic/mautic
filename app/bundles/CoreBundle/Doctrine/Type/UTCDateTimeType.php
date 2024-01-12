@@ -39,8 +39,6 @@ class UTCDateTimeType extends DateTimeType
     }
 
     /**
-     * @param mixed $value
-     *
      * @return \DateTimeInterface|null
      *
      * @throws ConversionException

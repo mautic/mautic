@@ -383,7 +383,7 @@ class MailHelper
             }
 
             // Attach assets
-            /** @var \Mautic\AssetBundle\Entity\Asset $asset */
+            /** @var Asset $asset */
             foreach ($this->assets as $asset) {
                 if (!in_array($asset->getId(), $this->attachedAssets)) {
                     $this->attachedAssets[] = $asset->getId();
@@ -854,8 +854,6 @@ class MailHelper
 
     /**
      * Get a copy of the raw body.
-     *
-     * @return mixed
      */
     public function getBody()
     {
@@ -937,7 +935,6 @@ class MailHelper
     /**
      * Set CC address(es).
      *
-     * @param mixed  $addresses
      * @param string $name
      *
      * //TODO: there is a bug here, the name is not passed in CC nor in the array of addresses, we do not handle names for CC
@@ -969,8 +966,6 @@ class MailHelper
     /**
      * Add cc address.
      *
-     * @param mixed $address
-     *
      * @return bool
      */
     public function addCc($address, $name = null)
@@ -992,7 +987,6 @@ class MailHelper
     /**
      * Set BCC address(es).
      *
-     * @param mixed  $addresses
      * @param string $name
      *
      * //TODO: same bug for the name as the one we have in setCc
@@ -1702,7 +1696,7 @@ class MailHelper
         // Note if a lead
         if (null !== $this->lead) {
             try {
-                $stat->setLead($this->factory->getEntityManager()->getReference(\Mautic\LeadBundle\Entity\Lead::class, $this->lead['id']));
+                $stat->setLead($this->factory->getEntityManager()->getReference(Lead::class, $this->lead['id']));
             } catch (ORMException) {
                 // keep IDE happy
             }
@@ -1907,9 +1901,6 @@ class MailHelper
         return $owner;
     }
 
-    /**
-     * @return mixed
-     */
     protected function getContactOwnerSignature($owner)
     {
         return empty($owner['signature'])

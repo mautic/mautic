@@ -25,7 +25,7 @@ class SyncDateHelper
     ) {
     }
 
-    public function setSyncDateTimes(?\DateTimeInterface $fromDateTime = null, ?\DateTimeInterface $toDateTime = null): void
+    public function setSyncDateTimes(\DateTimeInterface $fromDateTime = null, \DateTimeInterface $toDateTime = null): void
     {
         $this->syncFromDateTime    = $fromDateTime;
         $this->syncToDateTime      = $toDateTime;

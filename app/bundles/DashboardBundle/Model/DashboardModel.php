@@ -231,7 +231,7 @@ class DashboardModel extends FormModel
      *
      * @return \Symfony\Component\Form\FormInterface<mixed>
      *
-     * @throws \Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException
+     * @throws MethodNotAllowedHttpException
      */
     public function createForm($entity, FormFactoryInterface $formFactory, $action = null, $options = []): \Symfony\Component\Form\FormInterface
     {

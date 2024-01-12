@@ -396,7 +396,6 @@ class FetchCommonApiController extends AbstractFOSRestController implements Maut
     /**
      * Checks if user has permission to access retrieved entity.
      *
-     * @param mixed  $entity
      * @param string $action view|create|edit|publish|delete
      *
      * @return bool|Response
@@ -655,7 +654,7 @@ class FetchCommonApiController extends AbstractFOSRestController implements Maut
      * @phpstan-param E|null $entity
      * @phpstan-param array<int, E|null> $entities
      */
-    protected function setBatchError(int $key, string $msg, int $code, array &$errors, array &$entities = [], ?object $entity = null): void
+    protected function setBatchError(int $key, string $msg, int $code, array &$errors, array &$entities = [], object $entity = null): void
     {
         unset($entities[$key]);
         if ($entity) {
@@ -723,7 +722,7 @@ class FetchCommonApiController extends AbstractFOSRestController implements Maut
      * @param mixed|null                $data
      * @param array<string, string|int> $headers
      */
-    protected function view($data = null, ?int $statusCode = null, array $headers = []): View
+    protected function view($data = null, int $statusCode = null, array $headers = []): View
     {
         if ($data instanceof Paginator) {
             // Get iterator out of Paginator class so that the entities are properly serialized by the serializer

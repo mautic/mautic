@@ -95,8 +95,6 @@ abstract class AbstractPermissions
     /**
      * Takes an array from PermissionRepository::getPermissionsByRole() and converts the bitwise integers to an array
      * of permission names that can be used in forms, for example.
-     *
-     * @return mixed
      */
     public function convertBitsToPermissionNames(array $permissions)
     {

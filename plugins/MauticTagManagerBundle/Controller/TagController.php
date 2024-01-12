@@ -429,7 +429,7 @@ class TagController extends FormController
      */
     public function viewAction(Request $request, $objectId)
     {
-        /** @var \Mautic\LeadBundle\Model\TagModel $model */
+        /** @var TagModel $model */
         $model    = $this->getModel('lead.tag');
         $security = $this->security;
 

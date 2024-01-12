@@ -74,7 +74,7 @@ class Translator implements TranslatorInterface, WarmableInterface, TranslatorBa
      *
      * @return bool true if the message has a translation, false otherwise
      */
-    public function hasId(string $id, ?string $domain = null, ?string $locale = null): bool
+    public function hasId(string $id, string $domain = null, string $locale = null): bool
     {
         if (null === $domain) {
             $domain = 'messages';
@@ -89,7 +89,7 @@ class Translator implements TranslatorInterface, WarmableInterface, TranslatorBa
      *
      * @param array<mixed> $parameters
      */
-    public function transConditional(string $preferred, string $alternative, array $parameters = [], ?string $domain = null, ?string $locale = null): string
+    public function transConditional(string $preferred, string $alternative, array $parameters = [], string $domain = null, string $locale = null): string
     {
         if ($this->hasId($preferred, $domain, $locale)) {
             return $this->trans($preferred, $parameters, $domain, $locale);

@@ -238,8 +238,6 @@ class TwitterIntegration extends SocialIntegration
     /**
      * @param string $data
      * @param bool   $postAuthorization
-     *
-     * @return mixed
      */
     public function parseCallbackResponse($data, $postAuthorization = false)
     {

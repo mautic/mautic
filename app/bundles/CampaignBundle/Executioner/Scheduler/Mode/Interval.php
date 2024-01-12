@@ -155,9 +155,9 @@ class Interval implements ScheduleModeInterface
 
     private function hasTimeRelatedRestrictions(Event $event): bool
     {
-        return null === $event->getTriggerHour() &&
-            (null === $event->getTriggerRestrictedStartHour() || null === $event->getTriggerRestrictedStopHour()) &&
-            empty($event->getTriggerRestrictedDaysOfWeek());
+        return null === $event->getTriggerHour()
+            && (null === $event->getTriggerRestrictedStartHour() || null === $event->getTriggerRestrictedStopHour())
+            && empty($event->getTriggerRestrictedDaysOfWeek());
     }
 
     /**

@@ -20,7 +20,7 @@ return [
     'services'    => [
         'integrations' => [
             'mautic.integration.tagmanager' => [
-                'class'     => \MauticPlugin\MauticTagManagerBundle\Integration\TagManagerIntegration::class,
+                'class'     => MauticPlugin\MauticTagManagerBundle\Integration\TagManagerIntegration::class,
                 'arguments' => [
                     'event_dispatcher',
                     'mautic.helper.cache_storage',

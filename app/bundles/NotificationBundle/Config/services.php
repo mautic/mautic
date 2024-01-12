@@ -19,8 +19,8 @@ return function (ContainerConfigurator $configurator): void {
         ->exclude('../{'.implode(',', array_merge(MauticCoreExtension::DEFAULT_EXCLUDES, $excludes)).'}');
 
     $services->load('Mautic\\NotificationBundle\\Entity\\', '../Entity/*Repository.php')
-        ->tag(\Doctrine\Bundle\DoctrineBundle\DependencyInjection\Compiler\ServiceRepositoryCompilerPass::REPOSITORY_SERVICE_TAG);
+        ->tag(Doctrine\Bundle\DoctrineBundle\DependencyInjection\Compiler\ServiceRepositoryCompilerPass::REPOSITORY_SERVICE_TAG);
 
-    $services->alias('mautic.notification.model.notification', \Mautic\NotificationBundle\Model\NotificationModel::class);
-    $services->alias('mautic.notification.repository.stat', \Mautic\NotificationBundle\Entity\StatRepository::class);
+    $services->alias('mautic.notification.model.notification', Mautic\NotificationBundle\Model\NotificationModel::class);
+    $services->alias('mautic.notification.repository.stat', Mautic\NotificationBundle\Entity\StatRepository::class);
 };

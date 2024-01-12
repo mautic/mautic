@@ -204,7 +204,7 @@ class LeadSubscriberTest extends CommonMocks
     /**
      * @return array<string, mixed>
      */
-    private function getTimelineEvent(string $eventType, string $eventTypeName, string $focusName, \DateTime $date, ?Lead $lead=null): array
+    private function getTimelineEvent(string $eventType, string $eventTypeName, string $focusName, \DateTime $date, Lead $lead=null): array
     {
         $leadEventLogId = 1;
 

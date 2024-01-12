@@ -167,9 +167,6 @@ class CampaignExecutionEvent extends Event
         return $this;
     }
 
-    /**
-     * @return mixed
-     */
     public function getEventSettings()
     {
         return $this->eventSettings;
@@ -222,17 +219,11 @@ class CampaignExecutionEvent extends Event
         $this->channelId = $channelId;
     }
 
-    /**
-     * @return mixed
-     */
     public function getChannel()
     {
         return $this->channel;
     }
 
-    /**
-     * @return mixed
-     */
     public function getChannelId()
     {
         return $this->channelId;

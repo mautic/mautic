@@ -59,7 +59,7 @@ EOT
         if (!$contactIds) {
             $output->writeln('<error>No contacts to deduplicate.</error>');
 
-            return \Symfony\Component\Console\Command\Command::FAILURE;
+            return Command::FAILURE;
         }
 
         $output->writeln("{$duplicateCount} contacts passed to deduplicate");
@@ -76,7 +76,7 @@ EOT
         $event = $stopwatch->stop('deduplicate');
         $output->writeln("Duration: {$event->getDuration()} ms, Memory: {$event->getMemory()} bytes");
 
-        return \Symfony\Component\Console\Command\Command::SUCCESS;
+        return Command::SUCCESS;
     }
 
     protected static $defaultDescription = 'Merge contacts based on same unique identifiers';

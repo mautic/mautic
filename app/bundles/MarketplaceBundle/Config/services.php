@@ -18,5 +18,5 @@ return function (ContainerConfigurator $configurator): void {
     $services->load('Mautic\\MarketplaceBundle\\', '../')
         ->exclude('../{'.implode(',', array_merge(MauticCoreExtension::DEFAULT_EXCLUDES, $excludes)).'}');
 
-    $services->alias('marketplace.model.package', \Mautic\MarketplaceBundle\Model\PackageModel::class);
+    $services->alias('marketplace.model.package', Mautic\MarketplaceBundle\Model\PackageModel::class);
 };

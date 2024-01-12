@@ -13,8 +13,6 @@ class IntegrationEntityRepository extends CommonRepository
 {
     /**
      * @param array<int>|int|null $internalEntityIds
-     * @param mixed               $startDate
-     * @param mixed               $endDate
      * @param bool                $push
      * @param int                 $start
      * @param int                 $limit

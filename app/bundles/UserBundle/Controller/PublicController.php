@@ -57,7 +57,7 @@ class PublicController extends FormController
 
     public function passwordResetConfirmAction(Request $request, UserPasswordHasherInterface $hasher): mixed
     {
-        /** @var \Mautic\UserBundle\Model\UserModel $model */
+        /** @var UserModel $model */
         $model = $this->getModel('user');
 
         $data   = ['identifier' => '', 'password' => '', 'password_confirm' => ''];

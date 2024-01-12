@@ -67,17 +67,12 @@ class Result
         $this->contacts = $contacts;
     }
 
-    /**
-     * @return mixed
-     */
     public function getEmail()
     {
         return $this->email;
     }
 
     /**
-     * @param mixed $email
-     *
      * @return Result
      */
     public function setEmail($email)

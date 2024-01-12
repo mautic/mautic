@@ -118,7 +118,7 @@ class StageRepository extends CommonRepository
         }
 
         $q = $this->_em->createQueryBuilder()
-            ->from(\Mautic\StageBundle\Entity\Stage::class, 's', 's.id');
+            ->from(Stage::class, 's', 's.id');
 
         $q->select('partial s.{id, name}')
             ->andWhere($q->expr()->eq('s.isPublished', ':true'))
@@ -156,7 +156,7 @@ class StageRepository extends CommonRepository
         }
 
         $q = $this->_em->createQueryBuilder()
-            ->from(\Mautic\StageBundle\Entity\Stage::class, 's', 's.id');
+            ->from(Stage::class, 's', 's.id');
 
         $q->select('partial s.{id, name}')
             ->andWhere($q->expr()->eq('s.isPublished', ':true'))

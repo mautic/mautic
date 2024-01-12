@@ -269,7 +269,6 @@ final class ServicePass implements CompilerPassInterface
     }
 
     /**
-     * @param mixed   $argument
      * @param mixed[] $definitionArguments
      */
     private function processArgument($argument, ContainerBuilder $container, &$definitionArguments): void

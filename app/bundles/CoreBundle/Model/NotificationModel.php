@@ -139,8 +139,8 @@ class NotificationModel extends FormModel
     /**
      * Clears a notification for a user.
      *
-     * @param $id       Notification to clear; will clear all if empty
-     * @param $limit    Maximum number of notifications to clear if $id is empty
+     * @param $id    Notification to clear; will clear all if empty
+     * @param $limit Maximum number of notifications to clear if $id is empty
      */
     public function clearNotification($id, $limit = null): void
     {
@@ -150,7 +150,6 @@ class NotificationModel extends FormModel
     /**
      * Get content for notifications.
      *
-
      * @param bool $includeRead
      * @param int  $limit
      */

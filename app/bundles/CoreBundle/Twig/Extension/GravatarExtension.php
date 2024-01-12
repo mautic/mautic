@@ -22,7 +22,7 @@ class GravatarExtension extends AbstractExtension
         ];
     }
 
-    public function getImage(string $email, string $size = '250', ?string $default = null): string
+    public function getImage(string $email, string $size = '250', string $default = null): string
     {
         return $this->gravatarHelper->getImage($email, $size, $default);
     }

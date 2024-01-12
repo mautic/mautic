@@ -124,7 +124,7 @@ class ObjectMapping
     /**
      * @throws \Exception
      */
-    public function __construct(?\DateTime $dateCreated = null)
+    public function __construct(\DateTime $dateCreated = null)
     {
         if (null === $dateCreated) {
             $dateCreated = new \DateTime();

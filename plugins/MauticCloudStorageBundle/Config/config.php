@@ -9,7 +9,7 @@ return [
     'services' => [
         'integrations' => [
             'mautic.integration.amazons3' => [
-                'class'     => \MauticPlugin\MauticCloudStorageBundle\Integration\AmazonS3Integration::class,
+                'class'     => MauticPlugin\MauticCloudStorageBundle\Integration\AmazonS3Integration::class,
                 'arguments' => [
                     'event_dispatcher',
                     'mautic.helper.cache_storage',

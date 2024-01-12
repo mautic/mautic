@@ -245,7 +245,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
         $builder = new ClassMetadataBuilder($metadata);
 
         $builder->setTable('leads')
-            ->setCustomRepositoryClass(\Mautic\LeadBundle\Entity\LeadRepository::class)
+            ->setCustomRepositoryClass(LeadRepository::class)
             ->addLifecycleEvent('checkDateIdentified', 'preUpdate')
             ->addLifecycleEvent('checkDateIdentified', 'prePersist')
             ->addLifecycleEvent('checkAttributionDate', 'preUpdate')
@@ -256,7 +256,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
 
         $builder->addBigIntIdField();
 
-        $builder->createManyToOne('owner', \Mautic\UserBundle\Entity\User::class)
+        $builder->createManyToOne('owner', User::class)
             ->fetchLazy()
             ->addJoinColumn('owner_id', 'id', true, false, 'SET NULL')
             ->build();
@@ -280,7 +280,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
             ->fetchExtraLazy()
             ->build();
 
-        $builder->createOneToMany('doNotContact', \Mautic\LeadBundle\Entity\DoNotContact::class)
+        $builder->createOneToMany('doNotContact', DoNotContact::class)
             ->orphanRemoval()
             ->mappedBy('lead')
             ->cascadePersist()
@@ -289,7 +289,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
             ->fetchExtraLazy()
             ->build();
 
-        $builder->createManyToMany('ipAddresses', \Mautic\CoreBundle\Entity\IpAddress::class)
+        $builder->createManyToMany('ipAddresses', IpAddress::class)
             ->setJoinTable('lead_ips_xref')
             ->addInverseJoinColumn('ip_id', 'id', false)
             ->addJoinColumn('lead_id', 'id', false, false, 'CASCADE')
@@ -299,7 +299,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
             ->cascadePersist()
             ->build();
 
-        $builder->createOneToMany('pushIds', \Mautic\NotificationBundle\Entity\PushID::class)
+        $builder->createOneToMany('pushIds', PushID::class)
             ->orphanRemoval()
             ->mappedBy('lead')
             ->cascadeAll()
@@ -347,7 +347,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
             ->nullable()
             ->build();
 
-        $builder->createManyToMany('tags', \Mautic\LeadBundle\Entity\Tag::class)
+        $builder->createManyToMany('tags', Tag::class)
             ->setJoinTable('lead_tags_xref')
             ->addInverseJoinColumn('tag_id', 'id', false)
             ->addJoinColumn('lead_id', 'id', false, false, 'CASCADE')
@@ -359,7 +359,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
             ->cascadeDetach()
             ->build();
 
-        $builder->createManyToOne('stage', \Mautic\StageBundle\Entity\Stage::class)
+        $builder->createManyToOne('stage', Stage::class)
             ->cascadePersist()
             ->cascadeMerge()
             ->cascadeDetach()
@@ -374,14 +374,14 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
             ->fetchExtraLazy()
             ->build();
 
-        $builder->createOneToMany('utmtags', \Mautic\LeadBundle\Entity\UtmTag::class)
+        $builder->createOneToMany('utmtags', UtmTag::class)
             ->orphanRemoval()
             ->mappedBy('lead')
             ->cascadeAll()
             ->fetchExtraLazy()
             ->build();
 
-        $builder->createOneToMany('frequencyRules', \Mautic\LeadBundle\Entity\FrequencyRule::class)
+        $builder->createOneToMany('frequencyRules', FrequencyRule::class)
             ->orphanRemoval()
             ->setIndexBy('channel')
             ->setOrderBy(['dateAdded' => 'DESC'])
@@ -491,7 +491,6 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
 
     /**
      * @param string     $prop
-     * @param mixed      $val
      * @param mixed|null $oldValue
      */
     protected function isChanged($prop, $val, $oldValue = null)
@@ -654,7 +653,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
     /**
      * Get ipAddresses.
      *
-     * @return \Doctrine\Common\Collections\Collection
+     * @return Collection
      */
     public function getIpAddresses()
     {
@@ -968,7 +967,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
     /**
      * Get pointsChangeLog.
      *
-     * @return \Doctrine\Common\Collections\Collection
+     * @return Collection
      */
     public function getPointsChangeLog()
     {
@@ -1132,8 +1131,6 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
 
     /**
      * Get internal storage.
-     *
-     * @return mixed
      */
     public function getInternal()
     {
@@ -1150,25 +1147,17 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
 
     /**
      * Get social cache.
-     *
-     * @return mixed
      */
     public function getSocialCache()
     {
         return $this->socialCache;
     }
 
-    /**
-     * @return mixed
-     */
     public function getColor()
     {
         return $this->color;
     }
 
-    /**
-     * @param mixed $color
-     */
     public function setColor($color): void
     {
         $this->color = $color;
@@ -1246,9 +1235,6 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
         $this->newlyCreated = $newlyCreated;
     }
 
-    /**
-     * @return mixed
-     */
     public function getNotes()
     {
         return $this->notes;
@@ -1270,34 +1256,22 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
         return $this->preferredProfileImage;
     }
 
-    /**
-     * @return mixed
-     */
     public function getDateIdentified()
     {
         return $this->dateIdentified;
     }
 
-    /**
-     * @param mixed $dateIdentified
-     */
     public function setDateIdentified($dateIdentified): void
     {
         $this->isChanged('dateIdentified', $dateIdentified);
         $this->dateIdentified = $dateIdentified;
     }
 
-    /**
-     * @return mixed
-     */
     public function getLastActive()
     {
         return $this->lastActive;
     }
 
-    /**
-     * @param mixed $lastActive
-     */
     public function setLastActive($lastActive): void
     {
         $this->changes['dateLastActive'] = [$this->lastActive, $lastActive];
@@ -1333,8 +1307,6 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
 
     /**
      * Get tags.
-     *
-     * @return mixed
      */
     public function getTags()
     {
@@ -1355,8 +1327,6 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
 
     /**
      * Get utm tags.
-     *
-     * @return mixed
      */
     public function getUtmTags()
     {
@@ -1414,7 +1384,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
      */
     public function setFrequencyRules($frequencyRules)
     {
-        $this->frequencyRules = new \Doctrine\Common\Collections\ArrayCollection($frequencyRules);
+        $this->frequencyRules = new ArrayCollection($frequencyRules);
 
         return $this;
     }
@@ -1491,17 +1461,12 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
         }
     }
 
-    /**
-     * @return mixed
-     */
     public function getPrimaryCompany()
     {
         return $this->primaryCompany;
     }
 
     /**
-     * @param mixed $primaryCompany
-     *
      * @return Lead
      */
     public function setPrimaryCompany($primaryCompany)
@@ -1511,17 +1476,12 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
         return $this;
     }
 
-    /**
-     * @return mixed
-     */
     public function getTitle()
     {
         return $this->title;
     }
 
     /**
-     * @param mixed $title
-     *
      * @return Lead
      */
     public function setTitle($title)
@@ -1532,17 +1492,12 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
         return $this;
     }
 
-    /**
-     * @return mixed
-     */
     public function getFirstname()
     {
         return $this->firstname;
     }
 
     /**
-     * @param mixed $firstname
-     *
      * @return Lead
      */
     public function setFirstname($firstname)
@@ -1553,17 +1508,12 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
         return $this;
     }
 
-    /**
-     * @return mixed
-     */
     public function getLastname()
     {
         return $this->lastname;
     }
 
     /**
-     * @param mixed $lastname
-     *
      * @return Lead
      */
     public function setLastname($lastname)
@@ -1574,17 +1524,12 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
         return $this;
     }
 
-    /**
-     * @return mixed
-     */
     public function getPosition()
     {
         return $this->position;
     }
 
     /**
-     * @param mixed $position
-     *
      * @return Lead
      */
     public function setPosition($position)
@@ -1595,17 +1540,12 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
         return $this;
     }
 
-    /**
-     * @return mixed
-     */
     public function getPhone()
     {
         return $this->phone;
     }
 
     /**
-     * @param mixed $phone
-     *
      * @return Lead
      */
     public function setPhone($phone)
@@ -1616,17 +1556,12 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
         return $this;
     }
 
-    /**
-     * @return mixed
-     */
     public function getMobile()
     {
         return $this->mobile;
     }
 
     /**
-     * @param mixed $mobile
-     *
      * @return Lead
      */
     public function setMobile($mobile)
@@ -1645,17 +1580,12 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
         return $this->getMobile() ?: $this->getPhone();
     }
 
-    /**
-     * @return mixed
-     */
     public function getAddress1()
     {
         return $this->address1;
     }
 
     /**
-     * @param mixed $address1
-     *
      * @return Lead
      */
     public function setAddress1($address1)
@@ -1666,17 +1596,12 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
         return $this;
     }
 
-    /**
-     * @return mixed
-     */
     public function getAddress2()
     {
         return $this->address2;
     }
 
     /**
-     * @param mixed $address2
-     *
      * @return Lead
      */
     public function setAddress2($address2)
@@ -1687,17 +1612,12 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
         return $this;
     }
 
-    /**
-     * @return mixed
-     */
     public function getCity()
     {
         return $this->city;
     }
 
     /**
-     * @param mixed $city
-     *
      * @return Lead
      */
     public function setCity($city)
@@ -1708,17 +1628,12 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
         return $this;
     }
 
-    /**
-     * @return mixed
-     */
     public function getState()
     {
         return $this->state;
     }
 
     /**
-     * @param mixed $state
-     *
      * @return Lead
      */
     public function setState($state)
@@ -1729,17 +1644,12 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
         return $this;
     }
 
-    /**
-     * @return mixed
-     */
     public function getZipcode()
     {
         return $this->zipcode;
     }
 
     /**
-     * @param mixed $zipcode
-     *
      * @return Lead
      */
     public function setZipcode($zipcode)
@@ -1771,17 +1681,12 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
         return $this;
     }
 
-    /**
-     * @return mixed
-     */
     public function getCountry()
     {
         return $this->country;
     }
 
     /**
-     * @param mixed $country
-     *
      * @return Lead
      */
     public function setCountry($country)
@@ -1792,17 +1697,12 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
         return $this;
     }
 
-    /**
-     * @return mixed
-     */
     public function getCompany()
     {
         return $this->company;
     }
 
     /**
-     * @param mixed $company
-     *
      * @return Lead
      */
     public function setCompany($company)
@@ -1813,17 +1713,12 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
         return $this;
     }
 
-    /**
-     * @return mixed
-     */
     public function getEmail()
     {
         return $this->email;
     }
 
     /**
-     * @param mixed $email
-     *
      * @return Lead
      */
     public function setEmail($email)
@@ -1836,8 +1731,6 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
 
     /**
      * Returns array of rules with preferred channels first.
-     *
-     * @return mixed
      */
     public function getChannelRules()
     {

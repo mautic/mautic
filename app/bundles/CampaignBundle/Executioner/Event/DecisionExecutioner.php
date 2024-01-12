@@ -25,7 +25,6 @@ class DecisionExecutioner implements EventInterface
     }
 
     /**
-     * @param mixed       $passthrough
      * @param string|null $channel
      * @param int|null    $channelId
      *

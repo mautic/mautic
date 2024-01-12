@@ -162,7 +162,7 @@ class FormController extends CommonFormController
      */
     public function viewAction(Request $request, $objectId)
     {
-        /** @var \Mautic\FormBundle\Model\FormModel $model */
+        /** @var FormModel $model */
         $model      = $this->getModel('form');
         $activeForm = $model->getEntity($objectId);
 
@@ -296,7 +296,7 @@ class FormController extends CommonFormController
      */
     public function newAction(Request $request)
     {
-        /** @var \Mautic\FormBundle\Model\FormModel $model */
+        /** @var FormModel $model */
         $model   = $this->getModel('form');
         $entity  = $model->getEntity();
         $session = $request->getSession();
@@ -500,7 +500,7 @@ class FormController extends CommonFormController
      */
     public function editAction(Request $request, $objectId, $ignorePost = false, $forceTypeSelection = false)
     {
-        /** @var \Mautic\FormBundle\Model\FormModel $model */
+        /** @var FormModel $model */
         $model            = $this->getModel('form');
         $formData         = $request->request->get('mauticform');
         $sessionId        = $formData['sessionId'] ?? null;
@@ -876,7 +876,7 @@ class FormController extends CommonFormController
     {
         $model = $this->getModel('form.form');
 
-        /** @var \Mautic\FormBundle\Entity\Form $entity */
+        /** @var Form $entity */
         $entity = $model->getEntity($objectId);
 
         if (null != $entity) {
@@ -895,7 +895,7 @@ class FormController extends CommonFormController
 
             // Clone the forms's fields
             $fields = $entity->getFields()->toArray();
-            /** @var \Mautic\FormBundle\Entity\Field $field */
+            /** @var Field $field */
             foreach ($fields as $field) {
                 $fieldClone = clone $field;
                 $fieldClone->setForm($entity);
@@ -1166,7 +1166,7 @@ class FormController extends CommonFormController
         ];
 
         if ('POST' == $request->getMethod()) {
-            /** @var \Mautic\FormBundle\Model\FormModel $model */
+            /** @var FormModel $model */
             $model = $this->getModel('form');
             $ids   = json_decode($request->query->get('ids', ''));
             $count = 0;

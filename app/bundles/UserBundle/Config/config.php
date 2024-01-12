@@ -71,7 +71,7 @@ return [
                 'standard_entity' => true,
                 'name'            => 'users',
                 'path'            => '/users',
-                'controller'      => \Mautic\UserBundle\Controller\Api\UserApiController::class,
+                'controller'      => Mautic\UserBundle\Controller\Api\UserApiController::class,
             ],
             'mautic_api_getself' => [
                 'path'       => '/users/self',
@@ -90,7 +90,7 @@ return [
                 'standard_entity' => true,
                 'name'            => 'roles',
                 'path'            => '/roles',
-                'controller'      => \Mautic\UserBundle\Controller\Api\RoleApiController::class,
+                'controller'      => Mautic\UserBundle\Controller\Api\RoleApiController::class,
             ],
         ],
         'public' => [
@@ -117,17 +117,17 @@ return [
         'other' => [
             // Authentication
             'mautic.user.manager' => [
-                'class'     => \Doctrine\ORM\EntityManager::class,
-                'arguments' => \Mautic\UserBundle\Entity\User::class,
+                'class'     => Doctrine\ORM\EntityManager::class,
+                'arguments' => Mautic\UserBundle\Entity\User::class,
                 'factory'   => ['@doctrine', 'getManagerForClass'],
             ],
             'mautic.permission.manager' => [
-                'class'     => \Doctrine\ORM\EntityManager::class,
-                'arguments' => \Mautic\UserBundle\Entity\Permission::class,
+                'class'     => Doctrine\ORM\EntityManager::class,
+                'arguments' => Mautic\UserBundle\Entity\Permission::class,
                 'factory'   => ['@doctrine', 'getManagerForClass'],
             ],
             'mautic.user.form_guard_authenticator' => [
-                'class'     => \Mautic\UserBundle\Security\Authenticator\FormAuthenticator::class,
+                'class'     => Mautic\UserBundle\Security\Authenticator\FormAuthenticator::class,
                 'arguments' => [
                     'mautic.helper.integration',
                     'security.password_hasher',
@@ -138,7 +138,7 @@ return [
                 ],
             ],
             'mautic.user.preauth_authenticator' => [
-                'class'     => \Mautic\UserBundle\Security\Authenticator\PreAuthAuthenticator::class,
+                'class'     => Mautic\UserBundle\Security\Authenticator\PreAuthAuthenticator::class,
                 'arguments' => [
                     'mautic.helper.integration',
                     'event_dispatcher',
@@ -149,7 +149,7 @@ return [
                 'public' => false,
             ],
             'mautic.user.provider' => [
-                'class'     => \Mautic\UserBundle\Security\Provider\UserProvider::class,
+                'class'     => Mautic\UserBundle\Security\Provider\UserProvider::class,
                 'arguments' => [
                     'mautic.user.repository',
                     'mautic.permission.repository',
@@ -159,7 +159,7 @@ return [
                 ],
             ],
             'mautic.security.authentication_listener' => [
-                'class'     => \Mautic\UserBundle\Security\Firewall\AuthenticationListener::class,
+                'class'     => Mautic\UserBundle\Security\Firewall\AuthenticationListener::class,
                 'arguments' => [
                     'mautic.security.authentication_handler',
                     'security.token_storage',
@@ -173,15 +173,15 @@ return [
                 'public' => false,
             ],
             'mautic.security.authentication_handler' => [
-                'class'     => \Mautic\UserBundle\Security\Authentication\AuthenticationHandler::class,
+                'class'     => Mautic\UserBundle\Security\Authentication\AuthenticationHandler::class,
                 'arguments' => [
                     'router',
                 ],
             ],
             'mautic.security.logout_handler' => [
-                'class'        => \Mautic\UserBundle\EventListener\LogoutListener::class,
+                'class'        => Mautic\UserBundle\EventListener\LogoutListener::class,
                 'tagArguments' => [
-                    'event'      => \Symfony\Component\Security\Http\Event\LogoutEvent::class,
+                    'event'      => Symfony\Component\Security\Http\Event\LogoutEvent::class,
                 ],
                 'tag'          => 'kernel.event_listener',
                 'arguments'    => [
@@ -193,7 +193,7 @@ return [
 
             // SAML
             'mautic.security.saml.credential_store' => [
-                'class'     => \Mautic\UserBundle\Security\SAML\Store\CredentialsStore::class,
+                'class'     => Mautic\UserBundle\Security\SAML\Store\CredentialsStore::class,
                 'arguments' => [
                     'mautic.helper.core_parameters',
                     '%mautic.saml_idp_entity_id%',
@@ -202,7 +202,7 @@ return [
             ],
 
             'mautic.security.saml.trust_store' => [
-                'class'     => \Mautic\UserBundle\Security\SAML\Store\TrustOptionsStore::class,
+                'class'     => Mautic\UserBundle\Security\SAML\Store\TrustOptionsStore::class,
                 'arguments' => [
                     'mautic.helper.core_parameters',
                     '%mautic.saml_idp_entity_id%',
@@ -211,7 +211,7 @@ return [
             ],
 
             'mautic.security.saml.entity_descriptor_store' => [
-                'class'     => \Mautic\UserBundle\Security\SAML\Store\EntityDescriptorStore::class,
+                'class'     => Mautic\UserBundle\Security\SAML\Store\EntityDescriptorStore::class,
                 'arguments' => [
                     'mautic.helper.core_parameters',
                 ],
@@ -219,7 +219,7 @@ return [
             ],
 
             'mautic.security.saml.id_store' => [
-                'class'     => \Mautic\UserBundle\Security\SAML\Store\IdStore::class,
+                'class'     => Mautic\UserBundle\Security\SAML\Store\IdStore::class,
                 'arguments' => [
                     'doctrine.orm.entity_manager',
                     'lightsaml.system.time_provider',
@@ -227,7 +227,7 @@ return [
             ],
 
             'mautic.security.saml.username_mapper' => [
-                'class'     => \Mautic\UserBundle\Security\SAML\User\UserMapper::class,
+                'class'     => Mautic\UserBundle\Security\SAML\User\UserMapper::class,
                 'arguments' => [
                     [
                         'email'     => '%mautic.saml_idp_email_attribute%',
@@ -239,7 +239,7 @@ return [
             ],
 
             'mautic.security.saml.user_creator' => [
-                'class'     => \Mautic\UserBundle\Security\SAML\User\UserCreator::class,
+                'class'     => Mautic\UserBundle\Security\SAML\User\UserCreator::class,
                 'arguments' => [
                     'doctrine.orm.entity_manager',
                     'mautic.security.saml.username_mapper',
@@ -249,7 +249,7 @@ return [
                 ],
             ],
             'mautic.user.model.user_token_service' => [
-                'class'     => \Mautic\UserBundle\Model\UserToken\UserTokenService::class,
+                'class'     => Mautic\UserBundle\Model\UserToken\UserTokenService::class,
                 'arguments' => [
                     'mautic.helper.random',
                     'mautic.user.repository.user_token',
@@ -258,13 +258,13 @@ return [
         ],
         'fixtures' => [
             'mautic.user.fixture.role' => [
-                'class'     => \Mautic\UserBundle\DataFixtures\ORM\LoadRoleData::class,
-                'tag'       => \Doctrine\Bundle\FixturesBundle\DependencyInjection\CompilerPass\FixturesCompilerPass::FIXTURE_TAG,
+                'class'     => Mautic\UserBundle\DataFixtures\ORM\LoadRoleData::class,
+                'tag'       => Doctrine\Bundle\FixturesBundle\DependencyInjection\CompilerPass\FixturesCompilerPass::FIXTURE_TAG,
                 'arguments' => ['mautic.user.model.role'],
             ],
             'mautic.user.fixture.user' => [
-                'class'     => \Mautic\UserBundle\DataFixtures\ORM\LoadUserData::class,
-                'tag'       => \Doctrine\Bundle\FixturesBundle\DependencyInjection\CompilerPass\FixturesCompilerPass::FIXTURE_TAG,
+                'class'     => Mautic\UserBundle\DataFixtures\ORM\LoadUserData::class,
+                'tag'       => Doctrine\Bundle\FixturesBundle\DependencyInjection\CompilerPass\FixturesCompilerPass::FIXTURE_TAG,
                 'arguments' => ['security.password_hasher'],
             ],
         ],

@@ -19,8 +19,8 @@ return function (ContainerConfigurator $configurator): void {
         ->exclude('../{'.implode(',', array_merge(MauticCoreExtension::DEFAULT_EXCLUDES, $excludes)).'}');
 
     $services->load('Mautic\\SmsBundle\\Entity\\', '../Entity/*Repository.php')
-        ->tag(\Doctrine\Bundle\DoctrineBundle\DependencyInjection\Compiler\ServiceRepositoryCompilerPass::REPOSITORY_SERVICE_TAG);
+        ->tag(Doctrine\Bundle\DoctrineBundle\DependencyInjection\Compiler\ServiceRepositoryCompilerPass::REPOSITORY_SERVICE_TAG);
 
-    $services->alias('mautic.sms.model.sms', \Mautic\SmsBundle\Model\SmsModel::class);
-    $services->alias('mautic.sms.repository.stat', \Mautic\SmsBundle\Entity\StatRepository::class);
+    $services->alias('mautic.sms.model.sms', Mautic\SmsBundle\Model\SmsModel::class);
+    $services->alias('mautic.sms.repository.stat', Mautic\SmsBundle\Entity\StatRepository::class);
 };

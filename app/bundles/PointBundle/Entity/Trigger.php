@@ -81,7 +81,7 @@ class Trigger extends FormEntity
         $builder = new ClassMetadataBuilder($metadata);
 
         $builder->setTable('point_triggers')
-            ->setCustomRepositoryClass(\Mautic\PointBundle\Entity\TriggerRepository::class);
+            ->setCustomRepositoryClass(TriggerRepository::class);
 
         $builder->addIdColumns();
 
@@ -148,7 +148,6 @@ class Trigger extends FormEntity
 
     /**
      * @param string $prop
-     * @param mixed  $val
      */
     protected function isChanged($prop, $val)
     {
@@ -303,66 +302,42 @@ class Trigger extends FormEntity
         return $this->publishDown;
     }
 
-    /**
-     * @return mixed
-     */
     public function getPoints()
     {
         return $this->points;
     }
 
-    /**
-     * @param mixed $points
-     */
     public function setPoints($points): void
     {
         $this->isChanged('points', $points);
         $this->points = $points;
     }
 
-    /**
-     * @return mixed
-     */
     public function getColor()
     {
         return $this->color;
     }
 
-    /**
-     * @param mixed $color
-     */
     public function setColor($color): void
     {
         $this->color = $color;
     }
 
-    /**
-     * @return mixed
-     */
     public function getTriggerExistingLeads()
     {
         return $this->triggerExistingLeads;
     }
 
-    /**
-     * @param mixed $triggerExistingLeads
-     */
     public function setTriggerExistingLeads($triggerExistingLeads): void
     {
         $this->triggerExistingLeads = $triggerExistingLeads;
     }
 
-    /**
-     * @return mixed
-     */
     public function getCategory()
     {
         return $this->category;
     }
 
-    /**
-     * @param mixed $category
-     */
     public function setCategory($category): void
     {
         $this->category = $category;

@@ -53,9 +53,6 @@ class HubspotApi extends CrmApi
         return $request;
     }
 
-    /**
-     * @return mixed
-     */
     public function getLeadFields($object = 'contacts')
     {
         if ('company' == $object) {
@@ -67,8 +64,6 @@ class HubspotApi extends CrmApi
 
     /**
      * Creates Hubspot lead.
-     *
-     * @return mixed
      */
     public function createLead(array $data, $lead, $updateLink = false)
     {
@@ -91,8 +86,6 @@ class HubspotApi extends CrmApi
 
     /**
      * gets Hubspot contact.
-     *
-     * @return mixed
      */
     public function getContacts($params = [])
     {
@@ -101,8 +94,6 @@ class HubspotApi extends CrmApi
 
     /**
      * gets Hubspot company.
-     *
-     * @return mixed
      */
     public function getCompanies($params, $id)
     {

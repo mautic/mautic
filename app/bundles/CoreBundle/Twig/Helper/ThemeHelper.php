@@ -15,9 +15,6 @@ final class ThemeHelper
 
     private string $themePath;
 
-    /**
-     * @var mixed
-     */
     private $config;
 
     /**
@@ -52,8 +49,6 @@ final class ThemeHelper
 
     /**
      * Return  name of the template.
-     *
-     * @return mixed
      */
     public function getName()
     {
@@ -72,8 +67,6 @@ final class ThemeHelper
 
     /**
      * Get the theme's config.
-     *
-     * @return mixed
      */
     public function getConfig()
     {

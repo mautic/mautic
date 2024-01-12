@@ -156,7 +156,7 @@ class ClientController extends FormController
         $flashes = [];
 
         if ('POST' == $request->getMethod()) {
-            /** @var \Mautic\ApiBundle\Model\ClientModel $model */
+            /** @var ClientModel $model */
             $model = $this->clientModel;
 
             $client = $model->getEntity($clientId);
@@ -195,8 +195,6 @@ class ClientController extends FormController
     }
 
     /**
-     * @param mixed $objectId
-     *
      * @return array|JsonResponse|RedirectResponse|Response
      */
     public function newAction(Request $request, $objectId = 0)
@@ -208,7 +206,7 @@ class ClientController extends FormController
         $apiMode = (0 === $objectId) ? $request->getSession()->get('mautic.client.filter.api_mode', 'oauth2') : $objectId;
         $request->getSession()->set('mautic.client.filter.api_mode', $apiMode);
 
-        /** @var \Mautic\ApiBundle\Model\ClientModel $model */
+        /** @var ClientModel $model */
         $model = $this->clientModel;
         $model->setApiMode($apiMode);
 
@@ -307,7 +305,7 @@ class ClientController extends FormController
             return $this->accessDenied();
         }
 
-        /** @var \Mautic\ApiBundle\Model\ClientModel $model */
+        /** @var ClientModel $model */
         $model     = $this->clientModel;
         $client    = $model->getEntity($objectId);
         $returnUrl = $this->generateUrl('mautic_client_index');
@@ -428,7 +426,7 @@ class ClientController extends FormController
         ];
 
         if ('POST' === $request->getMethod()) {
-            /** @var \Mautic\ApiBundle\Model\ClientModel $model */
+            /** @var ClientModel $model */
             $model  = $this->clientModel;
             $entity = $model->getEntity($objectId);
             if (null === $entity) {

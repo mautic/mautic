@@ -74,7 +74,7 @@ class FormModel extends CommonFormModel
      */
     public function getRepository()
     {
-        return $this->em->getRepository(\Mautic\FormBundle\Entity\Form::class);
+        return $this->em->getRepository(Form::class);
     }
 
     public function getPermissionBase(): string
@@ -121,7 +121,7 @@ class FormModel extends CommonFormModel
     }
 
     /**
-     * @throws \Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException
+     * @throws MethodNotAllowedHttpException
      */
     protected function dispatchEvent($action, &$entity, $isNew = false, Event $event = null): ?Event
     {
@@ -308,7 +308,7 @@ class FormModel extends CommonFormModel
         $deleteActions   = [];
         foreach ($actions as $actionId) {
             if (isset($existingActions[$actionId])) {
-                $actionEntity = $this->em->getReference(\Mautic\FormBundle\Entity\Action::class, (int) $actionId);
+                $actionEntity = $this->em->getReference(Action::class, (int) $actionId);
                 $entity->removeAction($actionEntity);
                 $deleteActions[] = $actionId;
             }
@@ -621,8 +621,6 @@ class FormModel extends CommonFormModel
 
     /**
      * Gets array of custom fields and submit actions from bundles subscribed FormEvents::FORM_ON_BUILD.
-     *
-     * @return mixed
      */
     public function getCustomComponents()
     {
@@ -719,7 +717,7 @@ class FormModel extends CommonFormModel
         $request  = $this->requestStack->getCurrentRequest();
 
         $fields = $form->getFields()->toArray();
-        /** @var \Mautic\FormBundle\Entity\Field $f */
+        /** @var Field $f */
         foreach ($fields as $f) {
             $alias = $f->getAlias();
             if ($request->query->has($alias)) {
@@ -740,13 +738,13 @@ class FormModel extends CommonFormModel
         $autoFillFields    = [];
         $objectsToAutoFill = ['contact', 'company'];
 
-        /** @var \Mautic\FormBundle\Entity\Field $field */
+        /** @var Field $field */
         foreach ($fields as $key => $field) {
             // we want work just with matched autofill fields
             if (
-                $field->getMappedField() &&
-                $field->getIsAutoFill() &&
-                in_array($field->getMappedObject(), $objectsToAutoFill)
+                $field->getMappedField()
+                && $field->getIsAutoFill()
+                && in_array($field->getMappedObject(), $objectsToAutoFill)
             ) {
                 $autoFillFields[$key] = $field;
             }

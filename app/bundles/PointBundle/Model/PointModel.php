@@ -63,7 +63,7 @@ class PointModel extends CommonFormModel
      */
     public function getRepository()
     {
-        return $this->em->getRepository(\Mautic\PointBundle\Entity\Point::class);
+        return $this->em->getRepository(Point::class);
     }
 
     public function getPermissionBase(): string
@@ -142,8 +142,6 @@ class PointModel extends CommonFormModel
 
     /**
      * Gets array of custom actions from bundles subscribed PointEvents::POINT_ON_BUILD.
-     *
-     * @return mixed
      */
     public function getPointActions()
     {
@@ -190,7 +188,7 @@ class PointModel extends CommonFormModel
         }
 
         // find all the actions for published points
-        /** @var \Mautic\PointBundle\Entity\PointRepository $repo */
+        /** @var PointRepository $repo */
         $repo            = $this->getRepository();
         $availablePoints = $repo->getPublishedByType($type);
         $ipAddress       = $this->ipLookupHelper->getIpAddress();

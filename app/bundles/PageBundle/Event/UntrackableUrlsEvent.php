@@ -15,9 +15,6 @@ class UntrackableUrlsEvent extends Event
         '{trackable=(.*?)}',
     ];
 
-    /**
-     * @param mixed $content
-     */
     public function __construct(
         private $content
     ) {

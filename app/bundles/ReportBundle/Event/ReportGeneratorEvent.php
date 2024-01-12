@@ -38,7 +38,7 @@ class ReportGeneratorEvent extends AbstractReportEvent
         private array $options, /**
      * QueryBuilder object.
      */
-    private QueryBuilder $queryBuilder,
+        private QueryBuilder $queryBuilder,
         private ChannelListHelper $channelListHelper
     ) {
         $this->report            = $report;
@@ -422,8 +422,6 @@ class ReportGeneratorEvent extends AbstractReportEvent
      * Get filter value from a specific filter.
      *
      * @param string $column
-     *
-     * @return mixed
      *
      * @throws \UnexpectedValueException
      */

@@ -31,9 +31,6 @@ class Responses
         }
     }
 
-    /**
-     * @param mixed $response
-     */
     public function setResponse(Event $event, $response): void
     {
         switch ($event->getEventType()) {

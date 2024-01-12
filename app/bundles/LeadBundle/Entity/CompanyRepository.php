@@ -95,13 +95,13 @@ class CompanyRepository extends CommonRepository implements CustomFieldRepositor
     /**
      * @param mixed[] $args
      *
-     * @return \Doctrine\ORM\QueryBuilder
+     * @return QueryBuilder
      */
     public function getEntitiesOrmQueryBuilder($order, array $args=[])
     {
         $q = $this->getEntityManager()->createQueryBuilder();
         $q->select($this->getTableAlias().','.$order)
-            ->from(\Mautic\LeadBundle\Entity\Company::class, $this->getTableAlias(), $this->getTableAlias().'.id');
+            ->from(Company::class, $this->getTableAlias(), $this->getTableAlias().'.id');
 
         return $q;
     }
@@ -380,8 +380,6 @@ class CompanyRepository extends CommonRepository implements CustomFieldRepositor
     /**
      * @param int $limit
      * @param int $offset
-     *
-     * @return mixed
      */
     public function getMostCompanies($query, $limit = 10, $offset = 0)
     {
@@ -456,7 +454,7 @@ class CompanyRepository extends CommonRepository implements CustomFieldRepositor
      *
      * @return array<array{id: string}>
      */
-    public function getCompanyIdsByUniqueFields($uniqueFieldsWithData, ?int $companyId = null, ?int $limit = null): array
+    public function getCompanyIdsByUniqueFields($uniqueFieldsWithData, int $companyId = null, int $limit = null): array
     {
         return $this->getCompanyFieldsByUniqueFields($uniqueFieldsWithData, 'c.id', $companyId, $limit);
     }
@@ -470,7 +468,7 @@ class CompanyRepository extends CommonRepository implements CustomFieldRepositor
      *
      * @return array<array{id: string}>
      */
-    public function getCompanyFieldsByUniqueFields($uniqueFieldsWithData, string $select, ?int $companyId = null, ?int $limit = null): array
+    public function getCompanyFieldsByUniqueFields($uniqueFieldsWithData, string $select, int $companyId = null, int $limit = null): array
     {
         $q = $this->getEntityManager()->getConnection()->createQueryBuilder()
             ->select($select)

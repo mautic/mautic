@@ -62,7 +62,7 @@ EOT
                 'mautic.core.command.transifex_no_credentials')
             );
 
-            return \Symfony\Component\Console\Command\Command::FAILURE;
+            return Command::FAILURE;
         }
 
         $resources = $transifex->getConnector(Resources::class);
@@ -127,7 +127,7 @@ EOT
             }
         );
 
-        return \Symfony\Component\Console\Command\Command::SUCCESS;
+        return Command::SUCCESS;
     }
 
     protected static $defaultDescription = 'Pushes Mautic translation resources to Transifex';

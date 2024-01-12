@@ -84,7 +84,7 @@ class LeadController extends FormController
 
         $this->setListFilters();
 
-        /** @var \Mautic\LeadBundle\Model\LeadModel $model */
+        /** @var LeadModel $model */
         $model   = $this->getModel('lead');
         $session = $request->getSession();
         // set limits
@@ -233,7 +233,7 @@ class LeadController extends FormController
 
     public function quickAddAction(Request $request): Response
     {
-        /** @var \Mautic\LeadBundle\Model\LeadModel $model */
+        /** @var LeadModel $model */
         $model = $this->getModel('lead.lead');
 
         // Get the quick add form
@@ -297,7 +297,7 @@ class LeadController extends FormController
      */
     public function viewAction(Request $request, IntegrationHelper $integrationHelper, $objectId)
     {
-        /** @var \Mautic\LeadBundle\Model\LeadModel $model */
+        /** @var LeadModel $model */
         $model = $this->getModel('lead.lead');
 
         $lead = $model->getEntity($objectId);
@@ -329,7 +329,7 @@ class LeadController extends FormController
             );
         }
 
-        /** @var \Mautic\LeadBundle\Entity\Lead $lead */
+        /** @var Lead $lead */
         $model->getRepository()->refetchEntity($lead);
 
         // set some permissions
@@ -378,9 +378,9 @@ class LeadController extends FormController
         }
 
         // We need the DoNotContact repository to check if a lead is flagged as do not contact
-        $dnc = $this->doctrine->getManager()->getRepository(\Mautic\LeadBundle\Entity\DoNotContact::class)->getEntriesByLeadAndChannel($lead, 'email');
+        $dnc = $this->doctrine->getManager()->getRepository(DoNotContact::class)->getEntriesByLeadAndChannel($lead, 'email');
 
-        $dncSms = $this->doctrine->getManager()->getRepository(\Mautic\LeadBundle\Entity\DoNotContact::class)->getEntriesByLeadAndChannel($lead, 'sms');
+        $dncSms = $this->doctrine->getManager()->getRepository(DoNotContact::class)->getEntriesByLeadAndChannel($lead, 'sms');
 
         $integrationRepo = $this->doctrine->getRepository(IntegrationEntity::class);
 
@@ -816,7 +816,7 @@ class LeadController extends FormController
      */
     public function mergeAction(Request $request, ContactMerger $contactMerger, $objectId)
     {
-        /** @var \Mautic\LeadBundle\Model\LeadModel $model */
+        /** @var LeadModel $model */
         $model    = $this->getModel('lead');
         $mainLead = $model->getEntity($objectId);
         $page     = $request->getSession()->get('mautic.lead.page', 1);
@@ -1215,7 +1215,7 @@ class LeadController extends FormController
      */
     public function listAction($objectId): Response
     {
-        /** @var \Mautic\LeadBundle\Model\LeadModel $model */
+        /** @var LeadModel $model */
         $model = $this->getModel('lead');
         $lead  = $model->getEntity($objectId);
 
@@ -1226,7 +1226,7 @@ class LeadController extends FormController
                 $lead->getPermissionUser()
             )
         ) {
-            /** @var \Mautic\LeadBundle\Model\ListModel $listModel */
+            /** @var ListModel $listModel */
             $listModel = $this->getModel('lead.list');
             $lists     = $listModel->getUserLists();
 
@@ -1253,7 +1253,7 @@ class LeadController extends FormController
      */
     public function companyAction($objectId): Response
     {
-        /** @var \Mautic\LeadBundle\Model\LeadModel $model */
+        /** @var LeadModel $model */
         $model = $this->getModel('lead');
         $lead  = $model->getEntity($objectId);
 
@@ -1336,10 +1336,10 @@ class LeadController extends FormController
     {
         $valid = $cancelled = false;
 
-        /** @var \Mautic\LeadBundle\Model\LeadModel $model */
+        /** @var LeadModel $model */
         $model = $this->getModel('lead');
 
-        /** @var \Mautic\LeadBundle\Entity\Lead $lead */
+        /** @var Lead $lead */
         $lead = $model->getEntity($objectId);
 
         if (null === $lead
@@ -1383,7 +1383,7 @@ class LeadController extends FormController
         }
 
         // Check if lead has a bounce status
-        $dnc    = $this->doctrine->getManager()->getRepository(\Mautic\LeadBundle\Entity\DoNotContact::class)->getEntriesByLeadAndChannel($lead, 'email');
+        $dnc    = $this->doctrine->getManager()->getRepository(DoNotContact::class)->getEntriesByLeadAndChannel($lead, 'email');
 
         $action = $this->generateUrl('mautic_contact_action', ['objectAction' => 'email', 'objectId' => $objectId]);
         $form   = $this->formFactory->create(EmailType::class, $email, ['action' => $action]);
@@ -1529,7 +1529,7 @@ class LeadController extends FormController
         $campaignModel = $this->getModel('campaign');
 
         if ('POST' === $request->getMethod()) {
-            /** @var \Mautic\LeadBundle\Model\LeadModel $model */
+            /** @var LeadModel $model */
             $model = $this->getModel('lead');
             $data  = $request->request->all()['lead_batch'] ?? [];
             $ids   = json_decode($data['ids'], true);
@@ -1651,7 +1651,7 @@ class LeadController extends FormController
     public function batchDncAction(Request $request, \Mautic\LeadBundle\Model\DoNotContact $doNotContact, $objectId = 0)
     {
         if ('POST' === $request->getMethod()) {
-            /** @var \Mautic\LeadBundle\Model\LeadModel $model */
+            /** @var LeadModel $model */
             $model = $this->getModel('lead');
 
             $data = $request->request->all()['lead_batch_dnc'] ?? [];
@@ -1736,7 +1736,7 @@ class LeadController extends FormController
     public function batchStagesAction(Request $request, $objectId = 0)
     {
         if ('POST' === $request->getMethod()) {
-            /** @var \Mautic\LeadBundle\Model\LeadModel $model */
+            /** @var LeadModel $model */
             $model = $this->getModel('lead');
             $data  = $request->request->all()['lead_batch_stage'] ?? [];
             $ids   = json_decode($data['ids'], true);
@@ -1842,7 +1842,7 @@ class LeadController extends FormController
     public function batchOwnersAction(Request $request, $objectId = 0)
     {
         if ('POST' == $request->getMethod()) {
-            /** @var \Mautic\LeadBundle\Model\LeadModel $model */
+            /** @var LeadModel $model */
             $model = $this->getModel('lead');
             $data  = $request->request->all()['lead_batch_owner'] ?? [];
             $ids   = json_decode($data['ids'], true);
@@ -1959,7 +1959,7 @@ class LeadController extends FormController
             return $this->contactExportCSVScheduler($dispatcher, $permissions);
         }
 
-        /** @var \Mautic\LeadBundle\Model\LeadModel $model */
+        /** @var LeadModel $model */
         $model      = $this->getModel('lead');
         $session    = $request->getSession();
         $search     = $session->get('mautic.lead.filter', '');
@@ -2096,10 +2096,10 @@ class LeadController extends FormController
      */
     public function contactStatsAction(int $objectId)
     {
-        /** @var \Mautic\LeadBundle\Model\LeadModel $model */
+        /** @var LeadModel $model */
         $model = $this->getModel('lead.lead');
 
-        /** @var \Mautic\LeadBundle\Entity\Lead $lead */
+        /** @var Lead $lead */
         $lead = $model->getEntity($objectId);
 
         if (!$this->security->hasEntityAccess(

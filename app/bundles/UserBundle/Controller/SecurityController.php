@@ -31,8 +31,8 @@ class SecurityController extends CommonController implements EventSubscriberInte
         \assert($authChecker instanceof AuthorizationCheckerInterface);
 
         // redirect user if they are already authenticated
-        if ($authChecker->isGranted('IS_AUTHENTICATED_FULLY') ||
-            $authChecker->isGranted('IS_AUTHENTICATED_REMEMBERED')
+        if ($authChecker->isGranted('IS_AUTHENTICATED_FULLY')
+            || $authChecker->isGranted('IS_AUTHENTICATED_REMEMBERED')
         ) {
             $redirectUrl = $this->generateUrl('mautic_dashboard_index');
             $event->setResponse(new RedirectResponse($redirectUrl));

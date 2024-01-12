@@ -20,7 +20,7 @@ abstract class AbstractPluginBundle extends PluginBundleBase
      *
      * @throws \Exception
      */
-    public static function onPluginUpdate(Plugin $plugin, MauticFactory $factory, $metadata = null, ?Schema $installedSchema = null): void
+    public static function onPluginUpdate(Plugin $plugin, MauticFactory $factory, $metadata = null, Schema $installedSchema = null): void
     {
         $entityManager = $factory->getEntityManager();
         $tablePrefix   = (string) $factory->getParameter('mautic.db_table_prefix');

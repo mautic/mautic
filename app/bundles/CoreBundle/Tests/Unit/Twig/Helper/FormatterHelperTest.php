@@ -83,9 +83,6 @@ class FormatterHelperTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider stringProvider
-     *
-     * @param mixed $input
-     * @param mixed $expected
      */
     public function testNormalizeStringValue($input, $expected): void
     {

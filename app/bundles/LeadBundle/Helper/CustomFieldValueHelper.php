@@ -36,9 +36,6 @@ class CustomFieldValueHelper
         return $customFields;
     }
 
-    /**
-     * @return mixed
-     */
     private static function normalizeValue(array $field)
     {
         $value      = $field['value'] ?? '';
@@ -73,7 +70,6 @@ class CustomFieldValueHelper
     }
 
     /**
-     * @param mixed                          $value
      * @param string|null                    $type
      * @param string|array<int, string>|null $properties
      *

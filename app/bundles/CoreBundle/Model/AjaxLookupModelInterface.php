@@ -17,8 +17,6 @@ interface AjaxLookupModelInterface
      * @param string $filter
      * @param int    $limit
      * @param int    $start
-     *
-     * @return mixed
      */
     public function getLookupResults($type, $filter = '', $limit = 10, $start = 0);
 

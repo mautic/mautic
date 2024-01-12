@@ -139,8 +139,6 @@ class CategoryRepository extends CommonRepository
      * @param string $bundle
      * @param string $alias
      * @param object $entity
-     *
-     * @return mixed
      */
     public function checkUniqueCategoryAlias($bundle, $alias, $entity = null)
     {

@@ -62,8 +62,6 @@ class CampaignLeadChangeEvent extends Event
 
     /**
      * Returns added or removed.
-     *
-     * @return mixed
      */
     public function getAction()
     {

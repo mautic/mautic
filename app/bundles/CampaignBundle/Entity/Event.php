@@ -178,7 +178,7 @@ class Event implements ChannelInterface
         $builder = new ClassMetadataBuilder($metadata);
 
         $builder->setTable('campaign_events')
-            ->setCustomRepositoryClass(\Mautic\CampaignBundle\Entity\EventRepository::class)
+            ->setCustomRepositoryClass(EventRepository::class)
             ->addIndex(['type', 'event_type'], 'campaign_event_search')
             ->addIndex(['event_type'], 'campaign_event_type')
             ->addIndex(['channel', 'channel_id'], 'campaign_event_channel');
@@ -392,7 +392,6 @@ class Event implements ChannelInterface
 
     /**
      * @param string $prop
-     * @param mixed  $val
      */
     private function isChanged($prop, $val): void
     {
@@ -499,7 +498,7 @@ class Event implements ChannelInterface
     /**
      * Get campaign.
      *
-     * @return \Mautic\CampaignBundle\Entity\Campaign
+     * @return Campaign
      */
     public function getCampaign()
     {
@@ -730,24 +729,18 @@ class Event implements ChannelInterface
     /**
      * Get parent.
      *
-     * @return \Mautic\CampaignBundle\Entity\Event
+     * @return Event
      */
     public function getParent()
     {
         return $this->parent;
     }
 
-    /**
-     * @return mixed
-     */
     public function getTriggerDate()
     {
         return $this->triggerDate;
     }
 
-    /**
-     * @param mixed $triggerDate
-     */
     public function setTriggerDate($triggerDate): void
     {
         $this->isChanged('triggerDate', $triggerDate);
@@ -798,26 +791,17 @@ class Event implements ChannelInterface
         return $this;
     }
 
-    /**
-     * @return mixed
-     */
     public function getTriggerIntervalUnit()
     {
         return $this->triggerIntervalUnit;
     }
 
-    /**
-     * @param mixed $triggerIntervalUnit
-     */
     public function setTriggerIntervalUnit($triggerIntervalUnit): void
     {
         $this->isChanged('triggerIntervalUnit', $triggerIntervalUnit);
         $this->triggerIntervalUnit = $triggerIntervalUnit;
     }
 
-    /**
-     * @return mixed
-     */
     public function getEventType()
     {
         return $this->eventType;
@@ -834,68 +818,44 @@ class Event implements ChannelInterface
         return $this;
     }
 
-    /**
-     * @return mixed
-     */
     public function getTriggerMode()
     {
         return $this->triggerMode;
     }
 
-    /**
-     * @param mixed $triggerMode
-     */
     public function setTriggerMode($triggerMode): void
     {
         $this->isChanged('triggerMode', $triggerMode);
         $this->triggerMode = $triggerMode;
     }
 
-    /**
-     * @return mixed
-     */
     public function getDecisionPath()
     {
         return $this->decisionPath;
     }
 
-    /**
-     * @param mixed $decisionPath
-     */
     public function setDecisionPath($decisionPath): void
     {
         $this->isChanged('decisionPath', $decisionPath);
         $this->decisionPath = $decisionPath;
     }
 
-    /**
-     * @return mixed
-     */
     public function getTempId()
     {
         return $this->tempId;
     }
 
-    /**
-     * @param mixed $tempId
-     */
     public function setTempId($tempId): void
     {
         $this->isChanged('tempId', $tempId);
         $this->tempId = $tempId;
     }
 
-    /**
-     * @return mixed
-     */
     public function getChannel()
     {
         return $this->channel;
     }
 
-    /**
-     * @param mixed $channel
-     */
     public function setChannel($channel): void
     {
         $this->isChanged('channel', $channel);

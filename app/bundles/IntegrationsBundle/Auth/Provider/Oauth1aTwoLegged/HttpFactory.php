@@ -37,7 +37,7 @@ class HttpFactory implements AuthProviderInterface
      *
      * @throws PluginNotConfiguredException
      */
-    public function getClient(AuthCredentialsInterface $credentials, ?AuthConfigInterface $config = null): ClientInterface
+    public function getClient(AuthCredentialsInterface $credentials, AuthConfigInterface $config = null): ClientInterface
     {
         // Return cached initialized client if there is one.
         if (!empty($this->initializedClients[$credentials->getConsumerKey()])) {

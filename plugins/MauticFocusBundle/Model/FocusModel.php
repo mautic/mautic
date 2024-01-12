@@ -93,7 +93,7 @@ class FocusModel extends FormModel
      */
     public function getRepository()
     {
-        return $this->em->getRepository(\MauticPlugin\MauticFocusBundle\Entity\Focus::class);
+        return $this->em->getRepository(Focus::class);
     }
 
     /**
@@ -101,7 +101,7 @@ class FocusModel extends FormModel
      */
     public function getStatRepository()
     {
-        return $this->em->getRepository(\MauticPlugin\MauticFocusBundle\Entity\Stat::class);
+        return $this->em->getRepository(Stat::class);
     }
 
     /**
@@ -275,8 +275,6 @@ class FocusModel extends FormModel
     /**
      * Add a stat entry.
      *
-     * @param mixed                                                    $type
-     * @param mixed                                                    $data
      * @param array<int|string|array<int|string>>|Lead|Submission|null $lead
      */
     public function addStat(Focus $focus, $type, $data = null, $lead = null): ?Stat
@@ -321,7 +319,7 @@ class FocusModel extends FormModel
     }
 
     /**
-     * @throws \Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException
+     * @throws MethodNotAllowedHttpException
      */
     protected function dispatchEvent($action, &$entity, $isNew = false, Event $event = null): ?Event
     {

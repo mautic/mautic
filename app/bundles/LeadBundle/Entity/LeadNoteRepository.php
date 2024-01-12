@@ -26,8 +26,6 @@ class LeadNoteRepository extends CommonRepository
     }
 
     /**
-     * @return mixed
-     *
      * @throws \Doctrine\ORM\NoResultException
      * @throws \Doctrine\ORM\NonUniqueResultException
      */

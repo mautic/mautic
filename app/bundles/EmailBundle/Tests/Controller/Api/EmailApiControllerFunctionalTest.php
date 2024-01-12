@@ -401,9 +401,6 @@ class EmailApiControllerFunctionalTest extends MauticMysqlTestCase
         $testCustomReplyTo();
     }
 
-    /**
-     * @param mixed $value
-     */
     private function setPrivateProperty(object $object, string $property, $value): void
     {
         $reflector = new \ReflectionProperty($object::class, $property);

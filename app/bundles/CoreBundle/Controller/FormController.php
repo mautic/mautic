@@ -94,49 +94,31 @@ class FormController extends AbstractStandardFormController
         return $this->deprecatedModelName;
     }
 
-    /**
-     * @return mixed
-     */
     protected function getJsLoadMethodPrefix()
     {
         return $this->deprecatedMauticContent;
     }
 
-    /**
-     * @return mixed
-     */
     protected function getRouteBase()
     {
         return $this->deprecatedRouteBase;
     }
 
-    /**
-     * @return mixed
-     */
     protected function getSessionBase($objectId = null)
     {
         return $this->deprecatedSessionBase ?? parent::getSessionBase($objectId);
     }
 
-    /**
-     * @return mixed
-     */
     protected function getTemplateBase()
     {
         return $this->deprecatedTemplateBase;
     }
 
-    /**
-     * @return mixed
-     */
     protected function getTranslationBase()
     {
         return $this->deprecatedTranslationBase;
     }
 
-    /**
-     * @return mixed
-     */
     protected function getPermissionBase()
     {
         return $this->deprecatedPermissionBase;

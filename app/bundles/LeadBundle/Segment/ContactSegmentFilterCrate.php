@@ -174,9 +174,6 @@ class ContactSegmentFilterCrate
         $this->operator = $operator;
     }
 
-    /**
-     * @return mixed
-     */
     public function getNullValue()
     {
         return $this->nullValue;

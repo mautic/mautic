@@ -101,7 +101,6 @@ class IndexSchemaHelper
     }
 
     /**
-     * @param mixed  $columns
      * @param string $name
      * @param array  $options
      *

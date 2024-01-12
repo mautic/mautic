@@ -15,14 +15,8 @@ trait TranslationEntityTrait
      */
     public $languageSlug;
 
-    /**
-     * @var mixed
-     **/
     private $translationChildren;
 
-    /**
-     * @var mixed
-     **/
     private $translationParent;
 
     /**
@@ -77,7 +71,7 @@ trait TranslationEntityTrait
     /**
      * Get translated items.
      *
-     * @return \Doctrine\Common\Collections\Collection
+     * @return Collection
      */
     public function getTranslationChildren()
     {
@@ -102,8 +96,6 @@ trait TranslationEntityTrait
 
     /**
      * Get translation parent.
-     *
-     * @return mixed
      */
     public function getTranslationParent()
     {
@@ -218,9 +210,6 @@ trait TranslationEntityTrait
         return [$parent, $children];
     }
 
-    /**
-     * @return mixed
-     */
     protected function getAccumulativeTranslationCount($getter, $variantParent = null)
     {
         $count = 0;

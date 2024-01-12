@@ -42,14 +42,8 @@ abstract class AbstractFormFieldHelper
      */
     protected $translator;
 
-    /**
-     * @return mixed
-     */
     abstract public function setTranslationKeyPrefix();
 
-    /**
-     * @return mixed
-     */
     abstract public function getTypes();
 
     public function __construct()
@@ -116,8 +110,6 @@ abstract class AbstractFormFieldHelper
     /**
      * Same as parseList method above but it will return labels as keys.
      *
-     * @param mixed $list
-     *
      * @return mixed[]
      */
     public static function parseListForChoices($list): array
@@ -137,8 +129,6 @@ abstract class AbstractFormFieldHelper
     }
 
     /**
-     * @param mixed $list
-     *
      * @return mixed[]
      */
     public static function parseBooleanList($list): array
@@ -247,7 +237,6 @@ abstract class AbstractFormFieldHelper
     }
 
     /**
-     * @param mixed                 $list
      * @param ListParserInterface[] $parsers
      *
      * @return mixed[]

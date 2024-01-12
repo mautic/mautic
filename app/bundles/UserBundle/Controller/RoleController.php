@@ -17,7 +17,7 @@ class RoleController extends FormController
      *
      * @param int $page
      *
-     * @return \Symfony\Component\HttpFoundation\Response
+     * @return Response
      */
     public function indexAction(Request $request, PageHelperFactoryInterface $pageHelperFactory, $page = 1)
     {
@@ -194,7 +194,7 @@ class RoleController extends FormController
             return $this->accessDenied();
         }
 
-        /** @var \Mautic\UserBundle\Model\RoleModel $model */
+        /** @var RoleModel $model */
         $model  = $this->getModel('user.role');
         $entity = $model->getEntity($objectId);
 

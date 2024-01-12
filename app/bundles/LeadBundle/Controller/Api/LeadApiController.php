@@ -88,7 +88,7 @@ class LeadApiController extends CommonApiController
     /**
      * Obtains a list of users for lead owner edits.
      *
-     * @return \Symfony\Component\HttpFoundation\Response
+     * @return Response
      */
     public function getOwnersAction(Request $request)
     {
@@ -114,7 +114,7 @@ class LeadApiController extends CommonApiController
     /**
      * Obtains a list of custom fields.
      *
-     * @return \Symfony\Component\HttpFoundation\Response
+     * @return Response
      */
     public function getFieldsAction()
     {
@@ -147,7 +147,7 @@ class LeadApiController extends CommonApiController
     /**
      * Obtains a list of notes on a specific lead.
      *
-     * @return \Symfony\Component\HttpFoundation\Response
+     * @return Response
      */
     public function getNotesAction(Request $request, $id)
     {
@@ -199,7 +199,7 @@ class LeadApiController extends CommonApiController
     /**
      * Obtains a list of devices on a specific lead.
      *
-     * @return \Symfony\Component\HttpFoundation\Response
+     * @return Response
      */
     public function getDevicesAction(Request $request, $id)
     {
@@ -251,7 +251,7 @@ class LeadApiController extends CommonApiController
     /**
      * Obtains a list of contact segments the contact is in.
      *
-     * @return \Symfony\Component\HttpFoundation\Response
+     * @return Response
      */
     public function getListsAction($id)
     {
@@ -289,7 +289,7 @@ class LeadApiController extends CommonApiController
     /**
      * Obtains a list of contact companies the contact is in.
      *
-     * @return \Symfony\Component\HttpFoundation\Response
+     * @return Response
      */
     public function getCompaniesAction($id)
     {
@@ -319,7 +319,7 @@ class LeadApiController extends CommonApiController
     /**
      * Obtains a list of campaigns the lead is part of.
      *
-     * @return \Symfony\Component\HttpFoundation\Response
+     * @return Response
      */
     public function getCampaignsAction($id)
     {
@@ -364,7 +364,7 @@ class LeadApiController extends CommonApiController
     /**
      * Obtains a list of contact events.
      *
-     * @return \Symfony\Component\HttpFoundation\Response
+     * @return Response
      */
     public function getActivityAction(Request $request, $id)
     {
@@ -384,7 +384,7 @@ class LeadApiController extends CommonApiController
     /**
      * Obtains a list of contact events.
      *
-     * @return \Symfony\Component\HttpFoundation\Response
+     * @return Response
      */
     public function getAllActivityAction(Request $request, $lead = null)
     {
@@ -412,7 +412,7 @@ class LeadApiController extends CommonApiController
     /**
      * Adds a DNC to the contact.
      *
-     * @return \Symfony\Component\HttpFoundation\Response
+     * @return Response
      */
     public function addDncAction(Request $request, $id, $channel)
     {
@@ -455,7 +455,7 @@ class LeadApiController extends CommonApiController
     /**
      * Removes a DNC from the contact.
      *
-     * @return \Symfony\Component\HttpFoundation\Response
+     * @return Response
      */
     public function removeDncAction($id, $channel)
     {
@@ -489,7 +489,7 @@ class LeadApiController extends CommonApiController
      * @param string           $method
      * @param array<mixed>|int $data
      *
-     * @return \Symfony\Component\HttpFoundation\Response
+     * @return Response
      */
     protected function applyUtmTagsAction($id, $method, $data)
     {
@@ -529,7 +529,7 @@ class LeadApiController extends CommonApiController
      *
      * @param int $id
      *
-     * @return \Symfony\Component\HttpFoundation\Response
+     * @return Response
      */
     public function addUtmTagsAction(Request $request, $id)
     {
@@ -542,7 +542,7 @@ class LeadApiController extends CommonApiController
      * @param int $id
      * @param int $utmid
      *
-     * @return \Symfony\Component\HttpFoundation\Response
+     * @return Response
      */
     public function removeUtmTagsAction($id, $utmid)
     {

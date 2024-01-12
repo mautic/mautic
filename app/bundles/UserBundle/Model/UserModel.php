@@ -58,7 +58,7 @@ class UserModel extends FormModel
     }
 
     /**
-     * @throws \Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException
+     * @throws MethodNotAllowedHttpException
      */
     public function saveEntity($entity, $unlock = true): void
     {
@@ -144,7 +144,7 @@ class UserModel extends FormModel
      */
     public function getSystemAdministrator()
     {
-        $adminRole = $this->em->getRepository(\Mautic\UserBundle\Entity\Role::class)->findOneBy(['isAdmin' => true]);
+        $adminRole = $this->em->getRepository(Role::class)->findOneBy(['isAdmin' => true]);
 
         return $this->getRepository()->findOneBy(
             [
@@ -155,7 +155,7 @@ class UserModel extends FormModel
     }
 
     /**
-     * @throws \Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException
+     * @throws MethodNotAllowedHttpException
      */
     protected function dispatchEvent($action, &$entity, $isNew = false, Event $event = null): ?Event
     {

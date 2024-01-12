@@ -29,14 +29,14 @@ class ConfigMetadata
             return;
         }
 
-        $config = (new \Tightenco\Collect\Support\Collection($config));
+        $config = (new Collection($config));
         $config->transform(
             function ($configGroup, string $configGroupName) {
                 if (!is_array($configGroup)) {
                     return $configGroup;
                 }
 
-                $configGroup = new \Tightenco\Collect\Support\Collection($configGroup);
+                $configGroup = new Collection($configGroup);
 
                 switch ($configGroupName) {
                     case 'ip_lookup_services':
@@ -68,7 +68,7 @@ class ConfigMetadata
                     return $serviceGroup;
                 }
 
-                $serviceGroup = new \Tightenco\Collect\Support\Collection($serviceGroup);
+                $serviceGroup = new Collection($serviceGroup);
                 $filtered     = $serviceGroup->reject(
                     fn ($serviceDefinition): bool =>
                         // Remove optional services (has argument optional = true) if the service class does not exist

@@ -174,9 +174,6 @@ class LegacyEventDispatcher
         return $campaignEvent;
     }
 
-    /**
-     * @return mixed
-     */
     private function dispatchCallback(array $settings, LeadEventLog $log)
     {
         @trigger_error('callback is deprecated. Convert to using batchEventName.', E_USER_DEPRECATED);

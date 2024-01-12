@@ -30,7 +30,7 @@ class TranslatorExtension extends AbstractExtension
         return $this->translator->getJsLang();
     }
 
-    public function translatorHasId(string $id, ?string $domain = null, ?string $locale = null): bool
+    public function translatorHasId(string $id, string $domain = null, string $locale = null): bool
     {
         return $this->translator->hasId($id, $domain, $locale);
     }
@@ -41,7 +41,7 @@ class TranslatorExtension extends AbstractExtension
      *
      * @param array<mixed> $parameters
      */
-    public function translatorConditional(string $preferred, string $alternative, array $parameters = [], ?string $domain = null, ?string $locale = null): string
+    public function translatorConditional(string $preferred, string $alternative, array $parameters = [], string $domain = null, string $locale = null): string
     {
         return $this->translator->transConditional($preferred, $alternative, $parameters, $domain, $locale);
     }

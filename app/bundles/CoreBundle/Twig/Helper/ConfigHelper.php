@@ -18,11 +18,6 @@ final class ConfigHelper
     ) {
     }
 
-    /**
-     * @param mixed $default
-     *
-     * @return mixed
-     */
     public function get(string $name, $default = null)
     {
         return $this->coreParametersHelper->get($name, $default);

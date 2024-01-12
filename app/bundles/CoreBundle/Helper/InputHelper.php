@@ -96,8 +96,6 @@ class InputHelper
 
     /**
      * Wrapper to InputHelper.
-     *
-     * @return mixed
      */
     public static function __callStatic($name, $arguments)
     {
@@ -108,11 +106,7 @@ class InputHelper
      * Wrapper function to clean inputs.  $mask can be an array of keys as the field names and values as the cleaning
      * function to be used for the specific field.
      *
-     * @param mixed $value
-     * @param mixed $mask
-     * @param bool  $urldecode
-     *
-     * @return mixed
+     * @param bool $urldecode
      */
     public static function _($value, $mask = 'clean', $urldecode = false)
     {
@@ -192,7 +186,7 @@ class InputHelper
      *
      * @param string[] $allowedCharacters
      */
-    public static function alphanum(string $value, bool $urldecode = false, ?string $convertSpacesTo = null, array $allowedCharacters = []): string
+    public static function alphanum(string $value, bool $urldecode = false, string $convertSpacesTo = null, array $allowedCharacters = []): string
     {
         if ($urldecode) {
             $value = urldecode($value);
@@ -261,7 +255,6 @@ class InputHelper
      *
      * @param bool|false         $urldecode
      * @param array<string>|null $allowedProtocols
-     * @param mixed              $defaultProtocol
      * @param array<string>      $removeQuery
      * @param bool|false         $ignoreFragment
      *
@@ -479,8 +472,6 @@ class InputHelper
 
     /**
      * Converts UTF8 into Latin.
-     *
-     * @return mixed
      */
     public static function transliterate($value)
     {

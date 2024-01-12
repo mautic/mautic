@@ -28,9 +28,6 @@ final class VariableExpresserHelper implements VariableExpresserHelperInterface
         return $this->valueNormalizer->normalizeForMautic($encodedValueDAO->getType(), $value);
     }
 
-    /**
-     * @param mixed $var
-     */
     public function encodeVariable($var): EncodedValueDAO
     {
         if (is_null($var)) {

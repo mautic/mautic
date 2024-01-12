@@ -30,17 +30,11 @@ class MessageQueueBatchProcessEvent extends Event
         return $this->messages;
     }
 
-    /**
-     * @return mixed
-     */
     public function getChannel()
     {
         return $this->channel;
     }
 
-    /**
-     * @return mixed
-     */
     public function getChannelId()
     {
         return $this->channelId;

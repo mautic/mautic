@@ -27,10 +27,10 @@ class TokenHelper
                     continue;
                 }
                 $form = $this->formModel->getEntity($id);
-                if (null !== $form &&
-                    (
-                        $form->isPublished(false) ||
-                        $this->security->hasEntityAccess(
+                if (null !== $form
+                    && (
+                        $form->isPublished(false)
+                        || $this->security->hasEntityAccess(
                             'form:forms:viewown', 'form:forms:viewother', $form->getCreatedBy()
                         )
                     )

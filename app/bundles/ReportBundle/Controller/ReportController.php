@@ -427,7 +427,7 @@ class ReportController extends FormController
         );
     }
 
-    public function newAction(ReportModel $model, Request $request, ?Report $entity = null): Response
+    public function newAction(ReportModel $model, Request $request, Report $entity = null): Response
     {
         if (!$this->security->isGranted('report:reports:create')) {
             return $this->accessDenied();
@@ -729,7 +729,7 @@ class ReportController extends FormController
      */
     public function exportAction(Request $request, $objectId, $format = 'csv')
     {
-        /** @var \Mautic\ReportBundle\Model\ReportModel $model */
+        /** @var ReportModel $model */
         $model    = $this->getModel('report');
         $entity   = $model->getEntity($objectId);
         $security = $this->security;
@@ -834,10 +834,10 @@ class ReportController extends FormController
             throw new \Exception($this->translator->trans('mautic.format.invalid', ['%format%' => $format, '%validFormats%' => 'csv']));
         }
 
-        /** @var \Mautic\ReportBundle\Model\ReportModel $model */
+        /** @var ReportModel $model */
         $model = $this->getModel('report');
 
-        /** @var \Mautic\ReportBundle\Entity\Report $report */
+        /** @var Report $report */
         $report = $model->getEntity($reportId);
 
         /** @var \Mautic\CoreBundle\Security\Permissions\CorePermissions $security */

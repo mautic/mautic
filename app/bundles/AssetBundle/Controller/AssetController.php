@@ -223,7 +223,7 @@ class AssetController extends FormController
      */
     public function previewAction(Request $request, $objectId)
     {
-        /** @var \Mautic\AssetBundle\Model\AssetModel $model */
+        /** @var AssetModel $model */
         $model       = $this->getModel('asset');
         $activeAsset = $model->getEntity($objectId);
 
@@ -275,7 +275,7 @@ class AssetController extends FormController
      */
     public function newAction(Request $request, CoreParametersHelper $parametersHelper, UploaderHelper $uploaderHelper, $entity = null)
     {
-        /** @var \Mautic\AssetBundle\Model\AssetModel $model */
+        /** @var AssetModel $model */
         $model = $this->getModel('asset');
 
         /** @var \Mautic\AssetBundle\Entity\Asset $entity */
@@ -413,7 +413,7 @@ class AssetController extends FormController
      */
     public function editAction(Request $request, UploaderHelper $uploaderHelper, $objectId, $ignorePost = false)
     {
-        /** @var \Mautic\AssetBundle\Model\AssetModel $model */
+        /** @var AssetModel $model */
         $model  = $this->getModel('asset');
         $entity = $model->getEntity($objectId);
 
@@ -577,14 +577,14 @@ class AssetController extends FormController
      */
     public function cloneAction(Request $request, CoreParametersHelper $parametersHelper, UploaderHelper $uploaderHelper, $objectId)
     {
-        /** @var \Mautic\AssetBundle\Model\AssetModel $model */
+        /** @var AssetModel $model */
         $model  = $this->getModel('asset');
         $entity = $model->getEntity($objectId);
         $clone  = null;
 
         if (null != $entity) {
-            if (!$this->security->isGranted('asset:assets:create') ||
-                !$this->security->hasEntityAccess(
+            if (!$this->security->isGranted('asset:assets:create')
+                || !$this->security->hasEntityAccess(
                     'asset:assets:viewown', 'asset:assets:viewother', $entity->getCreatedBy()
                 )
             ) {
@@ -625,7 +625,7 @@ class AssetController extends FormController
         ];
 
         if ('POST' === $request->getMethod()) {
-            /** @var \Mautic\AssetBundle\Model\AssetModel $model */
+            /** @var AssetModel $model */
             $model  = $this->getModel('asset');
             $entity = $model->getEntity($objectId);
 
@@ -688,7 +688,7 @@ class AssetController extends FormController
         ];
 
         if ('POST' === $request->getMethod()) {
-            /** @var \Mautic\AssetBundle\Model\AssetModel $model */
+            /** @var AssetModel $model */
             $model     = $this->getModel('asset');
             $ids       = json_decode($request->query->get('ids', '{}'));
             $deleteIds = [];

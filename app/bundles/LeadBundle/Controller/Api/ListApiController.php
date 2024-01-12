@@ -79,7 +79,7 @@ class ListApiController extends CommonApiController
     /**
      * Obtains a list of smart lists for the user.
      *
-     * @return \Symfony\Component\HttpFoundation\Response
+     * @return Response
      */
     public function getListsAction()
     {
@@ -99,7 +99,7 @@ class ListApiController extends CommonApiController
      * @param int $id     List ID
      * @param int $leadId Lead ID
      *
-     * @return \Symfony\Component\HttpFoundation\Response
+     * @return Response
      *
      * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
      */
@@ -136,7 +136,7 @@ class ListApiController extends CommonApiController
      *
      * @param int $id segement ID
      *
-     * @return \Symfony\Component\HttpFoundation\Response
+     * @return Response
      *
      * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
      */
@@ -184,7 +184,7 @@ class ListApiController extends CommonApiController
      * @param int $id     List ID
      * @param int $leadId Lead ID
      *
-     * @return \Symfony\Component\HttpFoundation\Response
+     * @return Response
      *
      * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
      */
@@ -219,7 +219,6 @@ class ListApiController extends CommonApiController
     /**
      * Checks if user has permission to access retrieved entity.
      *
-     * @param mixed  $entity
      * @param string $action view|create|edit|publish|delete
      *
      * @return bool

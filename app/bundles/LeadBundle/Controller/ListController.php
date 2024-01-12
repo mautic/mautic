@@ -715,7 +715,7 @@ class ListController extends FormController
      */
     public function viewAction(Request $request, SegmentDependencies $segmentDependencies, SegmentCampaignShare $segmentCampaignShare, $objectId)
     {
-        /** @var \Mautic\LeadBundle\Model\ListModel $model */
+        /** @var ListModel $model */
         $model    = $this->getModel('lead.list');
         $security = $this->security;
 

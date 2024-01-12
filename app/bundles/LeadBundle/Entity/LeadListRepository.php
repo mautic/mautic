@@ -69,7 +69,7 @@ class LeadListRepository extends CommonRepository
      *
      * @return array
      */
-    public function getLists(?User $user = null, $alias = '', $id = '')
+    public function getLists(User $user = null, $alias = '', $id = '')
     {
         $q = $this->getEntityManager()->createQueryBuilder()
             ->from(LeadList::class, 'l', 'l.id');
@@ -107,8 +107,6 @@ class LeadListRepository extends CommonRepository
      * @param bool       $forList
      * @param bool       $singleArrayHydration
      * @param bool       $isPublic
-     *
-     * @return mixed
      */
     public function getLeadLists($lead, $forList = false, $singleArrayHydration = false, $isPublic = false, $isPreferenceCenter = false)
     {

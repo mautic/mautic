@@ -32,8 +32,8 @@ class StateValidationHelper
         }
 
         if (
-            !isset($mappedData['Country']) ||
-            !in_array($mappedData['Country'], self::$supportedCountriesWithStates)
+            !isset($mappedData['Country'])
+            || !in_array($mappedData['Country'], self::$supportedCountriesWithStates)
         ) {
             unset($mappedData['State']);
 

@@ -99,7 +99,7 @@ class PointController extends AbstractFormController
     /**
      * Generates new form and processes post data.
      *
-     * @param \Mautic\PointBundle\Entity\Point $entity
+     * @param Point $entity
      *
      * @return JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|Response
      */
@@ -109,7 +109,7 @@ class PointController extends AbstractFormController
         \assert($model instanceof PointModel);
 
         if (!($entity instanceof Point)) {
-            /** @var \Mautic\PointBundle\Entity\Point $entity */
+            /** @var Point $entity */
             $entity = $model->getEntity();
         }
 

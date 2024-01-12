@@ -676,7 +676,6 @@ class LeadModelTest extends \PHPUnit\Framework\TestCase
      * @param object $object
      * @param string $class
      * @param string $property
-     * @param mixed  $value
      */
     private function setProperty($object, $class, $property, $value): void
     {

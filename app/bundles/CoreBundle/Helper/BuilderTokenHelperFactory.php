@@ -21,9 +21,9 @@ class BuilderTokenHelperFactory
 
     public function getBuilderTokenHelper(
         string $modelName,
-        ?string $viewPermissionBase = null,
-        ?string $bundleName = null,
-        ?string $langVar = null
+        string $viewPermissionBase = null,
+        string $bundleName = null,
+        string $langVar = null
     ): BuilderTokenHelper {
         $builderTokenHelper = new BuilderTokenHelper($this->security, $this->modelFactory, $this->connection, $this->userHelper);
         $builderTokenHelper->configure($modelName, $viewPermissionBase, $bundleName, $langVar);

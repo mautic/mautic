@@ -49,7 +49,7 @@ class ThemeApiController extends CommonApiController
     /**
      * Accepts the zip file and installs the theme from it.
      *
-     * @return \Symfony\Component\HttpFoundation\Response
+     * @return Response
      */
     public function newAction(Request $request, PathsHelper $pathsHelper)
     {
@@ -134,7 +134,7 @@ class ThemeApiController extends CommonApiController
     /**
      * List the folders (themes) in the /themes directory.
      *
-     * @return \Symfony\Component\HttpFoundation\Response
+     * @return Response
      */
     public function listAction()
     {
@@ -158,7 +158,7 @@ class ThemeApiController extends CommonApiController
      *
      * @param string $theme
      *
-     * @return \Symfony\Component\HttpFoundation\Response
+     * @return Response
      */
     public function deleteAction($theme)
     {

@@ -134,7 +134,7 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
      */
     public function getCompanyLeadRepository()
     {
-        return $this->em->getRepository(\Mautic\LeadBundle\Entity\CompanyLead::class);
+        return $this->em->getRepository(CompanyLead::class);
     }
 
     public function getPermissionBase(): string
@@ -172,15 +172,12 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
         return parent::getEntity($id);
     }
 
-    /**
-     * @return mixed
-     */
     public function getUserCompanies()
     {
         $user = (!$this->security->isGranted('lead:leads:viewother')) ?
             $this->userHelper->getUser() : false;
 
-        return $this->em->getRepository(\Mautic\LeadBundle\Entity\Company::class)->getCompanies($user);
+        return $this->em->getRepository(Company::class)->getCompanies($user);
     }
 
     /**
@@ -295,7 +292,7 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
 
         if (!$lead instanceof Lead) {
             $leadId = (is_array($lead) && isset($lead['id'])) ? $lead['id'] : $lead;
-            $lead   = $this->em->getReference(\Mautic\LeadBundle\Entity\Lead::class, $leadId);
+            $lead   = $this->em->getReference(Lead::class, $leadId);
         }
 
         if ($companies instanceof Company) {
@@ -414,7 +411,7 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
     {
         if (!$lead instanceof Lead) {
             $leadId = (is_array($lead) && isset($lead['id'])) ? $lead['id'] : $lead;
-            $lead   = $this->em->getReference(\Mautic\LeadBundle\Entity\Lead::class, $leadId);
+            $lead   = $this->em->getReference(Lead::class, $leadId);
         }
 
         $companyLeadRemove = [];
@@ -567,7 +564,7 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
     }
 
     /**
-     * @throws \Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException
+     * @throws MethodNotAllowedHttpException
      */
     protected function dispatchEvent($action, &$entity, $isNew = false, Event $event = null): ?Event
     {
@@ -609,8 +606,6 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
     /**
      * Company Merge function, will merge $mainCompany with $secCompany -  empty records from main company will be
      * filled with secondary then secondary will be deleted.
-     *
-     * @return mixed
      */
     public function companyMerge($mainCompany, $secCompany)
     {
@@ -905,7 +900,7 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
 
         $lead->addUpdatedField('company', $primaryCompanyName)
             ->setDateModified(new \DateTime());
-        $this->em->getRepository(\Mautic\LeadBundle\Entity\Lead::class)->saveEntity($lead);
+        $this->em->getRepository(Lead::class)->saveEntity($lead);
 
         if (null !== $newPrimaryCompany) {
             $this->getCompanyLeadRepository()->detachEntity($newPrimaryCompany);

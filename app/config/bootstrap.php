@@ -8,7 +8,7 @@ if (!class_exists(Dotenv::class)) {
     throw new LogicException('Please run "composer require symfony/dotenv" to load the ".env" files configuring the application.');
 }
 
-$reflection     = new \ReflectionClass(Symfony\Component\Dotenv\Dotenv::class);
+$reflection     = new ReflectionClass(Dotenv::class);
 $vendorRootPath = dirname($reflection->getFileName(), 4);
 
 // Load cached env vars if the .env.local.php file exists

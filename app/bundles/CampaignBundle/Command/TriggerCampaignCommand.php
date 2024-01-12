@@ -186,7 +186,7 @@ class TriggerCampaignCommand extends ModeratedCommand
         // Specific campaign;
         if ($id) {
             $statusCode = 0;
-            /** @var \Mautic\CampaignBundle\Entity\Campaign $campaign */
+            /** @var Campaign $campaign */
             if ($campaign = $this->campaignRepository->getEntity($id)) {
                 $this->triggerCampaign($campaign);
             } else {

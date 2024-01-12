@@ -33,7 +33,7 @@ class CustomFieldColumn
      * @throws \Doctrine\DBAL\Exception
      * @throws DriverException
      * @throws \Doctrine\DBAL\Schema\SchemaException
-     * @throws \Mautic\CoreBundle\Exception\SchemaException
+     * @throws SchemaException
      */
     public function createLeadColumn(LeadField $leadField): void
     {
@@ -70,7 +70,7 @@ class CustomFieldColumn
      * @throws CustomFieldLimitException
      * @throws DriverException
      * @throws \Doctrine\DBAL\Schema\SchemaException
-     * @throws \Mautic\CoreBundle\Exception\SchemaException
+     * @throws SchemaException
      */
     public function processCreateLeadColumn(LeadField $leadField, bool $saveLeadField = true): void
     {

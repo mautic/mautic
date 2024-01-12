@@ -330,33 +330,21 @@ class Point extends FormEntity
         return $this->publishDown;
     }
 
-    /**
-     * @return mixed
-     */
     public function getCategory()
     {
         return $this->category;
     }
 
-    /**
-     * @param mixed $category
-     */
     public function setCategory($category): void
     {
         $this->category = $category;
     }
 
-    /**
-     * @return mixed
-     */
     public function getDelta()
     {
         return $this->delta;
     }
 
-    /**
-     * @param mixed $delta
-     */
     public function setDelta($delta): void
     {
         $this->delta = (int) $delta;

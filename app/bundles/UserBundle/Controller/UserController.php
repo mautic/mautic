@@ -111,7 +111,7 @@ class UserController extends FormController
             return $this->accessDenied();
         }
 
-        /** @var \Mautic\UserBundle\Model\UserModel $model */
+        /** @var UserModel $model */
         $model = $this->getModel('user.user');
 
         // retrieve the user entity

@@ -9,9 +9,6 @@ class DateOptionParameters
 {
     private bool $hasTimePart;
 
-    /**
-     * @var mixed
-     */
     private $timeframe;
 
     private bool $requiresBetween;

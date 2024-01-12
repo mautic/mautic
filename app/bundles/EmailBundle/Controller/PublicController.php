@@ -40,7 +40,7 @@ class PublicController extends CommonFormController
      */
     public function indexAction(Request $request, AnalyticsHelper $analyticsHelper, $idHash)
     {
-        /** @var \Mautic\EmailBundle\Model\EmailModel $model */
+        /** @var EmailModel $model */
         $model = $this->getModel('email');
         $stat  = $model->getEmailStatus($idHash);
 
@@ -119,7 +119,7 @@ class PublicController extends CommonFormController
         $idHash
     ) {
         // Find the email
-        /** @var \Mautic\EmailBundle\Model\EmailModel $model */
+        /** @var EmailModel $model */
         $model                 = $this->getModel('email');
         $translator            = $this->translator;
         $stat                  = $model->getEmailStatus($idHash);
@@ -427,11 +427,11 @@ class PublicController extends CommonFormController
     /**
      * Preview email.
      *
-     * @return \Symfony\Component\HttpFoundation\Response
+     * @return Response
      */
     public function previewAction(AnalyticsHelper $analyticsHelper, $objectId)
     {
-        /** @var \Mautic\EmailBundle\Model\EmailModel $model */
+        /** @var EmailModel $model */
         $model       = $this->getModel('email');
         $emailEntity = $model->getEntity($objectId);
 
@@ -615,7 +615,7 @@ class PublicController extends CommonFormController
             $logger->log('error', $integration.': '.json_encode($query, JSON_PRETTY_PRINT));
         }
 
-        /** @var \Mautic\EmailBundle\Model\EmailModel $model */
+        /** @var EmailModel $model */
         $model = $this->getModel('email');
 
         // email is a semicolon delimited list of emails
