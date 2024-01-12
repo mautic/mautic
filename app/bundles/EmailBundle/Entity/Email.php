@@ -204,21 +204,29 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
      */
     private $clonedId;
 
+    /**
+     * If true, email will be sent only to unsubscribed contacts.
+     *
+     * @var bool
+     */
+    private $sendOnlyToUnsubscribed;
+
     public function __clone()
     {
-        $this->clonedId         = $this->id;
-        $this->id               = null;
-        $this->sentCount        = 0;
-        $this->readCount        = 0;
-        $this->revision         = 0;
-        $this->variantSentCount = 0;
-        $this->variantReadCount = 0;
-        $this->variantStartDate = null;
-        $this->emailType        = null;
-        $this->sessionId        = 'new_'.hash('sha1', uniqid(mt_rand()));
-        $this->plainText        = null;
-        $this->publishUp        = null;
-        $this->publishDown      = null;
+        $this->clonedId               = $this->id;
+        $this->id                     = null;
+        $this->sentCount              = 0;
+        $this->readCount              = 0;
+        $this->revision               = 0;
+        $this->variantSentCount       = 0;
+        $this->variantReadCount       = 0;
+        $this->variantStartDate       = null;
+        $this->emailType              = null;
+        $this->sessionId              = 'new_'.hash('sha1', uniqid(mt_rand()));
+        $this->plainText              = null;
+        $this->publishUp              = null;
+        $this->publishDown            = null;
+        $this->sendOnlyToUnsubscribed = null;
         $this->clearTranslations();
         $this->clearVariants();
         $this->clearStats();
@@ -312,6 +320,7 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
         $builder->addField('headers', Types::JSON);
 
         $builder->addNullableField('publicPreview', Types::BOOLEAN, 'public_preview');
+        $builder->addNamedField('sendOnlyToUnsubscribed', Types::BOOLEAN, 'send_only_to_unsubscribed', true);
     }
 
     public static function loadValidatorMetadata(ClassMetadata $metadata): void
@@ -451,6 +460,7 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
                     'dynamicContent',
                     'lists',
                     'headers',
+                    'sendOnlyToUnsubscribed',
                 ]
             )
             ->build();
@@ -1173,5 +1183,15 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
     public function isBackgroundSending(): bool
     {
         return $this->isPublished() && !empty($this->getPublishUp()) && ($this->getPublishUp() < new \DateTime());
+    }
+
+    public function getSendOnlyToUnsubscribed()
+    {
+        return $this->sendOnlyToUnsubscribed;
+    }
+
+    public function setSendOnlyToUnsubscribed($sendOnlyToUnsubscribed)
+    {
+        return $this->sendOnlyToUnsubscribed = $sendOnlyToUnsubscribed;
     }
 }

@@ -206,6 +206,20 @@ class EmailType extends AbstractType
         $builder->add('isPublished', YesNoButtonGroupType::class);
         $builder->add('publishUp', PublishUpDateType::class);
         $builder->add('publishDown', PublishDownDateType::class);
+        $builder->add(
+            'sendOnlyToUnsubscribed',
+            YesNoButtonGroupType::class,
+            [
+                'label'      => 'mautic.email.send_only_to_unsubscribed',
+                'label_attr' => ['class' => 'control-label'],
+                'attr'       => [
+                    'class'   => 'form-control',
+                    'tooltip' => 'mautic.email.send_only_to_unsubscribed.tooltip',
+                ],
+                'data'     => !empty($options['data']->getSendOnlyToUnsubscribed()) ? $options['data']->getSendOnlyToUnsubscribed() : false,
+                'required' => true,
+            ]
+        );
 
         $builder->add(
             'plainText',

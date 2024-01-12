@@ -334,6 +334,7 @@ class MailHelper
             $this->message->returnPath($this->returnPath);
         }
 
+        $this->dispatchPreSendEvent();
         if (empty($this->fatal)) {
             if (!$isQueueFlush) {
                 // Search/replace tokens if this is not a queue flush
@@ -1380,7 +1381,6 @@ class MailHelper
             } else {
                 $headers['List-Unsubscribe'] = $listUnsubscribeHeader;
             }
-            $headers['List-Unsubscribe-Post'] = 'List-Unsubscribe=One-Click';
         }
 
         return $headers;
@@ -1495,6 +1495,29 @@ class MailHelper
         $this->dispatcher->dispatch($event, EmailEvents::EMAIL_ON_SEND);
 
         $this->eventTokens = array_merge($this->eventTokens, $event->getTokens(false));
+
+        unset($event);
+    }
+
+    public function dispatchPreSendEvent(): void
+    {
+        if (null == $this->dispatcher) {
+            $this->dispatcher = $this->factory->getDispatcher();
+        }
+
+        $event = new EmailSendEvent($this);
+
+        $this->dispatcher->dispatch($event, EmailEvents::EMAIL_PRE_SEND);
+
+        $this->fatal              = $event->isEnable();
+        $errors                   = $event->getErrors();
+        if (!empty($errors)) {
+            $currentErrors = [];
+            if (isset($this->errors['failures']) && is_array($this->errors['failures'])) {
+                $currentErrors = $this->errors['failures'];
+            }
+            $this->errors['failures'] = array_merge($errors, $currentErrors);
+        }
 
         unset($event);
     }
@@ -2030,5 +2053,15 @@ class MailHelper
     private function getMessageInstance(): MauticMessage
     {
         return new MauticMessage();
+    }
+
+    public function enable()
+    {
+        return $this->fatal = false;
+    }
+
+    public function disable()
+    {
+        $this->fatal = true;
     }
 }

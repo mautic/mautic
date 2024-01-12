@@ -18,6 +18,7 @@ use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Event\EmailBuilderEvent;
 use Mautic\EmailBundle\Event\EmailSendEvent;
 use Mautic\EmailBundle\Model\EmailModel;
+use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\PageBundle\Entity\Redirect;
 use Mautic\PageBundle\Entity\Trackable;
 use Mautic\PageBundle\Model\RedirectModel;
@@ -32,7 +33,8 @@ class BuilderSubscriber implements EventSubscriberInterface
         private EmailModel $emailModel,
         private TrackableModel $pageTrackableModel,
         private RedirectModel $pageRedirectModel,
-        private TranslatorInterface $translator
+        private TranslatorInterface $translator,
+        private LeadModel $leadModel
     ) {
     }
 
@@ -40,6 +42,7 @@ class BuilderSubscriber implements EventSubscriberInterface
     {
         return [
             EmailEvents::EMAIL_ON_BUILD => ['onEmailBuild', 0],
+            EmailEvents::EMAIL_PRE_SEND => ['emailPreSend', 0],
             EmailEvents::EMAIL_ON_SEND  => [
                 ['fixEmailAccessibility', 0],
                 ['onEmailGenerate', 0],
@@ -53,6 +56,35 @@ class BuilderSubscriber implements EventSubscriberInterface
                 ['convertUrlsToTokens', -9999],
             ],
         ];
+    }
+
+    public function emailPreSend(EmailSendEvent $event): void
+    {
+        $email = $event->getEmail();
+        if (!$email instanceof Email) {
+            return;
+        }
+
+        if (empty($email->getSendOnlyToUnsubscribed())) {
+            return;
+        }
+
+        $lead  = $event->getLead();
+        if (is_array($lead)) {
+            $lead = $this->leadModel->getEntity($lead['id']);
+        }
+
+        // Check if the email is already sent to the lead
+        $result = $this->emailModel->getStatRepository()->findBy(
+            [
+                'emailAddress' => $lead->getEmail(),
+                'email'        => $email,
+            ]
+        );
+        if (!empty($result) && count($result) > 1) {
+            $event->addError('Error Email already sent to this lead');
+            $event->disableSend();
+        }
     }
 
     public function onEmailBuild(EmailBuilderEvent $event): void

@@ -43,6 +43,8 @@ class EmailSendEvent extends CommonEvent
      */
     private $internalSend = false;
 
+    private array $errors = [];
+
     private array $textHeaders = [];
 
     /**
@@ -51,7 +53,7 @@ class EmailSendEvent extends CommonEvent
      */
     public function __construct(
         private ?MailHelper $helper = null,
-        $args = [],
+                            $args = [],
         private $isDynamicContentParsing = false
     ) {
         $this->content     = $args['content'] ?? '';
@@ -63,6 +65,9 @@ class EmailSendEvent extends CommonEvent
         $this->source      = $args['source'] ?? [];
         $this->tokens      = $args['tokens'] ?? [];
         $this->textHeaders = $args['textHeaders'] ?? [];
+        $this->canSend     = $args['canSend'] ?? true;
+        $this->errors      = $args['errors'] ?? [];
+        $this->fatal       = $args['fatal'] ?? false;
 
         if (!$this->subject && $this->email instanceof Email) {
             $this->subject = $args['email']->getSubject();
@@ -327,5 +332,30 @@ class EmailSendEvent extends CommonEvent
         $content .= $this->getEmail() ? $this->getEmail()->getCustomHtml() : '';
 
         return $content.implode(' ', $this->getTextHeaders());
+    }
+
+    public function enableSend()
+    {
+        $this->fatal = false;
+    }
+
+    public function disableSend()
+    {
+        $this->fatal = true;
+    }
+
+    public function isEnable(): bool
+    {
+        return $this->fatal;
+    }
+
+    public function addError($error): void
+    {
+        $this->errors[] = $error;
+    }
+
+    public function getErrors(): array
+    {
+        return $this->errors;
     }
 }

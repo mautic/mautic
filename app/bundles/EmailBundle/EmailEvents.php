@@ -38,6 +38,16 @@ final class EmailEvents
     public const EMAIL_ON_OPEN = 'mautic.email_on_open';
 
     /**
+     * The mautic.email_pre_send event is dispatched when an email is clicked.
+     *
+     * The event listener receives a
+     * Mautic\EmailBundle\Event\EmailSendEvent instance.
+     *
+     * @var string
+     */
+    public const EMAIL_PRE_SEND = 'mautic.email_pre_send';
+
+    /**
      * The mautic.email_on_send event is dispatched when an email is sent.
      *
      * The event listener receives a
