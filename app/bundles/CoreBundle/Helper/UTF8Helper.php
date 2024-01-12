@@ -302,6 +302,9 @@ class UTF8Helper
         return self::toUTF8($text);
     }
 
+    /**
+     * @return string|false
+     */
     protected static function utf8_decode($text, $option)
     {
         return iconv(
