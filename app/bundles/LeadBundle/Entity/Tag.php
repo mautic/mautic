@@ -25,6 +25,8 @@ class Tag
      */
     private $description;
 
+    public ?int $deletedId;
+
     public function __construct(string $tag = null, bool $clean = true)
     {
         $this->tag = $clean && $tag ? $this->validateTag($tag) : $tag;
