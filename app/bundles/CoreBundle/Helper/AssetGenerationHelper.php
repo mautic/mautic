@@ -32,7 +32,6 @@ class AssetGenerationHelper
         'dropzone/dist/dropzone.js', // Needed for the file upload in the asset detail page.
         'multiselect/js/jquery.multi-select.js', // Needed for the multiselect UI component.
         'chart.js/dist/Chart.js', // Needed for the charts.
-        'mousetrap/mousetrap.js',
         'chosen-js/chosen.jquery.js',
         'at.js/dist/js/jquery.atwho.js',
         'jvectormap-next/jquery-jvectormap.js',
