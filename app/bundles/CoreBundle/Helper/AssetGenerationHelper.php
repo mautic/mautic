@@ -15,7 +15,6 @@ class AssetGenerationHelper
         'js-cookie/src/js.cookie.js', // Needed for cookies.
         'bootstrap/dist/js/bootstrap.js', // Needed for the UI components like bodal boxes.
         'jquery-form/src/jquery.form.js', // Needed for ajax forms with file attachments.
-        'jquery-ui-touch-punch/jquery.ui.touch-punch.js', // Needed for touch devices.
         'moment/min/moment.min.js', // Needed for date/time formatting.
         'jquery.caret/dist/jquery.caret.js', // Needed for the text editor Twitter-like mentions (tokens).
         'codemirror/lib/codemirror.js', // Needed for the legacy code-mode editor.
@@ -71,6 +70,7 @@ class AssetGenerationHelper
         'jquery-ui/ui/widgets/resizable.js', // needed for ElFinder
         'jquery-ui/ui/widgets/slider.js', // needed for ElFinder
         'jquery-ui/ui/widgets/controlgroup.js', // needed for ElFinder
+        'jquery-ui-touch-punch/jquery.ui.touch-punch.js', // Needed for touch devices, and needs to be added after the jquery-ui components
     ];
 
     private string $version;
