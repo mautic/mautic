@@ -26,10 +26,8 @@ use Mautic\CoreBundle\Model\MauticModelInterface;
 use Mautic\CoreBundle\Security\Exception\PermissionException;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\CoreBundle\Translation\Translator;
-use Mautic\UserBundle\Entity\User;
 use Symfony\Component\DependencyInjection\ParameterBag\ContainerBagInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
-use Symfony\Component\Form\Form;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
@@ -135,7 +133,6 @@ class FetchCommonApiController extends AbstractFOSRestController implements Maut
     public function __construct(
         protected CorePermissions $security,
         Translator $translator,
-        protected EntityResultHelper $entityResultHelper,
         private AppVersion $appVersion,
         private RequestStack $requestStack,
         protected ManagerRegistry $doctrine,
@@ -144,7 +141,7 @@ class FetchCommonApiController extends AbstractFOSRestController implements Maut
         protected CoreParametersHelper $coreParametersHelper,
         protected MauticFactory $factory,
     ) {
-        $this->translator           = $translator;
+        $this->translator = $translator;
 
         if (null !== $this->model && !$this->permissionBase && method_exists($this->model, 'getPermissionBase')) {
             $this->permissionBase = $this->model->getPermissionBase();
@@ -591,7 +588,7 @@ class FetchCommonApiController extends AbstractFOSRestController implements Maut
             $totalCount = count($results);
         }
 
-        $entities = $this->entityResultHelper->getArray($results, $callback);
+        $entities = (new EntityResultHelper())->getArray($results, $callback);
 
         return [$entities, $totalCount];
     }
