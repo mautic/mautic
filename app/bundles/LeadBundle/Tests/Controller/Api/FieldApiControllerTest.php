@@ -3,7 +3,6 @@
 namespace Mautic\LeadBundle\Tests\Controller\Api;
 
 use Doctrine\Persistence\ManagerRegistry;
-use Mautic\ApiBundle\Helper\EntityResultHelper;
 use Mautic\CoreBundle\Factory\MauticFactory;
 use Mautic\CoreBundle\Factory\ModelFactory;
 use Mautic\CoreBundle\Helper\AppVersion;
@@ -83,7 +82,6 @@ class FieldApiControllerTest extends TestCase
         $controller   = new FieldApiController(
             $this->createMock(CorePermissions::class),
             $this->createMock(Translator::class),
-            $this->createMock(EntityResultHelper::class),
             $this->createMock(Router::class),
             $this->createMock(FormFactoryInterface::class),
             $this->createMock(AppVersion::class),

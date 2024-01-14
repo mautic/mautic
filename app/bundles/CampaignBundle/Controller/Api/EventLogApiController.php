@@ -5,7 +5,6 @@ namespace Mautic\CampaignBundle\Controller\Api;
 use Doctrine\Persistence\ManagerRegistry;
 use FOS\RestBundle\View\View;
 use Mautic\ApiBundle\Controller\FetchCommonApiController;
-use Mautic\ApiBundle\Helper\EntityResultHelper;
 use Mautic\ApiBundle\Serializer\Exclusion\FieldInclusionStrategy;
 use Mautic\CampaignBundle\Entity\Campaign;
 use Mautic\CampaignBundle\Entity\Event;
@@ -53,7 +52,6 @@ class EventLogApiController extends FetchCommonApiController
     public function __construct(
         CorePermissions $security,
         Translator $translator,
-        EntityResultHelper $entityResultHelper,
         AppVersion $appVersion,
         RequestStack $requestStack,
         ManagerRegistry $doctrine,
@@ -78,7 +76,7 @@ class EventLogApiController extends FetchCommonApiController
         // Only include the id of the parent
         $this->addExclusionStrategy(new FieldInclusionStrategy(['id'], 1, 'parent'));
 
-        parent::__construct($security, $translator, $entityResultHelper, $appVersion, $requestStack, $doctrine, $modelFactory, $dispatcher, $coreParametersHelper, $factory);
+        parent::__construct($security, $translator, $appVersion, $requestStack, $doctrine, $modelFactory, $dispatcher, $coreParametersHelper, $factory);
     }
 
     /**

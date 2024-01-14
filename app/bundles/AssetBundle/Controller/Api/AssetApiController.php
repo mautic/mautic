@@ -4,7 +4,6 @@ namespace Mautic\AssetBundle\Controller\Api;
 
 use Doctrine\Persistence\ManagerRegistry;
 use Mautic\ApiBundle\Controller\CommonApiController;
-use Mautic\ApiBundle\Helper\EntityResultHelper;
 use Mautic\AssetBundle\Entity\Asset;
 use Mautic\AssetBundle\Model\AssetModel;
 use Mautic\CoreBundle\Factory\MauticFactory;
@@ -33,7 +32,6 @@ class AssetApiController extends CommonApiController
     public function __construct(
         CorePermissions $security,
         Translator $translator,
-        EntityResultHelper $entityResultHelper,
         RouterInterface $router,
         FormFactoryInterface $formFactory,
         AppVersion $appVersion,
@@ -54,7 +52,7 @@ class AssetApiController extends CommonApiController
         $this->entityNameMulti  = 'assets';
         $this->serializerGroups = ['assetDetails', 'categoryList', 'publishDetails'];
 
-        parent::__construct($security, $translator, $entityResultHelper, $router, $formFactory, $appVersion, $requestStack, $doctrine, $modelFactory, $dispatcher, $coreParametersHelper, $factory);
+        parent::__construct($security, $translator, $router, $formFactory, $appVersion, $requestStack, $doctrine, $modelFactory, $dispatcher, $coreParametersHelper, $factory);
     }
 
     /**

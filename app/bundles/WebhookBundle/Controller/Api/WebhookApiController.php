@@ -4,7 +4,6 @@ namespace Mautic\WebhookBundle\Controller\Api;
 
 use Doctrine\Persistence\ManagerRegistry;
 use Mautic\ApiBundle\Controller\CommonApiController;
-use Mautic\ApiBundle\Helper\EntityResultHelper;
 use Mautic\CoreBundle\Factory\MauticFactory;
 use Mautic\CoreBundle\Factory\ModelFactory;
 use Mautic\CoreBundle\Helper\AppVersion;
@@ -31,7 +30,6 @@ class WebhookApiController extends CommonApiController
     public function __construct(
         CorePermissions $security,
         Translator $translator,
-        EntityResultHelper $entityResultHelper,
         RouterInterface $router,
         FormFactoryInterface $formFactory,
         AppVersion $appVersion,
@@ -51,7 +49,7 @@ class WebhookApiController extends CommonApiController
         $this->entityNameMulti  = 'hooks';
         $this->serializerGroups = ['hookDetails', 'categoryList', 'publishDetails'];
 
-        parent::__construct($security, $translator, $entityResultHelper, $router, $formFactory, $appVersion, $requestStack, $doctrine, $modelFactory, $dispatcher, $coreParametersHelper, $factory);
+        parent::__construct($security, $translator, $router, $formFactory, $appVersion, $requestStack, $doctrine, $modelFactory, $dispatcher, $coreParametersHelper, $factory);
     }
 
     /**

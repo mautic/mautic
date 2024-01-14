@@ -4,7 +4,6 @@ namespace Mautic\LeadBundle\Controller\Api;
 
 use Doctrine\Persistence\ManagerRegistry;
 use Mautic\ApiBundle\Controller\CommonApiController;
-use Mautic\ApiBundle\Helper\EntityResultHelper;
 use Mautic\CoreBundle\Entity\IpAddress;
 use Mautic\CoreBundle\Factory\MauticFactory;
 use Mautic\CoreBundle\Factory\ModelFactory;
@@ -55,7 +54,6 @@ class LeadApiController extends CommonApiController
     public function __construct(
         CorePermissions $security,
         Translator $translator,
-        EntityResultHelper $entityResultHelper,
         RouterInterface $router,
         FormFactoryInterface $formFactory,
         DoNotContactModel $doNotContactModel,
@@ -80,7 +78,7 @@ class LeadApiController extends CommonApiController
         $this->entityNameMulti  = 'contacts';
         $this->serializerGroups = ['leadDetails', 'frequencyRulesList', 'doNotContactList', 'userList', 'stageList', 'publishDetails', 'ipAddress', 'tagList', 'utmtagsList'];
 
-        parent::__construct($security, $translator, $entityResultHelper, $router, $formFactory, $appVersion, $requestStack, $doctrine, $modelFactory, $dispatcher, $coreParametersHelper, $factory);
+        parent::__construct($security, $translator, $router, $formFactory, $appVersion, $requestStack, $doctrine, $modelFactory, $dispatcher, $coreParametersHelper, $factory);
 
         $this->setCleaningRules();
     }
