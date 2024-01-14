@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 use Mautic\CoreBundle\DependencyInjection\MauticCoreExtension;
+use Mautic\CoreBundle\Helper\ServiceDeprecator;
 use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
 
 use function Symfony\Component\DependencyInjection\Loader\Configurator\service;
@@ -50,10 +51,9 @@ return function (ContainerConfigurator $configurator): void {
     $services->get(Mautic\ApiBundle\Form\Validator\Constraints\OAuthCallbackValidator::class)
         ->tag('validator.constraint_validator');
 
-    $services->get(Mautic\ApiBundle\Helper\EntityResultHelper::class)
-        ->deprecate('mautic/mautic', '5.1.0', 'Use as `new EntityResultHelper()` instead of a service.');
-
-    $services->alias('mautic.api.model.client', Mautic\ApiBundle\Model\ClientModel::class);
-    $services->alias('mautic.api.helper.entity_result', Mautic\ApiBundle\Helper\EntityResultHelper::class);
-    $services->alias('mautic.validator.oauthcallback', Mautic\ApiBundle\Form\Validator\Constraints\OAuthCallbackValidator::class);
+    $deprecator = new ServiceDeprecator($services);
+    $deprecator->setDeprecatedService(Mautic\ApiBundle\Helper\EntityResultHelper::class, 'Use as `new EntityResultHelper()` instead of a service.');
+    $deprecator->setDeprecatedAlias('mautic.api.model.client', Mautic\ApiBundle\Model\ClientModel::class);
+    $deprecator->setDeprecatedAlias('mautic.api.helper.entity_result', Mautic\ApiBundle\Helper\EntityResultHelper::class);
+    $deprecator->setDeprecatedAlias('mautic.validator.oauthcallback', Mautic\ApiBundle\Form\Validator\Constraints\OAuthCallbackValidator::class);
 };
