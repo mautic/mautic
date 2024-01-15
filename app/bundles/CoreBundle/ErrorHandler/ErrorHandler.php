@@ -3,6 +3,7 @@
 namespace Mautic\CoreBundle\ErrorHandler {
     use Mautic\CoreBundle\Exception\DatabaseConnectionException;
     use Mautic\CoreBundle\Exception\ErrorHandlerException;
+    use Mautic\CoreBundle\Exception\MessageOnlyErrorHandlerException;
     use Psr\Log\LoggerInterface;
     use Psr\Log\LogLevel;
     use Symfony\Component\ErrorHandler\Debug;
@@ -238,8 +239,8 @@ namespace Mautic\CoreBundle\ErrorHandler {
          */
         public static function prepareExceptionForOutput($exception)
         {
-            $inline     = null;
-            $logMessage = null;
+            $inline             = null;
+            $logMessage         = null;
 
             if (!$exception instanceof \Exception && !$exception instanceof FlattenException) {
                 if ($exception instanceof \Throwable) {
@@ -251,8 +252,10 @@ namespace Mautic\CoreBundle\ErrorHandler {
             }
 
             $showExceptionMessage = false;
+            $showExceptionDetails = false;
             if ($exception instanceof ErrorHandlerException) {
                 $showExceptionMessage = $exception->showMessage();
+                $showExceptionDetails = true;
                 $message              = $exception->getMessage();
 
                 if ($previous = $exception->getPrevious()) {
@@ -265,6 +268,10 @@ namespace Mautic\CoreBundle\ErrorHandler {
                 }
             } elseif ($exception instanceof DatabaseConnectionException) {
                 $showExceptionMessage = true;
+            }
+
+            if ($exception instanceof MessageOnlyErrorHandlerException) {
+                $showExceptionDetails = false;
             }
 
             $type = ($exception instanceof \ErrorException) ? $exception->getSeverity() : E_ERROR;
@@ -290,7 +297,7 @@ namespace Mautic\CoreBundle\ErrorHandler {
             $trace             = $exception->getTrace();
             $context           = (method_exists($exception, 'getContext')) ? $exception->getContext() : [];
 
-            return compact(['inline', 'type', 'message', 'logMessage', 'line', 'file', 'trace', 'context', 'showExceptionMessage', 'previous']);
+            return compact(['inline', 'type', 'message', 'logMessage', 'line', 'file', 'trace', 'context', 'showExceptionMessage', 'showExceptionDetails', 'previous']);
         }
 
         /**
@@ -468,10 +475,16 @@ namespace Mautic\CoreBundle\ErrorHandler {
                 $errorMessage           = $error['logMessage'] ?? $error['message'];
                 $error['message']       = "$errorMessage - in file {$error['file']} - at line {$error['line']}";
             } else {
-                if (empty($error['showExceptionMessage'])) {
+                if (empty($error['showExceptionMessage']) && empty($error['showExceptionDetails'])) {
                     unset($error);
                     $error['message']    = 'The site is currently offline due to encountering an error. If the problem persists, please contact the system administrator.';
                     $error['submessage'] = 'System administrators, check server logs for errors.';
+                }
+                if (!empty($error['showExceptionMessage']) && empty($error['showExceptionDetails'])) {
+                    unset($error['file']);
+                    unset($error['trace']);
+                    unset($error['context']);
+                    unset($error['line']);
                 }
             }
 
