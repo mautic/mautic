@@ -12,6 +12,7 @@ use Mautic\EmailBundle\Event\TransportWebhookEvent;
 use Mautic\FormBundle\Entity\Form;
 use Mautic\LeadBundle\Entity\DoNotContact;
 use Mautic\LeadBundle\Entity\Lead;
+use Mautic\PageBundle\Entity\Page;
 use PHPUnit\Framework\Assert;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -135,10 +136,22 @@ class PublicControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertEquals(DoNotContact::UNSUBSCRIBED, $dncCollection->first()->getReason());
     }
 
+    public function testUnsubscribeActionWithCustomPreferenceCenterHasCsrfToken(): void
+    {
+        $lead              = $this->createLead();
+        $preferencesCenter = $this->createCustomPreferencesPage('{segmentlist}{saveprefsbutton}');
+        $stat              = $this->getStat(null, $lead, $preferencesCenter);
+        $this->em->flush();
+        $crawler    = $this->client->request('GET', '/email/unsubscribe/'.$stat->getTrackingHash());
+        $tokenInput = $crawler->filter('input[name="lead_contact_frequency_rules[_token]"]');
+        $this->assertTrue($this->client->getResponse()->isOk());
+        $this->assertEquals(1, $tokenInput->count());
+    }
+
     /**
      * @throws \Doctrine\ORM\ORMException
      */
-    protected function getStat(Form $form = null, Lead $lead = null): Stat
+    protected function getStat(Form $form = null, Lead $lead = null, Page $preferenceCenter = null): Stat
     {
         $trackingHash = 'tracking_hash_unsubscribe_form_email';
         $emailName    = 'Test unsubscribe form email';
@@ -148,6 +161,7 @@ class PublicControllerFunctionalTest extends MauticMysqlTestCase
         $email->setSubject($emailName);
         $email->setEmailType('template');
         $email->setUnsubscribeForm($form);
+        $email->setPreferenceCenter($preferenceCenter);
         $this->em->persist($email);
 
         // Create a test email stat.
@@ -185,6 +199,20 @@ class PublicControllerFunctionalTest extends MauticMysqlTestCase
         $this->em->persist($lead);
 
         return $lead;
+    }
+
+    protected function createCustomPreferencesPage(string $html = ''): Page
+    {
+        $page = new Page();
+        $page->setTitle('Contact Preferences');
+        $page->setAlias('contact-preferences');
+        $page->setTemplate('blank');
+        $page->setIsPreferenceCenter(true);
+        $page->setIsPublished(true);
+        $page->setCustomHtml($html);
+        $this->em->persist($page);
+
+        return $page;
     }
 
     public function testPreviewDisabledByDefault(): void

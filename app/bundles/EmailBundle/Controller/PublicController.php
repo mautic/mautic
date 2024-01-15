@@ -236,7 +236,7 @@ class PublicController extends CommonFormController
                             $viewParameters,
                             [
                                 'form'                         => $formView,
-                                'startform'                    => $this->render('@MauticCore/Default/form.html.twig', ['form' => $formView]),
+                                'startform'                    => $this->renderView('@MauticCore/Default/form.html.twig', ['form' => $formView]),
                                 'custom_tag'                   => '<a name="end-'.$formView->vars['id'].'"></a>',
                                 'showContactFrequency'         => str_contains($html, 'data-slot="channelfrequency"') || str_contains($html, BuilderSubscriber::channelfrequency),
                                 'showContactSegments'          => str_contains($html, 'data-slot="segmentlist"') || str_contains($html, BuilderSubscriber::segmentListRegex),

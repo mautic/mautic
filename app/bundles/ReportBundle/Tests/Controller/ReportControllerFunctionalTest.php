@@ -6,9 +6,37 @@ use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\ReportBundle\Entity\Report;
 use PHPUnit\Framework\Assert;
+use Symfony\Component\HttpFoundation\Request;
 
 class ReportControllerFunctionalTest extends MauticMysqlTestCase
 {
+    public function testCreatingNewReportAndClone(): void
+    {
+        $crawler = $this->client->request(Request::METHOD_GET, '/s/reports/new/');
+        Assert::assertTrue($this->client->getResponse()->isOk(), $this->client->getResponse()->getContent());
+
+        $saveButton = $crawler->selectButton('Save');
+        $form       = $saveButton->form();
+        $form['report[name]']->setValue('Report ABC');
+
+        $this->client->submit($form);
+        Assert::assertTrue($this->client->getResponse()->isOk(), $this->client->getResponse()->getContent());
+        $report = $this->em->getRepository(Report::class)->findOneBy(['name' => 'Report ABC']);
+
+        $crawler = $this->client->request(Request::METHOD_GET, "/s/reports/clone/{$report->getId()}");
+        Assert::assertTrue($this->client->getResponse()->isOk(), $this->client->getResponse()->getContent());
+
+        $saveButton = $crawler->selectButton('Save');
+        $form       = $saveButton->form();
+        $form['report[name]']->setValue('Report ABC - cloned');
+
+        $this->client->submit($form);
+        Assert::assertTrue($this->client->getResponse()->isOk(), $this->client->getResponse()->getContent());
+        $reportClone = $this->em->getRepository(Report::class)->findOneBy(['name' => 'Report ABC - cloned']);
+
+        Assert::assertSame($report->getId() + 1, $reportClone->getId());
+    }
+
     public function testContactReportwithComanyDateAddedColumn(): void
     {
         $report = new Report();

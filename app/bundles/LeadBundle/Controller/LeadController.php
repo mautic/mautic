@@ -4,6 +4,7 @@ namespace Mautic\LeadBundle\Controller;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Mautic\CampaignBundle\Membership\MembershipManager;
+use Mautic\CoreBundle\Cache\ResultCacheOptions;
 use Mautic\CoreBundle\Controller\FormController;
 use Mautic\CoreBundle\Helper\EmojiHelper;
 use Mautic\CoreBundle\Helper\ExportHelper;
@@ -16,6 +17,7 @@ use Mautic\LeadBundle\Deduplicate\Exception\SameContactException;
 use Mautic\LeadBundle\Entity\DoNotContact;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadDevice;
+use Mautic\LeadBundle\Entity\LeadField;
 use Mautic\LeadBundle\Entity\LeadRepository;
 use Mautic\LeadBundle\Event\ContactExportSchedulerEvent;
 use Mautic\LeadBundle\Form\Type\BatchType;
@@ -259,6 +261,7 @@ class LeadController extends FormController
                     ],
                 ],
                 'hydration_mode' => 'HYDRATE_ARRAY',
+                'result_cache'   => new ResultCacheOptions(LeadField::CACHE_NAMESPACE),
             ]
         );
 
@@ -297,23 +300,7 @@ class LeadController extends FormController
         /** @var \Mautic\LeadBundle\Model\LeadModel $model */
         $model = $this->getModel('lead.lead');
 
-        /** @var \Mautic\LeadBundle\Entity\Lead $lead */
         $lead = $model->getEntity($objectId);
-        $model->getRepository()->refetchEntity($lead);
-
-        // set some permissions
-        $permissions = $this->security->isGranted(
-            [
-                'lead:leads:viewown',
-                'lead:leads:viewother',
-                'lead:leads:create',
-                'lead:leads:editown',
-                'lead:leads:editother',
-                'lead:leads:deleteown',
-                'lead:leads:deleteother',
-            ],
-            'RETURN_ARRAY'
-        );
 
         if (null === $lead) {
             // get the page we came from
@@ -341,6 +328,23 @@ class LeadController extends FormController
                 ]
             );
         }
+
+        /** @var \Mautic\LeadBundle\Entity\Lead $lead */
+        $model->getRepository()->refetchEntity($lead);
+
+        // set some permissions
+        $permissions = $this->security->isGranted(
+            [
+              'lead:leads:viewown',
+              'lead:leads:viewother',
+              'lead:leads:create',
+              'lead:leads:editown',
+              'lead:leads:editother',
+              'lead:leads:deleteown',
+              'lead:leads:deleteother',
+            ],
+            'RETURN_ARRAY'
+        );
 
         if (!$this->security->hasEntityAccess(
             'lead:leads:viewown',

@@ -36,6 +36,9 @@ use Symfony\Component\Form\FormView;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
+/**
+ * @extends AbstractType<Email>
+ */
 class EmailType extends AbstractType
 {
     use DynamicContentTrait;
@@ -71,7 +74,10 @@ class EmailType extends AbstractType
                 [
                     'label'      => 'mautic.email.subject',
                     'label_attr' => ['class' => 'control-label'],
-                    'attr'       => ['class' => 'form-control'],
+                    'attr'       => [
+                        'class'   => 'form-control',
+                        'onBlur'  => 'Mautic.copySubjectToName(mQuery(this))',
+                    ],
                 ]
             )
         );
