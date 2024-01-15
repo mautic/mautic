@@ -8,7 +8,7 @@ use Mautic\PluginBundle\Event\PluginIsPublishedEvent;
 
 class PluginIsPublishedEventTest extends \PHPUnit\Framework\TestCase
 {
-    public function testInstallPlugins(): void
+    public function testSettersGetters(): void
     {
         $pluginIsPublishedEvent = new PluginIsPublishedEvent(1, 'testIntegration');
 
