@@ -1,12 +1,14 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\PluginBundle\Form\Constraint;
 
 use Symfony\Component\Validator\Constraint;
 
 class CanPublish extends Constraint
 {
-    public string $message =  'You are not allowed to publish plugin due to insufficient configurations.';
+    public string $message =  'mautic.lead_list.not_allowed_plugin_publish';
 
     public string $integrationName;
 
