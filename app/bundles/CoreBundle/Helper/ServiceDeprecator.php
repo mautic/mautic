@@ -20,7 +20,7 @@ final class ServiceDeprecator
             ->deprecate(self::PACKAGE, $version, 'The "%service_id%" service is deprecated. '.$message);
     }
 
-    public function setDeprecatedAlias(string $alias, string $fqcn, $message = '', string $version = '5.1'): void
+    public function setDeprecatedAlias(string $alias, string $fqcn, string $message = '', string $version = '5.1'): void
     {
         $this->configurator->alias($alias, $fqcn)
             ->deprecate(self::PACKAGE, $version, 'The "%alias_id%" service alias is deprecated. Use FQCN instead. '.$message);
