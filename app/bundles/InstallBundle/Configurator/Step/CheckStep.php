@@ -91,11 +91,11 @@ class CheckStep implements StepInterface
         }
 
         if (!is_writable($this->getCacheDir())) {
-          $messages[] = 'mautic.install.cache.unwritable';
+            $messages[] = 'mautic.install.cache.unwritable';
         }
 
         if (!is_writable($this->getLogDir())) {
-          $messages[] = 'mautic.install.logs.unwritable';
+            $messages[] = 'mautic.install.logs.unwritable';
         }
 
         $timezones = [];
@@ -256,24 +256,25 @@ class CheckStep implements StepInterface
     }
 
   private function getParameterLoader(): ParameterLoader
-    {
-        if (!$this->parameterLoader) {
-            $this->parameterLoader = new ParameterLoader();
-        }
+  {
+      if (!$this->parameterLoader) {
+          $this->parameterLoader = new ParameterLoader();
+      }
 
-        return $this->parameterLoader;
-    }
+      return $this->parameterLoader;
+  }
 
     public function getCacheDir(): string
     {
-          $cachePath = $this->getParameterLoader()->getLocalParameterBag()->get('cache_path') ?? $this->cache_path;
-          return str_replace('%kernel.project_dir%', $this->projectDir, $cachePath);
+        $cachePath = $this->getParameterLoader()->getLocalParameterBag()->get('cache_path') ?? $this->cache_path;
+
+        return str_replace('%kernel.project_dir%', $this->projectDir, $cachePath);
     }
 
     public function getLogDir(): string
     {
-          $logPath = $this->getParameterLoader()->getLocalParameterBag()->get('log_path') ?? $this->log_path;
-          return str_replace('%kernel.project_dir%', $this->projectDir, $logPath);
-    }
+        $logPath = $this->getParameterLoader()->getLocalParameterBag()->get('log_path') ?? $this->log_path;
 
+        return str_replace('%kernel.project_dir%', $this->projectDir, $logPath);
+    }
 }
