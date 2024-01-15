@@ -25,7 +25,7 @@ class PluginControllerTest extends MauticMysqlTestCase
             ],
         ]);
 
-        $crawler     = $this->client->submit($form);
+        $this->client->submit($form);
         Assert::assertTrue($this->client->getResponse()->isOk());
     }
 
