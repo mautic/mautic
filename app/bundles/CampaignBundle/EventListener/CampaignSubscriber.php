@@ -10,6 +10,7 @@ use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\CoreBundle\Model\AuditLogModel;
 use Mautic\CoreBundle\Service\FlashBag;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 class CampaignSubscriber implements EventSubscriberInterface
 {
@@ -17,7 +18,8 @@ class CampaignSubscriber implements EventSubscriberInterface
         private IpLookupHelper $ipLookupHelper,
         private AuditLogModel $auditLogModel,
         private CampaignService $campaignService,
-        private FlashBag $flashBag
+        private FlashBag $flashBag,
+        private UrlGeneratorInterface $urlGenerator
     ) {
     }
 
@@ -79,8 +81,14 @@ class CampaignSubscriber implements EventSubscriberInterface
         $this->flashBag->add(
             'mautic.core.notice.campaign.unpublished.email',
             [
-                '%name%' => $campaign->getName(),
-            ]
+                '%name%'      => $campaign->getName(),
+                '%menu_link%' => 'mautic_campaign_index',
+                '%url%'       => $this->urlGenerator->generate('mautic_campaign_action', [
+                    'objectAction' => 'edit',
+                    'objectId'     => $campaign->getId(),
+                ]),
+            ],
+            FlashBag::LEVEL_WARNING,
         );
     }
 }
