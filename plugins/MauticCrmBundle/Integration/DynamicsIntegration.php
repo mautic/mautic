@@ -2,8 +2,6 @@
 
 namespace MauticPlugin\MauticCrmBundle\Integration;
 
-use Datetime;
-use DateTimeZone;
 use Mautic\LeadBundle\Entity\Company;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Helper\IdentifyCompanyHelper;
@@ -356,13 +354,13 @@ class DynamicsIntegration extends CrmAbstractIntegration
         return false;
     }
 
-     /**
-      * Convert to UTC date string for API call.
-      */
+    /**
+     * Convert to UTC date string for API call.
+     */
     public function getFilterDateUTC(string $paramDate): string
     {
-        $startDate = new DateTime($paramDate);
-        $startDate->setTimezone(new DateTimeZone('UTC'));
+        $startDate = new \DateTime($paramDate);
+        $startDate->setTimezone(new \DateTimeZone('UTC'));
 
         return sprintf('modifiedon ge %sZ', $startDate->format('Y-m-d\TH:i:s'));
     }
