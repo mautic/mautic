@@ -5928,7 +5928,7 @@
             "dist": {
                 "type": "path",
                 "url": "app",
-                "reference": "a4edc0cf8e3990bdce31e4cd1858da3aab9c9fdd"
+                "reference": "2e9bf2638929a9ce14cc348cedeabe5799eeff4f"
             },
             "require": {
                 "aws/aws-sdk-php": "~3.0",
@@ -5945,6 +5945,7 @@
                 "doctrine/orm": "^2.14.0",
                 "exercise/htmlpurifier-bundle": "^4.1",
                 "ext-imap": "*",
+                "ext-pdo": "*",
                 "ext-zip": "*",
                 "ext-zlib": "*",
                 "friendsofsymfony/oauth-server-bundle": "dev-upgrade-2",
