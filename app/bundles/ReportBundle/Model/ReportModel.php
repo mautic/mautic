@@ -630,7 +630,7 @@ class ReportModel extends FormModel
                 if (isset($options['notAnonymize']) && false === $options['notAnonymize']) {
                     if ('firstname' === $key || 'lastname' === $key || 'userip' === $key || 'ip_address' === $key) {
                         $data[$keys][$key] = '*';
-                    } elseif ($email && false !== strpos($field, $email)) {
+                    } elseif ($email && str_contains($field, $email)) {
                         $data[$keys][$key] = str_replace($email, $anonimEmail, $field);
                     } else {
                         $data[$keys][$key] = $field;

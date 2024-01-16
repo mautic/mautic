@@ -115,7 +115,8 @@ class CustomFieldValueHelper
     }
 
     /**
-     * @param array<string, string|array> $fields
+     * @param array<string, string|array<string, string>> $fields
+     *
      * @return array<string, string>
      */
     public static function anonymizationFields(array $fields): array
