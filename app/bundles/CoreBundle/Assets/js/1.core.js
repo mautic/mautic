@@ -674,11 +674,9 @@ var Mautic = {
      * @param flashes
      */
     setFlashes: function (flashes) {
-        const $flashes = mQuery('#flashes');
-        $flashes.append(flashes);
-        $flashes.trigger('flashes.update');
+        mQuery('#flashes').append(flashes);
 
-        $flashes.find('.alert-new').each(function () {
+        mQuery('#flashes .alert-new').each(function () {
             var me = this;
             window.setTimeout(function () {
                 mQuery(me).fadeTo(500, 0).slideUp(500, function () {
