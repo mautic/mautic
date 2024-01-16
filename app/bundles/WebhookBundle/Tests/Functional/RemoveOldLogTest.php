@@ -75,8 +75,8 @@ final class RemoveOldLogTest extends MauticMysqlTestCase
             array_push($logIds, $addedLog->getId());
         }
 
-        $output = $this->runCommand(DeleteWebhookLogsCommand::COMMAND_NAME);
-        Assert::assertStringContainsString('2 logs deleted successfully for webhook id - '.$webhook->getId(), $output);
+        $output = $this->testSymfonyCommand(DeleteWebhookLogsCommand::COMMAND_NAME);
+        Assert::assertStringContainsString('2 logs deleted successfully for webhook id - '.$webhook->getId(), $output->getDisplay());
         array_shift($logIds);
         array_shift($logIds);
         $this->assertLogs($webhook, 5, $logIds);
@@ -84,8 +84,8 @@ final class RemoveOldLogTest extends MauticMysqlTestCase
 
     public function testRemoveLogCommandForNoWebhook(): void
     {
-        $output = $this->runCommand(DeleteWebhookLogsCommand::COMMAND_NAME);
-        Assert::assertStringContainsString('There is 0 webhooks with logs more than defined limit.', $output);
+        $output = $this->testSymfonyCommand(DeleteWebhookLogsCommand::COMMAND_NAME);
+        Assert::assertStringContainsString('There is 0 webhooks with logs more than defined limit.', $output->getDisplay());
     }
 
     /**
