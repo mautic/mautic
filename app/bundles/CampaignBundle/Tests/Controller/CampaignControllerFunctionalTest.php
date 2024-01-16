@@ -235,7 +235,7 @@ class CampaignControllerFunctionalTest extends AbstractCampaignTest
         $campaignId = $campaign->getId();
 
         if ($runCommand) {
-            $this->runCommand(
+            $this->testSymfonyCommand(
                 SummarizeCommand::NAME,
                 [
                     '--env'       => 'test',

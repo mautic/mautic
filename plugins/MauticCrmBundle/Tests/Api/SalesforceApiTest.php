@@ -215,7 +215,7 @@ class SalesforceApiTest extends \PHPUnit\Framework\TestCase
     {
         $integration = $this->getMockBuilder(SalesforceIntegration::class)
             ->disableOriginalConstructor()
-            ->setMethodsExcept(['cleanPushData'])
+            ->onlyMethods(['mergeConfigToFeatureSettings', 'makeRequest', 'getQueryUrl', 'getIntegrationSettings', 'getFieldsForQuery', 'getApiUrl'])
             ->getMock();
 
         $integration->expects($this->exactly(1))
@@ -258,13 +258,13 @@ class SalesforceApiTest extends \PHPUnit\Framework\TestCase
     /**
      * @testdox Test that a backslash and an html entity of single quote are escaped for SF queries
      *
-     * @covers \MauticPlugin\MauticCrmBundle\Api\SalesforceApi::escapeQueryValue()
+     * @covers \MauticPlugin\MauticCrmBundle\Api\SalesforceApi::escapeQueryValue
      */
     public function testCompanyQueryWithHtmlEntitiesIsEscapedCorrectly(): void
     {
         $integration = $this->getMockBuilder(SalesforceIntegration::class)
             ->disableOriginalConstructor()
-            ->setMethodsExcept(['cleanPushData'])
+            ->onlyMethods(['mergeConfigToFeatureSettings', 'makeRequest', 'getQueryUrl', 'getIntegrationSettings', 'getFieldsForQuery', 'getApiUrl'])
             ->getMock();
 
         $integration->expects($this->exactly(1))
@@ -311,7 +311,7 @@ class SalesforceApiTest extends \PHPUnit\Framework\TestCase
     {
         $integration = $this->getMockBuilder(SalesforceIntegration::class)
             ->disableOriginalConstructor()
-            ->setMethodsExcept(['cleanPushData'])
+            ->onlyMethods(['mergeConfigToFeatureSettings', 'makeRequest', 'getQueryUrl', 'getIntegrationSettings', 'getFieldsForQuery', 'getApiUrl'])
             ->getMock();
 
         $integration->expects($this->exactly(1))
@@ -353,7 +353,7 @@ class SalesforceApiTest extends \PHPUnit\Framework\TestCase
     {
         $integration = $this->getMockBuilder(SalesforceIntegration::class)
             ->disableOriginalConstructor()
-            ->setMethodsExcept(['cleanPushData'])
+            ->onlyMethods(['mergeConfigToFeatureSettings', 'makeRequest', 'getQueryUrl', 'getIntegrationSettings', 'getFieldsForQuery', 'getApiUrl'])
             ->getMock();
 
         $integration->expects($this->exactly(1))

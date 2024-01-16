@@ -17,7 +17,7 @@ class ConfigMetadataTest extends TestCase
     protected function setUp(): void
     {
         $this->metadata = $this->getMockBuilder(BundleMetadata::class)
-            ->setMethodsExcept(['setConfig', 'toArray'])
+            ->onlyMethods(['getDirectory'])
             ->disableOriginalConstructor()
             ->getMock();
     }
