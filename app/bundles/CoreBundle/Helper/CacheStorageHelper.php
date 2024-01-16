@@ -37,8 +37,6 @@ class CacheStorageHelper
     protected $expirations = [];
 
     /**
-     * @param mixed  $cacheDir
-     * @param mixed  $namespace
      * @param int    $defaultExpiration
      * @param string $adaptor
      */

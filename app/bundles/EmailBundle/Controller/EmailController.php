@@ -258,11 +258,11 @@ class EmailController extends FormController
      */
     public function viewAction(Request $request, $objectId)
     {
-        /** @var \Mautic\EmailBundle\Model\EmailModel $model */
+        /** @var EmailModel $model */
         $model    = $this->getModel('email');
         $security = $this->security;
 
-        /** @var \Mautic\EmailBundle\Entity\Email $email */
+        /** @var Email $email */
         $email = $model->getEntity($objectId);
         // set the page we came from
         $page = $request->getSession()->get('mautic.email.page', 1);
@@ -438,7 +438,7 @@ class EmailController extends FormController
     /**
      * Generates new form and processes post data.
      *
-     * @param \Mautic\EmailBundle\Entity\Email $entity
+     * @param Email $entity
      *
      * @return \Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response
      */
@@ -448,7 +448,7 @@ class EmailController extends FormController
         \assert($model instanceof EmailModel);
 
         if (!($entity instanceof Email)) {
-            /** @var \Mautic\EmailBundle\Entity\Email $entity */
+            /** @var Email $entity */
             $entity = $model->getEntity();
         }
 
@@ -608,16 +608,16 @@ class EmailController extends FormController
      * @return array|\Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|Response
      */
     public function editAction(
-            Request $request,
-            AssetsHelper $assetsHelper,
-            Translator $translator,
-            RouterInterface $routerHelper,
-            CoreParametersHelper $coreParametersHelper,
-            $objectId,
-            $ignorePost = false,
-            $forceTypeSelection = false
+        Request $request,
+        AssetsHelper $assetsHelper,
+        Translator $translator,
+        RouterInterface $routerHelper,
+        CoreParametersHelper $coreParametersHelper,
+        $objectId,
+        $ignorePost = false,
+        $forceTypeSelection = false
     ) {
-        /** @var \Mautic\EmailBundle\Model\EmailModel $model */
+        /** @var EmailModel $model */
         $model  = $this->getModel('email');
         $method = $request->getMethod();
 
@@ -934,7 +934,7 @@ class EmailController extends FormController
      */
     public function builderAction(Request $request, SlotsHelper $slotsHelper, $objectId)
     {
-        /** @var \Mautic\EmailBundle\Model\EmailModel $model */
+        /** @var EmailModel $model */
         $model = $this->getModel('email');
 
         // permission check
@@ -1108,7 +1108,7 @@ class EmailController extends FormController
      */
     public function sendAction(Request $request, $objectId)
     {
-        /** @var \Mautic\EmailBundle\Model\EmailModel $model */
+        /** @var EmailModel $model */
         $model   = $this->getModel('email');
         $entity  = $model->getEntity($objectId);
         $session = $request->getSession();

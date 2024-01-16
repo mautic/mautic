@@ -22,7 +22,7 @@ class IntervalTest extends \PHPUnit\Framework\TestCase
      *
      * @param array<int> $restrictedDays
      */
-    public function testBatchRescheduling(\DateTime $expectedScheduleDate, \DateTime $scheduledOnDate, string $localTimezone = 'UTC', ?\DateTime $specifiedHour = null, ?\DateTime $startTime = null, ?\DateTime $endTime = null, array $restrictedDays = []): void
+    public function testBatchRescheduling(\DateTime $expectedScheduleDate, \DateTime $scheduledOnDate, string $localTimezone = 'UTC', \DateTime $specifiedHour = null, \DateTime $startTime = null, \DateTime $endTime = null, array $restrictedDays = []): void
     {
         $contact1 = $this->createMock(Lead::class);
         $contact1->method('getId')
@@ -111,7 +111,7 @@ class IntervalTest extends \PHPUnit\Framework\TestCase
      *
      * @param array<int> $restrictedDays
      */
-    public function testRescheduling(\DateTime $expectedScheduleDate, \DateTime $scheduledOnDate, ?\DateTime $specifiedHour = null, ?\DateTime $startTime = null, ?\DateTime $endTime = null, array $restrictedDays = [], int $triggerInterval = 0, string $intervalUnit = 'H'): void
+    public function testRescheduling(\DateTime $expectedScheduleDate, \DateTime $scheduledOnDate, \DateTime $specifiedHour = null, \DateTime $startTime = null, \DateTime $endTime = null, array $restrictedDays = [], int $triggerInterval = 0, string $intervalUnit = 'H'): void
     {
         $event = $this->createMock(Event::class);
         $event->method('getId')

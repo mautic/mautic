@@ -158,7 +158,7 @@ abstract class StandardImportTestHelper extends CommonMocks
                 $this->returnValueMap(
                     [
                         [\Mautic\LeadBundle\Entity\LeadEventLog::class, $logRepository],
-                        [\Mautic\LeadBundle\Entity\Import::class, $importRepository],
+                        [Import::class, $importRepository],
                     ]
                 )
             );

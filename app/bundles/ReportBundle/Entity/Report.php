@@ -336,8 +336,6 @@ class Report extends FormEntity implements SchedulerInterface
      *
      * @param string $column
      *
-     * @return mixed
-     *
      * @throws \UnexpectedValueException
      */
     public function getFilterValue($column)
@@ -374,25 +372,16 @@ class Report extends FormEntity implements SchedulerInterface
         return $values;
     }
 
-    /**
-     * @return mixed
-     */
     public function getDescription()
     {
         return $this->description;
     }
 
-    /**
-     * @param mixed $description
-     */
     public function setDescription($description): void
     {
         $this->description = $description;
     }
 
-    /**
-     * @return mixed
-     */
     public function getTableOrder()
     {
         return $this->tableOrder;
@@ -405,9 +394,6 @@ class Report extends FormEntity implements SchedulerInterface
         $this->tableOrder = $tableOrder;
     }
 
-    /**
-     * @return mixed
-     */
     public function getGraphs()
     {
         return $this->graphs;
@@ -420,9 +406,6 @@ class Report extends FormEntity implements SchedulerInterface
         $this->graphs = $graphs;
     }
 
-    /**
-     * @return mixed
-     */
     public function getGroupBy()
     {
         return $this->groupBy;
@@ -435,9 +418,6 @@ class Report extends FormEntity implements SchedulerInterface
         $this->groupBy = $groupBy;
     }
 
-    /**
-     * @return mixed
-     */
     public function getAggregators()
     {
         return $this->aggregators;
@@ -603,8 +583,8 @@ class Report extends FormEntity implements SchedulerInterface
     public function ensureIsMonthlyScheduled(): void
     {
         if (
-            !in_array($this->getScheduleMonthFrequency(), SchedulerEnum::getMonthFrequencyForSelect()) ||
-            !in_array($this->getScheduleDay(), SchedulerEnum::getDayEnumForSelect())
+            !in_array($this->getScheduleMonthFrequency(), SchedulerEnum::getMonthFrequencyForSelect())
+            || !in_array($this->getScheduleDay(), SchedulerEnum::getDayEnumForSelect())
         ) {
             throw new ScheduleNotValidException();
         }

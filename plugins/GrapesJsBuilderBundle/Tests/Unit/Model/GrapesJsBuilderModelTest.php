@@ -59,7 +59,7 @@ class GrapesJsBuilderModelTest extends \PHPUnit\Framework\TestCase
             {
             }
 
-            public function findOneBy(array $criteria, ?array $orderBy = null)
+            public function findOneBy(array $criteria, array $orderBy = null)
             {
                 return null;
             }
@@ -156,7 +156,7 @@ class GrapesJsBuilderModelTest extends \PHPUnit\Framework\TestCase
             {
             }
 
-            public function findOneBy(array $criteria, ?array $orderBy = null)
+            public function findOneBy(array $criteria, array $orderBy = null)
             {
                 return null;
             }

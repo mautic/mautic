@@ -52,7 +52,7 @@ EOT
             }
         }
 
-        return \Symfony\Component\Console\Command\Command::SUCCESS;
+        return Command::SUCCESS;
     }
 
     protected static $defaultDescription = 'Fetch remote do not sell list from MaxMind';

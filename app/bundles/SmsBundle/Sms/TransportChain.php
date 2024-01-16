@@ -70,8 +70,6 @@ class TransportChain
     /**
      * @param string $content
      *
-     * @return mixed
-     *
      * @throws \Exception
      */
     public function sendSms(Lead $lead, $content, Stat $stat = null)

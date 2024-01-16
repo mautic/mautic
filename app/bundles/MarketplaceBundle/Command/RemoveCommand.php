@@ -37,7 +37,7 @@ class RemoveCommand extends Command
         if (!in_array($packageVendorAndName, $this->composer->getMauticPluginPackages())) {
             $output->writeln('This package cannot be removed, it must be of type mautic-plugin');
 
-            return \Symfony\Component\Console\Command\Command::FAILURE;
+            return Command::FAILURE;
         }
 
         $removeResult = $this->composer->remove($packageVendorAndName);
@@ -47,12 +47,12 @@ class RemoveCommand extends Command
             $this->logger->error($message);
             $output->writeLn($message);
 
-            return \Symfony\Component\Console\Command\Command::FAILURE;
+            return Command::FAILURE;
         }
 
         $output->writeln($input->getArgument('package').' has successfully been removed.');
 
-        return \Symfony\Component\Console\Command\Command::SUCCESS;
+        return Command::SUCCESS;
     }
 
     protected static $defaultDescription = 'Removes a plugin that is currently installed';

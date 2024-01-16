@@ -28,7 +28,7 @@ class IpAddress
         $builder = new ClassMetadataBuilder($metadata);
 
         $builder->setTable('ip_addresses')
-            ->setCustomRepositoryClass(\Mautic\CoreBundle\Entity\IpAddressRepository::class)
+            ->setCustomRepositoryClass(IpAddressRepository::class)
             ->addIndex(['ip_address'], 'ip_search');
 
         $builder->addId();

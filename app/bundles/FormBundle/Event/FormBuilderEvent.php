@@ -145,8 +145,6 @@ class FormBuilderEvent extends Event
 
     /**
      * Get form fields.
-     *
-     * @return mixed
      */
     public function getFormFields()
     {

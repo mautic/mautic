@@ -48,7 +48,6 @@ class RealTimeExecutioner
 
     /**
      * @param string      $type
-     * @param mixed       $passthrough
      * @param string|null $channel
      * @param int|null    $channelId
      *
@@ -144,7 +143,6 @@ class RealTimeExecutioner
     }
 
     /**
-     * @param mixed       $passthrough
      * @param string|null $channel
      * @param int|null    $channelId
      *

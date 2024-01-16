@@ -67,9 +67,6 @@ class SocialMonitorEvent extends CommonEvent
         return $this->leadIds;
     }
 
-    /**
-     * @return mixed
-     */
     public function getIntegrationName()
     {
         return $this->integrationName;

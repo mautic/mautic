@@ -19,9 +19,6 @@ class DecisionDispatcher
     ) {
     }
 
-    /**
-     * @param mixed $passthrough
-     */
     public function dispatchRealTimeEvent(DecisionAccessor $config, LeadEventLog $log, $passthrough): DecisionEvent
     {
         $event = new DecisionEvent($config, $log, $passthrough);

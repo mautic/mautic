@@ -34,7 +34,7 @@ class LineChart extends AbstractChart implements ChartInterface
      * @param string      $dateFormat
      */
     public function __construct(
-        ?string $unit = null,
+        string $unit = null,
         $dateFrom = null,
         $dateTo = null,
         protected $dateFormat = null

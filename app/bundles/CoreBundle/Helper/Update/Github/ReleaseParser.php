@@ -30,8 +30,8 @@ class ReleaseParser
             }
 
             if (
-                ('stable' === $allowedStability && 'stable' !== $metadata->getStability()) ||
-                ('stable' !== $metadata->getStability() && version_compare($allowedStability, $metadata->getStability(), 'gt'))
+                ('stable' === $allowedStability && 'stable' !== $metadata->getStability())
+                || ('stable' !== $metadata->getStability() && version_compare($allowedStability, $metadata->getStability(), 'gt'))
             ) {
                 // This Mautic does support the given release's stability so continue
                 continue;

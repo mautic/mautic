@@ -10,5 +10,5 @@ interface AuthProviderInterface
 {
     public function getAuthType(): string;
 
-    public function getClient(AuthCredentialsInterface $credentials, ?AuthConfigInterface $config = null): ClientInterface;
+    public function getClient(AuthCredentialsInterface $credentials, AuthConfigInterface $config = null): ClientInterface;
 }

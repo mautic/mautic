@@ -11,8 +11,8 @@ class CheckPhpVersion extends AbstractPreUpdateCheck
         $metadata = $this->getUpdateCandidateMetadata();
 
         if (
-            version_compare(PHP_VERSION, $metadata->getMinSupportedPHPVersion(), 'lt') ||
-            version_compare(PHP_VERSION, $metadata->getMaxSupportedPHPVersion(), 'gt')
+            version_compare(PHP_VERSION, $metadata->getMinSupportedPHPVersion(), 'lt')
+            || version_compare(PHP_VERSION, $metadata->getMaxSupportedPHPVersion(), 'gt')
         ) {
             return new PreUpdateCheckResult(false, $this, [
                 new PreUpdateCheckError('mautic.core.update.check.phpversion', [

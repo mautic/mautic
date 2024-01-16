@@ -58,7 +58,7 @@ return [
                 'standard_entity' => true,
                 'name'            => 'pages',
                 'path'            => '/pages',
-                'controller'      => \Mautic\PageBundle\Controller\Api\PageApiController::class,
+                'controller'      => Mautic\PageBundle\Controller\Api\PageApiController::class,
             ],
         ],
         'catchall' => [
@@ -92,28 +92,28 @@ return [
     'services' => [
         'fixtures' => [
             'mautic.page.fixture.page_category' => [
-                'class'     => \Mautic\PageBundle\DataFixtures\ORM\LoadPageCategoryData::class,
-                'tag'       => \Doctrine\Bundle\FixturesBundle\DependencyInjection\CompilerPass\FixturesCompilerPass::FIXTURE_TAG,
+                'class'     => Mautic\PageBundle\DataFixtures\ORM\LoadPageCategoryData::class,
+                'tag'       => Doctrine\Bundle\FixturesBundle\DependencyInjection\CompilerPass\FixturesCompilerPass::FIXTURE_TAG,
                 'arguments' => ['mautic.category.model.category'],
             ],
             'mautic.page.fixture.page' => [
-                'class'     => \Mautic\PageBundle\DataFixtures\ORM\LoadPageData::class,
-                'tag'       => \Doctrine\Bundle\FixturesBundle\DependencyInjection\CompilerPass\FixturesCompilerPass::FIXTURE_TAG,
+                'class'     => Mautic\PageBundle\DataFixtures\ORM\LoadPageData::class,
+                'tag'       => Doctrine\Bundle\FixturesBundle\DependencyInjection\CompilerPass\FixturesCompilerPass::FIXTURE_TAG,
                 'arguments' => ['mautic.page.model.page'],
             ],
             'mautic.page.fixture.page_hit' => [
-                'class'     => \Mautic\PageBundle\DataFixtures\ORM\LoadPageHitData::class,
-                'tag'       => \Doctrine\Bundle\FixturesBundle\DependencyInjection\CompilerPass\FixturesCompilerPass::FIXTURE_TAG,
+                'class'     => Mautic\PageBundle\DataFixtures\ORM\LoadPageHitData::class,
+                'tag'       => Doctrine\Bundle\FixturesBundle\DependencyInjection\CompilerPass\FixturesCompilerPass::FIXTURE_TAG,
                 'arguments' => ['mautic.page.model.page'],
             ],
         ],
         'other' => [
             'mautic.page.helper.token' => [
-                'class'     => \Mautic\PageBundle\Helper\TokenHelper::class,
+                'class'     => Mautic\PageBundle\Helper\TokenHelper::class,
                 'arguments' => 'mautic.page.model.page',
             ],
             'mautic.page.helper.tracking' => [
-                'class'     => \Mautic\PageBundle\Helper\TrackingHelper::class,
+                'class'     => Mautic\PageBundle\Helper\TrackingHelper::class,
                 'arguments' => [
                     'session',
                     'mautic.helper.core_parameters',

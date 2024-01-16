@@ -26,7 +26,7 @@ class SmsController extends FormController
      */
     public function indexAction(Request $request, TransportChain $transportChain, $page = 1)
     {
-        /** @var \Mautic\SmsBundle\Model\SmsModel $model */
+        /** @var SmsModel $model */
         $model = $this->getModel('sms');
 
         // set some permissions
@@ -138,11 +138,11 @@ class SmsController extends FormController
      */
     public function viewAction(Request $request, $objectId)
     {
-        /** @var \Mautic\SmsBundle\Model\SmsModel $model */
+        /** @var SmsModel $model */
         $model    = $this->getModel('sms');
         $security = $this->security;
 
-        /** @var \Mautic\SmsBundle\Entity\Sms $sms */
+        /** @var Sms $sms */
         $sms = $model->getEntity($objectId);
         // set the page we came from
         $page = $request->getSession()->get('mautic.sms.page', 1);
@@ -243,11 +243,11 @@ class SmsController extends FormController
      */
     public function newAction(Request $request, $entity = null)
     {
-        /** @var \Mautic\SmsBundle\Model\SmsModel $model */
+        /** @var SmsModel $model */
         $model = $this->getModel('sms');
 
         if (!$entity instanceof Sms) {
-            /** @var \Mautic\SmsBundle\Entity\Sms $entity */
+            /** @var Sms $entity */
             $entity = $model->getEntity();
         }
 
@@ -377,7 +377,7 @@ class SmsController extends FormController
      */
     public function editAction(Request $request, $objectId, $ignorePost = false, $forceTypeSelection = false)
     {
-        /** @var \Mautic\SmsBundle\Model\SmsModel $model */
+        /** @var SmsModel $model */
         $model   = $this->getModel('sms');
         $method  = $request->getMethod();
         $entity  = $model->getEntity($objectId);
@@ -702,7 +702,7 @@ class SmsController extends FormController
      */
     public function previewAction($objectId)
     {
-        /** @var \Mautic\SmsBundle\Model\SmsModel $model */
+        /** @var SmsModel $model */
         $model    = $this->getModel('sms');
         $sms      = $model->getEntity($objectId);
         $security = $this->security;

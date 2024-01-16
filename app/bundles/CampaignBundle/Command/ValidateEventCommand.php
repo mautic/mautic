@@ -67,7 +67,7 @@ class ValidateEventCommand extends Command
                 .'</comment>'
             );
 
-            return \Symfony\Component\Console\Command\Command::SUCCESS;
+            return Command::SUCCESS;
         }
 
         $limiter = new ContactLimiter(null, $contactId, null, null, $contactIds);
@@ -75,7 +75,7 @@ class ValidateEventCommand extends Command
 
         $this->writeCounts($output, $this->translator, $counter);
 
-        return \Symfony\Component\Console\Command\Command::SUCCESS;
+        return Command::SUCCESS;
     }
 
     protected static $defaultDescription = 'Validate if a contact has been inactive for a decision and execute events if so.';

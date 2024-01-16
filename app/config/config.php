@@ -7,7 +7,7 @@ use Mautic\CoreBundle\EventListener\ConsoleTerminateListener;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Reference;
 
-/** @var \Symfony\Component\DependencyInjection\ContainerBuilder $container */
+/** @var Symfony\Component\DependencyInjection\ContainerBuilder $container */
 
 // Include path settings
 $root        = $container->getParameter('mautic.application_dir').'/app';
@@ -26,7 +26,7 @@ $container->loadFromExtension('sensio_framework_extra', [
 
 // Build and store Mautic bundle metadata
 $symfonyBundles        = $container->getParameter('kernel.bundles');
-$bundleMetadataBuilder = new \Mautic\CoreBundle\DependencyInjection\Builder\BundleMetadataBuilder($symfonyBundles, $paths, $root);
+$bundleMetadataBuilder = new Mautic\CoreBundle\DependencyInjection\Builder\BundleMetadataBuilder($symfonyBundles, $paths, $root);
 
 $container->setParameter('mautic.bundles', $bundleMetadataBuilder->getCoreBundleMetadata());
 $container->setParameter('mautic.plugin.bundles', $bundleMetadataBuilder->getPluginMetadata());
@@ -37,7 +37,7 @@ $container->setParameter('mautic.ip_lookup_services', $bundleMetadataBuilder->ge
 // Load parameters
 include __DIR__.'/parameters.php';
 $container->loadFromExtension('mautic_core');
-$parameterLoader         = new \Mautic\CoreBundle\Loader\ParameterLoader();
+$parameterLoader         = new Mautic\CoreBundle\Loader\ParameterLoader();
 $configParameterBag      = $parameterLoader->getParameterBag();
 $localConfigParameterBag = $parameterLoader->getLocalParameterBag();
 
@@ -45,7 +45,7 @@ $localConfigParameterBag = $parameterLoader->getLocalParameterBag();
 // This cannot be set dynamically
 
 if (defined('MAUTIC_INSTALLER')) {
-    $request      = \Symfony\Component\HttpFoundation\Request::createFromGlobals();
+    $request      = Symfony\Component\HttpFoundation\Request::createFromGlobals();
     $secureCookie = $request->isSecure();
 } else {
     $siteUrl      = $configParameterBag->get('site_url');
@@ -85,24 +85,24 @@ $container->loadFromExtension('framework', [
             'email' => [
                 'dsn'            => '%env(MAUTIC_MESSENGER_DSN_EMAIL)%',
                 'retry_strategy' => [
-                    'service' => \Mautic\MessengerBundle\Retry\RetryStrategy::class,
+                    'service' => Mautic\MessengerBundle\Retry\RetryStrategy::class,
                 ],
             ],
             'hit' => [
                 'dsn'            => '%env(MAUTIC_MESSENGER_DSN_HIT)%',
                 'retry_strategy' => [
-                    'service' => \Mautic\MessengerBundle\Retry\RetryStrategy::class,
+                    'service' => Mautic\MessengerBundle\Retry\RetryStrategy::class,
                 ],
             ],
             'failed' => '%env(messenger-nullable:MAUTIC_MESSENGER_DSN_FAILED)%',
         ],
         'routing' => [
-            \Symfony\Component\Mailer\Messenger\SendEmailMessage::class => 'email',
-            \Mautic\MessengerBundle\Message\TestEmail::class            => 'email',
-            \Mautic\MessengerBundle\Message\TestHit::class              => 'hit',
-            \Mautic\MessengerBundle\Message\TestFailed::class           => 'failed',
-            \Mautic\MessengerBundle\Message\PageHitNotification::class  => 'hit',
-            \Mautic\MessengerBundle\Message\EmailHitNotification::class => 'hit',
+            Symfony\Component\Mailer\Messenger\SendEmailMessage::class => 'email',
+            Mautic\MessengerBundle\Message\TestEmail::class            => 'email',
+            Mautic\MessengerBundle\Message\TestHit::class              => 'hit',
+            Mautic\MessengerBundle\Message\TestFailed::class           => 'failed',
+            Mautic\MessengerBundle\Message\PageHitNotification::class  => 'hit',
+            Mautic\MessengerBundle\Message\EmailHitNotification::class => 'hit',
         ],
     ],
 
@@ -134,12 +134,12 @@ $connectionSettings = [
         'bit'   => 'string',
     ],
     'server_version' => '%env(mauticconst:MAUTIC_DB_SERVER_VERSION)%',
-    'wrapper_class'  => \Mautic\CoreBundle\Doctrine\Connection\ConnectionWrapper::class,
-    'options'        => [\PDO::ATTR_STRINGIFY_FETCHES => true], // @see https://www.php.net/manual/en/migration81.incompatible.php#migration81.incompatible.pdo.mysql
+    'wrapper_class'  => Mautic\CoreBundle\Doctrine\Connection\ConnectionWrapper::class,
+    'options'        => [PDO::ATTR_STRINGIFY_FETCHES => true], // @see https://www.php.net/manual/en/migration81.incompatible.php#migration81.incompatible.pdo.mysql
 ];
 
 if (!empty($localConfigParameterBag->get('db_host_ro'))) {
-    $dbalSettings['wrapper_class']   = \Mautic\CoreBundle\Doctrine\Connection\PrimaryReadReplicaConnectionWrapper::class;
+    $dbalSettings['wrapper_class']   = Mautic\CoreBundle\Doctrine\Connection\PrimaryReadReplicaConnectionWrapper::class;
     $dbalSettings['keep_replica']    = true;
     $dbalSettings['replicas']        = [
         'replica1' => [
@@ -161,7 +161,7 @@ $container->loadFromExtension('doctrine', [
             'unbuffered' => array_merge($connectionSettings, [
                 'options' => [
                     PDO::MYSQL_ATTR_USE_BUFFERED_QUERY => false,
-                    \PDO::ATTR_STRINGIFY_FETCHES       => true, // @see https://www.php.net/manual/en/migration81.incompatible.php#migration81.incompatible.pdo.mysql
+                    PDO::ATTR_STRINGIFY_FETCHES        => true, // @see https://www.php.net/manual/en/migration81.incompatible.php#migration81.incompatible.pdo.mysql
                 ],
             ]),
         ],
@@ -178,7 +178,7 @@ $container->loadFromExtension('doctrine', [
         'mappings'                    => $bundleMetadataBuilder->getOrmConfig(),
         'dql'                         => [
             'string_functions' => [
-                'match' => \DoctrineExtensions\Query\Mysql\MatchAgainst::class,
+                'match' => DoctrineExtensions\Query\Mysql\MatchAgainst::class,
             ],
         ],
         'result_cache_driver' => [

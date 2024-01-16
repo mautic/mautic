@@ -29,11 +29,6 @@ class CookieHelper implements EventSubscriberInterface
     ) {
     }
 
-    /**
-     * @param mixed $default
-     *
-     * @return mixed
-     */
     public function getCookie(string $key, $default = null)
     {
         if (null === $this->getRequest()) {
@@ -46,7 +41,7 @@ class CookieHelper implements EventSubscriberInterface
     /**
      * @param int|string|float|bool|object|null $value
      */
-    public function setCookie(string $name, $value, ?int $expire = 1800, ?string $path = null, ?string $domain = null, ?bool $secure = null, ?bool $httponly = null, ?string $sameSite = Cookie::SAMESITE_LAX): void
+    public function setCookie(string $name, $value, ?int $expire = 1800, string $path = null, string $domain = null, bool $secure = null, bool $httponly = null, ?string $sameSite = Cookie::SAMESITE_LAX): void
     {
         if (null !== $value) {
             $value = (string) $value;
@@ -70,7 +65,7 @@ class CookieHelper implements EventSubscriberInterface
     /**
      * Deletes a cookie by expiring it.
      */
-    public function deleteCookie(string $name, ?string $path = null, ?string $domain = null, ?bool $secure = null, ?bool $httponly = null, ?string $sameSite = Cookie::SAMESITE_LAX): void
+    public function deleteCookie(string $name, string $path = null, string $domain = null, bool $secure = null, bool $httponly = null, ?string $sameSite = Cookie::SAMESITE_LAX): void
     {
         $this->setCookie($name, '', -86400, $path, $domain, $secure, $httponly, $sameSite);
     }

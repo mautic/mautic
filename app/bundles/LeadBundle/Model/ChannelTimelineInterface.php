@@ -14,8 +14,6 @@ interface ChannelTimelineInterface
      *
      * @param string $eventType
      * @param array  $details
-     *
-     * @return mixed
      */
     public function getChannelTimelineTemplate($eventType, $details);
 
@@ -26,8 +24,6 @@ interface ChannelTimelineInterface
      *
      * @param string $eventType
      * @param array  $details
-     *
-     * @return mixed
      */
     public function getChannelTimelineLabel($eventType, $details);
 
@@ -38,8 +34,6 @@ interface ChannelTimelineInterface
      *
      * @param string $eventType
      * @param array  $details
-     *
-     * @return mixed
      */
     public function getChannelTimelineIcon($eventType, $details);
 }

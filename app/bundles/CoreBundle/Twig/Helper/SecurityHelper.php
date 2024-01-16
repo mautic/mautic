@@ -42,8 +42,6 @@ final class SecurityHelper
 
     /**
      * @param string[]|string $permission
-     *
-     * @return mixed
      */
     public function isGranted($permission)
     {

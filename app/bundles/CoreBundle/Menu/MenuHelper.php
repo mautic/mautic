@@ -118,8 +118,6 @@ class MenuHelper
      * Get and reset orphaned menu items.
      *
      * @param string $type
-     *
-     * @return mixed
      */
     public function resetOrphans($type = 'main')
     {
@@ -194,9 +192,6 @@ class MenuHelper
         );
     }
 
-    /**
-     * @return mixed
-     */
     protected function getParameter($name)
     {
         return $this->coreParametersHelper->get($name, false);
@@ -240,7 +235,6 @@ class MenuHelper
 
     /**
      * @param string $name
-     * @param mixed  $value
      */
     protected function handleParametersChecks($name, $value): bool
     {
@@ -249,7 +243,6 @@ class MenuHelper
 
     /**
      * @param string $name
-     * @param mixed  $value
      */
     protected function handleRequestChecks($name, $value): bool
     {

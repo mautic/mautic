@@ -129,8 +129,6 @@ abstract class AbstractCommonModel implements MauticModelInterface
      * Decode a string appended to URL into an array.
      *
      * @param bool $urlDecode
-     *
-     * @return mixed
      */
     public function decodeArrayFromUrl($string, $urlDecode = true)
     {

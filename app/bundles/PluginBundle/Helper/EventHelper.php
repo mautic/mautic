@@ -13,7 +13,7 @@ class EventHelper
     {
         $contact = $factory->getEntityManager()->getRepository(\Mautic\LeadBundle\Entity\Lead::class)->getEntityWithPrimaryCompany($lead);
 
-        /** @var \Mautic\PluginBundle\Helper\IntegrationHelper $integrationHelper */
+        /** @var IntegrationHelper $integrationHelper */
         $integrationHelper = $factory->getHelper('integration');
 
         static::setStaticIntegrationHelper($integrationHelper);

@@ -13,8 +13,6 @@ class Serializer
      * PHP does not recommend untrusted user input even with ['allowed_classes' => false]
      *
      * @param string $serializedString
-     *
-     * @return mixed
      */
     public static function decode($serializedString, array $options = ['allowed_classes' => false])
     {

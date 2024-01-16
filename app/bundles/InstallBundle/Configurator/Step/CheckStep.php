@@ -180,7 +180,7 @@ class CheckStep implements StepInterface
             $messages[] = 'mautic.install.function.iconv';
         }
 
-        if (!function_exists('utf8_decode')) {
+        if (!extension_loaded('xml')) {
             $messages[] = 'mautic.install.function.xml';
         }
 

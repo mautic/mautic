@@ -97,7 +97,7 @@ class Company extends FormEntity implements CustomFieldEntityInterface, Identifi
             ->nullable()
             ->build();
 
-        $builder->createManyToOne('owner', \Mautic\UserBundle\Entity\User::class)
+        $builder->createManyToOne('owner', User::class)
             ->cascadeMerge()
             ->addJoinColumn('owner_id', 'id', true, false, 'SET NULL')
             ->build();
@@ -249,17 +249,12 @@ class Company extends FormEntity implements CustomFieldEntityInterface, Identifi
         return $this->score;
     }
 
-    /**
-     * @return mixed
-     */
     public function getName()
     {
         return $this->name;
     }
 
     /**
-     * @param mixed $name
-     *
      * @return Company
      */
     public function setName($name)
@@ -269,17 +264,12 @@ class Company extends FormEntity implements CustomFieldEntityInterface, Identifi
         return $this;
     }
 
-    /**
-     * @return mixed
-     */
     public function getEmail()
     {
         return $this->email;
     }
 
     /**
-     * @param mixed $email
-     *
      * @return Company
      */
     public function setEmail($email)
@@ -289,17 +279,12 @@ class Company extends FormEntity implements CustomFieldEntityInterface, Identifi
         return $this;
     }
 
-    /**
-     * @return mixed
-     */
     public function getAddress1()
     {
         return $this->address1;
     }
 
     /**
-     * @param mixed $address1
-     *
      * @return Company
      */
     public function setAddress1($address1)
@@ -309,17 +294,12 @@ class Company extends FormEntity implements CustomFieldEntityInterface, Identifi
         return $this;
     }
 
-    /**
-     * @return mixed
-     */
     public function getAddress2()
     {
         return $this->address2;
     }
 
     /**
-     * @param mixed $address2
-     *
      * @return Company
      */
     public function setAddress2($address2)
@@ -329,17 +309,12 @@ class Company extends FormEntity implements CustomFieldEntityInterface, Identifi
         return $this;
     }
 
-    /**
-     * @return mixed
-     */
     public function getPhone()
     {
         return $this->phone;
     }
 
     /**
-     * @param mixed $phone
-     *
      * @return Company
      */
     public function setPhone($phone)
@@ -349,17 +324,12 @@ class Company extends FormEntity implements CustomFieldEntityInterface, Identifi
         return $this;
     }
 
-    /**
-     * @return mixed
-     */
     public function getCity()
     {
         return $this->city;
     }
 
     /**
-     * @param mixed $city
-     *
      * @return Company
      */
     public function setCity($city)
@@ -369,17 +339,12 @@ class Company extends FormEntity implements CustomFieldEntityInterface, Identifi
         return $this;
     }
 
-    /**
-     * @return mixed
-     */
     public function getState()
     {
         return $this->state;
     }
 
     /**
-     * @param mixed $state
-     *
      * @return Company
      */
     public function setState($state)
@@ -389,17 +354,12 @@ class Company extends FormEntity implements CustomFieldEntityInterface, Identifi
         return $this;
     }
 
-    /**
-     * @return mixed
-     */
     public function getZipcode()
     {
         return $this->zipcode;
     }
 
     /**
-     * @param mixed $zipcode
-     *
      * @return Company
      */
     public function setZipcode($zipcode)
@@ -409,17 +369,12 @@ class Company extends FormEntity implements CustomFieldEntityInterface, Identifi
         return $this;
     }
 
-    /**
-     * @return mixed
-     */
     public function getCountry()
     {
         return $this->country;
     }
 
     /**
-     * @param mixed $country
-     *
      * @return Company
      */
     public function setCountry($country)
@@ -429,17 +384,12 @@ class Company extends FormEntity implements CustomFieldEntityInterface, Identifi
         return $this;
     }
 
-    /**
-     * @return mixed
-     */
     public function getWebsite()
     {
         return $this->website;
     }
 
     /**
-     * @param mixed $website
-     *
      * @return Company
      */
     public function setWebsite($website)
@@ -449,17 +399,12 @@ class Company extends FormEntity implements CustomFieldEntityInterface, Identifi
         return $this;
     }
 
-    /**
-     * @return mixed
-     */
     public function getIndustry()
     {
         return $this->industry;
     }
 
     /**
-     * @param mixed $industry
-     *
      * @return Company
      */
     public function setIndustry($industry)
@@ -469,17 +414,12 @@ class Company extends FormEntity implements CustomFieldEntityInterface, Identifi
         return $this;
     }
 
-    /**
-     * @return mixed
-     */
     public function getDescription()
     {
         return $this->description;
     }
 
     /**
-     * @param mixed $description
-     *
      * @return Company
      */
     public function setDescription($description)

@@ -149,7 +149,7 @@ class FormModelTest extends \PHPUnit\Framework\TestCase
             ->will(
                 $this->returnValueMap(
                     [
-                        [\Mautic\FormBundle\Entity\Form::class, $this->formRepository],
+                        [Form::class, $this->formRepository],
                     ]
                 )
             );

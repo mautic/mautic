@@ -53,7 +53,7 @@ class LeadFieldRepository extends CommonRepository
 
         if ($includeEntityFields) {
             // add lead main column names to prevent attempt to create a field with the same name
-            $leadRepo = $this->_em->getRepository(\Mautic\LeadBundle\Entity\Lead::class)->getBaseColumns(\Mautic\LeadBundle\Entity\Lead::class, true);
+            $leadRepo = $this->_em->getRepository(Lead::class)->getBaseColumns(Lead::class, true);
             $aliases  = array_merge($aliases, $leadRepo);
         }
 
@@ -198,7 +198,7 @@ class LeadFieldRepository extends CommonRepository
      *
      * @return bool
      */
-    public function compareValue($lead, $field, $value, $operatorExpr, ?string $fieldType = null)
+    public function compareValue($lead, $field, $value, $operatorExpr, string $fieldType = null)
     {
         $q = $this->_em->getConnection()->createQueryBuilder();
         $q->select('l.id')

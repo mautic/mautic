@@ -187,7 +187,7 @@ class PageTestAbstract extends TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $mockRedirectModel = $this->getMockBuilder(\Mautic\PageBundle\Model\RedirectModel::class)
+        $mockRedirectModel = $this->getMockBuilder(RedirectModel::class)
             ->setConstructorArgs([
                 $this->createMock(EntityManagerInterface::class),
                 $this->createMock(CorePermissions::class),

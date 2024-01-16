@@ -1054,9 +1054,6 @@ class CampaignController extends AbstractStandardFormController
         $this->getCurrentRequest()->getSession()->set('mautic.campaign.'.$sessionId.'.events.canvassettings', $canvasSettings);
     }
 
-    /**
-     * @return mixed
-     */
     protected function getSessionCanvasSettings($sessionId)
     {
         return $this->getCurrentRequest()->getSession()->get('mautic.campaign.'.$sessionId.'.events.canvassettings');
@@ -1138,10 +1135,10 @@ class CampaignController extends AbstractStandardFormController
 
         // rewrite stats data from parent condition if exist
         foreach ($events as &$event) {
-            if (!empty($event['decisionPath']) &&
-                !empty($event['parent_id']) &&
-                isset($events[$event['parent_id']]) &&
-                'condition' !== $event['eventType']) {
+            if (!empty($event['decisionPath'])
+                && !empty($event['parent_id'])
+                && isset($events[$event['parent_id']])
+                && 'condition' !== $event['eventType']) {
                 $parentEvent                 = $events[$event['parent_id']];
                 $event['percent']            = $parentEvent['percent'];
                 $event['yesPercent']         = $parentEvent['yesPercent'];

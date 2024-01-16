@@ -203,8 +203,8 @@ class SegmentContactsLineChartQuery extends ChartQuery
     {
         if (
             // Remove unwanted self join with lead_lists_leads table
-            false !== ($key = array_search(MAUTIC_TABLE_PREFIX.ListLead::TABLE_NAME, array_column($qb->getQueryPart('from'), 'table'))) &&
-            false !== ($joinKey = array_search(MAUTIC_TABLE_PREFIX.ListLead::TABLE_NAME, array_column($qb->getQueryPart('join')[$tableAlias = $qb->getQueryPart('from')[$key]['alias']], 'joinTable')))
+            false !== ($key = array_search(MAUTIC_TABLE_PREFIX.ListLead::TABLE_NAME, array_column($qb->getQueryPart('from'), 'table')))
+            && false !== ($joinKey = array_search(MAUTIC_TABLE_PREFIX.ListLead::TABLE_NAME, array_column($qb->getQueryPart('join')[$tableAlias = $qb->getQueryPart('from')[$key]['alias']], 'joinTable')))
         ) {
             $joinAlias = $qb->getQueryPart('join')[$tableAlias][$joinKey]['joinAlias'];
             $qb->resetQueryPart('join');

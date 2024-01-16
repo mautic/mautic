@@ -22,7 +22,7 @@ class Submission
     private $form;
 
     /**
-     * @var \Mautic\CoreBundle\Entity\IpAddress
+     * @var IpAddress
      */
     private $ipAddress;
 
@@ -61,7 +61,7 @@ class Submission
         $builder = new ClassMetadataBuilder($metadata);
 
         $builder->setTable('form_submissions')
-            ->setCustomRepositoryClass(\Mautic\FormBundle\Entity\SubmissionRepository::class)
+            ->setCustomRepositoryClass(SubmissionRepository::class)
             ->addIndex(['tracking_id'], 'form_submission_tracking_search')
             ->addIndex(['date_submitted'], 'form_date_submitted');
 
@@ -87,7 +87,7 @@ class Submission
 
         $builder->addField('referer', 'text');
 
-        $builder->createManyToOne('page', \Mautic\PageBundle\Entity\Page::class)
+        $builder->createManyToOne('page', Page::class)
             ->addJoinColumn('page_id', 'id', true, false, 'SET NULL')
             ->fetchExtraLazy()
             ->build();
@@ -221,7 +221,7 @@ class Submission
     /**
      * Get ipAddress.
      *
-     * @return \Mautic\CoreBundle\Entity\IpAddress
+     * @return IpAddress
      */
     public function getIpAddress()
     {
@@ -265,7 +265,7 @@ class Submission
     /**
      * Get page.
      *
-     * @return \Mautic\PageBundle\Entity\Page
+     * @return Page
      */
     public function getPage()
     {
@@ -290,9 +290,6 @@ class Submission
         return $this;
     }
 
-    /**
-     * @return mixed
-     */
     public function getTrackingId()
     {
         return $this->trackingId;
@@ -311,8 +308,6 @@ class Submission
     /**
      * This method is used by standard entity algorithms to check if the current
      * user has permission to view/edit/delete this item. Provide the form creator for it.
-     *
-     * @return mixed
      */
     public function getCreatedBy()
     {

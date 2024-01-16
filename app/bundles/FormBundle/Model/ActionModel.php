@@ -17,7 +17,7 @@ class ActionModel extends CommonFormModel
      */
     public function getRepository()
     {
-        return $this->em->getRepository(\Mautic\FormBundle\Entity\Action::class);
+        return $this->em->getRepository(Action::class);
     }
 
     public function getPermissionBase(): string

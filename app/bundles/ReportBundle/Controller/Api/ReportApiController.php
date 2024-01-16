@@ -49,7 +49,7 @@ class ReportApiController extends CommonApiController
      *
      * @param int $id Report ID
      *
-     * @return \Symfony\Component\HttpFoundation\Response
+     * @return Response
      */
     public function getReportAction(Request $request, $id)
     {

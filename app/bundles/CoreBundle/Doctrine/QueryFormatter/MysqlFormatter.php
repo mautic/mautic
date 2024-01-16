@@ -39,8 +39,6 @@ class MysqlFormatter extends AbstractFormatter
 
     /**
      * Format field to a numeric.
-     *
-     * @return mixed
      */
     public function toNumeric($field)
     {

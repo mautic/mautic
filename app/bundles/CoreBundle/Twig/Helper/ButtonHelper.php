@@ -89,9 +89,6 @@ final class ButtonHelper
 
     private ?\Symfony\Component\HttpFoundation\Request $request = null;
 
-    /**
-     * @var mixed
-     */
     private $item;
 
     /**
@@ -212,17 +209,12 @@ final class ButtonHelper
         return $content;
     }
 
-    /**
-     * @return mixed
-     */
     public function getLocation()
     {
         return $this->location;
     }
 
     /**
-     * @param mixed $location
-     *
      * @return ButtonHelper
      */
     public function setLocation($location)

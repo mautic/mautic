@@ -49,8 +49,6 @@ class EncryptionHelper
 
     /**
      * Encrypt string.
-     *
-     * @param mixed $data
      */
     public function encrypt($data): string
     {

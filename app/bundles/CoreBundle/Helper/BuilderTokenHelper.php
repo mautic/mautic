@@ -37,9 +37,9 @@ class BuilderTokenHelper
      */
     public function configure(
         string $modelName,
-        ?string $viewPermissionBase = null,
-        ?string $bundleName = null,
-        ?string $langVar = null
+        string $viewPermissionBase = null,
+        string $bundleName = null,
+        string $langVar = null
     ): void {
         $this->modelName          = $modelName;
         $this->viewPermissionBase = (!empty($viewPermissionBase)) ? $viewPermissionBase : "$modelName:{$modelName}s";

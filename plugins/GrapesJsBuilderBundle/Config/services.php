@@ -21,5 +21,5 @@ return function (ContainerConfigurator $configurator): void {
 
     $services->load('MauticPlugin\\GrapesJsBuilderBundle\\Entity\\', '../Entity/*Repository.php');
 
-    $services->alias('grapesjsbuilder.model', \MauticPlugin\GrapesJsBuilderBundle\Model\GrapesJsBuilderModel::class);
+    $services->alias('grapesjsbuilder.model', MauticPlugin\GrapesJsBuilderBundle\Model\GrapesJsBuilderModel::class);
 };

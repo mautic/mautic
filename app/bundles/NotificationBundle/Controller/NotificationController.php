@@ -26,7 +26,7 @@ class NotificationController extends AbstractFormController
      */
     public function indexAction(Request $request, $page = 1)
     {
-        /** @var \Mautic\NotificationBundle\Model\NotificationModel $model */
+        /** @var NotificationModel $model */
         $model = $this->getModel('notification');
 
         // set some permissions
@@ -149,11 +149,11 @@ class NotificationController extends AbstractFormController
      */
     public function viewAction(Request $request, FormFactoryInterface $formFactory, $objectId)
     {
-        /** @var \Mautic\NotificationBundle\Model\NotificationModel $model */
+        /** @var NotificationModel $model */
         $model    = $this->getModel('notification');
         $security = $this->security;
 
-        /** @var \Mautic\NotificationBundle\Entity\Notification $notification */
+        /** @var Notification $notification */
         $notification = $model->getEntity($objectId);
         // set the page we came from
         $page = $request->getSession()->get('mautic.notification.page', 1);
@@ -255,11 +255,11 @@ class NotificationController extends AbstractFormController
      */
     public function newAction(Request $request, FormFactoryInterface $formFactory, $entity = null)
     {
-        /** @var \Mautic\NotificationBundle\Model\NotificationModel $model */
+        /** @var NotificationModel $model */
         $model = $this->getModel('notification');
 
         if (!$entity instanceof Notification) {
-            /** @var \Mautic\NotificationBundle\Entity\Notification $entity */
+            /** @var Notification $entity */
             $entity = $model->getEntity();
         }
 
@@ -389,7 +389,7 @@ class NotificationController extends AbstractFormController
      */
     public function editAction(Request $request, FormFactoryInterface $formFactory, $objectId, $ignorePost = false, $forceTypeSelection = false)
     {
-        /** @var \Mautic\NotificationBundle\Model\NotificationModel $model */
+        /** @var NotificationModel $model */
         $model   = $this->getModel('notification');
         $method  = $request->getMethod();
         $entity  = $model->getEntity($objectId);
@@ -719,7 +719,7 @@ class NotificationController extends AbstractFormController
 
     public function previewAction($objectId): Response
     {
-        /** @var \Mautic\NotificationBundle\Model\NotificationModel $model */
+        /** @var NotificationModel $model */
         $model        = $this->getModel('notification');
         $notification = $model->getEntity($objectId);
 

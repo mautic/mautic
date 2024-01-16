@@ -55,7 +55,7 @@ class PointsChangeLog
         $builder = new ClassMetadataBuilder($metadata);
 
         $builder->setTable('lead_points_change_log')
-            ->setCustomRepositoryClass(\Mautic\LeadBundle\Entity\PointsChangeLogRepository::class)
+            ->setCustomRepositoryClass(PointsChangeLogRepository::class)
             ->addIndex(['date_added'], 'point_date_added');
 
         $builder->addBigIntIdField();
@@ -228,7 +228,7 @@ class PointsChangeLog
     /**
      * Get lead.
      *
-     * @return \Mautic\LeadBundle\Entity\Lead
+     * @return Lead
      */
     public function getLead()
     {

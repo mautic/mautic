@@ -132,7 +132,7 @@ class Stat
         $builder = new ClassMetadataBuilder($metadata);
 
         $builder->setTable('email_stats')
-            ->setCustomRepositoryClass(\Mautic\EmailBundle\Entity\StatRepository::class)
+            ->setCustomRepositoryClass(StatRepository::class)
             ->addIndex(['email_id', 'lead_id'], 'stat_email_search')
             ->addIndex(['lead_id', 'email_id'], 'stat_email_search2')
             ->addIndex(['is_failed'], 'stat_email_failed_search')
@@ -157,7 +157,7 @@ class Stat
             ->columnName('email_address')
             ->build();
 
-        $builder->createManyToOne('list', \Mautic\LeadBundle\Entity\LeadList::class)
+        $builder->createManyToOne('list', LeadList::class)
             ->addJoinColumn('list_id', 'id', true, false, 'SET NULL')
             ->build();
 
@@ -207,7 +207,7 @@ class Stat
             ->nullable()
             ->build();
 
-        $builder->createManyToOne('storedCopy', \Mautic\EmailBundle\Entity\Copy::class)
+        $builder->createManyToOne('storedCopy', Copy::class)
             ->addJoinColumn('copy_id', 'id', true, false, 'SET NULL')
             ->build();
 

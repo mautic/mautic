@@ -122,7 +122,7 @@ class ChannelClickQueryBuilderTest extends TestCase
     /**
      * @dataProvider dataApplyQueryWithBatchLimitersMinMaxBoth
      *
-     *  @param array<string, mixed> $batchLimiters
+     * @param array<string, mixed> $batchLimiters
      */
     public function testApplyQueryWithBatchLimitersMinMaxBoth(array $batchLimiters, string $operator, string $parameterValue, string $expectedQuery): void
     {
@@ -142,7 +142,7 @@ class ChannelClickQueryBuilderTest extends TestCase
     }
 
     /**
-     *  @param array<string, mixed> $batchLimiters
+     * @param array<string, mixed> $batchLimiters
      */
     private function getContactSegmentFilter(string $operator, string $parameterValue, array $batchLimiters = []): ContactSegmentFilter
     {

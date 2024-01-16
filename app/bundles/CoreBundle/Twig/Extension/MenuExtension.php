@@ -32,7 +32,7 @@ class MenuExtension extends AbstractExtension
      * @param \Knp\Menu\ItemInterface|string|array<mixed> $menu
      * @param array<mixed>                                $options
      */
-    public function menuRender($menu, array $options = [], ?string $renderer = null): string
+    public function menuRender($menu, array $options = [], string $renderer = null): string
     {
         return $this->menuHelper->render($menu, $options, $renderer);
     }

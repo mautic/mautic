@@ -15,8 +15,6 @@ class FieldsWithUniqueIdentifier
 
     /**
      * Retrieves a list of published fields that are unique identifiers.
-     *
-     * @return mixed
      */
     public function getFieldsWithUniqueIdentifier(array $filters = [])
     {

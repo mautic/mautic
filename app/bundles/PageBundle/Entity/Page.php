@@ -147,7 +147,7 @@ class Page extends FormEntity implements TranslationEntityInterface, VariantEnti
         $builder = new ClassMetadataBuilder($metadata);
 
         $builder->setTable('pages')
-            ->setCustomRepositoryClass(\Mautic\PageBundle\Entity\PageRepository::class)
+            ->setCustomRepositoryClass(PageRepository::class)
             ->addIndex(['alias'], 'page_alias_search');
 
         $builder->addId();
@@ -641,7 +641,7 @@ class Page extends FormEntity implements TranslationEntityInterface, VariantEnti
     /**
      * Get category.
      *
-     * @return \Mautic\CategoryBundle\Entity\Category
+     * @return Category
      */
     public function getCategory()
     {
@@ -787,25 +787,16 @@ class Page extends FormEntity implements TranslationEntityInterface, VariantEnti
         return ($includeVariants) ? $this->getAccumulativeVariantCount('getVariantHits') : $this->variantHits;
     }
 
-    /**
-     * @param mixed $variantHits
-     */
     public function setVariantHits($variantHits): void
     {
         $this->variantHits = $variantHits;
     }
 
-    /**
-     * @return mixed
-     */
     public function getCustomHtml()
     {
         return $this->customHtml;
     }
 
-    /**
-     * @param mixed $customHtml
-     */
     public function setCustomHtml($customHtml): void
     {
         $this->customHtml = $customHtml;

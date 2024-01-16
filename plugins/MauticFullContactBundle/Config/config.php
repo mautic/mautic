@@ -24,7 +24,7 @@ return [
     'services' => [
         'others' => [
             'mautic.plugin.fullcontact.lookup_helper' => [
-                'class'     => \MauticPlugin\MauticFullContactBundle\Helper\LookupHelper::class,
+                'class'     => MauticPlugin\MauticFullContactBundle\Helper\LookupHelper::class,
                 'arguments' => [
                     'mautic.helper.integration',
                     'mautic.helper.user',
@@ -37,7 +37,7 @@ return [
         ],
         'integrations' => [
             'mautic.integration.fullcontact' => [
-                'class'     => \MauticPlugin\MauticFullContactBundle\Integration\FullContactIntegration::class,
+                'class'     => MauticPlugin\MauticFullContactBundle\Integration\FullContactIntegration::class,
                 'arguments' => [
                     'event_dispatcher',
                     'mautic.helper.cache_storage',

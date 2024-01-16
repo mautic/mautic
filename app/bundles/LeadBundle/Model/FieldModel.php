@@ -764,7 +764,7 @@ class FieldModel extends FormModel
     }
 
     /**
-     * @throws \Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException
+     * @throws MethodNotAllowedHttpException
      */
     protected function dispatchEvent($action, &$entity, $isNew = false, Event $event = null): ?Event
     {
@@ -935,8 +935,6 @@ class FieldModel extends FormModel
      * @deprecated Use FieldsWithUniqueIdentifier::getFieldsWithUniqueIdentifier method instead
      *
      * @param array $filters
-     *
-     * @return mixed
      */
     public function getUniqueIdentifierFields($filters = [])
     {

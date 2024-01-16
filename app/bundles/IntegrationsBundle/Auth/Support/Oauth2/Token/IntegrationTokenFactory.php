@@ -16,7 +16,7 @@ class IntegrationTokenFactory implements TokenFactoryInterface
     ) {
     }
 
-    public function __invoke(array $data, ?TokenInterface $previousToken = null): IntegrationToken
+    public function __invoke(array $data, TokenInterface $previousToken = null): IntegrationToken
     {
         $accessToken  = null;
         $refreshToken = null;

@@ -250,7 +250,7 @@ final class LeadFieldRepositoryTest extends TestCase
 
     public function testGetFieldThatIsMissingColumnWhenMutlipleColumsMissing(): void
     {
-        $queryBuilder = $this->createMock(\Doctrine\ORM\QueryBuilder::class);
+        $queryBuilder = $this->createMock(OrmQueryBuilder::class);
 
         $this->entityManager->method('createQueryBuilder')
             ->willReturn($queryBuilder);

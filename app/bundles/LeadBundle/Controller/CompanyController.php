@@ -149,7 +149,7 @@ class CompanyController extends FormController
         /** @var CompanyModel $model */
         $model  = $this->getModel('lead.company');
 
-        /** @var \Mautic\LeadBundle\Entity\Company $company */
+        /** @var Company $company */
         $company = $model->getEntity($objectId);
 
         $companiesRepo  = $model->getCompanyLeadRepository();
@@ -178,7 +178,7 @@ class CompanyController extends FormController
     /**
      * Generates new form and processes post data.
      *
-     * @param \Mautic\LeadBundle\Entity\Company $entity
+     * @param Company $entity
      *
      * @return JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|Response
      */
@@ -188,7 +188,7 @@ class CompanyController extends FormController
         \assert($model instanceof CompanyModel);
 
         if (!($entity instanceof Company)) {
-            /** @var \Mautic\LeadBundle\Entity\Company $entity */
+            /** @var Company $entity */
             $entity = $model->getEntity();
         }
 
@@ -547,7 +547,7 @@ class CompanyController extends FormController
             );
         }
 
-        /** @var \Mautic\LeadBundle\Entity\Company $company */
+        /** @var Company $company */
         $model->getRepository()->refetchEntity($company);
 
         // set some permissions

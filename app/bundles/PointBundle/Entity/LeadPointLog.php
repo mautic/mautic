@@ -32,7 +32,7 @@ class LeadPointLog
         $builder = new ClassMetadataBuilder($metadata);
 
         $builder->setTable('point_lead_action_log')
-            ->setCustomRepositoryClass(\Mautic\PointBundle\Entity\LeadPointLogRepository::class);
+            ->setCustomRepositoryClass(LeadPointLogRepository::class);
 
         $builder->createManyToOne('point', 'Point')
             ->isPrimaryKey()
@@ -49,65 +49,41 @@ class LeadPointLog
             ->build();
     }
 
-    /**
-     * @return mixed
-     */
     public function getDateFired()
     {
         return $this->dateFired;
     }
 
-    /**
-     * @param mixed $dateFired
-     */
     public function setDateFired($dateFired): void
     {
         $this->dateFired = $dateFired;
     }
 
-    /**
-     * @return mixed
-     */
     public function getIpAddress()
     {
         return $this->ipAddress;
     }
 
-    /**
-     * @param mixed $ipAddress
-     */
     public function setIpAddress($ipAddress): void
     {
         $this->ipAddress = $ipAddress;
     }
 
-    /**
-     * @return mixed
-     */
     public function getLead()
     {
         return $this->lead;
     }
 
-    /**
-     * @param mixed $lead
-     */
     public function setLead($lead): void
     {
         $this->lead = $lead;
     }
 
-    /**
-     * @return mixed
-     */
     public function getPoint()
     {
         return $this->point;
     }
 
-    /**
-     * @param mixed $point
-     */
     public function setPoint($point): void
     {
         $this->point = $point;

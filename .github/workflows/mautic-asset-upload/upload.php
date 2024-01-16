@@ -40,10 +40,10 @@ $initAuth = new ApiAuth();
 $auth     = $initAuth->newAuth($settings, 'BasicAuth');
 $api      = new MauticApi();
 
-/** @var \Mautic\Api\Files */
+/** @var Mautic\Api\Files */
 $filesApi = $api->newApi('files', $auth, $instanceUrl);
 
-/** @var \Mautic\Api\Assets */
+/** @var Mautic\Api\Assets */
 $assetApi = $api->newApi('assets', $auth, $instanceUrl);
 
 /**

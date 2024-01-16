@@ -196,7 +196,7 @@ class CommonController extends AbstractController implements MauticController
     /**
      * Redirects URLs with trailing slashes in order to prevent 404s.
      *
-     * @return \Symfony\Component\HttpFoundation\RedirectResponse
+     * @return RedirectResponse
      */
     public function removeTrailingSlashAction(Request $request, TrailingSlashHelper $trailingSlashHelper)
     {

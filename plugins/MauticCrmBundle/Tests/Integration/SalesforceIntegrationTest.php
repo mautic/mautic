@@ -810,7 +810,7 @@ class SalesforceIntegrationTest extends AbstractIntegrationTestCase
         $this->em->method('getRepository')
             ->willReturnMap(
                 [
-                    [\Mautic\PluginBundle\Entity\IntegrationEntity::class, $integrationEntityRepository],
+                    [IntegrationEntity::class, $integrationEntityRepository],
                     [\Mautic\CoreBundle\Entity\AuditLog::class, $auditLogRepo],
                 ]
             );
@@ -819,7 +819,7 @@ class SalesforceIntegrationTest extends AbstractIntegrationTestCase
             ->willReturnCallback(
                 function () {
                     switch (func_get_arg(0)) {
-                        case \Mautic\PluginBundle\Entity\IntegrationEntity::class:
+                        case IntegrationEntity::class:
                             return new IntegrationEntity();
                     }
                 }

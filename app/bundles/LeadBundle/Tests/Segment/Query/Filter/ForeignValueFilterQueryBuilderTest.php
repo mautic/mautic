@@ -190,7 +190,7 @@ class ForeignValueFilterQueryBuilderTest extends TestCase
     /**
      * @dataProvider dataApplyQueryWithBatchFilters
      *
-     *  @param array<string, mixed> $batchLimiters
+     * @param array<string, mixed> $batchLimiters
      */
     public function testApplyQueryWithBatchFilters(array $batchLimiters, string $operator, string $parameterValue, string $expectedQuery): void
     {

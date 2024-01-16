@@ -227,9 +227,6 @@ class StatsEvent extends Event
         return $this->tables;
     }
 
-    /**
-     * @return mixed
-     */
     public function getTableColumns($table = null)
     {
         ksort($this->tableColumns);

@@ -79,7 +79,7 @@ class Download
         $builder = new ClassMetadataBuilder($metadata);
 
         $builder->setTable('asset_downloads')
-            ->setCustomRepositoryClass(\Mautic\AssetBundle\Entity\DownloadRepository::class)
+            ->setCustomRepositoryClass(DownloadRepository::class)
             ->addIndex(['tracking_id'], 'download_tracking_search')
             ->addIndex(['source', 'source_id'], 'download_source_search')
             ->addIndex(['date_download'], 'asset_date_download');
@@ -117,7 +117,7 @@ class Download
             ->nullable()
             ->build();
 
-        $builder->createManyToOne('email', \Mautic\EmailBundle\Entity\Email::class)
+        $builder->createManyToOne('email', Email::class)
             ->addJoinColumn('email_id', 'id', true, false, 'SET NULL')
             ->build();
 
@@ -295,33 +295,21 @@ class Download
         return $this->trackingId;
     }
 
-    /**
-     * @return mixed
-     */
     public function getLead()
     {
         return $this->lead;
     }
 
-    /**
-     * @param mixed $lead
-     */
     public function setLead($lead): void
     {
         $this->lead = $lead;
     }
 
-    /**
-     * @return mixed
-     */
     public function getSource()
     {
         return $this->source;
     }
 
-    /**
-     * @param mixed $source
-     */
     public function setSource($source): void
     {
         $this->source = $source;
@@ -335,17 +323,11 @@ class Download
         return $this->sourceId;
     }
 
-    /**
-     * @param mixed $sourceId
-     */
     public function setSourceId($sourceId): void
     {
         $this->sourceId = (int) $sourceId;
     }
 
-    /**
-     * @return mixed
-     */
     public function getEmail()
     {
         return $this->email;

@@ -195,7 +195,7 @@ class SubmissionModelTest extends \PHPUnit\Framework\TestCase
             'Y-m-d',
             'H:i',
             $this->translator,
-            $this->createMock(\Mautic\CoreBundle\Helper\CoreParametersHelper::class)
+            $this->createMock(CoreParametersHelper::class)
         );
         $this->userHelper               = $this->createMock(UserHelper::class);
         $this->entityManager            = $this->createMock(EntityManager::class);
@@ -278,7 +278,7 @@ class SubmissionModelTest extends \PHPUnit\Framework\TestCase
             ->will(
                 $this->returnValueMap(
                     [
-                        [\Mautic\LeadBundle\Entity\Lead::class, $this->leadRepository],
+                        [Lead::class, $this->leadRepository],
                         [Submission::class, $this->submissioRepository],
                     ]
                 )

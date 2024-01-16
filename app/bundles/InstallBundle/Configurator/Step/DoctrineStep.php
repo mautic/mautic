@@ -22,6 +22,11 @@ class DoctrineStep implements StepInterface
     public $host = 'localhost';
 
     /**
+     * Database host. Read Only Replica.
+     */
+    public ?string $host_ro = null;
+
+    /**
      * Database table prefix.
      * Required in step.
      *

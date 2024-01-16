@@ -4,7 +4,6 @@ namespace Mautic\CoreBundle\Doctrine\Type;
 
 use Doctrine\DBAL\Platforms\AbstractPlatform;
 use Doctrine\DBAL\Types\ConversionException;
-use Mautic\CoreBundle\Helper\UTF8Helper;
 
 /**
  * Type that maps a PHP array to a clob SQL type.
@@ -19,14 +18,6 @@ class ArrayType extends \Doctrine\DBAL\Types\ArrayType
             return (null === $value) ? 'N;' : 'a:0:{}';
         }
 
-        // MySQL will crap out on corrupt UTF8 leading to broken serialized strings
-        array_walk(
-            $value,
-            function (&$entry): void {
-                $entry = UTF8Helper::toUTF8($entry);
-            }
-        );
-
         $serialized = serialize($value);
 
         if (str_contains($serialized, chr(0))) {
@@ -38,8 +29,6 @@ class ArrayType extends \Doctrine\DBAL\Types\ArrayType
     }
 
     /**
-     * @param mixed $value
-     *
      * @return array
      */
     public function convertToPHPValue($value, AbstractPlatform $platform)

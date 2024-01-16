@@ -15,7 +15,7 @@ class AuditLogModel extends AbstractCommonModel
      */
     public function getRepository()
     {
-        return $this->em->getRepository(\Mautic\CoreBundle\Entity\AuditLog::class);
+        return $this->em->getRepository(AuditLog::class);
     }
 
     /**
@@ -51,7 +51,7 @@ class AuditLogModel extends AbstractCommonModel
         $log->setUserId($userId);
         $log->setUserName($userName);
 
-        $this->em->getRepository(\Mautic\CoreBundle\Entity\AuditLog::class)->saveEntity($log);
+        $this->em->getRepository(AuditLog::class)->saveEntity($log);
 
         $this->em->detach($log);
     }
@@ -64,8 +64,6 @@ class AuditLogModel extends AbstractCommonModel
      * @param \DateTimeInterface|null $afterDate
      * @param int                     $limit
      * @param string|null             $bundle
-     *
-     * @return mixed
      */
     public function getLogForObject($object, $id, $afterDate = null, $limit = 10, $bundle = null)
     {

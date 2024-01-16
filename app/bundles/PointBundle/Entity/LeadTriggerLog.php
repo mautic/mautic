@@ -49,65 +49,41 @@ class LeadTriggerLog
             ->build();
     }
 
-    /**
-     * @return mixed
-     */
     public function getDateFired()
     {
         return $this->dateFired;
     }
 
-    /**
-     * @param mixed $dateFired
-     */
     public function setDateFired($dateFired): void
     {
         $this->dateFired = $dateFired;
     }
 
-    /**
-     * @return mixed
-     */
     public function getIpAddress()
     {
         return $this->ipAddress;
     }
 
-    /**
-     * @param mixed $ipAddress
-     */
     public function setIpAddress($ipAddress): void
     {
         $this->ipAddress = $ipAddress;
     }
 
-    /**
-     * @return mixed
-     */
     public function getLead()
     {
         return $this->lead;
     }
 
-    /**
-     * @param mixed $lead
-     */
     public function setLead($lead): void
     {
         $this->lead = $lead;
     }
 
-    /**
-     * @return mixed
-     */
     public function getEvent()
     {
         return $this->event;
     }
 
-    /**
-     * @param mixed $event
-     */
     public function setEvent($event): void
     {
         $this->event = $event;

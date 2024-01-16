@@ -337,10 +337,10 @@ class EventExecutioner
     }
 
     /**
-     * @throws \Mautic\CampaignBundle\Executioner\Dispatcher\Exception\LogNotProcessedException
-     * @throws \Mautic\CampaignBundle\Executioner\Dispatcher\Exception\LogPassedAndFailedException
-     * @throws \Mautic\CampaignBundle\Executioner\Exception\CannotProcessEventException
-     * @throws \Mautic\CampaignBundle\Executioner\Scheduler\Exception\NotSchedulableException
+     * @throws Dispatcher\Exception\LogNotProcessedException
+     * @throws Dispatcher\Exception\LogPassedAndFailedException
+     * @throws Exception\CannotProcessEventException
+     * @throws Scheduler\Exception\NotSchedulableException
      */
     private function executeActionEventsForContacts(Event $event, ArrayCollection $contacts, Counter $counter = null): void
     {
@@ -359,10 +359,10 @@ class EventExecutioner
     }
 
     /**
-     * @throws \Mautic\CampaignBundle\Executioner\Dispatcher\Exception\LogNotProcessedException
-     * @throws \Mautic\CampaignBundle\Executioner\Dispatcher\Exception\LogPassedAndFailedException
-     * @throws \Mautic\CampaignBundle\Executioner\Exception\CannotProcessEventException
-     * @throws \Mautic\CampaignBundle\Executioner\Scheduler\Exception\NotSchedulableException
+     * @throws Dispatcher\Exception\LogNotProcessedException
+     * @throws Dispatcher\Exception\LogPassedAndFailedException
+     * @throws Exception\CannotProcessEventException
+     * @throws Scheduler\Exception\NotSchedulableException
      */
     private function executeConditionEventsForContacts(Event $event, ArrayCollection $contacts, Counter $counter = null): void
     {

@@ -74,8 +74,6 @@ class CommonRepository extends ServiceEntityRepository
     /**
      * @param string $alias
      * @param object $entity
-     *
-     * @return mixed
      */
     public function checkUniqueAlias($alias, $entity = null)
     {
@@ -136,8 +134,6 @@ class CommonRepository extends ServiceEntityRepository
 
     /**
      * @param class-string $className
-     *
-     * @return mixed
      *
      * @throws \Doctrine\ORM\Mapping\MappingException
      * @throws \Exception
@@ -215,9 +211,6 @@ class CommonRepository extends ServiceEntityRepository
         }
     }
 
-    /**
-     * @param mixed $entity
-     */
     public function detachEntity($entity): void
     {
         $this->getEntityManager()->detach($entity);
@@ -433,7 +426,7 @@ class CommonRepository extends ServiceEntityRepository
      * @param QueryBuilder|DbalQueryBuilder $q
      * @param array<mixed>                  $filter
      */
-    public function getFilterExpr($q, array $filter, ?string $unique = null): array
+    public function getFilterExpr($q, array $filter, string $unique = null): array
     {
         $unique    = ($unique) ?: $this->generateRandomParameterName();
         $parameter = [];
@@ -513,8 +506,6 @@ class CommonRepository extends ServiceEntityRepository
      * @param bool        $setNowParameter
      * @param bool        $setTrueParameter
      * @param bool        $allowNullForPublishedUp Allow entities without a published up date
-     *
-     * @return mixed
      */
     public function getPublishedByDateExpression(
         $q,
@@ -1063,8 +1054,8 @@ class CommonRepository extends ServiceEntityRepository
     }
 
     /**
-     * @param \Doctrine\ORM\QueryBuilder $q
-     * @param object                     $filter
+     * @param QueryBuilder $q
+     * @param object       $filter
      */
     protected function addStandardCatchAllWhereClause(&$q, $filter, array $columns): array
     {
@@ -1214,7 +1205,7 @@ class CommonRepository extends ServiceEntityRepository
     }
 
     /**
-     * @param \Doctrine\ORM\QueryBuilder $q
+     * @param QueryBuilder $q
      */
     protected function buildClauses($q, array $args): bool
     {
@@ -1652,9 +1643,6 @@ class CommonRepository extends ServiceEntityRepository
         return [];
     }
 
-    /**
-     * @return mixed
-     */
     protected function getIdsExpr(&$q, $filter)
     {
         if ($ids = array_map('intval', explode(',', $filter->string))) {

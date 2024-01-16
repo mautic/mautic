@@ -61,7 +61,7 @@ class HttpFactory implements AuthProviderInterface
      * @throws PluginNotConfiguredException
      * @throws InvalidCredentialsException
      */
-    public function getClient(AuthCredentialsInterface $credentials, ?AuthConfigInterface $config = null): ClientInterface
+    public function getClient(AuthCredentialsInterface $credentials, AuthConfigInterface $config = null): ClientInterface
     {
         if (!$this->credentialsAreValid($credentials)) {
             throw new InvalidCredentialsException(sprintf('Credentials must implement either the %s or %s interfaces', PasswordCredentialsGrantInterface::class, ClientCredentialsGrantInterface::class));

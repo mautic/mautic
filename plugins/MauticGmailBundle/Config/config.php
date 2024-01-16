@@ -8,7 +8,7 @@ return [
     'services'    => [
         'integrations' => [
             'mautic.integration.gmail' => [
-                'class'     => \MauticPlugin\MauticGmailBundle\Integration\GmailIntegration::class,
+                'class'     => MauticPlugin\MauticGmailBundle\Integration\GmailIntegration::class,
                 'arguments' => [
                     'event_dispatcher',
                     'mautic.helper.cache_storage',

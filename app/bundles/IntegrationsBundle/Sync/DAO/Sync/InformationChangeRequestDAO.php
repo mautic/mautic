@@ -15,7 +15,6 @@ class InformationChangeRequestDAO
     /**
      * @param string $integration
      * @param string $objectName
-     * @param mixed  $objectId
      * @param string $field
      */
     public function __construct(
@@ -32,9 +31,6 @@ class InformationChangeRequestDAO
         return $this->integration;
     }
 
-    /**
-     * @return mixed
-     */
     public function getObjectId()
     {
         return $this->objectId;
@@ -60,7 +56,7 @@ class InformationChangeRequestDAO
         return $this->possibleChangeDateTime;
     }
 
-    public function setPossibleChangeDateTime(?\DateTimeInterface $possibleChangeDateTime = null): self
+    public function setPossibleChangeDateTime(\DateTimeInterface $possibleChangeDateTime = null): self
     {
         $this->possibleChangeDateTime = $possibleChangeDateTime;
 
@@ -72,7 +68,7 @@ class InformationChangeRequestDAO
         return $this->certainChangeDateTime;
     }
 
-    public function setCertainChangeDateTime(?\DateTimeInterface $certainChangeDateTime = null): self
+    public function setCertainChangeDateTime(\DateTimeInterface $certainChangeDateTime = null): self
     {
         $this->certainChangeDateTime = $certainChangeDateTime;
 

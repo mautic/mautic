@@ -130,7 +130,7 @@ class OrderDAO
         ObjectChangeDAO $objectChangeDAO,
         $integrationObjectName,
         $integrationObjectId,
-        ?\DateTimeInterface $objectModifiedDate = null
+        \DateTimeInterface $objectModifiedDate = null
     ): void {
         if (null === $objectModifiedDate) {
             $objectModifiedDate = new \DateTime();
@@ -150,10 +150,8 @@ class OrderDAO
     /**
      * Update an existing mapping in the case of conversions (i.e. Lead converted to Contact).
      *
-     * @param mixed  $oldObjectId
      * @param string $oldObjectName
      * @param string $newObjectName
-     * @param mixed  $newObjectId
      */
     public function remapObject($oldObjectName, $oldObjectId, $newObjectName, $newObjectId = null): void
     {
@@ -167,7 +165,7 @@ class OrderDAO
     /**
      * Update the last sync date of an existing mapping.
      */
-    public function updateLastSyncDate(ObjectChangeDAO $objectChangeDAO, ?\DateTimeInterface $objectModifiedDate = null): void
+    public function updateLastSyncDate(ObjectChangeDAO $objectChangeDAO, \DateTimeInterface $objectModifiedDate = null): void
     {
         if (null === $objectModifiedDate) {
             $objectModifiedDate = new \DateTime();

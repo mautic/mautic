@@ -70,7 +70,7 @@ class MiddlewareCacheWarmer implements CacheWarmerInterface
         file_put_contents($this->cacheFile, $content);
     }
 
-    private function loadFromDirectory(string $directory, ?string $env = null): void
+    private function loadFromDirectory(string $directory, string $env = null): void
     {
         $glob = glob($directory.'/*Middleware.php');
 
@@ -79,7 +79,7 @@ class MiddlewareCacheWarmer implements CacheWarmerInterface
         }
     }
 
-    private function addMiddlewares(array $middlewares, ?string $env = null): void
+    private function addMiddlewares(array $middlewares, string $env = null): void
     {
         $prefix = 'Mautic\\Middleware\\';
 

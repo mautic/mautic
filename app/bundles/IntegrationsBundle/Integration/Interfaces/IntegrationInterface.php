@@ -20,8 +20,5 @@ interface IntegrationInterface extends UnifiedIntegrationInterface
 
     public function getIntegrationConfiguration(): Integration;
 
-    /**
-     * @return mixed
-     */
     public function setIntegrationConfiguration(Integration $integration);
 }

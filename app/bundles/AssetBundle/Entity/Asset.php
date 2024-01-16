@@ -157,7 +157,7 @@ class Asset extends FormEntity
         $builder = new ClassMetadataBuilder($metadata);
 
         $builder->setTable('assets')
-            ->setCustomRepositoryClass(\Mautic\AssetBundle\Entity\AssetRepository::class)
+            ->setCustomRepositoryClass(AssetRepository::class)
             ->addIndex(['alias'], 'asset_alias_search');
 
         $builder->addIdColumns('title');
@@ -331,33 +331,21 @@ class Asset extends FormEntity
         return $this->title;
     }
 
-    /**
-     * @return mixed
-     */
     public function getExtension()
     {
         return $this->extension;
     }
 
-    /**
-     * @param mixed $extension
-     */
     public function setExtension($extension): void
     {
         $this->extension = $extension;
     }
 
-    /**
-     * @return mixed
-     */
     public function getMime()
     {
         return $this->mime;
     }
 
-    /**
-     * @param mixed $mime
-     */
     public function setMime($mime): void
     {
         $this->mime = $mime;
@@ -1116,17 +1104,11 @@ class Asset extends FormEntity
         return $this->isRemote() ? $this->getRemotePath() : $this->getAbsolutePath();
     }
 
-    /**
-     * @return mixed
-     */
     public function getDescription()
     {
         return $this->description;
     }
 
-    /**
-     * @param mixed $description
-     */
     public function setDescription($description): void
     {
         $this->description = $description;
@@ -1264,8 +1246,6 @@ class Asset extends FormEntity
     }
 
     /**
-     * @param mixed $size
-     *
      * @return Asset
      */
     public function setSize($size)
@@ -1371,9 +1351,6 @@ class Asset extends FormEntity
         return $this->disallow;
     }
 
-    /**
-     * @param mixed $disallow
-     */
     public function setDisallow($disallow): void
     {
         $this->disallow = $disallow;

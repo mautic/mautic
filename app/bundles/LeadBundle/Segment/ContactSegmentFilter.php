@@ -70,9 +70,6 @@ class ContactSegmentFilter implements \Stringable
         return $this->filterDecorator->getOperator($this->contactSegmentFilterCrate);
     }
 
-    /**
-     * @return mixed
-     */
     public function getField()
     {
         return $this->filterDecorator->getField($this->contactSegmentFilterCrate);
@@ -86,9 +83,6 @@ class ContactSegmentFilter implements \Stringable
         return $this->contactSegmentFilterCrate->getType();
     }
 
-    /**
-     * @return mixed
-     */
     public function getTable()
     {
         return $this->filterDecorator->getTable($this->contactSegmentFilterCrate);
@@ -103,17 +97,11 @@ class ContactSegmentFilter implements \Stringable
         }
     }
 
-    /**
-     * @return mixed
-     */
     public function getParameterHolder($argument)
     {
         return $this->filterDecorator->getParameterHolder($this->contactSegmentFilterCrate, $argument);
     }
 
-    /**
-     * @return mixed
-     */
     public function getParameterValue()
     {
         return $this->filterDecorator->getParameterValue($this->contactSegmentFilterCrate);
@@ -163,9 +151,6 @@ class ContactSegmentFilter implements \Stringable
         return $this->contactSegmentFilterCrate->isBooleanType();
     }
 
-    /**
-     * @return mixed
-     */
     public function getNullValue()
     {
         return $this->contactSegmentFilterCrate->getNullValue();

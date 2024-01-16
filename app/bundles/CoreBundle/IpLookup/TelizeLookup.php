@@ -4,6 +4,14 @@ namespace Mautic\CoreBundle\IpLookup;
 
 class TelizeLookup extends AbstractRemoteDataLookup
 {
+    public string $offset         = '';
+    public string $area_code      = '';
+    public string $dma_code       = '';
+    public string $country_code3  = '';
+    public string $continent_code = '';
+    public string $country_code   = '';
+    public string $region_code    = '';
+
     public function getAttribution(): string
     {
         return '<a href="https://market.mashape.com/fcambus/telize/" target="_blank">Telize</a> is a paid lookup service.';

@@ -320,7 +320,7 @@ class ResultController extends CommonFormController
             'form'       => $form,
         ];
 
-        /** @var \Mautic\FormBundle\Model\SubmissionModel $model */
+        /** @var SubmissionModel $model */
         $model = $this->getModel('form.submission');
 
         return $model->exportResults($format, $form, $args);
@@ -441,8 +441,6 @@ class ResultController extends CommonFormController
 
     /**
      * @param array $parameters
-     *
-     * @return mixed
      */
     protected function getFormIdFromRequest($parameters = [])
     {

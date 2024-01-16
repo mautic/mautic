@@ -113,9 +113,6 @@ class CompanyLeadRepository extends CommonRepository
         return $qb->executeQuery()->fetchAllAssociative();
     }
 
-    /**
-     * @return mixed
-     */
     public function getEntitiesByLead(Lead $lead)
     {
         $qb = $this->getEntityManager()->createQueryBuilder();

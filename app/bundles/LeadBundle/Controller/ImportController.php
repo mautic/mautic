@@ -417,7 +417,7 @@ class ImportController extends FormController
                         return $this->newAction($request, 0, true);
                     }
 
-                    /** @var \Mautic\LeadBundle\Entity\Import $import */
+                    /** @var Import $import */
                     $import = $this->importModel->getEntity();
 
                     $import->setMatchedFields($matchedFields)

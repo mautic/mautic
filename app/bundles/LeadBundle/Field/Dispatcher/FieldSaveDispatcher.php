@@ -38,7 +38,7 @@ class FieldSaveDispatcher
     /**
      * @throws NoListenerException
      */
-    public function dispatchEvent(string $action, LeadField $entity, bool $isNew, ?LeadFieldEvent $event = null): LeadFieldEvent
+    public function dispatchEvent(string $action, LeadField $entity, bool $isNew, LeadFieldEvent $event = null): LeadFieldEvent
     {
         if (!$this->dispatcher->hasListeners($action)) {
             throw new NoListenerException('There is no Listener for '.$action.' event');

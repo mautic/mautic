@@ -175,7 +175,7 @@ class PageController extends FormController
      */
     public function viewAction(Request $request, $objectId)
     {
-        /** @var \Mautic\PageBundle\Model\PageModel $model */
+        /** @var PageModel $model */
         $model = $this->getModel('page.page');
         // set some permissions
         $security   = $this->security;
@@ -205,9 +205,9 @@ class PageController extends FormController
             ]);
         } elseif (!$security->hasEntityAccess(
             'page:pages:viewown', 'page:pages:viewother', $activePage->getCreatedBy()
-        ) ||
-            ($activePage->getIsPreferenceCenter() &&
-            !$security->hasEntityAccess(
+        )
+            || ($activePage->getIsPreferenceCenter()
+            && !$security->hasEntityAccess(
                 'page:preference_center:viewown', 'page:preference_center:viewother', $activePage->getCreatedBy()
             ))) {
             return $this->accessDenied();
@@ -353,11 +353,11 @@ class PageController extends FormController
      */
     public function newAction(Request $request, AssetsHelper $assetsHelper, Translator $translator, RouterInterface $routerHelper, CoreParametersHelper $coreParametersHelper, $entity = null)
     {
-        /** @var \Mautic\PageBundle\Model\PageModel $model */
+        /** @var PageModel $model */
         $model = $this->getModel('page.page');
 
         if (!($entity instanceof Page)) {
-            /** @var \Mautic\PageBundle\Entity\Page $entity */
+            /** @var Page $entity */
             $entity = $model->getEntity();
         }
 
@@ -483,7 +483,7 @@ class PageController extends FormController
         $objectId,
         $ignorePost = false
     ) {
-        /** @var \Mautic\PageBundle\Model\PageModel $model */
+        /** @var PageModel $model */
         $model    = $this->getModel('page.page');
         $security = $this->security;
         $entity   = $model->getEntity($objectId);
@@ -518,8 +518,8 @@ class PageController extends FormController
             );
         } elseif (!$security->hasEntityAccess(
             'page:pages:viewown', 'page:pages:viewother', $entity->getCreatedBy()
-        ) ||
-            ($entity->getIsPreferenceCenter() && !$security->hasEntityAccess(
+        )
+            || ($entity->getIsPreferenceCenter() && !$security->hasEntityAccess(
                 'page:preference_center:viewown', 'page:preference_center:viewother', $entity->getCreatedBy()
             ))) {
             return $this->accessDenied();
@@ -641,13 +641,13 @@ class PageController extends FormController
      */
     public function cloneAction(Request $request, AssetsHelper $assetsHelper, Translator $translator, RouterInterface $routerHelper, CoreParametersHelper $coreParametersHelper, $objectId)
     {
-        /** @var \Mautic\PageBundle\Model\PageModel $model */
+        /** @var PageModel $model */
         $model  = $this->getModel('page.page');
         $entity = $model->getEntity($objectId);
 
         if (null != $entity) {
-            if (!$this->security->isGranted('page:pages:create') ||
-                !$this->security->hasEntityAccess(
+            if (!$this->security->isGranted('page:pages:create')
+                || !$this->security->hasEntityAccess(
                     'page:pages:viewown', 'page:pages:viewother', $entity->getCreatedBy()
                 )
             ) {
@@ -693,7 +693,7 @@ class PageController extends FormController
         ];
 
         if ('POST' == $request->getMethod()) {
-            /** @var \Mautic\PageBundle\Model\PageModel $model */
+            /** @var PageModel $model */
             $model  = $this->getModel('page.page');
             $entity = $model->getEntity($objectId);
 
@@ -754,7 +754,7 @@ class PageController extends FormController
         ];
 
         if ('POST' == $request->getMethod()) {
-            /** @var \Mautic\PageBundle\Model\PageModel $model */
+            /** @var PageModel $model */
             $model     = $this->getModel('page');
             $ids       = json_decode($request->query->get('ids', '{}'));
             $deleteIds = [];
@@ -806,11 +806,11 @@ class PageController extends FormController
      *
      * @param int $objectId
      *
-     * @return \Symfony\Component\HttpFoundation\Response
+     * @return Response
      */
     public function builderAction(Request $request, SlotsHelper $slotsHelper, $objectId)
     {
-        /** @var \Mautic\PageBundle\Model\PageModel $model */
+        /** @var PageModel $model */
         $model = $this->getModel('page.page');
 
         // permission check
@@ -869,7 +869,7 @@ class PageController extends FormController
      */
     public function abtestAction(Request $request, AssetsHelper $assetsHelper, Translator $translator, RouterInterface $routerHelper, CoreParametersHelper $coreParametersHelper, $objectId)
     {
-        /** @var \Mautic\PageBundle\Model\PageModel $model */
+        /** @var PageModel $model */
         $model  = $this->getModel('page.page');
         $entity = $model->getEntity($objectId);
 
@@ -879,8 +879,8 @@ class PageController extends FormController
 
         $parent = $entity->getVariantParent();
 
-        if ($parent || !$this->security->isGranted('page:pages:create') ||
-                !$this->security->hasEntityAccess(
+        if ($parent || !$this->security->isGranted('page:pages:create')
+                || !$this->security->hasEntityAccess(
                     'page:pages:viewown', 'page:pages:viewother', $entity->getCreatedBy()
                 )
         ) {
@@ -924,7 +924,7 @@ class PageController extends FormController
         ];
 
         if ('POST' == $request->getMethod()) {
-            /** @var \Mautic\PageBundle\Model\PageModel $model */
+            /** @var PageModel $model */
             $model  = $this->getModel('page.page');
             $entity = $model->getEntity($objectId);
 
@@ -1020,7 +1020,7 @@ class PageController extends FormController
      */
     public function resultsAction(Request $request, $objectId, $page = 1)
     {
-        /** @var \Mautic\PageBundle\Model\PageModel $pageModel */
+        /** @var PageModel $pageModel */
         $pageModel    = $this->getModel('page.page');
         $activePage   = $pageModel->getEntity($objectId);
         $session      = $request->getSession();

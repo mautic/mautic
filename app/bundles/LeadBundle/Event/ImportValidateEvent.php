@@ -91,7 +91,7 @@ class ImportValidateEvent extends Event
         return $this->matchedFields;
     }
 
-    public function setOwnerId(?int $ownerId = null): void
+    public function setOwnerId(int $ownerId = null): void
     {
         $this->ownerId = $ownerId;
     }
@@ -101,7 +101,7 @@ class ImportValidateEvent extends Event
         return $this->ownerId;
     }
 
-    public function setList(?int $list = null): void
+    public function setList(int $list = null): void
     {
         $this->list = $list;
     }

@@ -6,8 +6,6 @@ class ConfigHelper
 {
     /**
      * Map local config values with form fields.
-     *
-     * @param mixed $defaults
      */
     public static function bindNestedConfigValues(array $configValues, $defaults): array
     {

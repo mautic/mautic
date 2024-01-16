@@ -47,7 +47,7 @@ class StageModel extends CommonFormModel
      */
     public function getRepository()
     {
-        return $this->em->getRepository(\Mautic\StageBundle\Entity\Stage::class);
+        return $this->em->getRepository(Stage::class);
     }
 
     public function getPermissionBase(): string
@@ -121,8 +121,6 @@ class StageModel extends CommonFormModel
 
     /**
      * Gets array of custom actions from bundles subscribed StageEvents::STAGE_ON_BUILD.
-     *
-     * @return mixed
      */
     public function getStageActions()
     {

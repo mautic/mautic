@@ -112,11 +112,11 @@ $container->loadFromExtension(
             ],
         ],
         'encoders' => [
-            \Symfony\Component\Security\Core\User\User::class => [
+            Symfony\Component\Security\Core\User\User::class => [
                 'algorithm'  => 'bcrypt',
                 'iterations' => 12,
             ],
-            \Mautic\UserBundle\Entity\User::class => [
+            Mautic\UserBundle\Entity\User::class => [
                 'algorithm'  => 'bcrypt',
                 'iterations' => 12,
             ],
@@ -165,7 +165,7 @@ if ('prod' == $container->getParameter('kernel.environment')) {
 }
 
 $container->setParameter('mautic.security.restrictedConfigFields', $restrictedConfigFields);
-$container->setParameter('mautic.security.restrictedConfigFields.displayMode', \Mautic\ConfigBundle\Form\Helper\RestrictionHelper::MODE_REMOVE);
+$container->setParameter('mautic.security.restrictedConfigFields.displayMode', Mautic\ConfigBundle\Form\Helper\RestrictionHelper::MODE_REMOVE);
 
 /*
  * Optional security parameters

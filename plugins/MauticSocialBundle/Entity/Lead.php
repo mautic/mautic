@@ -29,7 +29,7 @@ class Lead
         $builder = new ClassMetadataBuilder($metadata);
 
         $builder->setTable('monitoring_leads')
-            ->setCustomRepositoryClass(\MauticPlugin\MauticSocialBundle\Entity\LeadRepository::class);
+            ->setCustomRepositoryClass(LeadRepository::class);
 
         $builder->createManyToOne('monitor', 'Monitoring')
             ->isPrimaryKey()
@@ -41,9 +41,6 @@ class Lead
         $builder->addNamedField('dateAdded', 'datetime', 'date_added');
     }
 
-    /**
-     * @return mixed
-     */
     public function getDateAdded()
     {
         return $this->dateAdded;
@@ -59,9 +56,6 @@ class Lead
         return $this;
     }
 
-    /**
-     * @return mixed
-     */
     public function getLead()
     {
         return $this->lead;
@@ -77,9 +71,6 @@ class Lead
         return $this;
     }
 
-    /**
-     * @return mixed
-     */
     public function getMonitor()
     {
         return $this->monitor;

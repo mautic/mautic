@@ -119,7 +119,7 @@ class ComposerHelper
     /**
      * Updates one or multiple Composer packages.
      */
-    public function update(?string $packageName = null, bool $dryRun = false): ConsoleOutput
+    public function update(string $packageName = null, bool $dryRun = false): ConsoleOutput
     {
         $input = [
             'command'  => 'update',

@@ -52,9 +52,9 @@ class ReportDataResult
         private bool $isLastBatch = true
     ) {
         if (
-            !array_key_exists('data', $data) ||
-            !array_key_exists('dataColumns', $data) ||
-            !array_key_exists('columns', $data)
+            !array_key_exists('data', $data)
+            || !array_key_exists('dataColumns', $data)
+            || !array_key_exists('columns', $data)
         ) {
             throw new \InvalidArgumentException("Keys 'data', 'dataColumns' and 'columns' have to be provided");
         }
@@ -210,7 +210,7 @@ class ReportDataResult
     /**
      * @param array<mixed> $aggregatorVal
      */
-    public function calcTotal(string $calcFunction, int $rowsCount, array &$aggregatorVal, ?float $previousVal = null): float|int|null
+    public function calcTotal(string $calcFunction, int $rowsCount, array &$aggregatorVal, float $previousVal = null): float|int|null
     {
         switch ($calcFunction) {
             case 'COUNT':

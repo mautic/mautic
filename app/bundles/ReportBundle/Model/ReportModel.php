@@ -51,9 +51,6 @@ class ReportModel extends FormModel
      */
     private $reportBuilderData;
 
-    /**
-     * @var mixed
-     */
     protected $defaultPageLimit;
 
     public function __construct(
@@ -136,7 +133,7 @@ class ReportModel extends FormModel
     }
 
     /**
-     * @throws \Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException
+     * @throws MethodNotAllowedHttpException
      */
     protected function dispatchEvent($action, &$entity, $isNew = false, Event $event = null): ?Event
     {
@@ -177,10 +174,8 @@ class ReportModel extends FormModel
 
     /**
      * Build the table and graph data.
-     *
-     * @return mixed
      */
-    public function buildAvailableReports($context, ?string $reportSource = null)
+    public function buildAvailableReports($context, string $reportSource = null)
     {
         if (empty($this->reportBuilderData[$context])) {
             // Check to see if all has been obtained
@@ -226,7 +221,7 @@ class ReportModel extends FormModel
      *
      * @return array
      */
-    public function getTableData($context = 'all', ?string $reportSource = null)
+    public function getTableData($context = 'all', string $reportSource = null)
     {
         $data = $this->buildAvailableReports($context, $reportSource);
 
@@ -267,8 +262,6 @@ class ReportModel extends FormModel
 
     /**
      * @param string $context
-     *
-     * @return mixed
      */
     public function getGraphData($context = 'all')
     {

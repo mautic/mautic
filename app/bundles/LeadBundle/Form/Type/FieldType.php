@@ -449,7 +449,7 @@ class FieldType extends AbstractType
                 EntityType::class,
                 [
                     'label'         => 'mautic.core.order',
-                    'class'         => \Mautic\LeadBundle\Entity\LeadField::class,
+                    'class'         => LeadField::class,
                     'choice_label'  => 'label',
                     'label_attr'    => ['class' => 'control-label'],
                     'attr'          => ['class' => 'form-control'],

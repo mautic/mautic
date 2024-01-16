@@ -26,33 +26,21 @@ class CampaignDecisionEvent extends Event
     ) {
     }
 
-    /**
-     * @return mixed
-     */
     public function getLead()
     {
         return $this->lead;
     }
 
-    /**
-     * @return mixed
-     */
     public function getEvents()
     {
         return $this->events;
     }
 
-    /**
-     * @return mixed
-     */
     public function getDecisionType()
     {
         return $this->decisionType;
     }
 
-    /**
-     * @return mixed
-     */
     public function getDecisionEventDetails()
     {
         return $this->decisionEventDetails;
@@ -94,8 +82,6 @@ class CampaignDecisionEvent extends Event
 
     /**
      * Returns if the decision has already been triggered.
-     *
-     * @return mixed
      */
     public function wasDecisionTriggered()
     {

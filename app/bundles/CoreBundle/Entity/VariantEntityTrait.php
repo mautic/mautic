@@ -9,14 +9,8 @@ use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 
 trait VariantEntityTrait
 {
-    /**
-     * @var mixed
-     **/
     private $variantChildren;
 
-    /**
-     * @var mixed
-     **/
     private $variantParent;
 
     /**
@@ -80,8 +74,6 @@ trait VariantEntityTrait
 
     /**
      * Get variantChildren.
-     *
-     * @return mixed
      */
     public function getVariantChildren()
     {
@@ -108,8 +100,6 @@ trait VariantEntityTrait
 
     /**
      * Get variantParent.
-     *
-     * @return mixed
      */
     public function getVariantParent()
     {
@@ -152,9 +142,6 @@ trait VariantEntityTrait
         return $this->variantSettings;
     }
 
-    /**
-     * @return mixed
-     */
     public function getVariantStartDate()
     {
         return $this->variantStartDate;
@@ -270,9 +257,6 @@ trait VariantEntityTrait
         return array_unique($ids);
     }
 
-    /**
-     * @return mixed
-     */
     protected function getAccumulativeVariantCount($getter)
     {
         [$parent, $children]     = $this->getVariants();

@@ -18,11 +18,11 @@ class MappedIntegrationObjectTokenEvent extends CommonEvent
      * Add a new mapped integration object token.
      *
      * @param string $integrationName - The name of the integration
-     * @param $objectName - The name of the object in sync_object_mapping table
-     * @param $objectLink - The base_url to direct users to the object on the integration site
-     * @param string $title    - The title of the token in the token select dropdown
-     * @param string $linkText - The link text used for the url provided in $objectLink
-     * @param string $default  - The default value to show when the token value isnt found
+     * @param        $objectName      - The name of the object in sync_object_mapping table
+     * @param        $objectLink      - The base_url to direct users to the object on the integration site
+     * @param string $title           - The title of the token in the token select dropdown
+     * @param string $linkText        - The link text used for the url provided in $objectLink
+     * @param string $default         - The default value to show when the token value isnt found
      */
     public function addToken(
         $integrationName,

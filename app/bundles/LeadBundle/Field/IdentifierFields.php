@@ -19,7 +19,7 @@ class IdentifierFields
     /**
      * @return string[]
      */
-    public function getFieldList(string $object, ?object $entityClass = null): array
+    public function getFieldList(string $object, object $entityClass = null): array
     {
         return array_merge(
             $this->getDefaultFields($object, $entityClass),

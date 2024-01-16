@@ -80,8 +80,8 @@ class LeadPermissions extends AbstractPermissions
         // make sure the user has access to own leads as well if they have access to lists, notes or fields
         $viewPerms = ['viewown', 'viewother', 'full'];
         if (
-            (!isset($permissions['leads']) || (array_intersect($viewPerms, $permissions['leads']) == $viewPerms)) &&
-            (isset($permissions['lists']) || isset($permissions['fields']))
+            (!isset($permissions['leads']) || (array_intersect($viewPerms, $permissions['leads']) == $viewPerms))
+            && (isset($permissions['lists']) || isset($permissions['fields']))
         ) {
             $permissions['leads'][] = 'viewown';
         }

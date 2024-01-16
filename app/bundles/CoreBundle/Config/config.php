@@ -142,7 +142,7 @@ return [
     'services' => [
         'main' => [
             'mautic.core.service.flashbag' => [
-                'class'     => \Mautic\CoreBundle\Service\FlashBag::class,
+                'class'     => Mautic\CoreBundle\Service\FlashBag::class,
                 'arguments' => [
                     '@session',
                     'translator',
@@ -151,25 +151,25 @@ return [
                 ],
             ],
             'mautic.core.service.bulk_notification' => [
-                'class'     => \Mautic\CoreBundle\Service\BulkNotification::class,
+                'class'     => Mautic\CoreBundle\Service\BulkNotification::class,
                 'arguments' => [
                     'mautic.core.model.notification',
                 ],
             ],
             'mautic.core.service.local_file_adapter' => [
-                'class'     => \Mautic\CoreBundle\Service\LocalFileAdapterService::class,
+                'class'     => Mautic\CoreBundle\Service\LocalFileAdapterService::class,
                 'arguments' => [
                     '%env(resolve:MAUTIC_EL_FINDER_PATH)%',
                 ],
             ],
             'mautic.core.service.log_processor' => [
-                'class'     => \Mautic\CoreBundle\Monolog\LogProcessor::class,
+                'class'     => Mautic\CoreBundle\Monolog\LogProcessor::class,
                 'tags'      => ['monolog.processor'],
             ],
         ],
         'events' => [
             'mautic.core.subscriber.router' => [
-                'class'     => \Mautic\CoreBundle\EventListener\RouterSubscriber::class,
+                'class'     => Mautic\CoreBundle\EventListener\RouterSubscriber::class,
                 'arguments' => [
                     'router',
                     '%router.request_context.scheme%',
@@ -182,7 +182,7 @@ return [
         ],
         'forms' => [
             'mautic.form.type.dynamic_content_filter_entry_filters' => [
-                'class'     => \Mautic\CoreBundle\Form\Type\DynamicContentFilterEntryFiltersType::class,
+                'class'     => Mautic\CoreBundle\Form\Type\DynamicContentFilterEntryFiltersType::class,
                 'arguments' => [
                     'translator',
                 ],
@@ -195,15 +195,15 @@ return [
         ],
         'helpers' => [
             'mautic.helper.app_version' => [
-                'class' => \Mautic\CoreBundle\Helper\AppVersion::class,
+                'class' => Mautic\CoreBundle\Helper\AppVersion::class,
             ],
             'mautic.helper.twig.menu' => [
-                'class'     => \Mautic\CoreBundle\Twig\Helper\MenuHelper::class,
+                'class'     => Mautic\CoreBundle\Twig\Helper\MenuHelper::class,
                 'arguments' => ['knp_menu.helper'],
                 'alias'     => 'menu',
             ],
             'mautic.helper.twig.date' => [
-                'class'     => \Mautic\CoreBundle\Twig\Helper\DateHelper::class,
+                'class'     => Mautic\CoreBundle\Twig\Helper\DateHelper::class,
                 'arguments' => [
                     '%mautic.date_format_full%',
                     '%mautic.date_format_short%',
@@ -215,7 +215,7 @@ return [
                 'alias' => 'date',
             ],
             'mautic.helper.twig.gravatar' => [
-                'class'     => \Mautic\CoreBundle\Twig\Helper\GravatarHelper::class,
+                'class'     => Mautic\CoreBundle\Twig\Helper\GravatarHelper::class,
                 'arguments' => [
                     'mautic.helper.twig.default_avatar',
                     'mautic.helper.core_parameters',
@@ -224,25 +224,25 @@ return [
                 'alias'     => 'gravatar',
             ],
             'mautic.helper.twig.analytics' => [
-                'class'     => \Mautic\CoreBundle\Twig\Helper\AnalyticsHelper::class,
+                'class'     => Mautic\CoreBundle\Twig\Helper\AnalyticsHelper::class,
                 'alias'     => 'analytics',
                 'arguments' => [
                     'mautic.helper.core_parameters',
                 ],
             ],
             'mautic.helper.twig.config' => [
-                'class'     => \Mautic\CoreBundle\Twig\Helper\ConfigHelper::class,
+                'class'     => Mautic\CoreBundle\Twig\Helper\ConfigHelper::class,
                 'alias'     => 'config',
                 'arguments' => [
                     'mautic.helper.core_parameters',
                 ],
             ],
             'mautic.helper.twig.mautibot' => [
-                'class' => \Mautic\CoreBundle\Twig\Helper\MautibotHelper::class,
+                'class' => Mautic\CoreBundle\Twig\Helper\MautibotHelper::class,
                 'alias' => 'mautibot',
             ],
             'mautic.helper.twig.button' => [
-                'class'     => \Mautic\CoreBundle\Twig\Helper\ButtonHelper::class,
+                'class'     => Mautic\CoreBundle\Twig\Helper\ButtonHelper::class,
                 'arguments' => [
                     'twig',
                     'translator',
@@ -251,7 +251,7 @@ return [
                 'alias' => 'buttons',
             ],
             'mautic.helper.twig.content' => [
-                'class'     => \Mautic\CoreBundle\Twig\Helper\ContentHelper::class,
+                'class'     => Mautic\CoreBundle\Twig\Helper\ContentHelper::class,
                 'arguments' => [
                     'twig',
                     'event_dispatcher',
@@ -259,7 +259,7 @@ return [
                 'alias' => 'content',
             ],
             'mautic.helper.twig.formatter' => [
-                'class'     => \Mautic\CoreBundle\Twig\Helper\FormatterHelper::class,
+                'class'     => Mautic\CoreBundle\Twig\Helper\FormatterHelper::class,
                 'arguments' => [
                     'mautic.helper.twig.date',
                     'translator',
@@ -267,14 +267,14 @@ return [
                 'alias' => 'formatter',
             ],
             'mautic.helper.twig.version' => [
-                'class'     => \Mautic\CoreBundle\Twig\Helper\VersionHelper::class,
+                'class'     => Mautic\CoreBundle\Twig\Helper\VersionHelper::class,
                 'arguments' => [
                     'mautic.helper.app_version',
                 ],
                 'alias' => 'version',
             ],
             'mautic.helper.twig.security' => [
-                'class'     => \Mautic\CoreBundle\Twig\Helper\SecurityHelper::class,
+                'class'     => Mautic\CoreBundle\Twig\Helper\SecurityHelper::class,
                 'arguments' => [
                     'mautic.security',
                     'request_stack',
@@ -284,7 +284,7 @@ return [
                 'alias' => 'security',
             ],
             'mautic.helper.paths' => [
-                'class'     => \Mautic\CoreBundle\Helper\PathsHelper::class,
+                'class'     => Mautic\CoreBundle\Helper\PathsHelper::class,
                 'arguments' => [
                     'mautic.helper.user',
                     'mautic.helper.core_parameters',
@@ -294,7 +294,7 @@ return [
                 ],
             ],
             'mautic.helper.ip_lookup' => [
-                'class'     => \Mautic\CoreBundle\Helper\IpLookupHelper::class,
+                'class'     => Mautic\CoreBundle\Helper\IpLookupHelper::class,
                 'arguments' => [
                     'request_stack',
                     'doctrine.orm.entity_manager',
@@ -303,55 +303,55 @@ return [
                 ],
             ],
             'mautic.helper.user' => [
-                'class'     => \Mautic\CoreBundle\Helper\UserHelper::class,
+                'class'     => Mautic\CoreBundle\Helper\UserHelper::class,
                 'arguments' => [
                     'security.token_storage',
                 ],
             ],
             'mautic.helper.core_parameters' => [
-                'class'     => \Mautic\CoreBundle\Helper\CoreParametersHelper::class,
+                'class'     => Mautic\CoreBundle\Helper\CoreParametersHelper::class,
                 'arguments' => [
                     'service_container',
                 ],
                 'serviceAlias' => 'mautic.config',
             ],
             'mautic.helper.bundle' => [
-                'class'     => \Mautic\CoreBundle\Helper\BundleHelper::class,
+                'class'     => Mautic\CoreBundle\Helper\BundleHelper::class,
                 'arguments' => [
                     '%mautic.bundles%',
                     '%mautic.plugin.bundles%',
                 ],
             ],
             'mautic.helper.phone_number' => [
-                'class' => \Mautic\CoreBundle\Helper\PhoneNumberHelper::class,
+                'class' => Mautic\CoreBundle\Helper\PhoneNumberHelper::class,
             ],
             'mautic.helper.input_helper' => [
-                'class' => \Mautic\CoreBundle\Helper\InputHelper::class,
+                'class' => Mautic\CoreBundle\Helper\InputHelper::class,
             ],
             'mautic.helper.file_uploader' => [
-                'class'     => \Mautic\CoreBundle\Helper\FileUploader::class,
+                'class'     => Mautic\CoreBundle\Helper\FileUploader::class,
                 'arguments' => [
                     'mautic.helper.file_path_resolver',
                 ],
             ],
             'mautic.helper.file_path_resolver' => [
-                'class'     => \Mautic\CoreBundle\Helper\FilePathResolver::class,
+                'class'     => Mautic\CoreBundle\Helper\FilePathResolver::class,
                 'arguments' => [
                     'symfony.filesystem',
                     'mautic.helper.input_helper',
                 ],
             ],
             'mautic.helper.file_properties' => [
-                'class' => \Mautic\CoreBundle\Helper\FileProperties::class,
+                'class' => Mautic\CoreBundle\Helper\FileProperties::class,
             ],
             'mautic.helper.trailing_slash' => [
-                'class'     => \Mautic\CoreBundle\Helper\TrailingSlashHelper::class,
+                'class'     => Mautic\CoreBundle\Helper\TrailingSlashHelper::class,
                 'arguments' => [
                     'mautic.helper.core_parameters',
                 ],
             ],
             'mautic.helper.token_builder' => [
-                'class'     => \Mautic\CoreBundle\Helper\BuilderTokenHelper::class,
+                'class'     => Mautic\CoreBundle\Helper\BuilderTokenHelper::class,
                 'arguments' => [
                     'mautic.security',
                     'mautic.model.factory',
@@ -360,7 +360,7 @@ return [
                 ],
             ],
             'mautic.helper.token_builder.factory' => [
-                'class'     => \Mautic\CoreBundle\Helper\BuilderTokenHelperFactory::class,
+                'class'     => Mautic\CoreBundle\Helper\BuilderTokenHelperFactory::class,
                 'arguments' => [
                     'mautic.security',
                     'mautic.model.factory',
@@ -369,7 +369,7 @@ return [
                 ],
             ],
             'mautic.helper.maxmind_do_not_sell_download' => [
-                'class'     => \Mautic\CoreBundle\Helper\MaxMindDoNotSellDownloadHelper::class,
+                'class'     => Mautic\CoreBundle\Helper\MaxMindDoNotSellDownloadHelper::class,
                 'arguments' => [
                     '%mautic.ip_lookup_auth%',
                     'monolog.logger.mautic',
@@ -378,7 +378,7 @@ return [
                 ],
             ],
             'mautic.helper.update_checks' => [
-                'class' => \Mautic\CoreBundle\Helper\PreUpdateCheckHelper::class,
+                'class' => Mautic\CoreBundle\Helper\PreUpdateCheckHelper::class,
             ],
         ],
         'menus' => [
@@ -406,7 +406,7 @@ return [
         ],
         'other' => [
             'mautic.cache.warmer.middleware' => [
-                'class'     => \Mautic\CoreBundle\Cache\MiddlewareCacheWarmer::class,
+                'class'     => Mautic\CoreBundle\Cache\MiddlewareCacheWarmer::class,
                 'tag'       => 'kernel.cache_warmer',
                 'arguments' => [
                     '%kernel.environment%',
@@ -414,17 +414,17 @@ return [
             ],
             /* @deprecated to be removed in Mautic 4. Use 'mautic.filesystem' instead. */
             'symfony.filesystem' => [
-                'class' => \Symfony\Component\Filesystem\Filesystem::class,
+                'class' => Symfony\Component\Filesystem\Filesystem::class,
             ],
             'mautic.filesystem' => [
-                'class' => \Mautic\CoreBundle\Helper\Filesystem::class,
+                'class' => Mautic\CoreBundle\Helper\Filesystem::class,
             ],
             'symfony.finder' => [
-                'class' => \Symfony\Component\Finder\Finder::class,
+                'class' => Symfony\Component\Finder\Finder::class,
             ],
             // Error handler
             'mautic.core.errorhandler.subscriber' => [
-                'class'     => \Mautic\CoreBundle\EventListener\ErrorHandlingListener::class,
+                'class'     => Mautic\CoreBundle\EventListener\ErrorHandlingListener::class,
                 'arguments' => [
                     'monolog.logger.mautic',
                     'monolog.logger',
@@ -435,7 +435,7 @@ return [
 
             // Configurator (used in installer and managing global config]
             'mautic.configurator' => [
-                'class'     => \Mautic\CoreBundle\Configurator\Configurator::class,
+                'class'     => Mautic\CoreBundle\Configurator\Configurator::class,
                 'arguments' => [
                     'mautic.helper.paths',
                 ],
@@ -443,23 +443,23 @@ return [
 
             // System uses
             'mautic.di.env_processor.nullable' => [
-                'class' => \Mautic\CoreBundle\DependencyInjection\EnvProcessor\NullableProcessor::class,
+                'class' => Mautic\CoreBundle\DependencyInjection\EnvProcessor\NullableProcessor::class,
                 'tag'   => 'container.env_var_processor',
             ],
             'mautic.di.env_processor.int_nullable' => [
-                'class' => \Mautic\CoreBundle\DependencyInjection\EnvProcessor\IntNullableProcessor::class,
+                'class' => Mautic\CoreBundle\DependencyInjection\EnvProcessor\IntNullableProcessor::class,
                 'tag'   => 'container.env_var_processor',
             ],
             'mautic.di.env_processor.mauticconst' => [
-                'class' => \Mautic\CoreBundle\DependencyInjection\EnvProcessor\MauticConstProcessor::class,
+                'class' => Mautic\CoreBundle\DependencyInjection\EnvProcessor\MauticConstProcessor::class,
                 'tag'   => 'container.env_var_processor',
             ],
             'mautic.cipher.openssl' => [
-                'class'     => \Mautic\CoreBundle\Security\Cryptography\Cipher\Symmetric\OpenSSLCipher::class,
+                'class'     => Mautic\CoreBundle\Security\Cryptography\Cipher\Symmetric\OpenSSLCipher::class,
                 'arguments' => ['%kernel.environment%'],
             ],
             'mautic.route_loader' => [
-                'class'     => \Mautic\CoreBundle\Loader\RouteLoader::class,
+                'class'     => Mautic\CoreBundle\Loader\RouteLoader::class,
                 'arguments' => [
                     'event_dispatcher',
                     'mautic.helper.core_parameters',
@@ -467,7 +467,7 @@ return [
                 'tag' => 'routing.loader',
             ],
             'mautic.security' => [
-                'class'     => \Mautic\CoreBundle\Security\Permissions\CorePermissions::class,
+                'class'     => Mautic\CoreBundle\Security\Permissions\CorePermissions::class,
                 'arguments' => [
                     'mautic.helper.user',
                     'translator',
@@ -477,14 +477,14 @@ return [
                 ],
             ],
             'mautic.page.helper.factory' => [
-                'class'     => \Mautic\CoreBundle\Factory\PageHelperFactory::class,
+                'class'     => Mautic\CoreBundle\Factory\PageHelperFactory::class,
                 'arguments' => [
                     'session',
                     'mautic.helper.core_parameters',
                 ],
             ],
             'mautic.translation.loader' => [
-                'class'     => \Mautic\CoreBundle\Loader\TranslationLoader::class,
+                'class'     => Mautic\CoreBundle\Loader\TranslationLoader::class,
                 'arguments' => [
                     'mautic.helper.bundle',
                     'mautic.helper.paths',
@@ -493,20 +493,20 @@ return [
                 'alias'     => 'mautic',
             ],
             'mautic.tblprefix_subscriber' => [
-                'class'     => \Mautic\CoreBundle\EventListener\DoctrineEventsSubscriber::class,
+                'class'     => Mautic\CoreBundle\EventListener\DoctrineEventsSubscriber::class,
                 'tag'       => 'doctrine.event_subscriber',
                 'arguments' => '%mautic.db_table_prefix%',
             ],
             'mautic.database.version.provider' => [
-                'class'     => \Mautic\CoreBundle\Doctrine\Provider\VersionProvider::class,
+                'class'     => Mautic\CoreBundle\Doctrine\Provider\VersionProvider::class,
                 'arguments' => ['database_connection', 'mautic.helper.core_parameters'],
             ],
             'mautic.generated.columns.provider' => [
-                'class'     => \Mautic\CoreBundle\Doctrine\Provider\GeneratedColumnsProvider::class,
+                'class'     => Mautic\CoreBundle\Doctrine\Provider\GeneratedColumnsProvider::class,
                 'arguments' => ['mautic.database.version.provider', 'event_dispatcher'],
             ],
             'mautic.generated.columns.doctrine.listener' => [
-                'class'        => \Mautic\CoreBundle\EventListener\DoctrineGeneratedColumnsListener::class,
+                'class'        => Mautic\CoreBundle\EventListener\DoctrineGeneratedColumnsListener::class,
                 'tag'          => 'doctrine.event_listener',
                 'tagArguments' => [
                     'event' => 'postGenerateSchema',
@@ -518,7 +518,7 @@ return [
                 ],
             ],
             'mautic.exception.listener' => [
-                'class'     => \Mautic\CoreBundle\EventListener\ExceptionListener::class,
+                'class'     => Mautic\CoreBundle\EventListener\ExceptionListener::class,
                 'arguments' => [
                     'router',
                     'Mautic\CoreBundle\Controller\ExceptionController::showAction',
@@ -553,7 +553,7 @@ return [
                 ],
             ],
             'mautic.helper.update' => [
-                'class'     => \Mautic\CoreBundle\Helper\UpdateHelper::class,
+                'class'     => Mautic\CoreBundle\Helper\UpdateHelper::class,
                 'arguments' => [
                     'mautic.helper.paths',
                     'monolog.logger.mautic',
@@ -564,13 +564,13 @@ return [
                 ],
             ],
             'mautic.helper.update.release_parser' => [
-                'class'     => \Mautic\CoreBundle\Helper\Update\Github\ReleaseParser::class,
+                'class'     => Mautic\CoreBundle\Helper\Update\Github\ReleaseParser::class,
                 'arguments' => [
                     'mautic.http.client',
                 ],
             ],
             'mautic.helper.cache' => [
-                'class'     => \Mautic\CoreBundle\Helper\CacheHelper::class,
+                'class'     => Mautic\CoreBundle\Helper\CacheHelper::class,
                 'arguments' => [
                     '%kernel.cache_dir%',
                     'session',
@@ -579,7 +579,7 @@ return [
                 ],
             ],
             'mautic.helper.theme' => [
-                'class'     => \Mautic\CoreBundle\Helper\ThemeHelper::class,
+                'class'     => Mautic\CoreBundle\Helper\ThemeHelper::class,
                 'arguments' => [
                     'mautic.helper.paths',
                     'twig',
@@ -596,17 +596,17 @@ return [
                 ],
             ],
             'mautic.helper.encryption' => [
-                'class'     => \Mautic\CoreBundle\Helper\EncryptionHelper::class,
+                'class'     => Mautic\CoreBundle\Helper\EncryptionHelper::class,
                 'arguments' => [
                     'mautic.helper.core_parameters',
                     'mautic.cipher.openssl',
                 ],
             ],
             'mautic.helper.url' => [
-                'class'     => \Mautic\CoreBundle\Helper\UrlHelper::class,
+                'class'     => Mautic\CoreBundle\Helper\UrlHelper::class,
             ],
             'mautic.helper.export' => [
-                'class'     => \Mautic\CoreBundle\Helper\ExportHelper::class,
+                'class'     => Mautic\CoreBundle\Helper\ExportHelper::class,
                 'arguments' => [
                     'translator',
                     'mautic.helper.core_parameters',
@@ -614,7 +614,7 @@ return [
                 ],
             ],
             'mautic.helper.composer' => [
-                'class'     => \Mautic\CoreBundle\Helper\ComposerHelper::class,
+                'class'     => Mautic\CoreBundle\Helper\ComposerHelper::class,
                 'arguments' => [
                     'kernel',
                     'monolog.logger.mautic',
@@ -622,7 +622,7 @@ return [
             ],
             // Menu
             'mautic.helper.menu' => [
-                'class'     => \Mautic\CoreBundle\Menu\MenuHelper::class,
+                'class'     => Mautic\CoreBundle\Menu\MenuHelper::class,
                 'arguments' => [
                     'mautic.security',
                     'request_stack',
@@ -631,17 +631,17 @@ return [
                 ],
             ],
             'mautic.helper.hash' => [
-                'class' => \Mautic\CoreBundle\Helper\HashHelper\HashHelper::class,
+                'class' => Mautic\CoreBundle\Helper\HashHelper\HashHelper::class,
             ],
             'mautic.helper.random' => [
-                'class' => \Mautic\CoreBundle\Helper\RandomHelper\RandomHelper::class,
+                'class' => Mautic\CoreBundle\Helper\RandomHelper\RandomHelper::class,
             ],
             'mautic.helper.command' => [
-                'class'     => \Mautic\CoreBundle\Helper\CommandHelper::class,
+                'class'     => Mautic\CoreBundle\Helper\CommandHelper::class,
                 'arguments' => 'kernel',
             ],
             'mautic.menu_renderer' => [
-                'class'     => \Mautic\CoreBundle\Menu\MenuRenderer::class,
+                'class'     => Mautic\CoreBundle\Menu\MenuRenderer::class,
                 'arguments' => [
                     'knp_menu.matcher',
                     'twig',
@@ -650,7 +650,7 @@ return [
                 'alias' => 'mautic',
             ],
             'mautic.menu.builder' => [
-                'class'     => \Mautic\CoreBundle\Menu\MenuBuilder::class,
+                'class'     => Mautic\CoreBundle\Menu\MenuBuilder::class,
                 'arguments' => [
                     'knp_menu.factory',
                     'knp_menu.matcher',
@@ -660,7 +660,7 @@ return [
             ],
             // IP Lookup
             'mautic.ip_lookup.factory' => [
-                'class'     => \Mautic\CoreBundle\Factory\IpLookupFactory::class,
+                'class'     => Mautic\CoreBundle\Factory\IpLookupFactory::class,
                 'arguments' => [
                     '%mautic.ip_lookup_services%',
                     'monolog.logger.mautic',
@@ -669,7 +669,7 @@ return [
                 ],
             ],
             'mautic.ip_lookup' => [
-                'class'     => \Mautic\CoreBundle\IpLookup\AbstractLookup::class, // bogus just to make cache compilation happy
+                'class'     => Mautic\CoreBundle\IpLookup\AbstractLookup::class, // bogus just to make cache compilation happy
                 'factory'   => ['@mautic.ip_lookup.factory', 'getService'],
                 'arguments' => [
                     '%mautic.ip_lookup_service%',
@@ -679,35 +679,35 @@ return [
                 ],
             ],
             'mautic.native.connector' => [
-                'class'     => \Symfony\Contracts\HttpClient\HttpClientInterface::class,
+                'class'     => Symfony\Contracts\HttpClient\HttpClientInterface::class,
                 'factory'   => [Symfony\Component\HttpClient\HttpClient::class, 'create'],
             ],
 
-            'twig.controller.exception.class' => \Mautic\CoreBundle\Controller\ExceptionController::class,
+            'twig.controller.exception.class' => Mautic\CoreBundle\Controller\ExceptionController::class,
 
             'mautic.doctrine.loader.mautic_fixtures_loader' => [
-                'class'     => \Mautic\CoreBundle\Doctrine\Loader\MauticFixturesLoader::class,
+                'class'     => Mautic\CoreBundle\Doctrine\Loader\MauticFixturesLoader::class,
                 'arguments' => [
                     'doctrine.fixtures.loader',
                 ],
             ],
             // Schema
             'mautic.schema.helper.column' => [
-                'class'     => \Mautic\CoreBundle\Doctrine\Helper\ColumnSchemaHelper::class,
+                'class'     => Mautic\CoreBundle\Doctrine\Helper\ColumnSchemaHelper::class,
                 'arguments' => [
                     'database_connection',
                     '%mautic.db_table_prefix%',
                 ],
             ],
             'mautic.schema.helper.index' => [
-                'class'     => \Mautic\CoreBundle\Doctrine\Helper\IndexSchemaHelper::class,
+                'class'     => Mautic\CoreBundle\Doctrine\Helper\IndexSchemaHelper::class,
                 'arguments' => [
                     'database_connection',
                     '%mautic.db_table_prefix%',
                 ],
             ],
             'mautic.schema.helper.table' => [
-                'class'     => \Mautic\CoreBundle\Doctrine\Helper\TableSchemaHelper::class,
+                'class'     => Mautic\CoreBundle\Doctrine\Helper\TableSchemaHelper::class,
                 'arguments' => [
                     'database_connection',
                     '%mautic.db_table_prefix%',
@@ -730,7 +730,7 @@ return [
             ],
             // Logger
             'mautic.monolog.handler' => [
-                'class'     => \Mautic\CoreBundle\Monolog\Handler\FileLogHandler::class,
+                'class'     => Mautic\CoreBundle\Monolog\Handler\FileLogHandler::class,
                 'arguments' => [
                     'mautic.helper.core_parameters',
                     'mautic.monolog.fulltrace.formatter',
@@ -739,10 +739,10 @@ return [
 
             // Update steps
             'mautic.update.step_provider' => [
-                'class' => \Mautic\CoreBundle\Update\StepProvider::class,
+                'class' => Mautic\CoreBundle\Update\StepProvider::class,
             ],
             'mautic.update.step.delete_cache' => [
-                'class'     => \Mautic\CoreBundle\Update\Step\DeleteCacheStep::class,
+                'class'     => Mautic\CoreBundle\Update\Step\DeleteCacheStep::class,
                 'arguments' => [
                     'mautic.helper.cache',
                     'translator',
@@ -750,7 +750,7 @@ return [
                 'tag' => 'mautic.update_step',
             ],
             'mautic.update.step.finalize' => [
-                'class'     => \Mautic\CoreBundle\Update\Step\FinalizeUpdateStep::class,
+                'class'     => Mautic\CoreBundle\Update\Step\FinalizeUpdateStep::class,
                 'arguments' => [
                     'translator',
                     'mautic.helper.paths',
@@ -760,7 +760,7 @@ return [
                 'tag' => 'mautic.update_step',
             ],
             'mautic.update.step.install_new_files' => [
-                'class'     => \Mautic\CoreBundle\Update\Step\InstallNewFilesStep::class,
+                'class'     => Mautic\CoreBundle\Update\Step\InstallNewFilesStep::class,
                 'arguments' => [
                     'translator',
                     'mautic.helper.update',
@@ -769,7 +769,7 @@ return [
                 'tag' => 'mautic.update_step',
             ],
             'mautic.update.step.remove_deleted_files' => [
-                'class'     => \Mautic\CoreBundle\Update\Step\RemoveDeletedFilesStep::class,
+                'class'     => Mautic\CoreBundle\Update\Step\RemoveDeletedFilesStep::class,
                 'arguments' => [
                     'translator',
                     'mautic.helper.paths',
@@ -778,7 +778,7 @@ return [
                 'tag' => 'mautic.update_step',
             ],
             'mautic.update.step.update_schema' => [
-                'class'     => \Mautic\CoreBundle\Update\Step\UpdateSchemaStep::class,
+                'class'     => Mautic\CoreBundle\Update\Step\UpdateSchemaStep::class,
                 'arguments' => [
                     'translator',
                     'service_container',
@@ -786,7 +786,7 @@ return [
                 'tag' => 'mautic.update_step',
             ],
             'mautic.update.step.update_translations' => [
-                'class'     => \Mautic\CoreBundle\Update\Step\UpdateTranslationsStep::class,
+                'class'     => Mautic\CoreBundle\Update\Step\UpdateTranslationsStep::class,
                 'arguments' => [
                     'translator',
                     'mautic.helper.language',
@@ -795,7 +795,7 @@ return [
                 'tag' => 'mautic.update_step',
             ],
             'mautic.update.step.checks' => [
-                'class'     => \Mautic\CoreBundle\Update\Step\PreUpdateChecksStep::class,
+                'class'     => Mautic\CoreBundle\Update\Step\PreUpdateChecksStep::class,
                 'arguments' => [
                     'translator',
                     'mautic.helper.update',
@@ -803,11 +803,11 @@ return [
                 'tag' => 'mautic.update_step',
             ],
             'mautic.update.checks.php' => [
-                'class' => \Mautic\CoreBundle\Helper\Update\PreUpdateChecks\CheckPhpVersion::class,
+                'class' => Mautic\CoreBundle\Helper\Update\PreUpdateChecks\CheckPhpVersion::class,
                 'tag'   => 'mautic.update_check',
             ],
             'mautic.update.checks.database' => [
-                'class'     => \Mautic\CoreBundle\Helper\Update\PreUpdateChecks\CheckDatabaseDriverAndVersion::class,
+                'class'     => Mautic\CoreBundle\Helper\Update\PreUpdateChecks\CheckDatabaseDriverAndVersion::class,
                 'arguments' => [
                     'doctrine.orm.default_entity_manager',
                 ],
@@ -816,7 +816,7 @@ return [
         ],
         'validator' => [
             'mautic.core.validator.file_upload' => [
-                'class'     => \Mautic\CoreBundle\Validator\FileUploadValidator::class,
+                'class'     => Mautic\CoreBundle\Validator\FileUploadValidator::class,
                 'arguments' => [
                     'translator',
                 ],
@@ -827,51 +827,51 @@ return [
     'ip_lookup_services' => [
         'extreme-ip' => [
             'display_name' => 'Extreme-IP',
-            'class'        => \Mautic\CoreBundle\IpLookup\ExtremeIpLookup::class,
+            'class'        => Mautic\CoreBundle\IpLookup\ExtremeIpLookup::class,
         ],
         'freegeoip' => [
             'display_name' => 'Ipstack.com',
-            'class'        => \Mautic\CoreBundle\IpLookup\IpstackLookup::class,
+            'class'        => Mautic\CoreBundle\IpLookup\IpstackLookup::class,
         ],
         'geobytes' => [
             'display_name' => 'Geobytes',
-            'class'        => \Mautic\CoreBundle\IpLookup\GeobytesLookup::class,
+            'class'        => Mautic\CoreBundle\IpLookup\GeobytesLookup::class,
         ],
         'geoips' => [
             'display_name' => 'GeoIPs',
-            'class'        => \Mautic\CoreBundle\IpLookup\GeoipsLookup::class,
+            'class'        => Mautic\CoreBundle\IpLookup\GeoipsLookup::class,
         ],
         'ipinfodb' => [
             'display_name' => 'IPInfoDB',
-            'class'        => \Mautic\CoreBundle\IpLookup\IpinfodbLookup::class,
+            'class'        => Mautic\CoreBundle\IpLookup\IpinfodbLookup::class,
         ],
         'maxmind_country' => [
             'display_name' => 'MaxMind - Country Geolocation',
-            'class'        => \Mautic\CoreBundle\IpLookup\MaxmindCountryLookup::class,
+            'class'        => Mautic\CoreBundle\IpLookup\MaxmindCountryLookup::class,
         ],
         'maxmind_omni' => [
             'display_name' => 'MaxMind - Insights (formerly Omni]',
-            'class'        => \Mautic\CoreBundle\IpLookup\MaxmindOmniLookup::class,
+            'class'        => Mautic\CoreBundle\IpLookup\MaxmindOmniLookup::class,
         ],
         'maxmind_precision' => [
             'display_name' => 'MaxMind - GeoIP2 Precision',
-            'class'        => \Mautic\CoreBundle\IpLookup\MaxmindPrecisionLookup::class,
+            'class'        => Mautic\CoreBundle\IpLookup\MaxmindPrecisionLookup::class,
         ],
         'maxmind_download' => [
             'display_name' => 'MaxMind - GeoLite2 City Download',
-            'class'        => \Mautic\CoreBundle\IpLookup\MaxmindDownloadLookup::class,
+            'class'        => Mautic\CoreBundle\IpLookup\MaxmindDownloadLookup::class,
         ],
         'telize' => [
             'display_name' => 'Telize',
-            'class'        => \Mautic\CoreBundle\IpLookup\TelizeLookup::class,
+            'class'        => Mautic\CoreBundle\IpLookup\TelizeLookup::class,
         ],
         'ip2loctionlocal' => [
             'display_name' => 'IP2Location Local Bin File',
-            'class'        => \Mautic\CoreBundle\IpLookup\IP2LocationBinLookup::class,
+            'class'        => Mautic\CoreBundle\IpLookup\IP2LocationBinLookup::class,
         ],
         'ip2loctionapi' => [
             'display_name' => 'IP2Location Web Service',
-            'class'        => \Mautic\CoreBundle\IpLookup\IP2LocationAPILookup::class,
+            'class'        => Mautic\CoreBundle\IpLookup\IP2LocationAPILookup::class,
         ],
     ],
 
@@ -1426,6 +1426,6 @@ return [
         'composer_updates'                                        => false,
         'load_froala_assets'                                      => false, // As we cannot remove the legacy builder in M5 we require users to enable Froala assets and agree with its security vulnerabilities.
         'redis_primary_only'                                      => false,
-        \Mautic\CoreBundle\Shortener\Shortener::SHORTENER_SERVICE => null,
+        Mautic\CoreBundle\Shortener\Shortener::SHORTENER_SERVICE  => null,
     ],
 ];

@@ -84,7 +84,6 @@ class NotificationRepository extends CommonRepository
     /**
      * Fetch notifications for this user.
      *
-
      * @param bool $includeRead
      *
      * @return array

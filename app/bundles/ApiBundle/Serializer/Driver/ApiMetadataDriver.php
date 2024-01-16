@@ -244,8 +244,6 @@ class ApiMetadataDriver extends BaseAnnotationDriver implements DriverInterface
     /**
      * Add a group the property belongs to.
      *
-     * @param mixed $property
-     *
      * @return $this
      */
     public function addGroup($group, $property = null)

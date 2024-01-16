@@ -47,8 +47,6 @@ class PageHitEvent extends CommonEvent
 
     /**
      * Get HTML code.
-     *
-     * @return mixed
      */
     public function getCode()
     {
@@ -63,9 +61,6 @@ class PageHitEvent extends CommonEvent
         return $this->entity;
     }
 
-    /**
-     * @return mixed
-     */
     public function getClickthroughData()
     {
         return $this->clickthroughData;

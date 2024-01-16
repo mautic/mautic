@@ -57,9 +57,6 @@ class CustomContentEvent extends Event
         ];
     }
 
-    /**
-     * @return mixed
-     */
     public function getViewName()
     {
         return $this->viewName;

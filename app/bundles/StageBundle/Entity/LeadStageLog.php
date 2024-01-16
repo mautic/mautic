@@ -32,7 +32,7 @@ class LeadStageLog
         $builder = new ClassMetadataBuilder($metadata);
 
         $builder->setTable('stage_lead_action_log')
-            ->setCustomRepositoryClass(\Mautic\StageBundle\Entity\LeadStageLogRepository::class);
+            ->setCustomRepositoryClass(LeadStageLogRepository::class);
 
         $builder->createManyToOne('stage', 'Stage')
             ->isPrimaryKey()
@@ -49,65 +49,41 @@ class LeadStageLog
             ->build();
     }
 
-    /**
-     * @return mixed
-     */
     public function getDateFired()
     {
         return $this->dateFired;
     }
 
-    /**
-     * @param mixed $dateFired
-     */
     public function setDateFired($dateFired): void
     {
         $this->dateFired = $dateFired;
     }
 
-    /**
-     * @return mixed
-     */
     public function getIpAddress()
     {
         return $this->ipAddress;
     }
 
-    /**
-     * @param mixed $ipAddress
-     */
     public function setIpAddress($ipAddress): void
     {
         $this->ipAddress = $ipAddress;
     }
 
-    /**
-     * @return mixed
-     */
     public function getLead()
     {
         return $this->lead;
     }
 
-    /**
-     * @param mixed $lead
-     */
     public function setLead($lead): void
     {
         $this->lead = $lead;
     }
 
-    /**
-     * @return mixed
-     */
     public function getStage()
     {
         return $this->stage;
     }
 
-    /**
-     * @param mixed $stage
-     */
     public function setStage($stage): void
     {
         $this->stage = $stage;

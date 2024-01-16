@@ -16,8 +16,6 @@ class StatRepository extends CommonRepository
      * Fetch the base stat data from the database.
      *
      * @param int $id
-     *
-     * @return mixed
      */
     public function getStats($id, $type, $fromDate = null)
     {
@@ -103,7 +101,7 @@ class StatRepository extends CommonRepository
      *
      * @return array<string, mixed>
      */
-    public function getStatsViewByLead(?int $leadId=null, array $options = []): array
+    public function getStatsViewByLead(int $leadId=null, array $options = []): array
     {
         return $this->getStatsByLeadAndType(Stat::TYPE_NOTIFICATION, $leadId, $options);
     }
@@ -113,7 +111,7 @@ class StatRepository extends CommonRepository
      *
      * @return array<string, mixed>
      */
-    public function getStatsClickByLead(?int $leadId=null, array $options = []): array
+    public function getStatsClickByLead(int $leadId=null, array $options = []): array
     {
         return $this->getStatsByLeadAndType(Stat::TYPE_CLICK, $leadId, $options);
     }
@@ -123,7 +121,7 @@ class StatRepository extends CommonRepository
      *
      * @return array<string, mixed>
      */
-    private function getStatsByLeadAndType(string $type, ?int $leadId=null, array $options = []): array
+    private function getStatsByLeadAndType(string $type, int $leadId=null, array $options = []): array
     {
         $q = $this->getEntityManager()->getConnection()->createQueryBuilder();
 

@@ -41,7 +41,7 @@ class ProcessWebhookQueuesCommand extends Command
         if ($this->coreParametersHelper->get('queue_mode') != $this->webhookModel::COMMAND_PROCESS) {
             $output->writeLn('Webhook Bundle is in immediate process mode. To use the command function change to command mode.');
 
-            return \Symfony\Component\Console\Command\Command::SUCCESS;
+            return Command::SUCCESS;
         }
 
         $id = $input->getOption('webhook-id');
@@ -69,7 +69,7 @@ class ProcessWebhookQueuesCommand extends Command
         if (!count($webhooks)) {
             $output->writeln('<error>No published webhooks found. Try again later.</error>');
 
-            return \Symfony\Component\Console\Command\Command::FAILURE;
+            return Command::FAILURE;
         }
 
         $output->writeLn('<info>Processing Webhooks</info>');
@@ -80,12 +80,12 @@ class ProcessWebhookQueuesCommand extends Command
             $output->writeLn('<error>'.$e->getMessage().'</error>');
             $output->writeLn('<error>'.$e->getTraceAsString().'</error>');
 
-            return \Symfony\Component\Console\Command\Command::FAILURE;
+            return Command::FAILURE;
         }
 
         $output->writeLn('<info>Webhook Processing Complete</info>');
 
-        return \Symfony\Component\Console\Command\Command::SUCCESS;
+        return Command::SUCCESS;
     }
 
     protected static $defaultDescription = 'Process queued webhook payloads';

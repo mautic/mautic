@@ -164,9 +164,6 @@ class TweetStat
             ->build();
     }
 
-    /**
-     * @return mixed
-     */
     public function getId()
     {
         return $this->id;
@@ -192,17 +189,11 @@ class TweetStat
         return $this;
     }
 
-    /**
-     * @return mixed
-     */
     public function getDateSent()
     {
         return $this->dateSent;
     }
 
-    /**
-     * @param mixed $dateSent
-     */
     public function setDateSent($dateSent): void
     {
         $this->dateSent = $dateSent;
@@ -240,17 +231,11 @@ class TweetStat
         $this->lead = $lead;
     }
 
-    /**
-     * @return mixed
-     */
     public function getRetryCount()
     {
         return $this->retryCount;
     }
 
-    /**
-     * @param mixed $retryCount
-     */
     public function setRetryCount($retryCount): void
     {
         $this->retryCount = $retryCount;
@@ -301,25 +286,16 @@ class TweetStat
         return $this;
     }
 
-    /**
-     * @return mixed
-     */
     public function getIsFailed()
     {
         return $this->isFailed;
     }
 
-    /**
-     * @param mixed $isFailed
-     */
     public function setIsFailed($isFailed): void
     {
         $this->isFailed = $isFailed;
     }
 
-    /**
-     * @return mixed
-     */
     public function isFailed()
     {
         return $this->getIsFailed();
@@ -333,57 +309,37 @@ class TweetStat
         return $this->handle;
     }
 
-    /**
-     * @param mixed $handle
-     */
     public function setHandle($handle): void
     {
         $this->handle = $handle;
     }
 
-    /**
-     * @return mixed
-     */
     public function getSource()
     {
         return $this->source;
     }
 
-    /**
-     * @param mixed $source
-     */
     public function setSource($source): void
     {
         $this->source = $source;
     }
 
-    /**
-     * @return mixed
-     */
     public function getSourceId()
     {
         return $this->sourceId;
     }
 
-    /**
-     * @param mixed $sourceId
-     */
     public function setSourceId($sourceId): void
     {
         $this->sourceId = (int) $sourceId;
     }
 
-    /**
-     * @return mixed
-     */
     public function getResponseDetails()
     {
         return $this->responseDetails;
     }
 
     /**
-     * @param mixed $responseDetails
-     *
      * @return Stat
      */
     public function setResponseDetails($responseDetails)

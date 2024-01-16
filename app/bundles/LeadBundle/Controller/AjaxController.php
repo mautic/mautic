@@ -279,7 +279,7 @@ class AjaxController extends CommonAjaxController
 
             if (null !== $lead && $this->security->hasEntityAccess('lead:leads:editown', 'lead:leads:editown', $lead->getPermissionUser())) {
                 $dataArray['success'] = 1;
-                /** @var \Mautic\PluginBundle\Helper\IntegrationHelper $helper */
+                /** @var IntegrationHelper $helper */
                 $helper         = $this->factory->getHelper('integration');
                 $socialProfiles = $helper->clearIntegrationCache($lead, $network);
                 $socialCount    = count($socialProfiles);
@@ -434,13 +434,13 @@ class AjaxController extends CommonAjaxController
         $channel     = $request->request->get('channel', 'email');
 
         if (!empty($dncId)) {
-            /** @var \Mautic\LeadBundle\Model\LeadModel $model */
+            /** @var LeadModel $model */
 
             /** @var DoNotContactModel $doNotContact */
             $doNotContact = $this->getModel('lead.dnc');
 
             /** @var DoNotContactModel $dnc */
-            $dnc = $this->doctrine->getManager()->getRepository(\Mautic\LeadBundle\Entity\DoNotContact::class)->findOneBy(
+            $dnc = $this->doctrine->getManager()->getRepository(DoNotContact::class)->findOneBy(
                 [
                     'id' => $dncId,
                 ]
@@ -491,7 +491,7 @@ class AjaxController extends CommonAjaxController
                 return $this->accessDenied(true);
             }
 
-            /** @var \Mautic\LeadBundle\Model\LeadModel $model */
+            /** @var LeadModel $model */
             $model   = $this->getModel('lead.lead');
             $session = $request->getSession();
 
@@ -564,7 +564,7 @@ class AjaxController extends CommonAjaxController
         $data    = ['success' => 1, 'body' => '', 'subject' => ''];
         $emailId = $request->query->get('template');
 
-        /** @var \Mautic\EmailBundle\Model\EmailModel $model */
+        /** @var EmailModel $model */
         $model = $this->getModel('email');
 
         /** @var \Mautic\EmailBundle\Entity\Email $email */
@@ -589,7 +589,7 @@ class AjaxController extends CommonAjaxController
 
     public function updateLeadTagsAction(Request $request): JsonResponse
     {
-        /** @var \Mautic\LeadBundle\Model\LeadModel $leadModel */
+        /** @var LeadModel $leadModel */
         $leadModel   = $this->getModel('lead');
         $post        = $request->request->all()['lead_tags'] ?? [];
         $lead        = $leadModel->getEntity((int) $post['id']);
@@ -710,7 +710,7 @@ class AjaxController extends CommonAjaxController
         $limit     = (int) $request->get('limit');
 
         if (!empty($order)) {
-            /** @var \Mautic\LeadBundle\Model\FieldModel $model */
+            /** @var FieldModel $model */
             $model = $this->getModel('lead.field');
 
             $startAt = ($page > 1) ? ($page * $limit) + 1 : 1;

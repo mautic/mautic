@@ -46,7 +46,7 @@ class PublicController extends CommonFormController
         Tracking404Model $tracking404Model,
         $slug)
     {
-        /** @var \Mautic\PageBundle\Model\PageModel $model */
+        /** @var PageModel $model */
         $model    = $this->getModel('page');
         $security = $this->security;
         /** @var Page|bool $entity */
@@ -361,7 +361,7 @@ class PublicController extends CommonFormController
      */
     public function trackingImageAction(Request $request)
     {
-        /** @var \Mautic\PageBundle\Model\PageModel $model */
+        /** @var PageModel $model */
         $model = $this->getModel('page');
         $model->hitPage(null, $request);
 
@@ -388,7 +388,7 @@ class PublicController extends CommonFormController
             return $notSuccessResponse;
         }
 
-        /** @var \Mautic\PageBundle\Model\PageModel $model */
+        /** @var PageModel $model */
         $model = $this->getModel('page');
 
         try {
@@ -517,7 +517,7 @@ class PublicController extends CommonFormController
      */
     private function processSlots($slots, $entity): void
     {
-        /** @var \Mautic\CoreBundle\Twig\Helper\AssetsHelper $assetsHelper */
+        /** @var AssetsHelper $assetsHelper */
         $assetsHelper = $this->factory->getHelper('template.assets');
         /** @var \Mautic\CoreBundle\Twig\Helper\SlotsHelper $slotsHelper */
         $slotsHelper = $this->factory->getHelper('template.slots');

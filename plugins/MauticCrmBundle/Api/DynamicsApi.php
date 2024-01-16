@@ -64,8 +64,6 @@ class DynamicsApi extends CrmApi
      * List types.
      *
      * @param string $object Zoho module name
-     *
-     * @return mixed
      */
     public function getLeadFields($object = 'contacts')
     {
@@ -100,8 +98,6 @@ class DynamicsApi extends CrmApi
 
     /**
      * gets leads.
-     *
-     * @return mixed
      */
     public function getLeads(array $params)
     {
@@ -112,8 +108,6 @@ class DynamicsApi extends CrmApi
      * gets companies.
      *
      * @param string $id
-     *
-     * @return mixed
      */
     public function getCompanies(array $params, $id = null)
     {
@@ -158,7 +152,7 @@ class DynamicsApi extends CrmApi
             $odata .= 'Content-Type: application/http'.PHP_EOL;
             $odata .= 'Content-Transfer-Encoding:binary'.PHP_EOL;
             $odata .= 'Content-ID: '.$objectId.PHP_EOL.PHP_EOL;
-//            $odata .= 'Content-ID: '.(++$contentId).PHP_EOL.PHP_EOL;
+            //            $odata .= 'Content-ID: '.(++$contentId).PHP_EOL.PHP_EOL;
             $returnIds[$objectId] = $contentId;
             if (!$isUpdate) {
                 $oid                  = $objectId;

@@ -17,7 +17,7 @@ class TableSchemaHelper
     protected \Doctrine\DBAL\Schema\AbstractSchemaManager $sm;
 
     /**
-     * @var \Doctrine\DBAL\Schema\Schema
+     * @var Schema
      */
     protected $schema;
 

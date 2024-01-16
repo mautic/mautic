@@ -8,7 +8,7 @@ use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\IntegrationsBundle\Sync\DAO\Sync\Order\FieldDAO as OrderFieldDAO;
 use Mautic\IntegrationsBundle\Sync\DAO\Sync\Order\ObjectChangeDAO;
 use Mautic\IntegrationsBundle\Sync\DAO\Value\NormalizedValueDAO;
-use Mautic\IntegrationsBundle\Sync\SyncDataExchange\Internal\Object as SyncObject;
+use Mautic\IntegrationsBundle\Sync\SyncDataExchange\Internal\Object\Company as SyncObjectCompany;
 use Mautic\IntegrationsBundle\Sync\SyncDataExchange\Internal\ObjectHelper\CompanyObjectHelper;
 use Mautic\IntegrationsBundle\Sync\SyncDataExchange\MauticSyncDataExchange;
 use Mautic\LeadBundle\Entity\Company;
@@ -66,7 +66,7 @@ class CompanyObjectHelperTest extends MauticMysqlTestCase
 
     private function buildObjectChangeDAO(Company $company, string $name, string $value): ObjectChangeDAO
     {
-        $objectChangeDAO = new ObjectChangeDAO('Test', MauticSyncDataExchange::OBJECT_COMPANY, $company->getId(), SyncObject\Company::NAME, $company->getId(), new \DateTime());
+        $objectChangeDAO = new ObjectChangeDAO('Test', MauticSyncDataExchange::OBJECT_COMPANY, $company->getId(), SyncObjectCompany::NAME, $company->getId(), new \DateTime());
         $objectChangeDAO->addField(new OrderFieldDAO($name, new NormalizedValueDAO(NormalizedValueDAO::PHONE_TYPE, $value)));
 
         return $objectChangeDAO;
