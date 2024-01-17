@@ -28,46 +28,46 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 class WebhookModelTest extends TestCase
 {
     /**
-     * @var MockObject|CoreParametersHelper
+     * @var MockObject&CoreParametersHelper
      */
-    private \PHPUnit\Framework\MockObject\MockObject $parametersHelperMock;
+    private MockObject $parametersHelperMock;
 
     /**
-     * @var MockObject|SerializerInterface
+     * @var MockObject&SerializerInterface
      */
-    private \PHPUnit\Framework\MockObject\MockObject $serializerMock;
+    private MockObject $serializerMock;
 
     /**
-     * @var MockObject|EntityManager
+     * @var MockObject&EntityManager
      */
-    private \PHPUnit\Framework\MockObject\MockObject $entityManagerMock;
+    private MockObject $entityManagerMock;
 
     /**
-     * @var MockObject|WebhookRepository
+     * @var MockObject&WebhookRepository
      */
-    private \PHPUnit\Framework\MockObject\MockObject $webhookRepository;
+    private MockObject $webhookRepository;
 
     /**
-     * @var MockObject|WebhookQueueRepository
+     * @var MockObject&WebhookQueueRepository
      */
     private $webhookQueueRepository;
 
     /**
-     * @var MockObject|UserHelper
+     * @var MockObject&UserHelper
      */
-    private \PHPUnit\Framework\MockObject\MockObject $userHelper;
+    private MockObject $userHelper;
 
     /**
-     * @var MockObject|EventDispatcherInterface
+     * @var MockObject&EventDispatcherInterface
      */
-    private \PHPUnit\Framework\MockObject\MockObject $eventDispatcherMock;
+    private MockObject $eventDispatcherMock;
 
-    private \Mautic\WebhookBundle\Model\WebhookModel $model;
+    private WebhookModel $model;
 
     /**
-     * @var MockObject|Client
+     * @var MockObject&Client
      */
-    private \PHPUnit\Framework\MockObject\MockObject $httpClientMock;
+    private MockObject $httpClientMock;
 
     protected function setUp(): void
     {

@@ -14,22 +14,19 @@ use Mautic\WebhookBundle\Entity\WebhookQueueRepository;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
-class WebhookQueueRepositoryTest extends TestCase
+final class WebhookQueueRepositoryTest extends TestCase
 {
     /**
-     * @var EntityManager|MockObject
+     * @var EntityManager&MockObject
      */
-    private $entityManager;
+    private MockObject $entityManager;
 
     /**
-     * @var ClassMetadata<Webhook>|MockObject
+     * @var ClassMetadata<Webhook>&MockObject
      */
-    private $classMetadata;
+    private MockObject $classMetadata;
 
-    /**
-     * @var WebhookQueueRepository
-     */
-    private $repository;
+    private WebhookQueueRepository $repository;
 
     protected function setUp(): void
     {
@@ -54,8 +51,6 @@ class WebhookQueueRepositoryTest extends TestCase
 
     public function testDeleteQueuesById(): void
     {
-        defined('MAUTIC_TABLE_PREFIX') or define('MAUTIC_TABLE_PREFIX', '');
-
         $ids        = [1, 2, 3];
         $expression = 'expression';
 

@@ -10,17 +10,17 @@ use Mautic\WebhookBundle\Http\Client;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
-class ClientTest extends TestCase
+final class ClientTest extends TestCase
 {
     /**
-     * @var MockObject|CoreParametersHelper
+     * @var MockObject&CoreParametersHelper
      */
-    private $parametersMock;
+    private MockObject $parametersMock;
 
     /**
-     * @var MockObject|GuzzleClient
+     * @var MockObject&GuzzleClient
      */
-    private $httpClientMock;
+    private MockObject $httpClientMock;
 
     private Client $client;
 

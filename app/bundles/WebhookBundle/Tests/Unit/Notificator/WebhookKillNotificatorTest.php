@@ -16,97 +16,64 @@ use Symfony\Bundle\FrameworkBundle\Routing\Router;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class WebhookKillNotificatorTest extends \PHPUnit\Framework\TestCase
+final class WebhookKillNotificatorTest extends \PHPUnit\Framework\TestCase
 {
     /**
-     * @var MockObject|TranslatorInterface
+     * @var MockObject&TranslatorInterface
      */
-    private $translatorMock;
+    private MockObject $translatorMock;
 
     /**
-     * @var MockObject|Router
+     * @var MockObject&Router
      */
-    private $routerMock;
+    private MockObject $routerMock;
 
     /**
-     * @var MockObject|NotificationModel
+     * @var MockObject&NotificationModel
      */
-    private $notificationModelMock;
+    private MockObject $notificationModelMock;
 
     /**
-     * @var MockObject|EntityManager
+     * @var MockObject&EntityManager
      */
-    private $entityManagerMock;
+    private MockObject $entityManagerMock;
 
     /**
-     * @var MockObject|MailHelper
+     * @var MockObject&MailHelper
      */
-    private $mailHelperMock;
+    private MockObject $mailHelperMock;
 
     /**
-     * @var MockObject|Webhook
+     * @var MockObject&Webhook
      */
-    private $webhook;
+    private MockObject $webhook;
 
     /**
-     * @var MockObject|CoreParametersHelper
+     * @var MockObject&CoreParametersHelper
      */
-    private $coreParamHelperMock;
+    private MockObject $coreParamHelperMock;
 
-    /**
-     * @var WebhookKillNotificator
-     */
-    private $webhookKillNotificator;
+    private WebhookKillNotificator $webhookKillNotificator;
 
-    /**
-     * @var string
-     */
-    private $subject = 'subject';
+    private string $subject = 'subject';
 
-    /**
-     * @var string
-     */
-    private $reason = 'reason';
+    private string $reason = 'reason';
 
-    /**
-     * @var int
-     */
-    private $webhookId = 1;
+    private int $webhookId = 1;
 
-    /**
-     * @var string
-     */
-    private $webhookName = 'Webhook name';
+    private string $webhookName = 'Webhook name';
 
-    /**
-     * @var string
-     */
-    private $generatedRoute = 'generatedRoute';
+    private string $generatedRoute = 'generatedRoute';
 
-    /**
-     * @var string
-     */
-    private $details = 'details';
+    private string $details = 'details';
 
-    /**
-     * @var string
-     */
-    private $createdBy = 'createdBy';
+    private string $createdBy = 'createdBy';
 
-    /**
-     * @var User|null
-     */
-    private $owner;
+    private ?User $owner;
 
-    /**
-     * @var string
-     */
-    private $ownerEmail = 'toEmail';
+    private string $ownerEmail = 'toEmail';
 
-    /**
-     * @var string|null
-     */
-    private $modifiedBy = null;
+    private ?string $modifiedBy = null;
 
     protected function setUp(): void
     {

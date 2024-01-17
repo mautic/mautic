@@ -14,39 +14,39 @@ use Mautic\WebhookBundle\Helper\CampaignHelper;
 use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
-class CampaignHelperTest extends \PHPUnit\Framework\TestCase
+final class CampaignHelperTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var MockObject&Lead
      */
-    private \PHPUnit\Framework\MockObject\MockObject $contact;
+    private MockObject $contact;
 
     /**
      * @var MockObject|Client
      */
-    private \PHPUnit\Framework\MockObject\MockObject $client;
+    private MockObject $client;
 
     /**
      * @var MockObject|CompanyModel
      */
-    private \PHPUnit\Framework\MockObject\MockObject $companyModel;
+    private MockObject $companyModel;
 
     /**
      * @var MockObject|CompanyRepository
      */
-    private \PHPUnit\Framework\MockObject\MockObject $companyRepository;
+    private MockObject $companyRepository;
 
     /**
      * @var ArrayCollection<int,IpAddress>
      */
-    private \Doctrine\Common\Collections\ArrayCollection $ipCollection;
+    private ArrayCollection $ipCollection;
 
-    private \Mautic\WebhookBundle\Helper\CampaignHelper $campaignHelper;
+    private CampaignHelper $campaignHelper;
 
     /**
      * @var MockObject|EventDispatcherInterface
      */
-    private \PHPUnit\Framework\MockObject\MockObject $dispatcher;
+    private MockObject $dispatcher;
 
     protected function setUp(): void
     {
@@ -58,15 +58,13 @@ class CampaignHelperTest extends \PHPUnit\Framework\TestCase
         $this->dispatcher        = $this->createMock(EventDispatcherInterface::class);
         $this->ipCollection      = new ArrayCollection();
         $this->companyRepository = $this->getMockBuilder(CompanyRepository::class)
-        ->disableOriginalConstructor()
-        ->onlyMethods(['getCompaniesByLeadId'])
-        ->getMock();
+            ->disableOriginalConstructor()
+            ->onlyMethods(['getCompaniesByLeadId'])
+            ->getMock();
 
-        $this->companyRepository->method('getCompaniesByLeadId')
-        ->willReturn([new Company()]);
+        $this->companyRepository->method('getCompaniesByLeadId')->willReturn([new Company()]);
 
-        $this->companyModel->method('getRepository')
-        ->willReturn($this->companyRepository);
+        $this->companyModel->method('getRepository')->willReturn($this->companyRepository);
 
         $this->campaignHelper = new CampaignHelper($this->client, $this->companyModel, $this->dispatcher);
 
