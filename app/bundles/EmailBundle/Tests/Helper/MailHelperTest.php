@@ -621,4 +621,43 @@ class MailHelperTest extends TestCase
             }
         }
     }
+
+    public function testInlineImages(): void
+    {
+        $root = realpath(__DIR__.'/../');
+
+        $parameterMap = [
+          ['mailer_convert_embed_images', false, true],
+          ['site_url', false, 'http://default'],
+        ];
+
+        /** @var MockObject|MauticFactory $mockFactory */
+        $mockFactory = $this->getMockFactory(true, $parameterMap);
+
+        $mockFactory->method('getSystemPath')
+          ->with('root', true)
+          ->willReturn($root);
+
+        $transport     = new SmtpTransport();
+        $symfonyMailer = new Mailer($transport);
+
+        $mailer = new MailHelper($mockFactory, $symfonyMailer, ['nobody@nowhere.com' => '{tracking_pixel}']);
+        $mailer->addTo($this->contacts[0]['email']);
+
+        $email = new Email();
+        $email->setSubject('Test');
+        $email->setCustomHtml('<img src="http://default/_data/test_image.png" /><img src="https://www.mautic.org/themes/custom/mauticorg_base/logo.svg" />');
+
+        $mailer->setEmail($email);
+        $mailer->send();
+
+        $attachments = $mailer->message->getAttachments();
+        $body        = $mailer->message->getHtmlBody();
+
+        foreach ($attachments as $attachment) {
+            $matches = [];
+            preg_match('/filename: ([0-9a-z]+)/', $attachment->asDebugString(), $matches);
+            $this->assertStringContainsString('<img src="cid:'.$matches[1].'" />', $body);
+        }
+    }
 }
