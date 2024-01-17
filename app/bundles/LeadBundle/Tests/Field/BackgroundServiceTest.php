@@ -19,9 +19,6 @@ use PHPUnit\Framework\MockObject\MockObject;
 
 class BackgroundServiceTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var MockObject|BackgroundService
-     */
     private \Mautic\LeadBundle\Field\BackgroundService $backgroundService;
 
     /**
