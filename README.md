@@ -1,6 +1,6 @@
 [![codecov](https://codecov.io/gh/mautic/mautic/branch/features/graph/badge.svg)](https://codecov.io/gh/mautic/mautic)
 <!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
-[![All Contributors](https://img.shields.io/badge/all_contributors-128-orange.svg?style=flat-square)](#contributors-)
+[![All Contributors](https://img.shields.io/badge/all_contributors-129-orange.svg?style=flat-square)](#contributors-)
 <!-- ALL-CONTRIBUTORS-BADGE:END -->
 
 About Mautic
@@ -231,6 +231,7 @@ Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/d
     <tr>
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/andersonjeccel"><img src="https://avatars.githubusercontent.com/u/116097999?v=4?s=100" width="100px;" alt="andersonjeccel"/><br /><sub><b>andersonjeccel</b></sub></a><br /><a href="https://github.com/mautic/mautic/commits?author=andersonjeccel" title="Code">💻</a> <a href="#a11y-andersonjeccel" title="Accessibility">️️️️♿️</a></td>
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/pasxel"><img src="https://avatars.githubusercontent.com/u/1814849?v=4?s=100" width="100px;" alt="Alexei Pl"/><br /><sub><b>Alexei Pl</b></sub></a><br /><a href="https://github.com/mautic/mautic/issues?q=author%3Apasxel" title="Bug reports">🐛</a> <a href="https://github.com/mautic/mautic/commits?author=pasxel" title="Code">💻</a></td>
+      <td align="center" valign="top" width="14.28%"><a href="https://github.com/alvaroenoht"><img src="https://avatars.githubusercontent.com/u/7890431?v=4?s=100" width="100px;" alt="Alvaro"/><br /><sub><b>Alvaro</b></sub></a><br /><a href="https://github.com/mautic/mautic/issues?q=author%3Aalvaroenoht" title="Bug reports">🐛</a></td>
     </tr>
   </tbody>
 </table>

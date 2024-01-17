@@ -52,12 +52,12 @@ class EntityResultHelperTest extends TestCase
 
         $paginator = $this->getMockBuilder(Paginator::class)
             ->disableOriginalConstructor()
-            ->setMethods(['getIterator'])
+            ->onlyMethods(['getIterator'])
             ->getMock();
 
         $paginator->expects($this->any())
             ->method('getIterator')
-            ->will($this->returnValue($iterator));
+            ->willReturn($iterator);
 
         $arrayResult = $resultHelper->getArray($paginator);
 
