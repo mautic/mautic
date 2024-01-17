@@ -1,0 +1,57 @@
+#!/bin/bash
+
+## #ddev-generated: If you want to edit and own this file, remove this line.
+## Description: Launch a browser with PhpMyAdmin
+## Usage: phpmyadmin
+## Example: "ddev phpmyadmin"
+
+if [ "${DDEV_PROJECT_STATUS-running}" != "running" ]; then
+  echo "Project ${DDEV_PROJECT} is not running, starting it"
+  ddev start
+fi
+
+DDEV_PHPMYADMIN_PORT=8036
+DDEV_PHPMYADMIN_HTTPS_PORT=8037
+
+FULLURL=${DDEV_PRIMARY_URL}
+HTTPS=""
+if [ ${DDEV_PRIMARY_URL%://*} = "https" ]; then HTTPS=true; fi
+
+if [[ ! -z "${GITPOD_INSTANCE_ID}" ]] || [[ "${CODESPACES}" == "true" ]]; then
+    FULLURL="${FULLURL/-${DDEV_HOST_WEBSERVER_PORT}/-${DDEV_PHPMYADMIN_PORT}}"
+else
+    if [ "${HTTPS}" = "" ]; then
+        FULLURL="${FULLURL%:[0-9]*}:${DDEV_PHPMYADMIN_PORT}"
+    else
+        FULLURL="${FULLURL%:[0-9]*}:${DDEV_PHPMYADMIN_HTTPS_PORT}"
+    fi
+fi
+
+if [ -n "${1:-}" ] ; then
+  if [[ ${1::1} != "/" ]] ; then
+    FULLURL="${FULLURL}/";
+  fi
+
+  FULLURL="${FULLURL}${1}";
+fi
+
+if [ "${DDEV_DEBUG:-}" = "true" ]; then
+    printf "FULLURL $FULLURL\n" && exit 0
+fi
+
+case $OSTYPE in
+  linux-gnu)
+    if [[ ! -z "${GITPOD_INSTANCE_ID}" ]]; then
+        gp preview ${FULLURL}
+    else
+        xdg-open ${FULLURL}
+    fi
+    ;;
+  "darwin"*)
+    open ${FULLURL}
+    ;;
+  "win*"* | "msys"*)
+    start ${FULLURL}
+    ;;
+esac
+

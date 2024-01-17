@@ -1,0 +1,27 @@
+#ddev-generated
+services:
+  phpmyadmin:
+    container_name: ddev-${DDEV_SITENAME}-phpmyadmin
+    image: phpmyadmin:5
+    working_dir: "/root"
+    restart: "no"
+    labels:
+      com.ddev.site-name: ${DDEV_SITENAME}
+      com.ddev.approot: $DDEV_APPROOT
+    expose:
+      - "80"
+    environment:
+    - PMA_USER=root
+    - PMA_PASSWORD=root
+    - PMA_HOST=db
+    - PMA_PORT=3306
+    - VIRTUAL_HOST=$DDEV_HOSTNAME
+    - UPLOAD_LIMIT=4000M
+    - HTTP_EXPOSE=8036:80
+    - HTTPS_EXPOSE=8037:80
+    healthcheck:
+      interval: 120s
+      timeout: 2s
+      retries: 1
+    depends_on:
+      - db
