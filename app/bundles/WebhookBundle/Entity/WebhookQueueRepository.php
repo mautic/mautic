@@ -64,8 +64,8 @@ class WebhookQueueRepository extends CommonRepository
             ->where($this->getTableAlias().'.webhook_id = :id')
             ->setParameter('id', $id)
             ->setMaxResults(1)
-            ->execute()
-            ->fetch();
+            ->executeQuery()
+            ->fetchOne();
 
         return (bool) $result;
     }

@@ -19,8 +19,8 @@ final class WebhookModelTest extends MauticMysqlTestCase
         parent::setUp();
 
         // Cleanup from previous tests
-        $this->connection->exec('DELETE FROM '.MAUTIC_TABLE_PREFIX.'webhook_queue');
-        $this->connection->exec('ALTER TABLE '.MAUTIC_TABLE_PREFIX.'webhook_queue AUTO_INCREMENT = 1');
+        $this->connection->executeStatement('DELETE FROM '.MAUTIC_TABLE_PREFIX.'webhook_queue');
+        $this->connection->executeStatement('ALTER TABLE '.MAUTIC_TABLE_PREFIX.'webhook_queue AUTO_INCREMENT = 1');
     }
 
     public function testEventsOrderByDirAsc(): void
