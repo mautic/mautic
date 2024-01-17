@@ -71,7 +71,7 @@ Deletes records of anonymous <options=bold>and inactive identified</> contacts o
 <info>php %command.full_name% --dry-run</info>
 Shows you how many records of anonymous contacts <info>%command.name%</info> will purge.
 
-The <info>%command.name%</info> command dispatches the CoreEvents::MAINTENANCE_CLEANUP_DATA event in order to purge old data (data must be supported by event listeners as not all data is applicable to be purged).
+The <info>%command.name%</info> command dispatches the <info>CoreEvents::MAINTENANCE_CLEANUP_DATA</info> event in order to purge old data (data must be supported by event listeners as not all data is applicable to be purged).
 EOT
             );
         parent::configure();
