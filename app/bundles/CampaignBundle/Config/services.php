@@ -23,9 +23,15 @@ return function (ContainerConfigurator $configurator): void {
     $services->load('Mautic\\CampaignBundle\\', '../')
         ->exclude('../{'.implode(',', array_merge(MauticCoreExtension::DEFAULT_EXCLUDES, $excludes)).'}');
 
-    $services->load('Mautic\\CampaignBundle\\Entity\\', '../Entity/*Repository.php');
+    $services->load('Mautic\\CampaignBundle\\Entity\\', '../Entity/*Repository.php')
+        ->tag(\Doctrine\Bundle\DoctrineBundle\DependencyInjection\Compiler\ServiceRepositoryCompilerPass::REPOSITORY_SERVICE_TAG);
     $services->alias('mautic.campaign.model.campaign', \Mautic\CampaignBundle\Model\CampaignModel::class);
     $services->alias('mautic.campaign.model.event', \Mautic\CampaignBundle\Model\EventModel::class);
     $services->alias('mautic.campaign.model.event_log', \Mautic\CampaignBundle\Model\EventLogModel::class);
     $services->alias('mautic.campaign.model.summary', \Mautic\CampaignBundle\Model\SummaryModel::class);
+    $services->alias('mautic.campaign.repository.campaign', \Mautic\CampaignBundle\Entity\CampaignRepository::class);
+    $services->alias('mautic.campaign.repository.lead', \Mautic\CampaignBundle\Entity\LeadRepository::class);
+    $services->alias('mautic.campaign.repository.event', \Mautic\CampaignBundle\Entity\EventRepository::class);
+    $services->alias('mautic.campaign.repository.lead_event_log', \Mautic\CampaignBundle\Entity\LeadEventLogRepository::class);
+    $services->alias('mautic.campaign.repository.summary', \Mautic\CampaignBundle\Entity\SummaryRepository::class);
 };

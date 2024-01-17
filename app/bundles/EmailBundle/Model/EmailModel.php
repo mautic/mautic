@@ -264,7 +264,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
      * @param string|null $action
      * @param array       $options
      *
-     * @return FormInterface<object>
+     * @return FormInterface<Email>
      *
      * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
      */

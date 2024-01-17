@@ -844,7 +844,17 @@ class MailHelper
                     continue;
                 }
 
-                $this->embedImagesReplaces[$match] = $this->message->embedFromPath($match);
+                $path = $match;
+                // if the path contains the site url, make it an absolute path, so it can be fetched.
+                if (str_starts_with($match, $this->factory->getParameter('site_url'))) {
+                    $path = str_replace($this->factory->getParameter('site_url'), '', $match);
+                    $path = $this->factory->getSystemPath('root', true).$path;
+                }
+
+                if ($file_content = file_get_contents($path)) {
+                    $this->message->embed($file_content, md5($match));
+                    $this->embedImagesReplaces[$match] = 'cid:'.md5($match);
+                }
             }
             $content = strtr($content, $this->embedImagesReplaces);
         }
@@ -1380,6 +1390,7 @@ class MailHelper
             } else {
                 $headers['List-Unsubscribe'] = $listUnsubscribeHeader;
             }
+            $headers['List-Unsubscribe-Post'] = 'List-Unsubscribe=One-Click';
         }
 
         return $headers;
