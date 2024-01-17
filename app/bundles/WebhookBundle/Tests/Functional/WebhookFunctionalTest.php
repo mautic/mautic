@@ -62,23 +62,23 @@ class WebhookFunctionalTest extends MauticMysqlTestCase
             }
         );
 
-        /** @var WebhookQueueRepository $webhookQueueRepository */
         $webhookQueueRepository = $this->em->getRepository(WebhookQueue::class);
+        \assert($webhookQueueRepository instanceof WebhookQueueRepository);
 
         $webhook = $this->createWebhook();
 
         // Ensure we have a clean slate. There should be no rows waiting to be processed at this point.
-        Assert::assertSame(0, $webhookQueueRepository->getQueueCountByWebhookId($webhook->getId()));
+        Assert::assertfalse($webhookQueueRepository->exists($webhook->getId()));
 
         $this->createContacts();
 
         // At this point there should be 3 events waiting to be processed.
-        Assert::assertSame(3, $webhookQueueRepository->getQueueCountByWebhookId($webhook->getId()));
+        Assert::assertTrue($webhookQueueRepository->exists($webhook->getId()));
 
         $this->testSymfonyCommand(ProcessWebhookQueuesCommand::COMMAND_NAME, ['--webhook-id' => $webhook->getId()]);
 
         // The queue should be processed now.
-        Assert::assertSame(0, $webhookQueueRepository->getQueueCountByWebhookId($webhook->getId()));
+        Assert::assertfalse($webhookQueueRepository->exists($webhook->getId()));
         Assert::assertSame(1, $sendRequestCounter);
     }
 

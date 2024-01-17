@@ -11,29 +11,42 @@ use Mautic\LeadBundle\Entity\CompanyRepository;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Model\CompanyModel;
 use Mautic\WebhookBundle\Helper\CampaignHelper;
+use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
-class CampaignHelperTest extends \PHPUnit\Framework\TestCase
+final class CampaignHelperTest extends \PHPUnit\Framework\TestCase
 {
-    private \PHPUnit\Framework\MockObject\MockObject $contact;
+    /**
+     * @var MockObject&Lead
+     */
+    private MockObject $contact;
 
     /**
-     * @var \PHPUnit\Framework\MockObject\MockObject|Client
+     * @var MockObject|Client
      */
-    private \PHPUnit\Framework\MockObject\MockObject $client;
-
-    private \PHPUnit\Framework\MockObject\MockObject $companyModel;
-
-    private \PHPUnit\Framework\MockObject\MockObject $companyRepository;
-
-    private \Doctrine\Common\Collections\ArrayCollection $ipCollection;
-
-    private \Mautic\WebhookBundle\Helper\CampaignHelper $campaignHelper;
+    private MockObject $client;
 
     /**
-     * @var \PHPUnit\Framework\MockObject\MockObject|EventDispatcherInterface
+     * @var MockObject|CompanyModel
      */
-    private \PHPUnit\Framework\MockObject\MockObject $dispatcher;
+    private MockObject $companyModel;
+
+    /**
+     * @var MockObject|CompanyRepository
+     */
+    private MockObject $companyRepository;
+
+    /**
+     * @var ArrayCollection<int,IpAddress>
+     */
+    private ArrayCollection $ipCollection;
+
+    private CampaignHelper $campaignHelper;
+
+    /**
+     * @var MockObject|EventDispatcherInterface
+     */
+    private MockObject $dispatcher;
 
     protected function setUp(): void
     {
@@ -45,15 +58,13 @@ class CampaignHelperTest extends \PHPUnit\Framework\TestCase
         $this->dispatcher        = $this->createMock(EventDispatcherInterface::class);
         $this->ipCollection      = new ArrayCollection();
         $this->companyRepository = $this->getMockBuilder(CompanyRepository::class)
-        ->disableOriginalConstructor()
-        ->onlyMethods(['getCompaniesByLeadId'])
-        ->getMock();
+            ->disableOriginalConstructor()
+            ->onlyMethods(['getCompaniesByLeadId'])
+            ->getMock();
 
-        $this->companyRepository->method('getCompaniesByLeadId')
-        ->willReturn([new Company()]);
+        $this->companyRepository->method('getCompaniesByLeadId')->willReturn([new Company()]);
 
-        $this->companyModel->method('getRepository')
-        ->willReturn($this->companyRepository);
+        $this->companyModel->method('getRepository')->willReturn($this->companyRepository);
 
         $this->campaignHelper = new CampaignHelper($this->client, $this->companyModel, $this->dispatcher);
 
@@ -86,8 +97,7 @@ class CampaignHelperTest extends \PHPUnit\Framework\TestCase
 
     public function testFireWebhookWithPost(): void
     {
-        $config      = $this->provideSampleConfig('post');
-        $expectedUrl = 'https://mautic.org?test=tee&email=john%40doe.email&IP=127.0.0.1%2C127.0.0.2';
+        $config = $this->provideSampleConfig('post');
 
         $this->client->expects($this->once())
             ->method('request')
@@ -103,10 +113,7 @@ class CampaignHelperTest extends \PHPUnit\Framework\TestCase
 
     public function testFireWebhookWithPostJson(): void
     {
-        $config      = $this->provideSampleConfig('post');
-        $expectedUrl = 'https://mautic.org?test=tee&email=john%40doe.email&IP=127.0.0.1%2C127.0.0.2';
-
-        $config      = $this->provideSampleConfig('post', 'application/json');
+        $config = $this->provideSampleConfig('post', 'application/json');
         $this->client->expects($this->once())
             ->method('request')
             ->with('post', 'https://mautic.org', [
@@ -136,7 +143,10 @@ class CampaignHelperTest extends \PHPUnit\Framework\TestCase
         $this->campaignHelper->fireWebhook($this->provideSampleConfig(), $this->contact);
     }
 
-    private function provideSampleConfig($method = 'get', $type = 'application/x-www-form-urlencoded')
+    /**
+     * @return array<string,mixed>
+     */
+    private function provideSampleConfig(string $method = 'get', string $type = 'application/x-www-form-urlencoded'): array
     {
         $sample = [
             'url'             => 'https://mautic.org',

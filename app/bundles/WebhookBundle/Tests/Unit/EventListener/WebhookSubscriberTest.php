@@ -9,14 +9,24 @@ use Mautic\WebhookBundle\Event\WebhookEvent;
 use Mautic\WebhookBundle\EventListener\WebhookSubscriber;
 use Mautic\WebhookBundle\Notificator\WebhookKillNotificator;
 use Mautic\WebhookBundle\WebhookEvents;
+use PHPUnit\Framework\MockObject\MockObject;
 
 class WebhookSubscriberTest extends \PHPUnit\Framework\TestCase
 {
-    private \PHPUnit\Framework\MockObject\MockObject $ipLookupHelper;
+    /**
+     * @var MockObject&IpLookupHelper
+     */
+    private MockObject $ipLookupHelper;
 
-    private \PHPUnit\Framework\MockObject\MockObject $auditLogModel;
+    /**
+     * @var MockObject&AuditLogModel
+     */
+    private MockObject $auditLogModel;
 
-    private \PHPUnit\Framework\MockObject\MockObject $webhookKillNotificator;
+    /**
+     * @var MockObject&WebhookKillNotificator
+     */
+    private MockObject $webhookKillNotificator;
 
     protected function setUp(): void
     {
