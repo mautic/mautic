@@ -8,10 +8,9 @@ use Mautic\CampaignBundle\CampaignEvents;
 use Mautic\CampaignBundle\Entity\Campaign;
 use Mautic\CampaignBundle\Event\CampaignEvent;
 use Mautic\CampaignBundle\EventListener\CampaignSubscriber;
-use Mautic\CampaignBundle\Service\Campaign as CampaignService;
+use Mautic\CampaignBundle\Service\CampaignAuditService;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\CoreBundle\Model\AuditLogModel;
-use Mautic\CoreBundle\Service\FlashBag;
 use PHPUnit\Framework\TestCase;
 
 class CampaignSubscriberTest extends TestCase
@@ -20,9 +19,7 @@ class CampaignSubscriberTest extends TestCase
 
     private \PHPUnit\Framework\MockObject\MockObject $auditLogModel;
 
-    private \PHPUnit\Framework\MockObject\MockObject $campaignService;
-
-    private \PHPUnit\Framework\MockObject\MockObject $flashBag;
+    private \PHPUnit\Framework\MockObject\MockObject $campaignAuditService;
 
     private \Mautic\CampaignBundle\EventListener\CampaignSubscriber $subscriber;
 
@@ -30,16 +27,14 @@ class CampaignSubscriberTest extends TestCase
     {
         parent::setUp();
 
-        $this->ipLookupHelper  = $this->createMock(IpLookupHelper::class);
-        $this->auditLogModel   = $this->createMock(AuditLogModel::class);
-        $this->campaignService = $this->createMock(CampaignService::class);
-        $this->flashBag        = $this->createMock(FlashBag::class);
+        $this->ipLookupHelper       = $this->createMock(IpLookupHelper::class);
+        $this->auditLogModel        = $this->createMock(AuditLogModel::class);
+        $this->campaignAuditService = $this->createMock(CampaignAuditService::class);
 
         $this->subscriber = new CampaignSubscriber(
             $this->ipLookupHelper,
             $this->auditLogModel,
-            $this->campaignService,
-            $this->flashBag
+            $this->campaignAuditService
         );
     }
 
@@ -116,19 +111,9 @@ class CampaignSubscriberTest extends TestCase
 
         $event = new CampaignEvent($campaign);
 
-        $this->campaignService->expects($this->once())
-            ->method('hasUnpublishedEmail')
-            ->with(null)
-            ->willReturn(true);
-
-        $this->flashBag->expects($this->once())
-            ->method('add')
-            ->with(
-                'mautic.core.notice.campaign.unpublished.email',
-                [
-                    '%name%' => $campaign->getName(),
-                ]
-            );
+        $this->campaignAuditService->expects($this->once())
+            ->method('checkUnpublishedAndExpiredEmails')
+            ->with($campaign);
 
         $this->ipLookupHelper->expects($this->once())
             ->method('getIpAddressFromRequest')
