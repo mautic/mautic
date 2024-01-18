@@ -130,18 +130,13 @@ system('find . -type f -name build.properties -exec rm -f {} \\;');
 system('find . -type f -name build.xml -exec rm -f {} \\;');
 system('find . -type f -name Gruntfile.js -exec rm -f {} \\;');
 
-// Delete composer files
-system('find . -type f -name composer.json -exec rm -f {} \\;');
-system('find . -type f -name composer.lock -exec rm -f {} \\;');
-system('find . -type f -name package.json -exec rm -f {} \\;');
-
 // Delete MD files
 system('find vendor/ -type f -name "*.md" -exec rm -f {} \\;');
 system('find vendor/ -type f -name "*.mdown" -exec rm -f {} \\;');
 system('find vendor/ -type f -name "*.markdown" -exec rm -f {} \\;');
 
 // Find git special files
-system('find . -name ".git*" -prune -exec rm -rf {} \\;');
+system('find . -name ".git*" -not -wholename "./config/.gitkeep" -prune -exec rm -rf {} \\;');
 
 // Find any .DS_Store files and nuke them
 system('find . -name .DS_Store -exec rm -rf {} \\;');

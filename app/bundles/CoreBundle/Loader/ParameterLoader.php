@@ -9,40 +9,26 @@ use Symfony\Component\HttpFoundation\ParameterBag;
 
 class ParameterLoader
 {
-    /**
-     * @var string
-     */
-    private $rootPath;
+    private string $configBaseDir;
 
-    /**
-     * @var string
-     */
-    private $configBaseDir;
+    private \Symfony\Component\HttpFoundation\ParameterBag $parameterBag;
 
-    /**
-     * @var ParameterBag
-     */
-    private $parameterBag;
-
-    /**
-     * @var ParameterBag
-     */
-    private $localParameterBag;
+    private \Symfony\Component\HttpFoundation\ParameterBag $localParameterBag;
 
     /**
      * @var array<string, mixed>
      */
-    private $localParameters = [];
+    private array $localParameters = [];
 
     /**
      * @var array<string, mixed>
      */
     private static $defaultParameters = [];
 
-    public function __construct(string $configRootPath = __DIR__.'/../../../')
-    {
-        $this->rootPath      = $configRootPath;
-        $this->configBaseDir = $this->getLocalConfigBaseDir($this->rootPath);
+    public function __construct(
+        private string $rootPath = __DIR__.'/../../../'
+    ) {
+        $this->configBaseDir = static::getLocalConfigBaseDir($this->rootPath);
 
         $this->loadDefaultParameters();
         $this->loadLocalParameters();
@@ -179,8 +165,8 @@ class ParameterLoader
         // Force local specific params
         $localParametersFile = $this->getLocalParametersFile();
         if (file_exists($localParametersFile)) {
-            /** @var array<string, mixed> $parameters */
             include $localParametersFile;
+            /** @var array<string, mixed> $parameters */
 
             // override default with forced
             $compiledParameters = array_merge($compiledParameters, $parameters);
@@ -191,6 +177,10 @@ class ParameterLoader
         if ($envParameters) {
             $compiledParameters = array_merge($compiledParameters, json_decode($envParameters, true));
         }
+
+        // Hardcode the db_driver to pdo_mysql, as it is currently the only supported driver.
+        // We set in here, to ensure it is always set to this value.
+        $compiledParameters['db_driver'] = 'pdo_mysql';
 
         $this->localParameters = $compiledParameters;
     }
@@ -227,7 +217,7 @@ class ParameterLoader
         $dir = $rootDir = \dirname($root, 1);
         while (!is_file($dir.'/composer.json')) {
             if ($dir === \dirname($dir)) {
-                return $$rootDir;
+                return $rootDir;
             }
             $dir = \dirname($dir);
         }

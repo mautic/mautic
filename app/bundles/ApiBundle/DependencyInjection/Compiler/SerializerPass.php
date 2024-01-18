@@ -15,7 +15,7 @@ class SerializerPass implements CompilerPassInterface
      * currently no other way that I can find to get our driver into the
      * chain in front of the rest.
      */
-    public function process(ContainerBuilder $container)
+    public function process(ContainerBuilder $container): void
     {
         if ($container->hasDefinition('jms_serializer.metadata.annotation_driver')) {
             $definition = $container->getDefinition('jms_serializer.metadata.annotation_driver');

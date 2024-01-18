@@ -28,13 +28,10 @@ final class SyncJudge implements SyncJudgeInterface
             return $leftChangeRequest;
         }
 
-        switch ($mode) {
-            case SyncJudgeInterface::HARD_EVIDENCE_MODE:
-                return HardEvidence::adjudicate($leftChangeRequest, $rightChangeRequest);
-            case SyncJudgeInterface::BEST_EVIDENCE_MODE:
-                return BestEvidence::adjudicate($leftChangeRequest, $rightChangeRequest);
-            default:
-                return FuzzyEvidence::adjudicate($leftChangeRequest, $rightChangeRequest);
-        }
+        return match ($mode) {
+            SyncJudgeInterface::HARD_EVIDENCE_MODE => HardEvidence::adjudicate($leftChangeRequest, $rightChangeRequest),
+            SyncJudgeInterface::BEST_EVIDENCE_MODE => BestEvidence::adjudicate($leftChangeRequest, $rightChangeRequest),
+            default                                => FuzzyEvidence::adjudicate($leftChangeRequest, $rightChangeRequest),
+        };
     }
 }

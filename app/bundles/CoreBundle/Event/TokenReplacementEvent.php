@@ -18,45 +18,27 @@ class TokenReplacementEvent extends CommonEvent
     protected $content;
 
     /**
-     * @var Lead|mixed[]|null
-     */
-    protected $lead;
-
-    /**
-     * @var array
-     */
-    protected $clickthrough = [];
-
-    /**
      * @var array
      */
     protected $tokens = [];
-
-    /**
-     * Whatever the calling code wants to make available to the consumers.
-     *
-     * @var mixed
-     */
-    protected $passthrough;
-
-    private bool $internalSend;
 
     /**
      * @param CommonEntity|string|null $content
      * @param Lead|mixed[]|null        $lead
      * @param mixed                    $passthrough
      */
-    public function __construct($content, $lead = null, array $clickthrough = [], $passthrough = null, bool $internalSend = false)
-    {
+    public function __construct(
+        $content,
+        protected $lead = null,
+        protected array $clickthrough = [],
+        protected $passthrough = null,
+        private bool $internalSend = false
+    ) {
         if ($content instanceof CommonEntity) {
             $this->entity = $content;
         }
 
         $this->content      = $content;
-        $this->lead         = $lead;
-        $this->clickthrough = $clickthrough;
-        $this->passthrough  = $passthrough;
-        $this->internalSend = $internalSend;
     }
 
     /**
@@ -70,7 +52,7 @@ class TokenReplacementEvent extends CommonEvent
     /**
      * @param CommonEntity|string|null $content
      */
-    public function setContent($content)
+    public function setContent($content): void
     {
         $this->content = $content;
     }
@@ -102,7 +84,7 @@ class TokenReplacementEvent extends CommonEvent
     /**
      * @param mixed[] $clickthrough
      */
-    public function setClickthrough($clickthrough)
+    public function setClickthrough($clickthrough): void
     {
         $this->clickthrough = $clickthrough;
     }
@@ -115,7 +97,7 @@ class TokenReplacementEvent extends CommonEvent
         return $this->entity;
     }
 
-    public function addToken($token, $value)
+    public function addToken($token, $value): void
     {
         $this->tokens[$token] = $value;
     }

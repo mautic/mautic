@@ -15,6 +15,7 @@ use Symfony\Component\HttpFoundation\Response as SymfonyResponse;
 class PullTransifexCommandFunctionalTest extends MauticMysqlTestCase
 {
     private const FAKE_TRANSLATION_DIR = __DIR__.'/../Fixtures/Transifex/Translations';
+
     private Filesystem $filesystem;
 
     protected function setUp(): void

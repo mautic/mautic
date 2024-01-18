@@ -17,9 +17,6 @@ class MiddlewareBuilder
      */
     private $cacheFile;
 
-    /**
-     * MiddlewareBuilder constructor.
-     */
     public function __construct(\AppKernel $app)
     {
         $this->app       = $app;

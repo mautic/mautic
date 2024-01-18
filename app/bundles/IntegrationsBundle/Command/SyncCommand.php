@@ -17,16 +17,10 @@ class SyncCommand extends Command
 {
     public const NAME = 'mautic:integrations:sync';
 
-    /**
-     * @var SyncServiceInterface
-     */
-    private $syncService;
-
-    public function __construct(SyncServiceInterface $syncService)
-    {
+    public function __construct(
+        private SyncServiceInterface $syncService
+    ) {
         parent::__construct();
-
-        $this->syncService = $syncService;
     }
 
     protected function configure(): void
@@ -126,5 +120,6 @@ class SyncCommand extends Command
 
         return \Symfony\Component\Console\Command\Command::SUCCESS;
     }
+
     protected static $defaultDescription = 'Fetch objects from integration.';
 }

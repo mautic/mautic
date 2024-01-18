@@ -74,7 +74,7 @@ class SalesforceApiTest extends \PHPUnit\Framework\TestCase
 
         try {
             $api->request('/test');
-        } catch (ApiErrorException $exception) {
+        } catch (ApiErrorException) {
             $this->fail('ApiErrorException thrown');
         }
     }
@@ -107,7 +107,7 @@ class SalesforceApiTest extends \PHPUnit\Framework\TestCase
 
         try {
             $api->request('/test');
-        } catch (ApiErrorException $exception) {
+        } catch (ApiErrorException) {
             $this->fail('ApiErrorException should not have been thrown');
         }
     }
@@ -173,7 +173,7 @@ class SalesforceApiTest extends \PHPUnit\Framework\TestCase
 
         try {
             $api->request('/test');
-        } catch (ApiErrorException $exception) {
+        } catch (ApiErrorException) {
             $this->fail('ApiErrorException thrown');
         }
     }
@@ -215,7 +215,7 @@ class SalesforceApiTest extends \PHPUnit\Framework\TestCase
     {
         $integration = $this->getMockBuilder(SalesforceIntegration::class)
             ->disableOriginalConstructor()
-            ->setMethodsExcept(['cleanPushData'])
+            ->onlyMethods(['mergeConfigToFeatureSettings', 'makeRequest', 'getQueryUrl', 'getIntegrationSettings', 'getFieldsForQuery', 'getApiUrl'])
             ->getMock();
 
         $integration->expects($this->exactly(1))
@@ -231,7 +231,7 @@ class SalesforceApiTest extends \PHPUnit\Framework\TestCase
         $integration->expects($this->exactly(1))
             ->method('makeRequest')
             ->willReturnCallback(
-                function ($url, $parameters = [], $method = 'GET', $settings = []) {
+                function ($url, $parameters = [], $method = 'GET', $settings = []): void {
                     $this->assertEquals(
                         $parameters,
                         [
@@ -258,13 +258,13 @@ class SalesforceApiTest extends \PHPUnit\Framework\TestCase
     /**
      * @testdox Test that a backslash and an html entity of single quote are escaped for SF queries
      *
-     * @covers \MauticPlugin\MauticCrmBundle\Api\SalesforceApi::escapeQueryValue()
+     * @covers \MauticPlugin\MauticCrmBundle\Api\SalesforceApi::escapeQueryValue
      */
-    public function testCompanyQueryWithHtmlEntitiesIsEscapedCorrectly()
+    public function testCompanyQueryWithHtmlEntitiesIsEscapedCorrectly(): void
     {
         $integration = $this->getMockBuilder(SalesforceIntegration::class)
             ->disableOriginalConstructor()
-            ->setMethodsExcept(['cleanPushData'])
+            ->onlyMethods(['mergeConfigToFeatureSettings', 'makeRequest', 'getQueryUrl', 'getIntegrationSettings', 'getFieldsForQuery', 'getApiUrl'])
             ->getMock();
 
         $integration->expects($this->exactly(1))
@@ -280,7 +280,7 @@ class SalesforceApiTest extends \PHPUnit\Framework\TestCase
         $integration->expects($this->exactly(1))
             ->method('makeRequest')
             ->willReturnCallback(
-                function ($url, $parameters = [], $method = 'GET', $settings = []) {
+                function ($url, $parameters = [], $method = 'GET', $settings = []): void {
                     $this->assertEquals(
                         $parameters,
                         [
@@ -311,7 +311,7 @@ class SalesforceApiTest extends \PHPUnit\Framework\TestCase
     {
         $integration = $this->getMockBuilder(SalesforceIntegration::class)
             ->disableOriginalConstructor()
-            ->setMethodsExcept(['cleanPushData'])
+            ->onlyMethods(['mergeConfigToFeatureSettings', 'makeRequest', 'getQueryUrl', 'getIntegrationSettings', 'getFieldsForQuery', 'getApiUrl'])
             ->getMock();
 
         $integration->expects($this->exactly(1))
@@ -327,7 +327,7 @@ class SalesforceApiTest extends \PHPUnit\Framework\TestCase
         $integration->expects($this->exactly(1))
             ->method('makeRequest')
             ->willReturnCallback(
-                function ($url, $parameters = [], $method = 'GET', $settings = []) {
+                function ($url, $parameters = [], $method = 'GET', $settings = []): void {
                     $this->assertEquals(
                         $parameters,
                         [
@@ -353,7 +353,7 @@ class SalesforceApiTest extends \PHPUnit\Framework\TestCase
     {
         $integration = $this->getMockBuilder(SalesforceIntegration::class)
             ->disableOriginalConstructor()
-            ->setMethodsExcept(['cleanPushData'])
+            ->onlyMethods(['mergeConfigToFeatureSettings', 'makeRequest', 'getQueryUrl', 'getIntegrationSettings', 'getFieldsForQuery', 'getApiUrl'])
             ->getMock();
 
         $integration->expects($this->exactly(1))
@@ -369,7 +369,7 @@ class SalesforceApiTest extends \PHPUnit\Framework\TestCase
         $integration->expects($this->exactly(1))
             ->method('makeRequest')
             ->willReturnCallback(
-                function ($url, $parameters = [], $method = 'GET', $settings = []) {
+                function ($url, $parameters = [], $method = 'GET', $settings = []): void {
                     $this->assertEquals(
                         $parameters,
                         [

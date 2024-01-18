@@ -13,10 +13,7 @@ class CampaignSubscriber implements EventSubscriberInterface
 {
     use PushToIntegrationTrait;
 
-    /**
-     * {@inheritdoc}
-     */
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             CampaignEvents::CAMPAIGN_ON_BUILD        => ['onCampaignBuild', 0],
@@ -24,7 +21,7 @@ class CampaignSubscriber implements EventSubscriberInterface
         ];
     }
 
-    public function onCampaignBuild(CampaignBuilderEvent $event)
+    public function onCampaignBuild(CampaignBuilderEvent $event): void
     {
         $action = [
             'label'       => 'mautic.plugin.actions.push_lead',
@@ -37,7 +34,7 @@ class CampaignSubscriber implements EventSubscriberInterface
         $event->addAction('plugin.leadpush', $action);
     }
 
-    public function onCampaignTriggerAction(CampaignExecutionEvent $event)
+    public function onCampaignTriggerAction(CampaignExecutionEvent $event): void
     {
         $config                  = $event->getConfig();
         $config['campaignEvent'] = $event->getEvent();

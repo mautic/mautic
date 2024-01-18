@@ -6,7 +6,7 @@ use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 
-class CommonEntity
+class CommonEntity implements \Stringable
 {
     /**
      * @var array
@@ -18,7 +18,7 @@ class CommonEntity
      */
     protected $pastChanges = [];
 
-    public static function loadMetadata(ORM\ClassMetadata $metadata)
+    public static function loadMetadata(ORM\ClassMetadata $metadata): void
     {
         $builder = new ClassMetadataBuilder($metadata);
 
@@ -34,7 +34,7 @@ class CommonEntity
      */
     public function __call($name, $arguments)
     {
-        if (0 === strpos($name, 'is') && method_exists($this, 'get'.ucfirst($name))) {
+        if (str_starts_with($name, 'is') && method_exists($this, 'get'.ucfirst($name))) {
             return $this->{'get'.ucfirst($name)}();
         } elseif ('getName' == $name && method_exists($this, 'getTitle')) {
             return $this->getTitle();
@@ -43,12 +43,9 @@ class CommonEntity
         throw new \InvalidArgumentException('Method '.$name.' not exists');
     }
 
-    /**
-     * @return string
-     */
-    public function __toString()
+    public function __toString(): string
     {
-        $string = get_called_class();
+        $string = static::class;
         if (method_exists($this, 'getId')) {
             $string .= ' with ID #'.$this->getId();
         }
@@ -130,16 +127,13 @@ class CommonEntity
         return $this->changes;
     }
 
-    /**
-     * @return void
-     */
-    public function resetChanges()
+    public function resetChanges(): void
     {
         $this->pastChanges = $this->changes;
         $this->changes     = [];
     }
 
-    public function setChanges(array $changes)
+    public function setChanges(array $changes): void
     {
         $this->changes = $changes;
     }

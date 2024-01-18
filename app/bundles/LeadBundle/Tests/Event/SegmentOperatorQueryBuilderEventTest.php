@@ -14,12 +14,12 @@ final class SegmentOperatorQueryBuilderEventTest extends \PHPUnit\Framework\Test
     /**
      * @var MockObject|QueryBuilder
      */
-    private $queryBuilder;
+    private \PHPUnit\Framework\MockObject\MockObject $queryBuilder;
 
     /**
      * @var MockObject|ContactSegmentFilter
      */
-    private $filter;
+    private \PHPUnit\Framework\MockObject\MockObject $filter;
 
     protected function setUp(): void
     {

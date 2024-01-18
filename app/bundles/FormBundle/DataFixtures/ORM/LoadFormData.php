@@ -21,21 +21,6 @@ class LoadFormData extends AbstractFixture implements OrderedFixtureInterface
     public const FORM_PREFIX = 'form-';
 
     /**
-     * @var FormModel
-     */
-    private $formModel;
-
-    /**
-     * @var FieldModel
-     */
-    private $formFieldModel;
-
-    /**
-     * @var ActionModel
-     */
-    private $actionModel;
-
-    /**
      * @var array<int, Form>
      */
     private array $formEntities = [];
@@ -50,21 +35,21 @@ class LoadFormData extends AbstractFixture implements OrderedFixtureInterface
      */
     private array $actionEntities = [];
 
-    public function __construct(FormModel $formModel, FieldModel $formFieldModel, ActionModel $actionModel, EventDispatcherInterface $eventDispatcher)
-    {
-        $this->formModel      = $formModel;
-        $this->formFieldModel = $formFieldModel;
-        $this->actionModel    = $actionModel;
-
+    public function __construct(
+        private FormModel $formModel,
+        private FieldModel $formFieldModel,
+        private ActionModel $actionModel,
+        EventDispatcherInterface $eventDispatcher
+    ) {
         // this will load the data before fixtures are loaded
-        $eventDispatcher->addListener(PreExecuteEvent::class, function (PreExecuteEvent $event) {
+        $eventDispatcher->addListener(PreExecuteEvent::class, function (PreExecuteEvent $event): void {
             $formEntities = $this->getFormEntities();
             $this->getFieldEntities();
             $this->getActionEntities();
             $firstId = 0;
 
             // create the tables passed in LoadFormData fixture.
-            foreach ($formEntities as $key => $form) {
+            foreach ($formEntities as $form) {
                 $this->formModel->generateHtml($form);
 
                 if ($form->getId() < 1) {

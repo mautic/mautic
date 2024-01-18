@@ -132,7 +132,7 @@ class ContactSegmentServiceFunctionalTest extends MauticMysqlTestCase
     {
         $segmentTest3Ref       = $this->getReference('segment-test-3');
 
-        $this->runCommand(
+        $this->testSymfonyCommand(
             'mautic:segments:update',
             [
                 '-i'    => $segmentTest3Ref->getId(),
@@ -151,7 +151,7 @@ class ContactSegmentServiceFunctionalTest extends MauticMysqlTestCase
         // Remove the title from all contacts, rebuild the list, and check that list is updated
         $this->em->getConnection()->executeQuery(sprintf('UPDATE %sleads SET title = NULL;', MAUTIC_TABLE_PREFIX));
 
-        $this->runCommand(
+        $this->testSymfonyCommand(
             'mautic:segments:update',
             [
                 '-i'    => $segmentTest3Ref->getId(),
@@ -168,7 +168,7 @@ class ContactSegmentServiceFunctionalTest extends MauticMysqlTestCase
         );
 
         $segmentTest40Ref      = $this->getReference('segment-test-include-segment-with-or');
-        $this->runCommand('mautic:segments:update', [
+        $this->testSymfonyCommand('mautic:segments:update', [
             '-i'    => $segmentTest40Ref->getId(),
             '--env' => 'test',
         ]);
@@ -182,7 +182,7 @@ class ContactSegmentServiceFunctionalTest extends MauticMysqlTestCase
         );
 
         $segmentTest51Ref      = $this->getReference('has-email-and-visited-url');
-        $this->runCommand('mautic:segments:update', [
+        $this->testSymfonyCommand('mautic:segments:update', [
             '-i'    => $segmentTest51Ref->getId(),
             '--env' => 'test',
         ]);
@@ -203,7 +203,7 @@ class ContactSegmentServiceFunctionalTest extends MauticMysqlTestCase
             'abcdr')
         );
 
-        $this->runCommand(
+        $this->testSymfonyCommand(
             'mautic:segments:update',
             [
                 '-i'    => $segmentTest51Ref->getId(),

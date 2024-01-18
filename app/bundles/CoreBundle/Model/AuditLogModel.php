@@ -11,8 +11,6 @@ use Mautic\UserBundle\Entity\User;
 class AuditLogModel extends AbstractCommonModel
 {
     /**
-     * {@inheritdoc}
-     *
      * @return \Mautic\CoreBundle\Entity\AuditLogRepository
      */
     public function getRepository()
@@ -25,14 +23,14 @@ class AuditLogModel extends AbstractCommonModel
      *
      * @param array $args [bundle, object, objectId, action, details, ipAddress]
      */
-    public function writeToLog(array $args)
+    public function writeToLog(array $args): void
     {
-        $bundle    = (isset($args['bundle'])) ? $args['bundle'] : '';
-        $object    = (isset($args['object'])) ? $args['object'] : '';
-        $objectId  = (isset($args['objectId'])) ? $args['objectId'] : '';
-        $action    = (isset($args['action'])) ? $args['action'] : '';
-        $details   = (isset($args['details'])) ? $args['details'] : '';
-        $ipAddress = (isset($args['ipAddress'])) ? $args['ipAddress'] : '';
+        $bundle    = $args['bundle'] ?? '';
+        $object    = $args['object'] ?? '';
+        $objectId  = $args['objectId'] ?? '';
+        $action    = $args['action'] ?? '';
+        $details   = $args['details'] ?? '';
+        $ipAddress = $args['ipAddress'] ?? '';
 
         $log = new AuditLog();
         $log->setBundle($bundle);

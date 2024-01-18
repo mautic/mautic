@@ -9,51 +9,28 @@ class DecisionEvent extends CampaignExecutionEvent
 {
     use ContextTrait;
 
-    /**
-     * @var AbstractEventAccessor
-     */
-    private $eventConfig;
+    private bool $applicable = false;
 
     /**
-     * @var LeadEventLog
-     */
-    private $eventLog;
-
-    /**
-     * Anything that the dispatching listener wants to pass through to other listeners.
-     *
-     * @var mixed
-     */
-    private $passthrough;
-
-    /**
-     * @var bool
-     */
-    private $applicable = false;
-
-    /**
-     * DecisionEvent constructor.
-     *
      * @param mixed $passthrough
      */
-    public function __construct(AbstractEventAccessor $config, LeadEventLog $log, $passthrough = null)
-    {
-        $this->eventConfig = $config;
-        $this->eventLog    = $log;
-        $this->passthrough = $passthrough;
-
+    public function __construct(
+        private AbstractEventAccessor $eventConfig,
+        private LeadEventLog $eventLog,
+        private $passthrough = null
+    ) {
         // @deprecated support for pre 2.13.0; to be removed in 3.0
         parent::__construct(
             [
-                'eventSettings'   => $config->getConfig(),
+                'eventSettings'   => $eventConfig->getConfig(),
                 'eventDetails'    => $passthrough,
-                'event'           => $log->getEvent(),
-                'lead'            => $log->getLead(),
+                'event'           => $eventLog->getEvent(),
+                'lead'            => $eventLog->getLead(),
                 'systemTriggered' => defined('MAUTIC_CAMPAIGN_SYSTEM_TRIGGERED'),
-                'dateScheduled'   => $log->getTriggerDate(),
+                'dateScheduled'   => $eventLog->getTriggerDate(),
             ],
             null,
-            $log
+            $eventLog
         );
     }
 
@@ -84,15 +61,12 @@ class DecisionEvent extends CampaignExecutionEvent
     /**
      * Note that this decision is a match and the child events should be executed.
      */
-    public function setAsApplicable()
+    public function setAsApplicable(): void
     {
         $this->applicable = true;
     }
 
-    /**
-     * @return bool
-     */
-    public function wasDecisionApplicable()
+    public function wasDecisionApplicable(): bool
     {
         return $this->applicable;
     }
@@ -101,18 +75,16 @@ class DecisionEvent extends CampaignExecutionEvent
      * @param string   $channel
      * @param int|null $channelId
      */
-    public function setChannel($channel, $channelId = null)
+    public function setChannel($channel, $channelId = null): void
     {
-        $this->log->setChannel($this->channel)
-            ->setChannelId($this->channelId);
+        $this->log->setChannel($this->channel);
+        $this->log->setChannelId($this->channelId);
     }
 
     /**
      * @deprecated 2.13.0 to be removed in 3.0; BC support
-     *
-     * @return bool
      */
-    public function getResult()
+    public function getResult(): bool
     {
         return $this->applicable;
     }

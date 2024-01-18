@@ -19,10 +19,14 @@ class ContactExportScheduler
 
     private \DateTimeImmutable $scheduledDateTime;
 
-    /** @var array<mixed> */
+    /**
+     * @var array<mixed>
+     */
     private array $data = [];
 
-    /** @var array<mixed> */
+    /**
+     * @var array<mixed>
+     */
     private array $changes = [];
 
     /**
