@@ -25,6 +25,7 @@ class CleanupMaintenanceCommand extends ModeratedCommand
         PathsHelper $pathsHelper,
         CoreParametersHelper $coreParametersHelper
     ) {
+    	$this->coreParametersHelper = $coreParametersHelper;
         parent::__construct($pathsHelper, $coreParametersHelper);
     }
 
@@ -94,8 +95,8 @@ EOT
         }
 
         if (!empty($gdpr)) {
-            // to fullfill GDPR, you must delete inactive user data older than 3years
-            $daysOld = 365 * 3;
+            // Override threshold to delete records of inactive users
+            $daysOld = $this->coreParametersHelper->get('mautic.gdpr_user_purge_threshold', 1095);
         }
 
         if (empty($dryRun) && empty($noInteraction)) {
