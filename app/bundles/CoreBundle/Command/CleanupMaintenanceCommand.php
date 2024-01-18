@@ -46,7 +46,7 @@ class CleanupMaintenanceCommand extends ModeratedCommand
             )
             ->setHelp(
                 <<<'EOT'
-<info>%command.name%</info> purges records of anonymous contacts (<comment>unless <info>--gdpr</info> flag is set</comment>) that are older than 365 days.
+<info>%command.name%</info> purges records of anonymous contacts (<comment>unless the <info>--gdpr</info> flag is set</comment>) that are older than 365 days.
 Adjust the threshold by using <info>--days-old</info>.
 
 <comment><info>%command.name% --gdpr</info> purges records of anonymous <options=bold>and identified</> contacts.
