@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Mautic\IntegrationsBundle\Tests\Unit\Auth\Provider\Oauth2ThreeLegged;
 
 use GuzzleHttp\ClientInterface;
-use GuzzleHttp\Psr7\Uri;
 use kamermans\OAuth2\OAuth2Middleware;
 use kamermans\OAuth2\Persistence\TokenPersistenceInterface as KamermansTokenPersistenceInterface;
 use kamermans\OAuth2\Signer\AccessToken\SignerInterface as AccessTokenSigner;
@@ -133,8 +132,9 @@ class HttpFactoryTest extends TestCase
         $client = (new HttpFactory())->getClient($credentials);
         /**
          * Even though the method getConfig is deprecated it won't get deprecated
-         * https://github.com/guzzle/guzzle/issues/3114#issuecomment-1627228395
+         * https://github.com/guzzle/guzzle/issues/3114#issuecomment-1627228395.
          */
+        /** @phpstan-ignore-next-line */
         $this->assertEquals('https://mautic.com', (string) $client->getConfig('base_uri'));
     }
 
@@ -320,6 +320,7 @@ class HttpFactoryTest extends TestCase
      */
     private function extractMiddleware(ClientInterface $client): OAuth2Middleware
     {
+        /** @phpstan-ignore-next-line */
         $handler = $client->getConfig()['handler'];
 
         $reflection = new \ReflectionClass($handler);
