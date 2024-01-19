@@ -1831,8 +1831,10 @@ Mautic.campaignBuilderUpdateEventCloneButton = function (groups, eventType, anch
 
 Mautic.campaignBuilderUpdateEventCloneDescription = function () {
     var cloneDetails = Mautic.getCampaignEventClone();
-    mQuery('[data-campaign-event-clone="sourceEventName"]').html(cloneDetails['sourceEventName']);
-    mQuery('[data-campaign-event-clone="sourceCampaignName"]').html(cloneDetails['sourceCampaignName']);
+    if (cloneDetails) {
+        mQuery('[data-campaign-event-clone="sourceEventName"]').html(cloneDetails['sourceEventName']);
+        mQuery('[data-campaign-event-clone="sourceCampaignName"]').html(cloneDetails['sourceCampaignName']);
+    }
 };
 
 /**
