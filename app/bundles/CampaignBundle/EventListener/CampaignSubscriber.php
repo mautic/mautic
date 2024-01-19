@@ -35,7 +35,7 @@ class CampaignSubscriber implements EventSubscriberInterface
         $details  = $event->getChanges();
 
         if ($campaign->isPublished()) {
-            $this->campaignAuditService->checkUnpublishedAndExpiredEmails($campaign);
+            $this->campaignAuditService->addWarningForUnpublishedEmails($campaign);
         }
 
         // don't set leads

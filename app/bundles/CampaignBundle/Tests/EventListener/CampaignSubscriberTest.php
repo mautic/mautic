@@ -112,7 +112,7 @@ class CampaignSubscriberTest extends TestCase
         $event = new CampaignEvent($campaign);
 
         $this->campaignAuditService->expects($this->once())
-            ->method('checkUnpublishedAndExpiredEmails')
+            ->method('addWarningForUnpublishedEmails')
             ->with($campaign);
 
         $this->ipLookupHelper->expects($this->once())

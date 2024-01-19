@@ -5,7 +5,6 @@ namespace Mautic\CampaignBundle\Tests\Service;
 use Mautic\CampaignBundle\Entity\Campaign;
 use Mautic\CampaignBundle\Entity\CampaignRepository;
 use Mautic\CampaignBundle\Service\CampaignAuditService;
-use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\CoreBundle\Service\FlashBag;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Entity\EmailRepository;
@@ -19,7 +18,6 @@ class CampaignAuditServiceTest extends TestCase
     private MockObject $urlGenerator;
     private MockObject $campaignRepository;
     private MockObject $emailRepository;
-    private MockObject $dateTimeHelper;
     private CampaignAuditService $campaignAuditService;
 
     protected function setUp(): void
@@ -28,43 +26,26 @@ class CampaignAuditServiceTest extends TestCase
         $this->urlGenerator       = $this->createMock(UrlGeneratorInterface::class);
         $this->campaignRepository = $this->createMock(CampaignRepository::class);
         $this->emailRepository    = $this->createMock(EmailRepository::class);
-        $this->dateTimeHelper     = $this->createMock(DateTimeHelper::class);
 
         $this->campaignAuditService = new CampaignAuditService(
             $this->flashBag,
             $this->urlGenerator,
             $this->campaignRepository,
             $this->emailRepository,
-            $this->dateTimeHelper
         );
     }
 
-    public function testCheckUnpublishedAndExpiredEmails(): void
+    public function testAddWarningForUnpublishedEmails(): void
     {
-        $campaign = $this->createMock(Campaign::class);
-        $campaign->expects($this->any())
-            ->method('getId')
-            ->willReturn(1);
-        $campaign->expects($this->any())
-            ->method('getPublishDown')
-            ->willReturn(new \DateTime('-1 day'));
+        $campaign = new Campaign();
+        $campaign->setPublishDown(new \DateTime('-1 day'));
 
-        $email1 = $this->createMock(Email::class);
-        $email1->expects($this->any())
-            ->method('isPublished')
-            ->willReturn(false);
+        $email1 = new Email();
+        $email1->setIsPublished(false);
 
-        $email2 = $this->createMock(Email::class);
-        $email2->expects($this->any())
-            ->method('isPublished')
-            ->willReturn(true);
-        $email2->expects($this->any())
-            ->method('getPublishDown')
-            ->willReturn(new \DateTime('-1 day'));
-
-        $this->dateTimeHelper->expects($this->any())
-            ->method('getLocalDateTime')
-            ->willReturn(new \DateTime());
+        $email2 = new Email();
+        $email2->setIsPublished(true);
+        $email2->setPublishDown(new \DateTime('-1 day'));
 
         $this->campaignRepository->expects($this->once())
             ->method('fetchEmailIdsById')
@@ -87,7 +68,7 @@ class CampaignAuditServiceTest extends TestCase
             ->method('add')
             ->withConsecutive(
                 [
-                    CampaignAuditService::UNPUBLISHED_EMAIL_MESSAGE,
+                    'mautic.core.notice.campaign.unpublished.email',
                     [
                         '%name%'      => null,
                         '%menu_link%' => 'mautic_email_index',
@@ -96,7 +77,7 @@ class CampaignAuditServiceTest extends TestCase
                     FlashBag::LEVEL_WARNING,
                 ],
                 [
-                    CampaignAuditService::EXPIRED_EMAIL_MESSAGE,
+                    'mautic.core.notice.campaign.unpublished.email',
                     [
                         '%name%'      => null,
                         '%menu_link%' => 'mautic_email_index',
@@ -106,6 +87,6 @@ class CampaignAuditServiceTest extends TestCase
                 ]
             );
 
-        $this->campaignAuditService->checkUnpublishedAndExpiredEmails($campaign);
+        $this->campaignAuditService->addWarningForUnpublishedEmails($campaign);
     }
 }
