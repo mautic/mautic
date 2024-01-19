@@ -61,7 +61,7 @@ abstract class PluginBundleBase extends Bundle
                         throw $e;
                     }
                 }
-            } catch (\Exception $e) {
+            } catch (\Exception) {
             }
         }
     }
