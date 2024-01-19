@@ -42,23 +42,26 @@ abstract class PluginBundleBase extends Bundle
         $installQueries = $schemaTool->getCreateSchemaSql($metadata);
 
         foreach ($installQueries as $q) {
-            // Check if the query is a DDL statement
-            if (self::isDDLStatement($q)) {
-                // Execute DDL statements outside of a transaction
-                $db->executeQuery($q);
-            } else {
-                // For non-DDL statements, use transactions
-                try {
-                    $db->beginTransaction();
+            try {
+                // Check if the query is a DDL statement
+                if (self::isDDLStatement($q)) {
+                    // Execute DDL statements outside of a transaction
                     $db->executeQuery($q);
-                    $db->commit();
-                } catch (\Exception $e) {
-                    // Rollback only for non-DDL statements
-                    if ($db->isTransactionActive()) {
-                        $db->rollBack();
+                } else {
+                    // For non-DDL statements, use transactions
+                    try {
+                        $db->beginTransaction();
+                        $db->executeQuery($q);
+                        $db->commit();
+                    } catch (\Exception $e) {
+                        // Rollback only for non-DDL statements
+                        if ($db->isTransactionActive()) {
+                            $db->rollBack();
+                        }
+                        throw $e;
                     }
-                    throw $e;
                 }
+            } catch (\Exception $e) {
             }
         }
     }
