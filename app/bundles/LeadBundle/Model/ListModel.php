@@ -614,7 +614,7 @@ class ListModel extends FormModel
                 }
             } else {
                 $listLead = new ListLead();
-                $listLead->setList($this->leadChangeLists[$listId]);
+                $listLead->setList($this->em->getReference(LeadList::class, $listId));
                 $listLead->setLead($lead);
                 $listLead->setManuallyAdded($manuallyAdded);
                 $listLead->setDateAdded($dateManipulated);
