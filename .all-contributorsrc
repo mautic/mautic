@@ -1211,6 +1211,15 @@
         "bug",
         "code"
       ]
+    },
+    {
+      "login": "alvaroenoht",
+      "name": "Alvaro",
+      "avatar_url": "https://avatars.githubusercontent.com/u/7890431?v=4",
+      "profile": "https://github.com/alvaroenoht",
+      "contributions": [
+        "bug"
+      ]
     }
   ],
   "contributorsPerLine": 7,

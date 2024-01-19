@@ -266,7 +266,7 @@ class ThemeController extends FormController
     {
         return [
             'returnUrl'       => $this->generateUrl('mautic_themes_index'),
-            'contentTemplate' => 'Mautic\CoreBundle\Controller\themeController::indexAction',
+            'contentTemplate' => 'Mautic\CoreBundle\Controller\ThemeController::indexAction',
             'passthroughVars' => [
                 'activeLink'    => 'mautic_themes_index',
                 'mauticContent' => 'theme',
