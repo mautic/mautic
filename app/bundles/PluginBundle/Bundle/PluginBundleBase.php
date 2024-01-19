@@ -66,7 +66,7 @@ abstract class PluginBundleBase extends Bundle
         }
     }
 
-    private static function isDDLStatement($query)
+    private static function isDDLStatement(string $query): bool|int
     {
         return preg_match('/^(CREATE|ALTER|DROP)\s/i', $query);
     }
