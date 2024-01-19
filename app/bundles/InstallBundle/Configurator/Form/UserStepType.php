@@ -3,6 +3,7 @@
 namespace Mautic\InstallBundle\Configurator\Form;
 
 use Mautic\CoreBundle\Form\Type\FormButtonsType;
+use Mautic\UserBundle\Form\Validator\Constraints\NotWeak;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\EmailType;
 use Symfony\Component\Form\Extension\Core\Type\PasswordType;
@@ -11,6 +12,9 @@ use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\Validator\Constraints as Assert;
 
+/**
+ * @extends AbstractType<mixed>
+ */
 class UserStepType extends AbstractType
 {
     public function __construct(
@@ -132,6 +136,9 @@ class UserStepType extends AbstractType
                             'minMessage' => 'mautic.install.password.minlength',
                         ]
                     ),
+                    new NotWeak([
+                        'message' => 'mautic.user.user.password.weak',
+                    ]),
                 ],
             ]
         );

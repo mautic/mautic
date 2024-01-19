@@ -525,8 +525,8 @@ class ImportController extends FormController
     /**
      * Decide whether the import will be processed in client's browser.
      *
-     * @param FormInterface<FormInterface> $form
-     * @param string                       $object
+     * @param FormInterface<mixed> $form
+     * @param string               $object
      */
     protected function importInBrowser(FormInterface $form, $object): bool
     {
@@ -549,8 +549,8 @@ class ImportController extends FormController
     /**
      * Decide whether the import will be queued to be processed by the CLI command in the background.
      *
-     * @param FormInterface<FormInterface> $form
-     * @param string                       $object
+     * @param FormInterface<mixed> $form
+     * @param string               $object
      */
     protected function importInCli(FormInterface $form, $object): bool
     {

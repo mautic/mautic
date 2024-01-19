@@ -103,43 +103,6 @@ return [
     ],
 
     'services' => [
-        'repositories' => [
-            'mautic.campaign.repository.campaign' => [
-                'class'     => Doctrine\ORM\EntityRepository::class,
-                'factory'   => ['@doctrine.orm.entity_manager', 'getRepository'],
-                'arguments' => [
-                    \Mautic\CampaignBundle\Entity\Campaign::class,
-                ],
-            ],
-            'mautic.campaign.repository.lead' => [
-                'class'     => Doctrine\ORM\EntityRepository::class,
-                'factory'   => ['@doctrine.orm.entity_manager', 'getRepository'],
-                'arguments' => [
-                    \Mautic\CampaignBundle\Entity\Lead::class,
-                ],
-            ],
-            'mautic.campaign.repository.event' => [
-                'class'     => Doctrine\ORM\EntityRepository::class,
-                'factory'   => ['@doctrine.orm.entity_manager', 'getRepository'],
-                'arguments' => [
-                    \Mautic\CampaignBundle\Entity\Event::class,
-                ],
-            ],
-            'mautic.campaign.repository.lead_event_log' => [
-                'class'     => Doctrine\ORM\EntityRepository::class,
-                'factory'   => ['@doctrine.orm.entity_manager', 'getRepository'],
-                'arguments' => [
-                    \Mautic\CampaignBundle\Entity\LeadEventLog::class,
-                ],
-            ],
-            'mautic.campaign.repository.summary' => [
-                'class'     => Doctrine\ORM\EntityRepository::class,
-                'factory'   => ['@doctrine.orm.entity_manager', 'getRepository'],
-                'arguments' => [
-                    \Mautic\CampaignBundle\Entity\Summary::class,
-                ],
-            ],
-        ],
         'execution'    => [
             'mautic.campaign.contact_finder.kickoff'  => [
                 'class'     => \Mautic\CampaignBundle\Executioner\ContactFinder\KickoffContactFinder::class,

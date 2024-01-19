@@ -23,7 +23,8 @@ return function (ContainerConfigurator $configurator): void {
     $services->load('Mautic\\EmailBundle\\', '../')
         ->exclude('../{'.implode(',', array_merge(MauticCoreExtension::DEFAULT_EXCLUDES, $excludes)).'}');
 
-    $services->load('Mautic\\EmailBundle\\Entity\\', '../Entity/*Repository.php');
+    $services->load('Mautic\\EmailBundle\\Entity\\', '../Entity/*Repository.php')
+        ->tag(\Doctrine\Bundle\DoctrineBundle\DependencyInjection\Compiler\ServiceRepositoryCompilerPass::REPOSITORY_SERVICE_TAG);
 
     $services->alias(\Mautic\CoreBundle\Doctrine\Provider\GeneratedColumnsProviderInterface::class, \Mautic\CoreBundle\Doctrine\Provider\GeneratedColumnsProvider::class);
     $services->set(\Mautic\EmailBundle\Mailer\Transport\TransportFactory::class)
@@ -34,4 +35,7 @@ return function (ContainerConfigurator $configurator): void {
     $services->alias('mautic.email.model.send_email_to_contacts', \Mautic\EmailBundle\Model\SendEmailToContact::class);
     $services->alias('mautic.email.model.transport_callback', \Mautic\EmailBundle\Model\TransportCallback::class);
     $services->alias('mautic.email.helper.request.storage', \Mautic\EmailBundle\Helper\RequestStorageHelper::class);  /** @phpstan-ignore-line as the service is deprecated */
+    $services->alias('mautic.email.repository.email', \Mautic\EmailBundle\Entity\EmailRepository::class);
+    $services->alias('mautic.email.repository.emailReply', \Mautic\EmailBundle\Entity\EmailReplyRepository::class);
+    $services->alias('mautic.email.repository.stat', \Mautic\EmailBundle\Entity\StatRepository::class);
 };

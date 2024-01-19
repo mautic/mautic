@@ -87,15 +87,17 @@ class InstallWorkflowTest extends MauticMysqlTestCase
         $form         = $submitButton->form();
 
         $form['install_user_step[username]']->setValue('admin');
-        $form['install_user_step[password]']->setValue('mautic');
+        $form['install_user_step[password]']->setValue('maut!cR000cks');
         $form['install_user_step[firstname]']->setValue('admin');
         $form['install_user_step[lastname]']->setValue('mautic');
         $form['install_user_step[email]']->setValue('mautic@example.com');
 
         $crawler = $this->client->submit($form);
         Assert::assertTrue($this->client->getResponse()->isOk(), $this->client->getResponse()->getContent());
+        $heading = $crawler->filter('.panel-body.text-center h5');
+        Assert::assertCount(1, $heading, $this->client->getResponse()->getContent());
 
-        $successText = $crawler->filter('.panel-body.text-center h5')->text();
+        $successText = $heading->text();
         Assert::assertStringContainsString('Mautic is installed', $successText);
 
         // Assert that the fixtures were loaded

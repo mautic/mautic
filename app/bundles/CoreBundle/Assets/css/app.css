@@ -1444,6 +1444,9 @@ blockquote > p:after {
   right: 20px;
   z-index: 100000;
 }
+.alert-growl-container.alert-offset {
+  top: 50px;
+}
 .alert-growl-container .alert-growl {
   margin-bottom: 5px;
 }
