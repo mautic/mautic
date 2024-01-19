@@ -33,7 +33,7 @@ abstract class PluginBundleBase extends Bundle
     public static function installPluginSchema(array $metadata, MauticFactory $factory, $installedSchema = null): void
     {
         if (null !== $installedSchema) {
-            // Schema exists so bail
+            // Schema already exists, so no need to proceed
             return;
         }
 
@@ -41,18 +41,31 @@ abstract class PluginBundleBase extends Bundle
         $schemaTool     = new SchemaTool($factory->getEntityManager());
         $installQueries = $schemaTool->getCreateSchemaSql($metadata);
 
-        $db->beginTransaction();
-        try {
-            foreach ($installQueries as $q) {
+        foreach ($installQueries as $q) {
+            // Check if the query is a DDL statement
+            if (self::isDDLStatement($q)) {
+                // Execute DDL statements outside of a transaction
                 $db->executeQuery($q);
+            } else {
+                // For non-DDL statements, use transactions
+                try {
+                    $db->beginTransaction();
+                    $db->executeQuery($q);
+                    $db->commit();
+                } catch (\Exception $e) {
+                    // Rollback only for non-DDL statements
+                    if ($db->isTransactionActive()) {
+                        $db->rollBack();
+                    }
+                    throw $e;
+                }
             }
-
-            $db->commit();
-        } catch (\Exception $e) {
-            $db->rollback();
-
-            throw $e;
         }
+    }
+
+    private static function isDDLStatement($query)
+    {
+        return preg_match('/^(CREATE|ALTER|DROP)\s/i', $query);
     }
 
     /**
