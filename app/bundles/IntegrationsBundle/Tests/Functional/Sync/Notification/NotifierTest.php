@@ -72,7 +72,7 @@ class NotifierTest extends MauticMysqlTestCase
         $qb->select('1')
             ->from(MAUTIC_TABLE_PREFIX.'lead_event_log')
             ->where(
-                $qb->expr()->andX(
+                $qb->expr()->and(
                     $qb->expr()->eq('bundle', $qb->expr()->literal('integrations')),
                     $qb->expr()->eq('object', $qb->expr()->literal(ExampleIntegration::NAME))
                 )
