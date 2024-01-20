@@ -82,14 +82,14 @@ jobs:
     - name: Install dependencies
       # composer install cache - https://github.com/ramsey/composer-install
       uses: "ramsey/composer-install@v2"
-  
+
     - name: Run tests - database = ${{ matrix.db-types }}
       run: |
         rm -rf var/cache
         export DB_PORT="${{ job.services.database.ports[3306] }}"
 
         if [[ "${{ matrix.php-versions }}" == "8.1" ]] && [[ "${{ matrix.db-types }}" == "mariadb" ]]; then
-          php -d pcov.enabled=1 bin/phpunit -d memory_limit=1G --bootstrap vendor/autoload.php --configuration app/phpunit.xml.dist --coverage-clover=coverage.xml --log-junit=junit.xml
+          php -d pcov.enabled=1 bin/phpunit -d memory_limit=2G --bootstrap vendor/autoload.php --configuration app/phpunit.xml.dist --coverage-clover=coverage.xml --log-junit=junit.xml
         else
           composer test
         fi
@@ -174,7 +174,7 @@ jobs:
 
     - name: Get changed files
       id: changed-files
-      uses: tj-actions/changed-files@v35
+      uses: tj-actions/changed-files@v41
 
     - name: Setup PHP, with composer and extensions
       uses: shivammathur/setup-php@v2
@@ -198,9 +198,7 @@ jobs:
         elif [[ "${{ matrix.commands }}" == "Rector" ]]; then
           export SYMFONY_ENV=test
           bin/console cache:warmup
-          composer rector
-          git reset --hard
-          composer rector -- --dry-run --no-progress-bar
+          bin/rector --dry-run --ansi
         elif [[ "${{ matrix.commands }}" == "Twig Lint" ]]; then
           bin/console lint:twig app plugins
         elif [[ "${{ matrix.commands }}" == "CS Fixer" ]]; then
@@ -250,17 +248,7 @@ jobs:
           # test if console is executable
           ./bin/console cache:clear
         elif [[ "${{ matrix.commands }}" == "composer lock check" ]]; then
-          composer update --lock --no-plugins --no-scripts 2> /dev/null
-          git diff -I'"plugin-api-version": "[0-9\.]+"' > /tmp/diff_command_output.txt
-          if [[ $(wc -l </tmp/diff_command_output.txt) -ge 1 ]]; then
-            echo "The composer.lock file doesn't correspond with the changes in the composer.json file"
-            echo "Please run following command locally"
-            echo "composer update --lock"
-            echo ""
-            echo "verbose diff:"
-            cat /tmp/diff_command_output.txt
-            exit 1
-          fi
+          composer validate --ansi
         else
           echo "Invalid command"
           exit 1

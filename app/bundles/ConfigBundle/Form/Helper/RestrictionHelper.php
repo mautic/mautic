@@ -9,25 +9,27 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 class RestrictionHelper
 {
     public const MODE_REMOVE = 'remove';
-    public const MODE_MASK   = 'mask';
 
-    private TranslatorInterface $translator;
+    public const MODE_MASK   = 'mask';
 
     /**
      * @var string[]
      */
     private array $restrictedFields;
 
-    private string $displayMode;
-
-    public function __construct(TranslatorInterface $translator, array $restrictedFields, string $mode)
-    {
-        $this->translator       = $translator;
+    public function __construct(
+        private TranslatorInterface $translator,
+        array $restrictedFields,
+        private string $displayMode
+    ) {
         $this->restrictedFields = FieldHelper::prepareRestrictions($restrictedFields);
-        $this->displayMode      = $mode;
     }
 
-    public function applyRestrictions(FormInterface $childType, FormInterface $parentType, array $restrictedFields = null)
+    /**
+     * @param FormInterface<mixed> $childType
+     * @param FormInterface<mixed> $parentType
+     */
+    public function applyRestrictions(FormInterface $childType, FormInterface $parentType, array $restrictedFields = null): void
     {
         if (null === $restrictedFields) {
             $restrictedFields = $this->restrictedFields;
@@ -48,13 +50,17 @@ class RestrictionHelper
         }
     }
 
-    private function restrictField(FormInterface $childType, FormInterface $parentType)
+    /**
+     * @param FormInterface<mixed> $childType
+     * @param FormInterface<mixed> $parentType
+     */
+    private function restrictField(FormInterface $childType, FormInterface $parentType): void
     {
         switch ($this->displayMode) {
             case self::MODE_MASK:
                 $parentType->add(
                     $childType->getName(),
-                    get_class($childType->getConfig()->getType()->getInnerType()),
+                    $childType->getConfig()->getType()->getInnerType()::class,
                     array_merge(
                         $childType->getConfig()->getOptions(),
                         [

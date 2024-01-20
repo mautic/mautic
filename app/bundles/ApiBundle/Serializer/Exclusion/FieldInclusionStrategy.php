@@ -8,48 +8,28 @@ use JMS\Serializer\Metadata\ClassMetadata;
 use JMS\Serializer\Metadata\PropertyMetadata;
 
 /**
- * Class FieldInclusionStrategy.
- *
- * Include specific fields at a specific level
+ * Include specific fields at a specific level.
  */
 class FieldInclusionStrategy implements ExclusionStrategyInterface
 {
-    /**
-     * @var array
-     */
-    private $fields = [];
+    private int $level;
 
     /**
-     * @var int
+     * @param int $level
      */
-    private $level;
-
-    private $path;
-
-    /**
-     * FieldInclusionStrategy constructor.
-     *
-     * @param int  $level
-     * @param null $path
-     */
-    public function __construct(array $fields, $level = 3, $path = null)
-    {
-        $this->fields = $fields;
+    public function __construct(
+        private array $fields,
+        $level = 3,
+        private $path = null
+    ) {
         $this->level  = (int) $level;
-        $this->path   = $path;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function shouldSkipClass(ClassMetadata $metadata, Context $navigatorContext): bool
     {
         return false;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function shouldSkipProperty(PropertyMetadata $property, Context $navigatorContext): bool
     {
         if ($this->path) {

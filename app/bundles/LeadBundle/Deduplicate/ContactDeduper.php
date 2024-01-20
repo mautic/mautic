@@ -13,15 +13,12 @@ class ContactDeduper
 {
     use DeduperTrait;
 
-    private ContactMerger $contactMerger;
-
-    private LeadRepository $leadRepository;
-
-    public function __construct(FieldModel $fieldModel, ContactMerger $contactMerger, LeadRepository $leadRepository)
-    {
+    public function __construct(
+        FieldModel $fieldModel,
+        private ContactMerger $contactMerger,
+        private LeadRepository $leadRepository
+    ) {
         $this->fieldModel     = $fieldModel;
-        $this->contactMerger  = $contactMerger;
-        $this->leadRepository = $leadRepository;
     }
 
     /**
@@ -100,7 +97,7 @@ class ContactDeduper
         while ($winner = next($duplicates)) {
             try {
                 $this->contactMerger->merge($winner, $loser);
-            } catch (SameContactException $exception) {
+            } catch (SameContactException) {
             }
 
             $loser = $winner;

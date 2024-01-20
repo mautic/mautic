@@ -13,14 +13,11 @@ use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Form\FormInterface;
 
 /**
- * Class PointActionUrlHitType.
+ * @extends AbstractType<array<mixed>>
  */
 class PointActionUrlHitType extends AbstractType
 {
-    /**
-     * {@inheritdoc}
-     */
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder->add('page_url', TextType::class, [
             'label'      => 'mautic.page.point.action.form.page.url',
@@ -42,8 +39,8 @@ class PointActionUrlHitType extends AbstractType
             ],
         ]);
 
-        $formModifier = function (FormInterface $form, $data) use ($builder) {
-            $unit = (isset($data['accumulative_time_unit'])) ? $data['accumulative_time_unit'] : 'H';
+        $formModifier = function (FormInterface $form, $data) use ($builder): void {
+            $unit = $data['accumulative_time_unit'] ?? 'H';
             $form->add('accumulative_time_unit', HiddenType::class, [
                 'data' => $unit,
             ]);
@@ -64,7 +61,7 @@ class PointActionUrlHitType extends AbstractType
                     ->getForm()
             );
 
-            $unit               = (isset($data['returns_within_unit'])) ? $data['returns_within_unit'] : 'H';
+            $unit               = $data['returns_within_unit'] ?? 'H';
             $secondsTransformer = new SecondsConversionTransformer($unit);
             $form->add('returns_within_unit', HiddenType::class, [
                 'data' => $unit,
@@ -86,7 +83,7 @@ class PointActionUrlHitType extends AbstractType
                     ->getForm()
             );
 
-            $unit               = (isset($data['returns_after_unit'])) ? $data['returns_after_unit'] : 'H';
+            $unit               = $data['returns_after_unit'] ?? 'H';
             $secondsTransformer = new SecondsConversionTransformer($unit);
             $form->add('returns_after_unit', HiddenType::class, [
                 'data' => $unit,
@@ -109,23 +106,20 @@ class PointActionUrlHitType extends AbstractType
         };
 
         $builder->addEventListener(FormEvents::PRE_SET_DATA,
-            function (FormEvent $event) use ($formModifier) {
+            function (FormEvent $event) use ($formModifier): void {
                 $data = $event->getData();
                 $formModifier($event->getForm(), $data);
             }
         );
 
         $builder->addEventListener(FormEvents::PRE_SUBMIT,
-            function (FormEvent $event) use ($formModifier) {
+            function (FormEvent $event) use ($formModifier): void {
                 $data = $event->getData();
                 $formModifier($event->getForm(), $data);
             }
         );
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getBlockPrefix()
     {
         return 'pointaction_urlhit';

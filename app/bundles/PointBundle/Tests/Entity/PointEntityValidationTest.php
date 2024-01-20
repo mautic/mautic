@@ -87,7 +87,7 @@ class PointEntityValidationTest extends MauticMysqlTestCase
      *
      * @throws \Exception
      */
-    public function deltaScenariosProvider(): iterable
+    public static function deltaScenariosProvider(): iterable
     {
         yield 'within range positive number' => [3000, ''];
         yield 'within range negative number' => [-7857, ''];

@@ -4,77 +4,52 @@ namespace MauticPlugin\MauticSocialBundle\Controller;
 
 use Mautic\CoreBundle\Controller\FormController;
 use Symfony\Component\Form\Form;
+use Symfony\Component\Form\FormInterface;
+use Symfony\Component\Form\FormView;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 
-/**
- * Class TweetController.
- */
 class TweetController extends FormController
 {
-    /**
-     * @return mixed
-     */
-    protected function getModelName()
+    protected function getModelName(): string
     {
         return 'social.tweet';
     }
 
-    /**
-     * @return mixed
-     */
-    protected function getJsLoadMethodPrefix()
+    protected function getJsLoadMethodPrefix(): string
     {
         return 'socialTweet';
     }
 
-    /**
-     * @return mixed
-     */
-    protected function getRouteBase()
+    protected function getRouteBase(): string
     {
         return 'mautic_tweet';
     }
 
-    /**
-     * @param null $objectId
-     *
-     * @return mixed
-     */
-    protected function getSessionBase($objectId = null)
+    protected function getSessionBase($objectId = null): string
     {
         return 'mautic_tweet';
     }
 
-    /**
-     * @return mixed
-     */
-    protected function getTemplateBase()
+    protected function getTemplateBase(): string
     {
         return '@MauticSocial/Tweet';
     }
 
-    /**
-     * @return mixed
-     */
-    protected function getTranslationBase()
+    protected function getTranslationBase(): string
     {
         return 'mautic.integration.Twitter';
     }
 
-    /**
-     * @return mixed
-     */
-    protected function getPermissionBase()
+    protected function getPermissionBase(): string
     {
         return 'mauticSocial:tweets';
     }
 
     /**
      * Define options to pass to the form when it's being created.
-     *
-     * @return array
      */
-    protected function getEntityFormOptions()
+    protected function getEntityFormOptions(): array
     {
         return [
             'update_select'      => $this->getUpdateSelect(),
@@ -100,20 +75,16 @@ class TweetController extends FormController
      * Set custom form themes, etc.
      *
      * @param string $action
-     *
-     * @return \Symfony\Component\Form\FormView
      */
-    protected function getFormView(Form $form, $action)
+    protected function getFormView(FormInterface $form, $action): FormView
     {
         return $form->createView();
     }
 
     /**
      * @param int $page
-     *
-     * @return \Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|Response
      */
-    public function indexAction(Request $request, $page = 1)
+    public function indexAction(Request $request, $page = 1): Response
     {
         return parent::indexStandard($request, $page);
     }
@@ -130,10 +101,8 @@ class TweetController extends FormController
 
     /**
      * Get the template file.
-     *
-     * @return string
      */
-    protected function getTemplateName($file)
+    protected function getTemplateName($file): string
     {
         if (('form.html.twig' === $file) && 1 == $this->getCurrentRequest()->get('modal')) {
             return '@MauticSocial/Tweet/form_modal.html.twig';
@@ -155,12 +124,7 @@ class TweetController extends FormController
         return parent::editStandard($request, $objectId, $ignorePost);
     }
 
-    /**
-     * Displays details.
-     *
-     * @return array|\Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|Response
-     */
-    public function viewAction($objectId)
+    public function viewAction($objectId): Response
     {
         return $this->forward('MauticPlugin\MauticSocialBundle\Controller\TweetController::editAction', [
             'objectId' => $objectId,
@@ -168,8 +132,6 @@ class TweetController extends FormController
     }
 
     /**
-     * Clone an entity.
-     *
      * @param int $objectId
      *
      * @return \Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|Response

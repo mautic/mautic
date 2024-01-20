@@ -7,7 +7,7 @@ use Symfony\Component\HttpFoundation\Response;
 
 class TagApiControllerFunctionalTest extends MauticMysqlTestCase
 {
-    public function testTagWorkflow()
+    public function testTagWorkflow(): void
     {
         $tag1Payload = ['tag' => 'test_tag'];
 
@@ -64,7 +64,7 @@ class TagApiControllerFunctionalTest extends MauticMysqlTestCase
     /**
      * Test if whitespace before or after tag name is removed and duplicates are not created.
      */
-    public function testWhitespaceBeforeAndAfterNameNotCreatingDuplicates()
+    public function testWhitespaceBeforeAndAfterNameNotCreatingDuplicates(): void
     {
         $tagName               = 'test';
         $whitespaceTestPayload = ['test', 'test ', ' test', "test\t", "\ttest"];
@@ -87,7 +87,7 @@ class TagApiControllerFunctionalTest extends MauticMysqlTestCase
     /**
      * Test if special characters in tag name are encoded and duplicates are not created.
      */
-    public function testEncodedCharactersNotCreatingDuplicates()
+    public function testEncodedCharactersNotCreatingDuplicates(): void
     {
         $tagInputName    = 'hello" world';
 
@@ -105,7 +105,7 @@ class TagApiControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertSame($tagId, $response['tag']['id'], 'ID of created tag does not match. Possible duplicates.');
     }
 
-    public function testTagCreationWithoutRequiredData()
+    public function testTagCreationWithoutRequiredData(): void
     {
         // Sending an empty payload should return a 500 server error
         // TODO ensure that the server sends back a 400 status code instead

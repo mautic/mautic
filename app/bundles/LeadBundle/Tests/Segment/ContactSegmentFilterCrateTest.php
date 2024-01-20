@@ -9,7 +9,7 @@ class ContactSegmentFilterCrateTest extends \PHPUnit\Framework\TestCase
     /**
      * @covers \Mautic\LeadBundle\Segment\ContactSegmentFilterCrate
      */
-    public function testEmptyFilter()
+    public function testEmptyFilter(): void
     {
         $filter = [];
 
@@ -29,7 +29,7 @@ class ContactSegmentFilterCrateTest extends \PHPUnit\Framework\TestCase
     /**
      * @covers \Mautic\LeadBundle\Segment\ContactSegmentFilterCrate
      */
-    public function testDateIdentifiedFilter()
+    public function testDateIdentifiedFilter(): void
     {
         $filter = [
             'glue'     => 'and',
@@ -57,7 +57,7 @@ class ContactSegmentFilterCrateTest extends \PHPUnit\Framework\TestCase
     /**
      * @covers \Mautic\LeadBundle\Segment\ContactSegmentFilterCrate
      */
-    public function testDateFilter()
+    public function testDateFilter(): void
     {
         $filter = [
             'glue'     => 'and',
@@ -85,7 +85,7 @@ class ContactSegmentFilterCrateTest extends \PHPUnit\Framework\TestCase
     /**
      * @covers \Mautic\LeadBundle\Segment\ContactSegmentFilterCrate
      */
-    public function testBooleanFilter()
+    public function testBooleanFilter(): void
     {
         $filter = [
             'type'   => 'boolean',
@@ -104,7 +104,7 @@ class ContactSegmentFilterCrateTest extends \PHPUnit\Framework\TestCase
     /**
      * @covers \Mautic\LeadBundle\Segment\ContactSegmentFilterCrate
      */
-    public function testNumericFilter()
+    public function testNumericFilter(): void
     {
         $filter = [
             'type'   => 'number',
@@ -123,7 +123,7 @@ class ContactSegmentFilterCrateTest extends \PHPUnit\Framework\TestCase
     /**
      * @covers \Mautic\LeadBundle\Segment\ContactSegmentFilterCrate
      */
-    public function testCompanyTypeFilter()
+    public function testCompanyTypeFilter(): void
     {
         $filter = [
             'object' => 'company',
@@ -138,7 +138,7 @@ class ContactSegmentFilterCrateTest extends \PHPUnit\Framework\TestCase
     /**
      * @covers \Mautic\LeadBundle\Segment\ContactSegmentFilterCrate
      */
-    public function testMultiselectFilter()
+    public function testMultiselectFilter(): void
     {
         $filter = [
             'glue'     => 'and',
@@ -166,7 +166,7 @@ class ContactSegmentFilterCrateTest extends \PHPUnit\Framework\TestCase
     /**
      * @covers \Mautic\LeadBundle\Segment\ContactSegmentFilterCrate
      */
-    public function testNotMultiselectFilter()
+    public function testNotMultiselectFilter(): void
     {
         $filter = [
             'glue'     => 'and',
@@ -194,7 +194,7 @@ class ContactSegmentFilterCrateTest extends \PHPUnit\Framework\TestCase
     /**
      * @covers \Mautic\LeadBundle\Segment\ContactSegmentFilterCrate
      */
-    public function testOldEqualInsteadOfInOperator()
+    public function testOldEqualInsteadOfInOperator(): void
     {
         $filter = [
             'glue'     => 'and',
@@ -224,7 +224,7 @@ class ContactSegmentFilterCrateTest extends \PHPUnit\Framework\TestCase
      *
      * @dataProvider specialFieldsToConvertToEmptyProvider
      */
-    public function testSpecialFieldsToConvertToNotEmpty($field)
+    public function testSpecialFieldsToConvertToNotEmpty($field): void
     {
         $filter = [
             'glue'     => 'and',
@@ -254,7 +254,7 @@ class ContactSegmentFilterCrateTest extends \PHPUnit\Framework\TestCase
      *
      * @dataProvider specialFieldsToConvertToEmptyProvider
      */
-    public function testSpecialFieldsToConvertToEmpty($field)
+    public function testSpecialFieldsToConvertToEmpty($field): void
     {
         $filter = [
             'glue'     => 'and',
@@ -279,7 +279,7 @@ class ContactSegmentFilterCrateTest extends \PHPUnit\Framework\TestCase
         $this->assertFalse($contactSegmentFilterCrate->hasTimeParts());
     }
 
-    public function specialFieldsToConvertToEmptyProvider()
+    public static function specialFieldsToConvertToEmptyProvider()
     {
         return [
             ['page_id'],

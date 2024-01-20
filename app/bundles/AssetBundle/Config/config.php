@@ -21,7 +21,7 @@ return [
                 'standard_entity' => true,
                 'name'            => 'assets',
                 'path'            => '/assets',
-                'controller'      => 'Mautic\AssetBundle\Controller\Api\AssetApiController',
+                'controller'      => \Mautic\AssetBundle\Controller\Api\AssetApiController::class,
             ],
         ],
         'public' => [
@@ -73,13 +73,6 @@ return [
             'mautic.asset.fixture.asset' => [
                 'class'     => \Mautic\AssetBundle\DataFixtures\ORM\LoadAssetData::class,
                 'tag'       => \Doctrine\Bundle\FixturesBundle\DependencyInjection\CompilerPass\FixturesCompilerPass::FIXTURE_TAG,
-            ],
-        ],
-        'repositories' => [
-            'mautic.asset.repository.download' => [
-                'class'     => Doctrine\ORM\EntityRepository::class,
-                'factory'   => ['@doctrine.orm.entity_manager', 'getRepository'],
-                'arguments' => \Mautic\AssetBundle\Entity\Download::class,
             ],
         ],
     ],

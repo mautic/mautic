@@ -28,52 +28,25 @@ use Symfony\Component\Form\FormView;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
+/**
+ * @extends AbstractType<mixed>
+ */
 class ConfigType extends AbstractType
 {
-    private Shortener $shortenerFactory;
-
-    /**
-     * @var TranslatorInterface
-     */
-    private $translator;
-
-    /**
-     * @var LanguageHelper
-     */
-    private $langHelper;
-
-    /**
-     * @var array
-     */
-    private $supportedLanguages;
-
-    /**
-     * @var IpLookupFactory
-     */
-    private $ipLookupFactory;
-
-    /**
-     * @var AbstractLookup
-     */
-    private $ipLookup;
+    private array $supportedLanguages;
 
     public function __construct(
-        TranslatorInterface $translator,
-        LanguageHelper $langHelper,
-        IpLookupFactory $ipLookupFactory,
-        AbstractLookup $ipLookup = null,
-        Shortener $shortenerFactory,
+        private TranslatorInterface $translator,
+        private LanguageHelper $langHelper,
+        private IpLookupFactory $ipLookupFactory,
+        private ?AbstractLookup $ipLookup,
+        private Shortener $shortenerFactory,
         private CoreParametersHelper $coreParametersHelper,
     ) {
-        $this->translator          = $translator;
-        $this->langHelper          = $langHelper;
-        $this->ipLookupFactory     = $ipLookupFactory;
-        $this->ipLookup            = $ipLookup;
         $this->supportedLanguages  = $langHelper->getSupportedLanguages();
-        $this->shortenerFactory    = $shortenerFactory;
     }
 
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder->add('last_shown_tab', HiddenType::class);
 
@@ -503,17 +476,17 @@ class ConfigType extends AbstractType
                     'class'   => 'form-control',
                     'tooltip' => 'mautic.core.config.create.organization.from.ip.lookup.tooltip',
                 ],
-                'data'     => isset($options['data']['ip_lookup_create_organization']) ? (bool) $options['data']['ip_lookup_create_organization'] : false,
+                'data'     => isset($options['data']['ip_lookup_create_organization']) && (bool) $options['data']['ip_lookup_create_organization'],
                 'required' => false,
             ]
         );
 
         $ipLookupFactory = $this->ipLookupFactory;
-        $formModifier    = function (FormEvent $event) use ($ipLookupFactory) {
+        $formModifier    = function (FormEvent $event) use ($ipLookupFactory): void {
             $data = $event->getData();
             $form = $event->getForm();
 
-            $ipServiceName = (isset($data['ip_lookup_service'])) ? $data['ip_lookup_service'] : null;
+            $ipServiceName = $data['ip_lookup_service'] ?? null;
             if ($ipServiceName && $lookupService = $ipLookupFactory->getService($ipServiceName)) {
                 if ($lookupService instanceof IpLookupFormInterface && $formType = $lookupService->getConfigFormService()) {
                     $form->add(
@@ -530,14 +503,14 @@ class ConfigType extends AbstractType
 
         $builder->addEventListener(
             FormEvents::PRE_SET_DATA,
-            function (FormEvent $event) use ($formModifier) {
+            function (FormEvent $event) use ($formModifier): void {
                 $formModifier($event);
             }
         );
 
         $builder->addEventListener(
             FormEvents::PRE_SUBMIT,
-            function (FormEvent $event) use ($formModifier) {
+            function (FormEvent $event) use ($formModifier): void {
                 $formModifier($event);
             }
         );
@@ -730,17 +703,11 @@ class ConfigType extends AbstractType
         );
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function buildView(FormView $view, FormInterface $form, array $options)
+    public function buildView(FormView $view, FormInterface $form, array $options): void
     {
         $view->vars['ipLookupAttribution'] = (null !== $this->ipLookup) ? $this->ipLookup->getAttribution() : '';
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getBlockPrefix()
     {
         return 'coreconfig';

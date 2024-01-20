@@ -13,6 +13,9 @@ use Mautic\UserBundle\Entity\User;
 use Symfony\Component\Messenger\Handler\MessageSubscriberInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
+/**
+ * @deprecated since Mautic 5.0, to be removed in 6.0 with no replacement.
+ */
 class TestHandler implements MessageSubscriberInterface
 {
     public function __construct(

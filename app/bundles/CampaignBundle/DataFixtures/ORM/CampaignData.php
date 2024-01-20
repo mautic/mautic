@@ -9,7 +9,7 @@ use Mautic\CampaignBundle\Entity\Campaign;
 
 class CampaignData extends AbstractFixture implements OrderedFixtureInterface
 {
-    public function load(ObjectManager $manager)
+    public function load(ObjectManager $manager): void
     {
         $campaign = new Campaign();
 

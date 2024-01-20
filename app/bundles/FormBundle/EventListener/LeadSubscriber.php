@@ -14,49 +14,16 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class LeadSubscriber implements EventSubscriberInterface
 {
-    /**
-     * @var FormModel
-     */
-    private $formModel;
-
-    /**
-     * @var PageModel
-     */
-    private $pageModel;
-
-    /**
-     * @var SubmissionRepository
-     */
-    private $submissionRepository;
-
-    /**
-     * @var TranslatorInterface
-     */
-    private $translator;
-
-    /**
-     * @var RouterInterface
-     */
-    private $router;
-
     public function __construct(
-        FormModel $formModel,
-        PageModel $pageModel,
-        SubmissionRepository $submissionRepository,
-        TranslatorInterface $translator,
-        RouterInterface $router
+        private FormModel $formModel,
+        private PageModel $pageModel,
+        private SubmissionRepository $submissionRepository,
+        private TranslatorInterface $translator,
+        private RouterInterface $router
     ) {
-        $this->formModel            = $formModel;
-        $this->pageModel            = $pageModel;
-        $this->submissionRepository = $submissionRepository;
-        $this->translator           = $translator;
-        $this->router               = $router;
     }
 
-    /**
-     * @return array
-     */
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             LeadEvents::TIMELINE_ON_GENERATE => ['onTimelineGenerate', 0],
@@ -67,7 +34,7 @@ class LeadSubscriber implements EventSubscriberInterface
     /**
      * Compile events for the lead timeline.
      */
-    public function onTimelineGenerate(LeadTimelineEvent $event)
+    public function onTimelineGenerate(LeadTimelineEvent $event): void
     {
         // Set available event types
         $eventTypeKey  = 'form.submitted';
@@ -115,7 +82,7 @@ class LeadSubscriber implements EventSubscriberInterface
         }
     }
 
-    public function onLeadMerge(LeadMergeEvent $event)
+    public function onLeadMerge(LeadMergeEvent $event): void
     {
         $this->submissionRepository->updateLead($event->getLoser()->getId(), $event->getVictor()->getId());
     }

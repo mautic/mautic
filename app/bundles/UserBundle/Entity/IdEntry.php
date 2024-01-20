@@ -23,7 +23,7 @@ class IdEntry
      */
     protected $expiryTimestamp;
 
-    public static function loadMetadata(ORM\ClassMetadata $metadata)
+    public static function loadMetadata(ORM\ClassMetadata $metadata): void
     {
         $builder = new ClassMetadataBuilder($metadata);
 
@@ -64,10 +64,7 @@ class IdEntry
         return $this;
     }
 
-    /**
-     * @return \DateTime
-     */
-    public function getExpiryTime()
+    public function getExpiryTime(): \DateTime
     {
         $dt = new \DateTime();
         $dt->setTimestamp($this->expiryTimestamp);
