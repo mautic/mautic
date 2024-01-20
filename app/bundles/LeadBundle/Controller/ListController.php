@@ -750,7 +750,7 @@ class ListController extends FormController
                 'flashes' => [
                     [
                         'type'    => 'error',
-                        'msg'     => 'mautic.list.error.notfound',
+                        'msg'     => 'mautic.lead.list.error.notfound',
                         'msgVars' => ['%id%' => $objectId],
                     ],
                 ],
