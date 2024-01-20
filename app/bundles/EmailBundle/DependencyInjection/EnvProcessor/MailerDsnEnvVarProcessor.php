@@ -24,7 +24,11 @@ class MailerDsnEnvVarProcessor implements EnvVarProcessorInterface
     public static function getProvidedTypes()
     {
         return [
+<<<<<<< HEAD
             'mailer'         => 'string',
+=======
+            'mailer' => 'string',
+>>>>>>> abc7f835bd (Fix using messenger DSN with special characters)
             'urlencoded-dsn' => 'string',
         ];
     }
