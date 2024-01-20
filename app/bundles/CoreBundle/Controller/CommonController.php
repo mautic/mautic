@@ -173,8 +173,11 @@ class CommonController extends AbstractController implements MauticController
             $parameters = $event->getVars();
         }
 
+<<<<<<< HEAD
         $parameters['mauticTemplate'] = $template;
 
+=======
+>>>>>>> 87696c9f36 (Pass mauticTemplateVars to templates)
         $parameters['mauticTemplateVars'] = $parameters;
 
         return $this->render($template, $parameters, $response);
