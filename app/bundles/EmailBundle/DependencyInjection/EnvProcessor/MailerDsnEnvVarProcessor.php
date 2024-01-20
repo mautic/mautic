@@ -25,10 +25,14 @@ class MailerDsnEnvVarProcessor implements EnvVarProcessorInterface
     {
         return [
 <<<<<<< HEAD
+<<<<<<< HEAD
             'mailer'         => 'string',
 =======
             'mailer' => 'string',
 >>>>>>> abc7f835bd (Fix using messenger DSN with special characters)
+=======
+            'mailer'         => 'string',
+>>>>>>> 44856d331d (CS and test fixes)
             'urlencoded-dsn' => 'string',
         ];
     }
