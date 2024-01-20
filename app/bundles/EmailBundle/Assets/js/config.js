@@ -64,5 +64,5 @@ Mautic.testMonitoredEmailServerConnection = function(mailbox) {
 };
 
 Mautic.disableSendTestEmailButton = function(element) {
-    mQuery(element).closest('.tab-pane').find('.config-dsn-test-container').each(function () {Mautic.configDnsTestDisable(this)});
+    mQuery(element).closest('.tab-pane').find('.config-dsn-test-container').each(function () {Mautic.configDsnTestDisable(this)});
 };
