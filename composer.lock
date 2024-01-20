@@ -5314,7 +5314,7 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/mautic/SpBundle.git",
-                "reference": "b73d6b96f651fb2a62ab68cf1ddf76aebf75a6f0"
+                "reference": "91f36a54b223d5405e6e41ea612d640360d35554"
             },
             "require": {
                 "lightsaml/symfony-bridge": "dev-symfony5",
@@ -5348,7 +5348,7 @@
             ],
             "description": "Light SAML2 SP Symfony Bundle",
             "homepage": "http://www.lightsaml.com/SP-Bundle/",
-            "time": "2023-04-06T11:32:19+00:00"
+            "time": "2023-11-24T16:00:46+00:00"
         },
         {
             "name": "lightsaml/symfony-bridge",
