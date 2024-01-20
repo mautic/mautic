@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Mautic\EmailBundle\DependencyInjection\EnvProcessor;
 
+use Mautic\CoreBundle\Helper\Dsn\Dsn;
 use Symfony\Component\DependencyInjection\EnvVarProcessorInterface;
-use Symfony\Component\Mailer\Transport\Dsn;
 
 class MailerDsnEnvVarProcessor implements EnvVarProcessorInterface
 {
@@ -24,7 +24,7 @@ class MailerDsnEnvVarProcessor implements EnvVarProcessorInterface
     public static function getProvidedTypes()
     {
         return [
-            'mailer' => 'string',
+            'mailer'         => 'string',
             'urlencoded-dsn' => 'string',
         ];
     }
