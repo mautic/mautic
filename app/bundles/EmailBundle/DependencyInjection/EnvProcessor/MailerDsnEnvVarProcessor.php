@@ -25,6 +25,7 @@ class MailerDsnEnvVarProcessor implements EnvVarProcessorInterface
     {
         return [
             'mailer' => 'string',
+            'urlencoded-dsn' => 'string',
         ];
     }
 }

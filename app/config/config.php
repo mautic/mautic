@@ -74,19 +74,19 @@ $container->loadFromExtension('framework', [
     'fragments'            => null,
     'http_method_override' => true,
     'mailer'               => [
-        'dsn' => '%env(mailer:MAUTIC_MAILER_DSN)%',
+        'dsn' => '%env(urlencoded-dsn:MAUTIC_MAILER_DSN)%',
     ],
     'messenger'            => [
         'failure_transport'  => 'failed',
         'transports'         => [
             'email' => [
-                'dsn'            => '%env(MAUTIC_MESSENGER_DSN_EMAIL)%',
+                'dsn'            => '%env(urlencoded-dsn:MAUTIC_MESSENGER_DSN_EMAIL)%',
                 'retry_strategy' => [
                     'service' => \Mautic\MessengerBundle\Retry\RetryStrategy::class,
                 ],
             ],
             'hit' => [
-                'dsn'            => '%env(MAUTIC_MESSENGER_DSN_HIT)%',
+                'dsn'            => '%env(urlencoded-dsn:MAUTIC_MESSENGER_DSN_HIT)%',
                 'retry_strategy' => [
                     'service' => \Mautic\MessengerBundle\Retry\RetryStrategy::class,
                 ],
