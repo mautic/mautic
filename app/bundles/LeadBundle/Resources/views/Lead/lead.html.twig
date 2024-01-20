@@ -15,7 +15,7 @@
   {% endif %}
 {% endset %}
 
-{% set flag = fields.core.country.value is not null ? assetGetCountryFlag(fields.core.country.value) : '' %}
+{% set flag = fields.core.country is defined and fields.core.country.value is not empty ? assetGetCountryFlag(fields.core.country.value) : '' %}
 {% set groups = fields|keys %}
 
 {% block headerTitle %}
@@ -28,7 +28,7 @@
     {% set buttons = [] %}
 
     {# Send email button #}
-    {% if fields.core.email.value is not empty %}
+    {% if fields.core.email is defined %}
       {% set buttons = buttons|merge([{
           'attr': {
               'id': 'sendEmailButton',
@@ -428,7 +428,7 @@
                 </h6>
                 <address class="text-muted">
                     {% if fields.core.address1 is defined %}{{ fields.core.address1.value|purify }}<br>{% endif %}
-                    {% if fields.core.address2.value is not empty %}{{ fields.core.address2.value|purify }}<br>{% endif %}
+                    {% if fields.core.address2 is defined %}{{ fields.core.address2.value|purify }}<br>{% endif %}
                     {{ lead.location|purify }}
                     {% if fields.core.zipcode is defined %}{{ fields.core.zipcode.value|purify }}{% endif %}
                     <br>
