@@ -265,6 +265,7 @@
                   </div>
               </div>
 
+<<<<<<< HEAD
               <div class="stats-menu__content tab-content bg-white pa-md mb-lg shd-sm">
                   <div class="tab-pane active bdr-w-0" id="stats-container">
                       <div id="emailGraphStats"
@@ -286,6 +287,9 @@
               </div>
 
               {{ customContent('details.stats.graph.below', _context) }}
+=======
+              {{ customContent('details.stats.graph.below', mauticTemplateVars|default([])) }}
+>>>>>>> da6a9017eb (Refactor customContent function call to use default filter.)
 
               <!-- tabs controls -->
               <ul class="nav nav-tabs pr-md pl-md">
