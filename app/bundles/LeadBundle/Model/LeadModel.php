@@ -965,10 +965,9 @@ class LeadModel extends FormModel
         );
     }
 
-    public function removeFromStage(Lead $lead, ?Stage $stage, string $origin): void
+    public function removeFromStage(Lead $lead, Stage $stage, string $origin): void
     {
         // Get the current stage and validate it vs the new one
-        $stage = $stage ?? $lead->getStage();
         $lead->setStage(null);
 
         if (isset($stage)) {

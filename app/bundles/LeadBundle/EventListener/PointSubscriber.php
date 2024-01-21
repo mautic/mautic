@@ -2,6 +2,7 @@
 
 namespace Mautic\LeadBundle\EventListener;
 
+use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Form\Type\ListActionType;
 use Mautic\LeadBundle\Form\Type\ModifyLeadTagsType;
 use Mautic\LeadBundle\Form\Type\StageType;
@@ -99,34 +100,46 @@ class PointSubscriber implements EventSubscriberInterface
      */
     private function handelChangeStage(TriggerExecutedEvent $event): void
     {
-        $stageId = (int) $event->getTriggerEvent()->getProperties()['stage'];
+        $properties = $event->getTriggerEvent()->getProperties();
+        $stageId    = (int) $properties['addstage'];
+        $lead       = $event->getLead();
 
         if (0 === $stageId) {
-            $this->leadModel->removeFromStage(
-                $event->getLead(),
-                null,
-                $this->translator->trans('mautic.stage.event.removed.batch')
-            );
-
-            return;
-        }
-
-        $stage = $this->stageModel->getEntity($stageId);
-        if (null === $stage || !$stage->isPublished()) {
-            $event->setFailed();
-            $this->logger->error("Stage for ID $stageId not found");
+            $this->handleRemoveStage($lead);
+            $event->setSucceded();
 
             return;
         }
 
         try {
+            $stage = $this->stageModel->getEntity($stageId);
+            if (null === $stage || false === $stage->isPublished()) {
+                throw new \InvalidArgumentException("Stage for ID $stageId not found");
+            }
+
             $this->leadModel->changeStage(
-                $event->getLead(),
+                $lead,
                 $stage,
                 $this->translator->trans('mautic.lead.point.trigger')
             );
-        } catch (\UnexpectedValueException $e) {
+
+            $event->setSucceded();
+        } catch (\UnexpectedValueException|\InvalidArgumentException $e) {
+            $event->setFailed();
             $this->logger->info("LeadBundle: Stage not updated for lead {$event->getLead()->getId()} by trigger because: {$e->getMessage()}");
+        }
+    }
+
+    private function handleRemoveStage(Lead $lead): void
+    {
+        $stage = $lead->getStage();
+
+        if (isset($stage)) {
+            $this->leadModel->removeFromStage(
+                $lead,
+                $stage,
+                $this->translator->trans('mautic.stage.event.removed.batch')
+            );
         }
     }
 }
