@@ -541,7 +541,7 @@ class LeadControllerTest extends MauticMysqlTestCase
         $payload  = [
             'lead_batch_stage' => [
                 'addstage' => $stage->getId(),
-                'ids' => json_encode([$contactA->getId(), $contactB->getId(), $contactC->getId()]),
+                'ids'      => json_encode([$contactA->getId(), $contactB->getId(), $contactC->getId()]),
             ],
         ];
 
@@ -574,7 +574,7 @@ class LeadControllerTest extends MauticMysqlTestCase
         $payload  = [
             'lead_batch_stage' => [
                 'removestage' => $stage->getId(),
-                'ids' => json_encode([$contactA->getId(), $contactB->getId(), $contactC->getId()]),
+                'ids'         => json_encode([$contactA->getId(), $contactB->getId(), $contactC->getId()]),
             ],
         ];
 
