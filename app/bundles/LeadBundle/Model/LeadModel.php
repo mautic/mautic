@@ -970,13 +970,11 @@ class LeadModel extends FormModel
         // Get the current stage and validate it vs the new one
         $lead->setStage(null);
 
-        if (isset($stage)) {
-            $lead->stageChangeLogEntry(
-                $stage,
-                $stage->getId().': '.$stage->getName(),
-                $origin
-            );
-        }
+        $lead->stageChangeLogEntry(
+            $stage,
+            $stage->getId().': '.$stage->getName(),
+            $origin
+        );
 
         $this->saveEntity($lead);
 
