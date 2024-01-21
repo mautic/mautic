@@ -10,7 +10,7 @@
     convertDeprecationsToExceptions="true"
     processIsolation="false"
     stopOnFailure="false"
-    bootstrap="autoload.php"
+    bootstrap="../vendor/autoload.php"
     xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/9.3/phpunit.xsd"
     failOnRisky="true"
     failOnWarning="true"

@@ -1327,7 +1327,7 @@ class LeadModel extends FormModel
 
         if (!empty($fields['ownerusername']) && !empty($data[$fields['ownerusername']])) {
             try {
-                $newOwner = $this->userProvider->loadUserByUsername($data[$fields['ownerusername']]);
+                $newOwner = $this->userProvider->loadUserByIdentifier($data[$fields['ownerusername']]);
                 $lead->setOwner($newOwner);
                 // reset default import owner if exists owner for contact
                 $owner = null;

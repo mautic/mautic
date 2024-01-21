@@ -64,6 +64,16 @@ class WebhookModel extends FormModel
     protected $webhookLimit;
 
     /**
+     * Sets min webhook queue ID to get/process.
+     */
+    protected ?int $minQueueId = null;
+
+    /**
+     * Sets max webhook queue ID to get/process.
+     */
+    protected ?int $maxQueueId = null;
+
+    /**
      * How long the webhook processing can run in seconds.
      */
     private int $webhookTimeLimit;
@@ -338,14 +348,14 @@ class WebhookModel extends FormModel
         if (!empty($this->webhookQueueIdList)) {
             // delete all the queued items we just processed
             $webhookQueueRepo->deleteQueuesById(array_keys($this->webhookQueueIdList));
-            $queueCount = $webhookQueueRepo->getQueueCountByWebhookId($webhook->getId());
+            $nextWebhookExists = $webhookQueueRepo->exists($webhook->getId());
 
             // reset the array to blank so none of the IDs are repeated
             $this->webhookQueueIdList = [];
 
             // if there are still items in the queue after processing we re-process
             // WARNING: this is recursive
-            if ($queueCount > 0 && !$this->isProcessingExpired()) {
+            if ($nextWebhookExists && !$this->isProcessingExpired()) {
                 $this->processWebhook($webhook);
             }
         }
@@ -502,24 +512,41 @@ class WebhookModel extends FormModel
         /** @var WebhookQueueRepository $queueRepo */
         $queueRepo = $this->getQueueRepository();
 
-        return $queueRepo->getEntities(
-            [
-                'iterator_mode' => true,
-                'start'         => 0,
-                'limit'         => $this->webhookLimit,
-                'orderBy'       => $queueRepo->getTableAlias().'.dateAdded',
-                'orderByDir'    => $this->getEventsOrderbyDir($webhook),
-                'filter'        => [
-                    'force' => [
-                        [
-                            'column' => 'IDENTITY('.$queueRepo->getTableAlias().'.webhook)',
-                            'expr'   => 'eq',
-                            'value'  => $webhook->getId(),
-                        ],
+        $parameters = [
+            'iterator_mode' => true,
+            'start'         => 0,
+            'limit'         => $this->webhookLimit,
+            'orderBy'       => $queueRepo->getTableAlias().'.id',
+            'orderByDir'    => $this->getEventsOrderbyDir($webhook),
+            'filter'        => [
+                'force' => [
+                    [
+                        'column' => 'IDENTITY('.$queueRepo->getTableAlias().'.webhook)',
+                        'expr'   => 'eq',
+                        'value'  => $webhook->getId(),
                     ],
                 ],
-            ]
-        );
+            ],
+        ];
+
+        if ($this->minQueueId && $this->maxQueueId) {
+            unset($parameters['start']);
+            unset($parameters['limit']);
+
+            $parameters['filter']['force'][] = [
+                'column' => $queueRepo->getTableAlias().'.id',
+                'expr'   => 'gte',
+                'value'  => $this->minQueueId,
+            ];
+
+            $parameters['filter']['force'][] = [
+                'column' => $queueRepo->getTableAlias().'.id',
+                'expr'   => 'lte',
+                'value'  => $this->maxQueueId,
+            ];
+        }
+
+        return $queueRepo->getEntities($parameters);
     }
 
     /**
@@ -606,6 +633,20 @@ class WebhookModel extends FormModel
     public function getPermissionBase(): string
     {
         return 'webhook:webhooks';
+    }
+
+    public function setMinQueueId(int $minQueueId): self
+    {
+        $this->minQueueId = $minQueueId;
+
+        return $this;
+    }
+
+    public function setMaxQueueId(int $maxQueueId): self
+    {
+        $this->maxQueueId = $maxQueueId;
+
+        return $this;
     }
 
     private function isProcessingExpired(): bool

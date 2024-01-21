@@ -12,7 +12,7 @@ use PHPUnit\Framework\Assert;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
-final class WebhookControllerFunctionalTest extends MauticMysqlTestCase
+final class WebhookControllerTest extends MauticMysqlTestCase
 {
     public function testViewWebhookDetail(): void
     {

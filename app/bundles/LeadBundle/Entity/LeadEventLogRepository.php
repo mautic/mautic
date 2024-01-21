@@ -2,7 +2,7 @@
 
 namespace Mautic\LeadBundle\Entity;
 
-use Doctrine\DBAL\Connection;
+use Doctrine\DBAL\ArrayParameterType;
 use Doctrine\ORM\Tools\Pagination\Paginator;
 use Mautic\CoreBundle\Entity\CommonRepository;
 
@@ -108,7 +108,7 @@ class LeadEventLogRepository extends CommonRepository
                 $qb->andWhere(
                     $qb->expr()->in($alias.'.action', ':actions')
                 )
-                    ->setParameter('actions', $actions, Connection::PARAM_STR_ARRAY);
+                    ->setParameter('actions', $actions, ArrayParameterType::STRING);
             } else {
                 $qb->andWhere($alias.'.action = :action')
                     ->setParameter('action', $actions);
