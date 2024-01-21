@@ -76,7 +76,7 @@ class PointSubscriberTest extends \PHPUnit\Framework\TestCase
         $contact      = new Lead();
         $triggerEvent->setType('lead.changestage');
         $triggerEvent->setProperties([
-            'stage'    => 2,
+            'addstage'    => 2,
         ]);
 
         $this->stageModel->expects($this->once())
