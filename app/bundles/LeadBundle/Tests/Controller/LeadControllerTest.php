@@ -18,6 +18,7 @@ use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Model\CompanyModel;
 use Mautic\LeadBundle\Model\FieldModel;
 use Mautic\LeadBundle\Model\LeadModel;
+use Mautic\StageBundle\Entity\Stage;
 use PHPUnit\Framework\Assert;
 use Symfony\Component\DomCrawler\Crawler;
 use Symfony\Component\DomCrawler\Field\ChoiceFormField;
@@ -57,6 +58,7 @@ class LeadControllerTest extends MauticMysqlTestCase
             'campaigns',
             'categories',
             'lead_lists',
+            'stages',
         ]);
     }
 
@@ -525,6 +527,65 @@ class LeadControllerTest extends MauticMysqlTestCase
         $this->testEmailSendToContactSync();
     }
 
+    public function testContactStagesAreChangedInBatch(): void
+    {
+        $contactA = $this->createContact('contact@a.email');
+        $contactB = $this->createContact('contact@b.email');
+        $contactC = $this->createContact('contact@c.email');
+
+        $stage = $this->createStage('added stage');
+
+        $payload  = [
+            'lead_batch_stage' => [
+                'addstage' => $stage->getId(),
+                'ids' => json_encode([$contactA->getId(), $contactB->getId(), $contactC->getId()]),
+            ],
+        ];
+
+        $this->client->request(Request::METHOD_POST, '/s/contacts/batchStages', $payload);
+
+        $clientResponse = $this->client->getResponse();
+
+        $this->assertEquals(Response::HTTP_OK, $clientResponse->getStatusCode());
+        $response = json_decode($clientResponse->getContent(), true);
+        $this->assertTrue(isset($response['closeModal']), 'The response does not contain the `closeModal` param.');
+        $this->assertTrue($response['closeModal']);
+        $this->assertStringContainsString('3 contacts affected', $response['flashes']);
+    }
+
+    public function testContactStagesAreRemovedInBatch(): void
+    {
+        $contactA = $this->createContact('contact@a.email');
+        $contactB = $this->createContact('contact@b.email');
+        $contactC = $this->createContact('contact@c.email');
+
+        $stage = $this->createStage('removed stage');
+
+        $contactA->setStage($stage);
+        $contactC->setStage($stage);
+
+        $this->em->persist($contactA);
+        $this->em->persist($contactC);
+        $this->em->flush();
+
+        $payload  = [
+            'lead_batch_stage' => [
+                'removestage' => $stage->getId(),
+                'ids' => json_encode([$contactA->getId(), $contactB->getId(), $contactC->getId()]),
+            ],
+        ];
+
+        $this->client->request(Request::METHOD_POST, '/s/contacts/batchStages', $payload);
+
+        $clientResponse = $this->client->getResponse();
+
+        $this->assertEquals(Response::HTTP_OK, $clientResponse->getStatusCode());
+        $response = json_decode($clientResponse->getContent(), true);
+        $this->assertTrue(isset($response['closeModal']), 'The response does not contain the `closeModal` param.');
+        $this->assertTrue($response['closeModal']);
+        $this->assertStringContainsString('3 contacts affected', $response['flashes']);
+    }
+
     private function createContact(string $email): Lead
     {
         $lead = new Lead();
@@ -534,6 +595,17 @@ class LeadControllerTest extends MauticMysqlTestCase
         $this->em->flush();
 
         return $lead;
+    }
+
+    private function createStage(string $name): Stage
+    {
+        $stage = new Stage();
+        $stage->setName($name);
+
+        $this->em->persist($stage);
+        $this->em->flush();
+
+        return $stage;
     }
 
     public function testLookupTypeFieldOnError(): void

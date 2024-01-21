@@ -1775,6 +1775,8 @@ class LeadController extends FormController
                     }
 
                     if (!empty($data['removestage'])) {
+                        $stageModel = $this->getModel('stage');
+
                         $stage = $stageModel->getEntity($data['removestage']);
                         $model->removeFromStage(
                             $lead,
