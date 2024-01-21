@@ -198,7 +198,7 @@ final class CampaignSubscriberTest extends TestCase
             }
         };
 
-        $subscriber  = new CampaignSubscriber($contactModel, $stageModel, $this->createTranslatorMock());
+        $subscriber = new CampaignSubscriber($contactModel, $stageModel, $this->createTranslatorMock());
 
         $subscriber->onCampaignTriggerStageChange($pendingEvent);
 
@@ -367,7 +367,7 @@ final class CampaignSubscriberTest extends TestCase
             }
         };
 
-        $subscriber  = new CampaignSubscriber($contactModel, $stageModel, $this->createTranslatorMock());
+        $subscriber = new CampaignSubscriber($contactModel, $stageModel, $this->createTranslatorMock());
 
         $subscriber->onCampaignTriggerStageChange($pendingEvent);
 
@@ -459,7 +459,7 @@ final class CampaignSubscriberTest extends TestCase
             }
         };
 
-        $subscriber  = new CampaignSubscriber($contactModel, $stageModel, $this->createTranslatorMock());
+        $subscriber = new CampaignSubscriber($contactModel, $stageModel, $this->createTranslatorMock());
 
         $subscriber->onCampaignTriggerStageChange($pendingEvent);
 
