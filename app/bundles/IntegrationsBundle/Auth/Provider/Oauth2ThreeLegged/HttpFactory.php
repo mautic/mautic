@@ -76,7 +76,7 @@ class HttpFactory implements AuthProviderInterface
             'auth'    => 'oauth',
         ];
 
-        //  Initialize the base uri so client does not need api url
+        // Set up base URI if it's configured.
         if (method_exists($credentials, 'getBaseUri') && ($baseUri = $credentials->getBaseUri()) !== null) {
             $options['base_uri'] = $baseUri;
         }
