@@ -222,7 +222,7 @@ class RoleController extends FormController
                         [
                             'type'    => 'error',
                             'msg'     => 'mautic.user.role.error.notfound',
-                            'msgVars' => ['%id' => $objectId],
+                            'msgVars' => ['%id%' => $objectId],
                         ],
                     ],
                 ])
