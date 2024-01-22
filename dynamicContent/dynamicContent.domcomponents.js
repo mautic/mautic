@@ -25,8 +25,8 @@ export default class DynamicContentDomComponents {
         },
       },
       /**
-        * Initilize the component
-        */
+       * Initilize the component
+       */
       init() {
         // link component to the corresponding html store item
         this.em
@@ -61,7 +61,7 @@ export default class DynamicContentDomComponents {
           };
         }
         return false;
-      }
+      },
     };
 
     const view = {
