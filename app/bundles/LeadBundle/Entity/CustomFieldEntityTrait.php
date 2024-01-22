@@ -3,9 +3,9 @@
 namespace Mautic\LeadBundle\Entity;
 
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
+use Mautic\LeadBundle\Field\SchemaDefinition;
 use Mautic\LeadBundle\Helper\CustomFieldHelper;
 use Mautic\LeadBundle\Helper\CustomFieldValueHelper;
-use Mautic\LeadBundle\Model\FieldModel;
 
 trait CustomFieldEntityTrait
 {
@@ -277,7 +277,7 @@ trait CustomFieldEntityTrait
 
             $builder->addNamedField(
                 $fieldProperty,
-                FieldModel::getSchemaDefinition($field, $type, !empty($customFieldDefinitions[$field]['unique']))['type'],
+                SchemaDefinition::getSchemaDefinition($field, $type, !empty($customFieldDefinitions[$field]['unique']))['type'],
                 $field,
                 true
             );
