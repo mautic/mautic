@@ -516,23 +516,7 @@ class CompanyController extends FormController
         /** @var CompanyModel $model */
         $model  = $this->getModel('lead.company');
 
-        /** @var \Mautic\LeadBundle\Entity\Company $company */
         $company = $model->getEntity($objectId);
-        $model->getRepository()->refetchEntity($company);
-
-        // set some permissions
-        $permissions = $this->security->isGranted(
-            [
-                'lead:leads:viewown',
-                'lead:leads:viewother',
-                'lead:leads:create',
-                'lead:leads:editown',
-                'lead:leads:editother',
-                'lead:leads:deleteown',
-                'lead:leads:deleteother',
-            ],
-            'RETURN_ARRAY'
-        );
 
         // set the return URL
         $returnUrl = $this->generateUrl('mautic_company_index');
@@ -562,6 +546,23 @@ class CompanyController extends FormController
                 )
             );
         }
+
+        /** @var \Mautic\LeadBundle\Entity\Company $company */
+        $model->getRepository()->refetchEntity($company);
+
+        // set some permissions
+        $permissions = $this->security->isGranted(
+            [
+              'lead:leads:viewown',
+              'lead:leads:viewother',
+              'lead:leads:create',
+              'lead:leads:editown',
+              'lead:leads:editother',
+              'lead:leads:deleteown',
+              'lead:leads:deleteother',
+            ],
+            'RETURN_ARRAY'
+        );
 
         if (!$this->security->hasEntityAccess(
             'lead:leads:viewown',

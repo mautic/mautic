@@ -7,7 +7,6 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\ExpressionBuilder;
 use Doctrine\Common\Util\ClassUtils;
 use Doctrine\DBAL\ArrayParameterType;
-use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Query\Expression\CompositeExpression;
 use Doctrine\DBAL\Query\QueryBuilder as DbalQueryBuilder;
 use Doctrine\DBAL\Types\Types;
@@ -16,6 +15,8 @@ use Doctrine\ORM\Query;
 use Doctrine\ORM\QueryBuilder;
 use Doctrine\ORM\Tools\Pagination\Paginator;
 use Doctrine\Persistence\ManagerRegistry;
+use Mautic\CoreBundle\Cache\ResultCacheHelper;
+use Mautic\CoreBundle\Cache\ResultCacheOptions;
 use Mautic\CoreBundle\Doctrine\Paginator\SimplePaginator;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\CoreBundle\Helper\InputHelper;
@@ -358,6 +359,14 @@ class CommonRepository extends ServiceEntityRepository
 
         $this->buildClauses($q, $args);
         $query = $q->getQuery();
+
+        if (isset($args['result_cache'])) {
+            if (!$args['result_cache'] instanceof ResultCacheOptions) {
+                throw new \InvalidArgumentException(sprintf('The value of the key "result_cache" must be an instance of "%s"', ResultCacheOptions::class));
+            }
+
+            ResultCacheHelper::enableOrmQueryCache($query, $args['result_cache']);
+        }
 
         if (isset($args['hydration_mode'])) {
             $hydrationMode = constant('\\Doctrine\\ORM\\Query::'.strtoupper($args['hydration_mode']));
@@ -979,10 +988,8 @@ class CommonRepository extends ServiceEntityRepository
 
     /**
      * @param \Doctrine\ORM\QueryBuilder|\Doctrine\DBAL\Query\QueryBuilder $qb
-     *
-     * @return array
      */
-    protected function addCatchAllWhereClause($qb, $filter)
+    protected function addCatchAllWhereClause($qb, $filter): array
     {
         foreach (['name', 'title'] as $column) {
             if ($this->getClassMetadata()->hasField($column)) {
@@ -1435,7 +1442,7 @@ class CommonRepository extends ServiceEntityRepository
                 $queryExpression->add(
                     $q->expr()->in($this->getTableAlias().'.id', ':'.$param)
                 );
-                $q->setParameter($param, $ids, Connection::PARAM_INT_ARRAY);
+                $q->setParameter($param, $ids, ArrayParameterType::INTEGER);
             }
         } elseif (!empty($args['ownedBy'])) {
             $queryExpression->add(
@@ -1591,7 +1598,7 @@ class CommonRepository extends ServiceEntityRepository
 
                             if (is_array($arg)) {
                                 $whereClause = $query->expr()->{$clause['expr']}($column, ':'.$param);
-                                $query->setParameter($param, $arg, Connection::PARAM_STR_ARRAY);
+                                $query->setParameter($param, $arg, ArrayParameterType::STRING);
                             } else {
                                 $expression  = 'in' === $clause['expr'] ? 'eq' : 'neq';
                                 $whereClause = $query->expr()->{$expression}($column, ':'.$param);

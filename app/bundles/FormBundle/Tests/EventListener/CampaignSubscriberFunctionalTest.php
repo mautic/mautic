@@ -144,7 +144,7 @@ class CampaignSubscriberFunctionalTest extends MauticMysqlTestCase
     {
         $tablePrefix = self::$container->getParameter('mautic.db_table_prefix');
 
-        if ($this->connection->getSchemaManager()->tablesExist("{$tablePrefix}form_results_1_test_form")) {
+        if ($this->connection->createSchemaManager()->tablesExist("{$tablePrefix}form_results_1_test_form")) {
             $this->connection->executeQuery("DROP TABLE {$tablePrefix}form_results_1_test_form");
         }
     }

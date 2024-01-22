@@ -33,6 +33,8 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
 
     public const POINTS_DIVIDE   = 'divide';
 
+    public const POINTS_SET      = 'set';
+
     public const DEFAULT_ALIAS   = 'l';
 
     /**

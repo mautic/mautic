@@ -376,13 +376,12 @@ class MailHelperTest extends TestCase
     public function testUnsubscribeHeader(): void
     {
         $mockRouter  = $this->createMock(Router::class);
-        $emailSecret = hash_hmac('sha256', 'someemail@email.test', 'secret');
         $mockRouter->expects($this->once())
             ->method('generate')
             ->with('mautic_email_unsubscribe',
                 ['idHash' => 'hash'],
                 UrlGeneratorInterface::ABSOLUTE_URL)
-            ->willReturn('http://www.somedomain.cz/email/unsubscribe/hash/someemail@email.test/'.$emailSecret);
+            ->willReturn('https://example.com/email/unsubscribe/65842d012b5b5772172137');
 
         $parameterMap = [
             ['mailer_custom_headers', [], ['X-Mautic-Test' => 'test', 'X-Mautic-Test2' => 'test']],
@@ -410,12 +409,14 @@ class MailHelperTest extends TestCase
 
         $mailer->setEmailType(MailHelper::EMAIL_TYPE_MARKETING);
         $headers = $mailer->getCustomHeaders();
-        $this->assertSame('<http://www.somedomain.cz/email/unsubscribe/hash/someemail@email.test/'.$emailSecret.'>', $headers['List-Unsubscribe']);
+        $this->assertSame('<https://example.com/email/unsubscribe/65842d012b5b5772172137>', $headers['List-Unsubscribe']);
+        $this->assertSame('List-Unsubscribe=One-Click', $headers['List-Unsubscribe-Post']);
 
         // There are no unsubscribe headers in transactional emails.
         $mailer->setEmailType(MailHelper::EMAIL_TYPE_TRANSACTIONAL);
         $headers = $mailer->getCustomHeaders();
         $this->assertNull($headers['List-Unsubscribe'] ?? null);
+        $this->assertNull($headers['List-Unsubscribe-Post'] ?? null);
     }
 
     protected function mockEmptyMailHelper(): MailHelper
@@ -618,6 +619,45 @@ class MailHelperTest extends TestCase
             } elseif ('from' === $header->getName()) {
                 $this->assertEquals('{tracking_pixel}', $header->getBody()->getName());
             }
+        }
+    }
+
+    public function testInlineImages(): void
+    {
+        $root = realpath(__DIR__.'/../');
+
+        $parameterMap = [
+          ['mailer_convert_embed_images', false, true],
+          ['site_url', false, 'http://default'],
+        ];
+
+        /** @var MockObject|MauticFactory $mockFactory */
+        $mockFactory = $this->getMockFactory(true, $parameterMap);
+
+        $mockFactory->method('getSystemPath')
+          ->with('root', true)
+          ->willReturn($root);
+
+        $transport     = new SmtpTransport();
+        $symfonyMailer = new Mailer($transport);
+
+        $mailer = new MailHelper($mockFactory, $symfonyMailer, ['nobody@nowhere.com' => '{tracking_pixel}']);
+        $mailer->addTo($this->contacts[0]['email']);
+
+        $email = new Email();
+        $email->setSubject('Test');
+        $email->setCustomHtml('<img src="http://default/_data/test_image.png" /><img src="https://www.mautic.org/themes/custom/mauticorg_base/logo.svg" />');
+
+        $mailer->setEmail($email);
+        $mailer->send();
+
+        $attachments = $mailer->message->getAttachments();
+        $body        = $mailer->message->getHtmlBody();
+
+        foreach ($attachments as $attachment) {
+            $matches = [];
+            preg_match('/filename: ([0-9a-z]+)/', $attachment->asDebugString(), $matches);
+            $this->assertStringContainsString('<img src="cid:'.$matches[1].'" />', $body);
         }
     }
 }
