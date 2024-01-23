@@ -9,6 +9,8 @@
         <section id="app-wrapper">
             {{ outputScripts('bodyOpen') }}
 
+            {{ include('@MauticCore/Notification/flashes.html.twig') }}
+
             <aside class="app-sidebar sidebar-left">
                 {{ include('@MauticCore/LeftPanel/index.html.twig') }}
             </aside>

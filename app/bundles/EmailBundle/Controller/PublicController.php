@@ -120,16 +120,25 @@ class PublicController extends CommonFormController
     ) {
         // Find the email
         /** @var \Mautic\EmailBundle\Model\EmailModel $model */
-        $model      = $this->getModel('email');
-        $translator = $this->translator;
-        $stat       = $model->getEmailStatus($idHash);
-        $message    = '';
-        $email      = null;
-        $lead       = null;
-        $template   = null;
-        $session    = $request->getSession();
+        $model                 = $this->getModel('email');
+        $translator            = $this->translator;
+        $stat                  = $model->getEmailStatus($idHash);
+        $message               = '';
+        $email                 = null;
+        $lead                  = null;
+        $template              = null;
+        $session               = $request->getSession();
+        $isOneClickUnsubscribe = $request->isMethod(Request::METHOD_POST) && 'One-Click' === $request->get('List-Unsubscribe');
 
         if (!empty($stat)) {
+            if ($isOneClickUnsubscribe) {
+                // RFC 8058 One-Click unsubscribe
+                $unsubscribeComment = $this->translator->trans('mautic.email.dnc.unsubscribed');
+                $model->setDoNotContact($stat, $unsubscribeComment, DoNotContact::UNSUBSCRIBED);
+
+                return new Response($this->translator->trans('mautic.lead.do.not.contact_unsubscribed'));
+            }
+
             if ($email = $stat->getEmail()) {
                 $template = $email->getTemplate();
                 if ('mautic_code_mode' === $template) {
@@ -145,6 +154,10 @@ class PublicController extends CommonFormController
                     \assert($formModel instanceof FormModel);
                     $formContent = '<div class="mautic-unsubscribeform">'.$formModel->getContent($unsubscribeForm).'</div>';
                 }
+            }
+        } else {
+            if ($isOneClickUnsubscribe) {
+                return new Response($this->translator->trans('mautic.email.stat_record.not_found'), Response::HTTP_NOT_FOUND);
             }
         }
 
@@ -223,7 +236,7 @@ class PublicController extends CommonFormController
                             $viewParameters,
                             [
                                 'form'                         => $formView,
-                                'startform'                    => $this->render('@MauticCore/Default/form.html.twig', ['form' => $formView]),
+                                'startform'                    => $this->renderView('@MauticCore/Default/form.html.twig', ['form' => $formView]),
                                 'custom_tag'                   => '<a name="end-'.$formView->vars['id'].'"></a>',
                                 'showContactFrequency'         => str_contains($html, 'data-slot="channelfrequency"') || str_contains($html, BuilderSubscriber::channelfrequency),
                                 'showContactSegments'          => str_contains($html, 'data-slot="segmentlist"') || str_contains($html, BuilderSubscriber::segmentListRegex),
