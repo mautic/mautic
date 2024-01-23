@@ -224,6 +224,7 @@ class UserController extends FormController
         $auditLogModel      = $this->getModel('core.auditlog');
         $auditLogRepository = $auditLogModel->getRepository();
         $userActivity       = $auditLogRepository->getLogsForUser($user);
+        $users = $model->getEntities();
 
         // set the page we came from
         $page = $request->getSession()->get('mautic.user.page', 1);
@@ -327,6 +328,7 @@ class UserController extends FormController
             'viewParameters'  => [
                 'form'          => $form->createView(),
                 'logs'          => $userActivity,
+                'users'         => $users,
             ],
             'contentTemplate' => '@MauticUser/User/form.html.twig',
             'passthroughVars' => [
