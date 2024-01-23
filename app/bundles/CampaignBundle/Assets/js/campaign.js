@@ -225,7 +225,7 @@ Mautic.campaignEventCloneOnLoad = function(container, response) {
         'sourceCampaignId': response['campaignId'],
         'sourceCampaignName': response['campaignName'],
     });
-    const flashMessage = Mautic.addFlashMessage(Mautic.translate('mautic.campaign.event.clone.success'));
+    const flashMessage = Mautic.addInfoFlashMessage(Mautic.translate('mautic.campaign.event.clone.success'));
     Mautic.setFlashes(flashMessage);
     Mautic.campaignBuilderUpdateEventCloneDescription();
 };
@@ -234,7 +234,7 @@ Mautic.campaignEventInsertOnError = function (event, jqxhr) {
     Mautic.clearCampaignEventClone();
     Mautic.hideCampaignEventPanel();
     if (jqxhr.responseJSON.error) {
-        const flashMessage = Mautic.addFlashMessage(jqxhr.responseJSON.error);
+        const flashMessage = Mautic.addErrorFlashMessage(jqxhr.responseJSON.error);
         Mautic.setFlashes(flashMessage);
     }
 };
