@@ -223,7 +223,7 @@ class AssetController extends FormController
      */
     public function previewAction(Request $request, $objectId)
     {
-        /** @var \Mautic\AssetBundle\Model\AssetModel $model */
+        /** @var AssetModel $model */
         $model       = $this->getModel('asset');
         $activeAsset = $model->getEntity($objectId);
 
@@ -237,35 +237,40 @@ class AssetController extends FormController
         $defaultStream = in_array($activeAsset->getExtension(), $this->coreParametersHelper->get('streamed_extensions')) ? '1' : null;
         $stream        = $request->query->get('stream', $defaultStream);
 
-        if ('1' === $download || '1' === $stream) {
-            try {
-                // set the uploadDir
-                $activeAsset->setUploadDir($this->coreParametersHelper->get('upload_dir'));
-                $contents = $activeAsset->getFileContents();
-            } catch (\Exception) {
-                return $this->notFound();
-            }
+        try {
+            // set the uploadDir
+            $activeAsset->setUploadDir($this->coreParametersHelper->get('upload_dir'));
+            $contents = $activeAsset->getFileContents();
+        } catch (\Exception) {
+            return $this->notFound();
+        }
 
-            $response = new Response();
-            $response->headers->set('Content-Type', $activeAsset->getFileMimeType());
-            if ('1' === $download) {
-                $response->headers->set('Content-Disposition', 'attachment;filename="'.$activeAsset->getOriginalFileName());
+        if ($request->isXmlHttpRequest()) {
+            if ('preview' === $request->query->get('act')) {
+                return $this->delegateView([
+                    'viewParameters' => [
+                        'activeAsset'      => $activeAsset,
+                        'newContent'       => $model->generateUrl($activeAsset),
+                    ],
+                    'contentTemplate' => '@MauticAsset/Asset/modal.html.twig',
+                    'passthroughVars' => [
+                        'route' => false,
+                    ],
+                    'jsonResponse' => true,
+                ]);
             }
-            $response->setContent($contents);
+        } else {
+            if ('1' === $download || '1' === $stream) {
+                $response = new Response();
+                $response->headers->set('Content-Type', $activeAsset->getFileMimeType());
+                if ('1' === $download) {
+                    $response->headers->set('Content-Disposition', 'attachment;filename="'.$activeAsset->getOriginalFileName());
+                }
+                $response->setContent($contents);
+            }
 
             return $response;
         }
-
-        return $this->delegateView([
-            'viewParameters' => [
-                'activeAsset'      => $activeAsset,
-                'assetDownloadUrl' => $model->generateUrl($activeAsset),
-            ],
-            'contentTemplate' => '@MauticAsset/Asset/preview.html.twig',
-            'passthroughVars' => [
-                'route' => false,
-            ],
-        ]);
     }
 
     /**
@@ -275,7 +280,7 @@ class AssetController extends FormController
      */
     public function newAction(Request $request, CoreParametersHelper $parametersHelper, UploaderHelper $uploaderHelper, $entity = null)
     {
-        /** @var \Mautic\AssetBundle\Model\AssetModel $model */
+        /** @var AssetModel $model */
         $model = $this->getModel('asset');
 
         /** @var \Mautic\AssetBundle\Entity\Asset $entity */
@@ -413,7 +418,7 @@ class AssetController extends FormController
      */
     public function editAction(Request $request, UploaderHelper $uploaderHelper, $objectId, $ignorePost = false)
     {
-        /** @var \Mautic\AssetBundle\Model\AssetModel $model */
+        /** @var AssetModel $model */
         $model  = $this->getModel('asset');
         $entity = $model->getEntity($objectId);
 
@@ -577,14 +582,14 @@ class AssetController extends FormController
      */
     public function cloneAction(Request $request, CoreParametersHelper $parametersHelper, UploaderHelper $uploaderHelper, $objectId)
     {
-        /** @var \Mautic\AssetBundle\Model\AssetModel $model */
+        /** @var AssetModel $model */
         $model  = $this->getModel('asset');
         $entity = $model->getEntity($objectId);
         $clone  = null;
 
         if (null != $entity) {
-            if (!$this->security->isGranted('asset:assets:create') ||
-                !$this->security->hasEntityAccess(
+            if (!$this->security->isGranted('asset:assets:create')
+                || !$this->security->hasEntityAccess(
                     'asset:assets:viewown', 'asset:assets:viewother', $entity->getCreatedBy()
                 )
             ) {
@@ -625,7 +630,7 @@ class AssetController extends FormController
         ];
 
         if ('POST' === $request->getMethod()) {
-            /** @var \Mautic\AssetBundle\Model\AssetModel $model */
+            /** @var AssetModel $model */
             $model  = $this->getModel('asset');
             $entity = $model->getEntity($objectId);
 
@@ -688,7 +693,7 @@ class AssetController extends FormController
         ];
 
         if ('POST' === $request->getMethod()) {
-            /** @var \Mautic\AssetBundle\Model\AssetModel $model */
+            /** @var AssetModel $model */
             $model     = $this->getModel('asset');
             $ids       = json_decode($request->query->get('ids', '{}'));
             $deleteIds = [];
