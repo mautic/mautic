@@ -225,7 +225,7 @@ class EventExecutioner
 
         // Save updated log entries and clear from memory
         $this->eventLogger->persistCollection($logs)
-            ->clearCollection();
+            ->clearCollection($logs);
     }
 
     /**
@@ -247,7 +247,7 @@ class EventExecutioner
 
         // Save updated log entries and clear from memory
         $this->eventLogger->persistCollection($logs)
-            ->clearCollection();
+            ->clearCollection($logs);
     }
 
     /**
