@@ -4,18 +4,12 @@ namespace Mautic\CoreBundle\IpLookup;
 
 class IP2LocationAPILookup extends AbstractRemoteDataLookup
 {
-    /**
-     * @return string
-     */
-    public function getAttribution()
+    public function getAttribution(): string
     {
         return '<a href="http://IP2Location.com/" target="_blank">IP2Location </a> web service WS9 Package only.';
     }
 
-    /**
-     * @return string
-     */
-    protected function getUrl()
+    protected function getUrl(): string
     {
         return "api.ip2location.com/?ip={$this->ip}&key={$this->auth}&package=WS9&format=json";
     }

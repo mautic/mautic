@@ -17,6 +17,7 @@ use Mautic\LeadBundle\Entity\ListLead;
 class AbstractCampaignCommand extends MauticMysqlTestCase
 {
     public const SEND_EMAIL_SECONDS = 3;
+
     public const CONDITION_SECONDS  = 6;
 
     /**
@@ -103,7 +104,7 @@ class AbstractCampaignCommand extends MauticMysqlTestCase
             ->join('log', $this->prefix.'leads', 'l', 'l.id = log.lead_id')
             ->where('log.campaign_id = 1')
             ->andWhere('log.event_id IN ('.implode(',', $ids).')')
-            ->execute()
+            ->executeQuery()
             ->fetchAllAssociative();
 
         $byEvent = [];

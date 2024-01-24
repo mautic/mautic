@@ -4,30 +4,24 @@ namespace MauticPlugin\MauticTagManagerBundle\Entity;
 
 use Mautic\LeadBundle\Entity\TagRepository as BaseTagRepository;
 
-/**
- * Class TagRepository.
- */
 class TagRepository extends BaseTagRepository
 {
     /**
-     * @return array
+     * @return string[][]
      */
-    protected function getDefaultOrder()
+    protected function getDefaultOrder(): array
     {
         return [
             ['lt.tag', 'ASC'],
         ];
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getTableAlias()
+    public function getTableAlias(): string
     {
         return 'lt';
     }
 
-    public function countOccurrences($tag)
+    public function countOccurrences($tag): int
     {
         $q = $this->getEntityManager()->getConnection()->createQueryBuilder();
 
@@ -36,9 +30,7 @@ class TagRepository extends BaseTagRepository
             ->where('lt.tag = :tag')
             ->setParameter('tag', $tag);
 
-        $result = $q->execute()->fetchAllAssociative();
-
-        return count($result);
+        return $q->executeQuery()->rowCount();
     }
 
     /**
@@ -64,7 +56,7 @@ class TagRepository extends BaseTagRepository
         )
             ->groupBy('ltx.tag_id');
 
-        $result = $q->execute()->fetchAllAssociative();
+        $result = $q->executeQuery()->fetchAllAssociative();
 
         $return = [];
         foreach ($result as $r) {

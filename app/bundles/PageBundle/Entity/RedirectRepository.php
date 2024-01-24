@@ -28,8 +28,6 @@ class RedirectRepository extends CommonRepository
     }
 
     /**
-     * @param Email $email
-     *
      * @return array
      */
     public function findByIds(array $ids, Email $email = null)
@@ -63,7 +61,7 @@ class RedirectRepository extends CommonRepository
      * @param int        $increaseBy
      * @param bool|false $unique
      */
-    public function upHitCount($id, $increaseBy = 1, $unique = false)
+    public function upHitCount($id, $increaseBy = 1, $unique = false): void
     {
         $q = $this->getEntityManager()->getConnection()->createQueryBuilder();
 
@@ -75,7 +73,7 @@ class RedirectRepository extends CommonRepository
             $q->set('unique_hits', 'unique_hits + '.(int) $increaseBy);
         }
 
-        $q->execute();
+        $q->executeStatement();
     }
 
     /**
@@ -84,8 +82,6 @@ class RedirectRepository extends CommonRepository
      * @param int|null $companyId
      * @param int|null $campaignId
      * @param int|null $segmentId
-     *
-     * @return array
      */
     public function getMostHitEmailRedirects(
         $limit,
@@ -95,7 +91,7 @@ class RedirectRepository extends CommonRepository
         $companyId = null,
         $campaignId = null,
         $segmentId = null
-    ) {
+    ): array {
         $q = $this->getEntityManager()->getConnection()->createQueryBuilder();
         $q->addSelect('pr.url')
             ->addSelect('count(ph.id) as hits')
@@ -169,6 +165,6 @@ class RedirectRepository extends CommonRepository
 
         $q->orderBy('hits', 'DESC');
 
-        return $q->execute()->fetchAllAssociative();
+        return $q->executeQuery()->fetchAllAssociative();
     }
 }

@@ -424,7 +424,7 @@ final class SubmissionFunctionalTest extends MauticMysqlTestCase
     {
         $tablePrefix = self::$container->getParameter('mautic.db_table_prefix');
 
-        if ($this->connection->getSchemaManager()->tablesExist("{$tablePrefix}form_results_1_submission")) {
+        if ($this->connection->createSchemaManager()->tablesExist("{$tablePrefix}form_results_1_submission")) {
             $this->connection->executeQuery("DROP TABLE {$tablePrefix}form_results_1_submission");
         }
     }
@@ -491,7 +491,7 @@ final class SubmissionFunctionalTest extends MauticMysqlTestCase
 
         // Fetch form submissions as non-admin-user who don't have the permission to view submissions
         $this->client->request(Request::METHOD_GET, "/api/forms/{$formId}/submissions", [], [], [
-            'PHP_AUTH_USER' => $user->getUsername(),
+            'PHP_AUTH_USER' => $user->getUserIdentifier(),
             'PHP_AUTH_PW'   => $this->getUserPlainPassword(),
         ]);
         $clientResponse = $this->client->getResponse();

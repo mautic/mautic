@@ -22,7 +22,7 @@ class ConfigFormTest extends KernelTestCase
         self::bootKernel();
     }
 
-    public function testConfigForm()
+    public function testConfigForm(): void
     {
         $plugins = $this->getIntegrationObject()->getIntegrationObjects();
 
@@ -37,7 +37,7 @@ class ConfigFormTest extends KernelTestCase
         }
     }
 
-    public function testOauth()
+    public function testOauth(): void
     {
         $plugins    = $this->getIntegrationObject()->getIntegrationObjects();
         $url        = 'https://test.com';
@@ -61,7 +61,7 @@ class ConfigFormTest extends KernelTestCase
         }
     }
 
-    public function testAmendLeadDataBeforeMauticPopulate()
+    public function testAmendLeadDataBeforeMauticPopulate(): void
     {
         $plugins = $this->getIntegrationObject()->getIntegrationObjects();
         $object  = 'company';
@@ -138,9 +138,6 @@ class ConfigFormTest extends KernelTestCase
         return $integrationHelper;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function tearDown(): void
     {
         parent::tearDown();

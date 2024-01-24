@@ -65,6 +65,7 @@ class PointActionFunctionalTest extends MauticMysqlTestCase
             $pointAction->setGroup($group);
         }
         $this->em->persist($pointAction);
+        $this->em->flush();
 
         return $pointAction;
     }

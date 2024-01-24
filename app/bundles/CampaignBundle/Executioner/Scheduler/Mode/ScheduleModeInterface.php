@@ -6,8 +6,5 @@ use Mautic\CampaignBundle\Entity\Event;
 
 interface ScheduleModeInterface
 {
-    /**
-     * @return \DateTime
-     */
-    public function getExecutionDateTime(Event $event, \DateTime $now, \DateTime $comparedToDateTime);
+    public function getExecutionDateTime(Event $event, \DateTimeInterface $now, \DateTimeInterface $comparedToDateTime): \DateTimeInterface;
 }

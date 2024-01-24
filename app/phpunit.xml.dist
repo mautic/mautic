@@ -10,7 +10,7 @@
     convertDeprecationsToExceptions="true"
     processIsolation="false"
     stopOnFailure="false"
-    bootstrap="autoload.php"
+    bootstrap="../vendor/autoload.php"
     xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/9.3/phpunit.xsd"
     failOnRisky="true"
     failOnWarning="true"
@@ -57,6 +57,7 @@
     <server name="APP_DEBUG" value="0"/>
     <server name="APP_ENV" value="test" force="true" />
     <ini name="error_reporting" value="E_ALL" />
+    <ini name="date.timezone" value="UTC" />
   </php>
   <listeners>
     <listener class="\Mautic\CoreBundle\Test\Listeners\CleanupListener" />

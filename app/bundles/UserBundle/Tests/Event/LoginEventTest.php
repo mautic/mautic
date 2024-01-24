@@ -7,7 +7,7 @@ use Mautic\UserBundle\Event\LoginEvent;
 
 class LoginEventTest extends \PHPUnit\Framework\TestCase
 {
-    public function testGetUser()
+    public function testGetUser(): void
     {
         $user  = $this->createMock(User::class);
         $event = new LoginEvent($user);

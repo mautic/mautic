@@ -7,14 +7,11 @@ use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 
 /**
- * Class CampaignEventPageHitType.
+ * @extends AbstractType<array<mixed>>
  */
 class CampaignEventPageHitType extends AbstractType
 {
-    /**
-     * {@inheritdoc}
-     */
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder->add('pages', PageListType::class, [
             'label'      => 'mautic.page.campaign.event.form.pages',
@@ -46,9 +43,6 @@ class CampaignEventPageHitType extends AbstractType
         ]);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getBlockPrefix()
     {
         return 'campaignevent_pagehit';

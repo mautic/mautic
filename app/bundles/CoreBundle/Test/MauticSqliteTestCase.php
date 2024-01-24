@@ -10,6 +10,9 @@ use Mautic\InstallBundle\InstallFixtures\ORM\RoleData;
 use Mautic\UserBundle\DataFixtures\ORM\LoadRoleData;
 use Mautic\UserBundle\DataFixtures\ORM\LoadUserData;
 
+/**
+ * @deprecated since Mautic 5.0, to be removed in 6.0 with no replacement.
+ */
 abstract class MauticSqliteTestCase extends AbstractMauticTestCase
 {
     protected function setUp(): void
@@ -26,7 +29,7 @@ abstract class MauticSqliteTestCase extends AbstractMauticTestCase
         }
     }
 
-    private function createDatabase()
+    private function createDatabase(): void
     {
         // fix problem with prefixes in sqlite
         $tablePrefix = new TablePrefix('prefix_');
@@ -47,12 +50,12 @@ abstract class MauticSqliteTestCase extends AbstractMauticTestCase
         $this->em->getConnection()->close();
     }
 
-    private function createDatabaseFromFile()
+    private function createDatabaseFromFile(): void
     {
         copy($this->getOriginalDatabasePath(), $this->getDatabasePath());
     }
 
-    private function backupOrginalDatabase()
+    private function backupOrginalDatabase(): void
     {
         copy($this->getDatabasePath(), $this->getOriginalDatabasePath());
     }

@@ -58,9 +58,6 @@ class VersionCheckMiddleware implements HttpKernelInterface, PrioritizedMiddlewa
         return $this->app->handle($request, $type, $catch);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getPriority()
     {
         return self::PRIORITY;

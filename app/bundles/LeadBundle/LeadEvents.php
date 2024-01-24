@@ -3,7 +3,6 @@
 namespace Mautic\LeadBundle;
 
 /**
- * Class LeadEvents
  * Events available for LeadBundle.
  */
 final class LeadEvents

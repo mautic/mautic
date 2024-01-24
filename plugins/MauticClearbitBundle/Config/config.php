@@ -24,7 +24,7 @@ return [
     'services' => [
         'others' => [
             'mautic.plugin.clearbit.lookup_helper' => [
-                'class'     => 'MauticPlugin\MauticClearbitBundle\Helper\LookupHelper',
+                'class'     => \MauticPlugin\MauticClearbitBundle\Helper\LookupHelper::class,
                 'arguments' => [
                     'mautic.helper.integration',
                     'mautic.helper.user',
