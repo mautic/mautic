@@ -108,8 +108,6 @@ class CampaignActionJumpToEventWithIntervalTriggerModeFunctionalTest extends Mau
      */
     public function dataForCampaignWithJumpToEventWithIntervalTriggerMode(): iterable
     {
-        $now = new \DateTime();
-
         $event = new Event();
         $event->setName('Adjust points');
         $event->setEventType(Event::TYPE_ACTION);
@@ -131,7 +129,7 @@ class CampaignActionJumpToEventWithIntervalTriggerModeFunctionalTest extends Mau
         ];
 
         $adjustPointEvent = clone $event;
-        $adjustPointEvent->setTriggerHour($now->modify('-1 hour')->format('H:i'));
+        $adjustPointEvent->setTriggerHour((new \DateTime())->modify('-1 hour')->format('H:i'));
 
         yield 'Points at a relative time: Scheduled at - before one hour' => [
             $adjustPointEvent,
@@ -140,10 +138,10 @@ class CampaignActionJumpToEventWithIntervalTriggerModeFunctionalTest extends Mau
         ];
 
         $adjustPointEvent = clone $event;
-        $adjustPointEvent->setTriggerDate($now);
+        $adjustPointEvent->setTriggerDate(new \DateTime());
         $adjustPointEvent->setTriggerInterval(1);
         $adjustPointEvent->setTriggerIntervalUnit('H');
-        $adjustPointEvent->setTriggerHour($now->modify('-1 hour')->format('H:i'));
+        $adjustPointEvent->setTriggerHour((new \DateTime())->modify('-1 hour')->format('H:i'));
 
         yield 'Points at a relative time: Scheduled at - before one hour with delay of 1 hour' => [
             $adjustPointEvent,
@@ -152,9 +150,9 @@ class CampaignActionJumpToEventWithIntervalTriggerModeFunctionalTest extends Mau
         ];
 
         $adjustPointEvent = clone $event;
-        $adjustPointEvent->setTriggerDate($now);
-        $adjustPointEvent->setTriggerRestrictedStartHour($now->modify('+2 hour'));
-        $adjustPointEvent->setTriggerRestrictedStopHour($now->modify('+3 hour'));
+        $adjustPointEvent->setTriggerDate(new \DateTime());
+        $adjustPointEvent->setTriggerRestrictedStartHour((new \DateTime())->modify('+2 hour'));
+        $adjustPointEvent->setTriggerRestrictedStopHour((new \DateTime())->modify('+3 hour'));
 
         yield 'Points at a relative time: Between future start and stop time on same day' => [
             $adjustPointEvent,
@@ -163,8 +161,8 @@ class CampaignActionJumpToEventWithIntervalTriggerModeFunctionalTest extends Mau
         ];
 
         $adjustPointEvent = clone $event;
-        $adjustPointEvent->setTriggerRestrictedStartHour($now->modify('-2 hour'));
-        $adjustPointEvent->setTriggerRestrictedStopHour($now->modify('-1 hour'));
+        $adjustPointEvent->setTriggerRestrictedStartHour((new \DateTime())->modify('-2 hour'));
+        $adjustPointEvent->setTriggerRestrictedStopHour((new \DateTime())->modify('-1 hour'));
 
         yield 'Points at a relative time: Between passed time' => [
             $adjustPointEvent,
@@ -173,8 +171,8 @@ class CampaignActionJumpToEventWithIntervalTriggerModeFunctionalTest extends Mau
         ];
 
         $adjustPointEvent = clone $event;
-        $adjustPointEvent->setTriggerRestrictedStartHour($now->modify('+3 hour'));
-        $adjustPointEvent->setTriggerRestrictedStopHour($now->modify('+4 hour'));
+        $adjustPointEvent->setTriggerRestrictedStartHour((new \DateTime())->modify('+3 hour'));
+        $adjustPointEvent->setTriggerRestrictedStopHour((new \DateTime())->modify('+4 hour'));
 
         yield 'Points at a relative time: Between future time' => [
             $adjustPointEvent,
@@ -195,7 +193,7 @@ class CampaignActionJumpToEventWithIntervalTriggerModeFunctionalTest extends Mau
 
         $adjustPointEvent = clone $event;
         $adjustPointEvent->setTriggerMode(Event::TRIGGER_MODE_DATE);
-        $adjustPointEvent->setTriggerDate($now->modify('+5 hour'));
+        $adjustPointEvent->setTriggerDate((new \DateTime())->modify('+5 hour'));
 
         yield 'Points at specific date/time' => [
             $adjustPointEvent,

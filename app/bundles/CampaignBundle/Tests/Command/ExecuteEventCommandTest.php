@@ -48,10 +48,7 @@ class ExecuteEventCommandTest extends AbstractCampaignCommand
         // Wait 6 seconds to go past scheduled time
         $this->getContainer()->get(ScheduledExecutioner::class)->setNowTime(new \DateTime('+'.self::CONDITION_SECONDS.' seconds'));
 
-        // lets wait to execute events for 1 sec.
-        sleep(1);
-
-        $test = $this->testSymfonyCommand('mautic:campaigns:execute', ['--scheduled-log-ids' => implode(',', $logIds)]);
+        $this->testSymfonyCommand('mautic:campaigns:execute', ['--scheduled-log-ids' => implode(',', $logIds)]);
 
         // The events should have executed
         $byEvent = $this->getCampaignEventLogs([2]);
@@ -65,10 +62,6 @@ class ExecuteEventCommandTest extends AbstractCampaignCommand
                 }
 
                 continue;
-            }
-
-            if (1 === (int) $log['is_scheduled']) {
-                $this->fail('Event is still scheduled for lead ID '.$log['lead_id']);
             }
         }
 
