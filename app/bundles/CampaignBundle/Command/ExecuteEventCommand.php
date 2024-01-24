@@ -49,7 +49,7 @@ class ExecuteEventCommand extends Command
     {
         defined('MAUTIC_CAMPAIGN_SYSTEM_TRIGGERED') or define('MAUTIC_CAMPAIGN_SYSTEM_TRIGGERED', 1);
 
-        $now     = new \DateTime($input->getOption('execution-time') ?: null);
+        $now     = new \DateTime($input->getOption('execution-time') ?: 'now');
         $ids     = $this->formatterHelper->simpleCsvToArray($input->getOption('scheduled-log-ids'), 'int');
         $counter = $this->scheduledExecutioner->executeByIds($ids, $output, $now);
 
