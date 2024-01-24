@@ -40,7 +40,7 @@ class Webhook extends FormEntity
     private $webhookUrl;
 
     /**
-     * @var string
+     * @var ?string
      */
     private $secret;
 
@@ -257,7 +257,7 @@ class Webhook extends FormEntity
     }
 
     /**
-     * @param string $secret
+     * @param ?string $secret
      *
      * @return Webhook
      */
@@ -270,7 +270,7 @@ class Webhook extends FormEntity
     }
 
     /**
-     * @return string
+     * @return ?string
      */
     public function getSecret()
     {
