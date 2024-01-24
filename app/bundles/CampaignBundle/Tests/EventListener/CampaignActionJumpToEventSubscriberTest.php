@@ -233,7 +233,7 @@ final class CampaignActionJumpToEventSubscriberTest extends TestCase
             /**
              * @return \DateTime
              */
-            public function getExecutionDateTime(Event $event, \DateTimeInterface $compareFromDateTime = null, \DateTime $comparedToDateTime = null)
+            public function getExecutionDateTime(Event $event, \DateTimeInterface $compareFromDateTime = null, \DateTime $comparedToDateTime = null): \DateTimeInterface
             {
                 return new \DateTime();
             }

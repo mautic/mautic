@@ -150,7 +150,8 @@ class Interval implements ScheduleModeInterface
 
     private function isRestrictedToDailyScheduling(Event $event): bool
     {
-        return !in_array($event->getTriggerIntervalUnit(), ['d', 'm', 'y']);
+        return !in_array($event->getTriggerIntervalUnit(), ['i', 'h', 'd', 'm', 'y']) &&
+            empty($event->getTriggerRestrictedDaysOfWeek());
     }
 
     private function hasTimeRelatedRestrictions(Event $event): bool
@@ -231,7 +232,7 @@ class Interval implements ScheduleModeInterface
 
         /** @var \DateTime $groupExecutionDate */
         $groupExecutionDate = $this->getGroupExecutionDateWithTimeZone($contact, $eventId, $compareFromDateTime);
-        $groupExecutionDate->setTime($groupHour->format('H'), $groupHour->format('i'));
+        $groupExecutionDate->setTime((int) $groupHour->format('H'), (int) $groupHour->format('i'));
 
         $testGroupHour = clone $groupExecutionDate;
         $testGroupHour->setTime($groupHour->format('H'), $groupHour->format('i'));
@@ -285,7 +286,7 @@ class Interval implements ScheduleModeInterface
 
         if ($groupExecutionDate >= $testStopDateTime) {
             // Too late so try again tomorrow
-            $groupExecutionDate->modify('+1 day')->setTime($startTime->format('H'), $startTime->format('i'));
+            $groupExecutionDate->modify('+1 day')->setTime((int) $startTime->format('H'), (int) $startTime->format('i'));
         }
 
         return $groupExecutionDate;
@@ -321,7 +322,7 @@ class Interval implements ScheduleModeInterface
                 $this->logger->debug(
                     'CAMPAIGN: ('.$eventId.') Setting '.$timezone.' for contact '.$contact->getId()
                 );
-            } catch (\Exception $exception) {
+            } catch (\Exception) {
                 // Timezone is not recognized so use the default
                 $this->logger->debug(
                     'CAMPAIGN: ('.$eventId.') '.$timezone.' for contact '.$contact->getId().' is not recognized'

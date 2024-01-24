@@ -2,7 +2,6 @@
 
 namespace Mautic\CampaignBundle\Tests\Command;
 
-use DateTime;
 use Mautic\CampaignBundle\Entity\LeadEventLog;
 use Mautic\CampaignBundle\Entity\LeadEventLogRepository;
 use Mautic\CampaignBundle\Executioner\ScheduledExecutioner;
@@ -16,7 +15,7 @@ class ExecuteEventCommandTest extends AbstractCampaignCommand
     {
         putenv('CAMPAIGN_EXECUTIONER_SCHEDULER_ACKNOWLEDGE_SECONDS=1');
 
-        $this->runCommand('mautic:campaigns:trigger', ['-i' => 1, '--contact-ids' => '1,2,3']);
+        $this->testSymfonyCommand('mautic:campaigns:trigger', ['-i' => 1, '--contact-ids' => '1,2,3']);
 
         // There should be two events scheduled
         $byEvent = $this->getCampaignEventLogs([2]);
@@ -31,7 +30,7 @@ class ExecuteEventCommandTest extends AbstractCampaignCommand
             $logIds[] = $log['id'];
         }
 
-        $this->runCommand('mautic:campaigns:execute', ['--scheduled-log-ids' => implode(',', $logIds)]);
+        $this->testSymfonyCommand('mautic:campaigns:execute', ['--scheduled-log-ids' => implode(',', $logIds)]);
 
         // There should still be trhee events scheduled
         $byEvent = $this->getCampaignEventLogs([2]);
@@ -49,7 +48,7 @@ class ExecuteEventCommandTest extends AbstractCampaignCommand
         // Wait 6 seconds to go past scheduled time
         $this->getContainer()->get(ScheduledExecutioner::class)->setNowTime(new \DateTime('+'.self::CONDITION_SECONDS.' seconds'));
 
-        $this->runCommand('mautic:campaigns:execute', ['--scheduled-log-ids' => implode(',', $logIds)]);
+        $this->testSymfonyCommand('mautic:campaigns:execute', ['--scheduled-log-ids' => implode(',', $logIds)]);
 
         // The events should have executed
         $byEvent = $this->getCampaignEventLogs([2]);
@@ -83,9 +82,9 @@ class ExecuteEventCommandTest extends AbstractCampaignCommand
 
         $this->em->flush();
 
-        $output = $this->runCommand('mautic:campaigns:trigger', ['--campaign-id' => $campaign->getId()]);
+        $commandResult = $this->testSymfonyCommand('mautic:campaigns:trigger', ['--campaign-id' => $campaign->getId()]);
 
-        Assert::assertStringContainsString('1 total event was scheduled', $output);
+        Assert::assertStringContainsString('1 total event was scheduled', $commandResult->getDisplay());
 
         $campaign->setIsPublished(false);
         $this->em->persist($campaign);
@@ -101,18 +100,18 @@ class ExecuteEventCommandTest extends AbstractCampaignCommand
         Assert::assertTrue($log->getIsScheduled());
 
         // Time machine so we don't have to wait for that long.
-        $log->setTriggerDate(new DateTime('2 days ago'));
-        $log->setDateTriggered(new DateTime('2 days ago'));
+        $log->setTriggerDate(new \DateTime('2 days ago'));
+        $log->setDateTriggered(new \DateTime('2 days ago'));
         $log->setIsScheduled(true);
         $this->em->persist($log);
         $this->em->flush();
         $this->em->clear();
 
-        $output = $this->runCommand('mautic:campaigns:execute', ['--scheduled-log-ids' => $log->getId()]);
+        $commandResult = $this->testSymfonyCommand('mautic:campaigns:execute', ['--scheduled-log-ids' => $log->getId()]);
 
-        Assert::assertStringContainsString('0 total events(s) to be processed', $output);
-        Assert::assertStringContainsString('0 total events were executed', $output);
-        Assert::assertStringContainsString('0 total events were scheduled', $output);
+        Assert::assertStringContainsString('0 total events(s) to be processed', $commandResult->getDisplay());
+        Assert::assertStringContainsString('0 total events were executed', $commandResult->getDisplay());
+        Assert::assertStringContainsString('0 total events were scheduled', $commandResult->getDisplay());
 
         $log = $leadEventLogRepository->findOneBy(['lead' => $contact, 'campaign' => $campaign]);
         \assert($log instanceof LeadEventLog);
@@ -131,12 +130,12 @@ class ExecuteEventCommandTest extends AbstractCampaignCommand
 
         $this->em->flush();
 
-        $output = $this->runCommand('mautic:campaigns:trigger', ['--campaign-id' => $campaign->getId()]);
+        $commandResult = $this->testSymfonyCommand('mautic:campaigns:trigger', ['--campaign-id' => $campaign->getId()]);
 
-        Assert::assertStringContainsString('1 total event was scheduled', $output);
+        Assert::assertStringContainsString('1 total event was scheduled', $commandResult->getDisplay());
 
-        $campaign->setPublishUp(new DateTime('3 days ago'));
-        $campaign->setPublishDown(new DateTime('1 days ago'));
+        $campaign->setPublishUp(new \DateTime('3 days ago'));
+        $campaign->setPublishDown(new \DateTime('1 days ago'));
         $this->em->persist($campaign);
         $this->em->flush();
         $this->em->clear();
@@ -150,18 +149,18 @@ class ExecuteEventCommandTest extends AbstractCampaignCommand
         Assert::assertTrue($log->getIsScheduled());
 
         // Time machine so we don't have to wait for that long.
-        $log->setTriggerDate(new DateTime('2 days ago'));
-        $log->setDateTriggered(new DateTime('2 days ago'));
+        $log->setTriggerDate(new \DateTime('2 days ago'));
+        $log->setDateTriggered(new \DateTime('2 days ago'));
         $log->setIsScheduled(true);
         $this->em->persist($log);
         $this->em->flush();
         $this->em->clear();
 
-        $output = $this->runCommand('mautic:campaigns:execute', ['--scheduled-log-ids' => $log->getId()]);
+        $commandResult = $this->testSymfonyCommand('mautic:campaigns:execute', ['--scheduled-log-ids' => $log->getId()]);
 
-        Assert::assertStringContainsString('1 total events(s) to be processed', $output);
-        Assert::assertStringContainsString('0 total events were executed', $output);
-        Assert::assertStringContainsString('0 total events were scheduled', $output);
+        Assert::assertStringContainsString('1 total events(s) to be processed', $commandResult->getDisplay());
+        Assert::assertStringContainsString('0 total events were executed', $commandResult->getDisplay());
+        Assert::assertStringContainsString('0 total events were scheduled', $commandResult->getDisplay());
 
         $log = $leadEventLogRepository->findOneBy(['lead' => $contact, 'campaign' => $campaign]);
         \assert($log instanceof LeadEventLog);
@@ -178,15 +177,15 @@ class ExecuteEventCommandTest extends AbstractCampaignCommand
         $contact       = $fixtureHelper->createContact('some@contact.email');
         $campaign      = $fixtureHelper->createCampaign('Scheduled event test');
         $fixtureHelper->addContactToCampaign($contact, $campaign);
-        $hour = new DateTime();
+        $hour = new \DateTime();
         $hour->add((new DateTimeHelper())->buildInterval($interval, $unit));
         $fixtureHelper->createCampaignWithScheduledEvent($campaign, $interval, $unit, $hour);
 
         $this->em->flush();
 
-        $output = $this->runCommand('mautic:campaigns:trigger', ['--campaign-id' => $campaign->getId()]);
+        $commandResult = $this->testSymfonyCommand('mautic:campaigns:trigger', ['--campaign-id' => $campaign->getId()]);
 
-        Assert::assertStringContainsString('1 total event was scheduled', $output);
+        Assert::assertStringContainsString('1 total event was scheduled', $commandResult->getDisplay());
 
         $leadEventLogRepository = $this->em->getRepository(LeadEventLog::class);
         \assert($leadEventLogRepository instanceof LeadEventLogRepository);
@@ -196,11 +195,11 @@ class ExecuteEventCommandTest extends AbstractCampaignCommand
 
         Assert::assertTrue($log->getIsScheduled());
 
-        $output = $this->runCommand('mautic:campaigns:execute', ['--scheduled-log-ids' => $log->getId()]);
+        $commandResult = $this->testSymfonyCommand('mautic:campaigns:execute', ['--scheduled-log-ids' => $log->getId()]);
 
-        Assert::assertStringContainsString('1 total events(s) to be processed', $output);
-        Assert::assertStringContainsString('1 total event was executed', $output);
-        Assert::assertStringContainsString('0 total events were scheduled', $output);
+        Assert::assertStringContainsString('1 total events(s) to be processed', $commandResult->getDisplay());
+        Assert::assertStringContainsString('1 total event was executed', $commandResult->getDisplay());
+        Assert::assertStringContainsString('0 total events were scheduled', $commandResult->getDisplay());
 
         $log = $leadEventLogRepository->findOneBy(['lead' => $contact, 'campaign' => $campaign]);
         \assert($log instanceof LeadEventLog);
