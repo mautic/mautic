@@ -38,7 +38,7 @@ final class Version20230615101328 extends PreUpAssertionMigration
             (int) ($parameters['mailer_port'] ?? 25),
         );
 
-        $parameters['mailer_dsn'] = (string) $dsn;
+        $parameters['mailer_dsn'] = str_replace('%', '%%', (string) $dsn);
 
         $configurator->mergeParameters($parameters);
         $configurator->write();
