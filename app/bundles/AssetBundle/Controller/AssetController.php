@@ -258,6 +258,8 @@ class AssetController extends FormController
                     ],
                     'jsonResponse' => true,
                 ]);
+            } else {
+                return new Response();
             }
         } else {
             if ('1' === $download || '1' === $stream) {
