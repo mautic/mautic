@@ -41,7 +41,7 @@ class ColumnSchemaHelper
         protected Connection $db,
         protected $prefix
     ) {
-        $this->sm     = $db->getSchemaManager();
+        $this->sm = $db->createSchemaManager();
     }
 
     /**
@@ -61,7 +61,7 @@ class ColumnSchemaHelper
         $this->checkTableExists($this->tableName, true);
 
         // use the to schema to get table details so that changes will be calculated
-        $this->fromTable = $this->sm->listTableDetails($this->tableName);
+        $this->fromTable = $this->sm->introspectTable($this->tableName);
         $this->toTable   = clone $this->fromTable;
 
         return $this;
@@ -175,9 +175,9 @@ class ColumnSchemaHelper
     {
         // create a table diff
         $comparator = new Comparator();
-        $diff       = $comparator->diffTable($this->fromTable, $this->toTable);
+        $diff       = $comparator->compareTables($this->fromTable, $this->toTable);
 
-        if ($diff) {
+        if (!$diff->isEmpty()) {
             $this->sm->alterTable($diff);
         }
     }

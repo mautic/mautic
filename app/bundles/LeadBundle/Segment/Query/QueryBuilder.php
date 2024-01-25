@@ -2,6 +2,7 @@
 
 namespace Mautic\LeadBundle\Segment\Query;
 
+use Doctrine\DBAL\ArrayParameterType;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Query\Expression\CompositeExpression;
 use Doctrine\DBAL\Query\QueryBuilder as BaseQueryBuilder;
@@ -287,7 +288,7 @@ class QueryBuilder extends BaseQueryBuilder
             if (!is_int($val) && !is_float($val) && !is_array($val)) {
                 $val = "'$val'";
             } elseif (is_array($val)) {
-                if (Connection::PARAM_STR_ARRAY === $this->getParameterType($key)) {
+                if (ArrayParameterType::STRING === $this->getParameterType($key)) {
                     $val = array_map(static fn ($value) => "'$value'", $val);
                 }
                 $val = implode(', ', $val);

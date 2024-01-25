@@ -22,7 +22,7 @@ abstract class AbstractMigration implements MigrationInterface
 
     public function shouldExecute(): bool
     {
-        return $this->isApplicable($this->entityManager->getConnection()->getSchemaManager()->createSchema());
+        return $this->isApplicable($this->entityManager->getConnection()->createSchemaManager()->introspectSchema());
     }
 
     /**
