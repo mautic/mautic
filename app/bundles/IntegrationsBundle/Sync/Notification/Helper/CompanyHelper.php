@@ -8,14 +8,9 @@ use Doctrine\DBAL\Connection;
 
 class CompanyHelper
 {
-    /**
-     * @var Connection
-     */
-    private $connection;
-
-    public function __construct(Connection $connection)
-    {
-        $this->connection = $connection;
+    public function __construct(
+        private Connection $connection
+    ) {
     }
 
     /**
@@ -27,7 +22,7 @@ class CompanyHelper
             ->select('c.companyname')
             ->from(MAUTIC_TABLE_PREFIX.'companies', 'c')
             ->where('c.id = '.$id)
-            ->execute()
+            ->executeQuery()
             ->fetchOne();
     }
 }

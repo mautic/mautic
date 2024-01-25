@@ -4,25 +4,17 @@ declare(strict_types=1);
 
 namespace Mautic\LeadBundle\Field;
 
+use Mautic\CoreBundle\Cache\ResultCacheOptions;
+use Mautic\LeadBundle\Entity\LeadField;
 use Mautic\LeadBundle\Entity\LeadFieldRepository;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 class FieldList
 {
-    /**
-     * @var LeadFieldRepository
-     */
-    private $leadFieldRepository;
-
-    /**
-     * @var TranslatorInterface
-     */
-    private $translator;
-
-    public function __construct(LeadFieldRepository $leadFieldRepository, TranslatorInterface $translator)
-    {
-        $this->leadFieldRepository = $leadFieldRepository;
-        $this->translator          = $translator;
+    public function __construct(
+        private LeadFieldRepository $leadFieldRepository,
+        private TranslatorInterface $translator
+    ) {
     }
 
     /**
@@ -42,11 +34,12 @@ class FieldList
         }
         // Get a list of custom form fields
         $fields = $this->leadFieldRepository->getEntities([
-             'filter' => [
+            'filter' => [
                  'force' => $forceFilters,
              ],
-             'orderBy'    => 'f.order',
-             'orderByDir' => 'asc',
+            'orderBy'      => 'f.order',
+            'orderByDir'   => 'asc',
+            'result_cache' => new ResultCacheOptions(LeadField::CACHE_NAMESPACE),
         ]);
 
         $leadFields = [];

@@ -9,7 +9,10 @@ use Mautic\CoreBundle\Entity\CommonRepository;
  */
 class LeadCategoryRepository extends CommonRepository
 {
-    public function getLeadCategories(Lead $lead)
+    /**
+     * @return array<mixed, array<string, mixed>>
+     */
+    public function getLeadCategories(Lead $lead): array
     {
         $q = $this->_em->getConnection()->createQueryBuilder()
             ->select('lc.id, lc.category_id, lc.date_added, lc.manually_added, lc.manually_removed, c.alias, c.title')
@@ -17,7 +20,7 @@ class LeadCategoryRepository extends CommonRepository
             ->join('lc', MAUTIC_TABLE_PREFIX.'categories', 'c', 'c.id = lc.category_id')
             ->where('lc.lead_id = :lead')->setParameter('lead', $lead->getId());
 
-        $results = $q->execute()->fetchAllAssociative();
+        $results = $q->executeQuery()->fetchAllAssociative();
 
         $categories = [];
         foreach ($results as $category) {

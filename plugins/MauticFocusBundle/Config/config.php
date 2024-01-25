@@ -32,7 +32,7 @@ return [
                 'standard_entity' => true,
                 'name'            => 'focus',
                 'path'            => '/focus',
-                'controller'      => 'MauticPlugin\MauticFocusBundle\Controller\Api\FocusApiController',
+                'controller'      => \MauticPlugin\MauticFocusBundle\Controller\Api\FocusApiController::class,
             ],
             'mautic_api_focusjs' => [
                 'path'       => '/focus/{id}/js',
@@ -59,18 +59,6 @@ return [
                 ],
             ],
         ],
-//        'repositories' => [
-//            'mautic.focus.repository' => [
-//                'class'     => \Doctrine\ORM\EntityRepository::class,
-//                'arguments' => \MauticPlugin\MauticFocusBundle\Entity\FocusRepository::class,
-//                'factory'   => ['@doctrine.orm.entity_manager', 'getRepository'],
-//            ],
-//            'mautic.focus.stat.repository' => [
-//                'class'     => \Doctrine\ORM\EntityRepository::class,
-//                'arguments' => \MauticPlugin\MauticFocusBundle\Entity\StatRepository::class,
-//                'factory'   => ['@doctrine.orm.entity_manager', 'getRepository'],
-//            ],
-//        ]
     ],
 
     'menu' => [

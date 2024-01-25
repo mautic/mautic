@@ -22,19 +22,21 @@ use Mautic\PageBundle\Entity\PageRepository;
 use Mautic\PageBundle\Model\PageModel;
 use Mautic\PageBundle\Model\RedirectModel;
 use Mautic\PageBundle\Model\TrackableModel;
-use Mautic\QueueBundle\Queue\QueueService;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 use Symfony\Bundle\FrameworkBundle\Routing\Router;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\Messenger\MessageBus;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 class PageTestAbstract extends TestCase
 {
     protected static $mockId   = 123;
+
     protected static $mockName = 'Mock test name';
+
     protected string $mockTrackingId;
 
     /**
@@ -114,8 +116,8 @@ class PageTestAbstract extends TestCase
         $hitRepository = $this->createMock(HitRepository::class);
         $userHelper    = $this->createMock(UserHelper::class);
 
-        $queueService = $this
-            ->getMockBuilder(QueueService::class)
+        $messageBus = $this
+            ->getMockBuilder(MessageBus::class)
             ->disableOriginalConstructor()
             ->getMock();
 
@@ -129,13 +131,6 @@ class PageTestAbstract extends TestCase
             ->method('getContact')
             ->willReturn($this
                 ->returnValue(['id' => self::$mockId, 'name' => self::$mockName])
-            );
-
-        $queueService->expects($this
-            ->any())
-            ->method('isQueueEnabled')
-            ->will(
-                $this->returnValue(false)
             );
 
         $entityManager->expects($this
@@ -164,7 +159,7 @@ class PageTestAbstract extends TestCase
             $leadFieldModel,
             $redirectModel,
             $trackableModel,
-            $queueService,
+            $messageBus,
             $companyModel,
             $deviceTrackerMock,
             $contactTracker,
@@ -192,7 +187,7 @@ class PageTestAbstract extends TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $mockRedirectModel = $this->getMockBuilder('Mautic\PageBundle\Model\RedirectModel')
+        $mockRedirectModel = $this->getMockBuilder(\Mautic\PageBundle\Model\RedirectModel::class)
             ->setConstructorArgs([
                 $this->createMock(EntityManagerInterface::class),
                 $this->createMock(CorePermissions::class),
@@ -204,10 +199,10 @@ class PageTestAbstract extends TestCase
                 $this->createMock(CoreParametersHelper::class),
                 $shortener,
             ])
-            ->setMethods(['createRedirectEntity', 'generateRedirectUrl'])
+            ->onlyMethods(['createRedirectEntity', 'generateRedirectUrl'])
             ->getMock();
 
-        $mockRedirect = $this->getMockBuilder('Mautic\PageBundle\Entity\Redirect')
+        $mockRedirect = $this->getMockBuilder(\Mautic\PageBundle\Entity\Redirect::class)
             ->getMock();
 
         $mockRedirectModel->expects($this->any())

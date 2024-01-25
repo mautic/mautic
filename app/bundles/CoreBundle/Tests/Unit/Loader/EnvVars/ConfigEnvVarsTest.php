@@ -30,7 +30,7 @@ class ConfigEnvVarsTest extends TestCase
         $this->envVars       = new ParameterBag();
     }
 
-    public function testGetEnvWorks()
+    public function testGetEnvWorks(): void
     {
         putenv('MAUTIC_FOOBAR=bar');
         $this->config->set('foo', 'getenv(MAUTIC_FOOBAR)');
@@ -40,7 +40,7 @@ class ConfigEnvVarsTest extends TestCase
         $this->assertEquals('bar', $this->envVars->get('MAUTIC_FOO'));
     }
 
-    public function testLocalValueIsSet()
+    public function testLocalValueIsSet(): void
     {
         $this->config->set('foo', 'bar');
 
@@ -49,7 +49,7 @@ class ConfigEnvVarsTest extends TestCase
         $this->assertEquals('bar', $this->envVars->get('MAUTIC_FOO'));
     }
 
-    public function testValueIsJsonEncodedIfArray()
+    public function testValueIsJsonEncodedIfArray(): void
     {
         $this->config->set('foo', ['bar']);
 
@@ -58,7 +58,7 @@ class ConfigEnvVarsTest extends TestCase
         $this->assertEquals('["bar"]', $this->envVars->get('MAUTIC_FOO'));
     }
 
-    public function testDefaultValueIsJsonEncodedIfArray()
+    public function testDefaultValueIsJsonEncodedIfArray(): void
     {
         $this->config->set('foo', null);
         $this->defaultConfig->set('foo', ['bar']);
