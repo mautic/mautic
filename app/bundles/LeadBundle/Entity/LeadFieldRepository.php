@@ -3,7 +3,7 @@
 namespace Mautic\LeadBundle\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\DBAL\Connection;
+use Doctrine\DBAL\ArrayParameterType;
 use Mautic\CoreBundle\Entity\CommonRepository;
 use Mautic\CoreBundle\Helper\InputHelper;
 
@@ -298,14 +298,14 @@ class LeadFieldRepository extends CommonRepository
 
                     $q->where($expr)
                         ->setParameter('lead', (int) $lead)
-                        ->setParameter('values', $values, Connection::PARAM_STR_ARRAY);
+                        ->setParameter('values', $values, ArrayParameterType::STRING);
                 }
             } else {
                 $expr = $q->expr()->and(
                     $q->expr()->eq('l.id', ':lead')
                 );
 
-                if ('neq' == $operatorExpr) {
+                if ('neq' === $operatorExpr) {
                     // include null
                     $expr = $expr->with(
                         $q->expr()->or(
