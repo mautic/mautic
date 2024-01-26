@@ -23,9 +23,8 @@ class CleanupMaintenanceCommand extends ModeratedCommand
         private TranslatorInterface $translator,
         private EventDispatcherInterface $dispatcher,
         PathsHelper $pathsHelper,
-        CoreParametersHelper $coreParametersHelper
+        private CoreParametersHelper $coreParametersHelper
     ) {
-    	$this->coreParametersHelper = $coreParametersHelper;
         parent::__construct($pathsHelper, $coreParametersHelper);
     }
 
