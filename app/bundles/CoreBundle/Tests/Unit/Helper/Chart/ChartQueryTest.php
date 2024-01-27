@@ -341,6 +341,7 @@ class ChartQueryTest extends \PHPUnit\Framework\TestCase
             ->with(32);
 
         $this->createChartQuery();
-        $this->chartQuery->prepareTimeDataQuery($table, $column, $filters);
+        $query = $this->chartQuery->prepareTimeDataQuery($table, $column, $filters);
+        $this->assertInstanceOf(QueryBuilder::class, $query);
     }
 }

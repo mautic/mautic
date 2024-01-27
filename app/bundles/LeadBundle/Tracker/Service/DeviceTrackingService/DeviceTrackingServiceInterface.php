@@ -19,7 +19,12 @@ interface DeviceTrackingServiceInterface
      */
     public function getTrackedDevice();
 
-    public function trackCurrentDevice(LeadDevice $device, bool $replaceExistingTracking = false): LeadDevice;
+    /**
+     * @param bool $replaceExistingTracking
+     *
+     * @return LeadDevice
+     */
+    public function trackCurrentDevice(LeadDevice $device, $replaceExistingTracking = false);
 
     public function clearTrackingCookies();
 }

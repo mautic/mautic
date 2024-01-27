@@ -199,8 +199,10 @@ class ChartQuery extends AbstractChart
      * @param string $table   without prefix
      * @param string $column  name. The column must be type of datetime
      * @param array  $filters will be added to where claues
+     *
+     * @return QueryBuilder
      */
-    public function prepareTimeDataQuery($table, $column, $filters = [], $countColumn = '*', $isEnumerable = true, bool $useSqlOrder = true): QueryBuilder
+    public function prepareTimeDataQuery($table, $column, $filters = [], $countColumn = '*', $isEnumerable = true, bool $useSqlOrder = true)
     {
         // Convert time unitst to the right form for current database platform
         $query = $this->connection->createQueryBuilder();

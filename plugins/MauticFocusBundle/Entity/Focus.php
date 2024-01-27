@@ -72,7 +72,7 @@ class Focus extends FormEntity
     /**
      * @var array<mixed>
      */
-    private array $properties = [];
+    private $properties = [];
 
     /**
      * @var array
@@ -395,7 +395,7 @@ class Focus extends FormEntity
      *
      * @return Focus
      */
-    public function setProperties(array $properties)
+    public function setProperties($properties)
     {
         $this->isChanged('properties', $properties);
 
