@@ -33,11 +33,26 @@ class SmsRepository extends CommonRepository
     }
 
     /**
+     * @depreacated The method is replaced by getPublishedBroadcastsIterable
+     *
      * @param numeric|null $id
      *
-     * @return iterable<Sms>|\Doctrine\ORM\Internal\Hydration\IterableResult<Sms>
+     * @return \Doctrine\ORM\Internal\Hydration\IterableResult<Sms>
      */
-    public function getPublishedBroadcasts($id = null, bool $oldImplementation = true): \Doctrine\ORM\Internal\Hydration\IterableResult|iterable
+    public function getPublishedBroadcasts($id = null): \Doctrine\ORM\Internal\Hydration\IterableResult
+    {
+        return $this->getPublishedBroadcastsQuery($id)->iterate();
+    }
+
+    /**
+     * @return iterable<Sms>
+     */
+    public function getPublishedBroadcastsIterable(?int $id = null): iterable
+    {
+        return $this->getPublishedBroadcastsQuery($id)->toIterable();
+    }
+
+    private function getPublishedBroadcastsQuery(?int $id = null): Query
     {
         $qb   = $this->createQueryBuilder($this->getTableAlias());
         $expr = $this->getPublishedByDateExpression($qb, null, true, true, false);
@@ -46,20 +61,14 @@ class SmsRepository extends CommonRepository
             $qb->expr()->eq($this->getTableAlias().'.smsType', $qb->expr()->literal('list'))
         );
 
-        if (!empty($id)) {
+        if (null !== $id && 0 !== $id) {
             $expr->add(
                 $qb->expr()->eq($this->getTableAlias().'.id', (int) $id)
             );
         }
         $qb->where($expr);
 
-        if ($oldImplementation) {
-            @\trigger_error('Use the method with second parameter false. Method will be changed in 6.0.', \E_USER_DEPRECATED);
-
-            return $qb->getQuery()->iterate();
-        }
-
-        return $qb->getQuery()->toIterable();
+        return $qb->getQuery();
     }
 
     /**

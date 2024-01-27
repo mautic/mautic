@@ -32,7 +32,7 @@ class BroadcastSubscriber implements EventSubscriberInterface
         }
 
         // Get list of published broadcasts or broadcast if there is only a single ID
-        $emails = $this->model->getRepository()->getPublishedBroadcasts($event->getId());
+        $emails = $this->model->getRepository()->getPublishedBroadcastsIterable($event->getId());
 
         foreach ($emails as $email) {
             $emailEntity                                        = $email;

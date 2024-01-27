@@ -646,11 +646,24 @@ class EmailRepository extends CommonRepository
     }
 
     /**
-     * @param int|null $id
+     * @depreacated The method is replaced by getPublishedBroadcastsIterable
      *
+     * @param int|null $id
+     */
+    public function getPublishedBroadcasts($id = null): \Doctrine\ORM\Internal\Hydration\IterableResult
+    {
+        return $this->getPublishedBroadcastsQuery($id)->iterate();
+    }
+
+    /**
      * @return iterable<Email>
      */
-    public function getPublishedBroadcasts($id = null): iterable
+    public function getPublishedBroadcastsIterable(?int $id = null): iterable
+    {
+        return $this->getPublishedBroadcastsQuery($id)->toIterable();
+    }
+
+    private function getPublishedBroadcastsQuery(?int $id = null): Query
     {
         $qb   = $this->createQueryBuilder($this->getTableAlias());
         $expr = $this->getPublishedByDateExpression($qb, null, true, true, false);
@@ -659,14 +672,14 @@ class EmailRepository extends CommonRepository
             $qb->expr()->eq($this->getTableAlias().'.emailType', $qb->expr()->literal('list'))
         );
 
-        if (!empty($id)) {
+        if (null !== $id && 0 !== $id) {
             $expr->add(
                 $qb->expr()->eq($this->getTableAlias().'.id', (int) $id)
             );
         }
         $qb->where($expr);
 
-        return $qb->getQuery()->toIterable();
+        return $qb->getQuery();
     }
 
     /**

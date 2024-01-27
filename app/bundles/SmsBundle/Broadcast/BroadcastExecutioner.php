@@ -26,7 +26,7 @@ class BroadcastExecutioner
     public function execute(ChannelBroadcastEvent $event): void
     {
         // Get list of published broadcasts or broadcast if there is only a single ID
-        $smses = $this->smsModel->getRepository()->getPublishedBroadcasts($event->getId(), false);
+        $smses = $this->smsModel->getRepository()->getPublishedBroadcastsIterable($event->getId());
         foreach ($smses as $sms) {
             $this->contactLimiter = new ContactLimiter($event->getBatch(), null, $event->getMinContactIdFilter(), $event->getMaxContactIdFilter(), [], $event->getThreadId(), $event->getMaxThreads(), $event->getLimit());
             $this->result         = new BroadcastResult();
