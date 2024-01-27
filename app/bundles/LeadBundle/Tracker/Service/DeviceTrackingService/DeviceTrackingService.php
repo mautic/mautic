@@ -55,7 +55,12 @@ final class DeviceTrackingService implements DeviceTrackingServiceInterface
         return $this->leadDeviceRepository->getByTrackingId($trackingId);
     }
 
-    public function trackCurrentDevice(LeadDevice $device, bool $replaceExistingTracking = false): LeadDevice
+    /**
+     * @param bool $replaceExistingTracking
+     *
+     * @return LeadDevice
+     */
+    public function trackCurrentDevice(LeadDevice $device, $replaceExistingTracking = false)
     {
         $trackedDevice = $this->getTrackedDevice();
         if (null !== $trackedDevice && false === $replaceExistingTracking) {

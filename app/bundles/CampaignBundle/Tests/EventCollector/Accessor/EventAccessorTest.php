@@ -3,7 +3,9 @@
 namespace Mautic\CampaignBundle\Tests\EventCollector\Accessor;
 
 use Mautic\CampaignBundle\Entity\Event;
+use Mautic\CampaignBundle\EventCollector\Accessor\Event\ActionAccessor;
 use Mautic\CampaignBundle\EventCollector\Accessor\Event\ConditionAccessor;
+use Mautic\CampaignBundle\EventCollector\Accessor\Event\DecisionAccessor;
 use Mautic\CampaignBundle\EventCollector\Accessor\EventAccessor;
 use Mautic\EmailBundle\Form\Type\EmailClickDecisionType;
 use Mautic\LeadBundle\Form\Type\CampaignEventLeadCampaignsType;
@@ -56,6 +58,7 @@ class EventAccessorTest extends \PHPUnit\Framework\TestCase
         // Actions
         $this->assertCount(1, $eventAccessor->getActions());
         $accessor = $eventAccessor->getAction('lead.scorecontactscompanies');
+        $this->assertInstanceOf(ActionAccessor::class, $accessor);
         $this->assertEquals(
             $this->events[Event::TYPE_ACTION]['lead.scorecontactscompanies']['batchEventName'],
             $accessor->getBatchEventName()
@@ -73,6 +76,7 @@ class EventAccessorTest extends \PHPUnit\Framework\TestCase
         // Decisions
         $this->assertCount(1, $eventAccessor->getDecisions());
         $accessor = $eventAccessor->getDecision('email.click');
+        $this->assertInstanceOf(DecisionAccessor::class, $accessor);
         $this->assertEquals(
             $this->events[Event::TYPE_DECISION]['email.click']['eventName'],
             $accessor->getEventName()

@@ -560,9 +560,11 @@ class Import extends FormEntity
     }
 
     /**
+     * @param \DateTimeInterface $dateStarted
+     *
      * @return Import
      */
-    public function setDateStarted(\DateTimeInterface $dateStarted)
+    public function setDateStarted($dateStarted)
     {
         $this->isChanged('dateStarted', $dateStarted);
         $this->dateStarted = $dateStarted;
@@ -570,7 +572,10 @@ class Import extends FormEntity
         return $this;
     }
 
-    public function getDateStarted(): ?\DateTimeInterface
+    /**
+     * @return \DateTimeInterface|null
+     */
+    public function getDateStarted()
     {
         return $this->dateStarted;
     }

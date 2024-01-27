@@ -26,7 +26,7 @@ class Organizer
     /**
      * @return array<int, Lead>
      */
-    public function getLeads(): array
+    public function getLeads()
     {
         return $this->leads;
     }

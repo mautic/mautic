@@ -45,9 +45,11 @@ class EventAccessor
     /**
      * @param string $key
      *
+     * @return ActionAccessor
+     *
      * @throws EventNotFoundException
      */
-    public function getAction($key): ActionAccessor
+    public function getAction($key)
     {
         if (!isset($this->actions[$key])) {
             throw new EventNotFoundException("Action $key is not valid");
@@ -91,9 +93,11 @@ class EventAccessor
     /**
      * @param string $key
      *
+     * @return DecisionAccessor
+     *
      * @throws EventNotFoundException
      */
-    public function getDecision($key): DecisionAccessor
+    public function getDecision($key)
     {
         if (!isset($this->decisions[$key])) {
             throw new EventNotFoundException("Decision $key is not valid");

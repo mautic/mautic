@@ -175,7 +175,10 @@ class ConfigEvent extends CommonEvent
         return $this->originalNormData;
     }
 
-    public function setOriginalNormData(array $normData): ConfigEvent
+    /**
+     * @return ConfigEvent
+     */
+    public function setOriginalNormData(array $normData)
     {
         $this->originalNormData = $normData;
 
