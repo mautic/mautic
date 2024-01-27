@@ -42,6 +42,19 @@ class ConfigThemeType extends AbstractType
                 ]
             )->addViewTransformer(new ArrayStringTransformer())
         );
+
+        $builder->add(
+            'theme_email_default',
+            ThemeListType::class,
+            [
+                'label' => 'mautic.core.config.form.theme_email',
+                'attr'  => [
+                    'class'   => 'form-control',
+                    'tooltip' => 'mautic.core.config.form.theme_email.tooltip',
+                ],
+                'feature' => 'email',
+            ]
+        );
     }
 
     public function getBlockPrefix()
