@@ -6011,7 +6011,11 @@
             "dist": {
                 "type": "path",
                 "url": "app",
+<<<<<<< HEAD
                 "reference": "ff04262752d9b0a30c80be568ceeb5a585fc3cda"
+=======
+                "reference": "5d076ac8de44cbac09d23cd025a21257bc2b201e"
+>>>>>>> c898f59bc8 (bump jms/serializer-bundle dependency and ensure compatibility)
             },
             "require": {
                 "aws/aws-sdk-php": "~3.0",
