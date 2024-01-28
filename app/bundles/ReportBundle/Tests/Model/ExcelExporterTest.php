@@ -6,6 +6,7 @@ namespace Mautic\ReportBundle\Tests\Model;
 
 use Mautic\CoreBundle\Templating\Helper\DateHelper;
 use Mautic\CoreBundle\Templating\Helper\FormatterHelper;
+use Mautic\ReportBundle\Crate\ReportDataResult;
 use Mautic\ReportBundle\Model\ExcelExporter;
 use Mautic\ReportBundle\Tests\Fixtures;
 use PhpOffice\PhpSpreadsheet\IOFactory;
@@ -24,7 +25,7 @@ class ExcelExporterTest extends TestCase
         $excelExporter    = new ExcelExporter($formatterHelper);
 
         $tmpFile = tempnam(sys_get_temp_dir(), 'mautic_xlsx_export_test_');
-        $excelExporter->export($reportDataResult, 'mautic_xlsx_export_test', $tmpFile);
+        $excelExporter->export(new ReportDataResult($reportDataResult), 'mautic_xlsx_export_test', $tmpFile);
 
         /** @var Xlsx $objReader */
         $objReader   = IOFactory::createReader('Xlsx');

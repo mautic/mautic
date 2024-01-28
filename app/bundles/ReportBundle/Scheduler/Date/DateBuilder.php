@@ -29,9 +29,9 @@ class DateBuilder
      *
      * @return array
      */
-    public function getPreviewDays($isScheduled, $scheduleUnit, $scheduleDay, $scheduleMonthFrequency)
+    public function getPreviewDays($isScheduled, $scheduleUnit, $scheduleDay, $scheduleMonthFrequency, string $scheduleTimeZone, string $scheduleTime)
     {
-        $entity = new SchedulerEntity($isScheduled, $scheduleUnit, $scheduleDay, $scheduleMonthFrequency);
+        $entity = new SchedulerEntity($isScheduled, $scheduleUnit, $scheduleDay, $scheduleMonthFrequency, $scheduleTimeZone, $scheduleTime);
         $count  = $entity->isScheduledNow() ? 1 : 10;
 
         try {

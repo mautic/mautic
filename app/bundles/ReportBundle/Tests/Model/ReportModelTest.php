@@ -5,6 +5,7 @@ namespace Mautic\ReportBundle\Tests\Model;
 use Mautic\ChannelBundle\Helper\ChannelListHelper;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\TemplatingHelper;
+use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\LeadBundle\Model\FieldModel;
 use Mautic\ReportBundle\Event\ReportBuilderEvent;
 use Mautic\ReportBundle\Helper\ReportHelper;
@@ -34,7 +35,8 @@ class ReportModelTest extends \PHPUnit\Framework\TestCase
             $fieldModelMock,
             $this->createMock(ReportHelper::class),
             $this->createMock(CsvExporter::class),
-            $this->createMock(ExcelExporter::class)
+            $this->createMock(ExcelExporter::class),
+            $this->createMock(UserHelper::class)
         );
 
         $mockDispatcher = $this->createMock(EventDispatcher::class);

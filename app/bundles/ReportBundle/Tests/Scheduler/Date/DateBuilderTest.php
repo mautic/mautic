@@ -93,7 +93,7 @@ class DateBuilderTest extends \PHPUnit\Framework\TestCase
             ->with($this->isInstanceOf(SchedulerEntity::class), 1)
             ->willReturn([]);
 
-        $this->dateBuilder->getPreviewDays(true, SchedulerEnum::UNIT_NOW, '', '');
+        $this->dateBuilder->getPreviewDays(true, SchedulerEnum::UNIT_NOW, '', '', 'UTC', '00:00');
     }
 
     public function testGetPreviewDaysForMonths(): void
@@ -103,6 +103,6 @@ class DateBuilderTest extends \PHPUnit\Framework\TestCase
             ->with($this->isInstanceOf(SchedulerEntity::class), 10)
             ->willReturn([]);
 
-        $this->dateBuilder->getPreviewDays(true, SchedulerEnum::UNIT_MONTHLY, 'MON', '1');
+        $this->dateBuilder->getPreviewDays(true, SchedulerEnum::UNIT_MONTHLY, 'MON', '1', 'UTC', '00:00');
     }
 }

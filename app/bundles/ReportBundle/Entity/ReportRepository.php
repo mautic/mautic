@@ -140,4 +140,15 @@ class ReportRepository extends CommonRepository
 
         return $qb->execute()->fetchAll();
     }
+
+    public function saveEntity($entity, $flush = true)
+    {
+        // Ensure default value
+        /** @var Report $entity */
+        if (empty($entity->getScheduleTimezone())) {
+            $entity->setScheduleTimezone('UTC');
+        }
+
+        return parent::saveEntity($entity, $flush);
+    }
 }

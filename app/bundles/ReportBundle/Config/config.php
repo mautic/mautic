@@ -32,13 +32,18 @@ return [
                 ],
             ],
             'mautic_report_schedule_preview' => [
-                'path'       => '/reports/schedule/preview/{isScheduled}/{scheduleUnit}/{scheduleDay}/{scheduleMonthFrequency}',
+                'path'       => '/reports/schedule/preview/{isScheduled}/{scheduleUnit}/{scheduleDay}/{scheduleMonthFrequency}/{scheduleTime}/{scheduleTimeZone}',
                 'controller' => 'MauticReportBundle:Schedule:index',
                 'defaults'   => [
                     'isScheduled'            => 0,
                     'scheduleUnit'           => '',
                     'scheduleDay'            => '',
                     'scheduleMonthFrequency' => '',
+                    'scheduleTime'           => '00:00',
+                    'scheduleTimeZone'       => 'UTC',
+                ],
+                'requirements' => [
+                    'scheduleTimeZone' => '.+',
                 ],
             ],
             'mautic_report_schedule' => [
@@ -172,6 +177,7 @@ return [
                     'mautic.report.helper.report',
                     'mautic.report.model.csv_exporter',
                     'mautic.report.model.excel_exporter',
+                    'mautic.helper.user',
                 ],
             ],
             'mautic.report.model.csv_exporter' => [
@@ -268,6 +274,7 @@ return [
                 'class'     => \Mautic\ReportBundle\Model\ReportFileWriter::class,
                 'arguments' => [
                     'mautic.report.model.csv_exporter',
+                    'mautic.report.model.excel_exporter',
                     'mautic.report.model.export_handler',
                 ],
             ],
