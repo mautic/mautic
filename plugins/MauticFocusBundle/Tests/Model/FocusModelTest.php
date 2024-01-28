@@ -97,7 +97,7 @@ class FocusModelTest extends TestCase
         $focusModel->getContent($focus);
     }
 
-    public function focusTypeProvider(): iterable
+    public function focusTypeProvider(): \Generator
     {
         yield ['form', self::once()];
         yield ['notice', self::never()];

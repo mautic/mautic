@@ -125,7 +125,7 @@ class CampaignSubscriberFunctionalTest extends MauticMysqlTestCase
         Assert::assertSame($result, $event->getResult());
     }
 
-    public static function valueProvider(): iterable
+    public static function valueProvider(): \Generator
     {
         yield [
             'test & test',
