@@ -1,5 +1,3 @@
-const { mq } = require("modernizr");
-
 //LeadBundle
 Mautic.companyOnLoad = function (container, response) {
 
