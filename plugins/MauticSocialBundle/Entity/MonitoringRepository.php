@@ -36,7 +36,7 @@ class MonitoringRepository extends CommonRepository
         $q->where($expr);
         $args['qb'] = $q;
 
-        return parent::getEntities($args)->count();
+        return count(parent::getEntities($args));
     }
 
     /**
