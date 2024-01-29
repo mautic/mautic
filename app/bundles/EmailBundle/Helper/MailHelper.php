@@ -21,6 +21,7 @@ use Mautic\EmailBundle\Mailer\Message\MauticMessage;
 use Mautic\EmailBundle\Mailer\Transport\TokenTransportInterface;
 use Mautic\EmailBundle\MonitoredEmail\Mailbox;
 use Mautic\LeadBundle\Entity\Lead;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Mailer\Exception\TransportExceptionInterface;
 use Symfony\Component\Mailer\MailerInterface;
@@ -47,6 +48,9 @@ class MailHelper
 
     public const EMAIL_TYPE_MARKETING     = 'marketing';
 
+    /**
+     * @var TransportInterface
+     */
     protected $transport;
 
     /**
@@ -55,13 +59,6 @@ class MailHelper
     protected $twig;
 
     protected ?EventDispatcherInterface $dispatcher = null;
-
-    /**
-     * @var \Swift_Plugins_Loggers_ArrayLogger
-     */
-    protected $logger;
-
-    private FromEmailHelper $fromEmailHelper;
 
     /**
      * @var bool|MauticMessage
@@ -228,16 +225,17 @@ class MailHelper
         private FromEmailHelper $fromEmailHelper,
         private CoreParametersHelper $coreParametersHelper,
         private Mailbox $mailbox,
+        private LoggerInterface $logger,
     ) {
         $this->transport  = $this->getTransport();
-        $this->returnPath = $factory->getParameter('mailer_return_path');
+        $this->returnPath = $coreParametersHelper->get('mailer_return_path');
 
-        $systemFromEmail    = $factory->getParameter('mailer_from_email');
-        $systemReplyToEmail = $factory->getParameter('mailer_reply_to_email');
+        $systemFromEmail    = (string) $coreParametersHelper->get('mailer_from_email');
+        $systemReplyToEmail = $coreParametersHelper->get('mailer_reply_to_email');
         $systemFromName     = $this->cleanName(
-            $factory->getParameter('mailer_from_name')
+            $coreParametersHelper->get('mailer_from_name')
         );
-        $this->setDefaultFrom($from, [$systemFromEmail => $systemFromName]);
+        $this->setDefaultFrom(false, new AddressDTO($systemFromEmail, $systemFromName));
         $this->setDefaultReplyTo($systemReplyToEmail, $this->from);
 
         // Check if batching is supported by the transport
@@ -510,9 +508,7 @@ class MailHelper
 
                 $email = $this->getEmail();
 
-                if (!$this->useGlobalFrom) {
-                    $this->setFrom($metadatum['from'], null, null);
-                } else if ($email && $email->getUseOwnerAsMailer()) {
+                if ($email && $email->getUseOwnerAsMailer()) {
                     $this->setFrom($metadatum['from']->getEmail(), $metadatum['from']->getName());
                     $this->setMessageFrom(new AddressDTO($metadatum['from']->getEmail(), $metadatum['from']->getName()));
                 } else {
@@ -1024,7 +1020,7 @@ class MailHelper
      */
     protected function checkBatchMaxRecipients($toBeAdded = 1, $type = 'to')
     {
-        if ($this->queueEnabled) {
+        if ($this->queueEnabled && $this->transport instanceof TokenTransportInterface) {
             // Check if max batching has been hit
             $maxAllowed = $this->transport->getMaxBatchLimit();
 
@@ -1480,7 +1476,7 @@ class MailHelper
 
         $this->errors[] = $errorMessage;
 
-        $this->factory->getLogger()->log('error', '[MAIL ERROR] '.$error, $exceptionContext);
+        $this->logger->log('error', '[MAIL ERROR] '.$error, $exceptionContext);
     }
 
     /**
@@ -1511,8 +1507,6 @@ class MailHelper
     }
 
     /**
-     * Return transport.
-     *
      * @return TransportInterface
      */
     public function getTransport()
@@ -1658,7 +1652,7 @@ class MailHelper
         if (null !== $this->lead) {
             try {
                 $stat->setLead($this->factory->getEntityManager()->getReference(Lead::class, $this->lead['id']));
-            } catch (ORMException $exception) {
+            } catch (ORMException) {
                 // keep IDE happy
             }
             $emailAddress = $this->lead['email'];
@@ -1913,7 +1907,7 @@ class MailHelper
         }
     }
 
-    private function setDefaultFrom($overrideFrom, array $systemFrom): void
+    private function setDefaultFrom($overrideFrom, AddressDTO $systemFrom): void
     {
         if (is_array($overrideFrom)) {
             $fromEmail    = key($overrideFrom);
@@ -1925,8 +1919,17 @@ class MailHelper
 
         $this->systemFrom = $overrideFrom ?: $systemFrom;
         $this->from       = $this->systemFrom;
+    }
 
-        $this->fromEmailHelper->setDefaultFromArray($this->systemFrom);
+    private function setDefaultReplyTo($systemReplyToEmail = null, AddressDTO $systemFromEmail = null): void
+    {
+        $fromEmail = null;
+        if ($systemFromEmail) {
+            $fromEmail = $systemFromEmail->getEmail();
+        }
+
+        $this->systemReplyTo = $systemReplyToEmail ?: $fromEmail;
+        $this->replyTo       = $this->systemReplyTo;
     }
 
     private function setFromForSingleMessage(): void
@@ -2008,7 +2011,7 @@ class MailHelper
 
         try {
             return $this->fromEmailHelper->getContactOwner($contact['owner_id']);
-        } catch (OwnerNotFoundException $exception) {
+        } catch (OwnerNotFoundException) {
             return false;
         }
     }
@@ -2018,7 +2021,7 @@ class MailHelper
      *
      * @deprecated; use FromEmailHelper::getUserSignature
      */
-    protected function getContactOwnerSignature($owner)
+    protected function getContactOwnerSignature($owner): string
     {
         if (empty($owner['id'])) {
             return '';
@@ -2026,7 +2029,7 @@ class MailHelper
 
         try {
             $this->fromEmailHelper->getContactOwner($owner['id']);
-        } catch (OwnerNotFoundException $exception) {
+        } catch (OwnerNotFoundException) {
             return '';
         }
 
@@ -2060,7 +2063,7 @@ class MailHelper
 
     private function getSystemFrom(): AddressDTO
     {
-        if (!$this->systemFrom) {
+        if (!$this->systemFrom || $this->systemFrom->isEmpty()) {
             $this->systemFrom = new AddressDTO($this->coreParametersHelper->get('mailer_from_email'), $this->coreParametersHelper->get('mailer_from_name'));
             $this->fromEmailHelper->setDefaultFrom($this->systemFrom);
         }

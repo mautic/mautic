@@ -23,6 +23,7 @@ use Mautic\EmailBundle\Tests\Helper\Transport\BatchTransport;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Model\DoNotContact;
 use PHPUnit\Framework\MockObject\MockObject;
+use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\Mailer\Mailer;
@@ -620,13 +621,7 @@ class SendEmailToContactTest extends \PHPUnit\Framework\TestCase
         $routerMock = $this->createMock(Router::class);
         $factoryMock->method('getRouter')->willReturn($routerMock);
 
-        $fromEmaiHelper = $this->createMock(FromEmailHelper::class);
-        $fromEmaiHelper->method('getFromAddressArrayConsideringOwner')
-            ->willReturn(['someone@somewhere.com' => null]);
-        $factoryMock->method('get')
-            ->with('mautic.helper.from_email_helper')
-            ->willReturn($fromEmaiHelper);
-
+        /** @var MockObject&MailHelper $mailHelper */
         $mailHelper = $this->getMockBuilder(MailHelper::class)
             ->setConstructorArgs([$factoryMock, $mailer, $this->fromEmaiHelper, $this->coreParametersHelper, $this->mailbox])
             ->onlyMethods(['createEmailStat'])
@@ -717,6 +712,9 @@ class SendEmailToContactTest extends \PHPUnit\Framework\TestCase
         /** @var MockObject&Mailbox $mailbox */
         $mailbox = $this->createMock(Mailbox::class);
 
+        /** @var MockObject&LoggerInterface $logger */
+        $logger = $this->createMock(LoggerInterface::class);
+
         $coreParametersHelper->method('get')
             ->willReturnMap(
                 [
@@ -726,7 +724,7 @@ class SendEmailToContactTest extends \PHPUnit\Framework\TestCase
             );
 
         $mailer         = new Mailer(new BatchTransport());
-        $mailHelper     = new MailHelper($mockFactory, $mailer, $fromEmailHelper, $coreParametersHelper, $mailbox);
+        $mailHelper     = new MailHelper($mockFactory, $mailer, $fromEmailHelper, $coreParametersHelper, $mailbox, $logger);
         $statRepository = $this->createMock(StatRepository::class);
         $dncModel       = $this->createMock(DoNotContact::class);
         $translator     = $this->createMock(Translator::class);

@@ -40,6 +40,11 @@ final class AddressDTO
         return $this->name;
     }
 
+    public function isEmpty(): bool
+    {
+        return empty($this->email);
+    }
+
     /**
      * @param array<string,mixed> $contact
      *

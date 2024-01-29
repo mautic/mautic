@@ -1174,7 +1174,7 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
     private static function getTokenOrEmailConstraint(string $field): Callback
     {
         return new Callback([
-            'callback' => function ($value, ExecutionContextInterface $context) use ($field) {
+            'callback' => function ($value, ExecutionContextInterface $context) use ($field): void {
                 if ($value && preg_match('/{contactfield=(.*?)}/', $value)) {
                     return;
                 }

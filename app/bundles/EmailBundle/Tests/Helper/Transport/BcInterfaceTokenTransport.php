@@ -23,8 +23,8 @@ class BcInterfaceTokenTransport implements TransportInterface
 
     /**
      * @var string[]
-     */
-    private $metadatas = [];
+     */    
+    private $fromNames = [];
 
     private $numberToFail;
 
