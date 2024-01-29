@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Mautic\WebhookBundle\Tests\Functional;
+namespace Mautic\WebhookBundle\Tests\Functional\Command;
 
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\WebhookBundle\Command\DeleteWebhookLogsCommand;
@@ -12,7 +12,7 @@ use Mautic\WebhookBundle\Entity\Webhook;
 use Mautic\WebhookBundle\Model\WebhookModel;
 use PHPUnit\Framework\Assert;
 
-final class RemoveOldLogTest extends MauticMysqlTestCase
+final class DeleteWebhookLogsCommandTest extends MauticMysqlTestCase
 {
     /**
      * @var WebhookModel
@@ -75,8 +75,8 @@ final class RemoveOldLogTest extends MauticMysqlTestCase
             array_push($logIds, $addedLog->getId());
         }
 
-        $output = $this->runCommand(DeleteWebhookLogsCommand::COMMAND_NAME);
-        Assert::assertStringContainsString('2 logs deleted successfully for webhook id - '.$webhook->getId(), $output);
+        $output = $this->testSymfonyCommand(DeleteWebhookLogsCommand::COMMAND_NAME);
+        Assert::assertStringContainsString('2 logs deleted successfully for webhook id - '.$webhook->getId(), $output->getDisplay());
         array_shift($logIds);
         array_shift($logIds);
         $this->assertLogs($webhook, 5, $logIds);
@@ -84,16 +84,16 @@ final class RemoveOldLogTest extends MauticMysqlTestCase
 
     public function testRemoveLogCommandForNoWebhook(): void
     {
-        $output = $this->runCommand(DeleteWebhookLogsCommand::COMMAND_NAME);
-        Assert::assertStringContainsString('There is 0 webhooks with logs more than defined limit.', $output);
+        $output = $this->testSymfonyCommand(DeleteWebhookLogsCommand::COMMAND_NAME);
+        Assert::assertStringContainsString('There is 0 webhooks with logs more than defined limit.', $output->getDisplay());
     }
 
     /**
-     * @param array<int> $expectedIds
+     * @param int[] $expectedIds
      */
     private function assertLogs(Webhook $webhook, int $expectedCount, array $expectedIds): void
     {
-        $logs   = $this->em->getRepository(Log::class)->findBy(['webhook'=>$webhook]);
+        $logs   = $this->em->getRepository(Log::class)->findBy(['webhook' => $webhook]);
         $logIds = array_map(fn (Log $log) => $log->getId(), $logs);
 
         Assert::assertCount($expectedCount, $logs);

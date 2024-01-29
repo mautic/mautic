@@ -59,6 +59,7 @@ class PublicControllerFunctionalTest extends MauticMysqlTestCase
         $this->em->flush();
 
         $crawler = $this->client->request('GET', '/email/unsubscribe/'.$stat->getTrackingHash());
+        $this->assertEquals(200, $this->client->getResponse()->getStatusCode(), var_export($this->client->getResponse()->getContent(), true));
 
         self::assertStringContainsString('form/submit?formId='.$stat->getEmail()->getUnsubscribeForm()->getId(), $crawler->filter('form')->eq(0)->attr('action'));
         $this->assertTrue($this->client->getResponse()->isOk());

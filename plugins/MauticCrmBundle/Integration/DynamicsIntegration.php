@@ -513,7 +513,7 @@ class DynamicsIntegration extends CrmAbstractIntegration
 
         $result = [];
         if (isset($data['value'])) {
-            $this->em->getConnection()->getConfiguration()->setSQLLogger(null);
+            $this->em->getConnection()->getConfiguration()->setMiddlewares([]);
             $entity = null;
             /** @var IntegrationEntityRepository $integrationEntityRepo */
             $integrationEntityRepo = $this->em->getRepository(\Mautic\PluginBundle\Entity\IntegrationEntity::class);
