@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace MauticPlugin\MauticFocusBundle\Tests\Helper;
+namespace MauticPlugin\MauticFocusBundle\Tests\Model;
 
 use Doctrine\ORM\EntityManagerInterface;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
@@ -97,7 +97,7 @@ class FocusModelTest extends TestCase
         $focusModel->getContent($focus);
     }
 
-    public function focusTypeProvider(): iterable
+    public function focusTypeProvider(): \Generator
     {
         yield ['form', self::once()];
         yield ['notice', self::never()];
