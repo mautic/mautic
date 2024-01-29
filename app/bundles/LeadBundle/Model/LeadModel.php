@@ -2234,4 +2234,16 @@ class LeadModel extends FormModel
 
         return $statRepository->getStatsSummaryForContacts([$lead->getId()])[$lead->getId()];
     }
+
+    public function removeTagFromLead(int $leadId, int $tagId): void
+    {
+        /** @var \Mautic\LeadBundle\Entity\Lead $lead */
+        $lead = $this->getEntity($leadId);
+        $tag  = $this->getTagRepository()->find($tagId);
+
+        if ($lead && $tag) {
+            $lead->removeTag($tag);
+            $this->saveEntity($lead);
+        }
+    }
 }

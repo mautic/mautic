@@ -894,4 +894,23 @@ class AjaxController extends CommonAjaxController
             'leadCount' => $leadCount,
         ];
     }
+
+    public function removeTagFromLeadAction(Request $request): JsonResponse
+    {
+        $dataArray = ['success' => 0];
+        $leadId    = (int) $request->request->get('leadId');
+        $tagId     = (int) $request->request->get('tagId');
+
+        if (!empty($leadId) && !empty($tagId)) {
+            /** @var \Mautic\LeadBundle\Model\LeadModel $leadModel */
+            $leadModel = $this->getModel('lead.lead');
+            \assert($leadModel instanceof LeadModel);
+
+            $leadModel->removeTagFromLead($leadId, $tagId);
+
+            $dataArray['success'] = 1;
+        }
+
+        return $this->sendJsonResponse($dataArray);
+    }
 }

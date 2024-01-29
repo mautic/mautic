@@ -1,3 +1,5 @@
+const { mq } = require("modernizr");
+
 //LeadBundle
 Mautic.companyOnLoad = function (container, response) {
 
@@ -1149,6 +1151,17 @@ Mautic.removeBounceStatus = function (el, dncId, channel) {
     });
 };
 
+Mautic.removeTagFromLead = function (el, leadId, tagId) {
+    console.log('Tag removed from lead');
+    mQuery(el).removeClass('fa-times').addClass('fa-spinner fa-spin');
+
+    Mautic.ajaxActionRequest('lead:removeTagFromLead', {'leadId': leadId, 'tagId': tagId}, function() {
+        mQuery('#tagLabel' + tagId).fadeOut(300, function() { mQuery(this).remove(); });
+    });
+
+};
+
+
 Mautic.toggleLiveLeadListUpdate = function () {
     if (typeof MauticVars.moderatedIntervals['leadListLiveUpdate'] == 'undefined') {
         Mautic.setModeratedInterval('leadListLiveUpdate', 'updateLeadList', 5000);
@@ -1539,7 +1552,7 @@ Mautic.listOnLoad = function(container, response) {
     const segmentDependenciesTab = mQuery('a#segment-dependencies');
     let segmentDependenciesLoaded = false;
     let jsPlumbData = null;
-    
+
     if (segmentDependenciesTab.length) {
         mQuery(document).on('shown.bs.tab', 'a[data-toggle="tab"]', function (e) {
             if (!mQuery(e.target).attr('id') === 'segment-dependencies') {

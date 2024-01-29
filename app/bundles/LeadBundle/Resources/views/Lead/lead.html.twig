@@ -489,13 +489,16 @@
         {% endif %}
         <div class="pa-sm">
             {% for tag in lead.tags %}
-                <h5 class="pull-left mt-xs mr-xs">
-                    <span class="label label-success label-tag">
-                        <a href="{{ path('mautic_tagmanager_action', {'objectAction': 'view', 'objectId': tag.id}) }}" data-toggle="ajax" style="color: white;">
-                             {{ tag.tag|purify }}
-                        </a>
-                    </span>
-                </h5>
+                <div id="tagLabel{{ tag.id }}">
+                    <h5 class="pull-left mt-xs mr-xs">
+                        <span class="label label-success label-tag">
+                            <a href="{{ path('mautic_tagmanager_action', {'objectAction': 'view', 'objectId': tag.id}) }}" data-toggle="ajax" style="color: white;">
+                                {{ tag.tag|purify }}
+                            </a>
+                            <i class="fa fa-times has-click-event" onclick="Mautic.removeTagFromLead(this, {{ lead.id }}, {{ tag.id }});"></i>
+                        </span>
+                    </h5>
+                </div>
             {% endfor %}
             <div class="clearfix"></div>
         </div>
@@ -536,4 +539,14 @@
     <!--/ right section -->
 </div>
 <!--/ end: box layout -->
+<script>
+    Mautic.removeTagFromLead = function (el, leadId, tagId) {
+    console.log('Tag removed from lead');
+    mQuery(el).removeClass('fa-times').addClass('fa-spinner fa-spin');
+
+    Mautic.ajaxActionRequest('lead:removeTagFromLead', {'leadId': leadId, 'tagId': tagId}, function() {
+        mQuery('#tagLabel' + tagId).fadeOut(300, function() { mQuery(this).remove(); });
+    });
+};
+</script>
 {% endblock %}
