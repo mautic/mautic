@@ -149,4 +149,39 @@ class FieldChangeRepository extends CommonRepository
 
         return $qb->executeQuery()->fetchAllAssociative();
     }
+
+    public function deleteOrphanLeadChanges(): int
+    {
+        $qb = $this->getEntityManager()->getConnection()->createQueryBuilder();
+
+        $qb->select('f.id')
+        ->from(MAUTIC_TABLE_PREFIX.'sync_object_field_change_report', 'f')
+            ->leftJoin('f', MAUTIC_TABLE_PREFIX.'leads', 'l', 'l.id = f.object_id')
+            ->where(
+                $qb->expr()->and(
+                    $qb->expr()->eq('object_type', ':objectType'),
+                    $qb->expr()->isNull('l.id')
+                )
+            )
+            ->setParameter('objectType', Lead::class);
+
+        $results = $qb->execute()->fetchAllAssociative();
+
+        $objectIds = [];
+        foreach ($results as $result) {
+            $objectIds[] = (int) $result['id'];
+        }
+
+        if (!$objectIds) {
+            return 0;
+        }
+
+        $qb2 = $this->getEntityManager()->getConnection()->createQueryBuilder();
+        $qb2->delete(MAUTIC_TABLE_PREFIX.'sync_object_field_change_report')
+            ->where(
+                $qb2->expr()->in('id', $objectIds)
+            );
+
+        return $qb2->execute();
+    }
 }
