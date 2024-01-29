@@ -15,7 +15,7 @@
     "errorRecovery": true
   },
   "scripts": {
-    "build": "parcel build Assets/library/js/builder.js --dist-dir Assets/library/js/dist --public-url ./",
+    "build": "parcel build Assets/library/js/builder.js --dist-dir Assets/library/js/dist --public-url ./ --no-source-maps",
     "build-dev": "NODE_ENV=development parcel build Assets/library/js/builder.js --dist-dir Assets/library/js/dist --public-url ./ --no-optimize",
     "remove-build": "rm -rf ./Assets/library/js/dist/* && rm -rf .parcel-cache/*",
     "dev": "NODE_ENV=development parcel watch Assets/library/js/* --dist-dir Assets/library/js/dist --public-url /plugins/GrapesJsBuilderBundle/Assets/library/js/dist --hmr-hostname localhost",
