@@ -13,7 +13,7 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class ContactSegmentFilterFactory
 {
-    public const CUSTOM_OPERATOR = 'custom_operator';
+    public const CUSTOM_OPERATOR             = 'custom_operator';
     private $operatorsWithEmptyValuesAllowed = ['empty', '!empty', self::CUSTOM_OPERATOR];
 
     public function __construct(
@@ -22,9 +22,6 @@ class ContactSegmentFilterFactory
         private DecoratorFactory $decoratorFactory,
         private EventDispatcherInterface $eventDispatcher
     ) {
-        $this->schemaCache      = $schemaCache;
-        $this->container        = $container;
-        $this->decoratorFactory = $decoratorFactory;
     }
 
     /**
