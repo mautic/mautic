@@ -2,6 +2,13 @@ import grapesjs from 'grapesjs';
 import grapesjsmjml from 'grapesjs-mjml';
 import grapesjsnewsletter from 'grapesjs-preset-newsletter';
 import grapesjswebpage from 'grapesjs-preset-webpage';
+import grapesjsblocksbasic from 'grapesjs-blocks-basic';
+import grapesjscomponentcountdown from 'grapesjs-component-countdown';
+import grapesjsnavbar from 'grapesjs-navbar';
+import grapesjscustomcode from 'grapesjs-custom-code';
+import grapesjstouch from 'grapesjs-touch';
+import grapesjstuiimageeditor from 'grapesjs-tui-image-editor';
+import grapesjsstylebg from 'grapesjs-style-bg';
 import grapesjspostcss from 'grapesjs-parser-postcss';
 import contentService from 'grapesjs-preset-mautic/dist/content.service';
 import grapesjsmautic from 'grapesjs-preset-mautic';
@@ -154,15 +161,33 @@ export default class BuilderService {
       styleManager: {
         clearProperties: true, // Temp fix https://github.com/artf/grapesjs-preset-webpage/issues/27
       },
-      plugins: [grapesjswebpage, grapesjspostcss, grapesjsmautic, 'gjs-plugin-ckeditor5'],
+      plugins: [
+        // partially copied from: https://github.com/GrapesJS/grapesjs/blob/gh-pages/demo.html
+        grapesjswebpage,
+        grapesjspostcss,
+        grapesjsmautic,
+        'gjs-plugin-ckeditor5',
+        grapesjsblocksbasic,
+        grapesjscomponentcountdown,
+        grapesjsnavbar,
+        grapesjscustomcode,
+        grapesjstouch,
+        grapesjspostcss,
+        grapesjstuiimageeditor,
+        grapesjsstylebg,
+      ],
       pluginsOpts: {
         [grapesjswebpage]: {
           formsOpts: false,
+          useCustomTheme: false,
         },
         grapesjsmautic: BuilderService.getMauticConf('page-html'),
         'gjs-plugin-ckeditor5': BuilderService.getCkeConf('page:getBuilderTokens'),
+        
       },
     });
+
+    this.moveBlocksPage();
 
     return this.editor;
   }
@@ -177,6 +202,11 @@ export default class BuilderService {
     ];
 
     this.editor = grapesjs.init({
+      selectorManager: {
+        componentFirst: true,
+      },
+      avoidInlineStyle: false, // TEMP: fixes issue with disappearing inline styles
+      forceClass: false, // create new styles if there are some already on the element: https://github.com/GrapesJS/grapesjs/issues/1531
       clearOnRender: true,
       container: '.builder-panel',
       components,
@@ -184,11 +214,19 @@ export default class BuilderService {
       canvas: {
         styles,
       },
+      domComponents: {
+        // disable all except link components
+        disableTextInnerChilds: (child) => !child.is('link'), // https://github.com/GrapesJS/grapesjs/releases/tag/v0.21.2
+      },
       storageManager: false,
       assetManager: this.getAssetManagerConf(),
       plugins: [grapesjsmjml, grapesjspostcss, grapesjsmautic, 'gjs-plugin-ckeditor5'],
       pluginsOpts: {
-        grapesjsmjml: {},
+        [grapesjsmjml]: {
+          hideSelector: false,
+          custom: false,
+          useCustomTheme: false,
+        },
         grapesjsmautic: BuilderService.getMauticConf('email-mjml'),
         'gjs-plugin-ckeditor5': BuilderService.getCkeConf('email:getBuilderTokens'),
       },
@@ -224,7 +262,9 @@ export default class BuilderService {
       assetManager: this.getAssetManagerConf(),
       plugins: [grapesjsnewsletter, grapesjspostcss, grapesjsmautic, 'gjs-plugin-ckeditor5'],
       pluginsOpts: {
-        grapesjsnewsletter: {},
+        grapesjsnewsletter: {
+          useCustomTheme: false,
+        },
         grapesjsmautic: BuilderService.getMauticConf('email-html'),
         'gjs-plugin-ckeditor5': BuilderService.getCkeConf('email:getBuilderTokens'),
       },
@@ -284,6 +324,7 @@ export default class BuilderService {
     return this.editor;
   }
 
+  // https://github.com/artf/grapesjs-mjml/issues/193
   overrideCustomRteDisable() {
     const richTextEditor = this.editor.RichTextEditor;
 
@@ -305,6 +346,30 @@ export default class BuilderService {
       };
     }
   }
+
+  /**
+   * Move the blocks and categories in the sidebar
+   */
+  moveBlocksPage() {
+    const blocks = this.editor.BlockManager.getAll();
+    blocks.map(block => {
+      // columns go into a new category, at the top
+      if(block.attributes.id.indexOf('column') !== -1) {
+        this.editor.BlockManager.get(block.attributes.id).set('category', {
+          label:"Sections",
+          order: -1
+        });
+      }
+      // 'Blocks' category goes after 'Basic'
+      if(block.attributes.category === 'Basic') {
+        this.editor.BlockManager.get(block.attributes.id).set('category', {
+          label:"Basic",
+          order: -1
+        });
+      }
+    });
+  }
+
   /**
    * Generate assets list from GrapesJs
    */
