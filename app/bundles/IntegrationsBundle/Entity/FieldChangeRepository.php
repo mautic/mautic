@@ -7,6 +7,7 @@ namespace Mautic\IntegrationsBundle\Entity;
 use Doctrine\DBAL\ArrayParameterType;
 use Doctrine\DBAL\Query\Expression\CompositeExpression;
 use Mautic\CoreBundle\Entity\CommonRepository;
+use Mautic\LeadBundle\Entity\Lead;
 
 /**
  * @extends CommonRepository<FieldChange>
@@ -77,8 +78,11 @@ class FieldChangeRepository extends CommonRepository
                     $qb->expr()->eq('f.object_type', ':objectType'),
                     $qb->expr()->lte('f.modified_at', ':toDateTime')
                 )
-            )
-            ->setParameter('integration', $integration)
+            );
+        if (Lead::class === $objectType) {
+            $qb->join('f', MAUTIC_TABLE_PREFIX.'leads', 'l', 'l.id = f.object_id');
+        }
+        $qb->setParameter('integration', $integration)
             ->setParameter('objectType', $objectType)
             ->setParameter('toDateTime', $toDateTime->format('Y-m-d H:i:s'))
             ->orderBy('f.object_id')
@@ -102,7 +106,7 @@ class FieldChangeRepository extends CommonRepository
             return [];
         }
 
-        // Get all the field changes for the requested objects objects
+        // Get all the field changes for the requested objects
         $qb
             ->resetQueryParts()
             ->select('*')
