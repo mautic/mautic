@@ -232,15 +232,12 @@ abstract class MauticMysqlTestCase extends AbstractMauticTestCase
         $this->databaseInstalled = true;
     }
 
-    /**
-     * @throws \Exception
-     */
     private function createDatabase(): void
     {
-        $this->runCommand('doctrine:database:drop', ['--if-exists' => true, '--force' => true]);
-        $this->runCommand('doctrine:database:create');
-        $this->runCommand('doctrine:schema:create');
-        $this->runCommand('doctrine:migration:sync-metadata-storage');
+        $this->testSymfonyCommand('doctrine:database:drop', ['--if-exists' => true, '--force' => true]);
+        $this->testSymfonyCommand('doctrine:database:create');
+        $this->testSymfonyCommand('doctrine:schema:create');
+        $this->testSymfonyCommand('doctrine:migration:sync-metadata-storage');
     }
 
     private function generateResetDatabaseSql(string $file): void

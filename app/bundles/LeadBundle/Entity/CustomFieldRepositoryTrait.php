@@ -215,7 +215,7 @@ trait CustomFieldRepositoryTrait
             ->from($table, 'l');
 
         $q->where(
-            $q->expr()->andX(
+            $q->expr()->and(
                 $q->expr()->neq($col, $q->expr()->literal('')),
                 $q->expr()->isNotNull($col)
             )

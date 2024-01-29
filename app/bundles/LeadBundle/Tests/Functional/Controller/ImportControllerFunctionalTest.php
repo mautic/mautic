@@ -109,10 +109,10 @@ class ImportControllerFunctionalTest extends MauticMysqlTestCase
         );
 
         // Run command to import CSV.
-        $output = $this->runCommand('mautic:import', ['-e' => 'dev', '--id' => $import->getId(), '--limit' => 10000]);
+        $output = $this->testSymfonyCommand('mautic:import', ['-e' => 'dev', '--id' => $import->getId(), '--limit' => 10000]);
         Assert::assertStringContainsString(
             '4 lines were processed, 3 items created, 0 items updated, 1 items ignored',
-            $output
+            $output->getDisplay()
         );
         $leadCount = $this->em->getRepository(Lead::class)->count(['firstname' => 'John']);
         Assert::assertSame(3, $leadCount);

@@ -138,17 +138,14 @@ class UpdateLeadCampaignsCommand extends ModeratedCommand
         } else {
             $campaigns = $this->campaignRepository->getEntities(
                 [
-                    'iterator_mode' => true,
+                    'iterable_mode' => true,
                 ]
             );
 
-            while (false !== ($results = $campaigns->next())) {
-                // Get first item; using reset as the key will be the ID and not 0
-                $campaign = reset($results);
-
+            foreach ($campaigns as $campaign) {
                 $this->updateCampaign($campaign);
 
-                unset($results, $campaign);
+                unset($campaign);
             }
         }
 

@@ -30,7 +30,7 @@ class FocusRepository extends CommonRepository
             ->select($alias)
             ->from(\MauticPlugin\MauticFocusBundle\Entity\Focus::class, $alias, $alias.'.id');
 
-        if (empty($args['iterator_mode'])) {
+        if (empty($args['iterator_mode']) && empty($args['iterable_mode'])) {
             $q->leftJoin($alias.'.category', 'c');
         }
 
