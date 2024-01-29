@@ -7,16 +7,10 @@ use Mautic\CoreBundle\Event\CommonEvent;
 class LeadListMergeFiltersEvent extends CommonEvent
 {
     /**
-     * @var mixed[]
-     */
-    private array $filters;
-
-    /**
      * @param mixed[] $filters
      */
-    public function __construct(array $filters)
+    public function __construct(private array $filters)
     {
-        $this->filters = $filters;
     }
 
     /**

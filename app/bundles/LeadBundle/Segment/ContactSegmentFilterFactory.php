@@ -14,7 +14,11 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 class ContactSegmentFilterFactory
 {
     public const CUSTOM_OPERATOR             = 'custom_operator';
-    private $operatorsWithEmptyValuesAllowed = ['empty', '!empty', self::CUSTOM_OPERATOR];
+
+    /**
+     * @var array|string[]
+     */
+    private array $operatorsWithEmptyValuesAllowed = ['empty', '!empty', self::CUSTOM_OPERATOR];
 
     public function __construct(
         private TableSchemaColumnsCache $schemaCache,
@@ -34,12 +38,8 @@ class ContactSegmentFilterFactory
         $contactSegmentFilters = new ContactSegmentFilters();
 
         $filters = $leadList->getFilters();
-
-        // Merge multiple filters of same field with OR
-        $filters = $this->mergeFilters($filters);
-
-        $event = new LeadListMergeFiltersEvent($filters);
-        $this->eventDispatcher->dispatch(LeadEvents::LIST_FILTERS_MERGE, $event);
+        $event   = new LeadListMergeFiltersEvent($filters);
+        $this->eventDispatcher->dispatch($event, LeadEvents::LIST_FILTERS_MERGE);
         $filters = $event->getFilters();
         foreach ($filters as $filter) {
             if (self::CUSTOM_OPERATOR === $filter['operator']) {
