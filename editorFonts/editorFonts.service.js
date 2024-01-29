@@ -38,7 +38,10 @@ export default class EditorFontsService {
     const canvasHead = editor.Canvas.getDocument().head;
 
     mauticEditorFonts.forEach((item) => {
-      if (!fontList.find((element) => element.name === item.name)) {
+      let key = 'name';
+      if (propertyType === 'options') key = 'label';
+
+      if (!fontList.find((element) => element[key] === item.name)) {
         if (propertyType === 'list') fontList.push({ value: item.font, name: item.name });
         if (propertyType === 'options') fontList.push({ id: item.font, label: item.name });
 
