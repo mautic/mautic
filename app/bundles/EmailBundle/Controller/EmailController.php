@@ -8,6 +8,7 @@ use Mautic\CoreBundle\Controller\FormController;
 use Mautic\CoreBundle\Controller\FormErrorMessagesTrait;
 use Mautic\CoreBundle\Factory\PageHelperFactoryInterface;
 use Mautic\CoreBundle\Form\Type\BuilderSectionType;
+use Mautic\CoreBundle\Form\Type\ContentPreviewSettingsType;
 use Mautic\CoreBundle\Form\Type\DateRangeType;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\EmojiHelper;
@@ -20,7 +21,6 @@ use Mautic\CoreBundle\Twig\Helper\AssetsHelper;
 use Mautic\CoreBundle\Twig\Helper\SlotsHelper;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Form\Type\BatchSendType;
-use Mautic\EmailBundle\Form\Type\EmailPreviewSettingsType;
 use Mautic\EmailBundle\Form\Type\ExampleSendType;
 use Mautic\EmailBundle\Model\EmailModel;
 use Mautic\LeadBundle\Controller\EntityContactsTrait;
@@ -405,9 +405,11 @@ class EmailController extends FormController
                     )->getContent(),
                     'dateRangeForm'       => $dateRangeForm->createView(),
                     'previewSettingsForm' => $this->createForm(
-                        EmailPreviewSettingsType::class,
+                        ContentPreviewSettingsType::class,
                         null,
                         [
+                            'type'         => ContentPreviewSettingsType::TYPE_PAGE,
+                            'objectId'     => $email->getId(),
                             'variants'     => $variants,
                             'translations' => $translations,
                         ]

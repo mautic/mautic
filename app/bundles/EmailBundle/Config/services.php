@@ -43,5 +43,5 @@ return function (ContainerConfigurator $configurator): void {
 
     $services->get(\Mautic\EmailBundle\Controller\EmailController::class)
         ->call('setAbTestSettingsService', [service(\Mautic\CoreBundle\Model\AbTest\AbTestSettingsService::class)])
-        ->call('setAbTestResultService', [service(\Mautic\CoreBundle\Model\AbTest\AbTestSettingsService::class)]);
+        ->call('setAbTestResultService', [service(\Mautic\CoreBundle\Model\AbTest\AbTestResultService::class)]);
 };
