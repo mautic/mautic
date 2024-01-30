@@ -69,6 +69,10 @@ export default class BuilderService {
     const keymaps = this.editor.Keymaps;
     let allKeymaps;
 
+    if (mauticEditorFonts) {
+      this.editor.on('load', () => editorFontsService.loadEditorFonts(this.editor));
+    }
+
     this.editor.on('modal:open', () => {
       // Save all keyboard shortcuts
       allKeymaps = { ...keymaps.getAll() };
@@ -94,6 +98,7 @@ export default class BuilderService {
         data: { filename: response.getFilename() },
       });
     });
+
   }
 
   /**
@@ -120,10 +125,6 @@ export default class BuilderService {
     const codeModeButton = new CodeModeButton(this.editor);
     codeModeButton.addCommand();
     codeModeButton.addButton();
-
-    if (mauticEditorFonts) {
-      this.editor.on('load', () => editorFontsService.loadEditorFonts(this.editor));
-    }
 
     this.overrideCustomRteDisable();
     this.setListeners();
