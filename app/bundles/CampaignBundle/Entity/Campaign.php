@@ -72,10 +72,7 @@ class Campaign extends FormEntity implements PublishStatusIconAttributesInterfac
      */
     private $canvasSettings = [];
 
-    /**
-     * @var int
-     */
-    private $allowRestart = 0;
+    private bool $allowRestart = false;
 
     public function __construct()
     {
