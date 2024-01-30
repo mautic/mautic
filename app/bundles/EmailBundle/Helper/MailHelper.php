@@ -1968,24 +1968,34 @@ class MailHelper
 
     private function setReplyToForSingleMessage(?Email $emailToSend): void
     {
+        // 1. Set the reply to address from the email "reply-to" setting if set.
         if ($emailToSend && null !== $emailToSend->getReplyToAddress()) {
             $this->setMessageReplyTo($emailToSend->getReplyToAddress());
 
             return;
         }
 
-        if (empty($this->lead['owner_id'])) {
-            $this->setMessageReplyTo($this->getReplyTo());
+        // 2. Set the reply to address from the lead owner if set.
+        if (!empty($this->lead['owner_id'])) {
+            try {
+                $owner = $this->fromEmailHelper->getContactOwner((int) $this->lead['owner_id'], $emailToSend);
+                $this->setMessageReplyTo($owner['email']);
+            } catch (OwnerNotFoundException) {
+                $this->setMessageReplyTo($this->getSystemReplyTo());
+            }
 
             return;
         }
 
-        try {
-            $owner = $this->fromEmailHelper->getContactOwner((int) $this->lead['owner_id'], $emailToSend);
-            $this->setMessageReplyTo($owner['email']);
-        } catch (OwnerNotFoundException) {
-            $this->setMessageReplyTo($this->getSystemReplyTo());
+        // 3. Set the reply to address from the email "from" setting if set.
+        if ($emailToSend && null !== $emailToSend->getFromAddress() && empty($this->coreParametersHelper->get('mailer_reply_to_email'))) {
+            $this->setMessageReplyTo($emailToSend->getFromAddress());
+
+            return;
         }
+
+        // 4. Set the reply to address from the global config if nothing from above is set.
+        $this->setMessageReplyTo($this->getReplyTo());
     }
 
     /**

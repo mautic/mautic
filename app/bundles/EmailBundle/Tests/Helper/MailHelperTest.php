@@ -114,29 +114,6 @@ class MailHelperTest extends TestCase
         $this->mockFactory          = $this->createMock(MauticFactory::class);
         $this->mailbox              = $this->createMock(Mailbox::class);
         $this->logger               = $this->createMock(LoggerInterface::class);
-
-        // $fromName = 'No Body';
-
-        // if ('testMailAsOwnerWithEncodedCharactersInName' === $this->getName()) {
-        //     $fromName = 'No Body&#39;s Business';
-        // }
-
-        // $params = [
-        //     ['mailer_from_email', null, 'nobody@nowhere.com'],
-        //     ['mailer_from_name', null, $fromName],
-        // ];
-
-        // if ('testEmailReplyToWithFromAndGlobalEmail' === $this->getName()) {
-        //     $params[] = ['mailer_reply_to_email', null, 'admin@mautic.com'];
-        // }
-
-        // if (in_array($this->getName(), ['testGlobalHeadersAreMergedIfEmailEntityIsSet', 'testEmailHeadersAreSet', 'testGlobalHeadersAreSet'])) {
-        //     $params[] = ['mailer_custom_headers', [], ['X-Mautic-Test' => 'test', 'X-Mautic-Test2' => 'test']];
-        // }
-
-        // if (!str_starts_with($this->getName(), 'testMinifyHtml')) {
-        //     $this->coreParametersHelper->method('get')->will($this->returnValueMap($params));
-        // }
     }
 
     public function testQueueModeThrowsExceptionWhenBatchLimitHit(): void
@@ -253,6 +230,8 @@ class MailHelperTest extends TestCase
 
     public function testQueuedOwnerAsMailer(): void
     {
+        $this->coreParametersHelper->method('get')->will($this->returnValueMap($this->defaultParams));
+
         $this->contactRepository->method('getLeadOwner')
             ->willReturnOnConsecutiveCalls(
                 ['email' => 'owner1@owner.com', 'first_name' => 'owner 1', 'last_name' => null, 'signature' => 'owner 1'],
@@ -270,22 +249,6 @@ class MailHelperTest extends TestCase
 
         $mailer->setEmail($email);
         $mailer->enableQueue();
-        // $this->fromEmailHelper->expects($this->exactly(4))
-        //     ->method('getFromAddressArrayConsideringOwner')
-        //     ->willReturnOnConsecutiveCalls(
-        //         ['owner1@owner.com' => 'owner 1'],
-        //         ['nobody@nowhere.com' => 'No Body'],
-        //         ['owner2@owner.com'   => 'owner 2'],
-        //         ['owner1@owner.com'   => 'owner 1']
-        //     );
-        // $this->fromEmailHelper
-        //     ->method('getSignature')
-        //     ->willReturnOnConsecutiveCalls(
-        //         'owner 1',
-        //         '',
-        //         'owner 2',
-        //         'owner 1'
-        //     );
 
         foreach ($this->contacts as $contact) {
             $mailer->addTo($contact['email']);
@@ -472,6 +435,8 @@ class MailHelperTest extends TestCase
 
     public function testStandardEmailReplyTo(): void
     {
+        $this->coreParametersHelper->method('get')->will($this->returnValueMap($this->defaultParams));
+
         $transport     = new SmtpTransport();
         $symfonyMailer = new Mailer($transport);
         $mailer        = new MailHelper($this->mockFactory, $symfonyMailer, $this->fromEmailHelper, $this->coreParametersHelper, $this->mailbox, $this->logger);
@@ -506,7 +471,7 @@ class MailHelperTest extends TestCase
         $email->setCustomHtml('content');
         $mailer->setEmail($email);
         $mailer->send();
-        $replyTo = $mailer->message->getReplyTo() ? $mailer->message->getReplyTo()[0]->getAddress() : null;
+        $replyTo = $mailer->message->getReplyTo()[0]->getAddress();
         // Expect from address in reply to
         $this->assertEquals('from@nowhere.com', $replyTo);
     }
@@ -515,8 +480,9 @@ class MailHelperTest extends TestCase
     {
         $params = [
             ['mailer_from_email', null, 'nobody@nowhere.com'],
-            ['mailer_reply_to_email', null, 'admin@mautic.com']
+            ['mailer_reply_to_email', null, 'admin@mautic.com'],
         ];
+
         $this->coreParametersHelper->method('get')->will($this->returnValueMap($params));
 
         $transport     = new SmtpTransport();
@@ -717,6 +683,11 @@ class MailHelperTest extends TestCase
 
     public function testGlobalHeadersAreMergedIfEmailEntityIsSet(): void
     {
+        $params = [
+            ['mailer_custom_headers', [], ['X-Mautic-Test' => 'test', 'X-Mautic-Test2' => 'test']],
+            ['mailer_from_email', null, 'nobody@nowhere.com'],
+        ];
+        $this->coreParametersHelper->method('get')->will($this->returnValueMap($params));
         $transport     = new SmtpTransport();
         $symfonyMailer = new Mailer($transport);
         $mailer        = new MailHelper($this->mockFactory, $symfonyMailer, $this->fromEmailHelper, $this->coreParametersHelper, $this->mailbox, $this->logger);
