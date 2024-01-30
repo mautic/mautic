@@ -18,6 +18,8 @@
     "build": "parcel build Assets/library/js/builder.js --dist-dir Assets/library/js/dist --public-url ./",
     "build-dev": "NODE_ENV=development parcel build Assets/library/js/builder.js --dist-dir Assets/library/js/dist --public-url ./ --no-optimize",
     "remove-build": "rm -rf ./Assets/library/js/dist/* && rm -rf .parcel-cache/*",
+    "rebuild": "npm run remove-build && npm run build",
+    "rebuild-dev": "npm run remove-build && npm run build-dev",
     "dev": "NODE_ENV=development parcel watch Assets/library/js/* --dist-dir Assets/library/js/dist --public-url /plugins/GrapesJsBuilderBundle/Assets/library/js/dist --hmr-hostname localhost",
     "lint": "eslint Assets/library/js/",
     "prettier": "node_modules/.bin/prettier -w Assets/library/js/",
