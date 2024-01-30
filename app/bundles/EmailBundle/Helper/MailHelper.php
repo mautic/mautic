@@ -2027,8 +2027,6 @@ class MailHelper
     }
 
     /**
-     * @return mixed
-     *
      * @deprecated; use FromEmailHelper::getUserSignature
      */
     protected function getContactOwnerSignature($owner): string

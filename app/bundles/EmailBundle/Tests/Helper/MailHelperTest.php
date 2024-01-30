@@ -38,6 +38,9 @@ class MailHelperTest extends TestCase
         </body>
     </html>';
 
+    /**
+     * @var array<array<string|null>>
+     */
     private $defaultParams = [
         ['mailer_from_email', null, 'nobody@nowhere.com'],
         ['mailer_from_name', null, 'No Body'],
