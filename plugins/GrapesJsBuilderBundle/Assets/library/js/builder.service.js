@@ -198,6 +198,8 @@ export default class BuilderService {
       },
     });
 
+    this.moveBlocksPage();
+
     return this.editor;
   }
 
@@ -318,6 +320,30 @@ export default class BuilderService {
   getEditor() {
     return this.editor;
   }
+
+  /**
+   * Move the blocks and categories in the sidebar
+   */
+  moveBlocksPage() {
+    const blocks = this.editor.BlockManager.getAll();
+    blocks.map(block => {
+      // columns go into a new category, at the top
+      if(block.attributes.id.indexOf('column') !== -1) {
+        this.editor.BlockManager.get(block.attributes.id).set('category', {
+          label:"Sections",
+          order: -1
+        });
+      }
+      // 'Blocks' category goes after 'Basic'
+      if(block.attributes.category === 'Basic') {
+        this.editor.BlockManager.get(block.attributes.id).set('category', {
+          label:"Basic",
+          order: -1
+        });
+      }
+    });
+  }
+
   /**
    * Generate assets list from GrapesJs
    */
