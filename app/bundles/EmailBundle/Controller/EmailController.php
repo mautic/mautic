@@ -6,19 +6,21 @@ use Mautic\AssetBundle\Model\AssetModel;
 use Mautic\CoreBundle\Controller\BuilderControllerTrait;
 use Mautic\CoreBundle\Controller\FormController;
 use Mautic\CoreBundle\Controller\FormErrorMessagesTrait;
-use Mautic\CoreBundle\Event\DetermineWinnerEvent;
 use Mautic\CoreBundle\Factory\PageHelperFactoryInterface;
 use Mautic\CoreBundle\Form\Type\BuilderSectionType;
 use Mautic\CoreBundle\Form\Type\DateRangeType;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\EmojiHelper;
 use Mautic\CoreBundle\Helper\InputHelper;
+use Mautic\CoreBundle\Model\AbTest\AbTestResultService;
+use Mautic\CoreBundle\Model\AbTest\AbTestSettingsService;
 use Mautic\CoreBundle\Model\AuditLogModel;
 use Mautic\CoreBundle\Translation\Translator;
 use Mautic\CoreBundle\Twig\Helper\AssetsHelper;
 use Mautic\CoreBundle\Twig\Helper\SlotsHelper;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Form\Type\BatchSendType;
+use Mautic\EmailBundle\Form\Type\EmailPreviewSettingsType;
 use Mautic\EmailBundle\Form\Type\ExampleSendType;
 use Mautic\EmailBundle\Model\EmailModel;
 use Mautic\LeadBundle\Controller\EntityContactsTrait;
@@ -37,6 +39,19 @@ class EmailController extends FormController
     use EntityContactsTrait;
 
     public const EXAMPLE_EMAIL_SUBJECT_PREFIX = '[TEST]';
+
+    private AbTestSettingsService $abTestSettingsService;
+    private AbTestResultService $abTestResultService;
+
+    public function setAbTestSettingsService(AbTestSettingsService $abTestSettingsService): void
+    {
+        $this->abTestSettingsService = $abTestSettingsService;
+    }
+
+    public function setAbTestResultService(AbTestResultService $abTestResultService): void
+    {
+        $this->abTestResultService = $abTestResultService;
+    }
 
     /**
      * @param int $page
@@ -304,59 +319,18 @@ class EmailController extends FormController
         }
 
         // get A/B test information
-        [$parent, $children]     = $email->getVariants();
-        $properties              = [];
-        $variantError            = false;
-        $weight                  = 0;
-        if (count($children)) {
-            foreach ($children as $c) {
-                $variantSettings = $c->getVariantSettings();
+        [$parent, $children] = $email->getVariants();
+        $abTestResults       = [];
+        $criteria            = $model->getBuilderComponents($email, 'abTestWinnerCriteria');
 
-                if (is_array($variantSettings) && isset($variantSettings['winnerCriteria'])) {
-                    if ($c->isPublished()) {
-                        if (!isset($lastCriteria)) {
-                            $lastCriteria = $variantSettings['winnerCriteria'];
-                        }
+        if (count($children) > 0) {
+            $abTestSettings = $this->abTestSettingsService->getAbTestSettings($parent);
 
-                        // make sure all the variants are configured with the same criteria
-                        if ($lastCriteria != $variantSettings['winnerCriteria']) {
-                            $variantError = true;
-                        }
-
-                        $weight += $variantSettings['weight'];
-                    }
-                } else {
-                    $variantSettings['winnerCriteria'] = '';
-                    $variantSettings['weight']         = 0;
-                }
-
-                $properties[$c->getId()] = $variantSettings;
-            }
-
-            $properties[$parent->getId()]['weight']         = 100 - $weight;
-            $properties[$parent->getId()]['winnerCriteria'] = '';
-        }
-
-        $abTestResults = [];
-        $criteria      = $model->getBuilderComponents($email, 'abTestWinnerCriteria');
-        if (!empty($lastCriteria) && empty($variantError)) {
-            if (isset($criteria['criteria'][$lastCriteria])) {
-                $testSettings = $criteria['criteria'][$lastCriteria];
-
-                $args = [
-                    'email'      => $email,
-                    'parent'     => $parent,
-                    'children'   => $children,
-                    'properties' => $properties,
-                ];
-
-                $event = new DetermineWinnerEvent($args);
-                $this->dispatcher->dispatch(
-                    $event,
-                    $testSettings['event']
+            if (isset($criteria['criteria']) && isset($abTestSettings['winnerCriteria'])) {
+                $abTestResults = $this->abTestResultService->getAbTestResult(
+                    $parent,
+                    $criteria['criteria'][$abTestSettings['winnerCriteria']]
                 );
-
-                $abTestResults = $event->getAbTestResults();
             }
         }
 
@@ -370,6 +344,19 @@ class EmailController extends FormController
 
         // Get click through stats
         $trackableLinks = $model->getEmailClickStats($email->getId());
+        $variants       = [
+            'parent'             => $parent,
+            'children'           => $children,
+            'properties'         => isset($abTestSettings) ? $abTestSettings['variants'] : null,
+            'criteria'           => $criteria['criteria'],
+            'winnerCriteria'     => isset($abTestSettings) ? $abTestSettings['winnerCriteria'] : null,
+            'configurationError' => isset($abTestSettings) ? $abTestSettings['configurationError'] : null,
+        ];
+
+        $translations = [
+            'parent'   => $translationParent,
+            'children' => $translationChildren,
+        ];
 
         return $this->delegateView(
             [
@@ -385,17 +372,9 @@ class EmailController extends FormController
                     'trackables'   => $trackableLinks,
                     'logs'         => $logs,
                     'isEmbedded'   => $request->get('isEmbedded') ?: false,
-                    'variants'     => [
-                        'parent'     => $parent,
-                        'children'   => $children,
-                        'properties' => $properties,
-                        'criteria'   => $criteria['criteria'],
-                    ],
-                    'translations' => [
-                        'parent'   => $translationParent,
-                        'children' => $translationChildren,
-                    ],
-                    'permissions' => $security->isGranted(
+                    'variants'     => $variants,
+                    'translations' => $translations,
+                    'permissions'  => $security->isGranted(
                         [
                             'email:emails:viewown',
                             'email:emails:viewother',
@@ -424,7 +403,15 @@ class EmailController extends FormController
                             'ignoreAjax' => true,
                         ]
                     )->getContent(),
-                    'dateRangeForm' => $dateRangeForm->createView(),
+                    'dateRangeForm'       => $dateRangeForm->createView(),
+                    'previewSettingsForm' => $this->createForm(
+                        EmailPreviewSettingsType::class,
+                        null,
+                        [
+                            'variants'     => $variants,
+                            'translations' => $translations,
+                        ]
+                    )->createView(),
                 ],
                 'contentTemplate' => '@MauticEmail/Email/details.html.twig',
                 'passthroughVars' => [
