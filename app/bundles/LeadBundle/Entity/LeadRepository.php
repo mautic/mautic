@@ -91,10 +91,10 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
     /**
      * Get a list of leads based on field value.
      *
-     * @param string $field
-     * @param string $value
-     * @param ?int   $ignoreId
-     * @param bool   $indexByColumn
+     * @param string          $field
+     * @param string[]|string $value
+     * @param ?int            $ignoreId
+     * @param bool            $indexByColumn
      *
      * @return array
      */
@@ -117,9 +117,9 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
      *
      * @internal
      *
-     * @param string $field
-     * @param string $value
-     * @param ?int   $ignoreId
+     * @param string          $field
+     * @param string[]|string $value
+     * @param ?int            $ignoreId
      *
      * @return QueryBuilder
      */
@@ -144,7 +144,7 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
              */
             $valueParams = [];
             for ($i = 0; $i < count($value); ++$i) {
-                $valueParams[$this->generateRandomParameterName()] = $value[$i];
+                $valueParams[':'.$this->generateRandomParameterName()] = $value[$i];
             }
 
             $q->andWhere(
