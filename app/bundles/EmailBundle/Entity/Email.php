@@ -17,6 +17,7 @@ use Mautic\CoreBundle\Entity\VariantEntityInterface;
 use Mautic\CoreBundle\Entity\VariantEntityTrait;
 use Mautic\CoreBundle\Helper\EmojiHelper;
 use Mautic\CoreBundle\Helper\UrlHelper;
+use Mautic\EmailBundle\Validator\EmailOrEmailTokenList;
 use Mautic\FormBundle\Entity\Form;
 use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\LeadBundle\Form\Validator\Constraints\LeadListAccess;
@@ -336,7 +337,7 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
 
         $metadata->addPropertyConstraint(
             'fromAddress',
-            self::getTokenOrEmailConstraint('fromAddress')
+            new EmailOrEmailTokenList(),
         );
 
         $metadata->addPropertyConstraint(
@@ -1169,36 +1170,5 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
     public function isBackgroundSending(): bool
     {
         return $this->isPublished() && !empty($this->getPublishUp()) && ($this->getPublishUp() < new \DateTime());
-    }
-
-    private static function getTokenOrEmailConstraint(string $field): Callback
-    {
-        return new Callback([
-            'callback' => function ($value, ExecutionContextInterface $context) use ($field): void {
-                if ($value && preg_match('/{contactfield=(.*?)}/', $value)) {
-                    return;
-                }
-
-                $validator  = $context->getValidator();
-                $violations = $validator->validate(
-                    $value,
-                    [
-                        new \Symfony\Component\Validator\Constraints\Email(
-                            [
-                                'message' => 'mautic.core.email.required',
-                            ]
-                        ),
-                    ]
-                );
-
-                if (count($violations) > 0) {
-                    foreach ($violations as $violation) {
-                        $context->buildViolation($violation->getMessage())
-                            ->atPath($field)
-                            ->addViolation();
-                    }
-                }
-            },
-        ]);
     }
 }
