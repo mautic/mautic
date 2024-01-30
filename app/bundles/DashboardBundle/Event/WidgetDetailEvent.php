@@ -35,7 +35,7 @@ class WidgetDetailEvent extends CommonEvent
 
     protected $loadTime  = 0;
 
-    private $cacheKeyPath = 'dashboard.widget.';
+    private string $cacheKeyPath = 'dashboard.widget.';
 
     public function __construct(private TranslatorInterface $translator, private CacheProvider $cacheProvider)
     {
@@ -58,7 +58,7 @@ class WidgetDetailEvent extends CommonEvent
                 try {
                     $date       = $this->castDateTimeToString($params[$dateParameter]);
                     $cacheKey[] = $date;
-                } catch (CouldNotFormatDateTimeException $e) {
+                } catch (CouldNotFormatDateTimeException) {
                 }
             }
         }

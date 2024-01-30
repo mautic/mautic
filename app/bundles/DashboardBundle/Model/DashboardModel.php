@@ -183,8 +183,6 @@ class DashboardModel extends FormModel
      */
     public function populateWidgetContent(Widget $widget, $filter = []): void
     {
-        $cacheDir = $this->coreParametersHelper->get('cached_data_dir', $this->pathsHelper->getSystemPath('cache', true));
-
         if (null === $widget->getCacheTimeout() || -1 === $widget->getCacheTimeout()) {
             $widget->setCacheTimeout($this->coreParametersHelper->get('cached_data_timeout'));
         }
