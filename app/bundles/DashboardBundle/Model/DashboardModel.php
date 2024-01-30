@@ -5,6 +5,7 @@ namespace Mautic\DashboardBundle\Model;
 use Doctrine\ORM\EntityManagerInterface;
 use Mautic\CoreBundle\Helper\CacheStorageHelper;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
+use Mautic\CoreBundle\Helper\Filesystem;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\CoreBundle\Helper\PathsHelper;
 use Mautic\CoreBundle\Helper\UserHelper;
@@ -14,12 +15,11 @@ use Mautic\CoreBundle\Translation\Translator;
 use Mautic\DashboardBundle\DashboardEvents;
 use Mautic\DashboardBundle\Entity\Widget;
 use Mautic\DashboardBundle\Entity\WidgetRepository;
+use Mautic\DashboardBundle\Event\WidgetDetailEventFactory;
 use Mautic\DashboardBundle\Form\Type\WidgetType;
-use Mautic\DashboardBundle\Widget\WidgetDetailEventFactory;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Filesystem\Exception\IOException;
-use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
@@ -208,7 +208,7 @@ class DashboardModel extends FormModel
         $widget->setParams($resultParams);
 
         $this->dispatcher->dispatch(
-            $this->eventFactory->create($widget, $this->userHelper->getUser()->getId()),
+            $this->eventFactory->create($widget),
             DashboardEvents::DASHBOARD_ON_MODULE_DETAIL_GENERATE
         );
     }
@@ -231,7 +231,7 @@ class DashboardModel extends FormModel
      *
      * @return \Symfony\Component\Form\FormInterface<mixed>
      *
-     * @throws \Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException
+     * @throws MethodNotAllowedHttpException
      */
     public function createForm($entity, FormFactoryInterface $formFactory, $action = null, $options = []): \Symfony\Component\Form\FormInterface
     {

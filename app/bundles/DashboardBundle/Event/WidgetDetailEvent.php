@@ -37,7 +37,7 @@ class WidgetDetailEvent extends CommonEvent
 
     private $cacheKeyPath = 'dashboard.widget.';
 
-    public function __construct(private TranslatorInterface $translator, private CacheProvider $cacheProvider, private CorePermissions $security, Widget $widget)
+    public function __construct(private TranslatorInterface $translator, private CacheProvider $cacheProvider)
     {
         $this->startTime = microtime(true);
     }
@@ -184,13 +184,9 @@ class WidgetDetailEvent extends CommonEvent
     /**
      * Set the widget template data.
      *
-     * @param bool $skipCache
-     *
-     * @return bool
-     *
      * @throws \Psr\Cache\InvalidArgumentException
      */
-    public function setTemplateData(array $templateData, $skipCache = false): void
+    public function setTemplateData(array $templateData, ?bool $skipCache = false): bool
     {
         $this->templateData = $templateData;
         $this->widget->setTemplateData($templateData);
@@ -275,11 +271,9 @@ class WidgetDetailEvent extends CommonEvent
     }
 
     /**
-     * @return bool
-     *
      * @throws \Psr\Cache\InvalidArgumentException
-     * Checks the cache for the widget data.
-     * If cache exists, it sets the TemplateData.
+     *                                             Checks the cache for the widget data.
+     *                                             If cache exists, it sets the TemplateData.
      */
     public function isCached(): bool
     {
@@ -300,8 +294,15 @@ class WidgetDetailEvent extends CommonEvent
 
             return false;
         }
+        $cachedItem = $this->cacheProvider->getItem($this->getCacheKey());
+        if (!$cachedItem->isHit()) {
+            return false;
+        }
 
-        return $this->cacheProvider->getItem($this->getCacheKey())->isHit();
+        $this->widget->setCached(true);
+        $this->setTemplateData($cachedItem->get());
+
+        return true;
     }
 
     /**
@@ -362,9 +363,11 @@ class WidgetDetailEvent extends CommonEvent
     /**
      * We need to cast DateTime objects to strings to use them in the cache key.
      *
+     * @param \DateTimeInterface|mixed|null $value
+     *
      * @throws CouldNotFormatDateTimeException
      */
-    private function castDateTimeToString(\DateTimeInterface|mixed $value): string
+    private function castDateTimeToString($value): string
     {
         if ($value instanceof \DateTimeInterface) {
             // We use RFC 2822 format because it includes timezone

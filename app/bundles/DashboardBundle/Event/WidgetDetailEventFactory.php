@@ -2,13 +2,12 @@
 
 declare(strict_types=1);
 
-namespace Mautic\DashboardBundle\Widget;
+namespace Mautic\DashboardBundle\Event;
 
 use Mautic\CacheBundle\Cache\CacheProvider;
 use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\DashboardBundle\Entity\Widget;
-use Mautic\DashboardBundle\Event\WidgetDetailEvent;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 class WidgetDetailEventFactory
@@ -23,8 +22,10 @@ class WidgetDetailEventFactory
 
     public function create(Widget $widget): WidgetDetailEvent
     {
-        $event = new WidgetDetailEvent($this->translator, $this->cacheProvider, $this->corePermissions, $widget);
+        $event = new WidgetDetailEvent($this->translator, $this->cacheProvider);
+        $event->setWidget($widget);
         $event->setCacheDir(false, $this->userHelper->getUser()->getId());
+        $event->setSecurity($this->corePermissions);
 
         return $event;
     }

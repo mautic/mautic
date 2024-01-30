@@ -11,8 +11,8 @@ use Mautic\CoreBundle\Helper\PathsHelper;
 use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\CoreBundle\Translation\Translator;
+use Mautic\DashboardBundle\Event\WidgetDetailEventFactory;
 use Mautic\DashboardBundle\Model\DashboardModel;
-use Mautic\DashboardBundle\Widget\WidgetDetailEventFactory;
 use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
@@ -27,24 +27,24 @@ final class DashboardModelTest extends TestCase
     /**
      * @var CoreParametersHelper|MockObject
      */
-    private \PHPUnit\Framework\MockObject\MockObject $coreParametersHelper;
+    private MockObject $coreParametersHelper;
 
     /**
      * @var PathsHelper|MockObject
      */
-    private \PHPUnit\Framework\MockObject\MockObject $pathsHelper;
+    private MockObject $pathsHelper;
 
     /**
      * @var MockObject|Filesystem
      */
-    private \PHPUnit\Framework\MockObject\MockObject $filesystem;
+    private MockObject $filesystem;
 
     /**
      * @var MockObject|Session
      */
-    private \PHPUnit\Framework\MockObject\MockObject $session;
+    private MockObject $session;
 
-    private \Mautic\DashboardBundle\Model\DashboardModel $model;
+    private DashboardModel $model;
 
     /**
      * @var WidgetDetailEventFactory
