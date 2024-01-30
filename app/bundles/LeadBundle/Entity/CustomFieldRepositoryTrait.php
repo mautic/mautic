@@ -53,11 +53,11 @@ trait CustomFieldRepositoryTrait
                 $dq->resetQueryPart('groupBy');
             }
 
-            //get a total count
+            // get a total count
             if (!empty($args['totalCountTtl'])) {
-                $statement = ResultCacheHelper::executeCachedDbalQuery($dq, new ResultCacheOptions($object.'-total-count', $args['totalCountTtl']));
+                $statement = ResultCacheHelper::executeCachedDbalQuery($this->getEntityManager()->getConnection(), $dq, new ResultCacheOptions($object.'-total-count', $args['totalCountTtl']));
             } else {
-                $statement = $dq->execute();
+                $statement = $dq->executeQuery();
             }
 
             $result = $statement->fetchAllAssociative();

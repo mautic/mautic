@@ -10,7 +10,6 @@ use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadRepository;
 use PHPUnit\Framework\Assert;
-use ReflectionClass;
 use Symfony\Component\HttpFoundation\Request;
 
 /**
@@ -35,7 +34,7 @@ final class LeadApiControllerProfilerTest extends MauticMysqlTestCase
     public function testGetContacts(): void
     {
         // reset result cache if any
-        $cache = $this->em->getConfiguration()->getResultCacheImpl();
+        $cache = $this->em->getConfiguration()->getResultCache();
 
         if ($cache instanceof CacheProvider) {
             $cache = clone $cache;
@@ -72,7 +71,7 @@ final class LeadApiControllerProfilerTest extends MauticMysqlTestCase
         // We have to reset the param counter to emulate 2 requests otherwise the counter will cause the queries to be different.
         $leadRepository = $this->em->getRepository(Lead::class);
         \assert($leadRepository instanceof LeadRepository);
-        $reflection = new ReflectionClass($leadRepository);
+        $reflection = new \ReflectionClass($leadRepository);
         $counter    = $reflection->getProperty('lastUsedParameterId');
         $counter->setAccessible(true);
         $counter->setValue($leadRepository, 0);
