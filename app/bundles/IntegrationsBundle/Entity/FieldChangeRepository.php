@@ -97,10 +97,8 @@ class FieldChangeRepository extends CommonRepository
 
         $results = $qb->executeQuery()->fetchAllAssociative();
 
-        $objectIds = [];
-        foreach ($results as $result) {
-            $objectIds[] = (int) $result['object_id'];
-        }
+
+        $objectIds = array_column($results, 'object_id');
 
         if (!$objectIds) {
             return [];
@@ -167,10 +165,7 @@ class FieldChangeRepository extends CommonRepository
 
         $results = $qb->execute()->fetchAllAssociative();
 
-        $objectIds = [];
-        foreach ($results as $result) {
-            $objectIds[] = (int) $result['id'];
-        }
+        $objectIds = array_column($results, 'id');
 
         if (!$objectIds) {
             return 0;
