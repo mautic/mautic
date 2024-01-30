@@ -55,8 +55,8 @@ final class FieldChangeRepositoryTest extends MauticMysqlTestCase
             2
         );
 
-        Assert::assertSame((int) $lead1->getId(), (int) $changes[0]['object_id']);
-        Assert::assertSame((int) $lead3->getId(), (int) $changes[1]['object_id'], 'Lead 2 record is not fetched as lead 2 is deleted');
+        Assert::assertSame($lead1->getId(), $changes[0]['object_id']);
+        Assert::assertSame($lead3->getId(), $changes[1]['object_id'], 'Lead 2 record is not fetched as lead 2 is deleted');
     }
 
     public function testThatItDoesntDeleteObjectsThatCameDuringInternalSynchronization(): void
