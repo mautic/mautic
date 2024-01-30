@@ -249,7 +249,7 @@ class EmailApiControllerFunctionalTest extends MauticMysqlTestCase
         $user->setEmail('john@api.test');
         $user->setSignature('Best regards, |FROM_NAME|');
         $user->setRole($role);
-        $encoder = self::$container->get('security.encoder_factory')->getEncoder($user);
+        $encoder = $this->getContainer()->get('security.encoder_factory')->getEncoder($user);
         $user->setPassword($encoder->encodePassword('password', null));
         $this->em->persist($user);
 
@@ -322,7 +322,7 @@ class EmailApiControllerFunctionalTest extends MauticMysqlTestCase
             $this->assertSame([$message->getReplyTo()[0]->getAddress() => $message->getReplyTo()[0]->getName()], ['reply@api.test' => '']);
             $this->assertSame([$message->getBcc()[0]->getAddress() => $message->getBcc()[0]->getName()], ['bcc@api.test' => '']);
         };
-        $testEmail('\{custom-token\}');
+        $testEmail('{custom-token}');
 
         // Send to contact:
         $this->client->request('POST', "/api/emails/{$emailId}/contact/{$contactId}/send", ['tokens' => ['{custom-token}' => 'custom <b>value</b>']]);

@@ -71,11 +71,15 @@ class SendEmailToContactTest extends \PHPUnit\Framework\TestCase
     /** @var MockObject&Mailbox */
     private $mailbox;
 
+    /** @var MockObject&LoggerInterface */
+    private MockObject $loggerMock;
+
     protected function setUp(): void
     {
         $this->fromEmaiHelper       = $this->createMock(FromEmailHelper::class);
         $this->coreParametersHelper = $this->createMock(CoreParametersHelper::class);
         $this->mailbox              = $this->createMock(Mailbox::class);
+        $this->loggerMock           = $this->createMock(LoggerInterface::class);
 
         $this->coreParametersHelper->method('get')->will($this->returnValueMap([
             ['mailer_from_email', null, 'nobody@nowhere.com'],
@@ -215,8 +219,6 @@ class SendEmailToContactTest extends \PHPUnit\Framework\TestCase
      */
     public function testBadEmailDoesNotCauseBatchQueueMaxExceptionOnSubsequentContacts(): void
     {
-        defined('MAUTIC_ENV') or define('MAUTIC_ENV', 'test');
-
         $emailMock = $this->createMock(Email::class);
         $emailMock->method('getId')->will($this->returnValue(1));
         $emailMock->method('getFromAddress')->willReturn('test@mautic.com');
@@ -253,7 +255,7 @@ class SendEmailToContactTest extends \PHPUnit\Framework\TestCase
             ->willReturn(new AddressDTO('someone@somewhere.com'));
 
         $mailHelper = $this->getMockBuilder(MailHelper::class)
-            ->setConstructorArgs([$factoryMock, $mailer, $this->fromEmaiHelper, $this->coreParametersHelper, $this->mailbox])
+            ->setConstructorArgs([$factoryMock, $mailer, $this->fromEmaiHelper, $this->coreParametersHelper, $this->mailbox, $this->loggerMock])
             ->onlyMethods(['createEmailStat'])
             ->getMock();
 
@@ -331,8 +333,6 @@ class SendEmailToContactTest extends \PHPUnit\Framework\TestCase
      */
     public function testBatchQueueContactsHaveTokensHydrated(): void
     {
-        defined('MAUTIC_ENV') or define('MAUTIC_ENV', 'test');
-
         $emailMock = $this->createMock(Email::class);
         $emailMock->method('getId')->will($this->returnValue(1));
         $emailMock->method('getFromAddress')->willReturn('test@mautic.com');
@@ -406,7 +406,7 @@ class SendEmailToContactTest extends \PHPUnit\Framework\TestCase
             ->willReturn(new AddressDTO('someone@somewhere.com'));
 
         $mailHelper = $this->getMockBuilder(MailHelper::class)
-            ->setConstructorArgs([$factoryMock, $mailer, $this->fromEmaiHelper, $this->coreParametersHelper, $this->mailbox])
+            ->setConstructorArgs([$factoryMock, $mailer, $this->fromEmaiHelper, $this->coreParametersHelper, $this->mailbox, $this->loggerMock])
             ->onlyMethods([])
             ->getMock();
 
@@ -463,8 +463,6 @@ class SendEmailToContactTest extends \PHPUnit\Framework\TestCase
      */
     public function testThatStatEntriesAreCreatedAndPersistedEveryBatch(): void
     {
-        defined('MAUTIC_ENV') or define('MAUTIC_ENV', 'test');
-
         $emailMock = $this->createMock(Email::class);
         $emailMock->method('getId')->willReturn(1);
         $emailMock->method('getFromAddress')->willReturn('test@mautic.com');
@@ -503,7 +501,7 @@ class SendEmailToContactTest extends \PHPUnit\Framework\TestCase
             ->willReturn(new AddressDTO('someone@somewhere.com'));
 
         $mailHelper = $this->getMockBuilder(MailHelper::class)
-            ->setConstructorArgs([$factoryMock, $mailer, $this->fromEmaiHelper, $this->coreParametersHelper, $this->mailbox])
+            ->setConstructorArgs([$factoryMock, $mailer, $this->fromEmaiHelper, $this->coreParametersHelper, $this->mailbox, $this->loggerMock])
             ->onlyMethods(['createEmailStat'])
             ->getMock();
 
@@ -594,8 +592,6 @@ class SendEmailToContactTest extends \PHPUnit\Framework\TestCase
      */
     public function testThatAFailureFromTransportIsHandled(): void
     {
-        defined('MAUTIC_ENV') or define('MAUTIC_ENV', 'test');
-
         $emailMock = $this->createMock(Email::class);
         $emailMock->method('getId')->willReturn(1);
         $emailMock->method('getFromAddress')->willReturn('test@mautic.com');
@@ -623,7 +619,7 @@ class SendEmailToContactTest extends \PHPUnit\Framework\TestCase
 
         /** @var MockObject&MailHelper $mailHelper */
         $mailHelper = $this->getMockBuilder(MailHelper::class)
-            ->setConstructorArgs([$factoryMock, $mailer, $this->fromEmaiHelper, $this->coreParametersHelper, $this->mailbox])
+            ->setConstructorArgs([$factoryMock, $mailer, $this->fromEmaiHelper, $this->coreParametersHelper, $this->mailbox, $this->loggerMock])
             ->onlyMethods(['createEmailStat'])
             ->getMock();
 

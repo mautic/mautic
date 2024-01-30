@@ -334,8 +334,11 @@ class MailHelper
 
             if (!$isQueueFlush) {
                 // Replace token content
-                $tokens                = $this->getTokens();
-                $tokens['{signature}'] = $this->fromEmailHelper->getSignature();
+                $tokens = $this->getTokens();
+
+                if ($ownerSignature = $this->fromEmailHelper->getSignature()) {
+                    $tokens['{signature}'] = $ownerSignature;
+                }
 
                 // Set metadata if applicable
                 foreach ($this->queuedRecipients as $email => $name) {
