@@ -161,6 +161,7 @@ class FieldChangeRepository extends CommonRepository
                     $qb->expr()->isNull('l.id')
                 )
             )
+            ->setMaxResults(1000)
             ->setParameter('objectType', Lead::class);
 
         $results = $qb->execute()->fetchAllAssociative();
