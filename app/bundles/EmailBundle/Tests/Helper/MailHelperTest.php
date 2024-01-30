@@ -305,7 +305,7 @@ class MailHelperTest extends TestCase
             ->will($this->returnValueMap(
                 [
                     ['mailer_from_email', null, 'nobody@nowhere.com'],
-                    ['mailer_from_name', null, 'No Body&#39;s Business']
+                    ['mailer_from_name', null, 'No Body&#39;s Business'],
                 ]
             ));
 
@@ -974,15 +974,15 @@ class MailHelperTest extends TestCase
         self::assertSame(
             $realHeaders,
             [
-                'To' => 'contact1@somewhere.com',
-                'From' => 'No Body <nobody@nowhere.com>',
-                'Reply-To' => 'nobody@nowhere.com',
-                'Subject' => 'Test',
-                'X-Mautic-Test-2' => MailHelper::getBlankPixel(),
-                'X-Mautic-Test-1' => MailHelper::getBlankPixel(),
-                'List-Unsubscribe' => '<{unsubscribe_url}>',
+                'To'                    => 'contact1@somewhere.com',
+                'From'                  => 'No Body <nobody@nowhere.com>',
+                'Reply-To'              => 'nobody@nowhere.com',
+                'Subject'               => 'Test',
+                'X-Mautic-Test-2'       => MailHelper::getBlankPixel(),
+                'X-Mautic-Test-1'       => MailHelper::getBlankPixel(),
+                'List-Unsubscribe'      => '<{unsubscribe_url}>',
                 'List-Unsubscribe-Post' => 'List-Unsubscribe=One-Click',
             ]
-            );
+        );
     }
 }

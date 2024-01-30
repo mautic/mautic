@@ -18,12 +18,12 @@ class BcInterfaceTokenTransport implements TransportInterface
 
     /**
      * @var string[]
-     */    
+     */
     private $fromAddresses = [];
 
     /**
      * @var string[]
-     */    
+     */
     private $fromNames = [];
 
     private $numberToFail;
