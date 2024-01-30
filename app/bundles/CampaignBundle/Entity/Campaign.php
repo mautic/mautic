@@ -141,7 +141,7 @@ class Campaign extends FormEntity implements PublishStatusIconAttributesInterfac
             ->nullable()
             ->build();
 
-        $builder->addNamedField('allowRestart', 'integer', 'allow_restart');
+        $builder->addNamedField('allowRestart', 'boolean', 'allow_restart');
     }
 
     public static function loadValidatorMetadata(ClassMetadata $metadata): void
@@ -576,6 +576,7 @@ class Campaign extends FormEntity implements PublishStatusIconAttributesInterfac
      */
     public function setAllowRestart($allowRestart)
     {
+        $allowRestart = (bool) $allowRestart;
         $this->isChanged('allowRestart', $allowRestart);
 
         $this->allowRestart = (int) $allowRestart;
