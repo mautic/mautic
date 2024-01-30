@@ -2,11 +2,23 @@
   "name": "grapesjsbuilderbundle",
   "version": "1.0.0",
   "description": "⚠️ This Plugin is still Beta! It works great already and we're developing it actively! Please use it and report everything inside the \"Issues\" here in Github. ⚠️",
-  "main": "index.js",
+  "test": "Assets/library/js/dist/builder.js",
+  "targets": {
+    "test": {
+      "outputFormat": "global",
+      "distDir": "Assets/library/js/dist",
+      "publicUrl": "./",
+      "includeNodeModules": true
+    }
+  },
+  "@parcel/transformer-css": {
+    "errorRecovery": true
+  },
   "scripts": {
-    "build": "parcel build Assets/library/js/builder.js --out-dir Assets/library/js/dist --public-url ./",
-    "build-dev": "NODE_ENV=development parcel build Assets/library/js/builder.js --out-dir Assets/library/js/dist --public-url ./ --no-minify ",
-    "dev": "NODE_ENV=development parcel watch Assets/library/js/* --out-dir Assets/library/js/dist --public-url /plugins/GrapesJsBuilderBundle/Assets/library/js/dist --hmr-hostname localhost",
+    "build": "parcel build Assets/library/js/builder.js --dist-dir Assets/library/js/dist --public-url ./",
+    "build-dev": "NODE_ENV=development parcel build Assets/library/js/builder.js --dist-dir Assets/library/js/dist --public-url ./ --no-optimize",
+    "remove-build": "rm -rf ./Assets/library/js/dist/* && rm -rf .parcel-cache/*",
+    "dev": "NODE_ENV=development parcel watch Assets/library/js/* --dist-dir Assets/library/js/dist --public-url /plugins/GrapesJsBuilderBundle/Assets/library/js/dist --hmr-hostname localhost",
     "lint": "eslint Assets/library/js/",
     "prettier": "node_modules/.bin/prettier -w Assets/library/js/",
     "prettier-check": "node_modules/.bin/prettier -c Assets/library/js/",
@@ -26,13 +38,25 @@
   },
   "homepage": "https://github.com/mautic/plugin-grapesjs-builder#readme",
   "dependencies": {
-    "grapesjs": "^0.17.29",
-    "grapesjs-mjml": "^0.5.8",
+    "grapesjs": "^0.21.8",
+    "grapesjs-blocks-basic": "^1.0.1",
+    "grapesjs-component-countdown": "^1.0.1",
+    "grapesjs-custom-code": "^1.0.1",
+    "grapesjs-mjml": "^1.0.5",
+    "grapesjs-navbar": "^1.0.2",
     "grapesjs-parser-postcss": "^0.1.1",
     "grapesjs-plugin-ckeditor": "^0.0.10",
-    "grapesjs-preset-mautic": "github:mautic/grapesjs-preset-mautic#main",
-    "grapesjs-preset-newsletter": "^0.2.21",
-    "grapesjs-preset-webpage": "^0.1.11"
+    "grapesjs-plugin-export": "^1.0.11",
+    "grapesjs-plugin-forms": "^2.0.5",
+    "grapesjs-preset-mautic": "github:LordRembo/grapesjs-preset-mautic#update-grapesjs-compatibility-m4",
+    "grapesjs-preset-newsletter": "^1.0.2",
+    "grapesjs-preset-webpage": "^1.0.3",
+    "grapesjs-style-bg": "^2.0.1",
+    "grapesjs-tabs": "^1.0.6",
+    "grapesjs-tooltip": "^0.1.7",
+    "grapesjs-touch": "^0.1.1",
+    "grapesjs-tui-image-editor": "^0.1.3",
+    "grapesjs-typed": "^1.0.5"
   },
   "devDependencies": {
     "@babel/cli": "^7.16.8",
@@ -40,6 +64,7 @@
     "@babel/plugin-proposal-class-properties": "^7.16.7",
     "@babel/plugin-transform-runtime": "^7.16.8",
     "babel-eslint": "^10.1.0",
+    "buffer": "^6.0.3",
     "eslint": "^8.7.0",
     "eslint-config-airbnb": "^19.0.4",
     "eslint-config-prettier": "^8.3.0",
@@ -48,8 +73,9 @@
     "eslint-plugin-prettier": "^4.0.0",
     "eslint-plugin-react": "^7.28.0",
     "eslint-plugin-react-hooks": "^4.3.0",
-    "parcel-bundler": "^1.12.4",
+    "parcel": "^2.11.0",
     "prettier": "^2.5.1",
+    "process": "^0.11.10",
     "sass": "^1.48.0"
   }
 }
