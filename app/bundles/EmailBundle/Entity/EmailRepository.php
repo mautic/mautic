@@ -3,7 +3,9 @@
 namespace Mautic\EmailBundle\Entity;
 
 use Doctrine\DBAL\Query\QueryBuilder;
+use Doctrine\ORM\Internal\Hydration\IterableResult;
 use Doctrine\ORM\Query;
+use Doctrine\ORM\Query\Expr;
 use Doctrine\ORM\Tools\Pagination\Paginator;
 use Mautic\ChannelBundle\Entity\MessageQueue;
 use Mautic\CoreBundle\Entity\CommonRepository;
@@ -650,7 +652,7 @@ class EmailRepository extends CommonRepository
      *
      * @param int|null $id
      */
-    public function getPublishedBroadcasts($id = null): \Doctrine\ORM\Internal\Hydration\IterableResult
+    public function getPublishedBroadcasts($id = null): IterableResult
     {
         return $this->getPublishedBroadcastsQuery($id)->iterate();
     }
@@ -735,5 +737,77 @@ class EmailRepository extends CommonRepository
             ->innerJoin('lc', MAUTIC_TABLE_PREFIX.'emails', 'e', 'e.category_id = lc.category_id')
             ->where($qb->expr()->eq('e.id', $emailId))
             ->andWhere('lc.manually_removed = 1');
+    }
+
+    /**
+     * Gets emails with published variants.
+     *
+     * @return array<mixed>
+     */
+    public function getPublishedEmailsWithVariant()
+    {
+        $qb = $this->getPublishedEmailsWithVariantQb();
+
+        return $qb->getQuery()->getResult();
+    }
+
+    public function getPublishedEmailsWithVariantIterator(): IterableResult
+    {
+        $qb = $this->getPublishedEmailsWithVariantQb();
+
+        return $qb->getQuery()->iterate();
+    }
+
+    public function getEmailsWithVariantIterator(): IterableResult
+    {
+        $qb = $this->getEntityManager()
+            ->createQueryBuilder();
+
+        $qb->select('DISTINCT '.$this->getTableAlias().'.id')
+            ->from('MauticEmailBundle:Email', $this->getTableAlias())
+            ->innerJoin('MauticEmailBundle:Email', 'v', Expr\Join::WITH, $qb->expr()->eq($this->getTableAlias(), 'v.variantParent'));
+
+        return $qb->getQuery()->iterate();
+    }
+
+    private function getPublishedEmailsWithVariantQb(): \Doctrine\ORM\QueryBuilder
+    {
+        $qb = $this->getEntityManager()
+            ->createQueryBuilder();
+        $expr = $this->getPublishedByDateExpression($qb, $this->getTableAlias());
+
+        $qb->select('DISTINCT '.$this->getTableAlias())
+            ->from('MauticEmailBundle:Email', $this->getTableAlias())
+            ->innerJoin('MauticEmailBundle:Email', 'v', Expr\Join::WITH, $qb->expr()->andX(
+                $qb->expr()->eq($this->getTableAlias(), 'v.variantParent'),
+                $qb->expr()->eq('v.isPublished', true)
+            ))
+            ->where($expr);
+
+        return $qb;
+    }
+
+    private function getExcludedListQuery(int $emailId): ?QueryBuilder
+    {
+        $connection = $this->getEntityManager()
+            ->getConnection();
+        $excludedListIds = $connection->createQueryBuilder()
+            ->select('eel.leadlist_id')
+            ->from(MAUTIC_TABLE_PREFIX.'email_list_excluded', 'eel')
+            ->where('eel.email_id = :emailId')
+            ->setParameter('emailId', $emailId)
+            ->execute()
+            ->fetchAll(\PDO::FETCH_COLUMN);
+
+        if (!$excludedListIds) {
+            return null;
+        }
+
+        $queryBuilder = $connection->createQueryBuilder();
+        $queryBuilder->select('ll.lead_id')
+            ->from(MAUTIC_TABLE_PREFIX.'lead_lists_leads', 'll')
+            ->where($queryBuilder->expr()->in('ll.leadlist_id', $excludedListIds));
+
+        return $queryBuilder;
     }
 }
