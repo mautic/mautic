@@ -542,7 +542,7 @@ class MailHelperTest extends TestCase
                 $this->assertEquals('owner '.$contact['owner_id'], $body);
             } else {
                 $this->assertEquals('nobody@nowhere.com', $from);
-                $this->assertEquals('', $body);
+                $this->assertEquals('{signature}', $body); // The {signature} token is replaced in a subscriber with the current user's signature. But this is a unit test, so the subscriber doesn't run.
             }
         }
     }
