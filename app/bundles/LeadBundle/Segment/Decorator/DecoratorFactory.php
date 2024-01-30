@@ -12,50 +12,14 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class DecoratorFactory
 {
-    /**
-     * @var ContactSegmentFilterDictionary
-     */
-    private $contactSegmentFilterDictionary;
-
-    /**
-     * @var BaseDecorator
-     */
-    private $baseDecorator;
-
-    /**
-     * @var CustomMappedDecorator
-     */
-    private $customMappedDecorator;
-
-    /**
-     * @var CompanyDecorator
-     */
-    private $companyDecorator;
-
-    /**
-     * @var DateOptionFactory
-     */
-    private $dateOptionFactory;
-
-    /**
-     * @var EventDispatcherInterface
-     */
-    private $eventDispatcher;
-
     public function __construct(
-        ContactSegmentFilterDictionary $contactSegmentFilterDictionary,
-        BaseDecorator $baseDecorator,
-        CustomMappedDecorator $customMappedDecorator,
-        DateOptionFactory $dateOptionFactory,
-        CompanyDecorator $companyDecorator,
-        EventDispatcherInterface $eventDispatcher
+        private ContactSegmentFilterDictionary $contactSegmentFilterDictionary,
+        private BaseDecorator $baseDecorator,
+        private CustomMappedDecorator $customMappedDecorator,
+        private DateOptionFactory $dateOptionFactory,
+        private CompanyDecorator $companyDecorator,
+        private EventDispatcherInterface $eventDispatcher
     ) {
-        $this->baseDecorator                  = $baseDecorator;
-        $this->customMappedDecorator          = $customMappedDecorator;
-        $this->dateOptionFactory              = $dateOptionFactory;
-        $this->contactSegmentFilterDictionary = $contactSegmentFilterDictionary;
-        $this->companyDecorator               = $companyDecorator;
-        $this->eventDispatcher                = $eventDispatcher;
     }
 
     /**
@@ -86,7 +50,7 @@ class DecoratorFactory
             $this->contactSegmentFilterDictionary->getFilter($originalField);
 
             return $this->customMappedDecorator;
-        } catch (FilterNotFoundException $e) {
+        } catch (FilterNotFoundException) {
             if ($contactSegmentFilterCrate->isCompanyType()) {
                 return $this->companyDecorator;
             }

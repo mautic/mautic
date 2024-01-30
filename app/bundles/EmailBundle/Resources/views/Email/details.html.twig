@@ -62,6 +62,19 @@
         'primary'   : true,
     } %}
     {% set customButtons = customButtons|merge([sendExampleButton]) %}
+    {% set heatmapButton = {
+        'attr' : {
+            'class'       : 'btn btn-default btn-nospin',
+            'data-toggle' : 'email-heatmap',
+            'data-email'  : email.getId(),
+            'data-target' : '#MauticSharedModal',
+            'href'        : '#',
+            'data-header' : 'mautic.email.heatmap.click_heatmap'|trans,
+        },
+        'iconClass' : 'fa fa-fire',
+        'btnText'   : 'mautic.email.heatmap.click_heatmap'
+    } %}
+    {% set customButtons = customButtons|merge([heatmapButton]) %}
 {% endif %}
 
 
@@ -326,10 +339,22 @@
               </div>
           </div>
 
+          <!-- email usages -->
+          <div class="panel bg-transparent shd-none bdr-rds-0 bdr-w-0 mt-sm mb-0" data-fetch-email-usages="{{ email.id }}">
+              <div class="panel-heading">
+                  <div class="panel-title">{{ 'mautic.email.usages'|trans }}</div>
+              </div>
+              <div class="panel-body pt-xs">
+                  <i class="fa fa-spinner fa-spin"></i>
+              </div>
+          </div>
+
           <!-- activity feed -->
           {{- include('@MauticCore/Helper/recentactivity.html.twig', {'logs': logs}) -}}
+
+
       </div>
-      <!--/ right section -->
+      <!-- right section -->
       <input name="entityId" id="entityId" type="hidden" value="{{ email.id|escape }}"/>
   </div>
 {% endblock %}

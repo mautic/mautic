@@ -26,9 +26,9 @@ class ClientRepository extends CommonRepository
     }
 
     /**
-     * {@inheritdoc}
+     * @return Paginator<Client>
      */
-    public function getEntities(array $args = [])
+    public function getEntities(array $args = []): Paginator
     {
         $q = $this
             ->createQueryBuilder('c');
@@ -38,10 +38,7 @@ class ClientRepository extends CommonRepository
         return new Paginator($query);
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    protected function addCatchAllWhereClause($q, $filter)
+    protected function addCatchAllWhereClause($q, $filter): array
     {
         return $this->addStandardCatchAllWhereClause($q, $filter, [
             'c.name',
@@ -49,20 +46,14 @@ class ClientRepository extends CommonRepository
         ]);
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    protected function getDefaultOrder()
+    protected function getDefaultOrder(): array
     {
         return [
             ['c.name', 'ASC'],
         ];
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getTableAlias()
+    public function getTableAlias(): string
     {
         return 'c';
     }

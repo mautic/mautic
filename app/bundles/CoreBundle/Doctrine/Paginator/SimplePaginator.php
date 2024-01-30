@@ -18,16 +18,14 @@ use IteratorAggregate;
  */
 class SimplePaginator implements \IteratorAggregate, \Countable
 {
-    /** @var Query<T> */
-    private Query $query;
     private ?int $count = null;
 
     /**
      * @param Query<T> $query a Doctrine ORM query or query builder
      */
-    public function __construct(Query $query)
-    {
-        $this->query = $query;
+    public function __construct(
+        private Query $query
+    ) {
     }
 
     /**

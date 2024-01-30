@@ -17,13 +17,13 @@ use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
- * Class EventType.
+ * @extends AbstractType<mixed>
  */
 class EventType extends AbstractType
 {
     use PropertiesTrait;
 
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $masks = [];
 
@@ -64,9 +64,7 @@ class EventType extends AbstractType
                 $choices['interval'] = $choices['interval'].'_inaction';
                 $choices['date']     = $choices['date'].'_inaction';
             }
-
-            reset($choices);
-            $default = key($choices);
+            $default = array_key_first($choices);
 
             $triggerMode = (empty($options['data']['triggerMode'])) ? $default : $options['data']['triggerMode'];
             $builder->add(
@@ -229,7 +227,7 @@ class EventType extends AbstractType
             HiddenType::class,
             [
                 'mapped' => false,
-                'data'   => (isset($options['data']['anchorEventType'])) ? $options['data']['anchorEventType'] : '',
+                'data'   => $options['data']['anchorEventType'] ?? '',
             ]
         );
 
@@ -277,7 +275,7 @@ class EventType extends AbstractType
         }
     }
 
-    public function configureOptions(OptionsResolver $resolver)
+    public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setRequired(['settings']);
     }

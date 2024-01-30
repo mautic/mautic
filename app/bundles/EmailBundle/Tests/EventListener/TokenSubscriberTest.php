@@ -15,7 +15,7 @@ use Symfony\Component\Mailer\Mailer;
 
 class TokenSubscriberTest extends \PHPUnit\Framework\TestCase
 {
-    public function testDynamicContentCustomTokens()
+    public function testDynamicContentCustomTokens(): void
     {
         $mockFactory = $this->getMockBuilder(MauticFactory::class)
             ->disableOriginalConstructor()

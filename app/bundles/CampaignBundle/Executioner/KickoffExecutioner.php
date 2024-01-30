@@ -2,7 +2,6 @@
 
 namespace Mautic\CampaignBundle\Executioner;
 
-use Doctrine\Common\Collections\ArrayCollection;
 use Mautic\CampaignBundle\Entity\Campaign;
 use Mautic\CampaignBundle\Entity\Event;
 use Mautic\CampaignBundle\Executioner\ContactFinder\KickoffContactFinder;
@@ -14,80 +13,31 @@ use Mautic\CampaignBundle\Executioner\Scheduler\EventScheduler;
 use Mautic\CampaignBundle\Executioner\Scheduler\Exception\NotSchedulableException;
 use Mautic\CoreBundle\Helper\ProgressBarHelper;
 use Psr\Log\LoggerInterface;
-use Symfony\Component\Console\Helper\ProgressBar;
 use Symfony\Component\Console\Output\NullOutput;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 class KickoffExecutioner implements ExecutionerInterface
 {
-    /**
-     * @var ContactLimiter
-     */
-    private $limiter;
+    private ?\Mautic\CampaignBundle\Executioner\ContactFinder\Limiter\ContactLimiter $limiter = null;
 
-    /**
-     * @var Campaign
-     */
-    private $campaign;
+    private ?\Mautic\CampaignBundle\Entity\Campaign $campaign = null;
 
-    /**
-     * @var OutputInterface
-     */
-    private $output;
+    private ?\Symfony\Component\Console\Output\OutputInterface $output = null;
 
-    /**
-     * @var LoggerInterface
-     */
-    private $logger;
+    private ?\Symfony\Component\Console\Helper\ProgressBar $progressBar = null;
 
-    /**
-     * @var KickoffContactFinder
-     */
-    private $kickoffContactFinder;
+    private ?\Doctrine\Common\Collections\ArrayCollection $rootEvents = null;
 
-    /**
-     * @var TranslatorInterface
-     */
-    private $translator;
-
-    /**
-     * @var EventExecutioner
-     */
-    private $executioner;
-
-    /**
-     * @var EventScheduler
-     */
-    private $scheduler;
-
-    /**
-     * @var ProgressBar
-     */
-    private $progressBar;
-
-    /**
-     * @var ArrayCollection
-     */
-    private $rootEvents;
-
-    /**
-     * @var Counter
-     */
-    private $counter;
+    private ?\Mautic\CampaignBundle\Executioner\Result\Counter $counter = null;
 
     public function __construct(
-        LoggerInterface $logger,
-        KickoffContactFinder $kickoffContactFinder,
-        TranslatorInterface $translator,
-        EventExecutioner $executioner,
-        EventScheduler $scheduler
+        private LoggerInterface $logger,
+        private KickoffContactFinder $kickoffContactFinder,
+        private TranslatorInterface $translator,
+        private EventExecutioner $executioner,
+        private EventScheduler $scheduler
     ) {
-        $this->logger               = $logger;
-        $this->kickoffContactFinder = $kickoffContactFinder;
-        $this->translator           = $translator;
-        $this->executioner          = $executioner;
-        $this->scheduler            = $scheduler;
     }
 
     /**
@@ -102,15 +52,15 @@ class KickoffExecutioner implements ExecutionerInterface
     {
         $this->campaign = $campaign;
         $this->limiter  = $limiter;
-        $this->output   = ($output) ? $output : new NullOutput();
+        $this->output   = $output ?: new NullOutput();
         $this->counter  = new Counter();
 
         try {
             $this->prepareForExecution();
             $this->executeOrScheduleEvent();
-        } catch (NoContactsFoundException $exception) {
+        } catch (NoContactsFoundException) {
             $this->logger->debug('CAMPAIGN: No more contacts to process');
-        } catch (NoEventsFoundException $exception) {
+        } catch (NoEventsFoundException) {
             $this->logger->debug('CAMPAIGN: No events to process');
         } finally {
             if ($this->progressBar) {
@@ -125,7 +75,7 @@ class KickoffExecutioner implements ExecutionerInterface
     /**
      * @throws NoEventsFoundException
      */
-    private function prepareForExecution()
+    private function prepareForExecution(): void
     {
         $this->logger->debug('CAMPAIGN: Triggering kickoff events');
 
@@ -166,7 +116,7 @@ class KickoffExecutioner implements ExecutionerInterface
      * @throws NoContactsFoundException
      * @throws NotSchedulableException
      */
-    private function executeOrScheduleEvent()
+    private function executeOrScheduleEvent(): void
     {
         // Use the same timestamp across all contacts processed
         $now = new \DateTime();
@@ -199,7 +149,7 @@ class KickoffExecutioner implements ExecutionerInterface
                     $rootEvents->remove($key);
 
                     continue;
-                } catch (NotSchedulableException $exception) {
+                } catch (NotSchedulableException) {
                     // Execute the event
                 }
             }

@@ -20,37 +20,34 @@ final class EmailSubscriberTest extends \PHPUnit\Framework\TestCase
     /**
      * @var MockObject|IpLookupHelper
      */
-    private $ipLookupHelper;
+    private \PHPUnit\Framework\MockObject\MockObject $ipLookupHelper;
 
     /**
      * @var MockObject|AuditLogModel
      */
-    private $auditLogModel;
+    private \PHPUnit\Framework\MockObject\MockObject $auditLogModel;
 
     /**
      * @var MockObject|EmailModel
      */
-    private $emailModel;
+    private \PHPUnit\Framework\MockObject\MockObject $emailModel;
 
     /**
      * @var MockObject|TranslatorInterface
      */
-    private $translator;
+    private \PHPUnit\Framework\MockObject\MockObject $translator;
 
     /**
      * @var MockObject|EntityManager
      */
-    private $em;
+    private \PHPUnit\Framework\MockObject\MockObject $em;
 
     /**
      * @var MockObject|MauticMessage
      */
-    private $mockMessage;
+    private \PHPUnit\Framework\MockObject\MockObject $mockMessage;
 
-    /**
-     * @var EmailSubscriber
-     */
-    private $subscriber;
+    private \Mautic\EmailBundle\EventListener\EmailSubscriber $subscriber;
 
     protected function setup(): void
     {

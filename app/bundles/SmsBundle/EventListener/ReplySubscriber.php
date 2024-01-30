@@ -17,19 +17,13 @@ class ReplySubscriber implements EventSubscriberInterface
 {
     use TimelineEventLogTrait;
 
-    /**
-     * ReplySubscriber constructor.
-     */
     public function __construct(Translator $translator, LeadEventLogRepository $eventLogRepository)
     {
         $this->translator         = $translator;
         $this->eventLogRepository = $eventLogRepository;
     }
 
-    /**
-     * @return array
-     */
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             SmsEvents::ON_REPLY              => ['onReply', 0],
@@ -37,7 +31,7 @@ class ReplySubscriber implements EventSubscriberInterface
         ];
     }
 
-    public function onReply(ReplyEvent $event)
+    public function onReply(ReplyEvent $event): void
     {
         $message = $event->getMessage();
         $contact = $event->getContact();
@@ -58,7 +52,7 @@ class ReplySubscriber implements EventSubscriberInterface
         $this->eventLogRepository->detachEntity($log);
     }
 
-    public function onTimelineGenerate(LeadTimelineEvent $event)
+    public function onTimelineGenerate(LeadTimelineEvent $event): void
     {
         $this->addEvents(
             $event,

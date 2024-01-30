@@ -6,9 +6,12 @@ use Mautic\CampaignBundle\Entity\CampaignRepository;
 use Mautic\CampaignBundle\Service\Campaign;
 use Mautic\EmailBundle\Entity\EmailRepository;
 
+/**
+ * @deprecated to be removed in 6.0
+ */
 class CampaignTest extends \PHPUnit\Framework\TestCase
 {
-    public function testHasUnpublishedEmail()
+    public function testHasUnpublishedEmail(): void
     {
         $campaignId         = 1;
         $campaignRepository = $this->createMock(CampaignRepository::class);

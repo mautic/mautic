@@ -3,6 +3,7 @@
 namespace Mautic\SmsBundle\Helper;
 
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\DBAL\ArrayParameterType;
 use Doctrine\DBAL\Connection;
 use Mautic\CoreBundle\Helper\PhoneNumberHelper;
 use Mautic\LeadBundle\Entity\LeadRepository;
@@ -10,42 +11,19 @@ use Mautic\SmsBundle\Exception\NumberNotFoundException;
 
 class ContactHelper
 {
-    /**
-     * @var LeadRepository
-     */
-    private $leadRepository;
-
-    /**
-     * @var Connection
-     */
-    private $connection;
-
-    /**
-     * @var PhoneNumberHelper
-     */
-    private $phoneNumberHelper;
-
-    /**
-     * ContactHelper constructor.
-     */
     public function __construct(
-        LeadRepository $leadRepository,
-        Connection $connection,
-        PhoneNumberHelper $phoneNumberHelper
+        private LeadRepository $leadRepository,
+        private Connection $connection,
+        private PhoneNumberHelper $phoneNumberHelper
     ) {
-        $this->leadRepository    = $leadRepository;
-        $this->connection        = $connection;
-        $this->phoneNumberHelper = $phoneNumberHelper;
     }
 
     /**
      * @param string $number
      *
-     * @return ArrayCollection
-     *
      * @throws NumberNotFoundException
      */
-    public function findContactsByNumber($number)
+    public function findContactsByNumber($number): ArrayCollection
     {
         // Who knows what the number was originally formatted as so let's try a few
         $searchForNumbers = $this->phoneNumberHelper->getFormattedNumberList($number);
@@ -60,8 +38,8 @@ class ContactHelper
                     'l.phone IN (:numbers)'
                 )
             )
-            ->setParameter('numbers', $searchForNumbers, Connection::PARAM_STR_ARRAY)
-            ->execute()
+            ->setParameter('numbers', $searchForNumbers, ArrayParameterType::STRING)
+            ->executeQuery()
             ->fetchAllAssociative();
 
         $ids = array_column($foundContacts, 'id');

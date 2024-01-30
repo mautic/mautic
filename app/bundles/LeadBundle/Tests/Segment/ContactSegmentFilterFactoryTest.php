@@ -16,7 +16,7 @@ class ContactSegmentFilterFactoryTest extends \PHPUnit\Framework\TestCase
     /**
      * @covers \Mautic\LeadBundle\Segment\ContactSegmentFilterFactory
      */
-    public function testLeadFilter()
+    public function testLeadFilter(): void
     {
         $tableSchemaColumnsCache = $this->createMock(TableSchemaColumnsCache::class);
         $container               = $this->createMock(Container::class);

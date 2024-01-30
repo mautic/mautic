@@ -27,7 +27,7 @@ class LeadTriggerLog
      **/
     private $dateFired;
 
-    public static function loadMetadata(ORM\ClassMetadata $metadata)
+    public static function loadMetadata(ORM\ClassMetadata $metadata): void
     {
         $builder = new ClassMetadataBuilder($metadata);
 
@@ -60,7 +60,7 @@ class LeadTriggerLog
     /**
      * @param mixed $dateFired
      */
-    public function setDateFired($dateFired)
+    public function setDateFired($dateFired): void
     {
         $this->dateFired = $dateFired;
     }
@@ -76,7 +76,7 @@ class LeadTriggerLog
     /**
      * @param mixed $ipAddress
      */
-    public function setIpAddress($ipAddress)
+    public function setIpAddress($ipAddress): void
     {
         $this->ipAddress = $ipAddress;
     }
@@ -92,7 +92,7 @@ class LeadTriggerLog
     /**
      * @param mixed $lead
      */
-    public function setLead($lead)
+    public function setLead($lead): void
     {
         $this->lead = $lead;
     }
@@ -108,7 +108,7 @@ class LeadTriggerLog
     /**
      * @param mixed $event
      */
-    public function setEvent($event)
+    public function setEvent($event): void
     {
         $this->event = $event;
     }

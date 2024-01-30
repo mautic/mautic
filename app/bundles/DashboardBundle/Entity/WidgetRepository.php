@@ -14,10 +14,8 @@ class WidgetRepository extends CommonRepository
      *
      * @param array $ordering
      * @param int   $userId
-     *
-     * @return string
      */
-    public function updateOrdering($ordering, $userId)
+    public function updateOrdering($ordering, $userId): void
     {
         $widgets = $this->getEntities(
             [
@@ -36,20 +34,14 @@ class WidgetRepository extends CommonRepository
         $this->saveEntities($widgets);
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    protected function getDefaultOrder()
+    protected function getDefaultOrder(): array
     {
         return [
             ['w.ordering', 'ASC'],
         ];
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getTableAlias()
+    public function getTableAlias(): string
     {
         return 'w';
     }

@@ -12,16 +12,11 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class LeadFieldData extends AbstractFixture implements OrderedFixtureInterface, FixtureGroupInterface
 {
-    private TranslatorInterface $translator;
-
-    public function __construct(TranslatorInterface $translator)
-    {
-        $this->translator = $translator;
+    public function __construct(
+        private TranslatorInterface $translator
+    ) {
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public static function getGroups(): array
     {
         return ['group_install', 'group_mautic_install_data'];
@@ -30,7 +25,7 @@ class LeadFieldData extends AbstractFixture implements OrderedFixtureInterface, 
     /**
      * @throws \Doctrine\DBAL\Schema\SchemaException
      */
-    public function load(ObjectManager $manager)
+    public function load(ObjectManager $manager): void
     {
         $fieldGroups['lead']    = FieldModel::$coreFields;
         $fieldGroups['company'] = FieldModel::$coreCompanyFields;
@@ -38,18 +33,18 @@ class LeadFieldData extends AbstractFixture implements OrderedFixtureInterface, 
         foreach ($fieldGroups as $fields) {
             $order = 1;
             foreach ($fields as $alias => $field) {
-                $type = isset($field['type']) ? $field['type'] : 'text';
+                $type = $field['type'] ?? 'text';
 
                 $entity = new LeadField();
                 $entity->setLabel($this->translator->trans('mautic.lead.field.'.$alias, [], 'fixtures'));
-                $entity->setGroup(isset($field['group']) ? $field['group'] : 'core');
+                $entity->setGroup($field['group'] ?? 'core');
                 $entity->setOrder($order);
                 $entity->setAlias($alias);
-                $entity->setIsRequired(isset($field['required']) ? $field['required'] : false);
+                $entity->setIsRequired($field['required'] ?? false);
                 $entity->setType($type);
                 $entity->setObject($field['object']);
                 $entity->setIsUniqueIdentifer(!empty($field['unique']));
-                $entity->setProperties(isset($field['properties']) ? $field['properties'] : []);
+                $entity->setProperties($field['properties'] ?? []);
                 $entity->setIsFixed(!empty($field['fixed']));
                 $entity->setIsListable(!empty($field['listable']));
                 $entity->setIsShortVisible(!empty($field['short']));
@@ -69,9 +64,6 @@ class LeadFieldData extends AbstractFixture implements OrderedFixtureInterface, 
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getOrder()
     {
         return 4;
