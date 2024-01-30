@@ -2,6 +2,13 @@ import grapesjs from 'grapesjs';
 import grapesjsmjml from 'grapesjs-mjml';
 import grapesjsnewsletter from 'grapesjs-preset-newsletter';
 import grapesjswebpage from 'grapesjs-preset-webpage';
+import grapesjsblocksbasic from 'grapesjs-blocks-basic';
+import grapesjscomponentcountdown from 'grapesjs-component-countdown';
+import grapesjsnavbar from 'grapesjs-navbar';
+import grapesjscustomcode from 'grapesjs-custom-code';
+import grapesjstouch from 'grapesjs-touch';
+import grapesjstuiimageeditor from 'grapesjs-tui-image-editor';
+import grapesjsstylebg from 'grapesjs-style-bg';
 import grapesjspostcss from 'grapesjs-parser-postcss';
 import contentService from 'grapesjs-preset-mautic/dist/content.service';
 import grapesjsmautic from 'grapesjs-preset-mautic';
@@ -129,6 +136,11 @@ export default class BuilderService {
     return {
       options: {
         language: 'en',
+        startupFocus: true,
+        extraAllowedContent: '*(*);*{*}', // Allows any class and any inline style
+        allowedContent: true, // Disable auto-formatting, class removing, etc.
+        enterMode: 2, // CKEDITOR.ENTER_BR,
+        ckeditor: 'https://cdn.ckeditor.com/4.22.1/standard-all/ckeditor.js',
         toolbar: [
           { name: 'links', items: ['Link', 'Unlink'] },
           { name: 'basicstyles', items: ['Bold', 'Italic', 'Strike', '-', 'RemoveFormat'] },
@@ -160,13 +172,29 @@ export default class BuilderService {
       styleManager: {
         clearProperties: true, // Temp fix https://github.com/artf/grapesjs-preset-webpage/issues/27
       },
-      plugins: [grapesjswebpage, grapesjspostcss, grapesjsmautic, 'gjs-plugin-ckeditor'],
+      plugins: [
+        // partially copied from: https://github.com/GrapesJS/grapesjs/blob/gh-pages/demo.html
+        grapesjswebpage,
+        grapesjspostcss,
+        grapesjsmautic,
+        'gjs-plugin-ckeditor',
+        grapesjsblocksbasic,
+        grapesjscomponentcountdown,
+        grapesjsnavbar,
+        grapesjscustomcode,
+        grapesjstouch,
+        grapesjspostcss,
+        grapesjstuiimageeditor,
+        grapesjsstylebg,
+      ],
       pluginsOpts: {
         [grapesjswebpage]: {
           formsOpts: false,
+          useCustomTheme: false,
         },
         grapesjsmautic: BuilderService.getMauticConf('page-html'),
         'gjs-plugin-ckeditor': BuilderService.getCkeConf(),
+        
       },
     });
 
@@ -179,15 +207,28 @@ export default class BuilderService {
     mjmlService.mjmlToHtml(components);
 
     this.editor = grapesjs.init({
+      selectorManager: {
+        componentFirst: true,
+      },
+      avoidInlineStyle: false, // TEMP: fixes issue with disappearing inline styles
+      forceClass: false, // create new styles if there are some already on the element: https://github.com/GrapesJS/grapesjs/issues/1531
       clearOnRender: true,
       container: '.builder-panel',
       components,
+      domComponents: {
+        // disable all except link components
+        disableTextInnerChilds: (child) => !child.is('link'), // https://github.com/GrapesJS/grapesjs/releases/tag/v0.21.2
+      },
       height: '100%',
       storageManager: false,
       assetManager: this.getAssetManagerConf(),
       plugins: [grapesjsmjml, grapesjspostcss, grapesjsmautic, 'gjs-plugin-ckeditor'],
       pluginsOpts: {
-        grapesjsmjml: {},
+        [grapesjsmjml]: {
+          hideSelector: false,
+          custom: false,
+          useCustomTheme: false,
+        },
         grapesjsmautic: BuilderService.getMauticConf('email-mjml'),
         'gjs-plugin-ckeditor': BuilderService.getCkeConf(),
       },
@@ -216,7 +257,9 @@ export default class BuilderService {
       assetManager: this.getAssetManagerConf(),
       plugins: [grapesjsnewsletter, grapesjspostcss, grapesjsmautic, 'gjs-plugin-ckeditor'],
       pluginsOpts: {
-        grapesjsnewsletter: {},
+        grapesjsnewsletter: {
+          useCustomTheme: false,
+        },
         grapesjsmautic: BuilderService.getMauticConf('email-html'),
         'gjs-plugin-ckeditor': BuilderService.getCkeConf(),
       },
