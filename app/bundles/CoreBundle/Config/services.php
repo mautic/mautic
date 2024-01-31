@@ -66,9 +66,4 @@ return function (ContainerConfigurator $configurator): void {
     $services->get(\Mautic\CoreBundle\EventListener\CacheInvalidateSubscriber::class)
         ->arg('$ormConfiguration', service('doctrine.orm.default_configuration'))
         ->tag('doctrine.event_subscriber');
-
-    $services->alias('mautic.core.variant.converter', \Mautic\CoreBundle\Model\AbTest\VariantConverterService::class);
-    $services->alias('mautic.core.variant.abtest_settings', \Mautic\CoreBundle\Model\AbTest\AbTestSettingsService::class);
-    $services->alias('mautic.core.variant.abtest_result', \Mautic\CoreBundle\Model\AbTest\AbTestResultService::class);
-    $services->alias('mautic.core.variant.variant_updater', \Mautic\CoreBundle\Model\AbTest\VariantUpdaterService::class);
 };

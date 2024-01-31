@@ -40,19 +40,6 @@ class EmailController extends FormController
 
     public const EXAMPLE_EMAIL_SUBJECT_PREFIX = '[TEST]';
 
-    private AbTestSettingsService $abTestSettingsService;
-    private AbTestResultService $abTestResultService;
-
-    public function setAbTestSettingsService(AbTestSettingsService $abTestSettingsService): void
-    {
-        $this->abTestSettingsService = $abTestSettingsService;
-    }
-
-    public function setAbTestResultService(AbTestResultService $abTestResultService): void
-    {
-        $this->abTestResultService = $abTestResultService;
-    }
-
     /**
      * @param int $page
      *
@@ -271,7 +258,7 @@ class EmailController extends FormController
      *
      * @return \Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\Response
      */
-    public function viewAction(Request $request, $objectId)
+    public function viewAction(Request $request, $objectId, AbTestSettingsService $abTestSettingsService, AbTestResultService $abTestResultService)
     {
         /** @var \Mautic\EmailBundle\Model\EmailModel $model */
         $model    = $this->getModel('email');
@@ -324,10 +311,10 @@ class EmailController extends FormController
         $criteria            = $model->getBuilderComponents($email, 'abTestWinnerCriteria');
 
         if (count($children) > 0) {
-            $abTestSettings = $this->abTestSettingsService->getAbTestSettings($parent);
+            $abTestSettings = $abTestSettingsService->getAbTestSettings($parent);
 
             if (isset($criteria['criteria']) && isset($abTestSettings['winnerCriteria'])) {
-                $abTestResults = $this->abTestResultService->getAbTestResult(
+                $abTestResults = $abTestResultService->getAbTestResult(
                     $parent,
                     $criteria['criteria'][$abTestSettings['winnerCriteria']]
                 );

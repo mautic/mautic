@@ -40,8 +40,4 @@ return function (ContainerConfigurator $configurator): void {
     $services->alias('mautic.email.repository.email', \Mautic\EmailBundle\Entity\EmailRepository::class);
     $services->alias('mautic.email.repository.emailReply', \Mautic\EmailBundle\Entity\EmailReplyRepository::class);
     $services->alias('mautic.email.repository.stat', \Mautic\EmailBundle\Entity\StatRepository::class);
-
-    $services->get(\Mautic\EmailBundle\Controller\EmailController::class)
-        ->call('setAbTestSettingsService', [service(\Mautic\CoreBundle\Model\AbTest\AbTestSettingsService::class)])
-        ->call('setAbTestResultService', [service(\Mautic\CoreBundle\Model\AbTest\AbTestResultService::class)]);
 };
