@@ -7,10 +7,32 @@ use GuzzleHttp\Psr7\Request;
 use GuzzleHttp\Psr7\Response;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\WebhookBundle\Http\Client;
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
-class ClientTest extends TestCase
+final class ClientTest extends TestCase
 {
+    /**
+     * @var MockObject&CoreParametersHelper
+     */
+    private MockObject $parametersMock;
+
+    /**
+     * @var MockObject&GuzzleClient
+     */
+    private MockObject $httpClientMock;
+
+    private Client $client;
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        $this->parametersMock = $this->createMock(CoreParametersHelper::class);
+        $this->httpClientMock = $this->createMock(GuzzleClient::class);
+        $this->client         = new Client($this->parametersMock, $this->httpClientMock);
+    }
+
     public function testPost(): void
     {
         $method  = 'POST';
@@ -22,17 +44,14 @@ class ClientTest extends TestCase
             'X-Origin-Base-URL' => $siteUrl,
         ];
 
-        $response = new Response(); // here too
+        $response = new Response();
 
-        $parametersMock     = $this->createMock(CoreParametersHelper::class);
-        $httpClientMock     = $this->createMock(GuzzleClient::class);
-
-        $parametersMock->expects($this->once())
+        $this->parametersMock->expects($this->once())
             ->method('get')
             ->with('site_url')
             ->willReturn($siteUrl);
 
-        $httpClientMock->expects($this->once())
+        $this->httpClientMock->expects($this->once())
             ->method('sendRequest')
             ->with($this->callback(function (Request $request) use ($method, $url, $headers, $payload) {
                 $this->assertSame($method, $request->getMethod());
@@ -49,8 +68,6 @@ class ClientTest extends TestCase
             }))
             ->willReturn($response);
 
-        $client = new Client($parametersMock, $httpClientMock);
-
-        $this->assertEquals($response, $client->post($url, $payload));
+        $this->assertEquals($response, $this->client->post($url, $payload));
     }
 }

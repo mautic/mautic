@@ -14,7 +14,7 @@ class ConnectwiseIntegrationTest extends AbstractIntegrationTestCase
     /**
      * @testdox Test that all records are fetched till last page of results are consumed
      *
-     * @covers  \MauticPlugin\MauticCrmBundle\Integration\ConnectwiseIntegration::getRecords()
+     * @covers \MauticPlugin\MauticCrmBundle\Integration\ConnectwiseIntegration::getRecords
      */
     public function testMultiplePagesOfRecordsAreFetched(): void
     {
@@ -32,7 +32,7 @@ class ConnectwiseIntegrationTest extends AbstractIntegrationTestCase
 
         $integration = $this->getMockBuilder(ConnectwiseIntegration::class)
             ->disableOriginalConstructor()
-            ->setMethodsExcept(['getRecords'])
+            ->onlyMethods(['isAuthorized', 'getApiHelper', 'getMauticLead'])
             ->getMock();
 
         $integration->expects($this->once())
@@ -49,7 +49,7 @@ class ConnectwiseIntegrationTest extends AbstractIntegrationTestCase
     /**
      * @testdox Test that all records are fetched till last page of results are consumed
      *
-     * @covers  \MauticPlugin\MauticCrmBundle\Integration\ConnectwiseIntegration::getCampaignMembers()
+     * @covers \MauticPlugin\MauticCrmBundle\Integration\ConnectwiseIntegration::getCampaignMembers
      */
     public function testMultiplePagesOfCampaignMemberRecordsAreFetched(): void
     {
@@ -88,7 +88,7 @@ class ConnectwiseIntegrationTest extends AbstractIntegrationTestCase
                 $integrationEntityModel,
                 $this->doNotContact,
             ])
-            ->setMethodsExcept(['getCampaignMembers', 'getRecordList', 'setIntegrationEntityModel'])
+            ->onlyMethods(['isAuthorized', 'getApiHelper', 'getRecords', 'saveCampaignMembers'])
             ->getMock();
 
         $integration->expects($this->once())

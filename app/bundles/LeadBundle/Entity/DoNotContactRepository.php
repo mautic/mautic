@@ -2,7 +2,7 @@
 
 namespace Mautic\LeadBundle\Entity;
 
-use Doctrine\DBAL\Connection;
+use Doctrine\DBAL\ArrayParameterType;
 use Mautic\CoreBundle\Entity\CommonRepository;
 use Mautic\CoreBundle\Helper\Chart\ChartQuery;
 
@@ -72,7 +72,7 @@ class DoNotContactRepository extends CommonRepository
                         $q->expr()->in('cs.leadlist_id', ':segmentIds')
                     );
 
-                    $q->setParameter('segmentIds', $listId, Connection::PARAM_INT_ARRAY);
+                    $q->setParameter('segmentIds', $listId, ArrayParameterType::INTEGER);
 
                     $q->addSelect('cs.leadlist_id')
                         ->groupBy('cs.leadlist_id');
@@ -88,7 +88,7 @@ class DoNotContactRepository extends CommonRepository
                         $q->expr()->in('list.leadlist_id', ':segmentIds')
                     );
 
-                $q->setParameter('segmentIds', $listId, Connection::PARAM_INT_ARRAY);
+                $q->setParameter('segmentIds', $listId, ArrayParameterType::INTEGER);
 
                 $q->innerJoin('dnc', sprintf('(%s)', $subQ->getSQL()), 'cs', 'cs.lead_id = dnc.lead_id');
             }

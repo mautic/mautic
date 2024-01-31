@@ -362,6 +362,7 @@ return [
         ],
         'services' => [
             'mautic.campaign.service.campaign'=> [
+                /** @phpstan-ignore-next-line */
                 'class'     => \Mautic\CampaignBundle\Service\Campaign::class,
                 'arguments' => [
                     'mautic.campaign.repository.campaign',
