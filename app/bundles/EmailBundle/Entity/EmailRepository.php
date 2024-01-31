@@ -706,6 +706,8 @@ class EmailRepository extends CommonRepository
 
     /**
      * Is one of emails unpublished?
+     *
+     * @deprecated to be removed in 6.0 with no replacement
      */
     public function isOneUnpublished(array $ids): bool
     {
