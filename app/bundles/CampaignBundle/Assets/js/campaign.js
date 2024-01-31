@@ -2155,3 +2155,23 @@ Mautic.confirmCallbackCampaignPublishStatus = function (action, el) {
     // Dismiss the confirmation
     Mautic.dismissConfirmation();
 }
+
+Mautic.showSendToDncConfirmation = function (el) {
+    const element = mQuery(el);
+
+    if (element.val() === '1' && element.prop('checked')) {
+        Mautic.showConfirmation(element);
+    }
+};
+
+Mautic.setSendToDncToNo = function(el) {
+    Mautic.dismissConfirmation();
+    const noButton   = mQuery(el).parent('.btn-yes').siblings('.btn-no').children('input');
+    const noButtonId = mQuery(noButton).attr('id');
+
+    if (noButtonId !== undefined) {
+        mQuery('#' + noButtonId).trigger('click');
+        mQuery(el).parent('.btn-yes').removeClass('active');
+        mQuery(el).parent('.btn-yes').siblings('.btn-no').addClass('active');
+    }
+};
