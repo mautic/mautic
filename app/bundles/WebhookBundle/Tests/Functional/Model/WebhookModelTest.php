@@ -113,6 +113,6 @@ final class WebhookModelTest extends MauticMysqlTestCase
 
         $this->setUpSymfony($webhookParams);
 
-        return $this->getContainer()->get('mautic.webhook.model.webhook');
+        return static::getContainer()->get('mautic.webhook.model.webhook');
     }
 }

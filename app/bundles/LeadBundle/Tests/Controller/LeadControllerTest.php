@@ -298,7 +298,7 @@ class LeadControllerTest extends MauticMysqlTestCase
         $contactExportScheduler = $this->em->getRepository(ContactExportScheduler::class)->findOneBy([]);
         $data                   = $contactExportScheduler->getData();
         /** @var CoreParametersHelper $coreParametersHelper */
-        $coreParametersHelper = self::$container->get('mautic.helper.core_parameters');
+        $coreParametersHelper = static::getContainer()->get('mautic.helper.core_parameters');
 
         Assert::assertSame(
             [
@@ -412,7 +412,7 @@ class LeadControllerTest extends MauticMysqlTestCase
     {
         $crawler             = $this->client->request('GET', '/s/contacts/new');
         $elementPlaceholder  = $crawler->filter('#lead_timezone')->filter('select')->attr('data-placeholder');
-        $expectedPlaceholder = self::$container->get('translator')->trans('mautic.lead.field.timezone');
+        $expectedPlaceholder = static::getContainer()->get('translator')->trans('mautic.lead.field.timezone');
         $this->assertEquals($expectedPlaceholder, $elementPlaceholder);
 
         // Test that a locale option is present correctly.
@@ -687,9 +687,9 @@ class LeadControllerTest extends MauticMysqlTestCase
     public function testContactCompanyEditShowsOldCompanyNameInAuditLog(): void
     {
         /** @var CompanyModel $companyModel */
-        $companyModel = self::$container->get('mautic.lead.model.company');
+        $companyModel = static::getContainer()->get('mautic.lead.model.company');
         /** @var LeadModel $contactModel */
-        $contactModel = self::$container->get('mautic.lead.model.lead');
+        $contactModel = static::getContainer()->get('mautic.lead.model.lead');
 
         // Create companies
         $company = (new Company())
@@ -736,7 +736,7 @@ class LeadControllerTest extends MauticMysqlTestCase
     public function testSetNullCompanyToContact(): void
     {
         /** @var LeadModel $contactModel */
-        $contactModel = self::$container->get('mautic.lead.model.lead');
+        $contactModel = static::getContainer()->get('mautic.lead.model.lead');
 
         $company = new Company();
         $company->setName('Doe Corp');
