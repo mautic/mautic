@@ -387,7 +387,7 @@ class Widget extends FormEntity
     /**
      * Set loadTime.
      *
-     * @param string|float $loadTime
+     * @param string|float|int $loadTime
      *
      * @return Widget
      */

@@ -22,7 +22,7 @@ class WidgetDetailEventFactory
 
     public function create(Widget $widget): WidgetDetailEvent
     {
-        $event = new WidgetDetailEvent($this->translator, $this->cacheProvider, $this->corePermissions, $widget);
+        $event = new WidgetDetailEvent($this->translator, $this->corePermissions, $widget, $this->cacheProvider);
         $event->setCacheDir('', $this->userHelper->getUser()->getId());
 
         return $event;

@@ -34,7 +34,7 @@ class WidgetDetailEvent extends CommonEvent
 
     private string $cacheKeyPath = 'dashboard.widget.';
 
-    public function __construct(private TranslatorInterface $translator, private ?CacheProvider $cacheProvider = null, private CorePermissions $security, protected Widget $widget)
+    public function __construct(private TranslatorInterface $translator, private CorePermissions $security, protected Widget $widget, private ?CacheProvider $cacheProvider = null)
     {
         $this->startTime = microtime(true);
         $this->setWidget($widget);
