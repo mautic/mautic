@@ -69,6 +69,7 @@ $container->loadFromExtension('framework', [
     ],
     'session'         => [ // handler_id set to null will use default session handler from php.ini
         'handler_id'           => null,
+        'storage_factory_id'   => 'session.storage.factory.native',
         'name'                 => '%env(MAUTIC_SESSION_NAME)%',
         'cookie_secure'        => $secureCookie,
         'cookie_samesite'      => 'lax',
