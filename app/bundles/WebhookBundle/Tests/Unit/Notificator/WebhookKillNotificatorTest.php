@@ -173,7 +173,7 @@ final class WebhookKillNotificatorTest extends \PHPUnit\Framework\TestCase
         $this->mailHelperMock
             ->expects($this->once())
             ->method('setCc')
-            ->with($this->ownerEmail);
+            ->with([$this->ownerEmail => null]);
 
         $this->webhookKillNotificator->send($this->webhook, $this->reason);
     }
