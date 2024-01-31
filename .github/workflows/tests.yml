@@ -208,7 +208,7 @@ jobs:
             fi
           done
           if [[ $cs_fix_files ]]; then
-            bin/php-cs-fixer fix --config=.php-cs-fixer.php -v --dry-run --using-cache=no --show-progress=dots --diff $cs_fix_files
+            bin/php-cs-fixer fix --config=.php-cs-fixer.php --dry-run --using-cache=no --show-progress=dots --diff $cs_fix_files
           fi
         elif [[ "${{ matrix.commands }}" == "scaffolded files mismatch" ]]; then
           wget -q -O /tmp/jq https://github.com/stedolan/jq/releases/download/jq-1.6/jq-linux64 && chmod 755 /tmp/jq

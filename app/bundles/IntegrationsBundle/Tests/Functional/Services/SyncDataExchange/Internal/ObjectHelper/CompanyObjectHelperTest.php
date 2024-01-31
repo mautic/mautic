@@ -21,7 +21,7 @@ class CompanyObjectHelperTest extends MauticMysqlTestCase
     public function testUpdateEmpty(): void
     {
         /** @var CompanyObjectHelper $companyObjectHelper */
-        $companyObjectHelper  = self::$container->get('mautic.integrations.helper.company_object');
+        $companyObjectHelper  = static::getContainer()->get('mautic.integrations.helper.company_object');
         $updatedMappedObjects = $companyObjectHelper->update([], []);
         Assert::assertSame([], $updatedMappedObjects);
     }
@@ -29,7 +29,7 @@ class CompanyObjectHelperTest extends MauticMysqlTestCase
     public function testUpdate(): void
     {
         /** @var UserModel $userModel */
-        $userModel = self::$container->get('mautic.user.model.user');
+        $userModel = static::getContainer()->get('mautic.user.model.user');
         $users     = $userModel->getRepository()->findAll();
         $user      = reset($users);
         $now       = new \DateTime();
@@ -43,7 +43,7 @@ class CompanyObjectHelperTest extends MauticMysqlTestCase
         $company2->setOwner($user);
 
         /** @var CompanyModel $companyModel */
-        $companyModel = self::$container->get('mautic.lead.model.company');
+        $companyModel = static::getContainer()->get('mautic.lead.model.company');
         $companyModel->saveEntity($company1);
         $companyModel->saveEntity($company2);
 
@@ -51,7 +51,7 @@ class CompanyObjectHelperTest extends MauticMysqlTestCase
         $city  = 'Boston';
 
         /** @var CompanyObjectHelper $companyObjectHelper */
-        $companyObjectHelper = self::$container->get('mautic.integrations.helper.company_object');
+        $companyObjectHelper = static::getContainer()->get('mautic.integrations.helper.company_object');
         $companyObjectHelper->update([
             $company1->getId(),
             $company2->getId(),

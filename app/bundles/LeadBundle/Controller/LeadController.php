@@ -11,6 +11,7 @@ use Mautic\CoreBundle\Helper\ExportHelper;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Model\IteratorExportDataModel;
+use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Helper\MailHelper;
 use Mautic\LeadBundle\DataObject\LeadManipulator;
 use Mautic\LeadBundle\Deduplicate\ContactMerger;
@@ -1407,13 +1408,12 @@ class LeadController extends FormController
                         $mailer->addTo($leadEmail, $leadName);
 
                         if (!empty($email[EmailType::REPLY_TO_ADDRESS])) {
-                            $addresses = explode(',', $email[EmailType::REPLY_TO_ADDRESS]);
-
-                            $mailer->setReplyTo($addresses);
+                            // The reply to address must be set into an email entity in order to take an effect. Otherwise it's overridden.
+                            $emailEntity = new Email();
+                            $emailEntity->setSubject($email['subject']);
+                            $emailEntity->setReplyToAddress($email[EmailType::REPLY_TO_ADDRESS]);
+                            $mailer->setEmail($emailEntity);
                         }
-
-                        // From user
-                        $user = $userHelper->getUser();
 
                         $mailer->setFrom(
                             $email['from'],
