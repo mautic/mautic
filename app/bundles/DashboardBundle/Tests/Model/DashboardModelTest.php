@@ -93,10 +93,6 @@ final class DashboardModelTest extends TestCase
 
         $this->session->expects($this->exactly(2))
             ->method('get')
-            ->withConsecutive(
-                ['mautic.daterange.form.from'],
-                ['mautic.daterange.form.to']
-            )
             ->willReturnOnConsecutiveCalls(
                 $dateFrom->format(\DateTimeInterface::ATOM),
                 $dateTo->format(\DateTimeInterface::ATOM)

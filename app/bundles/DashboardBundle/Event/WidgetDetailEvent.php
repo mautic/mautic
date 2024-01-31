@@ -12,9 +12,6 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class WidgetDetailEvent extends CommonEvent
 {
-    /** @var Widget */
-    protected $widget;
-
     protected $type;
 
     protected $template;
@@ -37,9 +34,10 @@ class WidgetDetailEvent extends CommonEvent
 
     private string $cacheKeyPath = 'dashboard.widget.';
 
-    public function __construct(private TranslatorInterface $translator, private CacheProvider $cacheProvider)
+    public function __construct(private TranslatorInterface $translator, private ?CacheProvider $cacheProvider = null, private CorePermissions $security, protected Widget $widget)
     {
         $this->startTime = microtime(true);
+        $this->setWidget($widget);
     }
 
     /**
@@ -73,10 +71,8 @@ class WidgetDetailEvent extends CommonEvent
     /**
      * Set the cache dir.
      *
-     * @deprecated
-     *
-     * @param string $cacheDir
-     * @param null   $uniqueCacheDir
+     * @param string     $cacheDir
+     * @param mixed|null $uniqueCacheDir
      */
     public function setCacheDir($cacheDir, $uniqueCacheDir = null): void
     {
@@ -86,8 +82,6 @@ class WidgetDetailEvent extends CommonEvent
 
     /**
      * Set the cache timeout.
-     *
-     * @deprecated
      *
      * @param string $cacheTimeout
      */
@@ -118,8 +112,6 @@ class WidgetDetailEvent extends CommonEvent
 
     /**
      * Set the widget entity.
-     *
-     * @deprecated, will be private in M6
      */
     public function setWidget(Widget $widget): void
     {
@@ -217,7 +209,7 @@ class WidgetDetailEvent extends CommonEvent
     /**
      * Get the widget template data.
      *
-     * @return array $templateData
+     * @return array<mixed> $templateData
      */
     public function getTemplateData()
     {
@@ -227,7 +219,7 @@ class WidgetDetailEvent extends CommonEvent
     /**
      * Set en error message.
      *
-     * @param array $errorMessage
+     * @param string $errorMessage
      */
     public function setErrorMessage($errorMessage): void
     {
@@ -316,14 +308,6 @@ class WidgetDetailEvent extends CommonEvent
     }
 
     /**
-     * Set security object to check the perimissions.
-     */
-    public function setSecurity(CorePermissions $security): void
-    {
-        $this->security = $security;
-    }
-
-    /**
      * Check if the user has at least one permission of defined array of permissions.
      */
     public function hasPermissions(array $permissions): bool
@@ -363,7 +347,7 @@ class WidgetDetailEvent extends CommonEvent
     /**
      * We need to cast DateTime objects to strings to use them in the cache key.
      *
-     * @param \DateTimeInterface|mixed|null $value
+     * @param mixed|null $value
      *
      * @throws CouldNotFormatDateTimeException
      */
@@ -371,17 +355,12 @@ class WidgetDetailEvent extends CommonEvent
     {
         if ($value instanceof \DateTimeInterface) {
             // We use RFC 2822 format because it includes timezone
-            $value = $value->format('r');
-            if (false === $value) {
-                throw new CouldNotFormatDateTimeException();
-            }
-
-            return $value;
+            return $value->format('r');
         }
 
         try {
-            $value = (string) $value;
-        } catch (\Exception $e) {
+            $value = strval($value);
+        } catch (\Exception) {
             throw new CouldNotFormatDateTimeException();
         }
 
