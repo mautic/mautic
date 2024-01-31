@@ -5,9 +5,6 @@ namespace Mautic\LeadBundle\Event;
 use Mautic\CoreBundle\Event\CommonEvent;
 use Mautic\LeadBundle\Entity\Import;
 
-/**
- * Class ImportEvent.
- */
 class ImportEvent extends CommonEvent
 {
     /**

@@ -8,24 +8,16 @@ use Symfony\Component\HttpKernel\CacheWarmer\CacheWarmerInterface;
 
 class MiddlewareCacheWarmer implements CacheWarmerInterface
 {
-    /**
-     * @var string
-     */
-    private $env;
-
-    /**
-     * @var string
-     */
-    private $cacheFile;
+    private ?string $cacheFile = null;
 
     /**
      * @var \SplPriorityQueue|\ReflectionClass[]
      */
-    private $specs;
+    private \SplPriorityQueue $specs;
 
-    public function __construct(string $env)
-    {
-        $this->env       = $env;
+    public function __construct(
+        private string $env
+    ) {
         $this->specs     = new \SplPriorityQueue();
     }
 
@@ -40,7 +32,7 @@ class MiddlewareCacheWarmer implements CacheWarmerInterface
         return [];
     }
 
-    public function isOptional()
+    public function isOptional(): bool
     {
         return false;
     }
@@ -87,7 +79,7 @@ class MiddlewareCacheWarmer implements CacheWarmerInterface
         }
     }
 
-    private function addMiddlewares(array $middlewares, ?string $env = null)
+    private function addMiddlewares(array $middlewares, ?string $env = null): void
     {
         $prefix = 'Mautic\\Middleware\\';
 
@@ -107,7 +99,7 @@ class MiddlewareCacheWarmer implements CacheWarmerInterface
             $priority   = $reflection->getConstant('PRIORITY');
 
             $this->specs->insert($reflection, $priority);
-        } catch (\ReflectionException $e) {
+        } catch (\ReflectionException) {
             /* If there's an error getting the kernel class, it's
              * an invalid middleware. If it's invalid, don't push
              * it to the stack

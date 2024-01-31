@@ -18,25 +18,22 @@ use PHPUnit\Framework\TestCase;
 
 class ContactSegmentFilterTest extends TestCase
 {
-    /**
-     * @var ContactSegmentFilterCrate
-     */
-    private $contactSegmentFilterCrate;
+    private \Mautic\LeadBundle\Segment\ContactSegmentFilterCrate $contactSegmentFilterCrate;
 
     /**
      * @var BaseDecorator|MockObject
      */
-    private $filterDecorator;
+    private \PHPUnit\Framework\MockObject\MockObject $filterDecorator;
 
     /**
      * @var TableSchemaColumnsCache|MockObject
      */
-    private $tableSchemaColumnCache;
+    private \PHPUnit\Framework\MockObject\MockObject $tableSchemaColumnCache;
 
     /**
      * @var FilterQueryBuilderInterface&MockObject
      */
-    private $filterQueryBuilder;
+    private \PHPUnit\Framework\MockObject\MockObject $filterQueryBuilder;
 
     protected function setUp(): void
     {
@@ -208,7 +205,7 @@ class ContactSegmentFilterTest extends TestCase
         self::assertNull($filter->getRelationJoinTable());
 
         $this->filterDecorator = $this->getMockBuilder(FilterDecoratorInterface::class)
-            ->setMethods(['getRelationJoinTable'])
+            ->addMethods(['getRelationJoinTable'])
             ->getMockForAbstractClass();
         $this->filterDecorator->expects(self::once())
             ->method('getRelationJoinTable')
@@ -322,7 +319,7 @@ class ContactSegmentFilterTest extends TestCase
         self::assertNull($filter->getRelationJoinTableField());
 
         $this->filterDecorator = $this->getMockBuilder(FilterDecoratorInterface::class)
-            ->setMethods(['getRelationJoinTableField'])
+            ->addMethods(['getRelationJoinTableField'])
             ->getMockForAbstractClass();
         $this->filterDecorator->expects(self::once())
             ->method('getRelationJoinTableField')

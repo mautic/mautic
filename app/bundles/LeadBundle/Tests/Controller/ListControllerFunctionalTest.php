@@ -140,7 +140,7 @@ class ListControllerFunctionalTest extends MauticMysqlTestCase
 
     private function saveSegment(string $name, string $alias, array $filters = [], LeadList $segment = null): LeadList
     {
-        $segment = $segment ?? new LeadList();
+        $segment ??= new LeadList();
         $segment->setName($name)->setAlias($alias)->setFilters($filters);
         $this->listModel->saveEntity($segment);
 
@@ -177,7 +177,7 @@ class ListControllerFunctionalTest extends MauticMysqlTestCase
         $contact1Id = $contacts[0]->getId();
 
         // Rebuild segment - set current count to the cache.
-        $this->runCommand('mautic:segments:update', ['-i' => $segmentId, '--env' => 'test']);
+        $this->testSymfonyCommand('mautic:segments:update', ['-i' => $segmentId, '--env' => 'test']);
 
         // Check segment count UI for 4 contacts.
         $crawler = $this->client->request(Request::METHOD_GET, '/s/segments');
@@ -372,7 +372,10 @@ class ListControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertEquals(0, $secondColumnOfLine);
     }
 
-    public function testWarningOnInvalidDateField(): void
+    /**
+     * @dataProvider dateFieldProvider
+     */
+    public function testWarningOnInvalidDateField(?string $filter, bool $shouldContainError, string $operator = '='): void
     {
         $segment = $this->saveSegment(
             'Date Segment',
@@ -383,9 +386,9 @@ class ListControllerFunctionalTest extends MauticMysqlTestCase
                     'field'    => 'date_added',
                     'object'   => 'lead',
                     'type'     => 'date',
-                    'filter'   => 'Today',
+                    'filter'   => $filter,
                     'display'  => null,
-                    'operator' => '=',
+                    'operator' => $operator,
                 ],
             ]
         );
@@ -396,6 +399,28 @@ class ListControllerFunctionalTest extends MauticMysqlTestCase
         $form    = $crawler->selectButton('leadlist_buttons_apply')->form();
         $this->client->submit($form);
         $this->assertTrue($this->client->getResponse()->isOk());
-        $this->assertStringContainsString('Date field filter value &quot;Today&quot; is invalid', $this->client->getResponse()->getContent());
+
+        if ($shouldContainError) {
+            $this->assertStringContainsString('Date field filter value &quot;'.$filter.'&quot; is invalid', $this->client->getResponse()->getContent());
+        } else {
+            $this->assertStringNotContainsString('Date field filter value', $this->client->getResponse()->getContent());
+        }
+    }
+
+    /**
+     * @return array<int, array<int, bool|string|null>>
+     */
+    public static function dateFieldProvider(): array
+    {
+        return [
+            ['Today', true],
+            ['birthday', false],
+            ['2023-01-01 11:00', false],
+            ['2023-01-01 11:00:00', false],
+            ['2023-01-01', false],
+            ['next week', false],
+            [null, false],
+            ['\b\d{4}-(10|11|12)-\d{2}\b', false, 'regexp'],
+        ];
     }
 }

@@ -2,9 +2,6 @@
 
 namespace Mautic\CoreBundle\Form\Type;
 
-/**
- * Class SlotImageType.
- */
 class SlotSocialShareType extends SlotType
 {
     /**

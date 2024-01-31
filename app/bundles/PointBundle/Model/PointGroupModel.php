@@ -13,6 +13,7 @@ use Mautic\PointBundle\Event as Events;
 use Mautic\PointBundle\Form\Type\GroupType;
 use Mautic\PointBundle\PointGroupEvents;
 use Symfony\Component\Form\FormFactory;
+use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 use Symfony\Contracts\EventDispatcher\Event;
 
@@ -32,18 +33,14 @@ class PointGroupModel extends CommonFormModel
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @param object               $entity
      * @param FormFactory          $formFactory
      * @param string|null          $action
      * @param array<string,string> $options
      *
-     * @return mixed
-     *
      * @throws MethodNotAllowedHttpException
      */
-    public function createForm($entity, $formFactory, $action = null, $options = [])
+    public function createForm($entity, $formFactory, $action = null, $options = []): FormInterface
     {
         if (!$entity instanceof Group) {
             throw new MethodNotAllowedHttpException(['Group']);
@@ -60,10 +57,8 @@ class PointGroupModel extends CommonFormModel
      * Get a specific entity or generate a new one if id is empty.
      *
      * @param int $id
-     *
-     * @return object|null
      */
-    public function getEntity($id = null)
+    public function getEntity($id = null): ?Group
     {
         if (null === $id) {
             return new Group();
@@ -73,11 +68,9 @@ class PointGroupModel extends CommonFormModel
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @throws MethodNotAllowedHttpException
      */
-    protected function dispatchEvent($action, &$entity, $isNew = false, Event $event = null)
+    protected function dispatchEvent($action, &$entity, $isNew = false, Event $event = null): ?Event
     {
         if (!$entity instanceof Group) {
             throw new MethodNotAllowedHttpException(['Group']);
@@ -126,22 +119,14 @@ class PointGroupModel extends CommonFormModel
         $oldScore = $contactScore->getScore();
         $newScore = $oldScore;
 
-        switch ($operator) {
-            case Lead::POINTS_ADD:
-                $newScore += $points;
-                break;
-            case Lead::POINTS_SUBTRACT:
-                $newScore -= $points;
-                break;
-            case Lead::POINTS_MULTIPLY:
-                $newScore *= $points;
-                break;
-            case Lead::POINTS_DIVIDE:
-                $newScore /= $points;
-                break;
-            default:
-                throw new \UnexpectedValueException('Invalid operator');
-        }
+        match ($operator) {
+            Lead::POINTS_ADD      => $newScore += $points,
+            Lead::POINTS_SUBTRACT => $newScore -= $points,
+            Lead::POINTS_MULTIPLY => $newScore *= $points,
+            Lead::POINTS_DIVIDE   => $newScore /= $points,
+            Lead::POINTS_SET      => $newScore = $points,
+            default               => throw new \UnexpectedValueException('Invalid operator'),
+        };
         $contactScore->setScore($newScore);
         $this->em->persist($contactScore);
         $this->em->flush();

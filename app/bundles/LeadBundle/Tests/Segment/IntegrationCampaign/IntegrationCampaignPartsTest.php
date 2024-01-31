@@ -7,10 +7,10 @@ use Mautic\LeadBundle\Segment\IntegrationCampaign\IntegrationCampaignParts;
 class IntegrationCampaignPartsTest extends \PHPUnit\Framework\TestCase
 {
     /**
-     * @covers \Mautic\LeadBundle\Segment\IntegrationCampaign\IntegrationCampaignParts::getIntegrationName()
-     * @covers \Mautic\LeadBundle\Segment\IntegrationCampaign\IntegrationCampaignParts::getCampaignId()
+     * @covers \Mautic\LeadBundle\Segment\IntegrationCampaign\IntegrationCampaignParts::getIntegrationName
+     * @covers \Mautic\LeadBundle\Segment\IntegrationCampaign\IntegrationCampaignParts::getCampaignId
      */
-    public function testConnectwise()
+    public function testConnectwise(): void
     {
         $field             = 'Connectwise::283';
         $doNotContactParts = new IntegrationCampaignParts($field);
@@ -20,10 +20,10 @@ class IntegrationCampaignPartsTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @covers \Mautic\LeadBundle\Segment\IntegrationCampaign\IntegrationCampaignParts::getIntegrationName()
-     * @covers \Mautic\LeadBundle\Segment\IntegrationCampaign\IntegrationCampaignParts::getCampaignId()
+     * @covers \Mautic\LeadBundle\Segment\IntegrationCampaign\IntegrationCampaignParts::getIntegrationName
+     * @covers \Mautic\LeadBundle\Segment\IntegrationCampaign\IntegrationCampaignParts::getCampaignId
      */
-    public function testSalesforceExplicit()
+    public function testSalesforceExplicit(): void
     {
         $field             = 'Salesforce::22';
         $doNotContactParts = new IntegrationCampaignParts($field);
@@ -33,10 +33,10 @@ class IntegrationCampaignPartsTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @covers \Mautic\LeadBundle\Segment\IntegrationCampaign\IntegrationCampaignParts::getIntegrationName()
-     * @covers \Mautic\LeadBundle\Segment\IntegrationCampaign\IntegrationCampaignParts::getCampaignId()
+     * @covers \Mautic\LeadBundle\Segment\IntegrationCampaign\IntegrationCampaignParts::getIntegrationName
+     * @covers \Mautic\LeadBundle\Segment\IntegrationCampaign\IntegrationCampaignParts::getCampaignId
      */
-    public function testSalesforceDefault()
+    public function testSalesforceDefault(): void
     {
         $field             = '44';
         $doNotContactParts = new IntegrationCampaignParts($field);

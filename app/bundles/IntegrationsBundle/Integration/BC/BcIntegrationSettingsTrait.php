@@ -34,10 +34,8 @@ trait BcIntegrationSettingsTrait
 
     /**
      * @deprecated Required by Mautic\PluginBundle\Helper\IntegrationHelper
-     *
-     * @return int
      */
-    public function getPriority()
+    public function getPriority(): int
     {
         return 1;
     }

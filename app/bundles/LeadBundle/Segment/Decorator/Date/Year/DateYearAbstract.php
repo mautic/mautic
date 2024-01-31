@@ -16,17 +16,11 @@ abstract class DateYearAbstract extends DateOptionAbstract
         return '+1 year';
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function getValueForBetweenRange(DateTimeHelper $dateTimeHelper)
     {
         return $dateTimeHelper->toLocalString('Y-%');
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function getOperatorForBetweenRange(ContactSegmentFilterCrate $leadSegmentFilterCrate)
     {
         return '!=' === $leadSegmentFilterCrate->getOperator() ? 'notLike' : 'like';

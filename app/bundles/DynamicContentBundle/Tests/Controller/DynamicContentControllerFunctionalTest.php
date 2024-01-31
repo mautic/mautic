@@ -16,7 +16,9 @@ use Symfony\Component\HttpFoundation\Response;
 class DynamicContentControllerFunctionalTest extends MauticMysqlTestCase
 {
     public const PERMISSION_CREATE       = 'dynamiccontent:dynamiccontents:create';
+
     public const PERMISSION_DELETE_OTHER = 'dynamiccontent:dynamiccontents:deleteother';
+
     public const PERMISSION_DELETE_OWN   = 'dynamiccontent:dynamiccontents:deleteown';
 
     public const BITWISE_BY_PERM = [
@@ -71,8 +73,8 @@ class DynamicContentControllerFunctionalTest extends MauticMysqlTestCase
         $this->em->flush();
         $this->em->detach($role);
 
-        $this->loginUser($user->getUsername());
-        $this->client->setServerParameter('PHP_AUTH_USER', $user->getUsername());
+        $this->loginUser($user->getUserIdentifier());
+        $this->client->setServerParameter('PHP_AUTH_USER', $user->getUserIdentifier());
         $this->client->setServerParameter('PHP_AUTH_PW', 'mautic');
 
         return $user;

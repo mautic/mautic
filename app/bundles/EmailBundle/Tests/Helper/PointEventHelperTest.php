@@ -11,7 +11,7 @@ use Mautic\LeadBundle\Model\LeadModel;
 
 class PointEventHelperTest extends \PHPUnit\Framework\TestCase
 {
-    public function testSendEmail()
+    public function testSendEmail(): void
     {
         $helper = new PointEventHelper();
         $lead   = new Lead();

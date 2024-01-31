@@ -4,6 +4,8 @@ namespace Mautic\LeadBundle\Entity;
 
 use Doctrine\DBAL\Query\Expression\CompositeExpression;
 use Doctrine\DBAL\Query\QueryBuilder;
+use Mautic\CoreBundle\Cache\ResultCacheHelper;
+use Mautic\CoreBundle\Cache\ResultCacheOptions;
 use Mautic\LeadBundle\Controller\ListController;
 use Mautic\LeadBundle\Helper\CustomFieldHelper;
 
@@ -35,7 +37,7 @@ trait CustomFieldRepositoryTrait
 
         // DBAL
         /** @var QueryBuilder $dq */
-        $dq = isset($args['qb']) ? $args['qb'] : $this->getEntitiesDbalQueryBuilder();
+        $dq = $args['qb'] ?? $this->getEntitiesDbalQueryBuilder();
 
         // Generate where clause first to know if we need to use distinct on primary ID or not
         $this->useDistinctCount = false;
@@ -213,7 +215,7 @@ trait CustomFieldRepositoryTrait
             ->from($table, 'l');
 
         $q->where(
-            $q->expr()->andX(
+            $q->expr()->and(
                 $q->expr()->neq($col, $q->expr()->literal('')),
                 $q->expr()->isNotNull($col)
             )
@@ -239,7 +241,7 @@ trait CustomFieldRepositoryTrait
      *
      * @param array $entities
      */
-    public function saveEntities($entities)
+    public function saveEntities($entities): void
     {
         foreach ($entities as $entity) {
             // Leads cannot be batched due to requiring the ID to update the fields
@@ -247,10 +249,7 @@ trait CustomFieldRepositoryTrait
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function saveEntity($entity, $flush = true)
+    public function saveEntity($entity, $flush = true): void
     {
         $this->preSaveEntity($entity);
 
@@ -299,10 +298,8 @@ trait CustomFieldRepositoryTrait
      * @param array  $values
      * @param bool   $byGroup
      * @param string $object
-     *
-     * @return array
      */
-    protected function formatFieldValues($values, $byGroup = true, $object = 'lead')
+    protected function formatFieldValues($values, $byGroup = true, $object = 'lead'): array
     {
         [$fields, $fixedFields] = $this->getCustomFieldList($object);
 
@@ -366,7 +363,8 @@ trait CustomFieldRepositoryTrait
     {
         if (empty($this->customFieldList)) {
             // Get the list of custom fields
-            $fq = $this->getEntityManager()->getConnection()->createQueryBuilder();
+            $connection = $this->getEntityManager()->getConnection();
+            $fq         = $connection->createQueryBuilder();
             $fq->select('f.id, f.label, f.alias, f.type, f.field_group as "group", f.object, f.is_fixed, f.properties, f.default_value')
                 ->from(MAUTIC_TABLE_PREFIX.'lead_fields', 'f')
                 ->where('f.is_published = :published')
@@ -374,8 +372,8 @@ trait CustomFieldRepositoryTrait
                 ->setParameter('published', true, 'boolean')
                 ->setParameter('object', $object)
                 ->addOrderBy('f.field_order', 'asc');
-
-            $results = $fq->executeQuery()->fetchAllAssociative();
+            $result  = ResultCacheHelper::executeCachedDbalQuery($connection, $fq, new ResultCacheOptions(LeadField::CACHE_NAMESPACE));
+            $results = $result->fetchAllAssociative();
 
             $fields      = [];
             $fixedFields = [];
@@ -385,8 +383,6 @@ trait CustomFieldRepositoryTrait
                     $fixedFields[$r['alias']] = $r['alias'];
                 }
             }
-
-            unset($results);
 
             $this->customFieldList = [$fields, $fixedFields];
         }

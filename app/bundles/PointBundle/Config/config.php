@@ -37,7 +37,7 @@ return [
                 'standard_entity' => true,
                 'name'            => 'points',
                 'path'            => '/points',
-                'controller'      => 'Mautic\PointBundle\Controller\Api\PointApiController',
+                'controller'      => \Mautic\PointBundle\Controller\Api\PointApiController::class,
             ],
             'mautic_api_getpointactiontypes' => [
                 'path'       => '/points/actions/types',
@@ -47,7 +47,7 @@ return [
                 'standard_entity' => true,
                 'name'            => 'triggers',
                 'path'            => '/points/triggers',
-                'controller'      => 'Mautic\PointBundle\Controller\Api\TriggerApiController',
+                'controller'      => \Mautic\PointBundle\Controller\Api\TriggerApiController::class,
             ],
             'mautic_api_getpointtriggereventtypes' => [
                 'path'       => '/points/triggers/events/types',
@@ -93,24 +93,5 @@ return [
 
     'categories' => [
         'point' => null,
-    ],
-
-    'services' => [
-        'repositories' => [
-            'mautic.point.repository.lead_point_log' => [
-                'class'     => Doctrine\ORM\EntityRepository::class,
-                'factory'   => ['@doctrine.orm.entity_manager', 'getRepository'],
-                'arguments' => [
-                    \Mautic\PointBundle\Entity\LeadPointLog::class,
-                ],
-            ],
-            'mautic.point.repository.lead_trigger_log' => [
-                'class'     => Doctrine\ORM\EntityRepository::class,
-                'factory'   => ['@doctrine.orm.entity_manager', 'getRepository'],
-                'arguments' => [
-                    \Mautic\PointBundle\Entity\LeadTriggerLog::class,
-                ],
-            ],
-        ],
     ],
 ];

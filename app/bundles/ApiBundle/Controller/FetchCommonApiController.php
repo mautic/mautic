@@ -45,16 +45,6 @@ class FetchCommonApiController extends AbstractFOSRestController implements Maut
     use FormErrorMessagesTrait;
 
     /**
-     * @var EventDispatcherInterface
-     */
-    protected $dispatcher;
-
-    /**
-     * @var CoreParametersHelper
-     */
-    protected $coreParametersHelper;
-
-    /**
      * If set to true, serializer will not return null values.
      *
      * @var bool
@@ -97,16 +87,6 @@ class FetchCommonApiController extends AbstractFOSRestController implements Maut
     protected $extraGetEntitiesArguments = [];
 
     /**
-     * @var MauticFactory
-     */
-    protected $factory;
-
-    /**
-     * @var ModelFactory<E>
-     */
-    protected $modelFactory;
-
-    /**
      * @var bool
      */
     protected $inBatchMode = false;
@@ -123,7 +103,7 @@ class FetchCommonApiController extends AbstractFOSRestController implements Maut
      *
      * @var AbstractCommonModel<E>|null
      */
-    protected $model = null;
+    protected $model;
 
     /**
      * The level parent/children should stop loading if applicable.
@@ -139,13 +119,6 @@ class FetchCommonApiController extends AbstractFOSRestController implements Maut
      */
     protected $permissionBase;
 
-    private RequestStack $requestStack;
-
-    /**
-     * @var CorePermissions
-     */
-    protected $security;
-
     /**
      * @var array<int, string>
      */
@@ -158,37 +131,22 @@ class FetchCommonApiController extends AbstractFOSRestController implements Maut
 
     protected ContainerBagInterface $parametersContainer;
 
-    protected EntityResultHelper $entityResultHelper;
-
-    private AppVersion $appVersion;
-
-    protected ManagerRegistry $doctrine;
-
     /**
      * @param ModelFactory<E> $modelFactory
      */
     public function __construct(
-        CorePermissions $security,
+        protected CorePermissions $security,
         Translator $translator,
-        EntityResultHelper $entityResultHelper,
-        AppVersion $appVersion,
-        RequestStack $requestStack,
-        ManagerRegistry $doctrine,
-        ModelFactory $modelFactory,
-        EventDispatcherInterface $dispatcher,
-        CoreParametersHelper $coreParametersHelper,
-        MauticFactory $factory,
+        protected EntityResultHelper $entityResultHelper,
+        private AppVersion $appVersion,
+        private RequestStack $requestStack,
+        protected ManagerRegistry $doctrine,
+        protected ModelFactory $modelFactory,
+        protected EventDispatcherInterface $dispatcher,
+        protected CoreParametersHelper $coreParametersHelper,
+        protected MauticFactory $factory,
     ) {
-        $this->security             = $security;
         $this->translator           = $translator;
-        $this->entityResultHelper   = $entityResultHelper;
-        $this->appVersion           = $appVersion;
-        $this->requestStack         = $requestStack;
-        $this->doctrine             = $doctrine;
-        $this->modelFactory         = $modelFactory;
-        $this->dispatcher           = $dispatcher;
-        $this->coreParametersHelper = $coreParametersHelper;
-        $this->factory              = $factory;
 
         if (null !== $this->model && !$this->permissionBase && method_exists($this->model, 'getPermissionBase')) {
             $this->permissionBase = $this->model->getPermissionBase();
@@ -324,7 +282,7 @@ class FetchCommonApiController extends AbstractFOSRestController implements Maut
 
         array_walk(
             $columns,
-            function (&$column, $key, $prefix) {
+            function (&$column, $key, $prefix): void {
                 $column = trim($column);
                 if (1 === count(explode('.', $column))) {
                     $column = $prefix.$column;
@@ -471,9 +429,9 @@ class FetchCommonApiController extends AbstractFOSRestController implements Maut
      * @param MauticModelInterface|null $model
      * @param bool                      $returnWithOriginalKeys
      *
-     * @return array|mixed
+     * @return mixed[]
      */
-    protected function getBatchEntities($parameters, &$errors, $prepareForSerialization = false, $requestIdColumn = 'id', $model = null, $returnWithOriginalKeys = true)
+    protected function getBatchEntities($parameters, &$errors, $prepareForSerialization = false, $requestIdColumn = 'id', $model = null, $returnWithOriginalKeys = true): array
     {
         $idHelper = new BatchIdToEntityHelper($parameters, $requestIdColumn);
 
@@ -482,7 +440,7 @@ class FetchCommonApiController extends AbstractFOSRestController implements Maut
         }
 
         /** @var AbstractCommonModel<object> $model */
-        $model    = ($model) ? $model : $this->model;
+        $model    = $model ?: $this->model;
         $entities = $model->getEntities(
             [
                 'filter' => [
@@ -540,7 +498,7 @@ class FetchCommonApiController extends AbstractFOSRestController implements Maut
      */
     protected function getEntityDefaultProperties(object $entity): array
     {
-        $class         = get_class($entity);
+        $class         = $entity::class;
         $chain         = array_reverse(class_parents($entity), true) + [$class => $class];
         $defaultValues = [];
 
@@ -614,7 +572,7 @@ class FetchCommonApiController extends AbstractFOSRestController implements Maut
     {
         return $this->prepareEntityResultsToArray(
             $results,
-            function ($entity) {
+            function ($entity): void {
                 $this->preSerializeEntity($entity);
             }
         );
@@ -768,7 +726,7 @@ class FetchCommonApiController extends AbstractFOSRestController implements Maut
      */
     protected function validateBatchPayload(array $parameters)
     {
-        $batchLimit = (int) $this->coreParametersHelper->getParameter('api_batch_max_limit', 200);
+        $batchLimit = (int) $this->coreParametersHelper->get('api_batch_max_limit', 200);
         if (count($parameters) > $batchLimit) {
             return $this->returnError($this->translator->trans('mautic.api.call.batch_exception', ['%limit%' => $batchLimit]));
         }
@@ -777,8 +735,6 @@ class FetchCommonApiController extends AbstractFOSRestController implements Maut
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @param mixed|null                $data
      * @param array<string, string|int> $headers
      */

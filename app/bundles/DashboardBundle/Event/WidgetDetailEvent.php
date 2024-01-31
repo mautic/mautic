@@ -8,32 +8,38 @@ use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\DashboardBundle\Entity\Widget;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-/**
- * Class WidgetDetailEvent.
- */
 class WidgetDetailEvent extends CommonEvent
 {
     protected $widget;
+
     protected $type;
+
     protected $template;
+
     protected $templateData = [];
+
     protected $errorMessage;
+
     protected $uniqueId;
+
     protected $cacheDir;
+
     protected $uniqueCacheDir;
+
     protected $cacheTimeout;
-    protected $startTime = 0;
+
+    protected float $startTime;
+
     protected $loadTime  = 0;
-    protected $translator;
 
     /**
      * @var CorePermissions
      */
     protected $security;
 
-    public function __construct(TranslatorInterface $translator)
-    {
-        $this->translator = $translator;
+    public function __construct(
+        protected TranslatorInterface $translator
+    ) {
         $this->startTime  = microtime(true);
     }
 
@@ -42,7 +48,7 @@ class WidgetDetailEvent extends CommonEvent
      *
      * @param string $cacheDir
      */
-    public function setCacheDir($cacheDir, $uniqueCacheDir = null)
+    public function setCacheDir($cacheDir, $uniqueCacheDir = null): void
     {
         $this->cacheDir       = $cacheDir;
         $this->uniqueCacheDir = $uniqueCacheDir;
@@ -53,7 +59,7 @@ class WidgetDetailEvent extends CommonEvent
      *
      * @param string $cacheTimeout
      */
-    public function setCacheTimeout($cacheTimeout)
+    public function setCacheTimeout($cacheTimeout): void
     {
         $this->cacheTimeout = (int) $cacheTimeout;
     }
@@ -63,7 +69,7 @@ class WidgetDetailEvent extends CommonEvent
      *
      * @param string $type
      */
-    public function setType($type)
+    public function setType($type): void
     {
         $this->type = $type;
     }
@@ -81,7 +87,7 @@ class WidgetDetailEvent extends CommonEvent
     /**
      * Set the widget entity.
      */
-    public function setWidget(Widget $widget)
+    public function setWidget(Widget $widget): void
     {
         $this->widget = $widget;
 
@@ -125,7 +131,7 @@ class WidgetDetailEvent extends CommonEvent
      *
      * @param string $template
      */
-    public function setTemplate($template)
+    public function setTemplate($template): void
     {
         $this->template = $template;
         $this->widget->setTemplate($template);
@@ -144,7 +150,7 @@ class WidgetDetailEvent extends CommonEvent
     /**
      * Set the widget template data.
      */
-    public function setTemplateData(array $templateData, $skipCache = false)
+    public function setTemplateData(array $templateData, $skipCache = false): void
     {
         $this->templateData = $templateData;
         $this->widget->setTemplateData($templateData);
@@ -174,7 +180,7 @@ class WidgetDetailEvent extends CommonEvent
      *
      * @param array $errorMessage
      */
-    public function setErrorMessage($errorMessage)
+    public function setErrorMessage($errorMessage): void
     {
         $this->errorMessage = $errorMessage;
         $this->widget->setErrorMessage($errorMessage);
@@ -218,10 +224,8 @@ class WidgetDetailEvent extends CommonEvent
     /**
      * Checks the cache for the widget data.
      * If cache exists, it sets the TemplateData.
-     *
-     * @return string
      */
-    public function isCached()
+    public function isCached(): bool
     {
         if (!$this->cacheDir) {
             return false;
@@ -253,17 +257,15 @@ class WidgetDetailEvent extends CommonEvent
     /**
      * Set security object to check the perimissions.
      */
-    public function setSecurity(CorePermissions $security)
+    public function setSecurity(CorePermissions $security): void
     {
         $this->security = $security;
     }
 
     /**
      * Check if the user has at least one permission of defined array of permissions.
-     *
-     * @return bool
      */
-    public function hasPermissions(array $permissions)
+    public function hasPermissions(array $permissions): bool
     {
         if (!$this->security) {
             return true;
