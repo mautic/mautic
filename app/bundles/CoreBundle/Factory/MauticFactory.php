@@ -15,6 +15,7 @@ use Mautic\EmailBundle\Helper\MailHelper;
 use Mautic\UserBundle\Entity\User;
 use Symfony\Bundle\FrameworkBundle\Routing\Router;
 use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
@@ -137,7 +138,7 @@ class MauticFactory
     /**
      * Retrieves event dispatcher.
      *
-     * @return \Symfony\Component\EventDispatcher\ContainerAwareEventDispatcher
+     * @return EventDispatcherInterface
      */
     public function getDispatcher()
     {
@@ -407,7 +408,7 @@ class MauticFactory
     }
 
     /**
-     * @return bool
+     * @return object|bool
      */
     public function get($service)
     {
