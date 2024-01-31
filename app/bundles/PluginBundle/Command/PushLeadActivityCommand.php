@@ -62,13 +62,11 @@ class PushLeadActivityCommand extends Command
         if (!$interval) {
             $interval = '15 minutes';
         }
-        if (!$startDate) {
-            $startDate = date('c', strtotime('-'.$interval));
-        }
+        $startDateWithInterval = (new \DateTime('-'.$interval, new \DateTimeZone('UTC')))->format('c');
+        $endDateWithInterval   = (new \DateTime('NOW', new \DateTimeZone('UTC')))->format('c');
 
-        if (!$endDate) {
-            $endDate = date('c');
-        }
+        $startDate = !$startDate ? $startDateWithInterval : date('c', strtotime($startDate));
+        $endDate   = !$endDate ? $endDateWithInterval : date('c', strtotime($endDate));
 
         if ($integration && $startDate && $endDate) {
             $integrationObject = $this->integrationHelper->getIntegrationObject($integration);
