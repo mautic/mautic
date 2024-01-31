@@ -20,6 +20,11 @@ use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Output\BufferedOutput;
 use Symfony\Component\Console\Tester\CommandTester;
 use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\HttpFoundation\Session\Attribute\AttributeBag;
+use Symfony\Component\HttpFoundation\Session\Flash\FlashBag;
+use Symfony\Component\HttpFoundation\Session\Storage\MockFileSessionStorage;
+use Symfony\Component\HttpFoundation\Session\Storage\MockFileSessionStorageFactory;
+use Symfony\Component\HttpFoundation\Session\Storage\SessionStorageInterface;
 use Symfony\Component\Mime\RawMessage;
 use Symfony\Component\Routing\Router;
 use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
@@ -216,12 +221,8 @@ abstract class AbstractMauticTestCase extends WebTestCase
         }
 
         $firewall = 'mautic';
-        $session  = self::$container->get('session');
         $token    = new UsernamePasswordToken($user, $firewall, $user->getRoles());
-        $session->set('_security_'.$firewall, serialize($token));
-        $session->save();
-        $cookie = new Cookie($session->getName(), $session->getId());
-        $this->client->getCookieJar()->set($cookie);
+        $this->setUserToken($token, $firewall);
 
         return $user;
     }
@@ -244,5 +245,28 @@ abstract class AbstractMauticTestCase extends WebTestCase
         $commandTester->execute($params);
 
         return $commandTester;
+    }
+
+    private function setUserToken(UsernamePasswordToken $token, string $firewallName = 'default'): SessionStorageInterface
+    {
+        $container = $this->client->getContainer();
+
+        /** @var MockFileSessionStorageFactory $mockFileSessionStorageFactory */
+        $mockFileSessionStorageFactory = $container->get('session.storage.factory.mock_file');
+        /** @var MockFileSessionStorage $sessionStorage */
+        $sessionStorage = $mockFileSessionStorageFactory->createStorage(null);
+        $attributeBag   = new AttributeBag();
+        $sessionStorage->registerBag($attributeBag);
+        $flashBag = new FlashBag();
+        $sessionStorage->registerBag($flashBag);
+        $sessionStorage->start();
+
+        $attributeBag->set('_security_'.$firewallName, serialize($token));
+        $sessionStorage->save();
+
+        $cookie = new Cookie($sessionStorage->getName(), $sessionStorage->getId());
+        $this->client->getCookieJar()->set($cookie);
+
+        return $sessionStorage;
     }
 }
