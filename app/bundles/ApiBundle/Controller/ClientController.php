@@ -4,7 +4,7 @@ namespace Mautic\ApiBundle\Controller;
 
 use Doctrine\Persistence\ManagerRegistry;
 use Mautic\ApiBundle\Model\ClientModel;
-use Mautic\CoreBundle\Controller\FormController;
+use Mautic\CoreBundle\Controller\AbstractStandardFormController;
 use Mautic\CoreBundle\Factory\MauticFactory;
 use Mautic\CoreBundle\Factory\ModelFactory;
 use Mautic\CoreBundle\Factory\PageHelperFactoryInterface;
@@ -25,10 +25,9 @@ use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 
-class ClientController extends FormController
+class ClientController extends AbstractStandardFormController
 {
     public function __construct(
-        private ClientModel $clientModel,
         FormFactoryInterface $formFactory,
         FormFieldHelper $fieldHelper,
         ManagerRegistry $doctrine,
@@ -68,7 +67,8 @@ class ClientController extends FormController
         $request->getSession()->set('mautic.client.filter.api_mode', $apiMode);
         $request->getSession()->set('mautic.client.filter', $filter);
 
-        $clients = $this->clientModel->getEntities(
+        $model   = $this->getModel($this->getModelName());
+        $clients = $model->getEntities(
             [
                 'start'      => $start,
                 'limit'      => $limit,
@@ -136,7 +136,7 @@ class ClientController extends FormController
 
     public function authorizedClientsAction(TokenStorageInterface $tokenStorage): Response
     {
-        $apiClientModel = $this->clientModel;
+        $apiClientModel = $this->getModel($this->getModelName());
         \assert($apiClientModel instanceof ClientModel);
         $me = $tokenStorage->getToken()->getUser();
         \assert($me instanceof User);
@@ -157,7 +157,7 @@ class ClientController extends FormController
 
         if ('POST' == $request->getMethod()) {
             /** @var \Mautic\ApiBundle\Model\ClientModel $model */
-            $model = $this->clientModel;
+            $model = $this->getModel($this->getModelName());
 
             $client = $model->getEntity($clientId);
 
@@ -209,7 +209,7 @@ class ClientController extends FormController
         $request->getSession()->set('mautic.client.filter.api_mode', $apiMode);
 
         /** @var \Mautic\ApiBundle\Model\ClientModel $model */
-        $model = $this->clientModel;
+        $model = $this->getModel($this->getModelName());
         $model->setApiMode($apiMode);
 
         // retrieve the entity
@@ -308,7 +308,7 @@ class ClientController extends FormController
         }
 
         /** @var \Mautic\ApiBundle\Model\ClientModel $model */
-        $model     = $this->clientModel;
+        $model     = $this->getModel($this->getModelName());
         $client    = $model->getEntity($objectId);
         $returnUrl = $this->generateUrl('mautic_client_index');
 
@@ -429,7 +429,7 @@ class ClientController extends FormController
 
         if ('POST' === $request->getMethod()) {
             /** @var \Mautic\ApiBundle\Model\ClientModel $model */
-            $model  = $this->clientModel;
+            $model  = $this->getModel($this->getModelName());
             $entity = $model->getEntity($objectId);
             if (null === $entity) {
                 $flashes[] = [
@@ -462,5 +462,10 @@ class ClientController extends FormController
                 ]
             )
         );
+    }
+
+    public function getModelName(): string
+    {
+        return 'api.client';
     }
 }
