@@ -4,6 +4,8 @@ namespace Mautic\EmailBundle\Form\Type;
 
 use Mautic\ChannelBundle\Entity\MessageQueue;
 use Mautic\CoreBundle\Form\Type\ButtonGroupType;
+use Mautic\CoreBundle\Form\Type\YesNoButtonGroupType;
+use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\EmailBundle\Helper\MailHelper;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ButtonType;
@@ -13,6 +15,7 @@ use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Routing\RouterInterface;
 use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
  * @extends AbstractType<mixed>
@@ -20,7 +23,9 @@ use Symfony\Component\Validator\Constraints\NotBlank;
 class EmailSendType extends AbstractType
 {
     public function __construct(
-        private RouterInterface $router
+        private RouterInterface $router,
+        private CorePermissions $corePermissions,
+        private TranslatorInterface $translator
     ) {
     }
 
@@ -169,6 +174,30 @@ class EmailSendType extends AbstractType
                         'data'       => $data,
                         'empty_data' => 0,
                         'required'   => false,
+                    ]
+                );
+
+                $data = $options['data']['send_to_dnc'] ?? false;
+                $builder->add(
+                    'send_to_dnc',
+                    YesNoButtonGroupType::class,
+                    [
+                        'label'    => 'mautic.email.send.dnc.label',
+                        'attr'     => [
+                            'onchange'               => 'Mautic.showSendToDncConfirmation(mQuery(this))',
+                            'data-toggle'            => 'confirmation',
+                            'data-message'           => $this->translator->trans('mautic.email.send.dnc.confirmation'),
+                            'data-confirm-text'      => $this->translator->trans('mautic.email.send.dnc.confirmation.confirm.text'),
+                            'data-confirm-callback'  => 'dismissConfirmation',
+                            'data-cancel-text'       => $this->translator->trans('mautic.email.send.dnc.confirmation.cancel.text'),
+                            'data-cancel-callback'   => 'setSendToDncToNo',
+                            'data-confirm-btn-class' => 'btn btn-success',
+                            'tooltip'                => 'mautic.email.send.dnc.tooltip',
+                            'data-show-on'           => '{"campaignevent_properties_email_type_1":"checked"}',
+                            'disabled'               => !$this->corePermissions->isGranted('email:campaigns:sendtodnc'),
+                        ],
+                        'data'     => $data,
+                        'required' => false,
                     ]
                 );
             }
