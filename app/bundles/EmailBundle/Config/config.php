@@ -98,13 +98,6 @@ return [
                 'class' => \Mautic\EmailBundle\DependencyInjection\EnvProcessor\MailerDsnEnvVarProcessor::class,
                 'tag'   => 'container.env_var_processor',
             ],
-            'mautic.helper.mailbox' => [
-                'class'     => \Mautic\EmailBundle\MonitoredEmail\Mailbox::class,
-                'arguments' => [
-                    'mautic.helper.core_parameters',
-                    'mautic.helper.paths',
-                ],
-            ],
             'mautic.message.search.contact' => [
                 'class'     => \Mautic\EmailBundle\MonitoredEmail\Search\ContactFinder::class,
                 'arguments' => [
@@ -154,13 +147,6 @@ return [
                     'monolog.logger.mautic',
                     'mautic.tracker.contact',
                     'mautic.helper.email.address',
-                ],
-            ],
-            'mautic.helper.mailer' => [
-                'class'     => \Mautic\EmailBundle\Helper\MailHelper::class,
-                'arguments' => [
-                    'mautic.factory',
-                    'mailer',
                 ],
             ],
             'mautic.validator.email' => [
