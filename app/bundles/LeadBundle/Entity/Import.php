@@ -560,11 +560,9 @@ class Import extends FormEntity
     }
 
     /**
-     * @param \DateTimeInterface $dateStarted
-     *
      * @return Import
      */
-    public function setDateStarted($dateStarted)
+    public function setDateStarted(\DateTime $dateStarted)
     {
         $this->isChanged('dateStarted', $dateStarted);
         $this->dateStarted = $dateStarted;
@@ -681,8 +679,10 @@ class Import extends FormEntity
 
     /**
      * Counts speed in items per second.
+     *
+     * @return float
      */
-    public function getSpeed(): float
+    public function getSpeed()
     {
         $runtime       = $this->getRunTimeSeconds();
         $processedRows = $this->getProcessedRows();
