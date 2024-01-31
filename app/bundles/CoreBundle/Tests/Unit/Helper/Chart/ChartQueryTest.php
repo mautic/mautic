@@ -15,37 +15,25 @@ use PHPUnit\Framework\MockObject\MockObject;
 
 class ChartQueryTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var \DateTime
-     */
-    private $dateFrom;
+    private \DateTime $dateFrom;
 
     private DateTimeHelper $dateTimeHelper;
 
-    /**
-     * @var \DateTime
-     */
-    private $dateTo;
+    private \DateTime $dateTo;
 
     /**
      * @var MockObject|Connection
      */
-    private $connection;
+    private \PHPUnit\Framework\MockObject\MockObject $connection;
 
     /**
      * @var MockObject|QueryBuilder
      */
-    private $queryBuilder;
+    private \PHPUnit\Framework\MockObject\MockObject $queryBuilder;
 
-    /**
-     * @var string
-     */
-    private $dateColumn;
+    private string $dateColumn;
 
-    /**
-     * @var string
-     */
-    private $unit;
+    private string $unit;
 
     /**
      * @var ChartQuery
@@ -317,7 +305,7 @@ class ChartQueryTest extends \PHPUnit\Framework\TestCase
         $this->createChartQuery();
         self::assertSame(
             $expectedResult,
-            $this->chartQuery->completeTimeData($data, false, false)
+            $this->chartQuery->completeTimeData($data, false)
         );
     }
 

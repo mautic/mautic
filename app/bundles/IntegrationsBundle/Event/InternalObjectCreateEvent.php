@@ -11,24 +11,14 @@ use Symfony\Contracts\EventDispatcher\Event;
 class InternalObjectCreateEvent extends Event
 {
     /**
-     * @var ObjectInterface
-     */
-    private $object;
-
-    /**
-     * @var array
-     */
-    private $createObjects;
-
-    /**
      * @var ObjectMapping[]
      */
-    private $objectMappings = [];
+    private array $objectMappings = [];
 
-    public function __construct(ObjectInterface $object, array $createObjects)
-    {
-        $this->object        = $object;
-        $this->createObjects = $createObjects;
+    public function __construct(
+        private ObjectInterface $object,
+        private array $createObjects
+    ) {
     }
 
     public function getObject(): ObjectInterface

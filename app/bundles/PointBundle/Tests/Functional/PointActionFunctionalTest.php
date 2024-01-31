@@ -18,7 +18,7 @@ class PointActionFunctionalTest extends MauticMysqlTestCase
     public function testPointActionReadEmail(): void
     {
         /** @var LeadModel $leadModel */
-        $leadModel = self::$container->get('mautic.lead.model.lead');
+        $leadModel = static::getContainer()->get('mautic.lead.model.lead');
 
         $lead  = $this->createLead('john@doe.email');
         $email = $this->createEmail();
@@ -36,7 +36,7 @@ class PointActionFunctionalTest extends MauticMysqlTestCase
     public function testPointActionWithGroupReadEmail(): void
     {
         /** @var LeadModel $leadModel */
-        $leadModel = self::$container->get('mautic.lead.model.lead');
+        $leadModel = static::getContainer()->get('mautic.lead.model.lead');
 
         $lead   = $this->createLead('john@doe.email');
         $email  = $this->createEmail();
@@ -65,6 +65,7 @@ class PointActionFunctionalTest extends MauticMysqlTestCase
             $pointAction->setGroup($group);
         }
         $this->em->persist($pointAction);
+        $this->em->flush();
 
         return $pointAction;
     }
@@ -75,7 +76,7 @@ class PointActionFunctionalTest extends MauticMysqlTestCase
         string $trackingHash
     ): Stat {
         /** @var StatRepository $statRepository */
-        $statRepository = self::$container->get('mautic.email.repository.stat');
+        $statRepository = static::getContainer()->get('mautic.email.repository.stat');
 
         $stat = new Stat();
         $stat->setTrackingHash($trackingHash);

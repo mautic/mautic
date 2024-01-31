@@ -13,29 +13,11 @@ use Psr\Log\LoggerInterface;
 
 class KickoffContactFinder
 {
-    /**
-     * @var LeadRepository
-     */
-    private $leadRepository;
-
-    /**
-     * @var CampaignRepository
-     */
-    private $campaignRepository;
-
-    /**
-     * @var LoggerInterface
-     */
-    private $logger;
-
-    /**
-     * KickoffContactFinder constructor.
-     */
-    public function __construct(LeadRepository $leadRepository, CampaignRepository $campaignRepository, LoggerInterface $logger)
-    {
-        $this->leadRepository     = $leadRepository;
-        $this->campaignRepository = $campaignRepository;
-        $this->logger             = $logger;
+    public function __construct(
+        private LeadRepository $leadRepository,
+        private CampaignRepository $campaignRepository,
+        private LoggerInterface $logger
+    ) {
     }
 
     /**
@@ -73,10 +55,8 @@ class KickoffContactFinder
 
     /**
      * @param int $campaignId
-     *
-     * @return int
      */
-    public function getContactCount($campaignId, array $eventIds, ContactLimiter $limiter)
+    public function getContactCount($campaignId, array $eventIds, ContactLimiter $limiter): int
     {
         $countResult = $this->campaignRepository->getCountsForPendingContacts($campaignId, $eventIds, $limiter);
 

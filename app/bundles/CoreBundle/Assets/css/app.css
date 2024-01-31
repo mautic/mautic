@@ -1407,13 +1407,45 @@ blockquote > p:after {
 .alert-growl {
   background: rgba(0, 0, 0, 0.8);
   color: #FFFFFF;
-  border: 1px solid #000;
+  border-radius: 0;
+  border-left: 4px solid #4e5e9e;
+  border-top: none;
+  border-right: none;
+  border-bottom: none;
+}
+.alert-growl a {
+  font-weight: 700;
+  color: #6a79b5;
+}
+.alert-growl a:hover {
+  color: #aeb6d7;
+}
+.alert-growl--warning {
+  border-left-color: #FDB933;
+}
+.alert-growl--warning a {
+  color: #FDB933;
+}
+.alert-growl--warning a:hover {
+  color: #fedc98;
+}
+.alert-growl--error {
+  border-left-color: #F86B4F;
+}
+.alert-growl--error a {
+  color: #F86B4F;
+}
+.alert-growl--error a:hover {
+  color: #fcbdb1;
 }
 .alert-growl-container {
   position: absolute;
   top: 20px;
   right: 20px;
   z-index: 100000;
+}
+.alert-growl-container.alert-offset {
+  top: 50px;
 }
 .alert-growl-container .alert-growl {
   margin-bottom: 5px;
@@ -1466,6 +1498,10 @@ blockquote > p:after {
 }
 .ck.ck-balloon-panel.ck-balloon-panel_caret_se.ck-balloon-panel_visible {
   z-index: 99999 !important;
+}
+.ck-body-wrapper{
+  position: fixed;
+  z-index: 99999;
 }
 a.media {
   display: block;

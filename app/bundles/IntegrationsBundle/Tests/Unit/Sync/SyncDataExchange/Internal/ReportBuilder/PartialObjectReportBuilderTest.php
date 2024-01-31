@@ -33,44 +33,41 @@ class PartialObjectReportBuilderTest extends TestCase
     /**
      * @var FieldChangeRepository|MockObject
      */
-    private $fieldChangeRepository;
+    private \PHPUnit\Framework\MockObject\MockObject $fieldChangeRepository;
 
     /**
      * @var FieldHelper|MockObject
      */
-    private $fieldHelper;
+    private \PHPUnit\Framework\MockObject\MockObject $fieldHelper;
 
     /**
      * @var EventDispatcherInterface|MockObject
      */
-    private $dispatcher;
+    private \PHPUnit\Framework\MockObject\MockObject $dispatcher;
 
     /**
      * @var FieldBuilder|MockObject
      */
-    private $fieldBuilder;
+    private \PHPUnit\Framework\MockObject\MockObject $fieldBuilder;
 
     /**
      * @var ObjectProvider|MockObject
      */
-    private $objectProvider;
+    private \PHPUnit\Framework\MockObject\MockObject $objectProvider;
 
-    /**
-     * @var PartialObjectReportBuilder
-     */
-    private $reportBuilder;
+    private \Mautic\IntegrationsBundle\Sync\SyncDataExchange\Internal\ReportBuilder\PartialObjectReportBuilder $reportBuilder;
 
     protected function setUp(): void
     {
         $this->fieldChangeRepository = $this->createMock(FieldChangeRepository::class);
         $this->fieldHelper           = $this->getMockBuilder(FieldHelper::class)
             ->disableOriginalConstructor()
-            ->setMethodsExcept(['getNormalizedFieldType'])
+            ->onlyMethods(['getFieldChangeObject', 'getFieldObjectName'])
             ->getMock();
-        $this->dispatcher            = $this->createMock(EventDispatcherInterface::class);
-        $this->fieldBuilder          = $this->createMock(FieldBuilder::class);
-        $this->objectProvider        = $this->createMock(ObjectProvider::class);
-        $this->reportBuilder         = new PartialObjectReportBuilder(
+        $this->dispatcher     = $this->createMock(EventDispatcherInterface::class);
+        $this->fieldBuilder   = $this->createMock(FieldBuilder::class);
+        $this->objectProvider = $this->createMock(ObjectProvider::class);
+        $this->reportBuilder  = new PartialObjectReportBuilder(
             $this->fieldChangeRepository,
             $this->fieldHelper,
             $this->fieldBuilder,

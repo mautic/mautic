@@ -54,9 +54,7 @@ final class FieldCollection extends \ArrayIterator
         return new self(
             array_filter(
                 $this->getArrayCopy(),
-                function (FieldCrate $field) use ($keys, $keyToKeep) {
-                    return ($keyToKeep && $field->getKey() === $keyToKeep) || !in_array($field->getKey(), $keys, true);
-                }
+                fn (FieldCrate $field): bool => ($keyToKeep && $field->getKey() === $keyToKeep) || !in_array($field->getKey(), $keys, true)
             )
         );
     }

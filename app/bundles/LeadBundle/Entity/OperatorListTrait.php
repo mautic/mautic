@@ -123,7 +123,7 @@ trait OperatorListTrait
             return $processedTypes[$type];
         }
 
-        $this->normalizeType($type);
+        $type = $this->normalizeType($type);
 
         if (null === $type) {
             foreach ($this->typeOperators as $type => $def) {
@@ -146,7 +146,7 @@ trait OperatorListTrait
      *
      * @return mixed[]
      */
-    public function getOperatorChoiceList($definition, $overrideHiddenOperators = [])
+    public function getOperatorChoiceList($definition, $overrideHiddenOperators = []): array
     {
         static $operatorChoices = [];
         if (empty($operatorChoices)) {
@@ -179,29 +179,33 @@ trait OperatorListTrait
 
     /**
      * @deprecated These aliases are subscribed in the TypeOperatorSubscriber now so this is not necessary. To be removed in next Mautic version.
-     *
-     * Normalize type operator.
-     *
-     * @param string|null $type
-     *
-     * @return void
      */
-    protected function normalizeType(&$type)
+    protected function normalizeType(mixed $type): mixed
     {
         if (null === $type) {
-            return;
+            return $type;
         }
 
         if ('boolean' === $type) {
-            $type = 'bool';
-        } elseif (in_array($type, ['country', 'timezone', 'region', 'locale'])) {
-            $type = 'select';
-        } elseif (in_array($type, ['lookup',  'text', 'email', 'url', 'email', 'tel'])) {
-            $type = 'text';
-        } elseif ('datetime' === $type) {
-            $type = 'date';
-        } elseif (!array_key_exists($type, $this->typeOperators)) {
-            $type = 'default';
+            return 'bool';
         }
+
+        if (in_array($type, ['country', 'timezone', 'region', 'locale'])) {
+            return 'select';
+        }
+
+        if (in_array($type, ['lookup',  'text', 'email', 'url', 'email', 'tel'])) {
+            return 'text';
+        }
+
+        if ('datetime' === $type) {
+            return 'date';
+        }
+
+        if (!array_key_exists($type, $this->typeOperators)) {
+            return 'default';
+        }
+
+        return $type;
     }
 }

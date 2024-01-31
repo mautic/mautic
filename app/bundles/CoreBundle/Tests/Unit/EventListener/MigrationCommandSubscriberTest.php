@@ -22,47 +22,41 @@ class MigrationCommandSubscriberTest extends \PHPUnit\Framework\TestCase
     /**
      * @var MockObject|VersionProviderInterface
      */
-    private $versionProvider;
+    private \PHPUnit\Framework\MockObject\MockObject $versionProvider;
 
     /**
      * @var MockObject|GeneratedColumnsProviderInterface
      */
-    private $generatedColumnsProvider;
+    private \PHPUnit\Framework\MockObject\MockObject $generatedColumnsProvider;
 
     /**
      * @var MockObject|Connection
      */
-    private $connection;
+    private \PHPUnit\Framework\MockObject\MockObject $connection;
 
-    /**
-     * @var MockObject|ConsoleCommandEvent
-     */
-    private $event;
+    private \Symfony\Component\Console\Event\ConsoleCommandEvent $event;
 
     /**
      * @var MockObject|Command
      */
-    private $command;
+    private \PHPUnit\Framework\MockObject\MockObject $command;
 
     /**
      * @var MockObject|MySqlSchemaManager
      */
-    private $schemaManager;
+    private \PHPUnit\Framework\MockObject\MockObject $schemaManager;
 
     /**
      * @var MockObject|OutputInterface
      */
-    private $output;
+    private \PHPUnit\Framework\MockObject\MockObject $output;
 
     /**
      * @var GeneratedColumns<GeneratedColumn>
      */
-    private $generatedColumns;
+    private \Mautic\CoreBundle\Doctrine\GeneratedColumn\GeneratedColumns $generatedColumns;
 
-    /**
-     * @var MigrationCommandSubscriber
-     */
-    private $subscriber;
+    private \Mautic\CoreBundle\EventListener\MigrationCommandSubscriber $subscriber;
 
     protected function setUp(): void
     {
@@ -85,7 +79,7 @@ class MigrationCommandSubscriberTest extends \PHPUnit\Framework\TestCase
 
         $this->event = new ConsoleCommandEvent($this->command, $input, $this->output);
 
-        $this->connection->method('getSchemaManager')->willReturn($this->schemaManager);
+        $this->connection->method('createSchemaManager')->willReturn($this->schemaManager);
         $this->generatedColumns->add(new GeneratedColumn('page_hits', 'generated_hit_date', 'DATE', 'not important'));
     }
 

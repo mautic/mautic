@@ -10,18 +10,13 @@ use Mautic\UserBundle\Entity\User;
 final class BulkNotification implements BulkNotificationInterface
 {
     /**
-     * @var NotificationModel
-     */
-    private $notificationModel;
-
-    /**
      * @var mixed[]
      */
-    private $notifications = [];
+    private array $notifications = [];
 
-    public function __construct(NotificationModel $notificationModel)
-    {
-        $this->notificationModel = $notificationModel;
+    public function __construct(
+        private NotificationModel $notificationModel
+    ) {
     }
 
     public function addNotification(

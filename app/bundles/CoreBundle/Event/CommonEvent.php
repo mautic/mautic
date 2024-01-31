@@ -6,9 +6,6 @@ use Doctrine\ORM\EntityManagerInterface;
 use Mautic\LeadBundle\Entity\Lead;
 use Symfony\Contracts\EventDispatcher\Event;
 
-/**
- * Class CommonEvent.
- */
 class CommonEvent extends Event
 {
     /**
@@ -41,7 +38,7 @@ class CommonEvent extends Event
      *
      * @param EntityManagerInterface $em
      */
-    public function setEntityManager($em)
+    public function setEntityManager($em): void
     {
         $this->em = $em;
     }

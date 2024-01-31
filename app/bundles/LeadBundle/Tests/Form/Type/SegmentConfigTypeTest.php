@@ -17,7 +17,7 @@ final class SegmentConfigTypeTest extends TestCase
     /**
      * @var FormBuilderInterface<FormBuilderInterface>&MockObject
      */
-    private $formBuilderInterface;
+    private \PHPUnit\Framework\MockObject\MockObject $formBuilderInterface;
 
     protected function setUp(): void
     {

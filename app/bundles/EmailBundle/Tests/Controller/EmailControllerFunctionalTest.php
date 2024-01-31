@@ -97,7 +97,7 @@ final class EmailControllerFunctionalTest extends MauticMysqlTestCase
         /** @var DoctrineDataCollector $dbCollector */
         $dbCollector = $profile->getCollector('db');
         $queries     = $dbCollector->getQueries();
-        $prefix      = self::$container->getParameter('mautic.db_table_prefix');
+        $prefix      = static::getContainer()->getParameter('mautic.db_table_prefix');
 
         $dncQueries = array_filter(
             $queries['default'],
@@ -139,7 +139,7 @@ final class EmailControllerFunctionalTest extends MauticMysqlTestCase
         /** @var DoctrineDataCollector $dbCollector */
         $dbCollector = $profile->getCollector('db');
         $queries     = $dbCollector->getQueries();
-        $prefix      = self::$container->getParameter('mautic.db_table_prefix');
+        $prefix      = static::getContainer()->getParameter('mautic.db_table_prefix');
 
         $dncQueries = array_filter(
             $queries['default'],
@@ -327,6 +327,80 @@ final class EmailControllerFunctionalTest extends MauticMysqlTestCase
         Assert::assertSame('value123', $email->getHeaders()->get('x-global-custom-header')->getBody());
     }
 
+    public function testSegmentEmailSendWithTokenInFromAddress(): void
+    {
+        $segment = $this->createSegment();
+        $email   = $this->createEmail();
+        $email->addList($segment);
+        $email->setSubject('Subject A');
+        $email->setCustomHtml('Ahoy <i>{contactfield=email}</i><a href="https://mautic.org">Mautic</a>');
+        $email->setPlainText('Dear {contactfield=email}');
+        $email->setFromAddress('{contactfield=address2}');
+        $email->setFromName('{contactfield=address1}');
+        $email->setReplyToAddress('custom@replyto.address');
+
+        foreach (['contact@one.email', 'contact@two.email'] as $emailAddress) {
+            $contact = new Lead();
+            $contact->setEmail($emailAddress);
+            $contact->setAddress1('address1 name for '.$emailAddress);
+            $contact->setAddress2('address2+'.$emailAddress);
+
+            $member = new ListLead();
+            $member->setLead($contact);
+            $member->setList($segment);
+            $member->setDateAdded(new \DateTime());
+
+            $this->em->persist($member);
+            $this->em->persist($contact);
+        }
+
+        $this->em->persist($segment);
+        $this->em->persist($email);
+        $this->em->flush();
+
+        $this->client->request(Request::METHOD_POST, '/s/ajax?action=email:sendBatch', [
+            'id'         => $email->getId(),
+            'pending'    => 2,
+            'batchLimit' => 10,
+        ]);
+
+        $this->assertTrue($this->client->getResponse()->isOk(), $this->client->getResponse()->getContent());
+        $this->assertSame('{"success":1,"percent":100,"progress":[2,2],"stats":{"sent":2,"failed":0,"failedRecipients":[]}}', $this->client->getResponse()->getContent());
+        $this->assertQueuedEmailCount(2);
+
+        $messages   = self::getMailerMessages();
+        $messageOne = array_values(array_filter($messages, fn ($message) => 'contact@one.email' === $message->getTo()[0]->getAddress()))[0];
+        $messageTwo = array_values(array_filter($messages, fn ($message) => 'contact@two.email' === $message->getTo()[0]->getAddress()))[0];
+
+        Assert::assertSame('Subject A', $messageOne->getSubject());
+        Assert::assertMatchesRegularExpression('#Ahoy <i>contact@one\.email<\/i><a href="https:\/\/localhost\/r\/[a-z0-9]+\?ct=[a-zA-Z0-9%]+">Mautic<\/a><img height="1" width="1" src="https:\/\/localhost\/email\/[a-z0-9]+\.gif" alt="" \/>#', $messageOne->getHtmlBody());
+        Assert::assertSame('Dear contact@one.email', $messageOne->getTextBody());
+        Assert::assertCount(1, $messageOne->getFrom());
+        Assert::assertSame('address1 name for contact@one.email', $messageOne->getFrom()[0]->getName());
+        Assert::assertSame('address2+contact@one.email', $messageOne->getFrom()[0]->getAddress());
+        Assert::assertCount(1, $messageOne->getTo());
+        Assert::assertSame('', $messageOne->getTo()[0]->getName());
+        Assert::assertSame('contact@one.email', $messageOne->getTo()[0]->getAddress());
+        Assert::assertCount(1, $messageOne->getReplyTo());
+        Assert::assertSame('', $messageOne->getReplyTo()[0]->getName());
+        Assert::assertSame('custom@replyto.address', $messageOne->getReplyTo()[0]->getAddress());
+        Assert::assertSame('value123', $messageOne->getHeaders()->get('x-global-custom-header')->getBody());
+
+        Assert::assertSame('Subject A', $messageTwo->getSubject());
+        Assert::assertMatchesRegularExpression('#Ahoy <i>contact@two\.email<\/i><a href="https:\/\/localhost\/r\/[a-z0-9]+\?ct=[a-zA-Z0-9%]+">Mautic<\/a><img height="1" width="1" src="https:\/\/localhost\/email\/[a-z0-9]+\.gif" alt="" \/>#', $messageTwo->getHtmlBody());
+        Assert::assertSame('Dear contact@two.email', $messageTwo->getTextBody());
+        Assert::assertCount(1, $messageTwo->getFrom());
+        Assert::assertSame('address1 name for contact@two.email', $messageTwo->getFrom()[0]->getName());
+        Assert::assertSame('address2+contact@two.email', $messageTwo->getFrom()[0]->getAddress());
+        Assert::assertCount(1, $messageTwo->getTo());
+        Assert::assertSame('', $messageTwo->getTo()[0]->getName());
+        Assert::assertSame('contact@two.email', $messageTwo->getTo()[0]->getAddress());
+        Assert::assertCount(1, $messageTwo->getReplyTo());
+        Assert::assertSame('', $messageTwo->getReplyTo()[0]->getName());
+        Assert::assertSame('custom@replyto.address', $messageTwo->getReplyTo()[0]->getAddress());
+        Assert::assertSame('value123', $messageTwo->getHeaders()->get('x-global-custom-header')->getBody());
+    }
+
     private function createSegment(string $suffix = 'A'): LeadList
     {
         $segment = new LeadList();
@@ -378,7 +452,7 @@ final class EmailControllerFunctionalTest extends MauticMysqlTestCase
         /** @var DoctrineDataCollector $dbCollector */
         $dbCollector = $profile->getCollector('db');
         $queries     = $dbCollector->getQueries();
-        $prefix      = self::$container->getParameter('mautic.db_table_prefix');
+        $prefix      = static::getContainer()->getParameter('mautic.db_table_prefix');
 
         $pendingCountQuery = array_filter(
             $queries['default'],
@@ -386,5 +460,39 @@ final class EmailControllerFunctionalTest extends MauticMysqlTestCase
         );
 
         $this->assertCount(0, $pendingCountQuery);
+    }
+
+    public function testSendEmailForImportCustomEmailTemplate(): void
+    {
+        $email = new Email();
+        $email->setName('Test Email C');
+        $email->setSubject('Test Email C Subject');
+        $email->setTemplate('blank');
+        $email->setEmailType('template');
+
+        $contact = new Lead();
+        $contact->setEmail('john@doe.email');
+
+        $this->em->persist($email);
+        $this->em->persist($contact);
+        $this->em->flush();
+
+        // Create the member now.
+        $payload = [
+            'action'   => 'lead:getEmailTemplate',
+            'template' => $email->getId(),
+        ];
+
+        $this->client->request('GET', '/s/ajax', $payload, [], $this->createAjaxHeaders());
+        $clientResponse = $this->client->getResponse();
+
+        $this->assertTrue($clientResponse->isOk(), $clientResponse->getContent());
+
+        $response = json_decode($clientResponse->getContent(), true);
+
+        $this->assertSame(1, $response['success']);
+        $this->assertNotEmpty($response['subject']);
+        $this->assertEquals($email->getSubject(), $response['subject']);
+        $this->assertNotEmpty($response['body']);
     }
 }

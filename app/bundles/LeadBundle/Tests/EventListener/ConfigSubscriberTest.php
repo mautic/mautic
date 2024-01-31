@@ -17,7 +17,7 @@ class ConfigSubscriberTest extends TestCase
     /**
      * @var ConfigBuilderEvent&MockObject
      */
-    private $configBuilderEvent;
+    private \PHPUnit\Framework\MockObject\MockObject $configBuilderEvent;
 
     protected function setUp(): void
     {
@@ -38,7 +38,7 @@ class ConfigSubscriberTest extends TestCase
         $leadConfig = [
             'bundle'     => 'LeadBundle',
             'formAlias'  => 'leadconfig',
-            'formType'   => 'Mautic\\LeadBundle\\Form\\Type\\ConfigType',
+            'formType'   => \Mautic\LeadBundle\Form\Type\ConfigType::class,
             'formTheme'  => '@MauticLead/FormTheme/Config/_config_companyconfig_widget.html.twig',
             'parameters' => null,
         ];
@@ -46,7 +46,7 @@ class ConfigSubscriberTest extends TestCase
         $segmentConfig = [
             'bundle'     => 'LeadBundle',
             'formAlias'  => 'segment_config',
-            'formType'   => 'Mautic\\LeadBundle\\Form\\Type\\SegmentConfigType',
+            'formType'   => \Mautic\LeadBundle\Form\Type\SegmentConfigType::class,
             'formTheme'  => '@MauticLead/FormTheme/Config/_config_leadconfig_widget.html.twig',
             'parameters' => null,
         ];

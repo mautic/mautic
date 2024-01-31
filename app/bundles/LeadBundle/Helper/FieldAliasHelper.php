@@ -7,22 +7,15 @@ use Mautic\LeadBundle\Model\FieldModel;
 
 class FieldAliasHelper
 {
-    /**
-     * @var FieldModel
-     */
-    private $fieldModel;
-
-    public function __construct(FieldModel $fieldModel)
-    {
-        $this->fieldModel = $fieldModel;
+    public function __construct(
+        private FieldModel $fieldModel
+    ) {
     }
 
     /**
      * Cleans the alias and if it's not unique it will make it unique.
-     *
-     * @return LeadField
      */
-    public function makeAliasUnique(LeadField $field)
+    public function makeAliasUnique(LeadField $field): LeadField
     {
         // alias cannot be changed for existing fields
         if ($field->getId()) {
@@ -30,7 +23,7 @@ class FieldAliasHelper
         }
 
         // set alias as name if alias is empty
-        $alias = $field->getAlias() ?: $field->getName();
+        $alias = ($field->getAlias() ?: $field->getName()) ?: '';
 
         // clean the alias
         $alias = $this->fieldModel->cleanAlias($alias, 'f_', 25);
