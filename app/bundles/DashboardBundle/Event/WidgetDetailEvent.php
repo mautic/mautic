@@ -176,9 +176,11 @@ class WidgetDetailEvent extends CommonEvent
     /**
      * Set the widget template data.
      *
+     * @param bool|null $skipCache
+     *
      * @throws \Psr\Cache\InvalidArgumentException
      */
-    public function setTemplateData(array $templateData, ?bool $skipCache = false): void
+    public function setTemplateData(array $templateData, $skipCache = false): void
     {
         $this->templateData = $templateData;
         $this->widget->setTemplateData($templateData);
