@@ -17,10 +17,7 @@ class CheckStep implements StepInterface
      */
     private bool $configIsWritable;
 
-    /**
-     * @var ParameterLoader|null
-     **/
-    private $parameterLoader;
+    private ?ParameterLoader $parameterLoader = null;
 
     /**
      * Default absolute path to cache directory.
