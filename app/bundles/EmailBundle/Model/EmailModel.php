@@ -1685,14 +1685,9 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
         return false;
     }
 
-    /**
-     * @return bool|DoNotContact
-     */
-    public function setDoNotContactLead(Lead $lead, string $comments, int $reason = DoNotContact::BOUNCED, bool $flush = true)
+    public function setDoNotContactLead(Lead $lead, string $comments, int $reason = DoNotContact::BOUNCED, bool $flush = true): false|DoNotContact
     {
-        $channel = 'email';
-
-        return $this->doNotContact->addDncForContact($lead->getId(), $channel, $reason, $comments, $flush);
+        return $this->doNotContact->addDncForContact($lead->getId(), 'email', $reason, $comments, $flush);
     }
 
     /**

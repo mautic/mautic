@@ -38,8 +38,7 @@ class TokenSubscriberTest extends \PHPUnit\Framework\TestCase
         /** @var MockObject&LoggerInterface $logger */
         $logger = $this->createMock(LoggerInterface::class);
 
-        /** @var MockObject&MailHashHelper $logger */
-        $mailHashHelper = $this->createMock(MailHashHelper::class);
+        $mailHashHelper = new MailHashHelper($coreParametersHelper);
 
         $coreParametersHelper->method('get')
             ->willReturnMap(

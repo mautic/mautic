@@ -6,13 +6,10 @@ namespace Mautic\EmailBundle\Helper;
 
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 
-class MailHashHelper
+final class MailHashHelper
 {
-    private CoreParametersHelper $coreParametersHelper;
-
-    public function __construct(CoreParametersHelper $coreParametersHelper)
+    public function __construct(private CoreParametersHelper $coreParametersHelper)
     {
-        $this->coreParametersHelper = $coreParametersHelper;
     }
 
     public function getEmailHash(string $email): string

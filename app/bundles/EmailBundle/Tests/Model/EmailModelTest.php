@@ -592,12 +592,12 @@ class EmailModelTest extends \PHPUnit\Framework\TestCase
     {
         $lead = new Lead();
         $lead->setId(42);
-        $this->dncModel->expects($this->at(0))
+        $this->doNotContact->expects($this->once())
             ->method('addDncForContact')
             ->with(42, 'email', DoNotContactEntity::BOUNCED, 'comment', true)
-            ->willReturn(true);
+            ->willReturn(false);
 
-        $this->assertTrue($this->emailModel->setDoNotContactLead($lead, 'comment'));
+        $this->assertFalse($this->emailModel->setDoNotContactLead($lead, 'comment'));
     }
 
     /**

@@ -31,7 +31,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\Contracts\Translation\LocaleAwareInterface;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class PublicController extends CommonFormController
 {
@@ -115,7 +115,7 @@ class PublicController extends CommonFormController
      * @throws \Exception
      * @throws \Mautic\CoreBundle\Exception\FileNotFoundException
      */
-    public function unsubscribeAction(Request $request, ContactTracker $contactTracker, EmailModel $model, LeadModel $leadModel, MailHashHelper $mailHash, $idHash, string $urlEmail = null, string $secretHash = null)
+    public function unsubscribeAction(Request $request, ContactTracker $contactTracker, EmailModel $model, LeadModel $leadModel, FormModel $formModel, MailHashHelper $mailHash, $idHash, string $urlEmail = null, string $secretHash = null)
     {
         $stat                  = $model->getEmailStatus($idHash);
         $message               = '';
@@ -150,7 +150,6 @@ class PublicController extends CommonFormController
             $unsubscribeForm = $email->getUnsubscribeForm();
             if (null != $unsubscribeForm && $unsubscribeForm->isPublished()) {
                 $formTemplate = $unsubscribeForm->getTemplate();
-                $formModel    = $this->getModel('form');
                 $formContent  = '<div class="mautic-unsubscribeform">'.$formModel->getContent($unsubscribeForm).'</div>';
             }
         } else {
@@ -179,7 +178,7 @@ class PublicController extends CommonFormController
 
                 // Set lead lang
                 if ($lead->getPreferredLocale()) {
-                    $translator->setLocale($lead->getPreferredLocale());
+                    $this->translator->setLocale($lead->getPreferredLocale());
                 }
 
                 // Add contact ID to the session name in case more contacts
@@ -192,20 +191,24 @@ class PublicController extends CommonFormController
                 if (is_array($contacts) && count($contacts) > 0) {
                     $lead  = array_pop($contacts);
                 } else {
-                    $message = $translator->trans('mautic.email.stat_record.not_found');
+                    $message = $this->translator->trans('mautic.email.stat_record.not_found');
                 }
             }
 
             if (!$this->coreParametersHelper->get('show_contact_preferences')) {
                 if (!empty($stat)) {
-                    $message = $this->getUnsubscribeMessage($idHash, $model, $stat, $translator);
+                    $message = $this->getUnsubscribeMessage($idHash, $model, $stat, $this->translator);
                 } elseif ($lead && $lead instanceof Lead) {
-                    $message = $this->getUnsubscribeMessageLead($idHash, $model, $lead, $translator, $urlEmail);
+                    $message = $this->getUnsubscribeMessageLead($idHash, $model, $lead, $this->translator, $urlEmail);
                 }
             } elseif ($lead) {
-                $unsubscribeHash = $mailHash->getEmailHash($urlEmail);
-                $action          = $this->generateUrl('mautic_email_unsubscribe', ['idHash' => $idHash, 'urlEmail' => $urlEmail, 'secretHash' => $unsubscribeHash]);
+                $params = ['idHash' => $idHash, 'urlEmail' => $urlEmail];
 
+                if ($urlEmail) {
+                    $params['secretHash'] = $mailHash->getEmailHash($urlEmail);
+                }
+
+                $action         = $this->generateUrl('mautic_email_unsubscribe', $params);
                 $viewParameters = [
                     'lead'                         => $lead,
                     'idHash'                       => $idHash,
@@ -226,7 +229,7 @@ class PublicController extends CommonFormController
 
                     return $this->postActionRedirect(
                         [
-                            'returnUrl'       => $this->generateUrl('mautic_email_unsubscribe', ['idHash' => $idHash, 'urlEmail' => $urlEmail, 'secretHash' => $unsubscribeHash]),
+                            'returnUrl'       => $action,
                             'viewParameters'  => $viewParameters,
                             'contentTemplate' => $contentTemplate,
                         ]
@@ -309,7 +312,7 @@ class PublicController extends CommonFormController
                 $message = $html;
             }
         } else {
-            $message = $translator->trans('mautic.email.stat_record.not_found');
+            $message = $this->translator->trans('mautic.email.stat_record.not_found');
         }
 
         $config = $theme->getConfig();
