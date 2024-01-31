@@ -4,8 +4,8 @@ namespace Mautic\InstallBundle\Configurator\Step;
 
 use Mautic\CoreBundle\Configurator\Configurator;
 use Mautic\CoreBundle\Configurator\Step\StepInterface;
+use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\FileHelper;
-use Mautic\CoreBundle\Loader\ParameterLoader;
 use Mautic\CoreBundle\Security\Cryptography\Cipher\Symmetric\OpenSSLCipher;
 use Mautic\InstallBundle\Configurator\Form\CheckStepType;
 use Symfony\Component\HttpFoundation\RequestStack;
@@ -16,8 +16,6 @@ class CheckStep implements StepInterface
      * Flag if the configuration file is writable.
      */
     private bool $configIsWritable;
-
-    private ?ParameterLoader $parameterLoader = null;
 
     /**
      * Default absolute path to cache directory.
@@ -60,7 +58,8 @@ class CheckStep implements StepInterface
         Configurator $configurator,
         private string $projectDir,
         RequestStack $requestStack,
-        private OpenSSLCipher $openSSLCipher
+        private OpenSSLCipher $openSSLCipher,
+        private CoreParametersHelper $coreParametersHelper,
     ) {
         $request = $requestStack->getCurrentRequest();
 
@@ -252,25 +251,16 @@ class CheckStep implements StepInterface
         return $parameters;
     }
 
-  private function getParameterLoader(): ParameterLoader
-  {
-      if (!$this->parameterLoader) {
-          $this->parameterLoader = new ParameterLoader();
-      }
-
-      return $this->parameterLoader;
-  }
-
     public function getCacheDir(): string
     {
-        $cachePath = $this->getParameterLoader()->getLocalParameterBag()->get('cache_path') ?? $this->cache_path;
+        $cachePath = $this->coreParametersHelper->get('cache_path') ?? $this->cache_path;
 
         return str_replace('%kernel.project_dir%', $this->projectDir, $cachePath);
     }
 
     public function getLogDir(): string
     {
-        $logPath = $this->getParameterLoader()->getLocalParameterBag()->get('log_path') ?? $this->log_path;
+        $logPath = $this->coreParametersHelper->get('log_path') ?? $this->log_path;
 
         return str_replace('%kernel.project_dir%', $this->projectDir, $logPath);
     }
