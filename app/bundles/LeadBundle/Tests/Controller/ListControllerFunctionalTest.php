@@ -36,12 +36,12 @@ class ListControllerFunctionalTest extends MauticMysqlTestCase
     protected function setUp(): void
     {
         parent::setUp();
-        $this->listModel = self::$container->get('mautic.lead.model.list');
+        $this->listModel = static::getContainer()->get('mautic.lead.model.list');
         \assert($this->listModel instanceof ListModel);
         $this->listRepo = $this->listModel->getRepository();
         \assert($this->listRepo instanceof LeadListRepository);
         /** @var LeadModel $leadModel */
-        $leadModel = self::$container->get('mautic.lead.model.lead');
+        $leadModel = static::getContainer()->get('mautic.lead.model.lead');
         /* @var LeadRepository $leadRepo */
         $this->leadRepo = $leadModel->getRepository();
     }

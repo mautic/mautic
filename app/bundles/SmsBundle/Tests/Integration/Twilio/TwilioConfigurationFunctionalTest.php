@@ -15,7 +15,7 @@ class TwilioConfigurationFunctionalTest extends MauticMysqlTestCase
     public function testSaveTwilioConfig(): void
     {
         $messagingServiceSid = 'messaging_sid';
-        $integration         = $this->getContainer()->get('mautic.integration.twilio');
+        $integration         = static::getContainer()->get('mautic.integration.twilio');
         $crawler             = $this->client->request(Request::METHOD_GET, 's/plugins/config/'.$integration->getName());
         $response            = $this->client->getResponse();
 
