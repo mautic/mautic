@@ -501,7 +501,7 @@ class LeadControllerTest extends MauticMysqlTestCase
             ]
         );
         $crawler = $this->client->submit($form);
-        $this->assertTrue($this->client->getResponse()->isOk());
+        $this->assertTrue($this->client->getResponse()->isOk(), $this->client->getResponse()->getContent());
         $this->assertQueuedEmailCount(1);
 
         $email      = $this->getMailerMessage();
