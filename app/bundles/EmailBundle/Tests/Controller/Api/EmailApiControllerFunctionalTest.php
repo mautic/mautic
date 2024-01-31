@@ -31,7 +31,7 @@ class EmailApiControllerFunctionalTest extends MauticMysqlTestCase
 
     private function setUpMailer(): void
     {
-        $mailHelper = self::$container->get('mautic.helper.mailer');
+        $mailHelper = static::getContainer()->get('mautic.helper.mailer');
         $transport  = new SmtpTransport();
         $mailer     = new Mailer($transport);
         $this->setPrivateProperty($mailHelper, 'mailer', $mailer);
@@ -43,7 +43,7 @@ class EmailApiControllerFunctionalTest extends MauticMysqlTestCase
     protected function beforeTearDown(): void
     {
         // Clear owners cache (to leave a clean environment for future tests):
-        $mailHelper = self::$container->get('mautic.helper.mailer');
+        $mailHelper = static::getContainer()->get('mautic.helper.mailer');
         $this->setPrivateProperty($mailHelper, 'leadOwners', []);
     }
 
@@ -196,7 +196,7 @@ class EmailApiControllerFunctionalTest extends MauticMysqlTestCase
         $trackingHash = 'tracking_hash_123';
 
         /** @var StatRepository $statRepository */
-        $statRepository = self::$container->get('mautic.email.repository.stat');
+        $statRepository = static::getContainer()->get('mautic.email.repository.stat');
 
         // Create a test email stat.
         $stat = new Stat();
@@ -249,7 +249,7 @@ class EmailApiControllerFunctionalTest extends MauticMysqlTestCase
         $user->setEmail('john@api.test');
         $user->setSignature('Best regards, |FROM_NAME|');
         $user->setRole($role);
-        $encoder = self::$container->get('security.encoder_factory')->getEncoder($user);
+        $encoder = static::getContainer()->get('security.encoder_factory')->getEncoder($user);
         $user->setPassword($encoder->encodePassword('password', null));
         $this->em->persist($user);
 
