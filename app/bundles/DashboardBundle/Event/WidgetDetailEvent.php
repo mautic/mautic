@@ -178,7 +178,7 @@ class WidgetDetailEvent extends CommonEvent
      *
      * @throws \Psr\Cache\InvalidArgumentException
      */
-    public function setTemplateData(array $templateData, ?bool $skipCache = false): bool
+    public function setTemplateData(array $templateData, ?bool $skipCache = false): void
     {
         $this->templateData = $templateData;
         $this->widget->setTemplateData($templateData);
@@ -191,10 +191,8 @@ class WidgetDetailEvent extends CommonEvent
                 // must pass a DateTime object or a int of seconds to expire as 3rd attribute to set().
                 $expireTime = $this->widget->getCacheTimeout() * 60;
 
-                return $cache->set($this->getUniqueWidgetId(), $templateData, (int) $expireTime);
+                $cache->set($this->getUniqueWidgetId(), $templateData, (int) $expireTime);
             }
-
-            return false;
         }
 
         $cItem = $this->cacheProvider->getItem($this->getCacheKey());
@@ -203,7 +201,7 @@ class WidgetDetailEvent extends CommonEvent
         }
         $cItem->set($templateData);
 
-        return $this->cacheProvider->save($cItem);
+        $this->cacheProvider->save($cItem);
     }
 
     /**
@@ -305,6 +303,16 @@ class WidgetDetailEvent extends CommonEvent
     public function getTranslator()
     {
         return $this->translator;
+    }
+
+    /**
+     * Set security object to check the perimissions.
+     *
+     * @depreacated
+     */
+    public function setSecurity(CorePermissions $security): void
+    {
+        $this->security = $security;
     }
 
     /**

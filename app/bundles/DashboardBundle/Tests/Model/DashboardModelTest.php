@@ -46,10 +46,7 @@ final class DashboardModelTest extends TestCase
 
     private DashboardModel $model;
 
-    /**
-     * @var WidgetDetailEventFactory
-     */
-    private $widgetDetailEventFactory;
+    private WidgetDetailEventFactory $widgetDetailEventFactory;
 
     protected function setUp(): void
     {

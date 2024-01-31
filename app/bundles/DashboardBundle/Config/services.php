@@ -19,5 +19,6 @@ return function (ContainerConfigurator $configurator): void {
         ->exclude('../{'.implode(',', array_merge(MauticCoreExtension::DEFAULT_EXCLUDES, $excludes)).'}');
 
     $services->load('Mautic\\DashboardBundle\\Entity\\', '../Entity/*Repository.php');
-    $services->alias('mautic.dashboard.model.dashboard', \Mautic\DashboardBundle\Model\DashboardModel::class);
+    $services->load('Mautic\\DashboardBundle\\Event\\', '../Event/*Factory.php');
+    $services->alias('mautic.dashboard.model.dashboard', Mautic\DashboardBundle\Model\DashboardModel::class);
 };
