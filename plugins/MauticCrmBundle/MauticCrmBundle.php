@@ -29,7 +29,7 @@ class MauticCrmBundle extends PluginBundleBase
     private static function getMetadata(EntityManager $em)
     {
         $allMetadata   = $em->getMetadataFactory()->getAllMetadata();
-        $currentSchema = $em->getConnection()->getSchemaManager()->createSchema();
+        $currentSchema = $em->getConnection()->createSchemaManager()->introspectSchema();
 
         $classes = [];
 

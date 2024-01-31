@@ -2,7 +2,7 @@
 
 namespace Mautic\EmailBundle\Entity;
 
-use Doctrine\DBAL\Connection;
+use Doctrine\DBAL\ArrayParameterType;
 use Mautic\CoreBundle\Entity\CommonRepository;
 use Mautic\CoreBundle\Helper\Chart\ChartQuery;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
@@ -264,7 +264,7 @@ class StatRepository extends CommonRepository
                     $q->andWhere(
                         $q->expr()->in('s.list_id', ':segmentIds')
                     );
-                    $q->setParameter('segmentIds', $listId, Connection::PARAM_INT_ARRAY);
+                    $q->setParameter('segmentIds', $listId, ArrayParameterType::INTEGER);
 
                     $q->addSelect('s.list_id')
                         ->groupBy('s.list_id');
@@ -653,7 +653,7 @@ class StatRepository extends CommonRepository
             ->andWhere('s.lead_id in (:contacts)')
             ->andWhere('s.is_failed = 0')
             ->setParameter('email', $emailId)
-            ->setParameter('contacts', $contacts, Connection::PARAM_INT_ARRAY)
+            ->setParameter('contacts', $contacts, ArrayParameterType::INTEGER)
             ->groupBy('s.lead_id');
 
         $results = $query->executeQuery()->fetchAllAssociative();
@@ -698,7 +698,7 @@ class StatRepository extends CommonRepository
             )
             ->where("{$cutAlias}.channel = 'email' AND {$pageHitsAlias}.source = 'email'")
             ->andWhere("{$pageHitsAlias}.lead_id in (:contacts)")
-            ->setParameter('contacts', $contacts, Connection::PARAM_INT_ARRAY)
+            ->setParameter('contacts', $contacts, ArrayParameterType::INTEGER)
             ->groupBy("{$cutAlias}.channel_id, {$pageHitsAlias}.lead_id");
 
         // main query
@@ -719,7 +719,7 @@ class StatRepository extends CommonRepository
                 $subQueryAlias,
                 "{$statsAlias}.email_id = {$subQueryAlias}.channel_id AND {$statsAlias}.lead_id = {$subQueryAlias}.lead_id"
             )->andWhere("{$leadAlias}.id in (:contacts)")
-            ->setParameter('contacts', $contacts, Connection::PARAM_INT_ARRAY)
+            ->setParameter('contacts', $contacts, ArrayParameterType::INTEGER)
             ->groupBy("{$leadAlias}.id");
 
         $results = $queryBuilder->executeQuery()->fetchAllAssociative();

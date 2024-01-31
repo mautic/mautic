@@ -62,6 +62,7 @@
   <listeners>
     <listener class="\Mautic\CoreBundle\Test\Listeners\CleanupListener" />
     <listener class="\Mautic\CoreBundle\Test\Listeners\SeparateProcessListener" />
+    <listener class="Symfony\Bridge\PhpUnit\SymfonyTestsListener"/>
   </listeners>
   <extensions>
     <extension class="\Mautic\CoreBundle\Test\Hooks\MauticExtension" />

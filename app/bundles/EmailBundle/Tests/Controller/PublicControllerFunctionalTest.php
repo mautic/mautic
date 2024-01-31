@@ -59,6 +59,7 @@ class PublicControllerFunctionalTest extends MauticMysqlTestCase
         $this->em->flush();
 
         $crawler = $this->client->request('GET', '/email/unsubscribe/'.$stat->getTrackingHash());
+        $this->assertEquals(200, $this->client->getResponse()->getStatusCode(), var_export($this->client->getResponse()->getContent(), true));
 
         self::assertStringContainsString('form/submit?formId='.$stat->getEmail()->getUnsubscribeForm()->getId(), $crawler->filter('form')->eq(0)->attr('action'));
         $this->assertTrue($this->client->getResponse()->isOk());
@@ -75,7 +76,7 @@ class PublicControllerFunctionalTest extends MauticMysqlTestCase
         $crawler = $this->client->submitForm('Save');
 
         $this->assertEquals(1, $crawler->filter('#success-message-text')->count());
-        $expectedMessage = self::$container->get('translator')->trans('mautic.email.preferences_center_success_message.text');
+        $expectedMessage = static::getContainer()->get('translator')->trans('mautic.email.preferences_center_success_message.text');
         $this->assertEquals($expectedMessage, trim($crawler->filter('#success-message-text')->text(null, false)));
         $this->assertTrue($this->client->getResponse()->isOk());
     }
