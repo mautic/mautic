@@ -77,7 +77,7 @@ body:
     id: how_to_reproduce
     attributes:
        label: How can we reproduce this issue?
-       description: Explain us carefully how we can reproduce the bug you faced.
+       description: Explain to us carefully how we can reproduce the bug you faced.
        value: "Step 1: "
     validations:
       required: true
