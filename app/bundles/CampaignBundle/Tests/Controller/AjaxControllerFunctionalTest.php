@@ -16,15 +16,15 @@ use Symfony\Component\HttpFoundation\Request;
 
 class AjaxControllerFunctionalTest extends MauticMysqlTestCase
 {
-    public function testCancelScheduledCampaignEventAction()
+    public function testCancelScheduledCampaignEventAction(): void
     {
         $contact  = $this->createContact();
         $campaign = $this->createCampaign();
         $this->addContactToCampaign($contact, $campaign);
 
-        $output = $this->runCommand('mautic:campaigns:trigger', ['--campaign-id' => $campaign->getId()]);
+        $commandResult = $this->testSymfonyCommand('mautic:campaigns:trigger', ['--campaign-id' => $campaign->getId()]);
 
-        Assert::assertStringContainsString('1 total event was scheduled', $output);
+        Assert::assertStringContainsString('1 total event was scheduled', $commandResult->getDisplay());
 
         $payload = [
             'action'    => 'campaign:cancelScheduledCampaignEvent',

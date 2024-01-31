@@ -7,9 +7,12 @@ use Symfony\Component\Form\Extension\Core\Type\NumberType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Validator\Constraints\NotEqualTo;
 
+/**
+ * @extends AbstractType<mixed>
+ */
 class CompanyChangeScoreActionType extends AbstractType
 {
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder->add(
             'score',
@@ -19,7 +22,7 @@ class CompanyChangeScoreActionType extends AbstractType
                 'attr'        => ['class' => 'form-control'],
                 'label_attr'  => ['class' => 'control-label'],
                 'scale'       => 0,
-                'data'        => (isset($options['data']['score'])) ? $options['data']['score'] : 0,
+                'data'        => $options['data']['score'] ?? 0,
                 'constraints' => [
                     new NotEqualTo(
                         [

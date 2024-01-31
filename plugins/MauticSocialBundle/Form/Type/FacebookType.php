@@ -8,11 +8,11 @@ use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\FormBuilderInterface;
 
 /**
- * Class FacebookType.
+ * @extends AbstractType<array<mixed>>
  */
 class FacebookType extends AbstractType
 {
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder->add('layout', ChoiceType::class, [
             'choices' => [

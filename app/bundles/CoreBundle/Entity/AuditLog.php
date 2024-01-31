@@ -5,9 +5,6 @@ namespace Mautic\CoreBundle\Entity;
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 
-/**
- * Class AuditLog.
- */
 class AuditLog
 {
     /**
@@ -60,12 +57,12 @@ class AuditLog
      */
     protected $ipAddress;
 
-    public static function loadMetadata(ORM\ClassMetadata $metadata)
+    public static function loadMetadata(ORM\ClassMetadata $metadata): void
     {
         $builder = new ClassMetadataBuilder($metadata);
 
         $builder->setTable('audit_log')
-            ->setCustomRepositoryClass('Mautic\CoreBundle\Entity\AuditLogRepository')
+            ->setCustomRepositoryClass(\Mautic\CoreBundle\Entity\AuditLogRepository::class)
             ->addIndex(['object', 'object_id'], 'object_search')
             ->addIndex(['bundle', 'object', 'action', 'object_id'], 'timeline_search')
             ->addIndex(['date_added'], 'date_added_index');
@@ -108,10 +105,8 @@ class AuditLog
 
     /**
      * Get id.
-     *
-     * @return int
      */
-    public function getId()
+    public function getId(): int
     {
         return (int) $this->id;
     }
@@ -180,10 +175,8 @@ class AuditLog
 
     /**
      * Get objectId.
-     *
-     * @return int
      */
-    public function getObjectId()
+    public function getObjectId(): int
     {
         return (int) $this->objectId;
     }

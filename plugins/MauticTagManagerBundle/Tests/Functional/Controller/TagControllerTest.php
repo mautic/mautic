@@ -30,7 +30,7 @@ class TagControllerTest extends MauticMysqlTestCase
         ];
 
         /** @var TagModel $tagModel */
-        $tagModel            = self::$container->get('mautic.lead.model.tag');
+        $tagModel            = static::getContainer()->get('mautic.lead.model.tag');
         $this->tagRepository = $tagModel->getRepository();
 
         foreach ($tags as $tagName) {
@@ -163,9 +163,7 @@ class TagControllerTest extends MauticMysqlTestCase
     public function testBatchDeleteAction(): void
     {
         $tags   = $this->tagRepository->findAll();
-        $tagsId = array_map(function (Tag $tag) {
-            return $tag->getId();
-        }, $tags);
+        $tagsId = array_map(fn (Tag $tag) => $tag->getId(), $tags);
         $this->client->request('POST', '/s/tags/batchDelete?ids='.json_encode($tagsId));
         $this->assertTrue($this->client->getResponse()->isOk(), 'Return code must be 200.');
         $this->assertEmpty($this->tagRepository->count([]), 'All tags must be deleted.');

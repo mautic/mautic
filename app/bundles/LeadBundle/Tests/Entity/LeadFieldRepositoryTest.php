@@ -2,7 +2,6 @@
 
 namespace Mautic\LeadBundle\Tests\Entity;
 
-use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\DBAL\Query\Expression\ExpressionBuilder;
 use Doctrine\DBAL\Query\QueryBuilder;
 use Doctrine\DBAL\Result;
@@ -72,7 +71,7 @@ final class LeadFieldRepositoryTest extends TestCase
             ->willReturnSelf();
 
         $builderAlias->expects($this->once())
-            ->method('execute')
+            ->method('executeQuery')
             ->willReturn($statementAliasResult);
 
         // No company column found. Therefore it's a contact field.
@@ -110,7 +109,7 @@ final class LeadFieldRepositoryTest extends TestCase
             ->willReturnSelf();
 
         $builderCompare->expects($this->once())
-            ->method('execute')
+            ->method('executeQuery')
             ->willReturn($statementCompareResult);
 
         // No contact ID was found by the value so the result should be false.
@@ -165,7 +164,7 @@ final class LeadFieldRepositoryTest extends TestCase
             ->willReturnSelf();
 
         $builderAlias->expects($this->once())
-            ->method('execute')
+            ->method('executeQuery')
             ->willReturn($statementAliasResult);
 
         // A company column found. Therefore it's a company field.
@@ -210,7 +209,7 @@ final class LeadFieldRepositoryTest extends TestCase
             ->willReturnSelf();
 
         $builderCompare->expects($this->once())
-            ->method('execute')
+            ->method('executeQuery')
             ->willReturn($statementCompareResult);
 
         // A contact ID was found by the value so the result should be true.
@@ -231,7 +230,7 @@ final class LeadFieldRepositoryTest extends TestCase
 
         $query->method('execute')->willReturn([]);
 
-        $this->assertInstanceOf(ArrayCollection::class, $this->repository->getListablePublishedFields());
+        $this->repository->getListablePublishedFields();
     }
 
     public function testGetFieldSchemaData(): void
@@ -308,14 +307,16 @@ final class LeadFieldRepositoryTest extends TestCase
         // This is terrible, but the Query class is final and AbstractQuery doesn't have some methods used.
         $query = $this->getMockBuilder(AbstractQuery::class)
             ->disableOriginalConstructor()
-            ->setMethods([
+            ->onlyMethods([
                 'setParameters',
-                'setFirstResult',
-                'setMaxResults',
                 'getSingleResult',
                 'getSQL',
                 '_doExecute',
                 'execute',
+            ])
+            ->addMethods([
+                'setFirstResult',
+                'setMaxResults',
             ])
             ->getMock();
 

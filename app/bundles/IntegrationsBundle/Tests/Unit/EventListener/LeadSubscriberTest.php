@@ -7,8 +7,11 @@ namespace Mautic\IntegrationsBundle\Tests\Unit\EventListener;
 use Mautic\IntegrationsBundle\Entity\FieldChangeRepository;
 use Mautic\IntegrationsBundle\Entity\ObjectMappingRepository;
 use Mautic\IntegrationsBundle\EventListener\LeadSubscriber;
+use Mautic\IntegrationsBundle\Exception\IntegrationNotFoundException;
 use Mautic\IntegrationsBundle\Helper\SyncIntegrationsHelper;
+use Mautic\IntegrationsBundle\IntegrationEvents;
 use Mautic\IntegrationsBundle\Sync\DAO\Value\EncodedValueDAO;
+use Mautic\IntegrationsBundle\Sync\Exception\ObjectNotFoundException;
 use Mautic\IntegrationsBundle\Sync\SyncDataExchange\Internal\Object\Contact;
 use Mautic\IntegrationsBundle\Sync\SyncDataExchange\MauticSyncDataExchange;
 use Mautic\IntegrationsBundle\Sync\VariableExpresser\VariableExpresserHelperInterface;
@@ -19,59 +22,64 @@ use Mautic\LeadBundle\Event\LeadEvent;
 use Mautic\LeadBundle\LeadEvents;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class LeadSubscriberTest extends TestCase
 {
     /**
      * @var MockObject|FieldChangeRepository
      */
-    private $fieldChangeRepository;
+    private \PHPUnit\Framework\MockObject\MockObject $fieldChangeRepository;
 
     /**
      * @var MockObject|ObjectMappingRepository
      */
-    private $objectMappingRepository;
+    private \PHPUnit\Framework\MockObject\MockObject $objectMappingRepository;
 
     /**
      * @var MockObject|VariableExpresserHelperInterface
      */
-    private $variableExpresserHelper;
+    private \PHPUnit\Framework\MockObject\MockObject $variableExpresserHelper;
 
     /**
      * @var MockObject|SyncIntegrationsHelper
      */
-    private $syncIntegrationsHelper;
+    private \PHPUnit\Framework\MockObject\MockObject $syncIntegrationsHelper;
 
     /**
      * @var MockObject|LeadEvent
      */
-    private $leadEvent;
+    private \PHPUnit\Framework\MockObject\MockObject $leadEvent;
 
     /**
      * @var MockObject|CompanyEvent
      */
-    private $companyEvent;
+    private \PHPUnit\Framework\MockObject\MockObject $companyEvent;
+
+    private \Mautic\IntegrationsBundle\EventListener\LeadSubscriber $subscriber;
 
     /**
-     * @var LeadSubscriber
+     * @var MockObject|EventDispatcherInterface
      */
-    private $subscriber;
+    private \PHPUnit\Framework\MockObject\MockObject $eventDispatcherInterfaceMock;
 
     public function setUp(): void
     {
         parent::setUp();
 
-        $this->fieldChangeRepository   = $this->createMock(FieldChangeRepository::class);
-        $this->objectMappingRepository = $this->createMock(ObjectMappingRepository::class);
-        $this->variableExpresserHelper = $this->createMock(VariableExpresserHelperInterface::class);
-        $this->syncIntegrationsHelper  = $this->createMock(SyncIntegrationsHelper::class);
-        $this->leadEvent               = $this->createMock(LeadEvent::class);
-        $this->companyEvent            = $this->createMock(CompanyEvent::class);
-        $this->subscriber              = new LeadSubscriber(
+        $this->fieldChangeRepository        = $this->createMock(FieldChangeRepository::class);
+        $this->objectMappingRepository      = $this->createMock(ObjectMappingRepository::class);
+        $this->variableExpresserHelper      = $this->createMock(VariableExpresserHelperInterface::class);
+        $this->syncIntegrationsHelper       = $this->createMock(SyncIntegrationsHelper::class);
+        $this->leadEvent                    = $this->createMock(LeadEvent::class);
+        $this->companyEvent                 = $this->createMock(CompanyEvent::class);
+        $this->eventDispatcherInterfaceMock = $this->createMock(EventDispatcherInterface::class);
+        $this->subscriber                   = new LeadSubscriber(
             $this->fieldChangeRepository,
             $this->objectMappingRepository,
             $this->variableExpresserHelper,
-            $this->syncIntegrationsHelper
+            $this->syncIntegrationsHelper,
+            $this->eventDispatcherInterfaceMock
         );
     }
 
@@ -153,6 +161,10 @@ class LeadSubscriberTest extends TestCase
         $this->subscriber->onLeadPostSave($this->leadEvent);
     }
 
+    /**
+     * @throws IntegrationNotFoundException
+     * @throws ObjectNotFoundException
+     */
     public function testOnLeadPostSaveRecordChanges(): void
     {
         $fieldName    = 'fieldName';
@@ -167,18 +179,8 @@ class LeadSubscriberTest extends TestCase
             ],
         ];
         $objectId   = 1;
-        $objectType = Lead::class;
 
-        $lead = $this->createMock(Lead::class);
-        $lead->expects($this->once())
-            ->method('isAnonymous')
-            ->willReturn(false);
-        $lead->expects($this->once())
-            ->method('getChanges')
-            ->willReturn($fieldChanges);
-        $lead->expects($this->once())
-            ->method('getId')
-            ->willReturn($objectId);
+        $lead = $this->createLeadMock($fieldChanges, $objectId);
 
         $this->leadEvent->expects($this->once())
             ->method('getLead')
@@ -189,11 +191,20 @@ class LeadSubscriberTest extends TestCase
             ->with(Contact::NAME)
             ->willReturn(true);
 
-        $this->handleRecordFieldChanges($fieldChanges['fields'], $objectId, $objectType);
+        $this->handleRecordFieldChanges($fieldChanges['fields'], $objectId, Lead::class);
+
+        $this->eventDispatcherInterfaceMock
+            ->method('hasListeners')
+            ->with(IntegrationEvents::INTEGRATION_BEFORE_CONTACT_FIELD_CHANGES)
+            ->willReturn(true);
 
         $this->subscriber->onLeadPostSave($this->leadEvent);
     }
 
+    /**
+     * @throws IntegrationNotFoundException
+     * @throws ObjectNotFoundException
+     */
     public function testOnLeadPostSaveRecordChangesWithOwnerChange(): void
     {
         $newOwnerId   = 5;
@@ -204,18 +215,8 @@ class LeadSubscriberTest extends TestCase
             ],
         ];
         $objectId   = 1;
-        $objectType = Lead::class;
 
-        $lead = $this->createMock(Lead::class);
-        $lead->expects($this->once())
-            ->method('isAnonymous')
-            ->willReturn(false);
-        $lead->expects($this->once())
-            ->method('getChanges')
-            ->willReturn($fieldChanges);
-        $lead->expects($this->once())
-            ->method('getId')
-            ->willReturn($objectId);
+        $lead = $this->createLeadMock($fieldChanges, $objectId);
 
         $this->leadEvent->expects($this->once())
             ->method('getLead')
@@ -228,11 +229,20 @@ class LeadSubscriberTest extends TestCase
 
         $fieldChanges['fields']['owner_id'] = $fieldChanges['owner'];
 
-        $this->handleRecordFieldChanges($fieldChanges['fields'], $objectId, $objectType);
+        $this->handleRecordFieldChanges($fieldChanges['fields'], $objectId, Lead::class);
+
+        $this->eventDispatcherInterfaceMock
+            ->method('hasListeners')
+            ->with(IntegrationEvents::INTEGRATION_BEFORE_CONTACT_FIELD_CHANGES)
+            ->willReturn(true);
 
         $this->subscriber->onLeadPostSave($this->leadEvent);
     }
 
+    /**
+     * @throws IntegrationNotFoundException
+     * @throws ObjectNotFoundException
+     */
     public function testOnLeadPostSaveRecordChangesWithPointChange(): void
     {
         $newPointCount   = 5;
@@ -243,18 +253,8 @@ class LeadSubscriberTest extends TestCase
             ],
         ];
         $objectId   = 1;
-        $objectType = Lead::class;
 
-        $lead = $this->createMock(Lead::class);
-        $lead->expects($this->once())
-            ->method('isAnonymous')
-            ->willReturn(false);
-        $lead->expects($this->once())
-            ->method('getChanges')
-            ->willReturn($fieldChanges);
-        $lead->expects($this->once())
-            ->method('getId')
-            ->willReturn($objectId);
+        $lead = $this->createLeadMock($fieldChanges, $objectId);
 
         $this->leadEvent->expects($this->once())
             ->method('getLead')
@@ -267,7 +267,12 @@ class LeadSubscriberTest extends TestCase
 
         $fieldChanges['fields']['points'] = $fieldChanges['points'];
 
-        $this->handleRecordFieldChanges($fieldChanges['fields'], $objectId, $objectType);
+        $this->handleRecordFieldChanges($fieldChanges['fields'], $objectId, Lead::class);
+
+        $this->eventDispatcherInterfaceMock
+            ->method('hasListeners')
+            ->with(IntegrationEvents::INTEGRATION_BEFORE_CONTACT_FIELD_CHANGES)
+            ->willReturn(true);
 
         $this->subscriber->onLeadPostSave($this->leadEvent);
     }
@@ -328,10 +333,7 @@ class LeadSubscriberTest extends TestCase
     {
         $fieldChanges = [];
 
-        $company = $this->createMock(Company::class);
-        $company->expects($this->once())
-            ->method('getChanges')
-            ->willReturn($fieldChanges);
+        $company = $this->createCompanyMock($fieldChanges, 1);
 
         $this->companyEvent->expects($this->once())
             ->method('getCompany')
@@ -345,6 +347,10 @@ class LeadSubscriberTest extends TestCase
         $this->subscriber->onCompanyPostSave($this->companyEvent);
     }
 
+    /**
+     * @throws IntegrationNotFoundException
+     * @throws ObjectNotFoundException
+     */
     public function testOnCompanyPostSaveSyncRecordChanges(): void
     {
         $fieldName    = 'fieldName';
@@ -358,19 +364,9 @@ class LeadSubscriberTest extends TestCase
                 ],
             ],
         ];
-        $objectId   = 1;
-        $objectType = Company::class;
+        $objectId     = 1;
 
-        $company = $this->createMock(Company::class);
-        $company->expects($this->once())
-            ->method('getChanges')
-            ->willReturn($fieldChanges);
-        $company->expects($this->once())
-            ->method('getChanges')
-            ->willReturn($fieldChanges);
-        $company->expects($this->once())
-            ->method('getId')
-            ->willReturn($objectId);
+        $company = $this->createCompanyMock($fieldChanges, $objectId);
 
         $this->companyEvent->expects($this->once())
             ->method('getCompany')
@@ -381,11 +377,20 @@ class LeadSubscriberTest extends TestCase
             ->with(MauticSyncDataExchange::OBJECT_COMPANY)
             ->willReturn(true);
 
-        $this->handleRecordFieldChanges($fieldChanges['fields'], $objectId, $objectType);
+        $this->handleRecordFieldChanges($fieldChanges['fields'], $objectId, Company::class);
+
+        $this->eventDispatcherInterfaceMock
+            ->method('hasListeners')
+            ->with(IntegrationEvents::INTEGRATION_BEFORE_COMPANY_FIELD_CHANGES)
+            ->willReturn(true);
 
         $this->subscriber->onCompanyPostSave($this->companyEvent);
     }
 
+    /**
+     * @throws IntegrationNotFoundException
+     * @throws ObjectNotFoundException
+     */
     public function testOnCompanyPostSaveRecordChangesWithOwnerChange(): void
     {
         $newOwnerId   = 5;
@@ -395,16 +400,9 @@ class LeadSubscriberTest extends TestCase
                 $newOwnerId,
             ],
         ];
-        $objectId   = 1;
-        $objectType = Company::class;
+        $objectId     = 1;
 
-        $company = $this->createMock(Company::class);
-        $company->expects($this->once())
-            ->method('getChanges')
-            ->willReturn($fieldChanges);
-        $company->expects($this->once())
-            ->method('getId')
-            ->willReturn($objectId);
+        $company = $this->createCompanyMock($fieldChanges, $objectId);
 
         $this->companyEvent->expects($this->once())
             ->method('getCompany')
@@ -417,7 +415,12 @@ class LeadSubscriberTest extends TestCase
 
         $fieldChanges['fields']['owner_id'] = $fieldChanges['owner'];
 
-        $this->handleRecordFieldChanges($fieldChanges['fields'], $objectId, $objectType);
+        $this->handleRecordFieldChanges($fieldChanges['fields'], $objectId, Company::class);
+
+        $this->eventDispatcherInterfaceMock
+            ->method('hasListeners')
+            ->with(IntegrationEvents::INTEGRATION_BEFORE_COMPANY_FIELD_CHANGES)
+            ->willReturn(true);
 
         $this->subscriber->onCompanyPostSave($this->companyEvent);
     }
@@ -456,6 +459,7 @@ class LeadSubscriberTest extends TestCase
         $values     = [];
         $valueDAOs  = [];
         $i          = 0;
+
         foreach ($fieldChanges as $fieldName => [$oldValue, $newValue]) {
             $values[]     = [$newValue];
             $valueDAOs[]  = new EncodedValueDAO($objectType, (string) $newValue);
@@ -474,6 +478,66 @@ class LeadSubscriberTest extends TestCase
             ->method('saveEntities');
 
         $this->fieldChangeRepository->expects($this->once())
-            ->method('deleteEntities');
+            ->method('detachEntities');
+    }
+
+    /**
+     * @param mixed[] $fieldChanges
+     */
+    private function createLeadMock(array $fieldChanges, int $objectId): Lead
+    {
+        return new class($fieldChanges, $objectId) extends Lead {
+            /**
+             * @param mixed[] $fieldChanges
+             */
+            public function __construct(
+                private array $fieldChanges,
+                private int $objectId
+            ) {
+                parent::__construct();
+            }
+
+            public function isAnonymous(): bool
+            {
+                return false;
+            }
+
+            public function getChanges($includePast = false): array
+            {
+                return $this->fieldChanges;
+            }
+
+            public function getId(): int
+            {
+                return $this->objectId;
+            }
+        };
+    }
+
+    /**
+     * @param mixed[] $fieldChanges
+     */
+    private function createCompanyMock(array $fieldChanges, int $objectId): Company
+    {
+        return new class($fieldChanges, $objectId) extends Company {
+            /**
+             * @param mixed[] $fieldChanges
+             */
+            public function __construct(
+                private array $fieldChanges,
+                private int $objectId
+            ) {
+            }
+
+            public function getChanges($includePast = false): array
+            {
+                return $this->fieldChanges;
+            }
+
+            public function getId(): int
+            {
+                return $this->objectId;
+            }
+        };
     }
 }

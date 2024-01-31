@@ -9,7 +9,7 @@ use Mautic\ChannelBundle\PreferenceBuilder\ChannelPreferences;
 
 class ChannelPreferencesTest extends \PHPUnit\Framework\TestCase
 {
-    public function testLogsAreOrganizedByPriority()
+    public function testLogsAreOrganizedByPriority(): void
     {
         $campaign = new Campaign();
         $event    = new Event();

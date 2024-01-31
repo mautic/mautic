@@ -22,7 +22,7 @@ final class FormTest extends \PHPUnit\Framework\TestCase
         Assert::assertSame($changes, $form->getChanges());
     }
 
-    public function setNoIndexDataProvider(): iterable
+    public static function setNoIndexDataProvider(): iterable
     {
         yield [null, null, []];
         yield [true, true, ['noIndex' => [null, true]]];

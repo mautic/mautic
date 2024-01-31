@@ -15,7 +15,9 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 class LeadControllerTest extends MauticMysqlTestCase
 {
-    /** @var array<string> */
+    /**
+     * @var array<string>
+     */
     private array $filePaths = [];
 
     protected function setUp(): void
@@ -48,7 +50,7 @@ class LeadControllerTest extends MauticMysqlTestCase
         $this->testSymfonyCommand(ContactScheduledExportCommand::COMMAND_NAME, ['--ids' => $contactExportScheduler->getId()]);
         $this->checkContactExportScheduler(0);
         /** @var CoreParametersHelper $coreParametersHelper */
-        $coreParametersHelper    = self::$container->get('mautic.helper.core_parameters');
+        $coreParametersHelper    = static::getContainer()->get('mautic.helper.core_parameters');
         $zipFileName             = 'contacts_export_'.$contactExportScheduler->getScheduledDateTime()
                 ->format('Y_m_d_H_i_s').'.zip';
         $this->filePaths[] = $filePath = $coreParametersHelper->get('contact_export_dir').'/'.$zipFileName;
@@ -84,7 +86,7 @@ class LeadControllerTest extends MauticMysqlTestCase
             $contacts[] = $contact;
         }
 
-        $leadModel = self::$container->get('mautic.lead.model.lead');
+        $leadModel = static::getContainer()->get('mautic.lead.model.lead');
         $leadModel->saveEntities($contacts);
     }
 

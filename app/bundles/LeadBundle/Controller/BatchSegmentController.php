@@ -21,17 +21,27 @@ use Symfony\Component\HttpFoundation\RequestStack;
 
 class BatchSegmentController extends AbstractFormController
 {
-    public function __construct(private SegmentActionModel $segmentActionModel, private ListModel $segmentModel, ManagerRegistry $doctrine, MauticFactory $factory, ModelFactory $modelFactory, UserHelper $userHelper, CoreParametersHelper $coreParametersHelper, EventDispatcherInterface $dispatcher, Translator $translator, FlashBag $flashBag, RequestStack $requestStack, CorePermissions $security)
-    {
+    public function __construct(
+        private SegmentActionModel $segmentActionModel,
+        private ListModel $segmentModel,
+        ManagerRegistry $doctrine,
+        MauticFactory $factory,
+        ModelFactory $modelFactory,
+        UserHelper $userHelper,
+        CoreParametersHelper $coreParametersHelper,
+        EventDispatcherInterface $dispatcher,
+        Translator $translator,
+        FlashBag $flashBag,
+        RequestStack $requestStack,
+        CorePermissions $security
+    ) {
         parent::__construct($doctrine, $factory, $modelFactory, $userHelper, $coreParametersHelper, $dispatcher, $translator, $flashBag, $requestStack, $security);
     }
 
     /**
      * API for batch action.
-     *
-     * @return JsonResponse
      */
-    public function setAction(Request $request)
+    public function setAction(Request $request): JsonResponse
     {
         $params     = $request->get('lead_batch', []);
         $contactIds = empty($params['ids']) ? [] : json_decode($params['ids']);
@@ -63,10 +73,8 @@ class BatchSegmentController extends AbstractFormController
 
     /**
      * View for batch action.
-     *
-     * @return JsonResponse|\Symfony\Component\HttpFoundation\Response
      */
-    public function indexAction()
+    public function indexAction(): \Symfony\Component\HttpFoundation\Response
     {
         $route = $this->generateUrl('mautic_segment_batch_contact_set');
         $lists = $this->segmentModel->getUserLists();

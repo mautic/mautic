@@ -191,6 +191,8 @@
                                                   <div class="col-sm-8">
                                                       {{ form_row(form[alias]) }}
                                                   </div>
+                                              {% else %}
+                                                  {% do form[alias].setRendered %}
                                               {% endif %}
                                           {% endfor %}
                                       </div>

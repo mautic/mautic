@@ -26,10 +26,8 @@ class DashboardController extends AbstractFormController
 {
     /**
      * Generates the default view.
-     *
-     * @return JsonResponse|Response
      */
-    public function indexAction(Request $request, WidgetService $widget, FormFactoryInterface $formFactory, PathsHelper $pathsHelper)
+    public function indexAction(Request $request, WidgetService $widget, FormFactoryInterface $formFactory, PathsHelper $pathsHelper): Response
     {
         $model   = $this->getModel('dashboard');
         \assert($model instanceof DashboardModel);
@@ -91,10 +89,7 @@ class DashboardController extends AbstractFormController
         ]);
     }
 
-    /**
-     * @return JsonResponse|Response
-     */
-    public function widgetAction(Request $request, WidgetService $widgetService, $widgetId)
+    public function widgetAction(Request $request, WidgetService $widgetService, $widgetId): JsonResponse
     {
         if (!$request->isXmlHttpRequest()) {
             throw new NotFoundHttpException('Not found.');
@@ -343,10 +338,8 @@ class DashboardController extends AbstractFormController
 
     /**
      * Exports the widgets of current user into a json file and downloads it.
-     *
-     * @return JsonResponse
      */
-    public function exportAction(Request $request)
+    public function exportAction(Request $request): JsonResponse
     {
         $dashboardModel = $this->getModel('dashboard');
         \assert($dashboardModel instanceof DashboardModel);
@@ -365,10 +358,8 @@ class DashboardController extends AbstractFormController
 
     /**
      * Exports the widgets of current user into a json file.
-     *
-     * @return JsonResponse|Response
      */
-    public function deleteDashboardFileAction(Request $request, PathsHelper $pathsHelper)
+    public function deleteDashboardFileAction(Request $request, PathsHelper $pathsHelper): RedirectResponse
     {
         $file = $request->get('file');
 
@@ -390,10 +381,8 @@ class DashboardController extends AbstractFormController
      * Applies dashboard layout.
      *
      * @param string|null $file
-     *
-     * @return JsonResponse|Response
      */
-    public function applyDashboardFileAction(Request $request, PathsHelper $pathsHelper, $file = null)
+    public function applyDashboardFileAction(Request $request, PathsHelper $pathsHelper, $file = null): RedirectResponse
     {
         if (!$file) {
             $file = $request->get('file');
@@ -433,7 +422,7 @@ class DashboardController extends AbstractFormController
 
             $filter = $model->getDefaultFilter();
             foreach ($widgets as $widget) {
-                $widget = $model->populateWidgetEntity($widget, $filter);
+                $widget = $model->populateWidgetEntity($widget);
                 $model->saveEntity($widget);
             }
         }
@@ -441,10 +430,7 @@ class DashboardController extends AbstractFormController
         return $this->redirect($this->get('router')->generate('mautic_dashboard_index'));
     }
 
-    /**
-     * @return JsonResponse|Response
-     */
-    public function importAction(Request $request, FormFactoryInterface $formFactory, PathsHelper $pathsHelper)
+    public function importAction(Request $request, FormFactoryInterface $formFactory, PathsHelper $pathsHelper): Response
     {
         $preview = $request->get('preview');
 
@@ -512,17 +498,15 @@ class DashboardController extends AbstractFormController
                 // Check for name, description, etc
                 $tempDashboard[$dashboard] = [
                     'type'        => $type,
-                    'name'        => (isset($config['name'])) ? $config['name'] : $dashboard,
-                    'description' => (isset($config['description'])) ? $config['description'] : '',
-                    'widgets'     => (isset($config['widgets'])) ? $config['widgets'] : $config,
+                    'name'        => $config['name'] ?? $dashboard,
+                    'description' => $config['description'] ?? '',
+                    'widgets'     => $config['widgets'] ?? $config,
                 ];
             }
 
             // Sort by name
             uasort($tempDashboard,
-                function ($a, $b) {
-                    return strnatcasecmp($a['name'], $b['name']);
-                }
+                fn ($a, $b): int => strnatcasecmp($a['name'], $b['name'])
             );
 
             $dashboards = array_merge(
@@ -567,6 +551,8 @@ class DashboardController extends AbstractFormController
      * Gets name from request and defaults it to the timestamp if not provided.
      *
      * @return string
+     *
+     * @throws \Exception
      */
     private function getNameFromRequest(Request $request)
     {

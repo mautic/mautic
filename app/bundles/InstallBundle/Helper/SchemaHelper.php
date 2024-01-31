@@ -5,9 +5,10 @@ namespace Mautic\InstallBundle\Helper;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\DriverManager;
 use Doctrine\DBAL\Platforms\AbstractPlatform;
+use Doctrine\DBAL\Platforms\SqlitePlatform;
+use Doctrine\DBAL\Schema\AbstractSchemaManager;
 use Doctrine\DBAL\Schema\ForeignKeyConstraint;
 use Doctrine\DBAL\Schema\Index;
-use Doctrine\DBAL\Schema\TableDiff;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\ORMException;
 use Doctrine\ORM\Tools\SchemaTool;
@@ -16,10 +17,7 @@ use Mautic\InstallBundle\Exception\DatabaseVersionTooOldException;
 
 class SchemaHelper
 {
-    /**
-     * @var Connection
-     */
-    protected $db;
+    protected \Doctrine\DBAL\Connection $db;
 
     /**
      * @var EntityManager
@@ -31,10 +29,12 @@ class SchemaHelper
      */
     protected $platform;
 
+    protected array $dbParams;
+
     /**
-     * @var array
+     * @var AbstractSchemaManager<AbstractPlatform>|null
      */
-    protected $dbParams = [];
+    private ?AbstractSchemaManager $schemaManager = null;
 
     /**
      * @throws \Doctrine\DBAL\Exception
@@ -62,7 +62,7 @@ class SchemaHelper
         $this->dbParams = $dbParams;
     }
 
-    public function setEntityManager(EntityManager $em)
+    public function setEntityManager(EntityManager $em): void
     {
         $this->em = $em;
     }
@@ -70,7 +70,7 @@ class SchemaHelper
     /**
      * Test db connection.
      */
-    public function testConnection()
+    public function testConnection(): void
     {
         if (isset($this->dbParams['dbname'])) {
             // Test connection credentials
@@ -87,22 +87,20 @@ class SchemaHelper
     }
 
     /**
-     * @return bool
-     *
      * @throws \Doctrine\DBAL\Exception
      */
-    public function createDatabase()
+    public function createDatabase(): bool
     {
         try {
             $this->db->connect();
-        } catch (\Exception $exception) {
+        } catch (\Exception) {
             // it failed to connect so remove the dbname and try to create it
             $dbName                   = $this->dbParams['dbname'];
             $this->dbParams['dbname'] = null;
 
             try {
                 // database does not exist so try to create it
-                $this->db->getSchemaManager()->createDatabase($dbName);
+                $this->getSchemaManager()->createDatabase($dbName);
 
                 // close the connection and reconnect with the new database name
                 $this->db->close();
@@ -110,7 +108,7 @@ class SchemaHelper
                 $this->dbParams['dbname'] = $dbName;
                 $this->db                 = DriverManager::getConnection($this->dbParams);
                 $this->db->close();
-            } catch (\Exception $e) {
+            } catch (\Exception) {
                 return false;
             }
         }
@@ -121,14 +119,12 @@ class SchemaHelper
     /**
      * Generates SQL for installation.
      *
-     * @return array|bool Array containing the flash message data on a failure, boolean true on success
-     *
      * @throws \Doctrine\DBAL\Exception
      * @throws ORMException
      */
-    public function installSchema()
+    public function installSchema(): bool
     {
-        $sm = $this->db->getSchemaManager();
+        $sm = $this->getSchemaManager();
 
         try {
             // check to see if the table already exist
@@ -139,7 +135,7 @@ class SchemaHelper
             throw $e;
         }
 
-        $this->platform = $sm->getDatabasePlatform();
+        $this->platform = $this->db->getDatabasePlatform();
         $backupPrefix   = (!empty($this->dbParams['backup_prefix'])) ? $this->dbParams['backup_prefix'] : 'bak_';
 
         $metadatas = $this->em->getMetadataFactory()->getAllMetadata();
@@ -158,7 +154,8 @@ class SchemaHelper
             $mauticTables[$tableName] = $this->generateBackupName($this->dbParams['table_prefix'], $backupPrefix, $tableName);
         }
 
-        $sql = 'sqlite' === $this->em->getConnection()->getDatabasePlatform()->getName() ? [] : ['SET foreign_key_checks = 0;'];
+        $isSqlite = $this->em->getConnection()->getDatabasePlatform() instanceof SqlitePlatform;
+        $sql      = $isSqlite ? [] : ['SET foreign_key_checks = 0;'];
         if ($this->dbParams['backup_tables']) {
             $sql = array_merge($sql, $this->backupExistingSchema($tables, $mauticTables, $backupPrefix));
         } else {
@@ -168,15 +165,13 @@ class SchemaHelper
         $sql = array_merge($sql, $installSchema->toSql($this->platform));
 
         // Execute drop queries
-        if (!empty($sql)) {
-            foreach ($sql as $q) {
-                try {
-                    $this->db->executeQuery($q);
-                } catch (\Exception $exception) {
-                    $this->db->close();
+        foreach ($sql as $q) {
+            try {
+                $this->db->executeQuery($q);
+            } catch (\Exception $exception) {
+                $this->db->close();
 
-                    throw $exception;
-                }
+                throw $exception;
             }
         }
 
@@ -191,16 +186,16 @@ class SchemaHelper
         $version  = $this->db->executeQuery('SELECT VERSION()')->fetchOne();
 
         // Platform class names are in the format Doctrine\DBAL\Platforms\MariaDb1027Platform
-        $platform = strtolower(get_class($this->db->getDatabasePlatform()));
+        $platform = strtolower($this->db->getDatabasePlatform()::class);
         $metadata = ThisRelease::getMetadata();
 
         /**
          * The second case is for MariaDB < 10.2, where Doctrine reports it as MySQLPlatform. Here we can use a little
          * help from the version string, which contains "MariaDB" in that case: 10.1.48-MariaDB-1~bionic.
          */
-        if (false !== strpos($platform, 'mariadb') || false !== strpos(strtolower($version), 'mariadb')) {
+        if (str_contains($platform, 'mariadb') || str_contains(strtolower($version), 'mariadb')) {
             $minSupported = $metadata->getMinSupportedMariaDbVersion();
-        } elseif (false !== strpos($platform, 'mysql')) {
+        } elseif (str_contains($platform, 'mysql')) {
             $minSupported = $metadata->getMinSupportedMySqlVersion();
         } else {
             throw new \Exception('Invalid database platform '.$platform.'. Mautic only supports MySQL and MariaDB!');
@@ -212,14 +207,12 @@ class SchemaHelper
     }
 
     /**
-     * @return array
-     *
      * @throws \Doctrine\DBAL\Exception
      */
-    protected function backupExistingSchema($tables, $mauticTables, $backupPrefix)
+    protected function backupExistingSchema($tables, $mauticTables, $backupPrefix): array
     {
         $sql = [];
-        $sm  = $this->db->getSchemaManager();
+        $sm  = $this->getSchemaManager();
 
         // backup existing tables
         $backupRestraints = $backupSequences = $backupIndexes = $backupTables = $dropSequences = $dropTables = [];
@@ -279,10 +272,8 @@ class SchemaHelper
             }
 
             // rename table
-            $tableDiff          = new TableDiff($t);
-            $tableDiff->newName = $backup;
-            $queries            = $this->platform->getAlterTableSQL($tableDiff);
-            $sql                = array_merge($sql, $queries);
+            $queries = $this->platform->getRenameTableSQL($t, $backup);
+            $sql     = array_merge($sql, $queries);
 
             // create new index
             if (!empty($newIndexes)) {
@@ -312,10 +303,7 @@ class SchemaHelper
         return $sql;
     }
 
-    /**
-     * @return array
-     */
-    protected function dropExistingSchema($tables, $mauticTables)
+    protected function dropExistingSchema($tables, $mauticTables): array
     {
         $sql = [];
 
@@ -334,10 +322,22 @@ class SchemaHelper
      */
     protected function generateBackupName($prefix, $backupPrefix, $name)
     {
-        if (empty($prefix) || false === strpos($name, $prefix)) {
+        if (empty($prefix) || !str_contains($name, $prefix)) {
             return $backupPrefix.$name;
         } else {
             return str_replace($prefix, $backupPrefix, $name);
         }
+    }
+
+    /**
+     * @return AbstractSchemaManager<AbstractPlatform>
+     */
+    private function getSchemaManager(): AbstractSchemaManager
+    {
+        if (null !== $this->schemaManager) {
+            return $this->schemaManager;
+        }
+
+        return $this->schemaManager = $this->db->createSchemaManager();
     }
 }

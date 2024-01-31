@@ -14,12 +14,9 @@ final class LeadFieldsTypeTest extends \PHPUnit\Framework\TestCase
     /**
      * @var MockObject|FieldModel
      */
-    private $fieldModel;
+    private \PHPUnit\Framework\MockObject\MockObject $fieldModel;
 
-    /**
-     * @var LeadFieldsType
-     */
-    private $form;
+    private \Mautic\LeadBundle\Form\Type\LeadFieldsType $form;
 
     protected function setUp(): void
     {

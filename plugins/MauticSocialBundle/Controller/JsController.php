@@ -7,10 +7,7 @@ use Symfony\Component\HttpFoundation\Response;
 
 class JsController extends CommonController
 {
-    /**
-     * @return Response
-     */
-    public function generateAction($formName)
+    public function generateAction($formName): Response
     {
         $js = <<<JS
 

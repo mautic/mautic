@@ -6,23 +6,12 @@ use Symfony\Component\HttpFoundation\Request;
 
 class TrailingSlashHelper
 {
-    /**
-     * @var CoreParametersHelper
-     */
-    private $coreParametersHelper;
-
-    /**
-     * TrailingSlashHelper constructor.
-     */
-    public function __construct(CoreParametersHelper $coreParametersHelper)
-    {
-        $this->coreParametersHelper = $coreParametersHelper;
+    public function __construct(
+        private CoreParametersHelper $coreParametersHelper
+    ) {
     }
 
-    /**
-     * @return string
-     */
-    public function getSafeRedirectUrl(Request $request)
+    public function getSafeRedirectUrl(Request $request): string
     {
         $siteUrl  = $this->coreParametersHelper->get('site_url');
         $pathInfo = substr($request->getPathInfo(), 0, -1);

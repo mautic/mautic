@@ -12,22 +12,17 @@ use Symfony\Component\Form\Extension\Core\Type\IntegerType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 
+/**
+ * @extends AbstractType<array<mixed>>
+ */
 class MobileNotificationDetailsType extends AbstractType
 {
-    /**
-     * @var IntegrationHelper
-     */
-    protected $integrationHelper;
-
-    /**
-     * MobileNotificationDetailsType constructor.
-     */
-    public function __construct(IntegrationHelper $integrationHelper)
-    {
-        $this->integrationHelper = $integrationHelper;
+    public function __construct(
+        protected IntegrationHelper $integrationHelper
+    ) {
     }
 
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $integration = $this->integrationHelper->getIntegrationObject('OneSignal');
         $settings    = $integration->getIntegrationSettings()->getFeatureSettings();
@@ -43,7 +38,11 @@ class MobileNotificationDetailsType extends AbstractType
             ]
         );
 
-        if (in_array('ios', $settings['platforms'])) {
+        if (!isset($settings['platforms'])) {
+            return;
+        }
+
+        if (in_array('ios', $settings['platforms'], true)) {
             $builder->add(
                 'ios_subtitle',
                 TextType::class,
@@ -140,7 +139,7 @@ class MobileNotificationDetailsType extends AbstractType
             );
         }
 
-        if (in_array('android', $settings['platforms'])) {
+        if (in_array('android', $settings['platforms'], true)) {
             $builder->add(
                 'android_sound',
                 TextType::class,

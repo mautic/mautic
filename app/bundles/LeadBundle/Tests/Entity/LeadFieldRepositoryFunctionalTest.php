@@ -19,7 +19,7 @@ class LeadFieldRepositoryFunctionalTest extends MauticMysqlTestCase
         $this->em->persist($lead);
         $this->em->flush();
 
-        $repository = $this->getContainer()->get('mautic.lead.model.field')->getRepository();
+        $repository = static::getContainer()->get('mautic.lead.model.field')->getRepository();
 
         $this->assertTrue($repository->compareValue($lead->getId(), 'firstname', 'John', 'eq'));
         $this->assertFalse($repository->compareValue($lead->getId(), 'firstname', 'Jack', 'eq'));
@@ -32,7 +32,7 @@ class LeadFieldRepositoryFunctionalTest extends MauticMysqlTestCase
         $this->em->persist($lead);
         $this->em->flush();
 
-        $repository = $this->getContainer()->get('mautic.lead.model.field')->getRepository();
+        $repository = static::getContainer()->get('mautic.lead.model.field')->getRepository();
 
         $this->assertTrue($repository->compareValue($lead->getId(), 'firstname', 'Annie', 'neq'));
         $this->assertFalse($repository->compareValue($lead->getId(), 'firstname', 'Ada', 'neq'));
@@ -45,7 +45,7 @@ class LeadFieldRepositoryFunctionalTest extends MauticMysqlTestCase
         $this->em->persist($lead);
         $this->em->flush();
 
-        $repository = $this->getContainer()->get('mautic.lead.model.field')->getRepository();
+        $repository = static::getContainer()->get('mautic.lead.model.field')->getRepository();
 
         $this->assertTrue($repository->compareValue($lead->getId(), 'lastname', null, 'empty'));
         $this->assertFalse($repository->compareValue($lead->getId(), 'firstname', null, 'empty'));
@@ -58,7 +58,7 @@ class LeadFieldRepositoryFunctionalTest extends MauticMysqlTestCase
         $this->em->persist($lead);
         $this->em->flush();
 
-        $repository = $this->getContainer()->get('mautic.lead.model.field')->getRepository();
+        $repository = static::getContainer()->get('mautic.lead.model.field')->getRepository();
 
         $this->assertTrue($repository->compareValue($lead->getId(), 'firstname', null, 'notEmpty'));
         $this->assertFalse($repository->compareValue($lead->getId(), 'lastname', null, 'notEmpty'));
@@ -71,7 +71,7 @@ class LeadFieldRepositoryFunctionalTest extends MauticMysqlTestCase
         $this->em->persist($lead);
         $this->em->flush();
 
-        $repository = $this->getContainer()->get('mautic.lead.model.field')->getRepository();
+        $repository = static::getContainer()->get('mautic.lead.model.field')->getRepository();
 
         $this->assertTrue($repository->compareValue($lead->getId(), 'email', 'Mary', 'startsWith'));
         $this->assertFalse($repository->compareValue($lead->getId(), 'email', 'Unicorn', 'startsWith'));
@@ -84,7 +84,7 @@ class LeadFieldRepositoryFunctionalTest extends MauticMysqlTestCase
         $this->em->persist($lead);
         $this->em->flush();
 
-        $repository = $this->getContainer()->get('mautic.lead.model.field')->getRepository();
+        $repository = static::getContainer()->get('mautic.lead.model.field')->getRepository();
 
         $this->assertTrue($repository->compareValue($lead->getId(), 'email', 'armyspy.com', 'endsWith'));
         $this->assertFalse($repository->compareValue($lead->getId(), 'email', 'Unicorn', 'endsWith'));
@@ -97,7 +97,7 @@ class LeadFieldRepositoryFunctionalTest extends MauticMysqlTestCase
         $this->em->persist($lead);
         $this->em->flush();
 
-        $repository = $this->getContainer()->get('mautic.lead.model.field')->getRepository();
+        $repository = static::getContainer()->get('mautic.lead.model.field')->getRepository();
 
         $this->assertTrue($repository->compareValue($lead->getId(), 'email', 'Nevarez', 'contains'));
         $this->assertFalse($repository->compareValue($lead->getId(), 'email', 'Unicorn', 'contains'));
@@ -110,7 +110,7 @@ class LeadFieldRepositoryFunctionalTest extends MauticMysqlTestCase
         $this->em->persist($lead);
         $this->em->flush();
 
-        $repository = $this->getContainer()->get('mautic.lead.model.field')->getRepository();
+        $repository = static::getContainer()->get('mautic.lead.model.field')->getRepository();
 
         $this->assertTrue($repository->compareValue($lead->getId(), 'country', ['United Kingdom', 'South Africa'], 'in'));
         $this->assertFalse($repository->compareValue($lead->getId(), 'country', ['Poland', 'Canada'], 'in'));
@@ -123,7 +123,7 @@ class LeadFieldRepositoryFunctionalTest extends MauticMysqlTestCase
         $this->em->persist($lead);
         $this->em->flush();
 
-        $repository = $this->getContainer()->get('mautic.lead.model.field')->getRepository();
+        $repository = static::getContainer()->get('mautic.lead.model.field')->getRepository();
 
         $this->assertTrue($repository->compareValue($lead->getId(), 'country', ['Australia', 'Poland'], 'notIn'));
         $this->assertFalse($repository->compareValue($lead->getId(), 'country', ['United Kingdom'], 'notIn'));
@@ -153,13 +153,13 @@ class LeadFieldRepositoryFunctionalTest extends MauticMysqlTestCase
             ]
         );
 
-        $fieldModel = self::$container->get(FieldModel::class);
+        $fieldModel = self::getContainer()->get(FieldModel::class);
         \assert($fieldModel instanceof FieldModel);
         $fieldModel->saveEntity($field);
 
         $lead = new Lead();
         $lead->addUpdatedField('colors', 'green|blue');
-        $contactModel = self::$container->get(LeadModel::class);
+        $contactModel = self::getContainer()->get(LeadModel::class);
         \assert($contactModel instanceof LeadModel);
 
         $contactModel->saveEntity($lead);
@@ -167,5 +167,29 @@ class LeadFieldRepositoryFunctionalTest extends MauticMysqlTestCase
 
         $this->assertTrue($repository->compareValue($lead->getId(), 'colors', ['green', 'blue'], 'in'));
         $this->assertFalse($repository->compareValue($lead->getId(), 'colors', ['red', 'green'], 'in'));
+    }
+
+    public function testExcludeUnpublishedField(): void
+    {
+        $field = new LeadField();
+        $field->setType('text');
+        $field->setObject('lead');
+        $field->setAlias('colors');
+        $field->setName('Colors');
+        $field->setIsPublished(false);
+
+        $fieldModel = self::getContainer()->get(FieldModel::class);
+        $fieldModel->saveEntity($field);
+        $repository      = $fieldModel->getRepository();
+        $allLeadFields   = $repository->getFieldsForObject('lead');
+        $colorFieldExist = false;
+        if (!empty($allLeadFields)) {
+            foreach ($allLeadFields as $field) {
+                if ('colors' == $field->getAlias()) {
+                    $colorFieldExist = true;
+                }
+            }
+        }
+        $this->assertFalse($colorFieldExist);
     }
 }
