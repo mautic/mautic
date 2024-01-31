@@ -9,14 +9,12 @@ use Liip\TestFixturesBundle\Services\DatabaseToolCollection;
 use Liip\TestFixturesBundle\Services\DatabaseTools\AbstractDatabaseTool;
 use Mautic\EmailBundle\Mailer\Message\MauticMessage;
 use Mautic\UserBundle\Entity\User;
-use PHPUnit\Framework\Assert;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Symfony\Bundle\FrameworkBundle\KernelBrowser;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\BrowserKit\Cookie;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\ArgvInput;
-use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Output\BufferedOutput;
 use Symfony\Component\Console\Tester\CommandTester;
 use Symfony\Component\Mime\RawMessage;
@@ -164,36 +162,6 @@ abstract class AbstractMauticTestCase extends WebTestCase
             'HTTP_X-Requested-With' => 'XMLHttpRequest',
             'HTTP_X-CSRF-Token'     => $this->getCsrfToken('mautic_ajax_post'),
         ];
-    }
-
-    /**
-     * @return string Command's output
-     *
-     * @throws \Exception
-     *
-     * @deprecated use testSymfonyCommand() instead
-     */
-    protected function runCommand(string $name, array $params = [], Command $command = null, int $expectedStatusCode = 0, bool $catchExceptions = false): string
-    {
-        $params      = array_merge(['command' => $name], $params);
-        $kernel      = static::getContainer()->get('kernel');
-        $application = new Application($kernel);
-        $application->setAutoExit(false);
-        $application->setCatchExceptions($catchExceptions);
-
-        if ($command) {
-            // Register the command
-            $application->add($command);
-        }
-
-        $input      = new ArrayInput($params);
-        $output     = new BufferedOutput();
-        $statusCode = $application->run($input, $output);
-        $message    = $output->fetch();
-
-        Assert::assertSame($expectedStatusCode, $statusCode, $message);
-
-        return $message;
     }
 
     protected function loginUser(string $username): User
