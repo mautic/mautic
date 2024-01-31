@@ -2,7 +2,6 @@
 
 namespace Mautic\PageBundle\Form\Type;
 
-use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\OptionsResolver\OptionsResolver;
@@ -12,9 +11,8 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
  */
 class RedirectListType extends AbstractType
 {
-    public function __construct(
-        private CoreParametersHelper $coreParametersHelper
-    ) {
+    public function __construct()
+    {
     }
 
     public function configureOptions(OptionsResolver $resolver): void

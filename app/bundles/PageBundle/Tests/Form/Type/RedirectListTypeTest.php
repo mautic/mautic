@@ -2,26 +2,18 @@
 
 namespace Mautic\PageBundle\Tests\Form\Type;
 
-use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\PageBundle\Form\Type\RedirectListType;
-use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class RedirectListTypeTest extends TestCase
 {
-    /**
-     * @var CoreParametersHelper|MockObject
-     */
-    private \PHPUnit\Framework\MockObject\MockObject $coreParametersHelper;
-
     private \Mautic\PageBundle\Form\Type\RedirectListType $form;
 
     public function setUp(): void
     {
-        $this->coreParametersHelper = $this->createMock(CoreParametersHelper::class);
-        $this->form                 = new RedirectListType($this->coreParametersHelper);
+        $this->form = new RedirectListType();
     }
 
     public function testGetParent(): void
@@ -29,7 +21,7 @@ class RedirectListTypeTest extends TestCase
         $this->assertSame(ChoiceType::class, $this->form->getParent());
     }
 
-    public function testConfigureOptionsChoicesDefined()
+    public function testConfigureOptionsChoicesDefined(): void
     {
         $choices = [
             'mautic.page.form.redirecttype.permanent'     => 301,
