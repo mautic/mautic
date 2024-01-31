@@ -10,7 +10,6 @@ use Mautic\CampaignBundle\Entity\Event;
 use Mautic\CampaignBundle\Entity\LeadEventLog;
 use Mautic\CoreBundle\Entity\IpAddress;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
-use Mautic\CoreBundle\Test\Session\FixedMockFileSessionStorage;
 use Mautic\DynamicContentBundle\Entity\Stat as StatDC;
 use Mautic\EmailBundle\Entity\Stat as StatEmail;
 use Mautic\LeadBundle\Entity\Company;
@@ -20,6 +19,7 @@ use PHPUnit\Framework\Assert;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Session\Session;
+use Symfony\Component\HttpFoundation\Session\Storage\MockFileSessionStorage;
 
 class LeadApiControllerFunctionalTest extends MauticMysqlTestCase
 {
@@ -31,7 +31,7 @@ class LeadApiControllerFunctionalTest extends MauticMysqlTestCase
         static::getContainer()->set(
             'session',
             new Session(
-                new class() extends FixedMockFileSessionStorage {
+                new class() extends MockFileSessionStorage {
                     public function start()
                     {
                         Assert::fail('Session cannot be started during API call. It must be stateless.');
