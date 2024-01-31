@@ -2128,11 +2128,6 @@ parameters:
 			path: app/bundles/CampaignBundle/Entity/CampaignRepository.php
 
 		-
-			message: "#^Return type of method Mautic\\\\CampaignBundle\\\\Entity\\\\CampaignRepository\\:\\:getEntities\\(\\) has typehint with deprecated class Doctrine\\\\ORM\\\\Internal\\\\Hydration\\\\IterableResult\\.$#"
-			count: 1
-			path: app/bundles/CampaignBundle/Entity/CampaignRepository.php
-
-		-
 			message: "#^Method Mautic\\\\CampaignBundle\\\\Entity\\\\ChannelInterface\\:\\:setChannel\\(\\) has parameter \\$channel with no type specified\\.$#"
 			count: 1
 			path: app/bundles/CampaignBundle/Entity/ChannelInterface.php
@@ -2451,11 +2446,6 @@ parameters:
 		-
 			message: "#^Parameter \\#2 \\$value of method Doctrine\\\\DBAL\\\\Query\\\\QueryBuilder\\:\\:set\\(\\) expects string, int given\\.$#"
 			count: 2
-			path: app/bundles/CampaignBundle/Entity/LeadEventLogRepository.php
-
-		-
-			message: "#^Return type of method Mautic\\\\CampaignBundle\\\\Entity\\\\LeadEventLogRepository\\:\\:getEntities\\(\\) has typehint with deprecated class Doctrine\\\\ORM\\\\Internal\\\\Hydration\\\\IterableResult\\.$#"
-			count: 1
 			path: app/bundles/CampaignBundle/Entity/LeadEventLogRepository.php
 
 		-
@@ -6932,11 +6922,6 @@ parameters:
 
 		-
 			message: "#^Property Mautic\\\\CoreBundle\\\\Entity\\\\CommonRepository\\:\\:\\$advancedFilterCommands type has no value type specified in iterable type array\\.$#"
-			count: 1
-			path: app/bundles/CoreBundle/Entity/CommonRepository.php
-
-		-
-			message: "#^Return type of method Mautic\\\\CoreBundle\\\\Entity\\\\CommonRepository\\:\\:getEntities\\(\\) has typehint with deprecated class Doctrine\\\\ORM\\\\Internal\\\\Hydration\\\\IterableResult\\.$#"
 			count: 1
 			path: app/bundles/CoreBundle/Entity/CommonRepository.php
 
@@ -15772,6 +15757,16 @@ parameters:
 			path: app/bundles/EmailBundle/Tests/MonitoredEmail/Organizer/MailboxOrganizerTest.php
 
 		-
+			message: "#^Call to method PHPUnit\\\\Framework\\\\Assert\\:\\:assertTrue\\(\\) with int will always evaluate to false\\.$#"
+			count: 1
+			path: app/bundles/EmailBundle/Tests/MonitoredEmail/Processor/Bounce/BodyParserTest.php
+
+		-
+			message: "#^Call to method PHPUnit\\\\Framework\\\\Assert\\:\\:assertTrue\\(\\) with int will always evaluate to false\\.$#"
+			count: 2
+			path: app/bundles/EmailBundle/Tests/MonitoredEmail/Processor/Bounce/DsnParserTest.php
+
+		-
 			message: "#^Parameter \\#1 \\$emailsInString of method Mautic\\\\EmailBundle\\\\Validator\\\\MultipleEmailsValidValidator\\:\\:validate\\(\\) expects string, null given\\.$#"
 			count: 1
 			path: app/bundles/EmailBundle/Tests/Validator/MultipleEmailsValidValidatorTest.php
@@ -16268,11 +16263,6 @@ parameters:
 			path: app/bundles/FormBundle/Entity/FormRepository.php
 
 		-
-			message: "#^Return type of method Mautic\\\\FormBundle\\\\Entity\\\\FormRepository\\:\\:getEntities\\(\\) has typehint with deprecated class Doctrine\\\\ORM\\\\Internal\\\\Hydration\\\\IterableResult\\.$#"
-			count: 1
-			path: app/bundles/FormBundle/Entity/FormRepository.php
-
-		-
 			message: """
 				#^Call to deprecated method addLead\\(\\) of class Mautic\\\\CoreBundle\\\\Doctrine\\\\Mapping\\\\ClassMetadataBuilder\\:
 				Use addContact instead; existing implementations will need a migration to rename lead_id to contact_id$#
@@ -16382,11 +16372,6 @@ parameters:
 
 		-
 			message: "#^Parameter \\#2 \\$value of method Doctrine\\\\DBAL\\\\Query\\\\QueryBuilder\\:\\:set\\(\\) expects string, int given\\.$#"
-			count: 1
-			path: app/bundles/FormBundle/Entity/SubmissionRepository.php
-
-		-
-			message: "#^Return type of method Mautic\\\\FormBundle\\\\Entity\\\\SubmissionRepository\\:\\:getEntities\\(\\) has typehint with deprecated class Doctrine\\\\ORM\\\\Internal\\\\Hydration\\\\IterableResult\\.$#"
 			count: 1
 			path: app/bundles/FormBundle/Entity/SubmissionRepository.php
 
@@ -19164,11 +19149,6 @@ parameters:
 			message: "#^Method Mautic\\\\LeadBundle\\\\Command\\\\ImportCommand\\:\\:configure\\(\\) has no return type specified\\.$#"
 			count: 1
 			path: app/bundles/LeadBundle/Command/ImportCommand.php
-
-		-
-			message: "#^Cannot call method next\\(\\) on array\\|Doctrine\\\\ORM\\\\Tools\\\\Pagination\\\\Paginator\\.$#"
-			count: 1
-			path: app/bundles/LeadBundle/Command/UpdateLeadListsCommand.php
 
 		-
 			message: "#^Method Mautic\\\\LeadBundle\\\\Command\\\\UpdateLeadListsCommand\\:\\:configure\\(\\) has no return type specified\\.$#"
@@ -22662,11 +22642,6 @@ parameters:
 
 		-
 			message: "#^Call to function is_array\\(\\) with int will always evaluate to false\\.$#"
-			count: 1
-			path: app/bundles/LeadBundle/Entity/LeadRepository.php
-
-		-
-			message: "#^Call to function is_array\\(\\) with string will always evaluate to false\\.$#"
 			count: 1
 			path: app/bundles/LeadBundle/Entity/LeadRepository.php
 
@@ -26760,11 +26735,6 @@ parameters:
 			path: app/bundles/LeadBundle/Tests/Entity/LeadListTest.php
 
 		-
-			message: "#^Parameter \\#2 \\$value of method Mautic\\\\LeadBundle\\\\Entity\\\\LeadRepository\\:\\:getLeadsByFieldValue\\(\\) expects string, array\\<int, string\\> given\\.$#"
-			count: 2
-			path: app/bundles/LeadBundle/Tests/Entity/LeadRepositoryTest.php
-
-		-
 			message: "#^Call to an undefined method Mautic\\\\LeadBundle\\\\Entity\\\\Lead\\:\\:getTest\\(\\)\\.$#"
 			count: 1
 			path: app/bundles/LeadBundle/Tests/Entity/LeadTest.php
@@ -28562,11 +28532,6 @@ parameters:
 			path: app/bundles/PageBundle/Entity/PageRepository.php
 
 		-
-			message: "#^Return type of method Mautic\\\\PageBundle\\\\Entity\\\\PageRepository\\:\\:getEntities\\(\\) has typehint with deprecated class Doctrine\\\\ORM\\\\Internal\\\\Hydration\\\\IterableResult\\.$#"
-			count: 1
-			path: app/bundles/PageBundle/Entity/PageRepository.php
-
-		-
 			message: "#^Method Mautic\\\\PageBundle\\\\Entity\\\\Redirect\\:\\:setHits\\(\\) should return Mautic\\\\PageBundle\\\\Entity\\\\Page but returns \\$this\\(Mautic\\\\PageBundle\\\\Entity\\\\Redirect\\)\\.$#"
 			count: 1
 			path: app/bundles/PageBundle/Entity/Redirect.php
@@ -30237,11 +30202,6 @@ parameters:
 
 		-
 			message: "#^Method Mautic\\\\PluginBundle\\\\Entity\\\\PluginRepository\\:\\:getDefaultOrder\\(\\) return type has no value type specified in iterable type array\\.$#"
-			count: 1
-			path: app/bundles/PluginBundle/Entity/PluginRepository.php
-
-		-
-			message: "#^Return type of method Mautic\\\\PluginBundle\\\\Entity\\\\PluginRepository\\:\\:getEntities\\(\\) has typehint with deprecated class Doctrine\\\\ORM\\\\Internal\\\\Hydration\\\\IterableResult\\.$#"
 			count: 1
 			path: app/bundles/PluginBundle/Entity/PluginRepository.php
 
@@ -32024,11 +31984,6 @@ parameters:
 			path: app/bundles/PointBundle/Entity/PointRepository.php
 
 		-
-			message: "#^Return type of method Mautic\\\\PointBundle\\\\Entity\\\\PointRepository\\:\\:getEntities\\(\\) has typehint with deprecated class Doctrine\\\\ORM\\\\Internal\\\\Hydration\\\\IterableResult\\.$#"
-			count: 1
-			path: app/bundles/PointBundle/Entity/PointRepository.php
-
-		-
 			message: "#^Method Mautic\\\\PointBundle\\\\Entity\\\\Trigger\\:\\:addTriggerEvent\\(\\) has parameter \\$key with no type specified\\.$#"
 			count: 1
 			path: app/bundles/PointBundle/Entity/Trigger.php
@@ -32140,11 +32095,6 @@ parameters:
 
 		-
 			message: "#^Method Mautic\\\\PointBundle\\\\Entity\\\\TriggerRepository\\:\\:getTriggerColors\\(\\) return type has no value type specified in iterable type array\\.$#"
-			count: 1
-			path: app/bundles/PointBundle/Entity/TriggerRepository.php
-
-		-
-			message: "#^Return type of method Mautic\\\\PointBundle\\\\Entity\\\\TriggerRepository\\:\\:getEntities\\(\\) has typehint with deprecated class Doctrine\\\\ORM\\\\Internal\\\\Hydration\\\\IterableResult\\.$#"
 			count: 1
 			path: app/bundles/PointBundle/Entity/TriggerRepository.php
 
@@ -33481,11 +33431,6 @@ parameters:
 			path: app/bundles/SmsBundle/Entity/SmsRepository.php
 
 		-
-			message: "#^Method Mautic\\\\SmsBundle\\\\Entity\\\\SmsRepository\\:\\:getPublishedBroadcasts\\(\\) has parameter \\$id with no type specified\\.$#"
-			count: 1
-			path: app/bundles/SmsBundle/Entity/SmsRepository.php
-
-		-
 			message: "#^Method Mautic\\\\SmsBundle\\\\Entity\\\\SmsRepository\\:\\:getSentCount\\(\\) return type has no value type specified in iterable type array\\.$#"
 			count: 1
 			path: app/bundles/SmsBundle/Entity/SmsRepository.php
@@ -34119,11 +34064,6 @@ parameters:
 
 		-
 			message: "#^Method Mautic\\\\StageBundle\\\\Entity\\\\StageRepository\\:\\:getStages\\(\\) return type has no value type specified in iterable type array\\.$#"
-			count: 1
-			path: app/bundles/StageBundle/Entity/StageRepository.php
-
-		-
-			message: "#^Return type of method Mautic\\\\StageBundle\\\\Entity\\\\StageRepository\\:\\:getEntities\\(\\) has typehint with deprecated class Doctrine\\\\ORM\\\\Internal\\\\Hydration\\\\IterableResult\\.$#"
 			count: 1
 			path: app/bundles/StageBundle/Entity/StageRepository.php
 
@@ -40357,11 +40297,6 @@ parameters:
 
 		-
 			message: "#^Method MauticPlugin\\\\MauticFocusBundle\\\\Entity\\\\FocusRepository\\:\\:getFocusList\\(\\) return type has no value type specified in iterable type array\\.$#"
-			count: 1
-			path: plugins/MauticFocusBundle/Entity/FocusRepository.php
-
-		-
-			message: "#^Return type of method MauticPlugin\\\\MauticFocusBundle\\\\Entity\\\\FocusRepository\\:\\:getEntities\\(\\) has typehint with deprecated class Doctrine\\\\ORM\\\\Internal\\\\Hydration\\\\IterableResult\\.$#"
 			count: 1
 			path: plugins/MauticFocusBundle/Entity/FocusRepository.php
 
