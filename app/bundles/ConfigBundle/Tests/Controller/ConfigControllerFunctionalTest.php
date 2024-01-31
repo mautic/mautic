@@ -93,7 +93,7 @@ class ConfigControllerFunctionalTest extends MauticMysqlTestCase
 
     private function getConfigPath(): string
     {
-        return self::$container->get('kernel')->getLocalConfigFile();
+        return static::getContainer()->get('kernel')->getLocalConfigFile();
     }
 
     private function getConfigParameters(): array
@@ -246,7 +246,7 @@ class ConfigControllerFunctionalTest extends MauticMysqlTestCase
         );
         $this->client->submit($accountForm);
         Assert::assertTrue($this->client->getResponse()->isOk());
-        Assert::assertSame('en_US', self::$container->get('session')->get('_locale'));
+        Assert::assertSame('en_US', static::getContainer()->get('session')->get('_locale'));
 
         // 2. Change system locale in configuration - should not change _locale session
         $configCrawler    = $this->client->request(Request::METHOD_GET, '/s/config/edit');
@@ -260,7 +260,7 @@ class ConfigControllerFunctionalTest extends MauticMysqlTestCase
         );
         $this->client->submit($configForm);
         Assert::assertTrue($this->client->getResponse()->isOk());
-        Assert::assertSame('en_US', self::$container->get('session')->get('_locale'));
+        Assert::assertSame('en_US', static::getContainer()->get('session')->get('_locale'));
 
         // 3. Change user locale to system default in account - should change _locale session to system default
         $accountCrawler    = $this->client->request(Request::METHOD_GET, '/s/account');
@@ -273,7 +273,7 @@ class ConfigControllerFunctionalTest extends MauticMysqlTestCase
         );
         $this->client->submit($accountForm);
         Assert::assertTrue($this->client->getResponse()->isOk());
-        Assert::assertSame('en_US', self::$container->get('session')->get('_locale'));
+        Assert::assertSame('en_US', static::getContainer()->get('session')->get('_locale'));
 
         // 2. Change system locale in configuration to en_US - should change _locale session
         $configCrawler    = $this->client->request(Request::METHOD_GET, '/s/config/edit');
@@ -287,7 +287,7 @@ class ConfigControllerFunctionalTest extends MauticMysqlTestCase
         );
         $this->client->submit($configForm);
         Assert::assertTrue($this->client->getResponse()->isOk());
-        Assert::assertSame('en_US', self::$container->get('session')->get('_locale'));
+        Assert::assertSame('en_US', static::getContainer()->get('session')->get('_locale'));
     }
 
     public function testSSOSettingEntityId(): void
