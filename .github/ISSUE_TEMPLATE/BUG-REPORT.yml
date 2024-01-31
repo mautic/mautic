@@ -33,6 +33,19 @@ body:
         - 3.3.x series (not supported)
     validations:
       required: true
+  - type: dropdown
+    id: Installation_type
+    attributes:
+      label: Way of installing
+      description: How did you install Mautic?
+      options:
+        - I downloaded a release from https://www.mautic.org/mautic-releases
+        - I installed with composer using https://github.com/mautic/recommended-project
+        - I'm using a Docker image from https://hub.docker.com/r/mautic/mautic
+        - I cloned the Mautic repo (not recommended or supported)
+        - Other (please specify if relevant in the bug report)
+    validations:
+      required: true
   - type: input
     id: PHP_version
     attributes:
