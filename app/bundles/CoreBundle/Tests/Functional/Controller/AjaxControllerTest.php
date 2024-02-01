@@ -25,7 +25,7 @@ final class AjaxControllerTest extends MauticMysqlTestCase
 
         parent::setUp();
 
-        $this->clientMockHandler = self::$container->get(\GuzzleHttp\Handler\MockHandler::class);
+        $this->clientMockHandler = static::getContainer()->get(\GuzzleHttp\Handler\MockHandler::class);
     }
 
     public function testUpdateRunChecksAction(): void

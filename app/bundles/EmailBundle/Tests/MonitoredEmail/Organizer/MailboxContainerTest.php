@@ -19,10 +19,10 @@ class MailboxContainerTest extends \PHPUnit\Framework\TestCase
      * @testdox Container's path should be config's path for services that don't have access
      *          to the config but need to set the path
      *
-     * @covers \Mautic\EmailBundle\MonitoredEmail\Accessor\ConfigAccessor::getPath()
-     * @covers \Mautic\EmailBundle\MonitoredEmail\Organizer\MailboxContainer::getPath()
+     * @covers \Mautic\EmailBundle\MonitoredEmail\Accessor\ConfigAccessor::getPath
+     * @covers \Mautic\EmailBundle\MonitoredEmail\Organizer\MailboxContainer::getPath
      */
-    public function testPathMatches()
+    public function testPathMatches(): void
     {
         $configAccessor   = new ConfigAccessor($this->config);
         $mailboxContainer = new MailboxContainer($configAccessor);
@@ -33,10 +33,10 @@ class MailboxContainerTest extends \PHPUnit\Framework\TestCase
     /**
      * @testdox Criteria should be returned correctly
      *
-     * @covers \Mautic\EmailBundle\MonitoredEmail\Organizer\MailboxContainer::addCriteria()
-     * @covers \Mautic\EmailBundle\MonitoredEmail\Organizer\MailboxContainer::getCriteria()
+     * @covers \Mautic\EmailBundle\MonitoredEmail\Organizer\MailboxContainer::addCriteria
+     * @covers \Mautic\EmailBundle\MonitoredEmail\Organizer\MailboxContainer::getCriteria
      */
-    public function testCriteriaIsSetAsExpected()
+    public function testCriteriaIsSetAsExpected(): void
     {
         $configAccessor   = new ConfigAccessor($this->config);
         $mailboxContainer = new MailboxContainer($configAccessor);
@@ -61,10 +61,10 @@ class MailboxContainerTest extends \PHPUnit\Framework\TestCase
     /**
      * @testdox Keep as unseen flag should be correctly returned when set
      *
-     * @covers \Mautic\EmailBundle\MonitoredEmail\Organizer\MailboxContainer::keepAsUnseen()
-     * @covers \Mautic\EmailBundle\MonitoredEmail\Organizer\MailboxContainer::shouldMarkAsSeen()
+     * @covers \Mautic\EmailBundle\MonitoredEmail\Organizer\MailboxContainer::keepAsUnseen
+     * @covers \Mautic\EmailBundle\MonitoredEmail\Organizer\MailboxContainer::shouldMarkAsSeen
      */
-    public function testUnseenFlagIsReturnedAsExpected()
+    public function testUnseenFlagIsReturnedAsExpected(): void
     {
         $configAccessor   = new ConfigAccessor($this->config);
         $mailboxContainer = new MailboxContainer($configAccessor);

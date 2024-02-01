@@ -13,12 +13,12 @@ class EventModelTest extends TestCase
     /**
      * @var LeadEventLogRepository
      */
-    private $leadEventLogRepository;
+    private \PHPUnit\Framework\MockObject\MockObject $leadEventLogRepository;
 
     /**
      * @var EventModel
      */
-    private $eventModel;
+    private \PHPUnit\Framework\MockObject\MockObject $eventModel;
 
     protected function setUp(): void
     {

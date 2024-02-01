@@ -22,13 +22,13 @@ class LeadModelFunctionalTest extends MauticMysqlTestCase
     public function testSavingPrimaryCompanyAfterPointsAreSetByListenerAreNotResetToDefaultOf0BecauseOfPointsFieldDefaultIs0(): void
     {
         /** @var EventDispatcher $eventDispatcher */
-        $eventDispatcher = self::$container->get('event_dispatcher');
+        $eventDispatcher = static::getContainer()->get('event_dispatcher');
         $eventDispatcher->addListener(LeadEvents::LEAD_POST_SAVE, [$this, 'addPointsListener']);
 
         /** @var LeadModel $model */
-        $model = self::$container->get('mautic.lead.model.lead');
+        $model = static::getContainer()->get('mautic.lead.model.lead');
         /** @var EntityManager $em */
-        $em   = self::$container->get('doctrine.orm.entity_manager');
+        $em   = static::getContainer()->get('doctrine.orm.entity_manager');
 
         // Set company to trigger setPrimaryCompany()
         $lead = new Lead();
@@ -61,7 +61,7 @@ class LeadModelFunctionalTest extends MauticMysqlTestCase
         $lead->adjustPoints(10);
 
         /** @var LeadModel $model */
-        $model = self::$container->get('mautic.lead.model.lead');
+        $model = static::getContainer()->get('mautic.lead.model.lead');
         $model->saveEntity($lead);
     }
 

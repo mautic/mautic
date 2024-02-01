@@ -14,6 +14,7 @@ use Mautic\IntegrationsBundle\Event\InternalObjectUpdateEvent;
 use Mautic\IntegrationsBundle\EventListener\CompanyObjectSubscriber;
 use Mautic\IntegrationsBundle\IntegrationEvents;
 use Mautic\IntegrationsBundle\Sync\DAO\DateRange;
+use Mautic\IntegrationsBundle\Sync\DAO\Sync\Order\ObjectChangeDAO;
 use Mautic\IntegrationsBundle\Sync\SyncDataExchange\Internal\Object\Company;
 use Mautic\IntegrationsBundle\Sync\SyncDataExchange\Internal\Object\Contact;
 use Mautic\IntegrationsBundle\Sync\SyncDataExchange\Internal\ObjectHelper\CompanyObjectHelper;
@@ -89,11 +90,13 @@ class CompanyObjectSubscriberTest extends TestCase
 
     public function testUpdateCompaniesWithRightObject(): void
     {
-        $event = new InternalObjectUpdateEvent(new Company(), [123], [['id' => 345]]);
+        $objectChangeDAO = new ObjectChangeDAO('integration', 'object', 'objectId', 'mappedObject', 'mappedId');
+
+        $event = new InternalObjectUpdateEvent(new Company(), [123], [$objectChangeDAO]);
 
         $this->companyObjectHelper->expects($this->once())
             ->method('update')
-            ->with([123], [['id' => 345]])
+            ->with([123], [$objectChangeDAO])
             ->willReturn([['object_mapping_1']]);
 
         $this->subscriber->updateCompanies($event);

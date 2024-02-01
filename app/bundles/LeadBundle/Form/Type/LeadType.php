@@ -22,39 +22,22 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Validator\Constraints\File;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
+/**
+ * @extends AbstractType<Lead>
+ */
 class LeadType extends AbstractType
 {
     use EntityFieldsBuildFormTrait;
 
-    /**
-     * @var TranslatorInterface
-     */
-    private $translator;
-
-    /**
-     * @var CompanyModel
-     */
-    private $companyModel;
-
-    /**
-     * @var EntityManager
-     */
-    private $entityManager;
-
-    /**
-     * @var CoreParametersHelper
-     */
-    private $coreParametersHelper;
-
-    public function __construct(TranslatorInterface $translator, CompanyModel $companyModel, EntityManager $entityManager, CoreParametersHelper $coreParametersHelper)
-    {
-        $this->translator           = $translator;
-        $this->companyModel         = $companyModel;
-        $this->entityManager        = $entityManager;
-        $this->coreParametersHelper = $coreParametersHelper;
+    public function __construct(
+        private TranslatorInterface $translator,
+        private CompanyModel $companyModel,
+        private EntityManager $entityManager,
+        private CoreParametersHelper $coreParametersHelper
+    ) {
     }
 
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder->addEventSubscriber(new FormExitSubscriber('lead.lead', $options));
 

@@ -11,27 +11,19 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class ChannelSubscriber implements EventSubscriberInterface
 {
-    /**
-     * @var IntegrationHelper
-     */
-    private $helper;
-
-    public function __construct(IntegrationHelper $helper)
-    {
-        $this->helper = $helper;
+    public function __construct(
+        private IntegrationHelper $helper
+    ) {
     }
 
-    /**
-     * @return array
-     */
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             ChannelEvents::ADD_CHANNEL => ['onAddChannel', 80],
         ];
     }
 
-    public function onAddChannel(ChannelEvent $event)
+    public function onAddChannel(ChannelEvent $event): void
     {
         $integration = $this->helper->getIntegrationObject('Twitter');
         if ($integration && $integration->getIntegrationSettings()->isPublished()) {

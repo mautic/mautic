@@ -185,7 +185,7 @@ class FormSubscriberTest extends TestCase
         $this->subscriber->onFormSubmitActionSendEmail($submissionEvent);
     }
 
-    public function toCcBccProvider(): \Generator
+    public static function toCcBccProvider(): \Generator
     {
         yield ['to@email.email, to2@email.email', null, null];
         yield [null, 'cc@email.email, cc2@email.email', null];

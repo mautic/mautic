@@ -7,27 +7,20 @@ use Mautic\LeadBundle\Entity\Lead;
 use Mautic\NotificationBundle\Entity\Notification;
 
 /**
- * Class SendingNotificationEvent.
+ * @deprecated since Mautic 5.0, to be removed in 6.0 with no replacement.
  */
 class SendingNotificationEvent extends CommonEvent
 {
-    /**
-     * @var Lead
-     */
-    protected $lead;
-
     /**
      * @var Notification
      */
     protected $entity;
 
-    /**
-     * SendingNotificationEvent constructor.
-     */
-    public function __construct(Notification $notification, Lead $lead)
-    {
+    public function __construct(
+        Notification $notification,
+        protected Lead $lead
+    ) {
         $this->entity = $notification;
-        $this->lead   = $lead;
     }
 
     /**

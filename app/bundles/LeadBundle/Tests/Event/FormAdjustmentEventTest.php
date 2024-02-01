@@ -12,9 +12,9 @@ use Symfony\Component\Form\FormInterface;
 final class FormAdjustmentEventTest extends \PHPUnit\Framework\TestCase
 {
     /**
-     * @var MockObject&FormInterface<FormInterface>
+     * @var MockObject&FormInterface<FormInterface<mixed>>
      */
-    private $form;
+    private \PHPUnit\Framework\MockObject\MockObject $form;
 
     protected function setUp(): void
     {

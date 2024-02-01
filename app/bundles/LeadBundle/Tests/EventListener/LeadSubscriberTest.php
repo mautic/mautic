@@ -30,42 +30,39 @@ class LeadSubscriberTest extends CommonMocks
     /**
      * @var IpLookupHelper|MockObject
      */
-    private $ipLookupHelper;
+    private \PHPUnit\Framework\MockObject\MockObject $ipLookupHelper;
 
     /**
      * @var AuditLogModel|MockObject
      */
-    private $auditLogModel;
+    private \PHPUnit\Framework\MockObject\MockObject $auditLogModel;
 
     /**
      * @var LeadChangeEventDispatcher|MockObject
      */
-    private $leadEventDispatcher;
+    private \PHPUnit\Framework\MockObject\MockObject $leadEventDispatcher;
 
-    /**
-     * @var DncReasonHelper
-     */
-    private $dncReasonHelper;
+    private \Mautic\LeadBundle\Twig\Helper\DncReasonHelper $dncReasonHelper;
 
     /**
      * @var EntityManager|MockObject
      */
-    private $entityManager;
+    private \PHPUnit\Framework\MockObject\MockObject $entityManager;
 
     /**
      * @var TranslatorInterface|MockObject
      */
-    private $translator;
+    private \PHPUnit\Framework\MockObject\MockObject $translator;
 
     /**
      * @var RouterInterface|MockObject
      */
-    private $router;
+    private \PHPUnit\Framework\MockObject\MockObject $router;
 
     /**
      * @var ModelFactory<object>&MockObject
      */
-    private $modelFacotry;
+    private \PHPUnit\Framework\MockObject\MockObject $modelFacotry;
 
     /**
      * @var CoreParametersHelper
@@ -91,7 +88,7 @@ class LeadSubscriberTest extends CommonMocks
         $this->companyLeadRepository = $this->createMock(CompanyLeadRepository::class);
     }
 
-    public function testOnLeadPostSaveWillNotProcessTheSameLeadTwice()
+    public function testOnLeadPostSaveWillNotProcessTheSameLeadTwice(): void
     {
         $lead = new Lead();
 
@@ -166,7 +163,7 @@ class LeadSubscriberTest extends CommonMocks
      * Make sure that an timeline entry is created for a lead
      * that was created through the API.
      */
-    public function testAddTimelineApiCreatedEntries()
+    public function testAddTimelineApiCreatedEntries(): void
     {
         $eventTypeKey  = 'lead.apiadded';
         $eventTypeName = 'Added through API';

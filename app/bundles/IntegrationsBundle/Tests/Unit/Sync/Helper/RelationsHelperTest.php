@@ -22,22 +22,19 @@ class RelationsHelperTest extends TestCase
     /**
      * @var MappingHelper|\PHPUnit\Framework\MockObject\MockObject
      */
-    private $mappingHelper;
+    private \PHPUnit\Framework\MockObject\MockObject $mappingHelper;
 
-    /**
-     * @var RelationsHelper
-     */
-    private $relationsHelper;
+    private \Mautic\IntegrationsBundle\Sync\Helper\RelationsHelper $relationsHelper;
 
     /**
      * @var ReportDAO|\PHPUnit\Framework\MockObject\MockObject
      */
-    private $syncReport;
+    private \PHPUnit\Framework\MockObject\MockObject $syncReport;
 
     /**
      * @var MappingManualDAO|\PHPUnit\Framework\MockObject\MockObject
      */
-    private $mappingManual;
+    private \PHPUnit\Framework\MockObject\MockObject $mappingManual;
 
     protected function setUp(): void
     {

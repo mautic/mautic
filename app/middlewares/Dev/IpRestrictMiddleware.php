@@ -55,9 +55,6 @@ class IpRestrictMiddleware implements HttpKernelInterface, PrioritizedMiddleware
         return new Response('You are not allowed to access this file.', 403);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getPriority()
     {
         return self::PRIORITY;

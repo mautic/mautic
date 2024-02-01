@@ -538,7 +538,7 @@ class SmsController extends FormController
      *
      * @return JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|Response
      */
-    public function cloneAction($objectId)
+    public function cloneAction(Request $request, $objectId)
     {
         $model  = $this->getModel('sms');
         $entity = $model->getEntity($objectId);
@@ -557,7 +557,7 @@ class SmsController extends FormController
             $entity = clone $entity;
         }
 
-        return $this->newAction($entity);
+        return $this->newAction($request, $entity);
     }
 
     /**

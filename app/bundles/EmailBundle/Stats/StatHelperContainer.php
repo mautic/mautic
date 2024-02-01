@@ -7,19 +7,20 @@ use Mautic\EmailBundle\Stats\Helper\StatHelperInterface;
 
 class StatHelperContainer
 {
-    private $helpers = [];
+    /**
+     * @var array<string, StatHelperInterface>
+     */
+    private array $helpers = [];
 
-    public function addHelper(StatHelperInterface $helper)
+    public function addHelper(StatHelperInterface $helper): void
     {
         $this->helpers[$helper->getName()] = $helper;
     }
 
     /**
-     * @return StatHelperInterface
-     *
      * @throws InvalidStatHelperException
      */
-    public function getHelper($name)
+    public function getHelper($name): StatHelperInterface
     {
         if (!isset($this->helpers[$name])) {
             throw new InvalidStatHelperException($name.' has not been registered');
