@@ -21,6 +21,7 @@
     "ext-zlib": "*",
     "ext-zip": "*",
     "ext-imap": "*",
+    "ext-pdo": "*",
     "symfony/amqp-messenger": "~5.4",
     "symfony/console": "~5.4.0",
     "symfony/form": "~5.4.0",
@@ -107,7 +108,8 @@
     "symfony/mailer": "~5.4",
     "symfony/mime": "~5.4",
     "wikimedia/less.php": "^4.1",
-    "matthiasmullie/minify": "^1.3"
+    "matthiasmullie/minify": "^1.3",
+    "bjeavons/zxcvbn-php": "^1.3"
   },
   "conflict": {
     "psr/simple-cache": ">=3.0.0"

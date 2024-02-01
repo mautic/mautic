@@ -18,7 +18,7 @@ class ListApiControllerFunctionalTest extends MauticMysqlTestCase
     {
         parent::setUp();
         /* @var ListModel $listModel */
-        $this->listModel = self::$container->get('mautic.lead.model.list');
+        $this->listModel = static::getContainer()->get('mautic.lead.model.list');
     }
 
     public function testSingleSegmentWorkflow(): void

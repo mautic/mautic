@@ -44,14 +44,14 @@ jobs:
           --health-retries=3
 
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
       # Codecov needs access to previous commits, so we add fetch-depth: 0
       with:
         fetch-depth: 0
 
     - name: PHPUnit cache
       if: ${{matrix.php-versions == '8.1' && matrix.db-types == 'mariadb'}}
-      uses: actions/cache@v3
+      uses: actions/cache@v4
       with:
         path: ./var/cache/phpunit
         key: ${{ runner.os }}-phpunit-${{ hashFiles('**/composer.lock') }}-${{ github.run_id }}
@@ -89,7 +89,7 @@ jobs:
         export DB_PORT="${{ job.services.database.ports[3306] }}"
 
         if [[ "${{ matrix.php-versions }}" == "8.1" ]] && [[ "${{ matrix.db-types }}" == "mariadb" ]]; then
-          php -d pcov.enabled=1 bin/phpunit -d memory_limit=1G --bootstrap vendor/autoload.php --configuration app/phpunit.xml.dist --coverage-clover=coverage.xml --log-junit=junit.xml
+          php -d pcov.enabled=1 bin/phpunit -d memory_limit=2G --bootstrap vendor/autoload.php --configuration app/phpunit.xml.dist --coverage-clover=coverage.xml --log-junit=junit.xml
         else
           composer test
         fi
@@ -104,7 +104,7 @@ jobs:
 
     - name: Save test results for future steps
       if: ${{ matrix.php-versions == '8.1' && matrix.db-types == 'mariadb' && github.repository == 'mautic/mautic' }}
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: test-results
         path: |
@@ -120,7 +120,7 @@ jobs:
 
     - name: Store log artifacts
       if: ${{ always() }}
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: logs-${{ matrix.php-versions }}-${{ matrix.db-types }}
         path: ./var/logs/*
@@ -139,13 +139,13 @@ jobs:
     name: ${{ matrix.commands }} - ${{ matrix.php-versions }}
 
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
       with:
         fetch-depth: 0
 
     - name: Rector Cache
       if: ${{matrix.commands == 'Rector'}}
-      uses: actions/cache@v3
+      uses: actions/cache@v4
       with:
         path: ./var/cache/rector
         key: ${{ runner.os }}-rector-${{ hashFiles('**/composer.lock') }}-${{ github.run_id }}
@@ -155,16 +155,16 @@ jobs:
 
     - name: PHPStan Cache
       if: ${{matrix.commands == 'PHPSTAN'}}
-      uses: actions/cache@v3
+      uses: actions/cache@v4
       with:
-        path: ./var/cache/phpstan
+        path: ./var/phpstan-cache
         key: ${{ runner.os }}-phpstan-${{ hashFiles('**/composer.lock') }}-${{ github.run_id }}
         restore-keys: |
           ${{ runner.os }}-phpstan-${{ hashFiles('**/composer.lock') }}
           ${{ runner.os }}-phpstan-
 
     - name: NPM Cache
-      uses: actions/cache@v3
+      uses: actions/cache@v4
       with:
         path: ./var/cache/js
         key: ${{ runner.os }}-js-${{ hashFiles('**/package-lock.json', 'webpack.config.js') }}-${{ github.run_id }}
@@ -174,7 +174,7 @@ jobs:
 
     - name: Get changed files
       id: changed-files
-      uses: tj-actions/changed-files@v35
+      uses: tj-actions/changed-files@v42
 
     - name: Setup PHP, with composer and extensions
       uses: shivammathur/setup-php@v2
@@ -208,7 +208,7 @@ jobs:
             fi
           done
           if [[ $cs_fix_files ]]; then
-            bin/php-cs-fixer fix --config=.php-cs-fixer.php -v --dry-run --using-cache=no --show-progress=dots --diff $cs_fix_files
+            bin/php-cs-fixer fix --config=.php-cs-fixer.php --dry-run --using-cache=no --show-progress=dots --diff $cs_fix_files
           fi
         elif [[ "${{ matrix.commands }}" == "scaffolded files mismatch" ]]; then
           wget -q -O /tmp/jq https://github.com/stedolan/jq/releases/download/jq-1.6/jq-linux64 && chmod 755 /tmp/jq

@@ -28,7 +28,7 @@ class LoadUserData extends AbstractFixture implements OrderedFixtureInterface, F
         $user->setLastName('User');
         $user->setUsername('admin');
         $user->setEmail('admin@yoursite.com');
-        $user->setPassword($this->hasher->hashPassword($user, 'mautic'));
+        $user->setPassword($this->hasher->hashPassword($user, 'Maut1cR0cks!'));
         $user->setRole($this->getReference('admin-role'));
         $manager->persist($user);
         $manager->flush();
@@ -40,7 +40,7 @@ class LoadUserData extends AbstractFixture implements OrderedFixtureInterface, F
         $user->setLastName('User');
         $user->setUsername('sales');
         $user->setEmail('sales@yoursite.com');
-        $user->setPassword($this->hasher->hashPassword($user, 'mautic'));
+        $user->setPassword($this->hasher->hashPassword($user, 'Maut1cR0cks!'));
         $user->setRole($this->getReference('sales-role'));
         $manager->persist($user);
         $manager->flush();

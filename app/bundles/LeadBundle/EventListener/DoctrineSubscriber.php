@@ -6,7 +6,7 @@ use Doctrine\Common\EventSubscriber;
 use Doctrine\DBAL\Types\StringType;
 use Doctrine\ORM\Tools\Event\GenerateSchemaEventArgs;
 use Doctrine\ORM\Tools\ToolEvents;
-use Mautic\LeadBundle\Model\FieldModel;
+use Mautic\LeadBundle\Field\SchemaDefinition;
 use Monolog\Logger;
 
 class DoctrineSubscriber implements EventSubscriber
@@ -56,7 +56,7 @@ class DoctrineSubscriber implements EventSubscriber
                     if ($f['is_unique'] && 'email' !== $f['alias']) {
                         $uniqueFields[$f['alias']] = $f['alias'];
                     }
-                    $columnDef = FieldModel::getSchemaDefinition($f['alias'], $f['type'], !empty($f['is_unique']));
+                    $columnDef = SchemaDefinition::getSchemaDefinition($f['alias'], $f['type'], !empty($f['is_unique']));
 
                     if (!$table->hasColumn($f['alias'])) {
                         $table->addColumn($columnDef['name'], $columnDef['type'], $columnDef['options']);
