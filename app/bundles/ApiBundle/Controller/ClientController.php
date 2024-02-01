@@ -28,6 +28,7 @@ use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInt
 class ClientController extends AbstractStandardFormController
 {
     public function __construct(
+        private ClientModel $clientModel,
         FormFactoryInterface $formFactory,
         FormFieldHelper $fieldHelper,
         ManagerRegistry $doctrine,
@@ -67,9 +68,7 @@ class ClientController extends AbstractStandardFormController
         $request->getSession()->set('mautic.client.filter.api_mode', $apiMode);
         $request->getSession()->set('mautic.client.filter', $filter);
 
-        /** @var \Mautic\ApiBundle\Model\ClientModel $model */
-        $model   = $this->getModel($this->getModelName());
-        $clients = $model->getEntities(
+        $clients = $this->clientModel->getEntities(
             [
                 'start'      => $start,
                 'limit'      => $limit,
@@ -137,12 +136,9 @@ class ClientController extends AbstractStandardFormController
 
     public function authorizedClientsAction(TokenStorageInterface $tokenStorage): Response
     {
-        /** @var \Mautic\ApiBundle\Model\ClientModel $model */
-        $model = $this->getModel($this->getModelName());
-        \assert($model instanceof ClientModel);
         $me = $tokenStorage->getToken()->getUser();
         \assert($me instanceof User);
-        $clients = $model->getUserClients($me);
+        $clients = $this->clientModel->getUserClients($me);
 
         return $this->render('@MauticApi/Client/authorized.html.twig', ['clients' => $clients]);
     }
@@ -158,10 +154,7 @@ class ClientController extends AbstractStandardFormController
         $flashes = [];
 
         if ('POST' == $request->getMethod()) {
-            /** @var \Mautic\ApiBundle\Model\ClientModel $model */
-            $model = $this->getModel($this->getModelName());
-
-            $client = $model->getEntity($clientId);
+            $client = $this->clientModel->getEntity($clientId);
 
             if (null === $client) {
                 $flashes[] = [
@@ -172,7 +165,7 @@ class ClientController extends AbstractStandardFormController
             } else {
                 $name = $client->getName();
 
-                $model->revokeAccess($client);
+                $this->clientModel->revokeAccess($client);
 
                 $flashes[] = [
                     'type'    => 'notice',
@@ -210,19 +203,17 @@ class ClientController extends AbstractStandardFormController
         $apiMode = (0 === $objectId) ? $request->getSession()->get('mautic.client.filter.api_mode', 'oauth2') : $objectId;
         $request->getSession()->set('mautic.client.filter.api_mode', $apiMode);
 
-        /** @var \Mautic\ApiBundle\Model\ClientModel $model */
-        $model = $this->getModel($this->getModelName());
-        $model->setApiMode($apiMode);
+        $this->clientModel->setApiMode($apiMode);
 
         // retrieve the entity
-        $client = $model->getEntity();
+        $client = $this->clientModel->getEntity();
 
         // set the return URL for post actions
         $returnUrl = $this->generateUrl('mautic_client_index');
 
         // get the user form factory
         $action = $this->generateUrl('mautic_client_action', ['objectAction' => 'new']);
-        $form   = $model->createForm($client, $this->formFactory, $action);
+        $form   = $this->clientModel->createForm($client, $this->formFactory, $action);
 
         // remove the client id and secret fields as they'll be auto generated
         $form->remove('randomId');
@@ -244,7 +235,7 @@ class ClientController extends AbstractStandardFormController
                         $client->addGrantType(OAuth2::GRANT_TYPE_CLIENT_CREDENTIALS);
                     }
                     $client->setRole($user->getRole());
-                    $model->saveEntity($client);
+                    $this->clientModel->saveEntity($client);
                     $this->addFlashMessage(
                         'mautic.api.client.notice.created',
                         [
@@ -309,9 +300,7 @@ class ClientController extends AbstractStandardFormController
             return $this->accessDenied();
         }
 
-        /** @var \Mautic\ApiBundle\Model\ClientModel $model */
-        $model     = $this->getModel($this->getModelName());
-        $client    = $model->getEntity($objectId);
+        $client    = $this->clientModel->getEntity($objectId);
         $returnUrl = $this->generateUrl('mautic_client_index');
 
         $postActionVars = [
@@ -339,13 +328,13 @@ class ClientController extends AbstractStandardFormController
                     ]
                 )
             );
-        } elseif ($model->isLocked($client)) {
+        } elseif ($this->clientModel->isLocked($client)) {
             // deny access if the entity is locked
             return $this->isLocked($postActionVars, $client, 'api.client');
         }
 
         $action = $this->generateUrl('mautic_client_action', ['objectAction' => 'edit', 'objectId' => $objectId]);
-        $form   = $model->createForm($client, $this->formFactory, $action);
+        $form   = $this->clientModel->createForm($client, $this->formFactory, $action);
 
         // remove api_mode field
         $form->remove('api_mode');
@@ -355,7 +344,7 @@ class ClientController extends AbstractStandardFormController
             if (!$cancelled = $this->isFormCancelled($form)) {
                 if ($valid = $this->isFormValid($form)) {
                     // form is valid so process the data
-                    $model->saveEntity($client, $this->getFormButton($form, ['buttons', 'save'])->isClicked());
+                    $this->clientModel->saveEntity($client, $this->getFormButton($form, ['buttons', 'save'])->isClicked());
                     $this->addFlashMessage(
                         'mautic.core.notice.updated',
                         [
@@ -377,13 +366,13 @@ class ClientController extends AbstractStandardFormController
                 }
             } else {
                 // unlock the entity
-                $model->unlockEntity($client);
+                $this->clientModel->unlockEntity($client);
 
                 return $this->postActionRedirect($postActionVars);
             }
         } else {
             // lock the entity
-            $model->lockEntity($client);
+            $this->clientModel->lockEntity($client);
         }
 
         return $this->delegateView(
@@ -430,20 +419,18 @@ class ClientController extends AbstractStandardFormController
         ];
 
         if ('POST' === $request->getMethod()) {
-            /** @var \Mautic\ApiBundle\Model\ClientModel $model */
-            $model  = $this->getModel($this->getModelName());
-            $entity = $model->getEntity($objectId);
+            $entity = $this->clientModel->getEntity($objectId);
             if (null === $entity) {
                 $flashes[] = [
                     'type'    => 'error',
                     'msg'     => 'mautic.api.client.error.notfound',
                     'msgVars' => ['%id%' => $objectId],
                 ];
-            } elseif ($model->isLocked($entity)) {
+            } elseif ($this->clientModel->isLocked($entity)) {
                 // deny access if the entity is locked
                 return $this->isLocked($postActionVars, $entity, 'api.client');
             } else {
-                $model->deleteEntity($entity);
+                $this->clientModel->deleteEntity($entity);
                 $name      = $entity->getName();
                 $flashes[] = [
                     'type'    => 'notice',
