@@ -20,6 +20,7 @@ use Mautic\UserBundle\Entity\User;
 use Monolog\Logger;
 use PHPUnit\Framework\MockObject\MockObject;
 use Psr\Log\LoggerInterface;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Mailer\Mailer;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
@@ -301,9 +302,12 @@ class OwnerSubscriberTest extends \PHPUnit\Framework\TestCase
         /** @var LoggerInterface|MockObject $logger */
         $logger = $this->createMock(LoggerInterface::class);
 
+        /** @var MockObject&RequestStack $requestStack */
+        $requestStack = $this->createMock(RequestStack::class);
+
         $transport    = new SmtpTransport();
         $mailer       = new Mailer($transport);
-        $mailerHelper = new MailHelper($mockFactory, $mailer, $fromEmaiHelper, $coreParametersHelper, $mailbox, $logger);
+        $mailerHelper = new MailHelper($mockFactory, $mailer, $fromEmaiHelper, $coreParametersHelper, $mailbox, $logger, $requestStack);
         $mailerHelper->setLead($lead);
 
         return $mailerHelper;
