@@ -23,7 +23,7 @@ class SmsRepository extends CommonRepository
             ->select($this->getTableAlias())
             ->from(\Mautic\SmsBundle\Entity\Sms::class, $this->getTableAlias(), $this->getTableAlias().'.id');
 
-        if (empty($args['iterator_mode'])) {
+        if (empty($args['iterator_mode']) && empty($args['iterable_mode'])) {
             $q->leftJoin($this->getTableAlias().'.category', 'c');
         }
 
@@ -33,11 +33,26 @@ class SmsRepository extends CommonRepository
     }
 
     /**
-     * @param null $id
+     * @depreacated The method is replaced by getPublishedBroadcastsIterable
      *
-     * @return \Doctrine\ORM\Internal\Hydration\IterableResult
+     * @param numeric|null $id
+     *
+     * @return \Doctrine\ORM\Internal\Hydration\IterableResult<Sms>
      */
-    public function getPublishedBroadcasts($id = null)
+    public function getPublishedBroadcasts($id = null): \Doctrine\ORM\Internal\Hydration\IterableResult
+    {
+        return $this->getPublishedBroadcastsQuery($id)->iterate();
+    }
+
+    /**
+     * @return iterable<Sms>
+     */
+    public function getPublishedBroadcastsIterable(?int $id = null): iterable
+    {
+        return $this->getPublishedBroadcastsQuery($id)->toIterable();
+    }
+
+    private function getPublishedBroadcastsQuery(?int $id = null): Query
     {
         $qb   = $this->createQueryBuilder($this->getTableAlias());
         $expr = $this->getPublishedByDateExpression($qb, null, true, true, false);
@@ -46,14 +61,14 @@ class SmsRepository extends CommonRepository
             $qb->expr()->eq($this->getTableAlias().'.smsType', $qb->expr()->literal('list'))
         );
 
-        if (!empty($id)) {
+        if (null !== $id && 0 !== $id) {
             $expr->add(
                 $qb->expr()->eq($this->getTableAlias().'.id', (int) $id)
             );
         }
         $qb->where($expr);
 
-        return $qb->getQuery()->iterate();
+        return $qb->getQuery();
     }
 
     /**
@@ -100,12 +115,10 @@ class SmsRepository extends CommonRepository
 
     /**
      * @param \Doctrine\ORM\QueryBuilder|\Doctrine\DBAL\Query\QueryBuilder $q
-     *
-     * @return array
      */
-    protected function addSearchCommandWhereClause($q, $filter)
+    protected function addSearchCommandWhereClause($q, $filter): array
     {
-        list($expr, $parameters) = $this->addStandardSearchCommandWhereClause($q, $filter);
+        [$expr, $parameters] = $this->addStandardSearchCommandWhereClause($q, $filter);
         if ($expr) {
             return [$expr, $parameters];
         }
@@ -145,9 +158,9 @@ class SmsRepository extends CommonRepository
     }
 
     /**
-     * @return array
+     * @return string[]
      */
-    public function getSearchCommands()
+    public function getSearchCommands(): array
     {
         $commands = [
             'mautic.core.searchcommand.ispublished',
@@ -164,17 +177,14 @@ class SmsRepository extends CommonRepository
     /**
      * @return array<array<string>>
      */
-    protected function getDefaultOrder()
+    protected function getDefaultOrder(): array
     {
         return [
             ['e.name', 'ASC'],
         ];
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getTableAlias()
+    public function getTableAlias(): string
     {
         return 'e';
     }
@@ -185,7 +195,7 @@ class SmsRepository extends CommonRepository
      * @param string $type
      * @param int    $increaseBy
      */
-    public function upCount($id, $type = 'sent', $increaseBy = 1)
+    public function upCount($id, $type = 'sent', $increaseBy = 1): void
     {
         try {
             $q = $this->_em->getConnection()->createQueryBuilder();
@@ -194,8 +204,8 @@ class SmsRepository extends CommonRepository
                 ->set($type.'_count', $type.'_count + '.(int) $increaseBy)
                 ->where('id = '.(int) $id);
 
-            $q->execute();
-        } catch (\Exception $exception) {
+            $q->executeStatement();
+        } catch (\Exception) {
             // not important
         }
     }

@@ -12,15 +12,25 @@ use Mautic\PointBundle\Entity\GroupContactScore;
 final class Version20230621074925 extends PreUpAssertionMigration
 {
     private string $groupTableName;
+
     private string $contactScoreTableName;
+
     private string $contactTableName;
+
     private string $pointsTableName;
+
     private string $pointTriggersTableName;
+
     private string $leadPointsChangeLogTableName;
+
     private string $contactScoreContactFk;
+
     private string $contactScoreGroupFk;
+
     private string $pointsGroupFk;
+
     private string $pointTriggersGroupFk;
+
     private string $leadPointsChangeLogGroupFk;
 
     private function initTableNames(): void
@@ -50,11 +60,11 @@ final class Version20230621074925 extends PreUpAssertionMigration
         $this->assertColumnDoesNotExist($this->pointTriggersTableName, 'group_id');
         $this->assertColumnDoesNotExist($this->leadPointsChangeLogTableName, 'group_id');
 
-        $this->assertIndexDoesNotExist($this->contactScoreTableName, $this->contactScoreContactFk);
-        $this->assertIndexDoesNotExist($this->contactScoreTableName, $this->contactScoreGroupFk);
-        $this->assertIndexDoesNotExist($this->pointsTableName, $this->pointsGroupFk);
-        $this->assertIndexDoesNotExist($this->pointTriggersTableName, $this->pointTriggersGroupFk);
-        $this->assertIndexDoesNotExist($this->leadPointsChangeLogTableName, $this->leadPointsChangeLogGroupFk);
+        $this->assertForeignKeyDoesNotExist($this->contactScoreTableName, $this->contactScoreContactFk);
+        $this->assertForeignKeyDoesNotExist($this->contactScoreTableName, $this->contactScoreGroupFk);
+        $this->assertForeignKeyDoesNotExist($this->pointsTableName, $this->pointsGroupFk);
+        $this->assertForeignKeyDoesNotExist($this->pointTriggersTableName, $this->pointTriggersGroupFk);
+        $this->assertForeignKeyDoesNotExist($this->leadPointsChangeLogTableName, $this->leadPointsChangeLogGroupFk);
     }
 
     public function up(Schema $schema): void
@@ -109,19 +119,46 @@ final class Version20230621074925 extends PreUpAssertionMigration
     {
         $this->initTableNames();
 
-        $this->addSql("ALTER TABLE `{$this->contactScoreTableName}` DROP FOREIGN KEY `{$this->contactScoreContactFk}`");
-        $this->addSql("ALTER TABLE `{$this->contactScoreTableName}` DROP FOREIGN KEY `{$this->contactScoreGroupFk}`");
+        if ($schema->hasTable($this->contactScoreTableName)) {
+            $contactScoreTable = $schema->getTable($this->contactScoreTableName);
+            if ($contactScoreTable->hasForeignKey($this->contactScoreContactFk)) {
+                $this->addSql("ALTER TABLE `{$this->contactScoreTableName}` DROP FOREIGN KEY `{$this->contactScoreContactFk}`");
+            }
+            if ($contactScoreTable->hasForeignKey($this->contactScoreGroupFk)) {
+                $this->addSql("ALTER TABLE `{$this->contactScoreTableName}` DROP FOREIGN KEY `{$this->contactScoreGroupFk}`");
+            }
+        }
 
-        $this->addSql("ALTER TABLE `{$this->pointsTableName}` DROP FOREIGN KEY `{$this->pointsGroupFk}`");
-        $this->addSql("ALTER TABLE `{$this->pointTriggersTableName}` DROP FOREIGN KEY `{$this->pointTriggersGroupFk}`");
-        $this->addSql("ALTER TABLE `{$this->leadPointsChangeLogTableName}` DROP FOREIGN KEY `{$this->leadPointsChangeLogGroupFk}`");
+        $pointsTable              = $schema->getTable($this->pointsTableName);
+        $pointTriggersTable       = $schema->getTable($this->pointTriggersTableName);
+        $leadPointsChangeLogTable = $schema->getTable($this->leadPointsChangeLogTableName);
 
-        $this->addSql("ALTER TABLE `{$this->pointsTableName}` DROP group_id");
-        $this->addSql("ALTER TABLE `{$this->pointTriggersTableName}` DROP group_id");
-        $this->addSql("ALTER TABLE `{$this->leadPointsChangeLogTableName}` DROP group_id");
+        if ($pointsTable->hasForeignKey($this->pointsGroupFk)) {
+            $this->addSql("ALTER TABLE `{$this->pointsTableName}` DROP FOREIGN KEY `{$this->pointsGroupFk}`");
+        }
+        if ($pointTriggersTable->hasForeignKey($this->pointTriggersGroupFk)) {
+            $this->addSql("ALTER TABLE `{$this->pointTriggersTableName}` DROP FOREIGN KEY `{$this->pointTriggersGroupFk}`");
+        }
+        if ($leadPointsChangeLogTable->hasForeignKey($this->leadPointsChangeLogGroupFk)) {
+            $this->addSql("ALTER TABLE `{$this->leadPointsChangeLogTableName}` DROP FOREIGN KEY `{$this->leadPointsChangeLogGroupFk}`");
+        }
 
-        $this->addSql("DROP TABLE {$this->contactScoreTableName}");
-        $this->addSql("DROP TABLE {$this->groupTableName}");
+        if ($pointsTable->hasColumn('group_id')) {
+            $this->addSql("ALTER TABLE `{$this->pointsTableName}` DROP group_id");
+        }
+        if ($pointTriggersTable->hasColumn('group_id')) {
+            $this->addSql("ALTER TABLE `{$this->pointTriggersTableName}` DROP group_id");
+        }
+        if ($leadPointsChangeLogTable->hasColumn('group_id')) {
+            $this->addSql("ALTER TABLE `{$this->leadPointsChangeLogTableName}` DROP group_id");
+        }
+
+        if ($schema->hasTable($this->contactScoreTableName)) {
+            $this->addSql("DROP TABLE {$this->contactScoreTableName}");
+        }
+        if ($schema->hasTable($this->groupTableName)) {
+            $this->addSql("DROP TABLE {$this->groupTableName}");
+        }
     }
 
     private function generateTableName(string $tableName): string
@@ -145,11 +182,11 @@ final class Version20230621074925 extends PreUpAssertionMigration
         );
     }
 
-    private function assertIndexDoesNotExist(string $tableName, string $indexName): void
+    private function assertForeignKeyDoesNotExist(string $tableName, string $fkName): void
     {
         $this->skipAssertion(
-            fn (Schema $schema) => $schema->getTable("{$tableName}")->hasIndex($indexName),
-            "Index {$indexName} already exists in {$tableName} table"
+            fn (Schema $schema) => $schema->getTable("{$tableName}")->hasForeignKey($fkName),
+            "Foreign key {$fkName} already exists in {$tableName} table"
         );
     }
 }

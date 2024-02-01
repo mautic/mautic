@@ -26,22 +26,19 @@ class ChannelClickQueryBuilderTest extends TestCase
     /**
      * @var MockObject|RandomParameterName
      */
-    private $randomParameterMock;
+    private \PHPUnit\Framework\MockObject\MockObject $randomParameterMock;
 
     /**
      * @var MockObject|EventDispatcherInterface
      */
-    private $dispatcherMock;
+    private \PHPUnit\Framework\MockObject\MockObject $dispatcherMock;
 
     /**
      * @var Connection|MockObject
      */
-    private $connectionMock;
+    private \PHPUnit\Framework\MockObject\MockObject $connectionMock;
 
-    /**
-     * @var ChannelClickQueryBuilder
-     */
-    private $queryBuilder;
+    private \Mautic\LeadBundle\Segment\Query\Filter\ChannelClickQueryBuilder $queryBuilder;
 
     public function setUp(): void
     {

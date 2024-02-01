@@ -22,12 +22,9 @@ use Symfony\Component\HttpFoundation\Response;
 
 class CacheController extends CommonController
 {
-    private Config $config;
-    private Allowlist $allowlist;
-
     public function __construct(
-        Config $config,
-        Allowlist $allowlist,
+        private Config $config,
+        private Allowlist $allowlist,
         ManagerRegistry $doctrine,
         MauticFactory $factory,
         ModelFactory $modelFactory,
@@ -39,9 +36,6 @@ class CacheController extends CommonController
         RequestStack $requestStack,
         CorePermissions $security
     ) {
-        $this->config          = $config;
-        $this->allowlist       = $allowlist;
-
         parent::__construct($doctrine, $factory, $modelFactory, $userHelper, $coreParametersHelper, $dispatcher, $translator, $flashBag, $requestStack, $security);
     }
 
@@ -58,7 +52,7 @@ class CacheController extends CommonController
         $this->allowlist->clearCache();
 
         return $this->forward(
-            'MarketplaceBundle:Package\List:list'
+            'Mautic\MarketplaceBundle\Controller\Package\ListController::listAction'
         );
     }
 }

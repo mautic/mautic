@@ -165,7 +165,7 @@ final class LeadListTest extends \PHPUnit\Framework\TestCase
         Assert::assertSame($changes, $segment->getChanges());
     }
 
-    public function setIsGlobalDataProvider(): iterable
+    public static function setIsGlobalDataProvider(): iterable
     {
         yield [null, false, ['isGlobal' => [true, false]]];
         yield [true, true, []];
@@ -187,7 +187,7 @@ final class LeadListTest extends \PHPUnit\Framework\TestCase
         Assert::assertSame($changes, $segment->getChanges());
     }
 
-    public function setIsPreferenceCenterDataProvider(): iterable
+    public static function setIsPreferenceCenterDataProvider(): iterable
     {
         yield [null, false, []];
         yield [true, true, ['isPreferenceCenter' => [false, true]]];

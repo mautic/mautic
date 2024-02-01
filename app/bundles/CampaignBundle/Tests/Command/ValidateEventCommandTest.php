@@ -7,12 +7,12 @@ use Mautic\CampaignBundle\Executioner\ScheduledExecutioner;
 
 class ValidateEventCommandTest extends AbstractCampaignCommand
 {
-    public function testEventsAreExecutedForInactiveEventWithSingleContact()
+    public function testEventsAreExecutedForInactiveEventWithSingleContact(): void
     {
         $this->runCommand('mautic:campaigns:trigger', ['-i' => 1, '--contact-id' => 1]);
 
         // Wait 6 seconds then execute the campaign again to send scheduled events
-        $this->getContainer()->get(ScheduledExecutioner::class)->setNowTime(new \DateTime('+'.self::CONDITION_SECONDS.' seconds'));
+        static::getContainer()->get(ScheduledExecutioner::class)->setNowTime(new \DateTime('+'.self::CONDITION_SECONDS.' seconds'));
         $this->runCommand('mautic:campaigns:trigger', ['-i' => 1, '--contact-id' => 1]);
 
         // No open email decisions should be recorded yet
@@ -20,7 +20,7 @@ class ValidateEventCommandTest extends AbstractCampaignCommand
         $this->assertCount(0, $byEvent[3]);
 
         // Wait 6 seconds to go beyond the inaction timeframe
-        $this->getContainer()->get(InactiveExecutioner::class)->setNowTime(new \DateTime('+'.(self::CONDITION_SECONDS * 2).' seconds'));
+        static::getContainer()->get(InactiveExecutioner::class)->setNowTime(new \DateTime('+'.(self::CONDITION_SECONDS * 2).' seconds'));
 
         // Now they should be inactive
         $this->runCommand('mautic:campaigns:validate', ['--decision-id' => 3, '--contact-id' => 1]);
@@ -31,12 +31,12 @@ class ValidateEventCommandTest extends AbstractCampaignCommand
         $this->assertCount(0, $byEvent[10]); // the positive path should be 0
     }
 
-    public function testEventsAreExecutedForInactiveEventWithMultipleContact()
+    public function testEventsAreExecutedForInactiveEventWithMultipleContact(): void
     {
         $this->runCommand('mautic:campaigns:trigger', ['-i' => 1, '--contact-ids' => '1,2,3']);
 
         // Wait 6 seconds then execute the campaign again to send scheduled events
-        $this->getContainer()->get(ScheduledExecutioner::class)->setNowTime(new \DateTime('+'.self::CONDITION_SECONDS.' seconds'));
+        static::getContainer()->get(ScheduledExecutioner::class)->setNowTime(new \DateTime('+'.self::CONDITION_SECONDS.' seconds'));
         $this->runCommand('mautic:campaigns:trigger', ['-i' => 1, '--contact-ids' => '1,2,3']);
 
         // No open email decisions should be recorded yet
@@ -44,7 +44,7 @@ class ValidateEventCommandTest extends AbstractCampaignCommand
         $this->assertCount(0, $byEvent[3]);
 
         // Wait 6 seconds to go beyond the inaction timeframe
-        $this->getContainer()->get(InactiveExecutioner::class)->setNowTime(new \DateTime('+'.(self::CONDITION_SECONDS * 2).' seconds'));
+        static::getContainer()->get(InactiveExecutioner::class)->setNowTime(new \DateTime('+'.(self::CONDITION_SECONDS * 2).' seconds'));
 
         // Now they should be inactive
         $this->runCommand('mautic:campaigns:validate', ['--decision-id' => 3, '--contact-ids' => '1,2,3']);
@@ -55,12 +55,12 @@ class ValidateEventCommandTest extends AbstractCampaignCommand
         $this->assertCount(0, $byEvent[10]); // the positive path should be 0
     }
 
-    public function testContactsRemovedFromTheCampaignAreNotExecutedForInactiveEvents()
+    public function testContactsRemovedFromTheCampaignAreNotExecutedForInactiveEvents(): void
     {
         $this->runCommand('mautic:campaigns:trigger', ['-i' => 1, '--contact-ids' => '1,2,3']);
 
         // Wait 6 seconds then execute the campaign again to send scheduled events
-        $this->getContainer()->get(ScheduledExecutioner::class)->setNowTime(new \DateTime('+'.self::CONDITION_SECONDS.' seconds'));
+        static::getContainer()->get(ScheduledExecutioner::class)->setNowTime(new \DateTime('+'.self::CONDITION_SECONDS.' seconds'));
         $this->runCommand('mautic:campaigns:trigger', ['-i' => 1, '--contact-ids' => '1,2,3']);
 
         // No open email decisions should be recorded yet
@@ -68,13 +68,13 @@ class ValidateEventCommandTest extends AbstractCampaignCommand
         $this->assertCount(0, $byEvent[3]);
 
         // Wait 6 seconds to go beyond the inaction timeframe
-        $this->getContainer()->get(InactiveExecutioner::class)->setNowTime(new \DateTime('+'.(self::CONDITION_SECONDS * 2).' seconds'));
+        static::getContainer()->get(InactiveExecutioner::class)->setNowTime(new \DateTime('+'.(self::CONDITION_SECONDS * 2).' seconds'));
 
         // Remove a contact from the campaign
         $this->db->createQueryBuilder()->update(MAUTIC_TABLE_PREFIX.'campaign_leads')
             ->set('manually_removed', 1)
             ->where('lead_id = 1')
-            ->execute();
+            ->executeStatement();
 
         // Now they should be inactive
         $this->runCommand('mautic:campaigns:validate', ['--decision-id' => 3, '--contact-ids' => '1,2,3']);

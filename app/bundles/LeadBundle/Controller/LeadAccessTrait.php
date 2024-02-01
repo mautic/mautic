@@ -5,17 +5,12 @@ namespace Mautic\LeadBundle\Controller;
 use Mautic\LeadBundle\Entity\Lead;
 use Symfony\Component\HttpFoundation\Response;
 
-/**
- * Class LeadAccessTrait.
- */
 trait LeadAccessTrait
 {
     /**
      * Determines if the user has access to the lead the note is for.
      *
-     * @param $lead
-     * @param bool   $isPlugin
-     * @param string $intgegration
+     * @param bool $isPlugin
      *
      * @return Response|Lead
      */

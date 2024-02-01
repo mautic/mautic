@@ -19,17 +19,17 @@ class CompanyObjectHelperTest extends TestCase
     /**
      * @var CompanyModel|\PHPUnit\Framework\MockObject\MockObject
      */
-    private $model;
+    private \PHPUnit\Framework\MockObject\MockObject $model;
 
     /**
      * @var CompanyRepository|\PHPUnit\Framework\MockObject\MockObject
      */
-    private $repository;
+    private \PHPUnit\Framework\MockObject\MockObject $repository;
 
     /**
      * @var Connection|\PHPUnit\Framework\MockObject\MockObject
      */
-    private $connection;
+    private \PHPUnit\Framework\MockObject\MockObject $connection;
 
     protected function setUp(): void
     {
@@ -94,6 +94,35 @@ class CompanyObjectHelperTest extends TestCase
             $this->assertTrue(isset($objects[$objectMapping->getIntegrationObjectId()]));
             $this->assertEquals($objects[$objectMapping->getIntegrationObjectId()]->getMappedObjectId(), $objectMapping->getIntegrationObjectId());
         }
+    }
+
+    public function testFindObjectById(): void
+    {
+        $company = new Company();
+        $this->repository->expects(self::once())
+            ->method('getEntity')
+            ->with(1)
+            ->willReturn($company);
+
+        self::assertSame($company, $this->getObjectHelper()->findObjectById(1));
+    }
+
+    public function testFindObjectByIdReturnsNull(): void
+    {
+        $this->repository->expects(self::once())
+            ->method('getEntity')
+            ->with(1);
+
+        self::assertNull($this->getObjectHelper()->findObjectById(1));
+    }
+
+    public function testSetFieldValues(): void
+    {
+        $company = new Company();
+        $this->model->expects(self::once())
+            ->method('setFieldValues')
+            ->with($company, []);
+        $this->getObjectHelper()->setFieldValues($company);
     }
 
     public function testUpdateEmpty(): void

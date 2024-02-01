@@ -31,12 +31,9 @@ class HttpFactory implements AuthProviderInterface
      *
      * @var Client[]
      */
-    private $initializedClients = [];
+    private array $initializedClients = [];
 
-    /**
-     * @var HeaderCredentialsInterface|ParameterCredentialsInterface
-     */
-    private $credentials;
+    private HeaderCredentialsInterface|ParameterCredentialsInterface|null $credentials = null;
 
     public function getAuthType(): string
     {
@@ -44,7 +41,7 @@ class HttpFactory implements AuthProviderInterface
     }
 
     /**
-     * @param HeaderCredentialsInterface|ParameterCredentialsInterface|AuthCredentialsInterface $credentials
+     * @param HeaderCredentialsInterface|ParameterCredentialsInterface $credentials
      *
      * @throws PluginNotConfiguredException
      * @throws InvalidCredentialsException
@@ -106,11 +103,9 @@ class HttpFactory implements AuthProviderInterface
 
         $handler->unshift(
             Middleware::mapRequest(
-                function (Request $request) {
-                    return $request->withUri(
-                        Uri::withQueryValue($request->getUri(), $this->credentials->getKeyName(), $this->credentials->getApiKey())
-                    );
-                }
+                fn (Request $request) => $request->withUri(
+                    Uri::withQueryValue($request->getUri(), $this->credentials->getKeyName(), $this->credentials->getApiKey())
+                )
             )
         );
 

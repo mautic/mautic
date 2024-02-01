@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Mautic\WebhookBundle\Command;
 
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
-use Mautic\WebhookBundle\Entity\LogRepository;
 use Mautic\WebhookBundle\Model\WebhookModel;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
@@ -18,16 +17,13 @@ class DeleteWebhookLogsCommand extends Command
 {
     public const COMMAND_NAME = 'mautic:webhooks:delete_logs';
 
-    /** @var LogRepository */
-    private $logRepository;
+    private \Mautic\WebhookBundle\Entity\LogRepository $logRepository;
 
-    /** @var CoreParametersHelper */
-    private $coreParametersHelper;
-
-    public function __construct(WebhookModel $webhookModel, CoreParametersHelper $coreParametersHelper)
-    {
+    public function __construct(
+        WebhookModel $webhookModel,
+        private CoreParametersHelper $coreParametersHelper
+    ) {
         $this->logRepository        = $webhookModel->getLogRepository();
-        $this->coreParametersHelper = $coreParametersHelper;
 
         parent::__construct();
     }
@@ -51,5 +47,6 @@ class DeleteWebhookLogsCommand extends Command
 
         return \Symfony\Component\Console\Command\Command::SUCCESS;
     }
+
     protected static $defaultDescription = 'Retains a rolling number of log records.';
 }
