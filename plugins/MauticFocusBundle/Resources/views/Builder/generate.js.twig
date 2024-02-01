@@ -96,10 +96,6 @@
                     document.dispatchEvent(new CustomEvent("focus_{{ focus.id }}_close"));
                 });
 
-                document.addEventListener('click', function (event) {
-                    document.dispatchEvent(new CustomEvent("focus_{{ focus.id }}_close"));
-                });
-
                 document.addEventListener("focus_{{ focus.id }}_close", function (event) {
                     // Prevent multiple engagements for link clicks on exit intent
                     Focus.modalsDismissed["{{ focus.id }}"] = true;
