@@ -140,9 +140,9 @@ EOT
                 'userName'  => 'system',
                 'userId'    => 0,
                 'bundle'    => 'core',
-                'object'    => 'core',
+                'object'    => 'maintenance',
                 'objectId'  => 0,
-                'action'    => 'maintenance',
+                'action'    => 'cleanup',
                 'details'   => [
                     'options' => array_filter($options),
                     'stats'   => $notEmptyStats,
