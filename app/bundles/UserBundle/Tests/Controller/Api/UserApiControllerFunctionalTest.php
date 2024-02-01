@@ -53,8 +53,8 @@ class UserApiControllerFunctionalTest extends MauticMysqlTestCase
         $this->em->clear();
 
         // Login newly created non-admin user
-        $this->loginUser($user->getUsername());
-        $this->client->setServerParameter('PHP_AUTH_USER', $user->getUsername());
+        $this->loginUser($user->getUserIdentifier());
+        $this->client->setServerParameter('PHP_AUTH_USER', $user->getUserIdentifier());
         $this->client->setServerParameter('PHP_AUTH_PW', 'mautic');
 
         $this->client->request(Request::METHOD_PATCH, "/api/users/{$user->getId()}/edit", ['role' => $role->getId()]);
@@ -76,14 +76,14 @@ class UserApiControllerFunctionalTest extends MauticMysqlTestCase
         $this->em->clear();
 
         // Login newly created admin user
-        $this->loginUser($user->getUsername());
-        $this->client->setServerParameter('PHP_AUTH_USER', $user->getUsername());
+        $this->loginUser($user->getUserIdentifier());
+        $this->client->setServerParameter('PHP_AUTH_USER', $user->getUserIdentifier());
         $this->client->setServerParameter('PHP_AUTH_PW', 'mautic');
 
         $this->client->request(Request::METHOD_PATCH, "/api/users/{$user->getId()}/edit", ['role' => $role->getId()]);
         $clientResponse = $this->client->getResponse();
         Assert::assertSame(Response::HTTP_OK, $clientResponse->getStatusCode());
-        Assert::assertStringContainsString('"username":"'.$user->getUsername().'"', $clientResponse->getContent());
+        Assert::assertStringContainsString('"username":"'.$user->getUserIdentifier().'"', $clientResponse->getContent());
     }
 
     public function testRoleUpdateByApiThroughNonAdminUserGivesSuccessResponse(): void
@@ -97,14 +97,14 @@ class UserApiControllerFunctionalTest extends MauticMysqlTestCase
         $this->em->flush();
         $this->em->clear();
 
-        $this->loginUser($user->getUsername());
-        $this->client->setServerParameter('PHP_AUTH_USER', $user->getUsername());
+        $this->loginUser($user->getUserIdentifier());
+        $this->client->setServerParameter('PHP_AUTH_USER', $user->getUserIdentifier());
         $this->client->setServerParameter('PHP_AUTH_PW', 'mautic');
 
         $this->client->request(Request::METHOD_PATCH, "/api/users/{$user->getId()}/edit", ['role' => $role->getId()]);
         $clientResponse = $this->client->getResponse();
         Assert::assertSame(Response::HTTP_OK, $clientResponse->getStatusCode());
-        Assert::assertStringContainsString('"username":"'.$user->getUsername().'"', $clientResponse->getContent());
+        Assert::assertStringContainsString('"username":"'.$user->getUserIdentifier().'"', $clientResponse->getContent());
     }
 
     /**
@@ -165,7 +165,7 @@ class UserApiControllerFunctionalTest extends MauticMysqlTestCase
         $user->setLastName('Doe');
         $user->setUsername('john.doe');
         $user->setEmail('john.doe@email.com');
-        $encoder = self::$container->get('security.encoder_factory')->getEncoder($user);
+        $encoder = static::getContainer()->get('security.encoder_factory')->getEncoder($user);
         $user->setPassword($encoder->encodePassword('mautic', null));
         $user->setRole($role);
         $this->em->persist($user);

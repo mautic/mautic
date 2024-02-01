@@ -24,7 +24,7 @@ class FieldValidationHelper
     }
 
     /**
-     * @param FormInterface<FormInterface> $form
+     * @param FormInterface<mixed> $form
      */
     public function validateRequiredFields(FormInterface $form, ConfigFormSyncInterface $integrationObject, array $fieldMappings): void
     {

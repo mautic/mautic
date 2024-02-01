@@ -17,6 +17,7 @@ use Mautic\CoreBundle\Entity\VariantEntityInterface;
 use Mautic\CoreBundle\Entity\VariantEntityTrait;
 use Mautic\CoreBundle\Helper\EmojiHelper;
 use Mautic\CoreBundle\Helper\UrlHelper;
+use Mautic\EmailBundle\Validator\EmailOrEmailTokenList;
 use Mautic\FormBundle\Entity\Form;
 use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\LeadBundle\Form\Validator\Constraints\LeadListAccess;
@@ -340,11 +341,7 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
 
         $metadata->addPropertyConstraint(
             'fromAddress',
-            new \Symfony\Component\Validator\Constraints\Email(
-                [
-                    'message' => 'mautic.core.email.required',
-                ]
-            )
+            new EmailOrEmailTokenList(),
         );
 
         $metadata->addPropertyConstraint(

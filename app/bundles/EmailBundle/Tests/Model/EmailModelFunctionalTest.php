@@ -29,8 +29,8 @@ class EmailModelFunctionalTest extends MauticMysqlTestCase
         $this->addContactsToSegment($contacts, $segment);
         $email = $this->createEmail($segment);
 
-        $emailModel                                             =  self::$container->get('mautic.email.model.email');
-
+        $emailModel                                             =  static::getContainer()->get('mautic.email.model.email');
+        \assert($emailModel instanceof EmailModel);
         [$sentCount] = $emailModel->sendEmailToLists($email, [$segment], null, null, null, null, null, 3, 1);
         $this->assertEquals($sentCount, 7);
         [$sentCount] = $emailModel->sendEmailToLists($email, [$segment], null, null, null, null, null, 3, 2);
@@ -52,7 +52,7 @@ class EmailModelFunctionalTest extends MauticMysqlTestCase
             $contacts[] = $contact;
         }
 
-        $contactModel = self::$container->get('mautic.lead.model.lead');
+        $contactModel = static::getContainer()->get('mautic.lead.model.lead');
         \assert($contactModel instanceof LeadModel);
         $contactModel->saveEntities($contacts);
 
@@ -111,7 +111,7 @@ class EmailModelFunctionalTest extends MauticMysqlTestCase
         $this->addContactsToSegment($contacts, $segment);
         $email = $this->createEmail($segment);
 
-        $emailModel                                             =  self::$container->get('mautic.email.model.email');
+        $emailModel                                             =  static::getContainer()->get('mautic.email.model.email');
         [$sentCount, $failedCount, $failedRecipientsByList]     = $emailModel->sendEmailToLists($email, [$segment], 4, 2);
         $this->assertEquals($sentCount, 4);
         [$sentCount, $failedCount, $failedRecipientsByList] = $emailModel->sendEmailToLists($email, [$segment], 3, 2);
@@ -161,7 +161,7 @@ class EmailModelFunctionalTest extends MauticMysqlTestCase
        $this->em->detach($childrenEmail);
 
        /** @var EmailModel $emailModel */
-       $emailModel = self::$container->get('mautic.email.model.email');
+       $emailModel = static::getContainer()->get('mautic.email.model.email');
        $parentEmail->setName('Test change');
        $emailModel->saveEntity($parentEmail);
 

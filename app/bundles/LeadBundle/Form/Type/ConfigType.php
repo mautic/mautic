@@ -13,6 +13,9 @@ use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
+/**
+ * @extends AbstractType<mixed>
+ */
 class ConfigType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options): void

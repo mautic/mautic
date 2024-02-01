@@ -6,9 +6,37 @@ use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\ReportBundle\Entity\Report;
 use PHPUnit\Framework\Assert;
+use Symfony\Component\HttpFoundation\Request;
 
 class ReportControllerFunctionalTest extends MauticMysqlTestCase
 {
+    public function testCreatingNewReportAndClone(): void
+    {
+        $crawler = $this->client->request(Request::METHOD_GET, '/s/reports/new/');
+        Assert::assertTrue($this->client->getResponse()->isOk(), $this->client->getResponse()->getContent());
+
+        $saveButton = $crawler->selectButton('Save');
+        $form       = $saveButton->form();
+        $form['report[name]']->setValue('Report ABC');
+
+        $this->client->submit($form);
+        Assert::assertTrue($this->client->getResponse()->isOk(), $this->client->getResponse()->getContent());
+        $report = $this->em->getRepository(Report::class)->findOneBy(['name' => 'Report ABC']);
+
+        $crawler = $this->client->request(Request::METHOD_GET, "/s/reports/clone/{$report->getId()}");
+        Assert::assertTrue($this->client->getResponse()->isOk(), $this->client->getResponse()->getContent());
+
+        $saveButton = $crawler->selectButton('Save');
+        $form       = $saveButton->form();
+        $form['report[name]']->setValue('Report ABC - cloned');
+
+        $this->client->submit($form);
+        Assert::assertTrue($this->client->getResponse()->isOk(), $this->client->getResponse()->getContent());
+        $reportClone = $this->em->getRepository(Report::class)->findOneBy(['name' => 'Report ABC - cloned']);
+
+        Assert::assertSame($report->getId() + 1, $reportClone->getId());
+    }
+
     public function testContactReportwithComanyDateAddedColumn(): void
     {
         $report = new Report();
@@ -21,7 +49,7 @@ class ReportControllerFunctionalTest extends MauticMysqlTestCase
         ];
         $report->setColumns($coulmns);
 
-        $this->getContainer()->get('mautic.report.model.report')->saveEntity($report);
+        static::getContainer()->get('mautic.report.model.report')->saveEntity($report);
 
         // Check the details page
         $this->client->request('GET', '/s/reports/view/'.$report->getId());
@@ -30,7 +58,7 @@ class ReportControllerFunctionalTest extends MauticMysqlTestCase
 
     public function testEmailReportWithAggregatedColumnsAndTotals(): void
     {
-        $contactModel = self::$container->get('mautic.lead.model.lead');
+        $contactModel = static::getContainer()->get('mautic.lead.model.lead');
 
         // Create and save contacts
         $payload = [
@@ -112,7 +140,7 @@ class ReportControllerFunctionalTest extends MauticMysqlTestCase
                 'function'  => 'AVG',
             ],
         ]);
-        self::$container->get('mautic.report.model.report')->saveEntity($report);
+        static::getContainer()->get('mautic.report.model.report')->saveEntity($report);
 
         // Expected report table values [ID, Company name, MIN Points, Max Points, SUM Points, COUNT Points, AVG Points]
         $expected = [

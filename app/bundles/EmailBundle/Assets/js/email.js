@@ -87,6 +87,13 @@ Mautic.emailOnLoad = function (container, response) {
            Mautic.loadEmailDeliveredStat(mQuery(el));
         });
     }
+
+    var $loadEmailUsage = mQuery('[data-fetch-email-usages]');
+    if ($loadEmailUsage.length) {
+        $loadEmailUsage.each(function(i, el) {
+           Mautic.loadEmailUsages(mQuery(el));
+        });
+    }
 };
 
 Mautic.emailOnUnload = function(id) {
@@ -806,5 +813,13 @@ Mautic.loadEmailDeliveredStat = function($el) {
             var delivered = response.delivered;
             $el.html(delivered);
         }
+    }, false, true, "GET");
+};
+
+Mautic.loadEmailUsages = function($el) {
+    var emailId = $el.data('fetch-email-usages');
+    Mautic.ajaxActionRequest('email:getEmailUsages', {id: emailId}, function(response){
+        var usagesHtml = response.usagesHtml;
+        $el.html(usagesHtml);
     }, false, true, "GET");
 };
