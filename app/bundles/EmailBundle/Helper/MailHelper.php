@@ -23,6 +23,7 @@ use Mautic\EmailBundle\MonitoredEmail\Mailbox;
 use Mautic\LeadBundle\Entity\Lead;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Mailer\Exception\TransportExceptionInterface;
 use Symfony\Component\Mailer\MailerInterface;
@@ -1435,6 +1436,12 @@ class MailHelper
         }
 
         $request = $this->requestStack->getCurrentRequest();
+        if (empty($request)) {
+            // likely in a test as the request is not populated for outside the container
+            $request      = Request::createFromGlobals();
+            $requestStack = new RequestStack();
+            $requestStack->push($request);
+        }
         $parser  = new PlainTextHelper([
             'base_url' => $request->getSchemeAndHttpHost().$request->getBasePath(),
         ]);
