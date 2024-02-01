@@ -23,8 +23,6 @@ final class FormFieldExtension extends AbstractExtension
     /**
      * Clean input evil attributes to prevent XSS
      * Remove any attribute starting with "on" or xmlns or javascript:. Used in href, src, value, data, etc.
-     *
-     * @return string
      */
     public function cleanInputAttributes(string $value): string
     {
