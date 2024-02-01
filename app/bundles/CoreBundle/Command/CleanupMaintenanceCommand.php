@@ -21,11 +21,16 @@ use Symfony\Contracts\Translation\TranslatorInterface;
  */
 class CleanupMaintenanceCommand extends ModeratedCommand
 {
-    protected static $defaultDescription = 'Updates the Mautic application';
     public const NAME                    = 'mautic:maintenance:cleanup';
 
-    public function __construct(private TranslatorInterface $translator, private EventDispatcherInterface $dispatcher, protected PathsHelper $pathsHelper, CoreParametersHelper $coreParametersHelper, private AuditLogModel $auditLogModel, private IpLookupHelper $ipLookupHelper)
-    {
+    public function __construct(
+        private TranslatorInterface $translator,
+        private EventDispatcherInterface $dispatcher,
+        PathsHelper $pathsHelper,
+        CoreParametersHelper $coreParametersHelper,
+        private AuditLogModel $auditLogModel,
+        private IpLookupHelper $ipLookupHelper
+    ) {
         parent::__construct($pathsHelper, $coreParametersHelper);
     }
 
@@ -152,4 +157,6 @@ EOT
             $this->auditLogModel->writeToLog($log);
         }
     }
+
+    protected static $defaultDescription = 'Updates the Mautic application';
 }

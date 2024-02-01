@@ -23,7 +23,7 @@ class CleanupMaintenanceCommandTest extends MauticMysqlTestCase
 
         $this->runcommand('mautic:maintenance:cleanup', ['--days-old' => 180, '--no-interaction' => true]);
 
-        $this->assertNull($this->getContainer()->get('mautic.lead.model.lead')->getEntity($contactId));
+        $this->assertNull(static::getContainer()->get('mautic.lead.model.lead')->getEntity($contactId));
 
         // get last row sql query from audit_log table
         $sql    = 'SELECT * FROM '.MAUTIC_TABLE_PREFIX.'audit_log ORDER BY id DESC LIMIT 1';
