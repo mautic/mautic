@@ -18,21 +18,9 @@ class DeleteContactSecondaryCompaniesCommand extends Command
     protected static $defaultDescription = 'Deletes all contact\'s secondary companies.';
     public const NAME                    = 'mautic:contact:delete:secondary-companies';
 
-    private LoggerInterface $logger;
-
-    private TranslatorInterface $translator;
-
-    private CoreParametersHelper $coreParametersHelper;
-
-    private CompanyLeadRepository $companyLeadsRepository;
-
-    public function __construct(LoggerInterface $logger, TranslatorInterface $translator, CoreParametersHelper $coreParametersHelper, CompanyLeadRepository $companyLeadsRepository)
+    public function __construct(private LoggerInterface $logger, private TranslatorInterface $translator, private CoreParametersHelper $coreParametersHelper, private CompanyLeadRepository $companyLeadsRepository)
     {
         parent::__construct();
-        $this->logger                 = $logger;
-        $this->translator             = $translator;
-        $this->coreParametersHelper   = $coreParametersHelper;
-        $this->companyLeadsRepository = $companyLeadsRepository;
     }
 
     /**
