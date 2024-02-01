@@ -16,6 +16,8 @@ use Mautic\UserBundle\Entity\User;
 use Symfony\Bundle\FrameworkBundle\Routing\Router;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 
 /**
@@ -32,6 +34,7 @@ class MauticFactory
         private CorePermissions $security,
         private AuthorizationCheckerInterface $authorizationChecker,
         private UserHelper $userHelper,
+        private RequestStack $requestStack,
         private ManagerRegistry $doctrine,
         private Translator $translator
     ) {
@@ -140,6 +143,24 @@ class MauticFactory
     public function getDispatcher()
     {
         return $this->container->get('event_dispatcher');
+    }
+
+    /**
+     * Retrieves request.
+     *
+     * @return \Symfony\Component\HttpFoundation\Request|null
+     */
+    public function getRequest()
+    {
+        $request = $this->requestStack->getCurrentRequest();
+        if (empty($request)) {
+            // likely in a test as the request is not populated for outside the container
+            $request      = Request::createFromGlobals();
+            $requestStack = new RequestStack();
+            $requestStack->push($request);
+        }
+
+        return $request;
     }
 
     /**
