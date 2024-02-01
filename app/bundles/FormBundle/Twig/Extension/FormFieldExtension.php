@@ -26,7 +26,7 @@ final class FormFieldExtension extends AbstractExtension
      *
      * @return string
      */
-    public function cleanInputAttributes(string $value)
+    public function cleanInputAttributes(string $value): string
     {
         // Remove any HTML tags
         $value = htmlspecialchars($value, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8', false);
