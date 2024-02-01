@@ -4,13 +4,12 @@ namespace Mautic\LeadBundle\Tests\Entity;
 
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\LeadBundle\Entity\Lead;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 
 class LeadRepositoryFunctionalTest extends MauticMysqlTestCase
 {
-    /**
-     * @var Lead
-     */
-    private $lead;
+    private \Mautic\LeadBundle\Entity\Lead $lead;
 
     protected function setUp(): void
     {
@@ -19,9 +18,9 @@ class LeadRepositoryFunctionalTest extends MauticMysqlTestCase
         $this->lead = $this->createLead();
     }
 
-    public function testPointsAreAdded()
+    public function testPointsAreAdded(): void
     {
-        $model = self::$container->get('mautic.lead.model.lead');
+        $model = static::getContainer()->get('mautic.lead.model.lead');
 
         $this->lead->adjustPoints(100);
 
@@ -33,9 +32,9 @@ class LeadRepositoryFunctionalTest extends MauticMysqlTestCase
         $this->assertEquals(200, $changes['points'][1]);
     }
 
-    public function testPointsAreSubtracted()
+    public function testPointsAreSubtracted(): void
     {
-        $model = self::$container->get('mautic.lead.model.lead');
+        $model = static::getContainer()->get('mautic.lead.model.lead');
 
         $this->lead->adjustPoints(100, Lead::POINTS_SUBTRACT);
 
@@ -47,9 +46,9 @@ class LeadRepositoryFunctionalTest extends MauticMysqlTestCase
         $this->assertEquals(0, $changes['points'][1]);
     }
 
-    public function testPointsAreMultiplied()
+    public function testPointsAreMultiplied(): void
     {
-        $model = self::$container->get('mautic.lead.model.lead');
+        $model = static::getContainer()->get('mautic.lead.model.lead');
 
         $this->lead->adjustPoints(2, Lead::POINTS_MULTIPLY);
 
@@ -61,9 +60,9 @@ class LeadRepositoryFunctionalTest extends MauticMysqlTestCase
         $this->assertEquals(200, $changes['points'][1]);
     }
 
-    public function testPointsAreDivided()
+    public function testPointsAreDivided(): void
     {
-        $model = self::$container->get('mautic.lead.model.lead');
+        $model = static::getContainer()->get('mautic.lead.model.lead');
 
         $this->lead->adjustPoints(2, Lead::POINTS_DIVIDE);
 
@@ -75,9 +74,9 @@ class LeadRepositoryFunctionalTest extends MauticMysqlTestCase
         $this->assertEquals(50, $changes['points'][1]);
     }
 
-    public function testMixedOperatorPointsAreCalculated()
+    public function testMixedOperatorPointsAreCalculated(): void
     {
-        $model = self::$container->get('mautic.lead.model.lead');
+        $model = static::getContainer()->get('mautic.lead.model.lead');
 
         $this->lead->adjustPoints(100, Lead::POINTS_SUBTRACT);
         $this->lead->adjustPoints(120, Lead::POINTS_ADD);
@@ -92,9 +91,9 @@ class LeadRepositoryFunctionalTest extends MauticMysqlTestCase
         $this->assertEquals(60, $changes['points'][1]);
     }
 
-    public function testMixedModelAndRepositorySavesDoNotDoublePoints()
+    public function testMixedModelAndRepositorySavesDoNotDoublePoints(): void
     {
-        $model = self::$container->get('mautic.lead.model.lead');
+        $model = static::getContainer()->get('mautic.lead.model.lead');
         $this->lead->adjustPoints(120, Lead::POINTS_ADD);
         $model->saveEntity($this->lead);
         // Changes should be stored with points
@@ -110,10 +109,84 @@ class LeadRepositoryFunctionalTest extends MauticMysqlTestCase
         $this->assertEquals(220, $this->lead->getPoints());
     }
 
-    private function createLead(): Lead
+    /**
+     * @param string[]|string $emails
+     *
+     * @dataProvider dataForTestAjaxGetLeadsByFieldValue
+     */
+    public function testAjaxGetLeadsByFieldValue($emails, bool $createFlag, int $expectedCount): void
+    {
+        $this->createLeads($emails, $createFlag);
+
+        $payload = [
+            'action' => 'lead:getLeadIdsByFieldValue',
+            'field'  => 'email',
+            'value'  => $emails,
+        ];
+
+        $this->client->request(Request::METHOD_GET, '/s/ajax', $payload, [], $this->createAjaxHeaders());
+        $this->assertEquals(Response::HTTP_OK, $this->client->getResponse()->getStatusCode());
+        $contentArray = json_decode($this->client->getResponse()->getContent(), true);
+
+        $this->assertCount($expectedCount, $contentArray['items']);
+    }
+
+    /**
+     * @return array<string, array<int, int|string|bool|string[]>>
+     */
+    public function dataForTestAjaxGetLeadsByFieldValue(): iterable
+    {
+        yield 'Email passed as string with associated contact' => [
+            'john@doe.com', // Email
+            true,
+            1, // Count
+        ];
+
+        yield 'Email passed as string without associated contact' => [
+            'john@doe.com', // Email
+            false,
+            0, // Count
+        ];
+
+        yield 'Email passed as array with associated contacts' => [
+            ['john@doe.com', 'doe@doe.com'], // Email
+            true,
+            2, // Count
+        ];
+
+        yield 'Email passed as array without associated contacts' => [
+            ['john@doe.com', 'doe@doe.com'], // Email
+            false,
+            0, // Count
+        ];
+    }
+
+    /**
+     * @param string[]|string $emails
+     */
+    private function createLeads($emails, bool $flag): void
+    {
+        if (!$flag) {
+            return;
+        }
+
+        if (!is_array($emails)) {
+            $emails = [$emails];
+        }
+
+        foreach ($emails as $email) {
+            $this->createLead($email);
+        }
+    }
+
+    private function createLead(string $email = ''): Lead
     {
         $lead = new Lead();
         $lead->setPoints(100);
+
+        if ($email) {
+            $lead->setEmail($email);
+        }
 
         $this->em->persist($lead);
         $this->em->flush();

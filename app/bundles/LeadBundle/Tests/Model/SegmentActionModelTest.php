@@ -7,29 +7,16 @@ namespace Mautic\LeadBundle\Tests\Model;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\LeadBundle\Model\SegmentActionModel;
-use PHPUnit\Framework\MockObject\MockObject;
 
 class SegmentActionModelTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var MockObject
-     */
-    private $contactMock5;
+    private \PHPUnit\Framework\MockObject\MockObject $contactMock5;
 
-    /**
-     * @var MockObject
-     */
-    private $contactMock6;
+    private \PHPUnit\Framework\MockObject\MockObject $contactMock6;
 
-    /**
-     * @var MockObject
-     */
-    private $contactModelMock;
+    private \PHPUnit\Framework\MockObject\MockObject $contactModelMock;
 
-    /**
-     * @var SegmentActionModel
-     */
-    private $actionModel;
+    private \Mautic\LeadBundle\Model\SegmentActionModel $actionModel;
 
     protected function setUp(): void
     {

@@ -11,9 +11,6 @@ use MauticPlugin\MauticFocusBundle\FocusEvents;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
-/**
- * Class class PublicController extends CommonController.
- */
 class PublicController extends CommonController
 {
     /**

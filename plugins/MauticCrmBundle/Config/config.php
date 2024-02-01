@@ -177,7 +177,7 @@ return [
         ],
         'other' => [
             'mautic_integration.service.transport' => [
-                'class'     => 'MauticPlugin\MauticCrmBundle\Services\Transport',
+                'class'     => \MauticPlugin\MauticCrmBundle\Services\Transport::class,
                 'arguments' => [
                     'mautic.http.client',
                 ],

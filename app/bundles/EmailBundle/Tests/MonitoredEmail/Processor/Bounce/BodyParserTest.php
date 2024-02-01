@@ -14,10 +14,10 @@ class BodyParserTest extends \PHPUnit\Framework\TestCase
     /**
      * @testdox Test that a BouncedEmail is returned from a bounce detected in the body
      *
-     * @covers  \Mautic\EmailBundle\MonitoredEmail\Processor\Bounce\BodyParser::getBounce()
-     * @covers  \Mautic\EmailBundle\MonitoredEmail\Processor\Bounce\BodyParser::parse()
+     * @covers  \Mautic\EmailBundle\MonitoredEmail\Processor\Bounce\BodyParser::getBounce
+     * @covers  \Mautic\EmailBundle\MonitoredEmail\Processor\Bounce\BodyParser::parse
      */
-    public function testBouncedEmailIsReturnedFromParsedBody()
+    public function testBouncedEmailIsReturnedFromParsedBody(): void
     {
         $message            = new Message();
         $message->textPlain = <<<'BODY'
@@ -50,9 +50,9 @@ BODY;
     /**
      * @testdox Test that an exception is thrown if a bounce cannot be found in the body
      *
-     * @covers  \Mautic\EmailBundle\MonitoredEmail\Processor\Bounce\BodyParser::getBounce()
+     * @covers  \Mautic\EmailBundle\MonitoredEmail\Processor\Bounce\BodyParser::getBounce
      */
-    public function testBounceNotFoundFromBadDsnReport()
+    public function testBounceNotFoundFromBadDsnReport(): void
     {
         $this->expectException(BounceNotFound::class);
 

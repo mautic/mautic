@@ -25,36 +25,46 @@
             <td>
                 <div id="frequency_{{ channel.value }}" class="text-left row">
                     {%- if
-                          showContactFrequency
-                          and (form.lead_channels['frequency_number_' ~ channel.value] is defined and not form.lead_channels['frequency_number_' ~ channel.value].isRendered)
-                          and (form.lead_channels['frequency_time_' ~ channel.value] is defined and not form.lead_channels['frequency_time_' ~ channel.value].isRendered)
+                        form.lead_channels['frequency_number_' ~ channel.value] is defined
+                        and form.lead_channels['frequency_time_' ~ channel.value] is defined
                     %}
-                        <div class="col-md-6">
-                            <label class="text-muted label1">{{ form.lead_channels['frequency_number_' ~ channel.value].vars.label|trans }}</label>
-                            {{ form_widget(form.lead_channels['frequency_number_' ~ channel.value]) }}
-                            {{ form_label(form.lead_channels['frequency_time_' ~ channel.value]) }}
-                            {{ form_widget(form.lead_channels['frequency_time_' ~ channel.value]) }}
-                        </div>
-                    {%- else %}
-                        {%- do form.lead_channels['frequency_time_' ~ channel.value].setRendered(true) %}
-                        {%- do form.lead_channels['frequency_number_' ~ channel.value].setRendered(true) %}
-                    {%- endif %}
+                        {%- if
+                              showContactFrequency
+                              and not form.lead_channels['frequency_number_' ~ channel.value].isRendered
+                              and not form.lead_channels['frequency_time_' ~ channel.value].isRendered
+                        %}
+                            <div class="col-md-6">
+                                <label class="text-muted label1">{{ form.lead_channels['frequency_number_' ~ channel.value].vars.label|trans }}</label>
+                                {{ form_widget(form.lead_channels['frequency_number_' ~ channel.value]) }}
+                                {{ form_label(form.lead_channels['frequency_time_' ~ channel.value]) }}
+                                {{ form_widget(form.lead_channels['frequency_time_' ~ channel.value]) }}
+                            </div>
+                        {%- else %}
+                            {%- do form.lead_channels['frequency_time_' ~ channel.value].setRendered(true) %}
+                            {%- do form.lead_channels['frequency_number_' ~ channel.value].setRendered(true) %}
+                        {%- endif %}
+                    {%- endif  %}
 
                     {%- if
-                          showContactPauseDates
-                          and (form.lead_channels['contact_pause_start_date_' ~ channel.value] is defined and not form.lead_channels['contact_pause_start_date_' ~ channel.value].isRendered)
-                          and (form.lead_channels['contact_pause_end_date_' ~ channel.value] is defined and not form.lead_channels['contact_pause_end_date_' ~ channel.value].isRendered)
+                          form.lead_channels['contact_pause_start_date_' ~ channel.value] is defined
+                          and form.lead_channels['contact_pause_end_date_' ~ channel.value] is defined
                     %}
-                        <div class="col-md-6">
-                            <label class="text-muted label3">{{ 'mautic.lead.frequency.dates.label'|trans }}</label>
-                            {{ form_widget(form.lead_channels['contact_pause_start_date_' ~ channel.value]) }}
-                            {{ form_label(form.lead_channels['contact_pause_end_date_' ~ channel.value]) }}
-                            {{ form_widget(form.lead_channels['contact_pause_end_date_' ~ channel.value]) }}
-                        </div>
-                    {%- else %}
-                        {%- do form.lead_channels['contact_pause_start_date_' ~ channel.value].setRendered(true) %}
-                        {%- do form.lead_channels['contact_pause_end_date_' ~ channel.value].setRendered(true) %}
-                    {%- endif %}
+                        {%- if
+                              showContactPauseDates
+                              and not form.lead_channels['contact_pause_start_date_' ~ channel.value].isRendered
+                              and not form.lead_channels['contact_pause_end_date_' ~ channel.value].isRendered
+                        %}
+                            <div class="col-md-6">
+                                <label class="text-muted label3">{{ 'mautic.lead.frequency.dates.label'|trans }}</label>
+                                {{ form_widget(form.lead_channels['contact_pause_start_date_' ~ channel.value]) }}
+                                {{ form_label(form.lead_channels['contact_pause_end_date_' ~ channel.value]) }}
+                                {{ form_widget(form.lead_channels['contact_pause_end_date_' ~ channel.value]) }}
+                            </div>
+                        {%- else %}
+                            {%- do form.lead_channels['contact_pause_start_date_' ~ channel.value].setRendered(true) %}
+                            {%- do form.lead_channels['contact_pause_end_date_' ~ channel.value].setRendered(true) %}
+                        {%- endif %}
+                    {%- endif  %}
                 </div>
             </td>
         </tr>
@@ -82,7 +92,8 @@
                     <label class="text-muted fw-n frequency-label label2">{{ 'mautic.lead.list.frequency.times'|trans }}</label>
                     <select class="form-control">
                         <option value="" selected="selected"></option>
-                    </select></div>
+                    </select>
+                </div>
                 <div class="col-xs-6">
                     <label class="text-muted label3">{{ 'mautic.lead.frequency.dates.label'|trans }}</label>
                     <input type="date" class="form-control">

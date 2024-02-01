@@ -10,37 +10,30 @@ use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
- * Class PageListType.
+ * @extends AbstractType<array<mixed>>
  */
 class PageListType extends AbstractType
 {
-    /**
-     * @var PageModel
-     */
-    private $model;
-
     /**
      * @var bool
      */
     private $canViewOther = false;
 
-    public function __construct(PageModel $pageModel, CorePermissions $corePermissions)
-    {
-        $this->model        = $pageModel;
+    public function __construct(
+        private PageModel $model,
+        CorePermissions $corePermissions
+    ) {
         $this->canViewOther = $corePermissions->isGranted('page:pages:viewother');
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function configureOptions(OptionsResolver $resolver)
+    public function configureOptions(OptionsResolver $resolver): void
     {
         $model        = $this->model;
         $canViewOther = $this->canViewOther;
 
         $resolver->setDefaults(
             [
-                'choices' => function (Options $options) use ($model, $canViewOther) {
+                'choices' => function (Options $options) use ($model, $canViewOther): array {
                     $choices       = [];
                     $publishedOnly = $options['published_only'] ?? false;
                     $pages         = $model->getRepository()->getPageList('', 0, 0, $canViewOther, $options['top_level'], $options['ignore_ids'], [], $publishedOnly);
@@ -69,9 +62,6 @@ class PageListType extends AbstractType
         $resolver->setDefined(['top_level', 'ignore_ids', 'published_only']);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getParent()
     {
         return ChoiceType::class;

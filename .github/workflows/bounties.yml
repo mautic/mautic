@@ -1,0 +1,27 @@
+name: Issue bounties
+on:
+  issues:
+    types: [opened, labeled]
+
+jobs:
+  handle_issue:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js environment
+        uses: actions/setup-node@v2
+        with:
+          node-version: 16
+
+      - name: Install dependencies
+        run: |
+          cd .github/scripts/
+          npm ci
+    
+      - name: Run script
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_CONTEXT: ${{ toJson(github) }}
+        run: node .github/scripts/bounties.js

@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\IntegrationsBundle\Entity;
 
-use Doctrine\DBAL\Connection;
+use Doctrine\DBAL\ArrayParameterType;
 use Doctrine\DBAL\Types\Types;
 use Mautic\CoreBundle\Entity\CommonRepository;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
@@ -14,10 +14,7 @@ use Mautic\CoreBundle\Helper\DateTimeHelper;
  */
 class ObjectMappingRepository extends CommonRepository
 {
-    /**
-     * @return array|null
-     */
-    public function getInternalObject($integration, $integrationObjectName, $integrationObjectId, $internalObjectName)
+    public function getInternalObject($integration, $integrationObjectName, $integrationObjectId, $internalObjectName): ?array
     {
         return $this->doGetInternalObject($integration, $integrationObjectName, $integrationObjectId, $internalObjectName);
     }
@@ -62,10 +59,8 @@ class ObjectMappingRepository extends CommonRepository
      * @param mixed  $oldObjectId
      * @param string $newObjectName
      * @param mixed  $newObjectId
-     *
-     * @return int
      */
-    public function updateIntegrationObject($integration, $oldObjectName, $oldObjectId, $newObjectName, $newObjectId)
+    public function updateIntegrationObject($integration, $oldObjectName, $oldObjectId, $newObjectName, $newObjectId): int
     {
         $qb = $this->getEntityManager()->getConnection()->createQueryBuilder();
 
@@ -155,7 +150,7 @@ class ObjectMappingRepository extends CommonRepository
             ->setParameter('objectName', $objectName);
 
         if (is_array($objectIds)) {
-            $qb->setParameter('objectId', $objectIds, Connection::PARAM_STR_ARRAY);
+            $qb->setParameter('objectId', $objectIds, ArrayParameterType::STRING);
             $qb->andWhere($qb->expr()->in('m.integration_object_id', ':objectId'));
         } else {
             $qb->setParameter('objectId', $objectIds);

@@ -15,7 +15,7 @@ class ParserTest extends \PHPUnit\Framework\TestCase
      * @covers  \Mautic\EmailBundle\MonitoredEmail\Processor\Reply\Parser::parse()
      * @covers  \Mautic\EmailBundle\MonitoredEmail\Processor\Reply\RepliedEmail::getStatHash()
      */
-    public function testThatReplyIsDetectedThroughTrackingPixel()
+    public function testThatReplyIsDetectedThroughTrackingPixel(): void
     {
         $message           = new Message();
         $message->textHtml = <<<'BODY'
@@ -36,7 +36,7 @@ BODY;
      * @covers  \Mautic\EmailBundle\MonitoredEmail\Processor\Reply\Parser::parse()
      * @covers  \Mautic\EmailBundle\MonitoredEmail\Processor\Reply\RepliedEmail::getStatHash()
      */
-    public function testThatReplyIsDetectedThroughTrackingPixelWithUnsubcribeLink()
+    public function testThatReplyIsDetectedThroughTrackingPixelWithUnsubcribeLink(): void
     {
         $message           = new Message();
         $message->textHtml = <<<'BODY'
