@@ -133,7 +133,7 @@ class DoNotContactRepository extends CommonRepository
             );
         }
 
-        return $this->getTimelineResults($query, $options, 'dnc.channel', 'dnc.date_added', [], ['date_added']);
+        return $this->getTimelineResults($query, $options, 'dnc.channel', 'dnc.date_added', [], ['date_added'], null, 'dnc.id');
     }
 
     /**
