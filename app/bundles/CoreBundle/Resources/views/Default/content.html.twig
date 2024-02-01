@@ -1,0 +1,26 @@
+{% set request = app.request %}
+{% set contentOnly = request.get('contentOnly', false) or (contentOnly is defined and contentOnly is not empty) %}
+{% set modalView = request.get('modal', false) or (modalView is defined and modalView is not empty) %}
+{# load base template #}
+{% set template = null %}
+{% if not request.isXmlHttpRequest() and not modalView %}
+    {% set template = contentOnly ? '@MauticCore/Default/slim.html.twig' :  '@MauticCore/Default/base.html.twig' %}
+{% elseif not modalView %}
+    {% set template = '@MauticCore/Default/output.html.twig' %}
+{% endif %}
+{{- '' -}}
+{% if template is not empty %}
+    {{- include(template, {
+        content: block('content') is defined ? block('content') : content|default(''),
+        modal: block('modal') is defined ? block('modal') : modal|default(''),
+        headerTitle: block('headerTitle'),
+        pageTitle: block('pageTitle') is defined ? block('pageTitle') : pageTitle|default(''),
+        publishStatus: block('publishStatus') is defined ? block('publishStatus') : publishStatus|default(''),
+        actions: block('actions') is defined ? block('actions') : actions|default(''),
+        toolbar: block('toolbar') is defined ? block('toolbar') : toolbar|default(''),
+        mauticTemplateVars: mauticTemplateVars|default({}),
+        isXmlHttpRequest: request.isXmlHttpRequest,
+    }) -}}
+{% else %}
+    {{ block('content') }}
+{% endif %}

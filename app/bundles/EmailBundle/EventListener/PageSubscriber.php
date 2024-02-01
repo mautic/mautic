@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2015 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\EmailBundle\EventListener;
 
 use Mautic\CampaignBundle\Executioner\RealTimeExecutioner;
@@ -20,32 +11,14 @@ use Symfony\Component\HttpFoundation\RequestStack;
 
 class PageSubscriber implements EventSubscriberInterface
 {
-    /**
-     * @var EmailModel
-     */
-    private $emailModel;
-
-    /**
-     * @var RealTimeExecutioner
-     */
-    private $realTimeExecutioner;
-
-    /**
-     * @var RequestStack
-     */
-    private $requestStack;
-
-    public function __construct(EmailModel $emailModel, RealTimeExecutioner $realTimeExecutioner, RequestStack $requestStack)
-    {
-        $this->emailModel          = $emailModel;
-        $this->realTimeExecutioner = $realTimeExecutioner;
-        $this->requestStack        = $requestStack;
+    public function __construct(
+        private EmailModel $emailModel,
+        private RealTimeExecutioner $realTimeExecutioner,
+        private RequestStack $requestStack
+    ) {
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             PageEvents::PAGE_ON_HIT => ['onPageHit', 0],
@@ -55,13 +28,13 @@ class PageSubscriber implements EventSubscriberInterface
     /**
      * Trigger point actions for page hits.
      */
-    public function onPageHit(Events\PageHitEvent $event)
+    public function onPageHit(Events\PageHitEvent $event): void
     {
         $hit      = $event->getHit();
         $redirect = $hit->getRedirect();
 
         if ($redirect && $email = $hit->getEmail()) {
-            //click trigger condition
+            // click trigger condition
             $this->realTimeExecutioner->execute('email.click', $hit, 'email', $email->getId());
             // Check for an email stat
             $clickthrough = $event->getClickthroughData();

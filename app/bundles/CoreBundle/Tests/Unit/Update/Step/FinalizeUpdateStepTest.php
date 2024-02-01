@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2020 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        https://www.mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CoreBundle\Tests\Unit\Update\Step;
 
 use Mautic\CoreBundle\Helper\AppVersion;
@@ -16,34 +7,31 @@ use Mautic\CoreBundle\Helper\PathsHelper;
 use Mautic\CoreBundle\Update\Step\FinalizeUpdateStep;
 use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\HttpFoundation\Session\Session;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class FinalizeUpdateStepTest extends AbstractStepTest
 {
     /**
      * @var MockObject|TranslatorInterface
      */
-    private $translator;
+    private \PHPUnit\Framework\MockObject\MockObject $translator;
 
     /**
      * @var MockObject|PathsHelper
      */
-    private $pathsHelper;
+    private \PHPUnit\Framework\MockObject\MockObject $pathsHelper;
 
     /**
      * @var MockObject|Session
      */
-    private $session;
+    private \PHPUnit\Framework\MockObject\MockObject $session;
 
     /**
      * @var MockObject|AppVersion
      */
-    private $appVersion;
+    private \PHPUnit\Framework\MockObject\MockObject $appVersion;
 
-    /**
-     * @var FinalizeUpdateStep
-     */
-    private $step;
+    private \Mautic\CoreBundle\Update\Step\FinalizeUpdateStep $step;
 
     protected function setUp(): void
     {
@@ -57,7 +45,7 @@ class FinalizeUpdateStepTest extends AbstractStepTest
         $this->step = new FinalizeUpdateStep($this->translator, $this->pathsHelper, $this->session, $this->appVersion);
     }
 
-    public function testFinalizationCleansUpFiles()
+    public function testFinalizationCleansUpFiles(): void
     {
         file_put_contents(__DIR__.'/resources/upgrade.php', '');
         file_put_contents(__DIR__.'/resources/lastUpdateCheck.txt', '');
@@ -96,7 +84,7 @@ class FinalizeUpdateStepTest extends AbstractStepTest
         $this->assertEquals($updateSuccessfulKey, trim($this->progressBar->getMessage()));
     }
 
-    public function testFinalizationWithPostUpgradeMessage()
+    public function testFinalizationWithPostUpgradeMessage(): void
     {
         file_put_contents(__DIR__.'/resources/upgrade.php', '');
         file_put_contents(__DIR__.'/resources/lastUpdateCheck.txt', '');

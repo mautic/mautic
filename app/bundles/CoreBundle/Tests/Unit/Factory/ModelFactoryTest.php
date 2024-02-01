@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2020 Mautic Contributors. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CoreBundle\Tests\Unit\Factory;
 
 use Mautic\CoreBundle\Factory\ModelFactory;
@@ -22,12 +13,12 @@ class ModelFactoryTest extends TestCase
     /**
      * @var MockObject|ContainerInterface
      */
-    private $container;
+    private \PHPUnit\Framework\MockObject\MockObject $container;
 
     /**
-     * @var ModelFactory
+     * @var ModelFactory<object>
      */
-    private $factory;
+    private \Mautic\CoreBundle\Factory\ModelFactory $factory;
 
     protected function setUp(): void
     {
@@ -35,7 +26,7 @@ class ModelFactoryTest extends TestCase
         $this->factory   = new ModelFactory($this->container);
     }
 
-    public function testModelKeyIsLowerCaseToMatchServiceKeys()
+    public function testModelKeyIsLowerCaseToMatchServiceKeys(): void
     {
         $pointTriggerModel = $this->createMock(TriggerModel::class);
         $modelName         = 'point.triggerEvent';

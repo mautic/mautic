@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\FormBundle\EventListener;
 
 use Mautic\FormBundle\Entity\SubmissionRepository;
@@ -19,53 +10,20 @@ use Mautic\LeadBundle\LeadEvents;
 use Mautic\PageBundle\Model\PageModel;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Routing\RouterInterface;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class LeadSubscriber implements EventSubscriberInterface
 {
-    /**
-     * @var FormModel
-     */
-    private $formModel;
-
-    /**
-     * @var PageModel
-     */
-    private $pageModel;
-
-    /**
-     * @var SubmissionRepository
-     */
-    private $submissionRepository;
-
-    /**
-     * @var TranslatorInterface
-     */
-    private $translator;
-
-    /**
-     * @var RouterInterface
-     */
-    private $router;
-
     public function __construct(
-        FormModel $formModel,
-        PageModel $pageModel,
-        SubmissionRepository $submissionRepository,
-        TranslatorInterface $translator,
-        RouterInterface $router
+        private FormModel $formModel,
+        private PageModel $pageModel,
+        private SubmissionRepository $submissionRepository,
+        private TranslatorInterface $translator,
+        private RouterInterface $router
     ) {
-        $this->formModel            = $formModel;
-        $this->pageModel            = $pageModel;
-        $this->submissionRepository = $submissionRepository;
-        $this->translator           = $translator;
-        $this->router               = $router;
     }
 
-    /**
-     * @return array
-     */
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             LeadEvents::TIMELINE_ON_GENERATE => ['onTimelineGenerate', 0],
@@ -76,7 +34,7 @@ class LeadSubscriber implements EventSubscriberInterface
     /**
      * Compile events for the lead timeline.
      */
-    public function onTimelineGenerate(LeadTimelineEvent $event)
+    public function onTimelineGenerate(LeadTimelineEvent $event): void
     {
         // Set available event types
         $eventTypeKey  = 'form.submitted';
@@ -115,7 +73,7 @@ class LeadSubscriber implements EventSubscriberInterface
                             'form'       => $form,
                             'page'       => $this->pageModel->getEntity($row['page_id']),
                         ],
-                        'contentTemplate' => 'MauticFormBundle:SubscribedEvents\Timeline:index.html.php',
+                        'contentTemplate' => '@MauticForm/SubscribedEvents/Timeline/index.html.twig',
                         'icon'            => 'fa-pencil-square-o',
                         'contactId'       => $row['lead_id'],
                     ]
@@ -124,7 +82,7 @@ class LeadSubscriber implements EventSubscriberInterface
         }
     }
 
-    public function onLeadMerge(LeadMergeEvent $event)
+    public function onLeadMerge(LeadMergeEvent $event): void
     {
         $this->submissionRepository->updateLead($event->getLoser()->getId(), $event->getVictor()->getId());
     }

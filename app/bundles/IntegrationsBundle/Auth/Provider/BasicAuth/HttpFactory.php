@@ -2,15 +2,6 @@
 
 declare(strict_types=1);
 
-/*
- * @copyright   2019 Mautic Inc. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\IntegrationsBundle\Auth\Provider\BasicAuth;
 
 use GuzzleHttp\Client;
@@ -25,14 +16,14 @@ use Mautic\IntegrationsBundle\Exception\PluginNotConfiguredException;
  */
 class HttpFactory implements AuthProviderInterface
 {
-    const NAME = 'basic_auth';
+    public const NAME = 'basic_auth';
 
     /**
      * Cache of initialized clients.
      *
      * @var Client[]
      */
-    private $initializedClients = [];
+    private array $initializedClients = [];
 
     public function getAuthType(): string
     {
@@ -41,7 +32,6 @@ class HttpFactory implements AuthProviderInterface
 
     /**
      * @param CredentialsInterface|AuthCredentialsInterface $credentials
-     * @param AuthConfigInterface                           $config
      *
      * @throws PluginNotConfiguredException
      */

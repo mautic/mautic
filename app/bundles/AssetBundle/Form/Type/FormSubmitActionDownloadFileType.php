@@ -1,23 +1,17 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\AssetBundle\Form\Type;
 
 use Mautic\CategoryBundle\Form\Type\CategoryListType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 
+/**
+ * @extends AbstractType<mixed>
+ */
 class FormSubmitActionDownloadFileType extends AbstractType
 {
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder->add(
             'asset',
@@ -47,8 +41,9 @@ class FormSubmitActionDownloadFileType extends AbstractType
                 'bundle'        => 'asset',
                 'return_entity' => false,
                 'attr'          => [
-                    'class'   => 'form-control',
-                    'tooltip' => 'mautic.asset.form.submit.latest.category_descr',
+                    'class'        => 'form-control',
+                    'tooltip'      => 'mautic.asset.form.submit.latest.category_descr',
+                    'data-show-on' => '{"formaction_properties_asset":""}',
                 ],
             ]
         );

@@ -1,32 +1,21 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CoreBundle\Model;
 
 use Mautic\CoreBundle\Entity\AuditLog;
 use Mautic\UserBundle\Entity\User;
 
 /**
- * Class AuditLogModel.
+ * @extends AbstractCommonModel<AuditLog>
  */
 class AuditLogModel extends AbstractCommonModel
 {
     /**
-     * {@inheritdoc}
-     *
      * @return \Mautic\CoreBundle\Entity\AuditLogRepository
      */
     public function getRepository()
     {
-        return $this->em->getRepository('MauticCoreBundle:AuditLog');
+        return $this->em->getRepository(\Mautic\CoreBundle\Entity\AuditLog::class);
     }
 
     /**
@@ -34,14 +23,14 @@ class AuditLogModel extends AbstractCommonModel
      *
      * @param array $args [bundle, object, objectId, action, details, ipAddress]
      */
-    public function writeToLog(array $args)
+    public function writeToLog(array $args): void
     {
-        $bundle    = (isset($args['bundle'])) ? $args['bundle'] : '';
-        $object    = (isset($args['object'])) ? $args['object'] : '';
-        $objectId  = (isset($args['objectId'])) ? $args['objectId'] : '';
-        $action    = (isset($args['action'])) ? $args['action'] : '';
-        $details   = (isset($args['details'])) ? $args['details'] : '';
-        $ipAddress = (isset($args['ipAddress'])) ? $args['ipAddress'] : '';
+        $bundle    = $args['bundle'] ?? '';
+        $object    = $args['object'] ?? '';
+        $objectId  = $args['objectId'] ?? '';
+        $action    = $args['action'] ?? '';
+        $details   = $args['details'] ?? '';
+        $ipAddress = $args['ipAddress'] ?? '';
 
         $log = new AuditLog();
         $log->setBundle($bundle);
@@ -62,7 +51,7 @@ class AuditLogModel extends AbstractCommonModel
         $log->setUserId($userId);
         $log->setUserName($userName);
 
-        $this->em->getRepository('MauticCoreBundle:AuditLog')->saveEntity($log);
+        $this->em->getRepository(\Mautic\CoreBundle\Entity\AuditLog::class)->saveEntity($log);
 
         $this->em->detach($log);
     }
@@ -70,7 +59,7 @@ class AuditLogModel extends AbstractCommonModel
     /**
      * Get the audit log for specific object.
      *
-     * @param string                  $object
+     * @param string|null             $object
      * @param string|int              $id
      * @param \DateTimeInterface|null $afterDate
      * @param int                     $limit

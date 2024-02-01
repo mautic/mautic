@@ -2,15 +2,6 @@
 
 declare(strict_types=1);
 
-/*
- * @copyright   2018 Mautic Inc. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://www.mautic.com
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\IntegrationsBundle\Sync\Notification\Helper;
 
 use Mautic\IntegrationsBundle\Event\InternalObjectRouteEvent;
@@ -24,20 +15,14 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 class RouteHelper
 {
     /**
-     * @var ObjectProvider
-     */
-    private $objectProvider;
-
-    /**
      * @var RouEventDispatcherInterfaceter
      */
     private $dispatcher;
 
     public function __construct(
-        ObjectProvider $objectProvider,
+        private ObjectProvider $objectProvider,
         EventDispatcherInterface $dispatcher
     ) {
-        $this->objectProvider = $objectProvider;
         $this->dispatcher     = $dispatcher;
     }
 
@@ -48,12 +33,12 @@ class RouteHelper
     {
         try {
             $event = new InternalObjectRouteEvent($this->objectProvider->getObjectByName($object), $id);
-        } catch (ObjectNotFoundException $e) {
+        } catch (ObjectNotFoundException) {
             // Throw this exception instead to keep BC.
             throw new ObjectNotSupportedException(MauticSyncDataExchange::NAME, $object);
         }
 
-        $this->dispatcher->dispatch(IntegrationEvents::INTEGRATION_BUILD_INTERNAL_OBJECT_ROUTE, $event);
+        $this->dispatcher->dispatch($event, IntegrationEvents::INTEGRATION_BUILD_INTERNAL_OBJECT_ROUTE);
 
         return $event->getRoute();
     }

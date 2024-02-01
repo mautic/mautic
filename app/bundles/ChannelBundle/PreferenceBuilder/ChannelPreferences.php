@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2017 Mautic Contributors. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\ChannelBundle\PreferenceBuilder;
 
 use Doctrine\Common\Collections\ArrayCollection;
@@ -18,18 +9,13 @@ use Mautic\CampaignBundle\Entity\LeadEventLog;
 class ChannelPreferences
 {
     /**
-     * @var Event
-     */
-    private $event;
-
-    /**
      * @var ArrayCollection[]
      */
-    private $organizedByPriority = [];
+    private array $organizedByPriority = [];
 
-    public function __construct(Event $event)
-    {
-        $this->event   = $event;
+    public function __construct(
+        private Event $event
+    ) {
     }
 
     /**
@@ -77,11 +63,8 @@ class ChannelPreferences
      */
     public function removeLog(LeadEventLog $log)
     {
-        /**
-         * @var int
-         * @var ArrayCollection|LeadEventLog[] $logs
-         */
         foreach ($this->organizedByPriority as $logs) {
+            /** @var ArrayCollection<int, LeadEventLog> $logs */
             $logs->remove($log->getId());
         }
 
@@ -97,6 +80,6 @@ class ChannelPreferences
     {
         $priority = (int) $priority;
 
-        return isset($this->organizedByPriority[$priority]) ? $this->organizedByPriority[$priority] : new ArrayCollection();
+        return $this->organizedByPriority[$priority] ?? new ArrayCollection();
     }
 }

@@ -1,0 +1,57 @@
+{#
+  Variables
+    - event
+#}
+{% set utmTags = event.extra.utmtags %}
+<dl class="dl-horizontal">
+  {% if utmTags.utm_campaign is not empty %}
+    <dt>{{ 'mautic.lead.timeline.event.utmcampaign'|trans }}:</dt>
+    <dd>{{ utmTags['utm_campaign'] }}</dd>
+  {% endif %}
+  {% if utmTags.utm_content is not empty %}
+    <dt>{{ 'mautic.lead.timeline.event.utmcontent'|trans }}:</dt>
+    <dd>{{ utmTags['utm_content'] }}</dd>
+  {% endif %}
+  {% if utmTags.utm_medium is not empty %}
+    <dt>{{ 'mautic.lead.timeline.event.utmmedium'|trans }}:</dt>
+    <dd>{{ utmTags['utm_medium'] }}</dd>
+  {% endif %}
+  {% if utmTags.utm_source is not empty %}
+    <dt>{{ 'mautic.lead.timeline.event.umtsource'|trans }}:</dt>
+    <dd>{{ utmTags['utm_source'] }}</dd>
+  {% endif %}
+  {% if utmTags.utm_term is not empty %}
+    <dt>{{ 'mautic.lead.timeline.event.utmterm'|trans }}:</dt>
+    <dd>{{ utmTags['utm_term'] }}</dd>
+  {% endif %}
+  {% set counter = 1 %}
+  {% if utmTags.query is not empty %}
+      {% for k, v in utmTags.query %}
+          {# remove tags #}
+          {% set v = inputClean(v) %}
+          {% if
+                v not in ['', null, []] and
+                k not in ['ct', 'page_title', 'page_referrer', 'page_url', 'utm_campaign', 'utm_source', 'utm_medium', 'utm_content', 'utm_term'] and
+                v is not empty
+          %}
+              {% set counter = counter + 1 %}
+              {% set k = k|replace({'_': ' '})|upper %}
+
+              <dt>{{ k }}:</dt>
+              <dd>{{ v }}</dd>
+
+              {% if showMore is not defined and counter > 5 %}
+                  {% set showMore = true %}
+                  <div style="display:none">
+              {% endif %}
+          {% endif %}
+
+          {% if showMore is defined and showMore == true %}
+              </div>
+              <a href="javascript:void(0);" class="text-center small center-block mt-xs" onclick="Mautic.toggleTimelineMoreVisiblity(mQuery(this).prev());">
+                {{- 'mautic.core.more.show'|trans -}}
+              </a>
+          {% endif %}
+      {% endfor %}
+  {% endif %}
+</dl>

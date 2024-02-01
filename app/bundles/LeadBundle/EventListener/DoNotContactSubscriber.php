@@ -2,15 +2,6 @@
 
 declare(strict_types=1);
 
-/*
- * @copyright   2020 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\LeadBundle\EventListener;
 
 use Mautic\LeadBundle\Event\DoNotContactAddEvent;
@@ -20,14 +11,9 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 final class DoNotContactSubscriber implements EventSubscriberInterface
 {
-    /**
-     * @var DoNotContact
-     */
-    private $doNotContact;
-
-    public function __construct(DoNotContact $doNotContact)
-    {
-        $this->doNotContact = $doNotContact;
+    public function __construct(
+        private DoNotContact $doNotContact
+    ) {
     }
 
     public static function getSubscribedEvents(): array

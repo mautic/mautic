@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2018 Mautic Contributors. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CampaignBundle\EventListener;
 
 use Mautic\CampaignBundle\CampaignEvents;
@@ -21,44 +12,21 @@ use Mautic\CampaignBundle\Event\PendingEvent;
 use Mautic\CampaignBundle\Executioner\EventExecutioner;
 use Mautic\CampaignBundle\Form\Type\CampaignEventJumpToEventType;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class CampaignActionJumpToEventSubscriber implements EventSubscriberInterface
 {
-    const EVENT_NAME = 'campaign.jump_to_event';
+    public const EVENT_NAME = 'campaign.jump_to_event';
 
-    /**
-     * @var EventRepository
-     */
-    private $eventRepository;
-
-    /**
-     * @var EventExecutioner
-     */
-    private $eventExecutioner;
-
-    /**
-     * @var TranslatorInterface
-     */
-    private $translator;
-
-    /**
-     * @var LeadRepository
-     */
-    private $leadRepository;
-
-    public function __construct(EventRepository $eventRepository, EventExecutioner $eventExecutioner, TranslatorInterface $translator, LeadRepository $leadRepository)
-    {
-        $this->eventRepository  = $eventRepository;
-        $this->eventExecutioner = $eventExecutioner;
-        $this->translator       = $translator;
-        $this->leadRepository   = $leadRepository;
+    public function __construct(
+        private EventRepository $eventRepository,
+        private EventExecutioner $eventExecutioner,
+        private TranslatorInterface $translator,
+        private LeadRepository $leadRepository
+    ) {
     }
 
-    /**
-     * @return array
-     */
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             CampaignEvents::CAMPAIGN_POST_SAVE     => ['processCampaignEventsAfterSave', 1],
@@ -70,14 +38,14 @@ class CampaignActionJumpToEventSubscriber implements EventSubscriberInterface
     /**
      * Add event triggers and actions.
      */
-    public function onCampaignBuild(CampaignBuilderEvent $event)
+    public function onCampaignBuild(CampaignBuilderEvent $event): void
     {
         // Add action to jump to another event in the campaign flow.
         $event->addAction(self::EVENT_NAME, [
             'label'                  => 'mautic.campaign.event.jump_to_event',
             'description'            => 'mautic.campaign.event.jump_to_event_descr',
             'formType'               => CampaignEventJumpToEventType::class,
-            'template'               => 'MauticCampaignBundle:Event:jump.html.php',
+            'template'               => '@MauticCampaign/Event/jump.html.twig',
             'batchEventName'         => CampaignEvents::ON_EVENT_JUMP_TO_EVENT,
             'connectionRestrictions' => [
                 'target' => [
@@ -97,7 +65,7 @@ class CampaignActionJumpToEventSubscriber implements EventSubscriberInterface
      * @throws \Mautic\CampaignBundle\Executioner\Exception\CannotProcessEventException
      * @throws \Mautic\CampaignBundle\Executioner\Scheduler\Exception\NotSchedulableException
      */
-    public function onJumpToEvent(PendingEvent $campaignEvent)
+    public function onJumpToEvent(PendingEvent $campaignEvent): void
     {
         $event      = $campaignEvent->getEvent();
         $jumpTarget = $this->getJumpTargetForEvent($event, 'e.id');
@@ -131,7 +99,7 @@ class CampaignActionJumpToEventSubscriber implements EventSubscriberInterface
      * to ensure that it has the actual ID and not the temp_id as the
      * target for the jump.
      */
-    public function processCampaignEventsAfterSave(CampaignEvent $campaignEvent)
+    public function processCampaignEventsAfterSave(CampaignEvent $campaignEvent): void
     {
         $campaign = $campaignEvent->getCampaign();
         $events   = $campaign->getEvents();

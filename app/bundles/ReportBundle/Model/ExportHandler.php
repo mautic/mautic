@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\ReportBundle\Model;
 
 use Mautic\CoreBundle\Exception\FilePathException;
@@ -23,20 +14,14 @@ class ExportHandler
      */
     private $dir;
 
-    /**
-     * @var FilePathResolver
-     */
-    private $filePathResolver;
-
-    public function __construct(CoreParametersHelper $coreParametersHelper, FilePathResolver $filePathResolver)
-    {
+    public function __construct(
+        CoreParametersHelper $coreParametersHelper,
+        private FilePathResolver $filePathResolver
+    ) {
         $this->dir              = $coreParametersHelper->get('report_temp_dir');
-        $this->filePathResolver = $filePathResolver;
     }
 
     /**
-     * @param $fileName
-     *
      * @return bool|resource
      *
      * @throws FileIOException
@@ -55,7 +40,7 @@ class ExportHandler
     /**
      * @param resource $handler
      */
-    public function closeHandler($handler)
+    public function closeHandler($handler): void
     {
         fclose($handler);
     }
@@ -63,23 +48,19 @@ class ExportHandler
     /**
      * @param string $fileName
      */
-    public function removeFile($fileName)
+    public function removeFile($fileName): void
     {
         try {
             $path = $this->getPath($fileName);
             $this->filePathResolver->delete($path);
-        } catch (FileIOException $e) {
+        } catch (FileIOException) {
         }
     }
 
     /**
-     * @param $fileName
-     *
-     * @return string
-     *
      * @throws FileIOException
      */
-    public function getPath($fileName)
+    public function getPath($fileName): string
     {
         try {
             $this->filePathResolver->createDirectory($this->dir);

@@ -2,18 +2,8 @@
 
 declare(strict_types=1);
 
-/*
- * @copyright   2018 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\LeadBundle\Field;
 
-use Doctrine\DBAL\DBALException;
 use Doctrine\DBAL\Exception\DriverException;
 use Mautic\CoreBundle\Doctrine\Helper\ColumnSchemaHelper;
 use Mautic\CoreBundle\Exception\SchemaException;
@@ -21,68 +11,26 @@ use Mautic\LeadBundle\Entity\LeadField;
 use Mautic\LeadBundle\Field\Dispatcher\FieldColumnDispatcher;
 use Mautic\LeadBundle\Field\Exception\AbortColumnCreateException;
 use Mautic\LeadBundle\Field\Exception\CustomFieldLimitException;
-use Monolog\Logger;
-use Symfony\Component\Translation\TranslatorInterface;
+use Psr\Log\LoggerInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class CustomFieldColumn
 {
-    /**
-     * @var ColumnSchemaHelper
-     */
-    private $columnSchemaHelper;
-
-    /**
-     * @var SchemaDefinition
-     */
-    private $schemaDefinition;
-
-    /**
-     * @var Logger
-     */
-    private $logger;
-
-    /**
-     * @var LeadFieldSaver
-     */
-    private $leadFieldSaver;
-
-    /**
-     * @var CustomFieldIndex
-     */
-    private $customFieldIndex;
-
-    /**
-     * @var FieldColumnDispatcher
-     */
-    private $fieldColumnDispatcher;
-
-    /**
-     * @var TranslatorInterface
-     */
-    private $translator;
-
     public function __construct(
-        ColumnSchemaHelper $columnSchemaHelper,
-        SchemaDefinition $schemaDefinition,
-        Logger $logger,
-        LeadFieldSaver $leadFieldSaver,
-        CustomFieldIndex $customFieldIndex,
-        FieldColumnDispatcher $fieldColumnDispatcher,
-        TranslatorInterface $translator
+        private ColumnSchemaHelper $columnSchemaHelper,
+        private SchemaDefinition $schemaDefinition,
+        private LoggerInterface $logger,
+        private LeadFieldSaver $leadFieldSaver,
+        private CustomFieldIndex $customFieldIndex,
+        private FieldColumnDispatcher $fieldColumnDispatcher,
+        private TranslatorInterface $translator
     ) {
-        $this->columnSchemaHelper    = $columnSchemaHelper;
-        $this->schemaDefinition      = $schemaDefinition;
-        $this->logger                = $logger;
-        $this->leadFieldSaver        = $leadFieldSaver;
-        $this->customFieldIndex      = $customFieldIndex;
-        $this->fieldColumnDispatcher = $fieldColumnDispatcher;
-        $this->translator            = $translator;
     }
 
     /**
      * @throws AbortColumnCreateException
      * @throws CustomFieldLimitException
-     * @throws DBALException
+     * @throws \Doctrine\DBAL\Exception
      * @throws DriverException
      * @throws \Doctrine\DBAL\Schema\SchemaException
      * @throws \Mautic\CoreBundle\Exception\SchemaException
@@ -144,9 +92,9 @@ class CustomFieldColumn
         try {
             $leadsSchema->executeChanges();
         } catch (DriverException $e) {
-            $this->logger->addWarning($e->getMessage());
+            $this->logger->warning($e->getMessage());
 
-            if (1118 === $e->getErrorCode() /* ER_TOO_BIG_ROWSIZE */) {
+            if (1118 === $e->getCode() /* ER_TOO_BIG_ROWSIZE */) {
                 throw new CustomFieldLimitException('mautic.lead.field.max_column_error');
             }
 
@@ -154,7 +102,7 @@ class CustomFieldColumn
         }
 
         if ($saveLeadField) {
-            //$leadField is a new entity (this is not executed for update), it was successfully added to the lead table > save it
+            // $leadField is a new entity (this is not executed for update), it was successfully added to the lead table > save it
             $this->leadFieldSaver->saveLeadFieldEntity($leadField, true);
         }
 

@@ -1,45 +1,27 @@
 <?php
 
-/*
- * @copyright   2018 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CampaignBundle\Service;
 
 use Mautic\CampaignBundle\Entity\CampaignRepository;
 use Mautic\EmailBundle\Entity\EmailRepository;
 
+/**
+ * @deprecated to be removed in 6.0; use CampaignAuditService instead
+ */
 class Campaign
 {
-    /**
-     * @var CampaignRepository
-     */
-    private $campaignRepository;
-
-    /**
-     * @var EmailRepository
-     */
-    private $emailRepository;
-
-    public function __construct(CampaignRepository $campaignRepository, EmailRepository $emailRepository)
-    {
-        $this->campaignRepository = $campaignRepository;
-        $this->emailRepository    = $emailRepository;
+    public function __construct(
+        private CampaignRepository $campaignRepository,
+        private EmailRepository $emailRepository
+    ) {
     }
 
     /**
      * Has campaign at least one unpublished e-mail?
      *
      * @param int $id
-     *
-     * @return bool
      */
-    public function hasUnpublishedEmail($id)
+    public function hasUnpublishedEmail($id): bool
     {
         $emailIds = $this->campaignRepository->fetchEmailIdsById($id);
 

@@ -1,16 +1,8 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\PluginBundle\Bundle;
 
+use Doctrine\DBAL\Schema\Comparator;
 use Doctrine\DBAL\Schema\Schema;
 use Doctrine\ORM\Tools\SchemaTool;
 use Mautic\CoreBundle\Factory\MauticFactory;
@@ -23,12 +15,11 @@ use Symfony\Component\HttpKernel\Bundle\Bundle;
 abstract class PluginBundleBase extends Bundle
 {
     /**
-     * @param null $metadata
-     * @param null $installedSchema
-     *
      * @throws \Exception
+     *
+     * @deprecated To be removed in 5.0. Listen to PluginEvents::ON_PLUGIN_INSTALL instead
      */
-    public static function onPluginInstall(Plugin $plugin, MauticFactory $factory, $metadata = null, $installedSchema = null)
+    public static function onPluginInstall(Plugin $plugin, MauticFactory $factory, $metadata = null, $installedSchema = null): void
     {
         if (null !== $metadata) {
             self::installPluginSchema($metadata, $factory, $installedSchema);
@@ -38,11 +29,9 @@ abstract class PluginBundleBase extends Bundle
     /**
      * Install plugin schema based on Doctrine metadata.
      *
-     * @param null $installedSchema
-     *
      * @throws \Exception
      */
-    public static function installPluginSchema(array $metadata, MauticFactory $factory, $installedSchema = null)
+    public static function installPluginSchema(array $metadata, MauticFactory $factory, $installedSchema = null): void
     {
         if (null !== $installedSchema) {
             // Schema exists so bail
@@ -56,7 +45,7 @@ abstract class PluginBundleBase extends Bundle
         $db->beginTransaction();
         try {
             foreach ($installQueries as $q) {
-                $db->query($q);
+                $db->executeQuery($q);
             }
 
             $db->commit();
@@ -70,15 +59,14 @@ abstract class PluginBundleBase extends Bundle
     /**
      * Called by PluginController::reloadAction when the addon version does not match what's installed.
      *
-     * @param null   $metadata
-     * @param Schema $installedSchema
-     *
      * @throws \Exception
+     *
+     * @deprecated To be removed in 5.0. Listen to PluginEvents::ON_PLUGIN_UPDATE instead
      */
-    public static function onPluginUpdate(Plugin $plugin, MauticFactory $factory, $metadata = null, Schema $installedSchema = null)
+    public static function onPluginUpdate(Plugin $plugin, MauticFactory $factory, $metadata = null, Schema $installedSchema = null): void
     {
         // Not recommended although availalbe for simple schema changes - see updatePluginSchema docblock
-        //self::updatePluginSchema($metadata, $installedSchema, $factory);
+        // self::updatePluginSchema($metadata, $installedSchema, $factory);
     }
 
     /**
@@ -91,17 +79,19 @@ abstract class PluginBundleBase extends Bundle
      * @throws \Doctrine\DBAL\ConnectionException
      * @throws \Exception
      */
-    public static function updatePluginSchema(array $metadata, Schema $installedSchema, MauticFactory $factory)
+    public static function updatePluginSchema(array $metadata, Schema $installedSchema, MauticFactory $factory): void
     {
-        $db         = $factory->getDatabase();
-        $schemaTool = new SchemaTool($factory->getEntityManager());
-        $toSchema   = $schemaTool->getSchemaFromMetadata($metadata);
-        $queries    = $installedSchema->getMigrateToSql($toSchema, $db->getDatabasePlatform());
+        $db               = $factory->getDatabase();
+        $schemaTool       = new SchemaTool($factory->getEntityManager());
+        $toSchema         = $schemaTool->getSchemaFromMetadata($metadata);
+        $comparator       = (new Comparator())->compareSchemas($installedSchema, $toSchema);
+        $databasePlatform = $db->getDatabasePlatform();
+        $queries          = $databasePlatform->getAlterSchemaSQL($comparator);
 
         $db->beginTransaction();
         try {
             foreach ($queries as $q) {
-                $db->query($q);
+                $db->executeQuery($q);
             }
 
             $db->commit();
@@ -114,10 +104,8 @@ abstract class PluginBundleBase extends Bundle
 
     /**
      * Not used yet :-).
-     *
-     * @param null $metadata
      */
-    public static function onPluginUninstall(Plugin $plugin, MauticFactory $factory, $metadata = null)
+    public static function onPluginUninstall(Plugin $plugin, MauticFactory $factory, $metadata = null): void
     {
     }
 
@@ -127,7 +115,7 @@ abstract class PluginBundleBase extends Bundle
      * @throws \Doctrine\DBAL\ConnectionException
      * @throws \Exception
      */
-    public static function dropPluginSchema(array $metadata, MauticFactory $factory)
+    public static function dropPluginSchema(array $metadata, MauticFactory $factory): void
     {
         $db          = $factory->getDatabase();
         $schemaTool  = new SchemaTool($factory->getEntityManager());
@@ -136,7 +124,7 @@ abstract class PluginBundleBase extends Bundle
         $db->beginTransaction();
         try {
             foreach ($dropQueries as $q) {
-                $db->query($q);
+                $db->executeQuery($q);
             }
 
             $db->commit();

@@ -1,21 +1,12 @@
 <?php
 
-/*
- * @copyright   2018 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CoreBundle\Tests\Unit\Helper;
 
 use Mautic\CoreBundle\Helper\CsvHelper;
 
 class CsvHelperTest extends \PHPUnit\Framework\TestCase
 {
-    public function testSanitizeHeaders()
+    public function testSanitizeHeaders(): void
     {
         $headers = [
             'withoutSpaces',
@@ -34,7 +25,7 @@ class CsvHelperTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expected, CsvHelper::sanitizeHeaders($headers));
     }
 
-    public function testConvertHeadersIntoFields()
+    public function testConvertHeadersIntoFields(): void
     {
         $headers = [
             'České znáčky',

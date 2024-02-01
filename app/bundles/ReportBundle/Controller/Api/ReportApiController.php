@@ -1,44 +1,47 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\ReportBundle\Controller\Api;
 
-use DateTimeImmutable;
-use DateTimeZone;
+use Doctrine\Persistence\ManagerRegistry;
 use Mautic\ApiBundle\Controller\CommonApiController;
+use Mautic\ApiBundle\Helper\EntityResultHelper;
+use Mautic\CoreBundle\Factory\MauticFactory;
+use Mautic\CoreBundle\Factory\ModelFactory;
+use Mautic\CoreBundle\Helper\AppVersion;
+use Mautic\CoreBundle\Helper\CoreParametersHelper;
+use Mautic\CoreBundle\Security\Permissions\CorePermissions;
+use Mautic\CoreBundle\Translation\Translator;
 use Mautic\ReportBundle\Entity\Report;
+use Mautic\ReportBundle\Model\ReportModel;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\FormFactoryInterface;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpKernel\Event\FilterControllerEvent;
+use Symfony\Component\Routing\RouterInterface;
 
+/**
+ * @extends CommonApiController<Report>
+ */
 class ReportApiController extends CommonApiController
 {
     /**
-     * @var FormFactoryInterface
+     * @var ReportModel|null
      */
-    private $formFactory;
+    protected $model;
 
-    /**
-     * {@inheritdoc}
-     */
-    public function initialize(FilterControllerEvent $event)
+    public function __construct(CorePermissions $security, Translator $translator, EntityResultHelper $entityResultHelper, RouterInterface $router, FormFactoryInterface $formFactory, AppVersion $appVersion, RequestStack $requestStack, ManagerRegistry $doctrine, ModelFactory $modelFactory, EventDispatcherInterface $dispatcher, CoreParametersHelper $coreParametersHelper, MauticFactory $factory)
     {
-        $this->model            = $this->getModel('report');
+        $reportModel = $modelFactory->getModel('report');
+        \assert($reportModel instanceof ReportModel);
+
+        $this->model            = $reportModel;
         $this->entityClass      = Report::class;
         $this->entityNameOne    = 'report';
         $this->entityNameMulti  = 'reports';
         $this->serializerGroups = ['reportList', 'reportDetails'];
-        $this->formFactory      = $this->container->get('form.factory');
 
-        parent::initialize($event);
+        parent::__construct($security, $translator, $entityResultHelper, $router, $formFactory, $appVersion, $requestStack, $doctrine, $modelFactory, $dispatcher, $coreParametersHelper, $factory);
     }
 
     /**
@@ -48,7 +51,7 @@ class ReportApiController extends CommonApiController
      *
      * @return \Symfony\Component\HttpFoundation\Response
      */
-    public function getReportAction($id)
+    public function getReportAction(Request $request, $id)
     {
         $entity = $this->model->getEntity($id);
 
@@ -56,7 +59,7 @@ class ReportApiController extends CommonApiController
             return $this->notFound();
         }
 
-        $reportData = $this->model->getReportData($entity, $this->formFactory, $this->getOptionsFromRequest());
+        $reportData = $this->model->getReportData($entity, $this->formFactory, $this->getOptionsFromRequest($request));
 
         // Unset keys that we don't need to send back
         foreach (['graphs', 'contentTemplate', 'columns'] as $key) {
@@ -71,28 +74,26 @@ class ReportApiController extends CommonApiController
     /**
      * This method is careful to add new options from the request to keep BC.
      * It originally loaded all rows without any filter or pagination applied.
-     *
-     * @return array
      */
-    private function getOptionsFromRequest()
+    private function getOptionsFromRequest(Request $request): array
     {
         $options = ['paginate'=> false, 'ignoreGraphData' => true];
 
-        if ($this->request->query->has('dateFrom')) {
-            $options['dateFrom'] = new DateTimeImmutable($this->request->query->get('dateFrom'), new DateTimeZone('UTC'));
+        if ($request->query->has('dateFrom')) {
+            $options['dateFrom'] = new \DateTimeImmutable($request->query->get('dateFrom'), new \DateTimeZone('UTC'));
         }
 
-        if ($this->request->query->has('dateTo')) {
-            $options['dateTo']   = new DateTimeImmutable($this->request->query->get('dateTo'), new DateTimeZone('UTC'));
+        if ($request->query->has('dateTo')) {
+            $options['dateTo']   = new \DateTimeImmutable($request->query->get('dateTo'), new \DateTimeZone('UTC'));
         }
 
-        if ($this->request->query->has('page')) {
-            $options['page']     = $this->request->query->getInt('page');
+        if ($request->query->has('page')) {
+            $options['page']     = $request->query->getInt('page');
             $options['paginate'] = true;
         }
 
-        if ($this->request->query->has('limit')) {
-            $options['limit']    = $this->request->query->getInt('limit');
+        if ($request->query->has('limit')) {
+            $options['limit']    = $request->query->getInt('limit');
             $options['paginate'] = true;
         }
 

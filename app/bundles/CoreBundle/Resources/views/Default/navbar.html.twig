@@ -1,0 +1,34 @@
+<div class="loading-bar">
+    {% trans %}mautic.core.loading{% endtrans %}
+</div>
+
+<div class="navbar-nocollapse">
+    <!-- start: left nav -->
+    <ul class="nav navbar-nav navbar-left">
+        <li class="visible-xs">
+            <a href="javascript: void(0);" data-toggle="sidebar" data-direction="ltr">
+                <i class="fa fa-navicon fs-16"></i>
+            </a>
+        </li>
+        {{ render(controller('Mautic\\CoreBundle\\Controller\\DefaultController::notificationsAction')) }}
+        {{ render(controller('Mautic\\CoreBundle\\Controller\\DefaultController::globalSearchAction')) }}
+    </ul>
+    <!--/ end: left nav -->
+
+    <!-- start: right nav -->
+    <ul class="nav navbar-nav navbar-right">
+        {{ include('@MauticCore/Menu/profile.html.twig') }}
+        <li>
+            <a href="javascript: void(0);" data-toggle="sidebar" data-direction="rtl">
+                <i class="fa fa-cog fs-16"></i>
+            </a>
+        </li>
+    </ul>
+    <div class="navbar-toolbar pull-right mt-15 mr-10">
+    {{ buttonReset(constant('Mautic\\CoreBundle\\Twig\\Helper\\ButtonHelper::LOCATION_NAVBAR')) }}
+    {{ buttonsRender() }}
+    </div>
+
+    <!--/ end: right nav -->
+</div>
+<!--/ end: navbar nocollapse -->

@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2015 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CoreBundle\Tests\Unit\Helper;
 
 use Mautic\CoreBundle\Exception\FilePathException;
@@ -25,7 +16,7 @@ class FileUploaderTest extends \PHPUnit\Framework\TestCase
      *
      * @covers \Mautic\CoreBundle\Helper\FileUploader::upload
      */
-    public function testSuccessfulUpload()
+    public function testSuccessfulUpload(): void
     {
         $uploadDir = 'my/upload/dir';
         $fileName  = 'MyfileName';
@@ -61,7 +52,7 @@ class FileUploaderTest extends \PHPUnit\Framework\TestCase
      *
      * @covers \Mautic\CoreBundle\Helper\FileUploader::upload
      */
-    public function testCouldNotCreateDirectory()
+    public function testCouldNotCreateDirectory(): void
     {
         $uploadDir = 'my/upload/dir';
         $fileName  = 'MyfileName';
@@ -100,7 +91,7 @@ class FileUploaderTest extends \PHPUnit\Framework\TestCase
      *
      * @covers \Mautic\CoreBundle\Helper\FileUploader::upload
      */
-    public function testCouldNotMoveFile()
+    public function testCouldNotMoveFile(): void
     {
         $uploadDir = 'my/upload/dir';
         $fileName  = 'MyfileName';
@@ -140,7 +131,7 @@ class FileUploaderTest extends \PHPUnit\Framework\TestCase
      *
      * @covers \Mautic\CoreBundle\Helper\FileUploader::delete
      */
-    public function testDeleteFile()
+    public function testDeleteFile(): void
     {
         $file = 'MyfileName';
 

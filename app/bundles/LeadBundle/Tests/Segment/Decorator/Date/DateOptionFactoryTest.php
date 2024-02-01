@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2017 Mautic Contributors. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\LeadBundle\Tests\Segment\Decorator\Date;
 
 use Mautic\LeadBundle\Segment\ContactSegmentFilterCrate;
@@ -37,7 +28,7 @@ class DateOptionFactoryTest extends \PHPUnit\Framework\TestCase
     /**
      * @covers \Mautic\LeadBundle\Segment\Decorator\Date\DateOptionFactory::getDateOption
      */
-    public function testBirthday()
+    public function testBirthday(): void
     {
         $filterName = 'birthday';
 
@@ -55,7 +46,7 @@ class DateOptionFactoryTest extends \PHPUnit\Framework\TestCase
     /**
      * @covers \Mautic\LeadBundle\Segment\Decorator\Date\DateOptionFactory::getDateOption
      */
-    public function testDayToday()
+    public function testDayToday(): void
     {
         $filterName = 'today';
 
@@ -67,7 +58,7 @@ class DateOptionFactoryTest extends \PHPUnit\Framework\TestCase
     /**
      * @covers \Mautic\LeadBundle\Segment\Decorator\Date\DateOptionFactory::getDateOption
      */
-    public function testDayTomorrow()
+    public function testDayTomorrow(): void
     {
         $filterName = 'tomorrow';
 
@@ -79,7 +70,7 @@ class DateOptionFactoryTest extends \PHPUnit\Framework\TestCase
     /**
      * @covers \Mautic\LeadBundle\Segment\Decorator\Date\DateOptionFactory::getDateOption
      */
-    public function testDayYesterday()
+    public function testDayYesterday(): void
     {
         $filterName = 'yesterday';
 
@@ -91,7 +82,7 @@ class DateOptionFactoryTest extends \PHPUnit\Framework\TestCase
     /**
      * @covers \Mautic\LeadBundle\Segment\Decorator\Date\DateOptionFactory::getDateOption
      */
-    public function testWeekLast()
+    public function testWeekLast(): void
     {
         $filterName = 'last week';
 
@@ -103,7 +94,7 @@ class DateOptionFactoryTest extends \PHPUnit\Framework\TestCase
     /**
      * @covers \Mautic\LeadBundle\Segment\Decorator\Date\DateOptionFactory::getDateOption
      */
-    public function testWeekNext()
+    public function testWeekNext(): void
     {
         $filterName = 'next week';
 
@@ -115,7 +106,7 @@ class DateOptionFactoryTest extends \PHPUnit\Framework\TestCase
     /**
      * @covers \Mautic\LeadBundle\Segment\Decorator\Date\DateOptionFactory::getDateOption
      */
-    public function testWeekThis()
+    public function testWeekThis(): void
     {
         $filterName = 'this week';
 
@@ -127,7 +118,7 @@ class DateOptionFactoryTest extends \PHPUnit\Framework\TestCase
     /**
      * @covers \Mautic\LeadBundle\Segment\Decorator\Date\DateOptionFactory::getDateOption
      */
-    public function testMonthLast()
+    public function testMonthLast(): void
     {
         $filterName = 'last month';
 
@@ -139,7 +130,7 @@ class DateOptionFactoryTest extends \PHPUnit\Framework\TestCase
     /**
      * @covers \Mautic\LeadBundle\Segment\Decorator\Date\DateOptionFactory::getDateOption
      */
-    public function testMonthNext()
+    public function testMonthNext(): void
     {
         $filterName = 'next month';
 
@@ -151,7 +142,7 @@ class DateOptionFactoryTest extends \PHPUnit\Framework\TestCase
     /**
      * @covers \Mautic\LeadBundle\Segment\Decorator\Date\DateOptionFactory::getDateOption
      */
-    public function testMonthThis()
+    public function testMonthThis(): void
     {
         $filterName = 'this month';
 
@@ -163,7 +154,7 @@ class DateOptionFactoryTest extends \PHPUnit\Framework\TestCase
     /**
      * @covers \Mautic\LeadBundle\Segment\Decorator\Date\DateOptionFactory::getDateOption
      */
-    public function testYearLast()
+    public function testYearLast(): void
     {
         $filterName = 'last year';
 
@@ -175,7 +166,7 @@ class DateOptionFactoryTest extends \PHPUnit\Framework\TestCase
     /**
      * @covers \Mautic\LeadBundle\Segment\Decorator\Date\DateOptionFactory::getDateOption
      */
-    public function testYearNext()
+    public function testYearNext(): void
     {
         $filterName = 'next year';
 
@@ -187,7 +178,7 @@ class DateOptionFactoryTest extends \PHPUnit\Framework\TestCase
     /**
      * @covers \Mautic\LeadBundle\Segment\Decorator\Date\DateOptionFactory::getDateOption
      */
-    public function testYearThis()
+    public function testYearThis(): void
     {
         $filterName = 'this year';
 
@@ -199,7 +190,7 @@ class DateOptionFactoryTest extends \PHPUnit\Framework\TestCase
     /**
      * @covers \Mautic\LeadBundle\Segment\Decorator\Date\DateOptionFactory::getDateOption
      */
-    public function testRelativePlus()
+    public function testRelativePlus(): void
     {
         $filterName = '+20 days';
 
@@ -211,7 +202,7 @@ class DateOptionFactoryTest extends \PHPUnit\Framework\TestCase
     /**
      * @covers \Mautic\LeadBundle\Segment\Decorator\Date\DateOptionFactory::getDateOption
      */
-    public function testRelativeMinus()
+    public function testRelativeMinus(): void
     {
         $filterName = '+20 days';
 
@@ -223,7 +214,7 @@ class DateOptionFactoryTest extends \PHPUnit\Framework\TestCase
     /**
      * @covers \Mautic\LeadBundle\Segment\Decorator\Date\DateOptionFactory::getDateOption
      */
-    public function testRelativeAgo()
+    public function testRelativeAgo(): void
     {
         $filterName = '20 days ago';
 
@@ -235,7 +226,7 @@ class DateOptionFactoryTest extends \PHPUnit\Framework\TestCase
     /**
      * @covers \Mautic\LeadBundle\Segment\Decorator\Date\DateOptionFactory::getDateOption
      */
-    public function testDateDefault()
+    public function testDateDefault(): void
     {
         $filterName = '2018-01-01';
 
@@ -247,7 +238,7 @@ class DateOptionFactoryTest extends \PHPUnit\Framework\TestCase
     /**
      * @covers \Mautic\LeadBundle\Segment\Decorator\Date\DateOptionFactory::getDateOption
      */
-    public function testNullValue()
+    public function testNullValue(): void
     {
         $filterName = null;
 

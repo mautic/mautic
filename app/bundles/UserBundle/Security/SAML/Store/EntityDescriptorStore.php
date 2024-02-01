@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2019 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\UserBundle\Security\SAML\Store;
 
 use LightSaml\Model\Metadata\EntityDescriptor;
@@ -18,18 +9,13 @@ use Mautic\CoreBundle\Helper\CoreParametersHelper;
 class EntityDescriptorStore implements EntityDescriptorStoreInterface
 {
     /**
-     * @var CoreParametersHelper
-     */
-    private $coreParametersHelper;
-
-    /**
      * @var EntityDescriptor
      */
     private $entityDescriptor;
 
-    public function __construct(CoreParametersHelper $coreParametersHelper)
-    {
-        $this->coreParametersHelper = $coreParametersHelper;
+    public function __construct(
+        private CoreParametersHelper $coreParametersHelper
+    ) {
     }
 
     public function get($entityId): ?EntityDescriptor

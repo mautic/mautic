@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\ReportBundle\EventListener;
 
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
@@ -19,16 +10,6 @@ use Mautic\ReportBundle\Model\ReportModel;
 
 class DashboardSubscriber extends MainDashboardSubscriber
 {
-    /**
-     * @var ReportModel
-     */
-    protected $reportModel;
-
-    /**
-     * @var CorePermissions
-     */
-    protected $security;
-
     /**
      * Define the name of the bundle/category of the widget(s).
      *
@@ -57,16 +38,16 @@ class DashboardSubscriber extends MainDashboardSubscriber
         'report:reports:viewother',
     ];
 
-    public function __construct(ReportModel $reportModel, CorePermissions $security)
-    {
-        $this->reportModel = $reportModel;
-        $this->security    = $security;
+    public function __construct(
+        protected ReportModel $reportModel,
+        protected CorePermissions $security
+    ) {
     }
 
     /**
      * Set a widget detail when needed.
      */
-    public function onWidgetDetailGenerate(WidgetDetailEvent $event)
+    public function onWidgetDetailGenerate(WidgetDetailEvent $event): void
     {
         $this->checkPermissions($event);
 
@@ -74,7 +55,7 @@ class DashboardSubscriber extends MainDashboardSubscriber
             $widget = $event->getWidget();
             $params = $widget->getParams();
             if (!$event->isCached()) {
-                list($reportId, $graph) = explode(':', $params['graph']);
+                [$reportId, $graph]     = explode(':', $params['graph']);
                 $report                 = $this->reportModel->getEntity($reportId);
 
                 if ($report && $this->security->hasEntityAccess('report:reports:viewown', 'report:reports:viewother', $report->getCreatedBy())) {
@@ -91,6 +72,9 @@ class DashboardSubscriber extends MainDashboardSubscriber
 
                     if (isset($reportData['graphs'][$graph])) {
                         $graphData = $reportData['graphs'][$graph];
+                        if (!isset($graphData['data']['data'])) {
+                            $graphData['data']['data'] = $graphData['data'];
+                        }
                         $event->setTemplateData(
                             [
                                 'chartData'   => $graphData['data'],
@@ -104,7 +88,7 @@ class DashboardSubscriber extends MainDashboardSubscriber
                     }
                 }
             }
-            $event->setTemplate('MauticReportBundle:SubscribedEvents\Dashboard:widget.html.php');
+            $event->setTemplate('@MauticReport/SubscribedEvents/Dashboard/widget.html.twig');
             $event->stopPropagation();
         }
     }

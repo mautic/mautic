@@ -2,15 +2,6 @@
 
 declare(strict_types=1);
 
-/*
- * @copyright   2018 Mautic Inc. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://www.mautic.com
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\IntegrationsBundle\Sync\SyncProcess\Direction\Helper;
 
 use Mautic\IntegrationsBundle\Exception\InvalidValueException;
@@ -20,20 +11,11 @@ use Mautic\IntegrationsBundle\Sync\DAO\Value\NormalizedValueDAO;
 
 class ValueHelper
 {
-    /**
-     * @var NormalizedValueDAO
-     */
-    private $normalizedValueDAO;
+    private ?\Mautic\IntegrationsBundle\Sync\DAO\Value\NormalizedValueDAO $normalizedValueDAO = null;
 
-    /**
-     * @var string
-     */
-    private $fieldState;
+    private ?string $fieldState = null;
 
-    /**
-     * @var string
-     */
-    private $syncDirection;
+    private ?string $syncDirection = null;
 
     /**
      * @throws InvalidValueException
@@ -87,20 +69,11 @@ class ValueHelper
             return $value;
         }
 
-        switch ($this->normalizedValueDAO->getType()) {
-            case NormalizedValueDAO::EMAIL_TYPE:
-            case NormalizedValueDAO::DATE_TYPE:
-            case NormalizedValueDAO::DATETIME_TYPE:
-            case NormalizedValueDAO::BOOLEAN_TYPE:
-                // we can't assume anything with these so just return null and let the integration handle the error
-                return $this->normalizedValueDAO->getOriginalValue();
-            case NormalizedValueDAO::INT_TYPE:
-                return 0;
-            case NormalizedValueDAO::DOUBLE_TYPE:
-            case NormalizedValueDAO::FLOAT_TYPE:
-                return 1.0;
-            default:
-                throw new InvalidValueException("Required field can't be empty");
-        }
+        return match ($this->normalizedValueDAO->getType()) {
+            NormalizedValueDAO::EMAIL_TYPE, NormalizedValueDAO::DATE_TYPE, NormalizedValueDAO::DATETIME_TYPE, NormalizedValueDAO::BOOLEAN_TYPE => $this->normalizedValueDAO->getOriginalValue(),
+            NormalizedValueDAO::INT_TYPE => 0,
+            NormalizedValueDAO::DOUBLE_TYPE, NormalizedValueDAO::FLOAT_TYPE => 1.0,
+            default => throw new InvalidValueException("Required field can't be empty"),
+        };
     }
 }

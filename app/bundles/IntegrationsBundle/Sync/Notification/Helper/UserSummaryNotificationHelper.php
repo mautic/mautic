@@ -2,48 +2,14 @@
 
 declare(strict_types=1);
 
-/*
- * @copyright   2018 Mautic Inc. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://www.mautic.com
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\IntegrationsBundle\Sync\Notification\Helper;
 
 use Mautic\IntegrationsBundle\Sync\Exception\ObjectNotSupportedException;
 use Mautic\IntegrationsBundle\Sync\Notification\Writer;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class UserSummaryNotificationHelper
 {
-    /**
-     * @var Writer
-     */
-    private $writer;
-
-    /**
-     * @var UserHelper
-     */
-    private $userHelper;
-
-    /**
-     * @var OwnerProvider
-     */
-    private $ownerProvider;
-
-    /**
-     * @var RouteHelper
-     */
-    private $routeHelper;
-
-    /**
-     * @var TranslatorInterface
-     */
-    private $translator;
-
     /**
      * @var array
      */
@@ -59,28 +25,17 @@ class UserSummaryNotificationHelper
      */
     private $objectDisplayName;
 
-    /**
-     * @var string
-     */
-    private $mauticObject;
+    private ?string $mauticObject = null;
 
-    /**
-     * @var string
-     */
-    private $listTranslationKey;
+    private ?string $listTranslationKey = null;
 
     public function __construct(
-        Writer $writer,
-        UserHelper $userHelper,
-        OwnerProvider $ownerProvider,
-        RouteHelper $routeHelper,
-        TranslatorInterface $translator
+        private Writer $writer,
+        private UserHelper $userHelper,
+        private OwnerProvider $ownerProvider,
+        private RouteHelper $routeHelper,
+        private TranslatorInterface $translator
     ) {
-        $this->writer        = $writer;
-        $this->userHelper    = $userHelper;
-        $this->ownerProvider = $ownerProvider;
-        $this->routeHelper   = $routeHelper;
-        $this->translator    = $translator;
     }
 
     /**

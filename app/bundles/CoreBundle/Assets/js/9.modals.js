@@ -205,10 +205,6 @@ Mautic.processModalContent = function (response, target) {
             Mautic.setNotifications(response.notifications);
         }
 
-        if (response.browserNotifications) {
-            Mautic.setBrowserNotifications(response.browserNotifications);
-        }
-
         if (response.callback) {
             window["Mautic"][response.callback].apply('window', [response]);
             return;
@@ -293,7 +289,7 @@ Mautic.showConfirmation = function (el) {
             .addClass("btn btn-primary")
             .click(function () {
                 if (cancelCallback && typeof Mautic[cancelCallback] === "function") {
-                    window["Mautic"][cancelCallback].apply('window', []);
+                    window["Mautic"][cancelCallback].apply('window', [el]);
                 } else {
                     Mautic.dismissConfirmation();
                 }

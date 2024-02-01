@@ -1,24 +1,14 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CoreBundle\Helper;
 
-/**
- * Class SearchStringHelper.
- */
 class SearchStringHelper
 {
-    const COMMAND_NEGATE  = 0;
-    const COMMAND_POSIT   = 1;
-    const COMMAND_NEUTRAL = 2;
+    public const COMMAND_NEGATE  = 0;
+
+    public const COMMAND_POSIT   = 1;
+
+    public const COMMAND_NEUTRAL = 2;
 
     /**
      * @var array
@@ -45,13 +35,6 @@ class SearchStringHelper
         'parenthesis' => ')',
     ];
 
-    /**
-     * SearchStringHelper constructor.
-     *
-     * @param array $needsParsing
-     * @param array $needsClosing
-     * @param array $closingChars
-     */
     public function __construct(array $needsParsing = null, array $needsClosing = null, array $closingChars = null)
     {
         if (null !== $needsParsing) {
@@ -69,9 +52,6 @@ class SearchStringHelper
 
     /**
      * @param string $input
-     * @param array  $needsParsing
-     * @param array  $needsClosing
-     * @param array  $closingChars
      *
      * @return \stdClass
      */
@@ -84,18 +64,12 @@ class SearchStringHelper
         return $self->parseString($input);
     }
 
-    /**
-     * @param $input
-     */
     public function parseString($input)
     {
         return $this->splitUpSearchString($input);
     }
 
-    /**
-     * @param $filters
-     */
-    public static function mergeCommands(&$filters, array $commands)
+    public static function mergeCommands(&$filters, array $commands): void
     {
         if (!isset($filters->commands)) {
             $filters->commands = $commands;
@@ -114,10 +88,6 @@ class SearchStringHelper
         }
     }
 
-    /**
-     * @param $filters
-     * @param $mergeFilter
-     */
     protected function addFilterCommand(&$filters, $mergeFilter)
     {
         $command = $mergeFilter->command;
@@ -160,8 +130,8 @@ class SearchStringHelper
         $pos                                      = 0;
         $string                                   = '';
 
-        //Iterate through every character to ensure that the search string is properly parsed from left to right while
-        //considering quotes, parenthesis, and commands
+        // Iterate through every character to ensure that the search string is properly parsed from left to right while
+        // considering quotes, parenthesis, and commands
         while (count($chars)) {
             $char = $chars[$pos];
 
@@ -170,10 +140,10 @@ class SearchStringHelper
             ++$pos;
 
             if (':' == $char) {
-                //the string is a command
+                // the string is a command
                 $command = trim(substr($string, 0, -1));
-                //does this have a negative?
-                if (0 === strpos($command, '!')) {
+                // does this have a negative?
+                if (str_starts_with($command, '!')) {
                     $filters->{$baseName}[$keyCount]->not = 1;
                     $command                              = substr($command, 1);
                 }
@@ -186,42 +156,48 @@ class SearchStringHelper
                     $string                                   = '';
                 }
             } elseif (' ' == $char) {
-                //arrived at the end of a single word that is not within a quote or parenthesis so add it as standalone
+                // arrived at the end of a single word that is not within a quote or parenthesis so add it as standalone
                 if (' ' != $string) {
                     $string = trim($string);
                     $type   = ('or' == strtolower($string) || 'and' == strtolower($string)) ? $string : '';
-                    $this->setFilter($filters, $baseName, $keyCount, $string, $command, $overrideCommand, true, $type, (!empty($chars)));
+                    $this->setFilter($filters, $baseName, $keyCount, $string, $command, $overrideCommand, true, $type, !empty($chars));
                 }
                 continue;
             } elseif (in_array($char, $this->needsClosing)) {
-                //arrived at a character that has a closing partner and thus needs to be parsed as a group
+                // arrived at a character that has a closing partner and thus needs to be parsed as a group
 
-                //find the closing match
+                // find the closing match
                 $key = array_search($char, $this->needsClosing);
 
                 $openingCount = 1;
                 $closingCount = 1;
 
-                //reiterate through the rest of the chars to find its closing match
+                // reiterate through the rest of the chars to find its closing match
                 foreach ($chars as $k => $c) {
                     $string .= $c;
                     unset($chars[$k]);
                     ++$pos;
 
                     if ($c === $this->closingChars[$key] && $openingCount === $closingCount) {
-                        //found the matching character (accounts for nesting)
+                        // found the matching character (accounts for nesting)
 
-                        //remove wrapping grouping chars
-                        if (0 === strpos($string, $char) && substr($string, -1) === $c) {
+                        // does group have a negative?
+                        if (str_starts_with($string, '!')) {
+                            $filters->{$baseName}[$keyCount]->not = 1;
+                            $string                               = substr($string, 1);
+                        }
+
+                        // remove wrapping grouping chars
+                        if (str_starts_with($string, $char) && substr($string, -1) === $c) {
                             $string = substr($string, 1, -1);
                         }
 
-                        //handle characters that support nesting
+                        // handle characters that support nesting
                         $neededParsing = false;
                         if ('"' !== $c) {
-                            //check to see if the nested string needs to be parsed as well
+                            // check to see if the nested string needs to be parsed as well
                             foreach ($this->needsParsing as $parseMe) {
-                                if (false !== strpos($string, $parseMe)) {
+                                if (str_contains($string, $parseMe)) {
                                     $parsed                                    = $this->splitUpSearchString($string, 'parsed', $command);
                                     $filters->{$baseName}[$keyCount]->children = $parsed->parsed;
                                     $neededParsing                             = true;
@@ -230,21 +206,21 @@ class SearchStringHelper
                             }
                         }
 
-                        $this->setFilter($filters, $baseName, $keyCount, $string, $command, $overrideCommand, (!$neededParsing));
+                        $this->setFilter($filters, $baseName, $keyCount, $string, $command, $overrideCommand, !$neededParsing);
 
                         break;
                     } elseif ($c === $char) {
-                        //this is another opening char so keep track of it to properly handle nested strings
+                        // this is another opening char so keep track of it to properly handle nested strings
                         ++$openingCount;
                     } elseif ($c === $this->closingChars[$key]) {
-                        //this is a closing char within a nest but not the one to close the group
+                        // this is a closing char within a nest but not the one to close the group
                         ++$closingCount;
                     }
                 }
             } elseif (empty($chars)) {
                 $filters->{$baseName}[$keyCount]->command = $command;
                 $this->setFilter($filters, $baseName, $keyCount, $string, $command, $overrideCommand, true, null, false);
-            }//else keep concocting chars
+            }// else keep concocting chars
         }
 
         return $filters;
@@ -253,14 +229,14 @@ class SearchStringHelper
     private function setFilter(&$filters, &$baseName, &$keyCount, &$string, &$command, $overrideCommand,
                                       $setFilter = true,
                                       $type = null,
-                                      $setUpNext = true)
+                                      $setUpNext = true): void
     {
         if (!empty($type)) {
             $filters->{$baseName}[$keyCount]->type = strtolower($type);
         } elseif ($setFilter) {
             $string = trim(strtolower($string));
 
-            //remove operators and empty values
+            // remove operators and empty values
             if (in_array($string, ['', 'or', 'and'])) {
                 unset($filters->{$baseName}[$keyCount]);
 
@@ -276,19 +252,19 @@ class SearchStringHelper
 
             $strictPos = strpos($string, '+');
             $notPos    = strpos($string, '!');
-            if ((0 === $strictPos || 1 === $strictPos || 0 === $notPos || 1 === $notPos)) {
+            if (0 === $strictPos || 1 === $strictPos || 0 === $notPos || 1 === $notPos) {
                 if (false !== $strictPos && false !== $notPos) {
-                    //+! or !+
+                    // +! or !+
                     $filters->{$baseName}[$keyCount]->strict = 1;
                     $filters->{$baseName}[$keyCount]->not    = 1;
                     $string                                  = substr($string, 2);
                 } elseif (0 === $strictPos && false === $notPos) {
-                    //+
+                    // +
                     $filters->{$baseName}[$keyCount]->strict = 1;
                     $filters->{$baseName}[$keyCount]->not    = 0;
                     $string                                  = substr($string, 1);
                 } elseif (false === $strictPos && 0 === $notPos) {
-                    //!
+                    // !
                     $filters->{$baseName}[$keyCount]->strict = 0;
                     $filters->{$baseName}[$keyCount]->not    = 1;
                     $string                                  = substr($string, 1);
@@ -299,7 +275,7 @@ class SearchStringHelper
 
             $this->addFilterCommand($filters, $filters->{$baseName}[$keyCount]);
 
-            //setup the next filter
+            // setup the next filter
             if ($setUpNext) {
                 ++$keyCount;
                 $filters->{$baseName}[$keyCount]          = new \stdClass();

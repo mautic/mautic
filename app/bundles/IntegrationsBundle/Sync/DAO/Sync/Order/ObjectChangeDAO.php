@@ -2,60 +2,24 @@
 
 declare(strict_types=1);
 
-/*
- * @copyright   2018 Mautic Inc. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://www.mautic.com
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\IntegrationsBundle\Sync\DAO\Sync\Order;
 
+use Mautic\IntegrationsBundle\Entity\ObjectMapping;
 use Mautic\IntegrationsBundle\Sync\DAO\Sync\Report\FieldDAO as ReportFieldDAO;
 
 class ObjectChangeDAO
 {
     /**
-     * @var string
+     * @var FieldDAO[]
      */
-    private $integration;
+    private array $fields = [];
 
-    /**
-     * @var string
-     */
-    private $object;
-
-    /**
-     * @var mixed
-     */
-    private $objectId;
-
-    /**
-     * @var string
-     */
-    private $mappedObject;
-
-    /**
-     * @var mixed
-     */
-    private $mappedId;
-
-    /**
-     * @var \DateTimeInterface
-     */
-    private $changeDateTime;
+    private ?\Mautic\IntegrationsBundle\Entity\ObjectMapping $objectMapping = null;
 
     /**
      * @var FieldDAO[]
      */
-    private $fields = [];
-
-    /**
-     * @var FieldDAO[]
-     */
-    private $fieldsByState = [
+    private array $fieldsByState = [
         ReportFieldDAO::FIELD_CHANGED   => [],
         ReportFieldDAO::FIELD_UNCHANGED => [],
         ReportFieldDAO::FIELD_REQUIRED  => [],
@@ -69,14 +33,14 @@ class ObjectChangeDAO
      * @param mixed              $mappedId       ID of the source object
      * @param \DateTimeInterface $changeDateTime Date\Time the object was last changed
      */
-    public function __construct($integration, $object, $objectId, $mappedObject, $mappedId, ?\DateTimeInterface $changeDateTime = null)
-    {
-        $this->integration    = $integration;
-        $this->object         = $object;
-        $this->objectId       = $objectId;
-        $this->mappedObject   = $mappedObject;
-        $this->mappedId       = $mappedId;
-        $this->changeDateTime = $changeDateTime;
+    public function __construct(
+        private $integration,
+        private $object,
+        private $objectId,
+        private $mappedObject,
+        private $mappedId,
+        private ?\DateTimeInterface $changeDateTime = null
+    ) {
     }
 
     public function getIntegration(): string
@@ -84,9 +48,6 @@ class ObjectChangeDAO
         return $this->integration;
     }
 
-    /**
-     * @return ObjectChangeDAO
-     */
     public function addField(FieldDAO $fieldDAO, string $state = ReportFieldDAO::FIELD_CHANGED): self
     {
         $this->fields[$fieldDAO->getName()]                = $fieldDAO;
@@ -148,15 +109,11 @@ class ObjectChangeDAO
     /**
      * @param string $name
      *
-     * @return FieldDAO
+     * @return FieldDAO|null
      */
     public function getField($name)
     {
-        if (isset($this->fields[$name])) {
-            return $this->fields[$name];
-        }
-
-        return null;
+        return $this->fields[$name] ?? null;
     }
 
     /**
@@ -210,8 +167,6 @@ class ObjectChangeDAO
     }
 
     /**
-     * @param \DateTimeInterface $changeDateTime
-     *
      * @return ObjectChangeDAO
      */
     public function setChangeDateTime(?\DateTimeInterface $changeDateTime = null)
@@ -223,5 +178,24 @@ class ObjectChangeDAO
         $this->changeDateTime = $changeDateTime;
 
         return $this;
+    }
+
+    public function setObjectMapping(ObjectMapping $objectMapping): void
+    {
+        $this->objectMapping = $objectMapping;
+    }
+
+    /**
+     * This is set after the ObjectMapping entity has been persisted to the database with the updates from this object.
+     */
+    public function getObjectMapping(): ObjectMapping
+    {
+        return $this->objectMapping;
+    }
+
+    public function removeField(string $field): void
+    {
+        unset($this->fields[$field]);
+        unset($this->fieldsByState[ReportFieldDAO::FIELD_CHANGED][$field]);
     }
 }

@@ -2,15 +2,6 @@
 
 declare(strict_types=1);
 
-/*
- * @copyright   2017 Mautic Contributors. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CoreBundle\Tests\Unit\Helper;
 
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
@@ -25,17 +16,17 @@ class EncryptionHelperTest extends \PHPUnit\Framework\TestCase
     /**
      * @var MockObject|CoreParametersHelper
      */
-    private $coreParametersHelperMock;
+    private \PHPUnit\Framework\MockObject\MockObject $coreParametersHelperMock;
 
     /**
      * @var MockObject|OpenSSLCipher
      */
-    private $mainCipherMock;
+    private \PHPUnit\Framework\MockObject\MockObject $mainCipherMock;
 
     /**
      * @var MockObject|SymmetricCipherInterface
      */
-    private $secondaryCipherMock;
+    private \PHPUnit\Framework\MockObject\MockObject $secondaryCipherMock;
 
     /**
      * @var string

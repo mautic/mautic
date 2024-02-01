@@ -2,15 +2,6 @@
 
 declare(strict_types=1);
 
-/*
- * @copyright   2018 Mautic Contributors. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CampaignBundle\Tests\Executioner\Dispatcher;
 
 use Doctrine\Common\Collections\ArrayCollection;
@@ -23,29 +14,27 @@ use Mautic\CampaignBundle\Executioner\Dispatcher\DecisionDispatcher;
 use Mautic\CampaignBundle\Executioner\Dispatcher\LegacyEventDispatcher;
 use Mautic\CampaignBundle\Executioner\Result\EvaluatedContacts;
 use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
-class DecisionDispatcherTest extends \PHPUnit\Framework\TestCase
+class DecisionDispatcherTest extends TestCase
 {
     /**
      * @var MockObject|EventDispatcherInterface
      */
-    private $dispatcher;
+    private \PHPUnit\Framework\MockObject\MockObject $dispatcher;
 
     /**
      * @var MockObject|LegacyEventDispatcher
      */
-    private $legacyDispatcher;
+    private \PHPUnit\Framework\MockObject\MockObject $legacyDispatcher;
 
     /**
      * @var MockObject|DecisionAccessor
      */
-    private $config;
+    private \PHPUnit\Framework\MockObject\MockObject $config;
 
-    /**
-     * @var DecisionDispatcher
-     */
-    private $decisionDispatcher;
+    private \Mautic\CampaignBundle\Executioner\Dispatcher\DecisionDispatcher $decisionDispatcher;
 
     protected function setUp(): void
     {
@@ -66,7 +55,7 @@ class DecisionDispatcherTest extends \PHPUnit\Framework\TestCase
 
         $this->dispatcher->expects($this->once())
             ->method('dispatch')
-            ->with('something', $this->isInstanceOf(DecisionEvent::class));
+            ->with($this->isInstanceOf(DecisionEvent::class), 'something');
 
         $this->decisionDispatcher->dispatchRealTimeEvent($this->config, new LeadEventLog(), null);
     }
@@ -81,7 +70,7 @@ class DecisionDispatcherTest extends \PHPUnit\Framework\TestCase
 
         $this->dispatcher->expects($this->once())
             ->method('dispatch')
-            ->with(CampaignEvents::ON_EVENT_DECISION_EVALUATION, $this->isInstanceOf(DecisionEvent::class));
+            ->with($this->isInstanceOf(DecisionEvent::class), CampaignEvents::ON_EVENT_DECISION_EVALUATION);
 
         $this->decisionDispatcher->dispatchEvaluationEvent($this->config, new LeadEventLog());
     }
@@ -90,7 +79,7 @@ class DecisionDispatcherTest extends \PHPUnit\Framework\TestCase
     {
         $this->dispatcher->expects($this->once())
             ->method('dispatch')
-            ->with(CampaignEvents::ON_EVENT_DECISION_EVALUATION_RESULTS, $this->isInstanceOf(DecisionResultsEvent::class));
+            ->with($this->isInstanceOf(DecisionResultsEvent::class), CampaignEvents::ON_EVENT_DECISION_EVALUATION_RESULTS);
 
         $this->decisionDispatcher->dispatchDecisionResultsEvent($this->config, new ArrayCollection([new LeadEventLog()]), new EvaluatedContacts());
     }

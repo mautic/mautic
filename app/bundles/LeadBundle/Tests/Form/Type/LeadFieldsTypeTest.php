@@ -2,15 +2,6 @@
 
 declare(strict_types=1);
 
-/*
- * @copyright   2020 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\LeadBundle\Tests\Form\Type;
 
 use Mautic\LeadBundle\Form\Type\LeadFieldsType;
@@ -23,12 +14,9 @@ final class LeadFieldsTypeTest extends \PHPUnit\Framework\TestCase
     /**
      * @var MockObject|FieldModel
      */
-    private $fieldModel;
+    private \PHPUnit\Framework\MockObject\MockObject $fieldModel;
 
-    /**
-     * @var LeadFieldsType
-     */
-    private $form;
+    private \Mautic\LeadBundle\Form\Type\LeadFieldsType $form;
 
     protected function setUp(): void
     {

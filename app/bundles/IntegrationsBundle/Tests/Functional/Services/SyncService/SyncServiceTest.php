@@ -2,15 +2,6 @@
 
 declare(strict_types=1);
 
-/*
- * @copyright   2018 Mautic Contributors. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\IntegrationsBundle\Tests\Functional\Services\SyncService;
 
 use Doctrine\DBAL\Connection;
@@ -93,7 +84,7 @@ class SyncServiceTest extends MauticMysqlTestCase
             ->from($prefix.'sync_object_mapping', 'm')
             ->groupBy('m.integration, m.integration_object_name')
             ->execute()
-            ->fetchAll();
+            ->fetchAllAssociative();
 
         $this->assertCount(1, $results);
         $this->assertEquals(ExampleIntegration::NAME, $results[0]['integration']);
@@ -105,7 +96,7 @@ class SyncServiceTest extends MauticMysqlTestCase
             ->from($prefix.'sync_object_mapping', 'm')
             ->groupBy('m.integration, m.internal_object_name')
             ->execute()
-            ->fetchAll();
+            ->fetchAllAssociative();
 
         $this->assertCount(1, $results);
         $this->assertEquals(ExampleIntegration::NAME, $results[0]['integration']);
@@ -116,7 +107,7 @@ class SyncServiceTest extends MauticMysqlTestCase
         $results = $qb->select('count(*) as the_count')
             ->from($prefix.'sync_object_mapping', 'm')
             ->execute()
-            ->fetchAll();
+            ->fetchAllAssociative();
         $this->assertEquals(50, $results[0]['the_count']);
     }
 }

@@ -1,71 +1,61 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\LeadBundle\Entity;
 
-use Doctrine\DBAL\Types\Type;
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\CoreBundle\Entity\FormEntity;
-use Mautic\CoreBundle\Helper\Chart\PieChart;
-use Symfony\Bundle\FrameworkBundle\Templating\Helper\TranslatorHelper;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
 
-/**
- * Class Import.
- */
 class Import extends FormEntity
 {
     /** ===== Statuses: ===== */
     /**
      * When the import entity is created for background processing.
      */
-    const QUEUED = 1;
+    public const QUEUED = 1;
 
     /**
      * When the background process started the import.
      */
-    const IN_PROGRESS = 2;
+    public const IN_PROGRESS = 2;
 
     /**
      * When the import is finished.
      */
-    const IMPORTED = 3;
+    public const IMPORTED = 3;
 
     /**
      * When the import process failed.
      */
-    const FAILED = 4;
+    public const FAILED = 4;
 
     /**
      * When the import has been stopped by a user.
      */
-    const STOPPED = 5;
+    public const STOPPED = 5;
 
     /**
      * When the import happens in the browser.
      */
-    const MANUAL = 6;
+    public const MANUAL = 6;
 
     /**
      * When the import is scheduled for later processing.
      */
-    const DELAYED = 7;
+    public const DELAYED = 7;
 
-    /** ===== Priorities: ===== */
-    const LOW    = 512;
-    const NORMAL = 64;
-    const HIGH   = 1;
+    /**
+     * ===== Priorities: =====.
+     */
+    public const LOW    = 512;
+
+    public const NORMAL = 64;
+
+    public const HIGH   = 1;
 
     /**
      * @var int
@@ -89,7 +79,7 @@ class Import extends FormEntity
     /**
      * Name of the original uploaded file.
      *
-     * @var string
+     * @var string|null
      */
     private $originalFile;
 
@@ -122,7 +112,7 @@ class Import extends FormEntity
     private $ignoredCount = 0;
 
     /**
-     * @var bool
+     * @var int
      */
     private $priority;
 
@@ -132,12 +122,12 @@ class Import extends FormEntity
     private $status;
 
     /**
-     * @var \DateTime
+     * @var \DateTimeInterface
      */
     private $dateStarted;
 
     /**
-     * @var \DateTime
+     * @var \DateTimeInterface
      */
     private $dateEnded;
 
@@ -147,7 +137,7 @@ class Import extends FormEntity
     private $object = 'lead';
 
     /**
-     * @var array
+     * @var array<mixed>|null
      */
     private $properties = [];
 
@@ -164,7 +154,7 @@ class Import extends FormEntity
         $this->priority = self::LOW;
     }
 
-    public static function loadMetadata(ORM\ClassMetadata $metadata)
+    public static function loadMetadata(ORM\ClassMetadata $metadata): void
     {
         $builder = new ClassMetadataBuilder($metadata);
         $builder->setTable('imports')
@@ -173,22 +163,22 @@ class Import extends FormEntity
             ->addIndex(['status'], 'import_status')
             ->addIndex(['priority'], 'import_priority')
             ->addId()
-            ->addField('dir', Type::STRING)
-            ->addField('file', Type::STRING)
-            ->addNullableField('originalFile', Type::STRING, 'original_file')
-            ->addNamedField('lineCount', Type::INTEGER, 'line_count')
-            ->addNamedField('insertedCount', Type::INTEGER, 'inserted_count')
-            ->addNamedField('updatedCount', Type::INTEGER, 'updated_count')
-            ->addNamedField('ignoredCount', Type::INTEGER, 'ignored_count')
-            ->addField('priority', Type::INTEGER)
-            ->addField('status', Type::INTEGER)
-            ->addNullableField('dateStarted', Type::DATETIME, 'date_started')
-            ->addNullableField('dateEnded', Type::DATETIME, 'date_ended')
-            ->addField('object', Type::STRING)
-            ->addNullableField('properties', Type::JSON_ARRAY);
+            ->addField('dir', Types::STRING)
+            ->addField('file', Types::STRING)
+            ->addNullableField('originalFile', Types::STRING, 'original_file')
+            ->addNamedField('lineCount', Types::INTEGER, 'line_count')
+            ->addNamedField('insertedCount', Types::INTEGER, 'inserted_count')
+            ->addNamedField('updatedCount', Types::INTEGER, 'updated_count')
+            ->addNamedField('ignoredCount', Types::INTEGER, 'ignored_count')
+            ->addField('priority', Types::INTEGER)
+            ->addField('status', Types::INTEGER)
+            ->addNullableField('dateStarted', Types::DATETIME_MUTABLE, 'date_started')
+            ->addNullableField('dateEnded', Types::DATETIME_MUTABLE, 'date_ended')
+            ->addField('object', Types::STRING)
+            ->addNullableField('properties', Types::JSON);
     }
 
-    public static function loadValidatorMetadata(ClassMetadata $metadata)
+    public static function loadValidatorMetadata(ClassMetadata $metadata): void
     {
         $metadata->addPropertyConstraint('dir', new Assert\NotBlank(
             ['message' => 'mautic.lead.import.dir.notblank']
@@ -201,10 +191,8 @@ class Import extends FormEntity
 
     /**
      * Prepares the metadata for API usage.
-     *
-     * @param $metadata
      */
-    public static function loadApiMetadata(ApiMetadataDriver $metadata)
+    public static function loadApiMetadata(ApiMetadataDriver $metadata): void
     {
         $metadata->setGroupPrefix('import')
             ->addListProperties(
@@ -230,10 +218,8 @@ class Import extends FormEntity
 
     /**
      * Checks if the import has everything needed to proceed.
-     *
-     * @return bool
      */
-    public function canProceed()
+    public function canProceed(): bool
     {
         if (!in_array($this->getStatus(), [self::QUEUED, self::DELAYED])) {
             $this->setStatusInfo('Import could not be triggered since it is not queued nor delayed');
@@ -264,10 +250,8 @@ class Import extends FormEntity
     /**
      * Decides if this import entity is triggered as the background
      * job or as UI process.
-     *
-     * @return bool
      */
-    public function isBackgroundProcess()
+    public function isBackgroundProcess(): bool
     {
         return !(self::MANUAL === $this->getStatus());
     }
@@ -316,10 +300,8 @@ class Import extends FormEntity
 
     /**
      * Get import file path.
-     *
-     * @return string
      */
-    public function getFilePath()
+    public function getFilePath(): string
     {
         return $this->getDir().'/'.$this->getFile();
     }
@@ -334,7 +316,7 @@ class Import extends FormEntity
     public function setFilePath($path)
     {
         $fileName = basename($path);
-        $dir      = substr($path, 0, (-1 * (strlen($fileName) + 1)));
+        $dir      = substr($path, 0, -1 * (strlen($fileName) + 1));
 
         $this->setDir($dir);
         $this->setFile($fileName);
@@ -348,7 +330,7 @@ class Import extends FormEntity
      * Not removing the CSV file is not considered a big trouble.
      * It will be removed on the next cache:clear.
      */
-    public function removeFile()
+    public function removeFile(): void
     {
         $file = $this->getFilePath();
 
@@ -385,7 +367,7 @@ class Import extends FormEntity
      */
     public function getName()
     {
-        return $this->getOriginalFile() ? $this->getOriginalFile() : $this->getId();
+        return $this->getOriginalFile() ?: $this->getId();
     }
 
     /**
@@ -508,10 +490,8 @@ class Import extends FormEntity
 
     /**
      * Counts current progress percentage.
-     *
-     * @return float
      */
-    public function getProgressPercentage()
+    public function getProgressPercentage(): float|int
     {
         $processed = $this->getProcessedRows();
 
@@ -566,27 +546,17 @@ class Import extends FormEntity
 
     /**
      * Returns Twitter Bootstrap label class based on current status.
-     *
-     * @return string
      */
-    public function getSatusLabelClass()
+    public function getSatusLabelClass(): string
     {
-        switch ($this->status) {
-            case self::QUEUED:
-                return 'info';
-            case self::IN_PROGRESS:
-            case self::MANUAL:
-                return 'primary';
-            case self::IMPORTED:
-                return 'success';
-            case self::FAILED:
-                return 'danger';
-            case self::STOPPED:
-            case self::DELAYED:
-                return 'warning';
-            default:
-                return 'default';
-        }
+        return match ($this->status) {
+            self::QUEUED => 'info',
+            self::IN_PROGRESS, self::MANUAL => 'primary',
+            self::IMPORTED => 'success',
+            self::FAILED   => 'danger',
+            self::STOPPED, self::DELAYED => 'warning',
+            default => 'default',
+        };
     }
 
     /**
@@ -603,7 +573,7 @@ class Import extends FormEntity
     }
 
     /**
-     * @return \DateTime
+     * @return \DateTimeInterface
      */
     public function getDateStarted()
     {
@@ -660,7 +630,7 @@ class Import extends FormEntity
     }
 
     /**
-     * @return \DateTime
+     * @return \DateTimeInterface
      */
     public function getDateEnded()
     {
@@ -758,12 +728,7 @@ class Import extends FormEntity
         return $this->setProperties($properties);
     }
 
-    /**
-     * @param $line
-     *
-     * @return Import
-     */
-    public function setLastLineImported($line)
+    public function setLastLineImported($line): void
     {
         $this->properties['line'] = (int) $line;
     }
@@ -773,7 +738,7 @@ class Import extends FormEntity
      */
     public function getLastLineImported()
     {
-        return isset($this->properties['line']) ? $this->properties['line'] : 0;
+        return $this->properties['line'] ?? 0;
     }
 
     /**
@@ -798,7 +763,7 @@ class Import extends FormEntity
     }
 
     /**
-     * @param string $properties
+     * @param array<mixed> $properties
      *
      * @return Import
      */
@@ -814,18 +779,14 @@ class Import extends FormEntity
      */
     public function getDefaults()
     {
-        if (isset($this->properties['defaults'])) {
-            return $this->properties['defaults'];
-        }
-
-        return [];
+        return $this->properties['defaults'] ?? [];
     }
 
     /**
      * Set a default value to the defaults array.
      *
      * @param string $key
-     * @param string $value
+     * @param mixed  $value
      *
      * @return Import
      */
@@ -935,20 +896,5 @@ class Import extends FormEntity
         }
 
         return parent::setIsPublished($isPublished);
-    }
-
-    /**
-     * Get pie graph data for row status counts.
-     *
-     * @return array
-     */
-    public function getRowStatusesPieChart(TranslatorHelper $translator)
-    {
-        $chart = new PieChart();
-        $chart->setDataset($translator->trans('mautic.lead.import.inserted.count'), $this->getInsertedCount());
-        $chart->setDataset($translator->trans('mautic.lead.import.updated.count'), $this->getUpdatedCount());
-        $chart->setDataset($translator->trans('mautic.lead.import.ignored.count'), $this->getIgnoredCount());
-
-        return $chart->render();
     }
 }

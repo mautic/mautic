@@ -1,35 +1,18 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\PointBundle\Event;
 
-use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\Process\Exception\InvalidArgumentException;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\EventDispatcher\Event;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class PointBuilderEvent extends Event
 {
-    /**
-     * @var array
-     */
-    private $actions = [];
+    private array $actions = [];
 
-    /**
-     * @var TranslatorInterface
-     */
-    private $translator;
-
-    public function __construct(TranslatorInterface $translator)
-    {
-        $this->translator = $translator;
+    public function __construct(
+        private TranslatorInterface $translator
+    ) {
     }
 
     /**
@@ -40,7 +23,7 @@ class PointBuilderEvent extends Event
      *                       'label'           => (required) what to display in the list
      *                       'description'     => (optional) short description of event
      *                       'template'        => (optional) template to use for the action's HTML in the point builder
-     *                       i.e AcmeMyBundle:PointAction:theaction.html.php
+     *                       i.e AcmeMyBundle:PointAction:theaction.html.twig
      *                       'formType'        => (optional) name of the form type SERVICE for the action; will use a default form with point change only
      *                       'formTypeOptions' => (optional) array of options to pass to formType
      *                       'callback'        => (optional) callback function that will be passed when the action is triggered; return true to
@@ -58,20 +41,20 @@ class PointBuilderEvent extends Event
      *
      * @throws InvalidArgumentException
      */
-    public function addAction($key, array $action)
+    public function addAction($key, array $action): void
     {
         if (array_key_exists($key, $this->actions)) {
             throw new InvalidArgumentException("The key, '$key' is already used by another action. Please use a different key.");
         }
 
-        //check for required keys and that given functions are callable
+        // check for required keys and that given functions are callable
         $this->verifyComponent(
             ['group', 'label'],
             ['callback'],
             $action
         );
 
-        //translate the label and group
+        // translate the label and group
         $action['label'] = $this->translator->trans($action['label']);
         $action['group'] = $this->translator->trans($action['group']);
 
@@ -83,20 +66,16 @@ class PointBuilderEvent extends Event
      */
     public function getActions()
     {
-        uasort($this->actions, function ($a, $b) {
-            return strnatcasecmp(
-                $a['label'], $b['label']);
-        });
+        uasort($this->actions, fn ($a, $b): int => strnatcasecmp(
+            $a['label'], $b['label']));
 
         return $this->actions;
     }
 
     /**
      * Gets a list of actions supported by the choice form field.
-     *
-     * @return array
      */
-    public function getActionList()
+    public function getActionList(): array
     {
         $list    = [];
         $actions = $this->getActions();
@@ -107,7 +86,10 @@ class PointBuilderEvent extends Event
         return $list;
     }
 
-    public function getActionChoices()
+    /**
+     * @return mixed[]
+     */
+    public function getActionChoices(): array
     {
         $choices = [];
         foreach ($this->actions as $k => $c) {
@@ -120,7 +102,7 @@ class PointBuilderEvent extends Event
     /**
      * @throws InvalidArgumentException
      */
-    private function verifyComponent(array $keys, array $methods, array $component)
+    private function verifyComponent(array $keys, array $methods, array $component): void
     {
         foreach ($keys as $k) {
             if (!array_key_exists($k, $component)) {

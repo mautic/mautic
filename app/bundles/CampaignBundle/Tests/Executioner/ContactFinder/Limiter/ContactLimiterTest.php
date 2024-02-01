@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2018 Mautic Contributors. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CampaignBundle\Tests\Executioner\ContactFinder\Limiter;
 
 use Mautic\CampaignBundle\Executioner\ContactFinder\Limiter\ContactLimiter;
@@ -16,7 +7,7 @@ use Mautic\CampaignBundle\Executioner\Exception\NoContactsFoundException;
 
 class ContactLimiterTest extends \PHPUnit\Framework\TestCase
 {
-    public function testGetters()
+    public function testGetters(): void
     {
         $limiter = new ContactLimiter(1, 2, 3, 4, [1, 2, 3]);
 
@@ -27,7 +18,7 @@ class ContactLimiterTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals([1, 2, 3], $limiter->getContactIdList());
     }
 
-    public function testBatchMinContactIsReturned()
+    public function testBatchMinContactIsReturned(): void
     {
         $limiter = new ContactLimiter(1, 2, 3, 10, [1, 2, 3]);
 
@@ -35,7 +26,7 @@ class ContactLimiterTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals(5, $limiter->getMinContactId());
     }
 
-    public function testNoContactsFoundExceptionThrownIfIdIsLessThanMin()
+    public function testNoContactsFoundExceptionThrownIfIdIsLessThanMin(): void
     {
         $this->expectException(NoContactsFoundException::class);
 
@@ -43,7 +34,7 @@ class ContactLimiterTest extends \PHPUnit\Framework\TestCase
         $limiter->setBatchMinContactId(1);
     }
 
-    public function testNoContactsFoundExceptionThrownIfIdIsMoreThanMax()
+    public function testNoContactsFoundExceptionThrownIfIdIsMoreThanMax(): void
     {
         $this->expectException(NoContactsFoundException::class);
 
@@ -51,7 +42,7 @@ class ContactLimiterTest extends \PHPUnit\Framework\TestCase
         $limiter->setBatchMinContactId(11);
     }
 
-    public function testNoContactsFoundExceptionThrownIfIdIsTheSameAsLastBatch()
+    public function testNoContactsFoundExceptionThrownIfIdIsTheSameAsLastBatch(): void
     {
         $this->expectException(NoContactsFoundException::class);
 
@@ -60,19 +51,19 @@ class ContactLimiterTest extends \PHPUnit\Framework\TestCase
         $limiter->setBatchMinContactId(5);
     }
 
-    public function testExceptionNotThrownIfIdEqualsMinSoThatItsIsIncluded()
+    public function testExceptionNotThrownIfIdEqualsMinSoThatItsIsIncluded(): void
     {
         $limiter = new ContactLimiter(1, 2, 3, 10, [1, 2, 3]);
         $this->assertSame($limiter, $limiter->setBatchMinContactId(3));
     }
 
-    public function testExceptionNotThrownIfIdEqualsMaxSoThatItsIsIncluded()
+    public function testExceptionNotThrownIfIdEqualsMaxSoThatItsIsIncluded(): void
     {
         $limiter = new ContactLimiter(1, 2, 3, 10, [1, 2, 3]);
         $this->assertSame($limiter, $limiter->setBatchMinContactId(10));
     }
 
-    public function testExceptionThrownIfThreadIdLargerThanMaxThreads()
+    public function testExceptionThrownIfThreadIdLargerThanMaxThreads(): void
     {
         $this->expectException(\InvalidArgumentException::class);
 

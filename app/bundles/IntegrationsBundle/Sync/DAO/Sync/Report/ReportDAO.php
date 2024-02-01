@@ -2,15 +2,6 @@
 
 declare(strict_types=1);
 
-/*
- * @copyright   2018 Mautic Inc. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://www.mautic.com
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\IntegrationsBundle\Sync\DAO\Sync\Report;
 
 use Mautic\IntegrationsBundle\Sync\DAO\Mapping\RemappedObjectDAO;
@@ -21,32 +12,18 @@ use Mautic\IntegrationsBundle\Sync\Exception\ObjectNotFoundException;
 
 class ReportDAO
 {
-    /**
-     * @var string
-     */
-    private $integration;
+    private array $objects = [];
+
+    private array $remappedObjects = [];
+
+    private \Mautic\IntegrationsBundle\Sync\DAO\Sync\RelationsDAO $relationsDAO;
 
     /**
-     * @var array
+     * @param string $integration
      */
-    private $objects = [];
-
-    /**
-     * @var array
-     */
-    private $remappedObjects = [];
-
-    /**
-     * @var RelationsDAO
-     */
-    private $relationsDAO;
-
-    /**
-     * @param $integration
-     */
-    public function __construct($integration)
-    {
-        $this->integration     = $integration;
+    public function __construct(
+        private $integration
+    ) {
         $this->relationsDAO    = new RelationsDAO();
     }
 
@@ -88,16 +65,10 @@ class ReportDAO
     }
 
     /**
-     * @param $objectName
-     * @param $objectId
-     * @param $fieldName
-     *
-     * @return InformationChangeRequestDAO
-     *
      * @throws ObjectNotFoundException
      * @throws FieldNotFoundException
      */
-    public function getInformationChangeRequest($objectName, $objectId, $fieldName)
+    public function getInformationChangeRequest($objectName, $objectId, $fieldName): InformationChangeRequestDAO
     {
         if (empty($this->objects[$objectName][$objectId])) {
             throw new ObjectNotFoundException($objectName.':'.$objectId);
@@ -136,7 +107,7 @@ class ReportDAO
             return $returnedObjects;
         }
 
-        return isset($this->objects[$objectName]) ? $this->objects[$objectName] : [];
+        return $this->objects[$objectName] ?? [];
     }
 
     /**
@@ -163,10 +134,7 @@ class ReportDAO
         return $this->objects[$objectName][$objectId];
     }
 
-    /**
-     * @return bool
-     */
-    public function shouldSync()
+    public function shouldSync(): bool
     {
         return !empty($this->objects);
     }

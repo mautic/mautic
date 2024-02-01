@@ -1,50 +1,41 @@
 <?php
 
-/*
- * @copyright   2016 Mautic, Inc. All rights reserved
- * @author      Mautic, Inc
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace MauticPlugin\MauticSocialBundle\Model;
 
 use Mautic\CoreBundle\Model\AjaxLookupModelInterface;
 use Mautic\CoreBundle\Model\FormModel;
 use Mautic\LeadBundle\Entity\Lead;
 use MauticPlugin\MauticSocialBundle\Entity\Tweet;
+use MauticPlugin\MauticSocialBundle\Entity\TweetRepository;
 use MauticPlugin\MauticSocialBundle\Entity\TweetStat;
+use MauticPlugin\MauticSocialBundle\Entity\TweetStatRepository;
 use MauticPlugin\MauticSocialBundle\Event as Events;
 use MauticPlugin\MauticSocialBundle\Form\Type\TweetType;
 use MauticPlugin\MauticSocialBundle\SocialEvents;
-use Symfony\Component\EventDispatcher\Event;
+use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
+use Symfony\Contracts\EventDispatcher\Event;
 
 /**
- * Class TweetModel
- * {@inheritdoc}
+ * @extends FormModel<Tweet>
+ *
+ * @implements AjaxLookupModelInterface<Tweet>
  */
 class TweetModel extends FormModel implements AjaxLookupModelInterface
 {
     /**
-     * @param        $type
      * @param string $filter
      * @param int    $limit
      * @param int    $start
      * @param array  $options
-     *
-     * @return array
      */
-    public function getLookupResults($type, $filter = '', $limit = 10, $start = 0, $options = [])
+    public function getLookupResults($type, $filter = '', $limit = 10, $start = 0, $options = []): array
     {
         $results = [];
 
         switch ($type) {
             case 'social.tweet':
             case 'tweet':
-
                 if (isset($filter['tweet_text'])) {
                     // This tweet was created as the campaign action param and these params are not the filter. Clear the filter.
                     $filter = '';
@@ -63,7 +54,7 @@ class TweetModel extends FormModel implements AjaxLookupModelInterface
                     $results[$entity['language']][$entity['id']] = $entity['name'];
                 }
 
-                //sort by language
+                // sort by language
                 ksort($results);
 
                 unset($entities);
@@ -132,58 +123,42 @@ class TweetModel extends FormModel implements AjaxLookupModelInterface
     }
 
     /**
-     * {@inheritdoc}
-     *
-     * @param Tweet $entity
-     * @param       $formFactory
-     * @param null  $action
-     *
-     * @return mixed
+     * @param Tweet        $entity
+     * @param array<mixed> $options
      *
      * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
      */
-    public function createForm($entity, $formFactory, $action = null, $params = [])
+    public function createForm($entity, FormFactoryInterface $formFactory, $action = null, $options = []): \Symfony\Component\Form\FormInterface
     {
         if (!$entity instanceof Tweet) {
             throw new MethodNotAllowedHttpException(['Tweet']);
         }
 
         if (!empty($action)) {
-            $params['action'] = $action;
+            $options['action'] = $action;
         }
 
-        return $formFactory->create(TweetType::class, $entity, $params);
+        return $formFactory->create(TweetType::class, $entity, $options);
     }
 
     /**
      * Get a specific entity or generate a new one if id is empty.
      *
      * @param int $id
-     *
-     * @return Tweet|null
      */
-    public function getEntity($id = null)
+    public function getEntity($id = null): ?Tweet
     {
         if (null === $id) {
-            $entity = new Tweet();
-        } else {
-            $entity = parent::getEntity($id);
+            return new Tweet();
         }
 
-        return $entity;
+        return parent::getEntity($id);
     }
 
     /**
-     * {@inheritdoc}
-     *
-     * @param $action
-     * @param $event
-     * @param $entity
-     * @param $isNew
-     *
      * @throws \Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException
      */
-    protected function dispatchEvent($action, &$entity, $isNew = false, Event $event = null)
+    protected function dispatchEvent($action, &$entity, $isNew = false, Event $event = null): ?Event
     {
         if (!$entity instanceof Tweet) {
             throw new MethodNotAllowedHttpException(['Tweet']);
@@ -211,7 +186,7 @@ class TweetModel extends FormModel implements AjaxLookupModelInterface
                 $event = new Events\SocialEvent($entity, $isNew);
             }
 
-            $this->dispatcher->dispatch($name, $event);
+            $this->dispatcher->dispatch($event, $name);
 
             return $event;
         } else {
@@ -219,26 +194,17 @@ class TweetModel extends FormModel implements AjaxLookupModelInterface
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getRepository()
+    public function getRepository(): TweetRepository
     {
-        return $this->em->getRepository('MauticSocialBundle:Tweet');
+        return $this->em->getRepository(Tweet::class);
     }
 
-    /**
-     * @return TweetStatRepository
-     */
-    public function getStatRepository()
+    public function getStatRepository(): TweetStatRepository
     {
-        return $this->em->getRepository('MauticSocialBundle:TweetStat');
+        return $this->em->getRepository(TweetStat::class);
     }
 
-    /**
-     * @return string
-     */
-    public function getPermissionBase()
+    public function getPermissionBase(): string
     {
         return 'mauticSocial:tweets';
     }

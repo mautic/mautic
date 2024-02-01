@@ -1,32 +1,15 @@
 <?php
 
-/*
- * @copyright   2018 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\LeadBundle\Segment\Decorator;
 
 use Mautic\LeadBundle\Segment\ContactSegmentFilterCrate;
 use Mautic\LeadBundle\Segment\Query\Filter\ComplexRelationValueFilterQueryBuilder;
 
-/**
- * Class DateCompanyDecorator.
- */
 class DateCompanyDecorator implements FilterDecoratorInterface
 {
-    /**
-     * @var FilterDecoratorInterface
-     */
-    private $dateDecorator;
-
-    public function __construct(FilterDecoratorInterface $dateDecorator)
-    {
-        $this->dateDecorator = $dateDecorator;
+    public function __construct(
+        private FilterDecoratorInterface $dateDecorator
+    ) {
     }
 
     /**
@@ -66,47 +49,35 @@ class DateCompanyDecorator implements FilterDecoratorInterface
     /**
      * @return array|bool|float|string|null
      */
-    public function getParameterValue(ContactSegmentFilterCrate $contactSegmentFilterCrate)
+    public function getParameterValue(ContactSegmentFilterCrate $contactSegmentFilterCrate): mixed
     {
         return $this->dateDecorator->getParameterValue($contactSegmentFilterCrate);
     }
 
-    /**
-     * @return string
-     */
-    public function getQueryType(ContactSegmentFilterCrate $contactSegmentFilterCrate)
+    public function getQueryType(ContactSegmentFilterCrate $contactSegmentFilterCrate): string
     {
         return ComplexRelationValueFilterQueryBuilder::getServiceId();
     }
 
-    /**
-     * @return bool|string
-     */
-    public function getAggregateFunc(ContactSegmentFilterCrate $contactSegmentFilterCrate)
+    public function getAggregateFunc(ContactSegmentFilterCrate $contactSegmentFilterCrate): string|bool
     {
         return $this->dateDecorator->getAggregateFunc($contactSegmentFilterCrate);
     }
 
     /**
-     * @return \Mautic\LeadBundle\Segment\Query\Expression\CompositeExpression|string|null
+     * @return \Doctrine\DBAL\Query\Expression\CompositeExpression|string|null
      */
     public function getWhere(ContactSegmentFilterCrate $contactSegmentFilterCrate)
     {
         return $this->dateDecorator->getWhere($contactSegmentFilterCrate);
     }
 
-    /**
-     * @return string
-     */
-    public function getRelationJoinTable()
+    public function getRelationJoinTable(): string
     {
         return MAUTIC_TABLE_PREFIX.'companies_leads';
     }
 
-    /**
-     * @return string
-     */
-    public function getRelationJoinTableField()
+    public function getRelationJoinTableField(): string
     {
         return 'company_id';
     }

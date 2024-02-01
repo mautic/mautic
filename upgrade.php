@@ -1,25 +1,17 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 ini_set('display_errors', 'Off');
 date_default_timezone_set('UTC');
 
-$standalone = (int) getVar('standalone', 0);
+// Running this script standalone is no longer supported
+$standalone = 0;
 $task       = getVar('task');
 
 define('IN_CLI', 'cli' === php_sapi_name());
-define('MAUTIC_ROOT', (IN_CLI || $standalone || empty($task)) ? __DIR__ : dirname(__DIR__));
+define('MAUTIC_ROOT', (IN_CLI || empty($task)) ? __DIR__ : dirname(__DIR__));
 define('MAUTIC_APP_ROOT', MAUTIC_ROOT.'/app');
 
-if ($standalone || IN_CLI) {
+if (IN_CLI) {
     if (!file_exists(__DIR__.'/upgrade')) {
         mkdir(__DIR__.'/upgrade');
     }
@@ -49,8 +41,8 @@ if (file_exists(MAUTIC_UPGRADE_ROOT.'/app/release_metadata.json')) {
 
 // Get local parameters
 $localParameters = get_local_config();
-$cacheDir        = (isset($localParameters['cache_path'])) ? str_replace('%kernel.root_dir%', MAUTIC_APP_ROOT, $localParameters['cache_path'].'/prod') : MAUTIC_APP_ROOT.'/../var/cache/prod';
-$logDir          = (isset($localParameters['log_path'])) ? str_replace('%kernel.root_dir%', MAUTIC_APP_ROOT, $localParameters['log_path'].'/prod') : MAUTIC_APP_ROOT.'/../var/logs';
+$cacheDir        = (isset($localParameters['cache_path'])) ? str_replace('%kernel.project_dir%', MAUTIC_ROOT, $localParameters['cache_path'].'/prod') : MAUTIC_ROOT.'/var/cache/prod';
+$logDir          = (isset($localParameters['log_path'])) ? str_replace('%kernel.project_dir%', MAUTIC_ROOT, $localParameters['log_path'].'/prod') : MAUTIC_ROOT.'/var/logs';
 
 define('MAUTIC_CACHE_DIR', $cacheDir);
 define('MAUTIC_UPGRADE_ERROR_LOG', $logDir.'/upgrade_errors.php');
@@ -64,14 +56,14 @@ if (isset($_COOKIE['mautic_session_name'])) {
     $sessionValue = $_COOKIE[$_COOKIE['mautic_session_name']];
 
     include MAUTIC_APP_ROOT.'/config/paths.php';
-    $localConfigPath = str_replace('%kernel.root_dir%', MAUTIC_APP_ROOT, $paths['local_config']);
+    $localConfigPath = str_replace('%kernel.project_dir%', MAUTIC_ROOT, $paths['local_config']);
 
     $newSessionName = md5(md5($localConfigPath).$localParameters['secret_key']);
 
     setcookie($newSessionName, $sessionValue, 0, '/', '', false, true);
 
     unset($_COOKIE['mautic_session_name']);
-    setcookie('mautic_session_name', null, -1);
+    setcookie('mautic_session_name', '', -1);
 }
 
 // Fetch the update state out of the request if applicable
@@ -87,213 +79,91 @@ if (empty($state)) {
 }
 $status = ['complete' => false, 'error' => false, 'updateState' => $state, 'stepStatus' => 'In Progress'];
 
-// Web request upgrade
-if (!IN_CLI) {
-    $request         = explode('?', $_SERVER['REQUEST_URI'])[0];
-    $url             = "//{$_SERVER['HTTP_HOST']}{$request}";
-    $isSSL           = (!empty($_SERVER['HTTPS']) && 'off' != $_SERVER['HTTPS']);
-    $cookie_path     = (isset($localParameters['cookie_path'])) ? $localParameters['cookie_path'] : '/';
-    $cookie_domain   = (isset($localParameters['cookie_domain'])) ? $localParameters['cookie_domain'] : '';
-    $cookie_secure   = (isset($localParameters['cookie_secure'])) ? $localParameters['cookie_secure'] : $isSSL;
-    $cookie_httponly = (isset($localParameters['cookie_httponly'])) ? $localParameters['cookie_httponly'] : false;
-
-    setcookie('mautic_update', $task, time() + 300, $cookie_path, $cookie_domain, $cookie_secure, $cookie_httponly);
-    $query    = '';
-    $maxCount = (!empty($standalone)) ? 25 : 5;
-
-    switch ($task) {
-        case '':
-            html_body("<div class='well text-center'><h3><a href='$url?task=startUpgrade&standalone=1'>Click here to start upgrade.</a></h3><br /><strong>Do not refresh or stop the process. This may take several minutes.</strong></div>");
-
-            // no break
-        case 'startUpgrade':
-            $nextTask = 'fetchUpdates';
-            break;
-
-        case 'fetchUpdates':
-            [$success, $message] = fetch_updates();
-
-            if (!$success) {
-                html_body("<div alert='alert alert-danger'>$message</div>");
-            }
-
-            $query    = "version=$message&";
-            $nextTask = 'extractUpdate';
-            break;
-
-        case 'extractUpdate':
-            [$success, $message] = extract_package(getVar('version'));
-
-            if (!$success) {
-                html_body("<div alert='alert alert-danger'>$message</div>");
-            }
-
-            $nextTask = 'moveBundles';
-            break;
-
-        case 'moveBundles':
-            $status = move_mautic_bundles($status, $maxCount);
-            if (empty($status['complete'])) {
-                if (!isset($state['refresh_count'])) {
-                    $state['refresh_count'] = 1;
-                }
-                $nextTask = 'moveBundles';
-                $query    = 'count='.$state['refresh_count'].'&';
-                ++$state['refresh_count'];
-            } else {
-                $nextTask = 'moveCore';
-                unset($state['refresh_count']);
-            }
-            break;
-
-        case 'moveCore':
-            $status   = move_mautic_core($status);
-            $nextTask = 'moveVendors';
-            break;
-
-        case 'moveVendors':
-            $status   = move_mautic_vendors($status, $maxCount);
-            $nextTask = (!empty($status['complete'])) ? 'clearCache' : 'moveVendors';
-
-            if (empty($status['complete'])) {
-                if (!isset($state['refresh_count'])) {
-                    $state['refresh_count'] = 1;
-                }
-                $nextTask = 'moveVendors';
-                $query    = 'count='.$state['refresh_count'].'&';
-                ++$state['refresh_count'];
-            } else {
-                $nextTask = 'clearCache';
-                unset($state['refresh_count']);
-            }
-            break;
-
-        case 'clearCache':
-            clear_mautic_cache();
-            $nextTask = 'buildCache';
-            $redirect = true;
-            break;
-
-        case 'buildCache':
-            build_cache();
-            $nextTask = (!empty($standalone)) ? 'applyMigrations' : 'applyCriticalMigrations';
-            $redirect = true;
-            break;
-
-        case 'applyCriticalMigrations':
-            // Apply critical migrations
-            apply_critical_migrations();
-            $nextTask = 'finish';
-            $redirect = true;
-            break;
-
-        case 'applyMigrations':
-            // Apply critical migrations
-            apply_migrations();
-            $nextTask = 'finish';
-
-            break;
-
-        case 'finish':
-            clear_mautic_cache();
-
-            if (!empty($standalone)) {
-                html_body("<div class='well'><h3 class='text-center'>Success!</h3><h4 class='text-danger text-center'>Remove this script!</h4></div>");
-            } else {
-                $status['complete']                     = true;
-                $status['stepStatus']                   = 'Success';
-                $status['nextStep']                     = 'Processing Database Updates';
-                $status['nextStepStatus']               = 'In Progress';
-                $status['updateState']['cacheComplete'] = true;
-            }
-            break;
-
-        default:
-            $status['error']      = true;
-            $status['message']    = 'Invalid task';
-            $status['stepStatus'] = 'Failed';
-            break;
-    }
-
-    if ($standalone || !empty($redirect)) {
-        // Standalone updater or redirecting to help prevent timeouts
-        if (!empty($nextTask)) {
-            if ('finish' == $nextTask) {
-                header("Location: $url?task=$nextTask&standalone=$standalone");
-            } else {
-                header("Location: $url?{$query}task=$nextTask&standalone=$standalone&updateState=".get_state_param($state));
-            }
-
-            exit;
-        }
-    } else {
-        // Request through Mautic's UI
-        $status['updateState'] = get_state_param($status['updateState']);
-
-        send_response($status);
-    }
-} else {
-    // CLI upgrade
-    echo 'Checking for new updates...';
-    [$success, $message] = fetch_updates();
-    if (!$success) {
-        echo "failed. $message";
-        exit;
-    }
-    $version = $message;
-    echo "updating to $version!\n";
-
-    echo 'Extracting the update package...';
-    [$success, $message] = extract_package($version);
-    if (!$success) {
-        echo "failed. $message";
-        exit;
-    }
-    echo "done!\n";
-
-    echo 'Moving files...';
-    $status = move_mautic_bundles($status, -1);
-    $status = move_mautic_core($status);
-    $status = move_mautic_vendors($status, -1);
-    if (empty($status['complete'])) {
-        echo 'failed. Review udpate errors log for details.';
-        exit;
-    }
-    unset($status['complete']);
-    echo "done!\n";
-
-    echo 'Clearing the cache...';
-    if (!clear_mautic_cache()) {
-        echo 'failed. Review udpate errors log for details.';
-        exit;
-    }
-    echo "done!\n";
-
-    echo 'Rebuilding the cache...';
-    if (!build_cache()) {
-        echo 'failed. Review udpate errors log for details.';
-        exit;
-    }
-    echo "done!\n";
-
-    echo 'Applying migrations...';
-    if (!apply_migrations()) {
-        echo 'failed. Review udpate errors log for details.';
-        exit;
-    }
-    echo "done!\n";
-
-    echo 'Cleaning up...';
-    if (!recursive_remove_directory(MAUTIC_UPGRADE_ROOT)) {
-        echo "failed. Manually delete the upgrade folder.\n";
-    }
-    if (!clear_mautic_cache()) {
-        echo 'failed. Manually delete app/cache/prod.';
-    }
-    echo "done!\n";
-
-    echo "\nSuccess!";
+if (IN_CLI) {
+    echo "Upgrading through upgrade.php using the CLI is no longer supported. Please use 'php bin/console mautic:update:find' instead. \n";
+    exit(1);
 }
+
+// Web request upgrade
+$request         = explode('?', $_SERVER['REQUEST_URI'])[0];
+$url             = "//{$_SERVER['HTTP_HOST']}{$request}";
+$isSSL           = (!empty($_SERVER['HTTPS']) && 'off' != $_SERVER['HTTPS']);
+$cookie_path     = (isset($localParameters['cookie_path'])) ? $localParameters['cookie_path'] : '/';
+$cookie_domain   = (isset($localParameters['cookie_domain'])) ? $localParameters['cookie_domain'] : '';
+$cookie_secure   = (isset($localParameters['cookie_secure'])) ? $localParameters['cookie_secure'] : $isSSL;
+$cookie_httponly = (isset($localParameters['cookie_httponly'])) ? $localParameters['cookie_httponly'] : false;
+
+setcookie('mautic_update', $task, time() + 300, $cookie_path, $cookie_domain, $cookie_secure, $cookie_httponly);
+$query    = '';
+$maxCount = 5;
+
+switch ($task) {
+    case '':
+        html_body("<div class='well text-center'>This script cannot run standalone. Please log into Mautic to check for updates.</div>");
+
+        // no break
+    case 'moveBundles':
+        $status = move_mautic_bundles($status, $maxCount);
+        if (empty($status['complete'])) {
+            if (!isset($state['refresh_count'])) {
+                $state['refresh_count'] = 1;
+            }
+            $nextTask = 'moveBundles';
+            $query    = 'count='.$state['refresh_count'].'&';
+            ++$state['refresh_count'];
+        } else {
+            $nextTask = 'moveCore';
+            unset($state['refresh_count']);
+        }
+        break;
+
+    case 'moveCore':
+        $status   = move_mautic_core($status);
+        $nextTask = 'moveVendors';
+        break;
+
+    case 'moveVendors':
+        $status   = move_mautic_vendors($status, $maxCount);
+        $nextTask = (!empty($status['complete'])) ? 'clearCache' : 'moveVendors';
+
+        if (empty($status['complete'])) {
+            if (!isset($state['refresh_count'])) {
+                $state['refresh_count'] = 1;
+            }
+            $nextTask = 'moveVendors';
+            $query    = 'count='.$state['refresh_count'].'&';
+            ++$state['refresh_count'];
+        } else {
+            $nextTask = 'clearCache';
+            unset($state['refresh_count']);
+        }
+        break;
+
+    case 'clearCache':
+        clear_mautic_cache();
+        $nextTask = 'finish';
+        break;
+
+    case 'finish':
+        $status['complete']                     = true;
+        $status['stepStatus']                   = 'Success';
+        $status['nextStep']                     = 'Processing Database Updates';
+        $status['nextStepStatus']               = 'In Progress';
+        $status['updateState']['cacheComplete'] = true;
+
+        break;
+
+    default:
+        $status['error']      = true;
+        $status['message']    = 'Invalid task';
+        $status['stepStatus'] = 'Failed';
+        break;
+}
+
+// Request through Mautic's UI
+$status['updateState'] = get_state_param($status['updateState']);
+
+send_response($status);
 
 /**
  * Get local parameters.
@@ -308,21 +178,23 @@ function get_local_config()
         // Used in paths.php
         $root = MAUTIC_APP_ROOT;
 
-        /** @var array $paths */
+        /** @var array<string> $paths */
+        $paths = [];
         include MAUTIC_APP_ROOT.'/config/paths.php';
 
         // Include local config to get cache_path
-        $localConfig = str_replace('%kernel.root_dir%', MAUTIC_APP_ROOT, $paths['local_config']);
+        $localConfig = str_replace('%kernel.project_dir%', MAUTIC_ROOT, $paths['local_config']);
 
-        /** @var array $parameters */
+        /** @var array<string, mixed> $parameters */
+        $parameters = [];
         include $localConfig;
 
         $localParameters = $parameters;
 
-        //check for parameter overrides
-        if (file_exists(MAUTIC_APP_ROOT.'/config/parameters_local.php')) {
-            /** @var $parameters */
-            include MAUTIC_APP_ROOT.'/config/parameters_local.php';
+        // check for parameter overrides
+        if (file_exists(MAUTIC_APP_ROOT.'/../config/parameters_local.php')) {
+            /** @var array<string, mixed> $parameters */
+            include MAUTIC_APP_ROOT.'/../config/parameters_local.php';
             $localParameters = array_merge($localParameters, $parameters);
         }
 
@@ -339,125 +211,13 @@ function get_local_config()
 }
 
 /**
- * Fetch a list of updates.
- *
- * @return array
- */
-function fetch_updates()
-{
-    global $localParameters;
-
-    $version = file_get_contents(__DIR__.'/app/version.txt');
-    try {
-        // Generate a unique instance ID for the site
-        $instanceId = hash('sha1', $localParameters['secret_key'].'Mautic'.$localParameters['db_driver']);
-
-        $data = [
-            'application'   => 'Mautic',
-            'version'       => $version,
-            'phpVersion'    => PHP_VERSION,
-            'dbDriver'      => $localParameters['db_driver'],
-            'serverOs'      => php_uname('s').' '.php_uname('r'),
-            'instanceId'    => $instanceId,
-            'installSource' => (isset($localParameters['install_source'])) ? $localParameters['install_source'] : 'Mautic',
-        ];
-
-        make_request('https://updates.mautic.org/stats/send', 'post', $data);
-    } catch (\Exception $exception) {
-        // Not so concerned about failures here, move along
-    }
-
-    // Get the update data
-    try {
-        $appData = [
-            'appVersion' => $version,
-            'phpVersion' => PHP_VERSION,
-            'stability'  => (isset($localParameters['update_stability'])) ? $localParameters['update_stability'] : 'stable',
-        ];
-
-        $data   = make_request('https://updates.mautic.org/index.php?option=com_mauticdownload&task=checkUpdates', 'post', $appData);
-        $update = json_decode($data);
-
-        // Check if this version is up to date
-        if ($update->latest_version || version_compare($version, $update->version, 'ge')) {
-            return [false, 'Up to date!'];
-        }
-
-        // Fetch the package
-        try {
-            download_package($update);
-        } catch (\Exception $e) {
-            return [
-                false,
-                "Could not automatically download the package. Please download {$update->package}, place it in the same directory as this upgrade script, and try again. ".
-                "When moving the file, name it `{$update->version}-update.zip`",
-            ];
-        }
-
-        return [true, $update->version];
-    } catch (\Exception $exception) {
-        return [false, $exception->getMessage()];
-    }
-}
-
-/**
- * @param object $update
- *
- * @throws Exception
- *
- * @return bool
- */
-function download_package($update)
-{
-    $packageName = $update->version.'-update.zip';
-    $target      = __DIR__.'/'.$packageName;
-
-    if (file_exists($target)) {
-        return true;
-    }
-
-    $data = make_request($update->package);
-
-    if (!file_put_contents($target, $data)) {
-        throw new \Exception();
-    }
-}
-
-/**
- * @return int
- */
-function extract_package($version)
-{
-    $zipFile = __DIR__.'/'.$version.'-update.zip';
-
-    if (!file_exists($zipFile)) {
-        return [false, 'Package could not be found!'];
-    }
-
-    $zipper  = new \ZipArchive();
-    $archive = $zipper->open($zipFile);
-
-    if (true !== $archive) {
-        return [false, 'Could not open or read update package.'];
-    }
-
-    if (!$zipper->extractTo(MAUTIC_UPGRADE_ROOT)) {
-        return [false, 'Could not extract update package'];
-    }
-
-    $zipper->close();
-
-    return [true, 'success'];
-}
-
-/**
  * Clears the application cache.
  *
  * Since this script is being executed via web requests and standalone from the Mautic application, we don't have access to Symfony's
  * CLI suite.  So we'll go with Option B in this instance and just nuke the entire production cache and let Symfony rebuild it on the next
  * application cycle.
  *
- * @return array
+ * @return bool
  */
 function clear_mautic_cache()
 {
@@ -480,93 +240,6 @@ function clear_mautic_cache()
 }
 
 /**
- * @param $command
- *
- * @return array
- *
- * @throws Exception
- */
-function run_symfony_command($command, array $args)
-{
-    static $application;
-
-    require_once MAUTIC_APP_ROOT.'/autoload.php';
-    require_once MAUTIC_APP_ROOT.'/AppKernel.php';
-
-    $args = array_merge(
-        ['console', $command],
-        $args
-    );
-
-    if (null == $application) {
-        $kernel      = new \AppKernel('prod', true);
-        $application = new \Symfony\Bundle\FrameworkBundle\Console\Application($kernel);
-        $application->setAutoExit(false);
-    }
-
-    $input    = new \Symfony\Component\Console\Input\ArgvInput($args);
-    $output   = new \Symfony\Component\Console\Output\NullOutput();
-    $exitCode = $application->run($input, $output);
-
-    unset($input, $output);
-
-    return 0 === $exitCode;
-}
-
-/**
- * Build the cache.
- *
- * @return array
- */
-function build_cache()
-{
-    // Rebuild the cache
-    return run_symfony_command('cache:clear', ['--no-interaction', '--env=prod', '--no-debug', '--no-warmup']);
-}
-
-/**
- * Apply critical migrations.
- */
-function apply_critical_migrations()
-{
-    $criticalMigrations = json_decode(file_get_contents(__DIR__.'/critical_migrations.txt'), true);
-
-    $success = true;
-
-    $minExecutionTime = 300;
-    $maxExecutionTime = (int) ini_get('max_execution_time');
-    if ($maxExecutionTime > 0 && $maxExecutionTime < $minExecutionTime) {
-        ini_set('max_execution_time', $minExecutionTime);
-    }
-
-    if ($criticalMigrations) {
-        foreach ($criticalMigrations as $version) {
-            if (!run_symfony_command('doctrine:migrations:migrate', ['--no-interaction', '--env=prod', '--no-debug', $version])) {
-                $success = false;
-            }
-        }
-    }
-
-    return $success;
-}
-
-/**
- * Apply all migrations.
- *
- * @return bool
- */
-function apply_migrations()
-{
-    $minExecutionTime = 300;
-    $maxExecutionTime = (int) ini_get('max_execution_time');
-    if ($maxExecutionTime > 0 && $maxExecutionTime < $minExecutionTime) {
-        ini_set('max_execution_time', $minExecutionTime);
-    }
-
-    return run_symfony_command('doctrine:migrations:migrate', ['--no-interaction', '--env=prod', '--no-debug']);
-}
-
-/**
  * Copy a folder.
  *
  * This function is based on \Joomla\Filesystem\Folder:copy()
@@ -574,11 +247,11 @@ function apply_migrations()
  * @param string $src  The path to the source folder
  * @param string $dest The path to the destination folder
  *
- * @return array|string|bool True on success, a single error message on a "boot" fail, or an array of errors from the recursive operation
+ * @return array<string>|string|bool True on success, a single error message on a "boot" fail, or an array of errors from the recursive operation
  */
 function copy_directory($src, $dest)
 {
-    @set_time_limit(ini_get('max_execution_time'));
+    @set_time_limit((int) ini_get('max_execution_time'));
     $errorLog = [];
 
     // Eliminate trailing directory separators, if any
@@ -658,9 +331,10 @@ function getVar($name, $default = '', $filter = FILTER_SANITIZE_STRING)
  * A typical update package will only include changed files in the bundles.  However, in this script we will assume that all of
  * the bundle resources are included here and recursively iterate over the bundles in batches to update the filesystem.
  *
- * @param int $maxCount
+ * @param array<mixed> $status
+ * @param int          $maxCount
  *
- * @return array
+ * @return array<mixed>
  */
 function move_mautic_bundles(array $status, $maxCount = 5)
 {
@@ -804,7 +478,9 @@ function move_mautic_bundles(array $status, $maxCount = 5)
  * The "core" files are broken into groups for purposes of the update script: bundles, vendor, and everything else.  This step
  * will take care of the everything else.
  *
- * @return array
+ * @param array<mixed> $status
+ *
+ * @return array<mixed>
  */
 function move_mautic_core(array $status)
 {
@@ -879,9 +555,10 @@ function move_mautic_core(array $status)
  * between releases.  Therefore, this step will recursively iterate over the vendors in batches to remove each package completely
  * and replace it with the new version.
  *
- * @param int $maxCount
+ * @param array<mixed> $status
+ * @param int          $maxCount
  *
- * @return array
+ * @return array<mixed>
  */
 function move_mautic_vendors(array $status, $maxCount = 5)
 {
@@ -1070,8 +747,8 @@ function move_mautic_vendors(array $status, $maxCount = 5)
 /**
  * Copy files from the directory.
  *
- * @param string $dir
- * @param array  &$errorLog
+ * @param string        $dir
+ * @param array<string> &$errorLog
  *
  * @return bool
  */
@@ -1102,13 +779,11 @@ function copy_files($dir, &$errorLog)
 /**
  * Copy directories.
  *
- * @param string $dir
- * @param array  &$errorLog
- * @param bool   $createDest
- *
- * @return bool|void
+ * @param string        $dir
+ * @param array<string> &$errorLog
+ * @param bool          $createDest
  */
-function copy_directories($dir, &$errorLog, $createDest = true)
+function copy_directories($dir, &$errorLog, $createDest = true): bool
 {
     // Ensure the destination directory exists
     $exists = file_exists(MAUTIC_ROOT.$dir);
@@ -1149,12 +824,16 @@ function copy_directories($dir, &$errorLog, $createDest = true)
             }
         }
     }
+
+    return true;
 }
 
 /**
  * Processes the error log for each step.
+ *
+ * @param array<string> $errorLog
  */
-function process_error_log(array $errorLog)
+function process_error_log(array $errorLog): void
 {
     // If there were any errors, add them to the error log
     if (count($errorLog)) {
@@ -1240,7 +919,9 @@ function recursive_remove_directory($directory)
  * While packaging updates, the script will generate a list of deleted files in comparison to the previous version.  In this step,
  * we will process that list to remove files which are no longer included in the application.
  *
- * @return array
+ * @param array<mixed> $status
+ *
+ * @return array<mixed>
  */
 function remove_mautic_deleted_files(array $status)
 {
@@ -1292,6 +973,8 @@ function remove_mautic_deleted_files(array $status)
 }
 
 /**
+ * @param array<mixed> $state
+ *
  * @return string
  */
 function get_state_param(array $state)
@@ -1301,8 +984,10 @@ function get_state_param(array $state)
 
 /**
  * Send the response back to the main application.
+ *
+ * @param array<mixed> $status
  */
-function send_response(array $status)
+function send_response(array $status): void
 {
     header('Content-Type: application/json; charset=utf-8');
 
@@ -1310,34 +995,9 @@ function send_response(array $status)
 }
 
 /**
- * Crap means of not having issues with.
- */
-function make_request($url, $method = 'GET', $data = null)
-{
-    $method  = strtoupper($method);
-    $ch      = curl_init();
-    $timeout = 15;
-    if ($data && 'POST' == $method) {
-        curl_setopt($ch, CURLOPT_POSTFIELDS, $data);
-    }
-    curl_setopt($ch, CURLOPT_CUSTOMREQUEST, $method);
-    curl_setopt($ch, CURLOPT_URL, $url);
-    curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-    curl_setopt($ch, CURLOPT_FOLLOWLOCATION, 1);
-    curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, $timeout);
-    curl_setopt($ch, CURLOPT_CAINFO, MAUTIC_ROOT.'/vendor/joomla/http/src/Transport/cacert.pem');
-    $data = curl_exec($ch);
-    curl_close($ch);
-
-    return $data;
-}
-
-/**
  * Wrap content in some HTML.
- *
- * @param $content
  */
-function html_body($content)
+function html_body(string $content): void
 {
     $html = <<<HTML
 <!DOCTYPE html>

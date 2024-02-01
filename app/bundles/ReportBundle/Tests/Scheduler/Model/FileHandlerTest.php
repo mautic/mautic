@@ -2,15 +2,6 @@
 
 declare(strict_types=1);
 
-/*
- * @copyright   2019 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\ReportBundle\Tests\Scheduler\Model;
 
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
@@ -26,22 +17,19 @@ class FileHandlerTest extends \PHPUnit\Framework\TestCase
     /**
      * @var MockObject|FilePathResolver
      */
-    private $filePathResolver;
+    private \PHPUnit\Framework\MockObject\MockObject $filePathResolver;
 
     /**
      * @var MockObject|FileProperties
      */
-    private $fileProperties;
+    private \PHPUnit\Framework\MockObject\MockObject $fileProperties;
 
     /**
      * @var MockObject|CoreParametersHelper
      */
-    private $coreParametersHelper;
+    private \PHPUnit\Framework\MockObject\MockObject $coreParametersHelper;
 
-    /**
-     * @var FileHandler
-     */
-    private $fileHandler;
+    private \Mautic\ReportBundle\Scheduler\Model\FileHandler $fileHandler;
 
     protected function setUp(): void
     {

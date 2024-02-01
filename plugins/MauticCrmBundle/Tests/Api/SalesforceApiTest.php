@@ -2,15 +2,6 @@
 
 declare(strict_types=1);
 
-/*
- * @copyright   2017 Mautic Contributors. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace MauticPlugin\MauticCrmBundle\Tests\Api;
 
 use Mautic\PluginBundle\Exception\ApiErrorException;
@@ -83,7 +74,7 @@ class SalesforceApiTest extends \PHPUnit\Framework\TestCase
 
         try {
             $api->request('/test');
-        } catch (ApiErrorException $exception) {
+        } catch (ApiErrorException) {
             $this->fail('ApiErrorException thrown');
         }
     }
@@ -116,7 +107,7 @@ class SalesforceApiTest extends \PHPUnit\Framework\TestCase
 
         try {
             $api->request('/test');
-        } catch (ApiErrorException $exception) {
+        } catch (ApiErrorException) {
             $this->fail('ApiErrorException should not have been thrown');
         }
     }
@@ -127,7 +118,7 @@ class SalesforceApiTest extends \PHPUnit\Framework\TestCase
     public function testSessionExpiredIsRefreshed(): void
     {
         $integration = $this->createMock(SalesforceIntegration::class);
-        $message     = 'Session expired';
+        $message     = '["errorCode":"INVALID_SESSION_ID","body":"Session expired or invalid"]';
 
         $integration->expects($this->exactly(2))
             ->method('authCallback');
@@ -137,7 +128,6 @@ class SalesforceApiTest extends \PHPUnit\Framework\TestCase
             ->willReturn(
                 [
                     [
-                        'errorCode' => 'INVALID_SESSION_ID',
                         'message'   => $message,
                     ],
                 ]
@@ -183,7 +173,7 @@ class SalesforceApiTest extends \PHPUnit\Framework\TestCase
 
         try {
             $api->request('/test');
-        } catch (ApiErrorException $exception) {
+        } catch (ApiErrorException) {
             $this->fail('ApiErrorException thrown');
         }
     }
@@ -225,7 +215,7 @@ class SalesforceApiTest extends \PHPUnit\Framework\TestCase
     {
         $integration = $this->getMockBuilder(SalesforceIntegration::class)
             ->disableOriginalConstructor()
-            ->setMethodsExcept(['cleanPushData'])
+            ->onlyMethods(['mergeConfigToFeatureSettings', 'makeRequest', 'getQueryUrl', 'getIntegrationSettings', 'getFieldsForQuery', 'getApiUrl'])
             ->getMock();
 
         $integration->expects($this->exactly(1))
@@ -241,12 +231,12 @@ class SalesforceApiTest extends \PHPUnit\Framework\TestCase
         $integration->expects($this->exactly(1))
             ->method('makeRequest')
             ->willReturnCallback(
-                function ($url, $parameters = [], $method = 'GET', $settings = []) {
+                function ($url, $parameters = [], $method = 'GET', $settings = []): void {
                     $this->assertEquals(
-                        $parameters,
                         [
                             'q' => 'select Id from Account where Name = \'Some\\\\thing E\\\'lse\' and BillingCountry =  \'Some\\\\Where E\\\'lse\' and BillingCity =  \'Some\\\\Where E\\\'lse\' and BillingState =  \'Some\\\\Where E\\\'lse\'',
-                        ]
+                        ],
+                        $parameters
                     );
                 }
             );
@@ -266,13 +256,62 @@ class SalesforceApiTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
+     * @testdox Test that a backslash and an html entity of single quote are escaped for SF queries
+     *
+     * @covers \MauticPlugin\MauticCrmBundle\Api\SalesforceApi::escapeQueryValue
+     */
+    public function testCompanyQueryWithHtmlEntitiesIsEscapedCorrectly(): void
+    {
+        $integration = $this->getMockBuilder(SalesforceIntegration::class)
+            ->disableOriginalConstructor()
+            ->onlyMethods(['mergeConfigToFeatureSettings', 'makeRequest', 'getQueryUrl', 'getIntegrationSettings', 'getFieldsForQuery', 'getApiUrl'])
+            ->getMock();
+
+        $integration->expects($this->exactly(1))
+            ->method('mergeConfigToFeatureSettings')
+            ->willReturn(
+                [
+                    'objects' => [
+                        'company',
+                    ],
+                ]
+            );
+
+        $integration->expects($this->exactly(1))
+            ->method('makeRequest')
+            ->willReturnCallback(
+                function ($url, $parameters = [], $method = 'GET', $settings = []): void {
+                    $this->assertEquals(
+                        [
+                            'q' => 'select Id from Account where Name = \'Some\\\\thing\\\' E\\\'lse\' and BillingCountry =  \'Some\\\\Where\\\' E\\\'lse\' and BillingCity =  \'Some\\\\Where\\\' E\\\'lse\' and BillingState =  \'Some\\\\Where\\\' E\\\'lse\'',
+                        ],
+                        $parameters
+                    );
+                }
+            );
+
+        $api = new SalesforceApi($integration);
+
+        $api->getCompany(
+            [
+                'company' => [
+                    'BillingCountry' => 'Some\\Where&#39; E\'lse',
+                    'BillingCity'    => 'Some\\Where&#39; E\'lse',
+                    'BillingState'   => 'Some\\Where&#39; E\'lse',
+                    'Name'           => 'Some\\thing&#39; E\'lse',
+                ],
+            ]
+        );
+    }
+
+    /**
      * @testdox Test that a backslash and a single quote are escaped for SF queries
      */
     public function testContactQueryIsEscapedCorrectly(): void
     {
         $integration = $this->getMockBuilder(SalesforceIntegration::class)
             ->disableOriginalConstructor()
-            ->setMethodsExcept(['cleanPushData'])
+            ->onlyMethods(['mergeConfigToFeatureSettings', 'makeRequest', 'getQueryUrl', 'getIntegrationSettings', 'getFieldsForQuery', 'getApiUrl'])
             ->getMock();
 
         $integration->expects($this->exactly(1))
@@ -288,12 +327,12 @@ class SalesforceApiTest extends \PHPUnit\Framework\TestCase
         $integration->expects($this->exactly(1))
             ->method('makeRequest')
             ->willReturnCallback(
-                function ($url, $parameters = [], $method = 'GET', $settings = []) {
+                function ($url, $parameters = [], $method = 'GET', $settings = []): void {
                     $this->assertEquals(
-                        $parameters,
                         [
                             'q' => 'select Id from Contact where email = \'con\\\\tact\\\'email@email.com\'',
-                        ]
+                        ],
+                        $parameters
                     );
                 }
             );
@@ -314,7 +353,7 @@ class SalesforceApiTest extends \PHPUnit\Framework\TestCase
     {
         $integration = $this->getMockBuilder(SalesforceIntegration::class)
             ->disableOriginalConstructor()
-            ->setMethodsExcept(['cleanPushData'])
+            ->onlyMethods(['mergeConfigToFeatureSettings', 'makeRequest', 'getQueryUrl', 'getIntegrationSettings', 'getFieldsForQuery', 'getApiUrl'])
             ->getMock();
 
         $integration->expects($this->exactly(1))
@@ -330,12 +369,12 @@ class SalesforceApiTest extends \PHPUnit\Framework\TestCase
         $integration->expects($this->exactly(1))
             ->method('makeRequest')
             ->willReturnCallback(
-                function ($url, $parameters = [], $method = 'GET', $settings = []) {
+                function ($url, $parameters = [], $method = 'GET', $settings = []): void {
                     $this->assertEquals(
-                        $parameters,
                         [
                             'q' => 'select Id from Lead where email = \'con\\\\tact\\\'email@email.com\' and ConvertedContactId = NULL',
-                        ]
+                        ],
+                        $parameters
                     );
                 }
             );

@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2018 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\EmailBundle\Stats\Helper;
 
 use Doctrine\DBAL\Connection;
@@ -33,7 +24,7 @@ trait FilterTrait
             $sb->select('null')
                 ->from(MAUTIC_TABLE_PREFIX.'companies_leads', 'cl')
                 ->where(
-                    $sb->expr()->andX(
+                    $sb->expr()->and(
                         $sb->expr()->eq('cl.company_id', ':companyId'),
                         $sb->expr()->eq('cl.lead_id', $fromAlias.'.lead_id')
                     )
@@ -81,7 +72,7 @@ trait FilterTrait
             $sb->select('null')
                 ->from(MAUTIC_TABLE_PREFIX.'lead_lists_leads', 'lll')
                 ->where(
-                    $sb->expr()->andX(
+                    $sb->expr()->and(
                         $sb->expr()->eq('lll.leadlist_id', ':segmentId'),
                         $sb->expr()->eq('lll.lead_id', $fromAlias.'.lead_id'),
                         $sb->expr()->eq('lll.manually_removed', 0)

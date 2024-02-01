@@ -1,35 +1,25 @@
 <?php
-/*
- * @copyright   2018 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
 
 namespace Mautic\SmsBundle\Tests\Sms;
 
-use Exception;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\SmsBundle\Integration\Twilio\TwilioTransport;
 use Mautic\SmsBundle\Sms\TransportChain;
 use Mautic\SmsBundle\Sms\TransportInterface;
 use PHPUnit\Framework\MockObject\MockObject;
-use ReflectionClass;
 
 class TransportChainTest extends MauticMysqlTestCase
 {
     /**
      * @var TransportChain|MockObject
      */
-    private $transportChain;
+    private \Mautic\SmsBundle\Sms\TransportChain $transportChain;
 
     /**
      * @var TransportInterface|MockObject
      */
-    private $twilioTransport;
+    private \PHPUnit\Framework\MockObject\MockObject $twilioTransport;
 
     /**
      * Call protected/private method of a class.
@@ -38,13 +28,13 @@ class TransportChainTest extends MauticMysqlTestCase
      * @param string $methodName Method name to call
      * @param array  $parameters array of parameters to pass into method
      *
-     * @throws \ReflectionException
-     *
      * @return mixed method return
+     *
+     * @throws \ReflectionException
      */
     public function invokeMethod(&$object, $methodName, array $parameters = [])
     {
-        $reflection = new ReflectionClass(get_class($object));
+        $reflection = new \ReflectionClass($object::class);
         $method     = $reflection->getMethod($methodName);
         $method->setAccessible(true);
 
@@ -57,7 +47,7 @@ class TransportChainTest extends MauticMysqlTestCase
 
         $this->transportChain = new TransportChain(
             'mautic.test.twilio.mock',
-            self::$container->get('mautic.helper.integration')
+            static::getContainer()->get('mautic.helper.integration')
         );
 
         $this->twilioTransport = $this->createMock(TwilioTransport::class);
@@ -67,16 +57,16 @@ class TransportChainTest extends MauticMysqlTestCase
             ->will($this->returnValue('lol'));
     }
 
-    public function testAddTransport()
+    public function testAddTransport(): void
     {
         $count = count($this->transportChain->getTransports());
 
-        $this->transportChain->addTransport('mautic.transport.test', self::$container->get('mautic.sms.twilio.transport'), 'mautic.transport.test', 'Twilio');
+        $this->transportChain->addTransport('mautic.transport.test', static::getContainer()->get('mautic.sms.twilio.transport'), 'mautic.transport.test', 'Twilio');
 
         $this->assertCount($count + 1, $this->transportChain->getTransports());
     }
 
-    public function testSendSms()
+    public function testSendSms(): void
     {
         $this->testAddTransport();
 
@@ -87,7 +77,7 @@ class TransportChainTest extends MauticMysqlTestCase
 
         try {
             $this->transportChain->sendSms($lead, 'Yeah');
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             $message = $e->getMessage();
             $this->assertEquals('Primary SMS transport is not enabled', $message);
         }

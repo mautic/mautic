@@ -1,0 +1,141 @@
+{#
+  Variables
+    - items
+    - filters
+    - form
+    - viewOnlyFields
+    - page
+    - totalCount
+    - limit
+    - tmpl
+    - canDelete
+#}
+{% set formId = form.id %}
+<div class="table-responsive table-responsive-force">
+    <table class="table table-hover table-striped table-bordered formresult-list" id="formResultTable">
+        <thead>
+            <tr>
+                {% if canDelete %}
+                  {{ include('@MauticCore/Helper/tableheader.html.twig', {
+                      'checkall': 'true',
+                      'target': '#formResultTable',
+                      'routeBase': 'form_results',
+                      'query': {'formId': formId},
+                      'templateButtons': {'delete': canDelete},
+                  }) }}
+                {% endif %}
+
+                {{ include('@MauticCore/Helper/tableheader.html.twig', {
+                    'sessionVar': 'formresult.' ~ formId,
+                    'orderBy': 's.id',
+                    'text': 'mautic.form.report.submission.id',
+                    'class': 'col-formresult-id',
+                    'filterBy': 's.id',
+                }) }}
+
+                {{ include('@MauticCore/Helper/tableheader.html.twig', {
+                    'sessionVar': 'formresult.' ~ formId,
+                    'orderBy': 's.lead_id',
+                    'text': 'mautic.lead.report.contact_id',
+                    'class': 'col-formresult-lead-id',
+                    'filterBy': 's.lead_id',
+                }) }}
+
+                {{ include('@MauticCore/Helper/tableheader.html.twig', {
+                    'sessionVar': 'formresult.' ~ formId,
+                    'orderBy': 's.date_submitted',
+                    'text': 'mautic.form.result.thead.date',
+                    'class': 'col-formresult-date',
+                    'default': true,
+                    'filterBy': 's.date_submitted',
+                    'dataToggle': 'date',
+                }) }}
+
+                {{ include('@MauticCore/Helper/tableheader.html.twig', {
+                    'sessionVar': 'formresult.' ~ formId,
+                    'orderBy': 'i.ip_address',
+                    'text': 'mautic.core.ipaddress',
+                    'class': 'col-formresult-ip',
+                    'filterBy': 'i.ip_address',
+                }) }}
+
+                {% set fields = form.fields %}
+                {% set fieldCount = canDelete ? 4 : 3 %}
+                {% for f in fields %}
+                    {% if f.type not in viewOnlyFields and true == f.saveResult %}
+                      {{ include('@MauticCore/Helper/tableheader.html.twig', {
+                          'sessionVar': 'formresult.' ~ formId,
+                          'orderBy': 'r.' ~ f.alias,
+                          'text': f.label,
+                          'class': 'col-formresult-field col-formresult-field' ~ f.id,
+                          'filterBy': 'r.' ~ f.alias,
+                      }) }}
+                      {% set fieldCount = fieldCount + 1 %}
+                    {% endif %}
+                {% endfor %}
+            </tr>
+        </thead>
+        <tbody>
+        {% if items|length > 0 %}
+          {% for item in items %}
+              {% set item = item|merge({
+                      'name': 'mautic.form.form.results.name'|trans({'%id%': item.id})
+              }) %}
+              <tr>
+                  {% if canDelete %}
+                  <td>
+                      {{ include('@MauticCore/Helper/list_actions.html.twig', {
+                          'item': item,
+                          'templateButtons': {'delete': canDelete},
+                          'route': 'mautic_form_results_action',
+                          'langVar': 'form.results',
+                          'query': {'formId': formId, 'objectAction': 'delete'},
+                      }) }}
+                  </td>
+                  {% endif %}
+
+                  <td>{{ item.id|e }}</td>
+                  <td>
+                      {% if item.leadId is defined and item.leadId is not empty %}
+                        <a href="{{ path('mautic_contact_action', {'objectAction': 'view', 'objectId': item.leadId}) }}" data-toggle="ajax">
+                            {{ item.leadId|e }}
+                        </a>
+                      {% endif %}
+                  </td>
+                  <td>{{ dateToFull(item['dateSubmitted'], 'UTC') }}</td>
+                  <td>{{ item['ipAddress']|e }}</td>
+                  {% for key, r in item.results %}
+                      {% set isTextarea = ('textarea' == r.type) %}
+                      <td {% if isTextarea %}class="long-text"{% endif %}>
+                          {% if isTextarea %}
+                              {{ r.value|nl2br|e }}
+                          {% elseif 'file' == r.type %}
+                              <a href="{{ path('mautic_form_file_download', {'submissionId': item['id'], 'field': key}) }}">
+                                  {{ r.value|e }}
+                              </a>
+                          {% else %}
+                              {{ r.value|e }}
+                          {% endif %}
+                      </td>
+                  {% endfor %}
+              </tr>
+          {% endfor %}
+        {% else %}
+            <tr>
+                <td colspan="{{ fieldCount }}">
+                    {{ include('@MauticCore/Helper/noresults.html.twig') }}
+                </td>
+            </tr>
+        {% endif %}
+        </tbody>
+    </table>
+</div>
+<div class="panel-footer">
+    {{ include('@MauticCore/Helper/pagination.html.twig', {
+        'totalItems': totalCount,
+        'page': page,
+        'limit': limit,
+        'baseUrl': path('mautic_form_results', {'objectId': form.id}),
+        'sessionVar': 'formresult.' ~ formId,
+    }) }}
+</div>

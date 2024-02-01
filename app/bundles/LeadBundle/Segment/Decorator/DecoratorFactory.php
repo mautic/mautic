@@ -1,65 +1,25 @@
 <?php
 
-/*
- * @copyright   2018 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\LeadBundle\Segment\Decorator;
 
+use Mautic\LeadBundle\Event\LeadListFiltersDecoratorDelegateEvent;
+use Mautic\LeadBundle\Exception\FilterNotFoundException;
+use Mautic\LeadBundle\LeadEvents;
 use Mautic\LeadBundle\Segment\ContactSegmentFilterCrate;
 use Mautic\LeadBundle\Segment\Decorator\Date\DateOptionFactory;
 use Mautic\LeadBundle\Services\ContactSegmentFilterDictionary;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
-/**
- * Class DecoratorFactory.
- */
 class DecoratorFactory
 {
-    /**
-     * @var ContactSegmentFilterDictionary
-     */
-    private $contactSegmentFilterDictionary;
-
-    /**
-     * @var BaseDecorator
-     */
-    private $baseDecorator;
-
-    /**
-     * @var CustomMappedDecorator
-     */
-    private $customMappedDecorator;
-
-    /**
-     * @var CompanyDecorator
-     */
-    private $companyDecorator;
-
-    /**
-     * @var DateOptionFactory
-     */
-    private $dateOptionFactory;
-
-    /**
-     * DecoratorFactory constructor.
-     */
     public function __construct(
-        ContactSegmentFilterDictionary $contactSegmentFilterDictionary,
-        BaseDecorator $baseDecorator,
-        CustomMappedDecorator $customMappedDecorator,
-        DateOptionFactory $dateOptionFactory,
-        CompanyDecorator $companyDecorator
+        private ContactSegmentFilterDictionary $contactSegmentFilterDictionary,
+        private BaseDecorator $baseDecorator,
+        private CustomMappedDecorator $customMappedDecorator,
+        private DateOptionFactory $dateOptionFactory,
+        private CompanyDecorator $companyDecorator,
+        private EventDispatcherInterface $eventDispatcher
     ) {
-        $this->baseDecorator                  = $baseDecorator;
-        $this->customMappedDecorator          = $customMappedDecorator;
-        $this->dateOptionFactory              = $dateOptionFactory;
-        $this->contactSegmentFilterDictionary = $contactSegmentFilterDictionary;
-        $this->companyDecorator               = $companyDecorator;
     }
 
     /**
@@ -67,6 +27,13 @@ class DecoratorFactory
      */
     public function getDecoratorForFilter(ContactSegmentFilterCrate $contactSegmentFilterCrate)
     {
+        $decoratorEvent = new LeadListFiltersDecoratorDelegateEvent($contactSegmentFilterCrate);
+
+        $this->eventDispatcher->dispatch($decoratorEvent, LeadEvents::SEGMENT_ON_DECORATOR_DELEGATE);
+        if ($decorator = $decoratorEvent->getDecorator()) {
+            return $decorator;
+        }
+
         if ($contactSegmentFilterCrate->isDateType()) {
             $dateDecorator = $this->dateOptionFactory->getDateOption($contactSegmentFilterCrate);
 
@@ -79,14 +46,16 @@ class DecoratorFactory
 
         $originalField = $contactSegmentFilterCrate->getField();
 
-        if (empty($this->contactSegmentFilterDictionary[$originalField])) {
+        try {
+            $this->contactSegmentFilterDictionary->getFilter($originalField);
+
+            return $this->customMappedDecorator;
+        } catch (FilterNotFoundException) {
             if ($contactSegmentFilterCrate->isCompanyType()) {
                 return $this->companyDecorator;
             }
 
             return $this->baseDecorator;
         }
-
-        return $this->customMappedDecorator;
     }
 }

@@ -1,27 +1,14 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CoreBundle\Entity;
 
-use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 
-/**
- * Class AuditLog.
- */
 class AuditLog
 {
     /**
-     * @var int
+     * @var string
      */
     protected $id;
 
@@ -46,7 +33,7 @@ class AuditLog
     protected $object;
 
     /**
-     * @var int
+     * @var string
      */
     protected $objectId;
 
@@ -61,7 +48,7 @@ class AuditLog
     protected $details = [];
 
     /**
-     * @var \DateTime
+     * @var \DateTimeInterface
      */
     protected $dateAdded;
 
@@ -70,12 +57,12 @@ class AuditLog
      */
     protected $ipAddress;
 
-    public static function loadMetadata(ORM\ClassMetadata $metadata)
+    public static function loadMetadata(ORM\ClassMetadata $metadata): void
     {
         $builder = new ClassMetadataBuilder($metadata);
 
         $builder->setTable('audit_log')
-            ->setCustomRepositoryClass('Mautic\CoreBundle\Entity\AuditLogRepository')
+            ->setCustomRepositoryClass(\Mautic\CoreBundle\Entity\AuditLogRepository::class)
             ->addIndex(['object', 'object_id'], 'object_search')
             ->addIndex(['bundle', 'object', 'action', 'object_id'], 'timeline_search')
             ->addIndex(['date_added'], 'date_added_index');
@@ -118,12 +105,10 @@ class AuditLog
 
     /**
      * Get id.
-     *
-     * @return int
      */
-    public function getId()
+    public function getId(): int
     {
-        return $this->id;
+        return (int) $this->id;
     }
 
     /**
@@ -183,19 +168,17 @@ class AuditLog
      */
     public function setObjectId($objectId)
     {
-        $this->objectId = $objectId;
+        $this->objectId = (string) $objectId;
 
         return $this;
     }
 
     /**
      * Get objectId.
-     *
-     * @return int
      */
-    public function getObjectId()
+    public function getObjectId(): int
     {
-        return $this->objectId;
+        return (int) $this->objectId;
     }
 
     /**
@@ -261,7 +244,7 @@ class AuditLog
     /**
      * Get dateAdded.
      *
-     * @return \DateTime
+     * @return \DateTimeInterface
      */
     public function getDateAdded()
     {

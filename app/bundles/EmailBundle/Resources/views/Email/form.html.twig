@@ -1,0 +1,275 @@
+{% form_theme form '@MauticEmail/FormTheme/Email/layout.html.twig' %}
+{% extends '@MauticCore/Default/content.html.twig' %}
+
+{% block mauticContent 'email' %}
+
+{% set dynamicContentPrototype = form.dynamicContent.vars.prototype %}
+{% set filterBlockPrototype = form.dynamicContent.children[0].filters.vars.prototype|default(null) %}
+{% set filterSelectPrototype = form.dynamicContent.children[0].filters.children[0].filters.vars.prototype|default(null) %}
+
+{% set variantParent = email.variantParent %}
+{% set isExisting = email.id is not empty %}
+{% set emailType = form.emailType.vars.data %}
+{% set attachmentSize = attachmentSize|default(0) %}
+{% set templates = {
+    'select'    : 'select-template',
+    'countries' : 'country-template',
+    'regions'   : 'region-template',
+    'timezones' : 'timezone-template',
+    'stages'    : 'stage-template',
+    'locales'   : 'locale-template',
+} %}
+{% set isCodeMode = (email.getTemplate() is same as 'mautic_code_mode') %}
+{% set previewUrl = previewUrl|default('') %}
+{% set mauticTemplateVars = mauticTemplateVars|default({'mauticTemplate': '@MauticEmail/Email/form.html.twig', 'email': email}) %}
+
+{% block headerTitle %}
+  {% if email.id is not empty %}
+    {{ 'mautic.email.header.edit'|trans({'%name%': email.name}) }}
+  {% else %}
+    {{ 'mautic.email.header.new'|trans }}
+  {% endif %}
+
+  {% if email.variantParent %}
+    <div><span class="small">{{ 'mautic.core.variant_of'|trans({'%name%': email.name, '%parent%' : variantParent.name}) }}</span></div>
+  {% endif %}
+{% endblock %}
+
+{% block content %}
+    {{ form_start(form) }}
+    <div class="box-layout">
+        <div class="col-md-9 height-auto bg-white">
+            <div class="row">
+                <div class="col-xs-12">
+
+                    <!-- tabs controls -->
+                    <ul class="bg-auto nav nav-tabs pr-md pl-md">
+                        <li class="active">
+                            <a href="#email-container" role="tab" data-toggle="tab">{{ 'mautic.core.form.theme'|trans }}</a>
+                        </li>
+                        <li>
+                            <a href="#advanced-container" role="tab" data-toggle="tab">{{ 'mautic.core.advanced'|trans }}</a>
+                        </li>
+                        <li id="dynamic-content-tab" {{ (isCodeMode) ? '' : 'class="hidden"' }}>
+                            <a href="#dynamic-content-container" role="tab" data-toggle="tab">{{ 'mautic.core.dynamicContent'|trans }}</a>
+                        </li>
+                        {{ customContent('email.tabs', mauticTemplateVars) }}
+                    </ul>
+                    <!--/ tabs controls -->
+
+                    <div class="tab-content pa-md">
+                        <div class="tab-pane fade in active bdr-w-0" id="email-container">
+                            <div class="row">
+                                <div class="col-md-12">{{ form_row(form.template) }}</div>
+                            </div>
+                            {{- include('@MauticCore/Helper/theme_select.html.twig', {
+                                'type'   : 'email',
+                                'themes' : themes,
+                                'active' : form.template.vars.value,
+                            }) -}}
+                        </div>
+                        <div class="tab-pane fade bdr-w-0" id="advanced-container">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    {{ form_row(form.fromName) }}
+                                    {{ form_row(form.fromAddress) }}
+                                    {{ form_row(form.replyToAddress) }}
+                                    {{ form_row(form.bccAddress) }}
+                                    {{ customContent('email.settings.advanced', mauticTemplateVars) }}
+                                    <div>
+                                        <div class="pull-left">
+                                            {{ form_label(form.assetAttachments) }}
+                                        </div>
+                                        <div class="text-right pr-10">
+                                            <span class="label label-info"
+                                                  id="attachment-size">{{ attachmentSize }}</span>
+                                        </div>
+                                        <div class="clearfix"></div>
+                                        {{ form_widget(form.assetAttachments) }}
+                                    </div>
+
+                                </div>
+                                <div class="col-md-6">
+                                    {{ form_row(form.headers) }}
+                                </div>
+                                <div class="col-md-6">
+                                    {{ form_row(form.useOwnerAsMailer) }}
+                                </div>
+                            </div>
+                            <br/>
+                            <div class="row hidden" id="custom-html-row">
+                                <div class="col-md-12">
+                                    {{ form_label(form.customHtml) }}
+                                    {{ form_widget(form.customHtml) }}
+                                </div>
+                            </div>
+                            <br/>
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <div class="pull-left">
+                                        {{ form_label(form.plainText) }}
+                                    </div>
+                                    <div class="text-right pr-10">
+                                        <i class="fa fa-spinner fa-spin ml-2 plaintext-spinner hide"></i>
+                                        <a class="small"
+                                           onclick="Mautic.autoGeneratePlaintext();">{{ 'mautic.email.plaintext.generate'|trans }}</a>
+                                    </div>
+                                    <div class="clearfix"></div>
+                                    {{ form_widget(form.plainText) }}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="tab-pane fade bdr-w-0" id="dynamic-content-container">
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <div class="row">
+                                        <div class="col-xs-3 dynamicContentFilterContainer">
+                                          <ul class="nav nav-tabs tabs-left" id="dynamicContentTabs">
+                                            <li>
+                                              <a href="javascript:void(0);" role="tab" class="btn btn-primary" id="addNewDynamicContent"><i class="fa fa-plus text-success"></i>{{ 'mautic.core.form.new'|trans }}</a>
+                                            </li>
+                                            {% for dynamicContent in form.dynamicContent %}
+                                              {% set name = dynamicContent.tokenName.vars.value %}
+                                              {% set linkText = name is defined ? name : 'mautic.core.dynamicContent'|trans ~ ' ' ~ loop.index %}
+                                              <li class="{% if loop.first %}active{% endif %}">
+                                                <a role="tab" data-toggle="tab" href="#{{ dynamicContent.vars.id }}">{{ linkText }}</a>
+                                              </li>
+                                            {% endfor %}
+                                            </ul>
+                                        </div>
+                                        <div class="tab-content pa-md col-xs-9" id="dynamicContentContainer">
+                                          {% for dynamicContent in form.dynamicContent %}
+                                              {{ form_widget(dynamicContent) }}
+                                          {% endfor %}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        {{ customContent('email.tabs.content', mauticTemplateVars) }}
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 bg-white height-auto bdr-l">
+            <div class="pr-lg pl-lg pt-md pb-md">
+                {{ form_row(form.subject) }}
+                {{ form_row(form.name) }}
+                {% if isVariant %}
+                    {{ form_row(form.variantSettings) }}
+                    {{ form_row(form.isPublished) }}
+                    {{ form_row(form.publishUp) }}
+                    {{ form_row(form.publishDown) }}
+                {% else %}
+                    <div id="leadList"{{ (('template' == emailType) ? ' class="hide"' : '') }}>
+                        {{ form_row(form.lists) }}
+                    </div>
+                    {{ form_row(form.category) }}
+                    {{ form_row(form.language) }}
+                    <div id="segmentTranslationParent"{{ (('template' == emailType) ? ' class="hide"' : '') }}>
+                        {{ form_row(form.segmentTranslationParent) }}
+                    </div>
+                    <div id="templateTranslationParent"{{ (('list' == emailType) ? ' class="hide"' : '') }}>
+                        {{ form_row(form.templateTranslationParent) }}
+                    </div>
+                {% endif %}
+
+                {% if not isVariant %}
+                    {{ form_row(form.isPublished) }}
+                    {{ form_row(form.publishUp) }}
+                    {{ form_row(form.publishDown) }}
+                {% endif %}
+
+                {{ form_row(form.unsubscribeForm) }}
+                {% if permissions['page:preference_center:viewown'] is not empty or permissions['page:preference_center:viewother'] is not empty %}
+                    {{ form_row(form.preferenceCenter) }}
+                {% endif %}
+                <hr/>
+                <h5>{{ 'mautic.email.utm_tags'|trans }}</h5>
+                <br/>
+                {% for i, utmTag in form.utmTags %}
+                    {{ form_row(utmTag) }}
+                {% endfor %}
+            </div>
+            <div class="hide">
+                {{ form_rest(form) }}
+            </div>
+        </div>
+    </div>
+    {{ form_end(form) }}
+
+    <div id="dynamicContentPrototype" data-prototype="{{ form_widget(dynamicContentPrototype)|e }}"></div>
+    {% if filterBlockPrototype is instanceof('\\Symfony\\Component\\Form\\FormView') %}
+        <div id="filterBlockPrototype" data-prototype="{{ form_widget(filterBlockPrototype)|e }}"></div>
+    {% endif %}
+    {% if filterSelectPrototype is instanceof('\\Symfony\\Component\\Form\\FormView') %}
+        <div id="filterSelectPrototype" data-prototype="{{ form_widget(filterSelectPrototype)|e }}"></div>
+    {% endif %}
+
+    <div class="hide" id="templates">
+        {% for dataKey, template in templates %}
+            {% set attr = ('tags' == dataKey) ? ' data-placeholder="' ~ mautic.lead.tags.select_or_create|trans ~ '" data-no-results-text="' ~ mautic.lead.tags.enter_to_create|trans ~ '" data-allow-add="true" onchange="Mautic.createLeadTag(this)"' : '' %}
+            <select class="form-control not-chosen {{ template }}"
+                    name="emailform[dynamicContent][__dynamicContentIndex__][filters][__dynamicContentFilterIndex__][filters][__name__][filter]"
+                    id="emailform_dynamicContent___dynamicContentIndex___filters___dynamicContentFilterIndex___filters___name___filter"{{ attr }}>
+                {% if form.vars[dataKey] is defined %}
+                    {% for value, label in form.vars[dataKey] %}
+                        {% if label is iterable %}
+                            <optgroup label="{{ value }}">
+                                {% for optionValue, optionLabel in label %}
+                                    <option value="{{ optionValue }}">{{ optionLabel }}</option>
+                                {% endfor %}
+                            </optgroup>
+                        {% else %}
+                            {% if 'lists' != dataKey or (currentListId is not defined or (value != currentListId)) %}
+                                <option value="{{ label }}">{{ value }}</option>
+                            {% endif %}
+                        {% endif %}
+                    {% endfor %}
+                {% endif %}
+            </select>
+        {% endfor %}
+    </div>
+    {{- include('@MauticCore/Helper/builder.html.twig', {
+        'type'          : 'email',
+        'isCodeMode'    : isCodeMode,
+        'sectionForm'   : sectionForm,
+        'builderAssets' : builderAssets,
+        'slots'         : slots,
+        'sections'      : sections,
+        'objectId'      : email.sessionId,
+        'previewUrl'    : previewUrl,
+    }, with_context=false) -}}
+
+    {% set type = email.emailType %}
+    {% if (
+            (
+              (updateSelect is not defined or (updateSelect is defined and updateSelect is empty))
+              and not isExisting
+              and not formContainsErrors(form)
+              and not variantParent
+            )
+            or type is empty
+            or (forceTypeSelection is defined and forceTypeSelection is not empty)
+          )
+    %}
+        {{- include('@MauticCore/Helper/form_selecttype.html.twig', {
+            'item'       : email,
+            'mauticLang' : {
+                'newListEmail'     : 'mautic.email.type.list.header',
+                'newTemplateEmail' : 'mautic.email.type.template.header',
+            },
+            'typePrefix'         : 'email',
+            'cancelUrl'          : 'mautic_email_index',
+            'header'             : 'mautic.email.type.header',
+            'typeOneHeader'      : 'mautic.email.type.template.header',
+            'typeOneIconClass'   : 'fa-cube',
+            'typeOneDescription' : 'mautic.email.type.template.description',
+            'typeOneOnClick'     : "Mautic.selectEmailType('template');",
+            'typeTwoHeader'      : 'mautic.email.type.list.header',
+            'typeTwoIconClass'   : 'fa-pie-chart',
+            'typeTwoDescription' : 'mautic.email.type.list.description',
+            'typeTwoOnClick'     : "Mautic.selectEmailType('list');",
+        }) -}}
+    {% endif %}
+{% endblock %}

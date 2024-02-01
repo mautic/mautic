@@ -2,15 +2,6 @@
 
 declare(strict_types=1);
 
-/*
- * @copyright   2020 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\IntegrationsBundle\Tests\Unit\Event;
 
 use Mautic\IntegrationsBundle\Event\ConfigSaveEvent;
@@ -19,7 +10,7 @@ use PHPUnit\Framework\TestCase;
 
 class ConfigSaveEventTest extends TestCase
 {
-    public function testGetters()
+    public function testGetters(): void
     {
         $name        = 'name';
         $integration = $this->createMock(Integration::class);

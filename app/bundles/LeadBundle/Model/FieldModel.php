@@ -1,23 +1,23 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\LeadBundle\Model;
 
-use Doctrine\DBAL\DBALException;
 use Doctrine\DBAL\Exception\DriverException;
+use Doctrine\ORM\EntityManagerInterface;
+use Mautic\CoreBundle\Cache\ResultCacheOptions;
 use Mautic\CoreBundle\Doctrine\Helper\ColumnSchemaHelper;
+use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\InputHelper;
+use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Model\FormModel;
+use Mautic\CoreBundle\Security\Permissions\CorePermissions;
+use Mautic\CoreBundle\Translation\Translator;
+use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadField;
 use Mautic\LeadBundle\Entity\LeadFieldRepository;
+use Mautic\LeadBundle\Entity\LeadRepository;
+use Mautic\LeadBundle\Event\LeadFieldEvent;
+use Mautic\LeadBundle\Exception\NoListenerException;
 use Mautic\LeadBundle\Field\CustomFieldColumn;
 use Mautic\LeadBundle\Field\Dispatcher\FieldSaveDispatcher;
 use Mautic\LeadBundle\Field\Exception\AbortColumnCreateException;
@@ -28,11 +28,17 @@ use Mautic\LeadBundle\Field\LeadFieldSaver;
 use Mautic\LeadBundle\Field\SchemaDefinition;
 use Mautic\LeadBundle\Form\Type\FieldType;
 use Mautic\LeadBundle\Helper\FormFieldHelper;
-use Symfony\Component\EventDispatcher\Event;
+use Mautic\LeadBundle\LeadEvents;
+use Psr\Log\LoggerInterface;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\Form\FormFactoryInterface;
+use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
+use Symfony\Contracts\EventDispatcher\Event;
 
 /**
- * Class FieldModel.
+ * @extends FormModel<LeadField>
  */
 class FieldModel extends FormModel
 {
@@ -427,92 +433,41 @@ class FieldModel extends FormModel
         ],
     ];
 
-    /**
-     * @var ColumnSchemaHelper
-     */
-    private $columnSchemaHelper;
-
-    /**
-     * @var CustomFieldColumn
-     */
-    private $customFieldColumn;
-
-    /**
-     * @var FieldSaveDispatcher
-     */
-    private $fieldSaveDispatcher;
-
-    /**
-     * @var LeadFieldRepository
-     */
-    private $leadFieldRepository;
-
-    /**
-     * @var ListModel
-     */
-    private $leadListModel;
-
-    /**
-     * @var FieldsWithUniqueIdentifier
-     */
-    private $fieldsWithUniqueIdentifier;
-
-    /**
-     * @var FieldList
-     */
-    private $fieldList;
-
-    /**
-     * @var LeadFieldSaver
-     */
-    private $leadFieldSaver;
-
     public function __construct(
-        ColumnSchemaHelper $columnSchemaHelper,
-        ListModel $leadListModel,
-        CustomFieldColumn $customFieldColumn,
-        FieldSaveDispatcher $fieldSaveDispatcher,
-        LeadFieldRepository $leadFieldRepository,
-        FieldsWithUniqueIdentifier $fieldsWithUniqueIdentifier,
-        FieldList $fieldList,
-        LeadFieldSaver $leadFieldSaver
+        private ColumnSchemaHelper $columnSchemaHelper,
+        private ListModel $leadListModel,
+        private CustomFieldColumn $customFieldColumn,
+        private FieldSaveDispatcher $fieldSaveDispatcher,
+        private LeadFieldRepository $leadFieldRepository,
+        private FieldsWithUniqueIdentifier $fieldsWithUniqueIdentifier,
+        private FieldList $fieldList,
+        private LeadFieldSaver $leadFieldSaver,
+        EntityManagerInterface $em,
+        CorePermissions $security,
+        EventDispatcherInterface $dispatcher,
+        UrlGeneratorInterface $router,
+        Translator $translator,
+        UserHelper $userHelper,
+        LoggerInterface $mauticLogger,
+        CoreParametersHelper $coreParametersHelper
     ) {
-        $this->columnSchemaHelper         = $columnSchemaHelper;
-        $this->leadListModel              = $leadListModel;
-        $this->customFieldColumn          = $customFieldColumn;
-        $this->fieldSaveDispatcher        = $fieldSaveDispatcher;
-        $this->leadFieldRepository        = $leadFieldRepository;
-        $this->fieldsWithUniqueIdentifier = $fieldsWithUniqueIdentifier;
-        $this->fieldList                  = $fieldList;
-        $this->leadFieldSaver             = $leadFieldSaver;
+        parent::__construct($em, $security, $dispatcher, $router, $translator, $userHelper, $mauticLogger, $coreParametersHelper);
     }
 
-    /**
-     * @return LeadFieldRepository
-     */
-    public function getRepository()
+    public function getRepository(): LeadFieldRepository
     {
         return $this->leadFieldRepository;
     }
 
-    /**
-     * {@inheritdoc}
-     *
-     * @return string
-     */
-    public function getPermissionBase()
+    public function getPermissionBase(): string
     {
         return 'lead:fields';
     }
 
     /**
      * Get a specific entity or generate a new one if id is empty.
-     *
-     * @param $id
-     *
-     * @return LeadField|null
      */
-    public function getEntity($id = null)
+    public function getEntity($id = null): ?LeadField
     {
         if (null === $id) {
             return new LeadField();
@@ -523,8 +478,6 @@ class FieldModel extends FormModel
 
     /**
      * Returns lead custom fields.
-     *
-     * @param $args
      *
      * @return array
      */
@@ -574,12 +527,12 @@ class FieldModel extends FormModel
      * @param bool      $unlock
      *
      * @throws AbortColumnCreateException
-     * @throws DBALException
+     * @throws \Doctrine\DBAL\Exception
      * @throws DriverException
      * @throws \Doctrine\DBAL\Schema\SchemaException
      * @throws \Mautic\CoreBundle\Exception\SchemaException
      */
-    public function saveEntity($entity, $unlock = true)
+    public function saveEntity($entity, $unlock = true): void
     {
         if (!$entity instanceof LeadField) {
             throw new MethodNotAllowedHttpException(['LeadEntity']);
@@ -588,7 +541,7 @@ class FieldModel extends FormModel
         $this->setTimestamps($entity, $entity->isNew(), $unlock);
 
         if ('time' === $entity->getType()) {
-            //time does not work well with list filters
+            // time does not work well with list filters
             $entity->setIsListable(false);
         }
 
@@ -601,7 +554,7 @@ class FieldModel extends FormModel
             $this->customFieldColumn->createLeadColumn($entity);
         } catch (CustomFieldLimitException $e) {
             // Convert to original Exception not to cause BC
-            throw new DBALException($this->translator->trans($e->getMessage()));
+            throw new \Doctrine\DBAL\Exception($this->translator->trans($e->getMessage()));
         }
 
         // Update order of the other fields.
@@ -614,15 +567,13 @@ class FieldModel extends FormModel
      * @param array $entities
      * @param bool  $unlock
      *
-     * @return array|void
-     *
      * @throws AbortColumnCreateException
-     * @throws DBALException
+     * @throws \Doctrine\DBAL\Exception
      * @throws DriverException
      * @throws \Doctrine\DBAL\Schema\SchemaException
      * @throws \Mautic\CoreBundle\Exception\SchemaException
      */
-    public function saveEntities($entities, $unlock = true)
+    public function saveEntities($entities, $unlock = true): void
     {
         foreach ($entities as $entity) {
             $this->saveEntity($entity, $unlock);
@@ -634,7 +585,7 @@ class FieldModel extends FormModel
      *
      * @throws \Mautic\CoreBundle\Exception\SchemaException
      */
-    public function deleteEntity($entity)
+    public function deleteEntity($entity): void
     {
         parent::deleteEntity($entity);
 
@@ -651,13 +602,13 @@ class FieldModel extends FormModel
     /**
      * Delete an array of entities.
      *
-     * @param array $ids
+     * @param mixed[] $ids
      *
-     * @return array
+     * @return mixed[]
      *
      * @throws \Mautic\CoreBundle\Exception\SchemaException
      */
-    public function deleteEntities($ids)
+    public function deleteEntities($ids): array
     {
         $entities = parent::deleteEntities($ids);
 
@@ -678,10 +629,8 @@ class FieldModel extends FormModel
 
     /**
      * Is field used in segment filter?
-     *
-     * @return bool
      */
-    public function isUsedField(LeadField $field)
+    public function isUsedField(LeadField $field): bool
     {
         return $this->leadListModel->isFieldUsed($field);
     }
@@ -698,22 +647,16 @@ class FieldModel extends FormModel
 
     /**
      * Filter used field ids.
-     *
-     * @return array
      */
-    public function filterUsedFieldIds(array $ids)
+    public function filterUsedFieldIds(array $ids): array
     {
-        return array_filter($ids, function ($id) {
-            return false === $this->isUsedField($this->getEntity($id));
-        });
+        return array_filter($ids, fn ($id): bool => false === $this->isUsedField($this->getEntity($id)));
     }
 
     /**
      * Reorder fields based on passed entity position.
-     *
-     * @param $entity
      */
-    public function reorderFieldsByEntity($entity)
+    public function reorderFieldsByEntity($entity): void
     {
         if (!$entity instanceof LeadField) {
             throw new MethodNotAllowedHttpException(['LeadEntity']);
@@ -749,7 +692,7 @@ class FieldModel extends FormModel
      *
      * @param int $start Number to start the order by (used for paginated reordering)
      */
-    public function reorderFieldsByList(array $list, $start = 1)
+    public function reorderFieldsByList(array $list, $start = 1): void
     {
         $fields = $this->getRepository()->findBy([], ['order' => 'ASC']);
         foreach ($fields as $field) {
@@ -765,30 +708,26 @@ class FieldModel extends FormModel
     /**
      * Get list of custom field values for autopopulate fields.
      *
-     * @param $type
-     * @param $filter
-     * @param $limit
+     * @param string $type
+     * @param string $filter
+     * @param int    $limit
      *
      * @return array
      */
     public function getLookupResults($type, $filter = '', $limit = 10)
     {
-        return $this->em->getRepository('MauticLeadBundle:Lead')->getValueList($type, $filter, $limit);
+        /** @var LeadRepository $contactRepository */
+        $contactRepository = $this->em->getRepository(Lead::class);
+
+        return $contactRepository->getValueList($type, $filter, $limit);
     }
 
     /**
-     * {@inheritdoc}
-     *
-     * @param       $entity
-     * @param       $formFactory
-     * @param null  $action
      * @param array $options
-     *
-     * @return mixed
      *
      * @throws MethodNotAllowedHttpException
      */
-    public function createForm($entity, $formFactory, $action = null, $options = [])
+    public function createForm($entity, FormFactoryInterface $formFactory, $action = null, $options = []): FormInterface
     {
         if (!$entity instanceof LeadField) {
             throw new MethodNotAllowedHttpException(['LeadField']);
@@ -802,9 +741,7 @@ class FieldModel extends FormModel
     }
 
     /**
-     * @param $properties
-     *
-     * @return bool
+     * @return string|true
      */
     public function setFieldProperties(LeadField $entity, array $properties)
     {
@@ -814,7 +751,7 @@ class FieldModel extends FormModel
             $properties = [];
         }
 
-        //validate properties
+        // validate properties
         $type   = $entity->getType();
         $result = FormFieldHelper::validateProperties($type, $properties);
         if ($result[0]) {
@@ -827,22 +764,38 @@ class FieldModel extends FormModel
     }
 
     /**
-     * {@inheritdoc}
-     *
-     * @param $action
-     * @param $event
-     * @param $entity
-     * @param $isNew
-     *
      * @throws \Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException
      */
-    protected function dispatchEvent($action, &$entity, $isNew = false, Event $event = null)
+    protected function dispatchEvent($action, &$entity, $isNew = false, Event $event = null): ?Event
     {
+        switch ($action) {
+            case 'pre_save':
+                $action = LeadEvents::FIELD_PRE_SAVE;
+                break;
+            case 'post_save':
+                $action = LeadEvents::FIELD_POST_SAVE;
+                break;
+            case 'pre_delete':
+                $action = LeadEvents::FIELD_PRE_DELETE;
+                break;
+            case 'post_delete':
+                $action = LeadEvents::FIELD_POST_DELETE;
+                break;
+        }
+
         if (!$entity instanceof LeadField) {
             throw new MethodNotAllowedHttpException(['LeadField']);
         }
 
-        return $this->fieldSaveDispatcher->dispatchEventBc($action, $entity, $isNew, $event);
+        if (null !== $event && !$event instanceof LeadFieldEvent) {
+            throw new \RuntimeException('Event should be LeadFieldEvent|null.');
+        }
+
+        try {
+            return $this->fieldSaveDispatcher->dispatchEvent($action, $entity, $isNew, $event);
+        } catch (NoListenerException) {
+            return $event;
+        }
     }
 
     /**
@@ -852,9 +805,9 @@ class FieldModel extends FormModel
      * @param bool|true $alphabetical
      * @param array     $filters
      *
-     * @return array
+     * @return mixed[]
      */
-    public function getFieldList($byGroup = true, $alphabetical = true, $filters = ['isPublished' => true, 'object' => 'lead'])
+    public function getFieldList($byGroup = true, $alphabetical = true, $filters = ['isPublished' => true, 'object' => 'lead']): array
     {
         return $this->fieldList->getFieldList($byGroup, $alphabetical, $filters);
     }
@@ -883,16 +836,15 @@ class FieldModel extends FormModel
                     ],
                 ],
                 'hydration_mode' => 'HYDRATE_ARRAY',
+                'result_cache'   => new ResultCacheOptions(LeadField::CACHE_NAMESPACE),
             ]
         );
     }
 
     /**
      * @param string $object
-     *
-     * @return array
      */
-    public function getFieldListWithProperties($object = 'lead')
+    public function getFieldListWithProperties($object = 'lead'): array
     {
         $forceFilters[] = [
             'column' => 'f.object',
@@ -919,6 +871,7 @@ class FieldModel extends FormModel
                 'group_label'  => $this->translator->trans('mautic.lead.field.group.'.$contactField['group']),
                 'defaultValue' => $contactField['defaultValue'],
                 'properties'   => $contactField['properties'],
+                'isPublished'  => $contactField['isPublished'],
             ];
         }
 
@@ -928,12 +881,9 @@ class FieldModel extends FormModel
     /**
      * Get the fields for a specific group.
      *
-     * @param       $group
      * @param array $filters
-     *
-     * @return array
      */
-    public function getGroupFields($group, $filters = ['isPublished' => true])
+    public function getGroupFields($group, $filters = ['isPublished' => true]): array
     {
         $forceFilters = [
             [
@@ -1000,20 +950,13 @@ class FieldModel extends FormModel
      *
      * @deprecated Use SchemaDefinition::getSchemaDefinition method instead
      *
-     * @param      $alias
-     * @param      $type
      * @param bool $isUnique
-     *
-     * @return array
      */
-    public static function getSchemaDefinition($alias, $type, $isUnique = false)
+    public static function getSchemaDefinition($alias, $type, $isUnique = false): array
     {
         return SchemaDefinition::getSchemaDefinition($alias, $type, $isUnique);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getEntityByAlias($alias, $categoryAlias = null, $lang = null)
     {
         return $this->getRepository()->findOneByAlias($alias);

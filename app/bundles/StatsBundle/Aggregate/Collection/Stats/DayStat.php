@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2018 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\StatsBundle\Aggregate\Collection\Stats;
 
 class DayStat implements StatInterface
@@ -16,21 +7,14 @@ class DayStat implements StatInterface
     /**
      * @var HourStat[]
      */
-    private $stats = [];
+    private array $stats = [];
 
     /**
-     * @var string
-     */
-    private $day;
-
-    /**
-     * DayStat constructor.
-     *
      * @param string $day "2019-11-07" format
      */
-    public function __construct($day)
-    {
-        $this->day = $day;
+    public function __construct(
+        private $day
+    ) {
     }
 
     /**
@@ -72,10 +56,7 @@ class DayStat implements StatInterface
         return $sum;
     }
 
-    /**
-     * @return int
-     */
-    public function getCount()
+    public function getCount(): int
     {
         return count($this->stats);
     }

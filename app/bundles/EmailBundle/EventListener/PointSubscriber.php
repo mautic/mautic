@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\EmailBundle\EventListener;
 
 use Doctrine\ORM\EntityManager;
@@ -27,23 +18,13 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class PointSubscriber implements EventSubscriberInterface
 {
-    /**
-     * @var PointModel
-     */
-    private $pointModel;
-
-    /**
-     * @var EntityManager
-     */
-    private $entityManager;
-
-    public function __construct(PointModel $pointModel, EntityManager $entityManager)
-    {
-        $this->pointModel    = $pointModel;
-        $this->entityManager = $entityManager;
+    public function __construct(
+        private PointModel $pointModel,
+        private EntityManager $entityManager
+    ) {
     }
 
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             PointEvents::POINT_ON_BUILD   => ['onPointBuild', 0],
@@ -53,12 +34,12 @@ class PointSubscriber implements EventSubscriberInterface
         ];
     }
 
-    public function onPointBuild(PointBuilderEvent $event)
+    public function onPointBuild(PointBuilderEvent $event): void
     {
         $action = [
             'group'    => 'mautic.email.actions',
             'label'    => 'mautic.email.point.action.open',
-            'callback' => ['\\Mautic\\EmailBundle\\Helper\\PointEventHelper', 'validateEmail'],
+            'callback' => [\Mautic\EmailBundle\Helper\PointEventHelper::class, 'validateEmail'],
             'formType' => EmailOpenType::class,
         ];
 
@@ -67,22 +48,22 @@ class PointSubscriber implements EventSubscriberInterface
         $action = [
             'group'    => 'mautic.email.actions',
             'label'    => 'mautic.email.point.action.send',
-            'callback' => ['\\Mautic\\EmailBundle\\Helper\\PointEventHelper', 'validateEmail'],
+            'callback' => [\Mautic\EmailBundle\Helper\PointEventHelper::class, 'validateEmail'],
             'formType' => EmailOpenType::class,
         ];
 
         $event->addAction('email.send', $action);
     }
 
-    public function onTriggerBuild(TriggerBuilderEvent $event)
+    public function onTriggerBuild(TriggerBuilderEvent $event): void
     {
         $sendEvent = [
             'group'           => 'mautic.email.point.trigger',
             'label'           => 'mautic.email.point.trigger.sendemail',
-            'callback'        => ['\\Mautic\\EmailBundle\\Helper\\PointEventHelper', 'sendEmail'],
+            'callback'        => [\Mautic\EmailBundle\Helper\PointEventHelper::class, 'sendEmail'],
             'formType'        => EmailSendType::class,
             'formTypeOptions' => ['update_select' => 'pointtriggerevent_properties_email'],
-            'formTheme'       => 'MauticEmailBundle:FormTheme\EmailSendList',
+            'formTheme'       => '@MauticEmail/FormTheme/EmailSendList/emailsend_list_row.html.twig',
         ];
 
         $event->addEvent('email.send', $sendEvent);
@@ -91,8 +72,8 @@ class PointSubscriber implements EventSubscriberInterface
           'group'           => 'mautic.email.point.trigger',
           'label'           => 'mautic.email.point.trigger.send_email_to_user',
           'formType'        => EmailToUserType::class,
-          'formTypeOptions' => ['update_select' => 'pointtriggerevent_properties_email'],
-          'formTheme'       => 'MauticEmailBundle:FormTheme\EmailSendList',
+          'formTypeOptions' => ['update_select' => 'pointtriggerevent_properties_useremail_email'],
+          'formTheme'       => '@MauticEmail/FormTheme/EmailSendList/email_to_user_row.html.twig',
           'eventName'       => EmailEvents::ON_SENT_EMAIL_TO_USER,
         ];
 
@@ -102,7 +83,7 @@ class PointSubscriber implements EventSubscriberInterface
     /**
      * Trigger point actions for email open.
      */
-    public function onEmailOpen(EmailOpenEvent $event)
+    public function onEmailOpen(EmailOpenEvent $event): void
     {
         $this->pointModel->triggerAction('email.open', $event->getEmail());
     }
@@ -110,7 +91,7 @@ class PointSubscriber implements EventSubscriberInterface
     /**
      * Trigger point actions for email send.
      */
-    public function onEmailSend(EmailSendEvent $event)
+    public function onEmailSend(EmailSendEvent $event): void
     {
         $leadArray = $event->getLead();
         if ($leadArray && is_array($leadArray) && !empty($leadArray['id'])) {

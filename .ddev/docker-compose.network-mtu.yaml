@@ -1,0 +1,18 @@
+# Temporary fix for network issues when running composer inside ddev container (in Gitpod)
+#
+# Since Gitpod removed slirp4netns as part of performance improvements,
+# MTU value should be aligned to the one in gitpod.io
+#
+# Gitpod fixed it for docker - https://github.com/gitpod-io/gitpod/pull/9356
+# and for docker-compose - https://github.com/gitpod-io/template-docker-compose/pull/4
+#
+# ddev doesn't use Gitpod's custom docker-compose binary. Instead, ddev uses
+# its own docker-compose binary at /home/gitpod/.ddev/bin/docker-compose
+# ddev issue [WIP] - https://github.com/drud/ddev/issues/3766
+#
+# Align the MTU value to the one that is set in Gitpod (1440)
+
+networks:
+  default:
+    driver_opts:
+      com.docker.network.driver.mtu: 1440

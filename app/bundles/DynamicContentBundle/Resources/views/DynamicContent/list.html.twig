@@ -1,0 +1,44 @@
+{#
+  Variables
+    - searchValue
+    - items (\Mautic\DynamicContentBundle\Entity\DynamicContent[])
+    - categories
+    - page
+    - limit
+    - permissions
+    - model
+    - tmpl
+#}
+{%- set isIndex = 'index' == tmpl -%}
+{%- set tmpl = 'list' -%}
+{% extends isIndex ? '@MauticCore/Default/content.html.twig' : '@MauticCore/Default/raw_output.html.twig' %}
+
+{% block mauticContent 'dynamicContent' %}
+
+{% block headerTitle 'mautic.dynamicContent.dynamicContents'|trans %}
+
+{% block actions %}
+    {{ include('@MauticCore/Helper/page_actions.html.twig', {
+            'templateButtons': {
+                'new': permissions['dynamiccontent:dynamiccontents:create'],
+            },
+            'routeBase': 'dynamicContent',
+    }) }}
+{% endblock %}
+
+{% block content %}
+  {% if isIndex %}
+    <div class="panel panel-default bdr-t-wdh-0 mb-0">
+        {{ include('@MauticCore/Helper/list_toolbar.html.twig', {
+                'searchValue': searchValue,
+                'searchHelp': 'mautic.page.help.searchcommands',
+                'action': currentRoute,
+        }) }}
+        <div class="page-list">
+          {{ include('@MauticDynamicContent/DynamicContent/_list.html.twig') }}
+        </div>
+    </div>
+  {% else %}
+    {{ include('@MauticDynamicContent/DynamicContent/_list.html.twig') }}
+  {% endif %}
+{% endblock %}

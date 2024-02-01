@@ -2,15 +2,6 @@
 
 declare(strict_types=1);
 
-/*
- * @copyright   2017 Mautic Contributors. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\LeadBundle\Tests\Tracker\Service\DeviceTrackingService;
 
 use Doctrine\ORM\EntityManagerInterface;
@@ -21,41 +12,22 @@ use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadDevice;
 use Mautic\LeadBundle\Entity\LeadDeviceRepository;
 use Mautic\LeadBundle\Tracker\Service\DeviceTrackingService\DeviceTrackingService;
-use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 
 final class DeviceTrackingServiceTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var MockObject
-     */
-    private $cookieHelperMock;
+    private \PHPUnit\Framework\MockObject\MockObject $cookieHelperMock;
 
-    /**
-     * @var MockObject
-     */
-    private $entityManagerMock;
+    private \PHPUnit\Framework\MockObject\MockObject $entityManagerMock;
 
-    /**
-     * @var MockObject
-     */
-    private $randomHelperMock;
+    private \PHPUnit\Framework\MockObject\MockObject $randomHelperMock;
 
-    /**
-     * @var MockObject
-     */
-    private $leadDeviceRepositoryMock;
+    private \PHPUnit\Framework\MockObject\MockObject $leadDeviceRepositoryMock;
 
-    /**
-     * @var MockObject
-     */
-    private $requestStackMock;
+    private \PHPUnit\Framework\MockObject\MockObject $requestStackMock;
 
-    /**
-     * @var MockObject
-     */
-    private $security;
+    private \PHPUnit\Framework\MockObject\MockObject $security;
 
     protected function setUp(): void
     {
@@ -207,7 +179,7 @@ final class DeviceTrackingServiceTest extends \PHPUnit\Framework\TestCase
         $this->assertNull($this->getDeviceTrackingService()->getTrackedDevice());
     }
 
-    public function testGetTrackedDeviceNoRequest()
+    public function testGetTrackedDeviceNoRequest(): void
     {
         $deviceTrackingService = $this->getDeviceTrackingService();
         $this->assertNull($deviceTrackingService->getTrackedDevice());
@@ -243,7 +215,7 @@ final class DeviceTrackingServiceTest extends \PHPUnit\Framework\TestCase
 
         $deviceTrackingService = $this->getDeviceTrackingService();
 
-        $this->assertInstanceOf(LeadDevice::class, $deviceTrackingService->trackCurrentDevice($leadDeviceMock, false));
+        $deviceTrackingService->trackCurrentDevice($leadDeviceMock, false);
     }
 
     /**
@@ -297,10 +269,10 @@ final class DeviceTrackingServiceTest extends \PHPUnit\Framework\TestCase
             ->willReturn(new Lead());
 
         $this->cookieHelperMock->method('setCookie')
-            ->withConsecutive(['mautic_device_id', $uniqueTrackingIdentifier, 31536000]);
+            ->withConsecutive(['mautic_device_id', $uniqueTrackingIdentifier, 31_536_000]);
 
         $deviceTrackingService = $this->getDeviceTrackingService();
-        $this->assertInstanceOf(LeadDevice::class, $deviceTrackingService->trackCurrentDevice($leadDeviceMock, true));
+        $deviceTrackingService->trackCurrentDevice($leadDeviceMock, true);
     }
 
     /**
@@ -349,7 +321,7 @@ final class DeviceTrackingServiceTest extends \PHPUnit\Framework\TestCase
             ->willReturn(new Lead());
 
         $this->cookieHelperMock->method('setCookie')
-            ->withConsecutive(['mautic_device_id', $uniqueTrackingIdentifier, 31536000]);
+            ->withConsecutive(['mautic_device_id', $uniqueTrackingIdentifier, 31_536_000]);
 
         $this->entityManagerMock->expects($this->once())
             ->method('persist')
@@ -359,7 +331,7 @@ final class DeviceTrackingServiceTest extends \PHPUnit\Framework\TestCase
             ->method('flush');
 
         $deviceTrackingService = $this->getDeviceTrackingService();
-        $this->assertInstanceOf(LeadDevice::class, $deviceTrackingService->trackCurrentDevice($leadDeviceMock, false));
+        $deviceTrackingService->trackCurrentDevice($leadDeviceMock, false);
     }
 
     /**

@@ -1,47 +1,23 @@
 <?php
 
-/*
- * @copyright   2017 Mautic Contributors. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CampaignBundle\Event;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Mautic\CampaignBundle\Entity\LeadEventLog;
 use Mautic\CampaignBundle\EventCollector\Accessor\Event\AbstractEventAccessor;
 use Mautic\CampaignBundle\Executioner\Result\EvaluatedContacts;
-use Symfony\Component\EventDispatcher\Event;
+use Symfony\Contracts\EventDispatcher\Event;
 
 class DecisionResultsEvent extends Event
 {
     /**
-     * @var AbstractEventAccessor
+     * @param ArrayCollection<int, \Mautic\CampaignBundle\Entity\LeadEventLog> $eventLogs
      */
-    private $eventConfig;
-
-    /**
-     * @var ArrayCollection|LeadEventLog[]
-     */
-    private $eventLogs;
-
-    /**
-     * @var EvaluatedContacts
-     */
-    private $evaluatedContacts;
-
-    /**
-     * DecisionResultsEvent constructor.
-     */
-    public function __construct(AbstractEventAccessor $config, ArrayCollection $logs, EvaluatedContacts $evaluatedContacts)
-    {
-        $this->eventConfig       = $config;
-        $this->eventLogs         = $logs;
-        $this->evaluatedContacts = $evaluatedContacts;
+    public function __construct(
+        private AbstractEventAccessor $eventConfig,
+        private ArrayCollection $eventLogs,
+        private EvaluatedContacts $evaluatedContacts
+    ) {
     }
 
     /**

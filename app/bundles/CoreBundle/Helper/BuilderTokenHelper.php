@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CoreBundle\Helper;
 
 use Doctrine\DBAL\Connection;
@@ -16,34 +7,29 @@ use Doctrine\DBAL\Query\Expression\CompositeExpression;
 use Mautic\CoreBundle\Factory\ModelFactory;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 
-/**
- * Class BuilderTokenHelper.
- */
 class BuilderTokenHelper
 {
-    private $isConfigured = false;
-
-    private $security;
-    private $modelFactory;
-    private $connection;
-    private $userHelper;
+    private bool $isConfigured = false;
 
     protected $permissionSet;
+
     protected $modelName;
+
     protected $viewPermissionBase;
+
     protected $langVar;
+
     protected $bundleName;
 
+    /**
+     * @param ModelFactory<object> $modelFactory
+     */
     public function __construct(
-        CorePermissions $security,
-        ModelFactory $modelFactory,
-        Connection $connection,
-        UserHelper $userHelper
+        private CorePermissions $security,
+        private ModelFactory $modelFactory,
+        private Connection $connection,
+        private UserHelper $userHelper
     ) {
-        $this->security      = $security;
-        $this->modelFactory  = $modelFactory;
-        $this->connection    = $connection;
-        $this->userHelper    = $userHelper;
     }
 
     /**
@@ -76,9 +62,9 @@ class BuilderTokenHelper
      * @param string              $valueColumn The column that houses the value
      * @param CompositeExpression $expr        Use $factory->getDatabase()->getExpressionBuilder()->andX()
      *
-     * @throws \BadMethodCallException
-     *
      * @return array|void
+     *
+     * @throws \BadMethodCallException
      */
     public function getTokens(
         $tokenRegex,
@@ -88,10 +74,10 @@ class BuilderTokenHelper
         CompositeExpression $expr = null
     ) {
         if (!$this->isConfigured) {
-            throw new \BadMethodCallException('You must call the "'.get_class($this).'::configure()" method first.');
+            throw new \BadMethodCallException('You must call the "'.static::class.'::configure()" method first.');
         }
 
-        //set some permissions
+        // set some permissions
         $permissions = $this->security->isGranted(
             $this->permissionSet,
             'RETURN_ARRAY'
@@ -107,19 +93,16 @@ class BuilderTokenHelper
             $prefix .= '.';
         }
 
-        $exprBuilder = $this->connection->getExpressionBuilder();
-        if (null == $expr) {
-            $expr = $exprBuilder->andX();
-        }
+        $exprBuilder = $this->connection->createExpressionBuilder();
 
         if (isset($permissions[$this->viewPermissionBase.':viewother']) && !$permissions[$this->viewPermissionBase.':viewother']) {
-            $expr->add(
+            $expr = $expr->with(
                 $exprBuilder->eq($prefix.'created_by', $this->userHelper->getUser()->getId())
             );
         }
 
         if (!empty($filter)) {
-            $expr->add(
+            $expr = $expr->with(
                 $exprBuilder->like('LOWER('.$labelColumn.')', ':label')
             );
 
@@ -144,21 +127,15 @@ class BuilderTokenHelper
     /**
      * Override default permission set of viewown and viewother.
      */
-    public function setPermissionSet(array $permissions)
+    public function setPermissionSet(array $permissions): void
     {
         $this->permissionSet = $permissions;
     }
 
     /**
      * @deprecated 2.6.0 to be removed in 3.0
-     *
-     * @param $token
-     * @param $description
-     * @param $forPregReplace
-     *
-     * @return string
      */
-    public static function getVisualTokenHtml($token, $description, $forPregReplace = false)
+    public static function getVisualTokenHtml($token, $description, $forPregReplace = false): string
     {
         if ($forPregReplace) {
             return preg_quote('<strong contenteditable="false" data-token="', '/').'(.*?)'.preg_quote('">**', '/')

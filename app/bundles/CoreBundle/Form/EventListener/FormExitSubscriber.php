@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CoreBundle\Form\EventListener;
 
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
@@ -16,44 +7,28 @@ use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 
-/**
- * Class FormExitSubscriber.
- */
 class FormExitSubscriber implements EventSubscriberInterface
 {
     /**
-     * @var \Mautic\CoreBundle\Model\CommonModel
+     * @param string $model
+     * @param array  $options
      */
-    private $model;
-
-    /**
-     * @var array
-     */
-    private $options;
-
-    /**
-     * @param \Mautic\CoreBundle\Model\CommonModel $model
-     * @param array                                $options
-     */
-    public function __construct($model, $options = [])
-    {
-        $this->model   = $model;
-        $this->options = $options;
+    public function __construct(
+        private $model,
+        private $options = []
+    ) {
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [FormEvents::PRE_SET_DATA => 'preSetData'];
     }
 
-    public function preSetData(FormEvent $event)
+    public function preSetData(FormEvent $event): void
     {
         $id = !empty($this->options['data']) ? $this->options['data']->getId() : 0;
         if ($id && empty($this->options['ignore_formexit'])) {
-            //add a hidden field that is used exclusively to warn a user to use save/cancel to exit a form
+            // add a hidden field that is used exclusively to warn a user to use save/cancel to exit a form
             $form = $event->getForm();
 
             $form->add(

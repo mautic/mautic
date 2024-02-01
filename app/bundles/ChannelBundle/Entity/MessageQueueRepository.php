@@ -1,31 +1,17 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\ChannelBundle\Entity;
 
 use Mautic\CoreBundle\Entity\CommonRepository;
 use Mautic\LeadBundle\Entity\TimelineTrait;
 
 /**
- * MessageQueueRepository.
+ * @extends CommonRepository<MessageQueue>
  */
 class MessageQueueRepository extends CommonRepository
 {
     use TimelineTrait;
 
-    /**
-     * @param $channel
-     * @param $channelId
-     * @param $leadId
-     */
     public function findMessage($channel, $channelId, $leadId)
     {
         $results = $this->createQueryBuilder('mq')
@@ -42,12 +28,7 @@ class MessageQueueRepository extends CommonRepository
     }
 
     /**
-     * @param      $limit
-     * @param      $processStarted
-     * @param null $channel
-     * @param null $channelId
-     *
-     * @return mixed
+     * @return array<int, MessageQueue>
      */
     public function getQueuedMessages($limit, $processStarted, $channel = null, $channelId = null)
     {
@@ -61,7 +42,7 @@ class MessageQueueRepository extends CommonRepository
             ->setParameter('processStarted', $processStarted)
             ->indexBy('mq', 'mq.id');
 
-        $q->orderBy('mq.priority, mq.scheduledDate', 'ASC');
+        $q->orderBy('mq.priority, mq.scheduledDate', \Doctrine\Common\Collections\Criteria::ASC);
 
         if ($limit) {
             $q->setMaxResults((int) $limit);
@@ -79,22 +60,17 @@ class MessageQueueRepository extends CommonRepository
         return $q->getQuery()->getResult();
     }
 
-    /**
-     * @param $channel
-     *
-     * @return bool|string
-     */
-    public function getQueuedChannelCount($channel, array $ids = null)
+    public function getQueuedChannelCount($channel, array $ids = null): int
     {
         $q = $this->getEntityManager()->getConnection()->createQueryBuilder();
 
-        $expr = $q->expr()->andX(
+        $expr = $q->expr()->and(
             $q->expr()->eq($this->getTableAlias().'.channel', ':channel'),
             $q->expr()->neq($this->getTableAlias().'.status', ':status')
         );
 
         if (!empty($ids)) {
-            $expr->add(
+            $expr = $expr->with(
                 $q->expr()->in($this->getTableAlias().'.channel_id', $ids)
             );
         }
@@ -108,8 +84,8 @@ class MessageQueueRepository extends CommonRepository
                     'status'  => MessageQueue::STATUS_SENT,
                 ]
             )
-            ->execute()
-            ->fetchColumn();
+            ->executeQuery()
+            ->fetchOne();
     }
 
     /**
@@ -123,8 +99,8 @@ class MessageQueueRepository extends CommonRepository
     {
         $query = $this->getEntityManager()->getConnection()->createQueryBuilder()
             ->from(MAUTIC_TABLE_PREFIX.'message_queue', 'mq')
-            ->select('mq.id, mq.lead_id, mq.channel as channelName, mq.channel_id as channelId, 
-            mq.priority as priority, mq.attempts, mq.success, mq.status, mq.date_published as dateAdded, 
+            ->select('mq.id, mq.lead_id, mq.channel as channelName, mq.channel_id as channelId,
+            mq.priority as priority, mq.attempts, mq.success, mq.status, mq.date_published as dateAdded,
             mq.scheduled_date as scheduledDate, mq.last_attempt as lastAttempt, mq.date_sent as dateSent');
 
         if ($leadId) {
@@ -132,7 +108,7 @@ class MessageQueueRepository extends CommonRepository
         }
 
         if (isset($options['search']) && $options['search']) {
-            $query->andWhere($query->expr()->orX(
+            $query->andWhere($query->expr()->or(
                 $query->expr()->like('mq.channel', $query->expr()->literal('%'.$options['search'].'%'))
             ));
         }

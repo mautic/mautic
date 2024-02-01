@@ -2,22 +2,13 @@
 
 declare(strict_types=1);
 
-/*
- * @copyright   2021 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CoreBundle\Tests\Unit\Helper;
 
 use Mautic\CoreBundle\Helper\PhpVersionHelper;
 
 class PhpVersionHelperTest extends \PHPUnit\Framework\TestCase
 {
-    public function testGetCurrentSemver()
+    public function testGetCurrentSemver(): void
     {
         $helper = new PhpVersionHelper();
 

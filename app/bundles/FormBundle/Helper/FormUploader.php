@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\FormBundle\Helper;
 
 use Mautic\CoreBundle\Exception\FileUploadException;
@@ -21,30 +12,20 @@ use Mautic\FormBundle\Entity\Submission;
 
 class FormUploader
 {
-    /**
-     * @var FileUploader
-     */
-    private $fileUploader;
-
-    /**
-     * @var CoreParametersHelper
-     */
-    private $coreParametersHelper;
-
-    public function __construct(FileUploader $fileUploader, CoreParametersHelper $coreParametersHelper)
-    {
-        $this->fileUploader         = $fileUploader;
-        $this->coreParametersHelper = $coreParametersHelper;
+    public function __construct(
+        private FileUploader $fileUploader,
+        private CoreParametersHelper $coreParametersHelper
+    ) {
     }
 
     /**
      * @throws FileUploadException
      */
-    public function uploadFiles(UploadFileCrate $filesToUpload, Submission $submission)
+    public function uploadFiles(UploadFileCrate $filesToUpload, Submission $submission): void
     {
         $uploadedFiles = [];
         $result        = $submission->getResults();
-        $alias         = ''; //Only for IDE - will be overriden by foreach
+        $alias         = ''; // Only for IDE - will be overriden by foreach
 
         try {
             foreach ($filesToUpload as $fileFieldCrate) {
@@ -58,7 +39,7 @@ class FormUploader
                 $uploadedFiles[] =$uploadedFile;
             }
             $submission->setResults($result);
-        } catch (FileUploadException $e) {
+        } catch (FileUploadException) {
             foreach ($uploadedFiles as $filePath) {
                 $this->fileUploader->delete($filePath);
             }
@@ -68,17 +49,15 @@ class FormUploader
 
     /**
      * @param string $fileName
-     *
-     * @return string
      */
-    public function getCompleteFilePath(Field $field, $fileName)
+    public function getCompleteFilePath(Field $field, $fileName): string
     {
         $uploadDir = $this->getUploadDir($field);
 
         return $uploadDir.DIRECTORY_SEPARATOR.$fileName;
     }
 
-    public function deleteAllFilesOfFormField(Field $field)
+    public function deleteAllFilesOfFormField(Field $field): void
     {
         if (!$field->isFileType()) {
             return;
@@ -88,7 +67,7 @@ class FormUploader
         $this->fileUploader->delete($uploadDir);
     }
 
-    public function deleteFilesOfForm(Form $form)
+    public function deleteFilesOfForm(Form $form): void
     {
         $formId        = $form->getId() ?: $form->deletedId;
         $formUploadDir = $this->getUploadDirOfForm($formId);
@@ -98,7 +77,7 @@ class FormUploader
     /**
      * @todo Refactor code that result can be accessed normally and not only as a array of values
      */
-    public function deleteUploadedFiles(Submission $submission)
+    public function deleteUploadedFiles(Submission $submission): void
     {
         $fields = $submission->getForm()->getFields();
         foreach ($fields as $field) {
@@ -106,7 +85,7 @@ class FormUploader
         }
     }
 
-    private function deleteFileOfFormField(Submission $submission, Field $field)
+    private function deleteFileOfFormField(Submission $submission, Field $field): void
     {
         $alias   = $field->getAlias();
         $results = $submission->getResults();
@@ -120,10 +99,7 @@ class FormUploader
         $this->fileUploader->delete($filePath);
     }
 
-    /**
-     * @return string
-     */
-    private function getUploadDir(Field $field)
+    private function getUploadDir(Field $field): string
     {
         $fieldId       = $field->getId();
         $formUploadDir = $this->getUploadDirOfForm($field->getForm()->getId());
@@ -132,11 +108,9 @@ class FormUploader
     }
 
     /**
-     * @return string
-     *
      * @throws \LogicException If formId is null
      */
-    private function getUploadDirOfForm(int $formId)
+    private function getUploadDirOfForm(int $formId): string
     {
         $uploadDir = $this->coreParametersHelper->get('form_upload_dir');
 
@@ -146,10 +120,8 @@ class FormUploader
     /**
      * Fix iOS picture orientation after upload PHP
      * https://stackoverflow.com/questions/22308921/fix-ios-picture-orientation-after-upload-php.
-     *
-     * @param $filename
      */
-    private function fixRotationJPG($filename)
+    private function fixRotationJPG($filename): void
     {
         if (IMAGETYPE_JPEG != exif_imagetype($filename)) {
             return;
@@ -158,9 +130,8 @@ class FormUploader
         if (empty($exif['Orientation'])) {
             return;
         }
-        $ort  = $exif['Orientation']; /*STORES ORIENTATION FROM IMAGE */
+        $ort  = $exif['Orientation']; /* STORES ORIENTATION FROM IMAGE */
         $ort1 = $ort;
-        $exif = exif_read_data($filename, 0, true);
         if (!empty($ort1)) {
             $image = imagecreatefromjpeg($filename);
             $ort   = $ort1;

@@ -5,6 +5,9 @@ namespace Mautic\CategoryBundle\Tests\Controller;
 use Mautic\CategoryBundle\Entity\Category;
 use Mautic\CategoryBundle\Model\CategoryModel;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
+use Mautic\UserBundle\Model\UserModel;
+use PHPUnit\Framework\Assert;
+use Symfony\Component\HttpFoundation\Request;
 
 class CategoryControllerFunctionalTest extends MauticMysqlTestCase
 {
@@ -28,7 +31,7 @@ class CategoryControllerFunctionalTest extends MauticMysqlTestCase
             ],
         ];
         /** @var CategoryModel $model */
-        $model      = self::$container->get('mautic.category.model.category');
+        $model      = static::getContainer()->get('mautic.category.model.category');
 
         foreach ($categoriesData as $categoryData) {
             $category = new Category();
@@ -65,5 +68,46 @@ class CategoryControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertSame(200, $clientResponse->getStatusCode(), 'Return code must be 200.');
         $this->assertStringContainsString('TestTitleCategoryController1', $clientResponseContent, 'The return must contain TestTitleCategoryController1');
         $this->assertStringNotContainsString('TestTitleCategoryController2', $clientResponseContent, 'The return must not contain TestTitleCategoryController2');
+    }
+
+    public function testNewActionWithInForm(): void
+    {
+        $crawler                = $this->client->request(Request::METHOD_GET, 's/categories/category/new');
+        $clientResponse         = json_decode($this->client->getResponse()->getContent(), true);
+        $html                   = $clientResponse['newContent'];
+        $crawler->addHtmlContent($html);
+        $saveButton = $crawler->selectButton('category_form[buttons][save]');
+        $form       = $saveButton->form();
+        $form['category_form[bundle]']->setValue('category');
+        $form['category_form[title]']->setValue('Test');
+        $form['category_form[isPublished]']->setValue('1');
+        $form['category_form[inForm]']->setValue('1');
+
+        $this->client->submit($form);
+        Assert::assertTrue($this->client->getResponse()->isOk());
+        $clientResponse = $this->client->getResponse();
+        $body           = json_decode($clientResponse->getContent(), true);
+        $this->assertArrayHasKey('categoryId', $body);
+        $this->assertArrayHasKey('categoryName', $body);
+    }
+
+    public function testEditLockCategory(): void
+    {
+        /** @var CategoryModel $categoryModel */
+        $categoryModel      = static::getContainer()->get('mautic.category.model.category');
+        /** @var UserModel $userModel */
+        $userModel      = static::getContainer()->get('mautic.user.model.user');
+        $user           = $userModel->getEntity(2);
+
+        $category = new Category();
+        $category->setTitle('New Category');
+        $category->setAlias('category');
+        $category->setBundle('global');
+        $category->setCheckedOutBy($user);
+        $category->setCheckedOut(new \DateTime('now'));
+        $categoryModel->saveEntity($category, false);
+
+        $this->client->request(Request::METHOD_GET, 's/categories/category/edit/'.$category->getId());
+        $this->assertStringContainsString('is currently checked out by', $this->client->getResponse()->getContent());
     }
 }

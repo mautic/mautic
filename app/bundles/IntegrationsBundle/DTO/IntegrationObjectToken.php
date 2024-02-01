@@ -2,15 +2,6 @@
 
 declare(strict_types=1);
 
-/*
- * @copyright   2019 Mautic, Inc. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://mautic.com
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\IntegrationsBundle\DTO;
 
 /**
@@ -22,11 +13,6 @@ class IntegrationObjectToken
     /**
      * @var string
      */
-    private $token;
-
-    /**
-     * @var string
-     */
     private $objectName;
 
     /**
@@ -34,10 +20,7 @@ class IntegrationObjectToken
      */
     private $integration;
 
-    /**
-     * @var string
-     */
-    private $defaultValue = '';
+    private string $defaultValue = '';
 
     /**
      * @var string
@@ -49,18 +32,12 @@ class IntegrationObjectToken
      */
     private $baseURL;
 
-    /**
-     * IntegrationObjectToken constructor.
-     */
-    public function __construct(string $token)
-    {
-        $this->token = $token;
+    public function __construct(
+        private string $token
+    ) {
     }
 
-    /**
-     * @return string
-     */
-    public function getToken()
+    public function getToken(): string
     {
         return $this->token;
     }
@@ -105,10 +82,7 @@ class IntegrationObjectToken
         $this->defaultValue = $defaultValue;
     }
 
-    /**
-     * @return string
-     */
-    public function getDefaultValue()
+    public function getDefaultValue(): string
     {
         return $this->defaultValue;
     }

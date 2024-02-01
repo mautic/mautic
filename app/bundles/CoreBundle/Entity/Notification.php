@@ -1,20 +1,10 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CoreBundle\Entity;
 
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
-use Mautic\CoreBundle\Entity\NotificationRepository;
 use Mautic\UserBundle\Entity\User;
 
 class Notification
@@ -45,7 +35,7 @@ class Notification
     protected $message;
 
     /**
-     * @var \DateTiem|null
+     * @var \DateTimeInterface|null
      */
     protected $dateAdded;
 
@@ -55,11 +45,16 @@ class Notification
     protected $iconClass;
 
     /**
-     * @var bool|null
+     * @var bool
      */
     protected $isRead = false;
 
-    public static function loadMetadata(ORM\ClassMetadata $metadata)
+    /**
+     * @var string|null
+     */
+    protected $deduplicate;
+
+    public static function loadMetadata(ORM\ClassMetadata $metadata): void
     {
         $builder = new ClassMetadataBuilder($metadata);
 
@@ -67,7 +62,8 @@ class Notification
             ->setCustomRepositoryClass(NotificationRepository::class)
             ->addIndex(['is_read'], 'notification_read_status')
             ->addIndex(['type'], 'notification_type')
-            ->addIndex(['is_read', 'user_id'], 'notification_user_read_status');
+            ->addIndex(['is_read', 'user_id'], 'notification_user_read_status')
+            ->addIndex(['deduplicate', 'date_added'], 'deduplicate_date_added');
 
         $builder->addId();
 
@@ -97,6 +93,11 @@ class Notification
         $builder->createField('isRead', Types::BOOLEAN)
             ->columnName('is_read')
             ->build();
+
+        $builder->createField('deduplicate', 'string')
+            ->nullable()
+            ->length(32)
+            ->build();
     }
 
     /**
@@ -115,7 +116,7 @@ class Notification
         return $this->user;
     }
 
-    public function setUser(User $user)
+    public function setUser(User $user): void
     {
         $this->user = $user;
     }
@@ -131,7 +132,7 @@ class Notification
     /**
      * @param string|null $type
      */
-    public function setType($type)
+    public function setType($type): void
     {
         $this->type = $type;
     }
@@ -147,13 +148,13 @@ class Notification
     /**
      * @param string|null $message
      */
-    public function setMessage($message)
+    public function setMessage($message): void
     {
         $this->message = $message;
     }
 
     /**
-     * @return \DateTime|null
+     * @return \DateTimeInterface|null
      */
     public function getDateAdded()
     {
@@ -163,7 +164,7 @@ class Notification
     /**
      * @param \DateTime|null $dateAdded
      */
-    public function setDateAdded($dateAdded)
+    public function setDateAdded($dateAdded): void
     {
         $this->dateAdded = $dateAdded;
     }
@@ -179,7 +180,7 @@ class Notification
     /**
      * @param string|null $iconClass
      */
-    public function setIconClass($iconClass)
+    public function setIconClass($iconClass): void
     {
         $this->iconClass = $iconClass;
     }
@@ -195,7 +196,7 @@ class Notification
     /**
      * @param bool|null $isRead
      */
-    public function setIsRead($isRead)
+    public function setIsRead($isRead): void
     {
         $this->isRead = (bool) $isRead;
     }
@@ -211,8 +212,13 @@ class Notification
     /**
      * @param string|null $header
      */
-    public function setHeader($header)
+    public function setHeader($header): void
     {
         $this->header = $header;
+    }
+
+    public function setDeduplicate(?string $deduplicate): void
+    {
+        $this->deduplicate = $deduplicate;
     }
 }

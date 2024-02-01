@@ -1,53 +1,46 @@
 <?php
 
-/*
- * @copyright   2019 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CoreBundle\Loader;
 
+use Symfony\Component\Dotenv\Dotenv;
+use Symfony\Component\Filesystem\Path;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\HttpFoundation\ParameterBag;
 
 class ParameterLoader
 {
-    /**
-     * @var string
-     */
-    private $rootPath;
+    private string $configBaseDir;
+
+    private \Symfony\Component\HttpFoundation\ParameterBag $parameterBag;
+
+    private \Symfony\Component\HttpFoundation\ParameterBag $localParameterBag;
 
     /**
-     * @var ParameterBag
+     * @var array<string, mixed>
      */
-    private $parameterBag;
+    private array $localParameters = [];
 
     /**
-     * @var ParameterBag
-     */
-    private $localParameterBag;
-
-    /**
-     * @var array
-     */
-    private $localParameters = [];
-
-    /**
-     * @var array
+     * @var array<string, mixed>
      */
     private static $defaultParameters = [];
 
-    public function __construct(string $configRootPath = __DIR__.'/../../../')
-    {
-        $this->rootPath = $configRootPath;
+    public function __construct(
+        private string $rootPath = __DIR__.'/../../../'
+    ) {
+        $this->configBaseDir = static::getLocalConfigBaseDir($this->rootPath);
 
         $this->loadDefaultParameters();
         $this->loadLocalParameters();
         $this->createParameterBags();
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    public function getDefaultParameters(): array
+    {
+        return self::$defaultParameters;
     }
 
     public function getParameterBag(): ParameterBag
@@ -60,7 +53,7 @@ class ParameterLoader
         return $this->localParameterBag;
     }
 
-    public function loadIntoEnvironment()
+    public function loadIntoEnvironment(): void
     {
         $envVariables      = new ParameterBag();
         $defaultParameters = new ParameterBag(self::$defaultParameters);
@@ -78,26 +71,41 @@ class ParameterLoader
         EnvVars\TwigEnvVars::load($this->parameterBag, $defaultParameters, $envVariables);
 
         // Load the values into the environment for cache use
-        $dotenv = new \Symfony\Component\Dotenv\Dotenv();
+        $dotenv = new Dotenv(MAUTIC_ENV);
+        foreach ($envVariables->all() as $key => $value) {
+            if (null === $value) {
+                $envVariables->set($key, '');
+            }
+        }
         $dotenv->populate($envVariables->all());
     }
 
-    public static function getLocalConfigFile(string $root, $updateDefaultParameters = true): string
+    public static function getLocalConfigFile(string $root, bool $updateDefaultParameters = true): string
     {
-        $root = realpath($root);
+        $root        = realpath($root);
+        $projectRoot = self::getProjectDirByRoot($root);
 
-        /** @var array $paths */
+        /** @var array<string> $paths */
+        $paths = [];
         include $root.'/config/paths.php';
 
         if (!isset($paths['local_config'])) {
             if ($updateDefaultParameters) {
-                self::$defaultParameters['local_config_path'] = $root.'/config/local.php';
+                self::$defaultParameters['local_config_path'] = $projectRoot.'/config/local.php';
             }
 
-            return $root.'/config/local.php';
+            return $projectRoot.'/config/local.php';
         }
 
-        $paths['local_config'] = str_replace('%kernel.root_dir%', $root, $paths['local_config']);
+        $newConfigPath = str_replace('%kernel.project_dir%', $projectRoot, $paths['local_config']);
+        $oldConfigPath = str_replace('%kernel.project_dir%', $root, $paths['local_config']);
+
+        $paths['local_config'] = $newConfigPath;
+
+        // Check if the local config files are still present in the /app/config dir, instead of the /config dir
+        if (!file_exists($newConfigPath) && file_exists($oldConfigPath)) {
+            $paths['local_config'] = $oldConfigPath;
+        }
 
         if ($updateDefaultParameters) {
             self::$defaultParameters['local_config_path'] = $paths['local_config'];
@@ -131,7 +139,7 @@ class ParameterLoader
 
         /** @var \SplFileInfo $file */
         foreach ($finder as $file) {
-            /** @var array $config */
+            /** @var array<string, mixed> $config */
             $config = include $file->getPathname();
 
             $parameters              = $config['parameters'] ?? [];
@@ -146,7 +154,8 @@ class ParameterLoader
 
         // Load parameters array from local configuration
         if (file_exists($localConfigFile)) {
-            /** @var array $parameters */
+            /** @var array<string, mixed> $parameters */
+            $parameters = [];
             include $localConfigFile;
 
             // Override default with local
@@ -156,10 +165,10 @@ class ParameterLoader
         // Force local specific params
         $localParametersFile = $this->getLocalParametersFile();
         if (file_exists($localParametersFile)) {
-            /** @var array $parameters */
             include $localParametersFile;
+            /** @var array<string, mixed> $parameters */
 
-            //override default with forced
+            // override default with forced
             $compiledParameters = array_merge($compiledParameters, $parameters);
         }
 
@@ -168,6 +177,10 @@ class ParameterLoader
         if ($envParameters) {
             $compiledParameters = array_merge($compiledParameters, json_decode($envParameters, true));
         }
+
+        // Hardcode the db_driver to pdo_mysql, as it is currently the only supported driver.
+        // We set in here, to ensure it is always set to this value.
+        $compiledParameters['db_driver'] = 'pdo_mysql';
 
         $this->localParameters = $compiledParameters;
     }
@@ -180,6 +193,35 @@ class ParameterLoader
 
     private function getLocalParametersFile(): string
     {
-        return $this->rootPath.'/config/parameters_local.php';
+        // load the local parameter file from the same dir as the local config file.
+        return $this->configBaseDir.'/config/parameters_local.php';
+    }
+
+    public static function getLocalConfigBaseDir(string $root): string
+    {
+        $rootDir         = Path::canonicalize($root);
+        $projectDir      = self::getProjectDirByRoot($rootDir);
+        $localConfigFile = self::getLocalConfigFile($root, false);
+
+        if (Path::isBasePath($rootDir, $localConfigFile)) {
+            return $rootDir;
+        } elseif (Path::isBasePath($projectDir, $localConfigFile)) {
+            return $projectDir;
+        }
+
+        return $root;
+    }
+
+    public static function getProjectDirByRoot(string $root): string
+    {
+        $dir = $rootDir = \dirname($root, 1);
+        while (!is_file($dir.'/composer.json')) {
+            if ($dir === \dirname($dir)) {
+                return $rootDir;
+            }
+            $dir = \dirname($dir);
+        }
+
+        return $dir;
     }
 }

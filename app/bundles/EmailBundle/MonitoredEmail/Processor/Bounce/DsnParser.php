@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2017 Mautic Contributors. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\EmailBundle\MonitoredEmail\Processor\Bounce;
 
 use Mautic\EmailBundle\MonitoredEmail\Exception\BounceNotFound;
@@ -17,20 +8,15 @@ use Mautic\EmailBundle\MonitoredEmail\Processor\Address;
 use Mautic\EmailBundle\MonitoredEmail\Processor\Bounce\Definition\Category;
 use Mautic\EmailBundle\MonitoredEmail\Processor\Bounce\Mapper\CategoryMapper;
 
-/**
- * Class DsnParser.
- */
 class DsnParser
 {
     /**
-     * @return BouncedEmail
-     *
      * @throws BounceNotFound
      */
-    public function getBounce(Message $message)
+    public function getBounce(Message $message): BouncedEmail
     {
         // Parse the bounce
-        $dsnMessage = ($message->dsnMessage) ? $message->dsnMessage : $message->textPlain;
+        $dsnMessage = $message->dsnMessage ?: $message->textPlain;
         $dsnReport  = $message->dsnReport;
 
         // Try parsing the report
@@ -52,13 +38,8 @@ class DsnParser
 
     /**
      * @todo - refactor to get rid of the if/else statements
-     *
-     * @param $dsnMessage
-     * @param $dsnReport
-     *
-     * @return array
      */
-    public function parse($dsnMessage, $dsnReport)
+    public function parse(string $dsnMessage, string $dsnReport): array
     {
         // initialize the result array
         $result = [
@@ -1239,10 +1220,10 @@ class DsnParser
                     $result['rule_cat'] = Category::DELAYED;
                     $result['rule_no']  = '0110';
                     break;
+                    // unhandled cases
                 case 'delivered':
                 case 'relayed':
-                case 'expanded': // unhandled cases
-                    break;
+                case 'expanded':
                 default:
                     break;
             }

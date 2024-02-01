@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2016 Mautic Contributors. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CoreBundle\Tests\Unit\Entity;
 
 use Doctrine\DBAL\Connection;
@@ -16,39 +7,46 @@ use Doctrine\DBAL\Query\Expression\ExpressionBuilder;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\QueryBuilder;
+use Doctrine\Persistence\ManagerRegistry;
 use Mautic\CoreBundle\Entity\CommonRepository;
+use Mautic\LeadBundle\Entity\Lead;
+use PHPUnit\Framework\MockObject\MockObject;
 
 class CommonRepositoryTest extends \PHPUnit\Framework\TestCase
 {
     /**
-     * @var CommonRepository
+     * @var MockObject&CommonRepository<object>
      */
-    private $repo;
+    private \PHPUnit\Framework\MockObject\MockObject $repo;
+
+    private \Doctrine\ORM\QueryBuilder $qb;
 
     /**
-     * @var QueryBuilder
+     * @var MockObject|Connection
      */
-    private $qb;
-    /**
-     * @var \PHPUnit_Framework_MockObject_MockObject|Connection
-     */
-    private $connectionMock;
+    private \PHPUnit\Framework\MockObject\MockObject $connectionMock;
 
     /**
      * Sets up objects used in the tests.
      */
     protected function setUp(): void
     {
+        /** @var EntityManager&MockObject $emMock */
         $emMock = $this->getMockBuilder(EntityManager::class)
             ->addMethods(['none'])
+            ->onlyMethods(['getClassMetadata'])
             ->disableOriginalConstructor()
             ->getMock();
 
-        $metaMock = $this->getMockBuilder(ClassMetadata::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        /** @var ManagerRegistry&MockObject $managerRegistry */
+        $managerRegistry = $this->createMock(ManagerRegistry::class);
+        $managerRegistry->method('getManagerForClass')->willReturn($emMock);
 
-        $this->repo           = new CommonRepository($emMock, $metaMock);
+        /** @var ClassMetadata<object>&MockObject $classMetadata */
+        $classMetadata = $this->createMock(ClassMetadata::class);
+        $emMock->method('getClassMetadata')->willReturn($classMetadata);
+
+        $this->repo           = $this->getMockForAbstractClass(CommonRepository::class, [$managerRegistry, Lead::class]);
         $this->qb             = new QueryBuilder($emMock);
         $this->connectionMock = $this->createMock(Connection::class);
         $this->connectionMock->method('getExpressionBuilder')
@@ -61,7 +59,7 @@ class CommonRepositoryTest extends \PHPUnit\Framework\TestCase
      * @covers  \Mautic\CoreBundle\Entity\CommonRepository::buildClauses
      * @covers  \Mautic\CoreBundle\Entity\CommonRepository::buildOrderByClause
      */
-    public function testBuildingQueryWithUndefinedOrder()
+    public function testBuildingQueryWithUndefinedOrder(): void
     {
         $this->callProtectedMethod('buildClauses', [$this->qb, []]);
         $this->assertSame('SELECT e', (string) $this->qb);
@@ -73,7 +71,7 @@ class CommonRepositoryTest extends \PHPUnit\Framework\TestCase
      * @covers  \Mautic\CoreBundle\Entity\CommonRepository::buildClauses
      * @covers  \Mautic\CoreBundle\Entity\CommonRepository::buildOrderByClause
      */
-    public function testBuildingQueryWithBasicOrder()
+    public function testBuildingQueryWithBasicOrder(): void
     {
         $args = [
             'orderBy'    => 'e.someCol',
@@ -90,7 +88,7 @@ class CommonRepositoryTest extends \PHPUnit\Framework\TestCase
      * @covers  \Mautic\CoreBundle\Entity\CommonRepository::buildOrderByClause
      * @covers  \Mautic\CoreBundle\Entity\CommonRepository::buildOrderByClauseFromArray
      */
-    public function testBuildingQueryWithOrderArray()
+    public function testBuildingQueryWithOrderArray(): void
     {
         $args = [
             'filter' => [
@@ -111,7 +109,7 @@ class CommonRepositoryTest extends \PHPUnit\Framework\TestCase
      *
      * @covers  \Mautic\CoreBundle\Entity\CommonRepository::validateOrderByClause
      */
-    public function testValidateOrderByClauseWithColContainingAliasWillNotRemoveTheDot()
+    public function testValidateOrderByClauseWithColContainingAliasWillNotRemoveTheDot(): void
     {
         $provided = [
             'col' => 'e.someCol',
@@ -132,7 +130,7 @@ class CommonRepositoryTest extends \PHPUnit\Framework\TestCase
      *
      * @covers  \Mautic\CoreBundle\Entity\CommonRepository::validateOrderByClause
      */
-    public function testValidateOrderByClauseWillRemoveFunkyChars()
+    public function testValidateOrderByClauseWillRemoveFunkyChars(): void
     {
         $provided = [
             'col' => '" DELETE * FROM users',
@@ -152,7 +150,7 @@ class CommonRepositoryTest extends \PHPUnit\Framework\TestCase
      *
      * @covers  \Mautic\CoreBundle\Entity\CommonRepository::validateOrderByClause
      */
-    public function testValidateOrderByClauseWithMissingCol()
+    public function testValidateOrderByClauseWithMissingCol(): void
     {
         $this->expectException(\InvalidArgumentException::class);
         $this->callProtectedMethod('validateOrderByClause', [[]]);
@@ -163,7 +161,7 @@ class CommonRepositoryTest extends \PHPUnit\Framework\TestCase
      *
      * @see \Mautic\LeadBundle\Tests\Segment\RandomParameterNameTest::testGenerateRandomParameterName
      */
-    public function testGenerateRandomParameterName()
+    public function testGenerateRandomParameterName(): void
     {
         $expectedValues = [
             'par0',
@@ -230,7 +228,7 @@ class CommonRepositoryTest extends \PHPUnit\Framework\TestCase
         return $method->invokeArgs($this->repo, $args);
     }
 
-    public function testArgumentCSVArray()
+    public function testArgumentCSVArray(): void
     {
         $qb   = new \Doctrine\DBAL\Query\QueryBuilder($this->connectionMock);
         $args = [
@@ -241,7 +239,7 @@ class CommonRepositoryTest extends \PHPUnit\Framework\TestCase
             ],
         ];
         $matchArgs = explode(',', $args[0]['val']);
-        array_walk($matchArgs, function (&$element) { $element = trim($element, '"'); });
+        array_walk($matchArgs, function (&$element): void { $element = trim($element, '"'); });
 
         $this->callBuildWhereClauseFromArray($qb, $args);
 
@@ -258,7 +256,7 @@ class CommonRepositoryTest extends \PHPUnit\Framework\TestCase
             ],
         ];
         $matchArgs = explode(',', $args[0]['val']);
-        array_walk($matchArgs, function (&$element) { $element = trim($element, '"'); });
+        array_walk($matchArgs, function (&$element): void { $element = trim($element, '"'); });
 
         $this->callBuildWhereClauseFromArray($qb, $args);
 
@@ -267,7 +265,7 @@ class CommonRepositoryTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($matchArgs, array_shift($parameters));
     }
 
-    public function testNoEnquotedArgumentCSVArray()
+    public function testNoEnquotedArgumentCSVArray(): void
     {
         $qb   = new \Doctrine\DBAL\Query\QueryBuilder($this->connectionMock);
         $args = [
@@ -278,7 +276,7 @@ class CommonRepositoryTest extends \PHPUnit\Framework\TestCase
             ],
         ];
         $matchArgs = explode(',', $args[0]['val']);
-        array_walk($matchArgs, function (&$element) { $element = trim($element, '"'); });
+        array_walk($matchArgs, function (&$element): void { $element = trim($element, '"'); });
 
         $this->callBuildWhereClauseFromArray($qb, $args);
 
@@ -296,7 +294,7 @@ class CommonRepositoryTest extends \PHPUnit\Framework\TestCase
             ],
         ];
         $matchArgs = explode(',', $args[0]['val']);
-        array_walk($matchArgs, function (&$element) { $element = trim($element, '"'); });
+        array_walk($matchArgs, function (&$element): void { $element = trim($element, '"'); });
 
         $this->callBuildWhereClauseFromArray($qb, $args);
 
@@ -306,7 +304,7 @@ class CommonRepositoryTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($matchArgs, array_shift($parameters));
     }
 
-    public function testNoEnquotedStringArgumentCSVArray()
+    public function testNoEnquotedStringArgumentCSVArray(): void
     {
         $qb   = new \Doctrine\DBAL\Query\QueryBuilder($this->connectionMock);
         $args = [
@@ -317,7 +315,7 @@ class CommonRepositoryTest extends \PHPUnit\Framework\TestCase
             ],
         ];
         $matchArgs = explode(',', $args[0]['val']);
-        array_walk($matchArgs, function (&$element) { $element = trim($element, '"'); });
+        array_walk($matchArgs, function (&$element): void { $element = trim($element, '"'); });
 
         $this->callBuildWhereClauseFromArray($qb, $args);
 
@@ -335,7 +333,7 @@ class CommonRepositoryTest extends \PHPUnit\Framework\TestCase
             ],
         ];
         $matchArgs = explode(',', $args[0]['val']);
-        array_walk($matchArgs, function (&$element) { $element = trim($element, '"'); });
+        array_walk($matchArgs, function (&$element): void { $element = trim($element, '"'); });
 
         $this->callBuildWhereClauseFromArray($qb, $args);
 
@@ -345,7 +343,7 @@ class CommonRepositoryTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($matchArgs, array_shift($parameters));
     }
 
-    public function testStringArgumentInterpretedAsSingleValueEnquoted()
+    public function testStringArgumentInterpretedAsSingleValueEnquoted(): void
     {
         $qb   = new \Doctrine\DBAL\Query\QueryBuilder($this->connectionMock);
         $args = [

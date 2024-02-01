@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2018 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\StatsBundle\Aggregate;
 
 use Mautic\StatsBundle\Aggregate\Collection\StatCollection;
@@ -17,22 +8,11 @@ use Mautic\StatsBundle\Event\Options\FetchOptions;
 use Mautic\StatsBundle\StatEvents;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
-/**
- * Class Collector.
- */
 class Collector
 {
-    /**
-     * @var EventDispatcherInterface
-     */
-    private $eventDispatcher;
-
-    /**
-     * Collector constructor.
-     */
-    public function __construct(EventDispatcherInterface $eventDispatcher)
-    {
-        $this->eventDispatcher = $eventDispatcher;
+    public function __construct(
+        private EventDispatcherInterface $eventDispatcher
+    ) {
     }
 
     /**
@@ -48,7 +28,7 @@ class Collector
 
         $event = new AggregateStatRequestEvent($statName, $fromDateTime, $toDateTime, $fetchOptions);
 
-        $this->eventDispatcher->dispatch(StatEvents::AGGREGATE_STAT_REQUEST, $event);
+        $this->eventDispatcher->dispatch($event, StatEvents::AGGREGATE_STAT_REQUEST);
 
         return $event->getStatCollection();
     }
