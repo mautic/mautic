@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Mautic\EmailBundle\Tests\Security\Permissions;
+namespace Mautic\EmailBundle\Tests\Functional\Security\Permissions;
 
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\UserBundle\Entity\Role;
