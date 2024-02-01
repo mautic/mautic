@@ -10,6 +10,7 @@ use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Model\FormModel;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\CoreBundle\Translation\Translator;
+use Mautic\LeadBundle\Field\FieldList;
 use Mautic\LeadBundle\Model\FieldModel;
 use Mautic\PluginBundle\Entity\Plugin;
 use Psr\Log\LoggerInterface;
@@ -23,6 +24,7 @@ class PluginModel extends FormModel
 {
     public function __construct(
         protected FieldModel $leadFieldModel,
+        private FieldList $fieldList,
         CoreParametersHelper $coreParametersHelper,
         private BundleHelper $bundleHelper,
         EntityManager $em,
@@ -61,7 +63,7 @@ class PluginModel extends FormModel
      */
     public function getLeadFields(): array
     {
-        return $this->leadFieldModel->getFieldList();
+        return $this->fieldList->getFieldList();
     }
 
     /**
@@ -71,7 +73,7 @@ class PluginModel extends FormModel
      */
     public function getCompanyFields(): array
     {
-        return $this->leadFieldModel->getFieldList(true, true, ['isPublished' => true, 'object' => 'company']);
+        return $this->fieldList->getFieldList(true, true, ['isPublished' => true, 'object' => 'company']);
     }
 
     public function saveFeatureSettings($entity): void
@@ -132,7 +134,7 @@ class PluginModel extends FormModel
      */
     public function getInstalledPluginTables(array $pluginsMetadata): array
     {
-        $currentSchema          = $this->em->getConnection()->getSchemaManager()->createSchema();
+        $currentSchema          = $this->em->getConnection()->createSchemaManager()->introspectSchema();
         $installedPluginsTables = [];
 
         foreach ($pluginsMetadata as $bundleName => $pluginMetadata) {

@@ -224,6 +224,10 @@ class FetchCommonApiController extends AbstractFOSRestController implements Maut
             $args['filter']['order'] = $order;
         }
 
+        if ($totalCountTtl = $this->getTotalCountTtl()) {
+            $args['totalCountTtl'] = $totalCountTtl;
+        }
+
         $results = $this->model->getEntities($args);
 
         [$entities, $totalCount] = $this->prepareEntitiesForView($results);
@@ -711,7 +715,7 @@ class FetchCommonApiController extends AbstractFOSRestController implements Maut
      */
     protected function validateBatchPayload(array $parameters)
     {
-        $batchLimit = (int) $this->coreParametersHelper->getParameter('api_batch_max_limit', 200);
+        $batchLimit = (int) $this->coreParametersHelper->get('api_batch_max_limit', 200);
         if (count($parameters) > $batchLimit) {
             return $this->returnError($this->translator->trans('mautic.api.call.batch_exception', ['%limit%' => $batchLimit]));
         }
@@ -733,5 +737,10 @@ class FetchCommonApiController extends AbstractFOSRestController implements Maut
         $headers['Mautic-Version'] = $this->appVersion->getVersion();
 
         return parent::view($data, $statusCode, $headers);
+    }
+
+    protected function getTotalCountTtl(): ?int
+    {
+        return null;
     }
 }

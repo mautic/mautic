@@ -752,4 +752,12 @@ class CampaignModel extends CommonFormModel
 
         return $ids;
     }
+
+    /**
+     * @return array<int, int>
+     */
+    public function getCampaignIdsWithDependenciesOnEmail(int $emailId): array
+    {
+        return $this->getRepository()->getCampaignIdsWithDependenciesOnEmail($emailId);
+    }
 }

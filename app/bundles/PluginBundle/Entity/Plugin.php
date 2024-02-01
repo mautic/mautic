@@ -5,11 +5,13 @@ namespace Mautic\PluginBundle\Entity;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
+use Mautic\CoreBundle\Entity\CacheInvalidateInterface;
 use Mautic\CoreBundle\Entity\CommonEntity;
 
-class Plugin extends CommonEntity
+class Plugin extends CommonEntity implements CacheInvalidateInterface
 {
     public const DESCRIPTION_DELIMITER_REGEX = "/\R---\R/";
+    public const CACHE_NAMESPACE             = 'Plugin';
 
     /**
      * @var int
@@ -258,5 +260,13 @@ class Plugin extends CommonEntity
             $this->primaryDescription   = trim($parts[0]);
             $this->secondaryDescription = trim($parts[1]);
         }
+    }
+
+    public function getCacheNamespacesToDelete(): array
+    {
+        return [
+            self::CACHE_NAMESPACE,
+            Integration::CACHE_NAMESPACE,
+        ];
     }
 }

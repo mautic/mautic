@@ -23,7 +23,7 @@ class DynamicContentRepository extends CommonRepository
             ->select('e')
             ->from(DynamicContent::class, 'e', 'e.id');
 
-        if (empty($args['iterator_mode'])) {
+        if (empty($args['iterator_mode']) && empty($args['iterable_mode'])) {
             $q->leftJoin('e.category', 'c');
         }
 
