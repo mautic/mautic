@@ -35,12 +35,12 @@ class EmailPermissionsTest extends MauticMysqlTestCase
         $form['role[name]']->setValue('Send To DNC Permission');
         $form['role[isAdmin]']->setValue('0');
         $form['role[description]']->setValue('This is to send emails with "Send to DNC" permission');
-        $form['role[permissions][email:campaigns]']->setValue('sendtodnc');
+        $form['role[permissions][email:campaigns][0]']->setValue('sendtodnc');
         $this->client->submit($form);
         Assert::assertTrue($this->client->getResponse()->isOk(), $this->client->getResponse()->getContent());
 
         $role               = $this->em->getRepository(Role::class)->findOneBy(['name' => 'Send To DNC Permission']);
         $readablePermission = $role->getRawPermissions();
-        Assert::assertSame('ABC', $readablePermission);
+        Assert::assertSame(['email:campaigns' => ['sendtodnc']], $readablePermission);
     }
 }

@@ -11,12 +11,12 @@ class EmailPermissions extends AbstractPermissions
     public function __construct($params)
     {
         parent::__construct($params);
-        $this->addStandardPermissions(['categories', 'emails']);
         $this->permissions = [
             'campaigns' => [
                 'sendtodnc' => 2,
             ],
         ];
+        $this->addStandardPermissions(['categories', 'emails']);
     }
 
     public function getName(): string
