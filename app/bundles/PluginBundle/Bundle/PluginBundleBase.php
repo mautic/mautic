@@ -66,7 +66,7 @@ abstract class PluginBundleBase extends Bundle
 
     private static function isDDLStatement(string $query): bool|int
     {
-        return preg_match('/^(CREATE|ALTER|DROP)\s/i', $query);
+        return preg_match('/^(CREATE|ALTER|DROP|RENAME|TRUNCATE|COMMENT)\s/i', $query);
     }
 
     /**
@@ -76,8 +76,12 @@ abstract class PluginBundleBase extends Bundle
      *
      * @deprecated To be removed in 5.0. Listen to PluginEvents::ON_PLUGIN_UPDATE instead
      */
-    public static function onPluginUpdate(Plugin $plugin, MauticFactory $factory, $metadata = null, Schema $installedSchema = null): void
-    {
+    public static function onPluginUpdate(
+        Plugin $plugin,
+        MauticFactory $factory,
+        $metadata = null,
+        Schema $installedSchema = null
+    ): void {
         // Not recommended although availalbe for simple schema changes - see updatePluginSchema docblock
         // self::updatePluginSchema($metadata, $installedSchema, $factory);
     }
