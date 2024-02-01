@@ -2,20 +2,9 @@
 
 declare(strict_types=1);
 
-/*
- * @copyright   2019 Mautic Inc. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://www.mautic.com
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\IntegrationsBundle\Sync\DAO\Sync;
 
-use DateTimeImmutable;
 use DateTimeInterface;
-use DateTimeZone;
 use Mautic\IntegrationsBundle\Exception\InvalidValueException;
 use Mautic\IntegrationsBundle\Sync\SyncDataExchange\Internal\Object\Contact;
 
@@ -26,40 +15,21 @@ class InputOptionsDAO
      */
     private $integration;
 
-    /**
-     * @var bool
-     */
-    private $firstTimeSync;
+    private bool $firstTimeSync;
 
-    /**
-     * @var bool
-     */
-    private $disablePush;
+    private bool $disablePush;
 
-    /**
-     * @var bool
-     */
-    private $disablePull;
+    private bool $disablePull;
 
-    /**
-     * @var ObjectIdsDAO|null
-     */
-    private $mauticObjectIds;
+    private bool $disableActivityPush;
 
-    /**
-     * @var ObjectIdsDAO|null
-     */
-    private $integrationObjectIds;
+    private ?\Mautic\IntegrationsBundle\Sync\DAO\Sync\ObjectIdsDAO $mauticObjectIds;
 
-    /**
-     * @var DateTimeInterface|null
-     */
-    private $startDateTime;
+    private ?\Mautic\IntegrationsBundle\Sync\DAO\Sync\ObjectIdsDAO $integrationObjectIds;
 
-    /**
-     * @var DateTimeInterface|null
-     */
-    private $endDateTime;
+    private ?\DateTimeInterface $startDateTime;
+
+    private ?\DateTimeInterface $endDateTime;
 
     private array $options;
 
@@ -70,6 +40,7 @@ class InputOptionsDAO
      *      'first-time-sync' => true,
      *      'disable-push' => false,
      *      'disable-pull' => false,
+     *      'disable-activity-push' => false,
      *      'mautic-object-id' => ['contact:12', 'contact:13'] or a ObjectIdsDAO object,
      *      'integration-object-id' => ['Lead:hfskjdhf', 'Lead:hfskjdhr'] or a ObjectIdsDAO object,
      *      'start-datetime' => '2019-09-12T12:01:20' or a DateTimeInterface object, Expecting UTC timezone
@@ -88,6 +59,7 @@ class InputOptionsDAO
         $this->firstTimeSync        = (bool) ($input['first-time-sync'] ?? false);
         $this->disablePush          = (bool) ($input['disable-push'] ?? false);
         $this->disablePull          = (bool) ($input['disable-pull'] ?? false);
+        $this->disableActivityPush  = (bool) ($input['disable-activity-push'] ?? false);
         $this->startDateTime        = $this->validateDateTime($input, 'start-datetime');
         $this->endDateTime          = $this->validateDateTime($input, 'end-datetime');
         $this->mauticObjectIds      = $this->validateObjectIds($input, 'mautic-object-id');
@@ -108,6 +80,11 @@ class InputOptionsDAO
     public function pullIsEnabled(): bool
     {
         return !$this->disablePull;
+    }
+
+    public function activityPushIsEnabled(): bool
+    {
+        return !$this->disableActivityPush;
     }
 
     public function pushIsEnabled(): bool
@@ -143,18 +120,18 @@ class InputOptionsDAO
     /**
      * @throws InvalidValueException
      */
-    private function validateDateTime(array $input, string $optionName): ?DateTimeInterface
+    private function validateDateTime(array $input, string $optionName): ?\DateTimeInterface
     {
         if (empty($input[$optionName])) {
             return null;
         }
 
-        if ($input[$optionName] instanceof DateTimeInterface) {
+        if ($input[$optionName] instanceof \DateTimeInterface) {
             return $input[$optionName];
         } else {
             try {
-                return is_string($input[$optionName]) ? new DateTimeImmutable($input[$optionName], new DateTimeZone('UTC')) : null;
-            } catch (\Throwable $e) {
+                return is_string($input[$optionName]) ? new \DateTimeImmutable($input[$optionName], new \DateTimeZone('UTC')) : null;
+            } catch (\Throwable) {
                 throw new InvalidValueException("'$input[$optionName]' is not valid. Use 'Y-m-d H:i:s' format like '2018-12-24 20:30:00' or something like '-10 minutes'");
             }
         }
@@ -196,7 +173,7 @@ class InputOptionsDAO
             $input['mautic-object-id'][$key] = preg_replace(
                 '/^contact:/',
                 Contact::NAME.':',
-                $mauticObjectId
+                "$mauticObjectId"
             );
         }
 

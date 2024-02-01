@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2018 Mautic Contributors. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CampaignBundle\Membership;
 
 use Mautic\CampaignBundle\CampaignEvents;
@@ -19,38 +10,27 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class EventDispatcher
 {
-    /**
-     * @var EventDispatcherInterface
-     */
-    private $dispatcher;
-
-    /**
-     * EventDispatcher constructor.
-     */
-    public function __construct(EventDispatcherInterface $dispatcher)
-    {
-        $this->dispatcher = $dispatcher;
+    public function __construct(
+        private EventDispatcherInterface $dispatcher
+    ) {
     }
 
     /**
      * @param string $action
      */
-    public function dispatchMembershipChange(Lead $contact, Campaign $campaign, $action)
+    public function dispatchMembershipChange(Lead $contact, Campaign $campaign, $action): void
     {
         $this->dispatcher->dispatch(
-            CampaignEvents::CAMPAIGN_ON_LEADCHANGE,
-            new CampaignLeadChangeEvent($campaign, $contact, $action)
+            new CampaignLeadChangeEvent($campaign, $contact, $action),
+            CampaignEvents::CAMPAIGN_ON_LEADCHANGE
         );
     }
 
-    /**
-     * @param $action
-     */
-    public function dispatchBatchMembershipChange(array $contacts, Campaign $campaign, $action)
+    public function dispatchBatchMembershipChange(array $contacts, Campaign $campaign, $action): void
     {
         $this->dispatcher->dispatch(
-            CampaignEvents::LEAD_CAMPAIGN_BATCH_CHANGE,
-            new CampaignLeadChangeEvent($campaign, $contacts, $action)
+            new CampaignLeadChangeEvent($campaign, $contacts, $action),
+            CampaignEvents::LEAD_CAMPAIGN_BATCH_CHANGE
         );
     }
 }

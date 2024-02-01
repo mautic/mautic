@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\PointBundle\EventListener;
 
 use Mautic\DashboardBundle\Event\WidgetDetailEvent;
@@ -43,20 +34,15 @@ class DashboardSubscriber extends MainDashboardSubscriber
         'point:points:viewother',
     ];
 
-    /**
-     * @var PointModel
-     */
-    protected $pointModel;
-
-    public function __construct(PointModel $pointModel)
-    {
-        $this->pointModel = $pointModel;
+    public function __construct(
+        protected PointModel $pointModel
+    ) {
     }
 
     /**
      * Set a widget detail when needed.
      */
-    public function onWidgetDetailGenerate(WidgetDetailEvent $event)
+    public function onWidgetDetailGenerate(WidgetDetailEvent $event): void
     {
         $this->checkPermissions($event);
         $canViewOthers = $event->hasPermission('point:points:viewother');
@@ -80,7 +66,7 @@ class DashboardSubscriber extends MainDashboardSubscriber
                 ]);
             }
 
-            $event->setTemplate('MauticCoreBundle:Helper:chart.html.php');
+            $event->setTemplate('@MauticCore/Helper/chart.html.twig');
             $event->stopPropagation();
         }
     }

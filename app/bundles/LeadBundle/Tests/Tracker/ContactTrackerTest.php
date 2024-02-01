@@ -2,15 +2,6 @@
 
 declare(strict_types=1);
 
-/*
- * @copyright   2017 Mautic Contributors. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\LeadBundle\Tests\Tracker;
 
 use Mautic\CoreBundle\Entity\IpAddress;
@@ -20,6 +11,7 @@ use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadDevice;
 use Mautic\LeadBundle\Entity\LeadRepository;
+use Mautic\LeadBundle\Event\LeadChangeEvent;
 use Mautic\LeadBundle\LeadEvents;
 use Mautic\LeadBundle\Model\FieldModel;
 use Mautic\LeadBundle\Tracker\ContactTracker;
@@ -36,52 +28,49 @@ class ContactTrackerTest extends \PHPUnit\Framework\TestCase
     /**
      * @var MockObject|LeadRepository
      */
-    private $leadRepositoryMock;
+    private \PHPUnit\Framework\MockObject\MockObject $leadRepositoryMock;
 
     /**
      * @var MockObject|ContactTrackingServiceInterface
      */
-    private $contactTrackingServiceMock;
+    private \PHPUnit\Framework\MockObject\MockObject $contactTrackingServiceMock;
 
     /**
      * @var MockObject|DeviceTracker
      */
-    private $deviceTrackerMock;
+    private \PHPUnit\Framework\MockObject\MockObject $deviceTrackerMock;
 
     /**
      * @var MockObject|CorePermissions
      */
-    private $securityMock;
+    private \PHPUnit\Framework\MockObject\MockObject $securityMock;
 
     /**
      * @var MockObject|Logger
      */
-    private $loggerMock;
+    private \PHPUnit\Framework\MockObject\MockObject $loggerMock;
 
     /**
      * @var MockObject|IpLookupHelper
      */
-    private $ipLookupHelperMock;
+    private \PHPUnit\Framework\MockObject\MockObject $ipLookupHelperMock;
 
-    /**
-     * @var RequestStack
-     */
-    private $requestStack;
+    private \Symfony\Component\HttpFoundation\RequestStack $requestStack;
 
     /**
      * @var MockObject|CoreParametersHelper
      */
-    private $coreParametersHelperMock;
+    private \PHPUnit\Framework\MockObject\MockObject $coreParametersHelperMock;
 
     /**
      * @var MockObject|EventDispatcher
      */
-    private $dispatcherMock;
+    private \PHPUnit\Framework\MockObject\MockObject $dispatcherMock;
 
     /**
      * @var MockObject|FieldModel
      */
-    private $leadFieldModelMock;
+    private \PHPUnit\Framework\MockObject\MockObject $leadFieldModelMock;
 
     protected function setUp(): void
     {
@@ -213,9 +202,6 @@ class ContactTrackerTest extends \PHPUnit\Framework\TestCase
             ->method('getIpAddress')
             ->willReturn(new IpAddress());
 
-        $this->leadRepositoryMock->expects($this->once())
-            ->method('getFieldValues');
-
         $this->contactTrackingServiceMock->expects($this->once())
             ->method('getTrackedLead')
             ->willReturn(null);
@@ -249,16 +235,6 @@ class ContactTrackerTest extends \PHPUnit\Framework\TestCase
         $lead2->method('getId')
             ->willReturn(2);
 
-        $this->dispatcherMock->expects($this->once())
-            ->method('hasListeners')
-            ->withConsecutive([LeadEvents::CURRENT_LEAD_CHANGED])
-            ->willReturn(true);
-
-        $this->dispatcherMock->expects($this->once())
-            ->method('dispatch')
-            ->withConsecutive([LeadEvents::CURRENT_LEAD_CHANGED, $this->anything()])
-            ->willReturn(true);
-
         $leadDevice1 = new LeadDevice();
         $leadDevice2 = new LeadDevice();
 
@@ -267,6 +243,16 @@ class ContactTrackerTest extends \PHPUnit\Framework\TestCase
 
         $this->deviceTrackerMock->method('getTrackedDevice')
             ->willReturnOnConsecutiveCalls($leadDevice1, $leadDevice2);
+
+        $this->dispatcherMock->expects($this->once())
+            ->method('hasListeners')
+            ->with(LeadEvents::CURRENT_LEAD_CHANGED)
+            ->willReturn(true);
+
+        $this->dispatcherMock->expects($this->once())
+            ->method('dispatch')
+            ->with(new LeadChangeEvent($lead, 'def456', $lead2, null), LeadEvents::CURRENT_LEAD_CHANGED)
+            ->willReturn(new \stdClass());
 
         $contactTracker->setTrackedContact($lead);
         $contactTracker->setTrackedContact($lead2);

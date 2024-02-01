@@ -6,27 +6,25 @@ namespace Mautic\MarketplaceBundle\DTO;
 
 final class PackageBase
 {
-    /**
-     * Original name in format "vendor/name".
-     */
-    public string $name;
-    public string $url;
-    public string $repository;
-    public string $description;
-    public int $downloads;
-    public int $favers;
-
-    public function __construct(string $name, string $url, string $repository, string $description, int $downloads, int $favers)
-    {
-        $this->name        = $name;
-        $this->url         = $url;
-        $this->repository  = $repository;
-        $this->description = $description;
-        $this->downloads   = $downloads;
-        $this->favers      = $favers;
+    public function __construct(
+        /**
+         * Original name in format "vendor/name".
+         */
+        public string $name,
+        public string $url,
+        public string $repository,
+        public string $description,
+        public int $downloads,
+        public int $favers,
+        /**
+         * E.g. mautic-plugin.
+         */
+        public ?string $type,
+        public ?string $displayName = null
+    ) {
     }
 
-    public static function fromArray(array $array)
+    public static function fromArray(array $array): self
     {
         return new self(
             $array['name'],
@@ -34,7 +32,9 @@ final class PackageBase
             $array['repository'],
             $array['description'],
             (int) $array['downloads'],
-            (int) $array['favers']
+            (int) $array['favers'],
+            $array['type'] ?? null,
+            $array['display_name'] ?? null
         );
     }
 
@@ -56,19 +56,23 @@ final class PackageBase
 
     public function getPackageName(): string
     {
-        list(, $packageName) = explode('/', $this->name);
+        [, $packageName] = explode('/', $this->name);
 
         return $packageName;
     }
 
     public function getHumanPackageName(): string
     {
-        return utf8_ucfirst(str_replace('-', ' ', $this->getPackageName()));
+        if ($this->displayName) {
+            return $this->displayName;
+        }
+
+        return utf8_ucwords(str_replace('-', ' ', $this->getPackageName()));
     }
 
     public function getVendorName(): string
     {
-        list($vendor) = explode('/', $this->name);
+        [$vendor] = explode('/', $this->name);
 
         return $vendor;
     }

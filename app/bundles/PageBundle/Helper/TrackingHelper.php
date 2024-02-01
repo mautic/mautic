@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2016 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\PageBundle\Helper;
 
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
@@ -18,47 +9,20 @@ use Mautic\LeadBundle\Tracker\ContactTracker;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Session\Session;
 
-/**
- * Class TrackinHelper.
- */
 class TrackingHelper
 {
-    /**
-     * @var Session
-     */
-    protected $session;
-
-    /**
-     * @var CoreParametersHelper
-     */
-    protected $coreParametersHelper;
-
-    /**
-     * @var RequestStack
-     */
-    protected $requestStack;
-
-    /**
-     * @var ContactTracker
-     */
-    protected $contactTracker;
-
-    /**
-     * BuildJsSubscriber constructor.
-     */
     public function __construct(
-        Session $session,
-        CoreParametersHelper $coreParametersHelper,
-        RequestStack $requestStack,
-        ContactTracker $contactTracker
+        protected Session $session,
+        protected CoreParametersHelper $coreParametersHelper,
+        protected RequestStack $requestStack,
+        protected ContactTracker $contactTracker
     ) {
-        $this->session              = $session;
-        $this->coreParametersHelper = $coreParametersHelper;
-        $this->requestStack         = $requestStack;
-        $this->contactTracker       = $contactTracker;
     }
 
-    public function getEnabledServices()
+    /**
+     * @return array<string, 'facebook_pixel'|'google_analytics'>
+     */
+    public function getEnabledServices(): array
     {
         $keys = [
             'google_analytics' => 'Google Analytics',
@@ -66,7 +30,7 @@ class TrackingHelper
         ];
         $result = [];
         foreach ($keys as $key => $service) {
-            if (($id = $this->coreParametersHelper->get($key.'_id'))) {
+            if ($id = $this->coreParametersHelper->get($key.'_id')) {
                 $result[$service] = $key;
             }
         }
@@ -110,8 +74,6 @@ class TrackingHelper
     }
 
     /**
-     * @param $service
-     *
      * @return bool|mixed
      */
     public function displayInitCode($service)
@@ -141,13 +103,10 @@ class TrackingHelper
         return $this->coreParametersHelper->get('google_analytics_anonymize_ip');
     }
 
-    /**
-     * @return bool
-     */
-    protected function isLandingPage()
+    protected function isLandingPage(): bool
     {
         $server = $this->requestStack->getCurrentRequest()->server;
-        if (false === strpos($server->get('HTTP_REFERER'), $this->coreParametersHelper->get('site_url'))) {
+        if (!str_contains((string) $server->get('HTTP_REFERER'), $this->coreParametersHelper->get('site_url'))) {
             return false;
         }
 

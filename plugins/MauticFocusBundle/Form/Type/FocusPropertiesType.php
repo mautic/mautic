@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2016 Mautic, Inc. All rights reserved
- * @author      Mautic, Inc
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace MauticPlugin\MauticFocusBundle\Form\Type;
 
 use Mautic\CoreBundle\Form\Type\YesNoButtonGroupType;
@@ -17,9 +8,12 @@ use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
+/**
+ * @extends AbstractType<array<string, mixed>>
+ */
 class FocusPropertiesType extends AbstractType
 {
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $choices = [];
 
@@ -31,7 +25,7 @@ class FocusPropertiesType extends AbstractType
                     YesNoButtonGroupType::class,
                     [
                         'label' => 'mautic.focus.form.bar.allow_hide',
-                        'data'  => (isset($options['data']['allow_hide'])) ? $options['data']['allow_hide'] : true,
+                        'data'  => $options['data']['allow_hide'] ?? true,
                         'attr'  => [
                             'onchange' => 'Mautic.focusUpdatePreview()',
                         ],
@@ -47,7 +41,7 @@ class FocusPropertiesType extends AbstractType
                             'tooltip'  => 'mautic.focus.form.bar.push_page.tooltip',
                             'onchange' => 'Mautic.focusUpdatePreview()',
                         ],
-                        'data' => (isset($options['data']['push_page'])) ? $options['data']['push_page'] : true,
+                        'data' => $options['data']['push_page'] ?? true,
                     ]
                 );
 
@@ -60,7 +54,7 @@ class FocusPropertiesType extends AbstractType
                             'tooltip'  => 'mautic.focus.form.bar.sticky.tooltip',
                             'onchange' => 'Mautic.focusUpdatePreview()',
                         ],
-                        'data' => (isset($options['data']['sticky'])) ? $options['data']['sticky'] : true,
+                        'data' => $options['data']['sticky'] ?? true,
                     ]
                 );
 
@@ -126,15 +120,7 @@ class FocusPropertiesType extends AbstractType
         }
     }
 
-    public function getBlockPrefix()
-    {
-        return 'focus_properties';
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function configureOptions(OptionsResolver $resolver)
+    public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setRequired(['focus_style']);
 

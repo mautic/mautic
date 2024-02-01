@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2018 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\LeadBundle\Segment;
 
 use Mautic\LeadBundle\Entity\LeadList;
@@ -19,57 +10,45 @@ use Symfony\Component\DependencyInjection\Container;
 
 class ContactSegmentFilterFactory
 {
-    /**
-     * @var TableSchemaColumnsCache
-     */
-    private $schemaCache;
-
-    /**
-     * @var Container
-     */
-    private $container;
-
-    /**
-     * @var DecoratorFactory
-     */
-    private $decoratorFactory;
-
-    /**
-     * ContactSegmentFilterFactory constructor.
-     */
     public function __construct(
-        TableSchemaColumnsCache $schemaCache,
-        Container $container,
-        DecoratorFactory $decoratorFactory
+        private TableSchemaColumnsCache $schemaCache,
+        private Container $container,
+        private DecoratorFactory $decoratorFactory
     ) {
-        $this->schemaCache      = $schemaCache;
-        $this->container        = $container;
-        $this->decoratorFactory = $decoratorFactory;
     }
 
     /**
-     * @return ContactSegmentFilters
+     * @param array<string, mixed> $batchLimiters
      *
      * @throws \Exception
      */
-    public function getSegmentFilters(LeadList $leadList)
+    public function getSegmentFilters(LeadList $leadList, array $batchLimiters = []): ContactSegmentFilters
     {
         $contactSegmentFilters = new ContactSegmentFilters();
 
         $filters = $leadList->getFilters();
         foreach ($filters as $filter) {
-            $contactSegmentFilterCrate = new ContactSegmentFilterCrate($filter);
-
-            $decorator = $this->decoratorFactory->getDecoratorForFilter($contactSegmentFilterCrate);
-
-            $filterQueryBuilder = $this->getQueryBuilderForFilter($decorator, $contactSegmentFilterCrate);
-
-            $contactSegmentFilter = new ContactSegmentFilter($contactSegmentFilterCrate, $decorator, $this->schemaCache, $filterQueryBuilder);
-
-            $contactSegmentFilters->addContactSegmentFilter($contactSegmentFilter);
+            $contactSegmentFilters->addContactSegmentFilter($this->factorSegmentFilter($filter, $batchLimiters));
         }
 
         return $contactSegmentFilters;
+    }
+
+    /**
+     * @param array<string, mixed> $filter
+     * @param array<string, mixed> $batchLimiters
+     *
+     * @throws \Exception
+     */
+    public function factorSegmentFilter(array $filter, array $batchLimiters = []): ContactSegmentFilter
+    {
+        $contactSegmentFilterCrate = new ContactSegmentFilterCrate($filter);
+
+        $decorator = $this->decoratorFactory->getDecoratorForFilter($contactSegmentFilterCrate);
+
+        $filterQueryBuilder = $this->getQueryBuilderForFilter($decorator, $contactSegmentFilterCrate);
+
+        return new ContactSegmentFilter($contactSegmentFilterCrate, $decorator, $this->schemaCache, $filterQueryBuilder, $batchLimiters);
     }
 
     /**

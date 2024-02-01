@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2017 Mautic Contributors. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\LeadBundle\Tracker;
 
 use Mautic\LeadBundle\Entity\Lead;
@@ -16,58 +7,26 @@ use Mautic\LeadBundle\Entity\LeadDevice;
 use Mautic\LeadBundle\Tracker\Factory\DeviceDetectorFactory\DeviceDetectorFactoryInterface;
 use Mautic\LeadBundle\Tracker\Service\DeviceCreatorService\DeviceCreatorServiceInterface;
 use Mautic\LeadBundle\Tracker\Service\DeviceTrackingService\DeviceTrackingServiceInterface;
-use Monolog\Logger;
+use Psr\Log\LoggerInterface;
 
 class DeviceTracker
 {
-    /**
-     * @var DeviceCreatorServiceInterface
-     */
-    private $deviceCreatorService;
-
-    /**
-     * @var DeviceDetectorFactoryInterface
-     */
-    private $deviceDetectorFactory;
-
-    /**
-     * @var DeviceTrackingServiceInterface
-     */
-    private $deviceTrackingService;
-
-    /**
-     * @var Logger
-     */
-    private $logger;
-
-    /**
-     * @var bool
-     */
-    private $deviceWasChanged = false;
+    private bool $deviceWasChanged = false;
 
     /**
      * @var LeadDevice[]
      */
-    private $trackedDevice = [];
+    private array $trackedDevice = [];
 
-    /**
-     * DeviceTracker constructor.
-     */
     public function __construct(
-        DeviceCreatorServiceInterface $deviceCreatorService,
-        DeviceDetectorFactoryInterface $deviceDetectorFactory,
-        DeviceTrackingServiceInterface $deviceTrackingService,
-        Logger $logger
+        private DeviceCreatorServiceInterface $deviceCreatorService,
+        private DeviceDetectorFactoryInterface $deviceDetectorFactory,
+        private DeviceTrackingServiceInterface $deviceTrackingService,
+        private LoggerInterface $logger
     ) {
-        $this->deviceCreatorService  = $deviceCreatorService;
-        $this->deviceDetectorFactory = $deviceDetectorFactory;
-        $this->deviceTrackingService = $deviceTrackingService;
-        $this->logger                = $logger;
     }
 
     /**
-     * @param $userAgent
-     *
      * @return \Mautic\LeadBundle\Entity\LeadDevice|null
      */
     public function createDeviceFromUserAgent(Lead $trackedContact, $userAgent)
@@ -111,21 +70,18 @@ class DeviceTracker
         $trackedDevice = $this->deviceTrackingService->getTrackedDevice();
 
         if (null !== $trackedDevice) {
-            $this->logger->addDebug("LEAD: Tracking ID for this device is {$trackedDevice->getTrackingId()}");
+            $this->logger->debug("LEAD: Tracking ID for this device is {$trackedDevice->getTrackingId()}");
         }
 
         return $trackedDevice;
     }
 
-    /**
-     * @return bool
-     */
-    public function wasDeviceChanged()
+    public function wasDeviceChanged(): bool
     {
         return $this->deviceWasChanged;
     }
 
-    public function clearTrackingCookies()
+    public function clearTrackingCookies(): void
     {
         $this->deviceTrackingService->clearTrackingCookies();
     }

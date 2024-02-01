@@ -1,49 +1,39 @@
 <?php
 
-/*
- * @copyright   2016 Mautic Contributors. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CoreBundle\Controller;
 
+use Symfony\Component\Form\ClickableInterface;
 use Symfony\Component\Form\Form;
+use Symfony\Component\Form\FormError;
+use Symfony\Component\Form\FormInterface;
+use Symfony\Component\HttpFoundation\Request;
 
 abstract class AbstractFormController extends CommonController
 {
-    use FormThemeTrait;
-
-    protected $permissionBase;
+    protected ?string $permissionBase = null;
 
     /**
-     * @param $id
-     * @param $modelName
-     *
      * @return mixed
      */
-    public function unlockAction($id, $modelName)
+    public function unlockAction(Request $request, $objectId, $objectModel)
     {
-        $model                = $this->getModel($modelName);
-        $entity               = $model->getEntity($id);
+        $model                = $this->getModel($objectModel);
+        $entity               = $model->getEntity($objectId);
         $this->permissionBase = $model->getPermissionBase();
 
         if ($this->canEdit($entity)) {
             if (null !== $entity && null !== $entity->getCheckedOutBy()) {
                 $model->unlockEntity($entity);
             }
-            $returnUrl = urldecode($this->request->get('returnUrl'));
+            $returnUrl = urldecode($request->get('returnUrl'));
             if (empty($returnUrl)) {
                 $returnUrl = $this->generateUrl('mautic_dashboard_index');
             }
 
-            $this->addFlash(
+            $this->addFlashMessage(
                 'mautic.core.action.entity.unlocked',
                 [
-                    '%name%' => urldecode($this->request->get('name')),
+                    '%name%' => urldecode($request->get('name')),
                 ]
             );
 
@@ -75,7 +65,7 @@ abstract class AbstractFormController extends CommonController
         $this->permissionBase   = $modelClass->getPermissionBase();
 
         if ($this->canEdit($entity)) {
-            $override = $this->get('translator')->trans(
+            $override = $this->translator->trans(
                 'mautic.core.override.lock',
                 [
                     '%url%' => $this->generateUrl(
@@ -132,39 +122,46 @@ abstract class AbstractFormController extends CommonController
 
     /**
      * Checks to see if the form was cancelled.
-     *
-     * @return bool
      */
-    protected function isFormCancelled(Form $form)
+    protected function isFormCancelled(FormInterface $form): bool
     {
-        $formData = $this->request->request->get($form->getName());
+        $request = $this->getCurrentRequest();
+        if (null === $request) {
+            throw new \RuntimeException('Request is required.');
+        }
+
+        $formData = $request->request->get($form->getName());
 
         return is_array($formData) && array_key_exists('buttons', $formData) && array_key_exists('cancel', $formData['buttons']);
     }
 
     /**
      * Checks to see if the form was applied or saved.
-     *
-     * @return bool
      */
-    protected function isFormApplied(Form $form)
+    protected function isFormApplied(FormInterface $form): bool
     {
-        $formData = $this->request->request->get($form->getName());
+        $request = $this->getCurrentRequest();
+        if (null === $request) {
+            throw new \RuntimeException('Request is required.');
+        }
+
+        $formData = $request->request->get($form->getName());
 
         return array_key_exists('buttons', $formData) && array_key_exists('apply', $formData['buttons']);
     }
 
     /**
      * Binds form data, checks validity, and determines cancel request.
-     *
-     * @param array $data
-     *
-     * @return bool
      */
-    protected function isFormValid(Form $form, array $data = null)
+    protected function isFormValid(FormInterface $form): bool
     {
-        //bind request to the form
-        $form->handleRequest($this->request);
+        $request = $this->getCurrentRequest();
+        if (null === $request) {
+            throw new \RuntimeException('Request is required.');
+        }
+
+        // bind request to the form
+        $form->handleRequest($request);
 
         return $form->isSubmitted() && $form->isValid();
     }
@@ -179,8 +176,6 @@ abstract class AbstractFormController extends CommonController
      */
     protected function canEdit($entity = null)
     {
-        $security = $this->get('mautic.security');
-
         if ($this->permissionBase) {
             $permissionBase = $this->permissionBase;
         } else {
@@ -188,25 +183,25 @@ abstract class AbstractFormController extends CommonController
         }
 
         if ($permissionBase) {
-            if ($entity && $security->checkPermissionExists($permissionBase.':editown')) {
-                return $security->hasEntityAccess(
+            if ($entity && $this->security->checkPermissionExists($permissionBase.':editown')) {
+                return $this->security->hasEntityAccess(
                     $permissionBase.':editown',
                     $permissionBase.':editother',
                     $entity->getCreatedBy()
                 );
-            } elseif ($security->checkPermissionExists($permissionBase.':edit')) {
-                return $security->isGranted(
+            } elseif ($this->security->checkPermissionExists($permissionBase.':edit')) {
+                return $this->security->isGranted(
                     $permissionBase.':edit'
                 );
             }
         }
 
-        return $this->get('mautic.helper.user')->getUser()->isAdmin();
+        return $this->user->isAdmin();
     }
 
-    protected function copyErrorsRecursively(Form $copyFrom, Form $copyTo)
+    protected function copyErrorsRecursively(FormInterface $copyFrom, FormInterface $copyTo)
     {
-        /** @var $error FormError */
+        /** @var FormError $error */
         foreach ($copyFrom->getErrors() as $error) {
             $copyTo->addError($error);
         }
@@ -226,20 +221,25 @@ abstract class AbstractFormController extends CommonController
      */
     protected function refererPostActionVars($vars)
     {
-        if (empty($this->request->server->get('HTTP_REFERER'))) {
+        $request = $this->getCurrentRequest();
+        if (null === $request) {
+            throw new \RuntimeException('Request is required.');
+        }
+
+        if (empty($request->server->get('HTTP_REFERER'))) {
             return $vars;
         }
 
-        $returnUrl         = !empty($this->request->server->get('HTTP_REFERER')) ? $this->request->server->get('HTTP_REFERER') : '';
+        $returnUrl         = !empty($request->server->get('HTTP_REFERER')) ? $request->server->get('HTTP_REFERER') : '';
         $vars['returnUrl'] = $returnUrl;
 
         $urlMatcher  = explode('/s/', $returnUrl);
         $actionRoute = $this->get('router')->match('/s/'.$urlMatcher[1]);
-        $objAction   = isset($actionRoute['objectAction']) ? $actionRoute['objectAction'] : 'index';
+        $objAction   = $actionRoute['objectAction'] ?? 'index';
         $routeCtrlr  = explode('\\', $actionRoute['_controller']);
 
         $defaultContentTemplate  = $routeCtrlr[0].$routeCtrlr[1].':'.ucfirst(str_replace('Bundle', '', $routeCtrlr[1])).':'.$objAction;
-        $vars['contentTemplate'] = isset($vars['contentTemplate']) ? $vars['contentTemplate'] : $defaultContentTemplate;
+        $vars['contentTemplate'] ??= $defaultContentTemplate;
 
         $vars['passthroughVars']['activeLink'] = '#'.str_replace('_action', '_'.$objAction, $actionRoute['_route']);
 
@@ -248,5 +248,16 @@ abstract class AbstractFormController extends CommonController
         }
 
         return $vars;
+    }
+
+    protected function getFormButton(FormInterface $form, array $elements): ClickableInterface
+    {
+        foreach ($elements as $element) {
+            $form = $form->get($element);
+        }
+
+        \assert($form instanceof ClickableInterface);
+
+        return $form;
     }
 }

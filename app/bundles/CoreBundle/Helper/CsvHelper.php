@@ -1,19 +1,7 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CoreBundle\Helper;
 
-/**
- * Class CsvHelper.
- */
 class CsvHelper
 {
     /**
@@ -44,18 +32,12 @@ class CsvHelper
         return $data;
     }
 
-    /**
-     * @return array
-     */
-    public static function sanitizeHeaders(array $headers)
+    public static function sanitizeHeaders(array $headers): array
     {
         return array_map('trim', $headers);
     }
 
-    /**
-     * @return array
-     */
-    public static function convertHeadersIntoFields(array $headers)
+    public static function convertHeadersIntoFields(array $headers): array
     {
         sort($headers);
 

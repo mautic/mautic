@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2017 Mautic Contributors. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\LeadBundle\Tests\Segment;
 
 use Mautic\LeadBundle\Entity\LeadList;
@@ -25,7 +16,7 @@ class ContactSegmentFilterFactoryTest extends \PHPUnit\Framework\TestCase
     /**
      * @covers \Mautic\LeadBundle\Segment\ContactSegmentFilterFactory
      */
-    public function testLeadFilter()
+    public function testLeadFilter(): void
     {
         $tableSchemaColumnsCache = $this->createMock(TableSchemaColumnsCache::class);
         $container               = $this->createMock(Container::class);

@@ -1,27 +1,12 @@
 <?php
 
-/*
- * @copyright   2016 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\NotificationBundle\Security\Permissions;
 
 use Mautic\CoreBundle\Security\Permissions\AbstractPermissions;
 use Symfony\Component\Form\FormBuilderInterface;
 
-/**
- * Class NotificationPermissions.
- */
 class NotificationPermissions extends AbstractPermissions
 {
-    /**
-     * {@inheritdoc}
-     */
     public function __construct($params)
     {
         parent::__construct($params);
@@ -30,20 +15,12 @@ class NotificationPermissions extends AbstractPermissions
         $this->addExtendedPermissions('mobile_notifications');
     }
 
-    /**
-     * {@inheritdoc}
-     *
-     * @return string|void
-     */
-    public function getName()
+    public function getName(): string
     {
         return 'notification';
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function buildForm(FormBuilderInterface &$builder, array $options, array $data)
+    public function buildForm(FormBuilderInterface &$builder, array $options, array $data): void
     {
         $this->addStandardFormFields('notification', 'categories', $builder, $data);
         $this->addExtendedFormFields('notification', 'notifications', $builder, $data);

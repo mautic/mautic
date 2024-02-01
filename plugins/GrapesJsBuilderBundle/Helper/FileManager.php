@@ -14,39 +14,16 @@ use Symfony\Component\Finder\Finder;
 
 class FileManager
 {
-    const GRAPESJS_IMAGES_DIRECTORY = '';
+    public const GRAPESJS_IMAGES_DIRECTORY = '';
 
-    /**
-     * @var FileUploader
-     */
-    private $fileUploader;
-
-    /**
-     * @var CoreParametersHelper
-     */
-    private $coreParametersHelper;
-
-    /**
-     * @var PathsHelper
-     */
-    private $pathsHelper;
-
-    /**
-     * FileManager constructor.
-     */
     public function __construct(
-        FileUploader $fileUploader,
-        CoreParametersHelper $coreParametersHelper,
-        PathsHelper $pathsHelper
+        private FileUploader $fileUploader,
+        private CoreParametersHelper $coreParametersHelper,
+        private PathsHelper $pathsHelper
     ) {
-        $this->fileUploader         = $fileUploader;
-        $this->coreParametersHelper = $coreParametersHelper;
-        $this->pathsHelper          = $pathsHelper;
     }
 
     /**
-     * @param $request
-     *
      * @return array
      */
     public function uploadFiles($request)
@@ -59,7 +36,7 @@ class FileManager
             foreach ($files as $file) {
                 try {
                     $uploadedFiles[] =  $this->getFullUrl($this->fileUploader->upload($uploadDir, $file));
-                } catch (FileUploadException $e) {
+                } catch (FileUploadException) {
                 }
             }
         }
@@ -70,40 +47,30 @@ class FileManager
     /**
      * @param string $fileName
      */
-    public function deleteFile($fileName)
+    public function deleteFile($fileName): void
     {
         $this->fileUploader->delete($this->getCompleteFilePath($fileName));
     }
 
     /**
      * @param string $fileName
-     *
-     * @return string
      */
-    public function getCompleteFilePath($fileName)
+    public function getCompleteFilePath($fileName): string
     {
         $uploadDir = $this->getUploadDir();
 
         return $uploadDir.$fileName;
     }
 
-    /**
-     * @return string
-     */
-    private function getUploadDir()
+    private function getUploadDir(): string
     {
         return $this->getGrapesJsImagesPath(true);
     }
 
-    /**
-     * @param $fileName
-     *
-     * @return string
-     */
-    public function getFullUrl($fileName, $separator = '/')
+    public function getFullUrl($fileName, $separator = '/'): string
     {
         // if a static_url (CDN) is configured use that, otherwiese use the site url
-        $url = $this->coreParametersHelper->get('static_url') ?? $this->coreParametersHelper->get('site_url');
+        $url = $this->coreParametersHelper->getParameter('static_url') ?? $this->coreParametersHelper->getParameter('site_url');
 
         return $url
             .$separator
@@ -114,20 +81,15 @@ class FileManager
     /**
      * @param bool   $fullPath
      * @param string $separator
-     *
-     * @return string
      */
-    private function getGrapesJsImagesPath($fullPath = false, $separator = '/')
+    private function getGrapesJsImagesPath($fullPath = false, $separator = '/'): string
     {
         return $this->pathsHelper->getSystemPath('images', $fullPath)
             .$separator
             .self::GRAPESJS_IMAGES_DIRECTORY;
     }
 
-    /**
-     * @return array
-     */
-    public function getImages()
+    public function getImages(): array
     {
         $files      = [];
         $uploadDir  = $this->getUploadDir();
@@ -137,7 +99,7 @@ class FileManager
         if (!$fileSystem->exists($uploadDir)) {
             try {
                 $fileSystem->mkdir($uploadDir);
-            } catch (IOException $exception) {
+            } catch (IOException) {
                 return $files;
             }
         }

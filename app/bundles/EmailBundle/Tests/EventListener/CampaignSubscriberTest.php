@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2016 Mautic Contributors. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\EmailBundle\Tests\EventListener;
 
 use Doctrine\Common\Collections\ArrayCollection;
@@ -22,7 +13,7 @@ use Mautic\EmailBundle\Exception\EmailCouldNotBeSentException;
 use Mautic\EmailBundle\Model\EmailModel;
 use Mautic\EmailBundle\Model\SendEmailToUser;
 use Mautic\LeadBundle\Entity\Lead;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class CampaignSubscriberTest extends \PHPUnit\Framework\TestCase
 {
@@ -42,27 +33,24 @@ class CampaignSubscriberTest extends \PHPUnit\Framework\TestCase
     /**
      * @var EmailModel|\PHPUnit\Framework\MockObject\MockObject
      */
-    private $emailModel;
+    private \PHPUnit\Framework\MockObject\MockObject $emailModel;
 
     /**
      * @var RealTimeExecutioner|\PHPUnit_Framework_MockObject_MockObject
      */
-    private $realTimeExecutioner;
+    private \PHPUnit\Framework\MockObject\MockObject $realTimeExecutioner;
 
     /**
      * @var SendEmailToUser|\PHPUnit\Framework\MockObject\MockObject
      */
-    private $sendEmailToUser;
+    private \PHPUnit\Framework\MockObject\MockObject $sendEmailToUser;
 
     /**
      * @var TranslatorInterface|\PHPUnit\Framework\MockObject\MockObject
      */
-    private $translator;
+    private \PHPUnit\Framework\MockObject\MockObject $translator;
 
-    /**
-     * @var CampaignSubscriber
-     */
-    private $subscriber;
+    private \Mautic\EmailBundle\EventListener\CampaignSubscriber $subscriber;
 
     protected function setUp(): void
     {
@@ -81,11 +69,13 @@ class CampaignSubscriberTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testOnCampaignTriggerActionSendEmailToUserWithWrongEventType()
+    public function testOnCampaignTriggerActionSendEmailToUserWithWrongEventType(): void
     {
         $eventAccessor = $this->createMock(ActionAccessor::class);
         $event         = new Event();
         $lead          = (new Lead())->setEmail('tester@mautic.org');
+
+        $event->setType(Event::TYPE_ACTION);
 
         $leadEventLog = $this->createMock(LeadEventLog::class);
         $leadEventLog
@@ -104,7 +94,7 @@ class CampaignSubscriberTest extends \PHPUnit\Framework\TestCase
         $this->assertCount(0, $pendingEvent->getFailures());
     }
 
-    public function testOnCampaignTriggerActionSendEmailToUserWithSendingTheEmail()
+    public function testOnCampaignTriggerActionSendEmailToUserWithSendingTheEmail(): void
     {
         $eventAccessor = $this->createMock(ActionAccessor::class);
         $event         = (new Event())->setType('email.send.to.user');
@@ -131,7 +121,7 @@ class CampaignSubscriberTest extends \PHPUnit\Framework\TestCase
         $this->assertCount(0, $pendingEvent->getFailures());
     }
 
-    public function testOnCampaignTriggerActionSendEmailToUserWithError()
+    public function testOnCampaignTriggerActionSendEmailToUserWithError(): void
     {
         $eventAccessor = $this->createMock(ActionAccessor::class);
         $event         = (new Event())->setType('email.send.to.user');

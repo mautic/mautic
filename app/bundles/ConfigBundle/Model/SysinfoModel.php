@@ -1,59 +1,35 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\ConfigBundle\Model;
 
 use Doctrine\DBAL\Connection;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\PathsHelper;
-use Symfony\Component\Translation\TranslatorInterface;
+use Mautic\CoreBundle\Loader\ParameterLoader;
+use Mautic\InstallBundle\Configurator\Step\CheckStep;
+use Mautic\InstallBundle\Install\InstallService;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
-/**
- * Class SysinfoModel.
- */
 class SysinfoModel
 {
+    /**
+     * @var string|null
+     */
     protected $phpInfo;
+
+    /**
+     * @var array<string,bool>|null
+     */
     protected $folders;
 
-    /**
-     * @var PathsHelper
-     */
-    protected $pathsHelper;
-
-    /**
-     * @var CoreParametersHelper
-     */
-    protected $coreParametersHelper;
-
-    /**
-     * @var TranslatorInterface
-     */
-    private $translator;
-
-    protected Connection $connection;
-
-    /**
-     * SysinfoModel constructor.
-     */
     public function __construct(
-        PathsHelper $pathsHelper,
-        CoreParametersHelper $coreParametersHelper,
-        TranslatorInterface $translator,
-        Connection $connection
+        protected PathsHelper $pathsHelper,
+        protected CoreParametersHelper $coreParametersHelper,
+        private TranslatorInterface $translator,
+        protected Connection $connection,
+        private InstallService $installService,
+        private CheckStep $checkStep
     ) {
-        $this->pathsHelper          = $pathsHelper;
-        $this->coreParametersHelper = $coreParametersHelper;
-        $this->translator           = $translator;
-        $this->connection           = $connection;
     }
 
     /**
@@ -83,7 +59,7 @@ class SysinfoModel
             $output        = str_replace('</table>', '</tbody></table>', $output);
             $output        = str_replace('</div>', '', $output);
             $this->phpInfo = $output;
-            //ensure TZ is set back to default
+            // ensure TZ is set back to default
             date_default_timezone_set($currentTz);
         } elseif (function_exists('phpversion')) {
             $this->phpInfo = $this->translator->trans('mautic.sysinfo.phpinfo.phpversion', ['%phpversion%' => phpversion()]);
@@ -92,6 +68,22 @@ class SysinfoModel
         }
 
         return $this->phpInfo;
+    }
+
+    /**
+     * @return string[]
+     */
+    public function getRecommendations(): array
+    {
+        return $this->installService->checkOptionalSettings($this->checkStep);
+    }
+
+    /**
+     * @return string[]
+     */
+    public function getRequirements(): array
+    {
+        return $this->installService->checkRequirements($this->checkStep);
     }
 
     /**
@@ -106,7 +98,7 @@ class SysinfoModel
         }
 
         $importantFolders = [
-            $this->pathsHelper->getSystemPath('local_config'),
+            ParameterLoader::getLocalConfigFile($this->pathsHelper->getSystemPath('root').'/app'),
             $this->coreParametersHelper->get('cache_path'),
             $this->coreParametersHelper->get('log_path'),
             $this->coreParametersHelper->get('upload_dir'),
@@ -114,15 +106,10 @@ class SysinfoModel
             $this->pathsHelper->getSystemPath('translations', true),
         ];
 
-        // Show the spool folder only if the email queue is configured
-        if ('file' == $this->coreParametersHelper->get('mailer_spool_type')) {
-            $importantFolders[] = $this->coreParametersHelper->get('mailer_spool_path');
-        }
-
         foreach ($importantFolders as $folder) {
             $folderPath = realpath($folder);
-            $folderKey  = ($folderPath) ? $folderPath : $folder;
-            $isWritable = ($folderPath) ? is_writable($folderPath) : false;
+            $folderKey  = $folderPath ?: $folder;
+            $isWritable = $folderPath && is_writable($folderPath);
 
             $this->folders[$folderKey] = $isWritable;
         }
@@ -134,10 +121,8 @@ class SysinfoModel
      * Method to tail (a few last rows) of a file.
      *
      * @param int $lines
-     *
-     * @return string
      */
-    public function getLogTail($lines = 10)
+    public function getLogTail($lines = 10): ?string
     {
         $log = $this->coreParametersHelper->get('log_path').'/mautic_'.MAUTIC_ENV.'-'.date('Y-m-d').'.php';
 
@@ -151,22 +136,19 @@ class SysinfoModel
     public function getDbInfo(): array
     {
         return [
-            'version'  => $this->connection->executeQuery('SELECT VERSION()')->fetchColumn(),
-            'driver'   => $this->connection->getDriver()->getName(),
-            'platform' => get_class($this->connection->getDatabasePlatform()),
+            'version'  => $this->connection->executeQuery('SELECT VERSION()')->fetchOne(),
+            'driver'   => $this->connection->getParams()['driver'],
+            'platform' => $this->connection->getDatabasePlatform()::class,
         ];
     }
 
     /**
      * Method to tail (a few last rows) of a file.
      *
-     * @param     $filename
      * @param int $lines
      * @param int $buffer
-     *
-     * @return string
      */
-    public function tail($filename, $lines = 10, $buffer = 4096)
+    public function tail($filename, $lines = 10, $buffer = 4096): string
     {
         $f      = fopen($filename, 'rb');
         $output = '';

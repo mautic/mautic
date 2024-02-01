@@ -2,15 +2,6 @@
 
 declare(strict_types=1);
 
-/*
- * @copyright   2019 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\SmsBundle\EventListener;
 
 use Mautic\SmsBundle\Event\SmsSendEvent;
@@ -22,14 +13,9 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 final class WebhookSubscriber implements EventSubscriberInterface
 {
-    /**
-     * @var WebhookModel
-     */
-    private $webhookModel;
-
-    public function __construct(WebhookModel $webhookModel)
-    {
-        $this->webhookModel = $webhookModel;
+    public function __construct(
+        private WebhookModel $webhookModel
+    ) {
     }
 
     public static function getSubscribedEvents(): array

@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2016 Mautic Contributors. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace MauticPlugin\MauticClearbitBundle\Helper;
 
 use Mautic\CoreBundle\Helper\EncryptionHelper;
@@ -26,49 +17,25 @@ use Monolog\Logger;
 class LookupHelper
 {
     /**
-     * @var UserHelper
-     */
-    protected $userHelper;
-
-    /**
      * @var bool|ClearbitIntegration
      */
     protected $integration;
 
-    /**
-     * @var Logger
-     */
-    protected $logger;
-
-    /**
-     * @var LeadModel
-     */
-    protected $leadModel;
-
-    /**
-     * @var CompanyModel
-     */
-    protected $companyModel;
-
     public function __construct(
         IntegrationHelper $integrationHelper,
-        UserHelper $userHelper,
-        Logger $logger,
-        LeadModel $leadModel,
-        CompanyModel $companyModel
+        protected UserHelper $userHelper,
+        protected Logger $logger,
+        protected LeadModel $leadModel,
+        protected CompanyModel $companyModel
     ) {
         $this->integration  = $integrationHelper->getIntegrationObject('Clearbit');
-        $this->userHelper   = $userHelper;
-        $this->logger       = $logger;
-        $this->leadModel    = $leadModel;
-        $this->companyModel = $companyModel;
     }
 
     /**
      * @param bool $notify
      * @param bool $checkAuto
      */
-    public function lookupContact(Lead $lead, $notify = false, $checkAuto = false)
+    public function lookupContact(Lead $lead, $notify = false, $checkAuto = false): void
     {
         if (!$lead->getEmail()) {
             return;
@@ -78,7 +45,7 @@ class LookupHelper
         if ($clearbit = $this->getClearbit()) {
             if (!$checkAuto || ($checkAuto && $this->integration->shouldAutoUpdate())) {
                 try {
-                    list($cacheId, $webhookId, $cache) = $this->getCache($lead, $notify);
+                    [$cacheId, $webhookId, $cache] = $this->getCache($lead, $notify);
 
                     if (!array_key_exists($cacheId, $cache['clearbit'])) {
                         $clearbit->setWebhookId($webhookId);
@@ -107,7 +74,7 @@ class LookupHelper
      * @param bool $notify
      * @param bool $checkAuto
      */
-    public function lookupCompany(Company $company, $notify = false, $checkAuto = false)
+    public function lookupCompany(Company $company, $notify = false, $checkAuto = false): void
     {
         if (!$website = $company->getFieldValue('companywebsite')) {
             return;
@@ -118,7 +85,7 @@ class LookupHelper
             if (!$checkAuto || ($checkAuto && $this->integration->shouldAutoUpdate())) {
                 try {
                     $parse                             = parse_url($company->getFieldValue('companywebsite'));
-                    list($cacheId, $webhookId, $cache) = $this->getCache($company, $notify);
+                    [$cacheId, $webhookId, $cache]     = $this->getCache($company, $notify);
 
                     if (isset($parse['host']) && !array_key_exists($cacheId, $cache['clearbit'])) {
                         /* @var Router $router */
@@ -143,15 +110,11 @@ class LookupHelper
         }
     }
 
-    /**
-     * @param $oid
-     * @param $type
-     */
     public function validateRequest($oid, $type)
     {
         // prefix#entityId#hour#userId#nonce
-        list($w, $id, $hour, $uid, $nonce) = explode('#', $oid, 5);
-        $notify                            = (false !== strpos($w, '_notify') && $uid) ? $uid : false;
+        [$w, $id, $hour, $uid, $nonce]     = explode('#', $oid, 5);
+        $notify                            = (str_contains($w, '_notify') && $uid) ? $uid : false;
 
         switch ($type) {
             case 'person':
@@ -196,13 +159,7 @@ class LookupHelper
         return ($person) ? new Clearbit_Person($keys['apikey']) : new Clearbit_Company($keys['apikey']);
     }
 
-    /**
-     * @param $entity
-     * @param $notify
-     *
-     * @return array
-     */
-    protected function getCache($entity, $notify)
+    protected function getCache($entity, $notify): array
     {
         /** @var User $user */
         $user      = $this->userHelper->getUser();

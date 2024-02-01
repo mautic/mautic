@@ -2,15 +2,6 @@
 
 declare(strict_types=1);
 
-/*
- * @copyright   2018 Mautic Inc. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://www.mautic.com
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\IntegrationsBundle\Tests\Unit\Sync\SyncDataExchange\Internal\ObjectHelper;
 
 use Doctrine\DBAL\Connection;
@@ -20,6 +11,7 @@ use Mautic\IntegrationsBundle\Sync\SyncDataExchange\MauticSyncDataExchange;
 use Mautic\LeadBundle\Entity\Company;
 use Mautic\LeadBundle\Entity\CompanyRepository;
 use Mautic\LeadBundle\Model\CompanyModel;
+use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\TestCase;
 
 class CompanyObjectHelperTest extends TestCase
@@ -27,17 +19,17 @@ class CompanyObjectHelperTest extends TestCase
     /**
      * @var CompanyModel|\PHPUnit\Framework\MockObject\MockObject
      */
-    private $model;
+    private \PHPUnit\Framework\MockObject\MockObject $model;
 
     /**
      * @var CompanyRepository|\PHPUnit\Framework\MockObject\MockObject
      */
-    private $repository;
+    private \PHPUnit\Framework\MockObject\MockObject $repository;
 
     /**
      * @var Connection|\PHPUnit\Framework\MockObject\MockObject
      */
-    private $connection;
+    private \PHPUnit\Framework\MockObject\MockObject $connection;
 
     protected function setUp(): void
     {
@@ -102,6 +94,45 @@ class CompanyObjectHelperTest extends TestCase
             $this->assertTrue(isset($objects[$objectMapping->getIntegrationObjectId()]));
             $this->assertEquals($objects[$objectMapping->getIntegrationObjectId()]->getMappedObjectId(), $objectMapping->getIntegrationObjectId());
         }
+    }
+
+    public function testFindObjectById(): void
+    {
+        $company = new Company();
+        $this->repository->expects(self::once())
+            ->method('getEntity')
+            ->with(1)
+            ->willReturn($company);
+
+        self::assertSame($company, $this->getObjectHelper()->findObjectById(1));
+    }
+
+    public function testFindObjectByIdReturnsNull(): void
+    {
+        $this->repository->expects(self::once())
+            ->method('getEntity')
+            ->with(1);
+
+        self::assertNull($this->getObjectHelper()->findObjectById(1));
+    }
+
+    public function testSetFieldValues(): void
+    {
+        $company = new Company();
+        $this->model->expects(self::once())
+            ->method('setFieldValues')
+            ->with($company, []);
+        $this->getObjectHelper()->setFieldValues($company);
+    }
+
+    public function testUpdateEmpty(): void
+    {
+        $this->model->expects($this->never())
+            ->method('getEntities');
+
+        $objectMappings = $this->getObjectHelper()->update([], []);
+
+        Assert::assertSame([], $objectMappings);
     }
 
     /**

@@ -1,24 +1,11 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\WebhookBundle\Entity;
 
-use DateTime;
-use Doctrine\DBAL\Types\Type;
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 
-/**
- * Class Log.
- */
 class Log
 {
     /**
@@ -37,25 +24,23 @@ class Log
     private $statusCode;
 
     /**
-     * @var \DateTime
+     * @var \DateTimeInterface
      */
     private $dateAdded;
 
     /**
-     * @var float
+     * @var float|null
      */
     private $runtime;
 
-    /**
-     * @var string
-     */
-    private $note;
+    private ?string $note = null;
 
-    public static function loadMetadata(ClassMetadata $metadata)
+    public static function loadMetadata(ClassMetadata $metadata): void
     {
         $builder = new ClassMetadataBuilder($metadata);
         $builder->setTable('webhook_logs')
             ->setCustomRepositoryClass(LogRepository::class)
+            ->addIndex(['webhook_id', 'date_added'], 'webhook_id_date_added')
             ->addId();
 
         $builder->createManyToOne('webhook', 'Webhook')
@@ -63,14 +48,14 @@ class Log
             ->addJoinColumn('webhook_id', 'id', false, false, 'CASCADE')
             ->build();
 
-        $builder->createField('statusCode', Type::STRING)
+        $builder->createField('statusCode', Types::STRING)
             ->columnName('status_code')
             ->length(50)
             ->build();
 
-        $builder->addNullableField('dateAdded', Type::DATETIME, 'date_added');
-        $builder->addNullableField('note', Type::STRING);
-        $builder->addNullableField('runtime', Type::FLOAT);
+        $builder->addNullableField('dateAdded', Types::DATETIME_MUTABLE, 'date_added');
+        $builder->addNullableField('note', Types::STRING);
+        $builder->addNullableField('runtime', Types::FLOAT);
     }
 
     /**
@@ -120,7 +105,7 @@ class Log
     }
 
     /**
-     * @return \DateTime
+     * @return \DateTimeInterface
      */
     public function getDateAdded()
     {
@@ -137,24 +122,17 @@ class Log
         return $this;
     }
 
-    /**
-     * @return string
-     */
-    public function getNote()
+    public function getNote(): ?string
     {
         return $this->note;
     }
 
     /**
-     * Strips tags and keeps first 254 characters so it would fit in the varchar 191 limit.
-     *
-     * @param string $note
-     *
-     * @return Log
+     * Strips tags and keeps first 191 characters so it would fit in the varchar 191 limit.
      */
-    public function setNote($note)
+    public function setNote(?string $note): self
     {
-        $this->note = substr(strip_tags(iconv('UTF-8', 'UTF-8//IGNORE', $note)), 0, 190);
+        $this->note = $note ? substr(strip_tags(iconv('UTF-8', 'UTF-8//IGNORE', $note)), 0, 190) : $note;
 
         return $this;
     }

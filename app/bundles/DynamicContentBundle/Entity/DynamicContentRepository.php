@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2016 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\DynamicContentBundle\Entity;
 
 use Doctrine\ORM\Tools\Pagination\Paginator;
@@ -16,7 +7,7 @@ use Mautic\CoreBundle\Entity\CommonRepository;
 use Mautic\CoreBundle\Helper\Serializer;
 
 /**
- * DynamicContentRepository.
+ * @extends CommonRepository<DynamicContent>
  */
 class DynamicContentRepository extends CommonRepository
 {
@@ -30,9 +21,9 @@ class DynamicContentRepository extends CommonRepository
         $q = $this->_em
             ->createQueryBuilder()
             ->select('e')
-            ->from('MauticDynamicContentBundle:DynamicContent', 'e', 'e.id');
+            ->from(DynamicContent::class, 'e', 'e.id');
 
-        if (empty($args['iterator_mode'])) {
+        if (empty($args['iterator_mode']) && empty($args['iterable_mode'])) {
             $q->leftJoin('e.category', 'c');
         }
 
@@ -43,25 +34,22 @@ class DynamicContentRepository extends CommonRepository
 
     /**
      * @param \Doctrine\ORM\QueryBuilder|\Doctrine\DBAL\Query\QueryBuilder $q
-     * @param                                                              $filter
-     *
-     * @return array
      */
-    protected function addSearchCommandWhereClause($q, $filter)
+    protected function addSearchCommandWhereClause($q, $filter): array
     {
-        list($expr, $parameters) = $this->addStandardSearchCommandWhereClause($q, $filter);
+        [$expr, $parameters] = $this->addStandardSearchCommandWhereClause($q, $filter);
         if ($expr) {
             return [$expr, $parameters];
         }
 
-        list($expr, $parameters) = parent::addSearchCommandWhereClause($q, $filter);
+        [$expr, $parameters] = parent::addSearchCommandWhereClause($q, $filter);
         if ($expr) {
             return [$expr, $parameters];
         }
 
         $command         = $filter->command;
         $unique          = $this->generateRandomParameterName();
-        $returnParameter = false; //returning a parameter that is not used will lead to a Doctrine error
+        $returnParameter = false; // returning a parameter that is not used will lead to a Doctrine error
 
         switch ($command) {
             case $this->translator->trans('mautic.core.searchcommand.lang'):
@@ -93,9 +81,9 @@ class DynamicContentRepository extends CommonRepository
     }
 
     /**
-     * @return array
+     * @return string[]
      */
-    public function getSearchCommands()
+    public function getSearchCommands(): array
     {
         $commands = [
             'mautic.core.searchcommand.ispublished',
@@ -110,19 +98,16 @@ class DynamicContentRepository extends CommonRepository
     }
 
     /**
-     * @return string
+     * @return array<array<string>>
      */
-    protected function getDefaultOrder()
+    protected function getDefaultOrder(): array
     {
         return [
             ['e.name', 'ASC'],
         ];
     }
 
-    /**
-     * @return string
-     */
-    public function getTableAlias()
+    public function getTableAlias(): string
     {
         return 'e';
     }
@@ -130,10 +115,9 @@ class DynamicContentRepository extends CommonRepository
     /**
      * Up the sent counts.
      *
-     * @param     $id
      * @param int $increaseBy
      */
-    public function upSentCount($id, $increaseBy = 1)
+    public function upSentCount($id, $increaseBy = 1): void
     {
         $q = $this->_em->getConnection()->createQueryBuilder();
 
@@ -141,7 +125,7 @@ class DynamicContentRepository extends CommonRepository
             ->set('sent_count', 'sent_count + '.(int) $increaseBy)
             ->where('id = '.(int) $id);
 
-        $q->execute();
+        $q->executeStatement();
     }
 
     /**
@@ -177,7 +161,7 @@ class DynamicContentRepository extends CommonRepository
         }
 
         if ('translation' == $topLevel) {
-            //only get top level pages
+            // only get top level pages
             $q->andWhere($q->expr()->isNull('e.translationParent'));
         } elseif ('variant' == $topLevel) {
             $q->andWhere($q->expr()->isNull('e.variantParent'));
@@ -203,8 +187,6 @@ class DynamicContentRepository extends CommonRepository
     }
 
     /**
-     * @param $slot
-     *
      * @return bool|object|null
      */
     public function getDynamicContentForSlotFromCampaign($slot)
@@ -219,7 +201,7 @@ class DynamicContentRepository extends CommonRepository
             ->setParameter('slot', '%'.$slot.'%')
             ->orderBy('c.is_published');
 
-        $result = $qb->execute()->fetchAll();
+        $result = $qb->executeQuery()->fetchAllAssociative();
 
         foreach ($result as $item) {
             $properties = Serializer::decode($item['properties']);

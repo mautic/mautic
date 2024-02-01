@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2020 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CoreBundle\Tests\Unit\DependencyInjection\Builder\Metadata;
 
 use Mautic\AssetBundle\Security\Permissions\AssetPermissions;
@@ -19,7 +10,7 @@ use PHPUnit\Framework\TestCase;
 
 class PermissionClassMetadataTest extends TestCase
 {
-    public function testPermissionsFound()
+    public function testPermissionsFound(): void
     {
         $metadataArray = [
             'isPlugin'          => false,
@@ -40,7 +31,7 @@ class PermissionClassMetadataTest extends TestCase
         $this->assertCount(1, $metadata->toArray()['permissionClasses']);
     }
 
-    public function testCompatibilityWithPermissionServices()
+    public function testCompatibilityWithPermissionServices(): void
     {
         $metadataArray = [
             'isPlugin'          => false,

@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2020 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\UserBundle\Tests\Security\SAML\Store;
 
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
@@ -21,14 +12,14 @@ class EntityDescriptorStoreTest extends TestCase
     /**
      * @var CoreParametersHelper|MockObject
      */
-    private $coreParametersHelper;
+    private \PHPUnit\Framework\MockObject\MockObject $coreParametersHelper;
 
     protected function setUp(): void
     {
         $this->coreParametersHelper = $this->createMock(CoreParametersHelper::class);
     }
 
-    public function testNullIsReturnedIfEntityIdDoesNotMatch()
+    public function testNullIsReturnedIfEntityIdDoesNotMatch(): void
     {
         $store = new EntityDescriptorStore($this->coreParametersHelper);
 
@@ -43,7 +34,7 @@ class EntityDescriptorStoreTest extends TestCase
         $this->assertNull($descriptor);
     }
 
-    public function testHasReturnsFalseIfSamlIsDisabled()
+    public function testHasReturnsFalseIfSamlIsDisabled(): void
     {
         $store = new EntityDescriptorStore($this->coreParametersHelper);
 
@@ -54,7 +45,7 @@ class EntityDescriptorStoreTest extends TestCase
         $this->assertFalse($store->has('foobar'));
     }
 
-    public function testHasReturnsFalseIfEntityIdDoesNotMatch()
+    public function testHasReturnsFalseIfEntityIdDoesNotMatch(): void
     {
         $store = new EntityDescriptorStore($this->coreParametersHelper);
 

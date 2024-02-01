@@ -50,7 +50,7 @@
         # When mod_rewrite is not available, we instruct a temporary redirect of
         # the start page to the front controller explicitly so that the website
         # and the generated links can still be used.
-        RedirectMatch 302 ^(?!/(index\.php|index_dev\.php|app|addons|plugins|media|upgrade))(/(.*))$ /index.php$2
+        RedirectMatch 302 ^(?!/(index\.php|app|addons|plugins|media|upgrade))(/(.*))$ /index.php$2
         # RedirectTemp cannot be used instead
     </IfModule>
 </IfModule>
@@ -109,10 +109,10 @@
         Require all denied
     </FilesMatch>
 
-    # Except those whitelisted bellow.
-    <FilesMatch "^(index|index_dev|filemanager|upgrade)\.php$">
+    # Except those allowed below.
+    <If "%{REQUEST_URI} =~ m#^/(index|upgrade/upgrade)\.php#">
         Require all granted
-    </FilesMatch>
+    </If>
 </IfModule>
 
 # Fallback for Apache < 2.4
@@ -129,10 +129,10 @@
         Deny from all
     </FilesMatch>
 
-    # Except those whitelisted bellow.
-    <FilesMatch "^(index|index_dev|filemanager|upgrade)\.php$">
+    # Except those allowed below.
+    <If "%{REQUEST_URI} =~ m#^/(index|upgrade/upgrade)\.php#">
         Order allow,deny
         Allow from all
-    </FilesMatch>
+    </If>
 </IfModule>
 

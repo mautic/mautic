@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2015 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\EmailBundle\Form\Type;
 
 use Mautic\CoreBundle\Form\Type\StandAloneButtonType;
@@ -24,19 +15,17 @@ use Symfony\Component\Form\FormView;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Validator\Constraints\Email;
 
+/**
+ * @extends AbstractType<mixed>
+ */
 class ConfigMonitoredMailboxesType extends AbstractType
 {
-    /**
-     * @var Mailbox
-     */
-    private $imapHelper;
-
-    public function __construct(Mailbox $imapHelper)
-    {
-        $this->imapHelper = $imapHelper;
+    public function __construct(
+        private Mailbox $imapHelper
+    ) {
     }
 
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $monitoredShowOn = ('general' == $options['mailbox']) ? '{}'
             : '{"config_emailconfig_monitored_email_'.$options['mailbox'].'_override_settings_1": "checked"}';
@@ -114,7 +103,7 @@ class ConfigMonitoredMailboxesType extends AbstractType
                         'tooltip'      => 'mautic.email.config.monitored_email_encryption.tooltip',
                     ],
                     'placeholder' => 'mautic.email.config.mailer_encryption.none',
-                    'data'        => (isset($options['data']['encryption'])) ? $options['data']['encryption'] : '/ssl',
+                    'data'        => $options['data']['encryption'] ?? '/ssl',
                 ]
             );
         }
@@ -183,7 +172,7 @@ class ConfigMonitoredMailboxesType extends AbstractType
                 try {
                     $folders = $this->imapHelper->getListingFolders();
                     $choices = array_combine($folders, $folders);
-                } catch (\Exception $e) {
+                } catch (\Exception) {
                     // If the connection failed - add back the selected folder just in case it's a temporary connection issue
                     if (!empty($options['data']['folder'])) {
                         $choices[$options['data']['folder']] = $options['data']['folder'];
@@ -226,25 +215,16 @@ class ConfigMonitoredMailboxesType extends AbstractType
         );
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function configureOptions(OptionsResolver $resolver)
+    public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setRequired(['mailbox', 'default_folder', 'general_settings']);
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function buildView(FormView $view, FormInterface $form, array $options)
+    public function buildView(FormView $view, FormInterface $form, array $options): void
     {
         $view->vars['mailbox'] = $options['mailbox'];
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getBlockPrefix()
     {
         return 'monitored_mailboxes';

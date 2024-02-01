@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2018 Mautic Contributors. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CampaignBundle\Tests\Membership\Action;
 
 use Mautic\CampaignBundle\Entity\Campaign;
@@ -24,12 +15,12 @@ class AdderTest extends \PHPUnit\Framework\TestCase
     /**
      * @var LeadRepository|\PHPUnit\Framework\MockObject\MockObject
      */
-    private $leadRepository;
+    private \PHPUnit\Framework\MockObject\MockObject $leadRepository;
 
     /**
      * @var LeadEventLogRepository|\PHPUnit\Framework\MockObject\MockObject
      */
-    private $leadEventLogRepository;
+    private \PHPUnit\Framework\MockObject\MockObject $leadEventLogRepository;
 
     protected function setUp(): void
     {
@@ -37,7 +28,7 @@ class AdderTest extends \PHPUnit\Framework\TestCase
         $this->leadEventLogRepository = $this->createMock(LeadEventLogRepository::class);
     }
 
-    public function testNewMemberAdded()
+    public function testNewMemberAdded(): void
     {
         $campaign = $this->createMock(Campaign::class);
         $campaign->method('getId')
@@ -64,7 +55,7 @@ class AdderTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals(2, $campaignMember->getRotation());
     }
 
-    public function testManuallyRemovedAddedBackWhenManualActionAddsTheMember()
+    public function testManuallyRemovedAddedBackWhenManualActionAddsTheMember(): void
     {
         $campaignMember = new CampaignMember();
         $campaignMember->setManuallyRemoved(true);
@@ -79,7 +70,7 @@ class AdderTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals(2, $campaignMember->getRotation());
     }
 
-    public function testFilterRemovedAddedBackWhenManualActionAddsTheMember()
+    public function testFilterRemovedAddedBackWhenManualActionAddsTheMember(): void
     {
         $campaignMember = new CampaignMember();
         $campaignMember->setManuallyRemoved(true);
@@ -95,7 +86,7 @@ class AdderTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals(2, $campaignMember->getRotation());
     }
 
-    public function testManuallyRemovedIsNotAddedBackWhenFilterActionAddsTheMember()
+    public function testManuallyRemovedIsNotAddedBackWhenFilterActionAddsTheMember(): void
     {
         $this->expectException(ContactCannotBeAddedToCampaignException::class);
 

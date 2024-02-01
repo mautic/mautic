@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright  2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace MauticPlugin\MauticClearbitBundle\Integration;
 
 use Mautic\CoreBundle\Form\Type\YesNoButtonGroupType;
@@ -19,17 +10,15 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 class ClearbitIntegration extends AbstractIntegration
 {
-    public function getName()
+    public function getName(): string
     {
         return 'Clearbit';
     }
 
     /**
      * Return's authentication method such as oauth2, oauth1a, key, etc.
-     *
-     * @return string
      */
-    public function getAuthenticationType()
+    public function getAuthenticationType(): string
     {
         return 'none';
     }
@@ -38,9 +27,9 @@ class ClearbitIntegration extends AbstractIntegration
      * Return array of key => label elements that will be converted to inputs to
      * obtain from the user.
      *
-     * @return array
+     * @return array<string, string>
      */
-    public function getRequiredKeyFields()
+    public function getRequiredKeyFields(): array
     {
         // Do not rename field. clearbit.js depends on it
         return [
@@ -53,7 +42,7 @@ class ClearbitIntegration extends AbstractIntegration
      * @param array            $data
      * @param string           $formArea
      */
-    public function appendToForm(&$builder, $data, $formArea)
+    public function appendToForm(&$builder, $data, $formArea): void
     {
         if ('keys' === $formArea) {
             $builder->add(
@@ -61,7 +50,7 @@ class ClearbitIntegration extends AbstractIntegration
                 YesNoButtonGroupType::class,
                 [
                     'label' => 'mautic.plugin.clearbit.auto_update',
-                    'data'  => (isset($data['auto_update'])) ? (bool) $data['auto_update'] : false,
+                    'data'  => isset($data['auto_update']) && (bool) $data['auto_update'],
                     'attr'  => [
                         'tooltip' => 'mautic.plugin.clearbit.auto_update.tooltip',
                     ],
@@ -70,25 +59,21 @@ class ClearbitIntegration extends AbstractIntegration
         }
     }
 
-    public function shouldAutoUpdate()
+    public function shouldAutoUpdate(): bool
     {
         $featureSettings = $this->getKeys();
 
-        return (isset($featureSettings['auto_update'])) ? (bool) $featureSettings['auto_update'] : false;
+        return isset($featureSettings['auto_update']) && (bool) $featureSettings['auto_update'];
     }
 
     /**
-     * {@inheritdoc}
-     *
-     * @param $section
-     *
      * @return string|array
      */
     public function getFormNotes($section)
     {
         if ('custom' === $section) {
             return [
-                'template'   => 'MauticClearbitBundle:Integration:form.html.php',
+                'template'   => '@MauticClearbit/Integration/form.html.twig',
                 'parameters' => [
                     'mauticUrl' => $this->router->generate(
                         'mautic_plugin_clearbit_index', [], UrlGeneratorInterface::ABSOLUTE_URL

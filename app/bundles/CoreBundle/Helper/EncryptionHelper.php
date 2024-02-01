@@ -1,16 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- *
- * http://www.warpconduit.net/2013/04/14/highly-secure-data-encryption-decryption-made-easy-with-php-mcrypt-rijndael-256-and-cbc/
- */
-
 namespace Mautic\CoreBundle\Helper;
 
 use Mautic\CoreBundle\Security\Cryptography\Cipher\Symmetric\SymmetricCipherInterface;
@@ -18,10 +7,14 @@ use Mautic\CoreBundle\Security\Exception\Cryptography\Symmetric\InvalidDecryptio
 
 class EncryptionHelper
 {
-    /** @var SymmetricCipherInterface[] */
-    private $availableCiphers;
+    /**
+     * @var SymmetricCipherInterface[]
+     */
+    private ?array $availableCiphers = null;
 
-    /** @var string */
+    /**
+     * @var string
+     */
     private $key;
 
     public function __construct(
@@ -31,7 +24,7 @@ class EncryptionHelper
         for ($i = $nonCipherArgs; $i < func_num_args(); ++$i) {
             $possibleCipher = func_get_arg($i);
             if (!($possibleCipher instanceof SymmetricCipherInterface)) {
-                throw new \InvalidArgumentException(get_class($possibleCipher).' has to implement '.SymmetricCipherInterface::class);
+                throw new \InvalidArgumentException($possibleCipher::class.' has to implement '.SymmetricCipherInterface::class);
             }
             if (!$possibleCipher->isSupported()) {
                 continue;
@@ -48,10 +41,8 @@ class EncryptionHelper
 
     /**
      * Returns a 64 character string.
-     *
-     * @return string
      */
-    public static function generateKey()
+    public static function generateKey(): string
     {
         return hash('sha256', uniqid(mt_rand(), true));
     }
@@ -60,10 +51,8 @@ class EncryptionHelper
      * Encrypt string.
      *
      * @param mixed $data
-     *
-     * @return string
      */
-    public function encrypt($data)
+    public function encrypt($data): string
     {
         $encryptionCipher = reset($this->availableCiphers);
         $initVector       = $encryptionCipher->getRandomInitVector();
@@ -93,7 +82,7 @@ class EncryptionHelper
             }
             try {
                 return Serializer::decode($availableCipher->decrypt($encryptedMessage, $this->key, $initVector));
-            } catch (InvalidDecryptionException $ex) {
+            } catch (InvalidDecryptionException) {
             }
             $mainTried = true;
         }

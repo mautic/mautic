@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2018 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\StatsBundle\Aggregate\Collection\Stats;
 
 class YearStat implements StatInterface
@@ -16,16 +7,11 @@ class YearStat implements StatInterface
     /**
      * @var MonthStat[]
      */
-    private $stats = [];
+    private array $stats = [];
+
+    private int $year;
 
     /**
-     * @var int
-     */
-    private $year;
-
-    /**
-     * YearStat constructor.
-     *
      * @param int $year
      */
     public function __construct($year)
@@ -72,10 +58,7 @@ class YearStat implements StatInterface
         return $sum;
     }
 
-    /**
-     * @return int
-     */
-    public function getCount()
+    public function getCount(): int
     {
         return count($this->stats);
     }

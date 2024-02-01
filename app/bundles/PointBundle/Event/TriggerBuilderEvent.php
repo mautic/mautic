@@ -1,35 +1,18 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\PointBundle\Event;
 
-use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\Process\Exception\InvalidArgumentException;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\EventDispatcher\Event;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class TriggerBuilderEvent extends Event
 {
-    /**
-     * @var array
-     */
-    private $events = [];
+    private array $events = [];
 
-    /**
-     * @var TranslatorInterface
-     */
-    private $translator;
-
-    public function __construct(TranslatorInterface $translator)
-    {
-        $this->translator = $translator;
+    public function __construct(
+        private TranslatorInterface $translator
+    ) {
     }
 
     /**
@@ -40,7 +23,7 @@ class TriggerBuilderEvent extends Event
      *                      'label'           => (required) what to display in the list
      *                      'description'     => (optional) short description of event
      *                      'template'        => (optional) template to use for the action's HTML in the point builder
-     *                      i.e AcmeMyBundle:PointAction:theaction.html.php
+     *                      i.e AcmeMyBundle:PointAction:theaction.html.twig
      *                      'formType'        => (optional) name of the form type SERVICE for the action
      *                      'formTypeOptions' => (optional) array of options to pass to formType
      *                      'callback'        => (required) callback function that will be passed when the action is triggered
@@ -51,21 +34,21 @@ class TriggerBuilderEvent extends Event
      *
      * @throws InvalidArgumentException
      */
-    public function addEvent($key, array $event)
+    public function addEvent($key, array $event): void
     {
         if (array_key_exists($key, $this->events)) {
             throw new InvalidArgumentException("The key, '$key' is already used by another action. Please use a different key.");
         }
 
-        //check for required keys and that given functions are callable
+        // check for required keys and that given functions are callable
         $this->verifyComponent(
             ['group', 'label'],
             ['callback'],
             $event
         );
 
-        //Support for old way with callback and new event based system
-        //Could be removed after all events will be refactored to events. The key 'eventName' will be mandatory and 'callback' will be removed.
+        // Support for old way with callback and new event based system
+        // Could be removed after all events will be refactored to events. The key 'eventName' will be mandatory and 'callback' will be removed.
         if (!array_key_exists('callback', $event) && !array_key_exists('eventName', $event)) {
             throw new InvalidArgumentException("One of the 'callback' or 'eventName' has to be provided. Use 'eventName' for new code");
         }
@@ -82,10 +65,8 @@ class TriggerBuilderEvent extends Event
      */
     public function getEvents()
     {
-        uasort($this->events, function ($a, $b) {
-            return strnatcasecmp(
-                $a['label'], $b['label']);
-        });
+        uasort($this->events, fn ($a, $b): int => strnatcasecmp(
+            $a['label'], $b['label']));
 
         return $this->events;
     }
@@ -93,7 +74,7 @@ class TriggerBuilderEvent extends Event
     /**
      * @throws InvalidArgumentException
      */
-    private function verifyComponent(array $keys, array $methods, array $component)
+    private function verifyComponent(array $keys, array $methods, array $component): void
     {
         foreach ($keys as $k) {
             if (!array_key_exists($k, $component)) {

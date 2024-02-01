@@ -2,38 +2,15 @@
 
 declare(strict_types=1);
 
-/*
- * @copyright   2018 Mautic Inc. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://www.mautic.com
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\IntegrationsBundle\Sync\DAO\Mapping;
+
+use Mautic\IntegrationsBundle\Entity\ObjectMapping;
 
 class UpdatedObjectMappingDAO
 {
-    /**
-     * @var string
-     */
-    private $integration;
+    private \DateTimeInterface $objectModifiedDate;
 
-    /**
-     * @var string
-     */
-    private $integrationObjectName;
-
-    /**
-     * @var mixed
-     */
-    private $integrationObjectId;
-
-    /**
-     * @var \DateTime
-     */
-    private $objectModifiedDate;
+    private ?\Mautic\IntegrationsBundle\Entity\ObjectMapping $objectMapping = null;
 
     /**
      * @param string $integration
@@ -41,14 +18,11 @@ class UpdatedObjectMappingDAO
      * @param mixed  $integrationObjectId
      */
     public function __construct(
-        $integration,
-        $integrationObjectName,
-        $integrationObjectId,
+        private $integration,
+        private $integrationObjectName,
+        private $integrationObjectId,
         \DateTimeInterface $objectModifiedDate
     ) {
-        $this->integration           = $integration;
-        $this->integrationObjectName = $integrationObjectName;
-        $this->integrationObjectId   = $integrationObjectId;
         $this->objectModifiedDate    = $objectModifiedDate instanceof \DateTimeImmutable ? new \DateTime(
             $objectModifiedDate->format('Y-m-d H:i:s'),
             $objectModifiedDate->getTimezone()
@@ -76,5 +50,18 @@ class UpdatedObjectMappingDAO
     public function getObjectModifiedDate(): \DateTimeInterface
     {
         return $this->objectModifiedDate;
+    }
+
+    public function setObjectMapping(ObjectMapping $objectMapping): void
+    {
+        $this->objectMapping = $objectMapping;
+    }
+
+    /**
+     * This is set after the ObjectMapping entity has been persisted to the database with the updates from this object.
+     */
+    public function getObjectMapping(): ?ObjectMapping
+    {
+        return $this->objectMapping;
     }
 }

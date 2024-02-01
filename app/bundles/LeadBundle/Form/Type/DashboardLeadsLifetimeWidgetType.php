@@ -1,35 +1,25 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\LeadBundle\Form\Type;
 
 use Mautic\LeadBundle\Model\ListModel;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\FormBuilderInterface;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
+/**
+ * @extends AbstractType<mixed>
+ */
 class DashboardLeadsLifetimeWidgetType extends AbstractType
 {
-    private $segmentModel;
-
-    private $translator;
-
-    public function __construct(ListModel $segmentModel, TranslatorInterface $translator)
-    {
-        $this->segmentModel = $segmentModel;
-        $this->translator   = $translator;
+    public function __construct(
+        private ListModel $segmentModel,
+        private TranslatorInterface $translator
+    ) {
     }
 
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $lists                                                       = $this->segmentModel->getUserLists();
         $segments                                                    = [];

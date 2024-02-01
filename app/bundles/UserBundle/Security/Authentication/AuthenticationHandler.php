@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\UserBundle\Security\Authentication;
 
 use Symfony\Component\HttpFoundation\RedirectResponse;
@@ -23,11 +14,9 @@ use Symfony\Component\Security\Http\Authentication\AuthenticationSuccessHandlerI
 
 class AuthenticationHandler implements AuthenticationSuccessHandlerInterface, AuthenticationFailureHandlerInterface
 {
-    private $router;
-
-    public function __construct(RouterInterface $router)
-    {
-        $this->router  = $router;
+    public function __construct(
+        private RouterInterface $router
+    ) {
     }
 
     /**

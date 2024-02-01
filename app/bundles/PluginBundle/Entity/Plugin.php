@@ -1,27 +1,17 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\PluginBundle\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
+use Mautic\CoreBundle\Entity\CacheInvalidateInterface;
 use Mautic\CoreBundle\Entity\CommonEntity;
 
-/**
- * Class Plugin.
- */
-class Plugin extends CommonEntity
+class Plugin extends CommonEntity implements CacheInvalidateInterface
 {
-    const DESCRIPTION_DELIMITER_REGEX = "/\R---\R/";
+    public const DESCRIPTION_DELIMITER_REGEX = "/\R---\R/";
+    public const CACHE_NAMESPACE             = 'Plugin';
 
     /**
      * @var int
@@ -34,7 +24,7 @@ class Plugin extends CommonEntity
     private $name;
 
     /**
-     * @var string
+     * @var string|null
      */
     private $description;
 
@@ -59,17 +49,17 @@ class Plugin extends CommonEntity
     private $bundle;
 
     /**
-     * @var string
+     * @var string|null
      */
     private $version;
 
     /**
-     * @var string
+     * @var string|null
      */
     private $author;
 
     /**
-     * @var ArrayCollection
+     * @var ArrayCollection<int, \Mautic\PluginBundle\Entity\Integration>
      */
     private $integrations;
 
@@ -78,7 +68,7 @@ class Plugin extends CommonEntity
         $this->integrations = new ArrayCollection();
     }
 
-    public static function loadMetadata(ORM\ClassMetadata $metadata)
+    public static function loadMetadata(ORM\ClassMetadata $metadata): void
     {
         $builder = new ClassMetadataBuilder($metadata);
 
@@ -151,20 +141,14 @@ class Plugin extends CommonEntity
     }
 
     /**
-     * Set bundle.
-     *
      * @param string $bundle
-     *
-     * @return Plugin
      */
-    public function setBundle($bundle)
+    public function setBundle($bundle): void
     {
         $this->bundle = $bundle;
     }
 
     /**
-     * Get bundle.
-     *
      * @return string
      */
     public function getBundle()
@@ -191,7 +175,7 @@ class Plugin extends CommonEntity
     /**
      * @param mixed $description
      */
-    public function setDescription($description)
+    public function setDescription($description): void
     {
         $this->description = $description;
         $this->splitDescriptions();
@@ -205,12 +189,9 @@ class Plugin extends CommonEntity
         return $this->primaryDescription ?: $this->description;
     }
 
-    /**
-     * @return bool
-     */
-    public function hasSecondaryDescription()
+    public function hasSecondaryDescription(): bool
     {
-        return preg_match(self::DESCRIPTION_DELIMITER_REGEX, $this->description) >= 1;
+        return $this->description && preg_match(self::DESCRIPTION_DELIMITER_REGEX, $this->description) >= 1;
     }
 
     /**
@@ -232,7 +213,7 @@ class Plugin extends CommonEntity
     /**
      * @param mixed $version
      */
-    public function setVersion($version)
+    public function setVersion($version): void
     {
         $this->version = $version;
     }
@@ -248,7 +229,7 @@ class Plugin extends CommonEntity
     /**
      * @param mixed $isMissing
      */
-    public function setIsMissing($isMissing)
+    public function setIsMissing($isMissing): void
     {
         $this->isMissing = $isMissing;
     }
@@ -264,7 +245,7 @@ class Plugin extends CommonEntity
     /**
      * @param mixed $author
      */
-    public function setAuthor($author)
+    public function setAuthor($author): void
     {
         $this->author = $author;
     }
@@ -272,12 +253,20 @@ class Plugin extends CommonEntity
     /**
      * Splits description into primary and secondary.
      */
-    public function splitDescriptions()
+    public function splitDescriptions(): void
     {
         if ($this->hasSecondaryDescription()) {
             $parts                      = preg_split(self::DESCRIPTION_DELIMITER_REGEX, $this->description);
             $this->primaryDescription   = trim($parts[0]);
             $this->secondaryDescription = trim($parts[1]);
         }
+    }
+
+    public function getCacheNamespacesToDelete(): array
+    {
+        return [
+            self::CACHE_NAMESPACE,
+            Integration::CACHE_NAMESPACE,
+        ];
     }
 }

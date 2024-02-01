@@ -1,21 +1,12 @@
 <?php
 
-/*
- * @copyright   2018 Mautic Inc. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://www.mautic.com
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace MauticPlugin\MauticCrmBundle\Tests\Integration\Salesforce\Helper;
 
 use MauticPlugin\MauticCrmBundle\Integration\Salesforce\Helper\StateValidationHelper;
 
 class StateValidationHelperTest extends \PHPUnit\Framework\TestCase
 {
-    public function testStateIsRemovedWhenCountryIsUnknown()
+    public function testStateIsRemovedWhenCountryIsUnknown(): void
     {
         $payload = [
             'State' => 'Paris',
@@ -24,7 +15,7 @@ class StateValidationHelperTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals([], StateValidationHelper::validate($payload));
     }
 
-    public function testStateIsRemovedWhenCountryIsNotSupported()
+    public function testStateIsRemovedWhenCountryIsNotSupported(): void
     {
         $payload = [
             'Country' => 'France',
@@ -34,7 +25,7 @@ class StateValidationHelperTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals(['Country' => 'France'], StateValidationHelper::validate($payload));
     }
 
-    public function testStateIsLeftWhenCountryIsSupported()
+    public function testStateIsLeftWhenCountryIsSupported(): void
     {
         $payload = [
             'Country' => 'United States',

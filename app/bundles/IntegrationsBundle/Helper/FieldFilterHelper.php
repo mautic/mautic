@@ -2,15 +2,6 @@
 
 declare(strict_types=1);
 
-/*
- * @copyright   2019 Mautic Inc. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://www.mautic.com
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\IntegrationsBundle\Helper;
 
 use Mautic\IntegrationsBundle\Integration\Interfaces\ConfigFormSyncInterface;
@@ -18,24 +9,16 @@ use Mautic\IntegrationsBundle\Mapping\MappedFieldInfoInterface;
 
 class FieldFilterHelper
 {
-    /**
-     * @var int
-     */
-    private $totalFieldCount = 0;
+    private int $totalFieldCount = 0;
 
     /**
      * @var MappedFieldInfoInterface[]
      */
-    private $filteredFields = [];
+    private array $filteredFields = [];
 
-    /**
-     * @var ConfigFormSyncInterface
-     */
-    private $integrationObject;
-
-    public function __construct(ConfigFormSyncInterface $integrationObject)
-    {
-        $this->integrationObject = $integrationObject;
+    public function __construct(
+        private ConfigFormSyncInterface $integrationObject
+    ) {
     }
 
     public function filterFieldsByPage(string $objectName, int $page, int $limit = 15): void

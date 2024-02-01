@@ -2,15 +2,6 @@
 
 declare(strict_types=1);
 
-/*
- * @copyright   2021 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CoreBundle\Tests\Functional\Controller;
 
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
@@ -33,7 +24,7 @@ class FileControllerTest extends MauticMysqlTestCase
         Assert::arrayHasKey('url');
         Assert::assertNotEmpty($responseData['url']);
         $uploadedFileName = basename($responseData['url']);
-        $uploadedImage    = static::$container->getParameter('kernel.project_dir').'/media/images/'.$uploadedFileName;
+        $uploadedImage    = static::getContainer()->getParameter('mautic.application_dir').'/media/images/'.$uploadedFileName;
         Assert::assertTrue(file_exists($uploadedImage));
     }
 
@@ -65,7 +56,7 @@ class FileControllerTest extends MauticMysqlTestCase
 
     private function getFixurePath(): string
     {
-        return realpath(dirname(__FILE__).'/../../Fixtures/').'/';
+        return realpath(__DIR__.'/../../Fixtures/').'/';
     }
 
     protected function beforeTearDown(): void

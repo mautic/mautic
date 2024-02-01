@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2016 Mautic Contributors. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CoreBundle\Tests;
 
 use Doctrine\ORM\EntityManager;
@@ -18,90 +9,67 @@ use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\CoreBundle\Helper\PathsHelper;
 use Mautic\CoreBundle\Model\AuditLogModel;
 use Mautic\CoreBundle\Translation\Translator;
+use PHPUnit\Framework\MockObject\MockObject;
 
 abstract class CommonMocks extends \PHPUnit\Framework\TestCase
 {
     /**
-     * @return Translator
+     * @return MockObject&Translator
      */
     protected function getTranslatorMock()
     {
-        $translator = $this->getMockBuilder(Translator::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-        $translator->expects($this->any())
-            ->method('hasId')
+        $translator = $this->createMock(Translator::class);
+        $translator->method('hasId')
             ->will($this->returnValue(false));
 
         return $translator;
     }
 
     /**
-     * @return EntityManager
+     * @return MockObject&EntityManager
      */
     protected function getEntityManagerMock()
     {
-        $entityManager = $this
-            ->getMockBuilder(EntityManager::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        return $entityManager;
+        return $this->createMock(EntityManager::class);
     }
 
     /**
-     * @return PathsHelper
+     * @return MockObject&PathsHelper
      */
     protected function getPathsHelperMock()
     {
-        $pathsHelper = $this->getMockBuilder(PathsHelper::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        return $pathsHelper;
+        return $this->createMock(PathsHelper::class);
     }
 
     /**
-     * @return CoreParametersHelper
+     * @return MockObject&CoreParametersHelper
      */
     protected function getCoreParametersHelperMock()
     {
-        $paramHelper = $this->getMockBuilder(CoreParametersHelper::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        return $paramHelper;
+        return $this->createMock(CoreParametersHelper::class);
     }
 
     /**
-     * @return BundleHelper
+     * @return MockObject&BundleHelper
      */
     protected function getBundleHelperMock()
     {
-        $bundleHelper = $this->getMockBuilder(BundleHelper::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        return $bundleHelper;
+        return $this->createMock(BundleHelper::class);
     }
 
     /**
-     * @return IpLookupHelper
+     * @return MockObject&IpLookupHelper
      */
     protected function getIpLookupHelperMock()
     {
-        return $this->getMockBuilder(IpLookupHelper::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        return $this->createMock(IpLookupHelper::class);
     }
 
     /**
-     * @return AuditLogModel
+     * @return MockObject&AuditLogModel
      */
     protected function getAuditLogModelMock()
     {
-        return $this->getMockBuilder(AuditLogModel::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        return $this->createMock(AuditLogModel::class);
     }
 }

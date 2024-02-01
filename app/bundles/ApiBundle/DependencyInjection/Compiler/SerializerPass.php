@@ -6,7 +6,6 @@ namespace Mautic\ApiBundle\DependencyInjection\Compiler;
 
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
-use Symfony\Component\DependencyInjection\Reference;
 
 class SerializerPass implements CompilerPassInterface
 {
@@ -16,15 +15,11 @@ class SerializerPass implements CompilerPassInterface
      * currently no other way that I can find to get our driver into the
      * chain in front of the rest.
      */
-    public function process(ContainerBuilder $container)
+    public function process(ContainerBuilder $container): void
     {
-        if ($container->hasDefinition('jms_serializer.metadata.chain_driver')) {
-            $definition = $container->getDefinition('jms_serializer.metadata.chain_driver');
-            $drivers    = $definition->getArgument(0);
-
-            array_unshift($drivers, new Reference('jms_serializer.metadata.api_metadata_driver'));
-
-            $definition->replaceArgument(0, $drivers);
+        if ($container->hasDefinition('jms_serializer.metadata.annotation_driver')) {
+            $definition = $container->getDefinition('jms_serializer.metadata.annotation_driver');
+            $definition->setClass(\Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver::class);
         }
     }
 }

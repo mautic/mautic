@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2017 Mautic Contributors. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\ConfigBundle\Mapper;
 
 use Mautic\ConfigBundle\Exception\BadFormConfigException;
@@ -19,27 +10,21 @@ use Mautic\CoreBundle\Helper\CoreParametersHelper;
 class ConfigMapper
 {
     /**
-     * @var CoreParametersHelper
+     * @var mixed[]
      */
-    private $parametersHelper;
+    private array $restrictedParameters;
 
-    /**
-     * @var array
-     */
-    private $restrictedParameters;
-
-    public function __construct(CoreParametersHelper $parametersHelper, array $restrictedParameters = [])
-    {
-        $this->parametersHelper     = $parametersHelper;
+    public function __construct(
+        private CoreParametersHelper $parametersHelper,
+        array $restrictedParameters = []
+    ) {
         $this->restrictedParameters = RestrictionHelper::prepareRestrictions($restrictedParameters);
     }
 
     /**
-     * @return array
-     *
      * @throws BadFormConfigException
      */
-    public function bindFormConfigsWithRealValues(array $forms)
+    public function bindFormConfigsWithRealValues(array $forms): array
     {
         foreach ($forms as $bundle => $config) {
             if (!isset($config['parameters'])) {
@@ -54,10 +39,8 @@ class ConfigMapper
 
     /**
      * Merges default parameters from each subscribed bundle with the local (real) params.
-     *
-     * @return array
      */
-    private function mergeWithLocalParameters(array $formParameters)
+    private function mergeWithLocalParameters(array $formParameters): array
     {
         $formParameters = RestrictionHelper::applyRestrictions($formParameters, $this->restrictedParameters);
 

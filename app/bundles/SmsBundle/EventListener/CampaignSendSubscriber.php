@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2016 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\SmsBundle\EventListener;
 
 use Mautic\CampaignBundle\CampaignEvents;
@@ -22,28 +13,13 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class CampaignSendSubscriber implements EventSubscriberInterface
 {
-    /**
-     * @var SmsModel
-     */
-    private $smsModel;
-
-    /**
-     * @var TransportChain
-     */
-    private $transportChain;
-
     public function __construct(
-        SmsModel $smsModel,
-        TransportChain $transportChain
+        private SmsModel $smsModel,
+        private TransportChain $transportChain
     ) {
-        $this->smsModel       = $smsModel;
-        $this->transportChain = $transportChain;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             CampaignEvents::CAMPAIGN_ON_BUILD     => ['onCampaignBuild', 0],
@@ -51,7 +27,7 @@ class CampaignSendSubscriber implements EventSubscriberInterface
         ];
     }
 
-    public function onCampaignBuild(CampaignBuilderEvent $event)
+    public function onCampaignBuild(CampaignBuilderEvent $event): void
     {
         if (count($this->transportChain->getEnabledTransports()) > 0) {
             $event->addAction(
@@ -62,7 +38,7 @@ class CampaignSendSubscriber implements EventSubscriberInterface
                     'eventName'        => SmsEvents::ON_CAMPAIGN_TRIGGER_ACTION,
                     'formType'         => SmsSendType::class,
                     'formTypeOptions'  => ['update_select' => 'campaignevent_properties_sms'],
-                    'formTheme'        => 'MauticSmsBundle:FormTheme\SmsSendList',
+                    'formTheme'        => '@MauticSms/FormTheme/SmsSendList/smssend_list_row.html.twig',
                     'channel'          => 'sms',
                     'channelIdField'   => 'sms',
                 ]
@@ -70,25 +46,31 @@ class CampaignSendSubscriber implements EventSubscriberInterface
         }
     }
 
-    /**
-     * @return $this
-     */
-    public function onCampaignTriggerAction(CampaignExecutionEvent $event)
+    public function onCampaignTriggerAction(CampaignExecutionEvent $event): void
     {
         $lead  = $event->getLead();
-
         $smsId = (int) $event->getConfig()['sms'];
         $sms   = $this->smsModel->getEntity($smsId);
 
         if (!$sms) {
-            return $event->setFailed('mautic.sms.campaign.failed.missing_entity');
+            $event->setFailed('mautic.sms.campaign.failed.missing_entity');
+
+            return;
+        }
+
+        if (!$sms->isPublished()) {
+            $event->setFailed('mautic.sms.campaign.failed.unpublished');
+
+            return;
         }
 
         $result = $this->smsModel->sendSms($sms, $lead, ['channel' => ['campaign.event', $event->getEvent()['id']]])[$lead->getId()];
 
         if ('Authenticate' === $result['status']) {
             // Don't fail the event but reschedule it for later
-            return $event->setResult(false);
+            $event->setResult(false);
+
+            return;
         }
 
         if (!empty($result['sent'])) {

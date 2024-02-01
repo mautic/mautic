@@ -13,22 +13,17 @@ use Symfony\Component\Form\Extension\Core\Type\IntegerType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
+/**
+ * @extends AbstractType<mixed>
+ */
 class ContactChannelsType extends AbstractType
 {
-    /**
-     * @var CoreParametersHelper
-     */
-    private $coreParametersHelper;
-
-    public function __construct(CoreParametersHelper $coreParametersHelper)
-    {
-        $this->coreParametersHelper = $coreParametersHelper;
+    public function __construct(
+        private CoreParametersHelper $coreParametersHelper
+    ) {
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $showContactFrequency         = $this->coreParametersHelper->get('show_contact_frequency');
         $showContactPauseDates        = $this->coreParametersHelper->get('show_contact_pause_dates');
@@ -77,7 +72,6 @@ class ContactChannelsType extends AbstractType
                     'frequency_number_'.$channel,
                     IntegerType::class,
                     [
-                        'scale'      => 0,
                         'label'      => 'mautic.lead.list.frequency.number',
                         'label_attr' => ['class' => 'text-muted fw-n label1'],
                         'attr'       => array_merge(
@@ -133,28 +127,24 @@ class ContactChannelsType extends AbstractType
                     $builder->add(
                         'contact_pause_start_date_'.$channel,
                         DateType::class,
-                        [
+                        $this->configureDateTypeOptions([
                             'widget'     => 'single_text',
                             'label'      => false,
                             'label_attr' => ['class' => 'text-muted fw-n label3'],
                             'attr'       => $attributes,
-                            'format'     => $options['public_view'] ? DateType::HTML5_FORMAT : 'yyyy-MM-dd',
-                            'html5'      => $options['public_view'],
                             'required'   => false,
-                        ]
+                        ], $options['public_view'])
                     );
                     $builder->add(
                         'contact_pause_end_date_'.$channel,
                         DateType::class,
-                        [
+                        $this->configureDateTypeOptions([
                             'widget'     => 'single_text',
                             'label'      => 'mautic.lead.frequency.contact.end.date',
                             'label_attr' => ['class' => 'frequency-label text-muted fw-n label4'],
                             'attr'       => $attributes,
-                            'format'     => $options['public_view'] ? DateType::HTML5_FORMAT : 'yyyy-MM-dd',
-                            'html5'      => $options['public_view'],
                             'required'   => false,
-                        ]
+                        ], $options['public_view'])
                     );
                 }
             }
@@ -185,10 +175,7 @@ class ContactChannelsType extends AbstractType
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function configureOptions(OptionsResolver $resolver)
+    public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setRequired(['channels']);
         $resolver->setDefaults(
@@ -197,5 +184,21 @@ class ContactChannelsType extends AbstractType
                 'save_button'               => false,
             ]
         );
+    }
+
+    /**
+     * @param array<string,string|bool|mixed[]> $options
+     *
+     * @return array<string,string|bool|mixed[]>
+     */
+    private function configureDateTypeOptions(array $options, bool $useHtml5): array
+    {
+        $options['html5'] = $useHtml5;
+
+        if (!$useHtml5) {
+            $options['format'] = 'yyyy-MM-dd';
+        }
+
+        return $options;
     }
 }

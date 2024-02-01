@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2021 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\LeadBundle\Tests\EventListener;
 
 use Mautic\LeadBundle\Entity\Lead;
@@ -19,9 +10,9 @@ use Mautic\LeadBundle\Model\DoNotContact;
 
 class DoNotContactSubscriberTest extends \PHPUnit\Framework\TestCase
 {
-    private $doNotContactSubscriber;
+    private \Mautic\LeadBundle\EventListener\DoNotContactSubscriber $doNotContactSubscriber;
 
-    private $doNotContact;
+    private \PHPUnit\Framework\MockObject\MockObject $doNotContact;
 
     protected function setUp(): void
     {
@@ -29,7 +20,7 @@ class DoNotContactSubscriberTest extends \PHPUnit\Framework\TestCase
         $this->doNotContactSubscriber     = new DoNotContactSubscriber($this->doNotContact);
     }
 
-    public function testGetSubscribedEvents()
+    public function testGetSubscribedEvents(): void
     {
         $this->assertEquals(
             [
@@ -40,7 +31,7 @@ class DoNotContactSubscriberTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testAddDncForLeadForNewContacts()
+    public function testAddDncForLeadForNewContacts(): void
     {
         $lead              = new Lead();
         $doNotContactEvent = new DoNotContactAddEvent($lead, 'email');
@@ -51,7 +42,7 @@ class DoNotContactSubscriberTest extends \PHPUnit\Framework\TestCase
         $this->doNotContactSubscriber->addDncForLead($doNotContactEvent);
     }
 
-    public function testAddDncForLeadForExistedContacts()
+    public function testAddDncForLeadForExistedContacts(): void
     {
         $lead = new Lead();
         $lead->setId(1);

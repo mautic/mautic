@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\ChannelBundle\EventListener;
 
 use Mautic\LeadBundle\Model\CompanyReportData;
@@ -21,28 +12,15 @@ use Symfony\Component\Routing\RouterInterface;
 
 class ReportSubscriber implements EventSubscriberInterface
 {
-    const CONTEXT_MESSAGE_CHANNEL = 'message.channel';
+    public const CONTEXT_MESSAGE_CHANNEL = 'message.channel';
 
-    /**
-     * @var CompanyReportData
-     */
-    private $companyReportData;
-
-    /**
-     * @var RouterInterface
-     */
-    private $router;
-
-    public function __construct(CompanyReportData $companyReportData, RouterInterface $router)
-    {
-        $this->companyReportData = $companyReportData;
-        $this->router            = $router;
+    public function __construct(
+        private CompanyReportData $companyReportData,
+        private RouterInterface $router
+    ) {
     }
 
-    /**
-     * @return array
-     */
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             ReportEvents::REPORT_ON_BUILD    => ['onReportBuilder', 0],
@@ -54,7 +32,7 @@ class ReportSubscriber implements EventSubscriberInterface
     /**
      * Add available tables and columns to the report builder lookup.
      */
-    public function onReportBuilder(ReportBuilderEvent $event)
+    public function onReportBuilder(ReportBuilderEvent $event): void
     {
         if (!$event->checkContext([self::CONTEXT_MESSAGE_CHANNEL])) {
             return;
@@ -129,7 +107,7 @@ class ReportSubscriber implements EventSubscriberInterface
     /**
      * Initialize the QueryBuilder object to generate reports from.
      */
-    public function onReportGenerate(ReportGeneratorEvent $event)
+    public function onReportGenerate(ReportGeneratorEvent $event): void
     {
         if (!$event->checkContext([self::CONTEXT_MESSAGE_CHANNEL])) {
             return;
@@ -146,7 +124,7 @@ class ReportSubscriber implements EventSubscriberInterface
         $event->setQueryBuilder($queryBuilder);
     }
 
-    public function onReportDisplay(ReportDataEvent $event)
+    public function onReportDisplay(ReportDataEvent $event): void
     {
         $data = $event->getData();
         if ($event->checkContext([self::CONTEXT_MESSAGE_CHANNEL])) {

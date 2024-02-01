@@ -1,38 +1,18 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\WebhookBundle\Event;
 
-use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\Process\Exception\InvalidArgumentException;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\EventDispatcher\Event;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
-/**
- * Class WebhookBuilderEvent.
- */
 class WebhookBuilderEvent extends Event
 {
-    /**
-     * @var array
-     */
-    private $events = [];
+    private array $events = [];
 
-    /**
-     * @var TranslatorInterface
-     */
-    private $translator;
-
-    public function __construct(TranslatorInterface $translator)
-    {
-        $this->translator = $translator;
+    public function __construct(
+        private TranslatorInterface $translator
+    ) {
     }
 
     /**
@@ -43,7 +23,7 @@ class WebhookBuilderEvent extends Event
      *                      'label'       => (required) what to display in the list
      *                      'description' => (optional) short description of event
      */
-    public function addEvent($key, array $event)
+    public function addEvent($key, array $event): void
     {
         if (array_key_exists($key, $this->events)) {
             throw new InvalidArgumentException("The key, '$key' is already used by another webhook event. Please use a different key.");
@@ -65,10 +45,8 @@ class WebhookBuilderEvent extends Event
         static $sorted = false;
 
         if (empty($sorted)) {
-            uasort($this->events, function ($a, $b) {
-                return strnatcasecmp(
-                    $a['label'], $b['label']);
-            });
+            uasort($this->events, fn ($a, $b): int => strnatcasecmp(
+                $a['label'], $b['label']));
             $sorted = true;
         }
 

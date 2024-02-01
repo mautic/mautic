@@ -63,7 +63,16 @@ Mautic.filterTableData = function (name, filterby, filterValue, tmpl, target, ba
         baseUrl = baseUrl + "?tmpl=" + tmpl
     }
 
-    var route = baseUrl + "&name=" + name + "&filterby=" + encodeURIComponent(filterby) + "&value=" + encodeURIComponent(filterValue)
+    var value = '';
+    if (mQuery.isArray(filterValue)) {
+        for (var i = 0; i < filterValue.length; i++) {
+            value += '&value[]=' + encodeURIComponent(filterValue[i]);
+        }
+    } else {
+        value = "&value=" + encodeURIComponent(filterValue)
+    }
+
+    var route = baseUrl + "&name=" + name + "&filterby=" + encodeURIComponent(filterby) + value
     Mautic.loadContent(route, '', 'POST', target);
 };
 
@@ -127,8 +136,9 @@ Mautic.filterList = function (e, elId, route, target, liveCacheVar, action, over
             }
 
             if (typeof Mautic.liveSearchXhr !== 'undefined') {
-                //ensure current search request is aborted
-                Mautic['liveSearchXhr'].abort();
+                // ensure current search request is aborted
+                // with different statusText.
+                Mautic['liveSearchXhr'].abort('searchCompleted');
             }
 
             var btn = "button[data-livesearch-parent='" + elId + "']";

@@ -1,16 +1,9 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\LeadBundle\Form\Type;
 
+use Mautic\CoreBundle\Helper\ArrayHelper;
+use Mautic\CoreBundle\Translation\Translator;
 use Mautic\LeadBundle\Helper\FormFieldHelper;
 use Mautic\LeadBundle\Model\FieldModel;
 use Mautic\LeadBundle\Model\LeadModel;
@@ -20,37 +13,21 @@ use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
-use Symfony\Component\Translation\TranslatorInterface;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
+/**
+ * @extends AbstractType<mixed>
+ */
 class CampaignEventLeadFieldValueType extends AbstractType
 {
-    /**
-     * @var TranslatorInterface
-     */
-    protected $translator;
-
-    /**
-     * @var LeadModel
-     */
-    protected $leadModel;
-
-    /**
-     * @var FieldModel
-     */
-    protected $fieldModel;
-
-    public function __construct(TranslatorInterface $translator, LeadModel $leadModel, FieldModel $fieldModel)
-    {
-        $this->translator = $translator;
-        $this->leadModel  = $leadModel;
-        $this->fieldModel = $fieldModel;
+    public function __construct(
+        protected Translator $translator,
+        protected LeadModel $leadModel,
+        protected FieldModel $fieldModel
+    ) {
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder->add(
             'field',
@@ -78,7 +55,7 @@ class CampaignEventLeadFieldValueType extends AbstractType
         );
 
         // function to add 'template' choice field dynamically
-        $func = function (FormEvent $e) {
+        $func = function (FormEvent $e): void {
             $data = $e->getData();
             $form = $e->getForm();
 
@@ -109,13 +86,14 @@ class CampaignEventLeadFieldValueType extends AbstractType
                                 $fieldValues = FormFieldHelper::getCountryChoices();
                                 break;
                             case 'region':
-                                $fieldValues = FormFieldHelper::getRegionChoices();
+                                $fieldValues = ArrayHelper::flatten(FormFieldHelper::getRegionChoices());
                                 break;
                             case 'timezone':
-                                $fieldValues = FormFieldHelper::getTimezonesChoices();
+                                $fieldValues = ArrayHelper::flatten(FormFieldHelper::getTimezonesChoices());
                                 break;
                             case 'locale':
-                                $fieldValues = FormFieldHelper::getLocaleChoices();
+                                // Locales are flipped. And yes, we will flip the array again below.
+                                $fieldValues = array_flip(FormFieldHelper::getLocaleChoices());
                                 break;
                             case 'date':
                             case 'datetime':
@@ -132,7 +110,7 @@ class CampaignEventLeadFieldValueType extends AbstractType
                                         $fieldValues
                                     );
 
-                                    $choiceAttr = function ($value, $key, $index) use ($customValue) {
+                                    $choiceAttr = function ($value, $key, $index) use ($customValue): array {
                                         if ($customValue === $value) {
                                             return ['data-custom' => 1];
                                         }
@@ -158,6 +136,9 @@ class CampaignEventLeadFieldValueType extends AbstractType
 
             // Display selectbox for a field with choices, textbox for others
             if (!empty($fieldValues) && $supportsChoices) {
+                $multiple = in_array($operator, ['in', '!in']);
+                $value    = $multiple && !is_array($data['value']) ? [$data['value']] : $data['value'];
+
                 $form->add(
                     'value',
                     ChoiceType::class,
@@ -178,6 +159,8 @@ class CampaignEventLeadFieldValueType extends AbstractType
                                 ['message' => 'mautic.core.value.required']
                             ),
                         ],
+                        'multiple' => $multiple,
+                        'data'     => $value,
                     ]
                 );
             } else {
@@ -226,9 +209,6 @@ class CampaignEventLeadFieldValueType extends AbstractType
         $builder->addEventListener(FormEvents::PRE_SUBMIT, $func);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getBlockPrefix()
     {
         return 'campaignevent_lead_field_value';

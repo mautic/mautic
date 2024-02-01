@@ -1,64 +1,27 @@
 <?php
 
-/*
- * @copyright   2018 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\LeadBundle\EventListener;
 
 use Mautic\CoreBundle\Exception\RecordCanNotUnpublishException;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\CoreBundle\Model\AuditLogModel;
-use Mautic\LeadBundle\Entity\LeadListRepository;
 use Mautic\LeadBundle\Event\LeadListEvent as SegmentEvent;
 use Mautic\LeadBundle\LeadEvents;
 use Mautic\LeadBundle\Model\ListModel;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class SegmentSubscriber implements EventSubscriberInterface
 {
-    /**
-     * @var IpLookupHelper
-     */
-    private $ipLookupHelper;
-
-    /**
-     * @var AuditLogModel
-     */
-    private $auditLogModel;
-
-    /**
-     * @var TranslatorInterface
-     */
-    private $translator;
-
-    /**
-     * @var ListModel
-     */
-    private $listModel;
-
     public function __construct(
-        IpLookupHelper $ipLookupHelper,
-        AuditLogModel $auditLogModel,
-        ListModel $listModel,
-        TranslatorInterface $translator
+        private IpLookupHelper $ipLookupHelper,
+        private AuditLogModel $auditLogModel,
+        private ListModel $listModel,
+        private TranslatorInterface $translator
     ) {
-        $this->ipLookupHelper    = $ipLookupHelper;
-        $this->auditLogModel     = $auditLogModel;
-        $this->listModel         = $listModel;
-        $this->translator        = $translator;
     }
 
-    /**
-     * @return array
-     */
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             LeadEvents::LIST_PRE_UNPUBLISH => ['onSegmentPreUnpublish', 0],
@@ -70,7 +33,7 @@ class SegmentSubscriber implements EventSubscriberInterface
     /**
      * Add a segment entry to the audit log.
      */
-    public function onSegmentPostSave(SegmentEvent $event)
+    public function onSegmentPostSave(SegmentEvent $event): void
     {
         $segment = $event->getList();
         if ($details = $event->getChanges()) {
@@ -101,7 +64,7 @@ class SegmentSubscriber implements EventSubscriberInterface
     /**
      * Add a segment delete entry to the audit log.
      */
-    public function onSegmentDelete(SegmentEvent $event)
+    public function onSegmentDelete(SegmentEvent $event): void
     {
         $segment = $event->getList();
         $log     = [

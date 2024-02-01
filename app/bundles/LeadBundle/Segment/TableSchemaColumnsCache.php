@@ -1,50 +1,29 @@
 <?php
-/*
- * @copyright   2018 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
 
 namespace Mautic\LeadBundle\Segment;
 
 use Doctrine\ORM\EntityManager;
 
-/**
- * Class TableSchemaColumnsCache.
- */
 class TableSchemaColumnsCache
 {
-    /**
-     * @var EntityManager
-     */
-    private $entityManager;
-
     /**
      * @var array
      */
     private $cache;
 
-    /**
-     * TableSchemaColumnsCache constructor.
-     */
-    public function __construct(EntityManager $entityManager)
-    {
-        $this->entityManager = $entityManager;
+    public function __construct(
+        private EntityManager $entityManager
+    ) {
         $this->cache         = [];
     }
 
     /**
-     * @param $tableName
-     *
      * @return array|false
      */
     public function getColumns($tableName)
     {
         if (!isset($this->cache[$tableName])) {
-            $columns                 = $this->entityManager->getConnection()->getSchemaManager()->listTableColumns($tableName);
+            $columns                 = $this->entityManager->getConnection()->createSchemaManager()->listTableColumns($tableName);
             $this->cache[$tableName] = $columns ?: [];
         }
 

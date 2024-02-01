@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2019 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\LeadBundle\Segment\Stat;
 
 use Mautic\CampaignBundle\Model\CampaignModel;
@@ -20,52 +11,17 @@ use Mautic\ReportBundle\Model\ReportModel;
 
 class SegmentDependencies
 {
-    /**
-     * @var EmailModel
-     */
-    private $emailModel;
-
-    /**
-     * @var CampaignModel
-     */
-    private $campaignModel;
-
-    /**
-     * @var ActionModel
-     */
-    private $actionModel;
-
-    /**
-     * @var ListModel
-     */
-    private $listModel;
-
-    /**
-     * @var TriggerEventModel
-     */
-    private $triggerEventModel;
-
-    /**
-     * @var ReportModel
-     */
-    private $reportModel;
-
-    public function __construct(EmailModel $emailModel, CampaignModel $campaignModel, ActionModel $actionModel, ListModel $listModel, TriggerEventModel $triggerEventModel, ReportModel $reportModel)
-    {
-        $this->emailModel        = $emailModel;
-        $this->campaignModel     = $campaignModel;
-        $this->actionModel       = $actionModel;
-        $this->listModel         = $listModel;
-        $this->triggerEventModel = $triggerEventModel;
-        $this->reportModel       = $reportModel;
+    public function __construct(
+        private EmailModel $emailModel,
+        private CampaignModel $campaignModel,
+        private ActionModel $actionModel,
+        private ListModel $listModel,
+        private TriggerEventModel $triggerEventModel,
+        private ReportModel $reportModel
+    ) {
     }
 
-    /**
-     * @param $segmentId
-     *
-     * @return array
-     */
-    public function getChannelsIds($segmentId)
+    public function getChannelsIds($segmentId): array
     {
         $usage   = [];
         $usage[] = [

@@ -1,18 +1,9 @@
 <?php
 
-/*
- * @copyright   2016 Mautic Contributors. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CoreBundle\Event;
 
-use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Contracts\EventDispatcher\Event;
 
 abstract class AbstractCustomRequestEvent extends Event
 {
@@ -31,11 +22,6 @@ abstract class AbstractCustomRequestEvent extends Event
      */
     protected $routeParams = [];
 
-    /**
-     * AbstractCustomRequestEvent constructor.
-     *
-     * @param Request $request
-     */
     public function __construct(Request $request = null)
     {
         if ($request) {
@@ -75,23 +61,18 @@ abstract class AbstractCustomRequestEvent extends Event
         return ($withParams) ? [$this->route, $this->routeParams] : $this->route;
     }
 
-    /**
-     * @param $route
-     *
-     * @return bool
-     */
-    public function checkRouteContext($route)
+    public function checkRouteContext($route): bool
     {
         if (null == $this->request) {
             return false;
         }
 
         if (null !== $route) {
-            list($currentRoute, $routeParams) = $this->getRoute(true);
+            [$currentRoute, $routeParams]     = $this->getRoute(true);
             $givenRoute                       = $route;
             $givenRouteParams                 = [];
             if (is_array($route)) {
-                list($givenRoute, $givenRouteParams) = $route;
+                [$givenRoute, $givenRouteParams] = $route;
             }
 
             if ($givenRoute !== $currentRoute) {

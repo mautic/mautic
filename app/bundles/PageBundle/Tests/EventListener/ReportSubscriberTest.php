@@ -1,20 +1,10 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\PageBundle\Tests\EventListener;
 
-use DateTime;
-use Doctrine\DBAL\Driver\PDOStatement;
 use Doctrine\DBAL\Query\Expression\ExpressionBuilder;
 use Doctrine\DBAL\Query\QueryBuilder;
+use Doctrine\DBAL\Result;
 use Mautic\CoreBundle\Helper\Chart\ChartQuery;
 use Mautic\LeadBundle\Model\CompanyReportData;
 use Mautic\PageBundle\Entity\HitRepository;
@@ -24,34 +14,30 @@ use Mautic\ReportBundle\Event\ReportBuilderEvent;
 use Mautic\ReportBundle\Event\ReportGeneratorEvent;
 use Mautic\ReportBundle\Event\ReportGraphEvent;
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class ReportSubscriberTest extends TestCase
 {
     /**
      * @var CompanyReportData|\PHPUnit\Framework\MockObject\MockObject
      */
-    private $companyReportData;
+    private \PHPUnit\Framework\MockObject\MockObject $companyReportData;
 
     /**
      * @var HitRepository|\PHPUnit\Framework\MockObject\MockObject
      */
-    private $hitRepository;
+    private \PHPUnit\Framework\MockObject\MockObject $hitRepository;
 
     /**
      * @var TranslatorInterface|\PHPUnit\Framework\MockObject\MockObject
      */
-    private $translator;
+    private \PHPUnit\Framework\MockObject\MockObject $translator;
 
-    /**
-     * @var ReportSubscriber
-     */
-    private $subscriber;
+    private \Mautic\PageBundle\EventListener\ReportSubscriber $subscriber;
 
     public function setUp(): void
     {
         parent::setUp();
-        defined('MAUTIC_TABLE_PREFIX') or define('MAUTIC_TABLE_PREFIX', '');
 
         $this->companyReportData = $this->createMock(CompanyReportData::class);
         $this->hitRepository     = $this->createMock(HitRepository::class);
@@ -63,19 +49,9 @@ class ReportSubscriberTest extends TestCase
         );
     }
 
-    public function testOnReportBuilderAddsPageAndPageHitReports()
+    public function testOnReportBuilderAddsPageAndPageHitReports(): void
     {
-        $mockEvent = $this->getMockBuilder(ReportBuilderEvent::class)
-            ->disableOriginalConstructor()
-            ->onlyMethods([
-                'checkContext',
-                'addGraph',
-                'getStandardColumns',
-                'getCategoryColumns',
-                'getCampaignByChannelColumns',
-                'addTable',
-            ])
-            ->getMock();
+        $mockEvent = $this->createMock(ReportBuilderEvent::class);
 
         $mockEvent->expects($this->once())
             ->method('getStandardColumns')
@@ -98,7 +74,7 @@ class ReportSubscriberTest extends TestCase
 
         $mockEvent->expects($this->exactly(3))
             ->method('addTable')
-            ->willReturnCallback(function () use (&$setTables) {
+            ->willReturnCallback(function () use (&$setTables): void {
                 $args = func_get_args();
 
                 $setTables[] = $args;
@@ -106,7 +82,7 @@ class ReportSubscriberTest extends TestCase
 
         $mockEvent->expects($this->exactly(9))
             ->method('addGraph')
-            ->willReturnCallback(function () use (&$setGraphs) {
+            ->willReturnCallback(function () use (&$setGraphs): void {
                 $args = func_get_args();
 
                 $setGraphs[] = $args;
@@ -123,7 +99,7 @@ class ReportSubscriberTest extends TestCase
         $this->assertCount(9, $setGraphs);
     }
 
-    public function testOnReportGeneratePagesContext()
+    public function testOnReportGeneratePagesContext(): void
     {
         $mockEvent = $this->getMockBuilder(ReportGeneratorEvent::class)
             ->disableOriginalConstructor()
@@ -169,7 +145,7 @@ class ReportSubscriberTest extends TestCase
         $this->subscriber->onReportGenerate($mockEvent);
     }
 
-    public function testOnReportGeneratePageHitsContext()
+    public function testOnReportGeneratePageHitsContext(): void
     {
         $mockEvent = $this->getMockBuilder(ReportGeneratorEvent::class)
             ->disableOriginalConstructor()
@@ -219,7 +195,7 @@ class ReportSubscriberTest extends TestCase
         $this->subscriber->onReportGenerate($mockEvent);
     }
 
-    public function testOnReportGraphGenerateBadContextWillReturn()
+    public function testOnReportGraphGenerateBadContextWillReturn(): void
     {
         $mockEvent = $this->getMockBuilder(ReportGraphEvent::class)
             ->disableOriginalConstructor()
@@ -236,7 +212,7 @@ class ReportSubscriberTest extends TestCase
         $this->subscriber->onReportGraphGenerate($mockEvent);
     }
 
-    public function testOnReportGraphGenerate()
+    public function testOnReportGraphGenerate(): void
     {
         $mockEvent = $this->getMockBuilder(ReportGraphEvent::class)
             ->disableOriginalConstructor()
@@ -261,13 +237,13 @@ class ReportSubscriberTest extends TestCase
             ->onlyMethods(['expr', 'execute'])
             ->getMock();
 
-        $mockStmt = $this->getMockBuilder(PDOStatement::class)
+        $mockStmt = $this->getMockBuilder(Result::class)
             ->disableOriginalConstructor()
-            ->onlyMethods(['fetchAll'])
+            ->onlyMethods(['fetchAllAssociative'])
             ->getMock();
 
         $mockStmt->expects($this->exactly(2))
-            ->method('fetchAll')
+            ->method('fetchAllAssociative')
             ->willReturn(
                 [
                     [
@@ -321,8 +297,8 @@ class ReportSubscriberTest extends TestCase
         $graphOptions = [
             'chartQuery' => $mockChartQuery,
             'translator' => $this->translator,
-            'dateFrom'   => new DateTime(),
-            'dateTo'     => new DateTime(),
+            'dateFrom'   => new \DateTime(),
+            'dateTo'     => new \DateTime(),
         ];
 
         $mockEvent->expects($this->once())
@@ -362,8 +338,8 @@ class ReportSubscriberTest extends TestCase
             ->willReturn(
                 [
                     [
-                        'from'  => new DateTime(),
-                        'till'  => new DateTime(),
+                        'from'  => new \DateTime(),
+                        'till'  => new \DateTime(),
                         'label' => 'My Chart',
                     ],
                 ]

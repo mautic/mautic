@@ -1,0 +1,99 @@
+{% extends '@MauticCore/Default/content.html.twig' %}
+{% set header = (activeAsset.getId()) ? 'mautic.asset.asset.menu.edit'|trans({'%name%' : activeAsset.getTitle()}) :
+    'mautic.asset.asset.menu.new'|trans %}
+{% block headerTitle %}{{ header }}{% endblock %}
+{% block mauticContent %}asset{% endblock %}
+{% block content %}
+<script>
+	mauticAssetUploadEndpoint = "{{ uploadEndpoint }}";
+	mauticAssetUploadMaxSize = {{ maxSize }};
+	mauticAssetUploadMaxSizeError = "{{ maxSizeError }}";
+	mauticAssetUploadExtensions = "{{ extensions }}";
+	mauticAssetUploadExtensionError = "{{ extensionError }}";
+</script>
+{{ form_start(form) }}
+<!-- start: box layout -->
+<div class="box-layout">
+    <!-- container -->
+    <div class="col-md-9 bg-auto height-auto bdr-r">
+        <div class="pa-md">
+	        <div class="row">
+		        <div class="col-md-6">
+					<div class="col-md-7 pl-0">
+						{{ form_row(form.storageLocation) }}
+					</div>
+			        <div class="col-md-5 text-left mt-lg{% if startOnLocal %}  hide {% endif %}" id="remote-button">
+						{% if integrations %}
+							<a data-toggle="ajaxmodal" data-target="#RemoteFileModal" data-header="{% trans %}mautic.asset.remote.file.browse{% endtrans %}" href="{{ path('mautic_asset_remote') }}?tmpl=modal" class="btn btn-primary">
+								{% trans %}mautic.asset.remote.file.browse{% endtrans %}
+							</a>
+						{% endif %}
+					</div>
+			        <div id="storage-local"{% if not startOnLocal %} class="hide"{% endif %}>
+				        <div class="row">
+					        <div class="form-group col-xs-12 ">
+								{{ form_label(form.tempName) }}
+								{{ form_widget(form.tempName) }}
+								{{ form_errors(form.tempName) }}
+						        <div class="help-block mdropzone-error"></div>
+						        <div class="mdropzone text-center" id="dropzone">
+						        	<div class="dz-message">
+						        		{% trans %}mautic.asset.drop.file.here{% endtrans %}</h4>
+									</div>
+						        </div>
+					        </div>
+				        </div>
+			        </div>
+			        <div id="storage-remote"{% if startOnLocal %} class="hide"{% endif %}>
+						{{ form_row(form.remotePath) }}
+			        </div>
+		    	</div>
+		    	<div class="col-md-6">
+		    		<div class="row">
+				    	<div class="form-group col-xs-12 preview">
+				    		{{- include('@MauticAsset/Asset/preview.html.twig', {
+								'activeAsset' : activeAsset, 
+								'assetDownloadUrl' : url('mautic_asset_action',
+                                {'objectAction' : 'preview', 'objectId' : activeAsset.getId()}
+                            )}) -}}
+			    		</div>
+		    		</div>
+		    	</div>
+		    </div>
+		    <div class="row">
+				<div class="col-md-6">
+					{{ form_row(form.title) }}
+				</div>
+				<div class="col-md-6">
+					{{ form_row(form.alias) }}
+				</div>
+			</div>
+            <div class="row">
+                <div class="col-xs-12">
+					{{ form_row(form.description) }}
+                </div>
+            </div>
+		</div>
+	</div>
+ 	<div class="col-md-3 bg-white height-auto">
+		<div class="pr-lg pl-lg pt-md pb-md">
+			{{ form_row(form.category) }}
+			{{ form_row(form.language) }}
+			{{ form_row(form.isPublished) }}
+			{{ form_row(form.publishUp) }}
+			{{ form_row(form.publishDown) }}
+			{{ form_row(form.disallow) }}
+		</div>
+	</div>
+</div>
+{{ form_end(form) }}
+
+{% if integrations %}
+	{{- include('@MauticCore/Helper/modal.html.twig', {
+        'id'            : 'RemoteFileModal',
+        'size'          : 'lg',
+        'footerButtons' : true,
+	}) -}}
+{% endif %}
+
+{% endblock %}

@@ -2,15 +2,6 @@
 
 declare(strict_types=1);
 
-/*
- * @copyright   2019 Mautic, Inc. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://mautic.com
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\IntegrationsBundle\Auth\Support\Oauth2\Token;
 
 use kamermans\OAuth2\Token\TokenInterface;
@@ -21,14 +12,18 @@ class IntegrationToken implements TokenInterface
     // Pull in serialize() and unserialize() methods
     use TokenSerializer;
 
-    private $extraData = [];
-
-    public function __construct(?string $accessToken, ?string $refreshToken, $expiresAt = null, array $extraData = [])
-    {
+    /**
+     * @param mixed[] $extraData
+     */
+    public function __construct(
+        ?string $accessToken,
+        ?string $refreshToken,
+        $expiresAt = null,
+        private array $extraData = []
+    ) {
         $this->accessToken  = (string) $accessToken;
         $this->refreshToken = (string) $refreshToken;
         $this->expiresAt    = (int) $expiresAt;
-        $this->extraData    = $extraData;
     }
 
     /**

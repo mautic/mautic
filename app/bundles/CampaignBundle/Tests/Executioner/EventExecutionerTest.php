@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2018 Mautic Contributors. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CampaignBundle\Tests\Executioner;
 
 use Doctrine\Common\Collections\ArrayCollection;
@@ -43,57 +34,57 @@ class EventExecutionerTest extends \PHPUnit\Framework\TestCase
     /**
      * @var EventCollector|\PHPUnit\Framework\MockObject\MockObject
      */
-    private $eventCollector;
+    private \PHPUnit\Framework\MockObject\MockObject $eventCollector;
 
     /**
      * @var EventLogger|\PHPUnit\Framework\MockObject\MockObject
      */
-    private $eventLogger;
+    private \PHPUnit\Framework\MockObject\MockObject $eventLogger;
 
     /**
      * @var ActionExecutioner|\PHPUnit\Framework\MockObject\MockObject
      */
-    private $actionExecutioner;
+    private \PHPUnit\Framework\MockObject\MockObject $actionExecutioner;
 
     /**
      * @var ConditionExecutioner|\PHPUnit\Framework\MockObject\MockObject
      */
-    private $conditionExecutioner;
+    private \PHPUnit\Framework\MockObject\MockObject $conditionExecutioner;
 
     /**
      * @var DecisionExecutioner|\PHPUnit\Framework\MockObject\MockObject
      */
-    private $decisionExecutioner;
+    private \PHPUnit\Framework\MockObject\MockObject $decisionExecutioner;
 
     /**
      * @var LoggerInterface|\PHPUnit\Framework\MockObject\MockObject
      */
-    private $logger;
+    private \PHPUnit\Framework\MockObject\MockObject $logger;
 
     /**
      * @var EventScheduler|\PHPUnit\Framework\MockObject\MockObject
      */
-    private $eventScheduler;
+    private \PHPUnit\Framework\MockObject\MockObject $eventScheduler;
 
     /**
      * @var RemovedContactTracker|\PHPUnit\Framework\MockObject\MockObject
      */
-    private $removedContactTracker;
+    private \PHPUnit\Framework\MockObject\MockObject $removedContactTracker;
 
     /**
      * @var LeadRepository|\PHPUnit\Framework\MockObject\MockObject
      */
-    private $leadRepository;
+    private \PHPUnit\Framework\MockObject\MockObject $leadRepository;
 
     /**
      * @var EventRepository|MockBuilder
      */
-    private $eventRepository;
+    private \PHPUnit\Framework\MockObject\MockObject $eventRepository;
 
     /**
      * @var Translator|MockBuilder
      */
-    private $translator;
+    private \PHPUnit\Framework\MockObject\MockObject $translator;
 
     protected function setUp(): void
     {
@@ -117,7 +108,7 @@ class EventExecutionerTest extends \PHPUnit\Framework\TestCase
             ->getMock();
     }
 
-    public function testJumpToEventsAreProcessedAfterOtherEvents()
+    public function testJumpToEventsAreProcessedAfterOtherEvents(): void
     {
         $campaign = new Campaign();
 
@@ -126,16 +117,16 @@ class EventExecutionerTest extends \PHPUnit\Framework\TestCase
             ->setType('email.send')
             ->setCampaign($campaign);
         $otherConfig = new ActionAccessor(
-           [
-                'label'                => 'mautic.email.campaign.event.send',
-                'description'          => 'mautic.email.campaign.event.send_descr',
-                'batchEventName'       => EmailEvents::ON_CAMPAIGN_BATCH_ACTION,
-                'formType'             => EmailSendType::class,
-                'formTypeOptions'      => ['update_select' => 'campaignevent_properties_email', 'with_email_types' => true],
-                'formTheme'            => 'MauticEmailBundle:FormTheme\EmailSendList',
-                'channel'              => 'email',
-                'channelIdField'       => 'email',
-            ]
+            [
+                 'label'                => 'mautic.email.campaign.event.send',
+                 'description'          => 'mautic.email.campaign.event.send_descr',
+                 'batchEventName'       => EmailEvents::ON_CAMPAIGN_BATCH_ACTION,
+                 'formType'             => EmailSendType::class,
+                 'formTypeOptions'      => ['update_select' => 'campaignevent_properties_email', 'with_email_types' => true],
+                 'formTheme'            => 'MauticEmailBundle:FormTheme\EmailSendList',
+                 'channel'              => 'email',
+                 'channelIdField'       => 'email',
+             ]
         );
 
         $jumpEvent = new Event();
@@ -147,7 +138,7 @@ class EventExecutionerTest extends \PHPUnit\Framework\TestCase
                 'label'                  => 'mautic.campaign.event.jump_to_event',
                 'description'            => 'mautic.campaign.event.jump_to_event_descr',
                 'formType'               => CampaignEventJumpToEventType::class,
-                'template'               => 'MauticCampaignBundle:Event:jump.html.php',
+                'template'               => '@MauticCampaign/Event/jump.html.twig',
                 'batchEventName'         => CampaignEvents::ON_EVENT_JUMP_TO_EVENT,
                 'connectionRestrictions' => [
                     'target' => [
@@ -232,7 +223,7 @@ class EventExecutionerTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testJumpToEventsExecutedWithoutTarget()
+    public function testJumpToEventsExecutedWithoutTarget(): void
     {
         $campaign = new Campaign();
 
@@ -269,7 +260,7 @@ class EventExecutionerTest extends \PHPUnit\Framework\TestCase
                 'label'                  => 'mautic.campaign.event.jump_to_event',
                 'description'            => 'mautic.campaign.event.jump_to_event_descr',
                 'formType'               => CampaignEventJumpToEventType::class,
-                'template'               => 'MauticCampaignBundle:Event:jump.html.php',
+                'template'               => '@MauticCampaign/Event/jump.html.twig',
                 'batchEventName'         => CampaignEvents::ON_EVENT_JUMP_TO_EVENT,
                 'connectionRestrictions' => [
                     'target' => [

@@ -1,63 +1,27 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\EmailBundle\EventListener;
 
-use Mautic\EmailBundle\Entity\EmailReplyRepositoryInterface;
+use Mautic\EmailBundle\Entity\EmailReplyRepository;
 use Mautic\EmailBundle\Entity\StatRepository;
 use Mautic\LeadBundle\Event\LeadMergeEvent;
 use Mautic\LeadBundle\Event\LeadTimelineEvent;
 use Mautic\LeadBundle\LeadEvents;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Routing\RouterInterface;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class LeadSubscriber implements EventSubscriberInterface
 {
-    /**
-     * @var EmailReplyRepositoryInterface
-     */
-    private $emailReplyRepository;
-
-    /**
-     * @var StatRepository
-     */
-    private $statRepository;
-
-    /**
-     * @var TranslatorInterface
-     */
-    private $translator;
-
-    /**
-     * @var RouterInterface
-     */
-    private $router;
-
     public function __construct(
-        EmailReplyRepositoryInterface $emailReplyRepository,
-        StatRepository $statRepository,
-        TranslatorInterface $translator,
-        RouterInterface $router
+        private EmailReplyRepository $emailReplyRepository,
+        private StatRepository $statRepository,
+        private TranslatorInterface $translator,
+        private RouterInterface $router
     ) {
-        $this->emailReplyRepository = $emailReplyRepository;
-        $this->statRepository       = $statRepository;
-        $this->translator           = $translator;
-        $this->router               = $router;
     }
 
-    /**
-     * @return array
-     */
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             LeadEvents::TIMELINE_ON_GENERATE => ['onTimelineGenerate', 0],
@@ -68,7 +32,7 @@ class LeadSubscriber implements EventSubscriberInterface
     /**
      * Compile events for the lead timeline.
      */
-    public function onTimelineGenerate(LeadTimelineEvent $event)
+    public function onTimelineGenerate(LeadTimelineEvent $event): void
     {
         $this->addEmailEvents($event, 'read');
         $this->addEmailEvents($event, 'sent');
@@ -76,7 +40,7 @@ class LeadSubscriber implements EventSubscriberInterface
         $this->addEmailReplies($event);
     }
 
-    public function onLeadMerge(LeadMergeEvent $event)
+    public function onLeadMerge(LeadMergeEvent $event): void
     {
         $this->statRepository->updateLead(
             $event->getLoser()->getId(),
@@ -84,10 +48,7 @@ class LeadSubscriber implements EventSubscriberInterface
         );
     }
 
-    /**
-     * @param $state
-     */
-    private function addEmailEvents(LeadTimelineEvent $event, $state)
+    private function addEmailEvents(LeadTimelineEvent $event, $state): void
     {
         // Set available event types
         $eventTypeKey  = 'email.'.$state;
@@ -127,7 +88,7 @@ class LeadSubscriber implements EventSubscriberInterface
                 } else {
                     $eventName = $label;
                 }
-                if ('failed' == $state or 'sent' == $state) { //this is to get the correct column for date dateSent
+                if ('failed' == $state or 'sent' == $state) { // this is to get the correct column for date dateSent
                     $dateSent = 'sent';
                 } else {
                     $dateSent = 'read';
@@ -146,7 +107,7 @@ class LeadSubscriber implements EventSubscriberInterface
                             'stat' => $stat,
                             'type' => $state,
                         ],
-                        'contentTemplate' => 'MauticEmailBundle:SubscribedEvents\Timeline:index.html.php',
+                        'contentTemplate' => '@MauticEmail/SubscribedEvents/Timeline/index.html.twig',
                         'icon'            => ('read' == $state) ? 'fa-envelope-o' : 'fa-envelope',
                         'contactId'       => $contactId,
                     ]
@@ -155,7 +116,7 @@ class LeadSubscriber implements EventSubscriberInterface
         }
     }
 
-    private function addEmailReplies(LeadTimelineEvent $event)
+    private function addEmailReplies(LeadTimelineEvent $event): void
     {
         $eventTypeKey  = 'email.replied';
         $eventTypeName = $this->translator->trans('mautic.email.replied');
