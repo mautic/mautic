@@ -351,6 +351,8 @@ class MauticFactory
     }
 
     /**
+     * @param string $service
+     *
      * @return object|bool
      */
     public function get($service)

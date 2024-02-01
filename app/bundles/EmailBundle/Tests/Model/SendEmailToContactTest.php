@@ -14,6 +14,7 @@ use Mautic\EmailBundle\Event\EmailSendEvent;
 use Mautic\EmailBundle\Exception\FailedToSendToContactException;
 use Mautic\EmailBundle\Helper\DTO\AddressDTO;
 use Mautic\EmailBundle\Helper\FromEmailHelper;
+use Mautic\EmailBundle\Helper\MailHashHelper;
 use Mautic\EmailBundle\Helper\MailHelper;
 use Mautic\EmailBundle\Model\EmailModel;
 use Mautic\EmailBundle\Model\SendEmailToContact;
@@ -28,6 +29,7 @@ use Psr\Log\NullLogger;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\Mailer\Mailer;
 use Symfony\Component\Routing\Router;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class SendEmailToContactTest extends \PHPUnit\Framework\TestCase
 {
@@ -74,16 +76,19 @@ class SendEmailToContactTest extends \PHPUnit\Framework\TestCase
     /** @var MockObject&LoggerInterface */
     private MockObject $loggerMock;
 
+    private MailHashHelper $mailHashHelper;
+
+    /** @var MockObject&TranslatorInterface */
+    private MockObject $translator;
+
     protected function setUp(): void
     {
         $this->fromEmaiHelper       = $this->createMock(FromEmailHelper::class);
         $this->coreParametersHelper = $this->createMock(CoreParametersHelper::class);
         $this->mailbox              = $this->createMock(Mailbox::class);
         $this->loggerMock           = $this->createMock(LoggerInterface::class);
-
-        $this->coreParametersHelper->method('get')->will($this->returnValueMap([
-            ['mailer_from_email', null, 'nobody@nowhere.com'],
-        ]));
+        $this->mailHashHelper       = new MailHashHelper($this->coreParametersHelper);
+        $this->translator           = $this->createMock(TranslatorInterface::class);
     }
 
     /**
@@ -110,13 +115,9 @@ class SendEmailToContactTest extends \PHPUnit\Framework\TestCase
         $dncModel->expects($this->never())
             ->method('addDncForContact');
 
-        $translator = $this->getMockBuilder(Translator::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
         $statHelper = new StatHelper($statRepository);
 
-        $model = new SendEmailToContact($mailHelper, $statHelper, $dncModel, $translator);
+        $model = new SendEmailToContact($mailHelper, $statHelper, $dncModel, $this->translator);
 
         $email = new Email();
         $model->setEmail($email);
@@ -176,13 +177,9 @@ class SendEmailToContactTest extends \PHPUnit\Framework\TestCase
         $dncModel->expects($this->once())
             ->method('addDncForContact');
 
-        $translator = $this->getMockBuilder(Translator::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
         $statHelper = new StatHelper($statRepository);
 
-        $model = new SendEmailToContact($mailHelper, $statHelper, $dncModel, $translator);
+        $model = new SendEmailToContact($mailHelper, $statHelper, $dncModel, $this->translator);
         $model->setEmail($emailMock);
 
         $contacts             = $this->contacts;
@@ -254,8 +251,10 @@ class SendEmailToContactTest extends \PHPUnit\Framework\TestCase
         $this->fromEmaiHelper->method('getFromAddressConsideringOwner')
             ->willReturn(new AddressDTO('someone@somewhere.com'));
 
+        $this->coreParametersHelper->method('get')->will($this->returnValueMap([['mailer_from_email', null, 'nobody@nowhere.com'], ['secret_key', null, 'secret']]));
+
         $mailHelper = $this->getMockBuilder(MailHelper::class)
-            ->setConstructorArgs([$factoryMock, $mailer, $this->fromEmaiHelper, $this->coreParametersHelper, $this->mailbox, $this->loggerMock])
+            ->setConstructorArgs([$factoryMock, $mailer, $this->fromEmaiHelper, $this->coreParametersHelper, $this->mailbox, $this->loggerMock, $this->mailHashHelper])
             ->onlyMethods(['createEmailStat'])
             ->getMock();
 
@@ -333,6 +332,8 @@ class SendEmailToContactTest extends \PHPUnit\Framework\TestCase
      */
     public function testBatchQueueContactsHaveTokensHydrated(): void
     {
+        $this->coreParametersHelper->method('get')->will($this->returnValueMap([['mailer_from_email', null, 'nobody@nowhere.com'], ['secret_key', null, 'secret']]));
+
         $emailMock = $this->createMock(Email::class);
         $emailMock->method('getId')->will($this->returnValue(1));
         $emailMock->method('getFromAddress')->willReturn('test@mautic.com');
@@ -406,7 +407,7 @@ class SendEmailToContactTest extends \PHPUnit\Framework\TestCase
             ->willReturn(new AddressDTO('someone@somewhere.com'));
 
         $mailHelper = $this->getMockBuilder(MailHelper::class)
-            ->setConstructorArgs([$factoryMock, $mailer, $this->fromEmaiHelper, $this->coreParametersHelper, $this->mailbox, $this->loggerMock])
+            ->setConstructorArgs([$factoryMock, $mailer, $this->fromEmaiHelper, $this->coreParametersHelper, $this->mailbox, $this->loggerMock, $this->mailHashHelper])
             ->onlyMethods([])
             ->getMock();
 
@@ -463,6 +464,8 @@ class SendEmailToContactTest extends \PHPUnit\Framework\TestCase
      */
     public function testThatStatEntriesAreCreatedAndPersistedEveryBatch(): void
     {
+        $this->coreParametersHelper->method('get')->will($this->returnValueMap([['mailer_from_email', null, 'nobody@nowhere.com'], ['secret_key', null, 'secret']]));
+
         $emailMock = $this->createMock(Email::class);
         $emailMock->method('getId')->willReturn(1);
         $emailMock->method('getFromAddress')->willReturn('test@mautic.com');
@@ -501,7 +504,7 @@ class SendEmailToContactTest extends \PHPUnit\Framework\TestCase
             ->willReturn(new AddressDTO('someone@somewhere.com'));
 
         $mailHelper = $this->getMockBuilder(MailHelper::class)
-            ->setConstructorArgs([$factoryMock, $mailer, $this->fromEmaiHelper, $this->coreParametersHelper, $this->mailbox, $this->loggerMock])
+            ->setConstructorArgs([$factoryMock, $mailer, $this->fromEmaiHelper, $this->coreParametersHelper, $this->mailbox, $this->loggerMock, $this->mailHashHelper])
             ->onlyMethods(['createEmailStat'])
             ->getMock();
 
@@ -592,6 +595,8 @@ class SendEmailToContactTest extends \PHPUnit\Framework\TestCase
      */
     public function testThatAFailureFromTransportIsHandled(): void
     {
+        $this->coreParametersHelper->method('get')->will($this->returnValueMap([['mailer_from_email', null, 'nobody@nowhere.com'], ['secret_key', null, 'secret']]));
+
         $emailMock = $this->createMock(Email::class);
         $emailMock->method('getId')->willReturn(1);
         $emailMock->method('getFromAddress')->willReturn('test@mautic.com');
@@ -619,7 +624,7 @@ class SendEmailToContactTest extends \PHPUnit\Framework\TestCase
 
         /** @var MockObject&MailHelper $mailHelper */
         $mailHelper = $this->getMockBuilder(MailHelper::class)
-            ->setConstructorArgs([$factoryMock, $mailer, $this->fromEmaiHelper, $this->coreParametersHelper, $this->mailbox, $this->loggerMock])
+            ->setConstructorArgs([$factoryMock, $mailer, $this->fromEmaiHelper, $this->coreParametersHelper, $this->mailbox, $this->loggerMock, $this->mailHashHelper])
             ->onlyMethods(['createEmailStat'])
             ->getMock();
 
@@ -720,7 +725,7 @@ class SendEmailToContactTest extends \PHPUnit\Framework\TestCase
             );
 
         $mailer         = new Mailer(new BatchTransport());
-        $mailHelper     = new MailHelper($mockFactory, $mailer, $fromEmailHelper, $coreParametersHelper, $mailbox, $logger);
+        $mailHelper     = new MailHelper($mockFactory, $mailer, $fromEmailHelper, $coreParametersHelper, $mailbox, $logger, $this->mailHashHelper);
         $statRepository = $this->createMock(StatRepository::class);
         $dncModel       = $this->createMock(DoNotContact::class);
         $translator     = $this->createMock(Translator::class);
