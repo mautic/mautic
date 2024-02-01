@@ -54,7 +54,7 @@ class CampaignSubscriberFunctionalTest extends MauticMysqlTestCase
                     'leadField' => 'email',
                 ], [
                     'label' => 'Submit',
-                    'alias' => 'su bmit',
+                    'alias' => 'submit',
                     'type'  => 'button',
                 ],
             ],
