@@ -67,6 +67,7 @@ class ClientController extends AbstractStandardFormController
         $request->getSession()->set('mautic.client.filter.api_mode', $apiMode);
         $request->getSession()->set('mautic.client.filter', $filter);
 
+        /** @var \Mautic\ApiBundle\Model\ClientModel $model */
         $model   = $this->getModel($this->getModelName());
         $clients = $model->getEntities(
             [
@@ -136,11 +137,12 @@ class ClientController extends AbstractStandardFormController
 
     public function authorizedClientsAction(TokenStorageInterface $tokenStorage): Response
     {
-        $apiClientModel = $this->getModel($this->getModelName());
-        \assert($apiClientModel instanceof ClientModel);
+        /** @var \Mautic\ApiBundle\Model\ClientModel $model */
+        $model = $this->getModel($this->getModelName());
+        \assert($model instanceof ClientModel);
         $me = $tokenStorage->getToken()->getUser();
         \assert($me instanceof User);
-        $clients = $apiClientModel->getUserClients($me);
+        $clients = $model->getUserClients($me);
 
         return $this->render('@MauticApi/Client/authorized.html.twig', ['clients' => $clients]);
     }
