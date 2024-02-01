@@ -83,7 +83,7 @@
     "php-amqplib/rabbitmq-bundle": "^2.5.1",
     "simshaun/recurr": "^5.0",
     "ramsey/uuid": "^4.7",
-    "noxlogic/ratelimit-bundle": "^1.19",
+    "noxlogic/ratelimit-bundle": "^2.0",
     "knplabs/knp-menu-bundle": "^3.0",
     "guzzlehttp/oauth-subscriber": "^0.6.0",
     "helios-ag/fm-elfinder-bundle": "^12.3",
