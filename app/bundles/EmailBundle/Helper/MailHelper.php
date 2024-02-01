@@ -1884,7 +1884,7 @@ class MailHelper
                     } else {
                         $messageHeaders->addHeader($headerKey, $headerValue);
                     }
-                } catch (RfcComplianceException $complianceException) {
+                } catch (RfcComplianceException) {
                     $messageHeaders->remove($headerKey);
                 }
             }
