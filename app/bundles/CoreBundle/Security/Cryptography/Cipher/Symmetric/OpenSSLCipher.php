@@ -15,7 +15,7 @@ class OpenSSLCipher implements SymmetricCipherInterface
      */
     public function encrypt($secretMessage, $key, $randomInitVector): string|bool
     {
-        $key  = pack('H*', $key);
+        $key  = pack('H*', sprintf('%u', $key));
         $data = $secretMessage.$this->getHash($secretMessage, $this->getHashKey($key));
 
         return openssl_encrypt($data, $this->cipher, $key, $options = 0, $randomInitVector);
@@ -33,7 +33,7 @@ class OpenSSLCipher implements SymmetricCipherInterface
         if (strlen($originalInitVector) !== $this->getInitVectorSize()) {
             throw new InvalidDecryptionException();
         }
-        $key           = pack('H*', $key);
+        $key           = pack('H*', sprintf('%u', $key));
         $decrypted     = trim(openssl_decrypt($encryptedMessage, $this->cipher, $key, $options = 0, $originalInitVector));
         $sha256Length  = 64;
         $secretMessage = substr($decrypted, 0, -$sha256Length);
