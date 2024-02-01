@@ -82,6 +82,11 @@ class SendEmailToContactTest extends \PHPUnit\Framework\TestCase
     /** @var MockObject&TranslatorInterface */
     private MockObject $translator;
 
+    /**
+     * @var RequestStack&MockObject
+     */
+    private MockObject $requestStack;
+
     protected function setUp(): void
     {
         $this->fromEmaiHelper       = $this->createMock(FromEmailHelper::class);
@@ -90,6 +95,7 @@ class SendEmailToContactTest extends \PHPUnit\Framework\TestCase
         $this->loggerMock           = $this->createMock(LoggerInterface::class);
         $this->mailHashHelper       = new MailHashHelper($this->coreParametersHelper);
         $this->translator           = $this->createMock(TranslatorInterface::class);
+        $this->requestStack         = $this->createMock(RequestStack::class);
     }
 
     /**
@@ -255,7 +261,7 @@ class SendEmailToContactTest extends \PHPUnit\Framework\TestCase
         $this->coreParametersHelper->method('get')->will($this->returnValueMap([['mailer_from_email', null, 'nobody@nowhere.com'], ['secret_key', null, 'secret']]));
 
         $mailHelper = $this->getMockBuilder(MailHelper::class)
-            ->setConstructorArgs([$factoryMock, $mailer, $this->fromEmaiHelper, $this->coreParametersHelper, $this->mailbox, $this->loggerMock, $this->mailHashHelper])
+            ->setConstructorArgs([$factoryMock, $mailer, $this->fromEmaiHelper, $this->coreParametersHelper, $this->mailbox, $this->loggerMock, $this->mailHashHelper, $this->requestStack])
             ->onlyMethods(['createEmailStat'])
             ->getMock();
 
@@ -408,7 +414,7 @@ class SendEmailToContactTest extends \PHPUnit\Framework\TestCase
             ->willReturn(new AddressDTO('someone@somewhere.com'));
 
         $mailHelper = $this->getMockBuilder(MailHelper::class)
-            ->setConstructorArgs([$factoryMock, $mailer, $this->fromEmaiHelper, $this->coreParametersHelper, $this->mailbox, $this->loggerMock, $this->mailHashHelper])
+            ->setConstructorArgs([$factoryMock, $mailer, $this->fromEmaiHelper, $this->coreParametersHelper, $this->mailbox, $this->loggerMock, $this->mailHashHelper, $this->requestStack])
             ->onlyMethods([])
             ->getMock();
 
@@ -505,7 +511,7 @@ class SendEmailToContactTest extends \PHPUnit\Framework\TestCase
             ->willReturn(new AddressDTO('someone@somewhere.com'));
 
         $mailHelper = $this->getMockBuilder(MailHelper::class)
-            ->setConstructorArgs([$factoryMock, $mailer, $this->fromEmaiHelper, $this->coreParametersHelper, $this->mailbox, $this->loggerMock, $this->mailHashHelper])
+            ->setConstructorArgs([$factoryMock, $mailer, $this->fromEmaiHelper, $this->coreParametersHelper, $this->mailbox, $this->loggerMock, $this->mailHashHelper, $this->requestStack])
             ->onlyMethods(['createEmailStat'])
             ->getMock();
 
@@ -625,7 +631,7 @@ class SendEmailToContactTest extends \PHPUnit\Framework\TestCase
 
         /** @var MockObject&MailHelper $mailHelper */
         $mailHelper = $this->getMockBuilder(MailHelper::class)
-            ->setConstructorArgs([$factoryMock, $mailer, $this->fromEmaiHelper, $this->coreParametersHelper, $this->mailbox, $this->loggerMock, $this->mailHashHelper])
+            ->setConstructorArgs([$factoryMock, $mailer, $this->fromEmaiHelper, $this->coreParametersHelper, $this->mailbox, $this->loggerMock, $this->mailHashHelper, $this->requestStack])
             ->onlyMethods(['createEmailStat'])
             ->getMock();
 
@@ -717,9 +723,6 @@ class SendEmailToContactTest extends \PHPUnit\Framework\TestCase
         /** @var MockObject&LoggerInterface $logger */
         $logger = $this->createMock(LoggerInterface::class);
 
-        /** @var MockObject&RequestStack $requestStack */
-        $requestStack = $this->createMock(RequestStack::class);
-
         $coreParametersHelper->method('get')
             ->willReturnMap(
                 [
@@ -729,7 +732,7 @@ class SendEmailToContactTest extends \PHPUnit\Framework\TestCase
             );
 
         $mailer         = new Mailer(new BatchTransport());
-        $mailHelper     = new MailHelper($mockFactory, $mailer, $fromEmailHelper, $coreParametersHelper, $mailbox, $logger, $this->mailHashHelper, $requestStack);
+        $mailHelper     = new MailHelper($mockFactory, $mailer, $fromEmailHelper, $coreParametersHelper, $mailbox, $logger, $this->mailHashHelper, $this->requestStack);
         $statRepository = $this->createMock(StatRepository::class);
         $dncModel       = $this->createMock(DoNotContact::class);
         $translator     = $this->createMock(Translator::class);
