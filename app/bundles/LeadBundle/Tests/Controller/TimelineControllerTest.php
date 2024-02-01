@@ -27,7 +27,7 @@ final class TimelineControllerTest extends MauticMysqlTestCase
     public function testIndexActionsIsSuccessful(): void
     {
         $contact = (new Lead())->setFirstname('Test');
-        self::$container->get('mautic.lead.model.lead')->saveEntity($contact);
+        static::getContainer()->get('mautic.lead.model.lead')->saveEntity($contact);
 
         $crawler = $this->client->request('GET', '/s/contacts/timeline/'.$contact->getId());
         $this->assertEquals(Response::HTTP_OK, $this->client->getResponse()->getStatusCode());

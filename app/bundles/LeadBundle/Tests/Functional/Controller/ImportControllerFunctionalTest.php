@@ -127,7 +127,7 @@ class ImportControllerFunctionalTest extends MauticMysqlTestCase
         $field->setName($alias);
 
         /** @var FieldModel $fieldModel */
-        $fieldModel = self::$container->get('mautic.lead.model.field');
+        $fieldModel = static::getContainer()->get('mautic.lead.model.field');
         $fieldModel->saveEntity($field);
     }
 
@@ -175,7 +175,7 @@ class ImportControllerFunctionalTest extends MauticMysqlTestCase
         $import->setProperties($properties);
 
         /** @var ImportModel $importModel */
-        $importModel = self::$container->get('mautic.lead.model.import');
+        $importModel = static::getContainer()->get('mautic.lead.model.import');
         $importModel->saveEntity($import);
 
         return $import;
@@ -199,7 +199,7 @@ class ImportControllerFunctionalTest extends MauticMysqlTestCase
         $tag = new Tag();
         $tag->setTag($tagName);
 
-        $tagModel = self::$container->get('mautic.lead.model.tag');
+        $tagModel = static::getContainer()->get('mautic.lead.model.tag');
         $tagModel->saveEntity($tag);
 
         return $tag;
