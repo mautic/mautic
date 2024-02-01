@@ -9,6 +9,7 @@ use Mautic\CoreBundle\Translation\Translator;
 use Mautic\EmailBundle\Event\EmailBuilderEvent;
 use Mautic\EmailBundle\Event\EmailSendEvent;
 use Mautic\EmailBundle\Helper\FromEmailHelper;
+use Mautic\EmailBundle\Helper\MailHashHelper;
 use Mautic\EmailBundle\Helper\MailHelper;
 use Mautic\EmailBundle\MonitoredEmail\Mailbox;
 use Mautic\EmailBundle\Tests\Helper\Transport\SmtpTransport;
@@ -64,9 +65,15 @@ class OwnerSubscriberTest extends \PHPUnit\Framework\TestCase
         ],
     ];
 
+    /** @var MockObject&CoreParametersHelper */
+    private $coreParametersHelper;
+
+    private MailHashHelper $mailHashHelper;
+
     public function setUp(): void
     {
-        defined('MAUTIC_ENV') or define('MAUTIC_ENV', 'test');
+        $this->coreParametersHelper = $this->createMock(CoreParametersHelper::class);
+        $this->mailHashHelper       = new MailHashHelper($this->coreParametersHelper);
     }
 
     public function testOnEmailBuild(): void
@@ -307,7 +314,7 @@ class OwnerSubscriberTest extends \PHPUnit\Framework\TestCase
 
         $transport    = new SmtpTransport();
         $mailer       = new Mailer($transport);
-        $mailerHelper = new MailHelper($mockFactory, $mailer, $fromEmaiHelper, $coreParametersHelper, $mailbox, $logger, $requestStack);
+        $mailerHelper = new MailHelper($mockFactory, $mailer, $fromEmaiHelper, $coreParametersHelper, $mailbox, $logger, $this->mailHashHelper, $requestStack);
         $mailerHelper->setLead($lead);
 
         return $mailerHelper;
