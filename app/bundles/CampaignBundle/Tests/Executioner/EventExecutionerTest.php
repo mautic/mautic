@@ -199,7 +199,8 @@ class EventExecutionerTest extends \PHPUnit\Framework\TestCase
             )
             ->willReturn(new EvaluatedContacts());
 
-        $this->leadRepository->expects($this->once())
+        // This should not be called because the rotation is already incremented in the subscriber
+        $this->leadRepository->expects($this->never())
             ->method('incrementCampaignRotationForContacts');
 
         $this->getEventExecutioner()->executeEventsForContacts($events, $contacts);
