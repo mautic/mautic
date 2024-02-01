@@ -220,7 +220,6 @@ class EventExecutionerTest extends \PHPUnit\Framework\TestCase
             $this->logger,
             $this->eventScheduler,
             $this->removedContactTracker,
-            $this->leadRepository
         );
     }
 
