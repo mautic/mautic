@@ -8,11 +8,12 @@ use kamermans\OAuth2\Token\TokenInterface;
 
 class IntegrationTokenFactory implements TokenFactoryInterface
 {
-    private $extraKeysToStore = [];
-
-    public function __construct(array $extraKeysToStore = [])
-    {
-        $this->extraKeysToStore = $extraKeysToStore;
+    /**
+     * @param mixed[] $extraKeysToStore
+     */
+    public function __construct(
+        private array $extraKeysToStore = []
+    ) {
     }
 
     public function __invoke(array $data, ?TokenInterface $previousToken = null): IntegrationToken

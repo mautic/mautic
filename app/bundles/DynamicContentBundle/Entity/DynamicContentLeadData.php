@@ -39,12 +39,12 @@ class DynamicContentLeadData extends CommonEntity
      */
     private $slot;
 
-    public static function loadMetadata(ORM\ClassMetadata $metadata)
+    public static function loadMetadata(ORM\ClassMetadata $metadata): void
     {
         $builder = new ClassMetadataBuilder($metadata);
 
         $builder->setTable('dynamic_content_lead_data')
-            ->setCustomRepositoryClass('Mautic\DynamicContentBundle\Entity\DynamicContentLeadDataRepository');
+            ->setCustomRepositoryClass(\Mautic\DynamicContentBundle\Entity\DynamicContentLeadDataRepository::class);
 
         $builder->addIdColumns(false, false);
 

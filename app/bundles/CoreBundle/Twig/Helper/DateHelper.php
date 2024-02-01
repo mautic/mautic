@@ -11,22 +11,9 @@ final class DateHelper
     /**
      * @var string[]
      */
-    private $formats;
+    private array $formats;
 
-    /**
-     * @var DateTimeHelper
-     */
-    private $helper;
-
-    /**
-     * @var TranslatorInterface
-     */
-    private $translator;
-
-    /**
-     * @var CoreParametersHelper
-     */
-    private $coreParametersHelper;
+    private \Mautic\CoreBundle\Helper\DateTimeHelper $helper;
 
     /**
      * @param string $dateFullFormat
@@ -39,8 +26,8 @@ final class DateHelper
         $dateShortFormat,
         $dateOnlyFormat,
         $timeOnlyFormat,
-        TranslatorInterface $translator,
-        CoreParametersHelper $coreParametersHelper
+        private TranslatorInterface $translator,
+        private CoreParametersHelper $coreParametersHelper
     ) {
         $this->formats = [
             'datetime' => $dateFullFormat,
@@ -50,8 +37,6 @@ final class DateHelper
         ];
 
         $this->helper               = new DateTimeHelper('', 'Y-m-d H:i:s', 'local');
-        $this->translator           = $translator;
-        $this->coreParametersHelper = $coreParametersHelper;
     }
 
     /**

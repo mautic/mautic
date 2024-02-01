@@ -11,17 +11,12 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class GatedVideoType extends SlotType
 {
-    /**
-     * @var FormRepository
-     */
-    private $formRepository;
-
-    public function __construct(FormRepository $formRepository)
-    {
-        $this->formRepository = $formRepository;
+    public function __construct(
+        private FormRepository $formRepository
+    ) {
     }
 
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder->add(
             'url',
@@ -98,7 +93,7 @@ class GatedVideoType extends SlotType
         parent::buildForm($builder, $options);
     }
 
-    public function configureOptions(OptionsResolver $resolver)
+    public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults(
             [

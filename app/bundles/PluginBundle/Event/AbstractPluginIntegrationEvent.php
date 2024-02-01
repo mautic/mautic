@@ -5,9 +5,6 @@ namespace Mautic\PluginBundle\Event;
 use Mautic\PluginBundle\Integration\AbstractIntegration;
 use Symfony\Contracts\EventDispatcher\Event;
 
-/**
- * Class AbstractPluginIntegrationEvent.
- */
 class AbstractPluginIntegrationEvent extends Event
 {
     /**

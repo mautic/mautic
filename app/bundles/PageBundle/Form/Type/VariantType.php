@@ -12,24 +12,16 @@ use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
 /**
- * Class VariantType.
+ * @extends AbstractType<mixed>
  */
 class VariantType extends AbstractType
 {
-    /**
-     * @var PageModel
-     */
-    private $pageModel;
-
-    public function __construct(PageModel $pageModel)
-    {
-        $this->pageModel = $pageModel;
+    public function __construct(
+        private PageModel $pageModel
+    ) {
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder->add(
             'weight',
@@ -75,7 +67,7 @@ class VariantType extends AbstractType
                     ]
             );
 
-            $builder->addEventListener(FormEvents::PRE_SET_DATA, function (FormEvent $event) use ($criteria) {
+            $builder->addEventListener(FormEvents::PRE_SET_DATA, function (FormEvent $event) use ($criteria): void {
                 $form = $event->getForm();
                 $data = $event->getData();
                 if (isset($data['winnerCriteria'])) {
@@ -94,9 +86,6 @@ class VariantType extends AbstractType
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getBlockPrefix()
     {
         return 'pagevariant';

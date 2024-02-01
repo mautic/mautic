@@ -2,6 +2,7 @@
 
 namespace Mautic\CategoryBundle\Form\Type;
 
+use Mautic\CategoryBundle\Entity\Category;
 use Mautic\CoreBundle\Form\EventListener\CleanFormSubscriber;
 use Mautic\CoreBundle\Form\EventListener\FormExitSubscriber;
 use Mautic\CoreBundle\Form\Type\FormButtonsType;
@@ -14,16 +15,17 @@ use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
+/**
+ * @extends AbstractType<Category>
+ */
 class CategoryType extends AbstractType
 {
-    private SessionInterface $session;
-
-    public function __construct(SessionInterface $session)
-    {
-        $this->session = $session;
+    public function __construct(
+        private SessionInterface $session
+    ) {
     }
 
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder->addEventSubscriber(new CleanFormSubscriber([]));
         $builder->addEventSubscriber(new FormExitSubscriber('category.category', $options));
@@ -122,11 +124,11 @@ class CategoryType extends AbstractType
         }
     }
 
-    public function configureOptions(OptionsResolver $resolver)
+    public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults(
             [
-                'data_class'         => 'Mautic\CategoryBundle\Entity\Category',
+                'data_class'         => Category::class,
                 'show_bundle_select' => false,
                 'bundle'             => function (Options $options) {
                     if (!$bundle = $options['data']->getBundle()) {

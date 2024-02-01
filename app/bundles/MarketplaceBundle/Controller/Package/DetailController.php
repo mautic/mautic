@@ -25,16 +25,11 @@ use Symfony\Component\HttpFoundation\Response;
 
 class DetailController extends CommonController
 {
-    private PackageModel $packageModel;
-    private RouteProvider $routeProvider;
-    private Config $config;
-    private ComposerHelper $composer;
-
     public function __construct(
-        PackageModel $packageModel,
-        RouteProvider $routeProvider,
-        Config $config,
-        ComposerHelper $composer,
+        private PackageModel $packageModel,
+        private RouteProvider $routeProvider,
+        private Config $config,
+        private ComposerHelper $composer,
         ManagerRegistry $doctrine,
         MauticFactory $factory,
         ModelFactory $modelFactory,
@@ -46,11 +41,6 @@ class DetailController extends CommonController
         RequestStack $requestStack,
         CorePermissions $security
     ) {
-        $this->packageModel    = $packageModel;
-        $this->routeProvider   = $routeProvider;
-        $this->config          = $config;
-        $this->composer        = $composer;
-
         parent::__construct($doctrine, $factory, $modelFactory, $userHelper, $coreParametersHelper, $dispatcher, $translator, $flashBag, $requestStack, $security);
     }
 

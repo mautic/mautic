@@ -17,30 +17,25 @@ use Symfony\Component\Form\FormBuilder;
 
 class DynamicsIntegration extends CrmAbstractIntegration
 {
-    public function getName()
+    public function getName(): string
     {
         return 'Dynamics';
     }
 
-    public function getDisplayName()
+    public function getDisplayName(): string
     {
         return 'Dynamics CRM';
     }
 
-    /**
-     * @return array
-     */
-    public function getSupportedFeatures()
+    public function getSupportedFeatures(): array
     {
         return ['push_lead', 'get_leads', 'push_leads'];
     }
 
     /**
      * Return's authentication method such as oauth2, oauth1a, key, etc.
-     *
-     * @return string
      */
-    public function getAuthenticationType()
+    public function getAuthenticationType(): string
     {
         return 'oauth2';
     }
@@ -49,9 +44,9 @@ class DynamicsIntegration extends CrmAbstractIntegration
      * Return array of key => label elements that will be converted to inputs to
      * obtain from the user.
      *
-     * @return array
+     * @return array<string, string>
      */
-    public function getRequiredKeyFields()
+    public function getRequiredKeyFields(): array
     {
         return [
             'resource'      => 'mautic.integration.dynamics.resource',
@@ -65,7 +60,7 @@ class DynamicsIntegration extends CrmAbstractIntegration
      * @param array       $data
      * @param string      $formArea
      */
-    public function appendToForm(&$builder, $data, $formArea)
+    public function appendToForm(&$builder, $data, $formArea): void
     {
         $builder->add(
             'updateBlanks',
@@ -102,30 +97,23 @@ class DynamicsIntegration extends CrmAbstractIntegration
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function sortFieldsAlphabetically()
+    public function sortFieldsAlphabetically(): bool
     {
         return false;
     }
 
     /**
      * Get the array key for the auth token.
-     *
-     * @return string
      */
-    public function getAuthTokenKey()
+    public function getAuthTokenKey(): string
     {
         return 'access_token';
     }
 
     /**
      * Get the keys for the refresh token and expiry.
-     *
-     * @return array
      */
-    public function getRefreshTokenKeys()
+    public function getRefreshTokenKeys(): array
     {
         return ['refresh_token', 'expires_on'];
     }
@@ -138,30 +126,17 @@ class DynamicsIntegration extends CrmAbstractIntegration
         return $this->keys['resource'];
     }
 
-    /**
-     * {@inheritdoc}
-     *
-     * @return string
-     */
-    public function getAccessTokenUrl()
+    public function getAccessTokenUrl(): string
     {
         return 'https://login.microsoftonline.com/common/oauth2/token';
     }
 
-    /**
-     * {@inheritdoc}
-     *
-     * @return string
-     */
-    public function getAuthenticationUrl()
+    public function getAuthenticationUrl(): string
     {
         return 'https://login.microsoftonline.com/common/oauth2/authorize';
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getAuthLoginUrl()
+    public function getAuthLoginUrl(): string
     {
         $url = parent::getAuthLoginUrl();
 
@@ -169,8 +144,6 @@ class DynamicsIntegration extends CrmAbstractIntegration
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @param bool $inAuthorization
      */
     public function getBearerToken($inAuthorization = false)
@@ -182,19 +155,12 @@ class DynamicsIntegration extends CrmAbstractIntegration
         return false;
     }
 
-    /**
-     * {@inheritdoc}
-     *
-     * @return bool
-     */
-    public function getDataPriority()
+    public function getDataPriority(): bool
     {
         return true;
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @return string|array
      */
     public function getFormNotes($section)
@@ -248,19 +214,17 @@ class DynamicsIntegration extends CrmAbstractIntegration
     /**
      * @param array $settings
      *
-     * @return array|bool
-     *
      * @throws ApiErrorException
      */
-    public function getAvailableLeadFields($settings = [])
+    public function getAvailableLeadFields($settings = []): array
     {
         $dynamicsFields    = [];
-        $silenceExceptions = isset($settings['silence_exceptions']) ? $settings['silence_exceptions'] : true;
+        $silenceExceptions = $settings['silence_exceptions'] ?? true;
         if (isset($settings['feature_settings']['objects'])) {
             $dynamicsObjects = $settings['feature_settings']['objects'];
         } else {
             $settings        = $this->settings->getFeatureSettings();
-            $dynamicsObjects = isset($settings['objects']) ? $settings['objects'] : ['contacts'];
+            $dynamicsObjects = $settings['objects'] ?? ['contacts'];
         }
         try {
             if ($this->isAuthorized()) {
@@ -276,7 +240,6 @@ class DynamicsIntegration extends CrmAbstractIntegration
                         if (null === $leadObject || !array_key_exists('value', $leadObject)) {
                             return [];
                         }
-                        /** @var array $opts */
                         $fields = $leadObject['value'];
                         foreach ($fields as $field) {
                             $type      = 'string';
@@ -318,7 +281,7 @@ class DynamicsIntegration extends CrmAbstractIntegration
                 throw $exception;
             }
 
-            return false;
+            return [];
         }
 
         return $dynamicsFields;
@@ -394,10 +357,8 @@ class DynamicsIntegration extends CrmAbstractIntegration
     /**
      * @param array      $params
      * @param array|null $query
-     *
-     * @return int|null
      */
-    public function getLeads($params = [], $query = null, &$executed = null, $result = [], $object = 'contacts')
+    public function getLeads($params = [], $query = null, &$executed = null, $result = [], $object = 'contacts'): int
     {
         if ('Contact' === $object) {
             $object = 'contacts';
@@ -467,10 +428,8 @@ class DynamicsIntegration extends CrmAbstractIntegration
 
     /**
      * @param array $params
-     *
-     * @return int|null
      */
-    public function getCompanies($params = [])
+    public function getCompanies($params = []): int
     {
         $executed    = 0;
         $MAX_RECORDS = 200; // Default max records is 5000
@@ -541,10 +500,8 @@ class DynamicsIntegration extends CrmAbstractIntegration
      *
      * @param array  $data
      * @param string $object
-     *
-     * @return array
      */
-    public function amendLeadDataBeforeMauticPopulate($data, $object = null)
+    public function amendLeadDataBeforeMauticPopulate($data, $object = null): array
     {
         if ('company' === $object) {
             $object = 'accounts';
@@ -556,7 +513,7 @@ class DynamicsIntegration extends CrmAbstractIntegration
 
         $result = [];
         if (isset($data['value'])) {
-            $this->em->getConnection()->getConfiguration()->setSQLLogger(null);
+            $this->em->getConnection()->getConfiguration()->setMiddlewares([]);
             $entity = null;
             /** @var IntegrationEntityRepository $integrationEntityRepo */
             $integrationEntityRepo = $this->em->getRepository(\Mautic\PluginBundle\Entity\IntegrationEntity::class);
@@ -604,7 +561,7 @@ class DynamicsIntegration extends CrmAbstractIntegration
                         }
 
                         if (count($newMatchedFields)) {
-                            $this->companyModel->setFieldValues($entity, $newMatchedFields, false, false);
+                            $this->companyModel->setFieldValues($entity, $newMatchedFields, false);
                             $this->companyModel->saveEntity($entity, false);
                             $isModified = true;
                         }
@@ -731,9 +688,9 @@ class DynamicsIntegration extends CrmAbstractIntegration
     /**
      * @param array $params
      *
-     * @return mixed
+     * @return mixed[]
      */
-    public function pushLeads($params = [])
+    public function pushLeads($params = []): array
     {
         $MAX_RECORDS = (isset($params['limit']) && $params['limit'] < 100) ? $params['limit'] : 100;
         if (isset($params['fetchAll']) && $params['fetchAll']) {
@@ -907,7 +864,7 @@ class DynamicsIntegration extends CrmAbstractIntegration
      * @param array                       $ids
      * @param IntegrationEntityRepository $integrationEntityRepo
      */
-    private function createIntegrationEntities($ids, $object, $integrationEntityRepo)
+    private function createIntegrationEntities($ids, $object, $integrationEntityRepo): void
     {
         foreach ($ids as $oid => $leadId) {
             $this->logger->debug('CREATE INTEGRATION ENTITY: '.$oid);

@@ -29,6 +29,20 @@ class LeadApiControllerFunctionalTest extends MauticMysqlTestCase
         );
     }
 
+    public function testActivityApi(): void
+    {
+        $this->client->request('GET', '/api/contacts/activity');
+        Assert::assertTrue($this->client->getResponse()->isOk(), $this->client->getResponse()->getContent());
+        Assert::assertArrayHasKey('events', json_decode($this->client->getResponse()->getContent(), true));
+        Assert::assertArrayHasKey('filters', json_decode($this->client->getResponse()->getContent(), true));
+        Assert::assertArrayHasKey('order', json_decode($this->client->getResponse()->getContent(), true));
+        Assert::assertArrayHasKey('types', json_decode($this->client->getResponse()->getContent(), true));
+        Assert::assertArrayHasKey('total', json_decode($this->client->getResponse()->getContent(), true));
+        Assert::assertArrayHasKey('page', json_decode($this->client->getResponse()->getContent(), true));
+        Assert::assertArrayHasKey('limit', json_decode($this->client->getResponse()->getContent(), true));
+        Assert::assertArrayHasKey('maxPages', json_decode($this->client->getResponse()->getContent(), true));
+    }
+
     public function testBatchNewEndpointDoesNotCreateDuplicates(): void
     {
         $payload = [
@@ -824,6 +838,17 @@ class LeadApiControllerFunctionalTest extends MauticMysqlTestCase
         // MANUAL (3) is the default value according to the dev docs: https://developer.mautic.org/#add-do-not-contact
         $this->assertSame(DoNotContact::MANUAL, $dncResponse['contact']['doNotContact'][0]['reason']);
         $this->assertSame($dncChannel, $dncResponse['contact']['doNotContact'][0]['channel']);
+
+        // Check DNC is recorded in the contact activity.
+        $this->client->request('GET', "/api/contacts/{$contactId}/activity");
+        $clientResponse = $this->client->getResponse();
+        self::assertSame(Response::HTTP_OK, $clientResponse->getStatusCode(), $clientResponse->getContent());
+        $activityResponse = json_decode($clientResponse->getContent(), true);
+        Assert::assertCount(2, $activityResponse['events']); // identified and dnc added events
+        $dncEvents = array_values(array_filter($activityResponse['events'], fn ($event) => 'lead.donotcontact' === $event['event']));
+        Assert::assertCount(1, $dncEvents);
+        Assert::assertSame('Email', $dncEvents[0]['eventLabel']);
+        Assert::assertSame('Contact was manually set as do not contact for this channel.', $dncEvents[0]['details']['dnc']['reason']);
 
         // Remove DNC from the contact.
         $this->client->request('POST', "/api/contacts/$contactId/dnc/$dncChannel/remove");

@@ -47,7 +47,7 @@ class UtmTagTest extends \PHPUnit\Framework\TestCase
     /**
      * @return array<string|array<bool|string|''>>
      */
-    public function utmTagsDataProvider(): array
+    public static function utmTagsDataProvider(): array
     {
         return [
             'All tags are empty'       => ['', '', '', '', '', false],

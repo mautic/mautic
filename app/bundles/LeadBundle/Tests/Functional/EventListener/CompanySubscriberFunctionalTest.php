@@ -21,7 +21,7 @@ class CompanySubscriberFunctionalTest extends MauticMysqlTestCase
     public function testCreateCompany(): void
     {
         /** @var UserModel $userModel */
-        $userModel = $this->getContainer()->get('mautic.user.model.user');
+        $userModel = static::getContainer()->get('mautic.user.model.user');
         $users     = $userModel->getRepository()->findAll();
         $user      = reset($users);
         $this->assertInstanceOf(User::class, $user);
@@ -29,7 +29,7 @@ class CompanySubscriberFunctionalTest extends MauticMysqlTestCase
         $company = new Company();
         $company->setName('Test company');
         $company->setOwner($user);
-        $companyModel = $this->getContainer()->get('mautic.lead.model.company');
+        $companyModel = static::getContainer()->get('mautic.lead.model.company');
         $companyModel->saveEntity($company);
 
         $auditLogRepository = $this->em->getRepository(AuditLog::class);

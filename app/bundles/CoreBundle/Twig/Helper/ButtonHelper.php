@@ -59,21 +59,6 @@ final class ButtonHelper
     private $location;
 
     /**
-     * @var Environment
-     */
-    private $twig;
-
-    /**
-     * @var TranslatorInterface
-     */
-    private $translator;
-
-    /**
-     * @var EventDispatcherInterface
-     */
-    private $dispatcher;
-
-    /**
      * @var string|null
      */
     private $wrapOpeningTag;
@@ -83,10 +68,7 @@ final class ButtonHelper
      */
     private $wrapClosingTag;
 
-    /**
-     * @var string
-     */
-    private $groupType = self::TYPE_GROUP;
+    private string $groupType = self::TYPE_GROUP;
 
     /**
      * @var string|null
@@ -103,15 +85,9 @@ final class ButtonHelper
      */
     private $buttonCount = 0;
 
-    /**
-     * @var bool
-     */
-    private $buttonsFetched = false;
+    private bool $buttonsFetched = false;
 
-    /**
-     * @var Request
-     */
-    private $request;
+    private ?\Symfony\Component\HttpFoundation\Request $request = null;
 
     /**
      * @var mixed
@@ -123,11 +99,11 @@ final class ButtonHelper
      */
     private $listMarker = 3;
 
-    public function __construct(Environment $twig, TranslatorInterface $translator, EventDispatcherInterface $dispatcher)
-    {
-        $this->twig       = $twig;
-        $this->translator = $translator;
-        $this->dispatcher = $dispatcher;
+    public function __construct(
+        private Environment $twig,
+        private TranslatorInterface $translator,
+        private EventDispatcherInterface $dispatcher
+    ) {
     }
 
     /**
@@ -205,10 +181,8 @@ final class ButtonHelper
     /**
      * @param string $dropdownHtml
      * @param string $closingDropdownHtml
-     *
-     * @return string
      */
-    public function renderButtons($dropdownHtml = '', $closingDropdownHtml = '')
+    public function renderButtons($dropdownHtml = '', $closingDropdownHtml = ''): string
     {
         $this->fetchCustomButtons();
         $this->orderButtons();
@@ -263,7 +237,6 @@ final class ButtonHelper
      *
      * @param string $buttonCount
      * @param string $groupType
-     * @param null   $item
      *
      * @return $this
      */
@@ -284,10 +257,7 @@ final class ButtonHelper
         return $this;
     }
 
-    /**
-     * @return string
-     */
-    public function getName()
+    public function getName(): string
     {
         return 'buttons';
     }
@@ -295,10 +265,8 @@ final class ButtonHelper
     /**
      * @param array<string,mixed> $button
      * @param int                 $buttonCount
-     *
-     * @return string
      */
-    private function buildButton($button, $buttonCount = 0)
+    private function buildButton($button, $buttonCount = 0): string
     {
         $buttons = '';
 
@@ -375,7 +343,7 @@ final class ButtonHelper
 
         uasort(
             $this->buttons,
-            function ($a, $b) {
+            function ($a, $b): int {
                 $ap = (isset($a['priority']) ? (int) $a['priority'] : 0);
                 $bp = (isset($b['priority']) ? (int) $b['priority'] : 0);
 
@@ -438,10 +406,8 @@ final class ButtonHelper
 
     /**
      * @param array<string,mixed> $button
-     *
-     * @return string
      */
-    private function generateTextAttributes(&$button)
+    private function generateTextAttributes(&$button): string
     {
         $btnTextAttr = '';
         if (isset($button['btnTextAttr'])) {
@@ -460,10 +426,8 @@ final class ButtonHelper
 
     /**
      * @param array<string,mixed> $button
-     *
-     * @return string
      */
-    private function generateTooltipAttributes($button)
+    private function generateTooltipAttributes($button): string
     {
         $tooltip = '';
         if (isset($button['tooltip'])) {

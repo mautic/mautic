@@ -17,12 +17,9 @@ class DateBuilderTest extends \PHPUnit\Framework\TestCase
     /**
      * @var MockObject|SchedulerBuilder
      */
-    private $schedulerBuilder;
+    private \PHPUnit\Framework\MockObject\MockObject $schedulerBuilder;
 
-    /**
-     * @var DateBuilder
-     */
-    private $dateBuilder;
+    private \Mautic\ReportBundle\Scheduler\Date\DateBuilder $dateBuilder;
 
     protected function setUp(): void
     {

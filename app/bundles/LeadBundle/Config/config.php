@@ -150,7 +150,7 @@ return [
                 'standard_entity' => true,
                 'name'            => 'contacts',
                 'path'            => '/contacts',
-                'controller'      => 'Mautic\LeadBundle\Controller\Api\LeadApiController',
+                'controller'      => \Mautic\LeadBundle\Controller\Api\LeadApiController::class,
             ],
             'mautic_api_dncaddcontact' => [
                 'path'       => '/contacts/{id}/dnc/{channel}/add',
@@ -219,7 +219,7 @@ return [
                 'standard_entity' => true,
                 'name'            => 'lists',
                 'path'            => '/segments',
-                'controller'      => 'Mautic\LeadBundle\Controller\Api\ListApiController',
+                'controller'      => \Mautic\LeadBundle\Controller\Api\ListApiController::class,
             ],
             'mautic_api_segmentaddcontact' => [
                 'path'       => '/segments/{id}/contact/{leadId}/add',
@@ -240,7 +240,7 @@ return [
                 'standard_entity' => true,
                 'name'            => 'companies',
                 'path'            => '/companies',
-                'controller'      => 'Mautic\LeadBundle\Controller\Api\CompanyApiController',
+                'controller'      => \Mautic\LeadBundle\Controller\Api\CompanyApiController::class,
             ],
             'mautic_api_companyaddcontact' => [
                 'path'       => '/companies/{companyId}/contact/{contactId}/add',
@@ -256,7 +256,7 @@ return [
                 'standard_entity' => true,
                 'name'            => 'fields',
                 'path'            => '/fields/{object}',
-                'controller'      => 'Mautic\LeadBundle\Controller\Api\FieldApiController',
+                'controller'      => \Mautic\LeadBundle\Controller\Api\FieldApiController::class,
                 'defaults'        => [
                     'object' => 'contact',
                 ],
@@ -265,19 +265,19 @@ return [
                 'standard_entity' => true,
                 'name'            => 'notes',
                 'path'            => '/notes',
-                'controller'      => 'Mautic\LeadBundle\Controller\Api\NoteApiController',
+                'controller'      => \Mautic\LeadBundle\Controller\Api\NoteApiController::class,
             ],
             'mautic_api_devicesstandard' => [
                 'standard_entity' => true,
                 'name'            => 'devices',
                 'path'            => '/devices',
-                'controller'      => 'Mautic\LeadBundle\Controller\Api\DeviceApiController',
+                'controller'      => \Mautic\LeadBundle\Controller\Api\DeviceApiController::class,
             ],
             'mautic_api_tagsstandard' => [
                 'standard_entity' => true,
                 'name'            => 'tags',
                 'path'            => '/tags',
-                'controller'      => 'Mautic\LeadBundle\Controller\Api\TagApiController',
+                'controller'      => \Mautic\LeadBundle\Controller\Api\TagApiController::class,
             ],
         ],
     ],
@@ -360,7 +360,7 @@ return [
         ],
         'other' => [
             'mautic.lead.doctrine.subscriber' => [
-                'class'     => 'Mautic\LeadBundle\EventListener\DoctrineSubscriber',
+                'class'     => \Mautic\LeadBundle\EventListener\DoctrineSubscriber::class,
                 'tag'       => 'doctrine.event_subscriber',
                 'arguments' => ['monolog.logger.mautic'],
             ],
@@ -797,112 +797,7 @@ return [
                     'translator',
                 ],
             ],
-        ],
-        'repositories' => [
-            'mautic.lead.repository.company' => [
-                'class'     => Doctrine\ORM\EntityRepository::class,
-                'factory'   => ['@doctrine.orm.entity_manager', 'getRepository'],
-                'arguments' => [
-                    \Mautic\LeadBundle\Entity\Company::class,
-                ],
-                'methodCalls' => [
-                    'setUniqueIdentifiersOperator' => [
-                        '%mautic.company_unique_identifiers_operator%',
-                    ],
-                ],
-            ],
-            'mautic.lead.repository.company_lead' => [
-                'class'     => Doctrine\ORM\EntityRepository::class,
-                'factory'   => ['@doctrine.orm.entity_manager', 'getRepository'],
-                'arguments' => [
-                    \Mautic\LeadBundle\Entity\CompanyLead::class,
-                ],
-            ],
-            'mautic.lead.repository.stages_lead_log' => [
-                'class'     => Doctrine\ORM\EntityRepository::class,
-                'factory'   => ['@doctrine.orm.entity_manager', 'getRepository'],
-                'arguments' => [
-                    \Mautic\LeadBundle\Entity\StagesChangeLog::class,
-                ],
-            ],
-            'mautic.lead.repository.dnc' => [
-                'class'     => Doctrine\ORM\EntityRepository::class,
-                'factory'   => ['@doctrine.orm.entity_manager', 'getRepository'],
-                'arguments' => [
-                    \Mautic\LeadBundle\Entity\DoNotContact::class,
-                ],
-            ],
-            'mautic.lead.repository.lead' => [
-                'class'     => Doctrine\ORM\EntityRepository::class,
-                'factory'   => ['@doctrine.orm.entity_manager', 'getRepository'],
-                'arguments' => [
-                    \Mautic\LeadBundle\Entity\Lead::class,
-                ],
-                'methodCalls' => [
-                    'setUniqueIdentifiersOperator' => [
-                        '%mautic.contact_unique_identifiers_operator%',
-                    ],
-                    'setListLeadRepository' => [
-                        '@mautic.lead.repository.list_lead',
-                    ],
-                ],
-            ],
-            'mautic.lead.repository.list_lead' => [
-                'class'     => Doctrine\ORM\EntityRepository::class,
-                'factory'   => ['@doctrine.orm.entity_manager', 'getRepository'],
-                'arguments' => [
-                    \Mautic\LeadBundle\Entity\ListLead::class,
-                ],
-            ],
-            'mautic.lead.repository.frequency_rule' => [
-                'class'     => Doctrine\ORM\EntityRepository::class,
-                'factory'   => ['@doctrine.orm.entity_manager', 'getRepository'],
-                'arguments' => [
-                    \Mautic\LeadBundle\Entity\FrequencyRule::class,
-                ],
-            ],
-            'mautic.lead.repository.lead_event_log' => [
-                'class'     => Doctrine\ORM\EntityRepository::class,
-                'factory'   => ['@doctrine.orm.entity_manager', 'getRepository'],
-                'arguments' => [
-                    \Mautic\LeadBundle\Entity\LeadEventLog::class,
-                ],
-            ],
-            'mautic.lead.repository.lead_device' => [
-                'class'     => Doctrine\ORM\EntityRepository::class,
-                'factory'   => ['@doctrine.orm.entity_manager', 'getRepository'],
-                'arguments' => [
-                    \Mautic\LeadBundle\Entity\LeadDevice::class,
-                ],
-            ],
-            'mautic.lead.repository.lead_list' => [
-                'class'     => Doctrine\ORM\EntityRepository::class,
-                'factory'   => ['@doctrine.orm.entity_manager', 'getRepository'],
-                'arguments' => [
-                    \Mautic\LeadBundle\Entity\LeadList::class,
-                ],
-            ],
-            'mautic.lead.repository.points_change_log' => [
-                'class'     => Doctrine\ORM\EntityRepository::class,
-                'factory'   => ['@doctrine.orm.entity_manager', 'getRepository'],
-                'arguments' => [
-                    \Mautic\LeadBundle\Entity\PointsChangeLog::class,
-                ],
-            ],
-            'mautic.lead.repository.merged_records' => [
-                'class'     => Doctrine\ORM\EntityRepository::class,
-                'factory'   => ['@doctrine.orm.entity_manager', 'getRepository'],
-                'arguments' => [
-                    \Mautic\LeadBundle\Entity\MergeRecord::class,
-                ],
-            ],
-            'mautic.lead.repository.field' => [
-                'class'     => Doctrine\ORM\EntityRepository::class,
-                'factory'   => ['@doctrine.orm.entity_manager', 'getRepository'],
-                'arguments' => [
-                    \Mautic\LeadBundle\Entity\LeadField::class,
-                ],
-            ],
+
             //  Segment Filter Query builders
             'mautic.lead.query.builder.basic' => [
                 'class'     => \Mautic\LeadBundle\Segment\Query\Filter\BaseFilterQueryBuilder::class,
@@ -1039,6 +934,7 @@ return [
     'parameters' => [
         'parallel_import_limit'               => 1,
         'background_import_if_more_rows_than' => 0,
+        'contact_api_count_cache_ttl'         => 5, // in seconds, set null to disable.
         'contact_columns'                     => [
             '0' => 'name',
             '1' => 'email',

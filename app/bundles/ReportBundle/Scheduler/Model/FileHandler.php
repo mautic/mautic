@@ -13,29 +13,11 @@ use Mautic\ReportBundle\Exception\FileTooBigException;
 
 class FileHandler
 {
-    /**
-     * @var FilePathResolver
-     */
-    private $filePathResolver;
-
-    /**
-     * @var FileProperties
-     */
-    private $fileProperties;
-
-    /**
-     * @var CoreParametersHelper
-     */
-    private $coreParametersHelper;
-
     public function __construct(
-        FilePathResolver $filePathResolver,
-        FileProperties $fileProperties,
-        CoreParametersHelper $coreParametersHelper
+        private FilePathResolver $filePathResolver,
+        private FileProperties $fileProperties,
+        private CoreParametersHelper $coreParametersHelper
     ) {
-        $this->filePathResolver     = $filePathResolver;
-        $this->fileProperties       = $fileProperties;
-        $this->coreParametersHelper = $coreParametersHelper;
     }
 
     /**

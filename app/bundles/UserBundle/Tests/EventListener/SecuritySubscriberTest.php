@@ -11,7 +11,7 @@ use Mautic\UserBundle\UserEvents;
 
 class SecuritySubscriberTest extends \PHPUnit\Framework\TestCase
 {
-    public function testGetSubscribedEvents()
+    public function testGetSubscribedEvents(): void
     {
         $ipLookupHelper = $this->createMock(IpLookupHelper::class);
         $auditLogModel  = $this->createMock(AuditLogModel::class);
@@ -25,7 +25,7 @@ class SecuritySubscriberTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testOnSecurityInteractiveLogin()
+    public function testOnSecurityInteractiveLogin(): void
     {
         $userId   = 132564;
         $userName = 'John Doe';

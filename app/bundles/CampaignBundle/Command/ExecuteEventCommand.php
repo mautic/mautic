@@ -14,33 +14,14 @@ class ExecuteEventCommand extends Command
 {
     use WriteCountTrait;
 
-    /**
-     * @var ScheduledExecutioner
-     */
-    private $scheduledExecutioner;
-
-    /**
-     * @var TranslatorInterface
-     */
-    private $translator;
-
-    /**
-     * @var FormatterHelper
-     */
-    private $formatterHelper;
-
-    public function __construct(ScheduledExecutioner $scheduledExecutioner, TranslatorInterface $translator, FormatterHelper $formatterHelper)
-    {
+    public function __construct(
+        private ScheduledExecutioner $scheduledExecutioner,
+        private TranslatorInterface $translator,
+        private FormatterHelper $formatterHelper
+    ) {
         parent::__construct();
-
-        $this->scheduledExecutioner = $scheduledExecutioner;
-        $this->translator           = $translator;
-        $this->formatterHelper      = $formatterHelper;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function configure()
     {
         $this
@@ -69,5 +50,6 @@ class ExecuteEventCommand extends Command
 
         return \Symfony\Component\Console\Command\Command::SUCCESS;
     }
+
     protected static $defaultDescription = 'Execute specific scheduled events.';
 }
