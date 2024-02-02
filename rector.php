@@ -41,6 +41,12 @@ return static function (RectorConfig $rectorConfig): void {
             __DIR__.'/app/bundles/CoreBundle/Entity/TranslationEntityTrait.php',
         ],
 
+        // Avoiding breaking BC breaks with forced return types in public methods
+        ReturnTypeFromReturnNewRector::class => [
+            __DIR__.'/app/bundles/IntegrationsBundle/Sync/SyncProcess/Direction/Integration/ObjectChangeGenerator.php',
+            __DIR__.'/app/bundles/IntegrationsBundle/Sync/SyncProcess/Direction/Internal/ObjectChangeGenerator.php',
+        ],
+
         // lets handle later, once we have more type declaratoins
         RecastingRemovalRector::class,
 
