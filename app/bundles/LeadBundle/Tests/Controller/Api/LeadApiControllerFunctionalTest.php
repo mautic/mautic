@@ -20,9 +20,7 @@ class LeadApiControllerFunctionalTest extends MauticMysqlTestCase
         // Disable API just for specific test.
         $this->configParams['api_enabled'] = 'testDisabledApi' !== $this->getName();
 
-        $this->useMockServices = false;
-
-        self::$container->set(
+        static::getContainer()->set(
             'session',
             new Session(
                 new class() extends FixedMockFileSessionStorage {
