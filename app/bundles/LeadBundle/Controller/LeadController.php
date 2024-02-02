@@ -400,25 +400,26 @@ class LeadController extends FormController
         return $this->delegateView(
             [
                 'viewParameters' => [
-                    'lead'              => $lead,
-                    'avatarPanelState'  => $request->cookies->get('mautic_lead_avatar_panel', 'expanded'),
-                    'fields'            => $fields,
-                    'companies'         => $companies,
-                    'lists'             => $lists,
-                    'socialProfiles'    => $socialProfiles,
-                    'socialProfileUrls' => $socialProfileUrls,
-                    'places'            => $this->getPlaces($lead),
-                    'permissions'       => $permissions,
-                    'events'            => $this->getEngagements($lead),
-                    'upcomingEvents'    => $this->getScheduledCampaignEvents($lead),
-                    'engagementData'    => $this->getEngagementData($lead),
-                    'noteCount'         => $leadNoteModel->getNoteCount($lead, true),
-                    'integrations'      => $integrationRepo->getIntegrationEntityByLead($lead->getId()),
-                    'devices'           => $leadDeviceRepository->getLeadDevices($lead),
-                    'auditlog'          => $this->getAuditlogs($lead),
-                    'doNotContact'      => end($dnc),
-                    'doNotContactSms'   => end($dncSms),
-                    'pointGroups'       => $pointGroupModel->getEntities(),
+                    'lead'                   => $lead,
+                    'avatarPanelState'       => $request->cookies->get('mautic_lead_avatar_panel', 'expanded'),
+                    'fields'                 => $fields,
+                    'companies'              => $companies,
+                    'lists'                  => $lists,
+                    'socialProfiles'         => $socialProfiles,
+                    'socialProfileUrls'      => $socialProfileUrls,
+                    'places'                 => $this->getPlaces($lead),
+                    'permissions'            => $permissions,
+                    'events'                 => $this->getEngagements($lead),
+                    'upcomingEvents'         => $this->getScheduledCampaignEvents($lead),
+                    'engagementData'         => $this->getEngagementData($lead),
+                    'noteCount'              => $leadNoteModel->getNoteCount($lead, true),
+                    'integrations'           => $integrationRepo->getIntegrationEntityByLead($lead->getId()),
+                    'devices'                => $leadDeviceRepository->getLeadDevices($lead),
+                    'auditlog'               => $this->getAuditlogs($lead),
+                    'doNotContact'           => end($dnc),
+                    'doNotContactSms'        => end($dncSms),
+                    'pointGroups'            => $pointGroupModel->getEntities(),
+                    'enableExportPermission' => $this->security->isAdmin() || $this->security->isGranted('lead:export:enable', 'MATCH_ONE'),
                     // 'leadNotes'         => $this->forward(
                     //    'Mautic\LeadBundle\Controller\NoteController::indexAction',
                     //    [
@@ -2031,6 +2032,8 @@ class LeadController extends FormController
         );
 
         if (!$permissions['lead:leads:viewown'] && !$permissions['lead:leads:viewother']) {
+            return $this->accessDenied();
+        } elseif (!$this->security->isAdmin() && !$this->security->isGranted('lead:export:enable', 'MATCH_ONE')) {
             return $this->accessDenied();
         }
 
