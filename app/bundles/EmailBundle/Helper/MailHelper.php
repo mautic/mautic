@@ -38,7 +38,7 @@ use Symfony\Component\Mime\Address;
 use Symfony\Component\Mime\Header\HeaderInterface;
 use Symfony\Component\Mime\Header\UnstructuredHeader;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
-use Symfony\Component\Routing\Router;
+use Symfony\Component\Routing\RouterInterface;
 use Twig\Environment;
 
 class MailHelper
@@ -237,7 +237,7 @@ class MailHelper
         private Environment $twig,
         private PathsHelper $pathsHelper,
         private ThemeHelper $themeHelper,
-        private Router $router,
+        private RouterInterface $router,
         private RequestStack $requestStack,
         private EventDispatcherInterface $eventDispatcher,
         private EntityManagerInterface $entityManager,
