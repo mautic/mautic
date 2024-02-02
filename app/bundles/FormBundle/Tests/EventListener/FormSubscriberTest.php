@@ -4,6 +4,7 @@ namespace FormBundle\Tests\EventListener;
 
 use Mautic\CoreBundle\Entity\IpAddress;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
+use Mautic\CoreBundle\Helper\LanguageHelper;
 use Mautic\CoreBundle\Model\AuditLogModel;
 use Mautic\EmailBundle\Helper\MailHelper;
 use Mautic\FormBundle\Entity\Action;
@@ -37,6 +38,7 @@ class FormSubscriberTest extends TestCase
         $this->mailer         = $this->createMock(MailHelper::class);
         $translator           = $this->createMock(TranslatorInterface::class);
         $router               = $this->createMock(RouterInterface::class);
+        $languageHelper       = $this->createMock(LanguageHelper::class);
 
         $this->mailer->expects($this->once())
             ->method('getMailer')
@@ -47,7 +49,8 @@ class FormSubscriberTest extends TestCase
             $auditLogModel,
             $this->mailer,
             $translator,
-            $router
+            $router,
+            $languageHelper
         );
     }
 
