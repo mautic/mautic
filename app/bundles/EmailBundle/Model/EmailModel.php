@@ -264,7 +264,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
      * @param string|null $action
      * @param array       $options
      *
-     * @return FormInterface<object>
+     * @return FormInterface<Email>
      *
      * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
      */
@@ -1683,6 +1683,11 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
         }
 
         return false;
+    }
+
+    public function setDoNotContactLead(Lead $lead, string $comments, int $reason = DoNotContact::BOUNCED, bool $flush = true): false|DoNotContact
+    {
+        return $this->doNotContact->addDncForContact($lead->getId(), 'email', $reason, $comments, $flush);
     }
 
     /**

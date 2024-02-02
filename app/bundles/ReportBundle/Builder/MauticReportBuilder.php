@@ -103,7 +103,7 @@ final class MauticReportBuilder implements ReportBuilderInterface
     {
         $queryBuilder = $this->configureBuilder($options);
 
-        if (QueryBuilder::SELECT !== $queryBuilder->getType()) {
+        if (!array_key_exists('select', $queryBuilder->getQueryParts())) {
             throw new InvalidReportQueryException('Only SELECT statements are valid');
         }
 
@@ -435,6 +435,10 @@ final class MauticReportBuilder implements ReportBuilderInterface
                             case 'email':
                             case 'url':
                                 switch ($exprFunction) {
+                                    case 'like':
+                                    case 'notLike':
+                                        $filter['value'] = !str_contains($filter['value'], '%') ? '%'.$filter['value'].'%' : $filter['value'];
+                                        break;
                                     case 'startsWith':
                                         $exprFunction    = 'like';
                                         $filter['value'] = $filter['value'].'%';
@@ -464,7 +468,7 @@ final class MauticReportBuilder implements ReportBuilderInterface
             // Add the remaining $andGroup to the rest of the $orGroups if exists so we don't miss it.
             $orGroups[] = CompositeExpression::and(...$andGroup);
             $queryBuilder->andWhere(CompositeExpression::or(...$orGroups));
-        } else {
+        } elseif ($andGroup) {
             $queryBuilder->andWhere(CompositeExpression::and(...$andGroup));
         }
     }

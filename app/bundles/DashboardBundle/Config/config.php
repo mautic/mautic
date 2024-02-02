@@ -42,7 +42,7 @@ return [
     'services' => [
         'other' => [
             'mautic.dashboard.widget' => [
-                'class'     => \Mautic\DashboardBundle\Dashboard\Widget::class,
+                'class'     => Mautic\DashboardBundle\Dashboard\Widget::class,
                 'arguments' => [
                     'mautic.dashboard.model.dashboard',
                     'mautic.helper.user',

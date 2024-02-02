@@ -13,6 +13,9 @@ use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
+/**
+ * @extends AbstractType<array<mixed>>
+ */
 class FeatureSettingsType extends AbstractType
 {
     public function __construct(

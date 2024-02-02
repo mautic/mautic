@@ -23,10 +23,10 @@ use Symfony\Component\Form\ResolvedFormTypeInterface;
 trait RequestTrait
 {
     /**
-     * @param FormInterface<object> $form
-     * @param array<mixed>          $params
-     * @param array<mixed>          $masks
-     * @param array<mixed>          $fields
+     * @param FormInterface<mixed> $form
+     * @param array<mixed>         $params
+     * @param array<mixed>         $masks
+     * @param array<mixed>         $fields
      *
      * @throws \Exception
      */

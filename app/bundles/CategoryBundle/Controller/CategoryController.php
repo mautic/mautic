@@ -323,7 +323,22 @@ class CategoryController extends AbstractFormController
         } elseif (!$this->security->isGranted($model->getPermissionBase($bundle).':view')) {
             return $this->modalAccessDenied();
         } elseif ($model->isLocked($entity)) {
-            return $this->modalAccessDenied();
+            $viewParams = [
+                'page'   => $session->get('mautic.category.page', 1),
+                'bundle' => $bundle,
+            ];
+            $postActionVars = [
+                'returnUrl'       => $this->generateUrl('mautic_category_index', $viewParams),
+                'viewParameters'  => $viewParams,
+                'contentTemplate' => 'Mautic\CategoryBundle\Controller\CategoryController::indexAction',
+                'passthroughVars' => [
+                    'activeLink'    => 'mautic_'.$bundle.'category_index',
+                    'mauticContent' => 'category',
+                    'closeModal'    => 1,
+                ],
+            ];
+
+            return $this->isLocked($postActionVars, $entity, 'category.category');
         }
 
         // Create the form
