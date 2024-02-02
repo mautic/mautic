@@ -303,10 +303,9 @@ abstract class AbstractPermissions
     }
 
     /**
-     * @param string            $level
      * @param array<int|string> $permissions
      */
-    protected function addCustomPermission($level, $permissions): void
+    protected function addCustomPermission(string $level, array $permissions): void
     {
         $this->permissions[$level] = $permissions;
     }
