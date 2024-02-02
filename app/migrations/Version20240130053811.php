@@ -5,30 +5,11 @@ declare(strict_types=1);
 namespace Mautic\Migrations;
 
 use Doctrine\DBAL\Schema\Schema;
-use Doctrine\Migrations\Exception\SkipMigration;
 use Mautic\CoreBundle\Doctrine\AbstractMauticMigration;
 use Mautic\CoreBundle\Security\Cryptography\Cipher\Symmetric\OpenSSLCipher;
-use Mautic\PluginBundle\Entity\Integration;
-use Mautic\PluginBundle\Entity\IntegrationRepository;
 
 final class Version20240130053811 extends AbstractMauticMigration
 {
-    /**
-     * @throws SkipMigration
-     */
-    public function preUp(Schema $schema): void
-    {
-        $secreteKey         = $this->container->getParameter('mautic.secret_key');
-        $shouldRunMigration = true;
-        if (ctype_xdigit($secreteKey)) {
-            $shouldRunMigration = false;
-        }
-
-        if (!$shouldRunMigration) {
-            throw new SkipMigration('Schema includes this migration');
-        }
-    }
-
     public function up(Schema $schema): void
     {
         $secreteKey = $this->container->getParameter('mautic.secret_key');
@@ -37,19 +18,16 @@ final class Version20240130053811 extends AbstractMauticMigration
         $openSSLCipher = $this->container->get('mautic.cipher.openssl');
 
         // Load the \Mautic\PluginBundle\Entity\Integration entity
-        /** @var IntegrationRepository $integrationRepo */
-        $integrationRepo = $this->entityManager->getRepository(Integration::class);
-        $integrations    = $integrationRepo->getIntegrations();
+        $integrations = $this->connection->fetchAllAssociative(sprintf('select id, name, api_keys from %splugin_integration_settings WHERE api_keys <> "a:0:{}"', $this->prefix));
 
         error_reporting(E_ALL & ~E_WARNING);
 
-        /** @var Integration $integration */
         foreach ($integrations as $integration) {
-            if (empty($integration->getApiKeys())) {
+            $apiKeys = unserialize($integration['api_keys']);
+            if (empty($apiKeys)) {
                 continue;
             }
 
-            $apiKeys = $integration->getApiKeys();
             foreach ($apiKeys as $name => $apiKey) {
                 $encryptData      = explode('|', $apiKey);
                 $encryptedMessage = base64_decode($encryptData[0]);
@@ -66,10 +44,9 @@ final class Version20240130053811 extends AbstractMauticMigration
 
                 $apiKeys[$name] = $newApiKey;
             }
-            $integration->setApiKeys($apiKeys);
 
-            $integrationRepo->saveEntity($integration);
-            $this->write(sprintf('Updates api keys for "%s" plugin', $integration->getName()));
+            $this->addSql(sprintf("UPDATE %splugin_integration_settings SET api_keys = '%s' WHERE id = %s", $this->prefix, serialize($apiKeys), $integration['id']));
+            $this->write(sprintf('API Keys are updated for "%s" plugin.', $integration['name']));
         }
         $this->write('Please so check the sanity of Api keys for all configured plugins!!!');
     }
