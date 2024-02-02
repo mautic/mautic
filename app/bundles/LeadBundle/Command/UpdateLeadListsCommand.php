@@ -92,14 +92,11 @@ class UpdateLeadListsCommand extends ModeratedCommand
         } else {
             $leadLists = $this->listModel->getEntities(
                 [
-                    'iterator_mode' => true,
+                    'iterable_mode' => true,
                 ]
             );
 
-            while (false !== ($leadList = $leadLists->next())) {
-                // Get first item; using reset as the key will be the ID and not 0
-                /** @var LeadList $leadList */
-                $leadList                  = reset($leadList);
+            foreach ($leadLists as $leadList) {
                 $startTimeForSingleSegment = time();
                 $this->rebuildSegment($leadList, $batch, $max, $output);
                 if ($enableTimeMeasurement) {

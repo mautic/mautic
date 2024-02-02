@@ -11,7 +11,7 @@ class ParserTest extends \PHPUnit\Framework\TestCase
     /**
      * @testdox Test that a bounce is found through DsnReport
      *
-     * @covers  \Mautic\EmailBundle\MonitoredEmail\Processor\Bounce\Parser::parse()
+     * @covers  \Mautic\EmailBundle\MonitoredEmail\Processor\Bounce\Parser::parse
      */
     public function testBouncedEmailIsReturnedFromParsedDsnReport(): void
     {
@@ -33,7 +33,7 @@ DSN;
     /**
      * @testdox Test that a bounce is found through body
      *
-     * @covers  \Mautic\EmailBundle\MonitoredEmail\Processor\Bounce\Parser::parse()
+     * @covers  \Mautic\EmailBundle\MonitoredEmail\Processor\Bounce\Parser::parse
      */
     public function testBouncedEmailIsReturnedFromParsedBody(): void
     {

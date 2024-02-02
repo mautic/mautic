@@ -37,7 +37,7 @@ class GroupContactScore extends CommonEntity
         $builder->setTable(self::TABLE_NAME)
             ->setCustomRepositoryClass(GroupContactScoreRepository::class);
 
-        $builder->addContact(false, 'CASCADE', true, 'group_score');
+        $builder->addContact(false, 'CASCADE', true, 'groupScores');
 
         $builder->createManyToOne('group', Group::class)
             ->isPrimaryKey()

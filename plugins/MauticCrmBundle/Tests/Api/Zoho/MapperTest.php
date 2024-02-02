@@ -86,8 +86,8 @@ class MapperTest extends \PHPUnit\Framework\TestCase
     /**
      * @testdox Test that array is generated according to the mapping
      *
-     * @covers  \MauticPlugin\MauticCrmBundle\Api\Zoho\Mapper::map()
-     * @covers  \MauticPlugin\MauticCrmBundle\Api\Zoho\Mapper::getArray()
+     * @covers  \MauticPlugin\MauticCrmBundle\Api\Zoho\Mapper::map
+     * @covers  \MauticPlugin\MauticCrmBundle\Api\Zoho\Mapper::getArray
      */
     public function testArrayIsGeneratedBasedOnMapping(): void
     {
@@ -124,8 +124,8 @@ class MapperTest extends \PHPUnit\Framework\TestCase
     /**
      * @testdox Test that contacts do not inherit previous contact information
      *
-     * @covers  \MauticPlugin\MauticCrmBundle\Api\Zoho\Mapper::map()
-     * @covers  \MauticPlugin\MauticCrmBundle\Api\Zoho\Mapper::getArray()
+     * @covers  \MauticPlugin\MauticCrmBundle\Api\Zoho\Mapper::map
+     * @covers  \MauticPlugin\MauticCrmBundle\Api\Zoho\Mapper::getArray
      */
     public function testContactDoesNotInheritPreviousContactData(): void
     {
@@ -167,8 +167,8 @@ class MapperTest extends \PHPUnit\Framework\TestCase
     /**
      * @testdox Test that array is generated according to the mapping
      *
-     * @covers  \MauticPlugin\MauticCrmBundle\Api\Zoho\Mapper::map()
-     * @covers  \MauticPlugin\MauticCrmBundle\Api\Zoho\Mapper::getArray()
+     * @covers  \MauticPlugin\MauticCrmBundle\Api\Zoho\Mapper::map
+     * @covers  \MauticPlugin\MauticCrmBundle\Api\Zoho\Mapper::getArray
      */
     public function testArrayIsGeneratedBasedOnMappingWithId(): void
     {
@@ -208,7 +208,7 @@ class MapperTest extends \PHPUnit\Framework\TestCase
     /**
      * @testdox Test asking for a key returns the correct contact
      *
-     * @covers  \MauticPlugin\MauticCrmBundle\Api\Zoho\Mapper::getContactIdByKey()
+     * @covers  \MauticPlugin\MauticCrmBundle\Api\Zoho\Mapper::getContactIdByKey
      */
     public function testThatContactIdMatchesGivenKey(): void
     {
@@ -229,7 +229,7 @@ class MapperTest extends \PHPUnit\Framework\TestCase
     /**
      * @testdox Test asking for a key that doesn't exist throws exception
      *
-     * @covers  \MauticPlugin\MauticCrmBundle\Api\Zoho\Mapper::getContactIdByKey()
+     * @covers  \MauticPlugin\MauticCrmBundle\Api\Zoho\Mapper::getContactIdByKey
      */
     public function testThatExceptionIsThrownIfKeyNotFound(): void
     {

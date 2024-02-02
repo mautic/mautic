@@ -113,7 +113,7 @@ final class ThemeHelper
     {
         $errorPage = $this->getThemePath()."/error_{$code}.html.twig";
         if (file_exists($errorPage)) {
-            return ":{$this->theme}:error_{$code}.html.twig";
+            return "@themes/{$this->theme}/error_{$code}.html.twig";
         } else {
             return false;
         }
