@@ -19,16 +19,6 @@ use Mautic\IntegrationsBundle\Sync\SyncProcess\Direction\Helper\ValueHelper;
 
 class ObjectChangeGenerator
 {
-    private ?\Mautic\IntegrationsBundle\Sync\DAO\Sync\Report\ReportDAO $syncReport = null;
-
-    private ?\Mautic\IntegrationsBundle\Sync\DAO\Mapping\MappingManualDAO $mappingManual = null;
-
-    private ?\Mautic\IntegrationsBundle\Sync\DAO\Sync\Report\ObjectDAO $internalObject = null;
-
-    private ?\Mautic\IntegrationsBundle\Sync\DAO\Sync\Report\ObjectDAO $integrationObject = null;
-
-    private ?\Mautic\IntegrationsBundle\Sync\DAO\Sync\Order\ObjectChangeDAO $objectChange = null;
-
     public function __construct(
         private ValueHelper $valueHelper
     ) {

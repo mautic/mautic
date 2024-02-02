@@ -25,8 +25,6 @@ use Mautic\IntegrationsBundle\Sync\SyncProcess\Direction\Helper\ValueHelper;
 
 class ObjectChangeGenerator
 {
-    private ?\Mautic\IntegrationsBundle\Sync\DAO\Sync\Report\ObjectDAO $internalObject = null;
-
     private array $judgementModes = [
         SyncJudgeInterface::HARD_EVIDENCE_MODE,
         SyncJudgeInterface::BEST_EVIDENCE_MODE,
@@ -184,7 +182,7 @@ class ObjectChangeGenerator
         string $fieldState
     ): void {
         try {
-            $internalField = $this->internalObject->getField($fieldMappingDAO->getInternalField());
+            $internalField = $internalObject->getField($fieldMappingDAO->getInternalField());
         } catch (FieldNotFoundException) {
             $internalField = null;
         }
