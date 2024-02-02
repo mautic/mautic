@@ -1402,38 +1402,38 @@ class LeadController extends FormController
 
                     $bodyCheck = trim(strip_tags($email['body']));
                     if (!empty($bodyCheck)) {
-                        $mailer = $mailHelper->getMailer();
+                        $mailHelper->reset();
 
                         // To lead
-                        $mailer->addTo($leadEmail, $leadName);
+                        $mailHelper->addTo($leadEmail, $leadName);
 
                         if (!empty($email[EmailType::REPLY_TO_ADDRESS])) {
                             // The reply to address must be set into an email entity in order to take an effect. Otherwise it's overridden.
                             $emailEntity = new Email();
                             $emailEntity->setSubject($email['subject']);
                             $emailEntity->setReplyToAddress($email[EmailType::REPLY_TO_ADDRESS]);
-                            $mailer->setEmail($emailEntity);
+                            $mailHelper->setEmail($emailEntity);
                         }
 
-                        $mailer->setFrom(
+                        $mailHelper->setFrom(
                             $email['from'],
                             empty($email['fromname']) ? null : $email['fromname']
                         );
 
                         // Set Content
-                        $mailer->setBody($email['body']);
-                        $mailer->parsePlainText($email['body']);
+                        $mailHelper->setBody($email['body']);
+                        $mailHelper->parsePlainText($email['body']);
 
                         // Set lead
-                        $mailer->setLead($leadFields);
-                        $mailer->setIdHash();
+                        $mailHelper->setLead($leadFields);
+                        $mailHelper->setIdHash();
 
-                        $mailer->setSubject($email['subject']);
+                        $mailHelper->setSubject($email['subject']);
 
                         // Ensure safe emoji for notification
                         $subject = EmojiHelper::toHtml($email['subject']);
-                        if ($mailer->send(true, false)) {
-                            $mailer->createEmailStat();
+                        if ($mailHelper->send(true, false)) {
+                            $mailHelper->createEmailStat();
                             $this->addFlashMessage(
                                 'mautic.lead.email.notice.sent',
                                 [
@@ -1442,7 +1442,7 @@ class LeadController extends FormController
                                 ]
                             );
                         } else {
-                            $errors = $mailer->getErrors();
+                            $errors = $mailHelper->getErrors();
 
                             // Unset the array of failed email addresses
                             if (isset($errors['failures'])) {

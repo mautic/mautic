@@ -1520,42 +1520,42 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
             return false;
         }
 
-        $mailer            = $this->mailHelper->getMailer();
+        $this->mailHelper->reset();
         if (!isset($lead['companies'])) {
             $lead['companies'] = $this->companyModel->getRepository()->getCompaniesByLeadId($lead['id']);
         }
-        $mailer->setLead($lead, true);
-        $mailer->setTokens($tokens);
-        $mailer->setEmail($email, false, $emailSettings[$emailId]['slots'], $assetAttachments, !$saveStat);
-        $mailer->setCc($cc);
-        $mailer->setBcc($bcc);
+        $this->mailHelper->setLead($lead, true);
+        $this->mailHelper->setTokens($tokens);
+        $this->mailHelper->setEmail($email, false, $emailSettings[$emailId]['slots'], $assetAttachments, !$saveStat);
+        $this->mailHelper->setCc($cc);
+        $this->mailHelper->setBcc($bcc);
 
         $errors = [];
 
         $firstMail = true;
         foreach ($to as $toAddress) {
             $idHash = uniqid();
-            $mailer->setIdHash($idHash, $saveStat);
+            $this->mailHelper->setIdHash($idHash, $saveStat);
 
-            if (!$mailer->addTo($toAddress)) {
+            if (!$this->mailHelper->addTo($toAddress)) {
                 $errors[] = "{$toAddress}: ".$this->translator->trans('mautic.email.bounce.reason.bad_email');
                 continue;
             }
 
-            if (!$mailer->queue(true)) {
-                $errorArray = $mailer->getErrors();
+            if (!$this->mailHelper->queue(true)) {
+                $errorArray = $this->mailHelper->getErrors();
                 unset($errorArray['failures']);
                 $errors[] = "{$toAddress}: ".implode('; ', $errorArray);
             }
 
             if ($saveStat) {
-                $saveEntities[] = $mailer->createEmailStat(false, $toAddress);
+                $saveEntities[] = $this->mailHelper->createEmailStat(false, $toAddress);
             }
 
             // If this is the first message, flush the queue. This process clears the cc and bcc.
             if (true === $firstMail) {
                 try {
-                    $this->flushQueue($mailer);
+                    $this->flushQueue($this->mailHelper);
                 } catch (EmailCouldNotBeSentException $e) {
                     $errors[] = $e->getMessage();
                 }
@@ -1565,7 +1565,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
 
         foreach ($users as $user) {
             $idHash = uniqid();
-            $mailer->setIdHash($idHash, $saveStat);
+            $this->mailHelper->setIdHash($idHash, $saveStat);
 
             if (!is_array($user)) {
                 $id   = $user;
@@ -1586,25 +1586,25 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
                 $user['lastname']  = $userEntity->getLastName();
             }
 
-            if (!$mailer->setTo($user['email'], $user['firstname'].' '.$user['lastname'])) {
+            if (!$this->mailHelper->setTo($user['email'], $user['firstname'].' '.$user['lastname'])) {
                 $errors[] = "{$user['email']}: ".$this->translator->trans('mautic.email.bounce.reason.bad_email');
                 continue;
             }
 
-            if (!$mailer->queue(true)) {
-                $errorArray = $mailer->getErrors();
+            if (!$this->mailHelper->queue(true)) {
+                $errorArray = $this->mailHelper->getErrors();
                 unset($errorArray['failures']);
                 $errors[] = "{$user['email']}: ".implode('; ', $errorArray);
             }
 
             if ($saveStat) {
-                $saveEntities[] = $mailer->createEmailStat(false, $user['email']);
+                $saveEntities[] = $this->mailHelper->createEmailStat(false, $user['email']);
             }
 
             // If this is the first message, flush the queue. This process clears the cc and bcc.
             if (true === $firstMail) {
                 try {
-                    $this->flushQueue($mailer);
+                    $this->flushQueue($this->mailHelper);
                 } catch (EmailCouldNotBeSentException $e) {
                     $errors[] = $e->getMessage();
                 }
@@ -1613,7 +1613,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
         }
 
         try {
-            $this->flushQueue($mailer);
+            $this->flushQueue($this->mailHelper);
         } catch (EmailCouldNotBeSentException $e) {
             $errors[] = $e->getMessage();
         }
@@ -1623,7 +1623,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
         }
 
         // save some memory
-        unset($mailer);
+        $this->mailHelper->reset();
 
         return $errors;
     }
@@ -2163,15 +2163,15 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
             return false;
         }
 
-        $mailer = $this->mailHelper->getSampleMailer();
-        $mailer->setLead($leadFields, true);
-        $mailer->setTokens($tokens);
-        $mailer->setEmail($email, false, $emailSettings[$emailId]['slots'], $assetAttachments, !$saveStat);
+        $this->mailHelper->reset();
+        $this->mailHelper->setLead($leadFields, true);
+        $this->mailHelper->setTokens($tokens);
+        $this->mailHelper->setEmail($email, false, $emailSettings[$emailId]['slots'], $assetAttachments, !$saveStat);
 
         $errors = [];
         foreach ($users as $user) {
             $idHash = uniqid();
-            $mailer->setIdHash($idHash, $saveStat);
+            $this->mailHelper->setIdHash($idHash, $saveStat);
 
             if (!is_array($user)) {
                 $id   = $user;
@@ -2187,24 +2187,24 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
                 $user['lastname']  = $userEntity->getLastName();
             }
 
-            if (!$mailer->setTo($user['email'], $user['firstname'].' '.$user['lastname'])) {
+            if (!$this->mailHelper->setTo($user['email'], $user['firstname'].' '.$user['lastname'])) {
                 $errors[] = "{$user['email']}: ".$this->translator->trans('mautic.email.bounce.reason.bad_email');
             } else {
-                if (!$mailer->queue(true)) {
-                    $errorArray = $mailer->getErrors();
+                if (!$this->mailHelper->queue(true)) {
+                    $errorArray = $this->mailHelper->getErrors();
                     unset($errorArray['failures']);
                     $errors[] = "{$user['email']}: ".implode('; ', $errorArray);
                 }
 
                 if ($saveStat) {
-                    $saveEntities[] = $mailer->createEmailStat(false, $user['email']);
+                    $saveEntities[] = $this->mailHelper->createEmailStat(false, $user['email']);
                 }
             }
         }
 
         // flush the message
-        if (!$mailer->flushQueue()) {
-            $errorArray = $mailer->getErrors();
+        if (!$this->mailHelper->flushQueue()) {
+            $errorArray = $this->mailHelper->getErrors();
             unset($errorArray['failures']);
             $errors[] = implode('; ', $errorArray);
         }
@@ -2212,9 +2212,6 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
         if (isset($saveEntities)) {
             $this->getStatRepository()->saveEntities($saveEntities);
         }
-
-        // save some memory
-        unset($mailer);
 
         return $errors;
     }

@@ -2,30 +2,38 @@
 
 namespace Mautic\EmailBundle\Tests\EventListener;
 
-use Mautic\CoreBundle\Factory\MauticFactory;
+use Doctrine\ORM\EntityManagerInterface;
+use Mautic\AssetBundle\Model\AssetModel;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
+use Mautic\CoreBundle\Helper\PathsHelper;
+use Mautic\CoreBundle\Helper\ThemeHelper;
+use Mautic\CoreBundle\Twig\Helper\SlotsHelper;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Event\EmailSendEvent;
 use Mautic\EmailBundle\EventListener\TokenSubscriber;
 use Mautic\EmailBundle\Helper\FromEmailHelper;
 use Mautic\EmailBundle\Helper\MailHashHelper;
 use Mautic\EmailBundle\Helper\MailHelper;
+use Mautic\EmailBundle\Model\EmailModel;
 use Mautic\EmailBundle\MonitoredEmail\Mailbox;
 use Mautic\EmailBundle\Tests\Helper\Transport\SmtpTransport;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Helper\PrimaryCompanyHelper;
+use Mautic\PageBundle\Model\RedirectModel;
+use Mautic\PageBundle\Model\TrackableModel;
 use PHPUnit\Framework\MockObject\MockObject;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcher;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Mailer\Mailer;
+use Symfony\Component\Routing\Router;
+use Twig\Environment;
 
 class TokenSubscriberTest extends \PHPUnit\Framework\TestCase
 {
     public function testDynamicContentCustomTokens(): void
     {
-        /** @var MockObject&MauticFactory $mockFactory */
-        $mockFactory = $this->createMock(MauticFactory::class);
-
         /** @var MockObject&FromEmailHelper $fromEmailHelper */
         $fromEmailHelper = $this->createMock(FromEmailHelper::class);
 
@@ -40,6 +48,41 @@ class TokenSubscriberTest extends \PHPUnit\Framework\TestCase
 
         $mailHashHelper = new MailHashHelper($coreParametersHelper);
 
+        /** @var AssetModel|MockObject $assetModel */
+        $assetModel = $this->createMock(AssetModel::class);
+
+        /** @var EmailModel|MockObject $emailModel */
+        $emailModel = $this->createMock(EmailModel::class);
+
+        /** @var TrackableModel|MockObject $trackableModel */
+        $trackableModel = $this->createMock(TrackableModel::class);
+
+        /** @var RedirectModel|MockObject $redirectModel */
+        $redirectModel = $this->createMock(RedirectModel::class);
+
+        /** @var Environment|MockObject $twig */
+        $twig = $this->createMock(Environment::class);
+
+        /** @var PathsHelper|MockObject $pathsHelper */
+        $pathsHelper = $this->createMock(PathsHelper::class);
+
+        /** @var ThemeHelper|MockObject $themeHelper */
+        $themeHelper = $this->createMock(ThemeHelper::class);
+
+        /** @var Router|MockObject $router */
+        $router = $this->createMock(Router::class);
+
+        /** @var RequestStack|MockObject $requestStack */
+        $requestStack = $this->createMock(RequestStack::class);
+
+        /** @var EventDispatcherInterface|MockObject $eventDispatcher */
+        $eventDispatcher = $this->createMock(EventDispatcherInterface::class);
+
+        /** @var EntityManagerInterface|MockObject $entityManager */
+        $entityManager = $this->createMock(EntityManagerInterface::class);
+
+        $slotsHelper = new SlotsHelper();
+
         $coreParametersHelper->method('get')
             ->willReturnMap(
                 [
@@ -50,7 +93,25 @@ class TokenSubscriberTest extends \PHPUnit\Framework\TestCase
 
         $tokens = ['{test}' => 'value'];
 
-        $mailHelper = new MailHelper($mockFactory, new Mailer(new SmtpTransport()), $fromEmailHelper, $coreParametersHelper, $mailbox, $logger, $mailHashHelper);
+        $mailHelper = new MailHelper(
+            new Mailer(new SmtpTransport()),
+            $fromEmailHelper,
+            $coreParametersHelper,
+            $mailbox,
+            $logger,
+            $mailHashHelper,
+            $assetModel,
+            $emailModel,
+            $trackableModel,
+            $redirectModel,
+            $twig,
+            $pathsHelper,
+            $themeHelper,
+            $router,
+            $requestStack,
+            $eventDispatcher,
+            $entityManager,
+            $slotsHelper);
         $mailHelper->setTokens($tokens);
 
         $email = new Email();
