@@ -13,22 +13,6 @@ use Mautic\PluginBundle\Entity\IntegrationRepository;
 
 final class Version20240130053811 extends AbstractMauticMigration
 {
-    /**
-     * @throws SkipMigration
-     */
-    public function preUp(Schema $schema): void
-    {
-        $secreteKey         = $this->container->getParameter('mautic.secret_key');
-        $shouldRunMigration = true;
-        if (ctype_xdigit($secreteKey)) {
-            $shouldRunMigration = false;
-        }
-
-        if (!$shouldRunMigration) {
-            throw new SkipMigration('Schema includes this migration');
-        }
-    }
-
     public function up(Schema $schema): void
     {
         $secreteKey = $this->container->getParameter('mautic.secret_key');
