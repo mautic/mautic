@@ -30,10 +30,8 @@ final class SecurityHelper
 
     /**
      * Helper function to check if user is an Admin.
-     *
-     * @return bool
      */
-    public function isAdmin()
+    public function isAdmin(): bool
     {
         return $this->security->isAdmin();
     }
