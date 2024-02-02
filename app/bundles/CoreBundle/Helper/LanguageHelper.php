@@ -213,6 +213,13 @@ class LanguageHelper
             $this->fetchLanguages();
         }
 
+        if (!is_readable($this->cacheFile)) {
+            return [
+                'error'   => true,
+                'message' => 'mautic.core.language.helper.error.fetching.languages',
+            ];
+        }
+
         $cacheData = json_decode(file_get_contents($this->cacheFile), true);
 
         // Make sure the language actually exists
