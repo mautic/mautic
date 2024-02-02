@@ -109,12 +109,7 @@ class LeadType extends AbstractType
             ]
         );
 
-        $companyIds = array_map(
-            function (int $companyId) {
-                return (string) $companyId;
-            },
-            $this->companyModel->getCompanyLeadRepository()->getCompanyIdsByLeadId((int) $options['data']->getId())
-        );
+        $companyIds = $this->companyModel->getCompanyLeadRepository()->getCompanyIdsByLeadId((string) $options['data']->getId());
 
         $builder->add(
             'companies',

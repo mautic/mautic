@@ -15,7 +15,7 @@ class UserListType extends AbstractType
     /**
      * @var array<string,int>
      */
-    private $choices = [];
+    private array $choices = [];
 
     public function __construct(
         private UserModel $userModel
@@ -70,7 +70,7 @@ class UserListType extends AbstractType
             $this->choices[$user->getName(true)] = $user->getId();
         }
 
-        //sort by user name
+        // sort by user name
         ksort($this->choices);
 
         return $this->choices;

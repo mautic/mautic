@@ -104,10 +104,7 @@ class LeadModel extends FormModel
 
     private bool $repoSetup = false;
 
-    /**
-     * @var array
-     */
-    private $flattenedFields = [];
+    private array $flattenedFields = [];
 
     private array $fieldsByGroup = [];
 

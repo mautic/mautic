@@ -11,9 +11,10 @@ final class Version20211026152443 extends PreUpAssertionMigration
 {
     protected function preUpAssertions(): void
     {
-        $this->skipAssertion(function (Schema $schema) {
-            return $schema->getTable($this->getTableName())->hasIndex($this->getIndexName());
-        }, sprintf('Index %s already exists', $this->getIndexName()));
+        $this->skipAssertion(
+            fn (Schema $schema) => $schema->getTable($this->getTableName())->hasIndex($this->getIndexName()),
+            "Index {$this->getIndexName()} already exists"
+        );
     }
 
     public function up(Schema $schema): void
@@ -21,9 +22,14 @@ final class Version20211026152443 extends PreUpAssertionMigration
         $this->addSql("CREATE INDEX {$this->getIndexName()} ON {$this->getTableName()} (`object`, `field_order`, `is_published`)");
     }
 
+    public function down(Schema $schema): void
+    {
+        $this->addSql("DROP INDEX {$this->getIndexName()} ON {$this->getTableName()}");
+    }
+
     private function getTableName(): string
     {
-        return $this->getPrefixedTableName('lead_fields');
+        return "{$this->prefix}lead_fields";
     }
 
     private function getIndexName(): string

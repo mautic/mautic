@@ -7,9 +7,8 @@ namespace Mautic\LeadBundle\Tests\Controller\Api;
 use Doctrine\Common\Collections\ArrayCollection;
 use Mautic\LeadBundle\Controller\Api\CustomFieldsApiControllerTrait;
 use PHPUnit\Framework\Assert;
-use Symfony\Component\HttpFoundation\Request;
 
-class CustomFieldsApiControllerTraitTest extends \PHPUnit\Framework\TestCase
+final class CustomFieldsApiControllerTraitTest extends \PHPUnit\Framework\TestCase
 {
     public function testGetEntityFormOptions(): void
     {
@@ -28,10 +27,7 @@ class CustomFieldsApiControllerTraitTest extends \PHPUnit\Framework\TestCase
                 ],
             ];
 
-            /**
-             * @var int
-             */
-            public $getEntitiesCounter = 0;
+            public int $getEntitiesCounter = 0;
 
             /**
              * @return ArrayCollection<string, array{label: string, type: string}>
@@ -47,25 +43,12 @@ class CustomFieldsApiControllerTraitTest extends \PHPUnit\Framework\TestCase
         $controller = new class($modelFake) {
             use CustomFieldsApiControllerTrait;
 
-            /**
-             * @var object
-             */
-            private $model;
-
-            /**
-             * @var string
-             */
-            private $entityNameOne = 'lead';
-
-            /**
-             * @var Request
-             */
-            private $request;
+            private object $model;
+            private string $entityNameOne = 'lead';
 
             public function __construct(object $modelFake)
             {
-                $this->model   = $modelFake;
-                $this->request = new Request();
+                $this->model = $modelFake;
             }
 
             /**

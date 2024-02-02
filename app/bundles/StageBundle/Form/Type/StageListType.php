@@ -16,14 +16,14 @@ class StageListType extends AbstractType
     /**
      * @var array<string,int>
      */
-    private $choices = [];
+    private array $choices = [];
 
     public function __construct(private StageModel $stageModel)
     {
         $this->stageModel = $stageModel;
     }
 
-    public function configureOptions(OptionsResolver $resolver)
+    public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults([
             'choices'           => $this->getStageChoices(),
@@ -65,7 +65,7 @@ class StageListType extends AbstractType
             $this->choices[$stage->getName()] = $stage->getId();
         }
 
-        //sort by language
+        // sort by language
         ksort($this->choices);
 
         return $this->choices;

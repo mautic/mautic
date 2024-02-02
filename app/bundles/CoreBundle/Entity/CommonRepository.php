@@ -964,6 +964,12 @@ class CommonRepository extends ServiceEntityRepository
         return $clause;
     }
 
+    /**
+     * @param QueryBuilder|DbalQueryBuilder $qb
+     * @param \StdClass|mixed[]             $filters
+     *
+     * @return mixed[]
+     */
     protected function addAdvancedSearchWhereClause($qb, $filters): array
     {
         $parseFilters = [];
@@ -994,7 +1000,8 @@ class CommonRepository extends ServiceEntityRepository
     }
 
     /**
-     * @param \Doctrine\ORM\QueryBuilder|\Doctrine\DBAL\Query\QueryBuilder $qb
+     * @param QueryBuilder|DbalQueryBuilder $qb
+     * @param \StdClass                     $filter
      */
     protected function addCatchAllWhereClause($qb, $filter): array
     {
@@ -1048,7 +1055,8 @@ class CommonRepository extends ServiceEntityRepository
     }
 
     /**
-     * @param \Doctrine\ORM\QueryBuilder|\Doctrine\DBAL\Query\QueryBuilder $q
+     * @param QueryBuilder|DbalQueryBuilder $q
+     * @param \StdClass                     $filter
      */
     protected function addSearchCommandWhereClause($q, $filter): array
     {
@@ -1118,7 +1126,7 @@ class CommonRepository extends ServiceEntityRepository
 
     /**
      * @param DbalQueryBuilder|QueryBuilder $q
-     * @param object                        $filter
+     * @param \StdClass                     $filter
      */
     protected function addStandardSearchCommandWhereClause(&$q, $filter): array
     {
@@ -1704,9 +1712,13 @@ class CommonRepository extends ServiceEntityRepository
         return false;
     }
 
+    /**
+     * @param \StdClass                     $parseFilters
+     * @param QueryBuilder|DbalQueryBuilder $qb
+     */
     protected function parseSearchFilters($parseFilters, $qb, $expressions, &$parameters)
     {
-        foreach ($parseFilters as $f) {
+        foreach ($parseFilters as $f) { /** @phpstan-ignore-line we are iterating over StdClass. We should refactor this into a collection of DTO objects in M6 */
             if (isset($f->children)) {
                 [$expr, $params] = $this->addAdvancedSearchWhereClause($qb, $f);
             } else {

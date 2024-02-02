@@ -2,13 +2,13 @@
 
 namespace Mautic\LeadBundle\Controller\Api;
 
+use Doctrine\ORM\Tools\Pagination\Paginator;
 use Mautic\CoreBundle\Cache\ResultCacheOptions;
 use Mautic\LeadBundle\Entity\Company;
 use Mautic\LeadBundle\Entity\CustomFieldEntityInterface;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadField;
 use Mautic\LeadBundle\Model\FieldModel;
-use Mautic\LeadBundle\Model\LeadModel;
 use Symfony\Component\Form\Form;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
@@ -129,11 +129,14 @@ trait CustomFieldsApiControllerTrait
     {
         $object = ('company' === $this->entityNameOne) ? 'company' : 'lead';
 
-        if ($this->fieldCache[$object]) {
+        if (isset($this->fieldCache[$object])) {
             return $this->fieldCache[$object];
         }
 
-        $fields = $this->getModel('lead.field')->getEntities(
+        $model = $this->getModel('lead.field');
+        \assert($model instanceof FieldModel);
+
+        $fields = $model->getEntities(
             [
                 'filter' => [
                     'force' => [
@@ -153,6 +156,7 @@ trait CustomFieldsApiControllerTrait
                 'result_cache'   => new ResultCacheOptions(LeadField::CACHE_NAMESPACE),
             ]
         );
+        \assert($fields instanceof Paginator);
 
         $this->fieldCache[$object] = ['fields' => $fields->getIterator()];
 
@@ -206,6 +210,8 @@ trait CustomFieldsApiControllerTrait
 
     /**
      * @param string $object
+     *
+     * @return void
      */
     protected function setCleaningRules($object = 'lead')
     {
@@ -214,7 +220,7 @@ trait CustomFieldsApiControllerTrait
         $fields = $leadFieldModel->getFieldListWithProperties($object);
         foreach ($fields as $field) {
             if (!empty($field['properties']['allowHtml'])) {
-                $this->dataInputMasks[$field['alias']]  = 'html';
+                $this->dataInputMasks[$field['alias']]  = 'html'; /** @phpstan-ignore-line this is accessing a property from the parent class. Terrible. Refactor for M6. */
             }
         }
     }

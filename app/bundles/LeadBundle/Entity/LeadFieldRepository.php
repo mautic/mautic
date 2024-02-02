@@ -448,7 +448,7 @@ class LeadFieldRepository extends CommonRepository
     {
         return $this->_em->createQueryBuilder()
             ->select('f.alias, f.label, f.type, f.isUniqueIdentifer, f.charLengthLimit')
-            ->from($this->_entityName, 'f', 'f.alias')
+            ->from($this->getEntityName(), 'f', 'f.alias')
             ->where('f.object = :object')
             ->setParameter('object', $object)
             ->getQuery()
@@ -457,6 +457,9 @@ class LeadFieldRepository extends CommonRepository
 
     /**
      * @param \Doctrine\ORM\QueryBuilder|\Doctrine\DBAL\Query\QueryBuilder $q
+     * @param \StdClass                                                    $filter
+     *
+     * @return mixed[]
      */
     protected function addSearchCommandWhereClause($q, $filter): array
     {
@@ -467,7 +470,7 @@ class LeadFieldRepository extends CommonRepository
 
         $command         = $filter->command;
         $unique          = $this->generateRandomParameterName();
-        $returnParameter = false; //returning a parameter that is not used will lead to a Doctrine error
+        $returnParameter = false; // returning a parameter that is not used will lead to a Doctrine error
         $prefix          = $this->getTableAlias();
 
         switch ($command) {

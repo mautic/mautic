@@ -66,9 +66,9 @@ class CompanyLeadRepository extends CommonRepository
     }
 
     /**
-     * @return int[]
+     * @return string[]
      */
-    public function getCompanyIdsByLeadId(int $leadId): array
+    public function getCompanyIdsByLeadId(string $leadId): array
     {
         $q = $this->_em->getConnection()->createQueryBuilder();
 
@@ -78,10 +78,8 @@ class CompanyLeadRepository extends CommonRepository
             ->setParameter('leadId', $leadId);
 
         return array_map(
-            function (array $company) {
-                return (int) $company['company_id'];
-            },
-            $q->execute()->fetchAll()
+            fn (array $company) => (string) $company['company_id'],
+            $q->executeQuery()->fetchAllAssociative()
         );
     }
 
