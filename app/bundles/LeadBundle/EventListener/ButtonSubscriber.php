@@ -4,6 +4,7 @@ namespace Mautic\LeadBundle\EventListener;
 
 use Mautic\CoreBundle\CoreEvents;
 use Mautic\CoreBundle\Event\CustomButtonEvent;
+use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\CoreBundle\Twig\Helper\ButtonHelper;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Routing\RouterInterface;
@@ -13,7 +14,8 @@ class ButtonSubscriber implements EventSubscriberInterface
 {
     public function __construct(
         private TranslatorInterface $translator,
-        private RouterInterface $router
+        private RouterInterface $router,
+        private CorePermissions $security
     ) {
     }
 
@@ -29,6 +31,11 @@ class ButtonSubscriber implements EventSubscriberInterface
         if (!str_contains($event->getRoute(), 'mautic_contact_index')) {
             return;
         }
+
+        if (!$this->security->isAdmin() && !$this->security->isGranted('lead:export:enable', 'MATCH_ONE')) {
+            return;
+        }
+
         $exportRoute = $this->router->generate('mautic_contact_action', ['objectAction' => 'batchExport']);
 
         $event->addButton(
