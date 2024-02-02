@@ -1538,6 +1538,8 @@ Mautic.activateColorPicker = function(el, options) {
     input.minicolors(pickerOptions);
 
     // The previous version of the Minicolors library did not use the # in the value. This is for backwards compatibility.
+    input.val(input.val().replace('#', ''));
+
     input.on('blur', function() {
         input.val(input.val().replace('#', ''));
     });

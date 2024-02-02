@@ -8,6 +8,7 @@
 !.github/ci-files/.my.cnf
 .ddev/mautic-preference
 /.ddev/docker-compose.host-docker-internal.yaml
+!/.ddev/.env.*.dist
 !.gitpod.Dockerfile
 !.gitpod.yml
 !.ddev/commands/web/dd

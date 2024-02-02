@@ -6,6 +6,9 @@ use Mautic\CoreBundle\Form\Type\EntityLookupType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
+/**
+ * @extends AbstractType<mixed>
+ */
 class CompanyListType extends AbstractType
 {
     public function configureOptions(OptionsResolver $resolver): void

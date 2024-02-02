@@ -28,6 +28,9 @@ use Symfony\Component\Form\FormView;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
+/**
+ * @extends AbstractType<mixed>
+ */
 class ConfigType extends AbstractType
 {
     public function __construct(private TranslatorInterface $translator, private LanguageHelper $langHelper, private IpLookupFactory $ipLookupFactory, private ?AbstractLookup $ipLookup, private Shortener $shortenerFactory, private CoreParametersHelper $coreParametersHelper)
