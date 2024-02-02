@@ -65,8 +65,10 @@
                       {%- endif -%}
                       {%- set template = '@MauticForm/Field/' ~ f.type ~ '.html.twig' -%}
                   {%- endif %}
-                
+
+                  {# render theme specific form type template file or built-in template #}
                   {{- include([theme ~ f.type ~ '.html.twig', template], {
+                        'theme': theme,
                         'field': f.convertToArray,
                         'id': f.alias,
                         'formName': formName,
@@ -100,7 +102,7 @@
 
 
                   <!-- start: "{{ theme }}{{ template }}" -->
-                  {%- if theme is empty -%}                    
+                  {%- if theme is empty -%}
                   {{- include(theme ~ f.type ~ '.html.twig', {
                           'field': f.convertToArray,
                           'id': f.alias,
@@ -112,7 +114,7 @@
                           'language': form.getLanguage()
 
                   }) -}}
-                  {%- else -%}                    
+                  {%- else -%}
                   {{- include(template, {
                           'field': f.convertToArray,
                           'id': f.alias,
@@ -124,7 +126,7 @@
                           'language': form.getLanguage()
 
                   }) -}}
-                {%- endif -%}                    
+                {%- endif -%}
                   <!-- end: "{{ theme }}{{ template }}" -->
                 {%- endif -%}
               {%- endfor -%}

@@ -157,7 +157,7 @@ jobs:
       if: ${{matrix.commands == 'PHPSTAN'}}
       uses: actions/cache@v4
       with:
-        path: ./var/cache/phpstan
+        path: ./var/phpstan-cache
         key: ${{ runner.os }}-phpstan-${{ hashFiles('**/composer.lock') }}-${{ github.run_id }}
         restore-keys: |
           ${{ runner.os }}-phpstan-${{ hashFiles('**/composer.lock') }}
