@@ -2213,6 +2213,9 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
             $this->getStatRepository()->saveEntities($saveEntities);
         }
 
+        // save some memory
+        $this->mailHelper->reset();
+
         return $errors;
     }
 
