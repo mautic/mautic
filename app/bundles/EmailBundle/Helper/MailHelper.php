@@ -19,6 +19,7 @@ use Mautic\EmailBundle\Helper\Exception\OwnerNotFoundException;
 use Mautic\EmailBundle\Mailer\Exception\BatchQueueMaxException;
 use Mautic\EmailBundle\Mailer\Message\MauticMessage;
 use Mautic\EmailBundle\Mailer\Transport\TokenTransportInterface;
+use Mautic\EmailBundle\Model\EmailModel;
 use Mautic\EmailBundle\MonitoredEmail\Mailbox;
 use Mautic\LeadBundle\Entity\Lead;
 use Psr\Log\LoggerInterface;
@@ -226,7 +227,8 @@ class MailHelper
         private CoreParametersHelper $coreParametersHelper,
         private Mailbox $mailbox,
         private LoggerInterface $logger,
-        private MailHashHelper $mailHashHelper
+        private MailHashHelper $mailHashHelper,
+        private EmailModel $emailModel,
     ) {
         $this->transport  = $this->getTransport();
         $this->returnPath = $coreParametersHelper->get('mailer_return_path');
