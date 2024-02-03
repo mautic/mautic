@@ -37,6 +37,8 @@
 /var/cache/*
 !/var/cache/.gitkeep
 
+/var/phpstan-cache/*
+
 /app/logs/*
 !/app/logs/.gitkeep
 /var/logs/*
