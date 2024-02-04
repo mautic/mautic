@@ -1727,6 +1727,7 @@
         },
         {
             "name": "doctrine/dbal",
+<<<<<<< HEAD
             "version": "3.7.2",
             "source": {
                 "type": "git",
@@ -1737,6 +1738,18 @@
                 "type": "zip",
                 "url": "https://api.github.com/repos/doctrine/dbal/zipball/0ac3c270590e54910715e9a1a044cc368df282b2",
                 "reference": "0ac3c270590e54910715e9a1a044cc368df282b2",
+=======
+            "version": "3.8.1",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/doctrine/dbal.git",
+                "reference": "c9ea252cdce4da324ede3d6c5913dd89f769afd2"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/doctrine/dbal/zipball/c9ea252cdce4da324ede3d6c5913dd89f769afd2",
+                "reference": "c9ea252cdce4da324ede3d6c5913dd89f769afd2",
+>>>>>>> 068461e5e7 (bump doctrine packages to the latest releases)
                 "shasum": ""
             },
             "require": {
@@ -1752,6 +1765,7 @@
                 "doctrine/coding-standard": "12.0.0",
                 "fig/log-test": "^1",
                 "jetbrains/phpstorm-stubs": "2023.1",
+<<<<<<< HEAD
                 "phpstan/phpstan": "1.10.42",
                 "phpstan/phpstan-strict-rules": "^1.5",
                 "phpunit/phpunit": "9.6.13",
@@ -1760,6 +1774,16 @@
                 "squizlabs/php_codesniffer": "3.7.2",
                 "symfony/cache": "^5.4|^6.0",
                 "symfony/console": "^4.4|^5.4|^6.0",
+=======
+                "phpstan/phpstan": "1.10.57",
+                "phpstan/phpstan-strict-rules": "^1.5",
+                "phpunit/phpunit": "9.6.16",
+                "psalm/plugin-phpunit": "0.18.4",
+                "slevomat/coding-standard": "8.13.1",
+                "squizlabs/php_codesniffer": "3.8.1",
+                "symfony/cache": "^5.4|^6.0|^7.0",
+                "symfony/console": "^4.4|^5.4|^6.0|^7.0",
+>>>>>>> 068461e5e7 (bump doctrine packages to the latest releases)
                 "vimeo/psalm": "4.30.0"
             },
             "suggest": {
@@ -1820,7 +1844,11 @@
             ],
             "support": {
                 "issues": "https://github.com/doctrine/dbal/issues",
+<<<<<<< HEAD
                 "source": "https://github.com/doctrine/dbal/tree/3.7.2"
+=======
+                "source": "https://github.com/doctrine/dbal/tree/3.8.1"
+>>>>>>> 068461e5e7 (bump doctrine packages to the latest releases)
             },
             "funding": [
                 {
@@ -1836,7 +1864,11 @@
                     "type": "tidelift"
                 }
             ],
+<<<<<<< HEAD
             "time": "2023-11-19T08:06:58+00:00"
+=======
+            "time": "2024-02-03T17:33:49+00:00"
+>>>>>>> 068461e5e7 (bump doctrine packages to the latest releases)
         },
         {
             "name": "doctrine/deprecations",
