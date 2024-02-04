@@ -58,6 +58,11 @@ class DoNotContactFilterQueryBuilderTest extends TestCase
     }
 
     /**
+<<<<<<< HEAD
+=======
+     * @dataProvider dataApplyQueryWithBatchLimitersMinMaxBoth
+     *
+>>>>>>> de384098e2 (phpcs fixes needed due to update)
      * @param array<string, mixed> $batchLimiters
      */
     private function createFilter(string $operator, string $parameterValue, array $batchLimiters = []): ContactSegmentFilter

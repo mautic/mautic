@@ -29,10 +29,14 @@ trait MockedConnectionTrait
     }
 
 <<<<<<< HEAD
+<<<<<<< HEAD
     private function passThrough(MockObject $object, string $class, string $method, ?InvocationOrder $invocationRule = null): void
 =======
     private function passThrough(MockObject $object, string $class, string $method, InvocationOrder $invocationRule = null): void
 >>>>>>> 81b90388fa (Adapt tests to be compatible to the changes in the QueryBuilder:: getSQLForSelect() method)
+=======
+    private function passThrough(MockObject $object, string $class, string $method, ?InvocationOrder $invocationRule = null): void
+>>>>>>> de384098e2 (phpcs fixes needed due to update)
     {
         if (!$invocationRule) {
             $invocationRule = new AnyInvokedCount();
