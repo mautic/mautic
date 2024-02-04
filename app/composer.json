@@ -98,7 +98,7 @@
     "matomo/device-detector": "^4.0",
     "symfony/lock": "^5.1",
     "composer/package-versions-deprecated": "1.11.99.1",
-    "phpoffice/phpspreadsheet": "^1.15",
+    "phpoffice/phpspreadsheet": "^1.15 < 1.28",
     "predis/predis": "^1.1",
     "composer/composer": "^2.2",
     "beberlei/doctrineextensions": "^1.3",
