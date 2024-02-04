@@ -14,12 +14,18 @@ trait MockedConnectionTrait
     {
         $platform = $this->createMock(AbstractPlatform::class);
 <<<<<<< HEAD
+<<<<<<< HEAD
         // Following line is needed once we update to doctrine/dbal >= 3.8.0.
         // This allows easy mocking of the createSelectSQLBuilder method without needing to mock the whole chain.
         // $this->passThrough($platform, AbstractPlatform::class, 'createSelectSQLBuilder');
 =======
         $this->passThrough($platform, AbstractPlatform::class, 'createSelectSQLBuilder');
 >>>>>>> 81b90388fa (Adapt tests to be compatible to the changes in the QueryBuilder:: getSQLForSelect() method)
+=======
+        // Following line is needed once we update to doctrine/dbal >= 3.8.0.
+        // This allows easy mocking of the createSelectSQLBuilder method without needing to mock the whole chain.
+        // $this->passThrough($platform, AbstractPlatform::class, 'createSelectSQLBuilder');
+>>>>>>> 19815833a6 (temp restrict doctrine/dbal version to prevent large deprecation refactor)
 
         $connection = $this->createMock(Connection::class);
         $connection->method('getDatabasePlatform')
