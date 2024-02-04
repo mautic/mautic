@@ -6044,10 +6044,14 @@
                 "type": "path",
                 "url": "app",
 <<<<<<< HEAD
+<<<<<<< HEAD
                 "reference": "ff04262752d9b0a30c80be568ceeb5a585fc3cda"
 =======
                 "reference": "5d076ac8de44cbac09d23cd025a21257bc2b201e"
 >>>>>>> c898f59bc8 (bump jms/serializer-bundle dependency and ensure compatibility)
+=======
+                "reference": "a2fefb6250e5d342a5148891c216cf3bc9f3521b"
+>>>>>>> c69eb9fd76 (bump and restrict phpoffice/phpspreadsheet to a version compatible with Mautic)
             },
             "require": {
                 "aws/aws-sdk-php": "~3.0",
