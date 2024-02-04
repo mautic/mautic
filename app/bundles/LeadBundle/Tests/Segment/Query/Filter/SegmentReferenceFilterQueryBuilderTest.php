@@ -33,21 +33,21 @@ class SegmentReferenceFilterQueryBuilderTest extends MauticMysqlTestCase
     /**
      * @var MockObject|RandomParameterName
      */
-    private \PHPUnit\Framework\MockObject\MockObject $randomParameterMock;
+    private MockObject $randomParameterMock;
 
     /**
      * @var MockObject|EventDispatcherInterface
      */
-    private \PHPUnit\Framework\MockObject\MockObject $dispatcherMock;
+    private MockObject $dispatcherMock;
 
     /**
      * @var Connection|MockObject
      */
-    private \PHPUnit\Framework\MockObject\MockObject $connectionMock;
+    private MockObject $connectionMock;
 
-    private \Mautic\LeadBundle\Segment\Query\Filter\SegmentReferenceFilterQueryBuilder $queryBuilder;
+    private SegmentReferenceFilterQueryBuilder $queryBuilder;
 
-    private \Mautic\LeadBundle\Entity\LeadList $segment;
+    private LeadList $segment;
 
     public function setUp(): void
     {

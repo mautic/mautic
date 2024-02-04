@@ -29,19 +29,19 @@ class ChannelClickQueryBuilderTest extends TestCase
     /**
      * @var MockObject|RandomParameterName
      */
-    private \PHPUnit\Framework\MockObject\MockObject $randomParameterMock;
+    private MockObject $randomParameterMock;
 
     /**
      * @var MockObject|EventDispatcherInterface
      */
-    private \PHPUnit\Framework\MockObject\MockObject $dispatcherMock;
+    private MockObject $dispatcherMock;
 
     /**
      * @var Connection|MockObject
      */
-    private \PHPUnit\Framework\MockObject\MockObject $connectionMock;
+    private MockObject $connectionMock;
 
-    private \Mautic\LeadBundle\Segment\Query\Filter\ChannelClickQueryBuilder $queryBuilder;
+    private ChannelClickQueryBuilder $queryBuilder;
 
     public function setUp(): void
     {
@@ -125,7 +125,7 @@ class ChannelClickQueryBuilderTest extends TestCase
     /**
      * @dataProvider dataApplyQueryWithBatchLimitersMinMaxBoth
      *
-     *  @param array<string, mixed> $batchLimiters
+     * @param array<string, mixed> $batchLimiters
      */
     public function testApplyQueryWithBatchLimitersMinMaxBoth(array $batchLimiters, string $operator, string $parameterValue, string $expectedQuery): void
     {
@@ -145,7 +145,7 @@ class ChannelClickQueryBuilderTest extends TestCase
     }
 
     /**
-     *  @param array<string, mixed> $batchLimiters
+     * @param array<string, mixed> $batchLimiters
      */
     private function getContactSegmentFilter(string $operator, string $parameterValue, array $batchLimiters = []): ContactSegmentFilter
     {

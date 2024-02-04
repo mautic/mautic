@@ -25,17 +25,17 @@ final class MauticReportBuilderTest extends TestCase
     /**
      * @var MockObject|EventDispatcherInterface
      */
-    private \PHPUnit\Framework\MockObject\MockObject $dispatcher;
+    private MockObject $dispatcher;
 
     /**
      * @var MockObject|Connection
      */
-    private \PHPUnit\Framework\MockObject\MockObject $connection;
+    private MockObject $connection;
 
     /**
      * @var MockObject|ChannelListHelper
      */
-    private \Mautic\ChannelBundle\Helper\ChannelListHelper $channelListHelper;
+    private ChannelListHelper $channelListHelper;
 
     protected function setUp(): void
     {

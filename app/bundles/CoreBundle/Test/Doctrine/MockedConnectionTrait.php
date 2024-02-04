@@ -22,7 +22,7 @@ trait MockedConnectionTrait
         return $connection;
     }
 
-    private function passThrough(MockObject $object, string $class, string $method, InvocationOrder $invocationRule = null): void
+    private function passThrough(MockObject $object, string $class, string $method, ?InvocationOrder $invocationRule = null): void
     {
         if (!$invocationRule) {
             $invocationRule = new AnyInvokedCount();

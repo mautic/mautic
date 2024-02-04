@@ -31,14 +31,14 @@ class ForeignValueFilterQueryBuilderTest extends TestCase
     /**
      * @var EventDispatcherInterface&MockObject
      */
-    private \PHPUnit\Framework\MockObject\MockObject $dispatcher;
+    private MockObject $dispatcher;
 
     private ForeignValueFilterQueryBuilder $queryBuilder;
 
     /**
      * @var Connection&MockObject
      */
-    private \PHPUnit\Framework\MockObject\MockObject $connectionMock;
+    private MockObject $connectionMock;
 
     public function setUp(): void
     {
@@ -192,7 +192,7 @@ class ForeignValueFilterQueryBuilderTest extends TestCase
     /**
      * @dataProvider dataApplyQueryWithBatchFilters
      *
-     *  @param array<string, mixed> $batchLimiters
+     * @param array<string, mixed> $batchLimiters
      */
     public function testApplyQueryWithBatchFilters(array $batchLimiters, string $operator, string $parameterValue, string $expectedQuery): void
     {
