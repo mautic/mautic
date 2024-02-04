@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Mautic\LeadBundle\Tests\Segment\Query\Filter;
 
 use Doctrine\DBAL\Connection;
+use Mautic\CoreBundle\Test\Doctrine\MockedConnectionTrait;
 use Mautic\LeadBundle\Segment\ContactSegmentFilter;
 use Mautic\LeadBundle\Segment\DoNotContact\DoNotContactParts;
 use Mautic\LeadBundle\Segment\Query\Filter\DoNotContactFilterQueryBuilder;
@@ -16,6 +17,8 @@ use Symfony\Component\EventDispatcher\EventDispatcher;
 
 class DoNotContactFilterQueryBuilderTest extends TestCase
 {
+    use MockedConnectionTrait;
+
     public function testGetServiceId(): void
     {
         Assert::assertSame('mautic.lead.query.builder.special.dnc', DoNotContactFilterQueryBuilder::getServiceId());
@@ -51,14 +54,7 @@ class DoNotContactFilterQueryBuilderTest extends TestCase
 
     private function createConnection(): Connection
     {
-        return new class() extends Connection {
-            /**
-             * @noinspection PhpMissingParentConstructorInspection
-             */
-            public function __construct()
-            {
-            }
-        };
+        return $this->getMockedConnection();
     }
 
     /**

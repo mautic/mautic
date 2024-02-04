@@ -6,6 +6,7 @@ namespace Mautic\LeadBundle\Tests\Segment\Query\Filter;
 
 use Doctrine\DBAL\Connection;
 use Doctrine\ORM\EntityManager;
+use Mautic\CoreBundle\Test\Doctrine\MockedConnectionTrait;
 use Mautic\LeadBundle\Provider\FilterOperatorProvider;
 use Mautic\LeadBundle\Segment\ContactSegmentFilter;
 use Mautic\LeadBundle\Segment\ContactSegmentFilterCrate;
@@ -24,6 +25,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class ForeignValueFilterQueryBuilderTest extends TestCase
 {
+    use MockedConnectionTrait;
     private RandomParameterName $randomParameter;
 
     /**
@@ -43,7 +45,7 @@ class ForeignValueFilterQueryBuilderTest extends TestCase
         parent::setUp();
         $this->randomParameter     = new RandomParameterName();
         $this->dispatcher          = $this->createMock(EventDispatcherInterface::class);
-        $this->connectionMock      = $this->createMock(Connection::class);
+        $this->connectionMock      = $this->getMockedConnection();
         $this->queryBuilder        = new ForeignValueFilterQueryBuilder(
             $this->randomParameter,
             $this->dispatcher

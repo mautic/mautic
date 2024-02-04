@@ -9,6 +9,7 @@ use Doctrine\DBAL\Query\Expression\CompositeExpression;
 use Doctrine\DBAL\Query\Expression\ExpressionBuilder;
 use Doctrine\DBAL\Query\QueryBuilder;
 use Mautic\ChannelBundle\Helper\ChannelListHelper;
+use Mautic\CoreBundle\Test\Doctrine\MockedConnectionTrait;
 use Mautic\CoreBundle\Translation\Translator;
 use Mautic\ReportBundle\Builder\MauticReportBuilder;
 use Mautic\ReportBundle\Entity\Report;
@@ -20,6 +21,7 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 final class MauticReportBuilderTest extends TestCase
 {
+    use MockedConnectionTrait;
     /**
      * @var MockObject|EventDispatcherInterface
      */
@@ -40,7 +42,7 @@ final class MauticReportBuilderTest extends TestCase
         parent::setUp();
 
         $this->dispatcher          = $this->createMock(EventDispatcherInterface::class);
-        $this->connection          = $this->createMock(Connection::class);
+        $this->connection          = $this->getMockedConnection();
         $this->channelListHelper   = new ChannelListHelper($this->createMock(EventDispatcher::class), $this->createMock(Translator::class));
 
         $this->connection->method('createQueryBuilder')->willReturnOnConsecutiveCalls(

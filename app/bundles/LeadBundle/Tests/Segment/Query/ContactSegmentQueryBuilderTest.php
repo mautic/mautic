@@ -6,6 +6,7 @@ namespace Mautic\LeadBundle\Tests\Segment\Query;
 
 use Doctrine\DBAL\Connection;
 use Doctrine\ORM\EntityManager;
+use Mautic\CoreBundle\Test\Doctrine\MockedConnectionTrait;
 use Mautic\LeadBundle\Segment\Query\ContactSegmentQueryBuilder;
 use Mautic\LeadBundle\Segment\Query\QueryBuilder;
 use Mautic\LeadBundle\Segment\RandomParameterName;
@@ -15,6 +16,8 @@ use Symfony\Component\EventDispatcher\EventDispatcher;
 
 class ContactSegmentQueryBuilderTest extends TestCase
 {
+    use MockedConnectionTrait;
+
     public function testAddNewContactsRestrictions(): void
     {
         $queryBuilder = new QueryBuilder($this->createConnection());
@@ -59,13 +62,6 @@ class ContactSegmentQueryBuilderTest extends TestCase
 
     private function createConnection(): Connection
     {
-        return new class() extends Connection {
-            /**
-             * @noinspection PhpMissingParentConstructorInspection
-             */
-            public function __construct()
-            {
-            }
-        };
+        return $this->getMockedConnection();
     }
 }

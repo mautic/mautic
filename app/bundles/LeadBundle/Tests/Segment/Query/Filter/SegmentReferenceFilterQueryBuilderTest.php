@@ -6,6 +6,7 @@ namespace Mautic\LeadBundle\Tests\Segment\Query\Filter;
 
 use Doctrine\DBAL\Connection;
 use Doctrine\ORM\EntityManager;
+use Mautic\CoreBundle\Test\Doctrine\MockedConnectionTrait;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\LeadBundle\Provider\FilterOperatorProviderInterface;
@@ -27,6 +28,8 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class SegmentReferenceFilterQueryBuilderTest extends MauticMysqlTestCase
 {
+    use MockedConnectionTrait;
+
     /**
      * @var MockObject|RandomParameterName
      */
@@ -51,7 +54,7 @@ class SegmentReferenceFilterQueryBuilderTest extends MauticMysqlTestCase
         parent::setUp();
         $this->randomParameterMock = $this->createMock(RandomParameterName::class);
         $this->dispatcherMock      = $this->createMock(EventDispatcherInterface::class);
-        $this->connectionMock      = $this->createMock(Connection::class);
+        $this->connectionMock      = $this->getMockedConnection();
 
         $this->queryBuilder        = new SegmentReferenceFilterQueryBuilder(
             $this->randomParameterMock,
@@ -60,9 +63,6 @@ class SegmentReferenceFilterQueryBuilderTest extends MauticMysqlTestCase
             $this->createMock(ContactSegmentFilterFactory::class),
             $this->dispatcherMock
         );
-
-        $this->connectionMock->method('quote')
-            ->willReturnArgument(0);
 
         $this->segment = $this->createNewSegment();
     }
