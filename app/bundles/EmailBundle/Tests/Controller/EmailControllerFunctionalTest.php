@@ -36,7 +36,7 @@ final class EmailControllerFunctionalTest extends MauticMysqlTestCase
      */
     public function testViewEmail(): void
     {
-        $email   = $this->createEmail('ABC', 'template', 'list', 'blank', 'Test html');
+        $email = $this->createEmail('ABC', 'template', 'list', 'blank', 'Test html');
         $email->setDateAdded(new \DateTime('2020-02-07 20:29:02'));
         $email->setDateModified(new \DateTime('2020-03-21 20:29:02'));
         $email->setCreatedByUser('Test User');
@@ -424,7 +424,7 @@ final class EmailControllerFunctionalTest extends MauticMysqlTestCase
         $form           = $buttonCrawler->form();
         $form['emailform[subject]']->setValue('Email B Subject var 2');
         $form['emailform[name]']->setValue('Email B var 2');
-        $form['emailform[variantSettings][weight]']->setValue((string)$varientSetting['totalWeight']);
+        $form['emailform[variantSettings][weight]']->setValue((string) $varientSetting['totalWeight']);
         $form['emailform[variantSettings][winnerCriteria]']->setValue($varientSetting['winnerCriteria']);
         $form['emailform[isPublished]']->setValue('1');
 
@@ -472,7 +472,9 @@ final class EmailControllerFunctionalTest extends MauticMysqlTestCase
         $email->setTemplate($template);
         $email->setCustomHtml($customHtml);
         $email->setVariantSettings($varientSetting);
-        $email->addList($segment);
+        if (!empty($segment)) {
+            $email->addList($segment);
+        }
         $this->em->persist($email);
 
         return $email;
