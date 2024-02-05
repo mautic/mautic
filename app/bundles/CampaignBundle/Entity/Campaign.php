@@ -43,10 +43,7 @@ class Campaign extends FormEntity implements PublishStatusIconAttributesInterfac
      */
     private $publishDown;
 
-    /**
-     * @Groups({"campaign:read", "campaign:write"})
-     */
-    public ?\DateTimeInterface $deleted;
+    public ?\DateTimeInterface $deleted = null;
 
     /**
      * @var \Mautic\CategoryBundle\Entity\Category|null
@@ -195,6 +192,7 @@ class Campaign extends FormEntity implements PublishStatusIconAttributesInterfac
                     'events',
                     'publishUp',
                     'publishDown',
+                    'deleted'
                 ]
             )
             ->build();

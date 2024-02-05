@@ -619,7 +619,7 @@ SQL;
         $table_name    = $this->getTableName();
         $sql           = "DELETE FROM {$table_name} WHERE campaign_id = (?) LIMIT ".self::LOG_DELETE_BATCH_SIZE;
         $conn          = $this->getEntityManager()->getConnection();
-        while ($conn->executeQuery($sql, [$campaignId], [ArrayParameterType::INTEGER])->rowCount()) {
+        while ($conn->executeQuery($sql, [$campaignId], [Types::INTEGER])->rowCount()) {
         }
     }
 
