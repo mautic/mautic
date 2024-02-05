@@ -198,10 +198,7 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
      */
     private $queuedCount = 0;
 
-    /**
-     * @var bool
-     */
-    private $isCloned = false;
+    private bool $isCloned = false;
 
     /**
      * In some use cases, we need to get the original email ID after it's been cloned.
