@@ -625,7 +625,7 @@ class SubmissionModel extends CommonFormModel
     /**
      * @param array<string> $contentType
      */
-    protected function setExportResponseHeaders(StreamedResponse $response, string $filename, array $contentType): void
+    private function setExportResponseHeaders(StreamedResponse $response, string $filename, array $contentType): void
     {
         foreach ($contentType as $ct) {
             $response->headers->set('Content-Type', $ct);

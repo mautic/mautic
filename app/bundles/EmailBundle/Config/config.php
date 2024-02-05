@@ -20,12 +20,12 @@ return [
                 'controller' => 'Mautic\EmailBundle\Controller\EmailController::contactsAction',
             ],
             'mautic_email_countries_stats'      => [
-                'path'       => '/email-countries-stats/preview/{objectId}',
-                'controller' => 'Mautic\EmailBundle\Controller\EmailTableStatsController::viewAction',
+                'path'       => '/email/countries-stats/preview/{objectId}',
+                'controller' => 'Mautic\EmailBundle\Controller\EmailController::countryStatsAction',
             ],
             'mautic_email_countries_stats_export' => [
-                'path'         => '/email-countries-stats/{objectId}/export/{format}',
-                'controller'   => 'Mautic\EmailBundle\Controller\EmailTableStatsController::exportAction',
+                'path'         => '/email/countries-stats/export/{objectId}/{format}',
+                'controller'   => 'Mautic\EmailBundle\Controller\EmailController::exportAction',
             ],
         ],
         'api' => [

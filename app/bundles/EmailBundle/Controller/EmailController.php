@@ -2,18 +2,26 @@
 
 namespace Mautic\EmailBundle\Controller;
 
+use Doctrine\DBAL\Exception;
+use Doctrine\Persistence\ManagerRegistry;
 use Mautic\AssetBundle\Model\AssetModel;
 use Mautic\CoreBundle\Controller\BuilderControllerTrait;
 use Mautic\CoreBundle\Controller\FormController;
 use Mautic\CoreBundle\Controller\FormErrorMessagesTrait;
 use Mautic\CoreBundle\Event\DetermineWinnerEvent;
+use Mautic\CoreBundle\Factory\MauticFactory;
+use Mautic\CoreBundle\Factory\ModelFactory;
 use Mautic\CoreBundle\Factory\PageHelperFactoryInterface;
 use Mautic\CoreBundle\Form\Type\BuilderSectionType;
 use Mautic\CoreBundle\Form\Type\DateRangeType;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\EmojiHelper;
+use Mautic\CoreBundle\Helper\ExportHelper;
 use Mautic\CoreBundle\Helper\InputHelper;
+use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Model\AuditLogModel;
+use Mautic\CoreBundle\Security\Permissions\CorePermissions;
+use Mautic\CoreBundle\Service\FlashBag;
 use Mautic\CoreBundle\Translation\Translator;
 use Mautic\CoreBundle\Twig\Helper\AssetsHelper;
 use Mautic\CoreBundle\Twig\Helper\SlotsHelper;
@@ -21,12 +29,19 @@ use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Form\Type\BatchSendType;
 use Mautic\EmailBundle\Form\Type\ExampleSendType;
 use Mautic\EmailBundle\Model\EmailModel;
+use Mautic\FormBundle\Helper\FormFieldHelper;
 use Mautic\LeadBundle\Controller\EntityContactsTrait;
 use Mautic\LeadBundle\Model\ListModel;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\Form;
+use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\StreamedResponse;
+use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Routing\RouterInterface;
 
@@ -37,6 +52,23 @@ class EmailController extends FormController
     use EntityContactsTrait;
 
     public const EXAMPLE_EMAIL_SUBJECT_PREFIX = '[TEST]';
+
+    public function __construct(
+        FormFactoryInterface $formFactory,
+        FormFieldHelper $fieldHelper,
+        ManagerRegistry $managerRegistry,
+        MauticFactory $factory, ModelFactory
+        $modelFactory, UserHelper $userHelper,
+        CoreParametersHelper $coreParametersHelper,
+        EventDispatcherInterface $dispatcher,
+        Translator $translator,
+        FlashBag $flashBag,
+        RequestStack $requestStack,
+        CorePermissions $security,
+        protected ExportHelper $exportHelper
+    ) {
+        parent::__construct($formFactory, $fieldHelper, $managerRegistry, $factory, $modelFactory, $userHelper, $coreParametersHelper, $dispatcher, $translator, $flashBag, $requestStack, $security);
+    }
 
     /**
      * @param int $page
@@ -1488,5 +1520,106 @@ class EmailController extends FormController
     protected function getDefaultOrderDirection(): string
     {
         return 'DESC';
+    }
+
+    protected function getEmailModel(): EmailModel
+    {
+        $model = $this->getModel('email');
+        \assert($model instanceof EmailModel);
+
+        return $model;
+    }
+
+    /**
+     * @return array<int|string, array<int|string, int|string>>
+     *
+     * @throws Exception
+     */
+    public function getData(Email $entity): array
+    {
+        $model = $this->getEmailModel();
+
+        // get A/B test information
+        $parent = $entity->getVariantParent();
+
+        // get translation parent
+        $translationParent = $entity->getTranslationParent();
+        $includeVariants = (($entity->isVariant() && empty($parent)) || ($entity->isTranslation() && empty($translationParent)));
+
+        return $model->getCountryStats(
+            $entity,
+            $includeVariants,
+        );
+    }
+
+    public function hasAccess(Email $entity): bool
+    {
+        return $this->security->hasEntityAccess(
+            'email:emails:viewown',
+            'email:emails:viewother',
+            $entity->getCreatedBy()
+        );
+    }
+
+    /**
+     * @return array<int, string>
+     */
+    public function getExportHeader(): array
+    {
+        return [
+            $this->translator->trans('mautic.lead.lead.thead.country'),
+            $this->translator->trans('mautic.email.graph.line.stats.sent'),
+            $this->translator->trans('mautic.email.graph.line.stats.read'),
+            $this->translator->trans('mautic.email.clicked'),
+        ];
+    }
+
+    /**
+     * @throws \Exception
+     */
+    public function countryStatsAction(
+        int $objectId
+    ): Response {
+        $model = $this->getEmailModel();
+        $entity = $model->getEntity($objectId);
+
+        if (empty($entity) || !$this->hasAccess($entity)) {
+            throw new AccessDeniedHttpException();
+        }
+
+        $statsCountries = $this->getData($entity);
+
+        return $this->render(
+            '@MauticCore/Helper/countries_table.html.twig',
+            [
+                'data'           => $statsCountries,
+                'object'         => $entity,
+            ]
+        );
+    }
+
+    /**
+     * @throws \Exception
+     */
+    public function exportAction(int $objectId, string $format = 'csv'): StreamedResponse|Response
+    {
+        $model = $this->getEmailModel();
+        $entity = $model->getEntity($objectId);
+
+        if (empty($entity) || !$this->hasAccess($entity)) {
+            throw new AccessDeniedHttpException();
+        }
+
+        $filename       = $model->getExportFilename($entity->getName()).'.'.$format;
+        $headerRow      = $this->getExportHeader($entity);
+        $statsCountries = $this->getData($entity);
+
+        if (empty($statsCountries)) {
+            throw new NotFoundHttpException();
+        }
+
+        $this->exportHelper->setHeaderRow($headerRow);
+
+        return $this->exportHelper->exportDataAs(array_values($statsCountries), $format, $filename);
     }
 }

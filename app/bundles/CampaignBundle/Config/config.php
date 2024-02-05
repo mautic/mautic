@@ -28,12 +28,12 @@ return [
                 'controller' => 'Mautic\EmailBundle\Controller\PublicController::previewAction',
             ],
             'mautic_campaign_countries_stats'      => [
-                'path'       => '/campaign-countries-stats/preview/{objectId}',
-                'controller' => 'Mautic\CampaignBundle\Controller\CampaignTableStatsController::viewAction',
+                'path'       => '/campaign/countries-stats/preview/{objectId}',
+                'controller' => 'Mautic\CampaignBundle\Controller\CampaignController::countryStatsAction',
             ],
             'mautic_campaign_countries_stats_export' => [
-                'path'         => '/campaign-countries-stats/{objectId}/export/{format}',
-                'controller'   => 'Mautic\CampaignBundle\Controller\CampaignTableStatsController::exportAction',
+                'path'         => '/campaign/countries-stats/export/{objectId}/{format}',
+                'controller'   => 'Mautic\CampaignBundle\Controller\CampaignController::exportAction',
             ],
         ],
         'api'  => [

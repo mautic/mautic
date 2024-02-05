@@ -21,7 +21,6 @@ use Mautic\CoreBundle\Helper\Chart\LineChart;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Model\FormModel as CommonFormModel;
-use Mautic\CoreBundle\Model\TableModelInterface;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\CoreBundle\Translation\Translator;
 use Mautic\EmailBundle\Entity\Stat;
@@ -39,10 +38,8 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 /**
  * @extends CommonFormModel<Campaign>
- *
- * @implements TableModelInterface<Campaign>
  */
-class CampaignModel extends CommonFormModel implements TableModelInterface
+class CampaignModel extends CommonFormModel
 {
     public function __construct(
         protected ListModel $leadListModel,
@@ -768,13 +765,11 @@ class CampaignModel extends CommonFormModel implements TableModelInterface
     }
 
     /**
-     * @param Campaign $entity
-     *
      * @return array<int|string, array<string, int|string|null>>
      *
      * @throws Exception
      */
-    public function getCountryStats($entity, bool $includeVariants = false): array
+    public function getCountryStats(Campaign $entity): array
     {
         $eventsEmailsSend     = $entity->getEmailSendEvents();
         $eventsIds            = $eventsEmailsSend->getKeys();

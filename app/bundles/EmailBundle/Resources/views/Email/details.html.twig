@@ -317,6 +317,10 @@
 
               <!-- #countries-stats-container -->
               <div class="tab-pane bdr-w-0" id="countries-stats-container">
+                  <div id="countries-stats"
+                       data-target-url="{{ path('mautic_email_countries_stats', {'objectId': email.id }) }}">
+                    <div class="spinner"><i class="fa fa-spin fa-spinner"></i></div>
+                  </div>
                   <div class="std-toolbar btn-group download-toolbar">
                       <a class="btn btn-default disabled"
                          href="{{ path('mautic_email_countries_stats_export', {'objectId': email.id, 'format': 'csv'}) }}"
@@ -329,10 +333,6 @@
                       >
                           <span><i class="fa fa-file-excel-o"></i><span class="hidden-xs hidden-sm">{{ 'mautic.core.export.xlsx'|trans }}</span></span>
                       </a>
-                  </div>
-                  <div id="countries-stats"
-                       data-target-url="{{ path('mautic_email_countries_stats', {'objectId': email.id }) }}">
-                    <div class="spinner"><i class="fa fa-spin fa-spinner"></i></div>
                   </div>
               </div>
               <!--/ #translation-container -->

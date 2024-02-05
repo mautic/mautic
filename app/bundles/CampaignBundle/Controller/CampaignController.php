@@ -3,6 +3,7 @@
 namespace Mautic\CampaignBundle\Controller;
 
 use Doctrine\DBAL\Cache\CacheException;
+use Doctrine\DBAL\Exception;
 use Doctrine\Persistence\ManagerRegistry;
 use Mautic\CampaignBundle\Entity\Campaign;
 use Mautic\CampaignBundle\Entity\Event;
@@ -20,6 +21,7 @@ use Mautic\CoreBundle\Factory\ModelFactory;
 use Mautic\CoreBundle\Factory\PageHelperFactoryInterface;
 use Mautic\CoreBundle\Form\Type\DateRangeType;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
+use Mautic\CoreBundle\Helper\ExportHelper;
 use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\CoreBundle\Service\FlashBag;
@@ -38,6 +40,9 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Session\Session;
+use Symfony\Component\HttpFoundation\StreamedResponse;
+use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 class CampaignController extends AbstractStandardFormController
 {
@@ -99,7 +104,8 @@ class CampaignController extends AbstractStandardFormController
         Translator $translator,
         FlashBag $flashBag,
         private RequestStack $requestStack,
-        CorePermissions $security
+        CorePermissions $security,
+        protected ExportHelper $exportHelper
     ) {
         parent::__construct($formFactory, $fieldHelper, $managerRegistry, $factory, $modelFactory, $userHelper, $coreParametersHelper, $dispatcher, $translator, $flashBag, $requestStack, $security);
     }
@@ -1178,5 +1184,95 @@ class CampaignController extends AbstractStandardFormController
     protected function getDefaultOrderDirection(): string
     {
         return 'DESC';
+    }
+
+    public function hasAccess(Campaign $entity): bool
+    {
+        return $this->security->hasEntityAccess(
+            'campaign:campaigns:viewown',
+            'campaign:campaigns:viewother',
+            $entity->getCreatedBy()
+        );
+    }
+
+    /**
+     * @return array<int, string>
+     */
+    public function getExportHeader(Campaign $entity): array
+    {
+        $headers = [
+            $this->translator->trans('mautic.lead.lead.thead.country'),
+            $this->translator->trans('mautic.lead.leads'),
+        ];
+
+        if ($entity->isEmailCampaign()) {
+            array_push($headers,
+                $this->translator->trans('mautic.email.graph.line.stats.sent'),
+                $this->translator->trans('mautic.email.graph.line.stats.read'),
+                $this->translator->trans('mautic.email.clicked')
+            );
+        }
+
+        return $headers;
+    }
+
+    /**
+     * @param Campaign $entity
+     *
+     * @return array<int|string, array<int|string, int|string>>
+     *
+     * @throws Exception
+     */
+    public function getData(Campaign $entity): array
+    {
+        return $this->getCampaignModel()->getCountryStats($entity);
+    }
+
+    /**
+     * @throws \Exception
+     */
+    public function countryStatsAction(
+        int $objectId
+    ): Response {
+        $entity = $this->getCampaignModel()->getEntity($objectId);
+
+        if (empty($entity) || !$this->hasAccess($entity)) {
+            throw new AccessDeniedHttpException();
+        }
+
+        $statsCountries = $this->getData($entity);
+
+        return $this->render(
+            '@MauticCore/Helper/countries_table.html.twig',
+            [
+                'data'           => $statsCountries,
+                'object'         => $entity,
+            ]
+        );
+    }
+
+    /**
+     * @throws \Exception
+     */
+    public function exportAction(int $objectId, string $format = 'csv'): StreamedResponse|Response
+    {
+        $model = $this->getCampaignModel();
+        $entity = $model->getEntity($objectId);
+
+        if (empty($entity) || !$this->hasAccess($entity)) {
+            throw new AccessDeniedHttpException();
+        }
+
+        $filename       = $model->getExportFilename($entity->getName()).'.'.$format;
+        $headerRow      = $this->getExportHeader($entity);
+        $statsCountries = $this->getData($entity);
+
+        if (empty($statsCountries)) {
+            throw new NotFoundHttpException();
+        }
+
+        $this->exportHelper->setHeaderRow($headerRow);
+
+        return $this->exportHelper->exportDataAs(array_values($statsCountries), $format, $filename);
     }
 }
