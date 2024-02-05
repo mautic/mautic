@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\CampaignBundle\Tests\Functional\Entity;
 
+use Mautic\CampaignBundle\Entity\LeadEventLog;
 use Mautic\CampaignBundle\Entity\LeadEventLogRepository;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use PHPUnit\Framework\Assert;
@@ -15,8 +16,8 @@ class LeadEventLogRepositoryTest extends MauticMysqlTestCase
         $eventId    = random_int(200, 2000);
         $connection = $this->em->getConnection();
 
-        /** @var LeadEventLogRepository $leadEventLogRepository */
-        $leadEventLogRepository = $this->em->getRepository(\Mautic\CampaignBundle\Entity\LeadEventLog::class);
+        $leadEventLogRepository = $this->em->getRepository(LeadEventLog::class);
+        \assert($leadEventLogRepository instanceof LeadEventLogRepository);
 
         $insertStatement = $connection->prepare('INSERT INTO `'.MAUTIC_TABLE_PREFIX.'campaign_lead_event_log` (`event_id`, `lead_id`, `rotation`, `is_scheduled`, `system_triggered`) VALUES (?, ?, ?, ?, ?);');
 
@@ -28,7 +29,7 @@ class LeadEventLogRepositoryTest extends MauticMysqlTestCase
 
         Assert::assertCount(3, $leadEventLogRepository->findAll());
 
-        $leadEventLogRepository->removeEventLogs($eventId);
+        $leadEventLogRepository->removeEventLogs([(string) $eventId]);
 
         Assert::assertCount(0, $leadEventLogRepository->findAll());
     }

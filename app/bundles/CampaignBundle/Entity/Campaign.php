@@ -17,6 +17,7 @@ use Symfony\Component\Validator\Mapping\ClassMetadata;
 
 class Campaign extends FormEntity implements PublishStatusIconAttributesInterface
 {
+    public const TABLE_NAME = 'campaigns';
     /**
      * @var int
      */
@@ -41,6 +42,11 @@ class Campaign extends FormEntity implements PublishStatusIconAttributesInterfac
      * @var \DateTimeInterface|null
      */
     private $publishDown;
+
+    /**
+     * @Groups({"campaign:read", "campaign:write"})
+     */
+    public ?\DateTimeInterface $deleted;
 
     /**
      * @var \Mautic\CategoryBundle\Entity\Category|null
@@ -97,7 +103,7 @@ class Campaign extends FormEntity implements PublishStatusIconAttributesInterfac
     {
         $builder = new ClassMetadataBuilder($metadata);
 
-        $builder->setTable('campaigns')
+        $builder->setTable(self::TABLE_NAME)
             ->setCustomRepositoryClass(CampaignRepository::class);
 
         $builder->addIdColumns();
@@ -139,6 +145,7 @@ class Campaign extends FormEntity implements PublishStatusIconAttributesInterfac
             ->build();
 
         $builder->addNamedField('allowRestart', 'boolean', 'allow_restart');
+        $builder->addNullableField('deleted', 'datetime');
     }
 
     public static function loadValidatorMetadata(ClassMetadata $metadata): void
@@ -326,7 +333,12 @@ class Campaign extends FormEntity implements PublishStatusIconAttributesInterfac
 
     public function getRootEvents(): ArrayCollection
     {
-        $criteria = Criteria::create()->where(Criteria::expr()->isNull('parent'));
+        $criteria = Criteria::create()->where(
+            Criteria::expr()->andX(
+                Criteria::expr()->isNull('parent'),
+                Criteria::expr()->isNull('deleted')
+            )
+        );
         $events   = $this->getEvents()->matching($criteria);
 
         // Doctrine loses the indexBy mapping definition when using matching so we have to manually reset them.
@@ -579,6 +591,17 @@ class Campaign extends FormEntity implements PublishStatusIconAttributesInterfac
         $this->allowRestart = $allowRestart;
 
         return $this;
+    }
+
+    public function setDeleted(?\DateTimeInterface $deleted): void
+    {
+        $this->isChanged('deleted', $deleted);
+        $this->deleted = $deleted;
+    }
+
+    public function isDeleted(): bool
+    {
+        return !is_null($this->deleted);
     }
 
     /**

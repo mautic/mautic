@@ -129,14 +129,41 @@ class CampaignModel extends CommonFormModel
     }
 
     /**
-     * @param object $entity
+     * Delete an array of campaigns.
+     *
+     * @param int[] $campaignIds
+     *
+     * @return array<int,Campaign>
      */
+    public function deleteEntities($campaignIds): array
+    {
+        $entities = [];
+        foreach ($campaignIds as $campaignId) {
+            $campaign = $this->getEntity($campaignId);
+            if ($campaign) {
+                $entities[$campaignId] = $campaign;
+                $this->deleteEntity($campaign);
+            }
+        }
+
+        return $entities;
+    }
+
     public function deleteEntity($entity): void
     {
         // Null all the event parents for this campaign to avoid database constraints
         $this->getEventRepository()->nullEventParents($entity->getId());
+        $event = $this->dispatchEvent('pre_delete', $entity);
+        $this->getRepository()->setCampaignAsDeleted($entity->getId());
 
-        parent::deleteEntity($entity);
+        $this->dispatcher->dispatch(CampaignEvents::ON_CAMPAIGN_DELETE, new Events\DeleteCampaign($entity));
+    }
+
+    public function deleteCampaign(Campaign $campaign): void
+    {
+        $campaign->deletedId = $campaign->getId();
+        $this->getRepository()->deleteEntity($campaign);
+        $this->dispatchEvent('post_delete', $campaign);
     }
 
     /**

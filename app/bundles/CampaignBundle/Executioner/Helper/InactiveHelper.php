@@ -111,8 +111,9 @@ class InactiveHelper
     {
         $collection = new ArrayCollection();
 
-        /** @var Event $decision */
-        if ($decision = $this->eventRepository->find($decisionId)) {
+        /** @var Event|null $decision */
+        $decision = $this->eventRepository->find($decisionId);
+        if ($decision && !$decision->isDeleted()) {
             $collection->set($decision->getId(), $decision);
         }
 
