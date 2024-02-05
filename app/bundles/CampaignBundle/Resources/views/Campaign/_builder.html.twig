@@ -33,7 +33,7 @@
             {% endfor %}
 
             {% for event in campaignEvents %}
-                {% if event.deleted is not empty %}
+                {% if event.deleted is empty %}
                   {% set settings = eventSettings[event.eventType][event.type]|default(null) %}
                   {{- include(settings['template']|default('@MauticCampaign/Event/_generic.html.twig'), {
                         'event': event,
