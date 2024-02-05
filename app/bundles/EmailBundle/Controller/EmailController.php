@@ -57,8 +57,7 @@ class EmailController extends FormController
         FormFactoryInterface $formFactory,
         FormFieldHelper $fieldHelper,
         ManagerRegistry $managerRegistry,
-        MauticFactory $factory, ModelFactory
-        $modelFactory, UserHelper $userHelper,
+        MauticFactory $factory, ModelFactory $modelFactory, UserHelper $userHelper,
         CoreParametersHelper $coreParametersHelper,
         EventDispatcherInterface $dispatcher,
         Translator $translator,
@@ -1544,7 +1543,7 @@ class EmailController extends FormController
 
         // get translation parent
         $translationParent = $entity->getTranslationParent();
-        $includeVariants = (($entity->isVariant() && empty($parent)) || ($entity->isTranslation() && empty($translationParent)));
+        $includeVariants   = (($entity->isVariant() && empty($parent)) || ($entity->isTranslation() && empty($translationParent)));
 
         return $model->getCountryStats(
             $entity,
@@ -1580,7 +1579,7 @@ class EmailController extends FormController
     public function countryStatsAction(
         int $objectId
     ): Response {
-        $model = $this->getEmailModel();
+        $model  = $this->getEmailModel();
         $entity = $model->getEntity($objectId);
 
         if (empty($entity) || !$this->hasAccess($entity)) {
@@ -1603,7 +1602,7 @@ class EmailController extends FormController
      */
     public function exportAction(int $objectId, string $format = 'csv'): StreamedResponse|Response
     {
-        $model = $this->getEmailModel();
+        $model  = $this->getEmailModel();
         $entity = $model->getEntity($objectId);
 
         if (empty($entity) || !$this->hasAccess($entity)) {
@@ -1611,7 +1610,7 @@ class EmailController extends FormController
         }
 
         $filename       = $model->getExportFilename($entity->getName()).'.'.$format;
-        $headerRow      = $this->getExportHeader($entity);
+        $headerRow      = $this->getExportHeader();
         $statsCountries = $this->getData($entity);
 
         if (empty($statsCountries)) {

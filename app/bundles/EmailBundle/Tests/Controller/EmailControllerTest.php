@@ -120,7 +120,7 @@ class EmailControllerTest extends \PHPUnit\Framework\TestCase
         $this->flashBagMock         = $this->createMock(FlashBag::class);
         $this->requestStack         = new RequestStack();
         $this->corePermissionsMock  = $this->createMock(CorePermissions::class);
-        $exportHelper = $this->createMock(ExportHelper::class);
+        $exportHelper               = $this->createMock(ExportHelper::class);
 
         $helperUserMock->method('getUser')
             ->willReturn(new User(false));
