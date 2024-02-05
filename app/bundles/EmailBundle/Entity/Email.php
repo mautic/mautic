@@ -600,11 +600,6 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
         return $this->isCloned;
     }
 
-    public function getClonedId()
-    {
-        return (int) $this->clonedId;
-    }
-
     public function getRevision()
     {
         return $this->revision;
@@ -1106,6 +1101,11 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
     public function getPendingCount()
     {
         return $this->pendingCount;
+    }
+
+    public function getClonedId(): ?int
+    {
+        return $this->clonedId;
     }
 
     public function isBackgroundSending(): bool
