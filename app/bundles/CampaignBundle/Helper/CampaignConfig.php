@@ -8,11 +8,8 @@ use Mautic\CoreBundle\Helper\CoreParametersHelper;
 
 final class CampaignConfig
 {
-    private CoreParametersHelper $coreParametersHelper;
-
-    public function __construct(CoreParametersHelper $coreParametersHelper)
+    public function __construct(private CoreParametersHelper $coreParametersHelper)
     {
-        $this->coreParametersHelper = $coreParametersHelper;
     }
 
     public function shouldDeleteEventLogInBackground(): bool

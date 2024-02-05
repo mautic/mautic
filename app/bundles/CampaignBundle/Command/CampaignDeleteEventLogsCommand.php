@@ -20,17 +20,8 @@ class CampaignDeleteEventLogsCommand extends Command
      */
     public const COMMAND_NAME = 'mautic:campaign:delete-event-logs';
 
-    private LeadEventLogRepository $leadEventLogRepository;
-
-    private CampaignModel $campaignModel;
-
-    private EventModel $eventModel;
-
-    public function __construct(LeadEventLogRepository $leadEventLogRepository, CampaignModel $campaignModel, EventModel $eventModel)
+    public function __construct(private LeadEventLogRepository $leadEventLogRepository, private CampaignModel $campaignModel, private EventModel $eventModel)
     {
-        $this->leadEventLogRepository = $leadEventLogRepository;
-        $this->campaignModel          = $campaignModel;
-        $this->eventModel             = $eventModel;
         parent::__construct();
     }
 

@@ -4,21 +4,26 @@ declare(strict_types=1);
 
 namespace Mautic\CampaignBundle\Tests\Model;
 
-use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
 use Mautic\CampaignBundle\CampaignEvents;
 use Mautic\CampaignBundle\Entity\Event;
 use Mautic\CampaignBundle\Entity\EventRepository;
-use Mautic\CampaignBundle\Entity\LeadEventLogRepository;
 use Mautic\CampaignBundle\Event\DeleteEvent;
 use Mautic\CampaignBundle\Model\EventModel;
+use Mautic\CoreBundle\Helper\CoreParametersHelper;
+use Mautic\CoreBundle\Helper\UserHelper;
+use Mautic\CoreBundle\Security\Permissions\CorePermissions;
+use Mautic\CoreBundle\Translation\Translator;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 class EventModelTest extends TestCase
 {
     /**
-     * @var EntityManager|MockObject
+     * @var EntityManagerInterface|MockObject
      */
     private $entityManagerMock;
 
@@ -28,15 +33,28 @@ class EventModelTest extends TestCase
     private $eventRepositoryMock;
 
     /**
-     * @var EventModel
+     * @var EventDispatcherInterface|MockObject
      */
-    private \PHPUnit\Framework\MockObject\MockObject $eventModel;
+    private $dispatcherMock;
+
+    private MockObject|EventModel $eventModel;
 
     protected function setUp(): void
     {
-        $this->entityManagerMock   = $this->createMock(EntityManager::class);
+        $this->entityManagerMock   = $this->createMock(EntityManagerInterface::class);
         $this->eventRepositoryMock = $this->createMock(EventRepository::class);
-        $this->eventModel          = new EventModel();
+        $this->dispatcherMock      = $this->createMock(EventDispatcherInterface::class);
+
+        $this->eventModel          = new EventModel(
+            $this->entityManagerMock,
+            $this->createMock(CorePermissions::class),
+            $this->dispatcherMock,
+            $this->createMock(UrlGeneratorInterface::class),
+            $this->createMock(Translator::class),
+            $this->createMock(UserHelper::class),
+            $this->createMock(LoggerInterface::class),
+            $this->createMock(CoreParametersHelper::class)
+        );
     }
 
     public function testThatClonedEventsDoNotAttemptNullingParentInDeleteEvents(): void
@@ -56,7 +74,6 @@ class EventModelTest extends TestCase
             'new1',
         ];
 
-        $this->eventModel->setEntityManager($this->entityManagerMock);
         $this->eventModel->deleteEvents($currentEvents, $deletedEvents);
     }
 
@@ -85,13 +102,10 @@ class EventModelTest extends TestCase
             ->method('setEventsAsDeleted')
             ->with([1 => $idToDelete]);
 
-        $dispatcherMock = $this->createMock(EventDispatcherInterface::class);
-        $dispatcherMock->expects($this->once())
+        $this->dispatcherMock->expects($this->once())
             ->method('dispatch')
-            ->with(CampaignEvents::ON_EVENT_DELETE, new DeleteEvent([$idToDelete]));
+            ->with(new DeleteEvent([$idToDelete]), CampaignEvents::ON_EVENT_DELETE);
 
-        $this->eventModel->setEntityManager($this->entityManagerMock);
-        $this->eventModel->setDispatcher($dispatcherMock);
         $this->eventModel->deleteEvents($currentEvents, $deletedEvents);
     }
 

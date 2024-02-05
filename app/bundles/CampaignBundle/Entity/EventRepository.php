@@ -2,7 +2,7 @@
 
 namespace Mautic\CampaignBundle\Entity;
 
-use Doctrine\DBAL\Connection;
+use Doctrine\DBAL\ArrayParameterType;
 use Mautic\CoreBundle\Entity\CommonRepository;
 
 /**
@@ -113,7 +113,7 @@ class EventRepository extends CommonRepository
         $q = $this->getEntityManager()->createQueryBuilder();
 
         $q->select('e')
-            ->from(\Mautic\CampaignBundle\Entity\Event::class, 'e', 'e.id')
+            ->from(Event::class, 'e', 'e.id')
             ->where(
                 $q->expr()->eq('IDENTITY(e.parent)', (int) $parentId)
             );
@@ -145,7 +145,7 @@ class EventRepository extends CommonRepository
     {
         $q = $this->getEntityManager()->createQueryBuilder();
         $q->select('e, IDENTITY(e.parent)')
-            ->from(\Mautic\CampaignBundle\Entity\Event::class, 'e', 'e.id')
+            ->from(Event::class, 'e', 'e.id')
             ->where(
                 $q->expr()->eq('IDENTITY(e.campaign)', (int) $campaignId)
             )
@@ -178,7 +178,7 @@ class EventRepository extends CommonRepository
             ->from(MAUTIC_TABLE_PREFIX.Event::TABLE_NAME, 'e')
             ->where($q->expr()->eq('e.campaign_id', $campaignId));
 
-        return array_column($q->execute()->fetchAllAssociative(), 'id');
+        return array_column($q->executeQuery()->fetchAllAssociative(), 'id');
     }
 
     /**
@@ -256,7 +256,7 @@ class EventRepository extends CommonRepository
         $qb = $this->getEntityManager()->createQueryBuilder();
         $qb->delete(Event::class, 'e')
             ->where($qb->expr()->in('e.id', ':event_ids'))
-            ->setParameter('event_ids', $eventIds, Connection::PARAM_INT_ARRAY)
+            ->setParameter('event_ids', $eventIds, ArrayParameterType::INTEGER)
             ->getQuery()
             ->execute();
     }
@@ -274,7 +274,7 @@ class EventRepository extends CommonRepository
             ->where(
                 $qb->expr()->in('id', $eventIds)
             )
-            ->execute();
+            ->executeStatement();
     }
 
     public function getTableAlias(): string
@@ -300,7 +300,7 @@ class EventRepository extends CommonRepository
         $q = $this->getEntityManager()->createQueryBuilder();
 
         $q->select('e')
-            ->from(\Mautic\CampaignBundle\Entity\Event::class, 'e', 'e.id')
+            ->from(Event::class, 'e', 'e.id')
             ->where('e.channel = :channel')
             ->setParameter('channel', $channel);
 
@@ -325,7 +325,7 @@ class EventRepository extends CommonRepository
     {
         $q = $this->getEntityManager()->createQueryBuilder()
             ->select('e, c, l')
-            ->from(\Mautic\CampaignBundle\Entity\Event::class, 'e')
+            ->from(Event::class, 'e')
             ->join('e.campaign', 'c')
             ->join('e.log', 'l');
 

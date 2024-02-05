@@ -3,11 +3,9 @@
 namespace Mautic\CampaignBundle\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\DBAL\ArrayParameterType;
 use Doctrine\DBAL\Cache\QueryCacheProfile;
 use Doctrine\DBAL\Types\Types;
-use Doctrine\DBAL\Connection;
-use Doctrine\DBAL\ParameterType;
-use Doctrine\DBAL\Types\Type;
 use Mautic\CampaignBundle\Executioner\ContactFinder\Limiter\ContactLimiter;
 use Mautic\CoreBundle\Entity\CommonRepository;
 use Mautic\CoreBundle\Helper\Chart\ChartQuery;
@@ -21,7 +19,7 @@ class LeadEventLogRepository extends CommonRepository
     use TimelineTrait;
     use ContactLimiterTrait;
     use ReplicaConnectionTrait;
-    const LOG_DELETE_BATCH_SIZE = 5000;
+    public const LOG_DELETE_BATCH_SIZE = 5000;
 
     public function getEntities(array $args = [])
     {
@@ -621,7 +619,7 @@ SQL;
         $table_name    = $this->getTableName();
         $sql           = "DELETE FROM {$table_name} WHERE campaign_id = (?) LIMIT ".self::LOG_DELETE_BATCH_SIZE;
         $conn          = $this->getEntityManager()->getConnection();
-        while ($conn->executeQuery($sql, [$campaignId], [ParameterType::INTEGER])->rowCount()) {
+        while ($conn->executeQuery($sql, [$campaignId], [ArrayParameterType::INTEGER])->rowCount()) {
         }
     }
 
@@ -633,7 +631,7 @@ SQL;
         $table_name    = $this->getTableName();
         $sql           = "DELETE FROM {$table_name} WHERE event_id IN (?) ORDER BY event_id ASC LIMIT ".self::LOG_DELETE_BATCH_SIZE;
         $conn          = $this->getEntityManager()->getConnection();
-        while ($conn->executeQuery($sql, [$eventIds], [Connection::PARAM_INT_ARRAY])->rowCount()) {
+        while ($conn->executeQuery($sql, [$eventIds], [ArrayParameterType::INTEGER])->rowCount()) {
         }
     }
 }

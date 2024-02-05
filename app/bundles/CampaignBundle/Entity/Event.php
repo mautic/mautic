@@ -183,7 +183,7 @@ class Event implements ChannelInterface
         $builder = new ClassMetadataBuilder($metadata);
 
         $builder->setTable(self::TABLE_NAME)
-            ->setCustomRepositoryClass(\Mautic\CampaignBundle\Entity\EventRepository::class)
+            ->setCustomRepositoryClass(EventRepository::class)
             ->addIndex(['type', 'event_type'], 'campaign_event_search')
             ->addIndex(['event_type'], 'campaign_event_type')
             ->addIndex(['channel', 'channel_id'], 'campaign_event_channel');
@@ -491,7 +491,7 @@ class Event implements ChannelInterface
     }
 
     /**
-     * @return \Mautic\CampaignBundle\Entity\Campaign
+     * @return Campaign
      */
     public function getCampaign()
     {
@@ -585,7 +585,7 @@ class Event implements ChannelInterface
     }
 
     /**
-     * @return \Doctrine\Common\Collections\Collection
+     * @return Collection
      */
     public function getLog()
     {
@@ -718,7 +718,7 @@ class Event implements ChannelInterface
     }
 
     /**
-     * @return \DateTime|null
+     * @return mixed
      */
     public function getTriggerDate()
     {

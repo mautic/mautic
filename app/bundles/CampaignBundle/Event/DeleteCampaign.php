@@ -8,11 +8,8 @@ use Mautic\CampaignBundle\Entity\Campaign;
 
 final class DeleteCampaign extends \Symfony\Contracts\EventDispatcher\Event
 {
-    private Campaign $campaign;
-
-    public function __construct(Campaign $campaign)
+    public function __construct(private Campaign $campaign)
     {
-        $this->campaign = $campaign;
     }
 
     public function getCampaign(): Campaign

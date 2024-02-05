@@ -54,7 +54,7 @@ final class CampaignEvents
      *
      * @var string
      */
-    const ON_CAMPAIGN_DELETE = 'mautic.on_campaign_delete';
+    public const ON_CAMPAIGN_DELETE = 'mautic.on_campaign_delete';
 
     /**
      * The mautic.campaign_on_build event is dispatched before displaying the campaign builder form to allow adding of custom actions.
@@ -112,7 +112,7 @@ final class CampaignEvents
      *
      * @var string
      */
-    const ON_EVENT_DELETE = 'mautic.on_event_delete';
+    public const ON_EVENT_DELETE = 'mautic.on_event_delete';
 
     /**
      * The mautic.on_after_events_delete event is dispatched when a campaign events are deleted.
@@ -121,7 +121,7 @@ final class CampaignEvents
      *
      * @var string
      */
-    const ON_AFTER_EVENTS_DELETE = 'mautic.on_after_events_delete';
+    public const ON_AFTER_EVENTS_DELETE = 'mautic.on_after_events_delete';
 
     /**
      * The mautic.campaign_on_event_executed_batch event is dispatched when a batch of campaign events are executed.

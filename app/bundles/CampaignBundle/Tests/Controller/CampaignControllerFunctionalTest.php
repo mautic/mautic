@@ -46,8 +46,8 @@ class CampaignControllerFunctionalTest extends AbstractCampaignTest
         $this->configParams[self::CAMPAIGN_SUMMARY_PARAM] = in_array($this->getName(), $functionForUseSummary);
         $this->configParams[self::CAMPAIGN_RANGE_PARAM]   = in_array($this->getName(), $functionForUseRange);
         parent::setUp();
-        $this->campaignModel      = static::getContainer()->get('mautic.model.factory')->getModel('campaign');
-        $this->campaignLeadsLabel = static::getContainer()->get('translator')->trans('mautic.campaign.campaign.leads');
+        $this->campaignModel                                           = static::getContainer()->get('mautic.model.factory')->getModel('campaign');
+        $this->campaignLeadsLabel                                      = static::getContainer()->get('translator')->trans('mautic.campaign.campaign.leads');
         $this->configParams['delete_campaign_event_log_in_background'] = false;
     }
 
