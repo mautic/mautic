@@ -15,34 +15,19 @@ use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
+/**
+ * @extends AbstractType<mixed>
+ */
 class CampaignEventLeadFieldValueType extends AbstractType
 {
-    /**
-     * @var Translator
-     */
-    protected $translator;
-
-    /**
-     * @var LeadModel
-     */
-    protected $leadModel;
-
-    /**
-     * @var FieldModel
-     */
-    protected $fieldModel;
-
-    public function __construct(Translator $translator, LeadModel $leadModel, FieldModel $fieldModel)
-    {
-        $this->translator = $translator;
-        $this->leadModel  = $leadModel;
-        $this->fieldModel = $fieldModel;
+    public function __construct(
+        protected Translator $translator,
+        protected LeadModel $leadModel,
+        protected FieldModel $fieldModel
+    ) {
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder->add(
             'field',
@@ -70,7 +55,7 @@ class CampaignEventLeadFieldValueType extends AbstractType
         );
 
         // function to add 'template' choice field dynamically
-        $func = function (FormEvent $e) {
+        $func = function (FormEvent $e): void {
             $data = $e->getData();
             $form = $e->getForm();
 
@@ -125,7 +110,7 @@ class CampaignEventLeadFieldValueType extends AbstractType
                                         $fieldValues
                                     );
 
-                                    $choiceAttr = function ($value, $key, $index) use ($customValue) {
+                                    $choiceAttr = function ($value, $key, $index) use ($customValue): array {
                                         if ($customValue === $value) {
                                             return ['data-custom' => 1];
                                         }
@@ -224,9 +209,6 @@ class CampaignEventLeadFieldValueType extends AbstractType
         $builder->addEventListener(FormEvents::PRE_SUBMIT, $func);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getBlockPrefix()
     {
         return 'campaignevent_lead_field_value';

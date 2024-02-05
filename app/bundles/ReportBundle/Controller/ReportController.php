@@ -16,6 +16,7 @@ use Mautic\ReportBundle\Scheduler\Model\FileHandler;
 use Symfony\Component\HttpFoundation;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\ResponseHeaderBag;
 
 class ReportController extends FormController
@@ -64,8 +65,9 @@ class ReportController extends FormController
             $filter['force'][] = ['column' => 'r.createdBy', 'expr' => 'eq', 'value' => $this->user->getId()];
         }
 
-        $orderBy    = $request->getSession()->get('mautic.report.orderby', 'r.name');
-        $orderByDir = $request->getSession()->get('mautic.report.orderbydir', 'DESC');
+        $orderBy    = $request->getSession()->get('mautic.report.orderby', 'r.dateModified');
+        $orderByDir = $request->getSession()->get('mautic.report.orderbydir', $this->getDefaultOrderDirection());
+
         $reports    = $model->getEntities(
             [
                 'start'      => $start,
@@ -121,19 +123,13 @@ class ReportController extends FormController
     }
 
     /**
-     * Clone an entity.
-     *
      * @param int $objectId
-     *
-     * @return HttpFoundation\JsonResponse|HttpFoundation\RedirectResponse|HttpFoundation\Response
      */
-    public function cloneAction($objectId)
+    public function cloneAction(ReportModel $model, Request $request, $objectId): Response
     {
-        /* @type \Mautic\ReportBundle\Model\ReportModel $model */
-        $model  = $this->getModel('report');
         $entity = $model->getEntity($objectId);
 
-        if (null != $entity) {
+        if ($entity) {
             if (!$this->security->isGranted('report:reports:create')
                 || !$this->security->hasEntityAccess(
                     'report:reports:viewown',
@@ -149,7 +145,7 @@ class ReportController extends FormController
             $entity->setIsPublished(false);
         }
 
-        return $this->newAction($entity);
+        return $this->newAction($model, $request, $entity);
     }
 
     /**
@@ -440,24 +436,13 @@ class ReportController extends FormController
         );
     }
 
-    /**
-     * Generates new form and processes post data.
-     *
-     * @param \Mautic\ReportBundle\Entity\Report|null $entity
-     *
-     * @return HttpFoundation\Response
-     */
-    public function newAction(Request $request, $entity = null)
+    public function newAction(ReportModel $model, Request $request, ?Report $entity = null): Response
     {
         if (!$this->security->isGranted('report:reports:create')) {
             return $this->accessDenied();
         }
 
-        $model = $this->getModel('report');
-        \assert($model instanceof ReportModel);
-
         if (!($entity instanceof Report)) {
-            /** @var \Mautic\ReportBundle\Entity\Report $entity */
             $entity = $model->getEntity();
         }
 
@@ -495,11 +480,9 @@ class ReportController extends FormController
                         return $this->editAction($request, $entity->getId(), true);
                     }
 
-                    $viewParameters = [
-                        'objectId' => $entity->getId(),
-                    ];
-                    $returnUrl = $this->generateUrl('mautic_report_view', $viewParameters);
-                    $template  = 'Mautic\ReportBundle\Controller\ReportController::viewAction';
+                    $viewParameters = ['objectId' => $entity->getId()];
+                    $returnUrl      = $this->generateUrl('mautic_report_view', $viewParameters);
+                    $template       = 'Mautic\ReportBundle\Controller\ReportController::viewAction';
                 }
             } else {
                 $viewParameters = ['page' => $page];
@@ -514,8 +497,8 @@ class ReportController extends FormController
                         'viewParameters'  => $viewParameters,
                         'contentTemplate' => $template,
                         'passthroughVars' => [
-                            'activeLink'    => 'mautic_asset_index',
-                            'mauticContent' => 'asset',
+                            'activeLink'    => '#mautic_report_index',
+                            'mauticContent' => 'report',
                         ],
                     ]
                 );
@@ -798,7 +781,7 @@ class ReportController extends FormController
 
         if ('csv' === $format) {
             $response = new HttpFoundation\StreamedResponse(
-                function () use ($model, $entity, $format, $options) {
+                function () use ($model, $entity, $format, $options): void {
                     $options['paginate']        = true;
                     $options['ignoreGraphData'] = true;
                     $options['limit']           = (int) $this->coreParametersHelper->getParameter('report_export_batch_size', 1000);
@@ -894,5 +877,10 @@ class ReportController extends FormController
         $response->setContentDisposition(ResponseHeaderBag::DISPOSITION_ATTACHMENT, "report-{$report->getId()}.zip");
 
         return $response;
+    }
+
+    protected function getDefaultOrderDirection(): string
+    {
+        return 'DESC';
     }
 }

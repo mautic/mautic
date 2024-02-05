@@ -2,41 +2,38 @@
 
 namespace Mautic\EmailBundle\Helper;
 
-use Mautic\CoreBundle\Helper\CacheStorageHelper;
+use Mautic\CacheBundle\Cache\CacheProviderInterface;
+use Psr\Cache\InvalidArgumentException;
 use Symfony\Component\HttpFoundation\Request;
 
 /**
  * Helper class for storing request payload to a cache location and retrieving it back as a Request.
+ *
+ * @deprecated as unused. To be removed in Mautic 6.0.
  */
 class RequestStorageHelper
 {
     /**
      * Separator between the transport class name and random hash.
      */
-    public const KEY_SEPARATOR = ':webhook_request:';
+    public const KEY_SEPARATOR = ';webhook_request;';
 
-    /**
-     * @var CacheStorageHelper
-     */
-    private $cacheStorage;
-
-    public function __construct(CacheStorageHelper $cacheStorage)
-    {
-        $this->cacheStorage = $cacheStorage;
+    public function __construct(
+        private CacheProviderInterface $cacheStorage
+    ) {
     }
 
     /**
      * Stores the request content into cache and returns the unique key under which it's stored.
      *
      * @param string $transportName
-     *
-     * @return string
      */
-    public function storeRequest($transportName, Request $request)
+    public function storeRequest($transportName, Request $request): string
     {
-        $key = $this->getUniqueCacheHash($transportName);
-
-        $this->cacheStorage->set($key, $request->request->all());
+        $key  = $this->getUniqueCacheHash($transportName);
+        $item = $this->cacheStorage->getItem($key);
+        $item->set($request->request->all());
+        $this->cacheStorage->save($item);
 
         return $key;
     }
@@ -46,30 +43,32 @@ class RequestStorageHelper
      *
      * @param string $key
      *
-     * @return Request
-     *
      * @throws \UnexpectedValueException
      */
-    public function getRequest($key)
+    public function getRequest($key): Request
     {
-        $key           = $this->removeCachePrefix($key);
-        $cachedRequest = $this->cacheStorage->get($key);
+        $error = "Request with key '{$key}' was not found.";
+        $key   = $this->removeCachePrefix($key);
 
-        if (false === $cachedRequest) {
-            throw new \UnexpectedValueException("Request with key '{$key}' was not found in the cache store '{$this->cacheStorage->getAdaptorClassName()}'.");
+        try {
+            $item = $this->cacheStorage->getItem($key);
+        } catch (InvalidArgumentException) {
+            throw new \UnexpectedValueException($error);
         }
 
-        return new Request([], $cachedRequest);
+        if (!$item->isHit()) {
+            throw new \UnexpectedValueException($error);
+        }
+
+        return new Request([], $item->get());
     }
 
     /**
      * @param string $key
      */
-    public function deleteCachedRequest($key)
+    public function deleteCachedRequest($key): void
     {
-        $key = $this->removeCachePrefix($key);
-
-        $this->cacheStorage->delete($key);
+        $this->cacheStorage->deleteItem($this->removeCachePrefix($key));
     }
 
     /**
@@ -84,7 +83,7 @@ class RequestStorageHelper
         $key = $this->removeCachePrefix($key);
 
         // Take the part before the key separator as the serialized transpot name.
-        list($serializedTransportName) = explode(self::KEY_SEPARATOR, $key);
+        [$serializedTransportName] = explode(self::KEY_SEPARATOR, $key);
 
         // Unserialize transport name to the standard full class name.
         $transportName = str_replace('|', '\\', $serializedTransportName);
@@ -94,14 +93,10 @@ class RequestStorageHelper
 
     /**
      * Remove the default cache key prefix if set.
-     *
-     * @param string $key
-     *
-     * @return string
      */
-    private function removeCachePrefix($key)
+    private function removeCachePrefix(string $key): string
     {
-        if (0 === strpos($key, 'mautic:')) {
+        if (str_starts_with($key, 'mautic:')) {
             $key = ltrim($key, 'mautic:');
         }
 
@@ -110,22 +105,9 @@ class RequestStorageHelper
 
     /**
      * Generates unique hash in format $transportName:webhook_request:unique.hash.
-     *
-     * @param string $transportName
-     *
-     * @return string
-     *
-     * @throws \LengthException
      */
-    private function getUniqueCacheHash($transportName)
+    private function getUniqueCacheHash(string $transportName): string
     {
-        $key       = uniqid($transportName.self::KEY_SEPARATOR, true);
-        $keyLength = strlen($key);
-
-        if ($keyLength > 191) {
-            throw new \LengthException(sprintf('Key %s must be shorter than 191 characters. It has %d characters', $key, $keyLength));
-        }
-
-        return $key;
+        return uniqid(str_replace('\\', '|', $transportName).self::KEY_SEPARATOR, true);
     }
 }

@@ -8,10 +8,8 @@ trait ContextTrait
 {
     /**
      * Check if an event is applicable.
-     *
-     * @return bool
      */
-    public function checkContext($eventType)
+    public function checkContext($eventType): bool
     {
         if (!$this->event) {
             return false;

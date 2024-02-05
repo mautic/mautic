@@ -3,36 +3,29 @@
 namespace Mautic\LeadBundle\Segment;
 
 use Mautic\LeadBundle\Entity\LeadList;
+use Mautic\LeadBundle\Event\LeadListMergeFiltersEvent;
+use Mautic\LeadBundle\LeadEvents;
 use Mautic\LeadBundle\Segment\Decorator\DecoratorFactory;
 use Mautic\LeadBundle\Segment\Decorator\FilterDecoratorInterface;
 use Mautic\LeadBundle\Segment\Query\Filter\FilterQueryBuilderInterface;
 use Symfony\Component\DependencyInjection\Container;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class ContactSegmentFilterFactory
 {
-    /**
-     * @var TableSchemaColumnsCache
-     */
-    private $schemaCache;
+    public const CUSTOM_OPERATOR             = 'custom_operator';
 
     /**
-     * @var Container
+     * @var array|string[]
      */
-    private $container;
-
-    /**
-     * @var DecoratorFactory
-     */
-    private $decoratorFactory;
+    private array $operatorsWithEmptyValuesAllowed = ['empty', '!empty', self::CUSTOM_OPERATOR];
 
     public function __construct(
-        TableSchemaColumnsCache $schemaCache,
-        Container $container,
-        DecoratorFactory $decoratorFactory
+        private TableSchemaColumnsCache $schemaCache,
+        private Container $container,
+        private DecoratorFactory $decoratorFactory,
+        private EventDispatcherInterface $eventDispatcher
     ) {
-        $this->schemaCache      = $schemaCache;
-        $this->container        = $container;
-        $this->decoratorFactory = $decoratorFactory;
     }
 
     /**
@@ -45,8 +38,28 @@ class ContactSegmentFilterFactory
         $contactSegmentFilters = new ContactSegmentFilters();
 
         $filters = $leadList->getFilters();
+        $event   = new LeadListMergeFiltersEvent($filters);
+        $this->eventDispatcher->dispatch($event, LeadEvents::LIST_FILTERS_MERGE);
+        $filters = $event->getFilters();
         foreach ($filters as $filter) {
-            $contactSegmentFilters->addContactSegmentFilter($this->factorSegmentFilter($filter, $batchLimiters));
+            if (self::CUSTOM_OPERATOR === $filter['operator']) {
+                $mergedProperty      = $filter['merged_property'];
+                $factorSegmentFilter = null;
+                foreach ($filter['properties'] as $index => $nestedFilter) {
+                    if (!in_array($nestedFilter['operator'], $this->operatorsWithEmptyValuesAllowed) && empty($nestedFilter['filter']) && !is_numeric($nestedFilter['filter'])) {
+                        continue; // If no value set for the filter, don't consider it
+                    }
+                    $factorSegmentFilter                    = $this->factorSegmentFilter($nestedFilter, $batchLimiters);
+                    $mergedProperty[$index]['filter_value'] = $factorSegmentFilter->getParameterValue();
+                    $mergedProperty[$index]['operator']     = $factorSegmentFilter->getOperator();
+                }
+                if ($factorSegmentFilter) {
+                    $factorSegmentFilter->contactSegmentFilterCrate->setMergedProperty($mergedProperty);
+                    $contactSegmentFilters->addContactSegmentFilter($factorSegmentFilter);
+                }
+            } else {
+                $contactSegmentFilters->addContactSegmentFilter($this->factorSegmentFilter($filter, $batchLimiters));
+            }
         }
 
         return $contactSegmentFilters;

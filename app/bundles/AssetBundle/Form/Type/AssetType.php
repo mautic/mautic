@@ -22,25 +22,18 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
+/**
+ * @extends AbstractType<Asset>
+ */
 class AssetType extends AbstractType
 {
-    /**
-     * @var TranslatorInterface
-     */
-    private $translator;
-
-    /**
-     * @var AssetModel
-     */
-    private $assetModel;
-
-    public function __construct(TranslatorInterface $translator, AssetModel $assetModel)
-    {
-        $this->translator = $translator;
-        $this->assetModel = $assetModel;
+    public function __construct(
+        private TranslatorInterface $translator,
+        private AssetModel $assetModel
+    ) {
     }
 
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder->addEventSubscriber(new CleanFormSubscriber(['description' => 'html']));
         $builder->addEventSubscriber(new FormExitSubscriber('asset.asset', $options));
@@ -177,7 +170,7 @@ class AssetType extends AbstractType
         }
     }
 
-    public function configureOptions(OptionsResolver $resolver)
+    public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults(['data_class' => Asset::class]);
     }

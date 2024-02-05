@@ -8,7 +8,7 @@ use MauticPlugin\MauticCrmBundle\Integration\Salesforce\Object\Lead;
 
 class OrganizerTest extends \PHPUnit\Framework\TestCase
 {
-    public function testRecordsAreOrganizedIntoLeadsAndContacts()
+    public function testRecordsAreOrganizedIntoLeadsAndContacts(): void
     {
         $records = [
             [

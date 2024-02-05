@@ -2,9 +2,6 @@
 
 namespace Mautic\ApiBundle;
 
-/**
- * Class ApiEvents.
- */
 final class ApiEvents
 {
     /**

@@ -6,38 +6,24 @@ use Doctrine\Common\EventSubscriber;
 use Doctrine\DBAL\Types\StringType;
 use Doctrine\ORM\Tools\Event\GenerateSchemaEventArgs;
 use Doctrine\ORM\Tools\ToolEvents;
-use Mautic\LeadBundle\Model\FieldModel;
+use Mautic\LeadBundle\Field\SchemaDefinition;
 use Monolog\Logger;
 
-/**
- * Class DoctrineSubscriber.
- */
 class DoctrineSubscriber implements EventSubscriber
 {
-    /**
-     * @var Logger
-     */
-    private $logger;
-
-    /**
-     * DoctrineSubscriber constructor.
-     */
-    public function __construct(Logger $logger)
-    {
-        $this->logger = $logger;
+    public function __construct(
+        private Logger $logger
+    ) {
     }
 
-    /**
-     * @return array
-     */
-    public function getSubscribedEvents()
+    public function getSubscribedEvents(): array
     {
         return [
             ToolEvents::postGenerateSchema,
         ];
     }
 
-    public function postGenerateSchema(GenerateSchemaEventArgs $args)
+    public function postGenerateSchema(GenerateSchemaEventArgs $args): void
     {
         $schema = $args->getSchema();
 
@@ -70,7 +56,7 @@ class DoctrineSubscriber implements EventSubscriber
                     if ($f['is_unique'] && 'email' !== $f['alias']) {
                         $uniqueFields[$f['alias']] = $f['alias'];
                     }
-                    $columnDef = FieldModel::getSchemaDefinition($f['alias'], $f['type'], !empty($f['is_unique']));
+                    $columnDef = SchemaDefinition::getSchemaDefinition($f['alias'], $f['type'], !empty($f['is_unique']));
 
                     if (!$table->hasColumn($f['alias'])) {
                         $table->addColumn($columnDef['name'], $columnDef['type'], $columnDef['options']);

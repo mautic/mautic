@@ -3,7 +3,6 @@
 namespace Mautic\LeadBundle;
 
 /**
- * Class LeadEvents
  * Events available for LeadBundle.
  */
 final class LeadEvents
@@ -684,6 +683,16 @@ final class LeadEvents
      * @var string
      */
     public const LIST_FILTERS_ON_FILTERING = 'mautic.list_filters_on_filtering';
+
+    /**
+     * The mautic.list_filters_merge event is dispatched when the lists rebuilding.
+     *
+     * The event listener receives a
+     * Mautic\LeadBundle\Event\LeadListMergeFiltersEvent instance.
+     *
+     * @var string
+     */
+    public const LIST_FILTERS_MERGE = 'mautic.list_filters_merge';
 
     /**
      * The mautic.list_filters_querybuilder_generated event is dispatched when the queryBuilder for segment was generated.

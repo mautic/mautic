@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\IntegrationsBundle\Sync\SyncDataExchange\Internal\ObjectHelper;
 
+use Doctrine\DBAL\ArrayParameterType;
 use Doctrine\DBAL\Connection;
 use Mautic\IntegrationsBundle\Entity\ObjectMapping;
 use Mautic\IntegrationsBundle\Sync\DAO\Mapping\UpdatedObjectMappingDAO;
@@ -23,43 +24,15 @@ use Mautic\LeadBundle\Model\LeadModel;
 
 class ContactObjectHelper implements ObjectHelperInterface
 {
-    /**
-     * @var LeadModel
-     */
-    private $model;
+    private ?array $availableFields = null;
 
-    /**
-     * @var LeadRepository
-     */
-    private $repository;
-
-    /**
-     * @var Connection
-     */
-    private $connection;
-
-    /**
-     * @var FieldModel
-     */
-    private $fieldModel;
-
-    /**
-     * @var array
-     */
-    private $availableFields;
-
-    /**
-     * @var DoNotContactModel
-     */
-    private $dncModel;
-
-    public function __construct(LeadModel $model, LeadRepository $repository, Connection $connection, FieldModel $fieldModel, DoNotContactModel $dncModel)
-    {
-        $this->model      = $model;
-        $this->repository = $repository;
-        $this->connection = $connection;
-        $this->fieldModel = $fieldModel;
-        $this->dncModel   = $dncModel;
+    public function __construct(
+        private LeadModel $model,
+        private LeadRepository $repository,
+        private Connection $connection,
+        private FieldModel $fieldModel,
+        private DoNotContactModel $dncModel
+    ) {
     }
 
     /**
@@ -102,7 +75,7 @@ class ContactObjectHelper implements ObjectHelperInterface
                     'Created lead ID %d',
                     $contact->getId()
                 ),
-                __CLASS__.':'.__FUNCTION__
+                self::class.':'.__FUNCTION__
             );
 
             $objectMapping = new ObjectMapping();
@@ -134,7 +107,7 @@ class ContactObjectHelper implements ObjectHelperInterface
                 count($contacts),
                 implode(', ', $ids)
             ),
-            __CLASS__.':'.__FUNCTION__
+            self::class.':'.__FUNCTION__
         );
 
         $availableFields      = $this->getAvailableFields();
@@ -171,7 +144,7 @@ class ContactObjectHelper implements ObjectHelperInterface
                     'Updated lead ID %d',
                     $contact->getId()
                 ),
-                __CLASS__.':'.__FUNCTION__
+                self::class.':'.__FUNCTION__
             );
 
             // Integration name and ID are stored in the change's mappedObject/mappedObjectId
@@ -289,7 +262,7 @@ class ContactObjectHelper implements ObjectHelperInterface
         $qb->from(MAUTIC_TABLE_PREFIX.'leads', 'c');
         $qb->where('c.owner_id IS NOT NULL');
         $qb->andWhere('c.id IN (:objectIds)');
-        $qb->setParameter('objectIds', $objectIds, Connection::PARAM_INT_ARRAY);
+        $qb->setParameter('objectIds', $objectIds, ArrayParameterType::INTEGER);
 
         return $qb->executeQuery()->fetchAllAssociative();
     }
@@ -311,7 +284,7 @@ class ContactObjectHelper implements ObjectHelperInterface
     private function processPseudoFields(Lead $contact, array $fields, string $integration): void
     {
         foreach ($fields as $name => $field) {
-            if (0 === strpos($name, 'mautic_internal_dnc_')) {
+            if (str_starts_with($name, 'mautic_internal_dnc_')) {
                 $channel   = str_replace('mautic_internal_dnc_', '', $name);
 
                 $dncReason = $this->getDoNotContactReason($field->getValue()->getNormalizedValue());
@@ -341,10 +314,7 @@ class ContactObjectHelper implements ObjectHelperInterface
         }
     }
 
-    /**
-     * @return int
-     */
-    private function getDoNotContactReason($value)
+    private function getDoNotContactReason($value): int
     {
         $value = (int) $value;
 

@@ -25,7 +25,7 @@ return [
                 'standard_entity' => true,
                 'name'            => 'emails',
                 'path'            => '/emails',
-                'controller'      => 'Mautic\EmailBundle\Controller\Api\EmailApiController',
+                'controller'      => \Mautic\EmailBundle\Controller\Api\EmailApiController::class,
             ],
             'mautic_api_sendemail' => [
                 'path'       => '/emails/{id}/send',
@@ -60,8 +60,9 @@ return [
                 'controller' => 'Mautic\EmailBundle\Controller\PublicController::indexAction',
             ],
             'mautic_email_unsubscribe' => [
-                'path'       => '/email/unsubscribe/{idHash}',
+                'path'       => '/email/unsubscribe/{idHash}/{urlEmail}/{secretHash}',
                 'controller' => 'Mautic\EmailBundle\Controller\PublicController::unsubscribeAction',
+                'defaults'   => ['urlEmail' => null, 'secretHash' => null],
             ],
             'mautic_email_resubscribe' => [
                 'path'       => '/email/resubscribe/{idHash}',
@@ -97,13 +98,6 @@ return [
             'mautic.di.env_processor.mailerdsn' => [
                 'class' => \Mautic\EmailBundle\DependencyInjection\EnvProcessor\MailerDsnEnvVarProcessor::class,
                 'tag'   => 'container.env_var_processor',
-            ],
-            'mautic.helper.mailbox' => [
-                'class'     => 'Mautic\EmailBundle\MonitoredEmail\Mailbox',
-                'arguments' => [
-                    'mautic.helper.core_parameters',
-                    'mautic.helper.paths',
-                ],
             ],
             'mautic.message.search.contact' => [
                 'class'     => \Mautic\EmailBundle\MonitoredEmail\Search\ContactFinder::class,
@@ -156,13 +150,6 @@ return [
                     'mautic.helper.email.address',
                 ],
             ],
-            'mautic.helper.mailer' => [
-                'class'     => \Mautic\EmailBundle\Helper\MailHelper::class,
-                'arguments' => [
-                    'mautic.factory',
-                    'mailer',
-                ],
-            ],
             'mautic.validator.email' => [
                 'class'     => \Mautic\EmailBundle\Helper\EmailValidator::class,
                 'arguments' => [
@@ -182,12 +169,6 @@ return [
                 'class'     => \Mautic\EmailBundle\Stat\StatHelper::class,
                 'arguments' => [
                     'mautic.email.repository.stat',
-                ],
-            ],
-            'mautic.email.helper.request.storage' => [
-                'class'     => \Mautic\EmailBundle\Helper\RequestStorageHelper::class,
-                'arguments' => [
-                    'mautic.helper.cache_storage',
                 ],
             ],
             'mautic.email.helper.stats_collection' => [
@@ -275,29 +256,6 @@ return [
                     'mautic.lead.validator.custom_field',
                 ],
                 'tag' => 'validator.constraint_validator',
-            ],
-        ],
-        'repositories' => [
-            'mautic.email.repository.email' => [
-                'class'     => Doctrine\ORM\EntityRepository::class,
-                'factory'   => ['@doctrine.orm.entity_manager', 'getRepository'],
-                'arguments' => [
-                    \Mautic\EmailBundle\Entity\Email::class,
-                ],
-            ],
-            'mautic.email.repository.emailReply' => [
-                'class'     => \Doctrine\ORM\EntityRepository::class,
-                'factory'   => ['@doctrine.orm.entity_manager', 'getRepository'],
-                'arguments' => [
-                    \Mautic\EmailBundle\Entity\EmailReply::class,
-                ],
-            ],
-            'mautic.email.repository.stat' => [
-                'class'     => Doctrine\ORM\EntityRepository::class,
-                'factory'   => ['@doctrine.orm.entity_manager', 'getRepository'],
-                'arguments' => [
-                    \Mautic\EmailBundle\Entity\Stat::class,
-                ],
             ],
         ],
         'fixtures' => [
