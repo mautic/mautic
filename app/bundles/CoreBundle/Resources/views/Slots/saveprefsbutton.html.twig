@@ -19,7 +19,7 @@
     {# that's why we can't use the bodyclose customdeclaration #}
     {% if (custom_tag is defined and custom_tag is not empty) %}
         {{ custom_tag }}
-        {{ assetaddScriptDeclaration($view['form']->rest(form_rest(form)), 'customTag') }}
+        {{ assetaddScriptDeclaration(form_rest(form), 'customTag') }}
     {% else %}
-        {{ assetaddScriptDeclaration($view['form']->rest(form_rest(form)), 'bodyClose') }}
+        {{ assetaddScriptDeclaration(form_rest(form), 'bodyClose') }}
     {% endif %}

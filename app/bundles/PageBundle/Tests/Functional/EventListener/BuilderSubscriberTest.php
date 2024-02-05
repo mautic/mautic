@@ -4,12 +4,11 @@ declare(strict_types=1);
 
 namespace Mautic\PageBundle\Tests\Functional\EventListener;
 
-use DateTime;
-use Generator;
 use Mautic\CategoryBundle\Entity\Category;
 use Mautic\CoreBundle\Test\AbstractMauticTestCase;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Entity\Stat;
+use Mautic\EmailBundle\Helper\MailHashHelper;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadList as Segment;
 use Mautic\PageBundle\Entity\Page;
@@ -19,26 +18,29 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 class BuilderSubscriberTest extends AbstractMauticTestCase
 {
     // Custom preference center page
-    const CUSTOM_SEGMENT_SELECTOR           = '.pref-segmentlist';
-    const CUSTOM_CATEGORY_SELECTOR          = '.pref-categorylist';
-    const CUSTOM_PREFERRED_CHANNEL_SELECTOR = '.pref-preferredchannel';
-    const CUSTOM_CHANNEL_FREQ_SELECTOR      = '.pref-channelfrequency';
-    const CUSTOM_SAVE_BUTTON_SELECTOR       = '.prefs-saveprefs';
+    public const CUSTOM_SEGMENT_SELECTOR           = '.pref-segmentlist';
+    public const CUSTOM_CATEGORY_SELECTOR          = '.pref-categorylist';
+    public const CUSTOM_PREFERRED_CHANNEL_SELECTOR = '.pref-preferredchannel';
+    public const CUSTOM_CHANNEL_FREQ_SELECTOR      = '.pref-channelfrequency';
+    public const CUSTOM_SAVE_BUTTON_SELECTOR       = '.prefs-saveprefs';
 
     // Default preference center page
-    const DEFAULT_SEGMENT_SELECTOR           = '#contact-segments';
-    const DEFAULT_CATEGORY_SELECTOR          = '#global-categories';
-    const DEFAULT_PREFERRED_CHANNEL_SELECTOR = '#preferred_channel';
-    const DEFAULT_CHANNEL_FREQ_SELECTOR      = '[data-contact-frequency="1"]';
-    const DEFAULT_PAUSE_DATES_SELECTOR       = '[data-contact-pause-dates="1"]';
-    const DEFAULT_SAVE_BUTTON_SELECTOR       = '#lead_contact_frequency_rules_buttons_save';
+    public const DEFAULT_SEGMENT_SELECTOR           = '#contact-segments';
+    public const DEFAULT_CATEGORY_SELECTOR          = '#global-categories';
+    public const DEFAULT_PREFERRED_CHANNEL_SELECTOR = '#preferred_channel';
+    public const DEFAULT_CHANNEL_FREQ_SELECTOR      = '[data-contact-frequency="1"]';
+    public const DEFAULT_PAUSE_DATES_SELECTOR       = '[data-contact-pause-dates="1"]';
+    public const DEFAULT_SAVE_BUTTON_SELECTOR       = '#lead_contact_frequency_rules_buttons_save';
 
     // Common to both custom and default
-    const TOKEN_SELECTOR = '#lead_contact_frequency_rules__token';
-    const FORM_SELECTOR  = 'form[name="lead_contact_frequency_rules"]';
+    public const TOKEN_SELECTOR = '#lead_contact_frequency_rules__token';
+    public const FORM_SELECTOR  = 'form[name="lead_contact_frequency_rules"]';
 
     /**
      * Tests both the default and custom preference center pages.
+     *
+     * @param mixed[]           $configParams
+     * @param array<string,int> $selectorsAndExpectedCounts
      *
      * @dataProvider frequencyFormRenderingDataProvider
      */
@@ -56,10 +58,13 @@ class BuilderSubscriberTest extends AbstractMauticTestCase
 
         $this->em->flush();
 
+        $mailHashHelper = static::getContainer()->get(MailHashHelper::class);
+        \assert($mailHashHelper instanceof MailHashHelper);
+
         $unsubscribeUrl = $this->router->generate('mautic_email_unsubscribe', [
             'idHash'     => $emailStat->getTrackingHash(),
             'urlEmail'   => $lead->getEmail(),
-            'secretHash' => self::$container->get('mautic.helper.mailer_hash')->getEmailHash($lead->getEmail()),
+            'secretHash' => $mailHashHelper->getEmailHash($lead->getEmail()),
         ], UrlGeneratorInterface::ABSOLUTE_PATH);
 
         $crawler = $this->client->request('GET', $unsubscribeUrl);
@@ -91,7 +96,7 @@ class BuilderSubscriberTest extends AbstractMauticTestCase
         }
     }
 
-    public function frequencyFormRenderingDataProvider(): Generator
+    public function frequencyFormRenderingDataProvider(): \Generator
     {
         // Custom Preference Center: All preferences enabled
         yield [
@@ -322,7 +327,7 @@ class BuilderSubscriberTest extends AbstractMauticTestCase
         $stat->setEmail($email);
         $stat->setLead($lead);
         $stat->setEmailAddress($lead->getEmail());
-        $stat->setDateSent(new DateTime());
+        $stat->setDateSent(new \DateTime());
         $stat->setTrackingHash(uniqid());
         $this->em->persist($stat);
 
@@ -382,7 +387,6 @@ class BuilderSubscriberTest extends AbstractMauticTestCase
         $page->setTitle('Preference Center');
         $page->setAlias('preference-center');
         $page->setIsPreferenceCenter(true);
-        $page->setContent($this->getPageContent());
         $page->setCustomHtml($this->getPageContent());
         $page->setIsPublished(true);
         $this->em->persist($page);

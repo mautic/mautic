@@ -3,11 +3,6 @@
 namespace Mautic\PageBundle\EventListener;
 
 use Doctrine\DBAL\Connection;
-use DOMDocument;
-use DOMElement;
-use DOMNode;
-use DOMXPath;
-use InvalidArgumentException;
 use Mautic\CoreBundle\Form\Type\GatedVideoType;
 use Mautic\CoreBundle\Form\Type\SlotButtonType;
 use Mautic\CoreBundle\Form\Type\SlotCategoryListType;
@@ -27,7 +22,6 @@ use Mautic\CoreBundle\Form\Type\SlotSuccessMessageType;
 use Mautic\CoreBundle\Form\Type\SlotTextType;
 use Mautic\CoreBundle\Helper\BuilderTokenHelperFactory;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
-use Mautic\CoreBundle\Twig\Helper\AssetsHelper;
 use Mautic\EmailBundle\EmailEvents;
 use Mautic\EmailBundle\Event\EmailBuilderEvent;
 use Mautic\EmailBundle\Event\EmailSendEvent;
@@ -37,38 +31,37 @@ use Mautic\PageBundle\Helper\TokenHelper;
 use Mautic\PageBundle\Model\PageModel;
 use Mautic\PageBundle\PageEvents;
 use Mautic\PluginBundle\Helper\IntegrationHelper;
-use RuntimeException;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 use Twig\Environment;
 
-class BuilderSubscriber implements EventSubscriberInterface
+final class BuilderSubscriber implements EventSubscriberInterface
 {
-    private const pageTokenRegex      = '{pagelink=(.*?)}';
+    private const pageTokenRegex         = '{pagelink=(.*?)}';
 
-    private const dwcTokenRegex       = '{dwc=(.*?)}';
+    private const dwcTokenRegex          = '{dwc=(.*?)}';
 
-    private const langBarRegex        = '{langbar}';
+    private const langBarRegex           = '{langbar}';
 
-    private const shareButtonsRegex   = '{sharebuttons}';
+    private const shareButtonsRegex      = '{sharebuttons}';
 
-    private const titleRegex          = '{pagetitle}';
+    private const titleRegex             = '{pagetitle}';
 
-    private const descriptionRegex    = '{pagemetadescription}';
+    private const descriptionRegex       = '{pagemetadescription}';
 
-    public const segmentListRegex  = '{segmentlist}';
+    public const segmentListRegex         = '{segmentlist}';
 
-    public const categoryListRegex = '{categorylist}';
+    public const categoryListRegex        = '{categorylist}';
 
-    public const channelfrequency  = '{channelfrequency}';
+    public const channelfrequency         = '{channelfrequency}';
 
-    public const preferredchannel  = '{preferredchannel}';
+    public const preferredchannel         = '{preferredchannel}';
 
-    public const saveprefsRegex    = '{saveprefsbutton}';
+    public const saveprefsRegex           = '{saveprefsbutton}';
 
-    public const successmessage    = '{successmessage}';
+    public const successmessage           = '{successmessage}';
 
-    public const identifierToken   = '{leadidentifier}';
+    public const identifierToken          = '{leadidentifier}';
 
     public const saveButtonContainerClass = 'prefs-saveprefs';
 
@@ -87,8 +80,7 @@ class BuilderSubscriber implements EventSubscriberInterface
         private BuilderTokenHelperFactory $builderTokenHelperFactory,
         private TranslatorInterface $translator,
         private Connection $connection,
-        private Environment $twig,
-        private AssetsHelper $assetsHelper
+        private Environment $twig
     ) {
     }
 
@@ -389,11 +381,11 @@ class BuilderSubscriber implements EventSubscriberInterface
             static::descriptionRegex,
             static::successmessage,
         ], [
-            false !== strpos($content, static::langBarRegex) ? $this->renderLanguageBar($page) : '',
-            false !== strpos($content, static::shareButtonsRegex) ? $this->renderSocialShareButtons() : '',
-            false !== strpos($content, static::titleRegex) ? $page->getTitle() : '',
-            false !== strpos($content, static::descriptionRegex) ? $page->getMetaDescription() : '',
-            false !== strpos($content, static::successmessage) ? $this->renderSuccessMessage() : '',
+            str_contains($content, static::langBarRegex) ? $this->renderLanguageBar($page) : '',
+            str_contains($content, static::shareButtonsRegex) ? $this->renderSocialShareButtons() : '',
+            str_contains($content, static::titleRegex) ? $page->getTitle() : '',
+            str_contains($content, static::descriptionRegex) ? $page->getMetaDescription() : '',
+            str_contains($content, static::successmessage) ? $this->renderSuccessMessage() : '',
         ], $content);
     }
 
@@ -428,6 +420,9 @@ class BuilderSubscriber implements EventSubscriberInterface
         return $this->wrapPreferenceCenterInFormTag($content, $params);
     }
 
+    /**
+     * @param array<string,mixed> $params
+     */
     private function replacePreferenceCenterTokens(string $content, array $params): string
     {
         return str_ireplace([
@@ -437,11 +432,11 @@ class BuilderSubscriber implements EventSubscriberInterface
             static::channelfrequency,
             static::saveprefsRegex,
         ], [
-            false !== strpos($content, static::segmentListRegex) ? $this->renderSegmentList($params) : '',
-            false !== strpos($content, static::categoryListRegex) ? $this->renderCategoryList($params) : '',
-            false !== strpos($content, static::preferredchannel) ? $this->renderPreferredChannel($params) : '',
-            false !== strpos($content, static::channelfrequency) ? $this->renderChannelFrequency($params) : '',
-            false !== strpos($content, static::saveprefsRegex) ? $this->renderSavePrefs($params) : '',
+            str_contains($content, static::segmentListRegex) ? $this->renderSegmentList($params) : '',
+            str_contains($content, static::categoryListRegex) ? $this->renderCategoryList($params) : '',
+            str_contains($content, static::preferredchannel) ? $this->renderPreferredChannel($params) : '',
+            str_contains($content, static::channelfrequency) ? $this->renderChannelFrequency($params) : '',
+            str_contains($content, static::saveprefsRegex) ? $this->renderSavePrefs($params) : '',
         ], $content);
     }
 
@@ -458,8 +453,8 @@ class BuilderSubscriber implements EventSubscriberInterface
 
         if ($wrapperTemplate) {
             // If the content is not empty, ensure that the $wrapperTemplate contains a place to put it.
-            if (!empty($content) && false === strpos($wrapperTemplate, '{templateContent}')) {
-                throw new InvalidArgumentException('Your $wrapperTemplate must contain the string {templateContent} where you want to insert the rendered template content.');
+            if (!empty($content) && !str_contains($wrapperTemplate, '{templateContent}')) {
+                throw new \InvalidArgumentException('Your $wrapperTemplate must contain the string {templateContent} where you want to insert the rendered template content.');
             }
 
             $content = str_replace('{templateContent}', $content, sprintf($wrapperTemplate, ...$wrapperTemplateValues));
@@ -474,7 +469,7 @@ class BuilderSubscriber implements EventSubscriberInterface
             '@MauticPage/SubscribedEvents/PageToken/sharebtn_css.html.twig',
             [],
             '<div class="share-buttons">%s</div>',
-            implode($this->integrationHelper->getShareButtons())
+            implode('', $this->integrationHelper->getShareButtons())
         );
     }
 
@@ -569,19 +564,22 @@ class BuilderSubscriber implements EventSubscriberInterface
             return $related;
         }
 
-        $related[$parent->getId()] = $this->buildRelatedArrayForPage($parent);
+        if ($parent instanceof Page) {
+            $related[$parent->getId()] = $this->buildRelatedArrayForPage($parent);
+        }
 
         foreach ($children as $child) {
             $related[$child->getId()] = $this->buildRelatedArrayForPage($child);
         }
 
-        uasort($related, function ($a, $b) {
-            return strnatcasecmp($a['lang'], $b['lang']);
-        });
+        uasort($related, fn ($a, $b): int => strnatcasecmp($a['lang'], $b['lang']));
 
         return $related;
     }
 
+    /**
+     * @return array<string,string>
+     */
     private function buildRelatedArrayForPage(Page $page): array
     {
         $language   = $page->getLanguage();
@@ -598,11 +596,11 @@ class BuilderSubscriber implements EventSubscriberInterface
         ];
     }
 
-    private function setSlotContentToTokenForReplacement(DOMXPath $xpath, string $slotName, string $tokenValue, bool $shouldShow): void
+    private function setSlotContentToTokenForReplacement(\DOMXPath $xpath, string $slotName, string $tokenValue, bool $shouldShow): void
     {
         $nodeList = $xpath->query(sprintf('//*[@data-slot="%s"]', $slotName));
 
-        /** @var DOMElement $node */
+        /** @var \DOMElement $node */
         foreach ($nodeList as $node) {
             if ($shouldShow) {
                 $node->nodeValue = $tokenValue;
@@ -613,17 +611,20 @@ class BuilderSubscriber implements EventSubscriberInterface
         }
     }
 
-    private function createDOMXPathForContent(string $content): DOMXPath
+    private function createDOMXPathForContent(string $content): \DOMXPath
     {
-        $domDocument = new DOMDocument('1.0', 'utf-8');
+        $domDocument = new \DOMDocument('1.0', 'utf-8');
         $domDocument->loadHTML(mb_encode_numericentity($content, [0x80, 0x10ffff, 0, 0xfffff], 'UTF-8'), LIBXML_NOERROR);
 
-        return new DOMXPath($domDocument);
+        return new \DOMXPath($domDocument);
     }
 
+    /**
+     * @param mixed[] $params
+     */
     private function wrapPreferenceCenterInFormTag(string $content, array $params): string
     {
-        if (!isset($params['startform']) || false === strpos($content, 'data-prefs-center')) {
+        if (!isset($params['startform']) || !str_contains($content, 'data-prefs-center')) {
             return $content;
         }
 
@@ -636,13 +637,13 @@ class BuilderSubscriber implements EventSubscriberInterface
 
         $parentNode = $this->getFirstParentNodeThatContainsAllFormInputs($node);
 
-        $parentNode->insertBefore(new DOMElement('startform'), $parentNode->firstChild);
-        $parentNode->appendChild(new DOMElement('endform'));
+        $parentNode->insertBefore(new \DOMElement('startform'), $parentNode->firstChild);
+        $parentNode->appendChild(new \DOMElement('endform'));
 
         return str_replace(['<startform></startform>', '<endform></endform>'], [$params['startform'], '</form>'], $xpath->document->saveHTML());
     }
 
-    private function getFirstNodeThatContainsAPreferenceCenterSlot(DOMXPath $xpath): ?DOMNode
+    private function getFirstNodeThatContainsAPreferenceCenterSlot(\DOMXPath $xpath): ?\DOMNode
     {
         // Query if we're using slots.
         $nodeList = $xpath->query('//*[@data-prefs-center="1"]');
@@ -659,14 +660,14 @@ class BuilderSubscriber implements EventSubscriberInterface
         return null;
     }
 
-    private function getFirstParentNodeThatContainsAllFormInputs(DOMNode $node): DOMNode
+    private function getFirstParentNodeThatContainsAllFormInputs(\DOMNode $node): \DOMNode
     {
-        $content = implode(array_map([$node->ownerDocument, 'saveHTML'], iterator_to_array($node->childNodes)));
+        $content = implode('', array_map([$node->ownerDocument, 'saveHTML'], iterator_to_array($node->childNodes)));
 
         // Check if the save button exists in the content. If not, try again with the parentNode.
-        if (false === strpos($content, static::saveButtonContainerClass)) {
+        if (!str_contains($content, static::saveButtonContainerClass)) {
             if (null === $node->parentNode) {
-                throw new RuntimeException("Can't get parent node of #document. Did you forget to insert a save button in your preference center form?");
+                throw new \RuntimeException("Can't get parent node of #document. Did you forget to insert a save button in your preference center form?");
             }
 
             return $this->getFirstParentNodeThatContainsAllFormInputs($node->parentNode);

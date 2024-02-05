@@ -27,7 +27,7 @@ use Symfony\Contracts\EventDispatcher\Event;
 class CategoryModel extends FormModel
 {
     /**
-     * @var mixed[]
+     * @var array<string,mixed[]>
      */
     private array $categoriesByBundleCache = [];
 
@@ -47,8 +47,8 @@ class CategoryModel extends FormModel
 
     public function getRepository(): CategoryRepository
     {
-        /** @var CategoryRepository $repository */
         $repository = $this->em->getRepository(Category::class);
+        \assert($repository instanceof CategoryRepository);
 
         return $repository;
     }
@@ -174,7 +174,7 @@ class CategoryModel extends FormModel
      *
      * @param string $bundle
      * @param string $filter
-     * @param string $limit
+     * @param int    $limit
      *
      * @return mixed[]
      */

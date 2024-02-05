@@ -27,8 +27,6 @@ use Mautic\PageBundle\PageEvents;
 use Mautic\PluginBundle\Helper\IntegrationHelper;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpFoundation\Request;
-use Mautic\QueueBundle\Queue\QueueName;
-use Symfony\Component\Form\FormView;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\Contracts\Translation\LocaleAwareInterface;
@@ -250,14 +248,14 @@ class PublicController extends CommonFormController
                             $showParameters,
                             [
                                 'form'       => $formView,
-                                'startform'  => $this->get('templating.helper.form')->start($formView),
+                                'startform'  => $this->renderView('@MauticCore/Default/form.html.twig', ['form' => $formView]),
                                 'custom_tag' => '<a name="end-'.$formView->vars['id'].'"></a>',
                             ]
                         );
 
                         $event = new PageDisplayEvent($html, $prefCenter, $eventParameters);
 
-                        $this->get('event_dispatcher')->dispatch(PageEvents::PAGE_ON_DISPLAY, $event);
+                        $this->dispatcher->dispatch($event, PageEvents::PAGE_ON_DISPLAY);
 
                         $html = $event->getContent();
 
@@ -800,13 +798,13 @@ class PublicController extends CommonFormController
          * render that field just because a slot for it exists will result in an error.
          */
         $showParamsBasedOnContent = array_filter([
-            'showContactFrequency'         => false !== strpos($content, 'data-slot="channelfrequency"') || false !== strpos($content, BuilderSubscriber::channelfrequency),
-            'showContactSegments'          => false !== strpos($content, 'data-slot="segmentlist"') || false !== strpos($content, BuilderSubscriber::segmentListRegex),
-            'showContactCategories'        => false !== strpos($content, 'data-slot="categorylist"') || false !== strpos($content, BuilderSubscriber::categoryListRegex),
-            'showContactPreferredChannels' => false !== strpos($content, 'data-slot="preferredchannel"') || false !== strpos($content, BuilderSubscriber::preferredchannel),
+            'showContactFrequency'         => str_contains($content, 'data-slot="channelfrequency"') || str_contains($content, BuilderSubscriber::channelfrequency),
+            'showContactSegments'          => str_contains($content, 'data-slot="segmentlist"') || str_contains($content, BuilderSubscriber::segmentListRegex),
+            'showContactCategories'        => str_contains($content, 'data-slot="categorylist"') || str_contains($content, BuilderSubscriber::categoryListRegex),
+            'showContactPreferredChannels' => str_contains($content, 'data-slot="preferredchannel"') || str_contains($content, BuilderSubscriber::preferredchannel),
         ], fn (bool $value) =>!$value);
 
-        $showParamsBasedOnConfiguration = array_filter($viewParameters, fn ($key) => 0 === strpos($key, 'show'), ARRAY_FILTER_USE_KEY);
+        $showParamsBasedOnConfiguration = array_filter($viewParameters, fn ($key) => str_starts_with($key, 'show'), ARRAY_FILTER_USE_KEY);
 
         return array_merge($showParamsBasedOnConfiguration, $showParamsBasedOnContent);
     }

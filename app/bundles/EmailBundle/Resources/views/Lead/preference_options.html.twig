@@ -63,7 +63,7 @@
                     <hr />
                     <div id="preferred_channel" class="text-left">{{ form_row(form.lead_channels.preferred_channel) }}</div>
                 {% endif %}
-                {% set segmentCount = form.lead_lists.vars.choices|length %}
+                {% set segmentCount = form.lead_lists is defined ? form.lead_lists.vars.choices|length : 0 %}
                 {% if showContactSegments and segmentCount > 0 %}
                     <hr />
                     <div id="contact-segments">
@@ -76,7 +76,7 @@
                         {% endfor %}
                     </div>
                 {% endif %}
-                {% set categoryCount = form.global_categories.vars.choices|length %}
+                {% set categoryCount = form.global_categories is defined ? form.global_categories.vars.choices|length : 0 %}
                 {% if showContactCategories and categoryCount > 0 %}
                     <hr />
                     <div id="global-categories" class="text-left">
