@@ -41,7 +41,7 @@ class TriggerCampaignCommandTest extends AbstractCampaignCommand
     public function testCampaignExecutionForAll(): void
     {
         // Process in batches of 10 to ensure batching is working as expected
-        $this->runCommand('mautic:campaigns:trigger', ['-i' => 1, '-l' => 10]);
+        $this->testSymfonyCommand('mautic:campaigns:trigger', ['-i' => 1, '-l' => 10]);
 
         // Let's analyze
         $byEvent = $this->getCampaignEventLogs([1, 2, 11, 12, 13, 16]);
@@ -88,7 +88,7 @@ class TriggerCampaignCommandTest extends AbstractCampaignCommand
 
         // Wait 6 seconds then execute the campaign again to send scheduled events
         static::getContainer()->get(ScheduledExecutioner::class)->setNowTime(new \DateTime('+'.self::CONDITION_SECONDS.' seconds'));
-        $this->runCommand('mautic:campaigns:trigger', ['-i' => 1, '-l' => 10]);
+        $this->testSymfonyCommand('mautic:campaigns:trigger', ['-i' => 1, '-l' => 10]);
 
         // Send email 1 should no longer be scheduled
         $byEvent = $this->getCampaignEventLogs([2, 4]);
@@ -134,7 +134,7 @@ class TriggerCampaignCommandTest extends AbstractCampaignCommand
         static::getContainer()->get(InactiveExecutioner::class)->setNowTime(new \DateTime('+'.(self::CONDITION_SECONDS * 2).' seconds'));
 
         // Execute the command again to trigger inaction related events
-        $this->runCommand('mautic:campaigns:trigger', ['-i' => 1, '-l' => 10]);
+        $this->testSymfonyCommand('mautic:campaigns:trigger', ['-i' => 1, '-l' => 10]);
 
         // Now we should have 50 email open decisions
         $byEvent = $this->getCampaignEventLogs([3, 4, 5, 14, 15]);
@@ -207,7 +207,7 @@ class TriggerCampaignCommandTest extends AbstractCampaignCommand
      */
     public function testCampaignExecutionForOne(): void
     {
-        $this->runCommand('mautic:campaigns:trigger', ['-i' => 1, '--contact-id' => 1]);
+        $this->testSymfonyCommand('mautic:campaigns:trigger', ['-i' => 1, '--contact-id' => 1]);
 
         // Let's analyze
         $byEvent = $this->getCampaignEventLogs([1, 2, 11, 12, 13, 16]);
@@ -255,7 +255,7 @@ class TriggerCampaignCommandTest extends AbstractCampaignCommand
 
         // Wait 6 seconds then execute the campaign again to send scheduled events
         static::getContainer()->get(ScheduledExecutioner::class)->setNowTime(new \DateTime('+'.self::CONDITION_SECONDS.' seconds'));
-        $this->runCommand('mautic:campaigns:trigger', ['-i' => 1, '--contact-id' => 1]);
+        $this->testSymfonyCommand('mautic:campaigns:trigger', ['-i' => 1, '--contact-id' => 1]);
 
         // Send email 1 should no longer be scheduled
         $byEvent = $this->getCampaignEventLogs([2, 4]);
@@ -301,7 +301,7 @@ class TriggerCampaignCommandTest extends AbstractCampaignCommand
         static::getContainer()->get(InactiveExecutioner::class)->setNowTime(new \DateTime('+'.(self::CONDITION_SECONDS * 2).' seconds'));
 
         // Execute the command again to trigger inaction related events
-        $this->runCommand('mautic:campaigns:trigger', ['-i' => 1, '--contact-id' => 1]);
+        $this->testSymfonyCommand('mautic:campaigns:trigger', ['-i' => 1, '--contact-id' => 1]);
 
         // Now we should have 1 email open decisions
         $byEvent = $this->getCampaignEventLogs([3, 4, 5, 14, 15]);
@@ -368,7 +368,7 @@ class TriggerCampaignCommandTest extends AbstractCampaignCommand
 
     public function testCampaignExecutionForSome(): void
     {
-        $this->runCommand('mautic:campaigns:trigger', ['-i' => 1, '--contact-ids' => '1,2,3,4,19']);
+        $this->testSymfonyCommand('mautic:campaigns:trigger', ['-i' => 1, '--contact-ids' => '1,2,3,4,19']);
 
         // Let's analyze
         $byEvent = $this->getCampaignEventLogs([1, 2, 11, 12, 13, 16]);
@@ -416,7 +416,7 @@ class TriggerCampaignCommandTest extends AbstractCampaignCommand
 
         // Wait 6 seconds then execute the campaign again to send scheduled events
         static::getContainer()->get(ScheduledExecutioner::class)->setNowTime(new \DateTime('+'.self::CONDITION_SECONDS.' seconds'));
-        $this->runCommand('mautic:campaigns:trigger', ['-i' => 1, '--contact-ids' => '1,2,3,4,19']);
+        $this->testSymfonyCommand('mautic:campaigns:trigger', ['-i' => 1, '--contact-ids' => '1,2,3,4,19']);
 
         // Send email 1 should no longer be scheduled
         $byEvent = $this->getCampaignEventLogs([2, 4]);
@@ -461,7 +461,7 @@ class TriggerCampaignCommandTest extends AbstractCampaignCommand
         static::getContainer()->get(InactiveExecutioner::class)->setNowTime(new \DateTime('+'.(self::CONDITION_SECONDS * 2).' seconds'));
 
         // Execute the command again to trigger inaction related events
-        $this->runCommand('mautic:campaigns:trigger', ['-i' => 1, '--contact-ids' => '1,2,3,4,19']);
+        $this->testSymfonyCommand('mautic:campaigns:trigger', ['-i' => 1, '--contact-ids' => '1,2,3,4,19']);
 
         // Now we should have 5 email open decisions
         $byEvent = $this->getCampaignEventLogs([3, 4, 5, 14, 15]);
@@ -542,7 +542,7 @@ class TriggerCampaignCommandTest extends AbstractCampaignCommand
         $this->em->flush();
         $this->em->clear();
 
-        $this->runCommand('mautic:campaigns:trigger', ['--campaign-id' => $campaign1->getId(), '--contact-id' => $lead->getId(), '--kickoff-only' => true]);
+        $this->testSymfonyCommand('mautic:campaigns:trigger', ['--campaign-id' => $campaign1->getId(), '--contact-id' => $lead->getId(), '--kickoff-only' => true]);
 
         $campaignLeads = $this->em->getRepository(Lead::class)->findBy(['lead' => $lead], ['campaign' => 'ASC']);
 
@@ -566,7 +566,7 @@ class TriggerCampaignCommandTest extends AbstractCampaignCommand
         $this->em->flush();
         $this->em->clear();
 
-        $this->runCommand('mautic:campaigns:trigger', ['--campaign-id' => $campaign->getId(), '--contact-id' => $lead->getId(), '--kickoff-only' => true]);
+        $this->testSymfonyCommand('mautic:campaigns:trigger', ['--campaign-id' => $campaign->getId(), '--contact-id' => $lead->getId(), '--kickoff-only' => true]);
 
         $campaignLeads = $this->em->getRepository(Lead::class)->findBy(['lead' => $lead]);
         Assert::assertCount(1, $campaignLeads);
@@ -592,7 +592,7 @@ class TriggerCampaignCommandTest extends AbstractCampaignCommand
         $this->em->flush();
         $this->em->clear();
 
-        $this->runCommand('mautic:campaigns:trigger', ['--campaign-id' => $campaign->getId(), '--contact-id' => $lead->getId(), '--kickoff-only' => true]);
+        $this->testSymfonyCommand('mautic:campaigns:trigger', ['--campaign-id' => $campaign->getId(), '--contact-id' => $lead->getId(), '--kickoff-only' => true]);
 
         $campaignLeads = $this->em->getRepository(Lead::class)->findBy(['lead' => $lead]);
         Assert::assertCount(1, $campaignLeads);
@@ -645,7 +645,7 @@ class TriggerCampaignCommandTest extends AbstractCampaignCommand
 
         $tStart = microtime(true);
 
-        $this->runCommand('mautic:campaigns:update', ['--campaign-id' => $campaign->getId()]);
+        $this->testSymfonyCommand('mautic:campaigns:update', ['--campaign-id' => $campaign->getId()]);
 
         $tDiff = microtime(true) - $tStart;
 
@@ -681,7 +681,7 @@ class TriggerCampaignCommandTest extends AbstractCampaignCommand
     public function testSegmentCacheCount(): void
     {
         // Execute the command again to trigger related events.
-        $this->runCommand('mautic:campaigns:trigger', ['-i' => 1]);
+        $this->testSymfonyCommand('mautic:campaigns:trigger', ['-i' => 1]);
         // Segment cache count should be 50.
         $count = $this->segmentCountCacheHelper->getSegmentContactCount(1);
         self::assertEquals(50, $count);
