@@ -606,10 +606,7 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
         return $this;
     }
 
-    /**
-     * @return mixed
-     */
-    public function getIsClone()
+    public function getIsClone(): bool
     {
         return $this->isCloned;
     }
