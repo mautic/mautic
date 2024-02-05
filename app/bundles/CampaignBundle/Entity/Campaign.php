@@ -192,7 +192,7 @@ class Campaign extends FormEntity implements PublishStatusIconAttributesInterfac
                     'events',
                     'publishUp',
                     'publishDown',
-                    'deleted'
+                    'deleted',
                 ]
             )
             ->build();
