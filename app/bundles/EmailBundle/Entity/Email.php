@@ -208,24 +208,24 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
      *
      * @var int
      */
-    private $cloneId;
+    private $clonedId;
 
     public function __clone()
     {
-        $this->isCloned         = true;
-        $this->cloneId          = $this->id;
-        $this->id               = null;
-        $this->sentCount        = 0;
-        $this->readCount        = 0;
-        $this->revision         = 0;
-        $this->variantSentCount = 0;
-        $this->variantReadCount = 0;
-        $this->variantStartDate = null;
-        $this->emailType        = null;
-        $this->sessionId        = 'new_'.hash('sha1', uniqid(mt_rand()));
-        $this->plainText        = null;
-        $this->publishUp        = null;
-        $this->publishDown      = null;
+        $this->isCloned          = true;
+        $this->clonedId          = $this->id;
+        $this->id                = null;
+        $this->sentCount         = 0;
+        $this->readCount         = 0;
+        $this->revision          = 0;
+        $this->variantSentCount  = 0;
+        $this->variantReadCount  = 0;
+        $this->variantStartDate  = null;
+        $this->emailType         = null;
+        $this->sessionId         = 'new_'.hash('sha1', uniqid(mt_rand()));
+        $this->plainText         = null;
+        $this->publishUp         = null;
+        $this->publishDown       = null;
         $this->clearTranslations();
         $this->clearVariants();
         $this->clearStats();
@@ -602,7 +602,7 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
 
     public function getClonedId()
     {
-        return (int) $this->cloneId;
+        return (int) $this->clonedId;
     }
 
     public function getRevision()
