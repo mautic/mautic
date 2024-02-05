@@ -3,6 +3,7 @@
 namespace Mautic\CoreBundle\Tests\Unit\Command;
 
 use Doctrine\DBAL\Connection;
+use Doctrine\DBAL\Result;
 use Doctrine\DBAL\Statement;
 use Doctrine\ORM\EntityManager;
 use Mautic\CoreBundle\Command\MaxMindDoNotSellPurgeCommand;
@@ -14,16 +15,7 @@ use Symfony\Component\Console\Tester\CommandTester;
 
 class MaxMindDoNotSellPurgeCommandTest extends \PHPUnit\Framework\TestCase
 {
-    protected function setUp(): void
-    {
-        parent::setUp();
-
-        if (!defined('MAUTIC_TABLE_PREFIX')) {
-            define('MAUTIC_TABLE_PREFIX', '');
-        }
-    }
-
-    public function testCommandDryRun()
+    public function testCommandDryRun(): void
     {
         $mockEntityManager = $this->buildMockEntityManager(['test1', 'test2']);
         $mockDoNotSellList = $this->createMock(MaxMindDoNotSellList::class);
@@ -40,7 +32,7 @@ class MaxMindDoNotSellPurgeCommandTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals(0, $result);
     }
 
-    public function testNoContactsFound()
+    public function testNoContactsFound(): void
     {
         $mockEntityManager = $this->buildMockEntityManager([]);
         $mockDoNotSellList = $this->createMock(MaxMindDoNotSellList::class);
@@ -56,7 +48,7 @@ class MaxMindDoNotSellPurgeCommandTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals(0, $result);
     }
 
-    public function testPurge()
+    public function testPurge(): void
     {
         $mockEntityManager = $this->buildMockEntityManager([['id' => 1, 'ip_address' => '123.123.123.123']]);
         $mockDoNotSellList = $this->createMock(MaxMindDoNotSellList::class);
@@ -73,10 +65,12 @@ class MaxMindDoNotSellPurgeCommandTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals(0, $result);
     }
 
-    private function buildMockEntityManager(array $dataToReturn)
+    private function buildMockEntityManager(array $dataToReturn): EntityManager
     {
         $mockStatement = $this->createMock(Statement::class);
-        $mockStatement->method('fetchAll')->withAnyParameters()->willReturn($dataToReturn);
+        $resultMock    = $this->createMock(Result::class);
+        $mockStatement->method('executeQuery')->withAnyParameters()->willReturn($resultMock);
+        $resultMock->method('fetchAllAssociative')->withAnyParameters()->willReturn($dataToReturn);
 
         $mockConnection = $this->createMock(Connection::class);
         $mockConnection->method('prepare')->withAnyParameters()->willReturn($mockStatement);

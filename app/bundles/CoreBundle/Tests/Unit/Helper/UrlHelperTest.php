@@ -1,21 +1,12 @@
 <?php
 
-/*
- * @copyright   2015 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CoreBundle\Tests\Unit\Helper;
 
 use Mautic\CoreBundle\Helper\UrlHelper;
 
 class UrlHelperTest extends \PHPUnit\Framework\TestCase
 {
-    public function testAppendQueryToUrl()
+    public function testAppendQueryToUrl(): void
     {
         $appendQueryString = 'utm_source=mautic.org';
 
@@ -33,7 +24,7 @@ class UrlHelperTest extends \PHPUnit\Framework\TestCase
         }
     }
 
-    public function testSanitizeAbsoluteUrlDoesNotModifyCorrectFullUrl()
+    public function testSanitizeAbsoluteUrlDoesNotModifyCorrectFullUrl(): void
     {
         $this->assertEquals(
             'http://username:password@hostname:9090/path?arg=value#anchor',
@@ -41,7 +32,7 @@ class UrlHelperTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testSanitizeAbsoluteUrlSetHttpIfSchemeIsMissing()
+    public function testSanitizeAbsoluteUrlSetHttpIfSchemeIsMissing(): void
     {
         $this->assertEquals(
             'http://username:password@hostname:9090/path?arg=value#anchor',
@@ -49,7 +40,7 @@ class UrlHelperTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testSanitizeAbsoluteUrlSetHttpIfSchemeIsRelative()
+    public function testSanitizeAbsoluteUrlSetHttpIfSchemeIsRelative(): void
     {
         $this->assertEquals(
             '//username:password@hostname:9090/path?arg=value#anchor',
@@ -57,7 +48,7 @@ class UrlHelperTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testSanitizeAbsoluteUrlDoNotSetHttpIfSchemeIsRelative()
+    public function testSanitizeAbsoluteUrlDoNotSetHttpIfSchemeIsRelative(): void
     {
         $this->assertEquals(
             '//username:password@hostname:9090/path?arg=value#anchor',
@@ -65,7 +56,7 @@ class UrlHelperTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testSanitizeAbsoluteUrlWithHttps()
+    public function testSanitizeAbsoluteUrlWithHttps(): void
     {
         $this->assertEquals(
             'https://username:password@hostname:9090/path?arg=value#anchor',
@@ -73,7 +64,7 @@ class UrlHelperTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testSanitizeAbsoluteUrlWithHttp()
+    public function testSanitizeAbsoluteUrlWithHttp(): void
     {
         $this->assertEquals(
             'http://username:password@hostname:9090/path?arg=value#anchor',
@@ -81,7 +72,7 @@ class UrlHelperTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testSanitizeAbsoluteUrlWithFtp()
+    public function testSanitizeAbsoluteUrlWithFtp(): void
     {
         $this->assertEquals(
             'ftp://username:password@hostname:9090/path?arg=value#anchor',
@@ -89,7 +80,7 @@ class UrlHelperTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testSanitizeAbsoluteUrlSanitizeQuery()
+    public function testSanitizeAbsoluteUrlSanitizeQuery(): void
     {
         $this->assertEquals(
             'http://username:password@hostname:9090/path?ar_g1=value&arg2=some+email%40address.com#anchor',
@@ -97,9 +88,16 @@ class UrlHelperTest extends \PHPUnit\Framework\TestCase
                 'http://username:password@hostname:9090/path?ar g1=value&arg2=some+email@address.com#anchor'
             )
         );
+
+        $this->assertEquals(
+            'http://username:password@hostname:9090/path?a=',
+            UrlHelper::sanitizeAbsoluteUrl(
+                'http://username:password@hostname:9090/path?a'
+            )
+        );
     }
 
-    public function testSanitizeAbsoluteUrlSanitizePathWhitespace()
+    public function testSanitizeAbsoluteUrlSanitizePathWhitespace(): void
     {
         $this->assertEquals(
             'http://username:password@hostname:9090/some%20path%20with%20whitespace',
@@ -107,7 +105,7 @@ class UrlHelperTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetUrlsFromPlaintextWithHttp()
+    public function testGetUrlsFromPlaintextWithHttp(): void
     {
         $this->assertEquals(
             ['http://mautic.org'],
@@ -115,10 +113,10 @@ class UrlHelperTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetUrlsFromPlaintextSkipDefaultTokenValues()
+    public function testGetUrlsFromPlaintextSkipDefaultTokenValues(): void
     {
         $this->assertEquals(
-        // 1 is skipped because it's set as the token default
+            // 1 is skipped because it's set as the token default
             [0 => 'https://find.this', 2 => '{contactfield=website|http://skip.this}'],
             UrlHelper::getUrlsFromPlaintext(
                 'Find this url: https://find.this, but allow this token because we know its a url: {contactfield=website|http://skip.this}! '
@@ -126,7 +124,7 @@ class UrlHelperTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetUrlsFromPlaintextWith2Urls()
+    public function testGetUrlsFromPlaintextWith2Urls(): void
     {
         $this->assertEquals(
             ['http://mautic.org', 'http://mucktick.org'],
@@ -136,7 +134,7 @@ class UrlHelperTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetUrlsFromPlaintextWithSymbols()
+    public function testGetUrlsFromPlaintextWithSymbols(): void
     {
         $this->assertEquals(
             [
@@ -182,11 +180,33 @@ STRING
         );
     }
 
-    public function testUrlValid()
+    public function testUrlValid(): void
     {
         $this->assertTrue(UrlHelper::isValidUrl('https://domain.tld/e'));
         $this->assertTrue(UrlHelper::isValidUrl('https://domain.tld/é'));
         $this->assertFalse(UrlHelper::isValidUrl('notvalidurl'));
         $this->assertFalse(UrlHelper::isValidUrl('notvalidurlé'));
+    }
+
+    /**
+     * @dataProvider dataDecodeAmpersands
+     */
+    public function testDecodeAmpersands(string $value, string $expected): void
+    {
+        $this->assertSame($expected, UrlHelper::decodeAmpersands($value));
+    }
+
+    /**
+     * @return iterable<array<string>>
+     */
+    public function dataDecodeAmpersands(): iterable
+    {
+        yield 'With html encoded ampersands' => ['https://example.org/?utm_source=mautic&amp;utm_medium=phpunit&amp;utm_campaign=tests', 'https://example.org/?utm_source=mautic&utm_medium=phpunit&utm_campaign=tests'];
+        yield 'With decimal encoded ampersands' => ['https://example.org/?utm_source=mautic&#38;utm_medium=phpunit&#38;utm_campaign=tests', 'https://example.org/?utm_source=mautic&utm_medium=phpunit&utm_campaign=tests'];
+        yield 'With hex encoded ampersands' => ['https://example.org/?utm_source=mautic&#x26;utm_medium=phpunit&#x26;utm_campaign=tests', 'https://example.org/?utm_source=mautic&utm_medium=phpunit&utm_campaign=tests'];
+        yield 'With mixed encoded ampersands' => ['https://example.org/?utm_source=mautic&amp;utm_medium=phpunit&#38;utm_campaign=tests', 'https://example.org/?utm_source=mautic&utm_medium=phpunit&utm_campaign=tests'];
+        yield 'With double encoded ampersands' => ['https://example.org/?utm_source=mautic&#38;amp;utm_medium=phpunit&#38;amp;utm_campaign=tests', 'https://example.org/?utm_source=mautic&utm_medium=phpunit&utm_campaign=tests'];
+        yield 'With other encoded characters' => ['https://example.org/?utm_source=mautic&utm_medium=phpunit&utm_campaign=&#60;tests&#62;', 'https://example.org/?utm_source=mautic&utm_medium=phpunit&utm_campaign=&#60;tests&#62;'];
+        yield 'Without encoded ampersands' => ['https://example.org/?utm_source=mautic&utm_medium=phpunit&utm_campaign=tests', 'https://example.org/?utm_source=mautic&utm_medium=phpunit&utm_campaign=tests'];
     }
 }

@@ -1,0 +1,24 @@
+{% set route = route|default('mautic_campaignevent_action') %}
+
+{% if update is not defined %}
+<div id="CampaignEvent_{{ event['id'] }}" data-type="{{ event['eventType'] }}" class="draggable list-campaign-event list-campaign-{{ event['eventType'] }}" data-event="{{ event['type'] }}" data-event-id="{{ event['id'] }}">
+{% endif %}
+
+    <div class="campaign-event-content">
+        <div><span class="campaign-event-name ellipsis">{% if ('dev' == constant('MAUTIC_ENV')) %}<small>{{ event['id'] }}</small> {% endif %}{{ event['name'] }}</span></div>
+        <a class="btn btn-primary btn-nospin btn-xs highlight-jump-target" href="javascript:void(0)" onClick="Mautic.highlightJumpTarget(event, this)" data-jump-target="{{ event['properties']['jumpToEvent'] }}">
+            <i class="fa fa-refresh" style="margin-top:4px;"></i>
+        </a>
+    </div>
+
+{% if update is not defined %}
+    <div class="campaign-event-buttons hide">
+        <a data-toggle="ajaxmodal" data-prevent-dismiss="true" data-target="#CampaignEventModal" href="{{ path(route, {'objectAction': 'edit', 'objectId': event['id'], 'campaignId': campaignId}) }}" class="btn btn-primary btn-xs btn-edit">
+            <i class="fa fa-pencil"></i>
+        </a>
+        <a data-toggle="ajax" data-target="CampaignEvent_{{ event['id'] }}" data-ignore-formexit="true" data-method="POST" data-hide-loadingbar="true" href="{{ path(route, {'objectAction': 'delete', 'objectId': event['id'], 'campaignId': campaignId}) }}"  class="btn btn-delete btn-danger btn-xs">
+            <i class="fa fa-times"></i>
+        </a>
+    </div>
+</div>
+{% endif %}

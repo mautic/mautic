@@ -1,55 +1,56 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CategoryBundle\Model;
 
+use Doctrine\ORM\EntityManager;
 use Mautic\CategoryBundle\CategoryEvents;
 use Mautic\CategoryBundle\Entity\Category;
+use Mautic\CategoryBundle\Entity\CategoryRepository;
 use Mautic\CategoryBundle\Event\CategoryEvent;
 use Mautic\CategoryBundle\Form\Type\CategoryType;
+use Mautic\CoreBundle\Helper\CoreParametersHelper;
+use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Model\FormModel;
-use Symfony\Component\EventDispatcher\Event;
+use Mautic\CoreBundle\Security\Permissions\CorePermissions;
+use Mautic\CoreBundle\Translation\Translator;
+use Psr\Log\LoggerInterface;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
+use Symfony\Contracts\EventDispatcher\Event;
 
 /**
- * Class CategoryModel
- * {@inheritdoc}
+ * @extends FormModel<Category>
  */
 class CategoryModel extends FormModel
 {
-    /**
-     * @var RequestStack
-     */
-    protected $requestStack;
-
-    /**
-     * CategoryModel constructor.
-     */
-    public function __construct(RequestStack $requestStack)
-    {
-        $this->requestStack = $requestStack;
+    public function __construct(
+        protected RequestStack $requestStack,
+        EntityManager $em,
+        CorePermissions $security,
+        EventDispatcherInterface $dispatcher,
+        UrlGeneratorInterface $router,
+        Translator $translator,
+        UserHelper $userHelper,
+        LoggerInterface $mauticLogger,
+        CoreParametersHelper $coreParametersHelper
+    ) {
+        parent::__construct($em, $security, $dispatcher, $router, $translator, $userHelper, $mauticLogger, $coreParametersHelper);
     }
 
-    public function getRepository()
+    public function getRepository(): CategoryRepository
     {
-        return $this->em->getRepository('MauticCategoryBundle:Category');
+        return $this->em->getRepository(Category::class);
     }
 
-    public function getNameGetter()
+    public function getNameGetter(): string
     {
         return 'getTitle';
     }
 
-    public function getPermissionBase($bundle = null)
+    public function getPermissionBase($bundle = null): string
     {
         if (null === $bundle) {
             $bundle = $this->requestStack->getCurrentRequest()->get('bundle');
@@ -62,23 +63,15 @@ class CategoryModel extends FormModel
         return $bundle.':categories';
     }
 
-    /**
-     * {@inheritdoc}
-     *
-     * @param $entity
-     * @param $unlock
-     *
-     * @return mixed
-     */
-    public function saveEntity($entity, $unlock = true)
+    public function saveEntity($entity, $unlock = true): void
     {
         $alias = $entity->getAlias();
         if (empty($alias)) {
             $alias = $entity->getTitle();
         }
-        $alias = $this->cleanAlias($alias, '', false, '-');
+        $alias = $this->cleanAlias($alias, '', 0, '-');
 
-        //make sure alias is not already taken
+        // make sure alias is not already taken
         $repo      = $this->getRepository();
         $testAlias = $alias;
         $bundle    = $entity->getBundle();
@@ -99,18 +92,12 @@ class CategoryModel extends FormModel
     }
 
     /**
-     * {@inheritdoc}
-     *
-     * @param       $entity
-     * @param       $formFactory
-     * @param null  $action
-     * @param array $options
-     *
-     * @return mixed
+     * @param string|null $action
+     * @param array       $options
      *
      * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
      */
-    public function createForm($entity, $formFactory, $action = null, $options = [])
+    public function createForm($entity, FormFactoryInterface $formFactory, $action = null, $options = []): \Symfony\Component\Form\FormInterface
     {
         if (!$entity instanceof Category) {
             throw new MethodNotAllowedHttpException(['Category']);
@@ -124,12 +111,8 @@ class CategoryModel extends FormModel
 
     /**
      * Get a specific entity or generate a new one if id is empty.
-     *
-     * @param $id
-     *
-     * @return Category
      */
-    public function getEntity($id = null)
+    public function getEntity($id = null): ?Category
     {
         if (null === $id) {
             return new Category();
@@ -139,16 +122,9 @@ class CategoryModel extends FormModel
     }
 
     /**
-     * {@inheritdoc}
-     *
-     * @param $action
-     * @param $event
-     * @param $entity
-     * @param $isNew
-     *
      * @throws \Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException
      */
-    protected function dispatchEvent($action, &$entity, $isNew = false, Event $event = null)
+    protected function dispatchEvent($action, &$entity, $isNew = false, Event $event = null): ?Event
     {
         if (!$entity instanceof Category) {
             throw new MethodNotAllowedHttpException(['Category']);
@@ -177,7 +153,7 @@ class CategoryModel extends FormModel
                 $event->setEntityManager($this->em);
             }
 
-            $this->dispatcher->dispatch($name, $event);
+            $this->dispatcher->dispatch($event, $name);
 
             return $event;
         } else {
@@ -187,14 +163,8 @@ class CategoryModel extends FormModel
 
     /**
      * Get list of entities for autopopulate fields.
-     *
-     * @param $bundle
-     * @param $filter
-     * @param $limit
-     *
-     * @return array
      */
-    public function getLookupResults($bundle, $filter = '', $limit = 10)
+    public function getLookupResults($bundle, $filter = '', $limit = 10): array
     {
         static $results = [];
 

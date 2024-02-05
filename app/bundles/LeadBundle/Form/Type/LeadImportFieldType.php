@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\LeadBundle\Form\Type;
 
 use Doctrine\ORM\EntityManager;
@@ -21,27 +12,20 @@ use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
+/**
+ * @extends AbstractType<mixed>
+ */
 class LeadImportFieldType extends AbstractType
 {
-    /**
-     * @var TranslatorInterface
-     */
-    private $translator;
-
-    /**
-     * @var EntityManager
-     */
-    private $entityManager;
-
-    public function __construct(TranslatorInterface $translator, EntityManager $entityManager)
-    {
-        $this->translator    = $translator;
-        $this->entityManager = $entityManager;
+    public function __construct(
+        private TranslatorInterface $translator,
+        private EntityManager $entityManager
+    ) {
     }
 
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $choices = [];
         foreach ($options['all_fields'] as $optionGroup => $fields) {
@@ -158,10 +142,16 @@ class LeadImportFieldType extends AbstractType
         $builder->add('buttons', FormButtonsType::class, $buttons);
     }
 
-    public function configureOptions(OptionsResolver $resolver)
+    public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setRequired(['all_fields', 'import_fields', 'object']);
-        $resolver->setDefaults(['line_count_limit' => 0]);
+        $resolver->setDefaults([
+            'line_count_limit'  => 0,
+            'validation_groups' => [
+                User::class,
+                'determineValidationGroups',
+            ],
+        ]);
     }
 
     /**
@@ -179,10 +169,6 @@ class LeadImportFieldType extends AbstractType
      */
     public function getDefaultValue($fieldName, array $importFields)
     {
-        if (isset($importFields[$fieldName])) {
-            return $importFields[$fieldName];
-        }
-
-        return null;
+        return $importFields[$fieldName] ?? null;
     }
 }

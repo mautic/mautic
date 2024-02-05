@@ -1,0 +1,108 @@
+{% set channelNumber = 0 %}
+{% if form is defined %}
+<table class="table table-striped">
+    {% for key, channel in form.lead_channels.subscribed_channels.vars.choices %}
+        {%- set contactMe = leadChannels[channel.value] is defined %}
+        {%- set checked = contactMe ? 'checked' : '' %}
+        {%- set channelName = getChannelLabel(channel.value)|lower %}
+        <tr>
+            <td>
+                <div class="text-left">
+                    <input type="hidden" id="{{ channel.value }}"
+                           name="lead_contact_frequency_rules[lead_channels][subscribed_channels][{{ key }}]"
+                           value="">
+                    <input type="checkbox" id="{{ channel.value }}"
+                           name="lead_contact_frequency_rules[lead_channels][subscribed_channels][{{ key }}]"
+                           onclick="togglePreferredChannel(this.value);"
+                           value="{{ channel.value|e }}" {{ checked }}>
+                    <label for="{{ channel.value }}" id="is-contactable-{{ channel.value }}" data-channel="{{ channelName }}">
+                        {{ 'mautic.lead.contact.me.label'|trans({'%channel%': channelName}) }}
+                    </label>
+                </div>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <div id="frequency_{{ channel.value }}" class="text-left row">
+                    {%- if
+                        form.lead_channels['frequency_number_' ~ channel.value] is defined
+                        and form.lead_channels['frequency_time_' ~ channel.value] is defined
+                    %}
+                        {%- if
+                              showContactFrequency
+                              and not form.lead_channels['frequency_number_' ~ channel.value].isRendered
+                              and not form.lead_channels['frequency_time_' ~ channel.value].isRendered
+                        %}
+                            <div class="col-md-6">
+                                <label class="text-muted label1">{{ form.lead_channels['frequency_number_' ~ channel.value].vars.label|trans }}</label>
+                                {{ form_widget(form.lead_channels['frequency_number_' ~ channel.value]) }}
+                                {{ form_label(form.lead_channels['frequency_time_' ~ channel.value]) }}
+                                {{ form_widget(form.lead_channels['frequency_time_' ~ channel.value]) }}
+                            </div>
+                        {%- else %}
+                            {%- do form.lead_channels['frequency_time_' ~ channel.value].setRendered(true) %}
+                            {%- do form.lead_channels['frequency_number_' ~ channel.value].setRendered(true) %}
+                        {%- endif %}
+                    {%- endif  %}
+
+                    {%- if
+                          form.lead_channels['contact_pause_start_date_' ~ channel.value] is defined
+                          and form.lead_channels['contact_pause_end_date_' ~ channel.value] is defined
+                    %}
+                        {%- if
+                              showContactPauseDates
+                              and not form.lead_channels['contact_pause_start_date_' ~ channel.value].isRendered
+                              and not form.lead_channels['contact_pause_end_date_' ~ channel.value].isRendered
+                        %}
+                            <div class="col-md-6">
+                                <label class="text-muted label3">{{ 'mautic.lead.frequency.dates.label'|trans }}</label>
+                                {{ form_widget(form.lead_channels['contact_pause_start_date_' ~ channel.value]) }}
+                                {{ form_label(form.lead_channels['contact_pause_end_date_' ~ channel.value]) }}
+                                {{ form_widget(form.lead_channels['contact_pause_end_date_' ~ channel.value]) }}
+                            </div>
+                        {%- else %}
+                            {%- do form.lead_channels['contact_pause_start_date_' ~ channel.value].setRendered(true) %}
+                            {%- do form.lead_channels['contact_pause_end_date_' ~ channel.value].setRendered(true) %}
+                        {%- endif %}
+                    {%- endif  %}
+                </div>
+            </td>
+        </tr>
+      {%- do form.lead_channels.subscribed_channels.setRendered(true) %}
+    {% endfor %}
+</table>
+{% else %}
+<table class="table table-striped">
+    <tbody>
+    <tr>
+        <td>
+            <div class="text-left">
+                <input type="checkbox" checked="">
+                <label class="control-label">
+                    {{ 'mautic.lead.contact.me.label'|trans }}</label>
+            </div>
+        </td>
+    </tr>
+    <tr>
+        <td>
+            <div id="frequency_email" class="text-left row">
+                <div class="col-xs-6">
+                    <label class="text-muted label1">{{ 'mautic.lead.list.frequency.number'|trans }}</label>
+                    <input type="text" class="frequency form-control">
+                    <label class="text-muted fw-n frequency-label label2">{{ 'mautic.lead.list.frequency.times'|trans }}</label>
+                    <select class="form-control">
+                        <option value="" selected="selected"></option>
+                    </select>
+                </div>
+                <div class="col-xs-6">
+                    <label class="text-muted label3">{{ 'mautic.lead.frequency.dates.label'|trans }}</label>
+                    <input type="date" class="form-control">
+                    <label class="frequency-label text-muted fw-n label4">{{ 'mautic.lead.frequency.contact.end.date'|trans }}</label>
+                    <input type="date" class="form-control">
+                </div>
+            </div>
+        </td>
+    </tr>
+    </tbody>
+</table>
+{% endif %}

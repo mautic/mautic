@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\ApiBundle\Form\Type;
 
 use Mautic\CoreBundle\Form\Type\YesNoButtonGroupType;
@@ -18,18 +9,18 @@ use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
 /**
- * Class ConfigType.
+ * @extends AbstractType<mixed>
  */
 class ConfigType extends AbstractType
 {
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder->add(
             'api_enabled',
             YesNoButtonGroupType::class,
             [
                 'label' => 'mautic.api.config.form.api.enabled',
-                'data'  => isset($options['data']['api_enabled']) ? (bool) $options['data']['api_enabled'] : false,
+                'data'  => isset($options['data']['api_enabled']) && (bool) $options['data']['api_enabled'],
                 'attr'  => [
                     'tooltip' => 'mautic.api.config.form.api.enabled.tooltip',
                 ],
@@ -41,7 +32,7 @@ class ConfigType extends AbstractType
             YesNoButtonGroupType::class,
             [
                 'label' => 'mautic.api.config.form.api.basic_auth_enabled',
-                'data'  => isset($options['data']['api_enable_basic_auth']) ? (bool) $options['data']['api_enable_basic_auth'] : false,
+                'data'  => isset($options['data']['api_enable_basic_auth']) && (bool) $options['data']['api_enable_basic_auth'],
                 'attr'  => [
                     'tooltip' => 'mautic.api.config.form.api.basic_auth.tooltip',
                 ],
@@ -89,9 +80,6 @@ class ConfigType extends AbstractType
         );
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getBlockPrefix()
     {
         return 'apiconfig';

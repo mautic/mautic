@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2018 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\DashboardBundle\Dashboard;
 
 use Mautic\CoreBundle\Helper\UserHelper;
@@ -21,28 +12,14 @@ use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 class Widget
 {
     public const FORMAT_HUMAN = 'M j, Y';
+
     public const FORMAT_MYSQL = 'Y-m-d';
 
-    /**
-     * @var DashboardModel
-     */
-    private $dashboardModel;
-
-    /**
-     * @var UserHelper
-     */
-    private $userHelper;
-
-    /**
-     * @var Session
-     */
-    private $session;
-
-    public function __construct(DashboardModel $dashboardModel, UserHelper $userHelper, Session $session)
-    {
-        $this->dashboardModel = $dashboardModel;
-        $this->userHelper     = $userHelper;
-        $this->session        = $session;
+    public function __construct(
+        private DashboardModel $dashboardModel,
+        private UserHelper $userHelper,
+        private Session $session
+    ) {
     }
 
     /**
@@ -76,7 +53,7 @@ class Widget
      *
      * @throws \Exception
      */
-    public function setFilter(Request $request)
+    public function setFilter(Request $request): void
     {
         if (!$request->isMethod(Request::METHOD_POST)) {
             return;

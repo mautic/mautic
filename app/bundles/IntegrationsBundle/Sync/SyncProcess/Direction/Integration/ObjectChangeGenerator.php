@@ -2,15 +2,6 @@
 
 declare(strict_types=1);
 
-/*
- * @copyright   2018 Mautic Inc. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://www.mautic.com
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\IntegrationsBundle\Sync\SyncProcess\Direction\Integration;
 
 use Mautic\IntegrationsBundle\Exception\InvalidValueException;
@@ -28,39 +19,19 @@ use Mautic\IntegrationsBundle\Sync\SyncProcess\Direction\Helper\ValueHelper;
 
 class ObjectChangeGenerator
 {
-    /**
-     * @var ValueHelper
-     */
-    private $valueHelper;
+    private ?\Mautic\IntegrationsBundle\Sync\DAO\Sync\Report\ReportDAO $syncReport = null;
 
-    /**
-     * @var ReportDAO
-     */
-    private $syncReport;
+    private ?\Mautic\IntegrationsBundle\Sync\DAO\Mapping\MappingManualDAO $mappingManual = null;
 
-    /**
-     * @var MappingManualDAO
-     */
-    private $mappingManual;
+    private ?\Mautic\IntegrationsBundle\Sync\DAO\Sync\Report\ObjectDAO $internalObject = null;
 
-    /**
-     * @var ReportObjectDAO
-     */
-    private $internalObject;
+    private ?\Mautic\IntegrationsBundle\Sync\DAO\Sync\Report\ObjectDAO $integrationObject = null;
 
-    /**
-     * @var ReportObjectDAO
-     */
-    private $integrationObject;
+    private ?\Mautic\IntegrationsBundle\Sync\DAO\Sync\Order\ObjectChangeDAO $objectChange = null;
 
-    /**
-     * @var ObjectChangeDAO
-     */
-    private $objectChange;
-
-    public function __construct(ValueHelper $valueHelper)
-    {
-        $this->valueHelper = $valueHelper;
+    public function __construct(
+        private ValueHelper $valueHelper
+    ) {
     }
 
     /**
@@ -98,7 +69,7 @@ class ObjectChangeGenerator
                     $internalObject->getObject(),
                     (string) $internalObject->getObjectId()
                 ),
-                __CLASS__.':'.__FUNCTION__
+                self::class.':'.__FUNCTION__
             );
         } else {
             DebugLogger::log(
@@ -108,7 +79,7 @@ class ObjectChangeGenerator
                     $internalObject->getObject(),
                     (string) $internalObject->getObjectId()
                 ),
-                __CLASS__.':'.__FUNCTION__
+                self::class.':'.__FUNCTION__
             );
         }
 
@@ -137,7 +108,7 @@ class ObjectChangeGenerator
                 $this->internalObject->getObjectId(),
                 $fieldMappingDAO->getInternalField()
             );
-        } catch (FieldNotFoundException $e) {
+        } catch (FieldNotFoundException) {
             return;
         }
 
@@ -147,7 +118,7 @@ class ObjectChangeGenerator
                 $fieldState,
                 $fieldMappingDAO->getSyncDirection()
             );
-        } catch (InvalidValueException $e) {
+        } catch (InvalidValueException) {
             return; // Field has to be skipped
         }
 
@@ -172,7 +143,7 @@ class ObjectChangeGenerator
                     $fieldMappingDAO->getIntegrationField(),
                     $fieldState
                 ),
-                __CLASS__.':'.__FUNCTION__
+                self::class.':'.__FUNCTION__
             );
 
             return;
@@ -189,7 +160,7 @@ class ObjectChangeGenerator
                 $fieldMappingDAO->getIntegrationField(),
                 var_export($newValue->getNormalizedValue(), true)
             ),
-            __CLASS__.':'.__FUNCTION__
+            self::class.':'.__FUNCTION__
         );
     }
 }

@@ -1,0 +1,22 @@
+{#
+  Variables
+    - bundle
+    - icon
+#}
+<div class="row">
+    <div class="col-xs-4">
+        <img class="img img-responsive" style="margin: auto;" src="{{ getAssetUrl(icon) }}" />
+    </div>
+
+    <div class="col-xs-8">
+        <h3>{{ bundle.primaryDescription|purify }}</h3>
+    </div>
+</div>
+
+{% if bundle.hasSecondaryDescription %}
+<div class="row mt-lg">
+    <div class="col-xs-12">
+        {{ bundle.secondaryDescription|purify }}
+    </div>
+</div>
+{% endif %}

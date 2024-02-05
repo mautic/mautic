@@ -1,68 +1,41 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace MauticPlugin\MauticSocialBundle\Integration;
 
-/**
- * Class FoursquareIntegration.
- */
 class FoursquareIntegration extends SocialIntegration
 {
-    /**
-     * {@inheritdoc}
-     */
-    public function getName()
+    public function getName(): string
     {
         return 'Foursquare';
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getPriority()
+    public function getPriority(): int
     {
         return 2;
     }
 
     /**
-     * {@inheritdoc}
+     * @return string[]
      */
-    public function getIdentifierFields()
+    public function getIdentifierFields(): array
     {
         return [
             'email',
-            'twitter', //foursquare allows searching directly by twitter handle
+            'twitter', // foursquare allows searching directly by twitter handle
         ];
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getAuthenticationUrl()
+    public function getAuthenticationUrl(): string
     {
         return 'https://foursquare.com/oauth2/authenticate';
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getAccessTokenUrl()
+    public function getAccessTokenUrl(): string
     {
         return 'https://foursquare.com/oauth2/access_token';
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getAuthenticationType()
+    public function getAuthenticationType(): string
     {
         return 'oauth2';
     }
@@ -70,16 +43,13 @@ class FoursquareIntegration extends SocialIntegration
     /**
      * @param string $endpoint
      * @param string $m
-     *
-     * @return string
      */
-    public function getApiUrl($endpoint, $m = 'foursquare')
+    public function getApiUrl($endpoint, $m = 'foursquare'): string
     {
         return "https://api.foursquare.com/v2/$endpoint?v=20140806&m={$m}";
     }
 
     /**
-     * @param        $url
      * @param array  $parameters
      * @param string $method
      * @param array  $settings
@@ -95,13 +65,8 @@ class FoursquareIntegration extends SocialIntegration
 
     /**
      * Get public data.
-     *
-     * @param $identifier
-     * @param $socialCache
-     *
-     * @return array
      */
-    public function getUserData($identifier, &$socialCache)
+    public function getUserData($identifier, &$socialCache): void
     {
         if ($id = $this->getContactUserId($identifier, $socialCache)) {
             $url  = $this->getApiUrl("users/{$id}");
@@ -117,21 +82,13 @@ class FoursquareIntegration extends SocialIntegration
         }
     }
 
-    /**
-     * {@inheritdoc}
-     *
-     * @param $identifier
-     * @param $socialCache
-     *
-     * @return array|void
-     */
-    public function getPublicActivity($identifier, &$socialCache)
+    public function getPublicActivity($identifier, &$socialCache): void
     {
         if ($id = $this->getContactUserId($identifier, $socialCache)) {
             $activity = [
-                //'mayorships' => array(),
+                // 'mayorships' => array(),
                 'tips' => [],
-                //'lists'      => array()
+                // 'lists'      => array()
             ];
 
             /*
@@ -165,13 +122,13 @@ class FoursquareIntegration extends SocialIntegration
             }
             */
 
-            //tips
+            // tips
             $url  = $this->getApiUrl("users/{$id}/tips").'&limit=5&sort=recent';
             $data = $this->makeRequest($url);
 
             if (isset($data->response->tips) && count($data->response->tips->items)) {
                 foreach ($data->response->tips->items as $t) {
-                    //find main category of venue
+                    // find main category of venue
                     $category = '';
                     foreach ($t->venue->categories as $c) {
                         if ($c->primary) {
@@ -249,10 +206,7 @@ class FoursquareIntegration extends SocialIntegration
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getErrorsFromResponse($response)
+    public function getErrorsFromResponse($response): string
     {
         if (is_object($response) && isset($response->meta->errorDetail)) {
             return $response->meta->errorDetail.' ('.$response->meta->code.')';
@@ -261,9 +215,6 @@ class FoursquareIntegration extends SocialIntegration
         return '';
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function matchFieldName($field, $subfield = '')
     {
         if ('contact' == $field && in_array($subfield, ['facebook', 'twitter'])) {
@@ -273,10 +224,7 @@ class FoursquareIntegration extends SocialIntegration
         return parent::matchFieldName($field, $subfield);
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getAvailableLeadFields($settings = [])
+    public function getAvailableLeadFields($settings = []): array
     {
         return [
             'profileHandle' => ['type' => 'string'],
@@ -296,10 +244,7 @@ class FoursquareIntegration extends SocialIntegration
         ];
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getSupportedFeatures()
+    public function getSupportedFeatures(): array
     {
         return [
             'public_profile',
@@ -308,9 +253,6 @@ class FoursquareIntegration extends SocialIntegration
     }
 
     /**
-     * @param $identifier
-     * @param $socialCache
-     *
      * @return bool
      */
     private function getContactUserId(&$identifier, &$socialCache)
@@ -341,9 +283,6 @@ class FoursquareIntegration extends SocialIntegration
         return false;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getFormType()
     {
         return null;

@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2020 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\UserBundle\Tests\Security\SAML\Store;
 
 use LightSaml\Credential\X509Credential;
@@ -19,38 +10,31 @@ use PHPUnit\Framework\TestCase;
 
 class CredentialsStoreTest extends TestCase
 {
+    private string $cacheDir;
+
     /**
      * @var CoreParametersHelper|MockObject
      */
-    private $coreParametersHelper;
+    private \PHPUnit\Framework\MockObject\MockObject $coreParametersHelper;
 
     protected function setUp(): void
     {
         $this->coreParametersHelper = $this->createMock(CoreParametersHelper::class);
+        $this->cacheDir             = dirname((new \ReflectionClass(\Composer\Autoload\ClassLoader::class))->getFileName(), 3);
     }
 
-    public function testEmptyArrayReturnedIfEntityIdsDoNotMatch()
+    public function testEmptyArrayReturnedIfEntityIdsDoNotMatch(): void
     {
         $store = new CredentialsStore($this->coreParametersHelper, 'foobar');
 
         $this->assertEquals([], $store->getByEntityId('barfoo'));
     }
 
-    public function testDefaultCredentialsAreUsedIfSamlIsDisabled()
-    {
-        $store = new CredentialsStore($this->coreParametersHelper, 'foobar');
-
-        $credentials = $store->getByEntityId('foobar');
-        $this->assertCount(1, $credentials);
-
-        $this->assertInstanceOf(X509Credential::class, $credentials[0]);
-    }
-
-    public function testDefaultCredentialsAreUsedIfCustomCertificateIsNotProvided()
+    public function testDefaultCredentialsAreUsedIfSamlIsDisabled(): void
     {
         $this->coreParametersHelper->method('get')
-            ->withConsecutive(['saml_idp_metadata'], ['saml_idp_own_certificate'])
-            ->willReturnOnConsecutiveCalls('1', '');
+          ->withConsecutive(['saml_idp_metadata'], ['cache_path'])
+          ->willReturnOnConsecutiveCalls('', $this->cacheDir);
 
         $store = new CredentialsStore($this->coreParametersHelper, 'foobar');
 
@@ -60,7 +44,21 @@ class CredentialsStoreTest extends TestCase
         $this->assertInstanceOf(X509Credential::class, $credentials[0]);
     }
 
-    public function testOwnCredentialsAreUsedIfProvided()
+    public function testDefaultCredentialsAreUsedIfCustomCertificateIsNotProvided(): void
+    {
+        $this->coreParametersHelper->method('get')
+            ->withConsecutive(['saml_idp_metadata'], ['saml_idp_own_certificate'], ['cache_path'])
+            ->willReturnOnConsecutiveCalls('1', '', $this->cacheDir);
+
+        $store = new CredentialsStore($this->coreParametersHelper, 'foobar');
+
+        $credentials = $store->getByEntityId('foobar');
+        $this->assertCount(1, $credentials);
+
+        $this->assertInstanceOf(X509Credential::class, $credentials[0]);
+    }
+
+    public function testOwnCredentialsAreUsedIfProvided(): void
     {
         $this->coreParametersHelper->method('get')
             ->withConsecutive(

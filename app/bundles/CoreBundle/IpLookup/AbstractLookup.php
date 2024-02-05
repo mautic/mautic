@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2015 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CoreBundle\IpLookup;
 
 use GuzzleHttp\Client;
@@ -17,35 +8,29 @@ use Psr\Log\LoggerInterface;
 abstract class AbstractLookup
 {
     public $city         = '';
-    public $region       = '';
-    public $zipcode      = '';
-    public $country      = '';
-    public $latitude     = '';
-    public $longitude    = '';
-    public $isp          = '';
-    public $organization = '';
-    public $timezone     = '';
-    public $extra        = '';
 
-    protected ?Client $client;
+    public $region       = '';
+
+    public $zipcode      = '';
+
+    public $country      = '';
+
+    public $latitude     = '';
+
+    public $longitude    = '';
+
+    public $isp          = '';
+
+    public $organization = '';
+
+    public $timezone     = '';
+
+    public $extra        = '';
 
     /**
      * @var string IP Address
      */
     protected $ip;
-
-    /**
-     * Authorization for lookup service.
-     */
-    protected $auth;
-
-    protected ?string $cacheDir;
-    protected ?LoggerInterface $logger;
-
-    /**
-     * @var mixed
-     */
-    protected $config;
 
     /**
      * Return attribution HTML displayed in the configuration UI.
@@ -59,25 +44,16 @@ abstract class AbstractLookup
      */
     abstract protected function lookup();
 
-    /**
-     * AbstractLookup constructor.
-     *
-     * @param null $auth
-     * @param null $ipLookupConfig
-     * @param null $cacheDir
-     */
-    public function __construct($auth = null, $ipLookupConfig = null, $cacheDir = null, ?LoggerInterface $logger = null, ?Client $client = null)
-    {
-        $this->cacheDir  = $cacheDir;
-        $this->logger    = $logger;
-        $this->auth      = $auth;
-        $this->config    = $ipLookupConfig;
-        $this->client    = $client;
+    public function __construct(
+        protected ?string $auth = null,
+        protected $config = null,
+        protected ?string $cacheDir = null,
+        protected ?LoggerInterface $logger = null,
+        protected ?Client $client = null
+    ) {
     }
 
     /**
-     * @param $ip
-     *
      * @return $this
      */
     public function setIpAddress($ip)

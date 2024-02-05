@@ -1,31 +1,17 @@
 <?php
 
-/*
- * @copyright   2018 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CategoryBundle\Model;
 
 use Mautic\LeadBundle\Model\LeadModel;
 
 class ContactActionModel
 {
-    /**
-     * @var LeadModel
-     */
-    private $contactModel;
-
-    public function __construct(LeadModel $contactModel)
-    {
-        $this->contactModel = $contactModel;
+    public function __construct(
+        private LeadModel $contactModel
+    ) {
     }
 
-    public function addContactsToCategories(array $contactIds, array $categoryIds)
+    public function addContactsToCategories(array $contactIds, array $categoryIds): void
     {
         $contacts = $this->contactModel->getLeadsByIds($contactIds);
 
@@ -38,7 +24,7 @@ class ContactActionModel
         }
     }
 
-    public function removeContactsFromCategories(array $contactIds, array $categoryIds)
+    public function removeContactsFromCategories(array $contactIds, array $categoryIds): void
     {
         $contacts = $this->contactModel->getLeadsByIds($contactIds);
 

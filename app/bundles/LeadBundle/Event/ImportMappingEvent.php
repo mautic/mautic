@@ -2,28 +2,19 @@
 
 declare(strict_types=1);
 
-/*
- * @copyright   2019 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\LeadBundle\Event;
 
 use Mautic\CoreBundle\Event\CommonEvent;
 
 final class ImportMappingEvent extends CommonEvent
 {
-    public string $routeObjectName;
     public bool $objectSupported = false;
+
     public array $fields         = [];
 
-    public function __construct(string $routeObjectName)
-    {
-        $this->routeObjectName = $routeObjectName;
+    public function __construct(
+        public string $routeObjectName
+    ) {
     }
 
     /**

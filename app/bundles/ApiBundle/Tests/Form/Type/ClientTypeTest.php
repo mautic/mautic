@@ -2,15 +2,6 @@
 
 declare(strict_types=1);
 
-/*
- * @copyright   2021 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\ApiBundle\Tests\Form\Type;
 
 use Mautic\ApiBundle\Entity\oAuth2\Client;
@@ -23,50 +14,47 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\Routing\RouterInterface;
-use Symfony\Component\Translation\TranslatorInterface;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class ClientTypeTest extends TestCase
 {
-    /**
-     * @var ClientType
-     */
-    private $clientType;
+    private \Mautic\ApiBundle\Form\Type\ClientType $clientType;
 
     /**
      * @var RequestStack
      */
-    private $requestStack;
+    private \PHPUnit\Framework\MockObject\MockObject $requestStack;
 
     /**
      * @var TranslatorInterface
      */
-    private $translator;
+    private \PHPUnit\Framework\MockObject\MockObject $translator;
 
     /**
      * @var ValidatorInterface
      */
-    private $validator;
+    private \PHPUnit\Framework\MockObject\MockObject $validator;
 
     /**
      * @var Session
      */
-    private $session;
+    private \PHPUnit\Framework\MockObject\MockObject $session;
 
     /**
      * @var RouterInterface
      */
-    private $router;
+    private \PHPUnit\Framework\MockObject\MockObject $router;
 
     /**
      * @var FormBuilderInterface
      */
-    private $builder;
+    private \PHPUnit\Framework\MockObject\MockObject $builder;
 
     /**
      * @var Request
      */
-    private $request;
+    private \PHPUnit\Framework\MockObject\MockObject $request;
 
     private Client $client;
 

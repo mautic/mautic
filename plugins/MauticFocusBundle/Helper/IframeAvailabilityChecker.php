@@ -1,12 +1,4 @@
 <?php
-/*
- * @copyright   2020 Mautic, Inc. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://mautic.com
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
 
 namespace MauticPlugin\MauticFocusBundle\Helper;
 
@@ -14,22 +6,17 @@ use Symfony\Component\HttpClient\HttpClient;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Translation\TranslatorInterface;
 use Symfony\Contracts\HttpClient\ResponseInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
  * Check if URL can be displayed via IFRAME.
  */
 class IframeAvailabilityChecker
 {
-    /**
-     * @var TranslatorInterface
-     */
-    private $translator;
-
-    public function __construct(TranslatorInterface $translator)
-    {
-        $this->translator = $translator;
+    public function __construct(
+        private TranslatorInterface $translator
+    ) {
     }
 
     public function check(string $url, string $currentScheme): JsonResponse
@@ -91,7 +78,7 @@ class IframeAvailabilityChecker
         // Mixed Content: The page at 'https://example.com' was loaded over HTTPS,
         // but requested an insecure frame 'http://target-example.com/'. This request has been blocked; the content
         // must be served over HTTPS.
-        return 'https' === $currentScheme && 0 === strpos($url, 'http://');
+        return 'https' === $currentScheme && str_starts_with($url, 'http://');
     }
 
     /**
@@ -125,7 +112,7 @@ class IframeAvailabilityChecker
 
         if (array_key_exists($name, $headers)) {
             if (null !== $content) {
-                if (0 === strpos($headers[$name][0], $content)) {
+                if (str_starts_with($headers[$name][0], $content)) {
                     return true;
                 } else {
                     return false;

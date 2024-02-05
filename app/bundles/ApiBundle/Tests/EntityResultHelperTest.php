@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2019 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        https://mautic.com
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\ApiBundle\Tests;
 
 use Doctrine\ORM\Tools\Pagination\Paginator;
@@ -18,9 +9,9 @@ use PHPUnit\Framework\TestCase;
 
 class EntityResultHelperTest extends TestCase
 {
-    const NEW_TITLE = 'Callback Title';
+    public const NEW_TITLE = 'Callback Title';
 
-    public function testGetArrayEntities()
+    public function testGetArrayEntities(): void
     {
         $resultHelper = new EntityResultHelper();
 
@@ -36,7 +27,7 @@ class EntityResultHelperTest extends TestCase
 
         $this->assertEquals($results, $arrayResult);
 
-        $arrayResult = $resultHelper->getArray($results, function ($entity) {
+        $arrayResult = $resultHelper->getArray($results, function ($entity): void {
             $this->modifyEntityData($entity);
         });
 
@@ -45,7 +36,7 @@ class EntityResultHelperTest extends TestCase
         }
     }
 
-    public function testGetArrayPaginator()
+    public function testGetArrayPaginator(): void
     {
         $resultHelper = new EntityResultHelper();
 
@@ -61,18 +52,18 @@ class EntityResultHelperTest extends TestCase
 
         $paginator = $this->getMockBuilder(Paginator::class)
             ->disableOriginalConstructor()
-            ->setMethods(['getIterator'])
+            ->onlyMethods(['getIterator'])
             ->getMock();
 
         $paginator->expects($this->any())
             ->method('getIterator')
-            ->will($this->returnValue($iterator));
+            ->willReturn($iterator);
 
         $arrayResult = $resultHelper->getArray($paginator);
 
         $this->assertEquals($results, $arrayResult);
 
-        $arrayResult = $resultHelper->getArray($results, function ($entity) {
+        $arrayResult = $resultHelper->getArray($results, function ($entity): void {
             $this->modifyEntityData($entity);
         });
 
@@ -81,7 +72,7 @@ class EntityResultHelperTest extends TestCase
         }
     }
 
-    public function testGetArrayAppendedData()
+    public function testGetArrayAppendedData(): void
     {
         $resultHelper = new EntityResultHelper();
 
@@ -106,7 +97,7 @@ class EntityResultHelperTest extends TestCase
             $this->assertEquals($entity->getTitle(), 'Title '.$entity->getId());
         }
 
-        $arrayResult = $resultHelper->getArray($data, function ($entity) {
+        $arrayResult = $resultHelper->getArray($data, function ($entity): void {
             $this->modifyEntityData($entity);
         });
 
@@ -115,7 +106,7 @@ class EntityResultHelperTest extends TestCase
         }
     }
 
-    private function modifyEntityData(Lead $entity)
+    private function modifyEntityData(Lead $entity): void
     {
         $entity->setTitle(self::NEW_TITLE);
     }

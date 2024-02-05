@@ -2,15 +2,6 @@
 
 declare(strict_types=1);
 
-/*
- * @copyright   2018 Mautic Contributors. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\IntegrationsBundle\Sync\Helper;
 
 use Mautic\IntegrationsBundle\Entity\ObjectMapping;
@@ -33,46 +24,20 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class MappingHelper
 {
-    /**
-     * @var FieldModel
-     */
-    private $fieldModel;
-
-    /**
-     * @var ObjectMappingRepository
-     */
-    private $objectMappingRepository;
-
-    /**
-     * @var ObjectProvider
-     */
-    private $objectProvider;
-
-    /**
-     * @var ObjectMappingRepository
-     */
-    private $dispatcher;
-
     public function __construct(
-        FieldModel $fieldModel,
-        ObjectMappingRepository $objectMappingRepository,
-        ObjectProvider $objectProvider,
-        EventDispatcherInterface $dispatcher
+        private FieldModel $fieldModel,
+        private ObjectMappingRepository $objectMappingRepository,
+        private ObjectProvider $objectProvider,
+        private EventDispatcherInterface $dispatcher
     ) {
-        $this->fieldModel              = $fieldModel;
-        $this->objectMappingRepository = $objectMappingRepository;
-        $this->objectProvider          = $objectProvider;
-        $this->dispatcher              = $dispatcher;
     }
 
     /**
-     * @return ObjectDAO
-     *
      * @throws ObjectDeletedException
      * @throws ObjectNotFoundException
      * @throws ObjectNotSupportedException
      */
-    public function findMauticObject(MappingManualDAO $mappingManualDAO, string $internalObjectName, ObjectDAO $integrationObjectDAO)
+    public function findMauticObject(MappingManualDAO $mappingManualDAO, string $internalObjectName, ObjectDAO $integrationObjectDAO): ObjectDAO
     {
         // Check if this contact is already tracked
         if ($internalObject = $this->objectMappingRepository->getInternalObject(
@@ -102,7 +67,7 @@ class MappingHelper
                 if ($integrationValue = $integrationObjectDAO->getField($integrationField)) {
                     $identifiers[$field] = $integrationValue->getValue()->getNormalizedValue();
                 }
-            } catch (FieldNotFoundException $e) {
+            } catch (FieldNotFoundException) {
             }
         }
 
@@ -115,7 +80,7 @@ class MappingHelper
             $event = new InternalObjectFindEvent(
                 $this->objectProvider->getObjectByName($internalObjectName)
             );
-        } catch (ObjectNotFoundException $e) {
+        } catch (ObjectNotFoundException) {
             // Throw this exception for BC.
             throw new ObjectNotSupportedException(MauticSyncDataExchange::NAME, $internalObjectName);
         }
@@ -123,8 +88,8 @@ class MappingHelper
         $event->setFieldValues($identifiers);
 
         $this->dispatcher->dispatch(
+            $event,
             IntegrationEvents::INTEGRATION_FIND_INTERNAL_RECORDS,
-            $event
         );
 
         $foundObjects = $event->getFoundObjects();
@@ -159,18 +124,16 @@ class MappingHelper
     {
         try {
             return $this->objectProvider->getObjectByName($internalObject)->getEntityName();
-        } catch (ObjectNotFoundException $e) {
+        } catch (ObjectNotFoundException) {
             // Throw this exception instead to keep BC.
             throw new ObjectNotSupportedException(MauticSyncDataExchange::NAME, $internalObject);
         }
     }
 
     /**
-     * @return ObjectDAO
-     *
      * @throws ObjectDeletedException
      */
-    public function findIntegrationObject(string $integration, string $integrationObjectName, ObjectDAO $internalObjectDAO)
+    public function findIntegrationObject(string $integration, string $integrationObjectName, ObjectDAO $internalObjectDAO): ObjectDAO
     {
         if ($integrationObject = $this->objectMappingRepository->getIntegrationObject(
             $integration,
@@ -207,7 +170,7 @@ class MappingHelper
         foreach ($mappings as $mapping) {
             try {
                 $this->updateObjectMapping($mapping);
-            } catch (ObjectNotFoundException $exception) {
+            } catch (ObjectNotFoundException) {
                 continue;
             }
         }
@@ -242,7 +205,7 @@ class MappingHelper
     private function saveObjectMapping(ObjectMapping $objectMapping): void
     {
         $this->objectMappingRepository->saveEntity($objectMapping);
-        $this->objectMappingRepository->clear();
+        $this->objectMappingRepository->detachEntity($objectMapping);
     }
 
     /**
@@ -266,5 +229,8 @@ class MappingHelper
         $objectMapping->setLastSyncDate($updatedObjectMappingDAO->getObjectModifiedDate());
 
         $this->saveObjectMapping($objectMapping);
+
+        // Make the ObjectMapping available to the IntegrationEvents::INTEGRATION_BATCH_SYNC_COMPLETED_* events
+        $updatedObjectMappingDAO->setObjectMapping($objectMapping);
     }
 }

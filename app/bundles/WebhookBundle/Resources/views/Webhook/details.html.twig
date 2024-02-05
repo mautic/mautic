@@ -1,0 +1,145 @@
+{% extends '@MauticCore/Default/content.html.twig' %}
+
+{% block headerTitle %}{{ item.getName() }}{% endblock %}
+{% block mauticContent %}mauticWebhook{% endblock %}
+
+{% block actions %}
+    {{- include(
+        '@MauticCore/Helper/page_actions.html.twig', {
+            item: item,
+            templateButtons: {
+                'edit': securityHasEntityAccess(
+                    permissions['webhook:webhooks:editown'],
+                    permissions['webhook:webhooks:editother'],
+                    item.getCreatedBy()
+                ),
+                'clone': permissions['webhook:webhooks:create'],
+                'delete': securityHasEntityAccess(
+                    permissions['webhook:webhooks:deleteown'],
+                    permissions['webhook:webhooks:deleteother'],
+                    item.getCreatedBy()
+                )
+            },
+            routeBase: 'webhook'
+    }) -}}
+{% endblock %}
+
+{% block content %}
+<!-- start: box layout -->
+<div class="box-layout">
+    <!-- left section -->
+    <div class="col-md-9 bg-white height-auto">
+        <div class="bg-auto">
+            <!-- page detail header -->
+            <div class="pr-md pl-md pt-lg pb-lg">
+                <div class="box-layout">
+                    <div class="col-xs-10">
+                        <div class="text-muted">{{ item.getDescription()|purify }}</div>
+                    </div>
+                    <div class="col-xs-2 text-right">
+                        {{- include(
+                            '@MauticCore/Helper/page_actions.html.twig', {
+                                entity: item
+                            }
+                        ) }}
+                    </div>
+                </div>
+            </div>
+            <!--/ page detail header -->
+        </div>
+        <div class="pa-md">
+            <div class="row">
+                <div class="col-md-12">
+                    {% set hookLog = item.getLimitedLogs() %}
+                    {% if hookLog is empty %}
+                        <div class="alert alert-warning col-md-6 col-md-offset-3 mt-md" style="white-space: normal;">
+                            <h4>
+                                {% trans %}mautic.webhook.no.logs{% endtrans %}
+                            </h4>
+                            <p>
+                                {% trans %}mautic.webhook.no.logs_desc{% endtrans %}
+                            </p>
+                        </div>
+                    {% else %}
+                        <table class="table table-responsive table-striped">
+                            <thead>
+                                <tr>
+                                    <th>
+                                        {% trans %}mautic.core.id{% endtrans %}
+                                    </th>
+                                    <th>
+                                        {% trans %}mautic.webhook.status{% endtrans %}
+                                    </th>
+                                    <th>
+                                        {% trans %}mautic.webhook.note{% endtrans %}
+                                    </th>
+                                    <th>
+                                        {% trans %}mautic.webhook.runtime{% endtrans %}
+                                    </th>
+                                    <th>
+                                        {% trans %}mautic.core.date.added{% endtrans %}
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for log in hookLog %}
+                                    <tr>
+                                        <td>{{ log.getId() }}</td>
+                                        <td>{{- include(
+                                            '@MauticWebhook/Helper/labelcode.html.twig', {
+                                                code: log.getStatusCode()
+                                            }
+                                        ) }}</td>
+                                        <td>{{ log.getNote() is not empty ? log.getNote() : 'mautic.webhook.webhook.logs.empty.response'|trans }}</td>
+                                        <td>{{ log.getRuntime() }} s</td>
+                                        <td>{{ dateToFull(log.getDateAdded()) }}</td>
+                                    </tr>
+                                {% endfor  %}
+                            </tbody>
+                        </table>
+                        <div class="alert alert-info col-md-6 col-md-offset-3 mt-md">
+                            <h4>
+                                {% trans %}mautic.webhook.webhook.logs.title{% endtrans %}
+                            </h4>
+                            <p>
+                                {% trans %}mautic.webhook.webhook.logs.desc{% endtrans %}
+                            </p>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- right section -->
+    <div class="col-md-3 bg-white bdr-l height-auto">
+        <!-- preview URL -->
+        <div class="panel bg-transparent shd-none bdr-rds-0 bdr-w-0 mt-sm mb-0">
+            <div class="panel-heading">
+                <div class="panel-title">{% trans %}mautic.webhook.webhook_url{% endtrans %}</div>
+            </div>
+            <div class="panel-body pt-xs">
+                <div class="input-group">
+                    <input onclick="this.setSelectionRange(0, this.value.length);" type="text" class="form-control" readonly
+                           value="{{ item.getWebhookUrl()|escape('html_attr') }}" />
+                    <span class="input-group-btn">
+                        <button class="btn btn-default btn-nospin" onclick="window.open('{{ item.getWebhookUrl()|escape('html_attr') }}', '_blank');">
+                            <i class="fa fa-external-link"></i>
+                        </button>
+                    </span>
+                </div>
+            </div>
+
+            <hr class="hr-w-2" style="width:50%">
+
+            <!-- recent activity -->
+            {{- include(
+                '@MauticCore/Helper/recentactivity.html.twig', {
+                    logs: logs
+                }
+            ) }}
+        </div>
+    </div>
+    <!--/ right section -->
+</div>
+{% endblock %}

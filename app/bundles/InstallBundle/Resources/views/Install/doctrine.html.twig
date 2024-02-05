@@ -1,0 +1,82 @@
+{#
+    @copyright   2014 Mautic Contributors. All rights reserved
+    @author      Mautic
+    @link        http://mautic.org
+    @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
+#}
+
+{% if 'index' == tmpl %}
+    {% extends '@MauticInstall/Install/content.html.twig' %}
+{% endif %}
+
+{% block content %}
+<div class="panel-heading">
+    <h2 class="panel-title">
+        {{ 'mautic.install.heading.database.configuration'|trans }}
+    </h2>
+</div>
+<div class="panel-body">
+    {{ form_start(form) }}
+    <div class="alert alert-mautic">
+        <h6>{{ 'mautic.install.database.introtext'|trans }}</h6>
+    </div>
+
+    {{ form_row(form.driver) }}
+
+    {% set driver = form.driver.vars.data %}
+
+    <div id="DatabaseSettings"{% if 'pdo_sqlite' == driver %}{{ ' class="hide"' }}{% endif %}>
+        <div class="row">
+            <div class="col-sm-6">
+                {{ form_row(form.host) }}
+            </div>
+            <div class="col-sm-6">
+                {{ form_row(form.port) }}
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-sm-6">
+                {{ form_row(form.name) }}
+            </div>
+            <div class="col-sm-6">
+                {{ form_row(form.table_prefix) }}
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-sm-6">
+                {{ form_row(form.user) }}
+            </div>
+            <div class="col-sm-6">
+                {{ form_row(form.password) }}
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-sm-6">
+            {{ form_row(form.backup_tables) }}
+        </div>
+        {% set hide = (not form.backup_tables.vars.data) ? ' hide' : '' %}
+        <div class="col-sm-6{{ hide }}" id="backupPrefix">
+            {{ form_row(form.backup_prefix) }}
+        </div>
+    </div>
+
+    <div class="row mt-20">
+        <div class="col-sm-9">
+            <div class="hide" id="waitMessage">
+                <div class="alert alert-info">
+                    <strong>{{ 'mautic.install.database.installing'|trans }}</strong>
+                </div>
+            </div>
+            {{- include('@MauticInstall/Install/navbar.html.twig', {'step' : index, 'count' : count, 'completedSteps' : completedSteps}) -}}
+        </div>
+        <div class="col-sm-3">
+            {{ form_row(form.buttons) }}
+        </div>
+    </div>
+    {{ form_end(form) }}
+</div>
+{% endblock %}

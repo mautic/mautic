@@ -1,19 +1,12 @@
 <?php
 
-/*
- * @copyright   2018 Mautic Contributors. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CampaignBundle\Tests\Command;
+
+use Mautic\CampaignBundle\Executioner\ScheduledExecutioner;
 
 class ExecuteEventCommandTest extends AbstractCampaignCommand
 {
-    public function testEventsAreExecutedForInactiveEventWithSingleContact()
+    public function testEventsAreExecutedForInactiveEventWithSingleContact(): void
     {
         putenv('CAMPAIGN_EXECUTIONER_SCHEDULER_ACKNOWLEDGE_SECONDS=1');
 
@@ -47,8 +40,8 @@ class ExecuteEventCommandTest extends AbstractCampaignCommand
         // Pop off the last so we can test that only the two given are executed
         $lastId = array_pop($logIds);
 
-        // Wait 20 seconds to go past scheduled time
-        sleep(20);
+        // Wait 6 seconds to go past scheduled time
+        static::getContainer()->get(ScheduledExecutioner::class)->setNowTime(new \DateTime('+'.self::CONDITION_SECONDS.' seconds'));
 
         $this->runCommand('mautic:campaigns:execute', ['--scheduled-log-ids' => implode(',', $logIds)]);
 

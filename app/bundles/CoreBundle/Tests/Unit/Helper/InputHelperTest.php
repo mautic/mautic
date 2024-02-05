@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2015 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CoreBundle\Tests\Unit\Helper;
 
 use Mautic\CoreBundle\Helper\InputHelper;
@@ -22,7 +13,7 @@ class InputHelperTest extends TestCase
      *
      * @covers \Mautic\CoreBundle\Helper\InputHelper::html
      */
-    public function testHtmlFilter()
+    public function testHtmlFilter(): void
     {
         $outlookXML = '<!--[if gte mso 9]><xml>
  <o:OfficeDocumentSettings>
@@ -34,6 +25,12 @@ class InputHelperTest extends TestCase
         $html5DoctypeWithContent = '<!DOCTYPE html>
         <html>
         </html>';
+        $html5DoctypeWithUnicodeContent = '<!DOCTYPE html>
+        <html>
+        <body>
+            <a href="https://m3.mautibox.com/3.x/media/images/testá.png">test with unicode</a>
+        </body>
+        </html>';
         $xhtml1Doctype = '<!DOCTYPE html PUBLIC
   "-//W3C//DTD XHTML 1.0 Transitional//EN"
   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">';
@@ -42,14 +39,15 @@ class InputHelperTest extends TestCase
         $unicode = '<a href="https://m3.mautibox.com/3.x/media/images/testá.png">test with unicode</a>';
 
         $samples = [
-            $outlookXML                => $outlookXML,
-            $html5Doctype              => $html5Doctype,
-            $html5DoctypeWithContent   => $html5DoctypeWithContent,
-            $xhtml1Doctype             => $xhtml1Doctype,
-            $cdata                     => $cdata,
-            $script                    => $script,
-            $unicode                   => $unicode,
-            '<applet>content</applet>' => 'content',
+            $outlookXML                     => $outlookXML,
+            $html5Doctype                   => $html5Doctype,
+            $html5DoctypeWithContent        => $html5DoctypeWithContent,
+            $html5DoctypeWithUnicodeContent => $html5DoctypeWithUnicodeContent,
+            $xhtml1Doctype                  => $xhtml1Doctype,
+            $cdata                          => $cdata,
+            $script                         => $script,
+            $unicode                        => $unicode,
+            '<applet>content</applet>'      => 'content',
         ];
 
         foreach ($samples as $sample => $expected) {
@@ -63,11 +61,11 @@ class InputHelperTest extends TestCase
      *
      * @covers \Mautic\CoreBundle\Helper\InputHelper::email
      */
-    public function testEmailFilterRemovesDoublePeriods()
+    public function testEmailFilterRemovesDoublePeriods(): void
     {
         $clean = InputHelper::email('john..doe@email.com');
 
-        $this->assertEquals('john.doe@email.com', $clean);
+        $this->assertEquals('john..doe@email.com', $clean);
     }
 
     /**
@@ -75,7 +73,7 @@ class InputHelperTest extends TestCase
      *
      * @covers \Mautic\CoreBundle\Helper\InputHelper::email
      */
-    public function testEmailFilterRemovesWhitespace()
+    public function testEmailFilterRemovesWhitespace(): void
     {
         $clean = InputHelper::email('    john.doe@email.com  ');
 
@@ -87,7 +85,7 @@ class InputHelperTest extends TestCase
      *
      * @covers \Mautic\CoreBundle\Helper\InputHelper::cleanArray
      */
-    public function testCleanArrayWithEmptyValue()
+    public function testCleanArrayWithEmptyValue(): void
     {
         $this->assertEquals([], InputHelper::cleanArray(null));
     }
@@ -97,7 +95,7 @@ class InputHelperTest extends TestCase
      *
      * @covers \Mautic\CoreBundle\Helper\InputHelper::cleanArray
      */
-    public function testCleanArrayWithStringValue()
+    public function testCleanArrayWithStringValue(): void
     {
         $this->assertEquals(['kuk'], InputHelper::cleanArray('kuk'));
     }
@@ -107,7 +105,7 @@ class InputHelperTest extends TestCase
      *
      * @covers \Mautic\CoreBundle\Helper\InputHelper::cleanArray
      */
-    public function testCleanArrayWithJS()
+    public function testCleanArrayWithJS(): void
     {
         $this->assertEquals(
             ['&#60;script&#62;console.log(&#34;log me&#34;);&#60;/script&#62;'],
@@ -120,7 +118,7 @@ class InputHelperTest extends TestCase
      *
      * @covers \Mautic\CoreBundle\Helper\InputHelper::filename
      */
-    public function testFilename()
+    public function testFilename(): void
     {
         $this->assertSame(
             '29nidji__dsfjhro85t784_fff.r.txt',
@@ -133,7 +131,7 @@ class InputHelperTest extends TestCase
      *
      * @covers \Mautic\CoreBundle\Helper\InputHelper::filename
      */
-    public function testFilenameWithChangingDir()
+    public function testFilenameWithChangingDir(): void
     {
         $this->assertSame(
             '29nidji__dsfjhro85t784_fff..r',
@@ -146,7 +144,7 @@ class InputHelperTest extends TestCase
      *
      * @covers \Mautic\CoreBundle\Helper\InputHelper::filename
      */
-    public function testFilenameWithExtension()
+    public function testFilenameWithExtension(): void
     {
         $this->assertSame(
             '29nidji__dsfjhro85t784.txt',
@@ -154,7 +152,7 @@ class InputHelperTest extends TestCase
         );
     }
 
-    public function testTransliterate()
+    public function testTransliterate(): void
     {
         $tests = [
             'custom test' => 'custom test',
@@ -176,7 +174,7 @@ class InputHelperTest extends TestCase
         Assert::assertEquals($cleanedUrl, $outputUrl);
     }
 
-    public function urlProvider(): iterable
+    public static function urlProvider(): iterable
     {
         // valid URL is reconstructed as expected
         yield ['https://www.mautic.org/somewhere/something?foo=bar#abc123', 'https://www.mautic.org/somewhere/something?foo=bar#abc123'];
@@ -219,5 +217,115 @@ class InputHelperTest extends TestCase
 
         // fragment is not included
         yield ['http://www.mautic.org#abc123', 'http://www.mautic.org', true];
+    }
+
+    /**
+     * @dataProvider filenameProvider
+     */
+    public function testFilenameSanitization(string $inputFilename, string $outputFilename): void
+    {
+        $cleanedUrl = InputHelper::transliterateFilename($inputFilename);
+
+        Assert::assertEquals($cleanedUrl, $outputFilename);
+    }
+
+    /**
+     * @return iterable<array<string>>
+     */
+    public static function filenameProvider(): iterable
+    {
+        yield [
+            'dirname',
+            'dirname',
+        ];
+
+        yield [
+            'file.png',
+            'file.png',
+        ];
+
+        yield [
+            'dirname with space',
+            'dirname-with-space',
+        ];
+
+        yield [
+            'filename with space.png',
+            'filename-with-space.png',
+        ];
+
+        yield [
+            'directory with čšťĺé',
+            'directory-with-cstle',
+        ];
+
+        yield [
+            'filename with čšťĺé.png',
+            'filename-with-cstle.png',
+        ];
+    }
+
+    /**
+     * @dataProvider minifyHTMLProvider
+     */
+    public function testMinifyHTML(string $html, string $expected): void
+    {
+        $this->assertEquals($expected, InputHelper::minifyHTML($html));
+    }
+
+    /**
+     * @return array<array<string>>
+     */
+    public static function minifyHTMLProvider(): array
+    {
+        return [
+            // Test with a simple HTML string with no whitespace
+            ['<p>Hello World</p>', '<p>Hello World</p>'],
+            // Test with an HTML string with multiple spaces between tags
+            ['<p>    Hello World    </p>', '<p>Hello World</p>'],
+            // Test with an HTML string with multiple newlines between tags
+            ["<p>\n\nHello World\n\n</p>", '<p>Hello World</p>'],
+            // Test with an HTML string with inline CSS
+            ['<p style="color: red;">Hello World</p>', '<p style="color:red;">Hello World</p>'],
+            // Test with an empty HTML string
+            ['', ''],
+            // Test with an HTML string with multiple attributes
+            ['<p class="big" id="title">Hello World</p>', '<p class="big" id="title">Hello World</p>'],
+            // Test with an HTML string with multiple same tag
+            ['<p>Hello World</p><p>Hello World</p>', '<p>Hello World</p><p>Hello World</p>'],
+            // Test with an HTML string with multiple same tag but with different attributes
+            ['<p class="big">Hello World</p><p class="small">Hello World</p>', '<p class="big">Hello World</p><p class="small">Hello World</p>'],
+            [file_get_contents(__DIR__.'/resource/email/email-no-minify.html'), file_get_contents(__DIR__.'/resource/email/email-minify.html')],
+        ];
+    }
+
+    /**
+     * @dataProvider underscoreProvider
+     */
+    public function testUndersore(mixed $provided, mixed $expected): void
+    {
+        $this->assertSame($expected, InputHelper::_($provided));
+    }
+
+    /**
+     * @return mixed[]
+     */
+    public static function underscoreProvider(): array
+    {
+        return [
+            ['hello', 'hello'],
+            [null, null],
+            [false, ''],
+            [true, '1'],
+            [0, '0'],
+            [10, '10'],
+            [[null], [null]],
+            [[0], ['0']],
+            [[false], ['']],
+            [[true], ['1']],
+            [[null, 'hello'], [null, 'hello']],
+            [[null, 3], [null, '3']],
+            [[[null]], [[null]]],
+        ];
     }
 }

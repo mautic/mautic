@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2018 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\UserBundle\Tests\EventListener;
 
 use Mautic\CoreBundle\Helper\IpLookupHelper;
@@ -20,7 +11,7 @@ use Mautic\UserBundle\UserEvents;
 
 class SecuritySubscriberTest extends \PHPUnit\Framework\TestCase
 {
-    public function testGetSubscribedEvents()
+    public function testGetSubscribedEvents(): void
     {
         $ipLookupHelper = $this->createMock(IpLookupHelper::class);
         $auditLogModel  = $this->createMock(AuditLogModel::class);
@@ -34,7 +25,7 @@ class SecuritySubscriberTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testOnSecurityInteractiveLogin()
+    public function testOnSecurityInteractiveLogin(): void
     {
         $userId   = 132564;
         $userName = 'John Doe';

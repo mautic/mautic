@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2018 Mautic Contributors. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CampaignBundle\Tests\Executioner;
 
 use Doctrine\Common\Collections\ArrayCollection;
@@ -30,27 +21,27 @@ class InactiveExecutionerTest extends \PHPUnit\Framework\TestCase
     /**
      * @var \PHPUnit\Framework\MockObject\MockObject|InactiveContactFinder
      */
-    private $inactiveContactFinder;
+    private \PHPUnit\Framework\MockObject\MockObject $inactiveContactFinder;
 
     /**
      * @var \PHPUnit\Framework\MockObject\MockObject|Translator
      */
-    private $translator;
+    private \PHPUnit\Framework\MockObject\MockObject $translator;
 
     /**
      * @var \PHPUnit\Framework\MockObject\MockObject|EventScheduler
      */
-    private $eventScheduler;
+    private \PHPUnit\Framework\MockObject\MockObject $eventScheduler;
 
     /**
      * @var \PHPUnit\Framework\MockObject\MockObject|InactiveHelper
      */
-    private $inactiveHelper;
+    private \PHPUnit\Framework\MockObject\MockObject $inactiveHelper;
 
     /**
      * @var \PHPUnit\Framework\MockObject\MockObject|EventExecutioner
      */
-    private $eventExecutioner;
+    private \PHPUnit\Framework\MockObject\MockObject $eventExecutioner;
 
     protected function setUp(): void
     {
@@ -75,7 +66,7 @@ class InactiveExecutionerTest extends \PHPUnit\Framework\TestCase
             ->getMock();
     }
 
-    public function testNoContactsFoundResultsInNothingExecuted()
+    public function testNoContactsFoundResultsInNothingExecuted(): void
     {
         $campaign = $this->getMockBuilder(Campaign::class)
             ->getMock();
@@ -92,7 +83,7 @@ class InactiveExecutionerTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals(0, $counter->getEvaluated());
     }
 
-    public function testNoEventsFoundResultsInNothingExecuted()
+    public function testNoEventsFoundResultsInNothingExecuted(): void
     {
         $campaign = $this->getMockBuilder(Campaign::class)
             ->getMock();
@@ -110,7 +101,7 @@ class InactiveExecutionerTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals(0, $counter->getTotalEvaluated());
     }
 
-    public function testNextBatchOfContactsAreExecuted()
+    public function testNextBatchOfContactsAreExecuted(): void
     {
         $decision = new Event();
         $campaign = $this->getMockBuilder(Campaign::class)
@@ -145,7 +136,7 @@ class InactiveExecutionerTest extends \PHPUnit\Framework\TestCase
         $this->getExecutioner()->execute($campaign, $limiter, new BufferedOutput());
     }
 
-    public function testValidationExecutesNothingIfCampaignUnpublished()
+    public function testValidationExecutesNothingIfCampaignUnpublished(): void
     {
         $campaign = $this->getMockBuilder(Campaign::class)
             ->getMock();
@@ -170,7 +161,7 @@ class InactiveExecutionerTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals(0, $counter->getTotalEvaluated());
     }
 
-    public function testValidationEvaluatesFoundEvents()
+    public function testValidationEvaluatesFoundEvents(): void
     {
         $campaign = $this->getMockBuilder(Campaign::class)
             ->getMock();

@@ -1,51 +1,29 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\LeadBundle\EventListener;
 
+use Doctrine\Common\EventSubscriber;
 use Doctrine\DBAL\Types\StringType;
 use Doctrine\ORM\Tools\Event\GenerateSchemaEventArgs;
 use Doctrine\ORM\Tools\ToolEvents;
-use Mautic\LeadBundle\Model\FieldModel;
+use Mautic\LeadBundle\Field\SchemaDefinition;
 use Monolog\Logger;
 
-/**
- * Class DoctrineSubscriber.
- */
-class DoctrineSubscriber implements \Doctrine\Common\EventSubscriber
+class DoctrineSubscriber implements EventSubscriber
 {
-    /**
-     * @var Logger
-     */
-    private $logger;
-
-    /**
-     * DoctrineSubscriber constructor.
-     */
-    public function __construct(Logger $logger)
-    {
-        $this->logger = $logger;
+    public function __construct(
+        private Logger $logger
+    ) {
     }
 
-    /**
-     * @return array
-     */
-    public function getSubscribedEvents()
+    public function getSubscribedEvents(): array
     {
         return [
             ToolEvents::postGenerateSchema,
         ];
     }
 
-    public function postGenerateSchema(GenerateSchemaEventArgs $args)
+    public function postGenerateSchema(GenerateSchemaEventArgs $args): void
     {
         $schema = $args->getSchema();
 
@@ -62,22 +40,23 @@ class DoctrineSubscriber implements \Doctrine\Common\EventSubscriber
             foreach ($objects as $object => $tableName) {
                 $table = $schema->getTable(MAUTIC_TABLE_PREFIX.$tableName);
 
-                //get a list of fields
+                // get a list of fields
                 $fields = $args->getEntityManager()->getConnection()->createQueryBuilder()
                     ->select('f.alias, f.is_unique_identifer as is_unique, f.type, f.object')
                     ->from(MAUTIC_TABLE_PREFIX.'lead_fields', 'f')
                     ->where("f.object = '$object'")
                     ->orderBy('f.field_order', 'ASC')
-                    ->execute()->fetchAll();
+                    ->executeQuery()
+                    ->fetchAllAssociative();
 
                 // Compile which ones are unique identifiers
                 // Email will always be included first
                 $uniqueFields = ('lead' === $object) ? ['email' => 'email'] : ['companyemail' => 'companyemail'];
                 foreach ($fields as $f) {
-                    if ($f['is_unique'] && 'email' != $f['alias']) {
+                    if ($f['is_unique'] && 'email' !== $f['alias']) {
                         $uniqueFields[$f['alias']] = $f['alias'];
                     }
-                    $columnDef = FieldModel::getSchemaDefinition($f['alias'], $f['type'], !empty($f['is_unique']));
+                    $columnDef = SchemaDefinition::getSchemaDefinition($f['alias'], $f['type'], !empty($f['is_unique']));
 
                     if (!$table->hasColumn($f['alias'])) {
                         $table->addColumn($columnDef['name'], $columnDef['type'], $columnDef['options']);
@@ -121,8 +100,8 @@ class DoctrineSubscriber implements \Doctrine\Common\EventSubscriber
             if (defined('MAUTIC_INSTALLER')) {
                 return;
             }
-            //table doesn't exist or something bad happened so oh well
-            $this->logger->addError('SCHEMA ERROR: '.$e->getMessage());
+            // table doesn't exist or something bad happened so oh well
+            $this->logger->error('SCHEMA ERROR: '.$e->getMessage());
         }
     }
 }

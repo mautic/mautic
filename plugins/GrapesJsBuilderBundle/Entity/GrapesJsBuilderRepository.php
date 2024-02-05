@@ -6,12 +6,12 @@ namespace MauticPlugin\GrapesJsBuilderBundle\Entity;
 
 use Mautic\CoreBundle\Entity\CommonRepository;
 
+/**
+ * @extends CommonRepository<GrapesJsBuilder>
+ */
 class GrapesJsBuilderRepository extends CommonRepository
 {
-    /**
-     * @return string
-     */
-    public function getTableAlias()
+    public function getTableAlias(): string
     {
         return 'gjb';
     }

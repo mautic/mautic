@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2016 Mautic, Inc. All rights reserved
- * @author      Mautic, Inc
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace MauticPlugin\MauticFocusBundle\Form\Type;
 
 use Mautic\CoreBundle\Form\Type\YesNoButtonGroupType;
@@ -18,16 +9,19 @@ use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
+/**
+ * @extends AbstractType<array<string, mixed>>
+ */
 class PropertiesType extends AbstractType
 {
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder->add(
             'bar',
             FocusPropertiesType::class,
             [
                 'focus_style' => 'bar',
-                'data'        => (isset($options['data']['bar'])) ? $options['data']['bar'] : [],
+                'data'        => $options['data']['bar'] ?? [],
             ]
         );
 
@@ -36,7 +30,7 @@ class PropertiesType extends AbstractType
             FocusPropertiesType::class,
             [
                 'focus_style' => 'modal',
-                'data'        => (isset($options['data']['modal'])) ? $options['data']['modal'] : [],
+                'data'        => $options['data']['modal'] ?? [],
             ]
         );
 
@@ -45,7 +39,7 @@ class PropertiesType extends AbstractType
             FocusPropertiesType::class,
             [
                 'focus_style' => 'notification',
-                'data'        => (isset($options['data']['notification'])) ? $options['data']['notification'] : [],
+                'data'        => $options['data']['notification'] ?? [],
             ]
         );
 
@@ -54,7 +48,7 @@ class PropertiesType extends AbstractType
             FocusPropertiesType::class,
             [
                 'focus_style' => 'page',
-                'data'        => (isset($options['data']['page'])) ? $options['data']['page'] : [],
+                'data'        => $options['data']['page'] ?? [],
             ]
         );
 
@@ -63,7 +57,7 @@ class PropertiesType extends AbstractType
             YesNoButtonGroupType::class,
             [
                 'label' => 'mautic.focus.form.animate',
-                'data'  => (isset($options['data']['animate'])) ? $options['data']['animate'] : true,
+                'data'  => $options['data']['animate'] ?? true,
                 'attr'  => [
                     'onchange' => 'Mautic.focusUpdatePreview()',
                 ],
@@ -75,7 +69,7 @@ class PropertiesType extends AbstractType
             YesNoButtonGroupType::class,
             [
                 'label' => 'mautic.focus.form.activate_for_links',
-                'data'  => (isset($options['data']['link_activation'])) ? $options['data']['link_activation'] : true,
+                'data'  => $options['data']['link_activation'] ?? true,
                 'attr'  => [
                     'data-show-on' => '{"focus_properties_when": ["leave"]}',
                 ],
@@ -160,9 +154,21 @@ class PropertiesType extends AbstractType
             YesNoButtonGroupType::class,
             [
                 'label' => 'mautic.focus.form.engage_after_conversion',
-                'data'  => (isset($options['data']['stop_after_conversion'])) ? $options['data']['stop_after_conversion'] : true,
+                'data'  => $options['data']['stop_after_conversion'] ?? true,
                 'attr'  => [
                     'tooltip' => 'mautic.focus.form.engage_after_conversion.tooltip',
+                ],
+            ]
+        );
+
+        $builder->add(
+            'stop_after_close',
+            YesNoButtonGroupType::class,
+            [
+                'label' => 'mautic.focus.form.stop_after_close',
+                'data'  => (isset($options['data']['stop_after_close'])) ? $options['data']['stop_after_close'] : false,
+                'attr'  => [
+                    'tooltip' => 'mautic.focus.form.stop_after_close.tooltip',
                 ],
             ]
         );
@@ -176,10 +182,7 @@ class PropertiesType extends AbstractType
         return 'focus_entity_properties';
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function configureOptions(OptionsResolver $resolver)
+    public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults(
             [

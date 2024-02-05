@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2018 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\LeadBundle\EventListener;
 
 use Mautic\ChannelBundle\Helper\ChannelListHelper;
@@ -20,55 +11,22 @@ use Mautic\ReportBundle\Event\ReportGeneratorEvent;
 use Mautic\ReportBundle\ReportEvents;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Routing\RouterInterface;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class ReportDNCSubscriber implements EventSubscriberInterface
 {
-    const DNC = 'contact.dnc';
-
-    /**
-     * @var FieldsBuilder
-     */
-    private $fieldsBuilder;
-
-    /**
-     * @var CompanyReportData
-     */
-    private $companyReportData;
-
-    /**
-     * @var TranslatorInterface
-     */
-    private $translator;
-
-    /**
-     * @var RouterInterface
-     */
-    private $router;
-
-    /**
-     * @var ChannelListHelper
-     */
-    private $channelListHelper;
+    public const DNC = 'contact.dnc';
 
     public function __construct(
-        FieldsBuilder $fieldsBuilder,
-        CompanyReportData $companyReportData,
-        TranslatorInterface $translator,
-        RouterInterface $router,
-        ChannelListHelper $channelListHelper
+        private FieldsBuilder $fieldsBuilder,
+        private CompanyReportData $companyReportData,
+        private TranslatorInterface $translator,
+        private RouterInterface $router,
+        private ChannelListHelper $channelListHelper
     ) {
-        $this->fieldsBuilder     = $fieldsBuilder;
-        $this->companyReportData = $companyReportData;
-        $this->translator        = $translator;
-        $this->router            = $router;
-        $this->channelListHelper = $channelListHelper;
     }
 
-    /**
-     * @return array
-     */
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             ReportEvents::REPORT_ON_BUILD    => ['onReportBuilder', 0],
@@ -80,14 +38,15 @@ class ReportDNCSubscriber implements EventSubscriberInterface
     /**
      * Add available tables and columns to the report builder lookup.
      */
-    public function onReportBuilder(ReportBuilderEvent $event)
+    public function onReportBuilder(ReportBuilderEvent $event): void
     {
         if (!$event->checkContext([self::DNC])) {
             return;
         }
 
-        $columns        = $this->fieldsBuilder->getLeadFieldsColumns('l.');
-        $companyColumns = $this->companyReportData->getCompanyData();
+        $columns            = $this->fieldsBuilder->getLeadFieldsColumns('l.');
+        $companyColumns     = $this->companyReportData->getCompanyData();
+        $leadFilters        = $this->fieldsBuilder->getLeadFilter('l.', 's.');
 
         $dncColumns = [
             'dnc.reason' => [
@@ -116,6 +75,7 @@ class ReportDNCSubscriber implements EventSubscriberInterface
         $data = [
             'display_name' => 'mautic.lead.report.dnc',
             'columns'      => array_merge($columns, $companyColumns, $dncColumns),
+            'filters'      => array_merge($columns, $companyColumns, $dncColumns, $leadFilters),
         ];
         $event->addTable(self::DNC, $data, ReportSubscriber::GROUP_CONTACTS);
     }
@@ -123,7 +83,7 @@ class ReportDNCSubscriber implements EventSubscriberInterface
     /**
      * Initialize the QueryBuilder object to generate reports from.
      */
-    public function onReportGenerate(ReportGeneratorEvent $event)
+    public function onReportGenerate(ReportGeneratorEvent $event): void
     {
         if (!$event->checkContext([self::DNC])) {
             return;
@@ -146,10 +106,14 @@ class ReportDNCSubscriber implements EventSubscriberInterface
             $qb->leftJoin('companies_lead', MAUTIC_TABLE_PREFIX.'companies', 'comp', 'companies_lead.company_id = comp.id');
         }
 
+        if ($event->hasFilter('s.leadlist_id')) {
+            $qb->join('l', MAUTIC_TABLE_PREFIX.'lead_lists_leads', 's', 's.lead_id = l.id AND s.manually_removed = 0');
+        }
+
         $event->setQueryBuilder($qb);
     }
 
-    public function onReportDisplay(ReportDataEvent $event)
+    public function onReportDisplay(ReportDataEvent $event): void
     {
         if (!$event->checkContext([self::DNC])) {
             return;
@@ -177,10 +141,7 @@ class ReportDNCSubscriber implements EventSubscriberInterface
         }
     }
 
-    /**
-     * @return array
-     */
-    private function getDncReasons()
+    private function getDncReasons(): array
     {
         return [
             0 => $this->translator->trans('mautic.lead.report.dnc_contactable'),

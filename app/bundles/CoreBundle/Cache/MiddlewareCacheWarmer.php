@@ -1,52 +1,38 @@
 <?php
 
 declare(strict_types=1);
-/*
- * @copyright   2020 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
 
 namespace Mautic\CoreBundle\Cache;
 
-use ReflectionClass;
-use ReflectionException;
-use SplPriorityQueue;
 use Symfony\Component\HttpKernel\CacheWarmer\CacheWarmerInterface;
 
 class MiddlewareCacheWarmer implements CacheWarmerInterface
 {
-    /**
-     * @var string
-     */
-    private $env;
+    private ?string $cacheFile = null;
 
     /**
-     * @var string
+     * @var \SplPriorityQueue|\ReflectionClass[]
      */
-    private $cacheFile;
+    private \SplPriorityQueue $specs;
 
-    /**
-     * @var SplPriorityQueue|ReflectionClass[]
-     */
-    private $specs;
-
-    public function __construct(string $env)
-    {
-        $this->env       = $env;
-        $this->specs     = new SplPriorityQueue();
+    public function __construct(
+        private string $env
+    ) {
+        $this->specs     = new \SplPriorityQueue();
     }
 
-    public function warmUp($cacheDirectory)
+    /**
+     * @inerhitDoc
+     */
+    public function warmUp(string $cacheDirectory)
     {
         $this->cacheFile = sprintf('%s/middlewares.cache.php', $cacheDirectory);
         $this->createCacheFile($cacheDirectory);
+
+        return [];
     }
 
-    public function isOptional()
+    public function isOptional(): bool
     {
         return false;
     }
@@ -72,9 +58,9 @@ class MiddlewareCacheWarmer implements CacheWarmerInterface
         }
 
         $data  = [];
-        $this->specs->setExtractFlags(SplPriorityQueue::EXTR_DATA);
+        $this->specs->setExtractFlags(\SplPriorityQueue::EXTR_DATA);
 
-        /** @var ReflectionClass $middleware */
+        /** @var \ReflectionClass $middleware */
         foreach ($this->specs as $middleware) {
             $data[] = $middleware->getName();
         }
@@ -93,7 +79,7 @@ class MiddlewareCacheWarmer implements CacheWarmerInterface
         }
     }
 
-    private function addMiddlewares(array $middlewares, ?string $env = null)
+    private function addMiddlewares(array $middlewares, ?string $env = null): void
     {
         $prefix = 'Mautic\\Middleware\\';
 
@@ -109,11 +95,11 @@ class MiddlewareCacheWarmer implements CacheWarmerInterface
     private function push(string $middlewareClass): void
     {
         try {
-            $reflection = new ReflectionClass($middlewareClass);
+            $reflection = new \ReflectionClass($middlewareClass);
             $priority   = $reflection->getConstant('PRIORITY');
 
             $this->specs->insert($reflection, $priority);
-        } catch (ReflectionException $e) {
+        } catch (\ReflectionException) {
             /* If there's an error getting the kernel class, it's
              * an invalid middleware. If it's invalid, don't push
              * it to the stack

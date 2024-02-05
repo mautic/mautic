@@ -1,27 +1,15 @@
 <?php
 
-/*
- * @copyright   2015 Mautic Contributors. All rights reserved
- * @copyright   2005-2007 Jon Abernathy <jon@chuggnutt.com>
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\EmailBundle\Helper;
 
 class PlainTextHelper
 {
-    const ENCODING = 'UTF-8';
+    public const ENCODING = 'UTF-8';
 
     /**
      * Contains the HTML content to convert.
-     *
-     * @var string
      */
-    protected $html;
+    protected string $html = '';
 
     /**
      * Contains the converted, formatted text.
@@ -207,9 +195,9 @@ class PlainTextHelper
     /**
      * Various configuration options (able to be set in the constructor).
      *
-     * @var array
+     * @var array<string, mixed>
      */
-    protected $options = [
+    protected array $options = [
         'do_links' => 'inline', // 'none'
         // 'inline' (show links inline)
         // 'nextline' (show links on the next line)
@@ -223,18 +211,10 @@ class PlainTextHelper
     ];
 
     /**
-     * @param string $html    Source HTML
-     * @param array  $options Set configuration options
+     * @param array<string, mixed> $options Set configuration options
      */
-    public function __construct($html = '', $options = [])
+    public function __construct(array $options = [])
     {
-        if (is_array($html)) {
-            // Options were passed in without html
-            $options = $html;
-            $html    = '';
-        }
-
-        $this->html    = $html;
         $this->options = array_merge($this->options, $options);
     }
 
@@ -255,10 +235,8 @@ class PlainTextHelper
 
     /**
      * Returns the text, converted from HTML.
-     *
-     * @return string
      */
-    public function getText()
+    public function getText(): string
     {
         if (!$this->converted) {
             $this->convert();
@@ -324,15 +302,14 @@ class PlainTextHelper
      * appeared. Also makes an effort at identifying and handling absolute
      * and relative links.
      *
-     * @param string $link         URL of the link
-     * @param string $display      Part of the text to associate number with
-     * @param null   $linkOverride
+     * @param string $link    URL of the link
+     * @param string $display Part of the text to associate number with
      *
      * @return string
      */
-    protected function buildlinkList($link, $display, $linkOverride = null)
+    protected function buildlinkList($link, $display, ?string $linkOverride = null)
     {
-        $linkMethod = ($linkOverride) ? $linkOverride : $this->options['do_links'];
+        $linkMethod = $linkOverride ?: $this->options['do_links'];
         if ('none' == $linkMethod) {
             return $display;
         }
@@ -346,7 +323,7 @@ class PlainTextHelper
             $url = $link;
         } else {
             $url = $this->options['base_url'];
-            if ('/' != substr($link, 0, 1)) {
+            if (!str_starts_with($link, '/')) {
                 $url .= '/';
             }
             $url .= $link;
@@ -505,10 +482,10 @@ class PlainTextHelper
      *
      * @return string Converted text
      */
-    private function toupper($str)
+    private function toupper($str): string
     {
         // string can contain HTML tags
-        $chunks = preg_split('/(<[^>]*>)/', $str, null, PREG_SPLIT_NO_EMPTY | PREG_SPLIT_DELIM_CAPTURE);
+        $chunks = preg_split('/(<[^>]*>)/', $str, -1, PREG_SPLIT_NO_EMPTY | PREG_SPLIT_DELIM_CAPTURE);
 
         // convert toupper only the text between HTML tags
         foreach ($chunks as $i => $chunk) {
@@ -517,7 +494,7 @@ class PlainTextHelper
             }
         }
 
-        return implode($chunks);
+        return implode('', $chunks);
     }
 
     /**
@@ -527,7 +504,7 @@ class PlainTextHelper
      *
      * @return string Converted text
      */
-    private function strtoupper($str)
+    private function strtoupper($str): string
     {
         $str = html_entity_decode($str, ENT_COMPAT, self::ENCODING);
 
@@ -541,14 +518,10 @@ class PlainTextHelper
     }
 
     /**
-     * @param            $text
-     * @param            $width
      * @param string     $breakline
      * @param bool|false $cut
-     *
-     * @return string
      */
-    private function linewrap($text, $width, $breakline = "\n", $cut = false)
+    private function linewrap($text, $width, $breakline = "\n", $cut = false): string
     {
         $lines = explode("\n", $text);
         $text  = '';

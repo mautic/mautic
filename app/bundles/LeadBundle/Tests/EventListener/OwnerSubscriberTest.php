@@ -1,27 +1,28 @@
 <?php
 
-/*
- * @copyright   2019 Mautic Contributors. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\LeadBundle\Tests\EventListener;
 
+use Mautic\CoreBundle\Event\TokenReplacementEvent;
 use Mautic\CoreBundle\Factory\MauticFactory;
+use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Translation\Translator;
 use Mautic\EmailBundle\Event\EmailBuilderEvent;
 use Mautic\EmailBundle\Event\EmailSendEvent;
+use Mautic\EmailBundle\Helper\FromEmailHelper;
+use Mautic\EmailBundle\Helper\MailHashHelper;
 use Mautic\EmailBundle\Helper\MailHelper;
 use Mautic\EmailBundle\MonitoredEmail\Mailbox;
 use Mautic\EmailBundle\Tests\Helper\Transport\SmtpTransport;
+use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadRepository;
 use Mautic\LeadBundle\EventListener\OwnerSubscriber;
 use Mautic\LeadBundle\Model\LeadModel;
+use Mautic\UserBundle\Entity\User;
 use Monolog\Logger;
+use PHPUnit\Framework\MockObject\MockObject;
+use Psr\Log\LoggerInterface;
+use Symfony\Component\Mailer\Mailer;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class OwnerSubscriberTest extends \PHPUnit\Framework\TestCase
 {
@@ -63,14 +64,24 @@ class OwnerSubscriberTest extends \PHPUnit\Framework\TestCase
         ],
     ];
 
+    /** @var MockObject&CoreParametersHelper */
+    private $coreParametersHelper;
+
+    private MailHashHelper $mailHashHelper;
+
     public function setUp(): void
     {
-        defined('MAUTIC_ENV') or define('MAUTIC_ENV', 'test');
+        $this->coreParametersHelper = $this->createMock(CoreParametersHelper::class);
+        $this->mailHashHelper       = new MailHashHelper($this->coreParametersHelper);
     }
 
-    public function testOnEmailBuild()
+    public function testOnEmailBuild(): void
     {
-        $subscriber = new OwnerSubscriber($this->getMockFactory()->getModel('lead'), $this->getMockTranslator());
+        $leadModel = $this->getMockFactory()->getModel('lead');
+        if (!$leadModel instanceof LeadModel) {
+            self::fail('The mock does not contain LeadModel.');
+        }
+        $subscriber = new OwnerSubscriber($leadModel, $this->getMockTranslator());
         $event      = new EmailBuilderEvent($this->getMockTranslator());
         $subscriber->onEmailBuild($event);
 
@@ -80,31 +91,38 @@ class OwnerSubscriberTest extends \PHPUnit\Framework\TestCase
         $this->assertArrayHasKey('{ownerfield=lastname}', $tokens);
     }
 
-    public function testOnEmailGenerate()
+    public function testOnEmailGenerate(): void
     {
-        $subscriber = new OwnerSubscriber($this->getMockFactory()->getModel('lead'), $this->getMockTranslator());
+        $leadModel = $this->getMockFactory()->getModel('lead');
+        if (!$leadModel instanceof LeadModel) {
+            self::fail('The mock does not contain LeadModel.');
+        }
+        $subscriber = new OwnerSubscriber($leadModel, $this->getMockTranslator());
 
         $mailer = $this->getMockMailer($this->contacts[0]);
-        $event  = new EmailSendEvent($mailer);
+        $event  = $this->getEmailSendEvent($mailer);
         $subscriber->onEmailGenerate($event);
 
         $tokens = $event->getTokens();
 
-        $this->assertArrayHasKey('{ownerfield=email}', $tokens);
+        $this->assertArrayNotHasKey('{ownerfield=email}', $tokens);
         $this->assertArrayHasKey('{ownerfield=firstname}', $tokens);
         $this->assertArrayHasKey('{ownerfield=lastname}', $tokens);
 
-        $this->assertEquals('owner3@owner.com', $tokens['{ownerfield=email}']);
         $this->assertEquals('John', $tokens['{ownerfield=firstname}']);
         $this->assertEquals('S&#39;mith', $tokens['{ownerfield=lastname}']);
     }
 
-    public function testOnEmailGenerateWithFakeOwner()
+    public function testOnEmailGenerateWithFakeOwner(): void
     {
-        $subscriber = new OwnerSubscriber($this->getMockFactory()->getModel('lead'), $this->getMockTranslator());
+        $leadModel = $this->getMockFactory()->getModel('lead');
+        if (!$leadModel instanceof LeadModel) {
+            self::fail('The mock does not contain LeadModel.');
+        }
+        $subscriber = new OwnerSubscriber($leadModel, $this->getMockTranslator());
 
         $mailer = $this->getMockMailer($this->contacts[1]);
-        $event  = new EmailSendEvent($mailer);
+        $event  = $this->getEmailSendEvent($mailer);
         $subscriber->onEmailGenerate($event);
 
         $tokens = $event->getTokens();
@@ -113,12 +131,16 @@ class OwnerSubscriberTest extends \PHPUnit\Framework\TestCase
         $this->assertArrayHasKey('{ownerfield=lastname}', $tokens);
     }
 
-    public function testOnEmailGenerateWithNoOwner()
+    public function testOnEmailGenerateWithNoOwner(): void
     {
-        $subscriber = new OwnerSubscriber($this->getMockFactory()->getModel('lead'), $this->getMockTranslator());
+        $leadModel = $this->getMockFactory()->getModel('lead');
+        if (!$leadModel instanceof LeadModel) {
+            self::fail('The mock does not contain LeadModel.');
+        }
+        $subscriber = new OwnerSubscriber($leadModel, $this->getMockTranslator());
 
         $mailer = $this->getMockMailer($this->contacts[4]);
-        $event  = new EmailSendEvent($mailer);
+        $event  = $this->getEmailSendEvent($mailer);
         $subscriber->onEmailGenerate($event);
 
         $tokens = $event->getTokens();
@@ -131,26 +153,34 @@ class OwnerSubscriberTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals('', $tokens['{ownerfield=lastname}']);
     }
 
-    public function testOnEmailDisplay()
+    public function testOnEmailDisplay(): void
     {
-        $subscriber = new OwnerSubscriber($this->getMockFactory()->getModel('lead'), $this->getMockTranslator());
+        $leadModel = $this->getMockFactory()->getModel('lead');
+        if (!$leadModel instanceof LeadModel) {
+            self::fail('The mock does not contain LeadModel.');
+        }
+        $subscriber = new OwnerSubscriber($leadModel, $this->getMockTranslator());
 
         $mailer = $this->getMockMailer($this->contacts[0]);
-        $event  = new EmailSendEvent($mailer);
+        $event  = $this->getEmailSendEvent($mailer);
         $subscriber->onEmailDisplay($event);
 
         $tokens = $event->getTokens();
-        $this->assertArrayHasKey('{ownerfield=email}', $tokens);
+        $this->assertArrayNotHasKey('{ownerfield=email}', $tokens);
         $this->assertArrayHasKey('{ownerfield=firstname}', $tokens);
         $this->assertArrayHasKey('{ownerfield=lastname}', $tokens);
     }
 
-    public function testOnEmailDisplayWithFakeOwner()
+    public function testOnEmailDisplayWithFakeOwner(): void
     {
-        $subscriber = new OwnerSubscriber($this->getMockFactory()->getModel('lead'), $this->getMockTranslator());
+        $leadModel = $this->getMockFactory()->getModel('lead');
+        if (!$leadModel instanceof LeadModel) {
+            self::fail('The mock does not contain LeadModel.');
+        }
+        $subscriber = new OwnerSubscriber($leadModel, $this->getMockTranslator());
 
         $mailer = $this->getMockMailer($this->contacts[1]);
-        $event  = new EmailSendEvent($mailer);
+        $event  = $this->getEmailSendEvent($mailer);
         $subscriber->onEmailDisplay($event);
 
         $tokens = $event->getTokens();
@@ -159,12 +189,16 @@ class OwnerSubscriberTest extends \PHPUnit\Framework\TestCase
         $this->assertArrayHasKey('{ownerfield=lastname}', $tokens);
     }
 
-    public function testOnEmailDisplayWithNoOwner()
+    public function testOnEmailDisplayWithNoOwner(): void
     {
-        $subscriber = new OwnerSubscriber($this->getMockFactory()->getModel('lead'), $this->getMockTranslator());
+        $leadModel = $this->getMockFactory()->getModel('lead');
+        if (!$leadModel instanceof LeadModel) {
+            self::fail('The mock does not contain LeadModel.');
+        }
+        $subscriber = new OwnerSubscriber($leadModel, $this->getMockTranslator());
 
         $mailer = $this->getMockMailer($this->contacts[4]);
-        $event  = new EmailSendEvent($mailer);
+        $event  = $this->getEmailSendEvent($mailer);
         $subscriber->onEmailDisplay($event);
 
         $tokens = $event->getTokens();
@@ -178,12 +212,9 @@ class OwnerSubscriberTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @param bool  $mailIsOwner
-     * @param array $parameterMap
-     *
-     * @return MauticFactory|\PHPUnit_Framework_MockObject_MockObject
+     * @param mixed[] $parameterMap
      */
-    protected function getMockFactory($mailIsOwner = true, $parameterMap = [])
+    protected function getMockFactory(bool $mailIsOwner = true, array $parameterMap = []): MauticFactory|MockObject
     {
         $mockLeadRepository = $this->getMockBuilder(LeadRepository::class)
             ->disableOriginalConstructor()
@@ -207,7 +238,7 @@ class OwnerSubscriberTest extends \PHPUnit\Framework\TestCase
         $mockLeadModel->method('getRepository')
             ->willReturn($mockLeadRepository);
 
-        /** @var MauticFactory|\PHPUnit_Framework_MockObject_MockObject $mockFactory */
+        /** @var MauticFactory|MockObject $mockFactory */
         $mockFactory = $this->getMockBuilder(MauticFactory::class)
             ->disableOriginalConstructor()
             ->getMock();
@@ -215,7 +246,6 @@ class OwnerSubscriberTest extends \PHPUnit\Framework\TestCase
         $parameterMap = array_merge(
             [
                 ['mailer_return_path', false, null],
-                ['mailer_spool_type', false, 'memory'],
                 ['mailer_is_owner', false, $mailIsOwner],
             ],
             $parameterMap
@@ -258,35 +288,130 @@ class OwnerSubscriberTest extends \PHPUnit\Framework\TestCase
         return $mockFactory;
     }
 
-    protected function getMockMailer(array $lead)
+    protected function getMockMailer(array $lead): MailHelper
     {
         $parameterMap = [
             ['mailer_custom_headers', [], ['X-Mautic-Test' => 'test', 'X-Mautic-Test2' => 'test']],
         ];
-        /** @var MauticFactory $mockFactory */
+        /** @var MauticFactory|MockObject $mockFactory */
         $mockFactory = $this->getMockFactory(true, $parameterMap);
 
-        $transport   = new SmtpTransport();
-        $swiftMailer = new \Swift_Mailer($transport);
-        $mailer      = new MailHelper($mockFactory, $swiftMailer, ['nobody@nowhere.com' => 'No Body']);
-        $mailer->setLead($lead);
+        /** @var FromEmailHelper|MockObject $fromEmaiHelper */
+        $fromEmaiHelper = $this->createMock(FromEmailHelper::class);
 
-        return $mailer;
+        /** @var CoreParametersHelper|MockObject $coreParametersHelper */
+        $coreParametersHelper = $this->createMock(CoreParametersHelper::class);
+
+        /** @var Mailbox|MockObject $mailbox */
+        $mailbox = $this->createMock(Mailbox::class);
+
+        /** @var LoggerInterface|MockObject $logger */
+        $logger = $this->createMock(LoggerInterface::class);
+
+        $transport    = new SmtpTransport();
+        $mailer       = new Mailer($transport);
+        $mailerHelper = new MailHelper($mockFactory, $mailer, $fromEmaiHelper, $coreParametersHelper, $mailbox, $logger, $this->mailHashHelper);
+        $mailerHelper->setLead($lead);
+
+        return $mailerHelper;
     }
 
     /**
-     * @return Translator|\PHPUnit_Framework_MockObject_MockObject
+     * @return Translator|MockObject
      */
     protected function getMockTranslator()
     {
-        /** @var Translator|\PHPUnit_Framework_MockObject_MockObject $translator */
-        $translator = $this->getMockBuilder(Translator::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        /** @var Translator|MockObject $translator */
+        $translator = $this->createMock(Translator::class);
         $translator->expects($this->any())
             ->method('hasId')
             ->will($this->returnValue(false));
 
         return $translator;
+    }
+
+    /**
+     * @dataProvider onSmsTokenReplacementProvider
+     */
+    public function testOnSmsTokenReplacement(string $content, string $expected, Lead $lead): void
+    {
+        $leadModel      = $this->createMock(LeadModel::class);
+        $leadRepository = $this->createMock(LeadRepository::class);
+        $leadRepository->method('getLeadOwner')->willReturn(['first_name' => 'John', 'last_name' => 'Doe']);
+        $leadModel->method('getRepository')->willReturn($leadRepository);
+        $translator = $this->createMock(TranslatorInterface::class);
+        $subscriber = new OwnerSubscriber($leadModel, $translator);
+
+        $event = new TokenReplacementEvent($content, $lead);
+        $subscriber->onSmsTokenReplacement($event);
+        $this->assertEquals($expected, $event->getContent());
+    }
+
+    /**
+     * @return User
+     */
+    protected function getUser()
+    {
+        $user = new class() extends User {
+            public function setId(int $id): void
+            {
+                $this->id = $id;
+            }
+        };
+        $user->setId(1);
+        $user->setFirstName('John');
+        $user->setLastName('Doe');
+
+        return $user;
+    }
+
+    /**
+     * @return array<mixed>
+     */
+    public function onSmsTokenReplacementProvider(): array
+    {
+        $lead = $this->getMockBuilder(Lead::class)
+            ->getMock();
+        $lead->expects($this->any())
+            ->method('getId')
+            ->willReturn(1);
+        $lead->expects($this->any())
+            ->method('getProfileFields')
+            ->willReturn(
+                [
+                    'id'     => 1,
+                ]
+            );
+        $lead->expects($this->any())
+            ->method('getowner')
+            ->willReturn(
+                $this->getUser()
+            );
+        $user = $this->getUser();
+        $lead->setOwner($user);
+        $validOwner = [
+            'Hello {ownerfield=firstname} {ownerfield=lastname}',
+            'Hello John Doe',
+            $lead,
+        ];
+
+        $noOwner = [
+            'Hello {ownerfield=firstname} {ownerfield=lastname}',
+            'Hello  ',
+            new Lead(),
+        ];
+
+        return [
+            $validOwner,
+            $noOwner,
+        ];
+    }
+
+    protected function getEmailSendEvent(MailHelper $mailer): EmailSendEvent
+    {
+        $event = new EmailSendEvent($mailer);
+        $event->setContent('<html><body>{ownerfield=firstname} {ownerfield=lastname}</body></html>');
+
+        return $event;
     }
 }

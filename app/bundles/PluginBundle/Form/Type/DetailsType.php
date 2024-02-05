@@ -1,20 +1,12 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\PluginBundle\Form\Type;
 
 use Mautic\CoreBundle\Form\Type\FormButtonsType;
 use Mautic\CoreBundle\Form\Type\StandAloneButtonType;
 use Mautic\CoreBundle\Form\Type\YesNoButtonGroupType;
 use Mautic\PluginBundle\Entity\Integration;
+use Mautic\PluginBundle\Integration\AbstractIntegration;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\HiddenType;
@@ -24,84 +16,83 @@ use Symfony\Component\Form\FormEvents;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
- * Class DetailsType.
+ * @extends AbstractType<Integration>
  */
 class DetailsType extends AbstractType
 {
-    /**
-     * {@inheritdoc}
-     */
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder->add('isPublished', YesNoButtonGroupType::class);
 
-        $formSettings = $options['integration_object']->getFormDisplaySettings();
-        if ($keys = $options['integration_object']->getRequiredKeyFields()) {
-            $decryptedKeys = $options['integration_object']->decryptApiKeys($options['data']->getApiKeys());
+        /** @var AbstractIntegration $integrationObject */
+        $integrationObject = $options['integration_object'];
+        /** @var Integration $integration */
+        $integration   = $options['data'];
+        $formSettings  = $integrationObject->getFormDisplaySettings();
+        $decryptedKeys = $integrationObject->decryptApiKeys($integration->getApiKeys());
+        $keys          = $integrationObject->getRequiredKeyFields();
 
-            if (!empty($formSettings['hide_keys'])) {
-                foreach ($formSettings['hide_keys'] as $key) {
-                    unset($keys[$key]);
-                }
-            }
-
-            $builder->add(
-                'apiKeys',
-                KeysType::class,
-                [
-                    'label'              => false,
-                    'integration_keys'   => $keys,
-                    'data'               => $decryptedKeys,
-                    'integration_object' => $options['integration_object'],
-                ]
-            );
-
-            $builder->addEventListener(
-                FormEvents::PRE_SUBMIT,
-                function (FormEvent $event) use ($keys, $decryptedKeys, $options) {
-                    $data = $event->getData();
-                    $form = $event->getForm();
-
-                    $form->add(
-                        'apiKeys',
-                        KeysType::class,
-                        [
-                            'label'              => false,
-                            'integration_keys'   => $keys,
-                            'data'               => $decryptedKeys,
-                            'integration_object' => $options['integration_object'],
-                            'is_published'       => (int) $data['isPublished'],
-                        ]
-                    );
-                }
-            );
-
-            if (!empty($formSettings['requires_authorization'])) {
-                $disabled = false;
-                $label    = ($options['integration_object']->isAuthorized()) ? 'reauthorize' : 'authorize';
-
-                $builder->add(
-                    'authButton',
-                    StandAloneButtonType::class,
-                    [
-                        'attr'     => [
-                            'class'   => 'btn btn-success btn-lg',
-                            'onclick' => 'Mautic.initiateIntegrationAuthorization()',
-                            'icon'    => 'fa fa-key',
-                        ],
-                        'label'    => 'mautic.integration.form.'.$label,
-                        'disabled' => $disabled,
-                    ]
-                );
+        if (!empty($formSettings['hide_keys'])) {
+            foreach ($formSettings['hide_keys'] as $key) {
+                unset($keys[$key]);
             }
         }
 
-        $features = $options['integration_object']->getSupportedFeatures();
-        $tooltips = $options['integration_object']->getSupportedFeatureTooltips();
+        $builder->add(
+            'apiKeys',
+            KeysType::class,
+            [
+                'label'              => false,
+                'integration_keys'   => $keys,
+                'data'               => $decryptedKeys,
+                'integration_object' => $integrationObject,
+            ]
+        );
+
+        $builder->addEventListener(
+            FormEvents::PRE_SUBMIT,
+            function (FormEvent $event) use ($keys, $decryptedKeys, $options): void {
+                $data = $event->getData();
+                $form = $event->getForm();
+
+                $form->add(
+                    'apiKeys',
+                    KeysType::class,
+                    [
+                        'label'              => false,
+                        'integration_keys'   => $keys,
+                        'data'               => $decryptedKeys,
+                        'integration_object' => $options['integration_object'],
+                        'is_published'       => (int) $data['isPublished'],
+                    ]
+                );
+            }
+        );
+
+        if (!empty($formSettings['requires_authorization'])) {
+            $label = ($integrationObject->isAuthorized()) ? 'reauthorize' : 'authorize';
+
+            $builder->add(
+                'authButton',
+                StandAloneButtonType::class,
+                [
+                    'attr'     => [
+                        'class'   => 'btn btn-success btn-lg',
+                        'onclick' => 'Mautic.initiateIntegrationAuthorization()',
+                        'icon'    => 'fa fa-key',
+                    ],
+                    'label'    => 'mautic.integration.form.'.$label,
+                    'disabled' => false,
+                ]
+            );
+        }
+
+        $features = $integrationObject->getSupportedFeatures();
+        $tooltips = $integrationObject->getSupportedFeatureTooltips();
         if (!empty($features)) {
             // Check to see if the integration is a new entry and thus not configured
-            $configured      = null !== $options['data']->getId();
-            $enabledFeatures = $options['data']->getSupportedFeatures();
+            $configured      = null !== $integration->getId();
+            $enabledFeatures = $integration->getSupportedFeatures();
             $data            = ($configured) ? $enabledFeatures : $features;
 
             $choices = [];
@@ -120,15 +111,15 @@ class DetailsType extends AbstractType
                     'label'       => 'mautic.integration.form.features',
                     'required'    => false,
                     'data'        => $data,
-                    'choice_attr' => function ($val, $key, $index) use ($tooltips) {
+                    'choice_attr' => function ($val) use ($tooltips): array {
                         if (array_key_exists($val, $tooltips)) {
                             return [
                                 'data-toggle' => 'tooltip',
                                 'title'       => $tooltips[$val],
                             ];
-                        } else {
-                            return [];
                         }
+
+                        return [];
                     },
                 ]
             );
@@ -140,10 +131,10 @@ class DetailsType extends AbstractType
             [
                 'label'              => 'mautic.integration.form.feature.settings',
                 'required'           => true,
-                'data'               => $options['data']->getFeatureSettings(),
+                'data'               => $integration->getFeatureSettings(),
                 'label_attr'         => ['class' => 'control-label'],
                 'integration'        => $options['integration'],
-                'integration_object' => $options['integration_object'],
+                'integration_object' => $integrationObject,
                 'lead_fields'        => $options['lead_fields'],
                 'company_fields'     => $options['company_fields'],
             ]
@@ -159,13 +150,10 @@ class DetailsType extends AbstractType
             $builder->setAction($options['action']);
         }
 
-        $options['integration_object']->modifyForm($builder, $options);
+        $integrationObject->modifyForm($builder, $options);
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function configureOptions(OptionsResolver $resolver)
+    public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults(
             [
@@ -174,11 +162,9 @@ class DetailsType extends AbstractType
         );
 
         $resolver->setRequired(['integration', 'integration_object', 'lead_fields', 'company_fields']);
+        $resolver->setAllowedTypes('integration_object', [AbstractIntegration::class]);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getBlockPrefix()
     {
         return 'integration_details';

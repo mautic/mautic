@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\FormBundle\EventListener;
 
 use Mautic\FormBundle\Event\SubmissionEvent;
@@ -21,20 +12,12 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class PointSubscriber implements EventSubscriberInterface
 {
-    /**
-     * @var PointModel
-     */
-    private $pointModel;
-
-    public function __construct(PointModel $pointModel)
-    {
-        $this->pointModel = $pointModel;
+    public function __construct(
+        private PointModel $pointModel
+    ) {
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             PointEvents::POINT_ON_BUILD => ['onPointBuild', 0],
@@ -42,13 +25,13 @@ class PointSubscriber implements EventSubscriberInterface
         ];
     }
 
-    public function onPointBuild(PointBuilderEvent $event)
+    public function onPointBuild(PointBuilderEvent $event): void
     {
         $action = [
             'group'       => 'mautic.form.point.action',
             'label'       => 'mautic.form.point.action.submit',
             'description' => 'mautic.form.point.action.submit_descr',
-            'callback'    => ['\\Mautic\\FormBundle\\Helper\\PointActionHelper', 'validateFormSubmit'],
+            'callback'    => [\Mautic\FormBundle\Helper\PointActionHelper::class, 'validateFormSubmit'],
             'formType'    => PointActionFormSubmitType::class,
         ];
 
@@ -58,7 +41,7 @@ class PointSubscriber implements EventSubscriberInterface
     /**
      * Trigger point actions for form submit.
      */
-    public function onFormSubmit(SubmissionEvent $event)
+    public function onFormSubmit(SubmissionEvent $event): void
     {
         $this->pointModel->triggerAction('form.submit', $event->getSubmission());
     }

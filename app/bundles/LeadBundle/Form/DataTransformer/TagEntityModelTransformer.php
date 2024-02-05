@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\LeadBundle\Form\DataTransformer;
 
 use Doctrine\ORM\EntityManager;
@@ -16,42 +7,27 @@ use Doctrine\ORM\PersistentCollection;
 use Symfony\Component\Form\DataTransformerInterface;
 use Symfony\Component\Form\Exception\TransformationFailedException;
 
+/**
+ * @implements DataTransformerInterface<array<mixed>|int|null, array<mixed>|object|null>
+ */
 class TagEntityModelTransformer implements DataTransformerInterface
 {
     /**
-     * @var EntityManager
-     */
-    private $em;
-
-    /**
-     * @var string
-     */
-    private $repository;
-
-    /**
-     * @var bool
-     */
-    private $isArray;
-
-    /**
-     * @param string $repo
+     * @param string $repository
      * @param bool   $isArray
      */
-    public function __construct(EntityManager $em, $repo = '', $isArray = false)
-    {
-        $this->em         = $em;
-        $this->repository = $repo;
-        $this->isArray    = $isArray;
+    public function __construct(
+        private EntityManager $em,
+        private $repository = '',
+        private $isArray = false
+    ) {
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function reverseTransform($entity)
     {
         if (!$this->isArray) {
             if (is_null($entity) || !is_object($entity)) {
-                return '';
+                return null;
             }
 
             return $entity->getTag();
@@ -70,8 +46,6 @@ class TagEntityModelTransformer implements DataTransformerInterface
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @throws TransformationFailedException if object is not found
      */
     public function transform($id)
@@ -84,8 +58,7 @@ class TagEntityModelTransformer implements DataTransformerInterface
             $column = (is_numeric($id)) ? 'id' : 'tag';
             $entity = $this->em
                 ->getRepository($this->repository)
-                ->findOneBy([$column => $id])
-            ;
+                ->findOneBy([$column => $id]);
 
             if (null === $entity) {
                 throw new TransformationFailedException(sprintf('Tag with "%s" does not exist!', $id));
@@ -117,7 +90,7 @@ class TagEntityModelTransformer implements DataTransformerInterface
         ]);
 
         if (!count($entities)) {
-            throw new TransformationFailedException(sprintf('Tags for "%s" does not exist!', $id));
+            throw new TransformationFailedException(sprintf('Tags for "%s" does not exist!', implode(', ', $id)));
         }
 
         return $entities;
@@ -128,7 +101,7 @@ class TagEntityModelTransformer implements DataTransformerInterface
      *
      * @param string $repo
      */
-    public function setRepository($repo)
+    public function setRepository($repo): void
     {
         $this->repository = $repo;
     }

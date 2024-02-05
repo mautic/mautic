@@ -2,41 +2,30 @@
 
 declare(strict_types=1);
 
-/*
- * @copyright   2019 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\LeadBundle\EventListener;
 
+use Mautic\CoreBundle\Helper\ArrayHelper;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\LeadBundle\Event\ImportInitEvent;
 use Mautic\LeadBundle\Event\ImportMappingEvent;
 use Mautic\LeadBundle\Event\ImportProcessEvent;
+use Mautic\LeadBundle\Event\ImportValidateEvent;
 use Mautic\LeadBundle\Field\FieldList;
 use Mautic\LeadBundle\LeadEvents;
 use Mautic\LeadBundle\Model\CompanyModel;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\Form\FormError;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 final class ImportCompanySubscriber implements EventSubscriberInterface
 {
-    private FieldList $fieldList;
-    private CorePermissions $corePermissions;
-    private CompanyModel $companyModel;
-
     public function __construct(
-        FieldList $fieldList,
-        CorePermissions $corePermissions,
-        CompanyModel $companyModel
+        private FieldList $fieldList,
+        private CorePermissions $corePermissions,
+        private CompanyModel $companyModel,
+        private TranslatorInterface $translator
     ) {
-        $this->fieldList       = $fieldList;
-        $this->corePermissions = $corePermissions;
-        $this->companyModel    = $companyModel;
     }
 
     public static function getSubscribedEvents(): array
@@ -45,6 +34,7 @@ final class ImportCompanySubscriber implements EventSubscriberInterface
             LeadEvents::IMPORT_ON_INITIALIZE    => ['onImportInit'],
             LeadEvents::IMPORT_ON_FIELD_MAPPING => ['onFieldMapping'],
             LeadEvents::IMPORT_ON_PROCESS       => ['onImportProcess'],
+            LeadEvents::IMPORT_ON_VALIDATE      => ['onValidateImport'],
         ];
     }
 
@@ -94,6 +84,81 @@ final class ImportCompanySubscriber implements EventSubscriberInterface
             );
             $event->setWasMerged((bool) $merged);
             $event->stopPropagation();
+        }
+    }
+
+    public function onValidateImport(ImportValidateEvent $event): void
+    {
+        if (false === $event->importIsForRouteObject('companies')) {
+            return;
+        }
+
+        $matchedFields = $event->getForm()->getData();
+        $skipIfExists  = ArrayHelper::pickValue('skip_if_exists', $matchedFields, false);
+        $event->setSkipIfExists((bool) $skipIfExists);
+        unset($matchedFields['skip_if_exists']);
+        $event->setOwnerId($this->handleValidateOwner($matchedFields));
+
+        $matchedFields = array_map(
+            fn ($value) => is_string($value) ? trim($value) : $value,
+            array_filter($matchedFields)
+        );
+
+        if (empty($matchedFields)) {
+            $event->getForm()->addError(
+                new FormError(
+                    $this->translator->trans('mautic.lead.import.matchfields', [], 'validators')
+                )
+            );
+        }
+
+        $this->handleValidateRequired($event, $matchedFields);
+
+        $event->setMatchedFields($matchedFields);
+    }
+
+    /**
+     * @param mixed[] $matchedFields
+     */
+    private function handleValidateOwner(array &$matchedFields): ?int
+    {
+        $owner = ArrayHelper::pickValue('owner', $matchedFields);
+
+        return $owner ? $owner->getId() : null;
+    }
+
+    /**
+     * Validate required fields.
+     *
+     * Required fields come through as ['alias' => 'label'], and
+     * $matchedFields is a zero indexed array, so to calculate the
+     * diff, we must array_flip($matchedFields) and compare on key.
+     *
+     * @param mixed[] $matchedFields
+     */
+    private function handleValidateRequired(ImportValidateEvent $event, array &$matchedFields): void
+    {
+        $requiredFields = $this->fieldList->getFieldList(false, false, [
+            'isPublished' => true,
+            'object'      => 'company',
+            'isRequired'  => true,
+        ]);
+
+        $missingRequiredFields = array_diff_key($requiredFields, array_flip($matchedFields));
+
+        if (count($missingRequiredFields)) {
+            $event->getForm()->addError(
+                new FormError(
+                    $this->translator->trans(
+                        'mautic.import.missing.required.fields',
+                        [
+                            '%requiredFields%' => implode(', ', $missingRequiredFields),
+                            '%fieldOrFields%'  => 1 === count($missingRequiredFields) ? 'field' : 'fields',
+                        ],
+                        'validators'
+                    )
+                )
+            );
         }
     }
 }

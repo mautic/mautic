@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2019 Mautic Contributors. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\LeadBundle\Tests\Deduplicate\Helper;
 
 use Mautic\LeadBundle\Deduplicate\Exception\ValueNotMergeableException;
@@ -16,7 +7,7 @@ use Mautic\LeadBundle\Deduplicate\Helper\MergeValueHelper;
 
 class MergeValueHelperTest extends \PHPUnit\Framework\TestCase
 {
-    public function testGetMergeValueWhenNewAndOldValuesAreIdentical()
+    public function testGetMergeValueWhenNewAndOldValuesAreIdentical(): void
     {
         $newerValue     = 'bbb';
         $olderValue     = 'bbb';
@@ -28,7 +19,7 @@ class MergeValueHelperTest extends \PHPUnit\Framework\TestCase
         MergeValueHelper::getMergeValue($newerValue, $olderValue, $winnerValue, $defaultValue, $newIsAnonymous);
     }
 
-    public function testGetMergeValueWhenNewAndWinnerValuesAreIdentical()
+    public function testGetMergeValueWhenNewAndWinnerValuesAreIdentical(): void
     {
         $newerValue     = 'bbb';
         $olderValue     = 'aaa';
@@ -40,7 +31,7 @@ class MergeValueHelperTest extends \PHPUnit\Framework\TestCase
         MergeValueHelper::getMergeValue($newerValue, $olderValue, $winnerValue, $defaultValue, $newIsAnonymous);
     }
 
-    public function testGetMergeValueWhenNewerValueIsNotNull()
+    public function testGetMergeValueWhenNewerValueIsNotNull(): void
     {
         $newerValue     = 'aaa';
         $olderValue     = 'bbb';
@@ -53,7 +44,7 @@ class MergeValueHelperTest extends \PHPUnit\Framework\TestCase
         $this->assertSame('aaa', $value);
     }
 
-    public function testGetMergeValueWhenNewerValueIsNotNullAndSameAsDefaultValueForAnonymousContact()
+    public function testGetMergeValueWhenNewerValueIsNotNullAndSameAsDefaultValueForAnonymousContact(): void
     {
         $newerValue     = 'aaa';
         $olderValue     = 'bbb';
@@ -66,7 +57,7 @@ class MergeValueHelperTest extends \PHPUnit\Framework\TestCase
         $this->assertSame('bbb', $value);
     }
 
-    public function testGetMergeValueWhenNewerValueIsNotNullAndSameAsDefaultValueForIdentifiedContact()
+    public function testGetMergeValueWhenNewerValueIsNotNullAndSameAsDefaultValueForIdentifiedContact(): void
     {
         $newerValue     = 'aaa';
         $olderValue     = 'bbb';
@@ -79,7 +70,7 @@ class MergeValueHelperTest extends \PHPUnit\Framework\TestCase
         $this->assertSame('aaa', $value);
     }
 
-    public function testGetMergeValueWhenNewerValueIsNull()
+    public function testGetMergeValueWhenNewerValueIsNull(): void
     {
         $newerValue     = null;
         $olderValue     = 'bbb';
@@ -92,7 +83,7 @@ class MergeValueHelperTest extends \PHPUnit\Framework\TestCase
         $this->assertSame('bbb', $value);
     }
 
-    public function testGetMergeValueWhenNewerValueIsNotNullAndDefaultValueIsZero()
+    public function testGetMergeValueWhenNewerValueIsNotNullAndDefaultValueIsZero(): void
     {
         $newerValue     = 0;
         $olderValue     = 1;

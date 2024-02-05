@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2017 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\LeadBundle\Helper;
 
 use Mautic\CoreBundle\Helper\DateTimeHelper;
@@ -18,9 +9,11 @@ use Mautic\CoreBundle\Helper\DateTimeHelper;
  */
 class CustomFieldHelper
 {
-    const TYPE_BOOLEAN = 'boolean';
-    const TYPE_NUMBER  = 'number';
-    const TYPE_SELECT  = 'select';
+    public const TYPE_BOOLEAN = 'boolean';
+
+    public const TYPE_NUMBER  = 'number';
+
+    public const TYPE_SELECT  = 'select';
 
     /**
      * Fixes value type for specific field types.
@@ -37,19 +30,12 @@ class CustomFieldHelper
             return null;
         }
 
-        switch ($type) {
-            case self::TYPE_NUMBER:
-                $value = (float) $value;
-                break;
-            case self::TYPE_BOOLEAN:
-                $value = (bool) $value;
-                break;
-            case self::TYPE_SELECT:
-                $value = (string) $value;
-                break;
-        }
-
-        return $value;
+        return match ($type) {
+            self::TYPE_NUMBER  => (float) $value,
+            self::TYPE_BOOLEAN => (bool) $value,
+            self::TYPE_SELECT  => (string) $value,
+            default            => $value,
+        };
     }
 
     /**
@@ -94,8 +80,13 @@ class CustomFieldHelper
 
     /**
      * Transform all fields values.
+     *
+     * @param mixed[] $fields
+     * @param mixed[] $values
+     *
+     * @return mixed[]
      */
-    public static function fieldsValuesTransformer(array $fields, array $values)
+    public static function fieldsValuesTransformer(array $fields, array $values): array
     {
         foreach ($values as $alias => &$value) {
             if (!empty($fields[$alias])) {

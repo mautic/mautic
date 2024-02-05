@@ -2,48 +2,19 @@
 
 declare(strict_types=1);
 
-/*
- * @copyright   2020 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\WebhookBundle\Event;
 
 use Mautic\LeadBundle\Entity\Lead;
-use Symfony\Component\EventDispatcher\Event;
+use Symfony\Contracts\EventDispatcher\Event;
 
 class WebhookRequestEvent extends Event
 {
-    /**
-     * @var string
-     */
-    private $url;
-
-    /**
-     * @var array
-     */
-    private $headers;
-
-    /**
-     * @var array
-     */
-    private $payload;
-
-    /**
-     * @var Lead
-     */
-    private $contact;
-
-    public function __construct(Lead $contact, string $url, array $headers, array $payload)
-    {
-        $this->url     = $url;
-        $this->headers = $headers;
-        $this->payload = $payload;
-        $this->contact = $contact;
+    public function __construct(
+        private Lead $contact,
+        private string $url,
+        private array $headers,
+        private array $payload
+    ) {
     }
 
     public function getUrl(): string

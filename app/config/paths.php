@@ -1,31 +1,29 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
 $paths = [
-    //customizable
+    // customizable
     'themes'       => 'themes',
-    'assets'       => 'media',
+    'assets'       => 'app/assets',
+    'media'        => 'media',
     'asset_prefix' => '',
     'plugins'      => 'plugins',
     'translations' => 'translations',
-    'local_config' => '%kernel.root_dir%/config/local.php',
+    'local_config' => '%kernel.project_dir%/config/local.php',
 ];
 
-//allow easy overrides of the above
-if (file_exists(__DIR__.'/paths_local.php')) {
-    include __DIR__.'/paths_local.php';
+$root        = $root ?? realpath(__DIR__.'/..');
+$projectRoot = $projectRoot ?? \Mautic\CoreBundle\Loader\ParameterLoader::getProjectDirByRoot($root);
+
+// allow easy overrides of the above
+if (file_exists($projectRoot.'/config/paths_local.php')) {
+    include $projectRoot.'/config/paths_local.php';
+} elseif (file_exists($root.'/config/paths_local.php')) {
+    include $root.'/config/paths_local.php';
 }
 
-//fixed
+// fixed
 $paths = array_merge($paths, [
-    //remove /app from the root
+    // remove /app from the root
     'root'    => substr($root, 0, -4),
     'app'     => 'app',
     'bundles' => 'app/bundles',

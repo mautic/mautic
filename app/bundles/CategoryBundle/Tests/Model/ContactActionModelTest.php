@@ -2,15 +2,6 @@
 
 declare(strict_types=1);
 
-/*
- * @copyright   2018 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CategoryBundle\Tests\Model;
 
 use Mautic\CategoryBundle\Model\ContactActionModel;
@@ -20,25 +11,16 @@ use PHPUnit\Framework\MockObject\MockObject;
 
 class ContactActionModelTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var Lead
-     */
-    private $contactMock5;
+    private \Mautic\LeadBundle\Entity\Lead $contactMock5;
 
-    /**
-     * @var Lead
-     */
-    private $contactMock6;
+    private \Mautic\LeadBundle\Entity\Lead $contactMock6;
 
     /**
      * @var MockObject|LeadModel
      */
-    private $contactModelMock;
+    private \PHPUnit\Framework\MockObject\MockObject $contactModelMock;
 
-    /**
-     * @var ContactActionModel
-     */
-    private $actionModel;
+    private \Mautic\CategoryBundle\Model\ContactActionModel $actionModel;
 
     protected function setUp(): void
     {
@@ -48,7 +30,7 @@ class ContactActionModelTest extends \PHPUnit\Framework\TestCase
         $this->actionModel      = new ContactActionModel($this->contactModelMock);
     }
 
-    public function testAddContactsToCategoriesEntityAccess()
+    public function testAddContactsToCategoriesEntityAccess(): void
     {
         $contacts   = [5, 6];
         $categories = [4, 5];
@@ -70,7 +52,7 @@ class ContactActionModelTest extends \PHPUnit\Framework\TestCase
         $this->actionModel->addContactsToCategories($contacts, $categories);
     }
 
-    public function testRemoveContactsFromCategoriesEntityAccess()
+    public function testRemoveContactsFromCategoriesEntityAccess(): void
     {
         $contacts   = [5, 6];
         $categories = [1, 2];
@@ -97,7 +79,7 @@ class ContactActionModelTest extends \PHPUnit\Framework\TestCase
         $this->actionModel->removeContactsFromCategories($contacts, $categories);
     }
 
-    public function testAddContactsToCategories()
+    public function testAddContactsToCategories(): void
     {
         $contacts   = [5, 6];
         $categories = [1, 2];

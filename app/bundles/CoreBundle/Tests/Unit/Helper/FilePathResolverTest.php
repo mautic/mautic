@@ -2,15 +2,6 @@
 
 declare(strict_types=1);
 
-/*
- * @copyright   2015 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CoreBundle\Tests\Unit\Helper;
 
 use Mautic\CoreBundle\Exception\FilePathException;
@@ -26,22 +17,16 @@ class FilePathResolverTest extends \PHPUnit\Framework\TestCase
     /**
      * @var MockObject|Filesystem
      */
-    private $filesystemMock;
+    private \PHPUnit\Framework\MockObject\MockObject $filesystemMock;
 
     /**
      * @var MockObject|UploadedFile
      */
-    private $fileMock;
+    private \PHPUnit\Framework\MockObject\MockObject $fileMock;
 
-    /**
-     * @var InputHelper
-     */
-    private $inputHelper;
+    private \Mautic\CoreBundle\Helper\InputHelper $inputHelper;
 
-    /**
-     * @var FilePathResolver
-     */
-    private $filePathResolver;
+    private \Mautic\CoreBundle\Helper\FilePathResolver $filePathResolver;
 
     protected function setUp(): void
     {

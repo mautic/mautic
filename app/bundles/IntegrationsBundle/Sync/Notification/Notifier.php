@@ -2,15 +2,6 @@
 
 declare(strict_types=1);
 
-/*
- * @copyright   2018 Mautic Inc. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://www.mautic.com
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\IntegrationsBundle\Sync\Notification;
 
 use Mautic\IntegrationsBundle\Exception\IntegrationNotFoundException;
@@ -24,29 +15,11 @@ use Mautic\IntegrationsBundle\Sync\SyncDataExchange\MauticSyncDataExchange;
 
 class Notifier
 {
-    /**
-     * @var HandlerContainer
-     */
-    private $handlerContainer;
-
-    /**
-     * @var SyncIntegrationsHelper
-     */
-    private $syncIntegrationsHelper;
-
-    /**
-     * @var ConfigIntegrationsHelper
-     */
-    private $configIntegrationsHelper;
-
     public function __construct(
-        HandlerContainer $handlerContainer,
-        SyncIntegrationsHelper $syncIntegrationsHelper,
-        ConfigIntegrationsHelper $configIntegrationsHelper
+        private HandlerContainer $handlerContainer,
+        private SyncIntegrationsHelper $syncIntegrationsHelper,
+        private ConfigIntegrationsHelper $configIntegrationsHelper
     ) {
-        $this->handlerContainer         = $handlerContainer;
-        $this->syncIntegrationsHelper   = $syncIntegrationsHelper;
-        $this->configIntegrationsHelper = $configIntegrationsHelper;
     }
 
     /**
@@ -85,7 +58,7 @@ class Notifier
     {
         try {
             $configIntegration = $this->configIntegrationsHelper->getIntegration($integration);
-        } catch (IntegrationNotFoundException $exception) {
+        } catch (IntegrationNotFoundException) {
             return ucfirst($object);
         }
 

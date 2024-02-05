@@ -1,22 +1,10 @@
 <?php
 
-/*
- * @copyright   2016 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CoreBundle\Model;
 
 use Mautic\CoreBundle\Entity\TranslationEntityInterface;
 use Mautic\CoreBundle\Entity\VariantEntityInterface;
 
-/**
- * Class VariantModelTrait.
- */
 trait VariantModelTrait
 {
     /**
@@ -27,16 +15,16 @@ trait VariantModelTrait
     /**
      * Converts a variant to the main item and the original main item a variant.
      */
-    public function convertVariant(VariantEntityInterface $entity)
+    public function convertVariant(VariantEntityInterface $entity): void
     {
-        //let saveEntities() know it does not need to set variant start dates
+        // let saveEntities() know it does not need to set variant start dates
         $this->inConversion = true;
 
-        list($parent, $children) = $entity->getVariants();
+        [$parent, $children] = $entity->getVariants();
 
         $save = [];
 
-        //set this email as the parent for the original parent and children
+        // set this email as the parent for the original parent and children
         if ($parent) {
             if ($parent->getId() != $entity->getId()) {
                 if (method_exists($parent, 'setIsPublished')) {
@@ -51,7 +39,7 @@ trait VariantModelTrait
             $parent->setVariantSentCount(0);
 
             foreach ($children as $child) {
-                //capture child before it's removed from collection
+                // capture child before it's removed from collection
                 $save[] = $child;
 
                 $parent->removeVariantChild($child);
@@ -79,7 +67,7 @@ trait VariantModelTrait
         $save[] = $parent;
         $save[] = $entity;
 
-        //save the entities
+        // save the entities
         $this->saveEntities($save, false);
     }
 
@@ -88,7 +76,7 @@ trait VariantModelTrait
      *
      * @param array $resetVariantCounterMethods ['setVariantHits', 'setVariantSends', ...]
      */
-    protected function preVariantSaveEntity(VariantEntityInterface $entity, array $resetVariantCounterMethods = [], \DateTime $variantStartDate = null)
+    protected function preVariantSaveEntity(VariantEntityInterface $entity, array $resetVariantCounterMethods = [], \DateTime $variantStartDate = null): bool
     {
         $isVariant = $entity->isVariant();
 
@@ -148,11 +136,6 @@ trait VariantModelTrait
         }
     }
 
-    /**
-     * @param           $entity
-     * @param           $relatedIds
-     * @param \DateTime $variantStartDate
-     */
     protected function resetVariants($entity, $relatedIds = null, \DateTime $variantStartDate = null)
     {
         $repo = $this->getRepository();

@@ -1,0 +1,188 @@
+{% set isIndex = tmpl == 'index' ? true : false %}
+{% set tmpl = 'list' %}
+
+{% extends isIndex ? '@MauticCore/Default/content.html.twig' : '@MauticCore/Default/raw_output.html.twig' %}
+
+{% block muaticContent %}category
+{% endblock %}
+{% block headerTitle %}
+	{% trans %}mautic.category.header.index{% endtrans %}
+{% endblock %}
+
+{% block actions %}
+	{{- include('@MauticCore/Helper/page_actions.html.twig', {
+        'templateButtons': {
+            'new': permissions[permissionBase ~ ":create"]
+        },
+        'routeBase': 'category',
+        'query': {
+            'bundle': bundle,
+            'show_bundle_select': true,
+        },
+        'editMode': 'ajaxModal',
+        'editAttr': {
+            'data-target': '#MauticSharedModal',
+            'data-header': 'mautic.category.header.new'|trans,
+            'data-toggle':'ajaxmodal',
+        },
+    }) -}}
+{% endblock %}
+
+{% block content %}
+	{% if isIndex %}
+		<div class="panel panel-default bdr-t-wdh-0 mb-0">
+			{# //TODO - Restore these buttons to the listactions when custom content is supported #}
+			{# <div class="btn-group">
+							        <button type="button" class="btn btn-default"><i class="fa fa-upload"></i></button>
+							        <button type="button" class="btn btn-default"><i class="fa fa-archive"></i></button>
+							    </div> #}
+			{{- include('@MauticCore/Helper/list_toolbar.html.twig', {
+                'searchValue': searchValue,
+                'searchHelp' : 'mautic.category.help.searchcommands',
+                'filters'    : {
+                    'bundle': {
+                        'options'        : categoryTypes,
+                        'values'         : {0: bundle},
+                        'translateLabels': true,
+                    },
+                },
+                'action': currentRoute,
+            }) -}}
+            <div class="page-list"> 
+                {{ block('listResults') }}
+			</div>
+		</div>
+	{% else %}
+		{{ block('listResults') }}
+	{% endif %}
+
+{% endblock %}
+
+
+{% block listResults %}
+	{% if items|length %}
+		<div class="table-responsive">
+			<table class="table table-hover table-striped table-bordered category-list" id="categoryTable">
+				<thead>
+					<tr>
+						{{- include('@MauticCore/Helper/tableheader.html.twig', {
+                            'checkall'        :  'true',
+                            'target'          :  '#categoryTable',
+                            'routeBase'       :  'category',
+                            'templateButtons' :  {
+                                'delete' :  permissions[permissionBase ~ ':delete'],
+                            },
+                            'query' :  {
+                                'bundle' :  bundle,
+                            },
+                        }) -}}
+
+						{{- include(
+                        '@MauticCore/Helper/tableheader.html.twig',
+                            {
+                                'sessionVar' :  'category',
+                                'text'       :  '',
+                                'class'      :  'col-category-color',
+                            }
+                        ) -}}
+
+						{{- include('@MauticCore/Helper/tableheader.html.twig', {
+                            'sessionVar' :  'category',
+                            'orderBy'    :  'c.title',
+                            'text'       :  'mautic.core.title',
+                            'class'      :  'col-category-title',
+                            'default'    :  true,
+                        }) -}}
+
+						{{- include('@MauticCore/Helper/tableheader.html.twig', {
+                            'sessionVar' :  'category',
+                            'orderBy'    :  'c.bundle',
+                            'text'       :  'mautic.core.type',
+                            'class'      :  'visible-md visible-lg col-page-bundle',
+                        }) -}}
+
+						{{- include('@MauticCore/Helper/tableheader.html.twig', {
+                            'sessionVar' :  'category',
+                            'orderBy'    :  'c.id',
+                            'text'       :  'mautic.core.id',
+                            'class'      :  'visible-md visible-lg col-page-id',
+                        }) -}}
+					</tr>
+				</thead>
+				<tbody>
+					{% for item in items %}
+						<tr>
+							<td>
+								{% set title = 'mautic.category.header.edit'|trans({'%type%' :  ('mautic.' ~ item.getBundle() ~ '.' ~ item.getBundle())|trans, '%name%' :  item.getTitle()}) %}
+								{{- include('@MauticCore/Helper/list_actions.html.twig', {
+                                'item'            :  item,
+                                'templateButtons' :  {
+                                    'edit'   :  permissions[permissionBase ~ ':edit'],
+                                    'delete' :  permissions[permissionBase ~ ':delete'],
+                                },
+                                'editMode' :  'ajaxmodal',
+                                'editAttr' :  {
+                                    'data-target' :  '#MauticSharedModal',
+                                    'data-header' :  title,
+                                    'data-toggle' :  'ajaxmodal',
+                                },
+                                'routeBase' :  'category',
+                                'query'     :  {
+                                    'bundle' :  bundle,
+                                },
+                            }) -}}
+							</td>
+							<td>
+								{% set color = item.getColor() %}
+								<span class="label label-default pa-10" style="background: {{ '#' not in color ? '#' : ''}}{{ color }};"> </span>
+							</td>
+							<td>
+                                <div>
+                                    {{- include('@MauticCore/Helper/publishstatus_icon.html.twig',
+                                        {'item' :  item, 'model' :  'category', 'query' :  'bundle=' ~ bundle}) -}}
+                                    {% if permissions[permissionBase ~ ':edit'] %}
+                                        <a href="{{ path('mautic_category_action',
+                                            {'bundle' :  bundle, 'objectAction' :  'edit', 'objectId' :  item.getId()}) }}" data-toggle="ajaxmodal" data-target="#MauticSharedModal" data-header="{{ title }}"
+                                    {% endif %}
+                                    <span>{{ item.getTitle() }} ({{ item.getAlias() }})</span>
+                                    {% if permissions[permissionBase ~ ':edit'] %}
+                                        </a>
+                                    {% endif %}
+                                </div>
+                                {% set description = item.getDescription() %}
+                                {% if description %}
+                                    <div class="text-muted mt-4">
+                                        <small>{{ description }}</small>
+                                    </div>
+                                {% endif %}
+                            </td>
+                            <td class="visible-md visible-lg">
+                                {% if categoryTypes[item.getBundle()] is defined %}
+                                    {{ categoryTypes[item.getBundle()]|trans }}
+                                {% endif %}
+                            </td>
+                            <td class="visible-md visible-lg">{{ item.getId() }}</td>
+						</tr>
+                        {% endfor %}
+					</table>
+					<div class="panel-footer">
+						{{- include('@MauticCore/Helper/pagination.html.twig',
+                {
+                    'totalItems' :  items|length,
+                    'page'       :  page,
+                    'limit'      :  limit,
+                    'menuLinkId' :  'mautic_category_index',
+                    'baseUrl'    :  path(
+                        'mautic_category_index',
+                        {
+                            'bundle' :  ('category' == bundle) ? 'all' : bundle,
+                        }
+                    ),
+                    'sessionVar' :  'category',
+                }) -}}</div>
+				</tbody>
+			</div>
+		{% else %}
+			{{- include('@MauticCore/Helper/noresults.html.twig', {'tip' : 'mautic.category.noresults.tip'}) -}}
+		{% endif %}
+	{% endblock %}

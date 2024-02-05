@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2019 Mautic Inc. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://www.mautic.com
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CoreBundle\Tests\Unit\Helper;
 
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
@@ -20,7 +11,7 @@ class TrailingSlashHelperTest extends \PHPUnit\Framework\TestCase
     /**
      * @var CoreParametersHelper|\PHPUnit\Framework\MockObject\MockObject
      */
-    private $coreParametersHelper;
+    private \PHPUnit\Framework\MockObject\MockObject $coreParametersHelper;
 
     protected function setUp(): void
     {
@@ -30,7 +21,7 @@ class TrailingSlashHelperTest extends \PHPUnit\Framework\TestCase
             ->willReturn('https://test.com');
     }
 
-    public function testOpenRedirectIsNotPossible()
+    public function testOpenRedirectIsNotPossible(): void
     {
         $server = [
             'HTTP_HOST'       => 'test.com',
@@ -57,7 +48,7 @@ class TrailingSlashHelperTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals('https://test.com//google.com', $this->getHelper()->getSafeRedirectUrl($request));
     }
 
-    public function testMauticUrlWithTrailingSlashIsGeneratedCorrectly()
+    public function testMauticUrlWithTrailingSlashIsGeneratedCorrectly(): void
     {
         $server = [
             'HTTP_HOST'       => 'test.com',

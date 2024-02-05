@@ -1,0 +1,121 @@
+{% if items|length > 0 %}
+    <div class="table-responsive">
+        <table class="table table-hover table-striped table-bordered pointtrigger-list" id="triggerTable">
+            <thead>
+            <tr>
+                {{ include('@MauticCore/Helper/tableheader.html.twig', {
+                        'checkall': 'true',
+                        'target': '#triggerTable',
+                        'langVar': 'point.trigger',
+                        'routeBase': 'pointtrigger',
+                        'templateButtons': {
+                            'delete': permissions['point:triggers:delete'],
+                        },
+                }) }}
+
+                <th class='col-pointtrigger-color'></th>
+
+                {{ include('@MauticCore/Helper/tableheader.html.twig', {
+                        'sessionVar': 'point.trigger',
+                        'orderBy': 't.name',
+                        'text': 'mautic.core.name',
+                        'class': 'col-pointtrigger-name',
+                        'default': true,
+                }) }}
+
+                {{ include('@MauticCore/Helper/tableheader.html.twig', {
+                        'sessionVar': 'point.trigger',
+                        'orderBy': 'cat.title',
+                        'text': 'mautic.core.category',
+                        'class': 'col-pointtrigger-category visible-md visible-lg',
+                }) }}
+
+                {{ include('@MauticCore/Helper/tableheader.html.twig', {
+                        'sessionVar': 'point.trigger',
+                        'orderBy': 'pl.name',
+                        'text': 'mautic.point.thead.group',
+                        'class': 'visible-md visible-lg col-point-group',
+                }) }}
+
+                {{ include('@MauticCore/Helper/tableheader.html.twig', {
+                        'sessionVar': 'point.trigger',
+                        'orderBy': 't.points',
+                        'text': 'mautic.point.trigger.thead.points',
+                        'class': 'col-pointtrigger-points',
+                }) }}
+
+                {{ include('@MauticCore/Helper/tableheader.html.twig', {
+                        'sessionVar': 'point.trigger',
+                        'orderBy': 't.id',
+                        'text': 'mautic.core.id',
+                        'class': 'col-pointtrigger-id visible-md visible-lg',
+                }) }}
+            </tr>
+            </thead>
+            <tbody>
+            {% for item in items %}
+                <tr>
+                    <td>
+                        {{ include('@MauticCore/Helper/list_actions.html.twig', {
+                                'item': item,
+                                'templateButtons': {
+                                    'edit': permissions['point:triggers:edit'],
+                                    'clone': permissions['point:triggers:create'],
+                                    'delete': permissions['point:triggers:delete'],
+                                },
+                                'routeBase': 'pointtrigger',
+                                'langVar': 'point.trigger',
+                        }) }}
+                    </td>
+                    <td>
+                        <span class="label label-default pa-10" style="background: {{ '#' not in item.color ? '#' : ''}}{{ item.color }};"> </span>
+                    </td>
+                    <td>
+                        <div>
+                            {{ include('@MauticCore/Helper/publishstatus_icon.html.twig', {'item': item, 'model': 'point.trigger'}) }}
+                            {% if permissions['point:triggers:edit'] %}
+                                <a href="{{ path('mautic_pointtrigger_action', {'objectAction': 'edit', 'objectId': item.id}) }}" data-toggle="ajax">
+                                    {{ item.name }}
+                                </a>
+                            {% else %}
+                                {{ item.name }}
+                            {% endif %}
+                        </div>
+                        {% if item.description is not empty %}
+                            <div class="text-muted mt-4">
+                                <small>{{ item.description|purify }}</small>
+                            </div>
+                        {% endif %}
+                    </td>
+                    <td class="visible-md visible-lg">
+                        {% set category = item.category %}
+                        {% set catName = category.title|default('mautic.core.form.uncategorized'|trans) %}
+                        {% set color = category ? '#' ~ category.color : 'inherit' %}
+                        <span style="white-space: nowrap;">
+                          <span class="label label-default pa-4" style="border: 1px solid #d5d5d5; background: {{ color }};"> </span>
+                          <span>{{ catName }}</span>
+                        </span>
+                    </td>
+                    <td class="visible-md visible-lg">
+                        {{ item.group.name|default('mautic.point.group.form.nogroup'|trans) }}
+                    </td>
+                    <td>{{ item.points }}</td>
+                    <td class="visible-md visible-lg">{{ item.id }}</td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    <div class="panel-footer">
+        {{ include('@MauticCore/Helper/pagination.html.twig', {
+                'totalItems': items|length,
+                'page': page,
+                'limit': limit,
+                'menuLinkId': 'mautic_pointtrigger_index',
+                'baseUrl': path('mautic_pointtrigger_index'),
+                'sessionVar': 'point.trigger',
+        }) }}
+    </div>
+{% else %}
+    {{ include('@MauticCore/Helper/noresults.html.twig', {'tip': 'mautic.point.trigger.noresults.tip'}) }}
+{% endif %}

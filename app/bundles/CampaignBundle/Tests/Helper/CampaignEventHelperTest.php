@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2016 Mautic Contributors. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CampaignBundle\Tests\Helper;
 
 use Mautic\CampaignBundle\Entity\Campaign;
@@ -18,7 +9,7 @@ use Mautic\CampaignBundle\Tests\CampaignTestAbstract;
 
 class CampaignEventHelperTest extends CampaignTestAbstract
 {
-    public function testValidateLeadChangeTriggerWithEmptyCampaigns()
+    public function testValidateLeadChangeTriggerWithEmptyCampaigns(): void
     {
         $eventDetails = new CampaignLeadChangeEvent(new Campaign(), [], 'badaction');
         $event        = [
@@ -34,7 +25,7 @@ class CampaignEventHelperTest extends CampaignTestAbstract
         $this->assertFalse($result);
     }
 
-    public function testValidateLeadChangeTriggerWithUnmatchingCampaignsAndInvalidAction()
+    public function testValidateLeadChangeTriggerWithUnmatchingCampaignsAndInvalidAction(): void
     {
         $eventDetails = new CampaignLeadChangeEvent(new Campaign(), [], 'badaction');
         $event        = [
@@ -50,7 +41,7 @@ class CampaignEventHelperTest extends CampaignTestAbstract
         $this->assertFalse($result);
     }
 
-    public function testValidateLeadChangeTriggerWithMatchingCampaignsAndInvalidAction()
+    public function testValidateLeadChangeTriggerWithMatchingCampaignsAndInvalidAction(): void
     {
         $eventDetails = new CampaignLeadChangeEvent(new Campaign(), [], 'removed');
         $event        = [
@@ -66,7 +57,7 @@ class CampaignEventHelperTest extends CampaignTestAbstract
         $this->assertFalse($result);
     }
 
-    public function testValidateLeadChangeTriggerWithMatchingCampaignsAndVariousActions()
+    public function testValidateLeadChangeTriggerWithMatchingCampaignsAndVariousActions(): void
     {
         $actions = [
             'added'   => true,

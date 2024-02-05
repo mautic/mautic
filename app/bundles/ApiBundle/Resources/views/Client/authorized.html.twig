@@ -1,0 +1,27 @@
+{% block content %}
+<table class="table table-striped table-hover">
+    <thead>
+        <tr>
+            <th style="width: 50px;"></th>
+            <th>{{ 'mautic.core.name'|trans }}</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for k in clients %}
+        <tr>
+            <td>
+                {{- include('@MauticCore/Helper/confirm.html.twig', {
+                    'btnClass'      : 'btn btn-danger btn-xs',
+                    'message'       : 'mautic.api.client.form.confirmrevoke'|trans({'%name%' : k.getName()}),
+                    'confirmText'   : 'mautic.api.client.form.revoke'|trans,
+                    'confirmAction' : path('mautic_client_action', {'objectAction' : 'revoke', 'objectId' : k.getId()}),
+                    'iconClass'     : 'fa fa-trash-o',
+                    'btnText'       : 'mautic.api.client.form.revoke'|trans,
+                }) -}}
+            </td>
+            <td>{{ k.getName() }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}

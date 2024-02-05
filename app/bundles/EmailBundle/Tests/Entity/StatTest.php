@@ -2,15 +2,6 @@
 
 declare(strict_types=1);
 
-/*
- * @copyright   2020 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\EmailBundle\Tests\Entity;
 
 use Mautic\EmailBundle\Entity\Stat;
@@ -20,9 +11,10 @@ class StatTest extends TestCase
 {
     /**
      * @param int $count How many openDetails to add to the entity
+     *
      * @dataProvider addOpenDetailsTestProvider
      */
-    public function testAddOpenDetails(int $count)
+    public function testAddOpenDetails(int $count): void
     {
         $stat = new Stat();
 
@@ -46,7 +38,7 @@ class StatTest extends TestCase
     /**
      * Data provider for addOpenDetails.
      */
-    public function addOpenDetailsTestProvider(): array
+    public static function addOpenDetailsTestProvider(): array
     {
         return [
             'no openDetails'            => [0],

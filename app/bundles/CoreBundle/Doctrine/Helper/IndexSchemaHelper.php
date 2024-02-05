@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2015 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CoreBundle\Doctrine\Helper;
 
 use Doctrine\DBAL\Connection;
@@ -20,19 +11,9 @@ use Mautic\CoreBundle\Exception\SchemaException;
 class IndexSchemaHelper
 {
     /**
-     * @var Connection
+     * @var \Doctrine\DBAL\Schema\AbstractSchemaManager<\Doctrine\DBAL\Platforms\AbstractMySQLPlatform>
      */
-    protected $db;
-
-    /**
-     * @var string
-     */
-    protected $prefix;
-
-    /**
-     * @var \Doctrine\DBAL\Schema\AbstractSchemaManager
-     */
-    protected $sm;
+    protected \Doctrine\DBAL\Schema\AbstractSchemaManager $sm;
 
     /**
      * @var \Doctrine\DBAL\Schema\Schema
@@ -67,16 +48,14 @@ class IndexSchemaHelper
     /**
      * @param string $prefix
      */
-    public function __construct(Connection $db, $prefix)
-    {
-        $this->db     = $db;
-        $this->prefix = $prefix;
-        $this->sm     = $this->db->getSchemaManager();
+    public function __construct(
+        protected Connection $db,
+        protected $prefix
+    ) {
+        $this->sm = $this->db->createSchemaManager();
     }
 
     /**
-     * @param $name
-     *
      * @return $this
      *
      * @throws SchemaException
@@ -87,22 +66,17 @@ class IndexSchemaHelper
             throw new SchemaException("Table $name does not exist!");
         }
 
-        $this->table = $this->sm->listTableDetails($this->prefix.$name);
+        $this->table = $this->sm->introspectTable($this->prefix.$name);
 
         return $this;
     }
 
-    /**
-     * @param $name
-     */
-    public function allowColumn($name)
+    public function allowColumn($name): void
     {
         $this->allowedColumns[] = $name;
     }
 
     /**
-     * @param       $columns
-     * @param       $name
      * @param array $options
      *
      * @return $this
@@ -150,9 +124,9 @@ class IndexSchemaHelper
     /**
      * Execute changes.
      */
-    public function executeChanges()
+    public function executeChanges(): void
     {
-        $platform = $this->sm->getDatabasePlatform();
+        $platform = $this->db->getDatabasePlatform();
 
         $sql = [];
         if (count($this->changedIndexes)) {
@@ -176,7 +150,7 @@ class IndexSchemaHelper
 
         if (count($sql)) {
             foreach ($sql as $query) {
-                $this->db->executeUpdate($query);
+                $this->db->executeStatement($query);
             }
             $this->changedIndexes = [];
             $this->dropIndexes    = [];
@@ -185,13 +159,9 @@ class IndexSchemaHelper
     }
 
     /**
-     * @param $columns
-     *
-     * @return array
-     *
      * @throws \Doctrine\DBAL\Schema\SchemaException
      */
-    private function getTextColumns($columns)
+    private function getTextColumns($columns): array
     {
         if (!is_array($columns)) {
             $columns = [$columns];

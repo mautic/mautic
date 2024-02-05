@@ -1,23 +1,19 @@
 <?php
 
-/*
- * @copyright   2020 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        https://www.mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CoreBundle\Tests\Unit\Helper;
 
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\RequestException;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\PathsHelper;
+use Mautic\CoreBundle\Helper\PreUpdateCheckHelper;
 use Mautic\CoreBundle\Helper\Update\Exception\LatestVersionSupportedException;
 use Mautic\CoreBundle\Helper\Update\Github\ReleaseParser;
+use Mautic\CoreBundle\Helper\Update\PreUpdateChecks\AbstractPreUpdateCheck;
+use Mautic\CoreBundle\Helper\Update\PreUpdateChecks\PreUpdateCheckError;
+use Mautic\CoreBundle\Helper\Update\PreUpdateChecks\PreUpdateCheckResult;
 use Mautic\CoreBundle\Helper\UpdateHelper;
+use Mautic\CoreBundle\Release\Metadata;
 use Monolog\Logger;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
@@ -30,42 +26,44 @@ class UpdateHelperTest extends TestCase
     /**
      * @var PathsHelper|MockObject
      */
-    private $pathsHelper;
+    private \PHPUnit\Framework\MockObject\MockObject $pathsHelper;
 
     /**
      * @var Logger|MockObject
      */
-    private $logger;
+    private \PHPUnit\Framework\MockObject\MockObject $logger;
 
     /**
      * @var CoreParametersHelper|MockObject
      */
-    private $coreParametersHelper;
+    private \PHPUnit\Framework\MockObject\MockObject $coreParametersHelper;
 
     /**
      * @var Client|MockObject
      */
-    private $client;
+    private \PHPUnit\Framework\MockObject\MockObject $client;
 
     /**
      * @var ResponseInterface|MockObject
      */
-    private $response;
+    private \PHPUnit\Framework\MockObject\MockObject $response;
 
     /**
      * @var StreamInterface|MockObject
      */
-    private $streamBody;
+    private \PHPUnit\Framework\MockObject\MockObject $streamBody;
 
     /**
      * @var ReleaseParser|MockObject
      */
-    private $releaseParser;
+    private \PHPUnit\Framework\MockObject\MockObject $releaseParser;
 
     /**
-     * @var UpdateHelper
+     * @var PreUpdateCheckHelper|MockObject
      */
-    private $helper;
+    private \PHPUnit\Framework\MockObject\MockObject $preUpdateCheckHelper;
+
+    private \Mautic\CoreBundle\Helper\UpdateHelper $helper;
 
     protected function setUp(): void
     {
@@ -77,6 +75,7 @@ class UpdateHelperTest extends TestCase
         $this->logger               = $this->createMock(Logger::class);
         $this->coreParametersHelper = $this->createMock(CoreParametersHelper::class);
         $this->releaseParser        = $this->createMock(ReleaseParser::class);
+        $this->preUpdateCheckHelper = $this->createMock(PreUpdateCheckHelper::class);
 
         $this->response   = $this->createMock(ResponseInterface::class);
         $this->streamBody = $this->createMock(StreamInterface::class);
@@ -85,7 +84,13 @@ class UpdateHelperTest extends TestCase
             ->willReturn($this->streamBody);
         $this->client = $this->createMock(Client::class);
 
-        $this->helper = new UpdateHelper($this->pathsHelper, $this->logger, $this->coreParametersHelper, $this->client, $this->releaseParser);
+        $this->helper = new UpdateHelper(
+            $this->pathsHelper,
+            $this->logger,
+            $this->coreParametersHelper,
+            $this->client, $this->releaseParser,
+            $this->preUpdateCheckHelper
+        );
     }
 
     protected function tearDown(): void
@@ -96,7 +101,7 @@ class UpdateHelperTest extends TestCase
         @unlink(__DIR__.'/resource/update/tmp/lastUpdateCheck.txt');
     }
 
-    public function testUpdatePackageFetchedAndSaved()
+    public function testUpdatePackageFetchedAndSaved(): void
     {
         $this->response->expects($this->once())
             ->method('getStatusCode')
@@ -120,7 +125,7 @@ class UpdateHelperTest extends TestCase
         @unlink($updatePackage);
     }
 
-    public function testConnectionErrorReturnsError()
+    public function testConnectionErrorReturnsError(): void
     {
         $this->response->expects($this->exactly(2))
             ->method('getStatusCode')
@@ -139,7 +144,7 @@ class UpdateHelperTest extends TestCase
         $this->assertEquals('mautic.core.updater.error.fetching.package', $result['message']);
     }
 
-    public function testCacheIsRefreshedIfStabilityMismatches()
+    public function testCacheIsRefreshedIfStabilityMismatches(): void
     {
         $cache = [
             'error'        => false,
@@ -168,7 +173,7 @@ class UpdateHelperTest extends TestCase
         $this->helper->fetchData();
     }
 
-    public function testCacheIsRefreshedIfExpired()
+    public function testCacheIsRefreshedIfExpired(): void
     {
         $cache = [
             'error'        => false,
@@ -197,7 +202,7 @@ class UpdateHelperTest extends TestCase
         $this->helper->fetchData();
     }
 
-    public function testCacheIsRefreshedIfForced()
+    public function testCacheIsRefreshedIfForced(): void
     {
         $cache = [
             'error'        => false,
@@ -226,7 +231,7 @@ class UpdateHelperTest extends TestCase
         $this->helper->fetchData(true);
     }
 
-    public function testStatsAreSent()
+    public function testStatsAreSent(): void
     {
         $cache = [
             'error'        => false,
@@ -280,7 +285,7 @@ class UpdateHelperTest extends TestCase
         $this->helper->fetchData();
     }
 
-    public function testStatsNotSentIfDisabled()
+    public function testStatsNotSentIfDisabled(): void
     {
         $cache = [
             'error'        => false,
@@ -313,7 +318,7 @@ class UpdateHelperTest extends TestCase
         $this->helper->fetchData();
     }
 
-    public function testExceptionDoesNotGoUncaughtWhenThrownDuringUpdatingStats()
+    public function testExceptionDoesNotGoUncaughtWhenThrownDuringUpdatingStats(): void
     {
         $cache = [
             'error'        => false,
@@ -350,7 +355,7 @@ class UpdateHelperTest extends TestCase
             ->method('request')
             ->with('POST', $statsUrl, $this->anything())
             ->willReturnCallback(
-                function (string $method, string $url, array $options) {
+                function (string $method, string $url, array $options): void {
                     $request = $this->createMock(RequestInterface::class);
 
                     throw new \Exception('something bad happened');
@@ -363,8 +368,10 @@ class UpdateHelperTest extends TestCase
         $this->helper->fetchData();
     }
 
-    public function testRequestExceptionDoesNotGoUncaughtWhenThrownDuringUpdatingStats()
+    public function testRequestExceptionDoesNotGoUncaughtWhenThrownDuringUpdatingStats(): void
     {
+        $this->response->method('getStatusCode')->willReturn(200);
+
         $cache = [
             'error'        => false,
             'message'      => 'mautic.core.updater.update.available',
@@ -400,7 +407,7 @@ class UpdateHelperTest extends TestCase
             ->method('request')
             ->with('POST', $statsUrl, $this->anything())
             ->willReturnCallback(
-                function (string $method, string $url, array $options) {
+                function (string $method, string $url, array $options): void {
                     $request = $this->createMock(RequestInterface::class);
 
                     throw new RequestException('something bad happened', $request, $this->response);
@@ -413,7 +420,7 @@ class UpdateHelperTest extends TestCase
         $this->helper->fetchData();
     }
 
-    public function testRequestExceptionWithEmptyResponseDoesNotGoUncaughtWhenThrownDuringUpdatingStats()
+    public function testRequestExceptionWithEmptyResponseDoesNotGoUncaughtWhenThrownDuringUpdatingStats(): void
     {
         $cache = [
             'error'        => false,
@@ -450,7 +457,7 @@ class UpdateHelperTest extends TestCase
             ->method('request')
             ->with('POST', $statsUrl, $this->anything())
             ->willReturnCallback(
-                function (string $method, string $url, array $options) {
+                function (string $method, string $url, array $options): void {
                     $request = $this->createMock(RequestInterface::class);
 
                     throw new RequestException('something bad happened', $request, null);
@@ -463,7 +470,7 @@ class UpdateHelperTest extends TestCase
         $this->helper->fetchData();
     }
 
-    public function testNoErrorIfLatestVersionInstalled()
+    public function testNoErrorIfLatestVersionInstalled(): void
     {
         $cache = [
             'error'        => false,
@@ -512,7 +519,7 @@ class UpdateHelperTest extends TestCase
         $this->assertEquals('mautic.core.updater.running.latest.version', $data['message']);
     }
 
-    public function testErrorIfLatestVersionCouldNotBeDetermined()
+    public function testErrorIfLatestVersionCouldNotBeDetermined(): void
     {
         $cache = [
             'error'        => false,
@@ -559,8 +566,10 @@ class UpdateHelperTest extends TestCase
         $this->assertEquals('mautic.core.updater.error.fetching.updates', $data['message']);
     }
 
-    public function testErrorIfGuzzleException()
+    public function testErrorIfGuzzleException(): void
     {
+        $this->response->method('getStatusCode')->willReturn(200);
+
         $cache = [
             'error'        => false,
             'message'      => 'mautic.core.updater.update.available',
@@ -602,7 +611,7 @@ class UpdateHelperTest extends TestCase
         $this->assertEquals('mautic.core.updater.error.fetching.updates', $data['message']);
     }
 
-    public function testErrorForAnyException()
+    public function testErrorForAnyException(): void
     {
         $cache = [
             'error'        => false,
@@ -648,7 +657,7 @@ class UpdateHelperTest extends TestCase
         $this->assertEquals('mautic.core.updater.error.fetching.updates', $data['message']);
     }
 
-    public function testNoErrorIfInAppUpdatesAreDisabled()
+    public function testNoErrorIfInAppUpdatesAreDisabled(): void
     {
         $cache = [
             'error'        => false,
@@ -683,5 +692,111 @@ class UpdateHelperTest extends TestCase
         $data = $this->helper->fetchData();
         $this->assertFalse($data['error']);
         $this->assertEquals('mautic.core.updater.running.latest.version', $data['message']);
+    }
+
+    public function testFailingPreUpdateChecks(): void
+    {
+        $this->preparePreUpdateCheckTest();
+
+        $this->preUpdateCheckHelper->expects($this->once())
+            ->method('getChecks')
+            ->willReturn([
+                $this->getPassingPreUpdateTest(),
+                $this->getFailingPreUpdateTest(),
+                $this->getFailingPreUpdateTest(),
+                $this->getPassingPreUpdateTest(),
+            ]);
+
+        $results = $this->helper->runPreUpdateChecks();
+        $errors  = [];
+
+        foreach ($results as $result) {
+            if (!empty($result->errors)) {
+                $errors = array_merge($errors, array_map(fn (PreUpdateCheckError $error) => $error->key, $result->errors));
+            }
+        }
+
+        $this->assertSame(2, count($errors));
+    }
+
+    public function testPassingPreUpdateChecks(): void
+    {
+        $this->preparePreUpdateCheckTest();
+
+        $this->preUpdateCheckHelper->expects($this->once())
+            ->method('getChecks')
+            ->willReturn([
+                $this->getPassingPreUpdateTest(),
+                $this->getPassingPreUpdateTest(),
+                $this->getPassingPreUpdateTest(),
+                $this->getPassingPreUpdateTest(),
+            ]);
+
+        $results = $this->helper->runPreUpdateChecks();
+        $errors  = [];
+
+        foreach ($results as $result) {
+            if (!empty($result->errors)) {
+                $errors = array_merge($errors, array_map(fn (PreUpdateCheckError $error) => $error->key, $result->errors));
+            }
+        }
+
+        $this->assertSame(0, count($errors));
+    }
+
+    private function getFailingPreUpdateTest(): AbstractPreUpdateCheck
+    {
+        return new class() extends AbstractPreUpdateCheck {
+            public function runCheck(): PreUpdateCheckResult
+            {
+                return new PreUpdateCheckResult(false, null, [new PreUpdateCheckError('Dummy')]);
+            }
+        };
+    }
+
+    private function getPassingPreUpdateTest(): AbstractPreUpdateCheck
+    {
+        return new class() extends AbstractPreUpdateCheck {
+            public function runCheck(): PreUpdateCheckResult
+            {
+                return new PreUpdateCheckResult(true, null);
+            }
+        };
+    }
+
+    private function preparePreUpdateCheckTest(): void
+    {
+        $releaseMetadata = [
+            'version'                           => '10.0.1',
+            'stability'                         => 'stable',
+            'minimum_php_version'               => '7.4.0',
+            'maximum_php_version'               => '8.0.99',
+            'show_php_version_warning_if_under' => '7.4.0',
+            'minimum_mautic_version'            => '3.2.0',
+            'announcement_url'                  => '',
+            'minimum_mysql_version'             => '5.7.14',
+            'minimum_mariadb_version'           => '10.3.5',
+        ];
+
+        $cache = [
+            'error'        => false,
+            'message'      => 'mautic.core.updater.update.available',
+            'version'      => '10.0.1',
+            'announcement' => 'https://mautic.org',
+            'package'      => 'https://mautic.org/10.0.1/upgrade.zip',
+            'stability'    => 'stable',
+            'checkedTime'  => time(), // We actually want to use this cached data
+            'metadata'     => new Metadata($releaseMetadata),
+        ];
+
+        file_put_contents(__DIR__.'/resource/update/tmp/lastUpdateCheck.txt', json_encode($cache));
+
+        $this->coreParametersHelper->expects($this->once())
+            ->method('get')
+            ->with('update_stability')
+            ->willReturn('stable');
+
+        $this->releaseParser->expects($this->never())
+            ->method('getLatestSupportedRelease');
     }
 }

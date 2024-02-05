@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2019 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\ApiBundle\Tests\Helper;
 
 use Mautic\ApiBundle\Helper\RequestHelper;
@@ -19,37 +10,37 @@ use Symfony\Component\HttpFoundation\Request;
 class RequestHelperTest extends TestCase
 {
     /**
-     * @var \PHPUnit\Framework\MockObject\MockObject | Request
+     * @var \PHPUnit\Framework\MockObject\MockObject|Request
      */
-    private $request;
+    private \PHPUnit\Framework\MockObject\MockObject $request;
 
     protected function setUp(): void
     {
         $this->request = $this->createMock(Request::class);
     }
 
-    public function testIsBasicAuthWithValidBasicAuth()
+    public function testIsBasicAuthWithValidBasicAuth(): void
     {
         $this->request->headers = new HeaderBag(['Authorization' => 'Basic dXNlcm5hbWU6cGFzc3dvcmQ=']);
 
         $this->assertTrue(RequestHelper::hasBasicAuth($this->request));
     }
 
-    public function testIsBasicAuthWithInvalidBasicAuth()
+    public function testIsBasicAuthWithInvalidBasicAuth(): void
     {
         $this->request->headers = new HeaderBag(['Authorization' => 'Invalid Basic Auth value']);
 
         $this->assertFalse(RequestHelper::hasBasicAuth($this->request));
     }
 
-    public function testIsBasicAuthWithMissingBasicAuth()
+    public function testIsBasicAuthWithMissingBasicAuth(): void
     {
         $this->request->headers = new HeaderBag([]);
 
         $this->assertFalse(RequestHelper::hasBasicAuth($this->request));
     }
 
-    public function testIsApiRequestWithOauthUrl()
+    public function testIsApiRequestWithOauthUrl(): void
     {
         $this->request->expects($this->once())
             ->method('getRequestUri')
@@ -58,7 +49,7 @@ class RequestHelperTest extends TestCase
         $this->assertTrue(RequestHelper::isApiRequest($this->request));
     }
 
-    public function testIsApiRequestWithApiUrl()
+    public function testIsApiRequestWithApiUrl(): void
     {
         $this->request->expects($this->once())
             ->method('getRequestUri')
@@ -67,7 +58,7 @@ class RequestHelperTest extends TestCase
         $this->assertTrue(RequestHelper::isApiRequest($this->request));
     }
 
-    public function testIsNotApiRequest()
+    public function testIsNotApiRequest(): void
     {
         $this->request->expects($this->once())
             ->method('getRequestUri')

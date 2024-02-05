@@ -1,34 +1,20 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CampaignBundle\Event;
 
 use Mautic\CampaignBundle\Entity\Campaign;
-use Symfony\Component\EventDispatcher\Event;
+use Symfony\Contracts\EventDispatcher\Event;
 
 class CampaignTriggerEvent extends Event
 {
-    /**
-     * @var Campaign
-     */
-    protected $campaign;
-
     /**
      * @var bool
      */
     protected $triggerCampaign = true;
 
-    public function __construct(Campaign $campaign)
-    {
-        $this->campaign = $campaign;
+    public function __construct(
+        protected Campaign $campaign
+    ) {
     }
 
     /**
@@ -52,7 +38,7 @@ class CampaignTriggerEvent extends Event
     /**
      * Do not trigger this campaign.
      */
-    public function doNotTrigger()
+    public function doNotTrigger(): void
     {
         $this->triggerCampaign = false;
 

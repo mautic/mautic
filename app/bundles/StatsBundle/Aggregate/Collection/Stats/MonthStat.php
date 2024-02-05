@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2018 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\StatsBundle\Aggregate\Collection\Stats;
 
 class MonthStat implements StatInterface
@@ -16,21 +7,14 @@ class MonthStat implements StatInterface
     /**
      * @var DayStat[]
      */
-    private $stats = [];
+    private array $stats = [];
 
     /**
-     * @var string
-     */
-    private $month;
-
-    /**
-     * MonthStat constructor.
-     *
      * @param string $month "2019-01" format
      */
-    public function __construct($month)
-    {
-        $this->month = $month;
+    public function __construct(
+        private $month
+    ) {
     }
 
     /**
@@ -72,10 +56,7 @@ class MonthStat implements StatInterface
         return $sum;
     }
 
-    /**
-     * @return int
-     */
-    public function getCount()
+    public function getCount(): int
     {
         return count($this->stats);
     }

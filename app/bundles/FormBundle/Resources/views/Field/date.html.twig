@@ -1,0 +1,17 @@
+{#
+    This field relies on the `text.html.twig` implementation.
+
+    Mautic tries to render `@themes/{{theme}}/html/MauticFormBundle/Field/text.html.twig`
+    and falls back to the standard template '@MauticForm/Field/text.html.twig'.
+
+    This eliminates the need to copy twig templates into themes that just rely on one base template file.
+#}
+{{- include([theme|default('') ~ 'text.html.twig', '@MauticForm/Field/text.html.twig'], {
+        'field': field,
+        'fields': fields|default([]),
+        'inForm': inForm|default(false),
+        'type': 'date',
+        'id': id,
+        'formId': formId|default(0),
+        'formName': formName|default(''),
+}) -}}

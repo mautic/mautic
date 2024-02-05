@@ -1,0 +1,97 @@
+{% extends '@MauticCore/Default/content.html.twig' %}
+
+{% block headerTitle %}{{ 'mautic.dashboard.header.index'|trans }}{% endblock %}
+
+{% block mauticContent %}dashboard{% endblock %}
+
+{% block actions %}
+  {{ include('@MauticCore/Helper/page_actions.html.twig', {
+      'routeBase': 'dashboard',
+      'langVar': 'dashboard',
+      'customButtons': [
+          {
+              'attr': {
+                  'class': 'btn btn-default btn-nospin',
+                  'data-toggle': 'ajaxmodal',
+                  'data-target': '#MauticSharedModal',
+                  'href': path('mautic_dashboard_action', {'objectAction': 'new'}),
+                  'data-header': 'mautic.dashboard.widget.add'|trans,
+              },
+              'iconClass': 'fa fa-plus',
+              'btnText': 'mautic.dashboard.widget.add',
+          },
+          {
+              'attr': {
+                  'class': 'btn btn-default btn-nospin',
+                  'href': 'javascript:void(0)',
+                  'onclick': "Mautic.saveDashboardLayout('"~'mautic.dashboard.confirmation_layout_name'|trans~"');",
+                  'data-toggle': '',
+              },
+              'iconClass': 'fa fa-save',
+              'btnText': 'mautic.core.form.save',
+          },
+          {
+              'attr': {
+                  'class': 'btn btn-default btn-nospin',
+                  'href': 'javascript:void(0)',
+                  'onclick': "Mautic.exportDashboardLayout('"~'mautic.dashboard.confirmation_layout_name'|trans~"', '"~path('mautic_dashboard_action', {'objectAction': 'export'})~"');",
+                  'data-toggle': '',
+              },
+              'iconClass': 'fa fa-cloud-download',
+              'btnText': 'mautic.dashboard.export.widgets',
+          },
+          {
+              'attr': {
+                  'class': 'btn btn-default',
+                  'href': path('mautic_dashboard_action', {'objectAction': 'import'}),
+                  'data-header': 'mautic.dashboard.widget.import'|trans,
+              },
+              'iconClass': 'fa fa-cloud-upload',
+              'btnText': 'mautic.dashboard.widget.import',
+          },
+      ],
+  }) }}
+{% endblock %}
+
+{% block content %}
+  {% if true == phpVersion['isOutdated'] %}
+  <div class="pt-md pl-md col-md-12">
+      <div class="pt-md pl-md alert alert-warning">
+          <h3>{{ 'mautic.dashboard.phpversionwarning.title'|trans }}</h3>
+          <p>{{ 'mautic.dashboard.phpversionwarning.body'|trans({'%phpversion%': phpVersion['version']})|purify }}</p>
+      </div>
+  </div>
+  {% endif %}
+
+  <div class="row pt-md pl-md">
+      <div class="col-sm-6">
+          {{ include('@MauticCore/Helper/graph_dateselect.html.twig', {'dateRangeForm': dateRangeForm}) }}
+      </div>
+  </div>
+
+  {% if widgets|length > 0 %}
+      <div id="dashboard-widgets" class="dashboard-widgets cards">
+          {% for widget in widgets %}
+              <div class="card-flex widget" data-widget-id="{{ widget.id }}" style="width: {{ widget.width|default(100) }}%; height: {{ widget.height|default(300) }}px">
+                  <div class="spinner"><i class="fa fa-spin fa-spinner"></i></div>
+              </div>
+          {% endfor %}
+      </div>
+      <div id="cloned-widgets" class="dashboard-widgets cards"></div>
+  {% else %}
+      <div class="well well col-md-6 col-md-offset-3 mt-md">
+          <div class="row">
+              <div class="mautibot-image col-xs-3 text-center">
+                  <img class="img-responsive" style="max-height: 125px; margin-left: auto; margin-right: auto;" src="{{ mautibotGetImage('wave') }}" />
+              </div>
+              <div class="col-xs-9">
+                  <h4><i class="fa fa-quote-left"></i> {{ 'mautic.dashboard.nowidgets.tip.header'|trans }} <i class="fa fa-quote-right"></i></h4>
+                  <p class="mt-md">{{ 'mautic.dashboard.nowidgets.tip'|trans }}</p>
+                  <a href="{{ path('mautic_dashboard_action', {'objectAction': 'applyDashboardFile', 'file': 'default.json'}) }}" class="btn btn-success">
+                      Apply the default dashboard
+                  </a>
+              </div>
+          </div>
+      </div>
+  {% endif %}
+{% endblock %}

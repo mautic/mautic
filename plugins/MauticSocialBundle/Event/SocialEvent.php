@@ -1,22 +1,10 @@
 <?php
 
-/*
- * @copyright   2016 Mautic, Inc. All rights reserved
- * @author      Mautic, Inc
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace MauticPlugin\MauticSocialBundle\Event;
 
 use Mautic\CoreBundle\Event\CommonEvent;
 use MauticPlugin\MauticSocialBundle\Entity\Monitoring;
 
-/**
- * Class SocialEvent.
- */
 class SocialEvent extends CommonEvent
 {
     /**
@@ -41,7 +29,7 @@ class SocialEvent extends CommonEvent
     /**
      * Sets the Monitoring entity.
      */
-    public function setMonitoring(Monitoring $monitoring)
+    public function setMonitoring(Monitoring $monitoring): void
     {
         $this->entity = $monitoring;
     }

@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\WebhookBundle\Helper;
 
 use Doctrine\Common\Collections\Collection;
@@ -23,34 +14,29 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class CampaignHelper
 {
-    protected Client $client;
-    protected CompanyModel $companyModel;
-
     /**
      * Cached contact values in format [contact_id => [key1 => val1, key2 => val1]].
      */
     private array $contactsValues = [];
 
-    private EventDispatcherInterface $dispatcher;
-
-    public function __construct(Client $client, CompanyModel $companyModel, EventDispatcherInterface $dispatcher)
-    {
-        $this->client       = $client;
-        $this->companyModel = $companyModel;
-        $this->dispatcher   = $dispatcher;
+    public function __construct(
+        protected Client $client,
+        protected CompanyModel $companyModel,
+        private EventDispatcherInterface $dispatcher
+    ) {
     }
 
     /**
      * Prepares the neccessary data transformations and then makes the HTTP request.
      */
-    public function fireWebhook(array $config, Lead $contact)
+    public function fireWebhook(array $config, Lead $contact): void
     {
         $payload = $this->getPayload($config, $contact);
         $headers = $this->getHeaders($config, $contact);
         $url     = rawurldecode(TokenHelper::findLeadTokens($config['url'], $this->getContactValues($contact), true));
 
         $webhookRequestEvent = new WebhookRequestEvent($contact, $url, $headers, $payload);
-        $this->dispatcher->dispatch(WebhookEvents::WEBHOOK_ON_REQUEST, $webhookRequestEvent);
+        $this->dispatcher->dispatch($webhookRequestEvent, WebhookEvents::WEBHOOK_ON_REQUEST);
 
         $this->makeRequest(
             $webhookRequestEvent->getUrl(),
@@ -63,10 +49,8 @@ class CampaignHelper
 
     /**
      * Gets the payload fields from the config and if there are tokens it translates them to contact values.
-     *
-     * @return array
      */
-    private function getPayload(array $config, Lead $contact)
+    private function getPayload(array $config, Lead $contact): array
     {
         $payload = !empty($config['additional_data']['list']) ? $config['additional_data']['list'] : '';
         $payload = array_flip(AbstractFormFieldHelper::parseList($payload));
@@ -76,10 +60,8 @@ class CampaignHelper
 
     /**
      * Gets the payload fields from the config and if there are tokens it translates them to contact values.
-     *
-     * @return array
      */
-    private function getHeaders(array $config, Lead $contact)
+    private function getHeaders(array $config, Lead $contact): array
     {
         $headers = !empty($config['headers']['list']) ? $config['headers']['list'] : '';
         $headers = array_flip(AbstractFormFieldHelper::parseList($headers));
@@ -95,7 +77,7 @@ class CampaignHelper
      * @throws \InvalidArgumentException
      * @throws \OutOfRangeException
      */
-    private function makeRequest($url, $method, $timeout, array $headers, array $payload)
+    private function makeRequest($url, $method, $timeout, array $headers, array $payload): void
     {
         switch ($method) {
             case 'get':
@@ -108,15 +90,17 @@ class CampaignHelper
             case 'post':
             case 'put':
             case 'patch':
-                $headers = array_change_key_case($headers);
+                $headers  = array_change_key_case($headers);
+                $options  = [
+                    \GuzzleHttp\RequestOptions::HEADERS     => $headers,
+                    \GuzzleHttp\RequestOptions::TIMEOUT     => $timeout,
+                ];
                 if (array_key_exists('content-type', $headers) && 'application/json' == strtolower($headers['content-type'])) {
-                    $payload                 = json_encode($payload);
+                    $options[\GuzzleHttp\RequestOptions::BODY] = json_encode($payload);
+                } else {
+                    $options[\GuzzleHttp\RequestOptions::FORM_PARAMS] = $payload;
                 }
-                $response = $this->client->request($method, $url, [
-                    \GuzzleHttp\RequestOptions::BODY    => $payload,
-                    \GuzzleHttp\RequestOptions::HEADERS => $headers,
-                    \GuzzleHttp\RequestOptions::TIMEOUT => $timeout,
-                ]);
+                $response = $this->client->request($method, $url, $options);
                 break;
             case 'delete':
                 $response = $this->client->delete($url, [
@@ -135,10 +119,8 @@ class CampaignHelper
 
     /**
      * Translates tokens to values.
-     *
-     * @return array
      */
-    private function getTokenValues(array $rawTokens, Lead $contact)
+    private function getTokenValues(array $rawTokens, Lead $contact): array
     {
         $values        = [];
         $contactValues = $this->getContactValues($contact);
@@ -166,10 +148,7 @@ class CampaignHelper
         return $this->contactsValues[$contact->getId()];
     }
 
-    /**
-     * @return string
-     */
-    private function ipAddressesToCsv(Collection $ipAddresses)
+    private function ipAddressesToCsv(Collection $ipAddresses): string
     {
         $addresses = [];
         foreach ($ipAddresses as $ipAddress) {

@@ -1,23 +1,11 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\LeadBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\StageBundle\Entity\Stage;
 
-/**
- * Class StagesChangeLog.
- */
 class StagesChangeLog
 {
     /**
@@ -31,7 +19,7 @@ class StagesChangeLog
     private $lead;
 
     /**
-     * @var Stage
+     * @var Stage|null
      */
     private $stage;
 
@@ -46,16 +34,16 @@ class StagesChangeLog
     private $actionName;
 
     /**
-     * @var \DateTime
+     * @var \DateTimeInterface
      */
     private $dateAdded;
 
-    public static function loadMetadata(ORM\ClassMetadata $metadata)
+    public static function loadMetadata(ORM\ClassMetadata $metadata): void
     {
         $builder = new ClassMetadataBuilder($metadata);
 
         $builder->setTable('lead_stages_change_log')
-            ->setCustomRepositoryClass('Mautic\LeadBundle\Entity\StagesChangeLogRepository');
+            ->setCustomRepositoryClass(\Mautic\LeadBundle\Entity\StagesChangeLogRepository::class);
 
         $builder->addId();
 
@@ -69,7 +57,7 @@ class StagesChangeLog
             ->columnName('action_name')
             ->build();
 
-        $builder->createManyToOne('stage', 'Mautic\StageBundle\Entity\Stage')
+        $builder->createManyToOne('stage', \Mautic\StageBundle\Entity\Stage::class)
             ->inversedBy('log')
             ->addJoinColumn('stage_id', 'id', true, false, 'CASCADE')
             ->build();
@@ -152,7 +140,7 @@ class StagesChangeLog
     /**
      * Get dateAdded.
      *
-     * @return \DateTime
+     * @return \DateTimeInterface
      */
     public function getDateAdded()
     {
@@ -164,7 +152,7 @@ class StagesChangeLog
      *
      * @return StagesChangeLog
      */
-    public function setLead(\Mautic\LeadBundle\Entity\Lead $lead)
+    public function setLead(Lead $lead)
     {
         $this->lead = $lead;
 
@@ -186,7 +174,7 @@ class StagesChangeLog
      *
      * @return StagesChangeLog
      */
-    public function setStage(\Mautic\StageBundle\Entity\Stage $stage)
+    public function setStage(Stage $stage)
     {
         $this->stage = $stage;
 

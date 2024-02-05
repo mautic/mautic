@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2017 Mautic Contributors. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\EmailBundle\MonitoredEmail\Processor\Reply;
 
 use Mautic\EmailBundle\MonitoredEmail\Exception\ReplyNotFound;
@@ -16,27 +7,17 @@ use Mautic\EmailBundle\MonitoredEmail\Message;
 
 class Parser
 {
-    /**
-     * @var Message
-     */
-    private $message;
-
-    /**
-     * Parser constructor.
-     */
-    public function __construct(Message $message)
-    {
-        $this->message = $message;
+    public function __construct(
+        private Message $message
+    ) {
     }
 
     /**
      * Only sure way is to parse the content for the stat ID otherwise attempt the from.
      *
-     * @return RepliedEmail
-     *
      * @throws ReplyNotFound
      */
-    public function parse()
+    public function parse(): RepliedEmail
     {
         if (!preg_match('/email\/([a-zA-Z0-9]+)\.gif/', $this->message->textHtml, $parts)) {
             throw new ReplyNotFound();

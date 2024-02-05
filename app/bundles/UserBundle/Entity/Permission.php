@@ -1,24 +1,15 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\UserBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
+use Mautic\CoreBundle\Entity\CacheInvalidateInterface;
 
-/**
- * Class Permission.
- */
-class Permission
+class Permission implements CacheInvalidateInterface
 {
+    public const CACHE_NAMESPACE = 'Permission';
+
     /**
      * @var int
      */
@@ -44,12 +35,12 @@ class Permission
      */
     protected $bitwise;
 
-    public static function loadMetadata(ORM\ClassMetadata $metadata)
+    public static function loadMetadata(ORM\ClassMetadata $metadata): void
     {
         $builder = new ClassMetadataBuilder($metadata);
 
         $builder->setTable('permissions')
-            ->setCustomRepositoryClass('Mautic\UserBundle\Entity\PermissionRepository')
+            ->setCustomRepositoryClass(\Mautic\UserBundle\Entity\PermissionRepository::class)
             ->addUniqueConstraint(['bundle', 'name', 'role_id'], 'unique_perm');
 
         $builder->addId();
@@ -131,8 +122,6 @@ class Permission
     /**
      * Set role.
      *
-     * @param Role $role
-     *
      * @return Permission
      */
     public function setRole(Role $role = null)
@@ -174,5 +163,10 @@ class Permission
     public function getName()
     {
         return $this->name;
+    }
+
+    public function getCacheNamespacesToDelete(): array
+    {
+        return [self::CACHE_NAMESPACE];
     }
 }

@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\StageBundle\EventListener;
 
 use Mautic\CampaignBundle\CampaignEvents;
@@ -22,36 +13,18 @@ use Mautic\StageBundle\Form\Type\StageActionChangeType;
 use Mautic\StageBundle\Model\StageModel;
 use Mautic\StageBundle\StageEvents;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class CampaignSubscriber implements EventSubscriberInterface
 {
-    /**
-     * @var LeadModel
-     */
-    private $leadModel;
-
-    /**
-     * @var StageModel
-     */
-    private $stageModel;
-
-    /**
-     * @var TranslatorInterface
-     */
-    private $translator;
-
-    public function __construct(LeadModel $leadModel, StageModel $stageModel, TranslatorInterface $translator)
-    {
-        $this->leadModel  = $leadModel;
-        $this->stageModel = $stageModel;
-        $this->translator = $translator;
+    public function __construct(
+        private LeadModel $leadModel,
+        private StageModel $stageModel,
+        private TranslatorInterface $translator
+    ) {
     }
 
-    /**
-     * @return array
-     */
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             CampaignEvents::CAMPAIGN_ON_BUILD     => ['onCampaignBuild', 0],
@@ -59,14 +32,14 @@ class CampaignSubscriber implements EventSubscriberInterface
         ];
     }
 
-    public function onCampaignBuild(CampaignBuilderEvent $event)
+    public function onCampaignBuild(CampaignBuilderEvent $event): void
     {
         $action = [
             'label'            => 'mautic.stage.campaign.event.change',
             'description'      => 'mautic.stage.campaign.event.change_descr',
             'batchEventName'   => StageEvents::ON_CAMPAIGN_BATCH_ACTION,
             'formType'         => StageActionChangeType::class,
-            'formTheme'        => 'MauticStageBundle:FormTheme\StageActionChange',
+            'formTheme'        => '@MauticStage/FormTheme/Action/_stageaction_properties_row.html.twig',
         ];
         $event->addAction('stage.change', $action);
     }

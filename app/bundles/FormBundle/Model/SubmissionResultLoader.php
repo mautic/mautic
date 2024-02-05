@@ -1,39 +1,23 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\FormBundle\Model;
 
 use Doctrine\ORM\EntityManager;
+use Mautic\CoreBundle\Model\MauticModelInterface;
 use Mautic\FormBundle\Entity\Submission;
 use Mautic\FormBundle\Entity\SubmissionRepository;
 
-class SubmissionResultLoader
+class SubmissionResultLoader implements MauticModelInterface
 {
-    /**
-     * @var EntityManager
-     */
-    private $entityManager;
-
     public function __construct(
-        EntityManager $entityManager
+        private EntityManager $entityManager
     ) {
-        $this->entityManager = $entityManager;
     }
 
     /**
      * @param int $id
-     *
-     * @return Submission|null
      */
-    public function getSubmissionWithResult($id)
+    public function getSubmissionWithResult($id): ?Submission
     {
         $repository = $this->getRepository();
 

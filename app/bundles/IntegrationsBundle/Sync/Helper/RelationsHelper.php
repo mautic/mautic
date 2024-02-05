@@ -2,15 +2,6 @@
 
 declare(strict_types=1);
 
-/*
- * @copyright   2019 Mautic, Inc. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://mautic.com
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\IntegrationsBundle\Sync\Helper;
 
 use Mautic\IntegrationsBundle\Sync\DAO\Mapping\MappingManualDAO;
@@ -22,12 +13,11 @@ use Mautic\IntegrationsBundle\Sync\Exception\ObjectNotFoundException;
 
 class RelationsHelper
 {
-    private $mappingHelper;
     private $objectsToSynchronize = [];
 
-    public function __construct(MappingHelper $mappingsHelper)
-    {
-        $this->mappingHelper = $mappingsHelper;
+    public function __construct(
+        private MappingHelper $mappingHelper
+    ) {
     }
 
     public function processRelations(MappingManualDAO $mappingManualDao, ReportDAO $syncReport): void
@@ -60,9 +50,9 @@ class RelationsHelper
             $internalObjectName = $this->getInternalObjectName($mappingManualDao, $relationObject->getRelObjectName());
             $internalObjectId   = $this->getInternalObjectId($mappingManualDao, $relationObject, $relObjectDao);
             $this->addObjectInternalId($internalObjectId, $internalObjectName, $relationObject, $syncReport);
-        } catch (ObjectNotFoundException $e) {
+        } catch (ObjectNotFoundException) {
             return; // We are not mapping this object
-        } catch (InternalIdNotFoundException  $e) {
+        } catch (InternalIdNotFoundException) {
             $this->objectsToSynchronize[] = $relObjectDao;
         }
     }

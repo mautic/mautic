@@ -1,20 +1,11 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 return [
     'routes'   => [
         'main' => [
             'mautic_core_ajax' => [
                 'path'       => '/ajax',
-                'controller' => 'MauticCoreBundle:Ajax:delegateAjax',
+                'controller' => 'Mautic\CoreBundle\Controller\AjaxController::delegateAjaxAction',
             ],
         ],
     ],
@@ -30,7 +21,7 @@ return [
     'services' => [
         'helpers'  => [
             'mautic.helper.bundle' => [
-                'class'     => 'Mautic\CoreBundle\Helper\BundleHelper',
+                'class'     => \Mautic\CoreBundle\Helper\BundleHelper::class,
                 'arguments' => [
                     '%mautic.bundles%',
                     '%mautic.plugin.bundles%',
@@ -53,12 +44,12 @@ return [
     'ip_lookup_services' => [
         'extreme-ip' => [
             'display_name' => 'Extreme-IP',
-            'class'        => 'Mautic\CoreBundle\IpLookup\ExtremeIpLookup',
+            'class'        => \Mautic\CoreBundle\IpLookup\ExtremeIpLookup::class,
         ],
     ],
 
     'parameters' => [
-        'log_path'      => '%kernel.root_dir%/../var/logs',
+        'log_path'      => '%kernel.project_dir%/var/logs',
         'max_log_files' => 7,
         'image_path'    => 'media/images',
         'bool_value'    => false,

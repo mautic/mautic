@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2020 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        https://www.mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CoreBundle\Update\Step;
 
 use Mautic\CoreBundle\Helper\AppVersion;
@@ -17,41 +8,21 @@ use Symfony\Component\Console\Helper\ProgressBar;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\HttpFoundation\Session\Session;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 final class FinalizeUpdateStep implements StepInterface
 {
-    /**
-     * @var TranslatorInterface
-     */
-    private $translator;
-
-    /**
-     * @var PathsHelper
-     */
-    private $pathsHelper;
-
-    /**
-     * @var Session
-     */
-    private $session;
-
-    /**
-     * @var AppVersion
-     */
-    private $appVersion;
-
-    public function __construct(TranslatorInterface $translator, PathsHelper $pathsHelper, Session $session, AppVersion $appVersion)
-    {
-        $this->translator  = $translator;
-        $this->pathsHelper = $pathsHelper;
-        $this->session     = $session;
-        $this->appVersion  = $appVersion;
+    public function __construct(
+        private TranslatorInterface $translator,
+        private PathsHelper $pathsHelper,
+        private Session $session,
+        private AppVersion $appVersion
+    ) {
     }
 
     public function getOrder(): int
     {
-        return 50;
+        return 60;
     }
 
     public function shouldExecuteInFinalStage(): bool

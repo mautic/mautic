@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2016 Mautic Contributors. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\ChannelBundle\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;
@@ -20,13 +11,10 @@ use Mautic\CoreBundle\Entity\FormEntity;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\Mapping\ClassMetadata as ValidationClassMetadata;
 
-/**
- * Class Message.
- */
 class Message extends FormEntity
 {
     /**
-     * @var int
+     * @var ?int
      */
     private $id;
 
@@ -36,31 +24,36 @@ class Message extends FormEntity
     private $name;
 
     /**
-     * @var string
+     * @var ?string
      */
     private $description;
 
     /**
-     * @var \DateTime
+     * @var ?\DateTimeInterface
      */
     private $publishUp;
 
     /**
-     * @var \DateTime
+     * @var ?\DateTimeInterface
      */
     private $publishDown;
 
     /**
-     * @var Category
+     * @var ?Category
      */
     private $category;
 
     /**
-     * @var ArrayCollection
+     * @var ArrayCollection<int,Channel>
      */
     private $channels;
 
-    public static function loadMetadata(ClassMetadata $metadata)
+    public function __clone()
+    {
+        $this->id = null;
+    }
+
+    public static function loadMetadata(ClassMetadata $metadata): void
     {
         $builder = new ClassMetadataBuilder($metadata);
 
@@ -72,29 +65,25 @@ class Message extends FormEntity
             ->addIdColumns()
             ->addPublishDates()
             ->addCategory();
+
         $builder->createOneToMany('channels', Channel::class)
-                ->setIndexBy('channel')
-                ->orphanRemoval()
-                ->mappedBy('message')
-                ->cascadeMerge()
-                ->cascadePersist()
-                ->cascadeDetach()
-                ->build();
+            ->setIndexBy('channel')
+            ->orphanRemoval()
+            ->mappedBy('message')
+            ->cascadeMerge()
+            ->cascadePersist()
+            ->cascadeDetach()
+            ->build();
     }
 
-    public static function loadValidatorMetadata(ValidationClassMetadata $metadata)
+    public static function loadValidatorMetadata(ValidationClassMetadata $metadata): void
     {
         $metadata->addPropertyConstraint('name', new NotBlank([
             'message' => 'mautic.core.name.required',
         ]));
     }
 
-    /**
-     * Prepares the metadata for API usage.
-     *
-     * @param $metadata
-     */
-    public static function loadApiMetadata(ApiMetadataDriver $metadata)
+    public static function loadApiMetadata(ApiMetadataDriver $metadata): void
     {
         $metadata->setGroupPrefix('message')
             ->addListProperties(
@@ -115,16 +104,13 @@ class Message extends FormEntity
             ->build();
     }
 
-    /**
-     * Message constructor.
-     */
     public function __construct()
     {
         $this->channels = new ArrayCollection();
     }
 
     /**
-     * @return int
+     * @return ?int
      */
     public function getId()
     {
@@ -132,7 +118,7 @@ class Message extends FormEntity
     }
 
     /**
-     * @return string
+     * @return ?string
      */
     public function getName()
     {
@@ -140,19 +126,20 @@ class Message extends FormEntity
     }
 
     /**
-     * @param string $name
+     * @param ?string $name
      *
      * @return Message
      */
     public function setName($name)
     {
+        $this->isChanged('name', $name);
         $this->name = $name;
 
         return $this;
     }
 
     /**
-     * @return string
+     * @return ?string
      */
     public function getDescription()
     {
@@ -160,19 +147,20 @@ class Message extends FormEntity
     }
 
     /**
-     * @param string $description
+     * @param ?string $description
      *
      * @return Message
      */
     public function setDescription($description)
     {
+        $this->isChanged('description', $description);
         $this->description = $description;
 
         return $this;
     }
 
     /**
-     * @return \DateTime
+     * @return ?\DateTimeInterface
      */
     public function getPublishUp()
     {
@@ -180,19 +168,20 @@ class Message extends FormEntity
     }
 
     /**
-     * @param \DateTime $publishUp
+     * @param ?\DateTime $publishUp
      *
      * @return Message
      */
     public function setPublishUp($publishUp)
     {
+        $this->isChanged('publishUp', $publishUp);
         $this->publishUp = $publishUp;
 
         return $this;
     }
 
     /**
-     * @return \DateTime
+     * @return ?\DateTimeInterface
      */
     public function getPublishDown()
     {
@@ -200,19 +189,20 @@ class Message extends FormEntity
     }
 
     /**
-     * @param \DateTime $publishDown
+     * @param ?\DateTime $publishDown
      *
      * @return Message
      */
     public function setPublishDown($publishDown)
     {
+        $this->isChanged('publishDown', $publishDown);
         $this->publishDown = $publishDown;
 
         return $this;
     }
 
     /**
-     * @return Category
+     * @return ?Category
      */
     public function getCategory()
     {
@@ -220,19 +210,20 @@ class Message extends FormEntity
     }
 
     /**
-     * @param Category $category
+     * @param ?Category $category
      *
      * @return Message
      */
     public function setCategory($category)
     {
+        $this->isChanged('category', $category);
         $this->category = $category;
 
         return $this;
     }
 
     /**
-     * @return Channel[]
+     * @return ArrayCollection<int,Channel>
      */
     public function getChannels()
     {
@@ -240,18 +231,19 @@ class Message extends FormEntity
     }
 
     /**
-     * @param ArrayCollection $channels
+     * @param ArrayCollection<int,Channel> $channels
      *
      * @return Message
      */
     public function setChannels($channels)
     {
+        $this->isChanged('channels', $channels);
         $this->channels = $channels;
 
         return $this;
     }
 
-    public function addChannel(Channel $channel)
+    public function addChannel(Channel $channel): void
     {
         if (!$this->channels->contains($channel)) {
             $channel->setMessage($this);
@@ -261,7 +253,7 @@ class Message extends FormEntity
         }
     }
 
-    public function removeChannel(Channel $channel)
+    public function removeChannel(Channel $channel): void
     {
         if ($channel->getId()) {
             $this->isChanged('channels', $channel->getId());

@@ -1,29 +1,20 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\UserBundle\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
+use Mautic\CoreBundle\Entity\CacheInvalidateInterface;
 use Mautic\CoreBundle\Entity\FormEntity;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
 
-/**
- * Class Role.
- */
-class Role extends FormEntity
+class Role extends FormEntity implements CacheInvalidateInterface
 {
+    public const CACHE_NAMESPACE = 'Role';
+
     /**
      * @var int
      */
@@ -35,7 +26,7 @@ class Role extends FormEntity
     private $name;
 
     /**
-     * @var string
+     * @var string|null
      */
     private $description;
 
@@ -45,7 +36,7 @@ class Role extends FormEntity
     private $isAdmin = false;
 
     /**
-     * @var ArrayCollection
+     * @var ArrayCollection<int, \Mautic\UserBundle\Entity\Permission>
      */
     private $permissions;
 
@@ -55,25 +46,22 @@ class Role extends FormEntity
     private $rawPermissions;
 
     /**
-     * @var ArrayCollection
+     * @var ArrayCollection<int, \Mautic\UserBundle\Entity\User>
      */
     private $users;
 
-    /**
-     * Constructor.
-     */
     public function __construct()
     {
         $this->permissions = new ArrayCollection();
         $this->users       = new ArrayCollection();
     }
 
-    public static function loadMetadata(ORM\ClassMetadata $metadata)
+    public static function loadMetadata(ORM\ClassMetadata $metadata): void
     {
         $builder = new ClassMetadataBuilder($metadata);
 
         $builder->setTable('roles')
-            ->setCustomRepositoryClass('Mautic\UserBundle\Entity\RoleRepository');
+            ->setCustomRepositoryClass(\Mautic\UserBundle\Entity\RoleRepository::class);
 
         $builder->addIdColumns();
 
@@ -99,7 +87,7 @@ class Role extends FormEntity
             ->build();
     }
 
-    public static function loadValidatorMetadata(ClassMetadata $metadata)
+    public static function loadValidatorMetadata(ClassMetadata $metadata): void
     {
         $metadata->addPropertyConstraint('name', new Assert\NotBlank(
             ['message' => 'mautic.core.name.required']
@@ -108,10 +96,8 @@ class Role extends FormEntity
 
     /**
      * Prepares the metadata for API usage.
-     *
-     * @param $metadata
      */
-    public static function loadApiMetadata(ApiMetadataDriver $metadata)
+    public static function loadApiMetadata(ApiMetadataDriver $metadata): void
     {
         $metadata->setGroupPrefix('role')
             ->addListProperties(
@@ -178,7 +164,7 @@ class Role extends FormEntity
     /**
      * Remove permissions.
      */
-    public function removePermission(Permission $permissions)
+    public function removePermission(Permission $permissions): void
     {
         $this->permissions->removeElement($permissions);
     }
@@ -256,7 +242,7 @@ class Role extends FormEntity
     /**
      * Simply used to store a readable format of permissions for the changelog.
      */
-    public function setRawPermissions(array $permissions)
+    public function setRawPermissions(array $permissions): void
     {
         $this->isChanged('rawPermissions', $permissions);
         $this->rawPermissions = $permissions;
@@ -287,7 +273,7 @@ class Role extends FormEntity
     /**
      * Remove users.
      */
-    public function removeUser(User $users)
+    public function removeUser(User $users): void
     {
         $this->users->removeElement($users);
     }
@@ -300,5 +286,13 @@ class Role extends FormEntity
     public function getUsers()
     {
         return $this->users;
+    }
+
+    public function getCacheNamespacesToDelete(): array
+    {
+        return [
+            self::CACHE_NAMESPACE,
+            User::CACHE_NAMESPACE,
+        ];
     }
 }

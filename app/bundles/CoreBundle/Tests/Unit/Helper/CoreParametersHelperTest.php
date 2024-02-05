@@ -2,15 +2,6 @@
 
 declare(strict_types=1);
 
-/*
- * @copyright   2020 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        https://www.mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CoreBundle\Tests\Unit\Helper;
 
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
@@ -24,20 +15,18 @@ class CoreParametersHelperTest extends TestCase
     /**
      * @var MockObject|ContainerInterface
      */
-    private $container;
+    private \PHPUnit\Framework\MockObject\MockObject $container;
 
     protected function setUp(): void
     {
         $this->container = $this->createMock(ContainerInterface::class);
     }
 
-    public function testAllReturnsResolvedParameters()
+    public function testAllReturnsResolvedParameters(): void
     {
         $this->container->method('hasParameter')
             ->willReturnCallback(
-                function (string $key) {
-                    return 'mautic.cache_path' === $key;
-                }
+                fn (string $key) => 'mautic.cache_path' === $key
             );
 
         $this->container->expects($this->once())

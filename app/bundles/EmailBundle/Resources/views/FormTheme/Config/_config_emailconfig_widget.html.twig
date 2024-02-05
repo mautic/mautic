@@ -1,0 +1,124 @@
+{%- macro row_if_exists(form, field) %}
+  {% if form[field] is defined %}
+    <div class="col-md-6">
+      {{ form_row(form[field]) }}
+    </div>
+  {% endif %}
+{%- endmacro %}
+
+{% block _config_emailconfig_widget %}
+{% set fields = form.children %}
+{% set fieldKeys = fields|keys %}
+
+{% form_theme form with [
+    '@MauticEmail/FormTheme/Config/monitored_email_widget.html.twig',
+    '@MauticEmail/FormTheme/Config/monitored_mailboxes_widget.html.twig',
+] %}
+
+{% if fieldKeys|filter(k => k in ['mailer_from_name', 'mailer_from_email', 'mailer_reply_to_email'])|length > 0 %}
+    <div class="panel panel-primary">
+        <div class="panel-heading">
+            <h3 class="panel-title">{{ 'mautic.email.config.header.mail'|trans }}</h3>
+        </div>
+        <div class="panel-body">
+            <div class="row">
+                {{ _self.row_if_exists(fields, 'mailer_from_name') }}
+                {{ _self.row_if_exists(fields, 'mailer_from_email') }}
+            </div>
+            <div class="row">
+                {{ _self.row_if_exists(fields, 'mailer_reply_to_email') }}
+                {{ _self.row_if_exists(fields, 'mailer_return_path') }}
+            </div>
+            <div class="row">
+                {{ _self.row_if_exists(fields, 'mailer_is_owner') }}
+                {{ _self.row_if_exists(fields, 'mailer_custom_headers') }}
+            </div>
+        </div>
+    </div>
+{% endif %}
+
+<div class="panel panel-primary">
+    <div class="panel-heading">
+        <h3 class="panel-title">{{ 'mautic.email.config.header.dsn'|trans }}</h3>
+    </div>
+    <div class="panel-body">
+        {{ form_row(fields.mailer_dsn) }}
+    </div>
+</div>
+
+<div class="panel panel-primary">
+    <div class="panel-heading">
+        <h3 class="panel-title">{{ 'mautic.config.tab.frequency_rules'|trans }}</h3>
+    </div>
+    <div class="panel-body">
+        <div class="row">
+            <div class="col-md-12">
+                {{ form_row(fields.email_frequency_number) }}
+            </div>
+            <div class="col-md-12">
+                {{ form_row(fields.email_frequency_time) }}
+            </div>
+        </div>
+    </div>
+</div>
+
+{% if fields.monitored_email is defined %}
+    <div class="panel panel-primary">
+        <div class="panel-heading">
+            <h3 class="panel-title">{{ 'mautic.email.config.header.monitored_email'|trans }}</h3>
+        </div>
+        <div class="panel-body">
+            {% if 'imap_open' is function %}
+                {{ form_widget(form.monitored_email) }}
+            {% else %}
+                <div class="alert alert-info">{{ 'mautic.email.imap_extension_missing'|trans|purify }}</div>
+            {% endif %}
+        </div>
+    </div>
+{% endif %}
+
+<div class="panel panel-primary">
+    <div class="panel-heading">
+        <h3 class="panel-title">{{ 'mautic.email.config.header.message'|trans }}</h3>
+    </div>
+    <div class="panel-body">
+        <div class="row">
+            {{ _self.row_if_exists(fields, 'webview_text') }}
+            {{ _self.row_if_exists(fields, 'default_signature_text') }}
+        </div>
+        <div class="row">
+            {{ _self.row_if_exists(fields, 'mailer_append_tracking_pixel') }}
+            {{ _self.row_if_exists(fields, 'mailer_convert_embed_images') }}
+            {{ _self.row_if_exists(fields, 'disable_trackable_urls') }}
+            {{ _self.row_if_exists(fields, 'minify_email_html') }}
+        </div>
+    </div>
+</div>
+
+<div class="panel panel-primary">
+    <div class="panel-heading">
+        <h3 class="panel-title">{{ 'mautic.email.config.header.unsubscribe'|trans }}</h3>
+    </div>
+    <div class="panel-body">
+        <div class="row">
+            {{ _self.row_if_exists(fields, 'unsubscribe_text') }}
+        </div>
+        <div class="row">
+            {{ _self.row_if_exists(fields, 'unsubscribe_message') }}
+            {{ _self.row_if_exists(fields, 'resubscribe_message') }}
+        </div>
+        <div class="row">
+            {{ _self.row_if_exists(fields, 'show_contact_preferences') }}
+            {{ _self.row_if_exists(fields, 'show_contact_segments') }}
+        </div>
+        <div class="row">
+            {{ _self.row_if_exists(fields, 'show_contact_frequency') }}
+            {{ _self.row_if_exists(fields, 'show_contact_pause_dates') }}
+        </div>
+        <div class="row">
+            {{ _self.row_if_exists(fields, 'show_contact_categories') }}
+            {{ _self.row_if_exists(fields, 'show_contact_preferred_channels') }}
+        </div>
+    </div>
+</div>
+{% endblock %}

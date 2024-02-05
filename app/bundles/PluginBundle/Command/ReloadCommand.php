@@ -1,25 +1,20 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\PluginBundle\Command;
 
-use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
+use Mautic\PluginBundle\Facade\ReloadFacade;
+use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
-class ReloadCommand extends ContainerAwareCommand
+class ReloadCommand extends Command
 {
-    /**
-     * {@inheritdoc}
-     */
+    public function __construct(
+        private ReloadFacade $reloadFacade
+    ) {
+        parent::__construct();
+    }
+
     protected function configure()
     {
         $this
@@ -29,21 +24,17 @@ class ReloadCommand extends ContainerAwareCommand
                     'mautic:plugins:install',
                     'mautic:plugins:update',
                 ]
-            )
-            ->setDescription('Installs, updates, enable and/or disable plugins.');
+            );
 
         parent::configure();
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        $output->writeLn(
-            $this->getContainer()->get('mautic.plugin.facade.reload')->reloadPlugins()
-        );
+        $output->writeLn($this->reloadFacade->reloadPlugins());
 
-        return 0;
+        return \Symfony\Component\Console\Command\Command::SUCCESS;
     }
+
+    protected static $defaultDescription = 'Installs, updates, enable and/or disable plugins.';
 }

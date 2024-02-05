@@ -1,0 +1,22 @@
+{% if form is defined %}
+    {% if form.lead_channels.preferred_channel is defined %}
+        {% if showContactPreferredChannels is defined and showContactPreferredChannels %}
+            <div class="preferred_channel text-left">{{ form_row(form.lead_channels.preferred_channel) }}</div>
+        {% endif %}
+        {% do form.lead_channels.preferred_channel.setRendered(true) %}
+    {% endif %}
+{% else %}
+  <div class="preferred_channel text-left">
+      <div class="row">
+          <div class="form-group col-xs-12 ">
+              <label class="control-label">
+                  {{ 'mautic.lead.list.frequency.preferred.channel'|trans }}
+              </label>
+              <div class="choice-wrapper">
+                  <select class="form-control">
+                      <option value="email" selected="selected">{{ 'mautic.email.email'|trans }}</option>
+                  </select></div>
+          </div>
+      </div>
+  </div>
+{% endif %}
