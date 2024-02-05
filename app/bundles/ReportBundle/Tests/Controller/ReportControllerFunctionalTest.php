@@ -49,7 +49,7 @@ class ReportControllerFunctionalTest extends MauticMysqlTestCase
         ];
         $report->setColumns($coulmns);
 
-        $this->getContainer()->get('mautic.report.model.report')->saveEntity($report);
+        static::getContainer()->get('mautic.report.model.report')->saveEntity($report);
 
         // Check the details page
         $this->client->request('GET', '/s/reports/view/'.$report->getId());
@@ -58,7 +58,7 @@ class ReportControllerFunctionalTest extends MauticMysqlTestCase
 
     public function testEmailReportWithAggregatedColumnsAndTotals(): void
     {
-        $contactModel = self::$container->get('mautic.lead.model.lead');
+        $contactModel = static::getContainer()->get('mautic.lead.model.lead');
 
         // Create and save contacts
         $payload = [
@@ -140,7 +140,7 @@ class ReportControllerFunctionalTest extends MauticMysqlTestCase
                 'function'  => 'AVG',
             ],
         ]);
-        self::$container->get('mautic.report.model.report')->saveEntity($report);
+        static::getContainer()->get('mautic.report.model.report')->saveEntity($report);
 
         // Expected report table values [ID, Company name, MIN Points, Max Points, SUM Points, COUNT Points, AVG Points]
         $expected = [
@@ -172,5 +172,69 @@ class ReportControllerFunctionalTest extends MauticMysqlTestCase
 
         Assert::assertSame($expected, $result);
         Assert::assertCount($tbody->childElementCount, $expected);
+    }
+
+    public function testContactReportNotLikeExpression(): void
+    {
+        $contactModel = self::$container->get('mautic.lead.model.lead');
+
+        // Create and save contacts
+        $payload = [
+            [
+                'email'     => 'test1@example.com',
+                'firstname' => 'Tester',
+            ],
+            [
+                'email'     => 'test2@example.com',
+                'firstname' => 'Example',
+            ],
+        ];
+
+        foreach ($payload as $item) {
+            $contact = new Lead();
+            $contact->setEmail($item['email']);
+            $contact->setFirstname($item['firstname']);
+
+            $contactModel->saveEntity($contact);
+        }
+
+        $report = new Report();
+        $report->setName('Contact report');
+        $report->setDescription('<b>This is allowed HTML</b>');
+        $report->setSource('leads');
+        $coulmns = [
+            'l.firstname',
+        ];
+        $report->setColumns($coulmns);
+        $report->setFilters([
+            [
+                'column'    => 'l.firstname',
+                'glue'      => 'and',
+                'value'     => 'Test',
+                'condition' => 'notLike',
+            ]]
+        );
+
+        $this->getContainer()->get('mautic.report.model.report')->saveEntity($report);
+
+        // Check the details page
+        $this->client->request('GET', '/s/reports/view/'.$report->getId());
+        Assert::assertTrue($this->client->getResponse()->isOk());
+        $response = $this->client->getResponse();
+        $content  = $response->getContent();
+
+        $dom     = new \DOMDocument('1.0', 'utf-8');
+
+        $dom->loadHTML(mb_convert_encoding($content, 'HTML-ENTITIES', 'UTF-8'), LIBXML_NOERROR);
+        $tbody = $dom->getElementById('reportTable')->getElementsByTagName('tbody')[0];
+        $rows  = $tbody->getElementsByTagName('tr');
+
+        for ($i = 0; $i < count($rows); ++$i) {
+            $cells = $rows[$i]->getElementsByTagName('td');
+            foreach ($cells as $c) {
+                $result[$i][] = htmlentities(trim($c->nodeValue));
+            }
+        }
+        $this->assertEquals(2, count($result));
     }
 }

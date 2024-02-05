@@ -60,8 +60,9 @@ return [
                 'controller' => 'Mautic\EmailBundle\Controller\PublicController::indexAction',
             ],
             'mautic_email_unsubscribe' => [
-                'path'       => '/email/unsubscribe/{idHash}',
+                'path'       => '/email/unsubscribe/{idHash}/{urlEmail}/{secretHash}',
                 'controller' => 'Mautic\EmailBundle\Controller\PublicController::unsubscribeAction',
+                'defaults'   => ['urlEmail' => null, 'secretHash' => null],
             ],
             'mautic_email_resubscribe' => [
                 'path'       => '/email/resubscribe/{idHash}',
@@ -97,13 +98,6 @@ return [
             'mautic.di.env_processor.mailerdsn' => [
                 'class' => \Mautic\EmailBundle\DependencyInjection\EnvProcessor\MailerDsnEnvVarProcessor::class,
                 'tag'   => 'container.env_var_processor',
-            ],
-            'mautic.helper.mailbox' => [
-                'class'     => \Mautic\EmailBundle\MonitoredEmail\Mailbox::class,
-                'arguments' => [
-                    'mautic.helper.core_parameters',
-                    'mautic.helper.paths',
-                ],
             ],
             'mautic.message.search.contact' => [
                 'class'     => \Mautic\EmailBundle\MonitoredEmail\Search\ContactFinder::class,
@@ -154,13 +148,6 @@ return [
                     'monolog.logger.mautic',
                     'mautic.tracker.contact',
                     'mautic.helper.email.address',
-                ],
-            ],
-            'mautic.helper.mailer' => [
-                'class'     => \Mautic\EmailBundle\Helper\MailHelper::class,
-                'arguments' => [
-                    'mautic.factory',
-                    'mailer',
                 ],
             ],
             'mautic.validator.email' => [
