@@ -925,7 +925,6 @@ class EmailController extends FormController
                         ];
                         $returnUrl = $this->generateUrl('mautic_email_action', $viewParameters);
                         $template  = 'Mautic\EmailBundle\Controller\EmailController::viewAction';
-
                     } else {
                         return $this->redirect($this->generateUrl('mautic_email_action',
                             [
@@ -938,7 +937,7 @@ class EmailController extends FormController
             } else {
                 $viewParameters = ['page' => $page];
                 $returnUrl      = $this->generateUrl('mautic_email_index', $viewParameters);
-                $template       = 'MauticEmailBundle:Email:index';
+                $template       = 'Mautic\EmailBundle\Controller\EmailController::indexAction';
                 // clear any modified content
                 $session->remove('mautic.emailbuilder.'.$entity->getSessionId().'.content');
             }
