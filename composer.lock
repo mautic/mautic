@@ -5993,7 +5993,7 @@
             "dist": {
                 "type": "path",
                 "url": "app",
-                "reference": "a07982bbc6a6e438f80d365f875825a0ce9c1cfb"
+                "reference": "05f968726cecb5faeae31b348bde65e776e6dbcb"
             },
             "require": {
                 "aws/aws-sdk-php": "~3.0",
@@ -6010,6 +6010,7 @@
                 "doctrine/doctrine-migrations-bundle": "^3.2.2",
                 "doctrine/orm": "^2.14.0",
                 "exercise/htmlpurifier-bundle": "^4.1",
+                "ext-iconv": "*",
                 "ext-imap": "*",
                 "ext-pdo": "*",
                 "ext-zip": "*",
