@@ -156,7 +156,7 @@ class CampaignModel extends CommonFormModel
         $event = $this->dispatchEvent('pre_delete', $entity);
         $this->getRepository()->setCampaignAsDeleted($entity->getId());
 
-        $this->dispatcher->dispatch(CampaignEvents::ON_CAMPAIGN_DELETE, new Events\DeleteCampaign($entity));
+        $this->dispatcher->dispatch(new Events\DeleteCampaign($entity), CampaignEvents::ON_CAMPAIGN_DELETE);
     }
 
     public function deleteCampaign(Campaign $campaign): void

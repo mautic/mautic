@@ -83,7 +83,7 @@ class EventModel extends FormModel
             // wipe out any references to these events to prevent restraint violations
             $this->getRepository()->nullEventRelationships($deletedKeys);
             $this->getRepository()->setEventsAsDeleted($deletedEvents);
-            $this->dispatcher->dispatch(CampaignEvents::ON_EVENT_DELETE, new DeleteEvent($deletedKeys));
+            $this->dispatcher->dispatch(new DeleteEvent($deletedKeys), CampaignEvents::ON_EVENT_DELETE);
         }
     }
 
@@ -99,7 +99,7 @@ class EventModel extends FormModel
     public function deleteEventsByEventIds(array $eventIds): void
     {
         $this->getRepository()->deleteEvents($eventIds);
-        $this->dispatcher->dispatch(CampaignEvents::ON_AFTER_EVENTS_DELETE, new DeleteEvent($eventIds));
+        $this->dispatcher->dispatch(new DeleteEvent($eventIds), CampaignEvents::ON_AFTER_EVENTS_DELETE);
     }
 
     /**
