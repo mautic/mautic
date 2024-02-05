@@ -4,9 +4,14 @@ declare(strict_types=1);
 
 namespace Mautic\CampaignBundle\Tests\Controller;
 
+use Doctrine\ORM\Exception\ORMException;
+use Doctrine\ORM\OptimisticLockException;
 use Mautic\CampaignBundle\Command\SummarizeCommand;
+use Mautic\CampaignBundle\Entity\Campaign;
+use Mautic\CampaignBundle\Entity\Event;
 use Mautic\CampaignBundle\Model\CampaignModel;
 use Mautic\CampaignBundle\Tests\Campaign\AbstractCampaignTest;
+use Mautic\EmailBundle\Entity\Email;
 use PHPUnit\Framework\Assert;
 use Symfony\Component\DomCrawler\Crawler;
 use Symfony\Component\HttpFoundation\Request;
@@ -248,5 +253,126 @@ class CampaignControllerFunctionalTest extends AbstractCampaignTest
         Assert::assertSame($expectedSuccessPercent.'%', $actionCounts['successPercent']);
         Assert::assertSame($expectedCompleted, (int) $actionCounts['completed']);
         Assert::assertSame($expectedPending, (int) $actionCounts['pending']);
+    }
+
+    /**
+     * @throws ORMException
+     * @throws OptimisticLockException
+     */
+    private function createCampaignWithEmail(): Campaign
+    {
+        $campaign = new Campaign();
+        $campaign->setName('Test campaign');
+        $this->em->persist($campaign);
+        $this->em->flush();
+
+        // Create email
+        $email = new Email();
+        $email->setName('Test email');
+        $this->em->persist($email);
+        $this->em->flush();
+
+        // Create email events
+        $event = new Event();
+        $event->setName('Send email');
+        $event->setType('email.send');
+        $event->setEventType('action');
+        $event->setChannel('email');
+        $event->setChannelId($email->getId());
+        $event->setCampaign($campaign);
+        $this->em->persist($event);
+        $this->em->flush();
+
+        // Add events to campaign
+        $campaign->addEvent(0, $event);
+
+        return $campaign;
+    }
+
+    /**
+     * @throws ORMException
+     * @throws OptimisticLockException
+     */
+    private function createCampaignNoEmail(): Campaign
+    {
+        $campaign = new Campaign();
+        $campaign->setName('Test campaign');
+        $this->em->persist($campaign);
+        $this->em->flush();
+
+        return $campaign;
+    }
+
+    /**
+     * @return array<string, array<string, string>>
+     */
+    private function getStats(bool $addEmail = true): array
+    {
+        return $addEmail ? [
+            'Finland' => [
+                'contacts'              => '14',
+                'country'               => 'Finland',
+                'sent_count'            => '14',
+                'read_count'            => '4',
+                'clicked_through_count' => '0',
+            ],
+            'Italy' => [
+                'contacts'              => '5',
+                'country'               => 'Italy',
+                'sent_count'            => '5',
+                'read_count'            => '5',
+                'clicked_through_count' => '3',
+            ],
+        ] : [
+            'Finland' => [
+                'contacts' => '14',
+                'country'  => 'Finland',
+            ],
+            'Italy' => [
+                'contacts' => '5',
+                'country'  => 'Italy',
+            ],
+        ];
+    }
+
+    /**
+     * @throws OptimisticLockException
+     * @throws ORMException
+     */
+    public function testGetData(): void
+    {
+        $campaign = $this->createCampaignWithEmail();
+
+        $this->client->request(Request::METHOD_GET, '/email/countries-stats/preview/'.$campaign->getId());
+        $results = json_decode($this->client->getResponse()->getContent());
+
+        $this->assertCount(2, $results);
+        $this->assertSame(['Finland', 'Italy'], $results);
+        $this->assertSame([
+            'contacts'              => '5',
+            'country'               => 'Italy',
+            'sent_count'            => '5',
+            'read_count'            => '5',
+            'clicked_through_count' => '3',
+        ], $results['Italy']);
+    }
+
+    /**
+     * @throws OptimisticLockException
+     * @throws ORMException
+     */
+    public function testGetDataNoEmail(): void
+    {
+        $campaign = $this->createCampaignNoEmail();
+
+        $this->client->request(Request::METHOD_GET, '/email/countries-stats/preview/'.$campaign->getId());
+        $results = json_decode($this->client->getResponse()->getContent());
+
+        $this->assertCount(2, $results);
+        $this->assertSame(['Finland', 'Italy'], array_keys($results));
+        $this->assertSame([
+            'contacts' => '5',
+            'country'  => 'Italy',
+        ], $results['Italy']);
     }
 }

@@ -6,6 +6,7 @@ namespace Mautic\EmailBundle\Tests\Controller;
 
 use Doctrine\ORM\OptimisticLockException;
 use Doctrine\ORM\ORMException;
+use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\CoreBundle\Tests\Traits\ControllerTrait;
 use Mautic\EmailBundle\Entity\Email;
@@ -13,9 +14,12 @@ use Mautic\EmailBundle\Entity\Stat;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\LeadBundle\Entity\ListLead;
+use Mautic\UserBundle\Entity\Role;
+use Mautic\UserBundle\Entity\User;
 use PHPUnit\Framework\Assert;
 use Symfony\Bridge\Doctrine\DataCollector\DoctrineDataCollector;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 
 final class EmailControllerFunctionalTest extends MauticMysqlTestCase
 {
@@ -494,5 +498,49 @@ final class EmailControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertNotEmpty($response['subject']);
         $this->assertEquals($email->getSubject(), $response['subject']);
         $this->assertNotEmpty($response['body']);
+    }
+
+    /**
+     * @throws \Doctrine\ORM\Exception\ORMException
+     */
+    public function testHasAccess(): void
+    {
+        $role = new Role();
+        $role->setName('Example admin');
+        $this->em->persist($role);
+        $this->em->flush();
+
+        $user = new User();
+        $user->setFirstName('Example');
+        $user->setLastName('Example');
+        $user->setUsername('Example');
+        $user->setPassword('123456');
+        $user->setEmail('example@example.com');
+        $user->setRole($role);
+        $this->em->persist($user);
+        $this->em->flush();
+
+        $email = new Email();
+        $email->setName('Test email 1');
+        $email->setCreatedBy($user);
+        $this->em->persist($email);
+        $this->em->flush();
+
+        $corePermissionsMock = $this->createMock(CorePermissions::class);
+        $corePermissionsMock->method('hasEntityAccess')
+            ->with(
+                'email:emails:viewown',
+                'email:emails:viewother',
+                $user->getId()
+            )
+            ->willReturn(false);
+
+        try {
+            $this->client->request('GET', '/s/email/countries-stats/preview/'.$email->getId());
+        } catch (AccessDeniedHttpException|\Exception $e) {
+            $this->assertTrue($e instanceof AccessDeniedHttpException);
+        }
+
+        $this->fail();
     }
 }
