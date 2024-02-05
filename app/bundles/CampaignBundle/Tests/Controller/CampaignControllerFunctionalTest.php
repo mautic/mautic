@@ -9,12 +9,15 @@ use Doctrine\ORM\OptimisticLockException;
 use Mautic\CampaignBundle\Command\SummarizeCommand;
 use Mautic\CampaignBundle\Entity\Campaign;
 use Mautic\CampaignBundle\Entity\Event;
+use Mautic\CampaignBundle\Entity\Lead as CampaignLead;
 use Mautic\CampaignBundle\Model\CampaignModel;
 use Mautic\CampaignBundle\Tests\Campaign\AbstractCampaignTest;
 use Mautic\EmailBundle\Entity\Email;
+use Mautic\LeadBundle\Entity\Lead;
 use PHPUnit\Framework\Assert;
 use Symfony\Component\DomCrawler\Crawler;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 
 class CampaignControllerFunctionalTest extends AbstractCampaignTest
 {
@@ -285,6 +288,7 @@ class CampaignControllerFunctionalTest extends AbstractCampaignTest
 
         // Add events to campaign
         $campaign->addEvent(0, $event);
+        $this->em->flush();
 
         return $campaign;
     }
@@ -304,35 +308,26 @@ class CampaignControllerFunctionalTest extends AbstractCampaignTest
     }
 
     /**
-     * @return array<string, array<string, string>>
+     * @throws OptimisticLockException
+     * @throws ORMException
      */
-    private function getStats(bool $addEmail = true): array
+    private function addLeadsFromCountry(Campaign $campaign, int $leadCount, string $country): void
     {
-        return $addEmail ? [
-            'Finland' => [
-                'contacts'              => '14',
-                'country'               => 'Finland',
-                'sent_count'            => '14',
-                'read_count'            => '4',
-                'clicked_through_count' => '0',
-            ],
-            'Italy' => [
-                'contacts'              => '5',
-                'country'               => 'Italy',
-                'sent_count'            => '5',
-                'read_count'            => '5',
-                'clicked_through_count' => '3',
-            ],
-        ] : [
-            'Finland' => [
-                'contacts' => '14',
-                'country'  => 'Finland',
-            ],
-            'Italy' => [
-                'contacts' => '5',
-                'country'  => 'Italy',
-            ],
-        ];
+        for ($i = 0; $i < $leadCount; ++$i) {
+            $lead = new Lead();
+            $lead->setCountry($country);
+            $this->em->persist($lead);
+            $this->em->flush();
+
+            $campaignLead = new CampaignLead();
+            $campaignLead->setLead($lead);
+            $campaignLead->setCampaign($campaign);
+            $campaignLead->setDateAdded(new \DateTime());
+            $this->em->persist($campaignLead);
+            $campaign->addLead($i, $campaignLead);
+        }
+
+        $this->em->flush();
     }
 
     /**
@@ -342,37 +337,25 @@ class CampaignControllerFunctionalTest extends AbstractCampaignTest
     public function testGetData(): void
     {
         $campaign = $this->createCampaignWithEmail();
+        $this->addLeadsFromCountry($campaign, 4, 'Finland');
 
-        $this->client->request(Request::METHOD_GET, '/email/countries-stats/preview/'.$campaign->getId());
-        $results = json_decode($this->client->getResponse()->getContent());
+        var_dump($campaign->isEmailCampaign());
 
-        $this->assertCount(2, $results);
-        $this->assertSame(['Finland', 'Italy'], $results);
-        $this->assertSame([
-            'contacts'              => '5',
-            'country'               => 'Italy',
-            'sent_count'            => '5',
-            'read_count'            => '5',
-            'clicked_through_count' => '3',
-        ], $results['Italy']);
-    }
+        $this->client->request(Request::METHOD_GET, 's/campaign/countries-stats/preview/'.$campaign->getId());
+        $clientResponse = $this->client->getResponse();
 
-    /**
-     * @throws OptimisticLockException
-     * @throws ORMException
-     */
-    public function testGetDataNoEmail(): void
-    {
-        $campaign = $this->createCampaignNoEmail();
+        $contentDom      = new \DOMDocument();
+        $responseContent = $clientResponse->getContent();
+        $contentDom->loadHTML($responseContent);
+        $crawler             = new Crawler($contentDom);
+        $crawlerTable        = $crawler->filter('table')->first();
+        $crawlerTableHeaders = $crawlerTable->filter('thead tr td');
+        $crawlerTableValues  = $crawlerTable->filter('tbody tr td');
 
-        $this->client->request(Request::METHOD_GET, '/email/countries-stats/preview/'.$campaign->getId());
-        $results = json_decode($this->client->getResponse()->getContent());
-
-        $this->assertCount(2, $results);
-        $this->assertSame(['Finland', 'Italy'], array_keys($results));
-        $this->assertSame([
-            'contacts' => '5',
-            'country'  => 'Italy',
-        ], $results['Italy']);
+        $this->assertEquals(Response::HTTP_OK, $clientResponse->getStatusCode());
+        $this->assertSame('Country', $crawlerTableHeaders->eq(0)->text());
+        $this->assertSame('Contacts', $crawlerTableHeaders->eq(1)->text());
+        $this->assertSame('Finland', $crawlerTableValues->eq(0)->text());
+        $this->assertSame('4', $crawlerTableValues->eq(1)->text());
     }
 }

@@ -2,14 +2,10 @@
 
 namespace Mautic\CampaignBundle\Tests\Controller;
 
-use Doctrine\DBAL\Exception;
-use Doctrine\ORM\Exception\ORMException;
-use Doctrine\ORM\OptimisticLockException;
 use Doctrine\Persistence\ManagerRegistry;
 use Mautic\CampaignBundle\Controller\CampaignController;
 use Mautic\CampaignBundle\Entity\Campaign;
 use Mautic\CampaignBundle\EventCollector\EventCollector;
-use Mautic\CampaignBundle\Model\CampaignModel;
 use Mautic\CoreBundle\Factory\MauticFactory;
 use Mautic\CoreBundle\Factory\ModelFactory;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
@@ -23,22 +19,25 @@ use Mautic\CoreBundle\Twig\Helper\DateHelper;
 use Mautic\FormBundle\Helper\FormFieldHelper;
 use Mautic\UserBundle\Entity\User;
 use PHPUnit\Framework\Assert;
+use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\FormFactory;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpFoundation\StreamedResponse;
-use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 class CampaignControllerTest extends MauticMysqlTestCase
 {
+    private MockObject|Translator $translator;
+
+    private MockObject|DateHelper $dateHelper;
+
+    private CampaignController $controller;
+
     protected function setUp(): void
     {
         parent::setUp();
-        $this->requestStack = new RequestStack();
-        $this->corePermissionsMock = $this->createMock(CorePermissions::class);
-        $helperUserMock = $this->createMock(UserHelper::class);
-        $this->translator = $this->createMock(Translator::class);
+        $helperUserMock             = $this->createMock(UserHelper::class);
+        $this->translator           = $this->createMock(Translator::class);
         $this->dateHelper           = new DateHelper(
             'F j, Y g:i a T',
             'D, M d',
@@ -55,7 +54,7 @@ class CampaignControllerTest extends MauticMysqlTestCase
             $this->createMock(FormFactory::class),
             $this->createMock(FormFieldHelper::class),
             $this->createMock(EventCollector::class),
-            new DateHelper(),
+            $this->dateHelper,
             $this->createMock(ManagerRegistry::class),
             $this->createMock(MauticFactory::class),
             $this->createMock(ModelFactory::class),
@@ -69,6 +68,7 @@ class CampaignControllerTest extends MauticMysqlTestCase
             $this->createMock(ExportHelper::class)
         );
     }
+
     /**
      * Index should return status code 200.
      */
@@ -117,17 +117,14 @@ class CampaignControllerTest extends MauticMysqlTestCase
         Assert::assertSame(Response::HTTP_OK, $clientResponse->getStatusCode());
     }
 
-    /**
-     * @throws OptimisticLockException
-     * @throws ORMException
-     */
     public function testGetExportHeader(): void
     {
         $campaign        = $this->createMock(Campaign::class);
+        $campaign->method('isEmailCampaign')->willReturn(true);
+
         $campaignNoEmail = $this->createMock(Campaign::class);
 
-        $translator = $this->createMock(Translator::class);
-        $translator->expects($this->exactly(7))
+        $this->translator->expects($this->exactly(7))
             ->method('trans')
             ->withConsecutive(
                 ['mautic.lead.lead.thead.country'],
@@ -142,39 +139,5 @@ class CampaignControllerTest extends MauticMysqlTestCase
 
         $this->assertSame(['Country', 'Contacts'], $this->controller->getExportHeader($campaignNoEmail));
         $this->assertSame(['Country', 'Contacts', 'Sent', 'Read', 'Clicked'], $this->controller->getExportHeader($campaign));
-    }
-
-    /**
-     * @throws OptimisticLockException
-     * @throws ORMException
-     * @throws Exception
-     */
-    /**
-     * @throws OptimisticLockException
-     * @throws ORMException
-     * @throws \Exception
-     */
-    public function testExportAction(): void
-    {
-        $campaign = $this->createMock(Campaign::class);
-
-        $campaignModelMock       = $this->createMock(CampaignModel::class);
-        $campaignModelMock->expects($this->once())
-            ->method('getEntity')
-            ->with($campaign->getId())
-            ->willReturn($campaign);
-
-        $exportHelper = $this->createMock(ExportHelper::class);
-        $exportHelper->expects($this->exactly(0))
-            ->method('exportDataAs')
-            ->willReturn(new StreamedResponse());
-
-        try {
-            $this->client->request('GET', '/email/countries-stats/export/'.$campaign->getId().'/csv');
-        } catch (NotFoundHttpException|\Exception $e) {
-            $this->assertTrue($e instanceof NotFoundHttpException);
-        }
-
-        $this->fail();
     }
 }

@@ -1217,8 +1217,6 @@ class CampaignController extends AbstractStandardFormController
     }
 
     /**
-     * @param Campaign $entity
-     *
      * @return array<int|string, array<int|string, int|string>>
      *
      * @throws Exception
@@ -1256,7 +1254,7 @@ class CampaignController extends AbstractStandardFormController
      */
     public function exportAction(int $objectId, string $format = 'csv'): StreamedResponse|Response
     {
-        $model = $this->getCampaignModel();
+        $model  = $this->getCampaignModel();
         $entity = $model->getEntity($objectId);
 
         if (empty($entity) || !$this->hasAccess($entity)) {
