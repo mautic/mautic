@@ -2,6 +2,9 @@
 
 namespace Mautic\PluginBundle\Entity;
 
+use Doctrine\ORM\Query;
+use Mautic\CoreBundle\Cache\ResultCacheHelper;
+use Mautic\CoreBundle\Cache\ResultCacheOptions;
 use Mautic\CoreBundle\Entity\CommonRepository;
 
 /**
@@ -9,12 +12,17 @@ use Mautic\CoreBundle\Entity\CommonRepository;
  */
 class IntegrationRepository extends CommonRepository
 {
-    public function getIntegrations()
+    /**
+     * @return mixed[]
+     */
+    public function getIntegrations(): array
     {
-        $services = $this->createQueryBuilder('i')
+        $query = $this->createQueryBuilder('i')
             ->join('i.plugin', 'p')
-            ->getQuery()
-            ->getResult();
+            ->getQuery();
+        $this->enableCache($query);
+
+        $services = $query->getResult();
 
         $results = [];
         foreach ($services as $s) {
@@ -26,12 +34,16 @@ class IntegrationRepository extends CommonRepository
 
     /**
      * Get core (no plugin) integrations.
+     *
+     * @return mixed[]
      */
-    public function getCoreIntegrations()
+    public function getCoreIntegrations(): array
     {
-        $services = $this->createQueryBuilder('i')
-            ->getQuery()
-            ->getResult();
+        $query = $this->createQueryBuilder('i')
+            ->getQuery();
+        $this->enableCache($query);
+
+        $services = $query->getResult();
 
         $results = [];
         foreach ($services as $s) {
@@ -39,5 +51,22 @@ class IntegrationRepository extends CommonRepository
         }
 
         return $results;
+    }
+
+    public function findOneByName(string $name): ?Integration
+    {
+        $query = $this->createQueryBuilder('i')
+            ->where('i.name = :name')
+            ->setParameter('name', $name)
+            ->setMaxResults(1)
+            ->getQuery();
+        $this->enableCache($query);
+
+        return $query->getOneOrNullResult();
+    }
+
+    private function enableCache(Query $query): void
+    {
+        ResultCacheHelper::enableOrmQueryCache($query, new ResultCacheOptions(Integration::CACHE_NAMESPACE));
     }
 }

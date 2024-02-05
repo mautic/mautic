@@ -10,10 +10,7 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 final class ReportHelperTest extends TestCase
 {
-    /**
-     * @var ReportHelper
-     */
-    private $reportHelper;
+    private \Mautic\ReportBundle\Helper\ReportHelper $reportHelper;
 
     protected function setUp(): void
     {

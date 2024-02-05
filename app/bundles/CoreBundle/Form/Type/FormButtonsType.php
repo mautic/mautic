@@ -11,14 +11,11 @@ use Symfony\Component\Form\FormView;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
- * Class FormButtonsType.
+ * @extends AbstractType<mixed>
  */
 class FormButtonsType extends AbstractType
 {
-    /**
-     * {@inheritdoc}
-     */
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         foreach ($options['pre_extra_buttons'] as $btn) {
             $type = (empty($btn['type'])) ? ButtonType::class : SubmitType::class;
@@ -99,10 +96,7 @@ class FormButtonsType extends AbstractType
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function configureOptions(OptionsResolver $resolver)
+    public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults(
             [
@@ -134,10 +128,7 @@ class FormButtonsType extends AbstractType
         );
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function buildView(FormView $view, FormInterface $form, array $options)
+    public function buildView(FormView $view, FormInterface $form, array $options): void
     {
         $view->vars['containerClass'] = $options['container_class'];
     }

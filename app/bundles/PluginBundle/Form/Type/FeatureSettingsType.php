@@ -13,34 +13,19 @@ use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
+/**
+ * @extends AbstractType<array<mixed>>
+ */
 class FeatureSettingsType extends AbstractType
 {
-    /**
-     * @var SessionInterface
-     */
-    protected $session;
-
-    /**
-     * @var CoreParametersHelper
-     */
-    protected $coreParametersHelper;
-
-    /**
-     * @var LoggerInterface
-     */
-    protected $logger;
-
     public function __construct(
-        SessionInterface $session,
-        CoreParametersHelper $coreParametersHelper,
-        LoggerInterface $logger
+        protected SessionInterface $session,
+        protected CoreParametersHelper $coreParametersHelper,
+        protected LoggerInterface $logger
     ) {
-        $this->session              = $session;
-        $this->coreParametersHelper = $coreParametersHelper;
-        $this->logger               = $logger;
     }
 
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $integrationObject = $options['integration_object'];
 
@@ -49,7 +34,7 @@ class FeatureSettingsType extends AbstractType
         $leadFields    = $options['lead_fields'];
         $companyFields = $options['company_fields'];
 
-        $formModifier = function (FormInterface $form, $data, $method = 'get') use ($integrationObject, $leadFields, $companyFields) {
+        $formModifier = function (FormInterface $form, $data, $method = 'get') use ($integrationObject, $leadFields, $companyFields): void {
             $integrationName = $integrationObject->getName();
             $session         = $this->session;
             $limit           = $session->get(
@@ -68,7 +53,7 @@ class FeatureSettingsType extends AbstractType
             try {
                 if (empty($fields)) {
                     $fields = $integrationObject->getFormLeadFields($settings);
-                    $fields = (isset($fields[0])) ? $fields[0] : $fields;
+                    $fields = $fields[0] ?? $fields;
                 }
 
                 if (isset($settings['feature_settings']['objects']) and in_array('company', $settings['feature_settings']['objects'])) {
@@ -141,7 +126,7 @@ class FeatureSettingsType extends AbstractType
 
         $builder->addEventListener(
             FormEvents::PRE_SET_DATA,
-            function (FormEvent $event) use ($formModifier) {
+            function (FormEvent $event) use ($formModifier): void {
                 $data = $event->getData();
                 $formModifier($event->getForm(), $data);
             }
@@ -149,24 +134,18 @@ class FeatureSettingsType extends AbstractType
 
         $builder->addEventListener(
             FormEvents::PRE_SUBMIT,
-            function (FormEvent $event) use ($formModifier) {
+            function (FormEvent $event) use ($formModifier): void {
                 $data = $event->getData();
                 $formModifier($event->getForm(), $data, 'post');
             }
         );
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function configureOptions(OptionsResolver $resolver)
+    public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setRequired(['integration', 'integration_object', 'lead_fields', 'company_fields']);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getBlockPrefix()
     {
         return 'integration_featuresettings';

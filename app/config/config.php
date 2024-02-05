@@ -1,5 +1,7 @@
 <?php
 
+use Doctrine\DBAL\Types\Types;
+use Mautic\CoreBundle\Doctrine\Type;
 use Mautic\CoreBundle\EventListener\ConsoleErrorListener;
 use Mautic\CoreBundle\EventListener\ConsoleTerminateListener;
 use Symfony\Component\DependencyInjection\Definition;
@@ -8,9 +10,9 @@ use Symfony\Component\DependencyInjection\Reference;
 /** @var \Symfony\Component\DependencyInjection\ContainerBuilder $container */
 
 // Include path settings
-$root = $container->getParameter('kernel.project_dir').'/app';
+$root        = $container->getParameter('mautic.application_dir').'/app';
+$projectRoot = $container->getParameter('kernel.project_dir');
 
-/** @var array $paths */
 include __DIR__.'/paths_helper.php';
 
 // Load extra annotations
@@ -23,7 +25,7 @@ $container->loadFromExtension('sensio_framework_extra', [
 
 // Build and store Mautic bundle metadata
 $symfonyBundles        = $container->getParameter('kernel.bundles');
-$bundleMetadataBuilder = new \Mautic\CoreBundle\DependencyInjection\Builder\BundleMetadataBuilder($symfonyBundles, $paths, $root);
+$bundleMetadataBuilder = new \Mautic\CoreBundle\DependencyInjection\Builder\BundleMetadataBuilder($symfonyBundles, $paths);
 
 $container->setParameter('mautic.bundles', $bundleMetadataBuilder->getCoreBundleMetadata());
 $container->setParameter('mautic.plugin.bundles', $bundleMetadataBuilder->getPluginMetadata());
@@ -46,13 +48,13 @@ if (defined('MAUTIC_INSTALLER')) {
     $secureCookie = $request->isSecure();
 } else {
     $siteUrl      = $configParameterBag->get('site_url');
-    $secureCookie = ($siteUrl && 0 === strpos($siteUrl, 'https'));
+    $secureCookie = ($siteUrl && str_starts_with($siteUrl, 'https'));
 }
 
 $container->loadFromExtension('framework', [
     'secret' => '%mautic.secret_key%',
     'router' => [
-        'resource'            => '%kernel.project_dir%/app/config/routing.php',
+        'resource'            => '%mautic.application_dir%/app/config/routing.php',
         'strict_requirements' => null,
     ],
     'form'            => null,
@@ -136,9 +138,9 @@ $connectionSettings = [
 ];
 
 if (!empty($localConfigParameterBag->get('db_host_ro'))) {
-    $dbalSettings['wrapper_class']   = \Mautic\CoreBundle\Doctrine\Connection\PrimaryReadReplicaConnectionWrapper::class;
-    $dbalSettings['keep_replica']    = true;
-    $dbalSettings['replicas']        = [
+    $connectionSettings['wrapper_class']   = \Mautic\CoreBundle\Doctrine\Connection\PrimaryReadReplicaConnectionWrapper::class;
+    $connectionSettings['keep_replica']    = true;
+    $connectionSettings['replicas']        = [
         'replica1' => [
             'host'                  => '%mautic.db_host_ro%',
             'port'                  => '%mautic.db_port%',
@@ -163,9 +165,10 @@ $container->loadFromExtension('doctrine', [
             ]),
         ],
         'types'    => [
-            'array'     => \Mautic\CoreBundle\Doctrine\Type\ArrayType::class,
-            'datetime'  => \Mautic\CoreBundle\Doctrine\Type\UTCDateTimeType::class,
-            'generated' => \Mautic\CoreBundle\Doctrine\Type\GeneratedType::class,
+            Types::ARRAY                  => Type\ArrayType::class,
+            Types::DATETIME_MUTABLE       => Type\UTCDateTimeType::class,
+            Types::DATETIME_IMMUTABLE     => Type\UTCDateTimeImmutableType::class,
+            Type\GeneratedType::GENERATED => Type\GeneratedType::class,
         ],
     ],
     'orm'  => [
@@ -177,20 +180,24 @@ $container->loadFromExtension('doctrine', [
                 'match' => \DoctrineExtensions\Query\Mysql\MatchAgainst::class,
             ],
         ],
+        'result_cache_driver' => [
+            'type' => 'pool',
+            'pool' => 'doctrine_result_cache',
+        ],
     ],
 ]);
 
 // MigrationsBundle Configuration
 $container->loadFromExtension('doctrine_migrations', [
     'migrations_paths' => [
-        'Mautic\\Migrations' => '%kernel.project_dir%/app/migrations',
+        'Mautic\\Migrations' => '%mautic.application_dir%/app/migrations',
     ],
     'storage' => [
         'table_storage' => [
             'table_name' => '%env(MAUTIC_MIGRATIONS_TABLE_NAME)%',
         ],
     ],
-    'custom_template' => '%kernel.project_dir%/app/migrations/Migration.template',
+    'custom_template' => '%mautic.application_dir%/app/migrations/Migration.template',
 ]);
 
 // KnpMenu Configuration
@@ -263,6 +270,9 @@ $container->loadFromExtension('framework', [
     'cache' => [
         'pools' => [
             'api_rate_limiter_cache' => $configParameterBag->get('api_rate_limiter_cache'),
+            'doctrine_result_cache'  => [
+                'adapter' => 'cache.adapter.array',
+            ],
         ],
     ],
 ]);

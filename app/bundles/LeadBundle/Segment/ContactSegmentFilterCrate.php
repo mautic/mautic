@@ -5,7 +5,9 @@ namespace Mautic\LeadBundle\Segment;
 class ContactSegmentFilterCrate
 {
     public const CONTACT_OBJECT   = 'lead';
+
     public const COMPANY_OBJECT   = 'company';
+
     public const BEHAVIORS_OBJECT = 'behaviors';
 
     /**
@@ -38,23 +40,26 @@ class ContactSegmentFilterCrate
      */
     private $operator;
 
-    /**
-     * @var array
-     */
-    private $sourceArray;
+    private array $sourceArray;
 
     private $nullValue;
 
+    /**
+     * @var array|mixed[]
+     */
+    private array $mergedProperty;
+
     public function __construct(array $filter)
     {
-        $bcFilter          = $filter['filter'] ?? null;
-        $this->glue        = $filter['glue'] ?? null;
-        $this->field       = $filter['field'] ?? null;
-        $this->object      = $filter['object'] ?? self::CONTACT_OBJECT;
-        $this->type        = $filter['type'] ?? null;
-        $this->filter      = $filter['properties']['filter'] ?? $bcFilter;
-        $this->nullValue   = $filter['null_value'] ?? null;
-        $this->sourceArray = $filter;
+        $bcFilter               = $filter['filter'] ?? null;
+        $this->glue             = $filter['glue'] ?? null;
+        $this->field            = $filter['field'] ?? null;
+        $this->object           = $filter['object'] ?? self::CONTACT_OBJECT;
+        $this->type             = $filter['type'] ?? null;
+        $this->filter           = $filter['properties']['filter'] ?? $bcFilter;
+        $this->nullValue        = $filter['null_value'] ?? null;
+        $this->mergedProperty   = $filter['merged_property'] ?? [];
+        $this->sourceArray      = $filter;
 
         $this->setOperator($filter);
     }
@@ -75,18 +80,12 @@ class ContactSegmentFilterCrate
         return $this->field;
     }
 
-    /**
-     * @return bool
-     */
-    public function isContactType()
+    public function isContactType(): bool
     {
         return self::CONTACT_OBJECT === $this->object;
     }
 
-    /**
-     * @return bool
-     */
-    public function isCompanyType()
+    public function isCompanyType(): bool
     {
         return self::COMPANY_OBJECT === $this->object;
     }
@@ -101,14 +100,11 @@ class ContactSegmentFilterCrate
      */
     public function getFilter()
     {
-        switch ($this->getType()) {
-            case 'number':
-                return (float) $this->filter;
-            case 'boolean':
-                return (bool) $this->filter;
-        }
-
-        return $this->filter;
+        return match ($this->getType()) {
+            'number'  => (float) $this->filter,
+            'boolean' => (bool) $this->filter,
+            default   => $this->filter,
+        };
     }
 
     /**
@@ -119,44 +115,30 @@ class ContactSegmentFilterCrate
         return $this->operator;
     }
 
-    /**
-     * @return bool
-     */
-    public function isBooleanType()
+    public function isBooleanType(): bool
     {
         return 'boolean' === $this->getType();
     }
 
-    /**
-     * @return bool
-     */
-    public function isNumberType()
+    public function isNumberType(): bool
     {
         return 'number' === $this->getType();
     }
 
-    /**
-     * @return bool
-     */
-    public function isDateType()
+    public function isDateType(): bool
     {
         return 'date' === $this->getType() || $this->hasTimeParts();
     }
 
-    /**
-     * @return bool
-     */
-    public function hasTimeParts()
+    public function hasTimeParts(): bool
     {
         return 'datetime' === $this->getType();
     }
 
     /**
      * Filter value could be used directly - no modification (like regex etc.) needed.
-     *
-     * @return bool
      */
-    public function filterValueDoNotNeedAdjustment()
+    public function filterValueDoNotNeedAdjustment(): bool
     {
         return $this->isNumberType() || $this->isBooleanType();
     }
@@ -177,12 +159,12 @@ class ContactSegmentFilterCrate
         return $this->sourceArray;
     }
 
-    private function setOperator(array $filter)
+    private function setOperator(array $filter): void
     {
-        $operator = isset($filter['operator']) ? $filter['operator'] : null;
+        $operator = $filter['operator'] ?? null;
 
         if ('multiselect' === $this->getType() && in_array($operator, ['in', '!in'])) {
-            $neg            = false === strpos($operator, '!') ? '' : '!';
+            $neg            = !str_contains($operator, '!') ? '' : '!';
             $this->operator = $neg.$this->getType();
 
             return;
@@ -209,5 +191,21 @@ class ContactSegmentFilterCrate
     public function getObject(): ?string
     {
         return $this->object;
+    }
+
+    /**
+     * @return array|mixed[]
+     */
+    public function getMergedProperty(): array
+    {
+        return $this->mergedProperty;
+    }
+
+    /**
+     * @param array|mixed[] $mergedProperty
+     */
+    public function setMergedProperty(array $mergedProperty): void
+    {
+        $this->mergedProperty = $mergedProperty;
     }
 }

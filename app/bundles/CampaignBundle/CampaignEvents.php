@@ -3,7 +3,6 @@
 namespace Mautic\CampaignBundle;
 
 /**
- * Class CampaignEvents
  * Events available for CampaignBundle.
  */
 final class CampaignEvents

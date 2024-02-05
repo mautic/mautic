@@ -22,7 +22,7 @@ class TriggerCampaignCommandTest extends AbstractCampaignCommand
 
         putenv('CAMPAIGN_EXECUTIONER_SCHEDULER_ACKNOWLEDGE_SECONDS=1');
 
-        $this->segmentCountCacheHelper = self::$container->get('mautic.helper.segment.count.cache');
+        $this->segmentCountCacheHelper = static::getContainer()->get('mautic.helper.segment.count.cache');
     }
 
     public function beforeTearDown(): void
@@ -37,7 +37,7 @@ class TriggerCampaignCommandTest extends AbstractCampaignCommand
     /**
      * @throws \Exception
      */
-    public function testCampaignExecutionForAll()
+    public function testCampaignExecutionForAll(): void
     {
         // Process in batches of 10 to ensure batching is working as expected
         $this->runCommand('mautic:campaigns:trigger', ['-i' => 1, '-l' => 10]);
@@ -86,7 +86,7 @@ class TriggerCampaignCommandTest extends AbstractCampaignCommand
         $this->assertCount(0, $stats);
 
         // Wait 6 seconds then execute the campaign again to send scheduled events
-        $this->getContainer()->get(ScheduledExecutioner::class)->setNowTime(new \DateTime('+'.self::CONDITION_SECONDS.' seconds'));
+        static::getContainer()->get(ScheduledExecutioner::class)->setNowTime(new \DateTime('+'.self::CONDITION_SECONDS.' seconds'));
         $this->runCommand('mautic:campaigns:trigger', ['-i' => 1, '-l' => 10]);
 
         // Send email 1 should no longer be scheduled
@@ -130,7 +130,7 @@ class TriggerCampaignCommandTest extends AbstractCampaignCommand
         $this->assertCount(25, $byEvent[10]);
 
         // Wait another 6 seconds to go beyond the inaction timeframe
-        $this->getContainer()->get(InactiveExecutioner::class)->setNowTime(new \DateTime('+'.(self::CONDITION_SECONDS * 2).' seconds'));
+        static::getContainer()->get(InactiveExecutioner::class)->setNowTime(new \DateTime('+'.(self::CONDITION_SECONDS * 2).' seconds'));
 
         // Execute the command again to trigger inaction related events
         $this->runCommand('mautic:campaigns:trigger', ['-i' => 1, '-l' => 10]);
@@ -204,7 +204,7 @@ class TriggerCampaignCommandTest extends AbstractCampaignCommand
     /**
      * @throws \Exception
      */
-    public function testCampaignExecutionForOne()
+    public function testCampaignExecutionForOne(): void
     {
         $this->runCommand('mautic:campaigns:trigger', ['-i' => 1, '--contact-id' => 1]);
 
@@ -253,7 +253,7 @@ class TriggerCampaignCommandTest extends AbstractCampaignCommand
         $this->assertCount(0, $stats);
 
         // Wait 6 seconds then execute the campaign again to send scheduled events
-        $this->getContainer()->get(ScheduledExecutioner::class)->setNowTime(new \DateTime('+'.self::CONDITION_SECONDS.' seconds'));
+        static::getContainer()->get(ScheduledExecutioner::class)->setNowTime(new \DateTime('+'.self::CONDITION_SECONDS.' seconds'));
         $this->runCommand('mautic:campaigns:trigger', ['-i' => 1, '--contact-id' => 1]);
 
         // Send email 1 should no longer be scheduled
@@ -297,7 +297,7 @@ class TriggerCampaignCommandTest extends AbstractCampaignCommand
         $this->assertCount(1, $byEvent[10]);
 
         // Wait 6 seconds to go beyond the inaction timeframe
-        $this->getContainer()->get(InactiveExecutioner::class)->setNowTime(new \DateTime('+'.(self::CONDITION_SECONDS * 2).' seconds'));
+        static::getContainer()->get(InactiveExecutioner::class)->setNowTime(new \DateTime('+'.(self::CONDITION_SECONDS * 2).' seconds'));
 
         // Execute the command again to trigger inaction related events
         $this->runCommand('mautic:campaigns:trigger', ['-i' => 1, '--contact-id' => 1]);
@@ -365,7 +365,7 @@ class TriggerCampaignCommandTest extends AbstractCampaignCommand
         $this->assertTrue(empty($tags['EmailNotOpen']));
     }
 
-    public function testCampaignExecutionForSome()
+    public function testCampaignExecutionForSome(): void
     {
         $this->runCommand('mautic:campaigns:trigger', ['-i' => 1, '--contact-ids' => '1,2,3,4,19']);
 
@@ -414,7 +414,7 @@ class TriggerCampaignCommandTest extends AbstractCampaignCommand
         $this->assertCount(0, $stats);
 
         // Wait 6 seconds then execute the campaign again to send scheduled events
-        $this->getContainer()->get(ScheduledExecutioner::class)->setNowTime(new \DateTime('+'.self::CONDITION_SECONDS.' seconds'));
+        static::getContainer()->get(ScheduledExecutioner::class)->setNowTime(new \DateTime('+'.self::CONDITION_SECONDS.' seconds'));
         $this->runCommand('mautic:campaigns:trigger', ['-i' => 1, '--contact-ids' => '1,2,3,4,19']);
 
         // Send email 1 should no longer be scheduled
@@ -457,7 +457,7 @@ class TriggerCampaignCommandTest extends AbstractCampaignCommand
         $this->assertCount(2, $byEvent[10]);
 
         // Wait 6 seconds to go beyond the inaction timeframe
-        $this->getContainer()->get(InactiveExecutioner::class)->setNowTime(new \DateTime('+'.(self::CONDITION_SECONDS * 2).' seconds'));
+        static::getContainer()->get(InactiveExecutioner::class)->setNowTime(new \DateTime('+'.(self::CONDITION_SECONDS * 2).' seconds'));
 
         // Execute the command again to trigger inaction related events
         $this->runCommand('mautic:campaigns:trigger', ['-i' => 1, '--contact-ids' => '1,2,3,4,19']);
@@ -595,6 +595,29 @@ class TriggerCampaignCommandTest extends AbstractCampaignCommand
         $tDiff = microtime(true) - $tStart;
 
         $this->assertLessThan(10, $tDiff, 'The campaign rebuild takes more than 10 seconds, probably an infinite loop.');
+    }
+
+    public function testCampaignExecuteOrderByDateCreatedDesc(): void
+    {
+        $oldCampaign = $this->createCampaign('Some old campaign');
+        $oldCampaign->setDateAdded(new \DateTime('2019-01-03 03:54:25'));
+        $newCampaign = $this->createCampaign('New campaign');
+        $newCampaign->setDateAdded(new \DateTime());
+        $this->em->flush();
+
+        $commandTester = $this->testSymfonyCommand('mautic:campaigns:trigger');
+        $commandTester->assertCommandIsSuccessful();
+        $lines = preg_split('/\r\n|\r|\n/', $commandTester->getDisplay());
+
+        $campaignStartLines = [];
+        foreach ($lines as $line) {
+            if (str_starts_with($line, 'Triggering events for campaign')) {
+                $campaignStartLines[] = $line;
+            }
+        }
+
+        // check if the new campaign processed first
+        $this->assertEquals("Triggering events for campaign {$newCampaign->getId()}", $campaignStartLines[0]);
     }
 
     /**

@@ -6,9 +6,6 @@ use Doctrine\ORM\Mapping as ORM;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\PointBundle\Entity\Group;
 
-/**
- * Class PointsChangeLog.
- */
 class PointsChangeLog
 {
     /**
@@ -53,12 +50,12 @@ class PointsChangeLog
 
     private ?Group $group = null;
 
-    public static function loadMetadata(ORM\ClassMetadata $metadata)
+    public static function loadMetadata(ORM\ClassMetadata $metadata): void
     {
         $builder = new ClassMetadataBuilder($metadata);
 
         $builder->setTable('lead_points_change_log')
-            ->setCustomRepositoryClass('Mautic\LeadBundle\Entity\PointsChangeLogRepository')
+            ->setCustomRepositoryClass(\Mautic\LeadBundle\Entity\PointsChangeLogRepository::class)
             ->addIndex(['date_added'], 'point_date_added');
 
         $builder->addBigIntIdField();
@@ -90,10 +87,8 @@ class PointsChangeLog
 
     /**
      * Get id.
-     *
-     * @return int
      */
-    public function getId()
+    public function getId(): int
     {
         return (int) $this->id;
     }

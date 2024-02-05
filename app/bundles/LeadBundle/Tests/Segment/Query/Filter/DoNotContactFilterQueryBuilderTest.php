@@ -52,7 +52,9 @@ class DoNotContactFilterQueryBuilderTest extends TestCase
     private function createConnection(): Connection
     {
         return new class() extends Connection {
-            /** @noinspection PhpMissingParentConstructorInspection */
+            /**
+             * @noinspection PhpMissingParentConstructorInspection
+             */
             public function __construct()
             {
             }
@@ -60,37 +62,25 @@ class DoNotContactFilterQueryBuilderTest extends TestCase
     }
 
     /**
-     * @dataProvider dataApplyQueryWithBatchLimitersMinMaxBoth
-     *
      *  @param array<string, mixed> $batchLimiters
      */
     private function createFilter(string $operator, string $parameterValue, array $batchLimiters = []): ContactSegmentFilter
     {
         return new class($operator, $parameterValue, $batchLimiters) extends ContactSegmentFilter {
             /**
-             * @var string
+             * @noinspection PhpMissingParentConstructorInspection
              */
-            private $operator;
-
-            /**
-             * @var string
-             */
-            private $parameterValue;
-
-            /**
-             * @var array<string, mixed>
-             */
-            private $batchLimiters;
-
-            /** @noinspection PhpMissingParentConstructorInspection */
-            public function __construct(string $operator, string $parameterValue, array $batchLimiters)
-            {
-                $this->operator       = $operator;
-                $this->parameterValue = $parameterValue;
-                $this->batchLimiters  = $batchLimiters;
+            public function __construct(
+                private string $operator,
+                private string $parameterValue,
+                /**
+                 * @var array<string, mixed>
+                 */
+                private array $batchLimiters
+            ) {
             }
 
-            public function getDoNotContactParts()
+            public function getDoNotContactParts(): DoNotContactParts
             {
                 return new DoNotContactParts('dnc_unsubscribed');
             }
