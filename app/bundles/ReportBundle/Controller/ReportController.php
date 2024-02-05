@@ -339,9 +339,9 @@ class ReportController extends FormController
                 $entity->setColumns([]);
                 $oldSchedule = $entity->isScheduled() ? $entity->getSchedule() : null;
 
-                $newSchedule['schedule_unit']            = $this->request->request->all()['report']['scheduleUnit'];
-                $newSchedule['schedule_day']             = $this->request->request->all()['report']['scheduleDay'];
-                $newSchedule['schedule_month_frequency'] = $this->request->request->all()['report']['scheduleMonthFrequency'];
+                $newSchedule['schedule_unit']            = $request->request->all()['report']['scheduleUnit'];
+                $newSchedule['schedule_day']             = $request->request->all()['report']['scheduleDay'];
+                $newSchedule['schedule_month_frequency'] = $request->request->all()['report']['scheduleMonthFrequency'];
 
                 if ($oldSchedule != $newSchedule) {
                     $entity->setHasScheduleChanged(true);
