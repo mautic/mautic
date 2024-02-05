@@ -8,6 +8,8 @@ use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 
 /**
+ * @deprecated since Mautic 5.0, to be removed in 6.0 with no replacement.
+ *
  * @extends AbstractType<array<mixed>>
  */
 class ConfigType extends AbstractType

@@ -7,6 +7,8 @@ use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
+ * @deprecated since Mautic 5.0, to be removed in 6.0. Use \Mautic\PageBundle\Form\Type\AbTestPropertiesType instead.
+ *
  * @extends AbstractType<mixed>
  */
 class AbTestPropertiesType extends AbstractType

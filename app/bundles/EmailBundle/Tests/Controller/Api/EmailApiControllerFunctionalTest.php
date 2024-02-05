@@ -22,6 +22,8 @@ class EmailApiControllerFunctionalTest extends MauticMysqlTestCase
 
     protected function setUp(): void
     {
+        $this->configParams['mailer_from_name']       = 'Mautic Admin';
+        $this->configParams['default_signature_text'] = 'Best regards, |FROM_NAME|';
         parent::setUp();
         $this->loadFixtures([LoadCategoryData::class]);
         $this->setUpMailer();
@@ -29,7 +31,7 @@ class EmailApiControllerFunctionalTest extends MauticMysqlTestCase
 
     private function setUpMailer(): void
     {
-        $mailHelper = self::$container->get('mautic.helper.mailer');
+        $mailHelper = static::getContainer()->get('mautic.helper.mailer');
         $transport  = new SmtpTransport();
         $mailer     = new Mailer($transport);
         $this->setPrivateProperty($mailHelper, 'mailer', $mailer);
@@ -41,7 +43,7 @@ class EmailApiControllerFunctionalTest extends MauticMysqlTestCase
     protected function beforeTearDown(): void
     {
         // Clear owners cache (to leave a clean environment for future tests):
-        $mailHelper = self::$container->get('mautic.helper.mailer');
+        $mailHelper = static::getContainer()->get('mautic.helper.mailer');
         $this->setPrivateProperty($mailHelper, 'leadOwners', []);
     }
 
@@ -194,7 +196,7 @@ class EmailApiControllerFunctionalTest extends MauticMysqlTestCase
         $trackingHash = 'tracking_hash_123';
 
         /** @var StatRepository $statRepository */
-        $statRepository = self::$container->get('mautic.email.repository.stat');
+        $statRepository = static::getContainer()->get('mautic.email.repository.stat');
 
         // Create a test email stat.
         $stat = new Stat();
@@ -247,7 +249,9 @@ class EmailApiControllerFunctionalTest extends MauticMysqlTestCase
         $user->setEmail('john@api.test');
         $user->setSignature('Best regards, |FROM_NAME|');
         $user->setRole($role);
-        $encoder = self::$container->get('security.encoder_factory')->getEncoder($user);
+
+        $encoder = static::getContainer()->get('security.encoder_factory')->getEncoder($user);
+
         $user->setPassword($encoder->encodePassword('password', null));
         $this->em->persist($user);
 
@@ -279,7 +283,6 @@ class EmailApiControllerFunctionalTest extends MauticMysqlTestCase
         $this->em->flush();
 
         $contactId = $contact->getId();
-        $segmentId = $segment->getId();
 
         // Create an email:
         $createEmail = function () use ($segment) {
@@ -288,7 +291,7 @@ class EmailApiControllerFunctionalTest extends MauticMysqlTestCase
             $email->setSubject('Email created via API test');
             $email->setEmailType('list');
             $email->addList($segment);
-            $email->setCustomHtml('<h1>Email content created by an API test</h1><br>{signature}');
+            $email->setCustomHtml('<h1>Email content created by an API test</h1>{custom-token}<br>{signature}');
             $email->setIsPublished(true);
             $email->setFromAddress('from@api.test');
             $email->setFromName('API Test');
@@ -311,28 +314,29 @@ class EmailApiControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertSame(200, $clientResponse->getStatusCode(), $clientResponse->getContent());
         $this->assertEquals($sendResponse, ['success' => true, 'sentCount' => 1, 'failedRecipients' => 0], $clientResponse->getContent());
 
-        $testEmail = function (): void {
+        $testEmail = function (string $customToken): void {
             $message = $this->transport->sentMessage;
             $this->assertSame($message->getSubject(), 'Email created via API test');
-            $bodyRegExp = '#<h1>Email content created by an API test</h1><br><img height="1" width="1" src="[^"]+" alt="" />#';
+            $bodyRegExp = '#<h1>Email content created by an API test</h1>'.$customToken.'<br>Best regards, Mautic Admin<img height="1" width="1" src="[^"]+" alt="" />#';
             $this->assertMatchesRegularExpression($bodyRegExp, $message->getHtmlBody());
             $this->assertSame([$message->getTo()[0]->getAddress() => $message->getTo()[0]->getName()], ['jane@api.test' => 'Jane Doe']);
             $this->assertSame([$message->getFrom()[0]->getAddress() => $message->getFrom()[0]->getName()], ['from@api.test' => 'API Test']);
             $this->assertSame([$message->getReplyTo()[0]->getAddress() => $message->getReplyTo()[0]->getName()], ['reply@api.test' => '']);
             $this->assertSame([$message->getBcc()[0]->getAddress() => $message->getBcc()[0]->getName()], ['bcc@api.test' => '']);
         };
-        $testEmail();
+        $testEmail('{custom-token}');
 
         // Send to contact:
-        $this->client->request('POST', "/api/emails/{$emailId}/contact/{$contactId}/send");
+        $this->client->request('POST', "/api/emails/{$emailId}/contact/{$contactId}/send", ['tokens' => ['{custom-token}' => 'custom <b>value</b>']]);
+
         $clientResponse = $this->client->getResponse();
 
         $this->assertSame(200, $clientResponse->getStatusCode(), $clientResponse->getContent());
 
-        $sendResponse   = json_decode($clientResponse->getContent(), true);
+        $sendResponse = json_decode($clientResponse->getContent(), true);
 
         $this->assertEquals($sendResponse, ['success' => true], $clientResponse->getContent());
-        $testEmail();
+        $testEmail('custom <b>value</b>');
 
         // Test use owner as mailer:
         $email = $createEmail();
@@ -353,7 +357,7 @@ class EmailApiControllerFunctionalTest extends MauticMysqlTestCase
         $testEmailOwnerAsMailer = function (): void {
             $message = $this->transport->sentMessage;
             $this->assertSame($message->getSubject(), 'Email created via API test');
-            $bodyRegExp = '#<h1>Email content created by an API test</h1><br>Best regards, John Doe<img height="1" width="1" src="[^"]+" alt="" />#';
+            $bodyRegExp = '#<h1>Email content created by an API test</h1>{custom-token}<br>Best regards, John Doe<img height="1" width="1" src="[^"]+" alt="" />#';
             $this->assertMatchesRegularExpression($bodyRegExp, $message->getHtmlBody());
             $this->assertSame([$message->getTo()[0]->getAddress() => $message->getTo()[0]->getName()], ['jane@api.test' => 'Jane Doe']);
             $this->assertSame([$message->getFrom()[0]->getAddress() => $message->getFrom()[0]->getName()], ['john@api.test' => 'John Doe']);
@@ -368,7 +372,7 @@ class EmailApiControllerFunctionalTest extends MauticMysqlTestCase
 
         $this->assertSame(200, $clientResponse->getStatusCode(), $clientResponse->getContent());
 
-        $sendResponse   = json_decode($clientResponse->getContent(), true);
+        $sendResponse = json_decode($clientResponse->getContent(), true);
 
         $this->assertEquals($sendResponse, ['success' => true], $clientResponse->getContent());
         $testEmailOwnerAsMailer();
@@ -383,14 +387,14 @@ class EmailApiControllerFunctionalTest extends MauticMysqlTestCase
 
         $this->assertSame(200, $clientResponse->getStatusCode(), $clientResponse->getContent());
 
-        $sendResponse   = json_decode($clientResponse->getContent(), true);
+        $sendResponse = json_decode($clientResponse->getContent(), true);
 
         $this->assertEquals($sendResponse, ['success' => true], $clientResponse->getContent());
 
         $testCustomReplyTo = function (): void {
             $message = $this->transport->sentMessage;
             $this->assertSame($message->getSubject(), 'Email created via API test');
-            $bodyRegExp = '#<h1>Email content created by an API test</h1><br>Best regards, John Doe<img height="1" width="1" src="[^"]+" alt="" />#';
+            $bodyRegExp = '#<h1>Email content created by an API test</h1>{custom-token}<br>Best regards, John Doe<img height="1" width="1" src="[^"]+" alt="" />#';
             $this->assertMatchesRegularExpression($bodyRegExp, $message->getHtmlBody());
             $this->assertSame([$message->getTo()[0]->getAddress() => $message->getTo()[0]->getName()], ['jane@api.test' => 'Jane Doe']);
             $this->assertSame([$message->getFrom()[0]->getAddress() => $message->getFrom()[0]->getName()], ['john@api.test' => 'John Doe']);

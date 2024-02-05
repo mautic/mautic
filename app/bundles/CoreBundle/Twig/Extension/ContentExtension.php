@@ -20,6 +20,7 @@ class ContentExtension extends AbstractExtension
         return [
             new TwigFunction('customContent', [$this, 'getCustomContent'], ['is_safe' => ['all']]),
             new TwigFunction('showScriptTags', [$this, 'showScriptTags'], ['is_safe' => ['all']]),
+            new TwigFunction('getSortedEditorFonts', [$this, 'sortEditorFonts']),
         ];
     }
 
@@ -42,5 +43,22 @@ class ContentExtension extends AbstractExtension
     public function showScriptTags(string $html): string
     {
         return $this->contentHelper->showScriptTags($html);
+    }
+
+    /**
+     * @param array<mixed> $fonts
+     *
+     * @return array<mixed>
+     */
+    public function sortEditorFonts(array $fonts): array
+    {
+        usort($fonts, static function ($fontA, $fontB): int {
+            $fontAName = $fontA['name'] ?? '';
+            $fontBName = $fontB['name'] ?? '';
+
+            return strcasecmp($fontAName, $fontBName);
+        });
+
+        return $fonts;
     }
 }
