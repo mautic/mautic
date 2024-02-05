@@ -205,7 +205,7 @@ class EventExecutioner
         $logs   = $this->eventLogger->generateLogsFromContacts($event, $config, $contacts, $isInactiveEvent);
 
         // Save updated log entries and clear from memory
-        if (!empty($logs)) {
+        if (!$logs->isEmpty()) {
             $this->eventLogger->persistCollection($logs)
                 ->clearCollection($logs);
         }
@@ -218,7 +218,7 @@ class EventExecutioner
     {
         $config = $this->collector->getEventConfig($event);
         $logs   = $this->eventLogger->generateLogsFromContacts($event, $config, $contacts, $isInactiveEvent);
-        if (!empty($logs)) {
+        if (!$logs->isEmpty()) {
             foreach ($logs as $log) {
                 $failedLog = new FailedLeadEventLog();
                 $failedLog->setLog($log)
