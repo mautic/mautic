@@ -11,10 +11,6 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
  */
 class RedirectListType extends AbstractType
 {
-    public function __construct()
-    {
-    }
-
     public function configureOptions(OptionsResolver $resolver): void
     {
         $choices = [
