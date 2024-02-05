@@ -205,6 +205,8 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
      */
     private $clonedId;
 
+    private ?bool $continueSending = false;
+
     public function __clone()
     {
         $this->clonedId         = $this->id;
@@ -217,6 +219,7 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
         $this->variantStartDate = null;
         $this->emailType        = null;
         $this->sessionId        = 'new_'.hash('sha1', uniqid(mt_rand()));
+        $this->continueSending  = false;
         $this->plainText        = null;
         $this->publishUp        = null;
         $this->publishDown      = null;
@@ -269,6 +272,7 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
         $builder->addNullableField('customHtml', Types::TEXT, 'custom_html');
         $builder->addNullableField('emailType', Types::TEXT, 'email_type');
         $builder->addPublishDates();
+        $builder->addNullableField('continueSending', Types::BOOLEAN, 'continue_sending');
         $builder->addNamedField('readCount', Types::INTEGER, 'read_count');
         $builder->addNamedField('sentCount', Types::INTEGER, 'sent_count');
         $builder->addNamedField('variantSentCount', Types::INTEGER, 'variant_sent_count');
@@ -776,6 +780,10 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
      */
     public function getPublishDown()
     {
+        if ($this->isSegmentEmail() && !$this->isContinueSending()) {
+            return null;
+        }
+
         return $this->publishDown;
     }
 
@@ -899,6 +907,24 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
     public function setPlainText($plainText)
     {
         $this->plainText = $plainText;
+
+        return $this;
+    }
+
+    public function isContinueSending(): ?bool
+    {
+        return $this->continueSending;
+    }
+
+    public function getContinueSending(): ?bool
+    {
+        return $this->continueSending;
+    }
+
+    public function setContinueSending(?bool $continueSending): self
+    {
+        $this->isChanged('continueSending', $continueSending);
+        $this->continueSending = $continueSending;
 
         return $this;
     }
@@ -1170,5 +1196,10 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
     public function isBackgroundSending(): bool
     {
         return $this->isPublished() && !empty($this->getPublishUp()) && ($this->getPublishUp() < new \DateTime());
+    }
+
+    public function isSegmentEmail(): bool
+    {
+        return 'list' === $this->getEmailType();
     }
 }

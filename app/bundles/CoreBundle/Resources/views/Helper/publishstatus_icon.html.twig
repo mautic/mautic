@@ -39,6 +39,12 @@
 {%- elseif status is same as 'pending' %}
   {%- set icon = 'fa-clock-o text-warning' %}
   {%- set text = 'mautic.core.form.pending.start_at'|trans({'%date%': dateToFull(item.publishUp)}) %}
+{%- elseif status is same as 'running' %}
+  {%- set icon = 'fa-pause-circle-o text-success' %}
+  {%- set text = 'mautic.core.form.running'|trans %}
+{%- elseif status is same as 'sent' %}
+    {%- set icon = 'fa-check-circle text-success' %}
+    {%- set text = 'mautic.core.form.sent'|trans %}
 {%- endif %}
 
 {%- if true is same as status %}

@@ -41,6 +41,7 @@
             'iconClass' : 'fa fa-send-o',
             'btnText'   : 'mautic.email.send',
             'primary'   : true,
+            'priority'  : 500,
         } %}
         {% if email.isBackgroundSending() %}
             {% set sendButton = sendButton|merge({'tooltip' : 'mautic.email.send.disabled'}) %}
@@ -49,19 +50,38 @@
 
         {% set customButtons = customButtons|merge([sendButton]) %}
     {% endif %}
-    {% set sendExampleButton = {
-        'attr' : {
-            'class'       : 'btn btn-default btn-nospin',
-            'data-toggle' : 'ajaxmodal',
-            'data-target' : '#MauticSharedModal',
-            'href'        : path('mautic_email_action', {'objectAction' : 'sendExample', 'objectId' : email.getId()}),
-            'data-header' : 'mautic.email.send.example'|trans,
+
+    {% set sendButton = [
+        {
+            'attr': {
+            'class': 'btn btn-default btn-nospin',
+            'data-toggle': 'ajaxmodal',
+            'data-target': '#MauticSharedModal',
+            'href': path('mautic_email_action', {'objectAction': 'scheduleSend', 'objectId': email.getId()}),
+            'data-header': 'mautic.email.send.schedule'|trans
         },
-        'iconClass' : 'fa fa-send',
-        'btnText'   : 'mautic.email.send.example',
-        'primary'   : true,
-    } %}
-    {% set customButtons = customButtons|merge([sendExampleButton]) %}
+            'iconClass': 'fa fa-clock-o',
+            'btnText': 'mautic.email.send.schedule',
+            'primary': true,
+            'priority': 400
+        },
+        {
+            'attr': {
+            'class': 'btn btn-default btn-nospin',
+            'data-toggle': 'ajaxmodal',
+            'data-target': '#MauticSharedModal',
+            'href': path('mautic_email_action', {'objectAction': 'sendExample', 'objectId': email.getId()}),
+            'data-header': 'mautic.email.send.example'|trans
+        },
+            'iconClass': 'fa fa-send-o',
+            'btnText': 'mautic.email.send.example',
+            'primary': true,
+            'priority': 300
+        }
+    ] %}
+
+    {% set customButtons = customButtons|merge(sendButton) %}
+
     {% set heatmapButton = {
         'attr' : {
             'class'       : 'btn btn-default btn-nospin',

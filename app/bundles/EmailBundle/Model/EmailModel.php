@@ -6,7 +6,6 @@ use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Query\QueryBuilder;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\OptimisticLockException;
-use Exception;
 use Mautic\ChannelBundle\Entity\MessageQueue;
 use Mautic\ChannelBundle\Model\MessageQueueModel;
 use Mautic\CoreBundle\Helper\ArrayHelper;
@@ -919,7 +918,8 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
             $maxContactId,
             $countWithMaxMin,
             $maxThreads,
-            $threadId
+            $threadId,
+            $email->isSegmentEmail() && !$email->getContinueSending() ? $email->getPublishUp() : null,
         );
 
         if ($storeToCache) {
@@ -2277,5 +2277,23 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
         $context->setScheme($original_scheme);
 
         return $url;
+    }
+
+    public function getPublishStatus(Email $email): string
+    {
+        $publishStatus = $email->getPublishStatus();
+        if ($email->isSegmentEmail() && $email->getPublishUp()) {
+            if ('published' == $publishStatus) {
+                if ($email->isContinueSending()) {
+                    $publishStatus = 'running';
+                } elseif ($email->getPendingCount()) {
+                    $publishStatus = 'running';
+                } else {
+                    $publishStatus = 'sent';
+                }
+            }
+        }
+
+        return $publishStatus;
     }
 }

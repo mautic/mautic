@@ -1,5 +1,5 @@
 {% set labelColor %}
-    {%- if entity.getPublishStatus() is same as('published') -%}
+    {%- if entity.getPublishStatus() is same as('published') or entity.getPublishStatus() is same as('running') or entity.getPublishStatus() is same as('sent') -%}
         success
     {%- elseif entity.getPublishStatus() is same as('unpublished') or entity.getPublishStatus() is same as('expired') -%}
         danger
@@ -7,5 +7,6 @@
         warning
     {%- endif -%}
 {% endset %}
-{% set labelText = ('mautic.core.form.' ~ entity.getPublishStatus())|trans %}
+{% set publishStatus = publishStatus|default(entity.getPublishStatus()) %}
+{% set labelText = ('mautic.core.form.' ~ publishStatus)|trans %}
 <h4 class="fw-sb"><span class="tt-u label label-{{ labelColor }}">{{ labelText }}</span></h4>

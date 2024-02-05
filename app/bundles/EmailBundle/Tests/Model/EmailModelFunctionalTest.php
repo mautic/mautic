@@ -11,9 +11,12 @@ use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\LeadBundle\Entity\ListLead;
 use Mautic\LeadBundle\Model\LeadModel;
+use Symfony\Component\HttpFoundation\Request;
 
 class EmailModelFunctionalTest extends MauticMysqlTestCase
 {
+    protected $useCleanupRollback = true;
+
     protected function beforeBeginTransaction(): void
     {
         $this->resetAutoincrement(['leads']);
@@ -71,13 +74,13 @@ class EmailModelFunctionalTest extends MauticMysqlTestCase
     /**
      * @param Lead[] $contacts
      */
-    private function addContactsToSegment(array $contacts, LeadList $segment): void
+    private function addContactsToSegment(array $contacts, LeadList $segment, ?\DateTime $dateAdded = null): void
     {
         foreach ($contacts as $contact) {
             $reference = new ListLead();
             $reference->setLead($contact);
             $reference->setList($segment);
-            $reference->setDateAdded(new \DateTime());
+            $reference->setDateAdded($dateAdded ?? new \DateTime());
             $this->em->persist($reference);
         }
 
@@ -92,6 +95,7 @@ class EmailModelFunctionalTest extends MauticMysqlTestCase
         $email->setCustomHtml('Email content');
         $email->setEmailType('list');
         $email->setPublishUp(new \DateTime('-1 day'));
+        $email->setContinueSending(true);
         $email->setIsPublished(true);
         $email->addList($segment);
         $this->em->persist($email);
@@ -164,4 +168,71 @@ class EmailModelFunctionalTest extends MauticMysqlTestCase
        self::assertSame($customHtmlParent, $parentEmail->getCustomHtml());
        self::assertSame($customHtmlChildren, $childrenEmail->getCustomHtml());
    }
+
+    public function testScheduledSendEmailToLists(): void
+    {
+        $contacts       = array_chunk($this->generateContacts(23), 20);
+        $contactsBefore = $contacts[0];
+        $contactsAfter  = $contacts[1];
+
+        $segment  = $this->createSegment();
+        $this->addContactsToSegment($contactsBefore, $segment, new \DateTime('-2 days'));
+
+        $emailWithContinueSending = $this->createEmail($segment);
+
+        $emailWithoutContinueSending = $this->createEmail($segment);
+        $emailWithoutContinueSending->setContinueSending(false);
+        $this->em->persist($emailWithoutContinueSending);
+
+        $this->em->flush();
+
+        $emailModel                                             =  self::$container->get('mautic.email.model.email');
+        \assert($emailModel instanceof EmailModel);
+
+        // refresh pending count in cache
+        $pendingWithContinueSending    = $emailModel->getPendingLeads($emailWithContinueSending, null, true);
+        $pendingWithoutContinueSending = $emailModel->getPendingLeads($emailWithoutContinueSending, null, true);
+
+        $crawler = $this->client->request(Request::METHOD_GET, '/s/emails');
+        $this->assertEquals(2, $crawler->filter('.fa-pause-circle-o')->count());
+        $this->assertEquals(0, $crawler->filter('.fa-check-circle')->count());
+
+        $crawler = $this->client->request(Request::METHOD_GET, "/s/emails/view/{$emailWithContinueSending->getId()}");
+        // check If  element with class label-success has value Running
+        $this->assertStringContainsString('Running', $crawler->filter('.label-success')->text());
+
+        $crawler = $this->client->request(Request::METHOD_GET, "/s/emails/view/{$emailWithoutContinueSending->getId()}");
+        // check If  element with class label-success has value Running
+        $this->assertStringContainsString('Running', $crawler->filter('.label-success')->text());
+
+        [$sentCount] = $emailModel->sendEmailToLists($emailWithContinueSending, [$segment]);
+        $this->assertEquals($sentCount, 20);
+
+        [$sentCount] = $emailModel->sendEmailToLists($emailWithoutContinueSending, [$segment]);
+        $this->assertEquals($sentCount, 20);
+
+        // refresh pending count in cache
+        $pendingWithContinueSending    = $emailModel->getPendingLeads($emailWithContinueSending, null, true);
+        $pendingWithoutContinueSending = $emailModel->getPendingLeads($emailWithoutContinueSending, null, true);
+
+        $crawler = $this->client->request(Request::METHOD_GET, '/s/emails');
+        $this->assertEquals(1, $crawler->filter('.fa-pause-circle-o')->count());
+        $this->assertEquals(1, $crawler->filter('.fa-check-circle')->count());
+
+        $crawler = $this->client->request(Request::METHOD_GET, "/s/emails/view/{$emailWithContinueSending->getId()}");
+        // check If  element with class label-success has value Running
+        $this->assertStringContainsString('Running', $crawler->filter('.label-success')->text());
+
+        $crawler = $this->client->request(Request::METHOD_GET, "/s/emails/view/{$emailWithoutContinueSending->getId()}");
+        // check If  element with class label-success has value Running
+        $this->assertStringContainsString('Sent', $crawler->filter('.label-success')->text());
+
+        $this->addContactsToSegment($contactsAfter, $segment);
+
+        [$sentCount] = $emailModel->sendEmailToLists($emailWithContinueSending, [$segment]);
+        $this->assertEquals($sentCount, 3);
+
+        [$sentCount] = $emailModel->sendEmailToLists($emailWithoutContinueSending, [$segment]);
+        $this->assertEquals($sentCount, 0);
+    }
 }
