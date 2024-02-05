@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html>
+    {{ include('@MauticCore/Default/head.html.twig', {
+            headerTitle: block('headerTitle') is defined ? block('headerTitle') : headerTitle|default(''),
+            pageTitle: block('pageTitle') is defined ? block('pageTitle') : 'Mautic',
+        })
+    }}
+    <body class="header-fixed">
+        <section id="app-wrapper">
+            {{ outputScripts('bodyOpen') }}
+
+            {{ include('@MauticCore/Notification/flashes.html.twig') }}
+
+            <aside class="app-sidebar sidebar-left">
+                {{ include('@MauticCore/LeftPanel/index.html.twig') }}
+            </aside>
+
+            <aside class="app-sidebar sidebar-right">
+                {{ include('@MauticCore/RightPanel/index.html.twig') }}
+            </aside>
+
+            <header id="app-header" class="navbar">
+                {{ include('@MauticCore/Default/navbar.html.twig') }}
+            </header>
+
+            <!-- start: app-footer(need to put on top of #app-content)-->
+            <footer id="app-footer">
+                <div class="container-fluid">
+                    <div class="row">
+                        <div class="col-xs-6 text-muted">{% trans with {'%date%': 'now' | date('Y') } %}mautic.core.copyright{% endtrans %}</div>
+                        <div class="col-xs-6 text-muted text-right small">v{{ mauticAppVersion() }}</div>
+                    </div>
+                </div>
+            </footer>
+            <!--/ end: app-footer -->
+
+            <section id="app-content">
+                {% block _content %}
+                    {{ include('@MauticCore/Default/output.html.twig') }}
+                {% endblock %}
+            </section>
+
+            <script>
+                Mautic.onPageLoad('body');
+                {% if app.environment is same as 'dev' %}
+                mQuery( document ).ajaxComplete(function(event, XMLHttpRequest, ajaxOption){
+                    if(XMLHttpRequest.responseJSON && typeof XMLHttpRequest.responseJSON.ignore_wdt == 'undefined' && XMLHttpRequest.getResponseHeader('x-debug-token')) {
+                        if (mQuery('[class*="sf-tool"]').length) {
+                            mQuery('[class*="sf-tool"]').remove();
+                        }
+
+                        mQuery.get(mauticBaseUrl + '_wdt/'+XMLHttpRequest.getResponseHeader('x-debug-token'),function(data){
+                            mQuery('body').append('<div class="sf-toolbar-reload">'+data+'</div>');
+                        });
+                    }
+                });
+                {% endif %}
+            </script>
+            {{ outputScripts('bodyClose') }}
+            {{ include('@MauticCore/Helper/modal.html.twig', {
+                id: 'MauticSharedModal',
+                footerButtons: true
+            }) }}
+        </section>
+    </body>
+</html>

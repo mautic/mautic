@@ -1,7 +1,7 @@
 {
   "name": "Truly Personal",
-  "author": "Alex Hammerschmied",
-  "authorUrl": "https://hartmut.io",
+  "author": "Mautic team",
+  "authorUrl": "https://mautic.org",
   "builder": ["grapesjsbuilder"],
   "features": [
     "email"

@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2019 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\LeadBundle\Segment\Stat;
 
 use Doctrine\ORM\EntityManager;
@@ -17,29 +8,11 @@ use Mautic\CoreBundle\Helper\CacheStorageHelper;
 
 class SegmentCampaignShare
 {
-    /**
-     * @var CampaignModel
-     */
-    private $campaignModel;
-
-    /**
-     * @var CacheStorageHelper
-     */
-    private $cacheStorageHelper;
-
-    /**
-     * @var EntityManager
-     */
-    private $entityManager;
-
-    /**
-     * SegmentCampaignShare constructor.
-     */
-    public function __construct(CampaignModel $campaignModel, CacheStorageHelper $cacheStorageHelper, EntityManager $entityManager)
-    {
-        $this->campaignModel      = $campaignModel;
-        $this->cacheStorageHelper = $cacheStorageHelper;
-        $this->entityManager      = $entityManager;
+    public function __construct(
+        private CampaignModel $campaignModel,
+        private CacheStorageHelper $cacheStorageHelper,
+        private EntityManager $entityManager
+    ) {
     }
 
     /**
@@ -71,7 +44,8 @@ class SegmentCampaignShare
             ->where($this->campaignModel->getRepository()->getPublishedByDateExpression($q))
             ->orderBy('c.id', 'DESC');
 
-        $campaigns = $q->execute()->fetchAll();
+        $campaigns = $q->executeQuery()->fetchAllAssociative();
+
         foreach ($campaigns as &$campaign) {
             // just load from cache If exists
             if ($share  = $this->cacheStorageHelper->get($this->getCachedKey($segmentId, $campaign['id']))) {
@@ -85,10 +59,8 @@ class SegmentCampaignShare
     /**
      * @param int $segmentId
      * @param int $campaignId
-     *
-     * @return string
      */
-    private function getCachedKey($segmentId, $campaignId)
+    private function getCachedKey($segmentId, $campaignId): string
     {
         return sprintf('%s|%s|%s|%s|%s', 'campaign', $campaignId, 'segment', $segmentId, 'share');
     }

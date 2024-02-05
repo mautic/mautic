@@ -2,15 +2,6 @@
 
 declare(strict_types=1);
 
-/*
- * @copyright   2019 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\LeadBundle\Event;
 
 use Mautic\CoreBundle\Event\CommonEvent;
@@ -19,16 +10,13 @@ use Mautic\LeadBundle\Entity\LeadEventLog;
 
 final class ImportProcessEvent extends CommonEvent
 {
-    public Import $import;
-    public LeadEventLog $eventLog;
-    public array $rowData;
     private ?bool $wasMerged = null;
 
-    public function __construct(Import $import, LeadEventLog $eventLog, array $rowData)
-    {
-        $this->import   = $import;
-        $this->eventLog = $eventLog;
-        $this->rowData  = $rowData;
+    public function __construct(
+        public Import $import,
+        public LeadEventLog $eventLog,
+        public array $rowData
+    ) {
     }
 
     public function setWasMerged(bool $wasMerged): void

@@ -2,15 +2,6 @@
 
 declare(strict_types=1);
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\FormBundle\Tests\Model;
 
 use Mautic\CoreBundle\Exception\FileUploadException;
@@ -26,7 +17,9 @@ use Symfony\Component\HttpFoundation\File\UploadedFile;
 class FormUploaderTest extends \PHPUnit\Framework\TestCase
 {
     private $formId1   = 1;
+
     private $formId2   = 2;
+
     private $uploadDir = __DIR__.'/DummyFiles';
 
     /**

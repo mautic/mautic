@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CoreBundle\Controller;
 
 use Mautic\CoreBundle\CoreEvents;
@@ -16,9 +7,7 @@ use Mautic\CoreBundle\Event\GlobalSearchEvent;
 use Symfony\Component\HttpFoundation\Request;
 
 /**
- * Class DefaultController.
- *
- * Almost all other Mautic Bundle controllers extend this default controller
+ * Almost all other Mautic Bundle controllers extend this default controller.
  */
 class DefaultController extends CommonController
 {
@@ -30,7 +19,7 @@ class DefaultController extends CommonController
         $root = $this->coreParametersHelper->get('webroot');
 
         if (empty($root)) {
-            return $this->redirect($this->generateUrl('mautic_dashboard_index'));
+            return $this->redirectToRoute('mautic_dashboard_index');
         } else {
             /** @var \Mautic\PageBundle\Model\PageModel $pageModel */
             $pageModel = $this->getModel('page');
@@ -44,27 +33,24 @@ class DefaultController extends CommonController
 
             $request->attributes->set('ignore_mismatch', true);
 
-            return $this->forward('MauticPageBundle:Public:index', ['slug' => $slug]);
+            return $this->forward('Mautic\PageBundle\Controller\PublicController::indexAction', ['slug' => $slug]);
         }
     }
 
-    /**
-     * @return \Symfony\Component\HttpFoundation\Response
-     */
-    public function globalSearchAction()
+    public function globalSearchAction(Request $request): \Symfony\Component\HttpFoundation\Response
     {
-        $searchStr = $this->request->get('global_search', $this->get('session')->get('mautic.global_search', ''));
-        $this->get('session')->set('mautic.global_search', $searchStr);
+        $searchStr = $request->get('global_search', $request->getSession()->get('mautic.global_search', ''));
+        $request->getSession()->set('mautic.global_search', $searchStr);
 
         if (!empty($searchStr)) {
-            $event = new GlobalSearchEvent($searchStr, $this->get('translator'));
-            $this->get('event_dispatcher')->dispatch(CoreEvents::GLOBAL_SEARCH, $event);
+            $event = new GlobalSearchEvent($searchStr, $this->translator);
+            $this->dispatcher->dispatch($event, CoreEvents::GLOBAL_SEARCH);
             $results = $event->getResults();
         } else {
             $results = [];
         }
 
-        return $this->render('MauticCoreBundle:GlobalSearch:globalsearch.html.php',
+        return $this->render('@MauticCore/GlobalSearch/globalsearch.html.twig',
             [
                 'results'      => $results,
                 'searchString' => $searchStr,
@@ -75,16 +61,16 @@ class DefaultController extends CommonController
     /**
      * @return \Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\Response
      */
-    public function notificationsAction()
+    public function notificationsAction(): \Symfony\Component\HttpFoundation\Response
     {
         /** @var \Mautic\CoreBundle\Model\NotificationModel $model */
         $model = $this->getModel('core.notification');
 
-        list($notifications, $showNewIndicator, $updateMessage) = $model->getNotificationContent(null, false, 200);
+        [$notifications, $showNewIndicator, $updateMessage] = $model->getNotificationContent(null, false, 200);
 
         return $this->delegateView(
             [
-                'contentTemplate' => 'MauticCoreBundle:Notification:notifications.html.php',
+                'contentTemplate' => '@MauticCore/Notification/notifications.html.twig',
                 'viewParameters'  => [
                     'showNewIndicator' => $showNewIndicator,
                     'notifications'    => $notifications,

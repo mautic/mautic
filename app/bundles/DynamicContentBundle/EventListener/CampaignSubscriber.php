@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2016 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\DynamicContentBundle\EventListener;
 
 use Mautic\CampaignBundle\CampaignEvents;
@@ -22,34 +13,18 @@ use Mautic\DynamicContentBundle\Form\Type\DynamicContentSendType;
 use Mautic\DynamicContentBundle\Model\DynamicContentModel;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-use Symfony\Component\HttpFoundation\Session\Session;
+use Symfony\Component\HttpFoundation\Session\SessionInterface;
 
 class CampaignSubscriber implements EventSubscriberInterface
 {
-    /**
-     * @var DynamicContentModel
-     */
-    private $dynamicContentModel;
-    /**
-     * @var Session
-     */
-    private $session;
-    /**
-     * @var EventDispatcherInterface
-     */
-    private $dispatcher;
-
-    public function __construct(DynamicContentModel $dynamicContentModel, Session $session, EventDispatcherInterface $dispatcher)
-    {
-        $this->dynamicContentModel = $dynamicContentModel;
-        $this->session             = $session;
-        $this->dispatcher          = $dispatcher;
+    public function __construct(
+        private DynamicContentModel $dynamicContentModel,
+        private SessionInterface $session,
+        private EventDispatcherInterface $dispatcher
+    ) {
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             CampaignEvents::CAMPAIGN_ON_BUILD                  => ['onCampaignBuild', 0],
@@ -58,7 +33,7 @@ class CampaignSubscriber implements EventSubscriberInterface
         ];
     }
 
-    public function onCampaignBuild(CampaignBuilderEvent $event)
+    public function onCampaignBuild(CampaignBuilderEvent $event): void
     {
         $event->addAction(
             'dwc.push_content',
@@ -68,8 +43,8 @@ class CampaignSubscriber implements EventSubscriberInterface
                 'eventName'              => DynamicContentEvents::ON_CAMPAIGN_TRIGGER_ACTION,
                 'formType'               => DynamicContentSendType::class,
                 'formTypeOptions'        => ['update_select' => 'campaignevent_properties_dynamicContent'],
-                'formTheme'              => 'MauticDynamicContentBundle:FormTheme\DynamicContentPushList',
-                'timelineTemplate'       => 'MauticDynamicContentBundle:SubscribedEvents\Timeline:index.html.php',
+                'formTheme'              => '@MauticDynamicContent/FormTheme/DynamicContentPushList/_dynamiccontentpush_list_row.html.twig',
+                'timelineTemplate'       => '@MauticDynamicContent/SubscribedEvents/Timeline/index.html.twig',
                 'hideTriggerMode'        => true,
                 'connectionRestrictions' => [
                     'anchor' => [
@@ -94,7 +69,7 @@ class CampaignSubscriber implements EventSubscriberInterface
                 'eventName'       => DynamicContentEvents::ON_CAMPAIGN_TRIGGER_DECISION,
                 'formType'        => DynamicContentDecisionType::class,
                 'formTypeOptions' => ['update_select' => 'campaignevent_properties_dynamicContent'],
-                'formTheme'       => 'MauticDynamicContentBundle:FormTheme\DynamicContentDecisionList',
+                'formTheme'       => '@MauticDynamicContent/FormTheme/DynamicContentDecisionList/_dynamiccontentdecision_list_row.html.twig',
                 'channel'         => 'dynamicContent',
                 'channelIdField'  => 'dynamicContent',
             ]
@@ -141,7 +116,7 @@ class CampaignSubscriber implements EventSubscriberInterface
 
         if ($dwc instanceof DynamicContent) {
             // Use translation if available
-            [, $dwc] = $this->dynamicContentModel->getTranslatedEntity($dwc, $lead);
+            list($ignore, $dwc) = $this->dynamicContentModel->getTranslatedEntity($dwc, $lead);
 
             if ($slot) {
                 $this->dynamicContentModel->setSlotContentForLead($dwc, $lead, $slot);
@@ -151,7 +126,7 @@ class CampaignSubscriber implements EventSubscriberInterface
 
             $tokenEvent = new TokenReplacementEvent($dwc->getContent(), $lead, ['slot' => $slot, 'dynamic_content_id' => $dwc->getId()]);
             $tokenEvent->setStat($stat);
-            $this->dispatcher->dispatch(DynamicContentEvents::TOKEN_REPLACEMENT, $tokenEvent);
+            $this->dispatcher->dispatch($tokenEvent, DynamicContentEvents::TOKEN_REPLACEMENT);
 
             $content = $tokenEvent->getContent();
             $content = preg_replace('#<script(.*?)>(.*?)</script>#is', '', $content);

@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2019 Mautic, Inc. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://mautic.com
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\LeadBundle\EventListener;
 
 use JMS\Serializer\EventDispatcher\Events;
@@ -19,21 +10,15 @@ use Symfony\Component\HttpFoundation\RequestStack;
 
 class SerializerSubscriber implements EventSubscriberInterface
 {
-    /**
-     * @var RequestStack
-     */
-    private $requestStack;
-
     public function __construct(
-        RequestStack $requestStack
+        private RequestStack $requestStack
     ) {
-        $this->requestStack = $requestStack;
     }
 
     /**
-     * @return mixed[]
+     * @return array<int, array<string, string>>
      */
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             [
@@ -43,7 +28,7 @@ class SerializerSubscriber implements EventSubscriberInterface
         ];
     }
 
-    public function changeEmptyArraysToObject(ObjectEvent $event)
+    public function changeEmptyArraysToObject(ObjectEvent $event): void
     {
         $request  = $this->requestStack->getCurrentRequest();
 

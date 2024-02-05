@@ -1,0 +1,144 @@
+{# Override tmpl to "list" because otherwise AJAX calls render the whole content instead of just the raw output #}
+{% set isIndex = tmpl == 'index' ? true : false %}
+{% set tmpl = 'list' %}
+
+{% extends isIndex ? '@MauticCore/Default/content.html.twig' : '@MauticCore/Default/raw_output.html.twig' %}
+
+{% block headerTitle %}{% trans %}mautic.webhook.webhooks{% endtrans %}{% endblock %}
+{% block mauticContent %}mauticWebhook{% endblock %}
+
+{% block actions %}
+    {{- include(
+        '@MauticCore/Helper/page_actions.html.twig', {
+            templateButtons: {
+                'new': permissions['webhook:webhooks:create']
+            },
+            routeBase: 'webhook'
+    }) -}}
+{% endblock %}
+
+{% block content %}
+{% if isIndex %}
+<div class="panel panel-default bdr-t-wdh-0 mb-0">
+    {{- include(
+        '@MauticCore/Helper/list_toolbar.html.twig', {
+            searchValue: searchValue,
+            searchHelp: 'mautic.page.help.searchcommands',
+            action: currentRoute
+    }) -}}
+    <div class="page-list">
+        {{ block('listResults') }}
+    </div>
+</div>
+{% else %}
+    {{ block('listResults') }}
+{% endif %}
+{% endblock %}
+
+{% block listResults %}
+{% if items is defined and items is not empty %}
+    <div class="table-responsive panel-collapse pull out webhook-list">
+        <table class="table table-hover table-striped table-bordered webhook-list" id="webhookTable">
+            <thead>
+            <tr>
+                {{- include(
+                    '@MauticCore/Helper/tableheader.html.twig', {
+                        checkall: 'true',
+                        target: '#webhookTable',
+                        routeBase: 'webhook',
+                        templateButtons: {
+                            delete: (permissions['webhook:webhooks:deleteown'] or permissions['webhook:webhooks:deleteother'])
+                        }
+                }) -}}
+                {{- include(
+                    '@MauticCore/Helper/tableheader.html.twig', {
+                        sessionVar: 'mautic_webhook',
+                        orderBy: 'e.name',
+                        text: 'mautic.core.name',
+                        class: 'col-webhook-name',
+                        default: true
+                }) -}}
+                {{- include(
+                    '@MauticCore/Helper/tableheader.html.twig', {
+                        sessionVar: 'mautic_webhook',
+                        orderBy: 'e.webhookUrl',
+                        text: 'mautic.webhook.webhook_url',
+                        class: 'col-webhook-id visible-md visible-lg'
+                }) -}}
+                {{- include(
+                    '@MauticCore/Helper/tableheader.html.twig', {
+                        sessionVar: 'mautic_webhook',
+                        orderBy: 'e.id',
+                        text: 'mautic.core.id',
+                        class: 'col-webhook-id visible-md visible-lg'
+                }) -}}
+            </tr>
+            </thead>
+            <tbody>
+                {% for item in items %}
+                <tr>
+                    <td>
+                        {{- include(
+                            '@MauticCore/Helper/list_actions.html.twig', {
+                                item: item,
+                                templateButtons: {
+                                    edit: securityHasEntityAccess(
+                                        permissions['webhook:webhooks:editown'],
+                                        permissions['webhook:webhooks:editother'],
+                                        item.getCreatedBy()
+                                    ),
+                                    clone: permissions['webhook:webhooks:create'],
+                                    delete: securityHasEntityAccess(
+                                        permissions['webhook:webhooks:deleteown'],
+                                        permissions['webhook:webhooks:deleteother'],
+                                        item.getCreatedBy()
+                                    )
+                                },
+                                routeBase: 'webhook'
+                        }) -}}
+                    </td>
+                    <td>
+                        <div>
+                            {{- include(
+                                '@MauticCore/Helper/publishstatus_icon.html.twig', {
+                                    item: item,
+                                    model: 'webhook'
+                                }
+                            ) }}
+                            <a data-toggle="ajax" href="{{ path(
+                                'mautic_webhook_action',
+                                { objectId: item.getId(), objectAction: 'view' }
+                            ) }}">
+                                {{ item.getName() }}
+                            </a>
+                            {% if item.getDescription() is defined and item.getDescription() is not empty %}
+                            <div class="text-muted mt-4">
+                                <small>{{ item.getDescription()|purify }}</small>
+                            </div>
+                            {% endif %}
+                        </div>
+                    </td>
+                    <td class="visible-md visible-lg">{{ item.getWebhookUrl() }}</td>
+                    <td class="visible-md visible-lg">{{ item.getId() }} </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <div class="panel-footer">
+        {{- include(
+            '@MauticCore/Helper/pagination.html.twig', {
+                totalItems: items|length,
+                page: page,
+                limit: limit,
+                menuLinkId: 'mautic_webhook_index',
+                baseUrl: path('mautic_webhook_index'),
+                sessionVar: 'mautic_webhook'
+            }
+        ) }}
+    </div>
+{% else %}
+    {{ include('@MauticCore/Helper/noresults.html.twig') }}
+{% endif %}
+{% endblock %}

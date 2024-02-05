@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2020 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CoreBundle\Tests\Unit\Monolog\Handler;
 
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
@@ -23,12 +14,12 @@ class FileLogHandlerTest extends TestCase
     /**
      * @var CoreParametersHelper|MockObject
      */
-    private $coreParametersHelper;
+    private \PHPUnit\Framework\MockObject\MockObject $coreParametersHelper;
 
     /**
      * @var FormatterInterface|MockObject
      */
-    private $formatter;
+    private \PHPUnit\Framework\MockObject\MockObject $formatter;
 
     protected function setUp(): void
     {

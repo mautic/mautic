@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\LeadBundle\EventListener;
 
 use Mautic\LeadBundle\Report\FieldsBuilder;
@@ -19,22 +10,14 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class SegmentReportSubscriber implements EventSubscriberInterface
 {
-    const SEGMENT_MEMBERSHIP = 'segment.membership';
+    public const SEGMENT_MEMBERSHIP = 'segment.membership';
 
-    /**
-     * @var FieldsBuilder
-     */
-    private $fieldsBuilder;
-
-    public function __construct(FieldsBuilder $fieldsBuilder)
-    {
-        $this->fieldsBuilder = $fieldsBuilder;
+    public function __construct(
+        private FieldsBuilder $fieldsBuilder
+    ) {
     }
 
-    /**
-     * @return array
-     */
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             ReportEvents::REPORT_ON_BUILD    => ['onReportBuilder', 0],
@@ -45,7 +28,7 @@ class SegmentReportSubscriber implements EventSubscriberInterface
     /**
      * Add available tables and columns to the report builder lookup.
      */
-    public function onReportBuilder(ReportBuilderEvent $event)
+    public function onReportBuilder(ReportBuilderEvent $event): void
     {
         if (!$event->checkContext([self::SEGMENT_MEMBERSHIP])) {
             return;
@@ -79,7 +62,7 @@ class SegmentReportSubscriber implements EventSubscriberInterface
     /**
      * Initialize the QueryBuilder object to generate reports from.
      */
-    public function onReportGenerate(ReportGeneratorEvent $event)
+    public function onReportGenerate(ReportGeneratorEvent $event): void
     {
         if (!$event->checkContext([self::SEGMENT_MEMBERSHIP])) {
             return;

@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2016 Mautic, Inc. All rights reserved
- * @author      Mautic, Inc
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace MauticPlugin\MauticSocialBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
@@ -17,9 +8,6 @@ use Mautic\CoreBundle\Entity\FormEntity;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
 
-/**
- * Class Monitoring.
- */
 class Monitoring extends FormEntity
 {
     /**
@@ -33,12 +21,12 @@ class Monitoring extends FormEntity
     private $title;
 
     /**
-     * @var string
+     * @var string|null
      */
     private $description;
 
     /**
-     * @var \Mautic\CategoryBundle\Entity\Category
+     * @var \Mautic\CategoryBundle\Entity\Category|null
      */
     private $category;
 
@@ -48,7 +36,7 @@ class Monitoring extends FormEntity
     private $lists = [];
 
     /**
-     * @var string
+     * @var string|null
      */
     private $networkType;
 
@@ -68,21 +56,21 @@ class Monitoring extends FormEntity
     private $properties = [];
 
     /**
-     * @var \DateTime
+     * @var \DateTimeInterface
      */
     private $publishDown;
 
     /**
-     * @var \DateTime
+     * @var \DateTimeInterface
      */
     private $publishUp;
 
-    public static function loadMetadata(ORM\ClassMetadata $metadata)
+    public static function loadMetadata(ORM\ClassMetadata $metadata): void
     {
         $builder = new ClassMetadataBuilder($metadata);
 
         $builder->setTable('monitoring')
-            ->setCustomRepositoryClass('MauticPlugin\MauticSocialBundle\Entity\MonitoringRepository')
+            ->setCustomRepositoryClass(\MauticPlugin\MauticSocialBundle\Entity\MonitoringRepository::class)
             ->addLifecycleEvent('cleanMonitorData', 'preUpdate')
             ->addLifecycleEvent('cleanMonitorData', 'prePersist');
 
@@ -106,7 +94,7 @@ class Monitoring extends FormEntity
     /**
      * Constraints for required fields.
      */
-    public static function loadValidatorMetadata(ClassMetadata $metadata)
+    public static function loadValidatorMetadata(ClassMetadata $metadata): void
     {
         $metadata->addPropertyConstraint('title', new Assert\NotBlank(
             ['message' => 'mautic.core.title.required']
@@ -208,7 +196,7 @@ class Monitoring extends FormEntity
     /**
      * Get publishDown.
      *
-     * @return \DateTime
+     * @return \DateTimeInterface
      */
     public function getPublishDown()
     {
@@ -218,7 +206,7 @@ class Monitoring extends FormEntity
     /**
      * Get publishUp.
      *
-     * @return \DateTime
+     * @return \DateTimeInterface
      */
     public function getPublishUp()
     {
@@ -228,9 +216,9 @@ class Monitoring extends FormEntity
     /**
      * Set the category id.
      *
-     * @param int $category
+     * @param \Mautic\CategoryBundle\Entity\Category|null $category
      */
-    public function setCategory($category)
+    public function setCategory($category): void
     {
         $this->isChanged('category', $category);
         $this->category = $category;
@@ -254,8 +242,6 @@ class Monitoring extends FormEntity
     /**
      * Set the monitor lists.
      *
-     * @param $lists
-     *
      * @return Monitoring
      */
     public function setLists($lists)
@@ -268,8 +254,6 @@ class Monitoring extends FormEntity
 
     /**
      * Set the network type.
-     *
-     * @param $networkType
      *
      * @return Monitoring
      */
@@ -374,7 +358,7 @@ class Monitoring extends FormEntity
     /**
      * Clear out old properties data.
      */
-    public function cleanMonitorData()
+    public function cleanMonitorData(): void
     {
         $property = $this->getProperties();
 

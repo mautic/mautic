@@ -3,7 +3,7 @@
 namespace Mautic\CoreBundle\Test\Doctrine;
 
 use Doctrine\DBAL\Connection;
-use Doctrine\DBAL\Driver\ResultStatement;
+use Doctrine\DBAL\Driver\Result;
 use Doctrine\DBAL\Query\Expression\ExpressionBuilder;
 use Doctrine\DBAL\Query\QueryBuilder;
 use Doctrine\ORM\EntityManager;
@@ -12,11 +12,17 @@ use Mautic\LeadBundle\Entity\Lead;
 class DBALMocker
 {
     protected $testCase;
+
     protected $mockEm;
+
     protected $mockConnection;
+
     protected $mockQueryBuilder;
+
     protected $queryResponse;
+
     protected $connectionUpdated;
+
     protected $connectionInserted;
 
     protected $queryParts = [
@@ -31,7 +37,7 @@ class DBALMocker
         $this->testCase = $testCase;
     }
 
-    public function setQueryResponse($queryResponse)
+    public function setQueryResponse($queryResponse): void
     {
         $this->queryResponse = $queryResponse;
     }
@@ -50,7 +56,7 @@ class DBALMocker
         throw new \UnexpectedValueException(sprintf('The requested query part (%s) does not exist. It must be one of %s.', $part, implode(', ', array_keys($this->queryParts))));
     }
 
-    public function resetQueryParts()
+    public function resetQueryParts(): void
     {
         $this->queryParts = [
             'select'     => [],
@@ -60,17 +66,17 @@ class DBALMocker
         ];
     }
 
-    public function resetUpdated()
+    public function resetUpdated(): void
     {
         $this->connectionUpdated = [];
     }
 
-    public function resetInserted()
+    public function resetInserted(): void
     {
         $this->connectionInserted = [];
     }
 
-    public function reset()
+    public function reset(): void
     {
         $this->resetQueryParts();
         $this->resetUpdated();
@@ -98,7 +104,7 @@ class DBALMocker
                 ->method('getReference')
                 ->willReturnCallback(function () {
                     switch (func_get_arg(0)) {
-                        case 'MauticLeadBundle:Lead':
+                        case \Mautic\LeadBundle\Entity\Lead::class:
                             $entity = new Lead();
                             break;
                     }
@@ -137,13 +143,13 @@ class DBALMocker
 
             $mock->expects($this->testCase->any())
                 ->method('update')
-                ->willReturnCallback(function () {
+                ->willReturnCallback(function (): void {
                     $this->connectionUpdated[] = func_get_args();
                 });
 
             $mock->expects($this->testCase->any())
                 ->method('insert')
-                ->willReturnCallback(function () {
+                ->willReturnCallback(function (): void {
                     $this->connectionInserted[] = func_get_args();
                 });
 
@@ -194,9 +200,7 @@ class DBALMocker
             $mock->expects($this->testCase->any())
                 ->method('expr')
                 ->willReturnCallback(
-                    function () {
-                        return new ExpressionBuilder($this->getMockConnection());
-                    }
+                    fn () => new ExpressionBuilder($this->getMockConnection())
                 );
 
             $mock->expects($this->testCase->any())
@@ -241,23 +245,20 @@ class DBALMocker
 
     public function getMockResultStatement()
     {
-        $mock = $this->testCase->getMockBuilder(ResultStatement::class)
+        $mock = $this->testCase->getMockBuilder(Result::class)
             ->disableOriginalConstructor()
             ->setMethods([
-                'closeCursor',
+                'fetchNumeric',
+                'fetchAssociative',
+                'fetchOne',
+                'fetchAllNumeric',
+                'fetchAllAssociative',
+                'fetchFirstColumn',
+                'rowCount',
                 'columnCount',
-                'setFetchMode',
-                'fetch',
-                'fetchAll',
-                'fetchColumn',
+                'free',
             ])
             ->getMock();
-
-        $mock->method('closeCursor')
-            ->willReturn(true);
-
-        $mock->method('setFetchMode')
-            ->willReturn(true);
 
         $mock->method('columnCount')
             ->willReturnCallback(function () {
@@ -269,11 +270,11 @@ class DBALMocker
             });
 
         $mock->expects($this->testCase->any())
-            ->method('fetchAll')
+            ->method('fetchOne')
             ->willReturn($this->queryResponse);
 
         $mock->expects($this->testCase->any())
-            ->method('fetch')
+            ->method('fetchAllAssociative')
             ->willReturn($this->queryResponse);
 
         return $mock;

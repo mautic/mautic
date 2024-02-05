@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2015 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\UserBundle\Security\Authenticator;
 
 use Mautic\PluginBundle\Helper\IntegrationHelper;
@@ -27,43 +18,13 @@ use Symfony\Component\Security\Core\User\UserProviderInterface;
 
 class PreAuthAuthenticator implements AuthenticationProviderInterface
 {
-    /**
-     * @var EventDispatcherInterface
-     */
-    protected $dispatcher;
-
-    protected $providerKey;
-
-    /**
-     * @var UserProviderInterface
-     */
-    protected $userProvider;
-
-    /**
-     * @var IntegrationHelper
-     */
-    protected $integrationHelper;
-
-    /**
-     * @var requestStack|null
-     */
-    protected $requestStack;
-
-    /**
-     * @param $providerKey
-     */
     public function __construct(
-        IntegrationHelper $integrationHelper,
-        EventDispatcherInterface $dispatcher,
-        RequestStack $requestStack,
-        UserProviderInterface $userProvider,
-        $providerKey
+        protected IntegrationHelper $integrationHelper,
+        protected EventDispatcherInterface $dispatcher,
+        protected RequestStack $requestStack,
+        protected UserProviderInterface $userProvider,
+        protected $providerKey
     ) {
-        $this->dispatcher        = $dispatcher;
-        $this->providerKey       = $providerKey;
-        $this->userProvider      = $userProvider;
-        $this->integrationHelper = $integrationHelper;
-        $this->requestStack      = $requestStack;
     }
 
     /**
@@ -97,7 +58,7 @@ class PreAuthAuthenticator implements AuthenticationProviderInterface
                     $authenticatingService,
                     $integrations
                 );
-                $this->dispatcher->dispatch(UserEvents::USER_PRE_AUTHENTICATION, $authEvent);
+                $this->dispatcher->dispatch($authEvent, UserEvents::USER_PRE_AUTHENTICATION);
 
                 if ($authenticated = $authEvent->isAuthenticated()) {
                     $eventToken = $authEvent->getToken();
@@ -134,10 +95,7 @@ class PreAuthAuthenticator implements AuthenticationProviderInterface
         );
     }
 
-    /**
-     * @return mixed
-     */
-    public function supports(TokenInterface $token)
+    public function supports(TokenInterface $token): bool
     {
         return $token instanceof PluginToken && $token->getProviderKey() === $this->providerKey;
     }

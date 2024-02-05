@@ -1,18 +1,8 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\ConfigBundle;
 
 /**
- * Class ConfigEvents
  * Events available for ConfigBundle.
  */
 final class ConfigEvents
@@ -25,7 +15,7 @@ final class ConfigEvents
      *
      * @var string
      */
-    const CONFIG_ON_GENERATE = 'mautic.config_on_generate';
+    public const CONFIG_ON_GENERATE = 'mautic.config_on_generate';
 
     /**
      * The mautic.config_pre_save event is thrown right before config data are saved.
@@ -34,7 +24,7 @@ final class ConfigEvents
      *
      * @var string
      */
-    const CONFIG_PRE_SAVE = 'mautic.config_pre_save';
+    public const CONFIG_PRE_SAVE = 'mautic.config_pre_save';
 
     /**
      * The mautic.config_post_save event is thrown right after config data are saved.
@@ -43,5 +33,5 @@ final class ConfigEvents
      *
      * @var string
      */
-    const CONFIG_POST_SAVE = 'mautic.config_post_save';
+    public const CONFIG_POST_SAVE = 'mautic.config_post_save';
 }

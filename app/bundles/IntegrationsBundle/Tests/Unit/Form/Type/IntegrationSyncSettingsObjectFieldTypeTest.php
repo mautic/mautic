@@ -2,15 +2,6 @@
 
 declare(strict_types=1);
 
-/*
- * @copyright   2020 Mautic Inc. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://www.mautic.com
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\IntegrationsBundle\Tests\Unit\Form\Type;
 
 use Mautic\IntegrationsBundle\Exception\InvalidFormOptionException;
@@ -26,12 +17,9 @@ final class IntegrationSyncSettingsObjectFieldTypeTest extends \PHPUnit\Framewor
     /**
      * @var MockObject|FormBuilderInterface
      */
-    private $formBuilder;
+    private \PHPUnit\Framework\MockObject\MockObject $formBuilder;
 
-    /**
-     * @var IntegrationSyncSettingsObjectFieldType
-     */
-    private $form;
+    private \Mautic\IntegrationsBundle\Form\Type\IntegrationSyncSettingsObjectFieldType $form;
 
     protected function setUp(): void
     {

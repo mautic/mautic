@@ -1,36 +1,19 @@
 <?php
 
-/*
- * @copyright   2018 Mautic Contributors. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\LeadBundle\Helper;
 
 use Mautic\LeadBundle\Entity\CompanyLeadRepository;
 use Mautic\LeadBundle\Entity\Lead;
-use Mautic\LeadBundle\Entity\LeadRepository;
 
 class PrimaryCompanyHelper
 {
-    private $companyLeadRepository;
-
-    /**
-     * PrimaryCompanyHelper constructor.
-     *
-     * @param LeadRepository $companyLeadRepository
-     */
-    public function __construct(CompanyLeadRepository $companyLeadRepository)
-    {
-        $this->companyLeadRepository = $companyLeadRepository;
+    public function __construct(
+        private CompanyLeadRepository $companyLeadRepository
+    ) {
     }
 
     /**
-     * @return array
+     * @return array|null
      */
     public function getProfileFieldsWithPrimaryCompany(Lead $lead)
     {
@@ -41,8 +24,6 @@ class PrimaryCompanyHelper
     }
 
     /**
-     * @param $contactId
-     *
      * @return array
      */
     public function mergePrimaryCompanyWithProfileFields($contactId, array $profileFields)

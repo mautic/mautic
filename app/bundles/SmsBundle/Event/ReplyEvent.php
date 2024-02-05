@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2018 Mautic Inc. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://www.mautic.com
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\SmsBundle\Event;
 
 use Mautic\LeadBundle\Entity\Lead;
@@ -16,22 +7,9 @@ use Mautic\LeadBundle\Entity\LeadEventLog;
 use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\HttpFoundation\Response;
 
-class ReplyEvent extends Event
+class ReplyEvent extends \Symfony\Contracts\EventDispatcher\Event
 {
-    /**
-     * @var Lead
-     */
-    private $contact;
-
-    /**
-     * @var string
-     */
-    private $message;
-
-    /**
-     * @var Response|null
-     */
-    private $response;
+    private ?\Symfony\Component\HttpFoundation\Response $response = null;
 
     /**
      * @var ?LeadEventLog
@@ -43,10 +21,10 @@ class ReplyEvent extends Event
      *
      * @param string $message
      */
-    public function __construct(Lead $contact, $message)
-    {
-        $this->contact = $contact;
-        $this->message = $message;
+    public function __construct(
+        private Lead $contact,
+        private $message
+    ) {
     }
 
     /**
@@ -65,7 +43,7 @@ class ReplyEvent extends Event
         return $this->message;
     }
 
-    public function setResponse(Response $response)
+    public function setResponse(Response $response): void
     {
         $this->response = $response;
     }

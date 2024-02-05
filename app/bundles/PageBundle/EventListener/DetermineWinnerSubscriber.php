@@ -1,44 +1,22 @@
 <?php
 
-/*
- * @copyright   2019 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\PageBundle\EventListener;
 
 use Mautic\CoreBundle\Event\DetermineWinnerEvent;
 use Mautic\PageBundle\Entity\HitRepository;
 use Mautic\PageBundle\PageEvents;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class DetermineWinnerSubscriber implements EventSubscriberInterface
 {
-    /**
-     * @var HitRepository
-     */
-    private $hitRepository;
-
-    /**
-     * @var TranslatorInterface
-     */
-    private $translator;
-
-    public function __construct(HitRepository $hitRepository, TranslatorInterface $translator)
-    {
-        $this->hitRepository = $hitRepository;
-        $this->translator    = $translator;
+    public function __construct(
+        private HitRepository $hitRepository,
+        private TranslatorInterface $translator
+    ) {
     }
 
-    /**
-     * @return array
-     */
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             PageEvents::ON_DETERMINE_BOUNCE_RATE_WINNER => ['onDetermineBounceRateWinner', 0],
@@ -49,16 +27,16 @@ class DetermineWinnerSubscriber implements EventSubscriberInterface
     /**
      * Determines the winner of A/B test based on bounce rates.
      */
-    public function onDetermineBounceRateWinner(DetermineWinnerEvent $event)
+    public function onDetermineBounceRateWinner(DetermineWinnerEvent $event): void
     {
-        //find the hits that did not go any further
+        // find the hits that did not go any further
         $parent    = $event->getParameters()['parent'];
         $children  = $event->getParameters()['children'];
         $pageIds   = $parent->getRelatedEntityIds();
         $startDate = $parent->getVariantStartDate();
 
         if (null != $startDate && !empty($pageIds)) {
-            //get their bounce rates
+            // get their bounce rates
             $counts = $this->hitRepository->getBounces($pageIds, $startDate, true);
             if ($counts) {
                 // Group by translation
@@ -96,7 +74,7 @@ class DetermineWinnerSubscriber implements EventSubscriberInterface
                 }
                 unset($counts);
 
-                //let's arrange by rate
+                // let's arrange by rate
                 $rates             = [];
                 $support['data']   = [];
                 $support['labels'] = [];
@@ -108,17 +86,16 @@ class DetermineWinnerSubscriber implements EventSubscriberInterface
                     $support['labels'][]             = $pid.':'.$stats['title'];
                 }
 
-                // investigate the rate calculation, seems that lowest value should be the winner
-                $max                   = max($rates);
-                $support['step_width'] = (ceil($max / 10) * 10);
+                $min                   = min($rates);
+                $support['step_width'] = (ceil($min / 10) * 10);
 
-                $winners = ($max > 0) ? array_keys($rates, $max) : [];
+                $winners = ($min >= 0) ? array_keys($rates, $min) : [];
 
                 $event->setAbTestResults([
                     'winners'         => $winners,
                     'support'         => $support,
                     'basedOn'         => 'page.bouncerate',
-                    'supportTemplate' => 'MauticPageBundle:SubscribedEvents\AbTest:bargraph.html.php',
+                    'supportTemplate' => '@MauticPage/SubscribedEvents/AbTest/bargraph.html.twig',
                 ]);
 
                 return;
@@ -135,21 +112,21 @@ class DetermineWinnerSubscriber implements EventSubscriberInterface
     /**
      * Determines the winner of A/B test based on dwell time rates.
      */
-    public function onDetermineDwellTimeWinner(DetermineWinnerEvent $event)
+    public function onDetermineDwellTimeWinner(DetermineWinnerEvent $event): void
     {
-        //find the hits that did not go any further
+        // find the hits that did not go any further
         $parent    = $event->getParameters()['parent'];
         $pageIds   = $parent->getRelatedEntityIds();
         $startDate = $parent->getVariantStartDate();
 
         if (null != $startDate && !empty($pageIds)) {
-            //get their bounce rates
+            // get their bounce rates
             $counts  = $this->hitRepository->getDwellTimesForPages($pageIds, ['fromDate' => $startDate]);
             $support = [];
 
             if ($counts) {
-                //in order to get a fair grade, we have to compare the averages here since a page that is only shown
-                //25% of the time will have a significantly lower sum than a page shown 75% of the time
+                // in order to get a fair grade, we have to compare the averages here since a page that is only shown
+                // 25% of the time will have a significantly lower sum than a page shown 75% of the time
                 $avgs              = [];
                 $support['data']   = [];
                 $support['labels'] = [];
@@ -159,18 +136,18 @@ class DetermineWinnerSubscriber implements EventSubscriberInterface
                     $support['labels'][]                                                                       = $pid.':'.$stats['title'];
                 }
 
-                //set max for scales
+                // set max for scales
                 $max                   = max($avgs);
                 $support['step_width'] = (ceil($max / 10) * 10);
 
-                //get the page ids with the greatest average dwell time
+                // get the page ids with the greatest average dwell time
                 $winners = ($max > 0) ? array_keys($avgs, $max) : [];
 
                 $event->setAbTestResults([
                     'winners'         => $winners,
                     'support'         => $support,
                     'basedOn'         => 'page.dwelltime',
-                    'supportTemplate' => 'MauticPageBundle:SubscribedEvents\AbTest:bargraph.html.php',
+                    'supportTemplate' => '@MauticPage/SubscribedEvents/AbTest/bargraph.html.twig',
                 ]);
 
                 return;

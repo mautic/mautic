@@ -1,20 +1,11 @@
 <?php
 
-/*
- * @copyright   2018 Mautic Inc. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://www.mautic.com
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\SmsBundle\Integration\Twilio;
 
 use Mautic\SmsBundle\Callback\CallbackInterface;
 use Mautic\SmsBundle\Exception\NumberNotFoundException;
 use Mautic\SmsBundle\Helper\ContactHelper;
-use Symfony\Component\HttpFoundation\ParameterBag;
+use Symfony\Component\HttpFoundation\InputBag;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
@@ -22,39 +13,21 @@ use Twilio\Exceptions\ConfigurationException;
 
 class TwilioCallback implements CallbackInterface
 {
-    /**
-     * @var ContactHelper
-     */
-    private $contactHelper;
-
-    /**
-     * @var Configuration
-     */
-    private $configuration;
-
-    /**
-     * TwilioCallback constructor.
-     */
-    public function __construct(ContactHelper $contactHelper, Configuration $configuration)
-    {
-        $this->contactHelper = $contactHelper;
-        $this->configuration = $configuration;
+    public function __construct(
+        private ContactHelper $contactHelper,
+        private Configuration $configuration
+    ) {
     }
 
-    /**
-     * @return string
-     */
-    public function getTransportName()
+    public function getTransportName(): string
     {
         return 'twilio';
     }
 
     /**
-     * @return \Doctrine\Common\Collections\ArrayCollection
-     *
      * @throws NumberNotFoundException
      */
-    public function getContacts(Request $request)
+    public function getContacts(Request $request): \Doctrine\Common\Collections\ArrayCollection
     {
         $this->validateRequest($request->request);
 
@@ -63,21 +36,18 @@ class TwilioCallback implements CallbackInterface
         return $this->contactHelper->findContactsByNumber($number);
     }
 
-    /**
-     * @return string
-     */
-    public function getMessage(Request $request)
+    public function getMessage(Request $request): string
     {
         $this->validateRequest($request->request);
 
         return trim($request->get('Body'));
     }
 
-    private function validateRequest(ParameterBag $request)
+    private function validateRequest(InputBag $request): void
     {
         try {
             $accountSid = $this->configuration->getAccountSid();
-        } catch (ConfigurationException $exception) {
+        } catch (ConfigurationException) {
             // Not published or not configured
             throw new NotFoundHttpException();
         }

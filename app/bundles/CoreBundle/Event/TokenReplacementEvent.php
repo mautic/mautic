@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CoreBundle\Event;
 
 use Mautic\CoreBundle\Entity\CommonEntity;
@@ -23,19 +14,9 @@ class TokenReplacementEvent extends CommonEvent
     protected $entity;
 
     /**
-     * @var string
+     * @var CommonEntity|string|null
      */
     protected $content;
-
-    /**
-     * @var Lead
-     */
-    protected $lead;
-
-    /**
-     * @var array
-     */
-    protected $clickthrough = [];
 
     /**
      * @var array
@@ -43,36 +24,31 @@ class TokenReplacementEvent extends CommonEvent
     protected $tokens = [];
 
     /**
-     * Whatever the calling code wants to make available to the consumers.
-     *
-     * @var mixed
-     */
-    protected $passthrough;
-
-    /**
      * @var ?Stat
      */
     private $stat;
 
     /**
-     * @param CommonEntity|string $content
-     * @param Lead|array|null     $lead
-     * @param mixed               $passthrough
+     * @param CommonEntity|string|null $content
+     * @param Lead|mixed[]|null        $lead
+     * @param mixed                    $passthrough
      */
-    public function __construct($content, $lead = null, array $clickthrough = [], $passthrough = null)
-    {
+    public function __construct(
+        $content,
+        protected $lead = null,
+        protected array $clickthrough = [],
+        protected $passthrough = null,
+        private bool $internalSend = false
+    ) {
         if ($content instanceof CommonEntity) {
             $this->entity = $content;
         }
 
         $this->content      = $content;
-        $this->lead         = $lead;
-        $this->clickthrough = $clickthrough;
-        $this->passthrough  = $passthrough;
     }
 
     /**
-     * @return string
+     * @return CommonEntity|string|null
      */
     public function getContent()
     {
@@ -80,15 +56,15 @@ class TokenReplacementEvent extends CommonEvent
     }
 
     /**
-     * @param string $content
+     * @param CommonEntity|string|null $content
      */
-    public function setContent($content)
+    public function setContent($content): void
     {
         $this->content = $content;
     }
 
     /**
-     * @return Lead|array|null
+     * @return Lead|mixed[]|null
      */
     public function getLead()
     {
@@ -96,7 +72,7 @@ class TokenReplacementEvent extends CommonEvent
     }
 
     /**
-     * @return array
+     * @return mixed[]
      */
     public function getClickthrough()
     {
@@ -112,9 +88,9 @@ class TokenReplacementEvent extends CommonEvent
     }
 
     /**
-     * @param array $clickthrough
+     * @param mixed[] $clickthrough
      */
-    public function setClickthrough($clickthrough)
+    public function setClickthrough($clickthrough): void
     {
         $this->clickthrough = $clickthrough;
     }
@@ -127,11 +103,7 @@ class TokenReplacementEvent extends CommonEvent
         return $this->entity;
     }
 
-    /**
-     * @param $token
-     * @param $value
-     */
-    public function addToken($token, $value)
+    public function addToken($token, $value): void
     {
         $this->tokens[$token] = $value;
     }
@@ -160,5 +132,10 @@ class TokenReplacementEvent extends CommonEvent
     public function setStat(?Stat $stat): void
     {
         $this->stat = $stat;
+    }
+
+    public function isInternalSend(): bool
+    {
+        return $this->internalSend;
     }
 }

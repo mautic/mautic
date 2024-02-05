@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2015 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CoreBundle\Tests\Unit\Helper\Chart;
 
 use Mautic\CoreBundle\Helper\Chart\LineChart;
@@ -20,7 +11,7 @@ class LineChartTest extends \PHPUnit\Framework\TestCase
      *
      * @covers \Mautic\CoreBundle\Helper\Chart\LineChart::getUnitInterval
      */
-    public function testGetUnitInterval()
+    public function testGetUnitInterval(): void
     {
         $units = [
             'Y' => new \DateInterval('P1Y'),

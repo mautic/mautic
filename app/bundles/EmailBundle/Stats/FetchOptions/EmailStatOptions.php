@@ -1,24 +1,12 @@
 <?php
 
-/*
- * @copyright   2018 Mautic Inc. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://www.mautic.com
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\EmailBundle\Stats\FetchOptions;
 
 use Mautic\StatsBundle\Event\Options\FetchOptions;
 
 class EmailStatOptions extends FetchOptions
 {
-    /**
-     * @var array
-     */
-    private $ids = [];
+    private array $ids = [];
 
     /**
      * @var int|null
@@ -35,15 +23,9 @@ class EmailStatOptions extends FetchOptions
      */
     private $segmentId;
 
-    /**
-     * @var array
-     */
-    private $filters = [];
+    private array $filters = [];
 
-    /**
-     * @var bool
-     */
-    private $canViewOthers = false;
+    private bool $canViewOthers = false;
 
     /**
      * @var string
@@ -146,10 +128,7 @@ class EmailStatOptions extends FetchOptions
         return $this;
     }
 
-    /**
-     * @return bool
-     */
-    public function canViewOthers()
+    public function canViewOthers(): bool
     {
         return $this->canViewOthers;
     }

@@ -2,15 +2,6 @@
 
 declare(strict_types=1);
 
-/*
- * @copyright   2021 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\InstallBundle\InstallFixtures\ORM;
 
 use Doctrine\Bundle\FixturesBundle\FixtureGroupInterface;
@@ -24,10 +15,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 
 class GrapesJsData extends AbstractFixture implements OrderedFixtureInterface, ContainerAwareInterface, FixtureGroupInterface
 {
-    /**
-     * @var ContainerInterface
-     */
-    private $container;
+    private ?\Symfony\Component\DependencyInjection\ContainerInterface $container = null;
 
     public static function getGroups(): array
     {
@@ -41,8 +29,8 @@ class GrapesJsData extends AbstractFixture implements OrderedFixtureInterface, C
 
     public function load(ObjectManager $manager): void
     {
-        $projectDir               = $this->container->get('kernel')->getProjectDir();
-        $grapeJsBuilderConfigPath = $projectDir.'/plugins/GrapesJsBuilderBundle/Config/config.php';
+        $applicationDir           = $this->container->get('kernel')->getApplicationDir();
+        $grapeJsBuilderConfigPath = $applicationDir.'/plugins/GrapesJsBuilderBundle/Config/config.php';
 
         if (!file_exists($grapeJsBuilderConfigPath)) {
             return;

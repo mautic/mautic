@@ -1,39 +1,38 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
-*/
-
 namespace Mautic\ReportBundle\Scheduler\Enum;
 
 class SchedulerEnum
 {
-    const UNIT_NOW     = 'NOW';
-    const UNIT_DAILY   = 'DAILY';
-    const UNIT_WEEKLY  = 'WEEKLY'; //Defined in report.js too
-    const UNIT_MONTHLY = 'MONTHLY'; //Defined in report.js too
+    public const UNIT_NOW     = 'NOW';
 
-    const DAY_MO        = 'MO';
-    const DAY_TU        = 'TU';
-    const DAY_WE        = 'WE';
-    const DAY_TH        = 'TH';
-    const DAY_FR        = 'FR';
-    const DAY_SA        = 'SA';
-    const DAY_SU        = 'SU';
-    const DAY_WEEK_DAYS = 'WEEK_DAYS';
+    public const UNIT_DAILY   = 'DAILY';
 
-    const MONTH_FREQUENCY_FIRST = '1';
-    const MONTH_FREQUENCY_LAST  = '-1';
+    public const UNIT_WEEKLY  = 'WEEKLY'; // Defined in report.js too
 
-    /**
-     * @return array
-     */
-    public static function getUnitEnumForSelect()
+    public const UNIT_MONTHLY = 'MONTHLY'; // Defined in report.js too
+
+    public const DAY_MO        = 'MO';
+
+    public const DAY_TU        = 'TU';
+
+    public const DAY_WE        = 'WE';
+
+    public const DAY_TH        = 'TH';
+
+    public const DAY_FR        = 'FR';
+
+    public const DAY_SA        = 'SA';
+
+    public const DAY_SU        = 'SU';
+
+    public const DAY_WEEK_DAYS = 'WEEK_DAYS';
+
+    public const MONTH_FREQUENCY_FIRST = '1';
+
+    public const MONTH_FREQUENCY_LAST  = '-1';
+
+    public static function getUnitEnumForSelect(): array
     {
         return [
             'mautic.report.schedule.unit.now'   => self::UNIT_NOW,
@@ -43,10 +42,7 @@ class SchedulerEnum
         ];
     }
 
-    /**
-     * @return array
-     */
-    public static function getDayEnumForSelect()
+    public static function getDayEnumForSelect(): array
     {
         return [
             'mautic.report.schedule.day.monday'    => self::DAY_MO,
@@ -60,10 +56,7 @@ class SchedulerEnum
         ];
     }
 
-    /**
-     * @return array
-     */
-    public static function getMonthFrequencyForSelect()
+    public static function getMonthFrequencyForSelect(): array
     {
         return [
             'mautic.report.schedule.month_frequency.first' => self::MONTH_FREQUENCY_FIRST,
@@ -71,10 +64,7 @@ class SchedulerEnum
         ];
     }
 
-    /**
-     * @return array
-     */
-    public static function getWeekDays()
+    public static function getWeekDays(): array
     {
         return [
             self::DAY_MO,

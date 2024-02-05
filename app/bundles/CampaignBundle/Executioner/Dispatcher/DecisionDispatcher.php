@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2018 Mautic Contributors. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CampaignBundle\Executioner\Dispatcher;
 
 use Doctrine\Common\Collections\ArrayCollection;
@@ -22,62 +13,42 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class DecisionDispatcher
 {
-    /**
-     * @var EventDispatcherInterface
-     */
-    private $dispatcher;
-
-    /**
-     * @var LegacyEventDispatcher
-     */
-    private $legacyDispatcher;
-
-    /**
-     * DecisionDispatcher constructor.
-     */
     public function __construct(
-        EventDispatcherInterface $dispatcher,
-        LegacyEventDispatcher $legacyDispatcher
+        private EventDispatcherInterface $dispatcher,
+        private LegacyEventDispatcher $legacyDispatcher
     ) {
-        $this->dispatcher       = $dispatcher;
-        $this->legacyDispatcher = $legacyDispatcher;
     }
 
     /**
      * @param mixed $passthrough
-     *
-     * @return DecisionEvent
      */
-    public function dispatchRealTimeEvent(DecisionAccessor $config, LeadEventLog $log, $passthrough)
+    public function dispatchRealTimeEvent(DecisionAccessor $config, LeadEventLog $log, $passthrough): DecisionEvent
     {
         $event = new DecisionEvent($config, $log, $passthrough);
-        $this->dispatcher->dispatch($config->getEventName(), $event);
+        $this->dispatcher->dispatch($event, $config->getEventName());
 
         return $event;
     }
 
-    /**
-     * @return DecisionEvent
-     */
-    public function dispatchEvaluationEvent(DecisionAccessor $config, LeadEventLog $log)
+    public function dispatchEvaluationEvent(DecisionAccessor $config, LeadEventLog $log): DecisionEvent
     {
         $event = new DecisionEvent($config, $log);
 
-        $this->dispatcher->dispatch(CampaignEvents::ON_EVENT_DECISION_EVALUATION, $event);
+        $this->dispatcher->dispatch($event, CampaignEvents::ON_EVENT_DECISION_EVALUATION);
         $this->legacyDispatcher->dispatchDecisionEvent($event);
 
         return $event;
     }
 
-    public function dispatchDecisionResultsEvent(DecisionAccessor $config, ArrayCollection $logs, EvaluatedContacts $evaluatedContacts)
+    public function dispatchDecisionResultsEvent(DecisionAccessor $config, ArrayCollection $logs, EvaluatedContacts $evaluatedContacts): void
     {
         if (!$logs->count()) {
             return;
         }
 
         $this->dispatcher->dispatch(
-            CampaignEvents::ON_EVENT_DECISION_EVALUATION_RESULTS,
-            new DecisionResultsEvent($config, $logs, $evaluatedContacts)
+            new DecisionResultsEvent($config, $logs, $evaluatedContacts),
+            CampaignEvents::ON_EVENT_DECISION_EVALUATION_RESULTS
         );
     }
 }

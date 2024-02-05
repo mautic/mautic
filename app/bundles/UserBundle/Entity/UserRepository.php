@@ -1,33 +1,21 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\UserBundle\Entity;
 
+use Doctrine\DBAL\Query\QueryBuilder;
 use Doctrine\ORM\Tools\Pagination\Paginator;
 use Mautic\CoreBundle\Entity\CommonRepository;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
 
 /**
- * UserRepository.
+ * @extends CommonRepository<User>
  */
 class UserRepository extends CommonRepository
 {
     /**
      * Find user by username or email.
-     *
-     * @param $identifier
-     *
-     * @return array|null
      */
-    public function findByIdentifier($identifier)
+    public function findByIdentifier(string $identifier): ?User
     {
         $q = $this->createQueryBuilder('u')
             ->where('u.username = :identifier OR u.email = :identifier')
@@ -35,13 +23,10 @@ class UserRepository extends CommonRepository
 
         $result = $q->getQuery()->getResult();
 
-        return (null != $result) ? $result[0] : null;
+        return (!empty($result)) ? $result[0] : null;
     }
 
-    /**
-     * @param $user
-     */
-    public function setLastLogin($user)
+    public function setLastLogin($user): void
     {
         $now      = new DateTimeHelper();
         $datetime = $now->toUtcString();
@@ -52,10 +37,7 @@ class UserRepository extends CommonRepository
         ], ['id' => (int) $user->getId()]);
     }
 
-    /**
-     * @param $user
-     */
-    public function setLastActive($user)
+    public function setLastActive($user): void
     {
         $now  = new DateTimeHelper();
         $conn = $this->_em->getConnection();
@@ -64,8 +46,6 @@ class UserRepository extends CommonRepository
 
     /**
      * Checks to ensure that a username and/or email is unique.
-     *
-     * @param $params
      *
      * @return array
      */
@@ -118,7 +98,7 @@ class UserRepository extends CommonRepository
         $q = $this->_em->createQueryBuilder();
 
         $q->select('partial u.{id, firstName, lastName}')
-            ->from('MauticUserBundle:User', 'u')
+            ->from(\Mautic\UserBundle\Entity\User::class, 'u')
             ->leftJoin('u.role', 'r')
             ->leftJoin('r.permissions', 'p');
 
@@ -142,7 +122,7 @@ class UserRepository extends CommonRepository
         }
 
         if (!empty($permissionLimiter)) {
-            //only get users with a role that has some sort of access to set permissions
+            // only get users with a role that has some sort of access to set permissions
             $expr = $q->expr()->andX();
             foreach ($permissionLimiter as $bundle => $level) {
                 $expr->add(
@@ -173,10 +153,8 @@ class UserRepository extends CommonRepository
 
     /**
      * Return list of Users for formType Choice.
-     *
-     * @return array
      */
-    public function getOwnerListChoices()
+    public function getOwnerListChoices(): array
     {
         $q = $this->createQueryBuilder('u');
 
@@ -208,7 +186,7 @@ class UserRepository extends CommonRepository
         $q = $this->_em->createQueryBuilder()
             ->select('u.position')
             ->distinct()
-            ->from('MauticUserBundle:User', 'u')
+            ->from(\Mautic\UserBundle\Entity\User::class, 'u')
             ->where("u.position != ''")
             ->andWhere('u.position IS NOT NULL');
         if (!empty($search)) {
@@ -226,10 +204,7 @@ class UserRepository extends CommonRepository
         return $q->getQuery()->getArrayResult();
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    protected function addCatchAllWhereClause($q, $filter)
+    protected function addCatchAllWhereClause($q, $filter): array
     {
         return $this->addStandardCatchAllWhereClause(
             $q,
@@ -245,15 +220,12 @@ class UserRepository extends CommonRepository
         );
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    protected function addSearchCommandWhereClause($q, $filter)
+    protected function addSearchCommandWhereClause($q, $filter): array
     {
         $command                 = $filter->command;
         $unique                  = $this->generateRandomParameterName();
-        $returnParameter         = false; //returning a parameter that is not used will lead to a Doctrine error
-        list($expr, $parameters) = parent::addSearchCommandWhereClause($q, $filter);
+        $returnParameter         = false; // returning a parameter that is not used will lead to a Doctrine error
+        [$expr, $parameters]     = parent::addSearchCommandWhereClause($q, $filter);
 
         switch ($command) {
             case $this->translator->trans('mautic.core.searchcommand.ispublished'):
@@ -263,42 +235,50 @@ class UserRepository extends CommonRepository
 
                 break;
             case $this->translator->trans('mautic.core.searchcommand.isunpublished'):
-                case $this->translator->trans('mautic.core.searchcommand.isunpublished', [], null, 'en_US'):
+            case $this->translator->trans('mautic.core.searchcommand.isunpublished', [], null, 'en_US'):
                 $expr            = $q->expr()->eq('u.isPublished', ":$unique");
                 $forceParameters = [$unique => false];
 
                 break;
             case $this->translator->trans('mautic.user.user.searchcommand.isadmin'):
-                case $this->translator->trans('mautic.user.user.searchcommand.isadmin', [], null, 'en_US'):
+            case $this->translator->trans('mautic.user.user.searchcommand.isadmin', [], null, 'en_US'):
                 $expr            = $q->expr()->eq('r.isAdmin', ":$unique");
                 $forceParameters = [$unique => true];
                 break;
             case $this->translator->trans('mautic.core.searchcommand.email'):
-                case $this->translator->trans('mautic.core.searchcommand.email', [], null, 'en_US'):
+            case $this->translator->trans('mautic.core.searchcommand.email', [], null, 'en_US'):
                 $expr            = $q->expr()->like('u.email', ':'.$unique);
                 $returnParameter = true;
                 break;
             case $this->translator->trans('mautic.user.user.searchcommand.position'):
-                case $this->translator->trans('mautic.user.user.searchcommand.position', [], null, 'en_US'):
+            case $this->translator->trans('mautic.user.user.searchcommand.position', [], null, 'en_US'):
                 $expr            = $q->expr()->like('u.position', ':'.$unique);
                 $returnParameter = true;
                 break;
             case $this->translator->trans('mautic.user.user.searchcommand.username'):
-                case $this->translator->trans('mautic.user.user.searchcommand.username', [], null, 'en_US'):
+            case $this->translator->trans('mautic.user.user.searchcommand.username', [], null, 'en_US'):
                 $expr            = $q->expr()->like('u.username', ':'.$unique);
                 $returnParameter = true;
                 break;
             case $this->translator->trans('mautic.user.user.searchcommand.role'):
-                case $this->translator->trans('mautic.user.user.searchcommand.role', [], null, 'en_US'):
+            case $this->translator->trans('mautic.user.user.searchcommand.role', [], null, 'en_US'):
                 $expr            = $q->expr()->like('r.name', ':'.$unique);
                 $returnParameter = true;
                 break;
             case $this->translator->trans('mautic.core.searchcommand.name'):
-                case $this->translator->trans('mautic.core.searchcommand.name', [], null, 'en_US'):
-                $expr = $q->expr()->orX(
-                    $q->expr()->like('u.firstName', ':'.$unique),
-                    $q->expr()->like('u.lastName', ':'.$unique)
-                );
+            case $this->translator->trans('mautic.core.searchcommand.name', [], null, 'en_US'):
+                // This if/else can be removed once we upgrade to Dotrine 2.11 as both builders have the or() method there.
+                if ($q instanceof QueryBuilder) {
+                    $expr = $q->expr()->or(
+                        $q->expr()->like('u.firstName', ':'.$unique),
+                        $q->expr()->like('u.lastName', ':'.$unique)
+                    );
+                } else {
+                    $expr = $q->expr()->orX(
+                        $q->expr()->like('u.firstName', ':'.$unique),
+                        $q->expr()->like('u.lastName', ':'.$unique)
+                    );
+                }
                 $returnParameter = true;
                 break;
         }
@@ -314,9 +294,9 @@ class UserRepository extends CommonRepository
     }
 
     /**
-     * {@inheritdoc}
+     * @return string[]
      */
-    public function getSearchCommands()
+    public function getSearchCommands(): array
     {
         $commands = [
             'mautic.core.searchcommand.email',
@@ -332,10 +312,7 @@ class UserRepository extends CommonRepository
         return array_merge($commands, parent::getSearchCommands());
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    protected function getDefaultOrder()
+    protected function getDefaultOrder(): array
     {
         return [
             ['u.lastName', 'ASC'],
@@ -344,10 +321,7 @@ class UserRepository extends CommonRepository
         ];
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getTableAlias()
+    public function getTableAlias(): string
     {
         return 'u';
     }

@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2018 Mautic Contributors. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\SmsBundle\Tests\EventListener;
 
 use Mautic\LeadBundle\Entity\DoNotContact;
@@ -22,14 +13,14 @@ class StopSubscriberTest extends \PHPUnit\Framework\TestCase
     /**
      * @var \PHPUnit\Framework\MockObject\MockObject|DoNotContact
      */
-    private $doNotContactModel;
+    private \PHPUnit\Framework\MockObject\MockObject $doNotContactModel;
 
     protected function setUp(): void
     {
         $this->doNotContactModel = $this->createMock(DoNotContactModel::class);
     }
 
-    public function testLeadAddedToDNC()
+    public function testLeadAddedToDNC(): void
     {
         $lead = new Lead();
         $lead->setId(1);

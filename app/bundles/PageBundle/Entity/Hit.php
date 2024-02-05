@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\PageBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
@@ -18,43 +9,37 @@ use Mautic\EmailBundle\Entity\Email;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadDevice;
 
-/**
- * Class Hit.
- */
 class Hit
 {
     /**
-     * @var int
+     * @var string
      */
     private $id;
 
     /**
-     * @var \DateTime
+     * @var \DateTimeInterface
      */
     private $dateHit;
 
     /**
-     * @var \DateTime
+     * @var \DateTimeInterface
      */
     private $dateLeft;
 
-    /**
-     * @var Page
-     */
-    private $page;
+    private ?Page $page = null;
 
     /**
-     * @var Redirect
+     * @var Redirect|null
      */
     private $redirect;
 
     /**
-     * @var \Mautic\EmailBundle\Entity\Email
+     * @var \Mautic\EmailBundle\Entity\Email|null
      */
     private $email;
 
     /**
-     * @var \Mautic\LeadBundle\Entity\Lead
+     * @var \Mautic\LeadBundle\Entity\Lead|null
      */
     private $lead;
 
@@ -64,27 +49,27 @@ class Hit
     private $ipAddress;
 
     /**
-     * @var string
+     * @var string|null
      */
     private $country;
 
     /**
-     * @var string
+     * @var string|null
      */
     private $region;
 
     /**
-     * @var string
+     * @var string|null
      */
     private $city;
 
     /**
-     * @var string
+     * @var string|null
      */
     private $isp;
 
     /**
-     * @var string
+     * @var string|null
      */
     private $organization;
 
@@ -98,27 +83,27 @@ class Hit
     private $url;
 
     /**
-     * @var string
+     * @var string|null
      */
     private $urlTitle;
 
     /**
-     * @var string
+     * @var string|null
      */
     private $userAgent;
 
     /**
-     * @var string
+     * @var string|null
      */
     private $remoteHost;
 
     /**
-     * @var string
+     * @var string|null
      */
     private $pageLanguage;
 
     /**
-     * @var string
+     * @var array<string>
      */
     private $browserLanguages = [];
 
@@ -128,12 +113,12 @@ class Hit
     private $trackingId;
 
     /**
-     * @var string
+     * @var string|null
      */
     private $source;
 
     /**
-     * @var int
+     * @var int|null
      */
     private $sourceId;
 
@@ -141,24 +126,23 @@ class Hit
      * @var array
      */
     private $query = [];
+
     /**
-     * @var LeadDevice
+     * @var LeadDevice|null
      */
     private $device;
 
-    public static function loadMetadata(ORM\ClassMetadata $metadata)
+    public static function loadMetadata(ORM\ClassMetadata $metadata): void
     {
         $builder = new ClassMetadataBuilder($metadata);
 
         $builder->setTable('page_hits')
-            ->setCustomRepositoryClass('Mautic\PageBundle\Entity\HitRepository')
+            ->setCustomRepositoryClass(\Mautic\PageBundle\Entity\HitRepository::class)
             ->addIndex(['tracking_id'], 'page_hit_tracking_search')
             ->addIndex(['code'], 'page_hit_code_search')
             ->addIndex(['source', 'source_id'], 'page_hit_source_search')
-            ->addIndex(['date_hit', 'date_left'], 'date_hit_left_index');
-        // There should be a 128 char prefix index but it cannot be created here
-        // created in fixtures instead
-        //->addIndex(['url'], 'page_hit_url');
+            ->addIndex(['date_hit', 'date_left'], 'date_hit_left_index')
+            ->addIndexWithOptions(['url'], 'page_hit_url', ['lengths' => [0 => 128]]);
 
         $builder->addBigIntIdField();
 
@@ -179,7 +163,7 @@ class Hit
             ->addJoinColumn('redirect_id', 'id', true, false, 'SET NULL')
             ->build();
 
-        $builder->createManyToOne('email', 'Mautic\EmailBundle\Entity\Email')
+        $builder->createManyToOne('email', \Mautic\EmailBundle\Entity\Email::class)
             ->addJoinColumn('email_id', 'id', true, false, 'SET NULL')
             ->build();
 
@@ -257,7 +241,7 @@ class Hit
 
         $builder->addNullableField('query', 'array');
 
-        $builder->createManyToOne('device', 'Mautic\LeadBundle\Entity\LeadDevice')
+        $builder->createManyToOne('device', \Mautic\LeadBundle\Entity\LeadDevice::class)
             ->addJoinColumn('device_id', 'id', true, false, 'SET NULL')
             ->cascadePersist()
             ->build();
@@ -265,10 +249,8 @@ class Hit
 
     /**
      * Prepares the metadata for API usage.
-     *
-     * @param $metadata
      */
-    public static function loadApiMetadata(ApiMetadataDriver $metadata)
+    public static function loadApiMetadata(ApiMetadataDriver $metadata): void
     {
         $metadata->setGroupPrefix('hit')
             ->addProperties(
@@ -305,12 +287,10 @@ class Hit
 
     /**
      * Get id.
-     *
-     * @return int
      */
-    public function getId()
+    public function getId(): int
     {
-        return $this->id;
+        return (int) $this->id;
     }
 
     /**
@@ -330,7 +310,7 @@ class Hit
     /**
      * Get dateHit.
      *
-     * @return \DateTime
+     * @return \DateTimeInterface
      */
     public function getDateHit()
     {
@@ -338,7 +318,7 @@ class Hit
     }
 
     /**
-     * @return \DateTime
+     * @return \DateTimeInterface
      */
     public function getDateLeft()
     {
@@ -558,6 +538,7 @@ class Hit
      */
     public function setUrlTitle($urlTitle)
     {
+        $urlTitle       = mb_strlen($urlTitle) <= 191 ? $urlTitle : mb_substr($urlTitle, 0, 191);
         $this->urlTitle = $urlTitle;
 
         return $this;
@@ -624,8 +605,6 @@ class Hit
     /**
      * Set page.
      *
-     * @param Page $page
-     *
      * @return Hit
      */
     public function setPage(Page $page = null)
@@ -636,9 +615,7 @@ class Hit
     }
 
     /**
-     * Get page.
-     *
-     * @return Page
+     * @return ?Page
      */
     public function getPage()
     {
@@ -668,8 +645,6 @@ class Hit
     }
 
     /**
-     * Set trackingId.
-     *
      * @param string $trackingId
      *
      * @return Hit
@@ -718,7 +693,7 @@ class Hit
     /**
      * Set browserLanguages.
      *
-     * @param string $browserLanguages
+     * @param array<string> $browserLanguages
      *
      * @return Hit
      */
@@ -732,7 +707,7 @@ class Hit
     /**
      * Get browserLanguages.
      *
-     * @return string
+     * @return array<string>
      */
     public function getBrowserLanguages()
     {
@@ -826,7 +801,7 @@ class Hit
     /**
      * @param mixed $email
      */
-    public function setEmail(Email $email)
+    public function setEmail(Email $email): void
     {
         $this->email = $email;
     }

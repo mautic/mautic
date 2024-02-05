@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2017 Mautic Contributors. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\EmailBundle\Stat;
 
 use Mautic\EmailBundle\Entity\Stat;
@@ -17,11 +8,6 @@ use Mautic\EmailBundle\Stat\Exception\StatNotFoundException;
 
 class StatHelper
 {
-    /**
-     * @var StatRepository
-     */
-    private $repo;
-
     /**
      * Just store email ID and lead ID to avoid doctrine RAM issues with entities.
      *
@@ -34,18 +20,12 @@ class StatHelper
      */
     private $deleteUs = [];
 
-    /**
-     * StatHelper constructor.
-     */
-    public function __construct(StatRepository $statRepository)
-    {
-        $this->repo = $statRepository;
+    public function __construct(
+        private StatRepository $repo
+    ) {
     }
 
-    /**
-     * @param $emailAddress
-     */
-    public function storeStat(Stat $stat, $emailAddress)
+    public function storeStat(Stat $stat, $emailAddress): void
     {
         $this->repo->saveEntity($stat);
 
@@ -53,24 +33,22 @@ class StatHelper
         $this->stats[$emailAddress] = new Reference($stat);
 
         // clear stat from doctrine memory
-        $this->repo->clear();
+        $this->repo->detachEntity($stat);
     }
 
-    public function deletePending()
+    public function deletePending(): void
     {
         if (count($this->deleteUs)) {
             $this->repo->deleteStats($this->deleteUs);
         }
     }
 
-    public function markForDeletion(Reference $stat)
+    public function markForDeletion(Reference $stat): void
     {
         $this->deleteUs[] = $stat->getStatId();
     }
 
     /**
-     * @param $emailAddress
-     *
      * @return Reference
      *
      * @throws StatNotFoundException
@@ -84,7 +62,7 @@ class StatHelper
         return $this->stats[$emailAddress];
     }
 
-    public function reset()
+    public function reset(): void
     {
         $this->deleteUs = [];
         $this->stats    = [];

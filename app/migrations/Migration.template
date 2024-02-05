@@ -2,31 +2,29 @@
 
 declare(strict_types=1);
 
-/*
- * @copyright   2021 Mautic Contributors. All rights reserved.
- * @author      Mautic
- * @link        https://mautic.org
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
-namespace Mautic\Migrations;
+namespace <namespace>;
 
 use Doctrine\DBAL\Schema\Schema;
-use Doctrine\Migrations\Exception\SkipMigration;
-use Mautic\CoreBundle\Doctrine\AbstractMauticMigration;
+use Mautic\CoreBundle\Doctrine\PreUpAssertionMigration;
 
-final class Version<version> extends AbstractMauticMigration
+final class <className> extends PreUpAssertionMigration
 {
-    /**
-     * @throws SkipMigration
-     */
-    public function preUp(Schema $schema): void
+    protected function preUpAssertions(): void
     {
-        $shouldRunMigration = false; // Please modify to your needs
-        
-        if (!$shouldRunMigration) {
-            throw new SkipMigration('Schema includes this migration');
-        }
+        // Please add an assertion for every SQL you define in the `up()` method.
+        // The order does matter!
+        // E.g.:
+        /*
+        $this->skipAssertion(
+            fn (Schema $schema) => $schema->hasTable("{$this->prefix}table_name"),
+            "Table {$this->prefix}table_name already exists"
+        );
+
+        $this->skipAssertion(
+            fn (Schema $schema) => $schema->getTable("{$this->prefix}table_name")->hasIndex('index_name'),
+            'Index index_name already exists'
+        );
+        */
     }
 
     public function up(Schema $schema): void

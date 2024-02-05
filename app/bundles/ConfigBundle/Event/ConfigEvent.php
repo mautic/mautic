@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\ConfigBundle\Event;
 
 use Mautic\CoreBundle\Event\CommonEvent;
@@ -18,36 +9,24 @@ use Symfony\Component\HttpFoundation\ParameterBag;
 class ConfigEvent extends CommonEvent
 {
     /**
-     * @var array
+     * @var mixed[]
      */
-    private $preserve = [];
+    private array $preserve = [];
 
     /**
-     * @param array
+     * @var mixed[]
      */
-    private $config;
+    private array $errors = [];
 
     /**
-     * @param ParameterBag
+     * @var mixed[]
      */
-    private $post;
-
-    /**
-     * @var array
-     */
-    private $errors = [];
-
-    /**
-     * @var array
-     */
-    private $fieldErrors = [];
+    private array $fieldErrors = [];
 
     /**
      * Data got from build form before update.
-     *
-     * @var array
      */
-    private $originalNormData;
+    private ?array $originalNormData = null;
 
     /**
      * Data got from build form after update.
@@ -56,10 +35,13 @@ class ConfigEvent extends CommonEvent
      */
     private $normData;
 
-    public function __construct(array $config, ParameterBag $post)
-    {
-        $this->config = $config;
-        $this->post   = $post;
+    /**
+     * @param mixed[]|null $config
+     */
+    public function __construct(
+        private ?array $config,
+        private ParameterBag $post
+    ) {
     }
 
     /**
@@ -72,7 +54,7 @@ class ConfigEvent extends CommonEvent
     public function getConfig($key = null)
     {
         if ($key) {
-            return (isset($this->config[$key])) ? $this->config[$key] : [];
+            return $this->config[$key] ?? [];
         }
 
         return $this->config;
@@ -81,9 +63,9 @@ class ConfigEvent extends CommonEvent
     /**
      * Sets the config array.
      *
-     * @param null $key
+     * @param string $key
      */
-    public function setConfig(array $config, $key = null)
+    public function setConfig(array $config, $key = null): void
     {
         if ($key) {
             $this->config[$key] = $config;
@@ -103,7 +85,7 @@ class ConfigEvent extends CommonEvent
      *
      * @param array|string $fields
      */
-    public function unsetIfEmpty($fields)
+    public function unsetIfEmpty($fields): void
     {
         if (!is_array($fields)) {
             $fields = [$fields];
@@ -171,10 +153,7 @@ class ConfigEvent extends CommonEvent
         return $this->fieldErrors;
     }
 
-    /**
-     * @return string
-     */
-    public function getFileContent(UploadedFile $file)
+    public function getFileContent(UploadedFile $file): string
     {
         $tmpFile = $file->getRealPath();
         $content = trim(file_get_contents($tmpFile));
@@ -183,12 +162,7 @@ class ConfigEvent extends CommonEvent
         return $content;
     }
 
-    /**
-     * @param $content
-     *
-     * @return string
-     */
-    public function encodeFileContents($content)
+    public function encodeFileContents($content): string
     {
         return base64_encode($content);
     }
@@ -222,7 +196,7 @@ class ConfigEvent extends CommonEvent
     /**
      * @param array $normData
      */
-    public function setNormData($normData)
+    public function setNormData($normData): void
     {
         $this->normData = $normData;
     }

@@ -1,15 +1,8 @@
 <?php
 
-/*
- * @copyright   2016 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\Middleware;
+
+use Mautic\CoreBundle\Loader\ParameterLoader;
 
 trait ConfigAwareTrait
 {
@@ -24,13 +17,16 @@ trait ConfigAwareTrait
     public function getConfig()
     {
         // Include paths
-        $root = realpath(__DIR__.'/..');
+        $root          = realpath(__DIR__.'/..');
+        $configBaseDir = ParameterLoader::getLocalConfigBaseDir($root);
+        $projectRoot   = ParameterLoader::getProjectDirByRoot($root);
 
         /** @var array $paths */
         include $root.'/config/paths.php';
 
         $localParameters = [];
-        $localConfig     = str_replace('%kernel.root_dir%', $root, $paths['local_config']);
+
+        $localConfig = ParameterLoader::getLocalConfigFile($root, false);
 
         if (file_exists($localConfig)) {
             /** @var $parameters */
@@ -39,9 +35,9 @@ trait ConfigAwareTrait
             $localParameters = $parameters;
         }
 
-        //check for parameter overrides
-        if (file_exists($root.'/config/parameters_local.php')) {
-            include $root.'/config/parameters_local.php';
+        // check for parameter overrides
+        if (file_exists($configBaseDir.'/config/parameters_local.php')) {
+            include $configBaseDir.'/config/parameters_local.php';
             $localParameters = array_merge($localParameters, $parameters);
         }
 

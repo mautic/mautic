@@ -1,38 +1,26 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CoreBundle\Form\DataTransformer;
 
 use Symfony\Component\Form\DataTransformerInterface;
 
 /**
- * Class DatetimeToStringTransformer.
+ * @deprecated since Mautic 5.0, to be removed in 6.0 with no replacement.
+ *
+ * @implements DataTransformerInterface<string|null, \DateTime>
  */
 class DatetimeToStringTransformer implements DataTransformerInterface
 {
     /**
-     * @var string
-     */
-    private $format;
-
-    /**
      * @param string $format
      */
-    public function __construct($format = 'Y-m-d H:i')
-    {
-        $this->format = $format;
+    public function __construct(
+        private $format = 'Y-m-d H:i'
+    ) {
     }
 
     /**
-     * {@inheritdoc}
+     * @param \DateTime|null $value
      *
      * @return string
      */
@@ -42,13 +30,13 @@ class DatetimeToStringTransformer implements DataTransformerInterface
             return null;
         }
 
-        $datetime = new \Datetime($value->format($this->format));
+        $datetime = new \DateTime($value->format($this->format));
 
         return $datetime->format($this->format);
     }
 
     /**
-     * {@inheritdoc}
+     * @param string|null $value
      *
      * @return \DateTime
      */

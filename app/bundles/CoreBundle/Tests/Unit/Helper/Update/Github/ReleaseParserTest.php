@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2020 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        https://www.mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CoreBundle\Tests\Unit\Helper\Update\Github;
 
 use GuzzleHttp\Client;
@@ -21,10 +12,7 @@ use PHPUnit\Framework\TestCase;
 
 class ReleaseParserTest extends TestCase
 {
-    /**
-     * @var ReleaseParser
-     */
-    private $releaseParser;
+    private \Mautic\CoreBundle\Helper\Update\Github\ReleaseParser $releaseParser;
 
     protected function setUp(): void
     {
@@ -65,82 +53,54 @@ class ReleaseParserTest extends TestCase
         $this->releaseParser = new ReleaseParser($client);
     }
 
-    public function testMatchingReleaseReturnedForAlphaStability()
+    public function testMatchingReleaseReturnedForAlphaStability(): void
     {
         $expects       = '3.0.1-beta';
-        $phpVersion    = '7.3.0';
         $mauticVersion = '3.0.0-alpha';
         $stability     = 'alpha';
 
-        $release = $this->releaseParser->getLatestSupportedRelease($this->getReleases(), $phpVersion, $mauticVersion, $stability);
+        $release = $this->releaseParser->getLatestSupportedRelease($this->getReleases(), $mauticVersion, $stability);
 
         $this->assertSame($expects, $release->getVersion());
     }
 
-    public function testMatchingReleaseReturnedForBetaStability()
+    public function testMatchingReleaseReturnedForBetaStability(): void
     {
         $expects       = '3.0.1-beta';
-        $phpVersion    = '7.3.0';
         $mauticVersion = '3.0.0-alpha';
         $stability     = 'beta';
 
-        $release = $this->releaseParser->getLatestSupportedRelease($this->getReleases(), $phpVersion, $mauticVersion, $stability);
+        $release = $this->releaseParser->getLatestSupportedRelease($this->getReleases(), $mauticVersion, $stability);
 
         $this->assertSame($expects, $release->getVersion());
     }
 
-    public function testMatchingReleaseReturnedForStableStability()
+    public function testMatchingReleaseReturnedForStableStability(): void
     {
         $expects       = '3.0.0';
-        $phpVersion    = '7.3.0';
         $mauticVersion = '2.20.0';
         $stability     = 'stable';
 
-        $release = $this->releaseParser->getLatestSupportedRelease($this->getReleases(), $phpVersion, $mauticVersion, $stability);
+        $release = $this->releaseParser->getLatestSupportedRelease($this->getReleases(), $mauticVersion, $stability);
 
         $this->assertSame($expects, $release->getVersion());
     }
 
-    public function testMatchingReleaseReturnedForMinPHPVersion()
-    {
-        $expects       = '2.16.0';
-        $phpVersion    = '7.1.0';
-        $mauticVersion = '2.15.0';
-        $stability     = 'stable';
-
-        $release = $this->releaseParser->getLatestSupportedRelease($this->getReleases(), $phpVersion, $mauticVersion, $stability);
-
-        $this->assertSame($expects, $release->getVersion());
-    }
-
-    public function testMatchingReleaseReturnedForMinimumMauticVersion()
+    public function testMatchingReleaseReturnedForMinimumMauticVersion(): void
     {
         $expects       = '2.15.0';
-        $phpVersion    = '7.1.0';
         $mauticVersion = '2.1.0';
         $stability     = 'stable';
 
-        $release = $this->releaseParser->getLatestSupportedRelease($this->getReleases(), $phpVersion, $mauticVersion, $stability);
+        $release = $this->releaseParser->getLatestSupportedRelease($this->getReleases(), $mauticVersion, $stability);
 
         $this->assertSame($expects, $release->getVersion());
     }
 
-    public function testLatestVersionSupportedExceptionThrownForNonmatchingPHPVersion()
+    public function testLatestVersionSupportedExceptionThrownIfMetadataErrors(): void
     {
         $this->expectException(LatestVersionSupportedException::class);
 
-        $phpVersion    = '7.4.0';
-        $mauticVersion = '2.16.0';
-        $stability     = 'stable';
-
-        $this->releaseParser->getLatestSupportedRelease($this->getReleases(), $phpVersion, $mauticVersion, $stability);
-    }
-
-    public function testLatestVersionSupportedExceptionThrownIfMetadataErrors()
-    {
-        $this->expectException(LatestVersionSupportedException::class);
-
-        $phpVersion    = '7.4.0';
         $mauticVersion = '2.16.0';
         $stability     = 'stable';
 
@@ -148,22 +108,19 @@ class ReleaseParserTest extends TestCase
             [
                 'handler' => new MockHandler(
                     [
-                        function (Request $request, array $options) {
-                            return new Response(500);
-                        },
+                        fn (Request $request, array $options) => new Response(500),
                     ]
                 ),
             ]
         );
 
-        (new ReleaseParser($client))->getLatestSupportedRelease([['html_url' => 'foo://bar']], $phpVersion, $mauticVersion, $stability);
+        (new ReleaseParser($client))->getLatestSupportedRelease([['html_url' => 'foo://bar']], $mauticVersion, $stability);
     }
 
-    public function testLatestVersionSupportedExceptionThrownIfMetadataNotFound()
+    public function testLatestVersionSupportedExceptionThrownIfMetadataNotFound(): void
     {
         $this->expectException(LatestVersionSupportedException::class);
 
-        $phpVersion    = '7.4.0';
         $mauticVersion = '2.16.0';
         $stability     = 'stable';
 
@@ -171,15 +128,13 @@ class ReleaseParserTest extends TestCase
             [
                 'handler' => new MockHandler(
                     [
-                        function (Request $request, array $options) {
-                            return new Response(200, [], json_encode(['foo' => 'bar']));
-                        },
+                        fn (Request $request, array $options) => new Response(200, [], json_encode(['foo' => 'bar'])),
                     ]
                 ),
             ]
         );
 
-        (new ReleaseParser($client))->getLatestSupportedRelease([['html_url' => 'foo://bar']], $phpVersion, $mauticVersion, $stability);
+        (new ReleaseParser($client))->getLatestSupportedRelease([['html_url' => 'foo://bar']], $mauticVersion, $stability);
     }
 
     private function getReleases(): array

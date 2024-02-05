@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\DashboardBundle\EventListener;
 
 use Mautic\DashboardBundle\DashboardEvents;
@@ -40,10 +31,7 @@ class DashboardSubscriber implements EventSubscriberInterface
      */
     protected $permissions = [];
 
-    /**
-     * @return array
-     */
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             DashboardEvents::DASHBOARD_ON_MODULE_LIST_GENERATE   => ['onWidgetListGenerate', 0],
@@ -55,7 +43,7 @@ class DashboardSubscriber implements EventSubscriberInterface
     /**
      * Adds widget new widget types to the list of available widget types.
      */
-    public function onWidgetListGenerate(WidgetTypeListEvent $event)
+    public function onWidgetListGenerate(WidgetTypeListEvent $event): void
     {
         if ($this->permissions && !$event->hasPermissions($this->permissions)) {
             return;
@@ -71,7 +59,7 @@ class DashboardSubscriber implements EventSubscriberInterface
     /**
      * Set a widget edit form when needed.
      */
-    public function onWidgetFormGenerate(WidgetFormEvent $event)
+    public function onWidgetFormGenerate(WidgetFormEvent $event): void
     {
         if (isset($this->types[$event->getType()])) {
             $event->setForm($this->types[$event->getType()]);
@@ -82,14 +70,14 @@ class DashboardSubscriber implements EventSubscriberInterface
     /**
      * Set a widget detail when needed.
      */
-    public function onWidgetDetailGenerate(WidgetDetailEvent $event)
+    public function onWidgetDetailGenerate(WidgetDetailEvent $event): void
     {
     }
 
     /**
      * Set a widget detail when needed.
      */
-    public function checkPermissions(WidgetDetailEvent $event)
+    public function checkPermissions(WidgetDetailEvent $event): void
     {
         $widgetTypes = array_keys($this->types);
         if ($this->permissions && !$event->hasPermissions($this->permissions) && in_array($event->getType(), $widgetTypes)) {

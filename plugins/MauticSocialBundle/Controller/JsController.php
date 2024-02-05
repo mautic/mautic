@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2016 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace MauticPlugin\MauticSocialBundle\Controller;
 
 use Mautic\CoreBundle\Controller\CommonController;
@@ -16,10 +7,7 @@ use Symfony\Component\HttpFoundation\Response;
 
 class JsController extends CommonController
 {
-    /**
-     * @return Response
-     */
-    public function generateAction($formName)
+    public function generateAction($formName): Response
     {
         $js = <<<JS
 

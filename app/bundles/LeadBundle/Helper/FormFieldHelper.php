@@ -1,25 +1,13 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\LeadBundle\Helper;
 
 use Mautic\CoreBundle\Helper\AbstractFormFieldHelper;
-use Symfony\Component\Intl\Intl;
+use Symfony\Component\Intl\Locales;
 
 class FormFieldHelper extends AbstractFormFieldHelper
 {
-    /**
-     * @var array
-     */
-    private static $types = [
+    private static array $types = [
         'text' => [
             'properties' => [],
         ],
@@ -106,7 +94,7 @@ class FormFieldHelper extends AbstractFormFieldHelper
     /**
      * Set the translation key prefix.
      */
-    public function setTranslationKeyPrefix()
+    public function setTranslationKeyPrefix(): void
     {
         $this->translationKeyPrefix = 'mautic.lead.field.type.';
     }
@@ -119,24 +107,18 @@ class FormFieldHelper extends AbstractFormFieldHelper
         return self::$types;
     }
 
-    /**
-     * @return array
-     */
-    public static function getListTypes()
+    public static function getListTypes(): array
     {
         return ['select', 'multiselect', 'boolean', 'lookup', 'country', 'region', 'timezone', 'locale'];
     }
 
     /**
-     * @param $type
-     * @param $properties
-     *
-     * @return bool
+     * @return array{0: bool, 1:string}
      */
-    public static function validateProperties($type, &$properties)
+    public static function validateProperties($type, &$properties): array
     {
         if (!array_key_exists($type, self::$types)) {
-            //ensure the field type is supported
+            // ensure the field type is supported
             return [false, 'mautic.lead.field.typenotrecognized'];
         }
 
@@ -147,7 +129,7 @@ class FormFieldHelper extends AbstractFormFieldHelper
             }
 
             if (!empty($fieldType['properties'][$key]['required']) && empty($value)) {
-                //ensure requirements are met
+                // ensure requirements are met
                 return [false, $fieldType['properties'][$key]['error_msg']];
             }
         }
@@ -156,20 +138,20 @@ class FormFieldHelper extends AbstractFormFieldHelper
     }
 
     /**
-     * @return array
+     * @return array<string, string>
      */
-    public static function getCountryChoices()
+    public static function getCountryChoices(): array
     {
         $countryJson = file_get_contents(__DIR__.'/../../CoreBundle/Assets/json/countries.json');
         $countries   = json_decode($countryJson);
 
-        return  array_combine($countries, $countries);
+        return array_combine($countries, $countries);
     }
 
     /**
-     * @return array
+     * @return array<string, array<string, string>>
      */
-    public static function getRegionChoices()
+    public static function getRegionChoices(): array
     {
         $regionJson = file_get_contents(__DIR__.'/../../CoreBundle/Assets/json/regions.json');
         $regions    = json_decode($regionJson);
@@ -186,7 +168,7 @@ class FormFieldHelper extends AbstractFormFieldHelper
      * Symfony deprecated and changed Symfony\Component\Form\Extension\Core\Type\TimezoneType::getTimezones to private
      * in 3.0 - so duplicated code here.
      *
-     * @return array
+     * @return array<string, mixed>
      */
     public static function getTimezonesChoices()
     {
@@ -219,25 +201,23 @@ class FormFieldHelper extends AbstractFormFieldHelper
     /**
      * Get locale choices.
      *
-     * @return array
+     * @return array<string, string>
      */
-    public static function getLocaleChoices()
+    public static function getLocaleChoices(): array
     {
-        return array_flip(Intl::getLocaleBundle()->getLocaleNames());
+        return array_flip(Locales::getNames());
     }
 
     /**
      * Get date field choices.
-     *
-     * @return array
      */
-    public function getDateChoices()
+    public function getDateChoices(): array
     {
         return [
-            $this->translator->trans('mautic.campaign.event.timed.choice.anniversary') => 'anniversary',
-            $this->translator->trans('mautic.campaign.event.timed.choice.today')       => '+P0D',
-            $this->translator->trans('mautic.campaign.event.timed.choice.yesterday')   => '-P1D',
-            $this->translator->trans('mautic.campaign.event.timed.choice.tomorrow')    => '+P1D',
+            'anniversary' => $this->translator->trans('mautic.campaign.event.timed.choice.anniversary'),
+            '+P0D'        => $this->translator->trans('mautic.campaign.event.timed.choice.today'),
+            '-P1D'        => $this->translator->trans('mautic.campaign.event.timed.choice.yesterday'),
+            '+P1D'        => $this->translator->trans('mautic.campaign.event.timed.choice.tomorrow'),
         ];
     }
 }

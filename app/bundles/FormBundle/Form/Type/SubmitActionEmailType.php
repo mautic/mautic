@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\FormBundle\Form\Type;
 
 use Mautic\CoreBundle\Form\ToBcBccFieldsTrait;
@@ -22,45 +13,27 @@ use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
- * Class SubmitActionEmailType.
+ * @extends AbstractType<mixed>
  */
 class SubmitActionEmailType extends AbstractType
 {
     use FormFieldTrait;
     use ToBcBccFieldsTrait;
 
-    /**
-     * @var TranslatorInterface
-     */
-    private $translator;
-
-    /**
-     * @var CoreParametersHelper
-     */
-    protected $coreParametersHelper;
-
-    /**
-     * SubmitActionEmailType constructor.
-     */
-    public function __construct(TranslatorInterface $translator, CoreParametersHelper $coreParametersHelper)
-    {
-        $this->translator           = $translator;
-        $this->coreParametersHelper = $coreParametersHelper;
+    public function __construct(
+        private TranslatorInterface $translator,
+        protected CoreParametersHelper $coreParametersHelper
+    ) {
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
-        $data = (isset($options['data']['subject']))
-            ? $options['data']['subject']
-            : $this->translator->trans(
-                'mautic.form.action.sendemail.subject.default'
-            );
+        $data = $options['data']['subject'] ?? $this->translator->trans(
+            'mautic.form.action.sendemail.subject.default'
+        );
         $builder->add(
             'subject',
             TextType::class,
@@ -96,30 +69,15 @@ class SubmitActionEmailType extends AbstractType
             ]
         );
 
-        if ('file' == $this->coreParametersHelper->get('mailer_spool_type')) {
-            $default = isset($options['data']['immediately']) ? $options['data']['immediately'] : false;
-            $builder->add(
-                'immediately',
-                YesNoButtonGroupType::class,
-                [
-                    'label' => 'mautic.form.action.sendemail.immediately',
-                    'data'  => $default,
-                    'attr'  => [
-                        'tooltip' => 'mautic.form.action.sendemail.immediately.desc',
-                    ],
-                ]
-            );
-        } else {
-            $builder->add(
-                'immediately',
-                HiddenType::class,
-                [
-                    'data' => false,
-                ]
-            );
-        }
+        $builder->add(
+            'immediately',
+            HiddenType::class,
+            [
+                'data' => false,
+            ]
+        );
 
-        $default = isset($options['data']['copy_lead']) ? $options['data']['copy_lead'] : false;
+        $default = $options['data']['copy_lead'] ?? false;
         $builder->add(
             'copy_lead',
             YesNoButtonGroupType::class,
@@ -129,7 +87,7 @@ class SubmitActionEmailType extends AbstractType
             ]
         );
 
-        $default = isset($options['data']['set_replyto']) ? $options['data']['set_replyto'] : true;
+        $default = $options['data']['set_replyto'] ?? true;
         $builder->add(
             'set_replyto',
             YesNoButtonGroupType::class,
@@ -142,7 +100,7 @@ class SubmitActionEmailType extends AbstractType
             ]
         );
 
-        $default = isset($options['data']['email_to_owner']) ? $options['data']['email_to_owner'] : false;
+        $default = $options['data']['email_to_owner'] ?? false;
         $builder->add(
             'email_to_owner',
             YesNoButtonGroupType::class,
@@ -170,15 +128,12 @@ class SubmitActionEmailType extends AbstractType
         $this->addToBcBccFields($builder);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getBlockPrefix()
     {
         return 'form_submitaction_sendemail';
     }
 
-    public function buildView(FormView $view, FormInterface $form, array $options)
+    public function buildView(FormView $view, FormInterface $form, array $options): void
     {
         $view->vars['formFields'] = $this->getFormFields($options['attr']['data-formid']);
     }

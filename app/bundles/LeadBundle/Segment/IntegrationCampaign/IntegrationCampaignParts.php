@@ -1,35 +1,20 @@
 <?php
 
-/*
- * @copyright   2018 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\LeadBundle\Segment\IntegrationCampaign;
 
 class IntegrationCampaignParts
 {
-    /**
-     * @var string
-     */
-    private $integrationName;
+    private string $integrationName;
 
-    /**
-     * @var string
-     */
-    private $campaignId;
+    private string $campaignId;
 
     /**
      * @param string $field
      */
     public function __construct($field)
     {
-        if (false !== strpos($field, '::')) {
-            list($integrationName, $campaignId) = explode('::', $field);
+        if (str_contains($field, '::')) {
+            [$integrationName, $campaignId] = explode('::', $field);
         } else {
             // Assuming this is a Salesforce integration for BC with pre 2.11.0
             $integrationName = 'Salesforce';
@@ -39,18 +24,12 @@ class IntegrationCampaignParts
         $this->campaignId      = $campaignId;
     }
 
-    /**
-     * @return string
-     */
-    public function getIntegrationName()
+    public function getIntegrationName(): string
     {
         return $this->integrationName;
     }
 
-    /**
-     * @return string
-     */
-    public function getCampaignId()
+    public function getCampaignId(): string
     {
         return $this->campaignId;
     }

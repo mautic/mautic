@@ -1,30 +1,19 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CoreBundle\Helper;
 
 use Doctrine\DBAL\Connection;
+use Symfony\Component\Cache\Adapter\DoctrineDbalAdapter;
 use Symfony\Component\Cache\Adapter\FilesystemAdapter;
-use Symfony\Component\Cache\Adapter\PdoAdapter;
 
 /**
- * Class CacheStorageHelper.
- *
  * @deprecated This helper is deprecated in favor of CacheBundle
  */
 class CacheStorageHelper
 {
-    const ADAPTOR_DATABASE = 'db';
+    public const ADAPTOR_DATABASE = 'db';
 
-    const ADAPTOR_FILESYSTEM = 'fs';
+    public const ADAPTOR_FILESYSTEM = 'fs';
 
     /**
      * @var array
@@ -32,34 +21,11 @@ class CacheStorageHelper
     protected $cache = [];
 
     /**
-     * @var PdoAdapter|FilesystemAdapter
+     * @var DoctrineDbalAdapter|FilesystemAdapter
      */
     protected $cacheAdaptor;
 
-    /**
-     * @var string
-     */
-    protected $adaptor;
-
-    /**
-     * @var Connection
-     */
-    protected $connection;
-
-    /**
-     * @var string
-     */
-    protected $cacheDir;
-
-    /**
-     * @var string
-     */
-    protected $namespace;
-
-    /**
-     * @var int
-     */
-    protected $defaultExpiration;
+    protected string $cacheDir;
 
     /**
      * Semi BC support for pre 2.6.0.
@@ -71,18 +37,19 @@ class CacheStorageHelper
     protected $expirations = [];
 
     /**
-     * @param      $adaptor
-     * @param null $namespace
-     * @param null $cacheDir
-     * @param int  $defaultExpiration
+     * @param mixed  $cacheDir
+     * @param mixed  $namespace
+     * @param int    $defaultExpiration
+     * @param string $adaptor
      */
-    public function __construct($adaptor, $namespace = null, Connection $connection = null, $cacheDir = null, $defaultExpiration = 0)
-    {
+    public function __construct(
+        protected $adaptor,
+        protected $namespace = null,
+        protected ?Connection $connection = null,
+        $cacheDir = null,
+        protected $defaultExpiration = 0
+    ) {
         $this->cacheDir          = $cacheDir.'/data';
-        $this->adaptor           = $adaptor;
-        $this->namespace         = $namespace;
-        $this->connection        = $connection;
-        $this->defaultExpiration = $defaultExpiration;
 
         // @deprecated BC support for pre 2.6.0 to be removed in 3.0
         if (!in_array($adaptor, [self::ADAPTOR_DATABASE, self::ADAPTOR_FILESYSTEM])) {
@@ -98,19 +65,12 @@ class CacheStorageHelper
         $this->setCacheAdaptor();
     }
 
-    /**
-     * @return string|false
-     */
-    public function getAdaptorClassName()
+    public function getAdaptorClassName(): string
     {
-        return get_class($this->cacheAdaptor);
+        return $this->cacheAdaptor::class;
     }
 
     /**
-     * @param      $name
-     * @param      $data
-     * @param null $expiration
-     *
      * @return bool
      *
      * @throws \Psr\Cache\InvalidArgumentException
@@ -133,7 +93,6 @@ class CacheStorageHelper
     }
 
     /**
-     * @param     $name
      * @param int $maxAge @deprecated 2.6.0 to be removed in 3.0; set expiration when using set()
      *
      * @return bool|mixed
@@ -155,17 +114,12 @@ class CacheStorageHelper
         return false;
     }
 
-    /**
-     * @param $name
-     */
-    public function delete($name)
+    public function delete($name): void
     {
         $this->cacheAdaptor->deleteItem($name);
     }
 
     /**
-     * @param $name
-     *
      * @return bool
      */
     public function has($name)
@@ -176,15 +130,12 @@ class CacheStorageHelper
     /**
      * Wipes out the cache directory.
      */
-    public function clear()
+    public function clear(): void
     {
         $this->cacheAdaptor->clear();
     }
 
     /**
-     * @param null $namespace
-     * @param null $defaultExpiration
-     *
      * @return CacheStorageHelper;
      */
     public function getCache($namespace = null, $defaultExpiration = 0)
@@ -212,7 +163,8 @@ class CacheStorageHelper
         switch ($this->adaptor) {
             case self::ADAPTOR_DATABASE:
                 $namespace          = ($this->namespace) ? InputHelper::alphanum($this->namespace, false, '-', ['-', '+', '.']) : '';
-                $this->cacheAdaptor = new PdoAdapter(
+
+                $this->cacheAdaptor = new DoctrineDbalAdapter(
                     $this->connection, $namespace, $this->defaultExpiration, ['db_table' => MAUTIC_TABLE_PREFIX.'cache_items']
                 );
                 break;
@@ -231,7 +183,7 @@ class CacheStorageHelper
      *
      * @deprecated 2.6.0 to be removed in 3.0
      */
-    public function touchDir()
+    public function touchDir(): void
     {
     }
 }

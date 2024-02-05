@@ -2,15 +2,6 @@
 
 declare(strict_types=1);
 
-/*
- * @copyright   2018 Mautic Contributors. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CampaignBundle\Tests\Executioner\Dispatcher;
 
 use Doctrine\Common\Collections\ArrayCollection;
@@ -38,22 +29,22 @@ class ActionDispatcherTest extends \PHPUnit\Framework\TestCase
     /**
      * @var MockObject|EventDispatcherInterface
      */
-    private $dispatcher;
+    private \PHPUnit\Framework\MockObject\MockObject $dispatcher;
 
     /**
      * @var MockObject|EventScheduler
      */
-    private $scheduler;
+    private \PHPUnit\Framework\MockObject\MockObject $scheduler;
 
     /**
      * @var MockObject|LegacyEventDispatcher
      */
-    private $legacyDispatcher;
+    private \PHPUnit\Framework\MockObject\MockObject $legacyDispatcher;
 
     /**
      * @var MockObject|NotificationHelper
      */
-    private $notificationHelper;
+    private \PHPUnit\Framework\MockObject\MockObject $notificationHelper;
 
     protected function setUp(): void
     {
@@ -65,7 +56,7 @@ class ActionDispatcherTest extends \PHPUnit\Framework\TestCase
         $this->legacyDispatcher   = $this->createMock(LegacyEventDispatcher::class);
     }
 
-    public function testActionBatchEventIsDispatchedWithSuccessAndFailedLogs()
+    public function testActionBatchEventIsDispatchedWithSuccessAndFailedLogs(): void
     {
         $event = new Event();
         $lead1 = $this->createMock(Lead::class);
@@ -114,25 +105,28 @@ class ActionDispatcherTest extends \PHPUnit\Framework\TestCase
             ->method('dispatch')
             ->withConsecutive(
                 [],
-                [CampaignEvents::ON_EVENT_EXECUTED, $this->isInstanceOf(ExecutedEvent::class)],
-                [CampaignEvents::ON_EVENT_EXECUTED_BATCH, $this->isInstanceOf(ExecutedBatchEvent::class)],
-                [CampaignEvents::ON_EVENT_FAILED, $this->isInstanceOf(FailedEvent::class)]
+                [$this->isInstanceOf(ExecutedEvent::class), CampaignEvents::ON_EVENT_EXECUTED],
+                [$this->isInstanceOf(ExecutedBatchEvent::class), CampaignEvents::ON_EVENT_EXECUTED_BATCH],
+                [$this->isInstanceOf(FailedEvent::class), CampaignEvents::ON_EVENT_FAILED]
             )
             ->willReturnCallback(
-                function (string $eventName, $event) use ($logs, &$dispatcCounter) {
+                function (\Symfony\Contracts\EventDispatcher\Event $event, string $eventName) use ($logs, &$dispatcCounter) {
                     ++$dispatcCounter;
                     if (1 === $dispatcCounter) {
                         Assert::assertInstanceOf(PendingEvent::class, $event);
+                        \assert($event instanceof PendingEvent);
                         $event->pass($logs->get(1));
                         $event->fail($logs->get(2), 'just because');
                     }
+
+                    return $event;
                 }
             );
 
         $this->scheduler->expects($this->once())
             ->method('rescheduleFailures')
             ->willReturnCallback(
-                function (ArrayCollection $logs) use ($log2) {
+                function (ArrayCollection $logs) use ($log2): void {
                     if ($logs->count() > 1) {
                         $this->fail('Only one log was supposed to fail');
                     }
@@ -151,7 +145,7 @@ class ActionDispatcherTest extends \PHPUnit\Framework\TestCase
         $this->getEventDispatcher()->dispatchEvent($config, $event, $logs);
     }
 
-    public function testActionLogNotProcessedExceptionIsThrownIfLogNotProcessedWithSuccess()
+    public function testActionLogNotProcessedExceptionIsThrownIfLogNotProcessedWithSuccess(): void
     {
         $this->expectException(LogNotProcessedException::class);
 
@@ -200,9 +194,10 @@ class ActionDispatcherTest extends \PHPUnit\Framework\TestCase
         $this->dispatcher->expects($this->once())
             ->method('dispatch')
             ->willReturnCallback(
-                function ($eventName, PendingEvent $pendingEvent) use ($logs) {
+                function (PendingEvent $pendingEvent, string $eventName) use ($logs) {
                     $pendingEvent->pass($logs->get(1));
 
+                    return $pendingEvent;
                     // One log is not processed so the exception should be thrown
                 }
             );
@@ -210,7 +205,7 @@ class ActionDispatcherTest extends \PHPUnit\Framework\TestCase
         $this->getEventDispatcher()->dispatchEvent($config, $event, $logs);
     }
 
-    public function testActionLogNotProcessedExceptionIsThrownIfLogNotProcessedWithFailed()
+    public function testActionLogNotProcessedExceptionIsThrownIfLogNotProcessedWithFailed(): void
     {
         $this->expectException(LogNotProcessedException::class);
 
@@ -260,9 +255,10 @@ class ActionDispatcherTest extends \PHPUnit\Framework\TestCase
         $this->dispatcher->expects($this->once())
             ->method('dispatch')
             ->willReturnCallback(
-                function ($eventName, PendingEvent $pendingEvent) use ($logs) {
+                function (PendingEvent $pendingEvent, string $eventName) use ($logs) {
                     $pendingEvent->fail($logs->get(2), 'something');
 
+                    return $pendingEvent;
                     // One log is not processed so the exception should be thrown
                 }
             );
@@ -270,7 +266,7 @@ class ActionDispatcherTest extends \PHPUnit\Framework\TestCase
         $this->getEventDispatcher()->dispatchEvent($config, $event, $logs);
     }
 
-    public function testActionBatchEventIsIgnoredWithLegacy()
+    public function testActionBatchEventIsIgnoredWithLegacy(): void
     {
         $event  = new Event();
         $config = $this->createMock(ActionAccessor::class);

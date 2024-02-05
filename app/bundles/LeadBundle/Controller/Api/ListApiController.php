@@ -1,35 +1,79 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\LeadBundle\Controller\Api;
 
+use Doctrine\Persistence\ManagerRegistry;
 use Mautic\ApiBundle\Controller\CommonApiController;
+use Mautic\ApiBundle\Helper\EntityResultHelper;
+use Mautic\CoreBundle\Factory\MauticFactory;
+use Mautic\CoreBundle\Factory\ModelFactory;
+use Mautic\CoreBundle\Helper\AppVersion;
+use Mautic\CoreBundle\Helper\CoreParametersHelper;
+use Mautic\CoreBundle\Security\Permissions\CorePermissions;
+use Mautic\CoreBundle\Translation\Translator;
 use Mautic\LeadBundle\Controller\LeadAccessTrait;
 use Mautic\LeadBundle\Entity\LeadList;
+use Mautic\LeadBundle\Model\LeadModel;
+use Mautic\LeadBundle\Model\ListModel;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\Form\FormFactoryInterface;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpKernel\Event\FilterControllerEvent;
+use Symfony\Component\Routing\RouterInterface;
 
+/**
+ * @extends CommonApiController<LeadList>
+ */
 class ListApiController extends CommonApiController
 {
     use LeadAccessTrait;
 
-    public function initialize(FilterControllerEvent $event)
+    /**
+     * @var ListModel|null
+     */
+    protected $model;
+
+    public function __construct(CorePermissions $security, Translator $translator, EntityResultHelper $entityResultHelper, RouterInterface $router, FormFactoryInterface $formFactory, AppVersion $appVersion, RequestStack $requestStack, ManagerRegistry $doctrine, ModelFactory $modelFactory, EventDispatcherInterface $dispatcher, CoreParametersHelper $coreParametersHelper, MauticFactory $factory)
     {
-        $this->model            = $this->getModel('lead.list');
+        $listModel = $modelFactory->getModel('lead.list');
+        \assert($listModel instanceof ListModel);
+
+        $this->model            = $listModel;
         $this->entityClass      = LeadList::class;
         $this->entityNameOne    = 'list';
         $this->entityNameMulti  = 'lists';
         $this->serializerGroups = ['leadListDetails', 'userList', 'publishDetails', 'ipAddress', 'categoryList'];
 
-        parent::initialize($event);
+        parent::__construct($security, $translator, $entityResultHelper, $router, $formFactory, $appVersion, $requestStack, $doctrine, $modelFactory, $dispatcher, $coreParametersHelper, $factory);
+    }
+
+    /**
+     * @deprecated This conversion won't be needed in couple of years.
+     *
+     * The 'filter' and 'display' fields used to be part of each segment filter root array.
+     * Those fields were moved to 'properties' subarray. We have to ensure BC and remove them
+     * from filter root array so Symfony forms would not fail with unknown field error.
+     */
+    protected function prepareParametersForBinding(Request $request, $parameters, $entity, $action)
+    {
+        if (empty($parameters['filters']) || !is_array($parameters['filters'])) {
+            return $parameters;
+        }
+
+        foreach ($parameters['filters'] as $key => $filter) {
+            $bcFilterValue                                       = $filter['filter'] ?? null;
+            $filterValue                                         = $filter['properties']['filter'] ?? $bcFilterValue;
+            $parameters['filters'][$key]['properties']['filter'] = $filterValue;
+
+            if (!empty($filter['display']) && !isset($filter['properties']['display'])) {
+                $parameters['filters'][$key]['properties']['display'] = $filter['display'];
+            }
+
+            unset($parameters['filters'][$key]['filter'], $parameters['filters'][$key]['display']);
+        }
+
+        return $parameters;
     }
 
     /**
@@ -39,7 +83,9 @@ class ListApiController extends CommonApiController
      */
     public function getListsAction()
     {
-        $lists   = $this->getModel('lead.list')->getUserLists();
+        $listModel = $this->getModel('lead.list');
+        \assert($listModel instanceof ListModel);
+        $lists   = $listModel->getUserLists();
         $view    = $this->view($lists, Response::HTTP_OK);
         $context = $view->getContext()->setGroups(['leadListList']);
         $view->setContext($context);
@@ -76,7 +122,9 @@ class ListApiController extends CommonApiController
             return $this->accessDenied();
         }
 
-        $this->getModel('lead')->addToLists($leadId, $entity);
+        $leadModel = $this->getModel('lead');
+        \assert($leadModel instanceof LeadModel);
+        $leadModel->addToLists($leadId, $entity);
 
         $view = $this->view(['success' => 1], Response::HTTP_OK);
 
@@ -92,9 +140,9 @@ class ListApiController extends CommonApiController
      *
      * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
      */
-    public function addLeadsAction($id)
+    public function addLeadsAction(Request $request, $id)
     {
-        $contactIds = $this->request->request->get('ids');
+        $contactIds = $request->request->all()['ids'] ?? null;
         if (null === $contactIds) {
             return $this->returnError('mautic.core.error.badrequest', Response::HTTP_BAD_REQUEST);
         }
@@ -117,8 +165,10 @@ class ListApiController extends CommonApiController
             if ($contact instanceof Response) {
                 $responseDetail[$contactId] = ['success' => false];
             } else {
+                $leadModel = $this->getModel('lead');
+                \assert($leadModel instanceof LeadModel);
                 /* @var \Mautic\LeadBundle\Entity\Lead $contact */
-                $this->getModel('lead')->addToLists($contact, $entity);
+                $leadModel->addToLists($contact, $entity);
                 $responseDetail[$contact->getId()] = ['success' => true];
             }
         }
@@ -157,7 +207,9 @@ class ListApiController extends CommonApiController
             return $this->accessDenied();
         }
 
-        $this->getModel('lead')->removeFromLists($leadId, $entity);
+        $leadModel = $this->getModel('lead');
+        \assert($leadModel instanceof LeadModel);
+        $leadModel->removeFromLists($leadId, $entity);
 
         $view = $this->view(['success' => 1], Response::HTTP_OK);
 

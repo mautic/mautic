@@ -1,38 +1,27 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\LeadBundle\Form\DataTransformer;
 
 use Mautic\LeadBundle\Entity\LeadField;
 use Mautic\LeadBundle\Entity\LeadFieldRepository;
 use Symfony\Component\Form\DataTransformerInterface;
 
+/**
+ * @implements DataTransformerInterface<LeadField|null, int|null>
+ */
 class FieldToOrderTransformer implements DataTransformerInterface
 {
-    /**
-     * @var LeadFieldRepository
-     */
-    private $leadFieldRepository;
-
-    public function __construct(LeadFieldRepository $leadFieldRepository)
-    {
-        $this->leadFieldRepository = $leadFieldRepository;
+    public function __construct(
+        private LeadFieldRepository $leadFieldRepository
+    ) {
     }
 
     /**
      * Transforms an object to an integer (order).
      *
-     * @param LeadField|null $order
+     * @param int|null $order
      *
-     * @return string
+     * @return LeadField|null
      */
     public function transform($order)
     {
@@ -46,14 +35,14 @@ class FieldToOrderTransformer implements DataTransformerInterface
     /**
      * Transforms a integer to an object.
      *
-     * @param int $field
+     * @param LeadField|null $field
      *
-     * @return LeadField|null
+     * @return int|null
      */
     public function reverseTransform($field)
     {
         if (null === $field) {
-            return 0;
+            return null;
         }
 
         return $field->getOrder();

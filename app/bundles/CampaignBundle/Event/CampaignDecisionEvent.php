@@ -1,53 +1,29 @@
 <?php
 
-/*
- * @copyright   2015 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CampaignBundle\Event;
 
 use Mautic\CampaignBundle\Entity\LeadEventLog;
-use Symfony\Component\EventDispatcher\Event;
+use Symfony\Contracts\EventDispatcher\Event;
 
 /**
- * Class CampaignDecisionEvent.
- *
  * @deprecated 2.13.0; to be removed in 3.0
  */
 class CampaignDecisionEvent extends Event
 {
-    protected $lead;
-    protected $events;
-    protected $decisionType;
-    protected $decisionEventDetails;
-    protected $eventSettings;
-    protected $isRootLevel;
     protected $decisionTriggered = false;
-    protected $logs;
 
     /**
-     * @param $lead
-     * @param $decisionType
-     * @param $decisionEventDetails
-     * @param $events
-     * @param $eventSettings
-     * @param $isRootLevel
      * @param LeadEventLog[] $logs
      */
-    public function __construct($lead, $decisionType, $decisionEventDetails, $events, $eventSettings, $isRootLevel = false, $logs = [])
-    {
-        $this->lead                 = $lead;
-        $this->decisionType         = $decisionType;
-        $this->decisionEventDetails = $decisionEventDetails;
-        $this->events               = $events;
-        $this->eventSettings        = $eventSettings;
-        $this->isRootLevel          = $isRootLevel;
-        $this->logs                 = $logs;
+    public function __construct(
+        protected $lead,
+        protected $decisionType,
+        protected $decisionEventDetails,
+        protected $events,
+        protected $eventSettings,
+        protected $isRootLevel = false,
+        protected $logs = []
+    ) {
     }
 
     /**
@@ -83,9 +59,6 @@ class CampaignDecisionEvent extends Event
     }
 
     /**
-     * @param null $eventType
-     * @param null $type
-     *
      * @return bool
      */
     public function getEventSettings($eventType = null, $type = null)
@@ -114,7 +87,7 @@ class CampaignDecisionEvent extends Event
      *
      * @param bool|true $triggered
      */
-    public function setDecisionAlreadyTriggered($triggered = true)
+    public function setDecisionAlreadyTriggered($triggered = true): void
     {
         $this->decisionTriggered = $triggered;
     }

@@ -3,42 +3,39 @@
 namespace Mautic\CoreBundle\Tests\Unit\Helper;
 
 use Mautic\CoreBundle\Helper\CookieHelper;
+use PHPUnit\Framework\Assert;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
+use Symfony\Component\HttpFoundation\Cookie;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\ResponseHeaderBag;
+use Symfony\Component\HttpKernel\Event\ResponseEvent;
+use Symfony\Component\HttpKernel\HttpKernelInterface;
 
-class CookieHelperTest extends \PHPUnit\Framework\TestCase
+class CookieHelperTest extends TestCase
 {
     /**
-     * @var RequestStack|\PHPUnit\Framework\MockObject\MockObject
+     * @var RequestStack|MockObject
      */
-    private $requestStackMock;
-
-    /**
-     * @var Request|\PHPUnit\Framework\MockObject\MockObject
-     */
-    private $requestMock;
+    private \PHPUnit\Framework\MockObject\MockObject $requestStackMock;
 
     protected function setUp(): void
     {
-        if (!function_exists('xdebug_get_headers')) {
-            $this->markTestSkipped('This test needs xdebug.');
-        }
         $this->requestStackMock = $this->createMock(RequestStack::class);
-        $this->requestMock      = $this->createMock(Request::class);
-        $this->requestStackMock->method('getCurrentRequest')
-            ->willReturn($this->requestMock);
+        $requestMock            = $this->createMock(Request::class);
+        $this->requestStackMock->method('getMasterRequest')
+            ->willReturn($requestMock);
     }
 
     /**
-     * @testdox The helper is instantiated correctly when secure and contains SameSite = None
-     *
-     * @runInSeparateProcess
-     * @preserveGlobalState disabled
+     * @testdox The helper is instantiated correctly when secure and contains samesite=lax
      *
      * @covers \Mautic\CoreBundle\Helper\CookieHelper::__construct
      * @covers \Mautic\CoreBundle\Helper\CookieHelper::setCookie
      */
-    public function testSetCookieWhenSecure()
+    public function testSetCookieWhenSecure(): void
     {
         $cookiePath   = '/';
         $cookieDomain = 'https://test.test';
@@ -47,23 +44,34 @@ class CookieHelperTest extends \PHPUnit\Framework\TestCase
         $requestStack = $this->requestStackMock;
         $cookieHelper = new CookieHelper($cookiePath, $cookieDomain, $cookieSecure, $cookieHttp, $requestStack);
         $cookieName   = 'secureTest';
+
         $cookieHelper->setCookie($cookieName, 'test');
 
-        $cookie = $this->getCookie($cookieName);
-        $this->assertStringContainsString('SameSite=None', $cookie);
-        $this->assertStringContainsString('secure', $cookie);
+        $headers = $this->createMock(ResponseHeaderBag::class);
+        $headers->expects(self::once())
+            ->method('setCookie')
+            ->willReturnCallback(static function (Cookie $cookie): void {
+                Assert::assertStringContainsString('samesite=lax', (string) $cookie);
+                Assert::assertStringContainsString('secure', (string) $cookie);
+            });
+
+        $response          = $this->createMock(Response::class);
+        $response->headers = $headers;
+        $kernel            = new \AppKernel(MAUTIC_ENV, false);
+        $request           = $this->createMock(Request::class);
+
+        $event   = new ResponseEvent($kernel, $request, HttpKernelInterface::MAIN_REQUEST, $response);
+
+        $cookieHelper->onResponse($event);
     }
 
     /**
-     * @testdox The helper is instantiated correctly when not secure and does not contain SameSite = None
-     *
-     * @runInSeparateProcess
-     * @preserveGlobalState disabled
+     * @testdox The helper is instantiated correctly when not secure and contain samesite=lax
      *
      * @covers \Mautic\CoreBundle\Helper\CookieHelper::__construct
      * @covers \Mautic\CoreBundle\Helper\CookieHelper::setCookie
      */
-    public function testSetCookieWhenNotSecure()
+    public function testSetCookieWhenNotSecure(): void
     {
         $cookiePath   = '/';
         $cookieDomain = 'https://test.test';
@@ -72,33 +80,57 @@ class CookieHelperTest extends \PHPUnit\Framework\TestCase
         $requestStack = $this->requestStackMock;
         $cookieHelper = new CookieHelper($cookiePath, $cookieDomain, $cookieSecure, $cookieHttp, $requestStack);
         $cookieName   = 'notSecureTest';
+
         $cookieHelper->setCookie($cookieName, 'test');
 
-        $cookie = $this->getCookie($cookieName);
-        $this->assertNotContains('SameSite=None', $cookie);
-        $this->assertNotContains('secure', $cookie);
+        $headers = $this->createMock(ResponseHeaderBag::class);
+        $headers->expects(self::once())
+            ->method('setCookie')
+            ->willReturnCallback(static function (Cookie $cookie): void {
+                Assert::assertStringContainsString('samesite=lax', (string) $cookie);
+                Assert::assertStringNotContainsString('secure', (string) $cookie);
+            });
+
+        $response          = $this->createMock(Response::class);
+        $response->headers = $headers;
+        $kernel            = new \AppKernel(MAUTIC_ENV, false);
+        $request           = $this->createMock(Request::class);
+
+        $event             = new ResponseEvent($kernel, $request, HttpKernelInterface::MAIN_REQUEST, $response);
+
+        $cookieHelper->onResponse($event);
     }
 
-    /**
-     * Helper function to get cookie from header list.
-     *
-     * @param string $name
-     *
-     * @return string
-     */
-    private function getCookie($name)
+    public function testSetCookieWhenSecureAndSameSiteNone(): void
     {
-        $cookies = [];
-        $headers = xdebug_get_headers();
-        // see http://tools.ietf.org/html/rfc6265#section-4.1.1
-        foreach ($headers as $header) {
-            if (0 === strpos($header, 'Set-Cookie: ')) {
-                $value = str_replace('&', urlencode('&'), substr($header, 12));
-                parse_str(current(explode(';', $value, 1)), $pair);
-                $cookies = array_merge_recursive($cookies, $pair);
-            }
-        }
+        $cookiePath   = '/';
+        $cookieDomain = 'https://test.test';
+        $cookieSecure = true;
+        $cookieHttp   = false;
+        $requestStack = $this->requestStackMock;
+        $cookieHelper = new CookieHelper($cookiePath, $cookieDomain, $cookieSecure, $cookieHttp, $requestStack);
+        $cookieName   = 'samesite_test';
 
-        return $cookies[$name];
+        $cookieHelper->setCookie(
+            name: $cookieName,
+            value: 'test',
+            sameSite: Cookie::SAMESITE_NONE
+        );
+
+        $headers = $this->createMock(ResponseHeaderBag::class);
+        $headers->expects(self::once())
+            ->method('setCookie')
+            ->willReturnCallback(static function (Cookie $cookie): void {
+                Assert::assertStringContainsString('samesite=none', (string) $cookie);
+                Assert::assertStringContainsString('secure', (string) $cookie);
+            });
+
+        $response          = $this->createMock(Response::class);
+        $response->headers = $headers;
+        $kernel            = new \AppKernel(MAUTIC_ENV, false);
+        $request           = $this->createMock(Request::class);
+        $event             = new ResponseEvent($kernel, $request, HttpKernelInterface::MAIN_REQUEST, $response);
+
+        $cookieHelper->onResponse($event);
     }
 }

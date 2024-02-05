@@ -1,14 +1,5 @@
 <?php
 
-/**
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @see         http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CoreBundle\Helper;
 
 use Mautic\CoreBundle\Exception\FilePathException;
@@ -18,14 +9,9 @@ use Symfony\Component\HttpFoundation\File\UploadedFile;
 
 class FileUploader
 {
-    /**
-     * @var FilePathResolver
-     */
-    private $filePathResolver;
-
-    public function __construct(FilePathResolver $filePathResolver)
-    {
-        $this->filePathResolver = $filePathResolver;
+    public function __construct(
+        private FilePathResolver $filePathResolver
+    ) {
     }
 
     /**
@@ -45,7 +31,7 @@ class FileUploader
                 $file->move($uploadDir, $fileName);
 
                 return $fileName;
-            } catch (FileException $e) {
+            } catch (FileException) {
                 throw new FileUploadException('Could not upload file');
             }
         } catch (FilePathException $e) {
@@ -56,7 +42,7 @@ class FileUploader
     /**
      * @param string $path
      */
-    public function delete($path)
+    public function delete($path): void
     {
         $this->filePathResolver->delete($path);
     }

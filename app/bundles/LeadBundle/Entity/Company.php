@@ -1,31 +1,21 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\LeadBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\CoreBundle\Entity\FormEntity;
+use Mautic\LeadBundle\Form\Validator\Constraints\UniqueCustomField;
 use Mautic\LeadBundle\Model\FieldModel;
 use Mautic\UserBundle\Entity\User;
+use Symfony\Component\Validator\Mapping\ClassMetadata;
 
-/**
- * Class Company.
- */
-class Company extends FormEntity implements CustomFieldEntityInterface
+class Company extends FormEntity implements CustomFieldEntityInterface, IdentifierFieldEntityInterface
 {
     use CustomFieldEntityTrait;
 
-    const FIELD_ALIAS = 'company';
+    public const FIELD_ALIAS = 'company';
 
     /**
      * @var int
@@ -33,17 +23,14 @@ class Company extends FormEntity implements CustomFieldEntityInterface
     private $id;
 
     /**
-     * @var int
+     * @var int|null
      */
     private $score = 0;
 
-    /**
-     * @var \Mautic\UserBundle\Entity\User
-     */
-    private $owner;
+    private ?User $owner = null;
 
     /**
-     * @var array
+     * @var mixed[]
      */
     private $socialCache = [];
 
@@ -79,9 +66,7 @@ class Company extends FormEntity implements CustomFieldEntityInterface
     }
 
     /**
-     * Get social cache.
-     *
-     * @return mixed
+     * @return mixed[]
      */
     public function getSocialCache()
     {
@@ -89,23 +74,21 @@ class Company extends FormEntity implements CustomFieldEntityInterface
     }
 
     /**
-     * Set social cache.
-     *
-     * @param $cache
+     * @param mixed[] $cache
      */
-    public function setSocialCache($cache)
+    public function setSocialCache($cache): void
     {
         $this->socialCache = $cache;
     }
 
-    public static function loadMetadata(ORM\ClassMetadata $metadata)
+    public static function loadMetadata(ORM\ClassMetadata $metadata): void
     {
         $builder = new ClassMetadataBuilder($metadata);
         $builder->setTable('companies')
-            ->setCustomRepositoryClass('Mautic\LeadBundle\Entity\CompanyRepository');
+            ->setCustomRepositoryClass(CompanyRepository::class);
 
         $builder->createField('id', 'integer')
-            ->isPrimaryKey()
+            ->makePrimaryKey()
             ->generatedValue()
             ->build();
 
@@ -114,8 +97,7 @@ class Company extends FormEntity implements CustomFieldEntityInterface
             ->nullable()
             ->build();
 
-        $builder->createManyToOne('owner', 'Mautic\UserBundle\Entity\User')
-            ->cascadeDetach()
+        $builder->createManyToOne('owner', \Mautic\UserBundle\Entity\User::class)
             ->cascadeMerge()
             ->addJoinColumn('owner_id', 'id', true, false, 'SET NULL')
             ->build();
@@ -146,10 +128,8 @@ class Company extends FormEntity implements CustomFieldEntityInterface
 
     /**
      * Prepares the metadata for API usage.
-     *
-     * @param $metadata
      */
-    public static function loadApiMetadata(ApiMetadataDriver $metadata)
+    public static function loadApiMetadata(ApiMetadataDriver $metadata): void
     {
         $metadata->setGroupPrefix('companyBasic')
             ->addListProperties(
@@ -181,33 +161,24 @@ class Company extends FormEntity implements CustomFieldEntityInterface
             ->build();
     }
 
-    /**
-     * @param string $prop
-     * @param mixed  $val
-     */
-    protected function isChanged($prop, $val)
+    public static function loadValidatorMetadata(ClassMetadata $metadata): void
     {
-        $getter  = 'get'.ucfirst($prop);
-        $current = $this->$getter();
-        if ('owner' == $prop) {
-            if ($current && !$val) {
-                $this->changes['owner'] = [$current->getName().' ('.$current->getId().')', $val];
-            } elseif (!$current && $val) {
-                $this->changes['owner'] = [$current, $val->getName().' ('.$val->getId().')'];
-            } elseif ($current && $val && $current->getId() != $val->getId()) {
-                $this->changes['owner'] = [
-                    $current->getName().'('.$current->getId().')',
-                    $val->getName().'('.$val->getId().')',
-                ];
-            }
-        } else {
-            parent::isChanged($prop, $val);
-        }
+        $metadata->addConstraint(new UniqueCustomField(['object' => 'company']));
+    }
+
+    public static function getDefaultIdentifierFields(): array
+    {
+        return [
+            'companyname',
+            'companyemail',
+            'companywebsite',
+            'city',
+            'state',
+            'country',
+        ];
     }
 
     /**
-     * Get id.
-     *
      * @return int
      */
     public function getId()
@@ -230,10 +201,6 @@ class Company extends FormEntity implements CustomFieldEntityInterface
     }
 
     /**
-     * Set owner.
-     *
-     * @param User $owner
-     *
      * @return Company
      */
     public function setOwner(User $owner = null)
@@ -244,12 +211,7 @@ class Company extends FormEntity implements CustomFieldEntityInterface
         return $this;
     }
 
-    /**
-     * Get owner.
-     *
-     * @return User
-     */
-    public function getOwner()
+    public function getOwner(): ?User
     {
         return $this->owner;
     }
@@ -261,12 +223,10 @@ class Company extends FormEntity implements CustomFieldEntityInterface
      */
     public function getPermissionUser()
     {
-        return (null === $this->getOwner()) ? $this->getCreatedBy() : $this->getOwner();
+        return $this->getOwner() ?? $this->getCreatedBy();
     }
 
     /**
-     * Set score.
-     *
      * @param User $score
      *
      * @return Company
@@ -282,8 +242,6 @@ class Company extends FormEntity implements CustomFieldEntityInterface
     }
 
     /**
-     * Get score.
-     *
      * @return int
      */
     public function getScore()

@@ -1,38 +1,16 @@
 <?php
 
-/*
- * @copyright   2017 Mautic Contributors. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\EmailBundle\MonitoredEmail\Processor\Reply;
 
 class RepliedEmail
 {
     /**
-     * @var string
-     */
-    private $fromAddress;
-
-    /**
-     * @var string|null
-     */
-    private $statHash;
-
-    /**
-     * RepliedEmail constructor.
-     *
      * @param string $fromAddress
-     * @param null   $statHash
      */
-    public function __construct($fromAddress, $statHash = null)
-    {
-        $this->fromAddress = $fromAddress;
-        $this->statHash    = $statHash;
+    public function __construct(
+        private $fromAddress,
+        private $statHash = null
+    ) {
     }
 
     /**

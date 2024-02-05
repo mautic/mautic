@@ -1,46 +1,35 @@
 <?php
 
-/*
- * @copyright   2016 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CoreBundle\Controller;
 
-use Symfony\Component\Form\Form;
+use Symfony\Component\Form\FormInterface;
 
 trait FormErrorMessagesTrait
 {
     /**
-     * @return string
+     * @param array<mixed> $formErrors
      */
-    public function getFormErrorMessage(array $formErrors)
+    public function getFormErrorMessage(array $formErrors): string
     {
         $msg = '';
 
-        if ($formErrors) {
-            foreach ($formErrors as $key => $error) {
-                if (!$error) {
-                    continue;
-                }
+        foreach ($formErrors as $key => $error) {
+            if (!$error) {
+                continue;
+            }
 
-                if ($msg) {
-                    $msg .= ', ';
-                }
+            if ($msg) {
+                $msg .= ', ';
+            }
 
-                if (is_string($key)) {
-                    $msg .= $key.': ';
-                }
+            if (is_string($key)) {
+                $msg .= $key.': ';
+            }
 
-                if (is_array($error)) {
-                    $msg .= $this->getFormErrorMessage($error);
-                } else {
-                    $msg .= $error;
-                }
+            if (is_array($error)) {
+                $msg .= $this->getFormErrorMessage($error);
+            } else {
+                $msg .= $error;
             }
         }
 
@@ -48,9 +37,11 @@ trait FormErrorMessagesTrait
     }
 
     /**
-     * @return array
+     * @param FormInterface<mixed> $form
+     *
+     * @return array<array<string|null>>
      */
-    public function getFormErrorMessages(Form $form)
+    public function getFormErrorMessages(FormInterface $form): array
     {
         $errors = [];
 
@@ -65,7 +56,12 @@ trait FormErrorMessagesTrait
         return $errors;
     }
 
-    public function getFormErrorCodes(Form $form): array
+    /**
+     * @param FormInterface<mixed> $form
+     *
+     * @return array<string|null>
+     */
+    public function getFormErrorCodes(FormInterface $form): array
     {
         $codes = [];
 
@@ -77,13 +73,12 @@ trait FormErrorMessagesTrait
         return $codes;
     }
 
-    public function getFormErrorForBuilder(Form $form)
+    /**
+     * @param FormInterface<mixed> $form
+     */
+    public function getFormErrorForBuilder(FormInterface $form): ?string
     {
-        if (!$form->isSubmitted()) {
-            return null;
-        }
-
-        if ($form->isValid()) {
+        if (!$form->isSubmitted() || $form->isValid()) {
             return null;
         }
 
@@ -95,6 +90,6 @@ trait FormErrorMessagesTrait
 
         $validationError = $this->getFormErrorMessage($validationErrors);
 
-        return $this->get('translator')->trans('mautic.core.form.builder.error', ['%error%' => $validationError]);
+        return $this->translator->trans('mautic.core.form.builder.error', ['%error%' => $validationError]);
     }
 }

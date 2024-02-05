@@ -2,15 +2,6 @@
 
 declare(strict_types=1);
 
-/*
- * @copyright   2018 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\ChannelBundle\Tests\Model;
 
 use Mautic\ChannelBundle\Model\ChannelActionModel;
@@ -18,40 +9,21 @@ use Mautic\LeadBundle\Entity\DoNotContact as DNC;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Model\DoNotContact;
 use Mautic\LeadBundle\Model\LeadModel;
-use PHPUnit\Framework\MockObject\MockObject;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class ChannelActionModelTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var MockObject
-     */
-    private $contactMock5;
+    private \PHPUnit\Framework\MockObject\MockObject $contactMock5;
 
-    /**
-     * @var MockObject
-     */
-    private $contactMock6;
+    private \PHPUnit\Framework\MockObject\MockObject $contactMock6;
 
-    /**
-     * @var MockObject
-     */
-    private $contactModelMock;
+    private \PHPUnit\Framework\MockObject\MockObject $contactModelMock;
 
-    /**
-     * @var MockObject
-     */
-    private $doNotContactMock;
+    private \PHPUnit\Framework\MockObject\MockObject $doNotContactMock;
 
-    /**
-     * @var MockObject
-     */
-    private $translatorMock;
+    private \PHPUnit\Framework\MockObject\MockObject $translatorMock;
 
-    /**
-     * @var ChannelActionModel
-     */
-    private $actionModel;
+    private \Mautic\ChannelBundle\Model\ChannelActionModel $actionModel;
 
     protected function setUp(): void
     {
@@ -88,7 +60,7 @@ class ChannelActionModelTest extends \PHPUnit\Framework\TestCase
         $this->contactModelMock->expects($this->never())
             ->method('getContactChannels');
 
-        $this->actionModel->update($contacts, [], [], '');
+        $this->actionModel->update($contacts, []);
     }
 
     public function testSubscribeContactToEmailChannel(): void

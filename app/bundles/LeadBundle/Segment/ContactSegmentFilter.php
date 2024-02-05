@@ -1,15 +1,9 @@
 <?php
-/*
- * @copyright   2018 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
 
 namespace Mautic\LeadBundle\Segment;
 
+use Doctrine\DBAL\Schema\Column;
+use Mautic\LeadBundle\Segment\Decorator\ContactDecoratorForeignInterface;
 use Mautic\LeadBundle\Segment\Decorator\FilterDecoratorInterface;
 use Mautic\LeadBundle\Segment\DoNotContact\DoNotContactParts;
 use Mautic\LeadBundle\Segment\Exception\FieldNotFoundException;
@@ -18,9 +12,9 @@ use Mautic\LeadBundle\Segment\Query\Filter\FilterQueryBuilderInterface;
 use Mautic\LeadBundle\Segment\Query\QueryBuilder;
 
 /**
- * Class ContactSegmentFilter is used for accessing $filter as an object and to keep logic in an object.
+ * Used for accessing $filter as an object and to keep logic in an object.
  */
-class ContactSegmentFilter
+class ContactSegmentFilter implements \Stringable
 {
     /**
      * @var ContactSegmentFilterCrate
@@ -28,34 +22,20 @@ class ContactSegmentFilter
     public $contactSegmentFilterCrate;
 
     /**
-     * @var FilterDecoratorInterface
+     * @param array<string, mixed> $batchLimiters
      */
-    private $filterDecorator;
-
-    /**
-     * @var FilterQueryBuilderInterface
-     */
-    private $filterQueryBuilder;
-
-    /**
-     * @var TableSchemaColumnsCache
-     */
-    private $schemaCache;
-
     public function __construct(
         ContactSegmentFilterCrate $contactSegmentFilterCrate,
-        FilterDecoratorInterface $filterDecorator,
-        TableSchemaColumnsCache $cache,
-        FilterQueryBuilderInterface $filterQueryBuilder
+        private FilterDecoratorInterface $filterDecorator,
+        private TableSchemaColumnsCache $schemaCache,
+        private FilterQueryBuilderInterface $filterQueryBuilder,
+        private array $batchLimiters = []
     ) {
         $this->contactSegmentFilterCrate = $contactSegmentFilterCrate;
-        $this->filterDecorator           = $filterDecorator;
-        $this->schemaCache               = $cache;
-        $this->filterQueryBuilder        = $filterQueryBuilder;
     }
 
     /**
-     * @return \Doctrine\DBAL\Schema\Column
+     * @return Column
      *
      * @throws FieldNotFoundException
      */
@@ -99,6 +79,14 @@ class ContactSegmentFilter
     }
 
     /**
+     * @return string
+     */
+    public function getType()
+    {
+        return $this->contactSegmentFilterCrate->getType();
+    }
+
+    /**
      * @return mixed
      */
     public function getTable()
@@ -106,9 +94,16 @@ class ContactSegmentFilter
         return $this->filterDecorator->getTable($this->contactSegmentFilterCrate);
     }
 
+    public function getForeignContactColumn(): ?string
+    {
+        if ($this->filterDecorator instanceof ContactDecoratorForeignInterface) {
+            return $this->filterDecorator->getForeignContactColumn($this->contactSegmentFilterCrate);
+        } else {
+            return 'lead_id';
+        }
+    }
+
     /**
-     * @param $argument
-     *
      * @return mixed
      */
     public function getParameterHolder($argument)
@@ -140,44 +135,30 @@ class ContactSegmentFilter
         return $this->contactSegmentFilterCrate->getGlue();
     }
 
-    /**
-     * @return mixed
-     */
-    public function getAggregateFunction()
+    public function getAggregateFunction(): string|bool
     {
         return $this->filterDecorator->getAggregateFunc($this->contactSegmentFilterCrate);
     }
 
-    /**
-     * @return FilterQueryBuilderInterface
-     */
-    public function getFilterQueryBuilder()
+    public function getFilterQueryBuilder(): FilterQueryBuilderInterface
     {
         return $this->filterQueryBuilder;
     }
 
-    /**
-     * @return QueryBuilder
-     */
-    public function applyQuery(QueryBuilder $queryBuilder)
+    public function applyQuery(QueryBuilder $queryBuilder): QueryBuilder
     {
         return $this->filterQueryBuilder->applyQuery($queryBuilder, $this);
     }
 
     /**
      * Whether the filter references another ContactSegment.
-     *
-     * @return bool
      */
-    public function isContactSegmentReference()
+    public function isContactSegmentReference(): bool
     {
         return 'leadlist' === $this->getField();
     }
 
-    /**
-     * @return bool
-     */
-    public function isColumnTypeBoolean()
+    public function isColumnTypeBoolean(): bool
     {
         return $this->contactSegmentFilterCrate->isBooleanType();
     }
@@ -190,27 +171,21 @@ class ContactSegmentFilter
         return $this->contactSegmentFilterCrate->getNullValue();
     }
 
-    /**
-     * @return DoNotContactParts
-     */
-    public function getDoNotContactParts()
+    public function getDoNotContactParts(): DoNotContactParts
     {
         return new DoNotContactParts($this->contactSegmentFilterCrate->getField());
     }
 
-    /**
-     * @return IntegrationCampaignParts
-     */
-    public function getIntegrationCampaignParts()
+    public function getIntegrationCampaignParts(): IntegrationCampaignParts
     {
         return new IntegrationCampaignParts($this->getParameterValue());
     }
 
-    public function __toString()
+    public function __toString(): string
     {
         return sprintf(
             'table: %s,  %s on %s %s %s',
-                $this->getTable(),
+            $this->getTable(),
             $this->getField(),
             $this->getQueryType(),
             $this->getOperator(),
@@ -218,14 +193,33 @@ class ContactSegmentFilter
         );
     }
 
+    /**
+     * @return string|null
+     */
     public function getRelationJoinTable()
     {
         return method_exists($this->filterDecorator, 'getRelationJoinTable') ? $this->filterDecorator->getRelationJoinTable() : null;
     }
 
+    /**
+     * @return string|null
+     */
     public function getRelationJoinTableField()
     {
         return method_exists($this->filterDecorator, 'getRelationJoinTableField') ?
             $this->filterDecorator->getRelationJoinTableField() : null;
+    }
+
+    public function doesColumnSupportEmptyValue(): bool
+    {
+        return !in_array($this->contactSegmentFilterCrate->getType(), ['date', 'datetime'], true);
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    public function getBatchLimiters(): array
+    {
+        return $this->batchLimiters;
     }
 }

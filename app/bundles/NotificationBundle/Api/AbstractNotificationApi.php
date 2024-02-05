@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2016 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\NotificationBundle\Api;
 
 use GuzzleHttp\Client;
@@ -19,18 +10,11 @@ use Psr\Http\Message\ResponseInterface;
 
 abstract class AbstractNotificationApi
 {
-    protected Client $http;
-    protected TrackableModel $trackableModel;
-    protected IntegrationHelper $integrationHelper;
-
-    /**
-     * AbstractNotificationApi constructor.
-     */
-    public function __construct(Client $http, TrackableModel $trackableModel, IntegrationHelper $integrationHelper)
-    {
-        $this->http              = $http;
-        $this->trackableModel    = $trackableModel;
-        $this->integrationHelper = $integrationHelper;
+    public function __construct(
+        protected Client $http,
+        protected TrackableModel $trackableModel,
+        protected IntegrationHelper $integrationHelper
+    ) {
     }
 
     /**
@@ -40,8 +24,6 @@ abstract class AbstractNotificationApi
     abstract public function send(string $endpoint, array $data): ResponseInterface;
 
     /**
-     * @param $id
-     *
      * @return mixed
      */
     abstract public function sendNotification($id, Notification $notification);

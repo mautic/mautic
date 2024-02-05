@@ -1,50 +1,40 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\FormBundle\EventListener;
 
 use Mautic\CoreBundle\Helper\Chart\LineChart;
+use Mautic\CoreBundle\Helper\CoreParametersHelper;
+use Mautic\FormBundle\Entity\Form;
 use Mautic\FormBundle\Entity\SubmissionRepository;
+use Mautic\FormBundle\Model\FormModel;
 use Mautic\LeadBundle\Model\CompanyReportData;
 use Mautic\ReportBundle\Event\ReportBuilderEvent;
 use Mautic\ReportBundle\Event\ReportGeneratorEvent;
 use Mautic\ReportBundle\Event\ReportGraphEvent;
+use Mautic\ReportBundle\Helper\ReportHelper;
 use Mautic\ReportBundle\ReportEvents;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class ReportSubscriber implements EventSubscriberInterface
 {
-    const CONTEXT_FORMS           = 'forms';
-    const CONTEXT_FORM_SUBMISSION = 'form.submissions';
+    public const CONTEXT_FORMS           = 'forms';
 
-    /**
-     * @var CompanyReportData
-     */
-    private $companyReportData;
+    public const CONTEXT_FORM_SUBMISSION = 'form.submissions';
 
-    /**
-     * @var SubmissionRepository
-     */
-    private $submissionRepository;
+    public const CONTEXT_FORM_RESULT     = 'form.results';
 
-    public function __construct(CompanyReportData $companyReportData, SubmissionRepository $submissionRepository)
-    {
-        $this->companyReportData    = $companyReportData;
-        $this->submissionRepository = $submissionRepository;
+    public function __construct(
+        private CompanyReportData $companyReportData,
+        private SubmissionRepository $submissionRepository,
+        private FormModel $formModel,
+        private ReportHelper $reportHelper,
+        private CoreParametersHelper $coreParametersHelper,
+        private TranslatorInterface $translator
+    ) {
     }
 
-    /**
-     * @return array
-     */
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             ReportEvents::REPORT_ON_BUILD          => ['onReportBuilder', 0],
@@ -56,9 +46,9 @@ class ReportSubscriber implements EventSubscriberInterface
     /**
      * Add available tables and columns to the report builder lookup.
      */
-    public function onReportBuilder(ReportBuilderEvent $event)
+    public function onReportBuilder(ReportBuilderEvent $event): void
     {
-        if (!$event->checkContext([self::CONTEXT_FORMS, self::CONTEXT_FORM_SUBMISSION])) {
+        if (!$event->checkContext([self::CONTEXT_FORMS, self::CONTEXT_FORM_SUBMISSION, self::CONTEXT_FORM_RESULT])) {
             return;
         }
 
@@ -129,14 +119,57 @@ class ReportSubscriber implements EventSubscriberInterface
             $event->addGraph($context, 'table', 'mautic.form.table.top.referrers');
             $event->addGraph($context, 'table', 'mautic.form.table.most.submitted');
         }
+
+        if ($event->checkContext(self::CONTEXT_FORM_RESULT)) {
+            $formRepository = $this->formModel->getRepository();
+            // select only the table for an existing report, if the setting is disabled
+            if (false === $this->coreParametersHelper->get('form_results_data_sources')) {
+                $reportSource = empty($event->getContext()) ? ($event->getReportSource() ?? '') : $event->getContext();
+
+                $id   = $formRepository->getFormTableIdViaResults($reportSource);
+                $args = [
+                    'filter' => [
+                        'force' => [
+                            [
+                                'column' => 'f.id',
+                                'expr'   => 'eq',
+                                'value'  => $id,
+                            ],
+                        ],
+                    ],
+                ];
+            }
+
+            $forms = $formRepository->getEntities($args ?? []);
+            foreach ($forms as $form) {
+                $formEntity         = $form[0];
+
+                $formResultsColumns = $this->getFormResultsColumns($formEntity);
+                $mappedFieldValues  = $formEntity->getMappedFieldValues();
+                $columnsMapped      = [];
+                foreach ($mappedFieldValues as $item) {
+                    $columns        = $this->reportHelper->getMappedObjectColumns($item['mappedObject'], $item);
+                    $columnsMapped  = array_merge($columnsMapped, $columns);
+                }
+
+                $formResultsColumns = array_merge($formResultsColumns, $columnsMapped);
+                $data               = [
+                    'display_name' => $formEntity->getId().' '.$formEntity->getName(),
+                    'columns'      => $formResultsColumns,
+                ];
+
+                $resultsTableName   = $formRepository->getResultsTableName($formEntity->getId(), $formEntity->getAlias());
+                $event->addTable(self::CONTEXT_FORM_RESULT.'.'.$resultsTableName, $data, self::CONTEXT_FORM_RESULT);
+            }
+        }
     }
 
     /**
      * Initialize the QueryBuilder object to generate reports from.
      */
-    public function onReportGenerate(ReportGeneratorEvent $event)
+    public function onReportGenerate(ReportGeneratorEvent $event): void
     {
-        if (!$event->checkContext([self::CONTEXT_FORMS, self::CONTEXT_FORM_SUBMISSION])) {
+        if (!$event->checkContext([self::CONTEXT_FORMS, self::CONTEXT_FORM_SUBMISSION, self::CONTEXT_FORM_RESULT])) {
             return;
         }
 
@@ -164,6 +197,17 @@ class ReportSubscriber implements EventSubscriberInterface
                 }
 
                 break;
+            case self::CONTEXT_FORM_RESULT.str_replace(self::CONTEXT_FORM_RESULT, '', $context):
+                $resultsTableName = str_replace(self::CONTEXT_FORM_RESULT.'.', '', $context);
+
+                $qb->from(MAUTIC_TABLE_PREFIX.$resultsTableName, 'fr')
+                    ->leftJoin('fr', MAUTIC_TABLE_PREFIX.'form_submissions', 'fs', 'fs.id = fr.submission_id');
+                $event->addLeadLeftJoin($qb, 'fs');
+                if ($this->companyReportData->eventHasCompanyColumns($event)) {
+                    $event->addCompanyLeftJoin($qb);
+                }
+
+                break;
         }
 
         $event->setQueryBuilder($qb);
@@ -172,7 +216,7 @@ class ReportSubscriber implements EventSubscriberInterface
     /**
      * Initialize the QueryBuilder object to generate reports from.
      */
-    public function onReportGraphGenerate(ReportGraphEvent $event)
+    public function onReportGraphGenerate(ReportGraphEvent $event): void
     {
         // Context check, we only want to fire for Lead reports
         if (!$event->checkContext(self::CONTEXT_FORM_SUBMISSION)) {
@@ -226,5 +270,50 @@ class ReportSubscriber implements EventSubscriberInterface
             }
             unset($queryBuilder);
         }
+    }
+
+    /**
+     * Get form fields and create the list of the form results table columns.
+     *
+     * @return array<string, array<string, string>>
+     */
+    private function getFormResultsColumns(Form $form): array
+    {
+        $prefix         = 'fr.';
+        $fields         = $form->getFields();
+        $viewOnlyFields = $this->formModel->getCustomComponents()['viewOnlyFields'];
+
+        foreach ($fields as $field) {
+            if (!in_array($field->getType(), $viewOnlyFields)) {
+                $index                      = $prefix.$field->getAlias();
+                $formResultsColumns[$index] = [
+                    'label' => $this->translator->trans('mautic.form.report.form_results.label', ['%field%' => $field->getLabel()]),
+                    'type'  => 'number' === $field->getType() ? 'int' : 'string',
+                    'alias' => $field->getAlias(),
+                ];
+
+                if ('file' === $field->getType()) {
+                    $formResultsColumns[$index]['link']           = 'mautic_form_file_download_by_name';
+                    $formResultsColumns[$index]['linkParameters'] = [
+                        'fieldId'  => $field->getId(),
+                        'fileName' => '%alias%',
+                    ];
+                }
+            }
+        }
+
+        $formResultsColumns[$prefix.'submission_id'] = [
+            'label' => $this->translator->trans('mautic.form.report.form_results.label', ['%field%' => $this->translator->trans('mautic.form.report.submission.id')]),
+            'type'  => 'int',
+            'alias' => 'submissionId',
+        ];
+        $formResultsColumns[$prefix.'form_id']       = [
+            'label' => $this->translator->trans('mautic.form.report.form_results.label', ['%field%' => $this->translator->trans('mautic.form.report.form_id')]),
+            'type'  => 'int',
+            'link'  => 'mautic_form_action',
+            'alias' => 'formResultId',
+        ];
+
+        return $formResultsColumns;
     }
 }

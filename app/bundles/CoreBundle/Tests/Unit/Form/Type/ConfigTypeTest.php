@@ -4,8 +4,10 @@ namespace Mautic\CoreBundle\Tests\Unit\Form\Type;
 
 use Mautic\CoreBundle\Factory\IpLookupFactory;
 use Mautic\CoreBundle\Form\Type\ConfigType;
+use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\LanguageHelper;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
+use Mautic\CoreBundle\Shortener\Shortener;
 use Mautic\PageBundle\Entity\PageRepository;
 use Mautic\PageBundle\Form\Type\PageListType;
 use Mautic\PageBundle\Model\PageModel;
@@ -13,12 +15,13 @@ use Symfony\Component\Form\Extension\Validator\ValidatorExtension;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\PreloadedExtension;
 use Symfony\Component\Form\Test\TypeTestCase;
-use Symfony\Component\Translation\TranslatorInterface;
 use Symfony\Component\Validator\Validation;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class ConfigTypeTest extends TypeTestCase
 {
-    private $formBuilder;
+    private \PHPUnit\Framework\MockObject\MockObject $formBuilder;
+
     private $formType;
 
     protected function setUp(): void
@@ -28,7 +31,7 @@ class ConfigTypeTest extends TypeTestCase
         parent::setUp();
     }
 
-    public function testSubmitValidData()
+    public function testSubmitValidData(): void
     {
         $formData = [
             'site_url'             => 'http://example.com',
@@ -57,15 +60,17 @@ class ConfigTypeTest extends TypeTestCase
 
     private function getConfigFormType()
     {
-        $translator      = $this->createMock(TranslatorInterface::class);
-        $languageHelper  = $this->createMock(LanguageHelper::class);
-        $ipLookupFactory = $this->createMock(IpLookupFactory::class);
+        $translator                 = $this->createMock(TranslatorInterface::class);
+        $languageHelper             = $this->createMock(LanguageHelper::class);
+        $ipLookupFactory            = $this->createMock(IpLookupFactory::class);
+        $shortener                  = $this->createMock(Shortener::class);
+        $coreParametersHelper       = $this->createMock(CoreParametersHelper::class);
 
         $languageHelper->expects($this->any())
                        ->method('fetchLanguages')
                        ->willReturn(['en' => ['name'=>'English']]);
 
-        return new ConfigType($translator, $languageHelper, $ipLookupFactory, [], null);
+        return new ConfigType($translator, $languageHelper, $ipLookupFactory, null, $shortener, $coreParametersHelper);
     }
 
     protected function getExtensions()

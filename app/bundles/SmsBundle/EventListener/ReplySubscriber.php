@@ -1,17 +1,9 @@
 <?php
 
-/*
- * @copyright   2018 Mautic Inc. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://www.mautic.com
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\SmsBundle\EventListener;
 
 use Mautic\CoreBundle\Helper\InputHelper;
+use Mautic\CoreBundle\Translation\Translator;
 use Mautic\LeadBundle\Entity\LeadEventLog;
 use Mautic\LeadBundle\Entity\LeadEventLogRepository;
 use Mautic\LeadBundle\Event\LeadTimelineEvent;
@@ -20,25 +12,18 @@ use Mautic\LeadBundle\LeadEvents;
 use Mautic\SmsBundle\Event\ReplyEvent;
 use Mautic\SmsBundle\SmsEvents;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-use Symfony\Component\Translation\TranslatorInterface;
 
 class ReplySubscriber implements EventSubscriberInterface
 {
     use TimelineEventLogTrait;
 
-    /**
-     * ReplySubscriber constructor.
-     */
-    public function __construct(TranslatorInterface $translator, LeadEventLogRepository $eventLogRepository)
+    public function __construct(Translator $translator, LeadEventLogRepository $eventLogRepository)
     {
         $this->translator         = $translator;
         $this->eventLogRepository = $eventLogRepository;
     }
 
-    /**
-     * @return array
-     */
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             SmsEvents::ON_REPLY              => ['onReply', 0],
@@ -46,7 +31,7 @@ class ReplySubscriber implements EventSubscriberInterface
         ];
     }
 
-    public function onReply(ReplyEvent $event)
+    public function onReply(ReplyEvent $event): void
     {
         $message = $event->getMessage();
         $contact = $event->getContact();
@@ -68,7 +53,7 @@ class ReplySubscriber implements EventSubscriberInterface
         $event->setEventLog($log);
     }
 
-    public function onTimelineGenerate(LeadTimelineEvent $event)
+    public function onTimelineGenerate(LeadTimelineEvent $event): void
     {
         $this->addEvents(
             $event,
@@ -78,7 +63,7 @@ class ReplySubscriber implements EventSubscriberInterface
             'sms',
             'sms',
             'reply',
-            'MauticSmsBundle:SubscribedEvents/Timeline:reply.html.php'
+            '@MauticSms/SubscribedEvents/Timeline/reply.html.twig'
         );
     }
 }

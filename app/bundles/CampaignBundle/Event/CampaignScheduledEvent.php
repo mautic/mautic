@@ -1,22 +1,11 @@
 <?php
 
-/*
- * @copyright   2015 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CampaignBundle\Event;
 
 use Mautic\CampaignBundle\Entity\LeadEventLog;
-use Symfony\Component\EventDispatcher\Event;
+use Symfony\Contracts\EventDispatcher\Event;
 
 /**
- * Class CampaignScheduledEvent.
- *
  * @deprecated 2.13.0; to be removed in 3.0
  */
 class CampaignScheduledEvent extends Event
@@ -44,7 +33,7 @@ class CampaignScheduledEvent extends Event
     protected $systemTriggered;
 
     /**
-     * @var \DateTime
+     * @var \DateTimeInterface
      */
     protected $dateScheduled;
 
@@ -53,26 +42,16 @@ class CampaignScheduledEvent extends Event
      */
     protected $eventSettings;
 
-    /**
-     * @var LeadEventLog
-     */
-    protected $log;
-
-    /**
-     * CampaignScheduledEvent constructor.
-     *
-     * @param $args
-     */
-    public function __construct(array $args, LeadEventLog $log = null)
-    {
+    public function __construct(
+        array $args,
+        protected ?LeadEventLog $log = null
+    ) {
         $this->lead            = $args['lead'];
         $this->event           = $args['event'];
         $this->eventDetails    = $args['eventDetails'];
         $this->systemTriggered = $args['systemTriggered'];
         $this->dateScheduled   = $args['dateScheduled'];
         $this->eventSettings   = $args['eventSettings'];
-
-        $this->log = $log;
     }
 
     /**
@@ -116,7 +95,7 @@ class CampaignScheduledEvent extends Event
     }
 
     /**
-     * @return \DateTime
+     * @return \DateTimeInterface
      */
     public function getDateScheduled()
     {

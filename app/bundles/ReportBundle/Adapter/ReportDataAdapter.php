@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\ReportBundle\Adapter;
 
 use Mautic\ReportBundle\Crate\ReportDataResult;
@@ -18,17 +9,12 @@ use Mautic\ReportBundle\Model\ReportModel;
 
 class ReportDataAdapter
 {
-    /**
-     * @var ReportModel
-     */
-    private $reportModel;
-
-    public function __construct(ReportModel $reportModel)
-    {
-        $this->reportModel = $reportModel;
+    public function __construct(
+        private ReportModel $reportModel
+    ) {
     }
 
-    public function getReportData(Report $report, ReportExportOptions $reportExportOptions)
+    public function getReportData(Report $report, ReportExportOptions $reportExportOptions): ReportDataResult
     {
         $options                    = [];
         $options['paginate']        = true;

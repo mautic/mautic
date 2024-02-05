@@ -2,15 +2,6 @@
 
 declare(strict_types=1);
 
-/*
- * @copyright   2019 Mautic Inc. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://www.mautic.com
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\IntegrationsBundle\Sync\SyncDataExchange\Internal;
 
 use Mautic\IntegrationsBundle\Event\InternalObjectEvent;
@@ -22,20 +13,15 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 class ObjectProvider
 {
     /**
-     * @var EventDispatcherInterface
-     */
-    private $dispatcher;
-
-    /**
      * Cached internal objects.
      *
      * @var ObjectInterface[]
      */
-    private $objects = [];
+    private array $objects = [];
 
-    public function __construct(EventDispatcherInterface $dispatcher)
-    {
-        $this->dispatcher = $dispatcher;
+    public function __construct(
+        private EventDispatcherInterface $dispatcher
+    ) {
     }
 
     /**
@@ -78,7 +64,7 @@ class ObjectProvider
     {
         if (empty($this->objects)) {
             $event = new InternalObjectEvent();
-            $this->dispatcher->dispatch(IntegrationEvents::INTEGRATION_COLLECT_INTERNAL_OBJECTS, $event);
+            $this->dispatcher->dispatch($event, IntegrationEvents::INTEGRATION_COLLECT_INTERNAL_OBJECTS);
             $this->objects = $event->getObjects();
         }
     }

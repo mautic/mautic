@@ -1,12 +1,4 @@
 <?php
-/*
- * @copyright   2020 Mautic, Inc. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://mautic.com
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
 
 namespace Mautic\PageBundle\Tests\Form\Type;
 
@@ -20,8 +12,9 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class PageListTypeTest extends TestCase
 {
-    private $page;
-    private $pageModelMock;
+    private \Mautic\PageBundle\Form\Type\PageListType $page;
+
+    private \PHPUnit\Framework\MockObject\MockObject $pageModelMock;
 
     public function setUp(): void
     {
@@ -30,7 +23,7 @@ class PageListTypeTest extends TestCase
         $this->page            = new PageListType($this->pageModelMock, $corePermissionsHelper);
     }
 
-    public function testPageListTypeOptionsChoices()
+    public function testPageListTypeOptionsChoices(): void
     {
         $pageRepository = $this->createMock(PageRepository::class);
         $resolver       = new OptionsResolver();
@@ -56,12 +49,12 @@ class PageListTypeTest extends TestCase
         $this->assertEquals($expectedOptions, $resolver->resolve());
     }
 
-    public function testGetParent()
+    public function testGetParent(): void
     {
         $this->assertSame(ChoiceType::class, $this->page->getParent());
     }
 
-    public function testGetBlockPrefix()
+    public function testGetBlockPrefix(): void
     {
         $this->assertSame('page_list', $this->page->getBlockPrefix());
     }

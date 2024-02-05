@@ -1,41 +1,26 @@
 <?php
 
-/*
- * @copyright   2019 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\LeadBundle\Services;
 
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\LeadBundle\Model\FieldModel;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class ContactColumnsDictionary
 {
-    protected $fieldModel;
+    /**
+     * @var mixed[]
+     */
+    private array $fieldList = [];
 
-    private $translator;
-
-    private $coreParametersHelper;
-
-    private $fieldList = [];
-
-    public function __construct(FieldModel $fieldModel, TranslatorInterface $translator, CoreParametersHelper $coreParametersHelper)
-    {
-        $this->fieldModel           = $fieldModel;
-        $this->translator           = $translator;
-        $this->coreParametersHelper = $coreParametersHelper;
+    public function __construct(
+        protected FieldModel $fieldModel,
+        private TranslatorInterface $translator,
+        private CoreParametersHelper $coreParametersHelper
+    ) {
     }
 
-    /**
-     * @return array
-     */
-    public function getColumns()
+    public function getColumns(): array
     {
         $columns = array_flip($this->coreParametersHelper->get('contact_columns', []));
         $fields  = $this->getFields();
@@ -48,12 +33,9 @@ class ContactColumnsDictionary
         return $columns;
     }
 
-    /**
-     * @return array
-     */
-    public function getFields()
+    public function getFields(): array
     {
-        if (empty($this->fieldList)) {
+        if ([] === $this->fieldList) {
             $this->fieldList['name']        = sprintf(
                 '%s %s',
                 $this->translator->trans('mautic.core.firstname'),

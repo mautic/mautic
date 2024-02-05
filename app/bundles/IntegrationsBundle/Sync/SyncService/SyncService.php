@@ -2,15 +2,6 @@
 
 declare(strict_types=1);
 
-/*
- * @copyright   2018 Mautic Inc. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://www.mautic.com
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\IntegrationsBundle\Sync\SyncService;
 
 use GuzzleHttp\Exception\ClientException;
@@ -22,7 +13,6 @@ use Mautic\IntegrationsBundle\Sync\Helper\SyncDateHelper;
 use Mautic\IntegrationsBundle\Sync\Logger\DebugLogger;
 use Mautic\IntegrationsBundle\Sync\Notification\Notifier;
 use Mautic\IntegrationsBundle\Sync\SyncDataExchange\MauticSyncDataExchange;
-use Mautic\IntegrationsBundle\Sync\SyncDataExchange\SyncDataExchangeInterface;
 use Mautic\IntegrationsBundle\Sync\SyncProcess\Direction\Integration\IntegrationSyncProcess;
 use Mautic\IntegrationsBundle\Sync\SyncProcess\Direction\Internal\MauticSyncProcess;
 use Mautic\IntegrationsBundle\Sync\SyncProcess\SyncProcess;
@@ -31,71 +21,17 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 final class SyncService implements SyncServiceInterface
 {
-    /**
-     * @var SyncDataExchangeInterface
-     */
-    private $internalSyncDataExchange;
-
-    /**
-     * @var SyncDateHelper
-     */
-    private $syncDateHelper;
-
-    /**
-     * @var MappingHelper
-     */
-    private $mappingHelper;
-
-    /**
-     * @var RelationsHelper
-     */
-    private $relationsHelper;
-
-    /**
-     * @var IntegrationSyncProcess
-     */
-    private $integratinSyncProcess;
-
-    /**
-     * @var MauticSyncProcess
-     */
-    private $mauticSyncProcess;
-
-    /**
-     * @var SyncIntegrationsHelper
-     */
-    private $syncIntegrationsHelper;
-
-    /**
-     * @var EventDispatcherInterface
-     */
-    private $eventDispatcher;
-
-    /**
-     * @var Notifier
-     */
-    private $notifier;
-
     public function __construct(
-        MauticSyncDataExchange $internalSyncDataExchange,
-        SyncDateHelper $syncDateHelper,
-        MappingHelper $mappingHelper,
-        RelationsHelper $relationsHelper,
-        SyncIntegrationsHelper $syncIntegrationsHelper,
-        EventDispatcherInterface $eventDispatcher,
-        Notifier $notifier,
-        IntegrationSyncProcess $integrationSyncProcess,
-        MauticSyncProcess $mauticSyncProcess
+        private MauticSyncDataExchange $internalSyncDataExchange,
+        private SyncDateHelper $syncDateHelper,
+        private MappingHelper $mappingHelper,
+        private RelationsHelper $relationsHelper,
+        private SyncIntegrationsHelper $syncIntegrationsHelper,
+        private EventDispatcherInterface $eventDispatcher,
+        private Notifier $notifier,
+        private IntegrationSyncProcess $integratinSyncProcess,
+        private MauticSyncProcess $mauticSyncProcess
     ) {
-        $this->internalSyncDataExchange = $internalSyncDataExchange;
-        $this->syncDateHelper           = $syncDateHelper;
-        $this->mappingHelper            = $mappingHelper;
-        $this->relationsHelper          = $relationsHelper;
-        $this->syncIntegrationsHelper   = $syncIntegrationsHelper;
-        $this->eventDispatcher          = $eventDispatcher;
-        $this->notifier                 = $notifier;
-        $this->integratinSyncProcess    = $integrationSyncProcess;
-        $this->mauticSyncProcess        = $mauticSyncProcess;
     }
 
     /**
@@ -125,7 +61,7 @@ final class SyncService implements SyncServiceInterface
                 $inputOptionsDAO->isFirstTimeSync() ? 'first time' : 'subsequent',
                 $inputOptionsDAO->getStartDateTime() ? $inputOptionsDAO->getStartDateTime()->format('Y-m-d H:i:s') : 'yet to be determined'
             ),
-            __CLASS__.':'.__FUNCTION__
+            self::class.':'.__FUNCTION__
         );
 
         try {

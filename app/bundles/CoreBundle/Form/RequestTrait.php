@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2016 Mautic Contributors. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CoreBundle\Form;
 
 use Mautic\CoreBundle\Form\Type\BooleanType;
@@ -26,11 +17,20 @@ use Symfony\Component\Form\Extension\Core\Type\DateTimeType;
 use Symfony\Component\Form\Extension\Core\Type\DateType;
 use Symfony\Component\Form\Extension\Core\Type\TimeType;
 use Symfony\Component\Form\Form;
+use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\ResolvedFormTypeInterface;
 
 trait RequestTrait
 {
-    protected function prepareParametersFromRequest(Form $form, array &$params, $entity = null, $masks = [], $fields = [])
+    /**
+     * @param FormInterface<mixed> $form
+     * @param array<mixed>         $params
+     * @param array<mixed>         $masks
+     * @param array<mixed>         $fields
+     *
+     * @throws \Exception
+     */
+    protected function prepareParametersFromRequest(FormInterface $form, array &$params, object $entity = null, array $masks = [], array $fields = []): void
     {
         // ungroup fields if need it
         foreach ($fields as $key=>$field) {
@@ -53,7 +53,7 @@ trait RequestTrait
             if ($type instanceof ResolvedFormTypeInterface) {
                 $type = $type->getInnerType();
             }
-            switch (get_class($type)) {
+            switch ($type::class) {
                 case YesNoButtonGroupType::class:
                 case BooleanType::class:
                     if (!is_object($entity)) {
@@ -89,7 +89,7 @@ trait RequestTrait
                         // Manually handled so remove from form processing
                         unset($form[$name], $params[$name]);
                         break;
-                    } catch (\InvalidArgumentException $exception) {
+                    } catch (\InvalidArgumentException) {
                     }
 
                     // If not manually handled cast to int because Symfony form processing take false as empty
@@ -109,7 +109,7 @@ trait RequestTrait
 
                     // Ensure the value is an array
                     if (!is_array($params[$name])) {
-                        $params[$name] = (false !== strpos($params[$name], '|')) ? explode('|', $params[$name]) : ($params[$name] ? [$params[$name]] : []);
+                        $params[$name] = (str_contains($params[$name], '|')) ? explode('|', $params[$name]) : ($params[$name] ? [$params[$name]] : []);
                     }
 
                     break;
@@ -134,7 +134,7 @@ trait RequestTrait
                         break;
                     }
 
-                    switch ($type) {
+                    switch ($type::class) {
                         case DateTimeType::class:
                             $params[$name] = (new \DateTime(date('Y-m-d H:i:s', $timestamp)))->format('Y-m-d H:i');
                             break;
@@ -145,7 +145,6 @@ trait RequestTrait
                             $params[$name] = (new \DateTime(date('H:i:s', $timestamp)))->format('H:i:s');
                             break;
                     }
-
                     break;
             }
         }
@@ -164,10 +163,10 @@ trait RequestTrait
     }
 
     /**
-     * @param $fieldData
-     * @param $leadField
+     * @param array<mixed> $fieldData
+     * @param array<mixed> $leadField
      */
-    public function cleanFields(&$fieldData, $leadField)
+    public function cleanFields(array &$fieldData, array $leadField): void
     {
         // This will catch null values or non-existent values to prevent null from converting to false/0
         if (!isset($fieldData[$leadField['alias']])) {
@@ -175,11 +174,10 @@ trait RequestTrait
         }
 
         switch ($leadField['type']) {
-            // Adjust the boolean values from text to boolean. Do not convert null to false.
             case 'boolean':
-                $fieldData[$leadField['alias']] = (int) filter_var($fieldData[$leadField['alias']], FILTER_VALIDATE_BOOLEAN);
+                $fieldData[$leadField['alias']] = InputHelper::boolean($fieldData[$leadField['alias']]);
                 break;
-            // Ensure date/time entries match what symfony expects
+                // Ensure date/time entries match what symfony expects
             case 'datetime':
             case 'date':
             case 'time':
@@ -209,7 +207,7 @@ trait RequestTrait
                 break;
             case 'multiselect':
                 if (!is_array($fieldData[$leadField['alias']])) {
-                    if (false !== strpos($fieldData[$leadField['alias']], '|')) {
+                    if (str_contains($fieldData[$leadField['alias']], '|')) {
                         $fieldData[$leadField['alias']] = explode('|', $fieldData[$leadField['alias']]);
                     } else {
                         $fieldData[$leadField['alias']] = [$fieldData[$leadField['alias']]];

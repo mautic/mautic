@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2018 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CoreBundle\Test\EventListener;
 
 use Doctrine\DBAL\Connection;
@@ -18,14 +9,11 @@ use Mautic\CoreBundle\CoreEvents;
 use Mautic\CoreBundle\Event\MaintenanceEvent;
 use Mautic\CoreBundle\EventListener\MaintenanceSubscriber;
 use Mautic\UserBundle\Entity\UserTokenRepositoryInterface;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class MaintenanceSubscriberTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var MaintenanceSubscriber
-     */
-    private $subscriber;
+    private \Mautic\CoreBundle\EventListener\MaintenanceSubscriber $subscriber;
 
     protected function setUp(): void
     {
@@ -35,7 +23,7 @@ class MaintenanceSubscriberTest extends \PHPUnit\Framework\TestCase
         $this->subscriber    = new MaintenanceSubscriber($connection, $userTokenRepository, $translator);
     }
 
-    public function testGetSubscribedEvents()
+    public function testGetSubscribedEvents(): void
     {
         $this->assertEquals(
             [CoreEvents::MAINTENANCE_CLEANUP_DATA => ['onDataCleanup', -50]],
@@ -43,12 +31,8 @@ class MaintenanceSubscriberTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testOnDataCleanup()
+    public function testOnDataCleanup(): void
     {
-        if (!defined('MAUTIC_TABLE_PREFIX')) {
-            define('MAUTIC_TABLE_PREFIX', 'mautic');
-        }
-
         $dateTime         = new \DateTimeImmutable();
         $format           = 'Y-m-d H:i:s';
         $rowCount         = 2;
@@ -117,6 +101,6 @@ class MaintenanceSubscriberTest extends \PHPUnit\Framework\TestCase
             ->method('trans')
             ->willReturn($translatedString);
 
-        $this->assertNull($subscriber->onDataCleanup($event));
+        $subscriber->onDataCleanup($event);
     }
 }

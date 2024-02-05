@@ -2,46 +2,25 @@
 
 declare(strict_types=1);
 
-/*
- * @copyright   2019 Mautic Inc. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://www.mautic.com
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\IntegrationsBundle\Event;
 
 use Mautic\IntegrationsBundle\Sync\SyncDataExchange\Internal\Object\ObjectInterface;
-use Symfony\Component\EventDispatcher\Event;
+use Symfony\Contracts\EventDispatcher\Event;
 
 class InternalObjectOwnerEvent extends Event
 {
     /**
-     * @var ObjectInterface
-     */
-    private $object;
-
-    /**
-     * @var int[]
-     */
-    private $objectIds;
-
-    /**
      * Format: [object_id => owner_id].
-     *
-     * @var array
      */
-    private $owners = [];
+    private array $owners = [];
 
     /**
      * @param int[] $objectIds
      */
-    public function __construct(ObjectInterface $object, array $objectIds)
-    {
-        $this->object    = $object;
-        $this->objectIds = $objectIds;
+    public function __construct(
+        private ObjectInterface $object,
+        private array $objectIds
+    ) {
     }
 
     public function getObject(): ObjectInterface

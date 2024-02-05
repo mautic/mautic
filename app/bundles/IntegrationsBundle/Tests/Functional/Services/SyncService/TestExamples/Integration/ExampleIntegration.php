@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2018 Mautic Inc. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://www.mautic.com
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 declare(strict_types=1);
 
 namespace Mautic\IntegrationsBundle\Tests\Functional\Services\SyncService\TestExamples\Integration;
@@ -24,24 +15,13 @@ use Mautic\IntegrationsBundle\Tests\Functional\Services\SyncService\TestExamples
 
 final class ExampleIntegration extends BasicIntegration implements IntegrationInterface, SyncInterface
 {
-    const NAME = 'Example';
+    public const NAME = 'Example';
 
-    /**
-     * @var ExampleSyncDataExchange
-     */
-    private $syncDataExchange;
-
-    /**
-     * ExampleIntegration constructor.
-     */
-    public function __construct(ExampleSyncDataExchange $syncDataExchange)
-    {
-        $this->syncDataExchange = $syncDataExchange;
+    public function __construct(
+        private ExampleSyncDataExchange $syncDataExchange
+    ) {
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getName(): string
     {
         return self::NAME;

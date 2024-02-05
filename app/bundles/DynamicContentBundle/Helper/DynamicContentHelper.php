@@ -1,55 +1,33 @@
 <?php
 
-/*
- * @copyright   2016 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\DynamicContentBundle\Helper;
 
 use Mautic\CampaignBundle\Executioner\RealTimeExecutioner;
 use Mautic\CoreBundle\Event\TokenReplacementEvent;
 use Mautic\DynamicContentBundle\DynamicContentEvents;
 use Mautic\DynamicContentBundle\Entity\DynamicContent;
+use Mautic\DynamicContentBundle\Event\ContactFiltersEvaluateEvent;
 use Mautic\DynamicContentBundle\Model\DynamicContentModel;
 use Mautic\EmailBundle\EventListener\MatchFilterForLeadTrait;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\Tag;
-use Symfony\Component\EventDispatcher\ContainerAwareEventDispatcher;
+use Mautic\LeadBundle\Model\LeadModel;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class DynamicContentHelper
 {
     use MatchFilterForLeadTrait;
 
-    /**
-     * @var RealTimeExecutioner
-     */
-    protected $realTimeExecutioner;
-
-    /**
-     * @var ContainerAwareEventDispatcher
-     */
-    protected $dispatcher;
-
-    /**
-     * @var DynamicContentModel
-     */
-    protected $dynamicContentModel;
-
-    public function __construct(DynamicContentModel $dynamicContentModel, RealTimeExecutioner $realTimeExecutioner, EventDispatcherInterface $dispatcher)
-    {
-        $this->dynamicContentModel = $dynamicContentModel;
-        $this->realTimeExecutioner = $realTimeExecutioner;
-        $this->dispatcher          = $dispatcher;
+    public function __construct(
+        protected DynamicContentModel $dynamicContentModel,
+        protected RealTimeExecutioner $realTimeExecutioner,
+        protected EventDispatcherInterface $dispatcher,
+        protected LeadModel $leadModel
+    ) {
     }
 
     /**
-     * @param            $slot
+     * @param string     $slot
      * @param Lead|array $lead
      *
      * @return string
@@ -97,7 +75,7 @@ class DynamicContentHelper
             if ($dwc->getIsCampaignBased()) {
                 continue;
             }
-            if ($lead && $this->matchFilterForLead($dwc->getFilters(), $leadArray)) {
+            if ($lead && $this->filtersMatchContact($dwc->getFilters(), $leadArray)) {
                 return $lead ? $this->getRealDynamicContent($dwc->getSlotName(), $lead, $dwc) : '';
             }
         }
@@ -135,10 +113,8 @@ class DynamicContentHelper
     /**
      * @param string    $content
      * @param Lead|null $lead
-     *
-     * @return array
      */
-    public function findDwcTokens($content, $lead)
+    public function findDwcTokens($content, $lead): array
     {
         preg_match_all('/{dwc=(.*?)}/', $content, $matches);
 
@@ -170,9 +146,8 @@ class DynamicContentHelper
     }
 
     /**
-     * @param $slot
-     * @param $lead
-     * @param $dwc
+     * @param string       $slot
+     * @param Lead|mixed[] $lead
      *
      * @return string
      */
@@ -181,7 +156,7 @@ class DynamicContentHelper
         $content = $dwc->getContent();
         // Determine a translation based on contact's preferred locale
         /** @var DynamicContent $translation */
-        [, $translation] = $this->dynamicContentModel->getTranslatedEntity($dwc, $lead);
+        list($ignore, $translation) = $this->dynamicContentModel->getTranslatedEntity($dwc, $lead);
         if ($translation !== $dwc) {
             // Use translated version of content
             $dwc     = $translation;
@@ -191,7 +166,7 @@ class DynamicContentHelper
 
         $tokenEvent = new TokenReplacementEvent($content, $lead, ['slot' => $slot, 'dynamic_content_id' => $dwc->getId()]);
         $tokenEvent->setStat($stat);
-        $this->dispatcher->dispatch(DynamicContentEvents::TOKEN_REPLACEMENT, $tokenEvent);
+        $this->dispatcher->dispatch($tokenEvent, DynamicContentEvents::TOKEN_REPLACEMENT);
 
         return $tokenEvent->getContent();
     }
@@ -232,21 +207,42 @@ class DynamicContentHelper
 
     /**
      * @param Lead $lead
-     *
-     * @return array
      */
-    public function convertLeadToArray($lead)
+    public function convertLeadToArray($lead): array
     {
         return array_merge(
             $lead->getProfileFields(),
             [
                 'tags' => array_map(
-                    function (Tag $v) {
-                        return $v->getId();
-                    },
+                    fn (Tag $v) => $v->getId(),
                     $lead->getTags()->toArray()
                 ),
             ]
         );
+    }
+
+    /**
+     * @param mixed[] $filters
+     * @param mixed[] $contactArray
+     */
+    private function filtersMatchContact(array $filters, array $contactArray): bool
+    {
+        if (empty($contactArray['id'])) {
+            return false;
+        }
+
+        //  We attempt even listeners first
+        if ($this->dispatcher->hasListeners(DynamicContentEvents::ON_CONTACTS_FILTER_EVALUATE)) {
+            /** @var Lead $contact */
+            $contact = $this->leadModel->getEntity($contactArray['id']);
+
+            $event = new ContactFiltersEvaluateEvent($filters, $contact);
+            $this->dispatcher->dispatch($event, DynamicContentEvents::ON_CONTACTS_FILTER_EVALUATE);
+            if ($event->isMatch()) {
+                return true;
+            }
+        }
+
+        return $this->matchFilterForLead($filters, $contactArray);
     }
 }

@@ -1,75 +1,27 @@
 <?php
 
-/*
- * @copyright   2016 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\NotificationBundle\Helper;
 
 use Doctrine\ORM\EntityManager;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
-use Mautic\CoreBundle\Templating\Helper\AssetsHelper;
+use Mautic\CoreBundle\Twig\Helper\AssetsHelper;
 use Mautic\LeadBundle\Entity\DoNotContact;
 use Mautic\PluginBundle\Helper\IntegrationHelper;
 use Symfony\Bundle\FrameworkBundle\Routing\Router;
-use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 class NotificationHelper
 {
-    /**
-     * @var EntityManager
-     */
-    protected $em;
-
-    /**
-     * @var IntegrationHelper
-     */
-    protected $integrationHelper;
-
-    /**
-     * @var CoreParametersHelper
-     */
-    protected $coreParametersHelper;
-
-    /**
-     * @var AssetsHelper
-     */
-    protected $assetsHelper;
-
-    /**
-     * @var Router
-     */
-    protected $router;
-
-    /**
-     * @var RequestStack
-     */
-    protected $requestStack;
-
-    /**
-     * @var \Mautic\LeadBundle\Model\DoNotContact
-     */
-    private $doNotContact;
-
-    /**
-     * NotificationHelper constructor.
-     */
-    public function __construct(EntityManager $em, AssetsHelper $assetsHelper, CoreParametersHelper $coreParametersHelper, IntegrationHelper $integrationHelper, Router $router, RequestStack $requestStack, \Mautic\LeadBundle\Model\DoNotContact $doNotContact)
-    {
-        $this->em                   = $em;
-        $this->assetsHelper         = $assetsHelper;
-        $this->coreParametersHelper = $coreParametersHelper;
-        $this->integrationHelper    = $integrationHelper;
-        $this->router               = $router;
-        $this->requestStack         = $requestStack;
-        $this->doNotContact         = $doNotContact;
+    public function __construct(
+        protected EntityManager $em,
+        protected AssetsHelper $assetsHelper,
+        protected CoreParametersHelper $coreParametersHelper,
+        protected IntegrationHelper $integrationHelper,
+        protected Router $router,
+        protected RequestStack $requestStack,
+        private \Mautic\LeadBundle\Model\DoNotContact $doNotContact
+    ) {
     }
 
     /**
@@ -80,7 +32,7 @@ class NotificationHelper
     public function unsubscribe($notification)
     {
         /** @var \Mautic\LeadBundle\Entity\LeadRepository $repo */
-        $repo = $this->em->getRepository('MauticLeadBundle:Lead');
+        $repo = $this->em->getRepository(\Mautic\LeadBundle\Entity\Lead::class);
 
         $lead = $repo->getLeadByEmail($notification);
 
@@ -204,7 +156,7 @@ JS;
         }
     }
 
-    private function hasScript()
+    private function hasScript(): bool
     {
         $landingPage = true;
         $server      = $this->requestStack->getCurrentRequest()->server;
@@ -214,7 +166,7 @@ JS;
             return false;
         }
 
-        if (false === strpos($server->get('HTTP_REFERER'), $this->coreParametersHelper->get('site_url'))) {
+        if (!str_contains($server->get('HTTP_REFERER'), $this->coreParametersHelper->get('site_url'))) {
             $landingPage = false;
         }
 

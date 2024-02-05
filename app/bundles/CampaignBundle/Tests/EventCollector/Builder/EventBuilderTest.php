@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2018 Mautic Contributors. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CampaignBundle\Tests\EventCollector\Builder;
 
 use Mautic\CampaignBundle\EventCollector\Accessor\Event\ActionAccessor;
@@ -18,7 +9,7 @@ use Mautic\CampaignBundle\EventCollector\Builder\EventBuilder;
 
 class EventBuilderTest extends \PHPUnit\Framework\TestCase
 {
-    public function testActionsAreConvertedToAccessor()
+    public function testActionsAreConvertedToAccessor(): void
     {
         $array = [
             'some.action'  => [
@@ -38,7 +29,7 @@ class EventBuilderTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals('other.action', $converted['other.action']->getBatchEventName());
     }
 
-    public function testConditionsAreConvertedToAccessor()
+    public function testConditionsAreConvertedToAccessor(): void
     {
         $array = [
             'some.condition'  => [
@@ -58,7 +49,7 @@ class EventBuilderTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals('other.condition', $converted['other.condition']->getEventName());
     }
 
-    public function testDecisionsAreConvertedToAccessor()
+    public function testDecisionsAreConvertedToAccessor(): void
     {
         $array = [
             'some.decision'  => [
