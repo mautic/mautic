@@ -171,8 +171,8 @@ class PublicControllerFunctionalTest extends MauticMysqlTestCase
         $this->em->flush();
         $crawler    = $this->client->request('GET', '/email/unsubscribe/'.$stat->getTrackingHash());
         $tokenInput = $crawler->filter('input[name="lead_contact_frequency_rules[_token]"]');
-        $this->assertTrue($this->client->getResponse()->isOk());
-        $this->assertEquals(1, $tokenInput->count());
+        $this->assertTrue($this->client->getResponse()->isOk(), $this->client->getResponse()->getContent());
+        $this->assertEquals(1, $tokenInput->count(), $this->client->getResponse()->getContent());
     }
 
     /**

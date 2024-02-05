@@ -34,10 +34,10 @@ class AssetExtension extends AbstractExtension
             new TwigFunction('assetsGetImagesPath', [$this, 'getImagesPath']),
             new TwigFunction('assetsGetPrefix', [$this, 'getAssetPrefix']),
             new TwigFunction('assetAddScriptDeclaration', [$this, 'addScriptDeclaration']),
+            new TwigFunction('assetAddCustomDeclaration', [$this, 'addCustomDeclaration']),
             new TwigFunction('assetGetCountryFlag', [$this, 'getCountryFlag']),
             new TwigFunction('assetGetBaseUrl', [$this, 'getBaseUrl'], ['is_safe' => ['html']]),
             new TwigFunction('assetMakeLinks', [$this, 'makeLinks'], ['is_safe' => ['html']]),
-            new TwigFunction('assetaddScriptDeclaration', [$this, 'addCustomDeclaration'], ['is_safe' => ['html']]),
         ];
     }
 
@@ -142,9 +142,18 @@ class AssetExtension extends AbstractExtension
         return $this->assetsHelper->getAssetPrefix($includeEndingslash);
     }
 
-    public function addScriptDeclaration(string $script, string $location = 'head'): AssetsHelper
+    public function addScriptDeclaration(string $script, string $location = 'head'): string
     {
-        return $this->assetsHelper->addScriptDeclaration($script, $location);
+        $this->assetsHelper->addScriptDeclaration($script, $location);
+
+        return '';
+    }
+
+    public function addCustomDeclaration(string $script, string $location): string
+    {
+        $this->assetsHelper->addCustomDeclaration($script, $location);
+
+        return '';
     }
 
     /**
@@ -167,10 +176,5 @@ class AssetExtension extends AbstractExtension
     public function makeLinks(string $text, array $protocols = ['http', 'mail'], array $attributes = []): string
     {
         return $this->assetsHelper->makeLinks($text, $protocols, $attributes);
-    }
-
-    public function addCustomDeclaration(string $declaration, string $location): void
-    {
-        $this->assetsHelper->addCustomDeclaration($declaration, $location);
     }
 }

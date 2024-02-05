@@ -68,8 +68,11 @@ class BuilderSubscriberTest extends AbstractMauticTestCase
         ], UrlGeneratorInterface::ABSOLUTE_PATH);
 
         $crawler = $this->client->request('GET', $unsubscribeUrl);
-        $form    = $crawler->filter(static::FORM_SELECTOR);
-        $html    = $form->html();
+
+        self::assertTrue($this->client->getResponse()->isSuccessful(), $this->client->getResponse()->getContent());
+
+        $form = $crawler->filter(static::FORM_SELECTOR);
+        $html = $form->html();
 
         foreach ($selectorsAndExpectedCounts as $selector => $expectedCount) {
             $message = sprintf(

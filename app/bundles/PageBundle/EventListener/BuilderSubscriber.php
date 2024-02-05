@@ -404,10 +404,10 @@ final class BuilderSubscriber implements EventSubscriberInterface
         }
 
         $slotNamesAndConfig = [
-            'segmentlist'      => [static::segmentListRegex, (bool) $params['showContactSegments']],
-            'categorylist'     => [static::categoryListRegex, (bool) $params['showContactCategories']],
-            'preferredchannel' => [static::preferredchannel, (bool) $params['showContactPreferredChannels']],
-            'channelfrequency' => [static::channelfrequency, (bool) ($params['showContactFrequency'] || $params['showContactPauseDates'])],
+            'segmentlist'      => [static::segmentListRegex, (bool) ($params['showContactSegments'] ?? false)],
+            'categorylist'     => [static::categoryListRegex, (bool) ($params['showContactCategories'] ?? false)],
+            'preferredchannel' => [static::preferredchannel, (bool) ($params['showContactPreferredChannels'] ?? false)],
+            'channelfrequency' => [static::channelfrequency, (bool) (($params['showContactFrequency'] ?? false) || ($params['showContactPauseDates'] ?? false))],
             'saveprefsbutton'  => [static::saveprefsRegex, true],
         ];
 
@@ -449,7 +449,7 @@ final class BuilderSubscriber implements EventSubscriberInterface
             return $this->renderedContentCache[$templateName];
         }
 
-        $content = $this->twig->render($templateName, $templateParams);
+        $content = trim($this->twig->render($templateName, $templateParams));
 
         if ($wrapperTemplate) {
             // If the content is not empty, ensure that the $wrapperTemplate contains a place to put it.
