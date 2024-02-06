@@ -832,10 +832,8 @@ class EmailController extends FormController
      *
      * @return JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|Response
      */
-    public function cloneAction(Request $request, AssetsHelper $assetsHelper, Translator $translator, RouterInterface $routerHelper, CoreParametersHelper $coreParametersHelper, $objectId)
+    public function cloneAction(Request $request, AssetsHelper $assetsHelper, Translator $translator, RouterInterface $routerHelper, CoreParametersHelper $coreParametersHelper, EmailModel $model, $objectId)
     {
-        /** @var EmailModel $model */
-        $model        = $this->getModel('email');
         $emailEntity  = $model->getEntity($objectId);
         $entity       = null;
         if ($emailEntity) {
