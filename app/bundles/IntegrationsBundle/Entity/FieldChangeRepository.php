@@ -95,10 +95,7 @@ class FieldChangeRepository extends CommonRepository
             );
         }
 
-        $results = $qb->executeQuery()->fetchAllAssociative();
-
-
-        $objectIds = array_column($results, 'object_id');
+        $objectIds = $qb->executeQuery()->fetchFirstColumn();
 
         if (!$objectIds) {
             return [];
@@ -150,10 +147,24 @@ class FieldChangeRepository extends CommonRepository
 
     public function deleteOrphanLeadChanges(): int
     {
+        $totalDeleted      = 0;
+        $limit             = 1000;
+        $deletedInLastLoop = $limit;
+
+        while ($deletedInLastLoop === $limit && $deleted = $this->doDeleteOrphanLeadChanges($limit)) {
+            $deletedInLastLoop = $deleted;
+            $totalDeleted += $deleted;
+        }
+
+        return $totalDeleted;
+    }
+
+    private function doDeleteOrphanLeadChanges(int $limit): int
+    {
         $qb = $this->getEntityManager()->getConnection()->createQueryBuilder();
 
         $qb->select('f.id')
-        ->from(MAUTIC_TABLE_PREFIX.'sync_object_field_change_report', 'f')
+            ->from(MAUTIC_TABLE_PREFIX.'sync_object_field_change_report', 'f')
             ->leftJoin('f', MAUTIC_TABLE_PREFIX.'leads', 'l', 'l.id = f.object_id')
             ->where(
                 $qb->expr()->and(
@@ -161,12 +172,10 @@ class FieldChangeRepository extends CommonRepository
                     $qb->expr()->isNull('l.id')
                 )
             )
-            ->setMaxResults(1000)
+            ->setMaxResults($limit)
             ->setParameter('objectType', Lead::class);
 
-        $results = $qb->execute()->fetchAllAssociative();
-
-        $objectIds = array_column($results, 'id');
+        $objectIds = $qb->executeQuery()->fetchFirstColumn();
 
         if (!$objectIds) {
             return 0;
@@ -175,8 +184,9 @@ class FieldChangeRepository extends CommonRepository
         $qb2 = $this->getEntityManager()->getConnection()->createQueryBuilder();
         $qb2->delete(MAUTIC_TABLE_PREFIX.'sync_object_field_change_report')
             ->where(
-                $qb2->expr()->in('id', $objectIds)
-            );
+                $qb2->expr()->in('id', ':ids')
+            )
+            ->setParameter('ids', $objectIds, ArrayParameterType::INTEGER );
 
         return $qb2->execute();
     }
