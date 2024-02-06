@@ -80,10 +80,10 @@ class DateOptionFactory
             case 'year_this':
                 return new DateYearThis($this->dateDecorator, $dateOptionParameters);
             case $timeframe && (
-                    str_contains($timeframe[0], '-') || // -5 days
-                    str_contains($timeframe[0], '+') || // +5 days
-                    false !== $this->isRelativeFormatsPresent($timeframe)
-                ):
+                str_contains($timeframe[0], '-') || // -5 days
+                str_contains($timeframe[0], '+') || // +5 days
+                false !== $this->isRelativeFormatsPresent($timeframe)
+            ):
                 return new DateRelativeInterval($this->dateDecorator, $originalValue, $dateOptionParameters);
             default:
                 return new DateDefault($this->dateDecorator, $originalValue);
