@@ -2,8 +2,6 @@
 
 namespace Mautic\LeadBundle\Tests\Model;
 
-use DateTime;
-use DateTimeZone;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadList;
@@ -111,17 +109,17 @@ class ListModelFunctionalTest extends MauticMysqlTestCase
 
         // Adding record in mautic_lead_lists_leads before 11 second from mautic_lead_event_log
         // using old code there should be double records means 2 but now it will show only 1 contact
-        $segmentModel->addLead($contacts[0], $segment, true, false, 1, new DateTime('-11 seconds', new DateTimeZone('UTC'))); // Emulating adding by a filter.
+        $segmentModel->addLead($contacts[0], $segment, true, false, 1, new \DateTime('-11 seconds', new \DateTimeZone('UTC'))); // Emulating adding by a filter.
 
         $data = $segmentModel->getSegmentContactsLineChartData(
             'd',
-            new DateTime('-2 days', new DateTimeZone('UTC')),
-            new DateTime('now', new DateTimeZone('UTC')),
+            new \DateTime('-2 days', new \DateTimeZone('UTC')),
+            new \DateTime('now', new \DateTimeZone('UTC')),
             null,
             ['leadlist_id' => ['value' => $segment->getId(), 'list_column_name' => 't.lead_id']]
         );
 
-        //using old code there should be only 1 label added but now there should be all 3 labels
+        // using old code there should be only 1 label added but now there should be all 3 labels
         Assert::assertSame('added', strtolower($data['datasets'][0]['label']));
         Assert::assertSame('removed', strtolower($data['datasets'][1]['label']));
         Assert::assertSame('total', strtolower($data['datasets'][2]['label']));
@@ -135,8 +133,8 @@ class ListModelFunctionalTest extends MauticMysqlTestCase
 
         $data = $segmentModel->getSegmentContactsLineChartData(
             'd',
-            new DateTime('-2 days', new DateTimeZone('UTC')),
-            new DateTime('now', new DateTimeZone('UTC')),
+            new \DateTime('-2 days', new \DateTimeZone('UTC')),
+            new \DateTime('now', new \DateTimeZone('UTC')),
             null,
             ['leadlist_id' => ['value' => $segment->getId(), 'list_column_name' => 't.lead_id']]
         );
