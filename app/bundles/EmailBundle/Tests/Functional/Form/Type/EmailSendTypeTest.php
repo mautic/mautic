@@ -80,7 +80,7 @@ class EmailSendTypeTest extends MauticMysqlTestCase
         Assert::assertSame(ExitCode::SUCCESS, $commandTester->getStatusCode());
         Assert::assertStringContainsString($contactIdsCount.' total events(s) to be processed', $commandTester->getDisplay());
 
-        $stats = $this->em->getRepository(Stat::class)->findBy(['email' => $emailId]);
+        $stats = $this->em->getRepository(Stat::class)->count(['email' => $emailId]);
         Assert::assertSame($expectedEmailCopiesCount, $stats);
     }
 
