@@ -294,20 +294,6 @@ class CampaignControllerFunctionalTest extends AbstractCampaignTest
     }
 
     /**
-     * @throws ORMException
-     * @throws OptimisticLockException
-     */
-    private function createCampaignNoEmail(): Campaign
-    {
-        $campaign = new Campaign();
-        $campaign->setName('Test campaign');
-        $this->em->persist($campaign);
-        $this->em->flush();
-
-        return $campaign;
-    }
-
-    /**
      * @throws OptimisticLockException
      * @throws ORMException
      */
@@ -338,8 +324,6 @@ class CampaignControllerFunctionalTest extends AbstractCampaignTest
     {
         $campaign = $this->createCampaignWithEmail();
         $this->addLeadsFromCountry($campaign, 4, 'Finland');
-
-        var_dump($campaign->isEmailCampaign());
 
         $this->client->request(Request::METHOD_GET, 's/campaign/countries-stats/preview/'.$campaign->getId());
         $clientResponse = $this->client->getResponse();

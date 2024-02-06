@@ -323,8 +323,7 @@ class EmailControllerTest extends \PHPUnit\Framework\TestCase
 
     public function testGetExportHeader(): void
     {
-        $translator = $this->createMock(Translator::class);
-        $translator->expects($this->exactly(4))
+        $this->translatorMock->expects($this->exactly(4))
             ->method('trans')
             ->withConsecutive(
                 ['mautic.lead.lead.thead.country'],
