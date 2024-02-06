@@ -553,14 +553,4 @@
     <!--/ right section -->
 </div>
 <!--/ end: box layout -->
-<script>
-    Mautic.removeTagFromLead = function (el, leadId, tagId) {
-    console.log('Tag removed from lead');
-    mQuery(el).removeClass('fa-times').addClass('fa-spinner fa-spin');
-
-    Mautic.ajaxActionRequest('lead:removeTagFromLead', {'leadId': leadId, 'tagId': tagId}, function() {
-        mQuery('#tagLabel' + tagId).fadeOut(300, function() { mQuery(this).remove(); });
-    });
-};
-</script>
 {% endblock %}

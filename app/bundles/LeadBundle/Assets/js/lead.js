@@ -1150,7 +1150,6 @@ Mautic.removeBounceStatus = function (el, dncId, channel) {
 };
 
 Mautic.removeTagFromLead = function (el, leadId, tagId) {
-    console.log('Tag removed from lead');
     mQuery(el).removeClass('fa-times').addClass('fa-spinner fa-spin');
 
     Mautic.ajaxActionRequest('lead:removeTagFromLead', {'leadId': leadId, 'tagId': tagId}, function() {

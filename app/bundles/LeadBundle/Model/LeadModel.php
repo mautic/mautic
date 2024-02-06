@@ -2237,7 +2237,6 @@ class LeadModel extends FormModel
 
     public function removeTagFromLead(int $leadId, int $tagId): void
     {
-        /** @var \Mautic\LeadBundle\Entity\Lead $lead */
         $lead = $this->getEntity($leadId);
         $tag  = $this->getTagRepository()->find($tagId);
 
