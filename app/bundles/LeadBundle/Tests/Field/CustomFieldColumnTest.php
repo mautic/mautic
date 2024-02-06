@@ -168,6 +168,7 @@ class CustomFieldColumnTest extends \PHPUnit\Framework\TestCase
         $leadField = new LeadField();
         $leadField->setAlias('zip');
         $leadField->setType('text');
+        $leadField->setIsIndex(true);
 
         $this->columnSchemaHelper->expects($this->once())
             ->method('setName')
@@ -196,6 +197,60 @@ class CustomFieldColumnTest extends \PHPUnit\Framework\TestCase
             ->with($leadField);
 
         $this->customFieldColumn->processCreateLeadColumn($leadField);
+    }
+
+    public function testNoErrorWithUpdateAddColumnIndex()
+    {
+        $columnSchemaHelper    = $this->createMock(ColumnSchemaHelper::class);
+        $schemaDefinition      = $this->createMock(SchemaDefinition::class);
+        $logger                = $this->createMock(Logger::class);
+        $leadFieldSaver        = $this->createMock(LeadFieldSaver::class);
+        $customFieldIndex      = $this->createMock(CustomFieldIndex::class);
+        $fieldColumnDispatcher = $this->createMock(FieldColumnDispatcher::class);
+        $translator            = $this->createMock(TranslatorInterface::class);
+
+        $customFieldColumn = new CustomFieldColumn($columnSchemaHelper, $schemaDefinition, $logger, $leadFieldSaver, $customFieldIndex, $fieldColumnDispatcher, $translator);
+
+        $leadField = new LeadField();
+        $leadField->setIsIndex(true);
+
+        $customFieldIndex->expects($this->once())
+            ->method('hasIndex')
+            ->with($leadField)
+            ->willReturn(false);
+
+        $customFieldIndex->expects($this->once())
+            ->method('addIndexOnColumn')
+            ->with($leadField);
+
+        $customFieldColumn->processUpdateLeadColumn($leadField);
+    }
+
+    public function testNoErrorWithUpdateRemoveColumnIndex()
+    {
+        $columnSchemaHelper    = $this->createMock(ColumnSchemaHelper::class);
+        $schemaDefinition      = $this->createMock(SchemaDefinition::class);
+        $logger                = $this->createMock(Logger::class);
+        $leadFieldSaver        = $this->createMock(LeadFieldSaver::class);
+        $customFieldIndex      = $this->createMock(CustomFieldIndex::class);
+        $fieldColumnDispatcher = $this->createMock(FieldColumnDispatcher::class);
+        $translator            = $this->createMock(TranslatorInterface::class);
+
+        $customFieldColumn = new CustomFieldColumn($columnSchemaHelper, $schemaDefinition, $logger, $leadFieldSaver, $customFieldIndex, $fieldColumnDispatcher, $translator);
+
+        $leadField = new LeadField();
+        $leadField->setIsIndex(false);
+
+        $customFieldIndex->expects($this->once())
+            ->method('hasIndex')
+            ->with($leadField)
+            ->willReturn(true);
+
+        $customFieldIndex->expects($this->once())
+            ->method('dropIndexOnColumn')
+            ->with($leadField);
+
+        $customFieldColumn->processUpdateLeadColumn($leadField);
     }
 
     public function testNoErrorNoColumnIndex(): void

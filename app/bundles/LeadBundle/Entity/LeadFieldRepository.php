@@ -470,7 +470,7 @@ class LeadFieldRepository extends CommonRepository
 
         $command         = $filter->command;
         $unique          = $this->generateRandomParameterName();
-        $returnParameter = false; // returning a parameter that is not used will lead to a Doctrine error
+        $returnParameter = false; //returning a parameter that is not used will lead to a Doctrine error
         $prefix          = $this->getTableAlias();
 
         switch ($command) {

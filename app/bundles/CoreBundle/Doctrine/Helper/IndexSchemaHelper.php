@@ -7,6 +7,7 @@ use Doctrine\DBAL\Schema\Index;
 use Doctrine\DBAL\Schema\Table;
 use Doctrine\DBAL\Types\TextType;
 use Mautic\CoreBundle\Exception\SchemaException;
+use Mautic\LeadBundle\Entity\LeadField;
 
 class IndexSchemaHelper
 {
@@ -56,7 +57,9 @@ class IndexSchemaHelper
     }
 
     /**
-     * @return $this
+     * @param $name
+     *
+     * @return self
      *
      * @throws SchemaException
      */
@@ -77,18 +80,20 @@ class IndexSchemaHelper
     }
 
     /**
-     * @param array $options
+     * @param mixed  $columns
+     * @param string $name
+     * @param array  $options
      *
-     * @return $this
+     * @return self
      *
      * @throws \Doctrine\DBAL\Schema\SchemaException
      */
     public function addIndex($columns, $name, $options = [])
     {
-        $columns = $this->getTextColumns($columns);
+        $textColumns = $this->getTextColumns($columns);
 
-        if (!empty($columns)) {
-            $index = new Index($this->prefix.$name, $columns, false, false, $options);
+        if (!empty($textColumns)) {
+            $index = new Index($this->prefix.$name, $textColumns, false, false, $options);
 
             if ($this->table->hasIndex($this->prefix.$name)) {
                 $this->changedIndexes[] = $index;
@@ -116,6 +121,29 @@ class IndexSchemaHelper
         $index = new Index($name, $textColumns, false, false, $options);
         if ($this->table->hasIndex($name)) {
             $this->dropIndexes[] = $index;
+        }
+
+        return $this;
+    }
+
+    /**
+     * @param mixed  $columns
+     * @param string $name
+     * @param array  $options
+     *
+     * @return self
+     *
+     * @throws \Doctrine\DBAL\Schema\SchemaException
+     */
+    public function dropIndex($columns, $name, $options = [])
+    {
+        $textColumns = $this->getTextColumns($columns);
+
+        if (!empty($textColumns)) {
+            $index = new Index($this->prefix.$name, $textColumns, false, false, $options);
+            if ($this->table->hasIndex($this->prefix.$name)) {
+                $this->dropIndexes[] = $index;
+            }
         }
 
         return $this;
@@ -159,6 +187,24 @@ class IndexSchemaHelper
     }
 
     /**
+     * @param LeadField $leadField
+     * @return bool
+     *
+     * @throws SchemaException
+     */
+    public function hasIndex(LeadField $leadField)
+    {
+        $alias = $leadField->getAlias();
+        $this->setName($leadField->getCustomFieldObject());
+
+        return $this->table->hasIndex("{$alias}_search");
+    }
+
+    /**
+     * @param $columns
+     *
+     * @return array
+     *
      * @throws \Doctrine\DBAL\Schema\SchemaException
      */
     private function getTextColumns($columns): array

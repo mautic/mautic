@@ -9,6 +9,10 @@ use Mautic\CoreBundle\Doctrine\Helper\IndexSchemaHelper;
 use Mautic\LeadBundle\Entity\LeadField;
 use Psr\Log\LoggerInterface;
 
+/**
+ * Class CustomFieldIndex
+ * @package Mautic\LeadBundle\Field
+ */
 class CustomFieldIndex
 {
     public function __construct(
@@ -58,5 +62,62 @@ class CustomFieldIndex
                 throw $e;
             }
         }
+    }
+
+    /**
+     * Updates the index for this field.
+     *
+     * @param LeadField $leadField
+     *
+     * @throws DriverException
+     * @throws \Doctrine\DBAL\Schema\SchemaException
+     * @throws \Mautic\CoreBundle\Exception\SchemaException
+     */
+    public function dropIndexOnColumn(LeadField $leadField)
+    {
+        try {
+            /** @var \Mautic\CoreBundle\Doctrine\Helper\IndexSchemaHelper $modifySchema */
+            $modifySchema = $this->indexSchemaHelper->setName($leadField->getCustomFieldObject());
+
+            $alias = $leadField->getAlias();
+
+            $modifySchema->dropIndex([$alias], $alias.'_search');
+            $modifySchema->allowColumn($alias);
+
+            $modifySchema->executeChanges();
+        } catch (DriverException $e) {
+            if ($e->getErrorCode() === 1069 /* ER_TOO_MANY_KEYS */) {
+                $this->logger->addWarning($e->getMessage());
+            } else {
+                throw $e;
+            }
+        }
+    }
+
+    /**
+     * @param LeadField $leadField
+     * @return bool
+     * @throws \Mautic\CoreBundle\Exception\SchemaException
+     */
+    public function isUpdatePending(LeadField $leadField)
+    {
+        $hasIndex = $this->hasIndex($leadField);
+
+        if ($leadField->isIsIndex() !== $hasIndex) {
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
+     * @param LeadField $leadField
+     *
+     * @return bool
+     * @throws \Mautic\CoreBundle\Exception\SchemaException
+     */
+    public function hasIndex(LeadField $leadField)
+    {
+        return $this->indexSchemaHelper->hasIndex($leadField);
     }
 }

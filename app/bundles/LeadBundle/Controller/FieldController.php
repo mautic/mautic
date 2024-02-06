@@ -7,6 +7,7 @@ use Mautic\CoreBundle\Exception\SchemaException;
 use Mautic\LeadBundle\Entity\LeadField;
 use Mautic\LeadBundle\Field\Exception\AbortColumnCreateException;
 use Mautic\LeadBundle\Helper\FieldAliasHelper;
+use Mautic\LeadBundle\Field\Exception\AbortColumnUpdateException;
 use Mautic\LeadBundle\Model\FieldModel;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\HttpFoundation\Request;
@@ -289,10 +290,20 @@ class FieldController extends FormController
                     }
 
                     if ($valid) {
-                        // form is valid so process the data
-                        $model->saveEntity($field, $this->getFormButton($form, ['buttons', 'save'])->isClicked());
+                        $flashMessage = 'mautic.core.notice.updated';
 
-                        $this->addFlashMessage('mautic.core.notice.updated', [
+                        //form is valid so process the data
+                        try {
+                            $model->saveEntity($field, $this->getFormButton($form, ['buttons', 'save'])->isClicked());
+                        } catch (AbortColumnUpdateException) {
+                            $flashMessage = 'mautic.lead.field.update_pushed_to_background';
+                        } catch (SchemaException $e) {
+                            $flashMessage = $e->getMessage();
+                            $form['alias']->addError(new FormError($e->getMessage()));
+                            $valid = false;
+                        }
+
+                        $this->addFlash($flashMessage, [
                             '%name%'      => $field->getLabel(),
                             '%menu_link%' => 'mautic_contactfield_index',
                             '%url%'       => $this->generateUrl('mautic_contactfield_action', [
@@ -361,6 +372,7 @@ class FieldController extends FormController
             }
 
             $clone = clone $entity;
+            $clone->setId(null);
             $clone->setIsPublished(false);
             $clone->setIsFixed(false);
             $fieldAliasHelper->makeAliasUnique($clone);

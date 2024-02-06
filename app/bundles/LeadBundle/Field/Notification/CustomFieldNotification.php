@@ -37,6 +37,27 @@ class CustomFieldNotification
         $this->addToNotificationCenter($user, $message, $header);
     }
 
+    /**
+     * @param LeadField $leadField
+     * @param int       $userId
+     */
+    public function customFieldWasUpdated(LeadField $leadField, $userId)
+    {
+        try {
+            $user = $this->getUser($userId);
+        } catch (NoUserException $e) {
+            return;
+        }
+
+        $message = $this->translator->trans(
+            'mautic.lead.field.notification.updated_message',
+            ['%label%' => $leadField->getLabel()]
+        );
+        $header  = $this->translator->trans('mautic.lead.field.notification.updated_header');
+
+        $this->addToNotificationCenter($user, $message, $header);
+    }
+
     public function customFieldLimitWasHit(LeadField $leadField, ?int $userId): void
     {
         try {
