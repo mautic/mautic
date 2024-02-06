@@ -16,7 +16,8 @@ class EmailPermissions extends AbstractPermissions
                 'sendtodnc' => 2,
             ],
         ];
-        $this->addStandardPermissions(['categories', 'emails']);
+        $this->addStandardPermissions('categories');
+        $this->addExtendedPermissions('emails');
     }
 
     public function getName(): string
