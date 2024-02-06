@@ -215,8 +215,6 @@ class OwnerSubscriberTest extends TestCase
 
     /**
      * @param mixed[] $parameterMap
-     *
-     * @return MauticFactory&MockObject
      */
     protected function getMockFactory(bool $mailIsOwner = true, array $parameterMap = []): MauticFactory|MockObject
     {
