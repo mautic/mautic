@@ -4,31 +4,23 @@ declare(strict_types=1);
 
 namespace Mautic\LeadBundle\Tests\Command;
 
-use Exception;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
-use Mautic\LeadBundle\Command\SegmentCountCacheCommand;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadList;
-use Mautic\LeadBundle\Entity\LeadListRepository;
 use Mautic\LeadBundle\Entity\LeadRepository;
 use Mautic\LeadBundle\Entity\ListLead;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Symfony\Component\Console\Tester\ApplicationTester;
-use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\Response;
 
-class SegmentFilterOnUpdateCommandFunctionalTest extends MauticMysqlTestCase
+final class SegmentFilterOnUpdateCommandFunctionalTest extends MauticMysqlTestCase
 {
-    /**
-     * @throws Exception
-     */
     public function testSegmentFilterOnUpdateCommand(): void
     {
         $application = new Application(self::$kernel);
         $application->setAutoExit(false);
         $applicationTester = new ApplicationTester($application);
 
-        $contacts   = $this->saveContacts();
+        $this->saveContacts();
         $segmentA   = $this->saveSegmentA();
         $segmentAId = $segmentA->getId();
 
@@ -45,6 +37,9 @@ class SegmentFilterOnUpdateCommandFunctionalTest extends MauticMysqlTestCase
         self::assertCount(3, $this->em->getRepository(ListLead::class)->findBy(['list' => $segmentBId]));
     }
 
+    /**
+     * @return Lead[]
+     */
     private function saveContacts(): array
     {
         // Add 10 contacts
@@ -66,11 +61,8 @@ class SegmentFilterOnUpdateCommandFunctionalTest extends MauticMysqlTestCase
 
     private function saveSegmentA(): LeadList
     {
-        // Add 1 segment
-        /** @var LeadListRepository $contactRepo */
-        $segmentRepo = $this->em->getRepository(LeadList::class);
-        $segment     = new LeadList();
-        $filters     = [
+        $segment = new LeadList();
+        $filters = [
             [
                 'object'     => 'lead',
                 'glue'       => 'and',
@@ -130,20 +122,19 @@ class SegmentFilterOnUpdateCommandFunctionalTest extends MauticMysqlTestCase
         ];
 
         $segment->setName('Segment A')
+            ->setPublicName('Segment A')
             ->setFilters($filters)
             ->setAlias('segment-a');
-        $segmentRepo->saveEntity($segment);
+        $this->em->persist($segment);
+        $this->em->flush();
 
         return $segment;
     }
 
     private function saveSegmentB(int $segmentAId): LeadList
     {
-        // Add 1 segment
-        /** @var LeadListRepository $contactRepo */
-        $segmentRepo = $this->em->getRepository(LeadList::class);
-        $segment     = new LeadList();
-        $filters     = [
+        $segment = new LeadList();
+        $filters = [
             [
                 'object'     => 'lead',
                 'glue'       => 'and',
@@ -187,9 +178,11 @@ class SegmentFilterOnUpdateCommandFunctionalTest extends MauticMysqlTestCase
         ];
 
         $segment->setName('Segment B')
+            ->setPublicName('Segment B')
             ->setFilters($filters)
             ->setAlias('segment-b');
-        $segmentRepo->saveEntity($segment);
+        $this->em->persist($segment);
+        $this->em->flush();
 
         return $segment;
     }

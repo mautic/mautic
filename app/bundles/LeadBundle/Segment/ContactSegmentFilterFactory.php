@@ -13,7 +13,7 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class ContactSegmentFilterFactory
 {
-    public const CUSTOM_OPERATOR             = 'custom_operator';
+    public const CUSTOM_OPERATOR = 'custom_operator';
 
     /**
      * @var array|string[]
@@ -96,11 +96,11 @@ class ContactSegmentFilterFactory
     }
 
     /**
-     * Merge multiple filters of same field with OR
+     * Merge multiple filters of same field with OR.
      *
-     * @param array<string, mixed> $filters
+     * @param mixed[] $filters
      *
-     * @return array<string, mixed>
+     * @return mixed[]
      */
     private function mergeFilters(array $filters): array
     {
@@ -112,7 +112,7 @@ class ContactSegmentFilterFactory
         foreach ($filters as $filter) {
             // easy to compare
             $key = implode('_', [
-                $filter['object'],
+                $filter['object'] ?? '',
                 $filter['field'],
                 $filter['glue'],
                 $filter['operator'],
@@ -126,7 +126,7 @@ class ContactSegmentFilterFactory
                 array_push($arrStacks[$key], $filter);
             } else { // glue = and
                 // if 'or' followed by 'and', it becomes - or (cond1 and cond2)
-                if (isset($arrStacks[$previousKey]) && count($arrStacks[$previousKey]) > 0) {
+                if (isset($arrStacks[$previousKey]) && count($arrStacks[$previousKey]) > 0) { /** @phpstan-ignore-line `Comparison operation ">" between 0 and 0 is always false.` I don't see anything wrong. Seems to be a PHPSTAN issue https://github.com/phpstan/phpstan/issues/3831 */
                     $previousFilter = array_pop($arrStacks[$previousKey]);
                     array_push($shrinkedFilters, $previousFilter);
                 }
@@ -149,9 +149,9 @@ class ContactSegmentFilterFactory
     }
 
     /**
-     * @param array<string, mixed> $stack
+     * @param mixed[] $stack
      *
-     * @return array<string, mixed>
+     * @return mixed[]
      */
     private function groupFilters(array $stack): array
     {
