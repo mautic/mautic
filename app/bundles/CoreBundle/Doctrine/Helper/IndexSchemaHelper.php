@@ -127,29 +127,6 @@ class IndexSchemaHelper
     }
 
     /**
-     * @param mixed  $columns
-     * @param string $name
-     * @param array  $options
-     *
-     * @return self
-     *
-     * @throws \Doctrine\DBAL\Schema\SchemaException
-     */
-    public function dropIndex($columns, $name, $options = [])
-    {
-        $textColumns = $this->getTextColumns($columns);
-
-        if (!empty($textColumns)) {
-            $index = new Index($this->prefix.$name, $textColumns, false, false, $options);
-            if ($this->table->hasIndex($this->prefix.$name)) {
-                $this->dropIndexes[] = $index;
-            }
-        }
-
-        return $this;
-    }
-
-    /**
      * Execute changes.
      */
     public function executeChanges(): void
