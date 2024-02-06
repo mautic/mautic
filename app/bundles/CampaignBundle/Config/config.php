@@ -378,8 +378,9 @@ return [
         ],
     ],
     'parameters' => [
-        'campaign_time_wait_on_event_false' => 'PT1H',
-        'campaign_use_summary'              => 0,
-        'campaign_by_range'                 => 0,
+        'campaign_time_wait_on_event_false'       => 'PT1H',
+        'campaign_use_summary'                    => 0,
+        'campaign_by_range'                       => 0,
+        'delete_campaign_event_log_in_background' => false,
     ],
 ];
