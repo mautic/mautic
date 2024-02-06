@@ -23,10 +23,7 @@ class TokenReplacementEvent extends CommonEvent
      */
     protected $tokens = [];
 
-    /**
-     * @var ?Stat
-     */
-    private $stat;
+    private ?Stat $stat = null;
 
     /**
      * @param CommonEntity|string|null $content

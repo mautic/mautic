@@ -118,8 +118,7 @@ class HitRepository extends CommonRepository
     /**
      * Get an array of hits via an email clickthrough.
      *
-     * @param \DateTime $fromDate
-     * @param int       $code
+     * @param int $code
      */
     public function getEmailClickthroughHitCount($emailIds, \DateTime $fromDate = null, $code = 200): array
     {
@@ -250,7 +249,6 @@ class HitRepository extends CommonRepository
      * Get the number of bounces.
      *
      * @param array|string $pageIds
-     * @param \DateTime    $fromDate
      * @param bool         $isVariantCheck
      *
      * @return mixed[]
@@ -546,8 +544,7 @@ class HitRepository extends CommonRepository
                 ->setParameter('trackingId', $trackingId);
         }
 
-        $result = $q->executeQuery()
-            ->fetchColumn();
+        $result = $q->executeQuery()->fetchOne();
 
         return $result ? new \DateTime($result, new \DateTimeZone('UTC')) : null;
     }

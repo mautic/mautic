@@ -11,10 +11,7 @@ class ReplyEvent extends \Symfony\Contracts\EventDispatcher\Event
 {
     private ?\Symfony\Component\HttpFoundation\Response $response = null;
 
-    /**
-     * @var ?LeadEventLog
-     */
-    private $eventLog;
+    private ?LeadEventLog $eventLog = null;
 
     /**
      * ReplyEvent constructor.
