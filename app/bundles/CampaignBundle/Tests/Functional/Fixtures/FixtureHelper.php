@@ -10,13 +10,10 @@ use Mautic\CampaignBundle\Entity\Event;
 use Mautic\CampaignBundle\Entity\Lead as CampaignLead;
 use Mautic\LeadBundle\Entity\Lead;
 
-class FixtureHelper
+final class FixtureHelper
 {
-    private EntityManagerInterface $em;
-
-    public function __construct(EntityManagerInterface $em)
+    public function __construct(private EntityManagerInterface $em)
     {
-        $this->em = $em;
     }
 
     public function createContact(string $email): Lead
@@ -52,7 +49,7 @@ class FixtureHelper
         return $campaign;
     }
 
-    public function createCampaignWithScheduledEvent(Campaign $campaign, int $interval = 1, string $intervalUnit = 'd', \DateTime $hour = null): Event
+    public function createCampaignWithScheduledEvent(Campaign $campaign, int $interval = 1, string $intervalUnit = 'd', \DateTimeInterface $hour = null): Event
     {
         if (!$campaign->getId()) {
             $this->em->flush();

@@ -88,9 +88,9 @@ class ScheduledExecutioner implements ExecutionerInterface, ResetInterface
      * @throws Scheduler\Exception\NotSchedulableException
      * @throws \Doctrine\ORM\Query\QueryException
      */
-    public function executeByIds(array $logIds, OutputInterface $output = null, \DateTime $now = null)
+    public function executeByIds(array $logIds, OutputInterface $output = null, \DateTimeInterface $now = null)
     {
-        $now           = $now ?: new \DateTime();
+        $now           = $now ?? $this->now ?? new \DateTime();
         $this->output  = $output ?: new NullOutput();
         $this->counter = new Counter();
 
