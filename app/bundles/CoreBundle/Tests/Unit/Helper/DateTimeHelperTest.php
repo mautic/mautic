@@ -72,4 +72,58 @@ class DateTimeHelperTest extends \PHPUnit\Framework\TestCase
         $date->setTimezone(new \DateTimeZone($timezone));
         $this->assertEquals($date->format('P'), $helper->getLocalTimezoneOffset());
     }
+
+    public function testGetDiff(): void
+    {
+        // Initialize DateTimeHelper with a specific date and timezone
+        $dateTimeHelper = new DateTimeHelper('2023-01-01 12:00:00', DateTimeHelper::FORMAT_DB, 'UTC');
+
+        // Test default behavior with 'now' as compare and no format
+        $interval = $dateTimeHelper->getDiff();
+        $this->assertInstanceOf(\DateInterval::class, $interval);
+
+        // Test with custom compare date and no format
+        $customDate = new \DateTime('2023-01-02 12:00:00', new \DateTimeZone('UTC'));
+        $interval   = $dateTimeHelper->getDiff($customDate);
+        $this->assertEquals(1, $interval->days);
+
+        // Test with custom compare date and format
+        $formattedInterval = $dateTimeHelper->getDiff($customDate, '%a');
+        $this->assertEquals('1', $formattedInterval);
+
+        // Test with resetTime set to true
+        $interval = $dateTimeHelper->getDiff($customDate, null, true);
+        $this->assertEquals(0, $interval->h);
+    }
+
+    public function testGetDiffWithNowAndResetTime(): void
+    {
+        // Set a non-default timezone for the DateTimeHelper object
+        $nonDefaultTimezone = new \DateTimeZone('Asia/Tokyo');
+        $dateTimeHelper     = new DateTimeHelper('2023-01-01 12:00:00', DateTimeHelper::FORMAT_DB, $nonDefaultTimezone->getName());
+
+        // Get the difference with 'now' and $resetTime set to true
+        $interval = $dateTimeHelper->getDiff('now', null, true);
+
+        // Get the current time in the non-default timezone with time reset to midnight
+        $nowInNonDefaultTimezone = new \DateTime('now', $nonDefaultTimezone);
+        $nowInNonDefaultTimezone->setTime(0, 0, 0);
+
+        // Get the time from the DateTimeHelper object with time reset to midnight
+        $dateTimeFromHelper = clone $dateTimeHelper->getDateTime();
+        $dateTimeFromHelper->setTime(0, 0, 0);
+
+        // Calculate the expected difference in days
+        $expectedInterval = $nowInNonDefaultTimezone->diff($dateTimeFromHelper);
+        $expectedDays     = (int) $expectedInterval->format('%R%a');
+
+        // Assert that the interval days match the expected difference
+        $this->assertEquals($expectedDays, (int) $interval->format('%R%a'));
+
+        // Assert that the interval hours are zero since times were reset
+        $this->assertEquals(0, $interval->h);
+
+        // Assert that the interval has the correct timezone
+        $this->assertEquals($nonDefaultTimezone->getName(), $dateTimeHelper->getDateTime()->getTimezone()->getName());
+    }
 }
