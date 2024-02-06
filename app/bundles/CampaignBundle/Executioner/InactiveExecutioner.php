@@ -128,6 +128,10 @@ class InactiveExecutioner implements ExecutionerInterface
         if (!$this->campaign->isPublished()) {
             throw new NoEventsFoundException();
         }
+
+        if ($this->campaign->isDeleted()) {
+            throw new NoEventsFoundException();
+        }
     }
 
     /**
@@ -185,13 +189,13 @@ class InactiveExecutioner implements ExecutionerInterface
             try {
                 // We need the parent ID of the decision in order to fetch the time the contact executed this event
                 $parentEvent   = $decisionEvent->getParent();
-                $parentEventId = ($parentEvent) ? $parentEvent->getId() : null;
+                $parentEventId = $parentEvent && !$parentEvent->isDeleted() ? $parentEvent->getId() : null;
 
                 // Ge the first batch of contacts
                 $contacts = $this->inactiveContactFinder->getContacts($this->campaign->getId(), $decisionEvent, $this->limiter);
 
                 // Loop over all contacts till we've processed all those applicable for this decision
-                while ($contacts && $contacts->count()) {
+                while ($contacts->count()) {
                     // Get the max contact ID before any are removed
                     $batchMinContactId = max($contacts->getKeys()) + 1;
 

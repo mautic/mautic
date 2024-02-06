@@ -9,11 +9,12 @@ use Doctrine\ORM\OptimisticLockException;
 use Mautic\CampaignBundle\Command\SummarizeCommand;
 use Mautic\CampaignBundle\Entity\Campaign;
 use Mautic\CampaignBundle\Entity\Event;
+use Mautic\CampaignBundle\Entity\LeadEventLog;
 use Mautic\CampaignBundle\Entity\Lead as CampaignLead;
 use Mautic\CampaignBundle\Model\CampaignModel;
 use Mautic\CampaignBundle\Tests\Campaign\AbstractCampaignTest;
-use Mautic\EmailBundle\Entity\Email;
 use Mautic\LeadBundle\Entity\Lead;
+use Mautic\EmailBundle\Entity\Email;
 use PHPUnit\Framework\Assert;
 use Symfony\Component\DomCrawler\Crawler;
 use Symfony\Component\HttpFoundation\Request;
@@ -256,6 +257,67 @@ class CampaignControllerFunctionalTest extends AbstractCampaignTest
         Assert::assertSame($expectedSuccessPercent.'%', $actionCounts['successPercent']);
         Assert::assertSame($expectedCompleted, (int) $actionCounts['completed']);
         Assert::assertSame($expectedPending, (int) $actionCounts['pending']);
+    }
+
+    public function testDeleteCampaign(): void
+    {
+        $lead              = $this->createLead();
+        $campaign          = $this->createCampaign();
+        $event             = $this->createEvent('Event 1', $campaign);
+        $this->createEventLog($lead, $event, $campaign);
+
+        $this->client->request(Request::METHOD_POST, '/s/campaigns/delete/'.$campaign->getId());
+
+        $response = $this->client->getResponse();
+        Assert::assertSame(Response::HTTP_OK, $response->getStatusCode(), $response->getContent());
+
+        $eventLogs = $this->em->getRepository(LeadEventLog::class)->findAll();
+        Assert::assertCount(0, $eventLogs);
+    }
+
+    private function createLead(): Lead
+    {
+        $lead = new Lead();
+        $lead->setFirstname('Test');
+        $this->em->persist($lead);
+        $this->em->flush();
+
+        return $lead;
+    }
+
+    private function createCampaign(): Campaign
+    {
+        $campaign = new Campaign();
+        $campaign->setName('My campaign');
+        $this->em->persist($campaign);
+        $this->em->flush();
+
+        return $campaign;
+    }
+
+    private function createEvent(string $name, Campaign $campaign): Event
+    {
+        $event = new Event();
+        $event->setName($name);
+        $event->setCampaign($campaign);
+        $event->setType('email.send');
+        $event->setEventType('action');
+        $this->em->persist($event);
+        $this->em->flush();
+
+        return $event;
+    }
+
+    private function createEventLog(Lead $lead, Event $event, Campaign $campaign): LeadEventLog
+    {
+        $leadEventLog = new LeadEventLog();
+        $leadEventLog->setLead($lead);
+        $leadEventLog->setEvent($event);
+        $leadEventLog->setCampaign($campaign);
+        $this->em->persist($leadEventLog);
+        $this->em->flush();
+
+        return $leadEventLog;
     }
 
     /**

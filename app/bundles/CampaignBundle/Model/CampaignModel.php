@@ -64,7 +64,7 @@ class CampaignModel extends CommonFormModel
      */
     public function getRepository()
     {
-        $repo = $this->em->getRepository(\Mautic\CampaignBundle\Entity\Campaign::class);
+        $repo = $this->em->getRepository(Campaign::class);
         $repo->setCurrentUser($this->userHelper->getUser());
 
         return $repo;
@@ -75,7 +75,7 @@ class CampaignModel extends CommonFormModel
      */
     public function getEventRepository()
     {
-        return $this->em->getRepository(\Mautic\CampaignBundle\Entity\Event::class);
+        return $this->em->getRepository(Event::class);
     }
 
     /**
@@ -132,18 +132,45 @@ class CampaignModel extends CommonFormModel
     }
 
     /**
-     * @param object $entity
+     * Delete an array of campaigns.
+     *
+     * @param int[] $campaignIds
+     *
+     * @return array<int,Campaign>
      */
+    public function deleteEntities($campaignIds): array
+    {
+        $entities = [];
+        foreach ($campaignIds as $campaignId) {
+            $campaign = $this->getEntity($campaignId);
+            if ($campaign) {
+                $entities[$campaignId] = $campaign;
+                $this->deleteEntity($campaign);
+            }
+        }
+
+        return $entities;
+    }
+
     public function deleteEntity($entity): void
     {
         // Null all the event parents for this campaign to avoid database constraints
         $this->getEventRepository()->nullEventParents($entity->getId());
+        $this->dispatchEvent('pre_delete', $entity);
+        $this->getRepository()->setCampaignAsDeleted($entity->getId());
 
-        parent::deleteEntity($entity);
+        $this->dispatcher->dispatch(new Events\DeleteCampaign($entity), CampaignEvents::ON_CAMPAIGN_DELETE);
+    }
+
+    public function deleteCampaign(Campaign $campaign): void
+    {
+        $campaign->deletedId = $campaign->getId();
+        $this->getRepository()->deleteEntity($campaign);
+        $this->dispatchEvent('post_delete', $campaign);
     }
 
     /**
-     * @throws \Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException
+     * @throws MethodNotAllowedHttpException
      */
     protected function dispatchEvent($action, &$entity, $isNew = false, \Symfony\Contracts\EventDispatcher\Event $event = null): ?\Symfony\Contracts\EventDispatcher\Event
     {
@@ -421,7 +448,7 @@ class CampaignModel extends CommonFormModel
                         $entity->addList($this->em->getReference(\Mautic\LeadBundle\Entity\LeadList::class, $id));
                         break;
                     case 'forms':
-                        $entity->addForm($this->em->getReference(\Mautic\FormBundle\Entity\Form::class, $id));
+                        $entity->addForm($this->em->getReference(Form::class, $id));
                         break;
                     default:
                         break;
@@ -436,7 +463,7 @@ class CampaignModel extends CommonFormModel
                         $entity->removeList($this->em->getReference(\Mautic\LeadBundle\Entity\LeadList::class, $id));
                         break;
                     case 'forms':
-                        $entity->removeForm($this->em->getReference(\Mautic\FormBundle\Entity\Form::class, $id));
+                        $entity->removeForm($this->em->getReference(Form::class, $id));
                         break;
                     default:
                         break;

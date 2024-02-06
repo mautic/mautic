@@ -140,7 +140,7 @@ class LeadField extends FormEntity implements CacheInvalidateInterface
 
         $builder->setTable('lead_fields')
             ->setCustomRepositoryClass(LeadFieldRepository::class)
-            ->addIndex(['object'], 'search_by_object');
+            ->addIndex(['object', 'field_order', 'is_published'], 'idx_object_field_order_is_published');
 
         $builder->addId();
 

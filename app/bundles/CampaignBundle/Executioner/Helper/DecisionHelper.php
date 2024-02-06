@@ -43,7 +43,7 @@ class DecisionHelper
         // Check if parent taken path is the path of this event, otherwise exit
         $parentEvent = $event->getParent();
 
-        if (null !== $parentEvent && null !== $event->getDecisionPath()) {
+        if (null !== $parentEvent && !$parentEvent->isDeleted() && null !== $event->getDecisionPath()) {
             $rotation    = $this->leadRepository->getContactRotations([$contact->getId()], $event->getCampaign()->getId());
             $log         = $parentEvent->getLogByContactAndRotation($contact, $rotation);
 
