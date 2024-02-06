@@ -126,6 +126,7 @@ class DateTimeHelperTest extends \PHPUnit\Framework\TestCase
         // Assert that the interval has the correct timezone
         $this->assertEquals($nonDefaultTimezone->getName(), $dateTimeHelper->getDateTime()->getTimezone()->getName());
     }
+<<<<<<< HEAD
 
     public function testAddMethodModifiesOriginalDateTime(): void
     {
@@ -243,4 +244,6 @@ class DateTimeHelperTest extends \PHPUnit\Framework\TestCase
         // Assert that the original DateTime object remains unchanged
         $this->assertEquals($originalDate, $originalDateTime->format(DateTimeHelper::FORMAT_DB));
     }
+=======
+>>>>>>> beca7e681d (fix: [DPMMA-2401] Use object's timezone when comparing with 'now' in DateTimeHelper)
 }
